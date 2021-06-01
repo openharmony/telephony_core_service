@@ -1,0 +1,39 @@
+/*
+ * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#ifndef OHOS_NS_NETWORK_NOTIFY_H
+#define OHOS_NS_NETWORK_NOTIFY_H
+#include <singleton.h>
+#include "network_state.h"
+#include "signal_information.h"
+#include "telephony_state_registry_proxy.h"
+
+namespace OHOS {
+class NetworkSearchNotify {
+    DECLARE_DELAYED_SINGLETON(NetworkSearchNotify)
+    static const int RESET_CONNECTS = 5;
+    static const int RESET_CONNECT_SLEEP_TIME = 5;
+
+public:
+    void ConnectService();
+    bool ResetConnectService();
+    void NotifyNetworkStateUpdated(const sptr<NetworkState> &networkState);
+    void NotifySignalInfoUpdated(const std::vector<sptr<SignalInformation>> &signalInfos);
+
+private:
+    sptr<TelephonyState::ITelephonyStateNotify> telephonyStateNotify_ = nullptr;
+};
+} // namespace OHOS
+
+#endif // OHOS_NS_NETWORK_NOTIFY_H

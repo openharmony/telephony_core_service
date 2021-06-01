@@ -1,0 +1,48 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+module_output_path = "//base/telephony/core_service/common/telephonydfx"
+
+ohos_unittest("TelephonySAPreferencesTest") {
+  module_out_path = module_output_path
+
+  sources = [ "//base/telephony/core_service/common/preferences/src/preferences_utils.cpp" ]
+
+  sources += [ "telephony_preferences_test.cpp" ]
+
+  configs = [
+    "//base/telephony/core_service/common:telephony_common_config",
+    "//base/telephony/core_service/common/test:common_test_config",
+  ]
+
+  deps = [
+    "//foundation/distributeddatamgr/appdatamgr/interfaces/innerkits/native_preferences:native_preferences",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  part_name = "core_service"
+}
+
+group("unittest") {
+  testonly = true
+
+  deps = [ ":TelephonySAPreferencesTest" ]
+}
