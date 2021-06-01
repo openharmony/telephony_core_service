@@ -1,0 +1,44 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/ohos.gni")
+SUBSYSTEM_DIR = "//base/telephony"
+TEST_DIR = "$SUBSYSTEM_DIR/core_service/interfaces/kits/test"
+ohos_executable("tel_core_service_api_test") {
+  subsystem_name = "telephony"
+  part_name = "core_service"
+
+  sources = [ "$TEST_DIR/core_service_api_test.cpp" ]
+
+  include_dirs = [
+    "$TEST_DIR",
+    "$SUBSYSTEM_DIR/core_service/interfaces/kits/include",
+    "//third_party/node/src",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/common",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/proxy",
+    "$SUBSYSTEM_DIR/core_service/include",
+    "$SUBSYSTEM_DIR/ril_adapter/interfaces/innerkits",
+  ]
+
+  deps = [
+    "$SUBSYSTEM_DIR/core_service:tel_core_service",
+    "$SUBSYSTEM_DIR/core_service/interfaces/kits:tel_core_service_api",
+    "//utils/native/base:utils",
+  ]
+
+  external_deps = [
+    "appexecfwk_standard:libeventhandler",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr_L2:samgr_proxy",
+  ]
+}
