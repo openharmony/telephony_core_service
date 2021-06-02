@@ -74,20 +74,6 @@ The telephony core service module needs to provide APIs for related modules, inc
 <td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry165mcpsimpp0"><a name="entry165mcpsimpp0"></a><a name="entry165mcpsimpp0"></a>None</p>
 </td>
 </tr>
-<tr id="row170mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p4330155518336"><a name="p4330155518336"></a><a name="p4330155518336"></a>function isSimActive(slotId: number, callback: AsyncCallback&lt;boolean&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="p18501459133319"><a name="p18501459133319"></a><a name="p18501459133319"></a>Checks whether a SIM card is active.</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry173mcpsimpp0"><a name="entry173mcpsimpp0"></a><a name="entry173mcpsimpp0"></a>None</p>
-</td>
-</tr>
-<tr id="row174mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p1829010144347"><a name="p1829010144347"></a><a name="p1829010144347"></a>function getSimIccId(slotId: number, callback: AsyncCallback&lt;string&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="entry176mcpsimpp0"><a name="entry176mcpsimpp0"></a><a name="entry176mcpsimpp0"></a>Obtains the Circuit Card Identification Number (CCID) of the SIM card.</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry177mcpsimpp0"><a name="entry177mcpsimpp0"></a><a name="entry177mcpsimpp0"></a>ohos.permission.GET_TELEPHONY_STATE</p>
-</td>
-</tr>
 <tr id="row178mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="entry179mcpsimpp0"><a name="entry179mcpsimpp0"></a><a name="entry179mcpsimpp0"></a>function getISOCountryCodeForSim(slotId: number, callback: AsyncCallback&lt;string&gt;): void;</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="entry180mcpsimpp0"><a name="entry180mcpsimpp0"></a><a name="entry180mcpsimpp0"></a>Obtains the country code.</p>
@@ -228,12 +214,8 @@ The function of querying the status of a specified SIM card is used as an exampl
 
 ## Repositories Involved<a name="section409mcpsimp"></a>
 
-Telephony
+[Telephony](https://gitee.com/openharmony/docs/blob/master/en/readme/telephony.md)
 
-telephony_core_service
+**telephony_core_service**
 
-telephony_ril_adapter
-
-telephony_sms_mms
-
-telephony_cellular_data
+[telephony_sms_mms](https://gitee.com/openharmony/telephony_sms_mms/blob/master/README.md)
