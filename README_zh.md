@@ -74,20 +74,6 @@
 <td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry165mcpsimpp0"><a name="entry165mcpsimpp0"></a><a name="entry165mcpsimpp0"></a>无</p>
 </td>
 </tr>
-<tr id="row170mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p4330155518336"><a name="p4330155518336"></a><a name="p4330155518336"></a>function isSimActive(slotId: number, callback: AsyncCallback&lt;boolean&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="p18501459133319"><a name="p18501459133319"></a><a name="p18501459133319"></a>获取卡是否处于激活态</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry173mcpsimpp0"><a name="entry173mcpsimpp0"></a><a name="entry173mcpsimpp0"></a>无</p>
-</td>
-</tr>
-<tr id="row174mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p1829010144347"><a name="p1829010144347"></a><a name="p1829010144347"></a>function getSimIccId(slotId: number, callback: AsyncCallback&lt;string&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="entry176mcpsimpp0"><a name="entry176mcpsimpp0"></a><a name="entry176mcpsimpp0"></a>获取卡序列号</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry177mcpsimpp0"><a name="entry177mcpsimpp0"></a><a name="entry177mcpsimpp0"></a>ohos.permission.GET_TELEPHONY_STATE</p>
-</td>
-</tr>
 <tr id="row178mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="entry179mcpsimpp0"><a name="entry179mcpsimpp0"></a><a name="entry179mcpsimpp0"></a>function getISOCountryCodeForSim(slotId: number, callback: AsyncCallback&lt;string&gt;): void;</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="entry180mcpsimpp0"><a name="entry180mcpsimpp0"></a><a name="entry180mcpsimpp0"></a>获取国家码</p>
@@ -228,12 +214,8 @@
 
 ## 相关仓<a name="section409mcpsimp"></a>
 
-电话服务子系统
+[电话服务子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E7%94%B5%E8%AF%9D%E6%9C%8D%E5%8A%A1%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
 
-telephony_core_service
+**telephony_core_service**
 
-telephony_ril_adapter
-
-telephony_sms_mms
-
-telephony_cellular_data
+[telephony_sms_mms](https://gitee.com/openharmony/telephony_sms_mms/blob/master/README_zh.md)
