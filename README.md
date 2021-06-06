@@ -33,7 +33,7 @@ As shown in the preceding figure, the telephony core service consists of the SIM
 ## Directory Structure<a name="section129mcpsimp"></a>
 
 ```
-/OpenHarmony_Standard_System/base/telphony/core_service
+/base/telphony/core_service
 ├── interfaces             # APIs
 │   ├── innerkits          # Internal APIs
 │   └── kits               # External APIs (such as JS APIs)
