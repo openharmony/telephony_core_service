@@ -33,7 +33,7 @@
 ## 目录<a name="section129mcpsimp"></a>
 
 ```
-/OpenHarmony_Standard_System/base/telphony/core_service
+/base/telphony/core_service
 ├── interfaces             # 接口目录
 │   ├── innerkits          # 部件间的内部接口
 │   └── kits               # 对应用提供的接口（例如JS接口）
