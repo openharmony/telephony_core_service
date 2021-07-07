@@ -33,7 +33,7 @@ static bool InitRadioNetworkManager()
     if (g_radioNetworkManager == nullptr) {
         g_radioNetworkManager = std::make_unique<RadioNetworkManager>();
     }
-    return g_radioNetworkManager != nullptr;
+    return g_radioNetworkManager->IsConnect();
 }
 
 static char *GetChars(std::string str)
