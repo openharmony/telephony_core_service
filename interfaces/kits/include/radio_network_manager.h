@@ -35,10 +35,11 @@ public:
     std::u16string GetOperatorNumeric(int32_t slotId);
     std::u16string GetOperatorName(int32_t slotId);
     sptr<NetworkState> GetNetworkStatus(int32_t slotId);
+    bool IsConnect();
+    int32_t ConnectService(); 
 
 private:
     sptr<ICoreService> radioNetworkService_;
-    int32_t ConnectService();
 };
 } // namespace OHOS
 #endif // RADIO_NETWORK_MANAGER_H

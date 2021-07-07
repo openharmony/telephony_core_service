@@ -25,6 +25,11 @@ RadioNetworkManager::RadioNetworkManager()
     ConnectService();
 }
 
+bool RadioNetworkManager::IsConnect()
+{
+    return radioNetworkService_ != nullptr;
+}
+
 RadioNetworkManager::~RadioNetworkManager() {}
 
 int32_t RadioNetworkManager::GetPsRadioTech(int32_t slotId)
