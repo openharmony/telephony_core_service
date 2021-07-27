@@ -150,7 +150,8 @@ static void ExecGetRadioTechCallback(const napi_env env, const napi_status statu
         }
         napi_value callback = nullptr;
         napi_get_reference_value(env, asyncContext.callbackRef, &callback);
-        napi_call_function(env, nullptr, callback, 2, callbackValue, nullptr);
+	napi_value resultValue = nullptr;
+        napi_call_function(env, nullptr, callback, 2, callbackValue, &resultValue);
         HiLog::Debug(LABEL, "ExecGetRadioTechCallback no deferred end");
     }
     napi_delete_reference(env, asyncContext.callbackRef);
@@ -308,7 +309,8 @@ static void ExecGetSignalInfoListCallback(napi_env env, napi_status status, Asyn
         }
         napi_value callback = nullptr;
         napi_get_reference_value(env, asyncContext.callbackRef, &callback);
-        napi_call_function(env, nullptr, callback, 2, callbackValue, nullptr);
+	napi_value resultValue = nullptr;
+        napi_call_function(env, nullptr, callback, 2, callbackValue, &resultValue);
         napi_delete_reference(env, asyncContext.callbackRef);
     }
     delete &asyncContext;
@@ -399,7 +401,8 @@ static void ExecGetNetworkStateCallback(napi_env env, napi_status status, AsyncC
         }
         napi_value callback = nullptr;
         napi_get_reference_value(env, asyncContext.callbackRef, &callback);
-        napi_call_function(env, nullptr, callback, 2, callbackValue, nullptr);
+	napi_value resultValue = nullptr;
+        napi_call_function(env, nullptr, callback, 2, callbackValue, &resultValue);
     }
     napi_delete_reference(env, asyncContext.callbackRef);
     delete &asyncContext;
