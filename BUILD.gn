@@ -92,7 +92,7 @@ ohos_shared_library("tel_core_service") {
     "aafwk_standard:want",
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
-    "ces_standard:cesfwk_kits",
+    "ces_standard:cesfwk_core",
     "ces_standard:cesfwk_services",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

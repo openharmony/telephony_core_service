@@ -47,7 +47,7 @@ ohos_executable("tel_sim_test") {
 
   external_deps = [
     "appexecfwk_standard:libeventhandler",
-    "ces_standard:cesfwk_kits",
+    "ces_standard:cesfwk_innerkits",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_L2:samgr_proxy",
