@@ -47,7 +47,7 @@ int32_t PhoneManager ::Init()
 
 void PhoneManager ::ReleasePhone()
 {
-    TELEPHONY_INFO_LOG("PhoneManager  ReleasePhone phone_.size():%{public}d", phone_.size());
+    TELEPHONY_INFO_LOG("PhoneManager  ReleasePhone phone_.size():%{public}zu", phone_.size());
     if (phone_.size() != 0) {
         phone_.clear();
     }
