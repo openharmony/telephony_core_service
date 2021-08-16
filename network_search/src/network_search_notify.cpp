@@ -83,7 +83,7 @@ void NetworkSearchNotify::NotifyNetworkStateUpdated(const sptr<NetworkState> &ne
 
 void NetworkSearchNotify::NotifySignalInfoUpdated(const std::vector<sptr<SignalInformation>> &signalInfos)
 {
-    HILOG_INFO("NotifySignalInfoUpdated~~~ signalInfos.size=%{public}d\n", signalInfos.size());
+    HILOG_INFO("NotifySignalInfoUpdated~~~ signalInfos.size=%{public}zu\n", signalInfos.size());
 
     if (telephonyStateNotify_ != nullptr) {
         int32_t result = telephonyStateNotify_->UpdateSignalInfo(0, 0, signalInfos);
