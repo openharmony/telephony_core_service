@@ -12,96 +12,99 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "network_search_notify.h"
 #include <unistd.h>
-#include "hilog_network_search.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
+namespace Telephony {
 NetworkSearchNotify::NetworkSearchNotify() {};
 NetworkSearchNotify::~NetworkSearchNotify() {};
 void NetworkSearchNotify::ConnectService()
 {
-    HILOG_INFO("NetworkSearchNotify GetProxy ... ");
+    TELEPHONY_LOGI("NetworkSearchNotify GetProxy ... ");
     sptr<ISystemAbilityManager> systemAbilityMgr =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityMgr == nullptr) {
-        HILOG_INFO("NetworkSearchNotify Get ISystemAbilityManager failed ... ");
+        TELEPHONY_LOGI("NetworkSearchNotify Get ISystemAbilityManager failed ... ");
         return;
     }
+
     sptr<IRemoteObject> remote = systemAbilityMgr->CheckSystemAbility(TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID);
     if (remote) {
-        sptr<TelephonyState::ITelephonyStateNotify> telephonyService =
-            iface_cast<TelephonyState::ITelephonyStateNotify>(remote);
+        sptr<ITelephonyStateNotify> telephonyService = iface_cast<ITelephonyStateNotify>(remote);
         telephonyStateNotify_ = telephonyService;
-        HILOG_INFO("NetworkSearchNotify Get TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID succ ...");
+        TELEPHONY_LOGI("NetworkSearchNotify Get TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID success ...");
     } else {
-        HILOG_INFO("NetworkSearchNotify Get TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID fail ...");
+        TELEPHONY_LOGI("NetworkSearchNotify Get TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID fail ...");
     }
 }
 
 bool NetworkSearchNotify::ResetConnectService()
 {
-    HILOG_INFO("NetworkSearchNotify ResetConnectService ...");
+    TELEPHONY_LOGI("NetworkSearchNotify ResetConnectService ...");
     for (int i = 1; i <= RESET_CONNECTS; ++i) {
         ConnectService();
         if (telephonyStateNotify_ != nullptr) {
-            HILOG_INFO("NetworkSearchNotify ResetConnectService suc...");
+            TELEPHONY_LOGI("NetworkSearchNotify ResetConnectService suc...");
             return true;
         }
         usleep(RESET_CONNECT_SLEEP_TIME * i);
     }
-    HILOG_INFO("NetworkSearchNotify ResetConnectService fail...");
+    TELEPHONY_LOGI("NetworkSearchNotify ResetConnectService fail...");
     return false;
 }
 
 void NetworkSearchNotify::NotifyNetworkStateUpdated(const sptr<NetworkState> &networkState)
 {
-    HILOG_INFO("NotifyNetworkStateUpdated~~~\n");
-
+    TELEPHONY_LOGI("NotifyNetworkStateUpdated~~~\n");
+    int simId = 1;
     if (telephonyStateNotify_ != nullptr) {
-        int32_t result = telephonyStateNotify_->UpdateNetworkState(0, 0, networkState);
-        HILOG_INFO("NotifyNetworkStateUpdated ret %{public}d", result);
+        int32_t result = telephonyStateNotify_->UpdateNetworkState(simId, networkState);
+        TELEPHONY_LOGI("NotifyNetworkStateUpdated ret %{public}d", result);
         if (result != 0) {
             ResetConnectService();
             if (telephonyStateNotify_ != nullptr) {
-                telephonyStateNotify_->UpdateNetworkState(0, 0, networkState);
+                telephonyStateNotify_->UpdateNetworkState(simId, networkState);
                 return;
             }
         }
     } else {
         ResetConnectService();
         if (telephonyStateNotify_ != nullptr) {
-            telephonyStateNotify_->UpdateNetworkState(0, 0, networkState);
+            telephonyStateNotify_->UpdateNetworkState(simId, networkState);
             return;
         }
-        HILOG_INFO("NotifyNetworkStateUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found\n");
+        TELEPHONY_LOGI("NotifyNetworkStateUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found\n");
     }
 }
 
 void NetworkSearchNotify::NotifySignalInfoUpdated(const std::vector<sptr<SignalInformation>> &signalInfos)
 {
-    HILOG_INFO("NotifySignalInfoUpdated~~~ signalInfos.size=%{public}d\n", signalInfos.size());
-
+    TELEPHONY_LOGI("NotifySignalInfoUpdated~~~ signalInfos size=%{public}zu\n", signalInfos.size());
+    int simId = 1;
     if (telephonyStateNotify_ != nullptr) {
-        int32_t result = telephonyStateNotify_->UpdateSignalInfo(0, 0, signalInfos);
-        HILOG_INFO("NotifySignalInfoUpdated ret %{public}d", result);
+        int32_t result = telephonyStateNotify_->UpdateSignalInfo(simId, signalInfos);
+        TELEPHONY_LOGI("NotifySignalInfoUpdated ret %{public}d", result);
         if (result != 0) {
             ResetConnectService();
             if (telephonyStateNotify_ != nullptr) {
-                telephonyStateNotify_->UpdateSignalInfo(0, 0, signalInfos);
+                telephonyStateNotify_->UpdateSignalInfo(simId, signalInfos);
                 return;
             }
         }
     } else {
         ResetConnectService();
         if (telephonyStateNotify_ != nullptr) {
-            telephonyStateNotify_->UpdateSignalInfo(0, 0, signalInfos);
+            telephonyStateNotify_->UpdateSignalInfo(simId, signalInfos);
             return;
         }
-        HILOG_INFO("NotifySignalInfoUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found\n");
+        TELEPHONY_LOGI("NotifySignalInfoUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found\n");
     }
 }
+} // namespace Telephony
 } // namespace OHOS

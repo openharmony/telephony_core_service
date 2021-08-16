@@ -12,17 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef CORE_SERVICE_HDF_DEATH_RECIPIENT_H
-#define CORE_SERVICE_HDF_DEATH_RECIPIENT_H
 
+#ifndef HDF_DEATH_RECIPIENT_H
+#define HDF_DEATH_RECIPIENT_H
+
+#include <unistd.h>
 #include <ipc_object_stub.h>
 
 namespace OHOS {
+namespace Telephony {
 class HdfDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
-    HdfDeathRecipient();
+    HdfDeathRecipient(int32_t slotId);
     ~HdfDeathRecipient() = default;
     void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+
+private:
+    int32_t slotId_;
 };
+} // namespace Telephony
 } // namespace OHOS
-#endif // CORE_SERVICE_HDF_DEATH_RECIPIENT_H
+#endif // HDF_DEATH_RECIPIENT_H

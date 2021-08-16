@@ -12,23 +12,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef SMS_DELIVERY_SHORT_MESSAGE_PROXY_H
 #define SMS_DELIVERY_SHORT_MESSAGE_PROXY_H
+
 #include "i_delivery_short_message_callback.h"
 #include "iremote_object.h"
 #include "iremote_proxy.h"
+
+#ifndef EFAIL
+#define EFAIL (-1)
+#endif
+
 namespace OHOS {
-namespace SMS {
-class SmsDeliveryShortMessageProxy : public IRemoteProxy<SMS::IDeliveryShortMessageCallback> {
+namespace Telephony {
+class SmsDeliveryShortMessageProxy : public IRemoteProxy<IDeliveryShortMessageCallback> {
 public:
     explicit SmsDeliveryShortMessageProxy(const sptr<IRemoteObject> &impl);
     virtual ~SmsDeliveryShortMessageProxy() = default;
-    virtual int32_t OnSmsDeliveryResult(const std::u16string pdu) override;
+    virtual void OnSmsDeliveryResult(const std::u16string pdu) override;
 
 protected:
 private:
     static inline BrokerDelegator<SmsDeliveryShortMessageProxy> delegator_;
 };
-} // namespace SMS
+} // namespace Telephony
 } // namespace OHOS
 #endif

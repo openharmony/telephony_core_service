@@ -12,66 +12,86 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_I_TELEPHONY_STATE_NOTIFY_H
 #define OHOS_I_TELEPHONY_STATE_NOTIFY_H
 
 #include "telephony_observer_broker.h"
 
 namespace OHOS {
-namespace TelephonyState {
+namespace Telephony {
 class ITelephonyStateNotify : public IRemoteBroker {
 public:
     enum {
-        SIGNAL_INFO = 2,
-        NET_WORK_TYPE = 3,
-        NET_WORK_STATE = 4,
-        CALL_STATE = 5,
-        CALL_STATE_FOR_ID = 6,
-        ADD_OBSERVER = 7,
-        REMOVE_OBSERVER = 8,
+        CELL_INFO = 0,
+        CELLULAR_DATA,
+        SIGNAL_INFO,
+        NET_WORK_STATE,
+        CALL_STATE,
+        CALL_STATE_FOR_ID,
+        SIM_STATE,
+        ADD_OBSERVER,
+        REMOVE_OBSERVER
     };
+
+    /**
+     * UpdateCellularDataConnectState
+     *
+     * @param simId sim data id
+     * @param dataState cellular data link state
+     * @param networkState network state
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t UpdateCellularDataConnectState(int32_t simId, int32_t dataState, int32_t networkState) = 0;
+
+    /**
+     * UpdateSimState
+     *
+     * @param simId sim data id
+     * @param state sim state
+     * @param reason
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t UpdateSimState(int32_t simId, int32_t state, const std::u16string &reason) = 0;
+
     /**
      * UpdateCallState
      *
      * @param callStatus call status
      * @param number call number
-     * @return int32_t TELEPHONY_NO_ERROR on success, others on failure.
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     virtual int32_t UpdateCallState(int32_t callStatus, const std::u16string &number) = 0;
 
     /**
-     * UpdateCallStateForSlotIndex
+     * UpdateCallStateForSimId
      *
      * @param simId sim data id
-     * @param slotIndex slot index
+     * @param callId call id
      * @param callStatus call status
      * @param number incoming number
-     * @return int32_t TELEPHONY_NO_ERROR on success, others on failure.
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t UpdateCallStateForSlotIndex(
-        int32_t simId, int32_t slotIndex, int32_t callStatus, const std::u16string &incomingNumber) = 0;
+    virtual int32_t UpdateCallStateForSimId(
+        int32_t simId, int32_t callId, int32_t callStatus, const std::u16string &incomingNumber) = 0;
 
     /**
      * UpdateSignalInfo
      *
      * @param simId sim data id
-     * @param slotIndex slot index
      * @param vec networkType search signal information
-     * @return int32_t TELEPHONY_NO_ERROR on success, others on failure.
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t UpdateSignalInfo(
-        int32_t simId, int32_t slotIndex, const std::vector<sptr<SignalInformation>> &vec) = 0;
+    virtual int32_t UpdateSignalInfo(int32_t simId, const std::vector<sptr<SignalInformation>> &vec) = 0;
 
     /**
      * UpdateNetworkState
      *
      * @param simId sim data id
-     * @param slotIndex slot index
      * @param networkStatus network status
-     * @return int32_t TELEPHONY_NO_ERROR on success, others on failure.
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t UpdateNetworkState(
-        int32_t simId, int32_t slotIndex, const sptr<NetworkState> &networkState) = 0;
+    virtual int32_t UpdateNetworkState(int32_t simId, const sptr<NetworkState> &networkState) = 0;
 
     /**
      * RegisterStateChange
@@ -81,7 +101,7 @@ public:
      * @param mask  listening type bitmask
      * @param package calling Package
      * @param isUpdate Whether to update immediately
-     * @return int32_t TELEPHONY_NO_ERROR on success, others on failure.
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     virtual int32_t RegisterStateChange(const sptr<TelephonyObserverBroker> &telephonyObserver, int32_t simId,
         uint32_t mask, const std::u16string &package, bool isUpdate) = 0;
@@ -91,13 +111,13 @@ public:
      *
      * @param simId sim data id
      * @param mask listening type bitmask
-     * @return int32_t TELEPHONY_NO_ERROR on success, others on failure.
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     virtual int32_t UnregisterStateChange(int32_t simId, uint32_t mask) = 0;
 
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.ipc.ITelephonyStateNotify");
+    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ITelephonyStateNotify");
 };
-} // namespace TelephonyState
+} // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_I_TELEPHONY_STATE_NOTIFY_H
