@@ -50,7 +50,7 @@ bool TelRilData::IsDataRespOrNotify(uint32_t code)
 void TelRilData::ProcessDataRespOrNotify(uint32_t code, OHOS::MessageParcel &data)
 {
     TELEPHONY_INFO_LOG(
-        "TelRilData ProcessDataRespOrNotify code:%{public}d, GetDataSize:%{public}d", code, data.GetDataSize());
+        "TelRilData ProcessDataRespOrNotify code:%{public}u, GetDataSize:%{public}zu", code, data.GetDataSize());
     auto itFunc = memberFuncMap_.find(code);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;

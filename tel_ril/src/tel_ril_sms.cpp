@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <inttypes.h>
 #include "tel_ril_sms.h"
 #include "hdf_death_recipient.h"
 #include "hril_modem_parcel.h"
@@ -54,7 +56,7 @@ bool TelRilSms::IsSmsRespOrNotify(uint32_t code)
 void TelRilSms::ProcessSmsRespOrNotify(uint32_t code, OHOS::MessageParcel &data)
 {
     TELEPHONY_INFO_LOG(
-        "TelRilSms ProcessSmsRespOrNotify code:%{public}d, GetDataSize:%{public}d", code, data.GetDataSize());
+        "TelRilSms ProcessSmsRespOrNotify code:%{public}u, GetDataSize:%{public}zu", code, data.GetDataSize());
     auto itFunc = memberFuncMap_.find(code);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
@@ -149,7 +151,7 @@ void TelRilSms::NewSmsNotify(OHOS::MessageParcel &data)
     smsMessage->ReadFromParcel(data);
     int32_t indicationType = smsMessage->indicationType;
     RilProcessIndication(indicationType);
-    TELEPHONY_DEBUG_LOG("NewSmsNotify indicationType:%{public}d, size:%{public}d, PDU size:%{public}d",
+    TELEPHONY_DEBUG_LOG("NewSmsNotify indicationType:%{public}d, size:%{public}d, PDU size:%{public}zu",
         indicationType, smsMessage->size, smsMessage->pdu.size());
     if (observerHandler_ != nullptr) {
         observerHandler_->NotifyObserver(ObserverHandler::RADIO_GSM_SMS, smsMessage);
@@ -220,7 +222,7 @@ void TelRilSms::SendSmsResponse(OHOS::MessageParcel &data)
         if (radioResponseInfo->error == HRilErrType::NONE) {
             TELEPHONY_DEBUG_LOG("SendSmsResponse GetParam start");
             sendSmsResultInfo->flag = telRilRequest->pointer_->GetParam();
-            TELEPHONY_DEBUG_LOG("SendSmsResponse flag:%{public}lld", telRilRequest->pointer_->GetParam());
+            TELEPHONY_DEBUG_LOG("SendSmsResponse flag:%{public}" PRIu64 "", telRilRequest->pointer_->GetParam());
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
                 TELEPHONY_ERR_LOG("ERROR : SendSmsResponse --> handler == nullptr !!!");

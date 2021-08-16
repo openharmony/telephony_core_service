@@ -60,7 +60,7 @@ bool TelRilNetwork::IsNetworkRespOrNotify(uint32_t code)
 
 void TelRilNetwork::ProcessNetworkRespOrNotify(uint32_t code, OHOS::MessageParcel &data)
 {
-    TELEPHONY_INFO_LOG("TelRilNetwork ProcessNetworkRespOrNotify code:%{public}d, GetDataSize:%{public}d", code,
+    TELEPHONY_INFO_LOG("TelRilNetwork ProcessNetworkRespOrNotify code:%{public}u, GetDataSize:%{public}zu", code,
         data.GetDataSize());
     auto itFunc = memberFuncMap_.find(code);
     if (itFunc != memberFuncMap_.end()) {
@@ -238,7 +238,7 @@ void TelRilNetwork::GetCsRegStatusResponse(OHOS::MessageParcel &data)
     }
     csRegStatusInfo->ReadFromParcel(data);
     TELEPHONY_DEBUG_LOG(
-        "ReadIccFileResponse --> csRegStatusInfo.size:%{public}d,"
+        "ReadIccFileResponse --> csRegStatusInfo.size:%{public}zu,"
         " csRegStatusInfo->regStatus:%{public}d, csRegStatusInfo->radioTechnology:%{public}d",
         sizeof(csRegStatusInfo), csRegStatusInfo->regStatus, csRegStatusInfo->radioTechnology);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);

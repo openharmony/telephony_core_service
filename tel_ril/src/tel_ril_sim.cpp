@@ -51,7 +51,7 @@ bool TelRilSim::IsSimRespOrNotify(uint32_t code)
 void TelRilSim::ProcessSimRespOrNotify(uint32_t code, OHOS::MessageParcel &data)
 {
     TELEPHONY_INFO_LOG(
-        "TelRilSim ProcessSimRespOrNotify code:%{public}d, GetDataSize:%{public}d", code, data.GetDataSize());
+        "TelRilSim ProcessSimRespOrNotify code:%{public}u, GetDataSize:%{public}zu", code, data.GetDataSize());
     auto itFunc = memberFuncMap_.find(code);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;

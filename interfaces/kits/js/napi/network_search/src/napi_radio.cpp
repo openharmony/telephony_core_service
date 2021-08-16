@@ -231,7 +231,7 @@ static int32_t WrapNetworkType(SignalInformation::NetworkType type)
 static bool InitAsyncContext(
     const napi_env env, const size_t parameterCount, const napi_value parameters[], AsyncContext &asyncContext)
 {
-    HiLog::Error(LABEL, "InitAsyncContext parameterCount=%{public}d", parameterCount);
+    HiLog::Error(LABEL, "InitAsyncContext parameterCount=%{public}zu", parameterCount);
     if (parameterCount == TelephonyNapi::NONE_PARAMTER) {
         asyncContext.slotId = GetDefaultSlotId();
         return true;

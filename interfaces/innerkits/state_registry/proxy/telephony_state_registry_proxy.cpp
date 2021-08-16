@@ -102,7 +102,7 @@ int32_t TelephonyStateRegistryProxy::UpdateSignalInfo(
         result = TELEPHONY_FAIL;
         return result;
     }
-    printf("TelephonyStateRegistryProxy::UpdateSignalInfo##vec.size = %d\n", vec.size());
+    printf("TelephonyStateRegistryProxy::UpdateSignalInfo##vec.size = %zu\n", vec.size());
     if (!in.WriteInt32(static_cast<int32_t>(vec.size()))) {
         result = TELEPHONY_FAIL;
         return result;
