@@ -13,21 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_NETWORK_STATE_H
-#define OHOS_NETWORK_STATE_H
-#include <memory>
-#include <string>
-#include <vector>
+#ifndef NETWORK_STATE_H
+#define NETWORK_STATE_H
+
 #include "parcel.h"
+
 namespace OHOS {
+namespace Telephony {
 #define MSG_NS_SPN_UPDATED 0xF1
 const std::string SPN_INFO_UPDATED_ACTION = "ohos.action.telephonySpnInfoUpdated";
 const std::string CUR_PLMN = "CUR_PLMN";
 const std::string CUR_PLMN_SHOW = "CUR_PLMN_SHOW";
+const std::string CUR_SPN = "CUR_SPN";
+const std::string CUR_SPN_SHOW = "CUR_SPN_SHOW";
+const std::string CUR_REG_STATE = "CUR_REG_STATE";
+const std::string CUR_SPN_SHOW_RULE = "CUR_SPN_SHOW_RULE";
 
 typedef enum {
     DOMAIN_TYPE_PS,
-    DOMAIN_TYPE_CS,
+    DOMAIN_TYPE_CS
 } DomainType;
 
 typedef enum {
@@ -35,22 +39,24 @@ typedef enum {
     REG_STATE_IN_SERVICE,
     REG_STATE_NO_SERVICE,
     REG_STATE_EMERGENCY_ONLY,
-    REG_STATE_SEARCH,
+    REG_STATE_SEARCH
 } RegServiceState;
 
 typedef enum {
+    ROAMING_STATE_UNKNOWN,
     ROAMING_STATE_UNSPEC,
-    ROAMING_STATE_HOME_ONLY,
     ROAMING_STATE_DOMESTIC,
-    ROAMING_STATE_INTERNATIONAL,
+    ROAMING_STATE_INTERNATIONAL
 } RoamingType;
 
 typedef enum {
     RADIO_TECHNOLOGY_UNKNOWN,
     RADIO_TECHNOLOGY_GSM,
-    RADIO_TECHNOLOGY_1XRTT,
     RADIO_TECHNOLOGY_WCDMA,
+    RADIO_TECHNOLOGY_LTE
 } RadioTech;
+
+typedef enum { MODE_TYPE_UNKNOWN = -1, MODE_TYPE_AUTO = 0, MODE_TYPE_MANUAL = 1 } SelectionMode;
 
 const int NETWORK_MAX_NAME_LEN = 15;
 const int NETWORK_MAX_FULL_NAME_LEN = 31;
@@ -70,74 +76,71 @@ public:
     bool operator==(const NetworkState &other) const;
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
-    static std::unique_ptr<NetworkState> UnMarshalling(Parcel &parcel);
+    static NetworkState *Unmarshalling(Parcel &parcel);
     void SetOperatorInfo(const std::string &longName, const std::string &shortName, const std::string &numeric,
-        const DomainType domainType);
+        DomainType domainType);
     void SetEmergency(bool isEmergency);
     void SetNetworkType(RadioTech tech, DomainType domainType);
+    void SetRoaming(RoamingType roamingType, DomainType domainType);
     void SetNetworkState(RegServiceState state, DomainType domainType);
-    int32_t GetPsRegStatus();
-    int32_t GetCsRegStatus();
-
+    int32_t GetPsRegStatus() const;
+    int32_t GetCsRegStatus() const;
+    int32_t GetPsRoamingStatus() const;
+    int32_t GetCsRoamingStatus() const;
     /*
      * Obtains RAT of the PS domain on the registered network.
      * @return Returns RAT of the PS domain on the registered network
      */
-    int32_t GetPsRadioTech();
+    int32_t GetPsRadioTech() const;
 
     /*
      * Obtains RAT of the CS domain on the registered network.
      * @return Returns RAT of the CS domain on the registered network
      */
-    int32_t GetCsRadioTech();
+    int32_t GetCsRadioTech() const;
 
     /*
      * Obtains the operator name in the long alphanumeric format of the registered network.
      * @return Returns operator name in the long alphanumeric format
      */
-    std::string GetLongOperatorName();
+    std::string GetLongOperatorName() const;
 
     /*
      * Obtains the operator name in the short alphanumeric format of the registered network.
      * @return Returns operator name in the short alphanumeric format
      */
-    std::string GetShortOperatorName();
+    std::string GetShortOperatorName() const;
 
     /*
      * Obtains the PLMN code of the registered network.
      * @return Returns the PLMN code
      */
-    std::string GetPlmnNumeric();
+    std::string GetPlmnNumeric() const;
 
     /*
      * Obtains the network registration status of the device.
      * @return Returns the network registration status
      */
-    int32_t GetRegStatus();
-
-    /*
-     * Obtains the NSA network registration status of the device.
-     * @return Returns the NSA network registration status
-     */
-    int32_t GetNsaState();
-
-    /*
-     * Obtains the status of CA.
-     * @return Returns the status of CA.
-     */
-    bool IsCaActive();
+    int32_t GetRegStatus() const;
 
     /*
      * Checks whether this device is allowed to make emergency calls only.
      * @return Returns the device emergency calls state.
      */
-    bool IsEmergency();
+    bool IsEmergency() const;
 
     /*
      * Checks whether the device is roaming.
      * @return Returns roaming state.
      */
-    bool IsRoaming();
+    bool IsRoaming() const;
+
+    /*
+     * Obtains the network plmn status
+     * @return Returns the network plmn status
+     */
+    int32_t GetNetworkPlmnState() const;
+    std::string ToString() const;
 
 private:
     bool isEmergency_;
@@ -150,5 +153,6 @@ private:
     RadioTech psRadioTech_;
     RadioTech csRadioTech_;
 };
+} // namespace Telephony
 } // namespace OHOS
-#endif // OHOS_NS_NETWORK_STATE_H
+#endif // NETWORK_STATE_H

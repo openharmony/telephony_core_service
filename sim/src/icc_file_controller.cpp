@@ -12,12 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "icc_file_controller.h"
+
 using namespace std;
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
-namespace SIM {
+namespace Telephony {
 IccFileController::IccFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
     : AppExecFwk::EventHandler(runner)
 {}
@@ -26,7 +28,10 @@ void IccFileController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &even
 {
     int id = 0;
     id = event->GetInnerEventId();
-    TELEPHONY_INFO_LOG("IccFileController ProcessEvent Id is %{public}d", id);
+    TELEPHONY_LOGI("IccFileController ProcessEvent Id is %{public}d", id);
+    if (ProcessErrorResponse(event)) {
+        return;
+    }
     switch (id) {
         case MSG_SIM_OBTAIN_SIZE_OF_LINEAR_ELEMENTARY_FILE_DONE:
             ProcessLinearRecordSize(event);
@@ -40,6 +45,8 @@ void IccFileController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &even
         case MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE:
             ProcessReadRecord(event);
             break;
+        case MSG_SIM_UPDATE_LINEAR_FIXED_FILE_DONE:
+        case MSG_SIM_UPDATE_TRANSPARENT_ELEMENTARY_FILE_DONE:
         case MSG_SIM_OBTAIN_TRANSPARENT_ELEMENTARY_FILE_DONE:
             ProcessReadBinary(event);
             break;
@@ -54,20 +61,20 @@ void IccFileController::ProcessLinearRecordSize(const AppExecFwk::InnerEvent::Po
     std::string path = NULLSTR;
     auto eventId = event->GetInnerEventId();
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    const AppExecFwk::InnerEvent::Pointer &response = rcvMsg->controlHolder->fileLoaded;
+    const AppExecFwk::InnerEvent::Pointer &process = rcvMsg->controlHolder->fileLoaded;
     IccFileData *result = &(rcvMsg->fileData);
     std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
     path = hd->filePath;
-    const char *cdata = (result->resultData).c_str();
-    char *pdata = const_cast<char *>(cdata);
-    unsigned char *data = reinterpret_cast<unsigned char *>(pdata); // for unsigned int bitwise
+    const char *iccDdata = (result->resultData).c_str();
+    char *rawData = const_cast<char *>(iccDdata);
+    unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData); // for unsigned int bitwise
 
-    if (IsValidSizeData(data)) {
+    if (IsValidSizeData(fileData)) {
         int fileSize[] = {0, 0, 0};
-        ParseFileSize(fileSize, RECORD_NUM, data);
-        SendEfLinearResult(response, fileSize, RECORD_NUM);
+        ParseFileSize(fileSize, RECORD_NUM, fileData);
+        SendEfLinearResult(process, fileSize, RECORD_NUM);
     } else {
-        TELEPHONY_INFO_LOG("IccFileTypeMismatch --%d", eventId);
+        TELEPHONY_LOGI("IccFileTypeMismatch Error type %{public}d", eventId);
     }
 }
 
@@ -79,46 +86,43 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     IccFileData *result = &(rcvMsg->fileData);
     std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
-    const char *cdata = (result->resultData).c_str();
-    char *pdata = const_cast<char *>(cdata);
-    unsigned char *data = reinterpret_cast<unsigned char *>(pdata); // for unsigned int bitwise
+    const char *iccDdata = (result->resultData).c_str();
+    char *rawData = const_cast<char *>(iccDdata);
+    unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData); // for unsigned int bitwise
 
-    path = hd->filePath;
-    if (path.empty()) {
-        path = ObtainElementFilePath(hd->fileId);
+    path = CheckRightPath(hd->filePath, hd->fileId);
+    if (!IsValidSizeData(fileData)) {
+        TELEPHONY_LOGE("ProcessRecordSize get error filetype");
     }
-    if (!IsValidSizeData(data)) {
-        return;
-    }
-    GetFileAndDataSize(data, hd->fileSize, size);
+    GetFileAndDataSize(fileData, hd->fileSize, size);
     if (hd->fileSize != 0) {
         hd->countFiles = size / hd->fileSize;
     }
-    if (hd->getAll) {
-        hd->fileResults.resize(hd->countFiles);
+    TELEPHONY_LOGI("ProcessRecordSize  %{public}d %{public}d %{public}d", size, hd->fileSize, hd->countFiles);
+    if (rilManager_ != nullptr) {
+        rilManager_->RequestSimIO(CONTROLLER_REQ_READ_RECORD, hd->fileId, hd->fileNum, ICC_FILE_CURRENT_MODE,
+            hd->fileSize, NULLSTR, path, CreatePointer(MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE, hd));
     }
-    rilManager_->ReadIccFile(CONTROLLER_REQ_READ_RECORD, hd->fileId, path, hd->fileNum, ICC_FILE_CURRENT_MODE,
-        hd->fileSize, NULLSTR, NULLSTR, aid_, CreatePointer(MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE, hd));
 }
 
 void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer &event)
 {
     std::string str = NULLSTR;
     std::string path = NULLSTR;
-    TELEPHONY_INFO_LOG("IccFileController::ProcessBinarySize init--");
+    TELEPHONY_LOGI("IccFileController::ProcessBinarySize init");
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     bool isNull = rcvMsg->controlHolder == nullptr;
-    TELEPHONY_INFO_LOG("IccFileController::ProcessBinarySize get point--%{public}d", isNull);
     const AppExecFwk::InnerEvent::Pointer &evt = rcvMsg->controlHolder->fileLoaded;
     isNull = evt->GetOwner() == nullptr;
-    TELEPHONY_INFO_LOG("IccFileController::ProcessBinarySize prepare--%{public}d", isNull);
     int fileId = rcvMsg->arg1;
     int size = 0;
-    AppExecFwk::InnerEvent::Pointer response =
+    AppExecFwk::InnerEvent::Pointer process =
         CreatePointer(MSG_SIM_OBTAIN_TRANSPARENT_ELEMENTARY_FILE_DONE, fileId, 0, evt);
-    rilManager_->ReadIccFile(CONTROLLER_REQ_READ_BINARY, fileId, ObtainElementFilePath(fileId), 0, 0, size,
-        NULLSTR, NULLSTR, aid_, response);
-    TELEPHONY_INFO_LOG("IccFileController::ProcessBinarySize finish--%{public}d", fileId);
+    if (rilManager_ != nullptr) {
+        rilManager_->RequestSimIO(
+            CONTROLLER_REQ_READ_BINARY, fileId, 0, 0, size, NULLSTR, ObtainElementFilePath(fileId), process);
+    }
+    TELEPHONY_LOGI("IccFileController::ProcessBinarySize finish %{public}d", fileId);
 }
 
 void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer &event)
@@ -126,23 +130,20 @@ void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer 
     std::string str = NULLSTR;
     std::string path = NULLSTR;
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    const AppExecFwk::InnerEvent::Pointer &response = rcvMsg->controlHolder->fileLoaded;
+    const AppExecFwk::InnerEvent::Pointer &process = rcvMsg->controlHolder->fileLoaded;
     IccFileData *result = &(rcvMsg->fileData);
     std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
-    path = hd->filePath;
-    if (path.empty()) {
-        path = ObtainElementFilePath(hd->fileId);
-    }
-
-    if (hd->getAll) {
+    TELEPHONY_LOGI("ProcessReadRecord %{public}d %{public}d %{public}d %{public}s", hd->getAllFile, hd->fileNum,
+        hd->countFiles, result->resultData.c_str());
+    path = CheckRightPath(hd->filePath, hd->fileId);
+    if (hd->getAllFile) {
         hd->fileResults.push_back(result->resultData);
         hd->fileNum++;
         if (hd->fileNum > hd->countFiles) {
-            SendMultiRecordResult(response, hd->fileResults);
+            SendMultiRecordResult(process, hd->fileResults);
         } else {
-            rilManager_->ReadIccFile(CONTROLLER_REQ_READ_RECORD, hd->fileId, path, hd->fileNum,
-                ICC_FILE_CURRENT_MODE, hd->fileSize, NULLSTR, NULLSTR, aid_,
-                CreatePointer(MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE, hd));
+            rilManager_->RequestSimIO(CONTROLLER_REQ_READ_RECORD, hd->fileId, hd->fileNum, ICC_FILE_CURRENT_MODE,
+                hd->fileSize, NULLSTR, path, CreatePointer(MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE, hd));
         }
     } else {
         SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
@@ -151,12 +152,12 @@ void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer 
 
 void IccFileController::ProcessReadBinary(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_INFO_LOG("IccFileController MSG_SIM_OBTAIN_TRANSPARENT_ELEMENTARY_FILE_DONE");
+    TELEPHONY_LOGI("IccFileController MSG_SIM_OBTAIN_TRANSPARENT_ELEMENTARY_FILE_DONE");
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
 }
 
-std::string IccFileController::GetCommonElementFilePath(int efId)
+std::string IccFileController::ObtainElementFileForPublic(int efId)
 {
     std::string mf = MASTER_FILE_SIM;
     switch (efId) {
@@ -167,7 +168,6 @@ std::string IccFileController::GetCommonElementFilePath(int efId)
         case ELEMENTARY_FILE_EXT1:
         case ELEMENTARY_FILE_EXT2:
         case ELEMENTARY_FILE_EXT3:
-        case ELEMENTARY_FILE_PSI:
             mf.append(DEDICATED_FILE_TELECOM);
             return mf;
         case ELEMENTARY_FILE_ICCID:
@@ -187,145 +187,167 @@ std::string IccFileController::GetCommonElementFilePath(int efId)
     return NULLSTR;
 }
 
-// implementation GetTransparentFile
-void IccFileController::GetTransparentFile(int fileId, AppExecFwk::InnerEvent::Pointer &event)
+// implementation ObtainBinaryFile
+void IccFileController::ObtainBinaryFile(int fileId, const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_INFO_LOG("IccFileController::GetTransparentFile start");
-    AppExecFwk::InnerEvent::Pointer response =
+    TELEPHONY_LOGI("IccFileController::ObtainBinaryFile start");
+    AppExecFwk::InnerEvent::Pointer process =
         CreatePointer(MSG_SIM_OBTAIN_SIZE_OF_TRANSPARENT_ELEMENTARY_FILE_DONE, fileId, 0, event);
-    rilManager_->ReadIccFile(CONTROLLER_REQ_GET_RESPONSE, fileId, ObtainElementFilePath(fileId), 0, 0,
-        GET_RESPONSE_ELEMENTARY_FILE_SIZE_BYTES, NULLSTR, NULLSTR, aid_, response);
-    TELEPHONY_INFO_LOG("IccFileController::GetTransparentFile end");
+    if (rilManager_ != nullptr) {
+        rilManager_->RequestSimIO(CONTROLLER_REQ_GET_RESPONSE, fileId, 0, 0,
+            GET_RESPONSE_ELEMENTARY_FILE_SIZE_BYTES, NULLSTR, ObtainElementFilePath(fileId), process);
+    }
+    TELEPHONY_LOGI("IccFileController::ObtainBinaryFile end");
 }
 
-void IccFileController::GetTransparentFile(int fileId, int size, AppExecFwk::InnerEvent::Pointer &event)
+void IccFileController::ObtainBinaryFile(int fileId, int size, const AppExecFwk::InnerEvent::Pointer &event)
 {
-    AppExecFwk::InnerEvent::Pointer response =
+    AppExecFwk::InnerEvent::Pointer process =
         CreatePointer(MSG_SIM_OBTAIN_TRANSPARENT_ELEMENTARY_FILE_DONE, fileId, 0, event);
-    rilManager_->ReadIccFile(CONTROLLER_REQ_READ_BINARY, fileId, ObtainElementFilePath(fileId), 0, 0, size,
-        NULLSTR, NULLSTR, aid_, response);
+    if (rilManager_ != nullptr) {
+        rilManager_->RequestSimIO(
+            CONTROLLER_REQ_READ_BINARY, fileId, 0, 0, size, NULLSTR, ObtainElementFilePath(fileId), process);
+    }
 }
 
-void IccFileController::GetTransparentFile(int fileId, std::string path, AppExecFwk::InnerEvent::Pointer &event)
+// implementation ObtainLinearFixedFile
+void IccFileController::ObtainLinearFixedFile(
+    int fileId, const std::string &path, int fileNum, const AppExecFwk::InnerEvent::Pointer &event)
 {
-    SendResponse(nullptr, nullptr);
-}
-
-// implementation GetFixedLinearFile
-void IccFileController::GetFixedLinearFile(
-    int fileId, std::string path, int fileNum, AppExecFwk::InnerEvent::Pointer &event)
-{
-    std::string efPath = (path.empty()) ? ObtainElementFilePath(fileId) : path;
+    std::string filePath = CheckRightPath(path, fileId);
     std::shared_ptr<IccControllerHolder> ctrlHolder =
-        std::make_shared<IccControllerHolder>(fileId, fileNum, efPath);
+        std::make_shared<IccControllerHolder>(fileId, fileNum, filePath);
     ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(event));
-    AppExecFwk::InnerEvent::Pointer response =
+    AppExecFwk::InnerEvent::Pointer process =
         CreatePointer(MSG_SIM_OBTAIN_SIZE_OF_FIXED_ELEMENTARY_FILE_DONE, ctrlHolder);
-    rilManager_->ReadIccFile(CONTROLLER_REQ_GET_RESPONSE, fileId, efPath, 0, 0,
-        GET_RESPONSE_ELEMENTARY_FILE_SIZE_BYTES, NULLSTR, NULLSTR, aid_, response);
+    if (rilManager_ != nullptr) {
+        rilManager_->RequestSimIO(CONTROLLER_REQ_GET_RESPONSE, fileId, 0, 0,
+            GET_RESPONSE_ELEMENTARY_FILE_SIZE_BYTES, NULLSTR, filePath, process);
+    }
 }
 
-void IccFileController::GetFixedLinearFile(int fileId, int fileNum, AppExecFwk::InnerEvent::Pointer &event)
+void IccFileController::ObtainLinearFixedFile(int fileId, int fileNum, const AppExecFwk::InnerEvent::Pointer &event)
 {
-    GetFixedLinearFile(fileId, ObtainElementFilePath(fileId), fileNum, event);
+    ObtainLinearFixedFile(fileId, ObtainElementFilePath(fileId), fileNum, event);
 }
 
-// implementation GetAllFixedLinearFile
-void IccFileController::GetAllFixedLinearFile(int fileId, std::string path, AppExecFwk::InnerEvent::Pointer &event)
+// implementation ObtainAllLinearFixedFile
+void IccFileController::ObtainAllLinearFixedFile(
+    int fileId, const std::string &path, const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::string efPath = (path.empty()) ? ObtainElementFilePath(fileId) : path;
-    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(fileId, efPath);
+    std::string filePath = CheckRightPath(path, fileId);
+    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(fileId, filePath);
     ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(event));
-    AppExecFwk::InnerEvent::Pointer response =
+    AppExecFwk::InnerEvent::Pointer process =
         CreatePointer(MSG_SIM_OBTAIN_SIZE_OF_FIXED_ELEMENTARY_FILE_DONE, ctrlHolder);
-    rilManager_->ReadIccFile(CONTROLLER_REQ_GET_RESPONSE, fileId, efPath, 0, 0,
-        GET_RESPONSE_ELEMENTARY_FILE_SIZE_BYTES, NULLSTR, NULLSTR, aid_, response);
+    if (rilManager_ != nullptr) {
+        rilManager_->RequestSimIO(CONTROLLER_REQ_GET_RESPONSE, fileId, 0, 0,
+            GET_RESPONSE_ELEMENTARY_FILE_SIZE_BYTES, NULLSTR, filePath, process);
+    }
 }
 
-void IccFileController::GetAllFixedLinearFile(int fileId, AppExecFwk::InnerEvent::Pointer &event)
+void IccFileController::ObtainAllLinearFixedFile(int fileId, const AppExecFwk::InnerEvent::Pointer &event)
 {
-    GetAllFixedLinearFile(fileId, ObtainElementFilePath(fileId), event);
+    ObtainAllLinearFixedFile(fileId, ObtainElementFilePath(fileId), event);
 }
 
-void IccFileController::GetAllFixedLinearFile(int fileId, AppExecFwk::InnerEvent::Pointer &event, bool dedicated)
+void IccFileController::ObtainLinearFileSize(
+    int fileId, const std::string &path, const AppExecFwk::InnerEvent::Pointer &event)
 {
-    SendResponse(nullptr, nullptr);
-}
-
-void IccFileController::GetAllFixedLinearFile(int fileId, int mode, AppExecFwk::InnerEvent::Pointer &event)
-{
-    SendResponse(nullptr, nullptr);
-}
-
-void IccFileController::GetLinearFileSize(int fileId, std::string path, AppExecFwk::InnerEvent::Pointer &event)
-{
-    std::string efPath = (path.empty()) ? ObtainElementFilePath(fileId) : path;
-    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(fileId, efPath);
+    std::string filePath = CheckRightPath(path, fileId);
+    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(fileId, filePath);
     ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(event));
-    AppExecFwk::InnerEvent::Pointer response =
+    AppExecFwk::InnerEvent::Pointer process =
         CreatePointer(MSG_SIM_OBTAIN_SIZE_OF_LINEAR_ELEMENTARY_FILE_DONE, ctrlHolder);
-    rilManager_->ReadIccFile(CONTROLLER_REQ_GET_RESPONSE, fileId, efPath, 0, 0,
-        GET_RESPONSE_ELEMENTARY_FILE_SIZE_BYTES, NULLSTR, NULLSTR, aid_, response);
+    if (rilManager_ != nullptr) {
+        rilManager_->RequestSimIO(CONTROLLER_REQ_GET_RESPONSE, fileId, 0, 0,
+            GET_RESPONSE_ELEMENTARY_FILE_SIZE_BYTES, NULLSTR, filePath, process);
+    }
 }
 
-void IccFileController::GetLinearFileSize(int fileId, AppExecFwk::InnerEvent::Pointer &event)
+void IccFileController::ObtainLinearFileSize(int fileId, const AppExecFwk::InnerEvent::Pointer &event)
 {
-    GetLinearFileSize(fileId, ObtainElementFilePath(fileId), event);
+    ObtainLinearFileSize(fileId, ObtainElementFilePath(fileId), event);
 }
 
-void IccFileController::UpdateFixedLinearFile(int fileId, std::string path, int fileNum, std::string data,
-    int dataLength, std::string pin2, AppExecFwk::InnerEvent::Pointer &onComplete)
+void IccFileController::UpdateLinearFixedFile(int fileId, const std::string &path, int fileNum, std::string data,
+    int dataLength, const std::string pin2, const AppExecFwk::InnerEvent::Pointer &onComplete)
 {
-    std::string efPath = (path.empty()) ? ObtainElementFilePath(fileId) : path;
-    rilManager_->ReadIccFile(CONTROLLER_REQ_UPDATE_RECORD, fileId, efPath, fileNum, ICC_FILE_CURRENT_MODE,
-        dataLength, data, pin2, aid_, onComplete);
+    std::string filePath = CheckRightPath(path, fileId);
+    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(fileId);
+    ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(onComplete));
+    AppExecFwk::InnerEvent::Pointer process = CreatePointer(MSG_SIM_UPDATE_LINEAR_FIXED_FILE_DONE, ctrlHolder);
+    if (rilManager_ != nullptr) {
+        rilManager_->RequestSimIO(CONTROLLER_REQ_UPDATE_RECORD, fileId, fileNum, ICC_FILE_CURRENT_MODE, dataLength,
+            data, filePath, process);
+    }
 }
 
-void IccFileController::UpdateFixedLinearFile(int fileId, int fileNum, std::string data, int dataLength,
-    std::string pin2, AppExecFwk::InnerEvent::Pointer &onComplete)
+void IccFileController::UpdateLinearFixedFile(int fileId, int fileNum, const std::string data, int dataLength,
+    const std::string pin2, const AppExecFwk::InnerEvent::Pointer &onComplete)
 {
-    rilManager_->ReadIccFile(CONTROLLER_REQ_UPDATE_RECORD, fileId, ObtainElementFilePath(fileId), fileNum,
-        ICC_FILE_CURRENT_MODE, dataLength, data, pin2, aid_, onComplete);
+    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(fileId);
+    ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(onComplete));
+    AppExecFwk::InnerEvent::Pointer process = CreatePointer(MSG_SIM_UPDATE_LINEAR_FIXED_FILE_DONE, ctrlHolder);
+    if (rilManager_ != nullptr) {
+        rilManager_->RequestSimIO(CONTROLLER_REQ_UPDATE_RECORD, fileId, fileNum, ICC_FILE_CURRENT_MODE, dataLength,
+            data, ObtainElementFilePath(fileId), process);
+    }
 }
 
-void IccFileController::UpdateTransparentFile(
-    int fileId, std::string data, int dataLength, AppExecFwk::InnerEvent::Pointer &onComplete)
+void IccFileController::UpdateBinaryFile(
+    int fileId, const std::string data, int dataLength, const AppExecFwk::InnerEvent::Pointer &onComplete)
 {
-    rilManager_->ReadIccFile(CONTROLLER_REQ_UPDATE_BINARY, fileId, ObtainElementFilePath(fileId), 0, 0, dataLength,
-        data, NULLSTR, aid_, onComplete);
+    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(fileId);
+    ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(onComplete));
+    AppExecFwk::InnerEvent::Pointer process =
+        CreatePointer(MSG_SIM_UPDATE_TRANSPARENT_ELEMENTARY_FILE_DONE, ctrlHolder);
+    if (rilManager_ != nullptr) {
+        rilManager_->RequestSimIO(
+            CONTROLLER_REQ_UPDATE_BINARY, fileId, 0, 0, dataLength, data, ObtainElementFilePath(fileId), process);
+    }
 }
 
 void IccFileController::SendResponse(std::shared_ptr<IccControllerHolder> holder, const IccFileData *fd)
 {
     if (holder == nullptr || fd == nullptr) {
-        TELEPHONY_ERR_LOG("IccFileController::SendResponse  result is null");
+        TELEPHONY_LOGE("IccFileController::SendResponse  result is null");
         return;
     }
     AppExecFwk::InnerEvent::Pointer &response = holder->fileLoaded;
-    bool isNull = response == nullptr;
-    TELEPHONY_INFO_LOG("IccFileController::SendResponse start response %{public}d", isNull);
+    bool isNull = (response == nullptr);
     auto owner = response->GetOwner();
-    std::unique_ptr<IccFileData> object = std::make_unique<IccFileData>();
-    if (object == nullptr) {
-        TELEPHONY_ERR_LOG("IccFileController::SendResponse  create IccFileData is null");
+    std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
+    int id = response->GetInnerEventId();
+    bool needShare = (id == MSG_SIM_OBTAIN_ICC_FILE_DONE);
+    std::unique_ptr<ControllerToFileMsg> objectUnique = nullptr;
+    std::shared_ptr<ControllerToFileMsg> objectShare = nullptr;
+    TELEPHONY_LOGI("IccFileController::SendResponse start response %{public}d %{public}d", isNull, needShare);
+    if (needShare) {
+        objectShare = std::make_shared<ControllerToFileMsg>(cmdData.get(), fd);
+    } else {
+        objectUnique = std::make_unique<ControllerToFileMsg>(cmdData.get(), fd);
+    }
+
+    if ((objectUnique == nullptr) && (objectShare == nullptr)) {
+        TELEPHONY_LOGE("IccFileController::SendResponse  create ControllerToFileMsg is null");
         return;
     }
-    object->sw1 = fd->sw1;
-    object->sw2 = fd->sw2;
-    object->resultData = fd->resultData;
-    int id = response->GetInnerEventId();
-    int eventParam = 0;
-    isNull = owner == nullptr;
-    TELEPHONY_INFO_LOG("IccFileController::SendResponse owner: %{public}d evtId: %{public}d--", isNull, id);
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(id, object, eventParam);
-    owner->SendEvent(event);
-    TELEPHONY_INFO_LOG("IccFileController::SendResponse send end");
+
+    isNull = (owner == nullptr);
+    TELEPHONY_LOGI("IccFileController::SendResponse owner: %{public}d evtId: %{public}d", isNull, id);
+    if (needShare) {
+        owner->SendEvent(id, objectShare);
+    } else {
+        owner->SendEvent(id, objectUnique);
+    }
+    TELEPHONY_LOGI("IccFileController::SendResponse send end");
 }
 
 void IccFileController::SendEfLinearResult(
     const AppExecFwk::InnerEvent::Pointer &response, const int val[], int len)
 {
-    std::shared_ptr<AppExecFwk::EventHandler> hanler = response->GetOwner();
+    std::shared_ptr<AppExecFwk::EventHandler> handler = response->GetOwner();
     std::shared_ptr<EfLinearResult> object = std::make_shared<EfLinearResult>();
     object->valueData[0] = val[0];
     object->valueData[1] = val[1];
@@ -333,20 +355,21 @@ void IccFileController::SendEfLinearResult(
     int id = response->GetInnerEventId();
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(id, object, eventParam);
-    hanler->SendEvent(event);
+    handler->SendEvent(event);
 }
 
 void IccFileController::SendMultiRecordResult(
     const AppExecFwk::InnerEvent::Pointer &response, std::vector<std::string> &strValue)
 {
-    std::shared_ptr<AppExecFwk::EventHandler> hanler = response->GetOwner();
+    std::shared_ptr<AppExecFwk::EventHandler> handler = response->GetOwner();
     std::shared_ptr<MultiRecordResult> object = std::make_shared<MultiRecordResult>();
     object->fileResults.assign(strValue.begin(), strValue.end());
     object->resultLength = strValue.size();
     int id = response->GetInnerEventId();
     int eventParam = 0;
+    TELEPHONY_LOGI("IccFileController::SendMultiRecordResult send end");
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(id, object, eventParam);
-    hanler->SendEvent(event);
+    handler->SendEvent(event);
 }
 
 AppExecFwk::InnerEvent::Pointer IccFileController::CreatePointer(
@@ -354,7 +377,7 @@ AppExecFwk::InnerEvent::Pointer IccFileController::CreatePointer(
 {
     std::unique_ptr<IccToRilMsg> msgTo = std::make_unique<IccToRilMsg>(holderObject);
     if (msgTo == nullptr) {
-        TELEPHONY_ERR_LOG("IccFileController::CreatePointer1  create null poniter");
+        TELEPHONY_LOGE("IccFileController::CreatePointer1  create null pointer");
         return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
     }
     int64_t eventParam = 0;
@@ -368,7 +391,7 @@ AppExecFwk::InnerEvent::Pointer IccFileController::CreatePointer(
 {
     std::unique_ptr<IccToRilMsg> msgTo = std::make_unique<IccToRilMsg>(holderObject);
     if (msgTo == nullptr) {
-        TELEPHONY_ERR_LOG("IccFileController::CreatePointer2  create null poniter");
+        TELEPHONY_LOGE("IccFileController::CreatePointer2  create null pointer");
         return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
     }
     msgTo->arg1 = arg1;
@@ -385,13 +408,13 @@ AppExecFwk::InnerEvent::Pointer IccFileController::CreatePointer(
     std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(arg1);
     ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(msg));
     bool isNull = ctrlHolder->fileLoaded->GetOwner() == nullptr;
-    TELEPHONY_INFO_LOG("IccFileController::CreatePointer stage init owner: %{public}d", isNull);
+    TELEPHONY_LOGI("IccFileController::CreatePointer stage init owner: %{public}d", isNull);
     std::unique_ptr<IccToRilMsg> msgTo = std::make_unique<IccToRilMsg>(ctrlHolder);
     if (msgTo == nullptr) {
-        TELEPHONY_ERR_LOG("IccFileController::CreatePointer3  create null poniter");
+        TELEPHONY_LOGE("IccFileController::CreatePointer3  create null pointer");
         return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
     }
-    TELEPHONY_INFO_LOG("IccFileController::CreatePointer stage end");
+    TELEPHONY_LOGI("IccFileController::CreatePointer stage end");
     msgTo->arg1 = arg1;
     msgTo->arg2 = arg2;
     int64_t eventParam = 0;
@@ -406,15 +429,16 @@ void IccFileController::ParseFileSize(int val[], int len, const unsigned char *d
         GetFileAndDataSize(data, val[0], val[1]);
         val[MAX_FILE_INDEX] = val[1] / val[0];
     }
+    TELEPHONY_LOGI("ParseFileSize result %{public}d, %{public}d %{public}d", val[0], val[1], val[MAX_FILE_INDEX]);
 }
 bool IccFileController::IsValidSizeData(const unsigned char *data)
 {
     if (ICC_ELEMENTARY_FILE != data[TYPE_OF_FILE]) {
-        TELEPHONY_ERR_LOG("IccFileTypeMismatch ERROR TYPE_OF_FILE");
+        TELEPHONY_LOGE("IccFileTypeMismatch ERROR TYPE_OF_FILE");
         return false;
     }
     if (ELEMENTARY_FILE_TYPE_LINEAR_FIXED != data[STRUCTURE_OF_DATA]) {
-        TELEPHONY_ERR_LOG("IccFileTypeMismatch ERROR STRUCTURE_OF_DATA");
+        TELEPHONY_LOGE("IccFileTypeMismatch ERROR STRUCTURE_OF_DATA");
         return false;
     }
     return true;
@@ -422,15 +446,65 @@ bool IccFileController::IsValidSizeData(const unsigned char *data)
 void IccFileController::GetFileAndDataSize(const unsigned char *data, int &fileSize, int &dataSize)
 {
     if (data != nullptr) {
-        fileSize = data[LENTH_OF_RECORD] & BYTE_NUM;
+        fileSize = data[LENGTH_OF_RECORD] & BYTE_NUM;
         dataSize = ((data[SIZE_ONE_OF_FILE] & BYTE_NUM) << OFFSET) + (data[SIZE_TWO_OF_FILE] & BYTE_NUM);
     }
 }
-void IccFileController::SetRilManager(IRilManager *ril)
+
+void IccFileController::SetRilManager(std::shared_ptr<Telephony::IRilManager> ril)
 {
     rilManager_ = ril;
+    if (rilManager_ == nullptr) {
+        TELEPHONY_LOGE("IccFileController set NULL rilManager!!");
+    }
+}
+
+std::string IccFileController::CheckRightPath(const std::string &path, int fileId)
+{
+    if (path.empty()) {
+        return ObtainElementFilePath(fileId);
+    } else {
+        return path;
+    }
+}
+
+bool IccFileController::ProcessErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<IccFromRilMsg> rcvMsg = event->GetSharedObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        return false;
+    }
+    AppExecFwk::InnerEvent::Pointer &response = rcvMsg->controlHolder->fileLoaded;
+    auto owner = response->GetOwner();
+    int id = response->GetInnerEventId();
+    std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
+    bool needShare = (id == MSG_SIM_OBTAIN_ICC_FILE_DONE);
+    std::unique_ptr<ControllerToFileMsg> objectUnique = nullptr;
+    std::shared_ptr<ControllerToFileMsg> objectShare = nullptr;
+    TELEPHONY_LOGI("ProcessErrorResponse start response %{public}d", needShare);
+    if (needShare) {
+        objectShare = std::make_shared<ControllerToFileMsg>(cmdData.get(), nullptr);
+        objectShare->exception = rcvMsg->fileData.exception;
+    } else {
+        objectUnique = std::make_unique<ControllerToFileMsg>(cmdData.get(), nullptr);
+        objectUnique->exception = rcvMsg->fileData.exception;
+    }
+
+    if ((objectUnique == nullptr) && (objectShare == nullptr)) {
+        TELEPHONY_LOGE("ProcessErrorResponse  create ControllerToFileMsg is null");
+        return true;
+    }
+
+    TELEPHONY_LOGI("ProcessErrorResponse owner: evtId: %{public}d", id);
+    if (needShare) {
+        owner->SendEvent(id, objectShare);
+    } else {
+        owner->SendEvent(id, objectUnique);
+    }
+    TELEPHONY_LOGI("ProcessErrorResponse send end");
+    return true;
 }
 
 IccFileController::~IccFileController() {}
-} // namespace SIM
+} // namespace Telephony
 } // namespace OHOS
