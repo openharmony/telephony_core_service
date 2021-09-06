@@ -32,6 +32,7 @@ ohos_executable("tel_core_service_api_test") {
   deps = [
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/interfaces/kits:tel_core_service_api",
+    "$SUBSYSTEM_DIR/ril_adapter/hril:hril",
     "//utils/native/base:utils",
   ]
 

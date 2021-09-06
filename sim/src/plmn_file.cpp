@@ -15,17 +15,17 @@
 #include "plmn_file.h"
 
 namespace OHOS {
-namespace SIM {
+namespace Telephony {
 PlmnFile::PlmnFile(unsigned char *bytes, int offset)
 {
-    this->plmn_ = SIMUtils::BcdPlmnConvertTostring("", offset);
-    const char *pdata = reinterpret_cast<const char *>(bytes);
-    uint32_t aValue = atoi(pdata + offset + OFFSET_A);
-    uint32_t bValue = atoi(pdata + offset + OFFSET_B);
+    this->plmn_ = SIMUtils::BcdPlmnConvertToString("", offset);
+    const char *plmnData = reinterpret_cast<const char *>(bytes);
+    uint32_t aValue = atoi(plmnData + offset + OFFSET_A);
+    uint32_t bValue = atoi(plmnData + offset + OFFSET_B);
     this->rat_ = (aValue << OFFSET_ALL) | bValue;
 }
 
-PlmnFile::PlmnFile(std::string plmn, int accessTechs)
+PlmnFile::PlmnFile(const std::string &plmn, int accessTechs)
 {
     this->plmn_ = plmn;
     this->rat_ = accessTechs;
@@ -39,11 +39,11 @@ bool PlmnFile::ReadFromParcel(Parcel &parcel)
 bool PlmnFile::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteCString(plmn_.c_str())) {
-        TELEPHONY_INFO_LOG("PlmnFile::Marshalling write source bool to parcel failed");
+        TELEPHONY_LOGE("PlmnFile::Marshalling write source plmn_ to parcel failed");
         return false;
     }
     if (!parcel.WriteInt32(rat_)) {
-        TELEPHONY_INFO_LOG("PlmnFile::Marshalling write source bool to parcel failed");
+        TELEPHONY_LOGE("PlmnFile::Marshalling write source rat_ to parcel failed");
         return false;
     }
     return true;
@@ -55,5 +55,5 @@ PlmnFile *PlmnFile::UnMarshalling(Parcel &parcel)
 {
     return nullptr;
 }
-} // namespace SIM
+} // namespace Telephony
 } // namespace OHOS

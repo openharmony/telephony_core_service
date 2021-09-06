@@ -12,10 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "mcc_pool.h"
+
 using namespace std;
+
 namespace OHOS {
-namespace SIM {
+namespace Telephony {
+std::vector<MccAccess> MccPool::mccAccessTable_;
+std::vector<std::string> MccPool::specialMccMnc_;
 MccAccess MccPool::AccessToMcc(int mcc)
 {
     MccAccess m(mcc, "", 0);
@@ -48,7 +53,7 @@ int MccPool::ShortestMncLengthFromMcc(int mcc)
 void MccPool::InitMccTables()
 {
     if (mccAccessTable_.size() == 0) {
-        AddMccForAisa();
+        AddMccForAsia();
         AddMccForEurope();
         AddMccForAfrica();
         AddMccForNorthAmerica();
@@ -58,7 +63,7 @@ void MccPool::InitMccTables()
     }
 }
 
-void MccPool::AddMccForAisa()
+void MccPool::AddMccForAsia()
 {
     mccAccessTable_.push_back(MccAccess(MCC_GR, "gr", MCC_SHORT));
     mccAccessTable_.push_back(MccAccess(MCC_NL, "nl", MCC_SHORT));
@@ -321,15 +326,15 @@ void MccPool::AddMccForAustralia()
     mccAccessTable_.push_back(MccAccess(MCC_FK, "fk", MCC_SHORT));
 }
 
-bool MccPool::MccCompare(MccAccess &a, MccAccess &b)
+bool MccPool::MccCompare(const MccAccess &a, const MccAccess &b)
 {
     return (a.mcc_ < b.mcc_);
 }
 
-bool MccPool::LengthIsThreeMnc(std::string &mccmncCode)
+bool MccPool::LengthIsThreeMnc(const std::string &mccMncCode)
 {
     InitSpecialMccMncTables();
-    std::vector<std::string>::iterator obj = std::find(specialMccMnc_.begin(), specialMccMnc_.end(), mccmncCode);
+    std::vector<std::string>::iterator obj = std::find(specialMccMnc_.begin(), specialMccMnc_.end(), mccMncCode);
     return (obj == specialMccMnc_.end()) ? false : true;
 }
 
@@ -514,5 +519,5 @@ void MccPool::AddMccMncForMy()
 MccPool::MccPool() {}
 
 MccPool::~MccPool() {}
-} // namespace SIM
+} // namespace Telephony
 } // namespace OHOS

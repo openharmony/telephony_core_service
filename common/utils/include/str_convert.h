@@ -17,17 +17,15 @@
 #define STR_CONVERT_H
 
 #include <codecvt>
-#include <cstdio>
 #include <locale>
-#include <string>
 
 namespace OHOS {
-namespace CellularData {
+namespace Telephony {
 std::u16string ToUtf16(std::string str);
 std::string ToUtf8(std::u16string str16);
 std::u32string ToUtf32(std::string str);
 std::string ToUtf8(std::u32string str32);
 std::string ToUtf8(std::wstring wstr);
-} // namespace CellularData
+} // namespace Telephony
 } // namespace OHOS
 #endif // STR_CONVERT_H

@@ -12,10 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "observer_handler.h"
-#include "telephony_log.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
+namespace Telephony {
 ObserverHandler::ObserverHandler() {}
 
 ObserverHandler::~ObserverHandler() {}
@@ -29,9 +31,10 @@ void ObserverHandler::RegObserver(int what, const std::shared_ptr<AppExecFwk::Ev
         if (it == handlers.end()) {
             handlers.push_back(handler);
         }
-        TELEPHONY_INFO_LOG("ObserverHandler RegObserver handlers list: %{public}zu", handlers.size());
+        TELEPHONY_LOGD("ObserverHandler RegObserver update callback what: %{public}d, list size: %{public}zu",
+            what, handlers.size());
     } else {
-        TELEPHONY_INFO_LOG("ObserverHandler RegObserver callback list %{public}d", what);
+        TELEPHONY_LOGD("ObserverHandler RegObserver callback what: %{public}d", what);
         std::list<std::shared_ptr<AppExecFwk::EventHandler>> handlers;
         handlers.push_back(handler);
         observerHandlerMap_.emplace(what, handlers);
@@ -40,25 +43,39 @@ void ObserverHandler::RegObserver(int what, const std::shared_ptr<AppExecFwk::Ev
 
 void ObserverHandler::RemoveAll()
 {
-    observerHandlerMap_.erase(observerHandlerMap_.begin(), observerHandlerMap_.end());
+    observerHandlerMap_.clear();
 }
 
-void ObserverHandler::Remove(int what)
+void ObserverHandler::Remove(int what, const std::shared_ptr<AppExecFwk::EventHandler> handler)
 {
-    observerHandlerMap_.erase(what);
+    if (handler == nullptr) {
+        TELEPHONY_LOGE("ObserverHandler handler==nullptr");
+        return;
+    }
+
+    auto iter = observerHandlerMap_.find(what);
+    if (iter != observerHandlerMap_.end()) {
+        std::list<std::shared_ptr<OHOS::AppExecFwk::EventHandler>> &handlers = iter->second;
+        auto it = find(handlers.begin(), handlers.end(), handler);
+        if (it != handlers.end()) {
+            handlers.erase(it);
+        }
+        TELEPHONY_LOGD("ObserverHandler Remove handlers list: %{public}zu", handlers.size());
+    }
 }
 
 void ObserverHandler::NotifyObserver(int what)
 {
     auto iter = observerHandlerMap_.find(what);
     if (iter == observerHandlerMap_.end()) {
-        TELEPHONY_INFO_LOG("ObserverHandler NotifyObserver %{public}d not register", what);
+        TELEPHONY_LOGE("ObserverHandler NotifyObserver %{public}d not register", what);
         return;
     }
 
-    for (auto handlers : iter->second) {
-        TELEPHONY_INFO_LOG("handlers->SendEvent:%{public}d", what);
-        handlers->SendEvent(what);
+    for (auto handler : iter->second) {
+        TELEPHONY_LOGD("handler->SendEvent:%{public}d", what);
+        handler->SendEvent(what);
     }
 }
+} // namespace Telephony
 } // namespace OHOS

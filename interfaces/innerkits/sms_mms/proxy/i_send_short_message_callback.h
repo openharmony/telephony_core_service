@@ -12,11 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef I_SEND_SHORT_MESSAGE_CALLBACK_H
 #define I_SEND_SHORT_MESSAGE_CALLBACK_H
+
 #include "iremote_broker.h"
+
 namespace OHOS {
-namespace SMS {
+namespace Telephony {
 class ISendShortMessageCallback : public IRemoteBroker {
 public:
     virtual ~ISendShortMessageCallback() = default;
@@ -42,11 +45,11 @@ public:
 
     enum SendCallback { ON_SMS_SEND_RESULT };
 
-    virtual int32_t OnSmsSendResult(const SmsSendResult result) = 0;
+    virtual void OnSmsSendResult(const SmsSendResult result) = 0;
 
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"ipc.ISendShortMessageCallback");
+    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ISendShortMessageCallback");
 };
-} // namespace SMS
+} // namespace Telephony
 } // namespace OHOS
 #endif

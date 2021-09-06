@@ -15,15 +15,15 @@
 
 #ifndef CELLULAR_CALL_CALLBACK_DEATH_RECIPIENT_H
 #define CELLULAR_CALL_CALLBACK_DEATH_RECIPIENT_H
+
 #include "iremote_broker.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 class CellularCallCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
     explicit CellularCallCallbackDeathRecipient(
         const std::function<void(const wptr<IRemoteObject> &object)> &deathCallback);
-
     virtual ~CellularCallCallbackDeathRecipient() = default;
 
     void OnRemoteDied(const wptr<IRemoteObject> &object) override;
@@ -31,6 +31,7 @@ public:
 private:
     std::function<void(const wptr<IRemoteObject> &object)> deathCallback_;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
+
 #endif // CELLULAR_CALL_CALLBACK_DEATH_RECIPIENT_H
