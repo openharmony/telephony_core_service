@@ -12,11 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "tel_profile_util.h"
 #include "preferences_helper.h"
 
 namespace OHOS {
-namespace TelephonyCommon {
+namespace Telephony {
 TelProfileUtil::TelProfileUtil() {}
 TelProfileUtil::~TelProfileUtil() {}
 
@@ -179,5 +180,5 @@ void TelProfileUtil::UnRegisterObserver(std::shared_ptr<NativePreferences::Prefe
         ptr->UnRegisterObserver(preferencesObserver);
     }
 }
-} // namespace TelephonyCommon
+} // namespace Telephony
 } // namespace OHOS

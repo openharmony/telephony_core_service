@@ -12,20 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef I_DELIVERY_SHORT_MESSAGE_CALLBACK_H
 #define I_DELIVERY_SHORT_MESSAGE_CALLBACK_H
+
 #include "iremote_broker.h"
+
 namespace OHOS {
-namespace SMS {
+namespace Telephony {
 class IDeliveryShortMessageCallback : public IRemoteBroker {
 public:
     virtual ~IDeliveryShortMessageCallback() = default;
     enum DeliveryCallback { ON_SMS_DELIVERY_RESULT };
-    virtual int32_t OnSmsDeliveryResult(const std::u16string pdu) = 0;
+    virtual void OnSmsDeliveryResult(const std::u16string pdu) = 0;
 
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"ipc.IDeliveryShortMessageCallback");
+    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.IDeliveryShortMessageCallback");
 };
-} // namespace SMS
+} // namespace Telephony
 } // namespace OHOS
 #endif

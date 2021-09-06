@@ -12,35 +12,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_SIM_FILE_MANAGER_H
 #define OHOS_SIM_FILE_MANAGER_H
 
 #include <stdlib.h>
 #include <cstring>
 #include <string>
-#include "phone_manager.h"
+#include "core_manager.h"
 #include "event_handler.h"
 #include "event_runner.h"
 #include "sim_file_controller.h"
+#include "usim_file_controller.h"
 #include "i_tel_ril_manager.h"
 #include "i_sim_file_manager.h"
 #include "sim_file.h"
-#include "telephony_log.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
-namespace SIM {
-enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
-
+namespace Telephony {
 class SimFileManager : public ISimFileManager {
 public:
-    SimFileManager(std::shared_ptr<SIM::ISimStateManager> state);
+    SimFileManager(std::shared_ptr<Telephony::ISimStateManager> state);
     virtual ~SimFileManager();
     void Init();
-    virtual std::u16string GetSimOperator(int32_t slotId);
-    virtual std::u16string GetIsoCountryCode(int32_t slotId);
-    virtual std::u16string GetSpn(int32_t slotId);
-    virtual std::u16string GetIccId(int32_t slotId);
+    virtual std::u16string GetSimOperatorNumeric(int32_t slotId);
+    virtual std::u16string GetIsoCountryCodeForSim(int32_t slotId);
+    virtual std::u16string GetSimSpn(int32_t slotId);
+    virtual std::u16string GetSimIccId(int32_t slotId);
     virtual std::u16string GetIMSI(int32_t slotId);
+    virtual std::u16string GetLocaleFromDefaultSim();
+    virtual std::u16string GetSimGid1(int32_t slotId);
+    virtual int ObtainSpnCondition(bool roaming, std::string operatorNum);
     virtual void RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     virtual void UnregisterImsiLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     virtual void RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
@@ -48,6 +51,7 @@ public:
     virtual void SetImsi(std::string imsi);
     std::shared_ptr<IccFile> GetIccFile();
     std::shared_ptr<IccFileController> GetIccFileController();
+    enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
 
 protected:
     std::shared_ptr<IccFileController> fileController_ = nullptr;
@@ -56,9 +60,9 @@ protected:
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopFileController_ = nullptr;
     HandleRunningState stateRecord_ = HandleRunningState::STATE_NOT_START;
     HandleRunningState stateHandler_ = HandleRunningState::STATE_NOT_START;
-    std::shared_ptr<SIM::ISimStateManager> simStateManager_ = nullptr;
+    std::shared_ptr<Telephony::ISimStateManager> simStateManager_ = nullptr;
 };
-} // namespace SIM
+} // namespace Telephony
 } // namespace OHOS
 
 #endif // OHOS_SIM_FILE_MANAGER_H

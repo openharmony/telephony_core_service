@@ -16,7 +16,7 @@
 #include "cellular_call_callback_death_recipient.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 CellularCallCallbackDeathRecipient::CellularCallCallbackDeathRecipient(
     const std::function<void(const wptr<IRemoteObject> &object)> &deathCallback)
     : deathCallback_(deathCallback)
@@ -28,5 +28,5 @@ void CellularCallCallbackDeathRecipient::OnRemoteDied(const OHOS::wptr<OHOS::IRe
         deathCallback_(object);
     }
 }
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
