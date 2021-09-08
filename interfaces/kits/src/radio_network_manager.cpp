@@ -14,90 +14,75 @@
  */
 
 #include "radio_network_manager.h"
-#include "if_system_ability_manager.h"
-#include "iservice_registry.h"
-#include "kit_core_service_hilog_wrapper.h"
-#include "system_ability_definition.h"
+#include "network_search_service_proxy_holder.h"
+#include "singleton.h"
 
 namespace OHOS {
-RadioNetworkManager::RadioNetworkManager()
-{
-    ConnectService();
-}
-
-bool RadioNetworkManager::IsConnect()
-{
-    return radioNetworkService_ != nullptr;
-}
-
-RadioNetworkManager::~RadioNetworkManager() {}
-
+namespace Telephony {
 int32_t RadioNetworkManager::GetPsRadioTech(int32_t slotId)
 {
-    if (radioNetworkService_ != nullptr) {
-        return radioNetworkService_->GetPsRadioTech(slotId);
-    }
-    return -1;
+    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->GetPsRadioTech(slotId);
 }
 
 int32_t RadioNetworkManager::GetCsRadioTech(int32_t slotId)
 {
-    if (radioNetworkService_ != nullptr) {
-        return radioNetworkService_->GetCsRadioTech(slotId);
-    }
-    return -1;
+    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->GetCsRadioTech(slotId);
 }
 
-std::vector<sptr<OHOS::SignalInformation>> RadioNetworkManager::GetSignalInfoList(int32_t slotId)
+std::vector<sptr<SignalInformation>> RadioNetworkManager::GetSignalInfoList(int32_t slotId)
 {
-    if (radioNetworkService_ != nullptr) {
-        return radioNetworkService_->GetSignalInfoList(slotId);
-    }
-    return std::vector<sptr<OHOS::SignalInformation>>();
+    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->GetSignalInfoList(slotId);
 }
 
 std::u16string RadioNetworkManager::GetOperatorNumeric(int32_t slotId)
 {
-    if (radioNetworkService_ != nullptr) {
-        return radioNetworkService_->GetOperatorNumeric(slotId);
-    }
-    return u"";
+    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->GetOperatorNumeric(slotId);
 }
 
 std::u16string RadioNetworkManager::GetOperatorName(int32_t slotId)
 {
-    if (radioNetworkService_ != nullptr) {
-        return radioNetworkService_->GetOperatorName(slotId);
-    }
-    return u"";
+    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->GetOperatorName(slotId);
 }
 
-sptr<NetworkState> RadioNetworkManager::GetNetworkStatus(int32_t slotId)
+sptr<NetworkState> RadioNetworkManager::GetNetworkState(int32_t slotId)
 {
-    if (radioNetworkService_ != nullptr) {
-        return sptr<NetworkState>(radioNetworkService_->GetNetworkStatus(slotId));
-    }
-    return nullptr;
+    return sptr<NetworkState>(
+        DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->GetNetworkState(slotId));
 }
 
-int32_t RadioNetworkManager::ConnectService()
+bool RadioNetworkManager::GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
-    auto abilityManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (abilityManager == nullptr) {
-        HILOG_ERROR("RadioNetworkManager::GetInstance().GetSystemAbilityManager() null\n");
-        return -1;
-    }
-
-    sptr<IRemoteObject> object = abilityManager->GetSystemAbility(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID);
-    if (object != nullptr) {
-        HILOG_ERROR("RadioNetworkManager::ConnectService() IRemoteObject != null\n");
-        radioNetworkService_ = iface_cast<ICoreService>(object);
-    }
-    if (radioNetworkService_ == nullptr) {
-        HILOG_ERROR("radioNetworkService_ null\n");
-        return -1;
-    }
-    HILOG_ERROR("RadioNetworkManager ConnectService success\n");
-    return 0;
+    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->GetNetworkSelectionMode(
+        slotId, callback);
 }
+
+bool RadioNetworkManager::SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
+    const sptr<NetworkInformation> networkInformation, bool resumeSelection,
+    const sptr<INetworkSearchCallback> &callback)
+{
+    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->SetNetworkSelectionMode(
+        slotId, selectMode, networkInformation, resumeSelection, callback);
+}
+
+bool RadioNetworkManager::SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback)
+{
+    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->SetRadioState(slotId, isOn, callback);
+}
+
+bool RadioNetworkManager::GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+{
+    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->GetRadioState(slotId, callback);
+}
+
+bool RadioNetworkManager::GetNetworkSearchResult(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+{
+    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->GetNetworkSearchResult(
+        slotId, callback);
+}
+
+std::u16string RadioNetworkManager::GetIsoCountryCodeForNetwork(int32_t slotId)
+{
+    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->GetIsoCountryCodeForNetwork(slotId);
+}
+} // namespace Telephony
 } // namespace OHOS

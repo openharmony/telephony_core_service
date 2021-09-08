@@ -12,36 +12,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef TEL_RIL_DATA_H
 #define TEL_RIL_DATA_H
 
-#include <memory>
-#include <map>
-#include <unordered_map>
-#include "observer_handler.h"
-#include "telephony_log.h"
-#include "tel_ril_base.h"
 #include "i_tel_ril_manager.h"
+#include "tel_ril_base.h"
 #include "hril_data_parcel.h"
-#include "hril_types.h"
 
 namespace OHOS {
+namespace Telephony {
 class TelRilData : public TelRilBase {
 public:
     TelRilData(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
     ~TelRilData() = default;
     DataProfileDataInfo ChangeDPToHalDataProfile(CellularDataProfile dataProfile);
     void DeactivatePdpContext(int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
-    void DeactivatePdpContextResponse(OHOS::MessageParcel &data);
-    void PdpContextListUpdated(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what, void *obj);
+    void DeactivatePdpContextResponse(MessageParcel &data);
     void UnRegisterCallDataListChanged(int what);
-    void SetApnConnectNetworkResponse(OHOS::MessageParcel &data);
+    void SetApnConnectNetworkResponse(MessageParcel &data);
     void ActivatePdpContext(int32_t radioTechnology, CellularDataProfile dataProfile, bool isRoaming,
         bool allowRoaming, const AppExecFwk::InnerEvent::Pointer &response);
-    void ActivatePdpContextResponse(OHOS::MessageParcel &data);
-    void PdpContextListUpdated(OHOS::MessageParcel &data);
+    void ActivatePdpContextResponse(MessageParcel &data);
+    void PdpContextListUpdated(MessageParcel &data);
     bool IsDataRespOrNotify(uint32_t code);
-    void ProcessDataRespOrNotify(uint32_t code, OHOS::MessageParcel &data);
+    void ProcessDataRespOrNotify(uint32_t code, MessageParcel &data);
 
 private:
     bool IsDataResponse(uint32_t code);
@@ -52,5 +47,6 @@ private:
     using Func = void (TelRilData::*)(MessageParcel &data);
     std::map<uint32_t, Func> memberFuncMap_;
 };
+} // namespace Telephony
 } // namespace OHOS
 #endif // TEL_RIL_DATA_H

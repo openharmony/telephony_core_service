@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_NS_NETWORK_REGISTER_H
-#define OHOS_NS_NETWORK_REGISTER_H
+#ifndef NETWORK_SEARCH_INCLUDE_NETWORK_REGISTER_H
+#define NETWORK_SEARCH_INCLUDE_NETWORK_REGISTER_H
 #include <memory>
 #include <string>
 #include "event_handler.h"
@@ -21,28 +21,30 @@
 #include "network_search_state.h"
 
 namespace OHOS {
+namespace Telephony {
 class NetworkRegister {
 public:
     explicit NetworkRegister(std::shared_ptr<NetworkSearchState> networkSearchState);
     virtual ~NetworkRegister() = default;
-    void ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &event);
-    void ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &event);
-    void ProcessRestrictedState(const AppExecFwk::InnerEvent::Pointer &event) {};
+    void ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &event) const;
+    void ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &event) const;
+    void ProcessRestrictedState(const AppExecFwk::InnerEvent::Pointer &event) const;
     enum RilRegister {
         REG_STATE_NOT_REG = 0,
         REG_STATE_HOME_ONLY = 1,
         REG_STATE_SEARCH = 2,
         REG_STATE_NO_SERVICE = 3,
         REG_STATE_INVALID = 4,
-        REG_STATE_EMERGENCY_NOT_REG = 10,
-        REG_STATE_EMERGENCY_UNKNOWN = 14
+        REG_STATE_ROAMING = 5
     };
 
 private:
-    RegServiceState ConvertRegToNetworkState(int code);
-    std::shared_ptr<NetworkSearchState> networkSearchState_;
-    PhoneAbstract phone_;
-    bool pressingOnly_ = false;
+    RegServiceState ConvertRegFromRil(int code) const;
+    RadioTech ConvertTechFromRil(int code) const;
+
+private:
+    std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
 };
+} // namespace Telephony
 } // namespace OHOS
-#endif // OHOS_NS_NETWORK_REGISTER_H
+#endif // NETWORK_SEARCH_INCLUDE_NETWORK_REGISTER_H

@@ -12,13 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef BASE_PHONE_SERVICE_STUB_H
 #define BASE_PHONE_SERVICE_STUB_H
-#include <map>
+
 #include "iremote_stub.h"
 #include "i_core_service.h"
 
 namespace OHOS {
+namespace Telephony {
 class CoreServiceStub : public IRemoteStub<ICoreService> {
 public:
     CoreServiceStub();
@@ -35,20 +37,37 @@ private:
     int32_t OnGetOperatorName(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSignalInfoList(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetNetworkState(MessageParcel &data, MessageParcel &reply);
-    int32_t OnSetHRilRadioState(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetHRilRadioState(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetRadioState(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetRadioState(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetNetworkSelectionMode(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetNetworkSearchResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetNetworkSelectionMode(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetIsoCountryCodeForNetwork(MessageParcel &data, MessageParcel &reply);
 
     int32_t OnHasSimCard(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimState(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetIsoCountryCode(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetSpn(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetIccId(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetSimOperator(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetIsoCountryCodeForSim(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetSimSpn(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetSimIccId(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetSimOperatorNumeric(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetIMSI(MessageParcel &data, MessageParcel &reply);
     int32_t OnIsSimActive(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetLocaleFromDefaultSim(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetSimGid1(MessageParcel &data, MessageParcel &reply);
+
+    int32_t OnGetSimAccountInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetDefaultVoiceSlotId(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetDefaultVoiceSlotId(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUnlockPin(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUnlockPuk(MessageParcel &data, MessageParcel &reply);
+    int32_t OnAlterPin(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetLockState(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetLockState(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRefreshSimState(MessageParcel &data, MessageParcel &reply);
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;
 };
+} // namespace Telephony
 } // namespace OHOS
 #endif // BASE_PHONE_SERVICE_STUB_H

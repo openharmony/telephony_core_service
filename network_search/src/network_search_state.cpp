@@ -12,55 +12,78 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "network_search_state.h"
 #include <securec.h>
-#include "hilog_network_search.h"
 #include "network_search_manager.h"
 #include "network_search_notify.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
+namespace Telephony {
 NetworkSearchState::NetworkSearchState(const std::weak_ptr<NetworkSearchManager> &networkSearchManager)
     : networkSearchManager_(networkSearchManager)
 {}
 
 void NetworkSearchState::Init()
 {
-    HILOG_INFO("NetworkSearchState Init");
+    TELEPHONY_LOGI("NetworkSearchState Init");
     networkStateOld_ = std::make_shared<NetworkState>();
     if (networkStateOld_ == nullptr) {
-        HILOG_ERROR("failed to create new networkState");
+        TELEPHONY_LOGE("failed to create old networkState");
         return;
     }
     networkState_ = std::make_shared<NetworkState>();
     if (networkState_ == nullptr) {
-        HILOG_ERROR("failed to create new networkState");
+        TELEPHONY_LOGE("failed to create new networkState");
         return;
     }
 }
 
-void NetworkSearchState::SetOperatorInfo(const std::string &longName, const std::string &shortName,
-    const std::string &numeric, const DomainType domainType)
+void NetworkSearchState::SetOperatorInfo(
+    const std::string &longName, const std::string &shortName, const std::string &numeric, DomainType domainType)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    networkState_->SetOperatorInfo(longName, shortName, numeric, domainType);
+    if (networkState_ != nullptr) {
+        networkState_->SetOperatorInfo(longName, shortName, numeric, domainType);
+        TELEPHONY_LOGI(
+            "NetworkSearchState::SetOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : "
+            "%{public}s, %{public}p\n",
+            networkState_->GetLongOperatorName().c_str(), networkState_->GetShortOperatorName().c_str(),
+            networkState_->GetPlmnNumeric().c_str(), networkState_.get());
+    }
 }
 
 void NetworkSearchState::SetEmergency(bool isEmergency)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    networkState_->SetEmergency(isEmergency);
+    if (networkState_ != nullptr) {
+        networkState_->SetEmergency(isEmergency);
+    }
 }
 
 void NetworkSearchState::SetNetworkType(RadioTech tech, DomainType domainType)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    networkState_->SetNetworkType(tech, domainType);
+    if (networkState_ != nullptr) {
+        networkState_->SetNetworkType(tech, domainType);
+    }
 }
 
 void NetworkSearchState::SetNetworkState(RegServiceState state, DomainType domainType)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    networkState_->SetNetworkState(state, domainType);
+    if (networkState_ != nullptr) {
+        networkState_->SetNetworkState(state, domainType);
+    }
+}
+
+void NetworkSearchState::SetNetworkStateToRoaming(RoamingType roamingType, DomainType domainType)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (networkState_ != nullptr) {
+        networkState_->SetRoaming(roamingType, domainType);
+    }
 }
 
 bool NetworkSearchState::GetIMSState()
@@ -69,73 +92,88 @@ bool NetworkSearchState::GetIMSState()
     return iMSRegStatus_;
 }
 
-bool NetworkSearchState::GsmOrNot(int radioTechnology)
+bool NetworkSearchState::GsmOrNot(int radioTechnology) const
 {
-    std::lock_guard<std::mutex> lock(mutex_);
-    return radioTechnology == RADIO_TECHNOLOGY_GSM;
+    return (radioTechnology == RADIO_TECHNOLOGY_GSM) || (radioTechnology == RADIO_TECHNOLOGY_LTE) ||
+        (radioTechnology == RADIO_TECHNOLOGY_WCDMA);
 }
 
-bool NetworkSearchState::CdmaOrNot(int radioTechnology)
+bool NetworkSearchState::CdmaOrNot(int radioTechnology) const
 {
-    std::lock_guard<std::mutex> lock(mutex_);
-    return radioTechnology == RADIO_TECHNOLOGY_1XRTT || radioTechnology == RADIO_TECHNOLOGY_WCDMA;
+    return false;
 }
 
 std::unique_ptr<NetworkState> NetworkSearchState::GetNetworkStatus()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
+    MessageParcel data;
+    networkState_->Marshalling(data);
     std::unique_ptr<NetworkState> networkState = std::make_unique<NetworkState>();
     if (networkState == nullptr) {
-        HILOG_ERROR("failed to create new networkState");
+        TELEPHONY_LOGE("failed to create new networkState");
         return nullptr;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (memcpy_s(static_cast<void *>(networkState.get()), sizeof(NetworkState),
-        static_cast<const void *>(networkState_.get()), sizeof(NetworkState)) != 0) {
-        HILOG_ERROR("fail to copy memory");
-        return nullptr;
-    }
+    networkState->ReadFromParcel(data);
     return networkState;
 }
 
 void NetworkSearchState::SetInitial()
 {
+    TELEPHONY_LOGD("NetworkSearchState::SetInitial");
     std::lock_guard<std::mutex> lock(mutex_);
-    networkState_->Init();
+    if (networkState_ != nullptr) {
+        networkState_->Init();
+    }
 }
 
 void NetworkSearchState::NotifyStateChange()
 {
-    HILOG_INFO("NetworkSearchManager::StateCheck");
+    TELEPHONY_LOGI("NetworkSearchState::StateCheck");
     std::lock_guard<std::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        HILOG_ERROR("RadioOffState NetworkSearchHandler is null");
+        TELEPHONY_LOGE("RadioOffState NetworkSearchHandler is null");
+        return;
+    }
+    if (networkState_ == nullptr) {
+        TELEPHONY_LOGE("RadioOffState networkState_ is null");
         return;
     }
 
     if (networkState_->GetPsRegStatus() == REG_STATE_IN_SERVICE &&
         networkStateOld_->GetPsRegStatus() != REG_STATE_IN_SERVICE) {
-        HILOG_INFO("NetworkSearchManager::StateCheck isPSNetworkChange notify to dc...");
+        TELEPHONY_LOGI("NetworkSearchState::StateCheck isPSNetworkChange notify to dc...");
         networkSearchManager->NotifyPSConnectionAttachedChanged();
     }
-
     if (networkState_->GetPsRegStatus() != REG_STATE_IN_SERVICE &&
         networkStateOld_->GetPsRegStatus() == REG_STATE_IN_SERVICE) {
-        HILOG_INFO("NetworkSearchManager::StateCheck isPSNetworkAttached notify to dc...");
+        TELEPHONY_LOGI("NetworkSearchState::StateCheck isPSNetworkAttached notify to dc...");
         networkSearchManager->NotifyPSConnectionDetachedChanged();
     }
-
+    if (networkState_->GetPsRoamingStatus() > ROAMING_STATE_UNKNOWN &&
+        networkStateOld_->GetPsRoamingStatus() == ROAMING_STATE_UNKNOWN) {
+        TELEPHONY_LOGI("NetworkSearchState::StateCheck PSRoamingOpen notify to dc...");
+        networkSearchManager->NotifyPSRoamingOpenChanged();
+    }
+    if (networkStateOld_->GetPsRoamingStatus() > ROAMING_STATE_UNKNOWN &&
+        networkState_->GetPsRoamingStatus() == ROAMING_STATE_UNKNOWN) {
+        TELEPHONY_LOGI("NetworkSearchState::StateCheck PSRoamingClose notify to dc...");
+        networkSearchManager->NotifyPSRoamingCloseChanged();
+    }
     if (!(*networkState_ == *networkStateOld_)) {
-        HILOG_INFO("NetworkSearchManager::StateCheck isNetworkStateChange notify to app...");
-        std::unique_ptr<NetworkState> ns = std::make_unique<NetworkState>();
-        if (memcpy_s(ns.get(), sizeof(NetworkState), networkState_.get(), sizeof(NetworkState)) != 0) {
-            HILOG_ERROR("fail to copy memory state");
+        TELEPHONY_LOGI("NetworkSearchState::StateCheck isNetworkStateChange notify to app...");
+        sptr<NetworkState> ns = new NetworkState;
+        if (ns == nullptr) {
+            TELEPHONY_LOGE("failed to create networkState");
             return;
         }
-        DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifyNetworkStateUpdated(ns.release());
-        if (memcpy_s(networkStateOld_.get(), sizeof(NetworkState), networkState_.get(), sizeof(NetworkState)) != 0) {
-            HILOG_ERROR("fail to copy memory state");
-        }
+        MessageParcel data;
+        networkState_->Marshalling(data);
+        ns->ReadFromParcel(data);
+        DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifyNetworkStateUpdated(ns);
+        networkState_->Marshalling(data);
+        networkStateOld_->ReadFromParcel(data);
     }
 }
+} // namespace Telephony
 } // namespace OHOS

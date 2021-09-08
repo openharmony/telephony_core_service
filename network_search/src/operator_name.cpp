@@ -12,30 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "operator_name.h"
 
 #include <common_event_manager.h>
 #include <common_event.h>
-#include "hril_network_parcel.h"
+#include "common_event_support.h"
 
-#include "hilog_network_search.h"
+#include "core_manager.h"
+#include "hril_network_parcel.h"
 #include "network_search_manager.h"
+#include "telephony_log_wrapper.h"
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;
 
 namespace OHOS {
+namespace Telephony {
 const std::string EMERGENCY_ONLY = "Emergency only";
 const std::string NO_SERVICE = "No service";
 
-OperatorName::OperatorName(std::shared_ptr<NetworkSearchState> networkSearchState)
-    : networkSearchState_(networkSearchState), phone_()
-{
-    if (PhoneManager ::GetInstance().phone_[1] != nullptr) {
-        if (PhoneManager ::GetInstance().phone_[1]->simFileManager_ != nullptr) {
-            simFileManager_ = PhoneManager ::GetInstance().phone_[1]->simFileManager_;
-        }
-    }
-}
+OperatorName::OperatorName(
+    std::shared_ptr<NetworkSearchState> networkSearchState, std::shared_ptr<ISimFileManager> simFileManager)
+    : networkSearchState_(networkSearchState), simFileManager_(simFileManager)
+{}
 
 void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
@@ -45,93 +44,149 @@ void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &eve
     if (phone_.PhoneTypeCdmaOrNot()) {
         CdmaOperatorInfo(event);
     }
-
-    networkSearchState_->NotifyStateChange();
+    if (networkSearchState_ != nullptr) {
+        networkSearchState_->NotifyStateChange();
+    }
+    NotifySpnChanged();
 }
 
-void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
+void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const
 {
-    std::shared_ptr<OperatorInfoResult> operatorInfoResult = event->GetSharedObject<OperatorInfoResult>();
-    if (!operatorInfoResult) {
-        HILOG_INFO("OperatorName::GsmOperatorInfo operatorInfoResult is nullptr\n");
+    if (event == nullptr) {
+        TELEPHONY_LOGI("OperatorName::GsmOperatorInfo event is nullptr");
         return;
     }
-
-    HILOG_INFO(
+    std::shared_ptr<OperatorInfoResult> operatorInfoResult = event->GetSharedObject<OperatorInfoResult>();
+    if (!operatorInfoResult) {
+        TELEPHONY_LOGI("OperatorName::GsmOperatorInfo operatorInfoResult is nullptr");
+        return;
+    }
+    TELEPHONY_LOGD(
         "OperatorName::GsmOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : "
         "%{public}s\n",
         operatorInfoResult->longName.c_str(), operatorInfoResult->shortName.c_str(),
         operatorInfoResult->numeric.c_str());
-
-    networkSearchState_->SetOperatorInfo(
-        operatorInfoResult->longName, operatorInfoResult->shortName, operatorInfoResult->numeric, DOMAIN_TYPE_CS);
+    if (networkSearchState_ != nullptr) {
+        networkSearchState_->SetOperatorInfo(operatorInfoResult->longName, operatorInfoResult->shortName,
+            operatorInfoResult->numeric, DOMAIN_TYPE_CS);
+    }
 }
 
-void OperatorName::CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
+void OperatorName::CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const
 {
-    std::shared_ptr<OperatorInfoResult> operatorInfoResult = event->GetSharedObject<OperatorInfoResult>();
-    if (!operatorInfoResult) {
-        HILOG_INFO("OperatorName::CdmaOperatorInfo operatorInfoResult is nullptr\n");
+    if (event == nullptr) {
+        TELEPHONY_LOGE("OperatorName::CdmaOperatorInfo event is nullptr");
         return;
     }
-
-    HILOG_INFO(
+    std::shared_ptr<OperatorInfoResult> operatorInfoResult = event->GetSharedObject<OperatorInfoResult>();
+    if (!operatorInfoResult) {
+        TELEPHONY_LOGE("OperatorName::CdmaOperatorInfo operatorInfoResult is nullptr");
+        return;
+    }
+    TELEPHONY_LOGD(
         "OperatorName::CdmaOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : "
         "%{public}s\n",
         operatorInfoResult->longName.c_str(), operatorInfoResult->shortName.c_str(),
         operatorInfoResult->numeric.c_str());
-
-    networkSearchState_->SetOperatorInfo(
-        operatorInfoResult->longName, operatorInfoResult->shortName, operatorInfoResult->numeric, DOMAIN_TYPE_PS);
+    if (networkSearchState_ != nullptr) {
+        networkSearchState_->SetOperatorInfo(operatorInfoResult->longName, operatorInfoResult->shortName,
+            operatorInfoResult->numeric, DOMAIN_TYPE_PS);
+    }
 }
 
-void OperatorName::RenewSpnAndBroadcast()
+sptr<NetworkState> OperatorName::GetNetworkStatus()
 {
-    int regStatus = networkSearchState_->GetNetworkStatus()->GetRegStatus();
-    if (phone_.PhoneTypeGsmOrNot()) {
-        std::string plmn = "";
+    if (networkSearchState_ != nullptr) {
+        std::unique_ptr<NetworkState> networkState = networkSearchState_->GetNetworkStatus();
+        if (networkState != nullptr) {
+            networkState_ = networkState.release();
+            return networkState_;
+        }
+    }
+    TELEPHONY_LOGE("OperatorName::GetNetworkStatus networkState is nullptr");
+    networkState_ = nullptr;
+    return networkState_;
+}
 
+/**
+ * 3GPP TS 51.011 V5.0.0(2001-12) 10.3.11
+ */
+void OperatorName::NotifySpnChanged()
+{
+    TELEPHONY_LOGI("OperatorName::NotifySpnChanged");
+    int regStatus = REG_STATE_UNKNOWN;
+    sptr<NetworkState> networkState = GetNetworkStatus();
+    if (networkState != nullptr) {
+        regStatus = networkState->GetRegStatus();
+    } else {
+        TELEPHONY_LOGE("OperatorName::NotifySpnChanged networkState is nullptr");
+    }
+    if (phone_.PhoneTypeGsmOrNot()) {
+        int32_t spnRule = 0;
+        std::string plmn = "";
         bool showPlmn = false;
-        if (regStatus == REG_STATE_IN_SERVICE) {
-            plmn = networkSearchState_->GetNetworkStatus()->GetLongOperatorName();
-            showPlmn = !plmn.empty();
-        } else if (regStatus == REG_STATE_EMERGENCY_ONLY || regStatus == REG_STATE_NO_SERVICE) {
-            showPlmn = true;
-            if (regStatus == REG_STATE_EMERGENCY_ONLY) {
-                plmn = EMERGENCY_ONLY;
-            } else {
-                plmn = NO_SERVICE;
+        if (networkState != nullptr) {
+            bool roaming = networkState->IsRoaming();
+            std::string numeric = networkState->GetPlmnNumeric();
+            if (simFileManager_ != nullptr) {
+                spnRule = simFileManager_->ObtainSpnCondition(roaming, numeric);
             }
+        }
+        if (regStatus == REG_STATE_IN_SERVICE && networkState != nullptr) {
+            plmn = networkState->GetLongOperatorName();
+            showPlmn = !plmn.empty();
         } else {
             showPlmn = true;
-            plmn = NO_SERVICE;
         }
 
-        if (plmn != curPlmn_) {
-            HILOG_INFO("OperatorName::RenewSpnAndBroadcast start send broadcast......\n");
-            Want want;
-            want.SetAction(SPN_INFO_UPDATED_ACTION);
-            want.SetParam(CUR_PLMN_SHOW, showPlmn);
-            want.SetParam(CUR_PLMN, plmn);
-            PublishBroadcastEvent(want, MSG_NS_SPN_UPDATED, plmn);
-
-            curPlmn_ = plmn;
-            curPlmnShow_ = showPlmn;
+        bool showSpn = false;
+        std::string spn = "";
+        std::u16string result = Str8ToStr16("");
+        if (simFileManager_ != nullptr) {
+            result = simFileManager_->GetSimSpn(CoreManager::DEFAULT_SLOT_ID);
+        }
+        spn = Str16ToStr8(result);
+        showSpn = !spn.empty();
+        if (regStatus == REG_STATE_UNKNOWN) {
+            spn = "";
+            showSpn = false;
+        }
+        if (curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn ||
+            curPlmnShow_ != showPlmn || curSpn_.compare(spn) != 0 || curPlmn_.compare(plmn) != 0) {
+            TELEPHONY_LOGI("OperatorName::NotifySpnChanged start send broadcast......\n");
+            PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn);
+        } else {
+            TELEPHONY_LOGD("OperatorName::NotifySpnChanged spn no changed, not need to update!");
         }
     }
 }
 
-void OperatorName::PublishBroadcastEvent(const AAFwk::Want &want, int eventCode, const std::string &eventData)
+void OperatorName::PublishEvent(const int32_t rule, const int32_t state, const bool showPlmn,
+    const std::string &plmn, const bool showSpn, const std::string &spn)
 {
+    TELEPHONY_LOGI("OperatorName::PublishEvent\n");
+    Want want;
+    want.SetAction("usual.event.SPN_INFO_UPDATED");
+    want.SetParam(CUR_SPN_SHOW_RULE, rule);
+    want.SetParam(CUR_REG_STATE, state);
+    want.SetParam(CUR_PLMN_SHOW, showPlmn);
+    want.SetParam(CUR_PLMN, plmn);
+    want.SetParam(CUR_SPN_SHOW, showSpn);
+    want.SetParam(CUR_SPN, spn);
     CommonEventData data;
     data.SetWant(want);
-    data.SetCode(eventCode);
-    data.SetData(eventData);
+    data.SetCode(MSG_NS_SPN_UPDATED);
+    data.SetData(spn);
     CommonEventPublishInfo publishInfo;
     publishInfo.SetOrdered(true);
     bool publishResult = CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    if (!publishResult) {
-        HILOG_INFO("OperatorName::PublishBroadcastEvent result : %{public}d", publishResult);
-    }
+    TELEPHONY_LOGI("OperatorName::PublishEvent PublishSimEvent result : %{public}d", publishResult);
+    curRegState_ = state;
+    curSpnRule_ = rule;
+    curSpn_ = spn;
+    curSpnShow_ = showSpn;
+    curPlmn_ = plmn;
+    curPlmnShow_ = showPlmn;
 }
+} // namespace Telephony
 } // namespace OHOS

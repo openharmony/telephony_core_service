@@ -12,63 +12,68 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef TEL_RIL_NETWORK_H
 #define TEL_RIL_NETWORK_H
 
-#include <memory>
-#include <map>
-#include <unordered_map>
-#include "observer_handler.h"
-#include "telephony_log.h"
 #include "tel_ril_base.h"
-#include "i_tel_ril_manager.h"
 
 namespace OHOS {
+namespace Telephony {
 class TelRilNetwork : public TelRilBase {
 public:
     TelRilNetwork(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
     ~TelRilNetwork() = default;
 
-    // send  commond
+    // send  command
     void GetSignalStrength(const AppExecFwk::InnerEvent::Pointer &response);
     void GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
     void GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
     void GetOperatorInfo(const AppExecFwk::InnerEvent::Pointer &response);
+    void GetNetworkSearchInformation(const AppExecFwk::InnerEvent::Pointer &response);
+    void GetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &response);
+    void SetNetworkSelectionMode(
+        int32_t automaticFlag, std::string oper, const AppExecFwk::InnerEvent::Pointer &response);
+    void SetNetworkLocationUpdate(const AppExecFwk::InnerEvent::Pointer &response);
 
     // ril unsol
-    void SignalStrengthUpdated(OHOS::MessageParcel &data);
-    void CsRegStatusUpdated(OHOS::MessageParcel &data);
-    void UpdateImsNetworkStatus(OHOS::MessageParcel &data);
+    void SignalStrengthUpdated(MessageParcel &data);
+    void NetworkRegStatusUpdated(MessageParcel &data);
+    void UpdateImsNetworkStatus(MessageParcel &data);
 
     /**
      * @brief Get signal intensity response
      *
      * @param data is HDF service callback message
      */
-    void GetSignalStrengthResponse(OHOS::MessageParcel &data);
+    void GetSignalStrengthResponse(MessageParcel &data);
 
     /**
      * @brief Current voice registration status response
      *
      * @param data is HDF service callback message
      */
-    void GetCsRegStatusResponse(OHOS::MessageParcel &data);
+    void GetCsRegStatusResponse(MessageParcel &data);
 
     /**
      * @brief Get network registration status response
      *
      * @param data is HDF service callback message
      */
-    void GetPsRegStatusResponse(OHOS::MessageParcel &data);
+    void GetPsRegStatusResponse(MessageParcel &data);
 
+    void GetNetworkSearchInformationResponse(MessageParcel &data);
+    void GetNetworkSelectionModeResponse(MessageParcel &data);
+    void SetNetworkSelectionModeResponse(MessageParcel &data);
+    void SetNetworkLocationUpdateResponse(MessageParcel &data);
     /**
      * @brief Current operator ons or eons response
      *
      * @param data is HDF service callback message
      */
-    void GetOperatorInfoResponse(OHOS::MessageParcel &data);
+    void GetOperatorInfoResponse(MessageParcel &data);
 
-    void ProcessNetworkRespOrNotify(uint32_t code, OHOS::MessageParcel &data);
+    void ProcessNetworkRespOrNotify(uint32_t code, MessageParcel &data);
 
     bool IsNetworkRespOrNotify(uint32_t code);
 
@@ -81,5 +86,6 @@ private:
     using Func = void (TelRilNetwork::*)(MessageParcel &data);
     std::map<uint32_t, Func> memberFuncMap_;
 };
+} // namespace Telephony
 } // namespace OHOS
 #endif // TEL_RIL_NETWORK_H

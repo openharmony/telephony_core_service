@@ -12,10 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef RIL_COMMON_H
 #define RIL_COMMON_H
-
-#include <string>
 
 typedef enum {
     CORE_SERVICE_NO_PHONE = 0,
@@ -25,10 +24,10 @@ typedef enum {
 } CoreServiceTelephonyType;
 
 typedef enum {
-    HDF_SUCCESS = 0, /**< The operation is successful. */
-    HDF_FAILURE = -1, /**< Failed to invoke the OS underlying function. */
-    HDF_ERR_NOT_SUPPORT = -2, /**< Not supported. */
-    HDF_ERR_INVALID_PARAM = -3, /**< Invalid parameter. */
+    HDF_SUCCESS = 0, /* The operation is successful. */
+    HDF_FAILURE = -1, /* Failed to invoke the OS underlying function. */
+    HDF_ERR_NOT_SUPPORT = -2, /* Not supported. */
+    HDF_ERR_INVALID_PARAM = -3 /* Invalid parameter. */
 } HDF_STATUS;
 
 typedef enum { CORE_SERVICE_ERROR = 0, CORE_SERVICE_SUCCESS = 1 } CoreServiceLteOptStatus;
