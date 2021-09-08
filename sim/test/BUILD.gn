@@ -22,17 +22,24 @@ ohos_executable("tel_sim_test") {
   install_enable = true
   sources = [
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/proxy/core_service_proxy.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_information.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_result.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_state.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/signal_information.cpp",
     "$TELEPHONY_SIM_ROOT/test/test.cpp",
   ]
 
   include_dirs = [
+    "//base/telephony/data_storage/sim/include",
+    "//base/telephony/data_storage/common/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/base/include",
-
+    "//base/telephony/ril_adapter/interfaces/innerkits",
     "$TELEPHONY_CORE_SERVICE_ROOT/tel_ril/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/common",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/proxy",
+    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/state_registry/proxy",
+    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/data_storage/common/",
+    "$TELEPHONY_SIM_ROOT/include",
 
     "$HDF_FRAMEWORKS/ability/sbuf/include",
     "$HDF_FRAMEWORKS/core/shared/include",
@@ -43,12 +50,24 @@ ohos_executable("tel_sim_test") {
     "$HDF_FRAMEWORKS/utils/include",
     "$HDF_FRAMEWORKS/include/osal",
   ]
-  deps = [ "//utils/native/base:utils" ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceApi\"",
+    "LOG_DOMAIN = 0xD002B01",
+  ]
+
+  deps = [
+    "//base/telephony/core_service:tel_core_service",
+    "//base/telephony/core_service/common:libtelephony_common",
+    "//utils/native/base:utils",
+  ]
 
   external_deps = [
+    "aafwk_standard:want",
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
     "ipc:ipc_core",
+    "native_appdatamgr:native_rdb",
     "safwk:system_ability_fwk",
     "samgr_L2:samgr_proxy",
   ]

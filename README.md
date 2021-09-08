@@ -38,17 +38,33 @@ As shown in the preceding figure, the telephony core service consists of the SIM
 │   ├── innerkits          # Internal APIs
 │   └── kits               # External APIs (such as JS APIs)
 ├── services               # Implementation of the telephony core service
+│   ├── include
+│   └── src
 ├── etc                    # Telephony core service driver scripts
+│   └── init
 ├── sa_profile             # SA profile
 ├── tel_ril                # RIL Manager service code
+│   ├── include
+│   ├── src
+│   └── test
 ├── network_search         # Network search service code
+│   ├── include
+│   ├── src
+│   └── test
 ├── sim                    # SIM card service code
-└── common
+│   ├── include
+│   ├── src
+│   └── test     
+├── common
+│   ├── log                # Core service log print directory 
+│   ├── preferences
+│   ├── utils
+│   └── test
 ```
 
 ## Constraints<a name="section133mcpsimp"></a>
 
--   Programming language: JavaScript
+-   Programming language: C++、JavaScript
 -   In terms of software, this module needs to work with the RIL adapter service \(ril\_adapter\) and status registration service \(state\_registry\).
 -   In terms of hardware, the accommodating device must be equipped with a modem and a SIM card capable of independent cellular communication.
 
@@ -59,6 +75,7 @@ The telephony core service module needs to provide APIs for related modules, inc
 ### APIs for the SIM Card Service<a name="section142mcpsimp"></a>
 
 <a name="table144mcpsimp"></a>
+
 <table><thead align="left"><tr id="row150mcpsimp"><th class="cellrowborder" valign="top" width="33.406659334066596%" id="mcps1.1.4.1.1"><p id="entry151mcpsimpp0"><a name="entry151mcpsimpp0"></a><a name="entry151mcpsimpp0"></a>API</p>
 </th>
 <th class="cellrowborder" valign="top" width="33.266673332666734%" id="mcps1.1.4.1.2"><p id="entry152mcpsimpp0"><a name="entry152mcpsimpp0"></a><a name="entry152mcpsimpp0"></a>Description</p>
@@ -67,36 +84,53 @@ The telephony core service module needs to provide APIs for related modules, inc
 </th>
 </tr>
 </thead>
-<tbody><tr id="row162mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p109592823314"><a name="p109592823314"></a><a name="p109592823314"></a>function getSimState(slotId: number, callback: AsyncCallback&lt;SimState&gt;): void;</p>
+<tbody><tr id="row162mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p109592823314"><a name="p109592823314"></a><a name="p109592823314"></a>function GetSimStatus(int32_t slotId): void;</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="entry164mcpsimpp0"><a name="entry164mcpsimpp0"></a><a name="entry164mcpsimpp0"></a>Obtains the SIM card status.</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry165mcpsimpp0"><a name="entry165mcpsimpp0"></a><a name="entry165mcpsimpp0"></a>None</p>
 </td>
 </tr>
-<tr id="row178mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="entry179mcpsimpp0"><a name="entry179mcpsimpp0"></a><a name="entry179mcpsimpp0"></a>function getISOCountryCodeForSim(slotId: number, callback: AsyncCallback&lt;string&gt;): void;</p>
+<tr id="row178mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="entry179mcpsimpp0"><a name="entry179mcpsimpp0"></a><a name="entry179mcpsimpp0"></a>function GetIsoCountryCode(int32_t slotId): void;</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="entry180mcpsimpp0"><a name="entry180mcpsimpp0"></a><a name="entry180mcpsimpp0"></a>Obtains the country code.</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry181mcpsimpp0"><a name="entry181mcpsimpp0"></a><a name="entry181mcpsimpp0"></a>None</p>
 </td>
 </tr>
-<tr id="row182mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p1441115133518"><a name="p1441115133518"></a><a name="p1441115133518"></a>function getSimOperatorNumeric(slotId: number, callback: AsyncCallback&lt;string&gt;): void;</p>
+<tr id="row182mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p1441115133518"><a name="p1441115133518"></a><a name="p1441115133518"></a>function GetSimOperator(int32_t slotId): void;</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="entry184mcpsimpp0"><a name="entry184mcpsimpp0"></a><a name="entry184mcpsimpp0"></a>Obtains the carrier code.</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry185mcpsimpp0"><a name="entry185mcpsimpp0"></a><a name="entry185mcpsimpp0"></a>None</p>
 </td>
 </tr>
-<tr id="row186mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p1818291010352"><a name="p1818291010352"></a><a name="p1818291010352"></a>function getSimSpn(slotId: number, callback: AsyncCallback&lt;string&gt;): void;</p>
+<tr id="row186mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p1818291010352"><a name="p1818291010352"></a><a name="p1818291010352"></a>function GetSpn(int32_t slotId): void;</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="entry188mcpsimpp0"><a name="entry188mcpsimpp0"></a><a name="entry188mcpsimpp0"></a>Obtains the SPN information.</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry189mcpsimpp0"><a name="entry189mcpsimpp0"></a><a name="entry189mcpsimpp0"></a>None</p>
 </td>
 </tr>
+</tr>
+<tr id="row186mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p1818291010352"><a name="p1818291010352"></a><a name="p1818291010352"></a>function SimStateUpdated(int32_t slotId): void;</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="entry188mcpsimpp0"><a name="entry188mcpsimpp0"></a><a name="entry188mcpsimpp0"></a>SIM Card state update</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry189mcpsimpp0"><a name="entry189mcpsimpp0"></a><a name="entry189mcpsimpp0"></a>None</p>
+</td>
+</tr>
+</tr>
+<tr id="row186mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p1818291010352"><a name="p1818291010352"></a><a name="p1818291010352"></a>function UnlockSimPin(int32_t slotId): void;</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="entry188mcpsimpp0"><a name="entry188mcpsimpp0"></a><a name="entry188mcpsimpp0"></a>Unlock SIM Card</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry189mcpsimpp0"><a name="entry189mcpsimpp0"></a><a name="entry189mcpsimpp0"></a>None</p>
+</td>
+</tr>
 </tbody>
 </table>
+
 
 ### APIs for the Network Search Service<a name="section198mcpsimp"></a>
 
@@ -109,25 +143,104 @@ The telephony core service module needs to provide APIs for related modules, inc
 </th>
 </tr>
 </thead>
-<tbody><tr id="row210mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p611934143612"><a name="p611934143612"></a><a name="p611934143612"></a>function getRadioTech(slotId: number, callback: AsyncCallback&lt;{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}&gt;): void;</p>
+<tbody><tr id="row210mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p611934143612"><a name="p611934143612"></a><a name="p611934143612"></a>function GetPsRadioTech(int32_t slotId): void;</p>function GetCsRadioTech(int32_t slotId): void;</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="entry212mcpsimpp0"><a name="entry212mcpsimpp0"></a><a name="entry212mcpsimpp0"></a>Obtains the current radio access technology.</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry213mcpsimpp0"><a name="entry213mcpsimpp0"></a><a name="entry213mcpsimpp0"></a>ohos.permission.GET_NETWORK_INFO</p>
 </td>
 </tr>
-<tr id="row226mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p924781783614"><a name="p924781783614"></a><a name="p924781783614"></a>function getSignalInformation(slotId: number, callback: AsyncCallback&lt;Array&lt;SignalInformation&gt;&gt;): void;</p>
+<tr id="row226mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p924781783614"><a name="p924781783614"></a><a name="p924781783614"></a>function GetSignalInfoList(int32_t slotId): void;</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="entry228mcpsimpp0"><a name="entry228mcpsimpp0"></a><a name="entry228mcpsimpp0"></a>Obtains the signal information.</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry229mcpsimpp0"><a name="entry229mcpsimpp0"></a><a name="entry229mcpsimpp0"></a>None</p>
 </td>
 </tr>
-<tr id="row230mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p22372373611"><a name="p22372373611"></a><a name="p22372373611"></a>function getNetworkState(slotId: number, callback: AsyncCallback&lt;NetworkState&gt;): void;</p>
+<tr id="row230mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p22372373611"><a name="p22372373611"></a><a name="p22372373611"></a>function GetNetworkStatus(slotId: number, callback: AsyncCallback&lt;GetNetworkStatus&gt;): void;</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="entry232mcpsimpp0"><a name="entry232mcpsimpp0"></a><a name="entry232mcpsimpp0"></a>Obtains the network status.</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry233mcpsimpp0"><a name="entry233mcpsimpp0"></a><a name="entry233mcpsimpp0"></a>ohos.permission.GET_NETWORK_INFO</p>
+</td>
+</tr>
+<tr id="row226mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p924781783614"><a name="p924781783614"></a><a name="p924781783614"></a>function getNetworkSelectionMode(slotId: number, callback: AsyncCallback<NetworkSelectionMode>): void;</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="entry228mcpsimpp0"><a name="entry228mcpsimpp0"></a><a name="entry228mcpsimpp0"></a>Obtains the current network mode.</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry229mcpsimpp0"><a name="entry229mcpsimpp0"></a><a name="entry229mcpsimpp0"></a>None</p>
+</td>
+</tr>
+<tr id="row226mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p924781783614"><a name="p924781783614"></a><a name="p924781783614"></a>function setNetworkSelectionMode(options: NetworkSelectionModeOptions, callback: AsyncCallback<boolean>): void;</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="entry228mcpsimpp0"><a name="entry228mcpsimpp0"></a><a name="entry228mcpsimpp0"></a>Set the current network mode.</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry229mcpsimpp0"><a name="entry229mcpsimpp0"></a><a name="entry229mcpsimpp0"></a>None</p>
+</td>
+</tr>
+<tr id="row226mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p924781783614"><a name="p924781783614"></a><a name="p924781783614"></a>function getNetworkSearchInformation(slotId: number, callback: AsyncCallback<NetworkSearchResult>): void;</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="entry228mcpsimpp0"><a name="entry228mcpsimpp0"></a><a name="entry228mcpsimpp0"></a>Obtains the results of manual networksearch.</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry229mcpsimpp0"><a name="entry229mcpsimpp0"></a><a name="entry229mcpsimpp0"></a>None</p>
+</td>
+</tr>
+<tr id="row226mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p924781783614"><a name="p924781783614"></a><a name="p924781783614"></a>function isRadioOn(slotId: number, callback: AsyncCallback<boolean>): void;</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="entry228mcpsimpp0"><a name="entry228mcpsimpp0"></a><a name="entry228mcpsimpp0"></a>Determine that the radio is on.</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry229mcpsimpp0"><a name="entry229mcpsimpp0"></a><a name="entry229mcpsimpp0"></a>None</p>
+</td>
+</tr>
+<tr id="row226mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p924781783614"><a name="p924781783614"></a><a name="p924781783614"></a>function turnOnRadio(callback: AsyncCallback<void>): void;</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="entry228mcpsimpp0"><a name="entry228mcpsimpp0"></a><a name="entry228mcpsimpp0"></a>Open the radio.</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry229mcpsimpp0"><a name="entry229mcpsimpp0"></a><a name="entry229mcpsimpp0"></a>None</p>
+</td>
+</tr>
+<tr id="row226mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p924781783614"><a name="p924781783614"></a><a name="p924781783614"></a>function turnOffRadio(callback: AsyncCallback<void>): void;</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="entry228mcpsimpp0"><a name="entry228mcpsimpp0"></a><a name="entry228mcpsimpp0"></a>Close the radio.</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry229mcpsimpp0"><a name="entry229mcpsimpp0"></a><a name="entry229mcpsimpp0"></a>None</p>
+</td>
+</tr>
+<tr id="row226mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p924781783614"><a name="p924781783614"></a><a name="p924781783614"></a>function getISOCountryCodeForNetwork(slotId: number, callback: AsyncCallback<string>): void;</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="entry228mcpsimpp0"><a name="entry228mcpsimpp0"></a><a name="entry228mcpsimpp0"></a>Obtains the ISOCountryCode.</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry229mcpsimpp0"><a name="entry229mcpsimpp0"></a><a name="entry229mcpsimpp0"></a>None</p>
+</td>
+</tr>
+<tr id="row226mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p924781783614"><a name="p924781783614"></a><a name="p924781783614"></a>function setPreferredNetworkPara(slotId: number, networkMode: NetworkMode, callback: AsyncCallback<boolean>): void;</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="entry228mcpsimpp0"><a name="entry228mcpsimpp0"></a><a name="entry228mcpsimpp0"></a>Set the Preferred Network Mode.</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry229mcpsimpp0"><a name="entry229mcpsimpp0"></a><a name="entry229mcpsimpp0"></a>None</p>
+</td>
+</tr>
+<tr id="row226mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p924781783614"><a name="p924781783614"></a><a name="p924781783614"></a>function getPreferredNetworkPara(slotId: number, callback: AsyncCallback<NetworkMode>): void;</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="entry228mcpsimpp0"><a name="entry228mcpsimpp0"></a><a name="entry228mcpsimpp0"></a>Obtains the Preferred Network Mode.</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry229mcpsimpp0"><a name="entry229mcpsimpp0"></a><a name="entry229mcpsimpp0"></a>None</p>
+</td>
+</tr>
+</tr>
+<tr id="row226mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p924781783614"><a name="p924781783614"></a><a name="p924781783614"></a>function GetSignalStrength(slotId: number, callback: AsyncCallback<NetworkMode>): void;</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="entry228mcpsimpp0"><a name="entry228mcpsimpp0"></a><a name="entry228mcpsimpp0"></a>Get signal strength </p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry229mcpsimpp0"><a name="entry229mcpsimpp0"></a><a name="entry229mcpsimpp0"></a>None</p>
+</td>
+</tr>
+</tr>
+<tr id="row226mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p924781783614"><a name="p924781783614"></a><a name="p924781783614"></a>function GetOperatorInfo(slotId: number, callback: AsyncCallback<NetworkMode>): void;</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="entry228mcpsimpp0"><a name="entry228mcpsimpp0"></a><a name="entry228mcpsimpp0"></a>Get operator information </p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry229mcpsimpp0"><a name="entry229mcpsimpp0"></a><a name="entry229mcpsimpp0"></a>None</p>
 </td>
 </tr>
 </tbody>
@@ -143,8 +256,8 @@ The telephony core service module needs to provide APIs for related modules, inc
 The function of obtaining the network status is used as an example. The process is as follows:
 
 1.  Query the SIM card in the slot specified by  **slotId**. If  **slotId**  is not set, information about the primary card is queried by default.
-2.  Call the  **getNetworkState**  method in callback or Promise mode.
-3.  Obtain the network status information. The  **getNetworkState**  method works in asynchronous mode. The execution result is returned through the callback.
+2.  Call the  **GetNetworkStatus**  method in callback or Promise mode.
+3.  Obtain the network status information. The  **GetNetworkStatus**  method works in asynchronous mode. The execution result is returned through the callback.
 
     ```
     import radio from "@ohos.telephony.radio";
@@ -153,24 +266,24 @@ The function of obtaining the network status is used as an example. The process 
     let slotId = 1;
 
     // Call the API in callback mode.
-    radio.getNetworkState(slotId, (err, value) => {
+    radio.GetNetworkStatus(slotId, (err, value) => {
       if (err) {
         // If the API call failed, err is not empty.
-        console.error(`failed to getNetworkState because ${err.message}`);
+        console.error(`failed to GetNetworkStatus because ${err.message}`);
         return;
       }
       // If the API call succeeded, err is empty.
-      console.log(`success to getNetworkState: ${value}`);
+      console.log(`success to GetNetworkStatus: ${value}`);
     });
 
     // Call the API in Promise mode.
-    let promise = radio.getNetworkState(slotId);
+    let promise = radio.GetNetworkStatus(slotId);
     promise.then((value) => {
       // The API call succeeded.
-      console.log(`success to getNetworkState: ${value}`);
+      console.log(`success to GetNetworkStatus: ${value}`);
     }).catch((err) => {
       // The API call failed.
-      console.error(`failed to getNetworkState because ${err.message}`);
+      console.error(`failed to GetNetworkStatus because ${err.message}`);
     });
     ```
 

@@ -12,21 +12,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "hdf_death_recipient.h"
-#include "phone_manager.h"
-#include "telephony_log.h"
+#include "telephony_log_wrapper.h"
+#include "core_manager.h"
+#include "tel_ril_manager.h"
 
 namespace OHOS {
-HdfDeathRecipient::HdfDeathRecipient()
+namespace Telephony {
+HdfDeathRecipient::HdfDeathRecipient(int32_t slotId)
 {
-    TELEPHONY_INFO_LOG("HdfDeathRecipient");
+    slotId_ = slotId;
 }
 
 void HdfDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     sleep(2);
-    TELEPHONY_INFO_LOG("HdfDeathRecipient OnRemoteDied start");
-    PhoneManager ::GetInstance().Init();
-    TELEPHONY_INFO_LOG("HdfDeathRecipient OnRemoteDied end");
+    TELEPHONY_LOGD("HdfDeathRecipient OnRemoteDied id %{public}d start!", slotId_);
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId_);
+    if (core != nullptr) {
+        bool res;
+        int i = 0;
+        do {
+            res = core->InitCellularRadio(false);
+            if (!res) {
+                sleep(1);
+                i++;
+                TELEPHONY_LOGD("Initialization cellular radio failed. Try initialization again!");
+            }
+        } while (!res && (i < RilManager::RIL_INIT_COUNT_MAX));
+    } else {
+        TELEPHONY_LOGE("coreId:%{public}d is null, !", slotId_);
+    }
 }
+} // namespace Telephony
 } // namespace OHOS

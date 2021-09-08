@@ -14,9 +14,9 @@
  */
 
 #include "telephony_log_wrapper.h"
-#include <iostream>
 
 namespace OHOS {
+namespace Telephony {
 // initial static member object
 TelephonyLogLevel TelephonyLogWrapper::level_ = TelephonyLogLevel::DEBUG;
 
@@ -43,4 +43,5 @@ std::string TelephonyLogWrapper::GetBriefFileName(const std::string &file)
 
     return file;
 }
+} // namespace Telephony
 } // namespace OHOS

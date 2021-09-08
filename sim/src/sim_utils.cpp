@@ -12,229 +12,102 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "sim_utils.h"
 
 using namespace std;
 
 namespace OHOS {
-namespace SIM {
-std::string SIMUtils::BcdConvertTostring(std::string data, int offset, int length)
+namespace Telephony {
+unsigned char SIMUtils::HexCharConvertToInt(char c)
 {
-    (void)data;
-    (void)offset;
-    (void)length;
-    return "";
-}
-
-std::string SIMUtils::BcdConvertTostring(std::string data)
-{
-    (void)data;
-    return "";
-}
-
-std::string SIMUtils::BcdConvertToBytes(std::string bcd)
-{
-    (void)bcd;
-    return "";
-}
-
-void SIMUtils::BcdConvertToBytes(std::string bcd, std::string Bytes)
-{
-    (void)bcd;
-}
-
-std::string SIMUtils::BcdPlmnConvertTostring(std::string data, int offset)
-{
-    (void)data;
-    (void)offset;
-    return "";
-}
-
-std::string SIMUtils::BchConvertTostring(std::string data, int offset, int length)
-{
-    (void)data;
-    (void)offset;
-    (void)length;
-    return "";
-}
-
-std::string SIMUtils::CdmaBcdConvertTostring(std::string data, int offset, int length)
-{
-    (void)data;
-    (void)offset;
-    (void)length;
-    return "";
-}
-
-int SIMUtils::GsmBcdByteConvertToInt(unsigned char b)
-{
-    (void)b;
+    if (c >= '0' && c <= '9') {
+        return (c - '0');
+    } else if (c >= 'A' && c <= 'F') {
+        return (c - 'A' + DECIMAL_MAX);
+    } else if (c >= 'a' && c <= 'f') {
+        return (c - 'a' + DECIMAL_MAX);
+    }
     return 0;
 }
 
-int SIMUtils::CdmaBcdByteConvertToInt(unsigned char b)
+std::shared_ptr<unsigned char> SIMUtils::HexStringConvertToBytes(const std::string &s, int &byteslen)
 {
-    (void)b;
-    return 0;
+    if (s.empty()) {
+        return nullptr;
+    }
+    int id = 0;
+    int sz = s.length();
+    if (sz % HALF_LEN != 0) {
+        return nullptr;
+    }
+    int outlen = sz / HALF_LEN;
+    byteslen = outlen;
+    if (outlen == 0) {
+        return nullptr;
+    }
+    unsigned char *cache = (unsigned char *)calloc(outlen, sizeof(unsigned char));
+    if (cache == nullptr) {
+        return nullptr;
+    }
+    std::shared_ptr<unsigned char> ptr(cache);
+    unsigned char *ret = ptr.get();
+    for (int i = 0; i < sz; i += HALF_LEN) {
+        id = i / HALF_LEN;
+        ret[id] =
+            (unsigned char)((HexCharConvertToInt(s.at(i)) << HALF_BYTE_LEN) | HexCharConvertToInt(s.at(i + 1)));
+    }
+    return ptr;
 }
 
-std::string SIMUtils::AdnStringFieldConvertToString(std::string data, int offset, int length)
+std::string SIMUtils::BytesConvertToHexString(const unsigned char *bytes, int byteLen)
+{
+    if (bytes == nullptr) {
+        return "";
+    }
+    std::string str = "";
+    for (int i = 0; i < byteLen; i++) {
+        int b = 0;
+        b = 0x0f & (bytes[i] >> HALF_BYTE_LEN);
+        str.push_back(HEX_CHARS[b]);
+        b = 0x0f & bytes[i];
+        str.push_back(HEX_CHARS[b]);
+    }
+    return str;
+}
+
+void SIMUtils::ArrayCopy(const unsigned char *src, int srcPos, unsigned char *dest, int destPos, int length)
+{
+    src += srcPos;
+    dest += destPos;
+    for (int i = 0; i < length; i++) {
+        dest[i] = src[i];
+    }
+}
+
+bool SIMUtils::IsShowableAscii(char c)
+{
+    int asciiFirst = 0x20;
+    int asciiLast = 0x7E;
+    return (asciiFirst <= c && c <= asciiLast) || c == '\r' || c == '\n';
+}
+
+bool SIMUtils::IsShowableAsciiOnly(const std::string &str)
+{
+    int len = str.length();
+    for (int i = 0; i < len; i++) {
+        if (!IsShowableAscii(str.at(i))) {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::string SIMUtils::BcdPlmnConvertToString(const std::string &data, int offset)
 {
     (void)data;
     (void)offset;
-    (void)length;
     return "";
 }
-
-int SIMUtils::HexCharConvertToInt(char c)
-{
-    (void)c;
-    return 0;
-}
-
-std::string SIMUtils::HexstringConvertToBytes(std::string s)
-{
-    (void)s;
-    return "";
-}
-
-std::string SIMUtils::BytesConvertToHexString(std::string &bytes)
-{
-    return bytes;
-}
-
-std::string SIMUtils::NetworkNameConvertTostring(std::string data, int offset, int length)
-{
-    (void)data;
-    (void)offset;
-    (void)length;
-    return "";
-}
-
-std::string SIMUtils::ParseConvertToBnW(std::string data, int length)
-{
-    (void)data;
-    return "";
-}
-
-std::string SIMUtils::ParseConvertToRGB(std::string data, int length, bool transparency)
-{
-    (void)data;
-    (void)length;
-    (void)transparency;
-    return "";
-}
-
-std::string SIMUtils::GetDecimalSubstring(std::string iccId)
-{
-    (void)iccId;
-    return "";
-}
-
-int SIMUtils::BytesConvertToInt(std::string src, int offset, int length)
-{
-    (void)src;
-    (void)offset;
-    (void)length;
-    return 0;
-}
-
-long SIMUtils::BytesConvertToRawLong(std::string src, int offset, int length)
-{
-    (void)src;
-    (void)offset;
-    (void)length;
-    return 0;
-}
-
-std::string SIMUtils::UnsignedIntConvertToBytes(int value)
-{
-    (void)value;
-    return "";
-}
-
-std::string SIMUtils::SignedIntConvertToBytes(int value)
-{
-    (void)value;
-    return "";
-}
-
-int SIMUtils::UnsignedIntConvertToBytes(int value, std::string dest, int offset)
-{
-    (void)value;
-    (void)dest;
-    (void)offset;
-    return 0;
-}
-
-int SIMUtils::SignedIntConvertToBytes(int value, std::string dest, int offset)
-{
-    (void)value;
-    (void)dest;
-    (void)offset;
-    return 0;
-}
-
-unsigned char SIMUtils::CountTrailingZeros(unsigned char b)
-{
-    (void)b;
-    return 0;
-}
-
-std::string SIMUtils::ByteConvertToHex(unsigned char b)
-{
-    (void)b;
-    return "";
-}
-
-unsigned char SIMUtils::CharConvertToByte(char c)
-{
-    (void)c;
-    return 0;
-}
-
-int *SIMUtils::MapConvertTo2OrderBitColor(std::string data, int valueIndex, int length, int *colorArray, int bits)
-{
-    (void)data;
-    (void)valueIndex;
-    (void)length;
-    (void)colorArray;
-    (void)bits;
-    return nullptr;
-}
-
-int *SIMUtils::MapConvertToNon2OrderBitColor(
-    std::string data, int valueIndex, int length, int *colorArray, int bits)
-{
-    (void)data;
-    (void)valueIndex;
-    (void)length;
-    (void)colorArray;
-    (void)bits;
-    return nullptr;
-}
-
-int *SIMUtils::GetCLUT(std::string rawData, int offset, int number)
-{
-    (void)rawData;
-    (void)offset;
-    (void)number;
-    return nullptr;
-}
-
-int SIMUtils::BitConvertToRGB(int bit)
-{
-    (void)bit;
-    return 0;
-}
-
-int SIMUtils::IntConvertToBytes(int value, std::string dest, int offset, bool bsigned)
-{
-    (void)value;
-    (void)dest;
-    (void)offset;
-    (void)bsigned;
-    return 0;
-}
-} // namespace SIM
+} // namespace Telephony
 } // namespace OHOS

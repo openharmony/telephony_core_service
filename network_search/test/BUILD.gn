@@ -16,34 +16,51 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 
 TELEPHONY_CORE_SERVICE_ROOT = "//base/telephony/core_service"
 TELEPHONY_NETWORK_SEARCH_ROOT = "//base/telephony/core_service/network_search"
-HDF_FRAMEWORKS = "//drivers/hdf/frameworks"
 
 ohos_executable("tel_network_search_test") {
   install_enable = true
   sources = [
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/proxy/core_service_proxy.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_information.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_result.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_state.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/signal_information.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/test/test.cpp",
+    "network_search_test_callback_stub.cpp",
+    "test.cpp",
+    "test_broadcast.cpp",
   ]
 
   include_dirs = [
+    "//base/telephony/core_service/common/log/include",
+    "//base/telephony/ril_adapter/interfaces/innerkits",
     "$TELEPHONY_CORE_SERVICE_ROOT/base/include",
-
     "$TELEPHONY_CORE_SERVICE_ROOT/communication/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/common",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/proxy",
-
-    "$HDF_FRAMEWORKS/ability/sbuf/include",
-    "$HDF_FRAMEWORKS/core/shared/include",
-    "$HDF_FRAMEWORKS/core/host/include",
-    "$HDF_FRAMEWORKS/core/master/include",
-    "$HDF_FRAMEWORKS/include/core",
-    "$HDF_FRAMEWORKS/include/utils",
-    "$HDF_FRAMEWORKS/utils/include",
-    "$HDF_FRAMEWORKS/include/osal",
+    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/kits/include/",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
+    "//foundation/appexecfwk/standard/kits/appkit/native/app",
+    "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content",
+    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
+    "//foundation/appexecfwk/standard/services/bundlemgr/include",
+    "//foundation/aafwk/standard/services/abilitymgr/include",
+    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr/include",
+    "//base/notification/ces_standard/cesfwk/kits/native/include",
   ]
-  deps = [ "//utils/native/base:utils" ]
+  deps = [
+    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/kits:tel_core_service_api",
+    "//base/telephony/core_service/common:libtelephony_common",
+    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
+    "//foundation/aafwk/standard/frameworks/kits/ability/native:dummy_classes",
+    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
+    "//foundation/appexecfwk/standard/common:libappexecfwk_common",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base:appexecfwk_base",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core:appexecfwk_core",
+    "//foundation/appexecfwk/standard/kits:appkit_native",
+    "//foundation/appexecfwk/standard/services/bundlemgr:libbms",
+    "//utils/native/base:utils",
+  ]
 
   external_deps = [
     "appexecfwk_standard:libeventhandler",
@@ -52,6 +69,8 @@ ohos_executable("tel_network_search_test") {
     "safwk:system_ability_fwk",
     "samgr_L2:samgr_proxy",
   ]
+
+  defines = [ "TELEPHONY_LOG_TAG = \"NetworkSearchTest\"" ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]

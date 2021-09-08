@@ -16,10 +16,11 @@
 #ifndef OHOS_TELEPHONY_LOG_WRAPPER_H
 #define OHOS_TELEPHONY_LOG_WRAPPER_H
 
-#include "hilog/log.h"
 #include <string>
+#include "hilog/log.h"
 
 namespace OHOS {
+namespace Telephony {
 enum class TelephonyLogLevel {
     DEBUG = 0,
     INFO,
@@ -27,8 +28,6 @@ enum class TelephonyLogLevel {
     ERROR,
     FATAL,
 };
-
-static constexpr OHOS::HiviewDFX::HiLogLabel TELEPHONY_LABEL = {LOG_CORE, LOG_DOMAIN, TELEPHONY_LOG_TAG};
 
 class TelephonyLogWrapper {
 public:
@@ -50,15 +49,35 @@ private:
     static TelephonyLogLevel level_;
 };
 
-#define PRINT_LOG(LEVEL, Level, fmt, ...)                                           \
-    if (TelephonyLogWrapper::JudgeLevel(TelephonyLogLevel::LEVEL))                  \
-    OHOS::HiviewDFX::HiLog::Level(TELEPHONY_LABEL, "[%{public}s(%{public}s)] " fmt, \
-        TelephonyLogWrapper::GetBriefFileName(std::string(__FILE__)).c_str(), __FUNCTION__, ##__VA_ARGS__)
+#define CONFIG_HILOG
+#ifdef CONFIG_HILOG
 
-#define TELEPHONY_LOGD(fmt, ...) PRINT_LOG(DEBUG, Debug, fmt, ##__VA_ARGS__)
-#define TELEPHONY_LOGI(fmt, ...) PRINT_LOG(INFO, Info, fmt, ##__VA_ARGS__)
-#define TELEPHONY_LOGW(fmt, ...) PRINT_LOG(WARN, Warn, fmt, ##__VA_ARGS__)
-#define TELEPHONY_LOGE(fmt, ...) PRINT_LOG(ERROR, Error, fmt, ##__VA_ARGS__)
-#define TELEPHONY_LOGF(fmt, ...) PRINT_LOG(FATAL, Fatal, fmt, ##__VA_ARGS__)
+#ifndef TELEPHONY_LOG_TAG
+#define TELEPHONY_LOG_TAG "TelephonySubsystem"
+#endif
+
+static constexpr OHOS::HiviewDFX::HiLogLabel TELEPHONY_LABEL = {LOG_CORE, LOG_DOMAIN, TELEPHONY_LOG_TAG};
+
+#define __TEL_FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
+
+#define OHOS_DEBUG
+#ifndef OHOS_DEBUG
+#define PRINT_LOG(op, fmt, ...) (void)OHOS::HiviewDFX::HiLog::op(TELEPHONY_LABEL, fmt, ##__VA_ARGS__)
+#else
+#define PRINT_LOG(op, fmt, ...)                                                                                  \
+    (void)OHOS::HiviewDFX::HiLog::op(TELEPHONY_LABEL, "[%{public}s-(%{public}s:%{public}d)] " fmt, __FUNCTION__, \
+        __TEL_FILENAME__, __LINE__, ##__VA_ARGS__)
+#endif
+
+#define TELEPHONY_LOGD(fmt, ...) PRINT_LOG(Debug, fmt, ##__VA_ARGS__)
+#define TELEPHONY_LOGE(fmt, ...) PRINT_LOG(Error, fmt, ##__VA_ARGS__)
+#define TELEPHONY_LOGW(fmt, ...) PRINT_LOG(Warn, fmt, ##__VA_ARGS__)
+#define TELEPHONY_LOGI(fmt, ...) PRINT_LOG(Info, fmt, ##__VA_ARGS__)
+#define TELEPHONY_LOGF(fmt, ...) PRINT_LOG(Fatal, fmt, ##__VA_ARGS__)
+
+#else
+#define TELEPHONY_LOGD(...)
+#endif // CONFIG_HILOG
+} // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_TELEPHONY_LOG_WRAPPER_H

@@ -15,45 +15,45 @@
 
 #ifndef UNTITLED_SIGNAL_INFORMATION_H
 #define UNTITLED_SIGNAL_INFORMATION_H
+
 #include "parcel.h"
+
 namespace OHOS {
+namespace Telephony {
+static constexpr int MAX_SIGNAL_NUM = 2;
 class SignalInformation : public Parcelable {
 public:
-    enum class NetworkType { GSM = 1, CDMA, LTE, TDSCDMA };
+    enum class NetworkType { GSM = 1, CDMA, LTE, TDSCDMA, WCDMA };
     static constexpr int NO_VALUE = 0x1AAAAAAA;
-    static constexpr int GSM_SIGNAL_THRESHOLD_5BAR[] = {2, 4, 6, 8, 10, 12};
-    static constexpr int CDMA_SIGNAL_THRESHOLD_5BAR[] = {-113, -112, -106, -99, -92, -85};
-    static constexpr int EDVO_SIGNAL_THRESHOLD_5BAR[] = {-113, -112, -106, -99, -92, -85};
-    static constexpr int LTE_SIGNAL_THRESHOLD_5BAR[] = {-121, -120, -115, -110, -105, -97};
-    static constexpr int TDSCDMA_SIGNAL_THRESHOLD_5BAR[] = {-112, -111, -105, -99, -93, -87};
-    static constexpr int GSM_SIGNAL_THRESHOLD_4BAR[] = {2, 3, 5, 8, 12};
-    static constexpr int CDMA_SIGNAL_THRESHOLD_4BAR[] = {-113, -109, -101, -93, -85};
-    static constexpr int EDVO_SIGNAL_THRESHOLD_4BAR[] = {-113, -109, -101, -93, -85};
-    static constexpr int LTE_SIGNAL_THRESHOLD_4BAR[] = {-121, -120, -114, -107, -97};
-    static constexpr int TDSCDMA_SIGNAL_THRESHOLD_4BAR[] = {-112, -111, -103, -95, -87};
-    static const int *g_gsmSignalThreshold;
-    static const int *g_cdmaSignalThreshold;
-    static int g_signalBar;
     virtual SignalInformation::NetworkType GetNetworkType() const = 0;
     virtual bool Marshalling(Parcel &parcel) const = 0;
+    static void InitSignalBar(const int32_t bar = 5);
     static std::unique_ptr<SignalInformation> UnMarshalling(Parcel &parcel);
     virtual bool ReadFromParcel(Parcel &parcel) = 0;
     virtual int32_t GetSignalLevel() const = 0;
+    virtual std::string ToString() const = 0;
     virtual sptr<SignalInformation> NewInstance() const = 0;
-    SignalInformation() = default;
+    SignalInformation();
     virtual ~SignalInformation() = default;
+
+protected:
+    static int32_t signalBar_;
+    static int32_t *gsmSignalThreshold_;
+    static int32_t *cdmaSignalThreshold_;
+    static int32_t *lteSignalThreshold_;
+    static int32_t *wcdmaSignalThreshold_;
 };
 
 class GsmSignalInformation : public SignalInformation {
 public:
-    GsmSignalInformation();
-    ~GsmSignalInformation();
-    void SetValue(const int32_t gsmRssi = 0, const int32_t timeAdvance = 0);
+    GsmSignalInformation() = default;
+    ~GsmSignalInformation() = default;
+    void SetValue(const int32_t gsmRssi = 0, const int32_t gsmBer = 0);
     bool operator==(const GsmSignalInformation &gsm) const;
     int32_t GetRssi() const;
+    int32_t GetGsmBer() const;
     int32_t GetSignalLevel() const override;
-    int32_t GetTimeAdvance() const;
-    std::u16string ToString() const;
+    std::string ToString() const override;
     sptr<SignalInformation> NewInstance() const override;
     SignalInformation::NetworkType GetNetworkType() const override;
     bool Marshalling(Parcel &parcel) const override;
@@ -62,19 +62,19 @@ public:
     bool ValidateGsmValue() const;
 
 private:
-    int32_t gsmRssi_ = 0;
-    int32_t timeAdvance_ = 0;
+    int32_t gsmRxlev_ = 0;
+    int32_t gsmBer_ = 0;
 };
 
 class CdmaSignalInformation : public SignalInformation {
 public:
-    CdmaSignalInformation();
-    ~CdmaSignalInformation();
+    CdmaSignalInformation() = default;
+    ~CdmaSignalInformation() = default;
     void SetValue(const int32_t cdmaRssi = 0, const int32_t cdmaEcno = 0);
     bool operator==(const CdmaSignalInformation &cdma) const;
     int32_t GetCdmaRssi() const;
     int32_t GetSignalLevel() const override;
-    std::u16string ToString() const;
+    std::string ToString() const override;
     SignalInformation::NetworkType GetNetworkType() const override;
     sptr<SignalInformation> NewInstance() const override;
     bool Marshalling(Parcel &parcel) const override;
@@ -87,5 +87,60 @@ private:
     int32_t cdmaRssi_ = -1;
     int32_t cdmaEcno_ = -1;
 };
+
+class LteSignalInformation : public SignalInformation {
+public:
+    LteSignalInformation() = default;
+    ~LteSignalInformation() = default;
+    void SetValue(
+        const int32_t rxlev = 0, const int32_t lteRsrp = 0, const int32_t lteRsrq = 0, const int32_t lteSnr = 0);
+    bool operator==(const LteSignalInformation &lte) const;
+    int32_t GetRxlev() const;
+    int32_t GetRsrp() const;
+    int32_t GetRsrq() const;
+    int32_t GetSnr() const;
+    int32_t GetSignalLevel() const override;
+    std::string ToString() const override;
+    SignalInformation::NetworkType GetNetworkType() const override;
+    sptr<SignalInformation> NewInstance() const override;
+    bool Marshalling(Parcel &parcel) const override;
+    static std::unique_ptr<LteSignalInformation> UnMarshalling(Parcel &parcel);
+    bool ReadFromParcel(Parcel &parcel) override;
+    bool ValidateLteValue() const;
+
+private:
+    int32_t rxlev_ = 0;
+    int32_t lteRsrp_ = 0;
+    int32_t lteRsrq_ = 0;
+    int32_t lteSnr_ = 0;
+};
+
+class WcdmaSignalInformation : public SignalInformation {
+public:
+    WcdmaSignalInformation() = default;
+    ~WcdmaSignalInformation() = default;
+    void SetValue(const int32_t wcdmaRxlev = 0, const int32_t wcdmaRscp = 0, const int32_t wcdmaEcio = 0,
+        const int32_t wcdmaBer = 0);
+    bool operator==(const WcdmaSignalInformation &wcdma) const;
+    int32_t GetRxlev() const;
+    int32_t GetRscp() const;
+    int32_t GetEcno() const;
+    int32_t GetBer() const;
+    int32_t GetSignalLevel() const override;
+    std::string ToString() const override;
+    SignalInformation::NetworkType GetNetworkType() const override;
+    sptr<SignalInformation> NewInstance() const override;
+    bool Marshalling(Parcel &parcel) const override;
+    static std::unique_ptr<WcdmaSignalInformation> UnMarshalling(Parcel &parcel);
+    bool ReadFromParcel(Parcel &parcel) override;
+    bool ValidateWcdmaValue() const;
+
+private:
+    int32_t wcdmaRxlev_ = 0;
+    int32_t wcdmaRscp_ = 0;
+    int32_t wcdmaEcio_ = 0;
+    int32_t wcdmaBer_ = 0;
+};
+} // namespace Telephony
 } // namespace OHOS
 #endif // UNTITLED_SIGNAL_INFORMATION_H

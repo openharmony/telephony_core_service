@@ -17,7 +17,9 @@
 #define CELLULAR_DATA_TYPES_H
 
 #include <cstdint>
+
 namespace OHOS {
+namespace Telephony {
 namespace CellularData {
 const uint32_t DATA_FLOW_TYPE_NONE = 0;
 const uint32_t DATA_STATE_DISCONNECTED = 11;
@@ -37,6 +39,13 @@ const uint32_t RADIO_TECHNOLOGY_LTE = 108;
 const uint32_t RADIO_TECHNOLOGY_LTE_CA = 109;
 const uint32_t RADIO_TECHNOLOGY_IWLAN = 110;
 const uint32_t RADIO_TECHNOLOGY_NR = 111;
+
+enum HDataRespondCode {
+    H_CODE_INVALID_PARAM = -1,
+    H_CODE_FAILED = 0,
+    H_CODE_SUCCESS = 1,
+};
 } // namespace CellularData
+} // namespace Telephony
 } // namespace OHOS
 #endif // CELLULAR_DATA_TYPES_H

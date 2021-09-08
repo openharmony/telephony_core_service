@@ -33,6 +33,7 @@ ohos_executable("tel_ril_test") {
   ]
 
   include_dirs = [
+    "//base/telephony/ril_adapter/interfaces/innerkits",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/tel_ril/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/common",
@@ -58,8 +59,10 @@ ohos_executable("tel_ril_test") {
   deps = [
     "//base/telephony/core_service:tel_core_service",
     "//base/telephony/core_service/common:libtelephony_common",
+    "//base/telephony/ril_adapter/hril:hril",
     "//utils/native/base:utils",
   ]
+
   external_deps = [
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
@@ -73,6 +76,7 @@ ohos_executable("tel_ril_test") {
   } else {
     external_deps += [ "hilog:libhilog" ]
   }
+
   part_name = "core_service"
   subsystem_name = "telephony"
 }

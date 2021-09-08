@@ -16,7 +16,7 @@
 #include "state_registry_death_recipient.h"
 
 namespace OHOS {
-namespace TelephonyState {
+namespace Telephony {
 StateRegistryDeathRecipient::StateRegistryDeathRecipient(
     const std::function<void(const wptr<IRemoteObject> &object)> &deathCallback)
     : deathCallback_(deathCallback)
@@ -28,5 +28,5 @@ void StateRegistryDeathRecipient::OnRemoteDied(const OHOS::wptr<OHOS::IRemoteObj
         deathCallback_(object);
     }
 }
-} // namespace TelephonyState
+} // namespace Telephony
 } // namespace OHOS
