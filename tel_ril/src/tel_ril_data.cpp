@@ -12,11 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "tel_ril_data.h"
-#include "hril_call_parcel.h"
 #include "hril_modem_parcel.h"
 
 namespace OHOS {
+namespace Telephony {
 void TelRilData::AddHandlerToMap()
 {
     // Notification
@@ -34,12 +35,12 @@ TelRilData::TelRilData(sptr<IRemoteObject> cellularRadio, std::shared_ptr<Observ
 
 bool TelRilData::IsDataResponse(uint32_t code)
 {
-    return code >= HREQ_DATA_BASE && code < HREQ_NETWORK_BASE;
+    return ((code >= HREQ_DATA_BASE) && (code < HREQ_NETWORK_BASE));
 }
 
 bool TelRilData::IsDataNotification(uint32_t code)
 {
-    return code >= HNOTI_DATA_BASE && code < HNOTI_NETWORK_BASE;
+    return ((code >= HNOTI_DATA_BASE) && (code < HNOTI_NETWORK_BASE));
 }
 
 bool TelRilData::IsDataRespOrNotify(uint32_t code)
@@ -47,10 +48,9 @@ bool TelRilData::IsDataRespOrNotify(uint32_t code)
     return IsDataResponse(code) || IsDataNotification(code);
 }
 
-void TelRilData::ProcessDataRespOrNotify(uint32_t code, OHOS::MessageParcel &data)
+void TelRilData::ProcessDataRespOrNotify(uint32_t code, MessageParcel &data)
 {
-    TELEPHONY_INFO_LOG(
-        "TelRilData ProcessDataRespOrNotify code:%{public}u, GetDataSize:%{public}zu", code, data.GetDataSize());
+    TELEPHONY_LOGD("code:%{public}d, GetDataSize:%{public}zu", code, data.GetDataSize());
     auto itFunc = memberFuncMap_.find(code);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
@@ -63,181 +63,144 @@ void TelRilData::ProcessDataRespOrNotify(uint32_t code, OHOS::MessageParcel &dat
 DataProfileDataInfo TelRilData::ChangeDPToHalDataProfile(CellularDataProfile dataProfile)
 {
     DataProfileDataInfo dataProfileInfo;
-    dataProfileInfo.profileId = dataProfile.profileId;
-    dataProfileInfo.password = dataProfile.password;
-    dataProfileInfo.verType = dataProfile.verType;
-    dataProfileInfo.userName = dataProfile.userName;
-    dataProfileInfo.apn = dataProfile.apn;
-    dataProfileInfo.protocol = dataProfile.protocol;
-    dataProfileInfo.roamingProtocol = dataProfile.roamingProtocol;
+    dataProfileInfo.profileId = dataProfile.profileId_;
+    dataProfileInfo.password = dataProfile.password_;
+    dataProfileInfo.verType = dataProfile.verType_;
+    dataProfileInfo.userName = dataProfile.userName_;
+    dataProfileInfo.apn = dataProfile.apn_;
+    dataProfileInfo.protocol = dataProfile.protocol_;
+    dataProfileInfo.roamingProtocol = dataProfile.roamingProtocol_;
     return dataProfileInfo;
 }
 
 void TelRilData::DeactivatePdpContext(int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TELEPHONY_INFO_LOG("RilManagerBase::DeactivatePdpContext -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<TelRilRequest> telRilRequest =
             CreateTelRilRequest(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, response);
         if (telRilRequest == nullptr) {
-            TELEPHONY_DEBUG_LOG("RilManager DeactivatePdpContext:telRilRequest is nullptr");
+            TELEPHONY_LOGE("telRilRequest is nullptr");
             return;
         }
-        TELEPHONY_DEBUG_LOG(
-            "DeactivatePdpContext --> telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
+        TELEPHONY_LOGD("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
         UniInfo uniInfo;
         uniInfo.serial = telRilRequest->serialId_;
         uniInfo.gsmIndex = cid;
         uniInfo.arg1 = reason;
-        OHOS::MessageParcel wData;
+        MessageParcel wData;
         uniInfo.Marshalling(wData);
         int ret = SendBufferEvent(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, wData);
-        TELEPHONY_INFO_LOG(
-            "DeactivatePdpContext --> SendBufferEvent(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, "
-            "wData) "
-            "return ID: %{public}d",
-            ret);
+        TELEPHONY_LOGD("SendBufferEvent HREQ_DATA_DEACTIVATE_PDP_CONTEXT return: %{public}d", ret);
     } else {
-        TELEPHONY_ERR_LOG("ERROR : DeactivatePdpContext --> cellularRadio_ == nullptr");
+        TELEPHONY_LOGE("ERROR : cellularRadio_ is nullptr");
     }
 }
 
-void TelRilData::DeactivatePdpContextResponse(OHOS::MessageParcel &data)
+void TelRilData::DeactivatePdpContextResponse(MessageParcel &data)
 {
-    TELEPHONY_INFO_LOG("TelRilData::DeactivatePdpContextResponse --> ");
+    std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
+    setupDataCallResultInfo->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
-        TELEPHONY_ERR_LOG("DeactivatePdpContextResponse --> ReadBuffer(data) failed !!!");
+        TELEPHONY_LOGE("ERROR : spBuffer is nullptr !!!");
         return;
     }
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
-    if (radioResponseInfo == nullptr) {
-        TELEPHONY_ERR_LOG("ERROR : SendSmsMoreModeResponse --> radioResponseInfo == nullptr !!!");
-        return;
-    }
-    TELEPHONY_DEBUG_LOG(
-        "DeactivatePdpContextResponse --> radioResponseInfo->serial:%{public}d, "
-        "radioResponseInfo->error:%{public}d,"
-        " radioResponseInfo->type:%{public}d",
-        radioResponseInfo->serial, radioResponseInfo->error, radioResponseInfo->type);
+    TELEPHONY_LOGD("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
+        radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
             const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
-                TELEPHONY_ERR_LOG("ERROR : DeactivatePdpContextResponse --> handler == nullptr !!!");
+                TELEPHONY_LOGE("ERROR : handler is nullptr !!!");
                 return;
             }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
-            uint64_t param = telRilRequest->pointer_->GetParam();
-            handler->SendEvent(eventId, param, 0);
+            setupDataCallResultInfo->flag = telRilRequest->pointer_->GetParam();
+            TELEPHONY_LOGD("setupDataCallResultInfo->flag:%{public}d", setupDataCallResultInfo->flag);
+            handler->SendEvent(eventId, setupDataCallResultInfo);
+        } else {
+            ErrorResponse(telRilRequest, *radioResponseInfo);
         }
-
-        if (radioResponseInfo->type == HRilResponseType::HRIL_RESP_ACK_NEED) {
-            SendRespOrNotiAck();
-        }
+    } else {
+        TELEPHONY_LOGE("ERROR : telRilRequest is nullptr || radioResponseInfo error !");
     }
 }
 
 void TelRilData::ActivatePdpContext(int32_t radioTechnology, CellularDataProfile dataProfile, bool isRoaming,
     bool allowRoaming, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TELEPHONY_INFO_LOG("TelRilData::ActivatePdpContext -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<TelRilRequest> telRilRequest =
             CreateTelRilRequest(HREQ_DATA_ACTIVATE_PDP_CONTEXT, response);
         if (telRilRequest == nullptr) {
-            TELEPHONY_DEBUG_LOG("TelRilData ActivatePdpContext:telRilRequest is nullptr");
+            TELEPHONY_LOGE("telRilRequest is nullptr");
             return;
         }
-        TELEPHONY_DEBUG_LOG("ActivatePdpContext --> telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
+        TELEPHONY_LOGD(" telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
         DataCallInfo dataCallInfo;
         dataCallInfo.serial = telRilRequest->serialId_;
         dataCallInfo.radioTechnology = radioTechnology;
         dataCallInfo.dataProfileInfo = ChangeDPToHalDataProfile(dataProfile);
         dataCallInfo.roamingAllowed = allowRoaming;
         dataCallInfo.isRoaming = isRoaming;
-        OHOS::MessageParcel wData;
+        MessageParcel wData;
         dataCallInfo.Marshalling(wData);
-        OHOS::MessageParcel reply;
+        MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         int ret = cellularRadio_->SendRequest(HREQ_DATA_ACTIVATE_PDP_CONTEXT, wData, reply, option);
-        TELEPHONY_INFO_LOG(
-            "ActivatePdpContext --> SendBufferEvent(HREQ_DATA_ACTIVATE_PDP_CONTEXT, wData) return "
-            "ID: %{public}d",
-            ret);
+        TELEPHONY_LOGD("SendBufferEvent HREQ_DATA_ACTIVATE_PDP_CONTEXT return: %{public}d", ret);
     } else {
-        TELEPHONY_ERR_LOG("ERROR : ActivatePdpContext --> cellularRadio_ == nullptr");
+        TELEPHONY_LOGE("ERROR : cellularRadio_ == nullptr");
     }
 }
 
-void TelRilData::ActivatePdpContextResponse(OHOS::MessageParcel &data)
+void TelRilData::ActivatePdpContextResponse(MessageParcel &data)
 {
-    TELEPHONY_INFO_LOG("TelRilData::ActivatePdpContextResponse --> ");
     std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
-    if (setupDataCallResultInfo == nullptr) {
-        TELEPHONY_ERR_LOG("ERROR : ActivatePdpContextResponse --> setupDataCallResultInfo == nullptr failed !!!");
-        return;
-    }
     setupDataCallResultInfo->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
-        TELEPHONY_ERR_LOG("ERROR : ActivatePdpContextResponse --> spBuffer == nullptr !!!");
+        TELEPHONY_LOGE("ERROR : spBuffer is nullptr !!!");
         return;
     }
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
-    if (radioResponseInfo == nullptr) {
-        TELEPHONY_ERR_LOG("ERROR : SendSmsMoreModeResponse --> radioResponseInfo == nullptr !!!");
-        return;
-    }
-    TELEPHONY_DEBUG_LOG(
-        "ActivatePdpContextResponse -->  radioResponseInfo->serial:%{public}d,"
-        " radioResponseInfo->error:%{public}d,"
-        " radioResponseInfo->type:%{public}d",
-        radioResponseInfo->serial, radioResponseInfo->error, radioResponseInfo->type);
+    TELEPHONY_LOGD("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
+        radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
             const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
-                TELEPHONY_ERR_LOG("ERROR : ActivatePdpContextResponse --> handler == nullptr !!!");
+                TELEPHONY_LOGE("ERROR : handler is nullptr !!!");
                 return;
             }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             setupDataCallResultInfo->flag = telRilRequest->pointer_->GetParam();
-            TELEPHONY_DEBUG_LOG("ActivatePdpContextResponse -->  setupDataCallResultInfo->flag:%{public}d",
-                setupDataCallResultInfo->flag);
+            TELEPHONY_LOGD("setupDataCallResultInfo->flag:%{public}d", setupDataCallResultInfo->flag);
             handler->SendEvent(eventId, setupDataCallResultInfo);
-        }
-
-        if (radioResponseInfo->type == HRilResponseType::HRIL_RESP_ACK_NEED) {
-            SendRespOrNotiAck();
+        } else {
+            ErrorResponse(telRilRequest, *radioResponseInfo);
         }
     } else {
-        TELEPHONY_ERR_LOG(
-            "ERROR : ActivatePdpContextResponse --> "
-            "telRilRequest == nullptr || radioResponseInfo error !");
+        TELEPHONY_LOGE("ERROR : telRilRequest is nullptr || radioResponseInfo error !");
     }
 }
 
-void TelRilData::PdpContextListUpdated(OHOS::MessageParcel &data)
+void TelRilData::PdpContextListUpdated(MessageParcel &data)
 {
-    TELEPHONY_INFO_LOG("TelRilData::PdpContextListUpdated --> ");
-    std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
-    if (setupDataCallResultInfo == nullptr) {
-        TELEPHONY_ERR_LOG("PdpContextListUpdated setupDataCallResultInfo is nullptr");
-        return;
-    }
-    setupDataCallResultInfo->ReadFromParcel(data);
+    std::shared_ptr<DataCallResultList> dataCallResultList = std::make_shared<DataCallResultList>();
+    dataCallResultList->ReadFromParcel(data);
     int32_t indicationType = data.ReadInt32();
     if (observerHandler_ != nullptr) {
-        RilProcessIndication(indicationType);
-        TELEPHONY_DEBUG_LOG("TelRilData::PdpContextListUpdated indicationType:%{public}d", indicationType);
-        observerHandler_->NotifyObserver(ObserverHandler::RADIO_DATA_CALL_LIST_CHANGED, setupDataCallResultInfo);
+        TELEPHONY_LOGD("indicationType:%{public}d", indicationType);
+        observerHandler_->NotifyObserver(ObserverHandler::RADIO_DATA_CALL_LIST_CHANGED, dataCallResultList);
     }
 }
+} // namespace Telephony
 } // namespace OHOS

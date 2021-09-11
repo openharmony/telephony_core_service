@@ -12,11 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_USIM_FUNCTION_HANDLE_H
 #define OHOS_USIM_FUNCTION_HANDLE_H
 
 namespace OHOS {
-namespace SIM {
+namespace Telephony {
 class UsimFunctionHandle {
 public:
     UsimFunctionHandle(unsigned char table[], int len)
@@ -31,6 +32,6 @@ protected:
     int len_;
     const int BYTE_NUM = 8;
 };
-} // namespace SIM
+} // namespace Telephony
 } // namespace OHOS
 #endif

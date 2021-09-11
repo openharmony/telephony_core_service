@@ -12,44 +12,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef TEL_RIL_COMMON_H
 #define TEL_RIL_COMMON_H
 
-#include <memory>
-#include <map>
-#include <unordered_map>
-#include "observer_handler.h"
-#include "telephony_log.h"
-#include "tel_ril_base.h"
 #include "i_tel_ril_manager.h"
+#include "tel_ril_base.h"
 
 namespace OHOS {
+namespace Telephony {
 class TelRilModem : public TelRilBase {
 public:
     TelRilModem(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
     ~TelRilModem() = default;
-
-    void SetModemRadioPower(bool on, const AppExecFwk::InnerEvent::Pointer &response);
 
     /**
      * @brief Turn on and off radio response (for flight mode)
      *
      * @param data is HDF service callback message
      */
-    void SetRadioPowerResponse(OHOS::MessageParcel &data);
-
-    ModemPowerState GetRadioStatusFromInt(int32_t statusInt);
-    ModemPowerState GetRadioState();
+    void SetRadioStatusResponse(MessageParcel &data);
+    void GetRadioStatusResponse(MessageParcel &data);
     void ShutDown(const AppExecFwk::InnerEvent::Pointer &response) {}
+    void RadioStateUpdated(MessageParcel &data);
 
     /**
      * @brief Radio Status Change response
      *
      * @param data is HDF service callback message
      */
-    void RadioStateUpdated(OHOS::MessageParcel &data);
-    void SetRadioPower(ModemPowerState radioState);
-    void ProcessCommonRespOrNotify(uint32_t code, OHOS::MessageParcel &data);
+    void SetRadioStatus(int fun, int rst, const AppExecFwk::InnerEvent::Pointer &response);
+    void GetRadioStatus(const AppExecFwk::InnerEvent::Pointer &response);
+    void ProcessCommonRespOrNotify(uint32_t code, MessageParcel &data);
     bool IsCommonRespOrNotify(uint32_t code);
     ModemPowerState radioState_ = ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;
 
@@ -62,5 +56,6 @@ private:
     using Func = void (TelRilModem::*)(MessageParcel &data);
     std::map<uint32_t, Func> memberFuncMap_;
 };
+} // namespace Telephony
 } // namespace OHOS
 #endif // TEL_RIL_COMMON_H

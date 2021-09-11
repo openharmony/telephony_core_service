@@ -19,9 +19,11 @@
 #include <list>
 #include <memory>
 #include <mutex>
+#include <condition_variable>
+#include <chrono>
 #include <string>
 #include <vector>
-#include "phone_manager.h"
+#include "core_manager.h"
 #include "event_handler.h"
 #include "event_runner.h"
 #include "common_event.h"
@@ -30,28 +32,54 @@
 #include "i_tel_ril_manager.h"
 #include "icc_state.h"
 #include "observer_handler.h"
+#include "telephony_state_registry_proxy.h"
+#include "i_sim_state_manager.h"
 
 namespace OHOS {
-namespace SIM {
+namespace Telephony {
 class SimStateManager;
 
-enum ExternalState {
-    EX_UNKNOWN,
-    EX_ABSENT,
-    EX_PIN_LOCKED,
-    EX_PUK_LOCKED,
-    EX_NETWORK_LOCKED,
-    EX_READY,
-    EX_UNREADY,
-    EX_BLOCKED_PERM,
-    EX_ICC_ERROR,
-    EX_ICC_RESTRICTED,
+enum UnlockType { PIN_TYPE, PUK_TYPE };
+
+enum UnlockCmd {
+    REQUEST_UNLOCK_PIN,
+    REQUEST_UNLOCK_PUK,
+    REQUEST_UNLOCK_REMAIN,
 };
 
+// pin/puk password incorect
+const int UNLOCK_PIN_PUK_INCORRECT = 16; // incorrect password
+// Current valid phone id
+const int CUR_VALID_PHONEID = 0;
 // Phone number
 const int SIM_CARD_NUM = 2;
 // The events for handleMessage
 const int MSG_SIM_GET_ICC_STATUS_DONE = 3;
+// Unlock pin
+const int MSG_SIM_UNLOCK_PIN_DONE = 4;
+// Unlock puk
+const int MSG_SIM_UNLOCK_PUK_DONE = 5;
+// Change pin
+const int MSG_SIM_CHANGE_PIN_DONE = 6;
+// Check pin state
+const int MSG_SIM_CHECK_PIN_DONE = 7;
+// Set pin state[0:close_lock_state], [1:open_lock_state]
+const int MSG_SIM_ENABLE_PIN_DONE = 8;
+// Get sim unlock remain
+const int MSG_SIM_UNLOCK_REMAIN_DONE = 10;
+// Get sim realtime icc state
+const int MSG_SIM_GET_REALTIME_ICC_STATUS_DONE = 21;
+
+// pin lock type
+const std::string FAC_PIN_LOCK = "SC";
+
+struct UnlockData {
+    UnlockType type;
+    int32_t lockState;
+    int32_t result;
+    int32_t remain;
+    int32_t pinRemain;
+};
 
 class SimStateHandle : public AppExecFwk::EventHandler {
 public:
@@ -59,27 +87,42 @@ public:
         const std::weak_ptr<SimStateManager> &simStateManager);
     ~SimStateHandle();
     void Init();
-    void ReleaseStateManger();
     int GetSimState(int slotId);
     bool HasSimCard(int slotId);
     void ObtainIccStatus();
-    void GetSimCardData(const AppExecFwk::InnerEvent::Pointer &event, int phoneId);
-    void GetSmsData(const AppExecFwk::InnerEvent::Pointer &event, int phoneId);
+    void ObtainRealtimeIccStatus();
+    void GetSimCardData(const AppExecFwk::InnerEvent::Pointer &event, int32_t phoneId);
+    void GetSimLockState(const AppExecFwk::InnerEvent::Pointer &event, int32_t phoneId);
+    void GetSetLockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t phoneId);
+    void UnlockPin(std::string pin, int32_t phoneId);
+    void UnlockPuk(std::string newPin, std::string puk, int32_t phoneId);
+    void AlterPin(std::string newPin, std::string oldPin, int32_t phoneId);
+    void UnlockRemain(int32_t phoneId);
+    void SetLockState(std::string pin, int32_t enable, int32_t phoneId);
+    void GetLockState(int32_t phoneId);
+    UnlockData GetUnlockData();
+    bool ConnectService();
+    const std::string SIM_STATE_ACTION = "com.hos.action.SIM_STATE_CHANGED";
 
 private:
+    void SyncCmdResponse();
+    void GetUnlockReult(const AppExecFwk::InnerEvent::Pointer &event, int32_t phoneId);
+    void GetUnlockRemain(const AppExecFwk::InnerEvent::Pointer &event, int32_t phoneId);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
-    void ProcessIccCardState(IccState &ar, int index);
-    void UpdateAppInfo(IccState &ar, int index);
-    void UpdateIccState(IccState &ar, int index);
+    void ProcessIccCardState(IccState &ar, int32_t index);
+    void UpdateAppInfo(IccState &ar, int32_t index);
+    void UpdateIccState(IccState &ar, int32_t index);
     bool PublishSimStateEvent(std::string event, int eventCode, std::string eventData);
 
 private:
+    UnlockData unlockRespon_;
     std::weak_ptr<SimStateManager> simStateManager_;
     std::vector<IccState> iccState_; // icc card states
     std::vector<ExternalState> externalState_; // need to broadcast sim state;
-    IRilManager *rilManager_; // ril manager
+    std::shared_ptr<Telephony::IRilManager> rilManager_ = nullptr; // ril manager
+    sptr<ITelephonyStateNotify> telephonyStateNotify_ = nullptr;
 };
-} // namespace SIM
+} // namespace Telephony
 } // namespace OHOS
 
 #endif // __SIM_STATE_HANDLE__

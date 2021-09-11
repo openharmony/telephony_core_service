@@ -12,23 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "sms_delivery_short_message_proxy.h"
 #include "message_option.h"
 #include "message_parcel.h"
+
 namespace OHOS {
-namespace SMS {
+namespace Telephony {
 SmsDeliveryShortMessageProxy::SmsDeliveryShortMessageProxy(const sptr<IRemoteObject> &impl)
-    : IRemoteProxy<SMS::IDeliveryShortMessageCallback>(impl)
+    : IRemoteProxy<IDeliveryShortMessageCallback>(impl)
 {}
 
-int32_t SmsDeliveryShortMessageProxy::OnSmsDeliveryResult(const std::u16string pdu)
+void SmsDeliveryShortMessageProxy::OnSmsDeliveryResult(const std::u16string pdu)
 {
     MessageOption option;
     MessageParcel dataParcel;
     MessageParcel replyParcel;
     dataParcel.WriteString16(pdu);
-    Remote()->SendRequest(ON_SMS_DELIVERY_RESULT, dataParcel, replyParcel, option);
-    return 0;
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        return;
+    }
+    remote->SendRequest(ON_SMS_DELIVERY_RESULT, dataParcel, replyParcel, option);
 }
-} // namespace SMS
+} // namespace Telephony
 } // namespace OHOS

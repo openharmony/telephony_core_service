@@ -20,96 +20,96 @@
 #include <locale>
 #include <string>
 
+#include <mutex>
+#include <condition_variable>
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "napi_util.h"
+#include "network_state.h"
+#include "signal_information.h"
+#include "network_information.h"
+#include "telephony_napi_hril_error_code.h"
+#include "telephony_napi_common_error.h"
+#include "core_manager.h"
 
 namespace OHOS {
-namespace TelephonyNapi {
-constexpr int NONE_PARAMTER = 0;
-constexpr int DEFAULT_ERROR = -1;
+namespace Telephony {
+constexpr int DEFAULT_ERROR = ERROR_SERVICE_UNAVAILABLE;
 constexpr int RESOLVED = 1;
 constexpr int REJECT = 0;
+constexpr int BUF_SIZE = 32;
+constexpr int WAIT_TIME_SECOND = 60 * 3;
 
-struct AsyncContext {
-    napi_env env;
-    napi_async_work work;
-    int32_t slotId;
-    napi_value value[3];
-    size_t valueLen;
-    napi_deferred deferred;
-    napi_ref callbackRef;
-    int status;
-};
-
-enum RatType {
+enum RadioType {
     /**
      * Indicates unknown radio access technology (RAT).
      */
-    RADIO_TECHNOLOGY_UNKNOWN = 0,
+    RADIO_TECH_UNKNOWN = 0,
 
     /**
      * Indicates that RAT is global system for mobile communications (GSM), including GSM, general packet
      * radio system (GPRS), and enhanced data rates for GSM evolution (EDGE).
      */
-    RADIO_TECHNOLOGY_GSM = 1,
+    RADIO_TECH_GSM = 1,
 
     /**
      * Indicates that RAT is code division multiple access (CDMA), including Interim Standard 95 (IS95) and
      * Single-Carrier Radio Transmission Technology (1xRTT).
      */
-    RADIO_TECHNOLOGY_1XRTT = 2,
+    RADIO_TECH_1XRTT = 2,
 
     /**
      * Indicates that RAT is wideband code division multiple address (WCDMA).
      */
-    RADIO_TECHNOLOGY_WCDMA = 3,
+    RADIO_TECH_WCDMA = 3,
 
     /**
      * Indicates that RAT is high-speed packet access (HSPA), including HSPA, high-speed downlink packet
      * access (HSDPA), and high-speed uplink packet access (HSUPA).
      */
-    RADIO_TECHNOLOGY_HSPA = 4,
+    RADIO_TECH_HSPA = 4,
 
     /**
      * Indicates that RAT is evolved high-speed packet access (HSPA+), including HSPA+ and dual-carrier
      * HSPA+ (DC-HSPA+).
      */
-    RADIO_TECHNOLOGY_HSPAP = 5,
+    RADIO_TECH_HSPAP = 5,
 
     /**
      * Indicates that RAT is time division-synchronous code division multiple access (TD-SCDMA).
      */
-    RADIO_TECHNOLOGY_TD_SCDMA = 6,
+    RADIO_TECH_TD_SCDMA = 6,
 
     /**
      * Indicates that RAT is evolution data only (EVDO), including EVDO Rev.0, EVDO Rev.A, and EVDO Rev.B.
      */
-    RADIO_TECHNOLOGY_EVDO = 7,
+    RADIO_TECH_EVDO = 7,
 
     /**
      * Indicates that RAT is evolved high rate packet data (EHRPD).
      */
-    RADIO_TECHNOLOGY_EHRPD = 8,
+    RADIO_TECH_EHRPD = 8,
 
     /**
      * Indicates that RAT is long term evolution (LTE).
      */
-    RADIO_TECHNOLOGY_LTE = 9,
+    RADIO_TECH_LTE = 9,
 
     /**
      * Indicates that RAT is LTE carrier aggregation (LTE-CA).
      */
-    RADIO_TECHNOLOGY_LTE_CA = 10,
+    RADIO_TECH_LTE_CA = 10,
 
     /**
      * Indicates that RAT is interworking WLAN (I-WLAN).
      */
-    RADIO_TECHNOLOGY_IWLAN = 11,
+    RADIO_TECH_IWLAN = 11,
 
     /**
      * Indicates that RAT is 5G new radio (NR).
      */
-    RADIO_TECHNOLOGY_NR = 12
+    RADIO_TECH_NR = 12
 };
 
 enum NetworkType {
@@ -153,22 +153,22 @@ enum RegStatus {
     /**
      * Indicates a state in which a device cannot use any service.
      */
-    REG_STATE_NO_SERVICE = 0,
+    REGISTRATION_STATE_NO_SERVICE = 0,
 
     /**
      * Indicates a state in which a device can use services properly.
      */
-    REG_STATE_IN_SERVICE = 1,
+    REGISTRATION_STATE_IN_SERVICE = 1,
 
     /**
      * Indicates a state in which a device can use only the emergency call service.
      */
-    REG_STATE_EMERGENCY_CALL_ONLY = 2,
+    REGISTRATION_STATE_EMERGENCY_CALL_ONLY = 2,
 
     /**
      * Indicates that the cellular radio is powered off.
      */
-    REG_STATE_POWER_OFF = 3
+    REGISTRATION_STATE_POWER_OFF = 3
 };
 
 enum NsaState {
@@ -203,6 +203,108 @@ enum NsaState {
      */
     NSA_STATE_SA_ATTACHED = 6
 };
-} // namespace TelephonyNapi
+
+enum NativeSelectionMode { NATIVE_NETWORK_SELECTION_AUTOMATIC = 0, NATIVE_NETWORK_SELECTION_MANUAL = 1 };
+
+enum NetworkSelectionMode {
+    /** Unknown network selection modes. */
+    NETWORK_SELECTION_UNKNOWN,
+
+    /** Automatic network selection modes. */
+    NETWORK_SELECTION_AUTOMATIC,
+
+    /** Manual network selection modes. */
+    NETWORK_SELECTION_MANUAL
+};
+
+enum NetworkInformationState {
+    /** Indicates that the network state is unknown. */
+    NETWORK_UNKNOWN,
+
+    /** Indicates that the network is available for registration. */
+    NETWORK_AVAILABLE,
+
+    /** Indicates that you have already registered with the network. */
+    NETWORK_CURRENT,
+
+    /** Indicates that the network is unavailable for registration. */
+    NETWORK_FORBIDDEN
+};
+
+struct AsyncContext {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    napi_async_work work = nullptr;
+    napi_deferred deferred = nullptr;
+    napi_ref callbackRef = nullptr;
+    int status = DEFAULT_ERROR;
+    int32_t result = DEFAULT_ERROR;
+};
+
+struct CallbackContext : BaseContext {
+    std::mutex callbackMutex;
+    std::condition_variable cv;
+    bool callbackEnd = false;
+    bool sendRequest = false;
+    int32_t errorCode = HRIL_ERR_GENERIC_FAILURE;
+};
+
+struct RadioTechContext : BaseContext {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t csTech = DEFAULT_ERROR;
+    int32_t psTech = DEFAULT_ERROR;
+};
+
+struct SignalInfoListContext : BaseContext {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    std::vector<sptr<SignalInformation>> signalInfoList;
+};
+
+struct GetSelectModeContext : CallbackContext {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t selectMode = DEFAULT_ERROR;
+};
+
+struct SetSelectModeContext : CallbackContext {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t selectMode = DEFAULT_ERROR;
+    std::string operatorName = "";
+    std::string operatorNumeric = "";
+    int32_t state = NETWORK_UNKNOWN;
+    std::string radioTech = "";
+    bool resumeSelection = false;
+    bool setResult = false;
+};
+
+struct GetSearchInfoContext : CallbackContext {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    NetworkSearchResult *searchResult = nullptr;
+};
+
+struct GetStateContext : BaseContext {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    std::string longOperatorName = "";
+    std::string shortOperatorName = "";
+    std::string plmnNumeric = "";
+    bool isRoaming = false;
+    int32_t regStatus = 0;
+    int32_t nsaState = NSA_STATE_NOT_SUPPORT;
+    bool isCaActive = false;
+    bool isEmergency = false;
+};
+
+struct GetISOCountryCodeContext : BaseContext {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    std::string countryCode = "";
+};
+
+struct IsRadioOnContext : CallbackContext {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    bool isRadioOn = false;
+};
+
+struct SwitchRadioContext : CallbackContext {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+};
+} // namespace Telephony
 } // namespace OHOS
 #endif // NAPI_RADIO_H

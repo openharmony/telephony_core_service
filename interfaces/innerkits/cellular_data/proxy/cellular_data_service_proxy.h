@@ -20,7 +20,7 @@
 #include "iremote_proxy.h"
 
 namespace OHOS {
-namespace CellularData {
+namespace Telephony {
 class CellularDataServiceProxy : public IRemoteProxy<ICellularDataManager> {
 public:
     explicit CellularDataServiceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<ICellularDataManager>(impl)
@@ -31,9 +31,9 @@ public:
     /**
      * Whether the cellular data user switch is enabled
      * @param slotId
-     * @return return ture User data switch on, false User data switch off.
+     * @return return true User data switch on, false User data switch off.
      */
-    virtual bool IsCellularDataEnabled(int32_t slotId);
+    virtual int32_t IsCellularDataEnabled(int32_t slotId);
 
     /**
      * Whether to enable cellular data user switch
@@ -57,9 +57,9 @@ public:
     /**
      * Whether roaming is allowed
      * @param slotId
-     * @return return ture Allowed to roam, false not Allowed to roam.
+     * @return return true Allowed to roam, false not Allowed to roam.
      */
-    bool IsDataRoamingEnabled(int32_t slotId);
+    int32_t IsDataRoamingEnabled(int32_t slotId);
 
     /**
      * Whether roaming switches are allowed
@@ -69,9 +69,13 @@ public:
      */
     int32_t EnableDataRoaming(int32_t slotId, bool enable);
 
+    int32_t ReleaseNet(std::string ident, uint32_t capability);
+
+    int32_t RequestNet(std::string ident, uint32_t capability);
+
 private:
     static inline BrokerDelegator<CellularDataServiceProxy> delegator_;
 };
-} // namespace CellularData
+} // namespace Telephony
 } // namespace OHOS
 #endif // CELLULAR_DATA_SERVICE_PROXY_H

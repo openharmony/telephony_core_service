@@ -13,36 +13,42 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_I_NS_MANAGER_H
-#define OHOS_I_NS_MANAGER_H
+#ifndef I_NETWORK_SEARCH_H
+#define I_NETWORK_SEARCH_H
 
-#include <string.h>
-#include <unistd.h>
-#include <cstdio>
-#include <cstring>
-#include <memory>
 #include <vector>
 #include "event_handler.h"
 #include "network_state.h"
 #include "signal_information.h"
+#include "network_search_result.h"
+#include "i_network_search_callback.h"
 
 namespace OHOS {
+namespace Telephony {
 class INetworkSearch {
 public:
     using HANDLE = const std::shared_ptr<AppExecFwk::EventHandler>;
     virtual void Init();
-    virtual int32_t GetPsRadioTech(int32_t slotId) = 0;
-    virtual int32_t GetCsRadioTech(int32_t slotId) = 0;
-    virtual std::u16string GetOperatorNumeric(int32_t slotId) = 0;
-    virtual std::u16string GetOperatorName(int32_t slotId) = 0;
-    virtual sptr<NetworkState> GetNetworkStatus(int32_t slotId) = 0;
-    virtual bool GetRadioState(int32_t slotId) = 0;
-    virtual void SetHRilRadioState(bool isOn) = 0;
-    virtual std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId) = 0;
-    virtual void RegisterForPSConnectionAttached(const HANDLE &handler) = 0;
-    virtual void UnregisterForPSConnectionAttached(const HANDLE &handler) = 0;
-    virtual void RegisterForPSConnectionDetached(const HANDLE &handler) = 0;
-    virtual void UnregisterForPSConnectionDetached(const HANDLE &handler) = 0;
+    virtual int32_t GetPsRadioTech(int32_t slotId) const = 0;
+    virtual int32_t GetCsRadioTech(int32_t slotId) const = 0;
+    virtual std::u16string GetOperatorNumeric(int32_t slotId) const = 0;
+    virtual std::u16string GetOperatorName(int32_t slotId) const = 0;
+    virtual sptr<NetworkState> GetNetworkStatus(int32_t slotId) const = 0;
+    virtual int32_t GetRadioState() const = 0;
+    virtual bool GetRadioState(const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual void SetRadioState(bool isOn, int32_t rst) = 0;
+    virtual bool SetRadioState(bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId) const = 0;
+    virtual void RegisterPhoneNotify(
+        const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what, void *obj) = 0;
+    virtual void UnRegisterPhoneNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what) = 0;
+    virtual bool GetNetworkSearchResult(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
+        const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
+        const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) const = 0;
 };
+} // namespace Telephony
 } // namespace OHOS
-#endif // CORE_SERVICE_IRIL_MANAGER_H
+#endif // I_NETWORK_SEARCH_H
