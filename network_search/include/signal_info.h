@@ -12,35 +12,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TELEPHONY_CORE_SIGNAL_INFO_H
-#define TELEPHONY_CORE_SIGNAL_INFO_H
+
+#ifndef NETWORK_SEARCH_INCLUDE_SIGNAL_INFO_H
+#define NETWORK_SEARCH_INCLUDE_SIGNAL_INFO_H
+
 #include "event_handler.h"
+#include "hril_types.h"
 #include "signal_information.h"
 
 namespace OHOS {
+namespace Telephony {
 class NetworkSearchNotify;
 class NetworkSearchState;
-struct GsmRssi;
-struct CdmaRssi;
 class SignalInfo {
 public:
     explicit SignalInfo();
     virtual ~SignalInfo() = default;
     void Reset();
     void InitSignalBar(const int bar = 5) const;
-    void GetSignalInfoList(std::vector<sptr<SignalInformation>> &signals, const bool isLock = true);
+    void GetSignalInfoList(std::vector<sptr<SignalInformation>> &signals);
     void ProcessSignalIntensity(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     bool ProcessGsm(const GsmRssi &gsmSignal);
     bool ProcessCdma(const CdmaRssi &cdmaSignal);
+    bool ProcessLte(const LteRssi &lteSignal);
+    bool ProcessWcdma(const WCdmaRssi &wcdmaSignal);
 
+private:
     std::mutex mutex_;
     GsmSignalInformation gsmSigInfoCache_;
     CdmaSignalInformation cdmaSigInfoCache_;
+    LteSignalInformation lteSigInfoCache_;
+    WcdmaSignalInformation wcdmaSigInfoCache_;
     GsmSignalInformation gsmSigInfoCur_;
     CdmaSignalInformation cdmaSigInfoCur_;
+    LteSignalInformation lteSigInfoCur_;
+    WcdmaSignalInformation wcdmaSigInfoCur_;
 };
+} // namespace Telephony
 } // namespace OHOS
 
-#endif // TELEPHONY_CORE_SIGNAL_INFO_H
+#endif // NETWORK_SEARCH_INCLUDE_SIGNAL_INFO_H

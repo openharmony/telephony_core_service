@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_SIM_FILE_H
 #define OHOS_SIM_FILE_H
 
@@ -23,7 +24,7 @@
 #include "mcc_pool.h"
 
 namespace OHOS {
-namespace SIM {
+namespace Telephony {
 class SimFile : public IccFile {
 public:
     SimFile(
@@ -33,9 +34,11 @@ public:
     std::string ObtainMsisdnNumber();
     std::string ObtainSimOperator();
     std::string ObtainIsoCountryCode();
+    int ObtainSpnCondition(bool roaming, const std::string &operatorNum);
     int ObtainCallForwardStatus();
     std::shared_ptr<UsimFunctionHandle> ObtainUsimFunctionHandle();
-    void UpdateMsisdnNumber(std::string alphaTag, std::string number, EventPointer &onComplete);
+    void UpdateMsisdnNumber(
+        const std::string &alphaTag, const std::string &number, const AppExecFwk::InnerEvent::Pointer &onComplete);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     ~SimFile();
     bool ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event);
@@ -55,7 +58,7 @@ protected:
     bool ProcessIccLocked(const AppExecFwk::InnerEvent::Pointer &event);
     void ObtainCallForwardFiles();
     void UpdateSimLanguage();
-    int callFowardStatus_ = 0;
+    int callForwardStatus_ = 0;
     unsigned char *cphsInfo_ = nullptr;
     bool cspPlmnOn_ = false;
     unsigned char *efMWIS_ = nullptr;
@@ -73,7 +76,9 @@ private:
     using FileProcessFunc = bool (SimFile::*)(const AppExecFwk::InnerEvent::Pointer &event);
     std::map<int, FileProcessFunc> memberFuncMap_;
     void InitMemberFunc();
-    void LoadElementaryFileLiAndPI();
+    void LoadSimLanguageFile();
+    void LoadElementaryFileLi();
+    void LoadElementaryFilePl();
     void ObtainSpnPhase(bool start, const AppExecFwk::InnerEvent::Pointer &event);
     std::string AnalysisBcdPlmn(std::string data, std::string description);
     void ProcessElementaryFileCsp(std::string data);
@@ -110,7 +115,7 @@ private:
     bool ProcessGetEhplmnDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetPnnDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event);
-    bool ProcessSetCphsMaibox(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessSetCphsMailbox(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetFplmnDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessSetMbdn(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessMarkSms(const AppExecFwk::InnerEvent::Pointer &event);
@@ -123,13 +128,13 @@ private:
     const int MNC_LEN = 2;
     const int MCCMNC_LEN = 6;
     const int LOAD_STEP = 1;
-    const int SPN_COND = 2;
+    enum SpnType { SPN_INVALID = -1, SPN_COND = 2 };
     const uint8_t BYTE_NUM = 0xff;
     class ElementaryFilePlLoaded : public IccFileLoaded {
     public:
         ElementaryFilePlLoaded(std::shared_ptr<SimFile> file) : file_(file) {}
         std::string ObtainElementaryFileName();
-        void ProcessFileLoaded(std::string &result);
+        void ProcessParseFile(const AppExecFwk::InnerEvent::Pointer &event);
         virtual ~ElementaryFilePlLoaded() {}
 
     private:
@@ -140,14 +145,14 @@ private:
     public:
         ElementaryFileUsimLiLoaded(std::shared_ptr<SimFile> file) : file_(file) {}
         std::string ObtainElementaryFileName();
-        void ProcessFileLoaded(std::string &result);
+        void ProcessParseFile(const AppExecFwk::InnerEvent::Pointer &event);
         virtual ~ElementaryFileUsimLiLoaded() {}
 
     private:
         std::shared_ptr<SimFile> file_ = nullptr;
     };
 };
-} // namespace SIM
+} // namespace Telephony
 } // namespace OHOS
 
 #endif // OHOS_SIM_FILE_H

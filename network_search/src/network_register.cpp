@@ -12,65 +12,84 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "network_register.h"
 
+#include "network_register.h"
 #include "hril_modem_parcel.h"
 #include "hril_network_parcel.h"
-
-#include "hilog_network_search.h"
 #include "network_search_manager.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
+namespace Telephony {
 NetworkRegister::NetworkRegister(std::shared_ptr<NetworkSearchState> networkSearchState)
-    : networkSearchState_(networkSearchState), phone_()
+    : networkSearchState_(networkSearchState)
 {}
 
-void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &event)
+void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &event) const
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister event is nullptr");
+        return;
+    }
+
     std::shared_ptr<CsRegStatusInfo> csRegStateResult = event->GetSharedObject<CsRegStatusInfo>();
-    if (!csRegStateResult) {
-        HILOG_INFO("NetworkRegister::ProcessCsRegister csRegStateResult is nullptr\n");
+    if (csRegStateResult == nullptr) {
+        TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister csRegStateResult is nullptr\n");
         return;
     }
-
     int registrationStatus = csRegStateResult->regStatus;
-    RegServiceState regStatus = ConvertRegToNetworkState(registrationStatus);
-    networkSearchState_->SetNetworkState(regStatus, DOMAIN_TYPE_CS);
-    networkSearchState_->SetNetworkType((RadioTech)csRegStateResult->radioTechnology, DOMAIN_TYPE_CS);
-    if (phone_.PhoneTypeGsmOrNot()) {
-        if ((registrationStatus >= REG_STATE_EMERGENCY_NOT_REG) &&
-            (registrationStatus <= REG_STATE_EMERGENCY_UNKNOWN)) {
-            pressingOnly_ = true;
-        } else {
-            pressingOnly_ = false;
-        }
+    RegServiceState regStatus = ConvertRegFromRil(registrationStatus);
+    if (networkSearchState_ == nullptr) {
+        TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister networkSearchState_ is nullptr\n");
+        return;
     }
-    networkSearchState_->SetEmergency(pressingOnly_);
-    HILOG_INFO("ProcessCsRegister: regStatus= %{public}d radioTechnology= %{public}d", registrationStatus,
-        csRegStateResult->radioTechnology);
-
+    networkSearchState_->SetNetworkState(regStatus, DOMAIN_TYPE_CS);
+    RadioTech tech = ConvertTechFromRil(csRegStateResult->radioTechnology);
+    networkSearchState_->SetNetworkType(tech, DOMAIN_TYPE_CS);
+    RoamingType roam = ROAMING_STATE_UNKNOWN;
+    if (registrationStatus == REG_STATE_ROAMING) {
+        roam = ROAMING_STATE_UNSPEC;
+    }
+    networkSearchState_->SetNetworkStateToRoaming(roam, DOMAIN_TYPE_CS);
+    TELEPHONY_LOGD("ProcessCsRegister: regStatus= %{public}d radioTechnology=%{public}d roam=%{public}d",
+        registrationStatus, csRegStateResult->radioTechnology, roam);
     networkSearchState_->NotifyStateChange();
 }
 
-void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &event)
+void NetworkRegister::ProcessRestrictedState(const AppExecFwk::InnerEvent::Pointer &event) const {}
+
+void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &event) const
 {
-    std::shared_ptr<PsRegStatusResultInfo> psRegStatusResult = event->GetSharedObject<PsRegStatusResultInfo>();
-    if (!psRegStatusResult) {
-        HILOG_INFO("NetworkRegister::ProcessPsRegister psRegStatusResult is nullptr\n");
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister event is nullptr");
         return;
     }
 
+    std::shared_ptr<PsRegStatusResultInfo> psRegStatusResult = event->GetSharedObject<PsRegStatusResultInfo>();
+    if (psRegStatusResult == nullptr) {
+        TELEPHONY_LOGI("NetworkRegister::ProcessPsRegister psRegStatusResult is nullptr\n");
+        return;
+    }
     int registrationStatus = psRegStatusResult->regStatus;
-    RegServiceState regStatus = ConvertRegToNetworkState(psRegStatusResult->regStatus);
+    RegServiceState regStatus = ConvertRegFromRil(psRegStatusResult->regStatus);
+    if (networkSearchState_ == nullptr) {
+        TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister networkSearchState_ is nullptr\n");
+        return;
+    }
     networkSearchState_->SetNetworkState(regStatus, DOMAIN_TYPE_PS);
-    networkSearchState_->SetNetworkType((RadioTech)psRegStatusResult->radioTechnology, DOMAIN_TYPE_PS);
-    HILOG_INFO("ProcessPsRegister: regStatus= %{public}d radioTechnology= %{public}d", registrationStatus,
-        psRegStatusResult->radioTechnology);
-
+    RadioTech tech = ConvertTechFromRil(psRegStatusResult->radioTechnology);
+    networkSearchState_->SetNetworkType(tech, DOMAIN_TYPE_PS);
+    RoamingType roam = ROAMING_STATE_UNKNOWN;
+    if (registrationStatus == REG_STATE_ROAMING) {
+        roam = ROAMING_STATE_UNSPEC;
+    }
+    networkSearchState_->SetNetworkStateToRoaming(roam, DOMAIN_TYPE_PS);
+    TELEPHONY_LOGD("ProcessPsRegister: regStatus= %{public}d radioTechnology=%{public}d roam=%{public}d",
+        registrationStatus, psRegStatusResult->radioTechnology, roam);
     networkSearchState_->NotifyStateChange();
 }
 
-RegServiceState NetworkRegister::ConvertRegToNetworkState(int code)
+RegServiceState NetworkRegister::ConvertRegFromRil(int code) const
 {
     switch (code) {
         case RilRegister::REG_STATE_SEARCH:
@@ -79,13 +98,30 @@ RegServiceState NetworkRegister::ConvertRegToNetworkState(int code)
         case RilRegister::REG_STATE_NO_SERVICE:
         case RilRegister::REG_STATE_INVALID:
             return RegServiceState::REG_STATE_NO_SERVICE;
+        case RilRegister::REG_STATE_ROAMING:
         case RilRegister::REG_STATE_HOME_ONLY:
             return RegServiceState::REG_STATE_IN_SERVICE;
-        case RilRegister::REG_STATE_EMERGENCY_NOT_REG:
-        case RilRegister::REG_STATE_EMERGENCY_UNKNOWN:
-            return RegServiceState::REG_STATE_EMERGENCY_ONLY;
         default:
             return RegServiceState::REG_STATE_NO_SERVICE;
     }
 }
+
+RadioTech NetworkRegister::ConvertTechFromRil(int code) const
+{
+    switch (code) {
+        case HRiRadioTechnology::HRIL_RADIO_GSM:
+        case HRiRadioTechnology::HRIL_RADIO_GSM_COMPACT:
+        case HRiRadioTechnology::HRIL_RADIO_EGPRS:
+            return RadioTech::RADIO_TECHNOLOGY_GSM;
+        case HRiRadioTechnology::HRIL_RADIO_HSDPA_HSUPA:
+        case HRiRadioTechnology::HRIL_RADIO_HSDPA:
+        case HRiRadioTechnology::HRIL_RADIO_HSUPA:
+            return RadioTech::RADIO_TECHNOLOGY_WCDMA;
+        case HRiRadioTechnology::HRIL_RADIO_EUTRAN:
+            return RadioTech::RADIO_TECHNOLOGY_LTE;
+        default:
+            return RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    }
+}
+} // namespace Telephony
 } // namespace OHOS

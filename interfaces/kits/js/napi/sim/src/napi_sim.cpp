@@ -14,390 +14,633 @@
  */
 
 #include "napi_sim.h"
-#include <cstring>
+
 #include <memory>
-#include "kit_core_service_hilog_wrapper.h"
+#include <string_view>
+#include "napi_sim_type.h"
+#include "network_state.h"
 #include "sim_card_manager.h"
 #include "str_convert.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
-namespace TelephonyNapi {
-static std::unique_ptr<SimCardManager> g_simCardManager;
-static bool InitSimCardManager()
+namespace Telephony {
+namespace {
+std::unique_ptr<SimCardManager> g_simCardManager;
+
+struct AsyncPara {
+    std::string funcName = "";
+    napi_env env = nullptr;
+    napi_callback_info info = nullptr;
+    napi_async_execute_callback execute = nullptr;
+    napi_async_complete_callback complete = nullptr;
+};
+
+template<typename T, napi_async_execute_callback exec, napi_async_complete_callback complete>
+napi_value NapiCreateAsyncWork(napi_env env, napi_callback_info info, std::string_view funcName)
 {
-    if (g_simCardManager == nullptr) {
-        g_simCardManager = std::make_unique<SimCardManager>();
+    TELEPHONY_LOGD("NAPI_SIM NapiCreateAsyncWork");
+    size_t argc = 2;
+    napi_value argv[] {nullptr, nullptr};
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+
+    std::unique_ptr<AsyncContext<T>> asyncContext = std::make_unique<AsyncContext<T>>();
+    BaseContext &context = asyncContext->context;
+    vecNapiType typeStd {napi_number};
+    if (argc == std::size(argv)) {
+        typeStd.emplace_back(napi_function);
     }
-    return g_simCardManager != nullptr;
-}
+    auto inParaTp = std::make_tuple(&asyncContext->slotId, &context.callbackRef);
+    NAPI_ASSERT(env, MatchParameters(env, argv, argc, inParaTp, typeStd), "type mismatch");
 
-static char *GetChars(std::string str)
-{
-    return (char *)str.data();
-}
-
-static napi_value CreateErrorMessage(napi_env env, std::string msg)
-{
     napi_value result = nullptr;
-    napi_value message = nullptr;
-    napi_create_string_utf8(env, GetChars(msg), msg.size(), &message);
-    napi_create_error(env, nullptr, message, &result);
+    if (context.callbackRef == nullptr) {
+        NAPI_CALL(env, napi_create_promise(env, &context.deferred, &result));
+    } else {
+        NAPI_CALL(env, napi_get_undefined(env, &result));
+    }
+
+    napi_value resourceName = nullptr;
+    NAPI_CALL(env, napi_create_string_utf8(env, funcName.data(), funcName.length(), &resourceName));
+    AsyncContext<T> *pContext = asyncContext.release();
+    NAPI_CALL(env,
+        napi_create_async_work(
+            env, nullptr, resourceName, exec, complete, static_cast<void *>(pContext), &context.work));
+    if (napi_queue_async_work(env, context.work) != napi_ok) {
+        delete pContext;
+        result = nullptr;
+    }
     return result;
 }
 
-static napi_value CreateUndefined(napi_env env)
+template<typename... Ts>
+napi_value NapiCreateAsyncWork2(
+    const AsyncPara &para, BaseContext &context, std::tuple<Ts...> &theTuple, vecNapiType &typeStd)
 {
+    TELEPHONY_LOGD("NAPI_SIM NapiCreateAsyncWork2");
+    napi_env env = para.env;
+    NAPI_ASSERT(env, typeStd.size() == sizeof...(Ts), "Input parameter error");
+
+    size_t argc = typeStd.size();
+    constexpr size_t arrSize = sizeof...(Ts);
+    napi_value argv[arrSize] {nullptr};
+    NAPI_CALL(env, napi_get_cb_info(env, para.info, &argc, argv, nullptr, nullptr));
+    if (argc < typeStd.size()) {
+        typeStd.pop_back();
+    }
+
+    NAPI_ASSERT(env, MatchParameters(env, argv, argc, theTuple, typeStd), "type mismatch");
+
     napi_value result = nullptr;
-    napi_get_undefined(env, &result);
+    if (context.callbackRef == nullptr) {
+        NAPI_CALL(env, napi_create_promise(env, &context.deferred, &result));
+    } else {
+        NAPI_CALL(env, napi_get_undefined(env, &result));
+    }
+
+    napi_value resourceName = nullptr;
+    NAPI_CALL(env, napi_create_string_utf8(env, para.funcName.c_str(), para.funcName.length(), &resourceName));
+    NAPI_CALL(env,
+        napi_create_async_work(
+            env, nullptr, resourceName, para.execute, para.complete, (void *)&context, &context.work));
+    NAPI_CALL(env, napi_queue_async_work(env, context.work));
     return result;
 }
 
-static void ExecNativeGetIsoForSim(napi_env env, AsyncContext &asyncContext)
+template<typename T>
+void NapiAsyncCompleteCallback(napi_env env, napi_status status, const AsyncContext<T> &asyncContext,
+    std::string errMessage, bool isVoid = false)
 {
-    HILOG_DEBUG("Exec ExecNativeGetIsoForSim Start");
-    std::string isoCountryCode = "";
-    if (InitSimCardManager()) {
-        isoCountryCode = ToUtf8(g_simCardManager->GetIsoCountryCode(asyncContext.slotId));
+    TELEPHONY_LOGD("NAPI_SIM NapiAsyncCompleteCallback");
+    if (status != napi_ok) {
+        napi_throw_type_error(env, nullptr, "excute failed");
+        return;
+    }
+
+    const BaseContext &context = asyncContext.context;
+    if (context.deferred != nullptr) {
+        if (!context.resolved) {
+            napi_value errorMessage = NapiUtil::CreateErrorMessage(env, errMessage);
+            NAPI_CALL_RETURN_VOID(env, napi_reject_deferred(env, context.deferred, errorMessage));
+        } else {
+            napi_value res;
+            isVoid ? (res = NapiUtil::CreateUndefined(env)) : (res = GetNapiValue(env, asyncContext.callbackVal));
+            NAPI_CALL_RETURN_VOID(env, napi_resolve_deferred(env, context.deferred, res));
+        }
+    } else {
+        napi_value callbackValue[] {
+            NapiUtil::CreateUndefined(env),
+            isVoid ? NapiUtil::CreateUndefined(env) : GetNapiValue(env, asyncContext.callbackVal)
+        };
+        if (!context.resolved) {
+            callbackValue[0] = NapiUtil::CreateErrorMessage(env, errMessage);
+            callbackValue[1] = NapiUtil::CreateUndefined(env);
+        }
+        napi_value undefined = nullptr;
+        napi_value callback = nullptr;
+        napi_value result = nullptr;
+        NAPI_CALL_RETURN_VOID(env, napi_get_undefined(env, &undefined));
+        NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, context.callbackRef, &callback));
+        NAPI_CALL_RETURN_VOID(
+            env, napi_call_function(env, undefined, callback, std::size(callbackValue), callbackValue, &result));
+        NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, context.callbackRef));
+    }
+    NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context.work));
+}
+
+napi_value SubscriptionInfoConversion(napi_env env, const IccAccountInfo &iccAccountInfo)
+{
+    napi_value val = nullptr;
+    napi_create_object(env, &val);
+    napi_set_named_property(env, val, "slotIndex", GetNapiValue(env, iccAccountInfo.slotIndex));
+    napi_set_named_property(env, val, "showName", GetNapiValue(env, ToUtf8(iccAccountInfo.displayName)));
+    napi_set_named_property(env, val, "showNumber", GetNapiValue(env, ToUtf8(iccAccountInfo.displayNumber)));
+    return val;
+}
+
+napi_value PinOrPukUnlockConversion(napi_env env, const LockStatusResponse &response)
+{
+    constexpr int32_t passWordErr = -1;
+    napi_value val = nullptr;
+    napi_create_object(env, &val);
+    napi_set_named_property(env, val, "result", GetNapiValue(env, response.result));
+    napi_value res;
+    (response.result == passWordErr) ? (res = GetNapiValue(env, response.remain)) :
+                                       (res = NapiUtil::CreateUndefined(env));
+    napi_set_named_property(env, val, "remain", res);
+    return val;
+}
+} // namespace
+
+static void NativeGetDefaultVoiceSlotId(napi_env env, void *data)
+{
+    AsyncContext<int32_t> *asyncContext = static_cast<AsyncContext<int32_t> *>(data);
+    asyncContext->callbackVal = DEFAULT_ERROR;
+    if (g_simCardManager) {
+        asyncContext->callbackVal = g_simCardManager->GetDefaultVoiceSlotId();
+    }
+    asyncContext->callbackVal == DEFAULT_ERROR ? asyncContext->context.resolved = false :
+                                                 asyncContext->context.resolved = true;
+}
+
+static void GetDefaultVoiceSlotIdCallback(napi_env env, napi_status status, void *data)
+{
+    std::unique_ptr<AsyncContext<int32_t>> context(static_cast<AsyncContext<int32_t> *>(data));
+    NapiAsyncCompleteCallback(env, status, *context, "get default voice slot id failed");
+}
+
+static napi_value GetDefaultVoiceSlotId(napi_env env, napi_callback_info info)
+{
+    std::unique_ptr<AsyncContext<int32_t>> asyncContext = std::make_unique<AsyncContext<int32_t>>();
+    BaseContext &context = asyncContext->context;
+
+    auto initPara = std::make_tuple(&context.callbackRef);
+    vecNapiType typeStd {napi_function};
+    AsyncPara para {
+        .funcName = "GetDefaultVoiceSlotId",
+        .env = env,
+        .info = info,
+        .execute = NativeGetDefaultVoiceSlotId,
+        .complete = GetDefaultVoiceSlotIdCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2(para, context, initPara, typeStd);
+    if (result != nullptr) {
+        asyncContext.release();
+    }
+    return result;
+}
+
+static void NativeGetIsoForSim(napi_env env, void *data)
+{
+    AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
+    std::string isoCountryCode;
+    if (g_simCardManager) {
+        isoCountryCode = ToUtf8(g_simCardManager->GetIsoCountryCodeForSim(asyncContext->slotId));
+        asyncContext->callbackVal = isoCountryCode;
     }
     if (isoCountryCode.empty()) {
-        HILOG_DEBUG("Exec ExecNativeGetIsoForSim Start REJECT");
-        asyncContext.status = REJECT;
+        asyncContext->context.resolved = false;
     } else {
-        HILOG_DEBUG("Exec ExecNativeGetIsoForSim Start RESOLVED");
-        asyncContext.status = RESOLVED;
-        char *chars = GetChars(isoCountryCode);
-        napi_create_string_utf8(env, chars, strlen(chars), &(asyncContext.value));
+        asyncContext->context.resolved = true;
     }
 }
 
-static void ExecGetIsoForSimCallback(napi_env env, napi_status status, AsyncContext &asyncContext)
+static void GetIsoForSimCallback(napi_env env, napi_status status, void *data)
 {
-    HILOG_DEBUG("Exec ExecGetIsoForSimCallback Start");
-    if (asyncContext.deferred) {
-        if (asyncContext.status == RESOLVED) {
-            napi_resolve_deferred(env, asyncContext.deferred, asyncContext.value);
-            HILOG_DEBUG("Exec ExecGetIsoForSimCallback deferred ,RESOLVED");
-        } else {
-            napi_value undefined = CreateUndefined(env);
-            napi_reject_deferred(env, asyncContext.deferred, undefined);
-            HILOG_DEBUG("Exec ExecGetIsoForSimCallback deferred ,REJECT");
-        }
-    } else {
-        napi_value callbackValue[2] = {0};
-        if (asyncContext.status == RESOLVED) {
-            callbackValue[0] = CreateUndefined(env);
-            callbackValue[1] = asyncContext.value;
-            HILOG_DEBUG("Exec ExecGetIsoForSimCallback not deferred ,RESOLVED");
-        } else {
-            callbackValue[0] = CreateErrorMessage(env, "get iso country code failed");
-            callbackValue[1] = CreateUndefined(env);
-            HILOG_DEBUG("Exec ExecGetIsoForSimCallback not deferred ,REJECT");
-        }
-        napi_value callback = nullptr;
-        napi_get_reference_value(env, asyncContext.callbackRef, &callback);
-        napi_call_function(env, nullptr, callback, TWO_PARAMETER, callbackValue, nullptr);
-    }
-    napi_delete_reference(env, asyncContext.callbackRef);
-    HILOG_DEBUG("Exec ExecGetIsoForSimCallback End");
-    delete &asyncContext;
+    std::unique_ptr<AsyncContext<std::string>> context(static_cast<AsyncContext<std::string> *>(data));
+    NapiAsyncCompleteCallback(env, status, *context, "get iso country code for sim failed");
 }
 
 static napi_value GetIsoCountryCodeForSim(napi_env env, napi_callback_info info)
 {
-    HILOG_DEBUG("Exec GetIsoCountryCodeForSim start");
-    GET_PARAMS(env, info, TWO_PARAMETER);
-    NAPI_ASSERT(env, argc >= 1, "requires at least 1 parameter");
-    auto asyncContext = new AsyncContext();
-    asyncContext->env = env;
-    for (size_t i = 0; i < argc; i++) {
-        napi_valuetype valueType = napi_undefined;
-        napi_typeof(env, argv[i], &valueType);
-        if (i == 0 && valueType == napi_number) {
-            napi_get_value_int32(env, argv[i], &(asyncContext->slotId));
-        } else if (i == 1 && valueType == napi_function) {
-            napi_create_reference(env, argv[i], 1, &(asyncContext->callbackRef));
-        } else {
-            NAPI_ASSERT(env, false, "type mismatch");
-        }
-    }
-    napi_value result = nullptr;
-    if (asyncContext->callbackRef == nullptr) {
-        napi_create_promise(env, &asyncContext->deferred, &result);
-    } else {
-        napi_get_undefined(env, &result);
-    }
-    napi_value resourceName = nullptr;
-    napi_create_string_utf8(env, "GetIsoCountryCodeForSim", NAPI_AUTO_LENGTH, &resourceName);
-    napi_create_async_work(
-        env, nullptr, resourceName,
-        [](napi_env env, void *data) -> void {
-            auto asyncContext = (AsyncContext *)data;
-            ExecNativeGetIsoForSim(env, *asyncContext);
-        },
-        [](napi_env env, napi_status status, void *data) -> void {
-            auto asyncContext = (AsyncContext *)data;
-            ExecGetIsoForSimCallback(env, status, *asyncContext);
-        },
-        (void *)asyncContext, &(asyncContext->work));
-    napi_queue_async_work(env, asyncContext->work);
-    return result;
+    return NapiCreateAsyncWork<std::string, NativeGetIsoForSim, GetIsoForSimCallback>(
+        env, info, "GetIsoCountryCodeForSim");
 }
 
-static void ExecNativeGetSimOperatorNumeric(napi_env env, AsyncContext &asyncContext)
+static void NativeGetSimOperatorNumeric(napi_env env, void *data)
 {
-    std::string simOperatorNumeric = "";
-    if (InitSimCardManager()) {
-        simOperatorNumeric = ToUtf8(g_simCardManager->GetOperatorNumeric(asyncContext.slotId));
+    AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
+    std::string simOperNum;
+    if (g_simCardManager) {
+        simOperNum = ToUtf8(g_simCardManager->GetSimOperatorNumeric(asyncContext->slotId));
     }
-    if (simOperatorNumeric.empty()) {
-        asyncContext.status = REJECT;
+    if (simOperNum.empty()) {
+        asyncContext->context.resolved = false;
     } else {
-        asyncContext.status = RESOLVED;
-        char *chars = GetChars(simOperatorNumeric);
-        napi_create_string_utf8(env, chars, strlen(chars), &(asyncContext.value));
+        asyncContext->context.resolved = true;
+        asyncContext->callbackVal = simOperNum;
     }
 }
 
-static void ExecGetSimOperatorNumericCallback(napi_env env, napi_status status, AsyncContext &asyncContext)
+static void GetSimOperatorNumericCallback(napi_env env, napi_status status, void *data)
 {
-    if (asyncContext.deferred) {
-        if (asyncContext.status == RESOLVED) {
-            napi_resolve_deferred(env, asyncContext.deferred, asyncContext.value);
-        } else {
-            napi_value undefined = CreateUndefined(env);
-            napi_reject_deferred(env, asyncContext.deferred, undefined);
-        }
-    } else {
-        napi_value result[2] = {0};
-        if (asyncContext.status == RESOLVED) {
-            result[0] = CreateUndefined(env);
-            result[1] = asyncContext.value;
-        } else {
-            result[0] = CreateErrorMessage(env, "get sim operator numeric failed");
-            result[1] = CreateUndefined(env);
-        }
-        napi_value callback = nullptr;
-        napi_get_reference_value(env, asyncContext.callbackRef, &callback);
-        napi_call_function(env, nullptr, callback, TWO_PARAMETER, result, nullptr);
-    }
-    napi_delete_reference(env, asyncContext.callbackRef);
-    delete &asyncContext;
+    std::unique_ptr<AsyncContext<std::string>> context(static_cast<AsyncContext<std::string> *>(data));
+    NapiAsyncCompleteCallback(env, status, *context, "get sim operator numeric failed");
 }
 
 static napi_value GetSimOperatorNumeric(napi_env env, napi_callback_info info)
 {
-    GET_PARAMS(env, info, TWO_PARAMETER);
-    NAPI_ASSERT(env, argc >= 1, "requires at least 1 parameter");
-    auto asyncContext = new AsyncContext();
-    asyncContext->env = env;
-    for (size_t i = 0; i < argc; i++) {
-        napi_valuetype valueType = napi_undefined;
-        napi_typeof(env, argv[i], &valueType);
-        if (i == 0 && valueType == napi_number) {
-            napi_get_value_int32(env, argv[i], &(asyncContext->slotId));
-        } else if (i == 1 && valueType == napi_function) {
-            napi_create_reference(env, argv[i], 1, &(asyncContext->callbackRef));
-        } else {
-            NAPI_ASSERT(env, false, "type mismatch");
-        }
-    }
-    napi_value result = nullptr;
-    if (asyncContext->callbackRef == nullptr) {
-        napi_create_promise(env, &asyncContext->deferred, &result);
-    } else {
-        napi_get_undefined(env, &result);
-    }
-    napi_value resourceName = nullptr;
-    napi_create_string_utf8(env, "GetSimOperatorNumeric", NAPI_AUTO_LENGTH, &resourceName);
-    napi_create_async_work(
-        env, nullptr, resourceName,
-        [](napi_env env, void *data) -> void {
-            auto asyncContext = (AsyncContext *)data;
-            ExecNativeGetSimOperatorNumeric(env, *asyncContext);
-        },
-        [](napi_env env, napi_status status, void *data) -> void {
-            auto asyncContext = (AsyncContext *)data;
-            ExecGetSimOperatorNumericCallback(env, status, *asyncContext);
-        },
-        (void *)asyncContext, &(asyncContext->work));
-    napi_queue_async_work(env, asyncContext->work);
-    return result;
+    return NapiCreateAsyncWork<std::string, NativeGetSimOperatorNumeric, GetSimOperatorNumericCallback>(
+        env, info, "GetSimOperatorNumeric");
 }
 
-static void ExecNativeGetSimSpn(napi_env env, AsyncContext &asyncContext)
+static void NativeGetSimSpn(napi_env env, void *data)
 {
-    std::string simSpn = "";
-    if (InitSimCardManager()) {
-        simSpn = ToUtf8(g_simCardManager->GetSpn(asyncContext.slotId));
+    AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
+    std::string simSpn;
+    if (g_simCardManager) {
+        simSpn = ToUtf8(g_simCardManager->GetSimSpn(asyncContext->slotId));
     }
     if (simSpn.empty()) {
-        asyncContext.status = REJECT;
+        asyncContext->context.resolved = false;
     } else {
-        asyncContext.status = RESOLVED;
-        char *chars = GetChars(simSpn);
-        napi_create_string_utf8(env, chars, strlen(chars), &(asyncContext.value));
+        asyncContext->context.resolved = true;
+        asyncContext->callbackVal = simSpn;
     }
 }
 
-static void ExecGetSpnCallback(napi_env env, napi_status status, AsyncContext &asyncContext)
+static void GetSimSpnCallback(napi_env env, napi_status status, void *data)
 {
-    if (asyncContext.deferred) {
-        if (asyncContext.status == RESOLVED) {
-            napi_resolve_deferred(env, asyncContext.deferred, asyncContext.value);
-        } else {
-            napi_value undefined = CreateUndefined(env);
-            napi_reject_deferred(env, asyncContext.deferred, undefined);
-        }
-    } else {
-        napi_value result[2] = {0};
-        if (asyncContext.status == RESOLVED) {
-            result[0] = CreateUndefined(env);
-            result[1] = asyncContext.value;
-        } else {
-            result[0] = CreateErrorMessage(env, "get sim spn failed");
-            result[1] = CreateUndefined(env);
-        }
-        napi_value callback = nullptr;
-        napi_get_reference_value(env, asyncContext.callbackRef, &callback);
-        napi_call_function(env, nullptr, callback, TWO_PARAMETER, result, nullptr);
-    }
-    napi_delete_reference(env, asyncContext.callbackRef);
-    delete &asyncContext;
+    std::unique_ptr<AsyncContext<std::string>> context(static_cast<AsyncContext<std::string> *>(data));
+    NapiAsyncCompleteCallback(env, status, *context, "get sim spn failed");
 }
 
 static napi_value GetSimSpn(napi_env env, napi_callback_info info)
 {
-    GET_PARAMS(env, info, TWO_PARAMETER);
-    NAPI_ASSERT(env, argc >= 1, "requires at least 1 parameter");
-    auto asyncContext = new AsyncContext();
-    asyncContext->env = env;
-    for (size_t i = 0; i < argc; i++) {
-        napi_valuetype valueType = napi_undefined;
-        napi_typeof(env, argv[i], &valueType);
-        if (i == 0 && valueType == napi_number) {
-            napi_get_value_int32(env, argv[i], &(asyncContext->slotId));
-        } else if (i == 1 && valueType == napi_function) {
-            napi_create_reference(env, argv[i], 1, &(asyncContext->callbackRef));
-        } else {
-            NAPI_ASSERT(env, false, "type mismatch");
-        }
-    }
-    napi_value result = nullptr;
-    if (asyncContext->callbackRef == nullptr) {
-        napi_create_promise(env, &asyncContext->deferred, &result);
-    } else {
-        napi_get_undefined(env, &result);
-    }
-    napi_value resourceName = nullptr;
-    napi_create_string_utf8(env, "GetSimSpn", NAPI_AUTO_LENGTH, &resourceName);
-    napi_create_async_work(
-        env, nullptr, resourceName,
-        [](napi_env env, void *data) -> void {
-            auto asyncContext = (AsyncContext *)data;
-            ExecNativeGetSimSpn(env, *asyncContext);
-        },
-        [](napi_env env, napi_status status, void *data) -> void {
-            auto asyncContext = (AsyncContext *)data;
-            ExecGetSpnCallback(env, status, *asyncContext);
-        },
-        (void *)asyncContext, &(asyncContext->work));
-    napi_queue_async_work(env, asyncContext->work);
-    return result;
+    return NapiCreateAsyncWork<std::string, NativeGetSimSpn, GetSimSpnCallback>(env, info, "GetSimSpn");
 }
 
-static void ExecNativeGetSimState(napi_env env, AsyncContext &asyncContext)
+static void NativeGetSimState(napi_env env, void *data)
 {
-    HILOG_DEBUG("Exec ExecNativeGetSimState start");
-    int32_t simState = -1;
-    if (InitSimCardManager()) {
-        simState = g_simCardManager->GetSimState(asyncContext.slotId);
-        HILOG_DEBUG("Exec ExecNativeGetSimState GetSimState End simState = %d", simState);
+    AsyncContext<int32_t> *asyncContext = static_cast<AsyncContext<int32_t> *>(data);
+    int32_t simState = DEFAULT_ERROR;
+    if (g_simCardManager) {
+        simState = g_simCardManager->GetSimState(asyncContext->slotId);
     }
-    if (simState >= 0) {
-        asyncContext.status = RESOLVED;
-        napi_create_int32(env, simState, &(asyncContext.value));
+    if (simState >= SIM_STATE_UNKNOWN) {
+        asyncContext->context.resolved = true;
+        asyncContext->callbackVal = simState;
     } else {
-        asyncContext.status = REJECT;
+        asyncContext->context.resolved = false;
     }
 }
 
-static void ExecGetSimStateCallback(napi_env env, napi_status status, AsyncContext &asyncContext)
+static void GetSimStateCallback(napi_env env, napi_status status, void *data)
 {
-    HILOG_DEBUG("Exec ExecGetSimStateCallback start");
-    if (asyncContext.deferred != nullptr) {
-        HILOG_DEBUG("Exec ExecGetSimStateCallback has deferred");
-        if (asyncContext.status == RESOLVED) {
-            napi_resolve_deferred(env, asyncContext.deferred, asyncContext.value);
-        } else {
-            napi_value undefined = CreateUndefined(env);
-            napi_reject_deferred(env, asyncContext.deferred, undefined);
-        }
-    } else {
-        HILOG_DEBUG("Exec ExecGetSimStateCallback no deferred");
-        napi_value result[2] = {0};
-        if (asyncContext.status == RESOLVED) {
-            result[0] = CreateUndefined(env);
-            result[1] = asyncContext.value;
-        } else {
-            result[0] = CreateErrorMessage(env, "get sim state failed");
-            result[1] = CreateUndefined(env);
-        }
-        napi_value callback = nullptr;
-        napi_get_reference_value(env, asyncContext.callbackRef, &callback);
-        napi_call_function(env, nullptr, callback, TWO_PARAMETER, result, nullptr);
-        HILOG_DEBUG("Exec ExecGetSimStateCallback after call_function");
-    }
-    napi_delete_reference(env, asyncContext.callbackRef);
-    delete &asyncContext;
-    HILOG_DEBUG("Exec ExecGetSimStateCallback end");
+    std::unique_ptr<AsyncContext<int32_t>> context(static_cast<AsyncContext<int32_t> *>(data));
+    NapiAsyncCompleteCallback(env, status, *context, "get sim state failed");
 }
 
 static napi_value GetSimState(napi_env env, napi_callback_info info)
 {
-    HILOG_DEBUG("Exec GetSimState ");
-    GET_PARAMS(env, info, TWO_PARAMETER);
-    NAPI_ASSERT(env, argc >= 1, "requires at least 1 parameter");
-    auto asyncContext = new AsyncContext();
-    asyncContext->env = env;
-    asyncContext->callbackRef = nullptr;
-    for (size_t i = 0; i < argc; i++) {
-        napi_valuetype valueType = napi_undefined;
-        napi_typeof(env, argv[i], &valueType);
-        if (i == 0 && valueType == napi_number) {
-            napi_get_value_int32(env, argv[i], &(asyncContext->slotId));
-        } else if (i == 1 && valueType == napi_function) {
-            napi_create_reference(env, argv[i], 1, &(asyncContext->callbackRef));
-        } else {
-            NAPI_ASSERT(env, false, "type mismatch");
+    return NapiCreateAsyncWork<int32_t, NativeGetSimState, GetSimStateCallback>(env, info, "GetSimState");
+}
+
+static void NativeGetSimGid1(napi_env env, void *data)
+{
+    AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
+    std::string simGid1;
+    if (g_simCardManager) {
+        simGid1 = ToUtf8(g_simCardManager->GetSimGid1(asyncContext->slotId));
+    }
+    if (simGid1.empty()) {
+        asyncContext->context.resolved = false;
+    } else {
+        asyncContext->context.resolved = true;
+        asyncContext->callbackVal = simGid1;
+    }
+}
+
+static void GetSimGid1Callback(napi_env env, napi_status status, void *data)
+{
+    std::unique_ptr<AsyncContext<std::string>> context(static_cast<AsyncContext<std::string> *>(data));
+    NapiAsyncCompleteCallback(env, status, *context, "get sim gid1 failed");
+}
+
+static napi_value GetSimGid1(napi_env env, napi_callback_info info)
+{
+    return NapiCreateAsyncWork<std::string, NativeGetSimGid1, GetSimGid1Callback>(env, info, "GetSimGid1");
+}
+
+static void NativeGetSimIccId(napi_env env, void *data)
+{
+    AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
+    std::string simIccId;
+    if (g_simCardManager) {
+        simIccId = ToUtf8(g_simCardManager->GetSimIccId(asyncContext->slotId));
+        asyncContext->callbackVal = simIccId;
+    }
+    simIccId.empty() ? asyncContext->context.resolved = false : asyncContext->context.resolved = true;
+}
+
+static void GetSimIccIdCallback(napi_env env, napi_status status, void *data)
+{
+    std::unique_ptr<AsyncContext<std::string>> context(static_cast<AsyncContext<std::string> *>(data));
+    NapiAsyncCompleteCallback(env, status, *context, "get sim icc id failed");
+}
+
+static napi_value GetSimIccId(napi_env env, napi_callback_info info)
+{
+    return NapiCreateAsyncWork<std::string, NativeGetSimIccId, GetSimIccIdCallback>(env, info, "GetSimIccId");
+}
+
+static void NativeGetSimAccountInfo(napi_env env, void *data)
+{
+    AsyncIccAccountInfo *info = static_cast<AsyncIccAccountInfo *>(data);
+    bool result = false;
+    if (g_simCardManager) {
+        IccAccountInfo operInfo;
+        result = g_simCardManager->GetSimAccountInfo(info->asyncContext.slotId, operInfo);
+        if (result) {
+            info->vecInfo.emplace_back(operInfo);
         }
     }
-    napi_value result = nullptr;
-    if (asyncContext->callbackRef == nullptr) {
-        napi_create_promise(env, &(asyncContext->deferred), &result);
-    } else {
-        napi_get_undefined(env, &result);
+    info->asyncContext.context.resolved = result;
+}
+
+static void GetSimAccountInfoCallback(napi_env env, napi_status status, void *data)
+{
+    std::unique_ptr<AsyncIccAccountInfo> info(static_cast<AsyncIccAccountInfo *>(data));
+    AsyncContext<napi_value> &asyncContext = info->asyncContext;
+    if (asyncContext.context.resolved) {
+        asyncContext.callbackVal = SubscriptionInfoConversion(env, info->vecInfo.at(0));
     }
-    napi_value resourceName = nullptr;
-    napi_create_string_utf8(env, "GetSimState", NAPI_AUTO_LENGTH, &resourceName);
-    napi_create_async_work(
-        env, nullptr, resourceName,
-        [](napi_env env, void *data) -> void {
-            auto asyncContext = (AsyncContext *)data;
-            ExecNativeGetSimState(env, *asyncContext);
-        },
-        [](napi_env env, napi_status status, void *data) -> void {
-            auto asyncContext = (AsyncContext *)data;
-            ExecGetSimStateCallback(env, status, *asyncContext);
-        },
-        (void *)asyncContext, &(asyncContext->work));
-    napi_queue_async_work(env, asyncContext->work);
-    HILOG_DEBUG("Exec GetSimState after napi_queue_async_work");
+    NapiAsyncCompleteCallback(env, status, asyncContext, "get sim subscription info failed");
+}
+
+static napi_value GetSimAccountInfo(napi_env env, napi_callback_info info)
+{
+    std::unique_ptr<AsyncIccAccountInfo> iccAccountInfo = std::make_unique<AsyncIccAccountInfo>();
+    BaseContext &context = iccAccountInfo->asyncContext.context;
+
+    auto initPara = std::make_tuple(&iccAccountInfo->asyncContext.slotId, &context.callbackRef);
+    vecNapiType typeStd {napi_number, napi_function};
+    AsyncPara para {
+        .funcName = "GetSimAccountInfo",
+        .env = env,
+        .info = info,
+        .execute = NativeGetSimAccountInfo,
+        .complete = GetSimAccountInfoCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2(para, context, initPara, typeStd);
+    if (result != nullptr) {
+        iccAccountInfo.release();
+    }
     return result;
+}
+
+static void NativeSetDefaultVoiceSlotId(napi_env env, void *data)
+{
+    AsyncContext<bool> *reVal = static_cast<AsyncContext<bool> *>(data);
+    reVal->callbackVal = false;
+    if (g_simCardManager) {
+        reVal->callbackVal = g_simCardManager->SetDefaultVoiceSlotId(reVal->slotId);
+    }
+    reVal->context.resolved = reVal->callbackVal;
+}
+
+static void SetDefaultVoiceSlotIdCallback(napi_env env, napi_status status, void *data)
+{
+    std::unique_ptr<AsyncContext<bool>> context(static_cast<AsyncContext<bool> *>(data));
+    NapiAsyncCompleteCallback(env, status, *context, "set default voice slot id failed", true);
+}
+
+static napi_value SetDefaultVoiceSlotId(napi_env env, napi_callback_info info)
+{
+    return NapiCreateAsyncWork<bool, NativeSetDefaultVoiceSlotId, SetDefaultVoiceSlotIdCallback>(
+        env, info, "SetDefaultVoiceSlotId");
+}
+
+static void NativeUnlockPin(napi_env env, void *data)
+{
+    AsyncContextPIN *pinContext = static_cast<AsyncContextPIN *>(data);
+    bool res = false;
+    if (g_simCardManager) {
+        LockStatusResponse response {DEFAULT_ERROR, DEFAULT_ERROR};
+        res = g_simCardManager->UnlockPin(ToUtf16(pinContext->pin.data()), response, pinContext->pinContext.slotId);
+        if (res) {
+            pinContext->result = response.result;
+            pinContext->remain = response.remain;
+        }
+    }
+    pinContext->pinContext.context.resolved = res;
+}
+
+static void UnlockPinCallback(napi_env env, napi_status status, void *data)
+{
+    std::unique_ptr<AsyncContextPIN> pinContext(static_cast<AsyncContextPIN *>(data));
+    const LockStatusResponse res {pinContext->result, pinContext->remain};
+    pinContext->pinContext.callbackVal = PinOrPukUnlockConversion(env, res);
+    NapiAsyncCompleteCallback(env, status, pinContext->pinContext, "unlock pin failed");
+}
+
+static napi_value UnlockPin(napi_env env, napi_callback_info info)
+{
+    std::unique_ptr<AsyncContextPIN> pinContext = std::make_unique<AsyncContextPIN>();
+    BaseContext &context = pinContext->pinContext.context;
+
+    auto initPara =
+        std::make_tuple(&pinContext->pinContext.slotId, std::data(pinContext->pin), &context.callbackRef);
+    vecNapiType typeStd {napi_number, napi_string, napi_function};
+    AsyncPara para {
+        .funcName = "UnlockPin",
+        .env = env,
+        .info = info,
+        .execute = NativeUnlockPin,
+        .complete = UnlockPinCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2(para, context, initPara, typeStd);
+    if (result != nullptr) {
+        pinContext.release();
+    }
+    return result;
+}
+
+static void NativeUnlockPuk(napi_env env, void *data)
+{
+    AsyncContextPIN *pukContext = static_cast<AsyncContextPIN *>(data);
+    bool res = false;
+    if (g_simCardManager) {
+        LockStatusResponse response {DEFAULT_ERROR, DEFAULT_ERROR};
+        res = g_simCardManager->UnlockPuk(ToUtf16(pukContext->pin.data()), ToUtf16(pukContext->puk.data()),
+            response, pukContext->pinContext.slotId);
+        if (res) {
+            pukContext->result = response.result;
+            pukContext->remain = response.remain;
+        }
+    }
+    pukContext->pinContext.context.resolved = res;
+}
+
+static void UnlockPukCallback(napi_env env, napi_status status, void *data)
+{
+    std::unique_ptr<AsyncContextPIN> pukContext(static_cast<AsyncContextPIN *>(data));
+    const LockStatusResponse res {pukContext->result, pukContext->remain};
+    pukContext->pinContext.callbackVal = PinOrPukUnlockConversion(env, res);
+    NapiAsyncCompleteCallback(env, status, pukContext->pinContext, "unlock puk failed");
+}
+
+static napi_value UnlockPuk(napi_env env, napi_callback_info info)
+{
+    std::unique_ptr<AsyncContextPIN> pinContext = std::make_unique<AsyncContextPIN>();
+    BaseContext &context = pinContext->pinContext.context;
+
+    auto initPara = std::make_tuple(&pinContext->pinContext.slotId, std::data(pinContext->pin),
+        std::data(pinContext->puk), &context.callbackRef);
+    vecNapiType typeStd {napi_number, napi_string, napi_string, napi_function};
+    AsyncPara para {
+        .funcName = "UnlockPuk",
+        .env = env,
+        .info = info,
+        .execute = NativeUnlockPuk,
+        .complete = UnlockPukCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2(para, context, initPara, typeStd);
+    if (result != nullptr) {
+        pinContext.release();
+    }
+    return result;
+}
+
+static void NativeAlterPin(napi_env env, void *data)
+{
+    AsyncContextPIN *pinContext = static_cast<AsyncContextPIN *>(data);
+    bool res = false;
+    if (g_simCardManager) {
+        LockStatusResponse response {DEFAULT_ERROR, DEFAULT_ERROR};
+        res = g_simCardManager->AlterPin(ToUtf16(pinContext->pin.data()), ToUtf16(pinContext->puk.data()),
+            response, pinContext->pinContext.slotId);
+        if (res) {
+            pinContext->result = response.result;
+            pinContext->remain = response.remain;
+        }
+    }
+    pinContext->pinContext.context.resolved = res;
+}
+
+static void AlterPinCallback(napi_env env, napi_status status, void *data)
+{
+    std::unique_ptr<AsyncContextPIN> pinContext(static_cast<AsyncContextPIN *>(data));
+    const LockStatusResponse res {pinContext->result, pinContext->remain};
+    pinContext->pinContext.callbackVal = PinOrPukUnlockConversion(env, res);
+    NapiAsyncCompleteCallback(env, status, pinContext->pinContext, "alter pin failed");
+}
+
+static napi_value AlterPin(napi_env env, napi_callback_info info)
+{
+    std::unique_ptr<AsyncContextPIN> pinContext = std::make_unique<AsyncContextPIN>();
+    BaseContext &context = pinContext->pinContext.context;
+
+    auto initPara = std::make_tuple(&pinContext->pinContext.slotId, std::data(pinContext->pin),
+        std::data(pinContext->puk), &context.callbackRef);
+    vecNapiType typeStd {napi_number, napi_string, napi_string, napi_function};
+    AsyncPara para {
+        .funcName = "AlterPin",
+        .env = env,
+        .info = info,
+        .execute = NativeAlterPin,
+        .complete = AlterPinCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2(para, context, initPara, typeStd);
+    if (result != nullptr) {
+        pinContext.release();
+    }
+    return result;
+}
+
+static void NativeSetLockState(napi_env env, void *data)
+{
+    AsyncContextPIN *lockContext = static_cast<AsyncContextPIN *>(data);
+    bool res = false;
+    if (g_simCardManager) {
+        LockStatusResponse response {DEFAULT_ERROR, DEFAULT_ERROR};
+        res = g_simCardManager->SetLockState(
+            ToUtf16(lockContext->pin.data()), lockContext->pinEnable, response, lockContext->pinContext.slotId);
+        if (res) {
+            lockContext->result = response.result;
+            lockContext->remain = response.remain;
+        }
+    }
+    lockContext->pinContext.context.resolved = res;
+}
+
+static void SetLockStateCallback(napi_env env, napi_status status, void *data)
+{
+    std::unique_ptr<AsyncContextPIN> lockContext(static_cast<AsyncContextPIN *>(data));
+    const LockStatusResponse res {lockContext->result, lockContext->remain};
+    lockContext->pinContext.callbackVal = PinOrPukUnlockConversion(env, res);
+    NapiAsyncCompleteCallback(env, status, lockContext->pinContext, "set lock state failed");
+}
+
+static napi_value SetLockState(napi_env env, napi_callback_info info)
+{
+    std::unique_ptr<AsyncContextPIN> lockContext = std::make_unique<AsyncContextPIN>();
+    BaseContext &context = lockContext->pinContext.context;
+
+    auto initPara = std::make_tuple(&lockContext->pinContext.slotId, std::data(lockContext->pin),
+        &lockContext->pinEnable, &context.callbackRef);
+    vecNapiType typeStd {napi_number, napi_string, napi_number, napi_function};
+    AsyncPara para {
+        .funcName = "SetLockState",
+        .env = env,
+        .info = info,
+        .execute = NativeSetLockState,
+        .complete = SetLockStateCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2(para, context, initPara, typeStd);
+    if (result != nullptr) {
+        lockContext.release();
+    }
+    return result;
+}
+
+static void NativeGetIMSI(napi_env env, void *data)
+{
+    AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
+    std::string strIMSI;
+    if (g_simCardManager) {
+        strIMSI = ToUtf8(g_simCardManager->GetIMSI(asyncContext->slotId));
+        asyncContext->callbackVal = strIMSI;
+    }
+    strIMSI.empty() ? asyncContext->context.resolved = false : asyncContext->context.resolved = true;
+}
+
+static void GetIMSICallback(napi_env env, napi_status status, void *data)
+{
+    std::unique_ptr<AsyncContext<std::string>> context(static_cast<AsyncContext<std::string> *>(data));
+    NapiAsyncCompleteCallback(env, status, *context, "get IMSI failed");
+}
+
+static napi_value GetIMSI(napi_env env, napi_callback_info info)
+{
+    return NapiCreateAsyncWork<std::string, NativeGetIMSI, GetIMSICallback>(env, info, "GetIMSI");
 }
 
 EXTERN_C_START
 napi_value InitNapiSim(napi_env env, napi_value exports)
 {
+    g_simCardManager = std::make_unique<SimCardManager>();
+    g_simCardManager->ConnectService();
     napi_value simStateUnknown = nullptr;
     napi_value simStateNotPresent = nullptr;
     napi_value simStateLocked = nullptr;
@@ -411,15 +654,26 @@ napi_value InitNapiSim(napi_env env, napi_value exports)
     napi_create_int32(env, static_cast<int32_t>(SIM_STATE_READY), &simStateReady);
     napi_create_int32(env, static_cast<int32_t>(SIM_STATE_LOADED), &simStateLoaded);
     napi_property_descriptor desc[] = {
+        DECLARE_NAPI_FUNCTION("getSimState", GetSimState),
         DECLARE_NAPI_FUNCTION("getISOCountryCodeForSim", GetIsoCountryCodeForSim),
         DECLARE_NAPI_FUNCTION("getSimOperatorNumeric", GetSimOperatorNumeric),
-        DECLARE_NAPI_FUNCTION("getSimSpn", GetSimSpn), DECLARE_NAPI_FUNCTION("getSimState", GetSimState),
+        DECLARE_NAPI_FUNCTION("getSimSpn", GetSimSpn),
+        DECLARE_NAPI_FUNCTION("getIMSI", GetIMSI),
+        DECLARE_NAPI_FUNCTION("getSimIccId", GetSimIccId),
+        DECLARE_NAPI_FUNCTION("getSimGid1", GetSimGid1),
+        DECLARE_NAPI_FUNCTION("getSimAccountInfo", GetSimAccountInfo),
+        DECLARE_NAPI_FUNCTION("setDefaultVoiceSlotId", SetDefaultVoiceSlotId),
+        DECLARE_NAPI_FUNCTION("getDefaultVoiceSlotId", GetDefaultVoiceSlotId),
+        DECLARE_NAPI_FUNCTION("unlockPin", UnlockPin),
+        DECLARE_NAPI_FUNCTION("unlockPuk", UnlockPuk),
+        DECLARE_NAPI_FUNCTION("alterPin", AlterPin),
+        DECLARE_NAPI_FUNCTION("setLockState", SetLockState),
         DECLARE_NAPI_STATIC_PROPERTY("SIM_STATE_UNKNOWN", simStateUnknown),
         DECLARE_NAPI_STATIC_PROPERTY("SIM_STATE_NOT_PRESENT", simStateNotPresent),
         DECLARE_NAPI_STATIC_PROPERTY("SIM_STATE_LOCKED", simStateLocked),
         DECLARE_NAPI_STATIC_PROPERTY("SIM_STATE_NOT_READY", simStateNotReady),
         DECLARE_NAPI_STATIC_PROPERTY("SIM_STATE_READY", simStateReady),
-        DECLARE_NAPI_STATIC_PROPERTY("SIM_STATE_LOADED", simStateLoaded)
+        DECLARE_NAPI_STATIC_PROPERTY("SIM_STATE_LOADED", simStateLoaded),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -433,12 +687,12 @@ static napi_module _simModule = {
     .nm_register_func = InitNapiSim,
     .nm_modname = "libtelephony_sim.z.so",
     .nm_priv = ((void *)0),
-    .reserved = {0}
+    .reserved = {0},
 };
 
 extern "C" __attribute__((constructor)) void RegisterSimCardModule(void)
 {
     napi_module_register(&_simModule);
 }
-} // namespace TelephonyNapi
+} // namespace Telephony
 } // namespace OHOS

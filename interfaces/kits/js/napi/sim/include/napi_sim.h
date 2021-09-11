@@ -13,76 +13,51 @@
  * limitations under the License.
  */
 
-#ifndef NAPI_SIM_H
-#define NAPI_SIM_H
-#include <codecvt>
-#include <locale>
+#ifndef NAPI_SIM_INCLUDE_NAPI_SIM_H
+#define NAPI_SIM_INCLUDE_NAPI_SIM_H
+
+#include <array>
 #include <string>
+#include <unordered_map>
+#include "base_context.h"
+#include "i_sim_manager.h"
+#include "napi_util.h"
+#include "telephony_log_wrapper.h"
+#include "core_manager.h"
 
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
 namespace OHOS {
-namespace TelephonyNapi {
-#define GET_PARAMS(env, info, num) \
-    size_t argc = num;             \
-    napi_value argv[num];          \
-    napi_value thisVar;            \
-    void *data;                    \
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data)
+namespace Telephony {
+namespace {
+constexpr int32_t DEFAULT_ERROR = -1;
+constexpr size_t ARRAY_LENGTH = 32;
+} // namespace
 
-const int DEFAULT_ERROR = -1;
-const int RESOLVED = 1;
-const int REJECT = 0;
-const int NONE_PARAMTER = 0;
-const int TWO_PARAMETER = 2;
-
+template<typename T>
 struct AsyncContext {
-    napi_env env;
-    napi_async_work work;
-    int32_t slotId;
-    napi_value value;
-    size_t valueLen;
-    napi_deferred deferred;
-    napi_ref callbackRef;
-    int status;
+    BaseContext context;
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    T callbackVal;
 };
 
-enum SimState {
-    /**
-     * Indicates unknown SIM card state, that is, the accurate status cannot be obtained.
-     */
-    SIM_STATE_UNKNOWN,
-
-    /**
-     * Indicates that the SIM card is in the <b>not present</b> state, that is, no SIM card is inserted
-     * into the card slot.
-     */
-    SIM_STATE_NOT_PRESENT,
-
-    /**
-     * Indicates that the SIM card is in the <b>locked</b> state, that is, the SIM card is locked by the
-     * personal identification number (PIN)/PIN unblocking key (PUK) or network.
-     */
-    SIM_STATE_LOCKED,
-
-    /**
-     * Indicates that the SIM card is in the <b>not ready</b> state, that is, the SIM card is in position
-     * but cannot work properly.
-     */
-    SIM_STATE_NOT_READY,
-
-    /**
-     * Indicates that the SIM card is in the <b>ready</b> state, that is, the SIM card is in position and
-     * is working properly.
-     */
-    SIM_STATE_READY,
-
-    /**
-     * Indicates that the SIM card is in the <b>loaded</b> state, that is, the SIM card is in position and
-     * is working properly.
-     */
-    SIM_STATE_LOADED
+template<typename T>
+struct AsyncContext2 {
+    AsyncContext<T> value;
+    std::array<char, ARRAY_LENGTH> inputStr {};
 };
-} // namespace TelephonyNapi
+
+struct AsyncContextPIN {
+    AsyncContext<napi_value> pinContext;
+    int32_t result = DEFAULT_ERROR;
+    int32_t remain = DEFAULT_ERROR;
+    int32_t pinEnable = DEFAULT_ERROR;
+    std::array<char, ARRAY_LENGTH> pin {};
+    std::array<char, ARRAY_LENGTH> puk {};
+};
+
+struct AsyncIccAccountInfo {
+    AsyncContext<napi_value> asyncContext;
+    std::vector<IccAccountInfo> vecInfo;
+};
+} // namespace Telephony
 } // namespace OHOS
 #endif // NAPI_SIM_H

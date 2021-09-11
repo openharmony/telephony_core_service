@@ -16,16 +16,12 @@
 #ifndef OBSERVER_HANDLER_H
 #define OBSERVER_HANDLER_H
 
-#include <string>
 #include <unordered_map>
-#include <vector>
 #include "event_handler.h"
-#include "event_runner.h"
-#include "hilog/log.h"
-
-static constexpr OHOS::HiviewDFX::HiLogLabel OBSERVER_LABEL = {LOG_CORE, 1, "ObserverHandler"};
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
+namespace Telephony {
 class ObserverHandler {
 public:
     ObserverHandler();
@@ -36,7 +32,7 @@ public:
 
     void RegUniqueObserver(int what, const std::shared_ptr<AppExecFwk::EventHandler> handler);
 
-    void Remove(int what);
+    void Remove(int what, const std::shared_ptr<AppExecFwk::EventHandler> handler);
 
     void RemoveAll();
 
@@ -47,13 +43,12 @@ public:
     {
         auto iter = observerHandlerMap_.find(what);
         if (iter == observerHandlerMap_.end()) {
-            OHOS::HiviewDFX::HiLog::Info(OBSERVER_LABEL, "gesture %{public}d not register", what);
+            TELEPHONY_LOGE("ObserverHandler NotifyObserver %{public}d not register", what);
             return;
         }
         std::shared_ptr<T> msg(object);
 
         for (auto handlers : iter->second) {
-            OHOS::HiviewDFX::HiLog::Info(OBSERVER_LABEL, "zjy handlers->SendEvent:%{public}d", what);
             handlers->SendEvent(what, msg);
         }
     }
@@ -63,69 +58,123 @@ public:
     {
         auto iter = observerHandlerMap_.find(what);
         if (iter == observerHandlerMap_.end()) {
-            OHOS::HiviewDFX::HiLog::Info(OBSERVER_LABEL, "NotifyObserver %{public}d not register", what);
+            TELEPHONY_LOGE("ObserverHandler NotifyObserver %{public}d not register", what);
             return;
         }
         for (auto handlers : iter->second) {
-            OHOS::HiviewDFX::HiLog::Info(OBSERVER_LABEL, "NotifyObserver handlers->SendEvent:%{public}d", what);
             handlers->SendEvent(what, object);
         }
     }
 
     enum ObserverHandlerId {
+        // modem
         RADIO_STATE_CHANGED = 0,
-        RADIO_ON = 1,
-        RADIO_AVAIL = 2,
-        RADIO_OFF_OR_NOT_AVAIL = 3,
-        RADIO_NOT_AVAIL = 4,
-        RADIO_CALL_STATE = 5,
-        RADIO_NETWORK_STATE = 6,
-        RADIO_DATA_CALL_LIST_CHANGED = 7,
-        RADIO_IMS_NETWORK_STATE_CHANGED = 8,
-        RADIO_ICC_STATUS_CHANGED = 9,
-        RADIO_CONNECTED = 10,
-        RADIO_ICC_REFRESH = 11,
-        RADIO_PCODATA = 12,
-        RADIO_GET_SIGNAL_STRENGTH = 13,
-        RADIO_GSM_SMS = 14,
-        RADIO_SIGNAL_STRENGTH_UPDATE = 15,
-        RADIO_SMS_ON_SIM = 16,
-        RADIO_SMS_STATUS = 17,
-        RADIO_RESTRICTED_STATE = 18,
+        RADIO_GET_STATUS,
+        RADIO_SET_STATUS,
 
-        // cellcall
-        RADIO_DIAL = 19,
-        RADIO_REJECT_CALL = 20,
-        RADIO_HANDUP_CONNECT = 21,
-        RADIO_ACCEPT_CALL = 22,
-        RADIO_LAST_CALL_FAIL_CAUSE = 23,
-        RADIO_CURRENT_CALLS = 24,
+        RADIO_POWER,
+        RADIO_ON,
+        RADIO_AVAIL,
+        RADIO_OFF,
+        RADIO_NOT_AVAIL,
+        RADIO_CALL_STATE,
+        RADIO_DATA_CALL_LIST_CHANGED,
+        RADIO_IMS_NETWORK_STATE_CHANGED,
+        RADIO_ICC_STATUS_CHANGED,
+        RADIO_CONNECTED,
+        RADIO_ICC_REFRESH,
+        RADIO_PCODATA,
+        RADIO_GSM_SMS,
 
-        // Imssms
-        RADIO_SEND_IMS_GSM_SMS = 25,
-        RADIO_SEND_SMS = 26,
-        RADIO_SEND_SMS_EXPECT_MORE = 27,
+        RADIO_SMS_ON_SIM,
+        RADIO_SMS_STATUS,
+        RADIO_RESTRICTED_STATE,
+        RADIO_CELL_BROADCAST,
+        RADIO_RIL_SETUP_DATA_CALL,
+        RADIO_RIL_IMS_REGISTRATION_STATE,
+        RADIO_RIL_DEACTIVATE_DATA_CALL,
 
-        // data
-        RADIO_POWER = 28,
-        RADIO_VOICE_REG_STATE = 29,
-        RADIO_DATA_REG_STATE = 30,
-        RADIO_OPERATOR = 31,
-        RADIO_RIL_SETUP_DATA_CALL = 32,
-        RADIO_RIL_IMS_REGISTRATION_STATE = 33,
-        RADIO_RIL_DEACTIVATE_DATA_CALL = 34,
+        // cellular call
+        RADIO_DIAL = 101,
+        RADIO_REJECT_CALL,
+        RADIO_HANGUP_CONNECT,
+        RADIO_ACCEPT_CALL,
+        RADIO_LAST_CALL_FAIL_CAUSE,
+        RADIO_CURRENT_CALLS,
+        RADIO_HOLD_CALL,
+        RADIO_ACTIVE_CALL,
+        RADIO_SWAP_CALL,
+        RADIO_JOIN_CALL,
+        RADIO_SPLIT_CALL,
+        RADIO_CALL_SUPPLEMENT,
+        RADIO_GET_CALL_WAIT,
+        RADIO_SET_CALL_WAIT,
+        RADIO_GET_CALL_FORWARD,
+        RADIO_SET_CALL_FORWARD,
+        RADIO_GET_CALL_CLIP,
+        RADIO_SET_CALL_CLIP,
+        RADIO_GET_CALL_CLIR,
+        RADIO_SET_CALL_CLIR,
+        RADIO_GET_CALL_RESTRICTION,
+        RADIO_SET_CALL_RESTRICTION,
+        RADIO_SEND_DTMF,
+        RADIO_START_DTMF,
+        RADIO_STOP_DTMF,
+
+        // Ims sms
+        RADIO_SEND_IMS_GSM_SMS = 201,
+        RADIO_SEND_SMS,
+        RADIO_STORAGE_SMS,
+        RADIO_DELETE_SMS,
+        RADIO_SEND_SMS_EXPECT_MORE,
+
+        // Network Search
+        RADIO_NETWORK_STATE = 301,
+        RADIO_VOICE_REG_STATE,
+        RADIO_DATA_REG_STATE,
+        RADIO_OPERATOR,
+        RADIO_GET_SIGNAL_STRENGTH,
+        RADIO_SIGNAL_STRENGTH_UPDATE,
+        RADIO_NETWORK_SEARCH_RESULT,
+        RADIO_GET_NETWORK_SELECTION_MODE,
+        RADIO_SET_NETWORK_SELECTION_MODE,
+        RADIO_CELL_INFO_UPDATE,
+        RADIO_GET_CELL_INFO,
+        RADIO_GET_CELL_LOCATION,
 
         // module internal events
-        RADIO_PS_CONNECTION_ATTACHED = 500,
+        RADIO_PS_CONNECTION_ATTACHED = 401,
         RADIO_PS_CONNECTION_DETACHED,
+        RADIO_PS_ROAMING_OPEN,
+        RADIO_PS_ROAMING_CLOSE,
+
+        // SIM
+        RADIO_SIM_GET_STATUS = 501,
+        RADIO_SIM_IO,
+        RADIO_SIM_GET_IMSI,
+        RADIO_SIM_GET_ICCID,
+        RADIO_SIM_GET_LOCK_STATUS,
+        RADIO_SIM_SET_LOCK,
+        RADIO_SIM_CHANGE_PASSWD,
+        RADIO_SIM_ENTER_PIN,
+        RADIO_SIM_UNLOCK_PIN,
+        RADIO_SIM_PIN_INPUT_TIMES,
         RADIO_SIM_STATE_CHANGE,
         RADIO_SIM_STATE_READY,
         RADIO_IMSI_LOADED_READY,
         RADIO_SIM_RECORDS_LOADED,
+        RADIO_SIM_STATE_LOCKED,
+        RADIO_SIM_STATE_SIMLOCK,
+
+        RADIO_UPDATE_SMS,
+        RADIO_SET_SMS_CENTER_ADDRESS,
+        RADIO_GET_SMS_CENTER_ADDRESS,
+        RADIO_SET_CELL_BROADCAST
     };
 
 private:
     std::unordered_map<int32_t, std::list<std::shared_ptr<AppExecFwk::EventHandler>>> observerHandlerMap_;
 };
+} // namespace Telephony
 } // namespace OHOS
 #endif // OBSERVER_HANDLER_H

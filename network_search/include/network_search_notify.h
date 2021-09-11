@@ -12,14 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_NS_NETWORK_NOTIFY_H
-#define OHOS_NS_NETWORK_NOTIFY_H
+
+#ifndef NETWORK_SEARCH_INCLUDE_NETWORK_SEARCH_NOTIFY_H
+#define NETWORK_SEARCH_INCLUDE_NETWORK_SEARCH_NOTIFY_H
+
 #include <singleton.h>
 #include "network_state.h"
 #include "signal_information.h"
 #include "telephony_state_registry_proxy.h"
 
 namespace OHOS {
+namespace Telephony {
 class NetworkSearchNotify {
     DECLARE_DELAYED_SINGLETON(NetworkSearchNotify)
     static const int RESET_CONNECTS = 5;
@@ -32,8 +35,9 @@ public:
     void NotifySignalInfoUpdated(const std::vector<sptr<SignalInformation>> &signalInfos);
 
 private:
-    sptr<TelephonyState::ITelephonyStateNotify> telephonyStateNotify_ = nullptr;
+    sptr<ITelephonyStateNotify> telephonyStateNotify_ = nullptr;
 };
+} // namespace Telephony
 } // namespace OHOS
 
-#endif // OHOS_NS_NETWORK_NOTIFY_H
+#endif // NETWORK_SEARCH_INCLUDE_NETWORK_SEARCH_NOTIFY_H

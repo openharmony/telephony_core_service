@@ -36,6 +36,7 @@ ohos_shared_library("libtelephony_common") {
     "TELEPHONY_LOG_TAG = \"TELEPHONY_COMMON\"",
     "LOG_DOMAIN = 0xD002B01",
   ]
+
   if (is_standard_system) {
     defines += [ "STANDARD_SYSTEM_ENABLE" ]
   }
@@ -59,6 +60,8 @@ ohos_shared_library("libtelephony_common") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+
+  external_deps += [ "native_appdatamgr:native_preferences" ]
 
   part_name = "core_service"
   subsystem_name = "telephony"

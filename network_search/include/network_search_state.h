@@ -12,13 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_NS_NETWORK_STATE_H
-#define OHOS_NS_NETWORK_STATE_H
+
+#ifndef NETWORK_SEARCH_INCLUDE_NETWORK_SEARCH_STATE_H
+#define NETWORK_SEARCH_INCLUDE_NETWORK_SEARCH_STATE_H
+
 #include <memory>
 #include <mutex>
 #include "network_state.h"
 
 namespace OHOS {
+namespace Telephony {
 class PhoneAbstract {
 public:
     bool PhoneTypeGsmOrNot() const
@@ -39,14 +42,14 @@ public:
     virtual ~NetworkSearchState() = default;
     void Init();
     void SetOperatorInfo(const std::string &longName, const std::string &shortName, const std::string &numeric,
-        const DomainType domainType);
+        DomainType domainType);
     void SetEmergency(bool isEmergency);
     void SetNetworkType(RadioTech tech, DomainType domainType);
     void SetNetworkState(RegServiceState state, DomainType domainType);
     void SetNetworkStateToRoaming(RoamingType roamingType, DomainType domainType);
     void SetInitial();
-    bool GsmOrNot(int radioTechnology);
-    bool CdmaOrNot(int radioTechnology);
+    bool GsmOrNot(int radioTechnology) const;
+    bool CdmaOrNot(int radioTechnology) const;
     std::unique_ptr<NetworkState> GetNetworkStatus();
     bool GetIMSState();
     void NotifyStateChange();
@@ -54,9 +57,10 @@ public:
 private:
     std::mutex mutex_;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
-    std::shared_ptr<NetworkState> networkState_;
-    std::shared_ptr<NetworkState> networkStateOld_;
+    std::shared_ptr<NetworkState> networkState_ = nullptr;
+    std::shared_ptr<NetworkState> networkStateOld_ = nullptr;
     bool iMSRegStatus_ = false;
 };
+} // namespace Telephony
 } // namespace OHOS
-#endif // OHOS_NS_NETWORK_STATE_H
+#endif // NETWORK_SEARCH_INCLUDE_NETWORK_SEARCH_STATE_H
