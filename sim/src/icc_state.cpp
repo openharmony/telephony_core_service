@@ -16,27 +16,11 @@
 #include "icc_state.h"
 
 namespace OHOS {
-namespace SIM {
+namespace Telephony {
 IccState::IccState()
 {
-    cardState_ = ICC_CARD_ABSENT;
-    iccType_ = 0;
-    iccStatus_ = ICC_CONTENT_UNKNOWN;
-    pinState_ = 0;
-    contentIndexOfGU_ = CONTENT_INDEX_INVALID;
-    contentIndexOfCdma_ = CONTENT_INDEX_INVALID;
-    contentIndexOfIms_ = CONTENT_INDEX_INVALID;
-    iccContentNum_ = ICC_CONTENT_NUM;
+    simType_ = 0;
+    simStatus_ = ICC_CARD_ABSENT;
 }
-
-IccContent::IccContent()
-{
-    SimLockSubState_ = 0;
-    aid_ = "";
-    iccTag_ = "";
-    substitueOfPin1_ = PIN_SUBSTITUE_FALSE;
-    stateOfPin1_ = 0;
-    stateOfPin2_ = 0;
-}
-} // namespace SIM
+} // namespace Telephony
 } // namespace OHOS

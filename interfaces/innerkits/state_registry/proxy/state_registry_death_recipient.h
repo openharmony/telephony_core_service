@@ -12,11 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef TELEPHONY_STATE_REGISTRY_DEATH_RECIPIENT_H
 #define TELEPHONY_STATE_REGISTRY_DEATH_RECIPIENT_H
+
 #include "iremote_broker.h"
+
 namespace OHOS {
-namespace TelephonyState {
+namespace Telephony {
 class StateRegistryDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
     explicit StateRegistryDeathRecipient(
@@ -27,6 +30,6 @@ public:
 private:
     std::function<void(const wptr<IRemoteObject> &object)> deathCallback_;
 };
-} // namespace TelephonyState
+} // namespace Telephony
 } // namespace OHOS
 #endif // TELEPHONY_STATE_REGISTRY_DEATH_RECIPIENT_H

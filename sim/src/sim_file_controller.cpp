@@ -12,10 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "sim_file_controller.h"
 
 namespace OHOS {
-namespace SIM {
+namespace Telephony {
 SimFileController::SimFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
     : IccFileController(runner)
 {}
@@ -50,13 +51,13 @@ std::string SimFileController::ObtainElementFilePath(int efId)
         default:
             break;
     }
-    std::string path = GetCommonElementFilePath(efId);
+    std::string path = ObtainElementFileForPublic(efId);
     if (path.empty()) {
-        TELEPHONY_ERR_LOG("SimFileController ObtainElementFilePath Error: EF Path being returned in null");
+        TELEPHONY_LOGE("SimFileController ObtainElementFilePath Error: EF Path being returned in null");
     }
     return path;
 }
 
 SimFileController::~SimFileController() {}
-} // namespace SIM
+} // namespace Telephony
 } // namespace OHOS

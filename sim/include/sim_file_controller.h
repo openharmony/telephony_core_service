@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_SIM_FILE_CONTROLLER_H
 #define OHOS_SIM_FILE_CONTROLLER_H
 
@@ -22,13 +23,13 @@
 #include "icc_file_controller.h"
 
 namespace OHOS {
-namespace SIM {
+namespace Telephony {
 class SimFileController : public IccFileController {
 public:
     SimFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
     ~SimFileController();
     std::string ObtainElementFilePath(int efId);
 };
-} // namespace SIM
+} // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_SIM_FILE_CONTROLLER_H

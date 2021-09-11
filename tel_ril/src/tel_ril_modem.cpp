@@ -12,16 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "tel_ril_modem.h"
-#include "hril_modem_parcel.h"
 
 namespace OHOS {
+namespace Telephony {
 void TelRilModem::AddHandlerToMap()
 {
     // indication
     memberFuncMap_[HNOTI_MODEM_RADIO_STATE_UPDATED] = &TelRilModem::RadioStateUpdated;
-    // reponse
-    memberFuncMap_[HREQ_MODEM_SET_RADIO_POWER] = &TelRilModem::SetRadioPowerResponse;
+    // response
+    memberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &TelRilModem::SetRadioStatusResponse;
+    memberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] = &TelRilModem::GetRadioStatusResponse;
 }
 
 TelRilModem::TelRilModem(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler)
@@ -34,10 +36,10 @@ bool TelRilModem::IsCommonRespOrNotify(uint32_t code)
 {
     return IsCommonResponse(code) || IsCommonNotification(code);
 }
-void TelRilModem::ProcessCommonRespOrNotify(uint32_t code, OHOS::MessageParcel &data)
+void TelRilModem::ProcessCommonRespOrNotify(uint32_t code, MessageParcel &data)
 {
-    TELEPHONY_INFO_LOG(
-        "TelRilModem ProcessCommonRespOrNotify code:%{public}u, GetDataSize:%{public}zu", code, data.GetDataSize());
+    TELEPHONY_LOGD("TelRilModem ProcessCommonRespOrNotify code:%{public}d, GetDataSize:%{public}zu", code,
+        data.GetDataSize());
     auto itFunc = memberFuncMap_.find(code);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
@@ -57,140 +59,142 @@ bool TelRilModem::IsCommonNotification(uint32_t code)
     return code >= HREQ_COMMON_BASE;
 }
 
-void TelRilModem::SetModemRadioPower(bool on, const AppExecFwk::InnerEvent::Pointer &response)
+void TelRilModem::SetRadioStatusResponse(MessageParcel &data)
 {
-    TELEPHONY_INFO_LOG("TelRilModem SetModemRadioPower  on: %{public}d", on);
-    if (cellularRadio_ != nullptr) {
-        std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_MODEM_SET_RADIO_POWER, response);
-        if (telRilRequest == nullptr) {
-            TELEPHONY_DEBUG_LOG("SetModemRadioPower:telRilRequest is nullptr");
-            return;
-        }
-        OHOS::MessageParcel wData;
-        UniInfo universalInfo;
-        universalInfo.serial = telRilRequest->serialId_;
-        universalInfo.flag = on;
-        universalInfo.Marshalling(wData);
-        int ret = SendBufferEvent(HREQ_MODEM_SET_RADIO_POWER, wData);
-        TELEPHONY_INFO_LOG("HREQ_MODEM_SET_RADIO_POWER ret %{public}d", ret);
-    }
-}
-
-void TelRilModem::SetRadioPowerResponse(OHOS::MessageParcel &data)
-{
-    TELEPHONY_INFO_LOG("TelRilModem SetRadioPowerResponse --> ");
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
-        TELEPHONY_ERR_LOG("TelRilModem SetRadioPowerResponse read spBuffer failed");
+        TELEPHONY_LOGE("TelRilModem SetRadioStatusResponse read spBuffer failed");
         return;
     }
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     if (radioResponseInfo == nullptr) {
-        TELEPHONY_ERR_LOG("ERROR : SetRadioPowerResponse --> radioResponseInfo == nullptr !!!");
+        TELEPHONY_LOGE("ERROR : SetRadioStatusResponse --> radioResponseInfo == nullptr !!!");
         return;
     }
-    TELEPHONY_DEBUG_LOG(
-        "SetRadioPowerResponse serial:%{public}d, error:%{public}d, "
-        "type:%{public}d",
-        radioResponseInfo->serial, radioResponseInfo->error, radioResponseInfo->type);
+    TELEPHONY_LOGD("SetRadioStatusResponse serial:%{public}d, error:%{public}d ", radioResponseInfo->serial,
+        radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_DEBUG_LOG("SetRadioPowerResponse serialId_:%{public}d, requestId_:%{public}d,",
-        telRilRequest->serialId_, telRilRequest->requestId_);
+    TELEPHONY_LOGD("SetRadioStatusResponse serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_,
+        telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
-                TELEPHONY_WARNING_LOG("WARNNING : SetRadioPowerResponse --> handler == nullptr !!!");
+                TELEPHONY_LOGW("WARNING : SetRadioStatusResponse --> handler == nullptr !!!");
                 return;
             }
+
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
-            TELEPHONY_DEBUG_LOG("SetRadioPowerResponse eventId:%{public}d", eventId);
-            handler->SendEvent(eventId);
-        }
-
-        if (radioResponseInfo->type == HRilResponseType::HRIL_RESP_ACK_NEED) {
-            SendRespOrNotiAck();
+            TELEPHONY_LOGD("SetRadioStatusResponse eventId:%{public}d", eventId);
+            std::unique_ptr<HRilRadioStateInfo> radioState = std::make_unique<HRilRadioStateInfo>();
+            radioState->flag = telRilRequest->pointer_->GetParam();
+            radioState->state = (int32_t)(radioResponseInfo->error);
+            handler->SendEvent(eventId, radioState);
+        } else {
+            ErrorResponse(telRilRequest, *radioResponseInfo);
         }
     }
 }
 
-ModemPowerState TelRilModem::GetRadioState()
+void TelRilModem::GetRadioStatusResponse(MessageParcel &data)
 {
-    TELEPHONY_INFO_LOG("RilManager GetRadioState->");
-    return radioState_;
-}
+    int32_t radioStatus = data.ReadInt32();
 
-ModemPowerState TelRilModem::GetRadioStatusFromInt(int32_t statusInt)
-{
-    ModemPowerState state = ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;
-    switch (statusInt) {
-        case (int32_t)HRilRadioState::HRIL_RADIO_POWER_STATE_OFF:
-            state = ModemPowerState::CORE_SERVICE_POWER_OFF;
-            break;
-        case (int32_t)HRilRadioState::HRIL_RADIO_POWER_STATE_UNAVAILABLE:
-            state = ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;
-            break;
-        case (int32_t)HRilRadioState::HRIL_RADIO_POWER_STATE_ON:
-            state = ModemPowerState::CORE_SERVICE_POWER_ON;
-            break;
-        default:
-            TELEPHONY_ERR_LOG(
-                "TelRilModem GetRadioStatusFromInt Unrecognized HRilRadioState: %{public}d", statusInt);
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("TelRilModem GetRadioStatusResponse read spBuffer failed");
+        return;
     }
-    return state;
+    const struct HRilRadioResponseInfo *radioResponseInfo =
+        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    if (radioResponseInfo == nullptr) {
+        TELEPHONY_LOGE("ERROR : GetRadioStatusResponse --> radioResponseInfo == nullptr !!!");
+        return;
+    }
+
+    TELEPHONY_LOGD("SetRadioStatusResponse serial:%{public}d, error:%{public}d ", radioResponseInfo->serial,
+        radioResponseInfo->error);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
+    if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        TELEPHONY_LOGD("SetRadioStatusResponse serialId_:%{public}d, requestId_:%{public}d,",
+            telRilRequest->serialId_, telRilRequest->requestId_);
+        if (radioResponseInfo->error == HRilErrType::NONE) {
+            std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGW("WARNING : GetRadioStatusResponse --> handler == nullptr !!!");
+                return;
+            }
+
+            uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
+            TELEPHONY_LOGD("GetRadioStatusResponse eventId:%{public}d", eventId);
+            std::unique_ptr<HRilRadioStateInfo> state = std::make_unique<HRilRadioStateInfo>();
+            state->flag = telRilRequest->pointer_->GetParam();
+            state->state = radioStatus;
+            handler->SendEvent(eventId, state);
+        } else {
+            ErrorResponse(telRilRequest, *radioResponseInfo);
+        }
+    }
 }
 
-void TelRilModem::RadioStateUpdated(OHOS::MessageParcel &data)
+void TelRilModem::SetRadioStatus(int fun, int rst, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_MODEM_SET_RADIO_STATUS, response);
+        if (telRilRequest == nullptr) {
+            TELEPHONY_LOGE("TelRilSim UnlockSimPin:telRilRequest is nullptr");
+            return;
+        }
+        MessageParcel data;
+        data.WriteInt32(telRilRequest->serialId_);
+        data.WriteInt32(fun);
+        data.WriteInt32(rst);
+        MessageParcel reply;
+        OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+        int ret = cellularRadio_->SendRequest(HREQ_MODEM_SET_RADIO_STATUS, data, reply, option);
+        TELEPHONY_LOGD(
+            "SetRadioStatus --> SendBufferEvent(HREQ_MODEM_SET_RADIO_STATUS, wData) return ID: %{public}d", ret);
+    } else {
+        TELEPHONY_LOGE("ERROR : HREQ_MODEM_SET_RADIO_STATUS --> cellularRadio_ == nullptr !!!");
+    }
+}
+
+void TelRilModem::GetRadioStatus(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_MODEM_GET_RADIO_STATUS, response);
+        if (telRilRequest == nullptr) {
+            TELEPHONY_LOGE("TelRilModem GetRadioStatus:telRilRequest is nullptr");
+            return;
+        }
+        MessageParcel data;
+        data.WriteInt32(telRilRequest->serialId_);
+        MessageParcel reply;
+        OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+        int ret = cellularRadio_->SendRequest(HREQ_MODEM_GET_RADIO_STATUS, data, reply, option);
+        TELEPHONY_LOGD(
+            "GetRadioStatus --> SendBufferEvent(HREQ_MODEM_GET_RADIO_STATUS, wData) return ID: %{public}d", ret);
+    } else {
+        TELEPHONY_LOGE("ERROR : HREQ_MODEM_GET_RADIO_STATUS --> cellularRadio_ == nullptr !!!");
+    }
+}
+
+void TelRilModem::RadioStateUpdated(MessageParcel &data)
 {
     int32_t radioState = data.ReadInt32();
     int32_t indicationType = data.ReadInt32();
-    if (cellularRadio_ != nullptr) {
-        RilProcessIndication(indicationType);
-        ModemPowerState ModemPowerState = GetRadioStatusFromInt(radioState);
-
-        TELEPHONY_INFO_LOG("TelRilModem RadioStateUpdate radioState:%{public}d, ModemPowerState:%{public}d",
-            radioState, ModemPowerState);
-        SetRadioPower(ModemPowerState);
-    }
-}
-bool IsRadioOn(ModemPowerState state)
-{
-    return state == CORE_SERVICE_POWER_ON;
-}
-
-bool IsRadioAvailable(ModemPowerState state)
-{
-    return state != CORE_SERVICE_POWER_NOT_AVAILABLE;
-}
-void TelRilModem::SetRadioPower(ModemPowerState radioState)
-{
-    ModemPowerState oldRadioState = radioState_;
-    radioState_ = radioState;
-
-    if (oldRadioState == radioState_) {
-        // no state transition
+    TELEPHONY_LOGD(
+        "func :%{public}s indicationType: %{public}d state:%{public}d", __func__, indicationType, radioState);
+    if (observerHandler_ == nullptr) {
+        TELEPHONY_LOGE("observerHandler_ is nullptr");
         return;
     }
-    if (observerHandler_ != nullptr) {
-        observerHandler_->NotifyObserver(ObserverHandler::RADIO_STATE_CHANGED);
-        if (IsRadioAvailable(radioState_) && !IsRadioAvailable(oldRadioState)) {
-            observerHandler_->NotifyObserver(ObserverHandler::RADIO_AVAIL);
-        }
-        if (!IsRadioOn(radioState_)) {
-            if (IsRadioAvailable(oldRadioState)) {
-                observerHandler_->NotifyObserver(ObserverHandler::RADIO_NOT_AVAIL);
-            }
-        } else {
-            if (!IsRadioOn(oldRadioState) == false) {
-                observerHandler_->NotifyObserver(ObserverHandler::RADIO_ON);
-            }
-        }
-        if ((!IsRadioOn(radioState_) || !IsRadioAvailable(radioState_)) &&
-            !((!IsRadioOn(oldRadioState) || !IsRadioAvailable(oldRadioState)))) {
-            observerHandler_->NotifyObserver(ObserverHandler::RADIO_OFF_OR_NOT_AVAIL);
-        }
-    }
+    std::shared_ptr<int> state = std::make_shared<int>();
+    *state = radioState;
+    observerHandler_->NotifyObserver(ObserverHandler::RADIO_STATE_CHANGED, state);
 }
+} // namespace Telephony
 } // namespace OHOS

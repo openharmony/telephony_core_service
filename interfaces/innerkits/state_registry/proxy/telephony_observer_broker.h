@@ -17,30 +17,38 @@
 #define TELEPHONY_OBSERVER_BROKER_H
 
 #include "iremote_broker.h"
-
 #include "network_state.h"
 #include "signal_information.h"
 
 namespace OHOS {
-namespace TelephonyState {
+namespace Telephony {
 class TelephonyObserverBroker : public IRemoteBroker {
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.base.telephony.TelephonyObserverBroker");
+    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.TelephonyObserverBroker");
+
     enum {
         ON_CALL_STATE_UPDATED = 0,
         ON_SIGNAL_INFO_UPDATED,
-        ON_NETWORK_STATE_UPDATED
+        ON_NETWORK_STATE_UPDATED,
+        ON_CELL_INFO_UPDATED,
+        ON_SIM_STATE_UPDATED,
+        ON_CELLULAR_DATA_CONNECT_STATE_UPDATED
     };
 
+    virtual void OnCellularDataConnectStateUpdated(int32_t dataState, int32_t networkType) = 0;
     virtual void OnCallStateUpdated(int32_t callState, const std::u16string &phoneNumber) = 0;
     virtual void OnSignalInfoUpdated(const std::vector<sptr<SignalInformation>> &vec) = 0;
     virtual void OnNetworkStateUpdated(const sptr<NetworkState> &networkState) = 0;
+    virtual void OnSimStateUpdated(int32_t state, const std::u16string &reason) = 0;
 
 public:
     static const uint32_t OBSERVER_MASK_NETWORK_STATE = 0x00000001;
     static const uint32_t OBSERVER_MASK_CALL_STATE = 0x00000004;
-    static const uint32_t OBSERVER_MASK_SIGNAL_STRENGTHS = 0x00000016;
+    static const uint32_t OBSERVER_MASK_CELL_INFO = 0x00000008;
+    static const uint32_t OBSERVER_MASK_SIGNAL_STRENGTHS = 0x00000010;
+    static const uint32_t OBSERVER_MASK_SIM_STATE = 0x00000020;
+    static const uint32_t OBSERVER_MASK_DATA_CONNECTION_STATE = 0x00000040;
 };
-} // namespace TelephonyState
+} // namespace Telephony
 } // namespace OHOS
 #endif // TELEPHONY_OBSERVER_BROKER_H

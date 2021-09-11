@@ -16,32 +16,26 @@
 #ifndef OHOS_I_SIM_FILE_MANAGER_H
 #define OHOS_I_SIM_FILE_MANAGER_H
 
-#include <string.h>
-#include <unistd.h>
-#include <cstdio>
-#include <cstring>
-#include <memory>
-#include <vector>
-#include "event_handler.h"
-#include "event_runner.h"
-
 namespace OHOS {
-namespace SIM {
+namespace Telephony {
 class ISimFileManager {
 public:
     using HANDLE = std::shared_ptr<AppExecFwk::EventHandler>;
     virtual void Init() {}
-    virtual std::u16string GetSimOperator(int32_t slotId) = 0;
-    virtual std::u16string GetIsoCountryCode(int32_t slotId) = 0;
-    virtual std::u16string GetSpn(int32_t slotId) = 0;
-    virtual std::u16string GetIccId(int32_t slotId) = 0;
+    virtual std::u16string GetSimOperatorNumeric(int32_t slotId) = 0;
+    virtual std::u16string GetIsoCountryCodeForSim(int32_t slotId) = 0;
+    virtual std::u16string GetSimSpn(int32_t slotId) = 0;
+    virtual std::u16string GetSimIccId(int32_t slotId) = 0;
     virtual std::u16string GetIMSI(int32_t slotId) = 0;
+    virtual std::u16string GetLocaleFromDefaultSim() = 0;
+    virtual std::u16string GetSimGid1(int32_t slotId) = 0;
+    virtual int ObtainSpnCondition(bool roaming, std::string operatorNum) = 0;
     virtual void RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) = 0;
     virtual void UnregisterImsiLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler) = 0;
     virtual void RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) = 0;
     virtual void UnregisterAllFilesLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler) = 0;
     virtual void SetImsi(std::string imsi) = 0;
 };
-} // namespace SIM
+} // namespace Telephony
 } // namespace OHOS
 #endif
