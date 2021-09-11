@@ -19,10 +19,13 @@
 #include <memory>
 #include <sstream>
 #include <string>
+
+#include "network_state.h"
 #include "radio_network_manager.h"
 #include "str_convert.h"
 
 using namespace OHOS;
+using namespace OHOS::Telephony;
 namespace {
 const int CMD_GET_CS_RADIO_TECH = 0;
 const int CMD_GET_PS_RADIO_TECH = 1;
@@ -66,7 +69,7 @@ static void TestGetSignalInfoList(const std::unique_ptr<RadioNetworkManager> &ra
 
 static void TestGetNetworkState(const std::unique_ptr<RadioNetworkManager> &radioNetworkManager)
 {
-    sptr<NetworkState> networkState = radioNetworkManager->GetNetworkStatus(1);
+    sptr<NetworkState> networkState = radioNetworkManager->GetNetworkState(1);
     std::cout << "networkState->GetLongOperatorName() " << networkState->GetLongOperatorName() << std::endl;
     std::cout << "networkState->GetShortOperatorName() " << networkState->GetShortOperatorName() << std::endl;
     std::cout << "networkState->GetPlmnNumeric() " << networkState->GetPlmnNumeric() << std::endl;
@@ -117,18 +120,20 @@ int main()
 {
     std::unique_ptr<RadioNetworkManager> radioNetworkManager = std::make_unique<RadioNetworkManager>();
     int inputCMD = CMD_GET_CS_RADIO_TECH;
-    printf(
-        "\n-----------menu--------------\n"
-        "please input a cmd num:\n"
-        "0:GetCsRadioTech\n"
-        "1:GetPsRadioTech\n"
-        "2:GetOperatorName\n"
-        "3:GetOperatorNumeric\n"
-        "4:GetSignalInfoList\n"
-        "5:GetNetworkStatus\n"
-        "1000:exit\n");
-    std::cin >> inputCMD;
-    std::cout << "inputCMD is [" << inputCMD << "]" << std::endl;
-    TestCase(inputCMD, radioNetworkManager);
+    while (inputCMD != CMD_EXIT) {
+        printf(
+            "\n-----------menu--------------\n"
+            "please input a cmd num:\n"
+            "0:GetCsRadioTech\n"
+            "1:GetPsRadioTech\n"
+            "2:GetOperatorName\n"
+            "3:GetOperatorNumeric\n"
+            "4:GetSignalInfoList\n"
+            "5:GetNetworkStatus\n"
+            "1000:exit\n");
+        std::cin >> inputCMD;
+        std::cout << "inputCMD is [" << inputCMD << "]" << std::endl;
+        TestCase(inputCMD, radioNetworkManager);
+    }
     return 0;
 }

@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_NS_OPERATOR_NAME_H
-#define OHOS_NS_OPERATOR_NAME_H
+
+#ifndef NETWORK_SEARCH_INCLUDE_OPERATOR_NAME_H
+#define NETWORK_SEARCH_INCLUDE_OPERATOR_NAME_H
+
 #include <memory>
 #include "want.h"
 #include "event_handler.h"
@@ -21,23 +23,34 @@
 #include "network_search_state.h"
 
 namespace OHOS {
+namespace Telephony {
 class OperatorName {
 public:
-    explicit OperatorName(std::shared_ptr<NetworkSearchState> networkSearchState);
+    OperatorName(
+        std::shared_ptr<NetworkSearchState> networkSearchState, std::shared_ptr<ISimFileManager> simFileManager);
     virtual ~OperatorName() = default;
     void HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event);
-    void RenewSpnAndBroadcast();
+    void NotifySpnChanged();
 
 private:
-    void GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event);
-    void CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event);
-    void PublishBroadcastEvent(const AAFwk::Want &want, int eventCode, const std::string &eventData);
+    void GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const;
+    void CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const;
+    void PublishEvent(const int32_t rule, const int32_t state, const bool showPlmn, const std::string &plmn,
+        const bool showSpn, const std::string &spn);
+    sptr<NetworkState> GetNetworkStatus();
 
-    std::shared_ptr<NetworkSearchState> networkSearchState_;
-    std::shared_ptr<SIM::ISimFileManager> simFileManager_;
+private:
+    std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
+    std::shared_ptr<ISimFileManager> simFileManager_ = nullptr;
     PhoneAbstract phone_;
     std::string curPlmn_ = "";
     bool curPlmnShow_ = false;
+    std::string curSpn_ = "";
+    bool curSpnShow_ = false;
+    int curRegState_ = REG_STATE_UNKNOWN;
+    int curSpnRule_ = -1;
+    sptr<NetworkState> networkState_ = nullptr;
 };
+} // namespace Telephony
 } // namespace OHOS
-#endif // OHOS_NS_OPERATOR_NAME_H
+#endif // NETWORK_SEARCH_INCLUDE_OPERATOR_NAME_H

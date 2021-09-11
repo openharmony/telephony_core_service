@@ -20,7 +20,7 @@
 #include "sim_state_handle.h"
 
 namespace OHOS {
-namespace SIM {
+namespace Telephony {
 enum SimHandleRun { STATE_NOT_START, STATE_RUNNING };
 
 class SimStateManager : public ISimStateManager, public std::enable_shared_from_this<SimStateManager> {
@@ -29,23 +29,45 @@ public:
     virtual ~SimStateManager();
     void NotifyIccStateChanged();
     void NotifyIccReady();
-    void TestSimStateManager();
+    void NotifyIccLock();
+    void NotifyIccSimLock();
     virtual void Init() override;
     virtual bool HasSimCard(int32_t slotId) override;
     virtual int32_t GetSimState(int32_t slotId) override;
     virtual bool IsSimActive(int32_t slotId) override;
-    virtual void RegisterForIccStateChanged(HANDLE &handler) override;
-    virtual void UnregisterForIccStateChanged(HANDLE &handler) override;
-    virtual void RegisterForReady(HANDLE &handler) override;
-    virtual void UnregisterForReady(HANDLE &handler) override;
+    virtual bool UnlockPin(std::string pin, LockStatusResponse &response, int32_t phoneId) override;
+    virtual bool UnlockPuk(
+        std::string newPin, std::string puk, LockStatusResponse &response, int32_t phoneId) override;
+    virtual bool AlterPin(
+        std::string newPin, std::string oldPin, LockStatusResponse &response, int32_t phoneId) override;
+    virtual bool SetLockState(
+        std::string pin, int32_t enable, LockStatusResponse &response, int32_t phoneId) override;
+    virtual int32_t GetLockState(int32_t phoneId) override;
+    virtual void RegisterIccStateChanged(HANDLE &handler) override;
+    virtual void UnregisterIccStateChanged(HANDLE &handler) override;
+    virtual void RegisterIccReady(HANDLE &handler) override;
+    virtual void UnregisterIccReady(HANDLE &handler) override;
+    virtual void RegisterIccLocked(HANDLE &handler) override;
+    virtual void UnregisterIccLocked(HANDLE &handler) override;
+    virtual void RegisterIccSimLock(HANDLE &handler) override;
+    virtual void UnregisterIccSimLock(HANDLE &handler) override;
+    virtual int32_t RefreshSimState(int32_t slotId) override;
+
+public:
+    bool responseReady_ = false;
+    std::mutex ctx_;
+    std::condition_variable cv_;
 
 private:
-    std::shared_ptr<SimStateHandle> simStateHandle_;
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoop_;
-    SimHandleRun simStateRun_;
-    std::unique_ptr<ObserverHandler> observerHandler_;
+    void RequestUnlock(UnlockCmd type);
+
+private:
+    std::shared_ptr<SimStateHandle> simStateHandle_ = nullptr;
+    std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
+    SimHandleRun simStateRun_ = STATE_NOT_START;
+    std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     std::mutex mtx_;
 };
-} // namespace SIM
+} // namespace Telephony
 } // namespace OHOS
 #endif // __SIM_STATE_MANAGER__

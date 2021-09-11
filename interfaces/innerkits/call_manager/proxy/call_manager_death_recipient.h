@@ -15,10 +15,11 @@
 
 #ifndef CALL_MANAGER_DEATH_RECIPIENT_H
 #define CALL_MANAGER_DEATH_RECIPIENT_H
+
 #include "iremote_broker.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 class CallManagerDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
     explicit CallManagerDeathRecipient(const std::function<void(const wptr<IRemoteObject> &object)> &deathCallback);
@@ -28,6 +29,7 @@ public:
 private:
     std::function<void(const wptr<IRemoteObject> &object)> deathCallback_;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
+
 #endif // CALL_MANAGER_DEATH_RECIPIENT_H

@@ -16,7 +16,7 @@
 #include "str_convert.h"
 
 namespace OHOS {
-namespace CellularData {
+namespace Telephony {
 std::u16string ToUtf16(std::string str)
 {
     return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.from_bytes(str);
@@ -41,5 +41,5 @@ std::string ToUtf8(std::wstring wstr)
 {
     return std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> {}.to_bytes(wstr);
 }
-} // namespace CellularData
+} // namespace Telephony
 } // namespace OHOS

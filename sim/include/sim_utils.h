@@ -12,54 +12,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_SIM_UTILS_H
 #define OHOS_SIM_UTILS_H
+
 #include <stdlib.h>
 #include <string>
 #include "event_handler.h"
 #include "event_runner.h"
 #include "string_ex.h"
+#include "telephony_log_wrapper.h"
+
+#define DECIMAL_MAX 10
+#define HALF_LEN 2
+#define HALF_BYTE_LEN 4
 
 namespace OHOS {
-namespace SIM {
+namespace Telephony {
 static char HEX_CHARS[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 class SIMUtils {
 public:
-    static std::string BcdConvertTostring(std::string data, int offset, int length);
-    static std::string BcdConvertTostring(std::string data);
-    static std::string BcdConvertToBytes(std::string bcd);
-    static void BcdConvertToBytes(std::string bcd, std::string Bytes);
-    static std::string BcdPlmnConvertTostring(std::string data, int offset);
-    static std::string BchConvertTostring(std::string data, int offset, int length);
-    static std::string CdmaBcdConvertTostring(std::string data, int offset, int length);
-    static int GsmBcdByteConvertToInt(unsigned char b);
-    static int CdmaBcdByteConvertToInt(unsigned char b);
-    static std::string AdnStringFieldConvertToString(std::string data, int offset, int length);
-    static int HexCharConvertToInt(char c);
-    static std::string HexstringConvertToBytes(std::string s);
-    static std::string BytesConvertToHexString(std::string &bytes);
-    static std::string NetworkNameConvertTostring(std::string data, int offset, int length);
-    static std::string ParseConvertToBnW(std::string data, int length);
-    static std::string ParseConvertToRGB(std::string data, int length, bool transparency);
-    static std::string GetDecimalSubstring(std::string iccId);
-    static int BytesConvertToInt(std::string src, int offset, int length);
-    static long BytesConvertToRawLong(std::string src, int offset, int length);
-    static std::string UnsignedIntConvertToBytes(int value);
-    static std::string SignedIntConvertToBytes(int value);
-    static int UnsignedIntConvertToBytes(int value, std::string dest, int offset);
-    static int SignedIntConvertToBytes(int value, std::string dest, int offset);
-    static unsigned char CountTrailingZeros(unsigned char b);
-    static std::string ByteConvertToHex(unsigned char b);
-
-private:
-    static unsigned char CharConvertToByte(char c);
-    static int *MapConvertTo2OrderBitColor(std::string data, int valueIndex, int length, int *colorArray, int bits);
-    static int *MapConvertToNon2OrderBitColor(
-        std::string data, int valueIndex, int length, int *colorArray, int bits);
-    static int *GetCLUT(std::string rawData, int offset, int number);
-    static int BitConvertToRGB(int bit);
-    static int IntConvertToBytes(int value, std::string dest, int offset, bool bsigned);
+    static unsigned char HexCharConvertToInt(char c);
+    static std::shared_ptr<unsigned char> HexStringConvertToBytes(const std::string &s, int &byteslen);
+    static std::string BytesConvertToHexString(const unsigned char *bytes, int byteLen);
+    static void ArrayCopy(const unsigned char *src, int srcPos, unsigned char *dest, int destPos, int length);
+    static bool IsShowableAscii(char c);
+    static bool IsShowableAsciiOnly(const std::string &str);
+    static std::string BcdPlmnConvertToString(const std::string &data, int offset);
 };
-} // namespace SIM
+} // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_SIM_UTILS_H

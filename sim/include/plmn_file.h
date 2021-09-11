@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_PLMN_FILE_H
 #define OHOS_PLMN_FILE_H
 
@@ -19,15 +20,16 @@
 #include <sstream>
 #include "parcel.h"
 #include "sim_utils.h"
-#include "telephony_log.h"
+#include "telephony_log_wrapper.h"
+
 #define ENCODED_LENGTH 5
+
 namespace OHOS {
-namespace SIM {
+namespace Telephony {
 class PlmnFile : public Parcelable {
 public:
     std::string plmn_ = "";
     uint32_t rat_ = 0;
-    typedef PlmnFile *PlmnFileArray[];
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
     static PlmnFile *UnMarshalling(Parcel &parcel);
@@ -35,20 +37,19 @@ public:
     ~PlmnFile();
 
 private:
-    PlmnFile(std::string plmn, int accessTechs);
-    std::string AccessTechstring();
-
-    const uint32_t OFFSET_A = 3;
-    const uint32_t OFFSET_B = 4;
-    const uint32_t OFFSET_ALL = 8;
-    const uint32_t RAT_UMTS = 0x8000;
-    const uint32_t RAT_LTE = 0x4000;
-    const uint32_t RAT_GSM = 0x0080;
-    const uint32_t RAT_GSM_COMPACT = 0x0040;
-    const uint32_t RAT_EVDO = 0x0020;
-    const uint32_t RAT_1X = 0x0010;
-    const uint32_t RAT_REMAINED = 0x3F0F;
+    PlmnFile(const std::string &plmn, int accessTechs);
+    std::string AccessTechString();
+    static const uint32_t OFFSET_A = 3;
+    static const uint32_t OFFSET_B = 4;
+    static const uint32_t OFFSET_ALL = 8;
+    static const uint32_t RAT_UMTS = 0x8000;
+    static const uint32_t RAT_LTE = 0x4000;
+    static const uint32_t RAT_GSM = 0x0080;
+    static const uint32_t RAT_GSM_COMPACT = 0x0040;
+    static const uint32_t RAT_EVDO = 0x0020;
+    static const uint32_t RAT_1X = 0x0010;
+    static const uint32_t RAT_REMAINED = 0x3F0F;
 };
-} // namespace SIM
+} // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_PLMN_FILE_H

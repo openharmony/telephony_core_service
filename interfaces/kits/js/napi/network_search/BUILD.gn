@@ -14,11 +14,13 @@ import("//build/ohos.gni")
 SUBSYSTEM_DIR = "//base/telephony"
 ohos_shared_library("telephony_radio") {
   include_dirs = [
+    "//base/telephony/ril_adapter/interfaces/innerkits",
     "//third_party/node/src",
     "//foundation/ace/napi/interfaces/kits",
     "include",
     "$SUBSYSTEM_DIR/core_service/interfaces/kits/include",
     "//utils/native/base/include",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/api",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/common",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/proxy",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
@@ -27,19 +29,29 @@ ohos_shared_library("telephony_radio") {
     "//foundation/aafwk/standard/interfaces/innerkits/base/include/ohos/aafwk/base",
   ]
 
-  sources = [ "src/napi_radio.cpp" ]
+  sources = [
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/api/napi_util.cpp",
+    "src/get_network_search_info_callback.cpp",
+    "src/get_network_search_mode_callback.cpp",
+    "src/get_radio_status_callback.cpp",
+    "src/napi_radio.cpp",
+    "src/set_network_search_mode_callback.cpp",
+    "src/set_radio_status_callback.cpp",
+  ]
 
   deps = [
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/interfaces/kits:tel_core_service_api",
+    "$SUBSYSTEM_DIR/ril_adapter/hril:hril",
+    "//base/telephony/core_service/common:libtelephony_common",
     "//foundation/ace/napi:ace_napi",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
     "appexecfwk_standard:libeventhandler",
-    "ipc:ipc_core",
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_L2:samgr_proxy",
   ]

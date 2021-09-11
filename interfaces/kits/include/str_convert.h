@@ -22,11 +22,12 @@
 #define CALL_MANAGER_STR_CONVERT_H
 
 namespace OHOS {
+namespace Telephony {
 std::u16string ToUtf16(std::string str);
 std::string ToUtf8(std::u16string str16);
 std::u32string ToUtf32(std::string str);
 std::string ToUtf8(std::u32string str32);
-std::wstring ToWcharT(std::string str);
 std::string ToUtf8(std::wstring wstr);
+} // namespace Telephony
 } // namespace OHOS
 #endif // CALL_MANAGER_STR_CONVERT_H

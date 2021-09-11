@@ -12,19 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef TEL_RIL_BASE_H
 #define TEL_RIL_BASE_H
 
-#include <memory>
-#include <map>
-#include <unordered_map>
+#include <mutex>
 #include "iremote_broker.h"
+#include "telephony_log_wrapper.h"
 #include "observer_handler.h"
 #include "tel_ril_common.h"
 #include "hril_types.h"
-#include "telephony_log.h"
 
 namespace OHOS {
+namespace Telephony {
 struct TelRilRequest {
     int32_t serialId_;
     int32_t requestId_;
@@ -41,7 +41,7 @@ struct TelRilRequest {
 class TelRilBase {
 public:
     TelRilBase(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
-    ~TelRilBase() = default;
+    virtual ~TelRilBase() = default;
 
     /**
      * request list handler
@@ -71,7 +71,7 @@ public:
      * @param: MessageParcel &eventData
      * @return: Returns the value of the send_result.
      */
-    int32_t SendBufferEvent(int32_t dispatchId, OHOS::MessageParcel &eventData);
+    int32_t SendBufferEvent(int32_t dispatchId, MessageParcel &eventData);
 
     /**
      * @brief Send CommonBufferEvent
@@ -91,17 +91,9 @@ public:
      */
     static std::shared_ptr<TelRilRequest> FindTelRilRequest(const HRilRadioResponseInfo &responseInfo);
 
-    /**
-     * @brief send HRIL_RESPONSE_ACKNOWLEDGEMENT event and release request list.
-     */
-    void SendRespOrNotiAck();
+    void ErrorResponse(const int32_t serial, const HRilErrType err);
 
-    /**
-     * @brief It be called when a RadioIndication callback is called.
-     *
-     * @param indicationType HRilRadioNoticeType received
-     */
-    void RilProcessIndication(int32_t indicationType);
+    void ErrorResponse(std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo);
 
     static int32_t GetNextSerialId()
     {
@@ -109,10 +101,12 @@ public:
     }
     static std::atomic_int nextSerialId_;
     static std::unordered_map<int32_t, std::shared_ptr<TelRilRequest>> requestMap_;
+    static std::mutex requestLock_;
 
 protected:
     std::shared_ptr<ObserverHandler> observerHandler_;
     sptr<IRemoteObject> cellularRadio_;
 };
+} // namespace Telephony
 } // namespace OHOS
 #endif // TEL_RIL_BASE_H

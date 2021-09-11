@@ -23,23 +23,26 @@
 #include "iremote_object.h"
 #include "refbase.h"
 #include "signal_information.h"
-
+#include "network_search_result.h"
 namespace OHOS {
+namespace Telephony {
 class RadioNetworkManager {
 public:
-    RadioNetworkManager();
-    ~RadioNetworkManager();
-    int32_t GetPsRadioTech(int32_t slotId);
-    int32_t GetCsRadioTech(int32_t slotId);
-    std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId);
-    std::u16string GetOperatorNumeric(int32_t slotId);
-    std::u16string GetOperatorName(int32_t slotId);
-    sptr<NetworkState> GetNetworkStatus(int32_t slotId);
-    bool IsConnect();
-    int32_t ConnectService(); 
-
-private:
-    sptr<ICoreService> radioNetworkService_;
+    static int32_t GetPsRadioTech(int32_t slotId);
+    static int32_t GetCsRadioTech(int32_t slotId);
+    static std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId);
+    static std::u16string GetOperatorNumeric(int32_t slotId);
+    static std::u16string GetOperatorName(int32_t slotId);
+    static sptr<NetworkState> GetNetworkState(int32_t slotId);
+    static bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+    static bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
+        const sptr<NetworkInformation> networkInformation, bool resumeSelection,
+        const sptr<INetworkSearchCallback> &callback);
+    static bool GetNetworkSearchResult(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+    static bool SetRadioState(bool isOn, const sptr<INetworkSearchCallback> &callback);
+    static bool GetRadioState(const sptr<INetworkSearchCallback> &callback);
+    static std::u16string GetIsoCountryCodeForNetwork(int32_t slotId);
 };
+} // namespace Telephony
 } // namespace OHOS
 #endif // RADIO_NETWORK_MANAGER_H

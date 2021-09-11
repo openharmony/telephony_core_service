@@ -12,57 +12,91 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef TEL_RIL_SIM_H
 #define TEL_RIL_SIM_H
 
-#include <memory>
-#include <map>
-#include <unordered_map>
-#include "observer_handler.h"
-#include "telephony_log.h"
-#include "tel_ril_base.h"
-#include "i_tel_ril_manager.h"
 #include "hril_sim_parcel.h"
+#include "observer_handler.h"
+#include "tel_ril_base.h"
 
 namespace OHOS {
+namespace Telephony {
 class TelRilSim : public TelRilBase {
 public:
     TelRilSim(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
 
     ~TelRilSim() = default;
 
+    void SimStateUpdated(MessageParcel &data);
     /**
      * @brief Get IMSI
      *
      * @param :string aid
      */
-    void GetImsi(std::string aid, const AppExecFwk::InnerEvent::Pointer &result);
-
-    void ReadIccFile(int32_t command, int32_t fileId, std::string path, int32_t p1, int32_t p2, int32_t p3,
-        std::string data, std::string pin2, std::string aid, const AppExecFwk::InnerEvent::Pointer &response);
-
     void GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetImsi(const AppExecFwk::InnerEvent::Pointer &result);
+    void RequestSimIO(int32_t command, int32_t fileId, int32_t p1, int32_t p2, int32_t p3, std::string data,
+        std::string path, const AppExecFwk::InnerEvent::Pointer &response);
+    void GetIccID(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetSimLockStatus(std::string fac, const AppExecFwk::InnerEvent::Pointer &response);
+    void SetSimLock(
+        std::string fac, int32_t mode, std::string passwd, const AppExecFwk::InnerEvent::Pointer &response);
+    void ChangeSimPassword(std::string fac, std::string oldPassword, std::string newPassword,
+        int32_t passwordLength, const AppExecFwk::InnerEvent::Pointer &response);
+    void EnterSimPin(std::string pin, const AppExecFwk::InnerEvent::Pointer &response);
+    void UnlockSimPin(std::string puk, std::string pin, const AppExecFwk::InnerEvent::Pointer &response);
+    void GetSimPinInputTimes(const AppExecFwk::InnerEvent::Pointer &response);
 
     /**
      * @brief Get ICC card status response
      *
      * @param data is HDF service callback message
      */
-    void GetSimStatusResponse(OHOS::MessageParcel &data);
+    void GetSimStatusResponse(MessageParcel &data);
 
     /**
      * @brief Get IMSI response of SIM card
      *
      * @param data is HDF service callback message
      */
-    void GetImsiResponse(OHOS::MessageParcel &data);
+    void GetImsiResponse(MessageParcel &data);
+    /**
+     * @brief Get IccID response of SIM card
+     *
+     * @param data is HDF service callback message
+     */
+    void GetIccIDResponse(MessageParcel &data);
 
     /**
      * @brief ICC I / O operation response
      *
      * @param data is HDF service callback message
      */
-    void ReadIccFileResponse(OHOS::MessageParcel &data);
+    void RequestSimIOResponse(MessageParcel &data);
+
+    /**
+     * @brief Change  Null to  empty string
+     * @param:  std::string str
+     * @return: Returns empty string.
+     */
+    void GetSimLockStatusResponse(MessageParcel &data);
+
+    /**
+     * @brief Change  Null to  empty string
+     * @param:  std::string str
+     * @return: Returns empty string.
+     */
+    void SetSimLockResponse(MessageParcel &data);
+    /**
+     * @brief Change  Null to  empty string
+     * @param:  std::string str
+     * @return: Returns empty string.
+     */
+    void ChangeSimPasswordResponse(MessageParcel &data);
+    void EnterSimPinResponse(MessageParcel &data);
+    void UnlockSimPinResponse(MessageParcel &data);
+    void GetSimPinInputTimesResponse(MessageParcel &data);
 
     /**
      * @brief Change  Null to  empty string
@@ -73,18 +107,21 @@ public:
 
     bool IsSimRespOrNotify(uint32_t code);
 
-    void ProcessSimRespOrNotify(uint32_t code, OHOS::MessageParcel &data);
+    void ProcessSimRespOrNotify(uint32_t code, MessageParcel &data);
 
 private:
     bool IsSimResponse(uint32_t code);
     bool IsSimNotification(uint32_t code);
     void AddHandlerToMap();
-    void ProcessIccioInfo(
+    void ProcessIccIoInfo(
         std::shared_ptr<TelRilRequest> telRilRequest, std::shared_ptr<IccIoResultInfo> iccIoResult);
+    void ErrorIccIoResponse(
+        std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo);
 
 private:
     using Func = void (TelRilSim::*)(MessageParcel &data);
     std::map<uint32_t, Func> memberFuncMap_;
 };
+} // namespace Telephony
 } // namespace OHOS
 #endif // TEL_RIL_SIM_H
