@@ -29,10 +29,7 @@ const std::string CUR_SPN_SHOW = "CUR_SPN_SHOW";
 const std::string CUR_REG_STATE = "CUR_REG_STATE";
 const std::string CUR_SPN_SHOW_RULE = "CUR_SPN_SHOW_RULE";
 
-typedef enum {
-    DOMAIN_TYPE_PS,
-    DOMAIN_TYPE_CS
-} DomainType;
+typedef enum { DOMAIN_TYPE_PS, DOMAIN_TYPE_CS } DomainType;
 
 typedef enum {
     REG_STATE_UNKNOWN,
@@ -135,11 +132,6 @@ public:
      */
     bool IsRoaming() const;
 
-    /*
-     * Obtains the network plmn status
-     * @return Returns the network plmn status
-     */
-    int32_t GetNetworkPlmnState() const;
     std::string ToString() const;
 
 private:

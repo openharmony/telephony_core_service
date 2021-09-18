@@ -142,13 +142,12 @@ int32_t CoreServiceStub::OnSetRadioState(MessageParcel &data, MessageParcel &rep
     if (remoteCallback != nullptr) {
         callback = iface_cast<INetworkSearchCallback>(remoteCallback);
     }
-    auto slotId = data.ReadInt32();
     bool isOn = data.ReadBool();
 
     bool result = false;
     if (callback != nullptr) {
-        TELEPHONY_LOGD("CoreServiceStub::OnSetRadioState isOn:%{public}d,  slotId:%{public}d", isOn, slotId);
-        result = SetRadioState(slotId, isOn, callback);
+        TELEPHONY_LOGD("CoreServiceStub::OnSetRadioState isOn:%{public}d, ", isOn);
+        result = SetRadioState(isOn, callback);
     }
     bool ret = reply.WriteBool(result);
     if (!ret) {
@@ -166,18 +165,16 @@ int32_t CoreServiceStub::OnGetRadioState(MessageParcel &data, MessageParcel &rep
     if (remoteCallback != nullptr) {
         callback = iface_cast<INetworkSearchCallback>(remoteCallback);
     }
-    auto slotId = data.ReadInt32();
     bool result = false;
     if (callback != nullptr) {
-        TELEPHONY_LOGD("CoreServiceStub::OnGetRadioState slotId:%{public}d", slotId);
-        result = GetRadioState(slotId, callback);
+        result = GetRadioState(callback);
     }
     bool ret = reply.WriteBool(result);
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnGetRadioState write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
-    TELEPHONY_LOGD("CoreServiceStub::OnGetRadioState  result:%{public}d,  slotId:%{public}d", result, slotId);
+    TELEPHONY_LOGD("CoreServiceStub::OnGetRadioState  result:%{public}d,", result);
     return NO_ERROR;
 }
 

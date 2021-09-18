@@ -17,6 +17,7 @@
 
 #include <cstring>
 #include <memory>
+#include <chrono>
 
 #include "hilog/log.h"
 #include "radio_network_manager.h"
@@ -47,6 +48,36 @@ static int32_t WrapRadioTech(int32_t radioTechType)
 static int32_t GetDefaultSlotId()
 {
     return CoreManager::DEFAULT_SLOT_ID;
+}
+
+static napi_value ParseErrorValue(napi_env env, const int32_t rilErrorCode, const std::string &funcName)
+{
+    switch (rilErrorCode) {
+        case HRIL_ERR_NULL_POINT:
+            return NapiUtil::CreateErrorMessage(env, funcName + " error because hril err null point", rilErrorCode);
+        case HRIL_ERR_SUCCESS:
+            return NapiUtil::CreateUndefined(env);
+        case HRIL_ERR_GENERIC_FAILURE:
+            return NapiUtil::CreateErrorMessage(
+                env, funcName + " error because hril err generic failure", rilErrorCode);
+        case HRIL_ERR_INVALID_PARAMETER:
+            return NapiUtil::CreateErrorMessage(
+                env, funcName + " error because hril err invalid parameter", rilErrorCode);
+        case HRIL_ERR_CMD_SEND_FAILURE:
+            return NapiUtil::CreateErrorMessage(
+                env, funcName + " error because hril err cmd send failure", rilErrorCode);
+        case HRIL_ERR_CMD_NO_CARRIER:
+            return NapiUtil::CreateErrorMessage(
+                env, funcName + " error because hril err cmd no carrier", rilErrorCode);
+        case HRIL_ERR_INVALID_RESPONSE:
+            return NapiUtil::CreateErrorMessage(
+                env, funcName + " error because hril err invalid response", rilErrorCode);
+        case HRIL_ERR_REPEAT_STATUS:
+            return NapiUtil::CreateErrorMessage(
+                env, funcName + " error because hril err repeat status", rilErrorCode);
+        default:
+            return NapiUtil::CreateErrorMessage(env, funcName + " error", rilErrorCode);
+    }
 }
 
 static void NativeGetRadioTech(napi_env env, void *data)
@@ -124,26 +155,13 @@ static napi_value GetRadioTech(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchGetRadioTechParameter(env, parameters, parameterCount), "type mismatch");
-    auto asyncContext = std::make_unique<RadioTechContext>().release();
-    if (parameterCount == 1) {
-        NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-    } else if (parameterCount == 2) {
-        NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+    auto asyncContext = std::make_unique<RadioTechContext>();
+    NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+    if (parameterCount == 2) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], 1, &asyncContext->callbackRef));
     }
-    napi_value result = nullptr;
-    if (asyncContext->callbackRef == nullptr) {
-        NAPI_CALL(env, napi_create_promise(env, &asyncContext->deferred, &result));
-    } else {
-        NAPI_CALL(env, napi_get_undefined(env, &result));
-    }
-    napi_value resourceName = nullptr;
-    NAPI_CALL(env, napi_create_string_utf8(env, "GetRadioTech", NAPI_AUTO_LENGTH, &resourceName));
-    NAPI_CALL(env,
-        napi_create_async_work(env, nullptr, resourceName, NativeGetRadioTech, GetRadioTechCallback,
-            (void *)asyncContext, &(asyncContext->work)));
-    NAPI_CALL(env, napi_queue_async_work(env, asyncContext->work));
-    return result;
+    return NapiUtil::HandleAsyncWork(
+        env, asyncContext.release(), "GetRadioTech", NativeGetRadioTech, GetRadioTechCallback);
 }
 
 static int32_t WrapNetworkType(const sptr<SignalInformation> signalInfo)
@@ -228,31 +246,13 @@ static napi_value GetSignalInfoList(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchGetSignalInfoListParameter(env, parameters, parameterCount), "type mismatch");
-    auto asyncContext = std::make_unique<SignalInfoListContext>().release();
+    auto asyncContext = std::make_unique<SignalInfoListContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &(asyncContext->slotId)));
     if (parameterCount == 2) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], 1, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(
-        env, asyncContext, "GetSignalInfoList", NativeGetSignalInfoList, GetSignalInfoListCallback);
-}
-
-static int32_t WrapRegStatus(int32_t state)
-{
-    switch (state) {
-        case REG_STATE_IN_SERVICE: {
-            return REGISTRATION_STATE_IN_SERVICE;
-        }
-        case REG_STATE_NO_SERVICE: {
-            return REGISTRATION_STATE_NO_SERVICE;
-        }
-        case REG_STATE_EMERGENCY_ONLY: {
-            return REGISTRATION_STATE_EMERGENCY_CALL_ONLY;
-        }
-        default: {
-            return REGISTRATION_STATE_POWER_OFF;
-        }
-    }
+        env, asyncContext.release(), "GetSignalInfoList", NativeGetSignalInfoList, GetSignalInfoListCallback);
 }
 
 static int32_t WrapRegState(int32_t nativeState)
@@ -283,7 +283,8 @@ static void NativeGetNetworkState(napi_env env, void *data)
     networkState = RadioNetworkManager::GetNetworkState(asyncContext->slotId);
     if (networkState != nullptr) {
         asyncContext->resolved = true;
-        asyncContext->regStatus = WrapRegState(networkState->GetRegStatus());
+        asyncContext->regStatus = networkState->GetRegStatus();
+        TELEPHONY_LOGD("-----NativeGetNetworkState native regeState = %{public}d", asyncContext->regStatus);
         asyncContext->longOperatorName = networkState->GetLongOperatorName();
         asyncContext->shortOperatorName = networkState->GetShortOperatorName();
         asyncContext->plmnNumeric = networkState->GetPlmnNumeric();
@@ -304,7 +305,7 @@ static void GetNetworkStateCallback(napi_env env, napi_status status, void *data
         NapiUtil::SetPropertyStringUtf8(env, callbackValue, "shortOperatorName", asyncContext->shortOperatorName);
         NapiUtil::SetPropertyStringUtf8(env, callbackValue, "plmnNumeric", asyncContext->plmnNumeric);
         NapiUtil::SetPropertyBoolean(env, callbackValue, "isRoaming", asyncContext->isRoaming);
-        NapiUtil::SetPropertyInt32(env, callbackValue, "regStatus", WrapRegStatus(asyncContext->regStatus));
+        NapiUtil::SetPropertyInt32(env, callbackValue, "regStatus", WrapRegState(asyncContext->regStatus));
         NapiUtil::SetPropertyInt32(env, callbackValue, "nsaState", asyncContext->nsaState);
         NapiUtil::SetPropertyBoolean(env, callbackValue, "isCaActive", asyncContext->isCaActive);
         NapiUtil::SetPropertyBoolean(env, callbackValue, "isEmergency", asyncContext->isEmergency);
@@ -364,35 +365,29 @@ static napi_value GetNetworkState(napi_env env, napi_callback_info info)
 static void NativeGetNetworkSelectionMode(napi_env env, void *data)
 {
     auto asyncContext = static_cast<GetSelectModeContext *>(data);
-    bool getResult = false;
     std::unique_ptr<GetNetworkSearchModeCallback> callback =
-        std::make_unique<GetNetworkSearchModeCallback>(env, asyncContext->thisVarRef, asyncContext);
-    getResult = RadioNetworkManager::GetNetworkSelectionMode(asyncContext->slotId, callback.release());
-    asyncContext->resolved = getResult;
+        std::make_unique<GetNetworkSearchModeCallback>(asyncContext);
+    std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
+    asyncContext->sendRequest =
+        RadioNetworkManager::GetNetworkSelectionMode(asyncContext->slotId, callback.release());
+    if (asyncContext->sendRequest) {
+        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+            [asyncContext] { return asyncContext->callbackEnd; });
+        TELEPHONY_LOGD("NativeGetNetworkSelectionMode after callback end");
+    }
+    TELEPHONY_LOGD("NativeGetNetworkSelectionMode end");
 }
 
 static void GetNetworkSelectionModeCallback(napi_env env, napi_status status, void *data)
 {
     auto asyncContext = (GetSelectModeContext *)data;
-    if (!asyncContext->resolved) {
-        if (asyncContext->deferred != nullptr) {
-            napi_value errorMessage = NapiUtil::CreateErrorMessage(env, "get network selection mode error. ");
-            napi_reject_deferred(env, asyncContext->deferred, errorMessage);
-        } else {
-            napi_value callbackValues[2] = {0};
-            callbackValues[0] = NapiUtil::CreateErrorMessage(env, "get network selection mode error. ");
-            callbackValues[1] = NapiUtil::CreateUndefined(env);
-            napi_value callback = nullptr;
-            napi_value result = nullptr;
-            napi_value undefind = nullptr;
-            napi_get_undefined(env, &undefind);
-            napi_get_reference_value(env, asyncContext->callbackRef, &callback);
-            napi_call_function(env, undefind, callback, std::size(callbackValues), callbackValues, &result);
-            napi_delete_reference(env, asyncContext->callbackRef);
-        }
-        napi_delete_async_work(env, asyncContext->work);
-        delete asyncContext;
+    napi_value callbackValue = nullptr;
+    if (asyncContext->resolved) {
+        napi_create_int32(env, asyncContext->selectMode, &callbackValue);
+    } else {
+        callbackValue = ParseErrorValue(env, asyncContext->errorCode, " get network selection mode");
     }
+    NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGD("GetNetworkSelectionModeCallback end");
 }
 
@@ -404,59 +399,97 @@ static napi_value GetNetworkSelectionMode(napi_env env, napi_callback_info info)
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchGetRadioTechParameter(env, parameters, parameterCount), "type mismatch");
-    auto asyncContext = std::make_unique<GetSelectModeContext>().release();
-    NAPI_CALL(env, napi_create_reference(env, thisVar, 1, &asyncContext->thisVarRef));
+    auto asyncContext = std::make_unique<GetSelectModeContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
     if (parameterCount == 2) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], 1, &asyncContext->callbackRef));
     }
-    napi_value result = nullptr;
-    if (asyncContext->callbackRef == nullptr) {
-        NAPI_CALL(env, napi_create_promise(env, &asyncContext->deferred, &result));
-    } else {
-        NAPI_CALL(env, napi_get_undefined(env, &result));
-    }
-    napi_value resourceName = nullptr;
-    NAPI_CALL(env, napi_create_string_utf8(env, "GetNetworkSelectionMode", NAPI_AUTO_LENGTH, &resourceName));
-    NAPI_CALL(env,
-        napi_create_async_work(env, nullptr, resourceName, NativeGetNetworkSelectionMode,
-            GetNetworkSelectionModeCallback, (void *)asyncContext, &(asyncContext->work)));
-    NAPI_CALL(env, napi_queue_async_work(env, asyncContext->work));
-    return result;
+    return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "GetNetworkSelectionMode",
+        NativeGetNetworkSelectionMode, GetNetworkSelectionModeCallback);
 }
 
 static void NativeGetNetworkSearchInformation(napi_env env, void *data)
 {
-    auto context = static_cast<GetSearchInfoContext *>(data);
+    auto asyncContext = static_cast<GetSearchInfoContext *>(data);
     std::unique_ptr<GetNetworkSearchInfoCallback> callback =
-        std::make_unique<GetNetworkSearchInfoCallback>(env, context->thisVarRef, context);
-    context->isSendRequest = RadioNetworkManager::GetNetworkSearchResult(context->slotId, callback.release());
-    context->resolved = context->isSendRequest;
+        std::make_unique<GetNetworkSearchInfoCallback>(asyncContext);
+    std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
+    asyncContext->sendRequest =
+        RadioNetworkManager::GetNetworkSearchResult(asyncContext->slotId, callback.release());
+    if (asyncContext->sendRequest) {
+        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+            [asyncContext] { return asyncContext->callbackEnd; });
+        TELEPHONY_LOGD("NativeGetNetworkSearchInformation after callback end");
+    }
+    TELEPHONY_LOGD("NativeGetNetworkSearchInformation end");
+}
+
+static int32_t WrapToJsPlmnState(int32_t nativeState)
+{
+    switch (nativeState) {
+        case NETWORK_PLMN_STATE_AVAILABLE: {
+            return NETWORK_AVAILABLE;
+        }
+        case NETWORK_PLMN_STATE_REGISTERED: {
+            return NETWORK_CURRENT;
+        }
+        case NETWORK_PLMN_STATE_FORBIDDEN: {
+            return NETWORK_FORBIDDEN;
+        }
+        default: {
+            return NETWORK_UNKNOWN;
+        }
+    }
+}
+
+static std::string GetRadioTechName(int32_t radioTech)
+{
+    switch (radioTech) {
+        case NETWORK_GSM_OR_GPRS: {
+            return "GSM";
+        }
+        case NETWORK_WCDMA: {
+            return "WCDMA";
+        }
+        case NETWORK_LTE: {
+            return "LTE";
+        }
+        default: {
+            return "";
+        }
+    }
 }
 
 static void GetNetworkSearchInformationCallback(napi_env env, napi_status status, void *data)
 {
     auto asyncContext = static_cast<GetSearchInfoContext *>(data);
-    if (!asyncContext->resolved) {
-        if (asyncContext->deferred != nullptr) {
-            napi_value errorMessage = NapiUtil::CreateErrorMessage(env, "get network search info error.");
-            napi_reject_deferred(env, asyncContext->deferred, errorMessage);
-        } else {
-            napi_value callbackValues[2] = {0};
-            callbackValues[0] = NapiUtil::CreateErrorMessage(env, "get network search info error.");
-            callbackValues[1] = NapiUtil::CreateUndefined(env);
-            napi_value callback = nullptr;
-            napi_value result = nullptr;
-            napi_value undefind = nullptr;
-            napi_get_undefined(env, &undefind);
-            napi_get_reference_value(env, asyncContext->callbackRef, &callback);
-            napi_call_function(env, undefind, callback, std::size(callbackValues), callbackValues, &result);
-            napi_delete_reference(env, asyncContext->callbackRef);
+    napi_value callbackValue = nullptr;
+    if (asyncContext->resolved) {
+        int32_t searchResultSize = asyncContext->searchResult->GetNetworkSearchResultSize();
+        TELEPHONY_LOGD("GetNetworkSearchInformationCallback SearchResultSize = %{public}d", searchResultSize);
+        napi_create_object(env, &callbackValue);
+        bool isNetworkSearchSuccess = searchResultSize > 0;
+        NapiUtil::SetPropertyBoolean(env, callbackValue, "isNetworkSearchSuccess", isNetworkSearchSuccess);
+        napi_value searchResultArray = nullptr;
+        napi_create_array(env, &searchResultArray);
+        std::vector<NetworkInformation> resultList = asyncContext->searchResult->GetNetworkSearchResult();
+        int32_t resultListSize = static_cast<int32_t>(resultList.size());
+        TELEPHONY_LOGD("GetNetworkSearchInformationCallback SearchResultSize = %{public}d", searchResultSize);
+        for (int32_t i = 0; i < resultListSize; i++) {
+            napi_value info = nullptr;
+            napi_create_object(env, &info);
+            NapiUtil::SetPropertyStringUtf8(env, info, "operatorName", resultList[i].GetOperatorLongName());
+            NapiUtil::SetPropertyStringUtf8(env, info, "operatorNumeric", resultList[i].GetOperatorNumeric());
+            NapiUtil::SetPropertyInt32(env, info, "state", WrapToJsPlmnState(resultList[i].GetNetworkState()));
+            NapiUtil::SetPropertyStringUtf8(env, info, "radioTech", GetRadioTechName(resultList[i].GetRadioTech()));
+            napi_set_element(env, searchResultArray, i, info);
         }
-        napi_delete_async_work(env, asyncContext->work);
-        delete asyncContext;
+        napi_set_named_property(env, callbackValue, "networkSearchResult", searchResultArray);
+    } else {
+        callbackValue = ParseErrorValue(env, asyncContext->errorCode, "get network search info");
     }
-    TELEPHONY_LOGD("GetNetworkSelectionModeCallback end");
+    NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
+    TELEPHONY_LOGD("GetNetworkSearchInformationCallback end");
 }
 
 static bool MatchGetNetworkSearchInformation(napi_env env, const napi_value parameters[], size_t parameterCount)
@@ -483,7 +516,6 @@ static napi_value GetNetworkSearchInformation(napi_env env, napi_callback_info i
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchGetNetworkSearchInformation(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<GetSearchInfoContext>().release();
-    NAPI_CALL(env, napi_create_reference(env, thisVar, 1, &asyncContext->thisVarRef));
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
     if (parameterCount == 2) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], 1, &asyncContext->callbackRef));
@@ -622,39 +654,35 @@ static void NativeSetNetworkSelectionMode(napi_env env, void *data)
         WrapPlmnState(asyncContext->state), GetRatTechValue(asyncContext->radioTech));
     TELEPHONY_LOGD("NativeSetNetworkSelectionMode operatorName = %{public}s", asyncContext->operatorName.c_str());
     std::unique_ptr<SetNetworkSearchModeCallback> callback =
-        std::make_unique<SetNetworkSearchModeCallback>(env, asyncContext->thisVarRef, asyncContext);
-    bool setResult = RadioNetworkManager::SetNetworkSelectionMode(asyncContext->slotId, asyncContext->selectMode,
-        networkInfo, asyncContext->resumeSelection, callback.release());
-    asyncContext->resolved = setResult;
-    TELEPHONY_LOGD("NativeSetNetworkSelectionMode setResult = %{public}d", setResult);
+        std::make_unique<SetNetworkSearchModeCallback>(asyncContext);
+    std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
+    asyncContext->sendRequest = RadioNetworkManager::SetNetworkSelectionMode(asyncContext->slotId,
+        asyncContext->selectMode, networkInfo, asyncContext->resumeSelection, callback.release());
+    TELEPHONY_LOGD("NativeSetNetworkSelectionMode setResult = %{public}d", asyncContext->sendRequest);
+    if (asyncContext->sendRequest) {
+        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+            [asyncContext] { return asyncContext->callbackEnd; });
+        TELEPHONY_LOGD("NativeSetNetworkSelectionMode after callback end");
+    }
+    TELEPHONY_LOGD("NativeSetNetworkSelectionMode end");
 }
 
 static void SetNetworkSelectionModeCallback(napi_env env, napi_status status, void *data)
 {
     TELEPHONY_LOGD("SetNetworkSelectionModeCallback start");
     auto asyncContext = static_cast<SetSelectModeContext *>(data);
-    if (!asyncContext->resolved) {
-        if (asyncContext->deferred != nullptr) {
-            napi_value errorMessage = NapiUtil::CreateErrorMessage(env, "set network selection mode error. ");
-            napi_reject_deferred(env, asyncContext->deferred, errorMessage);
-        } else if (asyncContext->callbackRef != nullptr) {
-            napi_value callbackValues[2] = {0};
-            callbackValues[0] = asyncContext->resolved ?
-                NapiUtil::CreateUndefined(env) :
-                NapiUtil::CreateErrorMessage(env, "SetPreferredNetworkMode err");
-            callbackValues[1] = NapiUtil::CreateUndefined(env);
-            napi_value callback = nullptr;
-            napi_value result = nullptr;
-            napi_value undefind = nullptr;
-            napi_get_undefined(env, &undefind);
-            napi_get_reference_value(env, asyncContext->callbackRef, &callback);
-            napi_call_function(env, undefind, callback, std::size(callbackValues), callbackValues, &result);
-            napi_delete_reference(env, asyncContext->callbackRef);
-            TELEPHONY_LOGD("SetNetworkSelectionModeCallback callback end");
-        }
-        napi_delete_async_work(env, asyncContext->work);
-        delete asyncContext;
+    if (asyncContext->sendRequest) {
+        asyncContext->resolved = asyncContext->setResult;
+    } else {
+        asyncContext->resolved = false;
     }
+    napi_value callbackValue = nullptr;
+    if (asyncContext->resolved) {
+        napi_get_undefined(env, &callbackValue);
+    } else {
+        callbackValue = ParseErrorValue(env, asyncContext->errorCode, "set network selection mode");
+    }
+    NapiUtil::Handle1ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGD("SetNetworkSelectionModeCallback end");
 }
 
@@ -696,14 +724,13 @@ static napi_value SetNetworkSelectionMode(napi_env env, napi_callback_info info)
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchSetNetworkSelectionModeParameters(env, parameters, parameterCount), "type mismatch");
-    auto asyncContext = std::make_unique<SetSelectModeContext>().release();
-    napi_create_reference(env, thisVar, 1, &asyncContext->thisVarRef);
+    auto asyncContext = std::make_unique<SetSelectModeContext>();
     ParseNetworkSelectionParameter(env, parameters[0], *asyncContext);
     if (parameterCount == 2) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], 1, &asyncContext->callbackRef));
     }
-    return NapiUtil::HandleAsyncWork(env, asyncContext, "SetNetworkSelectionMode", NativeSetNetworkSelectionMode,
-        SetNetworkSelectionModeCallback);
+    return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "SetNetworkSelectionMode",
+        NativeSetNetworkSelectionMode, SetNetworkSelectionModeCallback);
 }
 
 static void NativeGetCountryCode(napi_env env, void *data)
@@ -711,11 +738,7 @@ static void NativeGetCountryCode(napi_env env, void *data)
     auto context = static_cast<GetISOCountryCodeContext *>(data);
     context->countryCode = NapiUtil::ToUtf8(RadioNetworkManager::GetIsoCountryCodeForNetwork(context->slotId));
     TELEPHONY_LOGD("NativeGetCountryCode countryCode = %{public}s", context->countryCode.c_str());
-    if (context->countryCode.empty()) {
-        context->resolved = false;
-    } else {
-        context->resolved = true;
-    }
+    context->resolved = true;
 }
 
 static void GetCountryCodeCallback(napi_env env, napi_status status, void *data)
@@ -757,125 +780,109 @@ static napi_value GetISOCountryCodeForNetwork(napi_env env, napi_callback_info i
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchGetISOCountryCodeForNetworkParameter(env, parameters, parameterCount), "type mismatch");
-    auto asyncContext = std::make_unique<GetISOCountryCodeContext>().release();
+    auto asyncContext = std::make_unique<GetISOCountryCodeContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
     if (parameterCount == 2) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], 1, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(
-        env, asyncContext, "GetISOCountryCodeForNetwork", NativeGetCountryCode, GetCountryCodeCallback);
+        env, asyncContext.release(), "GetISOCountryCodeForNetwork", NativeGetCountryCode, GetCountryCodeCallback);
 }
 
 static bool MatchIsRadioOnParameter(napi_env env, napi_value parameters[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 1: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number});
+        case 0: {
+            return true;
         }
-        case 2: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number, napi_function});
+        case 1: {
+            return NapiUtil::MatchParameters(env, parameters, {napi_function});
         }
         default:
             return false;
     }
 }
+
 static void NativeIsRadioOn(napi_env env, void *data)
 {
     auto asyncContext = static_cast<IsRadioOnContext *>(data);
-    bool getResult = false;
-    std::unique_ptr<GetRadioStatusCallback> callback =
-        std::make_unique<GetRadioStatusCallback>(env, asyncContext->thisVarRef, asyncContext);
-    getResult = RadioNetworkManager::GetRadioState(asyncContext->slotId, callback.release());
-    TELEPHONY_LOGD("NativeIsRadioOn getResult = %{public}d", getResult);
-    asyncContext->resolved = getResult;
+    std::unique_ptr<GetRadioStatusCallback> callback = std::make_unique<GetRadioStatusCallback>(asyncContext);
+    std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
+    asyncContext->sendRequest = RadioNetworkManager::GetRadioState(callback.release());
+    TELEPHONY_LOGD("NativeIsRadioOn sendRequest = %{public}d", asyncContext->sendRequest);
+    if (asyncContext->sendRequest) {
+        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+            [asyncContext] { return asyncContext->callbackEnd; });
+        TELEPHONY_LOGD("NativeIsRadioOn after callback end");
+    }
+    TELEPHONY_LOGD("NativeIsRadioOn end");
 }
 
 static void IsRadioOnCallback(napi_env env, napi_status status, void *data)
 {
     TELEPHONY_LOGD("IsRadioOnCallback start");
     auto asyncContext = static_cast<IsRadioOnContext *>(data);
-    if (!asyncContext->resolved) {
-        if (asyncContext->deferred != nullptr) {
-            napi_value errorMessage = NapiUtil::CreateErrorMessage(env, "get radio status failed.");
-            napi_reject_deferred(env, asyncContext->deferred, errorMessage);
-            TELEPHONY_LOGD("IsRadioOnCallback promise reject end");
-        } else if (asyncContext->callbackRef != nullptr) {
-            napi_value undefind = NapiUtil::CreateUndefined(env);
-            napi_value callback = nullptr;
-            napi_get_reference_value(env, asyncContext->callbackRef, &callback);
-            napi_value callbackValues[] = {
-                NapiUtil::CreateErrorMessage(env, "get radio status failed."), NapiUtil::CreateUndefined(env)};
-            napi_value result = nullptr;
-            napi_call_function(env, undefind, callback, std::size(callbackValues), callbackValues, &result);
-            napi_delete_reference(env, asyncContext->callbackRef);
-            TELEPHONY_LOGD("IsRadioOnCallback callback reject end");
-        }
-        napi_delete_async_work(env, asyncContext->work);
-        delete asyncContext;
+    napi_value callbackValue = nullptr;
+    if (asyncContext->resolved) {
+        napi_get_boolean(env, asyncContext->isRadioOn, &callbackValue);
+    } else {
+        callbackValue = ParseErrorValue(env, asyncContext->errorCode, "get radio status");
     }
+    NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGD("IsRadioOnCallback end");
 }
 
 static napi_value IsRadioOn(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = 1;
+    napi_value parameters[1] = {0};
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchIsRadioOnParameter(env, parameters, parameterCount), "type mismatch");
-    auto asyncContext = std::make_unique<IsRadioOnContext>().release();
-    NAPI_CALL(env, napi_create_reference(env, thisVar, 1, &asyncContext->thisVarRef));
-    NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-    if (parameterCount == 2) {
-        NAPI_CALL(env, napi_create_reference(env, parameters[1], 1, &asyncContext->callbackRef));
+    auto asyncContext = std::make_unique<IsRadioOnContext>();
+    if (parameterCount == 1) {
+        NAPI_CALL(env, napi_create_reference(env, parameters[0], 1, &asyncContext->callbackRef));
     }
-    return NapiUtil::HandleAsyncWork(env, asyncContext, "IsRadioOn", NativeIsRadioOn, IsRadioOnCallback);
+    return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "IsRadioOn", NativeIsRadioOn, IsRadioOnCallback);
 }
 
 static void NativeTurnOnRadio(napi_env env, void *data)
 {
     auto asyncContext = static_cast<SwitchRadioContext *>(data);
-    bool setResult = false;
-    std::unique_ptr<SetRadioStatusCallback> callback =
-        std::make_unique<SetRadioStatusCallback>(env, asyncContext->thisVarRef, asyncContext);
-    setResult = RadioNetworkManager::SetRadioState(asyncContext->slotId, true, callback.release());
-    asyncContext->resolved = setResult;
+    std::unique_ptr<SetRadioStatusCallback> callback = std::make_unique<SetRadioStatusCallback>(asyncContext);
+    std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
+    asyncContext->sendRequest = RadioNetworkManager::SetRadioState(true, callback.release());
+    if (asyncContext->sendRequest) {
+        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+            [asyncContext] { return asyncContext->callbackEnd; });
+        TELEPHONY_LOGD("NativeTurnOnRadio after callback end");
+    }
+    TELEPHONY_LOGD("NativeTurnOnRadio end");
 }
 
 static void TurnOnRadioCallback(napi_env env, napi_status status, void *data)
 {
     TELEPHONY_LOGD("TurnOnRadioCallback start");
     auto asyncContext = static_cast<SwitchRadioContext *>(data);
-    if (!asyncContext->resolved) {
-        if (asyncContext->deferred != nullptr) {
-            napi_value errorMessage = NapiUtil::CreateErrorMessage(env, "set radio status failed.");
-            napi_reject_deferred(env, asyncContext->deferred, errorMessage);
-            TELEPHONY_LOGD("TurnOnRadioCallback promise reject end");
-        } else if (asyncContext->callbackRef != nullptr) {
-            napi_value undefind = NapiUtil::CreateUndefined(env);
-            napi_value callback = nullptr;
-            napi_get_reference_value(env, asyncContext->callbackRef, &callback);
-            napi_value callbackValues[] = {NapiUtil::CreateErrorMessage(env, "set radio status failed.")};
-            napi_value result = nullptr;
-            napi_call_function(env, undefind, callback, std::size(callbackValues), callbackValues, &result);
-            napi_delete_reference(env, asyncContext->callbackRef);
-            TELEPHONY_LOGD("TurnOnRadioCallback callback reject end");
-        }
-        napi_delete_async_work(env, asyncContext->work);
-        delete asyncContext;
+    napi_value callbackValue = nullptr;
+    if (asyncContext->resolved) {
+        napi_get_undefined(env, &callbackValue);
+    } else {
+        callbackValue = ParseErrorValue(env, asyncContext->errorCode, "turn on radio");
     }
+    NapiUtil::Handle1ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGD("TurnOnRadioCallback end");
 }
 
 static bool MatchSwitchRadioParameter(napi_env env, napi_value parameters[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 1: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number});
+        case 0: {
+            return true;
         }
-        case 2: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number, napi_function});
+        case 1: {
+            return NapiUtil::MatchParameters(env, parameters, {napi_function});
         }
         default:
             return false;
@@ -884,71 +891,62 @@ static bool MatchSwitchRadioParameter(napi_env env, napi_value parameters[], siz
 
 static napi_value TurnOnRadio(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = 1;
+    napi_value parameters[1] = {0};
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchSwitchRadioParameter(env, parameters, parameterCount), "type mismatch");
-    auto asyncContext = std::make_unique<SwitchRadioContext>().release();
-    NAPI_CALL(env, napi_create_reference(env, thisVar, 1, &asyncContext->thisVarRef));
-    NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-    if (parameterCount == 2) {
-        NAPI_CALL(env, napi_create_reference(env, parameters[1], 1, &asyncContext->callbackRef));
+    auto asyncContext = std::make_unique<SwitchRadioContext>();
+    if (parameterCount == 1) {
+        NAPI_CALL(env, napi_create_reference(env, parameters[0], 1, &asyncContext->callbackRef));
     }
-    return NapiUtil::HandleAsyncWork(env, asyncContext, "TurnOnRadio", NativeTurnOnRadio, TurnOnRadioCallback);
+    return NapiUtil::HandleAsyncWork(
+        env, asyncContext.release(), "TurnOnRadio", NativeTurnOnRadio, TurnOnRadioCallback);
 }
 
 static void NativeTurnOffRadio(napi_env env, void *data)
 {
     auto asyncContext = static_cast<SwitchRadioContext *>(data);
-    bool setResult = false;
-    std::unique_ptr<SetRadioStatusCallback> callback =
-        std::make_unique<SetRadioStatusCallback>(env, asyncContext->thisVarRef, asyncContext);
-    setResult = RadioNetworkManager::SetRadioState(asyncContext->slotId, false, callback.release());
-    asyncContext->resolved = setResult;
+    std::unique_ptr<SetRadioStatusCallback> callback = std::make_unique<SetRadioStatusCallback>(asyncContext);
+    std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
+    asyncContext->sendRequest = RadioNetworkManager::SetRadioState(false, callback.release());
+    if (asyncContext->sendRequest) {
+        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+            [asyncContext] { return asyncContext->callbackEnd; });
+        TELEPHONY_LOGD("NativeTurnOffRadio after callback end");
+    }
+    TELEPHONY_LOGD("NativeTurnOffRadio end");
 }
 
 static void TurnOffRadioCallback(napi_env env, napi_status status, void *data)
 {
     TELEPHONY_LOGD("TurnOffRadioCallback start");
     auto asyncContext = static_cast<SwitchRadioContext *>(data);
-    if (!asyncContext->resolved) {
-        if (asyncContext->deferred != nullptr) {
-            napi_value errorMessage = NapiUtil::CreateErrorMessage(env, "set radio status failed.");
-            napi_reject_deferred(env, asyncContext->deferred, errorMessage);
-            TELEPHONY_LOGD("TurnOffRadioCallback promise reject end");
-        } else if (asyncContext->callbackRef != nullptr) {
-            napi_value undefind = NapiUtil::CreateUndefined(env);
-            napi_value callback = nullptr;
-            napi_get_reference_value(env, asyncContext->callbackRef, &callback);
-            napi_value callbackValues[] = {NapiUtil::CreateErrorMessage(env, "set radio status failed.")};
-            napi_value result = nullptr;
-            napi_call_function(env, undefind, callback, std::size(callbackValues), callbackValues, &result);
-            napi_delete_reference(env, asyncContext->callbackRef);
-            TELEPHONY_LOGD("TurnOffRadioCallback callback reject end");
-        }
-        napi_delete_async_work(env, asyncContext->work);
-        delete asyncContext;
+    napi_value callbackValue = nullptr;
+    if (asyncContext->resolved) {
+        napi_get_undefined(env, &callbackValue);
+    } else {
+        callbackValue = ParseErrorValue(env, asyncContext->errorCode, "turn off radio");
     }
+    NapiUtil::Handle1ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGD("TurnOffRadioCallback end");
 }
 
 static napi_value TurnOffRadio(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = 1;
+    napi_value parameters[1] = {0};
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchSwitchRadioParameter(env, parameters, parameterCount), "type mismatch");
-    auto asyncContext = std::make_unique<SwitchRadioContext>().release();
-    NAPI_CALL(env, napi_create_reference(env, thisVar, 1, &asyncContext->thisVarRef));
-    NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-    if (parameterCount == 2) {
-        NAPI_CALL(env, napi_create_reference(env, parameters[1], 1, &asyncContext->callbackRef));
+    auto asyncContext = std::make_unique<SwitchRadioContext>();
+    if (parameterCount == 1) {
+        NAPI_CALL(env, napi_create_reference(env, parameters[0], 1, &asyncContext->callbackRef));
     }
-    return NapiUtil::HandleAsyncWork(env, asyncContext, "TurnOffRadio", NativeTurnOffRadio, TurnOffRadioCallback);
+    return NapiUtil::HandleAsyncWork(
+        env, asyncContext.release(), "TurnOffRadio", NativeTurnOffRadio, TurnOffRadioCallback);
 }
 
 static napi_value InitEnumRadioType(napi_env env, napi_value exports)
@@ -1010,13 +1008,13 @@ static napi_value InitEnumNetworkType(napi_env env, napi_value exports)
 static napi_value InitEnumRegStatus(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("REGISTRATION_STATE_NO_SERVICE",
+        DECLARE_NAPI_STATIC_PROPERTY("REG_STATE_NO_SERVICE",
             NapiUtil::ToInt32Value(env, static_cast<int32_t>(REGISTRATION_STATE_NO_SERVICE))),
-        DECLARE_NAPI_STATIC_PROPERTY("REGISTRATION_STATE_IN_SERVICE",
+        DECLARE_NAPI_STATIC_PROPERTY("REG_STATE_IN_SERVICE",
             NapiUtil::ToInt32Value(env, static_cast<int32_t>(REGISTRATION_STATE_IN_SERVICE))),
-        DECLARE_NAPI_STATIC_PROPERTY("REGISTRATION_STATE_EMERGENCY_CALL_ONLY",
+        DECLARE_NAPI_STATIC_PROPERTY("REG_STATE_EMERGENCY_CALL_ONLY",
             NapiUtil::ToInt32Value(env, static_cast<int32_t>(REGISTRATION_STATE_EMERGENCY_CALL_ONLY))),
-        DECLARE_NAPI_STATIC_PROPERTY("REGISTRATION_STATE_POWER_OFF",
+        DECLARE_NAPI_STATIC_PROPERTY("REG_STATE_POWER_OFF",
             NapiUtil::ToInt32Value(env, static_cast<int32_t>(REGISTRATION_STATE_POWER_OFF))),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));

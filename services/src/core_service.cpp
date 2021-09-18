@@ -14,8 +14,10 @@
  */
 
 #include "core_service.h"
+
 #include "system_ability_definition.h"
 #include "string_ex.h"
+
 #include "core_manager.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -172,28 +174,30 @@ const sptr<NetworkState> CoreService::GetNetworkState(int32_t slotId)
     }
 }
 
-bool CoreService::SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback)
+bool CoreService::SetRadioState(bool isOn, const sptr<INetworkSearchCallback> &callback)
 {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
     TELEPHONY_LOGD("CoreService::SetRadioState --> slotId:%{public}d, isOn:%{public}d", slotId, isOn);
     if (CoreManager::GetInstance().core_.find(slotId) != CoreManager::GetInstance().core_.end()) {
         if (CoreManager::GetInstance().core_[slotId] == nullptr) {
             return false;
         }
-        return CoreManager::GetInstance().getCore(slotId)->SetRadioState(slotId, isOn, 0, callback);
+        return CoreManager::GetInstance().getCore(slotId)->SetRadioState(isOn, 0, callback);
     } else {
         TELEPHONY_LOGE("CoreService::SetRadioState slotId invalid.");
         return false;
     }
 }
 
-bool CoreService::GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+bool CoreService::GetRadioState(const sptr<INetworkSearchCallback> &callback)
 {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
     TELEPHONY_LOGD("CoreService::GetRadioState");
     if (CoreManager::GetInstance().core_.find(slotId) != CoreManager::GetInstance().core_.end()) {
         if (CoreManager::GetInstance().getCore(slotId) == nullptr) {
             return false;
         }
-        return static_cast<int32_t>(CoreManager::GetInstance().getCore(slotId)->GetRadioState(slotId, callback));
+        return static_cast<int32_t>(CoreManager::GetInstance().getCore(slotId)->GetRadioState(callback));
     } else {
         TELEPHONY_LOGE("CoreService::GetRadioState slotId invalid.");
         return false;

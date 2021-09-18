@@ -16,22 +16,20 @@
 #ifndef GET_NETWORK_SEARCH_INFO_CALLBACK_H
 #define GET_NETWORK_SEARCH_INFO_CALLBACK_H
 
-#include "network_search_callback_base.h"
-#include "base_context.h"
+#include "i_network_search_callback_stub.h"
+#include "napi_radio.h"
 #include "napi/native_api.h"
 
 namespace OHOS {
 namespace Telephony {
-class GetNetworkSearchInfoCallback : public NetworkSearchCallbackBase {
+class GetNetworkSearchInfoCallback : public INetworkSearchCallbackStub {
 public:
-    GetNetworkSearchInfoCallback(napi_env env, napi_ref thisVarRef, BaseContext *context);
+    GetNetworkSearchInfoCallback(GetSearchInfoContext *context);
     void OnGetNetworkSearchResult(
         const sptr<NetworkSearchResult> &networkSearchResult, const int32_t errorCode) override;
 
 private:
-    napi_env env_;
-    napi_ref thisVarRef_;
-    BaseContext *baseContext_;
+    GetSearchInfoContext *asyncContext_;
 };
 } // namespace Telephony
 } // namespace OHOS

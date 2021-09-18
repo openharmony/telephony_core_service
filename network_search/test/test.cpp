@@ -190,7 +190,7 @@ void TestSetRadioState()
     }
     TELEPHONY_LOGD("radio off(N) or on(Y) :%{public}d", isOn);
     OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = g_telephonyService->SetRadioState(CoreManager::DEFAULT_SLOT_ID, isOn, callback);
+    bool result = g_telephonyService->SetRadioState(isOn, callback);
     TELEPHONY_LOGD("TelephonyTestService Remote SetRadioState result:%{public}d", inputState);
     TELEPHONY_LOGI("TelephonyTestService::TestSetRadioState result:%{public}d", result);
 }
@@ -198,7 +198,7 @@ void TestSetRadioState()
 void TestGetRadioState()
 {
     OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    int32_t result = g_telephonyService->GetRadioState(CoreManager::DEFAULT_SLOT_ID, callback);
+    int32_t result = g_telephonyService->GetRadioState(callback);
     TELEPHONY_LOGI("TelephonyTestService Remote GetRadioState result:%{public}d", result);
 }
 
@@ -209,7 +209,7 @@ void TestNotifyNetworkStateChange()
     TestGetOperatorNumeric();
     bool isOn = true;
     OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    g_telephonyService->SetRadioState(CoreManager::DEFAULT_SLOT_ID, isOn, callback);
+    g_telephonyService->SetRadioState(isOn, callback);
 }
 
 void TestGetNetworkSearchResult()
