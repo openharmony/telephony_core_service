@@ -483,17 +483,17 @@ void TelRilTest::OnRequestSetSimLockTest(const std::shared_ptr<AppExecFwk::Event
         event->SetOwner(handler);
         std::string fac;
         int mode;
-        std::string passwd;
+        std::string code;
 
         std::cout << "please enter the fac:";
         std::cin >> fac;
         std::cout << "please enter the mode:";
         std::cin >> mode;
-        std::cout << "please enter the passwd:";
-        std::cin >> passwd;
+        std::cout << "please enter the pwd:";
+        std::cin >> code;
 
         TELEPHONY_LOGD("TelRilTest::%{public}s -->", __func__);
-        rilManager_->SetSimLock(fac, mode, passwd, event);
+        rilManager_->SetSimLock(fac, mode, code, event);
         TELEPHONY_LOGD("TelRilTest::%{public}s --> finished", __func__);
     }
 }

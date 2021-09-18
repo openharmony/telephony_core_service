@@ -54,7 +54,7 @@ public:
     virtual int32_t RefreshSimState(int32_t slotId) override;
 
 public:
-    bool responseReady_;
+    bool responseReady_ = false;
     std::mutex ctx_;
     std::condition_variable cv_;
 
@@ -62,10 +62,10 @@ private:
     void RequestUnlock(UnlockCmd type);
 
 private:
-    std::shared_ptr<SimStateHandle> simStateHandle_;
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoop_;
-    SimHandleRun simStateRun_;
-    std::unique_ptr<ObserverHandler> observerHandler_;
+    std::shared_ptr<SimStateHandle> simStateHandle_ = nullptr;
+    std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
+    SimHandleRun simStateRun_ = STATE_NOT_START;
+    std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     std::mutex mtx_;
 };
 } // namespace Telephony

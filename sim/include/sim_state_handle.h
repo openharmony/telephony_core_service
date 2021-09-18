@@ -119,8 +119,8 @@ private:
     std::weak_ptr<SimStateManager> simStateManager_;
     std::vector<IccState> iccState_; // icc card states
     std::vector<ExternalState> externalState_; // need to broadcast sim state;
-    std::shared_ptr<Telephony::IRilManager> rilManager_; // ril manager
-    sptr<ITelephonyStateNotify> telephonyStateNotify_;
+    std::shared_ptr<Telephony::IRilManager> rilManager_ = nullptr; // ril manager
+    sptr<ITelephonyStateNotify> telephonyStateNotify_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
