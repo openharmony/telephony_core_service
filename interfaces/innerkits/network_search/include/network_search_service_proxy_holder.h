@@ -40,8 +40,8 @@ public:
         const sptr<NetworkInformation> networkInformation, bool resumeSelection,
         const sptr<INetworkSearchCallback> &callback);
     bool GetNetworkSearchResult(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
-    bool SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback);
-    bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+    bool SetRadioState(bool isOn, const sptr<INetworkSearchCallback> &callback);
+    bool GetRadioState(const sptr<INetworkSearchCallback> &callback);
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId);
     bool GetNetworkSearchProxy();
     void ResetNetworkServiceServiceProxy();

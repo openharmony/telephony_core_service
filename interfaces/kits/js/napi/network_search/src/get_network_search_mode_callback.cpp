@@ -16,14 +16,12 @@
 #include "get_network_search_mode_callback.h"
 
 #include "napi_radio.h"
-#include "napi_util.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-GetNetworkSearchModeCallback::GetNetworkSearchModeCallback(
-    napi_env env, napi_ref thisVarRef, BaseContext *baseContext)
-    : env_(env), thisVarRef_(thisVarRef), baseContext_(baseContext)
+GetNetworkSearchModeCallback::GetNetworkSearchModeCallback(GetSelectModeContext *asyncContext)
+    : asyncContext_(asyncContext)
 {}
 
 int32_t WrapNetworkSelectionMode(int32_t mode)
@@ -41,39 +39,15 @@ int32_t WrapNetworkSelectionMode(int32_t mode)
 void GetNetworkSearchModeCallback::OnGetNetworkModeCallback(const int32_t searchModel, const int32_t errorCode)
 {
     TELEPHONY_LOGI("OnGetNetworkModeCallback searchModel = %{public}d", searchModel);
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env_, &scope);
-    bool resolved = errorCode == HRIL_ERR_SUCCESS;
-    napi_value callbackValue = nullptr;
-    if (resolved) {
-        int32_t jsSearchMode = WrapNetworkSelectionMode(searchModel);
-        napi_create_int32(env_, jsSearchMode, &callbackValue);
+    std::unique_lock<std::mutex> callbackLock(asyncContext_->callbackMutex);
+    asyncContext_->resolved = errorCode == HRIL_ERR_SUCCESS;
+    if (asyncContext_->resolved) {
+        asyncContext_->selectMode = WrapNetworkSelectionMode(searchModel);
     } else {
-        callbackValue = ParseErrorValue(env_, errorCode, "get network search mode");
+        asyncContext_->errorCode = errorCode;
     }
-    if (baseContext_->callbackRef != nullptr) {
-        napi_value callbackFunc = nullptr;
-        napi_get_reference_value(env_, baseContext_->callbackRef, &callbackFunc);
-        napi_value callbackValues[] = {nullptr, nullptr};
-        callbackValues[0] = resolved ? NapiUtil::CreateUndefined(env_) : callbackValue;
-        callbackValues[1] = resolved ? callbackValue : NapiUtil::CreateUndefined(env_);
-        napi_value callbackResult = nullptr;
-        napi_value thisVar = nullptr;
-        napi_get_reference_value(env_, thisVarRef_, &thisVar);
-        napi_call_function(env_, thisVar, callbackFunc, 2, callbackValues, &callbackResult);
-        napi_delete_reference(env_, baseContext_->callbackRef);
-    } else if (baseContext_->deferred != nullptr) {
-        if (resolved) {
-            napi_resolve_deferred(env_, baseContext_->deferred, callbackValue);
-        } else {
-            napi_reject_deferred(env_, baseContext_->deferred, callbackValue);
-        }
-    }
-    napi_delete_reference(env_, thisVarRef_);
-    napi_delete_async_work(env_, baseContext_->work);
-    napi_close_handle_scope(env_, scope);
-    delete baseContext_;
-    baseContext_ = nullptr;
+    asyncContext_->callbackEnd = true;
+    asyncContext_->cv.notify_all();
 }
 } // namespace Telephony
 } // namespace OHOS

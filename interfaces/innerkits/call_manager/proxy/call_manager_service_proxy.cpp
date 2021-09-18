@@ -511,7 +511,7 @@ int32_t CallManagerServiceProxy::CombineConference(int32_t mainCallId)
     return error;
 }
 
-bool CallManagerServiceProxy::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId)
+bool CallManagerServiceProxy::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode)
 {
     int32_t error = TELEPHONY_FAIL;
     MessageOption option;
@@ -531,7 +531,9 @@ bool CallManagerServiceProxy::IsEmergencyPhoneNumber(std::u16string &number, int
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function IsEmergencyPhoneNumber call failed! errCode:%{public}d", error);
     }
-    return replyParcel.ReadBool();
+    bool result = replyParcel.ReadBool();
+    errorCode = replyParcel.ReadInt32();
+    return result;
 }
 
 int32_t CallManagerServiceProxy::FormatPhoneNumber(

@@ -32,10 +32,6 @@ std::shared_ptr<TelRilRequest> TelRilBase::CreateTelRilRequest(
 {
     std::shared_ptr<TelRilRequest> telRilRequest =
         std::make_shared<TelRilRequest>(GetNextSerialId(), request, result);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("TelRilBase telRilRequest is nullptr");
-        return nullptr;
-    }
     std::lock_guard<std::mutex> lockRequest(TelRilBase::requestLock_);
     TelRilBase::requestMap_.insert(std::make_pair(telRilRequest->serialId_, telRilRequest));
     return telRilRequest;
@@ -43,7 +39,6 @@ std::shared_ptr<TelRilRequest> TelRilBase::CreateTelRilRequest(
 
 int32_t TelRilBase::SendInt32Event(int32_t dispatchId, int32_t value)
 {
-    TELEPHONY_LOGD("TelRilBase SendInt32Event, dispatchId:%{public}d, value:%{public}d", dispatchId, value);
     int status = 0;
     if (cellularRadio_ != nullptr) {
         MessageParcel data;
@@ -52,17 +47,20 @@ int32_t TelRilBase::SendInt32Event(int32_t dispatchId, int32_t value)
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, data, reply, option);
         TELEPHONY_LOGD("TelRilBase SendInt32Event, dispatchId:%{public}d, status:%{public}d", dispatchId, status);
+    } else {
+        TELEPHONY_LOGE("cellularRadio_ is nullptr!!!");
     }
     return status;
 }
 
 int32_t TelRilBase::SendStringEvent(int32_t dispatchId, const char *value)
 {
+    int32_t status = HDF_FAILURE;
     if (value == nullptr) {
-        TELEPHONY_LOGD("value is nullptr");
+        TELEPHONY_LOGE("value is nullptr");
+        return status;
     }
     TELEPHONY_LOGD("TelRilBase SendStringEvent, dispatchId:%d, status:%c", dispatchId, *value);
-    int32_t status = HDF_FAILURE;
     if (cellularRadio_ != nullptr) {
         MessageParcel data;
         MessageParcel reply;
@@ -76,13 +74,14 @@ int32_t TelRilBase::SendStringEvent(int32_t dispatchId, const char *value)
 
 int32_t TelRilBase::SendBufferEvent(int32_t dispatchId, MessageParcel &eventData)
 {
-    TELEPHONY_LOGD("TelRilBase SendBufferEvent, dispatchId:%{public}d", dispatchId);
     int32_t status = HDF_FAILURE;
     if (cellularRadio_ != nullptr) {
         MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, eventData, reply, option);
         TELEPHONY_LOGD("TelRilBase SendBufferEvent, dispatchId:%{public}d, status:%{public}d", dispatchId, status);
+    } else {
+        TELEPHONY_LOGE("cellularRadio_ is nullptr!!!");
     }
     return status;
 }
@@ -91,8 +90,8 @@ int32_t TelRilBase::SendCommonBufferEvent(int32_t dispatchId, const void *eventD
 {
     if (eventData == nullptr) {
         TELEPHONY_LOGE("eventData is nullptr");
+        return HDF_FAILURE;
     }
-    TELEPHONY_LOGD("TelRilBase SendCommonBufferEvent, dispatchId:%{public}d", dispatchId);
     int32_t status = HDF_FAILURE;
     if (cellularRadio_ != nullptr) {
         MessageParcel data;
@@ -102,6 +101,8 @@ int32_t TelRilBase::SendCommonBufferEvent(int32_t dispatchId, const void *eventD
         status = cellularRadio_->SendRequest(dispatchId, data, reply, option);
         TELEPHONY_LOGD(
             "TelRilBase SendCommonBufferEvent, dispatchId:%{public}d, status:%{public}d", dispatchId, status);
+    } else {
+        TELEPHONY_LOGE("cellularRadio_ is nullptr!!!");
     }
     return status;
 }
@@ -109,7 +110,7 @@ int32_t TelRilBase::SendCommonBufferEvent(int32_t dispatchId, const void *eventD
 std::shared_ptr<TelRilRequest> TelRilBase::FindTelRilRequest(const HRilRadioResponseInfo &responseInfo)
 {
     int32_t serial = responseInfo.serial;
-    std::shared_ptr<TelRilRequest> telRilRequest;
+    std::shared_ptr<TelRilRequest> telRilRequest = nullptr;
     std::lock_guard<std::mutex> lockRequest(TelRilBase::requestLock_);
     auto iter = TelRilBase::requestMap_.find(serial);
     if (iter == TelRilBase::requestMap_.end()) {
@@ -117,12 +118,10 @@ std::shared_ptr<TelRilRequest> TelRilBase::FindTelRilRequest(const HRilRadioResp
     } else {
         telRilRequest = iter->second;
     }
-    TELEPHONY_LOGD("RilProcessResponseSerial : %{public}d", serial);
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("Unexpected ack response! sn: %{public}d", serial);
         return telRilRequest;
     }
-
     // Remove telRilRequest from map.
     TelRilBase::requestMap_.erase(serial);
     return telRilRequest;
@@ -130,12 +129,7 @@ std::shared_ptr<TelRilRequest> TelRilBase::FindTelRilRequest(const HRilRadioResp
 
 void TelRilBase::ErrorResponse(const int32_t serial, const HRilErrType err)
 {
-    TELEPHONY_LOGD("======>enter");
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = std::make_shared<HRilRadioResponseInfo>();
-    if (responseInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : responseInfo == nullptr failed !!!");
-        return;
-    }
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*responseInfo);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
@@ -149,20 +143,14 @@ void TelRilBase::ErrorResponse(const int32_t serial, const HRilErrType err)
         responseInfo->flag = telRilRequest->pointer_->GetParam();
         handler->SendEvent(eventId, responseInfo);
     } else {
-        TELEPHONY_LOGE("ERROR : telRilRequest or telRilRequest->pointer_ == nullptr !!!");
-        return;
+        TELEPHONY_LOGE("ERROR : telRilRequest  == %p !!!", telRilRequest.get());
     }
 }
 
 void TelRilBase::ErrorResponse(
     std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo)
 {
-    TELEPHONY_LOGD("======>enter");
     std::shared_ptr<HRilRadioResponseInfo> respInfo = std::make_shared<HRilRadioResponseInfo>();
-    if (respInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : responseInfo == nullptr failed !!!");
-        return;
-    }
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
         if (handler == nullptr) {
@@ -175,8 +163,7 @@ void TelRilBase::ErrorResponse(
         respInfo->flag = telRilRequest->pointer_->GetParam();
         handler->SendEvent(eventId, respInfo);
     } else {
-        TELEPHONY_LOGE("ERROR : telRilRequest or telRilRequest->pointer_ == nullptr !!!");
-        return;
+        TELEPHONY_LOGE("ERROR : telRilRequest  == %p !!!", telRilRequest.get());
     }
 }
 } // namespace Telephony

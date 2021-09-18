@@ -92,7 +92,7 @@ public:
     virtual int32_t GetCallWaiting(int32_t slotId) = 0;
     virtual int32_t SetCallWaiting(int32_t slotId, bool activate) = 0;
     virtual int32_t CombineConference(int32_t mainCallId) = 0;
-    virtual bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId) = 0;
+    virtual bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode) = 0;
     virtual int32_t FormatPhoneNumber(
         std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber) = 0;
     virtual int32_t FormatPhoneNumberToE164(

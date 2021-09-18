@@ -13,11 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef NETWORK_SEARCH_CALLBACK_BASE_H
-#define NETWORK_SEARCH_CALLBACK_BASE_H
-
-#include "i_network_search_callback_stub.h"
-#include "napi/native_api.h"
+#ifndef TELEPHONY_NAPI_HRIL_ERROR_CODE_H
+#define TELEPHONY_NAPI_HRIL_ERROR_CODE_H
 
 namespace OHOS {
 namespace Telephony {
@@ -32,10 +29,6 @@ enum RilErrorCode {
     HRIL_ERR_INVALID_RESPONSE = 6,
     HRIL_ERR_REPEAT_STATUS = 7,
 };
-class NetworkSearchCallbackBase : public INetworkSearchCallbackStub {
-protected:
-    napi_value ParseErrorValue(napi_env env, const int32_t rilErrorCode, const std::string &funcName);
-};
 } // namespace Telephony
 } // namespace OHOS
-#endif // NETWORK_SEARCH_CALLBACK.BASE_H
+#endif // TELEPHONY_NAPI_HRIL_ERROR_CODE_H
