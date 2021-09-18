@@ -46,11 +46,12 @@ public:
      * from 3GPP TS 27.005 V4.1.0 (2001-09) section 3 Parameter Definitions
      */
     using SimMessageStatus = enum {
-        SIM_MESSAGE_STATUS_READ = 0, // 0 REC UNREAD received unread message
-        SIM_MESSAGE_STATUS_UNREAD = 1, // 1	REC READ received read message
-        SIM_MESSAGE_STATUS_SENT = 2, // 2 "STO UNSENT" stored unsent message (only applicable to SMs)
-        SIM_MESSAGE_STATUS_UNSENT = 3, // 3	"STO SENT" stored sent message (only applicable to SMs)
+        SIM_MESSAGE_STATUS_UNREAD = 0, // 0 REC UNREAD received unread message
+        SIM_MESSAGE_STATUS_READ = 1, // 1	REC READ received read message
+        SIM_MESSAGE_STATUS_UNSENT = 2, // 2 "STO UNSENT" stored unsent message (only applicable to SMs)
+        SIM_MESSAGE_STATUS_SENT = 3, // 3	"STO SENT" stored sent message (only applicable to SMs)
     };
+
     virtual ~ISmsServiceInterface() = default;
     virtual void SendMessage(int32_t slotId, const std::u16string desAddr, const std::u16string scAddr,
         const std::u16string text, const sptr<ISendShortMessageCallback> &sendCallback,

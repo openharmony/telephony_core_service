@@ -265,9 +265,9 @@ void CoreServiceProxy::ProcessSignalInfo(MessageParcel &reply, std::vector<sptr<
     }
 }
 
-bool CoreServiceProxy::SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback)
+bool CoreServiceProxy::SetRadioState(bool isOn, const sptr<INetworkSearchCallback> &callback)
 {
-    TELEPHONY_LOGD("CoreServiceProxy SetRadioState slotId:%{public}d, isOn:%{public}d", slotId, isOn);
+    TELEPHONY_LOGD("CoreServiceProxy SetRadioState isOn:%{public}d", isOn);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -278,7 +278,6 @@ bool CoreServiceProxy::SetRadioState(int32_t slotId, bool isOn, const sptr<INetw
     if (callback != nullptr) {
         data.WriteRemoteObject(callback->AsObject().GetRefPtr());
     }
-    data.WriteInt32(slotId);
     data.WriteBool(isOn);
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("SetRadioState Remote is null");
@@ -293,7 +292,7 @@ bool CoreServiceProxy::SetRadioState(int32_t slotId, bool isOn, const sptr<INetw
     return reply.ReadBool();
 }
 
-bool CoreServiceProxy::GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+bool CoreServiceProxy::GetRadioState(const sptr<INetworkSearchCallback> &callback)
 {
     TELEPHONY_LOGD("CoreServiceProxy GetRadioState");
     MessageParcel data;
@@ -306,7 +305,6 @@ bool CoreServiceProxy::GetRadioState(int32_t slotId, const sptr<INetworkSearchCa
     if (callback != nullptr) {
         data.WriteRemoteObject(callback->AsObject().GetRefPtr());
     }
-    data.WriteInt32(slotId);
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("GetRadioState Remote is null");
         return false;

@@ -41,7 +41,7 @@ struct TelRilRequest {
 class TelRilBase {
 public:
     TelRilBase(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
-    ~TelRilBase() = default;
+    virtual ~TelRilBase() = default;
 
     /**
      * request list handler

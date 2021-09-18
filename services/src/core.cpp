@@ -488,22 +488,22 @@ sptr<NetworkState> Core::GetNetworkStatus(int32_t slotId)
     return networkSearchManager_->GetNetworkStatus(slotId);
 }
 
-bool Core::SetRadioState(int32_t slotId, bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback)
+bool Core::SetRadioState(bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback)
 {
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager is null!");
         return false;
     }
-    return networkSearchManager_->SetRadioState(slotId, isOn, rst, callback);
+    return networkSearchManager_->SetRadioState(isOn, rst, callback);
 }
 
-bool Core::GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+bool Core::GetRadioState(const sptr<INetworkSearchCallback> &callback)
 {
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager is null!");
         return false;
     }
-    return networkSearchManager_->GetRadioState(slotId, callback);
+    return networkSearchManager_->GetRadioState(callback);
 }
 
 std::u16string Core::GetIsoCountryCodeForNetwork(int32_t slotId)

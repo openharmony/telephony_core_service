@@ -16,6 +16,7 @@
 #include "radio_info.h"
 #include "network_search_manager.h"
 #include "telephony_log_wrapper.h"
+#include "hril_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -92,7 +93,7 @@ void RadioInfo::ProcessSetRadioStatus(const AppExecFwk::InnerEvent::Pointer &eve
     if (responseInfo != nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessSetRadioStatus false");
         index = responseInfo->flag;
-        result = false;
+        result = (static_cast<int>(responseInfo->error) == HRilErrno::HRIL_ERR_REPEAT_STATUS) ? true : false;
         if (!data.WriteBool(result) || !data.WriteInt32((int32_t)responseInfo->error)) {
             TELEPHONY_LOGE("RadioInfo::ProcessSetRadioStatus WriteBool result is false");
             networkSearchManager_->RemoveCallbackFromMap(index);
@@ -139,7 +140,7 @@ void RadioInfo::SetToTheSuitableState() const
         ModemPowerState rdState = networkSearchManager_->GetRadioStatusValue();
         switch (rdState) {
             case CORE_SERVICE_POWER_OFF: {
-                networkSearchManager_->SetRadioState(1, false, 0);
+                networkSearchManager_->SetRadioState(false, 0);
                 break;
             }
             case CORE_SERVICE_POWER_NOT_AVAILABLE: {

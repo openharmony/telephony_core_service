@@ -13,7 +13,7 @@
 * limitations under the License.
 */
 
-import {AsyncCallback} from "./basic";
+import { AsyncCallback } from "./basic";
 
 /**
  * Provides interfaces for applications to obtain the network state, cell information, signal information,
@@ -53,8 +53,8 @@ declare namespace radio {
    * @permission ohos.permission.GET_NETWORK_INFO
    */
   function getRadioTech(slotId: number,
-    callback: AsyncCallback<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}>): void;
-  function getRadioTech(slotId: number): Promise<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}>;
+    callback: AsyncCallback<{ psRadioTech: RadioTechnology, csRadioTech: RadioTechnology }>): void;
+  function getRadioTech(slotId: number): Promise<{ psRadioTech: RadioTechnology, csRadioTech: RadioTechnology }>;
 
   /**
    * Obtains the network state of the registered network.
@@ -490,7 +490,7 @@ declare namespace radio {
     signalInformation: SignalInformation;
 
     data: CdmaCellInformation | GsmCellInformation | LteCellInformation | NrCellInformation | TdscdmaCellInformation
-      | WcdmaCellInformation;
+    | WcdmaCellInformation;
   }
 
   export interface CdmaCellInformation {
