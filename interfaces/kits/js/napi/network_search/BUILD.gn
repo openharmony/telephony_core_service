@@ -35,7 +35,6 @@ ohos_shared_library("telephony_radio") {
     "src/get_network_search_mode_callback.cpp",
     "src/get_radio_status_callback.cpp",
     "src/napi_radio.cpp",
-    "src/network_search_callback_base.cpp",
     "src/set_network_search_mode_callback.cpp",
     "src/set_radio_status_callback.cpp",
   ]

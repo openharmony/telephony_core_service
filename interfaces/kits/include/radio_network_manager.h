@@ -39,8 +39,8 @@ public:
         const sptr<NetworkInformation> networkInformation, bool resumeSelection,
         const sptr<INetworkSearchCallback> &callback);
     static bool GetNetworkSearchResult(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
-    static bool SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback);
-    static bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+    static bool SetRadioState(bool isOn, const sptr<INetworkSearchCallback> &callback);
+    static bool GetRadioState(const sptr<INetworkSearchCallback> &callback);
     static std::u16string GetIsoCountryCodeForNetwork(int32_t slotId);
 };
 } // namespace Telephony

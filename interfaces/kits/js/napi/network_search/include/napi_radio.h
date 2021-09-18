@@ -20,12 +20,16 @@
 #include <locale>
 #include <string>
 
+#include <mutex>
+#include <condition_variable>
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "napi_util.h"
 #include "network_state.h"
 #include "signal_information.h"
 #include "network_information.h"
+#include "telephony_napi_hril_error_code.h"
 #include "telephony_napi_common_error.h"
 #include "core_manager.h"
 
@@ -35,6 +39,7 @@ constexpr int DEFAULT_ERROR = ERROR_SERVICE_UNAVAILABLE;
 constexpr int RESOLVED = 1;
 constexpr int REJECT = 0;
 constexpr int BUF_SIZE = 32;
+constexpr int WAIT_TIME_SECOND = 60 * 3;
 
 enum RadioType {
     /**
@@ -235,6 +240,14 @@ struct AsyncContext {
     int32_t result = DEFAULT_ERROR;
 };
 
+struct CallbackContext : BaseContext {
+    std::mutex callbackMutex;
+    std::condition_variable cv;
+    bool callbackEnd = false;
+    bool sendRequest = false;
+    int32_t errorCode = HRIL_ERR_GENERIC_FAILURE;
+};
+
 struct RadioTechContext : BaseContext {
     int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
     int32_t csTech = DEFAULT_ERROR;
@@ -246,14 +259,12 @@ struct SignalInfoListContext : BaseContext {
     std::vector<sptr<SignalInformation>> signalInfoList;
 };
 
-struct GetSelectModeContext : BaseContext {
+struct GetSelectModeContext : CallbackContext {
     int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
-    int32_t result = DEFAULT_ERROR;
     int32_t selectMode = DEFAULT_ERROR;
-    napi_ref thisVarRef = nullptr;
 };
 
-struct SetSelectModeContext : BaseContext {
+struct SetSelectModeContext : CallbackContext {
     int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
     int32_t selectMode = DEFAULT_ERROR;
     std::string operatorName = "";
@@ -261,13 +272,12 @@ struct SetSelectModeContext : BaseContext {
     int32_t state = NETWORK_UNKNOWN;
     std::string radioTech = "";
     bool resumeSelection = false;
-    napi_ref thisVarRef = nullptr;
+    bool setResult = false;
 };
 
-struct GetSearchInfoContext : BaseContext {
+struct GetSearchInfoContext : CallbackContext {
     int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
-    bool isSendRequest = false;
-    napi_ref thisVarRef = nullptr;
+    NetworkSearchResult *searchResult = nullptr;
 };
 
 struct GetStateContext : BaseContext {
@@ -287,14 +297,13 @@ struct GetISOCountryCodeContext : BaseContext {
     std::string countryCode = "";
 };
 
-struct IsRadioOnContext : BaseContext {
+struct IsRadioOnContext : CallbackContext {
     int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
-    napi_ref thisVarRef = nullptr;
+    bool isRadioOn = false;
 };
 
-struct SwitchRadioContext : BaseContext {
+struct SwitchRadioContext : CallbackContext {
     int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
-    napi_ref thisVarRef = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -72,6 +72,7 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_CORE_SERVICE_ROOT/services/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/tel_ril/include",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/include",
+    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/api",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/common",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/proxy",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/state_registry/proxy",

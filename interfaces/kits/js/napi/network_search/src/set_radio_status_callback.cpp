@@ -15,52 +15,21 @@
 
 #include "set_radio_status_callback.h"
 
-#include "napi_util.h"
+#include "telephony_napi_hril_error_code.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-SetRadioStatusCallback::SetRadioStatusCallback(napi_env env, napi_ref thisVarRef, BaseContext *context)
-    : env_(env), thisVarRef_(thisVarRef), baseContext_(context)
-{}
+SetRadioStatusCallback::SetRadioStatusCallback(SwitchRadioContext *context) : asyncContext_(context) {}
 
 void SetRadioStatusCallback::OnSetRadioStatusCallback(const bool setResult, const int32_t errorCode)
 {
+    std::unique_lock<std::mutex> callbackLock(asyncContext_->callbackMutex);
     TELEPHONY_LOGD("OnSetRadioStatusCallback setResult = %{public}d", setResult);
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env_, &scope);
-    bool resolved = (errorCode == HRIL_ERR_REPEAT_STATUS) || ((errorCode == HRIL_ERR_SUCCESS) && setResult);
-    napi_value callbackValue = nullptr;
-    if (resolved) {
-        callbackValue = NapiUtil::CreateUndefined(env_);
-    } else {
-        if (errorCode == HRIL_ERR_SUCCESS) {
-            callbackValue = ParseErrorValue(env_, HRIL_ERR_GENERIC_FAILURE, "set radio status");
-        } else {
-            callbackValue = ParseErrorValue(env_, errorCode, "set radio status");
-        }
-    }
-    if (baseContext_->callbackRef != nullptr) {
-        napi_value callbackFunc = nullptr;
-        napi_get_reference_value(env_, baseContext_->callbackRef, &callbackFunc);
-        napi_value callbackValues[] = {callbackValue};
-        napi_value callbackResult = nullptr;
-        napi_value thisVar = nullptr;
-        napi_get_reference_value(env_, thisVarRef_, &thisVar);
-        napi_call_function(env_, thisVar, callbackFunc, std::size(callbackValues), callbackValues, &callbackResult);
-        napi_delete_reference(env_, baseContext_->callbackRef);
-    } else if (baseContext_->deferred != nullptr) {
-        if (resolved) {
-            napi_resolve_deferred(env_, baseContext_->deferred, callbackValue);
-        } else {
-            napi_reject_deferred(env_, baseContext_->deferred, callbackValue);
-        }
-    }
-    napi_delete_reference(env_, thisVarRef_);
-    napi_delete_async_work(env_, baseContext_->work);
-    napi_close_handle_scope(env_, scope);
-    delete baseContext_;
-    baseContext_ = nullptr;
+    asyncContext_->resolved = setResult;
+    asyncContext_->errorCode = errorCode;
+    asyncContext_->callbackEnd = true;
+    asyncContext_->cv.notify_all();
     TELEPHONY_LOGD("OnSetRadioStatusCallback end");
 }
 } // namespace Telephony

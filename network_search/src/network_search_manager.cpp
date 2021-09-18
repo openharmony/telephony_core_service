@@ -84,7 +84,7 @@ void NetworkSearchManager::Init()
     state_ = HandleRunningState::STATE_RUNNING;
     TELEPHONY_LOGI("NetworkSearchManager::Init eventLoop_->Run()");
 
-    SetRadioState(CoreManager::DEFAULT_SLOT_ID, CORE_SERVICE_POWER_ON, 0);
+    SetRadioState(CORE_SERVICE_POWER_ON, 0);
 }
 
 std::shared_ptr<NetworkSearchState> NetworkSearchManager::GetNetworkSearchState() const
@@ -107,7 +107,7 @@ std::shared_ptr<ISimStateManager> NetworkSearchManager::GetSimStateManager() con
     return simStateManager_;
 }
 
-void NetworkSearchManager::SetRadioState(int32_t slotId, bool isOn, int32_t rst)
+void NetworkSearchManager::SetRadioState(bool isOn, int32_t rst)
 {
     if (rilManager_ != nullptr) {
         TELEPHONY_LOGI("NetworkSearchManager SetRadioState isOn:%{public}d", isOn);
@@ -119,8 +119,7 @@ void NetworkSearchManager::SetRadioState(int32_t slotId, bool isOn, int32_t rst)
     }
 }
 
-bool NetworkSearchManager::SetRadioState(
-    int32_t slotId, bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback)
+bool NetworkSearchManager::SetRadioState(bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback)
 {
     if (rilManager_ == nullptr) {
         return false;
@@ -266,7 +265,7 @@ ModemPowerState NetworkSearchManager::GetRadioStatusValue() const
     return radioStatus_;
 }
 
-int32_t NetworkSearchManager::GetRadioState(int32_t slotId) const
+int32_t NetworkSearchManager::GetRadioState() const
 {
     if (rilManager_ != nullptr) {
         auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_STATUS);
@@ -278,7 +277,7 @@ int32_t NetworkSearchManager::GetRadioState(int32_t slotId) const
     return radioStatus_;
 }
 
-bool NetworkSearchManager::GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+bool NetworkSearchManager::GetRadioState(const sptr<INetworkSearchCallback> &callback)
 {
     TELEPHONY_LOGI("NetworkSearchManager::GetRadioState...");
     if (rilManager_ == nullptr) {

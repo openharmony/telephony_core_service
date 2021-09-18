@@ -101,7 +101,6 @@ void TelRilModem::SetRadioStatusResponse(MessageParcel &data)
 void TelRilModem::GetRadioStatusResponse(MessageParcel &data)
 {
     int32_t radioStatus = data.ReadInt32();
-
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
@@ -115,11 +114,11 @@ void TelRilModem::GetRadioStatusResponse(MessageParcel &data)
         return;
     }
 
-    TELEPHONY_LOGD("SetRadioStatusResponse serial:%{public}d, error:%{public}d ", radioResponseInfo->serial,
+    TELEPHONY_LOGD("GetRadioStatusResponse serial:%{public}d, error:%{public}d ", radioResponseInfo->serial,
         radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
-        TELEPHONY_LOGD("SetRadioStatusResponse serialId_:%{public}d, requestId_:%{public}d,",
+        TELEPHONY_LOGD("GetRadioStatusResponse serialId_:%{public}d, requestId_:%{public}d,",
             telRilRequest->serialId_, telRilRequest->requestId_);
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
@@ -145,7 +144,7 @@ void TelRilModem::SetRadioStatus(int fun, int rst, const AppExecFwk::InnerEvent:
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_MODEM_SET_RADIO_STATUS, response);
         if (telRilRequest == nullptr) {
-            TELEPHONY_LOGE("TelRilSim UnlockSimPin:telRilRequest is nullptr");
+            TELEPHONY_LOGE("TelRilModem SetRadioStatus:telRilRequest is nullptr");
             return;
         }
         MessageParcel data;

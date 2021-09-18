@@ -351,7 +351,7 @@ sptr<SignalInformation> LteSignalInformation::NewInstance() const
     if (lte == nullptr) {
         return nullptr;
     }
-    lte->SetValue(this->rxlev_, this->lteRsrp_, this->lteRsrq_, this->lteRsrp_);
+    lte->SetValue(this->rxlev_, this->lteRsrp_, this->lteRsrq_, this->lteSnr_);
     return lte.release();
 }
 
