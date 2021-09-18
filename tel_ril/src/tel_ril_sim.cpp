@@ -72,19 +72,16 @@ void TelRilSim::ProcessSimRespOrNotify(uint32_t code, MessageParcel &data)
 
 void TelRilSim::SimStateUpdated(MessageParcel &data)
 {
-    TELEPHONY_LOGD("TelRilSim SimStateUpdated");
     if (observerHandler_ == nullptr) {
         TELEPHONY_LOGE("TelRilSim observerHandler_ is null!!");
         return;
     }
-
     observerHandler_->NotifyObserver(ObserverHandler::RADIO_SIM_STATE_CHANGE);
 }
 
 // response
 void TelRilSim::RequestSimIOResponse(MessageParcel &data)
 {
-    TELEPHONY_LOGD("TelRilSim::RequestSimIOResponse --> ");
     std::shared_ptr<IccIoResultInfo> iccIoResult = std::make_shared<IccIoResultInfo>();
     if (iccIoResult == nullptr) {
         TELEPHONY_LOGE("ERROR : RequestSimIOResponse --> iccIoResult == nullptr !!!");
@@ -123,7 +120,6 @@ void TelRilSim::RequestSimIOResponse(MessageParcel &data)
 void TelRilSim::ErrorIccIoResponse(
     std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo)
 {
-    TELEPHONY_LOGD("======>enter");
     std::shared_ptr<HRilRadioResponseInfo> respInfo = std::make_shared<HRilRadioResponseInfo>();
     if (respInfo == nullptr) {
         TELEPHONY_LOGE("ERROR : ErrorIccIoResponse == nullptr failed !!!");
@@ -189,7 +185,6 @@ void TelRilSim::ProcessIccIoInfo(
 
 void TelRilSim::GetSimStatusResponse(MessageParcel &data)
 {
-    TELEPHONY_LOGD("OHOS::TelRilSim::GetSimStatusResponse --> ");
     std::shared_ptr<CardStatusInfo> cardStatusInfo = std::make_unique<CardStatusInfo>();
     if (cardStatusInfo == nullptr) {
         TELEPHONY_LOGE("ERROR : GetSimStatusResponse --> cardStatusInfo == nullptr !!!");
@@ -232,7 +227,6 @@ void TelRilSim::GetSimStatusResponse(MessageParcel &data)
 
 void TelRilSim::GetImsiResponse(MessageParcel &data)
 {
-    TELEPHONY_LOGD("TelRilSim::GetImsiResponse --> ");
     const char *buffer = data.ReadCString();
     std::shared_ptr<std::string> imsi = std::make_shared<std::string>(buffer);
     if (buffer == nullptr || imsi == nullptr) {
@@ -277,7 +271,6 @@ void TelRilSim::GetImsiResponse(MessageParcel &data)
 
 void TelRilSim::GetIccIDResponse(MessageParcel &data)
 {
-    TELEPHONY_LOGD("TelRilSim::GetIccIDResponse --> ");
     const char *buffer = data.ReadCString();
     std::shared_ptr<std::string> iccID = std::make_shared<std::string>(buffer);
     if (buffer == nullptr || iccID == nullptr) {
@@ -321,7 +314,6 @@ void TelRilSim::GetIccIDResponse(MessageParcel &data)
 
 void TelRilSim::GetSimLockStatusResponse(MessageParcel &data)
 {
-    TELEPHONY_LOGD("TelRilSim::GetSimLockStatusResponse --> ");
     std::shared_ptr<int> SimLockStatus = std::make_shared<int>();
     *SimLockStatus = data.ReadInt32();
 
@@ -363,7 +355,6 @@ void TelRilSim::GetSimLockStatusResponse(MessageParcel &data)
 
 void TelRilSim::SetSimLockResponse(MessageParcel &data)
 {
-    TELEPHONY_LOGD("TelRilSim::SetSimLockResponse --> ");
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
@@ -398,7 +389,6 @@ void TelRilSim::SetSimLockResponse(MessageParcel &data)
 
 void TelRilSim::ChangeSimPasswordResponse(MessageParcel &data)
 {
-    TELEPHONY_LOGD("TelRilSim::ChangeSimPasswordResponse --> ");
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
@@ -431,7 +421,6 @@ void TelRilSim::ChangeSimPasswordResponse(MessageParcel &data)
 
 void TelRilSim::EnterSimPinResponse(MessageParcel &data)
 {
-    TELEPHONY_LOGD("TelRilSim::EnterSimPinResponse --> ");
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
@@ -464,7 +453,6 @@ void TelRilSim::EnterSimPinResponse(MessageParcel &data)
 
 void TelRilSim::UnlockSimPinResponse(MessageParcel &data)
 {
-    TELEPHONY_LOGD("TelRilSim::UnlockSimPinResponse --> ");
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
@@ -497,7 +485,6 @@ void TelRilSim::UnlockSimPinResponse(MessageParcel &data)
 
 void TelRilSim::GetSimPinInputTimesResponse(MessageParcel &data)
 {
-    TELEPHONY_LOGD("TelRilSim GetSimPinInputTimesResponse -->");
     std::shared_ptr<SimPinInputTimes> pSimPinInputTimes = std::make_shared<SimPinInputTimes>();
     if (pSimPinInputTimes == nullptr) {
         TELEPHONY_LOGE("ERROR : GetSimPinInputTimesResponse --> callInfo == nullptr !!!");
@@ -540,7 +527,6 @@ void TelRilSim::GetSimPinInputTimesResponse(MessageParcel &data)
 
 void TelRilSim::GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGD("TelRilSim::GetSimStatus -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_GET_SIM_STATUS, result);
         if (telRilRequest == nullptr) {
@@ -558,7 +544,6 @@ void TelRilSim::GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result)
 void TelRilSim::RequestSimIO(int32_t command, int32_t fileId, int32_t p1, int32_t p2, int32_t p3, std::string data,
     std::string path, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TELEPHONY_LOGD("TelRilSim::RequestSimIO --> ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_IO, response);
         if (telRilRequest == nullptr) {
@@ -587,7 +572,6 @@ void TelRilSim::RequestSimIO(int32_t command, int32_t fileId, int32_t p1, int32_
 
 void TelRilSim::GetImsi(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGD("TelRilSim::GetImsi -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_GET_IMSI, result);
         if (telRilRequest == nullptr) {
@@ -607,7 +591,6 @@ void TelRilSim::GetImsi(const AppExecFwk::InnerEvent::Pointer &result)
 
 void TelRilSim::GetIccID(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGD("TelRilSim::GetIccID -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_GET_ICCID, result);
         if (telRilRequest == nullptr) {
@@ -627,7 +610,6 @@ void TelRilSim::GetIccID(const AppExecFwk::InnerEvent::Pointer &result)
 
 void TelRilSim::GetSimLockStatus(std::string fac, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TELEPHONY_LOGD("TelRilSim::GetSimLockStatus --> ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_GET_LOCK_STATUS, response);
         if (telRilRequest == nullptr) {
@@ -655,7 +637,6 @@ void TelRilSim::GetSimLockStatus(std::string fac, const AppExecFwk::InnerEvent::
 void TelRilSim::SetSimLock(
     std::string fac, int32_t mode, std::string passwd, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TELEPHONY_LOGD("TelRilSim::SetSimLock --> ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_SET_LOCK, response);
         if (telRilRequest == nullptr) {
@@ -681,7 +662,6 @@ void TelRilSim::SetSimLock(
 void TelRilSim::ChangeSimPassword(std::string fac, std::string oldPassword, std::string newPassword,
     int32_t passwordLength, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TELEPHONY_LOGD("TelRilSim::ChangeSimPassword --> ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_CHANGE_PASSWD, response);
         if (telRilRequest == nullptr) {
@@ -708,7 +688,6 @@ void TelRilSim::ChangeSimPassword(std::string fac, std::string oldPassword, std:
 
 void TelRilSim::EnterSimPin(std::string pin, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TELEPHONY_LOGD("TelRilSim::EnterSimPin --> ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_ENTER_PIN, response);
         if (telRilRequest == nullptr) {
@@ -729,7 +708,6 @@ void TelRilSim::EnterSimPin(std::string pin, const AppExecFwk::InnerEvent::Point
 
 void TelRilSim::UnlockSimPin(std::string puk, std::string pin, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TELEPHONY_LOGD("TelRilSim::UnlockSimPin --> ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_UNLOCK_PIN, response);
         if (telRilRequest == nullptr) {
@@ -751,7 +729,6 @@ void TelRilSim::UnlockSimPin(std::string puk, std::string pin, const AppExecFwk:
 
 void TelRilSim::GetSimPinInputTimes(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGD("TelRilSim::GetSimPinInputTimes -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_GET_PIN_INPUT_TIMES, result);
         if (telRilRequest == nullptr) {

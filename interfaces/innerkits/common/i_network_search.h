@@ -34,11 +34,10 @@ public:
     virtual std::u16string GetOperatorNumeric(int32_t slotId) const = 0;
     virtual std::u16string GetOperatorName(int32_t slotId) const = 0;
     virtual sptr<NetworkState> GetNetworkStatus(int32_t slotId) const = 0;
-    virtual int32_t GetRadioState(int32_t slotId) const = 0;
-    virtual bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
-    virtual void SetRadioState(int32_t slotId, bool isOn, int32_t rst) = 0;
-    virtual bool SetRadioState(
-        int32_t slotId, bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual int32_t GetRadioState() const = 0;
+    virtual bool GetRadioState(const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual void SetRadioState(bool isOn, int32_t rst) = 0;
+    virtual bool SetRadioState(bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId) const = 0;
     virtual void RegisterPhoneNotify(
         const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what, void *obj) = 0;

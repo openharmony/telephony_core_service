@@ -46,9 +46,9 @@ public:
 
     const sptr<NetworkState> GetNetworkState(int32_t slotId) override;
 
-    bool SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback) override;
+    bool SetRadioState(bool isOn, const sptr<INetworkSearchCallback> &callback) override;
 
-    bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
+    bool GetRadioState(const sptr<INetworkSearchCallback> &callback) override;
 
     bool HasSimCard(int32_t slotId) override;
 

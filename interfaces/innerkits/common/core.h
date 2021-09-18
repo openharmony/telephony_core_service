@@ -93,8 +93,8 @@ public:
     std::u16string GetOperatorNumeric(int32_t slotId);
     std::u16string GetOperatorName(int32_t slotId);
     sptr<NetworkState> GetNetworkStatus(int32_t slotId);
-    bool SetRadioState(int32_t slotId, bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback);
-    bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+    bool SetRadioState(bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback);
+    bool GetRadioState(const sptr<INetworkSearchCallback> &callback);
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId);
     bool GetNetworkSearchResult(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
