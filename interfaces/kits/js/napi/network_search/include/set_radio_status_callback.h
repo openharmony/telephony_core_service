@@ -16,21 +16,19 @@
 #ifndef SET_RADIO_STATUS_CALLBACK_H
 #define SET_RADIO_STATUS_CALLBACK_H
 
-#include "network_search_callback_base.h"
-#include "base_context.h"
+#include "i_network_search_callback_stub.h"
+#include "napi_radio.h"
 #include "napi/native_api.h"
 
 namespace OHOS {
 namespace Telephony {
-class SetRadioStatusCallback : public NetworkSearchCallbackBase {
+class SetRadioStatusCallback : public INetworkSearchCallbackStub {
 public:
-    SetRadioStatusCallback(napi_env env, napi_ref thisVarRef, BaseContext *context);
+    SetRadioStatusCallback(SwitchRadioContext *context);
     void OnSetRadioStatusCallback(const bool setResult, const int32_t errorCode) override;
 
 private:
-    napi_env env_;
-    napi_ref thisVarRef_;
-    BaseContext *baseContext_;
+    SwitchRadioContext *asyncContext_;
 };
 } // namespace Telephony
 } // namespace OHOS

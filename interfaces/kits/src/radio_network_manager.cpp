@@ -64,14 +64,14 @@ bool RadioNetworkManager::SetNetworkSelectionMode(int32_t slotId, int32_t select
         slotId, selectMode, networkInformation, resumeSelection, callback);
 }
 
-bool RadioNetworkManager::SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback)
+bool RadioNetworkManager::SetRadioState(bool isOn, const sptr<INetworkSearchCallback> &callback)
 {
-    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->SetRadioState(slotId, isOn, callback);
+    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->SetRadioState(isOn, callback);
 }
 
-bool RadioNetworkManager::GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+bool RadioNetworkManager::GetRadioState(const sptr<INetworkSearchCallback> &callback)
 {
-    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->GetRadioState(slotId, callback);
+    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->GetRadioState(callback);
 }
 
 bool RadioNetworkManager::GetNetworkSearchResult(int32_t slotId, const sptr<INetworkSearchCallback> &callback)

@@ -31,10 +31,10 @@ struct NetworkSearchCallbackInfo {
     int32_t param_;
     sptr<INetworkSearchCallback> networkSearchCacheItem_;
 
-    NetworkSearchCallbackInfo(int32_t param, sptr<INetworkSearchCallback> networkSearchCacheItem)
+    NetworkSearchCallbackInfo(int32_t param, sptr<INetworkSearchCallback> networkSearchItem)
     {
         param_ = param;
-        networkSearchCacheItem_ = networkSearchCacheItem;
+        networkSearchCacheItem_ = networkSearchItem;
     }
 };
 
@@ -55,11 +55,10 @@ public:
      * 27007-410_2001 8.2 Set phone functionality +CFUN
      * 3GPP TS 27.007 V4.1.0 (2001-03)
      */
-    void SetRadioState(int32_t slotId, bool isOn, int32_t rst) override;
-    bool SetRadioState(
-        int32_t slotId, bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback) override;
-    int32_t GetRadioState(int32_t slotId) const override;
-    bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
+    void SetRadioState(bool isOn, int32_t rst) override;
+    bool SetRadioState(bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback) override;
+    int32_t GetRadioState() const override;
+    bool GetRadioState(const sptr<INetworkSearchCallback> &callback) override;
     int32_t GetPsRadioTech(int32_t slotId) const override;
     int32_t GetCsRadioTech(int32_t slotId) const override;
     std::u16string GetOperatorNumeric(int32_t slotId) const override;

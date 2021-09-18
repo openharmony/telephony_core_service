@@ -16,21 +16,19 @@
 #ifndef SET_NETWORK_SEARCH_MODLE_CALLBACK_H
 #define SET_NETWORK_SEARCH_MODLE_CALLBACK_H
 
-#include "network_search_callback_base.h"
-#include "base_context.h"
+#include "i_network_search_callback_stub.h"
+#include "napi_radio.h"
 #include "napi/native_api.h"
 
 namespace OHOS {
 namespace Telephony {
-class SetNetworkSearchModeCallback : public NetworkSearchCallbackBase {
+class SetNetworkSearchModeCallback : public INetworkSearchCallbackStub {
 public:
-    SetNetworkSearchModeCallback(napi_env env, napi_ref thisVarRef, BaseContext *context);
+    SetNetworkSearchModeCallback(SetSelectModeContext *context);
     void OnSetNetworkModeCallback(const bool setResult, const int32_t errorCode) override;
 
 private:
-    napi_env env_;
-    napi_ref thisVarRef_;
-    BaseContext *baseContext_;
+    SetSelectModeContext *asyncContext_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -37,8 +37,8 @@ public:
     virtual std::u16string GetOperatorName(int32_t slotId) = 0;
     virtual std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId) = 0;
     virtual const sptr<NetworkState> GetNetworkState(int32_t slotId) = 0;
-    virtual bool SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback) = 0;
-    virtual bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual bool SetRadioState(bool isOn, const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual bool GetRadioState(const sptr<INetworkSearchCallback> &callback) = 0;
     virtual bool HasSimCard(int32_t slotId) = 0;
     virtual int32_t GetSimState(int32_t slotId) = 0;
     virtual bool UnlockPin(std::u16string pin, LockStatusResponse &response, int32_t phoneId) = 0;

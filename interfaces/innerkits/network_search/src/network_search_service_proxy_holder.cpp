@@ -133,19 +133,18 @@ bool NetworkSearchServiceProxyHolder::SetNetworkSelectionMode(int32_t slotId, in
     return false;
 }
 
-bool NetworkSearchServiceProxyHolder::SetRadioState(
-    int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback)
+bool NetworkSearchServiceProxyHolder::SetRadioState(bool isOn, const sptr<INetworkSearchCallback> &callback)
 {
     if (GetNetworkSearchProxy()) {
-        return radioNetworkService_->SetRadioState(slotId, isOn, callback);
+        return radioNetworkService_->SetRadioState(isOn, callback);
     }
     return false;
 }
 
-bool NetworkSearchServiceProxyHolder::GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+bool NetworkSearchServiceProxyHolder::GetRadioState(const sptr<INetworkSearchCallback> &callback)
 {
     if (GetNetworkSearchProxy()) {
-        return radioNetworkService_->GetRadioState(slotId, callback);
+        return radioNetworkService_->GetRadioState(callback);
     }
     return false;
 }

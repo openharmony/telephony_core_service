@@ -496,7 +496,6 @@ void TelRilNetwork::SetNetworkSelectionModeResponse(MessageParcel &data)
                 TELEPHONY_LOGE("ERROR : SetNetworkSelectionModeResponse --> handler == nullptr !!!");
                 return;
             }
-            TELEPHONY_LOGE("TelRilNetwork:: SetNetworkSelectionModeResponse ok");
             handler->SendEvent(telRilRequest->pointer_);
         } else {
             ErrorResponse(telRilRequest, *radioResponseInfo);
