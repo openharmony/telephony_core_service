@@ -22,6 +22,8 @@ ohos_unittest("tel_core_service_gtest") {
 
   sources = [
     "//base/telephony/core_service/interfaces/innerkits/proxy/core_service_proxy.cpp",
+    "//base/telephony/core_service/interfaces/kits/src/i_network_search_callback_stub.cpp",
+    "network_search_test_callback_stub.cpp",
     "network_search_test.cpp",
     "sim_test.cpp",
   ]
@@ -30,6 +32,7 @@ ohos_unittest("tel_core_service_gtest") {
     "//base/telephony/core_service/common/log/include",
     "//base/telephony/core_service/interfaces/innerkits/common",
     "//base/telephony/core_service/interfaces/innerkits/proxy",
+    "//base/telephony/core_service/interfaces/kits/include",
     "//base/telephony/ril_adapter/interfaces/innerkits",
     "//utils/native/base/include",
   ]
