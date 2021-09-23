@@ -126,22 +126,25 @@ bool NetworkSearchManager::SetRadioState(bool isOn, int32_t rst, const sptr<INet
     }
 
     int64_t index = GetCallbackIndex64bit();
+    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
+        std::make_shared<NetworkSearchCallbackInfo>(isOn, callback);
+    if (callbackInfo == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::SetRadioState callbackInfo is null!!");
+        return false;
+    }
+    if (!AddNetworkSearchCallBack(index, callbackInfo)) {
+        TELEPHONY_LOGE("NetworkSearchManager::SetRadioState Error!!");
+        return false;
+    }
+
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_STATUS, index);
     if (event == nullptr) {
+        RemoveCallbackFromMap(index);
         return false;
     }
     event->SetOwner(networkSearchHandler_);
     rilManager_->SetRadioStatus(isOn, rst, event);
-
-    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
-        std::make_shared<NetworkSearchCallbackInfo>(isOn, callback);
-    if (callbackInfo != nullptr) {
-        if (!AddNetworkSearchCallBack(index, callbackInfo)) {
-            TELEPHONY_LOGE("NetworkSearchManager::SetRadioState Error!!");
-        }
-        return true;
-    }
-    return false;
+    return true;
 }
 
 void NetworkSearchManager::RegisterPhoneNotify(
@@ -283,23 +286,27 @@ bool NetworkSearchManager::GetRadioState(const sptr<INetworkSearchCallback> &cal
     if (rilManager_ == nullptr) {
         return false;
     }
+
     int64_t index = GetCallbackIndex64bit();
+    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
+        std::make_shared<NetworkSearchCallbackInfo>(0, callback);
+    if (callbackInfo == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::GetRadioState callbackInfo is null!!");
+        return false;
+    }
+    if (!AddNetworkSearchCallBack(index, callbackInfo)) {
+        TELEPHONY_LOGE("NetworkSearchManager::GetRadioState Error!!");
+        return false;
+    }
+
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_STATUS, index);
     if (event == nullptr) {
+        RemoveCallbackFromMap(index);
         return false;
     }
     event->SetOwner(networkSearchHandler_);
     rilManager_->GetRadioStatus(event);
-
-    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
-        std::make_shared<NetworkSearchCallbackInfo>(0, callback);
-    if (callbackInfo != nullptr) {
-        if (!AddNetworkSearchCallBack(index, callbackInfo)) {
-            TELEPHONY_LOGE("NetworkSearchManager::GetRadioState Error!!");
-        }
-        return true;
-    }
-    return false;
+    return true;
 }
 
 std::vector<sptr<SignalInformation>> NetworkSearchManager::GetSignalInfoList(int32_t slotId) const
@@ -318,22 +325,25 @@ bool NetworkSearchManager::GetNetworkSearchResult(int32_t slotId, const sptr<INe
     }
 
     int64_t index = GetCallbackIndex64bit();
+    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
+        std::make_shared<NetworkSearchCallbackInfo>(0, callback);
+    if (callbackInfo == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::GetNetworkSearchResult callbackInfo is null!!");
+        return false;
+    }
+    if (!AddNetworkSearchCallBack(index, callbackInfo)) {
+        TELEPHONY_LOGE("NetworkSearchManager::GetNetworkSearchResult Error!!");
+        return false;
+    }
+
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_NETWORK_SEARCH_RESULT, index);
     if (event == nullptr) {
+        RemoveCallbackFromMap(index);
         return false;
     }
     event->SetOwner(networkSearchHandler_);
     rilManager_->GetNetworkSearchInformation(event);
-
-    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
-        std::make_shared<NetworkSearchCallbackInfo>(0, callback);
-    if (callbackInfo != nullptr) {
-        if (!AddNetworkSearchCallBack(index, callbackInfo)) {
-            TELEPHONY_LOGE("AddNetworkSearchCallBack Error!!");
-        }
-        return true;
-    }
-    return false;
+    return true;
 }
 
 void NetworkSearchManager::SetNetworkSearchResultValue(
@@ -381,23 +391,25 @@ bool NetworkSearchManager::GetNetworkSelectionMode(int32_t slotId, const sptr<IN
     }
 
     int64_t index = GetCallbackIndex64bit();
-    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_NETWORK_SELECTION_MODE, index);
-    if (event != nullptr) {
-        event->SetOwner(networkSearchHandler_);
-        rilManager_->GetNetworkSelectionMode(event);
-
-        std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
-            std::make_shared<NetworkSearchCallbackInfo>(0, callback);
-        if (callbackInfo == nullptr) {
-            return false;
-        }
-
-        if (!AddNetworkSearchCallBack(index, callbackInfo)) {
-            TELEPHONY_LOGE("GetNetworkSelectionMode Error!!");
-        }
-        return true;
+    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
+        std::make_shared<NetworkSearchCallbackInfo>(0, callback);
+    if (callbackInfo == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::GetNetworkSelectionMode callbackInfo is null!!");
+        return false;
     }
-    return false;
+    if (!AddNetworkSearchCallBack(index, callbackInfo)) {
+        TELEPHONY_LOGE("NetworkSearchManager::GetNetworkSelectionMode Error!!");
+        return false;
+    }
+
+    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_NETWORK_SELECTION_MODE, index);
+    if (event == nullptr) {
+        RemoveCallbackFromMap(index);
+        return false;
+    }
+    event->SetOwner(networkSearchHandler_);
+    rilManager_->GetNetworkSelectionMode(event);
+    return true;
 }
 
 bool NetworkSearchManager::SetNetworkSelectionMode(
@@ -435,32 +447,36 @@ bool NetworkSearchManager::SetNetworkSelectionMode(int32_t slotId, int32_t selec
 
     TELEPHONY_LOGI("NetworkSearchManager SetNetworkSelectionMode selectMode:%{public}d", selectMode);
     int64_t index = GetCallbackIndex64bit();
-    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_NETWORK_SELECTION_MODE, index);
-    if (event == nullptr) {
-        return false;
-    }
-
-    event->SetOwner(networkSearchHandler_);
     std::string plmnNumeric = "";
     if (networkInformation != nullptr) {
         plmnNumeric = networkInformation->GetOperatorNumeric();
     }
-    rilManager_->SetNetworkSelectionMode(selectMode, plmnNumeric, event);
 
     std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
         std::make_shared<NetworkSearchCallbackInfo>(selectMode, callback);
-    if (callbackInfo != nullptr) {
-        if (AddNetworkSearchCallBack(index, callbackInfo)) {
-            return true;
-        }
+    if (callbackInfo == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::SetNetworkSelectionMode callbackInfo is null!!");
+        return false;
     }
+    if (!AddNetworkSearchCallBack(index, callbackInfo)) {
+        TELEPHONY_LOGE("NetworkSearchManager::SetNetworkSelectionMode Error!!");
+        return false;
+    }
+
+    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_NETWORK_SELECTION_MODE, index);
+    if (event == nullptr) {
+        RemoveCallbackFromMap(index);
+        return false;
+    }
+    event->SetOwner(networkSearchHandler_);
+    rilManager_->SetNetworkSelectionMode(selectMode, plmnNumeric, event);
 
     if (resumeSelection) {
         TELEPHONY_LOGI("NetworkSearchManager::SetNetworkSelectionMode to update the database");
     } else {
         TELEPHONY_LOGI("NetworkSearchManager::SetNetworkSelectionMode to clear the database");
     }
-    return false;
+    return true;
 }
 
 bool NetworkSearchManager::AddNetworkSearchCallBack(

@@ -116,7 +116,7 @@ void RilManager::TelRilSetParam(int32_t preferredNetworkType, int32_t cdmaSubscr
 
 void RilManager::OnInit()
 {
-    bool res;
+    bool res = false;
     int i = 0;
 
     do {

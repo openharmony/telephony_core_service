@@ -583,7 +583,7 @@ void TelRilSim::GetImsi(const AppExecFwk::InnerEvent::Pointer &result)
         data.WriteInt32(telRilRequest->serialId_);
 
         int32_t ret = SendBufferEvent(HREQ_SIM_GET_IMSI, data);
-        TELEPHONY_LOGD("GetImsi --> SendBufferEvent(HREQ_SIM_GET_IMSI, wData) return ID: %{public}d", ret);
+        TELEPHONY_LOGD(" SendBufferEvent return ID: %{public}d", ret);
     } else {
         TELEPHONY_LOGE("ERROR : GetImsi --> cellularRadio_ == nullptr !!!");
     }
@@ -679,8 +679,7 @@ void TelRilSim::ChangeSimPassword(std::string fac, std::string oldPassword, std:
         MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         int ret = cellularRadio_->SendRequest(HREQ_SIM_CHANGE_PASSWD, wData, reply, option);
-        TELEPHONY_LOGD(
-            "ChangeSimPassword --> SendBufferEvent(HREQ_SIM_CHANGE_PASSWD, wData) return ID: %{public}d", ret);
+        TELEPHONY_LOGD("SendBufferEvent return ID: %{public}d", ret);
     } else {
         TELEPHONY_LOGE("ERROR : HREQ_SIM_CHANGE_PASSWD --> cellularRadio_ == nullptr !!!");
     }
