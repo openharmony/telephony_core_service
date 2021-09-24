@@ -35,7 +35,8 @@ public:
         REG_STATE_SEARCH = 2,
         REG_STATE_NO_SERVICE = 3,
         REG_STATE_INVALID = 4,
-        REG_STATE_ROAMING = 5
+        REG_STATE_ROAMING = 5,
+        REG_STATE_EMERGENCY_ONLY = 6
     };
 
 private:
