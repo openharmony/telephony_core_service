@@ -38,6 +38,10 @@ int32_t WrapNetworkSelectionMode(int32_t mode)
 
 void GetNetworkSearchModeCallback::OnGetNetworkModeCallback(const int32_t searchModel, const int32_t errorCode)
 {
+    if (asyncContext_ == nullptr) {
+        TELEPHONY_LOGE("OnGetNetworkModeCallback context nullptr");
+        return;
+    }
     TELEPHONY_LOGI("OnGetNetworkModeCallback searchModel = %{public}d", searchModel);
     std::unique_lock<std::mutex> callbackLock(asyncContext_->callbackMutex);
     asyncContext_->resolved = errorCode == HRIL_ERR_SUCCESS;

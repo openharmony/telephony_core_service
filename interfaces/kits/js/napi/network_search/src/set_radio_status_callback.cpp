@@ -24,6 +24,10 @@ SetRadioStatusCallback::SetRadioStatusCallback(SwitchRadioContext *context) : as
 
 void SetRadioStatusCallback::OnSetRadioStatusCallback(const bool setResult, const int32_t errorCode)
 {
+    if (asyncContext_ == nullptr) {
+        TELEPHONY_LOGE("OnSetRadioStatusCallback context nullptr");
+        return;
+    }
     std::unique_lock<std::mutex> callbackLock(asyncContext_->callbackMutex);
     TELEPHONY_LOGD("OnSetRadioStatusCallback setResult = %{public}d", setResult);
     asyncContext_->resolved = setResult;
