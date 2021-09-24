@@ -26,11 +26,15 @@ GetNetworkSearchInfoCallback::GetNetworkSearchInfoCallback(GetSearchInfoContext 
 void GetNetworkSearchInfoCallback::OnGetNetworkSearchResult(
     const sptr<NetworkSearchResult> &networkSearchResult, const int32_t errorCode)
 {
+    if (asyncContext_ == nullptr) {
+        TELEPHONY_LOGE("OnGetNetworkSearchResult context nullptr");
+        return;
+    }
     TELEPHONY_LOGD("OnGetNetworkSearchInfoCallback start errorCode = %{public}d", errorCode);
     std::unique_lock<std::mutex> callbackLock(asyncContext_->callbackMutex);
     asyncContext_->resolved = (errorCode == HRIL_ERR_SUCCESS) && (networkSearchResult != nullptr);
     if (asyncContext_->resolved) {
-        asyncContext_->searchResult = networkSearchResult.GetRefPtr();
+        asyncContext_->searchResult = networkSearchResult;
     } else {
         asyncContext_->errorCode = errorCode;
     }

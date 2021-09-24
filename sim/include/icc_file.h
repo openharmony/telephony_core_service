@@ -118,7 +118,7 @@ protected:
     bool loaded_ = false;
     bool fileQueried_ = false;
     bool lockQueried_ = false;
-    const int BYTE_NUMBER = 0xff;
+    const uint8_t BYTE_NUM = 0xff;
     const int DATA_STEP = 2;
     const std::string SIM_STATE_ACTION = "com.hos.action.SIM_STATE_CHANGED";
     std::unique_ptr<ObserverHandler> filesFetchedObser_ = nullptr;

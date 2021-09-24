@@ -12,7 +12,7 @@
 # limitations under the License.
 import("//build/ohos.gni")
 SUBSYSTEM_DIR = "//base/telephony"
-ohos_shared_library("telephony_sim") {
+ohos_shared_library("sim") {
   include_dirs = [
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/api",
     "//base/telephony/ril_adapter/interfaces/innerkits",
@@ -53,5 +53,5 @@ ohos_shared_library("telephony_sim") {
 
   subsystem_name = "telephony"
   part_name = "core_service"
-  relative_install_dir = "module"
+  relative_install_dir = "module/telephony"
 }
