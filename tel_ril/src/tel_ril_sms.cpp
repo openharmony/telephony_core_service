@@ -592,10 +592,6 @@ void TelRilSms::GetSmsCenterAddressResponse(MessageParcel &data)
         TELEPHONY_LOGE("TelRilSms::GetSmsCenterAddressResponse --> read spBuffer failed");
         return;
     }
-    TELEPHONY_LOGD(
-        "GetSmsCenterAddressResponse --> ServiceCenterAddress->address:%{public}s, "
-        "ServiceCenterAddress->tosca:%{public}d",
-        serCenterAddress->address.c_str(), serCenterAddress->tosca);
 
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);

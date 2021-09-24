@@ -96,11 +96,14 @@ RegServiceState NetworkRegister::ConvertRegFromRil(int code) const
             return RegServiceState::REG_STATE_SEARCH;
         case RilRegister::REG_STATE_NOT_REG:
         case RilRegister::REG_STATE_NO_SERVICE:
-        case RilRegister::REG_STATE_INVALID:
             return RegServiceState::REG_STATE_NO_SERVICE;
+        case RilRegister::REG_STATE_INVALID:
+            return RegServiceState::REG_STATE_UNKNOWN;
         case RilRegister::REG_STATE_ROAMING:
         case RilRegister::REG_STATE_HOME_ONLY:
             return RegServiceState::REG_STATE_IN_SERVICE;
+        case RilRegister::REG_STATE_EMERGENCY_ONLY:
+            return RegServiceState::REG_STATE_EMERGENCY_ONLY;
         default:
             return RegServiceState::REG_STATE_NO_SERVICE;
     }
