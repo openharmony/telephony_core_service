@@ -14,12 +14,14 @@
  */
 
 #include "hdf_death_recipient.h"
-#include "telephony_log_wrapper.h"
 #include "core_manager.h"
 #include "tel_ril_manager.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
+constexpr int SLEEP_TIME = 2;
+
 HdfDeathRecipient::HdfDeathRecipient(int32_t slotId)
 {
     slotId_ = slotId;
@@ -27,7 +29,7 @@ HdfDeathRecipient::HdfDeathRecipient(int32_t slotId)
 
 void HdfDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    sleep(2);
+    sleep(SLEEP_TIME);
     TELEPHONY_LOGD("HdfDeathRecipient OnRemoteDied id %{public}d start!", slotId_);
     std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId_);
     if (core != nullptr) {
@@ -36,7 +38,7 @@ void HdfDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
         do {
             res = core->InitCellularRadio(false);
             if (!res) {
-                sleep(1);
+                sleep(SLEEP_TIME);
                 i++;
                 TELEPHONY_LOGD("Initialization cellular radio failed. Try initialization again!");
             }
