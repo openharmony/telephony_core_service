@@ -81,15 +81,14 @@ bool NetworkInformation::Marshalling(Parcel &parcel) const
 
 NetworkInformation *NetworkInformation::Unmarshalling(Parcel &parcel)
 {
-    NetworkInformation *networkInfo = new (std::nothrow) NetworkInformation();
+    std::unique_ptr<NetworkInformation> networkInfo = std::make_unique<NetworkInformation>();
     if (networkInfo == nullptr) {
         return nullptr;
     }
     if (!networkInfo->ReadFromParcel(parcel)) {
-        delete networkInfo;
-        networkInfo = nullptr;
+        return nullptr;
     }
-    return networkInfo;
+    return networkInfo.release();
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -62,7 +62,7 @@ bool NetworkSearchNotify::ResetConnectService()
 void NetworkSearchNotify::NotifyNetworkStateUpdated(const sptr<NetworkState> &networkState)
 {
     TELEPHONY_LOGI("NotifyNetworkStateUpdated~~~\n");
-    int simId = 1;
+    int simId = 0;
     if (telephonyStateNotify_ != nullptr) {
         int32_t result = telephonyStateNotify_->UpdateNetworkState(simId, networkState);
         TELEPHONY_LOGI("NotifyNetworkStateUpdated ret %{public}d", result);
@@ -86,7 +86,7 @@ void NetworkSearchNotify::NotifyNetworkStateUpdated(const sptr<NetworkState> &ne
 void NetworkSearchNotify::NotifySignalInfoUpdated(const std::vector<sptr<SignalInformation>> &signalInfos)
 {
     TELEPHONY_LOGI("NotifySignalInfoUpdated~~~ signalInfos size=%{public}zu\n", signalInfos.size());
-    int simId = 1;
+    int simId = 0;
     if (telephonyStateNotify_ != nullptr) {
         int32_t result = telephonyStateNotify_->UpdateSignalInfo(simId, signalInfos);
         TELEPHONY_LOGI("NotifySignalInfoUpdated ret %{public}d", result);
