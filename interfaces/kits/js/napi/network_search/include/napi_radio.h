@@ -277,7 +277,7 @@ struct SetSelectModeContext : CallbackContext {
 
 struct GetSearchInfoContext : CallbackContext {
     int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
-    NetworkSearchResult *searchResult = nullptr;
+    sptr<NetworkSearchResult> searchResult = nullptr;
 };
 
 struct GetStateContext : BaseContext {
