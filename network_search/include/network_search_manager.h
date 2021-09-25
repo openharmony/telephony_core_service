@@ -31,10 +31,10 @@ struct NetworkSearchCallbackInfo {
     int32_t param_;
     sptr<INetworkSearchCallback> networkSearchCacheItem_;
 
-    NetworkSearchCallbackInfo(int32_t param, sptr<INetworkSearchCallback> networkSearchItem)
+    NetworkSearchCallbackInfo(int32_t param, sptr<INetworkSearchCallback> callback)
     {
         param_ = param;
-        networkSearchCacheItem_ = networkSearchItem;
+        networkSearchCacheItem_ = callback;
     }
 };
 
