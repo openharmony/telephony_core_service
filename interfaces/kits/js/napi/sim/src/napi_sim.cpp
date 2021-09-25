@@ -51,7 +51,11 @@ napi_value NapiCreateAsyncWork(napi_env env, napi_callback_info info, std::strin
         typeStd.emplace_back(napi_function);
     }
     auto inParaTp = std::make_tuple(&asyncContext->slotId, &context.callbackRef);
-    NAPI_ASSERT(env, MatchParameters(env, argv, argc, inParaTp, typeStd), "type mismatch");
+
+    if (!MatchParameters(env, argv, argc, inParaTp, typeStd)) {
+        napi_throw_error(env, nullptr, "type of input parameters error!");
+        return nullptr;
+    }
 
     napi_value result = nullptr;
     if (context.callbackRef == nullptr) {
@@ -79,7 +83,10 @@ napi_value NapiCreateAsyncWork2(
 {
     TELEPHONY_LOGD("NAPI_SIM NapiCreateAsyncWork2");
     napi_env env = para.env;
-    NAPI_ASSERT(env, typeStd.size() == sizeof...(Ts), "Input parameter error");
+    if (!(typeStd.size() == sizeof...(Ts))) {
+        napi_throw_error(env, nullptr, "Number of input parameters error!");
+        return nullptr;
+    }
 
     size_t argc = typeStd.size();
     constexpr size_t arrSize = sizeof...(Ts);
@@ -89,7 +96,10 @@ napi_value NapiCreateAsyncWork2(
         typeStd.pop_back();
     }
 
-    NAPI_ASSERT(env, MatchParameters(env, argv, argc, theTuple, typeStd), "type mismatch");
+    if (!MatchParameters(env, argv, argc, theTuple, typeStd)) {
+        napi_throw_error(env, nullptr, "type of input parameters error!");
+        return nullptr;
+    }
 
     napi_value result = nullptr;
     if (context.callbackRef == nullptr) {
@@ -109,7 +119,7 @@ napi_value NapiCreateAsyncWork2(
 
 template<typename T>
 void NapiAsyncCompleteCallback(napi_env env, napi_status status, const AsyncContext<T> &asyncContext,
-    std::string errMessage, bool isVoid = false)
+    std::string errMessage, bool funcHasReturnVal = false)
 {
     TELEPHONY_LOGD("NAPI_SIM NapiAsyncCompleteCallback");
     if (status != napi_ok) {
@@ -123,15 +133,14 @@ void NapiAsyncCompleteCallback(napi_env env, napi_status status, const AsyncCont
             napi_value errorMessage = NapiUtil::CreateErrorMessage(env, errMessage);
             NAPI_CALL_RETURN_VOID(env, napi_reject_deferred(env, context.deferred, errorMessage));
         } else {
-            napi_value res;
-            isVoid ? (res = NapiUtil::CreateUndefined(env)) : (res = GetNapiValue(env, asyncContext.callbackVal));
+            napi_value res =
+                (funcHasReturnVal ? NapiUtil::CreateUndefined(env) : GetNapiValue(env, asyncContext.callbackVal));
             NAPI_CALL_RETURN_VOID(env, napi_resolve_deferred(env, context.deferred, res));
         }
     } else {
-        napi_value callbackValue[] {
-            NapiUtil::CreateUndefined(env),
-            isVoid ? NapiUtil::CreateUndefined(env) : GetNapiValue(env, asyncContext.callbackVal)
-        };
+        napi_value res =
+            (funcHasReturnVal ? NapiUtil::CreateUndefined(env) : GetNapiValue(env, asyncContext.callbackVal));
+        napi_value callbackValue[] {NapiUtil::CreateUndefined(env), res};
         if (!context.resolved) {
             callbackValue[0] = NapiUtil::CreateErrorMessage(env, errMessage);
             callbackValue[1] = NapiUtil::CreateUndefined(env);
@@ -164,9 +173,8 @@ napi_value PinOrPukUnlockConversion(napi_env env, const LockStatusResponse &resp
     napi_value val = nullptr;
     napi_create_object(env, &val);
     napi_set_named_property(env, val, "result", GetNapiValue(env, response.result));
-    napi_value res;
-    (response.result == passWordErr) ? (res = GetNapiValue(env, response.remain)) :
-                                       (res = NapiUtil::CreateUndefined(env));
+    napi_value res =
+        ((response.result == passWordErr) ? GetNapiValue(env, response.remain) : NapiUtil::CreateUndefined(env));
     napi_set_named_property(env, val, "remain", res);
     return val;
 }
@@ -179,8 +187,7 @@ static void NativeGetDefaultVoiceSlotId(napi_env env, void *data)
     if (g_simCardManager) {
         asyncContext->callbackVal = g_simCardManager->GetDefaultVoiceSlotId();
     }
-    asyncContext->callbackVal == DEFAULT_ERROR ? asyncContext->context.resolved = false :
-                                                 asyncContext->context.resolved = true;
+    asyncContext->context.resolved = !(asyncContext->callbackVal == DEFAULT_ERROR);
 }
 
 static void GetDefaultVoiceSlotIdCallback(napi_env env, napi_status status, void *data)
@@ -218,11 +225,7 @@ static void NativeGetIsoForSim(napi_env env, void *data)
         isoCountryCode = ToUtf8(g_simCardManager->GetIsoCountryCodeForSim(asyncContext->slotId));
         asyncContext->callbackVal = isoCountryCode;
     }
-    if (isoCountryCode.empty()) {
-        asyncContext->context.resolved = false;
-    } else {
-        asyncContext->context.resolved = true;
-    }
+    asyncContext->context.resolved = !isoCountryCode.empty();
 }
 
 static void GetIsoForSimCallback(napi_env env, napi_status status, void *data)
@@ -243,13 +246,9 @@ static void NativeGetSimOperatorNumeric(napi_env env, void *data)
     std::string simOperNum;
     if (g_simCardManager) {
         simOperNum = ToUtf8(g_simCardManager->GetSimOperatorNumeric(asyncContext->slotId));
-    }
-    if (simOperNum.empty()) {
-        asyncContext->context.resolved = false;
-    } else {
-        asyncContext->context.resolved = true;
         asyncContext->callbackVal = simOperNum;
     }
+    asyncContext->context.resolved = !simOperNum.empty();
 }
 
 static void GetSimOperatorNumericCallback(napi_env env, napi_status status, void *data)
@@ -270,13 +269,9 @@ static void NativeGetSimSpn(napi_env env, void *data)
     std::string simSpn;
     if (g_simCardManager) {
         simSpn = ToUtf8(g_simCardManager->GetSimSpn(asyncContext->slotId));
-    }
-    if (simSpn.empty()) {
-        asyncContext->context.resolved = false;
-    } else {
-        asyncContext->context.resolved = true;
         asyncContext->callbackVal = simSpn;
     }
+    asyncContext->context.resolved = !simSpn.empty();
 }
 
 static void GetSimSpnCallback(napi_env env, napi_status status, void *data)
@@ -322,13 +317,9 @@ static void NativeGetSimGid1(napi_env env, void *data)
     std::string simGid1;
     if (g_simCardManager) {
         simGid1 = ToUtf8(g_simCardManager->GetSimGid1(asyncContext->slotId));
-    }
-    if (simGid1.empty()) {
-        asyncContext->context.resolved = false;
-    } else {
-        asyncContext->context.resolved = true;
         asyncContext->callbackVal = simGid1;
     }
+    asyncContext->context.resolved = !simGid1.empty();
 }
 
 static void GetSimGid1Callback(napi_env env, napi_status status, void *data)
@@ -350,7 +341,7 @@ static void NativeGetSimIccId(napi_env env, void *data)
         simIccId = ToUtf8(g_simCardManager->GetSimIccId(asyncContext->slotId));
         asyncContext->callbackVal = simIccId;
     }
-    simIccId.empty() ? asyncContext->context.resolved = false : asyncContext->context.resolved = true;
+    asyncContext->context.resolved = !simIccId.empty();
 }
 
 static void GetSimIccIdCallback(napi_env env, napi_status status, void *data)
@@ -622,7 +613,7 @@ static void NativeGetIMSI(napi_env env, void *data)
         strIMSI = ToUtf8(g_simCardManager->GetIMSI(asyncContext->slotId));
         asyncContext->callbackVal = strIMSI;
     }
-    strIMSI.empty() ? asyncContext->context.resolved = false : asyncContext->context.resolved = true;
+    asyncContext->context.resolved = !strIMSI.empty();
 }
 
 static void GetIMSICallback(napi_env env, napi_status status, void *data)
@@ -685,7 +676,7 @@ static napi_module _simModule = {
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = InitNapiSim,
-    .nm_modname = "libtelephony_sim.z.so",
+    .nm_modname = "telephony.sim",
     .nm_priv = ((void *)0),
     .reserved = {0},
 };
