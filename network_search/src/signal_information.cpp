@@ -34,14 +34,14 @@ constexpr int32_t WCDMA_RSSI_INVALID = -113;
 constexpr int32_t SIGNAL_LEVEL_INVALID = 0;
 constexpr int32_t SIGNAL_FIVE_BARS = 5;
 constexpr int32_t SIGNAL_FOUR_BARS = 4;
-int32_t GSM_SIGNAL_THRESHOLD_5BAR[] = {-110, -109, -103, -97, -91, -85};
-int32_t CDMA_SIGNAL_THRESHOLD_5BAR[] = {-113, -112, -106, -99, -92, -85};
-int32_t LTE_SIGNAL_THRESHOLD_5BAR[] = {-121, -120, -115, -110, -105, -97};
-int32_t WCDMA_SIGNAL_THRESHOLD_5BAR[] = {-113, -112, -105, -99, -93, -87};
-int32_t GSM_SIGNAL_THRESHOLD_4BAR[] = {-110, -103, -97, -91, -85};
-int32_t CDMA_SIGNAL_THRESHOLD_4BAR[] = {-113, -106, -99, -92, -85};
-int32_t LTE_SIGNAL_THRESHOLD_4BAR[] = {-121, -115, -109, -103, -97};
-int32_t WCDMA_SIGNAL_THRESHOLD_4BAR[] = {-113, -105, -99, -93, -87};
+int32_t gsmSignalThresholdFiveBar[] = {-110, -109, -103, -97, -91, -85};
+int32_t cdmaSignalThresholdFiveBar[] = {-113, -112, -106, -99, -92, -85};
+int32_t lteSignalThresholdFiveBar[] = {-121, -120, -115, -110, -105, -97};
+int32_t wcdmaSignalThresholdFiveBar[] = {-113, -112, -105, -99, -93, -87};
+int32_t gsmSignalThresholdFourBar[] = {-110, -103, -97, -91, -85};
+int32_t cdmaSignalThresholdFourBar[] = {-113, -106, -99, -92, -85};
+int32_t lteSignalThresholdFourBar[] = {-121, -115, -109, -103, -97};
+int32_t wcdmaSignalThresholdFourBar[] = {-113, -105, -99, -93, -87};
 int32_t SignalInformation::signalBar_ = SIGNAL_FIVE_BARS;
 int32_t *SignalInformation::gsmSignalThreshold_ = nullptr;
 int32_t *SignalInformation::cdmaSignalThreshold_ = nullptr;
@@ -56,16 +56,16 @@ SignalInformation::SignalInformation()
 void SignalInformation::InitSignalBar(const int32_t bar)
 {
     if (bar == SIGNAL_FOUR_BARS) {
-        gsmSignalThreshold_ = GSM_SIGNAL_THRESHOLD_4BAR;
-        cdmaSignalThreshold_ = CDMA_SIGNAL_THRESHOLD_4BAR;
-        lteSignalThreshold_ = LTE_SIGNAL_THRESHOLD_4BAR;
-        wcdmaSignalThreshold_ = WCDMA_SIGNAL_THRESHOLD_4BAR;
+        gsmSignalThreshold_ = gsmSignalThresholdFourBar;
+        cdmaSignalThreshold_ = cdmaSignalThresholdFourBar;
+        lteSignalThreshold_ = lteSignalThresholdFourBar;
+        wcdmaSignalThreshold_ = wcdmaSignalThresholdFourBar;
         signalBar_ = SIGNAL_FOUR_BARS;
     } else {
-        gsmSignalThreshold_ = GSM_SIGNAL_THRESHOLD_5BAR;
-        cdmaSignalThreshold_ = CDMA_SIGNAL_THRESHOLD_5BAR;
-        lteSignalThreshold_ = LTE_SIGNAL_THRESHOLD_5BAR;
-        wcdmaSignalThreshold_ = WCDMA_SIGNAL_THRESHOLD_5BAR;
+        gsmSignalThreshold_ = gsmSignalThresholdFiveBar;
+        cdmaSignalThreshold_ = cdmaSignalThresholdFiveBar;
+        lteSignalThreshold_ = lteSignalThresholdFiveBar;
+        wcdmaSignalThreshold_ = wcdmaSignalThresholdFiveBar;
         signalBar_ = SIGNAL_FIVE_BARS;
     }
 }
