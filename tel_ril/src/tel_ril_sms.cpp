@@ -72,7 +72,7 @@ void TelRilSms::ProcessSmsRespOrNotify(uint32_t code, MessageParcel &data)
 
 GsmSmsMessageInfo TelRilSms::ConstructGsmSendSmsRequestLinkList(std::string smsPdu, std::string pdu)
 {
-    GsmSmsMessageInfo msg;
+    GsmSmsMessageInfo msg = {};
     msg.smscPdu = smsPdu.empty() ? "" : smsPdu;
     msg.pdu = pdu.empty() ? "" : pdu;
     return msg;
@@ -80,7 +80,7 @@ GsmSmsMessageInfo TelRilSms::ConstructGsmSendSmsRequestLinkList(std::string smsP
 
 SmsMessageIOInfo TelRilSms::ConstructSmsMessageIOInfoRequestLinkList(std::string smsPdu, std::string pdu)
 {
-    SmsMessageIOInfo msg;
+    SmsMessageIOInfo msg = {};
     msg.smscPdu = smsPdu.empty() ? "" : smsPdu;
     msg.pdu = pdu.empty() ? "" : pdu;
     return msg;
@@ -95,13 +95,13 @@ void TelRilSms::SendSms(std::string smsPdu, std::string pdu, const AppExecFwk::I
             return;
         }
         TELEPHONY_LOGD("TelRilSms RilCmSendSMS:%{public}d", telRilRequest->serialId_);
-        MessageParcel data;
+        MessageParcel data = {};
         GsmSmsMessageInfo mGsmSmsMessageInfo = ConstructGsmSendSmsRequestLinkList(smsPdu, pdu);
         mGsmSmsMessageInfo.serial = telRilRequest->serialId_;
         mGsmSmsMessageInfo.Marshalling(data);
         MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_SMS_SEND_SMS, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_SMS_SEND_SMS, data, reply, option);
         if (ret != ERR_NONE) {
             TELEPHONY_LOGE("HREQ_SMS_SEND_SMS ret = %{public}d", ret);
         }
@@ -118,14 +118,14 @@ void TelRilSms::StorageSms(
             return;
         }
         TELEPHONY_LOGD("TelRilSms RilCmStorageSMS:%{public}d", telRilRequest->serialId_);
-        MessageParcel data;
+        MessageParcel data = {};
         SmsMessageIOInfo mGsmSmsMessageInfo = ConstructSmsMessageIOInfoRequestLinkList(smscPdu, pdu);
         mGsmSmsMessageInfo.serial = telRilRequest->serialId_;
         mGsmSmsMessageInfo.state = status;
         mGsmSmsMessageInfo.Marshalling(data);
         MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_SMS_STORAGE_SMS, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_SMS_STORAGE_SMS, data, reply, option);
         if (ret != ERR_NONE) {
             TELEPHONY_LOGE("HREQ_SMS_STORAGE_SMS ret = %{public}d", ret);
         }
@@ -142,13 +142,13 @@ void TelRilSms::DeleteSms(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointe
         }
         TELEPHONY_LOGD("TelRilSms RilCmDeleteSMS:%{public}d", telRilRequest->serialId_);
 
-        MessageParcel data;
+        MessageParcel data = {};
         data.WriteInt32(telRilRequest->serialId_);
         data.WriteInt32(gsmIndex);
 
         MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_SMS_DELETE_SMS, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_SMS_DELETE_SMS, data, reply, option);
         if (ret != ERR_NONE) {
             TELEPHONY_LOGE("HREQ_SMS_DELETE_SMS ret = %{public}d", ret);
         }
@@ -165,7 +165,7 @@ void TelRilSms::UpdateSms(int32_t gsmIndex, int32_t state, std::string smscPdu, 
             return;
         }
         TELEPHONY_LOGD("TelRilSms RilCmUpdateSms:%{public}d", telRilRequest->serialId_);
-        MessageParcel data;
+        MessageParcel data = {};
         SmsMessageIOInfo smsMessageIOInfo = ConstructSmsMessageIOInfoRequestLinkList(smscPdu, pdu);
         smsMessageIOInfo.serial = telRilRequest->serialId_;
         smsMessageIOInfo.index = gsmIndex;
@@ -173,7 +173,7 @@ void TelRilSms::UpdateSms(int32_t gsmIndex, int32_t state, std::string smscPdu, 
         smsMessageIOInfo.Marshalling(data);
         MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_SMS_UPDATE_SMS, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_SMS_UPDATE_SMS, data, reply, option);
         if (ret != ERR_NONE) {
             TELEPHONY_LOGE("HREQ_SMS_UPDATE_SMS ret = %{public}d", ret);
         }
@@ -192,15 +192,15 @@ void TelRilSms::SetSmsCenterAddress(
             return;
         }
         TELEPHONY_LOGD("TelRilSms RilCmSetSmsCenterAddress:%{public}d", telRilRequest->serialId_);
-        MessageParcel data;
-        ServiceCenterAddress serCenterAddress;
+        MessageParcel data = {};
+        ServiceCenterAddress serCenterAddress = {};
         serCenterAddress.serial = telRilRequest->serialId_;
         serCenterAddress.address = address.empty() ? "" : address;
         serCenterAddress.tosca = tosca;
         serCenterAddress.Marshalling(data);
         MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_SMS_SET_CENTER_ADDRESS, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_SMS_SET_CENTER_ADDRESS, data, reply, option);
         if (ret != ERR_NONE) {
             TELEPHONY_LOGE("HREQ_SMS_SET_CENTER_ADDRESS ret = %{public}d", ret);
         }
@@ -219,11 +219,11 @@ void TelRilSms::GetSmsCenterAddress(const AppExecFwk::InnerEvent::Pointer &respo
         }
         TELEPHONY_LOGD("TelRilSms RilCmGetSmsCenterAddress:%{public}d", telRilRequest->serialId_);
 
-        MessageParcel data;
+        MessageParcel data = {};
         data.WriteInt32(telRilRequest->serialId_);
         MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_SMS_GET_CENTER_ADDRESS, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_SMS_GET_CENTER_ADDRESS, data, reply, option);
         if (ret != ERR_NONE) {
             TELEPHONY_LOGE("HREQ_SMS_GET_CENTER_ADDRESS ret = %{public}d", ret);
         }
@@ -240,7 +240,7 @@ void TelRilSms::SendSmsMoreMode(
             return;
         }
         // Do not log function arg for privacy
-        MessageParcel data;
+        MessageParcel data = {};
         GsmSmsMessageInfo gsmSmsMessageInfo = ConstructGsmSendSmsRequestLinkList(smscPdu, pdu);
         gsmSmsMessageInfo.serial = telRilRequest->serialId_;
         if (!gsmSmsMessageInfo.Marshalling(data)) {
@@ -249,7 +249,7 @@ void TelRilSms::SendSmsMoreMode(
         }
         MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_SMS_SEND_SMS_MORE_MODE, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_SMS_SEND_SMS_MORE_MODE, data, reply, option);
         if (ret != ERR_NONE) {
             TELEPHONY_LOGE("HREQ_SMS_SEND_SMS_MORE_MODE ret = %{public}d", ret);
         }
@@ -273,7 +273,7 @@ void TelRilSms::SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerE
         mModeData.Marshalling(wData);
         MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_SMS_SEND_SMS_ACK, wData, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_SMS_SEND_SMS_ACK, wData, reply, option);
         if (ret != ERR_NONE) {
             TELEPHONY_LOGE("HREQ_SMS_SEND_SMS_ACK ret = %{public}d", ret);
         }
@@ -290,8 +290,8 @@ void TelRilSms::SetCellBroadcast(
             return;
         }
         // Do not log function arg for privacy
-        MessageParcel data;
-        CellBroadcastInfo cellBroadcastInfo;
+        MessageParcel data = {};
+        CellBroadcastInfo cellBroadcastInfo = {};
         cellBroadcastInfo.serial = telRilRequest->serialId_;
         cellBroadcastInfo.mode = mode;
         cellBroadcastInfo.mids = idList.empty() ? "" : idList;
@@ -302,7 +302,7 @@ void TelRilSms::SetCellBroadcast(
         }
         MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_SMS_SET_CELL_BROADCAST, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_SMS_SET_CELL_BROADCAST, data, reply, option);
         if (ret != ERR_NONE) {
             TELEPHONY_LOGE("HREQ_SMS_SET_CELL_BROADCAST ret = %{public}d", ret);
         }
@@ -391,7 +391,7 @@ void TelRilSms::CellBroadcastNotify(MessageParcel &data)
     cellBroadcastInfo->ReadFromParcel(data);
     int32_t indicationType = cellBroadcastInfo->indicationType;
     TELEPHONY_LOGD(
-        "CellBroadcastNotify indicationType:%{public}d, data:%{public}s, dcs :%{public}s, pdu :%{public}s",
+        "indicationType:%{public}d, data:%{public}p, dcs :%{public}p, pdu :%{public}p",
         indicationType, cellBroadcastInfo->data.c_str(), cellBroadcastInfo->dcs.c_str(),
         cellBroadcastInfo->pdu.c_str());
     if (observerHandler_ != nullptr) {
@@ -551,34 +551,34 @@ void TelRilSms::SetSmsCenterAddressResponse(MessageParcel &data)
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("TelRilSms::SetSmsCenterAddressResponse --> read spBuffer failed");
+        TELEPHONY_LOGE("--> read spBuffer failed");
         return;
     }
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     TELEPHONY_LOGD(
-        "SetSmsCenterAddressResponse --> radioResponseInfo->serial:%{public}d, "
+        "--> radioResponseInfo->serial:%{public}d, "
         "radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGD("SetSmsCenterAddressResponse serialId_:%{public}d, requestId_:%{public}d,",
-        telRilRequest->serialId_, telRilRequest->requestId_);
+    TELEPHONY_LOGD(
+        "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
-            TELEPHONY_LOGD("SetSmsCenterAddressResponse GetParam start");
+            TELEPHONY_LOGD("GetParam start");
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
-                TELEPHONY_LOGE("ERROR : SetSmsCenterAddressResponse --> handler == nullptr !!!");
+                TELEPHONY_LOGE("ERROR : --> handler == nullptr !!!");
                 return;
             }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             handler->SendEvent(eventId);
-            TELEPHONY_LOGD("SetSmsCenterAddressResponse GetInnerEventId:%{public}d", eventId);
+            TELEPHONY_LOGD("message id:%{public}d", eventId);
         } else {
             ErrorResponse(telRilRequest, *radioResponseInfo);
         }
     } else {
-        TELEPHONY_LOGE("TelRilSms::SetSmsCenterAddressResponse telRilRequest->pointer_ is null");
+        TELEPHONY_LOGE("telRilRequest->pointer_ is null");
     }
 }
 
@@ -589,35 +589,35 @@ void TelRilSms::GetSmsCenterAddressResponse(MessageParcel &data)
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("TelRilSms::GetSmsCenterAddressResponse --> read spBuffer failed");
+        TELEPHONY_LOGE("--> read spBuffer failed");
         return;
     }
 
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     TELEPHONY_LOGD(
-        "GetSmsCenterAddressResponse --> radioResponseInfo->serial:%{public}d, "
+        "--> radioResponseInfo->serial:%{public}d, "
         "radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGD("GetSmsCenterAddressResponse serialId_:%{public}d, requestId_:%{public}d,",
-        telRilRequest->serialId_, telRilRequest->requestId_);
+    TELEPHONY_LOGD(
+        "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
-            TELEPHONY_LOGD("GetSmsCenterAddressResponse GetParam start");
+            TELEPHONY_LOGD("GetParam start");
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
-                TELEPHONY_LOGE("ERROR : GetSmsCenterAddressResponse --> handler == nullptr !!!");
+                TELEPHONY_LOGE("ERROR : --> handler == nullptr !!!");
                 return;
             }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             handler->SendEvent(eventId, serCenterAddress);
-            TELEPHONY_LOGD("GetSmsCenterAddressResponse GetInnerEventId:%{public}d", eventId);
+            TELEPHONY_LOGD("message id:%{public}d", eventId);
         } else {
             ErrorResponse(telRilRequest, *radioResponseInfo);
         }
     } else {
-        TELEPHONY_LOGE("TelRilSms::GetSmsCenterAddressResponse telRilRequest->pointer_ is null");
+        TELEPHONY_LOGE("telRilRequest->pointer_ is null");
     }
 }
 

@@ -74,11 +74,11 @@ const int MSG_SIM_GET_REALTIME_ICC_STATUS_DONE = 21;
 const std::string FAC_PIN_LOCK = "SC";
 
 struct UnlockData {
-    UnlockType type;
-    int32_t lockState;
-    int32_t result;
-    int32_t remain;
-    int32_t pinRemain;
+    UnlockType type = PIN_TYPE;
+    int32_t lockState = 0;
+    int32_t result = 0;
+    int32_t remain = 0;
+    int32_t pinRemain = 0;
 };
 
 class SimStateHandle : public AppExecFwk::EventHandler {

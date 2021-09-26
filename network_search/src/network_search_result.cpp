@@ -72,15 +72,14 @@ bool NetworkSearchResult::Marshalling(Parcel &parcel) const
 
 NetworkSearchResult *NetworkSearchResult::Unmarshalling(Parcel &parcel)
 {
-    NetworkSearchResult *param = new (std::nothrow) NetworkSearchResult();
+    std::unique_ptr<NetworkSearchResult> param = std::make_unique<NetworkSearchResult>();
     if (param == nullptr) {
         return nullptr;
     }
     if (!param->ReadFromParcel(parcel)) {
-        delete param;
-        param = nullptr;
+        return nullptr;
     }
-    return param;
+    return param.release();
 }
 } // namespace Telephony
 } // namespace OHOS

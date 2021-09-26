@@ -13,13 +13,18 @@
  * limitations under the License.
  */
 
+#include "tel_ril_test.h"
+
 #include <iostream>
-#include "telephony_log_wrapper.h"
+
 #include "core_manager.h"
+#include "telephony_log_wrapper.h"
+
+using namespace testing::ext;
 
 namespace OHOS {
 namespace Telephony {
-enum DiffInterfaceId {
+enum class DiffInterfaceId {
     TEST_GET_RILCM_ICC_CARD_STATUS_TEST = 1,
     TEST_ICC_RILCM_IO_FOR_APP_TEST,
     TEST_GET_RILCM_IMSI_FOR_APP_TEST,
@@ -30,10 +35,16 @@ enum DiffInterfaceId {
     TEST_ENTER_SIM_PIN_TEST,
     TEST_UNLOCK_SIM_PIN_TEST,
     TEST_GET_PIN_INPUT_TIMES_TEST,
+    TEST_SET_RILCM_CELL_INFO_LIST_RATE_TEST,
+    TEST_SET_RILCM_INITIAL_ATTACH_APN_TEST,
+    TEST_SET_RILCM_DATA_PROFILE_TEST,
+    TEST_GET_RILCM_VOICE_REGISTRATION_STATE_TEST,
+    TEST_GET_RILCM_DATA_REGISTRATION_STATE_TEST,
     TEST_ACKNOWLEDGE_RILCM_LAST_INCOMING_GSM_SMS_TEST,
     TEST_SETUP_RILCM_DATA_CALL_TEST,
 
     TEST_DEACTIVATE_RILCM_DATA_CALL_TEST,
+    TEST_SET_BASE_DATA_ALLOWED_TEST,
     TEST_GET_SIGNAL_STRENGTH,
     TEST_CALL_DIAL,
     TEST_HANDUP_CONNECT,
@@ -41,8 +52,6 @@ enum DiffInterfaceId {
     TEST_HOLD_CALL,
     TEST_ACTIVE_CALL,
     TEST_SWAP_CALL,
-    TEST_CURRENT_CALLS,
-    TEST_REJECT_CALL,
     TEST_JOIN_CALL,
     TEST_SPLIT_CALL,
     TEST_GET_CALL_WAIT,
@@ -56,6 +65,10 @@ enum DiffInterfaceId {
     TEST_SEND_DTMF,
     TEST_START_DTMF,
     TEST_STOP_DTMF,
+    TEST_RADIO_LAST_CALL_FAIL_CAUSE,
+    TEST_CURRENT_CALLS,
+    TEST_REJECT_CALL,
+    TEST_SEND_IMS_GSM_SMS,
     TEST_SEND_SMS,
 
     TEST_STORAGE_SMS,
@@ -72,211 +85,55 @@ enum DiffInterfaceId {
     TEST_GET_SELECTION_MOD_FOR_NETWORKS,
     TEST_SET_MODE_AUTOMATIC_NETWORKS,
     TEST_SET_LOCATION_UPDATE_FOR_NETWORKS,
-    TEST_GET_RILCM_VOICE_REGISTRATION_STATE_TEST,
-    TEST_GET_RILCM_DATA_REGISTRATION_STATE_TEST,
     TEST_GET_CURRENT_CELL_INFO,
     TEST_GET_CELL_INFO_LIST,
     TEST_EXIT,
 };
 
-using namespace OHOS;
-using namespace OHOS::Telephony;
-using namespace std;
-
-namespace {
-class TelRilTest {
-public:
-    TelRilTest();
-
-    ~TelRilTest();
-
-    std::shared_ptr<IRilManager> rilManager_ = nullptr;
-
-    void OnInitInterface();
-
-    void OnInitCall();
-
-    void OnInitSms();
-
-    void OnInitSim();
-
-    void OnInitNetwork();
-
-    void OnInitForRegister(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnProcessInput(int32_t what, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestCallGetCurrentCallsStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSimGetSimStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSimIccIoTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSimGetImsiTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSimGetIccIDTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestGetSimLockStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSetSimLockTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestChangeSimPasswordTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestEnterSimPinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestUnlockSimPinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestGetSimPinInputTimesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestNetworkGetRssiTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestRefusedCallTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestGetCallWaitTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSetCallWaitTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestCallHangupTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestCallJoinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestCallSplitTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestCallAnswerTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestCallHoldTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestCallDialTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestCallActiveTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestCallSwapTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestGetClipTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSendDtmfTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestStartDtmfTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestStopDtmfTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSetClipTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestGetCallRestrictionTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSetCallRestrictionTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestNetworkVoiceRegistrationStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestNetworkDataRegistrationStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestGetCallForwardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSetCallForwardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestNetworkOperatorTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSendRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestStorageRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestDeleteRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestUpdateRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSetRilCmSmsCenterAddressTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestGetRilCmSmsCenterAddressTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSetRilCmCellBroadcastTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSmsSendSmsExpectMoreTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSetRadioStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestGetRadioStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestSmsAcknowledgeTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestDataSetupDataCallTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestDataDisableDataCallTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void OnRequestGetNetworkSearchInformationTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void OnRequestGetNetworkSelectionModeTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void OnRequestSetNetworkSelectionModeTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void OnRequestSetNetworkLocationUpdateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void SimTest();
-    void CallTest();
-    void SmsTest();
-
-    const int CID = 1;
-    const int REASON = 2;
-    const int EVENT_3 = 3;
-    const int AUTHTYPE_4 = 4;
-    const int EVENT_5 = 5;
-    const int EVENT_6 = 6;
-    const int TYPE = 7;
-    const int MAXCONNSTIME = 8;
-    const int MAXCONNS = 9;
-    const int WAITTIME = 10;
-    const int EVENT_11 = 11;
-    const int TYPESBITMAP = 12;
-    const int EVENT_13 = 13;
-    const int BEARERBITMAP = 14;
-    const int P3 = 15;
-    const int COMMAND = 192;
-    const int FILEID = 20272;
-    const int AUTHTYPE_1 = -1;
-
-    class DemoHandler : public AppExecFwk::EventHandler {
-    public:
-        explicit DemoHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-            : AppExecFwk::EventHandler(runner)
-        {}
-
-        ~DemoHandler() {}
-
-        void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
-    };
-
-private:
-    using RilManagerAndResponseTestFun = void (TelRilTest::*)(
-        const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    std::map<uint32_t, RilManagerAndResponseTestFun> memberFuncMap_;
-};
+const string GEEERIC_STRING = "1234";
+const string GEEERIC_PHONENUM = "12345678923";
+const int32_t LEN = 4;
+
+static void GtestLog(const string logbuff)
+{
+    cout << "---" << logbuff << "---" << endl;
+    TELEPHONY_LOGD("%{public}s", logbuff.c_str());
+}
+
+void TelRilTest::SetUpTestCase()
+{
+    GtestLog("TelRilTest gtest is start");
+}
+
+void TelRilTest::TearDownTestCase()
+{
+    GtestLog("TelRilTest gtest is end");
+}
+
+void TelRilTest::SetUp() {}
+
+void TelRilTest::TearDown() {}
 
 TelRilTest::TelRilTest()
 {
-    TELEPHONY_LOGD("TelRilTest -->");
     memberFuncMap_[TEST_CURRENT_CALLS] = &TelRilTest::OnRequestCallGetCurrentCallsStatusTest;
 }
 
-TelRilTest::~TelRilTest()
-{
-    TELEPHONY_LOGD("~TelRilTest -->");
-}
+TelRilTest::~TelRilTest() {}
 
 void TelRilTest::OnInitInterface()
 {
     CoreManager::GetInstance().Init();
-    rilManager_ = CoreManager ::GetInstance().getCore(CoreManager::DEFAULT_SLOT_ID)->GetRilManager();
-
+    rilManager_ = CoreManager::GetInstance().getCore(CoreManager::DEFAULT_SLOT_ID)->GetRilManager();
     /* --------------------------------- MODEL ----------------------------- */
     memberFuncMap_[TEST_GET_SIGNAL_STRENGTH] = &TelRilTest::OnRequestNetworkGetRssiTest;
     memberFuncMap_[TEST_SET_POWER_STATE] = &TelRilTest::OnRequestSetRadioStatusTest;
     memberFuncMap_[TEST_GET_POWER_STATE] = &TelRilTest::OnRequestGetRadioStatusTest;
-
     /* --------------------------------- DATA ----------------------------- */
-    memberFuncMap_[TEST_SETUP_RILCM_DATA_CALL_TEST] = &TelRilTest::OnRequestDataSetupDataCallTest;
     memberFuncMap_[TEST_DEACTIVATE_RILCM_DATA_CALL_TEST] = &TelRilTest::OnRequestDataDisableDataCallTest;
-
     OnInitCall();
-
     OnInitSms();
-
     OnInitSim();
-
     OnInitNetwork();
 }
 
@@ -329,7 +186,6 @@ void TelRilTest::OnInitSim()
     memberFuncMap_[TEST_GET_SIM_LOCK_STATUS_TEST] = &TelRilTest::OnRequestGetSimLockStatusTest;
     memberFuncMap_[TEST_SET_SIM_LOCK_TEST] = &TelRilTest::OnRequestSetSimLockTest;
     memberFuncMap_[TEST_GET_CHANGE_SIM_PASSWD_TEST] = &TelRilTest::OnRequestChangeSimPasswordTest;
-    memberFuncMap_[TEST_ENTER_SIM_PIN_TEST] = &TelRilTest::OnRequestEnterSimPinTest;
     memberFuncMap_[TEST_UNLOCK_SIM_PIN_TEST] = &TelRilTest::OnRequestUnlockSimPinTest;
     memberFuncMap_[TEST_GET_PIN_INPUT_TIMES_TEST] = &TelRilTest::OnRequestGetSimPinInputTimesTest;
 }
@@ -350,7 +206,6 @@ void TelRilTest::OnInitNetwork()
 
 void TelRilTest::OnInitForRegister(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    TELEPHONY_LOGD("TelRilTest::OnInitForRegister -->");
     // Register all APIs
     rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_STATE_CHANGED, nullptr);
     rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_IMS_NETWORK_STATE_CHANGED, nullptr);
@@ -383,11 +238,10 @@ void TelRilTest::OnInitForRegister(const std::shared_ptr<AppExecFwk::EventHandle
     rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_REJECT_CALL, nullptr);
 }
 
-void TelRilTest::OnProcessInput(int32_t what, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::OnProcessTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    auto itFunc = memberFuncMap_.find(what);
-    if (itFunc != memberFuncMap_.end()) {
-        auto memberFunc = itFunc->second;
+    for (auto itFunc : memberFuncMap_) {
+        auto memberFunc = itFunc.second;
         if (memberFunc != nullptr) {
             (this->*memberFunc)(handler);
         }
@@ -459,11 +313,7 @@ void TelRilTest::OnRequestGetSimLockStatusTest(const std::shared_ptr<AppExecFwk:
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_GET_LOCK_STATUS);
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
-        std::string fac;
-
-        std::cout << "please enter the fac:";
-        std::cin >> fac;
-
+        std::string fac = GEEERIC_STRING;
         TELEPHONY_LOGD("TelRilTest::%{public}s -->", __func__);
         rilManager_->GetSimLockStatus(fac, event);
         TELEPHONY_LOGD("TelRilTest::%{public}s --> finished", __func__);
@@ -475,17 +325,9 @@ void TelRilTest::OnRequestSetSimLockTest(const std::shared_ptr<AppExecFwk::Event
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_SET_LOCK);
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
-        std::string fac;
-        int32_t mode;
-        std::string code;
-
-        std::cout << "please enter the fac:";
-        std::cin >> fac;
-        std::cout << "please enter the mode:";
-        std::cin >> mode;
-        std::cout << "please enter the pwd:";
-        std::cin >> code;
-
+        std::string fac = GEEERIC_STRING;
+        int mode = 0;
+        std::string code = GEEERIC_STRING;
         TELEPHONY_LOGD("TelRilTest::%{public}s -->", __func__);
         rilManager_->SetSimLock(fac, mode, code, event);
         TELEPHONY_LOGD("TelRilTest::%{public}s --> finished", __func__);
@@ -497,36 +339,11 @@ void TelRilTest::OnRequestChangeSimPasswordTest(const std::shared_ptr<AppExecFwk
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_CHANGE_PASSWD);
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
-        std::string fac;
-        std::string oldPassword;
-        std::string newPassword;
-        int32_t passwordLength = 4;
-
-        std::cout << "please enter the fac:";
-        std::cin >> fac;
-        std::cout << "please enter the oldPassword:";
-        std::cin >> oldPassword;
-        std::cout << "please enter the newPassword:";
-        std::cin >> newPassword;
-
-        TELEPHONY_LOGD("TelRilTest::%{public}s -->", __func__);
+        std::string fac = GEEERIC_STRING;
+        std::string oldPassword = GEEERIC_STRING;
+        std::string newPassword = GEEERIC_STRING;
+        int32_t passwordLength = LEN;
         rilManager_->ChangeSimPassword(fac, oldPassword, newPassword, passwordLength, event);
-        TELEPHONY_LOGD("TelRilTest::%{public}s --> finished", __func__);
-    }
-}
-
-void TelRilTest::OnRequestEnterSimPinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_ENTER_PIN);
-    if (event != nullptr && rilManager_ != nullptr) {
-        event->SetOwner(handler);
-
-        std::string pin;
-        std::cout << "please enter the SIM PIN:";
-        std::cin >> pin;
-
-        TELEPHONY_LOGD("TelRilTest::%{public}s -->", __func__);
-        rilManager_->EnterSimPin(pin, event);
         TELEPHONY_LOGD("TelRilTest::%{public}s --> finished", __func__);
     }
 }
@@ -536,14 +353,8 @@ void TelRilTest::OnRequestUnlockSimPinTest(const std::shared_ptr<AppExecFwk::Eve
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_UNLOCK_PIN);
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
-        std::string puk;
-        std::string pin;
-
-        std::cout << "please enter the SIM PUK:";
-        std::cin >> puk;
-        std::cout << "please enter the SIM PIN:";
-        std::cin >> pin;
-
+        std::string puk = GEEERIC_STRING;
+        std::string pin = GEEERIC_STRING;
         TELEPHONY_LOGD("TelRilTest::%{public}s -->", __func__);
         rilManager_->UnlockSimPin(puk, pin, event);
         TELEPHONY_LOGD("TelRilTest::%{public}s --> finished", __func__);
@@ -555,12 +366,12 @@ void TelRilTest::OnRequestGetSimPinInputTimesTest(const std::shared_ptr<AppExecF
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_PIN_INPUT_TIMES);
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
-
         TELEPHONY_LOGD("TelRilTest::%{public}s -->", __func__);
         rilManager_->GetSimPinInputTimes(event);
         TELEPHONY_LOGD("TelRilTest::%{public}s --> finished", __func__);
     }
 }
+
 /************************************** SIM test func *******************************************/
 
 void TelRilTest::OnRequestNetworkGetRssiTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
@@ -583,15 +394,11 @@ void TelRilTest::OnRequestCallDialTest(const std::shared_ptr<AppExecFwk::EventHa
         TELEPHONY_LOGD("TelRilTest::OnRequestCallDialTest failed!!!!");
         return;
     }
-
-    std::string phoneNum;
-    int32_t clirMode; /* Calling Line Identification Restriction . From TS 27.007 V3.4.0 (2000-03) */
+    int32_t clirMode = 0; /* Calling Line Identification Restriction . From TS 27.007 V3.4.0 (2000-03) */
     event->SetOwner(handler);
-    std::cout << "please enter the phone number:";
-    std::cin >> phoneNum;
     clirMode = 0; // use subscription default value
     TELEPHONY_LOGD("TelRilTest::OnRequestCallDialTest -->");
-    rilManager_->Dial(phoneNum, clirMode, event);
+    rilManager_->Dial(GEEERIC_PHONENUM, clirMode, event);
     TELEPHONY_LOGD(
         "TelRilTest::OnRequestCallDialTest --> "
         "OnRequestCallDialTest finished");
@@ -628,13 +435,9 @@ void TelRilTest::OnRequestSetCallWaitTest(const std::shared_ptr<AppExecFwk::Even
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_CALL_WAIT);
     if (event == nullptr || rilManager_ == nullptr)
         return;
-
     event->SetOwner(handler);
-    int32_t operating;
-
+    int32_t operating = 0;
     TELEPHONY_LOGD("TelRilTest::OnRequestSetCallWaitTest -->");
-    std::cout << "Please input set value[0:disable 1:enable]: " << endl;
-    std::cin >> operating;
     rilManager_->SetCallWait(operating, event);
     TELEPHONY_LOGD(
         "TelRilTest::OnRequestSetCallWaitTest --> "
@@ -758,15 +561,9 @@ void TelRilTest::OnRequestSendRilCmSmsTest(const std::shared_ptr<AppExecFwk::Eve
 void TelRilTest::OnRequestStorageRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_STORAGE_SMS);
-    int32_t status;
-    std::cout << "Please input status:" << std::endl;
-    std::cin >> status;
-    std::cout << "Please input smsc:" << std::endl;
-    string smsc;
-    std::cin >> smsc;
-    std::cout << "Please input pdu:" << std::endl;
-    string pdu;
-    std::cin >> pdu;
+    int32_t status = 0;
+    string smsc = GEEERIC_STRING;
+    string pdu = GEEERIC_STRING;
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGD("TelRilTest::OnRequestStorageRilCmSmsTest -->");
@@ -778,10 +575,7 @@ void TelRilTest::OnRequestStorageRilCmSmsTest(const std::shared_ptr<AppExecFwk::
 void TelRilTest::OnRequestDeleteRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_DELETE_SMS);
-    int32_t gsmIndex;
-
-    std::cout << "Please input gsmIndex: " << endl;
-    std::cin >> gsmIndex;
+    int32_t gsmIndex = 0;
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGD("TelRilTest::OnRequestDeleteRilCmSmsTest -->");
@@ -793,13 +587,8 @@ void TelRilTest::OnRequestDeleteRilCmSmsTest(const std::shared_ptr<AppExecFwk::E
 void TelRilTest::OnRequestUpdateRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_UPDATE_SMS);
-    int32_t gsmIndex;
-    std::string pdu;
-
-    std::cout << "Please input gsmIndex: " << endl;
-    std::cin >> gsmIndex;
-    std::cout << "Please input pdu: " << endl;
-    std::cin >> pdu;
+    int32_t gsmIndex = 0;
+    std::string pdu = GEEERIC_STRING;
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGD("TelRilTest::OnRequestUpdateRilCmSmsTest -->");
@@ -811,13 +600,8 @@ void TelRilTest::OnRequestUpdateRilCmSmsTest(const std::shared_ptr<AppExecFwk::E
 void TelRilTest::OnRequestSetRilCmSmsCenterAddressTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_SMS_CENTER_ADDRESS);
-    int32_t tosca;
-    std::string address;
-
-    std::cout << "Please input tosca: " << endl;
-    std::cin >> tosca;
-    std::cout << "Please input address: " << endl;
-    std::cin >> address;
+    int32_t tosca = 0;
+    std::string address = GEEERIC_STRING;
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGD("TelRilTest::OnRequestSetRilCmSmsCenterAddressTest -->");
@@ -844,12 +628,9 @@ void TelRilTest::OnRequestGetRilCmSmsCenterAddressTest(const std::shared_ptr<App
 void TelRilTest::OnRequestSetRilCmCellBroadcastTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_CELL_BROADCAST);
-    int32_t mode;
-    std::string idList;
-    std::string dcsList;
-
-    std::cout << "Please input mode: " << endl;
-    std::cin >> mode;
+    int32_t mode = 0;
+    std::string idList = GEEERIC_STRING;
+    std::string dcsList = GEEERIC_STRING;
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGD("TelRilTest::SetRilCmCellBroadcastTest -->");
@@ -877,12 +658,7 @@ void TelRilTest::OnRequestSetRadioStatusTest(const std::shared_ptr<AppExecFwk::E
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGD("TelRilTest::OnRequestSetRadioStatusTest -->");
-        int radioStatus = -1;
-
-        std::cout << "please enter the new radioStatus:";
-        std::cin >> radioStatus;
-
-        rilManager_->SetRadioStatus(radioStatus, 0, event);
+        rilManager_->SetRadioStatus(0, 0, event);
         TELEPHONY_LOGD("TelRilTest::OnRequestSetRadioStatusTest --> OnRequestSetRadioStatusTest finished");
     }
 }
@@ -911,20 +687,6 @@ void TelRilTest::OnRequestSmsAcknowledgeTest(const std::shared_ptr<AppExecFwk::E
     }
 }
 
-void TelRilTest::OnRequestDataSetupDataCallTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    auto event = AppExecFwk::InnerEvent::Get(EVENT_11);
-    if (event != nullptr && rilManager_ != nullptr) {
-        event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestCallSetupDataCallTest -->");
-        CellularDataProfile dataProfile(0, "cmnet", "IPV4V6", AUTHTYPE_1, "", "", "IPV4V6");
-        rilManager_->ActivatePdpContext(REASON, dataProfile, false, true, event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestDataSetupDataCallTest -->"
-            "OnRequestDataSetupDataCallTest finished");
-    }
-}
-
 void TelRilTest::OnRequestDataDisableDataCallTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
@@ -943,9 +705,9 @@ void TelRilTest::OnRequestGetNetworkSearchInformationTest(const std::shared_ptr<
     auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestGetAvailableNetworksTest -->");
+        TELEPHONY_LOGD("TelRilTest::OnRequestGetAvailableNetworkTest -->");
         rilManager_->GetNetworkSearchInformation(event);
-        TELEPHONY_LOGD("TelRilTest::OnRequestGetAvailableNetworksTest -->finished");
+        TELEPHONY_LOGD("TelRilTest::OnRequestGetAvailableNetworkTest -->finished");
     }
 }
 
@@ -968,7 +730,7 @@ void TelRilTest::OnRequestSetNetworkSelectionModeTest(const std::shared_ptr<AppE
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGD("TelRilTest::OnRequestSetNetworkSelectionModeTest -->");
-        rilManager_->SetNetworkSelectionMode(1, "46001", event);
+        rilManager_->SetNetworkSelectionMode(0, "46001", event);
         TELEPHONY_LOGD(
             "TelRilTest::OnRequestSetNetworkSelectionModeTest --> "
             "OnRequestSetNetworkSelectionModeTest finished");
@@ -990,17 +752,8 @@ void TelRilTest::OnRequestSetNetworkLocationUpdateTest(const std::shared_ptr<App
 
 void TelRilTest::OnRequestCallJoinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    int32_t callType; /* call type
-                       * 0: Voice call
-                       * 1: Video call: send one-way video, two-way voice
-                       * 2: Video call: one-way receiving video, two-way voice
-                       * 3: Video call: two-way video, two-way voice
-                       */
-
+    int32_t callType = 0;
     TELEPHONY_LOGD("RilUnitTest::OnRequestCallJoinTest -->");
-    std::cout << "please enter the call type:";
-    std::cin >> callType;
-
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_JOIN_CALL);
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
@@ -1014,22 +767,9 @@ void TelRilTest::OnRequestCallJoinTest(const std::shared_ptr<AppExecFwk::EventHa
 
 void TelRilTest::OnRequestCallSplitTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    int32_t nThCall;
-    int32_t callType; /* call type
-                       * 0: Voice call
-                       * 1: Video call: send one-way video, two-way voice
-                       * 2: Video call: one-way receiving video, two-way voice
-                       * 3: Video call: two-way video, two-way voice
-                       */
-
+    int32_t nThCall = 0;
+    int32_t callType = 0;
     TELEPHONY_LOGD("RilUnitTest::OnRequestCallSplitTest -->");
-
-    std::cout << "please enter the call split number:";
-    std::cin >> nThCall;
-
-    std::cout << "please enter the call type:";
-    std::cin >> callType;
-
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SPLIT_CALL);
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
@@ -1043,13 +783,8 @@ void TelRilTest::OnRequestCallSplitTest(const std::shared_ptr<AppExecFwk::EventH
 
 void TelRilTest::OnRequestGetCallForwardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    int32_t reason;
-
+    int32_t reason = 0;
     TELEPHONY_LOGD("RilUnitTest::OnRequestGetCallForwardTest -->");
-
-    std::cout << "please enter Get Call Forward reason<0-5>:";
-    std::cin >> reason;
-
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_CALL_FORWARD);
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
@@ -1061,93 +796,13 @@ void TelRilTest::OnRequestGetCallForwardTest(const std::shared_ptr<AppExecFwk::E
     }
 }
 
-void DiffParamType(int32_t loopFlag, int32_t reasonType)
-{
-    const int32_t MIN_TYPE = 0;
-    const int32_t MAX_TYPE = 4;
-    while (loopFlag) {
-        cout << "0: unconditional" << endl;
-        cout << "1: mobile busy" << endl;
-        cout << "2: no reply" << endl;
-        cout << "3: not reachable" << endl;
-        cout << "4: all call forwarding" << endl;
-        cout << "5: all conditional call forwarding" << endl;
-        std::cout << "please select call forward reason type: ";
-        std::cin >> reasonType;
-        if (reasonType < MIN_TYPE || reasonType > MAX_TYPE) {
-            std::cout << "select error, please retry!" << endl;
-            continue;
-        }
-        break;
-    }
-}
-
-void DiffParamMode(int32_t loopFlag, int32_t mode)
-{
-    const int32_t MIN_MODE = 0;
-    const int32_t MAX_MODE = 4;
-    const int32_t QUERY_STATUS = 2;
-    while (loopFlag) {
-        cout << "0: disable" << endl;
-        cout << "1: enable" << endl; //  "2: query status"
-        cout << "3: registration" << endl;
-        cout << "4: erasure" << endl;
-        std::cout << "please select call forward mode type: ";
-        std::cin >> mode;
-        if (mode < MIN_MODE || mode > MAX_MODE) {
-            std::cout << "select error, please retry!" << endl;
-            continue;
-        }
-        if (mode == QUERY_STATUS) {
-            std::cout << "select error, mode 2 is query status please retry!" << endl;
-            continue;
-        }
-        break;
-    }
-}
-
-void DiffParamClassx(int32_t loopFlag, int32_t classx)
-{
-    const int32_t MIN_CLASSX = 1;
-    const int32_t MAX_CLASSX = 16;
-    while (loopFlag) {
-        cout << "1: voice" << endl;
-        cout << "2: data" << endl;
-        cout << "4: fax" << endl;
-        cout << "8: short message service" << endl;
-        cout << "16: data circuit sync" << endl;
-        std::cout << "please select call forward class type: ";
-        std::cin >> classx;
-        if (classx < MIN_CLASSX || classx > MAX_CLASSX) {
-            std::cout << "select error, please retry!" << endl;
-            continue;
-        }
-        break;
-    }
-}
-
 void TelRilTest::OnRequestSetCallForwardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     int32_t mode = 0;
     int32_t reasonType = 0;
-    int32_t classx = 0; /* call type
-                         * 0: Voice call
-                         * 1: Video call: send one-way video, two-way voice
-                         * 2: Video call: one-way receiving video, two-way voice
-                         * 3: Video call: two-way video, two-way voice
-                         */
-    std::string phoneNum;
-    int32_t loopFlag = true;
-
+    int32_t classx = 0;
+    std::string phoneNum = GEEERIC_STRING;
     TELEPHONY_LOGD("RilUnitTest::OnRequestSetCallForwardTest -->");
-    DiffParamType(loopFlag, reasonType);
-    DiffParamMode(loopFlag, mode);
-
-    std::cout << "please enter the phone number:";
-    std::cin >> phoneNum;
-
-    DiffParamClassx(loopFlag, classx);
-
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SPLIT_CALL);
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
@@ -1161,14 +816,12 @@ void TelRilTest::OnRequestSetCallForwardTest(const std::shared_ptr<AppExecFwk::E
 
 void TelRilTest::OnRequestGetClipTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    TELEPHONY_LOGI("RilUnitTest::OnRequestGetClipTest -->");
-
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_CALL_CLIP);
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::OnRequestGetClipTest -->");
+        TELEPHONY_LOGD("TelRilTest::OnRequestGetClipTest -->");
         rilManager_->GetClip(event);
-        TELEPHONY_LOGI(
+        TELEPHONY_LOGD(
             "TelRilTest::OnRequestGetClipTest --> "
             "OnRequestGetClipTest finished");
     }
@@ -1178,11 +831,9 @@ void TelRilTest::OnRequestSetClipTest(const std::shared_ptr<AppExecFwk::EventHan
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_CALL_CLIP);
     if (event != nullptr && rilManager_ != nullptr) {
-        int32_t action;
+        int32_t action = 0;
         event->SetOwner(handler);
         TELEPHONY_LOGD("TelRilTest::OnRequestSetClipTest -->");
-        std::cout << "please input call set clip action: ";
-        std::cin >> action;
         rilManager_->SetClip(action, event);
         TELEPHONY_LOGD(
             "TelRilTest::OnRequestSetClipTest --> "
@@ -1207,11 +858,9 @@ void TelRilTest::OnRequestSetCallRestrictionTest(const std::shared_ptr<AppExecFw
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_CALL_RESTRICTION);
     if (event != nullptr && rilManager_ != nullptr) {
-        int32_t action;
+        int32_t action = 0;
         event->SetOwner(handler);
         TELEPHONY_LOGD("TelRilTest::OnRequestSetCallRestrictionTest -->");
-        std::cout << "please input call set clir action: ";
-        std::cin >> action;
         rilManager_->SetClip(action, event);
         TELEPHONY_LOGD(
             "TelRilTest::OnRequestSetCallRestrictionTest --> "
@@ -1263,137 +912,34 @@ void TelRilTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
     }
 }
 
-void Promote()
+HWTEST_F(TelRilTest, Telephony_TelRil_ALLAPi_0101, Function | MediumTest | Level3)
 {
-    cout << "########################### TEL RIL TEST ######################" << endl;
-    cout << "usage:" << endl;
-
-    cout << TEST_SET_POWER_STATE << " --> OnRequestSetRadioStatusTest" << endl;
-    cout << TEST_GET_POWER_STATE << " --> OnRequestGetRadioStatusTest" << endl;
-
-    cout << TEST_EXIT << "--> Exit" << endl << endl; // exit
-}
-
-void SimTest()
-{
-    /*-----------------------------------------------SIM-------------------------------------*/
-    cout << "please input a cmd num: " << endl;
-    cout << TEST_GET_RILCM_ICC_CARD_STATUS_TEST << "--> OnRequestSimGetSimStatusTest" << endl; // pass
-    cout << TEST_ICC_RILCM_IO_FOR_APP_TEST << "--> OnRequestSimIccIoTest" << endl;
-    cout << TEST_GET_RILCM_IMSI_FOR_APP_TEST << "--> OnRequestSimGetImsiTest" << endl; // pass
-    cout << TEST_GET_ICCID_TEST << "--> OnRequestSimGetIccIDTest" << endl; // pass
-    cout << TEST_GET_SIM_LOCK_STATUS_TEST << "--> OnRequestGetSimLockStatusTest" << endl; // pass
-    cout << TEST_SET_SIM_LOCK_TEST << "--> OnRequestSetSimLockTest" << endl; // pass
-    cout << TEST_GET_CHANGE_SIM_PASSWD_TEST << "--> OnRequestChangeSimPasswordTest" << endl; // pass
-    cout << TEST_ENTER_SIM_PIN_TEST << "--> OnRequestEnterSimPinTest" << endl; // pass
-    cout << TEST_UNLOCK_SIM_PIN_TEST << "--> OnRequestUnlockSimPinTest" << endl; // pass
-    cout << TEST_GET_PIN_INPUT_TIMES_TEST << "--> OnRequestGetSimPinInputTimesTest" << endl; // pass
-
-    cout << TEST_ACKNOWLEDGE_RILCM_LAST_INCOMING_GSM_SMS_TEST << "--> OnRequestSmsAcknowledgeTest" << endl;
-    cout << TEST_SETUP_RILCM_DATA_CALL_TEST << "--> OnRequestDataSetupDataCallTest" << endl;
-    cout << TEST_DEACTIVATE_RILCM_DATA_CALL_TEST << "--> OnRequestDataDisableDataCallTest" << endl; // pass
-    cout << TEST_GET_SIGNAL_STRENGTH << "--> OnRequestNetworkGetRssiTest" << endl;
-}
-
-void CallTest()
-{
-    /* --------------------------------- CALL -------------------------- */
-    cout << TEST_CALL_DIAL << " --> OnRequestCallDialTest" << endl;
-    cout << TEST_HANDUP_CONNECT << " --> OnRequestCallHangupTest" << endl;
-    cout << TEST_ACCEPT_CALL << "--> OnRequestCallAnswerTest" << endl;
-    cout << TEST_CURRENT_CALLS << "--> OnRequestCallGetCurrentCallsStatusTest" << endl;
-    cout << TEST_REJECT_CALL << "--> OnRequestRefusedCallTest" << endl;
-    cout << TEST_JOIN_CALL << "--> OnRequestCallJoinTest" << endl;
-    cout << TEST_SPLIT_CALL << "--> OnRequestCallSplitTest" << endl;
-    cout << TEST_GET_CALL_WAIT << " --> OnRequestGetCallWaitTest" << endl;
-    cout << TEST_SET_CALL_WAIT << " --> OnRequestSetCallWaitTest" << endl;
-    cout << TEST_GET_CALL_FORWARD << " --> OnRequestGetCallForwardTest" << endl;
-    cout << TEST_SET_CALL_FORWARD << " --> OnRequestSetCallForwardTest" << endl;
-    cout << TEST_GET_CALL_DEAL_CLIP << " --> OnRequestGetClipTest" << endl;
-    cout << TEST_SET_CALL_CLIP << " --> OnRequestSetClipTest" << endl;
-    cout << TEST_GET_CALL_RESTRICTION << " --> OnRequestGetCallRestrictionTest" << endl;
-    cout << TEST_SET_CALL_RESTRICTION << " --> OnRequestSetCallRestrictionTest" << endl;
-    cout << TEST_SEND_DTMF << " --> OnRequestSendDtmfTest" << endl;
-    cout << TEST_START_DTMF << " --> OnRequestStartDtmfTest" << endl;
-    cout << TEST_STOP_DTMF << " --> OnRequestStopDtmfTest" << endl;
-}
-
-void SmsTest()
-{
-    /* --------------------------------- SMS -------------------------- */
-    cout << TEST_SEND_SMS << "--> OnRequestSendRilCmSmsTest"
-         << endl; // failed, Sim not inserted, radioResponseInfo->error : 2
-    cout << TEST_STORAGE_SMS << "--> OnRequestStorageRilCmSmsTest" << endl;
-    cout << TEST_DELETE_SMS << "--> OnRequestDeleteRilCmSmsTest" << endl;
-    cout << TEST_UPDATE_SMS << "--> OnRequestUpdateRilCmSmsTest" << endl;
-    cout << TEST_SET_SMS_CENTER_ADDRESS << "--> OnRequestSetRilCmSmsCenterAddressTest" << endl;
-    cout << TEST_GET_SMS_CENTER_ADDRESS << "--> OnRequestGetRilCmSmsCenterAddressTest" << endl;
-    cout << TEST_SET_CELL_BROADCAST << "--> OnRequestSetRilCmCellBroadcastTest" << endl;
-    cout << TEST_SEND_SMS_EXPECT_MORE << " --> OnRequestSmsSendSmsExpectMoreTest"
-         << endl; // failed, Sim not inserted, radioResponseInfo->error : 2
-    cout << TEST_OPERATOR << " --> OnRequestNetworkOperatorTest"
-         << endl; // failed, Invalid response: nullptr, radioResponseInfo->error : 2
-    cout << TEST_GET_NETWORKS_TO_USE << "--> OnRequestGetNetworkSearchInformationTest"
-         << endl; // failed, Invalid response: nullptr, radioResponseInfo->error : 2
-    cout << TEST_GET_SELECTION_MOD_FOR_NETWORKS << "--> OnRequestGetNetworkSelectionModeTest"
-         << endl; // failed, Invalid response: nullptr, radioResponseInfo->error : 2
-    cout << TEST_SET_MODE_AUTOMATIC_NETWORKS << "--> OnRequestSetNetworkSelectionModeTest"
-         << endl; // failed, Invalid response: nullptr, radioResponseInfo->error : 2
-    cout << TEST_SET_LOCATION_UPDATE_FOR_NETWORKS << "--> OnRequestSetNetworkLocationUpdateTest"
-         << endl; // failed, Invalid response: nullptr, radioResponseInfo->error : 2
-    cout << TEST_GET_RILCM_VOICE_REGISTRATION_STATE_TEST << "--> OnRequestNetworkVoiceRegistrationStateTest"
-         << endl; // pass
-    cout << TEST_GET_RILCM_DATA_REGISTRATION_STATE_TEST << "--> OnRequestNetworkDataRegistrationStateTest"
-         << endl; // pass
-}
-} // namespace
-} // namespace Telephony
-} // namespace OHOS
-
-using namespace OHOS;
-using namespace OHOS::Telephony;
-int main()
-{
-    std::unique_ptr<TelRilTest> rilManagerAndResponseTest;
-    std::shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    std::shared_ptr<TelRilTest::DemoHandler> demohandler;
+    shared_ptr<AppExecFwk::EventRunner> eventRunner;
+    shared_ptr<TelRilTest::DemoHandler> demohandler;
     TELEPHONY_LOGD("TelRilTest::main function entry -->");
-    rilManagerAndResponseTest = std::make_unique<TelRilTest>();
-    if (rilManagerAndResponseTest != nullptr) {
-        rilManagerAndResponseTest->OnInitInterface();
-    }
-    if (rilManagerAndResponseTest->rilManager_ == nullptr) {
+    OnInitInterface();
+    if (rilManager_ == nullptr) {
         TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return -1;
+        return;
     }
     TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
     eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
     if (eventRunner == nullptr) {
         TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return -1;
+        return;
     }
     TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
     demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
     if (demohandler == nullptr) {
         TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return -1;
+        return;
     }
     TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    rilManagerAndResponseTest->OnInitForRegister(demohandler);
+    OnInitForRegister(demohandler);
     TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
     eventRunner->Run();
-    int32_t what = 1;
-    while (what) {
-        Promote();
-        SimTest();
-        CallTest();
-        SmsTest();
-        cin >> what;
-        cout << "" << endl;
-        if (what == TEST_EXIT) {
-            break; // test end exit
-        }
-        rilManagerAndResponseTest->OnProcessInput(what, demohandler);
-    }
-    return 0;
+    OnProcessTest(demohandler);
+    return;
 }
+} // namespace Telephony
+} // namespace OHOS
