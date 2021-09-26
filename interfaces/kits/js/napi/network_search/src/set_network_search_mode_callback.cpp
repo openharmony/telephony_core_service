@@ -25,6 +25,10 @@ SetNetworkSearchModeCallback::SetNetworkSearchModeCallback(SetSelectModeContext 
 
 void SetNetworkSearchModeCallback::OnSetNetworkModeCallback(const bool setResult, const int32_t errorCode)
 {
+    if (asyncContext_ == nullptr) {
+        TELEPHONY_LOGE("OnSetNetworkModeCallback context nullptr");
+        return;
+    }
     TELEPHONY_LOGI("OnSetNetworkModeCallback setResult = %{public}d ,errorCode = %{public}d", setResult, errorCode);
     std::unique_lock<std::mutex> callbackLock(asyncContext_->callbackMutex);
     asyncContext_->setResult = setResult;

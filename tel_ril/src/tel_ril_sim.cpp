@@ -550,8 +550,8 @@ void TelRilSim::RequestSimIO(int32_t command, int32_t fileId, int32_t p1, int32_
             TELEPHONY_LOGE("TelRilSim RequestSimIO::telRilRequest is nullptr");
             return;
         }
-        MessageParcel wData;
-        SimIoRequestInfo iccIoRequestInfo;
+        MessageParcel wData = {};
+        SimIoRequestInfo iccIoRequestInfo = {};
         iccIoRequestInfo.serial = telRilRequest->serialId_;
         iccIoRequestInfo.command = command;
         iccIoRequestInfo.fileId = fileId;
@@ -561,9 +561,9 @@ void TelRilSim::RequestSimIO(int32_t command, int32_t fileId, int32_t p1, int32_
         iccIoRequestInfo.data = ChangeNullToEmptyString(data);
         iccIoRequestInfo.path = ChangeNullToEmptyString(path);
         iccIoRequestInfo.Marshalling(wData);
-        MessageParcel reply;
+        MessageParcel reply = {};
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_SIM_IO, wData, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_SIM_IO, wData, reply, option);
         TELEPHONY_LOGD("RequestSimIO --> SendBufferEvent(HREQ_SIM_IO, wData) return ID: %{public}d", ret);
     } else {
         TELEPHONY_LOGE("ERROR : RequestSimIO --> cellularRadio_ == nullptr !!!");
@@ -579,7 +579,7 @@ void TelRilSim::GetImsi(const AppExecFwk::InnerEvent::Pointer &result)
             return;
         }
 
-        MessageParcel data;
+        MessageParcel data = {};
         data.WriteInt32(telRilRequest->serialId_);
 
         int32_t ret = SendBufferEvent(HREQ_SIM_GET_IMSI, data);
@@ -598,7 +598,7 @@ void TelRilSim::GetIccID(const AppExecFwk::InnerEvent::Pointer &result)
             return;
         }
 
-        MessageParcel data;
+        MessageParcel data = {};
         data.WriteInt32(telRilRequest->serialId_);
 
         int32_t ret = SendBufferEvent(HREQ_SIM_GET_ICCID, data);
@@ -616,17 +616,17 @@ void TelRilSim::GetSimLockStatus(std::string fac, const AppExecFwk::InnerEvent::
             TELEPHONY_LOGE("TelRilSim GetSimLockStatus::telRilRequest is nullptr");
             return;
         }
-        int mode = 2;
 
-        MessageParcel wData;
-        SimLockInfo simLockInfo;
+        const int32_t MODE = 2;
+        MessageParcel wData = {};
+        SimLockInfo simLockInfo = {};
         simLockInfo.serial = telRilRequest->serialId_;
         simLockInfo.fac = ChangeNullToEmptyString(fac);
-        simLockInfo.mode = mode;
+        simLockInfo.mode = MODE;
         simLockInfo.Marshalling(wData);
-        MessageParcel reply;
+        MessageParcel reply = {};
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_SIM_GET_LOCK_STATUS, wData, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_SIM_GET_LOCK_STATUS, wData, reply, option);
         TELEPHONY_LOGD(
             "GetSimLockStatus --> SendBufferEvent(HREQ_SIM_GET_LOCK_STATUS, wData) return ID: %{public}d", ret);
     } else {
@@ -643,16 +643,16 @@ void TelRilSim::SetSimLock(
             TELEPHONY_LOGE("TelRilSim SetSimLock:t:elRilRequest is nullptr");
             return;
         }
-        MessageParcel wData;
-        SimLockInfo simLockInfo;
+        MessageParcel wData = {};
+        SimLockInfo simLockInfo = {};
         simLockInfo.serial = telRilRequest->serialId_;
         simLockInfo.fac = ChangeNullToEmptyString(fac);
         simLockInfo.mode = mode;
         simLockInfo.passwd = ChangeNullToEmptyString(passwd);
         simLockInfo.Marshalling(wData);
-        MessageParcel reply;
+        MessageParcel reply = {};
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_SIM_SET_LOCK, wData, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_SIM_SET_LOCK, wData, reply, option);
         TELEPHONY_LOGD("SetSimLock --> SendBufferEvent(HREQ_SIM_SET_LOCK, wData) return ID: %{public}d", ret);
     } else {
         TELEPHONY_LOGE("ERROR : HREQ_SIM_SET_LOCK --> cellularRadio_ == nullptr !!!");
@@ -665,20 +665,20 @@ void TelRilSim::ChangeSimPassword(std::string fac, std::string oldPassword, std:
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_CHANGE_PASSWD, response);
         if (telRilRequest == nullptr) {
-            TELEPHONY_LOGE("TelRilSim ChangeSimPassword::telRilRequest is nullptr");
+            TELEPHONY_LOGE("TelRilSim ChangeSimPwd::telRilRequest is nullptr");
             return;
         }
-        MessageParcel wData;
-        SimPasswordInfo simPasswordInfo;
+        MessageParcel wData = {};
+        SimPasswordInfo simPasswordInfo = {};
         simPasswordInfo.serial = telRilRequest->serialId_;
         simPasswordInfo.fac = ChangeNullToEmptyString(fac);
         simPasswordInfo.oldPassword = ChangeNullToEmptyString(oldPassword);
         simPasswordInfo.newPassword = ChangeNullToEmptyString(newPassword);
         simPasswordInfo.passwordLength = passwordLength;
         simPasswordInfo.Marshalling(wData);
-        MessageParcel reply;
+        MessageParcel reply = {};
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_SIM_CHANGE_PASSWD, wData, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_SIM_CHANGE_PASSWD, wData, reply, option);
         TELEPHONY_LOGD("SendBufferEvent return ID: %{public}d", ret);
     } else {
         TELEPHONY_LOGE("ERROR : HREQ_SIM_CHANGE_PASSWD --> cellularRadio_ == nullptr !!!");
@@ -693,12 +693,12 @@ void TelRilSim::EnterSimPin(std::string pin, const AppExecFwk::InnerEvent::Point
             TELEPHONY_LOGE("TelRilSim EnterSimPin::telRilRequest is nullptr");
             return;
         }
-        MessageParcel data;
+        MessageParcel data = {};
         data.WriteInt32(telRilRequest->serialId_);
         data.WriteCString(pin.c_str());
-        MessageParcel reply;
+        MessageParcel reply = {};
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_SIM_ENTER_PIN, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_SIM_ENTER_PIN, data, reply, option);
         TELEPHONY_LOGD("EnterSimPin --> SendBufferEvent(HREQ_SIM_ENTER_PIN, wData) return ID: %{public}d", ret);
     } else {
         TELEPHONY_LOGE("ERROR : HREQ_SIM_ENTER_PIN --> cellularRadio_ == nullptr !!!");
@@ -713,13 +713,13 @@ void TelRilSim::UnlockSimPin(std::string puk, std::string pin, const AppExecFwk:
             TELEPHONY_LOGE("TelRilSim UnlockSimPin::telRilRequest is nullptr");
             return;
         }
-        MessageParcel data;
+        MessageParcel data = {};
         data.WriteInt32(telRilRequest->serialId_);
         data.WriteCString(puk.c_str());
         data.WriteCString(pin.c_str());
-        MessageParcel reply;
+        MessageParcel reply = {};
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_SIM_UNLOCK_PIN, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_SIM_UNLOCK_PIN, data, reply, option);
         TELEPHONY_LOGD("UnlockSimPin --> SendBufferEvent(HREQ_SIM_UNLOCK_PIN, wData) return ID: %{public}d", ret);
     } else {
         TELEPHONY_LOGE("ERROR : HREQ_SIM_UNLOCK_PIN --> cellularRadio_ == nullptr !!!");

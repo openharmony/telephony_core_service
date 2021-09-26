@@ -25,28 +25,20 @@ constexpr int32_t GSM_RXLEV_MAXIMUM = 63;
 constexpr int32_t GSM_RSSI_INVALID = -110;
 constexpr int32_t CDMA_RSSI_MINIMUM = 0;
 constexpr int32_t CDMA_RSSI_INVALID = -120;
-constexpr int32_t LTE_RSRP_MINIMUM = 20;
-constexpr int32_t LTE_RSRP_MAXIMUM = 97;
+constexpr int32_t LTE_RSRP_MINIMUM = 0;
+constexpr int32_t LTE_RSRP_MAXIMUM = 99;
 constexpr int32_t LTE_RSSI_INVALID = -121;
-constexpr int32_t WCDMA_RSCP_MINIMUM = 8;
-constexpr int32_t WCDMA_RSCP_MAXIMUM = 96;
+constexpr int32_t WCDMA_RSCP_MINIMUM = 0;
+constexpr int32_t WCDMA_RSCP_MAXIMUM = 99;
 constexpr int32_t WCDMA_RSSI_INVALID = -113;
 constexpr int32_t SIGNAL_LEVEL_INVALID = 0;
 constexpr int32_t SIGNAL_FIVE_BARS = 5;
 constexpr int32_t SIGNAL_FOUR_BARS = 4;
-int32_t GSM_SIGNAL_THRESHOLD_5BAR[] = {-110, -109, -103, -97, -91, -85};
-int32_t CDMA_SIGNAL_THRESHOLD_5BAR[] = {-113, -112, -106, -99, -92, -85};
-int32_t LTE_SIGNAL_THRESHOLD_5BAR[] = {-121, -120, -115, -110, -105, -97};
-int32_t WCDMA_SIGNAL_THRESHOLD_5BAR[] = {-113, -112, -105, -99, -93, -87};
-int32_t GSM_SIGNAL_THRESHOLD_4BAR[] = {-110, -103, -97, -91, -85};
-int32_t CDMA_SIGNAL_THRESHOLD_4BAR[] = {-113, -106, -99, -92, -85};
-int32_t LTE_SIGNAL_THRESHOLD_4BAR[] = {-121, -115, -109, -103, -97};
-int32_t WCDMA_SIGNAL_THRESHOLD_4BAR[] = {-113, -105, -99, -93, -87};
+const int32_t *GSM_SIGNAL_THRESHOLD = SignalInformation::GSM_SIGNAL_THRESHOLD_5BAR;
+const int32_t *CDMA_SIGNAL_THRESHOLD = SignalInformation::CDMA_SIGNAL_THRESHOLD_5BAR;
+const int32_t *LTE_SIGNAL_THRESHOLD = SignalInformation::LTE_SIGNAL_THRESHOLD_5BAR;
+const int32_t *WCDMA_SIGNAL_THRESHOLD = SignalInformation::WCDMA_SIGNAL_THRESHOLD_5BAR;
 int32_t SignalInformation::signalBar_ = SIGNAL_FIVE_BARS;
-int32_t *SignalInformation::gsmSignalThreshold_ = nullptr;
-int32_t *SignalInformation::cdmaSignalThreshold_ = nullptr;
-int32_t *SignalInformation::lteSignalThreshold_ = nullptr;
-int32_t *SignalInformation::wcdmaSignalThreshold_ = nullptr;
 
 SignalInformation::SignalInformation()
 {
@@ -56,16 +48,16 @@ SignalInformation::SignalInformation()
 void SignalInformation::InitSignalBar(const int32_t bar)
 {
     if (bar == SIGNAL_FOUR_BARS) {
-        gsmSignalThreshold_ = GSM_SIGNAL_THRESHOLD_4BAR;
-        cdmaSignalThreshold_ = CDMA_SIGNAL_THRESHOLD_4BAR;
-        lteSignalThreshold_ = LTE_SIGNAL_THRESHOLD_4BAR;
-        wcdmaSignalThreshold_ = WCDMA_SIGNAL_THRESHOLD_4BAR;
+        GSM_SIGNAL_THRESHOLD = SignalInformation::GSM_SIGNAL_THRESHOLD_4BAR;
+        CDMA_SIGNAL_THRESHOLD = SignalInformation::CDMA_SIGNAL_THRESHOLD_4BAR;
+        LTE_SIGNAL_THRESHOLD = SignalInformation::LTE_SIGNAL_THRESHOLD_4BAR;
+        WCDMA_SIGNAL_THRESHOLD = SignalInformation::WCDMA_SIGNAL_THRESHOLD_4BAR;
         signalBar_ = SIGNAL_FOUR_BARS;
     } else {
-        gsmSignalThreshold_ = GSM_SIGNAL_THRESHOLD_5BAR;
-        cdmaSignalThreshold_ = CDMA_SIGNAL_THRESHOLD_5BAR;
-        lteSignalThreshold_ = LTE_SIGNAL_THRESHOLD_5BAR;
-        wcdmaSignalThreshold_ = WCDMA_SIGNAL_THRESHOLD_5BAR;
+        GSM_SIGNAL_THRESHOLD = SignalInformation::GSM_SIGNAL_THRESHOLD_5BAR;
+        CDMA_SIGNAL_THRESHOLD = SignalInformation::CDMA_SIGNAL_THRESHOLD_5BAR;
+        LTE_SIGNAL_THRESHOLD = SignalInformation::LTE_SIGNAL_THRESHOLD_5BAR;
+        WCDMA_SIGNAL_THRESHOLD = SignalInformation::WCDMA_SIGNAL_THRESHOLD_5BAR;
         signalBar_ = SIGNAL_FIVE_BARS;
     }
 }
@@ -108,7 +100,7 @@ int32_t GsmSignalInformation::GetSignalLevel() const
             }
         }
         for (int i = signalBar_; i >= 0; --i) {
-            if (gsmRssi >= gsmSignalThreshold_[i]) {
+            if (gsmRssi >= GSM_SIGNAL_THRESHOLD[i]) {
                 level = i;
                 break;
             }
@@ -203,7 +195,7 @@ int32_t CdmaSignalInformation::GetSignalLevel() const
     int32_t cdmaRssi = GetCdmaRssi();
     int32_t level = SIGNAL_LEVEL_INVALID;
     for (int i = signalBar_; i >= 0; --i) {
-        if (cdmaRssi >= cdmaSignalThreshold_[i]) {
+        if (cdmaRssi >= CDMA_SIGNAL_THRESHOLD[i]) {
             level = i;
             break;
         }
@@ -320,7 +312,7 @@ int32_t LteSignalInformation::GetSignalLevel() const
             }
         }
         for (int i = signalBar_; i >= 0; --i) {
-            if (lteRssi >= lteSignalThreshold_[i]) {
+            if (lteRssi >= LTE_SIGNAL_THRESHOLD[i]) {
                 level = i;
                 break;
             }
@@ -453,7 +445,7 @@ int32_t WcdmaSignalInformation::GetSignalLevel() const
             }
         }
         for (int i = signalBar_; i >= 0; --i) {
-            if (wcdmaRssi >= wcdmaSignalThreshold_[i]) {
+            if (wcdmaRssi >= WCDMA_SIGNAL_THRESHOLD[i]) {
                 level = i;
                 break;
             }

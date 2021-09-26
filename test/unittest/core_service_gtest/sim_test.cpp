@@ -234,7 +234,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetLockState_0100, Function | MediumTest | Level
     } else {
         const std::u16string pin = Str8ToStr16("1234");
         int32_t enable = 1;
-        LockStatusResponse response={0};
+        LockStatusResponse response = {0};
         bool result = SimTest::telephonyService_->SetLockState(pin, enable, response, slotId);
         EXPECT_TRUE(result);
     }
@@ -252,7 +252,7 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPin_0100, Function | MediumTest | Level3)
         SimTest::telephonyService_ = GetProxy();
     } else {
         const std::u16string pin = Str8ToStr16("1234");
-        LockStatusResponse response={0};
+        LockStatusResponse response = {0};
         bool result = SimTest::telephonyService_->UnlockPin(pin, response, slotId);
         EXPECT_TRUE(result);
     }
@@ -271,7 +271,7 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPuk_0100, Function | MediumTest | Level3)
     } else {
         const std::u16string pin = Str8ToStr16("1234");
         const std::u16string puk = Str8ToStr16("42014264");
-        LockStatusResponse response={0};
+        LockStatusResponse response = {0};
         bool result = SimTest::telephonyService_->UnlockPuk(pin, puk, response, slotId);
         EXPECT_TRUE(result);
     }

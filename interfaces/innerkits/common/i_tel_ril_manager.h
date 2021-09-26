@@ -53,7 +53,7 @@ public:
     virtual void GetCallWait(const AppExecFwk::InnerEvent::Pointer &result) = 0;
     virtual void SetCallWait(const int32_t activate, const AppExecFwk::InnerEvent::Pointer &result) = 0;
     virtual void GetCallForward(const int32_t reason, const AppExecFwk::InnerEvent::Pointer &result) = 0;
-    virtual void SetCallForward(const int32_t reason, int32_t mode, std::string number, int32_t classx,
+    virtual void SetCallForward(const int32_t reason, const int32_t mode, std::string number, const int32_t classx,
         const AppExecFwk::InnerEvent::Pointer &result) = 0;
     virtual void GetClip(const AppExecFwk::InnerEvent::Pointer &result) = 0;
     virtual void SetClip(const int32_t action, const AppExecFwk::InnerEvent::Pointer &result) = 0;
