@@ -129,7 +129,6 @@ private:
     const int MCCMNC_LEN = 6;
     const int LOAD_STEP = 1;
     enum SpnType { SPN_INVALID = -1, SPN_COND = 2 };
-    const uint8_t BYTE_NUM = 0xff;
     class ElementaryFilePlLoaded : public IccFileLoaded {
     public:
         ElementaryFilePlLoaded(std::shared_ptr<SimFile> file) : file_(file) {}

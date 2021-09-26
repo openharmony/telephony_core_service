@@ -14,6 +14,7 @@
  */
 
 #include "network_state.h"
+
 #include <securec.h>
 #include <string>
 #include "telephony_log_wrapper.h"
@@ -151,15 +152,14 @@ bool NetworkState::Marshalling(Parcel &parcel) const
 
 NetworkState *NetworkState::Unmarshalling(Parcel &parcel)
 {
-    NetworkState *param = new (std::nothrow) NetworkState();
+    std::unique_ptr<NetworkState> param = std::make_unique<NetworkState>();
     if (param == nullptr) {
         return nullptr;
     }
     if (!param->ReadFromParcel(parcel)) {
-        delete param;
-        param = nullptr;
+        return nullptr;
     }
-    return param;
+    return param.release();
 }
 
 std::string NetworkState::GetLongOperatorName() const

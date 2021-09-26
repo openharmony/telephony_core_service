@@ -75,8 +75,8 @@ void RadioInfo::ProcessGetRadioStatus(const AppExecFwk::InnerEvent::Pointer &eve
             callback->OnNetworkSearchCallback(INetworkSearchCallback::GET_RADIO_STATUS_RESULT, data)) {
             TELEPHONY_LOGD("RadioInfo::ProcessGetRadioStatus callback success");
         }
+        networkSearchManager_->RemoveCallbackFromMap(index);
     }
-    networkSearchManager_->RemoveCallbackFromMap(index);
 }
 
 void RadioInfo::ProcessSetRadioStatus(const AppExecFwk::InnerEvent::Pointer &event) const

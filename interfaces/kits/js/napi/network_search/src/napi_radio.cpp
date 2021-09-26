@@ -1102,7 +1102,7 @@ static napi_module _radioModule = {
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = InitNapiRadioNetwork,
-    .nm_modname = "libtelephony_radio.z.so",
+    .nm_modname = "telephony.radio",
     .nm_priv = ((void *)0),
     .reserved = {0},
 };

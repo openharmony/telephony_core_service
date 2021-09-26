@@ -23,6 +23,10 @@ GetRadioStatusCallback::GetRadioStatusCallback(IsRadioOnContext *context) : asyn
 
 void GetRadioStatusCallback::OnGetRadioStatusCallback(const bool isOn, const int32_t errorCode)
 {
+    if (asyncContext_ == nullptr) {
+        TELEPHONY_LOGE("OnGetRadioStatusCallback context nullptr");
+        return;
+    }
     TELEPHONY_LOGD("OnGetRadioStatusCallback isOn = %{public}d", isOn);
     std::unique_lock<std::mutex> callbackLock(asyncContext_->callbackMutex);
     asyncContext_->resolved = errorCode == HRIL_ERR_SUCCESS;
