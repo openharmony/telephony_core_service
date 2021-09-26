@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 
+#include "network_search_test.h"
+
 #include <unistd.h>
-#include <gtest/gtest.h>
+
 #include <string_ex.h>
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
-#include "core_service_proxy.h"
 #include "network_search_test_callback_stub.h"
 
 namespace OHOS {
@@ -28,19 +29,6 @@ using namespace testing::ext;
 constexpr int SLOT_ID = 0;
 constexpr int WAIT_TIME_SECOND = 10;
 constexpr int WAIT_TIME_SECOND_LONG = 60;
-
-class NetworkSearchTest : public testing::Test {
-public:
-    // execute before first testcase
-    static void SetUpTestCase();
-    void SetUp();
-    void TearDown();
-    static void TearDownTestCase();
-
-    static sptr<ICoreService> GetProxy();
-    static sptr<ICoreService> telephonyService_;
-};
-
 sptr<ICoreService> NetworkSearchTest::telephonyService_ = nullptr;
 void NetworkSearchTest::SetUpTestCase()
 {
@@ -239,12 +227,12 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0100
             "CHINA MOBILE", "CMCC", "46000", NETWORK_PLMN_STATE_AVAILABLE, NETWORK_LTE);
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
         bool result = NetworkSearchTest::telephonyService_->SetNetworkSelectionMode(
-            +SLOT_ID, selectionMode, networkInfo, isUpdateDatabase, callback);
+            SLOT_ID, selectionMode, networkInfo, isUpdateDatabase, callback);
         if (result) {
             callback->WaitFor(WAIT_TIME_SECOND);
             bool syncResult = callback->GetBoolResult();
             std::cout << "TelephonyTestService SetNetworkSelectionMode syncResult:" << syncResult << std::endl;
-            ASSERT_TRUE(syncResult);
+            EXPECT_TRUE(syncResult);
         } else {
             std::cout << "TelephonyTestService SetNetworkSelectionMode return fail" << std::endl;
         }
@@ -269,12 +257,12 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0100
             "CHINA MOBILE", "CMCC", "46000", NETWORK_PLMN_STATE_AVAILABLE, NETWORK_LTE);
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
         bool result = NetworkSearchTest::telephonyService_->SetNetworkSelectionMode(
-            +SLOT_ID, selectionMode, networkInfo, isUpdateDatabase, callback);
+            SLOT_ID, selectionMode, networkInfo, isUpdateDatabase, callback);
         if (result) {
             callback->WaitFor(WAIT_TIME_SECOND);
             bool syncResult = callback->GetBoolResult();
             std::cout << "TelephonyTestService SetNetworkSelectionMode syncResult:" << syncResult << std::endl;
-            ASSERT_TRUE(syncResult);
+            EXPECT_TRUE(syncResult);
         } else {
             std::cout << "TelephonyTestService SetNetworkSelectionMode return fail" << std::endl;
         }
@@ -284,7 +272,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0100
             callback->WaitFor(WAIT_TIME_SECOND);
             int SearchModel = callback->GetSearchModel();
             std::cout << "TelephonyTestService GetNetworkSelectionMode SearchModel:" << SearchModel << std::endl;
-            ASSERT_EQ(SearchModel, 1);
+            EXPECT_EQ(SearchModel, 1);
         } else {
             std::cout << "TelephonyTestService GetNetworkSelectionMode return fail" << std::endl;
         }
@@ -309,12 +297,12 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0200
             "CHINA MOBILE", "CMCC", "46000", NETWORK_PLMN_STATE_AVAILABLE, NETWORK_LTE);
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
         bool result = NetworkSearchTest::telephonyService_->SetNetworkSelectionMode(
-            +SLOT_ID, selectionMode, networkInfo, isUpdateDatabase, callback);
+            SLOT_ID, selectionMode, networkInfo, isUpdateDatabase, callback);
         if (result) {
             callback->WaitFor(WAIT_TIME_SECOND);
             bool syncResult = callback->GetBoolResult();
             std::cout << "TelephonyTestService SetNetworkSelectionMode syncResult:" << syncResult << std::endl;
-            ASSERT_TRUE(syncResult);
+            EXPECT_TRUE(syncResult);
         } else {
             std::cout << "TelephonyTestService SetNetworkSelectionMode return fail" << std::endl;
         }
@@ -339,12 +327,12 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0200
             "CHINA MOBILE", "CMCC", "46000", NETWORK_PLMN_STATE_AVAILABLE, NETWORK_LTE);
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
         bool result = NetworkSearchTest::telephonyService_->SetNetworkSelectionMode(
-            +SLOT_ID, selectionMode, networkInfo, isUpdateDatabase, callback);
+            SLOT_ID, selectionMode, networkInfo, isUpdateDatabase, callback);
         if (result) {
             callback->WaitFor(WAIT_TIME_SECOND);
             bool syncResult = callback->GetBoolResult();
             std::cout << "TelephonyTestService SetNetworkSelectionMode syncResult:" << syncResult << std::endl;
-            ASSERT_TRUE(syncResult);
+            EXPECT_TRUE(syncResult);
         } else {
             std::cout << "TelephonyTestService SetNetworkSelectionMode return fail" << std::endl;
         }
@@ -354,7 +342,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0200
             callback->WaitFor(WAIT_TIME_SECOND);
             int SearchModel = callback->GetSearchModel();
             std::cout << "TelephonyTestService GetNetworkSelectionMode SearchModel:" << SearchModel << std::endl;
-            ASSERT_EQ(SearchModel, 0);
+            EXPECT_EQ(SearchModel, 0);
         } else {
             std::cout << "TelephonyTestService GetNetworkSelectionMode return fail" << std::endl;
         }
@@ -378,7 +366,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0100, Function
             callback->WaitFor(WAIT_TIME_SECOND_LONG);
             bool syncResult = callback->GetBoolResult();
             std::cout << "TelephonyTestService SetRadioState syncResult:" << syncResult << std::endl;
-            ASSERT_TRUE(syncResult);
+            EXPECT_TRUE(syncResult);
         } else {
             std::cout << "TelephonyTestService SetRadioState return fail" << std::endl;
         }
@@ -388,7 +376,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0100, Function
             callback->WaitFor(WAIT_TIME_SECOND_LONG);
             bool syncResult = callback->GetBoolResult();
             std::cout << "TelephonyTestService SetRadioState syncResult:" << syncResult << std::endl;
-            ASSERT_FALSE(syncResult);
+            EXPECT_FALSE(syncResult);
         } else {
             std::cout << "TelephonyTestService SetRadioState return fail" << std::endl;
         }
@@ -413,7 +401,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0200, Function
             callback->WaitFor(WAIT_TIME_SECOND_LONG);
             bool syncResult = callback->GetBoolResult();
             std::cout << "TelephonyTestService SetRadioState syncResult:" << syncResult << std::endl;
-            ASSERT_TRUE(syncResult);
+            EXPECT_TRUE(syncResult);
         } else {
             std::cout << "TelephonyTestService SetRadioState return fail" << std::endl;
         }
@@ -438,7 +426,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0100, Function
             callback->WaitFor(WAIT_TIME_SECOND_LONG);
             bool syncResult = callback->GetBoolResult();
             std::cout << "TelephonyTestService SetRadioState syncResult:" << syncResult << std::endl;
-            ASSERT_TRUE(syncResult);
+            EXPECT_TRUE(syncResult);
         } else {
             std::cout << "TelephonyTestService SetRadioState return fail" << std::endl;
         }
@@ -448,7 +436,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0100, Function
             callback->WaitFor(WAIT_TIME_SECOND);
             bool syncResult = callback->GetBoolResult();
             std::cout << "TelephonyTestService SetRadioState syncResult:" << syncResult << std::endl;
-            ASSERT_TRUE(syncResult);
+            EXPECT_TRUE(syncResult);
         } else {
             std::cout << "TelephonyTestService SetRadioState return fail" << std::endl;
         }

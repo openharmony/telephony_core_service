@@ -30,16 +30,22 @@ ohos_unittest("tel_core_service_gtest") {
 
   include_dirs = [
     "//base/telephony/core_service/common/log/include",
-    "//base/telephony/core_service/interfaces/innerkits/common",
     "//base/telephony/core_service/interfaces/innerkits/proxy",
+    "//base/telephony/core_service/interfaces/innerkits/common",
+    "//base/telephony/core_service/interfaces/innerkits/sms_mms",
+    "//base/telephony/core_service/interfaces/innerkits/network_search",
     "//base/telephony/core_service/interfaces/kits/include",
+    "//base/telephony/core_service/frameworks/native/include",
+    "//base/telephony/core_service/common/sim",
+    "//base/telephony/core_service/common/network_search",
+    "//base/telephony/core_service/common/core",
     "//base/telephony/ril_adapter/interfaces/innerkits",
     "//utils/native/base/include",
   ]
 
   deps = [
     "//base/telephony/core_service:tel_core_service",
-    "//base/telephony/core_service/common:libtelephony_common",
+    "//base/telephony/ril_adapter/hril:hril",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
@@ -52,7 +58,7 @@ ohos_unittest("tel_core_service_gtest") {
     "samgr_L2:samgr_proxy",
   ]
 
-  defines = [ "TELEPHONY_LOG_TAG = \"NetworkSearchGtest\"" ]
+  defines = [ "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"" ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
