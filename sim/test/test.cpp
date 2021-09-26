@@ -115,9 +115,9 @@ static bool TestHasSimCard()
 
 static bool TestGetSimState()
 {
-    const int32_t SIM_READY = 5;
+    const int simReady = 5;
     int32_t result = g_telephonyService->GetSimState(SLOT_ID);
-    string expect = (result == SIM_READY) ? "success" : "fail";
+    string expect = (result == simReady) ? "success" : "fail";
     std::cout << "TelephonyTestService Remote GetSimState result [" << result << "] " << expect << std::endl;
     return true;
 }
@@ -207,15 +207,15 @@ static bool TestGetSimAccountInfo()
 
 static bool TestSetDefaultVoiceSlotId()
 {
-    static int32_t g_oldTestDefaultVoiceSlot = SLOT_ID;
+    static int32_t oldTestDefaultVoiceSlot = SLOT_ID;
     std::cout << "please input Default Voice Slot Id" << std::endl;
     std::cin >> g_testDefaultVoiceSlot;
     bool result = g_telephonyService->SetDefaultVoiceSlotId(g_testDefaultVoiceSlot);
     string expect = result ? "success" : "fail";
     if (!result) {
-        g_testDefaultVoiceSlot = g_oldTestDefaultVoiceSlot;
+        g_testDefaultVoiceSlot = oldTestDefaultVoiceSlot;
     } else {
-        g_oldTestDefaultVoiceSlot = g_testDefaultVoiceSlot;
+        oldTestDefaultVoiceSlot = g_testDefaultVoiceSlot;
     }
     std::cout << "TelephonyTestService Remote SetDefaultVoiceSlotId result [" << result << "] " << expect
               << std::endl;
