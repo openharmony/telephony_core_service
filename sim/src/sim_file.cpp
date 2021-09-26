@@ -285,7 +285,7 @@ void SimFile::ProcessSpnGeneral(const AppExecFwk::InnerEvent::Pointer &event)
         if (hexData != nullptr) {
             unsigned char *byteData = hexData.get();
             unsigned char value = byteData[0];
-            displayConditionOfSpn_ = (BYTE_NUMBER & value);
+            displayConditionOfSpn_ = (BYTE_NUM & value);
         }
         UpdateSPN(iccData);
         std::string spn = ObtainSPN();
@@ -525,7 +525,7 @@ bool SimFile::ProcessGetMwisDone(const AppExecFwk::InnerEvent::Pointer &event)
         return isFileProcessResponse;
     }
     unsigned char value = fileData[0];
-    if ((value & BYTE_NUMBER) == BYTE_NUMBER) {
+    if ((value & BYTE_NUM) == BYTE_NUM) {
         TELEPHONY_LOGI("SimFiles: Uninitialized record MWIS");
         return isFileProcessResponse;
     }

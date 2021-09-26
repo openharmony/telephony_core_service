@@ -17,11 +17,13 @@
 #define I_NETWORK_SEARCH_H
 
 #include <vector>
+
 #include "event_handler.h"
+
+#include "i_network_search_callback.h"
 #include "network_state.h"
 #include "signal_information.h"
 #include "network_search_result.h"
-#include "i_network_search_callback.h"
 
 namespace OHOS {
 namespace Telephony {
