@@ -14,6 +14,7 @@
  */
 
 #include "network_state.h"
+
 #include <securec.h>
 #include <string>
 #include "telephony_log_wrapper.h"
