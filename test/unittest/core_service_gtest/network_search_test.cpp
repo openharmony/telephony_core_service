@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 
+#include "network_search_test.h"
+
 #include <unistd.h>
-#include <gtest/gtest.h>
+
 #include <string_ex.h>
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
-#include "core_service_proxy.h"
 #include "network_search_test_callback_stub.h"
 
 namespace OHOS {
@@ -28,19 +29,6 @@ using namespace testing::ext;
 constexpr int SLOT_ID = 0;
 constexpr int WAIT_TIME_SECOND = 10;
 constexpr int WAIT_TIME_SECOND_LONG = 60;
-
-class NetworkSearchTest : public testing::Test {
-public:
-    // execute before first testcase
-    static void SetUpTestCase();
-    void SetUp();
-    void TearDown();
-    static void TearDownTestCase();
-
-    static sptr<ICoreService> GetProxy();
-    static sptr<ICoreService> telephonyService_;
-};
-
 sptr<ICoreService> NetworkSearchTest::telephonyService_ = nullptr;
 void NetworkSearchTest::SetUpTestCase()
 {

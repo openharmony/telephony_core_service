@@ -89,7 +89,7 @@ void TelRilData::DeactivatePdpContext(int32_t cid, int32_t reason, const AppExec
         uniInfo.arg1 = reason;
         MessageParcel wData;
         uniInfo.Marshalling(wData);
-        int ret = SendBufferEvent(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, wData);
+        int32_t ret = SendBufferEvent(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, wData);
         TELEPHONY_LOGD("SendBufferEvent HREQ_DATA_DEACTIVATE_PDP_CONTEXT return: %{public}d", ret);
     } else {
         TELEPHONY_LOGE("ERROR : cellularRadio_ is nullptr");
@@ -147,11 +147,11 @@ void TelRilData::ActivatePdpContext(int32_t radioTechnology, CellularDataProfile
         dataCallInfo.dataProfileInfo = ChangeDPToHalDataProfile(dataProfile);
         dataCallInfo.roamingAllowed = allowRoaming;
         dataCallInfo.isRoaming = isRoaming;
-        MessageParcel wData;
+        MessageParcel wData = {};
         dataCallInfo.Marshalling(wData);
-        MessageParcel reply;
+        MessageParcel reply = {};
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_DATA_ACTIVATE_PDP_CONTEXT, wData, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_DATA_ACTIVATE_PDP_CONTEXT, wData, reply, option);
         TELEPHONY_LOGD("SendBufferEvent HREQ_DATA_ACTIVATE_PDP_CONTEXT return: %{public}d", ret);
     } else {
         TELEPHONY_LOGE("ERROR : cellularRadio_ == nullptr");
@@ -198,7 +198,7 @@ void TelRilData::PdpContextListUpdated(MessageParcel &data)
     dataCallResultList->ReadFromParcel(data);
     int32_t indicationType = data.ReadInt32();
     if (observerHandler_ != nullptr) {
-        TELEPHONY_LOGD("indicationType:%{public}d", indicationType);
+        (void)indicationType;
         observerHandler_->NotifyObserver(ObserverHandler::RADIO_DATA_CALL_LIST_CHANGED, dataCallResultList);
     }
 }

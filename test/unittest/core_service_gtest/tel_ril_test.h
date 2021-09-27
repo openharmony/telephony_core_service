@@ -12,15 +12,83 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_TEL_RIL_TEST_H
 #define OHOS_TEL_RIL_TEST_H
 
 #include <gtest/gtest.h>
-#include "core_service_proxy.h"
+
 #include "core.h"
+#include "core_service_proxy.h"
+
 namespace OHOS {
 namespace Telephony {
 using namespace std;
+enum class DiffInterfaceId {
+    TEST_GET_RILCM_ICC_CARD_STATUS_TEST = 1,
+    TEST_ICC_RILCM_IO_FOR_APP_TEST,
+    TEST_GET_RILCM_IMSI_FOR_APP_TEST,
+    TEST_GET_ICCID_TEST,
+    TEST_GET_SIM_LOCK_STATUS_TEST,
+    TEST_SET_SIM_LOCK_TEST,
+    TEST_GET_CHANGE_SIM_PASSWD_TEST,
+    TEST_ENTER_SIM_PIN_TEST,
+    TEST_UNLOCK_SIM_PIN_TEST,
+    TEST_GET_PIN_INPUT_TIMES_TEST,
+    TEST_SET_RILCM_CELL_INFO_LIST_RATE_TEST,
+    TEST_SET_RILCM_INITIAL_ATTACH_APN_TEST,
+    TEST_SET_RILCM_DATA_PROFILE_TEST,
+    TEST_GET_RILCM_VOICE_REGISTRATION_STATE_TEST,
+    TEST_GET_RILCM_DATA_REGISTRATION_STATE_TEST,
+    TEST_ACKNOWLEDGE_RILCM_LAST_INCOMING_GSM_SMS_TEST,
+    TEST_SETUP_RILCM_DATA_CALL_TEST,
+
+    TEST_DEACTIVATE_RILCM_DATA_CALL_TEST,
+    TEST_SET_BASE_DATA_ALLOWED_TEST,
+    TEST_GET_SIGNAL_STRENGTH,
+    TEST_CALL_DIAL,
+    TEST_HANDUP_CONNECT,
+    TEST_ACCEPT_CALL,
+    TEST_HOLD_CALL,
+    TEST_ACTIVE_CALL,
+    TEST_SWAP_CALL,
+    TEST_JOIN_CALL,
+    TEST_SPLIT_CALL,
+    TEST_GET_CALL_WAIT,
+    TEST_SET_CALL_WAIT,
+    TEST_GET_CALL_FORWARD,
+    TEST_SET_CALL_FORWARD,
+    TEST_GET_CALL_DEAL_CLIP,
+    TEST_SET_CALL_CLIP,
+    TEST_GET_CALL_RESTRICTION,
+    TEST_SET_CALL_RESTRICTION,
+    TEST_SEND_DTMF,
+    TEST_START_DTMF,
+    TEST_STOP_DTMF,
+    TEST_RADIO_LAST_CALL_FAIL_CAUSE,
+    TEST_CURRENT_CALLS,
+    TEST_REJECT_CALL,
+    TEST_SEND_IMS_GSM_SMS,
+    TEST_SEND_SMS,
+
+    TEST_STORAGE_SMS,
+    TEST_DELETE_SMS,
+    TEST_UPDATE_SMS,
+    TEST_SET_SMS_CENTER_ADDRESS,
+    TEST_GET_SMS_CENTER_ADDRESS,
+    TEST_SET_CELL_BROADCAST,
+    TEST_SEND_SMS_EXPECT_MORE,
+    TEST_SET_POWER_STATE,
+    TEST_GET_POWER_STATE,
+    TEST_OPERATOR,
+    TEST_GET_NETWORKS_TO_USE,
+    TEST_GET_SELECTION_MOD_FOR_NETWORKS,
+    TEST_SET_MODE_AUTOMATIC_NETWORKS,
+    TEST_SET_LOCATION_UPDATE_FOR_NETWORKS,
+    TEST_GET_CURRENT_CELL_INFO,
+    TEST_GET_CELL_INFO_LIST,
+    TEST_EXIT
+};
 
 class TelRilTest : public testing::Test {
 public:
@@ -181,7 +249,7 @@ public:
 private:
     using RilManagerAndResponseTestFun = void (TelRilTest::*)(
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    map<uint32_t, RilManagerAndResponseTestFun> memberFuncMap_;
+    map<DiffInterfaceId, RilManagerAndResponseTestFun> memberFuncMap_;
 };
 } // namespace Telephony
 } // namespace OHOS

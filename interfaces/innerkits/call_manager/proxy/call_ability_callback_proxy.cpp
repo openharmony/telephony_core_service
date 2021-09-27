@@ -28,7 +28,6 @@ CallAbilityCallbackProxy::CallAbilityCallbackProxy(const sptr<IRemoteObject> &im
 
 int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &info)
 {
-    TELEPHONY_LOGE("start");
     MessageParcel dataParcel;
     MessageParcel replyParcel;
     MessageOption option;
@@ -50,7 +49,6 @@ int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &i
         return TELEPHONY_CONNECT_SYSTEM_ABILITY_STUB_FAIL;
     }
     error = replyParcel.ReadInt32();
-    TELEPHONY_LOGE("end");
     return error;
 }
 
