@@ -907,7 +907,7 @@ void TelRilCall::Dial(std::string address, int clirMode, const AppExecFwk::Inner
         return;
     }
 
-    MessageParcel wData;
+    MessageParcel wData = {};
     DialInfo dialInfo;
     dialInfo.address = address;
     dialInfo.clir = clirMode;
@@ -947,12 +947,12 @@ void TelRilCall::Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer 
         return;
     }
 
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data = {};
+    MessageParcel reply = {};
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteInt32(gsmIndex);
-    OHOS::MessageOption option;
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_HANGUP, data, reply, option);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_HANGUP, data, reply, option);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function Hangup failed, error: %{public}d", ret);
     }
@@ -971,7 +971,7 @@ void TelRilCall::Answer(const AppExecFwk::InnerEvent::Pointer &result)
         return;
     }
 
-    int ret = SendInt32Event(HREQ_CALL_ANSWER, telRilRequest->serialId_);
+    int32_t ret = SendInt32Event(HREQ_CALL_ANSWER, telRilRequest->serialId_);
     TELEPHONY_LOGD("HREQ_CALL_ANSWER ret %{public}d", ret);
 }
 
@@ -1041,12 +1041,12 @@ void TelRilCall::Join(int32_t callType, const AppExecFwk::InnerEvent::Pointer &r
         return;
     }
 
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data = {};
+    MessageParcel reply = {};
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteInt32(callType);
-    OHOS::MessageOption option;
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_JOIN, data, reply, option);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_JOIN, data, reply, option);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function Join failed, error: %{public}d", ret);
     }
@@ -1085,12 +1085,12 @@ void TelRilCall::SetCallWait(int32_t activate, const AppExecFwk::InnerEvent::Poi
     }
 
     TELEPHONY_LOGD("SetCallWait --> HREQ_CALL_SET_CALL_WAIT:%{public}d", telRilRequest->serialId_);
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data = {};
+    MessageParcel reply = {};
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteInt32(activate);
-    OHOS::MessageOption option;
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_SET_CALL_WAIT, data, reply, option);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SET_CALL_WAIT, data, reply, option);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function SetCallWait failed, error: %{public}d", ret);
     }
@@ -1110,13 +1110,13 @@ void TelRilCall::Split(int32_t nThCall, int32_t callType, const AppExecFwk::Inne
         return;
     }
 
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data = {};
+    MessageParcel reply = {};
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteInt32(nThCall);
     data.WriteInt32(callType);
-    OHOS::MessageOption option;
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_SPLIT, data, reply, option);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SPLIT, data, reply, option);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function Split failed, error: %{public}d", ret);
     }
@@ -1136,12 +1136,12 @@ void TelRilCall::CallSupplement(int32_t type, const AppExecFwk::InnerEvent::Poin
         return;
     }
 
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data = {};
+    MessageParcel reply = {};
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteInt32(type);
-    OHOS::MessageOption option;
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_SUPPLEMENT, data, reply, option);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SUPPLEMENT, data, reply, option);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function CallSupplement failed, error: %{public}d", ret);
     }
@@ -1161,12 +1161,12 @@ void TelRilCall::GetCallForward(int32_t reason, const AppExecFwk::InnerEvent::Po
         return;
     }
 
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data = {};
+    MessageParcel reply = {};
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteInt32(reason);
-    OHOS::MessageOption option;
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_GET_CALL_FORWARDING, data, reply, option);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_GET_CALL_FORWARDING, data, reply, option);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function GetCallForward failed, error: %{public}d", ret);
     }
@@ -1187,7 +1187,7 @@ void TelRilCall::SetCallForward(int32_t reason, int32_t mode, std::string number
         return;
     }
 
-    MessageParcel wData;
+    MessageParcel wData = {};
     CallForwardSetInfo callForwardSetInfo;
     callForwardSetInfo.reason = reason;
     callForwardSetInfo.mode = mode;
@@ -1232,12 +1232,12 @@ void TelRilCall::SetClip(const int32_t action, const AppExecFwk::InnerEvent::Poi
         return;
     }
 
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data = {};
+    MessageParcel reply = {};
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteInt32(action);
-    OHOS::MessageOption option;
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_SET_CLIP, data, reply, option);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SET_CLIP, data, reply, option);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function SetClip failed, error: %{public}d", ret);
     }
@@ -1274,12 +1274,12 @@ void TelRilCall::SetClir(const int32_t action, const AppExecFwk::InnerEvent::Poi
         return;
     }
 
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data = {};
+    MessageParcel reply = {};
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteInt32(action);
-    OHOS::MessageOption option;
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_SET_CLIR, data, reply, option);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SET_CLIR, data, reply, option);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function SetClir failed, error: %{public}d", ret);
     }
@@ -1299,12 +1299,12 @@ void TelRilCall::GetCallRestriction(std::string fac, const AppExecFwk::InnerEven
         return;
     }
 
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data = {};
+    MessageParcel reply = {};
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteCString(fac.c_str());
-    OHOS::MessageOption option;
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_GET_CALL_RESTRICTION, data, reply, option);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_GET_CALL_RESTRICTION, data, reply, option);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function GetCallRestriction failed, error: %{public}d", ret);
     }
@@ -1324,14 +1324,14 @@ void TelRilCall::SetCallRestriction(
         return;
     }
 
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data = {};
+    MessageParcel reply = {};
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteInt32(mode);
     data.WriteCString(fac.c_str());
     data.WriteCString(password.c_str());
-    OHOS::MessageOption option;
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_SET_CALL_RESTRICTION, data, reply, option);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SET_CALL_RESTRICTION, data, reply, option);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function SetCallRestriction failed, error: %{public}d", ret);
     }
@@ -1351,8 +1351,8 @@ void TelRilCall::SendDtmf(const std::string &sDTMFCode, int32_t index, int32_t s
         return;
     }
 
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data = {};
+    MessageParcel reply = {};
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteInt32(index);
     data.WriteInt32(switchOn);
@@ -1360,8 +1360,8 @@ void TelRilCall::SendDtmf(const std::string &sDTMFCode, int32_t index, int32_t s
     data.WriteInt32(sDTMFCode.length());
     data.WriteCString(sDTMFCode.c_str());
     TELEPHONY_LOGD("TelRilCall::SendDtmf --> cDTMFCode %{public}s", sDTMFCode.c_str());
-    OHOS::MessageOption option;
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_SEND_DTMF, data, reply, option);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SEND_DTMF, data, reply, option);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function SendDtmf failed, error: %{public}d", ret);
     }
@@ -1381,8 +1381,8 @@ void TelRilCall::SendDtmf(char cDTMFCode, int32_t index, const AppExecFwk::Inner
         return;
     }
     const int32_t stringLength = 1;
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data = {};
+    MessageParcel reply = {};
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteInt32(index);
     data.WriteInt32(1);
@@ -1392,8 +1392,8 @@ void TelRilCall::SendDtmf(char cDTMFCode, int32_t index, const AppExecFwk::Inner
     temp[0] = cDTMFCode;
     temp[1] = '\0';
     data.WriteCString(temp);
-    OHOS::MessageOption option;
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_SEND_DTMF, data, reply, option);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SEND_DTMF, data, reply, option);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function SendDtmf failed, error: %{public}d", ret);
     }
@@ -1411,16 +1411,16 @@ void TelRilCall::StartDtmf(char cDTMFCode, int32_t index, const AppExecFwk::Inne
         ErrorResponse(telRilRequest->serialId_, HRilErrType::HRIL_ERR_INVALID_RESPONSE);
         return;
     }
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data = {};
+    MessageParcel reply = {};
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteInt32(index);
     char temp[2];
     temp[0] = cDTMFCode;
     temp[1] = '\0';
     data.WriteCString(temp);
-    OHOS::MessageOption option;
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_START_DTMF, data, reply, option);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_START_DTMF, data, reply, option);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function StartDtmf failed, error: %{public}d", ret);
     }
@@ -1438,16 +1438,16 @@ void TelRilCall::StopDtmf(int32_t index, const AppExecFwk::InnerEvent::Pointer &
         ErrorResponse(telRilRequest->serialId_, HRilErrType::HRIL_ERR_INVALID_RESPONSE);
         return;
     }
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data = {};
+    MessageParcel reply = {};
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteInt32(index);
     char temp[2];
     temp[0] = 'A';
     temp[1] = '\0';
     data.WriteCString(temp);
-    OHOS::MessageOption option;
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_STOP_DTMF, data, reply, option);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_STOP_DTMF, data, reply, option);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function StopDtmf failed, error: %{public}d", ret);
     }

@@ -13,30 +13,13 @@
  * limitations under the License.
  */
 
-#include <unistd.h>
-#include <gtest/gtest.h>
+#include "sim_test.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#include "core_service_proxy.h"
 #include "string_ex.h"
 
 namespace OHOS {
 namespace Telephony {
-using namespace testing::ext;
-const int32_t slotId = 0;
-
-class SimTest : public testing::Test {
-public:
-    // execute before first testcase
-    static void SetUpTestCase();
-    void SetUp();
-    void TearDown();
-    static void TearDownTestCase();
-
-    static sptr<ICoreService> GetProxy();
-    static sptr<ICoreService> telephonyService_;
-};
-
 sptr<ICoreService> SimTest::telephonyService_ = nullptr;
 void SimTest::SetUpTestCase()
 {
@@ -233,7 +216,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetLockState_0100, Function | MediumTest | Level
         SimTest::telephonyService_ = GetProxy();
     } else {
         const std::u16string pin = Str8ToStr16("1234");
-        int32_t enable = 1;
+        int32_t enable = 0;
         LockStatusResponse response = {0};
         bool result = SimTest::telephonyService_->SetLockState(pin, enable, response, slotId);
         EXPECT_TRUE(result);
