@@ -14,8 +14,10 @@
  */
 
 #include "network_search_manager.h"
+
 #include <securec.h>
 #include <string_ex.h>
+
 #include "core_manager.h"
 #include "mcc_pool.h"
 #include "tel_profile_util.h"

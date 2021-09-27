@@ -14,7 +14,9 @@
  */
 
 #include "network_search_state.h"
+
 #include <securec.h>
+
 #include "network_search_manager.h"
 #include "network_search_notify.h"
 #include "telephony_log_wrapper.h"

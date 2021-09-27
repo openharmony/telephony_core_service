@@ -12,83 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "tel_ril_test.h"
 
 #include <iostream>
 
-#include "telephony_log_wrapper.h"
 #include "core_manager.h"
+#include "telephony_log_wrapper.h"
 
 using namespace testing::ext;
 
 namespace OHOS {
 namespace Telephony {
-enum DiffInterfaceId {
-    TEST_GET_RILCM_ICC_CARD_STATUS_TEST = 1,
-    TEST_ICC_RILCM_IO_FOR_APP_TEST,
-    TEST_GET_RILCM_IMSI_FOR_APP_TEST,
-    TEST_GET_ICCID_TEST,
-    TEST_GET_SIM_LOCK_STATUS_TEST,
-    TEST_SET_SIM_LOCK_TEST,
-    TEST_GET_CHANGE_SIM_PASSWD_TEST,
-    TEST_ENTER_SIM_PIN_TEST,
-    TEST_UNLOCK_SIM_PIN_TEST,
-    TEST_GET_PIN_INPUT_TIMES_TEST,
-    TEST_SET_RILCM_CELL_INFO_LIST_RATE_TEST,
-    TEST_SET_RILCM_INITIAL_ATTACH_APN_TEST,
-    TEST_SET_RILCM_DATA_PROFILE_TEST,
-    TEST_GET_RILCM_VOICE_REGISTRATION_STATE_TEST,
-    TEST_GET_RILCM_DATA_REGISTRATION_STATE_TEST,
-    TEST_ACKNOWLEDGE_RILCM_LAST_INCOMING_GSM_SMS_TEST,
-    TEST_SETUP_RILCM_DATA_CALL_TEST,
-
-    TEST_DEACTIVATE_RILCM_DATA_CALL_TEST,
-    TEST_SET_BASE_DATA_ALLOWED_TEST,
-    TEST_GET_SIGNAL_STRENGTH,
-    TEST_CALL_DIAL,
-    TEST_HANDUP_CONNECT,
-    TEST_ACCEPT_CALL,
-    TEST_HOLD_CALL,
-    TEST_ACTIVE_CALL,
-    TEST_SWAP_CALL,
-    TEST_JOIN_CALL,
-    TEST_SPLIT_CALL,
-    TEST_GET_CALL_WAIT,
-    TEST_SET_CALL_WAIT,
-    TEST_GET_CALL_FORWARD,
-    TEST_SET_CALL_FORWARD,
-    TEST_GET_CALL_DEAL_CLIP,
-    TEST_SET_CALL_CLIP,
-    TEST_GET_CALL_RESTRICTION,
-    TEST_SET_CALL_RESTRICTION,
-    TEST_SEND_DTMF,
-    TEST_START_DTMF,
-    TEST_STOP_DTMF,
-    TEST_RADIO_LAST_CALL_FAIL_CAUSE,
-    TEST_CURRENT_CALLS,
-    TEST_REJECT_CALL,
-    TEST_SEND_IMS_GSM_SMS,
-    TEST_SEND_SMS,
-
-    TEST_STORAGE_SMS,
-    TEST_DELETE_SMS,
-    TEST_UPDATE_SMS,
-    TEST_SET_SMS_CENTER_ADDRESS,
-    TEST_GET_SMS_CENTER_ADDRESS,
-    TEST_SET_CELL_BROADCAST,
-    TEST_SEND_SMS_EXPECT_MORE,
-    TEST_SET_POWER_STATE,
-    TEST_GET_POWER_STATE,
-    TEST_OPERATOR,
-    TEST_GET_NETWORKS_TO_USE,
-    TEST_GET_SELECTION_MOD_FOR_NETWORKS,
-    TEST_SET_MODE_AUTOMATIC_NETWORKS,
-    TEST_SET_LOCATION_UPDATE_FOR_NETWORKS,
-    TEST_GET_CURRENT_CELL_INFO,
-    TEST_GET_CELL_INFO_LIST,
-    TEST_EXIT,
-};
-
 const string GEEERIC_STRING = "1234";
 const string GEEERIC_PHONENUM = "12345678923";
 const int32_t LEN = 4;
@@ -113,10 +48,7 @@ void TelRilTest::SetUp() {}
 
 void TelRilTest::TearDown() {}
 
-TelRilTest::TelRilTest()
-{
-    memberFuncMap_[TEST_CURRENT_CALLS] = &TelRilTest::OnRequestCallGetCurrentCallsStatusTest;
-}
+TelRilTest::TelRilTest() {}
 
 TelRilTest::~TelRilTest() {}
 
@@ -125,11 +57,12 @@ void TelRilTest::OnInitInterface()
     CoreManager::GetInstance().Init();
     rilManager_ = CoreManager::GetInstance().getCore(CoreManager::DEFAULT_SLOT_ID)->GetRilManager();
     /* --------------------------------- MODEL ----------------------------- */
-    memberFuncMap_[TEST_GET_SIGNAL_STRENGTH] = &TelRilTest::OnRequestNetworkGetRssiTest;
-    memberFuncMap_[TEST_SET_POWER_STATE] = &TelRilTest::OnRequestSetRadioStatusTest;
-    memberFuncMap_[TEST_GET_POWER_STATE] = &TelRilTest::OnRequestGetRadioStatusTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH] = &TelRilTest::OnRequestNetworkGetRssiTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_POWER_STATE] = &TelRilTest::OnRequestSetRadioStatusTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_POWER_STATE] = &TelRilTest::OnRequestGetRadioStatusTest;
     /* --------------------------------- DATA ----------------------------- */
-    memberFuncMap_[TEST_DEACTIVATE_RILCM_DATA_CALL_TEST] = &TelRilTest::OnRequestDataDisableDataCallTest;
+    memberFuncMap_[DiffInterfaceId::TEST_DEACTIVATE_RILCM_DATA_CALL_TEST] =
+        &TelRilTest::OnRequestDataDisableDataCallTest;
     OnInitCall();
     OnInitSms();
     OnInitSim();
@@ -139,68 +72,77 @@ void TelRilTest::OnInitInterface()
 void TelRilTest::OnInitCall()
 {
     /* --------------------------------- CALL ----------------------------- */
-    memberFuncMap_[TEST_CALL_DIAL] = &TelRilTest::OnRequestCallDialTest;
-    memberFuncMap_[TEST_HANDUP_CONNECT] = &TelRilTest::OnRequestCallHangupTest;
-    memberFuncMap_[TEST_ACCEPT_CALL] = &TelRilTest::OnRequestCallAnswerTest;
-    memberFuncMap_[TEST_HOLD_CALL] = &TelRilTest::OnRequestCallHoldTest;
-    memberFuncMap_[TEST_ACTIVE_CALL] = &TelRilTest::OnRequestCallActiveTest;
-    memberFuncMap_[TEST_SWAP_CALL] = &TelRilTest::OnRequestCallSwapTest;
-    memberFuncMap_[TEST_JOIN_CALL] = &TelRilTest::OnRequestCallJoinTest;
-    memberFuncMap_[TEST_SPLIT_CALL] = &TelRilTest::OnRequestCallSplitTest;
-    memberFuncMap_[TEST_REJECT_CALL] = &TelRilTest::OnRequestRefusedCallTest;
-    memberFuncMap_[TEST_GET_CALL_WAIT] = &TelRilTest::OnRequestGetCallWaitTest;
-    memberFuncMap_[TEST_SET_CALL_WAIT] = &TelRilTest::OnRequestSetCallWaitTest;
-    memberFuncMap_[TEST_GET_CALL_FORWARD] = &TelRilTest::OnRequestGetCallForwardTest;
-    memberFuncMap_[TEST_SET_CALL_FORWARD] = &TelRilTest::OnRequestSetCallForwardTest;
-    memberFuncMap_[TEST_GET_CALL_DEAL_CLIP] = &TelRilTest::OnRequestGetClipTest;
-    memberFuncMap_[TEST_SET_CALL_CLIP] = &TelRilTest::OnRequestSetClipTest;
-    memberFuncMap_[TEST_GET_CALL_RESTRICTION] = &TelRilTest::OnRequestGetCallRestrictionTest;
-    memberFuncMap_[TEST_SET_CALL_RESTRICTION] = &TelRilTest::OnRequestSetCallRestrictionTest;
-    memberFuncMap_[TEST_SEND_DTMF] = &TelRilTest::OnRequestSendDtmfTest;
-    memberFuncMap_[TEST_START_DTMF] = &TelRilTest::OnRequestStartDtmfTest;
-    memberFuncMap_[TEST_STOP_DTMF] = &TelRilTest::OnRequestStopDtmfTest;
+    memberFuncMap_[DiffInterfaceId::TEST_CURRENT_CALLS] = &TelRilTest::OnRequestCallGetCurrentCallsStatusTest;
+    memberFuncMap_[DiffInterfaceId::TEST_CALL_DIAL] = &TelRilTest::OnRequestCallDialTest;
+    memberFuncMap_[DiffInterfaceId::TEST_HANDUP_CONNECT] = &TelRilTest::OnRequestCallHangupTest;
+    memberFuncMap_[DiffInterfaceId::TEST_ACCEPT_CALL] = &TelRilTest::OnRequestCallAnswerTest;
+    memberFuncMap_[DiffInterfaceId::TEST_HOLD_CALL] = &TelRilTest::OnRequestCallHoldTest;
+    memberFuncMap_[DiffInterfaceId::TEST_ACTIVE_CALL] = &TelRilTest::OnRequestCallActiveTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SWAP_CALL] = &TelRilTest::OnRequestCallSwapTest;
+    memberFuncMap_[DiffInterfaceId::TEST_JOIN_CALL] = &TelRilTest::OnRequestCallJoinTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SPLIT_CALL] = &TelRilTest::OnRequestCallSplitTest;
+    memberFuncMap_[DiffInterfaceId::TEST_REJECT_CALL] = &TelRilTest::OnRequestRefusedCallTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_WAIT] = &TelRilTest::OnRequestGetCallWaitTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_WAIT] = &TelRilTest::OnRequestSetCallWaitTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_FORWARD] = &TelRilTest::OnRequestGetCallForwardTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_FORWARD] = &TelRilTest::OnRequestSetCallForwardTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_DEAL_CLIP] = &TelRilTest::OnRequestGetClipTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_CLIP] = &TelRilTest::OnRequestSetClipTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_RESTRICTION] = &TelRilTest::OnRequestGetCallRestrictionTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_RESTRICTION] = &TelRilTest::OnRequestSetCallRestrictionTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SEND_DTMF] = &TelRilTest::OnRequestSendDtmfTest;
+    memberFuncMap_[DiffInterfaceId::TEST_START_DTMF] = &TelRilTest::OnRequestStartDtmfTest;
+    memberFuncMap_[DiffInterfaceId::TEST_STOP_DTMF] = &TelRilTest::OnRequestStopDtmfTest;
 }
 
 void TelRilTest::OnInitSms()
 {
     /* --------------------------------- SMS ----------------------------- */
-    memberFuncMap_[TEST_SEND_SMS] = &TelRilTest::OnRequestSendRilCmSmsTest;
-    memberFuncMap_[TEST_STORAGE_SMS] = &TelRilTest::OnRequestStorageRilCmSmsTest;
-    memberFuncMap_[TEST_DELETE_SMS] = &TelRilTest::OnRequestDeleteRilCmSmsTest;
-    memberFuncMap_[TEST_UPDATE_SMS] = &TelRilTest::OnRequestUpdateRilCmSmsTest;
-    memberFuncMap_[TEST_SET_SMS_CENTER_ADDRESS] = &TelRilTest::OnRequestSetRilCmSmsCenterAddressTest;
-    memberFuncMap_[TEST_GET_SMS_CENTER_ADDRESS] = &TelRilTest::OnRequestGetRilCmSmsCenterAddressTest;
-    memberFuncMap_[TEST_SET_CELL_BROADCAST] = &TelRilTest::OnRequestSetRilCmCellBroadcastTest;
-    memberFuncMap_[TEST_SEND_SMS_EXPECT_MORE] = &TelRilTest::OnRequestSmsSendSmsExpectMoreTest;
-    memberFuncMap_[TEST_ACKNOWLEDGE_RILCM_LAST_INCOMING_GSM_SMS_TEST] = &TelRilTest::OnRequestSmsAcknowledgeTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SEND_SMS] = &TelRilTest::OnRequestSendRilCmSmsTest;
+    memberFuncMap_[DiffInterfaceId::TEST_STORAGE_SMS] = &TelRilTest::OnRequestStorageRilCmSmsTest;
+    memberFuncMap_[DiffInterfaceId::TEST_DELETE_SMS] = &TelRilTest::OnRequestDeleteRilCmSmsTest;
+    memberFuncMap_[DiffInterfaceId::TEST_UPDATE_SMS] = &TelRilTest::OnRequestUpdateRilCmSmsTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_SMS_CENTER_ADDRESS] =
+        &TelRilTest::OnRequestSetRilCmSmsCenterAddressTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_SMS_CENTER_ADDRESS] =
+        &TelRilTest::OnRequestGetRilCmSmsCenterAddressTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_CELL_BROADCAST] = &TelRilTest::OnRequestSetRilCmCellBroadcastTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SEND_SMS_EXPECT_MORE] = &TelRilTest::OnRequestSmsSendSmsExpectMoreTest;
+    memberFuncMap_[DiffInterfaceId::TEST_ACKNOWLEDGE_RILCM_LAST_INCOMING_GSM_SMS_TEST] =
+        &TelRilTest::OnRequestSmsAcknowledgeTest;
 }
 
 void TelRilTest::OnInitSim()
 {
     /*-----------------------------------SIM----------------------------------*/
-    memberFuncMap_[TEST_GET_RILCM_ICC_CARD_STATUS_TEST] = &TelRilTest::OnRequestSimGetSimStatusTest;
-    memberFuncMap_[TEST_ICC_RILCM_IO_FOR_APP_TEST] = &TelRilTest::OnRequestSimIccIoTest;
-    memberFuncMap_[TEST_GET_RILCM_IMSI_FOR_APP_TEST] = &TelRilTest::OnRequestSimGetImsiTest;
-    memberFuncMap_[TEST_GET_ICCID_TEST] = &TelRilTest::OnRequestSimGetIccIDTest;
-    memberFuncMap_[TEST_GET_SIM_LOCK_STATUS_TEST] = &TelRilTest::OnRequestGetSimLockStatusTest;
-    memberFuncMap_[TEST_SET_SIM_LOCK_TEST] = &TelRilTest::OnRequestSetSimLockTest;
-    memberFuncMap_[TEST_GET_CHANGE_SIM_PASSWD_TEST] = &TelRilTest::OnRequestChangeSimPasswordTest;
-    memberFuncMap_[TEST_UNLOCK_SIM_PIN_TEST] = &TelRilTest::OnRequestUnlockSimPinTest;
-    memberFuncMap_[TEST_GET_PIN_INPUT_TIMES_TEST] = &TelRilTest::OnRequestGetSimPinInputTimesTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_RILCM_ICC_CARD_STATUS_TEST] =
+        &TelRilTest::OnRequestSimGetSimStatusTest;
+    memberFuncMap_[DiffInterfaceId::TEST_ICC_RILCM_IO_FOR_APP_TEST] = &TelRilTest::OnRequestSimIccIoTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_RILCM_IMSI_FOR_APP_TEST] = &TelRilTest::OnRequestSimGetImsiTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_ICCID_TEST] = &TelRilTest::OnRequestSimGetIccIDTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_SIM_LOCK_STATUS_TEST] = &TelRilTest::OnRequestGetSimLockStatusTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_SIM_LOCK_TEST] = &TelRilTest::OnRequestSetSimLockTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_CHANGE_SIM_PASSWD_TEST] = &TelRilTest::OnRequestChangeSimPasswordTest;
+    memberFuncMap_[DiffInterfaceId::TEST_UNLOCK_SIM_PIN_TEST] = &TelRilTest::OnRequestUnlockSimPinTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_PIN_INPUT_TIMES_TEST] = &TelRilTest::OnRequestGetSimPinInputTimesTest;
 }
 
 void TelRilTest::OnInitNetwork()
 {
     /* --------------------------------- NETWORK ----------------------------- */
-    memberFuncMap_[TEST_OPERATOR] = &TelRilTest::OnRequestNetworkOperatorTest;
-    memberFuncMap_[TEST_GET_RILCM_VOICE_REGISTRATION_STATE_TEST] =
+    memberFuncMap_[DiffInterfaceId::TEST_OPERATOR] = &TelRilTest::OnRequestNetworkOperatorTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE_TEST] =
         &TelRilTest::OnRequestNetworkVoiceRegistrationStateTest;
-    memberFuncMap_[TEST_GET_RILCM_DATA_REGISTRATION_STATE_TEST] =
+    memberFuncMap_[DiffInterfaceId::TEST_GET_RILCM_DATA_REGISTRATION_STATE_TEST] =
         &TelRilTest::OnRequestNetworkDataRegistrationStateTest;
-    memberFuncMap_[TEST_GET_NETWORKS_TO_USE] = &TelRilTest::OnRequestGetNetworkSearchInformationTest;
-    memberFuncMap_[TEST_GET_SELECTION_MOD_FOR_NETWORKS] = &TelRilTest::OnRequestGetNetworkSelectionModeTest;
-    memberFuncMap_[TEST_SET_MODE_AUTOMATIC_NETWORKS] = &TelRilTest::OnRequestSetNetworkSelectionModeTest;
-    memberFuncMap_[TEST_SET_LOCATION_UPDATE_FOR_NETWORKS] = &TelRilTest::OnRequestSetNetworkLocationUpdateTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_NETWORKS_TO_USE] =
+        &TelRilTest::OnRequestGetNetworkSearchInformationTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_SELECTION_MOD_FOR_NETWORKS] =
+        &TelRilTest::OnRequestGetNetworkSelectionModeTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_MODE_AUTOMATIC_NETWORKS] =
+        &TelRilTest::OnRequestSetNetworkSelectionModeTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_LOCATION_UPDATE_FOR_NETWORKS] =
+        &TelRilTest::OnRequestSetNetworkLocationUpdateTest;
 }
 
 void TelRilTest::OnInitForRegister(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
@@ -751,8 +693,7 @@ void TelRilTest::OnRequestSetNetworkLocationUpdateTest(const std::shared_ptr<App
 
 void TelRilTest::OnRequestCallJoinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    int32_t callType = 0; /* call type* 0: Voice call* 1: Video call: send one-way video,* 2: Video call: two-way
-                           * voice 3: Video call: two-way video, two-way voice*/
+    int32_t callType = 0;
     TELEPHONY_LOGD("RilUnitTest::OnRequestCallJoinTest -->");
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_JOIN_CALL);
     if (event != nullptr && rilManager_ != nullptr) {
@@ -768,8 +709,7 @@ void TelRilTest::OnRequestCallJoinTest(const std::shared_ptr<AppExecFwk::EventHa
 void TelRilTest::OnRequestCallSplitTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     int32_t nThCall = 0;
-    int32_t callType = 0; /* call type* 0: Voice call* 1: Video call: send one-way video,* 2: Video call:two-way
-                           * voice 3: Video call: two-way video, two-way voice*/
+    int32_t callType = 0;
     TELEPHONY_LOGD("RilUnitTest::OnRequestCallSplitTest -->");
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SPLIT_CALL);
     if (event != nullptr && rilManager_ != nullptr) {
@@ -801,8 +741,7 @@ void TelRilTest::OnRequestSetCallForwardTest(const std::shared_ptr<AppExecFwk::E
 {
     int32_t mode = 0;
     int32_t reasonType = 0;
-    int32_t classx = 0; /* 0: Voice call* 1: Video call: send one-way video,
-                         * 2: Video call: two-way voice* 3: Video call: two-way video, two-way voice*/
+    int32_t classx = 0;
     std::string phoneNum = GEEERIC_STRING;
     TELEPHONY_LOGD("RilUnitTest::OnRequestSetCallForwardTest -->");
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SPLIT_CALL);

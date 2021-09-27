@@ -390,10 +390,8 @@ void TelRilSms::CellBroadcastNotify(MessageParcel &data)
     std::shared_ptr<CellBroadcastReportInfo> cellBroadcastInfo = std::make_shared<CellBroadcastReportInfo>();
     cellBroadcastInfo->ReadFromParcel(data);
     int32_t indicationType = cellBroadcastInfo->indicationType;
-    TELEPHONY_LOGD(
-        "CellBroadcastNotify indicationType:%{public}d, data:%{public}s, dcs :%{public}s, pdu :%{public}s",
-        indicationType, cellBroadcastInfo->data.c_str(), cellBroadcastInfo->dcs.c_str(),
-        cellBroadcastInfo->pdu.c_str());
+    TELEPHONY_LOGD("indicationType:%{public}d, data:%{public}p, dcs :%{public}p, pdu :%{public}p", indicationType,
+        cellBroadcastInfo->data.c_str(), cellBroadcastInfo->dcs.c_str(), cellBroadcastInfo->pdu.c_str());
     if (observerHandler_ != nullptr) {
         observerHandler_->NotifyObserver(ObserverHandler::RADIO_CELL_BROADCAST, cellBroadcastInfo);
     }
@@ -457,7 +455,6 @@ void TelRilSms::StorageSmsResponse(MessageParcel &data)
         telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
-            TELEPHONY_LOGD("StorageSmsResponse GetParam start");
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
                 TELEPHONY_LOGE("ERROR : StorageSmsResponse --> handler == nullptr !!!");
@@ -493,7 +490,6 @@ void TelRilSms::DeleteSmsResponse(MessageParcel &data)
         telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
-            TELEPHONY_LOGD("DeleteSmsResponse GetParam start");
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
                 TELEPHONY_LOGE("ERROR : DeleteSmsResponse --> handler == nullptr !!!");
@@ -529,7 +525,6 @@ void TelRilSms::UpdateSmsResponse(MessageParcel &data)
         telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
-            TELEPHONY_LOGD("UpdateSmsResponse GetParam start");
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
                 TELEPHONY_LOGE("ERROR : UpdateSmsResponse --> handler == nullptr !!!");
@@ -551,34 +546,33 @@ void TelRilSms::SetSmsCenterAddressResponse(MessageParcel &data)
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("TelRilSms::SetSmsCenterAddressResponse --> read spBuffer failed");
+        TELEPHONY_LOGE("--> read spBuffer failed");
         return;
     }
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     TELEPHONY_LOGD(
-        "SetSmsCenterAddressResponse --> radioResponseInfo->serial:%{public}d, "
+        "--> radioResponseInfo->serial:%{public}d, "
         "radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGD("SetSmsCenterAddressResponse serialId_:%{public}d, requestId_:%{public}d,",
-        telRilRequest->serialId_, telRilRequest->requestId_);
+    TELEPHONY_LOGD(
+        "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
-            TELEPHONY_LOGD("SetSmsCenterAddressResponse GetParam start");
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
-                TELEPHONY_LOGE("ERROR : SetSmsCenterAddressResponse --> handler == nullptr !!!");
+                TELEPHONY_LOGE("ERROR : --> handler == nullptr !!!");
                 return;
             }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             handler->SendEvent(eventId);
-            TELEPHONY_LOGD("SetSmsCenterAddressResponse GetInnerEventId:%{public}d", eventId);
+            TELEPHONY_LOGD("message id:%{public}d", eventId);
         } else {
             ErrorResponse(telRilRequest, *radioResponseInfo);
         }
     } else {
-        TELEPHONY_LOGE("TelRilSms::SetSmsCenterAddressResponse telRilRequest->pointer_ is null");
+        TELEPHONY_LOGE("telRilRequest->pointer_ is null");
     }
 }
 
@@ -589,35 +583,34 @@ void TelRilSms::GetSmsCenterAddressResponse(MessageParcel &data)
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("TelRilSms::GetSmsCenterAddressResponse --> read spBuffer failed");
+        TELEPHONY_LOGE("--> read spBuffer failed");
         return;
     }
 
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     TELEPHONY_LOGD(
-        "GetSmsCenterAddressResponse --> radioResponseInfo->serial:%{public}d, "
+        "--> radioResponseInfo->serial:%{public}d, "
         "radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGD("GetSmsCenterAddressResponse serialId_:%{public}d, requestId_:%{public}d,",
-        telRilRequest->serialId_, telRilRequest->requestId_);
+    TELEPHONY_LOGD(
+        "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
-            TELEPHONY_LOGD("GetSmsCenterAddressResponse GetParam start");
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
-                TELEPHONY_LOGE("ERROR : GetSmsCenterAddressResponse --> handler == nullptr !!!");
+                TELEPHONY_LOGE("ERROR : --> handler == nullptr !!!");
                 return;
             }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             handler->SendEvent(eventId, serCenterAddress);
-            TELEPHONY_LOGD("GetSmsCenterAddressResponse GetInnerEventId:%{public}d", eventId);
+            TELEPHONY_LOGD("message id:%{public}d", eventId);
         } else {
             ErrorResponse(telRilRequest, *radioResponseInfo);
         }
     } else {
-        TELEPHONY_LOGE("TelRilSms::GetSmsCenterAddressResponse telRilRequest->pointer_ is null");
+        TELEPHONY_LOGE("telRilRequest->pointer_ is null");
     }
 }
 

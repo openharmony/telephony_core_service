@@ -25,6 +25,16 @@ class SignalInformation : public Parcelable {
 public:
     enum class NetworkType { GSM = 1, CDMA, LTE, TDSCDMA, WCDMA };
     static constexpr int NO_VALUE = 0x1AAAAAAA;
+    static constexpr int32_t GSM_SIGNAL_THRESHOLD_5BAR[] = {-110, -109, -103, -97, -91, -85};
+    static constexpr int32_t CDMA_SIGNAL_THRESHOLD_5BAR[] = {-113, -112, -106, -99, -92, -85};
+    static constexpr int32_t LTE_SIGNAL_THRESHOLD_5BAR[] = {-121, -120, -115, -110, -105, -97};
+    static constexpr int32_t WCDMA_SIGNAL_THRESHOLD_5BAR[] = {-113, -112, -105, -99, -93, -87};
+    static constexpr int32_t GSM_SIGNAL_THRESHOLD_4BAR[] = {-110, -103, -97, -91, -85};
+    static constexpr int32_t CDMA_SIGNAL_THRESHOLD_4BAR[] = {-113, -106, -99, -92, -85};
+    static constexpr int32_t LTE_SIGNAL_THRESHOLD_4BAR[] = {-121, -115, -109, -103, -97};
+    static constexpr int32_t WCDMA_SIGNAL_THRESHOLD_4BAR[] = {-113, -105, -99, -93, -87};
+
+public:
     virtual SignalInformation::NetworkType GetNetworkType() const = 0;
     virtual bool Marshalling(Parcel &parcel) const = 0;
     static void InitSignalBar(const int32_t bar = 5);
@@ -38,10 +48,6 @@ public:
 
 protected:
     static int32_t signalBar_;
-    static int32_t *gsmSignalThreshold_;
-    static int32_t *cdmaSignalThreshold_;
-    static int32_t *lteSignalThreshold_;
-    static int32_t *wcdmaSignalThreshold_;
 };
 
 class GsmSignalInformation : public SignalInformation {
