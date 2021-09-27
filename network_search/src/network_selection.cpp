@@ -61,9 +61,9 @@ void NetworkSelection::ProcessNetworkSearchResult(const AppExecFwk::InnerEvent::
         sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchCacheItem_;
         if (callback != nullptr) {
             callback->OnNetworkSearchCallback(INetworkSearchCallback::GET_AVAILABLE_RESULT, data);
-            nsm->RemoveCallbackFromMap(index);
             TELEPHONY_LOGD("NetworkSelection::ProcessNetworkSearchResult callback success");
         }
+        nsm->RemoveCallbackFromMap(index);
     }
 }
 
@@ -106,11 +106,9 @@ void NetworkSelection::ProcessGetNetworkSelectionMode(const AppExecFwk::InnerEve
         sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchCacheItem_;
         if (callback != nullptr) {
             callback->OnNetworkSearchCallback(INetworkSearchCallback::GET_NETWORK_MODE_RESULT, data);
-            nsm->RemoveCallbackFromMap(index);
             TELEPHONY_LOGD("NetworkSelection::ProcessGetNetworkSelectionMode callback success");
-        } else {
-            TELEPHONY_LOGE("NetworkSelection::ProcessGetNetworkSelectionMode callback is null");
         }
+        nsm->RemoveCallbackFromMap(index);
     } else {
         TELEPHONY_LOGE("NetworkSelection::ProcessGetNetworkSelectionMode callbackInfo is null");
     }
@@ -146,11 +144,9 @@ void NetworkSelection::ProcessSetNetworkSelectionMode(const AppExecFwk::InnerEve
         TELEPHONY_LOGI("NetworkSelection::ProcessSetNetworkSelectionMode SelectionMode is:%{public}d", selectMode);
         if (callback != nullptr) {
             callback->OnNetworkSearchCallback(INetworkSearchCallback::SET_NETWORK_MODE_RESULT, data);
-            nsm->RemoveCallbackFromMap(index);
             TELEPHONY_LOGD("NetworkSelection::ProcessSetNetworkSelectionMode callback success");
-        } else {
-            TELEPHONY_LOGE("NetworkSelection::ProcessSetNetworkSelectionMode callback is null");
         }
+        nsm->RemoveCallbackFromMap(index);
     } else {
         TELEPHONY_LOGE("NetworkSelection::ProcessSetNetworkSelectionMode callbackInfo is null");
     }

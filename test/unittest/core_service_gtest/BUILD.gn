@@ -26,7 +26,6 @@ ohos_unittest("tel_core_service_gtest") {
     "network_search_test.cpp",
     "network_search_test_callback_stub.cpp",
     "sim_test.cpp",
-    "tel_ril_test.cpp",
   ]
 
   include_dirs = [

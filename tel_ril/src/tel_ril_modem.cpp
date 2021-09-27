@@ -87,7 +87,7 @@ void TelRilModem::SetRadioStatusResponse(MessageParcel &data)
             }
 
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
-            TELEPHONY_LOGD("SetRadioStatusResponse eventId:%{public}d", eventId);
+            TELEPHONY_LOGD("message id:%{public}d", eventId);
             std::unique_ptr<HRilRadioStateInfo> radioState = std::make_unique<HRilRadioStateInfo>();
             radioState->flag = telRilRequest->pointer_->GetParam();
             radioState->state = (int32_t)(radioResponseInfo->error);
@@ -128,7 +128,7 @@ void TelRilModem::GetRadioStatusResponse(MessageParcel &data)
             }
 
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
-            TELEPHONY_LOGD("GetRadioStatusResponse eventId:%{public}d", eventId);
+            TELEPHONY_LOGD("message id:%{public}d", eventId);
             std::unique_ptr<HRilRadioStateInfo> state = std::make_unique<HRilRadioStateInfo>();
             state->flag = telRilRequest->pointer_->GetParam();
             state->state = radioStatus;
@@ -184,9 +184,7 @@ void TelRilModem::GetRadioStatus(const AppExecFwk::InnerEvent::Pointer &response
 void TelRilModem::RadioStateUpdated(MessageParcel &data)
 {
     int32_t radioState = data.ReadInt32();
-    int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGD(
-        "func :%{public}s indicationType: %{public}d state:%{public}d", __func__, indicationType, radioState);
+
     if (observerHandler_ == nullptr) {
         TELEPHONY_LOGE("observerHandler_ is nullptr");
         return;
