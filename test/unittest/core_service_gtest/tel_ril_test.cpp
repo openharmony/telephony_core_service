@@ -12,18 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "tel_ril_test.h"
 
 #include <iostream>
 
-#include "telephony_log_wrapper.h"
 #include "core_manager.h"
+#include "telephony_log_wrapper.h"
 
 using namespace testing::ext;
 
 namespace OHOS {
 namespace Telephony {
-enum DiffInterfaceId {
+enum class DiffInterfaceId {
     TEST_GET_RILCM_ICC_CARD_STATUS_TEST = 1,
     TEST_ICC_RILCM_IO_FOR_APP_TEST,
     TEST_GET_RILCM_IMSI_FOR_APP_TEST,
@@ -751,8 +752,7 @@ void TelRilTest::OnRequestSetNetworkLocationUpdateTest(const std::shared_ptr<App
 
 void TelRilTest::OnRequestCallJoinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    int32_t callType = 0; /* call type* 0: Voice call* 1: Video call: send one-way video,* 2: Video call: two-way
-                           * voice 3: Video call: two-way video, two-way voice*/
+    int32_t callType = 0;
     TELEPHONY_LOGD("RilUnitTest::OnRequestCallJoinTest -->");
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_JOIN_CALL);
     if (event != nullptr && rilManager_ != nullptr) {
@@ -768,8 +768,7 @@ void TelRilTest::OnRequestCallJoinTest(const std::shared_ptr<AppExecFwk::EventHa
 void TelRilTest::OnRequestCallSplitTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     int32_t nThCall = 0;
-    int32_t callType = 0; /* call type* 0: Voice call* 1: Video call: send one-way video,* 2: Video call:two-way
-                           * voice 3: Video call: two-way video, two-way voice*/
+    int32_t callType = 0;
     TELEPHONY_LOGD("RilUnitTest::OnRequestCallSplitTest -->");
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SPLIT_CALL);
     if (event != nullptr && rilManager_ != nullptr) {
@@ -801,8 +800,7 @@ void TelRilTest::OnRequestSetCallForwardTest(const std::shared_ptr<AppExecFwk::E
 {
     int32_t mode = 0;
     int32_t reasonType = 0;
-    int32_t classx = 0; /* 0: Voice call* 1: Video call: send one-way video,
-                         * 2: Video call: two-way voice* 3: Video call: two-way video, two-way voice*/
+    int32_t classx = 0;
     std::string phoneNum = GEEERIC_STRING;
     TELEPHONY_LOGD("RilUnitTest::OnRequestSetCallForwardTest -->");
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SPLIT_CALL);

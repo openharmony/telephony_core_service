@@ -12,12 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_TEL_RIL_TEST_H
 #define OHOS_TEL_RIL_TEST_H
 
 #include <gtest/gtest.h>
-#include "core_service_proxy.h"
+
 #include "core.h"
+#include "core_service_proxy.h"
+
 namespace OHOS {
 namespace Telephony {
 using namespace std;
@@ -25,7 +28,7 @@ using namespace std;
 class TelRilTest : public testing::Test {
 public:
     TelRilTest();
-    ~TelRilTest();
+    ~TelRilTest() = default;
     // execute before first testcase
     static void SetUpTestCase();
     void SetUp();
