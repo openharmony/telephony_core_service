@@ -28,7 +28,7 @@ TelRilBase::TelRilBase(sptr<IRemoteObject> cellularRadio, std::shared_ptr<Observ
 }
 
 std::shared_ptr<TelRilRequest> TelRilBase::CreateTelRilRequest(
-    int request, const AppExecFwk::InnerEvent::Pointer &result)
+    int32_t request, const AppExecFwk::InnerEvent::Pointer &result)
 {
     std::shared_ptr<TelRilRequest> telRilRequest =
         std::make_shared<TelRilRequest>(GetNextSerialId(), request, result);
@@ -39,10 +39,10 @@ std::shared_ptr<TelRilRequest> TelRilBase::CreateTelRilRequest(
 
 int32_t TelRilBase::SendInt32Event(int32_t dispatchId, int32_t value)
 {
-    int status = 0;
+    int32_t status = 0;
     if (cellularRadio_ != nullptr) {
-        MessageParcel data;
-        MessageParcel reply;
+        MessageParcel data = {};
+        MessageParcel reply = {};
         data.WriteInt32(value);
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, data, reply, option);
@@ -62,8 +62,8 @@ int32_t TelRilBase::SendStringEvent(int32_t dispatchId, const char *value)
     }
     TELEPHONY_LOGD("TelRilBase SendStringEvent, dispatchId:%d, status:%c", dispatchId, *value);
     if (cellularRadio_ != nullptr) {
-        MessageParcel data;
-        MessageParcel reply;
+        MessageParcel data = {};
+        MessageParcel reply = {};
         data.WriteCString(value);
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, data, reply, option);
@@ -76,7 +76,7 @@ int32_t TelRilBase::SendBufferEvent(int32_t dispatchId, MessageParcel &eventData
 {
     int32_t status = HDF_FAILURE;
     if (cellularRadio_ != nullptr) {
-        MessageParcel reply;
+        MessageParcel reply = {};
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, eventData, reply, option);
         TELEPHONY_LOGD("TelRilBase SendBufferEvent, dispatchId:%{public}d, status:%{public}d", dispatchId, status);
@@ -94,8 +94,8 @@ int32_t TelRilBase::SendCommonBufferEvent(int32_t dispatchId, const void *eventD
     }
     int32_t status = HDF_FAILURE;
     if (cellularRadio_ != nullptr) {
-        MessageParcel data;
-        MessageParcel reply;
+        MessageParcel data = {};
+        MessageParcel reply = {};
         data.WriteUnpadBuffer(eventData, dataLength);
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, data, reply, option);
