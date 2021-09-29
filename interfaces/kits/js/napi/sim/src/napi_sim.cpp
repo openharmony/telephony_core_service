@@ -51,7 +51,6 @@ napi_value NapiCreateAsyncWork(napi_env env, napi_callback_info info, std::strin
         typeStd.emplace_back(napi_function);
     }
     auto inParaTp = std::make_tuple(&asyncContext->slotId, &context.callbackRef);
-
     if (!MatchParameters(env, argv, argc, inParaTp, typeStd)) {
         napi_throw_error(env, nullptr, "type of input parameters error!");
         return nullptr;
