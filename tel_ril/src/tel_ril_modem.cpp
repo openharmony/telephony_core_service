@@ -184,9 +184,9 @@ void TelRilModem::GetRadioStatus(const AppExecFwk::InnerEvent::Pointer &response
 void TelRilModem::RadioStateUpdated(MessageParcel &data)
 {
     int32_t radioState = data.ReadInt32();
-
+    int32_t indicationType = data.ReadInt32();
     if (observerHandler_ == nullptr) {
-        TELEPHONY_LOGE("observerHandler_ is nullptr");
+        TELEPHONY_LOGE("observerHandler_ is nullptr, tpye:%{public}d", indicationType);
         return;
     }
     std::shared_ptr<int> state = std::make_shared<int>();
