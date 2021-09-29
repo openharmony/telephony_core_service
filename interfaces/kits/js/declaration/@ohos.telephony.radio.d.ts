@@ -70,6 +70,17 @@ declare namespace radio {
   function getNetworkState(slotId: number, callback: AsyncCallback<NetworkState>): void;
   function getNetworkState(slotId?: number): Promise<NetworkState>;
 
+  /**
+   * Obtains the network search mode of the SIM card in a specified slot.
+   *
+   * @param slotId Indicates the ID of the SIM card slot.
+   * @param callback Returns the network search mode of the SIM card. Available values are as follows:
+   * <ul>
+   * <li>{@link NetworkSelectionMode#NETWORK_SELECTION_UNKNOWN}
+   * <li>{@link NetworkSelectionMode#NETWORK_SELECTION_AUTOMATIC}
+   * <li>{@link NetworkSelectionMode#NETWORK_SELECTION_MANUAL}
+   * <ul>
+   */
   function getNetworkSelectionMode(slotId: number, callback: AsyncCallback<NetworkSelectionMode>): void;
   function getNetworkSelectionMode(slotId: number): Promise<NetworkSelectionMode>;
 
@@ -89,6 +100,11 @@ declare namespace radio {
 
   /**
    * Obtains the ISO-defined country code of the country where the registered network is deployed.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param callback Returns the country code defined in ISO 3166-2;
+   * returns an empty string if the device is not registered with any network.
    */
   function getISOCountryCodeForNetwork(slotId: number, callback: AsyncCallback<string>): void;
   function getISOCountryCodeForNetwork(slotId: number): Promise<string>;

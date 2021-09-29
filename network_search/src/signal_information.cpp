@@ -395,7 +395,7 @@ bool LteSignalInformation::ReadFromParcel(Parcel &parcel)
 
 bool LteSignalInformation::ValidateLteValue() const
 {
-    return (lteRsrp_ >= LTE_RSRP_MINIMUM && lteRsrp_ <= LTE_RSRP_MAXIMUM);
+    return (lteRsrp_ > LTE_RSRP_MINIMUM && lteRsrp_ <= LTE_RSRP_MAXIMUM);
 }
 
 bool WcdmaSignalInformation::operator==(const WcdmaSignalInformation &wcdma) const
