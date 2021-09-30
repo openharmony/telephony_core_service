@@ -488,7 +488,6 @@ int32_t CallManagerServiceProxy::SetCallWaiting(int32_t slotId, bool activate)
 
 int32_t CallManagerServiceProxy::CombineConference(int32_t mainCallId)
 {
-    TELEPHONY_LOGD("Enter");
     int32_t error = TELEPHONY_FAIL;
     MessageOption option;
     MessageParcel dataParcel;
@@ -506,7 +505,6 @@ int32_t CallManagerServiceProxy::CombineConference(int32_t mainCallId)
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function CombineConference failed! errCode:%{public}d", error);
     }
-    TELEPHONY_LOGD("Leave");
     error = replyParcel.ReadInt32();
     return error;
 }
