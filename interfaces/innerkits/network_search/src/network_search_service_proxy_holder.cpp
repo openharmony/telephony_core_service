@@ -14,6 +14,9 @@
  */
 
 #include "network_search_service_proxy_holder.h"
+
+#include <memory>
+
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "network_search_service_death_recipient.h"
@@ -45,7 +48,7 @@ bool NetworkSearchServiceProxyHolder::GetNetworkSearchProxy()
             TELEPHONY_LOGE("Get Telephony Core Proxy Failed.");
             return false;
         }
-        recipient_ = new NetworkSearchServiceDeathRecipient();
+        recipient_ = std::make_unique<NetworkSearchServiceDeathRecipient>().release();
         if (!recipient_) {
             TELEPHONY_LOGE("Failed to create death Recipient ptr NetworkSearchServiceDeathRecipient!");
             return false;
