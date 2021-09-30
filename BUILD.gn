@@ -94,7 +94,7 @@ ohos_shared_library("tel_core_service") {
   deps = [
     "$hdf_uhdf_path/hdi:libhdi",
     "//base/telephony/core_service/common:libtelephony_common",
-    "//drivers/adapter/uhdf2/osal:libhdf_utils",
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//utils/native/base:utils",
   ]
 
