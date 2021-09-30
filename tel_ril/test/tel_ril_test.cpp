@@ -30,16 +30,10 @@ enum DiffInterfaceId {
     TEST_ENTER_SIM_PIN_TEST,
     TEST_UNLOCK_SIM_PIN_TEST,
     TEST_GET_PIN_INPUT_TIMES_TEST,
-    TEST_SET_RILCM_CELL_INFO_LIST_RATE_TEST,
-    TEST_SET_RILCM_INITIAL_ATTACH_APN_TEST,
-    TEST_SET_RILCM_DATA_PROFILE_TEST,
-    TEST_GET_RILCM_VOICE_REGISTRATION_STATE_TEST,
-    TEST_GET_RILCM_DATA_REGISTRATION_STATE_TEST,
     TEST_ACKNOWLEDGE_RILCM_LAST_INCOMING_GSM_SMS_TEST,
     TEST_SETUP_RILCM_DATA_CALL_TEST,
 
     TEST_DEACTIVATE_RILCM_DATA_CALL_TEST,
-    TEST_SET_BASE_DATA_ALLOWED_TEST,
     TEST_GET_SIGNAL_STRENGTH,
     TEST_CALL_DIAL,
     TEST_HANDUP_CONNECT,
@@ -47,6 +41,8 @@ enum DiffInterfaceId {
     TEST_HOLD_CALL,
     TEST_ACTIVE_CALL,
     TEST_SWAP_CALL,
+    TEST_CURRENT_CALLS,
+    TEST_REJECT_CALL,
     TEST_JOIN_CALL,
     TEST_SPLIT_CALL,
     TEST_GET_CALL_WAIT,
@@ -60,10 +56,6 @@ enum DiffInterfaceId {
     TEST_SEND_DTMF,
     TEST_START_DTMF,
     TEST_STOP_DTMF,
-    TEST_RADIO_LAST_CALL_FAIL_CAUSE,
-    TEST_CURRENT_CALLS,
-    TEST_REJECT_CALL,
-    TEST_SEND_IMS_GSM_SMS,
     TEST_SEND_SMS,
 
     TEST_STORAGE_SMS,
@@ -80,6 +72,8 @@ enum DiffInterfaceId {
     TEST_GET_SELECTION_MOD_FOR_NETWORKS,
     TEST_SET_MODE_AUTOMATIC_NETWORKS,
     TEST_SET_LOCATION_UPDATE_FOR_NETWORKS,
+    TEST_GET_RILCM_VOICE_REGISTRATION_STATE_TEST,
+    TEST_GET_RILCM_DATA_REGISTRATION_STATE_TEST,
     TEST_GET_CURRENT_CELL_INFO,
     TEST_GET_CELL_INFO_LIST,
     TEST_EXIT,
@@ -482,7 +476,7 @@ void TelRilTest::OnRequestSetSimLockTest(const std::shared_ptr<AppExecFwk::Event
     if (event != nullptr && rilManager_ != nullptr) {
         event->SetOwner(handler);
         std::string fac;
-        int mode;
+        int32_t mode;
         std::string code;
 
         std::cout << "please enter the fac:";
@@ -1278,12 +1272,12 @@ void Promote()
     cout << TEST_GET_POWER_STATE << " --> OnRequestGetRadioStatusTest" << endl;
 
     cout << TEST_EXIT << "--> Exit" << endl << endl; // exit
-    cout << "please input a cmd num: ";
 }
 
 void SimTest()
 {
     /*-----------------------------------------------SIM-------------------------------------*/
+    cout << "please input a cmd num: " << endl;
     cout << TEST_GET_RILCM_ICC_CARD_STATUS_TEST << "--> OnRequestSimGetSimStatusTest" << endl; // pass
     cout << TEST_ICC_RILCM_IO_FOR_APP_TEST << "--> OnRequestSimIccIoTest" << endl;
     cout << TEST_GET_RILCM_IMSI_FOR_APP_TEST << "--> OnRequestSimGetImsiTest" << endl; // pass
@@ -1295,9 +1289,9 @@ void SimTest()
     cout << TEST_UNLOCK_SIM_PIN_TEST << "--> OnRequestUnlockSimPinTest" << endl; // pass
     cout << TEST_GET_PIN_INPUT_TIMES_TEST << "--> OnRequestGetSimPinInputTimesTest" << endl; // pass
 
+    cout << TEST_ACKNOWLEDGE_RILCM_LAST_INCOMING_GSM_SMS_TEST << "--> OnRequestSmsAcknowledgeTest" << endl;
     cout << TEST_SETUP_RILCM_DATA_CALL_TEST << "--> OnRequestDataSetupDataCallTest" << endl;
     cout << TEST_DEACTIVATE_RILCM_DATA_CALL_TEST << "--> OnRequestDataDisableDataCallTest" << endl; // pass
-    cout << TEST_ACKNOWLEDGE_RILCM_LAST_INCOMING_GSM_SMS_TEST << "--> OnRequestSmsAcknowledgeTest" << endl;
     cout << TEST_GET_SIGNAL_STRENGTH << "--> OnRequestNetworkGetRssiTest" << endl;
 }
 
@@ -1327,7 +1321,6 @@ void CallTest()
 void SmsTest()
 {
     /* --------------------------------- SMS -------------------------- */
-    cout << "19 --> OnRequestSmsSendSmsByImsTest" << endl; // failed, radioResponseInfo->error : 44
     cout << TEST_SEND_SMS << "--> OnRequestSendRilCmSmsTest"
          << endl; // failed, Sim not inserted, radioResponseInfo->error : 2
     cout << TEST_STORAGE_SMS << "--> OnRequestStorageRilCmSmsTest" << endl;
@@ -1336,10 +1329,9 @@ void SmsTest()
     cout << TEST_SET_SMS_CENTER_ADDRESS << "--> OnRequestSetRilCmSmsCenterAddressTest" << endl;
     cout << TEST_GET_SMS_CENTER_ADDRESS << "--> OnRequestGetRilCmSmsCenterAddressTest" << endl;
     cout << TEST_SET_CELL_BROADCAST << "--> OnRequestSetRilCmCellBroadcastTest" << endl;
-    cout << "21 --> OnRequestSmsSendSmsExpectMoreTest"
+    cout << TEST_SEND_SMS_EXPECT_MORE << " --> OnRequestSmsSendSmsExpectMoreTest"
          << endl; // failed, Sim not inserted, radioResponseInfo->error : 2
-    cout << "22 --> OnRequestSetModemRadioPowerTest" << endl; // pass
-    cout << "23 --> OnRequestNetworkOperatorTest"
+    cout << TEST_OPERATOR << " --> OnRequestNetworkOperatorTest"
          << endl; // failed, Invalid response: nullptr, radioResponseInfo->error : 2
     cout << TEST_GET_NETWORKS_TO_USE << "--> OnRequestGetNetworkSearchInformationTest"
          << endl; // failed, Invalid response: nullptr, radioResponseInfo->error : 2

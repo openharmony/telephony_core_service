@@ -37,8 +37,8 @@ int32_t RilManager::SetCellularRadioIndication(bool isFirst)
     int32_t status = RIL_ADAPTER_ERROR;
     if (cellularRadio_ != nullptr) {
         sptr<OHOS::IPCObjectStub> callback = this;
-        MessageParcel data;
-        MessageParcel reply;
+        MessageParcel data = {};
+        MessageParcel reply = {};
         /* Prevent OHOS::IPCObjectStub from getting abnormal. */
         if (isFirst) {
             telRilCallback_ = callback;
@@ -46,7 +46,7 @@ int32_t RilManager::SetCellularRadioIndication(bool isFirst)
             callback = telRilCallback_;
         }
         data.WriteRemoteObject(callback);
-        OHOS::MessageOption option;
+        OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(HRIL_ADAPTER_RADIO_INDICATION, data, reply, option);
         TELEPHONY_LOGD("SetCellularRadioIndication status:%{public}d", status);
     }
@@ -55,11 +55,11 @@ int32_t RilManager::SetCellularRadioIndication(bool isFirst)
 
 int32_t RilManager::SetCellularRadioResponse(bool isFirst)
 {
-    int status = RIL_ADAPTER_ERROR;
+    int32_t status = RIL_ADAPTER_ERROR;
     if (cellularRadio_ != nullptr) {
         sptr<OHOS::IPCObjectStub> callback = this;
-        MessageParcel data;
-        MessageParcel reply;
+        MessageParcel data = {};
+        MessageParcel reply = {};
         /* Prevent OHOS::IPCObjectStub from getting abnormal. */
         if (isFirst) {
             telRilCallback_ = callback;
@@ -67,7 +67,7 @@ int32_t RilManager::SetCellularRadioResponse(bool isFirst)
             callback = telRilCallback_;
         }
         data.WriteRemoteObject(callback);
-        OHOS::MessageOption option;
+        OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(HRIL_ADAPTER_RADIO_RESPONSE, data, reply, option);
         TELEPHONY_LOGD("SetCellularRadioResponse status:%{public}d", status);
     }
@@ -117,7 +117,7 @@ void RilManager::TelRilSetParam(int32_t preferredNetworkType, int32_t cdmaSubscr
 void RilManager::OnInit()
 {
     bool res = false;
-    int i = 0;
+    int32_t i = 0;
 
     do {
         res = InitCellularRadio(true);
@@ -132,7 +132,7 @@ void RilManager::OnInit()
 
 bool RilManager::InitCellularRadio(bool isFirst)
 {
-    int i = 0;
+    int32_t i = 0;
     cellularRadio_ = nullptr;
     auto servMgr_ = OHOS::HDI::ServiceManager::V1_0::IServiceManager::Get();
     while (servMgr_ == nullptr) {

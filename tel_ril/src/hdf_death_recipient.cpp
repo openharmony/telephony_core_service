@@ -34,7 +34,7 @@ void HdfDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
     std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId_);
     if (core != nullptr) {
         bool res = true;
-        int i = 0;
+        int32_t i = 0;
         do {
             res = core->InitCellularRadio(false);
             if (!res) {
