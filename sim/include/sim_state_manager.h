@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef __SIM_STATE_MANAGER__
-#define __SIM_STATE_MANAGER__
+#ifndef OHOS_SIM_STATE_MANAGER_H
+#define OHOS_SIM_STATE_MANAGER_H
 
 #include "i_sim_state_manager.h"
 #include "sim_state_handle.h"
@@ -70,4 +70,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // __SIM_STATE_MANAGER__
+#endif // OHOS_SIM_STATE_MANAGER_H
