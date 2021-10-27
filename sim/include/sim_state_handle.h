@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef __SIM_STATE_HANDLE__
-#define __SIM_STATE_HANDLE__
+#ifndef OHOS_SIM_STATE_HANDLE_H
+#define OHOS_SIM_STATE_HANDLE_H
 
 #include <list>
 #include <memory>
@@ -125,4 +125,4 @@ private:
 } // namespace Telephony
 } // namespace OHOS
 
-#endif // __SIM_STATE_HANDLE__
+#endif // OHOS_SIM_STATE_HANDLE_H

@@ -45,7 +45,7 @@ bool NetworkSearchServiceProxyHolder::GetNetworkSearchProxy()
             TELEPHONY_LOGE("Get Telephony Core Proxy Failed.");
             return false;
         }
-        recipient_ = new NetworkSearchServiceDeathRecipient();
+        recipient_ = std::make_unique<NetworkSearchServiceDeathRecipient>().release();
         if (!recipient_) {
             TELEPHONY_LOGE("Failed to create death Recipient ptr NetworkSearchServiceDeathRecipient!");
             return false;

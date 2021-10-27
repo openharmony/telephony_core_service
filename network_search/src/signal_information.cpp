@@ -482,7 +482,7 @@ sptr<SignalInformation> WcdmaSignalInformation::NewInstance() const
 
 bool WcdmaSignalInformation::Marshalling(Parcel &parcel) const
 {
-    if (!parcel.WriteInt32(static_cast<int32_t>(SignalInformation::NetworkType::LTE))) {
+    if (!parcel.WriteInt32(static_cast<int32_t>(SignalInformation::NetworkType::WCDMA))) {
         return false;
     }
     if (!parcel.WriteInt32(wcdmaRxlev_)) {
