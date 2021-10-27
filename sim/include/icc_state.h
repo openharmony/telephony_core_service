@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef __ICC_STATE__
-#define __ICC_STATE__
+#ifndef OHOS_ICC_STATE_H
+#define OHOS_ICC_STATE_H
 
 #include <iostream>
 #include <string>
@@ -76,4 +76,4 @@ public:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // __ICC_STATE__
+#endif // OHOS_ICC_STATE_H
