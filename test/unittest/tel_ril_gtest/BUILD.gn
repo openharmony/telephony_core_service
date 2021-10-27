@@ -13,19 +13,17 @@
 
 import("//build/test.gni")
 
-ohos_unittest("tel_core_service_gtest") {
+ohos_unittest("tel_ril_gtest") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "core_service"
-  test_module = "tel_core_service_gtest"
+  test_module = "tel_ril_gtest"
   module_out_path = part_name + "/" + test_module
 
   sources = [
     "//base/telephony/core_service/interfaces/innerkits/proxy/core_service_proxy.cpp",
     "//base/telephony/core_service/interfaces/kits/src/i_network_search_callback_stub.cpp",
-    "network_search_test.cpp",
-    "network_search_test_callback_stub.cpp",
-    "sim_test.cpp",
+    "tel_ril_test.cpp",
   ]
 
   include_dirs = [
@@ -55,7 +53,7 @@ ohos_unittest("tel_core_service_gtest") {
     "ces_standard:cesfwk_innerkits",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr_L2:samgr_proxy",
   ]
 
   defines = [ "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"" ]
@@ -69,5 +67,5 @@ ohos_unittest("tel_core_service_gtest") {
 
 group("unittest") {
   testonly = true
-  deps = [ ":tel_core_service_gtest" ]
+  deps = [ ":tel_ril_gtest" ]
 }
