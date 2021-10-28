@@ -13,20 +13,32 @@
  * limitations under the License.
  */
 
-#ifndef STATE_REGISTRY_ERRORS_H
-#define STATE_REGISTRY_ERRORS_H
-
-#include "../../../core_service/interfaces/innerkits/common/telephony_errors.h"
+#ifndef NAPI_RADIO_TYPES_H
+#define NAPI_RADIO_TYPES_H
 
 namespace OHOS {
 namespace Telephony {
-enum {
-    OPEN_FILE_ERROR = CORE_DATA_STORAGE_ERR_OFFSET,
-    TEL_PROFILE_UTIL_IS_NULL,
-    PDP_PROFILE_VERSION_IS_NULL,
-    PDP_PROFILE_VERSION_IS_OLD,
-    OPERATOR_IS_NULL,
+enum RegStatus {
+    /**
+     * Indicates a state in which a device cannot use any service.
+     */
+    REGISTRATION_STATE_NO_SERVICE = 0,
+
+    /**
+     * Indicates a state in which a device can use services properly.
+     */
+    REGISTRATION_STATE_IN_SERVICE = 1,
+
+    /**
+     * Indicates a state in which a device can use only the emergency call service.
+     */
+    REGISTRATION_STATE_EMERGENCY_CALL_ONLY = 2,
+
+    /**
+     * Indicates that the cellular radio is powered off.
+     */
+    REGISTRATION_STATE_POWER_OFF = 3
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // STATE_REGISTRY_ERRORS_H
+#endif // NAPI_RADIO_TYPES_H

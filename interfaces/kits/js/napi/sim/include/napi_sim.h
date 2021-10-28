@@ -29,7 +29,7 @@ namespace OHOS {
 namespace Telephony {
 namespace {
 constexpr int32_t DEFAULT_ERROR = -1;
-constexpr size_t ARRAY_LENGTH = 32;
+constexpr size_t ARRAY_SIZE = 32;
 } // namespace
 
 template<typename T>
@@ -42,7 +42,7 @@ struct AsyncContext {
 template<typename T>
 struct AsyncContext2 {
     AsyncContext<T> value;
-    std::array<char, ARRAY_LENGTH> inputStr {};
+    std::array<char, ARRAY_SIZE> inputStr {};
 };
 
 struct AsyncContextPIN {
@@ -50,13 +50,33 @@ struct AsyncContextPIN {
     int32_t result = DEFAULT_ERROR;
     int32_t remain = DEFAULT_ERROR;
     int32_t pinEnable = DEFAULT_ERROR;
-    std::array<char, ARRAY_LENGTH> pin {};
-    std::array<char, ARRAY_LENGTH> puk {};
+    std::array<char, ARRAY_SIZE> pin {};
+    std::array<char, ARRAY_SIZE> puk {};
 };
 
 struct AsyncIccAccountInfo {
     AsyncContext<napi_value> asyncContext;
     std::vector<IccAccountInfo> vecInfo;
+};
+
+struct TelNumbersInfo {
+    int32_t recordNumber = DEFAULT_ERROR;
+    std::array<char, ARRAY_SIZE> alphaTag {};
+    std::array<char, ARRAY_SIZE> number {};
+};
+
+template<typename T>
+struct AsyncPhoneBook {
+    AsyncContext<T> asyncContext;
+    int32_t type = DEFAULT_ERROR;
+    int32_t index = DEFAULT_ERROR;
+    std::vector<TelNumbersInfo> infoVec;
+};
+
+struct AsyncDelPhoneBook {
+    AsyncContext<bool> asyncContext;
+    int32_t type = DEFAULT_ERROR;
+    int32_t index = DEFAULT_ERROR;
 };
 } // namespace Telephony
 } // namespace OHOS

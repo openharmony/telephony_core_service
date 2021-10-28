@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
+#include "core.h"
+
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
-#include "core.h"
+#include "icc_dialling_numbers_manager.h"
 #include "network_search_manager.h"
 #include "sim_manager.h"
 #include "sim_sms_manager.h"
@@ -38,7 +40,7 @@ void Core::OnInit()
     if (simStateManager_ != nullptr) {
         simStateManager_->Init();
     }
-    simFileManager_ = std::make_shared<SimFileManager>(simStateManager_);
+    simFileManager_ = std::make_shared<SimFileManager>(rilManager_, simStateManager_);
     if (simFileManager_ != nullptr) {
         simFileManager_->Init();
     }
@@ -46,13 +48,17 @@ void Core::OnInit()
     if (networkSearchManager_ != nullptr) {
         networkSearchManager_->Init();
     }
-    simSmsManager_ = std::make_shared<SimSmsManager>();
+    simSmsManager_ = std::make_shared<SimSmsManager>(rilManager_, simFileManager_);
     if (simSmsManager_ != nullptr) {
         simSmsManager_->Init();
     }
     simManager_ = std::make_shared<SimManager>();
     if (simManager_ != nullptr) {
         simManager_->Init();
+    }
+    iccPhoneBookManager_ = std::make_shared<IccDiallingNumbersManager>(simFileManager_);
+    if (iccPhoneBookManager_ != nullptr) {
+        iccPhoneBookManager_->Init();
     }
 
     isInitCore_ = true;
@@ -533,6 +539,15 @@ bool Core::GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCall
     return networkSearchManager_->GetNetworkSelectionMode(slotId, callback);
 }
 
+std::u16string Core::GetImei(int32_t slotId) const
+{
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager is null!");
+        return std::u16string();
+    }
+    return networkSearchManager_->GetImei(slotId);
+}
+
 void Core::RegisterIccStateChanged(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (simStateManager_ != nullptr) {
@@ -799,6 +814,78 @@ bool Core::InitCellularRadio(bool isFirst)
     }
     return rilManager_->InitCellularRadio(isFirst);
 }
+std::u16string Core::GetSimTelephoneNumber(int32_t slotId)
+{
+    if (simFileManager_ == nullptr) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return u"";
+    }
+    return simFileManager_->GetSimTelephoneNumber(slotId);
+}
+
+std::u16string Core::GetVoiceMailIdentifier(int32_t slotId)
+{
+    if (simFileManager_ == nullptr) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return u"";
+    }
+    return simFileManager_->GetVoiceMailIdentifier(slotId);
+}
+
+std::u16string Core::GetVoiceMailNumber(int32_t slotId)
+{
+    if (simFileManager_ == nullptr) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return u"";
+    }
+    return simFileManager_->GetVoiceMailNumber(slotId);
+}
+std::vector<std::shared_ptr<DiallingNumbersInfo>> Core::QueryIccDiallingNumbers(int slotId, int type)
+{
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
+    if (iccPhoneBookManager_ == nullptr) {
+        TELEPHONY_LOGE("iccPhoneBookManager is null!");
+        return result;
+    }
+    return iccPhoneBookManager_->QueryIccDiallingNumbers(slotId, type);
+}
+
+bool Core::AddIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
+{
+    if (iccPhoneBookManager_ == nullptr) {
+        TELEPHONY_LOGE("iccPhoneBookManager is null!");
+        return false;
+    }
+    return iccPhoneBookManager_->AddIccDiallingNumbers(slotId, type, diallingNumber);
+}
+
+bool Core::DelIccDiallingNumbers(int slotId, int type, int index)
+{
+    if (iccPhoneBookManager_ == nullptr) {
+        TELEPHONY_LOGE("iccPhoneBookManager is null!");
+        return false;
+    }
+    return iccPhoneBookManager_->DelIccDiallingNumbers(slotId, type, index);
+}
+
+bool Core::UpdateIccDiallingNumbers(int slotId, int type,
+    const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index)
+{
+    if (iccPhoneBookManager_ == nullptr) {
+        TELEPHONY_LOGE("iccPhoneBookManager is null!");
+        return false;
+    }
+    return iccPhoneBookManager_->UpdateIccDiallingNumbers(slotId, type, diallingNumber, index);
+}
+
+bool Core::SetVoiceMail(const std::u16string &mailName, const std::u16string &mailNumber, int32_t slotId)
+{
+    if (simFileManager_ == nullptr) {
+        TELEPHONY_LOGE("simFileManager is null");
+        return false;
+    }
+    return simFileManager_->SetVoiceMail(mailName, mailNumber, slotId);
+}
 
 std::shared_ptr<INetworkSearch> Core::GetNetworkSearchManager() const
 {
@@ -828,6 +915,10 @@ std::shared_ptr<ISimSmsManager> Core::GetSimSmsManager() const
 std::shared_ptr<ISimManager> Core::GetSimManager() const
 {
     return simManager_;
+}
+std::shared_ptr<IIccDiallingNumbersManager> Core::GetIccPhoneBookManager() const
+{
+    return iccPhoneBookManager_;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -218,6 +218,16 @@ std::u16string CoreService::GetIsoCountryCodeForNetwork(int32_t slotId)
     }
 }
 
+std::u16string CoreService::GetImei(int32_t slotId)
+{
+    TELEPHONY_LOGD("CoreService::GetIMEI");
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
+    if (core == nullptr) {
+        return std::u16string();
+    }
+    return core->GetImei(slotId);
+}
+
 bool CoreService::HasSimCard(int32_t slotId)
 {
     TELEPHONY_LOGD("CoreService::HasSimCard");
@@ -533,6 +543,88 @@ int32_t CoreService::RefreshSimState(int32_t phoneId)
         TELEPHONY_LOGE("CoreService::RefreshSimState phoneId invalid.");
         return TELEPHONY_ERROR;
     }
+}
+
+std::u16string CoreService::GetSimTelephoneNumber(int32_t slotId)
+{
+    TELEPHONY_LOGI("CoreService::GetSimTelephoneNumber");
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
+    if (core == nullptr) {
+        return std::u16string();
+    }
+    return core->GetSimTelephoneNumber(slotId);
+}
+
+std::u16string CoreService::GetVoiceMailIdentifier(int32_t slotId)
+{
+    TELEPHONY_LOGI("CoreService::GetVoiceMailIdentifier");
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
+    if (core == nullptr) {
+        return std::u16string();
+    }
+    return core->GetVoiceMailIdentifier(slotId);
+}
+
+std::u16string CoreService::GetVoiceMailNumber(int32_t slotId)
+{
+    TELEPHONY_LOGI("CoreService::GetVoiceMailNumber");
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
+    if (core == nullptr) {
+        return std::u16string();
+    }
+    return core->GetVoiceMailNumber(slotId);
+}
+
+std::vector<std::shared_ptr<DiallingNumbersInfo>> CoreService::QueryIccDiallingNumbers(int slotId, int type)
+{
+    TELEPHONY_LOGI("CoreService::QueryIccDiallingNumbers");
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
+    if (core == nullptr) {
+        return std::vector<std::shared_ptr<DiallingNumbersInfo>>();
+    }
+    return core->QueryIccDiallingNumbers(slotId, type);
+}
+
+bool CoreService::AddIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
+{
+    TELEPHONY_LOGI("CoreService::AddIccDiallingNumbers");
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
+    if (core == nullptr) {
+        return false;
+    }
+    return core->AddIccDiallingNumbers(slotId, type, diallingNumber);
+}
+
+bool CoreService::DelIccDiallingNumbers(int slotId, int type, int index)
+{
+    TELEPHONY_LOGI("CoreService::DelIccDiallingNumbers");
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
+    if (core == nullptr) {
+        return false;
+    }
+    return core->DelIccDiallingNumbers(slotId, type, index);
+}
+
+bool CoreService::UpdateIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index)
+{
+    TELEPHONY_LOGI("CoreService::UpdateIccDiallingNumbers");
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
+    if (core == nullptr) {
+        return false;
+    }
+    return core->UpdateIccDiallingNumbers(slotId, type, diallingNumber, index);
+}
+
+bool CoreService::SetVoiceMail(const std::u16string &mailName, const std::u16string &mailNumber, int32_t slotId)
+{
+    TELEPHONY_LOGI("CoreService::SetVoiceMail");
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
+    if (core == nullptr) {
+        return false;
+    }
+    return core->SetVoiceMail(mailName, mailNumber, slotId);
 }
 } // namespace Telephony
 } // namespace OHOS

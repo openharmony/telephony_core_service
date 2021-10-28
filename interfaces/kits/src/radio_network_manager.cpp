@@ -84,5 +84,10 @@ std::u16string RadioNetworkManager::GetIsoCountryCodeForNetwork(int32_t slotId)
 {
     return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->GetIsoCountryCodeForNetwork(slotId);
 }
+
+std::u16string RadioNetworkManager::GetImei(int32_t slotId)
+{
+    return DelayedSingleton<NetworkSearchServiceProxyHolder>::GetInstance()->GetImei(slotId);
+}
 } // namespace Telephony
 } // namespace OHOS

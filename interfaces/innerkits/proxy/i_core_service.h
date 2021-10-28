@@ -16,6 +16,7 @@
 #ifndef I_BASE_PHONE_SERVICE_H
 #define I_BASE_PHONE_SERVICE_H
 
+#include "dialling_numbers_info.h"
 #include "i_network_search_callback.h"
 #include "i_sim_manager.h"
 #include "i_sim_state_manager.h"
@@ -39,6 +40,7 @@ public:
     virtual const sptr<NetworkState> GetNetworkState(int32_t slotId) = 0;
     virtual bool SetRadioState(bool isOn, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual bool GetRadioState(const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual std::u16string GetImei(int32_t slotId) = 0;
     virtual bool HasSimCard(int32_t slotId) = 0;
     virtual int32_t GetSimState(int32_t slotId) = 0;
     virtual bool UnlockPin(std::u16string pin, LockStatusResponse &response, int32_t phoneId) = 0;
@@ -67,6 +69,16 @@ public:
     virtual bool SetDefaultVoiceSlotId(int32_t subId) = 0;
     virtual int32_t GetDefaultVoiceSlotId() = 0;
     virtual int32_t RefreshSimState(int32_t slotId) = 0;
+    virtual std::u16string GetSimTelephoneNumber(int32_t slotId) = 0;
+    virtual std::u16string GetVoiceMailIdentifier(int32_t slotId) = 0;
+    virtual std::u16string GetVoiceMailNumber(int32_t slotId) = 0;
+    virtual std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int slotId, int type) = 0;
+    virtual bool AddIccDiallingNumbers(
+        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) = 0;
+    virtual bool DelIccDiallingNumbers(int slotId, int type, int index) = 0;
+    virtual bool UpdateIccDiallingNumbers(
+        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index) = 0;
+    virtual bool SetVoiceMail(const std::u16string &mailName, const std::u16string &mailNumber, int32_t slotId) = 0;
     enum {
         GET_PS_RADIO_TECH = 0,
         GET_CS_RADIO_TECH,
@@ -77,6 +89,7 @@ public:
         GET_CELL_INFO_LIST,
         SET_RADIO_STATE,
         GET_RADIO_STATE,
+        GET_IMEI,
         HAS_SIM_CARD,
         GET_SIM_STATE,
         GET_ISO_COUNTRY_CODE,
@@ -100,7 +113,15 @@ public:
         GET_SIM_ACCOUNT_INFO,
         SET_DEFAULT_VOICE_SLOTID,
         GET_DEFAULT_VOICE_SLOTID,
-        REFRESH_SIM_STATE
+        REFRESH_SIM_STATE,
+        GET_SIM_PHONE_NUMBER,
+        GET_VOICE_MAIL_TAG,
+        GET_VOICE_MAIL_NUMBER,
+        ICC_PHONE_BOOK_GET,
+        ICC_PHONE_BOOK_DELETE,
+        ICC_PHONE_BOOK_INSERT,
+        ICC_PHONE_BOOK_UPDATE,
+        SET_VOICE_MAIL,
     };
 
 protected:

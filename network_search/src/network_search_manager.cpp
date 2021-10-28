@@ -539,5 +539,23 @@ std::u16string NetworkSearchManager::GetIsoCountryCodeForNetwork(int32_t slotId)
     }
     return Str8ToStr16(iso);
 }
+
+void NetworkSearchManager::SetImei(std::u16string Imei)
+{
+    Imei_ = Imei;
+}
+
+std::u16string NetworkSearchManager::GetImei(int32_t slotId) const
+{
+    TELEPHONY_LOGI("NetworkSearchManager::GetImei start");
+    if (rilManager_ != nullptr) {
+        auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_IMEI);
+        if (event != nullptr) {
+            event->SetOwner(networkSearchHandler_);
+            rilManager_->GetSlotIMEI(event);
+        }
+    }
+    return Imei_;
+}
 } // namespace Telephony
 } // namespace OHOS

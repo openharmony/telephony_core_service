@@ -141,6 +141,7 @@ public:
         RADIO_CELL_INFO_UPDATE,
         RADIO_GET_CELL_INFO,
         RADIO_GET_CELL_LOCATION,
+        RADIO_GET_IMEI,
 
         // module internal events
         RADIO_PS_CONNECTION_ATTACHED = 401,

@@ -33,7 +33,7 @@ namespace OHOS {
 namespace Telephony {
 class SimFileManager : public ISimFileManager {
 public:
-    SimFileManager(std::shared_ptr<Telephony::ISimStateManager> state);
+    SimFileManager(std::shared_ptr<IRilManager> rilManager, std::shared_ptr<Telephony::ISimStateManager> state);
     virtual ~SimFileManager();
     void Init();
     virtual std::u16string GetSimOperatorNumeric(int32_t slotId);
@@ -43,24 +43,36 @@ public:
     virtual std::u16string GetIMSI(int32_t slotId);
     virtual std::u16string GetLocaleFromDefaultSim();
     virtual std::u16string GetSimGid1(int32_t slotId);
+    virtual std::u16string GetSimTelephoneNumber(int32_t slotId);
+    virtual std::u16string GetVoiceMailIdentifier(int32_t slotId);
+    virtual std::u16string GetVoiceMailNumber(int32_t slotId);
     virtual int ObtainSpnCondition(bool roaming, std::string operatorNum);
     virtual void RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     virtual void UnregisterImsiLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     virtual void RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     virtual void UnregisterAllFilesLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    virtual void RegisterPhoneNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    virtual void UnRegisterPhoneNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
     virtual void SetImsi(std::string imsi);
     std::shared_ptr<IccFile> GetIccFile();
     std::shared_ptr<IccFileController> GetIccFileController();
+    std::shared_ptr<SimDiallingNumbersHandler> ObtainDiallingNumberHandler();
+    virtual bool SetVoiceMail(const std::u16string &mailName, const std::u16string &mailNumber, int32_t slotId);
     enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
 
 protected:
+    std::shared_ptr<IRilManager> rilManager_ = nullptr;
     std::shared_ptr<IccFileController> fileController_ = nullptr;
     std::shared_ptr<IccFile> simFile_ = nullptr;
+    std::shared_ptr<SimDiallingNumbersHandler> diallingNumberHandler_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopFileController_ = nullptr;
     HandleRunningState stateRecord_ = HandleRunningState::STATE_NOT_START;
     HandleRunningState stateHandler_ = HandleRunningState::STATE_NOT_START;
     std::shared_ptr<Telephony::ISimStateManager> simStateManager_ = nullptr;
+
+private:
+    bool InitDiallingNumberHandler();
 };
 } // namespace Telephony
 } // namespace OHOS

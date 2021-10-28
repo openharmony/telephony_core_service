@@ -35,6 +35,7 @@ public:
     void SetNetworkSelectionMode(
         int32_t automaticFlag, std::string oper, const AppExecFwk::InnerEvent::Pointer &response);
     void SetNetworkLocationUpdate(const AppExecFwk::InnerEvent::Pointer &response);
+    void GetSlotIMEI(const AppExecFwk::InnerEvent::Pointer &response);
 
     // ril unsol
     void SignalStrengthUpdated(MessageParcel &data);
@@ -66,6 +67,7 @@ public:
     void GetNetworkSelectionModeResponse(MessageParcel &data);
     void SetNetworkSelectionModeResponse(MessageParcel &data);
     void SetNetworkLocationUpdateResponse(MessageParcel &data);
+    void GetSlotIMEIResponse(MessageParcel &data);
     /**
      * @brief Current operator ons or eons response
      *

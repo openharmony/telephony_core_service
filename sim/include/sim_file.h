@@ -42,6 +42,7 @@ public:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     ~SimFile();
     bool ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event);
+    bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber);
 
 protected:
     enum SpnStatus {
@@ -59,7 +60,7 @@ protected:
     void ObtainCallForwardFiles();
     void UpdateSimLanguage();
     int callForwardStatus_ = 0;
-    unsigned char *cphsInfo_ = nullptr;
+    std::string cphsInfo_ = NULLSTR;
     bool cspPlmnOn_ = false;
     unsigned char *efMWIS_ = nullptr;
     unsigned char *efCphsMwi_ = nullptr;
@@ -93,6 +94,7 @@ private:
     bool ProcessVoiceMailCphs(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetMwisDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetMbdnDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessGetCphsMailBoxDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetMbiDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetCfisDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetCffDone(const AppExecFwk::InnerEvent::Pointer &event);
@@ -129,6 +131,8 @@ private:
     const int MCCMNC_LEN = 6;
     const int LOAD_STEP = 1;
     enum SpnType { SPN_INVALID = -1, SPN_COND = 2 };
+    static const uint8_t CPHS_VOICE_MAIL_MASK = 0x30;
+    static const uint8_t CPHS_VOICE_MAIL_EXSIT = 0x30;
     class ElementaryFilePlLoaded : public IccFileLoaded {
     public:
         ElementaryFilePlLoaded(std::shared_ptr<SimFile> file) : file_(file) {}
@@ -150,6 +154,9 @@ private:
     private:
         std::shared_ptr<SimFile> file_ = nullptr;
     };
+    int GetExtFromEf(int ef);
+    bool CphsVoiceMailAvailable();
+    void GetCphsMailBox();
 };
 } // namespace Telephony
 } // namespace OHOS

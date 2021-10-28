@@ -15,12 +15,18 @@
 
 #include "icc_file.h"
 
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+#include "inner_event.h"
+#include "system_ability_definition.h"
+
 using namespace std;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
+Icc_File_Action IccFile::g_CurFileAction(ACTION_WAIT);
 IccFile::IccFile(
     const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<ISimStateManager> simStateManager)
     : AppExecFwk::EventHandler(runner), stateManager_(simStateManager)
@@ -157,7 +163,7 @@ bool IccFile::LockQueriedOrNot()
     return (fileToGet_ == 0) && lockQueried_;
 }
 
-std::string IccFile::ObtainAdnInfo()
+std::string IccFile::ObtainDiallingNumberInfo()
 {
     return "";
 }
@@ -260,6 +266,34 @@ void IccFile::RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> e
 void IccFile::UnregisterAllFilesLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     filesFetchedObser_->Remove(ObserverHandler::RADIO_SIM_RECORDS_LOADED, handler);
+}
+
+void IccFile::RegisterPhoneNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
+{
+    switch (what) {
+        case ObserverHandler::RADIO_SIM_RECORDS_LOADED:
+            RegisterAllFilesLoaded(handler);
+            break;
+        case ObserverHandler::RADIO_IMSI_LOADED_READY:
+            RegisterImsiLoaded(handler);
+            break;
+        default:
+            TELEPHONY_LOGD("RegisterPhoneNotify default");
+    }
+}
+
+void IccFile::UnRegisterPhoneNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
+{
+    switch (what) {
+        case ObserverHandler::RADIO_SIM_RECORDS_LOADED:
+            UnregisterAllFilesLoaded(handler);
+            break;
+        case ObserverHandler::RADIO_IMSI_LOADED_READY:
+            UnregisterImsiLoaded(handler);
+            break;
+        default:
+            TELEPHONY_LOGD("RegisterPhoneNotify default");
+    }
 }
 
 void IccFile::UpdateSPN(const std::string &spn)
@@ -366,8 +400,8 @@ std::string IccFile::ObtainValidLanguage(const std::string &langData)
 
 IccFile::~IccFile() {}
 
-void IccFile::SetRilAndFileController(
-    std::shared_ptr<Telephony::IRilManager> ril, std::shared_ptr<IccFileController> file)
+void IccFile::SetRilAndFileController(const std::shared_ptr<Telephony::IRilManager> &ril,
+    const std::shared_ptr<IccFileController> &file, const std::shared_ptr<SimDiallingNumbersHandler> &handler)
 {
     rilManager_ = ril;
     if (rilManager_ == nullptr) {
@@ -378,6 +412,78 @@ void IccFile::SetRilAndFileController(
     if (fileController_ == nullptr) {
         TELEPHONY_LOGE("IccFile set NULL File Controller!!");
     }
+    diallingNumberHandler_ = handler;
+    if (fileController_ == nullptr) {
+        TELEPHONY_LOGE("IccFile set NULL File Controller!!");
+    }
+}
+
+AppExecFwk::InnerEvent::Pointer IccFile::CreateDiallingNumberPointer(
+    int eventid, int efId, int index, std::shared_ptr<void> pobj)
+{
+    std::unique_ptr<PbLoadHolder> holder = std::make_unique<PbLoadHolder>();
+    holder->fileID = efId;
+    holder->index = index;
+    holder->diallingNumber = pobj;
+    int eventParam = 0;
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventid, holder, eventParam);
+    event->SetOwner(shared_from_this());
+    return event;
+}
+
+bool IccFile::IsActionOn()
+{
+    return (g_CurFileAction == SET_VOICE_MAIL);
+}
+
+void IccFile::SetCurAction(Icc_File_Action action)
+{
+    g_CurFileAction = action;
+}
+
+Icc_File_Action IccFile::GetCurAction()
+{
+    return g_CurFileAction;
+}
+
+bool IccFile::ConnectRegistryService()
+{
+    if (telephonyStateNotify_ != nullptr) {
+        TELEPHONY_LOGD("IccFile::ConnectRegistryService() already connected\n");
+        return true;
+    }
+
+    auto systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemManager == nullptr) {
+        TELEPHONY_LOGE("IccFile::ConnectRegistryService() GetSystemAbilityManager() null\n");
+        return false;
+    }
+
+    sptr<IRemoteObject> object = systemManager->GetSystemAbility(TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID);
+
+    if (object != nullptr) {
+        TELEPHONY_LOGD("IccFile::ConnectRegistryService() IRemoteObject not null\n");
+        telephonyStateNotify_ = iface_cast<ITelephonyStateNotify>(object);
+    }
+
+    if (telephonyStateNotify_ == nullptr) {
+        TELEPHONY_LOGE("IccFile::ConnectRegistryService() telephonyStateNotify_ null\n");
+        return false;
+    }
+    TELEPHONY_LOGD("IccFile::ConnectRegistryService() success\n");
+    return true;
+}
+
+void IccFile::NotifyRegistrySimState(int32_t state, const std::u16string &reason)
+{
+    ConnectRegistryService();
+    if (telephonyStateNotify_ == nullptr) {
+        TELEPHONY_LOGE("NotifyRegistrySimState telephonyStateNotify_ is null\n");
+        return;
+    }
+    int simId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t result = telephonyStateNotify_->UpdateSimState(simId, state, reason);
+    TELEPHONY_LOGI("NotifyRegistrySimState msgId is %{public}d ret %{public}d", state, result);
 }
 } // namespace Telephony
 } // namespace OHOS

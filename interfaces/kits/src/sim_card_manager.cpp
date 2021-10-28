@@ -42,6 +42,8 @@ SimState SimTypeConverted(ExternalState state)
             return SIM_STATE_NOT_READY;
         case EX_ABSENT:
             return SIM_STATE_NOT_PRESENT;
+        case EX_LOADED:
+            return SIM_STATE_LOADED;
         default:
             return SIM_STATE_UNKNOWN;
     }
@@ -218,6 +220,49 @@ std::u16string SimCardManager::GetIMSI(int32_t slotId)
         return simManagerInterface_->GetIMSI(slotId);
     }
     return u"";
+}
+
+std::u16string SimCardManager::GetSimTelephoneNumber(int32_t slotId)
+{
+    if (simManagerInterface_ != nullptr) {
+        return simManagerInterface_->GetSimTelephoneNumber(slotId);
+    }
+    return u"";
+}
+
+std::vector<std::shared_ptr<DiallingNumbersInfo>> SimCardManager::QueryIccDiallingNumbers(int slotId, int type)
+{
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
+    if (simManagerInterface_ != nullptr) {
+        result = simManagerInterface_->QueryIccDiallingNumbers(slotId, type);
+    }
+    return result;
+}
+
+bool SimCardManager::AddIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
+{
+    if (simManagerInterface_ != nullptr) {
+        return simManagerInterface_->AddIccDiallingNumbers(slotId, type, diallingNumber);
+    }
+    return false;
+}
+
+bool SimCardManager::DelIccDiallingNumbers(int slotId, int type, int index)
+{
+    if (simManagerInterface_ != nullptr) {
+        return simManagerInterface_->DelIccDiallingNumbers(slotId, type, index);
+    }
+    return false;
+}
+
+bool SimCardManager::UpdateIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index)
+{
+    if (simManagerInterface_ != nullptr) {
+        return simManagerInterface_->UpdateIccDiallingNumbers(slotId, type, diallingNumber, index);
+    }
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS

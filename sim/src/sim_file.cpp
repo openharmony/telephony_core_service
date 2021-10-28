@@ -32,6 +32,7 @@ SimFile::SimFile(
 void SimFile::Init()
 {
     TELEPHONY_LOGI("SimFile:::Init():start");
+    IccFile::Init();
     std::shared_ptr<AppExecFwk::EventHandler> pThis = shared_from_this();
     if (stateManager_ != nullptr) {
         stateManager_->RegisterIccReady(pThis);
@@ -156,6 +157,8 @@ void SimFile::OnAllFilesFetched()
     TELEPHONY_LOGI("SimFile SimFile::OnAllFilesFetched: start notify");
     filesFetchedObser_->NotifyObserver(ObserverHandler::RADIO_SIM_RECORDS_LOADED);
     PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_LOADED, "");
+    std::u16string reason = u"";
+    NotifyRegistrySimState(ExternalState::EX_LOADED, reason);
 }
 
 bool SimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
@@ -210,6 +213,20 @@ void SimFile::LoadSimFiles()
     fileToGet_++;
 
     LoadSimLanguageFile();
+
+    AppExecFwk::InnerEvent::Pointer phoneNumberEvent =
+        CreateDiallingNumberPointer(MSG_SIM_OBTAIN_MSISDN_DONE, 0, 0, nullptr);
+    diallingNumberHandler_->LoadFromEF(
+        ELEMENTARY_FILE_MSISDN, GetExtFromEf(ELEMENTARY_FILE_MSISDN), 1, phoneNumberEvent);
+    fileToGet_++;
+
+    AppExecFwk::InnerEvent::Pointer eventMBI = CreatePointer(MSG_SIM_OBTAIN_MBI_DONE);
+    fileController_->ObtainLinearFixedFile(ELEMENTARY_FILE_MBI, 1, eventMBI);
+    fileToGet_++;
+
+    AppExecFwk::InnerEvent::Pointer eventCphs = CreatePointer(MSG_SIM_OBTAIN_INFO_CPHS_DONE);
+    fileController_->ObtainBinaryFile(ELEMENTARY_FILE_INFO_CPHS, eventCphs);
+    fileToGet_++;
 }
 void SimFile::LoadSimLanguageFile()
 {
@@ -415,13 +432,16 @@ bool SimFile::ProcessObtainGid2Done(const AppExecFwk::InnerEvent::Pointer &event
 
 bool SimFile::ProcessGetMsisdnDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
+    std::unique_ptr<PbHandlerResult> fd = event->GetUniqueObject<PbHandlerResult>();
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::static_pointer_cast<DiallingNumbersInfo>(fd->result);
     bool isFileProcessResponse = true;
     if (fd->exception != nullptr) {
         TELEPHONY_LOGE("SimFile Invalid or missing EF[MSISDN]");
         return isFileProcessResponse;
     }
+    msisdn_ = Str16ToStr8(diallingNumber->GetNumber());
+    msisdnTag_ = Str16ToStr8(diallingNumber->GetAlphaTag());
+    TELEPHONY_LOGI("phonenumber: %{public}s name: %{public}s", msisdn_.c_str(), msisdnTag_.c_str());
     return isFileProcessResponse;
 }
 
@@ -479,37 +499,85 @@ bool SimFile::ProcessGetMbiDone(const AppExecFwk::InnerEvent::Pointer &event)
     bool isValidMbdn = false;
     char *rawData = const_cast<char *>(iccData.c_str());
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
-
-    isValidMbdn = false;
     if (fd->exception == nullptr) {
-        TELEPHONY_LOGI("ELEMENTARY_FILE_MBI: %{public}s", rawData);
-        indexOfMailbox_ = fileData[0] & BYTE_NUM;
-        if (indexOfMailbox_ != 0 && indexOfMailbox_ != BYTE_NUM) {
+        int dataLen = 0;
+        std::shared_ptr<unsigned char> dataByte = SIMUtils::HexStringConvertToBytes(iccData, dataLen);
+        int index = (dataByte != nullptr) ? (dataByte.get()[0] & BYTE_NUM) : 0;
+        if (index != 0 && index != BYTE_NUM) {
+            indexOfMailbox_ = index;
             TELEPHONY_LOGI("fetch valid mailbox number for MBDN");
+            isValidMbdn = true;
+        } else {
             isValidMbdn = true;
         }
     }
+    TELEPHONY_LOGI("ELEMENTARY_FILE_MBI data is:%{public}s id: %{public}d", fileData, indexOfMailbox_);
     fileToGet_ += LOAD_STEP;
+    AppExecFwk::InnerEvent::Pointer mbdnEvent =
+        CreateDiallingNumberPointer(MSG_SIM_OBTAIN_MBDN_DONE, 0, 0, nullptr);
+    diallingNumberHandler_->LoadFromEF(ELEMENTARY_FILE_MBDN, ELEMENTARY_FILE_EXT6, indexOfMailbox_, mbdnEvent);
     return isFileProcessResponse;
 }
 
 bool SimFile::ProcessGetMbdnDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    auto eventId = event->GetInnerEventId();
-    std::string iccData = fd->resultData;
+    std::unique_ptr<PbHandlerResult> fd = event->GetUniqueObject<PbHandlerResult>();
     bool isFileProcessResponse = true;
+    bool hasException = fd->exception == nullptr;
+    TELEPHONY_LOGI("ProcessGetMbdnDone start %{public}d", hasException);
     voiceMailNum_ = NULLSTR;
     voiceMailTag_ = NULLSTR;
     if (fd->exception != nullptr) {
-        bool cphs = (eventId == MSG_SIM_OBTAIN_CPHS_MAILBOX_DONE);
-        TELEPHONY_LOGE("SimFile failed missing EF %{public}s", (cphs ? "[MAILBOX]" : "[MBDN]"));
-        if (eventId == MSG_SIM_OBTAIN_MBDN_DONE) {
-            fileToGet_ += LOAD_STEP;
-        }
+        TELEPHONY_LOGE("SimFile failed missing EF MBDN");
+        GetCphsMailBox();
         return isFileProcessResponse;
     }
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::static_pointer_cast<DiallingNumbersInfo>(fd->result);
+    if (diallingNumber == nullptr) {
+        TELEPHONY_LOGE("ProcessGetMbdnDone get null diallingNumber!!");
+        return isFileProcessResponse;
+    }
+
+    if (diallingNumber->IsEmpty()) {
+        GetCphsMailBox();
+        return isFileProcessResponse;
+    }
+    voiceMailNum_ = Str16ToStr8(diallingNumber->GetNumber());
+    voiceMailTag_ = Str16ToStr8(diallingNumber->GetAlphaTag());
+    TELEPHONY_LOGI("ProcessGetMbdnDone result %{public}s %{public}s", voiceMailNum_.c_str(), voiceMailTag_.c_str());
     return isFileProcessResponse;
+}
+
+bool SimFile::ProcessGetCphsMailBoxDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::unique_ptr<PbHandlerResult> fd = event->GetUniqueObject<PbHandlerResult>();
+    bool isFileProcessResponse = true;
+    bool hasException = fd->exception == nullptr;
+    TELEPHONY_LOGI("ProcessGetCphsMailBoxDone start %{public}d", hasException);
+    voiceMailNum_ = NULLSTR;
+    voiceMailTag_ = NULLSTR;
+    if (fd->exception != nullptr) {
+        TELEPHONY_LOGE("SimFile failed missing CPHS MAILBOX");
+        return isFileProcessResponse;
+    }
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::static_pointer_cast<DiallingNumbersInfo>(fd->result);
+    if (diallingNumber == nullptr) {
+        TELEPHONY_LOGE("GetCphsMailBoxDone get null diallingNumber!!");
+        return isFileProcessResponse;
+    }
+
+    voiceMailNum_ = Str16ToStr8(diallingNumber->GetNumber());
+    voiceMailTag_ = Str16ToStr8(diallingNumber->GetAlphaTag());
+    TELEPHONY_LOGI("GetCphsMailBoxDone result %{public}s %{public}s", voiceMailNum_.c_str(), voiceMailTag_.c_str());
+    return isFileProcessResponse;
+}
+
+void SimFile::GetCphsMailBox()
+{
+    fileToGet_ += LOAD_STEP;
+    AppExecFwk::InnerEvent::Pointer cphsEvent =
+        CreateDiallingNumberPointer(MSG_SIM_OBTAIN_CPHS_MAILBOX_DONE, 0, 0, nullptr);
+    diallingNumberHandler_->LoadFromEF(ELEMENTARY_FILE_MAILBOX_CPHS, ELEMENTARY_FILE_EXT1, 1, cphsEvent);
 }
 
 bool SimFile::ProcessGetMwisDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -765,15 +833,12 @@ bool SimFile::ProcessGetCspCphs(const AppExecFwk::InnerEvent::Pointer &event)
 bool SimFile::ProcessGetInfoCphs(const AppExecFwk::InnerEvent::Pointer &event)
 {
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
-    char *rawData = const_cast<char *>(iccData.c_str());
-    unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
     if (fd->exception != nullptr) {
         return isFileProcessResponse;
     }
-    cphsInfo_ = fileData;
-    TELEPHONY_LOGI("SimFile iCPHS: %{public}s", rawData);
+    cphsInfo_ = fd->resultData;
+    TELEPHONY_LOGI("SimFile iCPHS: %{public}s", cphsInfo_.c_str());
     return isFileProcessResponse;
 }
 
@@ -816,14 +881,21 @@ bool SimFile::ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessSetCphsMailbox(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
-    bool isFileProcessResponse = false;
+    bool isFileProcessResponse = true;
+    std::unique_ptr<PbHandlerResult> fd = event->GetUniqueObject<PbHandlerResult>();
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::static_pointer_cast<DiallingNumbersInfo>(fd->result);
     if (fd->exception == nullptr) {
-        voiceMailNum_ = lastVoiceMailNum_;
-        voiceMailTag_ = lastVoiceMailTag_;
+        voiceMailNum_ = Str16ToStr8(diallingNumber->GetNumber());
+        voiceMailTag_ = Str16ToStr8(diallingNumber->GetAlphaTag());
+        waitResult_ = true;
+        SetCurAction(SET_VOICE_MAIL);
+        processWait_.notify_one();
+        TELEPHONY_LOGD("set cphs voicemail number: %{public}s name: %{public}s",
+            voiceMailNum_.c_str(), voiceMailTag_.c_str());
     } else {
-        TELEPHONY_LOGI("fail to update CPHS MailBox");
+        SetCurAction(SET_VOICE_MAIL);
+        processWait_.notify_one();
+        TELEPHONY_LOGE("set cphs voicemail failed with exception!!");
     }
     return isFileProcessResponse;
 }
@@ -880,8 +952,38 @@ bool SimFile::ProcessGetFplmnDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessSetMbdn(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    (void)event;
-    return false;
+    bool isFileProcessResponse = true;
+    bool hasNotify = false;
+    std::unique_ptr<PbHandlerResult> fd = event->GetUniqueObject<PbHandlerResult>();
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::static_pointer_cast<DiallingNumbersInfo>(fd->result);
+    if (fd->exception == nullptr) {
+        voiceMailNum_ = Str16ToStr8(diallingNumber->GetNumber());
+        voiceMailTag_ = Str16ToStr8(diallingNumber->GetAlphaTag());
+        waitResult_ = true;
+        SetCurAction(SET_VOICE_MAIL);
+        processWait_.notify_one();
+        hasNotify = true;
+        TELEPHONY_LOGD("set voicemail name: %{public}s number: %{public}s",
+            voiceMailTag_.c_str(), voiceMailNum_.c_str());
+    }
+
+    if (CphsVoiceMailAvailable()) {
+        std::shared_ptr<DiallingNumbersInfo> diallingNumberCphs = std::make_shared<DiallingNumbersInfo>();
+        diallingNumberCphs->alphaTag_ = Str8ToStr16(voiceMailNum_);
+        diallingNumberCphs->number_ = Str8ToStr16(voiceMailTag_);
+        AppExecFwk::InnerEvent::Pointer eventCphs =
+            CreateDiallingNumberPointer(MSG_SIM_SET_CPHS_MAILBOX_DONE, 0, 0, nullptr);
+        diallingNumberHandler_->UpdateEF(diallingNumberCphs,
+            ELEMENTARY_FILE_MAILBOX_CPHS, ELEMENTARY_FILE_EXT1, 1, "", eventCphs);
+        TELEPHONY_LOGD("set cphs voicemail number as it is available");
+    } else {
+        if (!hasNotify) {
+            SetCurAction(SET_VOICE_MAIL);
+            processWait_.notify_one();
+        }
+        TELEPHONY_LOGD("set voicemail number finished");
+    }
+    return isFileProcessResponse;
 }
 
 bool SimFile::ProcessMarkSms(const AppExecFwk::InnerEvent::Pointer &event)
@@ -922,7 +1024,7 @@ void SimFile::InitMemberFunc()
     memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] = &SimFile::ProcessObtainIMSIDone;
     memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] = &SimFile::ProcessGetIccIdDone;
     memberFuncMap_[MSG_SIM_OBTAIN_MBI_DONE] = &SimFile::ProcessGetMbiDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_CPHS_MAILBOX_DONE] = &SimFile::ProcessGetMbdnDone;
+    memberFuncMap_[MSG_SIM_OBTAIN_CPHS_MAILBOX_DONE] = &SimFile::ProcessGetCphsMailBoxDone;
     memberFuncMap_[MSG_SIM_OBTAIN_MBDN_DONE] = &SimFile::ProcessGetMbdnDone;
     memberFuncMap_[MSG_SIM_OBTAIN_MSISDN_DONE] = &SimFile::ProcessGetMsisdnDone;
     memberFuncMap_[MSG_SIM_SET_MSISDN_DONE] = &SimFile::ProcessSetMsisdnDone;
@@ -982,8 +1084,63 @@ void SimFile::ElementaryFileUsimLiLoaded::ProcessParseFile(const AppExecFwk::Inn
 int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
 {
     int rule = SPN_CONDITION_DISPLAY_SPN;
-    // will be implemented for more
     return rule;
+}
+
+int SimFile::GetExtFromEf(int ef)
+{
+    int ext = 0;
+    if (ef == ELEMENTARY_FILE_MSISDN) {
+        ext = ELEMENTARY_FILE_EXT5; // ELEMENTARY_FILE_EXT1
+    } else {
+        ext = ELEMENTARY_FILE_EXT1;
+    }
+    return ext;
+}
+
+bool SimFile::UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber)
+{
+    waitResult_ = false;
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
+    diallingNumber->alphaTag_ = Str8ToStr16(mailName);
+    diallingNumber->number_ = Str8ToStr16(mailNumber);
+
+    if ((indexOfMailbox_ != 0) && (indexOfMailbox_ != BYTE_NUM)) {
+        TELEPHONY_LOGD("UpdateVoiceMail start MBDN");
+        AppExecFwk::InnerEvent::Pointer event =
+            CreateDiallingNumberPointer(MSG_SIM_SET_MBDN_DONE, 0, 0, nullptr);
+        diallingNumberHandler_->UpdateEF(diallingNumber,
+            ELEMENTARY_FILE_MBDN, ELEMENTARY_FILE_EXT6, indexOfMailbox_, "", event);
+        SetCurAction(ACTION_WAIT);
+        std::unique_lock<std::mutex> lock(mtx_);
+        processWait_.wait(lock, IccFile::IsActionOn);
+        SetCurAction(ACTION_WAIT);
+    } else if (CphsVoiceMailAvailable()) {
+        AppExecFwk::InnerEvent::Pointer event =
+            CreateDiallingNumberPointer(MSG_SIM_SET_CPHS_MAILBOX_DONE, 0, 0, nullptr);
+        diallingNumberHandler_->UpdateEF(diallingNumber,
+            ELEMENTARY_FILE_MAILBOX_CPHS, ELEMENTARY_FILE_EXT1, 1, "", event);
+        SetCurAction(ACTION_WAIT);
+        std::unique_lock<std::mutex> lock(mtx_);
+        processWait_.wait(lock, SimFile::IsActionOn);
+        SetCurAction(ACTION_WAIT);
+    } else {
+        TELEPHONY_LOGE("UpdateVoiceMail indexOfMailbox_ %{public}d is invalid!!", indexOfMailbox_);
+    }
+    TELEPHONY_LOGE("UpdateVoiceMail finished %{public}d", waitResult_);
+    return waitResult_;
+}
+
+bool SimFile::CphsVoiceMailAvailable()
+{
+    bool available = false;
+    if (!cphsInfo_.empty()) {
+        int dataLen = 0;
+        std::shared_ptr<unsigned char> dataByte = SIMUtils::HexStringConvertToBytes(cphsInfo_, dataLen);
+        available = (dataByte != nullptr) ? (dataByte.get()[1] & CPHS_VOICE_MAIL_MASK) ==
+            CPHS_VOICE_MAIL_EXSIT : false;
+    }
+    return available;
 }
 } // namespace Telephony
 } // namespace OHOS
