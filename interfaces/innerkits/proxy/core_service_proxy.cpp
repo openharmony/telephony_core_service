@@ -345,6 +345,31 @@ std::u16string CoreServiceProxy::GetIsoCountryCodeForNetwork(int32_t slotId)
     return result;
 }
 
+std::u16string CoreServiceProxy::GetImei(int32_t slotId)
+{
+    TELEPHONY_LOGD("CoreServiceProxy::GetImei");
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetImei WriteInterfaceToken is false");
+        return Str8ToStr16("");
+    }
+    data.WriteInt32(slotId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("GetImei Remote is null");
+        return Str8ToStr16("");
+    }
+    int32_t st = Remote()->SendRequest(GET_IMEI, data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetImei failed, error code is %{public}d \n", st);
+        return Str8ToStr16("");
+    }
+    std::u16string result = reply.ReadString16();
+    std::string str = Str16ToStr8(result);
+    return result;
+}
+
 bool CoreServiceProxy::HasSimCard(int32_t slotId)
 {
     TELEPHONY_LOGD("CoreServiceProxy HasSimCard ::%{public}d", slotId);
@@ -956,6 +981,283 @@ int32_t CoreServiceProxy::RefreshSimState(int32_t slotId)
     int32_t result = reply.ReadInt32();
     TELEPHONY_LOGD("RefreshSimState call end:: result = %{public}d", result);
     return result;
+}
+std::u16string CoreServiceProxy::GetSimTelephoneNumber(int32_t slotId)
+{
+    TELEPHONY_LOGD("CoreServiceProxy::GetSimTelephoneNumber");
+    if (!IsValidSimId(slotId)) {
+        return u"";
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetSimTelephoneNumber WriteInterfaceToken is false");
+        return Str8ToStr16("");
+    }
+    data.WriteInt32(slotId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("GetSimTelephoneNumber Remote is null");
+        return Str8ToStr16("");
+    }
+    int32_t st = Remote()->SendRequest(GET_SIM_PHONE_NUMBER, data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetSimTelephoneNumber failed, error code is %{public}d \n", st);
+        return Str8ToStr16("");
+    }
+    std::u16string result = reply.ReadString16();
+    TELEPHONY_LOGD("GetSimTelephoneNumber call end");
+    return result;
+}
+
+std::u16string CoreServiceProxy::GetVoiceMailIdentifier(int32_t slotId)
+{
+    TELEPHONY_LOGD("CoreServiceProxy::GetVoiceMailIdentifier");
+    if (!IsValidSimId(slotId)) {
+        return u"";
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetVoiceMailIdentifier WriteInterfaceToken is false");
+        return Str8ToStr16("");
+    }
+    data.WriteInt32(slotId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("GetVoiceMailIdentifier Remote is null");
+        return Str8ToStr16("");
+    }
+    int32_t st = Remote()->SendRequest(GET_VOICE_MAIL_TAG, data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetVoiceMailIdentifier failed, error code is %{public}d \n", st);
+        return Str8ToStr16("");
+    }
+    std::u16string result = reply.ReadString16();
+    TELEPHONY_LOGD("GetVoiceMailIdentifier call end");
+    return result;
+}
+
+std::u16string CoreServiceProxy::GetVoiceMailNumber(int32_t slotId)
+{
+    TELEPHONY_LOGD("CoreServiceProxy::GetVoiceMailNumber");
+    if (!IsValidSimId(slotId)) {
+        return u"";
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetVoiceMailNumber WriteInterfaceToken is false");
+        return Str8ToStr16("");
+    }
+    data.WriteInt32(slotId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("GetVoiceMailNumber Remote is null");
+        return Str8ToStr16("");
+    }
+    int32_t st = Remote()->SendRequest(GET_VOICE_MAIL_NUMBER, data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetVoiceMailNumber failed, error code is %{public}d \n", st);
+        return Str8ToStr16("");
+    }
+    std::u16string result = reply.ReadString16();
+    TELEPHONY_LOGD("GetVoiceMailNumber call end");
+    return result;
+}
+
+std::vector<std::shared_ptr<DiallingNumbersInfo>> CoreServiceProxy::QueryIccDiallingNumbers(int slotId, int type)
+{
+    TELEPHONY_LOGD("CoreServiceProxy::QueryIccDiallingNumbers");
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
+    if (!IsValidSimId(slotId)) {
+        return result;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("QueryIccDiallingNumbers WriteInterfaceToken is false");
+        return result;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("QueryIccDiallingNumbers WriteInt32 slotId is false");
+        return result;
+    }
+    if (!data.WriteInt32(type)) {
+        TELEPHONY_LOGE("QueryIccDiallingNumbers WriteInt32 type is false");
+        return result;
+    }
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("QueryIccDiallingNumbers Remote is null");
+        return result;
+    }
+    int32_t st = Remote()->SendRequest(ICC_PHONE_BOOK_GET, data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("QueryIccDiallingNumbers failed, error code is %{public}d\n", st);
+        return result;
+    }
+    int32_t size = reply.ReadInt32();
+    TELEPHONY_LOGD("CoreServiceProxy::QueryIccDiallingNumbers size:%{public}d\n", size);
+    for (int i = 0; i < size; i++) {
+        std::shared_ptr<DiallingNumbersInfo> diallingNumber = DiallingNumbersInfo::UnMarshalling(reply);
+        result.emplace_back(diallingNumber);
+    }
+    return result;
+}
+
+bool CoreServiceProxy::AddIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
+{
+    TELEPHONY_LOGD("CoreServiceProxy AddIccDiallingNumbers ::%{public}d", slotId);
+    if (!IsValidSimId(slotId)) {
+        return false;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("AddIccDiallingNumbers WriteInterfaceToken is false");
+        return false;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("AddIccDiallingNumbers WriteInt32 slotId is false");
+        return false;
+    }
+    if (!data.WriteInt32(type)) {
+        TELEPHONY_LOGE("AddIccDiallingNumbers WriteInt32 type is false");
+        return false;
+    }
+    if (diallingNumber != nullptr) {
+        diallingNumber->Marshalling(data);
+    }
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("AddIccDiallingNumbers Remote is null");
+        return false;
+    }
+    int32_t st = Remote()->SendRequest(ICC_PHONE_BOOK_INSERT, data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("AddIccDiallingNumbers failed, error code is %{public}d \n", st);
+        return false;
+    }
+    return reply.ReadBool();
+}
+
+bool CoreServiceProxy::DelIccDiallingNumbers(int slotId, int type, int index)
+{
+    TELEPHONY_LOGD("CoreServiceProxy DelIccDiallingNumbers ::%{public}d", slotId);
+    if (!IsValidSimId(slotId)) {
+        return false;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("DelIccDiallingNumbers WriteInterfaceToken is false");
+        return false;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("DelIccDiallingNumbers WriteInt32 slotId is false");
+        return false;
+    }
+    if (!data.WriteInt32(type)) {
+        TELEPHONY_LOGE("DelIccDiallingNumbers WriteInt32 type is false");
+        return false;
+    }
+    if (!data.WriteInt32(index)) {
+        TELEPHONY_LOGE("DelIccDiallingNumbers WriteInt32 selectMode is false");
+        return false;
+    }
+
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("DelIccDiallingNumbers Remote is null");
+        return false;
+    }
+    int32_t st = Remote()->SendRequest(ICC_PHONE_BOOK_DELETE, data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("DelIccDiallingNumbers failed, error code is %{public}d \n", st);
+        return false;
+    }
+    return reply.ReadBool();
+}
+
+bool CoreServiceProxy::UpdateIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index)
+{
+    TELEPHONY_LOGD("CoreServiceProxy UpdateIccDiallingNumbers ::%{public}d", slotId);
+    if (!IsValidSimId(slotId)) {
+        return false;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("UpdateIccDiallingNumbers WriteInterfaceToken is false");
+        return false;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("UpdateIccDiallingNumbers WriteInt32 slotId is false");
+        return false;
+    }
+    if (!data.WriteInt32(type)) {
+        TELEPHONY_LOGE("DelIccDiallingNumbers WriteInt32 type is false");
+        return false;
+    }
+    if (!data.WriteInt32(index)) {
+        TELEPHONY_LOGE("UpdateIccDiallingNumbers WriteInt32 selectMode is false");
+        return false;
+    }
+    if (diallingNumber != nullptr) {
+        diallingNumber->Marshalling(data);
+    }
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("UpdateIccDiallingNumbers Remote is null");
+        return false;
+    }
+    int32_t st = Remote()->SendRequest(ICC_PHONE_BOOK_UPDATE, data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("UpdateIccDiallingNumbers failed, error code is %{public}d \n", st);
+        return false;
+    }
+    return reply.ReadBool();
+}
+
+bool CoreServiceProxy::SetVoiceMail(
+    const std::u16string &mailName, const std::u16string &mailNumber, int32_t slotId)
+{
+    TELEPHONY_LOGD("CoreServiceProxy SetVoiceMail ::%{public}d", slotId);
+    if (!IsValidSimId(slotId)) {
+        return false;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("SetVoiceMail WriteInterfaceToken is false");
+        return false;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("SetVoiceMail WriteInt32 slotId is false");
+        return false;
+    }
+    if (!data.WriteString16(mailName)) {
+        TELEPHONY_LOGE("SetVoiceMail WriteString16 mailName is false");
+        return false;
+    }
+    if (!data.WriteString16(mailNumber)) {
+        TELEPHONY_LOGE("SetVoiceMail WriteString16 mailNumber is false");
+        return false;
+    }
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("SetVoiceMail Remote is null");
+        return false;
+    }
+    int32_t st = Remote()->SendRequest(SET_VOICE_MAIL, data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("SetVoiceMail failed, error code is %{public}d \n", st);
+        return false;
+    }
+    return reply.ReadBool();
 }
 } // namespace Telephony
 } // namespace OHOS

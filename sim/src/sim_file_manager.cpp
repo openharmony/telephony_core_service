@@ -19,9 +19,9 @@
 
 namespace OHOS {
 namespace Telephony {
-SimFileManager::SimFileManager(std::shared_ptr<Telephony::ISimStateManager> state)
+SimFileManager::SimFileManager(std::shared_ptr<IRilManager> rilManager,
+    std::shared_ptr<Telephony::ISimStateManager> state) : rilManager_(rilManager), simStateManager_(state)
 {
-    simStateManager_ = state;
     if (simStateManager_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager set NULL simStateManager.");
         return;
@@ -38,47 +38,43 @@ void SimFileManager::Init()
         TELEPHONY_LOGI("SimFileManager::Init stateRecord_ started.");
         return;
     }
-
     if (stateHandler_ == HandleRunningState::STATE_RUNNING) {
         TELEPHONY_LOGI("SimFileManager::Init stateHandler_ started.");
         return;
     }
-
-    std::shared_ptr<Telephony::IRilManager> rilManager =
-        CoreManager::GetInstance().getCore(CoreManager::DEFAULT_SLOT_ID)->GetRilManager();
-    if (rilManager == nullptr) {
+    if (rilManager_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager get NULL IRilManager.");
         return;
     }
-
     eventLoopRecord_ = AppExecFwk::EventRunner::Create("IccFile");
     if (eventLoopRecord_.get() == nullptr) {
         TELEPHONY_LOGE("IccFile  failed to create EventRunner");
         return;
     }
-
     eventLoopFileController_ = AppExecFwk::EventRunner::Create("SIMHandler");
     if (eventLoopFileController_.get() == nullptr) {
         TELEPHONY_LOGE("SIMHandler  failed to create EventRunner");
         return;
     }
-
     fileController_ = std::make_shared<UsimFileController>(eventLoopFileController_);
     if (fileController_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::Init fileController create nullptr.");
         return;
     }
-    fileController_->SetRilManager(rilManager);
-
+    fileController_->SetRilManager(rilManager_);
+    eventLoopFileController_->Run();
+    if (!InitDiallingNumberHandler()) {
+        TELEPHONY_LOGE("SimFileManager::InitDiallingNumberHandler fail");
+        return;
+    }
     simFile_ = std::make_shared<SimFile>(eventLoopRecord_, simStateManager_);
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::Init simFile create nullptr.");
         return;
     }
-    simFile_->SetRilAndFileController(rilManager, fileController_);
-
+    simFile_->SetRilAndFileController(rilManager_, fileController_, diallingNumberHandler_);
     eventLoopRecord_->Run();
-    eventLoopFileController_->Run();
+
     stateRecord_ = HandleRunningState::STATE_RUNNING;
     stateHandler_ = HandleRunningState::STATE_RUNNING;
 
@@ -171,6 +167,43 @@ std::u16string SimFileManager::GetSimGid1(int32_t slotId)
     return Str8ToStr16(result);
 }
 
+std::u16string SimFileManager::GetSimTelephoneNumber(int32_t slotId)
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::GetSimTelephoneNumber simFile nullptr");
+        return Str8ToStr16("");
+    }
+
+    std::string result = simFile_->ObtainMsisdnNumber();
+    TELEPHONY_LOGI("SimFileManager::GetSimTelephoneNumber result:%{public}s ", (result.empty() ? "false" : "true"));
+    return Str8ToStr16(result);
+}
+
+std::u16string SimFileManager::GetVoiceMailIdentifier(int32_t slotId)
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::GetVoiceMailIdentifier simFile nullptr");
+        return Str8ToStr16("");
+    }
+
+    std::string result = simFile_->ObtainVoiceMailInfo();
+    TELEPHONY_LOGI(
+        "SimFileManager::GetVoiceMailIdentifier result:%{public}s ", (result.empty() ? "false" : "true"));
+    return Str8ToStr16(result);
+}
+
+std::u16string SimFileManager::GetVoiceMailNumber(int32_t slotId)
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::GetVoiceMailNumber simFile nullptr");
+        return Str8ToStr16("");
+    }
+
+    std::string result = simFile_->ObtainVoiceMailNumber();
+    TELEPHONY_LOGI("SimFileManager::GetVoiceMailNumber result:%{public}s ", (result.empty() ? "false" : "true"));
+    return Str8ToStr16(result);
+}
+
 int SimFileManager::ObtainSpnCondition(bool roaming, std::string operatorNum)
 {
     if (simFile_ == nullptr) {
@@ -213,9 +246,60 @@ void SimFileManager::UnregisterAllFilesLoaded(const std::shared_ptr<AppExecFwk::
     simFile_->UnregisterAllFilesLoaded(handler);
 }
 
+void SimFileManager::RegisterPhoneNotify(
+    const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
+{
+    simFile_->RegisterPhoneNotify(handler, what);
+}
+
+void SimFileManager::UnRegisterPhoneNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
+{
+    simFile_->UnRegisterPhoneNotify(handler, what);
+}
+
 void SimFileManager::SetImsi(std::string imsi)
 {
     simFile_->UpdateImsi(imsi);
+}
+
+bool SimFileManager::SetVoiceMail(const std::u16string &mailName, const std::u16string &mailNumber, int32_t slotId)
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::SetVoiceMail simFile nullptr");
+        return false;
+    }
+    std::string name = Str16ToStr8(mailName);
+    std::string number = Str16ToStr8(mailNumber);
+    bool result = simFile_->UpdateVoiceMail(name, number);
+    TELEPHONY_LOGI("SimFileManager::SetVoiceMail result:%{public}s ", (!result ? "false" : "true"));
+    return result;
+}
+
+bool SimFileManager::InitDiallingNumberHandler()
+{
+    if (diallingNumberHandler_ != nullptr) {
+        return true;
+    }
+    if (fileController_ == nullptr) {
+        return false;
+    }
+    std::shared_ptr<AppExecFwk::EventRunner> loaderLoop = AppExecFwk::EventRunner::Create("msisdnLoader");
+    if (loaderLoop.get() == nullptr) {
+        TELEPHONY_LOGE("SimFileManager failed to create diallingNumberloader loop");
+        return false;
+    }
+    diallingNumberHandler_ = std::make_shared<SimDiallingNumbersHandler>(loaderLoop, fileController_);
+    if (diallingNumberHandler_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager failed to create SimDiallingNumbersHandler.");
+        return false;
+    }
+    loaderLoop->Run();
+    return true;
+}
+
+std::shared_ptr<SimDiallingNumbersHandler> SimFileManager::ObtainDiallingNumberHandler()
+{
+    return diallingNumberHandler_;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -40,6 +40,7 @@ const int32_t INPUT_GET_NETWORK_SEARCH_RESULT = 9;
 const int32_t INPUT_GET_NETWORK_SELECTION_MODE = 10;
 const int32_t INPUT_SET_NETWORK_SELECTION_MODE = 11;
 const int32_t INPUT_GET_IOS_COUNTRY_CODE = 14;
+const int32_t INPUT_GET_IMEI = 18;
 const int32_t INPUT_QUIT = 100;
 const int32_t SLEEP_TIME = 5;
 using NsTestFunc = void (*)();
@@ -256,6 +257,15 @@ void TestGetIsoCountryCodeForNetwork()
     }
 }
 
+void TestGetImei()
+{
+    if (g_telephonyService != nullptr) {
+        std::u16string result = g_telephonyService->GetImei(CoreManager::DEFAULT_SLOT_ID);
+        std::string str = Str16ToStr8(result);
+        std::cout << " result:" << str << std::endl;
+    }
+}
+
 void Prompt()
 {
     printf(
@@ -274,6 +284,7 @@ void Prompt()
         "10:GetNetworkSelectionMode\n"
         "11:SetNetworkSelectionMode\n"
         "14:GetIsoCountryCodeForNetwork\n"
+        "18:GetImei\n"
         "100:exit \n");
 }
 
@@ -328,6 +339,7 @@ void Init()
     memberFuncMap_[INPUT_GET_NETWORK_SELECTION_MODE] = TestGetNetworkSelectionMode;
     memberFuncMap_[INPUT_SET_NETWORK_SELECTION_MODE] = TestSetNetworkSelectionMode;
     memberFuncMap_[INPUT_GET_IOS_COUNTRY_CODE] = TestGetIsoCountryCodeForNetwork;
+    memberFuncMap_[INPUT_GET_IMEI] = TestGetImei;
 }
 
 void InitBroadCast()

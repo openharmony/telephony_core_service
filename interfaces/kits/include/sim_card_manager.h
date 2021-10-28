@@ -49,6 +49,12 @@ public:
     int32_t RefreshSimState(int32_t slotId);
     bool IsSimActive(int32_t slotId);
     std::u16string GetIMSI(int32_t slotId);
+    std::u16string GetSimTelephoneNumber(int32_t slotId);
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int slotId, int type);
+    bool AddIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
+    bool DelIccDiallingNumbers(int slotId, int type, int index);
+    bool UpdateIccDiallingNumbers(
+        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index);
 
 private:
     sptr<ICoreService> simManagerInterface_;

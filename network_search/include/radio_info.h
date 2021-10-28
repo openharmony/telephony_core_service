@@ -30,6 +30,7 @@ public:
     void ProcessGetRadioStatus(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessSetRadioStatus(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessRadioChange() const;
+    void ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) const;
 
 private:
     std::shared_ptr<NetworkSearchManager> networkSearchManager_;

@@ -149,6 +149,7 @@ public:
 
     void GetOperatorInfo(const AppExecFwk::InnerEvent::Pointer &response) override;
 
+    void GetSlotIMEI(const AppExecFwk::InnerEvent::Pointer &response) override;
     /**
      * @brief  Send Sms
      */

@@ -24,6 +24,7 @@
 #include "i_sim_sms_manager.h"
 #include "i_tel_ril_manager.h"
 #include "i_sim_manager.h"
+#include "i_icc_dialling_numbers_manager.h"
 #include "observer_handler.h"
 
 namespace OHOS {
@@ -98,12 +99,15 @@ public:
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId);
     bool GetNetworkSearchResult(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+    std::u16string GetImei(int32_t slotId) const;
     void RegisterIccStateChanged(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void RegisterImsiLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void RegisterAllFilesLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t ObtainSpnCondition(bool roaming, std::string operatorNum);
     std::u16string GetSpn(int32_t slotId);
     void GetOperatorInfo(const AppExecFwk::InnerEvent::Pointer &response);
+    bool SetVoiceMail(const std::u16string &mailName, const std::u16string &mailNumber, int32_t slotId);
+    void GetOperatorInfo(const AppExecFwk::InnerEvent::Pointer &response) const;
 
     void SendSms(std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response);
     void StorageSms(
@@ -140,12 +144,21 @@ public:
     void SetNetworkLocationUpdate(const AppExecFwk::InnerEvent::Pointer &result);
     void TelRilSetParam(int32_t preferredNetworkType, int32_t cdmaSubscription, int32_t instanceId);
     bool InitCellularRadio(bool isFirst);
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int slotId, int type);
+    bool AddIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
+    bool DelIccDiallingNumbers(int slotId, int type, int index);
+    bool UpdateIccDiallingNumbers(int slotId, int type,
+            const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index);
+    std::u16string GetSimTelephoneNumber(int32_t slotId);
+    std::u16string GetVoiceMailIdentifier(int32_t slotId);
+    std::u16string GetVoiceMailNumber(int32_t slotId);
     std::shared_ptr<INetworkSearch> GetNetworkSearchManager() const;
     std::shared_ptr<IRilManager> GetRilManager() const;
     std::shared_ptr<ISimFileManager> GetSimFileManager() const;
     std::shared_ptr<ISimStateManager> GetSimStateManager() const;
     std::shared_ptr<ISimSmsManager> GetSimSmsManager() const;
     std::shared_ptr<ISimManager> GetSimManager() const;
+    std::shared_ptr<IIccDiallingNumbersManager> GetIccPhoneBookManager() const;
 
 private:
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
@@ -154,6 +167,7 @@ private:
     std::shared_ptr<ISimStateManager> simStateManager_ = nullptr;
     std::shared_ptr<ISimSmsManager> simSmsManager_ = nullptr;
     std::shared_ptr<ISimManager> simManager_ = nullptr;
+    std::shared_ptr<Telephony::IIccDiallingNumbersManager> iccPhoneBookManager_ = nullptr;
     int slotId_;
     bool isInitCore_;
 };

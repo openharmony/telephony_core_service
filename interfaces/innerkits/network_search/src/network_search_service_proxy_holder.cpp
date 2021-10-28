@@ -14,6 +14,7 @@
  */
 
 #include "network_search_service_proxy_holder.h"
+
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "network_search_service_death_recipient.h"
@@ -162,6 +163,14 @@ std::u16string NetworkSearchServiceProxyHolder::GetIsoCountryCodeForNetwork(int3
 {
     if (GetNetworkSearchProxy()) {
         return radioNetworkService_->GetIsoCountryCodeForNetwork(slotId);
+    }
+    return u"";
+}
+
+std::u16string NetworkSearchServiceProxyHolder::GetImei(int32_t slotId)
+{
+    if (GetNetworkSearchProxy()) {
+        return radioNetworkService_->GetImei(slotId);
     }
     return u"";
 }

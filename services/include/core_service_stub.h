@@ -43,6 +43,7 @@ private:
     int32_t OnGetNetworkSearchResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetNetworkSelectionMode(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetIsoCountryCodeForNetwork(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetImei(MessageParcel &data, MessageParcel &reply);
 
     int32_t OnHasSimCard(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimState(MessageParcel &data, MessageParcel &reply);
@@ -64,6 +65,14 @@ private:
     int32_t OnSetLockState(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetLockState(MessageParcel &data, MessageParcel &reply);
     int32_t OnRefreshSimState(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetSimPhoneNumber(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetVoiceMailInfor(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetVoiceMailNumber(MessageParcel &data, MessageParcel &reply);
+    int32_t OnPhoneBookGet(MessageParcel &data, MessageParcel &reply);
+    int32_t OnAddIccDiallingNumbers(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateIccDiallingNumbers(MessageParcel &data, MessageParcel &reply);
+    int32_t OnDelIccDiallingNumbers(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetVoiceMail(MessageParcel &data, MessageParcel &reply);
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;

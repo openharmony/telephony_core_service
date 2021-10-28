@@ -25,6 +25,7 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "napi_radio_types.h"
 #include "napi_util.h"
 #include "network_state.h"
 #include "signal_information.h"
@@ -147,28 +148,6 @@ enum NetworkType {
      * Indicates that the network type is 5G NR.
      */
     NETWORK_TYPE_NR
-};
-
-enum RegStatus {
-    /**
-     * Indicates a state in which a device cannot use any service.
-     */
-    REGISTRATION_STATE_NO_SERVICE = 0,
-
-    /**
-     * Indicates a state in which a device can use services properly.
-     */
-    REGISTRATION_STATE_IN_SERVICE = 1,
-
-    /**
-     * Indicates a state in which a device can use only the emergency call service.
-     */
-    REGISTRATION_STATE_EMERGENCY_CALL_ONLY = 2,
-
-    /**
-     * Indicates that the cellular radio is powered off.
-     */
-    REGISTRATION_STATE_POWER_OFF = 3
 };
 
 enum NsaState {
@@ -304,6 +283,11 @@ struct IsRadioOnContext : CallbackContext {
 
 struct SwitchRadioContext : CallbackContext {
     int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+};
+
+struct GetIMEIContext : BaseContext {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    std::string getIMEIResult = "";
 };
 } // namespace Telephony
 } // namespace OHOS

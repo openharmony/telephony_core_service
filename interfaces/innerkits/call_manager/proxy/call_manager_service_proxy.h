@@ -48,7 +48,7 @@ public:
      * @param callback[in], callback function pointer
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t RegisterCallBack(const sptr<ICallAbilityCallback> &callback) override;
+    int32_t RegisterCallBack(const sptr<ICallAbilityCallback> &callback, std::u16string &bundleName) override;
 
     /**
      * Call dial interface
@@ -213,6 +213,7 @@ public:
     int32_t GetMainCallId(int32_t callId) override;
     std::vector<std::u16string> GetSubCallIdList(int32_t callId) override;
     std::vector<std::u16string> GetCallIdListForConference(int32_t callId) override;
+    int32_t InsertData() override;
 
 private:
     static inline BrokerDelegator<CallManagerServiceProxy> delegator_;

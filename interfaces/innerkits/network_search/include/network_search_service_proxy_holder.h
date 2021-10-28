@@ -45,6 +45,7 @@ public:
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId);
     bool GetNetworkSearchProxy();
     void ResetNetworkServiceServiceProxy();
+    std::u16string GetImei(int32_t slotId);
 
 private:
     std::mutex mutex_;

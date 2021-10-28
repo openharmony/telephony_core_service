@@ -86,11 +86,28 @@ struct IccFromRilMsg : public IccToRilMsg {
     IccFileData fileData;
 };
 
-struct EfLinearResult {
+struct EfLinearResult : public FileToControllerMsg {
+    EfLinearResult(const FileToControllerMsg *cmd)
+    {
+        if (cmd != nullptr) {
+            arg1 = cmd->arg1;
+            arg2 = cmd->arg2;
+            iccLoader = cmd->iccLoader;
+        }
+    }
     int valueData[Ef_RESULT_NUM] = {0};
+    std::shared_ptr<void> exception = nullptr;
 };
 
-struct MultiRecordResult {
+struct MultiRecordResult : public FileToControllerMsg {
+    MultiRecordResult(const FileToControllerMsg *cmd)
+    {
+        if (cmd != nullptr) {
+            arg1 = cmd->arg1;
+            arg2 = cmd->arg2;
+            iccLoader = cmd->iccLoader;
+        }
+    }
     std::vector<std::string> fileResults;
     int resultLength = 0;
     std::shared_ptr<void> exception = nullptr;
@@ -99,10 +116,46 @@ struct MultiRecordResult {
 struct PbLoadHolder {
     int fileID = 0;
     int index = 0;
-    std::shared_ptr<void> adn = nullptr;
+    std::shared_ptr<void> diallingNumber = nullptr;
 };
 
-using EventPointer = AppExecFwk::InnerEvent::Pointer;
+struct PbHandlerResult : public PbLoadHolder {
+    PbHandlerResult(const PbLoadHolder *cmd)
+    {
+        if (cmd != nullptr) {
+            fileID = cmd->fileID;
+            index = cmd->index;
+            diallingNumber = cmd->diallingNumber;
+        }
+    }
+    std::shared_ptr<void> result = nullptr;
+    std::shared_ptr<void> exception = nullptr;
+};
+
+struct StationFetcher {
+    int fileID = 0;
+};
+
+struct StationResult : public StationFetcher {
+    StationResult(const StationFetcher *cmd)
+    {
+        if (cmd != nullptr) {
+            fileID = cmd->fileID;
+        }
+    }
+    std::shared_ptr<void> result = nullptr;
+    std::shared_ptr<void> exception = nullptr;
+};
+
+struct TagFile {
+    TagFile(int parentTag, int efid, int sfi, int indexNum)
+        : tag(parentTag), fileId(efid), shortFileId(sfi), index(indexNum)
+    {}
+    int tag = 0;
+    int fileId = 0;
+    int shortFileId = 0;
+    int index = 0;
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_SIM_DATA_TYPE_H

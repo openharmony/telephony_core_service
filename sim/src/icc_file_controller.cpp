@@ -70,12 +70,15 @@ void IccFileController::ProcessLinearRecordSize(const AppExecFwk::InnerEvent::Po
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData); // for unsigned int bitwise
 
     if (IsValidSizeData(fileData)) {
-        int fileSize[] = {0, 0, 0};
-        ParseFileSize(fileSize, RECORD_NUM, fileData);
-        SendEfLinearResult(process, fileSize, RECORD_NUM);
+        TELEPHONY_LOGI("ProcessLinearRecordSize valid data");
     } else {
         TELEPHONY_LOGI("IccFileTypeMismatch Error type %{public}d", eventId);
     }
+    int fileSize[] = {0, 0, 0};
+    if (!result->resultData.empty()) {
+        ParseFileSize(fileSize, RECORD_NUM, fileData);
+    }
+    SendEfLinearResult(process, fileSize, RECORD_NUM);
 }
 
 void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer &event)
@@ -97,8 +100,13 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
     GetFileAndDataSize(fileData, hd->fileSize, size);
     if (hd->fileSize != 0) {
         hd->countFiles = size / hd->fileSize;
+        TELEPHONY_LOGD("origin count file %{public}d", hd->countFiles);
     }
-    TELEPHONY_LOGI("ProcessRecordSize  %{public}d %{public}d %{public}d", size, hd->fileSize, hd->countFiles);
+
+    if (IsFixedNumberType(hd->fileId)) {
+        hd->countFiles = MAX_RECORD_NUM;
+    }
+    TELEPHONY_LOGI("ProcessRecordSize %{public}d %{public}d %{public}d", size, hd->fileSize, hd->countFiles);
     if (rilManager_ != nullptr) {
         rilManager_->RequestSimIO(CONTROLLER_REQ_READ_RECORD, hd->fileId, hd->fileNum, ICC_FILE_CURRENT_MODE,
             hd->fileSize, NULLSTR, path, CreatePointer(MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE, hd));
@@ -348,7 +356,8 @@ void IccFileController::SendEfLinearResult(
     const AppExecFwk::InnerEvent::Pointer &response, const int val[], int len)
 {
     std::shared_ptr<AppExecFwk::EventHandler> handler = response->GetOwner();
-    std::shared_ptr<EfLinearResult> object = std::make_shared<EfLinearResult>();
+    std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
+    std::shared_ptr<EfLinearResult> object = std::make_shared<EfLinearResult>(cmdData.get());
     object->valueData[0] = val[0];
     object->valueData[1] = val[1];
     object->valueData[MAX_FILE_INDEX] = val[MAX_FILE_INDEX];
@@ -362,7 +371,8 @@ void IccFileController::SendMultiRecordResult(
     const AppExecFwk::InnerEvent::Pointer &response, std::vector<std::string> &strValue)
 {
     std::shared_ptr<AppExecFwk::EventHandler> handler = response->GetOwner();
-    std::shared_ptr<MultiRecordResult> object = std::make_shared<MultiRecordResult>();
+    std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
+    std::shared_ptr<MultiRecordResult> object = std::make_shared<MultiRecordResult>(cmdData.get());
     object->fileResults.assign(strValue.begin(), strValue.end());
     object->resultLength = strValue.size();
     int id = response->GetInnerEventId();
@@ -425,6 +435,10 @@ AppExecFwk::InnerEvent::Pointer IccFileController::CreatePointer(
 
 void IccFileController::ParseFileSize(int val[], int len, const unsigned char *data)
 {
+    if (data == nullptr) {
+        TELEPHONY_LOGE("ParseFileSize null data");
+        return;
+    }
     if (len > MAX_FILE_INDEX) {
         GetFileAndDataSize(data, val[0], val[1]);
         val[MAX_FILE_INDEX] = val[1] / val[0];
@@ -503,6 +517,22 @@ bool IccFileController::ProcessErrorResponse(const AppExecFwk::InnerEvent::Point
     }
     TELEPHONY_LOGI("ProcessErrorResponse send end");
     return true;
+}
+
+bool IccFileController::IsFixedNumberType(int efId)
+{
+    bool fixed = false;
+    switch (efId) {
+        case ELEMENTARY_FILE_ADN:
+        case ELEMENTARY_FILE_FDN:
+        case ELEMENTARY_FILE_USIM_ADN:
+        case ELEMENTARY_FILE_USIM_IAP:
+            fixed = true;
+            return fixed;
+        default:
+            break;
+    }
+    return fixed;
 }
 
 IccFileController::~IccFileController() {}

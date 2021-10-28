@@ -65,4 +65,6 @@ enum SimState {
     SIM_STATE_LOADED
 };
 
+enum LockReason { SIM_NONE, SIM_PIN, SIM_PUK };
+
 #endif
