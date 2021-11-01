@@ -38,6 +38,7 @@ void TelRilNetwork::AddHandlerToMap()
     memberFuncMap_[HREQ_NETWORK_GET_SELECTION_MODE] = &TelRilNetwork::GetNetworkSelectionModeResponse;
     memberFuncMap_[HREQ_NETWORK_SET_SELECTION_MODE] = &TelRilNetwork::SetNetworkSelectionModeResponse;
     memberFuncMap_[HREQ_NETWORK_SET_LOCATION_UPDATE] = &TelRilNetwork::SetNetworkLocationUpdateResponse;
+    memberFuncMap_[HREQ_NETWORK_GET_SLOT_IMEI] = &TelRilNetwork::GetSlotIMEIResponse;
 }
 
 TelRilNetwork::TelRilNetwork(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler)
@@ -139,6 +140,20 @@ void TelRilNetwork::GetOperatorInfo(const AppExecFwk::InnerEvent::Pointer &respo
         }
         TELEPHONY_LOGD("TelRilNetwork GetOperatorInfo:%{public}d", telRilRequest->serialId_);
         SendInt32Event(HREQ_NETWORK_GET_OPERATOR_INFO, telRilRequest->serialId_);
+    }
+}
+
+void TelRilNetwork::GetSlotIMEI(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<TelRilRequest> telRilRequest =
+            CreateTelRilRequest(HREQ_NETWORK_GET_SLOT_IMEI, response);
+        if (telRilRequest == nullptr) {
+            TELEPHONY_LOGE("TelRilNetwork GetSlotIMEI::telRilRequest is nullptr");
+            return;
+        }
+        TELEPHONY_LOGD("TelRilNetwork GetSlotIMEI:%{public}d", telRilRequest->serialId_);
+        SendInt32Event(HREQ_NETWORK_GET_SLOT_IMEI, telRilRequest->serialId_);
     }
 }
 
@@ -534,6 +549,44 @@ void TelRilNetwork::SetNetworkLocationUpdateResponse(MessageParcel &data)
         } else {
             ErrorResponse(telRilRequest, *radioResponseInfo);
         }
+    }
+}
+
+void TelRilNetwork::GetSlotIMEIResponse(MessageParcel &data)
+{
+    const char *buffer = data.ReadCString();
+    if (buffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : GetSlotIMEIResponse --> buffer == nullptr !!!");
+        return;
+    }
+    std::shared_ptr<std::string> imeiID = std::make_shared<std::string>(buffer);
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : GetSlotIMEIResponse --> spBuffer == nullptr!!!");
+        return;
+    }
+    const struct HRilRadioResponseInfo *radioResponseInfo =
+        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    TELEPHONY_LOGD(
+        "GetSlotIMEIResponse --> radioResponseInfo->serial:%{public}d, "
+        "radioResponseInfo->error:%{public}d",
+        radioResponseInfo->serial, radioResponseInfo->error);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
+    if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        if (radioResponseInfo->error == HRilErrType::NONE) {
+            std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR : GetSlotIMEIResponse --> handler == nullptr !!!");
+                return;
+            }
+            uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
+            handler->SendEvent(eventId, imeiID);
+        } else {
+            ErrorResponse(telRilRequest, *radioResponseInfo);
+        }
+    } else {
+        TELEPHONY_LOGE("ERROR : GetSlotIMEIResponse --> telRilRequest == nullptr || radioResponseInfo error !!!");
     }
 }
 } // namespace Telephony

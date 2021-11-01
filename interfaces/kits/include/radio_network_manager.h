@@ -42,6 +42,7 @@ public:
     static bool SetRadioState(bool isOn, const sptr<INetworkSearchCallback> &callback);
     static bool GetRadioState(const sptr<INetworkSearchCallback> &callback);
     static std::u16string GetIsoCountryCodeForNetwork(int32_t slotId);
+    static std::u16string GetImei(int32_t slotId);
 };
 } // namespace Telephony
 } // namespace OHOS

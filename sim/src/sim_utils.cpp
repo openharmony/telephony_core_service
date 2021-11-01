@@ -103,11 +103,146 @@ bool SIMUtils::IsShowableAsciiOnly(const std::string &str)
     return true;
 }
 
+std::shared_ptr<char16_t> SIMUtils::CharsConvertToChar16(
+    const unsigned char *charBytes, int charBytesLen, int &outChar16Len, bool bigEndian)
+{
+    if (charBytes == nullptr || charBytesLen == 0) {
+        return nullptr;
+    }
+
+    int id = 0;
+    if (charBytesLen % HALF_LEN != 0) {
+        return nullptr;
+    }
+
+    int outLen = charBytesLen / HALF_LEN;
+    outChar16Len = outLen;
+    if (outChar16Len == 0) {
+        return nullptr;
+    }
+    char16_t *cache = (char16_t *)calloc(outLen, sizeof(char16_t));
+    if (cache == nullptr) {
+        return nullptr;
+    }
+    std::shared_ptr<char16_t> ptr(cache);
+    char16_t *ret = ptr.get();
+    for (int i = 0; i < charBytesLen; i += HALF_LEN) {
+        id = i / HALF_LEN;
+        char16_t high = charBytes[i];
+        char16_t low = charBytes[i + 1];
+        if (bigEndian) {
+            ret[id] = (char16_t)((high << BYTE_LENGTH) | low);
+        } else {
+            ret[id] = (char16_t)((low << BYTE_LENGTH) | high);
+        }
+    }
+    return ptr;
+}
+
 std::string SIMUtils::BcdPlmnConvertToString(const std::string &data, int offset)
 {
     (void)data;
     (void)offset;
     return "";
+}
+
+std::string SIMUtils::DiallingNumberStringFieldConvertToString(
+    std::shared_ptr<unsigned char> array, int offset, int length, int offPos)
+{
+    if (length == 0) {
+        return "";
+    }
+    unsigned char *data = array.get();
+
+    if (data[offset] == (unsigned char)CHINESE_FLAG) {
+        TELEPHONY_LOGI("DiallingNumberStringFieldToString: start 16be decode");
+        int ucslen = (length - 1) / HALF_LEN;
+        int outlen = 0;
+        std::shared_ptr<char16_t> cs = CharsConvertToChar16(data + 1, ucslen * HALF_LEN, outlen, true);
+        std::string ns = "";
+        std::u16string hs(cs.get(), 0, outlen);
+        std::u16string rtl = u"";
+        if (!hs.empty()) {
+            ucslen = hs.length();
+            wchar_t c = L'\uFFFF';
+            while (ucslen > 0 && hs.at(ucslen - 1) == c) {
+                ucslen--;
+            }
+            rtl = hs.substr(0, ucslen);
+            std::string uz = Str16ToStr8(hs);
+            ns = Str16ToStr8(rtl);
+            TELEPHONY_LOGD("16be result %{public}s, %{public}s", uz.c_str(), ns.c_str());
+            return ns;
+        }
+    } else {
+        int i = 0;
+        for (i = offset; i < offset + length; i++) {
+            int c = data[i] & BYTE_VALUE;
+            if (c == BYTE_VALUE) {
+                break;
+            }
+        }
+        i -= offset;
+        string str((char *)data, offset, i);
+        TELEPHONY_LOGD("8bit decode result %{public}s", str.c_str());
+        if (!str.empty()) {
+            return str;
+        }
+    }
+    return UcsCodeConvertToString(array, offset, length, offPos);
+}
+
+std::string SIMUtils::UcsCodeConvertToString(
+    std::shared_ptr<unsigned char> array, int offset, int length, int offPos)
+{
+    bool isucs2 = false;
+    char base = '\0';
+    int len = 0;
+    unsigned char *data = array.get();
+    if (length >= START_POS && data[offset] == (unsigned char)UCS_FLAG) {
+        len = data[offset + 1] & BYTE_VALUE;
+        if (len > length - START_POS) {
+            len = length - START_POS;
+        }
+        base = (char)((data[offset + HALF_LEN] & BYTE_VALUE) << BYTE_LESS);
+        offset += START_POS;
+        isucs2 = true;
+    } else if (length >= END_POS && data[offset] == (unsigned char)UCS_WIDE_FLAG) {
+        len = data[offset + 1] & BYTE_VALUE;
+        if (len > length - END_POS)
+            len = length - END_POS;
+
+        base =
+            (char)(((data[offset + HALF_LEN] & BYTE_VALUE) << BYTE_BIT) | (data[offset + START_POS] & BYTE_VALUE));
+        offset += END_POS;
+        isucs2 = true;
+    }
+
+    if (isucs2) {
+        std::string retuc = "";
+        while (len > 0) {
+            if (data[offset] < 0) {
+                retuc.push_back((char)(base + (data[offset] & 0x7F)));
+                offset++;
+                len--;
+            }
+            int count = 0;
+            int id = offset + count;
+            while ((count < len) && (data[id] >= 0)) {
+                count++;
+                id = offset + count;
+            }
+            TELEPHONY_LOGI("start 8bit decode");
+            offset += count;
+            len -= count;
+        }
+        TELEPHONY_LOGD("isucs2 decode result %{public}s", retuc.c_str());
+        return retuc;
+    }
+
+    std::string defaultCharset = "";
+    TELEPHONY_LOGI("UcsCodeConvertToString finished");
+    return defaultCharset;
 }
 } // namespace Telephony
 } // namespace OHOS

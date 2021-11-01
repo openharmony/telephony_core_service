@@ -23,6 +23,7 @@ ohos_shared_library("radio") {
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/api",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/common",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/proxy",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/network_search/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/include",
     "//foundation/aafwk/standard/frameworks/kits/ability/native/include",

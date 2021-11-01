@@ -34,6 +34,7 @@ public:
     const sptr<NetworkState> GetNetworkState(int32_t slotId) override;
     bool SetRadioState(bool isOn, const sptr<INetworkSearchCallback> &callback) override;
     bool GetRadioState(const sptr<INetworkSearchCallback> &callback) override;
+    std::u16string GetImei(int32_t slotId) override;
     bool HasSimCard(int32_t slotId) override;
     int32_t GetSimState(int32_t slotId) override;
     std::u16string GetSimOperatorNumeric(int32_t slotId) override;
@@ -63,6 +64,16 @@ public:
     bool SetLockState(std::u16string pin, int32_t enable, LockStatusResponse &response, int32_t phoneId) override;
     int32_t GetLockState(int32_t phoneId) override;
     int32_t RefreshSimState(int32_t slotId) override;
+    std::u16string GetSimTelephoneNumber(int32_t slotId) override;
+    std::u16string GetVoiceMailIdentifier(int32_t slotId) override;
+    std::u16string GetVoiceMailNumber(int32_t slotId) override;
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int slotId, int type) override;
+    bool AddIccDiallingNumbers(
+        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) override;
+    bool DelIccDiallingNumbers(int slotId, int type, int index) override;
+    bool UpdateIccDiallingNumbers(
+        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index) override;
+    bool SetVoiceMail(const std::u16string &mailName, const std::u16string &mailNumber, int32_t slotId) override;
 
 private:
     bool WriteInterfaceToken(MessageParcel &data);

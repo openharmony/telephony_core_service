@@ -32,7 +32,7 @@ namespace OHOS {
 namespace Telephony {
 class SimSmsManager : public ISimSmsManager {
 public:
-    SimSmsManager();
+    SimSmsManager(std::shared_ptr<IRilManager> rilManager, std::shared_ptr<ISimFileManager> simFileManager);
     virtual ~SimSmsManager();
     void Init();
     bool AddSmsToIcc(int status, std::string &pdu, std::string &smsc);
@@ -42,6 +42,8 @@ public:
     enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
 
 protected:
+    std::shared_ptr<IRilManager> rilManager_ = nullptr;
+    std::shared_ptr<ISimFileManager> simFileManager_ = nullptr;
     std::shared_ptr<SimSmsController> smsController_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopSms_ = nullptr;
     HandleRunningState stateSms_ = HandleRunningState::STATE_NOT_START;

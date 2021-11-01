@@ -29,12 +29,18 @@ public:
     virtual std::u16string GetIMSI(int32_t slotId) = 0;
     virtual std::u16string GetLocaleFromDefaultSim() = 0;
     virtual std::u16string GetSimGid1(int32_t slotId) = 0;
+    virtual std::u16string GetSimTelephoneNumber(int32_t slotId) = 0;
+    virtual std::u16string GetVoiceMailIdentifier(int32_t slotId) = 0;
+    virtual std::u16string GetVoiceMailNumber(int32_t slotId) = 0;
     virtual int ObtainSpnCondition(bool roaming, std::string operatorNum) = 0;
     virtual void RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) = 0;
     virtual void UnregisterImsiLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler) = 0;
     virtual void RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) = 0;
     virtual void UnregisterAllFilesLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler) = 0;
+    virtual void RegisterPhoneNotify(const HANDLE &handler, int what) = 0;
+    virtual void UnRegisterPhoneNotify(const HANDLE &observerCallBack, int what) = 0;
     virtual void SetImsi(std::string imsi) = 0;
+    virtual bool SetVoiceMail(const std::u16string &mailName, const std::u16string &mailNumber, int32_t slotId) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

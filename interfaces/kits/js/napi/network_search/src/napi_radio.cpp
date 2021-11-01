@@ -334,6 +334,25 @@ static bool MatchGetNetworkStateParameter(napi_env env, napi_value parameter[], 
     }
 }
 
+static bool MatchGetIMEIParameter(napi_env env, napi_value parameter[], size_t parameterCount)
+{
+    switch (parameterCount) {
+        case 0: {
+            return true;
+        }
+        case 1: {
+            return NapiUtil::MatchParameters(env, parameter, {napi_number}) ||
+                NapiUtil::MatchParameters(env, parameter, {napi_function});
+        }
+        case 2: {
+            return NapiUtil::MatchParameters(env, parameter, {napi_number, napi_function});
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
 static napi_value GetNetworkState(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = 2;
@@ -949,6 +968,58 @@ static napi_value TurnOffRadio(napi_env env, napi_callback_info info)
         env, asyncContext.release(), "TurnOffRadio", NativeTurnOffRadio, TurnOffRadioCallback);
 }
 
+void NativeGetImei(napi_env env, void *data)
+{
+    auto context = static_cast<GetIMEIContext *>(data);
+    context->getIMEIResult = NapiUtil::ToUtf8(RadioNetworkManager::GetImei(context->slotId));
+    TELEPHONY_LOGD("NativeGetIMEI getIMEIResult = %{public}s", context->getIMEIResult.c_str());
+    context->resolved = true;
+}
+
+void GetImeiCallback(napi_env env, napi_status status, void *data)
+{
+    auto context = static_cast<GetIMEIContext *>(data);
+    napi_value callbackValue = nullptr;
+    if (status == napi_ok) {
+        if (context->resolved) {
+            napi_create_string_utf8(
+                env, context->getIMEIResult.c_str(), context->getIMEIResult.size(), &callbackValue);
+        } else {
+            callbackValue = NapiUtil::CreateErrorMessage(env, "getIMEI error");
+        }
+    } else {
+        callbackValue = NapiUtil::CreateErrorMessage(env, "getIMEI error,napi_status = " + std ::to_string(status));
+    }
+    NapiUtil::Handle2ValueCallback(env, context, callbackValue);
+}
+
+static napi_value GetImei(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 2;
+    napi_value parameters[2] = {0};
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
+    NAPI_ASSERT(env, MatchGetIMEIParameter(env, parameters, parameterCount), "type mismatch");
+    auto asyncContext = std::make_unique<GetIMEIContext>();
+    if (parameterCount == 0) {
+        asyncContext->slotId = GetDefaultSlotId();
+    } else if (parameterCount == 1) {
+        napi_valuetype valueType = napi_undefined;
+        NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
+        if (valueType == napi_number) {
+            NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+        } else if (valueType == napi_function) {
+            asyncContext->slotId = GetDefaultSlotId();
+            NAPI_CALL(env, napi_create_reference(env, parameters[0], 1, &asyncContext->callbackRef));
+        }
+    } else if (parameterCount == 2) {
+        NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+        NAPI_CALL(env, napi_create_reference(env, parameters[1], 1, &asyncContext->callbackRef));
+    }
+    return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "GetIMEI", NativeGetImei, GetImeiCallback);
+}
+
 static napi_value InitEnumRadioType(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
@@ -1085,6 +1156,7 @@ napi_value InitNapiRadioNetwork(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("isRadioOn", IsRadioOn),
         DECLARE_NAPI_FUNCTION("turnOnRadio", TurnOnRadio),
         DECLARE_NAPI_FUNCTION("turnOffRadio", TurnOffRadio),
+        DECLARE_NAPI_FUNCTION("getImei", GetImei),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     InitEnumRadioType(env, exports);

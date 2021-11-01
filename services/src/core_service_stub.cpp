@@ -34,6 +34,7 @@ CoreServiceStub::CoreServiceStub()
     memberFuncMap_[GET_NETWORK_SELECTION_MODE] = &CoreServiceStub::OnGetNetworkSelectionMode;
     memberFuncMap_[SET_NETWORK_SELECTION_MODE] = &CoreServiceStub::OnSetNetworkSelectionMode;
     memberFuncMap_[GET_ISO_COUNTRY_CODE_FOR_NETWORK] = &CoreServiceStub::OnGetIsoCountryCodeForNetwork;
+    memberFuncMap_[GET_IMEI] = &CoreServiceStub::OnGetImei;
 
     memberFuncMap_[HAS_SIM_CARD] = &CoreServiceStub::OnHasSimCard;
     memberFuncMap_[GET_SIM_STATE] = &CoreServiceStub::OnGetSimState;
@@ -55,6 +56,14 @@ CoreServiceStub::CoreServiceStub()
     memberFuncMap_[CHECK_PIN] = &CoreServiceStub::OnGetLockState;
     memberFuncMap_[SWITCH_PIN] = &CoreServiceStub::OnSetLockState;
     memberFuncMap_[REFRESH_SIM_STATE] = &CoreServiceStub::OnRefreshSimState;
+    memberFuncMap_[GET_SIM_PHONE_NUMBER] = &CoreServiceStub::OnGetSimPhoneNumber;
+    memberFuncMap_[GET_VOICE_MAIL_TAG] = &CoreServiceStub::OnGetVoiceMailInfor;
+    memberFuncMap_[GET_VOICE_MAIL_NUMBER] = &CoreServiceStub::OnGetVoiceMailNumber;
+    memberFuncMap_[ICC_PHONE_BOOK_GET] = &CoreServiceStub::OnPhoneBookGet;
+    memberFuncMap_[ICC_PHONE_BOOK_INSERT] = &CoreServiceStub::OnAddIccDiallingNumbers;
+    memberFuncMap_[ICC_PHONE_BOOK_UPDATE] = &CoreServiceStub::OnUpdateIccDiallingNumbers;
+    memberFuncMap_[ICC_PHONE_BOOK_DELETE] = &CoreServiceStub::OnDelIccDiallingNumbers;
+    memberFuncMap_[SET_VOICE_MAIL] = &CoreServiceStub::OnSetVoiceMail;
 }
 
 int32_t CoreServiceStub::OnRemoteRequest(
@@ -182,6 +191,18 @@ int32_t CoreServiceStub::OnGetIsoCountryCodeForNetwork(MessageParcel &data, Mess
 {
     int32_t slotId = data.ReadInt32();
     std::u16string result = GetIsoCountryCodeForNetwork(slotId);
+    bool ret = reply.WriteString16(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::GET_ISO_COUNTRY_CODE write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetImei(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string result = GetImei(slotId);
     bool ret = reply.WriteString16(result);
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::GET_ISO_COUNTRY_CODE write reply failed.");
@@ -532,6 +553,129 @@ int32_t CoreServiceStub::OnRefreshSimState(MessageParcel &data, MessageParcel &r
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnRefreshSimState write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetSimPhoneNumber(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string result = GetSimTelephoneNumber(slotId);
+    bool ret = reply.WriteString16(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetSimPhoneNumber write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetVoiceMailInfor(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string result = GetVoiceMailIdentifier(slotId);
+    bool ret = reply.WriteString16(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetVoiceMailInfor write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetVoiceMailNumber(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string result = GetVoiceMailNumber(slotId);
+    bool ret = reply.WriteString16(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetVoiceMailNumber write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnPhoneBookGet(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t type = data.ReadInt32();
+    auto result = QueryIccDiallingNumbers(slotId, type);
+    bool ret = reply.WriteInt32(static_cast<int32_t>(result.size()));
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnPhoneBookGet write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    for (const auto &v : result) {
+        v->Marshalling(reply);
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnAddIccDiallingNumbers(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t type = data.ReadInt32();
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber = DiallingNumbersInfo::UnMarshalling(data);
+    bool result = false;
+    if (diallingNumber != nullptr) {
+        result = AddIccDiallingNumbers(slotId, type, diallingNumber);
+    } else {
+        TELEPHONY_LOGE("CoreServiceStub::OnAddIccDiallingNumbers callback is nulll");
+    }
+
+    bool ret = reply.WriteBool(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnAddIccDiallingNumbers write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnUpdateIccDiallingNumbers(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t type = data.ReadInt32();
+    int32_t index = data.ReadInt32();
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber = DiallingNumbersInfo::UnMarshalling(data);
+    bool result = false;
+    if (diallingNumber != nullptr) {
+        result = UpdateIccDiallingNumbers(slotId, type, diallingNumber, index);
+    } else {
+        TELEPHONY_LOGE("CoreServiceStub::OnUpdateIccDiallingNumbers callback is nulll");
+    }
+
+    bool ret = reply.WriteBool(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnUpdateIccDiallingNumbers write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnDelIccDiallingNumbers(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t type = data.ReadInt32();
+    int32_t index = data.ReadInt32();
+    bool result = DelIccDiallingNumbers(slotId, type, index);
+
+    bool ret = reply.WriteBool(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnDelIccDiallingNumbers write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnSetVoiceMail(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string name = data.ReadString16();
+    std::u16string number = data.ReadString16();
+    bool result = SetVoiceMail(name, number, slotId);
+
+    bool ret = reply.WriteBool(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnSetVoiceMail write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
     return NO_ERROR;

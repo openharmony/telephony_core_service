@@ -88,11 +88,13 @@ private:
     const uint8_t BYTE_NUM = 0xff;
     const int MAX_FILE_INDEX = 2;
     const int ICC_FILE_CURRENT_MODE = 4;
+    const int MAX_RECORD_NUM = 255;
     void ParseFileSize(int val[], int len, const unsigned char *data);
     bool IsValidSizeData(const unsigned char *data);
     void GetFileAndDataSize(const unsigned char *data, int &dataSize, int &fileSize);
     std::string CheckRightPath(const std::string &path, int fileId);
     bool ProcessErrorResponse(const AppExecFwk::InnerEvent::Pointer &event);
+    bool IsFixedNumberType(int);
 };
 } // namespace Telephony
 } // namespace OHOS

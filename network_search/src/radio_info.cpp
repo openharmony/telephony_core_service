@@ -151,5 +151,20 @@ void RadioInfo::SetToTheSuitableState() const
         }
     }
 }
+
+void RadioInfo::ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) const
+{
+    TELEPHONY_LOGE("RadioInfo::ProcessGetImei");
+    if (event == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetImei event is nullptr");
+        return;
+    }
+    std::shared_ptr<std::string> imeiID = event->GetSharedObject<std::string>();
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetImei networkSearchManager_ is nullptr");
+        return;
+    }
+    networkSearchManager_->SetImei(Str8ToStr16(*imeiID));
+}
 } // namespace Telephony
 } // namespace OHOS

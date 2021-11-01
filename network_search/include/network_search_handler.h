@@ -90,6 +90,7 @@ protected:
     void SetNetworkSelectionModeResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void InitGetNetworkSelectionMode();
     void InitNetworkSearchResult();
+    void RadioGetImei(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     static const int REQ_INTERVAL = 30;
