@@ -50,6 +50,7 @@ public:
         const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
         const sptr<INetworkSearchCallback> &callback) = 0;
     virtual std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) const = 0;
+    virtual std::u16string GetImei(int32_t slotId) const = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

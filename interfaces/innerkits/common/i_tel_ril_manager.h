@@ -112,6 +112,7 @@ public:
     virtual void SetNetworkSelectionMode(
         int32_t automaticFlag, std::string oper, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual void SetNetworkLocationUpdate(const AppExecFwk::InnerEvent::Pointer &result) = 0;
+    virtual void GetSlotIMEI(const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual void TelRilSetParam(int32_t preferredNetworkType, int32_t cdmaSubscription, int32_t instanceId) = 0;
     virtual bool InitCellularRadio(bool isFirst) = 0;
 };

@@ -26,7 +26,8 @@ CallManagerServiceProxy::CallManagerServiceProxy(const sptr<IRemoteObject> &impl
     : IRemoteProxy<ICallManagerService>(impl)
 {}
 
-int32_t CallManagerServiceProxy::RegisterCallBack(const sptr<ICallAbilityCallback> &callback)
+int32_t CallManagerServiceProxy::RegisterCallBack(const sptr<ICallAbilityCallback> &callback,
+    std::u16string &bundleName)
 {
     int32_t error = TELEPHONY_REGISTER_CALLBACK_FAIL;
     MessageOption option;
@@ -37,6 +38,7 @@ int32_t CallManagerServiceProxy::RegisterCallBack(const sptr<ICallAbilityCallbac
         return TELEPHONY_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     dataParcel.WriteRemoteObject(callback->AsObject().GetRefPtr());
+    dataParcel.WriteString16(bundleName);
     error = Remote()->SendRequest(INTERFACE_REGISTER_CALLBACK, dataParcel, replyParcel, option);
     TELEPHONY_LOGD("error = %{public}d", error);
     if (error != TELEPHONY_SUCCESS) {
@@ -657,6 +659,29 @@ std::vector<std::u16string> CallManagerServiceProxy::GetCallIdListForConference(
     }
     replyParcel.ReadString16Vector(&list);
     return list;
+}
+
+int32_t CallManagerServiceProxy::InsertData()
+{
+    TELEPHONY_LOGD("CallManagerServiceProxy InsertData");
+    MessageOption option;
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return false;
+    }
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_CONNECT_SYSTEM_ABILITY_STUB_FAIL;
+    }
+
+    int32_t error = Remote()->SendRequest(INTERFACE_INSERT_DATA, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Function InsertData! errCode:%{public}d", error);
+    }
+    error = replyParcel.ReadInt32();
+    return error;
 }
 } // namespace Telephony
 } // namespace OHOS

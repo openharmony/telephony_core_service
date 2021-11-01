@@ -141,6 +141,13 @@ declare namespace radio {
   function turnOffRadio(): Promise<void>;
 
   /**
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   */
+  function getIMEI(callback: AsyncCallback<string>): void;
+  function getIMEI(slotId: number, callback: AsyncCallback<string>): void;
+  function getIMEI(slotId?: number): Promise<string>;
+
+  /**
    * Describes the radio access technology.
    */
   export enum RadioTechnology {

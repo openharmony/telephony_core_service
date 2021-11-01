@@ -30,9 +30,11 @@
 #include "common_event.h"
 #include "common_event_manager.h"
 #include "want.h"
+#include "sim_dialling_numbers_handler.h"
 
 namespace OHOS {
 namespace Telephony {
+enum Icc_File_Action { ACTION_WAIT, SET_VOICE_MAIL };
 class IccFile : public AppExecFwk::EventHandler {
 public:
     IccFile(
@@ -57,7 +59,7 @@ public:
     virtual void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     virtual ~IccFile();
     virtual bool ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event) = 0;
-    std::string ObtainAdnInfo();
+    std::string ObtainDiallingNumberInfo();
     std::string ObtainNAI();
     std::string ObtainHomeNameOfPnn();
     std::string ObtainMsisdnAlphaStatus();
@@ -73,12 +75,15 @@ public:
     void UnregisterImsiLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void UnregisterAllFilesLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void SetRilAndFileController(
-        std::shared_ptr<Telephony::IRilManager> ril, std::shared_ptr<IccFileController> file);
+    virtual void RegisterPhoneNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    virtual void UnRegisterPhoneNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
+    void SetRilAndFileController(const std::shared_ptr<Telephony::IRilManager> &ril,
+         const std::shared_ptr<IccFileController> &file, const std::shared_ptr<SimDiallingNumbersHandler> &handler);
     struct IccFileLoaded {
         virtual std::string ObtainElementaryFileName() = 0;
         virtual void ProcessParseFile(const AppExecFwk::InnerEvent::Pointer &event) = 0;
     };
+    virtual bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber) = 0;
 
 protected:
     virtual void ProcessIccRefresh(int msgId) = 0;
@@ -104,6 +109,7 @@ protected:
     std::string lastVoiceMailNum_ = "";
     std::string lastVoiceMailTag_ = "";
     std::string operatorNumeric_ = "";
+    sptr<ITelephonyStateNotify> telephonyStateNotify_ = nullptr;
     bool voiceMailFixedOrNot_ = false;
     std::string pnnHomeName_ = "";
     std::string iccLanguage_ = "";
@@ -113,11 +119,14 @@ protected:
     std::string ehplmns_ = "";
     std::string fplmns_ = "";
     int lengthOfMnc_ = DEFAULT_MNC;
-    int indexOfMailbox_ = 0;
+    int indexOfMailbox_ = 1;
     int fileToGet_ = 0;
     bool loaded_ = false;
     bool fileQueried_ = false;
     bool lockQueried_ = false;
+    bool waitResult_ = false;
+    std::mutex mtx_;
+    std::condition_variable processWait_;
     const uint8_t BYTE_NUM = 0xff;
     const int DATA_STEP = 2;
     const std::string SIM_STATE_ACTION = "com.hos.action.SIM_STATE_CHANGED";
@@ -133,12 +142,20 @@ protected:
     virtual AppExecFwk::InnerEvent::Pointer CreatePointer(int eventId, int arg1, int arg2);
     virtual AppExecFwk::InnerEvent::Pointer CreatePointer(int eventId, std::shared_ptr<void> loader);
     bool PublishSimFileEvent(const std::string &event, int eventCode, const std::string &eventData);
-
     void UpdateIccLanguage(const std::string &langLi, const std::string &langPl);
     std::string ObtainValidLanguage(const std::string &langData);
+    std::shared_ptr<SimDiallingNumbersHandler> diallingNumberHandler_ = nullptr;
+    AppExecFwk::InnerEvent::Pointer CreateDiallingNumberPointer(
+        int eventid, int efId, int index, std::shared_ptr<void> pobj);
+    static bool IsActionOn();
+    void SetCurAction(Icc_File_Action action);
+    Icc_File_Action GetCurAction();
+    void NotifyRegistrySimState(int32_t state, const std::u16string &reason);
 
 private:
     bool ProcessIccFileObtained(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ConnectRegistryService();
+    static Icc_File_Action g_CurFileAction;
 };
 } // namespace Telephony
 } // namespace OHOS

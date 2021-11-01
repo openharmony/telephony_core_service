@@ -42,6 +42,7 @@ NetworkSearchHandler::NetworkSearchHandler(const std::shared_ptr<AppExecFwk::Eve
         &NetworkSearchHandler::SetNetworkSelectionModeResponse;
     memberFuncMap_[ObserverHandler::RADIO_GET_STATUS] = &NetworkSearchHandler::GetRadioStatusResponse;
     memberFuncMap_[ObserverHandler::RADIO_SET_STATUS] = &NetworkSearchHandler::SetRadioStatusResponse;
+    memberFuncMap_[ObserverHandler::RADIO_GET_IMEI] = &NetworkSearchHandler::RadioGetImei;
 }
 
 NetworkSearchHandler::~NetworkSearchHandler()
@@ -278,6 +279,13 @@ void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Poi
             TELEPHONY_LOGI("Unhandled message with number: %{public}d", radioState);
             break;
     }
+    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_IMEI);
+    if (event != nullptr) {
+        event->SetOwner(shared_from_this());
+        if (rilManager_ != nullptr) {
+            rilManager_->GetSlotIMEI(event);
+        }
+    }
 }
 
 void NetworkSearchHandler::RadioOffState() const
@@ -451,6 +459,16 @@ bool NetworkSearchHandler::TimeOutCheck(int64_t &lastTime)
         return true;
     }
     return false;
+}
+
+void NetworkSearchHandler::RadioGetImei(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("NetworkSearchHandler::RadioGetImei start");
+    if (radioInfo_ != nullptr) {
+        radioInfo_->ProcessGetImei(event);
+    } else {
+        TELEPHONY_LOGE("RadioGetImei radioInfo_ is null");
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

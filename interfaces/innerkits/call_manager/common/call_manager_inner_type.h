@@ -16,9 +16,9 @@
 #ifndef CALL_MANAGER_INNER_TYPE_H
 #define CALL_MANAGER_INNER_TYPE_H
 
-#include <cstdio>
 #include <string>
 #include <vector>
+#include <ctime>
 
 namespace OHOS {
 namespace Telephony {
@@ -77,8 +77,8 @@ enum DialScene {
 };
 
 enum CallDirection {
-    CALL_DIRECTION_OUT = 0,
-    CALL_DIRECTION_IN,
+    CALL_DIRECTION_IN = 0,
+    CALL_DIRECTION_OUT,
     CALL_DIRECTION_UNKNOW,
 };
 
@@ -137,17 +137,42 @@ enum class CallStateToApp {
     CALL_STATE_OFFHOOK = 2
 };
 
+enum CallAnswerType {
+    CALL_ANSWER_MISSED = 0,
+    CALL_ANSWER_ACTIVED,
+    CALL_ANSWER_REJECT,
+};
+
 struct CallAttributeInfo {
     char accountNumber[kMaxNumberLen];
     bool speakerphoneOn;
     int32_t accountId;
     VideoStateType videoState;
-    int32_t startTime; // Call start time
+    int64_t startTime; // Call start time
     bool isEcc;
     CallType callType;
     int32_t callId;
     TelCallState callState;
     TelConferenceState conferenceState;
+    time_t callBeginTime;
+    time_t callEndTime;
+    time_t ringBeginTime;
+    time_t ringEndTime;
+    CallDirection callDirection;
+    CallAnswerType answerType;
+};
+
+struct CallRecordInfo {
+    int32_t callId;
+    char phoneNumber[kMaxNumberLen];
+    CallType callType;
+    time_t callBeginTime;
+    time_t callEndTime;
+    uint32_t ringDuration;
+    uint32_t callDuration;
+    CallDirection directionType;
+    CallAnswerType answerType;
+    int32_t countryCode;
 };
 
 enum CallAbilityEventId {

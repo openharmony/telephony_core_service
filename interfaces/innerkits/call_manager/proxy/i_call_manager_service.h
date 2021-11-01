@@ -66,13 +66,14 @@ enum TelephonyCallManagerSurfaceCode {
     INTERFACE_MUTE_RINGER,
     INTERFACE_SET_AUDIO_DEVICE,
     INTERFACE_PLAY_DTMF,
+    INTERFACE_INSERT_DATA,
 };
 } // end extern
 
 class ICallManagerService : public IRemoteBroker {
 public:
     virtual ~ICallManagerService() = default;
-    virtual int32_t RegisterCallBack(const sptr<ICallAbilityCallback> &callback) = 0;
+    virtual int32_t RegisterCallBack(const sptr<ICallAbilityCallback> &callback, std::u16string &bundleName) = 0;
     virtual int32_t DialCall(std::u16string number, AppExecFwk::PacMap &extras) = 0;
     virtual int32_t AnswerCall(int32_t callId, int32_t videoState) = 0;
     virtual int32_t RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage) = 0;
@@ -100,6 +101,7 @@ public:
     virtual int32_t GetMainCallId(int32_t callId) = 0;
     virtual std::vector<std::u16string> GetSubCallIdList(int32_t callId) = 0;
     virtual std::vector<std::u16string> GetCallIdListForConference(int32_t callId) = 0;
+    virtual int32_t InsertData() = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallManagerService");

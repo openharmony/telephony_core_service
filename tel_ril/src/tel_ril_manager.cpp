@@ -554,6 +554,15 @@ void RilManager::GetOperatorInfo(const AppExecFwk::InnerEvent::Pointer &response
     }
 }
 
+void RilManager::GetSlotIMEI(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    if (telRilNetwork_ != nullptr) {
+        telRilNetwork_->GetSlotIMEI(response);
+    } else {
+        TELEPHONY_LOGE("telRilNetwork_ is null");
+    }
+}
+
 void RilManager::GetNetworkSearchInformation(const AppExecFwk::InnerEvent::Pointer &response)
 {
     if (telRilNetwork_ != nullptr) {

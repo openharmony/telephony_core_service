@@ -22,13 +22,16 @@
 #include "event_runner.h"
 #include "string_ex.h"
 #include "telephony_log_wrapper.h"
-
-#define DECIMAL_MAX 10
-#define HALF_LEN 2
-#define HALF_BYTE_LEN 4
-
+#include "sim_char_decode.h"
 namespace OHOS {
 namespace Telephony {
+static const int DECIMAL_MAX = 10;
+static const int HALF_LEN = 2;
+static const int HALF_BYTE_LEN = 4;
+static const int UCS_FLAG = 0x81;
+static const int UCS_WIDE_FLAG = 0x82;
+static const int START_POS = 3;
+static const int END_POS = 4;
 static char HEX_CHARS[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 class SIMUtils {
 public:
@@ -39,6 +42,14 @@ public:
     static bool IsShowableAscii(char c);
     static bool IsShowableAsciiOnly(const std::string &str);
     static std::string BcdPlmnConvertToString(const std::string &data, int offset);
+    static std::string DiallingNumberStringFieldConvertToString(
+        std::shared_ptr<unsigned char> array, int offset, int length, int offPos);
+    static std::shared_ptr<char16_t> CharsConvertToChar16(
+        const unsigned char *charBytes, int charBytesLen, int &outChar16Len, bool bigEndian);
+
+private:
+    static std::string UcsCodeConvertToString(
+        std::shared_ptr<unsigned char> array, int offset, int length, int offPos);
 };
 } // namespace Telephony
 } // namespace OHOS

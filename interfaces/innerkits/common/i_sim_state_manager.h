@@ -37,6 +37,7 @@ enum ExternalState {
     EX_BLOCKED_PERM,
     EX_ICC_ERROR,
     EX_ICC_RESTRICTED,
+    EX_LOADED,
 };
 
 struct LockStatusResponse {

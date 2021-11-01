@@ -89,6 +89,8 @@ public:
     std::shared_ptr<NetworkSearchCallbackInfo> FindNetworkSearchCallback(int64_t index);
     bool RemoveCallbackFromMap(int64_t index);
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) const override;
+    void SetImei(std::u16string Imei);
+    std::u16string GetImei(int32_t slotId) const override;
 
 private:
     int64_t GetCallbackIndex64bit();
@@ -110,6 +112,7 @@ private:
     std::unordered_map<int64_t, std::shared_ptr<NetworkSearchCallbackInfo>> networkSearchCacheMap_;
     std::mutex callbackMapMutex_;
     std::atomic<int64_t> callbackIndex64bit_ = 0;
+    std::u16string Imei_ = std::u16string();
 };
 } // namespace Telephony
 } // namespace OHOS
