@@ -75,7 +75,8 @@ sptr<ICoreService> NetworkSearchTest::GetProxy()
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetPsRadioTech_0100, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr) {
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         std::cout << "TelephonyTestService Remote service is null" << std::endl;
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
@@ -92,7 +93,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetPsRadioTech_0100, Functio
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCsRadioTech_0100, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr) {
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         std::cout << "TelephonyTestService Remote service is null" << std::endl;
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
@@ -108,7 +110,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCsRadioTech_0100, Functio
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0100, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr) {
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         std::cout << "TelephonyTestService Remote service is null" << std::endl;
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
@@ -131,7 +134,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0100, Functi
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorNumeric_0100, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr) {
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         std::cout << "TelephonyTestService Remote service is null" << std::endl;
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
@@ -148,7 +152,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorNumeric_0100, Fun
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorName_0100, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr) {
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         std::cout << "TelephonyTestService Remote service is null" << std::endl;
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
@@ -165,7 +170,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorName_0100, Functi
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetSignalInfoList_0100, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr) {
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         std::cout << "TelephonyTestService Remote service is null" << std::endl;
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
@@ -198,7 +204,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetSignalInfoList_0100, Func
 HWTEST_F(
     NetworkSearchTest, Telephony_NetworkSearch_GetIsoCountryCodeForNetwork_0100, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr) {
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         std::cout << "TelephonyTestService Remote service is null" << std::endl;
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
@@ -216,7 +223,8 @@ HWTEST_F(
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0100, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr) {
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         std::cout << "TelephonyTestService Remote service is null" << std::endl;
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
@@ -246,7 +254,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0100
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0100, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr) {
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         std::cout << "TelephonyTestService Remote service is null" << std::endl;
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
@@ -286,7 +295,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0100
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0200, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr) {
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         std::cout << "TelephonyTestService Remote service is null" << std::endl;
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
@@ -316,7 +326,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0200
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0200, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr) {
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         std::cout << "TelephonyTestService Remote service is null" << std::endl;
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
@@ -355,7 +366,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0200
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0100, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr) {
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         std::cout << "TelephonyTestService Remote service is null" << std::endl;
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
@@ -390,7 +402,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0100, Function
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0200, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr) {
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         std::cout << "TelephonyTestService Remote service is null" << std::endl;
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
@@ -415,7 +428,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0200, Function
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0100, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr) {
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         std::cout << "TelephonyTestService Remote service is null" << std::endl;
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {

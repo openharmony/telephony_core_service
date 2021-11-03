@@ -191,6 +191,14 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
             break;
     }
 
+    auto handler = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_IMEI);
+    if (handler != nullptr) {
+        handler->SetOwner(shared_from_this());
+        if (rilManager_ != nullptr) {
+            rilManager_->GetSlotIMEI(handler);
+        }
+    }
+
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("NetworkSearchHandler::RadioStateChange failed to get NetworkSearchManager");
@@ -278,13 +286,6 @@ void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Poi
         default:
             TELEPHONY_LOGI("Unhandled message with number: %{public}d", radioState);
             break;
-    }
-    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_IMEI);
-    if (event != nullptr) {
-        event->SetOwner(shared_from_this());
-        if (rilManager_ != nullptr) {
-            rilManager_->GetSlotIMEI(event);
-        }
     }
 }
 
