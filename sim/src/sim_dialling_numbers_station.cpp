@@ -216,7 +216,7 @@ void SimDiallingNumbersStation::ChangeDiallingNumberForContents(int efid,
         efid, std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(response))));
     AppExecFwk::InnerEvent::Pointer event =
         CreatePointer(MSG_SIM_CHANGE_ADN_COMPLETED, efid, index, latestDiallingNumber);
-    pbLoader_->UpdateEF(latestDiallingNumber, efid, extensionEF, index, pin2, event);
+    pbLoader_->UpdateDiallingNumbers(latestDiallingNumber, efid, extensionEF, index, pin2, event);
 }
 
 bool SimDiallingNumbersStation::CheckForSearch(
@@ -278,12 +278,14 @@ void SimDiallingNumbersStation::ChangeDiallingNumberForId(int efid,
     }
     diallingNumberInfor->efid_ = efid;
     diallingNumberInfor->recordNumber_ = recordIndex;
+    pin2 = Str16ToStr8(diallingNumberInfor->pin2_);
+    diallingNumberInfor->pin2_ = u""; // reset
 
     callerPointers_.insert(std::pair<int, AppExecFwk::InnerEvent::Pointer>(
         efid, std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(response))));
     AppExecFwk::InnerEvent::Pointer event =
         CreatePointer(MSG_SIM_CHANGE_ADN_COMPLETED, efid, recordIndex, diallingNumberInfor);
-    pbLoader_->UpdateEF(diallingNumberInfor, efid, extensionEF, recordIndex, pin2, event);
+    pbLoader_->UpdateDiallingNumbers(diallingNumberInfor, efid, extensionEF, recordIndex, pin2, event);
 }
 
 bool SimDiallingNumbersStation::CheckValueAndOperation(

@@ -150,13 +150,14 @@ void IccDiallingNumbersController::ProcessDeleteDone(const AppExecFwk::InnerEven
 }
 
 bool IccDiallingNumbersController::UpdateIccDiallingNumbers(
-    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index)
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
-    result_ = false;
-    TELEPHONY_LOGI("UpdateIccDiallingNumbers start: %{public}d", index);
-    if (!IsValidType(type)) {
+    if (!IsValidType(type) || diallingNumber == nullptr) {
         return false;
     }
+    result_ = false;
+    int index = diallingNumber->GetRecId();
+    TELEPHONY_LOGI("UpdateIccDiallingNumbers start: %{public}d", index);
     int fileId = GetFileIdForType(type);
     AppExecFwk::InnerEvent::Pointer response = CreatePointer(PHONE_BOOK_UPDATE_COMPLETED);
     phoneBookCache_->ChangeDiallingNumberForId(fileId, diallingNumber, index, "", response);
@@ -168,13 +169,15 @@ bool IccDiallingNumbersController::UpdateIccDiallingNumbers(
     return result_;
 }
 
-bool IccDiallingNumbersController::DelIccDiallingNumbers(int slotId, int type, int index)
+bool IccDiallingNumbersController::DelIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
-    result_ = false;
-    TELEPHONY_LOGI("DelIccDiallingNumbers start: %{public}d %{public}d", type, index);
-    if (!IsValidType(type)) {
+    if (!IsValidType(type) || diallingNumber == nullptr) {
         return false;
     }
+    result_ = false;
+    int index = diallingNumber->GetRecId();
+    TELEPHONY_LOGI("DelIccDiallingNumbers start: %{public}d %{public}d", type, index);
     int fileId = GetFileIdForType(type);
     AppExecFwk::InnerEvent::Pointer response = CreatePointer(PHONE_BOOK_DELETE_COMPLETED);
     std::string name = "";
@@ -196,7 +199,7 @@ bool IccDiallingNumbersController::AddIccDiallingNumbers(
 {
     result_ = false;
     TELEPHONY_LOGI("AddIccDiallingNumbers start:%{public}d", type);
-    if (!IsValidType(type)) {
+    if (!IsValidType(type) || diallingNumber == nullptr) {
         return false;
     }
     AppExecFwk::InnerEvent::Pointer response = CreatePointer(PHONE_BOOK_WRITE_COMPLETED);

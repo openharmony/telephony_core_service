@@ -203,26 +203,26 @@ declare namespace sim {
   /**
    * @systemapi Hide this for inner system use.
    */
-  function queryIccDiallingNumbers(slotId: number, type: number, callback: AsyncCallback<Array<DiallingNumbersInfo>>): void
-  function queryIccDiallingNumbers(slotId: number, type: number): Promise<Array<DiallingNumbersInfo>>;
+  function queryIccDiallingNumbers(slotId: number, type: ContactType, callback: AsyncCallback<Array<DiallingNumbersInfo>>): void
+  function queryIccDiallingNumbers(slotId: number, type: ContactType): Promise<Array<DiallingNumbersInfo>>;
 
    /**
     * @systemapi Hide this for inner system use.
     */
-  function addIccDiallingNumbers(slotId: number, type: number, diallingNumbers: DiallingNumbersInfo, callback: AsyncCallback<void>): void;
-  function addIccDiallingNumbers(slotId: number, type: number, diallingNumbers: DiallingNumbersInfo): Promise<void>;
+  function addIccDiallingNumbers(slotId: number, type: ContactType, diallingNumbers: DiallingNumbersInfo, callback: AsyncCallback<void>): void;
+  function addIccDiallingNumbers(slotId: number, type: ContactType, diallingNumbers: DiallingNumbersInfo): Promise<void>;
 
    /**
     * @systemapi Hide this for inner system use.
     */
-  function delIccDiallingNumbers(slotId: number, type: number, index: number, callback :AsyncCallback<void>): void;
-  function delIccDiallingNumbers(slotId: number, type: number, index: number): Promise<void>;
+  function delIccDiallingNumbers(slotId: number, type: ContactType, diallingNumbers: DiallingNumbersInfo, callback :AsyncCallback<void>): void;
+  function delIccDiallingNumbers(slotId: number, type: ContactType, diallingNumbers: DiallingNumbersInfo): Promise<void>;
 
    /**
     * @systemapi Hide this for inner system use.
     */
-  function updateIccDiallingNumbers(slotId: number, type: number, diallingNumbers: DiallingNumbersInfo, index: number, callback: AsyncCallback<void>): void;
-  function updateIccDiallingNumbers(slotId: number, type: number, diallingNumbers: DiallingNumbersInfo, index: number): Promise<void>;
+  function updateIccDiallingNumbers(slotId: number, type: ContactType, diallingNumbers: DiallingNumbersInfo, callback: AsyncCallback<void>): void;
+  function updateIccDiallingNumbers(slotId: number, type: ContactType, diallingNumbers: DiallingNumbersInfo): Promise<void>;
 
   /**
    * @systemapi Hide this for inner system use.
@@ -246,10 +246,15 @@ declare namespace sim {
   /**
    * @systemapi Hide this for inner system use.
    */
-   export interface DiallingNumbersInfo {
+  export interface DiallingNumbersInfo {
     recordNumber: number,
     alphaTag: string,
     number: string,
+  }
+
+  export enum ContactType {
+    GENERAL_CONTACT = 1,
+    FIXED_DIALING = 2,
   }
 
   export enum SimState {
