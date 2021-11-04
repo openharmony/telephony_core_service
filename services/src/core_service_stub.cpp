@@ -634,11 +634,10 @@ int32_t CoreServiceStub::OnUpdateIccDiallingNumbers(MessageParcel &data, Message
 {
     int32_t slotId = data.ReadInt32();
     int32_t type = data.ReadInt32();
-    int32_t index = data.ReadInt32();
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = DiallingNumbersInfo::UnMarshalling(data);
     bool result = false;
     if (diallingNumber != nullptr) {
-        result = UpdateIccDiallingNumbers(slotId, type, diallingNumber, index);
+        result = UpdateIccDiallingNumbers(slotId, type, diallingNumber);
     } else {
         TELEPHONY_LOGE("CoreServiceStub::OnUpdateIccDiallingNumbers callback is nulll");
     }
@@ -655,9 +654,13 @@ int32_t CoreServiceStub::OnDelIccDiallingNumbers(MessageParcel &data, MessagePar
 {
     int32_t slotId = data.ReadInt32();
     int32_t type = data.ReadInt32();
-    int32_t index = data.ReadInt32();
-    bool result = DelIccDiallingNumbers(slotId, type, index);
-
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber = DiallingNumbersInfo::UnMarshalling(data);
+    bool result = false;
+    if (diallingNumber != nullptr) {
+        result = DelIccDiallingNumbers(slotId, type, diallingNumber);
+    } else {
+        TELEPHONY_LOGE("CoreServiceStub::OnDelIccDiallingNumbers callback is nulll");
+    }
     bool ret = reply.WriteBool(result);
     if (!ret) {
         TELEPHONY_LOGE("OnDelIccDiallingNumbers write reply failed.");

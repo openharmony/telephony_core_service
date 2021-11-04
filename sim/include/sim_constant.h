@@ -195,6 +195,7 @@ enum IccState {
 
 enum IccDiallingNumberConstant {
     LOADER_ERROR = 200,
+    PARAMETER_INCORRECT = 201,
     NAME_CHAR_POS = 36,
     GSM_EXTENDED_ESCAPE = 0x1B,
     ENCODING_OCTET = 0x00,

@@ -20,7 +20,6 @@
 #include <cstring>
 #include <string>
 
-#include "dialling_numbers_info.h"
 #include "icc_file_controller.h"
 #include "sim_constant.h"
 #include "sim_dialling_numbers_handler.h"

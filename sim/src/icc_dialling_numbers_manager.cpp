@@ -80,25 +80,26 @@ bool IccDiallingNumbersManager::AddIccDiallingNumbers(
     return result;
 }
 
-bool IccDiallingNumbersManager::DelIccDiallingNumbers(int slotId, int type, int index)
+bool IccDiallingNumbersManager::DelIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     if (phoneBookCtrl_ == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersManager::DelIccDiallingNumbers phoneBookCtrl_ nullptr");
         return false;
     }
-    bool result = phoneBookCtrl_->DelIccDiallingNumbers(slotId, type, index);
+    bool result = phoneBookCtrl_->DelIccDiallingNumbers(slotId, type, diallingNumber);
     TELEPHONY_LOGI("IccDiallingNumbersManager::DelIccDiallingNumbers:%{public}d", result);
     return result;
 }
 
 bool IccDiallingNumbersManager::UpdateIccDiallingNumbers(
-    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index)
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     if (phoneBookCtrl_ == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersManager::UpdateIccDiallingNumbers phoneBookCtrl_ nullptr");
         return false;
     }
-    bool result = phoneBookCtrl_->UpdateIccDiallingNumbers(slotId, type, diallingNumber, index);
+    bool result = phoneBookCtrl_->UpdateIccDiallingNumbers(slotId, type, diallingNumber);
     TELEPHONY_LOGI("IccDiallingNumbersManager::UpdateIccDiallingNumbers:%{public}d", result);
     return result;
 }

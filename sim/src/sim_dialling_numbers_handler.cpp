@@ -75,7 +75,7 @@ void SimDiallingNumbersHandler::GetAllDiallingNumbers(
     fileController_->ObtainAllLinearFixedFile(ef, GetEFPath(ef), ptDiallingNumberReadAll);
 }
 
-void SimDiallingNumbersHandler::UpdateEF(std::shared_ptr<DiallingNumbersInfo> diallingNumber, int ef,
+void SimDiallingNumbersHandler::UpdateDiallingNumbers(std::shared_ptr<DiallingNumbersInfo> diallingNumber, int ef,
     int extensionEF, int recordNumber, std::string pin2, AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest = CreateLoadRequest(response);
@@ -86,7 +86,7 @@ void SimDiallingNumbersHandler::UpdateEF(std::shared_ptr<DiallingNumbersInfo> di
 
     std::string name = Str16ToStr8(diallingNumber->GetAlphaTag());
     std::string number = Str16ToStr8(diallingNumber->GetNumber());
-    TELEPHONY_LOGI("UpdateEF contents: %{public}s %{public}s", name.c_str(), number.c_str());
+    TELEPHONY_LOGI("UpdateDiallingNumbers contents: %{public}s %{public}s", name.c_str(), number.c_str());
     std::shared_ptr<void> diallingNumberObj = static_cast<std::shared_ptr<void>>(diallingNumber);
     AppExecFwk::InnerEvent::Pointer linearFileSize =
         CreatePointer(MSG_SIM_OBTAIN_LINEAR_FILE_SIZE_COMPLETED, diallingNumberObj, loadRequest->loadId);
@@ -151,6 +151,10 @@ void SimDiallingNumbersHandler::ProcessLinearSizeDone(const AppExecFwk::InnerEve
             }
             if (baseLoad != nullptr) {
                 diallingNumberLoad = std::static_pointer_cast<DiallingNumbersInfo>(baseLoad);
+            }
+            if (!FormatNameAndNumber(diallingNumberLoad)) {
+                loadRequest->exception = static_cast<std::shared_ptr<void>>(MakeExceptionResult(PARAMETER_INCORRECT));
+                return;
             }
             int dataLen = dataSize[0]; // 0 is file length
             dataLen = RECORD_LENGTH;
@@ -443,7 +447,7 @@ std::shared_ptr<unsigned char> SimDiallingNumbersHandler::CreateSavingSequence(
     std::string number = Str16ToStr8(diallingNumber->number_);
     TELEPHONY_LOGI("CreateSavingSequence contentsx: %{public}s %{public}s", name.c_str(), number.c_str());
 
-    int maxNumberSize = (ADN_DIALING_NUMBER_END - ADN_DIALING_NUMBER_START + 1) * LENGTH_RATE;
+    uint maxNumberSize = (ADN_DIALING_NUMBER_END - ADN_DIALING_NUMBER_START + 1) * LENGTH_RATE;
     if (diallingNumber->number_.empty()) {
         TELEPHONY_LOGE("[buildDiallingNumberstring] Empty dialing number");
         return diallingNumberStringPac;
@@ -504,6 +508,34 @@ std::shared_ptr<unsigned char> SimDiallingNumbersHandler::CreateNameSequence(
         TELEPHONY_LOGI("english alphabet encode result %{public}s %{public}d", sq.c_str(), seqLength);
     }
     return seqResult;
+}
+
+bool SimDiallingNumbersHandler::FormatNameAndNumber(std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
+{
+    std::string &&name = Str16ToStr8(diallingNumber->alphaTag_);
+    std::string &&number = Str16ToStr8(diallingNumber->number_);
+
+    uint nameMaxNum = SimCharDecode::IsChineseString(name) ? MAX_CHINESE_NAME : MAX_ENGLISH_NAME;
+    if (name.size() > nameMaxNum) {
+        diallingNumber->alphaTag_ = Str8ToStr16(name.substr(0, nameMaxNum));
+    }
+
+    uint numberMaxNum = MAX_NUMBER_CHAR;
+    if (number.size() > numberMaxNum) {
+        std::string tpNum = number.substr(0, numberMaxNum);
+        if (SimNumberDecode::IsValidNumberString(tpNum)) {
+            diallingNumber->number_ = Str8ToStr16(tpNum);
+        } else {
+            TELEPHONY_LOGE("invalid number full string  %{public}s", number.c_str());
+            return false;
+        }
+    } else {
+        if (!SimNumberDecode::IsValidNumberString(number)) {
+            TELEPHONY_LOGE("invalid number string  %{public}s", number.c_str());
+            return false;
+        }
+    }
+    return true;
 }
 
 std::shared_ptr<HRilRadioResponseInfo> SimDiallingNumbersHandler::MakeExceptionResult(int code)

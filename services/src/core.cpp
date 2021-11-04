@@ -859,24 +859,25 @@ bool Core::AddIccDiallingNumbers(int slotId, int type, const std::shared_ptr<Dia
     return iccPhoneBookManager_->AddIccDiallingNumbers(slotId, type, diallingNumber);
 }
 
-bool Core::DelIccDiallingNumbers(int slotId, int type, int index)
+bool Core::DelIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     if (iccPhoneBookManager_ == nullptr) {
         TELEPHONY_LOGE("iccPhoneBookManager is null!");
         return false;
     }
-    return iccPhoneBookManager_->DelIccDiallingNumbers(slotId, type, index);
+    return iccPhoneBookManager_->DelIccDiallingNumbers(slotId, type, diallingNumber);
 }
 
-bool Core::UpdateIccDiallingNumbers(int slotId, int type,
-    const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index)
+bool Core::UpdateIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     if (iccPhoneBookManager_ == nullptr) {
         TELEPHONY_LOGE("iccPhoneBookManager is null!");
         return false;
     }
-    return iccPhoneBookManager_->UpdateIccDiallingNumbers(slotId, type, diallingNumber, index);
+    return iccPhoneBookManager_->UpdateIccDiallingNumbers(slotId, type, diallingNumber);
 }
+
 
 bool Core::SetVoiceMail(const std::u16string &mailName, const std::u16string &mailNumber, int32_t slotId)
 {

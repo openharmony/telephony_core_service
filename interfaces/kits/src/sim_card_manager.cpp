@@ -248,19 +248,20 @@ bool SimCardManager::AddIccDiallingNumbers(
     return false;
 }
 
-bool SimCardManager::DelIccDiallingNumbers(int slotId, int type, int index)
+bool SimCardManager::DelIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     if (simManagerInterface_ != nullptr) {
-        return simManagerInterface_->DelIccDiallingNumbers(slotId, type, index);
+        return simManagerInterface_->DelIccDiallingNumbers(slotId, type, diallingNumber);
     }
     return false;
 }
 
 bool SimCardManager::UpdateIccDiallingNumbers(
-    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index)
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     if (simManagerInterface_ != nullptr) {
-        return simManagerInterface_->UpdateIccDiallingNumbers(slotId, type, diallingNumber, index);
+        return simManagerInterface_->UpdateIccDiallingNumbers(slotId, type, diallingNumber);
     }
     return false;
 }

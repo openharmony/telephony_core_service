@@ -69,14 +69,7 @@ template<typename T>
 struct AsyncPhoneBook {
     AsyncContext<T> asyncContext;
     int32_t type = DEFAULT_ERROR;
-    int32_t index = DEFAULT_ERROR;
     std::vector<TelNumbersInfo> infoVec;
-};
-
-struct AsyncDelPhoneBook {
-    AsyncContext<bool> asyncContext;
-    int32_t type = DEFAULT_ERROR;
-    int32_t index = DEFAULT_ERROR;
 };
 } // namespace Telephony
 } // namespace OHOS

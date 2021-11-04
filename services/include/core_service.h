@@ -113,10 +113,11 @@ public:
     bool AddIccDiallingNumbers(
         int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) override;
 
-    bool DelIccDiallingNumbers(int slotId, int type, int index) override;
+    bool DelIccDiallingNumbers(
+        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) override;
 
     bool UpdateIccDiallingNumbers(
-        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index) override;
+        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) override;
 
     bool SetVoiceMail(const std::u16string &mailName, const std::u16string &mailNumber, int32_t slotId) override;
 private:
