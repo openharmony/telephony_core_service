@@ -70,156 +70,38 @@
 
 核心服务模块需要提供SIM卡，搜网相关模块的接口。
 
-### SIM卡对外提供的接口<a name="section142mcpsimp"></a>
+###  SIM卡对外提供的接口<a name="section142mcpsimp"></a>
 
-<a name="table144mcpsimp"></a>
-<table><thead align="left"><tr id="row150mcpsimp"><th class="cellrowborder" valign="top" width="33.406659334066596%" id="mcps1.1.4.1.1"><p id="entry151mcpsimpp0"><a name="entry151mcpsimpp0"></a><a name="entry151mcpsimpp0"></a>接口名称</p>
-</th>
-<th class="cellrowborder" valign="top" width="33.266673332666734%" id="mcps1.1.4.1.2"><p id="entry152mcpsimpp0"><a name="entry152mcpsimpp0"></a><a name="entry152mcpsimpp0"></a>接口描述</p>
-</th>
-<th class="cellrowborder" valign="top" width="33.32666733326668%" id="mcps1.1.4.1.3"><p id="entry153mcpsimpp0"><a name="entry153mcpsimpp0"></a><a name="entry153mcpsimpp0"></a>所需权限</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row162mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p109592823314"><a name="p109592823314"></a><a name="p109592823314"></a>function getSimState(slotId: number, callback: AsyncCallback&lt;SimState&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="p6465112873313"><a name="p6465112873313"></a><a name="p6465112873313"></a>获取指定卡槽的SIM卡状态</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry165mcpsimpp0"><a name="entry165mcpsimpp0"></a><a name="entry165mcpsimpp0"></a>无</p>
-</td>
-</tr>
-<tr id="row112142420336"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p321517423338"><a name="p321517423338"></a><a name="p321517423338"></a>function getSimGid1(slotId: number, callback: AsyncCallback&lt;string&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="p1321515422336"><a name="p1321515422336"></a><a name="p1321515422336"></a>获取指定卡槽SIM卡的GID1(Group Identifier Level 1)</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="p1321519421336"><a name="p1321519421336"></a><a name="p1321519421336"></a>ohos.permission.GET_TELEPHONY_STATE</p>
-</td>
-</tr>
-<tr id="row179361554173312"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p1829010144347"><a name="p1829010144347"></a><a name="p1829010144347"></a>function getSimIccId(slotId: number, callback: AsyncCallback&lt;string&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="p1283325183420"><a name="p1283325183420"></a><a name="p1283325183420"></a>获取指定卡槽SIM卡的ICCID（Integrate Circuit Card Identity）</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry177mcpsimpp0"><a name="entry177mcpsimpp0"></a><a name="entry177mcpsimpp0"></a>ohos.permission.GET_TELEPHONY_STATE</p>
-</td>
-</tr>
-<tr id="row178mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="entry179mcpsimpp0"><a name="entry179mcpsimpp0"></a><a name="entry179mcpsimpp0"></a>function getISOCountryCodeForSim(slotId: number, callback: AsyncCallback&lt;string&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="p3912143793414"><a name="p3912143793414"></a><a name="p3912143793414"></a>获取指定卡槽SIM卡的ISO国家码</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry181mcpsimpp0"><a name="entry181mcpsimpp0"></a><a name="entry181mcpsimpp0"></a>无</p>
-</td>
-</tr>
-<tr id="row182mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p1441115133518"><a name="p1441115133518"></a><a name="p1441115133518"></a>function getSimOperatorNumeric(slotId: number, callback: AsyncCallback&lt;string&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="p20213343133418"><a name="p20213343133418"></a><a name="p20213343133418"></a>获取指定卡槽SIM卡的归属PLMN（Public Land Mobile Network）号</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry185mcpsimpp0"><a name="entry185mcpsimpp0"></a><a name="entry185mcpsimpp0"></a>无</p>
-</td>
-</tr>
-<tr id="row186mcpsimp"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p1818291010352"><a name="p1818291010352"></a><a name="p1818291010352"></a>function getSimSpn(slotId: number, callback: AsyncCallback&lt;string&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="p10817104713416"><a name="p10817104713416"></a><a name="p10817104713416"></a>获取指定卡槽SIM卡的运营商SPN（Service Provider Name）</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="entry189mcpsimpp0"><a name="entry189mcpsimpp0"></a><a name="entry189mcpsimpp0"></a>无</p>
-</td>
-</tr>
-<tr id="row86173529343"><td class="cellrowborder" valign="top" width="33.406659334066596%" headers="mcps1.1.4.1.1 "><p id="p76171552183413"><a name="p76171552183413"></a><a name="p76171552183413"></a>function getDefaultVoiceSlotId(callback: AsyncCallback&lt;number&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.266673332666734%" headers="mcps1.1.4.1.2 "><p id="p10617125210345"><a name="p10617125210345"></a><a name="p10617125210345"></a>获取语音业务的默认卡卡槽</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.32666733326668%" headers="mcps1.1.4.1.3 "><p id="p0826218351"><a name="p0826218351"></a><a name="p0826218351"></a>无</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 接口名称                                                     | 接口描述                                                    | 所需权限                            |
+| ------------------------------------------------------------ | ----------------------------------------------------------- | ----------------------------------- |
+| function getSimState(slotId: number, callback: AsyncCallback\<SimState>): void; | 获取指定卡槽的SIM卡状态                                     | 无                                  |
+| function getSimGid1(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽SIM卡的GID1(Group Identifier Level 1)           | ohos.permission.GET_TELEPHONY_STATE |
+| function getSimIccId(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽SIM卡的ICCID（Integrate Circuit Card Identity） | ohos.permission.GET_TELEPHONY_STATE |
+| function getISOCountryCodeForSim(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽SIM卡的ISO国家码                                | 无                                  |
+| function getSimOperatorNumeric(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽SIM卡的归属PLMN（Public Land Mobile Network）号 | 无                                  |
+| function getSimSpn(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽SIM卡的运营商SPN（Service Provider Name）       | 无                                  |
+| function getDefaultVoiceSlotId(callback: AsyncCallback\<number>): void; | 获取语音业务的默认卡卡槽                                    | 无                                  |
 
-完整的JS API说明以及实例代码请参考：[SIM卡管理](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/js-reference/SIM%E5%8D%A1%E7%AE%A1%E7%90%86.md)。
+
+完整的JS API说明以及实例代码请参考：[SIM卡管理](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/js-reference/apis/js-apis-sim.md)。
 
 ### 搜网服务对外提供的接口<a name="section198mcpsimp"></a>
 
-<a name="table200mcpsimp"></a>
-<table><thead align="left"><tr id="row206mcpsimp"><th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.1.4.1.1"><p id="entry207mcpsimpp0"><a name="entry207mcpsimpp0"></a><a name="entry207mcpsimpp0"></a>接口名称</p>
-</th>
-<th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.1.4.1.2"><p id="entry208mcpsimpp0"><a name="entry208mcpsimpp0"></a><a name="entry208mcpsimpp0"></a>接口描述</p>
-</th>
-<th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.1.4.1.3"><p id="entry209mcpsimpp0"><a name="entry209mcpsimpp0"></a><a name="entry209mcpsimpp0"></a>所需权限</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row210mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p611934143612"><a name="p611934143612"></a><a name="p611934143612"></a>function getRadioTech(slotId: number, callback: AsyncCallback&lt;{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="entry212mcpsimpp0"><a name="entry212mcpsimpp0"></a><a name="entry212mcpsimpp0"></a>获取指定卡槽的当前接入技术</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry213mcpsimpp0"><a name="entry213mcpsimpp0"></a><a name="entry213mcpsimpp0"></a>ohos.permission.GET_NETWORK_INFO</p>
-</td>
-</tr>
-<tr id="row226mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p924781783614"><a name="p924781783614"></a><a name="p924781783614"></a>function getSignalInformation(slotId: number, callback: AsyncCallback&lt;Array&lt;SignalInformation&gt;&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="p12171627113811"><a name="p12171627113811"></a><a name="p12171627113811"></a>获取指定卡槽的信号列表</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry229mcpsimpp0"><a name="entry229mcpsimpp0"></a><a name="entry229mcpsimpp0"></a>无</p>
-</td>
-</tr>
-<tr id="row230mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p22372373611"><a name="p22372373611"></a><a name="p22372373611"></a>function getNetworkState(slotId: number, callback: AsyncCallback&lt;NetworkState&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="p23981325384"><a name="p23981325384"></a><a name="p23981325384"></a>获取指定卡槽的网络状态</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="entry233mcpsimpp0"><a name="entry233mcpsimpp0"></a><a name="entry233mcpsimpp0"></a>ohos.permission.GET_NETWORK_INFO</p>
-</td>
-</tr>
-<tr id="row17188184311384"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p31882434382"><a name="p31882434382"></a><a name="p31882434382"></a>function getISOCountryCodeForNetwork(slotId: number, callback: AsyncCallback&lt;string&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="p1918815434388"><a name="p1918815434388"></a><a name="p1918815434388"></a>获取指定卡槽的网络国家码</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="p1818894323813"><a name="p1818894323813"></a><a name="p1818894323813"></a>无</p>
-</td>
-</tr>
-<tr id="row927264911384"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p227294913819"><a name="p227294913819"></a><a name="p227294913819"></a>function getNetworkSearchInformation(slotId: number, callback: AsyncCallback&lt;NetworkSearchResult&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="p162721149183812"><a name="p162721149183812"></a><a name="p162721149183812"></a>获取指定卡槽的手动搜网结果</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="p1327216495382"><a name="p1327216495382"></a><a name="p1327216495382"></a>ohos.permission.GET_TELEPHONY_STATE</p>
-</td>
-</tr>
-<tr id="row350525373816"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p15055539387"><a name="p15055539387"></a><a name="p15055539387"></a>function getNetworkSelectionMode(slotId: number, callback: AsyncCallback&lt;NetworkSelectionMode&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="p55051532387"><a name="p55051532387"></a><a name="p55051532387"></a>获取指定卡槽的选网模式</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="p7505155363815"><a name="p7505155363815"></a><a name="p7505155363815"></a>无</p>
-</td>
-</tr>
-<tr id="row10262135216383"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p0263452143810"><a name="p0263452143810"></a><a name="p0263452143810"></a>function setNetworkSelectionMode(options: NetworkSelectionModeOptions, callback: AsyncCallback&lt;void&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="p11263052113811"><a name="p11263052113811"></a><a name="p11263052113811"></a>设置指定卡槽的选网模式</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="p32637527381"><a name="p32637527381"></a><a name="p32637527381"></a>ohos.permission.SET_TELEPHONY_STATE</p>
-</td>
-</tr>
-<tr id="row1096475063810"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p99648502381"><a name="p99648502381"></a><a name="p99648502381"></a>function isRadioOn(callback: AsyncCallback&lt;boolean&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="p296455083811"><a name="p296455083811"></a><a name="p296455083811"></a>判断Radio是否打开</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="p14964135012383"><a name="p14964135012383"></a><a name="p14964135012383"></a>ohos.permission.GET_NETWORK_INFO</p>
-</td>
-</tr>
-<tr id="row2851134633813"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p17588523164312"><a name="p17588523164312"></a><a name="p17588523164312"></a>function turnOnRadio(callback: AsyncCallback&lt;void&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="p685115467386"><a name="p685115467386"></a><a name="p685115467386"></a>开启Radio</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="p223815324217"><a name="p223815324217"></a><a name="p223815324217"></a>ohos.permission.SET_TELEPHONY_STATE</p>
-</td>
-</tr>
-<tr id="row317374511384"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.1 "><p id="p4173174515380"><a name="p4173174515380"></a><a name="p4173174515380"></a>function turnOffRadio(callback: AsyncCallback&lt;void&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.2 "><p id="p817364513385"><a name="p817364513385"></a><a name="p817364513385"></a>关闭Radio</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.1.4.1.3 "><p id="p13558115384210"><a name="p13558115384210"></a><a name="p13558115384210"></a>ohos.permission.SET_TELEPHONY_STATE</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 接口名称                                                     | 接口描述                   | 所需权限                            |
+| ------------------------------------------------------------ | -------------------------- | ----------------------------------- |
+| function getRadioTech(slotId: number, callback: AsyncCallback\<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}>): void; | 获取指定卡槽的当前接入技术 | ohos.permission.GET_NETWORK_INFO    |
+| function getSignalInformation(slotId: number, callback: AsyncCallback\<Array\<SignalInformation>>): void; | 获取指定卡槽的信号列表     | 无                                  |
+| function getNetworkState(slotId: number, callback: AsyncCallback\<NetworkState>): void; | 获取指定卡槽的网络状态     | ohos.permission.GET_NETWORK_INFO    |
+| function getISOCountryCodeForNetwork(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽的网络国家码   | 无                                  |
+| function getNetworkSearchInformation(slotId: number, callback: AsyncCallback\<NetworkSearchResult>): void; | 获取指定卡槽的手动搜网结果 | ohos.permission.GET_TELEPHONY_STATE |
+| function getNetworkSelectionMode(slotId: number, callback: AsyncCallback\<NetworkSelectionMode>): void; | 获取指定卡槽的选网模式     | 无                                  |
+| function setNetworkSelectionMode(options: NetworkSelectionModeOptions, callback: AsyncCallback\<void>): void; | 设置指定卡槽的选网模式     | ohos.permission.SET_TELEPHONY_STATE |
+| function isRadioOn(callback: AsyncCallback\<boolean>): void;  | 判断Radio是否打开          | ohos.permission.GET_NETWORK_INFO    |
+| function turnOnRadio(callback: AsyncCallback\<void>): void;   | 开启Radio                  | ohos.permission.SET_TELEPHONY_STATE |
+| function turnOffRadio(callback: AsyncCallback\<void>): void;  | 关闭Radio                  | ohos.permission.SET_TELEPHONY_STATE |
 
-完整的JS API说明以及实例代码请参考：[网络搜索](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/js-reference/%E7%BD%91%E7%BB%9C%E6%90%9C%E7%B4%A2.md)。
+
+完整的JS API说明以及实例代码请参考：[网络搜索](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/js-reference/apis/js-apis-radio.md)。
 
 **说明：**
 
@@ -237,10 +119,10 @@
 
     ```
     import radio from "@ohos.telephony.radio";
-
+    
     // 参数赋值
     let slotId = 0;
-
+    
     // 调用接口【callback方式】
     radio.getNetworkState(slotId, (err, value) => {
       if (err) {
@@ -251,7 +133,7 @@
       // 接口调用成功，err为空
       console.log(`success to getNetworkState: ${value}`);
     });
-
+    
     // 调用接口【Promise方式】
     let promise = radio.getNetworkState(slotId);
     promise.then((value) => {
@@ -274,10 +156,10 @@
 
     ```
     import sim from "@ohos.telephony.sim";
-
+    
     // 参数赋值
     let slotId = 0;
-
+    
     // 调用接口【callback方式】
     sim.getSimState(slotId, (err, value) => {
       if (err) {
@@ -288,7 +170,7 @@
       // 接口调用成功，err为空
       console.log(`success to getSimState: ${value}`);
     });
-
+    
     // 调用接口【Promise方式】
     let promise = sim.getSimState(slotId);
     promise.then((value) => {
