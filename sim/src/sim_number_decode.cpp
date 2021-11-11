@@ -249,5 +249,21 @@ char SimNumberDecode::BcdToChar(unsigned char b, int bcdExtType)
     }
     return extended.at(b - CHAR_START);
 }
+
+bool SimNumberDecode::IsValidNumberString(const std::string &number)
+{
+    uint32_t len = number.length();
+    for (uint32_t i = 0; i < len; i++) {
+        char c = number[i];
+        if ((c >= '0') && (c <= '9')) {
+            continue;
+        }
+        if ((c == '+') || (c == '#') || (c == '*')) {
+            continue;
+        }
+        return false;
+    }
+    return true;
+}
 } // namespace Telephony
 } // namespace OHOS

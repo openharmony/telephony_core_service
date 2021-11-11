@@ -75,9 +75,11 @@ public:
     virtual std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int slotId, int type) = 0;
     virtual bool AddIccDiallingNumbers(
         int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) = 0;
-    virtual bool DelIccDiallingNumbers(int slotId, int type, int index) = 0;
+    virtual bool DelIccDiallingNumbers(
+        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) = 0;
     virtual bool UpdateIccDiallingNumbers(
-        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index) = 0;
+        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) = 0;
+
     virtual bool SetVoiceMail(const std::u16string &mailName, const std::u16string &mailNumber, int32_t slotId) = 0;
     enum {
         GET_PS_RADIO_TECH = 0,

@@ -35,9 +35,9 @@ public:
     void Init();
     std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int slotId, int type);
     bool AddIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
-    bool DelIccDiallingNumbers(int slotId, int type, int index);
+    bool DelIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
     bool UpdateIccDiallingNumbers(
-        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index);
+        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
     enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
 
 protected:

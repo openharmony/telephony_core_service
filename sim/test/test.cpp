@@ -271,6 +271,7 @@ static bool TestAddIccDiallingNumbers()
     }
     std::string name = "";
     std::string number = "";
+    std::string pin2 = "";
     int type = 0;
     std::cout << "input name:" << std::endl;
     std::cin >> name;
@@ -280,6 +281,8 @@ static bool TestAddIccDiallingNumbers()
     std::cin >> type;
     if (type == FIX_DAILING) {
         type = SimPhoneBook_Fdn;
+        std::cout << "input pin2:" << std::endl;
+        std::cin >> pin2;
     } else {
         type = SimPhoneBook_Adn;
     }
@@ -287,6 +290,7 @@ static bool TestAddIccDiallingNumbers()
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>(type, 0);
     diallingNumber->alphaTag_ = Str8ToStr16(name);
     diallingNumber->number_ = Str8ToStr16(number);
+    diallingNumber->pin2_ = Str8ToStr16(pin2);
     std::cout << "start insert " << Str16ToStr8(diallingNumber->alphaTag_) << " "
               << Str16ToStr8(diallingNumber->number_) << std::endl;
     bool result = g_telephonyService->AddIccDiallingNumbers(SLOT_ID, type, diallingNumber);
@@ -302,18 +306,23 @@ static bool TestDelIccDiallingNumbers()
     }
     int type = 0;
     int index = 0;
+    std::string pin2 = "";
     std::cout << "select id:" << std::endl;
     std::cin >> index;
     std::cout << "please select type: 1.public phonebooks 2.fix dialing number" << std::endl;
     std::cin >> type;
     if (type == FIX_DAILING) {
         type = SimPhoneBook_Fdn;
+        std::cout << "input pin2:" << std::endl;
+        std::cin >> pin2;
     } else {
         type = SimPhoneBook_Adn;
     }
 
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>(type, 0);
-    bool result = g_telephonyService->DelIccDiallingNumbers(SLOT_ID, type, index);
+    diallingNumber->recordNumber_ = index;
+    diallingNumber->pin2_ = Str8ToStr16(pin2);
+    bool result = g_telephonyService->DelIccDiallingNumbers(SLOT_ID, type, diallingNumber);
     std::cout << "TelephonyTestService Remote DelIccDiallingNumbers result [" << result << "] " << std::endl;
     return true;
 }
@@ -326,6 +335,7 @@ static bool TestUpdateIccDiallingNumbers()
     }
     std::string name = "";
     std::string number = "";
+    std::string pin2 = "";
     int type = 0;
     int index = 0;
     std::cout << "select id:" << std::endl;
@@ -338,6 +348,8 @@ static bool TestUpdateIccDiallingNumbers()
     std::cin >> type;
     if (type == FIX_DAILING) {
         type = SimPhoneBook_Fdn;
+        std::cout << "input pin2:" << std::endl;
+        std::cin >> pin2;
     } else {
         type = SimPhoneBook_Adn;
     }
@@ -345,7 +357,9 @@ static bool TestUpdateIccDiallingNumbers()
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>(type, 0);
     diallingNumber->alphaTag_ = Str8ToStr16(name);
     diallingNumber->number_ = Str8ToStr16(number);
-    bool result = g_telephonyService->UpdateIccDiallingNumbers(SLOT_ID, type, diallingNumber, index);
+    diallingNumber->pin2_ = Str8ToStr16(pin2);
+    diallingNumber->recordNumber_ = index;
+    bool result = g_telephonyService->UpdateIccDiallingNumbers(SLOT_ID, type, diallingNumber);
     std::cout << "TelephonyTestService Remote UpdateIccDiallingNumbers result [" << result << "] " << std::endl;
     return true;
 }

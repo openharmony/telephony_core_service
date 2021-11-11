@@ -183,7 +183,7 @@ std::string SIMUtils::DiallingNumberStringFieldConvertToString(
             }
         }
         i -= offset;
-        string str((char *)data, offset, i);
+        std::string str((char *)data, offset, i);
         TELEPHONY_LOGD("8bit decode result %{public}s", str.c_str());
         if (!str.empty()) {
             return str;
