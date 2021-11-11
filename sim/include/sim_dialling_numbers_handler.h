@@ -76,8 +76,8 @@ public:
     void LoadFromEF(int ef, int extensionEF, int recordNumber, AppExecFwk::InnerEvent::Pointer &response);
     void GetAllDiallingNumbers(int ef, int extensionEF, AppExecFwk::InnerEvent::Pointer &response);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
-    void UpdateEF(std::shared_ptr<DiallingNumbersInfo> diallingNumber, int ef, int extensionEF, int recordNumber,
-        std::string pin2, AppExecFwk::InnerEvent::Pointer &response);
+    void UpdateDiallingNumbers(std::shared_ptr<DiallingNumbersInfo> diallingNumber, int ef, int extensionEF,
+        int recordNumber, std::string pin2, AppExecFwk::InnerEvent::Pointer &response);
     static int GetNextSerialId()
     {
         return nextSerialId_++;
@@ -114,6 +114,7 @@ private:
     std::shared_ptr<HRilRadioResponseInfo> MakeExceptionResult(int code);
     void FillNumberFiledForDiallingNumber(
         std::shared_ptr<unsigned char> diallingNumber, const std::string &number, int recordSize);
+    bool FormatNameAndNumber(std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
     const int RECORD_LENGTH = 28;
     const int SIZE_POS = 2;
     const int LENGTH_RATE = 2;

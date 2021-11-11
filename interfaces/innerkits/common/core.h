@@ -146,9 +146,10 @@ public:
     bool InitCellularRadio(bool isFirst);
     std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int slotId, int type);
     bool AddIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
-    bool DelIccDiallingNumbers(int slotId, int type, int index);
-    bool UpdateIccDiallingNumbers(int slotId, int type,
-            const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index);
+    bool DelIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
+    bool UpdateIccDiallingNumbers(
+        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
+
     std::u16string GetSimTelephoneNumber(int32_t slotId);
     std::u16string GetVoiceMailIdentifier(int32_t slotId);
     std::u16string GetVoiceMailNumber(int32_t slotId);

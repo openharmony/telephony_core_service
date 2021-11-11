@@ -16,10 +16,6 @@
 #ifndef OHOS_SIM_FILE_CONTROLLER_H
 #define OHOS_SIM_FILE_CONTROLLER_H
 
-#include <stdlib.h>
-#include <cstring>
-#include <string>
-#include "sim_constant.h"
 #include "icc_file_controller.h"
 
 namespace OHOS {

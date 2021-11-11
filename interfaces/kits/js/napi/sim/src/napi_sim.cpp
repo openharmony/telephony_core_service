@@ -819,33 +819,40 @@ napi_value AddIccDiallingNumbers(napi_env env, napi_callback_info info)
 
 void NativeDelIccDiallingNumbers(napi_env env, void *data)
 {
-    AsyncDelPhoneBook *phoneBook = static_cast<AsyncDelPhoneBook *>(data);
+    AsyncPhoneBook<bool> *phoneBook = static_cast<AsyncPhoneBook<bool> *>(data);
 
-    TELEPHONY_LOGD("DelIccDiallingNumbers phoneBook->index = %{public}d", phoneBook->index);
     phoneBook->asyncContext.context.resolved = false;
     if (g_simCardManager) {
-        phoneBook->asyncContext.callbackVal = g_simCardManager->DelIccDiallingNumbers(
-            phoneBook->asyncContext.slotId, phoneBook->type, phoneBook->index);
-        TELEPHONY_LOGD(
-            "DelIccDiallingNumbers asyncContext.callbackVal = %{public}d", phoneBook->asyncContext.callbackVal);
-        phoneBook->asyncContext.context.resolved = phoneBook->asyncContext.callbackVal;
+        if (phoneBook->infoVec.size() > 0) {
+            std::shared_ptr<DiallingNumbersInfo> telNumber = std::make_shared<DiallingNumbersInfo>();
+            const TelNumbersInfo &info = phoneBook->infoVec.at(0);
+            telNumber->recordNumber_ = info.recordNumber;
+            telNumber->alphaTag_ = NapiUtil::ToUtf16(info.alphaTag.data());
+            telNumber->number_ = NapiUtil::ToUtf16(info.number.data());
+            phoneBook->asyncContext.callbackVal = g_simCardManager->DelIccDiallingNumbers(
+                phoneBook->asyncContext.slotId, phoneBook->type, telNumber);
+            TELEPHONY_LOGD("DelIccDiallingNumbers asyncContext.callbackVal = %{public}d",
+                phoneBook->asyncContext.callbackVal);
+            phoneBook->asyncContext.context.resolved = phoneBook->asyncContext.callbackVal;
+        }
     }
 }
 
 void DelIccDiallingNumbersCallback(napi_env env, napi_status status, void *data)
 {
-    std::unique_ptr<AsyncDelPhoneBook> phoneBook(static_cast<AsyncDelPhoneBook *>(data));
+    std::unique_ptr<AsyncPhoneBook<bool>> phoneBook(static_cast<AsyncPhoneBook<bool> *>(data));
     NapiAsyncCompleteCallback(env, status, phoneBook->asyncContext, "phone book delete failed", true);
 }
 
 napi_value DelIccDiallingNumbers(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncDelPhoneBook> phoneBook = std::make_unique<AsyncDelPhoneBook>();
+    std::unique_ptr<AsyncPhoneBook<bool>> phoneBook = std::make_unique<AsyncPhoneBook<bool>>();
     BaseContext &context = phoneBook->asyncContext.context;
 
-    auto initPara = std::make_tuple(
-        &phoneBook->asyncContext.slotId, &phoneBook->type, &phoneBook->index, &context.callbackRef);
-    vecNapiType typeStd {napi_number, napi_number, napi_number, napi_function};
+    napi_value object = NapiUtil::CreateUndefined(env);
+    auto initPara =
+        std::make_tuple(&phoneBook->asyncContext.slotId, &phoneBook->type, &object, &context.callbackRef);
+    vecNapiType typeStd {napi_number, napi_number, napi_object, napi_function};
     AsyncPara para {
         .funcName = "DelIccDiallingNumbers",
         .env = env,
@@ -855,6 +862,9 @@ napi_value DelIccDiallingNumbers(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2(para, context, initPara, typeStd);
     if (result) {
+        TelNumbersInfo inputInfo;
+        DiallingNumberParaAnalyze(env, object, inputInfo);
+        phoneBook->infoVec.push_back(std::move(inputInfo));
         phoneBook.release();
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
@@ -874,8 +884,8 @@ void NativeUpdateIccDiallingNumbers(napi_env env, void *data)
             telNumber->alphaTag_ = NapiUtil::ToUtf16(info.alphaTag.data());
             telNumber->number_ = NapiUtil::ToUtf16(info.number.data());
             TELEPHONY_LOGD("UpdateIccDiallingNumbers number_ = %{public}s", info.number.data());
-            asyncContext.callbackVal = g_simCardManager->UpdateIccDiallingNumbers(
-                asyncContext.slotId, phoneBook->type, telNumber, phoneBook->index);
+            asyncContext.callbackVal =
+                g_simCardManager->UpdateIccDiallingNumbers(asyncContext.slotId, phoneBook->type, telNumber);
             TELEPHONY_LOGD(
                 "UpdateIccDiallingNumbers asyncContext.callbackVal = %{public}d", asyncContext.callbackVal);
             asyncContext.context.resolved = asyncContext.callbackVal;
@@ -895,9 +905,9 @@ napi_value UpdateIccDiallingNumbers(napi_env env, napi_callback_info info)
     BaseContext &context = phoneBook->asyncContext.context;
 
     napi_value object = NapiUtil::CreateUndefined(env);
-    auto initPara = std::make_tuple(
-        &phoneBook->asyncContext.slotId, &phoneBook->type, &object, &phoneBook->index, &context.callbackRef);
-    vecNapiType typeStd {napi_number, napi_number, napi_object, napi_number, napi_function};
+    auto initPara =
+        std::make_tuple(&phoneBook->asyncContext.slotId, &phoneBook->type, &object, &context.callbackRef);
+    vecNapiType typeStd {napi_number, napi_number, napi_object, napi_function};
 
     AsyncPara para {
         .funcName = "UpdateIccDiallingNumbers",

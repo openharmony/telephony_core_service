@@ -596,25 +596,26 @@ bool CoreService::AddIccDiallingNumbers(
     return core->AddIccDiallingNumbers(slotId, type, diallingNumber);
 }
 
-bool CoreService::DelIccDiallingNumbers(int slotId, int type, int index)
+bool CoreService::DelIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     TELEPHONY_LOGI("CoreService::DelIccDiallingNumbers");
     std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
     if (core == nullptr) {
         return false;
     }
-    return core->DelIccDiallingNumbers(slotId, type, index);
+    return core->DelIccDiallingNumbers(slotId, type, diallingNumber);
 }
 
 bool CoreService::UpdateIccDiallingNumbers(
-    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index)
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     TELEPHONY_LOGI("CoreService::UpdateIccDiallingNumbers");
     std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
     if (core == nullptr) {
         return false;
     }
-    return core->UpdateIccDiallingNumbers(slotId, type, diallingNumber, index);
+    return core->UpdateIccDiallingNumbers(slotId, type, diallingNumber);
 }
 
 bool CoreService::SetVoiceMail(const std::u16string &mailName, const std::u16string &mailNumber, int32_t slotId)

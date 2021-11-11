@@ -32,6 +32,7 @@ public:
     std::u16string alphaTag_ = u"";
     std::u16string number_ = u"";
     std::vector<std::u16string> emails_;
+    std::u16string pin2_ = u"";
     bool ReadFromParcel(Parcel &parcel)
     {
         if (!parcel.ReadInt32(extRecord_)) {
@@ -47,6 +48,9 @@ public:
             return false;
         }
         if (!parcel.ReadString16(number_)) {
+            return false;
+        }
+        if (!parcel.ReadString16(pin2_)) {
             return false;
         }
         if (!parcel.ReadString16Vector(&emails_)) {
@@ -70,6 +74,9 @@ public:
             return false;
         }
         if (!parcel.WriteString16(number_)) {
+            return false;
+        }
+        if (!parcel.WriteString16(pin2_)) {
             return false;
         }
         if (!parcel.WriteString16Vector(emails_)) {

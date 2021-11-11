@@ -973,7 +973,7 @@ bool SimFile::ProcessSetMbdn(const AppExecFwk::InnerEvent::Pointer &event)
         diallingNumberCphs->number_ = Str8ToStr16(voiceMailTag_);
         AppExecFwk::InnerEvent::Pointer eventCphs =
             CreateDiallingNumberPointer(MSG_SIM_SET_CPHS_MAILBOX_DONE, 0, 0, nullptr);
-        diallingNumberHandler_->UpdateEF(diallingNumberCphs,
+        diallingNumberHandler_->UpdateDiallingNumbers(diallingNumberCphs,
             ELEMENTARY_FILE_MAILBOX_CPHS, ELEMENTARY_FILE_EXT1, 1, "", eventCphs);
         TELEPHONY_LOGD("set cphs voicemail number as it is available");
     } else {
@@ -1109,7 +1109,7 @@ bool SimFile::UpdateVoiceMail(const std::string &mailName, const std::string &ma
         TELEPHONY_LOGD("UpdateVoiceMail start MBDN");
         AppExecFwk::InnerEvent::Pointer event =
             CreateDiallingNumberPointer(MSG_SIM_SET_MBDN_DONE, 0, 0, nullptr);
-        diallingNumberHandler_->UpdateEF(diallingNumber,
+        diallingNumberHandler_->UpdateDiallingNumbers(diallingNumber,
             ELEMENTARY_FILE_MBDN, ELEMENTARY_FILE_EXT6, indexOfMailbox_, "", event);
         SetCurAction(ACTION_WAIT);
         std::unique_lock<std::mutex> lock(mtx_);
@@ -1118,7 +1118,7 @@ bool SimFile::UpdateVoiceMail(const std::string &mailName, const std::string &ma
     } else if (CphsVoiceMailAvailable()) {
         AppExecFwk::InnerEvent::Pointer event =
             CreateDiallingNumberPointer(MSG_SIM_SET_CPHS_MAILBOX_DONE, 0, 0, nullptr);
-        diallingNumberHandler_->UpdateEF(diallingNumber,
+        diallingNumberHandler_->UpdateDiallingNumbers(diallingNumber,
             ELEMENTARY_FILE_MAILBOX_CPHS, ELEMENTARY_FILE_EXT1, 1, "", event);
         SetCurAction(ACTION_WAIT);
         std::unique_lock<std::mutex> lock(mtx_);

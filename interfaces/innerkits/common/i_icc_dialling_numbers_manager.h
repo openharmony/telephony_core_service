@@ -25,9 +25,10 @@ public:
     virtual std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int slotId, int type) = 0;
     virtual bool AddIccDiallingNumbers(
         int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) = 0;
-    virtual bool DelIccDiallingNumbers(int slotId, int type, int index) = 0;
-    virtual bool UpdateIccDiallingNumbers(
-        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index) = 0;
+    virtual bool DelIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) = 0;
+        virtual bool UpdateIccDiallingNumbers(
+        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

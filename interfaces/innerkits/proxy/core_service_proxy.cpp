@@ -1143,7 +1143,8 @@ bool CoreServiceProxy::AddIccDiallingNumbers(
     return reply.ReadBool();
 }
 
-bool CoreServiceProxy::DelIccDiallingNumbers(int slotId, int type, int index)
+bool CoreServiceProxy::DelIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     TELEPHONY_LOGD("CoreServiceProxy DelIccDiallingNumbers ::%{public}d", slotId);
     if (!IsValidSimId(slotId)) {
@@ -1164,11 +1165,9 @@ bool CoreServiceProxy::DelIccDiallingNumbers(int slotId, int type, int index)
         TELEPHONY_LOGE("DelIccDiallingNumbers WriteInt32 type is false");
         return false;
     }
-    if (!data.WriteInt32(index)) {
-        TELEPHONY_LOGE("DelIccDiallingNumbers WriteInt32 selectMode is false");
-        return false;
+    if (diallingNumber != nullptr) {
+        diallingNumber->Marshalling(data);
     }
-
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("DelIccDiallingNumbers Remote is null");
         return false;
@@ -1182,7 +1181,7 @@ bool CoreServiceProxy::DelIccDiallingNumbers(int slotId, int type, int index)
 }
 
 bool CoreServiceProxy::UpdateIccDiallingNumbers(
-    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int index)
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     TELEPHONY_LOGD("CoreServiceProxy UpdateIccDiallingNumbers ::%{public}d", slotId);
     if (!IsValidSimId(slotId)) {
@@ -1200,11 +1199,7 @@ bool CoreServiceProxy::UpdateIccDiallingNumbers(
         return false;
     }
     if (!data.WriteInt32(type)) {
-        TELEPHONY_LOGE("DelIccDiallingNumbers WriteInt32 type is false");
-        return false;
-    }
-    if (!data.WriteInt32(index)) {
-        TELEPHONY_LOGE("UpdateIccDiallingNumbers WriteInt32 selectMode is false");
+        TELEPHONY_LOGE("UpdateIccDiallingNumbers WriteInt32 type is false");
         return false;
     }
     if (diallingNumber != nullptr) {
@@ -1221,6 +1216,7 @@ bool CoreServiceProxy::UpdateIccDiallingNumbers(
     }
     return reply.ReadBool();
 }
+
 
 bool CoreServiceProxy::SetVoiceMail(
     const std::u16string &mailName, const std::u16string &mailNumber, int32_t slotId)
