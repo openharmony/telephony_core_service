@@ -114,8 +114,8 @@ For details about the complete description of JavaScript APIs and sample code, s
 The function of obtaining the network status is used as an example. The process is as follows:
 
 1.  Query the SIM card in the slot specified by **slotId**. If **slotId** is not set, information about the primary card is queried by default.
-2.  Call the **GetNetworkStatus** method in callback or promise mode to obtain the network status.
-3.  Obtain the dialup result. The **GetNetworkStatus** API works in asynchronous mode. The dial result is returned through the callback.
+2.  Call the **getNetworkState** method in callback or promise mode to query the network status.
+3.  Obtain the query result. The **getNetworkState** API works in asynchronous mode. The query result is returned through the callback.
 
     ```
     import radio from "@ohos.telephony.radio";
@@ -151,8 +151,8 @@ The function of obtaining the network status is used as an example. The process 
 The function of querying the status of a specified SIM card is used as an example. The process is as follows:
 
 1.  Set the value of **slotId**.
-2.  Call the **getSimState** method in callback or promise mode to obtain the SIM card status.
-3.  Obtain the dialup result. The **dial** API works in asynchronous mode. The dial result is returned through the callback.
+2.  Call the **getSimState** method in callback or promise mode to query the SIM card status.
+3.  Obtain the query result. The **getSimState** API works in asynchronous mode. The query result is returned through the callback.
 
     ```
     import sim from "@ohos.telephony.sim";
