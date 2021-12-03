@@ -115,7 +115,7 @@ The function of obtaining the network status is used as an example. The process 
 
 1.  Query the SIM card in the slot specified by **slotId**. If **slotId** is not set, information about the primary card is queried by default.
 2.  Call the **GetNetworkStatus** method in callback or promise mode to obtain the network status.
-3.  Obtain the dialup result. The **dial** API works in asynchronous mode. The dial result is returned through the callback.
+3.  Obtain the dialup result. The **GetNetworkStatus** API works in asynchronous mode. The dial result is returned through the callback.
 
     ```
     import radio from "@ohos.telephony.radio";
