@@ -21,42 +21,44 @@ ohos_unittest("tel_ril_gtest") {
   module_out_path = part_name + "/" + test_module
 
   sources = [
-    "//base/telephony/core_service/interfaces/innerkits/proxy/core_service_proxy.cpp",
-    "//base/telephony/core_service/interfaces/kits/src/i_network_search_callback_stub.cpp",
     "tel_ril_test.cpp",
+    "//base/telephony/core_service/frameworks/native/src/core_service_client.cpp",
+    "//base/telephony/core_service/frameworks/native/src/core_service_proxy.cpp",
+    "//base/telephony/core_service/frameworks/native/src/i_network_search_callback_stub.cpp",
   ]
 
   include_dirs = [
-    "//base/telephony/core_service/common/log/include",
-    "//base/telephony/core_service/interfaces/innerkits/proxy",
-    "//base/telephony/core_service/interfaces/innerkits/common",
-    "//base/telephony/core_service/interfaces/innerkits/sms_mms",
+    "//base/telephony/core_service/utils/log/include",
+    "//base/telephony/core_service/interfaces/innerkits/core",
+    "//base/telephony/core_service/interfaces/innerkits/sim",
     "//base/telephony/core_service/interfaces/innerkits/network_search",
-    "//base/telephony/core_service/interfaces/kits/include",
     "//base/telephony/core_service/frameworks/native/include",
     "//base/telephony/core_service/common/sim",
     "//base/telephony/core_service/common/network_search",
     "//base/telephony/core_service/common/core",
-    "//base/telephony/ril_adapter/interfaces/innerkits",
+    "//base/telephony/ril_adapter/interfaces/innerkits/include",
     "//utils/native/base/include",
   ]
 
   deps = [
-    "//base/telephony/core_service:tel_core_service",
-    "//base/telephony/ril_adapter/hril:hril",
     "//third_party/googletest:gtest_main",
+    "//base/telephony/core_service:tel_core_service",
     "//utils/native/base:utils",
+    "//base/telephony/core_service/utils:libtelephony_common"
   ]
 
   external_deps = [
-    "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
-    "ipc:ipc_core",
     "safwk:system_ability_fwk",
+    "appexecfwk_standard:libeventhandler",
     "samgr_standard:samgr_proxy",
+    "ipc:ipc_core",
+    "ril_adapter:hril_innerkits"
   ]
 
-  defines = [ "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"" ]
+  defines = [
+      "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
@@ -66,6 +68,6 @@ ohos_unittest("tel_ril_gtest") {
 }
 
 group("unittest") {
-  testonly = true
-  deps = [ ":tel_ril_gtest" ]
+    testonly = true
+    deps = [ ":tel_ril_gtest" ]
 }
