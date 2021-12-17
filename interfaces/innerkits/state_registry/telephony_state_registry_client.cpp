@@ -19,8 +19,14 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
+#include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
+
 namespace OHOS {
 namespace Telephony {
+TelephonyStateRegistryClient::TelephonyStateRegistryClient() = default;
+TelephonyStateRegistryClient::~TelephonyStateRegistryClient() = default;
+
 sptr<ITelephonyStateNotify> TelephonyStateRegistryClient::GetProxy()
 {
     std::lock_guard<std::mutex> lock(mutexProxy_);

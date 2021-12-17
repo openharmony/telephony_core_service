@@ -14,10 +14,10 @@
 import("//build/test.gni")
 
 group("unittest") {
-    testonly = true
-    deps = []
-    deps += [
-        "unittest/core_service_gtest:tel_core_service_gtest",
-        "unittest/tel_ril_gtest:tel_ril_gtest"
-    ]
+  testonly = true
+  deps = []
+  deps += [
+    "unittest/core_service_gtest:tel_core_service_gtest",
+    "unittest/tel_ril_gtest:tel_ril_gtest",
+  ]
 }

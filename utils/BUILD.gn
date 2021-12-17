@@ -21,15 +21,15 @@ config("telephony_common_config") {
   include_dirs = [
     "log/include",
     "common/include",
-    "preferences/include"
+    "preferences/include",
   ]
 }
 
 ohos_shared_library("libtelephony_common") {
   sources = [
+    "common/src/str_convert.cpp",
     "log/src/telephony_log_wrapper.cpp",
     "preferences/src/tel_profile_util.cpp",
-    "common/src/str_convert.cpp"
   ]
 
   defines = [
@@ -47,8 +47,8 @@ ohos_shared_library("libtelephony_common") {
   ]
 
   public_deps = [
-    "//utils/native/base:utils",
     "//foundation/distributeddatamgr/appdatamgr/interfaces/innerkits/native_preferences:native_preferences",
+    "//utils/native/base:utils",
   ]
 
   if (is_double_framework) {

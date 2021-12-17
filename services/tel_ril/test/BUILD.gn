@@ -11,26 +11,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
 TELEPHONY_CORE_SERVICE_ROOT = "//base/telephony/core_service"
-TELEPHONY_NETWORK_SEARCH_ROOT = "//base/telephony/core_service/services/network_search"
+TELEPHONY_NETWORK_SEARCH_ROOT =
+    "//base/telephony/core_service/services/network_search"
 TELEPHONY_SIM_ROOT = "//base/telephony/core_service/services/sim"
 HDF_FRAMEWORKS = "//drivers/hdf/frameworks"
 
 ohos_executable("tel_ril_test") {
   install_enable = true
   sources = [
-    "tel_ril_test.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_base.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_call.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_modem.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_data.cpp",
+    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_modem.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_network.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_sim.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_sms.cpp",
+    "tel_ril_test.cpp",
   ]
 
   include_dirs = [
@@ -69,12 +69,12 @@ ohos_executable("tel_ril_test") {
   ]
 
   external_deps = [
-    "ces_standard:cesfwk_innerkits",
-    "safwk:system_ability_fwk",
     "appexecfwk_standard:libeventhandler",
-    "samgr_standard:samgr_proxy",
+    "ces_standard:cesfwk_innerkits",
     "ipc:ipc_core",
-    "ril_adapter:hril_innerkits"
+    "ril_adapter:hril_innerkits",
+    "safwk:system_ability_fwk",
+    "samgr_standard:samgr_proxy",
   ]
 
   if (is_standard_system) {

@@ -26,7 +26,5 @@ config("common_test_config") {
 group("unittest") {
   testonly = true
 
-  deps = [
-    "unittest/common_telephony_log_test:unittest",
-  ]
+  deps = [ "unittest/common_telephony_log_test:unittest" ]
 }

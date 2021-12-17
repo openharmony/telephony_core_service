@@ -21,10 +21,10 @@ ohos_unittest("tel_ril_gtest") {
   module_out_path = part_name + "/" + test_module
 
   sources = [
-    "tel_ril_test.cpp",
     "//base/telephony/core_service/frameworks/native/src/core_service_client.cpp",
     "//base/telephony/core_service/frameworks/native/src/core_service_proxy.cpp",
     "//base/telephony/core_service/frameworks/native/src/i_network_search_callback_stub.cpp",
+    "tel_ril_test.cpp",
   ]
 
   include_dirs = [
@@ -41,24 +41,22 @@ ohos_unittest("tel_ril_gtest") {
   ]
 
   deps = [
-    "//third_party/googletest:gtest_main",
     "//base/telephony/core_service:tel_core_service",
+    "//base/telephony/core_service/utils:libtelephony_common",
+    "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "//base/telephony/core_service/utils:libtelephony_common"
   ]
 
   external_deps = [
-    "ces_standard:cesfwk_innerkits",
-    "safwk:system_ability_fwk",
     "appexecfwk_standard:libeventhandler",
-    "samgr_standard:samgr_proxy",
+    "ces_standard:cesfwk_innerkits",
     "ipc:ipc_core",
-    "ril_adapter:hril_innerkits"
+    "ril_adapter:hril_innerkits",
+    "safwk:system_ability_fwk",
+    "samgr_standard:samgr_proxy",
   ]
 
-  defines = [
-      "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
-    ]
+  defines = [ "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"" ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
@@ -68,6 +66,6 @@ ohos_unittest("tel_ril_gtest") {
 }
 
 group("unittest") {
-    testonly = true
-    deps = [ ":tel_ril_gtest" ]
+  testonly = true
+  deps = [ ":tel_ril_gtest" ]
 }

@@ -12,13 +12,13 @@
 # limitations under the License.
 import("//build/ohos.gni")
 TELEPHONY_CORE_SERVICE_ROOT = "//base/telephony/core_service"
-TELEPHONY_CELLULAR_DATA_API_ROOT = "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/cellular_data"
+TELEPHONY_CELLULAR_DATA_API_ROOT =
+    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/cellular_data"
 
 config("cellular_call_util_config") {
   # header file path
-  include_dirs = [
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/cellular_data"
-  ]
+  include_dirs =
+      [ "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/cellular_data" ]
 
   cflags = []
   if (is_double_framework) {
@@ -44,20 +44,18 @@ ohos_shared_library("tel_cellular_data_api") {
   include_dirs = [
     "//third_party/node/src",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/core",
-    "$TELEPHONY_CORE_SERVICE_ROOT/utils/log/include"
+    "$TELEPHONY_CORE_SERVICE_ROOT/utils/log/include",
   ]
 
   public_configs = [ ":cellular_call_util_config" ]
 
-  deps = [
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//utils/native/base:utils" ]
 
   external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "hiviewdfx_hilog_native:libhilog"
   ]
 
   part_name = "core_service"

@@ -11,24 +11,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
-import("//base/telephony/core_service/telephony.gni")
 
 TELEPHONY_CORE_SERVICE_ROOT = "//base/telephony/core_service"
-TELEPHONY_NETWORK_SEARCH_ROOT = "//base/telephony/core_service/services/network_search"
+TELEPHONY_NETWORK_SEARCH_ROOT =
+    "//base/telephony/core_service/services/network_search"
 TELEPHONY_SIM_ROOT = "//base/telephony/core_service/services/sim"
 TELEPHONY_FRAMEWORKS_ROOT = "//base/telephony/core_service/frameworks/native/"
 
 config("telephony_sim_config") {
-    if (defined (sim_slot_num)) {
-        defines = [ "SIM_SLOT_NUM = $sim_slot_num" ]
-        if (sim_slot_num > 1) {
-          defines += [ "MULTI_SIM_SLOT_SUPPORT" ]
-        }
-    } else {
-        defines = [ "SIM_SLOT_NUM = 1" ]
+  if (defined(sim_slot_num)) {
+    defines = [ "SIM_SLOT_NUM = $sim_slot_num" ]
+    if (sim_slot_num > 1) {
+      defines += [ "MULTI_SIM_SLOT_SUPPORT" ]
     }
+  } else {
+    defines = [ "SIM_SLOT_NUM = 1" ]
+  }
 }
 
 ohos_shared_library("tel_core_service") {
@@ -37,69 +38,69 @@ ohos_shared_library("tel_core_service") {
   configs = [ ":telephony_sim_config" ]
 
   sources = [
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/server/src/core_service.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/server/src/core_service_stub.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/server/src/core_manager.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/server/src/core.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/server/src/observer_handler.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_manager.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_handler.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_state.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_notify.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_register.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_state.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/radio_info.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/signal_information.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/signal_info.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/operator_name.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_search_result.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_selection.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_information.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_type.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/nitz_update.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/cell_information.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/cell_manager.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/network_search/network_search_callback_proxy.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/state_registry/telephony_state_registry_proxy.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_manager.cpp",
+    "$TELEPHONY_CORE_SERVICE_ROOT/services/server/src/core.cpp",
+    "$TELEPHONY_CORE_SERVICE_ROOT/services/server/src/core_manager.cpp",
+    "$TELEPHONY_CORE_SERVICE_ROOT/services/server/src/core_service.cpp",
+    "$TELEPHONY_CORE_SERVICE_ROOT/services/server/src/core_service_stub.cpp",
+    "$TELEPHONY_CORE_SERVICE_ROOT/services/server/src/observer_handler.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/hdf_death_recipient.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_base.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_call.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_modem.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_data.cpp",
+    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_manager.cpp",
+    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_modem.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_network.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_sim.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_sms.cpp",
-    "$TELEPHONY_SIM_ROOT/src/sim_utils.cpp",
+    "$TELEPHONY_FRAMEWORKS_ROOT/src/cell_information.cpp",
+    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_information.cpp",
+    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_search_result.cpp",
+    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_state.cpp",
+    "$TELEPHONY_FRAMEWORKS_ROOT/src/signal_information.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/cell_manager.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_register.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_handler.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_manager.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_notify.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_state.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_selection.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_type.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/nitz_update.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/operator_name.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/radio_info.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/signal_info.cpp",
+    "$TELEPHONY_SIM_ROOT/src/icc_dialling_numbers_cache.cpp",
+    "$TELEPHONY_SIM_ROOT/src/icc_dialling_numbers_handler.cpp",
+    "$TELEPHONY_SIM_ROOT/src/icc_dialling_numbers_manager.cpp",
     "$TELEPHONY_SIM_ROOT/src/icc_file.cpp",
-    "$TELEPHONY_SIM_ROOT/src/sim_file_controller.cpp",
-    "$TELEPHONY_SIM_ROOT/src/sim_file.cpp",
-    "$TELEPHONY_SIM_ROOT/src/mcc_pool.cpp",
-    "$TELEPHONY_SIM_ROOT/src/sim_file_manager.cpp",
-    "$TELEPHONY_SIM_ROOT/src/icc_state.cpp",
-    "$TELEPHONY_SIM_ROOT/src/sim_state_handle.cpp",
-    "$TELEPHONY_SIM_ROOT/src/sim_state_manager.cpp",
     "$TELEPHONY_SIM_ROOT/src/icc_file_controller.cpp",
-    "$TELEPHONY_SIM_ROOT/src/plmn_file.cpp",
-    "$TELEPHONY_SIM_ROOT/src/usim_file_controller.cpp",
-    "$TELEPHONY_SIM_ROOT/src/sim_sms_controller.cpp",
-    "$TELEPHONY_SIM_ROOT/src/sim_sms_manager.cpp",
-    "$TELEPHONY_SIM_ROOT/src/sim_account_manager.cpp",
+    "$TELEPHONY_SIM_ROOT/src/icc_state.cpp",
+    "$TELEPHONY_SIM_ROOT/src/mcc_pool.cpp",
     "$TELEPHONY_SIM_ROOT/src/multi_sim_controller.cpp",
     "$TELEPHONY_SIM_ROOT/src/multi_sim_monitor.cpp",
-    "$TELEPHONY_SIM_ROOT/src/sim_state_tracker.cpp",
     "$TELEPHONY_SIM_ROOT/src/operator_conf.cpp",
+    "$TELEPHONY_SIM_ROOT/src/plmn_file.cpp",
+    "$TELEPHONY_SIM_ROOT/src/sim_account_manager.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_char_decode.cpp",
+    "$TELEPHONY_SIM_ROOT/src/sim_file.cpp",
+    "$TELEPHONY_SIM_ROOT/src/sim_file_controller.cpp",
+    "$TELEPHONY_SIM_ROOT/src/sim_file_manager.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_number_decode.cpp",
-    "$TELEPHONY_SIM_ROOT/src/icc_dialling_numbers_handler.cpp",
-    "$TELEPHONY_SIM_ROOT/src/icc_dialling_numbers_cache.cpp",
+    "$TELEPHONY_SIM_ROOT/src/sim_rdb_helper.cpp",
+    "$TELEPHONY_SIM_ROOT/src/sim_sms_controller.cpp",
+    "$TELEPHONY_SIM_ROOT/src/sim_sms_manager.cpp",
+    "$TELEPHONY_SIM_ROOT/src/sim_state_handle.cpp",
+    "$TELEPHONY_SIM_ROOT/src/sim_state_manager.cpp",
+    "$TELEPHONY_SIM_ROOT/src/sim_state_tracker.cpp",
+    "$TELEPHONY_SIM_ROOT/src/sim_utils.cpp",
     "$TELEPHONY_SIM_ROOT/src/tag_service.cpp",
     "$TELEPHONY_SIM_ROOT/src/usim_dialling_numbers_service.cpp",
-    "$TELEPHONY_SIM_ROOT/src/icc_dialling_numbers_manager.cpp",
-    "$TELEPHONY_SIM_ROOT/src/sim_rdb_helper.cpp"
+    "$TELEPHONY_SIM_ROOT/src/usim_file_controller.cpp",
   ]
 
-   include_dirs = [
+  include_dirs = [
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/core",
     "//base/telephony/data_storage/sim/include",
     "//base/telephony/data_storage/common/include",
@@ -136,33 +137,33 @@ ohos_shared_library("tel_core_service") {
 
   deps = [
     "$hdf_uhdf_path/hdi:libhdi",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
-    "//utils/native/base:utils",
-    "//base/telephony/core_service/utils:libtelephony_common",
+    "//base/global/i18n_standard/frameworks/zone:zone_util",
     "//base/miscservices/time/services:time_service",
     "//base/notification/ans_standard/frameworks/wantagent:wantagent_innerkits",
-    "//base/global/i18n_standard/frameworks/zone:zone_util",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
-    "//third_party/libxml2:libxml2",
-    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
+    "//base/telephony/core_service/utils:libtelephony_common",
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
+    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
+    "//third_party/libphonenumber/cpp:phonenumber_standard",
+    "//third_party/libxml2:libxml2",
+    "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "safwk:system_ability_fwk",
-    "appexecfwk_standard:libeventhandler",
-    "appexecfwk_standard:appexecfwk_core",
-    "samgr_standard:samgr_proxy",
-    "ipc:ipc_core",
-    "aafwk_standard:want",
     "aafwk_standard:ability_manager",
+    "aafwk_standard:want",
+    "appexecfwk_standard:appexecfwk_core",
+    "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
     "ces_standard:cesfwk_services",
-    "native_appdatamgr:native_rdb",
+    "ipc:ipc_core",
     "native_appdatamgr:native_dataability",
+    "native_appdatamgr:native_rdb",
     "power_manager_native:powermgr_client",
-    "ril_adapter:hril_innerkits"
+    "ril_adapter:hril_innerkits",
+    "safwk:system_ability_fwk",
+    "samgr_standard:samgr_proxy",
   ]
 
   if (is_standard_system) {

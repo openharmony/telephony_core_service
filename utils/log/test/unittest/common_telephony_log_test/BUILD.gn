@@ -18,7 +18,9 @@ module_output_path = "//base/telephony/core_service/utils/telephonydfx"
 ohos_unittest("TelephonySALogTest") {
   module_out_path = module_output_path
 
-  sources = [ "//base/telephony/core_service/utils/log/src/telephony_log_wrapper.cpp" ]
+  sources = [
+    "//base/telephony/core_service/utils/log/src/telephony_log_wrapper.cpp",
+  ]
 
   configs = [
     "//base/telephony/core_service/utils:telephony_common_config",
