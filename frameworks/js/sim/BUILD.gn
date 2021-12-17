@@ -36,24 +36,24 @@ ohos_shared_library("sim") {
 
   sources = [
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
-    "src/napi_sim.cpp"
+    "src/napi_sim.cpp",
   ]
 
   deps = [
-    "//base/telephony/core_service/utils:libtelephony_common",
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/frameworks/native:tel_core_service_api",
+    "//base/telephony/core_service/utils:libtelephony_common",
     "//foundation/ace/napi:ace_napi",
-    "//utils/native/base:utils"
+    "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "safwk:system_ability_fwk",
     "appexecfwk_standard:libeventhandler",
-    "samgr_standard:samgr_proxy",
-    "ipc:ipc_core",
     "hiviewdfx_hilog_native:libhilog",
-    "ril_adapter:hril_innerkits"
+    "ipc:ipc_core",
+    "ril_adapter:hril_innerkits",
+    "safwk:system_ability_fwk",
+    "samgr_standard:samgr_proxy",
   ]
 
   subsystem_name = "telephony"

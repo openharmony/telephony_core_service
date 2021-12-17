@@ -28,18 +28,18 @@ ohos_shared_library("tel_core_service_api") {
   subsystem_name = "telephony"
   part_name = "core_service"
   sources = [
-    "$SUBSYSTEM_DIR/core_service/frameworks/native/src/radio_network_manager.cpp",
-    "$SUBSYSTEM_DIR/core_service/frameworks/native/src/i_network_search_callback_stub.cpp",
-    "$SUBSYSTEM_DIR/core_service/frameworks/native/src/sim_card_manager.cpp",
     "$SUBSYSTEM_DIR/core_service/frameworks/native/src/cell_information.cpp",
+    "$SUBSYSTEM_DIR/core_service/frameworks/native/src/core_service_client.cpp",
+    "$SUBSYSTEM_DIR/core_service/frameworks/native/src/core_service_proxy.cpp",
+    "$SUBSYSTEM_DIR/core_service/frameworks/native/src/i_network_search_callback_stub.cpp",
     "$SUBSYSTEM_DIR/core_service/frameworks/native/src/network_information.cpp",
     "$SUBSYSTEM_DIR/core_service/frameworks/native/src/network_search_result.cpp",
     "$SUBSYSTEM_DIR/core_service/frameworks/native/src/network_state.cpp",
+    "$SUBSYSTEM_DIR/core_service/frameworks/native/src/radio_network_manager.cpp",
     "$SUBSYSTEM_DIR/core_service/frameworks/native/src/signal_information.cpp",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/sim/sim_card_interface.cpp",
-    "$SUBSYSTEM_DIR/core_service/frameworks/native/src/core_service_proxy.cpp",
-    "$SUBSYSTEM_DIR/core_service/frameworks/native/src/core_service_client.cpp",
+    "$SUBSYSTEM_DIR/core_service/frameworks/native/src/sim_card_manager.cpp",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/network_search/network_search_service_proxy_holder.cpp",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/sim/sim_card_interface.cpp",
   ]
 
   include_dirs = [
@@ -58,18 +58,16 @@ ohos_shared_library("tel_core_service_api") {
     "$SUBSYSTEM_DIR/ril_adapter/interfaces/innerkits/include",
   ]
 
-  configs = [":tel_core_service_api_private_config"]
+  configs = [ ":tel_core_service_api_private_config" ]
 
   public_configs = [ ":tel_core_service_api_public_config" ]
 
-  deps = [
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//utils/native/base:utils" ]
   external_deps = [
-    "safwk:system_ability_fwk",
     "appexecfwk_standard:libeventhandler",
-    "samgr_standard:samgr_proxy",
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "hiviewdfx_hilog_native:libhilog"
+    "safwk:system_ability_fwk",
+    "samgr_standard:samgr_proxy",
   ]
 }

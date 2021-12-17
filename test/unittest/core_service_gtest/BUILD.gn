@@ -25,8 +25,8 @@ ohos_unittest("tel_core_service_gtest") {
     "//base/telephony/core_service/frameworks/native/src/core_service_proxy.cpp",
     "//base/telephony/core_service/frameworks/native/src/i_network_search_callback_stub.cpp",
     "network_search_test.cpp",
+    "network_search_test_callback_stub.cpp",
     "sim_test.cpp",
-    "network_search_test_callback_stub.cpp"
   ]
 
   include_dirs = [
@@ -43,23 +43,21 @@ ohos_unittest("tel_core_service_gtest") {
   ]
 
   deps = [
-    "//third_party/googletest:gtest_main",
     "//base/telephony/core_service:tel_core_service",
+    "//base/telephony/core_service/utils:libtelephony_common",
+    "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "//base/telephony/core_service/utils:libtelephony_common"
   ]
 
   external_deps = [
-    "ces_standard:cesfwk_innerkits",
-    "safwk:system_ability_fwk",
     "appexecfwk_standard:libeventhandler",
+    "ces_standard:cesfwk_innerkits",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "ipc:ipc_core"
   ]
 
-  defines = [
-      "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
-    ]
+  defines = [ "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"" ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
@@ -69,6 +67,6 @@ ohos_unittest("tel_core_service_gtest") {
 }
 
 group("unittest") {
-    testonly = true
-    deps = [ ":tel_core_service_gtest" ]
+  testonly = true
+  deps = [ ":tel_core_service_gtest" ]
 }

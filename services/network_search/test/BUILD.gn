@@ -20,16 +20,16 @@ TELEPHONY_FRAMEWORKS_ROOT = "//base/telephony/core_service/frameworks/native/"
 ohos_executable("tel_network_search_test") {
   install_enable = true
   sources = [
-    "test.cpp",
-    "network_search_test_callback_stub.cpp",
-    "test_broadcast.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_state.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_search_result.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/signal_information.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_information.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/cell_information.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/frameworks/native/src/core_service_client.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/frameworks/native/src/core_service_proxy.cpp",
+    "$TELEPHONY_FRAMEWORKS_ROOT/src/cell_information.cpp",
+    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_information.cpp",
+    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_search_result.cpp",
+    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_state.cpp",
+    "$TELEPHONY_FRAMEWORKS_ROOT/src/signal_information.cpp",
+    "network_search_test_callback_stub.cpp",
+    "test.cpp",
+    "test_broadcast.cpp",
   ]
 
   include_dirs = [
@@ -54,14 +54,12 @@ ohos_executable("tel_network_search_test") {
     "//foundation/aafwk/standard/services/abilitymgr/include",
     "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr/include",
     "//base/notification/ces_standard/cesfwk/kits/native/include",
-
   ]
   deps = [
     "$TELEPHONY_CORE_SERVICE_ROOT/frameworks/native:tel_core_service_api",
-    "//utils/native/base:utils",
-    "//base/telephony/core_service/utils:libtelephony_common",
     "//base/miscservices/time/services:time_service",
     "//base/notification/ans_standard/frameworks/wantagent:wantagent_innerkits",
+    "//base/telephony/core_service/utils:libtelephony_common",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:dummy_classes",
     "//foundation/aafwk/standard/interfaces/innerkits/want:want",
@@ -70,19 +68,18 @@ ohos_executable("tel_network_search_test") {
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core:appexecfwk_core",
     "//foundation/appexecfwk/standard/kits:appkit_native",
     "//foundation/appexecfwk/standard/services/bundlemgr:libbms",
+    "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "ces_standard:cesfwk_innerkits",
-    "safwk:system_ability_fwk",
     "appexecfwk_standard:libeventhandler",
+    "ces_standard:cesfwk_innerkits",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "ipc:ipc_core"
   ]
 
-  defines = [
-      "TELEPHONY_LOG_TAG = \"NetworkSearchTest\"",
-    ]
+  defines = [ "TELEPHONY_LOG_TAG = \"NetworkSearchTest\"" ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
