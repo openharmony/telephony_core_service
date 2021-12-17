@@ -1,0 +1,468 @@
+/*
+* Copyright (C) 2021 Huawei Device Co., Ltd.
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+import {AsyncCallback} from "./basic";
+
+/**
+ * Provides applications with APIs for obtaining SIM card status, card file information, and card specifications.
+ * SIM cards include SIM, USIM, and CSIM cards.
+ *
+ * @since 7
+ * @sysCap SystemCapability.Telephony.Telephony
+ * @devices phone, tablet, wearable
+ */
+declare namespace sim {
+  /**
+   * Checks whether the SIM card in a specified slot is activated.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from {@code 0} to the maximum card slot index number supported by the device.
+   * @param callback Returns {@code true} if the SIM card is activated; returns {@code false} otherwise.
+   */
+  function isSimActive(slotId: number, callback: AsyncCallback<boolean>): void;
+  function isSimActive(slotId: number): Promise<boolean>;
+
+  /**
+   * Obtains the default card slot for the voice service.
+   *
+   * @param callback Returns {@code 0} if card 1 is used as the default card slot for the voice service;
+   * returns {@code 1} if card 2 is used as the default card slot for the voice service;
+   * returns {@code -1} if no card is available for the voice service.
+   */
+  function getDefaultVoiceSlotId(callback: AsyncCallback<number>): void;
+  function getDefaultVoiceSlotId(): Promise<number>;
+
+  /**
+   * Obtains the ISO country code of the SIM card in a specified slot.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param callback Returns the country code defined in ISO 3166-2; returns an empty string if no SIM card is inserted.
+   */
+  function getISOCountryCodeForSim(slotId: number, callback: AsyncCallback<string>): void;
+  function getISOCountryCodeForSim(slotId: number): Promise<string>;
+
+  /**
+   * Obtains the home PLMN number of the SIM card in a specified slot.
+   *
+   * <p>The value is recorded in the SIM card and is irrelevant to the network
+   * with which the SIM card is currently registered.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param callback Returns the PLMN number; returns an empty string if no SIM card is inserted.
+   */
+  function getSimOperatorNumeric(slotId: number, callback: AsyncCallback<string>): void;
+  function getSimOperatorNumeric(slotId: number): Promise<string>;
+
+  /**
+   * Obtains the service provider name (SPN) of the SIM card in a specified slot.
+   *
+   * <p>The value is recorded in the EFSPN file of the SIM card and is irrelevant to the network
+   * with which the SIM card is currently registered.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param callback Returns the SPN; returns an empty string if no SIM card is inserted or
+   * no EFSPN file in the SIM card.
+   */
+  function getSimSpn(slotId: number, callback: AsyncCallback<string>): void;
+  function getSimSpn(slotId: number): Promise<string>;
+
+  /**
+   * Obtains the state of the SIM card in a specified slot.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from {@code 0} to the maximum card slot index number supported by the device.
+   * @param callback Returns one of the following SIM card states:
+   * <ul>
+   * <li>{@code SimState#SIM_STATE_UNKNOWN}
+   * <li>{@code SimState#SIM_STATE_NOT_PRESENT}
+   * <li>{@code SimState#SIM_STATE_LOCKED}
+   * <li>{@code SimState#SIM_STATE_NOT_READY}
+   * <li>{@code SimState#SIM_STATE_READY}
+   * <li>{@code SimState#SIM_STATE_LOADED}
+   * </ul>
+   */
+  function getSimState(slotId: number, callback: AsyncCallback<SimState>): void;
+  function getSimState(slotId: number): Promise<SimState>;
+
+  /**
+   * Obtains the ICCID of the SIM card in a specified slot.
+   *
+   * <p>The ICCID is a unique identifier of a SIM card. It consists of 20 digits
+   * and is recorded in the EFICCID file of the SIM card.
+   *
+   * <p>Requires Permission: {@code ohos.permission.GET_TELEPHONY_STATE}.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param callback Returns the ICCID; returns an empty string if no SIM card is inserted.
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   */
+  function getSimIccId(slotId: number, callback: AsyncCallback<string>): void;
+  function getSimIccId(slotId: number): Promise<string>;
+
+  /**
+   * Obtains the alpha identifier of the voice mailbox of the SIM card in a specified slot.
+   *
+   * <p>Only applications with the {@code ohos.permission.GET_TELEPHONY_STATE} permission can call this method.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from {@code 0} to the maximum card slot index number supported by the device.
+   * @param callback Returns the voice mailbox alpha identifier;
+   * returns an empty string if no voice mailbox alpha identifier is written into the SIM card.
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   */
+  function getVoiceMailIdentifier(slotId: number, callback: AsyncCallback<string>): void;
+  function getVoiceMailIdentifier(slotId: number): Promise<string>;
+
+  /**
+   * Obtains the voice mailbox number of the SIM card in a specified slot.
+   *
+   * <p>Only applications with the {@code ohos.permission.GET_TELEPHONY_STATE} permission can call this method.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from {@code 0} to the maximum card slot index number supported by the device.
+   * @param callback Returns the voice mailbox number;
+   * returns an empty string if no voice mailbox number is written into the SIM card.
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   */
+  function getVoiceMailNumber(slotId: number, callback: AsyncCallback<string>): void;
+  function getVoiceMailNumber(slotId: number): Promise<string>;
+
+  /**
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
+  function setVoiceMailInfo(slotId: number, mailName: string, mailNumber: string, callback: AsyncCallback<void>): void;
+  function setVoiceMailInfo(slotId: number, mailName: string, mailNumber: string): Promise<void>;
+
+  /**
+   * Obtains the MSISDN of the SIM card in a specified slot.
+   * The MSISDN is recorded in the EFMSISDN file of the SIM card.
+   *
+   * <p>Requires Permission: {@code ohos.permission.GET_TELEPHONY_STATE}.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param callback Returns the MSISDN; returns an empty string if no SIM card is inserted or
+   * no MSISDN is recorded in the EFMSISDN file.
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   */
+  function getSimTelephoneNumber(slotId: number, callback: AsyncCallback<string>): void;
+  function getSimTelephoneNumber(slotId: number): Promise<string>;
+
+  /**
+   * Obtains the Group Identifier Level 1 (GID1) of the SIM card in a specified slot.
+   * The GID1 is recorded in the EFGID1 file of the SIM card.
+   *
+   * <p>Requires Permission: {@code ohos.permission.GET_TELEPHONY_STATE}.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param callback Returns the GID1; returns an empty string if no SIM card is inserted or
+   * no GID1 in the SIM card.
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   */
+  function getSimGid1(slotId: number, callback: AsyncCallback<string>): void;
+  function getSimGid1(slotId: number): Promise<string>;
+
+  /**
+   * Obtains the maximum number of SIM cards that can be used simultaneously on the device,
+   * that is, the maximum number of SIM card slots.
+   *
+   * @return Returns the maximum number of SIM card slots.
+   */
+  function getMaxSimCount(): number;
+
+  /**
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   */
+  function getIMSI(slotId: number, callback: AsyncCallback<string>): void;
+  function getIMSI(slotId: number): Promise<string>;
+
+  /**
+   * Checks whether a SIM card is inserted in a specified slot.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param callback Returns true if a SIM card is inserted; return false otherwise.
+   */
+  function hasSimCard(slotId: number, callback: AsyncCallback<boolean>): void;
+  function hasSimCard(slotId: number): Promise<boolean>;
+
+  /**
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   */
+  function getSimAccountInfo(slotId: number, callback: AsyncCallback<IccAccountInfo>): void;
+  function getSimAccountInfo(slotId: number): Promise<IccAccountInfo>;
+
+  /**
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   */
+  function getActiveSimAccountInfoList(callback: AsyncCallback<Array<IccAccountInfo>>): void;
+  function getActiveSimAccountInfoList(): Promise<Array<IccAccountInfo>>;
+
+  /**
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   */
+  function setDefaultVoiceSlotId(slotId: number, callback: AsyncCallback<void>): void;
+  function setDefaultVoiceSlotId(slotId: number): Promise<void>;
+
+  /**
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   */
+  function activateSim(slotId: number, callback: AsyncCallback<void>): void;
+  function activateSim(slotId: number): Promise<void>;
+
+  /**
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   */
+  function deactivateSim(slotId: number, callback: AsyncCallback<void>): void;
+  function deactivateSim(slotId: number): Promise<void>;
+
+  /**
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   */
+  function setShowName(slotId: number, name: string, callback: AsyncCallback<void>): void;
+  function setShowName(slotId: number, name: string): Promise<void>;
+
+  /**
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   */
+  function getShowName(slotId: number, callback: AsyncCallback<string>): void;
+  function getShowName(slotId: number): Promise<string>;
+
+  /**
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   */
+  function setShowNumber(slotId: number, number: string, callback: AsyncCallback<void>): void;
+  function setShowNumber(slotId: number, number: string): Promise<void>;
+
+  /**
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   */
+  function getShowNumber(slotId: number, callback: AsyncCallback<string>): void;
+  function getShowNumber(slotId: number): Promise<string>;
+
+  /**
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   */
+  function getOperatorConfigs(slotId: number, callback: AsyncCallback<Array<OperatorConfig>>): void;
+  function getOperatorConfigs(slotId: number): Promise<Array<OperatorConfig>>;
+
+  /**
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   */
+  function unlockPin(slotId: number, pin: string, callback: AsyncCallback<LockStatusResponse>): void;
+  function unlockPin(slotId: number, pin: string): Promise<LockStatusResponse>;
+
+  /**
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   */
+  function unlockPuk(slotId: number, newPin: string, puk: string, callback: AsyncCallback<LockStatusResponse>): void;
+  function unlockPuk(slotId: number, newPin: string, puk: string): Promise<LockStatusResponse>;
+
+  /**
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   */
+  function alterPin(slotId: number, newPin: string, oldPin: string, callback: AsyncCallback<LockStatusResponse>): void;
+  function alterPin(slotId: number, newPin: string, oldPin: string): Promise<LockStatusResponse>;
+
+  /**
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   */
+  function setLockState(slotId: number, pin: string, enable: number, callback: AsyncCallback<LockStatusResponse>): void;
+  function setLockState(slotId: number, pin: string, enable: number): Promise<LockStatusResponse>;
+
+  /**
+   * @systemapi Hide this for inner system use.
+   */
+  function unlockPin2(slotId: number, pin2: string, callback: AsyncCallback<LockStatusResponse>): void;
+  function unlockPin2(slotId: number, pin2: string): Promise<LockStatusResponse>;
+
+  /**
+   * @systemapi Hide this for inner system use.
+   */
+  function unlockPuk2(slotId: number, newPin2: string, puk2: string, callback: AsyncCallback<LockStatusResponse>): void;
+  function unlockPuk2(slotId: number, newPin2: string, puk2: string): Promise<LockStatusResponse>;
+
+  /**
+   * @systemapi Hide this for inner system use.
+   */
+  function alterPin2(slotId: number, newPin2: string, oldPin2: string, callback: AsyncCallback<LockStatusResponse>): void;
+  function alterPin2(slotId: number, newPin2: string, oldPin2: string): Promise<LockStatusResponse>;
+
+  /**
+   * @systemapi Hide this for inner system use.
+   */
+  function queryIccDiallingNumbers(slotId: number, type: ContactType, callback: AsyncCallback<Array<DiallingNumbersInfo>>): void
+  function queryIccDiallingNumbers(slotId: number, type: ContactType): Promise<Array<DiallingNumbersInfo>>;
+
+  /**
+   * @systemapi Hide this for inner system use.
+   */
+  function addIccDiallingNumbers(slotId: number, type: ContactType, diallingNumbers: DiallingNumbersInfo, callback: AsyncCallback<void>): void;
+  function addIccDiallingNumbers(slotId: number, type: ContactType, diallingNumbers: DiallingNumbersInfo): Promise<void>;
+
+  /**
+   * @systemapi Hide this for inner system use.
+   */
+  function delIccDiallingNumbers(slotId: number, type: ContactType, diallingNumbers: DiallingNumbersInfo, callback: AsyncCallback<void>): void;
+  function delIccDiallingNumbers(slotId: number, type: ContactType, diallingNumbers: DiallingNumbersInfo): Promise<void>;
+
+  /**
+   * @systemapi Hide this for inner system use.
+   */
+  function updateIccDiallingNumbers(slotId: number, type: ContactType, diallingNumbers: DiallingNumbersInfo, callback: AsyncCallback<void>): void;
+  function updateIccDiallingNumbers(slotId: number, type: ContactType, diallingNumbers: DiallingNumbersInfo): Promise<void>;
+
+
+  /**
+   * @systemapi Hide this for inner system use.
+   */
+  export interface OperatorConfig {
+    field: string,
+    value: string,
+  }
+
+  /**
+   * @systemapi Hide this for inner system use.
+   */
+  export interface IccAccountInfo {
+    simId: number,                  /* sim Id for card */
+    slotIndex: number,              /* slot id */
+    isEsim: boolean,                /* mark card is eSim or not */
+    isActive: boolean,              /* active status for card */
+    iccId: string,                  /* iccId for card */
+    showName: string,               /* display name for card */
+    showNumber: string,             /* display number for card */
+  }
+
+  /**
+   * @systemapi Hide this for inner system use.
+   */
+  export interface LockStatusResponse {
+    result: number,                 /* Current operation result */
+    remain?: number,                /* Operations remaining */
+  }
+
+  /**
+   * @systemapi Hide this for inner system use.
+   */
+  export interface DiallingNumbersInfo {
+    alphaTag: string,
+    number: string,
+    recordNumber?: number,
+    /**
+     * @since 8
+     */
+    pin2?: string,
+  }
+
+  export enum CardType {
+    /** Icc card type: Unknow type Card. */
+    UNKNOWN_CARD = -1,
+
+    /** Icc card type: Single sim card type. */
+    SINGLE_MODE_SIM_CARD = 10,
+
+    /** Icc card type: Single usim card type. */
+    SINGLE_MODE_USIM_CARD = 20,
+
+    /** Icc card type: Single ruim card type. */
+    SINGLE_MODE_RUIM_CARD = 30,
+
+    /** Icc card type: Double card C+G. */
+    DUAL_MODE_CG_CARD = 40,
+
+    /** Icc card type: China Telecom Internal Roaming Card (Dual Mode). */
+    CT_NATIONAL_ROAMING_CARD = 41,
+
+    /** Icc card type: China Unicom Dual Mode Card. */
+    CU_DUAL_MODE_CARD = 42,
+
+    /** Icc card type: China Telecom LTE Card (Dual Mode). */
+    DUAL_MODE_TELECOM_LTE_CARD = 43,
+
+    /** Icc card type: Double card U+G. */
+    DUAL_MODE_UG_CARD = 50
+  }
+
+  export enum SimState {
+    /**
+     * Indicates unknown SIM card state, that is, the accurate status cannot be obtained.
+     */
+    SIM_STATE_UNKNOWN,
+
+    /**
+     * Indicates that the SIM card is in the <b>not present</b> state, that is, no SIM card is inserted
+     * into the card slot.
+     */
+    SIM_STATE_NOT_PRESENT,
+
+    /**
+     * Indicates that the SIM card is in the <b>locked</b> state, that is, the SIM card is locked by the
+     * personal identification number (PIN)/PIN unblocking key (PUK) or network.
+     */
+    SIM_STATE_LOCKED,
+
+    /**
+     * Indicates that the SIM card is in the <b>not ready</b> state, that is, the SIM card is in position
+     * but cannot work properly.
+     */
+    SIM_STATE_NOT_READY,
+
+    /**
+     * Indicates that the SIM card is in the <b>ready</b> state, that is, the SIM card is in position and
+     * is working properly.
+     */
+    SIM_STATE_READY,
+
+    /**
+     * Indicates that the SIM card is in the <b>loaded</b> state, that is, the SIM card is in position and
+     * is working properly.
+     */
+    SIM_STATE_LOADED
+  }
+
+  /**
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
+  export enum ContactType {
+    GENERAL_CONTACT = 1,
+    FIXED_DIALING = 2,
+  }
+}
+
+export default sim;

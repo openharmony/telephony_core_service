@@ -24,7 +24,7 @@ void NetworkSearchTestCallbackStub::NotifyAll()
     cv_.notify_all();
 }
 
-void NetworkSearchTestCallbackStub::WaitFor(int timeoutSecond)
+void NetworkSearchTestCallbackStub::WaitFor(int32_t timeoutSecond)
 {
     std::unique_lock<std::mutex> callbackLock(callbackMutex_);
     cv_.wait_for(callbackLock, std::chrono::seconds(timeoutSecond));
@@ -52,38 +52,38 @@ void NetworkSearchTestCallbackStub::OnSetNetworkModeCallback(const bool setResul
     NotifyAll();
 }
 
-void NetworkSearchTestCallbackStub::OnSetRadioStatusCallback(const bool setResult, const int32_t errorCode)
+void NetworkSearchTestCallbackStub::OnSetRadioStateCallback(const bool setResult, const int32_t errorCode)
 {
     TELEPHONY_LOGI(
-        "NetworkSearchTestCallbackStub OnSetRadioStatusCallback success setResult:%{public}d, "
+        "NetworkSearchTestCallbackStub OnSetRadioStateCallback success setResult:%{public}d, "
         "errorCode:%{public}d",
         setResult, errorCode);
     boolResult_ = setResult;
     NotifyAll();
 }
 
-void NetworkSearchTestCallbackStub::OnGetRadioStatusCallback(const bool setResult, const int32_t errorCode)
+void NetworkSearchTestCallbackStub::OnGetRadioStateCallback(const bool setResult, const int32_t errorCode)
 {
     TELEPHONY_LOGI(
-        "NetworkSearchTestCallbackStub OnGetRadioStatusCallback success setResult:%{public}d, "
+        "NetworkSearchTestCallbackStub OnGetRadioStateCallback success setResult:%{public}d, "
         "errorCode:%{public}d",
         setResult, errorCode);
     boolResult_ = setResult;
     NotifyAll();
 }
 
-void NetworkSearchTestCallbackStub::OnGetNetworkSearchResult(
+void NetworkSearchTestCallbackStub::OnGetNetworkSearchInformation(
     const sptr<NetworkSearchResult> &nsResult, const int32_t errorCode)
 {
     if (errorCode == 0) {
-        TELEPHONY_LOGI("NetworkSearchTestCallbackStub OnGetNetworkSearchResult success");
+        TELEPHONY_LOGI("NetworkSearchTestCallbackStub OnGetNetworkSearchInformation success");
         sptr<NetworkSearchResult> networkSearchResult = nsResult;
         if (networkSearchResult != nullptr) {
-            std::vector<NetworkInformation> networkStates = networkSearchResult->GetNetworkSearchResult();
+            std::vector<NetworkInformation> networkStates = networkSearchResult->GetNetworkSearchInformation();
             if (!networkStates.empty()) {
                 for (auto &networkState : networkStates) {
-                    TELEPHONY_LOGD(
-                        "NetworkSearchTestCallbackStub OnGetNetworkSearchResult plmnNumeric:%{public}s,"
+                    TELEPHONY_LOGI(
+                        "NetworkSearchTestCallbackStub OnGetNetworkSearchInformation plmnNumeric:%{public}s,"
                         " shortOperatorName:%{public}s, rat_:%{public}d",
                         networkState.GetOperatorNumeric().c_str(), networkState.GetOperatorShortName().c_str(),
                         networkState.GetRadioTech());
@@ -93,9 +93,30 @@ void NetworkSearchTestCallbackStub::OnGetNetworkSearchResult(
         boolResult_ = true;
     } else {
         TELEPHONY_LOGE(
-            "NetworkSearchTestCallbackStub OnGetNetworkSearchResult fail errorCode:%{public}d", errorCode);
+            "NetworkSearchTestCallbackStub OnGetNetworkSearchInformation fail errorCode:%{public}d", errorCode);
         boolResult_ = false;
     }
+    NotifyAll();
+}
+
+void NetworkSearchTestCallbackStub::OnSetPreferredNetworkCallback(const bool result, const int32_t errorCode)
+{
+    TELEPHONY_LOGI(
+        "NetworkSearchTestCallbackStub OnSetPreferredNetworkCallback success, result:%{public}d, "
+        "errorCode:%{public}d",
+        result, errorCode);
+    boolResult_ = result;
+    NotifyAll();
+}
+
+void NetworkSearchTestCallbackStub::OnGetPreferredNetworkCallback(
+    const int32_t networkMode, const int32_t errorCode)
+{
+    TELEPHONY_LOGI(
+        "NetworkSearchTestCallbackStub OnGetPreferredNetworkCallback success, result:%{public}d, "
+        "errorCode:%{public}d",
+        networkMode, errorCode);
+    searchModel_ = networkMode;
     NotifyAll();
 }
 } // namespace Telephony
