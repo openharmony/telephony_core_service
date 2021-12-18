@@ -4,13 +4,49 @@
         "core_service": {
             "module_list": [
                 "//base/telephony/core_service:tel_core_service",
+                "//base/telephony/core_service/services/network_search/test:tel_network_search_test",
+                "//base/telephony/core_service/services/sim/test:tel_sim_test",
+                "//base/telephony/core_service/services/tel_ril/test:tel_ril_test",
                 "//base/telephony/core_service/sa_profile:core_service_sa_profile",
-                "//base/telephony/core_service/etc/init:telephony.rc",
-                "//base/telephony/core_service/interfaces/kits:tel_core_service_api",
-                "//base/telephony/core_service/interfaces/kits/js/napi/network_search:radio",
-                "//base/telephony/core_service/interfaces/kits/js/napi/sim:sim"
-
+                "//base/telephony/core_service/services/etc/init:telephony.rc",
+                "//base/telephony/core_service/frameworks/native:tel_core_service_api",
+                "//base/telephony/core_service/frameworks/js/network_search:radio",
+                "//base/telephony/core_service/frameworks/js/sim:sim",
+                "//base/telephony/core_service/interfaces/innerkits/cellular_data:tel_cellular_data_api"
             ],
+            "inner_kits": [
+                {
+                    "header": {
+                        "header_base" : "//base/telephony/core_service/interfaces/innerkits/core",
+                        "header_files": [
+                            "i_network_search_callback.h",
+                            "i_sim_state_manager.h",
+                            "i_sim_account_manager.h",
+                            "network_state.h",
+                            "signal_information.h",
+                            "network_information.h",
+                            "network_search_result.h",
+                            "radio_network_manager.h",
+                            "dialling_numbers_info.h",
+                            "sim_card_manager.h",
+                            "core_service_client.h"                        ]
+                    },
+                    "name":"//base/telephony/core_service/frameworks/native:tel_core_service_api"
+                },
+
+                {
+                    "type": "so",
+                    "name": "//base/telephony/core_service/interfaces/innerkits/cellular_data:tel_cellular_data_api",
+                    "header": {
+                        "header_files": [
+                            "cellular_data_client.h",
+                            "i_cellular_data_manager.h"
+                        ],
+                        "header_base": "//base/telephony/core_service/interfaces/innerkits/cellular_data"
+                    }
+                }
+            ],
+
             "test_list": [
                 "//base/telephony/core_service/test:unittest"
             ]

@@ -12,17 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef SIM_TEST_H
 #define SIM_TEST_H
 
-#include <unistd.h>
 #include <gtest/gtest.h>
-#include "core_service_proxy.h"
+
+#include "core_service_client.h"
 
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
-const int32_t slotId = 0;
 
 class SimTest : public testing::Test {
 public:
@@ -33,8 +33,8 @@ public:
     static void TearDownTestCase();
     static sptr<ICoreService> GetProxy();
     static sptr<ICoreService> telephonyService_;
+    static const int32_t slotId_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
-
 #endif // SIM_TEST_H

@@ -1,0 +1,316 @@
+/*
+ * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "icc_dialling_numbers_manager.h"
+
+namespace OHOS {
+namespace Telephony {
+std::mutex IccDiallingNumbersManager::mtx_;
+
+IccDiallingNumbersManager::IccDiallingNumbersManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+    std::shared_ptr<ISimFileManager> simFileManager, std::shared_ptr<ISimStateManager> simState)
+    : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), simStateManager_(simState)
+{}
+
+void IccDiallingNumbersManager::Init()
+{
+    TELEPHONY_LOGI("IccDiallingNumbersManager::Init() started ");
+    if (stateDiallingNumbers_ == HandleRunningState::STATE_RUNNING) {
+        TELEPHONY_LOGI("IccDiallingNumbersManager::Init eventLoopDiallingNumbers_ started.");
+        return;
+    }
+
+    eventLoopDiallingNumbers_ = AppExecFwk::EventRunner::Create("diallingNumbersCacheLoop");
+    if (eventLoopDiallingNumbers_.get() == nullptr) {
+        TELEPHONY_LOGE("IccDiallingNumbersManager failed to create EventRunner");
+        return;
+    }
+
+    if (simFileManager_ == nullptr) {
+        TELEPHONY_LOGE("IccDiallingNumbersManager::Init ISimFileManager null pointer");
+        return;
+    }
+
+    diallingNumbersCache_ = std::make_shared<IccDiallingNumbersCache>(eventLoopDiallingNumbers_, simFileManager_);
+    if (diallingNumbersCache_ == nullptr) {
+        TELEPHONY_LOGE("IccDiallingNumbersManager::Init simFile create nullptr.");
+        return;
+    }
+
+    eventLoopDiallingNumbers_->Run();
+    stateDiallingNumbers_ = HandleRunningState::STATE_RUNNING;
+
+    diallingNumbersCache_->Init();
+    TELEPHONY_LOGI("IccDiallingNumbersManager::Init() end");
+}
+
+void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    int id = 0;
+    id = event->GetInnerEventId();
+    TELEPHONY_LOGI("IccDiallingNumbersManager ProcessEvent Id is %{public}d", id);
+    switch (id) {
+        case MSG_SIM_DIALLING_NUMBERS_GET_DONE:
+            ProcessLoadDone(event);
+            break;
+        case MSG_SIM_DIALLING_NUMBERS_UPDATE_DONE:
+            ProcessUpdateDone(event);
+            break;
+        case MSG_SIM_DIALLING_NUMBERS_WRITE_DONE:
+            ProcessWriteDone(event);
+            break;
+        case MSG_SIM_DIALLING_NUMBERS_DELETE_DONE:
+            ProcessDeleteDone(event);
+            break;
+        default:
+            break;
+    }
+}
+
+void IccDiallingNumbersManager::ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessLoadDone: start");
+    std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
+    if (object != nullptr) {
+        if (object->exception == nullptr) {
+            std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList =
+                std::static_pointer_cast<std::vector<std::shared_ptr<DiallingNumbersInfo>>>(object->result);
+            if (diallingNumberList != nullptr) {
+                FillResults(diallingNumberList);
+            } else {
+                TELEPHONY_LOGE("ProcessDiallingNumberLoadDone: get null vectors!!!");
+                ClearRecords();
+            }
+        } else {
+            TELEPHONY_LOGE("ProcessLoadDone: icc diallingnumbers get exception result");
+            ClearRecords();
+        }
+    } else {
+        TELEPHONY_LOGE("ProcessDiallingNumberLoadDone: get null pointer!!!");
+        ClearRecords();
+    }
+    processWait_.notify_all();
+}
+
+void IccDiallingNumbersManager::ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    result_ = true;
+    std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
+    if (object->exception != nullptr) {
+        std::shared_ptr<HRilRadioResponseInfo> responseInfo =
+            std::static_pointer_cast<HRilRadioResponseInfo>(object->exception);
+        TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessUpdateDone error %{public}d", responseInfo->error);
+        result_ = (responseInfo->error == HRilErrType::NONE);
+    }
+    TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessUpdateDone: end");
+    processWait_.notify_all();
+}
+
+void IccDiallingNumbersManager::ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    result_ = true;
+    std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
+    if (object->exception != nullptr) {
+        std::shared_ptr<HRilRadioResponseInfo> responseInfo =
+            std::static_pointer_cast<HRilRadioResponseInfo>(object->exception);
+        TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessWriteDone error %{public}d", responseInfo->error);
+        result_ = (responseInfo->error == HRilErrType::NONE);
+    }
+    TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessWriteDone: end");
+    processWait_.notify_all();
+}
+
+void IccDiallingNumbersManager::ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    result_ = true;
+    std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
+    if (object->exception != nullptr) {
+        std::shared_ptr<HRilRadioResponseInfo> responseInfo =
+            std::static_pointer_cast<HRilRadioResponseInfo>(object->exception);
+        TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessDeleteDone error %{public}d", responseInfo->error);
+        result_ = (responseInfo->error == HRilErrType::NONE);
+    }
+    TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessDeleteDone: end");
+    processWait_.notify_all();
+}
+
+bool IccDiallingNumbersManager::UpdateIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
+{
+    std::unique_lock<std::mutex> lock(mtx_);
+    if (!IsValidType(type) || diallingNumber == nullptr || !HasSimCard(slotId) ||
+        !IsValidParam(type, diallingNumber)) {
+        return false;
+    }
+    result_ = false;
+    int index = diallingNumber->GetIndex();
+    TELEPHONY_LOGI("UpdateIccDiallingNumbers start: %{public}d %{public}d", type, index);
+    int fileId = GetFileIdForType(type);
+    AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_UPDATE_DONE);
+    diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, index, false, response);
+    processWait_.wait(lock);
+    TELEPHONY_LOGI("IccDiallingNumbersManager::UpdateIccDiallingNumbers OK return %{public}d", result_);
+    return result_;
+}
+
+bool IccDiallingNumbersManager::DelIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
+{
+    std::unique_lock<std::mutex> lock(mtx_);
+    if (!IsValidType(type) || diallingNumber == nullptr || !HasSimCard(slotId) ||
+        !IsValidParam(type, diallingNumber)) {
+        return false;
+    }
+    result_ = false;
+    int index = diallingNumber->GetIndex();
+    TELEPHONY_LOGI("DelIccDiallingNumbers start: %{public}d %{public}d", type, index);
+    int fileId = GetFileIdForType(type);
+    AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_DELETE_DONE);
+    diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, index, true, response);
+    processWait_.wait(lock);
+    TELEPHONY_LOGI("IccDiallingNumbersManager::DelIccDiallingNumbers OK return %{public}d", result_);
+    return result_;
+}
+
+bool IccDiallingNumbersManager::AddIccDiallingNumbers(
+    int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
+{
+    std::unique_lock<std::mutex> lock(mtx_);
+    result_ = false;
+    TELEPHONY_LOGI("AddIccDiallingNumbers start:%{public}d", type);
+    if (!IsValidType(type) || diallingNumber == nullptr || !HasSimCard(slotId) ||
+        !IsValidParam(type, diallingNumber)) {
+        return false;
+    }
+    AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_WRITE_DONE);
+    int fileId = GetFileIdForType(type);
+    diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, ADD_FLAG, false, response);
+    processWait_.wait(lock);
+    TELEPHONY_LOGI("IccDiallingNumbersManager::AddIccDiallingNumbers OK return %{public}d", result_);
+    return result_;
+}
+
+std::vector<std::shared_ptr<DiallingNumbersInfo>> IccDiallingNumbersManager::QueryIccDiallingNumbers(
+    int slotId, int type)
+{
+    std::unique_lock<std::mutex> lock(mtx_);
+    ClearRecords();
+    if (diallingNumbersCache_ == nullptr || !IsValidType(type) || !HasSimCard(slotId)) {
+        TELEPHONY_LOGE("Cannot load DiallingNumbersInfo records. no sim inserted?");
+        return diallingNumbersList_;
+    }
+    TELEPHONY_LOGI("QueryIccDiallingNumbers start:%{public}d", type);
+    int fileId = GetFileIdForType(type);
+
+    int extensionEf = diallingNumbersCache_->ExtendedElementFile(fileId);
+    AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_GET_DONE);
+    diallingNumbersCache_->ObtainAllDiallingNumberFiles(fileId, extensionEf, event);
+
+    processWait_.wait(lock);
+    TELEPHONY_LOGI("IccDiallingNumbersManager::QueryIccDiallingNumbers: end");
+
+    return diallingNumbersList_;
+}
+
+AppExecFwk::InnerEvent::Pointer IccDiallingNumbersManager::BuildCallerInfo(int eventId)
+{
+    std::unique_ptr<ResultObtain> object = std::make_unique<ResultObtain>();
+    int eventParam = 0;
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object, eventParam);
+    event->SetOwner(shared_from_this());
+    return event;
+}
+
+void IccDiallingNumbersManager::ClearRecords()
+{
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> nullVector;
+    diallingNumbersList_.swap(nullVector);
+}
+
+int IccDiallingNumbersManager::GetFileIdForType(int fileType)
+{
+    int fileId = 0;
+    if (fileType == DiallingNumbersInfo::SIM_ADN) {
+        fileId = ELEMENTARY_FILE_ADN; //  ELEMENTARY_FILE_PBR  for usim
+    } else if (fileType == DiallingNumbersInfo::SIM_FDN) {
+        fileId = ELEMENTARY_FILE_FDN;
+    }
+    return fileId;
+}
+
+void IccDiallingNumbersManager::FillResults(
+    const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &listInfo)
+{
+    TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessLoadDone  %{public}zu", listInfo->size());
+    for (auto it = listInfo->begin(); it != listInfo->end(); it++) {
+        std::shared_ptr<DiallingNumbersInfo> item = *it;
+        TELEPHONY_LOGI("dialling numbers item");
+        if (!item->IsEmpty()) {
+            diallingNumbersList_.push_back(item);
+        }
+    }
+}
+
+bool IccDiallingNumbersManager::IsValidType(int type)
+{
+    switch (type) {
+        case DiallingNumbersInfo::SIM_ADN:
+        case DiallingNumbersInfo::SIM_FDN:
+            return true;
+        default:
+            return false;
+    }
+}
+
+std::shared_ptr<IIccDiallingNumbersManager> IccDiallingNumbersManager::CreateInstance(
+    const std::shared_ptr<ISimFileManager> &simFile, const std::shared_ptr<ISimStateManager> &simState)
+{
+    std::shared_ptr<AppExecFwk::EventRunner> eventLoop =
+        AppExecFwk::EventRunner::Create("diallingNumbersManagerLoop");
+    if (eventLoop.get() == nullptr) {
+        TELEPHONY_LOGE("IccDiallingNumbersManager  failed to create EventRunner");
+        return nullptr;
+    }
+    if (simFile == nullptr) {
+        TELEPHONY_LOGE("IccDiallingNumbersManager::Init ISimFileManager null pointer");
+        return nullptr;
+    }
+    std::shared_ptr<IccDiallingNumbersManager> manager =
+        std::make_shared<IccDiallingNumbersManager>(eventLoop, simFile, simState);
+    if (manager == nullptr) {
+        TELEPHONY_LOGE("IccDiallingNumbersManager::Init manager create nullptr.");
+        return nullptr;
+    }
+    eventLoop->Run();
+    return manager;
+}
+
+bool IccDiallingNumbersManager::HasSimCard(int slotId)
+{
+    return (simStateManager_ != nullptr) ? simStateManager_->HasSimCard(slotId) : false;
+}
+
+bool IccDiallingNumbersManager::IsValidParam(int type, const std::shared_ptr<DiallingNumbersInfo> &info)
+{
+    if (type == DiallingNumbersInfo::SIM_FDN) {
+        return !(info->pin2_.empty());
+    } else {
+        return true;
+    }
+}
+
+IccDiallingNumbersManager::~IccDiallingNumbersManager() {}
+} // namespace Telephony
+} // namespace OHOS

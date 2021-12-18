@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<preferences version="1.0">
+  <bool key="auto_timezone" value="1"/>
+  <bool key="auto_time" value="1"/>
+  <string key="preferred_network_mode">2</string>
+  <string key="system_time"></string>
+  <string key="system_timezone"></string>
+  <string key="network_country_iso">cn</string>
+</preferences>
