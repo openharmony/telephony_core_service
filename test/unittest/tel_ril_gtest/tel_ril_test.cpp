@@ -18,173 +18,49 @@
 #include <fcntl.h>
 #include <iostream>
 
-#include "core_manager.h"
-#include "telephony_log_wrapper.h"
-
 using namespace testing::ext;
 
 namespace OHOS {
 namespace Telephony {
-const int32_t LEN = 4;
-const string COMMON_STRING = "1234";
-const int32_t val = 10;
-const int32_t phoneNumLen = 11;
+const std::string GTEST_STRING = "1234";
+const int32_t PW_LEN = 4;
+const int32_t DECIMAL = 10;
+const int32_t PHONE_NUM_LEN = 11;
+const int32_t CID = 1;
+const int32_t REASON = 2;
+const int32_t P3 = 15;
+const int32_t COMMAND = 192;
+const int32_t FILEID = 20272;
+const int32_t AUTHTYPE_1 = -1;
 
-static void GtestLog(const string logbuff)
-{
-    cout << "---" << logbuff << "---" << endl;
-    TELEPHONY_LOGD("%{public}s", logbuff.c_str());
-}
-
-void TelRilTest::SetUpTestCase()
-{
-    GtestLog("TelRilTest gtest is start");
-}
-
-void TelRilTest::TearDownTestCase()
-{
-    GtestLog("TelRilTest gtest is end");
-}
+std::shared_ptr<Telephony::ITelRilManager> TelRilTest::telRilManager_ =
+    CoreManager::GetInstance().getCore(CoreManager::DEFAULT_SLOT_ID)->GetRilManager();
 
 void TelRilTest::SetUp() {}
 
 void TelRilTest::TearDown() {}
 
+void TelRilTest::SetUpTestCase()
+{
+    std::cout << "----------TelRilTest gtest start ------------" << std::endl;
+}
+
+void TelRilTest::TearDownTestCase()
+{
+    std::cout << "----------TelRilTest gtest end ------------" << std::endl;
+}
+
 TelRilTest::TelRilTest()
 {
-    OnInitInterface();
+    AddRequestToMap();
 }
 
-TelRilTest::~TelRilTest() {}
-
-void TelRilTest::OnInitInterface()
+TelRilTest::~TelRilTest()
 {
-    CoreManager::GetInstance().Init();
-    rilManager_ = CoreManager::GetInstance().getCore(CoreManager::DEFAULT_SLOT_ID)->GetRilManager();
-    /* --------------------------------- MODEL ----------------------------- */
-    memberFuncMap_[DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH] = &TelRilTest::OnRequestNetworkGetRssiTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SET_POWER_STATE] = &TelRilTest::OnRequestSetRadioStatusTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_POWER_STATE] = &TelRilTest::OnRequestGetRadioStatusTest;
-    /* --------------------------------- DATA ----------------------------- */
-    memberFuncMap_[DiffInterfaceId::TEST_DEACTIVATE_RILCM_DATA_CALL] =
-        &TelRilTest::OnRequestDataDisableDataCallTest;
-    OnInitCall();
-    OnInitSms();
-    OnInitSim();
-    OnInitNetwork();
+    memberFuncMap_.clear();
 }
 
-void TelRilTest::OnInitCall()
-{
-    /* --------------------------------- CALL ----------------------------- */
-    memberFuncMap_[DiffInterfaceId::TEST_CURRENT_CALLS] = &TelRilTest::OnRequestCallGetCurrentCallsStatusTest;
-    memberFuncMap_[DiffInterfaceId::TEST_CALL_DIAL] = &TelRilTest::OnRequestCallDialTest;
-    memberFuncMap_[DiffInterfaceId::TEST_HANDUP_CONNECT] = &TelRilTest::OnRequestCallHangupTest;
-    memberFuncMap_[DiffInterfaceId::TEST_ACCEPT_CALL] = &TelRilTest::OnRequestCallAnswerTest;
-    memberFuncMap_[DiffInterfaceId::TEST_HOLD_CALL] = &TelRilTest::OnRequestCallHoldTest;
-    memberFuncMap_[DiffInterfaceId::TEST_ACTIVE_CALL] = &TelRilTest::OnRequestCallActiveTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SWAP_CALL] = &TelRilTest::OnRequestCallSwapTest;
-    memberFuncMap_[DiffInterfaceId::TEST_JOIN_CALL] = &TelRilTest::OnRequestCallJoinTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SPLIT_CALL] = &TelRilTest::OnRequestCallSplitTest;
-    memberFuncMap_[DiffInterfaceId::TEST_REJECT_CALL] = &TelRilTest::OnRequestRefusedCallTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_WAIT] = &TelRilTest::OnRequestGetCallWaitTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_WAIT] = &TelRilTest::OnRequestSetCallWaitTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_FORWARD] = &TelRilTest::OnRequestGetCallForwardTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_FORWARD] = &TelRilTest::OnRequestSetCallForwardTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_DEAL_CLIP] = &TelRilTest::OnRequestGetClipTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_CLIP] = &TelRilTest::OnRequestSetClipTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_RESTRICTION] = &TelRilTest::OnRequestGetCallRestrictionTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_RESTRICTION] = &TelRilTest::OnRequestSetCallRestrictionTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SEND_DTMF] = &TelRilTest::OnRequestSendDtmfTest;
-    memberFuncMap_[DiffInterfaceId::TEST_START_DTMF] = &TelRilTest::OnRequestStartDtmfTest;
-    memberFuncMap_[DiffInterfaceId::TEST_STOP_DTMF] = &TelRilTest::OnRequestStopDtmfTest;
-}
-
-void TelRilTest::OnInitSms()
-{
-    /* --------------------------------- SMS ----------------------------- */
-    memberFuncMap_[DiffInterfaceId::TEST_SEND_SMS] = &TelRilTest::OnRequestSendRilCmSmsTest;
-    memberFuncMap_[DiffInterfaceId::TEST_STORAGE_SMS] = &TelRilTest::OnRequestStorageRilCmSmsTest;
-    memberFuncMap_[DiffInterfaceId::TEST_DELETE_SMS] = &TelRilTest::OnRequestDeleteRilCmSmsTest;
-    memberFuncMap_[DiffInterfaceId::TEST_UPDATE_SMS] = &TelRilTest::OnRequestUpdateRilCmSmsTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SET_SMS_CENTER_ADDRESS] =
-        &TelRilTest::OnRequestSetRilCmSmsCenterAddressTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_SMS_CENTER_ADDRESS] =
-        &TelRilTest::OnRequestGetRilCmSmsCenterAddressTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SET_CELL_BROADCAST] = &TelRilTest::OnRequestSetRilCmCellBroadcastTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SEND_SMS_EXPECT_MORE] = &TelRilTest::OnRequestSmsSendSmsExpectMoreTest;
-    memberFuncMap_[DiffInterfaceId::TEST_ACKNOWLEDGE_RILCM_LAST_INCOMING_GSM_SMS] =
-        &TelRilTest::OnRequestSmsAcknowledgeTest;
-}
-
-void TelRilTest::OnInitSim()
-{
-    /*-----------------------------------SIM----------------------------------*/
-    memberFuncMap_[DiffInterfaceId::TEST_GET_RILCM_ICC_CARD_STATUS] =
-        &TelRilTest::OnRequestSimGetSimStatusTest;
-    memberFuncMap_[DiffInterfaceId::TEST_ICC_RILCM_IO_FOR_APP] = &TelRilTest::OnRequestSimIccIoTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_RILCM_IMSI_FOR_APP] = &TelRilTest::OnRequestSimGetImsiTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_ICCID] = &TelRilTest::OnRequestSimGetIccIDTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_SIM_LOCK_STATUS] = &TelRilTest::OnRequestGetSimLockStatusTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SET_SIM_LOCK] = &TelRilTest::OnRequestSetSimLockTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_CHANGE_SIM_PASSWD] = &TelRilTest::OnRequestChangeSimPasswordTest;
-    memberFuncMap_[DiffInterfaceId::TEST_UNLOCK_SIM_PIN] = &TelRilTest::OnRequestUnlockSimPinTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_PIN_INPUT_TIMES] = &TelRilTest::OnRequestGetSimPinInputTimesTest;
-}
-
-void TelRilTest::OnInitNetwork()
-{
-    /* --------------------------------- NETWORK ----------------------------- */
-    memberFuncMap_[DiffInterfaceId::TEST_OPERATOR] = &TelRilTest::OnRequestNetworkOperatorTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE] =
-        &TelRilTest::OnRequestNetworkVoiceRegistrationStateTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_RILCM_DATA_REGISTRATION_STATE] =
-        &TelRilTest::OnRequestNetworkDataRegistrationStateTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_NETWORKS_TO_USE] =
-        &TelRilTest::OnRequestGetNetworkSearchInformationTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_SELECTION_MOD_FOR_NETWORKS] =
-        &TelRilTest::OnRequestGetNetworkSelectionModeTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SET_MODE_AUTOMATIC_NETWORKS] =
-        &TelRilTest::OnRequestSetNetworkSelectionModeTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SET_LOCATION_UPDATE_FOR_NETWORKS] =
-        &TelRilTest::OnRequestSetNetworkLocationUpdateTest;
-}
-
-void TelRilTest::OnInitForRegister(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    // Register all APIs
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_STATE_CHANGED, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_IMS_NETWORK_STATE_CHANGED, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_ON, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_NOT_AVAIL, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_CALL_STATE, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_NETWORK_STATE, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_DATA_CALL_LIST_CHANGED, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_ICC_STATUS_CHANGED, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_GSM_SMS, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_SMS_ON_SIM, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_SMS_STATUS, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_SIGNAL_STRENGTH_UPDATE, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_ICC_REFRESH, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_CONNECTED, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_PCODATA, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_JOIN_CALL, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_SPLIT_CALL, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_GET_CALL_WAIT, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_SET_CALL_WAIT, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_GET_CALL_FORWARD, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_SET_CALL_FORWARD, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_GET_CALL_CLIP, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_SET_CALL_CLIP, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_GET_CALL_RESTRICTION, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_SET_CALL_RESTRICTION, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_SEND_DTMF, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_START_DTMF, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_STOP_DTMF, nullptr);
-    rilManager_->RegisterPhoneNotify(handler, ObserverHandler::RADIO_REJECT_CALL, nullptr);
-}
-
-void TelRilTest::OnProcessTest(int32_t index, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::ProcessTest(int32_t index, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     for (auto itFunc : memberFuncMap_) {
         int32_t val = static_cast<int32_t>(itFunc.first);
@@ -195,662 +71,910 @@ void TelRilTest::OnProcessTest(int32_t index, const std::shared_ptr<AppExecFwk::
     }
 }
 
-void TelRilTest::OnRequestCallGetCurrentCallsStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::AddRequestToMap()
+{
+    InitCall();
+    InitData();
+    InitSim();
+    InitSms();
+    InitNetwork();
+    InitModem();
+}
+
+void TelRilTest::InitCall()
+{
+    /* --------------------------------- CALL ----------------------------- */
+    memberFuncMap_[DiffInterfaceId::TEST_CURRENT_CALLS] = &TelRilTest::CallGetCurrentCallsStatusTest;
+    memberFuncMap_[DiffInterfaceId::TEST_CALL_DIAL] = &TelRilTest::CallDialTest;
+    memberFuncMap_[DiffInterfaceId::TEST_HANDUP_CONNECT] = &TelRilTest::CallHangupTest;
+    memberFuncMap_[DiffInterfaceId::TEST_ACCEPT_CALL] = &TelRilTest::CallAnswerTest;
+    memberFuncMap_[DiffInterfaceId::TEST_HOLD_CALL] = &TelRilTest::CallHoldTest;
+    memberFuncMap_[DiffInterfaceId::TEST_ACTIVE_CALL] = &TelRilTest::CallActiveTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SWAP_CALL] = &TelRilTest::CallSwapTest;
+    memberFuncMap_[DiffInterfaceId::TEST_JOIN_CALL] = &TelRilTest::CallJoinTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SPLIT_CALL] = &TelRilTest::CallSplitTest;
+    memberFuncMap_[DiffInterfaceId::TEST_REJECT_CALL] = &TelRilTest::RefusedCallTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_WAIT] = &TelRilTest::GetCallWaitTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_WAIT] = &TelRilTest::SetCallWaitTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_FORWARD] = &TelRilTest::GetCallForwardTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_FORWARD] = &TelRilTest::SetCallForwardTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_DEAL_CLIP] = &TelRilTest::GetClipTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_CLIP] = &TelRilTest::SetClipTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_RESTRICTION] = &TelRilTest::GetCallRestrictionTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_RESTRICTION] = &TelRilTest::SetCallRestrictionTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SEND_DTMF] = &TelRilTest::SendDtmfTest;
+    memberFuncMap_[DiffInterfaceId::TEST_START_DTMF] = &TelRilTest::StartDtmfTest;
+    memberFuncMap_[DiffInterfaceId::TEST_STOP_DTMF] = &TelRilTest::StopDtmfTest;
+}
+
+void TelRilTest::InitData()
+{
+    /* --------------------------------- DATA ----------------------------- */
+    memberFuncMap_[DiffInterfaceId::TEST_SETUP_RILCM_DATA_CALL] = &TelRilTest::DataSetupDataCallTest;
+    memberFuncMap_[DiffInterfaceId::TEST_DEACTIVATE_RILCM_DATA_CALL] = &TelRilTest::DataDisableDataCallTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_RILCM_DATA_CALL_LIST] = &TelRilTest::GetDataCallListTest;
+}
+
+void TelRilTest::InitSim()
+{
+    /*-----------------------------------SIM----------------------------------*/
+    memberFuncMap_[DiffInterfaceId::TEST_GET_SIM_CARD_STATUS] = &TelRilTest::SimGetSimStatusTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SIM_IO] = &TelRilTest::SimIccIoTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_IMSI] = &TelRilTest::SimGetImsiTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_SIM_LOCK_STATUS] = &TelRilTest::GetSimLockStatusTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_SIM_LOCK] = &TelRilTest::SetSimLockTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_CHANGE_SIM_PASSWD] = &TelRilTest::ChangeSimPasswordTest;
+    memberFuncMap_[DiffInterfaceId::TEST_ENTER_SIM_PIN] = &TelRilTest::EnterSimPinTest;
+    memberFuncMap_[DiffInterfaceId::TEST_UNLOCK_SIM_PIN] = &TelRilTest::UnlockSimPinTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_PIN_INPUT_TIMES] = &TelRilTest::GetSimPinInputTimesTest;
+    memberFuncMap_[DiffInterfaceId::TEST_ENTER_SIM_PIN2] = &TelRilTest::EnterSimPin2Test;
+    memberFuncMap_[DiffInterfaceId::TEST_UNLOCK_SIM_PIN2] = &TelRilTest::UnlockSimPin2Test;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_PIN2_INPUT_TIMES] = &TelRilTest::GetSimPin2InputTimesTest;
+    memberFuncMap_[DiffInterfaceId::TEST_ENABLE_SIM_CARD] = &TelRilTest::EnableSimCardTest;
+}
+
+void TelRilTest::InitSms()
+{
+    /* --------------------------------- SMS ----------------------------- */
+    memberFuncMap_[DiffInterfaceId::TEST_SEND_SMS] = &TelRilTest::SendRilCmSmsTest;
+    memberFuncMap_[DiffInterfaceId::TEST_STORAGE_SMS] = &TelRilTest::StorageRilCmSmsTest;
+    memberFuncMap_[DiffInterfaceId::TEST_DELETE_SMS] = &TelRilTest::DeleteRilCmSmsTest;
+    memberFuncMap_[DiffInterfaceId::TEST_UPDATE_SMS] = &TelRilTest::UpdateRilCmSmsTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_SMS_CENTER_ADDRESS] = &TelRilTest::SetRilCmSmsCenterAddressTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_SMS_CENTER_ADDRESS] = &TelRilTest::GetRilCmSmsCenterAddressTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_CB_CONFIG] = &TelRilTest::SetRilCmCBConfigTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_CDMA_CB_CONFIG] = &TelRilTest::SetRilCmCdmaCBConfigTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_CB_CONFIG] = &TelRilTest::GetRilCmCBConfigTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_CDMA_CB_CONFIG] = &TelRilTest::GetCdmaCBConfigTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SEND_SMS_EXPECT_MORE] = &TelRilTest::SmsSendSmsExpectMoreTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SEND_SMS_ACK] = &TelRilTest::SmsAcknowledgeTest;
+}
+
+void TelRilTest::InitNetwork()
+{
+    /* --------------------------------- NETWORK ----------------------------- */
+    memberFuncMap_[DiffInterfaceId::TEST_OPERATOR] = &TelRilTest::NetworkOperatorTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE] =
+        &TelRilTest::NetworkVoiceRegistrationStateTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_RILCM_DATA_REGISTRATION_STATE] =
+        &TelRilTest::NetworkDataRegistrationStateTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_NETWORKS_TO_USE] = &TelRilTest::GetNetworkSearchInformationTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_SELECTION_MOD_FOR_NETWORKS] =
+        &TelRilTest::GetNetworkSelectionModeTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_MODE_AUTOMATIC_NETWORKS] = &TelRilTest::SetNetworkSelectionModeTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE] = &TelRilTest::GetPreferredNetworkParaTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE] = &TelRilTest::SetPreferredNetworkParaTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_IMEI] = &TelRilTest::GetImeiTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_IMS_REG_STATUS] = &TelRilTest::GetImsRegStatusTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_PS_ATTACH_STATUS] = &TelRilTest::GetPsAttachStatusTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_PS_ATTACH_STATUS] = &TelRilTest::SetPsAttachStatusTest;
+}
+
+void TelRilTest::InitModem()
+{
+    /* --------------------------------- MODEM -------------------------- */
+    memberFuncMap_[DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH] = &TelRilTest::NetworkGetRssiTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_POWER_STATE] = &TelRilTest::SetRadioStateTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_POWER_STATE] = &TelRilTest::GetRadioStateTest;
+}
+
+void TelRilTest::CallGetCurrentCallsStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_CURRENT_CALLS);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestCallGetCurrentCallsStatusTest -->");
-        rilManager_->GetCallList(event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestCallGetCurrentCallsStatusTest --> "
-            "OnRequestCallGetCurrentCallsStatusTest "
-            "finished");
+        TELEPHONY_LOGI("TelRilTest::CallGetCurrentCallsStatusTest -->");
+        telRilManager_->GetCallList(event);
+        TELEPHONY_LOGI("TelRilTest::CallGetCurrentCallsStatusTest --> finished");
     }
 }
+
 /************************************** SIM test func *******************************************/
-void TelRilTest::OnRequestSimGetSimStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SimGetSimStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_GET_STATUS);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSimGetSimStatusTest -->");
-        rilManager_->GetSimStatus(event);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSimGetSimStatusTest --> OnRequestSimGetSimStatusTest finished");
+        TELEPHONY_LOGI("TelRilTest::SimGetSimStatusTest -->");
+        telRilManager_->GetSimStatus(event);
+        TELEPHONY_LOGI("TelRilTest::SimGetSimStatusTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSimIccIoTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SimIccIoTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_IO);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSimIccIoTest -->");
-        rilManager_->RequestSimIO(COMMAND, FILEID, 0, 0, P3, "", "3F007F105F3A", event);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSimIccIoTest --> OnRequestSimIccIoTest finished");
+        TELEPHONY_LOGI("TelRilTest::SimIccIoTest -->");
+        SimIoRequestInfo msg;
+        msg.command = COMMAND;
+        msg.fileId = FILEID;
+        msg.p1 = 0;
+        msg.p2 = 0;
+        msg.p3 = P3;
+        msg.data = "";
+        msg.path = "3F007F105F3A";
+        msg.pin2 = "";
+        telRilManager_->GetSimIO(msg, event);
+        TELEPHONY_LOGI("TelRilTest::SimIccIoTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSimGetImsiTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SimGetImsiTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_GET_IMSI);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSimGetImsiTest -->");
-        rilManager_->GetImsi(event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestSimGetImsiTest --> "
-            "OnRequestSimGetImsiTest finished");
+        TELEPHONY_LOGI("TelRilTest::SimGetImsiTest -->");
+        telRilManager_->GetImsi(event);
+        TELEPHONY_LOGI("TelRilTest::SimGetImsiTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSimGetIccIDTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_GET_ICCID);
-    if (event != nullptr && rilManager_ != nullptr) {
-        event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::%{public}s -->", __func__);
-        rilManager_->GetIccID(event);
-        TELEPHONY_LOGD("TelRilTest::%{public}s --> finished", __func__);
-    }
-}
-
-void TelRilTest::OnRequestGetSimLockStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::GetSimLockStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_GET_LOCK_STATUS);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        std::string fac = COMMON_STRING;
-        TELEPHONY_LOGD("TelRilTest::%{public}s -->", __func__);
-        rilManager_->GetSimLockStatus(fac, event);
-        TELEPHONY_LOGD("TelRilTest::%{public}s --> finished", __func__);
+        std::string fac = GTEST_STRING;
+        TELEPHONY_LOGI("TelRilTest::GetSimLockStatusTest -->");
+        telRilManager_->GetSimLockStatus(fac, event);
+        TELEPHONY_LOGI("TelRilTest::GetSimLockStatusTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSetSimLockTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SetSimLockTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_SET_LOCK);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
+        std::string fac = GTEST_STRING;
         int mode = 0;
-        std::string fac = COMMON_STRING;
-        std::string code = COMMON_STRING;
-        TELEPHONY_LOGD("TelRilTest::%{public}s -->", __func__);
-        rilManager_->SetSimLock(fac, mode, code, event);
-        TELEPHONY_LOGD("TelRilTest::%{public}s --> finished", __func__);
+        std::string code = GTEST_STRING;
+        TELEPHONY_LOGI("TelRilTest::SetSimLockTest -->");
+        telRilManager_->SetSimLock(fac, mode, code, event);
+        TELEPHONY_LOGI("TelRilTest::SetSimLockTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestChangeSimPasswordTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::ChangeSimPasswordTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_CHANGE_PASSWD);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        std::string fac = COMMON_STRING;
-        std::string oldPassword = COMMON_STRING;
-        std::string newPassword = COMMON_STRING;
-        int32_t passwordLength = LEN;
-        rilManager_->ChangeSimPassword(fac, oldPassword, newPassword, passwordLength, event);
-        TELEPHONY_LOGD("TelRilTest::%{public}s --> finished", __func__);
+        std::string fac = GTEST_STRING;
+        std::string oldPassword = GTEST_STRING;
+        std::string newPassword = GTEST_STRING;
+        int32_t passwordLength = PW_LEN;
+        TELEPHONY_LOGI("TelRilTest::ChangeSimPasswordTest -->");
+        telRilManager_->ChangeSimPassword(fac, oldPassword, newPassword, passwordLength, event);
+        TELEPHONY_LOGI("TelRilTest::ChangeSimPasswordTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestUnlockSimPinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::EnterSimPinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_ENTER_PIN);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        std::string pin = GTEST_STRING;
+        TELEPHONY_LOGI("TelRilTest::EnterSimPinTest -->");
+        telRilManager_->UnlockPin(pin, event);
+        TELEPHONY_LOGI("TelRilTest::EnterSimPinTest --> finished");
+    }
+}
+
+void TelRilTest::UnlockSimPinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_UNLOCK_PIN);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        std::string puk = COMMON_STRING;
-        std::string pin = COMMON_STRING;
-        TELEPHONY_LOGD("TelRilTest::%{public}s -->", __func__);
-        rilManager_->UnlockSimPin(puk, pin, event);
-        TELEPHONY_LOGD("TelRilTest::%{public}s --> finished", __func__);
+        std::string puk = GTEST_STRING;
+        std::string pin = GTEST_STRING;
+        TELEPHONY_LOGI("TelRilTest::UnlockSimPinTest -->");
+        telRilManager_->UnlockPuk(puk, pin, event);
+        TELEPHONY_LOGI("TelRilTest::UnlockSimPinTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestGetSimPinInputTimesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::GetSimPinInputTimesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_PIN_INPUT_TIMES);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::%{public}s -->", __func__);
-        rilManager_->GetSimPinInputTimes(event);
-        TELEPHONY_LOGD("TelRilTest::%{public}s --> finished", __func__);
+        TELEPHONY_LOGI("TelRilTest::GetSimPinInputTimesTest -->");
+        telRilManager_->GetSimPinInputTimes(event);
+        TELEPHONY_LOGI("TelRilTest::GetSimPinInputTimesTest --> finished");
+    }
+}
+
+void TelRilTest::EnterSimPin2Test(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_ENTER_PIN2);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        std::string pin2 = GTEST_STRING;
+        TELEPHONY_LOGI("TelRilTest::EnterSimPin2Test -->");
+        telRilManager_->UnlockPin2(pin2, event);
+        TELEPHONY_LOGI("TelRilTest::EnterSimPin2Test --> finished");
+    }
+}
+
+void TelRilTest::UnlockSimPin2Test(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_UNLOCK_PIN2);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        std::string puk2 = GTEST_STRING;
+        std::string pin2 = GTEST_STRING;
+        TELEPHONY_LOGI("TelRilTest::UnlockSimPin2Test -->");
+        telRilManager_->UnlockPuk2(puk2, pin2, event);
+        TELEPHONY_LOGI("TelRilTest::UnlockSimPin2Test --> finished");
+    }
+}
+
+void TelRilTest::GetSimPin2InputTimesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_PIN2_INPUT_TIMES);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetSimPin2InputTimesTest -->");
+        telRilManager_->GetSimPin2InputTimes(event);
+        TELEPHONY_LOGI("TelRilTest::GetSimPin2InputTimesTest --> finished");
+    }
+}
+
+void TelRilTest::EnableSimCardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SIM_CARD_ENABLED);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        int index = 0;
+        int enable = 0;
+        TELEPHONY_LOGI("TelRilTest::EnableSimCardTest -->");
+        telRilManager_->SetActiveSim(index, enable, event);
+        TELEPHONY_LOGI("TelRilTest::EnableSimCardTest --> finished");
     }
 }
 
 /************************************** SIM test func *******************************************/
 
-void TelRilTest::OnRequestNetworkGetRssiTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::NetworkGetRssiTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_SIGNAL_STRENGTH);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestNetworkGetRssiTest -->");
-        rilManager_->GetSignalStrength(event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestNetworkGetRssiTest --> "
-            "OnRequestNetworkGetRssiTest finished");
+        TELEPHONY_LOGI("TelRilTest::NetworkGetRssiTest -->");
+        telRilManager_->GetSignalStrength(event);
+        TELEPHONY_LOGI("TelRilTest::NetworkGetRssiTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestCallDialTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::CallDialTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_DIAL);
-    if (event == nullptr || rilManager_ == nullptr) {
-        TELEPHONY_LOGD("TelRilTest::OnRequestCallDialTest failed!!!!");
+    if (event == nullptr || telRilManager_ == nullptr) {
+        TELEPHONY_LOGI("TelRilTest::CallDialTest failed!!!!");
         return;
     }
 
-    std::string phoneNum = GetRandPhoneNum(phoneNumLen);
+    std::string phoneNum = GetRandPhoneNum(PHONE_NUM_LEN);
     int32_t clirMode; /* Calling Line Identification Restriction . From TS 27.007 V3.4.0 (2000-03) */
     event->SetOwner(handler);
     clirMode = 0; // use subscription default value
-    TELEPHONY_LOGD("TelRilTest::OnRequestCallDialTest -->");
-    rilManager_->Dial(phoneNum, clirMode, event);
-    TELEPHONY_LOGD(
-        "TelRilTest::OnRequestCallDialTest --> "
-        "OnRequestCallDialTest finished");
+    TELEPHONY_LOGI("TelRilTest::CallDialTest -->");
+    telRilManager_->Dial(phoneNum, clirMode, event);
+    TELEPHONY_LOGI("TelRilTest::CallDialTest --> finished");
 }
 
-void TelRilTest::OnRequestRefusedCallTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::RefusedCallTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_REJECT_CALL);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestRefusedCallTest -->");
-        rilManager_->Reject(event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestRefusedCallTest --> "
-            "OnRequestRefusedCallTest finished");
+        TELEPHONY_LOGI("TelRilTest::RefusedCallTest -->");
+        telRilManager_->Reject(event);
+        TELEPHONY_LOGI("TelRilTest::RefusedCallTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestGetCallWaitTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::GetCallWaitTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_CALL_WAIT);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestGetCallWaitTest -->");
-        rilManager_->GetCallWait(event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestGetCallWaitTest --> "
-            "OnRequestGetCallWaitTest finished");
+        TELEPHONY_LOGI("TelRilTest::GetCallWaitTest -->");
+        telRilManager_->GetCallWaiting(event);
+        TELEPHONY_LOGI("TelRilTest::GetCallWaitTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSetCallWaitTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SetCallWaitTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_CALL_WAIT);
-    if (event == nullptr || rilManager_ == nullptr)
+    if (event == nullptr || telRilManager_ == nullptr)
         return;
     event->SetOwner(handler);
     int32_t operating = 0;
-    TELEPHONY_LOGD("TelRilTest::OnRequestSetCallWaitTest -->");
-    rilManager_->SetCallWait(operating, event);
-    TELEPHONY_LOGD(
-        "TelRilTest::OnRequestSetCallWaitTest --> "
-        "OnRequestSetCallWaitTest finished");
+    TELEPHONY_LOGI("TelRilTest::SetCallWaitTest -->");
+    telRilManager_->SetCallWaiting(operating, event);
+    TELEPHONY_LOGI("TelRilTest::SetCallWaitTest --> finished");
 }
 
-void TelRilTest::OnRequestCallHangupTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::CallHangupTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_HANGUP_CONNECT);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestCallHangupTest -->");
-        rilManager_->Hangup(static_cast<int>(event->GetInnerEventId()), event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestCallHangupTest --> OnRequestCallHangupTest "
-            "finished");
+        TELEPHONY_LOGI("TelRilTest::CallHangupTest -->");
+        telRilManager_->Hangup(static_cast<int>(event->GetInnerEventId()), event);
+        TELEPHONY_LOGI("TelRilTest::CallHangupTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestCallAnswerTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::CallAnswerTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_ACCEPT_CALL);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestCallAnswerTest -->");
-        rilManager_->Answer(event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestCallAnswerTest --> "
-            "OnRequestCallAnswerTest finished");
+        TELEPHONY_LOGI("TelRilTest::CallAnswerTest -->");
+        telRilManager_->Answer(event);
+        TELEPHONY_LOGI("TelRilTest::CallAnswerTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestCallHoldTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::CallHoldTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_HOLD_CALL);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestCallHoldTest -->");
-        rilManager_->Hold(event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestCallHoldTest --> "
-            "OnRequestCallHoldTest finished");
+        TELEPHONY_LOGI("TelRilTest::CallHoldTest -->");
+        telRilManager_->HoldCall(event);
+        TELEPHONY_LOGI("TelRilTest::CallHoldTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestCallActiveTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::CallActiveTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_ACTIVE_CALL);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestCallActiveTest -->");
-        rilManager_->Active(event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestCallActiveTest --> "
-            "OnRequestCallActiveTest finished");
+        TELEPHONY_LOGI("TelRilTest::CallActiveTest -->");
+        telRilManager_->UnHoldCall(event);
+        TELEPHONY_LOGI("TelRilTest::CallActiveTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestCallSwapTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::CallSwapTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SWAP_CALL);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestCallSwapTest -->");
-        rilManager_->Swap(event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestCallSwapTest --> "
-            "OnRequestCallSwapTest finished");
+        TELEPHONY_LOGI("TelRilTest::CallSwapTest -->");
+        telRilManager_->SwitchCall(event);
+        TELEPHONY_LOGI("TelRilTest::CallSwapTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestNetworkVoiceRegistrationStateTest(
-    const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::NetworkVoiceRegistrationStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    auto event = AppExecFwk::InnerEvent::Get(TYPE);
-    if (event != nullptr && rilManager_ != nullptr) {
+    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_VOICE_REG_STATE);
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestNetworkVoiceRegistrationStateTest -->");
-        rilManager_->GetCsRegStatus(event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestNetworkVoiceRegistrationStateTest --> "
-            "OnRequestNetworkVoiceRegistrationStateTest finished");
+        TELEPHONY_LOGI("TelRilTest::NetworkVoiceRegistrationStateTest -->");
+        telRilManager_->GetCsRegStatus(event);
+        TELEPHONY_LOGI("TelRilTest::NetworkVoiceRegistrationStateTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestNetworkDataRegistrationStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::NetworkDataRegistrationStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    auto event = AppExecFwk::InnerEvent::Get(MAXCONNSTIME);
-    if (event != nullptr && rilManager_ != nullptr) {
+    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_DATA_REG_STATE);
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestNetworkDataRegistrationStateTest -->");
-        rilManager_->GetPsRegStatus(event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestNetworkDataRegistrationStateTest --> "
-            "OnRequestNetworkDataRegistrationStateTest finished");
+        TELEPHONY_LOGI("TelRilTest::NetworkDataRegistrationStateTest -->");
+        telRilManager_->GetPsRegStatus(event);
+        TELEPHONY_LOGI("TelRilTest::NetworkDataRegistrationStateTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestNetworkOperatorTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::NetworkOperatorTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_OPERATOR);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestNetworkOperatorTest -->");
-        rilManager_->GetOperatorInfo(event);
-        TELEPHONY_LOGD("TelRilTest::OnRequestNetworkOperatorTest --> OnRequestNetworkOperatorTest finished");
+        TELEPHONY_LOGI("TelRilTest::NetworkOperatorTest -->");
+        telRilManager_->GetOperatorInfo(event);
+        TELEPHONY_LOGI("TelRilTest::NetworkOperatorTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSendRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SendRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SEND_SMS);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSendRilCmSmsTest -->");
-        rilManager_->SendSms("smscPdu", "pdu", event);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSendRilCmSmsTest --> OnRequestSendRilCmSmsTest finished");
+        TELEPHONY_LOGI("TelRilTest::SendRilCmSmsTest -->");
+        telRilManager_->SendGsmSms("smscPdu", "pdu", event);
+        TELEPHONY_LOGI("TelRilTest::SendRilCmSmsTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestStorageRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::StorageRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_STORAGE_SMS);
     int32_t status = 0;
-    std::string smscPdu = COMMON_STRING;
-    std::string pdu = COMMON_STRING;
-    if (event != nullptr && rilManager_ != nullptr) {
+    std::string smsc = GTEST_STRING;
+    std::string pdu = GTEST_STRING;
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestStorageRilCmSmsTest -->");
-        rilManager_->StorageSms(status, smscPdu, pdu, event);
-        TELEPHONY_LOGD("TelRilTest::OnRequestStorageRilCmSmsTest --> OnRequestStorageRilCmSmsTest finished");
+        TELEPHONY_LOGI("TelRilTest::StorageRilCmSmsTest -->");
+        telRilManager_->AddSimMessage(status, smsc, pdu, event);
+        TELEPHONY_LOGI("TelRilTest::StorageRilCmSmsTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestDeleteRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::DeleteRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_DELETE_SMS);
     int32_t gsmIndex = 0;
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestDeleteRilCmSmsTest -->");
-        rilManager_->DeleteSms(gsmIndex, event);
-        TELEPHONY_LOGD("TelRilTest::OnRequestDeleteRilCmSmsTest --> OnRequestDeleteRilCmSmsTest finished");
+        TELEPHONY_LOGI("TelRilTest::DeleteRilCmSmsTest -->");
+        telRilManager_->DelSimMessage(gsmIndex, event);
+        TELEPHONY_LOGI("TelRilTest::DeleteRilCmSmsTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestUpdateRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::UpdateRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_UPDATE_SMS);
     int32_t gsmIndex = 0;
-    std::string pdu = COMMON_STRING;
-    std::string smscPdu = COMMON_STRING;
-    if (event != nullptr && rilManager_ != nullptr) {
+    std::string pdu = GTEST_STRING;
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestUpdateRilCmSmsTest -->");
-        rilManager_->UpdateSms(gsmIndex, 0, smscPdu, pdu, event);
-        TELEPHONY_LOGD("TelRilTest::OnRequestUpdateRilCmSmsTest --> OnRequestUpdateRilCmSmsTest finished");
+        TELEPHONY_LOGI("TelRilTest::UpdateRilCmSmsTest -->");
+        telRilManager_->UpdateSimMessage(gsmIndex, 0, "00", pdu, event);
+        TELEPHONY_LOGI("TelRilTest::UpdateRilCmSmsTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSetRilCmSmsCenterAddressTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SetRilCmSmsCenterAddressTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_SMS_CENTER_ADDRESS);
     int32_t tosca = 0;
-    std::string address = COMMON_STRING;
-    if (event != nullptr && rilManager_ != nullptr) {
+    std::string address = GTEST_STRING;
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSetRilCmSmsCenterAddressTest -->");
-        rilManager_->SetSmsCenterAddress(tosca, address, event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestSetRilCmSmsCenterAddressTest --> OnRequestSetRilCmSmsCenterAddressTest "
-            "finished");
+        TELEPHONY_LOGI("TelRilTest::SetRilCmSmsCenterAddressTest -->");
+        telRilManager_->SetSmscAddr(tosca, address, event);
+        TELEPHONY_LOGI("TelRilTest::SetRilCmSmsCenterAddressTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestGetRilCmSmsCenterAddressTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::GetRilCmSmsCenterAddressTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_SMS_CENTER_ADDRESS);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestGetRilCmSmsCenterAddressTest -->");
-        rilManager_->GetSmsCenterAddress(event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestGetRilCmSmsCenterAddressTest --> OnRequestGetRilCmSmsCenterAddressTest "
-            "finished");
+        TELEPHONY_LOGI("TelRilTest::GetRilCmSmsCenterAddressTest -->");
+        telRilManager_->GetSmscAddr(event);
+        TELEPHONY_LOGI("TelRilTest::GetRilCmSmsCenterAddressTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSetRilCmCellBroadcastTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SetRilCmCBConfigTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_CELL_BROADCAST);
     int32_t mode = 0;
-    std::string idList = COMMON_STRING;
-    std::string dcsList = COMMON_STRING;
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::SetRilCmCellBroadcastTest -->");
-        rilManager_->SetCellBroadcast(mode, idList, dcsList, event);
-        TELEPHONY_LOGD("TelRilTest::SetRilCmCellBroadcastTest --> SetRilCmCellBroadcastTest finished");
+        TELEPHONY_LOGI("TelRilTest::SetRilCmCBConfigTest -->");
+        telRilManager_->SetCBConfig(mode, "0,1,5,320-478,922", "0-3,5", event);
+        TELEPHONY_LOGI("TelRilTest::SetRilCmCBConfigTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSmsSendSmsExpectMoreTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SetRilCmCdmaCBConfigTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_CDMA_CELL_BROADCAST);
+    CdmaCBConfigInfoList broadcastInfoList = {};
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::SetRilCmCdmaCBConfigTest -->");
+        telRilManager_->SetCdmaCBConfig(broadcastInfoList, event);
+        TELEPHONY_LOGI("TelRilTest::SetRilCmCdmaCBConfigTest --> finished");
+    }
+}
+
+void TelRilTest::GetRilCmCBConfigTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_CELL_BROADCAST);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetRilCmCBConfigTest -->");
+        telRilManager_->GetCBConfig(event);
+        TELEPHONY_LOGI("TelRilTest::GetRilCmCBConfigTest --> finished");
+    }
+}
+
+void TelRilTest::GetCdmaCBConfigTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_CDMA_CELL_BROADCAST);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetCdmaCBConfigTest -->");
+        telRilManager_->GetCdmaCBConfig(event);
+        TELEPHONY_LOGI("TelRilTest::GetCdmaCBConfigTest --> finished");
+    }
+}
+
+void TelRilTest::SmsSendSmsExpectMoreTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SEND_SMS_EXPECT_MORE);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSmsSendSmsExpectMoreTest -->");
-        rilManager_->SendSmsMoreMode("smscPdu", "pdu", event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestSmsSendSmsExpectMoreTest --> OnRequestSmsSendSmsExpectMoreTest "
-            "finished");
+        TELEPHONY_LOGI("TelRilTest::SmsSendSmsExpectMoreTest -->");
+        telRilManager_->SendSmsMoreMode("smscPdu", "pdu", event);
+        TELEPHONY_LOGI("TelRilTest::SmsSendSmsExpectMoreTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSetRadioStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SetRadioStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_STATUS);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSetRadioStatusTest -->");
-        rilManager_->SetRadioStatus(0, 0, event);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSetRadioStatusTest --> OnRequestSetRadioStatusTest finished");
+        TELEPHONY_LOGI("TelRilTest::SetRadioStateTest -->");
+        telRilManager_->SetRadioState(0, 0, event);
+        TELEPHONY_LOGI("TelRilTest::SetRadioStateTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestGetRadioStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::GetRadioStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_STATUS);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestOnGetRadioStatusTest -->");
-        rilManager_->GetRadioStatus(event);
-        TELEPHONY_LOGD("TelRilTest::OnRequestOnGetRadioStatusTest --> OnRequestOnGetRadioStatusTest finished");
+        TELEPHONY_LOGI("TelRilTest::GetRadioStateTest -->");
+        telRilManager_->GetRadioState(event);
+        TELEPHONY_LOGI("TelRilTest::GetRadioStateTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSmsAcknowledgeTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SmsAcknowledgeTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    auto event = AppExecFwk::InnerEvent::Get(MAXCONNS);
-    if (event != nullptr && rilManager_ != nullptr) {
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS_ACK);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSmsAcknowledgeTest -->");
-        rilManager_->SendSmsAck(true, REASON, event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestSmsAcknowledgeTest -->"
-            " OnRequestSmsAcknowledgeTest finished");
+        TELEPHONY_LOGI("TelRilTest::SmsAcknowledgeTest -->");
+        telRilManager_->SendSmsAck(true, REASON, event);
+        TELEPHONY_LOGI("TelRilTest::SmsAcknowledgeTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestDataDisableDataCallTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::DataSetupDataCallTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
-    if (event != nullptr && rilManager_ != nullptr) {
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_SETUP_RILCM_DATA_CALL);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestCallDeactivateDataCallTest -->");
-        rilManager_->DeactivatePdpContext(CID, REASON, event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestDataDisableDataCallTest --> "
-            "OnRequestDataDisableDataCallTest finished");
+        TELEPHONY_LOGI("TelRilTest::DataSetupDataCallTest -->");
+        ITelRilManager::CellularDataProfile dataProfile(0, "cmnet", "IPV4V6", AUTHTYPE_1, "", "", "IPV4V6");
+        telRilManager_->ActivatePdpContext(REASON, dataProfile, false, true, event);
+        TELEPHONY_LOGI("TelRilTest::DataSetupDataCallTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestGetNetworkSearchInformationTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::DataDisableDataCallTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
-    if (event != nullptr && rilManager_ != nullptr) {
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_DEACTIVATE_RILCM_DATA_CALL);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestGetAvailableNetworkTest -->");
-        rilManager_->GetNetworkSearchInformation(event);
-        TELEPHONY_LOGD("TelRilTest::OnRequestGetAvailableNetworkTest -->finished");
+        TELEPHONY_LOGI("TelRilTest::DataDisableDataCallTest -->");
+        telRilManager_->DeactivatePdpContext(CID, REASON, event);
+        TELEPHONY_LOGI("TelRilTest::DataDisableDataCallTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestGetNetworkSelectionModeTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::GetDataCallListTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
-    if (event != nullptr && rilManager_ != nullptr) {
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_DATA_CALL_LIST);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestGetNetworkSelectionModeTest -->");
-        rilManager_->GetNetworkSelectionMode(event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestGetNetworkSelectionModeTest --> "
-            "OnRequestGetNetworkSelectionModeTest finished");
+        TELEPHONY_LOGI("TelRilTest::GetDataCallListTest -->");
+        telRilManager_->GetPdpContextList(event);
+        TELEPHONY_LOGI("TelRilTest::GetDataCallListTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSetNetworkSelectionModeTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::GetNetworkSearchInformationTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
-    if (event != nullptr && rilManager_ != nullptr) {
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_NETWORKS_TO_USE);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSetNetworkSelectionModeTest -->");
-        rilManager_->SetNetworkSelectionMode(0, "46001", event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestSetNetworkSelectionModeTest --> "
-            "OnRequestSetNetworkSelectionModeTest finished");
+        TELEPHONY_LOGI("TelRilTest::GetNetworkSearchInformationTest -->");
+        telRilManager_->GetNetworkSearchInformation(event);
+        TELEPHONY_LOGI("TelRilTest::GetNetworkSearchInformationTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSetNetworkLocationUpdateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::GetNetworkSelectionModeTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
-    if (event != nullptr && rilManager_ != nullptr) {
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_SELECTION_MOD_FOR_NETWORKS);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSetNetworkLocationUpdateTest -->");
-        rilManager_->SetNetworkLocationUpdate(event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestSetNetworkLocationUpdateTest --> "
-            "OnRequestSetNetworkLocationUpdateTest finished");
+        TELEPHONY_LOGI("TelRilTest::GetNetworkSelectionModeTest -->");
+        telRilManager_->GetNetworkSelectionMode(event);
+        TELEPHONY_LOGI("TelRilTest::GetNetworkSelectionModeTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestCallJoinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SetNetworkSelectionModeTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    int32_t callType = 0;
-    TELEPHONY_LOGD("RilUnitTest::OnRequestCallJoinTest -->");
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_SET_MODE_AUTOMATIC_NETWORKS);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::SetNetworkSelectionModeTest -->");
+        telRilManager_->SetNetworkSelectionMode(0, "46001", event);
+        TELEPHONY_LOGI("TelRilTest::SetNetworkSelectionModeTest --> finished");
+    }
+}
+
+void TelRilTest::SetPreferredNetworkParaTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        int32_t netType = 0;
+        TELEPHONY_LOGI("TelRilTest::SetPreferredNetworkParaTest -->");
+        telRilManager_->SetPreferredNetwork(netType, event);
+        TELEPHONY_LOGI("TelRilTest::SetPreferredNetworkParaTest --> finished");
+    }
+}
+
+void TelRilTest::GetPreferredNetworkParaTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetPreferredNetworkParaTest -->");
+        telRilManager_->GetPreferredNetwork(event);
+        TELEPHONY_LOGI("TelRilTest::GetPreferredNetworkParaTest --> finished");
+    }
+}
+
+void TelRilTest::GetImeiTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMEI);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetImeiTest -->");
+        telRilManager_->GetImei(event);
+        TELEPHONY_LOGI("TelRilTest::GetImeiTest --> finished");
+    }
+}
+
+void TelRilTest::GetImsRegStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMS_REG_STATUS);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetImsRegStatusTest -->");
+        telRilManager_->GetImsRegStatus(event);
+        TELEPHONY_LOGI("TelRilTest::GetImsRegStatusTest --> finished");
+    }
+}
+
+void TelRilTest::GetPsAttachStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_PS_ATTACH_STATUS);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetPsAttachStatusTest -->");
+        telRilManager_->GetPsAttachStatus(event);
+        TELEPHONY_LOGI("TelRilTest::GetPsAttachStatusTest --> finished");
+    }
+}
+
+void TelRilTest::SetPsAttachStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_SET_PS_ATTACH_STATUS);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        int32_t psAttachStatus = 0;
+        TELEPHONY_LOGI("TelRilTest::SetPsAttachStatusTest -->psAttachStatus:%{public}d", psAttachStatus);
+        telRilManager_->SetPsAttachStatus(psAttachStatus, event);
+        TELEPHONY_LOGI("TelRilTest::SetPsAttachStatusTest --> finished");
+    }
+}
+
+void TelRilTest::CallJoinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t callType = 0; /* call type
+                           * 0: Voice call
+                           * 1: Video call: send one-way video
+                           * 2: Video call: two-way voice
+                           * 3: Video call: two-way video, two-way voice
+                           */
+    TELEPHONY_LOGI("RilUnitTest::CallJoinTest -->");
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_JOIN_CALL);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestCallJoinTest -->");
-        rilManager_->Join(callType, event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestCallJoinTest --> "
-            "OnRequestCallJoinTest finished");
+        TELEPHONY_LOGI("TelRilTest::CallJoinTest -->");
+        telRilManager_->CombineConference(callType, event);
+        TELEPHONY_LOGI("TelRilTest::CallJoinTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestCallSplitTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::CallSplitTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    int32_t nThCall = 0;
-    int32_t callType = 0;
-    TELEPHONY_LOGD("RilUnitTest::OnRequestCallSplitTest -->");
+    int32_t callIndex = 0;
+    int32_t callType = 0; /* call type
+                           * 0: Voice call
+                           * 1: Video call: send one-way video
+                           * 2: Video call:two-way voice
+                           * 3: Video call: two-way video, two-way voice
+                           */
+    TELEPHONY_LOGI("RilUnitTest::CallSplitTest -->");
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SPLIT_CALL);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestCallSplitTest -->");
-        rilManager_->Split(nThCall, callType, event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestCallSplitTest --> "
-            "OnRequestCallSplitTest finished");
+        TELEPHONY_LOGI("TelRilTest::CallSplitTest -->");
+        telRilManager_->SeparateConference(callIndex, callType, event);
+        TELEPHONY_LOGI("TelRilTest::CallSplitTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestGetCallForwardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::GetCallForwardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     int32_t reason = 0;
-    TELEPHONY_LOGD("RilUnitTest::OnRequestGetCallForwardTest -->");
+    TELEPHONY_LOGI("RilUnitTest::GetCallForwardTest -->");
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_CALL_FORWARD);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestGetCallForwardTest -->");
-        rilManager_->GetCallForward(reason, event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestGetCallForwardTest --> "
-            "OnRequestGetCallForwardTest finished");
+        TELEPHONY_LOGI("TelRilTest::GetCallForwardTest -->");
+        telRilManager_->GetCallTransferInfo(reason, event);
+        TELEPHONY_LOGI("TelRilTest::GetCallForwardTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSetCallForwardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SetCallForwardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     int32_t mode = 0;
     int32_t reasonType = 0;
-    int32_t classx = 0;
-    std::string phoneNum = GetRandPhoneNum(phoneNumLen);
-    TELEPHONY_LOGD("RilUnitTest::OnRequestSetCallForwardTest -->");
+    int32_t classx = 0; /* 0: Voice call
+                         * 1: Video call: send one-way video
+                         * 2: Video call: two-way voice
+                         * 3: Video call: two-way video, two-way voice
+                         */
+    std::string phoneNum = GTEST_STRING;
+    TELEPHONY_LOGI("RilUnitTest::SetCallForwardTest -->");
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SPLIT_CALL);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSetCallForwardTest -->");
-        rilManager_->SetCallForward(reasonType, mode, phoneNum, classx, event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestSetCallForwardTest --> "
-            "OnRequestSetCallForwardTest finished");
+        TELEPHONY_LOGI("TelRilTest::SetCallForwardTest -->");
+        telRilManager_->SetCallTransferInfo(reasonType, mode, phoneNum, classx, event);
+        TELEPHONY_LOGI("TelRilTest::SetCallForwardTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestGetClipTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::GetClipTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_CALL_CLIP);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestGetClipTest -->");
-        rilManager_->GetClip(event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestGetClipTest --> "
-            "OnRequestGetClipTest finished");
+        TELEPHONY_LOGI("TelRilTest::GetClipTest -->");
+        telRilManager_->GetClip(event);
+        TELEPHONY_LOGI("TelRilTest::GetClipTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSetClipTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SetClipTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_CALL_CLIP);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         int32_t action = 0;
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSetClipTest -->");
-        rilManager_->SetClip(action, event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestSetClipTest --> "
-            "OnRequestSetClipTest finished");
+        TELEPHONY_LOGI("TelRilTest::SetClipTest -->");
+        telRilManager_->SetClip(action, event);
+        TELEPHONY_LOGI("TelRilTest::SetClipTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestGetCallRestrictionTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::GetCallRestrictionTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_CALL_RESTRICTION);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestGetCallRestrictionTest -->");
-        rilManager_->GetCallRestriction("AI", event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestGetCallRestrictionTest --> "
-            "OnRequestGetCallRestrictionTest finished");
+        TELEPHONY_LOGI("TelRilTest::GetCallRestrictionTest -->");
+        telRilManager_->GetCallRestriction("AI", event);
+        TELEPHONY_LOGI("TelRilTest::GetCallRestrictionTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSetCallRestrictionTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SetCallRestrictionTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_CALL_RESTRICTION);
-    if (event != nullptr && rilManager_ != nullptr) {
-        int32_t action = 0;
+    if (event != nullptr && telRilManager_ != nullptr) {
+        int32_t mode = 0;
+        std::string fac = GTEST_STRING;
+        std::string password = GTEST_STRING;
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSetCallRestrictionTest -->");
-        rilManager_->SetClip(action, event);
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestSetCallRestrictionTest --> "
-            "OnRequestSetCallRestrictionTest finished");
+        TELEPHONY_LOGI("TelRilTest::SetCallRestrictionTest -->");
+        telRilManager_->SetCallRestriction(fac, mode, password, event);
+        TELEPHONY_LOGI("TelRilTest::SetCallRestrictionTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestSendDtmfTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SendDtmfTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SEND_DTMF);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestSendDtmfTest -->");
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestSendDtmfTest --> "
-            "OnRequestSendDtmfTest finished");
+        TELEPHONY_LOGI("TelRilTest::SendDtmfTest -->");
+        TELEPHONY_LOGI("TelRilTest::SendDtmfTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestStartDtmfTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::StartDtmfTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_START_DTMF);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestStartDtmfTest -->");
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestStartDtmfTest --> "
-            "OnRequestStartDtmfTest finished");
+        TELEPHONY_LOGI("TelRilTest::StartDtmfTest -->");
+        TELEPHONY_LOGI("TelRilTest::StartDtmfTest --> finished");
     }
 }
 
-void TelRilTest::OnRequestStopDtmfTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::StopDtmfTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_STOP_DTMF);
-    if (event != nullptr && rilManager_ != nullptr) {
+    if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGD("TelRilTest::OnRequestStopDtmfTest -->");
-        TELEPHONY_LOGD(
-            "TelRilTest::OnRequestStopDtmfTest --> "
-            "OnRequestStopDtmfTest finished");
+        TELEPHONY_LOGI("TelRilTest::StopDtmfTest -->");
+        TELEPHONY_LOGI("TelRilTest::StopDtmfTest --> finished");
+    }
+}
+
+void TelRilTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    auto eventId = event->GetInnerEventId();
+    if (event != nullptr) {
+        TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessEvent --> eventId:%{public}d", eventId);
     }
 }
 
@@ -873,7 +997,7 @@ std::string TelRilTest::GetRandPhoneNum(const int len)
     std::string str;
 
     for (idx = 0; idx < len; idx ++) {
-        rtv = GetRandNum() % val;
+        rtv = GetRandNum() % DECIMAL;
         c = static_cast<char>(rtv);
         str.push_back(c);
     }
@@ -881,1357 +1005,389 @@ std::string TelRilTest::GetRandPhoneNum(const int len)
     return str;
 }
 
-void TelRilTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
+std::shared_ptr<TelRilTest::DemoHandler> TelRilTest::GetHandler(void)
 {
-    auto eventId = event->GetInnerEventId();
-    if (event != nullptr) {
-        TELEPHONY_LOGD("TelRilTest::DemoHandler::ProcessEvent --> eventId:%{public}d", eventId);
+    std::shared_ptr<AppExecFwk::EventRunner> eventRunner;
+    std::shared_ptr<TelRilTest::DemoHandler> demohandler;
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("ERROR : make_shared<ITelRilManager>(telRilManager) --> nullptr !!!");
+        return NULL;
     }
-}
-
-
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestNetworkGetRssiTest_0101, Function | MediumTest | Level3)
-{
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
+    TELEPHONY_LOGI("make_shared<ITelRilManager>(telRilManager) --> success");
     eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
     if (eventRunner == nullptr) {
         TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
+        return NULL;
     }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
+    TELEPHONY_LOGI("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
+    demohandler = std::make_shared<TelRilTest::DemoHandler>(eventRunner);
     if (demohandler == nullptr) {
         TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
+        return NULL;
     }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
+    TELEPHONY_LOGI("make_shared<TelRilTest::DemoHandler>(runner) --> success");
     eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH), demohandler);
+
+    return demohandler;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_NetworkGetRssiTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSetRadioStatusTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioStateTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_POWER_STATE), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_POWER_STATE), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestGetRadioStatusTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioStateTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestDataDisableDataCallTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_DataSetupDataCallTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_DEACTIVATE_RILCM_DATA_CALL), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SETUP_RILCM_DATA_CALL), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestCallGetCurrentCallsStatusTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_DataDisableDataCallTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_CURRENT_CALLS), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_DEACTIVATE_RILCM_DATA_CALL), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestCallDialTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_GetDataCallListTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_CALL_DIAL), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_DATA_CALL_LIST), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestCallHangupTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_CallGetCurrentCallsStatusTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_HANDUP_CONNECT), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_CURRENT_CALLS), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestCallAnswerTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_CallDialTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ACCEPT_CALL), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_CALL_DIAL), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestCallHoldTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_CallHangupTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_HOLD_CALL), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_HANDUP_CONNECT), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestCallActiveTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_CallAnswerTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ACTIVE_CALL), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ACCEPT_CALL), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestCallSwapTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_CallHoldTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SWAP_CALL), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_HOLD_CALL), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestCallJoinTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_CallActiveTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_JOIN_CALL), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ACTIVE_CALL), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestCallSplitTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_CallSwapTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SPLIT_CALL), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SWAP_CALL), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestRefusedCallTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_CallJoinTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_REJECT_CALL), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_JOIN_CALL), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestGetCallWaitTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_CallSplitTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_WAIT), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SPLIT_CALL), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSetCallWaitTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_RefusedCallTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_CALL_WAIT), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_REJECT_CALL), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestGetCallForwardTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_GetCallWaitTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_FORWARD), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_WAIT), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSetCallForwardTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_SetCallWaitTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_CALL_FORWARD), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_CALL_WAIT), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestGetClipTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_GetCallForwardTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_DEAL_CLIP), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_FORWARD), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSetClipTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_SetCallForwardTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_CALL_CLIP), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_CALL_FORWARD), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestGetCallRestrictionTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_GetClipTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_RESTRICTION), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_DEAL_CLIP), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSetCallRestrictionTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_SetClipTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_CALL_RESTRICTION), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_CALL_CLIP), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSendRilCmSmsTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_GetCallRestrictionTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_RESTRICTION), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestStorageRilCmSmsTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_SetCallRestrictionTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_STORAGE_SMS), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_CALL_RESTRICTION), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestDeleteRilCmSmsTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_SendRilCmSmsTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_DELETE_SMS), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestUpdateRilCmSmsTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_StorageRilCmSmsTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UPDATE_SMS), demohandler);
-    return;
-}
-   
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSetRilCmSmsCenterAddressTest_0101, Function | MediumTest | Level3)
-{
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_SMS_CENTER_ADDRESS), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_STORAGE_SMS), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestGetRilCmSmsCenterAddressTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_DeleteRilCmSmsTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SMS_CENTER_ADDRESS), demohandler);
-    return;
-}
-    
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSetRilCmCellBroadcastTest_0101, Function | MediumTest | Level3)
-{
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_CELL_BROADCAST), demohandler);
-    return;
-}
-        
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSmsSendSmsExpectMoreTest_0101, Function | MediumTest | Level3)
-{
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS_EXPECT_MORE), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_DELETE_SMS), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSmsAcknowledgeTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_UpdateRilCmSmsTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ACKNOWLEDGE_RILCM_LAST_INCOMING_GSM_SMS),
-        demohandler);
-    return;
-}
-    
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSimGetSimStatusTest_0101, Function | MediumTest | Level3)
-{
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_ICC_CARD_STATUS), demohandler);
-    return;
-}
-    
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSimIccIoTest_0101, Function | MediumTest | Level3)
-{
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ICC_RILCM_IO_FOR_APP), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UPDATE_SMS), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSimGetImsiTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_SetRilCmSmsCenterAddressTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_IMSI_FOR_APP), demohandler);
-    return;
-}
-    
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSimGetIccIDTest_0101, Function | MediumTest | Level3)
-{
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_ICCID), demohandler);
-    return;
-}
-    
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestGetSimLockStatusTest_0101, Function | MediumTest | Level3)
-{
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIM_LOCK_STATUS), demohandler);
-    return;
-}
-    
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSetSimLockTest_0101, Function | MediumTest | Level3)
-{
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_SIM_LOCK), demohandler);
-    return;
-}
-    
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestChangeSimPasswordTest_0101, Function | MediumTest | Level3)
-{
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CHANGE_SIM_PASSWD), demohandler);
-    return;
-}
-    
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestEnterSimPinTest_0101, Function | MediumTest | Level3)
-{
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_SIM_PIN), demohandler);
-    return;
-}
-    
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestUnlockSimPinTest_0101, Function | MediumTest | Level3)
-{
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UNLOCK_SIM_PIN), demohandler);
-    return;
-}
-    
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestGetSimPinInputTimesTest_0101, Function | MediumTest | Level3)
-{
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PIN_INPUT_TIMES), demohandler);
-    return;
-}
- 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestNetworkOperatorTest_0101, Function | MediumTest | Level3)
-{
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_OPERATOR), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_SMS_CENTER_ADDRESS), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestNetworkVoiceRegistrationStateTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_GetRilCmSmsCenterAddressTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE), demohandler);
-    return;
-}
-    
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestNetworkDataRegistrationStateTest_0101, Function | MediumTest | Level3)
-{
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_DATA_REGISTRATION_STATE), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SMS_CENTER_ADDRESS), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestGetNetworkSearchInformationTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_SetRilCmCBConfigTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_NETWORKS_TO_USE), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_CB_CONFIG), GetHandler());
     return;
 }
-    
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestGetNetworkSelectionModeTest_0101, Function | MediumTest | Level3)
+
+HWTEST_F(TelRilTest, Telephony_TelRil_GetRilCmCBConfigTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SELECTION_MOD_FOR_NETWORKS), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CB_CONFIG), GetHandler());
     return;
 }
-    
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSetNetworkSelectionModeTest_0101, Function | MediumTest | Level3)
+
+HWTEST_F(TelRilTest, Telephony_TelRil_GetCdmaCBConfigTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_MODE_AUTOMATIC_NETWORKS), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CDMA_CB_CONFIG), GetHandler());
     return;
 }
-    
-HWTEST_F(TelRilTest, Telephony_TelRil_OnRequestSetNetworkLocationUpdateTest_0101, Function | MediumTest | Level3)
+
+HWTEST_F(TelRilTest, Telephony_TelRil_SmsSendSmsExpectMoreTest_0101, Function | MediumTest | Level3)
 {
-    shared_ptr<AppExecFwk::EventRunner> eventRunner;
-    shared_ptr<TelRilTest::DemoHandler> demohandler;
-    if (rilManager_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<IRilManager>(rilManager) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<IRilManager>(rilManager) --> success");
-    eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
-    if (eventRunner == nullptr) {
-        TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
-    demohandler = make_shared<TelRilTest::DemoHandler>(eventRunner);
-    if (demohandler == nullptr) {
-        TELEPHONY_LOGE("ERROR : make_shared<TelRilTest::DemoHandler>(runner) --> nullptr !!!");
-        return;
-    }
-    TELEPHONY_LOGD("make_shared<TelRilTest::DemoHandler>(runner) --> success");
-    OnInitForRegister(demohandler);
-    TELEPHONY_LOGD("OnInitForRegister(g_handler) finished -->");
-    eventRunner->Run();
-    OnProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_LOCATION_UPDATE_FOR_NETWORKS), demohandler);
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS_EXPECT_MORE), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_SmsAcknowledgeTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS_ACK), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_SimGetSimStatusTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIM_CARD_STATUS), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_SimIccIoTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SIM_IO), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_SimGetImsiTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMSI), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_GetSimLockStatusTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIM_LOCK_STATUS), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_SetSimLockTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_SIM_LOCK), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_ChangeSimPasswordTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CHANGE_SIM_PASSWD), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_EnterSimPinTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_SIM_PIN), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_UnlockSimPinTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UNLOCK_SIM_PIN), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_GetSimPinInputTimesTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PIN_INPUT_TIMES), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_EnterSimPin2Test_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_SIM_PIN2), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_UnlockSimPin2Test_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UNLOCK_SIM_PIN2), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_GetSimPin2InputTimesTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PIN2_INPUT_TIMES), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_EnableSimCardTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENABLE_SIM_CARD), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_NetworkOperatorTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_OPERATOR), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_NetworkVoiceRegistrationStateTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_NetworkDataRegistrationStateTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_DATA_REGISTRATION_STATE), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSearchInformationTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_NETWORKS_TO_USE), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSelectionModeTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SELECTION_MOD_FOR_NETWORKS), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_SetNetworkSelectionModeTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_MODE_AUTOMATIC_NETWORKS), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_GetPreferredNetworkParaTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_SetPreferredNetworkParaTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_GetImeiTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMEI), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_GetImsRegStatusTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMS_REG_STATUS), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_GetPsAttachStatusTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PS_ATTACH_STATUS), GetHandler());
+    return;
+}
+
+HWTEST_F(TelRilTest, Telephony_TelRil_SetPsAttachStatusTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_PS_ATTACH_STATUS), GetHandler());
     return;
 }
 } // namespace Telephony

@@ -27,24 +27,25 @@ class NetworkSearchTestCallbackStub : public INetworkSearchCallbackStub {
 public:
     void OnGetNetworkModeCallback(const int32_t searchModel, const int32_t errorCode) override;
     void OnSetNetworkModeCallback(const bool setResult, const int32_t errorCode) override;
-    void OnSetRadioStatusCallback(const bool setResult, const int32_t errorCode) override;
-    void OnGetRadioStatusCallback(const bool setResult, const int32_t errorCode) override;
-    void OnGetNetworkSearchResult(
+    void OnSetRadioStateCallback(const bool setResult, const int32_t errorCode) override;
+    void OnGetRadioStateCallback(const bool setResult, const int32_t errorCode) override;
+    void OnGetNetworkSearchInformation(
         const sptr<NetworkSearchResult> &networkSearchResult, const int32_t errorCode) override;
-    void WaitFor(int timeoutSecond);
-    bool GetBoolResult()
+    void OnSetPreferredNetworkCallback(const bool result, const int32_t errorCode) override;
+    void OnGetPreferredNetworkCallback(const int32_t networkMode, const int32_t errorCode) override;
+    void WaitFor(int32_t timeoutSecond);
+    bool GetBoolResult() const
     {
         return boolResult_;
     }
-    int GetSearchModel()
+    int32_t GetSearchModel() const
     {
         return searchModel_;
     }
-
 private:
     void NotifyAll();
     bool boolResult_ = false;
-    int searchModel_ = 0;
+    int32_t searchModel_ = 0;
     std::mutex callbackMutex_;
     std::condition_variable cv_;
 };

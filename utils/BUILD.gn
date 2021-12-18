@@ -1,0 +1,68 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+group("common_target") {
+  deps = [ ":libtelephony_common" ]
+}
+
+config("telephony_common_config") {
+  include_dirs = [
+    "log/include",
+    "common/include",
+    "preferences/include",
+  ]
+}
+
+ohos_shared_library("libtelephony_common") {
+  sources = [
+    "common/src/str_convert.cpp",
+    "log/src/telephony_log_wrapper.cpp",
+    "preferences/src/tel_profile_util.cpp",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"TELEPHONY_COMMON\"",
+    "LOG_DOMAIN = 0xD002B01",
+  ]
+
+  if (is_standard_system) {
+    defines += [ "STANDARD_SYSTEM_ENABLE" ]
+  }
+
+  public_configs = [
+    ":telephony_common_config",
+    "//utils/native/base:utils_config",
+  ]
+
+  public_deps = [
+    "//foundation/distributeddatamgr/appdatamgr/interfaces/innerkits/native_preferences:native_preferences",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_double_framework) {
+    cflags_cc = [ "-DCONFIG_DUAL_FRAMEWORK" ]
+  }
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  external_deps += [ "native_appdatamgr:native_preferences" ]
+
+  part_name = "core_service"
+  subsystem_name = "telephony"
+}

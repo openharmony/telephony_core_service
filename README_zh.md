@@ -192,4 +192,3 @@
 [telephony\_sms\_mms](https://gitee.com/openharmony/telephony_sms_mms/blob/master/README_zh.md)
 
 [telephony\_ril\_adapter](https://gitee.com/openharmony/telephony_ril_adapter/blob/master/README_zh.md)
-
