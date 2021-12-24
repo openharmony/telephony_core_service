@@ -15,7 +15,7 @@ TELEPHONY_CORE_SERVICE_ROOT = "//base/telephony/core_service"
 TELEPHONY_CELLULAR_DATA_API_ROOT =
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/cellular_data"
 
-config("cellular_call_util_config") {
+config("cellular_data_util_config") {
   # header file path
   include_dirs =
       [ "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/cellular_data" ]
@@ -47,7 +47,7 @@ ohos_shared_library("tel_cellular_data_api") {
     "$TELEPHONY_CORE_SERVICE_ROOT/utils/log/include",
   ]
 
-  public_configs = [ ":cellular_call_util_config" ]
+  public_configs = [ ":cellular_data_util_config" ]
 
   deps = [ "//utils/native/base:utils" ]
 

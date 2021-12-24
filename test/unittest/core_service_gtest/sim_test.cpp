@@ -65,7 +65,7 @@ sptr<ICoreService> SimTest::GetProxy()
  * @tc.name     Get sim State
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_GetSimState_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_GetSimState_0100, Function | MediumTest | Level1)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -82,7 +82,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimState_0100, Function | MediumTest | Level3
  * @tc.name     Get sim State
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_HasSimCard_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_HasSimCard_0100, Function | MediumTest | Level1)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -99,7 +99,7 @@ HWTEST_F(SimTest, Telephony_Sim_HasSimCard_0100, Function | MediumTest | Level3)
  * @tc.name     Get sim IsoCountryCode
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_GetISOCountryCodeForSim_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_GetISOCountryCodeForSim_0100, Function | MediumTest | Level1)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -116,7 +116,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetISOCountryCodeForSim_0100, Function | MediumT
  * @tc.name     Get sim service privode name
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_GetSimSpn_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_GetSimSpn_0100, Function | MediumTest | Level1)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -133,7 +133,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimSpn_0100, Function | MediumTest | Level3)
  * @tc.name     Get sim iccid
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_GetSimIccId_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_GetSimIccId_0100, Function | MediumTest | Level1)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -150,7 +150,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimIccId_0100, Function | MediumTest | Level3
  * @tc.name     Get sim iccid
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_GetSimOperatorNumeric_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_GetSimOperatorNumeric_0100, Function | MediumTest | Level1)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -167,7 +167,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimOperatorNumeric_0100, Function | MediumTes
  * @tc.name     Get sim imsi
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_GetIMSI_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_GetIMSI_0100, Function | MediumTest | Level1)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -184,7 +184,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetIMSI_0100, Function | MediumTest | Level3)
  * @tc.name     Get sim gid1
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_GetSimGid1_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_GetSimGid1_0100, Function | MediumTest | Level1)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -201,7 +201,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimGid1_0100, Function | MediumTest | Level3)
  * @tc.name     Get sim gid1
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_GetSimTelephoneNumber_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_GetSimTelephoneNumber_0100, Function | MediumTest | Level1)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -219,7 +219,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimTelephoneNumber_0100, Function | MediumTes
  * @tc.name     Get sim gid1
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailIdentifier_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailIdentifier_0100, Function | MediumTest | Level1)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -237,7 +237,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailIdentifier_0100, Function | MediumTe
  * @tc.name     Get sim VoiceMailNumber
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailNumber_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailNumber_0100, Function | MediumTest | Level1)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -255,7 +255,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailNumber_0100, Function | MediumTest |
  * @tc.name     Get sim GetDefaultVoiceSlotId
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_GetDefaultVoiceSlotId_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_GetDefaultVoiceSlotId_0100, Function | MediumTest | Level1)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -272,7 +272,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetDefaultVoiceSlotId_0100, Function | MediumTes
  * @tc.name     Get sim SetDefaultVoiceSlotId
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_SetDefaultVoiceSlotId_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_SetDefaultVoiceSlotId_0100, Function | MediumTest | Level2)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -290,7 +290,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetDefaultVoiceSlotId_0100, Function | MediumTes
  * @tc.name     Get sim RefreshSimState
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_RefreshSimState_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_RefreshSimState_0100, Function | MediumTest | Level0)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -307,7 +307,7 @@ HWTEST_F(SimTest, Telephony_Sim_RefreshSimState_0100, Function | MediumTest | Le
  * @tc.name     Get sim GetOperatorConfigs
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_GetOperatorConfig_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_GetOperatorConfig_0100, Function | MediumTest | Level2)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -325,7 +325,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetOperatorConfig_0100, Function | MediumTest | 
  * @tc.name     Get sim GetActiveSimAccountInfoList
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0100, Function | MediumTest | Level1)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -380,7 +380,7 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0100, Function | Medium
 }
 
 /**
- * @tc.number   Telephony_Sim_QueryIccAdnDiallingNumbers_0100
+ * @tc.number   Telephony_Sim_QueryIccAdnDiallingNumbers_0101
  * @tc.name     Get sim QueryIccAdnDiallingNumbers
  * @tc.desc     Function test
  */
@@ -423,7 +423,7 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0100, Function | Med
 }
 
 /**
- * @tc.number   Telephony_Sim_QueryIccAdnDiallingNumbers_0100
+ * @tc.number   Telephony_Sim_QueryIccAdnDiallingNumbers_0102
  * @tc.name     Get sim QueryIccAdnDiallingNumbers
  * @tc.desc     Function test
  */
@@ -503,7 +503,7 @@ HWTEST_F(SimTest, Telephony_Sim_getShowName_0100, Function | MediumTest | Level3
  * @tc.name     Get sim getShowNumber
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_getShowNumber_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_getShowNumber_0100, Function | MediumTest | Level1)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -538,7 +538,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowNumber_0100, Function | MediumTest | Leve
  * @tc.name     Get sim IsSimActive
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_IsSimActive_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_IsSimActive_0100, Function | MediumTest | Level2)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -704,10 +704,10 @@ HWTEST_F(SimTest, Telephony_Sim_AlterPin2_0100, Function | MediumTest | Level3)
 
 /**
  * @tc.number   Telephony_Sim_SetActiveSim_0100
- * @tc.name     Get sim UnlockPuk
+ * @tc.name     Get sim SetActiveSim
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_SetActiveSim_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_SetActiveSim_0100, Function | MediumTest | Level2)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -722,10 +722,10 @@ HWTEST_F(SimTest, Telephony_Sim_SetActiveSim_0100, Function | MediumTest | Level
 
 /**
  * @tc.number   Telephony_Sim_ReSetActiveSim_0100
- * @tc.name     Get sim UnlockPuk
+ * @tc.name     Get sim ReSetActiveSim
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSim_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSim_0100, Function | MediumTest | Level2)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -743,7 +743,7 @@ HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSim_0100, Function | MediumTest | Lev
  * @tc.name     Get sim GetMaxSimCount
  * @tc.desc     Function test
  */
-HWTEST_F(SimTest, Telephony_Sim_GetMaxSimCount_0100, Function | MediumTest | Level3)
+HWTEST_F(SimTest, Telephony_Sim_GetMaxSimCount_0100, Function | MediumTest | Level1)
 {
     if (SimTest::telephonyService_ == nullptr ||
         !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {

@@ -85,7 +85,7 @@ sptr<ICoreService> NetworkSearchTest::GetProxy()
  * @tc.name     Get RAT of the PS domain on the registered network
  * @tc.desc     Function test
  */
-HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetPsRadioTech_0100, Function | MediumTest | Level3)
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetPsRadioTech_0100, Function | MediumTest | Level1)
 {
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
@@ -103,7 +103,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetPsRadioTech_0100, Functio
  * @tc.name     Get RAT of the CS domain on the registered network
  * @tc.desc     Function test
  */
-HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCsRadioTech_0100, Function | MediumTest | Level3)
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCsRadioTech_0100, Function | MediumTest | Level1)
 {
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
@@ -120,7 +120,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCsRadioTech_0100, Functio
  * @tc.name     Get Network State
  * @tc.desc     Function test
  */
-HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0100, Function | MediumTest | Level3)
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0100, Function | MediumTest | Level2)
 {
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
@@ -144,7 +144,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0100, Functi
  * @tc.name     Get Operator Numeric of PLMN
  * @tc.desc     Function test
  */
-HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorNumeric_0100, Function | MediumTest | Level3)
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorNumeric_0100, Function | MediumTest | Level1)
 {
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
@@ -162,7 +162,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorNumeric_0100, Fun
  * @tc.name     Get GetOperator Name
  * @tc.desc     Function test
  */
-HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorName_0100, Function | MediumTest | Level3)
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorName_0100, Function | MediumTest | Level1)
 {
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
@@ -214,7 +214,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetSignalInfoList_0100, Func
  * @tc.desc     Function test
  */
 HWTEST_F(
-    NetworkSearchTest, Telephony_NetworkSearch_GetIsoCountryCodeForNetwork_0100, Function | MediumTest | Level3)
+    NetworkSearchTest, Telephony_NetworkSearch_GetIsoCountryCodeForNetwork_0100, Function | MediumTest | Level1)
 {
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
@@ -478,7 +478,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0100, Function
  * @tc.name     Get Imei
  * @tc.desc     Function test
  */
-HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0100, Function | MediumTest | Level3)
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0100, Function | MediumTest | Level1)
 {
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
