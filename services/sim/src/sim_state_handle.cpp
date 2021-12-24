@@ -289,9 +289,11 @@ void SimStateHandle::GetSimLockState(const AppExecFwk::InnerEvent::Pointer &even
         TELEPHONY_LOGI("SimStateHandle::GetSimLockState(), param = %{public}d", *param);
         unlockRespon_.lockState = *param;
     } else {
+        unlockRespon_.lockState = static_cast<int32_t>(LockState::LOCK_ERROR);
         error = static_cast<int32_t>(response->error);
         TELEPHONY_LOGI("SimStateHandle::GetSimLockState(), error = %{public}d", error);
     }
+    TELEPHONY_LOGI("SimStateHandle::GetSimLockState(), lockState = %{public}d", unlockRespon_.lockState);
 }
 
 void SimStateHandle::GetSetLockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId)
