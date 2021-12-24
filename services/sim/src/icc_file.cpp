@@ -98,11 +98,6 @@ void IccFile::UpdateImsi(std::string imsi)
     imsi_ = imsi;
 }
 
-std::string IccFile::ObtainFullIccId()
-{
-    return iccIdComplete_;
-}
-
 std::string IccFile::ObtainIccId()
 {
     return iccId_;
