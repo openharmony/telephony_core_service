@@ -47,7 +47,6 @@ public:
     virtual void StartLoad();
     std::string ObtainIMSI();
     void UpdateImsi(std::string imsi);
-    std::string ObtainFullIccId();
     std::string ObtainIccId();
     std::string ObtainGid1();
     std::string ObtainGid2();
@@ -96,7 +95,6 @@ protected:
     std::shared_ptr<IccFileController> fileController_ = nullptr;
     std::shared_ptr<ISimStateManager> stateManager_ = nullptr;
     std::string imsi_ = "";
-    std::string iccIdComplete_ = ""; // hex
     std::string iccId_ = ""; // decimals
     std::string spn_ = "";
     std::string gid1_ = "";

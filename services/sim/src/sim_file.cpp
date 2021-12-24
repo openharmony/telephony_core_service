@@ -612,9 +612,8 @@ bool SimFile::ProcessGetIccIdDone(const AppExecFwk::InnerEvent::Pointer &event)
     bool isFileProcessResponse = true;
     if (fd->exception == nullptr) {
         std::string iccData = fd->resultData;
-        TELEPHONY_LOGI("SimFile::ProcessEvent MSG_SIM_OBTAIN_ICCID_DONE result success");
+        TELEPHONY_LOGI("SimFile::ProcessEvent ICCID result success");
         iccId_ = iccData;
-        iccIdComplete_ = iccData;
     }
     return isFileProcessResponse;
 }
@@ -625,7 +624,7 @@ bool SimFile::ProcessObtainIMSIDone(const AppExecFwk::InnerEvent::Pointer &event
     bool isFileProcessResponse = true;
     if (sharedObject != nullptr) {
         imsi_ = *sharedObject;
-        TELEPHONY_LOGI("SimFile::ProcessEvent MSG_SIM_OBTAIN_IMSI_DONE received success");
+        TELEPHONY_LOGI("SimFile::ProcessEvent IMSI received success");
         std::string iso = ObtainIsoCountryCode();
         TELEPHONY_LOGI("SimFile::ObtainIsoCountryCode result success");
         if (!imsi_.empty()) {

@@ -60,6 +60,17 @@ enum class LockReason {
     SIM_PIN,
     SIM_PUK
 };
+
+enum class LockState {
+    /**Indicates that the lock state card is in the <b>off</b> state. */
+    LOCK_OFF = 0,
+
+    /**Indicates that the lock state card is in the <b>open</b> state. */
+    LOCK_ON,
+
+    /**Indicates that the lock state card is in the <b>error</b> state. */
+    LOCK_ERROR,
+};
 }
 }
 #endif // OHOS_SIM_STATE_TYPE_H
