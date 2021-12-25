@@ -4,9 +4,6 @@
         "core_service": {
             "module_list": [
                 "//base/telephony/core_service:tel_core_service",
-                "//base/telephony/core_service/services/network_search/test:tel_network_search_test",
-                "//base/telephony/core_service/services/sim/test:tel_sim_test",
-                "//base/telephony/core_service/services/tel_ril/test:tel_ril_test",
                 "//base/telephony/core_service/sa_profile:core_service_sa_profile",
                 "//base/telephony/core_service/services/etc/init:telephony.rc",
                 "//base/telephony/core_service/frameworks/native:tel_core_service_api",
