@@ -60,6 +60,9 @@ bool Core::OnInit()
     if (iccDiallingNumbersManager_ != nullptr) {
         iccDiallingNumbersManager_->Init();
     }
+    if (simStateManager_ != nullptr) {
+        simStateManager_->RefreshSimState(slotId_);
+    }
 
     isInitCore_ = ret;
     return ret;
