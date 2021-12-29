@@ -148,10 +148,12 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
         TELEPHONY_LOGE("NitzUpdate::ProcessTime time error");
         return;
     }
-
+    
+#ifdef IS_SUPPORT_POWERMGR
     auto &powerMgrClient = PowerMgrClient::GetInstance();
     auto runningLock = powerMgrClient.CreateRunningLock("runninglock", RunningLockType::RUNNINGLOCK_BACKGROUND);
     runningLock->Lock();
+#endif
 
     struct tm t;
     (void)memset_s(&t, sizeof(t), 0, sizeof(t));
@@ -169,7 +171,10 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
         std::to_string(networkTime.day) + " " + std::to_string(networkTime.hour) + ":" +
         std::to_string(networkTime.minute) + ":" + std::to_string(networkTime.second));
     SaveTime(strDate);
+
+#ifdef IS_SUPPORT_POWERMGR
     runningLock->UnLock();
+#endif
 
     std::string action = "usual.event.NITZ_TIME_UPDATED";
     std::string param = "time";
