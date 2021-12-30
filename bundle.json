@@ -1,0 +1,60 @@
+{
+    "name": "@ohos/telephony_core_service",
+    "version": "",
+    "description": "支持蜂窝通话功能（CS&IMS通话）",
+    "homePage": "https://gitee.com/openharmony",
+    "license": "Apache V2",
+    "repository": "https://gitee.com/openharmony/telephony_core_service",
+    "domain": "os",
+    "language": "",
+    "publishAs": "code-segment",
+    "private": false,
+    "scripts": {},
+    "tags": [
+        "base"
+    ],
+    "keywords": [
+        "telephony",
+        "core",
+        "service"
+    ],
+    "envs": [],
+    "dirs": [],
+    "author": {
+        "name": "",
+        "email": "",
+        "url": ""
+    },
+    "contributors": [
+        {
+            "name": "",
+            "email": "",
+            "url": ""
+        }
+    ],
+    "segment": {
+        "destPath": "base/telephony/core_service"
+    },
+    "component": {
+        "name": "cellular_call",
+        "subsystem": "telephony",
+        "syscap": [
+            "SystemCapability.Telephony.CellularCall"
+        ],
+        "features": [],
+        "adapted_system_type": [
+            "standard"
+        ],
+        "rom": "",
+        "ram": "",
+        "deps": {
+            "components": [],
+            "third_party": []
+        },
+        "build": {
+            "sub_component": [],
+            "inner_kits": [],
+            "test": []
+        }
+    }
+}
