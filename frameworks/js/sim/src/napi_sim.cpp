@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <string_view>
+#include "napi_sim_type.h"
 #include "napi_util.h"
 #include "network_state.h"
 #include "sim_card_manager.h"
@@ -1418,6 +1419,17 @@ void InitEnumSimState(napi_env env, napi_value exports)
     };
     NAPI_CALL_RETURN_VOID(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
 }
+
+void InitEnumContactType(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "GENERAL_CONTACT", GetNapiValue(env, static_cast<int32_t>(ContactType::GENERAL_CONTACT))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "FIXED_DIALING", GetNapiValue(env, static_cast<int32_t>(ContactType::FIXED_DIALING))),
+    };
+    NAPI_CALL_RETURN_VOID(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+}
 } // namespace
 
 EXTERN_C_START
@@ -1463,6 +1475,7 @@ napi_value InitNapiSim(napi_env env, napi_value exports)
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     InitEnumSimState(env, exports);
+    InitEnumContactType(env, exports);
     return exports;
 }
 EXTERN_C_END
