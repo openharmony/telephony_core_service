@@ -118,6 +118,7 @@ void NetworkSearchManager::SetRadioState(bool isOn, int32_t rst)
 
 bool NetworkSearchManager::SetRadioState(bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback)
 {
+    AirplaneMode_ = isOn ? false : true;
     TELEPHONY_LOGI("NetworkSearchManager SetRadioState isOn:%{public}d", isOn);
     int32_t fun = static_cast<int32_t>(isOn);
     return SendEventToRilCallback(ObserverHandler::ObserverHandlerId::RADIO_SET_STATUS, &callback, fun, rst);

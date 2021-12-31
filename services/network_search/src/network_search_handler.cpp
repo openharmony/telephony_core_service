@@ -373,6 +373,10 @@ void NetworkSearchHandler::RadioOffState() const
     }
     networkSearchState->CsRadioTechChange();
     networkSearchState->NotifyStateChange();
+
+    if (!networkSearchManager->GetAirplaneMode()) {
+        networkSearchManager->SetRadioState(static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
+    }
 }
 
 void NetworkSearchHandler::RadioOnState()
