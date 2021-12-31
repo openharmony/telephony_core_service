@@ -127,15 +127,19 @@ public:
     std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) override;
     bool SendUpdateCellLocationRequest() override;
     void UpdateCellLocation(int32_t techType, int32_t cellId, int32_t lac);
-    void InitMsgNum()
+    inline bool GetAirplaneMode()
+    {
+        return AirplaneMode_;
+    }
+    inline void InitMsgNum()
     {
         msgNum_ = MSG_NUM;
     }
-    bool CheckIsNeedNotify()
+    inline bool CheckIsNeedNotify()
     {
         return msgNum_ == 0 ? true : false;
     }
-    void decMsgNum()
+    inline void decMsgNum()
     {
         msgNum_--;
     }
@@ -157,6 +161,7 @@ private:
     HandleRunningState state_ = HandleRunningState::STATE_NOT_START;
     std::unique_ptr<NetworkSearchResult> networkSearchResult_ = nullptr;
     SelectionMode selection_ = SelectionMode::MODE_TYPE_UNKNOWN;
+    bool AirplaneMode_ = false;
     ModemPowerState radioState_ = ModemPowerState::CORE_SERVICE_POWER_OFF;
     std::unordered_map<int64_t, std::shared_ptr<NetworkSearchCallbackInfo>> networkSearchCacheMap_;
     std::mutex callbackMapMutex_;
