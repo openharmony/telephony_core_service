@@ -12,14 +12,9 @@
 # limitations under the License.
 import("//build/ohos.gni")
 
-## Install telephony.rc to /system/etc/init/telephony.rc
-ohos_prebuilt_etc("telephony.rc") {
-  if (use_musl) {
-    source = "telephony.cfg"
-  } else {
-    source = "telephony.rc"
-  }
-
+## Install telephony.cfg to /system/etc/init/telephony.cfg
+ohos_prebuilt_etc("telephony.cfg") {
+  source = "telephony.cfg"
   relative_install_dir = "init"
   part_name = "core_service"
   subsystem_name = "telephony"
