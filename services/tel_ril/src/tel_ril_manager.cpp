@@ -75,6 +75,7 @@ int32_t TelRilManager::SetCellularRadioResponse(bool isFirst)
 int TelRilManager::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, OHOS::MessageOption &option)
 {
+    TELEPHONY_LOGI("TelRilManager OnRemoteRequest code:%{public}d", code);
     if (telRilCall_ != nullptr && telRilCall_->IsCallRespOrNotify(code)) {
         telRilCall_->ProcessCallRespOrNotify(code, data);
         return CORE_SERVICE_SUCCESS;
