@@ -15,6 +15,7 @@
 
 #include "multi_sim_monitor.h"
 #include "string_ex.h"
+#include "observer_handler.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -54,7 +55,6 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
                 TELEPHONY_LOGE("MultiSimMonitor::INIT_DATA failed by nullptr");
                 return;
             }
-            controller_->Init();
             controller_->InitData();
             break;
         default:

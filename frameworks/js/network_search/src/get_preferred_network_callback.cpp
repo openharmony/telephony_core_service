@@ -26,7 +26,9 @@ GetPreferredNetworkCallback::GetPreferredNetworkCallback(PreferredNetworkModeCon
 
 int32_t WrapNativeNetworkMode(int32_t nativeMode)
 {
-    if ((nativeMode >= PREFERRED_NETWORK_MODE_AUTO) && (nativeMode <= PREFERRED_NETWORK_MODE_WCDMA_GSM)) {
+    TELEPHONY_LOGI("OnGetPreferredNetworkModelCallback11111 networkMode = %{public}d", nativeMode);
+    if ((nativeMode >= PREFERRED_NETWORK_MODE_AUTO) &&
+        (nativeMode <= PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA)) {
         return nativeMode;
     }
     return PREFERRED_NETWORK_MODE_AUTO;
@@ -41,10 +43,10 @@ void GetPreferredNetworkCallback::OnGetPreferredNetworkCallback(const int32_t ne
     std::unique_lock<std::mutex> callbackLock(asyncContext_->callbackMutex);
     TELEPHONY_LOGI("OnGetPreferredNetworkModelCallback networkMode = %{public}d,errorCode = %{public}d",
         networkMode, errorCode);
-    asyncContext_->resolved = (errorCode == HRIL_ERR_SUCCESS) && (asyncContext_->errorCode != SLOTID_INPUT_ERROR);
+    asyncContext_->resolved = errorCode == HRIL_ERR_SUCCESS;
     if (asyncContext_->resolved) {
         asyncContext_->preferredNetworkMode = WrapNativeNetworkMode(networkMode);
-    } else if (asyncContext_->errorCode == SLOTID_INPUT_ERROR) {
+    } else if (errorCode == SLOTID_INPUT_ERROR) {
         asyncContext_->errorCode = SLOTID_INPUT_ERROR;
     } else {
         asyncContext_->errorCode = errorCode;

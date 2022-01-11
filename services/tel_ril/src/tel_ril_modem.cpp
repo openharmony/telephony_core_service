@@ -24,9 +24,14 @@ void TelRilModem::AddHandlerToMap()
 {
     // indication
     memberFuncMap_[HNOTI_MODEM_RADIO_STATE_UPDATED] = &TelRilModem::RadioStateUpdated;
+    memberFuncMap_[HNOTI_MODEM_VOICE_TECH_UPDATED] = &TelRilModem::VoiceRadioTechUpdated;
     // response
+    memberFuncMap_[HNOTI_MODEM_VOICE_TECH_UPDATED] = &TelRilModem::VoiceRadioTechUpdated;
     memberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &TelRilModem::SetRadioStateResponse;
     memberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] = &TelRilModem::GetRadioStateResponse;
+    memberFuncMap_[HREQ_MODEM_GET_IMEI] = &TelRilModem::GetImeiResponse;
+    memberFuncMap_[HREQ_MODEM_GET_MEID] = &TelRilModem::GetMeidResponse;
+    memberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &TelRilModem::GetVoiceRadioTechnologyResponse;
 }
 
 TelRilModem::TelRilModem(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler)
@@ -185,6 +190,159 @@ void TelRilModem::GetRadioState(const AppExecFwk::InnerEvent::Pointer &response)
     }
 }
 
+
+void TelRilModem::GetImei(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_MODEM_GET_IMEI, response);
+        if (telRilRequest == nullptr) {
+            TELEPHONY_LOGE("TelRilModem GetImei::telRilRequest is nullptr");
+            return;
+        }
+        TELEPHONY_LOGI("TelRilModem GetImei:%{public}d", telRilRequest->serialId_);
+        SendInt32Event(HREQ_MODEM_GET_IMEI, telRilRequest->serialId_);
+    }
+}
+
+void TelRilModem::GetMeid(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_MODEM_GET_MEID, response);
+        if (telRilRequest == nullptr) {
+            TELEPHONY_LOGE("TelRilModem GetMeid::telRilRequest is nullptr");
+            return;
+        }
+        TELEPHONY_LOGI("TelRilModem GetMeid:%{public}d", telRilRequest->serialId_);
+        SendInt32Event(HREQ_MODEM_GET_MEID, telRilRequest->serialId_);
+    }
+}
+
+void TelRilModem::GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    std::shared_ptr<TelRilRequest> telRilRequest =
+        CreateTelRilRequest(HREQ_MODEM_GET_VOICE_RADIO, response);
+    if (telRilRequest == nullptr) {
+        TELEPHONY_LOGE("GetVoiceRadioTechnology::telRilRequest is nullptr");
+        return;
+    }
+
+    if (cellularRadio_ != nullptr) {
+        TELEPHONY_LOGI("GetVoiceRadioTechnology:%{public}d", telRilRequest->serialId_);
+        SendInt32Event(HREQ_MODEM_GET_VOICE_RADIO, telRilRequest->serialId_);
+    } else {
+        TELEPHONY_LOGE("%{public}s  cellularRadio_ == nullptr", __func__);
+        ErrorResponse(telRilRequest->serialId_, HRilErrType::HRIL_ERR_INVALID_RESPONSE);
+        return;
+    }
+}
+
+void TelRilModem::GetImeiResponse(MessageParcel &data)
+{
+    const char *buffer = data.ReadCString();
+    if (buffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : GetImeiResponse --> buffer == nullptr !!!");
+        return;
+    }
+    std::shared_ptr<std::string> imeiId = std::make_shared<std::string>(buffer);
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : GetImeiResponse --> spBuffer == nullptr!!!");
+        return;
+    }
+    const struct HRilRadioResponseInfo *radioResponseInfo =
+        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
+    if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        if (radioResponseInfo->error == HRilErrType::NONE) {
+            std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR : GetImeiResponse --> handler == nullptr !!!");
+                return;
+            }
+            uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
+            handler->SendEvent(eventId, imeiId);
+        } else {
+            ErrorResponse(telRilRequest, *radioResponseInfo);
+        }
+    } else {
+        TELEPHONY_LOGE("ERROR : GetImeiResponse --> telRilRequest == nullptr || radioResponseInfo error !!!");
+    }
+}
+
+void TelRilModem::GetMeidResponse(MessageParcel &data)
+{
+    const char *buffer = data.ReadCString();
+    if (buffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : GetMeidResponse --> buffer == nullptr !!!");
+        return;
+    }
+    std::shared_ptr<std::string> meidId = std::make_shared<std::string>(buffer);
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : GetMeidResponse --> spBuffer == nullptr!!!");
+        return;
+    }
+    const struct HRilRadioResponseInfo *radioResponseInfo =
+        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    TELEPHONY_LOGI(
+        "GetMeidResponse --> radioResponseInfo->serial:%{public}d, "
+        "radioResponseInfo->error:%{public}d",
+        radioResponseInfo->serial, radioResponseInfo->error);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
+    if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        if (radioResponseInfo->error == HRilErrType::NONE) {
+            std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR : GetMeidResponse --> handler == nullptr !!!");
+                return;
+            }
+            uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
+            handler->SendEvent(eventId, meidId);
+        } else {
+            ErrorResponse(telRilRequest, *radioResponseInfo);
+        }
+    } else {
+        TELEPHONY_LOGE("ERROR : GetMeidResponse --> telRilRequest == nullptr || radioResponseInfo error !!!");
+    }
+}
+
+
+void TelRilModem::GetVoiceRadioTechnologyResponse(MessageParcel &data)
+{
+    std::shared_ptr<VoiceRadioTechnology> voiceRadioTechnology = std::make_shared<VoiceRadioTechnology>();
+    if (voiceRadioTechnology == nullptr) {
+        TELEPHONY_LOGE("voiceRadioTechnology == nullptr");
+        return;
+    }
+    voiceRadioTechnology->ReadFromParcel(data);
+    const size_t readSpSize = sizeof(HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("GetVoiceRadioTechnologyResponse read spBuffer failed");
+        return;
+    }
+    const struct HRilRadioResponseInfo *radioResponseInfo =
+        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    if (radioResponseInfo == nullptr) {
+        TELEPHONY_LOGE("radioResponseInfo == nullptr");
+        return;
+    }
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
+    if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        if (radioResponseInfo->error == HRilErrType::NONE) {
+            std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
+            TELEPHONY_LOGI("GetVoiceRadioTechnologyResponse eventId:%{public}d", eventId);
+            voiceRadioTechnology->flag = telRilRequest->pointer_->GetParam();
+            handler->SendEvent(eventId, voiceRadioTechnology);
+        } else {
+            ErrorResponse(telRilRequest, *radioResponseInfo);
+        }
+    }
+}
+
 void TelRilModem::RadioStateUpdated(MessageParcel &data)
 {
     int32_t radioState = data.ReadInt32();
@@ -198,6 +356,19 @@ void TelRilModem::RadioStateUpdated(MessageParcel &data)
     std::shared_ptr<int32_t> state = std::make_shared<int32_t>();
     *state = radioState;
     observerHandler_->NotifyObserver(ObserverHandler::RADIO_STATE_CHANGED, state);
+}
+
+void TelRilModem::VoiceRadioTechUpdated(MessageParcel &data)
+{
+    std::shared_ptr<VoiceRadioTechnology> voiceInfo = std::make_shared<VoiceRadioTechnology>();
+    if (voiceInfo == nullptr) {
+        TELEPHONY_LOGE("voiceInfo == nullptr");
+        return;
+    }
+    voiceInfo->ReadFromParcel(data);
+    if (observerHandler_ != nullptr) {
+        observerHandler_->NotifyObserver(ObserverHandler::RADIO_VOICE_TECH_CHANGED, voiceInfo);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

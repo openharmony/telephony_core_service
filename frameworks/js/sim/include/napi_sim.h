@@ -25,14 +25,13 @@
 namespace OHOS {
 namespace Telephony {
 namespace {
-constexpr int32_t DEFAULT_ERROR = -1;
 constexpr size_t ARRAY_SIZE = 64;
 } // namespace
 
 template<typename T>
 struct AsyncContext {
     BaseContext context;
-    int32_t slotId = DEFAULT_ERROR;
+    int32_t slotId = ERROR_DEFAULT;
     T callbackVal;
 };
 
@@ -44,9 +43,9 @@ struct AsyncContext2 {
 
 struct AsyncContextPIN {
     AsyncContext<napi_value> pinContext;
-    int32_t result = DEFAULT_ERROR;
-    int32_t remain = DEFAULT_ERROR;
-    int32_t pinEnable = DEFAULT_ERROR;
+    int32_t result = ERROR_DEFAULT;
+    int32_t remain = ERROR_DEFAULT;
+    int32_t pinEnable = ERROR_DEFAULT;
     std::string inStr1 {};
     std::string inStr2 {};
 };
@@ -67,7 +66,7 @@ struct AsyncOperatorConfig {
 };
 
 struct TelNumbersInfo {
-    int32_t recordNumber = DEFAULT_ERROR;
+    int32_t recordNumber = ERROR_DEFAULT;
     std::array<char, ARRAY_SIZE> alphaTag {};
     std::array<char, ARRAY_SIZE> number {};
     std::array<char, ARRAY_SIZE> pin2 {};
@@ -76,7 +75,7 @@ struct TelNumbersInfo {
 template<typename T>
 struct AsyncDiallingNumbers {
     AsyncContext<T> asyncContext;
-    int32_t type = DEFAULT_ERROR;
+    int32_t type = ERROR_DEFAULT;
     std::vector<TelNumbersInfo> infoVec;
 };
 
@@ -84,6 +83,11 @@ struct AsyncVoiceMail {
     AsyncContext<bool> asyncContext;
     std::array<char, ARRAY_SIZE> mailName {};
     std::array<char, ARRAY_SIZE> mailNumber {};
+};
+
+struct AsyncGetLockState {
+    AsyncContext<int32_t> asyncContext;
+    int32_t lockType = ERROR_DEFAULT;
 };
 } // namespace Telephony
 } // namespace OHOS

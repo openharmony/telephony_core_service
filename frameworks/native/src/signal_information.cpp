@@ -20,17 +20,23 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t GSM_RXLEV_MINIMUM = 1;
+constexpr int32_t GSM_RXLEV_MINIMUM = 0;
 constexpr int32_t GSM_RXLEV_MAXIMUM = 63;
 constexpr int32_t GSM_RSSI_INVALID = -110;
 constexpr int32_t CDMA_RSSI_MINIMUM = 0;
-constexpr int32_t CDMA_RSSI_INVALID = -120;
+constexpr int32_t CDMA_RSSI_INVALID = -113;
 constexpr int32_t LTE_RSRP_MINIMUM = 0;
 constexpr int32_t LTE_RSRP_MAXIMUM = 99;
 constexpr int32_t LTE_RSSI_INVALID = -121;
 constexpr int32_t WCDMA_RSCP_MINIMUM = 0;
 constexpr int32_t WCDMA_RSCP_MAXIMUM = 99;
 constexpr int32_t WCDMA_RSSI_INVALID = -113;
+constexpr int32_t TD_SCDMA_RSCP_MINIMUM = 25;
+constexpr int32_t TD_SCDMA_RSCP_MAXIMUM = 112;
+constexpr int32_t TD_SCDMA_RSSI_INVALID = -113;
+constexpr int32_t NR_RSRP_MINIMUM = 0;
+constexpr int32_t NR_RSRP_MAXIMUM = 99;
+constexpr int32_t NR_RSSI_INVALID = -121;
 constexpr int32_t SIGNAL_LEVEL_INVALID = 0;
 constexpr int32_t SIGNAL_FIVE_BARS = 5;
 constexpr int32_t SIGNAL_FOUR_BARS = 4;
@@ -38,6 +44,8 @@ const int32_t *GSM_SIGNAL_THRESHOLD = SignalInformation::GSM_SIGNAL_THRESHOLD_5B
 const int32_t *CDMA_SIGNAL_THRESHOLD = SignalInformation::CDMA_SIGNAL_THRESHOLD_5BAR;
 const int32_t *LTE_SIGNAL_THRESHOLD = SignalInformation::LTE_SIGNAL_THRESHOLD_5BAR;
 const int32_t *WCDMA_SIGNAL_THRESHOLD = SignalInformation::WCDMA_SIGNAL_THRESHOLD_5BAR;
+const int32_t *TD_SCDMA_SIGNAL_THRESHOLD = SignalInformation::TD_SCDMA_SIGNAL_THRESHOLD_5BAR;
+const int32_t *NR_SIGNAL_THRESHOLD = SignalInformation::NR_SIGNAL_THRESHOLD_5BAR;
 int32_t SignalInformation::signalBar_ = SIGNAL_FIVE_BARS;
 
 SignalInformation::SignalInformation()
@@ -52,17 +60,21 @@ void SignalInformation::InitSignalBar(const int32_t bar)
         CDMA_SIGNAL_THRESHOLD = SignalInformation::CDMA_SIGNAL_THRESHOLD_4BAR;
         LTE_SIGNAL_THRESHOLD = SignalInformation::LTE_SIGNAL_THRESHOLD_4BAR;
         WCDMA_SIGNAL_THRESHOLD = SignalInformation::WCDMA_SIGNAL_THRESHOLD_4BAR;
+        TD_SCDMA_SIGNAL_THRESHOLD = SignalInformation::TD_SCDMA_SIGNAL_THRESHOLD_4BAR;
+        NR_SIGNAL_THRESHOLD = SignalInformation::NR_SIGNAL_THRESHOLD_4BAR;
         signalBar_ = SIGNAL_FOUR_BARS;
     } else {
         GSM_SIGNAL_THRESHOLD = SignalInformation::GSM_SIGNAL_THRESHOLD_5BAR;
         CDMA_SIGNAL_THRESHOLD = SignalInformation::CDMA_SIGNAL_THRESHOLD_5BAR;
         LTE_SIGNAL_THRESHOLD = SignalInformation::LTE_SIGNAL_THRESHOLD_5BAR;
         WCDMA_SIGNAL_THRESHOLD = SignalInformation::WCDMA_SIGNAL_THRESHOLD_5BAR;
+        TD_SCDMA_SIGNAL_THRESHOLD = SignalInformation::TD_SCDMA_SIGNAL_THRESHOLD_5BAR;
+        NR_SIGNAL_THRESHOLD = SignalInformation::NR_SIGNAL_THRESHOLD_5BAR;
         signalBar_ = SIGNAL_FIVE_BARS;
     }
 }
 
-std::unique_ptr<SignalInformation> SignalInformation::UnMarshalling(Parcel &parcel)
+std::unique_ptr<SignalInformation> SignalInformation::Unmarshalling(Parcel &parcel)
 {
     return nullptr;
 }
@@ -94,11 +106,8 @@ int32_t GsmSignalInformation::GetSignalLevel() const
     int32_t gsmRxlev = GetRssi();
     int32_t gsmRssi = GSM_RSSI_INVALID;
     if (ValidateGsmValue()) {
-        for (int32_t i = 0; i <= gsmRxlev; ++i) {
-            if (i != 0) {
-                ++gsmRssi;
-            }
-        }
+        // Reference: TS 27.007 section 8.69
+        gsmRssi += gsmRxlev;
         for (int32_t i = signalBar_; i >= 0; --i) {
             if (gsmRssi >= GSM_SIGNAL_THRESHOLD[i]) {
                 level = i;
@@ -149,7 +158,7 @@ bool GsmSignalInformation::Marshalling(Parcel &parcel) const
     return true;
 }
 
-std::unique_ptr<GsmSignalInformation> GsmSignalInformation::UnMarshalling(Parcel &parcel)
+std::unique_ptr<GsmSignalInformation> GsmSignalInformation::Unmarshalling(Parcel &parcel)
 {
     std::unique_ptr<GsmSignalInformation> signal = std::make_unique<GsmSignalInformation>();
     if (signal && !signal->ReadFromParcel(parcel)) {
@@ -171,7 +180,7 @@ bool GsmSignalInformation::ReadFromParcel(Parcel &parcel)
 
 bool GsmSignalInformation::ValidateGsmValue() const
 {
-    return (gsmRxlev_ >= GSM_RXLEV_MINIMUM && gsmRxlev_ <= GSM_RXLEV_MAXIMUM);
+    return (gsmRxlev_ > GSM_RXLEV_MINIMUM && gsmRxlev_ <= GSM_RXLEV_MAXIMUM);
 }
 
 void CdmaSignalInformation::SetValue(const int32_t cdmaRssi, const int32_t cdmaEcno)
@@ -187,17 +196,22 @@ bool CdmaSignalInformation::operator==(const CdmaSignalInformation &cdma) const
 
 int32_t CdmaSignalInformation::GetCdmaRssi() const
 {
-    return (cdmaRssi_ > CDMA_RSSI_MINIMUM) ? -cdmaRssi_ : CDMA_RSSI_INVALID;
+    return cdmaRssi_;
 }
 
 int32_t CdmaSignalInformation::GetSignalLevel() const
 {
     int32_t cdmaRssi = GetCdmaRssi();
     int32_t level = SIGNAL_LEVEL_INVALID;
-    for (int32_t i = signalBar_; i >= 0; --i) {
-        if (cdmaRssi >= CDMA_SIGNAL_THRESHOLD[i]) {
-            level = i;
-            break;
+    int32_t rssi = CDMA_RSSI_INVALID;
+    if (ValidateCdmaValue()) {
+        // Reference: TS 27.007 section 8.69
+        rssi += cdmaRssi;
+        for (int32_t i = signalBar_; i >= 0; --i) {
+            if (rssi >= CDMA_SIGNAL_THRESHOLD[i]) {
+                level = i;
+                break;
+            }
         }
     }
     return level;
@@ -241,7 +255,7 @@ bool CdmaSignalInformation::Marshalling(Parcel &parcel) const
     return true;
 }
 
-std::unique_ptr<CdmaSignalInformation> CdmaSignalInformation::UnMarshalling(Parcel &parcel)
+std::unique_ptr<CdmaSignalInformation> CdmaSignalInformation::Unmarshalling(Parcel &parcel)
 {
     std::unique_ptr<CdmaSignalInformation> signal = std::make_unique<CdmaSignalInformation>();
     if (signal && !signal->ReadFromParcel(parcel)) {
@@ -263,7 +277,7 @@ bool CdmaSignalInformation::ReadFromParcel(Parcel &parcel)
 
 bool CdmaSignalInformation::ValidateCdmaValue() const
 {
-    return (cdmaRssi_ > CDMA_RSSI_MINIMUM);
+    return (cdmaRssi_ > CDMA_RSSI_MINIMUM && cdmaRssi_ < -CDMA_RSSI_INVALID);
 }
 
 bool LteSignalInformation::operator==(const LteSignalInformation &lte) const
@@ -306,11 +320,8 @@ int32_t LteSignalInformation::GetSignalLevel() const
     int32_t lteRsrp = GetRsrp();
     int32_t lteRssi = LTE_RSSI_INVALID;
     if (ValidateLteValue()) {
-        for (int32_t i = 0; i <= lteRsrp; ++i) {
-            if (i != 0) {
-                ++lteRssi;
-            }
-        }
+        // Reference: TS 27.007 section 8.69
+        lteRssi += lteRsrp;
         for (int32_t i = signalBar_; i >= 0; --i) {
             if (lteRssi >= LTE_SIGNAL_THRESHOLD[i]) {
                 level = i;
@@ -367,7 +378,7 @@ bool LteSignalInformation::Marshalling(Parcel &parcel) const
     return true;
 }
 
-std::unique_ptr<LteSignalInformation> LteSignalInformation::UnMarshalling(Parcel &parcel)
+std::unique_ptr<LteSignalInformation> LteSignalInformation::Unmarshalling(Parcel &parcel)
 {
     std::unique_ptr<LteSignalInformation> signal = std::make_unique<LteSignalInformation>();
     if (signal && !signal->ReadFromParcel(parcel)) {
@@ -439,11 +450,8 @@ int32_t WcdmaSignalInformation::GetSignalLevel() const
     int32_t wcdmaRscp = GetRscp();
     int32_t wcdmaRssi = WCDMA_RSSI_INVALID;
     if (ValidateWcdmaValue()) {
-        for (int32_t i = 0; i <= wcdmaRscp; ++i) {
-            if (i != 0) {
-                ++wcdmaRssi;
-            }
-        }
+        // Reference: TS 27.007 section 8.69
+        wcdmaRssi += wcdmaRscp;
         for (int32_t i = signalBar_; i >= 0; --i) {
             if (wcdmaRssi >= WCDMA_SIGNAL_THRESHOLD[i]) {
                 level = i;
@@ -500,7 +508,7 @@ bool WcdmaSignalInformation::Marshalling(Parcel &parcel) const
     return true;
 }
 
-std::unique_ptr<WcdmaSignalInformation> WcdmaSignalInformation::UnMarshalling(Parcel &parcel)
+std::unique_ptr<WcdmaSignalInformation> WcdmaSignalInformation::Unmarshalling(Parcel &parcel)
 {
     std::unique_ptr<WcdmaSignalInformation> signal = std::make_unique<WcdmaSignalInformation>();
     if (signal && !signal->ReadFromParcel(parcel)) {
@@ -529,6 +537,210 @@ bool WcdmaSignalInformation::ReadFromParcel(Parcel &parcel)
 bool WcdmaSignalInformation::ValidateWcdmaValue() const
 {
     return (wcdmaRscp_ > WCDMA_RSCP_MINIMUM && wcdmaRscp_ <= WCDMA_RSCP_MAXIMUM);
+}
+
+bool TdScdmaSignalInformation::operator==(const TdScdmaSignalInformation &tdScdma) const
+{
+    return tdScdmaRscp_ == tdScdma.tdScdmaRscp_;
+}
+
+void TdScdmaSignalInformation::SetValue(const int32_t tdScdmaRscp)
+{
+    tdScdmaRscp_ = tdScdmaRscp;
+}
+
+int32_t TdScdmaSignalInformation::GetRscp() const
+{
+    return (tdScdmaRscp_ >= TD_SCDMA_RSCP_MINIMUM &&
+        tdScdmaRscp_ <= TD_SCDMA_RSCP_MAXIMUM) ? tdScdmaRscp_ : TD_SCDMA_RSSI_INVALID;
+}
+
+int32_t TdScdmaSignalInformation::GetSignalLevel() const
+{
+    int32_t tdScdmaRscp = GetRscp();
+    int32_t level = SIGNAL_LEVEL_INVALID;
+    int32_t tdScdmaRssi = TD_SCDMA_RSSI_INVALID;
+    if (ValidateTdScdmaValue()) {
+        // Reference: TS 27.007 section 8.69
+        tdScdmaRssi += tdScdmaRscp;
+        for (int32_t i = signalBar_; i >= 0; --i) {
+            if (tdScdmaRssi >= TD_SCDMA_SIGNAL_THRESHOLD[i]) {
+                level = i;
+                break;
+            }
+        }
+    }
+    return level;
+}
+
+SignalInformation::NetworkType TdScdmaSignalInformation::GetNetworkType() const
+{
+    return SignalInformation::NetworkType::TDSCDMA;
+}
+
+std::string TdScdmaSignalInformation::ToString() const
+{
+    int32_t netWorkType = static_cast<int32_t>(TdScdmaSignalInformation::GetNetworkType());
+    std::string content("networkType:" + std::to_string(netWorkType) + ",tdScdmaRscp:" + std::to_string(tdScdmaRscp_) +
+        ",signalLevel:" + std::to_string(TdScdmaSignalInformation::GetSignalLevel()));
+    return content;
+}
+
+sptr<SignalInformation> TdScdmaSignalInformation::NewInstance() const
+{
+    std::unique_ptr<TdScdmaSignalInformation> tdScdma = std::make_unique<TdScdmaSignalInformation>();
+    if (tdScdma == nullptr) {
+        return nullptr;
+    }
+    tdScdma->SetValue(this->tdScdmaRscp_);
+    return tdScdma.release();
+}
+
+bool TdScdmaSignalInformation::Marshalling(Parcel &parcel) const
+{
+    if (!parcel.WriteInt32(static_cast<int32_t>(SignalInformation::NetworkType::TDSCDMA))) {
+        return false;
+    }
+    if (!parcel.WriteInt32(tdScdmaRscp_)) {
+        return false;
+    }
+    return true;
+}
+
+std::unique_ptr<TdScdmaSignalInformation> TdScdmaSignalInformation::Unmarshalling(Parcel &parcel)
+{
+    std::unique_ptr<TdScdmaSignalInformation> signal = std::make_unique<TdScdmaSignalInformation>();
+    if (signal && !signal->ReadFromParcel(parcel)) {
+        signal = nullptr;
+    }
+    return signal;
+}
+
+bool TdScdmaSignalInformation::ReadFromParcel(Parcel &parcel)
+{
+    if (!parcel.ReadInt32(tdScdmaRscp_)) {
+        return false;
+    }
+    return true;
+}
+
+bool TdScdmaSignalInformation::ValidateTdScdmaValue() const
+{
+    return (tdScdmaRscp_ >= TD_SCDMA_RSCP_MINIMUM && tdScdmaRscp_ <= TD_SCDMA_RSCP_MAXIMUM);
+}
+
+bool NrSignalInformation::operator==(const NrSignalInformation &nr) const
+{
+    return nrRsrp_ == nr.nrRsrp_ && nrRsrq_ == nr.nrRsrq_ && nrSinr_ == nr.nrSinr_;
+}
+
+void NrSignalInformation::SetValue(const int32_t rsrp, const int32_t rsrq, const int32_t sinr)
+{
+    nrRsrp_ = rsrp;
+    nrRsrq_ = rsrq;
+    nrSinr_ = sinr;
+}
+
+int32_t NrSignalInformation::GetRsrp() const
+{
+    return nrRsrp_;
+}
+
+int32_t NrSignalInformation::GetRsrq() const
+{
+    return nrRsrq_;
+}
+
+int32_t NrSignalInformation::GetSinr() const
+{
+    return nrSinr_;
+}
+
+int32_t NrSignalInformation::GetSignalLevel() const
+{
+    int32_t nrRsrp = GetRsrp();
+    int32_t level = SIGNAL_LEVEL_INVALID;
+    int32_t rssi = NR_RSSI_INVALID;
+    if (ValidateNrValue()) {
+        // Reference: TS 27.007 section 8.69
+        rssi += nrRsrp;
+        for (int32_t i = signalBar_; i >= 0; --i) {
+            if (rssi >= NR_SIGNAL_THRESHOLD[i]) {
+                level = i;
+                break;
+            }
+        }
+    }
+    return level;
+}
+
+SignalInformation::NetworkType NrSignalInformation::GetNetworkType() const
+{
+    return SignalInformation::NetworkType::NR;
+}
+
+std::string NrSignalInformation::ToString() const
+{
+    int32_t netWorkType = static_cast<int32_t>(NrSignalInformation::GetNetworkType());
+    std::string content("networkType:" + std::to_string(netWorkType) + ",nrRsrp:" + std::to_string(nrRsrp_) +
+                        ",nrRsrq:" + std::to_string(nrRsrq_) + ",nrSinr:" + std::to_string(nrSinr_) +
+                        ",signalLevel:" + std::to_string(NrSignalInformation::GetSignalLevel()));
+    return content;
+}
+
+sptr<SignalInformation> NrSignalInformation::NewInstance() const
+{
+    std::unique_ptr<NrSignalInformation> nr = std::make_unique<NrSignalInformation>();
+    if (nr == nullptr) {
+        return nullptr;
+    }
+    nr->SetValue(this->nrRsrp_, this->nrRsrq_, this->nrSinr_);
+    return nr.release();
+}
+
+bool NrSignalInformation::Marshalling(Parcel &parcel) const
+{
+    if (!parcel.WriteInt32(static_cast<int32_t>(SignalInformation::NetworkType::NR))) {
+        return false;
+    }
+    if (!parcel.WriteInt32(nrRsrp_)) {
+        return false;
+    }
+    if (!parcel.WriteInt32(nrRsrq_)) {
+        return false;
+    }
+    if (!parcel.WriteInt32(nrSinr_)) {
+        return false;
+    }
+    return true;
+}
+
+std::unique_ptr<NrSignalInformation> NrSignalInformation::Unmarshalling(Parcel &parcel)
+{
+    std::unique_ptr<NrSignalInformation> signal = std::make_unique<NrSignalInformation>();
+    if (signal && !signal->ReadFromParcel(parcel)) {
+        signal = nullptr;
+    }
+    return signal;
+}
+
+bool NrSignalInformation::ReadFromParcel(Parcel &parcel)
+{
+    if (!parcel.ReadInt32(nrRsrp_)) {
+        return false;
+    }
+    if (!parcel.ReadInt32(nrRsrq_)) {
+        return false;
+    }
+    if (!parcel.ReadInt32(nrSinr_)) {
+        return false;
+    }
+    return true;
+}
+
+bool NrSignalInformation::ValidateNrValue() const
+{
+    return (nrRsrp_ > NR_RSRP_MINIMUM && nrRsrp_ <= NR_RSRP_MAXIMUM);
 }
 } // namespace Telephony
 } // namespace OHOS

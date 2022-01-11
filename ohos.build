@@ -8,8 +8,7 @@
                 "//base/telephony/core_service/services/etc/init:telephony.cfg",
                 "//base/telephony/core_service/frameworks/native:tel_core_service_api",
                 "//base/telephony/core_service/frameworks/js/network_search:radio",
-                "//base/telephony/core_service/frameworks/js/sim:sim",
-                "//base/telephony/core_service/interfaces/innerkits/cellular_data:tel_cellular_data_api"
+                "//base/telephony/core_service/frameworks/js/sim:sim"
             ],
             "inner_kits": [
                 {
@@ -23,24 +22,11 @@
                             "signal_information.h",
                             "network_information.h",
                             "network_search_result.h",
-                            "radio_network_manager.h",
                             "dialling_numbers_info.h",
-                            "sim_card_manager.h",
-                            "core_service_client.h"                        ]
+                            "core_service_client.h"
+                        ]
                     },
                     "name":"//base/telephony/core_service/frameworks/native:tel_core_service_api"
-                },
-
-                {
-                    "type": "so",
-                    "name": "//base/telephony/core_service/interfaces/innerkits/cellular_data:tel_cellular_data_api",
-                    "header": {
-                        "header_files": [
-                            "cellular_data_client.h",
-                            "i_cellular_data_manager.h"
-                        ],
-                        "header_base": "//base/telephony/core_service/interfaces/innerkits/cellular_data"
-                    }
                 }
             ],
 

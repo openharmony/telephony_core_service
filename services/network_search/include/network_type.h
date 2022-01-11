@@ -31,12 +31,8 @@ public:
     virtual ~NetworkType() = default;
     void ProcessGetPreferredNetwork(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessSetPreferredNetwork(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) const;
-    void UpdatePhone(RadioTech csRadioTech);
-    void SetPhoneType(PhoneType phoneType);
-    PhoneType GetPhoneType() const;
 
 private:
-    PhoneType phoneType_ = PhoneType::PHONE_TYPE_IS_GSM;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
 };
 } // namespace Telephony

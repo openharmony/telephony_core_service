@@ -29,13 +29,16 @@
 #include "i_network_search.h"
 #include "sim_constant.h"
 #include "sim_rdb_helper.h"
-#include "telephony_state_registry_proxy.h"
+#include "sim_data.h"
+#include "rdb_sim_helper.h"
+#include "radio_cap_controller.h"
 
 namespace OHOS {
 namespace Telephony {
 class MultiSimController {
 public:
-    MultiSimController(std::shared_ptr<ISimStateManager> simStateManager,
+    MultiSimController(std::shared_ptr<ITelRilManager> telRilManager,
+        std::shared_ptr<ISimStateManager> simStateManager,
         std::shared_ptr<ISimFileManager> simFileManager,
         std::shared_ptr<INetworkSearch> networkSearchManager,
         int32_t slotId);
@@ -50,12 +53,16 @@ public:
     bool GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
     int32_t GetDefaultCellularDataSlotId();
     bool SetDefaultCellularDataSlotId(int32_t slotId);
+    int32_t GetPrimarySlotId();
+    bool SetPrimarySlotId(int32_t slotId);
     std::u16string GetShowNumber(int32_t slotId);
     bool SetShowNumber(int32_t slotId, std::u16string Number, bool force = false);
     std::u16string GetShowName(int32_t slotId);
     bool SetShowName(int32_t slotId, std::u16string name, bool force = false);
     bool IsSimActive(int32_t slotId);
     bool SetActiveSim(int32_t slotId, int32_t enable, bool force = false);
+    bool SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable);
+    void CreateRadioCapController(std::shared_ptr<AppExecFwk::EventRunner> runner);
 
     std::vector<IccAccountInfo> iccAccountInfoList_;
 
@@ -66,8 +73,12 @@ private:
     bool InitActive(int slotId);
     bool InitIccId(int slotId);
     bool GetListFromDataBase();
+    void SortCache();
     std::u16string GetIccId(int32_t slotId);
     bool SetIccId(int32_t slotId, std::u16string iccId);
+    int32_t GetDefaultCellularDataSlotIdUnit();
+    bool SetRadioProtocol(int32_t slotId, int32_t protocol);
+    bool AnnounceDefaultMainSlotIdChanged(int32_t slotId);
     bool AnnounceDefaultVoiceSlotIdChanged(int32_t slotId);
     bool AnnounceDefaultSmsSlotIdChanged(int32_t slotId);
     bool AnnounceDefaultCellularDataSlotIdChanged(int32_t slotId);
@@ -75,17 +86,25 @@ private:
 
     const static int32_t EVENT_CODE = 1;
     const static int32_t EMPTY_VECTOR = 0;
+    const static int32_t SUCCESS = 0;
+    const static int32_t ACTIVE_INIT = -1;
     int32_t slotId_;
     int32_t maxCount_;
-    inline static const std::string DEFAULT_VOICE_SLOTID_CHANGE_ACTION = "com.hos.action.DEFAULT_VOICE_SLOTID_CHANGE";
-    inline static const std::string DEFAULT_SMS_SLOTID_CHANGE_ACTION = "com.hos.action.DEFAULT_SMS_SLOTID_CHANGE";
-    inline static const std::string DEFAULT_DATA_SLOTID_CHANGE_ACTION = "con.hos.action.DEFAULT_DATA_SLOTID_CHANGE";
+    inline static const std::string DEFAULT_VOICE_SLOTID_CHANGE_ACTION =
+        "com.hos.action.DEFAULT_VOICE_SUBSCRIPTION_CHANGED";
+    inline static const std::string DEFAULT_SMS_SLOTID_CHANGE_ACTION =
+        "com.hos.action.DEFAULT_SMS_SUBSCRIPTION_CHANGED";
+    inline static const std::string DEFAULT_DATA_SLOTID_CHANGE_ACTION =
+        "com.hos.action.DEFAULT_DATA_SUBSCRIPTION_CHANGED";
+    inline static const std::string DEFAULT_MAIN_SLOTID_CHANGE_ACTION =
+        "com.hos.action.MAIN_SUBSCRIPTION_CHANGED";
     inline static const std::string PARAM_SLOTID = "slotId";
     inline static const std::string DEFAULT_VOICE_SLOT_CHANGED = "defaultVoiceSlotChanged";
     inline static const std::string DEFAULT_SMS_SLOT_CHANGED = "defaultSmsSlotChanged";
     inline static const std::string DEFAULT_CELLULAR_DATA_SLOT_CHANGED = "defaultCellularDataChanged";
-    inline static const std::u16string DEFAULT_ICC_ID = u"";
+    inline static const std::string DEFAULT_MAIN_SLOT_CHANGED = "defaultMainSlotChanged";
     inline static bool lackSim_;
+    std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<ISimStateManager> simStateManager_ = nullptr;
     std::shared_ptr<ISimFileManager> simFileManager_ = nullptr;
     std::shared_ptr<INetworkSearch> netWorkSearchManager_ = nullptr;
@@ -93,6 +112,7 @@ private:
     IccAccountInfo iccAccountInfo_;
     static std::vector<SimRdbInfo> localCacheInfo_;
     static std::mutex mutex_;
+    std::shared_ptr<RadioCapController> radioCapController_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

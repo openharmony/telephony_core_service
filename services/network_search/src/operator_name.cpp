@@ -23,26 +23,25 @@
 #include "hril_network_parcel.h"
 #include "network_search_manager.h"
 #include "telephony_log_wrapper.h"
+#include "resource_utils.h"
+#include "sim_constant.h"
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
-const std::string EMERGENCY_ONLY = "Emergency only";
-const std::string NO_SERVICE = "No service";
-
 OperatorName::OperatorName(std::shared_ptr<NetworkSearchState> networkSearchState,
     std::shared_ptr<ISimFileManager> simFileManager, std::weak_ptr<NetworkSearchManager> networkSearchManager)
     : networkSearchState_(networkSearchState), simFileManager_(simFileManager),
-    networkSearchManager_(networkSearchManager)
+      networkSearchManager_(networkSearchManager)
 {}
 
 void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (phone_.PhoneTypeGsmOrNot()) {
+    if (phoneType_ == PhoneType::PHONE_TYPE_IS_GSM) {
         GsmOperatorInfo(event);
     }
-    if (phone_.PhoneTypeCdmaOrNot()) {
+    if (phoneType_ == PhoneType::PHONE_TYPE_IS_CDMA) {
         CdmaOperatorInfo(event);
     }
 
@@ -130,51 +129,122 @@ void OperatorName::NotifySpnChanged()
     } else {
         TELEPHONY_LOGE("OperatorName::NotifySpnChanged networkState is nullptr");
     }
-    if (phone_.PhoneTypeGsmOrNot()) {
-        int32_t spnRule = 0;
-        std::string plmn = "";
-        bool showPlmn = false;
-        if (networkState != nullptr) {
-            bool roaming = networkState->IsRoaming();
-            std::string numeric = networkState->GetPlmnNumeric();
-            if (simFileManager_ != nullptr) {
-                spnRule = simFileManager_->ObtainSpnCondition(roaming, numeric);
-            }
+    if (phoneType_ == PhoneType::PHONE_TYPE_IS_GSM) {
+        NotifyGsmSpnChanged(regStatus, networkState);
+    } else {
+        NotifyCdmaSpnChanged(regStatus, networkState);
+    }
+}
+
+void OperatorName::UpdatePlmn(RegServiceState regStatus, sptr<NetworkState> &networkState, int32_t spnRule,
+    std::string &plmn, bool &showPlmn)
+{
+    if (networkState != nullptr) {
+        switch (regStatus) {
+            case RegServiceState::REG_STATE_IN_SERVICE:
+                plmn = networkState->GetLongOperatorName();
+                showPlmn = !plmn.empty() && (spnRule == SpnShowType::SPN_CONDITION_DISPLAY_PLMN);
+                break;
+            case RegServiceState::REG_STATE_NO_SERVICE:
+            case RegServiceState::REG_STATE_EMERGENCY_ONLY:
+            case RegServiceState::REG_STATE_SEARCH:
+                if (networkState->IsEmergency()) {
+                    NetworkSearchManager::GetResourceUtils()->GetValueByName<std::string>(
+                        ResourceUtils::EMERGENCY_CALLS_ONLY, plmn);
+                } else {
+                    NetworkSearchManager::GetResourceUtils()->GetValueByName<std::string>(
+                        ResourceUtils::LOCKSCREEN_CARRIER_DEFAULT, plmn);
+                }
+                showPlmn = true;
+                break;
+            case RegServiceState::REG_STATE_UNKNOWN:
+            default:
+                NetworkSearchManager::GetResourceUtils()->GetValueByName<std::string>(
+                    ResourceUtils::LOCKSCREEN_CARRIER_DEFAULT, plmn);
+                showPlmn = true;
+                break;
         }
-        if (regStatus == RegServiceState::REG_STATE_IN_SERVICE && networkState != nullptr) {
+    }
+}
+
+void OperatorName::UpdateSpn(
+    RegServiceState regStatus, sptr<NetworkState> &networkState, int32_t spnRule, std::string &spn, bool &showSpn)
+{
+    std::u16string result = Str8ToStr16("");
+    if (simFileManager_ != nullptr) {
+        result = simFileManager_->GetSimSpn(CoreManager::DEFAULT_SLOT_ID);
+    }
+    spn = Str16ToStr8(result);
+    showSpn = !spn.empty() && (spnRule == SpnShowType::SPN_CONDITION_DISPLAY_SPN);
+    if (regStatus != RegServiceState::REG_STATE_IN_SERVICE) {
+        spn = "";
+        showSpn = false;
+    }
+}
+
+void OperatorName::NotifyGsmSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState)
+{
+    int32_t spnRule = 0;
+    std::string plmn = "";
+    std::string spn = "";
+    bool showPlmn = false;
+    bool showSpn = false;
+    if (networkState != nullptr) {
+        bool roaming = networkState->IsRoaming();
+        std::string numeric = networkState->GetPlmnNumeric();
+        if (simFileManager_ != nullptr) {
+            spnRule = simFileManager_->ObtainSpnCondition(roaming, numeric);
+        }
+    }
+    UpdatePlmn(regStatus, networkState, spnRule, plmn, showPlmn);
+    UpdateSpn(regStatus, networkState, spnRule, spn, showSpn);
+    if (curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn ||
+        curPlmnShow_ != showPlmn || curSpn_.compare(spn) != 0 || curPlmn_.compare(plmn) != 0) {
+        TELEPHONY_LOGI("OperatorName::NotifySpnChanged start send broadcast......\n");
+        PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn);
+    } else {
+        TELEPHONY_LOGE("OperatorName::NotifySpnChanged spn no changed, not need to update!");
+    }
+}
+
+void OperatorName::NotifyCdmaSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState)
+{
+    int32_t spnRule = 0;
+    std::string plmn = "";
+    std::string spn = "";
+    bool showPlmn = false;
+    bool showSpn = false;
+    if (networkState != nullptr) {
+        bool roaming = networkState->IsRoaming();
+        std::string numeric = networkState->GetPlmnNumeric();
+        if (simFileManager_ != nullptr) {
+            spnRule = simFileManager_->ObtainSpnCondition(roaming, numeric);
+        }
+    }
+    if (networkState != nullptr) {
+        if (regStatus == RegServiceState::REG_STATE_IN_SERVICE) {
             plmn = networkState->GetLongOperatorName();
-            showPlmn = !plmn.empty();
+        } else if (regStatus == RegServiceState::REG_STATE_NO_SERVICE) {
+            NetworkSearchManager::GetResourceUtils()->GetValueByName<std::string>(
+                ResourceUtils::LOCKSCREEN_CARRIER_DEFAULT, plmn);
         } else {
             plmn = "";
-            showPlmn = true;
         }
-
-        bool showSpn = false;
-        std::string spn = "";
-        std::u16string result = Str8ToStr16("");
-        if (simFileManager_ != nullptr) {
-            result = simFileManager_->GetSimSpn(CoreManager::DEFAULT_SLOT_ID);
-        }
-        spn = Str16ToStr8(result);
-        showSpn = !spn.empty();
-        if (regStatus == RegServiceState::REG_STATE_UNKNOWN) {
-            spn = "";
-            showSpn = false;
-        }
-        if (curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn ||
-            curPlmnShow_ != showPlmn || curSpn_.compare(spn) != 0 || curPlmn_.compare(plmn) != 0) {
-            TELEPHONY_LOGI("OperatorName::NotifySpnChanged start send broadcast......\n");
-            PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn);
-        } else {
-            TELEPHONY_LOGE("OperatorName::NotifySpnChanged spn no changed, not need to update!");
-        }
+    }
+    showPlmn = !plmn.empty() && (spnRule == SpnShowType::SPN_CONDITION_DISPLAY_PLMN);
+    if (curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn ||
+        curPlmnShow_ != showPlmn || curSpn_.compare(spn) != 0 || curPlmn_.compare(plmn) != 0) {
+        TELEPHONY_LOGI("OperatorName::NotifySpnChanged start send broadcast......\n");
+        PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn);
+    } else {
+        TELEPHONY_LOGI("OperatorName::NotifySpnChanged spn no changed, not need to update!");
     }
 }
 
 void OperatorName::PublishEvent(const int32_t rule, const RegServiceState state, const bool showPlmn,
     const std::string &plmn, const bool showSpn, const std::string &spn)
 {
-    TELEPHONY_LOGI("OperatorName::PublishEvent\n");
+    TELEPHONY_LOGI("OperatorName::PublishEvent %{public}s %{public}s", plmn.c_str(), spn.c_str());
     Want want;
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SPN_INFO_UPDATED);
     want.SetParam(CUR_SPN_SHOW_RULE, rule);

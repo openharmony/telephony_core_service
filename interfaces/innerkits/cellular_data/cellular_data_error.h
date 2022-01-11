@@ -16,7 +16,7 @@
 #ifndef CELLULAR_DATA_ERROR_H
 #define CELLULAR_DATA_ERROR_H
 
-#include "../core/telephony_errors.h"
+#include "telephony_errors.h"
 
 namespace OHOS {
 namespace Telephony {

@@ -19,7 +19,6 @@
 #include <gtest/gtest.h>
 
 #include "core_service_client.h"
-
 namespace OHOS {
 namespace Telephony {
 enum class DiffInterfaceId {
@@ -36,16 +35,16 @@ enum class DiffInterfaceId {
     TEST_UNLOCK_SIM_PIN2,
     TEST_GET_PIN2_INPUT_TIMES,
     TEST_ENABLE_SIM_CARD,
-    TEST_SET_RILCM_CELL_INFO_LIST_RATE,
-    TEST_SET_RILCM_INITIAL_ATTACH_APN,
     TEST_SET_RILCM_DATA_PROFILE,
     TEST_GET_RILCM_VOICE_REGISTRATION_STATE,
     TEST_GET_RILCM_DATA_REGISTRATION_STATE,
     TEST_SEND_SMS_ACK,
-    TEST_SETUP_RILCM_DATA_CALL,
-    TEST_DEACTIVATE_RILCM_DATA_CALL,
-    TEST_GET_RILCM_DATA_CALL_LIST,
-    TEST_SET_BASE_DATA_ALLOWED,
+    TEST_RILCM_SET_INIT_APN_INFO,
+    TEST_RILCM_SETUP_DATA_CALL,
+    TEST_RILCM_DEACTIVATE_DATA_CALL,
+    TEST_RILCM_GET_DATA_CALL_LIST,
+    TEST_RILCM_GET_LINK_BANDWIDTH_INFO,
+    TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE,
     TEST_GET_SIGNAL_STRENGTH,
     TEST_CALL_DIAL,
     TEST_HANDUP_CONNECT,
@@ -81,8 +80,11 @@ enum class DiffInterfaceId {
     TEST_SET_CDMA_CB_CONFIG,
     TEST_GET_CB_CONFIG,
     TEST_GET_CDMA_CB_CONFIG,
-    TEST_ACTIVE_CDMA_CB_CONFIG,
     TEST_SEND_SMS_EXPECT_MORE,
+    TEST_ADD_CDMA_SMS,
+    TEST_DEL_CDMA_SMS,
+    TEST_UPDATE_CDMA_SMS,
+
     TEST_SET_POWER_STATE,
     TEST_GET_POWER_STATE,
     TEST_OPERATOR,
@@ -94,9 +96,20 @@ enum class DiffInterfaceId {
     TEST_GET_PREFERRED_NETWORK_TYPE,
     TEST_SET_PREFERRED_NETWORK_TYPE,
     TEST_GET_IMEI,
+    TEST_GET_MEID,
     TEST_GET_IMS_REG_STATUS,
     TEST_GET_PS_ATTACH_STATUS,
     TEST_SET_PS_ATTACH_STATUS,
+    TEST_GET_RADIO_CAPABILITY,
+    TEST_SET_RADIO_CAPABILITY,
+    TEST_GET_VOICE_RADIO_INFO,
+    TEST_GET_PHYSICAL_CHANNEL_CONFIG,
+    TEST_SET_LOCATE_UPDATES,
+    TEST_SET_USSD_CUSD,
+    TEST_GET_USSD_CUSD,
+    TEST_SET_CMUT,
+    TEST_GET_CMUT,
+    TEST_GET_EMERGENCY_CALL_LIST,
     TEST_EXIT
 };
 
@@ -169,6 +182,8 @@ private:
     void SetCallRestrictionTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void NetworkVoiceRegistrationStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void NetworkDataRegistrationStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void GetRadioCapabilityTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void SetRadioCapabilityTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetCallForwardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetCallForwardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void NetworkOperatorTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -181,13 +196,23 @@ private:
     void SetRilCmCBConfigTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetRilCmCdmaCBConfigTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetRilCmCBConfigTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void GetCdmaCBConfigTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void GetRilCmCdmaCBConfigTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SmsSendSmsExpectMoreTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetRadioStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetRadioStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SmsAcknowledgeTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void AddRilCmCdmaSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void DelRilCmCdmaSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void UpdateRilCmCdmaSmsTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+
+    /* =========== Cellular Data Start ============= */
+    void DataSetInitApnInfoTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void DataSetupDataCallTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void DataDisableDataCallTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void GetLinkBandwidthInfoTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestSetLinkBandwidthReportingRuleTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    /* =========== Cellular Data End ============= */
+
     void GetDataCallListTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetNetworkSearchInformationTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetNetworkSelectionModeTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -199,8 +224,14 @@ private:
     void GetImsRegStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetPsAttachStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetPsAttachStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void GetVoiceRadioTechnologyTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void GetPhysicalChannelConfigTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void SetLocateUpdatesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetUssdCusdTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetUssdCusdTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void SetMuteTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void GetMuteTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void GetEmergencyCallListTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     int32_t GetRandNum();
     std::string GetRandPhoneNum(const int len);

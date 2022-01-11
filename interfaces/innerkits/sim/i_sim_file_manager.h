@@ -21,7 +21,7 @@ namespace Telephony {
 class ISimFileManager {
 public:
     using HANDLE = std::shared_ptr<AppExecFwk::EventHandler>;
-    virtual void Init() {}
+    virtual void Init(int slotId) {}
     virtual std::u16string GetSimOperatorNumeric(int32_t slotId) = 0;
     virtual std::u16string GetISOCountryCodeForSim(int32_t slotId) = 0;
     virtual std::u16string GetSimSpn(int32_t slotId) = 0;
@@ -30,6 +30,7 @@ public:
     virtual std::u16string GetLocaleFromDefaultSim() = 0;
     virtual std::u16string GetSimGid1(int32_t slotId) = 0;
     virtual std::u16string GetSimTelephoneNumber(int32_t slotId) = 0;
+    virtual std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) = 0;
     virtual std::u16string GetVoiceMailIdentifier(int32_t slotId) = 0;
     virtual std::u16string GetVoiceMailNumber(int32_t slotId) = 0;
     virtual int ObtainSpnCondition(bool roaming, std::string operatorNum) = 0;

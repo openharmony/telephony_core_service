@@ -32,6 +32,7 @@ public:
     static constexpr const char *CARD_TYPE = "card_type";
     static constexpr const char *IS_ACTIVE = "is_active";
     static constexpr const char *IS_MAIN_CARD = "is_main_card";
+    static constexpr const char *IS_VOICE_CARD = "is_voice_card";
     static constexpr const char *IS_MESSAGE_CARD = "is_message_card";
     static constexpr const char *IS_CELLULAR_DATA_CARD = "is_cellular_data_card";
     inline static const std::string SIM_RDB_URI = "dataability:///com.ohos.simability/sim/sim_info";
@@ -48,12 +49,14 @@ public:
     std::string language;
     std::string imsi;
     int isMainCard;
+    int isVoiceCard;
     int isMessageCard;
     int isCellularDataCard;
     int isActive;
 };
 
 enum class DefaultCardType {
+    MAIN,
     VOICE,
     SMS,
     CELLULAR_DATA,

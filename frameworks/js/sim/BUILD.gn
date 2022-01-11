@@ -42,6 +42,7 @@ ohos_shared_library("sim") {
   deps = [
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/frameworks/native:tel_core_service_api",
+    "$SUBSYSTEM_DIR/ril_adapter/services/hril:hril",
     "//base/telephony/core_service/utils:libtelephony_common",
     "//foundation/ace/napi:ace_napi",
     "//utils/native/base:utils",
@@ -51,7 +52,6 @@ ohos_shared_library("sim") {
     "appexecfwk_standard:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "ril_adapter:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]

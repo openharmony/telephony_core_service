@@ -337,7 +337,7 @@ public:
      */
     void SetCallPreferenceResponse(MessageParcel &data);
 
-  /**
+    /**
      *  @brief get voice call preference mode
      */
     void GetCallPreferenceMode(const AppExecFwk::InnerEvent::Pointer &result);
@@ -349,7 +349,7 @@ public:
      */
     void GetCallPreferenceResponse(MessageParcel &data);
 
-       /**
+    /**
      *  @brief set IMS service capability switch
      */
     void SetLteImsSwitchStatus(const int32_t active, const AppExecFwk::InnerEvent::Pointer &result);
@@ -361,7 +361,7 @@ public:
      */
     void SetLteImsSwitchStatusResponse(MessageParcel &data);
 
-  /**
+    /**
      *  @brief get IMS service capability switch
      */
     void GetLteImsSwitchStatus(const AppExecFwk::InnerEvent::Pointer &result);
@@ -374,46 +374,143 @@ public:
     void GetLteImsSwitchStatusResponse(MessageParcel &data);
 
     /**
+     *  @brief set ussd cusd
+     */
+    void SetUssdCusd(const std::string str, const AppExecFwk::InnerEvent::Pointer &result);
+    /**
+     * @brief set ussd cusd response
+     *
+     * @param data is HDF service callback message
+     */
+    void SetUssdCusdResponse(MessageParcel &data);
+    /**
+     *  @brief get ussd cusd
+     */
+    void GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result);
+    /**
+     * @brief get ussd cusd response
+     *
+     * @param data is HDF service callback message
+     */
+    void GetUssdCusdResponse(MessageParcel &data);
+
+    /**
      * @brief call cring notice
      *
      * @param data is HDF service callback message
      */
     void CallCringNotice(MessageParcel &data);
 
-        /**
+    /**
      * @brief call waiti notice
      *
      * @param data is HDF service callback message
      */
     void CallWaitingNotice(MessageParcel &data);
 
-        /**
+    /**
      * @brief call connect notice
      *
      * @param data is HDF service callback message
      */
     void CallConnectNotice(MessageParcel &data);
 
-        /**
+    /**
      * @brief call end notice
      *
      * @param data is HDF service callback message
      */
     void CallEndNotice(MessageParcel &data);
 
-            /**
+    /**
      * @brief call status info notice
      *
      * @param data is HDF service callback message
      */
     void CallStatusInfoNotice(MessageParcel &data);
 
-            /**
+    /**
      * @brief call Ims service status notice
      *
      * @param data is HDF service callback message
      */
     void CallImsServiceStatusNotice(MessageParcel &data);
+
+    /**
+     * @brief call ussd cusd notice
+     *
+     * @param data is HDF service callback message
+     */
+    void CallUssdCusdNotice(MessageParcel &data);
+
+    /**
+     *  @brief set ussd cusd
+     */
+    void SetMute(const int32_t mute, const AppExecFwk::InnerEvent::Pointer &result);
+
+    /**
+     * @brief set ussd cusd response
+     *
+     * @param data is HDF service callback message
+     */
+    void SetMuteResponse(MessageParcel &data);
+
+      /**
+     *  @brief get mute  cmut
+     */
+    void GetMute(const AppExecFwk::InnerEvent::Pointer &result);
+
+    /**
+     * @brief get mute cmut response
+     *
+     * @param data is HDF service callback message
+     */
+    void GetMuteResponse(MessageParcel &data);
+
+          /**
+     *  @brief get call list
+     */
+    void GetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &result);
+
+    /**
+     * @brief get call list response
+     *
+     * @param data is HDF service callback message
+     */
+    void GetEmergencyCallListResponse(MessageParcel &data);
+
+    /**
+     *  @brief get mute  cmut
+     */
+    void GetCallFailReason(const AppExecFwk::InnerEvent::Pointer &result);
+
+    /**
+     * @brief get mute cmut response
+     *
+     * @param data is HDF service callback message
+     */
+    void GetCallFailReasonResponse(MessageParcel &data);
+
+    /**
+     * @brief report of ringback voice
+     *
+     * @param data is HDF service callback message
+     */
+    void CallRingbackVoiceNotice(MessageParcel &data);
+
+    /**
+     * @brief report of srvcc
+     *
+     * @param data is HDF service callback message
+     */
+    void SrvccStatusNotice(MessageParcel &data);
+
+     /**
+     * @brief call XLEMA notice
+     *
+     * @param data is HDF service callback message
+     */
+    void CallEmergencyNotice(MessageParcel &data);
 
 private:
     bool IsCallResponse(uint32_t code);

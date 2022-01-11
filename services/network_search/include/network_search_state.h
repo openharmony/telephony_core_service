@@ -23,19 +23,6 @@
 
 namespace OHOS {
 namespace Telephony {
-class PhoneAbstract {
-public:
-    bool PhoneTypeGsmOrNot() const
-    {
-        return true;
-    }
-
-    bool PhoneTypeCdmaOrNot() const
-    {
-        return true;
-    }
-};
-
 class NetworkSearchManager;
 class NetworkSearchState {
 public:
@@ -49,8 +36,8 @@ public:
     void SetNetworkState(RegServiceState state, DomainType domainType);
     void SetNetworkStateToRoaming(RoamingType roamingType, DomainType domainType);
     void SetInitial();
-    bool GsmOrNot(RadioTech radioTechnology) const;
-    bool CdmaOrNot(RadioTech radioTechnology) const;
+    void SetNrState(NrState state);
+    void SetCfgTech(RadioTech tech);
     std::unique_ptr<NetworkState> GetNetworkStatus();
     bool GetImsStatus();
     void SetImsStatus(bool imsRegStatus);
@@ -58,6 +45,11 @@ public:
     void CsRadioTechChange();
 
 private:
+    void NotifyPsRegStatusChange();
+    void NotifyPsRoamingStatusChange();
+    void NotifyPsRadioTechChange();
+    void NotifyEmergencyChange();
+    void NotifyNrStateChange();
     std::mutex mutex_;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     std::shared_ptr<NetworkState> networkState_ = nullptr;

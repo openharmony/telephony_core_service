@@ -164,21 +164,5 @@ int TelProfileUtil::RefreshSync()
     }
     return ptr->FlushSync();
 }
-
-void TelProfileUtil::RegisterObserver(std::shared_ptr<NativePreferences::PreferencesObserver> preferencesObserver)
-{
-    std::shared_ptr<NativePreferences::Preferences> ptr = GetProfiles(path_, errCode_);
-    if (ptr != nullptr) {
-        ptr->RegisterObserver(preferencesObserver);
-    }
-}
-
-void TelProfileUtil::UnRegisterObserver(std::shared_ptr<NativePreferences::PreferencesObserver> preferencesObserver)
-{
-    std::shared_ptr<NativePreferences::Preferences> ptr = GetProfiles(path_, errCode_);
-    if (ptr != nullptr) {
-        ptr->UnRegisterObserver(preferencesObserver);
-    }
-}
 } // namespace Telephony
 } // namespace OHOS

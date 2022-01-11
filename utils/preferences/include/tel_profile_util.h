@@ -45,8 +45,6 @@ public:
     int RemoveAll();
     void Refresh();
     int RefreshSync();
-    void RegisterObserver(std::shared_ptr<NativePreferences::PreferencesObserver> preferencesObserver);
-    void UnRegisterObserver(std::shared_ptr<NativePreferences::PreferencesObserver> preferencesObserver);
     int DeleteProfiles();
 
 private:

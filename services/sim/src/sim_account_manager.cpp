@@ -18,10 +18,11 @@
 
 namespace OHOS {
 namespace Telephony {
-SimAccountManager::SimAccountManager(std::shared_ptr<ISimStateManager> simStateManager,
-    std::shared_ptr<ISimFileManager> simFileManager, std::shared_ptr<INetworkSearch> networkSearchManager)
-    : simStateManager_(simStateManager), simFileManager_(simFileManager),
-    netWorkSearchManager_(networkSearchManager)
+SimAccountManager::SimAccountManager(std::shared_ptr<ITelRilManager> telRilManager,
+    std::shared_ptr<ISimStateManager> simStateManager, std::shared_ptr<ISimFileManager> simFileManager,
+    std::shared_ptr<INetworkSearch> networkSearchManager)
+    : telRilManager_(telRilManager), simStateManager_(simStateManager), simFileManager_(simFileManager),
+      netWorkSearchManager_(networkSearchManager)
 {
     TELEPHONY_LOGI("SimAccountManager construct");
 }
@@ -31,13 +32,14 @@ SimAccountManager::~SimAccountManager() {}
 void SimAccountManager::Init(int32_t slotId)
 {
     TELEPHONY_LOGI("SimAccountManager::Init = %{public}d", slotId);
-    if (simFileManager_ == nullptr || simStateManager_ == nullptr || netWorkSearchManager_ == nullptr) {
+    if ((telRilManager_ == nullptr) || (simFileManager_ == nullptr) || (simStateManager_ == nullptr) ||
+        (netWorkSearchManager_ == nullptr)) {
         TELEPHONY_LOGE("can not init simAccountManager");
         return;
     }
     TELEPHONY_LOGI("SimAccountManager::make MultiSimController");
-    multiSimController_ =
-        std::make_shared<MultiSimController>(simStateManager_, simFileManager_, netWorkSearchManager_, slotId);
+    multiSimController_ = std::make_shared<MultiSimController>(
+        telRilManager_, simStateManager_, simFileManager_, netWorkSearchManager_, slotId);
     if (multiSimController_ == nullptr) {
         TELEPHONY_LOGE("SimAccountManager:: multiSimController is null");
         return;
@@ -47,6 +49,8 @@ void SimAccountManager::Init(int32_t slotId)
         TELEPHONY_LOGE("get runner_ failed");
         return;
     }
+    multiSimController_->Init();
+    multiSimController_->CreateRadioCapController(runner_);
     multiSimMonitor_ =
         std::make_shared<MultiSimMonitor>(runner_, multiSimController_, simStateManager_, simFileManager_);
     simStateTracker_ = std::make_shared<SimStateTracker>(runner_, simFileManager_);
@@ -61,7 +65,7 @@ void SimAccountManager::Init(int32_t slotId)
     multiSimMonitor_->Init(slotId);
     multiSimMonitor_->RegisterForIccLoaded();
     if (simStateTracker_ == nullptr) {
-        TELEPHONY_LOGE("SimAccountManager:: simStateTracker_ is null");
+        TELEPHONY_LOGE("SimManager::simStateTracker_ is null");
         return;
     }
     simStateTracker_->RegisterForIccLoaded();
@@ -150,6 +154,20 @@ bool SimAccountManager::SetDefaultCellularDataSlotId(int32_t slotId)
     return multiSimController_->SetDefaultCellularDataSlotId(slotId);
 }
 
+bool SimAccountManager::SetPrimarySlotId(int32_t slotId)
+{
+    TELEPHONY_LOGI("SetPrimarySlotId");
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("SimAccountManager::SetPrimarySlotId failed by nullptr");
+        return false;
+    }
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("SimAccountManager::SetPrimarySlotId invalid slotId = %d", slotId);
+        return false;
+    }
+    return multiSimController_->SetPrimarySlotId(slotId);
+}
+
 int32_t SimAccountManager::GetDefaultCellularDataSlotId()
 {
     TELEPHONY_LOGI("SimAccountManager::GetDefaultCellularDataSlotId");
@@ -158,6 +176,16 @@ int32_t SimAccountManager::GetDefaultCellularDataSlotId()
         return INVALID_VALUE;
     }
     return multiSimController_->GetDefaultCellularDataSlotId();
+}
+
+int32_t SimAccountManager::GetPrimarySlotId()
+{
+    TELEPHONY_LOGI("SimAccountManager::GetPrimarySlotId");
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("SimAccountManager::GetPrimarySlotId failed by nullptr");
+        return INVALID_VALUE;
+    }
+    return multiSimController_->GetPrimarySlotId();
 }
 
 bool SimAccountManager::SetShowNumber(int32_t slotId, const std::u16string number)
@@ -246,6 +274,32 @@ bool SimAccountManager::IsValidSlotId(int32_t slotId)
         TELEPHONY_LOGE("SimAccountManager slotId is InValid = %d", slotId);
         return false;
     }
+}
+
+bool SimAccountManager::HasOperatorPrivileges(const int32_t slotId)
+{
+    TELEPHONY_LOGI("SimAccountManager::HasOperatorPrivileges begin");
+    if (!this->IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("SimAccountManager slotId is InValid = %{public}d", slotId);
+        return false;
+    }
+    auto controllerIt = privilegeControllers_.find(slotId);
+    if (controllerIt != privilegeControllers_.end()) {
+        return controllerIt->second->HasOperatorPrivileges();
+    }
+    if ((runner_ == nullptr) || (telRilManager_ == nullptr) || (simStateManager_ == nullptr)) {
+        TELEPHONY_LOGE("has nullptr at runner_ or telRilManager_ or simStateManager_");
+        return false;
+    }
+    auto controller =
+        std::make_shared<IccOperatorPrivilegeController>(slotId, runner_, telRilManager_, simStateManager_);
+    if (controller == nullptr) {
+        TELEPHONY_LOGE("Make IccOperatorPrivilegeController fail!!");
+        return false;
+    }
+    controller->Init();
+    privilegeControllers_.insert(std::make_pair(slotId, controller));
+    return controller->HasOperatorPrivileges();
 }
 } // namespace Telephony
 } // namespace OHOS

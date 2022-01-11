@@ -18,6 +18,7 @@
 
 #include "i_tel_ril_manager.h"
 #include "tel_ril_base.h"
+#include "hril_modem_parcel.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -33,12 +34,19 @@ public:
     void GetRadioStateResponse(MessageParcel &data);
     void ShutDown(const AppExecFwk::InnerEvent::Pointer &response) {}
     void RadioStateUpdated(MessageParcel &data);
+    void VoiceRadioTechUpdated(MessageParcel &data);
     /**
      * @brief Radio Status Change response
      * @param data is HDF service callback message
      */
     void SetRadioState(int fun, int rst, const AppExecFwk::InnerEvent::Pointer &response);
     void GetRadioState(const AppExecFwk::InnerEvent::Pointer &response);
+    void GetImei(const AppExecFwk::InnerEvent::Pointer &response);
+    void GetMeid(const AppExecFwk::InnerEvent::Pointer &response);
+    void GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Pointer &response);
+    void GetImeiResponse(MessageParcel &data);
+    void GetMeidResponse(MessageParcel &data);
+    void GetVoiceRadioTechnologyResponse(MessageParcel &data);
     void ProcessCommonRespOrNotify(uint32_t code, MessageParcel &data);
     bool IsCommonRespOrNotify(uint32_t code);
     ModemPowerState radioState_ = ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;

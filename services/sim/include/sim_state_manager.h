@@ -33,21 +33,22 @@ public:
     virtual void Init() override;
     virtual bool HasSimCard(int32_t slotId) override;
     virtual SimState GetSimState(int32_t slotId) override;
+    virtual CardType GetCardType(int32_t slotId) override;
     virtual bool UnlockPin(int32_t slotId, std::string pin, LockStatusResponse &response) override;
     virtual bool UnlockPuk(
         int32_t slotId, std::string newPin, std::string puk, LockStatusResponse &response) override;
     virtual bool AlterPin(
         int32_t slotId, std::string newPin, std::string oldPin, LockStatusResponse &response) override;
-    virtual bool SetLockState(
-        int32_t slotId, std::string pin, int32_t enable, LockStatusResponse &response) override;
-    virtual int32_t GetLockState(int32_t slotId) override;
+    virtual bool SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response) override;
+    virtual int32_t GetLockState(int32_t slotId, LockType lockType) override;
     virtual int32_t RefreshSimState(int32_t slotId) override;
     virtual bool UnlockPin2(int32_t slotId, std::string pin2, LockStatusResponse &response) override;
     virtual bool UnlockPuk2(
         int32_t slotId, std::string newPin2, std::string puk2, LockStatusResponse &response) override;
     virtual bool AlterPin2(
         int32_t slotId, std::string newPin2, std::string oldPin2, LockStatusResponse &response) override;
-    virtual bool SetActiveSim(int32_t slotId, int32_t type, int32_t enable) override;
+    virtual bool UnlockSimLock(
+        int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;
     virtual void RegisterCoreNotify(const HANDLE &handler, int what) override;
     virtual void UnRegisterCoreNotify(const HANDLE &observerCallBack, int what) override;
 

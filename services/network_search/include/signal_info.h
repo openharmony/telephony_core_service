@@ -36,6 +36,8 @@ private:
     bool ProcessCdma(const CdmaRssi &cdmaSignal);
     bool ProcessLte(const LteRssi &lteSignal);
     bool ProcessWcdma(const WCdmaRssi &wcdmaSignal);
+    bool ProcessTdScdma(const TdScdmaRssi &tdScdmaSignal);
+    bool ProcessNr(const NrRssi &nrSignal);
 
 private:
     std::mutex mutex_;
@@ -43,10 +45,14 @@ private:
     CdmaSignalInformation cdmaSigInfoCache_;
     LteSignalInformation lteSigInfoCache_;
     WcdmaSignalInformation wcdmaSigInfoCache_;
+    TdScdmaSignalInformation tdScdmaSigInfoCache_;
+    NrSignalInformation nrSigInfoCache_;
     GsmSignalInformation gsmSigInfoCur_;
     CdmaSignalInformation cdmaSigInfoCur_;
     LteSignalInformation lteSigInfoCur_;
     WcdmaSignalInformation wcdmaSigInfoCur_;
+    TdScdmaSignalInformation tdScdmaSigInfoCur_;
+    NrSignalInformation nrSigInfoCur_;
 };
 } // namespace Telephony
 } // namespace OHOS

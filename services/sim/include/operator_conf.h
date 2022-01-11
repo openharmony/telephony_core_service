@@ -34,17 +34,13 @@
 
 namespace OHOS {
 namespace Telephony {
-static const std::u16string DEFAULT_CONFIG = u"localConfig";
-static const std::string COMMON_EVENT_TELEPHONY_CARRIER_CONFIG_CHANGED =
-    "usual.event.telephony.CARRIER_CONFIG_CHANGED";
-static const std::int64_t TIME_OUT_LINE = 5;
 static const std::string TEST_MCC = "204";
 static const std::string TEST_MNC = "04";
-static const std::string CARRIER_PATH = "/data/OperatorConfig/carrier_config_";
+static const std::string CARRIER_PATH = "/system/etc/telephony/operator_config_";
 static const std::string CARRIER_XML = ".xml";
 static const std::string CARRIER_THRID_PART_XML_PATH = "/data/OperatorConfig/thrid_part_config.xml";
-static const std::string CARRIER_CONFIG_LIST = "carrier_config_list";
-static const std::string CARRIER_CONFIG = "carrier_config";
+static const std::string OPERATOR_CONFIG_LIST = "operator_config_list";
+static const std::string OPERATOR_CONFIG = "operator_config";
 static const std::string CARRIER_NAME = "name";
 static const std::string CARRIER_VALUE = "value";
 

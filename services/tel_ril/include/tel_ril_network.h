@@ -17,6 +17,7 @@
 #define TEL_RIL_NETWORK_H
 
 #include "tel_ril_base.h"
+#include "hril_network_parcel.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -26,6 +27,8 @@ public:
     ~TelRilNetwork() = default;
 
     // send  command
+    void GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response);
+    void SetRadioCapability(RadioCapabilityInfo &radioCapabilityInfo, const AppExecFwk::InnerEvent::Pointer &response);
     void GetImsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
     void GetSignalStrength(const AppExecFwk::InnerEvent::Pointer &response);
     void GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
@@ -37,20 +40,23 @@ public:
         int32_t automaticFlag, std::string oper, const AppExecFwk::InnerEvent::Pointer &response);
     void SetPreferredNetwork(int32_t preferredNetworkType, const AppExecFwk::InnerEvent::Pointer &response);
     void GetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetImei(const AppExecFwk::InnerEvent::Pointer &response);
     void SetPsAttachStatus(int32_t psAttachStatus, const AppExecFwk::InnerEvent::Pointer &response);
     void GetPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &response);
     void GetCellInfoList(const AppExecFwk::InnerEvent::Pointer &response);
     void GetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &response);
+    void GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response);
+    void SetLocateUpdates(HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response);
 
     // ril unsol
     void SignalStrengthUpdated(MessageParcel &data);
-    void NetworkRegStatusUpdated(MessageParcel &data);
+    void NetworkCsRegStatusUpdated(MessageParcel &data);
+    void NetworkPsRegStatusUpdated(MessageParcel &data);
     void NetworkTimeZoneUpdated(MessageParcel &data);
     void NetworkTimeUpdated(MessageParcel &data);
     void NetworkImsRegStatusUpdated(MessageParcel &data);
+    void NetworkPhyChnlCfgUpdated(MessageParcel &data);
     void GetImsRegStatusResponse(MessageParcel &data);
-
+    void GetRadioCapabilityResponse(MessageParcel &data);
     /**
      * @brief Get signal intensity response
      * @param data is HDF service callback message
@@ -74,9 +80,11 @@ public:
     void SetNetworkSelectionModeResponse(MessageParcel &data);
     void SetPreferredNetworkResponse(MessageParcel &data);
     void GetPreferredNetworkResponse(MessageParcel &data);
-    void GetImeiResponse(MessageParcel &data);
     void SetPsAttachStatusResponse(MessageParcel &data);
     void GetPsAttachStatusResponse(MessageParcel &data);
+    void SetRadioCapabilityResponse(MessageParcel &data);
+    void GetPhysicalChannelConfigResponse(MessageParcel &data);
+    void SetLocateUpdatesResponse(MessageParcel &data);
 
     /**
      * @brief Current operator ons or eons response

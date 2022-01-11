@@ -19,8 +19,9 @@ namespace OHOS {
 namespace Telephony {
 std::mutex SimSmsController::mtx_;
 
-SimSmsController::SimSmsController(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-    : AppExecFwk::EventHandler(runner)
+SimSmsController::SimSmsController(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+    std::shared_ptr<ISimStateManager> simStateManager)
+    : AppExecFwk::EventHandler(runner), stateManager_(simStateManager)
 {}
 
 void SimSmsController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -67,7 +68,7 @@ void SimSmsController::ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &ev
             TELEPHONY_LOGE("ProcessLoadDone: get null pointer!!!");
         }
     }
-    processWait_.notify_one();
+    processWait_.notify_all();
 }
 
 void SimSmsController::ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -79,7 +80,7 @@ void SimSmsController::ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &
         result_ = (responseInfo->error == HRilErrType::NONE);
     }
     TELEPHONY_LOGI("SimSmsController::ProcessUpdateDone: end");
-    processWait_.notify_one();
+    processWait_.notify_all();
 }
 
 void SimSmsController::ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -91,7 +92,7 @@ void SimSmsController::ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &e
         result_ = (responseInfo->error == HRilErrType::NONE);
     }
     TELEPHONY_LOGI("SimSmsController::ProcessWriteDone: end");
-    processWait_.notify_one();
+    processWait_.notify_all();
 }
 
 void SimSmsController::ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -103,17 +104,24 @@ void SimSmsController::ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &
         result_ = (responseInfo->error == HRilErrType::NONE);
     }
     TELEPHONY_LOGI("SimSmsController::ProcessDeleteDone: end");
-    processWait_.notify_one();
+    processWait_.notify_all();
 }
 
 bool SimSmsController::UpdateSmsIcc(int index, int status, std::string &pduData, std::string &smsc)
 {
     std::unique_lock<std::mutex> lock(mtx_);
     result_ = false;
-    TELEPHONY_LOGI("UpdateSmsIcc start: %{public}d", index);
-    AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_UPDATE_COMPLETED);
-    telRilManager_->UpdateSimMessage(index, status, smsc, pduData, response);
-    processWait_.wait(lock);
+    bool isCDMA = IsCdmaCardType();
+    TELEPHONY_LOGI("UpdateSmsIcc start: %{public}d, %{public}d", index, isCDMA);
+    if (!isCDMA) {
+        AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_UPDATE_COMPLETED);
+        telRilManager_->UpdateSimMessage(index, status, smsc, pduData, response);
+        processWait_.wait(lock);
+    } else {
+        AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_UPDATE_COMPLETED);
+        telRilManager_->UpdateCdmaSimMessage(index, status, pduData, response);
+        processWait_.wait(lock);
+    }
     TELEPHONY_LOGI("SimSmsController::UpdateSmsIcc OK return %{public}d", result_);
     return result_;
 }
@@ -122,15 +130,19 @@ bool SimSmsController::DelSmsIcc(int index)
 {
     std::unique_lock<std::mutex> lock(mtx_);
     result_ = false;
-    TELEPHONY_LOGI("DelSmsIcc start: %{public}d", index);
-    if (PhoneTypeGsmOrNot()) {
+    bool isCDMA = IsCdmaCardType();
+    TELEPHONY_LOGI("DelSmsIcc start: %{public}d, %{public}d", index, isCDMA);
+    if (!isCDMA) {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_DELETE_COMPLETED);
         telRilManager_->DelSimMessage(index, response);
         processWait_.wait(lock);
         TELEPHONY_LOGI("SimSmsController::DelSmsIcc OK return %{public}d", result_);
         return result_;
     } else {
-        TELEPHONY_LOGE("DeleteSimMessage cdma do not support temporary");
+        AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_DELETE_COMPLETED);
+        telRilManager_->DelCdmaSimMessage(index, response);
+        processWait_.wait(lock);
+        TELEPHONY_LOGI("SimSmsController::DelCdmaSimMessage OK return %{public}d", result_);
         return result_;
     }
 }
@@ -139,23 +151,30 @@ bool SimSmsController::AddSmsToIcc(int status, std::string &pdu, std::string &sm
 {
     std::unique_lock<std::mutex> lock(mtx_);
     result_ = false;
-    TELEPHONY_LOGI("AddSmsToIcc start: %{public}d", status);
-    if (PhoneTypeGsmOrNot()) {
+    bool isCDMA = IsCdmaCardType();
+    TELEPHONY_LOGI("AddSmsToIcc start: %{public}d, %{public}d", status, isCDMA);
+    if (!isCDMA) {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_WRITE_COMPLETED);
         telRilManager_->AddSimMessage(status, smsc, pdu, response);
     } else {
-        TELEPHONY_LOGE("AddSmsToIcc cdma do not support temporary");
+        AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_WRITE_COMPLETED);
+        telRilManager_->AddCdmaSimMessage(status, pdu, response);
     }
     processWait_.wait(lock);
     TELEPHONY_LOGI("SimSmsController::AddSmsToIcc OK return %{public}d", result_);
     return result_;
 }
 
-void SimSmsController::Init() {}
+void SimSmsController::Init(int slodId)
+{
+    slotId_ = slodId;
+}
 
 std::vector<std::string> SimSmsController::ObtainAllSmsOfIcc()
 {
-    if (fileController_ == nullptr) {
+    std::unique_lock<std::mutex> lock(mtx_);
+    std::shared_ptr<IccFileController> fileController = fileManager_->GetIccFileController();
+    if (fileController == nullptr) {
         TELEPHONY_LOGE("Cannot load Sms records. No icc card?");
         std::vector<std::string> nullVector;
         smsList_.swap(nullVector);
@@ -163,24 +182,22 @@ std::vector<std::string> SimSmsController::ObtainAllSmsOfIcc()
     }
     TELEPHONY_LOGI("ObtainAllSmsOfIcc start!!");
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(SIM_SMS_GET_COMPLETED);
-    fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_SMS, event);
-
-    std::unique_lock<std::mutex> lock(mtx_);
+    fileController->ObtainAllLinearFixedFile(ELEMENTARY_FILE_SMS, event);
     processWait_.wait(lock);
     TELEPHONY_LOGI("SimSmsController::ObtainAllSmsOfIcc: end");
     return smsList_;
 }
 
-void SimSmsController::SetRilAndFileController(
-    std::shared_ptr<Telephony::ITelRilManager> ril, std::shared_ptr<IccFileController> file)
+void SimSmsController::SetRilAndFileManager(
+    std::shared_ptr<Telephony::ITelRilManager> ril, std::shared_ptr<SimFileManager> fileMgr)
 {
     telRilManager_ = ril;
     if (telRilManager_ == nullptr) {
         TELEPHONY_LOGE("SimSmsController rilmanager get null pointer");
     }
-    fileController_ = file;
-    if (fileController_ == nullptr) {
-        TELEPHONY_LOGE("SimSmsController fileController get null pointer");
+    fileManager_  = fileMgr;
+    if (fileManager_ == nullptr) {
+        TELEPHONY_LOGE("SimSmsController fileManager get null pointer");
     }
 }
 
@@ -193,9 +210,18 @@ AppExecFwk::InnerEvent::Pointer SimSmsController::BuildCallerInfo(int eventId)
     return event;
 }
 
-bool SimSmsController::PhoneTypeGsmOrNot() const
+bool SimSmsController::IsCdmaCardType() const
 {
-    return true;
+    bool isCdmaType = false;
+    if (stateManager_ != nullptr) {
+        CardType type = stateManager_->GetCardType(slotId_);
+        TELEPHONY_LOGI("IsCdmaCardType card type id %{public}d", type);
+        if (type == CardType::SINGLE_MODE_RUIM_CARD) {
+            isCdmaType = true; // cdma
+        }
+    }
+    TELEPHONY_LOGI("IsCdmaCardType result %{public}d", isCdmaType);
+    return isCdmaType;
 }
 
 SimSmsController::~SimSmsController() {}

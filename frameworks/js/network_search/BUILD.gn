@@ -20,19 +20,18 @@ ohos_shared_library("radio") {
     "$SUBSYSTEM_DIR/core_service/interfaces/kits/native",
     "//utils/native/base/include",
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/core",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/network_search",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/sim",
+    "$SUBSYSTEM_DIR/core_service/common/sim",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/network_search",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/core",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/sim",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/core",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/cellular_data",
     "$SUBSYSTEM_DIR/core_service/frameworks/native/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/include",
     "//foundation/aafwk/standard/frameworks/kits/ability/native/include",
     "//foundation/aafwk/standard/interfaces/innerkits/base/include/ohos/aafwk/base",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/core",
   ]
 
   sources = [
@@ -50,6 +49,7 @@ ohos_shared_library("radio") {
   deps = [
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/frameworks/native:tel_core_service_api",
+    "$SUBSYSTEM_DIR/ril_adapter/services/hril:hril",
     "//base/telephony/core_service/utils:libtelephony_common",
     "//foundation/ace/napi:ace_napi",
     "//utils/native/base:utils",
@@ -59,7 +59,6 @@ ohos_shared_library("radio") {
     "appexecfwk_standard:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "ril_adapter:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
