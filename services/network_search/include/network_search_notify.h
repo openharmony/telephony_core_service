@@ -19,7 +19,7 @@
 #include <singleton.h>
 #include "network_state.h"
 #include "signal_information.h"
-#include "telephony_state_registry_proxy.h"
+#include "telephony_state_registry_client.h"
 #include "cell_information.h"
 namespace OHOS {
 namespace Telephony {
@@ -29,13 +29,9 @@ class NetworkSearchNotify {
     static const int32_t RESET_CONNECT_SLEEP_TIME = 5;
 
 public:
-    void ConnectService();
-    bool ResetConnectService();
     void NotifyNetworkStateUpdated(const sptr<NetworkState> &networkState);
     void NotifySignalInfoUpdated(const std::vector<sptr<SignalInformation>> &signalInfos);
     void NotifyCellInfoUpdated(const std::vector<sptr<CellInformation>> &signalInfos);
-private:
-    sptr<ITelephonyStateNotify> telephonyStateNotify_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

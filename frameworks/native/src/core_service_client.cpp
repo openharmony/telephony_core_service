@@ -14,6 +14,10 @@
  */
 
 #include "core_service_client.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -91,6 +95,46 @@ int32_t CoreServiceClient::GetCsRadioTech(int32_t slotId)
     }
     return proxy->GetCsRadioTech(slotId);
 }
+
+std::u16string CoreServiceClient::GetMeid(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return std::u16string();
+    }
+    return proxy->GetMeid(slotId);
+}
+
+std::u16string CoreServiceClient::GetUniqueDeviceId(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return std::u16string();
+    }
+    return proxy->GetUniqueDeviceId(slotId);
+}
+bool CoreServiceClient::IsNrSupported()
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return false;
+    }
+    return proxy->IsNrSupported();
+}
+
+NrMode CoreServiceClient::GetNrOptionMode(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return NrMode::NR_MODE_UNKNOWN;
+    }
+    return proxy->GetNrOptionMode(slotId);
+}
+
 
 std::vector<sptr<SignalInformation>> CoreServiceClient::GetSignalInfoList(int32_t slotId)
 {
@@ -461,25 +505,24 @@ bool CoreServiceClient::AlterPin2(
     return proxy->AlterPin2(slotId, newPin2, oldPin2, response);
 }
 
-bool CoreServiceClient::SetLockState(
-    int32_t slotId, std::u16string pin, int32_t enable, LockStatusResponse &response)
+bool CoreServiceClient::SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return false;
     }
-    return proxy->SetLockState(slotId, pin, enable, response);
+    return proxy->SetLockState(slotId, options, response);
 }
 
-int32_t CoreServiceClient::GetLockState(int32_t slotId)
+int32_t CoreServiceClient::GetLockState(int32_t slotId, LockType lockType)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetLockState(slotId);
+    return proxy->GetLockState(slotId, lockType);
 }
 
 int32_t CoreServiceClient::RefreshSimState(int32_t slotId)
@@ -638,6 +681,72 @@ int32_t CoreServiceClient::GetMaxSimCount()
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->GetMaxSimCount();
+}
+
+int32_t CoreServiceClient::GetCardType(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetCardType(slotId);
+}
+
+bool CoreServiceClient::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return false;
+    }
+    return proxy->SendEnvelopeCmd(slotId, cmd);
+}
+bool CoreServiceClient::SendTerminalResponseCmd(int32_t slotId, const std::string &cmd)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return false;
+    }
+    return proxy->SendTerminalResponseCmd(slotId, cmd);
+}
+bool CoreServiceClient::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return false;
+    }
+    return proxy->UnlockSimLock(slotId, lockInfo, response);
+}
+
+bool CoreServiceClient::HasOperatorPrivileges(const int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return false;
+    }
+    return proxy->HasOperatorPrivileges(slotId);
+}
+int32_t CoreServiceClient::GetPrimarySlotId()
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetPrimarySlotId();
+}
+bool CoreServiceClient::SetPrimarySlotId(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return false;
+    }
+    return proxy->SetPrimarySlotId(slotId);
 }
 
 std::vector<sptr<CellInformation>> CoreServiceClient::GetCellInfoList(int32_t slotId)

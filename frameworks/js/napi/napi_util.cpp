@@ -85,6 +85,13 @@ void NapiUtil::SetPropertyInt32(napi_env env, napi_value object, std::string nam
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), propertyValue));
 }
 
+void NapiUtil::SetPropertyInt64(napi_env env, napi_value object, std::string name, int64_t value)
+{
+    napi_value propertyValue = nullptr;
+    NAPI_CALL_RETURN_VOID(env, napi_create_int64(env, value, &propertyValue));
+    NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), propertyValue));
+}
+
 void NapiUtil::SetPropertyStringUtf8(napi_env env, napi_value object, std::string name, std::string value)
 {
     napi_value propertyValue = nullptr;
@@ -221,6 +228,7 @@ void NapiUtil::Handle1ValueCallback(napi_env env, BaseContext *baseContext, napi
         NAPI_CALL_RETURN_VOID(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
     }
     if (baseContext->callbackRef != nullptr) {
+        TELEPHONY_LOGI("Handle1ValueCallback start normal callback");
         napi_value recv = CreateUndefined(env);
         napi_value callbackFunc = nullptr;
         NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, baseContext->callbackRef, &callbackFunc));
@@ -231,6 +239,7 @@ void NapiUtil::Handle1ValueCallback(napi_env env, BaseContext *baseContext, napi
         NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, baseContext->callbackRef));
         TELEPHONY_LOGI("Handle1ValueCallback normal callback end");
     } else if (baseContext->deferred != nullptr) {
+        TELEPHONY_LOGI("Handle1ValueCallback start promise callback");
         if (baseContext->resolved) {
             NAPI_CALL_RETURN_VOID(env, napi_resolve_deferred(env, baseContext->deferred, callbackValue));
             TELEPHONY_LOGI("Handle1ValueCallback napi_resolve_deferred end");
@@ -238,6 +247,7 @@ void NapiUtil::Handle1ValueCallback(napi_env env, BaseContext *baseContext, napi
             NAPI_CALL_RETURN_VOID(env, napi_reject_deferred(env, baseContext->deferred, callbackValue));
             TELEPHONY_LOGI("Handle1ValueCallback napi_reject_deferred end");
         }
+        TELEPHONY_LOGI("Handle1ValueCallback promise callback end");
     }
     napi_delete_async_work(env, baseContext->work);
     delete baseContext;
@@ -255,6 +265,7 @@ void NapiUtil::Handle2ValueCallback(napi_env env, BaseContext *baseContext, napi
         NAPI_CALL_RETURN_VOID(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
     }
     if (baseContext->callbackRef != nullptr) {
+        TELEPHONY_LOGI("Handle2ValueCallback start normal callback");
         napi_value recv = CreateUndefined(env);
         napi_value callbackFunc = nullptr;
         NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, baseContext->callbackRef, &callbackFunc));
@@ -265,12 +276,15 @@ void NapiUtil::Handle2ValueCallback(napi_env env, BaseContext *baseContext, napi
         NAPI_CALL_RETURN_VOID(
             env, napi_call_function(env, recv, callbackFunc, std::size(callbackValues), callbackValues, &result));
         NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, baseContext->callbackRef));
+        TELEPHONY_LOGI("Handle2ValueCallback normal callback end");
     } else if (baseContext->deferred != nullptr) {
+        TELEPHONY_LOGI("Handle2ValueCallback start promise callback");
         if (baseContext->resolved) {
             NAPI_CALL_RETURN_VOID(env, napi_resolve_deferred(env, baseContext->deferred, callbackValue));
         } else {
             NAPI_CALL_RETURN_VOID(env, napi_reject_deferred(env, baseContext->deferred, callbackValue));
         }
+        TELEPHONY_LOGI("Handle2ValueCallback promise callback end");
     }
     napi_delete_async_work(env, baseContext->work);
     delete baseContext;

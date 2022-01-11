@@ -18,6 +18,7 @@
 
 #include <memory>
 #include "event_handler.h"
+#include "network_state.h"
 namespace OHOS {
 namespace Telephony {
 class NetworkSearchManager;
@@ -31,8 +32,17 @@ public:
     void ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessRadioChange() const;
     void ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) const;
+    void ProcessGetMeid(const AppExecFwk::InnerEvent::Pointer &event) const;
+    void ProcessSetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event) const;
+    void ProcessGetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event) const;
+    void UpdatePhone(RadioTech csRadioTech);
+    void SetPhoneType(PhoneType phoneType);
+    PhoneType GetPhoneType() const;
+    void ProcessVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
+    PhoneType RadioTechToPhoneType(RadioTech radioTech) const;
+    PhoneType phoneType_ = PhoneType::PHONE_TYPE_IS_NONE;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
 };
 } // namespace Telephony

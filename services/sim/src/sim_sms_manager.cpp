@@ -18,16 +18,18 @@
 namespace OHOS {
 namespace Telephony {
 SimSmsManager::SimSmsManager(std::shared_ptr<ITelRilManager> telRilManager,
-    std::shared_ptr<ISimFileManager> simFileManager) : telRilManager_(telRilManager), simFileManager_(simFileManager)
+    std::shared_ptr<ISimFileManager> simFileManager, std::shared_ptr<ISimStateManager> simStateManager)
+    : telRilManager_(telRilManager), simFileManager_(simFileManager), stateManager_(simStateManager)
 {
     TELEPHONY_LOGI("SimSmsManager::SimSmsManager started");
 }
 
 SimSmsManager::~SimSmsManager() {}
 
-void SimSmsManager::Init()
+void SimSmsManager::Init(int slotId)
 {
     TELEPHONY_LOGI("SimSmsManager::Init() started ");
+    slotId_ = slotId;
     if (stateSms_ == HandleRunningState::STATE_RUNNING) {
         TELEPHONY_LOGI("SimSmsManager::Init stateSms_ started.");
         return;
@@ -48,19 +50,19 @@ void SimSmsManager::Init()
         TELEPHONY_LOGE("SimSmsManager::Init ISimFileManager null pointer");
         return;
     }
-    std::shared_ptr<SimFileManager> fileMannager = std::static_pointer_cast<SimFileManager>(simFileManager_);
+    std::shared_ptr<SimFileManager> fileManager = std::static_pointer_cast<SimFileManager>(simFileManager_);
 
-    smsController_ = std::make_shared<SimSmsController>(eventLoopSms_);
+    smsController_ = std::make_shared<SimSmsController>(eventLoopSms_, stateManager_);
     if (smsController_ == nullptr) {
         TELEPHONY_LOGE("SimSmsManager::Init simFile create nullptr.");
         return;
     }
-    smsController_->SetRilAndFileController(telRilManager_, fileMannager->GetIccFileController());
+    smsController_->SetRilAndFileManager(telRilManager_, fileManager);
 
     eventLoopSms_->Run();
     stateSms_ = HandleRunningState::STATE_RUNNING;
 
-    smsController_->Init();
+    smsController_->Init(slotId_);
     TELEPHONY_LOGI("SimSmsManager::Init() end");
 }
 

@@ -45,6 +45,7 @@ void IccFileController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &even
         case MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE:
             ProcessReadRecord(event);
             break;
+        case MSG_SIM_OBTAIN_ICON_DONE:
         case MSG_SIM_UPDATE_LINEAR_FIXED_FILE_DONE:
         case MSG_SIM_UPDATE_TRANSPARENT_ELEMENTARY_FILE_DONE:
         case MSG_SIM_OBTAIN_TRANSPARENT_ELEMENTARY_FILE_DONE:
@@ -115,7 +116,7 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
         msg.p2 = ICC_FILE_CURRENT_MODE;
         msg.p3 = hd->fileSize;
         msg.data = IccFileController::NULLSTR;
-        msg.path =  path;
+        msg.path = path;
         msg.pin2 = "";
         telRilManager_->GetSimIO(msg, BuildCallerInfo(MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE, hd));
     }
@@ -192,29 +193,22 @@ void IccFileController::ProcessReadBinary(const AppExecFwk::InnerEvent::Pointer 
 std::string IccFileController::ObtainElementFileForPublic(int efId)
 {
     std::string mf = MASTER_FILE_SIM;
-    switch (efId) {
-        case ELEMENTARY_FILE_ADN:
-        case ELEMENTARY_FILE_FDN:
-        case ELEMENTARY_FILE_MSISDN:
-        case ELEMENTARY_FILE_SDN:
-        case ELEMENTARY_FILE_EXT1:
-        case ELEMENTARY_FILE_EXT2:
-        case ELEMENTARY_FILE_EXT3:
-            mf.append(DEDICATED_FILE_TELECOM);
-            return mf;
-        case ELEMENTARY_FILE_ICCID:
-        case ELEMENTARY_FILE_PL:
-            return mf;
-        case ELEMENTARY_FILE_PBR:
-            mf.append(DEDICATED_FILE_TELECOM);
-            mf.append(DEDICATED_FILE_DIALLING_NUMBERS);
-            return mf;
-        case ELEMENTARY_FILE_IMG:
-            mf.append(DEDICATED_FILE_TELECOM);
-            mf.append(DEDICATED_FILE_GRAPHICS);
-            return mf;
-        default:
-            break;
+    if (efId == ELEMENTARY_FILE_ICCID || efId == ELEMENTARY_FILE_PL) {
+        return mf;
+    }
+    mf.append(DEDICATED_FILE_TELECOM);
+    if (efId == ELEMENTARY_FILE_ADN || efId == ELEMENTARY_FILE_FDN || efId == ELEMENTARY_FILE_MSISDN ||
+        efId == ELEMENTARY_FILE_SDN || efId == ELEMENTARY_FILE_EXT1 || efId == ELEMENTARY_FILE_EXT2 ||
+        efId == ELEMENTARY_FILE_EXT3) {
+        return mf;
+    }
+    if (efId == ELEMENTARY_FILE_PBR) {
+        mf.append(DEDICATED_FILE_DIALLING_NUMBERS);
+        return mf;
+    }
+    if (efId == ELEMENTARY_FILE_IMG) {
+        mf.append(DEDICATED_FILE_GRAPHICS);
+        return mf;
     }
     return IccFileController::NULLSTR;
 }
@@ -615,7 +609,6 @@ bool IccFileController::IsFixedNumberType(int efId)
         case ELEMENTARY_FILE_FDN:
         case ELEMENTARY_FILE_USIM_ADN:
         case ELEMENTARY_FILE_USIM_IAP:
-        case ELEMENTARY_FILE_USIM_EMAIL:
             fixed = true;
             return fixed;
         default:

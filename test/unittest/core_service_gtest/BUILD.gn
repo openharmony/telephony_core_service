@@ -45,6 +45,7 @@ ohos_unittest("tel_core_service_gtest") {
   deps = [
     "//base/telephony/core_service:tel_core_service",
     "//base/telephony/core_service/utils:libtelephony_common",
+    "//base/telephony/ril_adapter/services/hril:hril",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]

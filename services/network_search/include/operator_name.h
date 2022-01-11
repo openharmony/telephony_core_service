@@ -31,18 +31,28 @@ public:
     virtual ~OperatorName() = default;
     void HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void NotifySpnChanged();
+    inline void SetPhoneType(PhoneType phoneType)
+    {
+        phoneType_ = phoneType;
+    }
 
 private:
     void GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const;
     void CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const;
-    void PublishEvent(const int32_t rule, const RegServiceState state, const bool showPlmn, const std::string &plmn,
-        const bool showSpn, const std::string &spn);
+    void PublishEvent(const int32_t rule, const RegServiceState state, const bool showPlmn,
+        const std::string &plmn, const bool showSpn, const std::string &spn);
     sptr<NetworkState> GetNetworkStatus();
+    void NotifyGsmSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState);
+    void NotifyCdmaSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState);
+
+    void UpdatePlmn(RegServiceState regStatus, sptr<NetworkState> &networkState, int32_t spnRule,
+        std::string &plmn, bool &showPlmn);
+    void UpdateSpn(RegServiceState regStatus, sptr<NetworkState> &networkState, int32_t spnRule, std::string &spn,
+        bool &showSpn);
 
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
     std::shared_ptr<ISimFileManager> simFileManager_ = nullptr;
-    PhoneAbstract phone_;
     std::string curPlmn_ = "";
     bool curPlmnShow_ = false;
     std::string curSpn_ = "";
@@ -50,6 +60,7 @@ private:
     RegServiceState curRegState_ = RegServiceState::REG_STATE_UNKNOWN;
     int32_t curSpnRule_ = -1;
     sptr<NetworkState> networkState_ = nullptr;
+    PhoneType phoneType_ = PhoneType::PHONE_TYPE_IS_NONE;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
 };
 } // namespace Telephony

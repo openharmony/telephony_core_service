@@ -16,11 +16,9 @@
 #ifndef OHOS_SIM_SMS_CONTROLLER_H
 #define OHOS_SIM_SMS_CONTROLLER_H
 
-#include <iostream>
-#include <cstring>
-#include <string>
-
 #include "icc_file_controller.h"
+#include "sim_state_manager.h"
+#include "sim_file_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -41,24 +39,27 @@ enum {
 
 class SimSmsController : public AppExecFwk::EventHandler {
 public:
-    SimSmsController(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    SimSmsController(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+        std::shared_ptr<ISimStateManager> simStateManager);
     ~SimSmsController();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     bool AddSmsToIcc(int status, std::string &pdu, std::string &smsc);
     bool UpdateSmsIcc(int index, int status, std::string &pduData, std::string &smsc);
     bool DelSmsIcc(int index);
     std::vector<std::string> ObtainAllSmsOfIcc();
-    void SetRilAndFileController(
-        std::shared_ptr<Telephony::ITelRilManager> ril, std::shared_ptr<IccFileController> file);
-    void Init();
+    void SetRilAndFileManager(
+        std::shared_ptr<Telephony::ITelRilManager> ril, std::shared_ptr<SimFileManager> fileMgr);
+    void Init(int slotId);
 
 protected:
-    std::shared_ptr<IccFileController> fileController_ = nullptr;
+    std::shared_ptr<SimFileManager> fileManager_ = nullptr;
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
+    std::shared_ptr<ISimStateManager> stateManager_ = nullptr;
     bool result_ = false;
+    int slotId_ = 0;
 
 private:
-    bool PhoneTypeGsmOrNot() const;
+    bool IsCdmaCardType() const;
     std::vector<std::string> smsList_;
     static std::mutex mtx_;
     std::condition_variable processWait_;

@@ -124,40 +124,5 @@ void NetworkType::ProcessSetPreferredNetwork(int32_t slotId, const AppExecFwk::I
         networkSearchManager->RemoveCallbackFromMap(index);
     }
 }
-
-void NetworkType::SetPhoneType(PhoneType phoneType)
-{
-    phoneType_ = phoneType;
-}
-
-PhoneType NetworkType::GetPhoneType() const
-{
-    return phoneType_;
-}
-
-void NetworkType::UpdatePhone(RadioTech csRadioTech)
-{
-    TELEPHONY_LOGI("NetworkType::UpdatePhone");
-        std::shared_ptr<NetworkSearchManager> networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("NetworkType::UpdatePhone networkSearchManager is nullptr\n");
-        return;
-    }
-    bool isGsm = networkSearchManager->GetNetworkSearchState()->GsmOrNot(csRadioTech);
-    if (isGsm && (phoneType_ == PhoneType::PHONE_TYPE_IS_GSM)) {
-        TELEPHONY_LOGE("NetworkType::UpdatePhone No Change");
-        return;
-    }
-    if (csRadioTech == RadioTech::RADIO_TECHNOLOGY_UNKNOWN) {
-        TELEPHONY_LOGE("NetworkType::UpdatePhone CsRadioTech is UNKNOWN");
-        return;
-    }
-    if (isGsm) {
-        TELEPHONY_LOGI("NetworkType::UpdatePhone SetPhoneType is success");
-        SetPhoneType(PhoneType::PHONE_TYPE_IS_GSM);
-    } else {
-        TELEPHONY_LOGE("NetworkType::UpdatePhone failed");
-    }
-}
 } // namespace Telephony
 } // namespace OHOS

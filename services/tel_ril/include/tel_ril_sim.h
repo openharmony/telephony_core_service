@@ -25,10 +25,12 @@ namespace Telephony {
 class TelRilSim : public TelRilBase {
 public:
     TelRilSim(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
-
     ~TelRilSim() = default;
 
     void SimStateUpdated(MessageParcel &data);
+    void StkSessionEndNotify(MessageParcel &data);
+    void StkProactiveCommandNotify(MessageParcel &data);
+    void StkAlphaNotify(MessageParcel &data);
 
     void GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result);
     void GetImsi(const AppExecFwk::InnerEvent::Pointer &result);
@@ -45,6 +47,15 @@ public:
     void UnlockPuk2(std::string puk2, std::string pin2, const AppExecFwk::InnerEvent::Pointer &response);
     void GetSimPin2InputTimes(const AppExecFwk::InnerEvent::Pointer &response);
     void SetActiveSim(int32_t index, int32_t enable, const AppExecFwk::InnerEvent::Pointer &response);
+    void SendTerminalResponseCmd(const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response);
+    void SendEnvelopeCmd(const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response);
+    void StkControllerIsReady(const AppExecFwk::InnerEvent::Pointer &response);
+    void StkCmdCallSetup(int32_t flagAccept, const AppExecFwk::InnerEvent::Pointer &response);
+    void SetRadioProtocol(SimProtocolRequest data, const AppExecFwk::InnerEvent::Pointer &response);
+    void OpenLogicalSimIO(std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response);
+    void CloseLogicalSimIO(int chanID, const AppExecFwk::InnerEvent::Pointer &response);
+    void TransmitApduSimIO(ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response);
+    void UnlockSimLock(int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response);
 
     void GetSimStatusResponse(MessageParcel &data);
     void GetImsiResponse(MessageParcel &data);
@@ -59,6 +70,15 @@ public:
     void UnlockPuk2Response(MessageParcel &data);
     void GetSimPin2InputTimesResponse(MessageParcel &data);
     void SetActiveSimResponse(MessageParcel &data);
+    void SendTerminalResponseCmdResponse(MessageParcel &data);
+    void SendEnvelopeCmdResponse(MessageParcel &data);
+    void StkControllerIsReadyResponse(MessageParcel &data);
+    void StkCmdCallSetupResponse(MessageParcel &data);
+    void SetRadioProtocolResponse(MessageParcel &data);
+    void OpenLogicalSimIOResponse(MessageParcel &data);
+    void CloseLogicalSimIOResponse(MessageParcel &data);
+    void TransmitApduSimIOResponse(MessageParcel &data);
+    void UnlockSimLockResponse(MessageParcel &data);
 
     bool IsSimRespOrNotify(uint32_t code);
 

@@ -25,7 +25,6 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
-Icc_File_Action IccFile::g_CurFileAction(ACTION_WAIT);
 IccFile::IccFile(
     const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<ISimStateManager> simStateManager)
     : AppExecFwk::EventHandler(runner), stateManager_(simStateManager)
@@ -233,33 +232,45 @@ void IccFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 void IccFile::RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
     int eventCode = ObserverHandler::RADIO_IMSI_LOADED_READY;
-    imsiReadyObser_->RegObserver(eventCode, eventHandler);
+    if (imsiReadyObser_ != nullptr) {
+        imsiReadyObser_->RegObserver(eventCode, eventHandler);
+    }
     if (!ObtainIMSI().empty()) {
-        imsiReadyObser_->NotifyObserver(ObserverHandler::RADIO_IMSI_LOADED_READY);
+        if (imsiReadyObser_ != nullptr) {
+            imsiReadyObser_->NotifyObserver(ObserverHandler::RADIO_IMSI_LOADED_READY);
+        }
         PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_IMSI, ObtainIMSI());
     }
 }
 
 void IccFile::UnregisterImsiLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    imsiReadyObser_->Remove(ObserverHandler::RADIO_IMSI_LOADED_READY, handler);
+    if (imsiReadyObser_ != nullptr) {
+        imsiReadyObser_->Remove(ObserverHandler::RADIO_IMSI_LOADED_READY, handler);
+    }
 }
 
 void IccFile::RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
     int eventCode = ObserverHandler::RADIO_SIM_RECORDS_LOADED;
-    filesFetchedObser_->RegObserver(eventCode, eventHandler);
+    if (filesFetchedObser_ != nullptr) {
+        filesFetchedObser_->RegObserver(eventCode, eventHandler);
+    }
     TELEPHONY_LOGI("IccFile::RegisterAllFilesLoaded: registerd");
     if (ObtainFilesFetched()) {
         TELEPHONY_LOGI("IccFile::RegisterAllFilesLoaded: notify");
-        filesFetchedObser_->NotifyObserver(ObserverHandler::RADIO_SIM_RECORDS_LOADED);
+        if (filesFetchedObser_ != nullptr) {
+            filesFetchedObser_->NotifyObserver(ObserverHandler::RADIO_SIM_RECORDS_LOADED);
+        }
         PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_LOADED, "");
     }
 }
 
 void IccFile::UnregisterAllFilesLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    filesFetchedObser_->Remove(ObserverHandler::RADIO_SIM_RECORDS_LOADED, handler);
+    if (filesFetchedObser_ != nullptr) {
+        filesFetchedObser_->Remove(ObserverHandler::RADIO_SIM_RECORDS_LOADED, handler);
+    }
 }
 
 void IccFile::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
@@ -290,7 +301,7 @@ void IccFile::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandle
     }
 }
 
-void IccFile::UpdateSPN(const std::string &spn)
+void IccFile::UpdateSPN(const std::string spn)
 {
     if (spn_ != spn) {
         spnUpdatedObser_->NotifyObserver(MSG_SIM_SPN_UPDATED);
@@ -425,64 +436,32 @@ AppExecFwk::InnerEvent::Pointer IccFile::CreateDiallingNumberPointer(
     return event;
 }
 
-bool IccFile::IsActionOn()
+void IccFile::NotifyRegistrySimState(CardType type, SimState state, LockReason reason)
 {
-    return (g_CurFileAction == SET_VOICE_MAIL);
-}
-
-void IccFile::SetCurAction(Icc_File_Action action)
-{
-    g_CurFileAction = action;
-}
-
-Icc_File_Action IccFile::GetCurAction()
-{
-    return g_CurFileAction;
-}
-
-bool IccFile::ConnectRegistryService()
-{
-    if (telephonyStateNotify_ != nullptr) {
-        TELEPHONY_LOGI("IccFile::ConnectRegistryService() already connected\n");
-        return true;
-    }
-
-    auto systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemManager == nullptr) {
-        TELEPHONY_LOGE("IccFile::ConnectRegistryService() GetSystemAbilityManager() null\n");
-        return false;
-    }
-
-    sptr<IRemoteObject> object = systemManager->GetSystemAbility(TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID);
-
-    if (object != nullptr) {
-        TELEPHONY_LOGI("IccFile::ConnectRegistryService() IRemoteObject not null\n");
-        telephonyStateNotify_ = iface_cast<ITelephonyStateNotify>(object);
-    }
-
-    if (telephonyStateNotify_ == nullptr) {
-        TELEPHONY_LOGE("IccFile::ConnectRegistryService() telephonyStateNotify_ null\n");
-        return false;
-    }
-    TELEPHONY_LOGI("IccFile::ConnectRegistryService() success\n");
-    return true;
-}
-
-void IccFile::NotifyRegistrySimState(SimState state, LockReason reason)
-{
-    ConnectRegistryService();
-    if (telephonyStateNotify_ == nullptr) {
-        TELEPHONY_LOGE("NotifyRegistrySimState telephonyStateNotify_ is null\n");
-        return;
-    }
-    int simId = CoreManager::DEFAULT_SLOT_ID;
-    int32_t result = telephonyStateNotify_->UpdateSimState(simId, state, reason);
+    int slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t result =
+        DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSimState(slotId, type, state, reason);
     TELEPHONY_LOGI("NotifyRegistrySimState msgId is %{public}d ret %{public}d", state, result);
 }
 
 bool IccFile::HasSimCard(int slotId)
 {
     return (stateManager_ != nullptr) ? stateManager_->HasSimCard(slotId) : false;
+}
+
+void IccFile::UnInit()
+{
+    imsi_ = "";
+    iccId_ = "";
+    UpdateSPN("");
+    UpdateLoaded(false);
+    operatorNumeric_ = "";
+    voiceMailNum_ = "";
+    voiceMailTag_ = "";
+    indexOfMailbox_ = 1;
+    msisdn_ = "";
+    gid1_ = "";
+    msisdnTag_ = "";
 }
 } // namespace Telephony
 } // namespace OHOS

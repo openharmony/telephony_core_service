@@ -100,18 +100,6 @@ void NetworkSearchState::SetImsStatus(bool imsRegStatus)
     imsRegStatus_ = imsRegStatus;
 }
 
-bool NetworkSearchState::GsmOrNot(RadioTech radioTechnology) const
-{
-    return (radioTechnology == RadioTech::RADIO_TECHNOLOGY_GSM) ||
-        (radioTechnology == RadioTech::RADIO_TECHNOLOGY_LTE) ||
-        (radioTechnology == RadioTech::RADIO_TECHNOLOGY_WCDMA);
-}
-
-bool NetworkSearchState::CdmaOrNot(RadioTech radioTechnology) const
-{
-    return false;
-}
-
 std::unique_ptr<NetworkState> NetworkSearchState::GetNetworkStatus()
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -135,44 +123,139 @@ void NetworkSearchState::SetInitial()
     }
 }
 
-void NetworkSearchState::NotifyStateChange()
+void NetworkSearchState::SetCfgTech(RadioTech tech)
 {
-    TELEPHONY_LOGI("NetworkSearchState::StateCheck");
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (networkState_ != nullptr) {
+        networkState_->SetCfgTech(tech);
+    }
+}
+
+void NetworkSearchState::SetNrState(NrState state)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (networkState_ != nullptr) {
+        networkState_->SetNrState(state);
+    }
+}
+
+void NetworkSearchState::NotifyPsRegStatusChange()
+{
     std::lock_guard<std::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("NotifyStateChange NetworkSearchManager is null");
+        TELEPHONY_LOGE("NotifyPsRegStatusChange NetworkSearchManager is null");
         return;
     }
     if (networkState_ == nullptr) {
-        TELEPHONY_LOGE("NotifyStateChange networkState_ is null");
+        TELEPHONY_LOGE("NotifyPsRegStatusChange networkState_ is null");
         return;
     }
 
     if (networkState_->GetPsRegStatus() == RegServiceState::REG_STATE_IN_SERVICE &&
         networkStateOld_->GetPsRegStatus() != RegServiceState::REG_STATE_IN_SERVICE) {
-        TELEPHONY_LOGI("NetworkSearchState::StateCheck isPSNetworkChange notify to dc...");
         networkSearchManager->NotifyPsConnectionAttachedChanged();
     }
     if (networkState_->GetPsRegStatus() != RegServiceState::REG_STATE_IN_SERVICE &&
         networkStateOld_->GetPsRegStatus() == RegServiceState::REG_STATE_IN_SERVICE) {
-        TELEPHONY_LOGI("NetworkSearchState::StateCheck isPSNetworkAttached notify to dc...");
         networkSearchManager->NotifyPsConnectionDetachedChanged();
+    }
+}
+
+void NetworkSearchState::NotifyPsRoamingStatusChange()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NotifyPsRoamingStatusChange NetworkSearchManager is null");
+        return;
+    }
+    if (networkState_ == nullptr) {
+        TELEPHONY_LOGE("NotifyPsRoamingStatusChange networkState_ is null");
+        return;
     }
     if (networkState_->GetPsRoamingStatus() > RoamingType::ROAMING_STATE_UNKNOWN &&
         networkStateOld_->GetPsRoamingStatus() == RoamingType::ROAMING_STATE_UNKNOWN) {
-        TELEPHONY_LOGI("NetworkSearchState::StateCheck PSRoamingOpen notify to dc...");
         networkSearchManager->NotifyPsRoamingOpenChanged();
     }
     if (networkStateOld_->GetPsRoamingStatus() > RoamingType::ROAMING_STATE_UNKNOWN &&
         networkState_->GetPsRoamingStatus() == RoamingType::ROAMING_STATE_UNKNOWN) {
-        TELEPHONY_LOGI("NetworkSearchState::StateCheck PSRoamingClose notify to dc...");
         networkSearchManager->NotifyPsRoamingCloseChanged();
     }
+}
+
+void NetworkSearchState::NotifyPsRadioTechChange()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NotifyPsRadioTechChange NetworkSearchManager is null");
+        return;
+    }
+    if (networkState_ == nullptr) {
+        TELEPHONY_LOGE("NotifyPsRadioTechChange networkState_ is null");
+        return;
+    }
+
     if (networkState_->GetPsRadioTech() != networkStateOld_->GetPsRadioTech()) {
         networkSearchManager->SendUpdateCellLocationRequest();
         networkSearchManager->NotifyPsRatChanged();
     }
+}
+
+void NetworkSearchState::NotifyEmergencyChange()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NotifyEmergencyChange NetworkSearchManager is null");
+        return;
+    }
+    if (networkState_ == nullptr) {
+        TELEPHONY_LOGE("NotifyEmergencyChange networkState_ is null");
+        return;
+    }
+    if (networkState_->IsEmergency() != networkStateOld_->IsEmergency()) {
+        if (networkState_->IsEmergency()) {
+            networkSearchManager->NotifyEmergencyOpenChanged();
+        } else {
+            networkSearchManager->NotifyEmergencyCloseChanged();
+        }
+    }
+}
+
+void NetworkSearchState::NotifyNrStateChange()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NotifyPsRadioTechChange NetworkSearchManager is null");
+        return;
+    }
+    if (networkState_ == nullptr) {
+        TELEPHONY_LOGE("NotifyPsRadioTechChange networkState_ is null");
+        return;
+    }
+
+    if (networkState_->GetNrState() != networkStateOld_->GetNrState()) {
+        networkSearchManager->NotifyNrStateChanged();
+    }
+}
+
+void NetworkSearchState::NotifyStateChange()
+{
+    TELEPHONY_LOGI("NetworkSearchState::NotifyStateChange");
+    if (networkState_ == nullptr) {
+        TELEPHONY_LOGE("NotifyStateChange networkState_ is null");
+        return;
+    }
+
+    NotifyPsRegStatusChange();
+    NotifyPsRoamingStatusChange();
+    NotifyPsRadioTechChange();
+    NotifyEmergencyChange();
+    NotifyNrStateChange();
+
     if (!(*networkState_ == *networkStateOld_)) {
         TELEPHONY_LOGI("NetworkSearchState::StateCheck isNetworkStateChange notify to app...");
         sptr<NetworkState> ns = new NetworkState;

@@ -15,8 +15,8 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 
 TELEPHONY_CORE_SERVICE_ROOT = "//base/telephony/core_service"
 TELEPHONY_SIM_ROOT = "//base/telephony/core_service/services/sim"
-TELEPHONY_FRAMEWORKS_ROOT = "//base/telephony/core_service/frameworks/native/"
 HDF_FRAMEWORKS = "//drivers/hdf/frameworks"
+TELEPHONY_FRAMEWORKS_ROOT = "//base/telephony/core_service/frameworks/native/"
 
 ohos_executable("tel_sim_test") {
   install_enable = true
@@ -35,16 +35,16 @@ ohos_executable("tel_sim_test") {
     "//base/telephony/data_storage/common/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/base/include",
     "//base/telephony/ril_adapter/interfaces/innerkits/include",
-    "$TELEPHONY_CORE_SERVICE_ROOT/tel_ril/include",
+    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/sim",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/network_search",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/core",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/state_registry",
-    "$TELEPHONY_CORE_SERVICE_ROOT/common/data_storage",
-    "$TELEPHONY_CORE_SERVICE_ROOT/common/network_search",
-    "$TELEPHONY_CORE_SERVICE_ROOT/common/sim",
-    "$TELEPHONY_CORE_SERVICE_ROOT/common/core",
-    "$TELEPHONY_CORE_SERVICE_ROOT/common/cellular_data",
+    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/data_storage",
+    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/network_search",
+    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/sim",
+    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/core",
+    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/cellular_data",
     "$TELEPHONY_SIM_ROOT/include",
 
     "$HDF_FRAMEWORKS/ability/sbuf/include",
