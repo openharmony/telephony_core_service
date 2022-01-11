@@ -14,6 +14,7 @@
  */
 
 #include "sim_state_tracker.h"
+#include "observer_handler.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -52,14 +53,32 @@ bool SimStateTracker::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
         return false;
     }
     TELEPHONY_LOGI("SimStateTracker::GetOperatorConfigs from new");
-    bool result = operatorConf_->GetOperatorConfigs(slotId, conf_);
+    if (!operatorConf_->GetOperatorConfigs(slotId, conf_)) {
+        TELEPHONY_LOGE("SimStateTracker::GetOperatorConfigs can not get from xml");
+        return false;
+    }
     auto valueIt = conf_.configValue.begin();
     while (valueIt != conf_.configValue.end()) {
         poc.configValue.emplace(
             std::pair<std::u16string, std::u16string>(valueIt->first, valueIt->second));
         valueIt++;
     }
-    return result;
+    return AnnounceOperatorConfigChanged();
+}
+
+bool SimStateTracker::AnnounceOperatorConfigChanged()
+{
+    AAFwk::Want want;
+    want.SetAction(COMMON_EVENT_TELEPHONY_OPERATOR_CONFIG_CHANGED);
+    std::string eventData(OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventData data;
+    data.SetWant(want);
+    data.SetData(eventData);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    publishInfo.SetOrdered(true);
+    bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
+    TELEPHONY_LOGI("SimStateTracker::PublishSimFileEvent end###publishResult = %{public}d\n", publishResult);
+    return publishResult;
 }
 
 void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)

@@ -31,14 +31,10 @@
 #include "common_event_manager.h"
 #include "want.h"
 #include "icc_dialling_numbers_handler.h"
+#include "telephony_state_registry_client.h"
 
 namespace OHOS {
 namespace Telephony {
-enum Icc_File_Action {
-    ACTION_WAIT,
-    SET_VOICE_MAIL
-};
-
 class IccFile : public AppExecFwk::EventHandler {
 public:
     IccFile(
@@ -84,13 +80,18 @@ public:
     };
     virtual bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber) = 0;
     bool HasSimCard(int slotId);
+    virtual void UnInit();
+    void SetId(int id)
+    {
+        slotId_ = id;
+    }
 
 protected:
     virtual void ProcessIccRefresh(int msgId) = 0;
     virtual void ProcessFileLoaded(bool response) = 0;
     virtual void OnAllFilesFetched() = 0;
     bool LockQueriedOrNot();
-    void UpdateSPN(const std::string &spn);
+    void UpdateSPN(const std::string spn);
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<IccFileController> fileController_ = nullptr;
     std::shared_ptr<ISimStateManager> stateManager_ = nullptr;
@@ -108,7 +109,6 @@ protected:
     std::string lastVoiceMailNum_ = "";
     std::string lastVoiceMailTag_ = "";
     std::string operatorNumeric_ = "";
-    sptr<ITelephonyStateNotify> telephonyStateNotify_ = nullptr;
     bool voiceMailFixedOrNot_ = false;
     std::string pnnHomeName_ = "";
     std::string iccLanguage_ = "";
@@ -146,19 +146,15 @@ protected:
     std::shared_ptr<IccDiallingNumbersHandler> diallingNumberHandler_ = nullptr;
     AppExecFwk::InnerEvent::Pointer CreateDiallingNumberPointer(
         int eventid, int efId, int index, std::shared_ptr<void> pobj);
-    static bool IsActionOn();
-    void SetCurAction(Icc_File_Action action);
-    Icc_File_Action GetCurAction();
-    void NotifyRegistrySimState(SimState state, LockReason reason);
+    void NotifyRegistrySimState(CardType type, SimState state, LockReason reason);
+    int slotId_ = 0;
 
 private:
     bool ProcessIccFileObtained(const AppExecFwk::InnerEvent::Pointer &event);
-    bool ConnectRegistryService();
     void RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void UnregisterImsiLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void UnregisterAllFilesLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    static Icc_File_Action g_CurFileAction;
 };
 } // namespace Telephony
 } // namespace OHOS

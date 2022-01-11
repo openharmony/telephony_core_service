@@ -28,7 +28,7 @@
 #include "get_preferred_network_callback.h"
 #include "set_preferred_network_callback.h"
 #include "core_manager.h"
-#include "radio_network_manager.h"
+#include "core_service_client.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -43,6 +43,24 @@ static int32_t WrapRadioTech(int32_t radioTechType)
             return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_LTE);
         case RadioTech::RADIO_TECHNOLOGY_WCDMA:
             return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_WCDMA);
+        case RadioTech::RADIO_TECHNOLOGY_1XRTT:
+            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_1XRTT);
+        case RadioTech::RADIO_TECHNOLOGY_HSPA:
+            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_HSPA);
+        case RadioTech::RADIO_TECHNOLOGY_HSPAP:
+            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_HSPAP);
+        case RadioTech::RADIO_TECHNOLOGY_TD_SCDMA:
+            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_TD_SCDMA);
+        case RadioTech::RADIO_TECHNOLOGY_EVDO:
+            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_EVDO);
+        case RadioTech::RADIO_TECHNOLOGY_EHRPD:
+            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_EHRPD);
+        case RadioTech::RADIO_TECHNOLOGY_LTE_CA:
+            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_LTE_CA);
+        case RadioTech::RADIO_TECHNOLOGY_IWLAN:
+            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_IWLAN);
+        case RadioTech::RADIO_TECHNOLOGY_NR:
+            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR);
         default:
             return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_UNKNOWN);
     }
@@ -59,6 +77,10 @@ static int32_t WrapSignalInformationType(SignalInformation::NetworkType type)
             return static_cast<int32_t>(NetworkType::NETWORK_TYPE_LTE);
         case SignalInformation::NetworkType::WCDMA:
             return static_cast<int32_t>(NetworkType::NETWORK_TYPE_WCDMA);
+        case SignalInformation::NetworkType::TDSCDMA:
+            return static_cast<int32_t>(NetworkType::NETWORK_TYPE_TDSCDMA);
+        case SignalInformation::NetworkType::NR:
+            return static_cast<int32_t>(NetworkType::NETWORK_TYPE_NR);
         default:
             return static_cast<int32_t>(NetworkType::NETWORK_TYPE_UNKNOWN);
     }
@@ -96,8 +118,7 @@ static napi_value ParseErrorValue(napi_env env, const int32_t rilErrorCode, cons
             return NapiUtil::CreateErrorMessage(
                 env, funcName + " error because hril err repeat status", rilErrorCode);
         default:
-            return NapiUtil::CreateErrorMessage(
-                env, funcName + " error unknown because hril err repeat status", rilErrorCode);
+            return NapiUtil::CreateErrorMessage(env, funcName + " ", rilErrorCode);
     }
 }
 
@@ -106,8 +127,8 @@ static void NativeGetRadioTech(napi_env env, void *data)
     auto asyncContext = static_cast<RadioTechContext *>(data);
     int32_t psRadioTech = DEFAULT_ERROR;
     int32_t csRadioTech = DEFAULT_ERROR;
-    psRadioTech = RadioNetworkManager::GetPsRadioTech(asyncContext->slotId);
-    csRadioTech = RadioNetworkManager::GetCsRadioTech(asyncContext->slotId);
+    psRadioTech = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPsRadioTech(asyncContext->slotId);
+    csRadioTech = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCsRadioTech(asyncContext->slotId);
     auto napiRadioTechUnknown = static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_UNKNOWN);
     if ((psRadioTech >= napiRadioTechUnknown) && (csRadioTech >= napiRadioTechUnknown)) {
         asyncContext->resolved = true;
@@ -189,7 +210,8 @@ static napi_value GetRadioTech(napi_env env, napi_callback_info info)
 static void NativeGetSignalInfoList(napi_env env, void *data)
 {
     auto asyncContext = static_cast<SignalInfoListContext *>(data);
-    asyncContext->signalInfoList = RadioNetworkManager::GetSignalInfoList(asyncContext->slotId);
+    asyncContext->signalInfoList =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSignalInfoList(asyncContext->slotId);
     TELEPHONY_LOGI("NativeGetSignalInfoList size = %{public}zu", asyncContext->signalInfoList.size());
     asyncContext->resolved = true;
 }
@@ -288,7 +310,7 @@ static void NativeGetNetworkState(napi_env env, void *data)
 {
     auto asyncContext = static_cast<GetStateContext *>(data);
     sptr<NetworkState> networkState = nullptr;
-    networkState = RadioNetworkManager::GetNetworkState(asyncContext->slotId);
+    networkState = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkState(asyncContext->slotId);
     if (networkState != nullptr) {
         asyncContext->resolved = true;
         asyncContext->regStatus = static_cast<int32_t>(networkState->GetRegStatus());
@@ -297,6 +319,9 @@ static void NativeGetNetworkState(napi_env env, void *data)
         asyncContext->plmnNumeric = networkState->GetPlmnNumeric();
         asyncContext->isRoaming = networkState->IsRoaming();
         asyncContext->isEmergency = networkState->IsEmergency();
+        asyncContext->csRoamingStatus = static_cast<int32_t>(networkState->GetCsRoamingStatus());
+        asyncContext->psRoamingStatus = static_cast<int32_t>(networkState->GetPsRoamingStatus());
+        asyncContext->cfgTech = static_cast<int32_t>(networkState->GetCfgTech());
     } else {
         asyncContext->resolved = false;
     }
@@ -314,8 +339,11 @@ static void GetNetworkStateCallback(napi_env env, napi_status status, void *data
         NapiUtil::SetPropertyBoolean(env, callbackValue, "isRoaming", asyncContext->isRoaming);
         NapiUtil::SetPropertyInt32(env, callbackValue, "regStatus", WrapRegState(asyncContext->regStatus));
         NapiUtil::SetPropertyInt32(env, callbackValue, "nsaState", asyncContext->nsaState);
+        NapiUtil::SetPropertyInt32(env, callbackValue, "cfgTech", WrapRadioTech(asyncContext->cfgTech));
         NapiUtil::SetPropertyBoolean(env, callbackValue, "isCaActive", asyncContext->isCaActive);
         NapiUtil::SetPropertyBoolean(env, callbackValue, "isEmergency", asyncContext->isEmergency);
+        NapiUtil::SetPropertyInt32(env, callbackValue, "csRoamingStatus", asyncContext->csRoamingStatus);
+        NapiUtil::SetPropertyInt32(env, callbackValue, "psRoamingStatus", asyncContext->psRoamingStatus);
     } else {
         callbackValue = NapiUtil::CreateErrorMessage(env, "get network state null");
     }
@@ -342,6 +370,25 @@ static bool MatchGetNetworkStateParameter(napi_env env, napi_value parameter[], 
 }
 
 static bool MatchGetIMEIParameter(napi_env env, napi_value parameter[], size_t parameterCount)
+{
+    switch (parameterCount) {
+        case 0: {
+            return true;
+        }
+        case 1: {
+            return NapiUtil::MatchParameters(env, parameter, {napi_number}) ||
+                NapiUtil::MatchParameters(env, parameter, {napi_function});
+        }
+        case 2: {
+            return NapiUtil::MatchParameters(env, parameter, {napi_number, napi_function});
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
+static bool MatchGetNrOptionModeParameter(napi_env env, napi_value parameter[], size_t parameterCount)
 {
     switch (parameterCount) {
         case 0: {
@@ -395,8 +442,8 @@ static void NativeGetNetworkSelectionMode(napi_env env, void *data)
     std::unique_ptr<GetNetworkSearchModeCallback> callback =
         std::make_unique<GetNetworkSearchModeCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest =
-        RadioNetworkManager::GetNetworkSelectionMode(asyncContext->slotId, callback.release());
+    asyncContext->sendRequest = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkSelectionMode(
+        asyncContext->slotId, callback.release());
     if (asyncContext->sendRequest) {
         asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [asyncContext] { return asyncContext->callbackEnd; });
@@ -441,8 +488,8 @@ static void NativeGetNetworkSearchInformation(napi_env env, void *data)
     std::unique_ptr<GetNetworkSearchInfoCallback> callback =
         std::make_unique<GetNetworkSearchInfoCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest =
-        RadioNetworkManager::GetNetworkSearchInformation(asyncContext->slotId, callback.release());
+    asyncContext->sendRequest = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkSearchInformation(
+        asyncContext->slotId, callback.release());
     if (asyncContext->sendRequest) {
         asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [asyncContext] { return asyncContext->callbackEnd; });
@@ -681,8 +728,9 @@ static void NativeSetNetworkSelectionMode(napi_env env, void *data)
     std::unique_ptr<SetNetworkSearchModeCallback> callback =
         std::make_unique<SetNetworkSearchModeCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest = RadioNetworkManager::SetNetworkSelectionMode(asyncContext->slotId,
-        asyncContext->selectMode, networkInfo, asyncContext->resumeSelection, callback.release());
+    asyncContext->sendRequest =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().SetNetworkSelectionMode(asyncContext->slotId,
+            asyncContext->selectMode, networkInfo, asyncContext->resumeSelection, callback.release());
     TELEPHONY_LOGI("NativeSetNetworkSelectionMode setResult = %{public}d", asyncContext->sendRequest);
     if (asyncContext->sendRequest) {
         asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
@@ -762,7 +810,8 @@ static napi_value SetNetworkSelectionMode(napi_env env, napi_callback_info info)
 static void NativeGetCountryCode(napi_env env, void *data)
 {
     auto context = static_cast<GetISOCountryCodeContext *>(data);
-    context->countryCode = NapiUtil::ToUtf8(RadioNetworkManager::GetIsoCountryCodeForNetwork(context->slotId));
+    context->countryCode = NapiUtil::ToUtf8(
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetIsoCountryCodeForNetwork(context->slotId));
     TELEPHONY_LOGI("NativeGetCountryCode countryCode = %{public}s", context->countryCode.c_str());
     context->resolved = true;
 }
@@ -834,7 +883,8 @@ static void NativeIsRadioOn(napi_env env, void *data)
     auto asyncContext = static_cast<IsRadioOnContext *>(data);
     std::unique_ptr<GetRadioStateCallback> callback = std::make_unique<GetRadioStateCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest = RadioNetworkManager::GetRadioState(callback.release());
+    asyncContext->sendRequest =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetRadioState(callback.release());
     TELEPHONY_LOGI("NativeIsRadioOn sendRequest = %{public}d", asyncContext->sendRequest);
     if (asyncContext->sendRequest) {
         asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
@@ -878,7 +928,8 @@ static void NativeTurnOnRadio(napi_env env, void *data)
     auto asyncContext = static_cast<SwitchRadioContext *>(data);
     std::unique_ptr<SetRadioStateCallback> callback = std::make_unique<SetRadioStateCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest = RadioNetworkManager::SetRadioState(true, callback.release());
+    asyncContext->sendRequest =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().SetRadioState(true, callback.release());
     if (asyncContext->sendRequest) {
         asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [asyncContext] { return asyncContext->callbackEnd; });
@@ -936,7 +987,8 @@ static void NativeTurnOffRadio(napi_env env, void *data)
     auto asyncContext = static_cast<SwitchRadioContext *>(data);
     std::unique_ptr<SetRadioStateCallback> callback = std::make_unique<SetRadioStateCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest = RadioNetworkManager::SetRadioState(false, callback.release());
+    asyncContext->sendRequest =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().SetRadioState(false, callback.release());
     if (asyncContext->sendRequest) {
         asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [asyncContext] { return asyncContext->callbackEnd; });
@@ -978,7 +1030,8 @@ static napi_value TurnOffRadio(napi_env env, napi_callback_info info)
 static void NativeGetOperatorName(napi_env env, void *data)
 {
     auto context = static_cast<GetOperatorNameContext *>(data);
-    std::u16string u16OperatorName = RadioNetworkManager::GetOperatorName(context->slotId);
+    std::u16string u16OperatorName =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOperatorName(context->slotId);
     std::string operatorName = NapiUtil::ToUtf8(u16OperatorName);
     TELEPHONY_LOGI("NativeGetOperatorName operatorName = %{public}s", operatorName.c_str());
     context->resolved = true;
@@ -1036,10 +1089,15 @@ static napi_value GetOperatorName(napi_env env, napi_callback_info info)
 static void NativeSetPreferredNetwork(napi_env env, void *data)
 {
     auto asyncContext = static_cast<PreferredNetworkModeContext *>(data);
+//    if ((asyncContext->preferredNetworkMode >= PREFERRED_NETWORK_MODE_AUTO) &&
+//        (asyncContext->preferredNetworkMode <= PREFERRED_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA)) {
+//        asyncContext->resolved = false;
+//        asyncContext->errorCode = ENUMERATION_INPUT_ERROR;
+//    }
     auto setPreferredNetworkCallback = std::make_unique<SetPreferredNetworkCallback>(asyncContext);
     OHOS::sptr<INetworkSearchCallback> callback(setPreferredNetworkCallback.release());
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest = RadioNetworkManager::SetPreferredNetwork(
+    asyncContext->sendRequest = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetPreferredNetwork(
         asyncContext->slotId, asyncContext->preferredNetworkMode, callback);
     if (asyncContext->slotId != 0) {
         asyncContext->resolved = false;
@@ -1067,6 +1125,8 @@ static void SetPreferredNetworkCallback(napi_env env, napi_status status, void *
         } else {
             if (context->errorCode == SLOTID_INPUT_ERROR) {
                 callbackValue = ParseErrorValue(env, context->errorCode, "slotId input error");
+            } else if (context->errorCode == ENUMERATION_INPUT_ERROR) {
+                callbackValue = ParseErrorValue(env, context->errorCode, "enumeration input error");
             } else {
                 callbackValue = ParseErrorValue(env, context->errorCode, "set preferred network mode error");
             }
@@ -1117,7 +1177,8 @@ static void NativeGetPreferredNetwork(napi_env env, void *data)
     auto getPreferredNetworkCallback = std::make_unique<GetPreferredNetworkCallback>(asyncContext);
     OHOS::sptr<INetworkSearchCallback> callback(getPreferredNetworkCallback.release());
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest = RadioNetworkManager::GetPreferredNetwork(asyncContext->slotId, callback);
+    asyncContext->sendRequest =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPreferredNetwork(asyncContext->slotId, callback);
     if (asyncContext->slotId != 0) {
         asyncContext->resolved = false;
         asyncContext->errorCode = SLOTID_INPUT_ERROR;
@@ -1190,7 +1251,8 @@ static napi_value GetPreferredNetwork(napi_env env, napi_callback_info info)
 void NativeGetIMEI(napi_env env, void *data)
 {
     auto context = static_cast<GetIMEIContext *>(data);
-    context->getIMEIResult = NapiUtil::ToUtf8(RadioNetworkManager::GetImei(context->slotId));
+    context->getIMEIResult =
+        NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImei(context->slotId));
     TELEPHONY_LOGI("NativeGetIMEI getIMEIResult = %{public}s", context->getIMEIResult.c_str());
     context->resolved = true;
 }
@@ -1243,7 +1305,9 @@ static napi_value GetIMEI(napi_env env, napi_callback_info info)
 void NativeGetMEID(napi_env env, void *data)
 {
     auto context = static_cast<GetMEIDContext *>(data);
-    context->getMEIDResult = "NA";
+    context->getMEIDResult =
+        NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetMeid(context->slotId));
+    TELEPHONY_LOGI("NativeGetMEID context->slotId = %{public}d", context->slotId);
     TELEPHONY_LOGI("NativeGetMEID countryCode = %{public}s", context->getMEIDResult.c_str());
     context->resolved = true;
 }
@@ -1279,8 +1343,9 @@ static napi_value GetMEID(napi_env env, napi_callback_info info)
     } else if (parameterCount == 1) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
-        if (valueType == napi_string) {
+        if (valueType == napi_number) {
             NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+            TELEPHONY_LOGI("NativeGetMEID context->slotId222 = %{public}d", asyncContext->slotId);
         } else if (valueType == napi_function) {
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(
@@ -1296,7 +1361,8 @@ static napi_value GetMEID(napi_env env, napi_callback_info info)
 static void NativeSendUpdateCellLocationRequest(napi_env env, void *data)
 {
     auto asyncContext = static_cast<SendUpdateCellLocationRequest *>(data);
-    asyncContext->sendRequest = RadioNetworkManager::SendUpdateCellLocationRequest();
+    asyncContext->sendRequest =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().SendUpdateCellLocationRequest();
     TELEPHONY_LOGI("asyncContext->sendRequest = %{public}d", asyncContext->sendRequest);
     asyncContext->resolved = true;
     TELEPHONY_LOGI("NativeSendUpdateCellLocationRequest end");
@@ -1343,6 +1409,12 @@ static int32_t WrapCellInformationType(const sptr<CellInformation> CellInfo)
                 return static_cast<int32_t>(NetworkType::NETWORK_TYPE_WCDMA);
             case CellInformation::CellType::CELL_TYPE_LTE:
                 return static_cast<int32_t>(NetworkType::NETWORK_TYPE_LTE);
+            case CellInformation::CellType::CELL_TYPE_TDSCDMA:
+                return static_cast<int32_t>(NetworkType::NETWORK_TYPE_TDSCDMA);
+            case CellInformation::CellType::CELL_TYPE_CDMA:
+                return static_cast<int32_t>(NetworkType::NETWORK_TYPE_CDMA);
+            case CellInformation::CellType::CELL_TYPE_NR:
+                return static_cast<int32_t>(NetworkType::NETWORK_TYPE_NR);
             default:
                 return static_cast<int32_t>(NetworkType::NETWORK_TYPE_UNKNOWN);
         }
@@ -1393,6 +1465,41 @@ napi_value JudgmentData(napi_env env, sptr<CellInformation> infoItem, CellInform
             }
             break;
         }
+        case CellInformation::CellType::CELL_TYPE_CDMA: {
+            auto cdmaCellInfo = static_cast<CdmaCellInformation *>(infoItem.GetRefPtr());
+            if (cdmaCellInfo != nullptr) {
+                NapiUtil::SetPropertyInt32(env, data, "baseId", cdmaCellInfo->GetBaseId());
+                NapiUtil::SetPropertyInt32(env, data, "latitude", cdmaCellInfo->GetLatitude());
+                NapiUtil::SetPropertyInt32(env, data, "longitude", cdmaCellInfo->GetLongitude());
+                NapiUtil::SetPropertyInt32(env, data, "nid", cdmaCellInfo->GetNid());
+                NapiUtil::SetPropertyInt32(env, data, "sid", cdmaCellInfo->GetSid());
+            }
+            break;
+        }
+        case CellInformation::CellType::CELL_TYPE_TDSCDMA: {
+            auto tdscdmaCellInfo = static_cast<TdscdmaCellInformation *>(infoItem.GetRefPtr());
+            if (tdscdmaCellInfo != nullptr) {
+                NapiUtil::SetPropertyInt32(env, data, "lac", tdscdmaCellInfo->GetLac());
+                NapiUtil::SetPropertyInt32(env, data, "cellId", tdscdmaCellInfo->GetCellId());
+                NapiUtil::SetPropertyInt32(env, data, "cpid", tdscdmaCellInfo->GetCpid());
+                NapiUtil::SetPropertyInt32(env, data, "uarfcn", tdscdmaCellInfo->GetArfcn());
+                NapiUtil::SetPropertyInt32(env, data, "mcc", tdscdmaCellInfo->GetMcc());
+                NapiUtil::SetPropertyInt32(env, data, "mnc", tdscdmaCellInfo->GetMnc());
+            }
+            break;
+        }
+        case CellInformation::CellType::CELL_TYPE_NR: {
+            auto nrCellCellInfo = static_cast<NrCellInformation *>(infoItem.GetRefPtr());
+            if (nrCellCellInfo != nullptr) {
+                NapiUtil::SetPropertyInt32(env, data, "nrArfcn", nrCellCellInfo->GetArfcn());
+                NapiUtil::SetPropertyInt32(env, data, "pci", nrCellCellInfo->GetPci());
+                NapiUtil::SetPropertyInt32(env, data, "tac", nrCellCellInfo->GetTac());
+                NapiUtil::SetPropertyInt32(env, data, "nci", nrCellCellInfo->GetNci());
+                NapiUtil::SetPropertyInt32(env, data, "mcc", nrCellCellInfo->GetMcc());
+                NapiUtil::SetPropertyInt32(env, data, "mnc", nrCellCellInfo->GetMnc());
+            }
+            break;
+        }
         default:
             break;
     }
@@ -1402,7 +1509,8 @@ napi_value JudgmentData(napi_env env, sptr<CellInformation> infoItem, CellInform
 static void NativeGetCellInformation(napi_env env, void *data)
 {
     auto asyncContext = (CellInformationContext *)data;
-    asyncContext->cellInformations = RadioNetworkManager::GetCellInfoList(asyncContext->slotId);
+    asyncContext->cellInformations =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCellInfoList(asyncContext->slotId);
     asyncContext->resolved = true;
 }
 
@@ -1480,6 +1588,186 @@ static napi_value GetCellInformation(napi_env env, napi_callback_info info)
         napi_create_async_work(env, nullptr, resourceName, NativeGetCellInformation, GetCellInformationCallback,
             (void *)asyncContext, &(asyncContext->work)));
     NAPI_CALL(env, napi_queue_async_work(env, asyncContext->work));
+    return result;
+}
+
+static void NativeGetPrimarySlotId(napi_env env, void *data)
+{
+    auto asyncContext = (GetPrimarySlotIdContext *)data;
+    TELEPHONY_LOGI("GetPrimarySlotId  = %{public}d", asyncContext->slotId);
+    asyncContext->resolved = true;
+}
+
+void GetPrimarySlotIdCallback(napi_env env, napi_status status, void *data)
+{
+    auto asyncContext = static_cast<GetPrimarySlotIdContext *>(data);
+    napi_value callbackValue = nullptr;
+    if (asyncContext->resolved) {
+        napi_create_int32(env, asyncContext->slotId, &callbackValue);
+    } else {
+        callbackValue = NapiUtil::CreateErrorMessage(env, " GetPrimarySlotI error");
+    }
+    NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
+}
+
+static napi_value GetPrimarySlotId(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[1] = {0};
+    napi_value thisVar;
+    void *data;
+    napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
+    NAPI_ASSERT(env, MatchSwitchRadioParameter(env, parameters, parameterCount), "type mismatch");
+    auto asyncContext = std::make_unique<SwitchRadioContext>();
+    if (parameterCount == 1) {
+        NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+    }
+    return NapiUtil::HandleAsyncWork(
+        env, asyncContext.release(), "GetPrimarySlotId", NativeGetPrimarySlotId, GetPrimarySlotIdCallback);
+}
+
+static void NativeGetUniqueDeviceId(napi_env env, void *data)
+{
+    auto context = static_cast<GetUniqueDeviceIdContext *>(data);
+    context->getUniqueDeviceId =
+        NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetUniqueDeviceId(context->slotId));
+    TELEPHONY_LOGI("NativeGetUniqueDeviceId getUniqueDeviceId = %{public}s", context->getUniqueDeviceId.c_str());
+    context->resolved = true;
+}
+
+void GetUniqueDeviceIdCallback(napi_env env, napi_status status, void *data)
+{
+    auto context = static_cast<GetUniqueDeviceIdContext *>(data);
+    napi_value callbackValue = nullptr;
+    if (status == napi_ok) {
+        if (context->resolved) {
+            napi_create_string_utf8(
+                env, context->getUniqueDeviceId.c_str(), context->getUniqueDeviceId.size(), &callbackValue);
+        } else {
+            callbackValue = NapiUtil::CreateErrorMessage(env, "GetUniqueDeviceId error");
+        }
+    } else {
+        callbackValue =
+            NapiUtil::CreateErrorMessage(env, "GetUniqueDeviceId error,napi_status = " + std ::to_string(status));
+    }
+    NapiUtil::Handle2ValueCallback(env, context, callbackValue);
+}
+
+static napi_value GetUniqueDeviceId(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 2;
+    napi_value parameters[2] = {0};
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
+    NAPI_ASSERT(env, MatchGetIMEIParameter(env, parameters, parameterCount), "type mismatch");
+    auto asyncContext = std::make_unique<GetIMEIContext>();
+    if (parameterCount == 0) {
+        asyncContext->slotId = GetDefaultSlotId();
+    } else if (parameterCount == 1) {
+        napi_valuetype valueType = napi_undefined;
+        NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
+        if (valueType == napi_number) {
+            NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+        } else if (valueType == napi_function) {
+            asyncContext->slotId = GetDefaultSlotId();
+            NAPI_CALL(
+                env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+        }
+    } else if (parameterCount == 2) {
+        NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+        NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+    }
+    return NapiUtil::HandleAsyncWork(
+        env, asyncContext.release(), "GetUniqueDeviceId", NativeGetUniqueDeviceId, GetUniqueDeviceIdCallback);
+}
+
+static int32_t WrapNrOptionMode(NrMode type)
+{
+    switch (type) {
+        case NrMode::NR_MODE_UNKNOWN:
+            return static_cast<int32_t>(NR_OPTION_UNKNOWN);
+        case NrMode::NR_MODE_NSA_ONLY:
+            return static_cast<int32_t>(NR_OPTION_NSA_ONLY);
+        case NrMode::NR_MODE_SA_ONLY:
+            return static_cast<int32_t>(NR_OPTION_SA_ONLY);
+        case NrMode::NR_MODE_NSA_AND_SA:
+            return static_cast<int32_t>(NR_OPTION_NSA_AND_SA);
+        default:
+            return static_cast<int32_t>(NR_OPTION_UNKNOWN);
+    }
+}
+
+static void NativeGetNrOptionMode(napi_env env, void *data)
+{
+    auto context = static_cast<GetNrOptionModeContext *>(data);
+    context->nrOptionMode =
+        WrapNrOptionMode(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNrOptionMode(context->slotId));
+    if (context->slotId != 0) {
+        context->resolved = false;
+        context->errorCode = SLOTID_INPUT_ERROR;
+    }
+    TELEPHONY_LOGI("NativeGetNrOptionMode nrOptionMode = %{public}d", context->nrOptionMode);
+    context->resolved = true;
+}
+
+static void GetNrOptionModeCallback(napi_env env, napi_status status, void *data)
+{
+    auto context = static_cast<GetNrOptionModeContext *>(data);
+    TELEPHONY_LOGI("GetNrOptionModeCallback resolved = %{public}d", context->resolved);
+    napi_value callbackValue = nullptr;
+    if (status == napi_ok) {
+        if (context->resolved) {
+            napi_create_int32(env, context->nrOptionMode, &callbackValue);
+        } else {
+            if (context->errorCode == SLOTID_INPUT_ERROR) {
+                callbackValue = ParseErrorValue(env, context->errorCode, "slotId input error");
+            } else {
+                callbackValue = ParseErrorValue(env, context->errorCode, "get nrOptionMode mode err");
+            }
+        }
+    } else {
+        callbackValue = ParseErrorValue(env, context->errorCode, "getNrOptionMod0 error");
+    }
+    NapiUtil::Handle2ValueCallback(env, context, callbackValue);
+}
+
+static napi_value GetNrOptionMode(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 2;
+    napi_value parameters[2] = {0};
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
+    NAPI_ASSERT(env, MatchGetNrOptionModeParameter(env, parameters, parameterCount), "type mismatch");
+    auto asyncContext = std::make_unique<GetNrOptionModeContext>();
+    if (parameterCount == 0) {
+        asyncContext->slotId = GetDefaultSlotId();
+    } else if (parameterCount == 1) {
+        napi_valuetype valueType = napi_undefined;
+        NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
+        if (valueType == napi_number) {
+            NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+        } else if (valueType == napi_function) {
+            asyncContext->slotId = GetDefaultSlotId();
+            NAPI_CALL(
+                env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+        }
+    } else if (parameterCount == 2) {
+        NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+        NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+    }
+    return NapiUtil::HandleAsyncWork(
+        env, asyncContext.release(), "GetNrOptionMode", NativeGetNrOptionMode, GetNrOptionModeCallback);
+}
+
+static napi_value IsNrSupported(napi_env env, napi_callback_info info)
+{
+    TELEPHONY_LOGI("IsNrSupported start!");
+    napi_value result = nullptr;
+    bool isNrSupported = false;
+    isNrSupported = DelayedRefSingleton<CoreServiceClient>::GetInstance().IsNrSupported();
+    napi_get_boolean(env, isNrSupported, &result);
     return result;
 }
 
@@ -1622,6 +1910,78 @@ static napi_value InitEnumPreferredNetwork(napi_env env, napi_value exports)
             NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_LTE_WCDMA_GSM))),
         DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_WCDMA_GSM",
             NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_WCDMA_GSM))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_CDMA",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_CDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_EVDO",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_EVDO))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_EVDO_CDMA",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_EVDO_CDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_WCDMA_GSM_EVDO_CDMA",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_WCDMA_GSM_EVDO_CDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_LTE_EVDO_CDMA",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_LTE_EVDO_CDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_LTE_WCDMA_GSM_EVDO_CDMA",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_LTE_WCDMA_GSM_EVDO_CDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_TDSCDMA",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_TDSCDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_TDSCDMA_GSM",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_TDSCDMA_GSM))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_TDSCDMA_WCDMA",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_TDSCDMA_WCDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_TDSCDMA_WCDMA_GSM",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_TDSCDMA_WCDMA_GSM))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_LTE_TDSCDMA_WCDMA",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_LTE_TDSCDMA_WCDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_TDSCDMA_WCDMA_GSM_EVDO_CDMA",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_TDSCDMA_WCDMA_GSM_EVDO_CDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA",
+            NapiUtil::ToInt32Value(
+                env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_LTE_TDSCDMA",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_LTE_TDSCDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_LTE_TDSCDMA_GSM",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_LTE_TDSCDMA_GSM))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_NR",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_NR))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_NR_LTE",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_NR_LTE))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_NR_LTE_WCDMA",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_NR_LTE_WCDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_NR_LTE_WCDMA_GSM",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_NR_LTE_WCDMA_GSM))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_NR_LTE_EVDO_CDMA",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_NR_LTE_EVDO_CDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_NR_LTE_WCDMA_GSM_EVDO_CDMA",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_NR_LTE_WCDMA_GSM_EVDO_CDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_GSM",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_GSM))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM))),
+        DECLARE_NAPI_STATIC_PROPERTY("PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA",
+            NapiUtil::ToInt32Value(
+                env, static_cast<int32_t>(PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA))),
+    };
+    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    return exports;
+}
+
+static napi_value InitEnumNrOptionMode(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "NR_OPTION_UNKNOWN", NapiUtil::ToInt32Value(env, static_cast<int32_t>(NR_OPTION_UNKNOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "NR_OPTION_NSA_ONLY", NapiUtil::ToInt32Value(env, static_cast<int32_t>(NR_OPTION_NSA_ONLY))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "NR_OPTION_SA_ONLY", NapiUtil::ToInt32Value(env, static_cast<int32_t>(NR_OPTION_SA_ONLY))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "NR_OPTION_NSA_AND_SA", NapiUtil::ToInt32Value(env, static_cast<int32_t>(NR_OPTION_NSA_AND_SA))),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -1630,8 +1990,7 @@ static napi_value InitEnumPreferredNetwork(napi_env env, napi_value exports)
 EXTERN_C_START
 napi_value InitNapiRadioNetwork(napi_env env, napi_value exports)
 {
-    napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("getRadioTech", GetRadioTech),
+    napi_property_descriptor desc[] = {DECLARE_NAPI_FUNCTION("getRadioTech", GetRadioTech),
         DECLARE_NAPI_FUNCTION("getSignalInformation", GetSignalInfoList),
         DECLARE_NAPI_FUNCTION("getNetworkState", GetNetworkState),
         DECLARE_NAPI_FUNCTION("setNetworkSelectionMode", SetNetworkSelectionMode),
@@ -1644,11 +2003,14 @@ napi_value InitNapiRadioNetwork(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getOperatorName", GetOperatorName),
         DECLARE_NAPI_FUNCTION("setPreferredNetwork", SetPreferredNetwork),
         DECLARE_NAPI_FUNCTION("getPreferredNetwork", GetPreferredNetwork),
-        DECLARE_NAPI_FUNCTION("getImei", GetIMEI),
+        DECLARE_NAPI_FUNCTION("getIMEI", GetIMEI),
         DECLARE_NAPI_FUNCTION("getMEID", GetMEID),
         DECLARE_NAPI_FUNCTION("sendUpdateCellLocationRequest", SendUpdateCellLocationRequest),
         DECLARE_NAPI_FUNCTION("getCellInformation", GetCellInformation),
-    };
+        DECLARE_NAPI_FUNCTION("getPrimarySlotId", GetPrimarySlotId),
+        DECLARE_NAPI_FUNCTION("getUniqueDeviceId", GetUniqueDeviceId),
+        DECLARE_NAPI_FUNCTION("getNrOptionMode", GetNrOptionMode),
+        DECLARE_NAPI_FUNCTION("isNrSupported", IsNrSupported)};
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     InitEnumRadioType(env, exports);
     InitEnumNetworkType(env, exports);
@@ -1657,6 +2019,7 @@ napi_value InitNapiRadioNetwork(napi_env env, napi_value exports)
     InitEnumNetworkSelectionMode(env, exports);
     InitEnumNetworkInformationState(env, exports);
     InitEnumPreferredNetwork(env, exports);
+    InitEnumNrOptionMode(env, exports);
     return exports;
 }
 EXTERN_C_END

@@ -77,6 +77,7 @@ struct IccAccountInfo : public Parcelable {
     inline static const std::u16string DEFAULT_SHOW_NAME = u"Card";
     inline static const std::u16string DEFAULT_SHOW_NUMBER = u"";
     inline static const std::u16string DEFAULT_ICC_ID = u"";
+
     void Init(int32_t simCardId, int32_t slotId)
     {
         this->simId = simCardId;
@@ -177,17 +178,20 @@ public:
     virtual bool SetDefaultVoiceSlotId(int32_t slotId);
     virtual bool SetDefaultSmsSlotId(int32_t slotId);
     virtual bool SetDefaultCellularDataSlotId(int32_t slotId);
+    virtual bool SetPrimarySlotId(int32_t slotId);
     virtual bool SetShowNumber(int32_t slotId, const std::u16string number);
     virtual bool SetShowName(int32_t slotId, const std::u16string name);
     virtual int32_t GetDefaultVoiceSlotId();
     virtual int32_t GetDefaultSmsSlotId();
     virtual int32_t GetDefaultCellularDataSlotId();
+    virtual int32_t GetPrimarySlotId();
     virtual std::u16string GetShowNumber(int32_t slotId);
     virtual std::u16string GetShowName(int32_t slotId);
     virtual bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList);
     virtual bool GetOperatorConfigs(int slotId, OperatorConfig &poc);
+    virtual bool HasOperatorPrivileges(const int32_t slotId);
 };
 } // namespace Telephony
 } // namespace OHOS
 
-#endif // OHOS_I_SIM_MANAGER_H
+#endif // OHOS_I_SIM_ACCOUNT_MANAGER_H

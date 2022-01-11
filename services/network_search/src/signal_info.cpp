@@ -22,8 +22,8 @@
 namespace OHOS {
 namespace Telephony {
 SignalInfo::SignalInfo()
-    : gsmSigInfoCache_(), cdmaSigInfoCache_(), lteSigInfoCache_(), wcdmaSigInfoCache_(), gsmSigInfoCur_(),
-      cdmaSigInfoCur_(), lteSigInfoCur_(), wcdmaSigInfoCur_()
+    : gsmSigInfoCache_(), cdmaSigInfoCache_(), lteSigInfoCache_(), wcdmaSigInfoCache_(), tdScdmaSigInfoCache_(),
+    gsmSigInfoCur_(), cdmaSigInfoCur_(), lteSigInfoCur_(), wcdmaSigInfoCur_(), tdScdmaSigInfoCur_()
 {}
 
 void SignalInfo::Reset()
@@ -33,10 +33,12 @@ void SignalInfo::Reset()
     cdmaSigInfoCache_.SetValue();
     lteSigInfoCache_.SetValue();
     wcdmaSigInfoCache_.SetValue();
+    tdScdmaSigInfoCache_.SetValue();
     gsmSigInfoCur_.SetValue();
     cdmaSigInfoCur_.SetValue();
     lteSigInfoCur_.SetValue();
     wcdmaSigInfoCur_.SetValue();
+    tdScdmaSigInfoCur_.SetValue();
 }
 
 void SignalInfo::InitSignalBar(const int32_t bar) const
@@ -80,6 +82,24 @@ bool SignalInfo::ProcessWcdma(const WCdmaRssi &wcdmaSignal)
     return ret;
 }
 
+bool SignalInfo::ProcessTdScdma(const TdScdmaRssi &tdScdmaSignal)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    tdScdmaSigInfoCur_.SetValue(tdScdmaSignal.rscp);
+    bool ret = (tdScdmaSigInfoCur_ == tdScdmaSigInfoCache_);
+    tdScdmaSigInfoCache_ = tdScdmaSigInfoCur_;
+    return ret;
+}
+
+bool SignalInfo::ProcessNr(const NrRssi &nrSignal)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    nrSigInfoCur_.SetValue(nrSignal.rsrp, nrSignal.rsrq, nrSignal.sinr);
+    bool ret = (nrSigInfoCur_ == nrSigInfoCache_);
+    nrSigInfoCache_ = nrSigInfoCur_;
+    return ret;
+}
+
 static void PrintfLog(const Rssi &signalIntensity)
 {
     TELEPHONY_LOGI("SignalInfo::ProcessSignalIntensity gm.rssi:%{public}d, gm.ber:%{public}d\n",
@@ -100,6 +120,14 @@ static void PrintfLog(const Rssi &signalIntensity)
         "SignalInfo::ProcessSignalIntensity wcdma.ber:%{public}d ",
         signalIntensity.wcdma.rxlev, signalIntensity.wcdma.ecio, signalIntensity.wcdma.rscp,
         signalIntensity.wcdma.ber);
+
+    TELEPHONY_LOGI("SignalInfo::ProcessSignalIntensity tdScdma.rscp:%{public}d\n",
+        signalIntensity.tdScdma.rscp);
+
+    TELEPHONY_LOGI(
+        "SignalInfo::ProcessSignalIntensity nr.rsrp:%{public}d, "
+        "nr.rsrq:%{public}d, nr.sinr:%{public}d ",
+        signalIntensity.nr.rsrp, signalIntensity.nr.rsrq, signalIntensity.nr.sinr);
 }
 
 void SignalInfo::ProcessSignalIntensity(const AppExecFwk::InnerEvent::Pointer &event)
@@ -119,7 +147,9 @@ void SignalInfo::ProcessSignalIntensity(const AppExecFwk::InnerEvent::Pointer &e
     bool cdmaUpdate = ProcessCdma(signalIntensity->cdma);
     bool lteUpdate = ProcessLte(signalIntensity->lte);
     bool wcdmaUpdate = ProcessWcdma(signalIntensity->wcdma);
-    if (!gsmUpdate || !cdmaUpdate || !lteUpdate || !wcdmaUpdate) {
+    bool tdScdmaUpdate = ProcessTdScdma(signalIntensity->tdScdma);
+    bool nrUpdate = ProcessNr(signalIntensity->nr);
+    if (!gsmUpdate || !cdmaUpdate || !lteUpdate || !wcdmaUpdate || !tdScdmaUpdate || !nrUpdate) {
         std::vector<sptr<SignalInformation>> signals;
         GetSignalInfoList(signals);
         DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifySignalInfoUpdated(signals);
@@ -134,6 +164,8 @@ void SignalInfo::GetSignalInfoList(std::vector<sptr<SignalInformation>> &signals
     bool cdmaValid = cdmaSigInfoCur_.ValidateCdmaValue();
     bool lteValid = lteSigInfoCur_.ValidateLteValue();
     bool wcdmaValid = wcdmaSigInfoCur_.ValidateWcdmaValue();
+    bool tdScdmaValid = tdScdmaSigInfoCur_.ValidateTdScdmaValue();
+    bool nrValid = nrSigInfoCur_.ValidateNrValue();
 
     if (gsmValid) {
         signals.emplace_back(gsmSigInfoCur_.NewInstance());
@@ -146,6 +178,12 @@ void SignalInfo::GetSignalInfoList(std::vector<sptr<SignalInformation>> &signals
     }
     if (wcdmaValid) {
         signals.emplace_back(wcdmaSigInfoCur_.NewInstance());
+    }
+    if (tdScdmaValid) {
+        signals.emplace_back(tdScdmaSigInfoCur_.NewInstance());
+    }
+    if (nrValid) {
+        signals.emplace_back(nrSigInfoCur_.NewInstance());
     }
 }
 } // namespace Telephony

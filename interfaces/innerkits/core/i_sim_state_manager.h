@@ -21,6 +21,12 @@
 
 namespace OHOS {
 namespace Telephony {
+enum UnlockResult {
+    UNLOCK_FAIL = -2, // unlock fail
+    UNLOCK_INCORRECT = -1, // password error
+    UNLOCK_OK = 0, // unlock sucessful
+};
+
 struct LockStatusResponse {
     int32_t result;
     int32_t remain;
@@ -32,24 +38,22 @@ public:
     virtual void Init() = 0;
     virtual bool HasSimCard(int32_t slotId) = 0;
     virtual SimState GetSimState(int32_t slotId) = 0;
+    virtual CardType GetCardType(int32_t slotId) = 0;
     virtual bool UnlockPin(int32_t slotId, std::string pin, LockStatusResponse &response) = 0;
     virtual bool UnlockPuk(int32_t slotId, std::string newPin, std::string puk, LockStatusResponse &response) = 0;
     virtual bool AlterPin(int32_t slotId, std::string newPin, std::string oldPin, LockStatusResponse &response) = 0;
-    virtual bool SetLockState(int32_t slotId, std::string pin, int32_t enable, LockStatusResponse &response) = 0;
-    virtual int32_t GetLockState(int32_t slotId) = 0;
+    virtual bool SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response) = 0;
+    virtual int32_t GetLockState(int32_t slotId, LockType lockType) = 0;
     virtual int32_t RefreshSimState(int32_t slotId) = 0;
     virtual bool UnlockPin2(int32_t slotId, std::string pin2, LockStatusResponse &response) = 0;
     virtual bool UnlockPuk2(
         int32_t slotId, std::string newPin2, std::string puk2, LockStatusResponse &response) = 0;
     virtual bool AlterPin2(
         int32_t slotId, std::string newPin2, std::string oldPin2, LockStatusResponse &response) = 0;
-    virtual bool SetActiveSim(int32_t slotId, int32_t type, int32_t enable) = 0;
+    virtual bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) = 0;
     // Event register
     virtual void RegisterCoreNotify(const HANDLE &handler, int what) = 0;
     virtual void UnRegisterCoreNotify(const HANDLE &observerCallBack, int what) = 0;
-    static const int UNLOCK_FAIL = -2; // unlock fail
-    static const int UNLOCK_INCORRECT = -1; // password error
-    static const int UNLOCK_OK = 0; // unlock sucessful
 };
 } // namespace Telephony
 } // namespace OHOS

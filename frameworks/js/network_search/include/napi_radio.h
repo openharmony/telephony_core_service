@@ -43,7 +43,10 @@ const static std::string GPRS = "GPRS";
 const static std::string WCDMA = "WCDMA";
 const static std::string LTE = "LTE";
 
-enum NativeSelectionMode { NATIVE_NETWORK_SELECTION_AUTOMATIC = 0, NATIVE_NETWORK_SELECTION_MANUAL = 1 };
+enum NativeSelectionMode { 
+    NATIVE_NETWORK_SELECTION_AUTOMATIC = 0, 
+    NATIVE_NETWORK_SELECTION_MANUAL = 1 
+};
 
 enum NetworkSelectionMode {
     /** Unknown network selection modes. */
@@ -70,10 +73,21 @@ enum NetworkInformationState {
     NETWORK_FORBIDDEN
 };
 
-enum SlotIdState {
-    SLOTID_INPUT_ERROR = 111,
-    SLOTID_INPUT_RIGHT
+enum NrOptionMode {
+    /** Indicates unknown NR networking mode. */
+    NR_OPTION_UNKNOWN,
+
+    /** Indicates that the NR networking mode is NSA only. */
+    NR_OPTION_NSA_ONLY,
+
+    /** Indicates that the NR networking mode is SA only. */
+    NR_OPTION_SA_ONLY,
+
+    /** Indicates that the NR networking mode is NSA and SA. */
+    NR_OPTION_NSA_AND_SA,
 };
+
+enum SlotIdState { SLOTID_INPUT_ERROR = 111, ENUMERATION_INPUT_ERROR = 222 };
 
 enum PreferredNetwork {
     PREFERRED_NETWORK_MODE_AUTO,
@@ -82,7 +96,34 @@ enum PreferredNetwork {
     PREFERRED_NETWORK_MODE_LTE,
     PREFERRED_NETWORK_MODE_LTE_WCDMA,
     PREFERRED_NETWORK_MODE_LTE_WCDMA_GSM,
-    PREFERRED_NETWORK_MODE_WCDMA_GSM
+    PREFERRED_NETWORK_MODE_WCDMA_GSM,
+    PREFERRED_NETWORK_MODE_CDMA,
+    PREFERRED_NETWORK_MODE_EVDO,
+    PREFERRED_NETWORK_MODE_EVDO_CDMA,
+    PREFERRED_NETWORK_MODE_WCDMA_GSM_EVDO_CDMA,
+    PREFERRED_NETWORK_MODE_LTE_EVDO_CDMA,
+    PREFERRED_NETWORK_MODE_LTE_WCDMA_GSM_EVDO_CDMA,
+    PREFERRED_NETWORK_MODE_TDSCDMA,
+    PREFERRED_NETWORK_MODE_TDSCDMA_GSM,
+    PREFERRED_NETWORK_MODE_TDSCDMA_WCDMA,
+    PREFERRED_NETWORK_MODE_TDSCDMA_WCDMA_GSM,
+    PREFERRED_NETWORK_MODE_LTE_TDSCDMA,
+    PREFERRED_NETWORK_MODE_LTE_TDSCDMA_GSM,
+    PREFERRED_NETWORK_MODE_LTE_TDSCDMA_WCDMA,
+    PREFERRED_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM,
+    PREFERRED_NETWORK_MODE_TDSCDMA_WCDMA_GSM_EVDO_CDMA,
+    PREFERRED_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA,
+    PREFERRED_NETWORK_MODE_NR = 31,
+    PREFERRED_NETWORK_MODE_NR_LTE,
+    PREFERRED_NETWORK_MODE_NR_LTE_WCDMA,
+    PREFERRED_NETWORK_MODE_NR_LTE_WCDMA_GSM,
+    PREFERRED_NETWORK_MODE_NR_LTE_EVDO_CDMA,
+    PREFERRED_NETWORK_MODE_NR_LTE_WCDMA_GSM_EVDO_CDMA,
+    PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA,
+    PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_GSM,
+    PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA,
+    PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM,
+    PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA,
 };
 
 struct AsyncContext {
@@ -139,6 +180,9 @@ struct GetStateContext : BaseContext {
     std::string longOperatorName = "";
     std::string shortOperatorName = "";
     std::string plmnNumeric = "";
+    int32_t psRoamingStatus = 0;
+    int32_t csRoamingStatus = 0;
+    int32_t cfgTech = 0;
     bool isRoaming = false;
     int32_t regStatus = 0;
     int32_t nsaState = static_cast<int32_t>(NsaState::NSA_STATE_NOT_SUPPORT);
@@ -189,6 +233,20 @@ struct CellInformationContext : BaseContext {
     int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
     std::vector<sptr<CellInformation>> cellInformations;
     napi_value callbackValue = nullptr;
+};
+
+struct GetPrimarySlotIdContext : BaseContext {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+};
+
+struct GetUniqueDeviceIdContext : BaseContext {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    std::string getUniqueDeviceId = "";
+};
+
+struct GetNrOptionModeContext : BaseContext {
+    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t nrOptionMode = DEFAULT_ERROR;
 };
 } // namespace Telephony
 } // namespace OHOS

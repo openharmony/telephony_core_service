@@ -22,14 +22,16 @@
 #include "network_state.h"
 #include "signal_information.h"
 #include "i_network_search_callback.h"
+#include "network_search_callback_base.h"
 #include "cell_information.h"
+#include "cell_location.h"
 
 namespace OHOS {
 namespace Telephony {
 class INetworkSearch {
 public:
     using HANDLE = const std::shared_ptr<AppExecFwk::EventHandler>;
-    virtual void Init() = 0;
+    virtual void Init();
     virtual int32_t GetPsRadioTech(int32_t slotId) const = 0;
     virtual int32_t GetCsRadioTech(int32_t slotId) const = 0;
     virtual std::u16string GetOperatorNumeric(int32_t slotId) const = 0;
@@ -37,12 +39,20 @@ public:
     virtual sptr<NetworkState> GetNetworkStatus(int32_t slotId) const = 0;
     virtual int32_t GetRadioState() const = 0;
     virtual bool GetRadioState(const sptr<INetworkSearchCallback> &callback) = 0;
+    /**
+     * Set radio state
+     * 27007-410_2001 8.2 Set phone functionality +CFUN
+     * 3GPP TS 27.007 V4.1.0 (2001-03)
+     */
     virtual void SetRadioState(bool isOn, int32_t rst) = 0;
     virtual bool SetRadioState(bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId) const = 0;
-    virtual void RegisterCoreNotify(
-        const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what) = 0;
+    virtual void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what) = 0;
     virtual void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what) = 0;
+    virtual void RegisterCellularDataObject(const sptr<NetworkSearchCallBackBase> &callback) = 0;
+    virtual void UnRegisterCellularDataObject(const sptr<NetworkSearchCallBackBase> &callback) = 0;
+    virtual void RegisterCellularCallObject(const sptr<NetworkSearchCallBackBase> &callback) = 0;
+    virtual void UnRegisterCellularCallObject(const sptr<NetworkSearchCallBackBase> &callback) = 0;
     virtual bool GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
@@ -53,6 +63,7 @@ public:
     virtual bool SetPreferredNetwork(
         int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual int32_t GetPsRegState(int32_t slotId) const = 0;
+    virtual int32_t GetCsRegState(int32_t slotId) const = 0;
     virtual int32_t GetPsRoamingState(int32_t slotId) const = 0;
     virtual std::u16string GetImei(int32_t slotId) = 0;
     virtual bool SetPsAttachStatus(
@@ -60,6 +71,21 @@ public:
     virtual bool GetImsRegStatus() = 0;
     virtual std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) = 0;
     virtual bool SendUpdateCellLocationRequest() = 0;
+    virtual sptr<CellLocation> GetCellLocation(int32_t slotId) const = 0;
+    virtual std::u16string GetMeid(int32_t slotId) = 0;
+    virtual std::u16string GetUniqueDeviceId(int32_t slotId) const = 0;
+    virtual PhoneType GetPhoneType() const = 0;
+    virtual NrMode GetNrOptionMode(int32_t slotId) const = 0;
+    virtual FrequencyType GetFrequencyType(int32_t slotId) const = 0;
+    virtual NrState GetNrState(int32_t slotId) const = 0;
+    /**
+     * @brief support Nr network or not
+     *
+     * @return true support
+     * @return false not support
+     */
+    virtual bool IsNrSupported() = 0;
+    virtual void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

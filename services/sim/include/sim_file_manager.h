@@ -16,28 +16,30 @@
 #ifndef OHOS_SIM_FILE_MANAGER_H
 #define OHOS_SIM_FILE_MANAGER_H
 
-#include <stdlib.h>
-#include <cstring>
-#include <string>
-
 #include "core_manager.h"
 #include "event_handler.h"
 #include "event_runner.h"
+#include "hril_modem_parcel.h"
 #include "sim_file_controller.h"
 #include "usim_file_controller.h"
 #include "i_tel_ril_manager.h"
 #include "i_sim_file_manager.h"
+#include "ruim_file.h"
+#include "ruim_file_controller.h"
 #include "sim_file.h"
+#include "isim_file.h"
+#include "isim_file_controller.h"
+#include "csim_file_controller.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-class SimFileManager : public ISimFileManager {
+class SimFileManager : public ISimFileManager, public AppExecFwk::EventHandler {
 public:
-    SimFileManager(
+    SimFileManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
         std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<Telephony::ISimStateManager> state);
     virtual ~SimFileManager();
-    void Init();
+    void Init(int slotId);
     virtual std::u16string GetSimOperatorNumeric(int32_t slotId);
     virtual std::u16string GetISOCountryCodeForSim(int32_t slotId);
     virtual std::u16string GetSimSpn(int32_t slotId);
@@ -46,6 +48,7 @@ public:
     virtual std::u16string GetLocaleFromDefaultSim();
     virtual std::u16string GetSimGid1(int32_t slotId);
     virtual std::u16string GetSimTelephoneNumber(int32_t slotId);
+    virtual std::u16string GetSimTeleNumberIdentifier(const int32_t slotId);
     virtual std::u16string GetVoiceMailIdentifier(int32_t slotId);
     virtual std::u16string GetVoiceMailNumber(int32_t slotId);
     virtual int ObtainSpnCondition(bool roaming, std::string operatorNum);
@@ -56,10 +59,11 @@ public:
     std::shared_ptr<IccFileController> GetIccFileController();
     std::shared_ptr<IccDiallingNumbersHandler> ObtainDiallingNumberHandler();
     virtual bool SetVoiceMailInfo(int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber);
-    enum class HandleRunningState {
-        STATE_NOT_START,
-        STATE_RUNNING
-    };
+    void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    static std::shared_ptr<ISimFileManager> CreateInstance(
+        const std::shared_ptr<ITelRilManager> &ril, const std::shared_ptr<ISimStateManager> &simState);
+    enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
+    enum class IccType { ICC_TYPE_CDMA, ICC_TYPE_GSM, ICC_TYPE_IMS, ICC_TYPE_USIM };
 
 protected:
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
@@ -71,11 +75,20 @@ protected:
     HandleRunningState stateRecord_ = HandleRunningState::STATE_NOT_START;
     HandleRunningState stateHandler_ = HandleRunningState::STATE_NOT_START;
     std::shared_ptr<Telephony::ISimStateManager> simStateManager_ = nullptr;
+    int slotId_ = 0;
+    IccType iccType_ = IccType::ICC_TYPE_USIM;
+    std::map<IccType, std::shared_ptr<IccFile>> iccFileCache_;
+    std::map<IccType, std::shared_ptr<IccFileController>> iccFileControllerCache_;
 
 private:
     bool InitDiallingNumberHandler();
+    IccType GetIccTypeByCardType(CardType type);
+    IccType GetIccTypeByTech(const std::shared_ptr<VoiceRadioTechnology> &tech);
+    bool InitSimFile(IccType type);
+    bool InitIccFileController(IccType type);
+    void ChangeSimFileByCardType(IccType type);
+    bool IsValidType(IccType type);
 };
 } // namespace Telephony
 } // namespace OHOS
-
 #endif // OHOS_SIM_FILE_MANAGER_H

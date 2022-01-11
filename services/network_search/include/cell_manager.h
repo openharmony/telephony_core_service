@@ -13,14 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_CELL_MANAGER_H
-#define OHOS_CELL_MANAGER_H
+#ifndef NETWORK_SEARCH_INCLUDE_CELL_MANAGER_H
+#define NETWORK_SEARCH_INCLUDE_CELL_MANAGER_H
 
 #include "event_handler.h"
 #include "hril_network_parcel.h"
 #include "cell_information.h"
 #include "signal_information.h"
 #include "network_state.h"
+#include "cell_location.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -34,15 +35,22 @@ public:
     void ProcessCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void ClearCellInfoList();
     void UpdateCellLocation(int32_t techType, int32_t cellId, int32_t lac);
+    sptr<CellLocation> GetCellLocation();
 private:
     void ProcessCellLocation(CellInformation::CellType type, int32_t cellId, int32_t lac);
-    bool ProcessNeighboringGsm(CellNearbyInfo *cellInfo);
-    bool ProcessNeighboringLte(CellNearbyInfo *cellInfo);
-    bool ProcessNeighboringWcdma(CellNearbyInfo *cellInfo);
+    bool ProcessNeighboringCellGsm(CellNearbyInfo *cellInfo);
+    bool ProcessNeighboringCellLte(CellNearbyInfo *cellInfo);
+    bool ProcessNeighboringCellWcdma(CellNearbyInfo *cellInfo);
+    bool ProcessNeighboringCellCdma(CellNearbyInfo *cellInfo);
+    bool ProcessNeighboringCellTdscdma(CellNearbyInfo *cellInfo);
+    bool ProcessNeighboringCellNr(CellNearbyInfo *cellInfo);
     bool ProcessCurrentCell(CurrentCellInfo *cellInfo);
     bool ProcessCurrentCellWcdma(CurrentCellInfo *cellInfo);
     bool ProcessCurrentCellLte(CurrentCellInfo *cellInfo);
     bool ProcessCurrentCellGsm(CurrentCellInfo *cellInfo);
+    bool ProcessCurrentCellCdma(CurrentCellInfo *cellInfo);
+    bool ProcessCurrentCellTdscdma(CurrentCellInfo *cellInfo);
+    bool ProcessCurrentCellNr(CurrentCellInfo *cellInfo);
     void AddCellInformation(sptr<CellInformation>& cellInfo, std::vector<sptr<CellInformation>> &cellInfos);
     void NotifyCellInfoUpdated() const;
     void UpdateSignalLevel(CellInformation::CellType cellType);
@@ -54,7 +62,9 @@ private:
     sptr<CellInformation> currentCellInfo_ = nullptr;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     bool cellInfoChangedFlag_ = false;
+    using NsHandlerFunc = bool (CellManager::*)(CellNearbyInfo *);
+    std::map<uint32_t, NsHandlerFunc> memberFuncMap_;
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // OHOS_CELL_MANAGER_H
+#endif // NETWORK_SEARCH_INCLUDE_CELL_MANAGER_H

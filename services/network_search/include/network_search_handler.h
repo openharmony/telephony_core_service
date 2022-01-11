@@ -48,7 +48,9 @@ public:
     void RadioOffState() const;
     void UpdatePhone(RadioTech csRadioTech) const;
     void GetCellInfoList(std::vector<sptr<CellInformation>> &cells);
+    void DcPhysicalLinkActiveUpdate(bool isActive);
     void SendUpdateCellLocationRequest();
+    PhoneType GetPhoneType();
 
     /**
      * Get signal quality
@@ -79,8 +81,8 @@ public:
     void GetRilCsRegistration(bool checkTime = true);
 
     void UpdateCellLocation(int32_t techType, int32_t cellId, int32_t lac);
-
-protected:
+    sptr<CellLocation> GetCellLocation();
+private:
     void RadioOnState();
     void GetRadioStateResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void SetRadioStateResponse(const AppExecFwk::InnerEvent::Pointer &event);
@@ -108,9 +110,13 @@ protected:
     void ImsRegStateUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetImei(const AppExecFwk::InnerEvent::Pointer &event);
     void SetPsAttachStatusResponse(const AppExecFwk::InnerEvent::Pointer &event);
+    void RadioGetMeid(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &event);
-
+    void RadioSetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event);
+    void RadioGetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event);
+    void RadioChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event);
+    void RadioVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event);
 private:
     static const int32_t REQ_INTERVAL = 30;
     using NsHandlerFunc = void (NetworkSearchHandler::*)(const AppExecFwk::InnerEvent::Pointer &);

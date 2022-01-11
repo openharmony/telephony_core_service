@@ -23,11 +23,6 @@
 
 #include "core_service_proxy.h"
 #include "i_core_service.h"
-
-#include "if_system_ability_manager.h"
-#include "iservice_registry.h"
-#include "system_ability_definition.h"
-
 #include "telephony_errors.h"
 
 namespace OHOS {
@@ -39,9 +34,13 @@ public:
     sptr<ICoreService> GetProxy();
     void OnRemoteDied(const wptr<IRemoteObject> &remote);
 
+    std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId);
+    bool IsNrSupported();
     int32_t GetPsRadioTech(int32_t slotId);
     int32_t GetCsRadioTech(int32_t slotId);
-    std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId);
+    NrMode GetNrOptionMode(int32_t slotId);
+    std::u16string GetUniqueDeviceId(int32_t slotId);
+    std::u16string GetMeid(int32_t slotId);
     std::u16string GetOperatorNumeric(int32_t slotId);
     std::u16string GetOperatorName(int32_t slotId);
     const sptr<NetworkState> GetNetworkState(int32_t slotId);
@@ -80,8 +79,8 @@ public:
     bool UnlockPin2(int32_t slotId, std::u16string pin2, LockStatusResponse &response);
     bool UnlockPuk2(int32_t slotId, std::u16string newPin2, std::u16string puk2, LockStatusResponse &response);
     bool AlterPin2(int32_t slotId, std::u16string newPin2, std::u16string oldPin2, LockStatusResponse &response);
-    bool SetLockState(int32_t slotId, std::u16string pin, int32_t enable, LockStatusResponse &response);
-    int32_t GetLockState(int32_t slotId);
+    bool SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response);
+    int32_t GetLockState(int32_t slotId, LockType lockType);
     int32_t RefreshSimState(int32_t slotId);
     bool SetActiveSim(const int32_t slotId, int32_t enable);
     bool GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
@@ -97,6 +96,13 @@ public:
     bool SetVoiceMailInfo(int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber);
     bool GetImsRegStatus(int32_t slotId);
     int32_t GetMaxSimCount();
+    int32_t GetCardType(int32_t slotId);
+    bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd);
+    bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd);
+    bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response);
+    bool HasOperatorPrivileges(const int32_t slotId);
+    int32_t GetPrimarySlotId();
+    bool SetPrimarySlotId(int32_t slotId);
     std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId);
     bool SendUpdateCellLocationRequest();
 

@@ -16,11 +16,11 @@
 #include <unistd.h>
 #include <gtest/gtest.h>
 #include <string_ex.h>
-#include "iservice_registry.h"
-#include "system_ability_definition.h"
-
 #include "core_service_client.h"
+#include "iservice_registry.h"
 #include "network_search_test_callback_stub.h"
+#include "system_ability_definition.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -213,8 +213,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetSignalInfoList_0100, Func
  * @tc.name     Get GetOperator Name
  * @tc.desc     Function test
  */
-HWTEST_F(
-    NetworkSearchTest, Telephony_NetworkSearch_GetIsoCountryCodeForNetwork_0100, Function | MediumTest | Level1)
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetIsoCountryCodeForNetwork_0100, Function | MediumTest | Level1)
 {
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
@@ -243,8 +242,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0100
         sptr<NetworkInformation> networkInfo = new (std::nothrow) NetworkInformation();
         int32_t selectionMode = 1;
         bool isUpdateDatabase = true;
-        networkInfo->SetOperateInformation("CHINA MOBILE", "CMCC", "46000",
-            static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
+        networkInfo->SetOperateInformation(
+            "CHINA MOBILE", "CMCC", "46000", static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
             static_cast<int32_t>(NetworkRat::NETWORK_LTE));
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
         bool result = NetworkSearchTest::telephonyService_->SetNetworkSelectionMode(
@@ -275,8 +274,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0100
         sptr<NetworkInformation> networkInfo = new (std::nothrow) NetworkInformation();
         int32_t selectionMode = 1;
         bool isUpdateDatabase = true;
-        networkInfo->SetOperateInformation("CHINA MOBILE", "CMCC", "46000",
-            static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
+        networkInfo->SetOperateInformation(
+            "CHINA MOBILE", "CMCC", "46000", static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
             static_cast<int32_t>(NetworkRat::NETWORK_LTE));
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
         bool result = NetworkSearchTest::telephonyService_->SetNetworkSelectionMode(
@@ -317,8 +316,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0200
         sptr<NetworkInformation> networkInfo = new (std::nothrow) NetworkInformation();
         int32_t selectionMode = 0;
         bool isUpdateDatabase = true;
-        networkInfo->SetOperateInformation("CHINA MOBILE", "CMCC", "46000",
-            static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
+        networkInfo->SetOperateInformation(
+            "CHINA MOBILE", "CMCC", "46000", static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
             static_cast<int32_t>(NetworkRat::NETWORK_LTE));
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
         bool result = NetworkSearchTest::telephonyService_->SetNetworkSelectionMode(
@@ -349,8 +348,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0200
         sptr<NetworkInformation> networkInfo = new (std::nothrow) NetworkInformation();
         int32_t selectionMode = 0;
         bool isUpdateDatabase = true;
-        networkInfo->SetOperateInformation("CHINA MOBILE", "CMCC", "46000",
-            static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
+        networkInfo->SetOperateInformation(
+            "CHINA MOBILE", "CMCC", "46000", static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
             static_cast<int32_t>(NetworkRat::NETWORK_LTE));
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
         bool result = NetworkSearchTest::telephonyService_->SetNetworkSelectionMode(
@@ -478,7 +477,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0100, Function
  * @tc.name     Get Imei
  * @tc.desc     Function test
  */
-HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0100, Function | MediumTest | Level1)
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0100, Function | MediumTest | Level2)
 {
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
@@ -493,12 +492,49 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0100, Function | Med
 }
 
 /**
+ * @tc.number   Telephony_NetworkSearch_GetMeid_0100
+ * @tc.name     Get Meid
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetMeid_0100, Function | MediumTest | Level2)
+{
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+        std::cout << "TelephonyTestService Remote service is null" << std::endl;
+        NetworkSearchTest::telephonyService_ = GetProxy();
+    } else {
+        std::u16string result = NetworkSearchTest::telephonyService_->GetMeid(SLOT_ID);
+        std::string meid = Str16ToStr8(result);
+        std::cout << "TelephonyTestService GetMeid Meid:" << meid << std::endl;
+        EXPECT_STRNE(meid.c_str(), "");
+    }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetUniqueDeviceId_0100
+ * @tc.name     Get unique device id
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetUniqueDeviceId_0100, Function | MediumTest | Level2)
+{
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+        std::cout << "TelephonyTestService Remote service is null" << std::endl;
+        NetworkSearchTest::telephonyService_ = GetProxy();
+    } else {
+        std::u16string result = NetworkSearchTest::telephonyService_->GetUniqueDeviceId(SLOT_ID);
+        std::string deviceid = Str16ToStr8(result);
+        std::cout << "TelephonyTestService GetUniqueDeviceId DeviceId:" << deviceid << std::endl;
+        EXPECT_STRNE(deviceid.c_str(), "");
+    }
+}
+
+/**
  * @tc.number   Telephony_NetworkSearch_SendUpdateCellLocationRequest_0100
  * @tc.name     Send Cell Location Update
  * @tc.desc     Function test
  */
-HWTEST_F(
-    NetworkSearchTest, Telephony_NetworkSearch_SendUpdateCellLocationRequest_0100, Function | MediumTest | Level3)
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SendUpdateCellLocationRequest_0100, Function | MediumTest | Level3)
 {
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {

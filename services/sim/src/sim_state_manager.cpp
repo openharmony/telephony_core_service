@@ -89,6 +89,17 @@ SimState SimStateManager::GetSimState(int32_t slotId)
     return ret;
 }
 
+CardType SimStateManager::GetCardType(int32_t slotId)
+{
+    CardType ret = CardType::UNKNOWN_CARD;
+    if (simStateHandle_ != nullptr) {
+        std::lock_guard<std::mutex> lck(mtx_);
+        TELEPHONY_LOGI("SimStateManager::GetCardType()");
+        ret = simStateHandle_->GetCardType(slotId);
+    }
+    return ret;
+}
+
 bool SimStateManager::UnlockPin(int32_t slotId, std::string pin, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
@@ -200,14 +211,14 @@ bool SimStateManager::AlterPin(int32_t slotId, std::string newPin, std::string o
     return true;
 }
 
-bool SimStateManager::SetLockState(int32_t slotId, std::string pin, int32_t enable, LockStatusResponse &response)
+bool SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {
         std::unique_lock<std::mutex> lck(ctx_);
         TELEPHONY_LOGI("SimStateManager::SetLockState()");
         responseReady_ = false;
-        simStateHandle_->SetLockState(slotId, pin, enable);
+        simStateHandle_->SetLockState(slotId, options);
         while (!responseReady_) {
             TELEPHONY_LOGI("SetLockState::wait(), response = false");
             cv_.wait(lck);
@@ -229,7 +240,11 @@ bool SimStateManager::SetLockState(int32_t slotId, std::string pin, int32_t enab
             cv_.wait(lck);
         }
         TELEPHONY_LOGI("SimStateManager::UnlockRemain(), response = true");
-        ret = simStateHandle_->GetUnlockData().pinRemain;
+        if (LockType::PIN_LOCK == options.lockType) {
+            ret = simStateHandle_->GetUnlockData().pinRemain;
+        } else {
+            ret = simStateHandle_->GetUnlockData().pin2Remain;
+        }
         response.result = UNLOCK_INCORRECT;
         response.remain = ret;
     }
@@ -237,14 +252,14 @@ bool SimStateManager::SetLockState(int32_t slotId, std::string pin, int32_t enab
     return true;
 }
 
-int32_t SimStateManager::GetLockState(int32_t slotId)
+int32_t SimStateManager::GetLockState(int32_t slotId, LockType lockType)
 {
     int32_t ret = 0;
     if (simStateHandle_ != nullptr) {
         std::unique_lock<std::mutex> lck(ctx_);
         TELEPHONY_LOGI("SimStateManager::GetLockState()");
         responseReady_ = false;
-        simStateHandle_->GetLockState(slotId);
+        simStateHandle_->GetLockState(slotId, lockType);
         while (!responseReady_) {
             TELEPHONY_LOGI("GetLockState::wait(), response = false");
             cv_.wait(lck);
@@ -386,21 +401,37 @@ int32_t SimStateManager::RefreshSimState(int32_t slotId)
     return ret;
 }
 
-bool SimStateManager::SetActiveSim(int32_t slotId, int32_t type, int32_t enable)
+bool SimStateManager::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo,
+    LockStatusResponse &response)
 {
-    int32_t ret = ACTIVE_INIT;
-    if (simStateHandle_ != nullptr) {
-        std::unique_lock<std::mutex> lck(ctx_);
-        TELEPHONY_LOGI("SimStateManager::SetActiveSim()");
-        responseReady_ = false;
-        simStateHandle_->SetActiveSim(slotId, type, enable);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("SetActiveSim::wait(), response = false");
-            cv_.wait(lck);
-        }
-        ret = simStateHandle_->GetActiveSimResult();
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGE("UnlockSimLock(), simStateHandle_ is nullptr!!!");
+        return false;
     }
-    return ret ? false : true;
+    int32_t ret = UNLOCK_OK;
+    std::unique_lock<std::mutex> lck(ctx_);
+    TELEPHONY_LOGI("SimStateManager::UnlockSimLock()");
+    responseReady_ = false;
+    simStateHandle_->UnlockSimLock(slotId, lockInfo);
+    while (!responseReady_) {
+        TELEPHONY_LOGI("UnlockSimLock::wait(), response = false");
+        cv_.wait(lck);
+    }
+    ret = simStateHandle_->GetSimlockResponse().result;
+    TELEPHONY_LOGI("SimStateManager::UnlockSimLock(), remain: %{public}d", response.remain);
+    response.remain = simStateHandle_->GetSimlockResponse().remain;
+    if (ret == UNLOCK_PIN_PUK_INCORRECT) {
+        TELEPHONY_LOGI("SimStateManager::UnlockSimLock(), pin or puk incorrect");
+        response.result = UNLOCK_INCORRECT;
+    } else {
+        TELEPHONY_LOGI("SimStateManager::UnlockSimLock(), %{public}d", ret);
+        if (ret) {
+            response.result = UNLOCK_FAIL;
+        } else {
+            response.result = UNLOCK_OK;
+        }
+    }
+    return true;
 }
 
 SimStateManager::~SimStateManager() {}

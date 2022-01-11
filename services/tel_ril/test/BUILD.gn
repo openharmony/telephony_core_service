@@ -63,6 +63,7 @@ ohos_executable("tel_ril_test") {
   ]
 
   deps = [
+    #    "//base/telephony/ril_adapter/services/hril:hril",
     "//base/telephony/core_service:tel_core_service",
     "//base/telephony/core_service/utils:libtelephony_common",
     "//utils/native/base:utils",

@@ -20,7 +20,7 @@ namespace OHOS {
 namespace Telephony {
 class ISimSmsManager {
 public:
-    virtual void Init() {}
+    virtual void Init(int slotId) {}
     virtual bool AddSmsToIcc(int status, std::string &pdu, std::string &smsc) = 0;
     virtual bool UpdateSmsIcc(int index, int status, std::string &pduData, std::string &smsc) = 0;
     virtual bool DelSmsIcc(int index) = 0;

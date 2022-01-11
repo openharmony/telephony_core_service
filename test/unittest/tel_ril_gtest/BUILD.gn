@@ -43,6 +43,8 @@ ohos_unittest("tel_ril_gtest") {
   deps = [
     "//base/telephony/core_service:tel_core_service",
     "//base/telephony/core_service/utils:libtelephony_common",
+    "//base/telephony/ril_adapter/frameworks:hril_innerkits",
+    "//base/telephony/ril_adapter/services/hril:hril",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
@@ -51,7 +53,6 @@ ohos_unittest("tel_ril_gtest") {
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
     "ipc:ipc_core",
-    "ril_adapter:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]

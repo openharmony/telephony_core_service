@@ -21,8 +21,9 @@
 #include "system_ability_definition.h"
 #include "time_service_client.h"
 
-#include "core_service_client.h"
+#include "core_service_proxy.h"
 #include "core_manager.h"
+#include "telephony_log_wrapper.h"
 #include "test_broadcast.h"
 #include "network_search_test_callback_stub.h"
 
@@ -47,10 +48,14 @@ const int32_t INPUT_GET_PREFERRED_NETWORK_MODE = 15;
 const int32_t INPUT_SET_PREFERRED_NETWORK_MODE = 16;
 const int32_t INPUT_SET_TIME_AND_TIMEZONE = 17;
 const int32_t INPUT_GET_IMEI = 18;
-const int32_t INPUT_SET_PS_ATTACH_STATUS = 19;
-const int32_t INPUT_SET_GET_IMS_REG_STATUS = 20;
-const int32_t INPUT_GET_CELL_INFO_LIST = 21;
-const int32_t INPUT_REQUEST_CELL_LOCATION = 22;
+const int32_t INPUT_GET_MEID = 19;
+const int32_t INPUT_GET_UNIQUE_DEVICE_ID = 20;
+const int32_t INPUT_SET_PS_ATTACH_STATUS = 21;
+const int32_t INPUT_SET_GET_IMS_REG_STATUS = 22;
+const int32_t INPUT_GET_CELL_INFO_LIST = 23;
+const int32_t INPUT_REQUEST_CELL_LOCATION = 24;
+const int32_t INPUT_IS_NR_SUPPORTED = 25;
+const int32_t INPUT_GET_NR_OPTION_MODE = 26;
 const int32_t INPUT_INIT_TIME = 99;
 const int32_t INPUT_QUIT = 100;
 const int32_t SLEEP_TIME = 5;
@@ -85,13 +90,16 @@ void TestGetNetworkState()
     if (result == nullptr) {
         TELEPHONY_LOGE("result is null");
     } else {
-        TELEPHONY_LOGI("CoreServiceClient::GetNetworkState return");
+        TELEPHONY_LOGI("CoreServiceProxy::GetNetworkState return");
         TELEPHONY_LOGI("GetRegStatus():%{public}d", result->GetRegStatus());
         TELEPHONY_LOGI("GetLongOperatorName():%{public}s", result->GetLongOperatorName().c_str());
         TELEPHONY_LOGI("GetShortOperatorName():%{public}s", result->GetShortOperatorName().c_str());
         TELEPHONY_LOGI("GetPlmnNumeric():%{public}s", result->GetPlmnNumeric().c_str());
         TELEPHONY_LOGI("GetPsRoamingStatus():%{public}d", result->GetPsRoamingStatus());
         TELEPHONY_LOGI("GetCsRoamingStatus():%{public}d", result->GetCsRoamingStatus());
+        TELEPHONY_LOGI("IsEmergency():%{public}d", result->IsEmergency());
+        TELEPHONY_LOGI("GetCfgTech():%{public}d", result->GetCfgTech());
+        TELEPHONY_LOGI("GetNrState():%{public}d", result->GetNrState());
     }
 }
 
@@ -166,6 +174,27 @@ void TestWcdmaSignalInformation(const WcdmaSignalInformation &wcdma)
     TELEPHONY_LOGI("TelephonyTestService Remote WcdmaSignalInformation GetNetworkType[WCDMA] \n");
 }
 
+void TestTdScdmaSignalInformation(const TdScdmaSignalInformation &tdScdma)
+{
+    TELEPHONY_LOGI(
+        "TelephonyTestService Remote TdScdmaSignalInformation ToString:%{public}s", tdScdma.ToString().c_str());
+    TELEPHONY_LOGI("TelephonyTestService Remote TdScdmaSignalInformation GetRssi:%{public}d", tdScdma.GetRscp());
+    TELEPHONY_LOGI("TelephonyTestService Remote TdScdmaSignalInformation GetSignalLevel:%{public}d",
+        tdScdma.GetSignalLevel());
+    TELEPHONY_LOGI("TelephonyTestService Remote TdScdmaSignalInformation GetNetworkType[TDSCDMA] \n");
+}
+
+void TestNrSignalInformation(const NrSignalInformation &nr)
+{
+    TELEPHONY_LOGI("TelephonyTestService Remote NrSignalInformation ToString:%{public}s", nr.ToString().c_str());
+    TELEPHONY_LOGI("TelephonyTestService Remote NrSignalInformation NrRsrp:%{public}d", nr.GetRsrp());
+    TELEPHONY_LOGI("TelephonyTestService Remote NrSignalInformation NrRsrq:%{public}d", nr.GetRsrq());
+    TELEPHONY_LOGI("TelephonyTestService Remote NrSignalInformation NrSinr:%{public}d", nr.GetSinr());
+    TELEPHONY_LOGI(
+        "TelephonyTestService Remote NrSignalInformation GetSignalLevel:%{public}d", nr.GetSignalLevel());
+    TELEPHONY_LOGI("TelephonyTestService Remote NrSignalInformation GetNetworkType[NR] \n");
+}
+
 void TestGetSignalInfoList()
 {
     auto result = g_telephonyService->GetSignalInfoList(CoreManager::DEFAULT_SLOT_ID);
@@ -186,6 +215,12 @@ void TestGetSignalInfoList()
         } else if (type == SignalInformation::NetworkType::WCDMA) {
             WcdmaSignalInformation *wcdma = reinterpret_cast<WcdmaSignalInformation *>(v.GetRefPtr());
             TestWcdmaSignalInformation(*wcdma);
+        } else if (type == SignalInformation::NetworkType::TDSCDMA) {
+            TdScdmaSignalInformation *tdScdma = reinterpret_cast<TdScdmaSignalInformation *>(v.GetRefPtr());
+            TestTdScdmaSignalInformation(*tdScdma);
+        } else if (type == SignalInformation::NetworkType::NR) {
+            NrSignalInformation *nr = reinterpret_cast<NrSignalInformation *>(v.GetRefPtr());
+            TestNrSignalInformation(*nr);
         }
     }
     TELEPHONY_LOGI("TelephonyTestService Remote TestGetSignalInfoList size:%{public}zu", result.size());
@@ -290,6 +325,22 @@ void TestSetPreferredNetwork()
     }
 }
 
+void TestIsNrSupported()
+{
+    if (g_telephonyService != nullptr) {
+        bool result = g_telephonyService->IsNrSupported();
+        TELEPHONY_LOGI("TelephonyTestService::TestIsNrSupported result:%{public}s", result ? "true" : "false");
+    }
+}
+
+void TestGetNrOptionMode()
+{
+    if (g_telephonyService != nullptr) {
+        NrMode result = g_telephonyService->GetNrOptionMode(CoreManager::DEFAULT_SLOT_ID);
+        TELEPHONY_LOGI("TelephonyTestService::TestGetNrOptionMode result:%{public}d", result);
+    }
+}
+
 void TestGetTimeZone()
 {
     std::string timeZoneRes = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetTimeZone();
@@ -349,6 +400,25 @@ void TestGetImei()
         std::cout << " result:" << str << std::endl;
     }
 }
+
+void TestGetMeid()
+{
+    if (g_telephonyService != nullptr) {
+        std::u16string result = g_telephonyService->GetMeid(CoreManager::DEFAULT_SLOT_ID);
+        std::string str = Str16ToStr8(result);
+        std::cout << " result:" << str << std::endl;
+    }
+}
+
+void TestGetUniqueDeviceId()
+{
+    if (g_telephonyService != nullptr) {
+        std::u16string result = g_telephonyService->GetUniqueDeviceId(CoreManager::DEFAULT_SLOT_ID);
+        std::string str = Str16ToStr8(result);
+        std::cout << " result:" << str << std::endl;
+    }
+}
+
 void TestGetCellInfoList()
 {
     if (g_telephonyService != nullptr) {
@@ -369,6 +439,15 @@ void TestGetCellInfoList()
             } else if (type == CellInformation::CellType::CELL_TYPE_WCDMA) {
                 WcdmaCellInformation *wcdma = reinterpret_cast<WcdmaCellInformation *>(v.GetRefPtr());
                 TELEPHONY_LOGI("result:%{public}s", wcdma->ToString().c_str());
+            } else if (type == CellInformation::CellType::CELL_TYPE_CDMA) {
+                CdmaCellInformation *cdma = reinterpret_cast<CdmaCellInformation *>(v.GetRefPtr());
+                TELEPHONY_LOGI("result:%{public}s", cdma->ToString().c_str());
+            } else if (type == CellInformation::CellType::CELL_TYPE_TDSCDMA) {
+                TdscdmaCellInformation *tdscdma = reinterpret_cast<TdscdmaCellInformation *>(v.GetRefPtr());
+                TELEPHONY_LOGI("result:%{public}s", tdscdma->ToString().c_str());
+            } else if (type == CellInformation::CellType::CELL_TYPE_NR) {
+                NrCellInformation *nr = reinterpret_cast<NrCellInformation *>(v.GetRefPtr());
+                TELEPHONY_LOGI("result:%{public}s", nr->ToString().c_str());
             }
         }
     }
@@ -403,10 +482,14 @@ void Prompt()
         "16:SetPreferredNetwork\n"
         "17:GetTimeZone\n"
         "18:GetImei\n"
-        "19:SetPsAttachStatus\n"
-        "20:GetImsRegStatus\n"
-        "21:GetCellInfoList\n"
-        "22:SendUpdateCellLocationRequest\n"
+        "19:GetMeid\n"
+        "20:GetUniqueDeviceId\n"
+        "21:SetPsAttachStatus\n"
+        "22:GetImsRegStatus\n"
+        "23:GetCellInfoList\n"
+        "24:SendUpdateCellLocationRequest\n"
+        "25:IsNrSupported\n"
+        "26:GetNrOptionMode\n"
         "99:InitTimeAndTimeZone\n"
         "100:exit \n");
 }
@@ -466,11 +549,15 @@ void Init()
     memberFuncMap_[INPUT_SET_PREFERRED_NETWORK_MODE] = TestSetPreferredNetwork;
     memberFuncMap_[INPUT_SET_TIME_AND_TIMEZONE] = TestGetTimeZone;
     memberFuncMap_[INPUT_GET_IMEI] = TestGetImei;
+    memberFuncMap_[INPUT_GET_MEID] = TestGetMeid;
+    memberFuncMap_[INPUT_GET_UNIQUE_DEVICE_ID] = TestGetUniqueDeviceId;
     memberFuncMap_[INPUT_SET_PS_ATTACH_STATUS] = TestSetPsAttachStatus;
     memberFuncMap_[INPUT_SET_GET_IMS_REG_STATUS] = TestGetImsRegStatus;
     memberFuncMap_[INPUT_GET_CELL_INFO_LIST] = TestGetCellInfoList;
     memberFuncMap_[INPUT_REQUEST_CELL_LOCATION] = TestSendUpdateCellLocationRequest;
     memberFuncMap_[INPUT_INIT_TIME] = TestInitTimeAndTimeZone;
+    memberFuncMap_[INPUT_IS_NR_SUPPORTED] = TestIsNrSupported;
+    memberFuncMap_[INPUT_GET_NR_OPTION_MODE] = TestGetNrOptionMode;
 }
 
 void InitBroadCast()

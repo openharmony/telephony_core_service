@@ -25,11 +25,7 @@ PlmnFile::PlmnFile(unsigned char *bytes, int offset)
     this->rat_ = (aValue << OFFSET_ALL) | bValue;
 }
 
-PlmnFile::PlmnFile(const std::string &plmn, int accessTechs)
-{
-    this->plmn_ = plmn;
-    this->rat_ = accessTechs;
-}
+PlmnFile::PlmnFile(const std::string &plmn, int accessTechs) : plmn_(plmn), rat_(accessTechs) {}
 
 bool PlmnFile::ReadFromParcel(Parcel &parcel)
 {

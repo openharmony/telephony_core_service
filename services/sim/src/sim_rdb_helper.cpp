@@ -151,10 +151,25 @@ int32_t SimRdbHelper::SetDefaultMainCard(int32_t slotId)
     TELEPHONY_LOGI("SimRdbHelper::SetDefaultMainCard = %{public}d", slotId);
     NativeRdb::DataAbilityPredicates predicates;
     NativeRdb::ValuesBucket value;
-    value.PutInt(SimRdbInfo::SIM_ID, slotId);
-    value.PutInt(SimRdbInfo::CARD_TYPE, static_cast<int>(DefaultCardType::VOICE));
+    value.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
+    value.PutInt(SimRdbInfo::CARD_TYPE, static_cast<int>(DefaultCardType::MAIN));
     if (helper_ == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::SetDefaultMainCard failed by nullptr");
+        return INVALID_VALUE;
+    }
+    Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
+    return helper_->Update(defaultUri, value, predicates);
+}
+
+int32_t SimRdbHelper::SetDefaultVoiceCard(int32_t slotId)
+{
+    TELEPHONY_LOGI("SimRdbHelper::SetDefaultVoiceCard = %{public}d", slotId);
+    NativeRdb::DataAbilityPredicates predicates;
+    NativeRdb::ValuesBucket value;
+    value.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
+    value.PutInt(SimRdbInfo::CARD_TYPE, static_cast<int>(DefaultCardType::VOICE));
+    if (helper_ == nullptr) {
+        TELEPHONY_LOGE("SimRdbHelper::SetDefaultVoiceCard failed by nullptr");
         return INVALID_VALUE;
     }
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
@@ -166,7 +181,7 @@ int32_t SimRdbHelper::SetDefaultMessageCard(int32_t slotId)
     TELEPHONY_LOGI("SimRdbHelper::SetDefaultMessageCard = %{public}d", slotId);
     NativeRdb::DataAbilityPredicates predicates;
     NativeRdb::ValuesBucket value;
-    value.PutInt(SimRdbInfo::SIM_ID, slotId);
+    value.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
     value.PutInt(SimRdbInfo::CARD_TYPE, static_cast<int>(DefaultCardType::SMS));
     if (helper_ == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::SetDefaultMessageCard failed by nullptr");
@@ -181,7 +196,7 @@ int32_t SimRdbHelper::SetDefaultCellularData(int32_t slotId)
     TELEPHONY_LOGI("SimRdbHelper::SetDefaultCellularData = %{public}d", slotId);
     NativeRdb::DataAbilityPredicates predicates;
     NativeRdb::ValuesBucket value;
-    value.PutInt(SimRdbInfo::SIM_ID, slotId);
+    value.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
     value.PutInt(SimRdbInfo::CARD_TYPE, static_cast<int>(DefaultCardType::CELLULAR_DATA));
     if (helper_ == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::SetDefaultCellularData failed by nullptr");
@@ -223,6 +238,8 @@ void SimRdbHelper::SaveDataToBean(std::shared_ptr<NativeRdb::AbsSharedResultSet>
     result->GetString(index, simBean.imsi);
     result->GetColumnIndex(SimRdbInfo::IS_MAIN_CARD, index);
     result->GetInt(index, simBean.isMainCard);
+    result->GetColumnIndex(SimRdbInfo::IS_VOICE_CARD, index);
+    result->GetInt(index, simBean.isVoiceCard);
     result->GetColumnIndex(SimRdbInfo::IS_MESSAGE_CARD, index);
     result->GetInt(index, simBean.isMessageCard);
     result->GetColumnIndex(SimRdbInfo::IS_CELLULAR_DATA_CARD, index);
@@ -241,6 +258,26 @@ int32_t SimRdbHelper::QueryDataBySlotId(int32_t slotId, SimRdbInfo &simBean)
     std::shared_ptr<NativeRdb::AbsSharedResultSet> result = Query(colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::QueryDataBySlotId get nothing");
+        return INVALID_VALUE;
+    }
+    int resultSetNum = result->GoToFirstRow();
+    while (resultSetNum == 0) {
+        SaveDataToBean(result, simBean);
+        resultSetNum = result->GoToNextRow();
+    }
+    result->Close();
+    return SUCCESS;
+}
+
+int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)
+{
+    TELEPHONY_LOGI("SimRdbHelper::QueryDataByIccId");
+    std::vector<std::string> colume;
+    NativeRdb::DataAbilityPredicates predicates;
+    predicates.EqualTo(SimRdbInfo::ICC_ID, iccId);
+    std::shared_ptr<NativeRdb::AbsSharedResultSet> result = Query(colume, predicates);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("SimRdbHelper::QueryDataByIccId get nothing");
         return INVALID_VALUE;
     }
     int resultSetNum = result->GoToFirstRow();
@@ -273,20 +310,60 @@ int32_t SimRdbHelper::QueryAllData(std::vector<SimRdbInfo> &vec)
     return SUCCESS;
 }
 
-int32_t SimRdbHelper::UpdateDateBySlotId(int32_t slotId, const NativeRdb::ValuesBucket &values)
+int32_t SimRdbHelper::QueryAllValidData(std::vector<SimRdbInfo> &vec)
 {
-    TELEPHONY_LOGI("SimRdbHelper::UpdateDateBySlotId = %{public}d", slotId);
+    TELEPHONY_LOGI("SimRdbHelper::QueryAllValidData");
+    std::vector<std::string> colume;
+    std::string id = std::to_string(INVALID_VALUE);
+    NativeRdb::DataAbilityPredicates predicates;
+    predicates.GreaterThan(SimRdbInfo::SLOT_INDEX, id);
+    std::shared_ptr<NativeRdb::AbsSharedResultSet> result = Query(colume, predicates);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("SimRdbHelper::QueryAllValidData get nothing");
+        return INVALID_VALUE;
+    }
+    int resultSetNum = result->GoToFirstRow();
+    while (resultSetNum == 0) {
+        SimRdbInfo simBean;
+        SaveDataToBean(result, simBean);
+        vec.push_back(simBean);
+        resultSetNum = result->GoToNextRow();
+    }
+    result->Close();
+    return SUCCESS;
+}
+
+int32_t SimRdbHelper::UpdateDataBySlotId(int32_t slotId, const NativeRdb::ValuesBucket &values)
+{
+    TELEPHONY_LOGI("SimRdbHelper::UpdateDataBySlotId = %{public}d", slotId);
     std::string slot = std::to_string(slotId);
     NativeRdb::DataAbilityPredicates predicates;
     predicates.EqualTo(SimRdbInfo::SLOT_INDEX, slot);
     return Update(values, predicates);
 }
 
+int32_t SimRdbHelper::UpdateDataByIccId(std::string iccId, const NativeRdb::ValuesBucket &values)
+{
+    TELEPHONY_LOGI("SimRdbHelper::UpdateDataByIccId");
+    NativeRdb::DataAbilityPredicates predicates;
+    predicates.EqualTo(SimRdbInfo::ICC_ID, iccId);
+    return Update(values, predicates);
+}
+
+int32_t SimRdbHelper::ForgetAllData()
+{
+    TELEPHONY_LOGI("SimRdbHelper::ForgetAllData");
+    NativeRdb::DataAbilityPredicates predicates;
+    NativeRdb::ValuesBucket values;
+    values.PutInt(SimRdbInfo::SLOT_INDEX, INVALID_VALUE);
+    return Update(values, predicates);
+}
+
 int32_t SimRdbHelper::ClearData()
 {
-    std::string slot = std::to_string(INVALID_VALUE);
+    std::string id = std::to_string(INVALID_VALUE);
     NativeRdb::DataAbilityPredicates predicates;
-    predicates.GreaterThan(SimRdbInfo::SLOT_INDEX, slot);
+    predicates.GreaterThan(SimRdbInfo::SIM_ID, id);
     return Delete(predicates);
 }
 } // namespace Telephony
