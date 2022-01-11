@@ -41,6 +41,8 @@ void NetworkState::Init()
     csOperatorInfo_.operatorNumeric[0] = '\0';
     psRadioTech_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
     csRadioTech_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    cfgTech_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    nrState_ = NrState::NR_STATE_NOT_SUPPORT;
 }
 
 bool NetworkState::ReadFromParcel(Parcel &parcel)
@@ -93,6 +95,8 @@ bool NetworkState::ReadFromParcel(Parcel &parcel)
     csRegStatus_ = static_cast<RegServiceState>(parcel.ReadInt32());
     psRadioTech_ = static_cast<RadioTech>(parcel.ReadInt32());
     csRadioTech_ = static_cast<RadioTech>(parcel.ReadInt32());
+    cfgTech_ = static_cast<RadioTech>(parcel.ReadInt32());
+    nrState_ = static_cast<NrState>(parcel.ReadInt32());
     return true;
 }
 
@@ -101,6 +105,7 @@ bool NetworkState::operator==(const NetworkState &other) const
     return isEmergency_ == other.isEmergency_ && csRoaming_ == other.csRoaming_ && psRoaming_ == other.psRoaming_ &&
         psRegStatus_ == other.psRegStatus_ && csRegStatus_ == other.csRegStatus_ &&
         psRadioTech_ == other.psRadioTech_ && csRadioTech_ == other.csRadioTech_ &&
+        cfgTech_ == other.cfgTech_ && nrState_ == other.nrState_ &&
         !memcmp(psOperatorInfo_.operatorNumeric, other.psOperatorInfo_.operatorNumeric,
             strlen(psOperatorInfo_.operatorNumeric)) &&
         !memcmp(psOperatorInfo_.fullName, other.psOperatorInfo_.fullName, strlen(psOperatorInfo_.fullName)) &&
@@ -150,6 +155,12 @@ bool NetworkState::Marshalling(Parcel &parcel) const
         return false;
     }
     if (!parcel.WriteInt32(static_cast<int32_t>(csRadioTech_))) {
+        return false;
+    }
+    if (!parcel.WriteInt32(static_cast<int32_t>(cfgTech_))) {
+        return false;
+    }
+    if (!parcel.WriteInt32(static_cast<int32_t>(nrState_))) {
         return false;
     }
     return true;
@@ -321,6 +332,8 @@ std::string NetworkState::ToString() const
     int32_t csRegStatus = static_cast<int32_t>(csRegStatus_);
     int32_t psRadioTech = static_cast<int32_t>(psRadioTech_);
     int32_t csRadioTech = static_cast<int32_t>(csRadioTech_);
+    int32_t cfgTech = static_cast<int32_t>(cfgTech_);
+    int32_t nrState = static_cast<int32_t>(nrState_);
     std::string psFullName(psOperatorInfo_.fullName);
     std::string psOperatorNumeric(psOperatorInfo_.operatorNumeric);
     std::string psShortName(psOperatorInfo_.shortName);
@@ -333,8 +346,30 @@ std::string NetworkState::ToString() const
         ",psOperatorInfo:" + psOperatorInfoStr + ",csOperatorInfo:" + csOperatorInfoStr +
         ",csRoaming:" + std::to_string(csRoaming) + ",psRoaming:" + std::to_string(psRoaming) +
         ",psRegStatus:" + std::to_string(psRegStatus) + ",csRegStatus:" + std::to_string(csRegStatus) +
+        ",cfgTech:" + std::to_string(cfgTech) + ",nrState:" + std::to_string(nrState) +
         ",psRadioTech:" + std::to_string(psRadioTech) + ",csRadioTech:" + std::to_string(csRadioTech));
     return content;
+}
+    RadioTech cfgTech_;
+    NrState nrState_;
+void NetworkState::SetCfgTech(RadioTech tech)
+{
+    cfgTech_ = tech;
+}
+
+RadioTech NetworkState::GetCfgTech() const
+{
+    return cfgTech_;
+}
+
+void NetworkState::SetNrState(NrState state)
+{
+    nrState_ = state;
+}
+
+NrState NetworkState::GetNrState() const
+{
+    return nrState_;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -20,7 +20,7 @@ namespace Telephony {
 IccState::IccState()
 {
     simType_ = 0;
-    simState_ = ICC_CARD_ABSENT;
+    simStatus_ = ICC_CARD_ABSENT;
 }
 } // namespace Telephony
 } // namespace OHOS

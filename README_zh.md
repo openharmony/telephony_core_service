@@ -22,7 +22,7 @@
 **图 1**  核心服务架构图<a name="fig5700192716219"></a>
 
 
-![](figures/zh-cn_architecture-of-the-core_service-module.png)
+ ![](figures/zh-cn_architecture-of-the-core_service-module.png)
 
 上图示中核心服务关联的业务服务包括SIM卡服务、搜网服务、RIL通信管理。
 
@@ -32,32 +32,29 @@
 
 ## 目录<a name="section129mcpsimp"></a>
 
-```
+```sh
 /base/telphony/core_service
+├── figures                # Readme资源文件
+├── frameworks             # 框架层目录
+│   ├── js
+│   └── native
 ├── interfaces             # 接口目录
-│   ├── innerkits          # 部件间的内部接口
-│   └── kits               # 对应用提供的接口（例如JS接口）
-├── services               # 核心服务实现代码目录
-│   ├── include
-│   └── src
-├── etc                    # 核心服务的驱动脚本目录
-│   └── init
+│   ├── innerkits          # 部件间的内部接口
+│   └── kits               # 对应用提供的接口（例如JS接口）
 ├── sa_profile             # 核心服务的启动文件目录
-├── tel_ril                # 核心服务与RIL Adapter通信代码目录
-│   ├── include
-│   ├── src
-├── network_search         # 搜网服务代码目录
-│   ├── include
-│   ├── src
-├── sim                    # SIM卡服务代码目录
-│   ├── include
-│   ├── src
-├── common
-│   ├── log                # 核心服务日志打印目录
-│   ├── preferences
-│   ├── utils
-└── test                   # 单元测试相关代码
-    └── unittest
+├── services               # 核心服务实现代码目录
+│   ├── etc                # 核心服务的驱动脚本目录
+│   ├── include
+│   ├── network_search     # 搜网服务代码目录
+│   ├── sim                # SIM卡服务代码目录
+│   ├── src
+│   └── tel_ril            # 核心服务与RIL Adapter通信代码目录
+├── test                   # 单元测试相关代码
+│   └── unittest
+└── utils
+    ├── common             # 核心服务日志打印目录
+    ├── log
+    └── preferences
 ```
 
 ## 约束<a name="section133mcpsimp"></a>
@@ -81,7 +78,15 @@
 | function getSimOperatorNumeric(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽SIM卡的归属PLMN（Public Land Mobile Network）号 | 无                                  |
 | function getSimSpn(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽SIM卡的运营商SPN（Service Provider Name）       | 无                                  |
 | function getDefaultVoiceSlotId(callback: AsyncCallback\<number>): void; | 获取语音业务的默认卡卡槽                                    | 无                                  |
-
+| function isSimActive(slotId: number, callback: AsyncCallback\<boolean>): void | 检查指定卡槽的SIM卡是否激活                           | 无                                  |
+| function hasSimCard(slotId: number, callback: AsyncCallback\<boolean>): void  | 检查SIM卡是否插入指定卡槽                             | 无                                  |
+| function getSimTelephoneNumber(slotId: number, callback: AsyncCallback\<string>): void | 获取指定卡槽SIM卡的MSISDN（Mobile Station Integrated Services Digital Network）|ohos.permission.GET_TELEPHONY_STATE |
+| function getVoiceMailIdentifier(slotId: number, callback: AsyncCallback\<string>): void | 获取指定卡槽SIM卡语音信箱的身份标识 | ohos.permission.GET_TELEPHONY_STATE |
+| function getVoiceMailNumber(slotId: number, callback: AsyncCallback\<string>): void | 获取指定卡槽SIM卡的语音邮箱号码 | ohos.permission.GET_TELEPHONY_STATE |
+| function getCardType(slotId: number, callback: AsyncCallback\<CardType>): void | 获取指定卡槽SIM卡的类型 | 无 |
+| function hasOperatorPrivileges(slotId: number, callback: AsyncCallback\<boolean>): void | 检查应用（调用者）是否已被授予运营商权限 | 无 |
+| function getMaxSimCount(): number | 获取设备上可同时使用的最大SIM卡数，即最大SIM卡槽数。 | 无 |
+| function getPrimarySlotId(callback: AsyncCallback\<number>): void | 获取默认主卡槽ID | 无 |
 
 完整的JS API说明以及实例代码请参考：[SIM卡管理](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/js-reference/apis/js-apis-sim.md)。
 
@@ -96,9 +101,19 @@
 | function getNetworkSearchInformation(slotId: number, callback: AsyncCallback\<NetworkSearchResult>): void; | 获取指定卡槽的手动搜网结果 | ohos.permission.GET_TELEPHONY_STATE |
 | function getNetworkSelectionMode(slotId: number, callback: AsyncCallback\<NetworkSelectionMode>): void; | 获取指定卡槽的选网模式     | 无                                  |
 | function setNetworkSelectionMode(options: NetworkSelectionModeOptions, callback: AsyncCallback\<void>): void; | 设置指定卡槽的选网模式     | ohos.permission.SET_TELEPHONY_STATE |
-| function isRadioOn(callback: AsyncCallback\<boolean>): void;  | 判断Radio是否打开          | ohos.permission.GET_NETWORK_INFO    |
-| function turnOnRadio(callback: AsyncCallback\<void>): void;   | 开启Radio                  | ohos.permission.SET_TELEPHONY_STATE |
-| function turnOffRadio(callback: AsyncCallback\<void>): void;  | 关闭Radio                  | ohos.permission.SET_TELEPHONY_STATE |
+| function isRadioOn(callback: AsyncCallback\<boolean>): void; | 判断Radio是否打开          | ohos.permission.GET_NETWORK_INFO    |
+| function turnOnRadio(callback: AsyncCallback\<void>): void;  | 开启Radio                  | ohos.permission.SET_TELEPHONY_STATE |
+| function turnOffRadio(callback: AsyncCallback\<void>): void; | 关闭Radio                  | ohos.permission.SET_TELEPHONY_STATE |
+| function getOperatorName(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽的运营商名称   | 无                                  |
+| function setPreferredNetwork(slotId: number, networkMode: PreferredNetworkMode, callback: AsyncCallback\<void>): void; | 设置指定卡槽的优选网络模式 | 无                                  |
+| function getPreferredNetwork(slotId: number, callback: AsyncCallback\<PreferredNetworkMode>): void; | 获取指定卡槽的优选网络模式 | 无                                  |
+| function getCellInformation(slotId: number, callback: AsyncCallback<Array\<CellInformation>>) | 获取小区信息列表           | ohos.permission.LOCATION            |
+| function sendUpdateCellLocationRequest(callback: AsyncCallback\<void>) | 请求小区位置               | ohos.permission.LOCATION            |
+| function getIMEI(slotId: number, callback: AsyncCallback\<string>) | 获取Imei                   | ohos.permission.GET_TELEPHONY_STATE |
+| function getMeId(slotId: number, callback: AsyncCallback\<string>） | 获取Meid                   | ohos.permission.GET_TELEPHONY_STATE |
+| function getUniqueDeviceId(slotId: number, callback: AsyncCallback\<string>） | 获取设备唯一标识码         | ohos.permission.GET_TELEPHONY_STATE |
+| function getNrOptionMode(slotId: number, callback: AsyncCallback\<NrOptionMode>） | 获取5G模式                 | ohos.permission.GET_TELEPHONY_STATE |
+| function isNrSupported: boolean;                             | 是否支持5g网络             | 无                                  |
 
 
 完整的JS API说明以及实例代码请参考：[网络搜索](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/js-reference/apis/js-apis-radio.md)。
@@ -117,12 +132,12 @@
 2.  可以通过callback或者Promise的方式调用getNetworkState方法，返回网络状态信息。
 3.  该接口为异步接口，相关执行结果会从callback中返回。
 
-    ```
+    ```js
     import radio from "@ohos.telephony.radio";
-    
+
     // 参数赋值
     let slotId = 0;
-    
+
     // 调用接口【callback方式】
     radio.getNetworkState(slotId, (err, value) => {
       if (err) {
@@ -133,7 +148,7 @@
       // 接口调用成功，err为空
       console.log(`success to getNetworkState: ${value}`);
     });
-    
+
     // 调用接口【Promise方式】
     let promise = radio.getNetworkState(slotId);
     promise.then((value) => {
@@ -154,12 +169,12 @@
 2.  可以通过callback或者Promise的方式调用getSimState方法，返回卡状态信息。
 3.  该接口为异步接口，相关执行结果会从callback中返回。
 
-    ```
+    ```js
     import sim from "@ohos.telephony.sim";
-    
+
     // 参数赋值
     let slotId = 0;
-    
+
     // 调用接口【callback方式】
     sim.getSimState(slotId, (err, value) => {
       if (err) {
@@ -170,7 +185,7 @@
       // 接口调用成功，err为空
       console.log(`success to getSimState: ${value}`);
     });
-    
+
     // 调用接口【Promise方式】
     let promise = sim.getSimState(slotId);
     promise.then((value) => {

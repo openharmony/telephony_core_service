@@ -36,6 +36,10 @@ public:
     std::unique_ptr<OperatorConf> operatorConf_ = nullptr;
 
 private:
+    bool AnnounceOperatorConfigChanged();
+    inline static const std::string COMMON_EVENT_TELEPHONY_OPERATOR_CONFIG_CHANGED =
+            "com.hos.action.OPERATOR_CONFIG_CHANGED";
+    inline static const std::string OPERATOR_CONFIG_CHANGED = "operatorConfigChanged";
     std::shared_ptr<ISimFileManager> simFileManager_ = nullptr;
     OperatorConfig conf_;
 };

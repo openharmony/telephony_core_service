@@ -46,6 +46,7 @@ int32_t TelRilBase::SendInt32Event(int32_t dispatchId, int32_t value)
         data.WriteInt32(value);
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, data, reply, option);
+        TELEPHONY_LOGI("TelRilBase SendInt32Event, dispatchId:%{public}d, status:%{public}d", dispatchId, status);
     } else {
         TELEPHONY_LOGE("cellularRadio_ is nullptr!!!");
     }
@@ -59,6 +60,7 @@ int32_t TelRilBase::SendBufferEvent(int32_t dispatchId, MessageParcel &eventData
         MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, eventData, reply, option);
+        TELEPHONY_LOGI("TelRilBase SendBufferEvent, dispatchId:%{public}d, status:%{public}d", dispatchId, status);
     } else {
         TELEPHONY_LOGE("cellularRadio_ is nullptr!!!");
     }
@@ -78,13 +80,15 @@ int32_t TelRilBase::SendCommonBufferEvent(int32_t dispatchId, const void *eventD
         data.WriteUnpadBuffer(eventData, dataLength);
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, data, reply, option);
+        TELEPHONY_LOGI(
+            "TelRilBase SendCommonBufferEvent, dispatchId:%{public}d, status:%{public}d", dispatchId, status);
     } else {
         TELEPHONY_LOGE("cellularRadio_ is nullptr!!!");
     }
     return status;
 }
 
-int32_t TelRilBase::GetNextSerialId()
+int32_t TelRilBase::GetNextSerialId(void)
 {
     return nextSerialId_++;
 }
@@ -147,6 +151,45 @@ void TelRilBase::ErrorResponse(
     } else {
         TELEPHONY_LOGE("ERROR : telRilRequest  == %p !!!", telRilRequest.get());
     }
+}
+
+bool TelRilBase::TelRilOnlyReportResponseInfo(MessageParcel &data)
+{
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("TelRilCall DialResponse read spBuffer failed");
+        return false;
+    }
+    const struct HRilRadioResponseInfo *radioResponseInfo =
+        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
+        radioResponseInfo->serial, radioResponseInfo->error);
+
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
+    if (telRilRequest == nullptr || telRilRequest->pointer_ == nullptr) {
+        TELEPHONY_LOGE("ERROR : telRilRequest or telRilRequest->pointer_ == nullptr !!!");
+        return false;
+    }
+    const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
+    if (handler == nullptr) {
+        TELEPHONY_LOGE("ERROR :handler == nullptr !!!");
+        return false;
+    }
+    uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
+    std::shared_ptr<HRilRadioResponseInfo> result = std::make_shared<HRilRadioResponseInfo>();
+    result->flag = telRilRequest->pointer_->GetParam();
+    result->error = radioResponseInfo->error;
+    result->serial = radioResponseInfo->serial;
+    if (!handler->SendEvent(eventId, result)) {
+        TELEPHONY_LOGE("Send eventId:%{public}d is failed!", eventId);
+    }
+    return true;
+}
+
+void TelRilBase::PrintErrorForEmptyPointor(void)
+{
+    TELEPHONY_LOGE("ERROR : it is empty pointor!!!");
 }
 } // namespace Telephony
 } // namespace OHOS

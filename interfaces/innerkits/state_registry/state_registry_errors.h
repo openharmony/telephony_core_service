@@ -16,14 +16,16 @@
 #ifndef STATE_REGISTRY_ERRORS_H
 #define STATE_REGISTRY_ERRORS_H
 
-#include "../../../core_service/interfaces/innerkits/core/telephony_errors.h"
+#include "../core/telephony_errors.h"
 
 namespace OHOS {
 namespace Telephony {
 enum {
     TELEPHONY_STATE_REGISTRY_DATA_NOT_EXIST = STATE_REGISTRY_ERR_OFFSET,
     TELEPHONY_STATE_UNREGISTRY_DATA_NOT_EXIST,
-    TELEPHONY_STATE_REGISTRY_DATA_EXIST
+    TELEPHONY_STATE_REGISTRY_DATA_EXIST,
+    TELEPHONY_STATE_REGISTRY_NOT_IMPLEMENTED,
+    TELEPHONY_STATE_REGISTRY_PERMISSION_DENIED
 };
 } // namespace Telephony
 } // namespace OHOS

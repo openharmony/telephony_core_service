@@ -55,10 +55,17 @@ NetworkSearchHandler::NetworkSearchHandler(const std::shared_ptr<AppExecFwk::Eve
     memberFuncMap_[ObserverHandler::RADIO_IMS_REG_STATUS_UPDATE] = &NetworkSearchHandler::ImsRegStateUpdate;
     memberFuncMap_[ObserverHandler::RADIO_GET_IMS_REG_STATUS] = &NetworkSearchHandler::GetImsRegStatus;
     memberFuncMap_[ObserverHandler::RADIO_GET_IMEI] = &NetworkSearchHandler::RadioGetImei;
+    memberFuncMap_[ObserverHandler::RADIO_GET_MEID] = &NetworkSearchHandler::RadioGetMeid;
     memberFuncMap_[ObserverHandler::RADIO_SET_PS_ATTACH_STATUS] = &NetworkSearchHandler::SetPsAttachStatusResponse;
     memberFuncMap_[ObserverHandler::RADIO_GET_NEIGHBORING_CELL_INFO] =
         &NetworkSearchHandler::RadioGetNeighboringCellInfo;
     memberFuncMap_[ObserverHandler::RADIO_GET_CURRENT_CELL_INFO] = &NetworkSearchHandler::RadioGetCurrentCellInfo;
+
+    memberFuncMap_[ObserverHandler::RADIO_GET_RADIO_CAPABILITY] = &NetworkSearchHandler::RadioGetRadioCapability;
+    memberFuncMap_[ObserverHandler::RADIO_SET_RADIO_CAPABILITY] = &NetworkSearchHandler::RadioSetRadioCapability;
+    memberFuncMap_[ObserverHandler::RADIO_CHANNEL_CONFIG_UPDATE] = &NetworkSearchHandler::RadioChannelConfigInfo;
+    memberFuncMap_[ObserverHandler::RADIO_VOICE_TECH_CHANGED] = &NetworkSearchHandler::RadioVoiceTechChange;
+    memberFuncMap_[ObserverHandler::RADIO_GET_VOICE_TECH] = &NetworkSearchHandler::RadioVoiceTechChange;
 }
 
 NetworkSearchHandler::~NetworkSearchHandler()
@@ -78,6 +85,7 @@ void NetworkSearchHandler::Init()
         TELEPHONY_LOGE("failed to create new networkRegister");
         return;
     }
+    networkRegister_->InitNrConversionConfig();
     operatorName_ = std::make_unique<OperatorName>(
         nsm->GetNetworkSearchState(), nsm->GetSimFileManager(), networkSearchManager_);
     if (operatorName_ == nullptr) {
@@ -149,6 +157,10 @@ void NetworkSearchHandler::RegisterEvents()
                 shared_from_this(), ObserverHandler::RADIO_NETWORK_TIME_UPDATE, nullptr);
             telRilManager->RegisterCoreNotify(
                 shared_from_this(), ObserverHandler::RADIO_IMS_REG_STATUS_UPDATE, nullptr);
+            telRilManager->RegisterCoreNotify(
+                shared_from_this(), ObserverHandler::RADIO_CHANNEL_CONFIG_UPDATE, nullptr);
+            telRilManager->RegisterCoreNotify(
+                shared_from_this(), ObserverHandler::RADIO_VOICE_TECH_CHANGED, nullptr);
         }
     }
 }
@@ -211,22 +223,23 @@ void NetworkSearchHandler::SimStateChange(const AppExecFwk::InnerEvent::Pointer 
 void NetworkSearchHandler::ImsiLoadedReady(const AppExecFwk::InnerEvent::Pointer &event)
 {
     SendUpdateCellLocationRequest();
-    GetRilSignalIntensity(false);
+    GetRilSignalIntensity(true);
     InitGetNetworkSelectionMode();
     GetNetworkStateInfo(event);
 }
 
 void NetworkSearchHandler::SimRecordsLoaded(const AppExecFwk::InnerEvent::Pointer &)
 {
-    if (operatorName_ != nullptr) {
-        operatorName_->NotifySpnChanged();
-    }
-
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager != nullptr) {
         RadioTech csRadioTech =
             static_cast<RadioTech>(networkSearchManager->GetCsRadioTech(CoreManager::DEFAULT_SLOT_ID));
         UpdatePhone(csRadioTech);
+        InitPreferredNetwork();
+    }
+
+    if (operatorName_ != nullptr) {
+        operatorName_->NotifySpnChanged();
     }
 }
 
@@ -237,17 +250,24 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
         TELEPHONY_LOGE("NetworkSearchHandler::RadioStateChange object is nullptr!");
         return;
     }
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioStateChange failed to get NetworkSearchManager");
+        return;
+    }
     int32_t radioState = *object;
     TELEPHONY_LOGI("NetworkSearchHandler::RadioState change: %{public}d", radioState);
     switch (radioState) {
-        case static_cast<int32_t>(ModemPowerState::CORE_SERVICE_POWER_OFF): {
+        case CORE_SERVICE_POWER_NOT_AVAILABLE:
+        case CORE_SERVICE_POWER_OFF: {
             RadioOffState();
             break;
         }
-        case static_cast<int32_t>(ModemPowerState::CORE_SERVICE_POWER_ON): {
+        case CORE_SERVICE_POWER_ON: {
             SendUpdateCellLocationRequest();
-            GetRilSignalIntensity(true);
+            GetRilSignalIntensity(false);
             InitGetNetworkSelectionMode();
+            networkSearchManager->GetImsRegStatus();
             RadioOnState();
             break;
         }
@@ -255,18 +275,10 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
             TELEPHONY_LOGI("Unhandled message with number: %{public}d", radioState);
             break;
     }
-
-    auto networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchHandler::RadioStateChange failed to get NetworkSearchManager");
-        return;
-    }
-    networkSearchManager->GetImei(0);
-    if (radioState == static_cast<int32_t>(ModemPowerState::CORE_SERVICE_POWER_ON) ||
-        radioState == static_cast<int32_t>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
+    if (radioState == CORE_SERVICE_POWER_ON || radioState == CORE_SERVICE_POWER_OFF) {
         networkSearchManager->SetRadioStateValue((ModemPowerState)radioState);
     } else {
-        networkSearchManager->SetRadioStateValue(ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
+        networkSearchManager->SetRadioStateValue(CORE_SERVICE_POWER_NOT_AVAILABLE);
     }
 }
 
@@ -330,23 +342,30 @@ void NetworkSearchHandler::GetRilSignalIntensity(bool checkTime)
 void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Pointer &)
 {
     auto networkSearchManager = networkSearchManager_.lock();
+    std::shared_ptr<NetworkSearchState> networkSearchState = networkSearchManager->GetNetworkSearchState();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("failed to get NetworkSearchManager RadioState");
         return;
     }
-    ModemPowerState radioState = networkSearchManager->GetRadioStateValue();
+    if (networkSearchState == nullptr) {
+        TELEPHONY_LOGE("networkSearchState is null");
+        return;
+    }
+
+    ModemPowerState radioState = static_cast<ModemPowerState>(networkSearchManager->GetRadioState());
     TELEPHONY_LOGI("NetworkSearchHandler GetRadioState : %{public}d", radioState);
     switch (radioState) {
-        case ModemPowerState::CORE_SERVICE_POWER_OFF:
+        case CORE_SERVICE_POWER_OFF:
             RadioOffState();
             break;
-        case ModemPowerState::CORE_SERVICE_POWER_ON:
+        case CORE_SERVICE_POWER_ON:
             RadioOnState();
             break;
         default:
             TELEPHONY_LOGI("Unhandled message with number: %{public}d", radioState);
             break;
     }
+    networkSearchState->CsRadioTechChange();
 }
 
 void NetworkSearchHandler::RadioOffState() const
@@ -371,9 +390,8 @@ void NetworkSearchHandler::RadioOffState() const
     if (cellManager_ != nullptr) {
         cellManager_->ClearCellInfoList();
     }
-    networkSearchState->CsRadioTechChange();
     networkSearchState->NotifyStateChange();
-
+    networkSearchManager->SetNrOptionMode(NrMode::NR_MODE_UNKNOWN);
     if (!networkSearchManager->GetAirplaneMode()) {
         networkSearchManager->SetRadioState(static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
     }
@@ -561,10 +579,20 @@ void NetworkSearchHandler::RadioGetImei(const AppExecFwk::InnerEvent::Pointer &e
     }
 }
 
+void NetworkSearchHandler::RadioGetMeid(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("NetworkSearchHandler::RadioGetMeid start");
+    if (radioInfo_ != nullptr) {
+        radioInfo_->ProcessGetMeid(event);
+    } else {
+        TELEPHONY_LOGE("RadioGetMeid radioInfo_ is null");
+    }
+}
+
 void NetworkSearchHandler::UpdatePhone(RadioTech csRadioTech) const
 {
-    if (networkType_ != nullptr) {
-        networkType_->UpdatePhone(csRadioTech);
+    if (radioInfo_ != nullptr) {
+        radioInfo_->UpdatePhone(csRadioTech);
     } else {
         TELEPHONY_LOGE("UpdatePhone networkType is null");
     }
@@ -600,11 +628,11 @@ void NetworkSearchHandler::ImsRegStateUpdate(const AppExecFwk::InnerEvent::Point
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("InitGetNetworkSelectionMode networkSearchManager is null");
+        TELEPHONY_LOGE("ImsRegStateUpdate networkSearchManager is null");
         return;
     }
     if (event == nullptr) {
-        TELEPHONY_LOGE("IMSRegister::ImsRegStateUpdate event is nullptr");
+        TELEPHONY_LOGE("NetworkSearchHandler::ImsRegStateUpdate event is nullptr");
         return;
     }
     std::shared_ptr<ImsRegStatusInfo> imsRegStatusInfo = event->GetSharedObject<ImsRegStatusInfo>();
@@ -646,17 +674,31 @@ void NetworkSearchHandler::RadioGetNeighboringCellInfo(const AppExecFwk::InnerEv
 
 void NetworkSearchHandler::GetCellInfoList(std::vector<sptr<CellInformation>> &cells)
 {
-    TELEPHONY_LOGI("NetworkSearchHandler::GetCellInfoList start......");
+    TELEPHONY_LOGI("NetworkSearchHandler::GetCellInfoList");
     if (cellManager_ != nullptr) {
         cellManager_->GetCellInfoList(cells);
     }
 }
 
+sptr<CellLocation> NetworkSearchHandler::GetCellLocation()
+{
+    TELEPHONY_LOGI("NetworkSearchHandler::GetCellLocation");
+    if (cellManager_ != nullptr) {
+        return cellManager_->GetCellLocation();
+    }
+    return nullptr;
+}
+
 void NetworkSearchHandler::SendUpdateCellLocationRequest()
 {
-    TELEPHONY_LOGI("NetworkSearchHandler::SendUpdateCellLocationRequest start......");
+    TELEPHONY_LOGI("NetworkSearchHandler::SendUpdateCellLocationRequest");
     std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
-    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_CURRENT_CELL_INFO);
+    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_LOCATION_UPDATE);
+    if (event != nullptr && telRilManager != nullptr) {
+        event->SetOwner(shared_from_this());
+        telRilManager->SetLocateUpdates(HRilRegNotifyMode::REG_NOTIFY_STAT_LAC_CELLID, event);
+    }
+    event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_CURRENT_CELL_INFO);
     if (event != nullptr && telRilManager != nullptr) {
         event->SetOwner(shared_from_this());
         telRilManager->GetCurrentCellInfo(event);
@@ -669,6 +711,57 @@ void NetworkSearchHandler::UpdateCellLocation(int32_t techType, int32_t cellId, 
     if (cellManager_ != nullptr) {
         cellManager_->UpdateCellLocation(techType, cellId, lac);
     }
+}
+
+PhoneType NetworkSearchHandler::GetPhoneType()
+{
+    TELEPHONY_LOGI("NetworkSearchHandler::GetPhoneType");
+    if (radioInfo_ != nullptr) {
+        return radioInfo_->GetPhoneType();
+    }
+    return PhoneType::PHONE_TYPE_IS_NONE;
+}
+
+void NetworkSearchHandler::RadioSetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (radioInfo_ != nullptr) {
+        radioInfo_->ProcessSetRadioCapability(event);
+    } else {
+        TELEPHONY_LOGE("RadioSetRadioCapability radioInfo_ is null");
+    }
+}
+
+void NetworkSearchHandler::RadioGetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (radioInfo_ != nullptr) {
+        radioInfo_->ProcessGetRadioCapability(event);
+    } else {
+        TELEPHONY_LOGE("RadioGetRadioCapability radioInfo_ is null");
+    }
+}
+
+void NetworkSearchHandler::RadioChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (networkRegister_ != nullptr) {
+        networkRegister_->ProcessChannelConfigInfo(event);
+    }
+    TELEPHONY_LOGI("NetworkSearchHandler::ProcessChannelConfigInfo");
+}
+
+void NetworkSearchHandler::DcPhysicalLinkActiveUpdate(bool isActive)
+{
+    if (networkRegister_ != nullptr) {
+        networkRegister_->DcPhysicalLinkActiveUpdate(isActive);
+    }
+    TELEPHONY_LOGI("NetworkSearchHandler::DcPhysicalLinkActiveUpdate");
+}
+
+void NetworkSearchHandler::RadioVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (radioInfo_ != nullptr) {
+        radioInfo_->ProcessVoiceTechChange(event);
+    }
+    TELEPHONY_LOGI("NetworkSearchHandler::RadioVoiceTechChange");
 }
 } // namespace Telephony
 } // namespace OHOS

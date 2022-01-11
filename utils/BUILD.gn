@@ -28,6 +28,7 @@ config("telephony_common_config") {
 ohos_shared_library("libtelephony_common") {
   sources = [
     "common/src/str_convert.cpp",
+    "common/src/telephony_permission.cpp",
     "log/src/telephony_log_wrapper.cpp",
     "preferences/src/tel_profile_util.cpp",
   ]
@@ -61,7 +62,14 @@ ohos_shared_library("libtelephony_common") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  external_deps += [ "native_appdatamgr:native_preferences" ]
+  external_deps += [
+    "aafwk_standard:want",
+    "appexecfwk_standard:appexecfwk_core",
+    "ipc:ipc_core",
+    "permission_standard:libpermissionsdk_standard",
+    "safwk:system_ability_fwk",
+    "samgr_standard:samgr_proxy",
+  ]
 
   part_name = "core_service"
   subsystem_name = "telephony"

@@ -20,12 +20,20 @@
 
 namespace OHOS {
 namespace Telephony {
+// matched to HRilSimState
 const int ICC_CONTENT_UNKNOWN = -1;
 const int ICC_CARD_ABSENT = 0;
 const int ICC_CONTENT_READY = 1;
 const int ICC_CONTENT_PIN = 2;
 const int ICC_CONTENT_PUK = 3;
-const int ICC_CONTENT_SIMLOCK = 4;
+const int ICC_CONTENT_PIN2 = 4;
+const int ICC_CONTENT_PUK2 = 5;
+const int ICC_CONTENT_PH_NET_PIN = 6;
+const int ICC_CONTENT_PH_NET_PUK = 7;
+const int ICC_CONTENT_PH_NET_SUB_PIN = 8;
+const int ICC_CONTENT_PH_NET_SUB_PUK = 9;
+const int ICC_CONTENT_PH_SP_PIN = 10;
+const int ICC_CONTENT_PH_SP_PUK = 11;
 
 const int CONTENT_INDEX_INVALID = -1;
 const int ICC_CONTENT_NUM = 0;
@@ -42,9 +50,13 @@ const int ICC_PIN_BLOCKED_PERM = 5;
 const int ICC_UNKNOWN_TYPE = 0;
 const int ICC_SIM_TYPE = 1;
 const int ICC_USIM_TYPE = 2;
-const int ICC_RUIM_TYPE = 3;
-const int ICC_CSIM_TYPE = 4;
-const int ICC_ISIM_TYPE = 5;
+const int ICC_RUIM_TYPE = 4;
+const int ICC_CG_TYPE = 5;
+const int ICC_DUAL_MODE_ROAMING_TYPE = 7;
+const int ICC_UNICOM_DUAL_MODE_TYPE = 8;
+const int ICC_4G_LTE_TYPE = 9;
+const int ICC_UG_TYPE = 10;
+const int ICC_IMS_TYPE = 11;
 
 const int ICC_SIMLOCK_UNKNOWN = 0;
 const int ICC_SIMLOCK_IN_PROGRESS = 1;
@@ -70,7 +82,7 @@ public:
 
 public:
     int32_t simType_;
-    int32_t simState_;
+    int32_t simStatus_;
 };
 } // namespace Telephony
 } // namespace OHOS

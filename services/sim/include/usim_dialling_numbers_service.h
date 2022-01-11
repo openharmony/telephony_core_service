@@ -96,7 +96,7 @@ private:
         TAG_SIM_USIM_IAP,
         TAG_SIM_USIM_EXT1,
         TAG_SIM_USIM_SNE,
-        TAG_SIM_USIM_ANR,
+        TAG_SIM_USIM_ANR, // 3gpp 31102-9j0 4.4.2.9
         TAG_SIM_USIM_PBC,
         TAG_SIM_USIM_GRP,
         TAG_SIM_USIM_AAS,

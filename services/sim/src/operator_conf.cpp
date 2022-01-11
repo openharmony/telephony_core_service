@@ -59,14 +59,14 @@ bool OperatorConf::ParseDoc(const std::string docname, OperatorConfig &poc)
         xmlFreeDoc(doc);
         return false;
     }
-    if (xmlStrcmp(cur->name, (const xmlChar *)CARRIER_CONFIG_LIST.c_str())) {
+    if (xmlStrcmp(cur->name, (const xmlChar *)OPERATOR_CONFIG_LIST.c_str())) {
         TELEPHONY_LOGE("OperatorConf xml is not format");
         xmlFreeDoc(doc);
         return false;
     }
     cur = cur->xmlChildrenNode;
     while (cur != NULL) {
-        if (!xmlStrcmp(cur->name, (const xmlChar *)CARRIER_CONFIG.c_str())) {
+        if (!xmlStrcmp(cur->name, (const xmlChar *)OPERATOR_CONFIG.c_str())) {
             ParseChild(doc, cur, poc);
         }
         cur = cur->next;

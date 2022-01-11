@@ -110,14 +110,14 @@ bool NitzUpdate::NitzTimeParse(std::string &strTimeSubs, NetworkTime &networkTim
         strSep = "-";
         flag = -1;
     } else {
-        TELEPHONY_LOGE("NitzUpdate::NitzTimeParse timezone string error %{public}s", strTimeSubs.c_str());
+        TELEPHONY_LOGE("NitzUpdate::NitzParse timezone string error %{public}s", strTimeSubs.c_str());
         return false;
     }
 
     std::vector<std::string> strsRet;
     SplitStr(strTimeSubs, strSep, strsRet);
     if (strsRet.size() != TIMEZONE_SPLIT_NUM) {
-        TELEPHONY_LOGE("NitzUpdate::NitzTimeParse timezone error");
+        TELEPHONY_LOGE("NitzUpdate::NitzParse timezone error");
         return false;
     }
     strTimeSubs = strsRet[0];
@@ -128,7 +128,7 @@ bool NitzUpdate::NitzTimeParse(std::string &strTimeSubs, NetworkTime &networkTim
     strsRet.clear();
     SplitStr(strTimeSubs, strSep, strsRet);
     if (strsRet.size() != TIME_SPLIT_NUM) {
-        TELEPHONY_LOGE("NitzUpdate::NitzTimeParse time vector error");
+        TELEPHONY_LOGE("NitzUpdate::NitzParse timezone vector error");
         return false;
     }
     StrToInt(strsRet[0], networkTime.hour);
@@ -148,7 +148,7 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
         TELEPHONY_LOGE("NitzUpdate::ProcessTime time error");
         return;
     }
-    
+
 #ifdef IS_SUPPORT_POWERMGR
     auto &powerMgrClient = PowerMgrClient::GetInstance();
     auto runningLock = powerMgrClient.CreateRunningLock("runninglock", RunningLockType::RUNNINGLOCK_BACKGROUND);
@@ -171,11 +171,9 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
         std::to_string(networkTime.day) + " " + std::to_string(networkTime.hour) + ":" +
         std::to_string(networkTime.minute) + ":" + std::to_string(networkTime.second));
     SaveTime(strDate);
-
 #ifdef IS_SUPPORT_POWERMGR
     runningLock->UnLock();
 #endif
-
     std::string action = "usual.event.NITZ_TIME_UPDATED";
     std::string param = "time";
     AAFwk::Want want;

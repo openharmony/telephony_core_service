@@ -21,7 +21,6 @@
 #include "i_sim_account_manager.h"
 #include "telephony_log_wrapper.h"
 #include "sim_constant.h"
-#include "telephony_state_registry_proxy.h"
 #include "sim_data.h"
 #include "multi_sim_controller.h"
 #include "rdb_sim_helper.h"

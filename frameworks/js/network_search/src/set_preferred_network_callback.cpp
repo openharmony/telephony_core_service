@@ -33,12 +33,15 @@ void SetPreferredNetworkCallback::OnSetPreferredNetworkCallback(const bool setRe
     TELEPHONY_LOGI("OnSetPreferredNetworkModelCallback setResult = %{public}d , errorCode = %{public}d", setResult,
         errorCode);
     asyncContext_->resolved = (errorCode == HRIL_ERR_SUCCESS) && setResult &&
-        (asyncContext_->errorCode != SLOTID_INPUT_ERROR);
+        (asyncContext_->preferredNetworkMode >= PREFERRED_NETWORK_MODE_AUTO) &&
+        (asyncContext_->preferredNetworkMode <= PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA);
     if (!asyncContext_->resolved) {
-        if (asyncContext_->errorCode == HRIL_ERR_SUCCESS) {
+        if (errorCode == HRIL_ERR_SUCCESS) {
             asyncContext_->errorCode = HRIL_ERR_GENERIC_FAILURE;
-        } else if (asyncContext_->errorCode == SLOTID_INPUT_ERROR) {
+        } else if (errorCode == SLOTID_INPUT_ERROR) {
             asyncContext_->errorCode = SLOTID_INPUT_ERROR;
+        } else if (errorCode == ENUMERATION_INPUT_ERROR) {
+            asyncContext_->errorCode = ENUMERATION_INPUT_ERROR;
         } else {
             asyncContext_->errorCode = errorCode;
         }

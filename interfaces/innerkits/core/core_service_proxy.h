@@ -13,12 +13,11 @@
  * limitations under the License.
  */
 
-#ifndef CORE_SERVICE_PROXY_H
-#define CORE_SERVICE_PROXY_H
+#ifndef BASE_PHONE_SERVICE_PROXY_H
+#define BASE_PHONE_SERVICE_PROXY_H
 
 #include "i_core_service.h"
 #include "telephony_errors.h"
-#include "telephony_log_wrapper.h"
 #include "core_manager.h"
 
 namespace OHOS {
@@ -36,8 +35,13 @@ public:
     bool SetRadioState(bool isOn, const sptr<INetworkSearchCallback> &callback) override;
     bool GetRadioState(const sptr<INetworkSearchCallback> &callback) override;
     std::u16string GetImei(int32_t slotId) override;
+    std::u16string GetMeid(int32_t slotId) override;
+    std::u16string GetUniqueDeviceId(int32_t slotId) override;
+    bool IsNrSupported() override;
+    NrMode GetNrOptionMode(int32_t slotId) override;
     bool HasSimCard(int32_t slotId) override;
     int32_t GetSimState(int32_t slotId) override;
+    int32_t GetCardType(int32_t slotId) override;
     std::u16string GetSimOperatorNumeric(int32_t slotId) override;
     std::u16string GetISOCountryCodeForSim(int32_t slotId) override;
     std::u16string GetSimSpn(int32_t slotId) override;
@@ -55,6 +59,8 @@ public:
     bool GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) override;
     bool SetDefaultVoiceSlotId(int32_t slotId) override;
     int32_t GetDefaultVoiceSlotId() override;
+    int32_t GetPrimarySlotId() override;
+    bool SetPrimarySlotId(int32_t slotId) override;
     bool SetShowNumber(int32_t slotId, const std::u16string number) override;
     std::u16string GetShowNumber(int32_t slotId) override;
     bool SetShowName(int32_t slotId, const std::u16string name) override;
@@ -64,26 +70,27 @@ public:
     bool IsValidSlotId(int32_t slotId);
     bool IsValidStringLength(std::u16string str);
 
-    bool UnlockPin(int32_t slotId, std::u16string pin, LockStatusResponse &response) override;
+    bool UnlockPin(const int32_t slotId, std::u16string pin, LockStatusResponse &response) override;
     bool UnlockPuk(
-        int32_t slotId, std::u16string newPin, std::u16string puk, LockStatusResponse &response) override;
+        const int32_t slotId, std::u16string newPin, std::u16string puk, LockStatusResponse &response) override;
     bool AlterPin(
-        int32_t slotId, std::u16string newPin, std::u16string oldPin, LockStatusResponse &response) override;
-    bool UnlockPin2(int32_t slotId, std::u16string pin2, LockStatusResponse &response) override;
+        const int32_t slotId, std::u16string newPin, std::u16string oldPin, LockStatusResponse &response) override;
+    bool UnlockPin2(const int32_t slotId, std::u16string pin2, LockStatusResponse &response) override;
     bool UnlockPuk2(
-        int32_t slotId, std::u16string newPin2, std::u16string puk2, LockStatusResponse &response) override;
-    bool AlterPin2(
-        int32_t slotId, std::u16string newPin2, std::u16string oldPin2, LockStatusResponse &response) override;
-    bool SetLockState(int32_t slotId, std::u16string pin, int32_t enable, LockStatusResponse &response) override;
-    int32_t GetLockState(int32_t slotId) override;
+        const int32_t slotId, std::u16string newPin2, std::u16string puk2, LockStatusResponse &response) override;
+    bool AlterPin2(const int32_t slotId, std::u16string newPin2, std::u16string oldPin2,
+        LockStatusResponse &response) override;
+    bool SetLockState(const int32_t slotId, const LockInfo &options, LockStatusResponse &response) override;
+    int32_t GetLockState(int32_t slotId, LockType lockType) override;
     int32_t RefreshSimState(int32_t slotId) override;
-    bool SetActiveSim(const int32_t slotId, int32_t enable) override;
+    bool SetActiveSim(int32_t slotId, int32_t enable) override;
     bool GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
     bool SetPreferredNetwork(
         int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback) override;
     bool SetPsAttachStatus(
         int32_t slotId, int32_t psAttachStatus, const sptr<INetworkSearchCallback> &callback) override;
     std::u16string GetSimTelephoneNumber(int32_t slotId) override;
+    std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) override;
     std::u16string GetVoiceMailIdentifier(int32_t slotId) override;
     std::u16string GetVoiceMailNumber(int32_t slotId) override;
     std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int slotId, int type) override;
@@ -94,11 +101,15 @@ public:
     bool UpdateIccDiallingNumbers(
         int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) override;
     bool SetVoiceMailInfo(
-        int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) override;
+        const int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) override;
     bool GetImsRegStatus(int32_t slotId) override;
     int32_t GetMaxSimCount() override;
+    bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
+    bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
+    bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;
     std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) override;
     bool SendUpdateCellLocationRequest() override;
+    bool HasOperatorPrivileges(const int32_t slotId) override;
 
 private:
     template<class T>
@@ -113,10 +124,10 @@ private:
     static inline BrokerDelegator<CoreServiceProxy> delegator_;
     bool WriteInterfaceToken(MessageParcel &data);
     void ProcessSignalInfo(MessageParcel &reply, std::vector<sptr<SignalInformation>> &result);
+    void ProcessCellInfo(MessageParcel &reply, std::vector<sptr<CellInformation>> &cells);
     std::vector<IccAccountInfo> activeIccAccountInfo_;
-    IccAccountInfo accountInfo_;
     std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // CORE_SERVICE_PROXY_H
+#endif // BASE_PHONE_SERVICE_PROXY_H

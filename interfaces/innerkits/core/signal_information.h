@@ -22,23 +22,27 @@ namespace OHOS {
 namespace Telephony {
 class SignalInformation : public Parcelable {
 public:
-    enum class NetworkType { GSM = 1, CDMA, LTE, TDSCDMA, WCDMA };
+    enum class NetworkType { GSM = 1, CDMA, WCDMA, TDSCDMA, LTE, NR };
     static constexpr int32_t NO_VALUE = 0x1AAAAAAA;
     static constexpr int32_t MAX_SIGNAL_NUM = 2;
     static constexpr int32_t GSM_SIGNAL_THRESHOLD_5BAR[] = {-110, -109, -103, -97, -91, -85};
     static constexpr int32_t CDMA_SIGNAL_THRESHOLD_5BAR[] = {-113, -112, -106, -99, -92, -85};
     static constexpr int32_t LTE_SIGNAL_THRESHOLD_5BAR[] = {-121, -120, -115, -110, -105, -97};
     static constexpr int32_t WCDMA_SIGNAL_THRESHOLD_5BAR[] = {-113, -112, -105, -99, -93, -87};
+    static constexpr int32_t TD_SCDMA_SIGNAL_THRESHOLD_5BAR[] = {-112, -111, -105, -99, -93, -87};
+    static constexpr int32_t NR_SIGNAL_THRESHOLD_5BAR[] = {-121, -120, -115, -110, -105, -97};
     static constexpr int32_t GSM_SIGNAL_THRESHOLD_4BAR[] = {-110, -103, -97, -91, -85};
     static constexpr int32_t CDMA_SIGNAL_THRESHOLD_4BAR[] = {-113, -106, -99, -92, -85};
     static constexpr int32_t LTE_SIGNAL_THRESHOLD_4BAR[] = {-121, -115, -109, -103, -97};
     static constexpr int32_t WCDMA_SIGNAL_THRESHOLD_4BAR[] = {-113, -105, -99, -93, -87};
+    static constexpr int32_t TD_SCDMA_SIGNAL_THRESHOLD_4BAR[] = {-112, -105, -99, -93, -87};
+    static constexpr int32_t NR_SIGNAL_THRESHOLD_4BAR[] = {-121, -115, -109, -103, -97};
 
 public:
     virtual SignalInformation::NetworkType GetNetworkType() const = 0;
     virtual bool Marshalling(Parcel &parcel) const = 0;
     static void InitSignalBar(const int32_t bar = 5);
-    static std::unique_ptr<SignalInformation> UnMarshalling(Parcel &parcel);
+    static std::unique_ptr<SignalInformation> Unmarshalling(Parcel &parcel);
     virtual bool ReadFromParcel(Parcel &parcel) = 0;
     virtual int32_t GetSignalLevel() const = 0;
     virtual std::string ToString() const = 0;
@@ -63,7 +67,7 @@ public:
     sptr<SignalInformation> NewInstance() const override;
     SignalInformation::NetworkType GetNetworkType() const override;
     bool Marshalling(Parcel &parcel) const override;
-    static std::unique_ptr<GsmSignalInformation> UnMarshalling(Parcel &parcel);
+    static std::unique_ptr<GsmSignalInformation> Unmarshalling(Parcel &parcel);
     bool ReadFromParcel(Parcel &parcel) override;
     bool ValidateGsmValue() const;
 
@@ -84,10 +88,9 @@ public:
     SignalInformation::NetworkType GetNetworkType() const override;
     sptr<SignalInformation> NewInstance() const override;
     bool Marshalling(Parcel &parcel) const override;
-    static std::unique_ptr<CdmaSignalInformation> UnMarshalling(Parcel &parcel);
+    static std::unique_ptr<CdmaSignalInformation> Unmarshalling(Parcel &parcel);
     bool ReadFromParcel(Parcel &parcel) override;
     bool ValidateCdmaValue() const;
-    bool ValidateEvdoValue() const;
 
 private:
     int32_t cdmaRssi_ = -1;
@@ -110,7 +113,7 @@ public:
     SignalInformation::NetworkType GetNetworkType() const override;
     sptr<SignalInformation> NewInstance() const override;
     bool Marshalling(Parcel &parcel) const override;
-    static std::unique_ptr<LteSignalInformation> UnMarshalling(Parcel &parcel);
+    static std::unique_ptr<LteSignalInformation> Unmarshalling(Parcel &parcel);
     bool ReadFromParcel(Parcel &parcel) override;
     bool ValidateLteValue() const;
 
@@ -137,7 +140,7 @@ public:
     SignalInformation::NetworkType GetNetworkType() const override;
     sptr<SignalInformation> NewInstance() const override;
     bool Marshalling(Parcel &parcel) const override;
-    static std::unique_ptr<WcdmaSignalInformation> UnMarshalling(Parcel &parcel);
+    static std::unique_ptr<WcdmaSignalInformation> Unmarshalling(Parcel &parcel);
     bool ReadFromParcel(Parcel &parcel) override;
     bool ValidateWcdmaValue() const;
 
@@ -146,6 +149,50 @@ private:
     int32_t wcdmaRscp_ = 0;
     int32_t wcdmaEcio_ = 0;
     int32_t wcdmaBer_ = 0;
+};
+
+class TdScdmaSignalInformation : public SignalInformation {
+public:
+    TdScdmaSignalInformation() = default;
+    ~TdScdmaSignalInformation() = default;
+    void SetValue(const int32_t tdScdmaRscp = 0);
+    bool operator==(const TdScdmaSignalInformation &tdScdma) const;
+    int32_t GetRscp() const;
+    int32_t GetSignalLevel() const override;
+    std::string ToString() const override;
+    SignalInformation::NetworkType GetNetworkType() const override;
+    sptr<SignalInformation> NewInstance() const override;
+    bool Marshalling(Parcel &parcel) const override;
+    static std::unique_ptr<TdScdmaSignalInformation> Unmarshalling(Parcel &parcel);
+    bool ReadFromParcel(Parcel &parcel) override;
+    bool ValidateTdScdmaValue() const;
+
+private:
+    int32_t tdScdmaRscp_ = 0;
+};
+
+class NrSignalInformation : public SignalInformation {
+public:
+    NrSignalInformation() = default;
+    ~NrSignalInformation() = default;
+    void SetValue(const int32_t rsrp = 0, const int32_t rsrq = 0, const int32_t sinr = 0);
+    bool operator==(const NrSignalInformation &nr) const;
+    int32_t GetRsrp() const;
+    int32_t GetRsrq() const;
+    int32_t GetSinr() const;
+    int32_t GetSignalLevel() const override;
+    std::string ToString() const override;
+    SignalInformation::NetworkType GetNetworkType() const override;
+    sptr<SignalInformation> NewInstance() const override;
+    bool Marshalling(Parcel &parcel) const override;
+    static std::unique_ptr<NrSignalInformation> Unmarshalling(Parcel &parcel);
+    bool ReadFromParcel(Parcel &parcel) override;
+    bool ValidateNrValue() const;
+
+private:
+    int32_t nrRsrp_ = 0;
+    int32_t nrRsrq_ = 0;
+    int32_t nrSinr_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

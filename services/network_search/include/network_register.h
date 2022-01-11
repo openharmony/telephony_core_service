@@ -16,8 +16,11 @@
 #define NETWORK_SEARCH_INCLUDE_NETWORK_REGISTER_H
 #include <memory>
 #include <string>
+#include <vector>
+#include <map>
 #include "event_handler.h"
-#include "hril_types.h"
+
+#include "hril_network_parcel.h"
 #include "network_search_state.h"
 
 namespace OHOS {
@@ -27,10 +30,13 @@ public:
     explicit NetworkRegister(std::shared_ptr<NetworkSearchState> networkSearchState,
         std::weak_ptr<NetworkSearchManager> networkSearchManager);
     virtual ~NetworkRegister() = default;
-    void ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &event) const;
+    void InitNrConversionConfig();
+    void ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessRestrictedState(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &event) const;
+    void ProcessChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event);
+    void DcPhysicalLinkActiveUpdate(bool isActive);
     enum class RilRegister {
         REG_STATE_NOT_REG = 0,
         REG_STATE_HOME_ONLY = 1,
@@ -40,13 +46,51 @@ public:
         REG_STATE_ROAMING = 5,
         REG_STATE_EMERGENCY_ONLY = 6
     };
+    enum class ConnectServiceCell {
+        /** UE has connection to primary cell cell(3GPP 36.331).*/
+        CONNECTION_PRIMARY_CELL = 1,
+        /** UE has connectionto secondary cell cell(3GPP 36.331).*/
+        CONNECTION_SECONDARY_CELL = 2,
+        /** Connection status is unknown. */
+        CONNECTION_UNKNOWN = 10
+    };
 
 private:
     RegServiceState ConvertRegFromRil(RilRegister code) const;
-    RadioTech ConvertTechFromRil(HRiRadioTechnology code) const;
+    RadioTech ConvertTechFromRil(HRilRadioTech code) const;
+    NrState ConvertStringToNrState(std::string& strState) const;
+    void UpdateNrState();
+    void UpdateCfgTech();
+    void NotifyNrFrequencyChanged();
+    void NrConfigParse(std::string &cfgStr);
+
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
+    /**
+     * Indicates that if E-UTRA-NR Dual Connectivity (EN-DC) is supported by the primary serving
+     * cell.
+     *
+     * Reference: 3GPP TS 36.331 V16.6.0 6.3.1 System information blocks.
+     */
+    bool endcSupport_ = false;
+    /**
+     * Indicates if the use of dual connectivity with NR is restricted.
+     * Reference: 3GPP TS 24.301 V17.4.0 section 9.9.3.12A.
+     */
+    bool dcNrRestricted_ = false;
+    /**
+     * Indicates if NR is supported by the selected PLMN.
+     * Reference: 3GPP TS 36.331 V16.6.0 section 6.3.1 PLMN-InfoList-r15.
+     *            3GPP TS 36.331 V16.6.0 section 6.2.2 SystemInformationBlockType1 message.
+     */
+    bool nrSupport_ = false;
+    FrequencyType freqType_ = FrequencyType::FREQ_TYPE_UNKNOWN;
+    bool isNrSecondaryCell_ = false;
+    bool isPhysicalLinkActive_ = false;
+    NrState nrState_ = NrState::NR_STATE_NOT_SUPPORT;
+    std::vector<PhysicalChannelConfig> channelConfigInfos_;
+    std::map<NrState, RadioTech> nrConfigMap_;
 };
 } // namespace Telephony
 } // namespace OHOS

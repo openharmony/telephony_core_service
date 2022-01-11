@@ -155,14 +155,24 @@ void SimFile::OnAllFilesFetched()
     UpdateSimLanguage();
     UpdateLoaded(true);
     TELEPHONY_LOGI("SimFile SimFile::OnAllFilesFetched: start notify");
-    filesFetchedObser_->NotifyObserver(ObserverHandler::RADIO_SIM_RECORDS_LOADED);
+    if (filesFetchedObser_ != nullptr) {
+        filesFetchedObser_->NotifyObserver(ObserverHandler::RADIO_SIM_RECORDS_LOADED);
+    }
     PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_LOADED, "");
-    NotifyRegistrySimState(SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
+    NotifyRegistrySimState(CardType::SINGLE_MODE_USIM_CARD, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
 }
 
 bool SimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("SimFile::SIM_STATE_READY received");
+    if (stateManager_->GetCardType(slotId_) != CardType::SINGLE_MODE_USIM_CARD) {
+        TELEPHONY_LOGI("invalid SimFile::SIM_STATE_READY received");
+        return false;
+    }
+    if (LoadedOrNot()) {
+        TELEPHONY_LOGI("SimFile::SIM_STATE_READY already handled");
+        return false;
+    }
     LoadSimFiles();
     return false;
 }
@@ -213,7 +223,7 @@ void SimFile::LoadSimFiles()
     AppExecFwk::InnerEvent::Pointer phoneNumberEvent =
         CreateDiallingNumberPointer(MSG_SIM_OBTAIN_MSISDN_DONE, 0, 0, nullptr);
     diallingNumberHandler_->GetDiallingNumbers(
-        ELEMENTARY_FILE_MSISDN, GetExtFromEf(ELEMENTARY_FILE_MSISDN), 1, phoneNumberEvent);
+        ELEMENTARY_FILE_MSISDN, ObtainExtensionElementaryFile(ELEMENTARY_FILE_MSISDN), 1, phoneNumberEvent);
     fileToGet_++;
 
     AppExecFwk::InnerEvent::Pointer eventMBI = BuildCallerInfo(MSG_SIM_OBTAIN_MBI_DONE);
@@ -267,7 +277,8 @@ void SimFile::ProcessSpnGeneral(const AppExecFwk::InnerEvent::Pointer &event)
             unsigned char value = byteData[0];
             displayConditionOfSpn_ = (BYTE_NUM & value);
         }
-        UpdateSPN(ParseSpn(iccData, spnStatus_));
+        std::string str = ParseSpn(iccData, spnStatus_);
+        UpdateSPN(str);
         std::string spn = ObtainSPN();
         if (spn.empty() || spn.size() == 0) {
             spnStatus_ = SpnStatus::OBTAIN_OPERATOR_NAMESTRING;
@@ -872,13 +883,11 @@ bool SimFile::ProcessSetCphsMailbox(const AppExecFwk::InnerEvent::Pointer &event
         voiceMailNum_ = Str16ToStr8(diallingNumber->GetNumber());
         voiceMailTag_ = Str16ToStr8(diallingNumber->GetName());
         waitResult_ = true;
-        SetCurAction(SET_VOICE_MAIL);
-        processWait_.notify_one();
+        processWait_.notify_all();
         TELEPHONY_LOGI("set cphs voicemail number: %{public}s name: %{public}s",
             voiceMailNum_.c_str(), voiceMailTag_.c_str());
     } else {
-        SetCurAction(SET_VOICE_MAIL);
-        processWait_.notify_one();
+        processWait_.notify_all();
         TELEPHONY_LOGE("set cphs voicemail failed with exception!!");
     }
     return isFileProcessResponse;
@@ -944,8 +953,7 @@ bool SimFile::ProcessSetMbdn(const AppExecFwk::InnerEvent::Pointer &event)
         voiceMailNum_ = Str16ToStr8(diallingNumber->GetNumber());
         voiceMailTag_ = Str16ToStr8(diallingNumber->GetName());
         waitResult_ = true;
-        SetCurAction(SET_VOICE_MAIL);
-        processWait_.notify_one();
+        processWait_.notify_all();
         hasNotify = true;
         TELEPHONY_LOGI("set voicemail name: %{public}s number: %{public}s",
             voiceMailTag_.c_str(), voiceMailNum_.c_str());
@@ -966,8 +974,7 @@ bool SimFile::ProcessSetMbdn(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGI("set cphs voicemail number as it is available");
     } else {
         if (!hasNotify) {
-            SetCurAction(SET_VOICE_MAIL);
-            processWait_.notify_one();
+            processWait_.notify_all();
         }
         TELEPHONY_LOGI("set voicemail number finished");
     }
@@ -1054,11 +1061,21 @@ SimFile::~SimFile()
 
 int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
 {
-    int rule = SPN_CONDITION_DISPLAY_SPN;
-    return rule;
+    int cond = 0;
+    if (ObtainSPN().empty() || (displayConditionOfSpn_ == SPN_INVALID)) {
+        cond = SPN_CONDITION_DISPLAY_PLMN;
+    } else if (!roaming || !operatorNum.empty()) {
+        cond = SPN_CONDITION_DISPLAY_SPN;
+        if ((displayConditionOfSpn_ & SPN_COND_PLMN) == SPN_COND_PLMN) {
+            cond |= SPN_CONDITION_DISPLAY_PLMN;
+        }
+    } else {
+        cond = SPN_CONDITION_DISPLAY_SPN;
+    }
+    return cond;
 }
 
-int SimFile::GetExtFromEf(int ef)
+int SimFile::ObtainExtensionElementaryFile(int ef)
 {
     int ext = 0;
     if (ef == ELEMENTARY_FILE_MSISDN) {
@@ -1077,6 +1094,7 @@ bool SimFile::UpdateVoiceMail(const std::string &mailName, const std::string &ma
     diallingNumber->number_ = Str8ToStr16(mailNumber);
 
     if ((indexOfMailbox_ != 0) && (indexOfMailbox_ != BYTE_NUM)) {
+        std::unique_lock<std::mutex> lock(IccFile::mtx_);
         TELEPHONY_LOGI("UpdateVoiceMail start MBDN");
         AppExecFwk::InnerEvent::Pointer event =
             CreateDiallingNumberPointer(MSG_SIM_SET_MBDN_DONE, 0, 0, nullptr);
@@ -1086,11 +1104,9 @@ bool SimFile::UpdateVoiceMail(const std::string &mailName, const std::string &ma
         infor.extFile = ELEMENTARY_FILE_EXT6;
         infor.index = indexOfMailbox_;
         diallingNumberHandler_->UpdateDiallingNumbers(infor, event);
-        SetCurAction(ACTION_WAIT);
-        std::unique_lock<std::mutex> lock(IccFile::mtx_);
-        processWait_.wait(lock, IccFile::IsActionOn);
-        SetCurAction(ACTION_WAIT);
+        processWait_.wait(lock);
     } else if (CphsVoiceMailAvailable()) {
+        std::unique_lock<std::mutex> lock(IccFile::mtx_);
         AppExecFwk::InnerEvent::Pointer event =
             CreateDiallingNumberPointer(MSG_SIM_SET_CPHS_MAILBOX_DONE, 0, 0, nullptr);
         DiallingNumberUpdateInfor infor;
@@ -1099,10 +1115,7 @@ bool SimFile::UpdateVoiceMail(const std::string &mailName, const std::string &ma
         infor.extFile = ELEMENTARY_FILE_EXT1;
         infor.index = 1;
         diallingNumberHandler_->UpdateDiallingNumbers(infor, event);
-        SetCurAction(ACTION_WAIT);
-        std::unique_lock<std::mutex> lock(IccFile::mtx_);
-        processWait_.wait(lock, SimFile::IsActionOn);
-        SetCurAction(ACTION_WAIT);
+        processWait_.wait(lock);
     } else {
         TELEPHONY_LOGE("UpdateVoiceMail indexOfMailbox_ %{public}d is invalid!!", indexOfMailbox_);
     }
@@ -1120,6 +1133,16 @@ bool SimFile::CphsVoiceMailAvailable()
             CPHS_VOICE_MAIL_EXSIT : false;
     }
     return available;
+}
+
+void SimFile::UnInit()
+{
+    if (stateManager_ != nullptr) {
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_READY);
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_LOCKED);
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_SIMLOCK);
+    }
+    IccFile::UnInit();
 }
 } // namespace Telephony
 } // namespace OHOS

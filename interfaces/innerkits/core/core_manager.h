@@ -23,9 +23,9 @@ namespace OHOS {
 namespace Telephony {
 class CoreManager {
 public:
-    static const int32_t SLOT_ID1 = 0;
-    static const int32_t SLOT_ID2 = 1;
-    static const int32_t DEFAULT_SLOT_ID = SLOT_ID1;
+    static const int32_t SLOT_ID0 = 0;
+    static const int32_t SLOT_ID1 = 1;
+    static const int32_t DEFAULT_SLOT_ID = SLOT_ID0;
 
     static CoreManager &GetInstance();
 

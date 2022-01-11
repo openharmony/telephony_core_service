@@ -41,12 +41,17 @@ public:
     int32_t GetDefaultMessageCardSlotId();
     int32_t GetDefaultCellularDataCardSlotId();
     int32_t SetDefaultMainCard(int32_t slotId);
+    int32_t SetDefaultVoiceCard(int32_t slotId);
     int32_t SetDefaultMessageCard(int32_t slotId);
     int32_t SetDefaultCellularData(int32_t slotId);
     int32_t InsertData(int64_t &id, const NativeRdb::ValuesBucket &values);
     int32_t QueryDataBySlotId(int32_t slotId, SimRdbInfo &simBean);
+    int32_t QueryDataByIccId(std::string iccId, SimRdbInfo &simBean);
     int32_t QueryAllData(std::vector<SimRdbInfo> &vec);
-    int32_t UpdateDateBySlotId(int32_t slotId, const NativeRdb::ValuesBucket &values);
+    int32_t QueryAllValidData(std::vector<SimRdbInfo> &vec);
+    int32_t UpdateDataBySlotId(int32_t slotId, const NativeRdb::ValuesBucket &values);
+    int32_t UpdateDataByIccId(std::string iccId, const NativeRdb::ValuesBucket &values);
+    int32_t ForgetAllData();
     int32_t ClearData();
 
 private:

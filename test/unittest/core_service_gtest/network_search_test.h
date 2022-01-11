@@ -17,9 +17,7 @@
 #define NETWORK_SEARCH_TEST_H
 
 #include <gtest/gtest.h>
-
 #include "core_service_client.h"
-
 namespace OHOS {
 namespace Telephony {
 class NetworkSearchTest : public testing::Test {

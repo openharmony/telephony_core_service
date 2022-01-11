@@ -26,14 +26,14 @@
 #include "i_tel_ril_manager.h"
 #include "i_sim_account_manager.h"
 #include "i_icc_dialling_numbers_manager.h"
-#include "observer_handler.h"
+#include "i_stk_manager.h"
 #include "telephony_errors.h"
 
 namespace OHOS {
 namespace Telephony {
 class Core {
 public:
-    explicit Core(int opt);
+    Core(int opt);
 
     ~Core() = default;
 
@@ -42,13 +42,25 @@ public:
 
     void InitTelInfo();
 
-    void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what, uint8_t*);
+    void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what, void *obj);
     void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
+
+    void RegisterCellularDataObject(const sptr<NetworkSearchCallBackBase> &callback);
+    void UnRegisterCellularDataObject(const sptr<NetworkSearchCallBackBase> &callback);
+    void RegisterCellularCallObject(const sptr<NetworkSearchCallBackBase> &callback);
+    void UnRegisterCellularCallObject(const sptr<NetworkSearchCallBackBase> &callback);
 
     void SetRadioState(int fun, int rst, const AppExecFwk::InnerEvent::Pointer &response);
     void GetRadioState(const AppExecFwk::InnerEvent::Pointer &response) const;
     void ShutDown(const AppExecFwk::InnerEvent::Pointer &response);
-
+    void GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response) const;
+    void SetRadioCapability(
+        RadioCapabilityInfo &radioCapabilityInfo, const AppExecFwk::InnerEvent::Pointer &response) const;
+    bool IsNrSupported();
+    NrMode GetNrOptionMode(int32_t slotId);
+    FrequencyType GetFrequencyType(int32_t slotId) const;
+    NrState GetNrState(int32_t slotId) const;
+    void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive);
     void Dial(std::string address, int clirMode, const AppExecFwk::InnerEvent::Pointer &result);
     void Reject(const AppExecFwk::InnerEvent::Pointer &result);
     void Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &result);
@@ -73,10 +85,15 @@ public:
     void SetCallRestriction(
         std::string &fac, int32_t mode, std::string &password, const AppExecFwk::InnerEvent::Pointer &result);
     /* PDP start */
-    void ActivatePdpContext(int32_t radioTechnology, ITelRilManager::CellularDataProfile dataProfile,
+    int32_t SetInitApnInfo(
+        ITelRilManager::CellularDataProfile dataProfile, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t ActivatePdpContext(int32_t radioTechnology, ITelRilManager::CellularDataProfile dataProfile,
         bool isRoaming, bool allowRoaming, const AppExecFwk::InnerEvent::Pointer &response);
-    void DeactivatePdpContext(int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
-    void GetPdpContextList(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t DeactivatePdpContext(int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetPdpContextList(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetLinkBandwidthReportingRule(
+        LinkBandwidthRule linkBandwidth, const AppExecFwk::InnerEvent::Pointer &response);
     /* PDP end */
     void StopDTMF(int32_t index, const AppExecFwk::InnerEvent::Pointer &result);
     void StartDTMF(char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &result);
@@ -92,6 +109,7 @@ public:
     int32_t GetPsRadioTech(int32_t slotId) const;
     int32_t GetCsRadioTech(int32_t slotId) const;
     int32_t GetPsRegState(int32_t slotId) const;
+    int32_t GetCsRegState(int32_t slotId) const;
     int32_t GetPsRoamingState(int32_t slotId) const;
     bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
         const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
@@ -105,6 +123,10 @@ public:
     bool GetRadioState(const sptr<INetworkSearchCallback> &callback) const;
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) const;
     std::u16string GetImei(int32_t slotId) const;
+    std::u16string GetMeid(int32_t slotId) const;
+    std::u16string GetUniqueDeviceId(int32_t slotId) const;
+    PhoneType GetPhoneType() const;
+    sptr<CellLocation> GetCellLocation(int32_t slotId) const;
     bool GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback) const;
     bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) const;
     bool SetPsAttachStatus(int32_t slotId, int32_t psAttachStatus, const sptr<INetworkSearchCallback> &callback);
@@ -119,18 +141,12 @@ public:
     void GetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &response);
 
     void SendGsmSms(std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response);
-
-    void SendCdmaSms(CdmaSmsMessageInfo &msg, const AppExecFwk::InnerEvent::Pointer &response);
-
+    void SendCdmaSms(std::string pdu, const AppExecFwk::InnerEvent::Pointer &response);
     void AddSimMessage(
         int32_t status, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response);
-
     void GetSmscAddr(const AppExecFwk::InnerEvent::Pointer &response) const;
-
     void GetCdmaCBConfig(const AppExecFwk::InnerEvent::Pointer &response);
-
     void SetSmscAddr(int32_t tosca, std::string address, const AppExecFwk::InnerEvent::Pointer &response);
-
     void DelSimMessage(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &response);
     void SendSmsMoreMode(std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response);
     void SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response);
@@ -143,11 +159,16 @@ public:
     void GetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &response) const;
     void SetNetworkSelectionMode(
         int32_t automaticFlag, std::string oper, const AppExecFwk::InnerEvent::Pointer &response);
+    void AddCdmaSimMessage(int32_t status, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response);
+    void DelCdmaSimMessage(int32_t cdmaIndex, const AppExecFwk::InnerEvent::Pointer &response);
+    void UpdateCdmaSimMessage(
+        int32_t cdmaIndex, int32_t state, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response);
+
     void TelRilSetParam(int32_t preferredNetworkType, int32_t cdmaSubscription, int32_t instanceId);
     bool GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     bool SetPreferredNetwork(int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback);
-    void SetPreferredNetwork(int32_t preferredNetworkType, const AppExecFwk::InnerEvent::Pointer &response);
-    void GetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &response);
+    void SetPreferredNetworkPara(int32_t preferredNetworkType, const AppExecFwk::InnerEvent::Pointer &response);
+    void GetPreferredNetworkPara(const AppExecFwk::InnerEvent::Pointer &response);
     bool InitCellularRadio(bool isFirst);
     std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int slotId, int type);
     bool AddIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
@@ -163,11 +184,13 @@ public:
     bool SetDefaultVoiceSlotId(int32_t slotId);
     bool SetDefaultSmsSlotId(int32_t slotId);
     bool SetDefaultCellularDataSlotId(int32_t slotId);
+    bool SetPrimarySlotId(int32_t slotId);
     bool SetShowNumber(int32_t slotId, const std::u16string number);
     bool SetShowName(int32_t slotId, const std::u16string name);
     int32_t GetDefaultVoiceSlotId();
     int32_t GetDefaultSmsSlotId();
     int32_t GetDefaultCellularDataSlotId();
+    int32_t GetPrimarySlotId();
     std::u16string GetShowNumber(int32_t slotId);
     std::u16string GetShowName(int32_t slotId);
     bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList);
@@ -179,20 +202,25 @@ public:
     std::u16string GetLocaleFromDefaultSim();
     std::u16string GetSimGid1(int32_t slotId);
     std::u16string GetSimTelephoneNumber(int32_t slotId);
+    std::u16string GetSimTeleNumberIdentifier(const int32_t slotId);
     std::u16string GetVoiceMailIdentifier(int32_t slotId);
     std::u16string GetVoiceMailNumber(int32_t slotId);
     bool HasSimCard(int32_t slotId);
     int32_t GetSimState(int32_t slotId);
+    int32_t GetCardType(int32_t slotId);
     bool UnlockPin(int32_t slotId, std::string pin, LockStatusResponse &response);
     bool UnlockPuk(int32_t slotId, std::string newPin, std::string puk, LockStatusResponse &response);
     bool AlterPin(int32_t slotId, std::string newPin, std::string oldPin, LockStatusResponse &response);
-    bool SetLockState(int32_t slotId, std::string pin, int32_t enable, LockStatusResponse &response);
-    int32_t GetLockState(int32_t slotId);
+    bool SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response);
+    int32_t GetLockState(int32_t slotId, LockType lockType);
     int32_t RefreshSimState(int32_t slotId);
     bool UnlockPin2(int32_t slotId, std::string pin2, LockStatusResponse &response);
     bool UnlockPuk2(int32_t slotId, std::string newPin2, std::string puk2, LockStatusResponse &response);
     bool AlterPin2(int32_t slotId, std::string newPin2, std::string oldPin2, LockStatusResponse &response);
     int32_t GetMaxSimCount();
+    bool SendEnvelopeCmd(const std::string &cmd);
+    bool SendTerminalResponseCmd(const std::string &cmd);
+    bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response);
     std::shared_ptr<ITelRilManager> GetRilManager() const;
 
     void GetImsCallList(const AppExecFwk::InnerEvent::Pointer &result) const;
@@ -200,6 +228,13 @@ public:
     void GetCallPreferenceMode(const AppExecFwk::InnerEvent::Pointer &result) const;
     void SetLteImsSwitchStatus(int32_t active, const AppExecFwk::InnerEvent::Pointer &result) const;
     void GetLteImsSwitchStatus(const AppExecFwk::InnerEvent::Pointer &result) const;
+    void SetUssdCusd(const std::string str, const AppExecFwk::InnerEvent::Pointer &result) const;
+    void GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result) const;
+    void GetMute(const AppExecFwk::InnerEvent::Pointer &result) const;
+    void SetMute(int32_t mute, const AppExecFwk::InnerEvent::Pointer &result) const;
+    void GetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &result) const;
+    void GetCallFailReason(const AppExecFwk::InnerEvent::Pointer &response) const;
+    bool HasOperatorPrivileges(const int32_t slotId);
 
 private:
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
@@ -209,6 +244,8 @@ private:
     std::shared_ptr<Telephony::ISimSmsManager> simSmsManager_ = nullptr;
     std::shared_ptr<Telephony::ISimAccountManager> simAccountManager_ = nullptr;
     std::shared_ptr<Telephony::IIccDiallingNumbersManager> iccDiallingNumbersManager_ = nullptr;
+    std::shared_ptr<Telephony::IStkManager> stkManager_ = nullptr;
+
     int slotId_;
     bool isInitCore_;
 };

@@ -87,15 +87,28 @@ public:
     static std::shared_ptr<TelRilRequest> FindTelRilRequest(const HRilRadioResponseInfo &responseInfo);
 
     void ErrorResponse(const int32_t serial, const HRilErrType err);
-
     void ErrorResponse(std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo);
+    bool TelRilOnlyReportResponseInfo(MessageParcel &data);
+    template<typename T>
+    void NotifyObserver(int what, MessageParcel &data)
+    {
+        std::shared_ptr<T> info = std::make_shared<T>();
+        info->ReadFromParcel(data);
+        if (observerHandler_ != nullptr) {
+            observerHandler_->NotifyObserver(what, info);
+        } else {
+            PrintErrorForEmptyPointor();
+        }
+    }
 
 protected:
     std::shared_ptr<ObserverHandler> observerHandler_;
     sptr<IRemoteObject> cellularRadio_;
 
 private:
-    static int32_t GetNextSerialId();
+    /* Output "null pointer" error log */
+    void PrintErrorForEmptyPointor(void);
+    static int32_t GetNextSerialId(void);
 
 private:
     static std::atomic_int nextSerialId_;

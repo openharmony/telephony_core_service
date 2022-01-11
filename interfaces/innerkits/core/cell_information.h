@@ -23,7 +23,15 @@ namespace Telephony {
 class CellInformation : public Parcelable {
 public:
     static const int32_t MAX_CELL_NUM = 10;
-    enum class CellType { CELL_TYPE_NONE = 0, CELL_TYPE_GSM, CELL_TYPE_LTE, CELL_TYPE_WCDMA };
+    enum class CellType {
+        CELL_TYPE_NONE = 0,
+        CELL_TYPE_GSM,
+        CELL_TYPE_CDMA,
+        CELL_TYPE_WCDMA,
+        CELL_TYPE_TDSCDMA,
+        CELL_TYPE_LTE,
+        CELL_TYPE_NR
+    };
     CellInformation() = default;
     virtual ~CellInformation() = default;
     virtual bool Marshalling(Parcel &parcel) const = 0;
@@ -33,7 +41,6 @@ public:
     virtual std::string ToString() const = 0;
     void Init(int32_t mcc, int32_t mnc, int32_t cellId);
 
-    virtual int32_t GetArfcn() const = 0;
     virtual int32_t GetCellId() const;
     virtual int32_t GetMcc() const;
     virtual int32_t GetMnc() const;
@@ -65,13 +72,12 @@ public:
     GsmCellInformation(const GsmCellInformation &gsmCell);
     GsmCellInformation &operator=(const GsmCellInformation &gsmCell);
     bool operator==(const GsmCellInformation &other) const;
-
     int32_t GetLac() const;
     int32_t GetBsic() const;
-    int32_t GetArfcn() const override;
+    int32_t GetArfcn() const;
 private:
-    int32_t bsic_ = 0;
     int32_t lac_ = 0;
+    int32_t bsic_ = 0;
     int32_t arfcn_ = 0;
 };
 
@@ -91,7 +97,7 @@ public:
     void UpdateLocation(int32_t cellId, int32_t tac);
     int32_t GetPci() const;
     int32_t GetTac() const;
-    int32_t GetArfcn() const override;
+    int32_t GetArfcn() const;
 private:
     int32_t pci_ = 0;
     int32_t tac_ = 0;
@@ -114,11 +120,86 @@ public:
     void UpdateLocation(int32_t cellId, int32_t lac);
     int32_t GetPsc() const;
     int32_t GetLac() const;
-    int32_t GetArfcn() const override;
+    int32_t GetArfcn() const;
 private:
     int32_t lac_ = 0;
     int32_t psc_ = 0;
     int32_t uarfcn_ = 0;
+};
+
+class TdscdmaCellInformation : public CellInformation {
+public:
+    TdscdmaCellInformation() = default;
+    virtual ~TdscdmaCellInformation() = default;
+    bool Marshalling(Parcel &parcel) const override;
+    static TdscdmaCellInformation *Unmarshalling(Parcel &parcel);
+    bool ReadFromParcel(Parcel &parcel) override;
+    CellInformation::CellType GetNetworkType() const override;
+    std::string ToString() const override;
+    void SetTdscdmaParam(int32_t psc, int32_t lac, int32_t arfcn);
+    TdscdmaCellInformation(const TdscdmaCellInformation &wcdmaCell);
+    TdscdmaCellInformation &operator=(const TdscdmaCellInformation &wcdmaCell);
+    bool operator==(const TdscdmaCellInformation &other) const;
+    void UpdateLocation(int32_t cellId, int32_t lac);
+    int32_t GetCpid() const;
+    int32_t GetLac() const;
+    int32_t GetArfcn() const;
+private:
+    int32_t lac_ = 0;
+    int32_t cpid_ = 0;
+    int32_t uarfcn_ = 0;
+};
+
+class CdmaCellInformation : public CellInformation {
+public:
+    CdmaCellInformation() = default;
+    virtual ~CdmaCellInformation() = default;
+    bool Marshalling(Parcel &parcel) const override;
+    static CdmaCellInformation *Unmarshalling(Parcel &parcel);
+    bool ReadFromParcel(Parcel &parcel) override;
+    CellInformation::CellType GetNetworkType() const override;
+    std::string ToString() const override;
+    void SetCdmaParam(int32_t baseId, int32_t latitude, int32_t longitude, int32_t nid, int32_t sid);
+    CdmaCellInformation(const CdmaCellInformation &cdmaCell);
+    CdmaCellInformation &operator=(const CdmaCellInformation &cdmaCell);
+    bool operator==(const CdmaCellInformation &other) const;
+    void UpdateLocation(int32_t baseId, int32_t latitude, int32_t longitude);
+    int32_t GetBaseId() const;
+    int32_t GetLatitude() const;
+    int32_t GetLongitude() const;
+    int32_t GetNid() const;
+    int32_t GetSid() const;
+private:
+    int32_t baseId_ = 0;
+    int32_t latitude_ = 0;
+    int32_t longitude_ = 0;
+    int32_t nid_ = 0;
+    int32_t sid_ = 0;
+};
+
+class NrCellInformation : public CellInformation {
+public:
+    NrCellInformation() = default;
+    virtual ~NrCellInformation() = default;
+    bool Marshalling(Parcel &parcel) const override;
+    static NrCellInformation *Unmarshalling(Parcel &parcel);
+    bool ReadFromParcel(Parcel &parcel) override;
+    CellInformation::CellType GetNetworkType() const override;
+    std::string ToString() const override;
+    void SetNrParam(int32_t nrArfcn, int32_t pci, int32_t tac, int32_t nci);
+    NrCellInformation(const NrCellInformation &nrCell);
+    NrCellInformation &operator=(const NrCellInformation &nrCell);
+    bool operator==(const NrCellInformation &other) const;
+    void UpdateLocation(int32_t pci, int32_t tac);
+    int32_t GetArfcn() const;
+    int32_t GetPci() const;
+    int32_t GetTac() const;
+    int32_t GetNci() const;
+private:
+    int32_t nrArfcn_ = 0;
+    int32_t pci_ = 0;
+    int32_t tac_ = 0;
+    int32_t nci_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
