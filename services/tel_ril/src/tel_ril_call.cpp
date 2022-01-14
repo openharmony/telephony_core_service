@@ -33,7 +33,7 @@ void TelRilCall::AddHandlerToMap()
     memberFuncMap_[HNOTI_CALL_END_REPORT] = &TelRilCall::CallEndNotice;
     memberFuncMap_[HNOTI_CALL_STATUS_INFO_REPORT] = &TelRilCall::CallStatusInfoNotice;
     memberFuncMap_[HNOTI_CALL_IMS_SERVICE_STATUS_REPORT] = &TelRilCall::CallImsServiceStatusNotice;
-    memberFuncMap_[HNOTI_CALL_USSD_CUSD_REPORT] = &TelRilCall::CallUssdCusdNotice;
+    memberFuncMap_[HNOTI_CALL_USSD_REPORT] = &TelRilCall::CallUssdCusdNotice;
     memberFuncMap_[HNOTI_CALL_RINGBACK_VOICE_REPORT] = &TelRilCall::CallRingbackVoiceNotice;
     memberFuncMap_[HNOTI_CALL_SRVCC_STATUS_REPORT] = &TelRilCall::SrvccStatusNotice;
     memberFuncMap_[HNOTI_CALL_EMERGENCY_NUMBER_REPORT] = &TelRilCall::CallEmergencyNotice;
@@ -68,10 +68,10 @@ void TelRilCall::AddHandlerToMap()
     memberFuncMap_[HREQ_CALL_GET_CALL_PREFERENCE] = &TelRilCall::GetCallPreferenceResponse;
     memberFuncMap_[HREQ_CALL_SET_LTEIMSSWITCH_STATUS] = &TelRilCall::SetLteImsSwitchStatusResponse;
     memberFuncMap_[HREQ_CALL_GET_LTEIMSSWITCH_STATUS] = &TelRilCall::GetLteImsSwitchStatusResponse;
-    memberFuncMap_[HREQ_CALL_SET_USSD_CUSD] = &TelRilCall::SetUssdCusdResponse;
-    memberFuncMap_[HREQ_CALL_GET_USSD_CUSD] = &TelRilCall::GetUssdCusdResponse;
-    memberFuncMap_[HREQ_CALL_SET_CMUT] = &TelRilCall::SetMuteResponse;
-    memberFuncMap_[HREQ_CALL_GET_CMUT] = &TelRilCall::GetMuteResponse;
+    memberFuncMap_[HREQ_CALL_SET_USSD] = &TelRilCall::SetUssdCusdResponse;
+    memberFuncMap_[HREQ_CALL_GET_USSD] = &TelRilCall::GetUssdCusdResponse;
+    memberFuncMap_[HREQ_CALL_SET_MUTE] = &TelRilCall::SetMuteResponse;
+    memberFuncMap_[HREQ_CALL_GET_MUTE] = &TelRilCall::GetMuteResponse;
     memberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] = &TelRilCall::GetEmergencyCallListResponse;
     memberFuncMap_[HREQ_CALL_GET_FAIL_REASON] = &TelRilCall::GetCallFailReasonResponse;
 }
@@ -1715,7 +1715,7 @@ void TelRilCall::GetLteImsSwitchStatusResponse(MessageParcel &data)
 void TelRilCall::SetUssdCusd(const std::string str, const AppExecFwk::InnerEvent::Pointer &result)
 {
     if (cellularRadio_ != nullptr) {
-        std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_SET_USSD_CUSD, result);
+        std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_SET_USSD, result);
         if (telRilRequest == nullptr) {
             TELEPHONY_LOGE("telRilRequest is nullptr");
             return;
@@ -1725,8 +1725,8 @@ void TelRilCall::SetUssdCusd(const std::string str, const AppExecFwk::InnerEvent
         data.WriteCString(str.c_str());
         MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SET_USSD_CUSD, data, reply, option);
-        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_CALL_SET_USSD_CUSD, ret);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SET_USSD, data, reply, option);
+        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_CALL_SET_USSD, ret);
     } else {
         TELEPHONY_LOGE("ERROR : cellularRadio_ == nullptr !!!");
     }
@@ -1764,7 +1764,7 @@ void TelRilCall::SetUssdCusdResponse(MessageParcel &data)
 
 void TelRilCall::GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_GET_USSD_CUSD, result);
+    std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_GET_USSD, result);
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("TelRilManager GetImsCallList:telRilRequest is nullptr");
         return;
@@ -1775,7 +1775,7 @@ void TelRilCall::GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result)
         return;
     }
 
-    SendInt32Event(HREQ_CALL_GET_USSD_CUSD, telRilRequest->serialId_);
+    SendInt32Event(HREQ_CALL_GET_USSD, telRilRequest->serialId_);
 }
 
 void TelRilCall::GetUssdCusdResponse(MessageParcel &data)
@@ -1927,7 +1927,7 @@ void TelRilCall::SrvccStatusNotice(MessageParcel &data)
 void TelRilCall::SetMute(const int32_t mute, const AppExecFwk::InnerEvent::Pointer &result)
 {
     if (cellularRadio_ != nullptr) {
-        std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_SET_CMUT, result);
+        std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_SET_MUTE, result);
         if (telRilRequest == nullptr) {
             TELEPHONY_LOGE("telRilRequest is nullptr");
             return;
@@ -1937,8 +1937,8 @@ void TelRilCall::SetMute(const int32_t mute, const AppExecFwk::InnerEvent::Point
         data.WriteInt32(mute);
         MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SET_CMUT, data, reply, option);
-        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_CALL_SET_CMUT, ret);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SET_MUTE, data, reply, option);
+        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_CALL_SET_MUTE, ret);
     } else {
         TELEPHONY_LOGE("ERROR : cellularRadio_ == nullptr !!!");
     }
@@ -1976,7 +1976,7 @@ void TelRilCall::SetMuteResponse(MessageParcel &data)
 
 void TelRilCall::GetMute(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_GET_CMUT, result);
+    std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_GET_MUTE, result);
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("TelRilManager GetImsCallList:telRilRequest is nullptr");
         return;
@@ -1987,7 +1987,7 @@ void TelRilCall::GetMute(const AppExecFwk::InnerEvent::Pointer &result)
         return;
     }
 
-    SendInt32Event(HREQ_CALL_GET_CMUT, telRilRequest->serialId_);
+    SendInt32Event(HREQ_CALL_GET_MUTE, telRilRequest->serialId_);
 }
 
 void TelRilCall::GetMuteResponse(MessageParcel &data)
