@@ -22,6 +22,7 @@ config("telephony_common_config") {
     "log/include",
     "common/include",
     "preferences/include",
+    "//base/telephony/core_service/frameworks/js/napi",
   ]
 }
 
@@ -43,10 +44,7 @@ ohos_shared_library("libtel_common") {
     defines += [ "STANDARD_SYSTEM_ENABLE" ]
   }
 
-  public_configs = [
-    ":telephony_common_config",
-    "//utils/native/base:utils_config",
-  ]
+  public_configs = [ ":telephony_common_config" ]
 
   public_deps = [
     "//foundation/distributeddatamgr/appdatamgr/interfaces/innerkits/native_preferences:native_preferences",
