@@ -350,8 +350,7 @@ std::string NetworkState::ToString() const
         ",psRadioTech:" + std::to_string(psRadioTech) + ",csRadioTech:" + std::to_string(csRadioTech));
     return content;
 }
-    RadioTech cfgTech_;
-    NrState nrState_;
+
 void NetworkState::SetCfgTech(RadioTech tech)
 {
     cfgTech_ = tech;

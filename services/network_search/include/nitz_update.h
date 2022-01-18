@@ -25,7 +25,7 @@ namespace Telephony {
 class NetworkSearchManager;
 class NitzUpdate {
 public:
-    explicit NitzUpdate(std::weak_ptr<NetworkSearchManager> networkSearchManager);
+    NitzUpdate(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId);
     virtual ~NitzUpdate() = default;
     void ProcessNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     struct NetworkTime {
@@ -47,23 +47,11 @@ private:
     bool IsAutoTime();
     bool NitzParse(std::string &nitzStr, NetworkTime &networkTime);
     bool NitzTimeParse(std::string &strTimeSubs, NetworkTime &networkTime);
-    void PublishCommonEvent(AAFwk::Want& want);
+    void PublishCommonEvent(AAFwk::Want &want);
+
 private:
-    static const int32_t MAX_UPDATE_TIME = 5;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
-    const std::string KEY_AUTO_TIME_ZONE = "auto_timezone";
-    const std::string KEY_AUTO_TIME = "auto_time";
-    const std::string KEY_SYSTEM_TIMEZONE = "system_timezone";
-    const std::string KEY_SYSTEM_TIME = "system_time";
-    const uint32_t TIME_SPLIT_NUM = 3;
-    const uint32_t TIMEZONE_SPLIT_NUM = 2;
-    const uint32_t CST_YEAR = 1900;
-    const uint32_t ONE_HOUR_TO_MINUTE = 60;
-    const uint32_t ONE_HOUR_TO_SECOND = 3600;
-    const uint32_t ONE_SECOND_TO_MILLISECOND = 1000;
-    const uint32_t ONE_QUARTER_TO_MINUTE = 15;
-    const uint32_t LOCATION_DAY_OR_SEC = 2;
-    const int64_t lastUpdateTime_ = 0;
+    int32_t slotId_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -17,85 +17,77 @@
 #define TEL_RIL_SIM_H
 
 #include "hril_sim_parcel.h"
-#include "observer_handler.h"
 #include "tel_ril_base.h"
 
 namespace OHOS {
 namespace Telephony {
 class TelRilSim : public TelRilBase {
 public:
-    TelRilSim(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
+    TelRilSim(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
     ~TelRilSim() = default;
 
-    void SimStateUpdated(MessageParcel &data);
-    void StkSessionEndNotify(MessageParcel &data);
-    void StkProactiveCommandNotify(MessageParcel &data);
-    void StkAlphaNotify(MessageParcel &data);
+    int32_t SimStateUpdated(MessageParcel &data);
+    int32_t SimStkSessionEndNotify(MessageParcel &data);
+    int32_t SimStkProactiveNotify(MessageParcel &data);
+    int32_t SimStkAlphaNotify(MessageParcel &data);
 
-    void GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result);
-    void GetImsi(const AppExecFwk::InnerEvent::Pointer &result);
-    void GetSimIO(SimIoRequestInfo data, const AppExecFwk::InnerEvent::Pointer &response);
-    void GetSimLockStatus(std::string fac, const AppExecFwk::InnerEvent::Pointer &response);
-    void SetSimLock(
+    int32_t GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetImsi(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetSimIO(SimIoRequestInfo simIoInfo, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetSimLockStatus(std::string fac, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetSimLock(
         std::string fac, int32_t mode, std::string passwd, const AppExecFwk::InnerEvent::Pointer &response);
-    void ChangeSimPassword(std::string fac, std::string oldPassword, std::string newPassword,
+    int32_t ChangeSimPassword(std::string fac, std::string oldPassword, std::string newPassword,
         int32_t passwordLength, const AppExecFwk::InnerEvent::Pointer &response);
-    void UnlockPin(std::string pin, const AppExecFwk::InnerEvent::Pointer &response);
-    void UnlockPuk(std::string puk, std::string pin, const AppExecFwk::InnerEvent::Pointer &response);
-    void GetSimPinInputTimes(const AppExecFwk::InnerEvent::Pointer &response);
-    void UnlockPin2(std::string pin2, const AppExecFwk::InnerEvent::Pointer &response);
-    void UnlockPuk2(std::string puk2, std::string pin2, const AppExecFwk::InnerEvent::Pointer &response);
-    void GetSimPin2InputTimes(const AppExecFwk::InnerEvent::Pointer &response);
-    void SetActiveSim(int32_t index, int32_t enable, const AppExecFwk::InnerEvent::Pointer &response);
-    void SendTerminalResponseCmd(const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response);
-    void SendEnvelopeCmd(const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response);
-    void StkControllerIsReady(const AppExecFwk::InnerEvent::Pointer &response);
-    void StkCmdCallSetup(int32_t flagAccept, const AppExecFwk::InnerEvent::Pointer &response);
-    void SetRadioProtocol(SimProtocolRequest data, const AppExecFwk::InnerEvent::Pointer &response);
-    void OpenLogicalSimIO(std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response);
-    void CloseLogicalSimIO(int chanID, const AppExecFwk::InnerEvent::Pointer &response);
-    void TransmitApduSimIO(ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response);
-    void UnlockSimLock(int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t UnlockPin(std::string pin, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t UnlockPuk(std::string puk, std::string pin, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetSimPinInputTimes(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t UnlockPin2(std::string pin2, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t UnlockPuk2(std::string puk2, std::string pin2, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetSimPin2InputTimes(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetActiveSim(int32_t index, int32_t enable, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SimStkSendTerminalResponse(const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SimStkSendEnvelope(const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SimStkIsReady(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetRadioProtocol(SimProtocolRequest simProtocolData, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SimOpenLogicalChannel(std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SimCloseLogicalChannel(int channelId, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SimTransmitApduLogicalChannel(ApduSimIORequestInfo reqInfo,
+        const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t UnlockSimLock(int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response);
 
-    void GetSimStatusResponse(MessageParcel &data);
-    void GetImsiResponse(MessageParcel &data);
-    void GetSimIOResponse(MessageParcel &data);
-    void GetSimLockStatusResponse(MessageParcel &data);
-    void SetSimLockResponse(MessageParcel &data);
-    void ChangeSimPasswordResponse(MessageParcel &data);
-    void UnlockPinResponse(MessageParcel &data);
-    void UnlockPukResponse(MessageParcel &data);
-    void GetSimPinInputTimesResponse(MessageParcel &data);
-    void UnlockPin2Response(MessageParcel &data);
-    void UnlockPuk2Response(MessageParcel &data);
-    void GetSimPin2InputTimesResponse(MessageParcel &data);
-    void SetActiveSimResponse(MessageParcel &data);
-    void SendTerminalResponseCmdResponse(MessageParcel &data);
-    void SendEnvelopeCmdResponse(MessageParcel &data);
-    void StkControllerIsReadyResponse(MessageParcel &data);
-    void StkCmdCallSetupResponse(MessageParcel &data);
-    void SetRadioProtocolResponse(MessageParcel &data);
-    void OpenLogicalSimIOResponse(MessageParcel &data);
-    void CloseLogicalSimIOResponse(MessageParcel &data);
-    void TransmitApduSimIOResponse(MessageParcel &data);
-    void UnlockSimLockResponse(MessageParcel &data);
+    int32_t GetSimStatusResponse(MessageParcel &data);
+    int32_t GetImsiResponse(MessageParcel &data);
+    int32_t GetSimIOResponse(MessageParcel &data);
+    int32_t GetSimLockStatusResponse(MessageParcel &data);
+    int32_t SetSimLockResponse(MessageParcel &data);
+    int32_t ChangeSimPasswordResponse(MessageParcel &data);
+    int32_t UnlockPinResponse(MessageParcel &data);
+    int32_t UnlockPukResponse(MessageParcel &data);
+    int32_t GetSimPinInputTimesResponse(MessageParcel &data);
+    int32_t UnlockPin2Response(MessageParcel &data);
+    int32_t UnlockPuk2Response(MessageParcel &data);
+    int32_t GetSimPin2InputTimesResponse(MessageParcel &data);
+    int32_t SetActiveSimResponse(MessageParcel &data);
+    int32_t SimStkSendTerminalResponseResponse(MessageParcel &data);
+    int32_t SimStkSendEnvelopeResponse(MessageParcel &data);
+    int32_t SimStkIsReadyResponse(MessageParcel &data);
+    int32_t SetRadioProtocolResponse(MessageParcel &data);
+    int32_t SimOpenLogicalChannelResponse(MessageParcel &data);
+    int32_t SimCloseLogicalChannelResponse(MessageParcel &data);
+    int32_t SimTransmitApduLogicalChannelResponse(MessageParcel &data);
+    int32_t UnlockSimLockResponse(MessageParcel &data);
 
     bool IsSimRespOrNotify(uint32_t code);
-
-    void ProcessSimRespOrNotify(uint32_t code, MessageParcel &data);
 
 private:
     bool IsSimResponse(uint32_t code);
     bool IsSimNotification(uint32_t code);
     void AddHandlerToMap();
-    void ProcessIccIoInfo(
+    int32_t ProcessIccIoInfo(
         std::shared_ptr<TelRilRequest> telRilRequest, std::shared_ptr<IccIoResultInfo> iccIoResult);
-    void ErrorIccIoResponse(
+    int32_t ErrorIccIoResponse(
         std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo);
-
-private:
-    using Func = void (TelRilSim::*)(MessageParcel &data);
-    std::map<uint32_t, Func> memberFuncMap_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -26,7 +26,7 @@ namespace Telephony {
 class SimStateTracker : public AppExecFwk::EventHandler {
 public:
     SimStateTracker(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-            std::shared_ptr<ISimFileManager> simFileManager);
+            std::shared_ptr<SimFileManager> simFileManager, int32_t slotId);
     virtual ~SimStateTracker();
     bool GetOperatorConfigs(int32_t slotId, OperatorConfig &poc);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
@@ -40,7 +40,8 @@ private:
     inline static const std::string COMMON_EVENT_TELEPHONY_OPERATOR_CONFIG_CHANGED =
             "com.hos.action.OPERATOR_CONFIG_CHANGED";
     inline static const std::string OPERATOR_CONFIG_CHANGED = "operatorConfigChanged";
-    std::shared_ptr<ISimFileManager> simFileManager_ = nullptr;
+    std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
+    int32_t slotId_;
     OperatorConfig conf_;
 };
 } // namespace Telephony

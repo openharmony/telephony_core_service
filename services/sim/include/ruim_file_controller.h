@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Telephony {
 class RuimFileController : public IccFileController {
 public:
-    RuimFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    RuimFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int slotId);
     ~RuimFileController();
     std::string ObtainElementFilePath(int efId);
     void ObtainTransparentImg(

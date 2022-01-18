@@ -14,7 +14,10 @@
  */
 
 #include "core_service_proxy.h"
+
 #include "string_ex.h"
+
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -177,7 +180,7 @@ const sptr<NetworkState> CoreServiceProxy::GetNetworkState(int32_t slotId)
 
 std::vector<sptr<SignalInformation>> CoreServiceProxy::GetSignalInfoList(int32_t slotId)
 {
-    TELEPHONY_LOGI("CoreServiceProxy::GetSignalInfoList soltId : %{public}d", slotId);
+    TELEPHONY_LOGI("CoreServiceProxy::GetSignalInfoList slotId : %{public}d", slotId);
     std::vector<sptr<SignalInformation>> result;
     MessageParcel data;
     MessageParcel reply;
@@ -292,7 +295,7 @@ void CoreServiceProxy::ProcessSignalInfo(MessageParcel &reply, std::vector<sptr<
     }
 }
 
-bool CoreServiceProxy::SetRadioState(bool isOn, const sptr<INetworkSearchCallback> &callback)
+bool CoreServiceProxy::SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback)
 {
     TELEPHONY_LOGI("CoreServiceProxy SetRadioState isOn:%{public}d", isOn);
     MessageParcel data;
@@ -302,6 +305,7 @@ bool CoreServiceProxy::SetRadioState(bool isOn, const sptr<INetworkSearchCallbac
         TELEPHONY_LOGE("SetRadioState WriteInterfaceToken is false");
         return false;
     }
+    data.WriteInt32(slotId);
     if (callback != nullptr) {
         data.WriteRemoteObject(callback->AsObject().GetRefPtr());
     }
@@ -318,7 +322,7 @@ bool CoreServiceProxy::SetRadioState(bool isOn, const sptr<INetworkSearchCallbac
     return reply.ReadBool();
 }
 
-bool CoreServiceProxy::GetRadioState(const sptr<INetworkSearchCallback> &callback)
+bool CoreServiceProxy::GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -327,6 +331,7 @@ bool CoreServiceProxy::GetRadioState(const sptr<INetworkSearchCallback> &callbac
         TELEPHONY_LOGE("GetRadioState WriteInterfaceToken is false");
         return false;
     }
+    data.WriteInt32(slotId);
     if (callback != nullptr) {
         data.WriteRemoteObject(callback->AsObject().GetRefPtr());
     }
@@ -356,8 +361,7 @@ std::u16string CoreServiceProxy::GetIsoCountryCodeForNetwork(int32_t slotId)
         TELEPHONY_LOGE("GetIsoCountryCodeForNetwork Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st =
-        Remote()->SendRequest(uint32_t(InterfaceID::GET_ISO_COUNTRY_CODE_FOR_NETWORK), data, reply, option);
+    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_ISO_COUNTRY_CODE_FOR_NETWORK), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetIsoCountryCodeForNetwork failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -537,7 +541,7 @@ std::u16string CoreServiceProxy::GetISOCountryCodeForSim(int32_t slotId)
     }
     std::u16string result = reply.ReadString16();
     std::string str = Str16ToStr8(result);
-    TELEPHONY_LOGI("GetISOCountryCodeForSim call end: result=%s \n", str.c_str());
+    TELEPHONY_LOGI("GetISOCountryCodeForSim call end: result=%{public}s \n", str.c_str());
     return result;
 }
 
@@ -565,7 +569,7 @@ std::u16string CoreServiceProxy::GetSimOperatorNumeric(int32_t slotId)
     }
     std::u16string result = reply.ReadString16();
     std::string str = Str16ToStr8(result);
-    TELEPHONY_LOGI("GetSimOperatorNumeric call end: result=%s \n", str.c_str());
+    TELEPHONY_LOGI("GetSimOperatorNumeric call end: result=%{public}s \n", str.c_str());
     return result;
 }
 
@@ -593,7 +597,7 @@ std::u16string CoreServiceProxy::GetSimSpn(int32_t slotId)
     }
     std::u16string result = reply.ReadString16();
     std::string str = Str16ToStr8(result);
-    TELEPHONY_LOGI("GetSimSpn call end: result=%s \n", str.c_str());
+    TELEPHONY_LOGI("GetSimSpn call end: result=%{public}s \n", str.c_str());
     return result;
 }
 
@@ -787,8 +791,8 @@ std::u16string CoreServiceProxy::GetLocaleFromDefaultSim()
         TELEPHONY_LOGE("GetLocaleFromDefaultSim WriteInterfaceToken is false");
         return Str8ToStr16("");
     }
-    int slotId = CoreManager::DEFAULT_SLOT_ID;
-    data.WriteInt32(slotId);
+
+    data.WriteInt32(DEFAULT_SIM_SLOT_ID);
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("GetLocaleFromDefaultSim Remote is null");
         return Str8ToStr16("");
@@ -1106,8 +1110,7 @@ bool CoreServiceProxy::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &
             IccAccountInfo accountInfo;
             accountInfo.ReadFromParcel(reply);
             TELEPHONY_LOGI(
-                "CoreServiceProxy::GetActiveSimAccountInfoList slotindex = %{public}d, showname = "
-                "%{public}s",
+                "CoreServiceProxy::GetActiveSimAccountInfoList slotIndex = %{public}d, showName = %{public}s",
                 accountInfo.slotIndex, Str16ToStr8(accountInfo.showName).c_str());
             iccAccountInfoList.emplace_back(accountInfo);
         }
@@ -1149,10 +1152,10 @@ bool CoreServiceProxy::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
 bool CoreServiceProxy::IsValidSlotId(int32_t slotId)
 {
     int32_t count = GetMaxSimCount();
-    if ((slotId >= CoreManager::DEFAULT_SLOT_ID) && (slotId < count)) {
+    if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < count)) {
         return true;
     } else {
-        TELEPHONY_LOGE("SimId is InValid = %d", slotId);
+        TELEPHONY_LOGE("SimId is InValid = %{public}d", slotId);
         return false;
     }
 }
@@ -1175,21 +1178,21 @@ bool CoreServiceProxy::UnlockPin(const int32_t slotId, std::u16string pin, LockS
     MessageParcel reply;
     MessageOption option;
     if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("RequestUnlockPin WriteInterfaceToken is false");
+        TELEPHONY_LOGE("UnlockPin WriteInterfaceToken is false");
         return false;
     }
     data.WriteInt32(slotId);
     data.WriteString16(pin);
     if (Remote() == nullptr) {
-        TELEPHONY_LOGE("RequestUnlockPin Remote is null");
+        TELEPHONY_LOGE("UnlockPin Remote is null");
         return false;
     }
     int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::UNLOCK_PIN), data, reply, option);
     if (st != ERR_NONE) {
-        TELEPHONY_LOGE("RequestUnlockPin failed, error code is %{public}d \n", st);
+        TELEPHONY_LOGE("UnlockPin failed, error code is %{public}d \n", st);
         return false;
     }
-    TELEPHONY_LOGI("RequestUnlockPin successful, error code is %{public}d \n", st);
+    TELEPHONY_LOGI("UnlockPin successful, error code is %{public}d \n", st);
     bool result = reply.ReadBool();
     response.result = reply.ReadInt32();
     response.remain = reply.ReadInt32();
@@ -1204,22 +1207,22 @@ bool CoreServiceProxy::UnlockPuk(
     MessageParcel reply;
     MessageOption option;
     if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("RequestUnlockPuk WriteInterfaceToken is false");
+        TELEPHONY_LOGE("UnlockPuk WriteInterfaceToken is false");
         return false;
     }
     data.WriteInt32(slotId);
     data.WriteString16(newPin);
     data.WriteString16(puk);
     if (Remote() == nullptr) {
-        TELEPHONY_LOGE("RequestUnlockPuk Remote is null");
+        TELEPHONY_LOGE("UnlockPuk Remote is null");
         return false;
     }
     int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::UNLOCK_PUK), data, reply, option);
     if (st != ERR_NONE) {
-        TELEPHONY_LOGE("RequestUnlockPuk failed, error code is %{public}d \n", st);
+        TELEPHONY_LOGE("UnlockPuk failed, error code is %{public}d \n", st);
         return false;
     }
-    TELEPHONY_LOGI("RequestUnlockPuk successful, error code is %{public}d \n", st);
+    TELEPHONY_LOGI("UnlockPuk successful, error code is %{public}d \n", st);
     bool result = reply.ReadBool();
     response.result = reply.ReadInt32();
     response.remain = reply.ReadInt32();
@@ -1234,22 +1237,22 @@ bool CoreServiceProxy::AlterPin(
     MessageParcel reply;
     MessageOption option;
     if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("RequestAlterPin WriteInterfaceToken is false");
+        TELEPHONY_LOGE("AlterPin WriteInterfaceToken is false");
         return false;
     }
     data.WriteInt32(slotId);
     data.WriteString16(newPin);
     data.WriteString16(oldPin);
     if (Remote() == nullptr) {
-        TELEPHONY_LOGE("RequestAlterPin Remote is null");
+        TELEPHONY_LOGE("AlterPin Remote is null");
         return false;
     }
     int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::ALTER_PIN), data, reply, option);
     if (st != ERR_NONE) {
-        TELEPHONY_LOGE("RequestAlterPin failed, error code is %{public}d \n", st);
+        TELEPHONY_LOGE("AlterPin failed, error code is %{public}d \n", st);
         return false;
     }
-    TELEPHONY_LOGI("RequestAlterPin successful, error code is %{public}d \n", st);
+    TELEPHONY_LOGI("AlterPin successful, error code is %{public}d \n", st);
     bool result = reply.ReadBool();
     response.result = reply.ReadInt32();
     response.remain = reply.ReadInt32();
@@ -1263,21 +1266,21 @@ bool CoreServiceProxy::UnlockPin2(const int32_t slotId, std::u16string pin2, Loc
     MessageParcel reply;
     MessageOption option;
     if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("RequestUnlockPin2 WriteInterfaceToken is false");
+        TELEPHONY_LOGE("UnlockPin2 WriteInterfaceToken is false");
         return false;
     }
     data.WriteInt32(slotId);
     data.WriteString16(pin2);
     if (Remote() == nullptr) {
-        TELEPHONY_LOGE("RequestUnlockPin2 Remote is null");
+        TELEPHONY_LOGE("UnlockPin2 Remote is null");
         return false;
     }
     int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::UNLOCK_PIN2), data, reply, option);
     if (st != ERR_NONE) {
-        TELEPHONY_LOGE("RequestUnlockPin2 failed, error code is %{public}d \n", st);
+        TELEPHONY_LOGE("UnlockPin2 failed, error code is %{public}d \n", st);
         return false;
     }
-    TELEPHONY_LOGI("RequestUnlockPin2 successful, error code is %{public}d \n", st);
+    TELEPHONY_LOGI("UnlockPin2 successful, error code is %{public}d \n", st);
     bool result = reply.ReadBool();
     response.result = reply.ReadInt32();
     response.remain = reply.ReadInt32();
@@ -1292,22 +1295,22 @@ bool CoreServiceProxy::UnlockPuk2(
     MessageParcel reply;
     MessageOption option;
     if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("RequestUnlockPuk2 WriteInterfaceToken is false");
+        TELEPHONY_LOGE("UnlockPuk2 WriteInterfaceToken is false");
         return false;
     }
     data.WriteInt32(slotId);
     data.WriteString16(newPin2);
     data.WriteString16(puk2);
     if (Remote() == nullptr) {
-        TELEPHONY_LOGE("RequestUnlockPuk2 Remote is null");
+        TELEPHONY_LOGE("UnlockPuk2 Remote is null");
         return false;
     }
     int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::UNLOCK_PUK2), data, reply, option);
     if (st != ERR_NONE) {
-        TELEPHONY_LOGE("RequestUnlockPuk2 failed, error code is %{public}d \n", st);
+        TELEPHONY_LOGE("UnlockPuk2 failed, error code is %{public}d \n", st);
         return false;
     }
-    TELEPHONY_LOGI("RequestUnlockPuk2 successful, error code is %{public}d \n", st);
+    TELEPHONY_LOGI("UnlockPuk2 successful, error code is %{public}d \n", st);
     bool result = reply.ReadBool();
     response.result = reply.ReadInt32();
     response.remain = reply.ReadInt32();
@@ -1322,22 +1325,22 @@ bool CoreServiceProxy::AlterPin2(
     MessageParcel reply;
     MessageOption option;
     if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("RequestAlterPin2 WriteInterfaceToken is false");
+        TELEPHONY_LOGE("AlterPin2 WriteInterfaceToken is false");
         return false;
     }
     data.WriteInt32(slotId);
     data.WriteString16(newPin2);
     data.WriteString16(oldPin2);
     if (Remote() == nullptr) {
-        TELEPHONY_LOGE("RequestAlterPin2 Remote is null");
+        TELEPHONY_LOGE("AlterPin2 Remote is null");
         return false;
     }
     int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::ALTER_PIN2), data, reply, option);
     if (st != ERR_NONE) {
-        TELEPHONY_LOGE("RequestAlterPin2 failed, error code is %{public}d \n", st);
+        TELEPHONY_LOGE("AlterPin2 failed, error code is %{public}d \n", st);
         return false;
     }
-    TELEPHONY_LOGI("RequestAlterPin2 successful, error code is %{public}d \n", st);
+    TELEPHONY_LOGI("AlterPin2 successful, error code is %{public}d \n", st);
     bool result = reply.ReadBool();
     response.result = reply.ReadInt32();
     response.remain = reply.ReadInt32();
@@ -1351,7 +1354,7 @@ bool CoreServiceProxy::SetLockState(const int32_t slotId, const LockInfo &option
     MessageParcel reply;
     MessageOption option;
     if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("RequestSetLockState WriteInterfaceToken is false");
+        TELEPHONY_LOGE("SetLockState WriteInterfaceToken is false");
         return false;
     }
     data.WriteInt32(slotId);
@@ -1359,15 +1362,15 @@ bool CoreServiceProxy::SetLockState(const int32_t slotId, const LockInfo &option
     data.WriteInt32(static_cast<int32_t>(options.lockState));
     data.WriteString16(options.password);
     if (Remote() == nullptr) {
-        TELEPHONY_LOGE("RequestSetLockState Remote is null");
+        TELEPHONY_LOGE("SetLockState Remote is null");
         return false;
     }
     int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::SWITCH_LOCK), data, reply, option);
     if (st != ERR_NONE) {
-        TELEPHONY_LOGE("RequestSetLockState failed, error code is %{public}d \n", st);
+        TELEPHONY_LOGE("SetLockState failed, error code is %{public}d \n", st);
         return false;
     }
-    TELEPHONY_LOGI("RequestSetLockState sucessful, error code is %{public}d \n", st);
+    TELEPHONY_LOGI("SetLockState successful, error code is %{public}d \n", st);
     bool result = reply.ReadBool();
     response.result = reply.ReadInt32();
     response.remain = reply.ReadInt32();
@@ -1381,23 +1384,23 @@ int32_t CoreServiceProxy::GetLockState(int32_t slotId, LockType lockType)
     MessageParcel reply;
     MessageOption option;
     if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("RequestGetLockState WriteInterfaceToken is false");
+        TELEPHONY_LOGE("GetLockState WriteInterfaceToken is false");
         return TELEPHONY_ERROR;
     }
-    TELEPHONY_LOGI("RequestGetLockState WriteInterfaceToken is true");
+    TELEPHONY_LOGI("GetLockState WriteInterfaceToken is true");
     data.WriteInt32(slotId);
     data.WriteInt32(static_cast<int32_t>(lockType));
     if (Remote() == nullptr) {
-        TELEPHONY_LOGE("RequestGetLockState Remote is null");
+        TELEPHONY_LOGE("GetLockState Remote is null");
         return TELEPHONY_ERROR;
     }
-    TELEPHONY_LOGI("RequestGetLockState Remote is  != null");
+    TELEPHONY_LOGI("GetLockState Remote is  != null");
     int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::CHECK_LOCK), data, reply, option);
     if (st != ERR_NONE) {
-        TELEPHONY_LOGE("RequestGetLockState failed, error code is %{public}d \n", st);
+        TELEPHONY_LOGE("GetLockState failed, error code is %{public}d \n", st);
         return TELEPHONY_ERROR;
     }
-    TELEPHONY_LOGI("RequestGetLockState successful, error code is %{public}d \n", st);
+    TELEPHONY_LOGI("GetLockState successful, error code is %{public}d \n", st);
     int32_t result = reply.ReadInt32();
     TELEPHONY_LOGI("GetLockState call end: result=%{public}d \n", result);
     return result;
@@ -1427,6 +1430,7 @@ int32_t CoreServiceProxy::RefreshSimState(int32_t slotId)
     TELEPHONY_LOGI("RefreshSimState call end:: result = %{public}d", result);
     return result;
 }
+
 bool CoreServiceProxy::SetActiveSim(int32_t slotId, int32_t enable)
 {
     TELEPHONY_LOGI("CoreServiceProxy SetActiveSim ::%{public}d", slotId);
@@ -1886,8 +1890,7 @@ bool CoreServiceProxy::SendTerminalResponseCmd(int32_t slotId, const std::string
         return ERROR;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t st =
-        Remote()->SendRequest(uint32_t(InterfaceID::STK_CMD_FROM_APP_TERMINAL_RESPONSE), data, reply, option);
+    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::STK_CMD_FROM_APP_TERMINAL_RESPONSE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SendTerminalResponseCmd failed, error code is %{public}d \n", st);
         return false;
@@ -1907,22 +1910,22 @@ bool CoreServiceProxy::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockIn
     MessageParcel reply;
     MessageOption option;
     if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("RequestUnlockSimLock WriteInterfaceToken is false");
+        TELEPHONY_LOGE("UnlockSimLock WriteInterfaceToken is false");
         return false;
     }
     data.WriteInt32(slotId);
     data.WriteInt32(static_cast<int32_t>(lockInfo.lockType));
     data.WriteString16(lockInfo.password);
     if (Remote() == nullptr) {
-        TELEPHONY_LOGE("RequestUnlockSimLock Remote is null");
+        TELEPHONY_LOGE("UnlockSimLock Remote is null");
         return false;
     }
     int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::UNLOCK_SIMLOCK), data, reply, option);
     if (st != ERR_NONE) {
-        TELEPHONY_LOGE("RequestUnlockSimLock failed, error code is %{public}d \n", st);
+        TELEPHONY_LOGE("UnlockSimLock failed, error code is %{public}d \n", st);
         return false;
     }
-    TELEPHONY_LOGI("RequestUnlockSimLock sucessful, error code is %{public}d \n", st);
+    TELEPHONY_LOGI("UnlockSimLock successful, error code is %{public}d \n", st);
     bool result = reply.ReadBool();
     response.result = reply.ReadInt32();
     response.remain = reply.ReadInt32();
@@ -2019,7 +2022,7 @@ void CoreServiceProxy::ProcessCellInfo(MessageParcel &reply, std::vector<sptr<Ce
     }
 }
 
-bool CoreServiceProxy::SendUpdateCellLocationRequest()
+bool CoreServiceProxy::SendUpdateCellLocationRequest(int32_t slotId)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -2028,11 +2031,11 @@ bool CoreServiceProxy::SendUpdateCellLocationRequest()
         TELEPHONY_LOGE("SendUpdateCellLocationRequest WriteInterfaceToken is false");
         return false;
     }
-
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("SendUpdateCellLocationRequest Remote is null");
         return false;
     }
+    data.WriteInt32(slotId);
     int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_CELL_LOCATION), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SendUpdateCellLocationRequest failed, error code is %{public}d \n", st);
@@ -2066,7 +2069,8 @@ bool CoreServiceProxy::HasOperatorPrivileges(const int32_t slotId)
     TELEPHONY_LOGI("HasOperatorPrivileges end: result=%{public}d \n", result);
     return result;
 }
-bool CoreServiceProxy::IsNrSupported()
+
+bool CoreServiceProxy::IsNrSupported(int32_t slotId)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -2075,6 +2079,7 @@ bool CoreServiceProxy::IsNrSupported()
         TELEPHONY_LOGE("IsNrSupported WriteInterfaceToken is false");
         return false;
     }
+    data.WriteInt32(slotId);
     int32_t st = Remote()->SendRequest(static_cast<uint32_t>(InterfaceID::IS_NR_SUPPORTED), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("IsNrSupported failed, error code is %{public}d \n", st);

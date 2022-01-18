@@ -25,13 +25,10 @@ namespace OHOS {
 namespace Telephony {
 class NetworkSearchNotify {
     DECLARE_DELAYED_SINGLETON(NetworkSearchNotify)
-    static const int32_t RESET_CONNECTS = 5;
-    static const int32_t RESET_CONNECT_SLEEP_TIME = 5;
-
 public:
-    void NotifyNetworkStateUpdated(const sptr<NetworkState> &networkState);
-    void NotifySignalInfoUpdated(const std::vector<sptr<SignalInformation>> &signalInfos);
-    void NotifyCellInfoUpdated(const std::vector<sptr<CellInformation>> &signalInfos);
+    void NotifyNetworkStateUpdated(int32_t slotId, const sptr<NetworkState> &networkState);
+    void NotifySignalInfoUpdated(int32_t slotId, const std::vector<sptr<SignalInformation>> &signalInfos);
+    void NotifyCellInfoUpdated(int32_t slotId, const std::vector<sptr<CellInformation>> &signalInfos);
 };
 } // namespace Telephony
 } // namespace OHOS

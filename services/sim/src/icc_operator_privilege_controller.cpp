@@ -21,10 +21,10 @@
 #include <mutex>
 #include <mutex>
 
-#include "observer_handler.h"
 #include "inner_event.h"
 #include "sim_data_type.h"
 #include "telephony_log_wrapper.h"
+#include "radio_event.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -164,10 +164,10 @@ public:
     }
 };
 
-IccOperatorPrivilegeController::IccOperatorPrivilegeController(const int32_t slotId,
-    std::shared_ptr<AppExecFwk::EventRunner> runner, std::shared_ptr<ITelRilManager> telRilManager,
-    std::shared_ptr<ISimStateManager> simStateManager)
-    : AppExecFwk::EventHandler(runner), slotId_(slotId), telRilManager_(telRilManager),
+IccOperatorPrivilegeController::IccOperatorPrivilegeController(std::shared_ptr<AppExecFwk::EventRunner> runner,
+    std::shared_ptr<Telephony::ITelRilManager> telRilManager,
+    std::shared_ptr<SimStateManager> simStateManager)
+    : AppExecFwk::EventHandler(runner), slotId_(0), telRilManager_(telRilManager),
       simStateManager_(simStateManager), state_(new IccOperatorPrivilegeController::LogicalStateMachine())
 {}
 
@@ -176,8 +176,9 @@ IccOperatorPrivilegeController::~IccOperatorPrivilegeController()
     delete state_;
 }
 
-void IccOperatorPrivilegeController::Init()
+void IccOperatorPrivilegeController::Init(const int32_t slotId)
 {
+    this->slotId_ = slotId;
     TELEPHONY_LOGI("IccOperatorPrivilegeController::Init begin");
     if (telRilManager_ == nullptr) {
         TELEPHONY_LOGE("telRilManager_ can not be nullptr!!");
@@ -199,7 +200,7 @@ void IccOperatorPrivilegeController::Init()
         }
     }
     auto self = this->shared_from_this();
-    simStateManager_->RegisterCoreNotify(self, ObserverHandler::RADIO_SIM_STATE_CHANGE);
+    simStateManager_->RegisterCoreNotify(self, RadioEvent::RADIO_SIM_STATE_CHANGE);
     /* try to load data */
     ProcessSimStateChanged();
 }
@@ -230,7 +231,7 @@ bool IccOperatorPrivilegeController::HasOperatorPrivileges(
             "IccOperatorPrivilegeController::HasOperatorPrivileges false with rules.size:%{public}zu and "
             "simState:%{public}d",
             rules_.size(),
-            ((simStateManager_ == nullptr) ? SimState::SIM_STATE_UNKNOWN : simStateManager_->GetSimState(slotId_)));
+            ((simStateManager_ == nullptr) ? SimState::SIM_STATE_UNKNOWN : simStateManager_->GetSimState()));
         return false;
     }
     auto hash = Strip(certHash);
@@ -249,7 +250,7 @@ void IccOperatorPrivilegeController::ProcessEvent(const AppExecFwk::InnerEvent::
 {
     const uint32_t id = event->GetInnerEventId();
     switch (id) {
-        case ObserverHandler::RADIO_SIM_STATE_CHANGE:
+        case RadioEvent::RADIO_SIM_STATE_CHANGE:
             ProcessSimStateChanged();
             break;
         case MSG_OPEN_LOGICAL_CHANNEL_DONE:
@@ -268,7 +269,7 @@ void IccOperatorPrivilegeController::ProcessEvent(const AppExecFwk::InnerEvent::
 
 void IccOperatorPrivilegeController::ProcessSimStateChanged()
 {
-    const SimState state = simStateManager_->GetSimState(slotId_);
+    const SimState state = simStateManager_->GetSimState();
     TELEPHONY_LOGI("ProcessSimStateChanged simState:%{public}d", state);
     switch (state) {
         case SimState::SIM_STATE_UNKNOWN:
@@ -297,11 +298,11 @@ void IccOperatorPrivilegeController::OpenChannel()
         TELEPHONY_LOGI("now is not appropriate to open a new logical channel!!");
         return;
     }
-    TELEPHONY_LOGI("will to OpenLogicalSimIO!");
+    TELEPHONY_LOGI("will to SimOpenLogicalChannel!");
     rules_.clear();
     state_->SetForOpenChannel();
     auto response = GenCallBackEvent(shared_from_this(), MSG_OPEN_LOGICAL_CHANNEL_DONE);
-    telRilManager_->OpenLogicalSimIO(ARAM_AID.data(), P2, response);
+    telRilManager_->SimOpenLogicalChannel(slotId_, ARAM_AID.data(), P2, response);
 }
 
 void IccOperatorPrivilegeController::ProcessOpenLogicalChannelDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -314,18 +315,18 @@ void IccOperatorPrivilegeController::ProcessOpenLogicalChannelDone(const AppExec
         state_->currentChannelId = INT32_FST_NEGATIVE;
         return;
     }
-    TELEPHONY_LOGI("Will to TransmitApduSimIO");
+    TELEPHONY_LOGI("Will to SimTransmitApduLogicalChannel");
     state_->currentChannelId = INT32_FST_POSITIVE;
     auto transmitEvent = GenCallBackEvent(shared_from_this(), MSG_TRANSMIT_LOGICAL_CHANNEL_DONE);
     ApduSimIORequestInfo reqInfo;
-    reqInfo.chanId = state_->currentChannelId;
+    reqInfo.channelId = state_->currentChannelId;
     reqInfo.type = CLA;
     reqInfo.instruction = COMMAND;
     reqInfo.p1 = P1;
     reqInfo.p2 = P2;
     reqInfo.p3 = P3;
     reqInfo.data = "";
-    telRilManager_->TransmitApduSimIO(reqInfo, transmitEvent);
+    telRilManager_->SimTransmitApduLogicalChannel(slotId_, reqInfo, transmitEvent);
 }
 
 void IccOperatorPrivilegeController::ProcessTransmitLogicalChannelDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -350,14 +351,14 @@ void IccOperatorPrivilegeController::ProcessTransmitLogicalChannelDone(const App
             TELEPHONY_LOGI("need continue load TLV data");
             auto transmitEvent = GenCallBackEvent(shared_from_this(), MSG_TRANSMIT_LOGICAL_CHANNEL_DONE);
             ApduSimIORequestInfo reqInfo;
-            reqInfo.chanId = state_->currentChannelId;
+            reqInfo.channelId = state_->currentChannelId;
             reqInfo.type = CLA;
             reqInfo.instruction = COMMAND;
             reqInfo.p1 = P1;
             reqInfo.p2 = P2_EXTENDED_DATA;
             reqInfo.p3 = P3;
             reqInfo.data = "";
-            telRilManager_->TransmitApduSimIO(reqInfo, transmitEvent);
+            telRilManager_->SimTransmitApduLogicalChannel(slotId_, reqInfo, transmitEvent);
             return;
         }
         if (!IccOperatorRule::CreateFromTLV(state_->currData, rules_)) {
@@ -367,7 +368,7 @@ void IccOperatorPrivilegeController::ProcessTransmitLogicalChannelDone(const App
     } while (false);
     auto closeEvent = GenCallBackEvent(shared_from_this(), MSG_CLOSE_LOGICAL_CHANNEL_DONE);
     if (state_->currentChannelId > INT32_ZERO) {
-        telRilManager_->CloseLogicalSimIO(state_->currentChannelId, closeEvent);
+        telRilManager_->SimCloseLogicalChannel(slotId_, state_->currentChannelId, closeEvent);
     }
     state_->SetForCloseChannel();
     return;
