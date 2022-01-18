@@ -17,7 +17,13 @@
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
+
+#include "core_service_proxy.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_errors.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -115,14 +121,14 @@ std::u16string CoreServiceClient::GetUniqueDeviceId(int32_t slotId)
     }
     return proxy->GetUniqueDeviceId(slotId);
 }
-bool CoreServiceClient::IsNrSupported()
+bool CoreServiceClient::IsNrSupported(int32_t slotId)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return false;
     }
-    return proxy->IsNrSupported();
+    return proxy->IsNrSupported(slotId);
 }
 
 NrMode CoreServiceClient::GetNrOptionMode(int32_t slotId)
@@ -134,7 +140,6 @@ NrMode CoreServiceClient::GetNrOptionMode(int32_t slotId)
     }
     return proxy->GetNrOptionMode(slotId);
 }
-
 
 std::vector<sptr<SignalInformation>> CoreServiceClient::GetSignalInfoList(int32_t slotId)
 {
@@ -179,24 +184,24 @@ const sptr<NetworkState> CoreServiceClient::GetNetworkState(int32_t slotId)
     return proxy->GetNetworkState(slotId);
 }
 
-bool CoreServiceClient::SetRadioState(bool isOn, const sptr<INetworkSearchCallback> &callback)
+bool CoreServiceClient::SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return false;
     }
-    return proxy->SetRadioState(isOn, callback);
+    return proxy->SetRadioState(slotId, isOn, callback);
 }
 
-bool CoreServiceClient::GetRadioState(const sptr<INetworkSearchCallback> &callback)
+bool CoreServiceClient::GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return false;
     }
-    return proxy->GetRadioState(callback);
+    return proxy->GetRadioState(slotId, callback);
 }
 
 std::u16string CoreServiceClient::GetImei(int32_t slotId)
@@ -730,6 +735,7 @@ bool CoreServiceClient::HasOperatorPrivileges(const int32_t slotId)
     }
     return proxy->HasOperatorPrivileges(slotId);
 }
+
 int32_t CoreServiceClient::GetPrimarySlotId()
 {
     auto proxy = GetProxy();
@@ -739,6 +745,7 @@ int32_t CoreServiceClient::GetPrimarySlotId()
     }
     return proxy->GetPrimarySlotId();
 }
+
 bool CoreServiceClient::SetPrimarySlotId(int32_t slotId)
 {
     auto proxy = GetProxy();
@@ -761,14 +768,14 @@ std::vector<sptr<CellInformation>> CoreServiceClient::GetCellInfoList(int32_t sl
     return proxy->GetCellInfoList(slotId);
 }
 
-bool CoreServiceClient::SendUpdateCellLocationRequest()
+bool CoreServiceClient::SendUpdateCellLocationRequest(int32_t slotId)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return false;
     }
-    return proxy->SendUpdateCellLocationRequest();
+    return proxy->SendUpdateCellLocationRequest(slotId);
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -23,11 +23,11 @@
 
 namespace OHOS {
 namespace Telephony {
-NetworkType::NetworkType(std::weak_ptr<NetworkSearchManager> networkSearchManager)
-    : networkSearchManager_(networkSearchManager)
+NetworkType::NetworkType(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
+    : networkSearchManager_(networkSearchManager), slotId_(slotId)
 {}
 
-void NetworkType::ProcessGetPreferredNetwork(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) const
+void NetworkType::ProcessGetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &event) const
 {
     TELEPHONY_LOGI("NetworkType::ProcessGetPreferredNetwork");
     if (event == nullptr) {
@@ -52,7 +52,7 @@ void NetworkType::ProcessGetPreferredNetwork(int32_t slotId, const AppExecFwk::I
     if (preferredNetworkInfo != nullptr) {
         networkMode = preferredNetworkInfo->preferredNetworkType;
         index = preferredNetworkInfo->flag;
-        networkSearchManager->SavePreferredNetworkValue(slotId, networkMode);
+        networkSearchManager->SavePreferredNetworkValue(slotId_, networkMode);
         if (!data.WriteInt32(networkMode) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
             TELEPHONY_LOGE("NetworkType::ProcessGetPreferredNetwork WriteInt32 networkMode is false");
             return;
@@ -66,7 +66,7 @@ void NetworkType::ProcessGetPreferredNetwork(int32_t slotId, const AppExecFwk::I
         }
     }
     std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
-        networkSearchManager->FindNetworkSearchCallback(index);
+        NetworkUtils::FindNetworkSearchCallback(index);
     if (callbackInfo != nullptr) {
         sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchItem_;
         if (callback != nullptr) {
@@ -74,11 +74,11 @@ void NetworkType::ProcessGetPreferredNetwork(int32_t slotId, const AppExecFwk::I
                 INetworkSearchCallback::NetworkSearchCallback::GET_PREFERRED_NETWORK_MODE_RESULT, data);
             TELEPHONY_LOGI("NetworkType::ProcessGetPreferredNetwork callback success");
         }
-        networkSearchManager->RemoveCallbackFromMap(index);
+        NetworkUtils::RemoveCallbackFromMap(index);
     }
 }
 
-void NetworkType::ProcessSetPreferredNetwork(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) const
+void NetworkType::ProcessSetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &event) const
 {
     TELEPHONY_LOGI("NetworkType::ProcessSetPreferredNetwork ok");
     if (event == nullptr) {
@@ -110,18 +110,18 @@ void NetworkType::ProcessSetPreferredNetwork(int32_t slotId, const AppExecFwk::I
         }
     }
     std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
-        networkSearchManager->FindNetworkSearchCallback(index);
+        NetworkUtils::FindNetworkSearchCallback(index);
     if (callbackInfo != nullptr) {
         sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchItem_;
         int32_t networkMode = callbackInfo->param_;
-        networkSearchManager->SavePreferredNetworkValue(slotId, networkMode);
+        networkSearchManager->SavePreferredNetworkValue(slotId_, networkMode);
         TELEPHONY_LOGI("NetworkSelection::ProcessSetNetworkSelectionMode NetworkMode is:%{public}d", networkMode);
         if (callback != nullptr) {
             callback->OnNetworkSearchCallback(
                 INetworkSearchCallback::NetworkSearchCallback::SET_PREFERRED_NETWORK_MODE_RESULT, data);
             TELEPHONY_LOGI("NetworkSelection::ProcessSetNetworkSelectionMode callback success");
         }
-        networkSearchManager->RemoveCallbackFromMap(index);
+        NetworkUtils::RemoveCallbackFromMap(index);
     }
 }
 } // namespace Telephony

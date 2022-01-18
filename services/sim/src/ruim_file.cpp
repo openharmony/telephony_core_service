@@ -15,13 +15,15 @@
 
 #include "ruim_file.h"
 
+#include "radio_event.h"
+
 using namespace std;
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 namespace Telephony {
 RuimFile::RuimFile(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<ISimStateManager> simStateManager)
+    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager)
     : IccFile(runner, simStateManager)
 {
     fileQueried_ = false;
@@ -33,9 +35,9 @@ void RuimFile::Init()
     TELEPHONY_LOGI("RuimFile:::Init():start");
     IccFile::Init();
     if (stateManager_ != nullptr) {
-        stateManager_->RegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_READY);
-        stateManager_->RegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_LOCKED);
-        stateManager_->RegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_SIMLOCK);
+        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
+        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
+        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
     }
 }
 
@@ -125,7 +127,7 @@ void RuimFile::ProcessLockedAllFilesFetched()
 void RuimFile::OnAllFilesFetched()
 {
     UpdateLoaded(true);
-    filesFetchedObser_->NotifyObserver(ObserverHandler::RADIO_SIM_RECORDS_LOADED);
+    filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED);
     PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_LOADED, "");
     NotifyRegistrySimState(CardType::SINGLE_MODE_RUIM_CARD, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
 }
@@ -133,7 +135,7 @@ void RuimFile::OnAllFilesFetched()
 bool RuimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("RuimFile::SIM_STATE_READY --received");
-    if (stateManager_->GetCardType(slotId_) != CardType::SINGLE_MODE_RUIM_CARD) {
+    if (stateManager_->GetCardType() != CardType::SINGLE_MODE_RUIM_CARD) {
         TELEPHONY_LOGI("invalid RuimFile::SIM_STATE_READY received");
         return false;
     }
@@ -160,7 +162,7 @@ void RuimFile::LoadRuimFiles()
     std::shared_ptr<RuimFile> owner = std::static_pointer_cast<RuimFile>(shared_from_this());
 
     AppExecFwk::InnerEvent::Pointer eventIMSI = BuildCallerInfo(MSG_SIM_OBTAIN_IMSI_DONE);
-    telRilManager_->GetImsi(eventIMSI);
+    telRilManager_->GetImsi(slotId_, eventIMSI);
     fileToGet_++;
 
     AppExecFwk::InnerEvent::Pointer eventICCID = BuildCallerInfo(MSG_SIM_OBTAIN_ICCID_DONE);
@@ -198,7 +200,7 @@ bool RuimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
         imsi_ = *sharedObject;
         TELEPHONY_LOGI("RuimFile::ProcessEvent -MSG_SIM_OBTAIN_IMSI_DONE %{public}s", imsi_.c_str());
         if (!imsi_.empty()) {
-            imsiReadyObser_->NotifyObserver(ObserverHandler::RADIO_IMSI_LOADED_READY);
+            imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
             PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_IMSI, imsi_);
         }
     }
@@ -251,9 +253,9 @@ bool RuimFile::ObtainCsimSpnDisplayCondition()
 
 void RuimFile::InitMemberFunc()
 {
-    memberFuncMap_[ObserverHandler::RADIO_SIM_STATE_READY] = &RuimFile::ProcessIccReady;
-    memberFuncMap_[ObserverHandler::RADIO_SIM_STATE_LOCKED] = &RuimFile::ProcessIccLocked;
-    memberFuncMap_[ObserverHandler::RADIO_SIM_STATE_SIMLOCK] = &RuimFile::ProcessIccLocked;
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_READY] = &RuimFile::ProcessIccReady;
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_LOCKED] = &RuimFile::ProcessIccLocked;
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_SIMLOCK] = &RuimFile::ProcessIccLocked;
     memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] = &RuimFile::ProcessGetImsiDone;
     memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] = &RuimFile::ProcessGetIccidDone;
     memberFuncMap_[MSG_SIM_OBTAIN_CDMA_SUBSCRIPTION_DONE] = &RuimFile::ProcessGetSubscriptionDone;
@@ -354,9 +356,9 @@ bool RuimFile::UpdateVoiceMail(const std::string &mailName, const std::string &m
 void RuimFile::UnInit()
 {
     if (stateManager_ != nullptr) {
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_READY);
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_LOCKED);
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_SIMLOCK);
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
     }
     IccFile::UnInit();
 }

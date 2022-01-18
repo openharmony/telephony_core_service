@@ -14,13 +14,14 @@
  */
 
 #include "sim_state_tracker.h"
-#include "observer_handler.h"
+
+#include "radio_event.h"
 
 namespace OHOS {
 namespace Telephony {
 SimStateTracker::SimStateTracker(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    std::shared_ptr<ISimFileManager> simFileManager)
-    : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager)
+    std::shared_ptr<SimFileManager> simFileManager, int32_t slotId)
+    : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), slotId_(slotId)
 {
     if (simFileManager == nullptr) {
         TELEPHONY_LOGE("can not make OperatorConf");
@@ -89,10 +90,10 @@ void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
     auto eventCode = event->GetInnerEventId();
     switch (eventCode) {
-        case ObserverHandler::RADIO_SIM_RECORDS_LOADED:
+        case RadioEvent::RADIO_SIM_RECORDS_LOADED:
             TELEPHONY_LOGI("SimStateTracker::Refresh config");
             conf_.configValue.clear();
-            GetOperatorConfigs(CoreManager::DEFAULT_SLOT_ID, conf_);
+            GetOperatorConfigs(slotId_, conf_);
             break;
         default:
             break;
@@ -106,7 +107,7 @@ bool SimStateTracker::RegisterForIccLoaded()
         TELEPHONY_LOGE("SimStateTracker::can not get SimFileManager");
         return false;
     }
-    simFileManager_->RegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_RECORDS_LOADED);
+    simFileManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
     return true;
 }
 
@@ -117,7 +118,7 @@ bool SimStateTracker::UnRegisterForIccLoaded()
         TELEPHONY_LOGE("SimStateTracker::can not get SimFileManager");
         return false;
     }
-    simFileManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_RECORDS_LOADED);
+    simFileManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
     return true;
 }
 } // namespace Telephony

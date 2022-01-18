@@ -30,5 +30,5 @@ typedef enum {
     HDF_ERR_INVALID_PARAM = -3 /* Invalid parameter. */
 } HDF_STATUS;
 
-typedef enum { CORE_SERVICE_ERROR = 0, CORE_SERVICE_SUCCESS = 1 } CoreServiceLteOptStatus;
+typedef enum { CORE_SERVICE_SUCCESS = 0, CORE_SERVICE_ERROR = 1 } CoreServiceLteOptStatus;
 #endif

@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace Telephony {
 IccDiallingNumbersCache::IccDiallingNumbersCache(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<ISimFileManager> simFileManager)
+    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimFileManager> simFileManager)
     : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager)
 {
     InitFileTypeMap();
@@ -36,8 +36,7 @@ void IccDiallingNumbersCache::Init()
         TELEPHONY_LOGE("IccDiallingNumbersCache int get null pointer");
         return;
     }
-    std::shared_ptr<SimFileManager> fileMannager = std::static_pointer_cast<SimFileManager>(simFileManager_);
-    diallingNumbersHandler_ = fileMannager->ObtainDiallingNumberHandler();
+    diallingNumbersHandler_ = simFileManager_->ObtainDiallingNumberHandler();
     if (diallingNumbersHandler_ == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersCache failed to InitDiallingNumbersLoader");
         return;
@@ -53,7 +52,7 @@ void IccDiallingNumbersCache::Init()
         TELEPHONY_LOGE("IccDiallingNumbersCache failed to create usimpdiallingnumbers.");
         return;
     }
-    std::shared_ptr<IccFileController> fileController = fileMannager->GetIccFileController();
+    std::shared_ptr<IccFileController> fileController = simFileManager_->GetIccFileController();
     usimDiallingNumberSrv_->SetFileControllerAndDiallingNumberHandler(fileController, diallingNumbersHandler_);
     loaderLoop->Run();
 }

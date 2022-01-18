@@ -19,14 +19,14 @@
 #include "event_handler.h"
 #include "inner_event.h"
 #include "i_tel_ril_manager.h"
-#include "i_sim_state_manager.h"
+#include "sim_state_manager.h"
 #include "want.h"
 
 namespace OHOS {
 namespace Telephony {
-const int MSG_STK_TERMINAL_RESPONSE = 1;
-const int MSG_STK_CMD_ENVELOPE = 2;
-const int MSG_STK_CONTROLLER_IS_READY = 3;
+const int MSG_SIM_STK_TERMINAL_RESPONSE = 1;
+const int MSG_SIM_STK_ENVELOPE = 2;
+const int MSG_SIM_STK_IS_READY = 3;
 
 class StkController : public AppExecFwk::EventHandler {
 public:
@@ -34,9 +34,9 @@ public:
     ~StkController();
     void Init(int slotId);
     void SetRilAndSimStateManager(std::shared_ptr<Telephony::ITelRilManager> ril,
-        const std::shared_ptr<Telephony::ISimStateManager> simstateMgr);
-    bool SendTerminalResponseCmd(const std::string &strCmd);
-    bool SendEnvelopeCmd(const std::string &strCmd);
+        const std::shared_ptr<Telephony::SimStateManager> simstateMgr);
+    bool SendTerminalResponseCmd(int32_t slotId, const std::string &strCmd);
+    bool SendEnvelopeCmd(int32_t slotId, const std::string &strCmd);
 
 private:
     void RegisterEvents();
@@ -52,7 +52,7 @@ private:
 
 private:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
-    std::shared_ptr<Telephony::ISimStateManager> simStateManager_ = nullptr;
+    std::shared_ptr<Telephony::SimStateManager> simStateManager_ = nullptr;
     int slotId_ = 0;
     const std::string ACTION_SESSION_END = "usual.event.telpnony.STK_SESSION_END";
     const std::string ACTION_ALPHA_IDENTIFIER = "usual.event.telpnony.STK_ALPHA_IDENTIFIER";

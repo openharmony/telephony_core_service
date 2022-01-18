@@ -23,7 +23,7 @@ namespace Telephony {
 class SimFile : public IccFile {
 public:
     SimFile(
-        const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<ISimStateManager> simStateManager);
+        const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager);
     void Init();
     void StartLoad();
     std::string ObtainMsisdnNumber();

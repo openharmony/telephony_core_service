@@ -19,22 +19,18 @@
 #include <memory>
 #include "want.h"
 #include "event_handler.h"
-#include "i_sim_file_manager.h"
+#include "i_sim_manager.h"
 #include "network_search_state.h"
 
 namespace OHOS {
 namespace Telephony {
 class OperatorName {
 public:
-    OperatorName(std::shared_ptr<NetworkSearchState> networkSearchState,
-        std::shared_ptr<ISimFileManager> simFileManager, std::weak_ptr<NetworkSearchManager> networkSearchManager);
+    OperatorName(std::shared_ptr<NetworkSearchState> networkSearchState, std::shared_ptr<ISimManager> simManager,
+        std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId);
     virtual ~OperatorName() = default;
     void HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void NotifySpnChanged();
-    inline void SetPhoneType(PhoneType phoneType)
-    {
-        phoneType_ = phoneType;
-    }
 
 private:
     void GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const;
@@ -52,7 +48,7 @@ private:
 
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
-    std::shared_ptr<ISimFileManager> simFileManager_ = nullptr;
+    std::shared_ptr<ISimManager> simManager_ = nullptr;
     std::string curPlmn_ = "";
     bool curPlmnShow_ = false;
     std::string curSpn_ = "";
@@ -60,8 +56,9 @@ private:
     RegServiceState curRegState_ = RegServiceState::REG_STATE_UNKNOWN;
     int32_t curSpnRule_ = -1;
     sptr<NetworkState> networkState_ = nullptr;
-    PhoneType phoneType_ = PhoneType::PHONE_TYPE_IS_NONE;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
+    int32_t slotId_ = 0;
+    std::string csSpnFormat_;
 };
 } // namespace Telephony
 } // namespace OHOS

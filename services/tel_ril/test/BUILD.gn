@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
@@ -37,13 +38,8 @@ ohos_executable("tel_ril_test") {
     "//base/telephony/ril_adapter/interfaces/innerkits/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/include",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/network_search",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/sim",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/core",
-    "$TELEPHONY_CORE_SERVICE_ROOT/common/core",
-    "$TELEPHONY_CORE_SERVICE_ROOT/common/cellular_data",
-    "$TELEPHONY_CORE_SERVICE_ROOT/common/network_search",
-    "$TELEPHONY_CORE_SERVICE_ROOT/common/sim",
+    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/include",
+    "$TELEPHONY_CORE_SERVICE_ROOT/frameworks/native/include",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/include",
     "//base/telephony/core_service/interfaces/innerkits/state_registry",
     "$TELEPHONY_SIM_ROOT/include",
@@ -57,15 +53,16 @@ ohos_executable("tel_ril_test") {
     "$HDF_FRAMEWORKS/include/osal",
   ]
 
-  defines = [
+  defines += [
     "TELEPHONY_LOG_TAG = \"TelRilTest\"",
     "LOG_DOMAIN = 0xD002B01",
   ]
 
   deps = [
-    #    "//base/telephony/ril_adapter/services/hril:hril",
+    "$hdf_uhdf_path/hdi:libhdi",
     "//base/telephony/core_service:tel_core_service",
-    "//base/telephony/core_service/utils:libtelephony_common",
+    "//base/telephony/core_service/utils:libtel_common",
+    "//base/telephony/ril_adapter/services/hril:hril",
     "//utils/native/base:utils",
   ]
 
