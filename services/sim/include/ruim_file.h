@@ -23,7 +23,7 @@ namespace Telephony {
 class RuimFile : public IccFile {
 public:
     RuimFile(
-        const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<ISimStateManager> simStateManager);
+        const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager);
     void Init();
     void StartLoad();
     std::string ObtainSimOperator();

@@ -16,11 +16,11 @@
 #include <unistd.h>
 #include <gtest/gtest.h>
 #include <string_ex.h>
-#include "core_service_client.h"
 #include "iservice_registry.h"
-#include "network_search_test_callback_stub.h"
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
+#include "core_service_client.h"
+#include "network_search_test_callback_stub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -388,7 +388,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0100, Function
     } else {
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
         bool isOn = false;
-        bool result = NetworkSearchTest::telephonyService_->SetRadioState(isOn, callback);
+        bool result = NetworkSearchTest::telephonyService_->SetRadioState(SLOT_ID, isOn, callback);
         if (result) {
             callback->WaitFor(WAIT_TIME_SECOND_LONG);
             bool syncResult = callback->GetBoolResult();
@@ -398,7 +398,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0100, Function
             std::cout << "TelephonyTestService SetRadioState return fail" << std::endl;
         }
 
-        result = NetworkSearchTest::telephonyService_->GetRadioState(callback);
+        result = NetworkSearchTest::telephonyService_->GetRadioState(SLOT_ID, callback);
         if (result) {
             callback->WaitFor(WAIT_TIME_SECOND_LONG);
             bool syncResult = callback->GetBoolResult();
@@ -424,7 +424,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0200, Function
     } else {
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
         bool isOn = true;
-        bool result = NetworkSearchTest::telephonyService_->SetRadioState(isOn, callback);
+        bool result = NetworkSearchTest::telephonyService_->SetRadioState(SLOT_ID, isOn, callback);
         if (result) {
             callback->WaitFor(WAIT_TIME_SECOND_LONG);
             bool syncResult = callback->GetBoolResult();
@@ -450,7 +450,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0100, Function
     } else {
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
         bool isOn = true;
-        bool result = NetworkSearchTest::telephonyService_->SetRadioState(isOn, callback);
+        bool result = NetworkSearchTest::telephonyService_->SetRadioState(SLOT_ID, isOn, callback);
         if (result) {
             callback->WaitFor(WAIT_TIME_SECOND_LONG);
             bool syncResult = callback->GetBoolResult();
@@ -460,7 +460,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0100, Function
             std::cout << "TelephonyTestService SetRadioState return fail" << std::endl;
         }
 
-        result = NetworkSearchTest::telephonyService_->GetRadioState(callback);
+        result = NetworkSearchTest::telephonyService_->GetRadioState(SLOT_ID, callback);
         if (result) {
             callback->WaitFor(WAIT_TIME_SECOND);
             bool syncResult = callback->GetBoolResult();
@@ -541,7 +541,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SendUpdateCellLocationReques
         std::cout << "TelephonyTestService Remote service is null" << std::endl;
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        bool result = NetworkSearchTest::telephonyService_->SendUpdateCellLocationRequest();
+        bool result = NetworkSearchTest::telephonyService_->SendUpdateCellLocationRequest(SLOT_ID);
         std::cout << "TelephonyTestService SendUpdateCellLocationRequest result:" << result << std::endl;
         ASSERT_TRUE(result);
     }

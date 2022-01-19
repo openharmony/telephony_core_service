@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "radio_cap_controller.h"
+
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -20,7 +21,7 @@ namespace Telephony {
 std::mutex RadioCapController::ctx_;
 std::condition_variable RadioCapController::cv_;
 
-RadioCapController::RadioCapController(std::shared_ptr<ITelRilManager> telRilManager,
+RadioCapController::RadioCapController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
     const std::shared_ptr<AppExecFwk::EventRunner> &runner)
     : AppExecFwk::EventHandler(runner), telRilManager_(telRilManager)
 {
@@ -29,7 +30,7 @@ RadioCapController::RadioCapController(std::shared_ptr<ITelRilManager> telRilMan
     }
     InitMemberFunc();
     responseReady_ = false;
-    maxCount_ = CoreManager::GetInstance().getCore(CoreManager::DEFAULT_SLOT_ID)->GetMaxSimCount();
+    maxCount_ = SIM_SLOT_COUNT;
     for (int32_t i = 0; i < maxCount_; i++) {
         SimProtocolRequest protocol;
         protocol.slotId = i;
@@ -94,25 +95,36 @@ bool RadioCapController::RadioCapControllerPoll()
 
 bool RadioCapController::SetRadioProtocol(int32_t slotId, int32_t protocol)
 {
-    TELEPHONY_LOGI("RadioCapController::SetRadioProtocol slotId = %{public}d, protocol = %{public}d", slotId, protocol);
+    TELEPHONY_LOGI(
+        "RadioCapController::SetRadioProtocol slotId = %{public}d, protocol = %{public}d", slotId, protocol);
     if (telRilManager_ == nullptr) {
         TELEPHONY_LOGE("RadioCapController::SetRadioProtocol nullptr");
+        radioProtocolResponse_ = false;
+        EndCommunicate();
         return false;
     }
-    SendEvent(MSG_SIM_TIME_OUT_PROTOCOL, SET_PROTOCOL_OUT_TIME, Priority::LOW);
+    localSlot_ = slotId;
+    localProtocol_ = protocol;
+    if (count_ == CLEAR) {
+        SendEvent(MSG_SIM_TIME_OUT_PROTOCOL, SET_PROTOCOL_OUT_TIME, Priority::LOW);
+    }
     auto event = AppExecFwk::InnerEvent::Get(RadioCapControllerConstant::MSG_SIM_SET_RADIO_PROTOCOL);
     event->SetOwner(shared_from_this());
-    for (int32_t i = 0; i < maxCount_; i++) {
-        oldProtocol_[i].phase = SET_PROTOCOL;
-        TELEPHONY_LOGI("RadioCapController:: telRilManager SetRadioProtocol");
-        telRilManager_->SetRadioProtocol(oldProtocol_[i], event);
-        ClearProtocolCache(newProtocol_[i]);
-        newProtocol_[i].slotId = i;
-        if (slotId == i) {
-            newProtocol_[i].protocol = protocol;
-        } else {
-            newProtocol_[i].protocol = MIN_PROTOCOL;
-        }
+    if (count_ >= maxCount_) {
+        TELEPHONY_LOGI("RadioCapController::SetRadioProtocol success");
+        radioProtocolResponse_ = true;
+        EndCommunicate();
+        return true;
+    }
+    oldProtocol_[count_].phase = SET_PROTOCOL;
+    TELEPHONY_LOGI("RadioCapController:: telRilManager_ SetRadioProtocol");
+    telRilManager_->SetRadioProtocol(slotId, oldProtocol_[count_], event);
+    ClearProtocolCache(newProtocol_[count_]);
+    newProtocol_[count_].slotId = count_;
+    if (slotId == count_) {
+        newProtocol_[count_].protocol = protocol;
+    } else {
+        newProtocol_[count_].protocol = MIN_PROTOCOL;
     }
     return true;
 }
@@ -138,9 +150,9 @@ void RadioCapController::ProcessSetRadioProtocolDone(const AppExecFwk::InnerEven
     auto newEvent = AppExecFwk::InnerEvent::Get(RadioCapControllerConstant::MSG_SIM_UPDATE_RADIO_PROTOCOL);
     newEvent->SetOwner(shared_from_this());
     newProtocol_[param->slotId].phase = UPDATE_PROTOCOL;
-    TELEPHONY_LOGI("RadioCapController::send again = %{public}d %{public}d %{public}d",
-        param->slotId, newProtocol_[param->slotId].phase, newProtocol_[param->slotId].protocol);
-    telRilManager_->SetRadioProtocol(newProtocol_[param->slotId], newEvent);
+    TELEPHONY_LOGI("RadioCapController::send again = %{public}d %{public}d %{public}d", param->slotId,
+        newProtocol_[param->slotId].phase, newProtocol_[param->slotId].protocol);
+    telRilManager_->SetRadioProtocol(param->slotId, newProtocol_[param->slotId], newEvent);
 }
 
 void RadioCapController::ProcessUpdateRadioProtocolDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -158,27 +170,25 @@ void RadioCapController::ProcessUpdateRadioProtocolDone(const AppExecFwk::InnerE
     }
     TELEPHONY_LOGI("RadioCapController::ProcessUpdateRadioProtocolDone = %{public}d + %{public}d",
         param->slotId, param->result);
-    if (param->result == 0) {
+    if (param->result == SUCCEED) {
         oldProtocol_ = newProtocol_;
     }
     bool opposite = param->result;
-    radioProtocolResponse_[param->slotId] = !opposite;
-    bool complete = true;
-    for (int32_t i = 0; i < maxCount_; i++) {
-        if (!radioProtocolResponse_[i]) {
-            complete = false;
-            i = maxCount_;
-        }
+    if (opposite) { // 0 means success , 1 means failed
+        TELEPHONY_LOGE("RadioCapController::ProcessUpdateRadioProtocolDone abort");
+        EndCommunicate();
+        return;
     }
-    if (complete) {
-        radioProtocolResponse_[maxCount_] = true;
+    count_++;
+    if (!SetRadioProtocol(localSlot_, localProtocol_)) {
+        TELEPHONY_LOGE("RadioCapController::SetRadioProtocol() update event is nullptr");
         EndCommunicate();
     }
 }
 
 void RadioCapController::ProcessProtocolTimeOutDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    radioProtocolResponse_[maxCount_] = false;
+    radioProtocolResponse_ = false;
     RadioCapControllerContinue();
     cv_.notify_all();
 }
@@ -193,10 +203,10 @@ void RadioCapController::ProcessActiveSimTimeOutDone(const AppExecFwk::InnerEven
 
 bool RadioCapController::GetRadioProtocolResponse()
 {
-    return radioProtocolResponse_[maxCount_];
+    return radioProtocolResponse_;
 }
 
-void RadioCapController::ClearProtocolCache(SimProtocolRequest& simProtocolRequest)
+void RadioCapController::ClearProtocolCache(SimProtocolRequest &simProtocolRequest)
 {
     simProtocolRequest.phase = INVALID_VALUE;
     simProtocolRequest.protocol = INVALID_VALUE;
@@ -206,16 +216,13 @@ void RadioCapController::EndCommunicate()
 {
     RemoveEvent(MSG_SIM_TIME_OUT_PROTOCOL);
     RadioCapControllerContinue();
+    count_ = CLEAR;
     cv_.notify_all();
 }
 
 void RadioCapController::ResetResponse()
 {
-    radioProtocolResponse_.clear();
-    bool radioProtocolResponse = false;
-    for (int32_t i = 0; i <= maxCount_; i++) {
-        radioProtocolResponse_.emplace_back(radioProtocolResponse);
-    }
+    radioProtocolResponse_ = false;
 }
 
 bool RadioCapController::SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable)
@@ -228,7 +235,7 @@ bool RadioCapController::SetActiveSimToRil(int32_t slotId, int32_t type, int32_t
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_SET_ACTIVE);
     event->SetOwner(shared_from_this());
     SendEvent(MSG_SIM_TIME_OUT_ACTIVE, SET_ACTIVE_OUT_TIME, Priority::LOW);
-    telRilManager_->SetActiveSim(type, enable, event);
+    telRilManager_->SetActiveSim(slotId, type, enable, event);
     return true;
 }
 

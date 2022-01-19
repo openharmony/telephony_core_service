@@ -27,9 +27,7 @@
 #include "common_event_manager.h"
 #include "want.h"
 #include "telephony_log_wrapper.h"
-#include "core_manager.h"
-#include "i_sim_account_manager.h"
-#include "i_sim_file_manager.h"
+#include "sim_file_manager.h"
 #include "sim_constant.h"
 
 namespace OHOS {
@@ -46,7 +44,7 @@ static const std::string CARRIER_VALUE = "value";
 
 class OperatorConf {
 public:
-    OperatorConf(std::shared_ptr<ISimFileManager> simFileManager);
+    OperatorConf(std::shared_ptr<SimFileManager> simFileManager);
     virtual ~OperatorConf();
     bool GetOperatorConfigs(int32_t slotId, OperatorConfig &poc);
 
@@ -61,7 +59,7 @@ private:
     static const int32_t MNC_LENGTH = 2;
     static const int32_t MNC_THREE = 3;
     static const int32_t MCC_LENGTH = 3;
-    std::shared_ptr<ISimFileManager> simFileManager_ = nullptr;
+    std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -19,16 +19,19 @@
 #include <unistd.h>
 #include <ipc_object_stub.h>
 
+#include "tel_ril_manager.h"
+
 namespace OHOS {
 namespace Telephony {
 class HdfDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
+    HdfDeathRecipient(sptr<TelRilManager> telRilManager);
     HdfDeathRecipient(int32_t slotId);
     ~HdfDeathRecipient() = default;
     void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
 
 private:
-    int32_t slotId_ = 0;
+    sptr<TelRilManager> telRilManager_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

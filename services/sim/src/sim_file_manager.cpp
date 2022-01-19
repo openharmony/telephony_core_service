@@ -15,10 +15,13 @@
 
 #include "sim_file_manager.h"
 
+#include "network_state.h"
+#include "radio_event.h"
+
 namespace OHOS {
 namespace Telephony {
 SimFileManager::SimFileManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<Telephony::ISimStateManager> state)
+    std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<Telephony::SimStateManager> state)
     : AppExecFwk::EventHandler(runner), telRilManager_(telRilManager), simStateManager_(state)
 {
     if (simStateManager_ == nullptr) {
@@ -46,7 +49,7 @@ void SimFileManager::Init(int slotId)
         TELEPHONY_LOGE("SimFileManager get NULL ITelRilManager.");
         return;
     }
-    CardType cardType = simStateManager_->GetCardType(slotId_);
+    CardType cardType = simStateManager_->GetCardType();
     TELEPHONY_LOGI("SimFileManager current card type is %{public}d", cardType);
     if ((cardType == static_cast<CardType>(0)) || (cardType == CardType::UNKNOWN_CARD)) {
         cardType = CardType::SINGLE_MODE_USIM_CARD; // default card
@@ -68,8 +71,9 @@ void SimFileManager::Init(int slotId)
     stateRecord_ = HandleRunningState::STATE_RUNNING;
     stateHandler_ = HandleRunningState::STATE_RUNNING;
 
-    simStateManager_->RegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_CARD_TYPE_CHANGE);
-    telRilManager_->RegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_VOICE_TECH_CHANGED, nullptr);
+    simStateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_CARD_TYPE_CHANGE);
+    telRilManager_->RegisterCoreNotify(
+        slotId, shared_from_this(), RadioEvent::RADIO_VOICE_TECH_CHANGED, nullptr);
     TELEPHONY_LOGI("SimFileManager::Init() end");
 }
 
@@ -127,15 +131,13 @@ bool SimFileManager::InitIccFileController(SimFileManager::IccType type)
     auto iccFileConIt = iccFileControllerCache_.find(type);
     if (iccFileConIt == iccFileControllerCache_.end()) {
         if (type == SimFileManager::IccType::ICC_TYPE_CDMA) { // ruim 30 usim 20 isim 60
-            fileController_ = std::make_shared<RuimFileController>(eventLoopFileController_);
+            fileController_ = std::make_shared<RuimFileController>(eventLoopFileController_, slotId_);
         } else if (type == SimFileManager::IccType::ICC_TYPE_IMS) {
-            fileController_ = std::make_shared<IsimFileController>(eventLoopFileController_);
-        } else if (type == SimFileManager::IccType::ICC_TYPE_USIM) {
-            fileController_ = std::make_shared<UsimFileController>(eventLoopFileController_);
+            fileController_ = std::make_shared<IsimFileController>(eventLoopFileController_, slotId_);
         } else if (type == SimFileManager::IccType::ICC_TYPE_GSM) {
-            fileController_ = std::make_shared<SimFileController>(eventLoopFileController_);
+            fileController_ = std::make_shared<SimFileController>(eventLoopFileController_, slotId_);
         } else {
-            fileController_ = std::make_shared<UsimFileController>(eventLoopFileController_);
+            fileController_ = std::make_shared<UsimFileController>(eventLoopFileController_, slotId_);
         }
         iccFileControllerCache_.insert(std::make_pair(type, fileController_));
     } else {
@@ -150,7 +152,7 @@ bool SimFileManager::InitIccFileController(SimFileManager::IccType type)
     return true;
 }
 
-std::u16string SimFileManager::GetSimOperatorNumeric(int32_t slotId)
+std::u16string SimFileManager::GetSimOperatorNumeric()
 {
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::GetSimOperatorNumeric simFile nullptr");
@@ -162,7 +164,7 @@ std::u16string SimFileManager::GetSimOperatorNumeric(int32_t slotId)
     return Str8ToStr16(result);
 }
 
-std::u16string SimFileManager::GetISOCountryCodeForSim(int32_t slotId)
+std::u16string SimFileManager::GetISOCountryCodeForSim()
 {
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::GetISOCountryCodeForSim simFile nullptr");
@@ -174,7 +176,7 @@ std::u16string SimFileManager::GetISOCountryCodeForSim(int32_t slotId)
     return Str8ToStr16(result);
 }
 
-std::u16string SimFileManager::GetSimSpn(int32_t slotId)
+std::u16string SimFileManager::GetSimSpn()
 {
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::GetSimSpn simFile nullptr");
@@ -186,7 +188,7 @@ std::u16string SimFileManager::GetSimSpn(int32_t slotId)
     return Str8ToStr16(result);
 }
 
-std::u16string SimFileManager::GetSimIccId(int32_t slotId)
+std::u16string SimFileManager::GetSimIccId()
 {
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::GetSimIccId simFile nullptr");
@@ -198,7 +200,7 @@ std::u16string SimFileManager::GetSimIccId(int32_t slotId)
     return Str8ToStr16(result);
 }
 
-std::u16string SimFileManager::GetIMSI(int32_t slotId)
+std::u16string SimFileManager::GetIMSI()
 {
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::GetIMSI simFile nullptr");
@@ -223,7 +225,7 @@ std::u16string SimFileManager::GetLocaleFromDefaultSim()
     return Str8ToStr16(result);
 }
 
-std::u16string SimFileManager::GetSimGid1(int32_t slotId)
+std::u16string SimFileManager::GetSimGid1()
 {
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::GetSimGid1 simFile nullptr");
@@ -235,7 +237,7 @@ std::u16string SimFileManager::GetSimGid1(int32_t slotId)
     return Str8ToStr16(result);
 }
 
-std::u16string SimFileManager::GetSimTelephoneNumber(int32_t slotId)
+std::u16string SimFileManager::GetSimTelephoneNumber()
 {
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::GetSimTelephoneNumber simFile nullptr");
@@ -247,7 +249,7 @@ std::u16string SimFileManager::GetSimTelephoneNumber(int32_t slotId)
     return Str8ToStr16(result);
 }
 
-std::u16string SimFileManager::GetSimTeleNumberIdentifier(const int32_t slotId)
+std::u16string SimFileManager::GetSimTeleNumberIdentifier()
 {
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::GetSimTeleNumberIdentifier simFile nullptr");
@@ -260,7 +262,7 @@ std::u16string SimFileManager::GetSimTeleNumberIdentifier(const int32_t slotId)
     return Str8ToStr16(result);
 }
 
-std::u16string SimFileManager::GetVoiceMailIdentifier(int32_t slotId)
+std::u16string SimFileManager::GetVoiceMailIdentifier()
 {
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::GetVoiceMailIdentifier simFile nullptr");
@@ -273,7 +275,7 @@ std::u16string SimFileManager::GetVoiceMailIdentifier(int32_t slotId)
     return Str8ToStr16(result);
 }
 
-std::u16string SimFileManager::GetVoiceMailNumber(int32_t slotId)
+std::u16string SimFileManager::GetVoiceMailNumber()
 {
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::GetVoiceMailNumber simFile nullptr");
@@ -334,10 +336,9 @@ void SimFileManager::SetImsi(std::string imsi)
     simFile_->UpdateImsi(imsi);
 }
 
-bool SimFileManager::SetVoiceMailInfo(
-    int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber)
+bool SimFileManager::SetVoiceMailInfo(const std::u16string &mailName, const std::u16string &mailNumber)
 {
-    if (simFile_ == nullptr || !simFile_->HasSimCard(slotId)) {
+    if (simFile_ == nullptr || !simStateManager_->HasSimCard()) {
         TELEPHONY_LOGE("SimFileManager::SetVoiceMail simFile nullptr");
         return false;
     }
@@ -351,7 +352,13 @@ bool SimFileManager::SetVoiceMailInfo(
 bool SimFileManager::InitDiallingNumberHandler()
 {
     if (fileController_ == nullptr) {
+        TELEPHONY_LOGI("InitDiallingNumberHandler null fileController");
         return false;
+    }
+    if (diallingNumberHandler_ != nullptr) {
+        TELEPHONY_LOGI("InitDiallingNumberHandler update fileController");
+        diallingNumberHandler_->UpdateFileController(fileController_);
+        return true;
     }
     std::shared_ptr<AppExecFwk::EventRunner> loaderLoop = AppExecFwk::EventRunner::Create("msisdnLoader");
     if (loaderLoop.get() == nullptr) {
@@ -377,15 +384,15 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     int id = event->GetInnerEventId();
     TELEPHONY_LOGI("SimFileManager::ProcessEvent id %{public}d", id);
     switch (id) {
-        case ObserverHandler::RADIO_VOICE_TECH_CHANGED: {
+        case RadioEvent::RADIO_VOICE_TECH_CHANGED: {
             TELEPHONY_LOGI("SimFileManager receive RADIO_VOICE_TECH_CHANGED");
             std::shared_ptr<VoiceRadioTechnology> tech = event->GetSharedObject<VoiceRadioTechnology>();
             SimFileManager::IccType iccType = GetIccTypeByTech(tech);
             ChangeSimFileByCardType(iccType);
             break;
         }
-        case ObserverHandler::RADIO_CARD_TYPE_CHANGE: {
-            CardType cardType = simStateManager_->GetCardType(slotId_);
+        case RadioEvent::RADIO_CARD_TYPE_CHANGE: {
+            CardType cardType = simStateManager_->GetCardType();
             TELEPHONY_LOGI("SimFileManager GetCardType is %{public}d", cardType);
             SimFileManager::IccType iccType = GetIccTypeByCardType(cardType);
             ChangeSimFileByCardType(iccType);
@@ -396,8 +403,8 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
 }
 
-std::shared_ptr<ISimFileManager> SimFileManager::CreateInstance(
-    const std::shared_ptr<ITelRilManager> &ril, const std::shared_ptr<ISimStateManager> &simState)
+std::shared_ptr<SimFileManager> SimFileManager::CreateInstance(
+    const std::shared_ptr<ITelRilManager> &ril, const std::shared_ptr<SimStateManager> &simState)
 {
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop = AppExecFwk::EventRunner::Create("simFileMgrLoop");
     if (eventLoop.get() == nullptr) {
@@ -443,8 +450,6 @@ void SimFileManager::ChangeSimFileByCardType(SimFileManager::IccType type)
 SimFileManager::IccType SimFileManager::GetIccTypeByCardType(CardType type)
 {
     switch (type) {
-        case CardType::SINGLE_MODE_USIM_CARD:
-            return SimFileManager::IccType::ICC_TYPE_USIM;
         case CardType::SINGLE_MODE_RUIM_CARD:
             return SimFileManager::IccType::ICC_TYPE_CDMA;
         case CardType::SINGLE_MODE_ISIM_CARD:
@@ -455,10 +460,11 @@ SimFileManager::IccType SimFileManager::GetIccTypeByCardType(CardType type)
         case CardType::CU_DUAL_MODE_CARD:
         case CardType::DUAL_MODE_TELECOM_LTE_CARD:
         case CardType::DUAL_MODE_UG_CARD:
+            return SimFileManager::IccType::ICC_TYPE_GSM;
         default:
             break;
     }
-    return SimFileManager::IccType::ICC_TYPE_GSM;
+    return SimFileManager::IccType::ICC_TYPE_USIM;
 }
 
 SimFileManager::IccType SimFileManager::GetIccTypeByTech(const std::shared_ptr<VoiceRadioTechnology> &tech)

@@ -16,38 +16,40 @@
 #ifndef TEL_RIL_MODEM_H
 #define TEL_RIL_MODEM_H
 
-#include "i_tel_ril_manager.h"
-#include "tel_ril_base.h"
 #include "hril_modem_parcel.h"
+#include "tel_ril_base.h"
+#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
 class TelRilModem : public TelRilBase {
 public:
-    TelRilModem(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
+    TelRilModem(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
     ~TelRilModem() = default;
     /**
      * @brief Turn on and off radio response (for flight mode)
      * @param data is HDF service callback message
      */
-    void SetRadioStateResponse(MessageParcel &data);
-    void GetRadioStateResponse(MessageParcel &data);
-    void ShutDown(const AppExecFwk::InnerEvent::Pointer &response) {}
-    void RadioStateUpdated(MessageParcel &data);
-    void VoiceRadioTechUpdated(MessageParcel &data);
+    int32_t SetRadioStateResponse(MessageParcel &data);
+    int32_t GetRadioStateResponse(MessageParcel &data);
+    int32_t ShutDown(const AppExecFwk::InnerEvent::Pointer &response)
+    {
+        return 0;
+    }
+    int32_t RadioStateUpdated(MessageParcel &data);
+    int32_t VoiceRadioTechUpdated(MessageParcel &data);
     /**
      * @brief Radio Status Change response
      * @param data is HDF service callback message
      */
-    void SetRadioState(int fun, int rst, const AppExecFwk::InnerEvent::Pointer &response);
-    void GetRadioState(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetImei(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetMeid(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetImeiResponse(MessageParcel &data);
-    void GetMeidResponse(MessageParcel &data);
-    void GetVoiceRadioTechnologyResponse(MessageParcel &data);
-    void ProcessCommonRespOrNotify(uint32_t code, MessageParcel &data);
+    int32_t SetRadioState(int fun, int rst, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetRadioState(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetImei(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetMeid(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetImeiResponse(MessageParcel &data);
+    int32_t GetMeidResponse(MessageParcel &data);
+    int32_t GetVoiceRadioTechnologyResponse(MessageParcel &data);
     bool IsCommonRespOrNotify(uint32_t code);
     ModemPowerState radioState_ = ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;
 
@@ -55,10 +57,6 @@ private:
     void AddHandlerToMap();
     bool IsCommonResponse(uint32_t code);
     bool IsCommonNotification(uint32_t code);
-
-private:
-    using Func = void (TelRilModem::*)(MessageParcel &data);
-    std::map<uint32_t, Func> memberFuncMap_;
 };
 } // namespace Telephony
 } // namespace OHOS

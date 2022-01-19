@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 
 group("common_target") {
-  deps = [ ":libtelephony_common" ]
+  deps = [ ":libtel_common" ]
 }
 
 config("telephony_common_config") {
@@ -25,8 +25,9 @@ config("telephony_common_config") {
   ]
 }
 
-ohos_shared_library("libtelephony_common") {
+ohos_shared_library("libtel_common") {
   sources = [
+    "common/src/desensitize_string_stream.cpp",
     "common/src/str_convert.cpp",
     "common/src/telephony_permission.cpp",
     "log/src/telephony_log_wrapper.cpp",
