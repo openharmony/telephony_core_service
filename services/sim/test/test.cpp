@@ -27,7 +27,6 @@
 #include "string_ex.h"
 #include "system_ability_definition.h"
 #include "want.h"
-#include "sim_rdb_helper.h"
 #include "sim_account_manager.h"
 #include "sim_state_type.h"
 
@@ -37,9 +36,9 @@ namespace OHOS {
 namespace Telephony {
 using CmdProcessFunc = bool (*)();
 static sptr<ICoreService> g_telephonyService = nullptr;
-std::unique_ptr<Telephony::ISimAccountManager> g_simAccountManager = nullptr;
+std::unique_ptr<Telephony::SimAccountManager> g_simAccountManager = nullptr;
 
-const int32_t SLOT_ID = CoreManager::DEFAULT_SLOT_ID;
+const int32_t SLOT_ID = DEFAULT_SIM_SLOT_ID;
 const int32_t DEFAULT_VALUE = 0;
 const int32_t FIX_DAILING = 2;
 static bool g_simDiallingNumbersRead = false;
@@ -63,7 +62,6 @@ enum class InputCmd {
     INPUT_CHECK_LOCK = 24,
     INPUT_ENABLE_LOCK = 25,
     INPUT_REFRESHSIMSTATE = 26,
-    INPUT_SIM_RDB = 27,
     INPUT_UNLOCK_PIN2 = 31,
     INPUT_UNLOCK_PUK2 = 32,
     INPUT_ALTER_PIN2 = 33,
@@ -200,11 +198,11 @@ static bool TestGetCardType()
 static bool TestSetPrimarySlotId()
 {
     static int32_t testDefaultPrimarySlot = SLOT_ID;
-    std::cout << "please input Default Voice Slot Id" << std::endl;
+    std::cout << "please input Primary Slot Id" << std::endl;
     std::cin >> testDefaultPrimarySlot;
     bool result = g_telephonyService->SetPrimarySlotId(testDefaultPrimarySlot);
     string expect = result ? "success" : "fail";
-    std::cout << "TelephonyTestService Remote SetDefaultVoiceSlotId result [" << result << "] " << expect
+    std::cout << "TelephonyTestService Remote SetPrimarySlotId result [" << result << "] " << expect
               << std::endl;
     return true;
 }
@@ -239,7 +237,10 @@ static bool TestGetSimSpn()
 
 static bool TestGetSimIccId()
 {
-    std::u16string result = g_telephonyService->GetSimIccId(SLOT_ID);
+    int32_t slotId = 0;
+    std::cout << "please input soltid:"<<std::endl;
+    std::cin >> slotId;
+    std::u16string result = g_telephonyService->GetSimIccId(slotId);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote GetSimIccId result [" << str << "] " << expect << std::endl;
@@ -590,7 +591,7 @@ static bool TestGetActiveSimAccountInfoList()
 static bool TestGetOperatorConfig()
 {
     OperatorConfig oc;
-    bool result = g_telephonyService->GetOperatorConfigs(CoreManager::DEFAULT_SLOT_ID, oc);
+    bool result = g_telephonyService->GetOperatorConfigs(DEFAULT_SIM_SLOT_ID, oc);
     string expect = result ? "success" : "fail";
     std::cout << "TelephonyTestService Remote GetOperatorConfigs result [" << result << "] " << expect << std::endl;
     std::map<std::u16string, std::u16string>::iterator valueIt = oc.configValue.begin();
@@ -784,7 +785,7 @@ static bool TestRefreshSimState()
 static bool TestSetActiveSim()
 {
     int32_t enable = ACTIVE;
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::cout << "please input sim Id" << endl;
     std::cin >> slotId;
     std::cout << "\n Set active sim enable, Please input enable \n";
@@ -792,17 +793,6 @@ static bool TestSetActiveSim()
 
     bool result = g_telephonyService->SetActiveSim(slotId, enable);
     std::cout << "TestSetActiveSim(), result = " << result << endl;
-    return true;
-}
-
-static bool TestSimRdbClear()
-{
-    std::unique_ptr<SimRdbHelper> simDbHelper = std::make_unique<SimRdbHelper>();
-    if (simDbHelper == nullptr) {
-        std::cout << "clear failed" << std::endl;
-        return false;
-    }
-    simDbHelper->ClearData();
     return true;
 }
 
@@ -816,7 +806,7 @@ static bool TestGetMaxSimCount()
 
 static bool TestSendEnvelopeCmd()
 {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::cout << "please input sim Id" << endl;
     std::cin >> slotId;
     std::string cmd = "";
@@ -829,7 +819,7 @@ static bool TestSendEnvelopeCmd()
 
 static bool TestSendTerminalResponseCmd()
 {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::cout << "please input sim Id" << endl;
     std::cin >> slotId;
     std::string cmd = "";
@@ -909,10 +899,10 @@ static std::string GetSimLockPassword(int32_t testType)
 
 static bool TestUnlockSimLock()
 {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::cout << "please input sim Id" << endl;
     std::cin >> slotId;
-    if (slotId != CoreManager::DEFAULT_SLOT_ID) {
+    if (slotId != DEFAULT_SIM_SLOT_ID) {
         std::cout << "incorrect slot ID" << endl;
         return true;
     }
@@ -967,7 +957,6 @@ static void Prompt()
                  "24:GetLockState\n"
                  "25:SetLockState\n"
                  "26:RefreshSimState\n"
-                 "27:SimRdbClear\n"
                  "31:UnlockPin2\n"
                  "32:UnlockPuk2\n"
                  "33:AlterPin2\n"
@@ -1029,7 +1018,6 @@ static void InitFuncMap()
     g_funcMap[InputCmd::INPUT_GETACTIVEACCOUNTLIST] = TestGetActiveSimAccountInfoList;
     g_funcMap[InputCmd::INPUT_GETOPERATORCONFIG] = TestGetOperatorConfig;
     g_funcMap[InputCmd::INPUT_REFRESHSIMSTATE] = TestRefreshSimState;
-    g_funcMap[InputCmd::INPUT_SIM_RDB] = TestSimRdbClear;
     g_funcMap[InputCmd::INPUT_GET_VOICEMAIL_NAME] = TestGetVoiceMailIdentifier;
     g_funcMap[InputCmd::INPUT_GET_VOICEMAIL_NUMBER] = TestGetVoiceMailNumber;
     g_funcMap[InputCmd::INPUT_DIALLING_NUMBERS_GET] = TestQueryIccDiallingNumbers;

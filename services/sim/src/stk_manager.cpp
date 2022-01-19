@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace Telephony {
 StkManager::StkManager(std::shared_ptr<ITelRilManager> telRilManager,
-    std::shared_ptr<Telephony::ISimStateManager> simStateManager)
+    std::shared_ptr<Telephony::SimStateManager> simStateManager)
     : telRilManager_(telRilManager), simStateManager_(simStateManager)
 {
     TELEPHONY_LOGI("StkManager::StkManager()");
@@ -55,27 +55,27 @@ void StkManager::Init(int slotId)
     TELEPHONY_LOGI("StkManager::Init() end");
 }
 
-bool StkManager::SendEnvelopeCmd(const std::string &cmd)
+bool StkManager::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
 {
     TELEPHONY_LOGI("StkManager::SendEnvelopeCmd()");
     if (stkController_ == nullptr) {
         TELEPHONY_LOGE("StkManager::stkController_ is nullptr");
         return false;
     }
-    bool result = stkController_->SendEnvelopeCmd(cmd);
+    bool result = stkController_->SendEnvelopeCmd(slotId, cmd);
     TELEPHONY_LOGI("StkManager::SendEnvelopeCmd result:%{public}s ",
         (result ? "true" : "false"));
     return result;
 }
 
-bool StkManager::SendTerminalResponseCmd(const std::string &cmd)
+bool StkManager::SendTerminalResponseCmd(int32_t slotId, const std::string &cmd)
 {
     TELEPHONY_LOGI("StkManager::SendTerminalResponseCmd()");
     if (stkController_ == nullptr) {
         TELEPHONY_LOGE("StkManager::stkController_ is nullptr");
         return false;
     }
-    bool result = stkController_->SendTerminalResponseCmd(cmd);
+    bool result = stkController_->SendTerminalResponseCmd(slotId, cmd);
     TELEPHONY_LOGI("StkManager::SendTerminalResponseCmd result:%{public}s ",
         (result ? "true" : "false"));
     return result;

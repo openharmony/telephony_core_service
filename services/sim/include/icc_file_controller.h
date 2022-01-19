@@ -22,7 +22,6 @@
 #include "event_handler.h"
 #include "event_runner.h"
 #include "i_tel_ril_manager.h"
-#include "observer_handler.h"
 #include "sim_constant.h"
 #include "sim_data_type.h"
 #include "sim_utils.h"
@@ -32,7 +31,7 @@ namespace OHOS {
 namespace Telephony {
 class IccFileController : public AppExecFwk::EventHandler {
 public:
-    IccFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    IccFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int slotId);
     virtual void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     virtual ~IccFileController();
     void ObtainBinaryFile(int fileId, const AppExecFwk::InnerEvent::Pointer &event);
@@ -54,7 +53,7 @@ public:
         const std::string pin2, const AppExecFwk::InnerEvent::Pointer &onComplete);
     void UpdateBinaryFile(
         int fileId, const std::string data, int dataLength, const AppExecFwk::InnerEvent::Pointer &onComplete);
-    void SetRilManager(std::shared_ptr<Telephony::ITelRilManager> ril);
+    void SetRilManager(std::shared_ptr<ITelRilManager> ril);
     inline const static std::string NULLSTR = "";
 
 protected:
@@ -67,6 +66,7 @@ protected:
     const std::string DEDICATED_FILE_DIALLING_NUMBERS = "5F3A";
     const std::string DEDICATED_FILE_ADF = "7FFF";
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
+    int slotId_ = 0;
     virtual std::string ObtainElementFilePath(int efId) = 0;
     std::string ObtainElementFileForPublic(int efId);
     void SendResponse(std::shared_ptr<IccControllerHolder> holder, const IccFileData *fd);

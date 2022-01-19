@@ -18,24 +18,24 @@
 
 #include <iservice_registry.h>
 #include <iservmgr_hdi.h>
+#include <singleton.h>
 
+#include "i_tel_ril_manager.h"
 #include "tel_ril_call.h"
 #include "tel_ril_data.h"
 #include "tel_ril_modem.h"
 #include "tel_ril_network.h"
 #include "tel_ril_sim.h"
 #include "tel_ril_sms.h"
-#include "hril_vendor_network_defs.h"
 
 namespace OHOS {
 namespace Telephony {
-class TelRilManager : public OHOS::IPCObjectStub,
-                      public ITelRilManager,
+class TelRilManager : public ITelRilManager,
+                      public OHOS::IPCObjectStub,
                       public std::enable_shared_from_this<TelRilManager> {
 public:
     TelRilManager();
-    ~TelRilManager();
-
+    ~TelRilManager() = default;
     /**
      * @brief Oem Remote Request
      * @param code Number of retries remaining, must be equal to -1 if unknown
@@ -46,193 +46,200 @@ public:
      */
     int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, OHOS::MessageOption &option) override;
-    void TelRilSetParam(int32_t preferredNetworkType, int32_t cdmaSubscription, int32_t instanceId) override;
 
     /**
      * @brief Deal with the init_event,get ril_adapter service .
      */
     bool OnInit() override;
+    bool ConnectRilAdapterService() override;
+    bool ResetRemoteObject(void) override;
 
-    /**
-     * Send the request of CellularRadioIndication
-     *
-     * @return:Returns the value of the send_result.
-     */
-    int32_t SetCellularRadioIndication(bool isFirst);
+    int32_t RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what,
+        int32_t *obj) override;
+    int32_t UnRegisterCoreNotify(
+        int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int32_t what) override;
 
-    /**
-     * Send the request of CellularRadioResponse
-     *
-     */
-    int32_t SetCellularRadioResponse(bool isFirst);
+    int32_t SetRadioState(
+        int32_t slotId, int32_t fun, int32_t rst, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetRadioState(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what, void *obj) override;
-    void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what) override;
-
-    void SetRadioState(int fun, int rst, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void GetRadioState(const AppExecFwk::InnerEvent::Pointer &response) override;
-
-    void ShutDown(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t ShutDown(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     /**
      * @brief Get current Calls
      */
-    void GetCallList(const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t GetCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
 
     /**
      * @brief Dial a call
      *
      * @param string address
-     * @param int clirMode
+     * @param int32_t clirMode
      */
-    void Dial(std::string address, int clirMode, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t Dial(int32_t slotId, std::string address, int32_t clirMode,
+        const AppExecFwk::InnerEvent::Pointer &result) override;
 
     /**
      * @brief  Reject the Call
      */
-    void Reject(const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t Reject(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
 
     /**
      *  @brief Hang up the call
      *
      *  @param :int32_t gsmIndex
      */
-    void Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t Hangup(int32_t slotId, int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void Answer(const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t Answer(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void HoldCall(const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t HoldCall(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void UnHoldCall(const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t UnHoldCall(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void SwitchCall(const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t SwitchCall(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void CombineConference(int32_t callType, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t CombineConference(
+        int32_t slotId, int32_t callType, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void SeparateConference(
-        int32_t callIndex, int32_t callType, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t SeparateConference(
+        int32_t slotId, int32_t callIndex, int32_t callType, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void CallSupplement(int32_t type, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t CallSupplement(int32_t slotId, int32_t type, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void GetCallWaiting(const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t GetCallWaiting(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void SetCallWaiting(const int32_t activate, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t SetCallWaiting(
+        int32_t slotId, const int32_t activate, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void GetCallTransferInfo(const int32_t reason, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t GetCallTransferInfo(
+        int32_t slotId, const int32_t reason, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void SetCallTransferInfo(const int32_t reason, const int32_t mode, std::string number, const int32_t classx,
+    int32_t SetCallTransferInfo(int32_t slotId, const CallTransferParam &callTransfer,
         const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void GetClip(const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t GetClip(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void SetClip(const int32_t action, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t SetClip(int32_t slotId, const int32_t action, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void GetClir(const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t GetClir(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void SetClir(const int32_t action, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t SetClir(int32_t slotId, const int32_t action, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void GetCallRestriction(std::string fac, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t GetCallRestriction(
+        int32_t slotId, std::string fac, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void SetCallRestriction(std::string &fac, int32_t mode, std::string &password,
+    int32_t SetCallRestriction(int32_t slotId, const CallRestrictionParam &callRestriction,
         const AppExecFwk::InnerEvent::Pointer &result) override;
-    void SendDtmf(const std::string &sDTMFCode, int32_t index, int32_t switchOn, int32_t switchOff,
-        const AppExecFwk::InnerEvent::Pointer &result) override;
-    void SendDtmf(char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &result) override;
-    void StartDtmf(char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &result) override;
-    void StopDtmf(int32_t index, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t SendDtmf(
+        int32_t slotId, const DtmfParam &dtmfParam, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t SendDtmf(
+        int32_t slotId, char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t StartDtmf(
+        int32_t slotId, char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t StopDtmf(int32_t slotId, int32_t index, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void GetSignalStrength(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetSignalStrength(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void GetImsRegStatus(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetImsRegStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetCsRegStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetPsRegStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void GetOperatorInfo(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetOperatorInfo(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void GetCellInfoList(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetCellInfoList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void GetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetCurrentCellInfo(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void GetImei(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetImei(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void GetMeid(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetMeid(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void SetPsAttachStatus(int32_t psAttachStatus, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SetPsAttachStatus(
+        int32_t slotId, int32_t psAttachStatus, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void GetPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetPsAttachStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetVoiceRadioTechnology(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetPhysicalChannelConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void SetLocateUpdates(HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SetLocateUpdates(
+        int32_t slotId, HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response) override;
     /**
      * @brief  Send Sms
      */
-    void SendGsmSms(std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SendGsmSms(int32_t slotId, std::string smscPdu, std::string pdu,
+        const AppExecFwk::InnerEvent::Pointer &response) override;
 
     /**
      * @brief  Send CDMA Sms
      */
-    void SendCdmaSms(std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SendCdmaSms(int32_t slotId, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     /**
      * @brief  Storage Sms
      */
-    void AddSimMessage(int32_t status, std::string smscPdu, std::string pdu,
-        const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t AddSimMessage(
+        int32_t slotId, const SimMessageParam &simMessage, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     /**
      * @brief  Delete Sms
      */
-    void DelSimMessage(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t DelSimMessage(int32_t slotId, int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void UpdateSimMessage(int32_t gsmIndex, int32_t state, std::string smscPdu, std::string pdu,
+    int32_t UpdateSimMessage(
+        int32_t slotId, const SimMessageParam &simMessage, const AppExecFwk::InnerEvent::Pointer &response) override;
+
+    int32_t GetSmscAddr(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+
+    int32_t GetCdmaCBConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+
+    int32_t SetSmscAddr(
+        int32_t slotId, int32_t tosca, std::string address, const AppExecFwk::InnerEvent::Pointer &response) override;
+
+    int32_t SetCBConfig(
+        int32_t slotId, const CBConfigParam &cbConfig, const AppExecFwk::InnerEvent::Pointer &response) override;
+
+    int32_t SetCdmaCBConfig(int32_t slotId, CdmaCBConfigInfoList &cdmaCBConfigInfoList,
         const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void GetSmscAddr(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetCBConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    void GetCdmaCBConfig(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetRadioCapability(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void SetSmscAddr(int32_t tosca, std::string address, const AppExecFwk::InnerEvent::Pointer &response) override;
-
-    void SetCBConfig(int32_t mode, std::string idList, std::string dcsList,
+    int32_t SetRadioCapability(int32_t slotId, RadioCapabilityInfo &radioCapabilityInfo,
         const AppExecFwk::InnerEvent::Pointer &response) override;
-
-    void SetCdmaCBConfig(
-        CdmaCBConfigInfoList &cdmaCBConfigInfoList, const AppExecFwk::InnerEvent::Pointer &response) override;
-
-    void GetCBConfig(const AppExecFwk::InnerEvent::Pointer &result) override;
-
-    void GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response) override;
-
-    void SetRadioCapability(
-        RadioCapabilityInfo &radioCapabilityInfo, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     /**
      * @brief Send Sms ExpectMore
      */
-    void SendSmsMoreMode(
-        std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SendSmsMoreMode(int32_t slotId, std::string smscPdu, std::string pdu,
+        const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void AddCdmaSimMessage(int32_t status, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void DelCdmaSimMessage(int32_t cdmaIndex, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void UpdateCdmaSimMessage(int32_t cdmaIndex, int32_t state, std::string pdu,
+    int32_t SendSmsAck(
+        int32_t slotId, bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t AddCdmaSimMessage(
+        int32_t slotId, int32_t status, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t DelCdmaSimMessage(
+        int32_t slotId, int32_t cdmaIndex, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t UpdateCdmaSimMessage(int32_t slotId, const CdmaSimMessageParam &cdmaSimMsg,
         const AppExecFwk::InnerEvent::Pointer &response) override;
 
     /* PDP start */
-    int32_t SetInitApnInfo(CellularDataProfile dataProfile, const AppExecFwk::InnerEvent::Pointer &response) override;
-    int32_t ActivatePdpContext(int32_t radioTechnology, CellularDataProfile dataProfile, bool isRoaming,
-        bool allowRoaming, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SetInitApnInfo(
+        int32_t slotId, const DataProfile &dataProfile, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t ActivatePdpContext(int32_t slotId, const ActivateDataParam &activeData,
+        const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t DeactivatePdpContext(
-        int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response) override;
-    int32_t GetPdpContextList(const AppExecFwk::InnerEvent::Pointer &response) override;
-    int32_t GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &response) override;
+        int32_t slotId, int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetPdpContextList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetLinkBandwidthInfo(
+        int32_t slotId, const int32_t cid, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SetLinkBandwidthReportingRule(
-        LinkBandwidthRule linkBandwidth, const AppExecFwk::InnerEvent::Pointer &response) override;
+        int32_t slotId, LinkBandwidthRule linkBandwidth, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     /* PDP end */
 
@@ -241,117 +248,129 @@ public:
      *
      * @param :string aid
      */
-    void GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result) override;
-    void GetSimIO(SimIoRequestInfo data, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void GetImsi(const AppExecFwk::InnerEvent::Pointer &result) override;
-    void GetSimLockStatus(std::string fac, const AppExecFwk::InnerEvent::Pointer &result) override;
-    void SetSimLock(
-        std::string fac, int32_t mode, std::string passwd, const AppExecFwk::InnerEvent::Pointer &result) override;
-    void ChangeSimPassword(std::string fac, std::string oldPassword, std::string newPassword,
-        int32_t passwordLength, const AppExecFwk::InnerEvent::Pointer &result) override;
-    void UnlockPin(std::string pin, const AppExecFwk::InnerEvent::Pointer &result) override;
-    void UnlockPuk(std::string puk, std::string pin, const AppExecFwk::InnerEvent::Pointer &result) override;
-    void GetSimPinInputTimes(const AppExecFwk::InnerEvent::Pointer &result) override;
-    void UnlockPin2(std::string pin2, const AppExecFwk::InnerEvent::Pointer &result) override;
-    void UnlockPuk2(std::string puk2, std::string pin2, const AppExecFwk::InnerEvent::Pointer &result) override;
-    void GetSimPin2InputTimes(const AppExecFwk::InnerEvent::Pointer &result) override;
-    void SetActiveSim(int32_t index, int32_t enable, const AppExecFwk::InnerEvent::Pointer &result) override;
-    void SendTerminalResponseCmd(
-        const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void SendEnvelopeCmd(const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void StkControllerIsReady(const AppExecFwk::InnerEvent::Pointer &response) override;
-    void StkCmdCallSetup(int32_t flagAccept, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void UnlockSimLock(int32_t lockType, std::string password,
+    int32_t GetSimStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t GetSimIO(int32_t slotId, SimIoRequestInfo data, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetImsi(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t GetSimLockStatus(int32_t slotId, std::string fac, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t SetSimLock(
+        int32_t slotId, const SimLockParam &simLock, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t ChangeSimPassword(
+        int32_t slotId, const SimPasswordParam &simPassword, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t UnlockPin(int32_t slotId, std::string pin, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t UnlockPuk(
+        int32_t slotId, std::string puk, std::string pin, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t GetSimPinInputTimes(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t UnlockPin2(int32_t slotId, std::string pin2, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t UnlockPuk2(
+        int32_t slotId, std::string puk2, std::string pin2, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t GetSimPin2InputTimes(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t SetActiveSim(
+        int32_t slotId, int32_t index, int32_t enable, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t SendTerminalResponseCmd(
+        int32_t slotId, const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SendEnvelopeCmd(
+        int32_t slotId, const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SimStkIsReady(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t UnlockSimLock(int32_t slotId, int32_t lockType, std::string password,
         const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void GetNetworkSearchInformation(const AppExecFwk::InnerEvent::Pointer &result) override;
-    void GetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &result) override;
-    void SetNetworkSelectionMode(
-        int32_t automaticFlag, std::string oper, const AppExecFwk::InnerEvent::Pointer &result) override;
-    void SetPreferredNetwork(
-        int32_t preferredNetworkType, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void GetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetNetworkSearchInformation(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t GetNetworkSelectionMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t SetNetworkSelectionMode(int32_t slotId, int32_t automaticFlag, std::string oper,
+        const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t SetPreferredNetwork(
+        int32_t slotId, int32_t preferredNetworkType, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetPreferredNetwork(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    void GetImsCallList(const AppExecFwk::InnerEvent::Pointer &response) override;
-    void SetCallPreferenceMode(const int32_t mode, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void GetCallPreferenceMode(const AppExecFwk::InnerEvent::Pointer &response) override;
-    void SetLteImsSwitchStatus(const int32_t active, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void GetLteImsSwitchStatus(const AppExecFwk::InnerEvent::Pointer &response) override;
-    void SetRadioProtocol(SimProtocolRequest data, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void SetUssdCusd(const std::string str, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &response) override;
-    void SetMute(const int32_t mute, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void GetMute(const AppExecFwk::InnerEvent::Pointer &response) override;
-    void GetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &response) override;
-    void GetCallFailReason(const AppExecFwk::InnerEvent::Pointer &response) override;
-    void OpenLogicalSimIO(
-        const std::string &appID, const int32_t p2, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void CloseLogicalSimIO(const int32_t chanID, const AppExecFwk::InnerEvent::Pointer &response) override;
-    void TransmitApduSimIO(ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetImsCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SetCallPreferenceMode(
+        int32_t slotId, const int32_t mode, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetCallPreferenceMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SetLteImsSwitchStatus(
+        int32_t slotId, const int32_t active, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetLteImsSwitchStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SetRadioProtocol(
+        int32_t slotId, SimProtocolRequest data, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SetUssdCusd(
+        int32_t slotId, const std::string str, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetUssdCusd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SetMute(int32_t slotId, const int32_t mute, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetMute(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetEmergencyCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetCallFailReason(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SimOpenLogicalChannel(int32_t slotId, const std::string &appID, const int32_t p2,
+        const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SimCloseLogicalChannel(
+        int32_t slotId, const int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SimTransmitApduLogicalChannel(
+        int32_t slotId, ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    bool InitCellularRadio(bool isFirst) override;
-    int32_t cdmaSubscription_ = 0;
-    static const int INVALID_WAKELOCK = -1;
-    static const int FOR_WAKELOCK = 0;
-    static const int FOR_ACK_WAKELOCK = 1;
+    static const int32_t INVALID_WAKELOCK = -1;
+    static const int32_t FOR_WAKELOCK = 0;
+    static const int32_t FOR_ACK_WAKELOCK = 1;
     static const int32_t RIL_INIT_COUNT_MAX = 10;
 
-protected:
-    int32_t preferredNetworkType_ = 0;
-    void InitTelInfo() override;
-
 private:
+    void InitTelModule(int32_t slotId);
+    TelRilSms &GetTelRilSms(int32_t slotId);
+    TelRilSim &GetTelRilSim(int32_t slotId);
+    TelRilCall &GetTelRilCall(int32_t slotId);
+    TelRilData &GetTelRilData(int32_t slotId);
+    TelRilNetwork &GetTelRilNetwork(int32_t slotId);
+    TelRilModem &GetTelRilModem(int32_t slotId);
+    std::shared_ptr<ObserverHandler> GetObserverHandler(int32_t slotId);
+    /**
+     * Send the request of CellularRadioIndication
+     *
+     * @return:Returns the value of the send_result.
+     */
+    int32_t SetCellularRadioIndication();
+
+    /**
+     * Send the request of CellularRadioResponse
+     *
+     */
+    int32_t SetCellularRadioResponse();
+
     /**
      * @brief Task schedule. The function of this function is to unify the input interface.
-     * @param __result response handler
-     * @param __module Sub module identification, used to print logs.
+     * @param _result response handler
+     * @param _module Sub module identification, used to print logs.
      *   This header file cannot use the typeid() keyword, so the module name is passed in.
-     * @param template: __obj - Object type (this)pointer.
-     * @param template: __func - Class member function address.
-     * @param template: __args - The parameter list of the class member function except the response parameter.
+     * @param template: _obj - Object type (this)pointer.
+     * @param template: _func - Class member function address.
+     * @param template: _args - The parameter list of the class member function except the response parameter.
      *    The number can vary.
      * @return true/false - success/fail
      */
     template<typename ResponsePtr, typename ClassTypePtr, typename FuncType, typename... ParamTypes>
-    inline bool TaskSchedule(ResponsePtr &__result, const char *__module, ClassTypePtr &&__obj, FuncType &&__func,
-        ParamTypes &&...__args) const
+    inline int32_t TaskSchedule(ResponsePtr &_result, const std::string _module, ClassTypePtr &_obj,
+        FuncType &&_func, ParamTypes &&..._args) const
     {
-        if (__obj != nullptr && __func != nullptr) {
+        if (_func != nullptr) {
             // The reason for using native member function access here is to
             //   remove std::unique_ptr to prevent copying.
             // The reason for not directly using pointers to access member functions is:
-            //   __obj is a smart pointer, not a native pointer.
-            ((*__obj).*(__func))(std::forward<ParamTypes>(__args)..., __result);
-            return true;
+            //   _obj is a smart pointer, not a native pointer.
+            return (_obj.*(_func))(std::forward<ParamTypes>(_args)..., _result);
         } else {
-            PrintErrorLog(__module, (const uint8_t *)(__obj.get()), "null pointer");
-            return false;
+            TELEPHONY_LOGE("%{public}s - this %{public}p: %{public}s", _module.c_str(), &_obj, "null pointer");
+            return HRIL_ERR_NULL_POINT;
         }
     }
 
-    /**
-     * @brief print error log.
-     * @param moduleName Module flag.
-     * @param objPtr Object pointer.
-     * @param param Additional parameters.
-     * @return no
-     */
-    void PrintErrorLog(const char *moduleName, const uint8_t *objPtr, const char *param) const;
-
 private:
-    int32_t slotId_ = 0;
     std::mutex mutex_;
-    static constexpr const char *RIL_ADAPTER_SERVICE_NAME = "cellular_radio1";
-    static const int32_t RIL_ADAPTER_ERROR = 29189;
-    std::shared_ptr<ObserverHandler> observerHandler_;
-    sptr<IRemoteObject> cellularRadio_;
-    std::unique_ptr<TelRilNetwork> telRilNetwork_;
-    std::unique_ptr<TelRilModem> telRilModem_;
-    std::unique_ptr<TelRilData> telRilData_;
-    std::unique_ptr<TelRilSim> telRilSim_;
-    std::unique_ptr<TelRilCall> telRilCall_;
-    std::unique_ptr<TelRilSms> telRilSms_;
+    sptr<IRemoteObject> rilAdapterRemoteObj_;
     sptr<OHOS::IPCObjectStub> telRilCallback_;
+    sptr<OHOS::IPCObjectStub::DeathRecipient> death_;
+    std::vector<std::unique_ptr<TelRilSim>> telRilSim_;
+    std::vector<std::unique_ptr<TelRilSms>> telRilSms_;
+    std::vector<std::unique_ptr<TelRilCall>> telRilCall_;
+    std::vector<std::unique_ptr<TelRilData>> telRilData_;
+    std::vector<std::unique_ptr<TelRilModem>> telRilModem_;
+    std::vector<std::unique_ptr<TelRilNetwork>> telRilNetwork_;
+    std::vector<std::shared_ptr<ObserverHandler>> observerHandler_;
 };
 } // namespace Telephony
 } // namespace OHOS

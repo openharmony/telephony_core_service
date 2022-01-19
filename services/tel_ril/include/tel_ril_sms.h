@@ -23,59 +23,57 @@ namespace OHOS {
 namespace Telephony {
 class TelRilSms : public TelRilBase {
 public:
-    TelRilSms(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
+    TelRilSms(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
     ~TelRilSms() = default;
 
     uint8_t *ConvertHexStringToBytes(const uint8_t *hexString, size_t length);
     uint8_t ConvertHexCharToInt(uint8_t ch);
     bool IsSmsRespOrNotify(uint32_t code);
-    void ProcessSmsRespOrNotify(uint32_t code, MessageParcel &data);
 
-    void SendGsmSms(std::string &smsPdu, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response);
-    void SendCdmaSms(std::string pdu, const AppExecFwk::InnerEvent::Pointer &response);
-    void AddSimMessage(
-        int32_t status, std::string &smscPdu, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response);
-    void DelSimMessage(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &response);
-    void UpdateSimMessage(int32_t gsmIndex, int32_t state, std::string smscPdu, std::string pdu,
+    int32_t SendGsmSms(std::string &smsPdu, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SendCdmaSms(std::string pdu, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t AddSimMessage(
+        int32_t status, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t DelSimMessage(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t UpdateSimMessage(int32_t gsmIndex, int32_t state, std::string smscPdu, std::string pdu,
         const AppExecFwk::InnerEvent::Pointer &response);
-    void SetSmscAddr(int32_t tosca, std::string address, const AppExecFwk::InnerEvent::Pointer &response);
-    void GetSmscAddr(const AppExecFwk::InnerEvent::Pointer &response);
-    void SetCdmaCBConfig(
+    int32_t SetSmscAddr(int32_t tosca, std::string address, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetSmscAddr(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetCdmaCBConfig(
         CdmaCBConfigInfoList &cdmaCBConfigInfoList, const AppExecFwk::InnerEvent::Pointer &response);
-    void GetCdmaCBConfig(const AppExecFwk::InnerEvent::Pointer &response);
-    void SetCBConfig(
+    int32_t GetCdmaCBConfig(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetCBConfig(
         int32_t mode, std::string idList, std::string dcsList, const AppExecFwk::InnerEvent::Pointer &response);
-    void GetCBConfig(const AppExecFwk::InnerEvent::Pointer &result);
-    void SendSmsMoreMode(std::string &smsPdu, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response);
-    void SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response);
-    void AddCdmaSimMessage(int32_t status, std::string &pdu,
-        const AppExecFwk::InnerEvent::Pointer &response);
-    void DelCdmaSimMessage(int32_t cdmaIndex, const AppExecFwk::InnerEvent::Pointer &response);
-    void UpdateCdmaSimMessage(int32_t cdmaIndex, int32_t state, std::string pdu,
-        const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetCBConfig(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SendSmsMoreMode(std::string &smsPdu, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t AddCdmaSimMessage(int32_t status, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t DelCdmaSimMessage(int32_t cdmaIndex, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t UpdateCdmaSimMessage(
+        int32_t cdmaIndex, int32_t state, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response);
 
-    void SendGsmSmsResponse(MessageParcel &data);
-    void SendCdmaSmsResponse(MessageParcel &data);
-    void AddSimMessageResponse(MessageParcel &data);
-    void DelSimMessageResponse(MessageParcel &data);
-    void UpdateSimMessageResponse(MessageParcel &data);
-    void SetSmscAddrResponse(MessageParcel &data);
-    void GetSmscAddrResponse(MessageParcel &data);
-    void SetCBConfigResponse(MessageParcel &data);
-    void GetCBConfigResponse(MessageParcel &data);
-    void GetCdmaCBConfigResponse(MessageParcel &data);
-    void SetCdmaCBConfigResponse(MessageParcel &data);
-    void SendSmsMoreModeResponse(MessageParcel &data);
-    void SendSmsAckResponse(MessageParcel &data);
-    void AddCdmaSimMessageResponse(MessageParcel &data);
-    void DelCdmaSimMessageResponse(MessageParcel &data);
-    void UpdateCdmaSimMessageResponse(MessageParcel &data);
+    int32_t SendGsmSmsResponse(MessageParcel &data);
+    int32_t SendCdmaSmsResponse(MessageParcel &data);
+    int32_t AddSimMessageResponse(MessageParcel &data);
+    int32_t DelSimMessageResponse(MessageParcel &data);
+    int32_t UpdateSimMessageResponse(MessageParcel &data);
+    int32_t SetSmscAddrResponse(MessageParcel &data);
+    int32_t GetSmscAddrResponse(MessageParcel &data);
+    int32_t SetCBConfigResponse(MessageParcel &data);
+    int32_t GetCBConfigResponse(MessageParcel &data);
+    int32_t GetCdmaCBConfigResponse(MessageParcel &data);
+    int32_t SetCdmaCBConfigResponse(MessageParcel &data);
+    int32_t SendSmsMoreModeResponse(MessageParcel &data);
+    int32_t SendSmsAckResponse(MessageParcel &data);
+    int32_t AddCdmaSimMessageResponse(MessageParcel &data);
+    int32_t DelCdmaSimMessageResponse(MessageParcel &data);
+    int32_t UpdateCdmaSimMessageResponse(MessageParcel &data);
 
-    void NewSmsNotify(MessageParcel &data);
-    void NewCdmaSmsNotify(MessageParcel &data);
-    void SmsStatusReportNotify(MessageParcel &data);
-    void NewSmsStoredOnSimNotify(MessageParcel &data);
-    void CBConfigNotify(MessageParcel &data);
+    int32_t NewSmsNotify(MessageParcel &data);
+    int32_t NewCdmaSmsNotify(MessageParcel &data);
+    int32_t SmsStatusReportNotify(MessageParcel &data);
+    int32_t NewSmsStoredOnSimNotify(MessageParcel &data);
+    int32_t CBConfigNotify(MessageParcel &data);
 
 private:
     void AddHandlerToMap();
@@ -83,9 +81,6 @@ private:
     bool IsSmsNotification(uint32_t code);
     GsmSmsMessageInfo ConstructGsmSendSmsRequestLinkList(std::string &smsPdu, std::string &pdu);
     SmsMessageIOInfo ConstructSmsMessageIOInfoRequestLinkList(std::string &smsPdu, std::string &pdu);
-
-    using Func = void (TelRilSms::*)(MessageParcel &data);
-    std::map<uint32_t, Func> memberFuncMap_;
 };
 } // namespace Telephony
 } // namespace OHOS

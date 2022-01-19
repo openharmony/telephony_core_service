@@ -44,7 +44,7 @@ void NetworkSearchTestCallbackStub::OnSetRadioStateCallback(const bool setResult
 void NetworkSearchTestCallbackStub::OnGetRadioStateCallback(const bool setResult, const int32_t errorCode)
 {
     TELEPHONY_LOGI(
-        "NetworkSearchTestCallbackStub OnGetRadioStateCallback success setResult:%{public}d, "
+        "NetworkSearchTestCallbackStub OnGetRadioStateCallback success radiostate:%{public}d, "
         "errorCode:%{public}d",
         setResult, errorCode);
 }
@@ -61,7 +61,7 @@ void NetworkSearchTestCallbackStub::OnGetNetworkSearchInformation(
                 for (auto &networkState : networkStates) {
                     TELEPHONY_LOGI(
                         "NetworkSearchTestCallbackStub OnGetNetworkSearchInformation plmnNumeric:%{public}s,"
-                        " shortOperatorName:%{public}s, rat_:%{public}d",
+                        " shortOperatorName:%{public}s, rat:%{public}d",
                         networkState.GetOperatorNumeric().c_str(), networkState.GetOperatorShortName().c_str(),
                         networkState.GetRadioTech());
                 }
@@ -85,7 +85,7 @@ void NetworkSearchTestCallbackStub::OnGetPreferredNetworkCallback(
     const int32_t networkMode, const int32_t errorCode)
 {
     TELEPHONY_LOGI(
-        "NetworkSearchTestCallbackStub OnGetPreferredNetworkCallback success, result:%{public}d, "
+        "NetworkSearchTestCallbackStub OnGetPreferredNetworkCallback success, networkMode:%{public}d, "
         "errorCode:%{public}d",
         networkMode, errorCode);
 }

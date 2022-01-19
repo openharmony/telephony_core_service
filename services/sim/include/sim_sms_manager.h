@@ -16,19 +16,18 @@
 #ifndef OHOS_SIM_SMS_MANAGER_H
 #define OHOS_SIM_SMS_MANAGER_H
 
-#include "core_manager.h"
 #include "event_handler.h"
 #include "event_runner.h"
 #include "i_tel_ril_manager.h"
-#include "i_sim_sms_manager.h"
 #include "sim_sms_controller.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-class SimSmsManager : public ISimSmsManager {
+class SimSmsManager {
 public:
-    SimSmsManager(std::shared_ptr<ITelRilManager> telRilManager,
-        std::shared_ptr<ISimFileManager> simFileManager, std::shared_ptr<ISimStateManager> simStateManager);
+    SimSmsManager(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
+        std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simStateManager);
     virtual ~SimSmsManager();
     void Init(int slotId);
     bool AddSmsToIcc(int status, std::string &pdu, std::string &smsc);
@@ -42,9 +41,9 @@ public:
 
 protected:
     int slotId_ = 0;
-    std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
-    std::shared_ptr<ISimFileManager> simFileManager_ = nullptr;
-    std::shared_ptr<ISimStateManager> stateManager_ = nullptr;
+    std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
+    std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
+    std::shared_ptr<SimStateManager> stateManager_ = nullptr;
     std::shared_ptr<SimSmsController> smsController_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopSms_ = nullptr;
     HandleRunningState stateSms_ = HandleRunningState::STATE_NOT_START;

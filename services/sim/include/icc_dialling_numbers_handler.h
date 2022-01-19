@@ -16,6 +16,7 @@
 #ifndef OHOS_SIM_DIALLING_NUMBERS_HANDLER_H
 #define OHOS_SIM_DIALLING_NUMBERS_HANDLER_H
 
+#include <unordered_map>
 #include <thread>
 
 #include "event_handler.h"
@@ -201,6 +202,7 @@ public:
     static void ClearLoadRequest(int serial);
     static std::shared_ptr<DiallingNumberLoadRequest> CreateLoadRequest(int fileId,
         int exId, int indexNum, const std::string &pin2Str, const AppExecFwk::InnerEvent::Pointer &result);
+    void UpdateFileController(const std::shared_ptr<IccFileController> &fileController);
 
 protected:
     std::shared_ptr<IccFileController> fileController_;

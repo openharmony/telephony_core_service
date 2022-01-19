@@ -21,7 +21,6 @@
 #include <vector>
 #include <map>
 
-#include "core_manager.h"
 #include "icc_file_controller.h"
 #include "sim_file_manager.h"
 #include "icc_dialling_numbers_handler.h"
@@ -39,7 +38,7 @@ const int ADD_FLAG = -1;
 class IccDiallingNumbersCache : public AppExecFwk::EventHandler {
 public:
     IccDiallingNumbersCache(
-        const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<ISimFileManager> simFileManager);
+        const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimFileManager> simFileManager);
     ~IccDiallingNumbersCache();
     void Init();
     std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> LoadReadyDiallingNumbers(int fileId);
@@ -50,7 +49,7 @@ public:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
 
 protected:
-    std::shared_ptr<ISimFileManager> simFileManager_ = nullptr;
+    std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
     std::shared_ptr<IccDiallingNumbersHandler> diallingNumbersHandler_ = nullptr;
     std::shared_ptr<UsimDiallingNumbersService> usimDiallingNumberSrv_ = nullptr;
     std::map<int, std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>>> diallingNumberFileList_;

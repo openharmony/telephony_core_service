@@ -17,34 +17,32 @@
 #define TEL_RIL_DATA_H
 
 #include "hril_data_parcel.h"
-#include "i_tel_ril_manager.h"
 #include "tel_ril_base.h"
+#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
 class TelRilData : public TelRilBase {
 public:
-    TelRilData(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
+    TelRilData(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
     ~TelRilData() = default;
-    DataProfileDataInfo ChangeDPToHalDataProfile(ITelRilManager::CellularDataProfile dataProfile);
-    void DeactivatePdpContext(int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
-    void DeactivatePdpContextResponse(MessageParcel &data);
-    void SetInitApnInfo(
-        ITelRilManager::CellularDataProfile dataProfile, const AppExecFwk::InnerEvent::Pointer &response);
-    void SetInitApnInfoResponse(MessageParcel &data);
-    void ActivatePdpContext(int32_t radioTechnology, ITelRilManager::CellularDataProfile dataProfile, bool isRoaming,
-        bool allowRoaming, const AppExecFwk::InnerEvent::Pointer &response);
-    void ActivatePdpContextResponse(MessageParcel &data);
-    void GetPdpContextList(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetPdpContextListResponse(MessageParcel &data);
-    void PdpContextListUpdated(MessageParcel &data);
+    DataProfileDataInfo ChangeDPToHalDataProfile(DataProfile dataProfile);
+    int32_t DeactivatePdpContext(int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t DeactivatePdpContextResponse(MessageParcel &data);
+    int32_t SetInitApnInfo(const DataProfile &dataProfile, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetInitApnInfoResponse(MessageParcel &data);
+    int32_t ActivatePdpContext(int32_t radioTechnology, DataProfile dataProfile, bool isRoaming, bool allowRoaming,
+        const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t ActivatePdpContextResponse(MessageParcel &data);
+    int32_t GetPdpContextList(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetPdpContextListResponse(MessageParcel &data);
+    int32_t PdpContextListUpdated(MessageParcel &data);
     bool IsDataRespOrNotify(uint32_t code);
-    void ProcessDataRespOrNotify(uint32_t code, MessageParcel &data);
-    void GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &response);
-    void GetLinkBandwidthInfoResponse(MessageParcel &data);
-    void SetLinkBandwidthReportingRule(
+    int32_t GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetLinkBandwidthInfoResponse(MessageParcel &data);
+    int32_t SetLinkBandwidthReportingRule(
         LinkBandwidthRule linkBandwidth, const AppExecFwk::InnerEvent::Pointer &response);
-    void SetLinkBandwidthReportingRuleResponse(MessageParcel &data);
+    int32_t SetLinkBandwidthReportingRuleResponse(MessageParcel &data);
 
 private:
     bool IsDataResponse(uint32_t code);
@@ -52,9 +50,6 @@ private:
     void AddHandlerToMap();
     void DataResponseError(HRilErrType errCode, const AppExecFwk::InnerEvent::Pointer &response);
 
-private:
-    using Func = void (TelRilData::*)(MessageParcel &data);
-    std::map<uint32_t, Func> memberFuncMap_;
     std::mutex responseErrorLock_;
 };
 } // namespace Telephony

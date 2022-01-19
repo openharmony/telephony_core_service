@@ -26,36 +26,34 @@ namespace Telephony {
 NetworkSearchNotify::NetworkSearchNotify() {};
 NetworkSearchNotify::~NetworkSearchNotify() {};
 
-void NetworkSearchNotify::NotifyNetworkStateUpdated(const sptr<NetworkState> &networkState)
+void NetworkSearchNotify::NotifyNetworkStateUpdated(int32_t slotId, const sptr<NetworkState> &networkState)
 {
     TELEPHONY_LOGI("NotifyNetworkStateUpdated~~~\n");
-    int32_t simId = 0;
-    int32_t result = DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().
-        UpdateNetworkState(simId, networkState);
+    int32_t result =
+        DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateNetworkState(slotId, networkState);
     TELEPHONY_LOGI("NotifyNetworkStateUpdated ret %{public}s", networkState->ToString().c_str());
     if (result != 0) {
         TELEPHONY_LOGE("NotifyNetworkStateUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found\n");
     }
 }
 
-void NetworkSearchNotify::NotifySignalInfoUpdated(const std::vector<sptr<SignalInformation>> &signalInfos)
+void NetworkSearchNotify::NotifySignalInfoUpdated(
+    int32_t slotId, const std::vector<sptr<SignalInformation>> &signalInfos)
 {
     TELEPHONY_LOGI("NotifySignalInfoUpdated~~~ signalInfos size=%{public}zu\n", signalInfos.size());
-    int32_t simId = 0;
-    int32_t result = DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().
-        UpdateSignalInfo(simId, signalInfos);
+    int32_t result =
+        DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSignalInfo(slotId, signalInfos);
     TELEPHONY_LOGI("NotifySignalInfoUpdated ret %{public}d", result);
     if (result != 0) {
         TELEPHONY_LOGE("NotifySignalInfoUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found\n");
     }
 }
 
-void NetworkSearchNotify::NotifyCellInfoUpdated(const std::vector<sptr<CellInformation>> &cellInfos)
+void NetworkSearchNotify::NotifyCellInfoUpdated(int32_t slotId, const std::vector<sptr<CellInformation>> &cellInfos)
 {
     TELEPHONY_LOGI("NotifyCellInfoUpdated~~~ cell size=%{public}zu\n", cellInfos.size());
-    int32_t simId = 0;
-    int32_t result = DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().
-        UpdateCellInfo(simId, cellInfos);
+    int32_t result =
+        DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateCellInfo(slotId, cellInfos);
     TELEPHONY_LOGI("NotifyCellInfoUpdated ret %{public}d", result);
     if (result != 0) {
         TELEPHONY_LOGE("NotifySignalInfoUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found\n");

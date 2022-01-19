@@ -23,87 +23,84 @@ namespace OHOS {
 namespace Telephony {
 class TelRilNetwork : public TelRilBase {
 public:
-    TelRilNetwork(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
+    TelRilNetwork(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
     ~TelRilNetwork() = default;
 
     // send  command
-    void GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response);
-    void SetRadioCapability(RadioCapabilityInfo &radioCapabilityInfo, const AppExecFwk::InnerEvent::Pointer &response);
-    void GetImsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetSignalStrength(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetOperatorInfo(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetNetworkSearchInformation(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &response);
-    void SetNetworkSelectionMode(
+    int32_t GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetRadioCapability(
+        RadioCapabilityInfo &radioCapabilityInfo, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetImsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetSignalStrength(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetOperatorInfo(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetNetworkSearchInformation(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetNetworkSelectionMode(
         int32_t automaticFlag, std::string oper, const AppExecFwk::InnerEvent::Pointer &response);
-    void SetPreferredNetwork(int32_t preferredNetworkType, const AppExecFwk::InnerEvent::Pointer &response);
-    void GetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &response);
-    void SetPsAttachStatus(int32_t psAttachStatus, const AppExecFwk::InnerEvent::Pointer &response);
-    void GetPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetCellInfoList(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response);
-    void SetLocateUpdates(HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetPreferredNetwork(int32_t preferredNetworkType, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetPsAttachStatus(int32_t psAttachStatus, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetCellInfoList(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetLocateUpdates(HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response);
 
     // ril unsol
-    void SignalStrengthUpdated(MessageParcel &data);
-    void NetworkCsRegStatusUpdated(MessageParcel &data);
-    void NetworkPsRegStatusUpdated(MessageParcel &data);
-    void NetworkTimeZoneUpdated(MessageParcel &data);
-    void NetworkTimeUpdated(MessageParcel &data);
-    void NetworkImsRegStatusUpdated(MessageParcel &data);
-    void NetworkPhyChnlCfgUpdated(MessageParcel &data);
-    void GetImsRegStatusResponse(MessageParcel &data);
-    void GetRadioCapabilityResponse(MessageParcel &data);
+    int32_t SignalStrengthUpdated(MessageParcel &data);
+    int32_t NetworkCsRegStatusUpdated(MessageParcel &data);
+    int32_t NetworkPsRegStatusUpdated(MessageParcel &data);
+    int32_t NetworkTimeZoneUpdated(MessageParcel &data);
+    int32_t NetworkTimeUpdated(MessageParcel &data);
+    int32_t NetworkImsRegStatusUpdated(MessageParcel &data);
+    int32_t NetworkPhyChnlCfgUpdated(MessageParcel &data);
+    int32_t NetworkCurrentCellUpdated(MessageParcel &data);
+    int32_t GetImsRegStatusResponse(MessageParcel &data);
+    int32_t GetRadioCapabilityResponse(MessageParcel &data);
     /**
      * @brief Get signal intensity response
      * @param data is HDF service callback message
      */
-    void GetSignalStrengthResponse(MessageParcel &data);
+    int32_t GetSignalStrengthResponse(MessageParcel &data);
 
     /**
      * @brief Current voice registration status response
      * @param data is HDF service callback message
      */
-    void GetCsRegStatusResponse(MessageParcel &data);
+    int32_t GetCsRegStatusResponse(MessageParcel &data);
 
     /**
      * @brief Get network registration status response
      * @param data is HDF service callback message
      */
-    void GetPsRegStatusResponse(MessageParcel &data);
+    int32_t GetPsRegStatusResponse(MessageParcel &data);
 
-    void GetNetworkSearchInformationResponse(MessageParcel &data);
-    void GetNetworkSelectionModeResponse(MessageParcel &data);
-    void SetNetworkSelectionModeResponse(MessageParcel &data);
-    void SetPreferredNetworkResponse(MessageParcel &data);
-    void GetPreferredNetworkResponse(MessageParcel &data);
-    void SetPsAttachStatusResponse(MessageParcel &data);
-    void GetPsAttachStatusResponse(MessageParcel &data);
-    void SetRadioCapabilityResponse(MessageParcel &data);
-    void GetPhysicalChannelConfigResponse(MessageParcel &data);
-    void SetLocateUpdatesResponse(MessageParcel &data);
+    int32_t GetNetworkSearchInformationResponse(MessageParcel &data);
+    int32_t GetNetworkSelectionModeResponse(MessageParcel &data);
+    int32_t SetNetworkSelectionModeResponse(MessageParcel &data);
+    int32_t SetPreferredNetworkResponse(MessageParcel &data);
+    int32_t GetPreferredNetworkResponse(MessageParcel &data);
+    int32_t SetPsAttachStatusResponse(MessageParcel &data);
+    int32_t GetPsAttachStatusResponse(MessageParcel &data);
+    int32_t SetRadioCapabilityResponse(MessageParcel &data);
+    int32_t GetPhysicalChannelConfigResponse(MessageParcel &data);
+    int32_t SetLocateUpdatesResponse(MessageParcel &data);
 
     /**
      * @brief Current operator ons or eons response
      * @param data is HDF service callback message
      */
-    void GetOperatorInfoResponse(MessageParcel &data);
-    void GetNeighboringCellInfoListResponse(MessageParcel &data);
-    void GetCurrentCellInfoResponse(MessageParcel &data);
-    void ProcessNetworkRespOrNotify(uint32_t code, MessageParcel &data);
+    int32_t GetOperatorInfoResponse(MessageParcel &data);
+    int32_t GetNeighboringCellInfoListResponse(MessageParcel &data);
+    int32_t GetCurrentCellInfoResponse(MessageParcel &data);
     bool IsNetworkRespOrNotify(uint32_t code);
 
 private:
     void AddHandlerToMap();
     bool IsNetworkResponse(uint32_t code);
     bool IsNetworkNotification(uint32_t code);
-
-private:
-    using Func = void (TelRilNetwork::*)(MessageParcel &data);
-    std::map<uint32_t, Func> memberFuncMap_;
 };
 } // namespace Telephony
 } // namespace OHOS

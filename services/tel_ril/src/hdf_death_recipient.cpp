@@ -15,37 +15,40 @@
 
 #include "hdf_death_recipient.h"
 
-#include "core_manager.h"
-#include "tel_ril_manager.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-constexpr int SLEEP_TIME = 2;
-
-HdfDeathRecipient::HdfDeathRecipient(int32_t slotId)
+HdfDeathRecipient::HdfDeathRecipient(sptr<TelRilManager> telRilManager)
 {
-    slotId_ = slotId;
+    telRilManager_ = telRilManager;
 }
+
+HdfDeathRecipient::HdfDeathRecipient(int32_t slotId) {}
 
 void HdfDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    sleep(SLEEP_TIME);
-    TELEPHONY_LOGI("HdfDeathRecipient OnRemoteDied id %{public}d start!", slotId_);
-    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId_);
-    if (core != nullptr) {
-        bool res = true;
-        int i = 0;
-        do {
-            res = core->InitCellularRadio(false);
-            if (!res) {
-                sleep(SLEEP_TIME);
-                i++;
-                TELEPHONY_LOGI("Initialization cellular radio failed. Try initialization again!");
-            }
-        } while (!res && (i < TelRilManager::RIL_INIT_COUNT_MAX));
-    } else {
-        TELEPHONY_LOGE("coreId:%{public}d is null, !", slotId_);
+    TELEPHONY_LOGI("HdfDeathRecipient OnRemoteDied start!");
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("HdfDeathRecipient telRilManager_ is nullptr!");
+        return;
+    }
+    bool res = false;
+    int32_t i = 0;
+
+    do {
+        TELEPHONY_LOGI("HdfDeathRecipient ConnectRilAdapterService!");
+        res = telRilManager_->ConnectRilAdapterService();
+        if (!res) {
+            i++;
+            sleep(1);
+        } else {
+            TELEPHONY_LOGE("HdfDeathRecipient ResetRemoteObject!");
+            telRilManager_->ResetRemoteObject();
+        }
+    } while (!res && (i < TelRilManager::RIL_INIT_COUNT_MAX));
+    if (!res) {
+        TELEPHONY_LOGE("Reset Remote Object is failed!");
     }
 }
 } // namespace Telephony

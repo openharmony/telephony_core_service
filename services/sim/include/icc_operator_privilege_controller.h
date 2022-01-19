@@ -22,7 +22,7 @@
 #include "event_handler.h"
 #include "event_runner.h"
 
-#include "i_sim_state_manager.h"
+#include "sim_state_manager.h"
 #include "i_tel_ril_manager.h"
 #include "icc_operator_rule.h"
 
@@ -36,12 +36,13 @@ public:
         MSG_CLOSE_LOGICAL_CHANNEL_DONE = 0x7ffffff2
     };
 
-    IccOperatorPrivilegeController(const int32_t slotId, std::shared_ptr<AppExecFwk::EventRunner> runner,
-        std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<ISimStateManager> simStateManager);
+    IccOperatorPrivilegeController(std::shared_ptr<AppExecFwk::EventRunner> runner,
+        std::shared_ptr<Telephony::ITelRilManager> telRilManager,
+        std::shared_ptr<SimStateManager> simStateManager);
 
     virtual ~IccOperatorPrivilegeController();
 
-    void Init();
+    void Init(const int32_t slotId);
     bool HasOperatorPrivileges();
     bool HasOperatorPrivileges(const std::string_view &certHash, const std::string_view &packageName);
 
@@ -56,9 +57,9 @@ private:
     void OpenChannel();
 
 private:
-    const int32_t slotId_;
-    std::shared_ptr<ITelRilManager> telRilManager_;
-    std::shared_ptr<ISimStateManager> simStateManager_;
+    int32_t slotId_;
+    std::shared_ptr<Telephony::ITelRilManager> telRilManager_;
+    std::shared_ptr<SimStateManager> simStateManager_;
     std::vector<IccOperatorRule> rules_;
 
     class LogicalStateMachine;

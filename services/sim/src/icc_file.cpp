@@ -18,6 +18,8 @@
 #include "inner_event.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "telephony_state_registry_client.h"
+#include "radio_event.h"
 
 using namespace std;
 using namespace OHOS::AppExecFwk;
@@ -25,15 +27,17 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
+std::unique_ptr<ObserverHandler> IccFile::filesFetchedObser_ = nullptr;
 IccFile::IccFile(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<ISimStateManager> simStateManager)
+    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager)
     : AppExecFwk::EventHandler(runner), stateManager_(simStateManager)
 {
     if (stateManager_ == nullptr) {
         TELEPHONY_LOGE("IccFile::IccFile set NULL SIMStateManager!!");
     }
-
-    filesFetchedObser_ = std::make_unique<ObserverHandler>();
+    if (filesFetchedObser_ == nullptr) {
+        filesFetchedObser_ = std::make_unique<ObserverHandler>();
+    }
     if (filesFetchedObser_ == nullptr) {
         TELEPHONY_LOGE("IccFile::IccFile filesFetchedObser_ create nullptr.");
         return;
@@ -231,13 +235,13 @@ void IccFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 
 void IccFile::RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
-    int eventCode = ObserverHandler::RADIO_IMSI_LOADED_READY;
+    int eventCode = RadioEvent::RADIO_IMSI_LOADED_READY;
     if (imsiReadyObser_ != nullptr) {
         imsiReadyObser_->RegObserver(eventCode, eventHandler);
     }
     if (!ObtainIMSI().empty()) {
         if (imsiReadyObser_ != nullptr) {
-            imsiReadyObser_->NotifyObserver(ObserverHandler::RADIO_IMSI_LOADED_READY);
+            imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
         }
         PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_IMSI, ObtainIMSI());
     }
@@ -246,13 +250,13 @@ void IccFile::RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> event
 void IccFile::UnregisterImsiLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (imsiReadyObser_ != nullptr) {
-        imsiReadyObser_->Remove(ObserverHandler::RADIO_IMSI_LOADED_READY, handler);
+        imsiReadyObser_->Remove(RadioEvent::RADIO_IMSI_LOADED_READY, handler);
     }
 }
 
 void IccFile::RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
-    int eventCode = ObserverHandler::RADIO_SIM_RECORDS_LOADED;
+    int eventCode = RadioEvent::RADIO_SIM_RECORDS_LOADED;
     if (filesFetchedObser_ != nullptr) {
         filesFetchedObser_->RegObserver(eventCode, eventHandler);
     }
@@ -260,7 +264,7 @@ void IccFile::RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> e
     if (ObtainFilesFetched()) {
         TELEPHONY_LOGI("IccFile::RegisterAllFilesLoaded: notify");
         if (filesFetchedObser_ != nullptr) {
-            filesFetchedObser_->NotifyObserver(ObserverHandler::RADIO_SIM_RECORDS_LOADED);
+            filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED);
         }
         PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_LOADED, "");
     }
@@ -269,17 +273,17 @@ void IccFile::RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> e
 void IccFile::UnregisterAllFilesLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (filesFetchedObser_ != nullptr) {
-        filesFetchedObser_->Remove(ObserverHandler::RADIO_SIM_RECORDS_LOADED, handler);
+        filesFetchedObser_->Remove(RadioEvent::RADIO_SIM_RECORDS_LOADED, handler);
     }
 }
 
 void IccFile::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {
     switch (what) {
-        case ObserverHandler::RADIO_SIM_RECORDS_LOADED:
+        case RadioEvent::RADIO_SIM_RECORDS_LOADED:
             RegisterAllFilesLoaded(handler);
             break;
-        case ObserverHandler::RADIO_IMSI_LOADED_READY:
+        case RadioEvent::RADIO_IMSI_LOADED_READY:
             RegisterImsiLoaded(handler);
             break;
         default:
@@ -290,10 +294,10 @@ void IccFile::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler>
 void IccFile::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {
     switch (what) {
-        case ObserverHandler::RADIO_SIM_RECORDS_LOADED:
+        case RadioEvent::RADIO_SIM_RECORDS_LOADED:
             UnregisterAllFilesLoaded(handler);
             break;
-        case ObserverHandler::RADIO_IMSI_LOADED_READY:
+        case RadioEvent::RADIO_IMSI_LOADED_READY:
             UnregisterImsiLoaded(handler);
             break;
         default:
@@ -410,7 +414,7 @@ void IccFile::SetRilAndFileController(const std::shared_ptr<Telephony::ITelRilMa
 {
     telRilManager_ = ril;
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("IccFile set NULL telRilManager!!");
+        TELEPHONY_LOGE("IccFile set NULL TelRilManager!!");
     }
 
     fileController_ = file;
@@ -436,17 +440,17 @@ AppExecFwk::InnerEvent::Pointer IccFile::CreateDiallingNumberPointer(
     return event;
 }
 
+
 void IccFile::NotifyRegistrySimState(CardType type, SimState state, LockReason reason)
 {
-    int slotId = CoreManager::DEFAULT_SLOT_ID;
     int32_t result =
-        DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSimState(slotId, type, state, reason);
+        DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSimState(slotId_, type, state, reason);
     TELEPHONY_LOGI("NotifyRegistrySimState msgId is %{public}d ret %{public}d", state, result);
 }
 
-bool IccFile::HasSimCard(int slotId)
+bool IccFile::HasSimCard()
 {
-    return (stateManager_ != nullptr) ? stateManager_->HasSimCard(slotId) : false;
+    return (stateManager_ != nullptr) ? stateManager_->HasSimCard() : false;
 }
 
 void IccFile::UnInit()

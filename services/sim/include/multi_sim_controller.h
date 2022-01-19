@@ -18,14 +18,10 @@
 
 #include <list>
 
-#include "common_event.h"
-#include "common_event_manager.h"
 #include "want.h"
 #include "if_system_ability_manager.h"
-#include "core_manager.h"
-#include "i_sim_account_manager.h"
-#include "i_sim_state_manager.h"
-#include "i_sim_file_manager.h"
+#include "sim_state_manager.h"
+#include "sim_file_manager.h"
 #include "i_network_search.h"
 #include "sim_constant.h"
 #include "sim_rdb_helper.h"
@@ -37,14 +33,15 @@ namespace OHOS {
 namespace Telephony {
 class MultiSimController {
 public:
-    MultiSimController(std::shared_ptr<ITelRilManager> telRilManager,
-        std::shared_ptr<ISimStateManager> simStateManager,
-        std::shared_ptr<ISimFileManager> simFileManager,
-        std::shared_ptr<INetworkSearch> networkSearchManager,
+    MultiSimController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
+        std::shared_ptr<SimStateManager> simStateManager,
+        std::shared_ptr<SimFileManager> simFileManager,
+        const std::shared_ptr<AppExecFwk::EventRunner> &runner,
         int32_t slotId);
     virtual ~MultiSimController();
     void Init();
-    void InitData();
+    bool InitData(int32_t slotId);
+    void SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager);
     bool RefreshActiveIccAccountInfoList();
     int32_t GetDefaultVoiceSlotId();
     bool SetDefaultVoiceSlotId(int32_t slotId);
@@ -62,8 +59,7 @@ public:
     bool IsSimActive(int32_t slotId);
     bool SetActiveSim(int32_t slotId, int32_t enable, bool force = false);
     bool SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable);
-    void CreateRadioCapController(std::shared_ptr<AppExecFwk::EventRunner> runner);
-
+    bool ForgetAllData();
     std::vector<IccAccountInfo> iccAccountInfoList_;
 
 private:
@@ -88,8 +84,11 @@ private:
     const static int32_t EMPTY_VECTOR = 0;
     const static int32_t SUCCESS = 0;
     const static int32_t ACTIVE_INIT = -1;
+    const static int32_t RETRY_COUNT = 12;
+    const static int32_t RETRY_TIME = 5000;
     int32_t slotId_;
     int32_t maxCount_;
+    static bool ready_;
     inline static const std::string DEFAULT_VOICE_SLOTID_CHANGE_ACTION =
         "com.hos.action.DEFAULT_VOICE_SUBSCRIPTION_CHANGED";
     inline static const std::string DEFAULT_SMS_SLOTID_CHANGE_ACTION =
@@ -105,10 +104,10 @@ private:
     inline static const std::string DEFAULT_MAIN_SLOT_CHANGED = "defaultMainSlotChanged";
     inline static bool lackSim_;
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
-    std::shared_ptr<ISimStateManager> simStateManager_ = nullptr;
-    std::shared_ptr<ISimFileManager> simFileManager_ = nullptr;
-    std::shared_ptr<INetworkSearch> netWorkSearchManager_ = nullptr;
+    std::shared_ptr<SimStateManager> simStateManager_ = nullptr;
+    std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
     std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;
+    std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
     IccAccountInfo iccAccountInfo_;
     static std::vector<SimRdbInfo> localCacheInfo_;
     static std::mutex mutex_;

@@ -20,8 +20,8 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 namespace Telephony {
-IccFileController::IccFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-    : AppExecFwk::EventHandler(runner)
+IccFileController::IccFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int slotId)
+    : AppExecFwk::EventHandler(runner), slotId_(slotId)
 {}
 
 void IccFileController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -118,7 +118,7 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
         msg.data = IccFileController::NULLSTR;
         msg.path = path;
         msg.pin2 = "";
-        telRilManager_->GetSimIO(msg, BuildCallerInfo(MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE, hd));
+        telRilManager_->GetSimIO(slotId_, msg, BuildCallerInfo(MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE, hd));
     }
 }
 
@@ -145,7 +145,7 @@ void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer 
         msg.data = IccFileController::NULLSTR;
         msg.path = ObtainElementFilePath(fileId);
         msg.pin2 = "";
-        telRilManager_->GetSimIO(msg, process);
+        telRilManager_->GetSimIO(slotId_, msg, process);
     }
     TELEPHONY_LOGI("IccFileController::ProcessBinarySize finish %{public}d", fileId);
 }
@@ -176,7 +176,7 @@ void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer 
             msg.data = IccFileController::NULLSTR;
             msg.path = path;
             msg.pin2 = "";
-            telRilManager_->GetSimIO(msg, BuildCallerInfo(MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE, hd));
+            telRilManager_->GetSimIO(slotId_, msg, BuildCallerInfo(MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE, hd));
         }
     } else {
         SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
@@ -229,7 +229,7 @@ void IccFileController::ObtainBinaryFile(int fileId, const AppExecFwk::InnerEven
         msg.data = IccFileController::NULLSTR;
         msg.path = ObtainElementFilePath(fileId);
         msg.pin2 = "";
-        telRilManager_->GetSimIO(msg, process);
+        telRilManager_->GetSimIO(slotId_, msg, process);
     }
     TELEPHONY_LOGI("IccFileController::ObtainBinaryFile end");
 }
@@ -248,7 +248,7 @@ void IccFileController::ObtainBinaryFile(int fileId, int size, const AppExecFwk:
         msg.data = IccFileController::NULLSTR;
         msg.path = ObtainElementFilePath(fileId);
         msg.pin2 = "";
-        telRilManager_->GetSimIO(msg, process);
+        telRilManager_->GetSimIO(slotId_, msg, process);
     }
 }
 
@@ -272,7 +272,7 @@ void IccFileController::ObtainLinearFixedFile(
         msg.data = IccFileController::NULLSTR;
         msg.path = filePath;
         msg.pin2 = "";
-        telRilManager_->GetSimIO(msg, process);
+        telRilManager_->GetSimIO(slotId_, msg, process);
     }
 }
 
@@ -300,7 +300,7 @@ void IccFileController::ObtainAllLinearFixedFile(
         msg.data = IccFileController::NULLSTR;
         msg.path = filePath;
         msg.pin2 = "";
-        telRilManager_->GetSimIO(msg, process);
+        telRilManager_->GetSimIO(slotId_, msg, process);
     }
 }
 
@@ -327,7 +327,7 @@ void IccFileController::ObtainLinearFileSize(
         msg.data = IccFileController::NULLSTR;
         msg.path = filePath;
         msg.pin2 = "";
-        telRilManager_->GetSimIO(msg, process);
+        telRilManager_->GetSimIO(slotId_, msg, process);
     }
 }
 
@@ -353,7 +353,7 @@ void IccFileController::UpdateLinearFixedFile(int fileId, const std::string &pat
         msg.data = data;
         msg.path = filePath;
         msg.pin2 = pin2;
-        telRilManager_->GetSimIO(msg, process);
+        telRilManager_->GetSimIO(slotId_, msg, process);
     }
 }
 
@@ -373,7 +373,7 @@ void IccFileController::UpdateLinearFixedFile(int fileId, int fileNum, const std
         msg.data = data;
         msg.path = ObtainElementFilePath(fileId);
         msg.pin2 = pin2;
-        telRilManager_->GetSimIO(msg, process);
+        telRilManager_->GetSimIO(slotId_, msg, process);
     }
 }
 
@@ -394,7 +394,7 @@ void IccFileController::UpdateBinaryFile(
         msg.data = data;
         msg.path = ObtainElementFilePath(fileId);
         msg.pin2 = "";
-        telRilManager_->GetSimIO(msg, process);
+        telRilManager_->GetSimIO(slotId_, msg, process);
     }
 }
 
@@ -551,7 +551,7 @@ void IccFileController::SetRilManager(std::shared_ptr<Telephony::ITelRilManager>
 {
     telRilManager_ = ril;
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("IccFileController set NULL telRilManager!!");
+        TELEPHONY_LOGE("IccFileController set NULL TelRilManager!!");
     }
 }
 

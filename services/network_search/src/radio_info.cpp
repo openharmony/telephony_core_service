@@ -15,12 +15,11 @@
 
 #include "radio_info.h"
 
+#include "hril_types.h"
+#include "hril_modem_parcel.h"
 #include "network_search_manager.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
-#include "core_manager.h"
-#include "hril_types.h"
-#include "hril_modem_parcel.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -51,10 +50,8 @@ PhoneType RadioInfo::RadioTechToPhoneType(RadioTech radioTech) const
     return phoneType;
 }
 
-RadioInfo::RadioInfo() {}
-
-RadioInfo::RadioInfo(std::weak_ptr<NetworkSearchManager> networkSearchManager)
-    : networkSearchManager_(networkSearchManager)
+RadioInfo::RadioInfo(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
+    : networkSearchManager_(networkSearchManager), slotId_(slotId)
 {}
 
 void RadioInfo::ProcessGetRadioState(const AppExecFwk::InnerEvent::Pointer &event) const
@@ -63,51 +60,47 @@ void RadioInfo::ProcessGetRadioState(const AppExecFwk::InnerEvent::Pointer &even
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
     if ((responseInfo == nullptr && object == nullptr) || nsm == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetRadioState object is nullptr!");
+        TELEPHONY_LOGE("RadioInfo::ProcessGetRadioState object is nullptr slotId:%{public}d", slotId_);
         return;
     }
     int64_t index = 0;
     bool state = false;
     MessageParcel data;
     if (responseInfo != nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetRadioState false");
+        TELEPHONY_LOGE("RadioInfo::ProcessGetRadioState false slotId:%{public}d", slotId_);
         index = responseInfo->flag;
         state = false;
         if (!data.WriteBool(state) || !data.WriteInt32((int32_t)responseInfo->error)) {
-            TELEPHONY_LOGE("RadioInfo::ProcessGetRadioState WriteBool slotId is false");
-            nsm->RemoveCallbackFromMap(index);
+            NetworkUtils::RemoveCallbackFromMap(index);
             return;
         }
     }
-
     if (object != nullptr) {
         index = object->flag;
-        int32_t RadioState = object->state;
-        TELEPHONY_LOGI("RadioInfo::ProcessGetRadioState RadioState is:%{public}d", RadioState);
-        if (RadioState == CORE_SERVICE_POWER_ON) {
-            state = true;
-        }
-        nsm->SetRadioStateValue((ModemPowerState)RadioState);
-
+        int32_t radioState = object->state;
+        TELEPHONY_LOGI(
+            "RadioInfo::ProcessGetRadioState RadioState is:%{public}d slotId:%{public}d", radioState, slotId_);
+        state = (radioState == ModemPowerState::CORE_SERVICE_POWER_ON) ? true : false;
+        nsm->SetRadioStateValue(slotId_, (ModemPowerState)radioState);
         if (!data.WriteBool(state) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
-            TELEPHONY_LOGE("RadioInfo::ProcessGetRadioState WriteBool slotId is false");
-            nsm->RemoveCallbackFromMap(index);
+            NetworkUtils::RemoveCallbackFromMap(index);
             return;
         }
     }
-    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo = nsm->FindNetworkSearchCallback(index);
+    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo = NetworkUtils::FindNetworkSearchCallback(index);
     if (callbackInfo != nullptr) {
         sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchItem_;
-        if (callback != nullptr &&
-            callback->OnNetworkSearchCallback(
-                INetworkSearchCallback::NetworkSearchCallback::GET_RADIO_STATUS_RESULT, data)) {
-            TELEPHONY_LOGI("RadioInfo::ProcessGetRadioState callback success");
+        if (callback != nullptr && callback->OnNetworkSearchCallback(
+            INetworkSearchCallback::NetworkSearchCallback::GET_RADIO_STATUS_RESULT, data)) {
+            TELEPHONY_LOGE("RadioInfo::ProcessGetRadioState callback fail slotId:%{public}d", slotId_);
         }
-        nsm->RemoveCallbackFromMap(index);
+        NetworkUtils::RemoveCallbackFromMap(index);
     } else {
-        if (nsm->GetRadioState() != ModemPowerState::CORE_SERVICE_POWER_ON &&
-            !nsm->GetAirplaneMode()) {
-            nsm->SetRadioState(static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
+        if (nsm->GetRadioState(slotId_) != ModemPowerState::CORE_SERVICE_POWER_ON && !nsm->GetAirplaneMode()) {
+            nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
+        }
+        if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_ON) {
+            nsm->TriggerSimRefresh(slotId_);
         }
     }
 }
@@ -118,164 +111,140 @@ void RadioInfo::ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &even
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
     if ((responseInfo == nullptr && object == nullptr) || nsm == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessSetRadioState object is nullptr!");
+        TELEPHONY_LOGE("RadioInfo::ProcessSetRadioState object is nullptr slotId:%{public}d", slotId_);
         return;
     }
     MessageParcel data;
     int64_t index = 0;
     bool result = true;
     if (responseInfo != nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessSetRadioState false");
+        TELEPHONY_LOGE("RadioInfo::ProcessSetRadioState false slotId:%{public}d", slotId_);
         index = responseInfo->flag;
-        result = (static_cast<int32_t>(responseInfo->error) ==
-                     static_cast<int32_t>(HRilErrNumber::HRIL_ERR_REPEAT_STATUS)) ?
-            true :
-            false;
+        int32_t error = static_cast<int32_t>(responseInfo->error);
+        int32_t status = static_cast<int32_t>(HRilErrNumber::HRIL_ERR_REPEAT_STATUS);
+        result = (error == status) ? true : false;
         if (!data.WriteBool(result) || !data.WriteInt32((int32_t)responseInfo->error)) {
-            TELEPHONY_LOGE("RadioInfo::ProcessSetRadioState WriteBool result is false");
-            nsm->RemoveCallbackFromMap(index);
+            TELEPHONY_LOGE("RadioInfo::ProcessSetRadioState WriteBool result false slotId:%{public}d", slotId_);
+            NetworkUtils::RemoveCallbackFromMap(index);
             return;
         }
     }
 
     if (object != nullptr) {
-        TELEPHONY_LOGI("RadioInfo::ProcessSetRadioState ok");
+        TELEPHONY_LOGI("RadioInfo::ProcessSetRadioState ok slotId:%{public}d", slotId_);
         index = object->flag;
         result = true;
         if (!data.WriteBool(result) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
-            TELEPHONY_LOGE("RadioInfo::ProcessSetRadioState WriteBool result is false");
-            nsm->RemoveCallbackFromMap(index);
+            TELEPHONY_LOGE("RadioInfo::ProcessSetRadioState WriteBool result false slotId:%{public}d", slotId_);
+            NetworkUtils::RemoveCallbackFromMap(index);
             return;
         }
     }
 
-    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo = nsm->FindNetworkSearchCallback(index);
+    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
+        NetworkUtils::FindNetworkSearchCallback(index);
     if (callbackInfo != nullptr) {
         if (result) {
-            nsm->SetRadioStateValue((ModemPowerState)(callbackInfo->param_));
+            nsm->SetRadioStateValue(slotId_, (ModemPowerState)(callbackInfo->param_));
         }
         sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchItem_;
         if (callback != nullptr &&
             callback->OnNetworkSearchCallback(
                 INetworkSearchCallback::NetworkSearchCallback::SET_RADIO_STATUS_RESULT, data)) {
-            TELEPHONY_LOGI("RadioInfo::ProcessSetRadioState callback success");
+            TELEPHONY_LOGE("RadioInfo::ProcessSetRadioState callback fail slotId:%{public}d", slotId_);
         }
-        nsm->RemoveCallbackFromMap(index);
+        NetworkUtils::RemoveCallbackFromMap(index);
     }
-}
-
-void RadioInfo::ProcessRadioChange() const
-{
-    SetToTheSuitableState();
 }
 
 void RadioInfo::ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) const
 {
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    TELEPHONY_LOGI("RadioInfo::ProcessGetImei");
+    TELEPHONY_LOGI("RadioInfo::ProcessGetImei slotId:%{public}d", slotId_);
     if (event == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetImei event is nullptr");
+        TELEPHONY_LOGE("RadioInfo::ProcessGetImei event is nullptr slotId:%{public}d", slotId_);
         return;
     }
     if (nsm == nullptr) {
-        TELEPHONY_LOGE("NetworkSelection::ProcessGetImei nsm is nullptr");
+        TELEPHONY_LOGE("NetworkSelection::ProcessGetImei nsm is nullptr slotId:%{public}d", slotId_);
         return;
     }
 
-    std::shared_ptr<std::string> imeiID = event->GetSharedObject<std::string>();
+    std::shared_ptr<HrilStringParcel> imeiID = event->GetSharedObject<HrilStringParcel>();
     if (imeiID == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetImei imei is nullptr");
+        TELEPHONY_LOGE("RadioInfo::ProcessGetImei imei is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    nsm->SetImei(Str8ToStr16(*imeiID));
+    TELEPHONY_LOGI("imei = %{public}s", imeiID->ToString());
+    nsm->SetImei(slotId_, Str8ToStr16(imeiID->data));
 }
 
 void RadioInfo::ProcessGetMeid(const AppExecFwk::InnerEvent::Pointer &event) const
 {
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    TELEPHONY_LOGI("RadioInfo::ProcessGetMeid");
+    TELEPHONY_LOGI("RadioInfo::ProcessGetMeid slotId:%{public}d", slotId_);
     if (event == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetMeid event is nullptr");
+        TELEPHONY_LOGE("RadioInfo::ProcessGetMeid event is nullptr slotId:%{public}d", slotId_);
         return;
     }
     if (nsm == nullptr) {
-        TELEPHONY_LOGE("NetworkSelection::ProcessGetMeid nsm is nullptr");
+        TELEPHONY_LOGE("NetworkSelection::ProcessGetMeid nsm is nullptr slotId:%{public}d", slotId_);
         return;
     }
 
-    std::shared_ptr<std::string> meid = event->GetSharedObject<std::string>();
+    std::shared_ptr<HrilStringParcel> meid = event->GetSharedObject<HrilStringParcel>();
     if (meid == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetMeid meid is nullptr");
+        TELEPHONY_LOGE("RadioInfo::ProcessGetMeid meid is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    nsm->SetMeid(Str8ToStr16(*meid));
-}
-
-void RadioInfo::SetToTheSuitableState() const
-{
-    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    if (nsm == nullptr) {
-        TELEPHONY_LOGE("NetworkSelection::ProcessNetworkSearchResult nsm is nullptr");
-        return;
-    }
-    if (nsm != nullptr) {
-        ModemPowerState rdState = static_cast<ModemPowerState>(nsm->GetRadioState());
-        switch (rdState) {
-            case CORE_SERVICE_POWER_OFF: {
-                nsm->SetRadioState(false, 0);
-                break;
-            }
-            case CORE_SERVICE_POWER_NOT_AVAILABLE: {
-                break;
-            }
-            default:
-                break;
-        }
-    }
+    TELEPHONY_LOGI("meid = %{public}s", meid->ToString());
+    nsm->SetMeid(slotId_, Str8ToStr16(meid->data));
 }
 
 void RadioInfo::ProcessSetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event) const
 {
-    TELEPHONY_LOGI("RadioInfo::ProcessSetRadioCapability ok");
+    TELEPHONY_LOGI("RadioInfo::ProcessSetRadioCapability ok slotId:%{public}d", slotId_);
     if (event == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessSetRadioCapability event is nullptr");
+        TELEPHONY_LOGE("RadioInfo::ProcessSetRadioCapability event is nullptr slotId:%{public}d", slotId_);
         return;
     }
     std::shared_ptr<RadioCapabilityInfo> object = event->GetSharedObject<RadioCapabilityInfo>();
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (responseInfo == nullptr && object == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessSetRadioCapability object is nullptr!");
+        TELEPHONY_LOGE("RadioInfo::ProcessSetRadioCapability object is nullptr slotId:%{public}d", slotId_);
         return;
     }
     if (responseInfo != nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessSetRadioCapability false %{public}d %{public}d", responseInfo->error,
-            responseInfo->flag);
+        TELEPHONY_LOGE("RadioInfo::ProcessSetRadioCapability false %{public}d %{public}d slotId:%{public}d",
+            responseInfo->error, responseInfo->flag, slotId_);
     }
     if (object != nullptr) {
-        TELEPHONY_LOGI("RadioInfo::ProcessGetRadioState ratfamily is:%{public}d", object->ratfamily);
+        TELEPHONY_LOGI("RadioInfo::ProcessGetRadioState ratFamily is:%{public}d slotId:%{public}d",
+            object->ratFamily, slotId_);
     }
 }
 
 void RadioInfo::ProcessGetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event) const
 {
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    TELEPHONY_LOGI("RadioInfo::ProcessGetRadioCapability");
+    TELEPHONY_LOGI("RadioInfo::ProcessGetRadioCapability slotId:%{public}d", slotId_);
     if (event == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetRadioCapability event is nullptr");
+        TELEPHONY_LOGE("RadioInfo::ProcessGetRadioCapability event is nullptr slotId:%{public}d", slotId_);
         return;
     }
     if (nsm == nullptr) {
-        TELEPHONY_LOGE("NetworkSelection::ProcessGetRadioCapability nsm is nullptr");
+        TELEPHONY_LOGE("NetworkSelection::ProcessGetRadioCapability nsm is nullptr slotId:%{public}d", slotId_);
         return;
     }
 
     std::shared_ptr<RadioCapabilityInfo> rc = event->GetSharedObject<RadioCapabilityInfo>();
     if (rc == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetRadioCapability rc is nullptr");
+        TELEPHONY_LOGE("RadioInfo::ProcessGetRadioCapability rc is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    TELEPHONY_LOGI("RadioInfo::ProcessGetRadioCapability RadioCapability : %{public}d", rc->ratfamily);
-    nsm->SetCapability(0, *rc);
+    TELEPHONY_LOGI("RadioInfo::ProcessGetRadioCapability RadioCapability : %{public}d slotId:%{public}d",
+        rc->ratFamily, slotId_);
+    nsm->SetCapability(slotId_, *rc);
 }
 
 void RadioInfo::SetPhoneType(PhoneType phoneType)
@@ -308,13 +277,13 @@ void RadioInfo::UpdatePhone(RadioTech csRadioTech)
     TELEPHONY_LOGI("NetworkType::UpdatePhone SetPhoneType is success %{public}d", phoneType);
     SetPhoneType(phoneType);
 
-    int radioState = networkSearchManager->GetRadioState();
+    int radioState = networkSearchManager->GetRadioState(slotId_);
     if (static_cast<ModemPowerState>(radioState) != CORE_SERVICE_POWER_NOT_AVAILABLE) {
-        networkSearchManager->GetRadioCapability(CoreManager::DEFAULT_SLOT_ID);
-        networkSearchManager->GetImei(CoreManager::DEFAULT_SLOT_ID);
-        networkSearchManager->GetMeid(CoreManager::DEFAULT_SLOT_ID);
+        networkSearchManager->GetRadioCapability(slotId_);
+        networkSearchManager->GetImei(slotId_);
+        networkSearchManager->GetMeid(slotId_);
         if (static_cast<ModemPowerState>(radioState) == CORE_SERVICE_POWER_ON) {
-            networkSearchManager->GetVoiceTech();
+            networkSearchManager->GetVoiceTech(slotId_);
         }
     }
 }

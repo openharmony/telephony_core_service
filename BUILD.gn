@@ -19,55 +19,24 @@ TELEPHONY_CORE_SERVICE_ROOT = "//base/telephony/core_service"
 TELEPHONY_NETWORK_SEARCH_ROOT =
     "//base/telephony/core_service/services/network_search"
 TELEPHONY_SIM_ROOT = "//base/telephony/core_service/services/sim"
-TELEPHONY_FRAMEWORKS_ROOT = "//base/telephony/core_service/frameworks/native/"
-
-config("telephony_sim_config") {
-  if (defined(sim_slot_num)) {
-    defines = [ "SIM_SLOT_NUM = $sim_slot_num" ]
-    if (sim_slot_num > 1) {
-      defines += [ "MULTI_SIM_SLOT_SUPPORT" ]
-    }
-  } else {
-    defines = [ "SIM_SLOT_NUM = 1" ]
-  }
-}
+TELEPHONY_TEL_RIL_ROOT = "//base/telephony/core_service/services/tel_ril"
 
 ohos_shared_library("tel_core_service") {
   install_enable = true
 
-  configs = [ ":telephony_sim_config" ]
-
   sources = [
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/network_search/network_search_callback_proxy.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/src/core.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/src/core_manager.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/src/core_manager_inner.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/src/core_service.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/src/core_service_stub.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/src/observer_handler.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/hdf_death_recipient.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_base.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_call.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_data.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_manager.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_modem.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_network.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_sim.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_sms.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/cell_information.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_information.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_search_result.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_state.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/signal_information.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/cell_location.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/cell_manager.cpp",
+    "$TELEPHONY_CORE_SERVICE_ROOT/services/core/src/core_service.cpp",
+    "$TELEPHONY_CORE_SERVICE_ROOT/services/core/src/core_service_stub.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/cell_info.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_register.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_callback_proxy.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_handler.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_manager.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_notify.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_state.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_selection.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_type.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_utils.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/nitz_update.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/operator_name.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/radio_info.cpp",
@@ -97,6 +66,7 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_SIM_ROOT/src/sim_file.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_file_controller.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_file_manager.cpp",
+    "$TELEPHONY_SIM_ROOT/src/sim_manager.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_number_decode.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_rdb_helper.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_sms_controller.cpp",
@@ -110,18 +80,24 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_SIM_ROOT/src/tag_service.cpp",
     "$TELEPHONY_SIM_ROOT/src/usim_dialling_numbers_service.cpp",
     "$TELEPHONY_SIM_ROOT/src/usim_file_controller.cpp",
+    "$TELEPHONY_TEL_RIL_ROOT/src/hdf_death_recipient.cpp",
+    "$TELEPHONY_TEL_RIL_ROOT/src/observer_handler.cpp",
+    "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_base.cpp",
+    "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_call.cpp",
+    "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_data.cpp",
+    "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_manager.cpp",
+    "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_modem.cpp",
+    "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_network.cpp",
+    "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_sim.cpp",
+    "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_sms.cpp",
   ]
 
   include_dirs = [
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/core",
     "//base/telephony/data_storage/sim/include",
     "//base/telephony/data_storage/common/include",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/include",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/include",
+    "$TELEPHONY_CORE_SERVICE_ROOT/services/core/include",
+    "$TELEPHONY_TEL_RIL_ROOT/include",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/include",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/network_search",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/sim",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/core",
     "$TELEPHONY_CORE_SERVICE_ROOT/utils/log/include",
     "$TELEPHONY_SIM_ROOT/include",
     "//utils/native/base/include",
@@ -140,7 +116,7 @@ ohos_shared_library("tel_core_service") {
     "//base/global/resmgr_standard/interfaces/innerkits/include/",
   ]
 
-  defines = [
+  defines += [
     "TELEPHONY_LOG_TAG = \"CoreService\"",
     "LOG_DOMAIN = 0xD002B01",
   ]
@@ -151,7 +127,8 @@ ohos_shared_library("tel_core_service") {
     "//base/miscservices/time/services:time_service",
     "//base/notification/ans_standard/frameworks/wantagent:wantagent_innerkits",
     "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
-    "//base/telephony/core_service/utils:libtelephony_common",
+    "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
+    "//base/telephony/core_service/utils:libtel_common",
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",

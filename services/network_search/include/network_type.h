@@ -27,13 +27,14 @@ namespace Telephony {
 class NetworkSearchManager;
 class NetworkType {
 public:
-    explicit NetworkType(std::weak_ptr<NetworkSearchManager> networkSearchManager);
+    NetworkType(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId);
     virtual ~NetworkType() = default;
-    void ProcessGetPreferredNetwork(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) const;
-    void ProcessSetPreferredNetwork(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) const;
+    void ProcessGetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &event) const;
+    void ProcessSetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &event) const;
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
+    int32_t slotId_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

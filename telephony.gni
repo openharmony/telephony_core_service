@@ -14,5 +14,21 @@
 #declare build args
 
 declare_args() {
-  sim_slot_num = 1
+  sim_slot_count = 2
 }
+
+if (!defined(defines)) {
+  defines = []
+}
+
+if (defined(sim_slot_count)) {
+  defines += [ "SIM_SLOT_COUNT = $sim_slot_count" ]
+  defines += [ "SIM_SLOT_0 = 0" ]
+  defines += [ "SIM_SLOT_1 = 1" ]
+  defines += [ "SIM_SLOT_2 = 2" ]
+  defines += [ "SIM_SLOT_3 = 3" ]
+} else {
+  defines += [ "SIM_SLOT_COUNT = 1" ]
+}
+
+defines += [ "DEFAULT_SIM_SLOT_ID = 0" ]

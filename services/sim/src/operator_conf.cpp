@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-OperatorConf::OperatorConf(std::shared_ptr<ISimFileManager> simFileManager)
+OperatorConf::OperatorConf(std::shared_ptr<SimFileManager> simFileManager)
     : simFileManager_(simFileManager)
 {
     TELEPHONY_LOGI("OperatorConf construct");
@@ -109,12 +109,11 @@ void OperatorConf::ParseChild(xmlDocPtr doc, xmlNodePtr cur, OperatorConfig &poc
 
 std::string OperatorConf::GetMcc()
 {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
     if (simFileManager_ == nullptr) {
         TELEPHONY_LOGE("OperatorConf GetMcc failed by nullptr");
         return TEST_MCC;
     }
-    std::string imsi = Str16ToStr8(simFileManager_->GetIMSI(slotId));
+    std::string imsi = Str16ToStr8(simFileManager_->GetIMSI());
     if (imsi.empty()) {
         TELEPHONY_LOGE("OperatorConf GetMcc failed empty imsi");
         return TEST_MCC;
@@ -124,12 +123,11 @@ std::string OperatorConf::GetMcc()
 
 std::string OperatorConf::GetMncLengthTwo()
 {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
     if (simFileManager_ == nullptr) {
         TELEPHONY_LOGE("OperatorConf GetMnc2 failed by nullptr");
         return TEST_MNC;
     }
-    std::string imsi = Str16ToStr8(simFileManager_->GetIMSI(slotId));
+    std::string imsi = Str16ToStr8(simFileManager_->GetIMSI());
     if (imsi.empty()) {
         TELEPHONY_LOGE("OperatorConf GetMnc2 failed empty imsi");
         return TEST_MNC;
@@ -139,12 +137,11 @@ std::string OperatorConf::GetMncLengthTwo()
 
 std::string OperatorConf::GetMncLengthThree()
 {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
     if (simFileManager_ == nullptr) {
         TELEPHONY_LOGE("OperatorConf GetMnc3 failed by nullptr");
         return TEST_MNC;
     }
-    std::string imsi = Str16ToStr8(simFileManager_->GetIMSI(slotId));
+    std::string imsi = Str16ToStr8(simFileManager_->GetIMSI());
     if (imsi.empty()) {
         TELEPHONY_LOGE("OperatorConf GetMnc3 failed empty imsi");
         return TEST_MNC;

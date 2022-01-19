@@ -26,12 +26,13 @@ namespace Telephony {
 class NetworkSearchManager;
 class NetworkSearchState {
 public:
-    NetworkSearchState(const std::weak_ptr<NetworkSearchManager> &networkSearchManager);
+    NetworkSearchState(const std::weak_ptr<NetworkSearchManager> &networkSearchManager, int32_t slotId);
     virtual ~NetworkSearchState() = default;
-    void Init();
+    bool Init();
     void SetOperatorInfo(const std::string &longName, const std::string &shortName, const std::string &numeric,
         DomainType domainType);
     void SetEmergency(bool isEmergency);
+    bool IsEmergency();
     void SetNetworkType(RadioTech tech, DomainType domainType);
     void SetNetworkState(RegServiceState state, DomainType domainType);
     void SetNetworkStateToRoaming(RoamingType roamingType, DomainType domainType);
@@ -52,10 +53,11 @@ private:
     void NotifyNrStateChange();
     std::mutex mutex_;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
-    std::shared_ptr<NetworkState> networkState_ = nullptr;
-    std::shared_ptr<NetworkState> networkStateOld_ = nullptr;
+    std::unique_ptr<NetworkState> networkState_ = nullptr;
+    std::unique_ptr<NetworkState> networkStateOld_ = nullptr;
     std::mutex imsMutex_;
     bool imsRegStatus_ = false;
+    int32_t slotId_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

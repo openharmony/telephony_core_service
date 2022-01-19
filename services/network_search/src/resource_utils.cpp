@@ -19,40 +19,35 @@
 
 namespace OHOS {
 namespace Telephony {
-const std::string ResourceUtils::CONFIG_USER_NOTIFICATION_OF_RESTRICTIED_MOBILE_ACCESS =
-    "config_user_notification_of_restrictied_mobile_access";
-const std::string ResourceUtils::CONFIG_CDMA_INTERNATIONAL_ROAMING_INDICATORS =
-    "config_cdma_international_roaming_indicators";
-const std::string ResourceUtils::CONFIG_VOICE_CAPABLE = "config_voice_capable";
-const std::string ResourceUtils::CONFIG_SWITCH_PHONE_ON_VOICE_REG_STATE_CHANGE =
-    "config_switch_phone_on_voice_reg_state_change";
-const std::string ResourceUtils::CONFIG_CDMA_HOME_SYSTEM = "config_cdma_home_system";
-const std::string ResourceUtils::WFC_SPN_FORMATS = "wfcSpnFormats";
-const std::string ResourceUtils::ROAMING_TEXT_SEARCHING = "roamingTextSearching";
-const std::string ResourceUtils::CONFIG_LTE_ERI_FOR_NETWORK_NAME = "config_LTE_eri_for_network_name";
-const std::string ResourceUtils::CONFIG_OPERATOR_CONSIDEREDNON_ROAMING = "config_operatorConsideredNonRoaming";
-const std::string ResourceUtils::CONFIG_SAME_NAME_DOPERATOR_CONSIDERED_ROAMING =
-    "config_sameNamedOperatorConsideredRoaming";
+const std::string ResourceUtils::RESOURCE_HAP_BUNDLE_NAME = "ohos.global.systemres";
+const std::string ResourceUtils::RESOURCE_INDEX_PATH = "/data/accounts/account_0/applications/" +
+    ResourceUtils::RESOURCE_HAP_BUNDLE_NAME + "/" + ResourceUtils::RESOURCE_HAP_BUNDLE_NAME +
+    "/assets/entry/resources.index";
+
+const std::string ResourceUtils::IS_NOTIFY_USER_RESTRICTIED_CHANGE = "is_notify_user_restrictied_change";
+const std::string ResourceUtils::IS_CS_CAPABLE = "is_cs_capable";
+const std::string ResourceUtils::IS_SWITCH_PHONE_REG_CHANGE = "is_switch_phone_reg_change";
+const std::string ResourceUtils::SPN_FORMATS = "spn_formats";
 const std::string ResourceUtils::EMERGENCY_CALLS_ONLY = "emergency_calls_only";
-const std::string ResourceUtils::LOCKSCREEN_CARRIER_DEFAULT = "lockscreen_carrier_default";
+const std::string ResourceUtils::OUT_OF_SERIVCE = "out_of_serivce";
 
 const std::map<std::string, ResourceUtils::ResourceType> ResourceUtils::mapResourceNameType_ = {
-    {ResourceUtils::CONFIG_USER_NOTIFICATION_OF_RESTRICTIED_MOBILE_ACCESS,
-        ResourceUtils::ResourceType::ResourceTypeBoolean},
-    {ResourceUtils::CONFIG_CDMA_INTERNATIONAL_ROAMING_INDICATORS,
-        ResourceUtils::ResourceType::ResourceTypeArrayInteger},
-    {ResourceUtils::CONFIG_VOICE_CAPABLE, ResourceUtils::ResourceType::ResourceTypeBoolean},
-    {ResourceUtils::CONFIG_SWITCH_PHONE_ON_VOICE_REG_STATE_CHANGE, ResourceUtils::ResourceType::ResourceTypeBoolean},
-    {ResourceUtils::CONFIG_CDMA_HOME_SYSTEM, ResourceUtils::ResourceType::ResourceTypeArrayString},
-    {ResourceUtils::WFC_SPN_FORMATS, ResourceUtils::ResourceType::ResourceTypeArrayString},
-    {ResourceUtils::ROAMING_TEXT_SEARCHING, ResourceUtils::ResourceType::ResourceTypeString},
-    {ResourceUtils::CONFIG_LTE_ERI_FOR_NETWORK_NAME, ResourceUtils::ResourceType::ResourceTypeBoolean},
-    {ResourceUtils::CONFIG_OPERATOR_CONSIDEREDNON_ROAMING, ResourceUtils::ResourceType::ResourceTypeArrayString},
-    {ResourceUtils::CONFIG_SAME_NAME_DOPERATOR_CONSIDERED_ROAMING,
-        ResourceUtils::ResourceType::ResourceTypeArrayString},
+    {ResourceUtils::IS_NOTIFY_USER_RESTRICTIED_CHANGE, ResourceUtils::ResourceType::ResourceTypeBoolean},
+    {ResourceUtils::IS_CS_CAPABLE, ResourceUtils::ResourceType::ResourceTypeBoolean},
+    {ResourceUtils::IS_SWITCH_PHONE_REG_CHANGE, ResourceUtils::ResourceType::ResourceTypeBoolean},
+    {ResourceUtils::SPN_FORMATS, ResourceUtils::ResourceType::ResourceTypeArrayString},
     {ResourceUtils::EMERGENCY_CALLS_ONLY, ResourceUtils::ResourceType::ResourceTypeString},
-    {ResourceUtils::LOCKSCREEN_CARRIER_DEFAULT, ResourceUtils::ResourceType::ResourceTypeString},
+    {ResourceUtils::OUT_OF_SERIVCE, ResourceUtils::ResourceType::ResourceTypeString},
 };
+
+ResourceUtils &ResourceUtils::Get()
+{
+    static ResourceUtils utils_;
+    if (!utils_.Init(RESOURCE_INDEX_PATH)) {
+        TELEPHONY_LOGE("ResourceUtils::Get init failed.");
+    }
+    return utils_;
+}
 
 ResourceUtils::ResourceUtils()
 {
