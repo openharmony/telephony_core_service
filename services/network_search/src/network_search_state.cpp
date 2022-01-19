@@ -23,23 +23,25 @@
 
 namespace OHOS {
 namespace Telephony {
-NetworkSearchState::NetworkSearchState(const std::weak_ptr<NetworkSearchManager> &networkSearchManager)
-    : networkSearchManager_(networkSearchManager)
+NetworkSearchState::NetworkSearchState(
+    const std::weak_ptr<NetworkSearchManager> &networkSearchManager, int32_t slotId)
+    : networkSearchManager_(networkSearchManager), slotId_(slotId)
 {}
 
-void NetworkSearchState::Init()
+bool NetworkSearchState::Init()
 {
-    TELEPHONY_LOGI("NetworkSearchState Init");
-    networkStateOld_ = std::make_shared<NetworkState>();
+    TELEPHONY_LOGI("NetworkSearchState Init slotId:%{public}d", slotId_);
+    networkStateOld_ = std::make_unique<NetworkState>();
     if (networkStateOld_ == nullptr) {
-        TELEPHONY_LOGE("failed to create old networkState");
-        return;
+        TELEPHONY_LOGE("failed to create old networkState slotId:%{public}d", slotId_);
+        return false;
     }
-    networkState_ = std::make_shared<NetworkState>();
+    networkState_ = std::make_unique<NetworkState>();
     if (networkState_ == nullptr) {
-        TELEPHONY_LOGE("failed to create new networkState");
-        return;
+        TELEPHONY_LOGE("failed to create new networkState slotId:%{public}d", slotId_);
+        return false;
     }
+    return true;
 }
 
 void NetworkSearchState::SetOperatorInfo(
@@ -50,9 +52,9 @@ void NetworkSearchState::SetOperatorInfo(
         networkState_->SetOperatorInfo(longName, shortName, numeric, domainType);
         TELEPHONY_LOGI(
             "NetworkSearchState::SetOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : "
-            "%{public}s, %{public}p\n",
+            "%{public}s, %{public}p slotId:%{public}d",
             networkState_->GetLongOperatorName().c_str(), networkState_->GetShortOperatorName().c_str(),
-            networkState_->GetPlmnNumeric().c_str(), networkState_.get());
+            networkState_->GetPlmnNumeric().c_str(), networkState_.get(), slotId_);
     }
 }
 
@@ -62,6 +64,15 @@ void NetworkSearchState::SetEmergency(bool isEmergency)
     if (networkState_ != nullptr) {
         networkState_->SetEmergency(isEmergency);
     }
+}
+
+bool NetworkSearchState::IsEmergency()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (networkState_ != nullptr) {
+        return networkState_->IsEmergency();
+    }
+    return false;
 }
 
 void NetworkSearchState::SetNetworkType(RadioTech tech, DomainType domainType)
@@ -107,7 +118,7 @@ std::unique_ptr<NetworkState> NetworkSearchState::GetNetworkStatus()
     networkState_->Marshalling(data);
     std::unique_ptr<NetworkState> networkState = std::make_unique<NetworkState>();
     if (networkState == nullptr) {
-        TELEPHONY_LOGE("failed to create new networkState");
+        TELEPHONY_LOGE("failed to create new networkState slotId:%{public}d", slotId_);
         return nullptr;
     }
     networkState->ReadFromParcel(data);
@@ -116,7 +127,7 @@ std::unique_ptr<NetworkState> NetworkSearchState::GetNetworkStatus()
 
 void NetworkSearchState::SetInitial()
 {
-    TELEPHONY_LOGI("NetworkSearchState::SetInitial");
+    TELEPHONY_LOGI("NetworkSearchState::SetInitial slotId:%{public}d", slotId_);
     std::lock_guard<std::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->Init();
@@ -144,21 +155,21 @@ void NetworkSearchState::NotifyPsRegStatusChange()
     std::lock_guard<std::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("NotifyPsRegStatusChange NetworkSearchManager is null");
+        TELEPHONY_LOGE("NotifyPsRegStatusChange NetworkSearchManager is null slotId:%{public}d", slotId_);
         return;
     }
     if (networkState_ == nullptr) {
-        TELEPHONY_LOGE("NotifyPsRegStatusChange networkState_ is null");
+        TELEPHONY_LOGE("NotifyPsRegStatusChange networkState_ is null slotId:%{public}d", slotId_);
         return;
     }
 
     if (networkState_->GetPsRegStatus() == RegServiceState::REG_STATE_IN_SERVICE &&
         networkStateOld_->GetPsRegStatus() != RegServiceState::REG_STATE_IN_SERVICE) {
-        networkSearchManager->NotifyPsConnectionAttachedChanged();
+        networkSearchManager->NotifyPsConnectionAttachedChanged(slotId_);
     }
     if (networkState_->GetPsRegStatus() != RegServiceState::REG_STATE_IN_SERVICE &&
         networkStateOld_->GetPsRegStatus() == RegServiceState::REG_STATE_IN_SERVICE) {
-        networkSearchManager->NotifyPsConnectionDetachedChanged();
+        networkSearchManager->NotifyPsConnectionDetachedChanged(slotId_);
     }
 }
 
@@ -167,20 +178,20 @@ void NetworkSearchState::NotifyPsRoamingStatusChange()
     std::lock_guard<std::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("NotifyPsRoamingStatusChange NetworkSearchManager is null");
+        TELEPHONY_LOGE("NotifyPsRoamingStatusChange NetworkSearchManager is null slotId:%{public}d", slotId_);
         return;
     }
     if (networkState_ == nullptr) {
-        TELEPHONY_LOGE("NotifyPsRoamingStatusChange networkState_ is null");
+        TELEPHONY_LOGE("NotifyPsRoamingStatusChange networkState_ is null slotId:%{public}d", slotId_);
         return;
     }
     if (networkState_->GetPsRoamingStatus() > RoamingType::ROAMING_STATE_UNKNOWN &&
         networkStateOld_->GetPsRoamingStatus() == RoamingType::ROAMING_STATE_UNKNOWN) {
-        networkSearchManager->NotifyPsRoamingOpenChanged();
+        networkSearchManager->NotifyPsRoamingOpenChanged(slotId_);
     }
     if (networkStateOld_->GetPsRoamingStatus() > RoamingType::ROAMING_STATE_UNKNOWN &&
         networkState_->GetPsRoamingStatus() == RoamingType::ROAMING_STATE_UNKNOWN) {
-        networkSearchManager->NotifyPsRoamingCloseChanged();
+        networkSearchManager->NotifyPsRoamingCloseChanged(slotId_);
     }
 }
 
@@ -189,17 +200,17 @@ void NetworkSearchState::NotifyPsRadioTechChange()
     std::lock_guard<std::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("NotifyPsRadioTechChange NetworkSearchManager is null");
+        TELEPHONY_LOGE("NotifyPsRadioTechChange NetworkSearchManager is null slotId:%{public}d", slotId_);
         return;
     }
     if (networkState_ == nullptr) {
-        TELEPHONY_LOGE("NotifyPsRadioTechChange networkState_ is null");
+        TELEPHONY_LOGE("NotifyPsRadioTechChange networkState_ is null slotId:%{public}d", slotId_);
         return;
     }
 
     if (networkState_->GetPsRadioTech() != networkStateOld_->GetPsRadioTech()) {
-        networkSearchManager->SendUpdateCellLocationRequest();
-        networkSearchManager->NotifyPsRatChanged();
+        networkSearchManager->SendUpdateCellLocationRequest(slotId_);
+        networkSearchManager->NotifyPsRatChanged(slotId_);
     }
 }
 
@@ -208,18 +219,18 @@ void NetworkSearchState::NotifyEmergencyChange()
     std::lock_guard<std::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("NotifyEmergencyChange NetworkSearchManager is null");
+        TELEPHONY_LOGE("NotifyEmergencyChange NetworkSearchManager is null slotId:%{public}d", slotId_);
         return;
     }
     if (networkState_ == nullptr) {
-        TELEPHONY_LOGE("NotifyEmergencyChange networkState_ is null");
+        TELEPHONY_LOGE("NotifyEmergencyChange networkState_ is null slotId:%{public}d", slotId_);
         return;
     }
     if (networkState_->IsEmergency() != networkStateOld_->IsEmergency()) {
         if (networkState_->IsEmergency()) {
-            networkSearchManager->NotifyEmergencyOpenChanged();
+            networkSearchManager->NotifyEmergencyOpenChanged(slotId_);
         } else {
-            networkSearchManager->NotifyEmergencyCloseChanged();
+            networkSearchManager->NotifyEmergencyCloseChanged(slotId_);
         }
     }
 }
@@ -229,24 +240,24 @@ void NetworkSearchState::NotifyNrStateChange()
     std::lock_guard<std::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("NotifyPsRadioTechChange NetworkSearchManager is null");
+        TELEPHONY_LOGE("NotifyPsRadioTechChange NetworkSearchManager is null slotId:%{public}d", slotId_);
         return;
     }
     if (networkState_ == nullptr) {
-        TELEPHONY_LOGE("NotifyPsRadioTechChange networkState_ is null");
+        TELEPHONY_LOGE("NotifyPsRadioTechChange networkState_ is null slotId:%{public}d", slotId_);
         return;
     }
 
     if (networkState_->GetNrState() != networkStateOld_->GetNrState()) {
-        networkSearchManager->NotifyNrStateChanged();
+        networkSearchManager->NotifyNrStateChanged(slotId_);
     }
 }
 
 void NetworkSearchState::NotifyStateChange()
 {
-    TELEPHONY_LOGI("NetworkSearchState::NotifyStateChange");
+    TELEPHONY_LOGI("NetworkSearchState::NotifyStateChange slotId:%{public}d", slotId_);
     if (networkState_ == nullptr) {
-        TELEPHONY_LOGE("NotifyStateChange networkState_ is null");
+        TELEPHONY_LOGE("NotifyStateChange networkState_ is null slotId:%{public}d", slotId_);
         return;
     }
 
@@ -255,19 +266,21 @@ void NetworkSearchState::NotifyStateChange()
     NotifyPsRadioTechChange();
     NotifyEmergencyChange();
     NotifyNrStateChange();
+    CsRadioTechChange();
 
     if (!(*networkState_ == *networkStateOld_)) {
-        TELEPHONY_LOGI("NetworkSearchState::StateCheck isNetworkStateChange notify to app...");
+        TELEPHONY_LOGI(
+            "NetworkSearchState::StateCheck isNetworkStateChange notify to app... slotId:%{public}d", slotId_);
         sptr<NetworkState> ns = new NetworkState;
         if (ns == nullptr) {
-            TELEPHONY_LOGE("failed to create networkState");
+            TELEPHONY_LOGE("failed to create networkState slotId:%{public}d", slotId_);
             return;
         }
 
         MessageParcel data;
         networkState_->Marshalling(data);
         ns->ReadFromParcel(data);
-        DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifyNetworkStateUpdated(ns);
+        DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifyNetworkStateUpdated(slotId_, ns);
         networkState_->Marshalling(data);
         networkStateOld_->ReadFromParcel(data);
     }
@@ -275,24 +288,24 @@ void NetworkSearchState::NotifyStateChange()
 
 void NetworkSearchState::CsRadioTechChange()
 {
-    TELEPHONY_LOGI("NetworkSearchState::CsRadioTechChange");
+    TELEPHONY_LOGI("NetworkSearchState::CsRadioTechChange slotId:%{public}d", slotId_);
     std::lock_guard<std::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("CsRadioTechChange NetworkSearchManager is null");
+        TELEPHONY_LOGE("CsRadioTechChange NetworkSearchManager is null slotId:%{public}d", slotId_);
         return;
     }
     if (networkState_ == nullptr) {
-        TELEPHONY_LOGE("CsRadioTechChange networkState is null");
+        TELEPHONY_LOGE("CsRadioTechChange networkState is null slotId:%{public}d", slotId_);
         return;
     }
     if (networkStateOld_ == nullptr) {
-        TELEPHONY_LOGE("CsRadioTechChange networkStateOld_ is null");
+        TELEPHONY_LOGE("CsRadioTechChange networkStateOld_ is null slotId:%{public}d", slotId_);
         return;
     }
 
     if (networkState_->GetCsRadioTech() != networkStateOld_->GetCsRadioTech()) {
-        networkSearchManager->UpdatePhone(networkState_->GetCsRadioTech());
+        networkSearchManager->UpdatePhone(slotId_, networkState_->GetCsRadioTech());
     }
 }
 } // namespace Telephony

@@ -18,8 +18,8 @@
 #include "iservice_registry.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
-#include "sim_state_type.h"
 #include "telephony_log_wrapper.h"
+#include "sim_state_type.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -926,6 +926,92 @@ HWTEST_F(SimTest, Telephony_Sim_HasOperatorPrivileges_0100, Function | MediumTes
     } else {
         constexpr int32_t slotId = 0;
         bool result = SimTest::telephonyService_->HasOperatorPrivileges(slotId);
+        EXPECT_TRUE(result);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_GetCardType_0100
+ * @tc.name     GetCardType
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetCardType_0100, Function | MediumTest | Level3)
+{
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+        std::cout << "TelephonyTestService Remote service is null" << std::endl;
+        SimTest::telephonyService_ = GetProxy();
+    } else {
+        int32_t result = SimTest::telephonyService_->GetCardType(SimTest::slotId_);
+        EXPECT_GT(result, -1);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_UnlockSimLock_0100
+ * @tc.name     UnlockSimLock
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_UnlockSimLock_0100, Function | MediumTest | Level3)
+{
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+        std::cout << "TelephonyTestService Remote service is null" << std::endl;
+        SimTest::telephonyService_ = GetProxy();
+    } else {
+        PersoLockInfo lockInfo;
+        lockInfo.lockType = PersoLockType::PN_PIN_LOCK;
+        lockInfo.password = Str8ToStr16("1234");
+        LockStatusResponse response = {0};
+        bool result = SimTest::telephonyService_->UnlockSimLock(SimTest::slotId_, lockInfo, response);
+        EXPECT_TRUE(result);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_SetPrimarySlotId_0100
+ * @tc.name     SetPrimarySlotId
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0100, Function | MediumTest | Level3)
+{
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+        std::cout << "TelephonyTestService Remote service is null" << std::endl;
+        SimTest::telephonyService_ = GetProxy();
+    } else {
+        bool result = SimTest::telephonyService_->SetPrimarySlotId(SimTest::slotId_);
+        EXPECT_TRUE(result);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_GetPrimarySlotId_0100
+ * @tc.name     GetPrimarySlotId
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetPrimarySlotId_0100, Function | MediumTest | Level3)
+{
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+        std::cout << "TelephonyTestService Remote service is null" << std::endl;
+        SimTest::telephonyService_ = GetProxy();
+    } else {
+        int32_t result = SimTest::telephonyService_->GetPrimarySlotId();
+        EXPECT_GT(result, -1);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_SetVoiceMailInfo_0100
+ * @tc.name     SetVoiceMailInfo
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailInfo_0100, Function | MediumTest | Level3)
+{
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+        std::cout << "TelephonyTestService Remote service is null" << std::endl;
+        SimTest::telephonyService_ = GetProxy();
+    } else {
+        const std::u16string mailName = Str8ToStr16("张三");
+        const std::u16string mailnumber = Str8ToStr16("13123456789");
+        bool result = SimTest::telephonyService_->SetVoiceMailInfo(SimTest::slotId_, mailName, mailnumber);
         EXPECT_TRUE(result);
     }
 }

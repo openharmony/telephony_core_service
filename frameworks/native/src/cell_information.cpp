@@ -790,7 +790,7 @@ std::string CdmaCellInformation::ToString() const
     return content;
 }
 
-void NrCellInformation::SetNrParam(int32_t nrArfcn, int32_t pci, int32_t tac, int32_t nci)
+void NrCellInformation::SetNrParam(int32_t nrArfcn, int32_t pci, int32_t tac, int64_t nci)
 {
     nrArfcn_ = nrArfcn;
     pci_ = pci;
@@ -864,7 +864,7 @@ bool NrCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(tac_)) {
         return false;
     }
-    if (!parcel.WriteInt32(nci_)) {
+    if (!parcel.WriteInt64(nci_)) {
         return false;
     }
     if (!parcel.WriteInt64(timeStamp_)) {
@@ -900,7 +900,7 @@ bool NrCellInformation::ReadFromParcel(Parcel &parcel)
     nrArfcn_ = parcel.ReadInt32();
     pci_ = parcel.ReadInt32();
     tac_ = parcel.ReadInt32();
-    nci_ = parcel.ReadInt32();
+    nci_ = parcel.ReadInt64();
     timeStamp_ = parcel.ReadInt64();
     signalLevel_ = parcel.ReadInt32();
     isCamped_ = parcel.ReadBool();
@@ -922,7 +922,7 @@ int32_t NrCellInformation::GetTac() const
     return tac_;
 }
 
-int32_t NrCellInformation::GetNci() const
+int64_t NrCellInformation::GetNci() const
 {
     return nci_;
 }

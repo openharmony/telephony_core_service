@@ -17,8 +17,8 @@
 
 namespace OHOS {
 namespace Telephony {
-SimFileController::SimFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-    : IccFileController(runner)
+SimFileController::SimFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int slotId)
+    : IccFileController(runner, slotId)
 {}
 
 std::string SimFileController::ObtainElementFilePath(int efId)

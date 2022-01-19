@@ -16,14 +16,18 @@
 #ifndef TEL_RIL_BASE_H
 #define TEL_RIL_BASE_H
 
+#include <any>
 #include <mutex>
 
 #include "event_runner.h"
 #include "iremote_broker.h"
 
+#include "hril_base_parcel.h"
 #include "hril_types.h"
+#include "radio_event.h"
 #include "observer_handler.h"
 #include "tel_ril_common.h"
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -43,7 +47,7 @@ struct TelRilRequest {
 
 class TelRilBase {
 public:
-    TelRilBase(sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
+    TelRilBase(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
     virtual ~TelRilBase() = default;
 
     /**
@@ -61,12 +65,35 @@ public:
     int32_t SendInt32Event(int32_t dispatchId, int32_t value);
 
     /**
-     * @brief Send BufferEvent
-     * @param: int32_t dispatchId
-     * @param: MessageParcel &eventData
+     * @brief Send Int32Event
+     * @param: int32_t dispatchId.
+     * @param: int32_t value.
      * @return: Returns the value of the send_result.
      */
-    int32_t SendBufferEvent(int32_t dispatchId, MessageParcel &eventData);
+    int32_t SendInt32sEvent(int32_t dispatchId, int32_t argCount, ...);
+
+    /**
+     * @brief Send BufferEvent
+     * @param: int32_t dispatchId
+     * @param: user data &eventData
+     * @return: Returns the value of the send_result.
+     */
+    template<typename T>
+    int32_t SendBufferEvent(int32_t dispatchId, const T &eventData)
+    {
+        if (cellularRadio_ == nullptr) {
+            TELEPHONY_LOGE("cellularRadio_ is nullptr!!!");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+
+        MessageParcel data;
+        MessageParcel reply;
+        data.WriteInt32(slotId_);
+        eventData.Marshalling(data);
+        OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+        TELEPHONY_LOGI("Send event, dispatchId:%{public}d", dispatchId);
+        return cellularRadio_->SendRequest(dispatchId, data, reply, option);
+    }
 
     /**
      * @brief Send CommonBufferEvent
@@ -84,37 +111,158 @@ public:
      * @param rr for response callback was called
      * @param responseInfo HRilRadioResponseInfo received in the callback
      */
+
+    void ResetRemoteObject(sptr<IRemoteObject> rilAdapterObj);
     static std::shared_ptr<TelRilRequest> FindTelRilRequest(const HRilRadioResponseInfo &responseInfo);
 
-    void ErrorResponse(const int32_t serial, const HRilErrType err);
-    void ErrorResponse(std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo);
-    bool TelRilOnlyReportResponseInfo(MessageParcel &data);
+    int32_t ErrorResponse(const int32_t serial, const HRilErrType err);
+    int32_t ErrorResponse(std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo);
+    int32_t TelRilOnlyReportResponseInfo(MessageParcel &data);
     template<typename T>
-    void NotifyObserver(int what, MessageParcel &data)
-    {
-        std::shared_ptr<T> info = std::make_shared<T>();
-        info->ReadFromParcel(data);
-        if (observerHandler_ != nullptr) {
-            observerHandler_->NotifyObserver(what, info);
-        } else {
-            PrintErrorForEmptyPointor();
-        }
-    }
+    int32_t NotifyObserver(int what, MessageParcel &data);
+    template<typename T>
+    int32_t ProcessRespOrNotify(int32_t code, MessageParcel &data);
 
 protected:
+    using EventHandler = OHOS::AppExecFwk::EventHandler;
+    struct UserEvent {
+        const char *funcName_;
+        TelRilBase &this_;
+        EventHandler &handler_;
+        MessageParcel &data_;
+        uint32_t eventId_;
+        const HRilRadioResponseInfo &radioResponseInfo_;
+        const TelRilRequest &telRilRequest_;
+    };
+    using UserSendEvent = int32_t (*)(UserEvent &event);
+    using SendEvent = int32_t (TelRilBase::*)(const char *funcName, EventHandler &handler, MessageParcel &data,
+        uint32_t eventId);
+
+    template<typename... ValueTypes>
+    int32_t Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response, uint32_t requestId,
+        ValueTypes &&...vals);
+    int32_t Response(const char *funcName, MessageParcel &data, UserSendEvent send);
+    template<typename T>
+    int32_t Response(const char *funcName, MessageParcel &data);
+    template<typename T>
+    int32_t Notify(const char *funcName, MessageParcel &data, RadioEvent notifyId);
+
+    // std::any type: int32_t (T::*)(MessageParcel &data);
+    std::map<uint32_t, std::any> memberFuncMap_;
     std::shared_ptr<ObserverHandler> observerHandler_;
     sptr<IRemoteObject> cellularRadio_;
+    int32_t slotId_;
 
 private:
     /* Output "null pointer" error log */
-    void PrintErrorForEmptyPointor(void);
+    void PrintErrorForEmptyPointer(void);
     static int32_t GetNextSerialId(void);
 
+    /* Request */
+    int32_t GetSerialId(const AppExecFwk::InnerEvent::Pointer &response, uint32_t requestId);
+    /* Response */
+    template<typename F>
+    F GetReportFunc(uint32_t code);
+    template<typename T>
+    int32_t SendData(const char *funcName, EventHandler &handler, MessageParcel &data, uint32_t eventId);
+    const HRilRadioResponseInfo &GetHRilRadioResponse(MessageParcel &data);
+    int32_t Response(const char *funcName, MessageParcel &data, SendEvent send);
+    SendEvent &SelfSendEvent(void);
+
 private:
-    static std::atomic_int nextSerialId_;
+    static std::atomic_uint nextSerialId_;
     static std::unordered_map<int32_t, std::shared_ptr<TelRilRequest>> requestMap_;
     static std::mutex requestLock_;
 };
+
+template<typename... ValueTypes>
+int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response,
+    uint32_t requestId, ValueTypes &&...vals)
+{
+    int32_t serialId = GetSerialId(response, requestId);
+    if (serialId >= 0) {
+        MessageParcel data;
+        MessageParcel reply;
+        thread_local OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+        if (BaseParcel::WriteVals(data, slotId_, serialId, std::forward<ValueTypes>(vals)...)) {
+            int ret = cellularRadio_->SendRequest(requestId, data, reply, option);
+            TELEPHONY_LOGI("%{public}s() eventId=%{public}d, return: %{public}d", funcName, requestId, ret);
+            return ret;
+        }
+        TELEPHONY_LOGE("%{public}s() write fail to parcel: eventid=%{public}d", funcName, requestId);
+        return TELEPHONY_ERR_FAIL;
+    }
+    TELEPHONY_LOGE("%{public}s() get serial fail: eventid=%{public}d", funcName, requestId);
+    return TELEPHONY_ERR_ARGUMENT_INVALID;
+}
+
+template<typename F>
+F TelRilBase::GetReportFunc(uint32_t code)
+{
+    auto itFunc = memberFuncMap_.find(code);
+    if (itFunc != memberFuncMap_.end()) {
+        return std::any_cast<F>(itFunc->second);
+    }
+    TELEPHONY_LOGE("Can not find report code in func map: %{public}d!", code);
+    return nullptr;
+}
+
+template<typename T>
+int32_t TelRilBase::ProcessRespOrNotify(int32_t code, MessageParcel &data)
+{
+    using ReportFunc = int32_t (T::*)(MessageParcel &data);
+    auto func = GetReportFunc<ReportFunc>(code);
+    if (func != nullptr) {
+        return (static_cast<T *>(this)->*func)(data);
+    }
+    return TELEPHONY_ERR_ARGUMENT_INVALID;
+}
+
+template<typename T>
+int32_t TelRilBase::NotifyObserver(int what, MessageParcel &data)
+{
+    std::shared_ptr<T> info = std::make_shared<T>();
+    info->ReadFromParcel(data);
+    if (observerHandler_ != nullptr) {
+        observerHandler_->NotifyObserver(what, info);
+        return TELEPHONY_ERR_SUCCESS;
+    } else {
+        PrintErrorForEmptyPointer();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+template<typename T>
+int32_t TelRilBase::Response(const char *funcName, MessageParcel &data)
+{
+    return Response(funcName, data, (SendEvent)&TelRilBase::SendData<T>);
+}
+
+template<typename T>
+int32_t TelRilBase::SendData(const char *funcName, EventHandler &handler, MessageParcel &data, uint32_t eventId)
+{
+    std::shared_ptr<T> t = std::make_shared<T>();
+    bool ret = t->ReadFromParcel(data);
+    TELEPHONY_LOGI("%{public}s() response event %{public}d =[%{public}s], read ret=%{public}d, slotId:%{public}d",
+        funcName, eventId, t->ToString(), ret, slotId_);
+    return handler.SendEvent(eventId, t);
+}
+
+template<typename T>
+int32_t TelRilBase::Notify(const char *funcName, MessageParcel &data, RadioEvent notifyId)
+{
+    if (observerHandler_ == nullptr) {
+        TELEPHONY_LOGE("%{public}s() observerHandler_ is nullptr", funcName);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    std::shared_ptr<T> t = std::make_shared<T>();
+    bool ret = t->ReadFromParcel(data);
+    TELEPHONY_LOGI("%{public}s() notify event %{public}d =[%{public}s], read ret=%{public}d, slotId:%{public}d",
+        funcName, notifyId, t->ToString(), ret, slotId_);
+    observerHandler_->NotifyObserver(notifyId, t);
+    return TELEPHONY_ERR_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS
 #endif // TEL_RIL_BASE_H

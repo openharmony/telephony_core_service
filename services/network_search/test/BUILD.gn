@@ -14,37 +14,15 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-TELEPHONY_CORE_SERVICE_ROOT = "//base/telephony/core_service"
-TELEPHONY_FRAMEWORKS_ROOT = "//base/telephony/core_service/frameworks/native/"
-
 ohos_executable("tel_network_search_test") {
   install_enable = true
   sources = [
-    "$TELEPHONY_CORE_SERVICE_ROOT/frameworks/native/src/core_service_client.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/frameworks/native/src/core_service_proxy.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/cell_information.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_information.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_search_result.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/network_state.cpp",
-    "$TELEPHONY_FRAMEWORKS_ROOT/src/signal_information.cpp",
     "network_search_test_callback_stub.cpp",
     "test.cpp",
     "test_broadcast.cpp",
   ]
 
   include_dirs = [
-    "//base/telephony/core_service/utils/log/include",
-    "//base/telephony/ril_adapter/interfaces/innerkits/include",
-    "$TELEPHONY_CORE_SERVICE_ROOT/frameworks/native/include",
-    "$TELEPHONY_CORE_SERVICE_ROOT/base/include",
-    "$TELEPHONY_CORE_SERVICE_ROOT/communication/include",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/network_search",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/core",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/sim",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/kits/native",
-    "$TELEPHONY_CORE_SERVICE_ROOT/common/network_search",
-    "$TELEPHONY_CORE_SERVICE_ROOT/common/core",
-    "$TELEPHONY_CORE_SERVICE_ROOT/common/sim",
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
     "//foundation/appexecfwk/standard/kits/appkit/native/app",
     "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content",
@@ -56,10 +34,9 @@ ohos_executable("tel_network_search_test") {
     "//base/notification/ces_standard/cesfwk/kits/native/include",
   ]
   deps = [
-    "$TELEPHONY_CORE_SERVICE_ROOT/frameworks/native:tel_core_service_api",
     "//base/miscservices/time/services:time_service",
     "//base/notification/ans_standard/frameworks/wantagent:wantagent_innerkits",
-    "//base/telephony/core_service/utils:libtelephony_common",
+    "//base/telephony/core_service/utils:libtel_common",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:dummy_classes",
     "//foundation/aafwk/standard/interfaces/innerkits/want:want",
@@ -74,7 +51,9 @@ ohos_executable("tel_network_search_test") {
   external_deps = [
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
+    "core_service:tel_core_service_api",
     "ipc:ipc_core",
+    "ril_adapter:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]

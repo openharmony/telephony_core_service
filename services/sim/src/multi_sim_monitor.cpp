@@ -14,20 +14,30 @@
  */
 
 #include "multi_sim_monitor.h"
+
 #include "string_ex.h"
-#include "observer_handler.h"
+
+#include "radio_event.h"
 
 namespace OHOS {
 namespace Telephony {
+bool MultiSimMonitor::ready_ = false;
+std::unique_ptr<ObserverHandler> MultiSimMonitor::observerHandler_ = nullptr;
+
 MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
                                  const std::shared_ptr<MultiSimController> &controller,
-                                 std::shared_ptr<ISimStateManager> simStateManager,
-                                 std::shared_ptr<ISimFileManager> simFileManager)
+                                 std::shared_ptr<SimStateManager> simStateManager,
+                                 std::shared_ptr<SimFileManager> simFileManager,
+                                 int32_t slotId)
     : AppExecFwk::EventHandler(runner), controller_(controller),
       simStateManager_(simStateManager), simFileManager_(simFileManager)
 {
+    slotId_ = slotId;
     if (runner != nullptr) {
         runner->Run();
+    }
+    if (observerHandler_ == nullptr) {
+        observerHandler_ = std::make_unique<ObserverHandler>();
     }
 }
 
@@ -36,9 +46,9 @@ MultiSimMonitor::~MultiSimMonitor()
     UnRegisterForIccLoaded();
 }
 
-void MultiSimMonitor::Init(int32_t slotId)
+void MultiSimMonitor::Init()
 {
-    slotId_ = slotId;
+    SendEvent(MSG_SIM_FORGET_ALLDATA);
 }
 
 void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -49,14 +59,31 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
     auto eventCode = event->GetInnerEventId();
     switch (eventCode) {
-        case ObserverHandler::RADIO_SIM_RECORDS_LOADED:
+        case RadioEvent::RADIO_SIM_RECORDS_LOADED:
             TELEPHONY_LOGI("MultiSimMonitor::INIT_DATA sim icc data slotId_ = %{public}d", slotId_);
             if (controller_ == nullptr) {
                 TELEPHONY_LOGE("MultiSimMonitor::INIT_DATA failed by nullptr");
                 return;
             }
-            controller_->InitData();
+            for (int i =0; i < RETRY_COUNT; i++) {
+                if (ready_) {
+                    TELEPHONY_LOGI("MultiSimMonitor::dataAbility ready");
+                    break;
+                }
+            }
+            if (!controller_->InitData(slotId_)) {
+                TELEPHONY_LOGE("MultiSimMonitor::InitData failed");
+                return;
+            }
+            if (observerHandler_ == nullptr) {
+                TELEPHONY_LOGE("MultiSimMonitor::can not notify RADIO_SIM_ACCOUNT_LOADED by nullptr");
+                return;
+            }
+            observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
             break;
+        case MSG_SIM_FORGET_ALLDATA:
+            TELEPHONY_LOGI("MultiSimMonitor::forget all data");
+            ready_ = controller_->ForgetAllData();
         default:
             break;
     }
@@ -66,10 +93,10 @@ bool MultiSimMonitor::RegisterForIccLoaded()
 {
     TELEPHONY_LOGI("MultiSimMonitor::RegisterForIccLoaded");
     if (simFileManager_ == nullptr) {
-        TELEPHONY_LOGI("MultiSimMonitor::can not get SimFileManager");
+        TELEPHONY_LOGE("MultiSimMonitor::can not get SimFileManager");
         return false;
     }
-    simFileManager_->RegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_RECORDS_LOADED);
+    simFileManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
     return true;
 }
 
@@ -77,12 +104,19 @@ bool MultiSimMonitor::UnRegisterForIccLoaded()
 {
     TELEPHONY_LOGI("MultiSimMonitor::UnRegisterForIccLoaded");
     if (simFileManager_ == nullptr) {
-        TELEPHONY_LOGI("MultiSimMonitor::can not get SimFileManager");
+        TELEPHONY_LOGE("MultiSimMonitor::can not get SimFileManager");
         return false;
     }
-    simFileManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_RECORDS_LOADED);
+    simFileManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
     return true;
+}
+
+void MultiSimMonitor::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what) {
+    if (observerHandler_ == nullptr) {
+        TELEPHONY_LOGE("MultiSimMonitor::can not RegisterCoreNotify by nullptr");
+        return;
+    }
+    observerHandler_->RegObserver(what, handler);
 }
 } // namespace Telephony
 } // namespace OHOS
-

@@ -22,6 +22,7 @@
 #include <mutex>
 #include <condition_variable>
 
+#include "cell_information.h"
 #include "napi_radio_types.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -29,9 +30,9 @@
 #include "network_state.h"
 #include "signal_information.h"
 #include "network_information.h"
+#include "network_search_result.h"
 #include "telephony_napi_hril_error_code.h"
 #include "telephony_napi_common_error.h"
-#include "core_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -43,9 +44,9 @@ const static std::string GPRS = "GPRS";
 const static std::string WCDMA = "WCDMA";
 const static std::string LTE = "LTE";
 
-enum NativeSelectionMode { 
-    NATIVE_NETWORK_SELECTION_AUTOMATIC = 0, 
-    NATIVE_NETWORK_SELECTION_MANUAL = 1 
+enum NativeSelectionMode {
+    NATIVE_NETWORK_SELECTION_AUTOMATIC = 0,
+    NATIVE_NETWORK_SELECTION_MANUAL = 1
 };
 
 enum NetworkSelectionMode {
@@ -127,7 +128,7 @@ enum PreferredNetwork {
 };
 
 struct AsyncContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     napi_async_work work = nullptr;
     napi_deferred deferred = nullptr;
     napi_ref callbackRef = nullptr;
@@ -144,23 +145,23 @@ struct CallbackContext : BaseContext {
 };
 
 struct RadioTechContext : BaseContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     int32_t csTech = DEFAULT_ERROR;
     int32_t psTech = DEFAULT_ERROR;
 };
 
 struct SignalInfoListContext : BaseContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::vector<sptr<SignalInformation>> signalInfoList;
 };
 
 struct GetSelectModeContext : CallbackContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     int32_t selectMode = DEFAULT_ERROR;
 };
 
 struct SetSelectModeContext : CallbackContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     int32_t selectMode = DEFAULT_ERROR;
     std::string operatorName = "";
     std::string operatorNumeric = "";
@@ -171,12 +172,12 @@ struct SetSelectModeContext : CallbackContext {
 };
 
 struct GetSearchInfoContext : CallbackContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     sptr<NetworkSearchResult> searchResult = nullptr;
 };
 
 struct GetStateContext : BaseContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::string longOperatorName = "";
     std::string shortOperatorName = "";
     std::string plmnNumeric = "";
@@ -191,62 +192,70 @@ struct GetStateContext : BaseContext {
 };
 
 struct GetISOCountryCodeContext : BaseContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::string countryCode = "";
 };
 
 struct IsRadioOnContext : CallbackContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     bool isRadioOn = false;
+    bool sendRequestSlot2 = false;
 };
 
 struct SwitchRadioContext : CallbackContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    bool sendRequestSlot2 = false;
 };
 
 struct GetOperatorNameContext : BaseContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     char operatorName[BUF_SIZE + 1] = {0};
     size_t operatorNameLength = 0;
 };
 
 struct PreferredNetworkModeContext : CallbackContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     int32_t preferredNetworkMode = DEFAULT_ERROR;
 };
 
 struct GetIMEIContext : BaseContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::string getIMEIResult = "";
 };
 
 struct GetMEIDContext : BaseContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::string getMEIDResult = "";
 };
 
 struct SendUpdateCellLocationRequest : CallbackContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    bool sendRequestSlot2 = false;
 };
 
 struct CellInformationContext : BaseContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::vector<sptr<CellInformation>> cellInformations;
     napi_value callbackValue = nullptr;
 };
 
 struct GetPrimarySlotIdContext : BaseContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
 };
 
 struct GetUniqueDeviceIdContext : BaseContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::string getUniqueDeviceId = "";
 };
 
 struct GetNrOptionModeContext : BaseContext {
-    int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     int32_t nrOptionMode = DEFAULT_ERROR;
+};
+
+struct SetPrimarySlotIdContext : BaseContext {
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    bool setResult = false;
 };
 } // namespace Telephony
 } // namespace OHOS

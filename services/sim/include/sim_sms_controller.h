@@ -40,7 +40,7 @@ enum {
 class SimSmsController : public AppExecFwk::EventHandler {
 public:
     SimSmsController(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        std::shared_ptr<ISimStateManager> simStateManager);
+        std::shared_ptr<SimStateManager> simStateManager);
     ~SimSmsController();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     bool AddSmsToIcc(int status, std::string &pdu, std::string &smsc);
@@ -54,7 +54,7 @@ public:
 protected:
     std::shared_ptr<SimFileManager> fileManager_ = nullptr;
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
-    std::shared_ptr<ISimStateManager> stateManager_ = nullptr;
+    std::shared_ptr<SimStateManager> stateManager_ = nullptr;
     bool result_ = false;
     int slotId_ = 0;
 

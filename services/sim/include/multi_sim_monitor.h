@@ -18,11 +18,11 @@
 
 #include <list>
 
-#include "i_sim_account_manager.h"
+#include "multi_sim_controller.h"
+#include "sim_file_manager.h"
 #include "telephony_log_wrapper.h"
 #include "sim_constant.h"
 #include "sim_data.h"
-#include "multi_sim_controller.h"
 #include "rdb_sim_helper.h"
 
 namespace OHOS {
@@ -31,19 +31,24 @@ class MultiSimMonitor : public AppExecFwk::EventHandler {
 public:
     MultiSimMonitor(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
             const std::shared_ptr<MultiSimController> &controller,
-            std::shared_ptr<ISimStateManager> simStateManager,
-            std::shared_ptr<ISimFileManager> simFileManager);
+            std::shared_ptr<SimStateManager> simStateManager,
+            std::shared_ptr<SimFileManager> simFileManager,
+            int32_t slotId);
     virtual ~MultiSimMonitor();
-    void Init(int32_t slotId);
+    void Init();
     bool RegisterForIccLoaded();
     bool UnRegisterForIccLoaded();
+    void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
 
 private:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t slotId_;
+    static bool ready_;
+    const static int32_t RETRY_COUNT = 30;
     std::shared_ptr<MultiSimController> controller_ = nullptr;
-    std::shared_ptr<ISimStateManager> simStateManager_ = nullptr;
-    std::shared_ptr<ISimFileManager> simFileManager_ = nullptr;
+    std::shared_ptr<SimStateManager> simStateManager_ = nullptr;
+    std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
+    static std::unique_ptr<ObserverHandler> observerHandler_;
 };
 } // namespace Telephony
 } // namespace OHOS

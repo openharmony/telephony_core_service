@@ -16,9 +16,13 @@
 #ifndef OHOS_TEL_RIL_TEST_H
 #define OHOS_TEL_RIL_TEST_H
 
+#include <condition_variable>
 #include <gtest/gtest.h>
+#include <mutex>
 
 #include "core_service_client.h"
+#include "tel_ril_manager.h"
+
 namespace OHOS {
 namespace Telephony {
 enum class DiffInterfaceId {
@@ -105,8 +109,8 @@ enum class DiffInterfaceId {
     TEST_GET_VOICE_RADIO_INFO,
     TEST_GET_PHYSICAL_CHANNEL_CONFIG,
     TEST_SET_LOCATE_UPDATES,
-    TEST_SET_USSD_CUSD,
-    TEST_GET_USSD_CUSD,
+    TEST_SET_USSD,
+    TEST_GET_USSD,
     TEST_SET_CMUT,
     TEST_GET_CMUT,
     TEST_GET_EMERGENCY_CALL_LIST,
@@ -131,7 +135,17 @@ public:
         {}
         virtual ~DemoHandler() {}
 
+        void NotifyAll();
+        void WaitFor(int32_t timeoutSecond);
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
+        void ProcessResponseInfo(const AppExecFwk::InnerEvent::Pointer &event);
+        bool GetBoolResult(int32_t eventId);
+
+    private:
+        std::mutex callbackMutex_;
+        std::condition_variable cv_;
+        int32_t eventId_;
+        std::shared_ptr<HRilRadioResponseInfo> resultInfo_;
     };
 
 public:
@@ -235,12 +249,16 @@ private:
 
     int32_t GetRandNum();
     std::string GetRandPhoneNum(const int len);
+    bool WaitGetResult(int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t timeOut);
 
 private:
+    int32_t slotId_;
     static std::shared_ptr<Telephony::ITelRilManager> telRilManager_;
-    using RilManagerAndResponseTestFun =
-        void (TelRilTest::*)(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    using RilManagerAndResponseTestFun = void (TelRilTest::*)(
+        const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     std::map<DiffInterfaceId, RilManagerAndResponseTestFun> memberFuncMap_;
+    constexpr static const int32_t WAIT_TIME_SECOND = 10;
+    constexpr static const int32_t WAIT_TIME_SECOND_LONG = 60;
 };
 } // namespace Telephony
 } // namespace OHOS

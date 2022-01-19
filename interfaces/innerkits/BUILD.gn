@@ -1,0 +1,80 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//base/telephony/core_service/telephony.gni")
+import("//build/ohos.gni")
+
+SUBSYSTEM_DIR = "//base/telephony"
+TELEPHONY_CORE_SERVICE_ROOT = "$SUBSYSTEM_DIR/core_service"
+TELEPHONY_INTERFACES_INNERKITS =
+    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits"
+TELEPHONY_FRAMEWORKS_NATIVE_ROOT =
+    "$TELEPHONY_CORE_SERVICE_ROOT/frameworks/native/"
+
+config("tel_core_service_api_config") {
+  # header file path
+  include_dirs = [ "$TELEPHONY_INTERFACES_INNERKITS/include" ]
+
+  cflags = []
+  if (is_double_framework) {
+    cflags = [ "-DCONFIG_DUAL_FRAMEWORK" ]
+  }
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+  if (is_standard_system) {
+    cflags += [ "-DCONFIG_STANDARD_SYSTEM" ]
+  }
+  if (defined(build_public_version) && build_public_version) {
+    cflags += [ "-DBUILD_PUBLIC_VERSION" ]
+  }
+}
+
+ohos_shared_library("tel_core_service_api") {
+  sources = [
+    "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/cell_information.cpp",
+    "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/cell_location.cpp",
+    "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/core_manager_inner.cpp",
+    "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/core_service_client.cpp",
+    "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/core_service_proxy.cpp",
+    "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/i_network_search_callback_stub.cpp",
+    "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/network_information.cpp",
+    "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/network_search_result.cpp",
+    "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/network_state.cpp",
+    "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/signal_information.cpp",
+  ]
+
+  include_dirs = [
+    "$TELEPHONY_INTERFACES_INNERKITS/include",
+    "$SUBSYSTEM_DIR/ril_adapter/interfaces/innerkits/include",
+  ]
+
+  defines += [
+    "TELEPHONY_LOG_TAG = \"CoreService\"",
+    "LOG_DOMAIN = 0xD002B01",
+  ]
+
+  public_configs = [ ":tel_core_service_api_config" ]
+
+  deps = [ "//utils/native/base:utils" ]
+
+  external_deps = [
+    "appexecfwk_standard:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr_standard:samgr_proxy",
+  ]
+
+  part_name = "core_service"
+  subsystem_name = "telephony"
+}
