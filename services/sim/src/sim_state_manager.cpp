@@ -26,7 +26,7 @@ SimStateManager::SimStateManager(std::shared_ptr<ITelRilManager> telRilManager)
     TELEPHONY_LOGI("SimStateManager::SimStateManager()");
 }
 
-void SimStateManager::Init()
+void SimStateManager::Init(int32_t slotId)
 {
     std::lock_guard<std::mutex> lck(mtx_);
     TELEPHONY_LOGE("SimStateManager::Init()");
@@ -49,7 +49,7 @@ void SimStateManager::Init()
         return;
     }
     simStateHandle_->SetRilManager(telRilManager_);
-    simStateHandle_->Init();
+    simStateHandle_->Init(slotId);
     eventLoop_->Run();
     TELEPHONY_LOGI("SimStateManager::eventLoop_  is running");
     simStateRun_ = STATE_RUNNING;
@@ -67,35 +67,35 @@ void SimStateManager::UnRegisterCoreNotify(const HANDLE &handler, int what)
     simStateHandle_->UnRegisterCoreNotify(handler, what);
 }
 
-bool SimStateManager::HasSimCard(int32_t slotId)
+bool SimStateManager::HasSimCard()
 {
     bool ret = false;
     if (simStateHandle_ != nullptr) {
         std::lock_guard<std::mutex> lck(mtx_);
         TELEPHONY_LOGI("SimStateManager::HasSimCard()");
-        ret = simStateHandle_->HasSimCard(slotId);
+        ret = simStateHandle_->HasSimCard();
     }
     return ret;
 }
 
-SimState SimStateManager::GetSimState(int32_t slotId)
+SimState SimStateManager::GetSimState()
 {
     SimState ret = SimState::SIM_STATE_UNKNOWN;
     if (simStateHandle_ != nullptr) {
         std::lock_guard<std::mutex> lck(mtx_);
         TELEPHONY_LOGI("SimStateManager::GetSimState()");
-        ret = simStateHandle_->GetSimState(slotId);
+        ret = simStateHandle_->GetSimState();
     }
     return ret;
 }
 
-CardType SimStateManager::GetCardType(int32_t slotId)
+CardType SimStateManager::GetCardType()
 {
     CardType ret = CardType::UNKNOWN_CARD;
     if (simStateHandle_ != nullptr) {
         std::lock_guard<std::mutex> lck(mtx_);
         TELEPHONY_LOGI("SimStateManager::GetCardType()");
-        ret = simStateHandle_->GetCardType(slotId);
+        ret = simStateHandle_->GetCardType();
     }
     return ret;
 }
@@ -390,12 +390,12 @@ int32_t SimStateManager::RefreshSimState(int32_t slotId)
         std::unique_lock<std::mutex> lck(ctx_);
         TELEPHONY_LOGI("SimStateManager::RefreshSimState()");
         responseReady_ = false;
-        simStateHandle_->ObtainRealtimeIccStatus();
+        simStateHandle_->ObtainRealtimeIccStatus(slotId);
         while (!responseReady_) {
             TELEPHONY_LOGI("RefreshSimState::wait(), response = false");
             cv_.wait(lck);
         }
-        ret = static_cast<int32_t>(simStateHandle_->GetSimState(slotId));
+        ret = static_cast<int32_t>(simStateHandle_->GetSimState());
     }
     TELEPHONY_LOGI("SimStateManager::RefreshSimState(), %{public}d", ret);
     return ret;

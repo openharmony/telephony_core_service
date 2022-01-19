@@ -16,29 +16,15 @@
 #include "signal_info.h"
 
 #include "network_search_notify.h"
-#include "observer_handler.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-SignalInfo::SignalInfo()
-    : gsmSigInfoCache_(), cdmaSigInfoCache_(), lteSigInfoCache_(), wcdmaSigInfoCache_(), tdScdmaSigInfoCache_(),
-    gsmSigInfoCur_(), cdmaSigInfoCur_(), lteSigInfoCur_(), wcdmaSigInfoCur_(), tdScdmaSigInfoCur_()
-{}
-
 void SignalInfo::Reset()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    gsmSigInfoCache_.SetValue();
-    cdmaSigInfoCache_.SetValue();
-    lteSigInfoCache_.SetValue();
-    wcdmaSigInfoCache_.SetValue();
-    tdScdmaSigInfoCache_.SetValue();
-    gsmSigInfoCur_.SetValue();
-    cdmaSigInfoCur_.SetValue();
-    lteSigInfoCur_.SetValue();
-    wcdmaSigInfoCur_.SetValue();
-    tdScdmaSigInfoCur_.SetValue();
+    cache_.Init();
+    cur_.Init();
 }
 
 void SignalInfo::InitSignalBar(const int32_t bar) const
@@ -49,54 +35,54 @@ void SignalInfo::InitSignalBar(const int32_t bar) const
 bool SignalInfo::ProcessGsm(const GsmRssi &gsmSignal)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    gsmSigInfoCur_.SetValue(gsmSignal.rxlev, gsmSignal.ber);
-    bool ret = (gsmSigInfoCur_ == gsmSigInfoCache_);
-    gsmSigInfoCache_ = gsmSigInfoCur_;
+    cur_.gsm.SetValue(gsmSignal.rxlev, gsmSignal.ber);
+    bool ret = (cur_.gsm == cache_.gsm);
+    cache_.gsm = cur_.gsm;
     return ret;
 }
 
 bool SignalInfo::ProcessCdma(const CdmaRssi &cdmaSignal)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    cdmaSigInfoCur_.SetValue(cdmaSignal.absoluteRssi, cdmaSignal.ecno);
-    bool ret = (cdmaSigInfoCur_ == cdmaSigInfoCache_);
-    cdmaSigInfoCache_ = cdmaSigInfoCur_;
+    cur_.cdma.SetValue(cdmaSignal.absoluteRssi, cdmaSignal.ecno);
+    bool ret = (cur_.cdma == cache_.cdma);
+    cache_.cdma = cur_.cdma;
     return ret;
 }
 
 bool SignalInfo::ProcessLte(const LteRssi &lteSignal)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    lteSigInfoCur_.SetValue(lteSignal.rxlev, lteSignal.rsrq, lteSignal.rsrp, lteSignal.snr);
-    bool ret = (lteSigInfoCur_ == lteSigInfoCache_);
-    lteSigInfoCache_ = lteSigInfoCur_;
+    cur_.lte.SetValue(lteSignal.rxlev, lteSignal.rsrq, lteSignal.rsrp, lteSignal.snr);
+    bool ret = (cur_.lte == cache_.lte);
+    cache_.lte = cur_.lte;
     return ret;
 }
 
 bool SignalInfo::ProcessWcdma(const WCdmaRssi &wcdmaSignal)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    wcdmaSigInfoCur_.SetValue(wcdmaSignal.rxlev, wcdmaSignal.ecio, wcdmaSignal.rscp, wcdmaSignal.ber);
-    bool ret = (wcdmaSigInfoCur_ == wcdmaSigInfoCache_);
-    wcdmaSigInfoCache_ = wcdmaSigInfoCur_;
+    cur_.wcdma.SetValue(wcdmaSignal.rxlev, wcdmaSignal.ecio, wcdmaSignal.rscp, wcdmaSignal.ber);
+    bool ret = (cur_.wcdma == cache_.wcdma);
+    cache_.wcdma = cur_.wcdma;
     return ret;
 }
 
 bool SignalInfo::ProcessTdScdma(const TdScdmaRssi &tdScdmaSignal)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    tdScdmaSigInfoCur_.SetValue(tdScdmaSignal.rscp);
-    bool ret = (tdScdmaSigInfoCur_ == tdScdmaSigInfoCache_);
-    tdScdmaSigInfoCache_ = tdScdmaSigInfoCur_;
+    cur_.tdScdma.SetValue(tdScdmaSignal.rscp);
+    bool ret = (cur_.tdScdma == cache_.tdScdma);
+    cache_.tdScdma = cur_.tdScdma;
     return ret;
 }
 
 bool SignalInfo::ProcessNr(const NrRssi &nrSignal)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    nrSigInfoCur_.SetValue(nrSignal.rsrp, nrSignal.rsrq, nrSignal.sinr);
-    bool ret = (nrSigInfoCur_ == nrSigInfoCache_);
-    nrSigInfoCache_ = nrSigInfoCur_;
+    cur_.nr.SetValue(nrSignal.rsrp, nrSignal.rsrq, nrSignal.sinr);
+    bool ret = (cur_.nr == cache_.nr);
+    cache_.nr = cur_.nr;
     return ret;
 }
 
@@ -121,8 +107,7 @@ static void PrintfLog(const Rssi &signalIntensity)
         signalIntensity.wcdma.rxlev, signalIntensity.wcdma.ecio, signalIntensity.wcdma.rscp,
         signalIntensity.wcdma.ber);
 
-    TELEPHONY_LOGI("SignalInfo::ProcessSignalIntensity tdScdma.rscp:%{public}d\n",
-        signalIntensity.tdScdma.rscp);
+    TELEPHONY_LOGI("SignalInfo::ProcessSignalIntensity tdScdma.rscp:%{public}d\n", signalIntensity.tdScdma.rscp);
 
     TELEPHONY_LOGI(
         "SignalInfo::ProcessSignalIntensity nr.rsrp:%{public}d, "
@@ -130,7 +115,7 @@ static void PrintfLog(const Rssi &signalIntensity)
         signalIntensity.nr.rsrp, signalIntensity.nr.rsrq, signalIntensity.nr.sinr);
 }
 
-void SignalInfo::ProcessSignalIntensity(const AppExecFwk::InnerEvent::Pointer &event)
+void SignalInfo::ProcessSignalIntensity(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("SignalInfo::ProcessSignalIntensity rssi start......\n");
     if (event == nullptr) {
@@ -152,7 +137,7 @@ void SignalInfo::ProcessSignalIntensity(const AppExecFwk::InnerEvent::Pointer &e
     if (!gsmUpdate || !cdmaUpdate || !lteUpdate || !wcdmaUpdate || !tdScdmaUpdate || !nrUpdate) {
         std::vector<sptr<SignalInformation>> signals;
         GetSignalInfoList(signals);
-        DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifySignalInfoUpdated(signals);
+        DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifySignalInfoUpdated(slotId, signals);
     }
     PrintfLog(*signalIntensity);
 }
@@ -160,30 +145,30 @@ void SignalInfo::ProcessSignalIntensity(const AppExecFwk::InnerEvent::Pointer &e
 void SignalInfo::GetSignalInfoList(std::vector<sptr<SignalInformation>> &signals)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    bool gsmValid = gsmSigInfoCur_.ValidateGsmValue();
-    bool cdmaValid = cdmaSigInfoCur_.ValidateCdmaValue();
-    bool lteValid = lteSigInfoCur_.ValidateLteValue();
-    bool wcdmaValid = wcdmaSigInfoCur_.ValidateWcdmaValue();
-    bool tdScdmaValid = tdScdmaSigInfoCur_.ValidateTdScdmaValue();
-    bool nrValid = nrSigInfoCur_.ValidateNrValue();
+    bool gsmValid = cur_.gsm.ValidateGsmValue();
+    bool cdmaValid = cur_.cdma.ValidateCdmaValue();
+    bool lteValid = cur_.lte.ValidateLteValue();
+    bool wcdmaValid = cur_.wcdma.ValidateWcdmaValue();
+    bool tdScdmaValid = cur_.tdScdma.ValidateTdScdmaValue();
+    bool nrValid = cur_.nr.ValidateNrValue();
 
     if (gsmValid) {
-        signals.emplace_back(gsmSigInfoCur_.NewInstance());
+        signals.emplace_back(cur_.gsm.NewInstance());
     }
     if (cdmaValid) {
-        signals.emplace_back(cdmaSigInfoCur_.NewInstance());
+        signals.emplace_back(cur_.cdma.NewInstance());
     }
     if (lteValid) {
-        signals.emplace_back(lteSigInfoCur_.NewInstance());
+        signals.emplace_back(cur_.lte.NewInstance());
     }
     if (wcdmaValid) {
-        signals.emplace_back(wcdmaSigInfoCur_.NewInstance());
+        signals.emplace_back(cur_.wcdma.NewInstance());
     }
     if (tdScdmaValid) {
-        signals.emplace_back(tdScdmaSigInfoCur_.NewInstance());
+        signals.emplace_back(cur_.tdScdma.NewInstance());
     }
     if (nrValid) {
-        signals.emplace_back(nrSigInfoCur_.NewInstance());
+        signals.emplace_back(cur_.nr.NewInstance());
     }
 }
 } // namespace Telephony

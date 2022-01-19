@@ -23,7 +23,7 @@ namespace Telephony {
 class IsimFile : public IccFile {
 public:
     IsimFile(
-        const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<ISimStateManager> simStateManager);
+        const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager);
     void Init();
     void StartLoad();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);

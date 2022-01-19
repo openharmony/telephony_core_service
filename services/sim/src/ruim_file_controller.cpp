@@ -17,8 +17,8 @@
 
 namespace OHOS {
 namespace Telephony {
-RuimFileController::RuimFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-    : IccFileController(runner)
+RuimFileController::RuimFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int slotId)
+    : IccFileController(runner, slotId)
 {}
 
 std::string RuimFileController::ObtainElementFilePath(int efId)
@@ -49,7 +49,7 @@ void RuimFileController::ObtainTransparentImg(
         msg.data = "";
         msg.path = ObtainElementFilePath(ELEMENTARY_FILE_IMG);
         msg.pin2 = "";
-        telRilManager_->GetSimIO(msg, response);
+        telRilManager_->GetSimIO(slotId_, msg, response);
     }
 }
 

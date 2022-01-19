@@ -496,6 +496,10 @@ void IccDiallingNumbersHandler::InitFuncMap()
     memberFuncMap_[MSG_SIM_RENEW_ADN_DONE] = &IccDiallingNumbersHandler::ProcessUpdateRecordDone;
 }
 
+void IccDiallingNumbersHandler::UpdateFileController(const std::shared_ptr<IccFileController> &fileController)
+{
+    fileController_ = fileController;
+}
 IccDiallingNumbersHandler::~IccDiallingNumbersHandler() {}
 } // namespace Telephony
 } // namespace OHOS

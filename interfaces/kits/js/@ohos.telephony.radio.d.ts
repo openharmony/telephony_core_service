@@ -52,7 +52,7 @@ declare namespace radio {
    * @permission ohos.permission.GET_NETWORK_INFO
    */
   function getRadioTech(slotId: number,
-    callback: AsyncCallback<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}>): void;
+                        callback: AsyncCallback<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}>): void;
   function getRadioTech(slotId: number): Promise<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}>;
 
   /**
@@ -144,7 +144,7 @@ declare namespace radio {
   function getIMEI(callback: AsyncCallback<string>): void;
   function getIMEI(slotId: number, callback: AsyncCallback<string>): void;
   function getIMEI(slotId?: number): Promise<string>;
-  
+
   /**
    * Obtains the MEID of a specified card slot of the device.
    *
@@ -188,6 +188,14 @@ declare namespace radio {
   function getPrimarySlotId(): Promise<number>;
 
   /**
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
+  function setPrimarySlotId(slotId: number, callback: AsyncCallback<void>): void;
+  function setPrimarySlotId(slotId: number): Promise<void>;
+
+  /**
    * Obtains the list of signal strength information of the registered network corresponding to a specified SIM card.
    *
    * @param slotId Indicates the card slot index number, ranging from 0 to the maximum card slot index number
@@ -201,8 +209,18 @@ declare namespace radio {
    * Checks whether the device supports 5G New Radio (NR).
    *
    * @return Returns {@code true} if the device supports 5G NR; returns {@code false} otherwise.
+   * @deprecated Advised to use isNrSupported(slotId: number) instead.
    */
   function isNrSupported(): boolean;
+
+  /**
+   * Checks whether the device supports 5G New Radio (NR) by according card slot.
+   *
+   * @param slotId Indicates the card slot index number, ranging from 0 to the maximum card slot index number
+   * supported by the device.
+   * @return Returns {@code true} if the device supports 5G NR; returns {@code false} otherwise.
+   */
+  function isNrSupported(slotId: number): boolean;
 
   /**
    * @permission ohos.permission.GET_NETWORK_INFO
@@ -251,7 +269,35 @@ declare namespace radio {
     PREFERRED_NETWORK_MODE_LTE = 3,
     PREFERRED_NETWORK_MODE_LTE_WCDMA = 4,
     PREFERRED_NETWORK_MODE_LTE_WCDMA_GSM = 5,
-    PREFERRED_NETWORK_MODE_WCDMA_GSM = 6
+    PREFERRED_NETWORK_MODE_WCDMA_GSM = 6,
+    PREFERRED_NETWORK_MODE_CDMA = 7,
+    PREFERRED_NETWORK_MODE_EVDO = 8,
+    PREFERRED_NETWORK_MODE_EVDO_CDMA = 9,
+    PREFERRED_NETWORK_MODE_WCDMA_GSM_EVDO_CDMA = 10,
+    PREFERRED_NETWORK_MODE_LTE_EVDO_CDMA = 11,
+    PREFERRED_NETWORK_MODE_LTE_WCDMA_GSM_EVDO_CDMA = 12,
+    PREFERRED_NETWORK_MODE_TDSCDMA = 13,
+    PREFERRED_NETWORK_MODE_TDSCDMA_GSM = 14,
+    PREFERRED_NETWORK_MODE_TDSCDMA_WCDMA = 15,
+    PREFERRED_NETWORK_MODE_TDSCDMA_WCDMA_GSM = 16,
+    PREFERRED_NETWORK_MODE_LTE_TDSCDMA = 17,
+    PREFERRED_NETWORK_MODE_LTE_TDSCDMA_GSM = 18,
+    PREFERRED_NETWORK_MODE_LTE_TDSCDMA_WCDMA = 19,
+    PREFERRED_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM = 20,
+    PREFERRED_NETWORK_MODE_TDSCDMA_WCDMA_GSM_EVDO_CDMA = 21,
+    PREFERRED_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA = 22,
+    PREFERRED_NETWORK_MODE_NR = 31,
+    PREFERRED_NETWORK_MODE_NR_LTE = 32,
+    PREFERRED_NETWORK_MODE_NR_LTE_WCDMA = 33,
+    PREFERRED_NETWORK_MODE_NR_LTE_WCDMA_GSM = 34,
+    PREFERRED_NETWORK_MODE_NR_LTE_EVDO_CDMA = 35,
+    PREFERRED_NETWORK_MODE_NR_LTE_WCDMA_GSM_EVDO_CDMA = 36,
+    PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA = 37,
+    PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_GSM = 38,
+    PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA = 39,
+    PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM = 40,
+    PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA = 41,
+    PREFERRED_NETWORK_MODE_MAX_VALUE = 99,
   }
 
   /**
@@ -422,6 +468,13 @@ declare namespace radio {
     regState: RegState;
 
     /**
+     * Obtains the radio Access technology after config conversion.
+     *
+     * @return Returns the radio Access technology {@code RadioTechnology}.
+     */
+    cfgTech: RadioTechnology;
+
+    /**
      * Obtains the NSA network registration status of the device.
      *
      * @return Returns the NSA network registration status {@code NsaState}.
@@ -546,7 +599,7 @@ declare namespace radio {
     signalInformation: SignalInformation;
 
     data: CdmaCellInformation | GsmCellInformation | LteCellInformation | NrCellInformation | TdscdmaCellInformation
-      | WcdmaCellInformation;
+        | WcdmaCellInformation;
   }
 
   /**

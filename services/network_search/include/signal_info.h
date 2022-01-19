@@ -24,12 +24,12 @@ namespace OHOS {
 namespace Telephony {
 class SignalInfo {
 public:
-    explicit SignalInfo();
+    SignalInfo() = default;
     virtual ~SignalInfo() = default;
     void Reset();
     void InitSignalBar(const int32_t bar = 5) const;
     void GetSignalInfoList(std::vector<sptr<SignalInformation>> &signals);
-    void ProcessSignalIntensity(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessSignalIntensity(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     bool ProcessGsm(const GsmRssi &gsmSignal);
@@ -41,18 +41,29 @@ private:
 
 private:
     std::mutex mutex_;
-    GsmSignalInformation gsmSigInfoCache_;
-    CdmaSignalInformation cdmaSigInfoCache_;
-    LteSignalInformation lteSigInfoCache_;
-    WcdmaSignalInformation wcdmaSigInfoCache_;
-    TdScdmaSignalInformation tdScdmaSigInfoCache_;
-    NrSignalInformation nrSigInfoCache_;
-    GsmSignalInformation gsmSigInfoCur_;
-    CdmaSignalInformation cdmaSigInfoCur_;
-    LteSignalInformation lteSigInfoCur_;
-    WcdmaSignalInformation wcdmaSigInfoCur_;
-    TdScdmaSignalInformation tdScdmaSigInfoCur_;
-    NrSignalInformation nrSigInfoCur_;
+    struct SignalInformations {
+        SignalInformations()
+        {
+            Init();
+        }
+        void Init()
+        {
+            gsm.SetValue();
+            cdma.SetValue();
+            lte.SetValue();
+            wcdma.SetValue();
+            tdScdma.SetValue();
+            nr.SetValue();
+        }
+        GsmSignalInformation gsm;
+        CdmaSignalInformation cdma;
+        LteSignalInformation lte;
+        WcdmaSignalInformation wcdma;
+        TdScdmaSignalInformation tdScdma;
+        NrSignalInformation nr;
+    };
+    SignalInformations cache_;
+    SignalInformations cur_;
 };
 } // namespace Telephony
 } // namespace OHOS

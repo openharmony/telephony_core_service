@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 #include "base_context.h"
-#include "i_sim_account_manager.h"
+#include "sim_state_type.h"
 
 namespace OHOS {
 namespace Telephony {

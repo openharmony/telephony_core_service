@@ -21,43 +21,30 @@
 #include <memory>
 #include <any>
 #include <mutex>
+
 #include "resource_manager.h"
 
 namespace OHOS {
 namespace Telephony {
 class ResourceUtils {
 public:
-    static const std::string CONFIG_USER_NOTIFICATION_OF_RESTRICTIED_MOBILE_ACCESS;
-    static const std::string CONFIG_CDMA_INTERNATIONAL_ROAMING_INDICATORS;
-    static const std::string CONFIG_VOICE_CAPABLE;
-    static const std::string CONFIG_SWITCH_PHONE_ON_VOICE_REG_STATE_CHANGE;
-    static const std::string CONFIG_CDMA_HOME_SYSTEM;
-    static const std::string WFC_SPN_FORMATS;
-    static const std::string ROAMING_TEXT_SEARCHING;
-    static const std::string CONFIG_LTE_ERI_FOR_NETWORK_NAME;
-    static const std::string CONFIG_OPERATOR_CONSIDEREDNON_ROAMING;
-    static const std::string CONFIG_SAME_NAME_DOPERATOR_CONSIDERED_ROAMING;
+    static const std::string IS_NOTIFY_USER_RESTRICTIED_CHANGE;
+    static const std::string IS_CS_CAPABLE;
+    static const std::string IS_SWITCH_PHONE_REG_CHANGE;
+    static const std::string SPN_FORMATS;
     static const std::string EMERGENCY_CALLS_ONLY;
-    static const std::string LOCKSCREEN_CARRIER_DEFAULT;
+    static const std::string OUT_OF_SERIVCE;
 
-    ResourceUtils();
+    static ResourceUtils &Get();
+    bool Init(std::string path);
+    void ShowAllValue();
     ~ResourceUtils() = default;
 
-    bool Init(std::string path);
-
     template<typename T>
-    bool GetValueByName(std::string name, T &value)
-    {
-        if (mapResourceValues_.find(name) == mapResourceValues_.end()) {
-            return false;
-        }
-        value = std::any_cast<T>(mapResourceValues_[name]);
-        return true;
-    }
-
-    void ShowAllValue();
+    bool GetValueByName(std::string name, T &value);
 
 private:
+    ResourceUtils();
     void SaveAllValue();
     bool GetStringByName(std::string name, std::string &value);
     bool GetIntegerByName(std::string name, int &value);
@@ -81,6 +68,18 @@ private:
     };
 
     static const std::map<std::string, ResourceType> mapResourceNameType_;
+    static const std::string RESOURCE_HAP_BUNDLE_NAME;
+    static const std::string RESOURCE_INDEX_PATH;
+};
+
+template<typename T>
+bool ResourceUtils::GetValueByName(std::string name, T &value)
+{
+    if (mapResourceValues_.find(name) == mapResourceValues_.end()) {
+        return false;
+    }
+    value = std::any_cast<T>(mapResourceValues_[name]);
+    return true;
 };
 } // namespace Telephony
 } // namespace OHOS

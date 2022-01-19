@@ -23,6 +23,7 @@
 #include "i_tel_ril_manager.h"
 #include "icc_dialling_numbers_cache.h"
 #include "sim_file_manager.h"
+#include "dialling_numbers_info.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -41,20 +42,19 @@ enum DiallingNumbersMessageType {
     MSG_SIM_DIALLING_NUMBERS_DELETE_DONE,
 };
 static DiallingNumbers_Action_Type g_CurCtrlAction = ACTION_READY;
-class IccDiallingNumbersManager : public AppExecFwk::EventHandler, public IIccDiallingNumbersManager {
+class IccDiallingNumbersManager : public AppExecFwk::EventHandler {
 public:
     IccDiallingNumbersManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        std::shared_ptr<ISimFileManager> simFileManager, std::shared_ptr<ISimStateManager> simState);
+        std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simState);
     ~IccDiallingNumbersManager();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
-    std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int slotId, int type);
-    bool AddIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
-    bool DelIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
-    bool UpdateIccDiallingNumbers(
-        int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int type);
+    bool AddIccDiallingNumbers(int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
+    bool DelIccDiallingNumbers(int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
+    bool UpdateIccDiallingNumbers(int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
     void Init();
-    static std::shared_ptr<IIccDiallingNumbersManager> CreateInstance(
-        const std::shared_ptr<ISimFileManager> &simFile, const std::shared_ptr<ISimStateManager> &simState);
+    static std::shared_ptr<IccDiallingNumbersManager> CreateInstance(
+        const std::shared_ptr<SimFileManager> &simFile, const std::shared_ptr<SimStateManager> &simState);
     enum class HandleRunningState {
         STATE_NOT_START,
         STATE_RUNNING
@@ -67,10 +67,11 @@ protected:
     bool result_ = false;
 
 private:
-    std::shared_ptr<ISimFileManager> simFileManager_ = nullptr;
-    std::shared_ptr<Telephony::ISimStateManager> simStateManager_ = nullptr;
+    std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
+    std::shared_ptr<Telephony::SimStateManager> simStateManager_ = nullptr;
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbersList_;
-    static std::mutex mtx_;
+    std::mutex mtx_;
+    std::mutex queryMtx_;
     std::condition_variable processWait_;
     void ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event);
@@ -81,7 +82,7 @@ private:
     int GetFileIdForType(int fileType);
     void FillResults(const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &listInfo);
     bool IsValidType(int type);
-    bool HasSimCard(int slotId);
+    bool HasSimCard();
     bool IsValidParam(int type, const std::shared_ptr<DiallingNumbersInfo> &info);
 };
 } // namespace Telephony
