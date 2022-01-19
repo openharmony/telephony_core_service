@@ -15,11 +15,11 @@
 
 #include "stk_controller.h"
 #include "telephony_log_wrapper.h"
-#include "observer_handler.h"
 #include "common_event_data.h"
 #include "common_event_publish_info.h"
 #include "common_event_manager.h"
 #include "hril_types.h"
+#include "radio_event.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -54,10 +54,10 @@ void StkController::RegisterEvents()
         return;
     }
     TELEPHONY_LOGI("StkController:: RegisterEvent start");
-    simStateManager_->RegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_CHANGE);
-    telRilManager_->RegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_STK_SESSION_END, nullptr);
-    telRilManager_->RegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_STK_PROACTIVE_COMMAND, nullptr);
-    telRilManager_->RegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_STK_ALPHA_NOTIFY, nullptr);
+    simStateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+    telRilManager_->RegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STK_SESSION_END, nullptr);
+    telRilManager_->RegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STK_PROACTIVE_COMMAND, nullptr);
+    telRilManager_->RegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STK_ALPHA_NOTIFY, nullptr);
     TELEPHONY_LOGI("StkController:: RegisterEvent end");
 }
 
@@ -67,20 +67,20 @@ void StkController::UnRegisterEvents()
         TELEPHONY_LOGE("StkController:: UnRegisterEvents TelRilManager is null");
         return;
     }
-    if (simStateManager_ == nullptr) {
+    if (telRilManager_ == nullptr) {
         TELEPHONY_LOGE("StkController:: UnRegisterEvents SimStateManager is null");
         return;
     }
     TELEPHONY_LOGI("StkController:: UnRegisterEvent start");
-    simStateManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_CHANGE);
-    telRilManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_STK_SESSION_END);
-    telRilManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_STK_PROACTIVE_COMMAND);
-    telRilManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_STK_ALPHA_NOTIFY);
+    simStateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+    telRilManager_->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STK_SESSION_END);
+    telRilManager_->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STK_PROACTIVE_COMMAND);
+    telRilManager_->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STK_ALPHA_NOTIFY);
     TELEPHONY_LOGI("StkController:: UnRegisterEvent end");
 }
 
 void StkController::SetRilAndSimStateManager(std::shared_ptr<Telephony::ITelRilManager> ril,
-    const std::shared_ptr<Telephony::ISimStateManager> simstateMgr)
+    const std::shared_ptr<Telephony::SimStateManager> simstateMgr)
 {
     telRilManager_ = ril;
     if (telRilManager_ == nullptr) {
@@ -147,7 +147,7 @@ bool StkController::OnsendRilAlphaNotify(const AppExecFwk::InnerEvent::Pointer &
 bool StkController::OnIccStateChanged(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("StkController::OnIccStateChanged(), publish to STK APP.");
-    bool hasCard = simStateManager_->HasSimCard(slotId_);
+    bool hasCard = simStateManager_->HasSimCard();
     TELEPHONY_LOGI("StkController::OnIccStateChanged(), hasCard: %{public}d\n", hasCard);
     int32_t newState = hasCard ? ICC_CARD_STATE_PRESENT : ICC_CARD_STATE_ABSENT;
     int32_t oldState = iccCardState_;
@@ -167,16 +167,10 @@ bool StkController::OnIccStateChanged(const AppExecFwk::InnerEvent::Pointer &eve
         bool publishResult = PublishStkEvent(want, eventCode, eventData);
         TELEPHONY_LOGI("StkController::OnIccStateChanged end ### publishResult = %{public}d\n", publishResult);
     } else if ((oldState == ICC_CARD_STATE_ABSENT) && (newState == ICC_CARD_STATE_PRESENT)) {
-        TELEPHONY_LOGI("StkController::OnIccStateChanged(), call StkControllerIsReady()");
-        auto event = AppExecFwk::InnerEvent::Get(MSG_STK_CONTROLLER_IS_READY);
+        TELEPHONY_LOGI("StkController::OnIccStateChanged(), call SimStkIsReady()");
+        auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_STK_IS_READY);
         event->SetOwner(shared_from_this());
-        telRilManager_->StkControllerIsReady(event);
-    } else {
-        // There is no SIM card on the test board, because the test is added,it will be deleted later!!!!!!
-        TELEPHONY_LOGI("StkController::OnIccStateChanged(), call StkControllerIsReady()");
-        auto innerEvent = AppExecFwk::InnerEvent::Get(MSG_STK_CONTROLLER_IS_READY);
-        innerEvent->SetOwner(shared_from_this());
-        telRilManager_->StkControllerIsReady(innerEvent);
+        telRilManager_->SimStkIsReady(slotId_, event);
     }
     return true;
 }
@@ -204,28 +198,28 @@ void StkController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         return;
     }
     switch (id) {
-        case ObserverHandler::RADIO_SIM_STATE_CHANGE:
+        case RadioEvent::RADIO_SIM_STATE_CHANGE:
             OnIccStateChanged(event);
             break;
-        case ObserverHandler::RADIO_STK_SESSION_END:
+        case RadioEvent::RADIO_STK_SESSION_END:
             OnsendRilSessionEnd(event);
             break;
-        case ObserverHandler::RADIO_STK_PROACTIVE_COMMAND:
+        case RadioEvent::RADIO_STK_PROACTIVE_COMMAND:
             OnsendRilProactiveCommand(event);
             break;
-        case ObserverHandler::RADIO_STK_ALPHA_NOTIFY:
+        case RadioEvent::RADIO_STK_ALPHA_NOTIFY:
             OnsendRilAlphaNotify(event);
             break;
-        case MSG_STK_TERMINAL_RESPONSE:
+        case MSG_SIM_STK_TERMINAL_RESPONSE:
             TELEPHONY_LOGI("StkController::SendTerminalResponseCmd done.");
             GetTerminalResponseResult(event);
             break;
-        case MSG_STK_CMD_ENVELOPE:
+        case MSG_SIM_STK_ENVELOPE:
             TELEPHONY_LOGI("StkController::SendEnvelopeCmd done.");
             GetEnvelopeCmdResult(event);
             break;
-        case MSG_STK_CONTROLLER_IS_READY:
-            TELEPHONY_LOGI("StkController::StkControllerIsReady done.");
+        case MSG_SIM_STK_IS_READY:
+            TELEPHONY_LOGI("StkController::SimStkIsReady done.");
             break;
         default:
             TELEPHONY_LOGI("StkController::ProcessEvent(), unknown event");
@@ -233,16 +227,16 @@ void StkController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
 }
 
-bool StkController::SendTerminalResponseCmd(const std::string &strCmd)
+bool StkController::SendTerminalResponseCmd(int32_t slotId, const std::string &strCmd)
 {
     TELEPHONY_LOGI("StkController::SendTerminalResponseCmd");
-    auto event = AppExecFwk::InnerEvent::Get(MSG_STK_TERMINAL_RESPONSE);
+    auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_STK_TERMINAL_RESPONSE);
     event->SetOwner(shared_from_this());
     std::unique_lock<std::mutex> lck(ctx_);
     responseReady_ = false;
 
     if (telRilManager_ != nullptr) {
-        telRilManager_->SendTerminalResponseCmd(strCmd, event);
+        telRilManager_->SendTerminalResponseCmd(slotId_, strCmd, event);
     }
     while (!responseReady_) {
         TELEPHONY_LOGI("StkController::wait(), response = false");
@@ -251,15 +245,15 @@ bool StkController::SendTerminalResponseCmd(const std::string &strCmd)
     return terminalResponse_;
 }
 
-bool StkController::SendEnvelopeCmd(const std::string &strCmd)
+bool StkController::SendEnvelopeCmd(int32_t slotId, const std::string &strCmd)
 {
     TELEPHONY_LOGI("StkController::SendEnvelopeCmd");
-    auto event = AppExecFwk::InnerEvent::Get(MSG_STK_CMD_ENVELOPE);
+    auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_STK_ENVELOPE);
     event->SetOwner(shared_from_this());
     std::unique_lock<std::mutex> lck(ctx_);
     responseReady_ = false;
     if (telRilManager_ != nullptr) {
-        telRilManager_->SendEnvelopeCmd(strCmd, event);
+        telRilManager_->SendEnvelopeCmd(slotId, strCmd, event);
     }
     while (!responseReady_) {
         TELEPHONY_LOGI("StkController::wait(), response = false");

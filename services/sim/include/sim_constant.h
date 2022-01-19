@@ -271,6 +271,7 @@ enum RadioCapControllerConstant {
     MSG_SIM_UPDATE_RADIO_PROTOCOL = 2002,
     MSG_SIM_TIME_OUT_ACTIVE = 2003,
     MSG_SIM_SET_ACTIVE = 2004,
+    MSG_SIM_FORGET_ALLDATA = 2005,
 };
 } // namespace Telephony
 } // namespace OHOS

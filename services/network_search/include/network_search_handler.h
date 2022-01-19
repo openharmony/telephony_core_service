@@ -17,10 +17,11 @@
 #define NETWORK_SEARCH_INCLUDE_NETWORK_SEARCH_HANDLER_H
 
 #include <memory>
+
 #include "i_tel_ril_manager.h"
 #include "event_handler.h"
-#include "i_sim_file_manager.h"
-#include "i_sim_state_manager.h"
+#include "radio_event.h"
+#include "i_sim_manager.h"
 #include "radio_info.h"
 #include "signal_info.h"
 #include "operator_name.h"
@@ -28,19 +29,20 @@
 #include "network_selection.h"
 #include "network_type.h"
 #include "nitz_update.h"
-#include "cell_manager.h"
+#include "cell_info.h"
 
 namespace OHOS {
 namespace Telephony {
 class NetworkSearchManager;
 class NetworkSearchHandler : public AppExecFwk::EventHandler {
 public:
+    using NsHandlerFunc = void (NetworkSearchHandler::*)(const AppExecFwk::InnerEvent::Pointer &);
     NetworkSearchHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
         const std::weak_ptr<NetworkSearchManager> &networkSearchManager,
-        const std::weak_ptr<ITelRilManager> &telRilManager, const std::weak_ptr<ISimFileManager> &simFileManager,
-        const std::weak_ptr<ISimStateManager> &simStateManager);
+        const std::weak_ptr<ITelRilManager> &telRilManager, const std::weak_ptr<ISimManager> &simManager,
+        int32_t slotId);
     virtual ~NetworkSearchHandler();
-    void Init();
+    bool Init();
     void RegisterEvents();
     void UnregisterEvents();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
@@ -82,6 +84,7 @@ public:
 
     void UpdateCellLocation(int32_t techType, int32_t cellId, int32_t lac);
     sptr<CellLocation> GetCellLocation();
+
 private:
     void RadioOnState();
     void GetRadioStateResponse(const AppExecFwk::InnerEvent::Pointer &event);
@@ -113,13 +116,13 @@ private:
     void RadioGetMeid(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &event);
+    void RadioCurrentCellInfoUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioSetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event);
+
 private:
-    static const int32_t REQ_INTERVAL = 30;
-    using NsHandlerFunc = void (NetworkSearchHandler::*)(const AppExecFwk::InnerEvent::Pointer &);
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     std::unique_ptr<NetworkRegister> networkRegister_ = nullptr;
     std::unique_ptr<OperatorName> operatorName_ = nullptr;
@@ -127,17 +130,17 @@ private:
     std::unique_ptr<SignalInfo> signalInfo_ = nullptr;
     std::unique_ptr<NetworkSelection> networkSelection_ = nullptr;
     std::weak_ptr<ITelRilManager> telRilManager_;
-    std::weak_ptr<ISimFileManager> simFileManager_;
-    std::weak_ptr<ISimStateManager> simStateManager_;
+    std::weak_ptr<ISimManager> simManager_;
     std::unique_ptr<NetworkType> networkType_ = nullptr;
     std::unique_ptr<NitzUpdate> nitzUpdate_ = nullptr;
-    std::unique_ptr<CellManager> cellManager_ = nullptr;
-    std::map<uint32_t, NsHandlerFunc> memberFuncMap_;
+    std::unique_ptr<CellInfo> cellInfo_ = nullptr;
+    static const std::map<RadioEvent, NsHandlerFunc> memberFuncMap_;
     int64_t lastTimeSignalReq_ = 0;
     int64_t lastTimeOperatorReq_ = 0;
     int64_t lastTimePsRegistrationReq_ = 0;
     int64_t lastTimeCsRegistrationReq_ = 0;
     bool firstInit_ = true;
+    int32_t slotId_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

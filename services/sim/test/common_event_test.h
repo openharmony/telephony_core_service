@@ -44,7 +44,7 @@ public:
         OHOS::EventFwk::Want want = data.GetWant();
         std::string action = want.GetAction();
         if (action == SIM_STATE_CHANGE_ACTION) {
-            int32_t slotId = want.GetIntParam(PARAM_SIMID, DEFAULT_PARAM);
+            int32_t slotId = want.GetIntParam(PARAM_SLOTID, DEFAULT_PARAM);
             int32_t state = want.GetIntParam(PARAM_STATE, DEFAULT_PARAM);
             std::string reason = want.GetStringParam(PARAM_REASON);
             int32_t code = data.GetCode();

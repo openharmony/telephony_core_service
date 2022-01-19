@@ -15,8 +15,12 @@
 
 #include "tel_ril_manager.h"
 
-#include "hdf_death_recipient.h"
+#include <iservice_registry.h>
+#include <iservmgr_hdi.h>
+#include <unistd.h>
 
+#include "hdf_death_recipient.h"
+#include "radio_event.h"
 #include "telephony_errors.h"
 
 using namespace std;
@@ -24,784 +28,837 @@ using OHOS::IRemoteObject;
 using OHOS::sptr;
 namespace OHOS {
 namespace Telephony {
-TelRilManager::TelRilManager() : IPCObjectStub(std::u16string(u""))
-{
-}
+const std::string RIL_ADAPTER_SERVICE_NAME = "cellular_radio1";
+constexpr int32_t RIL_ADAPTER_ERROR = 29189;
+TelRilManager::TelRilManager() : IPCObjectStub(std::u16string(u"")) {}
 
-TelRilManager::~TelRilManager()
+int32_t TelRilManager::SetCellularRadioIndication()
 {
-}
-
-int32_t TelRilManager::SetCellularRadioIndication(bool isFirst)
-{
-    int32_t ret = RIL_ADAPTER_ERROR;
-    if (cellularRadio_ != nullptr) {
-        sptr<OHOS::IPCObjectStub> callback = this;
-        MessageParcel data;
-        MessageParcel reply;
-        /* Prevent OHOS::IPCObjectStub from getting abnormal. */
-        if (isFirst) {
-            telRilCallback_ = callback;
-        } else {
-            callback = telRilCallback_;
-        }
-        data.WriteRemoteObject(callback);
-        OHOS::MessageOption option;
-        ret = cellularRadio_->SendRequest(HRIL_ADAPTER_RADIO_INDICATION, data, reply, option);
-        TELEPHONY_LOGI("SetCellularRadioIndication ret:%{public}d", ret);
+    if (rilAdapterRemoteObj_ == nullptr) {
+        TELEPHONY_LOGE("hdf remote object doesn't exist.");
+        return RIL_ADAPTER_ERROR;
     }
-    return ret;
+
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteRemoteObject(telRilCallback_);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    return rilAdapterRemoteObj_->SendRequest(HRIL_ADAPTER_RADIO_INDICATION, data, reply, option);
 }
 
-int32_t TelRilManager::SetCellularRadioResponse(bool isFirst)
+int32_t TelRilManager::SetCellularRadioResponse()
 {
-    int ret = RIL_ADAPTER_ERROR;
-    if (cellularRadio_ != nullptr) {
-        sptr<OHOS::IPCObjectStub> callback = this;
-        MessageParcel data;
-        MessageParcel reply;
-        /* Prevent OHOS::IPCObjectStub from getting abnormal. */
-        if (isFirst) {
-            telRilCallback_ = callback;
-        } else {
-            callback = telRilCallback_;
-        }
-        data.WriteRemoteObject(callback);
-        OHOS::MessageOption option;
-        ret = cellularRadio_->SendRequest(HRIL_ADAPTER_RADIO_RESPONSE, data, reply, option);
-        TELEPHONY_LOGI("SetCellularRadioResponse ret:%{public}d", ret);
+    if (rilAdapterRemoteObj_ == nullptr) {
+        TELEPHONY_LOGE("hdf remote object doesn't exist.");
+        return RIL_ADAPTER_ERROR;
     }
-    return ret;
+
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteRemoteObject(telRilCallback_);
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    return rilAdapterRemoteObj_->SendRequest(HRIL_ADAPTER_RADIO_RESPONSE, data, reply, option);
 }
 
-int TelRilManager::OnRemoteRequest(
+int32_t TelRilManager::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, OHOS::MessageOption &option)
 {
-    TELEPHONY_LOGI("TelRilManager OnRemoteRequest code:%{public}d", code);
-    if (telRilCall_ != nullptr && telRilCall_->IsCallRespOrNotify(code)) {
-        telRilCall_->ProcessCallRespOrNotify(code, data);
-        return CORE_SERVICE_SUCCESS;
+    int32_t slotId = data.ReadInt32();
+    TELEPHONY_LOGI("TelRilManager OnRemoteRequest code:%{public}d, slotId:%{public}d", code, slotId);
+    if ((slotId < 0) || (slotId > static_cast<int32_t>(telRilCall_.size()))) {
+        TELEPHONY_LOGE("TelRilManager slotId is invalid:%{public}d", slotId);
+        return CORE_SERVICE_ERROR;
     }
-    if (telRilSms_ != nullptr && telRilSms_->IsSmsRespOrNotify(code)) {
-        telRilSms_->ProcessSmsRespOrNotify(code, data);
-        return CORE_SERVICE_SUCCESS;
+    if (GetTelRilCall(slotId).IsCallRespOrNotify(code)) {
+        return GetTelRilCall(slotId).ProcessRespOrNotify<TelRilCall>(code, data);
     }
-    if (telRilSim_ != nullptr && telRilSim_->IsSimRespOrNotify(code)) {
-        telRilSim_->ProcessSimRespOrNotify(code, data);
-        return CORE_SERVICE_SUCCESS;
+    if (GetTelRilSms(slotId).IsSmsRespOrNotify(code)) {
+        return GetTelRilSms(slotId).ProcessRespOrNotify<TelRilSms>(code, data);
     }
-    if (telRilNetwork_ != nullptr && telRilNetwork_->IsNetworkRespOrNotify(code)) {
-        telRilNetwork_->ProcessNetworkRespOrNotify(code, data);
-        return CORE_SERVICE_SUCCESS;
+    if (GetTelRilSim(slotId).IsSimRespOrNotify(code)) {
+        return GetTelRilSim(slotId).ProcessRespOrNotify<TelRilSim>(code, data);
     }
-    if (telRilData_ != nullptr && telRilData_->IsDataRespOrNotify(code)) {
-        telRilData_->ProcessDataRespOrNotify(code, data);
-        return CORE_SERVICE_SUCCESS;
+    if (GetTelRilNetwork(slotId).IsNetworkRespOrNotify(code)) {
+        return GetTelRilNetwork(slotId).ProcessRespOrNotify<TelRilNetwork>(code, data);
+    }
+    if (GetTelRilData(slotId).IsDataRespOrNotify(code)) {
+        return GetTelRilData(slotId).ProcessRespOrNotify<TelRilData>(code, data);
     }
     /* The common notice should be placed last. */
-    if (telRilModem_ != nullptr && telRilModem_->IsCommonRespOrNotify(code)) {
-        telRilModem_->ProcessCommonRespOrNotify(code, data);
-        return CORE_SERVICE_SUCCESS;
+    if (GetTelRilModem(slotId).IsCommonRespOrNotify(code)) {
+        return GetTelRilModem(slotId).ProcessRespOrNotify<TelRilModem>(code, data);
     }
-    return CORE_SERVICE_SUCCESS;
-}
-
-void TelRilManager::TelRilSetParam(int32_t preferredNetworkType, int32_t cdmaSubscription, int32_t instanceId)
-{
-    preferredNetworkType_ = preferredNetworkType;
-    cdmaSubscription_ = cdmaSubscription;
-    slotId_ = instanceId;
-    observerHandler_ = std::make_shared<ObserverHandler>();
+    TELEPHONY_LOGE("TelRilManager not find code:%{public}d", code);
+    return CORE_SERVICE_ERROR;
 }
 
 bool TelRilManager::OnInit()
 {
     bool res = false;
-    int i = 0;
+    int32_t i = 0;
 
+    telRilCallback_ = this;
+    death_ = sptr<OHOS::IPCObjectStub::DeathRecipient>(new HdfDeathRecipient(this));
     do {
-        res = InitCellularRadio(true);
+        res = ConnectRilAdapterService();
         if (!res) {
             i++;
             sleep(1);
-        } else {
-            InitTelInfo();
         }
     } while (!res && (i < RIL_INIT_COUNT_MAX));
+    if (res) {
+        for (int32_t slotId = SIM_SLOT_0; slotId < SIM_SLOT_COUNT; slotId++) {
+            InitTelModule(slotId);
+        }
+    }
     return res;
 }
 
-bool TelRilManager::InitCellularRadio(bool isFirst)
+bool TelRilManager::ConnectRilAdapterService()
 {
-    int i = 0;
-    cellularRadio_ = nullptr;
+    std::lock_guard<std::mutex> lock_l(mutex_);
+    rilAdapterRemoteObj_ = nullptr;
     auto servMgr_ = OHOS::HDI::ServiceManager::V1_0::IServiceManager::Get();
-    while (servMgr_ == nullptr) {
-        TELEPHONY_LOGI("bind hdf error! time:%{public}d", i++);
-        sleep(1);
-        servMgr_ = OHOS::HDI::ServiceManager::V1_0::IServiceManager::Get();
-    }
-    cellularRadio_ = servMgr_->GetService(RIL_ADAPTER_SERVICE_NAME);
-    if (cellularRadio_ == nullptr) {
-        TELEPHONY_LOGE("bind hdf%{public}d error!", slotId_);
+    if (servMgr_ == nullptr) {
+        TELEPHONY_LOGI("Get service manager error!");
         return false;
     }
-    sptr<IRemoteObject::DeathRecipient> death_ =
-        sptr<IRemoteObject::DeathRecipient>(new HdfDeathRecipient(slotId_));
+
+    rilAdapterRemoteObj_ = servMgr_->GetService(RIL_ADAPTER_SERVICE_NAME.c_str());
+    if (rilAdapterRemoteObj_ == nullptr) {
+        TELEPHONY_LOGE("bind hdf error!");
+        return false;
+    }
     if (death_ == nullptr) {
         TELEPHONY_LOGE("create HdfDeathRecipient object failed!");
+        rilAdapterRemoteObj_ = nullptr;
         return false;
     }
-    bool res = cellularRadio_->AddDeathRecipient(death_);
-    if (!res) {
-        TELEPHONY_LOGE("AddDeathRecipient hdfId:%{public}d failed!", slotId_);
+    if (!rilAdapterRemoteObj_->AddDeathRecipient(death_)) {
+        TELEPHONY_LOGE("AddDeathRecipient hdf failed!");
+        rilAdapterRemoteObj_ = nullptr;
         return false;
     }
-    if (SetCellularRadioIndication(isFirst)) {
-        TELEPHONY_LOGE("SetCellularRadioIndication error ");
+
+    int32_t ret = SetCellularRadioIndication();
+    if (ret != CORE_SERVICE_SUCCESS) {
+        TELEPHONY_LOGE("SetCellularRadioIndication error, ret:%{public}d", ret);
         return false;
     }
-    if (SetCellularRadioResponse(isFirst)) {
-        TELEPHONY_LOGE("SetCellularRadioResponse error ");
+    ret = SetCellularRadioResponse();
+    if (ret != CORE_SERVICE_SUCCESS) {
+        TELEPHONY_LOGE("SetCellularRadioResponse error, ret:%{public}d", ret);
         return false;
+    }
+
+    return true;
+}
+
+void TelRilManager::InitTelModule(int32_t slotId)
+{
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+    observerHandler_.push_back(observerHandler);
+    telRilSms_.push_back(std::make_unique<TelRilSms>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId]));
+    telRilSim_.push_back(std::make_unique<TelRilSim>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId]));
+    telRilCall_.push_back(std::make_unique<TelRilCall>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId]));
+    telRilData_.push_back(std::make_unique<TelRilData>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId]));
+    telRilModem_.push_back(std::make_unique<TelRilModem>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId]));
+    telRilNetwork_.push_back(std::make_unique<TelRilNetwork>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId]));
+}
+
+TelRilSms &TelRilManager::GetTelRilSms(int32_t slotId)
+{
+    return *telRilSms_[slotId];
+}
+
+TelRilSim &TelRilManager::GetTelRilSim(int32_t slotId)
+{
+    return *telRilSim_[slotId];
+}
+
+TelRilCall &TelRilManager::GetTelRilCall(int32_t slotId)
+{
+    return *telRilCall_[slotId];
+}
+
+TelRilData &TelRilManager::GetTelRilData(int32_t slotId)
+{
+    return *telRilData_[slotId];
+}
+
+TelRilNetwork &TelRilManager::GetTelRilNetwork(int32_t slotId)
+{
+    return *telRilNetwork_[slotId];
+}
+
+TelRilModem &TelRilManager::GetTelRilModem(int32_t slotId)
+{
+    return *telRilModem_[slotId];
+}
+
+std::shared_ptr<ObserverHandler> TelRilManager::GetObserverHandler(int32_t slotId)
+{
+    return observerHandler_[slotId];
+}
+
+bool TelRilManager::ResetRemoteObject(void)
+{
+    if (rilAdapterRemoteObj_ == nullptr) {
+        return false;
+    }
+
+    int32_t size = static_cast<int32_t>(telRilCall_.size());
+    for (int32_t slotId = 0; slotId < size; slotId++) {
+        GetTelRilSms(slotId).ResetRemoteObject(rilAdapterRemoteObj_);
+        GetTelRilSim(slotId).ResetRemoteObject(rilAdapterRemoteObj_);
+        GetTelRilCall(slotId).ResetRemoteObject(rilAdapterRemoteObj_);
+        GetTelRilData(slotId).ResetRemoteObject(rilAdapterRemoteObj_);
+        GetTelRilModem(slotId).ResetRemoteObject(rilAdapterRemoteObj_);
+        GetTelRilNetwork(slotId).ResetRemoteObject(rilAdapterRemoteObj_);
     }
     return true;
 }
 
-void TelRilManager::InitTelInfo()
+int32_t TelRilManager::RegisterCoreNotify(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int32_t what, int32_t *obj)
 {
-    telRilSms_ = std::make_unique<TelRilSms>(cellularRadio_, observerHandler_);
-    if (telRilSms_ == nullptr) {
-        TELEPHONY_LOGE("create TelRilSms object failed!");
-        return;
-    }
-    telRilSim_ = std::make_unique<TelRilSim>(cellularRadio_, observerHandler_);
-    if (telRilSim_ == nullptr) {
-        TELEPHONY_LOGE("create TelRilSim object failed!");
-        return;
-    }
-    telRilCall_ = std::make_unique<TelRilCall>(cellularRadio_, observerHandler_);
-    if (telRilCall_ == nullptr) {
-        TELEPHONY_LOGE("create TelRilCall object failed!");
-        return;
-    }
-    telRilNetwork_ = std::make_unique<TelRilNetwork>(cellularRadio_, observerHandler_);
-    if (telRilNetwork_ == nullptr) {
-        TELEPHONY_LOGE("create TelRilNetwork object failed!");
-        return;
-    }
-    telRilModem_ = std::make_unique<TelRilModem>(cellularRadio_, observerHandler_);
-    if (telRilModem_ == nullptr) {
-        TELEPHONY_LOGE("create TelRilModem object failed!");
-        return;
-    }
-    telRilData_ = std::make_unique<TelRilData>(cellularRadio_, observerHandler_);
-    if (telRilData_ == nullptr) {
-        TELEPHONY_LOGE("create TelRilData object failed!");
-        return;
-    }
-}
-
-void TelRilManager::RegisterCoreNotify(
-    const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what, void *obj)
-{
-    if (observerHandler_ != nullptr) {
-        std::lock_guard<std::mutex> lock_l(mutex_);
+    std::lock_guard<std::mutex> lock_l(mutex_);
+    std::shared_ptr<ObserverHandler> observerHandler = GetObserverHandler(slotId);
+    if (observerHandler != nullptr) {
         switch (what) {
-            case ObserverHandler::RADIO_ICC_STATUS_CHANGED:
-                observerHandler_->RegObserver(what, observerCallBack);
-                observerHandler_->NotifyObserver(ObserverHandler::RADIO_ICC_STATUS_CHANGED);
+            case RadioEvent::RADIO_ICC_STATUS_CHANGED:
+                observerHandler->RegObserver(what, observerCallBack);
+                observerHandler->NotifyObserver(RadioEvent::RADIO_ICC_STATUS_CHANGED);
                 break;
-            case ObserverHandler::RADIO_OFF:
-                observerHandler_->RegObserver(what, observerCallBack);
-                if (telRilModem_->radioState_ == CORE_SERVICE_POWER_OFF ||
-                    CORE_SERVICE_POWER_NOT_AVAILABLE == telRilModem_->radioState_) {
-                    observerHandler_->NotifyObserver(what);
+            case RadioEvent::RADIO_OFF:
+                observerHandler->RegObserver(what, observerCallBack);
+                if (GetTelRilModem(slotId).radioState_ == CORE_SERVICE_POWER_OFF ||
+                    CORE_SERVICE_POWER_NOT_AVAILABLE == GetTelRilModem(slotId).radioState_) {
+                    observerHandler->NotifyObserver(what);
                 }
                 break;
             default:
-                TELEPHONY_LOGI("RegisterCoreNotify default what:%{public}d", what);
-                observerHandler_->RegObserver(what, observerCallBack);
+                TELEPHONY_LOGI("RegisterCoreNotify default what:%{public}d, slotId:%{public}d", what, slotId);
+                observerHandler->RegObserver(what, observerCallBack);
                 break;
         }
     }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-void TelRilManager::UnRegisterCoreNotify(
-    const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what)
+int32_t TelRilManager::UnRegisterCoreNotify(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int32_t what)
 {
-    if (observerHandler_ != nullptr) {
-        std::lock_guard<std::mutex> lock_l(mutex_);
-        observerHandler_->Remove(what, observerCallBack);
+    std::lock_guard<std::mutex> lock_l(mutex_);
+    std::shared_ptr<ObserverHandler> observerHandler = GetObserverHandler(slotId);
+    if (observerHandler != nullptr) {
+        observerHandler->Remove(what, observerCallBack);
     } else {
         TELEPHONY_LOGE("observerHandler_ is null");
     }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-void TelRilManager::PrintErrorLog(const char *moduleName, const uint8_t *objPtr, const char *errStr) const
+/*********************** TelRilModem start **************************/
+int32_t TelRilManager::SetRadioState(
+    int32_t slotId, int32_t fun, int32_t rst, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TELEPHONY_LOGE("%{public}s - this %{public}p: %{public}s", moduleName, objPtr, errStr);
+    return TaskSchedule(response, "TelRilModem", GetTelRilModem(slotId), &TelRilModem::SetRadioState, fun, rst);
 }
 
-void TelRilManager::SetRadioState(int fun, int rst, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetRadioState(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilModem", telRilModem_, &TelRilModem::SetRadioState, fun, rst);
+    return TaskSchedule(response, "TelRilModem", GetTelRilModem(slotId), &TelRilModem::GetRadioState);
 }
 
-void TelRilManager::GetRadioState(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::ShutDown(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilModem", telRilModem_, &TelRilModem::GetRadioState);
+    return TaskSchedule(response, "TelRilModem", GetTelRilModem(slotId), &TelRilModem::ShutDown);
 }
 
-void TelRilManager::ShutDown(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetVoiceRadioTechnology(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilModem", telRilModem_, &TelRilModem::ShutDown);
+    return TaskSchedule(response, "TelRilModem", GetTelRilModem(slotId), &TelRilModem::GetVoiceRadioTechnology);
 }
 
-void TelRilManager::GetImei(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetImei(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilModem", telRilModem_, &TelRilModem::GetImei);
+    return TaskSchedule(response, "TelRilModem", GetTelRilModem(slotId), &TelRilModem::GetImei);
 }
 
-void TelRilManager::GetMeid(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetMeid(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilModem", telRilModem_, &TelRilModem::GetMeid);
+    return TaskSchedule(response, "TelRilModem", GetTelRilModem(slotId), &TelRilModem::GetMeid);
 }
 
-void TelRilManager::GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Pointer &response)
+/*********************** TelRilModem end ***************************/
+/*********************** TelRilCall start **************************/
+int32_t TelRilManager::Dial(
+    int32_t slotId, std::string address, int32_t clirMode, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilModem", telRilModem_, &TelRilModem::GetVoiceRadioTechnology);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::Dial, address, clirMode);
 }
 
-void TelRilManager::Dial(std::string address, int clirMode, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::Reject(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::Dial, address, clirMode);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::Reject);
 }
 
-void TelRilManager::Reject(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::HoldCall(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::Reject);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::HoldCall);
 }
 
-void TelRilManager::HoldCall(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::UnHoldCall(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::HoldCall);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::UnHoldCall);
 }
 
-void TelRilManager::UnHoldCall(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SwitchCall(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::UnHoldCall);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SwitchCall);
 }
 
-void TelRilManager::SwitchCall(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::Hangup(int32_t slotId, int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::SwitchCall);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::Hangup, gsmIndex);
 }
 
-void TelRilManager::Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::Answer(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::Hangup, gsmIndex);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::Answer);
 }
 
-void TelRilManager::Answer(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::CombineConference(
+    int32_t slotId, int32_t callType, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::Answer);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::CombineConference, callType);
 }
 
-void TelRilManager::CombineConference(int32_t callType, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SeparateConference(
+    int32_t slotId, int32_t callIndex, int32_t callType, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::CombineConference, callType);
+    return TaskSchedule(
+        response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SeparateConference, callIndex, callType);
 }
 
-void TelRilManager::SeparateConference(
-    int32_t callIndex, int32_t callType, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::CallSupplement(int32_t slotId, int32_t type, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::SeparateConference, callIndex, callType);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::CallSupplement, type);
 }
 
-void TelRilManager::CallSupplement(int32_t type, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::CallSupplement, type);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetCallList);
 }
 
-void TelRilManager::GetCallList(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetCallWaiting(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::GetCallList);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetCallWaiting);
 }
 
-void TelRilManager::GetCallWaiting(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetCallWaiting(
+    int32_t slotId, const int32_t activate, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::GetCallWaiting);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetCallWaiting, activate);
 }
 
-void TelRilManager::SetCallWaiting(const int32_t activate, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetCallTransferInfo(
+    int32_t slotId, const int32_t reason, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::SetCallWaiting, activate);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetCallTransferInfo, reason);
 }
 
-void TelRilManager::GetCallTransferInfo(const int32_t reason, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetCallTransferInfo(
+    int32_t slotId, const CallTransferParam &callTransfer, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::GetCallTransferInfo, reason);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetCallTransferInfo,
+        callTransfer.reason, callTransfer.mode, callTransfer.number, callTransfer.classx);
 }
 
-void TelRilManager::SetCallTransferInfo(const int32_t reason, const int32_t mode, std::string number,
-    const int32_t classx, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetClip(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(
-        response, "TelRilCall", telRilCall_, &TelRilCall::SetCallTransferInfo, reason, mode, number, classx);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetClip);
 }
 
-void TelRilManager::GetClip(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetClip(int32_t slotId, const int32_t action, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::GetClip);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetClip, action);
 }
 
-void TelRilManager::SetClip(const int32_t action, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetClir(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::SetClip, action);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetClir);
 }
 
-void TelRilManager::GetClir(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetClir(int32_t slotId, const int32_t action, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::GetClir);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetClir, action);
 }
 
-void TelRilManager::SetClir(const int32_t action, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetCallRestriction(
+    int32_t slotId, std::string fac, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::SetClir, action);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetCallRestriction, fac);
 }
 
-void TelRilManager::GetCallRestriction(std::string fac, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetCallRestriction(
+    int32_t slotId, const CallRestrictionParam &callRestriction, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::GetCallRestriction, fac);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetCallRestriction,
+        callRestriction.fac, callRestriction.mode, callRestriction.password);
 }
 
-void TelRilManager::SetCallRestriction(
-    std::string &fac, int32_t mode, std::string &password, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::SetCallRestriction, fac, mode, password);
-}
-
-void TelRilManager::SendDtmf(const std::string &sDTMFCode, int32_t index, int32_t switchOn, int32_t switchOff,
-    const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SendDtmf(
+    int32_t slotId, const DtmfParam &dtmfParam, const AppExecFwk::InnerEvent::Pointer &response)
 {
     // Define the function pointer type here, it is necessary to deal with
     // the function pointer difference caused by overloading
-    typedef void (TelRilCall::*SendDtmfFunc)(
+    typedef int32_t (TelRilCall::*SendDtmfFunc)(
         const std::string &, int32_t, int32_t, int32_t, const AppExecFwk::InnerEvent::Pointer &);
-    TaskSchedule(response, "TelRilCall", telRilCall_, (SendDtmfFunc)&TelRilCall::SendDtmf, sDTMFCode, index,
-        switchOn, switchOff);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), (SendDtmfFunc)&TelRilCall::SendDtmf,
+        dtmfParam.sDTMFCode, dtmfParam.index, dtmfParam.switchOn, dtmfParam.switchOff);
 }
 
-void TelRilManager::SendDtmf(char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SendDtmf(
+    int32_t slotId, char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &response)
 {
     // Define the function pointer type here, it is necessary to deal with
     // the function pointer difference caused by overloading
-    typedef void (TelRilCall::*SendDtmfFunc)(char, int32_t, const AppExecFwk::InnerEvent::Pointer &);
-    TaskSchedule(response, "TelRilCall", telRilCall_, (SendDtmfFunc)&TelRilCall::SendDtmf, cDTMFCode, index);
+    typedef int32_t (TelRilCall::*SendDtmfFunc)(char, int32_t, const AppExecFwk::InnerEvent::Pointer &);
+    return TaskSchedule(
+        response, "TelRilCall", GetTelRilCall(slotId), (SendDtmfFunc)&TelRilCall::SendDtmf, cDTMFCode, index);
 }
 
-void TelRilManager::StartDtmf(char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::StartDtmf(
+    int32_t slotId, char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::StartDtmf, cDTMFCode, index);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::StartDtmf, cDTMFCode, index);
 }
 
-void TelRilManager::StopDtmf(int32_t index, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::StopDtmf(int32_t slotId, int32_t index, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::StopDtmf, index);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::StopDtmf, index);
 }
 
-int32_t TelRilManager::SetInitApnInfo(CellularDataProfile dataProfile, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetImsCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilData", telRilData_, &TelRilData::SetInitApnInfo, dataProfile);
-    return TELEPHONY_SUCCESS;
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetImsCallList);
 }
 
-int32_t TelRilManager::ActivatePdpContext(int32_t radioTechnology, CellularDataProfile dataProfile, bool isRoaming,
-    bool allowRoaming, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetCallPreferenceMode(
+    int32_t slotId, const int32_t mode, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilData", telRilData_, &TelRilData::ActivatePdpContext, radioTechnology, dataProfile,
-        isRoaming, allowRoaming);
-    return TELEPHONY_SUCCESS;
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetCallPreferenceMode, mode);
+}
+
+int32_t TelRilManager::GetCallPreferenceMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetCallPreferenceMode);
+}
+
+int32_t TelRilManager::SetLteImsSwitchStatus(
+    int32_t slotId, const int32_t active, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetLteImsSwitchStatus, active);
+}
+
+int32_t TelRilManager::GetLteImsSwitchStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetLteImsSwitchStatus);
+}
+
+int32_t TelRilManager::SetUssdCusd(
+    int32_t slotId, const std::string str, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetUssdCusd, str);
+}
+
+int32_t TelRilManager::GetUssdCusd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetUssdCusd);
+}
+
+int32_t TelRilManager::SetMute(int32_t slotId, const int32_t mute, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetMute, mute);
+}
+
+int32_t TelRilManager::GetMute(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetMute);
+}
+
+int32_t TelRilManager::GetEmergencyCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetEmergencyCallList);
+}
+
+int32_t TelRilManager::GetCallFailReason(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetCallFailReason);
+}
+
+/*********************** TelRilCall end ****************************/
+/*********************** TelRilData start **************************/
+int32_t TelRilManager::SetInitApnInfo(
+    int32_t slotId, const DataProfile &dataProfile, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilData", GetTelRilData(slotId), &TelRilData::SetInitApnInfo, dataProfile);
+}
+
+int32_t TelRilManager::ActivatePdpContext(
+    int32_t slotId, const ActivateDataParam &activateData, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilData", GetTelRilData(slotId), &TelRilData::ActivatePdpContext,
+        activateData.radioTechnology, activateData.dataProfile, activateData.isRoaming, activateData.allowRoaming);
 }
 
 int32_t TelRilManager::DeactivatePdpContext(
-    int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response)
+    int32_t slotId, int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilData", telRilData_, &TelRilData::DeactivatePdpContext, cid, reason);
-    return TELEPHONY_SUCCESS;
+    return TaskSchedule(response, "TelRilData", GetTelRilData(slotId), &TelRilData::DeactivatePdpContext, cid, reason);
 }
 
-int32_t TelRilManager::GetPdpContextList(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetPdpContextList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilData", telRilData_, &TelRilData::GetPdpContextList);
-    return TELEPHONY_SUCCESS;
+    return TaskSchedule(response, "TelRilData", GetTelRilData(slotId), &TelRilData::GetPdpContextList);
 }
 
 int32_t TelRilManager::SetLinkBandwidthReportingRule(
-    LinkBandwidthRule linkBandwidth, const AppExecFwk::InnerEvent::Pointer &response)
+    int32_t slotId, LinkBandwidthRule linkBandwidth, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilData", telRilData_, &TelRilData::SetLinkBandwidthReportingRule, linkBandwidth);
-    return TELEPHONY_SUCCESS;
+    return TaskSchedule(
+        response, "TelRilData", GetTelRilData(slotId), &TelRilData::SetLinkBandwidthReportingRule, linkBandwidth);
 }
 
 int32_t TelRilManager::GetLinkBandwidthInfo(
-    const int32_t cid, const AppExecFwk::InnerEvent::Pointer &response)
+    int32_t slotId, const int32_t cid, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilData", telRilData_, &TelRilData::GetLinkBandwidthInfo, cid);
-    return TELEPHONY_SUCCESS;
+    return TaskSchedule(response, "TelRilData", GetTelRilData(slotId), &TelRilData::GetLinkBandwidthInfo, cid);
 }
 
-void TelRilManager::GetImsRegStatus(const AppExecFwk::InnerEvent::Pointer &response)
+/*********************** TelRilData end ****************************/
+/*********************** TelRilNetwork start ***********************/
+int32_t TelRilManager::GetImsRegStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::GetImsRegStatus);
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetImsRegStatus);
 }
 
-void TelRilManager::GetSignalStrength(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetSignalStrength(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::GetSignalStrength);
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetSignalStrength);
 }
 
-void TelRilManager::GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetCsRegStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::GetCsRegStatus);
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetCsRegStatus);
 }
 
-void TelRilManager::GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetPsRegStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::GetPsRegStatus);
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetPsRegStatus);
 }
 
-void TelRilManager::GetOperatorInfo(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetOperatorInfo(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::GetOperatorInfo);
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetOperatorInfo);
 }
 
-void TelRilManager::SetPsAttachStatus(int32_t psAttachStatus, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetPsAttachStatus(
+    int32_t slotId, int32_t psAttachStatus, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::SetPsAttachStatus, psAttachStatus);
+    return TaskSchedule(
+        response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::SetPsAttachStatus, psAttachStatus);
 }
 
-void TelRilManager::GetPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetPsAttachStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::GetPsAttachStatus);
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetPsAttachStatus);
 }
 
-void TelRilManager::GetNetworkSearchInformation(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetNetworkSearchInformation(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::GetNetworkSearchInformation);
+    return TaskSchedule(
+        response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetNetworkSearchInformation);
 }
 
-void TelRilManager::GetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetNetworkSelectionMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::GetNetworkSelectionMode);
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetNetworkSelectionMode);
 }
 
-void TelRilManager::SetNetworkSelectionMode(
-    int32_t automaticFlag, std::string oper, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetNetworkSelectionMode(
+    int32_t slotId, int32_t automaticFlag, std::string oper, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(
-        response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::SetNetworkSelectionMode, automaticFlag, oper);
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::SetNetworkSelectionMode,
+        automaticFlag, oper);
 }
 
-void TelRilManager::GetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetPreferredNetwork(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::GetPreferredNetwork);
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetPreferredNetwork);
 }
 
-void TelRilManager::SetPreferredNetwork(
-    int32_t preferredNetworkType, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetPreferredNetwork(
+    int32_t slotId, int32_t preferredNetworkType, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(
-        response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::SetPreferredNetwork, preferredNetworkType);
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::SetPreferredNetwork,
+        preferredNetworkType);
 }
 
-void TelRilManager::GetCellInfoList(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetCellInfoList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::GetCellInfoList);
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetCellInfoList);
 }
 
-void TelRilManager::GetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetCurrentCellInfo(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::GetCurrentCellInfo);
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetCurrentCellInfo);
 }
-void TelRilManager::GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetRadioCapability(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::GetRadioCapability);
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetRadioCapability);
 }
 
-void TelRilManager::SetRadioCapability(
-    RadioCapabilityInfo &radioCapabilityInfo, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetRadioCapability(
+    int32_t slotId, RadioCapabilityInfo &radioCapabilityInfo, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::SetRadioCapability, radioCapabilityInfo);
+    return TaskSchedule(
+        response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::SetRadioCapability, radioCapabilityInfo);
 }
 
-void TelRilManager::GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetPhysicalChannelConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::GetPhysicalChannelConfig);
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetPhysicalChannelConfig);
 }
 
-void TelRilManager::SetLocateUpdates(HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetLocateUpdates(
+    int32_t slotId, HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilNetwork", telRilNetwork_, &TelRilNetwork::SetLocateUpdates, mode);
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::SetLocateUpdates, mode);
 }
 
-void TelRilManager::SendGsmSms(
-    std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
+/*********************** TelRilNetwork end ****************************/
+/*********************** TelRilSms start ******************************/
+int32_t TelRilManager::SendGsmSms(
+    int32_t slotId, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::SendGsmSms, smscPdu, pdu);
+    return TaskSchedule(response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::SendGsmSms, smscPdu, pdu);
 }
 
-void TelRilManager::SendCdmaSms(std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SendCdmaSms(int32_t slotId, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::SendCdmaSms, pdu);
+    return TaskSchedule(response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::SendCdmaSms, pdu);
 }
 
-void TelRilManager::AddSimMessage(
-    int32_t status, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::AddSimMessage(
+    int32_t slotId, const SimMessageParam &simMessage, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::AddSimMessage, status, smscPdu, pdu);
+    return TaskSchedule(response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::AddSimMessage, simMessage.status,
+        simMessage.smscPdu, simMessage.pdu);
 }
 
-void TelRilManager::DelSimMessage(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::DelSimMessage(int32_t slotId, int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::DelSimMessage, gsmIndex);
+    return TaskSchedule(response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::DelSimMessage, gsmIndex);
 }
 
-void TelRilManager::UpdateSimMessage(int32_t gsmIndex, int32_t state, std::string smscPdu, std::string pdu,
-    const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::UpdateSimMessage(
+    int32_t slotId, const SimMessageParam &simMessage, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::UpdateSimMessage, gsmIndex, state, smscPdu, pdu);
+    return TaskSchedule(response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::UpdateSimMessage,
+        simMessage.gsmIndex, simMessage.status, simMessage.smscPdu, simMessage.pdu);
 }
 
-void TelRilManager::GetSmscAddr(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetSmscAddr(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::GetSmscAddr);
+    return TaskSchedule(response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::GetSmscAddr);
 }
 
-void TelRilManager::GetCdmaCBConfig(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetCdmaCBConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::GetCdmaCBConfig);
+    return TaskSchedule(response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::GetCdmaCBConfig);
 }
 
-void TelRilManager::SetSmscAddr(int32_t tosca, std::string address, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetSmscAddr(
+    int32_t slotId, int32_t tosca, std::string address, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::SetSmscAddr, tosca, address);
+    return TaskSchedule(response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::SetSmscAddr, tosca, address);
 }
 
-void TelRilManager::SetCBConfig(
-    int32_t mode, std::string idList, std::string dcsList, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetCBConfig(
+    int32_t slotId, const CBConfigParam &cbConfig, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::SetCBConfig, mode, idList, dcsList);
+    return TaskSchedule(response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::SetCBConfig, cbConfig.mode,
+        cbConfig.idList, cbConfig.dcsList);
 }
 
-void TelRilManager::SetCdmaCBConfig(
-    CdmaCBConfigInfoList &cdmaCBConfigInfoList, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetCdmaCBConfig(
+    int32_t slotId, CdmaCBConfigInfoList &cdmaCBConfigInfoList, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::SetCdmaCBConfig, cdmaCBConfigInfoList);
+    return TaskSchedule(
+        response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::SetCdmaCBConfig, cdmaCBConfigInfoList);
 }
 
-void TelRilManager::GetCBConfig(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetCBConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::GetCBConfig);
+    return TaskSchedule(response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::GetCBConfig);
 }
 
-void TelRilManager::SendSmsMoreMode(
-    std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SendSmsMoreMode(
+    int32_t slotId, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::SendSmsMoreMode, smscPdu, pdu);
+    return TaskSchedule(response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::SendSmsMoreMode, smscPdu, pdu);
 }
 
-void TelRilManager::SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SendSmsAck(
+    int32_t slotId, bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::SendSmsAck, success, cause);
+    return TaskSchedule(response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::SendSmsAck, success, cause);
 }
 
-void TelRilManager::AddCdmaSimMessage(
-    int32_t status, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::AddCdmaSimMessage(
+    int32_t slotId, int32_t status, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::AddCdmaSimMessage, status, pdu);
+    return TaskSchedule(response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::AddCdmaSimMessage, status, pdu);
 }
 
-void TelRilManager::DelCdmaSimMessage(int32_t cdmaIndex, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::DelCdmaSimMessage(
+    int32_t slotId, int32_t cdmaIndex, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::DelCdmaSimMessage, cdmaIndex);
+    return TaskSchedule(response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::DelCdmaSimMessage, cdmaIndex);
 }
 
-void TelRilManager::UpdateCdmaSimMessage(
-    int32_t cdmaIndex, int32_t state, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::UpdateCdmaSimMessage(
+    int32_t slotId, const CdmaSimMessageParam &cdmaSimMsg, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSms", telRilSms_, &TelRilSms::UpdateCdmaSimMessage, cdmaIndex, state, pdu);
+    return TaskSchedule(response, "TelRilSms", GetTelRilSms(slotId), &TelRilSms::UpdateCdmaSimMessage,
+        cdmaSimMsg.cdmaIndex, cdmaSimMsg.status, cdmaSimMsg.pdu);
 }
 
-void TelRilManager::GetSimStatus(const AppExecFwk::InnerEvent::Pointer &response)
+/*********************** TelRilSms end ********************************/
+/*********************** TelRilSim start ******************************/
+int32_t TelRilManager::GetSimStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::GetSimStatus);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::GetSimStatus);
 }
 
-void TelRilManager::GetSimIO(SimIoRequestInfo data, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetSimIO(int32_t slotId, SimIoRequestInfo data, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::GetSimIO, data);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::GetSimIO, data);
 }
 
-void TelRilManager::GetImsi(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetImsi(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::GetImsi);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::GetImsi);
 }
 
-void TelRilManager::GetSimLockStatus(std::string fac, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetSimLockStatus(
+    int32_t slotId, std::string fac, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::GetSimLockStatus, fac);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::GetSimLockStatus, fac);
 }
 
-void TelRilManager::SetSimLock(
-    std::string fac, int32_t mode, std::string passwd, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetSimLock(
+    int32_t slotId, const SimLockParam &simLock, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::SetSimLock, fac, mode, passwd);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SetSimLock, simLock.fac,
+        simLock.mode, simLock.passwd);
 }
 
-void TelRilManager::ChangeSimPassword(std::string fac, std::string oldPassword, std::string newPassword,
-    int32_t passwordLength, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::ChangeSimPassword(
+    int32_t slotId, const SimPasswordParam &simPassword, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::ChangeSimPassword, fac, oldPassword, newPassword,
-        passwordLength);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::ChangeSimPassword, simPassword.fac,
+        simPassword.oldPassword, simPassword.newPassword, simPassword.passwordLength);
 }
 
-void TelRilManager::UnlockPin(std::string pin, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::UnlockPin(int32_t slotId, std::string pin, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::UnlockPin, pin);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::UnlockPin, pin);
 }
 
-void TelRilManager::UnlockPuk(std::string puk, std::string pin, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::UnlockPuk(
+    int32_t slotId, std::string puk, std::string pin, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::UnlockPuk, puk, pin);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::UnlockPuk, puk, pin);
 }
 
-void TelRilManager::GetSimPinInputTimes(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetSimPinInputTimes(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::GetSimPinInputTimes);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::GetSimPinInputTimes);
 }
-void TelRilManager::UnlockPin2(std::string pin2, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::UnlockPin2(int32_t slotId, std::string pin2, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::UnlockPin2, pin2);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::UnlockPin2, pin2);
 }
 
-void TelRilManager::UnlockPuk2(std::string puk2, std::string pin2, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::UnlockPuk2(
+    int32_t slotId, std::string puk2, std::string pin2, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::UnlockPuk2, puk2, pin2);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::UnlockPuk2, puk2, pin2);
 }
 
-void TelRilManager::GetSimPin2InputTimes(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetSimPin2InputTimes(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::GetSimPin2InputTimes);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::GetSimPin2InputTimes);
 }
 
-void TelRilManager::SetActiveSim(int32_t index, int32_t enable, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetActiveSim(
+    int32_t slotId, int32_t index, int32_t enable, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::SetActiveSim, index, enable);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SetActiveSim, index, enable);
 }
 
-void TelRilManager::SendTerminalResponseCmd(
-    const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SendTerminalResponseCmd(
+    int32_t slotId, const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::SendTerminalResponseCmd, strCmd);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimStkSendTerminalResponse, strCmd);
 }
 
-void TelRilManager::SendEnvelopeCmd(const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SendEnvelopeCmd(
+    int32_t slotId, const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::SendEnvelopeCmd, strCmd);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimStkSendEnvelope, strCmd);
 }
 
-void TelRilManager::StkControllerIsReady(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SimStkIsReady(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::StkControllerIsReady);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimStkIsReady);
 }
 
-void TelRilManager::StkCmdCallSetup(int32_t flagAccept, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SimOpenLogicalChannel(
+    int32_t slotId, const std::string &appID, const int32_t p2, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::StkCmdCallSetup, flagAccept);
+    return TaskSchedule(
+        response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimOpenLogicalChannel, appID.substr(0), p2);
 }
 
-void TelRilManager::OpenLogicalSimIO(
-    const std::string &appID, const int32_t p2, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SimCloseLogicalChannel(
+    int32_t slotId, const int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::OpenLogicalSimIO, appID.substr(0), p2);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimCloseLogicalChannel, channelId);
 }
 
-void TelRilManager::CloseLogicalSimIO(const int32_t chanID, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SimTransmitApduLogicalChannel(
+    int32_t slotId, ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::CloseLogicalSimIO, chanID);
+    return TaskSchedule(
+        response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimTransmitApduLogicalChannel, reqInfo);
 }
 
-void TelRilManager::TransmitApduSimIO(ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::UnlockSimLock(
+    int32_t slotId, int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::TransmitApduSimIO, reqInfo);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::UnlockSimLock, lockType, password);
 }
 
-void TelRilManager::UnlockSimLock(int32_t lockType, std::string password,
-    const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::SetRadioProtocol(
+    int32_t slotId, SimProtocolRequest data, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::UnlockSimLock, lockType, password);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SetRadioProtocol, data);
 }
-
-void TelRilManager::GetImsCallList(const AppExecFwk::InnerEvent::Pointer &response)
-{
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::GetImsCallList);
-}
-
-void TelRilManager::SetCallPreferenceMode(const int32_t mode, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::SetCallPreferenceMode, mode);
-}
-
-void TelRilManager::GetCallPreferenceMode(const AppExecFwk::InnerEvent::Pointer &response)
-{
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::GetCallPreferenceMode);
-}
-
-void TelRilManager::SetLteImsSwitchStatus(const int32_t active, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::SetLteImsSwitchStatus, active);
-}
-
-void TelRilManager::GetLteImsSwitchStatus(const AppExecFwk::InnerEvent::Pointer &response)
-{
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::GetLteImsSwitchStatus);
-}
-
-void TelRilManager::SetRadioProtocol(SimProtocolRequest data, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    TaskSchedule(response, "TelRilSim", telRilSim_, &TelRilSim::SetRadioProtocol, data);
-}
-
-void TelRilManager::SetUssdCusd(const std::string str, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::SetUssdCusd, str);
-}
-
-void TelRilManager::GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &response)
-{
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::GetUssdCusd);
-}
-
-void TelRilManager::SetMute(const int32_t mute, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::SetMute, mute);
-}
-
-void TelRilManager::GetMute(const AppExecFwk::InnerEvent::Pointer &response)
-{
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::GetMute);
-}
-
-void TelRilManager::GetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &response)
-{
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::GetEmergencyCallList);
-}
-
-void TelRilManager::GetCallFailReason(const AppExecFwk::InnerEvent::Pointer &response)
-{
-    TaskSchedule(response, "TelRilCall", telRilCall_, &TelRilCall::GetCallFailReason);
-}
+/*********************** TelRilSim end ********************************/
 } // namespace Telephony
 } // namespace OHOS

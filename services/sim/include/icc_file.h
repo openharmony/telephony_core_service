@@ -31,14 +31,13 @@
 #include "common_event_manager.h"
 #include "want.h"
 #include "icc_dialling_numbers_handler.h"
-#include "telephony_state_registry_client.h"
 
 namespace OHOS {
 namespace Telephony {
 class IccFile : public AppExecFwk::EventHandler {
 public:
     IccFile(
-        const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<ISimStateManager> simStateManager);
+        const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager);
     virtual void Init();
     virtual void StartLoad();
     std::string ObtainIMSI();
@@ -79,7 +78,7 @@ public:
         virtual void ProcessParseFile(const AppExecFwk::InnerEvent::Pointer &event) = 0;
     };
     virtual bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber) = 0;
-    bool HasSimCard(int slotId);
+    bool HasSimCard();
     virtual void UnInit();
     void SetId(int id)
     {
@@ -94,7 +93,7 @@ protected:
     void UpdateSPN(const std::string spn);
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<IccFileController> fileController_ = nullptr;
-    std::shared_ptr<ISimStateManager> stateManager_ = nullptr;
+    std::shared_ptr<SimStateManager> stateManager_ = nullptr;
     std::string imsi_ = "";
     std::string iccId_ = ""; // decimals
     std::string spn_ = "";
@@ -129,7 +128,7 @@ protected:
     const uint8_t BYTE_NUM = 0xff;
     const int DATA_STEP = 2;
     const std::string SIM_STATE_ACTION = "com.hos.action.SIM_STATE_CHANGED";
-    std::unique_ptr<ObserverHandler> filesFetchedObser_ = nullptr;
+    static std::unique_ptr<ObserverHandler> filesFetchedObser_;
     std::unique_ptr<ObserverHandler> lockedFilesFetchedObser_ = nullptr;
     std::unique_ptr<ObserverHandler> networkLockedFilesFetchedObser_ = nullptr;
     std::unique_ptr<ObserverHandler> imsiReadyObser_ = nullptr;

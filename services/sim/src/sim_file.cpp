@@ -15,6 +15,8 @@
 
 #include "sim_file.h"
 
+#include "radio_event.h"
+
 using namespace std;
 using namespace OHOS::AppExecFwk;
 
@@ -22,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 std::mutex IccFile::mtx_;
 SimFile::SimFile(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<ISimStateManager> simStateManager)
+    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager)
     : IccFile(runner, simStateManager)
 {
     fileQueried_ = false;
@@ -35,9 +37,9 @@ void SimFile::Init()
     TELEPHONY_LOGI("SimFile:::Init():start");
     IccFile::Init();
     if (stateManager_ != nullptr) {
-        stateManager_->RegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_READY);
-        stateManager_->RegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_LOCKED);
-        stateManager_->RegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_SIMLOCK);
+        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
+        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
+        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
     }
 }
 
@@ -156,7 +158,7 @@ void SimFile::OnAllFilesFetched()
     UpdateLoaded(true);
     TELEPHONY_LOGI("SimFile SimFile::OnAllFilesFetched: start notify");
     if (filesFetchedObser_ != nullptr) {
-        filesFetchedObser_->NotifyObserver(ObserverHandler::RADIO_SIM_RECORDS_LOADED);
+        filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED);
     }
     PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_LOADED, "");
     NotifyRegistrySimState(CardType::SINGLE_MODE_USIM_CARD, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
@@ -165,7 +167,7 @@ void SimFile::OnAllFilesFetched()
 bool SimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("SimFile::SIM_STATE_READY received");
-    if (stateManager_->GetCardType(slotId_) != CardType::SINGLE_MODE_USIM_CARD) {
+    if (stateManager_->GetCardType() != CardType::SINGLE_MODE_USIM_CARD) {
         TELEPHONY_LOGI("invalid SimFile::SIM_STATE_READY received");
         return false;
     }
@@ -206,7 +208,7 @@ void SimFile::LoadSimFiles()
     fileQueried_ = true;
 
     AppExecFwk::InnerEvent::Pointer eventIMSI = BuildCallerInfo(MSG_SIM_OBTAIN_IMSI_DONE);
-    telRilManager_->GetImsi(eventIMSI);
+    telRilManager_->GetImsi(slotId_, eventIMSI);
     fileToGet_++;
 
     AppExecFwk::InnerEvent::Pointer eventIccId = BuildCallerInfo(MSG_SIM_OBTAIN_ICCID_DONE);
@@ -228,10 +230,6 @@ void SimFile::LoadSimFiles()
 
     AppExecFwk::InnerEvent::Pointer eventMBI = BuildCallerInfo(MSG_SIM_OBTAIN_MBI_DONE);
     fileController_->ObtainLinearFixedFile(ELEMENTARY_FILE_MBI, 1, eventMBI);
-    fileToGet_++;
-
-    AppExecFwk::InnerEvent::Pointer eventCphs = BuildCallerInfo(MSG_SIM_OBTAIN_INFO_CPHS_DONE);
-    fileController_->ObtainBinaryFile(ELEMENTARY_FILE_INFO_CPHS, eventCphs);
     fileToGet_++;
 }
 
@@ -639,7 +637,7 @@ bool SimFile::ProcessObtainIMSIDone(const AppExecFwk::InnerEvent::Pointer &event
         std::string iso = ObtainIsoCountryCode();
         TELEPHONY_LOGI("SimFile::ObtainIsoCountryCode result success");
         if (!imsi_.empty()) {
-            imsiReadyObser_->NotifyObserver(ObserverHandler::RADIO_IMSI_LOADED_READY);
+            imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
             PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_IMSI, imsi_);
         }
     }
@@ -1013,9 +1011,9 @@ bool SimFile::IsContinueGetSpn(bool start, SpnStatus curStatus, SpnStatus &newSt
 }
 void SimFile::InitMemberFunc()
 {
-    memberFuncMap_[ObserverHandler::RADIO_SIM_STATE_READY] = &SimFile::ProcessIccReady;
-    memberFuncMap_[ObserverHandler::RADIO_SIM_STATE_LOCKED] = &SimFile::ProcessIccLocked;
-    memberFuncMap_[ObserverHandler::RADIO_SIM_STATE_SIMLOCK] = &SimFile::ProcessIccLocked;
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_READY] = &SimFile::ProcessIccReady;
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_LOCKED] = &SimFile::ProcessIccLocked;
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_SIMLOCK] = &SimFile::ProcessIccLocked;
     memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] = &SimFile::ProcessObtainIMSIDone;
     memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] = &SimFile::ProcessGetIccIdDone;
     memberFuncMap_[MSG_SIM_OBTAIN_MBI_DONE] = &SimFile::ProcessGetMbiDone;
@@ -1053,9 +1051,9 @@ void SimFile::InitMemberFunc()
 SimFile::~SimFile()
 {
     if (stateManager_ != nullptr) {
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_READY);
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_LOCKED);
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_SIMLOCK);
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
     }
 }
 
@@ -1138,9 +1136,9 @@ bool SimFile::CphsVoiceMailAvailable()
 void SimFile::UnInit()
 {
     if (stateManager_ != nullptr) {
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_READY);
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_LOCKED);
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), ObserverHandler::RADIO_SIM_STATE_SIMLOCK);
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
     }
     IccFile::UnInit();
 }

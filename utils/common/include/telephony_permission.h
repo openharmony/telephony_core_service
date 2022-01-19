@@ -29,12 +29,15 @@ static const std::string TELEPHONY_SEND_MESSAGES = "ohos.permission.SEND_MESSAGE
 static const std::string TELEPHONY_RECEIVE_MESSAGES = "ohos.permission.RECEIVE_SMS";
 static const std::string GET_SIM_INFO = "ohos.permission.GET_SIM_INFO";
 static const std::string SET_SIM_INFO = "ohos.permission.SET_SIM_INFO";
+static const std::string GET_CALL_HISTORY = "ohos.permission.GET_CALL_HISTORY";
+static const std::string GET_CALL_STATE = "ohos.permission.GET_CALL_STATE";
 } // namespace Permission
 
 class TelephonyPermission {
 public:
     static bool CheckPermission(const std::string &permissionName);
     static bool CheckPermission(const std::string &bundleName, const std::string &permissionName);
+    static bool GetBundleNameByUid(int32_t uid, std::string &bundleName);
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -24,13 +24,10 @@ namespace Telephony {
 class NetworkSearchManager;
 class RadioInfo {
 public:
-    RadioInfo();
-    explicit RadioInfo(std::weak_ptr<NetworkSearchManager> networkSearchManager);
+    RadioInfo(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId);
     virtual ~RadioInfo() = default;
-    void SetToTheSuitableState() const;
     void ProcessGetRadioState(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &event) const;
-    void ProcessRadioChange() const;
     void ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessGetMeid(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessSetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event) const;
@@ -44,6 +41,7 @@ private:
     PhoneType RadioTechToPhoneType(RadioTech radioTech) const;
     PhoneType phoneType_ = PhoneType::PHONE_TYPE_IS_NONE;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
+    int32_t slotId_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -17,8 +17,8 @@
 
 namespace OHOS {
 namespace Telephony {
-SimSmsManager::SimSmsManager(std::shared_ptr<ITelRilManager> telRilManager,
-    std::shared_ptr<ISimFileManager> simFileManager, std::shared_ptr<ISimStateManager> simStateManager)
+SimSmsManager::SimSmsManager(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
+    std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simStateManager)
     : telRilManager_(telRilManager), simFileManager_(simFileManager), stateManager_(simStateManager)
 {
     TELEPHONY_LOGI("SimSmsManager::SimSmsManager started");
@@ -47,7 +47,7 @@ void SimSmsManager::Init(int slotId)
     }
 
     if (simFileManager_ == nullptr) {
-        TELEPHONY_LOGE("SimSmsManager::Init ISimFileManager null pointer");
+        TELEPHONY_LOGE("SimSmsManager::Init SimFileManager null pointer");
         return;
     }
     std::shared_ptr<SimFileManager> fileManager = std::static_pointer_cast<SimFileManager>(simFileManager_);

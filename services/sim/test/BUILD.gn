@@ -10,6 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
@@ -21,8 +22,6 @@ TELEPHONY_FRAMEWORKS_ROOT = "//base/telephony/core_service/frameworks/native/"
 ohos_executable("tel_sim_test") {
   install_enable = true
   sources = [
-    "$TELEPHONY_CORE_SERVICE_ROOT/frameworks/native/src/core_service_client.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/frameworks/native/src/core_service_proxy.cpp",
     "$TELEPHONY_FRAMEWORKS_ROOT/src/network_information.cpp",
     "$TELEPHONY_FRAMEWORKS_ROOT/src/network_search_result.cpp",
     "$TELEPHONY_FRAMEWORKS_ROOT/src/network_state.cpp",
@@ -36,15 +35,9 @@ ohos_executable("tel_sim_test") {
     "$TELEPHONY_CORE_SERVICE_ROOT/base/include",
     "//base/telephony/ril_adapter/interfaces/innerkits/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/include",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/sim",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/network_search",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/core",
+    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/state_registry",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/data_storage",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/network_search",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/sim",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/core",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/cellular_data",
     "$TELEPHONY_SIM_ROOT/include",
 
     "$HDF_FRAMEWORKS/ability/sbuf/include",
@@ -57,14 +50,15 @@ ohos_executable("tel_sim_test") {
     "$HDF_FRAMEWORKS/include/osal",
   ]
 
-  defines = [
+  defines += [
     "TELEPHONY_LOG_TAG = \"CoreServiceApi\"",
     "LOG_DOMAIN = 0xD002B01",
   ]
 
   deps = [
     "//base/telephony/core_service:tel_core_service",
-    "//base/telephony/core_service/utils:libtelephony_common",
+    "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
+    "//base/telephony/core_service/utils:libtel_common",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
     "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
