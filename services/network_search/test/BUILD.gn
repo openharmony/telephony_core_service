@@ -24,7 +24,7 @@ ohos_executable("tel_network_search_test") {
 
   include_dirs = [
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
-    "//foundation/appexecfwk/standard/kits/appkit/native/app",
+    "//foundation/aafwk/standard/frameworks/kits/appkit/native/app",
     "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
@@ -39,11 +39,12 @@ ohos_executable("tel_network_search_test") {
     "//base/telephony/core_service/utils:libtel_common",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:dummy_classes",
+    "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
+    "//foundation/aafwk/standard/interfaces/innerkits/app_manager:app_manager",
     "//foundation/aafwk/standard/interfaces/innerkits/want:want",
     "//foundation/appexecfwk/standard/common:libappexecfwk_common",
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base:appexecfwk_base",
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core:appexecfwk_core",
-    "//foundation/appexecfwk/standard/kits:appkit_native",
     "//foundation/appexecfwk/standard/services/bundlemgr:libbms",
     "//utils/native/base:utils",
   ]
