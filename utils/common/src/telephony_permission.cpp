@@ -28,18 +28,13 @@
 namespace OHOS {
 namespace Telephony {
 /**
- * @brief Permission check by callingUid.
- * @param permissionName permission name.
+ * @brief Get bundleName by callingUid.
+ * @param callingUid.
+ * @param bundleName.
  * @return Returns true on success, false on failure.
  */
-bool TelephonyPermission::CheckPermission(const std::string &permissionName)
+bool TelephonyPermission::GetBundleNameByUid(int32_t uid, std::string &bundleName)
 {
-#ifdef IS_SUPPORT_PERMISSION
-    if (permissionName.empty()) {
-        TELEPHONY_LOGE("permission check failed，permission name is empty.");
-        return false;
-    }
-
     OHOS::sptr<OHOS::ISystemAbilityManager> systemAbilityManager =
         OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     OHOS::sptr<OHOS::IRemoteObject> remoteObject =
@@ -50,10 +45,26 @@ bool TelephonyPermission::CheckPermission(const std::string &permissionName)
         TELEPHONY_LOGE(" permission check failed, cannot get IBundleMgr.");
         return false;
     }
+    return iBundleMgr->GetBundleNameForUid(uid, bundleName);
+}
 
+/**
+ * @brief Permission check by callingUid.
+ * @param permissionName permission name.
+ * @return Returns true on success, false on failure.
+ */
+bool TelephonyPermission::CheckPermission(const std::string &permissionName)
+{
+#ifndef SUPPORT_PERMISSION
+    return true;
+#endif
+    if (permissionName.empty()) {
+        TELEPHONY_LOGE("permission check failed，permission name is empty.");
+        return false;
+    }
     int32_t uid = IPCSkeleton::GetCallingUid();
-    std::string bundleName;
-    bool result = iBundleMgr->GetBundleNameForUid(uid, bundleName);
+    std::string bundleName = "";
+    bool result = GetBundleNameByUid(uid, bundleName);
     if (!result || bundleName.empty()) {
         TELEPHONY_LOGE("permission check failed, cannot get bundle name by uid:%{public}d", uid);
         return false;
@@ -66,9 +77,6 @@ bool TelephonyPermission::CheckPermission(const std::string &permissionName)
     }
 
     return result == OHOS::Security::Permission::PermissionState::PERMISSION_GRANTED;
-#else
-    return true;
-#endif
 }
 
 /**
@@ -77,8 +85,7 @@ bool TelephonyPermission::CheckPermission(const std::string &permissionName)
  * @param permissionName permission name.
  * @return Returns true on success, false on failure.
  */
-bool TelephonyPermission::CheckPermission(
-    const std::string &bundleName, const std::string &permissionName)
+bool TelephonyPermission::CheckPermission(const std::string &bundleName, const std::string &permissionName)
 {
 #ifndef SUPPORT_PERMISSION
     return true;
@@ -91,7 +98,7 @@ bool TelephonyPermission::CheckPermission(
     bool result = OHOS::Security::Permission::PermissionKit::VerifyPermission(bundleName, permissionName, 0);
     if (result != OHOS::Security::Permission::PermissionState::PERMISSION_GRANTED) {
         TELEPHONY_LOGW("permission = %{public}s, bundleName = %{public}s, result = %{public}d",
-                       permissionName.c_str(), bundleName.c_str(), result);
+            permissionName.c_str(), bundleName.c_str(), result);
     }
 
     return result == OHOS::Security::Permission::PermissionState::PERMISSION_GRANTED;

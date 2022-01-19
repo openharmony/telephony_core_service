@@ -15,23 +15,16 @@ SUBSYSTEM_DIR = "//base/telephony"
 ohos_shared_library("sim") {
   include_dirs = [
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
-    "//base/telephony/ril_adapter/interfaces/innerkits/include",
     "//third_party/node/src",
     "include",
     "$SUBSYSTEM_DIR/core_service/interfaces/kits/native",
     "//utils/native/base/include",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/network_search",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/sim",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/core",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/network_search",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/sim",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/core",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/cellular_data",
-    "$SUBSYSTEM_DIR/core_service/frameworks/native/include",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/include",
     "//foundation/aafwk/standard/frameworks/kits/ability/native/include",
     "//foundation/aafwk/standard/interfaces/innerkits/base/include/ohos/aafwk/base",
+    "//base/telephony/core_service/interfaces/innerkits/include",
   ]
 
   sources = [
@@ -41,9 +34,8 @@ ohos_shared_library("sim") {
 
   deps = [
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
-    "$SUBSYSTEM_DIR/core_service/frameworks/native:tel_core_service_api",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
     "$SUBSYSTEM_DIR/ril_adapter/services/hril:hril",
-    "//base/telephony/core_service/utils:libtelephony_common",
     "//foundation/ace/napi:ace_napi",
     "//utils/native/base:utils",
   ]
@@ -52,6 +44,7 @@ ohos_shared_library("sim") {
     "appexecfwk_standard:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "ril_adapter:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]

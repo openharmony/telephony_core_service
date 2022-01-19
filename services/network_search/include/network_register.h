@@ -27,8 +27,8 @@ namespace OHOS {
 namespace Telephony {
 class NetworkRegister {
 public:
-    explicit NetworkRegister(std::shared_ptr<NetworkSearchState> networkSearchState,
-        std::weak_ptr<NetworkSearchManager> networkSearchManager);
+    NetworkRegister(std::shared_ptr<NetworkSearchState> networkSearchState,
+        std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId);
     virtual ~NetworkRegister() = default;
     void InitNrConversionConfig();
     void ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &event);
@@ -58,7 +58,7 @@ public:
 private:
     RegServiceState ConvertRegFromRil(RilRegister code) const;
     RadioTech ConvertTechFromRil(HRilRadioTech code) const;
-    NrState ConvertStringToNrState(std::string& strState) const;
+    NrState ConvertStringToNrState(std::string &strState) const;
     void UpdateNrState();
     void UpdateCfgTech();
     void NotifyNrFrequencyChanged();
@@ -91,6 +91,9 @@ private:
     NrState nrState_ = NrState::NR_STATE_NOT_SUPPORT;
     std::vector<PhysicalChannelConfig> channelConfigInfos_;
     std::map<NrState, RadioTech> nrConfigMap_;
+
+    int32_t slotId_ = 0;
+    bool isCsCapable_ = true;
 };
 } // namespace Telephony
 } // namespace OHOS

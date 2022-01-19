@@ -19,19 +19,15 @@
 #include <mutex>
 #include <condition_variable>
 #include <string_ex.h>
-#include "core_manager.h"
+
+#include "event_handler.h"
+#include "event_runner.h"
+
 #include "i_tel_ril_manager.h"
 #include "sim_constant.h"
 
 namespace OHOS {
 namespace Telephony {
-enum {
-    DEFAULT_REASON = 0,
-    SUCCESS_REASON = 1,
-    COMMUNICAT_FAILED_REASON = 2,
-    TIME_OUT_REASON = 3
-};
-
 enum {
     SET_PROTOCOL = 0,
     UPDATE_PROTOCOL = 1
@@ -39,7 +35,7 @@ enum {
 
 class RadioCapController : public AppExecFwk::EventHandler {
 public:
-    RadioCapController(std::shared_ptr<ITelRilManager> telRilManager,
+    RadioCapController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
         const std::shared_ptr<AppExecFwk::EventRunner> &runner);
     virtual ~RadioCapController();
     void RadioCapControllerWait();
@@ -65,15 +61,20 @@ private:
     void ProcessActiveSimTimeOutDone(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioCapControllerContinue();
     void EndCommunicate();
+    const static int32_t CLEAR = 0;
+    const static int32_t SUCCEED = 0;
     const static int32_t FAILED = 1;
     const static int64_t SET_PROTOCOL_OUT_TIME = 15 * 1000;
-    const static int64_t SET_ACTIVE_OUT_TIME = 3 * 1000;
+    const static int64_t SET_ACTIVE_OUT_TIME = 10 * 1000;
     int32_t maxCount_ = 0;
     int32_t activeResponse_ = 0;
+    int32_t count_ = 0;
+    int32_t localSlot_ = 0;
+    int32_t localProtocol_ = 0;
     std::vector<SimProtocolRequest> oldProtocol_;
     std::vector<SimProtocolRequest> newProtocol_;
     bool responseReady_;
-    std::vector<bool> radioProtocolResponse_;
+    bool radioProtocolResponse_;
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
 };
 } // namespace Telephony

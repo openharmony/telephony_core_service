@@ -24,17 +24,14 @@
 #include <string>
 #include <vector>
 
-#include "core_manager.h"
 #include "event_handler.h"
 #include "event_runner.h"
-#include "common_event.h"
-#include "common_event_manager.h"
 #include "want.h"
 #include "i_tel_ril_manager.h"
+#include "i_sim_manager.h"
 #include "icc_state.h"
 #include "observer_handler.h"
-#include "telephony_state_registry_client.h"
-#include "i_sim_state_manager.h"
+#include "sim_state_type.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -104,11 +101,11 @@ public:
     SimStateHandle(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
         const std::weak_ptr<SimStateManager> &simStateManager);
     ~SimStateHandle();
-    void Init();
-    SimState GetSimState(int32_t slotId);
-    CardType GetCardType(int32_t slotId);
-    bool HasSimCard(int slotId);
-    void ObtainRealtimeIccStatus();
+    void Init(int32_t slotId);
+    SimState GetSimState();
+    CardType GetCardType();
+    bool HasSimCard();
+    void ObtainRealtimeIccStatus(int32_t slotId);
     void UnlockPin(int32_t slotId, std::string pin);
     void UnlockPuk(int32_t slotId, std::string newPin, std::string puk);
     void AlterPin(int32_t slotId, std::string newPin, std::string oldPin);
@@ -130,7 +127,7 @@ public:
 
 private:
     void SyncCmdResponse();
-    void ObtainIccStatus();
+    void ObtainIccStatus(int32_t slotId);
     void GetSimCardData(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
     void GetSimLockState(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
     void GetSetLockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
@@ -147,13 +144,14 @@ private:
     void GetUnlockSimLockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
 
 private:
+    int32_t slotId_ = DEFAULT_SIM_SLOT_ID;
     UnlockData unlockRespon_;
     LockStatusResponse simlockRespon_ = {0};
+    IccState iccState_; // icc card states
+    SimState externalState_; // need to broadcast sim state;
+    CardType externalType_; // need to broadcast card type;
     std::weak_ptr<SimStateManager> simStateManager_;
-    std::vector<IccState> iccState_; // icc card states
-    std::vector<SimState> externalState_; // need to broadcast sim state;
-    std::shared_ptr<Telephony::ITelRilManager> telRilManager_; // ril manager
-    std::vector<CardType> externalType_; // need to broadcast card type;
+    std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr; // ril manager
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
 };
 } // namespace Telephony

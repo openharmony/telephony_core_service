@@ -26,15 +26,11 @@ namespace Telephony {
 class NetworkSearchManager;
 class NetworkSelection {
 public:
-    NetworkSelection();
-    explicit NetworkSelection(std::weak_ptr<NetworkSearchManager> networkSearchManager);
+    NetworkSelection(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId);
     virtual ~NetworkSelection() = default;
     void ProcessNetworkSearchResult(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessGetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessSetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &event) const;
-
-private:
-    std::weak_ptr<NetworkSearchManager> networkSearchManager_;
 
 private:
     bool AvailNetworkResult(
@@ -47,6 +43,9 @@ private:
         std::shared_ptr<HRilRadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const;
     bool ResponseInfoOfSet(
         std::shared_ptr<HRilRadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const;
+
+    std::weak_ptr<NetworkSearchManager> networkSearchManager_;
+    int32_t slotId_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
