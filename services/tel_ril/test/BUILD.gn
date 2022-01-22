@@ -16,41 +16,19 @@ import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
 TELEPHONY_CORE_SERVICE_ROOT = "//base/telephony/core_service"
-TELEPHONY_NETWORK_SEARCH_ROOT =
-    "//base/telephony/core_service/services/network_search"
 TELEPHONY_SIM_ROOT = "//base/telephony/core_service/services/sim"
-HDF_FRAMEWORKS = "//drivers/hdf/frameworks"
 
 ohos_executable("tel_ril_test") {
   install_enable = true
-  sources = [
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_base.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_call.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_data.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_modem.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_network.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_sim.cpp",
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/src/tel_ril_sms.cpp",
-    "tel_ril_test.cpp",
-  ]
+  sources = [ "tel_ril_test.cpp" ]
 
   include_dirs = [
-    "//base/telephony/ril_adapter/interfaces/innerkits/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/frameworks/native/include",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/include",
     "//base/telephony/core_service/interfaces/innerkits/state_registry",
     "$TELEPHONY_SIM_ROOT/include",
-    "$HDF_FRAMEWORKS/ability/sbuf/include",
-    "$HDF_FRAMEWORKS/core/shared/include",
-    "$HDF_FRAMEWORKS/core/host/include",
-    "$HDF_FRAMEWORKS/core/master/include",
-    "$HDF_FRAMEWORKS/include/core",
-    "$HDF_FRAMEWORKS/include/utils",
-    "$HDF_FRAMEWORKS/utils/include",
-    "$HDF_FRAMEWORKS/include/osal",
   ]
 
   defines += [
@@ -58,11 +36,11 @@ ohos_executable("tel_ril_test") {
     "LOG_DOMAIN = 0xD002B01",
   ]
 
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+
   deps = [
     "$hdf_uhdf_path/hdi:libhdi",
     "//base/telephony/core_service:tel_core_service",
-    "//base/telephony/core_service/utils:libtel_common",
-    "//base/telephony/ril_adapter/services/hril:hril",
     "//utils/native/base:utils",
   ]
 
@@ -71,7 +49,6 @@ ohos_executable("tel_ril_test") {
     "ces_standard:cesfwk_innerkits",
     "ipc:ipc_core",
     "ril_adapter:hril_innerkits",
-    "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
 

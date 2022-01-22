@@ -97,6 +97,7 @@ void IccDiallingNumbersManager::ProcessLoadDone(const AppExecFwk::InnerEvent::Po
         TELEPHONY_LOGE("ProcessDiallingNumberLoadDone: get null pointer!!!");
     }
     TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessLoadDone: end");
+    hasEventDone_ = true;
     processWait_.notify_all();
 }
 
@@ -111,6 +112,7 @@ void IccDiallingNumbersManager::ProcessUpdateDone(const AppExecFwk::InnerEvent::
         result_ = (responseInfo->error == HRilErrType::NONE);
     }
     TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessUpdateDone: end");
+    hasEventDone_ = true;
     processWait_.notify_all();
 }
 
@@ -125,6 +127,7 @@ void IccDiallingNumbersManager::ProcessWriteDone(const AppExecFwk::InnerEvent::P
         result_ = (responseInfo->error == HRilErrType::NONE);
     }
     TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessWriteDone: end");
+    hasEventDone_ = true;
     processWait_.notify_all();
 }
 
@@ -139,6 +142,7 @@ void IccDiallingNumbersManager::ProcessDeleteDone(const AppExecFwk::InnerEvent::
         result_ = (responseInfo->error == HRilErrType::NONE);
     }
     TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessDeleteDone: end");
+    hasEventDone_ = true;
     processWait_.notify_all();
 }
 
@@ -155,8 +159,9 @@ bool IccDiallingNumbersManager::UpdateIccDiallingNumbers(
     TELEPHONY_LOGI("UpdateIccDiallingNumbers start: %{public}d %{public}d", type, index);
     int fileId = GetFileIdForType(type);
     AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_UPDATE_DONE);
+    hasEventDone_ = false;
     diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, index, false, response);
-    processWait_.wait(lock);
+    processWait_.wait(lock, [this] { return hasEventDone_ == true; });
     TELEPHONY_LOGI("IccDiallingNumbersManager::UpdateIccDiallingNumbers OK return %{public}d", result_);
     return result_;
 }
@@ -174,8 +179,9 @@ bool IccDiallingNumbersManager::DelIccDiallingNumbers(
     TELEPHONY_LOGI("DelIccDiallingNumbers start: %{public}d %{public}d", type, index);
     int fileId = GetFileIdForType(type);
     AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_DELETE_DONE);
+    hasEventDone_ = false;
     diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, index, true, response);
-    processWait_.wait(lock);
+    processWait_.wait(lock, [this] { return hasEventDone_ == true; });
     TELEPHONY_LOGI("IccDiallingNumbersManager::DelIccDiallingNumbers OK return %{public}d", result_);
     return result_;
 }
@@ -192,8 +198,9 @@ bool IccDiallingNumbersManager::AddIccDiallingNumbers(
     }
     AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_WRITE_DONE);
     int fileId = GetFileIdForType(type);
+    hasEventDone_ = false;
     diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, ADD_FLAG, false, response);
-    processWait_.wait(lock);
+    processWait_.wait(lock, [this] { return hasEventDone_ == true; });
     TELEPHONY_LOGI("IccDiallingNumbersManager::AddIccDiallingNumbers OK return %{public}d", result_);
     return result_;
 }
@@ -201,7 +208,7 @@ bool IccDiallingNumbersManager::AddIccDiallingNumbers(
 std::vector<std::shared_ptr<DiallingNumbersInfo>> IccDiallingNumbersManager::QueryIccDiallingNumbers(
     int type)
 {
-    std::unique_lock<std::mutex> lock(queryMtx_);
+    std::unique_lock<std::mutex> lock(mtx_);
     ClearRecords();
     if (diallingNumbersCache_ == nullptr || !IsValidType(type) || !HasSimCard()) {
         TELEPHONY_LOGE("Cannot load DiallingNumbersInfo records. no sim inserted?");
@@ -211,9 +218,9 @@ std::vector<std::shared_ptr<DiallingNumbersInfo>> IccDiallingNumbersManager::Que
     int fileId = GetFileIdForType(type);
     int extensionEf = diallingNumbersCache_->ExtendedElementFile(fileId);
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_GET_DONE);
+    hasEventDone_ = false;
     diallingNumbersCache_->ObtainAllDiallingNumberFiles(fileId, extensionEf, event);
-
-    processWait_.wait(lock);
+    processWait_.wait(lock, [this] { return hasEventDone_ == true; });
     TELEPHONY_LOGI("IccDiallingNumbersManager::QueryIccDiallingNumbers: end");
     return diallingNumbersList_;
 }

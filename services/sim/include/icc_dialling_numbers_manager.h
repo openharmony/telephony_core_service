@@ -27,21 +27,12 @@
 
 namespace OHOS {
 namespace Telephony {
-enum DiallingNumbers_Action_Type {
-    ACTION_READY,
-    OBTAIN_DIALLING_NUMBERS,
-    WRITE_DIALLING_NUMBERS,
-    UPDATE_DIALLING_NUMBERS,
-    DELETE_DIALLING_NUMBERS,
-};
-
 enum DiallingNumbersMessageType {
     MSG_SIM_DIALLING_NUMBERS_GET_DONE  = 1,
     MSG_SIM_DIALLING_NUMBERS_UPDATE_DONE,
     MSG_SIM_DIALLING_NUMBERS_WRITE_DONE,
     MSG_SIM_DIALLING_NUMBERS_DELETE_DONE,
 };
-static DiallingNumbers_Action_Type g_CurCtrlAction = ACTION_READY;
 class IccDiallingNumbersManager : public AppExecFwk::EventHandler {
 public:
     IccDiallingNumbersManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
@@ -71,13 +62,14 @@ private:
     std::shared_ptr<Telephony::SimStateManager> simStateManager_ = nullptr;
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbersList_;
     std::mutex mtx_;
-    std::mutex queryMtx_;
+    bool hasEventDone_ = false;
     std::condition_variable processWait_;
     void ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &event);
     AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId);
+
     void ClearRecords();
     int GetFileIdForType(int fileType);
     void FillResults(const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &listInfo);

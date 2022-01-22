@@ -51,7 +51,7 @@ public:
     int32_t SimStkIsReady(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetRadioProtocol(SimProtocolRequest simProtocolData, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimOpenLogicalChannel(std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t SimCloseLogicalChannel(int channelId, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SimCloseLogicalChannel(int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimTransmitApduLogicalChannel(ApduSimIORequestInfo reqInfo,
         const AppExecFwk::InnerEvent::Pointer &response);
     int32_t UnlockSimLock(int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response);

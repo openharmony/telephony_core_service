@@ -70,7 +70,7 @@ int32_t TelRilModem::SetRadioStateResponse(MessageParcel &data)
 int32_t TelRilModem::GetRadioStateResponse(MessageParcel &data)
 {
     auto sendData = [](UserEvent &userEvent) -> int32_t {
-        std::shared_ptr<HrilInt32Parcel> state = std::make_shared<HrilInt32Parcel>();
+        std::shared_ptr<HRilInt32Parcel> state = std::make_shared<HRilInt32Parcel>();
         state->ReadFromParcel(userEvent.data_);
 
         std::unique_ptr<HRilRadioStateInfo> radioState = std::make_unique<HRilRadioStateInfo>();
@@ -81,7 +81,7 @@ int32_t TelRilModem::GetRadioStateResponse(MessageParcel &data)
     return Response(TELEPHONY_LOG_FUNC_NAME, data, (UserSendEvent)sendData);
 }
 
-int32_t TelRilModem::SetRadioState(int fun, int rst, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilModem::SetRadioState(int32_t fun, int32_t rst, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, (uint32_t)HREQ_MODEM_SET_RADIO_STATUS, fun, rst);
 }
@@ -108,12 +108,12 @@ int32_t TelRilModem::GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Point
 
 int32_t TelRilModem::GetImeiResponse(MessageParcel &data)
 {
-    return Response<HrilStringParcel>(TELEPHONY_LOG_FUNC_NAME, data);
+    return Response<HRilStringParcel>(TELEPHONY_LOG_FUNC_NAME, data);
 }
 
 int32_t TelRilModem::GetMeidResponse(MessageParcel &data)
 {
-    return Response<HrilStringParcel>(TELEPHONY_LOG_FUNC_NAME, data);
+    return Response<HRilStringParcel>(TELEPHONY_LOG_FUNC_NAME, data);
 }
 
 int32_t TelRilModem::GetVoiceRadioTechnologyResponse(MessageParcel &data)
@@ -123,7 +123,7 @@ int32_t TelRilModem::GetVoiceRadioTechnologyResponse(MessageParcel &data)
 
 int32_t TelRilModem::RadioStateUpdated(MessageParcel &data)
 {
-    return Notify<HrilInt32Parcel>(TELEPHONY_LOG_FUNC_NAME, data, RadioEvent::RADIO_STATE_CHANGED);
+    return Notify<HRilInt32Parcel>(TELEPHONY_LOG_FUNC_NAME, data, RadioEvent::RADIO_STATE_CHANGED);
 }
 
 int32_t TelRilModem::VoiceRadioTechUpdated(MessageParcel &data)

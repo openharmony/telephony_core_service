@@ -1473,8 +1473,8 @@ napi_value JudgmentData(napi_env env, sptr<CellInformation> infoItem, CellInform
                 NapiUtil::SetPropertyInt32(env, data, "cellId", gsmCellInfo->GetCellId());
                 NapiUtil::SetPropertyInt32(env, data, "arfcn", gsmCellInfo->GetArfcn());
                 NapiUtil::SetPropertyInt32(env, data, "bsic", gsmCellInfo->GetBsic());
-                NapiUtil::SetPropertyInt32(env, data, "mcc", gsmCellInfo->GetMcc());
-                NapiUtil::SetPropertyInt32(env, data, "mnc", gsmCellInfo->GetMnc());
+                NapiUtil::SetPropertyStringUtf8(env, data, "mcc", gsmCellInfo->GetMcc());
+                NapiUtil::SetPropertyStringUtf8(env, data, "mnc", gsmCellInfo->GetMnc());
             }
             break;
         }
@@ -1486,8 +1486,8 @@ napi_value JudgmentData(napi_env env, sptr<CellInformation> infoItem, CellInform
                 NapiUtil::SetPropertyInt32(env, data, "tac", lteCellInfo->GetTac());
                 NapiUtil::SetPropertyInt32(env, data, "earfcn", lteCellInfo->GetArfcn());
                 NapiUtil::SetPropertyInt32(env, data, "bandwidth", 0);
-                NapiUtil::SetPropertyInt32(env, data, "mcc", lteCellInfo->GetMcc());
-                NapiUtil::SetPropertyInt32(env, data, "mnc", lteCellInfo->GetMnc());
+                NapiUtil::SetPropertyStringUtf8(env, data, "mcc", lteCellInfo->GetMcc());
+                NapiUtil::SetPropertyStringUtf8(env, data, "mnc", lteCellInfo->GetMnc());
                 NapiUtil::SetPropertyBoolean(env, data, "isSupportEndc", false);
             }
             break;
@@ -1499,8 +1499,8 @@ napi_value JudgmentData(napi_env env, sptr<CellInformation> infoItem, CellInform
                 NapiUtil::SetPropertyInt32(env, data, "cellId", wcdmaCellInfo->GetCellId());
                 NapiUtil::SetPropertyInt32(env, data, "psc", wcdmaCellInfo->GetPsc());
                 NapiUtil::SetPropertyInt32(env, data, "uarfcn", 0);
-                NapiUtil::SetPropertyInt32(env, data, "mcc", wcdmaCellInfo->GetMcc());
-                NapiUtil::SetPropertyInt32(env, data, "mnc", wcdmaCellInfo->GetMnc());
+                NapiUtil::SetPropertyStringUtf8(env, data, "mcc", wcdmaCellInfo->GetMcc());
+                NapiUtil::SetPropertyStringUtf8(env, data, "mnc", wcdmaCellInfo->GetMnc());
             }
             break;
         }
@@ -1522,8 +1522,8 @@ napi_value JudgmentData(napi_env env, sptr<CellInformation> infoItem, CellInform
                 NapiUtil::SetPropertyInt32(env, data, "cellId", tdscdmaCellInfo->GetCellId());
                 NapiUtil::SetPropertyInt32(env, data, "cpid", tdscdmaCellInfo->GetCpid());
                 NapiUtil::SetPropertyInt32(env, data, "uarfcn", tdscdmaCellInfo->GetArfcn());
-                NapiUtil::SetPropertyInt32(env, data, "mcc", tdscdmaCellInfo->GetMcc());
-                NapiUtil::SetPropertyInt32(env, data, "mnc", tdscdmaCellInfo->GetMnc());
+                NapiUtil::SetPropertyStringUtf8(env, data, "mcc", tdscdmaCellInfo->GetMcc());
+                NapiUtil::SetPropertyStringUtf8(env, data, "mnc", tdscdmaCellInfo->GetMnc());
             }
             break;
         }
@@ -1534,8 +1534,8 @@ napi_value JudgmentData(napi_env env, sptr<CellInformation> infoItem, CellInform
                 NapiUtil::SetPropertyInt32(env, data, "pci", nrCellCellInfo->GetPci());
                 NapiUtil::SetPropertyInt32(env, data, "tac", nrCellCellInfo->GetTac());
                 NapiUtil::SetPropertyInt32(env, data, "nci", nrCellCellInfo->GetNci());
-                NapiUtil::SetPropertyInt32(env, data, "mcc", nrCellCellInfo->GetMcc());
-                NapiUtil::SetPropertyInt32(env, data, "mnc", nrCellCellInfo->GetMnc());
+                NapiUtil::SetPropertyStringUtf8(env, data, "mcc", nrCellCellInfo->GetMcc());
+                NapiUtil::SetPropertyStringUtf8(env, data, "mnc", nrCellCellInfo->GetMnc());
             }
             break;
         }

@@ -35,7 +35,7 @@ void TelRilBase::ResetRemoteObject(sptr<IRemoteObject> rilAdapterObj)
 }
 
 std::shared_ptr<TelRilRequest> TelRilBase::CreateTelRilRequest(
-    int request, const AppExecFwk::InnerEvent::Pointer &result)
+    int32_t request, const AppExecFwk::InnerEvent::Pointer &result)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = std::make_shared<TelRilRequest>(GetNextSerialId(), request, result);
     std::lock_guard<std::mutex> lockRequest(TelRilBase::requestLock_);

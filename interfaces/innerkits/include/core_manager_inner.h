@@ -19,8 +19,6 @@
 #include <unistd.h>
 #include <thread>
 
-#include "singleton.h"
-
 #include "i_network_search.h"
 #include "i_sim_manager.h"
 #include "i_tel_ril_manager.h"
@@ -136,9 +134,9 @@ public:
         const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetLteImsSwitchStatus(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t SetUssdCusd(int32_t slotId, int32_t eventId, const std::string str,
+    int32_t SetUssd(int32_t slotId, int32_t eventId, const std::string str,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t GetUssdCusd(
+    int32_t GetUssd(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetMute(int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t SetMute(int32_t slotId, int32_t eventId, int32_t mute,

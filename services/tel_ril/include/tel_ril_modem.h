@@ -42,7 +42,7 @@ public:
      * @brief Radio Status Change response
      * @param data is HDF service callback message
      */
-    int32_t SetRadioState(int fun, int rst, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetRadioState(int32_t fun, int32_t rst, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetRadioState(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetImei(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetMeid(const AppExecFwk::InnerEvent::Pointer &response);

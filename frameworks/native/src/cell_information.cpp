@@ -18,10 +18,27 @@
 
 namespace OHOS {
 namespace Telephony {
+const int32_t MNC_INT_MAX = 999;
+const int32_t MNC_DIGIT_OFFSET = 28;
+const int32_t MNC_VALID_BIT = 0X0FFFFFFF;
 void CellInformation::Init(int32_t mcc, int32_t mnc, int32_t cellId)
 {
-    mcc_ = mcc;
-    mnc_ = mnc;
+    if (mnc > MNC_INT_MAX) {
+        int mnc_digit = mnc >> MNC_DIGIT_OFFSET;
+        mnc = mnc & MNC_VALID_BIT;
+        char mnc_str[MNC_DIGIT_OFFSET] = {0};
+        char strFormat[MNC_DIGIT_OFFSET] = {0};
+        int size = snprintf(strFormat, sizeof(strFormat), "%s%dd", "%0", mnc_digit);
+        if (size > 0) {
+            size = snprintf(mnc_str, mnc_digit + 1, strFormat, mnc);
+        }
+        if (size > 0) {
+            mnc_ = mnc_str;
+        }
+    } else {
+        mnc_ = std::to_string(mnc);
+    }
+    mcc_ = std::to_string(mcc);
     cellId_ = cellId;
     timeStamp_ = time(0);
 }
@@ -31,12 +48,12 @@ int32_t CellInformation::GetCellId() const
     return cellId_;
 }
 
-int32_t CellInformation::GetMcc() const
+std::string CellInformation::GetMcc() const
 {
     return mcc_;
 }
 
-int32_t CellInformation::GetMnc() const
+std::string CellInformation::GetMnc() const
 {
     return mnc_;
 }
@@ -129,8 +146,8 @@ int32_t GsmCellInformation::GetArfcn() const
 std::string GsmCellInformation::ToString() const
 {
     int32_t netWorkType = static_cast<int32_t>(GsmCellInformation::GetNetworkType());
-    std::string content("netWorkType:" + std::to_string(netWorkType) + ",mcc:" + std::to_string(mcc_) +
-        ",mnc:" + std::to_string(mnc_) + ",arfcn:" + std::to_string(arfcn_) + ",cellId:" + std::to_string(cellId_) +
+    std::string content("netWorkType:" + std::to_string(netWorkType) + ",mcc:" + mcc_ +
+        ",mnc:" + mnc_ + ",arfcn:" + std::to_string(arfcn_) + ",cellId:" + std::to_string(cellId_) +
         ",timeStamp:" + std::to_string(timeStamp_) + ",signalLevel:" + std::to_string(signalLevel_) +
         ",bsic:" + std::to_string(bsic_) + ",lac:" + std::to_string(lac_));
     return content;
@@ -141,10 +158,10 @@ bool GsmCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(static_cast<int32_t>(CellInformation::CellType::CELL_TYPE_GSM))) {
         return false;
     }
-    if (!parcel.WriteInt32(mcc_)) {
+    if (!parcel.WriteString(mcc_)) {
         return false;
     }
-    if (!parcel.WriteInt32(mnc_)) {
+    if (!parcel.WriteString(mnc_)) {
         return false;
     }
     if (!parcel.WriteInt32(arfcn_)) {
@@ -186,8 +203,8 @@ GsmCellInformation *GsmCellInformation::Unmarshalling(Parcel &parcel)
 
 bool GsmCellInformation::ReadFromParcel(Parcel &parcel)
 {
-    mcc_ = parcel.ReadInt32();
-    mnc_ = parcel.ReadInt32();
+    mcc_ = parcel.ReadString();
+    mnc_ = parcel.ReadString();
     arfcn_ = parcel.ReadInt32();
     cellId_ = parcel.ReadInt32();
     bsic_ = parcel.ReadInt32();
@@ -274,10 +291,10 @@ bool LteCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(static_cast<int32_t>(CellInformation::CellType::CELL_TYPE_LTE))) {
         return false;
     }
-    if (!parcel.WriteInt32(mcc_)) {
+    if (!parcel.WriteString(mcc_)) {
         return false;
     }
-    if (!parcel.WriteInt32(mnc_)) {
+    if (!parcel.WriteString(mnc_)) {
         return false;
     }
     if (!parcel.WriteInt32(earfcn_)) {
@@ -319,8 +336,8 @@ LteCellInformation *LteCellInformation::Unmarshalling(Parcel &parcel)
 
 bool LteCellInformation::ReadFromParcel(Parcel &parcel)
 {
-    mcc_ = parcel.ReadInt32();
-    mnc_ = parcel.ReadInt32();
+    mcc_ = parcel.ReadString();
+    mnc_ = parcel.ReadString();
     earfcn_ = parcel.ReadInt32();
     cellId_ = parcel.ReadInt32();
     pci_ = parcel.ReadInt32();
@@ -351,8 +368,8 @@ void LteCellInformation::UpdateLocation(int32_t cellId, int32_t tac)
 std::string LteCellInformation::ToString() const
 {
     int32_t netWorkType = static_cast<int32_t>(LteCellInformation::GetNetworkType());
-    std::string content("netWorkType:" + std::to_string(netWorkType) + ",mcc:" + std::to_string(mcc_) +
-        ",mnc:" + std::to_string(mnc_) + ",earfcn:" + std::to_string(earfcn_) + ",cellId:" + std::to_string(cellId_) +
+    std::string content("netWorkType:" + std::to_string(netWorkType) + ",mcc:" + mcc_ +
+        ",mnc:" + mnc_ + ",earfcn:" + std::to_string(earfcn_) + ",cellId:" + std::to_string(cellId_) +
         ",timeStamp:" + std::to_string(timeStamp_) + ",signalLevel:" + std::to_string(signalLevel_) +
         ",pci:" + std::to_string(pci_) + ",tac:" + std::to_string(tac_));
     return content;
@@ -416,10 +433,10 @@ bool WcdmaCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(static_cast<int32_t>(CellInformation::CellType::CELL_TYPE_WCDMA))) {
         return false;
     }
-    if (!parcel.WriteInt32(mcc_)) {
+    if (!parcel.WriteString(mcc_)) {
         return false;
     }
-    if (!parcel.WriteInt32(mnc_)) {
+    if (!parcel.WriteString(mnc_)) {
         return false;
     }
     if (!parcel.WriteInt32(uarfcn_)) {
@@ -461,8 +478,8 @@ WcdmaCellInformation *WcdmaCellInformation::Unmarshalling(Parcel &parcel)
 
 bool WcdmaCellInformation::ReadFromParcel(Parcel &parcel)
 {
-    mcc_ = parcel.ReadInt32();
-    mnc_ = parcel.ReadInt32();
+    mcc_ = parcel.ReadString();
+    mnc_ = parcel.ReadString();
     uarfcn_ = parcel.ReadInt32();
     cellId_ = parcel.ReadInt32();
     psc_ = parcel.ReadInt32();
@@ -493,8 +510,8 @@ void WcdmaCellInformation::UpdateLocation(int32_t cellId, int32_t lac)
 std::string WcdmaCellInformation::ToString() const
 {
     int32_t netWorkType = static_cast<int32_t>(WcdmaCellInformation::GetNetworkType());
-    std::string content("netWorkType:" + std::to_string(netWorkType) + ",mcc:" + std::to_string(mcc_) +
-        ",mnc:" + std::to_string(mnc_) + ",uarfcn:" + std::to_string(uarfcn_) + ",cellId:" + std::to_string(cellId_) +
+    std::string content("netWorkType:" + std::to_string(netWorkType) + ",mcc:" + mcc_ +
+        ",mnc:" + mnc_ + ",uarfcn:" + std::to_string(uarfcn_) + ",cellId:" + std::to_string(cellId_) +
         ",timeStamp:" + std::to_string(timeStamp_) + ",signalLevel:" + std::to_string(signalLevel_) +
         ",psc:" + std::to_string(psc_) + ",lac:" + std::to_string(lac_));
     return content;
@@ -558,10 +575,10 @@ bool TdscdmaCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(static_cast<int32_t>(CellInformation::CellType::CELL_TYPE_TDSCDMA))) {
         return false;
     }
-    if (!parcel.WriteInt32(mcc_)) {
+    if (!parcel.WriteString(mcc_)) {
         return false;
     }
-    if (!parcel.WriteInt32(mnc_)) {
+    if (!parcel.WriteString(mnc_)) {
         return false;
     }
     if (!parcel.WriteInt32(uarfcn_)) {
@@ -603,8 +620,8 @@ TdscdmaCellInformation *TdscdmaCellInformation::Unmarshalling(Parcel &parcel)
 
 bool TdscdmaCellInformation::ReadFromParcel(Parcel &parcel)
 {
-    mcc_ = parcel.ReadInt32();
-    mnc_ = parcel.ReadInt32();
+    mcc_ = parcel.ReadString();
+    mnc_ = parcel.ReadString();
     uarfcn_ = parcel.ReadInt32();
     cellId_ = parcel.ReadInt32();
     cpid_ = parcel.ReadInt32();
@@ -635,8 +652,8 @@ void TdscdmaCellInformation::UpdateLocation(int32_t cellId, int32_t lac)
 std::string TdscdmaCellInformation::ToString() const
 {
     int32_t netWorkType = static_cast<int32_t>(TdscdmaCellInformation::GetNetworkType());
-    std::string content("netWorkType:" + std::to_string(netWorkType) + ",mcc:" + std::to_string(mcc_) +
-        ",mnc:" + std::to_string(mnc_) + ",uarfcn:" + std::to_string(uarfcn_) + ",cellId:" + std::to_string(cellId_) +
+    std::string content("netWorkType:" + std::to_string(netWorkType) + ",mcc:" + mcc_ +
+        ",mnc:" + mnc_ + ",uarfcn:" + std::to_string(uarfcn_) + ",cellId:" + std::to_string(cellId_) +
         ",timeStamp:" + std::to_string(timeStamp_) + ",signalLevel:" + std::to_string(signalLevel_) +
         ",cpid:" + std::to_string(cpid_) + ",lac:" + std::to_string(lac_));
     return content;
@@ -846,10 +863,10 @@ bool NrCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(static_cast<int32_t>(CellInformation::CellType::CELL_TYPE_NR))) {
         return false;
     }
-    if (!parcel.WriteInt32(mcc_)) {
+    if (!parcel.WriteString(mcc_)) {
         return false;
     }
-    if (!parcel.WriteInt32(mnc_)) {
+    if (!parcel.WriteString(mnc_)) {
         return false;
     }
     if (!parcel.WriteInt32(cellId_)) {
@@ -894,8 +911,8 @@ NrCellInformation *NrCellInformation::Unmarshalling(Parcel &parcel)
 
 bool NrCellInformation::ReadFromParcel(Parcel &parcel)
 {
-    mcc_ = parcel.ReadInt32();
-    mnc_ = parcel.ReadInt32();
+    mcc_ = parcel.ReadString();
+    mnc_ = parcel.ReadString();
     cellId_ = parcel.ReadInt32();
     nrArfcn_ = parcel.ReadInt32();
     pci_ = parcel.ReadInt32();
@@ -937,8 +954,8 @@ void NrCellInformation::UpdateLocation(int32_t pci, int32_t tac)
 std::string NrCellInformation::ToString() const
 {
     int32_t netWorkType = static_cast<int32_t>(NrCellInformation::GetNetworkType());
-    std::string content("netWorkType:" + std::to_string(netWorkType) + ",mcc:" + std::to_string(mcc_) +
-        ",mnc:" + std::to_string(mnc_) + ",earfcn:" + std::to_string(nrArfcn_) + ",cellId:" + std::to_string(cellId_) +
+    std::string content("netWorkType:" + std::to_string(netWorkType) + ",mcc:" + mcc_ +
+        ",mnc:" + mnc_ + ",earfcn:" + std::to_string(nrArfcn_) + ",cellId:" + std::to_string(cellId_) +
         ",timeStamp:" + std::to_string(timeStamp_) + ",signalLevel:" + std::to_string(signalLevel_) +
         ",pci:" + std::to_string(pci_) + ",tac:" + std::to_string(tac_) + ",nci:" + std::to_string(nci_));
     return content;

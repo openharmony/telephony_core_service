@@ -42,9 +42,9 @@ public:
      * @param data is HDF service callback message
      * @param reply is HDF service callback message
      * @param option is HDF service callback message
-     * @return int type
+     * @return int32_t type
      */
-    int OnRemoteRequest(
+    int32_t OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, OHOS::MessageOption &option) override;
 
     /**
@@ -291,9 +291,9 @@ public:
     int32_t GetLteImsSwitchStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SetRadioProtocol(
         int32_t slotId, SimProtocolRequest data, const AppExecFwk::InnerEvent::Pointer &response) override;
-    int32_t SetUssdCusd(
+    int32_t SetUssd(
         int32_t slotId, const std::string str, const AppExecFwk::InnerEvent::Pointer &response) override;
-    int32_t GetUssdCusd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetUssd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SetMute(int32_t slotId, const int32_t mute, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetMute(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetEmergencyCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;

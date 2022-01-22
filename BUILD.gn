@@ -93,14 +93,19 @@ ohos_shared_library("tel_core_service") {
   ]
 
   include_dirs = [
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/core/include",
-    "$TELEPHONY_TEL_RIL_ROOT/include",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/core",
     "//base/telephony/data_storage/sim/include",
     "//base/telephony/data_storage/common/include",
+    "$TELEPHONY_CORE_SERVICE_ROOT/services/core/include",
+    "$TELEPHONY_TEL_RIL_ROOT/include",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/utils/log/include",
     "$TELEPHONY_SIM_ROOT/include",
+    "//utils/native/base/include",
+    "//utils/system/safwk/native/include",
+    "//base/notification/ces_standard/cesfwk/kits/native/include",
+    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
+    "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content/",
     "//third_party/icu/icu4c/source/common/unicode",
     "//third_party/icu/icu4c/source/common",
     "//base/global/i18n_standard/interfaces/native/innerkits/zone/include",
@@ -108,7 +113,10 @@ ohos_shared_library("tel_core_service") {
     "//third_party/protobuf/src",
     "//third_party/protobuf/src/google",
     "//third_party/protobuf/src/google/protobuf",
+    "//base/global/resmgr_standard/interfaces/innerkits/include/",
   ]
+
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   defines += [
     "TELEPHONY_LOG_TAG = \"CoreService\"",
@@ -116,28 +124,30 @@ ohos_shared_library("tel_core_service") {
   ]
 
   deps = [
+    "$hdf_uhdf_path/hdi:libhdi",
+    "//base/global/i18n_standard/frameworks/zone:zone_util",
     "//base/miscservices/time/services:time_service",
     "//base/notification/ans_standard/frameworks/wantagent:wantagent_innerkits",
+    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
     "//base/telephony/core_service/utils:libtel_common",
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
+    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
+    "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
+    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
     "//third_party/libxml2:libxml2",
+    "//utils/native/base:utils",
   ]
 
   external_deps = [
     "ability_runtime:ability_manager",
-    "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "ability_runtime:want",
-    "appexecfwk_standard:appexecfwk_base",
     "appexecfwk_standard:appexecfwk_core",
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
     "ces_standard:cesfwk_services",
-    "device_driver_framework:libhdf_utils",
-    "device_driver_framework:libhdi",
-    "dmsfwk_standard:zuri",
-    "i18n_standard:zone_util",
     "ipc:ipc_core",
     "native_appdatamgr:native_dataability",
     "native_appdatamgr:native_rdb",
@@ -146,9 +156,7 @@ ohos_shared_library("tel_core_service") {
     "ril_adapter:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "startup_l2:syspara",
     "state_registry:tel_state_registry_notify",
-    "utils_base:utils",
   ]
 
   if (is_standard_system) {

@@ -54,7 +54,7 @@ public:
      * request list handler
      */
     static std::shared_ptr<TelRilRequest> CreateTelRilRequest(
-        int request, const AppExecFwk::InnerEvent::Pointer &result);
+        int32_t request, const AppExecFwk::InnerEvent::Pointer &result);
 
     /**
      * @brief Send Int32Event
@@ -119,11 +119,12 @@ public:
     int32_t ErrorResponse(std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo);
     int32_t TelRilOnlyReportResponseInfo(MessageParcel &data);
     template<typename T>
-    int32_t NotifyObserver(int what, MessageParcel &data);
+    int32_t NotifyObserver(int32_t what, MessageParcel &data);
     template<typename T>
     int32_t ProcessRespOrNotify(int32_t code, MessageParcel &data);
 
 protected:
+    // Data type definitions within the subdivision module.
     using EventHandler = OHOS::AppExecFwk::EventHandler;
     struct UserEvent {
         const char *funcName_;
@@ -138,12 +139,16 @@ protected:
     using SendEvent = int32_t (TelRilBase::*)(const char *funcName, EventHandler &handler, MessageParcel &data,
         uint32_t eventId);
 
+    // Respond to "request" events from the upper layer of tel_ril.
     template<typename... ValueTypes>
     int32_t Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response, uint32_t requestId,
         ValueTypes &&...vals);
+    // Respond to the "reply" event sent by the hril layer.
     int32_t Response(const char *funcName, MessageParcel &data, UserSendEvent send);
+    // Respond to the "reply" event sent by the hril layer.
     template<typename T>
     int32_t Response(const char *funcName, MessageParcel &data);
+    // Respond to "active reporting" events sent by the hril layer.
     template<typename T>
     int32_t Notify(const char *funcName, MessageParcel &data, RadioEvent notifyId);
 
@@ -163,10 +168,12 @@ private:
     /* Response */
     template<typename F>
     F GetReportFunc(uint32_t code);
+    // Send data to "tel_ril" upper layer.
     template<typename T>
     int32_t SendData(const char *funcName, EventHandler &handler, MessageParcel &data, uint32_t eventId);
     const HRilRadioResponseInfo &GetHRilRadioResponse(MessageParcel &data);
     int32_t Response(const char *funcName, MessageParcel &data, SendEvent send);
+    // Get the event pointer of the current thread: thread variable.
     SendEvent &SelfSendEvent(void);
 
 private:
@@ -185,7 +192,7 @@ int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::InnerEvent::
         MessageParcel reply;
         thread_local OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         if (BaseParcel::WriteVals(data, slotId_, serialId, std::forward<ValueTypes>(vals)...)) {
-            int ret = cellularRadio_->SendRequest(requestId, data, reply, option);
+            int32_t ret = cellularRadio_->SendRequest(requestId, data, reply, option);
             TELEPHONY_LOGI("%{public}s() eventId=%{public}d, return: %{public}d", funcName, requestId, ret);
             return ret;
         }
@@ -219,7 +226,7 @@ int32_t TelRilBase::ProcessRespOrNotify(int32_t code, MessageParcel &data)
 }
 
 template<typename T>
-int32_t TelRilBase::NotifyObserver(int what, MessageParcel &data)
+int32_t TelRilBase::NotifyObserver(int32_t what, MessageParcel &data)
 {
     std::shared_ptr<T> info = std::make_shared<T>();
     info->ReadFromParcel(data);
