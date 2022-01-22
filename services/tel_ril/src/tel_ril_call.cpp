@@ -32,7 +32,7 @@ void TelRilCall::AddHandlerToMap()
     memberFuncMap_[HNOTI_CALL_END_REPORT] = &TelRilCall::CallEndNotice;
     memberFuncMap_[HNOTI_CALL_STATUS_INFO_REPORT] = &TelRilCall::CallStatusInfoNotice;
     memberFuncMap_[HNOTI_CALL_IMS_SERVICE_STATUS_REPORT] = &TelRilCall::CallImsServiceStatusNotice;
-    memberFuncMap_[HNOTI_CALL_USSD_REPORT] = &TelRilCall::CallUssdCusdNotice;
+    memberFuncMap_[HNOTI_CALL_USSD_REPORT] = &TelRilCall::CallUssdNotice;
     memberFuncMap_[HNOTI_CALL_RINGBACK_VOICE_REPORT] = &TelRilCall::CallRingbackVoiceNotice;
     memberFuncMap_[HNOTI_CALL_SRVCC_STATUS_REPORT] = &TelRilCall::SrvccStatusNotice;
     memberFuncMap_[HNOTI_CALL_EMERGENCY_NUMBER_REPORT] = &TelRilCall::CallEmergencyNotice;
@@ -67,8 +67,8 @@ void TelRilCall::AddHandlerToMap()
     memberFuncMap_[HREQ_CALL_GET_CALL_PREFERENCE] = &TelRilCall::GetCallPreferenceResponse;
     memberFuncMap_[HREQ_CALL_SET_LTEIMSSWITCH_STATUS] = &TelRilCall::SetLteImsSwitchStatusResponse;
     memberFuncMap_[HREQ_CALL_GET_LTEIMSSWITCH_STATUS] = &TelRilCall::GetLteImsSwitchStatusResponse;
-    memberFuncMap_[HREQ_CALL_SET_USSD] = &TelRilCall::SetUssdCusdResponse;
-    memberFuncMap_[HREQ_CALL_GET_USSD] = &TelRilCall::GetUssdCusdResponse;
+    memberFuncMap_[HREQ_CALL_SET_USSD] = &TelRilCall::SetUssdResponse;
+    memberFuncMap_[HREQ_CALL_GET_USSD] = &TelRilCall::GetUssdResponse;
     memberFuncMap_[HREQ_CALL_SET_MUTE] = &TelRilCall::SetMuteResponse;
     memberFuncMap_[HREQ_CALL_GET_MUTE] = &TelRilCall::GetMuteResponse;
     memberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] = &TelRilCall::GetEmergencyCallListResponse;
@@ -887,7 +887,7 @@ int32_t TelRilCall::GetCallList(const AppExecFwk::InnerEvent::Pointer &result)
     return SendInt32Event(HREQ_CALL_GET_CALL_LIST, telRilRequest->serialId_);
 }
 
-int32_t TelRilCall::Dial(const std::string address, int clirMode, const AppExecFwk::InnerEvent::Pointer &result)
+int32_t TelRilCall::Dial(const std::string address, int32_t clirMode, const AppExecFwk::InnerEvent::Pointer &result)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_DIAL, result);
     if (telRilRequest == nullptr) {
@@ -943,7 +943,7 @@ int32_t TelRilCall::Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Point
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteInt32(gsmIndex);
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_HANGUP, data, reply, option);
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_HANGUP, data, reply, option);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("function is failed, error: %{public}d", ret);
     }
@@ -962,7 +962,7 @@ int32_t TelRilCall::Answer(const AppExecFwk::InnerEvent::Pointer &result)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    int ret = SendInt32Event(HREQ_CALL_ANSWER, telRilRequest->serialId_);
+    int32_t ret = SendInt32Event(HREQ_CALL_ANSWER, telRilRequest->serialId_);
     TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_CALL_ANSWER, ret);
     return ret;
 }
@@ -1248,7 +1248,7 @@ int32_t TelRilCall::GetCallRestriction(std::string fac, const AppExecFwk::InnerE
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteCString(fac.c_str());
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_GET_CALL_RESTRICTION, data, reply, option);
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_GET_CALL_RESTRICTION, data, reply, option);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("function is failed, error: %{public}d", ret);
     }
@@ -1276,7 +1276,7 @@ int32_t TelRilCall::SetCallRestriction(
     data.WriteCString(fac.c_str());
     data.WriteCString(password.c_str());
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_SET_CALL_RESTRICTION, data, reply, option);
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SET_CALL_RESTRICTION, data, reply, option);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("function is failed, error: %{public}d", ret);
     }
@@ -1307,7 +1307,7 @@ int32_t TelRilCall::SendDtmf(const std::string &sDTMFCode, int32_t index, int32_
     data.WriteInt32(sDTMFCode.length());
     data.WriteCString(sDTMFCode.c_str());
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_SEND_DTMF, data, reply, option);
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SEND_DTMF, data, reply, option);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("function is failed, error: %{public}d", ret);
     }
@@ -1341,7 +1341,7 @@ int32_t TelRilCall::SendDtmf(char cDTMFCode, int32_t index, const AppExecFwk::In
     data.WriteInt32(stringLength);
     data.WriteCString(temp);
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_SEND_DTMF, data, reply, option);
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SEND_DTMF, data, reply, option);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("function is failed, error: %{public}d", ret);
     }
@@ -1370,7 +1370,7 @@ int32_t TelRilCall::StartDtmf(char cDTMFCode, int32_t index, const AppExecFwk::I
     data.WriteInt32(index);
     data.WriteCString(temp);
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_START_DTMF, data, reply, option);
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_START_DTMF, data, reply, option);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("function is failed, error: %{public}d", ret);
     }
@@ -1399,7 +1399,7 @@ int32_t TelRilCall::StopDtmf(int32_t index, const AppExecFwk::InnerEvent::Pointe
     data.WriteInt32(index);
     data.WriteCString(temp);
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    int ret = cellularRadio_->SendRequest(HREQ_CALL_STOP_DTMF, data, reply, option);
+    int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_STOP_DTMF, data, reply, option);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret StopDtmf failed, error: %{public}d", ret);
     }
@@ -1473,7 +1473,7 @@ int32_t TelRilCall::SetCallPreferenceMode(const int32_t mode, const AppExecFwk::
         TELEPHONY_LOGE("%{public}s  cellularRadio_ == nullptr", __func__);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int ret = SendInt32sEvent(HREQ_CALL_SET_CALL_PREFERENCE, HRIL_EVENT_COUNT_2, telRilRequest->serialId_, mode);
+    int32_t ret = SendInt32sEvent(HREQ_CALL_SET_CALL_PREFERENCE, HRIL_EVENT_COUNT_2, telRilRequest->serialId_, mode);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("function is failed, error: %{public}d", ret);
     }
@@ -1527,7 +1527,7 @@ int32_t TelRilCall::GetCallPreferenceMode(const AppExecFwk::InnerEvent::Pointer 
         TELEPHONY_LOGE("%{public}s  cellularRadio_ == nullptr", __func__);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int ret = SendInt32Event(HREQ_CALL_GET_CALL_PREFERENCE, telRilRequest->serialId_);
+    int32_t ret = SendInt32Event(HREQ_CALL_GET_CALL_PREFERENCE, telRilRequest->serialId_);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("function is failed, error: %{public}d", ret);
     }
@@ -1582,7 +1582,8 @@ int32_t TelRilCall::SetLteImsSwitchStatus(const int32_t active, const AppExecFwk
         TELEPHONY_LOGE("%{public}s  cellularRadio_ == nullptr", __func__);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int ret = SendInt32sEvent(HREQ_CALL_SET_LTEIMSSWITCH_STATUS, HRIL_EVENT_COUNT_2, telRilRequest->serialId_, active);
+    int32_t ret =
+        SendInt32sEvent(HREQ_CALL_SET_LTEIMSSWITCH_STATUS, HRIL_EVENT_COUNT_2, telRilRequest->serialId_, active);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("function is failed, error: %{public}d", ret);
     }
@@ -1635,7 +1636,7 @@ int32_t TelRilCall::GetLteImsSwitchStatus(const AppExecFwk::InnerEvent::Pointer 
         TELEPHONY_LOGE("%{public}s  cellularRadio_ == nullptr", __func__);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int ret = SendInt32Event(HREQ_CALL_GET_LTEIMSSWITCH_STATUS, telRilRequest->serialId_);
+    int32_t ret = SendInt32Event(HREQ_CALL_GET_LTEIMSSWITCH_STATUS, telRilRequest->serialId_);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("function is failed, error: %{public}d", ret);
     }
@@ -1679,7 +1680,7 @@ int32_t TelRilCall::GetLteImsSwitchStatusResponse(MessageParcel &data)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilCall::SetUssdCusd(const std::string str, const AppExecFwk::InnerEvent::Pointer &result)
+int32_t TelRilCall::SetUssd(const std::string str, const AppExecFwk::InnerEvent::Pointer &result)
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_SET_USSD, result);
@@ -1702,7 +1703,7 @@ int32_t TelRilCall::SetUssdCusd(const std::string str, const AppExecFwk::InnerEv
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilCall::SetUssdCusdResponse(MessageParcel &data)
+int32_t TelRilCall::SetUssdResponse(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
@@ -1734,11 +1735,11 @@ int32_t TelRilCall::SetUssdCusdResponse(MessageParcel &data)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilCall::GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result)
+int32_t TelRilCall::GetUssd(const AppExecFwk::InnerEvent::Pointer &result)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_GET_USSD, result);
     if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("TelRilManager GetUssdCusd:telRilRequest is nullptr");
+        TELEPHONY_LOGE("TelRilManager GetUssd:telRilRequest is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (cellularRadio_ == nullptr) {
@@ -1749,7 +1750,7 @@ int32_t TelRilCall::GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result)
     return SendInt32Event(HREQ_CALL_GET_USSD, telRilRequest->serialId_);
 }
 
-int32_t TelRilCall::GetUssdCusdResponse(MessageParcel &data)
+int32_t TelRilCall::GetUssdResponse(MessageParcel &data)
 {
     std::shared_ptr<int32_t> cusd = std::make_shared<int32_t>();
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
@@ -1884,16 +1885,16 @@ int32_t TelRilCall::CallImsServiceStatusNotice(MessageParcel &data)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilCall::CallUssdCusdNotice(MessageParcel &data)
+int32_t TelRilCall::CallUssdNotice(MessageParcel &data)
 {
-    std::shared_ptr<UssdCusdNoticeInfo> ussdCusdNoticeInfo = std::make_shared<UssdCusdNoticeInfo>();
-    if (ussdCusdNoticeInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : ussdCusdNoticeInfo == nullptr !!!");
+    std::shared_ptr<UssdNoticeInfo> ussdNoticeInfo = std::make_shared<UssdNoticeInfo>();
+    if (ussdNoticeInfo == nullptr) {
+        TELEPHONY_LOGE("ERROR : ussdNoticeInfo == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ussdCusdNoticeInfo->ReadFromParcel(data);
+    ussdNoticeInfo->ReadFromParcel(data);
     if (observerHandler_ != nullptr) {
-        observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_USSD_CUSD_NOTICE, ussdCusdNoticeInfo);
+        observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_USSD_CUSD_NOTICE, ussdNoticeInfo);
     } else {
         TELEPHONY_LOGE("ERROR : observerHandler_ == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

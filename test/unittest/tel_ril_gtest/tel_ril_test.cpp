@@ -108,8 +108,8 @@ void TelRilTest::InitCall()
     memberFuncMap_[DiffInterfaceId::TEST_SEND_DTMF] = &TelRilTest::SendDtmfTest;
     memberFuncMap_[DiffInterfaceId::TEST_START_DTMF] = &TelRilTest::StartDtmfTest;
     memberFuncMap_[DiffInterfaceId::TEST_STOP_DTMF] = &TelRilTest::StopDtmfTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SET_USSD] = &TelRilTest::SetUssdCusdTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_USSD] = &TelRilTest::GetUssdCusdTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_USSD] = &TelRilTest::SetUssdTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_USSD] = &TelRilTest::GetUssdTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_CMUT] = &TelRilTest::SetMuteTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_CMUT] = &TelRilTest::GetMuteTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_EMERGENCY_CALL_LIST] = &TelRilTest::GetEmergencyCallListTest;
@@ -1335,29 +1335,29 @@ void TelRilTest::StopDtmfTest(const std::shared_ptr<AppExecFwk::EventHandler> &h
     }
 }
 
-void TelRilTest::SetUssdCusdTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SetUssdTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SET_USSD_CUSD);
     auto event = AppExecFwk::InnerEvent::Get(eventId);
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::SetUssdCusdTest -->");
-        telRilManager_->SetUssdCusd(slotId_, "12345678", event);
-        TELEPHONY_LOGI("TelRilTest::SetUssdCusdTest --> finished");
+        TELEPHONY_LOGI("TelRilTest::SetUssdTest -->");
+        telRilManager_->SetUssd(slotId_, "12345678", event);
+        TELEPHONY_LOGI("TelRilTest::SetUssdTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }
 }
 
-void TelRilTest::GetUssdCusdTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::GetUssdTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_GET_USSD_CUSD);
     auto event = AppExecFwk::InnerEvent::Get(eventId);
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::GetUssdCusdTest -->");
-        telRilManager_->GetUssdCusd(slotId_, event);
-        TELEPHONY_LOGI("TelRilTest::GetUssdCusdTest --> finished");
+        TELEPHONY_LOGI("TelRilTest::GetUssdTest -->");
+        telRilManager_->GetUssd(slotId_, event);
+        TELEPHONY_LOGI("TelRilTest::GetUssdTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }
@@ -2007,13 +2007,13 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetLocateUpdatesTest_0101, Function | Medi
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_SetUssdCusdTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_SetUssdTest_0101, Function | MediumTest | Level3)
 {
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_USSD), GetHandler());
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_GetUssdCusdTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_GetUssdTest_0101, Function | MediumTest | Level3)
 {
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_USSD), GetHandler());
     return;

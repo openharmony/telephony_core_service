@@ -76,7 +76,8 @@ void NitzUpdate::ProcessNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event)
     (void)memset_s(&networkTime, sizeof(NetworkTime), 0, sizeof(NetworkTime));
     if (NitzParse(*strTime, networkTime)) {
         ProcessTime(networkTime);
-        ProcessTimeZone(networkTime);
+        offset_ = networkTime.offset;
+        ProcessTimeZone();
     }
 }
 
@@ -205,7 +206,7 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
     PublishCommonEvent(want);
 }
 
-void NitzUpdate::ProcessTimeZone(NetworkTime &networkTime)
+void NitzUpdate::ProcessTimeZone()
 {
     bool autoTimezone = IsAutoTimeZone();
     if (!autoTimezone) {
@@ -216,14 +217,18 @@ void NitzUpdate::ProcessTimeZone(NetworkTime &networkTime)
         TELEPHONY_LOGE("failed to get NetworkSearchManager slotId:%{public}d", slotId_);
         return;
     }
-
+    if (timeZoneUpdateFlag_) {
+        TELEPHONY_LOGI("TimeZone is updated slotId:%{public}d", slotId_);
+        return;
+    }
     std::u16string iso = nsm->GetIsoCountryCodeForNetwork(slotId_);
     std::string countryCode = Str16ToStr8(iso);
     if (!countryCode.empty()) {
+        timeZoneUpdateFlag_ = true;
         OHOS::Global::I18n::ZoneUtil util;
         std::string timeZone = util.GetDefaultZone(countryCode.c_str());
         if (timeZone.empty()) {
-            int32_t offset = ONE_HOUR_TO_SECOND * ONE_SECOND_TO_MILLISECOND * networkTime.offset;
+            int32_t offset = ONE_HOUR_TO_SECOND * ONE_SECOND_TO_MILLISECOND * offset_;
             timeZone = util.GetDefaultZone(countryCode.c_str(), offset);
         }
         if (timeZone.empty()) {

@@ -38,8 +38,8 @@ StkController::~StkController()
 void StkController::Init(int slotId)
 {
     TELEPHONY_LOGI("StkController::Init() started ");
-    RegisterEvents();
     slotId_ = slotId;
+    RegisterEvents();
     TELEPHONY_LOGI("StkController::Init() end");
 }
 

@@ -468,15 +468,15 @@ int32_t TelRilManager::GetLteImsSwitchStatus(int32_t slotId, const AppExecFwk::I
     return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetLteImsSwitchStatus);
 }
 
-int32_t TelRilManager::SetUssdCusd(
+int32_t TelRilManager::SetUssd(
     int32_t slotId, const std::string str, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetUssdCusd, str);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetUssd, str);
 }
 
-int32_t TelRilManager::GetUssdCusd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetUssd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetUssdCusd);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetUssd);
 }
 
 int32_t TelRilManager::SetMute(int32_t slotId, const int32_t mute, const AppExecFwk::InnerEvent::Pointer &response)

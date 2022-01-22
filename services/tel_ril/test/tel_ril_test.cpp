@@ -325,17 +325,17 @@ public:
     void OnRequestGetEmergencyCallListTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetCallFailReasonTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
-    const int CID = 1;
-    const int REASON = 2;
-    const int TYPE = 7;
-    const int MAXCONNSTIME = 8;
-    const int MAXCONNS = 9;
-    const int EVENT_11 = 11;
-    const int TYPESBITMAP = 12;
-    const int P3 = 15;
-    const int COMMAND = 192;
-    const int FILEID = 20272;
-    const int AUTHTYPE_1 = 0;
+    const int32_t CID = 1;
+    const int32_t REASON = 2;
+    const int32_t TYPE = 7;
+    const int32_t MAXCONNSTIME = 8;
+    const int32_t MAXCONNS = 9;
+    const int32_t EVENT_11 = 11;
+    const int32_t TYPESBITMAP = 12;
+    const int32_t P3 = 15;
+    const int32_t COMMAND = 192;
+    const int32_t FILEID = 20272;
+    const int32_t AUTHTYPE_1 = 0;
     class DemoHandler : public AppExecFwk::EventHandler {
     public:
         explicit DemoHandler(int32_t slotId, const std::shared_ptr<AppExecFwk::EventRunner> &runner)
@@ -691,7 +691,7 @@ void TelRilTest::OnRequestSetSimLockTest(int32_t slotId, const std::shared_ptr<A
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
         std::string fac;
-        int mode;
+        int32_t mode;
         std::string code;
 
         std::cout << "please enter the fac:";
@@ -841,8 +841,8 @@ void TelRilTest::OnRequestSetActiveSimTest(int32_t slotId, const std::shared_ptr
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
 
-        int index;
-        int enable;
+        int32_t index;
+        int32_t enable;
         std::cout << "please enter the SIM index:";
         std::cin >> index;
 
@@ -941,7 +941,7 @@ void TelRilTest::OnRequestCallHangupTest(int32_t slotId, const std::shared_ptr<A
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestCallHangupTest -->");
-        telRilManager_->Hangup(slotId, static_cast<int>(event->GetInnerEventId()), event);
+        telRilManager_->Hangup(slotId, static_cast<int32_t>(event->GetInnerEventId()), event);
         TELEPHONY_LOGI(
             "TelRilTest::OnRequestCallHangupTest --> OnRequestCallHangupTest "
             "finished");
@@ -1295,7 +1295,7 @@ void TelRilTest::OnRequestSetRadioStateTest(int32_t slotId, const std::shared_pt
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestSetRadioStateTest -->");
-        int radioState = -1;
+        int32_t radioState = -1;
 
         std::cout << "please enter the new radioState:";
         std::cin >> radioState;
@@ -1432,9 +1432,9 @@ void TelRilTest::OnRequestGetLinkBandwidthInfoTest(
 void TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest(
     int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    const int BANDWIDTH_HYSTERESIS_MS = 3000;
-    const int BANDWIDTH_HYSTERESIS_KBPS = 50;
-    const int MAX_DOWNLINK_LINK_BANDWIDTH[] = {
+    const int32_t BANDWIDTH_HYSTERESIS_MS = 3000;
+    const int32_t BANDWIDTH_HYSTERESIS_KBPS = 50;
+    const int32_t MAX_DOWNLINK_LINK_BANDWIDTH[] = {
         100,    // VoIP
         500,    // Web
         1000,   // SD
@@ -1447,7 +1447,7 @@ void TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest(
         500000,
         1000000
     };
-    const int MAX_UPLINK_LINK_BANDWIDTH[] = {100, 500, 1000, 5000, 10000, 20000, 50000, 100000, 200000};
+    const int32_t MAX_UPLINK_LINK_BANDWIDTH[] = {100, 500, 1000, 5000, 10000, 20000, 50000, 100000, 200000};
     int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE);
     auto event = AppExecFwk::InnerEvent::Get(eventId);
     if (event != nullptr && telRilManager_ != nullptr) {
@@ -1458,10 +1458,10 @@ void TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest(
         rule.rat = NETWORK_TYPE_LTE;
         rule.delayUplinkKbps = BANDWIDTH_HYSTERESIS_KBPS;
         rule.delayDownlinkKbps = BANDWIDTH_HYSTERESIS_KBPS;
-        for (uint32_t i = 0; i < sizeof(MAX_UPLINK_LINK_BANDWIDTH) / sizeof(int); i++) {
+        for (uint32_t i = 0; i < sizeof(MAX_UPLINK_LINK_BANDWIDTH) / sizeof(int32_t); i++) {
             rule.maximumUplinkKbps.push_back(MAX_UPLINK_LINK_BANDWIDTH[i]);
         }
-        for (uint32_t i = 0; i < sizeof(MAX_DOWNLINK_LINK_BANDWIDTH) / sizeof(int); i++) {
+        for (uint32_t i = 0; i < sizeof(MAX_DOWNLINK_LINK_BANDWIDTH) / sizeof(int32_t); i++) {
             rule.maximumDownlinkKbps.push_back(MAX_DOWNLINK_LINK_BANDWIDTH[i]);
         }
         telRilManager_->SetLinkBandwidthReportingRule(slotId, rule, event);
@@ -1939,12 +1939,26 @@ void TelRilTest::OnRequestSetCallRestrictionTest(
 {
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SET_CALL_RESTRICTION);
     if (event != nullptr && telRilManager_ != nullptr) {
-        int32_t action = 0;
+        CallRestrictionParam restriction = {};
+
+        std::string fac;
+        int32_t mode;
+        std::string code;
+
+        std::cout << "please enter the fac:";
+        std::cin >> fac;
+        std::cout << "please enter the mode:";
+        std::cin >> mode;
+        std::cout << "please enter the pwd:";
+        std::cin >> code;
+
+        TELEPHONY_LOGI("TelRilTest::%{public}s -->", __func__);
+        restriction.fac = fac;
+        restriction.mode = mode;
+        restriction.password = code;
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestSetCallRestrictionTest -->");
-        std::cout << "please input call set clir action: ";
-        std::cin >> action;
-        telRilManager_->SetClip(slotId, action, event);
+        telRilManager_->SetCallRestriction(slotId, restriction, event);
         TELEPHONY_LOGI(
             "TelRilTest::OnRequestSetCallRestrictionTest --> "
             "OnRequestSetCallRestrictionTest finished");
@@ -2106,7 +2120,7 @@ void TelRilTest::OnRequestSetUssdTest(int32_t slotId, const std::shared_ptr<AppE
         std::cout << "USSD string, the maximum length is 160 characters: ";
         std::cin >> str;
         TELEPHONY_LOGI("TelRilTest::OnRequestSetUssdTest --> str = [%{public}s]", str.c_str());
-        telRilManager_->SetUssdCusd(slotId, str, event);
+        telRilManager_->SetUssd(slotId, str, event);
         TELEPHONY_LOGI(
             "TelRilTest::OnRequestSetUssdTest --> "
             "OnRequestSetUssdTest finished");
@@ -2119,7 +2133,7 @@ void TelRilTest::OnRequestGetUssdTest(int32_t slotId, const std::shared_ptr<AppE
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetUssdTest -->");
-        telRilManager_->GetUssdCusd(slotId, event);
+        telRilManager_->GetUssd(slotId, event);
         TELEPHONY_LOGI(
             "TelRilTest::OnRequestGetUssdTest --> "
             "OnRequestGetUssdTest finished");

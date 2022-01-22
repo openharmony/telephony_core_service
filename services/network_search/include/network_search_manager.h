@@ -155,11 +155,8 @@ public:
     void NotifyNrFrequencyChanged(int32_t slotId);
     void NotifyImsRegStateChanged(int32_t slotId);
     std::shared_ptr<NetworkSearchState> GetNetworkSearchState(int32_t slotId);
-    inline std::shared_ptr<ISimManager> GetSimManager() const
-    {
-        return simManager_;
-    }
     void TriggerSimRefresh(int32_t slotId);
+    void TriggerTimezoneRefresh(int32_t slotId);
     void SetNetworkSearchResultValue(
         int32_t slotId, int32_t listSize, std::vector<NetworkInformation> &operatorInfo);
     sptr<NetworkSearchResult> GetNetworkSearchInformationValue(int32_t slotId);
@@ -224,7 +221,10 @@ public:
     {
         return cellularCallCallBack_;
     }
-
+    inline std::shared_ptr<ISimManager> GetSimManager() const
+    {
+        return simManager_;
+    }
 private:
     bool InitPointer(std::shared_ptr<NetworkSearchManagerInner> &inner, int32_t slotId);
     void ClearManagerInner();

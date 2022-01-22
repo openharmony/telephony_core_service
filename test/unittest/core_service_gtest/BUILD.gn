@@ -32,15 +32,14 @@ ohos_unittest("tel_core_service_gtest") {
     "//base/telephony/core_service/common/sim",
     "//base/telephony/core_service/common/network_search",
     "//base/telephony/core_service/common/core",
-    "//base/telephony/ril_adapter/interfaces/innerkits/include",
     "//utils/native/base/include",
   ]
+
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
     "//base/telephony/core_service:tel_core_service",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
-    "//base/telephony/core_service/utils:libtel_common",
-    "//base/telephony/ril_adapter/services/hril:hril",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
@@ -49,6 +48,7 @@ ohos_unittest("tel_core_service_gtest") {
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
     "ipc:ipc_core",
+    "ril_adapter:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]

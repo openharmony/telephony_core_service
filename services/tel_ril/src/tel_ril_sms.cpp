@@ -551,7 +551,7 @@ int32_t TelRilSms::NewSmsStoredOnSimNotify(MessageParcel &data)
 {
     int32_t recordNumber = data.ReadInt32();
     int32_t indicationType = data.ReadInt32();
-    std::shared_ptr<int> recordNumbers = std::make_shared<int>(recordNumber);
+    std::shared_ptr<int32_t> recordNumbers = std::make_shared<int32_t>(recordNumber);
     TELEPHONY_LOGI("indicationType: %{public}d", indicationType);
     if (observerHandler_ != nullptr && recordNumbers != nullptr) {
         observerHandler_->NotifyObserver(RadioEvent::RADIO_SMS_ON_SIM, recordNumbers);

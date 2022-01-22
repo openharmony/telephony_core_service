@@ -275,9 +275,9 @@ public:
     virtual int32_t GetLteImsSwitchStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t SetRadioProtocol(
         int32_t slotId, SimProtocolRequest data, const AppExecFwk::InnerEvent::Pointer &response) = 0;
-    virtual int32_t SetUssdCusd(
+    virtual int32_t SetUssd(
         int32_t slotId, const std::string str, const AppExecFwk::InnerEvent::Pointer &response) = 0;
-    virtual int32_t GetUssdCusd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t GetUssd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t SetMute(int32_t slotId, const int32_t mute, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t GetMute(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t GetEmergencyCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;

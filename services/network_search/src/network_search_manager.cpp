@@ -669,7 +669,6 @@ bool NetworkSearchManager::GetImsRegStatus(int32_t slotId)
                 "NetworkSearchManager GetImsRegStatus networkSearchState is null slotId:%{public}d", slotId);
             return false;
         }
-        eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_IMS_REG_STATUS);
         return inner->networkSearchState_->GetImsStatus();
     }
     return false;
@@ -930,6 +929,17 @@ void NetworkSearchManager::TriggerSimRefresh(int32_t slotId)
                 RadioEvent::RADIO_IMSI_LOADED_READY);
         }
     }
+}
+
+void NetworkSearchManager::TriggerTimezoneRefresh(int32_t slotId)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner != nullptr) {
+        if (inner->networkSearchHandler_ != nullptr) {
+            inner->networkSearchHandler_->TimezoneRefresh();
+        }
+    }
+    TELEPHONY_LOGE("NetworkSearchManager::TriggerTimezoneRefresh Failed slotId:%{public}d", slotId);
 }
 } // namespace Telephony
 } // namespace OHOS

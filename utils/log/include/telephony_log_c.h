@@ -53,7 +53,6 @@ inline const char *GetRawFileName(const char *path)
     } while (0)
 #endif
 
-#define TELEPHONY_LOGD(fmt, args...) DECORATOR_HILOG(HILOG_DEBUG, fmt, ##args)
 #define TELEPHONY_LOGE(fmt, args...) DECORATOR_HILOG(HILOG_ERROR, fmt, ##args)
 #define TELEPHONY_LOGW(fmt, args...) DECORATOR_HILOG(HILOG_WARN, fmt, ##args)
 #define TELEPHONY_LOGI(fmt, args...) DECORATOR_HILOG(HILOG_INFO, fmt, ##args)
