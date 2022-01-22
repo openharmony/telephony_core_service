@@ -84,7 +84,7 @@ public:
 
     void UpdateCellLocation(int32_t techType, int32_t cellId, int32_t lac);
     sptr<CellLocation> GetCellLocation();
-
+    void TimezoneRefresh();
 private:
     void RadioOnState();
     void GetRadioStateResponse(const AppExecFwk::InnerEvent::Pointer &event);

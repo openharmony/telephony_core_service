@@ -23,7 +23,7 @@ ObserverHandler::ObserverHandler() {}
 
 ObserverHandler::~ObserverHandler() {}
 
-void ObserverHandler::RegObserver(int what, const std::shared_ptr<AppExecFwk::EventHandler> handler)
+void ObserverHandler::RegObserver(int32_t what, const std::shared_ptr<AppExecFwk::EventHandler> handler)
 {
     auto iter = observerHandlerMap_.find(what);
     if (iter != observerHandlerMap_.end()) {
@@ -47,7 +47,7 @@ void ObserverHandler::RemoveAll()
     observerHandlerMap_.clear();
 }
 
-void ObserverHandler::Remove(int what, const std::shared_ptr<AppExecFwk::EventHandler> handler)
+void ObserverHandler::Remove(int32_t what, const std::shared_ptr<AppExecFwk::EventHandler> handler)
 {
     if (handler == nullptr) {
         TELEPHONY_LOGE("ObserverHandler handler==nullptr");
@@ -65,7 +65,7 @@ void ObserverHandler::Remove(int what, const std::shared_ptr<AppExecFwk::EventHa
     }
 }
 
-void ObserverHandler::NotifyObserver(int what)
+void ObserverHandler::NotifyObserver(int32_t what)
 {
     auto iter = observerHandlerMap_.find(what);
     if (iter == observerHandlerMap_.end()) {

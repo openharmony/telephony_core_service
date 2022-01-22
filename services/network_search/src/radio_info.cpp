@@ -170,7 +170,7 @@ void RadioInfo::ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) con
         return;
     }
 
-    std::shared_ptr<HrilStringParcel> imeiID = event->GetSharedObject<HrilStringParcel>();
+    std::shared_ptr<HRilStringParcel> imeiID = event->GetSharedObject<HRilStringParcel>();
     if (imeiID == nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetImei imei is nullptr slotId:%{public}d", slotId_);
         return;
@@ -192,7 +192,7 @@ void RadioInfo::ProcessGetMeid(const AppExecFwk::InnerEvent::Pointer &event) con
         return;
     }
 
-    std::shared_ptr<HrilStringParcel> meid = event->GetSharedObject<HrilStringParcel>();
+    std::shared_ptr<HRilStringParcel> meid = event->GetSharedObject<HRilStringParcel>();
     if (meid == nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetMeid meid is nullptr slotId:%{public}d", slotId_);
         return;
@@ -279,9 +279,14 @@ void RadioInfo::UpdatePhone(RadioTech csRadioTech)
 
     int radioState = networkSearchManager->GetRadioState(slotId_);
     if (static_cast<ModemPowerState>(radioState) != CORE_SERVICE_POWER_NOT_AVAILABLE) {
+        if (phoneType == PhoneType::PHONE_TYPE_IS_GSM) {
+            networkSearchManager->GetImei(slotId_);
+            networkSearchManager->SetMeid(slotId_, u"");
+        } else {
+            networkSearchManager->GetMeid(slotId_);
+            networkSearchManager->SetImei(slotId_, u"");
+        }
         networkSearchManager->GetRadioCapability(slotId_);
-        networkSearchManager->GetImei(slotId_);
-        networkSearchManager->GetMeid(slotId_);
         if (static_cast<ModemPowerState>(radioState) == CORE_SERVICE_POWER_ON) {
             networkSearchManager->GetVoiceTech(slotId_);
         }

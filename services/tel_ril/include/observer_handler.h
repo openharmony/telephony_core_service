@@ -28,18 +28,18 @@ public:
 
     virtual ~ObserverHandler();
 
-    void RegObserver(int what, const std::shared_ptr<AppExecFwk::EventHandler> handler);
+    void RegObserver(int32_t what, const std::shared_ptr<AppExecFwk::EventHandler> handler);
 
-    void RegUniqueObserver(int what, const std::shared_ptr<AppExecFwk::EventHandler> handler);
+    void RegUniqueObserver(int32_t what, const std::shared_ptr<AppExecFwk::EventHandler> handler);
 
-    void Remove(int what, const std::shared_ptr<AppExecFwk::EventHandler> handler);
+    void Remove(int32_t what, const std::shared_ptr<AppExecFwk::EventHandler> handler);
 
     void RemoveAll();
 
-    void NotifyObserver(int what);
+    void NotifyObserver(int32_t what);
 
     template<typename T>
-    void NotifyObserver(int what, T *object)
+    void NotifyObserver(int32_t what, T *object)
     {
         auto iter = observerHandlerMap_.find(what);
         if (iter == observerHandlerMap_.end()) {
@@ -54,7 +54,7 @@ public:
     }
 
     template<typename T>
-    void NotifyObserver(int what, std::shared_ptr<T> object)
+    void NotifyObserver(int32_t what, std::shared_ptr<T> object)
     {
         auto iter = observerHandlerMap_.find(what);
         if (iter == observerHandlerMap_.end()) {

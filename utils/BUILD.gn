@@ -17,21 +17,21 @@ group("common_target") {
   deps = [ ":libtel_common" ]
 }
 
-config("telephony_common_config") {
+config("telephony_log_config") {
+  include_dirs = [ "log/include" ]
+}
+
+config("tel_utils_config") {
   include_dirs = [
-    "log/include",
     "common/include",
     "preferences/include",
-    "//base/telephony/core_service/frameworks/js/napi",
   ]
 }
 
 ohos_shared_library("libtel_common") {
   sources = [
-    "common/src/desensitize_string_stream.cpp",
     "common/src/str_convert.cpp",
     "common/src/telephony_permission.cpp",
-    "log/src/telephony_log_wrapper.cpp",
     "preferences/src/tel_profile_util.cpp",
   ]
 
@@ -44,7 +44,9 @@ ohos_shared_library("libtel_common") {
     defines += [ "STANDARD_SYSTEM_ENABLE" ]
   }
 
-  public_configs = [ ":telephony_common_config" ]
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+
+  public_configs = [ ":tel_utils_config" ]
 
   public_deps = [
     "//foundation/distributeddatamgr/appdatamgr/interfaces/innerkits/native_preferences:native_preferences",

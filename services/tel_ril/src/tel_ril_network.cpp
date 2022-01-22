@@ -661,7 +661,7 @@ int32_t TelRilNetwork::SetRadioCapability(
         data.WriteString(radioCapabilityInfo.modemId);
         MessageParcel reply;
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        int ret = cellularRadio_->SendRequest(HREQ_NETWORK_SET_RADIO_CAPABILITY, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_NETWORK_SET_RADIO_CAPABILITY, data, reply, option);
         TELEPHONY_LOGI("SetRadioCapability return ID: %{public}d", ret);
         return TELEPHONY_ERR_SUCCESS;
     } else {

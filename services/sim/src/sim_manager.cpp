@@ -64,8 +64,8 @@ bool SimManager::OnInit(int32_t slotCount)
         if (stkManager_[slotId] != nullptr) {
             stkManager_[slotId]->Init(slotId);
         }
-        if (simStateManager_[slotId] != nullptr) {
-            simStateManager_[slotId]->RefreshSimState(slotId);
+        if (simStateManager_[DEFAULT_SIM_SLOT_ID] != nullptr) {
+            simStateManager_[DEFAULT_SIM_SLOT_ID]->RefreshSimState(DEFAULT_SIM_SLOT_ID);
         }
     }
     return true;

@@ -113,6 +113,7 @@ void IccDiallingNumbersCache::ProcessObtainAdnDetailsDone(const AppExecFwk::Inne
         std::pair<int, std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>>>(
             fileId, diallingNumberList));
     SendBackResult(fd->callerCache->caller, diallingNumberList, fd->exception);
+    TELEPHONY_LOGI("IccDiallingNumbersCache::ProcessObtainAdnDetailsDone finished");
 }
 
 void IccDiallingNumbersCache::ProcessChangeDiallingNumbersDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -275,6 +276,8 @@ void IccDiallingNumbersCache::SendBackResult(const AppExecFwk::InnerEvent::Point
     data->exception = object;
     if (owner != nullptr) {
         owner->SendEvent(id, data);
+    } else {
+        TELEPHONY_LOGE("IccDiallingNumbersCache::SendBackResult null owner");
     }
     TELEPHONY_LOGI("IccDiallingNumbersCache::SendBackResult send end");
 }

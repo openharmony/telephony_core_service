@@ -23,7 +23,7 @@ ohos_unittest("TelephonySALogTest") {
   ]
 
   configs = [
-    "//base/telephony/core_service/utils:telephony_common_config",
+    "//base/telephony/core_service/utils:telephony_log_config",
     "//base/telephony/core_service/utils/test:common_test_config",
   ]
 

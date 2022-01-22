@@ -386,7 +386,7 @@ std::shared_ptr<unsigned char> IccDiallingNumbersHandler::CreateSavingSequence(
         if (byteTagLen > 0) {
             SIMUtils::ArrayCopy(byteTag, 0, diallingNumberString, 0, byteTagLen);
         }
-        TELEPHONY_LOGI("CreateSavingSequence result: %{public}d  %{public}s", byteTagLen, diallingNumberString);
+        TELEPHONY_LOGI("CreateSavingSequence result: %{public}d", byteTagLen);
         return diallingNumberStringPac;
     } else {
         TELEPHONY_LOGE("CreateSavingSequence max data length is %{public}d", offset);

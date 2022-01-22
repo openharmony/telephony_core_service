@@ -42,16 +42,16 @@ public:
     void Init(int32_t mcc, int32_t mnc, int32_t cellId);
 
     virtual int32_t GetCellId() const;
-    virtual int32_t GetMcc() const;
-    virtual int32_t GetMnc() const;
+    virtual std::string GetMcc() const;
+    virtual std::string GetMnc() const;
     virtual uint64_t GetTimeStamp() const;
     virtual int32_t GetSignalLevel() const;
     virtual bool GetIsCamped() const;
     virtual void SetIsCamped(bool isCamped);
     virtual void SetSignalLevel(int32_t signalLevel);
 protected:
-    int32_t mcc_ = 0;
-    int32_t mnc_ = 0;
+    std::string mcc_ = "";
+    std::string mnc_ = "";
     int32_t cellId_ = 0;
     uint64_t timeStamp_ = 0;
     int32_t signalLevel_ = 0;

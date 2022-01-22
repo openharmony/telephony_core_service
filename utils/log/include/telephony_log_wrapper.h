@@ -92,14 +92,10 @@ inline constexpr const char *GetRawFileName(const char *path)
         GetRawFileName(__FILE__), __LINE__, ##__VA_ARGS__)
 #endif
 
-#define TELEPHONY_LOGD(fmt, ...) PRINT_TELEPHONY_LOG(Debug, fmt, ##__VA_ARGS__)
 #define TELEPHONY_LOGE(fmt, ...) PRINT_TELEPHONY_LOG(Error, fmt, ##__VA_ARGS__)
 #define TELEPHONY_LOGW(fmt, ...) PRINT_TELEPHONY_LOG(Warn, fmt, ##__VA_ARGS__)
 #define TELEPHONY_LOGI(fmt, ...) PRINT_TELEPHONY_LOG(Info, fmt, ##__VA_ARGS__)
 #define TELEPHONY_LOGF(fmt, ...) PRINT_TELEPHONY_LOG(Fatal, fmt, ##__VA_ARGS__)
-
-#else
-#define TELEPHONY_LOGD(...)
 #endif // CONFIG_HILOG
 } // namespace Telephony
 } // namespace OHOS
