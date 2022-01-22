@@ -28,6 +28,7 @@ public:
     NitzUpdate(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId);
     virtual ~NitzUpdate() = default;
     void ProcessNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessTimeZone();
     struct NetworkTime {
         int32_t year;
         int32_t month;
@@ -40,7 +41,6 @@ public:
 
 private:
     void ProcessTime(NetworkTime &networkTime);
-    void ProcessTimeZone(NetworkTime &networkTime);
     void SaveTimeZone(std::string &timeZone);
     void SaveTime(std::string &time);
     bool IsAutoTimeZone();
@@ -51,6 +51,8 @@ private:
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
+    bool timeZoneUpdateFlag_ = false;
+    int32_t offset_;
     int32_t slotId_ = 0;
 };
 } // namespace Telephony

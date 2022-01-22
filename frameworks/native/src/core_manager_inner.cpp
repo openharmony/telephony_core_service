@@ -159,7 +159,7 @@ void CoreManagerInner::UnRegisterCellularCallObject(const sptr<NetworkSearchCall
 }
 
 /******************** telRilManager start *******************/
-int32_t CoreManagerInner::SetUssdCusd(int32_t slotId, int32_t eventId, const std::string str,
+int32_t CoreManagerInner::SetUssd(int32_t slotId, int32_t eventId, const std::string str,
     const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
@@ -168,10 +168,10 @@ int32_t CoreManagerInner::SetUssdCusd(int32_t slotId, int32_t eventId, const std
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     response->SetOwner(handler);
-    return telRilManager_->SetUssdCusd(slotId, str, response);
+    return telRilManager_->SetUssd(slotId, str, response);
 }
 
-int32_t CoreManagerInner::GetUssdCusd(
+int32_t CoreManagerInner::GetUssd(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
@@ -180,7 +180,7 @@ int32_t CoreManagerInner::GetUssdCusd(
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     response->SetOwner(handler);
-    return telRilManager_->GetUssdCusd(slotId, response);
+    return telRilManager_->GetUssd(slotId, response);
 }
 
 int32_t CoreManagerInner::GetMute(

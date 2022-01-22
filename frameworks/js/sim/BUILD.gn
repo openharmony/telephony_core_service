@@ -19,12 +19,10 @@ ohos_shared_library("sim") {
     "include",
     "$SUBSYSTEM_DIR/core_service/interfaces/kits/native",
     "//utils/native/base/include",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/include",
     "//foundation/aafwk/standard/frameworks/kits/ability/native/include",
     "//foundation/aafwk/standard/interfaces/innerkits/base/include/ohos/aafwk/base",
-    "//base/telephony/core_service/interfaces/innerkits/include",
   ]
 
   sources = [
@@ -32,10 +30,11 @@ ohos_shared_library("sim") {
     "src/napi_sim.cpp",
   ]
 
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+
   deps = [
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
-    "$SUBSYSTEM_DIR/ril_adapter/services/hril:hril",
     "//foundation/ace/napi:ace_napi",
     "//utils/native/base:utils",
   ]

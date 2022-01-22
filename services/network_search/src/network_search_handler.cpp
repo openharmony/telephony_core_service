@@ -238,7 +238,7 @@ void NetworkSearchHandler::SimRecordsLoaded(const AppExecFwk::InnerEvent::Pointe
 
 void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::shared_ptr<HrilInt32Parcel> object = event->GetSharedObject<HrilInt32Parcel>();
+    std::shared_ptr<HRilInt32Parcel> object = event->GetSharedObject<HRilInt32Parcel>();
     if (object == nullptr) {
         TELEPHONY_LOGE("NetworkSearchHandler::RadioStateChange object is nullptr!");
         return;
@@ -260,7 +260,6 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
             SendUpdateCellLocationRequest();
             GetRilSignalIntensity(false);
             InitGetNetworkSelectionMode();
-            networkSearchManager->GetImsRegStatus(slotId_);
             RadioOnState();
             break;
         }
@@ -405,6 +404,15 @@ void NetworkSearchHandler::RadioOnState()
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager != nullptr) {
         networkSearchManager->InitMsgNum(slotId_);
+    }
+
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_GET_IMS_REG_STATUS);
+    if (event != nullptr) {
+        event->SetOwner(shared_from_this());
+        std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
+        if (telRilManager != nullptr) {
+            telRilManager->GetImsRegStatus(slotId_, event);
+        }
     }
 }
 
@@ -701,6 +709,14 @@ sptr<CellLocation> NetworkSearchHandler::GetCellLocation()
         return cellInfo_->GetCellLocation();
     }
     return nullptr;
+}
+
+void NetworkSearchHandler::TimezoneRefresh()
+{
+    TELEPHONY_LOGI("NetworkSearchHandler::TimezoneRefresh slotId:%{public}d", slotId_);
+    if (nitzUpdate_ != nullptr) {
+        nitzUpdate_->ProcessTimeZone();
+    }
 }
 
 void NetworkSearchHandler::SendUpdateCellLocationRequest()

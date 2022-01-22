@@ -23,7 +23,6 @@ ohos_shared_library("radio") {
     "//utils/native/base/include",
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
     "$SUBSYSTEM_DIR/core_service/common/sim",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/include",
     "//foundation/aafwk/standard/frameworks/kits/ability/native/include",
@@ -42,11 +41,11 @@ ohos_shared_library("radio") {
     "src/set_radio_state_callback.cpp",
   ]
 
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+
   deps = [
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
-    "$SUBSYSTEM_DIR/ril_adapter/services/hril:hril",
-    "//base/telephony/core_service/utils:libtel_common",
     "//foundation/ace/napi:ace_napi",
     "//utils/native/base:utils",
   ]

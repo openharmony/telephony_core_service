@@ -59,13 +59,18 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
     auto eventCode = event->GetInnerEventId();
     switch (eventCode) {
-        case RadioEvent::RADIO_SIM_RECORDS_LOADED:
+        case RadioEvent::RADIO_SIM_RECORDS_LOADED: {
+            auto slotId = event->GetSharedObject<int32_t>();
+            if ((slotId != nullptr) && (*slotId != slotId_)) {
+                TELEPHONY_LOGI("MultiSimMonitor::getEvent not right slotId_ = %{public}d", slotId_);
+                return;
+            }
             TELEPHONY_LOGI("MultiSimMonitor::INIT_DATA sim icc data slotId_ = %{public}d", slotId_);
             if (controller_ == nullptr) {
                 TELEPHONY_LOGE("MultiSimMonitor::INIT_DATA failed by nullptr");
                 return;
             }
-            for (int i =0; i < RETRY_COUNT; i++) {
+            for (int i = 0; i < RETRY_COUNT; i++) {
                 if (ready_) {
                     TELEPHONY_LOGI("MultiSimMonitor::dataAbility ready");
                     break;
@@ -79,8 +84,9 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
                 TELEPHONY_LOGE("MultiSimMonitor::can not notify RADIO_SIM_ACCOUNT_LOADED by nullptr");
                 return;
             }
-            observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+            observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, &slotId_);
             break;
+        }
         case MSG_SIM_FORGET_ALLDATA:
             TELEPHONY_LOGI("MultiSimMonitor::forget all data");
             ready_ = controller_->ForgetAllData();
@@ -111,7 +117,8 @@ bool MultiSimMonitor::UnRegisterForIccLoaded()
     return true;
 }
 
-void MultiSimMonitor::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what) {
+void MultiSimMonitor::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
+{
     if (observerHandler_ == nullptr) {
         TELEPHONY_LOGE("MultiSimMonitor::can not RegisterCoreNotify by nullptr");
         return;

@@ -1245,7 +1245,7 @@ int32_t TelRilSim::SimOpenLogicalChannel(
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilSim::SimCloseLogicalChannel(int channelId, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilSim::SimCloseLogicalChannel(int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_CLOSE_LOGICAL_CHANNEL, response);
     if (telRilRequest == nullptr) {

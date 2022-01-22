@@ -393,6 +393,7 @@ std::u16string CoreServiceProxy::GetImei(int32_t slotId)
     }
     std::u16string result = reply.ReadString16();
     std::string str = Str16ToStr8(result);
+    TELEPHONY_LOGI("CoreServiceProxy::GetImei str = %{public}s", str.c_str());
     return result;
 }
 
@@ -417,6 +418,7 @@ std::u16string CoreServiceProxy::GetMeid(int32_t slotId)
     }
     std::u16string result = reply.ReadString16();
     std::string str = Str16ToStr8(result);
+    TELEPHONY_LOGI("CoreServiceProxy::GetMeid str = %{public}s", str.c_str());
     return result;
 }
 

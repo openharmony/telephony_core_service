@@ -241,8 +241,8 @@ private:
     void GetVoiceRadioTechnologyTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetPhysicalChannelConfigTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetLocateUpdatesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void SetUssdCusdTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void GetUssdCusdTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void SetUssdTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void GetUssdTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetMuteTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetMuteTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetEmergencyCallListTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);

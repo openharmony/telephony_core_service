@@ -33,7 +33,6 @@ ohos_executable("tel_sim_test") {
     "//base/telephony/data_storage/sim/include",
     "//base/telephony/data_storage/common/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/base/include",
-    "//base/telephony/ril_adapter/interfaces/innerkits/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/state_registry",
@@ -55,10 +54,11 @@ ohos_executable("tel_sim_test") {
     "LOG_DOMAIN = 0xD002B01",
   ]
 
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+
   deps = [
     "//base/telephony/core_service:tel_core_service",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
-    "//base/telephony/core_service/utils:libtel_common",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
     "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
@@ -74,6 +74,7 @@ ohos_executable("tel_sim_test") {
     "ipc:ipc_core",
     "native_appdatamgr:native_dataability",
     "native_appdatamgr:native_rdb",
+    "ril_adapter:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]

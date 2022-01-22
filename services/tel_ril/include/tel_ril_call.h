@@ -35,9 +35,9 @@ public:
      * @brief Calling Dial by UusInformation
      *
      * @param string address
-     * @param int clirMode
+     * @param int32_t clirMode
      */
-    int32_t Dial(const std::string address, int clirMode, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t Dial(const std::string address, int32_t clirMode, const AppExecFwk::InnerEvent::Pointer &result);
 
     /**
      * @brief  Reject the Call
@@ -372,25 +372,25 @@ public:
     int32_t GetLteImsSwitchStatusResponse(MessageParcel &data);
 
     /**
-     *  @brief set ussd cusd
+     *  @brief set ussd
      */
-    int32_t SetUssdCusd(const std::string str, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetUssd(const std::string str, const AppExecFwk::InnerEvent::Pointer &result);
     /**
-     * @brief set ussd cusd response
+     * @brief set ussd  response
      *
      * @param data is HDF service callback message
      */
-    int32_t SetUssdCusdResponse(MessageParcel &data);
+    int32_t SetUssdResponse(MessageParcel &data);
     /**
-     *  @brief get ussd cusd
+     *  @brief get ussd
      */
-    int32_t GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetUssd(const AppExecFwk::InnerEvent::Pointer &result);
     /**
      * @brief get ussd cusd response
      *
      * @param data is HDF service callback message
      */
-    int32_t GetUssdCusdResponse(MessageParcel &data);
+    int32_t GetUssdResponse(MessageParcel &data);
 
     /**
      * @brief call cring notice
@@ -435,19 +435,19 @@ public:
     int32_t CallImsServiceStatusNotice(MessageParcel &data);
 
     /**
-     * @brief call ussd cusd notice
+     * @brief call ussd notice
      *
      * @param data is HDF service callback message
      */
-    int32_t CallUssdCusdNotice(MessageParcel &data);
+    int32_t CallUssdNotice(MessageParcel &data);
 
     /**
-     *  @brief set ussd cusd
+     *  @brief set ussd
      */
     int32_t SetMute(const int32_t mute, const AppExecFwk::InnerEvent::Pointer &result);
 
     /**
-     * @brief set ussd cusd response
+     * @brief set ussd  response
      *
      * @param data is HDF service callback message
      */

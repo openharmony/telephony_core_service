@@ -53,27 +53,28 @@ ohos_shared_library("tel_core_service_api") {
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/signal_information.cpp",
   ]
 
-  include_dirs = [
-    "$TELEPHONY_INTERFACES_INNERKITS/include",
-    "$SUBSYSTEM_DIR/ril_adapter/interfaces/innerkits/include",
-  ]
-
   defines += [
     "TELEPHONY_LOG_TAG = \"CoreService\"",
     "LOG_DOMAIN = 0xD002B01",
   ]
 
-  public_configs = [ ":tel_core_service_api_config" ]
+  configs = [ "$TELEPHONY_CORE_SERVICE_ROOT/utils:telephony_log_config" ]
 
-  deps = [ "//utils/native/base:utils" ]
+  public_configs = [ ":tel_core_service_api_config" ]
 
   external_deps = [
     "appexecfwk_standard:libeventhandler",
-    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "safwk:system_ability_fwk",
+    "ril_adapter:hril_innerkits",
     "samgr_standard:samgr_proxy",
+    "utils_base:utils",
   ]
+
+  if (is_standard_system) {
+    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps += [ "hilog:libhilog" ]
+  }
 
   part_name = "core_service"
   subsystem_name = "telephony"

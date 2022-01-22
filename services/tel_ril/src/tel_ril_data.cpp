@@ -99,7 +99,7 @@ int32_t TelRilData::DeactivatePdpContext(int32_t cid, int32_t reason, const AppE
     uniInfo.serial = telRilRequest->serialId_;
     uniInfo.gsmIndex = cid;
     uniInfo.arg1 = reason;
-    int ret = SendBufferEvent(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, uniInfo);
+    int32_t ret = SendBufferEvent(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, uniInfo);
     if (ret != HDF_SUCCESS) {
         TELEPHONY_LOGE("Send HREQ_DATA_DEACTIVATE_PDP_CONTEXT return: %{public}d", ret);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -186,7 +186,7 @@ int32_t TelRilData::GetPdpContextList(const AppExecFwk::InnerEvent::Pointer &res
     TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
     UniInfo uniInfo;
     uniInfo.serial = telRilRequest->serialId_;
-    int ret = SendBufferEvent(HREQ_DATA_GET_PDP_CONTEXT_LIST, uniInfo);
+    int32_t ret = SendBufferEvent(HREQ_DATA_GET_PDP_CONTEXT_LIST, uniInfo);
     if (ret != HDF_SUCCESS) {
         TELEPHONY_LOGE("HREQ_DATA_GET_PDP_CONTEXT_LIST return: %{public}d", ret);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -370,7 +370,7 @@ int32_t TelRilData::SetLinkBandwidthReportingRule(
     dLinkBandwidth.maximumDownlinkKbps = linkBandwidth.maximumDownlinkKbps;
     TELEPHONY_LOGI("maximumUplinkKbpsSize:%{public}d, maximumDownlinkKbpsSize:%{public}d",
         dLinkBandwidth.maximumUplinkKbpsSize, dLinkBandwidth.maximumDownlinkKbpsSize);
-    int ret = SendBufferEvent(HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE, dLinkBandwidth);
+    int32_t ret = SendBufferEvent(HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE, dLinkBandwidth);
     if (ret != HDF_SUCCESS) {
         TELEPHONY_LOGE("HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE return: %{public}d", ret);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
