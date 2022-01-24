@@ -22,6 +22,7 @@ namespace OHOS {
 namespace Telephony {
 std::atomic_int IccDiallingNumbersHandler::nextSerialId_(1);
 std::unordered_map<int, std::shared_ptr<DiallingNumberLoadRequest>> IccDiallingNumbersHandler::requestMap_;
+static std::mutex requestLock_;
 
 IccDiallingNumbersHandler::IccDiallingNumbersHandler(
     const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<IccFileController> fh)
@@ -33,6 +34,7 @@ IccDiallingNumbersHandler::IccDiallingNumbersHandler(
 std::shared_ptr<DiallingNumberLoadRequest> IccDiallingNumbersHandler::CreateLoadRequest(
     int fileId, int exId, int indexNum, const std::string &pin2Str, const AppExecFwk::InnerEvent::Pointer &result)
 {
+    std::lock_guard<std::mutex> lock(requestLock_);
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest =
         std::make_shared<DiallingNumberLoadRequest>(GetNextSerialId(), fileId, exId, indexNum, pin2Str, result);
     if (loadRequest == nullptr) {
@@ -298,6 +300,7 @@ AppExecFwk::InnerEvent::Pointer IccDiallingNumbersHandler::BuildCallerInfo(
 
 std::shared_ptr<DiallingNumberLoadRequest> IccDiallingNumbersHandler::FindLoadRequest(int serial)
 {
+    std::lock_guard<std::mutex> lock(requestLock_);
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest = nullptr;
     auto iter = IccDiallingNumbersHandler::requestMap_.find(serial);
     if (iter == IccDiallingNumbersHandler::requestMap_.end()) {
@@ -311,6 +314,7 @@ std::shared_ptr<DiallingNumberLoadRequest> IccDiallingNumbersHandler::FindLoadRe
 
 void IccDiallingNumbersHandler::ClearLoadRequest(int serial)
 {
+    std::lock_guard<std::mutex> lock(requestLock_);
     IccDiallingNumbersHandler::requestMap_.erase(serial);
 }
 
