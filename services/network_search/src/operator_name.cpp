@@ -63,6 +63,7 @@ void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &eve
     }
 
     NotifySpnChanged();
+    networkSearchManager->TriggerTimezoneRefresh(slotId_);
 }
 
 void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const

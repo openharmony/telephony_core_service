@@ -335,7 +335,7 @@ static void GetNetworkStateCallback(napi_env env, napi_status status, void *data
         NapiUtil::SetPropertyStringUtf8(env, callbackValue, "shortOperatorName", asyncContext->shortOperatorName);
         NapiUtil::SetPropertyStringUtf8(env, callbackValue, "plmnNumeric", asyncContext->plmnNumeric);
         NapiUtil::SetPropertyBoolean(env, callbackValue, "isRoaming", asyncContext->isRoaming);
-        NapiUtil::SetPropertyInt32(env, callbackValue, "regStatus", WrapRegState(asyncContext->regStatus));
+        NapiUtil::SetPropertyInt32(env, callbackValue, "regState", WrapRegState(asyncContext->regStatus));
         NapiUtil::SetPropertyInt32(env, callbackValue, "nsaState", asyncContext->nsaState);
         NapiUtil::SetPropertyInt32(env, callbackValue, "cfgTech", WrapRadioTech(asyncContext->cfgTech));
         NapiUtil::SetPropertyBoolean(env, callbackValue, "isCaActive", asyncContext->isCaActive);
@@ -894,24 +894,12 @@ static void NativeIsRadioOn(napi_env env, void *data)
     auto asyncContext = static_cast<IsRadioOnContext *>(data);
     std::unique_ptr<GetRadioStateCallback> callback = std::make_unique<GetRadioStateCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    if (SIM_SLOT_COUNT == 2) {
-        asyncContext->sendRequest =
-            DelayedRefSingleton<CoreServiceClient>::GetInstance().GetRadioState(SIM_SLOT_0, callback.release());
-        asyncContext->sendRequestSlot2 =
-            DelayedRefSingleton<CoreServiceClient>::GetInstance().GetRadioState(SIM_SLOT_1, callback.release());
-        if (asyncContext->sendRequest == asyncContext->sendRequestSlot2) {
-            asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-                [asyncContext] { return asyncContext->callbackEnd; });
-            TELEPHONY_LOGI("NativeIsRadioOn after callback end");
-        }
-    } else if (SIM_SLOT_COUNT == 1) {
-        asyncContext->sendRequest =
-            DelayedRefSingleton<CoreServiceClient>::GetInstance().GetRadioState(SIM_SLOT_0, callback.release());
-        if (asyncContext->sendRequest) {
-            asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-                [asyncContext] { return asyncContext->callbackEnd; });
-            TELEPHONY_LOGI("NativeIsRadioOn after callback end");
-        }
+    asyncContext->sendRequest =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetRadioState(SIM_SLOT_0, callback.release());
+    if (asyncContext->sendRequest) {
+        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+            [asyncContext] { return asyncContext->callbackEnd; });
+        TELEPHONY_LOGI("NativeIsRadioOn after callback end");
     }
     TELEPHONY_LOGI("NativeIsRadioOn end");
 }
@@ -950,24 +938,12 @@ static void NativeTurnOnRadio(napi_env env, void *data)
     auto asyncContext = static_cast<SwitchRadioContext *>(data);
     std::unique_ptr<SetRadioStateCallback> callback = std::make_unique<SetRadioStateCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    if (SIM_SLOT_COUNT == 2) {
-        asyncContext->sendRequest =
-            DelayedRefSingleton<CoreServiceClient>::GetInstance().SetRadioState(SIM_SLOT_0, true, callback.release());
-        asyncContext->sendRequestSlot2 =
-            DelayedRefSingleton<CoreServiceClient>::GetInstance().SetRadioState(SIM_SLOT_1, true, callback.release());
-        if (asyncContext->sendRequest == asyncContext->sendRequestSlot2) {
-            asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-                [asyncContext] { return asyncContext->callbackEnd; });
-            TELEPHONY_LOGI("NativeTurnOnRadio after callback end");
-        }
-    } else if (SIM_SLOT_COUNT == 1) {
-        asyncContext->sendRequest =
-            DelayedRefSingleton<CoreServiceClient>::GetInstance().SetRadioState(SIM_SLOT_0, true, callback.release());
-        if (asyncContext->sendRequest) {
-            asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-                [asyncContext] { return asyncContext->callbackEnd; });
-            TELEPHONY_LOGI("NativeTurnOnRadio after callback end");
-        }
+    asyncContext->sendRequest =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().SetRadioState(SIM_SLOT_0, true, callback.release());
+    if (asyncContext->sendRequest) {
+        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+            [asyncContext] { return asyncContext->callbackEnd; });
+        TELEPHONY_LOGI("NativeTurnOnRadio after callback end");
     }
     TELEPHONY_LOGI("NativeTurnOnRadio end");
 }
@@ -1021,24 +997,12 @@ static void NativeTurnOffRadio(napi_env env, void *data)
     auto asyncContext = static_cast<SwitchRadioContext *>(data);
     std::unique_ptr<SetRadioStateCallback> callback = std::make_unique<SetRadioStateCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    if (SIM_SLOT_COUNT == 2) {
-        asyncContext->sendRequest = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetRadioState(
-            SIM_SLOT_0, false, callback.release());
-        asyncContext->sendRequestSlot2 = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetRadioState(
-            SIM_SLOT_1, false, callback.release());
-        if (asyncContext->sendRequest == asyncContext->sendRequestSlot2) {
-            asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-                [asyncContext] { return asyncContext->callbackEnd; });
-            TELEPHONY_LOGI("NativeTurnOffRadio after callback end");
-        }
-    } else if (SIM_SLOT_COUNT == 1) {
-        asyncContext->sendRequest = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetRadioState(
-            SIM_SLOT_0, false, callback.release());
-        if (asyncContext->sendRequest) {
-            asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-                [asyncContext] { return asyncContext->callbackEnd; });
-            TELEPHONY_LOGI("NativeTurnOffRadio after callback end");
-        }
+    asyncContext->sendRequest = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetRadioState(
+        SIM_SLOT_0, false, callback.release());
+    if (asyncContext->sendRequest) {
+        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+            [asyncContext] { return asyncContext->callbackEnd; });
+        TELEPHONY_LOGI("NativeTurnOffRadio after callback end");
     }
     TELEPHONY_LOGI("NativeTurnOffRadio end");
 }
