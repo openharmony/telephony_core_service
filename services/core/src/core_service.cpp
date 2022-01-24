@@ -92,6 +92,7 @@ bool CoreService::Init()
     }
     simManager_->SetNetworkSearchManager(slotCount, networkSearchManager_);
     CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
+    TELEPHONY_LOGI("CoreService::Init success");
     return true;
 }
 
