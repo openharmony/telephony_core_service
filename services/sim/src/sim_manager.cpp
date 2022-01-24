@@ -64,10 +64,11 @@ bool SimManager::OnInit(int32_t slotCount)
         if (stkManager_[slotId] != nullptr) {
             stkManager_[slotId]->Init(slotId);
         }
-        if (simStateManager_[DEFAULT_SIM_SLOT_ID] != nullptr) {
+        if (simStateManager_[DEFAULT_SIM_SLOT_ID] != nullptr && slotId == DEFAULT_SIM_SLOT_ID) {
             simStateManager_[DEFAULT_SIM_SLOT_ID]->RefreshSimState(DEFAULT_SIM_SLOT_ID);
         }
     }
+    TELEPHONY_LOGI("SimManager OnInit success");
     return true;
 }
 
