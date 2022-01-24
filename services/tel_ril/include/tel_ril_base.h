@@ -35,7 +35,7 @@ namespace Telephony {
 struct TelRilRequest {
     int32_t serialId_ = 0;
     int32_t requestId_ = 0;
-    AppExecFwk::InnerEvent::Pointer pointer_ = nullptr_;
+    AppExecFwk::InnerEvent::Pointer &pointer_ = nullptr_;
 
     TelRilRequest(int32_t serialId, int32_t requestId, const AppExecFwk::InnerEvent::Pointer &pointer)
     {
