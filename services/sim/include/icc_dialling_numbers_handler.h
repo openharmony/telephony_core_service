@@ -172,7 +172,8 @@ private:
     bool isDelete = false;
     std::shared_ptr<void> result = nullptr;
     std::shared_ptr<void> exception = nullptr;
-    AppExecFwk::InnerEvent::Pointer callPointer = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    AppExecFwk::InnerEvent::Pointer &callPointer = nullptr_;
+    AppExecFwk::InnerEvent::Pointer nullptr_ = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
     const int INIT_COUNT = 1;
 };
 struct DiallingNumberUpdateInfor {
