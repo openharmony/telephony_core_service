@@ -671,8 +671,8 @@ declare namespace radio {
     cellId: number;
     psc: number;
     uarfcn: number;
-    mcc: number;
-    mnc: number;
+    mcc: string;
+    mnc: string;
   }
 
   /**
