@@ -45,8 +45,8 @@ ohos_executable("tel_ril_test") {
   ]
 
   external_deps = [
-    "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "ril_adapter:hril_innerkits",
     "samgr_standard:samgr_proxy",

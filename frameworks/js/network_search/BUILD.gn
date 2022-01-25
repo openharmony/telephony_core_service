@@ -51,7 +51,7 @@ ohos_shared_library("radio") {
   ]
 
   external_deps = [
-    "appexecfwk_standard:libeventhandler",
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "ril_adapter:hril_innerkits",
