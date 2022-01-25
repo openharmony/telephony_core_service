@@ -44,8 +44,8 @@ ohos_unittest("tel_ril_gtest") {
   ]
 
   external_deps = [
-    "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "ril_adapter:hril_innerkits",
     "safwk:system_ability_fwk",

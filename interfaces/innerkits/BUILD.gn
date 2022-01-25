@@ -63,7 +63,7 @@ ohos_shared_library("tel_core_service_api") {
   public_configs = [ ":tel_core_service_api_config" ]
 
   external_deps = [
-    "appexecfwk_standard:libeventhandler",
+    "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "ril_adapter:hril_innerkits",
     "samgr_standard:samgr_proxy",
