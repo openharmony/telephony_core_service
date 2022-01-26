@@ -144,7 +144,7 @@ ohos_shared_library("tel_core_service") {
     "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
     "ability_runtime:want",
-    "appexecfwk_standard:appexecfwk_core",
+    "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
     "ces_standard:cesfwk_services",
     "eventhandler:libeventhandler",

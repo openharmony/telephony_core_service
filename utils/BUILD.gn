@@ -66,7 +66,7 @@ ohos_shared_library("libtel_common") {
   external_deps += [
     "ability_runtime:app_manager",
     "ability_runtime:want",
-    "appexecfwk_standard:appexecfwk_core",
+    "bundle_framework:appexecfwk_core",
     "ipc:ipc_core",
     "permission_standard:libpermissionsdk_standard",
     "safwk:system_ability_fwk",
