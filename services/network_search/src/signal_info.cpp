@@ -53,7 +53,7 @@ bool SignalInfo::ProcessCdma(const CdmaRssi &cdmaSignal)
 bool SignalInfo::ProcessLte(const LteRssi &lteSignal)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    cur_.lte.SetValue(lteSignal.rxlev, lteSignal.rsrq, lteSignal.rsrp, lteSignal.snr);
+    cur_.lte.SetValue(lteSignal.rxlev, lteSignal.rsrp, lteSignal.rsrq, lteSignal.snr);
     bool ret = (cur_.lte == cache_.lte);
     cache_.lte = cur_.lte;
     return ret;
