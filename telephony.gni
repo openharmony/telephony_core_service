@@ -14,7 +14,7 @@
 #declare build args
 
 declare_args() {
-  sim_slot_count = 2
+  sim_slot_count = 1
 }
 
 if (!defined(defines)) {
