@@ -452,17 +452,27 @@ declare namespace sim {
     pin2?: string,
   }
 
+  /**
+   * @systemapi Hide this for inner system use.
+   */
   export interface LockInfo {
     lockType: LockType,
     password: string,
     state: LockState,
   }
 
+  /**
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   export interface PersoLockInfo {
     lockType: PersoLockType,
     password: string,
   }
 
+  /**
+   * @systemapi Hide this for inner system use.
+   */
   export enum LockType {
     PIN_LOCK = 1,
     FDN_LOCK = 2,
@@ -537,6 +547,9 @@ declare namespace sim {
     SIM_STATE_LOADED
   }
 
+  /**
+   * @systemapi Hide this for inner system use.
+   */
   export enum LockState {
     /**Indicates that the lock state card is in the <b>off</b> state. */
     LOCK_OFF = 0,
@@ -555,8 +568,9 @@ declare namespace sim {
   }
 
   /**
- * @since 8
- */
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   export enum PersoLockType {
     PN_PIN_LOCK, //Network Personalization (refer 3GPP TS 22.022 [33])
     PN_PUK_LOCK,
