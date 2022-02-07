@@ -144,6 +144,8 @@ private:
     void GetUnlockSimLockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
 
 private:
+    int32_t oldSimType_ = ICC_UNKNOWN_TYPE;
+    int32_t oldSimStatus_ = ICC_CONTENT_UNKNOWN;
     int32_t slotId_ = DEFAULT_SIM_SLOT_ID;
     UnlockData unlockRespon_;
     LockStatusResponse simlockRespon_ = {0};
