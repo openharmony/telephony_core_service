@@ -354,7 +354,8 @@ std::string SimFile::ParseSpn(const std::string &rawData, int spnStatus)
     if (spnStatus == OBTAIN_SPN_GENERAL) {
         offset = 0;
         length -= INVALID_BYTES_NUM;
-        bytesNew = std::shared_ptr<unsigned char>(bytesRaw.get() + INVALID_BYTES_NUM); // first is 0, +1
+        bytesNew = std::shared_ptr<unsigned char>(bytesRaw.get() + INVALID_BYTES_NUM,
+                                                  [bytesRaw](unsigned char *) {}); // first is 0, +1
     } else if ((spnStatus == OBTAIN_OPERATOR_NAMESTRING) || (spnStatus == OBTAIN_OPERATOR_NAME_SHORTFORM)) {
         offset = 0;
         bytesNew = bytesRaw;
