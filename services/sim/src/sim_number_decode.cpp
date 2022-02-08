@@ -81,12 +81,13 @@ std::shared_ptr<unsigned char> SimNumberDecode::NumberConvertToBCD(
         TELEPHONY_LOGE("calloc(%{public}d, %{public}zu) fail!", bcdLength, sizeof(uint8_t));
         return nullptr;
     }
+    uint8_t *resTemp = res;
     for (const auto &v : result) {
-        *res = v;
-        ++res;
+        *resTemp = v;
+        ++resTemp;
     }
     TELEPHONY_LOGI("SimNumberDecode::NumberConvertToBCD success end_A with result");
-    return std::shared_ptr<unsigned char>(res);
+    return std::shared_ptr<unsigned char>(res, [](unsigned char *ptr) { free(ptr); });
 }
 
 const std::string *SimNumberDecode::chooseExtendedByType(const int bcdExtType)

@@ -215,16 +215,22 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
     iccState_ = ar;
     TELEPHONY_LOGI("SimStateHandle::ProcessIccCardState SimType[%{public}d], SimStatus[%{public}d]", newSimType,
         newSimStatus);
-    CardTypeEscape(newSimType, slotId);
-    SimStateEscape(newSimStatus, slotId, reason);
-    TELEPHONY_LOGI(
-        "will to NotifyIccStateChanged at newSimStatus[%{public}d] observerHandler_ is nullptr[%{public}d] ",
-        newSimStatus, (observerHandler_ == nullptr));
-    if (observerHandler_ != nullptr) {
-        observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_CHANGE);
+    if (oldSimType_ != newSimType) {
+        CardTypeEscape(newSimType, slotId);
+        oldSimType_ = newSimType;
     }
-    DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSimState(
-        slotId, externalType_, externalState_, reason);
+    if (oldSimStatus_ != newSimStatus) {
+        SimStateEscape(newSimStatus, slotId, reason);
+        oldSimStatus_ = newSimStatus;
+        TELEPHONY_LOGI(
+            "will to NotifyIccStateChanged at newSimStatus[%{public}d] observerHandler_ is nullptr[%{public}d] ",
+            newSimStatus, (observerHandler_ == nullptr));
+        if (observerHandler_ != nullptr) {
+            observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_CHANGE);
+        }
+        DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSimState(
+            slotId, externalType_, externalState_, reason);
+    }
 }
 
 SimStateHandle::~SimStateHandle()
