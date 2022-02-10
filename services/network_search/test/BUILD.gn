@@ -38,7 +38,6 @@ ohos_executable("tel_network_search_test") {
 
   deps = [
     "//base/miscservices/time/services:time_service",
-    "//base/notification/ans_standard/frameworks/wantagent:wantagent_innerkits",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:dummy_classes",
     "//foundation/aafwk/standard/interfaces/innerkits/want:want",
@@ -51,6 +50,7 @@ ohos_executable("tel_network_search_test") {
   ]
 
   external_deps = [
+    "ability_runtime:wantagent_innerkits",
     "ces_standard:cesfwk_innerkits",
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",
