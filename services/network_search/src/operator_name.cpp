@@ -50,10 +50,13 @@ void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE(
             "OperatorName::HandleOperatorInfo networkSearchManager is nullptr slotId:%{public}d", slotId_);
     }
-    if (networkSearchManager->GetPhoneType(slotId_) == PhoneType::PHONE_TYPE_IS_GSM) {
+    PhoneType type = networkSearchManager->GetPhoneType(slotId_);
+    if (type == PhoneType::PHONE_TYPE_IS_GSM) {
         GsmOperatorInfo(event);
-    } else {
+    } else if (type == PhoneType::PHONE_TYPE_IS_CDMA) {
         CdmaOperatorInfo(event);
+    } else {
+        TELEPHONY_LOGE("OperatorName::HandleOperatorInfo phone type:%{public}d invalid", type);
     }
     networkSearchManager->decMsgNum(slotId_);
     if (networkSearchState_ != nullptr) {
@@ -85,6 +88,8 @@ void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
     if (networkSearchState_ != nullptr) {
         networkSearchState_->SetOperatorInfo(operatorInfoResult->longName, operatorInfoResult->shortName,
             operatorInfoResult->numeric, DomainType::DOMAIN_TYPE_CS);
+        networkSearchState_->SetOperatorInfo(operatorInfoResult->longName, operatorInfoResult->shortName,
+            operatorInfoResult->numeric, DomainType::DOMAIN_TYPE_PS);
     }
 }
 
@@ -105,6 +110,8 @@ void OperatorName::CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event
         operatorInfoResult->longName.c_str(), operatorInfoResult->shortName.c_str(),
         operatorInfoResult->numeric.c_str(), slotId_);
     if (networkSearchState_ != nullptr) {
+        networkSearchState_->SetOperatorInfo(operatorInfoResult->longName, operatorInfoResult->shortName,
+            operatorInfoResult->numeric, DomainType::DOMAIN_TYPE_CS);
         networkSearchState_->SetOperatorInfo(operatorInfoResult->longName, operatorInfoResult->shortName,
             operatorInfoResult->numeric, DomainType::DOMAIN_TYPE_PS);
     }
