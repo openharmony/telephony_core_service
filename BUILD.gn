@@ -141,9 +141,8 @@ ohos_shared_library("tel_core_service") {
   ]
 
   external_deps = [
+    "ability_base:want",
     "ability_runtime:ability_manager",
-    "ability_runtime:app_manager",
-    "ability_runtime:want",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
     "ces_standard:cesfwk_services",
