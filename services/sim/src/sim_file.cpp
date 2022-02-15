@@ -171,10 +171,6 @@ bool SimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGI("invalid SimFile::SIM_STATE_READY received");
         return false;
     }
-    if (LoadedOrNot()) {
-        TELEPHONY_LOGI("SimFile::SIM_STATE_READY already handled");
-        return false;
-    }
     LoadSimFiles();
     return false;
 }
