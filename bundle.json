@@ -30,6 +30,7 @@
         "ram": "5MB",
         "deps": {
             "components": [
+                "ability_base",
                 "ability_runtime",
                 "appexecfwk_standard",
                 "ces_standard",
