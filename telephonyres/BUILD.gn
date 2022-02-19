@@ -10,12 +10,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-service telephony_sa /system/bin/sa_main /system/profile/telephony.xml
-    class telephony
-    user telephony
-    group system shell
-    seclabel u:r:telephony:s0
 
-on boot
-    exec /system/bin/sleep 4
-    start telephony_sa
+import("//build/ohos.gni")
+
+ohos_resources("telephony_res") {
+  sources = [ "main/resources" ]
+  hap_profile = "./main/config.json"
+}
+
+ohos_hap("telephonyres_hap") {
+  deps = [ ":telephony_res" ]
+  hap_profile = "./main/config.json"
+  hap_name = "TelephonyResources"
+  module_install_dir = "app"
+  certificate_profile = "./TelephonyResources.p7b"
+  subsystem_name = "telephony"
+  part_name = "core_service"
+}

@@ -576,14 +576,15 @@ int32_t TelRilSms::CBConfigNotify(MessageParcel &data)
 
 int32_t TelRilSms::SendGsmSmsResponse(MessageParcel &data)
 {
-    std::shared_ptr<SendSmsResultInfo> sendSmsResultInfo = std::make_shared<SendSmsResultInfo>();
-    sendSmsResultInfo->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("read spBuffer failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<SendSmsResultInfo> sendSmsResultInfo = std::make_shared<SendSmsResultInfo>();
+    sendSmsResultInfo->ReadFromParcel(data);
+
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
@@ -614,18 +615,19 @@ int32_t TelRilSms::SendGsmSmsResponse(MessageParcel &data)
 
 int32_t TelRilSms::SendCdmaSmsResponse(MessageParcel &data)
 {
-    std::shared_ptr<SendSmsResultInfo> sendSmsResultInfo = std::make_shared<SendSmsResultInfo>();
-    if (sendSmsResultInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR :sendSmsResultInfo == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    sendSmsResultInfo->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("read spBuffer failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<SendSmsResultInfo> sendSmsResultInfo = std::make_shared<SendSmsResultInfo>();
+    if (sendSmsResultInfo == nullptr) {
+        TELEPHONY_LOGE("ERROR :sendSmsResultInfo == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    sendSmsResultInfo->ReadFromParcel(data);
+
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     if (radioResponseInfo == nullptr) {
@@ -800,14 +802,15 @@ int32_t TelRilSms::SetSmscAddrResponse(MessageParcel &data)
 
 int32_t TelRilSms::GetSmscAddrResponse(MessageParcel &data)
 {
-    std::shared_ptr<ServiceCenterAddress> serCenterAddress = std::make_shared<ServiceCenterAddress>();
-    serCenterAddress->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("read spBuffer failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<ServiceCenterAddress> serCenterAddress = std::make_shared<ServiceCenterAddress>();
+    serCenterAddress->ReadFromParcel(data);
+
     TELEPHONY_LOGI("ServiceCenterAddress->address:%{public}s, ServiceCenterAddress->tosca:%{public}d",
         serCenterAddress->address.c_str(), serCenterAddress->tosca);
 
@@ -840,18 +843,19 @@ int32_t TelRilSms::GetSmscAddrResponse(MessageParcel &data)
 
 int32_t TelRilSms::GetCBConfigResponse(MessageParcel &data)
 {
-    std::shared_ptr<CBConfigInfo> cellBroadcastInfo = std::make_shared<CBConfigInfo>();
-    if (cellBroadcastInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR :cellBroadcastInfo == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    cellBroadcastInfo->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("read spBuffer failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<CBConfigInfo> cellBroadcastInfo = std::make_shared<CBConfigInfo>();
+    if (cellBroadcastInfo == nullptr) {
+        TELEPHONY_LOGE("ERROR :cellBroadcastInfo == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    cellBroadcastInfo->ReadFromParcel(data);
+
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     if (radioResponseInfo == nullptr) {
@@ -885,18 +889,19 @@ int32_t TelRilSms::GetCBConfigResponse(MessageParcel &data)
 
 int32_t TelRilSms::GetCdmaCBConfigResponse(MessageParcel &data)
 {
-    std::shared_ptr<CdmaCBConfigInfo> cdmaCBConfigInfo = std::make_shared<CdmaCBConfigInfo>();
-    if (cdmaCBConfigInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR :cellBroadcastInfo == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    cdmaCBConfigInfo->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("read spBuffer failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<CdmaCBConfigInfo> cdmaCBConfigInfo = std::make_shared<CdmaCBConfigInfo>();
+    if (cdmaCBConfigInfo == nullptr) {
+        TELEPHONY_LOGE("ERROR :cellBroadcastInfo == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    cdmaCBConfigInfo->ReadFromParcel(data);
+
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     if (radioResponseInfo == nullptr) {
@@ -930,14 +935,15 @@ int32_t TelRilSms::GetCdmaCBConfigResponse(MessageParcel &data)
 
 int32_t TelRilSms::SendSmsMoreModeResponse(MessageParcel &data)
 {
-    std::shared_ptr<SendSmsResultInfo> sendSmsResultInfo = std::make_shared<SendSmsResultInfo>();
-    sendSmsResultInfo->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("read Buffer failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<SendSmsResultInfo> sendSmsResultInfo = std::make_shared<SendSmsResultInfo>();
+    sendSmsResultInfo->ReadFromParcel(data);
+
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d,radioResponseInfo->error:%{public}d",

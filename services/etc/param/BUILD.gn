@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,11 +10,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build/ohos.gni")
 
-#declare build args
+## Install telephony.para to /system/etc/param/telephony.para
 
-if (!defined(defines)) {
-  defines = []
+ohos_prebuilt_etc("telephony.para") {
+  source = "telephony.para"
+  relative_install_dir = "param"
+  part_name = "core_service"
+  subsystem_name = "telephony"
 }
-
-defines += [ "CELLULAR_SUPPORT = true" ]

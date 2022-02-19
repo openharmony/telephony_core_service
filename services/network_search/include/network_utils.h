@@ -77,10 +77,10 @@ std::string NetworkUtils::FormatString(const std::string &format, Args... args)
     if (buf == nullptr) {
         return "";
     }
-    if (snprintf_s(buf.release(), size, size, format.c_str(), args...) < 0) {
+    if (snprintf_s(buf.get(), size, size, format.c_str(), args...) < 0) {
         return "";
     }
-    return std::string(buf.release());
+    return std::string(buf.get());
 }
 
 class NetworkSearchManager;

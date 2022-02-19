@@ -105,11 +105,11 @@ napi_value GetNapiValue(napi_env env, T val)
     return result;
 }
 
-template<typename T, std::enable_if_t<std::is_same_v<T, uint64_t>, uint64_t> = 0>
+template<typename T, std::enable_if_t<std::is_same_v<T, int64_t>, int64_t> = 0>
 napi_value GetNapiValue(napi_env env, T val)
 {
     napi_value result = nullptr;
-    NAPI_CALL(env, napi_create_bigint_uint64(env, val, &result));
+    NAPI_CALL(env, napi_create_int64(env, val, &result));
     return result;
 }
 

@@ -40,6 +40,7 @@ ohos_executable("tel_ril_test") {
 
   deps = [
     "$hdf_uhdf_path/hdi:libhdi",
+    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//base/telephony/core_service:tel_core_service",
     "//utils/native/base:utils",
   ]

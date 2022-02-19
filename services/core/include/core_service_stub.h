@@ -50,7 +50,6 @@ private:
     int32_t OnGetMeid(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetUniqueDeviceId(MessageParcel &data, MessageParcel &reply);
     int32_t OnIsNrSupported(MessageParcel &data, MessageParcel &reply);
-    int32_t OnSetPsAttachStatus(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCellInfoList(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCellLocation(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetNrOptionMode(MessageParcel &data, MessageParcel &reply);

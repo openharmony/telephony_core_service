@@ -83,7 +83,6 @@ public:
     bool SetActiveSim(const int32_t slotId, int32_t enable);
     bool GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     bool SetPreferredNetwork(int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback);
-    bool SetPsAttachStatus(int32_t slotId, int32_t psAttachStatus, const sptr<INetworkSearchCallback> &callback);
     std::u16string GetSimTelephoneNumber(int32_t slotId);
     std::u16string GetVoiceMailIdentifier(int32_t slotId);
     std::u16string GetVoiceMailNumber(int32_t slotId);

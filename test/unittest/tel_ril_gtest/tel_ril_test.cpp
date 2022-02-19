@@ -181,10 +181,7 @@ void TelRilTest::InitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_GET_IMEI] = &TelRilTest::GetImeiTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_MEID] = &TelRilTest::GetMeidTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_IMS_REG_STATUS] = &TelRilTest::GetImsRegStatusTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_PS_ATTACH_STATUS] = &TelRilTest::GetPsAttachStatusTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SET_PS_ATTACH_STATUS] = &TelRilTest::SetPsAttachStatusTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_RADIO_CAPABILITY] = &TelRilTest::GetRadioCapabilityTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SET_RADIO_CAPABILITY] = &TelRilTest::SetRadioCapabilityTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO] = &TelRilTest::GetVoiceRadioTechnologyTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG] = &TelRilTest::GetPhysicalChannelConfigTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_LOCATE_UPDATES] = &TelRilTest::SetLocateUpdatesTest;
@@ -1065,35 +1062,6 @@ void TelRilTest::GetImsRegStatusTest(const std::shared_ptr<AppExecFwk::EventHand
     }
 }
 
-void TelRilTest::GetPsAttachStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_PS_ATTACH_STATUS);
-    auto event = AppExecFwk::InnerEvent::Get(eventId);
-    if (event != nullptr && telRilManager_ != nullptr) {
-        event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::GetPsAttachStatusTest -->");
-        telRilManager_->GetPsAttachStatus(slotId_, event);
-        TELEPHONY_LOGI("TelRilTest::GetPsAttachStatusTest --> finished");
-        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
-        ASSERT_TRUE(syncResult);
-    }
-}
-
-void TelRilTest::SetPsAttachStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_SET_PS_ATTACH_STATUS);
-    auto event = AppExecFwk::InnerEvent::Get(eventId);
-    if (event != nullptr && telRilManager_ != nullptr) {
-        event->SetOwner(handler);
-        int32_t psAttachStatus = 0;
-        TELEPHONY_LOGI("TelRilTest::SetPsAttachStatusTest -->psAttachStatus:%{public}d", psAttachStatus);
-        telRilManager_->SetPsAttachStatus(slotId_, psAttachStatus, event);
-        TELEPHONY_LOGI("TelRilTest::SetPsAttachStatusTest --> finished");
-        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
-        ASSERT_TRUE(syncResult);
-    }
-}
-
 void TelRilTest::GetRadioCapabilityTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_RADIO_CAPABILITY);
@@ -1103,21 +1071,6 @@ void TelRilTest::GetRadioCapabilityTest(const std::shared_ptr<AppExecFwk::EventH
         TELEPHONY_LOGI("TelRilTest::GetRadioCapabilityTest -->");
         telRilManager_->GetRadioCapability(slotId_, event);
         TELEPHONY_LOGI("TelRilTest::GetRadioCapabilityTest --> finished");
-        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
-        ASSERT_TRUE(syncResult);
-    }
-}
-
-void TelRilTest::SetRadioCapabilityTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_SET_RADIO_CAPABILITY);
-    auto event = AppExecFwk::InnerEvent::Get(eventId);
-    RadioCapabilityInfo radioCapabilityInfo = {};
-    if (event != nullptr && telRilManager_ != nullptr) {
-        event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::SetRadioCapabilityTest -->");
-        telRilManager_->SetRadioCapability(slotId_, radioCapabilityInfo, event);
-        TELEPHONY_LOGI("TelRilTest::OnRequestSetRadioCapabilityTest --> SetRilCdmaCBConfigTest finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }
@@ -1337,7 +1290,7 @@ void TelRilTest::StopDtmfTest(const std::shared_ptr<AppExecFwk::EventHandler> &h
 
 void TelRilTest::SetUssdTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SET_USSD_CUSD);
+    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SET_USSD);
     auto event = AppExecFwk::InnerEvent::Get(eventId);
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
@@ -1351,7 +1304,7 @@ void TelRilTest::SetUssdTest(const std::shared_ptr<AppExecFwk::EventHandler> &ha
 
 void TelRilTest::GetUssdTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_GET_USSD_CUSD);
+    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_GET_USSD);
     auto event = AppExecFwk::InnerEvent::Get(eventId);
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
@@ -1965,27 +1918,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetImsRegStatusTest_0101, Function | Mediu
     return;
 }
 
-HWTEST_F(TelRilTest, Telephony_TelRil_GetPsAttachStatusTest_0101, Function | MediumTest | Level3)
-{
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PS_ATTACH_STATUS), GetHandler());
-    return;
-}
-
-HWTEST_F(TelRilTest, Telephony_TelRil_SetPsAttachStatusTest_0101, Function | MediumTest | Level3)
-{
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_PS_ATTACH_STATUS), GetHandler());
-    return;
-}
-
 HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioCapabilityTest_0101, Function | MediumTest | Level3)
 {
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RADIO_CAPABILITY), GetHandler());
-    return;
-}
-
-HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioCapabilityTest_0101, Function | MediumTest | Level3)
-{
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_RADIO_CAPABILITY), GetHandler());
     return;
 }
 

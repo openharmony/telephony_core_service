@@ -107,17 +107,14 @@ private:
     void InitNetworkSearchResult();
     void GetPreferredNetworkResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void SetPreferredNetworkResponse(const AppExecFwk::InnerEvent::Pointer &event);
-    void InitPreferredNetwork();
     void RadioNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void GetImsRegStatus(const AppExecFwk::InnerEvent::Pointer &event);
     void ImsRegStateUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetImei(const AppExecFwk::InnerEvent::Pointer &event);
-    void SetPsAttachStatusResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetMeid(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioCurrentCellInfoUpdate(const AppExecFwk::InnerEvent::Pointer &event);
-    void RadioSetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event);

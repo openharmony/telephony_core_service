@@ -127,7 +127,6 @@ public:
     bool SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback) override;
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) override;
     std::u16string GetImei(int32_t slotId) override;
-    bool SetPsAttachStatus(int32_t slotId, int32_t psAttachStatus, NSCALLBACK &callback) override;
     int32_t GetPsRegState(int32_t slotId) override;
     int32_t GetCsRegState(int32_t slotId) override;
     int32_t GetPsRoamingState(int32_t slotId) override;
@@ -174,11 +173,11 @@ public:
     void UpdateCellLocation(int32_t slotId, int32_t techType, int32_t cellId, int32_t lac);
     void SetMeid(int32_t slotId, std::u16string meid);
     int32_t GetRadioCapability(int32_t slotId);
-    bool SetRadioCapability(int32_t slotId, RadioCapabilityInfo &radioCapability);
     void SetNrOptionMode(int32_t slotId, NrMode mode);
     void SetFrequencyType(int32_t slotId, FrequencyType type);
     void GetVoiceTech(int32_t slotId);
     std::shared_ptr<NetworkSearchManagerInner> FindManagerInner(int32_t slotId);
+    void SetLocateUpdate(int32_t slotId);
 
     inline bool GetAirplaneMode()
     {

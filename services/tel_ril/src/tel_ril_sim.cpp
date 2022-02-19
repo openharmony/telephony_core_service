@@ -91,14 +91,15 @@ int32_t TelRilSim::SimStateUpdated(MessageParcel &data)
 // response
 int32_t TelRilSim::GetSimIOResponse(MessageParcel &data)
 {
-    std::shared_ptr<IccIoResultInfo> iccIoResult = std::make_shared<IccIoResultInfo>();
-    iccIoResult->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("ERROR :read spBuffer(HRilRadioResponseInfo) failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<IccIoResultInfo> iccIoResult = std::make_shared<IccIoResultInfo>();
+    iccIoResult->ReadFromParcel(data);
+
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d,radioResponseInfo->error:%{public}d",
@@ -182,14 +183,15 @@ int32_t TelRilSim::ProcessIccIoInfo(
 
 int32_t TelRilSim::GetSimStatusResponse(MessageParcel &data)
 {
-    std::shared_ptr<CardStatusInfo> cardStatusInfo = std::make_unique<CardStatusInfo>();
-    cardStatusInfo->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("ERROR :spBuffer == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<CardStatusInfo> cardStatusInfo = std::make_unique<CardStatusInfo>();
+    cardStatusInfo->ReadFromParcel(data);
+
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
@@ -216,22 +218,23 @@ int32_t TelRilSim::GetSimStatusResponse(MessageParcel &data)
 
 int32_t TelRilSim::GetImsiResponse(MessageParcel &data)
 {
-    const char *buffer = data.ReadCString();
-    std::shared_ptr<std::string> imsi = std::make_shared<std::string>(buffer);
-    if (buffer == nullptr) {
-        TELEPHONY_LOGE("ERROR : buffer == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("ERROR :spBuffer == nullptr!!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    const char *buffer = data.ReadCString();
+    if (buffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : buffer == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
+    std::shared_ptr<std::string> imsi = std::make_shared<std::string>(buffer);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
@@ -254,15 +257,15 @@ int32_t TelRilSim::GetImsiResponse(MessageParcel &data)
 
 int32_t TelRilSim::GetSimLockStatusResponse(MessageParcel &data)
 {
-    std::shared_ptr<int32_t> SimLockStatus = std::make_shared<int32_t>();
-    *SimLockStatus = data.ReadInt32();
-
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("ERROR :spBuffer == nullptr!!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<int32_t> SimLockStatus = std::make_shared<int32_t>();
+    *SimLockStatus = data.ReadInt32();
+
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d,radioResponseInfo->error:%{public}d",
@@ -412,19 +415,18 @@ int32_t TelRilSim::UnlockPukResponse(MessageParcel &data)
 
 int32_t TelRilSim::GetSimPinInputTimesResponse(MessageParcel &data)
 {
-    std::shared_ptr<SimPinInputTimes> pSimPinInputTimes = std::make_shared<SimPinInputTimes>();
-    if (pSimPinInputTimes == nullptr) {
-        TELEPHONY_LOGE("ERROR : callInfo == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    pSimPinInputTimes->ReadFromParcel(data);
-
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("spBuffer == nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<SimPinInputTimes> pSimPinInputTimes = std::make_shared<SimPinInputTimes>();
+    if (pSimPinInputTimes == nullptr) {
+        TELEPHONY_LOGE("ERROR : callInfo == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    pSimPinInputTimes->ReadFromParcel(data);
 
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
@@ -515,19 +517,18 @@ int32_t TelRilSim::UnlockPuk2Response(MessageParcel &data)
 
 int32_t TelRilSim::GetSimPin2InputTimesResponse(MessageParcel &data)
 {
-    std::shared_ptr<SimPinInputTimes> pSimPin2InputTimes = std::make_shared<SimPinInputTimes>();
-    if (pSimPin2InputTimes == nullptr) {
-        TELEPHONY_LOGE("ERROR :callInfo == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    pSimPin2InputTimes->ReadFromParcel(data);
-
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("spBuffer == nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<SimPinInputTimes> pSimPin2InputTimes = std::make_shared<SimPinInputTimes>();
+    if (pSimPin2InputTimes == nullptr) {
+        TELEPHONY_LOGE("ERROR :callInfo == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    pSimPin2InputTimes->ReadFromParcel(data);
 
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
@@ -689,18 +690,19 @@ int32_t TelRilSim::SimStkIsReadyResponse(MessageParcel &data)
 
 int32_t TelRilSim::SetRadioProtocolResponse(MessageParcel &data)
 {
-    std::shared_ptr<SimProtocolResponse> protocol = std::make_shared<SimProtocolResponse>();
-    if (protocol == nullptr) {
-        TELEPHONY_LOGE("ERROR : callInfo == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    protocol->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("spBuffer == nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<SimProtocolResponse> protocol = std::make_shared<SimProtocolResponse>();
+    if (protocol == nullptr) {
+        TELEPHONY_LOGE("ERROR : callInfo == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    protocol->ReadFromParcel(data);
+
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     if (radioResponseInfo == nullptr) {
@@ -792,14 +794,15 @@ int32_t TelRilSim::SimCloseLogicalChannelResponse(MessageParcel &data)
 
 int32_t TelRilSim::SimTransmitApduLogicalChannelResponse(MessageParcel &data)
 {
-    std::unique_ptr<IccIoResultInfo> iccIoResult = std::make_unique<IccIoResultInfo>();
-    iccIoResult->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("spBuffer == nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::unique_ptr<IccIoResultInfo> iccIoResult = std::make_unique<IccIoResultInfo>();
+    iccIoResult->ReadFromParcel(data);
+
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     if (radioResponseInfo == nullptr) {
@@ -827,14 +830,15 @@ int32_t TelRilSim::SimTransmitApduLogicalChannelResponse(MessageParcel &data)
 
 int32_t TelRilSim::UnlockSimLockResponse(MessageParcel &data)
 {
-    std::shared_ptr<LockStatusResp> lockStatus = std::make_shared<LockStatusResp>();
-    lockStatus->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("ERROR :read spBuffer(HRilRadioResponseInfo) failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<LockStatusResp> lockStatus = std::make_shared<LockStatusResp>();
+    lockStatus->ReadFromParcel(data);
+
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);

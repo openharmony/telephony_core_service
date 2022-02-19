@@ -62,7 +62,7 @@ bool SignalInfo::ProcessLte(const LteRssi &lteSignal)
 bool SignalInfo::ProcessWcdma(const WCdmaRssi &wcdmaSignal)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    cur_.wcdma.SetValue(wcdmaSignal.rxlev, wcdmaSignal.ecio, wcdmaSignal.rscp, wcdmaSignal.ber);
+    cur_.wcdma.SetValue(wcdmaSignal.rxlev, wcdmaSignal.rscp, wcdmaSignal.ecio, wcdmaSignal.ber);
     bool ret = (cur_.wcdma == cache_.wcdma);
     cache_.wcdma = cur_.wcdma;
     return ret;
