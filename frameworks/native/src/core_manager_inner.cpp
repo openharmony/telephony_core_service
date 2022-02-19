@@ -15,6 +15,8 @@
 
 #include "core_manager_inner.h"
 
+#include "parameter.h"
+
 #include "radio_event.h"
 #include "telephony_log_wrapper.h"
 
@@ -68,7 +70,10 @@ int32_t CoreManagerInner::GetDefaultSlotId(void)
 
 int32_t CoreManagerInner::GetMaxSimCount(void)
 {
-    return SIM_SLOT_COUNT;
+    char simSlotCount[SYSPARA_SIZE] = {0};
+    GetParameter(TEL_SIM_SLOT_COUNT.c_str(), DEFAULT_SLOT_COUNT.c_str(), simSlotCount, SYSPARA_SIZE);
+    int32_t slotCount = std::atoi(simSlotCount);
+    return slotCount;
 }
 
 int32_t CoreManagerInner::RegisterCoreNotify(
@@ -325,18 +330,6 @@ int32_t CoreManagerInner::GetRadioCapability(
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     response->SetOwner(handler);
     return telRilManager_->GetRadioCapability(slotId, response);
-}
-
-int32_t CoreManagerInner::SetRadioCapability(int32_t slotId, int32_t eventId, RadioCapabilityInfo &radioCapabilityInfo,
-    const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
-{
-    if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
-    response->SetOwner(handler);
-    return telRilManager_->SetRadioCapability(slotId, radioCapabilityInfo, response);
 }
 
 int32_t CoreManagerInner::GetOperatorInfo(
@@ -1257,16 +1250,6 @@ bool CoreManagerInner::SendUpdateCellLocationRequest(int32_t slotId)
         return false;
     }
     return networkSearchManager_->SendUpdateCellLocationRequest(slotId);
-}
-
-bool CoreManagerInner::SetPsAttachStatus(
-    int32_t slotId, int32_t psAttachStatus, const sptr<INetworkSearchCallback> &callback)
-{
-    if (networkSearchManager_ == nullptr) {
-        TELEPHONY_LOGE("networkSearchManager is null!");
-        return false;
-    }
-    return networkSearchManager_->SetPsAttachStatus(slotId, psAttachStatus, callback);
 }
 
 bool CoreManagerInner::GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback)

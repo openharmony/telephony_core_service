@@ -85,8 +85,6 @@ public:
     bool GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
     bool SetPreferredNetwork(
         int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback) override;
-    bool SetPsAttachStatus(
-        int32_t slotId, int32_t psAttachStatus, const sptr<INetworkSearchCallback> &callback) override;
     std::u16string GetSimTelephoneNumber(int32_t slotId) override;
     std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) override;
     std::u16string GetVoiceMailIdentifier(int32_t slotId) override;

@@ -45,8 +45,6 @@ public:
     virtual std::u16string GetUniqueDeviceId(int32_t slotId) = 0;
     virtual bool IsNrSupported(int32_t slotId) = 0;
     virtual NrMode GetNrOptionMode(int32_t slotId) = 0;
-    virtual bool SetPsAttachStatus(
-        int32_t slotId, int32_t psAttachStatus, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual bool HasSimCard(int32_t slotId) = 0;
     virtual int32_t GetSimState(int32_t slotId) = 0;
     virtual int32_t GetCardType(int32_t slotId) = 0;

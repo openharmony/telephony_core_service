@@ -157,11 +157,6 @@ public:
 
     int32_t GetMeid(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    int32_t SetPsAttachStatus(
-        int32_t slotId, int32_t psAttachStatus, const AppExecFwk::InnerEvent::Pointer &response) override;
-
-    int32_t GetPsAttachStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
-
     int32_t GetVoiceRadioTechnology(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t GetPhysicalChannelConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
@@ -209,10 +204,6 @@ public:
     int32_t GetCBConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
 
     int32_t GetRadioCapability(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
-
-    int32_t SetRadioCapability(int32_t slotId, RadioCapabilityInfo &radioCapabilityInfo,
-        const AppExecFwk::InnerEvent::Pointer &response) override;
-
     /**
      * @brief Send Sms ExpectMore
      */

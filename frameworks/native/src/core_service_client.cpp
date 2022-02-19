@@ -571,17 +571,6 @@ bool CoreServiceClient::SetPreferredNetwork(
     return proxy->SetPreferredNetwork(slotId, networkMode, callback);
 }
 
-bool CoreServiceClient::SetPsAttachStatus(
-    int32_t slotId, int32_t psAttachStatus, const sptr<INetworkSearchCallback> &callback)
-{
-    auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
-        return false;
-    }
-    return proxy->SetPsAttachStatus(slotId, psAttachStatus, callback);
-}
-
 std::u16string CoreServiceClient::GetSimTelephoneNumber(int32_t slotId)
 {
     auto proxy = GetProxy();

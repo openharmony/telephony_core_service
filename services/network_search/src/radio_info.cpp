@@ -23,33 +23,6 @@
 
 namespace OHOS {
 namespace Telephony {
-PhoneType RadioInfo::RadioTechToPhoneType(RadioTech radioTech) const
-{
-    PhoneType phoneType = PhoneType::PHONE_TYPE_IS_NONE;
-    switch (radioTech) {
-        case RadioTech::RADIO_TECHNOLOGY_GSM:
-        case RadioTech::RADIO_TECHNOLOGY_WCDMA:
-        case RadioTech::RADIO_TECHNOLOGY_HSPA:
-        case RadioTech::RADIO_TECHNOLOGY_HSPAP:
-        case RadioTech::RADIO_TECHNOLOGY_TD_SCDMA:
-        case RadioTech::RADIO_TECHNOLOGY_LTE:
-        case RadioTech::RADIO_TECHNOLOGY_LTE_CA:
-        case RadioTech::RADIO_TECHNOLOGY_NR:
-            phoneType = PhoneType::PHONE_TYPE_IS_GSM;
-            break;
-        case RadioTech::RADIO_TECHNOLOGY_1XRTT:
-        case RadioTech::RADIO_TECHNOLOGY_EVDO:
-        case RadioTech::RADIO_TECHNOLOGY_EHRPD:
-            phoneType = PhoneType::PHONE_TYPE_IS_CDMA;
-            break;
-        case RadioTech::RADIO_TECHNOLOGY_UNKNOWN:
-        default:
-            phoneType = PhoneType::PHONE_TYPE_IS_NONE;
-            break;
-    }
-    return phoneType;
-}
-
 RadioInfo::RadioInfo(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
     : networkSearchManager_(networkSearchManager), slotId_(slotId)
 {}
@@ -124,18 +97,15 @@ void RadioInfo::ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &even
         int32_t status = static_cast<int32_t>(HRilErrNumber::HRIL_ERR_REPEAT_STATUS);
         result = (error == status) ? true : false;
         if (!data.WriteBool(result) || !data.WriteInt32((int32_t)responseInfo->error)) {
-            TELEPHONY_LOGE("RadioInfo::ProcessSetRadioState WriteBool result false slotId:%{public}d", slotId_);
             NetworkUtils::RemoveCallbackFromMap(index);
             return;
         }
     }
-
     if (object != nullptr) {
         TELEPHONY_LOGI("RadioInfo::ProcessSetRadioState ok slotId:%{public}d", slotId_);
         index = object->flag;
         result = true;
         if (!data.WriteBool(result) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
-            TELEPHONY_LOGE("RadioInfo::ProcessSetRadioState WriteBool result false slotId:%{public}d", slotId_);
             NetworkUtils::RemoveCallbackFromMap(index);
             return;
         }
@@ -148,12 +118,15 @@ void RadioInfo::ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &even
             nsm->SetRadioStateValue(slotId_, (ModemPowerState)(callbackInfo->param_));
         }
         sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchItem_;
-        if (callback != nullptr &&
-            callback->OnNetworkSearchCallback(
-                INetworkSearchCallback::NetworkSearchCallback::SET_RADIO_STATUS_RESULT, data)) {
+        if (callback != nullptr && callback->OnNetworkSearchCallback(
+            INetworkSearchCallback::NetworkSearchCallback::SET_RADIO_STATUS_RESULT, data)) {
             TELEPHONY_LOGE("RadioInfo::ProcessSetRadioState callback fail slotId:%{public}d", slotId_);
         }
         NetworkUtils::RemoveCallbackFromMap(index);
+    } else {
+        int32_t networkMode = nsm->GetPreferredNetworkValue(slotId_);
+        nsm->SetPreferredNetwork(slotId_, networkMode);
+        nsm->SetLocateUpdate(slotId_);
     }
 }
 
@@ -173,6 +146,7 @@ void RadioInfo::ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) con
     std::shared_ptr<HRilStringParcel> imeiID = event->GetSharedObject<HRilStringParcel>();
     if (imeiID == nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetImei imei is nullptr slotId:%{public}d", slotId_);
+        nsm->SetImei(slotId_, u"");
         return;
     }
     TELEPHONY_LOGI("imei = %{public}s", imeiID->ToString());
@@ -195,33 +169,11 @@ void RadioInfo::ProcessGetMeid(const AppExecFwk::InnerEvent::Pointer &event) con
     std::shared_ptr<HRilStringParcel> meid = event->GetSharedObject<HRilStringParcel>();
     if (meid == nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetMeid meid is nullptr slotId:%{public}d", slotId_);
+        nsm->SetMeid(slotId_, u"");
         return;
     }
     TELEPHONY_LOGI("meid = %{public}s", meid->ToString());
     nsm->SetMeid(slotId_, Str8ToStr16(meid->data));
-}
-
-void RadioInfo::ProcessSetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event) const
-{
-    TELEPHONY_LOGI("RadioInfo::ProcessSetRadioCapability ok slotId:%{public}d", slotId_);
-    if (event == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessSetRadioCapability event is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-    std::shared_ptr<RadioCapabilityInfo> object = event->GetSharedObject<RadioCapabilityInfo>();
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
-    if (responseInfo == nullptr && object == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessSetRadioCapability object is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-    if (responseInfo != nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessSetRadioCapability false %{public}d %{public}d slotId:%{public}d",
-            responseInfo->error, responseInfo->flag, slotId_);
-    }
-    if (object != nullptr) {
-        TELEPHONY_LOGI("RadioInfo::ProcessGetRadioState ratFamily is:%{public}d slotId:%{public}d",
-            object->ratFamily, slotId_);
-    }
 }
 
 void RadioInfo::ProcessGetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event) const
@@ -306,6 +258,33 @@ void RadioInfo::ProcessVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &ev
         return;
     }
     UpdatePhone(static_cast<RadioTech>(radioTech->actType));
+}
+
+PhoneType RadioInfo::RadioTechToPhoneType(RadioTech radioTech) const
+{
+    PhoneType phoneType = PhoneType::PHONE_TYPE_IS_NONE;
+    switch (radioTech) {
+        case RadioTech::RADIO_TECHNOLOGY_GSM:
+        case RadioTech::RADIO_TECHNOLOGY_WCDMA:
+        case RadioTech::RADIO_TECHNOLOGY_HSPA:
+        case RadioTech::RADIO_TECHNOLOGY_HSPAP:
+        case RadioTech::RADIO_TECHNOLOGY_TD_SCDMA:
+        case RadioTech::RADIO_TECHNOLOGY_LTE:
+        case RadioTech::RADIO_TECHNOLOGY_LTE_CA:
+        case RadioTech::RADIO_TECHNOLOGY_NR:
+            phoneType = PhoneType::PHONE_TYPE_IS_GSM;
+            break;
+        case RadioTech::RADIO_TECHNOLOGY_1XRTT:
+        case RadioTech::RADIO_TECHNOLOGY_EVDO:
+        case RadioTech::RADIO_TECHNOLOGY_EHRPD:
+            phoneType = PhoneType::PHONE_TYPE_IS_CDMA;
+            break;
+        case RadioTech::RADIO_TECHNOLOGY_UNKNOWN:
+        default:
+            phoneType = PhoneType::PHONE_TYPE_IS_NONE;
+            break;
+    }
+    return phoneType;
 }
 } // namespace Telephony
 } // namespace OHOS

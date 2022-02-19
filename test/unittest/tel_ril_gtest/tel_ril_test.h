@@ -102,10 +102,7 @@ enum class DiffInterfaceId {
     TEST_GET_IMEI,
     TEST_GET_MEID,
     TEST_GET_IMS_REG_STATUS,
-    TEST_GET_PS_ATTACH_STATUS,
-    TEST_SET_PS_ATTACH_STATUS,
     TEST_GET_RADIO_CAPABILITY,
-    TEST_SET_RADIO_CAPABILITY,
     TEST_GET_VOICE_RADIO_INFO,
     TEST_GET_PHYSICAL_CHANNEL_CONFIG,
     TEST_SET_LOCATE_UPDATES,
@@ -197,7 +194,6 @@ private:
     void NetworkVoiceRegistrationStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void NetworkDataRegistrationStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetRadioCapabilityTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void SetRadioCapabilityTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetCallForwardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetCallForwardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void NetworkOperatorTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -236,8 +232,6 @@ private:
     void GetImeiTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetMeidTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetImsRegStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void GetPsAttachStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void SetPsAttachStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetVoiceRadioTechnologyTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetPhysicalChannelConfigTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetLocateUpdatesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);

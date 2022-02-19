@@ -140,14 +140,15 @@ int32_t TelRilData::ActivatePdpContext(int32_t radioTechnology, DataProfile data
 
 int32_t TelRilData::ActivatePdpContextResponse(MessageParcel &data)
 {
-    std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
-    setupDataCallResultInfo->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("ERROR : spBuffer is nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
+    setupDataCallResultInfo->ReadFromParcel(data);
+
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
@@ -202,18 +203,19 @@ int32_t TelRilData::GetPdpContextListResponse(MessageParcel &data)
     std::shared_ptr<TelRilRequest> telRilRequest;
     std::shared_ptr<DataCallResultList> dataCallResultList;
 
-    dataCallResultList = std::make_shared<DataCallResultList>();
-    if (dataCallResultList == nullptr) {
-        TELEPHONY_LOGE("dataCallResultList is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    dataCallResultList->ReadFromParcel(data);
     readSpSize = sizeof(struct HRilRadioResponseInfo);
     spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("ERROR : spBuffer is nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    dataCallResultList = std::make_shared<DataCallResultList>();
+    if (dataCallResultList == nullptr) {
+        TELEPHONY_LOGE("dataCallResultList is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    dataCallResultList->ReadFromParcel(data);
+
     radioResponseInfo = reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     if (radioResponseInfo == nullptr) {
         TELEPHONY_LOGE("ERROR : radioResponseInfo is nullptr !!!");
@@ -306,19 +308,18 @@ int32_t TelRilData::GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::In
 
 int32_t TelRilData::GetLinkBandwidthInfoResponse(MessageParcel &data)
 {
-    std::shared_ptr<DataLinkBandwidthInfo> dataLinkBandwidthInfo = std::make_shared<DataLinkBandwidthInfo>();
-    if (dataLinkBandwidthInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : dataLinkBandwidthInfo == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    dataLinkBandwidthInfo->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("ERROR : spBuffer is nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<DataLinkBandwidthInfo> dataLinkBandwidthInfo = std::make_shared<DataLinkBandwidthInfo>();
+    if (dataLinkBandwidthInfo == nullptr) {
+        TELEPHONY_LOGE("ERROR : dataLinkBandwidthInfo == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    dataLinkBandwidthInfo->ReadFromParcel(data);
 
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);

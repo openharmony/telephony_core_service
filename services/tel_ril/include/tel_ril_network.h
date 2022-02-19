@@ -28,8 +28,6 @@ public:
 
     // send  command
     int32_t GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t SetRadioCapability(
-        RadioCapabilityInfo &radioCapabilityInfo, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetImsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetSignalStrength(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
@@ -41,8 +39,6 @@ public:
         int32_t automaticFlag, std::string oper, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetPreferredNetwork(int32_t preferredNetworkType, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t SetPsAttachStatus(int32_t psAttachStatus, const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t GetPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetCellInfoList(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response);
@@ -82,9 +78,6 @@ public:
     int32_t SetNetworkSelectionModeResponse(MessageParcel &data);
     int32_t SetPreferredNetworkResponse(MessageParcel &data);
     int32_t GetPreferredNetworkResponse(MessageParcel &data);
-    int32_t SetPsAttachStatusResponse(MessageParcel &data);
-    int32_t GetPsAttachStatusResponse(MessageParcel &data);
-    int32_t SetRadioCapabilityResponse(MessageParcel &data);
     int32_t GetPhysicalChannelConfigResponse(MessageParcel &data);
     int32_t SetLocateUpdatesResponse(MessageParcel &data);
 

@@ -51,10 +51,6 @@ int32_t INetworkSearchCallbackStub::OnNetworkSearchCallback(NetworkSearchCallbac
             OnSetPreferredNetworkCallback(data);
             break;
         }
-        case INetworkSearchCallback::NetworkSearchCallback::SET_PS_ATTACH_STATUS_RESULT: {
-            OnSetPsAttachStatusCallback(data);
-            break;
-        }
         default: {
             return DEFAULT_ERROR;
         }
@@ -111,13 +107,6 @@ void INetworkSearchCallbackStub::OnGetPreferredNetworkCallback(MessageParcel &da
     OnGetPreferredNetworkCallback(networkMode, error);
 }
 
-void INetworkSearchCallbackStub::OnSetPsAttachStatusCallback(MessageParcel &data)
-{
-    bool result = data.ReadBool();
-    int32_t error = data.ReadInt32();
-    OnSetPsAttachStatusCallback(result, error);
-}
-
 void INetworkSearchCallbackStub::OnGetNetworkSearchInformation(
     const sptr<NetworkSearchResult> &networkSearchResult, const int32_t errorCode)
 {}
@@ -139,9 +128,6 @@ int INetworkSearchCallbackStub::OnRemoteRequest(
 void INetworkSearchCallbackStub::OnSetPreferredNetworkCallback(const bool result, const int32_t errorCode) {}
 
 void INetworkSearchCallbackStub::OnGetPreferredNetworkCallback(const int32_t networkMode, const int32_t errorCode)
-{}
-
-void INetworkSearchCallbackStub::OnSetPsAttachStatusCallback(const int32_t psAttachStatus, const int32_t errorCode)
 {}
 } // namespace Telephony
 } // namespace OHOS

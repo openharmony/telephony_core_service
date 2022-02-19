@@ -674,11 +674,6 @@ bool NetworkSearchManager::GetImsRegStatus(int32_t slotId)
     return false;
 }
 
-bool NetworkSearchManager::SetPsAttachStatus(int32_t slotId, int32_t psAttachStatus, NSCALLBACK &callback)
-{
-    return eventSender_->SendCallbackEx(slotId, RadioEvent::RADIO_SET_PS_ATTACH_STATUS, &callback, psAttachStatus);
-}
-
 void NetworkSearchManager::SetImei(int32_t slotId, std::u16string imei)
 {
     auto inner = FindManagerInner(slotId);
@@ -764,6 +759,22 @@ std::u16string NetworkSearchManager::GetMeid(int32_t slotId)
     return std::u16string();
 }
 
+void NetworkSearchManager::SetLocateUpdate(int32_t slotId)
+{
+    TELEPHONY_LOGI("NetworkSearchManager::SetLocateUpdate start slotId:%{public}d", slotId);
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        TELEPHONY_LOGI("NetworkSearchManager::SetLocateUpdate inner null slotId:%{public}d", slotId);
+        return;
+    }
+
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SET_LOCATION_UPDATE);
+    if (event != nullptr && inner->networkSearchHandler_ != nullptr) {
+        event->SetOwner(inner->networkSearchHandler_);
+        telRilManager_->SetLocateUpdates(slotId, HRilRegNotifyMode::REG_NOTIFY_STAT_LAC_CELLID, event);
+    }
+}
+
 std::u16string NetworkSearchManager::GetUniqueDeviceId(int32_t slotId)
 {
     TELEPHONY_LOGI("NetworkSearchManager::GetUniqueDeviceId start slotId:%{public}d", slotId);
@@ -796,6 +807,7 @@ PhoneType NetworkSearchManager::GetPhoneType(int32_t slotId)
 void NetworkSearchManager::GetVoiceTech(int32_t slotId)
 {
     eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_VOICE_TECH);
+    eventSender_->SendBase(slotId, RadioEvent::RADIO_OPERATOR);
 }
 
 bool NetworkSearchManager::IsNrSupported(int32_t slotId)
@@ -816,11 +828,6 @@ int32_t NetworkSearchManager::GetRadioCapability(int32_t slotId)
         return inner->radioCapability_.ratFamily;
     }
     return false;
-}
-
-bool NetworkSearchManager::SetRadioCapability(int32_t slotId, RadioCapabilityInfo &radioCapability)
-{
-    return eventSender_->SendBase(slotId, RadioEvent::RADIO_SET_RADIO_CAPABILITY, radioCapability);
 }
 
 NrMode NetworkSearchManager::GetNrOptionMode(int32_t slotId)
@@ -939,7 +946,7 @@ void NetworkSearchManager::TriggerTimezoneRefresh(int32_t slotId)
             inner->networkSearchHandler_->TimezoneRefresh();
         }
     }
-    TELEPHONY_LOGE("NetworkSearchManager::TriggerTimezoneRefresh Failed slotId:%{public}d", slotId);
+    TELEPHONY_LOGE("NetworkSearchManager::TriggerTimezoneRefresh slotId:%{public}d", slotId);
 }
 } // namespace Telephony
 } // namespace OHOS

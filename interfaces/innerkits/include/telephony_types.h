@@ -19,8 +19,32 @@
 #include <string>
 #include <vector>
 
+#include "parameter.h"
+
 namespace OHOS {
 namespace Telephony {
+#define SIM_SLOT_COUNT GetMaxSlotCount<int32_t>()
+inline const int32_t SYSPARA_SIZE = 128;
+inline const int32_t DEFAULT_SIM_SLOT_ID = 0;
+inline const std::string DEFAULT_SLOT_COUNT = "1";
+inline const std::string TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
+
+template<typename T>
+inline T GetMaxSlotCount()
+{
+    char simSlotCount[SYSPARA_SIZE] = {0};
+    GetParameter(TEL_SIM_SLOT_COUNT.c_str(), DEFAULT_SLOT_COUNT.c_str(), simSlotCount, SYSPARA_SIZE);
+    T slotCount = std::atoi(simSlotCount);
+    return slotCount;
+}
+
+enum SimSlotId {
+    SIM_SLOT_0 = 0,
+    SIM_SLOT_1,
+    SIM_SLOT_2,
+    SIM_SLOT_3,
+};
+
 enum ModemPowerState {
     CORE_SERVICE_POWER_NOT_AVAILABLE = -1,
     CORE_SERVICE_POWER_OFF = 0,

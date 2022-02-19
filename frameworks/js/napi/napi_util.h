@@ -41,8 +41,7 @@ public:
     static void SetPropertyBoolean(napi_env env, napi_value object, std::string name, bool value);
     static napi_value ToInt32Value(napi_env env, int value);
     static bool HasNamedProperty(napi_env env, napi_value object, std::string propertyName);
-    static bool HasNamedTypeProperty(
-        napi_env env, napi_value object, napi_valuetype type, std::string propertyName);
+    static bool HasNamedTypeProperty(napi_env env, napi_value object, napi_valuetype type, std::string propertyName);
     static bool MatchObjectProperty(
         napi_env env, napi_value object, std::initializer_list<std::pair<std::string, napi_valuetype>> pairList);
     static bool MatchOptionPropertyType(
@@ -53,6 +52,8 @@ public:
         napi_async_execute_callback execute, napi_async_complete_callback complete);
     static void Handle1ValueCallback(napi_env env, BaseContext *context, napi_value callbackValue);
     static void Handle2ValueCallback(napi_env env, BaseContext *context, napi_value callbackValue);
+    static void DefineEnumClassByName(napi_env env, napi_value exports, std::string_view enumName,
+        size_t arrSize, const napi_property_descriptor *desc);
 };
 } // namespace Telephony
 } // namespace OHOS
