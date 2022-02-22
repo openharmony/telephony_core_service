@@ -34,9 +34,6 @@ public:
     static bool NumberConvertToBCD(const std::string &number, std::vector<uint8_t> &bcdCodes,
         const bool includeLen = false, const int bcdExtType = BCD_TYPE_ADN);
 
-    static std::shared_ptr<unsigned char> NumberConvertToBCD(
-        const std::string &number, int bcdExtType, int &bcdLength);
-
     static bool BCDConvertToString(const std::vector<uint8_t>::const_iterator &codeBeg,
         const std::vector<uint8_t>::const_iterator &codeEnd, std::string &number,
         const int bcdExtType = BCD_TYPE_ADN);

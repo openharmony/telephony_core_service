@@ -51,7 +51,7 @@ declare namespace radio {
    * @permission ohos.permission.GET_NETWORK_INFO
    */
   function getRadioTech(slotId: number,
-                        callback: AsyncCallback<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}>): void;
+    callback: AsyncCallback<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}>): void;
   function getRadioTech(slotId: number): Promise<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}>;
 
   /**
@@ -139,6 +139,7 @@ declare namespace radio {
    * supported by the device.
    * @param callback Returns the IMEI; returns an empty string if the IMEI does not exist.
    * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
    */
   function getIMEI(callback: AsyncCallback<string>): void;
   function getIMEI(slotId: number, callback: AsyncCallback<string>): void;
@@ -153,6 +154,7 @@ declare namespace radio {
    * supported by the device.
    * @param callback Returns the MEID; returns an empty string if the MEID does not exist.
    * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
    */
   function getMEID(callback: AsyncCallback<string>): void;
   function getMEID(slotId: number, callback: AsyncCallback<string>): void;
@@ -171,6 +173,7 @@ declare namespace radio {
    * supported by the device.
    * @param callback Returns the unique device ID; returns an empty string if the unique device ID does not exist.
    * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
    */
   function getUniqueDeviceId(callback: AsyncCallback<string>): void;
   function getUniqueDeviceId(slotId: number, callback: AsyncCallback<string>): void;
@@ -218,28 +221,35 @@ declare namespace radio {
    * @param slotId Indicates the card slot index number, ranging from 0 to the maximum card slot index number
    * supported by the device.
    * @return Returns {@code true} if the device supports 5G NR; returns {@code false} otherwise.
+   * @since 8
    */
   function isNrSupported(slotId: number): boolean;
 
   /**
+   * @param slotId Indicates the card slot index number,
    * @permission ohos.permission.GET_NETWORK_INFO
    */
   function isRadioOn(callback: AsyncCallback<boolean>): void;
-  function isRadioOn(): Promise<boolean>;
+  function isRadioOn(slotId: number, callback: AsyncCallback<boolean>): void
+  function isRadioOn(slotId?: number): Promise<boolean>;
 
   /**
+   * @param slotId Indicates the card slot index number,
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @systemapi Hide this for inner system use.
    */
   function turnOnRadio(callback: AsyncCallback<void>): void;
-  function turnOnRadio(): Promise<void>;
+  function turnOnRadio(slotId: number, callback: AsyncCallback<void>): void;
+  function turnOnRadio(slotId?: number): Promise<void>;
 
   /**
+   * @param slotId Indicates the card slot index number,
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @systemapi Hide this for inner system use.
    */
   function turnOffRadio(callback: AsyncCallback<void>): void;
-  function turnOffRadio(): Promise<void>;
+  function turnOffRadio(slotId: number, callback: AsyncCallback<void>): void;
+  function turnOffRadio(slotId?: number): Promise<void>;
 
   function getOperatorName(slotId: number, callback: AsyncCallback<string>): void;
   function getOperatorName(slotId: number): Promise<string>;
@@ -470,6 +480,7 @@ declare namespace radio {
      * Obtains the radio Access technology after config conversion.
      *
      * @return Returns the radio Access technology {@code RadioTechnology}.
+     * @since 8
      */
     cfgTech: RadioTechnology;
 
@@ -598,7 +609,7 @@ declare namespace radio {
     signalInformation: SignalInformation;
 
     data: CdmaCellInformation | GsmCellInformation | LteCellInformation | NrCellInformation | TdscdmaCellInformation
-        | WcdmaCellInformation;
+      | WcdmaCellInformation;
   }
 
   /**

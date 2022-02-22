@@ -37,6 +37,7 @@ ohos_unittest("tel_ril_gtest") {
   ]
 
   deps = [
+    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//base/telephony/core_service:tel_core_service",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
     "//third_party/googletest:gtest_main",

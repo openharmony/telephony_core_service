@@ -565,18 +565,6 @@ int32_t TelRilManager::GetOperatorInfo(int32_t slotId, const AppExecFwk::InnerEv
     return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetOperatorInfo);
 }
 
-int32_t TelRilManager::SetPsAttachStatus(
-    int32_t slotId, int32_t psAttachStatus, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    return TaskSchedule(
-        response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::SetPsAttachStatus, psAttachStatus);
-}
-
-int32_t TelRilManager::GetPsAttachStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetPsAttachStatus);
-}
-
 int32_t TelRilManager::GetNetworkSearchInformation(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(
@@ -619,13 +607,6 @@ int32_t TelRilManager::GetCurrentCellInfo(int32_t slotId, const AppExecFwk::Inne
 int32_t TelRilManager::GetRadioCapability(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetRadioCapability);
-}
-
-int32_t TelRilManager::SetRadioCapability(
-    int32_t slotId, RadioCapabilityInfo &radioCapabilityInfo, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    return TaskSchedule(
-        response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::SetRadioCapability, radioCapabilityInfo);
 }
 
 int32_t TelRilManager::GetPhysicalChannelConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)

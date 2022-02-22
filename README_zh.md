@@ -86,7 +86,6 @@
 | function getCardType(slotId: number, callback: AsyncCallback\<CardType>): void | 获取指定卡槽SIM卡的类型 | 无 |
 | function hasOperatorPrivileges(slotId: number, callback: AsyncCallback\<boolean>): void | 检查应用（调用者）是否已被授予运营商权限 | 无 |
 | function getMaxSimCount(): number | 获取设备上可同时使用的最大SIM卡数，即最大SIM卡槽数。 | 无 |
-| function getPrimarySlotId(callback: AsyncCallback\<number>): void | 获取默认主卡槽ID | 无 |
 
 完整的JS API说明以及实例代码请参考：[SIM卡管理](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/js-reference/apis/js-apis-sim.md)。
 

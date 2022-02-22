@@ -26,7 +26,7 @@ GetPreferredNetworkCallback::GetPreferredNetworkCallback(PreferredNetworkModeCon
 
 int32_t WrapNativeNetworkMode(int32_t nativeMode)
 {
-    TELEPHONY_LOGI("OnGetPreferredNetworkModelCallback11111 networkMode = %{public}d", nativeMode);
+    TELEPHONY_LOGI("OnGetPreferredNetworkModelCallback networkMode = %{public}d", nativeMode);
     if ((nativeMode >= PREFERRED_NETWORK_MODE_AUTO) &&
         (nativeMode <= PREFERRED_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA)) {
         return nativeMode;

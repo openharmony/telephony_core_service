@@ -46,12 +46,10 @@ const std::map<RadioEvent, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHan
     {RadioEvent::RADIO_GET_IMS_REG_STATUS, &NetworkSearchHandler::GetImsRegStatus},
     {RadioEvent::RADIO_GET_IMEI, &NetworkSearchHandler::RadioGetImei},
     {RadioEvent::RADIO_GET_MEID, &NetworkSearchHandler::RadioGetMeid},
-    {RadioEvent::RADIO_SET_PS_ATTACH_STATUS, &NetworkSearchHandler::SetPsAttachStatusResponse},
     {RadioEvent::RADIO_GET_NEIGHBORING_CELL_INFO, &NetworkSearchHandler::RadioGetNeighboringCellInfo},
     {RadioEvent::RADIO_GET_CURRENT_CELL_INFO, &NetworkSearchHandler::RadioGetCurrentCellInfo},
     {RadioEvent::RADIO_CURRENT_CELL_UPDATE, &NetworkSearchHandler::RadioCurrentCellInfoUpdate},
     {RadioEvent::RADIO_GET_RADIO_CAPABILITY, &NetworkSearchHandler::RadioGetRadioCapability},
-    {RadioEvent::RADIO_SET_RADIO_CAPABILITY, &NetworkSearchHandler::RadioSetRadioCapability},
     {RadioEvent::RADIO_CHANNEL_CONFIG_UPDATE, &NetworkSearchHandler::RadioChannelConfigInfo},
     {RadioEvent::RADIO_VOICE_TECH_CHANGED, &NetworkSearchHandler::RadioVoiceTechChange},
     {RadioEvent::RADIO_GET_VOICE_TECH, &NetworkSearchHandler::RadioVoiceTechChange}};
@@ -217,10 +215,8 @@ void NetworkSearchHandler::SimStateChange(const AppExecFwk::InnerEvent::Pointer 
 void NetworkSearchHandler::ImsiLoadedReady(const AppExecFwk::InnerEvent::Pointer &event)
 {
     SendUpdateCellLocationRequest();
-    GetRilSignalIntensity(true);
     InitGetNetworkSelectionMode();
     GetNetworkStateInfo(event);
-    InitPreferredNetwork();
 }
 
 void NetworkSearchHandler::SimRecordsLoaded(const AppExecFwk::InnerEvent::Pointer &)
@@ -258,7 +254,6 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
         }
         case CORE_SERVICE_POWER_ON: {
             SendUpdateCellLocationRequest();
-            GetRilSignalIntensity(false);
             InitGetNetworkSelectionMode();
             RadioOnState();
             break;
@@ -405,7 +400,7 @@ void NetworkSearchHandler::RadioOnState()
     if (networkSearchManager != nullptr) {
         networkSearchManager->InitMsgNum(slotId_);
     }
-
+    GetRilSignalIntensity(false);
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_GET_IMS_REG_STATUS);
     if (event != nullptr) {
         event->SetOwner(shared_from_this());
@@ -557,17 +552,6 @@ void NetworkSearchHandler::SetPreferredNetworkResponse(const AppExecFwk::InnerEv
     }
 }
 
-void NetworkSearchHandler::InitPreferredNetwork()
-{
-    auto networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("InitGetNetworkSelectionMode networkSearchManager is null slotId:%{public}d", slotId_);
-        return;
-    }
-    int32_t networkMode = networkSearchManager->GetPreferredNetworkValue(slotId_);
-    networkSearchManager->SetPreferredNetwork(slotId_, networkMode);
-}
-
 void NetworkSearchHandler::RadioNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (nitzUpdate_ != nullptr) {
@@ -664,15 +648,6 @@ void NetworkSearchHandler::ImsRegStateUpdate(const AppExecFwk::InnerEvent::Point
     networkSearchManager->NotifyImsRegStateChanged(slotId_);
 }
 
-void NetworkSearchHandler::SetPsAttachStatusResponse(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    if (networkRegister_ != nullptr) {
-        networkRegister_->ProcessPsAttachStatus(event);
-    } else {
-        TELEPHONY_LOGE("SetPsAttachStatusResponse networkRegister_ is null slotId:%{public}d", slotId_);
-    }
-}
-
 void NetworkSearchHandler::RadioGetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (cellInfo_ != nullptr) {
@@ -723,12 +698,7 @@ void NetworkSearchHandler::SendUpdateCellLocationRequest()
 {
     TELEPHONY_LOGI("NetworkSearchHandler::SendUpdateCellLocationRequest slotId:%{public}d", slotId_);
     std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
-    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SET_LOCATION_UPDATE);
-    if (event != nullptr && telRilManager != nullptr) {
-        event->SetOwner(shared_from_this());
-        telRilManager->SetLocateUpdates(slotId_, HRilRegNotifyMode::REG_NOTIFY_STAT_LAC_CELLID, event);
-    }
-    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_GET_CURRENT_CELL_INFO);
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_GET_CURRENT_CELL_INFO);
     if (event != nullptr && telRilManager != nullptr) {
         event->SetOwner(shared_from_this());
         telRilManager->GetCurrentCellInfo(slotId_, event);
@@ -750,15 +720,6 @@ PhoneType NetworkSearchHandler::GetPhoneType()
         return radioInfo_->GetPhoneType();
     }
     return PhoneType::PHONE_TYPE_IS_NONE;
-}
-
-void NetworkSearchHandler::RadioSetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    if (radioInfo_ != nullptr) {
-        radioInfo_->ProcessSetRadioCapability(event);
-    } else {
-        TELEPHONY_LOGE("RadioSetRadioCapability radioInfo_ is null slotId:%{public}d", slotId_);
-    }
 }
 
 void NetworkSearchHandler::RadioGetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event)

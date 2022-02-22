@@ -11,10 +11,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#declare build args
-
-if (!defined(defines)) {
-  defines = []
-}
-
-defines += [ "CELLULAR_SUPPORT = true" ]
+const.telephony.slotCount=1

@@ -38,19 +38,18 @@ ohos_executable("tel_network_search_test") {
 
   deps = [
     "//base/miscservices/time/services:time_service",
+    "//base/notification/ans_standard/frameworks/wantagent:wantagent_innerkits",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:dummy_classes",
     "//foundation/aafwk/standard/interfaces/innerkits/want:want",
     "//foundation/appexecfwk/standard/common:libappexecfwk_common",
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base:appexecfwk_base",
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core:appexecfwk_core",
-    "//foundation/appexecfwk/standard/kits:appkit_native",
     "//foundation/appexecfwk/standard/services/bundlemgr:libbms",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "ability_runtime:wantagent_innerkits",
     "ces_standard:cesfwk_innerkits",
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",
