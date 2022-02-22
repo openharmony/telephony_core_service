@@ -15,6 +15,8 @@
 
 #include "sim_file.h"
 
+#include <unistd.h>
+
 #include "radio_event.h"
 
 using namespace std;
@@ -167,11 +169,12 @@ void SimFile::OnAllFilesFetched()
 bool SimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("SimFile::SIM_STATE_READY received");
-    if (stateManager_->GetCardType() != CardType::SINGLE_MODE_USIM_CARD) {
-        TELEPHONY_LOGI("invalid SimFile::SIM_STATE_READY received");
-        return false;
+    CardType cardType = stateManager_->GetCardType();
+    if (cardType == CardType::SINGLE_MODE_USIM_CARD || cardType == CardType::SINGLE_MODE_SIM_CARD) {
+        LoadSimFiles();
+    } else {
+        TELEPHONY_LOGI("invalid SimFile::SIM_STATE_READY received %{public}d", cardType);
     }
-    LoadSimFiles();
     return false;
 }
 
@@ -351,7 +354,7 @@ std::string SimFile::ParseSpn(const std::string &rawData, int spnStatus)
         offset = 0;
         length -= INVALID_BYTES_NUM;
         bytesNew = std::shared_ptr<unsigned char>(bytesRaw.get() + INVALID_BYTES_NUM,
-                                                  [bytesRaw](unsigned char *) {}); // first is 0, +1
+            [bytesRaw](unsigned char *) {}); // first is 0, +1
     } else if ((spnStatus == OBTAIN_OPERATOR_NAMESTRING) || (spnStatus == OBTAIN_OPERATOR_NAME_SHORTFORM)) {
         offset = 0;
         bytesNew = bytesRaw;

@@ -21,16 +21,22 @@
 namespace OHOS {
 namespace Telephony {
 namespace Permission {
-static const std::string GET_NETWORK_INFO = "ohos.permission.GET_NETWORK_INFO";
-static const std::string GET_SIM_STATE = "ohos.permission.GET_SIM_STATE";
+static const std::string PLACE_CALL = "ohos.permission.PLACE_CALL";
+static const std::string ANSWER_CALL = "ohos.permission.ANSWER_CALL";
+static const std::string WRITE_CALL_LOG = "ohos.permission.WRITE_CALL_LOG";
+static const std::string READ_CALL_LOG = "ohos.permission.READ_CALL_LOG";
+static const std::string WRITE_CALENDAR = "ohos.permission.WRITE_CALENDAR";
+static const std::string READ_CELL_MESSAGES = "ohos.permission.READ_CELL_MESSAGES";
+static const std::string WRITE_CONTACTS = "ohos.permission.WRITE_CONTACTS";
+static const std::string READ_CONTACTS = "ohos.permission.READ_CONTACTS";
 static const std::string SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
 static const std::string GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHONY_STATE";
-static const std::string TELEPHONY_SEND_MESSAGES = "ohos.permission.SEND_MESSAGES";
-static const std::string TELEPHONY_RECEIVE_MESSAGES = "ohos.permission.RECEIVE_SMS";
-static const std::string GET_SIM_INFO = "ohos.permission.GET_SIM_INFO";
-static const std::string SET_SIM_INFO = "ohos.permission.SET_SIM_INFO";
-static const std::string GET_CALL_HISTORY = "ohos.permission.GET_CALL_HISTORY";
-static const std::string GET_CALL_STATE = "ohos.permission.GET_CALL_STATE";
+static const std::string SET_NETWORK_INFO = "ohos.permission.SET_NETWORK_INFO";
+static const std::string GET_NETWORK_INFO = "ohos.permission.GET_NETWORK_INFO";
+static const std::string CELL_LOCATION = "ohos.permission.LOCATION";
+static const std::string READ_MESSAGES = "ohos.permission.READ_MESSAGES";
+static const std::string SEND_MESSAGES = "ohos.permission.SEND_MESSAGES";
+static const std::string RECEIVE_MESSAGES = "ohos.permission.RECEIVE_SMS";
 } // namespace Permission
 
 class TelephonyPermission {

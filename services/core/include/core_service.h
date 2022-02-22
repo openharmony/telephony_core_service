@@ -97,9 +97,6 @@ public:
 
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) override;
 
-    bool SetPsAttachStatus(
-        int32_t slotId, int32_t psAttachStatus, const sptr<INetworkSearchCallback> &callback) override;
-
     bool UnlockPin(int32_t slotId, std::u16string pin, LockStatusResponse &response) override;
 
     bool UnlockPuk(int32_t slotId, std::u16string newPin, std::u16string puk, LockStatusResponse &response) override;

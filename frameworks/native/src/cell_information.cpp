@@ -14,7 +14,9 @@
  */
 
 #include "cell_information.h"
+
 #include <ctime>
+#include <securec.h>
 
 namespace OHOS {
 namespace Telephony {
@@ -28,9 +30,9 @@ void CellInformation::Init(int32_t mcc, int32_t mnc, int32_t cellId)
         mnc = mnc & MNC_VALID_BIT;
         char mnc_str[MNC_DIGIT_OFFSET] = {0};
         char strFormat[MNC_DIGIT_OFFSET] = {0};
-        int size = snprintf(strFormat, sizeof(strFormat), "%s%dd", "%0", mnc_digit);
+        int size = snprintf_s(strFormat, MNC_DIGIT_OFFSET, MNC_DIGIT_OFFSET - 1, "%s%dd", "%0", mnc_digit);
         if (size > 0) {
-            size = snprintf(mnc_str, mnc_digit + 1, strFormat, mnc);
+            size = snprintf_s(mnc_str, mnc_digit + 1, mnc_digit, strFormat, mnc);
         }
         if (size > 0) {
             mnc_ = mnc_str;

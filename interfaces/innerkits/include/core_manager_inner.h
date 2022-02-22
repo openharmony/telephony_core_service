@@ -56,8 +56,6 @@ public:
     int32_t ShutDown(int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t GetRadioCapability(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t SetRadioCapability(int32_t slotId, int32_t eventId, RadioCapabilityInfo &radioCapabilityInfo,
-        const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t Dial(int32_t slotId, int32_t eventId, std::string address, int clirMode,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t Reject(int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -216,7 +214,6 @@ public:
     sptr<CellLocation> GetCellLocation(int32_t slotId);
     bool GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
-    bool SetPsAttachStatus(int32_t slotId, int32_t psAttachStatus, const sptr<INetworkSearchCallback> &callback);
     bool GetImsRegStatus(int32_t slotId) const;
     std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId);
     bool SendUpdateCellLocationRequest(int32_t slotId);

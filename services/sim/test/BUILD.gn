@@ -57,6 +57,7 @@ ohos_executable("tel_sim_test") {
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
+    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//base/telephony/core_service:tel_core_service",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
