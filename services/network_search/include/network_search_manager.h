@@ -59,7 +59,6 @@ struct NetworkSearchManagerInner {
     NrMode nrMode_ = NrMode::NR_MODE_UNKNOWN;
     FrequencyType freqType_ = FrequencyType::FREQ_TYPE_UNKNOWN;
     RadioCapabilityInfo radioCapability_;
-    std::mutex mutex_;
 
     bool Init()
     {

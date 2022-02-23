@@ -834,7 +834,6 @@ NrMode NetworkSearchManager::GetNrOptionMode(int32_t slotId)
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
-        std::lock_guard<std::mutex> lock(inner->mutex_);
         return inner->nrMode_;
     }
     return NrMode::NR_MODE_UNKNOWN;
@@ -844,7 +843,6 @@ void NetworkSearchManager::SetNrOptionMode(int32_t slotId, NrMode mode)
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
-        std::lock_guard<std::mutex> lock(inner->mutex_);
         inner->nrMode_ = mode;
     }
 }
@@ -853,7 +851,6 @@ void NetworkSearchManager::SetFrequencyType(int32_t slotId, FrequencyType type)
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
-        std::lock_guard<std::mutex> lock(inner->mutex_);
         inner->freqType_ = type;
     }
 }
@@ -862,7 +859,6 @@ FrequencyType NetworkSearchManager::GetFrequencyType(int32_t slotId)
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
-        std::lock_guard<std::mutex> lock(inner->mutex_);
         return inner->freqType_;
     }
     return FrequencyType::FREQ_TYPE_UNKNOWN;

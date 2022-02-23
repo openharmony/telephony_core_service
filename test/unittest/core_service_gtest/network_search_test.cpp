@@ -365,8 +365,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0200
     }
 }
 /**
- * @tc.number   Telephony_NetworkSearch_GetRadioState_0100
- * @tc.name     Get Radio State Off
+ * @tc.number   Telephony_NetworkSearch_SetRadioState_0100
+ * @tc.name     Set Radio State Off
  * @tc.desc     Function test
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0100, Function | MediumTest | Level3)
@@ -401,7 +401,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0100, Function
 }
 
 /**
- * @tc.number   Telephony_NetworkSearch_SetRadioState_0100
+ * @tc.number   Telephony_NetworkSearch_SetRadioState_0200
  * @tc.name     Set Radio State On
  * @tc.desc     Function test
  */

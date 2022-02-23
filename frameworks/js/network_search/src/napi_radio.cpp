@@ -1004,7 +1004,7 @@ static napi_value TurnOnRadio(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchIsRadioOnParameter(env, parameters, parameterCount), "type mismatch");
-    auto asyncContext = std::make_unique<IsRadioOnContext>();
+    auto asyncContext = std::make_unique<SwitchRadioContext>();
     if (parameterCount == 0) {
         asyncContext->slotId = GetDefaultSlotId();
     } else if (parameterCount == 1) {
@@ -1062,7 +1062,7 @@ static napi_value TurnOffRadio(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchIsRadioOnParameter(env, parameters, parameterCount), "type mismatch");
-    auto asyncContext = std::make_unique<IsRadioOnContext>();
+    auto asyncContext = std::make_unique<SwitchRadioContext>();
     if (parameterCount == 0) {
         asyncContext->slotId = GetDefaultSlotId();
     } else if (parameterCount == 1) {
