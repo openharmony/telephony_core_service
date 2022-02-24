@@ -62,15 +62,12 @@ ohos_shared_library("tel_core_service_api") {
 
   public_configs = [ ":tel_core_service_api_config" ]
 
-  deps = [
-    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
-  ]
-
   external_deps = [
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "ril_adapter:hril_innerkits",
     "samgr_standard:samgr_proxy",
+    "startup_l2:syspara",
     "utils_base:utils",
   ]
 

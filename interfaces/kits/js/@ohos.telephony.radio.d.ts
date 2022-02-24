@@ -20,8 +20,8 @@ import {AsyncCallback} from "./basic";
  * and device ID of the wireless cellular network (WCN), and provides a callback registration mechanism to
  * listen for changes of the network, cell, and signal status of the WCN.
  *
- * @since 7
- * @sysCap SystemCapability.Telephony.CoreService
+ * @since 6
+ * @syscap SystemCapability.Telephony.CoreService
  */
 declare namespace radio {
   /**
@@ -72,6 +72,7 @@ declare namespace radio {
    * Proactively requests to update location information.
    *
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   function sendUpdateCellLocationRequest(callback: AsyncCallback<void>): void;
   function sendUpdateCellLocationRequest(): Promise<void>;
@@ -79,6 +80,7 @@ declare namespace radio {
   /**
    * @permission ohos.permission.LOCATION
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   function getCellInformation(callback: AsyncCallback<Array<CellInformation>>): void;
   function getCellInformation(slotId: number, callback: AsyncCallback<Array<CellInformation>>): void;
@@ -119,12 +121,14 @@ declare namespace radio {
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @param callback Returns the country code defined in ISO 3166-2;
    * returns an empty string if the device is not registered with any network.
+   * @since 7
    */
   function getISOCountryCodeForNetwork(slotId: number, callback: AsyncCallback<string>): void;
   function getISOCountryCodeForNetwork(slotId: number): Promise<string>;
 
   /**
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   function getNrOptionMode(callback: AsyncCallback<NrOptionMode>): void;
   function getNrOptionMode(slotId: number, callback: AsyncCallback<NrOptionMode>): void;
@@ -139,7 +143,7 @@ declare namespace radio {
    * supported by the device.
    * @param callback Returns the IMEI; returns an empty string if the IMEI does not exist.
    * @permission ohos.permission.GET_TELEPHONY_STATE
-   * @systemapi Hide this for inner system use.
+   * @since 8
    */
   function getIMEI(callback: AsyncCallback<string>): void;
   function getIMEI(slotId: number, callback: AsyncCallback<string>): void;
@@ -155,6 +159,7 @@ declare namespace radio {
    * @param callback Returns the MEID; returns an empty string if the MEID does not exist.
    * @permission ohos.permission.GET_TELEPHONY_STATE
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   function getMEID(callback: AsyncCallback<string>): void;
   function getMEID(slotId: number, callback: AsyncCallback<string>): void;
@@ -174,6 +179,7 @@ declare namespace radio {
    * @param callback Returns the unique device ID; returns an empty string if the unique device ID does not exist.
    * @permission ohos.permission.GET_TELEPHONY_STATE
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   function getUniqueDeviceId(callback: AsyncCallback<string>): void;
   function getUniqueDeviceId(slotId: number, callback: AsyncCallback<string>): void;
@@ -185,6 +191,7 @@ declare namespace radio {
    * <p>The primary card is the SIM card inserted in the card slot that uses data services by default.
    *
    * @param callback Returns the index number of the primary card slot.
+   * @since 7
    */
   function getPrimarySlotId(callback: AsyncCallback<number>): void;
   function getPrimarySlotId(): Promise<number>;
@@ -203,6 +210,7 @@ declare namespace radio {
    * @param slotId Indicates the card slot index number, ranging from 0 to the maximum card slot index number
    * supported by the device.
    * @param callback Returns the instance list of the child classes derived from {@link SignalInformation}.
+   * @since 7
    */
   function getSignalInformation(slotId: number, callback: AsyncCallback<Array<SignalInformation>>): void;
   function getSignalInformation(slotId: number): Promise<Array<SignalInformation>>;
@@ -212,6 +220,7 @@ declare namespace radio {
    *
    * @return Returns {@code true} if the device supports 5G NR; returns {@code false} otherwise.
    * @deprecated Advised to use isNrSupported(slotId: number) instead.
+   * @since 7
    */
   function isNrSupported(): boolean;
 
@@ -228,6 +237,7 @@ declare namespace radio {
   /**
    * @param slotId Indicates the card slot index number,
    * @permission ohos.permission.GET_NETWORK_INFO
+   * @since 7
    */
   function isRadioOn(callback: AsyncCallback<boolean>): void;
   function isRadioOn(slotId: number, callback: AsyncCallback<boolean>): void
@@ -237,6 +247,7 @@ declare namespace radio {
    * @param slotId Indicates the card slot index number,
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @systemapi Hide this for inner system use.
+   * @since 7
    */
   function turnOnRadio(callback: AsyncCallback<void>): void;
   function turnOnRadio(slotId: number, callback: AsyncCallback<void>): void;
@@ -246,17 +257,21 @@ declare namespace radio {
    * @param slotId Indicates the card slot index number,
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @systemapi Hide this for inner system use.
+   * @since 7
    */
   function turnOffRadio(callback: AsyncCallback<void>): void;
   function turnOffRadio(slotId: number, callback: AsyncCallback<void>): void;
   function turnOffRadio(slotId?: number): Promise<void>;
-
+  /**
+   * @since 7
+   */
   function getOperatorName(slotId: number, callback: AsyncCallback<string>): void;
   function getOperatorName(slotId: number): Promise<string>;
 
   /**
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   function setPreferredNetwork(slotId: number, networkMode: PreferredNetworkMode, callback: AsyncCallback<void>): void;
   function setPreferredNetwork(slotId: number, networkMode: PreferredNetworkMode): Promise<void>;
@@ -264,12 +279,14 @@ declare namespace radio {
   /**
    * @permission ohos.permission.GET_TELEPHONY_STATE
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   function getPreferredNetwork(slotId: number, callback: AsyncCallback<PreferredNetworkMode>): void;
   function getPreferredNetwork(slotId: number): Promise<PreferredNetworkMode>;
 
   /**
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   export enum PreferredNetworkMode {
     PREFERRED_NETWORK_MODE_AUTO = 0,
@@ -570,6 +587,7 @@ declare namespace radio {
 
   /**
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   export interface CellInformation {
     /**
@@ -578,7 +596,6 @@ declare namespace radio {
      * <p>An application can call this method to determine the network type that the child class uses.
      *
      * @return Returns the the network type of the serving cell.
-     * @version 5
      */
     networkType: NetworkType;
 
@@ -587,7 +604,6 @@ declare namespace radio {
      *
      * @return Returns {@code true} if the user equipment (UE) is camped on the cell; returns
      * {@code false} otherwise.
-     * @version 5
      */
     isCamped: boolean;
 
@@ -595,7 +611,6 @@ declare namespace radio {
      * Obtains the timestamp when the cell information is obtained.
      *
      * @return Returns a timestamp since boot, in nanoseconds.
-     * @version 5
      */
     timeStamp: number;
 
@@ -604,7 +619,6 @@ declare namespace radio {
      * Returned child class objects vary according to the network type.
      *
      * @return Returns child class objects specific to the network type.
-     * @version 5
      */
     signalInformation: SignalInformation;
 
@@ -614,6 +628,7 @@ declare namespace radio {
 
   /**
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   export interface CdmaCellInformation {
     baseId: number,
@@ -625,6 +640,7 @@ declare namespace radio {
 
   /**
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   export interface GsmCellInformation {
     lac: number;
@@ -637,6 +653,7 @@ declare namespace radio {
 
   /**
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   export interface LteCellInformation {
     cgi: number;
@@ -651,6 +668,7 @@ declare namespace radio {
 
   /**
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   export interface NrCellInformation {
     nrArfcn: number;
@@ -663,6 +681,7 @@ declare namespace radio {
 
   /**
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   export interface TdscdmaCellInformation {
     lac: number;
@@ -675,6 +694,7 @@ declare namespace radio {
 
   /**
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   export interface WcdmaCellInformation {
     lac: number;
@@ -687,6 +707,7 @@ declare namespace radio {
 
   /**
    * @systemapi Hide this for inner system use.
+   * @since 8
    */
   export enum NrOptionMode {
     /** Indicates unknown NR networking mode. */

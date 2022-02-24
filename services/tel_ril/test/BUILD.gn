@@ -40,7 +40,6 @@ ohos_executable("tel_ril_test") {
 
   deps = [
     "$hdf_uhdf_path/hdi:libhdi",
-    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//base/telephony/core_service:tel_core_service",
     "//utils/native/base:utils",
   ]
@@ -51,6 +50,7 @@ ohos_executable("tel_ril_test") {
     "ipc:ipc_core",
     "ril_adapter:hril_innerkits",
     "samgr_standard:samgr_proxy",
+    "startup_l2:syspara",
   ]
 
   if (is_standard_system) {
