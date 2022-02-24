@@ -887,7 +887,9 @@ void NetworkSearchManager::DcPhysicalLinkActiveUpdate(int32_t slotId, bool isAct
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
         if (inner->networkSearchHandler_ != nullptr) {
-            inner->networkSearchHandler_->DcPhysicalLinkActiveUpdate(isActive);
+            int active = isActive ? 1 : 0;
+            auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SET_DATA_CONNECT_ACTIVE, active);
+            inner->networkSearchHandler_->SendEvent(event);
         }
     }
 }
