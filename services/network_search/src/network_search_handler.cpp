@@ -52,7 +52,8 @@ const std::map<RadioEvent, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHan
     {RadioEvent::RADIO_GET_RADIO_CAPABILITY, &NetworkSearchHandler::RadioGetRadioCapability},
     {RadioEvent::RADIO_CHANNEL_CONFIG_UPDATE, &NetworkSearchHandler::RadioChannelConfigInfo},
     {RadioEvent::RADIO_VOICE_TECH_CHANGED, &NetworkSearchHandler::RadioVoiceTechChange},
-    {RadioEvent::RADIO_GET_VOICE_TECH, &NetworkSearchHandler::RadioVoiceTechChange}};
+    {RadioEvent::RADIO_GET_VOICE_TECH, &NetworkSearchHandler::RadioVoiceTechChange},
+    {RadioEvent::RADIO_SET_DATA_CONNECT_ACTIVE, &NetworkSearchHandler::DcPhysicalLinkActiveUpdate}};
 
 NetworkSearchHandler::NetworkSearchHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     const std::weak_ptr<NetworkSearchManager> &networkSearchManager,
@@ -739,12 +740,17 @@ void NetworkSearchHandler::RadioChannelConfigInfo(const AppExecFwk::InnerEvent::
     TELEPHONY_LOGI("NetworkSearchHandler::ProcessChannelConfigInfo slotId:%{public}d", slotId_);
 }
 
-void NetworkSearchHandler::DcPhysicalLinkActiveUpdate(bool isActive)
+void NetworkSearchHandler::DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        return;
+    }
+    bool isActive = (event->GetParam() == 1) ? true : false;
     if (networkRegister_ != nullptr) {
         networkRegister_->DcPhysicalLinkActiveUpdate(isActive);
     }
-    TELEPHONY_LOGI("NetworkSearchHandler::DcPhysicalLinkActiveUpdate slotId:%{public}d", slotId_);
+    TELEPHONY_LOGI("NetworkSearchHandler::DcPhysicalLinkActiveUpdate slotId:%{public}d active:%{public}s",
+        slotId_, isActive ? "true" : "false");
 }
 
 void NetworkSearchHandler::RadioVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event)

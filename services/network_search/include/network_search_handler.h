@@ -50,7 +50,7 @@ public:
     void RadioOffState() const;
     void UpdatePhone(RadioTech csRadioTech) const;
     void GetCellInfoList(std::vector<sptr<CellInformation>> &cells);
-    void DcPhysicalLinkActiveUpdate(bool isActive);
+    void DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void SendUpdateCellLocationRequest();
     PhoneType GetPhoneType();
 
