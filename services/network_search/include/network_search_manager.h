@@ -228,7 +228,7 @@ public:
 private:
     bool InitPointer(std::shared_ptr<NetworkSearchManagerInner> &inner, int32_t slotId);
     void ClearManagerInner();
-    void AddManagerInner(int32_t slotId, std::shared_ptr<NetworkSearchManagerInner> inner);
+    void AddManagerInner(int32_t slotId, const std::shared_ptr<NetworkSearchManagerInner> &inner);
     bool RemoveManagerInner(int32_t slotId);
 
 private:
