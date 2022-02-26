@@ -691,9 +691,8 @@ int32_t CoreServiceStub::OnSetLockState(MessageParcel &data, MessageParcel &repl
     options.password = data.ReadString16();
     LockStatusResponse response = {0};
     TELEPHONY_LOGI(
-        "CoreServiceStub::OnSetLockState(), pin = %{public}s, lockType = %{public}d, lockState = %{public}d, "
-        "slotId = %{public}d",
-        Str16ToStr8(options.password).c_str(), options.lockType, options.lockState, slotId);
+        "CoreServiceStub::OnSetLockState(), lockType = %{public}d, lockState = %{public}d, "
+        "slotId = %{public}d", options.lockType, options.lockState, slotId);
     bool result = SetLockState(slotId, options, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
@@ -1074,8 +1073,7 @@ int32_t CoreServiceStub::OnUnlockSimLock(MessageParcel &data, MessageParcel &rep
     lockInfo.password = data.ReadString16();
     LockStatusResponse response = {0};
 
-    TELEPHONY_LOGI("CoreServiceStub::OnUnlockSimLock(), password = %{public}s, lockType = %{public}d",
-        Str16ToStr8(lockInfo.password).c_str(), lockInfo.lockType);
+    TELEPHONY_LOGI("CoreServiceStub::OnUnlockSimLock(), lockType = %{public}d", lockInfo.lockType);
     bool result = UnlockSimLock(slotId, lockInfo, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
