@@ -1606,18 +1606,24 @@ void GetCellInformationCallback(napi_env env, napi_status status, void *data)
             napi_value info = nullptr;
             napi_create_object(env, &info);
             NapiUtil::SetPropertyBoolean(env, info, "isCamped", true);
-            NapiUtil::SetPropertyInt32(env, info, "timeStamp", infoItem->GetTimeStamp());
-            CellInformation::CellType cellType = infoItem->GetNetworkType();
+            
+            uint64_t timeStamp = 0;
+            int32_t signalLevel = 0;
+            CellInformation::CellType cellType = CellInformation::CellType::CELL_TYPE_NONE;
+            if (infoItem != nullptr) {
+                timeStamp = infoItem->GetTimeStamp();
+                signalLevel = infoItem->GetSignalLevel();
+                cellType = infoItem->GetNetworkType();
+            }
+            NapiUtil::SetPropertyInt32(env, info, "timeStamp", timeStamp);
             NapiUtil::SetPropertyInt32(env, info, "networkType", WrapCellInformationType(infoItem));
+            
             napi_value signalInformation = nullptr;
             napi_create_object(env, &signalInformation);
             int32_t signalType = WrapCellInformationType(infoItem);
             NapiUtil::SetPropertyInt32(env, signalInformation, "signalType", signalType);
-            int32_t signalLevel = 0;
-            if (infoItem != nullptr) {
-                signalLevel = infoItem->GetSignalLevel();
-            }
             NapiUtil::SetPropertyInt32(env, signalInformation, "signalLevel", signalLevel);
+            
             std::string name = "signalInformation";
             napi_set_named_property(env, info, name.c_str(), signalInformation);
             napi_set_named_property(env, info, "data", JudgmentData(env, infoItem, cellType));
