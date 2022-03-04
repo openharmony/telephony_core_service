@@ -65,8 +65,9 @@ ohos_shared_library("libtel_common") {
 
   external_deps += [
     "ability_base:want",
+    "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_core",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "permission_standard:libpermissionsdk_standard",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",

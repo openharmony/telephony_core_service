@@ -42,7 +42,6 @@ static const std::string RECEIVE_MESSAGES = "ohos.permission.RECEIVE_SMS";
 class TelephonyPermission {
 public:
     static bool CheckPermission(const std::string &permissionName);
-    static bool CheckPermission(const std::string &bundleName, const std::string &permissionName);
     static bool GetBundleNameByUid(int32_t uid, std::string &bundleName);
 };
 } // namespace Telephony
