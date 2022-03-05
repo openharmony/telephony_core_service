@@ -152,23 +152,23 @@ void SignalInfo::GetSignalInfoList(std::vector<sptr<SignalInformation>> &signals
     bool tdScdmaValid = cur_.tdScdma.ValidateTdScdmaValue();
     bool nrValid = cur_.nr.ValidateNrValue();
 
-    if (gsmValid) {
-        signals.emplace_back(cur_.gsm.NewInstance());
+    if (lteValid) {
+        signals.emplace_back(cur_.lte.NewInstance());
+    }
+    if (nrValid) {
+        signals.emplace_back(cur_.nr.NewInstance());
     }
     if (cdmaValid) {
         signals.emplace_back(cur_.cdma.NewInstance());
     }
-    if (lteValid) {
-        signals.emplace_back(cur_.lte.NewInstance());
+    if (tdScdmaValid) {
+        signals.emplace_back(cur_.tdScdma.NewInstance());
     }
     if (wcdmaValid) {
         signals.emplace_back(cur_.wcdma.NewInstance());
     }
-    if (tdScdmaValid) {
-        signals.emplace_back(cur_.tdScdma.NewInstance());
-    }
-    if (nrValid) {
-        signals.emplace_back(cur_.nr.NewInstance());
+    if (gsmValid) {
+        signals.emplace_back(cur_.gsm.NewInstance());
     }
 }
 } // namespace Telephony
