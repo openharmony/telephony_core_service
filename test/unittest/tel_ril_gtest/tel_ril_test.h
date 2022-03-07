@@ -137,6 +137,7 @@ public:
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
         void ProcessResponseInfo(const AppExecFwk::InnerEvent::Pointer &event);
         bool GetBoolResult(int32_t eventId);
+        void Clean();
 
     private:
         std::mutex callbackMutex_;
@@ -241,7 +242,7 @@ private:
     void GetMuteTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetEmergencyCallListTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
-    int32_t GetRandNum();
+    uint32_t GetRandNum();
     std::string GetRandPhoneNum(const int len);
     bool WaitGetResult(int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t timeOut);
 
@@ -251,8 +252,8 @@ private:
     using RilManagerAndResponseTestFun = void (TelRilTest::*)(
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     std::map<DiffInterfaceId, RilManagerAndResponseTestFun> memberFuncMap_;
-    constexpr static const int32_t WAIT_TIME_SECOND = 10;
-    constexpr static const int32_t WAIT_TIME_SECOND_LONG = 60;
+    constexpr static const int32_t WAIT_TIME_SECOND = 3;
+    constexpr static const int32_t WAIT_TIME_SECOND_LONG = 30;
 };
 } // namespace Telephony
 } // namespace OHOS
