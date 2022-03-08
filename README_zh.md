@@ -91,28 +91,31 @@
 
 ### 搜网服务对外提供的接口<a name="section198mcpsimp"></a>
 
-| 接口名称                                                     | 接口描述                   | 所需权限                            |
-| ------------------------------------------------------------ | -------------------------- | ----------------------------------- |
-| function getRadioTech(slotId: number, callback: AsyncCallback\<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}>): void; | 获取指定卡槽的当前接入技术 | ohos.permission.GET_NETWORK_INFO    |
-| function getSignalInformation(slotId: number, callback: AsyncCallback\<Array\<SignalInformation>>): void; | 获取指定卡槽的信号列表     | 无                                  |
-| function getNetworkState(slotId: number, callback: AsyncCallback\<NetworkState>): void; | 获取指定卡槽的网络状态     | ohos.permission.GET_NETWORK_INFO    |
-| function getISOCountryCodeForNetwork(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽的网络国家码   | 无                                  |
-| function getNetworkSearchInformation(slotId: number, callback: AsyncCallback\<NetworkSearchResult>): void; | 获取指定卡槽的手动搜网结果 | ohos.permission.GET_TELEPHONY_STATE |
-| function getNetworkSelectionMode(slotId: number, callback: AsyncCallback\<NetworkSelectionMode>): void; | 获取指定卡槽的选网模式     | 无                                  |
-| function setNetworkSelectionMode(options: NetworkSelectionModeOptions, callback: AsyncCallback\<void>): void; | 设置指定卡槽的选网模式     | ohos.permission.SET_TELEPHONY_STATE |
-| function isRadioOn(callback: AsyncCallback\<boolean>): void; | 判断Radio是否打开          | ohos.permission.GET_NETWORK_INFO    |
-| function turnOnRadio(callback: AsyncCallback\<void>): void;  | 开启Radio                  | ohos.permission.SET_TELEPHONY_STATE |
-| function turnOffRadio(callback: AsyncCallback\<void>): void; | 关闭Radio                  | ohos.permission.SET_TELEPHONY_STATE |
-| function getOperatorName(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽的运营商名称   | 无                                  |
-| function setPreferredNetwork(slotId: number, networkMode: PreferredNetworkMode, callback: AsyncCallback\<void>): void; | 设置指定卡槽的优选网络模式 | 无                                  |
-| function getPreferredNetwork(slotId: number, callback: AsyncCallback\<PreferredNetworkMode>): void; | 获取指定卡槽的优选网络模式 | 无                                  |
-| function getCellInformation(slotId: number, callback: AsyncCallback<Array\<CellInformation>>) | 获取小区信息列表           | ohos.permission.LOCATION            |
-| function sendUpdateCellLocationRequest(callback: AsyncCallback\<void>) | 请求小区位置               | ohos.permission.LOCATION            |
-| function getIMEI(slotId: number, callback: AsyncCallback\<string>) | 获取Imei                   | ohos.permission.GET_TELEPHONY_STATE |
-| function getMeId(slotId: number, callback: AsyncCallback\<string>） | 获取Meid                   | ohos.permission.GET_TELEPHONY_STATE |
-| function getUniqueDeviceId(slotId: number, callback: AsyncCallback\<string>） | 获取设备唯一标识码         | ohos.permission.GET_TELEPHONY_STATE |
-| function getNrOptionMode(slotId: number, callback: AsyncCallback\<NrOptionMode>） | 获取5G模式                 | ohos.permission.GET_TELEPHONY_STATE |
-| function isNrSupported: boolean;                             | 是否支持5g网络             | 无                                  |
+| 接口名称                                                     | 接口描述                      | 所需权限                            |
+| ------------------------------------------------------------ | ----------------------------- | ----------------------------------- |
+| function getRadioTech(slotId: number, callback: AsyncCallback\<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}>): void; | 获取指定卡槽的当前接入技术    | ohos.permission.GET_NETWORK_INFO    |
+| function getSignalInformation(slotId: number, callback: AsyncCallback\<Array\<SignalInformation>>): void; | 获取指定卡槽的信号列表        | 无                                  |
+| function getNetworkState(slotId: number, callback: AsyncCallback\<NetworkState>): void; | 获取指定卡槽的网络状态        | ohos.permission.GET_NETWORK_INFO    |
+| function getISOCountryCodeForNetwork(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽的网络国家码      | 无                                  |
+| function getNetworkSearchInformation(slotId: number, callback: AsyncCallback\<NetworkSearchResult>): void; | 获取指定卡槽的手动搜网结果    | ohos.permission.GET_TELEPHONY_STATE |
+| function getNetworkSelectionMode(slotId: number, callback: AsyncCallback\<NetworkSelectionMode>): void; | 获取指定卡槽的选网模式        | 无                                  |
+| function setNetworkSelectionMode(options: NetworkSelectionModeOptions, callback: AsyncCallback\<void>): void; | 设置指定卡槽的选网模式        | ohos.permission.SET_TELEPHONY_STATE |
+| function isRadioOn(callback: AsyncCallback\<boolean>): void; | 判断主卡Radio是否打开         | ohos.permission.GET_NETWORK_INFO    |
+| function isRadioOn(slotId: number, callback: AsyncCallback\<boolean>): void; | 判断指定卡槽位的Radio是否打开 | ohos.permission.GET_NETWORK_INFO    |
+| function turnOnRadio(callback: AsyncCallback\<void>): void;  | 开启主卡Radio                 | ohos.permission.SET_TELEPHONY_STATE |
+| function turnOnRadio(slotId: number, callback: AsyncCallback\<void>): void; | 开启指定卡槽位的Radio         | ohos.permission.SET_TELEPHONY_STATE |
+| function turnOffRadio(callback: AsyncCallback\<void>): void; | 关闭主卡Radio                 | ohos.permission.SET_TELEPHONY_STATE |
+| function turnOffRadio(slotId: number, callback: AsyncCallback\<void>): void; | 关闭指定卡槽位的Radio         | ohos.permission.SET_TELEPHONY_STATE |
+| function getOperatorName(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽的运营商名称      | 无                                  |
+| function setPreferredNetwork(slotId: number, networkMode: PreferredNetworkMode, callback: AsyncCallback\<void>): void; | 设置指定卡槽的优选网络模式    | 无                                  |
+| function getPreferredNetwork(slotId: number, callback: AsyncCallback\<PreferredNetworkMode>): void; | 获取指定卡槽的优选网络模式    | 无                                  |
+| function getCellInformation(slotId: number, callback: AsyncCallback<Array\<CellInformation>>) | 获取小区信息列表              | ohos.permission.LOCATION            |
+| function sendUpdateCellLocationRequest(callback: AsyncCallback\<void>) | 请求小区位置                  | ohos.permission.LOCATION            |
+| function getIMEI(slotId: number, callback: AsyncCallback\<string>) | 获取Imei                      | ohos.permission.GET_TELEPHONY_STATE |
+| function getMEID(slotId: number, callback: AsyncCallback\<string>） | 获取Meid                      | ohos.permission.GET_TELEPHONY_STATE |
+| function getUniqueDeviceId(slotId: number, callback: AsyncCallback\<string>） | 获取设备唯一标识码            | ohos.permission.GET_TELEPHONY_STATE |
+| function getNrOptionMode(slotId: number, callback: AsyncCallback\<NrOptionMode>） | 获取5G模式                    | ohos.permission.GET_TELEPHONY_STATE |
+| function isNrSupported: boolean;                             | 是否支持5g网络                | 无                                  |
 
 
 完整的JS API说明以及实例代码请参考：[网络搜索](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/js-reference/apis/js-apis-radio.md)。
