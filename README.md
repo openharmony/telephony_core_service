@@ -22,7 +22,7 @@ You can implement communication with the RIL Adapter by registering the callback
 **Figure  1**  Architecture of the telephony core service<a name="fig5700192716219"></a>
 
 
- ![](figures/zh-cn_architecture-of-the-core_service-module.png)
+ ![](figures/en-us_architecture-of-the-core_service-module.png)
 
 As shown in the preceding figure, the telephony core service consists of the following:
 
