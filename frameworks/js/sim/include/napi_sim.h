@@ -26,6 +26,7 @@ namespace OHOS {
 namespace Telephony {
 namespace {
 constexpr size_t ARRAY_SIZE = 64;
+constexpr size_t IMSI_LOG_LENGTH = 6;
 } // namespace
 
 template<typename T>
