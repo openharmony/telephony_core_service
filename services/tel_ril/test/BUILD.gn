@@ -27,7 +27,6 @@ ohos_executable("tel_ril_test") {
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/frameworks/native/include",
-    "//base/telephony/core_service/interfaces/innerkits/state_registry",
     "$TELEPHONY_SIM_ROOT/include",
   ]
 

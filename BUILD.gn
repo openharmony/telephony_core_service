@@ -155,7 +155,6 @@ ohos_shared_library("tel_core_service") {
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
     "startup_l2:syspara",
-    "state_registry:tel_state_registry_notify",
   ]
 
   if (is_standard_system) {
