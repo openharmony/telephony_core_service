@@ -920,7 +920,12 @@ void NativeGetIMSI(napi_env env, void *data)
     AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
     asyncContext->callbackVal =
         NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetIMSI(asyncContext->slotId));
-    TELEPHONY_LOGI("NAPI NativeGetIMSI %{public}s", asyncContext->callbackVal.c_str());
+    if (asyncContext->callbackVal.length() > IMSI_LOG_LENGTH) {
+        std::string imsiLog = asyncContext->callbackVal.substr(0, IMSI_LOG_LENGTH);
+        TELEPHONY_LOGI("NAPI NativeGetIMSI %{public}s***", imsiLog.c_str());
+    } else {
+        TELEPHONY_LOGE("NAPI NativeGetIMSI IMSI length is invalid %{public}d", asyncContext->callbackVal.length());
+    }
     asyncContext->context.resolved = !(asyncContext->callbackVal.empty());
 }
 
