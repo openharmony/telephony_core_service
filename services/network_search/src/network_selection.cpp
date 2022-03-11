@@ -47,6 +47,7 @@ void NetworkSelection::ProcessNetworkSearchResult(const AppExecFwk::InnerEvent::
 
     MessageParcel data;
     int64_t index = -1;
+    data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
     if (availNetworkResult != nullptr) {
         if (!AvailNetworkResult(availNetworkResult, data, index)) {
             return;
@@ -98,6 +99,7 @@ void NetworkSelection::ProcessGetNetworkSelectionMode(const AppExecFwk::InnerEve
 
     MessageParcel data;
     int64_t index = -1;
+    data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
     if (selectModeResult != nullptr) {
         if (!SelectModeResult(selectModeResult, data, index)) {
             return;
@@ -145,6 +147,7 @@ void NetworkSelection::ProcessSetNetworkSelectionMode(const AppExecFwk::InnerEve
 
     MessageParcel data;
     int64_t index = -1;
+    data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
     index = event->GetParam();
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (!ResponseInfoOfSet(responseInfo, data, index)) {

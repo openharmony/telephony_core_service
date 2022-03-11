@@ -122,6 +122,12 @@ void INetworkSearchCallbackStub::OnGetRadioStateCallback(const bool setResult, c
 int INetworkSearchCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    std::u16string myDescriptor = INetworkSearchCallbackStub::GetDescriptor();
+    std::u16string remoteDescriptor = data.ReadInterfaceToken();
+    if (myDescriptor != remoteDescriptor) {
+        TELEPHONY_LOGE("descriptor check fail!");
+        return DEFAULT_ERROR;
+    }
     return OnNetworkSearchCallback(static_cast<NetworkSearchCallback>(code), data);
 }
 
