@@ -102,10 +102,7 @@ enum class DiffInterfaceId {
     TEST_GET_IMEI,
     TEST_GET_MEID,
     TEST_GET_IMS_REG_STATUS,
-    TEST_GET_PS_ATTACH_STATUS,
-    TEST_SET_PS_ATTACH_STATUS,
     TEST_GET_RADIO_CAPABILITY,
-    TEST_SET_RADIO_CAPABILITY,
     TEST_GET_VOICE_RADIO_INFO,
     TEST_GET_PHYSICAL_CHANNEL_CONFIG,
     TEST_SET_LOCATE_UPDATES,
@@ -140,6 +137,7 @@ public:
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
         void ProcessResponseInfo(const AppExecFwk::InnerEvent::Pointer &event);
         bool GetBoolResult(int32_t eventId);
+        void Clean();
 
     private:
         std::mutex callbackMutex_;
@@ -197,7 +195,6 @@ private:
     void NetworkVoiceRegistrationStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void NetworkDataRegistrationStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetRadioCapabilityTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void SetRadioCapabilityTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetCallForwardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetCallForwardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void NetworkOperatorTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -236,8 +233,6 @@ private:
     void GetImeiTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetMeidTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetImsRegStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void GetPsAttachStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void SetPsAttachStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetVoiceRadioTechnologyTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetPhysicalChannelConfigTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetLocateUpdatesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -247,7 +242,7 @@ private:
     void GetMuteTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetEmergencyCallListTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
-    int32_t GetRandNum();
+    uint32_t GetRandNum();
     std::string GetRandPhoneNum(const int len);
     bool WaitGetResult(int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t timeOut);
 
@@ -257,8 +252,8 @@ private:
     using RilManagerAndResponseTestFun = void (TelRilTest::*)(
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     std::map<DiffInterfaceId, RilManagerAndResponseTestFun> memberFuncMap_;
-    constexpr static const int32_t WAIT_TIME_SECOND = 10;
-    constexpr static const int32_t WAIT_TIME_SECOND_LONG = 60;
+    constexpr static const int32_t WAIT_TIME_SECOND = 3;
+    constexpr static const int32_t WAIT_TIME_SECOND_LONG = 30;
 };
 } // namespace Telephony
 } // namespace OHOS

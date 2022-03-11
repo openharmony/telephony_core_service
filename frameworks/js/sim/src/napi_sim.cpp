@@ -99,8 +99,8 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, BaseContext &context, std
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_utf8(env, para.funcName.c_str(), para.funcName.length(), &resourceName));
     NAPI_CALL(env,
-        napi_create_async_work(env, nullptr, resourceName, para.execute, para.complete,
-            static_cast<void *>(&context), &context.work));
+        napi_create_async_work(
+            env, nullptr, resourceName, para.execute, para.complete, static_cast<void *>(&context), &context.work));
     return result;
 }
 
@@ -119,8 +119,8 @@ void NapiAsyncCompleteCallback(napi_env env, napi_status status, const AsyncCont
             napi_value errorMessage = NapiUtil::CreateErrorMessage(env, errMessage);
             NAPI_CALL_RETURN_VOID(env, napi_reject_deferred(env, context.deferred, errorMessage));
         } else {
-            napi_value res = (funcIgnoreReturnVal ? NapiUtil::CreateUndefined(env) :
-                                                    GetNapiValue(env, asyncContext.callbackVal));
+            napi_value res =
+                (funcIgnoreReturnVal ? NapiUtil::CreateUndefined(env) : GetNapiValue(env, asyncContext.callbackVal));
             NAPI_CALL_RETURN_VOID(env, napi_resolve_deferred(env, context.deferred, res));
         }
     } else {
@@ -159,8 +159,8 @@ napi_value IccAccountInfoConversion(napi_env env, const IccAccountInfo &iccAccou
 
 napi_value PinOrPukUnlockConversion(napi_env env, const LockStatusResponse &response)
 {
-    TELEPHONY_LOGI("PinOrPukUnlockConversion response.result %{public}d, response.remain %{public}d",
-        response.result, response.remain);
+    TELEPHONY_LOGI("PinOrPukUnlockConversion response.result %{public}d, response.remain %{public}d", response.result,
+        response.remain);
     constexpr int32_t passWordErr = -1;
     napi_value val = nullptr;
     napi_create_object(env, &val);
@@ -624,8 +624,8 @@ void NativeGetSimAccountInfo(napi_env env, void *data)
     AsyncIccAccountInfo *info = static_cast<AsyncIccAccountInfo *>(data);
 
     IccAccountInfo operInfo;
-    bool result = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimAccountInfo(
-        info->asyncContext.slotId, operInfo);
+    bool result =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimAccountInfo(info->asyncContext.slotId, operInfo);
     TELEPHONY_LOGI("NAPI NativeGetSimAccountInfo %{public}d", result);
     if (result) {
         info->vecInfo.push_back(std::move(operInfo));
@@ -920,7 +920,12 @@ void NativeGetIMSI(napi_env env, void *data)
     AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
     asyncContext->callbackVal =
         NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetIMSI(asyncContext->slotId));
-    TELEPHONY_LOGI("NAPI NativeGetIMSI %{public}s", asyncContext->callbackVal.c_str());
+    if (asyncContext->callbackVal.length() > IMSI_LOG_LENGTH) {
+        std::string imsiLog = asyncContext->callbackVal.substr(0, IMSI_LOG_LENGTH);
+        TELEPHONY_LOGI("NAPI NativeGetIMSI %{public}s***", imsiLog.c_str());
+    } else {
+        TELEPHONY_LOGE("NAPI NativeGetIMSI IMSI length is invalid %{public}d", asyncContext->callbackVal.length());
+    }
     asyncContext->context.resolved = !(asyncContext->callbackVal.empty());
 }
 
@@ -1049,8 +1054,8 @@ void NativeGetShowNumber(napi_env env, void *data)
         return;
     }
     AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
-    asyncContext->callbackVal = NapiUtil::ToUtf8(
-        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetShowNumber(asyncContext->slotId));
+    asyncContext->callbackVal =
+        NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetShowNumber(asyncContext->slotId));
     TELEPHONY_LOGI("NAPI NativeGetShowNumber %{public}s", asyncContext->callbackVal.c_str());
     asyncContext->context.resolved = !(asyncContext->callbackVal.empty());
 }
@@ -1218,8 +1223,8 @@ void NativeGetOperatorConfigs(napi_env env, void *data)
     }
     AsyncOperatorConfig *info = static_cast<AsyncOperatorConfig *>(data);
     OperatorConfig config;
-    bool result = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOperatorConfigs(
-        info->asyncContext.slotId, config);
+    bool result =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOperatorConfigs(info->asyncContext.slotId, config);
     TELEPHONY_LOGI("NAPI NativeGetOperatorConfigs %{public}d", result);
     if (result) {
         for (const auto &val : config.configValue) {
@@ -1410,8 +1415,8 @@ napi_value AddIccDiallingNumbers(napi_env env, napi_callback_info info)
     BaseContext &context = diallingNumbers->asyncContext.context;
 
     napi_value object = NapiUtil::CreateUndefined(env);
-    auto initPara = std::make_tuple(
-        &diallingNumbers->asyncContext.slotId, &diallingNumbers->type, &object, &context.callbackRef);
+    auto initPara =
+        std::make_tuple(&diallingNumbers->asyncContext.slotId, &diallingNumbers->type, &object, &context.callbackRef);
 
     AsyncPara para {
         .funcName = "AddIccDiallingNumbers",
@@ -1461,8 +1466,8 @@ napi_value DelIccDiallingNumbers(napi_env env, napi_callback_info info)
     BaseContext &context = diallingNumbers->asyncContext.context;
 
     napi_value object = NapiUtil::CreateUndefined(env);
-    auto initPara = std::make_tuple(
-        &diallingNumbers->asyncContext.slotId, &diallingNumbers->type, &object, &context.callbackRef);
+    auto initPara =
+        std::make_tuple(&diallingNumbers->asyncContext.slotId, &diallingNumbers->type, &object, &context.callbackRef);
     AsyncPara para {
         .funcName = "DelIccDiallingNumbers",
         .env = env,
@@ -1512,8 +1517,8 @@ napi_value UpdateIccDiallingNumbers(napi_env env, napi_callback_info info)
     BaseContext &context = diallingNumbers->asyncContext.context;
 
     napi_value object = NapiUtil::CreateUndefined(env);
-    auto initPara = std::make_tuple(
-        &diallingNumbers->asyncContext.slotId, &diallingNumbers->type, &object, &context.callbackRef);
+    auto initPara =
+        std::make_tuple(&diallingNumbers->asyncContext.slotId, &diallingNumbers->type, &object, &context.callbackRef);
 
     AsyncPara para {
         .funcName = "UpdateIccDiallingNumbers",
@@ -1804,7 +1809,9 @@ napi_status InitEnumSimState(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY(
             "SIM_STATE_LOADED", GetNapiValue(env, static_cast<int32_t>(SimState::SIM_STATE_LOADED))),
     };
-    return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+    constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
+    NapiUtil::DefineEnumClassByName(env, exports, "SimState", arrSize, desc);
+    return napi_define_properties(env, exports, arrSize, desc);
 }
 
 napi_status InitEnumContactType(napi_env env, napi_value exports)
@@ -1815,7 +1822,10 @@ napi_status InitEnumContactType(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY(
             "FIXED_DIALING", GetNapiValue(env, static_cast<int32_t>(ContactType::FIXED_DIALING))),
     };
-    return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+
+    constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
+    NapiUtil::DefineEnumClassByName(env, exports, "ContactType", arrSize, desc);
+    return napi_define_properties(env, exports, arrSize, desc);
 }
 
 napi_status InitEnumLockState(napi_env env, napi_value exports)
@@ -1824,7 +1834,10 @@ napi_status InitEnumLockState(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("LOCK_OFF", GetNapiValue(env, static_cast<int32_t>(LockState::LOCK_OFF))),
         DECLARE_NAPI_STATIC_PROPERTY("LOCK_ON", GetNapiValue(env, static_cast<int32_t>(LockState::LOCK_ON))),
     };
-    return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+
+    constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
+    NapiUtil::DefineEnumClassByName(env, exports, "LockState", arrSize, desc);
+    return napi_define_properties(env, exports, arrSize, desc);
 }
 
 napi_status InitEnumLockType(napi_env env, napi_value exports)
@@ -1833,14 +1846,16 @@ napi_status InitEnumLockType(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("PIN_LOCK", GetNapiValue(env, static_cast<int32_t>(LockType::PIN_LOCK))),
         DECLARE_NAPI_STATIC_PROPERTY("FDN_LOCK", GetNapiValue(env, static_cast<int32_t>(LockType::FDN_LOCK))),
     };
-    return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+
+    constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
+    NapiUtil::DefineEnumClassByName(env, exports, "LockType", arrSize, desc);
+    return napi_define_properties(env, exports, arrSize, desc);
 }
 
 napi_status InitEnumCardType(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "UNKNOWN_CARD", GetNapiValue(env, static_cast<int32_t>(CardType::UNKNOWN_CARD))),
+        DECLARE_NAPI_STATIC_PROPERTY("UNKNOWN_CARD", GetNapiValue(env, static_cast<int32_t>(CardType::UNKNOWN_CARD))),
         DECLARE_NAPI_STATIC_PROPERTY(
             "SINGLE_MODE_SIM_CARD", GetNapiValue(env, static_cast<int32_t>(CardType::SINGLE_MODE_SIM_CARD))),
         DECLARE_NAPI_STATIC_PROPERTY(
@@ -1849,8 +1864,8 @@ napi_status InitEnumCardType(napi_env env, napi_value exports)
             "SINGLE_MODE_RUIM_CARD", GetNapiValue(env, static_cast<int32_t>(CardType::SINGLE_MODE_RUIM_CARD))),
         DECLARE_NAPI_STATIC_PROPERTY(
             "DUAL_MODE_CG_CARD", GetNapiValue(env, static_cast<int32_t>(CardType::DUAL_MODE_CG_CARD))),
-        DECLARE_NAPI_STATIC_PROPERTY("CT_NATIONAL_ROAMING_CARD",
-            GetNapiValue(env, static_cast<int32_t>(CardType::CT_NATIONAL_ROAMING_CARD))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "CT_NATIONAL_ROAMING_CARD", GetNapiValue(env, static_cast<int32_t>(CardType::CT_NATIONAL_ROAMING_CARD))),
         DECLARE_NAPI_STATIC_PROPERTY(
             "CU_DUAL_MODE_CARD", GetNapiValue(env, static_cast<int32_t>(CardType::CU_DUAL_MODE_CARD))),
         DECLARE_NAPI_STATIC_PROPERTY("DUAL_MODE_TELECOM_LTE_CARD",
@@ -1860,7 +1875,10 @@ napi_status InitEnumCardType(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY(
             "SINGLE_MODE_ISIM_CARD", GetNapiValue(env, static_cast<int32_t>(CardType::SINGLE_MODE_ISIM_CARD))),
     };
-    return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+
+    constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
+    NapiUtil::DefineEnumClassByName(env, exports, "CardType", arrSize, desc);
+    return napi_define_properties(env, exports, arrSize, desc);
 }
 
 napi_status InitEnumPersoLockType(napi_env env, napi_value exports)
@@ -1887,7 +1905,10 @@ napi_status InitEnumPersoLockType(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY(
             "SIM_PUK_LOCK", GetNapiValue(env, static_cast<int32_t>(PersoLockType::SIM_PUK_LOCK))),
     };
-    return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+
+    constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
+    NapiUtil::DefineEnumClassByName(env, exports, "PersoLockType", arrSize, desc);
+    return napi_define_properties(env, exports, arrSize, desc);
 }
 
 napi_status InitSimLockInterface(napi_env env, napi_value exports)

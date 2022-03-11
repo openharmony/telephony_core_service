@@ -62,7 +62,7 @@ bool SignalInfo::ProcessLte(const LteRssi &lteSignal)
 bool SignalInfo::ProcessWcdma(const WCdmaRssi &wcdmaSignal)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    cur_.wcdma.SetValue(wcdmaSignal.rxlev, wcdmaSignal.ecio, wcdmaSignal.rscp, wcdmaSignal.ber);
+    cur_.wcdma.SetValue(wcdmaSignal.rxlev, wcdmaSignal.rscp, wcdmaSignal.ecio, wcdmaSignal.ber);
     bool ret = (cur_.wcdma == cache_.wcdma);
     cache_.wcdma = cur_.wcdma;
     return ret;
@@ -152,23 +152,23 @@ void SignalInfo::GetSignalInfoList(std::vector<sptr<SignalInformation>> &signals
     bool tdScdmaValid = cur_.tdScdma.ValidateTdScdmaValue();
     bool nrValid = cur_.nr.ValidateNrValue();
 
-    if (gsmValid) {
-        signals.emplace_back(cur_.gsm.NewInstance());
+    if (lteValid) {
+        signals.emplace_back(cur_.lte.NewInstance());
+    }
+    if (nrValid) {
+        signals.emplace_back(cur_.nr.NewInstance());
     }
     if (cdmaValid) {
         signals.emplace_back(cur_.cdma.NewInstance());
     }
-    if (lteValid) {
-        signals.emplace_back(cur_.lte.NewInstance());
+    if (tdScdmaValid) {
+        signals.emplace_back(cur_.tdScdma.NewInstance());
     }
     if (wcdmaValid) {
         signals.emplace_back(cur_.wcdma.NewInstance());
     }
-    if (tdScdmaValid) {
-        signals.emplace_back(cur_.tdScdma.NewInstance());
-    }
-    if (nrValid) {
-        signals.emplace_back(cur_.nr.NewInstance());
+    if (gsmValid) {
+        signals.emplace_back(cur_.gsm.NewInstance());
     }
 }
 } // namespace Telephony

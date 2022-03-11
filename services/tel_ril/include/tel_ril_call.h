@@ -150,13 +150,6 @@ public:
     int32_t StopDtmf(int32_t index, const AppExecFwk::InnerEvent::Pointer &result);
 
     /**
-     * @brief Call Status Change response
-     *
-     * @param data is HDF service callback message
-     */
-    int32_t CallStateUpdated(MessageParcel &data);
-
-    /**
      * @brief Answering a call response
      *
      * @param data is HDF service callback message
@@ -393,39 +386,11 @@ public:
     int32_t GetUssdResponse(MessageParcel &data);
 
     /**
-     * @brief call cring notice
-     *
-     * @param data is HDF service callback message
-     */
-    int32_t CallCringNotice(MessageParcel &data);
-
-    /**
-     * @brief call wait notice
-     *
-     * @param data is HDF service callback message
-     */
-    int32_t CallWaitingNotice(MessageParcel &data);
-
-    /**
-     * @brief call connect notice
-     *
-     * @param data is HDF service callback message
-     */
-    int32_t CallConnectNotice(MessageParcel &data);
-
-    /**
-     * @brief call end notice
-     *
-     * @param data is HDF service callback message
-     */
-    int32_t CallEndNotice(MessageParcel &data);
-
-    /**
      * @brief call status info notice
      *
      * @param data is HDF service callback message
      */
-    int32_t CallStatusInfoNotice(MessageParcel &data);
+    int32_t CallStateUpdated(MessageParcel &data);
 
     /**
      * @brief call Ims service status notice

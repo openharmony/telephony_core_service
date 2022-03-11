@@ -15,6 +15,7 @@
 
 #include "core_service.h"
 
+#include "parameter.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
 
@@ -29,13 +30,6 @@
 
 namespace OHOS {
 namespace Telephony {
-const std::string OHOS_PERMISSION_GET_NETWORK_INFO = "ohos.permission.GET_NETWORK_INFO";
-const std::string OHOS_PERMISSION_LOCATION = "ohos.permission.LOCATION";
-const std::string OHOS_PERMISSION_SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
-const std::string OHOS_PERMISSION_GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHONY_STATE";
-const std::string OHOS_PERMISSION_GET_SIM_INFO = "ohos.permission.GET_SIM_INFO";
-const std::string OHOS_PERMISSION_SET_SIM_INFO = "ohos.permission.SET_SIM_INFO";
-
 const bool G_REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<CoreService>::GetInstance().get());
 
@@ -105,7 +99,7 @@ void CoreService::OnStop()
 
 int32_t CoreService::GetPsRadioTech(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_NETWORK_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
         return TELEPHONY_PERMISSION_ERROR;
     }
     if (networkSearchManager_ == nullptr) {
@@ -116,7 +110,7 @@ int32_t CoreService::GetPsRadioTech(int32_t slotId)
 
 int32_t CoreService::GetCsRadioTech(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_NETWORK_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
         return TELEPHONY_PERMISSION_ERROR;
     }
     if (networkSearchManager_ == nullptr) {
@@ -129,7 +123,7 @@ bool CoreService::SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
     const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
     const sptr<INetworkSearchCallback> &callback)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return TELEPHONY_PERMISSION_ERROR;
     }
     if (networkSearchManager_ == nullptr) {
@@ -166,7 +160,7 @@ std::u16string CoreService::GetOperatorName(int32_t slotId)
 
 const sptr<NetworkState> CoreService::GetNetworkState(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_NETWORK_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
         return nullptr;
     }
     if (networkSearchManager_ == nullptr) {
@@ -177,7 +171,7 @@ const sptr<NetworkState> CoreService::GetNetworkState(int32_t slotId)
 
 bool CoreService::SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return TELEPHONY_PERMISSION_ERROR;
     }
     if (networkSearchManager_ == nullptr) {
@@ -189,7 +183,7 @@ bool CoreService::SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSe
 
 bool CoreService::GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_NETWORK_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
         return TELEPHONY_PERMISSION_ERROR;
     }
     if (networkSearchManager_ == nullptr) {
@@ -208,7 +202,7 @@ std::u16string CoreService::GetIsoCountryCodeForNetwork(int32_t slotId)
 
 std::u16string CoreService::GetImei(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return std::u16string();
     }
     if (networkSearchManager_ == nullptr) {
@@ -219,7 +213,7 @@ std::u16string CoreService::GetImei(int32_t slotId)
 
 std::u16string CoreService::GetMeid(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return std::u16string();
     }
     if (networkSearchManager_ == nullptr) {
@@ -230,7 +224,7 @@ std::u16string CoreService::GetMeid(int32_t slotId)
 
 std::u16string CoreService::GetUniqueDeviceId(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return std::u16string();
     }
     if (networkSearchManager_ == nullptr) {
@@ -257,9 +251,6 @@ NrMode CoreService::GetNrOptionMode(int32_t slotId)
 
 bool CoreService::HasSimCard(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
-        return false;
-    }
     TELEPHONY_LOGI("CoreService::HasSimCard(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         return TELEPHONY_ERROR;
@@ -269,9 +260,6 @@ bool CoreService::HasSimCard(int32_t slotId)
 
 int32_t CoreService::GetSimState(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
-        return TELEPHONY_PERMISSION_ERROR;
-    }
     TELEPHONY_LOGI("CoreService::GetSimState(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         return TELEPHONY_ERROR;
@@ -282,9 +270,6 @@ int32_t CoreService::GetSimState(int32_t slotId)
 
 int32_t CoreService::GetCardType(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
-        return TELEPHONY_PERMISSION_ERROR;
-    }
     TELEPHONY_LOGI("CoreService::GetCardType(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         return TELEPHONY_ERROR;
@@ -295,9 +280,6 @@ int32_t CoreService::GetCardType(int32_t slotId)
 
 std::u16string CoreService::GetISOCountryCodeForSim(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
-        return std::u16string();
-    }
     TELEPHONY_LOGI("CoreService::GetISOCountryCodeForSim(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         return std::u16string();
@@ -308,9 +290,6 @@ std::u16string CoreService::GetISOCountryCodeForSim(int32_t slotId)
 
 std::u16string CoreService::GetSimSpn(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
-        return std::u16string();
-    }
     TELEPHONY_LOGI("CoreService::GetSimSpn(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         return std::u16string();
@@ -320,7 +299,7 @@ std::u16string CoreService::GetSimSpn(int32_t slotId)
 
 std::u16string CoreService::GetSimIccId(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return std::u16string();
     }
     TELEPHONY_LOGI("CoreService::GetSimIccId(), slotId = %{public}d", slotId);
@@ -332,9 +311,6 @@ std::u16string CoreService::GetSimIccId(int32_t slotId)
 
 std::u16string CoreService::GetSimOperatorNumeric(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
-        return std::u16string();
-    }
     TELEPHONY_LOGI("CoreService::GetSimOperatorNumeric(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         return std::u16string();
@@ -344,7 +320,7 @@ std::u16string CoreService::GetSimOperatorNumeric(int32_t slotId)
 
 std::u16string CoreService::GetIMSI(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return std::u16string();
     }
     TELEPHONY_LOGI("CoreService::GetIMSI(), slotId = %{public}d", slotId);
@@ -356,9 +332,6 @@ std::u16string CoreService::GetIMSI(int32_t slotId)
 
 bool CoreService::IsSimActive(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
-        return false;
-    }
     TELEPHONY_LOGI("CoreService::IsSimActive(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         return false;
@@ -368,6 +341,9 @@ bool CoreService::IsSimActive(int32_t slotId)
 
 bool CoreService::GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        return false;
+    }
     if (networkSearchManager_ == nullptr) {
         return TELEPHONY_ERROR;
     }
@@ -376,9 +352,6 @@ bool CoreService::GetNetworkSearchInformation(int32_t slotId, const sptr<INetwor
 
 bool CoreService::GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
-        return TELEPHONY_PERMISSION_ERROR;
-    }
     if (networkSearchManager_ == nullptr) {
         return TELEPHONY_ERROR;
     }
@@ -388,9 +361,6 @@ bool CoreService::GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSea
 std::u16string CoreService::GetLocaleFromDefaultSim()
 {
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
-        return std::u16string();
-    }
     TELEPHONY_LOGI("CoreService::GetSimAccountInfo()");
     if (simManager_ == nullptr) {
         return std::u16string();
@@ -400,7 +370,7 @@ std::u16string CoreService::GetLocaleFromDefaultSim()
 
 std::u16string CoreService::GetSimGid1(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return std::u16string();
     }
     TELEPHONY_LOGI("CoreService::GetSimGid1(), slotId = %{public}d", slotId);
@@ -412,7 +382,7 @@ std::u16string CoreService::GetSimGid1(int32_t slotId)
 
 bool CoreService::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::GetSimAccountInfo(), slotId = %{public}d", slotId);
@@ -424,7 +394,7 @@ bool CoreService::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
 
 bool CoreService::SetDefaultVoiceSlotId(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::SetDefaultVoiceSlotId(), slotId = %{public}d", slotId);
@@ -436,9 +406,6 @@ bool CoreService::SetDefaultVoiceSlotId(int32_t slotId)
 
 int32_t CoreService::GetDefaultVoiceSlotId()
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
-        return TELEPHONY_PERMISSION_ERROR;
-    }
     TELEPHONY_LOGI("CoreService::GetDefaultVoiceSlotId()");
     if (simManager_ == nullptr) {
         return TELEPHONY_ERROR;
@@ -448,7 +415,7 @@ int32_t CoreService::GetDefaultVoiceSlotId()
 
 bool CoreService::SetPrimarySlotId(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::SetPrimarySlotId(), slotId = %{public}d", slotId);
@@ -460,9 +427,6 @@ bool CoreService::SetPrimarySlotId(int32_t slotId)
 
 int32_t CoreService::GetPrimarySlotId()
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
-        return TELEPHONY_PERMISSION_ERROR;
-    }
     TELEPHONY_LOGI("CoreService::GetPrimarySlotId()");
     if (simManager_ == nullptr) {
         return TELEPHONY_ERROR;
@@ -472,7 +436,7 @@ int32_t CoreService::GetPrimarySlotId()
 
 bool CoreService::SetShowNumber(int32_t slotId, const std::u16string number)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::SetShowNumber(), slotId = %{public}d", slotId);
@@ -484,7 +448,7 @@ bool CoreService::SetShowNumber(int32_t slotId, const std::u16string number)
 
 std::u16string CoreService::GetShowNumber(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return std::u16string();
     }
     TELEPHONY_LOGI("CoreService::GetShowNumber(), slotId = %{public}d", slotId);
@@ -496,7 +460,7 @@ std::u16string CoreService::GetShowNumber(int32_t slotId)
 
 bool CoreService::SetShowName(int32_t slotId, const std::u16string name)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::SetShowName(), slotId = %{public}d", slotId);
@@ -508,7 +472,7 @@ bool CoreService::SetShowName(int32_t slotId, const std::u16string name)
 
 std::u16string CoreService::GetShowName(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return std::u16string();
     }
     TELEPHONY_LOGI("CoreService::GetShowName(), slotId = %{public}d", slotId);
@@ -520,7 +484,7 @@ std::u16string CoreService::GetShowName(int32_t slotId)
 
 bool CoreService::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::GetActiveSimAccountInfoList");
@@ -532,7 +496,7 @@ bool CoreService::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAc
 
 bool CoreService::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::GetOperatorConfigs");
@@ -544,7 +508,7 @@ bool CoreService::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
 
 bool CoreService::UnlockPin(const int32_t slotId, std::u16string pin, LockStatusResponse &response)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI(
@@ -557,7 +521,7 @@ bool CoreService::UnlockPin(const int32_t slotId, std::u16string pin, LockStatus
 
 bool CoreService::UnlockPuk(const int slotId, std::u16string newPin, std::u16string puk, LockStatusResponse &response)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::UnlockPuk(), newPin = %{public}s, puk = %{public}s, slotId = %{public}d",
@@ -571,7 +535,7 @@ bool CoreService::UnlockPuk(const int slotId, std::u16string newPin, std::u16str
 bool CoreService::AlterPin(
     const int slotId, std::u16string newPin, std::u16string oldPin, LockStatusResponse &response)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::AlterPin(), newPin = %{public}s, oldPin = %{public}s, slotId = %{public}d",
@@ -584,7 +548,7 @@ bool CoreService::AlterPin(
 
 bool CoreService::UnlockPin2(const int32_t slotId, std::u16string pin2, LockStatusResponse &response)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI(
@@ -598,7 +562,7 @@ bool CoreService::UnlockPin2(const int32_t slotId, std::u16string pin2, LockStat
 bool CoreService::UnlockPuk2(
     const int slotId, std::u16string newPin2, std::u16string puk2, LockStatusResponse &response)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::UnlockPuk2(), newPin2 = %{public}s, puk2 = %{public}s, slotId = %{public}d",
@@ -612,7 +576,7 @@ bool CoreService::UnlockPuk2(
 bool CoreService::AlterPin2(
     const int slotId, std::u16string newPin2, std::u16string oldPin2, LockStatusResponse &response)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::AlterPin2(), newPin2 = %{public}s, oldPin2 = %{public}s, slotId = %{public}d",
@@ -625,7 +589,7 @@ bool CoreService::AlterPin2(
 
 bool CoreService::SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     std::u16string strPin = options.password;
@@ -642,9 +606,6 @@ bool CoreService::SetLockState(int32_t slotId, const LockInfo &options, LockStat
 
 int32_t CoreService::GetLockState(int32_t slotId, LockType lockType)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
-        return TELEPHONY_PERMISSION_ERROR;
-    }
     TELEPHONY_LOGI("CoreService::GetLockState(), lockType = %{public}d, slotId = %{public}d", lockType, slotId);
     if (simManager_ == nullptr) {
         return TELEPHONY_ERROR;
@@ -654,9 +615,6 @@ int32_t CoreService::GetLockState(int32_t slotId, LockType lockType)
 
 int32_t CoreService::RefreshSimState(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
-        return TELEPHONY_PERMISSION_ERROR;
-    }
     TELEPHONY_LOGI("CoreService::RefreshSimState(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         return TELEPHONY_ERROR;
@@ -666,7 +624,7 @@ int32_t CoreService::RefreshSimState(int32_t slotId)
 
 bool CoreService::SetActiveSim(int32_t slotId, int32_t enable)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::SetActiveSim(), slotId = %{public}d", slotId);
@@ -678,7 +636,7 @@ bool CoreService::SetActiveSim(int32_t slotId, int32_t enable)
 
 bool CoreService::GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return TELEPHONY_PERMISSION_ERROR;
     }
     if (networkSearchManager_ == nullptr) {
@@ -690,7 +648,7 @@ bool CoreService::GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchC
 bool CoreService::SetPreferredNetwork(
     int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return TELEPHONY_PERMISSION_ERROR;
     }
     if (networkSearchManager_ == nullptr) {
@@ -699,18 +657,9 @@ bool CoreService::SetPreferredNetwork(
     return networkSearchManager_->SetPreferredNetwork(slotId, networkMode, callback);
 }
 
-bool CoreService::SetPsAttachStatus(
-    int32_t slotId, int32_t psAttachStatus, const sptr<INetworkSearchCallback> &callback)
-{
-    if (networkSearchManager_ == nullptr) {
-        return TELEPHONY_ERROR;
-    }
-    return networkSearchManager_->SetPsAttachStatus(slotId, psAttachStatus, callback);
-}
-
 std::u16string CoreService::GetSimTelephoneNumber(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return std::u16string();
     }
     TELEPHONY_LOGI("CoreService::GetSimTelephoneNumber(), slotId = %{public}d", slotId);
@@ -722,9 +671,6 @@ std::u16string CoreService::GetSimTelephoneNumber(int32_t slotId)
 
 std::u16string CoreService::GetSimTeleNumberIdentifier(const int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
-        return std::u16string();
-    }
     TELEPHONY_LOGI("CoreService::GetSimTeleNumberIdentifier(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         return std::u16string();
@@ -734,7 +680,7 @@ std::u16string CoreService::GetSimTeleNumberIdentifier(const int32_t slotId)
 
 std::u16string CoreService::GetVoiceMailIdentifier(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return std::u16string();
     }
     TELEPHONY_LOGI("CoreService::GetVoiceMailIdentifier(), slotId = %{public}d", slotId);
@@ -746,7 +692,7 @@ std::u16string CoreService::GetVoiceMailIdentifier(int32_t slotId)
 
 std::u16string CoreService::GetVoiceMailNumber(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return std::u16string();
     }
     TELEPHONY_LOGI("CoreService::GetVoiceMailNumber(), slotId = %{public}d", slotId);
@@ -758,7 +704,7 @@ std::u16string CoreService::GetVoiceMailNumber(int32_t slotId)
 
 std::vector<std::shared_ptr<DiallingNumbersInfo>> CoreService::QueryIccDiallingNumbers(int slotId, int type)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::READ_CONTACTS)) {
         return std::vector<std::shared_ptr<DiallingNumbersInfo>>();
     }
     TELEPHONY_LOGI("CoreService::QueryIccDiallingNumbers");
@@ -771,7 +717,7 @@ std::vector<std::shared_ptr<DiallingNumbersInfo>> CoreService::QueryIccDiallingN
 bool CoreService::AddIccDiallingNumbers(
     int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::WRITE_CONTACTS)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::AddIccDiallingNumbers");
@@ -784,7 +730,7 @@ bool CoreService::AddIccDiallingNumbers(
 bool CoreService::DelIccDiallingNumbers(
     int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::WRITE_CONTACTS)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::DelIccDiallingNumbers");
@@ -797,7 +743,7 @@ bool CoreService::DelIccDiallingNumbers(
 bool CoreService::UpdateIccDiallingNumbers(
     int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::WRITE_CONTACTS)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::UpdateIccDiallingNumbers");
@@ -810,7 +756,7 @@ bool CoreService::UpdateIccDiallingNumbers(
 bool CoreService::SetVoiceMailInfo(
     const int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::SetVoiceMailInfo(), slotId = %{public}d", slotId);
@@ -822,15 +768,15 @@ bool CoreService::SetVoiceMailInfo(
 
 int32_t CoreService::GetMaxSimCount()
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
-        return TELEPHONY_PERMISSION_ERROR;
-    }
-    return SIM_SLOT_COUNT;
+    char simSlotCount[SYSPARA_SIZE] = {0};
+    GetParameter(TEL_SIM_SLOT_COUNT.c_str(), DEFAULT_SLOT_COUNT.c_str(), simSlotCount, SYSPARA_SIZE);
+    int32_t slotCount = std::atoi(simSlotCount);
+    return slotCount;
 }
 
 bool CoreService::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::SendEnvelopeCmd(), slotId = %{public}d", slotId);
@@ -842,7 +788,7 @@ bool CoreService::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
 
 bool CoreService::SendTerminalResponseCmd(int32_t slotId, const std::string &cmd)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::SendTerminalResponseCmd(), slotId = %{public}d", slotId);
@@ -854,7 +800,7 @@ bool CoreService::SendTerminalResponseCmd(int32_t slotId, const std::string &cmd
 
 bool CoreService::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_SIM_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI(
@@ -876,7 +822,7 @@ bool CoreService::GetImsRegStatus(int32_t slotId)
 
 std::vector<sptr<CellInformation>> CoreService::GetCellInfoList(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_LOCATION)) {
+    if (!TelephonyPermission::CheckPermission(Permission::CELL_LOCATION)) {
         return std::vector<sptr<CellInformation>>();
     }
     if (networkSearchManager_ == nullptr) {
@@ -895,9 +841,6 @@ bool CoreService::SendUpdateCellLocationRequest(int32_t slotId)
 
 bool CoreService::HasOperatorPrivileges(const int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_SIM_INFO)) {
-        return false;
-    }
     TELEPHONY_LOGI("CoreService::HasOperatorPrivileges(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         return false;

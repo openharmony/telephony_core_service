@@ -76,6 +76,7 @@ private:
     bool IsValidType(int type);
     bool HasSimCard();
     bool IsValidParam(int type, const std::shared_ptr<DiallingNumbersInfo> &info);
+    void InitFdnCache();
 };
 } // namespace Telephony
 } // namespace OHOS

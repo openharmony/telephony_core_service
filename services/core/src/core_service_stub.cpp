@@ -44,7 +44,6 @@ void CoreServiceStub::AddHandlerNetWorkToMap()
     memberFuncMap_[uint32_t(InterfaceID::GET_IMEI)] = &CoreServiceStub::OnGetImei;
     memberFuncMap_[uint32_t(InterfaceID::GET_MEID)] = &CoreServiceStub::OnGetMeid;
     memberFuncMap_[uint32_t(InterfaceID::GET_UNIQUE_DEVICE_ID)] = &CoreServiceStub::OnGetUniqueDeviceId;
-    memberFuncMap_[uint32_t(InterfaceID::SET_PS_ATTACH_STATUS)] = &CoreServiceStub::OnSetPsAttachStatus;
     memberFuncMap_[uint32_t(InterfaceID::GET_IMS_REG_STATUS)] = &CoreServiceStub::OnGetImsRegStatus;
     memberFuncMap_[uint32_t(InterfaceID::GET_CELL_INFO_LIST)] = &CoreServiceStub::OnGetCellInfoList;
     memberFuncMap_[uint32_t(InterfaceID::GET_CELL_LOCATION)] = &CoreServiceStub::OnGetCellLocation;
@@ -692,9 +691,8 @@ int32_t CoreServiceStub::OnSetLockState(MessageParcel &data, MessageParcel &repl
     options.password = data.ReadString16();
     LockStatusResponse response = {0};
     TELEPHONY_LOGI(
-        "CoreServiceStub::OnSetLockState(), pin = %{public}s, lockType = %{public}d, lockState = %{public}d, "
-        "slotId = %{public}d",
-        Str16ToStr8(options.password).c_str(), options.lockType, options.lockState, slotId);
+        "CoreServiceStub::OnSetLockState(), lockType = %{public}d, lockState = %{public}d, "
+        "slotId = %{public}d", options.lockType, options.lockState, slotId);
     bool result = SetLockState(slotId, options, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
@@ -831,32 +829,6 @@ int32_t CoreServiceStub::OnSetPreferredNetwork(MessageParcel &data, MessageParce
     bool ret = reply.WriteBool(result);
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnSetPreferredNetwork write reply failed.");
-        return ERR_FLATTEN_OBJECT;
-    }
-    return NO_ERROR;
-}
-
-int32_t CoreServiceStub::OnSetPsAttachStatus(MessageParcel &data, MessageParcel &reply)
-{
-    sptr<INetworkSearchCallback> callback = nullptr;
-    int32_t slotId = data.ReadInt32();
-    int32_t psAttachStatus = data.ReadInt32();
-    TELEPHONY_LOGI("CoreServiceStub::OnSetPsAttachStatus psAttachStatus:%{public}d", psAttachStatus);
-    sptr<IRemoteObject> remoteCallback = data.ReadRemoteObject();
-    if (remoteCallback != nullptr) {
-        callback = iface_cast<INetworkSearchCallback>(remoteCallback);
-    } else {
-        TELEPHONY_LOGE("CoreServiceStub::OnSetPsAttachStatus remoteCallback is null");
-    }
-    bool result = false;
-    if (callback != nullptr) {
-        result = SetPsAttachStatus(slotId, psAttachStatus, callback);
-    } else {
-        TELEPHONY_LOGE("CoreServiceStub::OnSetPsAttachStatus callback is null");
-    }
-    bool ret = reply.WriteBool(result);
-    if (!ret) {
-        TELEPHONY_LOGE("CoreServiceStub::OnSetPsAttachStatus write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
     return NO_ERROR;
@@ -1101,8 +1073,7 @@ int32_t CoreServiceStub::OnUnlockSimLock(MessageParcel &data, MessageParcel &rep
     lockInfo.password = data.ReadString16();
     LockStatusResponse response = {0};
 
-    TELEPHONY_LOGI("CoreServiceStub::OnUnlockSimLock(), password = %{public}s, lockType = %{public}d",
-        Str16ToStr8(lockInfo.password).c_str(), lockInfo.lockType);
+    TELEPHONY_LOGI("CoreServiceStub::OnUnlockSimLock(), lockType = %{public}d", lockInfo.lockType);
     bool result = UnlockSimLock(slotId, lockInfo, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);

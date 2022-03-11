@@ -48,7 +48,6 @@ const int32_t INPUT_SET_TIME_AND_TIMEZONE = 17;
 const int32_t INPUT_GET_IMEI = 18;
 const int32_t INPUT_GET_MEID = 19;
 const int32_t INPUT_GET_UNIQUE_DEVICE_ID = 20;
-const int32_t INPUT_SET_PS_ATTACH_STATUS = 21;
 const int32_t INPUT_SET_GET_IMS_REG_STATUS = 22;
 const int32_t INPUT_GET_CELL_INFO_LIST = 23;
 const int32_t INPUT_REQUEST_CELL_LOCATION = 24;
@@ -393,18 +392,6 @@ void TestGetImsRegStatus()
     }
 }
 
-void TestSetPsAttachStatus()
-{
-    int32_t psAttachStatus = 0;
-    std::cout << "please input psAttachStatus (0:detachStatus , 1:attachStatus):" << std::endl;
-    std::cin >> psAttachStatus;
-    if (g_telephonyService != nullptr) {
-        OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-        bool result = g_telephonyService->SetPsAttachStatus(InputSlotId(), psAttachStatus, callback);
-        TELEPHONY_LOGI("TelephonyTestService::TestSetPsAttachStatus result:%{public}d", result);
-    }
-}
-
 void TestGetImei()
 {
     if (g_telephonyService != nullptr) {
@@ -496,7 +483,6 @@ void Prompt()
         "18:GetImei\n"
         "19:GetMeid\n"
         "20:GetUniqueDeviceId\n"
-        "21:SetPsAttachStatus\n"
         "22:GetImsRegStatus\n"
         "23:GetCellInfoList\n"
         "24:SendUpdateCellLocationRequest\n"
@@ -563,7 +549,6 @@ void Init()
     memberFuncMap_[INPUT_GET_IMEI] = TestGetImei;
     memberFuncMap_[INPUT_GET_MEID] = TestGetMeid;
     memberFuncMap_[INPUT_GET_UNIQUE_DEVICE_ID] = TestGetUniqueDeviceId;
-    memberFuncMap_[INPUT_SET_PS_ATTACH_STATUS] = TestSetPsAttachStatus;
     memberFuncMap_[INPUT_SET_GET_IMS_REG_STATUS] = TestGetImsRegStatus;
     memberFuncMap_[INPUT_GET_CELL_INFO_LIST] = TestGetCellInfoList;
     memberFuncMap_[INPUT_REQUEST_CELL_LOCATION] = TestSendUpdateCellLocationRequest;

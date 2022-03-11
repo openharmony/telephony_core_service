@@ -26,11 +26,6 @@ void TelRilCall::AddHandlerToMap()
 {
     // Notification
     memberFuncMap_[HNOTI_CALL_STATE_UPDATED] = &TelRilCall::CallStateUpdated;
-    memberFuncMap_[HNOTI_CALL_CRING_REPORT] = &TelRilCall::CallCringNotice;
-    memberFuncMap_[HNOTI_CALL_WAITING_REPORT] = &TelRilCall::CallWaitingNotice;
-    memberFuncMap_[HNOTI_CALL_CONNECT_REPORT] = &TelRilCall::CallConnectNotice;
-    memberFuncMap_[HNOTI_CALL_END_REPORT] = &TelRilCall::CallEndNotice;
-    memberFuncMap_[HNOTI_CALL_STATUS_INFO_REPORT] = &TelRilCall::CallStatusInfoNotice;
     memberFuncMap_[HNOTI_CALL_IMS_SERVICE_STATUS_REPORT] = &TelRilCall::CallImsServiceStatusNotice;
     memberFuncMap_[HNOTI_CALL_USSD_REPORT] = &TelRilCall::CallUssdNotice;
     memberFuncMap_[HNOTI_CALL_RINGBACK_VOICE_REPORT] = &TelRilCall::CallRingbackVoiceNotice;
@@ -95,16 +90,6 @@ bool TelRilCall::IsCallNotification(uint32_t code)
 bool TelRilCall::IsCallRespOrNotify(uint32_t code)
 {
     return IsCallResponse(code) || IsCallNotification(code);
-}
-
-int32_t TelRilCall::CallStateUpdated(MessageParcel &data)
-{
-    if (observerHandler_ == nullptr) {
-        TELEPHONY_LOGE("TelRilCall observerHandler_ is null!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_STATE);
-    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t TelRilCall::AnswerResponse(MessageParcel &data)
@@ -539,7 +524,7 @@ int32_t TelRilCall::SetCallTransferInfoResponse(MessageParcel &data)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    if (telRilRequest == nullptr && telRilRequest->pointer_ == nullptr) {
+    if (telRilRequest == nullptr || telRilRequest->pointer_ == nullptr) {
         TELEPHONY_LOGE("ERROR : telRilRequest or telRilRequest->pointer_ is nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1783,84 +1768,10 @@ int32_t TelRilCall::GetUssdResponse(MessageParcel &data)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilCall::CallCringNotice(MessageParcel &data)
+int32_t TelRilCall::CallStateUpdated(MessageParcel &data)
 {
-    std::shared_ptr<CallCringInfo> cringInfo = std::make_shared<CallCringInfo>();
-    if (cringInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : cringInfo == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    cringInfo->ReadFromParcel(data);
     if (observerHandler_ != nullptr) {
-        observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_CRING, cringInfo);
-    } else {
-        TELEPHONY_LOGE("ERROR : observerHandler_ == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    return TELEPHONY_ERR_SUCCESS;
-}
-
-int32_t TelRilCall::CallWaitingNotice(MessageParcel &data)
-{
-    std::shared_ptr<CallWaitInfo> waitInfo = std::make_shared<CallWaitInfo>();
-    if (waitInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : waitInfo == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    waitInfo->ReadFromParcel(data);
-    if (observerHandler_ != nullptr) {
-        observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_WAITING, waitInfo);
-    } else {
-        TELEPHONY_LOGE("ERROR : observerHandler_ == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    return TELEPHONY_ERR_SUCCESS;
-}
-
-int32_t TelRilCall::CallConnectNotice(MessageParcel &data)
-{
-    std::shared_ptr<CallConnectInfo> connectInfo = std::make_shared<CallConnectInfo>();
-    if (connectInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : connectInfo == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    connectInfo->ReadFromParcel(data);
-    if (observerHandler_ != nullptr) {
-        observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_CONNECT, connectInfo);
-    } else {
-        TELEPHONY_LOGE("ERROR : observerHandler_ == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    return TELEPHONY_ERR_SUCCESS;
-}
-
-int32_t TelRilCall::CallEndNotice(MessageParcel &data)
-{
-    std::shared_ptr<CallEndInfo> endInfo = std::make_shared<CallEndInfo>();
-    if (endInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : endInfo == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    endInfo->ReadFromParcel(data);
-    if (observerHandler_ != nullptr) {
-        observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_END, endInfo);
-    } else {
-        TELEPHONY_LOGE("ERROR : observerHandler_ == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    return TELEPHONY_ERR_SUCCESS;
-}
-
-int32_t TelRilCall::CallStatusInfoNotice(MessageParcel &data)
-{
-    std::shared_ptr<CallStatusInfo> statusInfo = std::make_shared<CallStatusInfo>();
-    if (statusInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : statusInfo == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    statusInfo->ReadFromParcel(data);
-    if (observerHandler_ != nullptr) {
-        observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_STATUS_INFO, statusInfo);
+        observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_STATUS_INFO);
     } else {
         TELEPHONY_LOGE("ERROR : observerHandler_ == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1894,7 +1805,7 @@ int32_t TelRilCall::CallUssdNotice(MessageParcel &data)
     }
     ussdNoticeInfo->ReadFromParcel(data);
     if (observerHandler_ != nullptr) {
-        observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_USSD_CUSD_NOTICE, ussdNoticeInfo);
+        observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_USSD_NOTICE, ussdNoticeInfo);
     } else {
         TELEPHONY_LOGE("ERROR : observerHandler_ == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
