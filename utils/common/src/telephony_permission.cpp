@@ -56,7 +56,6 @@ bool TelephonyPermission::GetBundleNameByUid(int32_t uid, std::string &bundleNam
  */
 bool TelephonyPermission::CheckPermission(const std::string &permissionName)
 {
-#ifdef SUPPORT_PERMISSION
     if (permissionName.empty()) {
         TELEPHONY_LOGE("permission check failed，permission name is empty.");
         return false;
@@ -81,9 +80,6 @@ bool TelephonyPermission::CheckPermission(const std::string &permissionName)
         return false;
     }
     return true;
-#else
-    return true;
-#endif
 }
 } // namespace Telephony
 } // namespace OHOS
