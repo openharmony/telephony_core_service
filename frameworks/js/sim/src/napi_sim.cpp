@@ -600,7 +600,6 @@ void NativeGetSimIccId(napi_env env, void *data)
     AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
     asyncContext->callbackVal =
         NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimIccId(asyncContext->slotId));
-    TELEPHONY_LOGI("NAPI NativeGetSimIccId %{public}s", asyncContext->callbackVal.c_str());
     asyncContext->context.resolved = !(asyncContext->callbackVal.empty());
 }
 
@@ -920,7 +919,6 @@ void NativeGetIMSI(napi_env env, void *data)
     AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
     asyncContext->callbackVal =
         NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetIMSI(asyncContext->slotId));
-    TELEPHONY_LOGI("NAPI NativeGetIMSI %{public}s", asyncContext->callbackVal.c_str());
     asyncContext->context.resolved = !(asyncContext->callbackVal.empty());
 }
 
@@ -1744,8 +1742,6 @@ void NativeUnlockSimLock(napi_env env, void *data)
     LockStatusResponse response {ERROR_DEFAULT, ERROR_DEFAULT};
     PersoLockInfo lockInfo {
         static_cast<PersoLockType>(asyncContext->pinEnable), NapiUtil::ToUtf16(asyncContext->inStr1.data())};
-    TELEPHONY_LOGI("NAPI NativeUnlockSimLock %{public}d, %{public}s", lockInfo.lockType,
-        NapiUtil::ToUtf8(lockInfo.password).c_str());
     bool result = DelayedRefSingleton<CoreServiceClient>::GetInstance().UnlockSimLock(
         asyncContext->pinContext.slotId, lockInfo, response);
     TELEPHONY_LOGI("NAPI NativeUnlockSimLock %{public}d", result);
