@@ -1,17 +1,17 @@
 /*
-* Copyright (C) 2021 Huawei Device Co., Ltd.
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import {AsyncCallback} from "./basic";
 
@@ -143,6 +143,7 @@ declare namespace radio {
    * supported by the device.
    * @param callback Returns the IMEI; returns an empty string if the IMEI does not exist.
    * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
    * @since 8
    */
   function getIMEI(callback: AsyncCallback<string>): void;
@@ -235,7 +236,10 @@ declare namespace radio {
   function isNrSupported(slotId: number): boolean;
 
   /**
+   * Checks whether the radio service is enabled.
+   *
    * @param slotId Indicates the card slot index number,
+   *   ranging from 0 to the maximum card slot index number supported by the device.
    * @permission ohos.permission.GET_NETWORK_INFO
    * @since 7
    */
@@ -244,7 +248,10 @@ declare namespace radio {
   function isRadioOn(slotId?: number): Promise<boolean>;
 
   /**
+   * Turn on the radio service.
+   *
    * @param slotId Indicates the card slot index number,
+   *   ranging from 0 to the maximum card slot index number supported by the device.
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @systemapi Hide this for inner system use.
    * @since 7
@@ -254,7 +261,10 @@ declare namespace radio {
   function turnOnRadio(slotId?: number): Promise<void>;
 
   /**
+   * Turn off the radio service.
+   *
    * @param slotId Indicates the card slot index number,
+   *   ranging from 0 to the maximum card slot index number supported by the device.
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @systemapi Hide this for inner system use.
    * @since 7
@@ -262,6 +272,7 @@ declare namespace radio {
   function turnOffRadio(callback: AsyncCallback<void>): void;
   function turnOffRadio(slotId: number, callback: AsyncCallback<void>): void;
   function turnOffRadio(slotId?: number): Promise<void>;
+
   /**
    * @since 7
    */
@@ -289,7 +300,6 @@ declare namespace radio {
    * @since 8
    */
   export enum PreferredNetworkMode {
-    PREFERRED_NETWORK_MODE_AUTO = 0,
     PREFERRED_NETWORK_MODE_GSM = 1,
     PREFERRED_NETWORK_MODE_WCDMA = 2,
     PREFERRED_NETWORK_MODE_LTE = 3,
@@ -631,11 +641,11 @@ declare namespace radio {
    * @since 8
    */
   export interface CdmaCellInformation {
-    baseId: number,
-    latitude: number,
-    longitude: number,
-    nid: number,
-    sid: number,
+    baseId: number;
+    latitude: number;
+    longitude: number;
+    nid: number;
+    sid: number;
   }
 
   /**
