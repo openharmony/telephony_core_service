@@ -524,7 +524,7 @@ int32_t TelRilCall::SetCallTransferInfoResponse(MessageParcel &data)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    if (telRilRequest == nullptr && telRilRequest->pointer_ == nullptr) {
+    if (telRilRequest == nullptr || telRilRequest->pointer_ == nullptr) {
         TELEPHONY_LOGE("ERROR : telRilRequest or telRilRequest->pointer_ is nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
