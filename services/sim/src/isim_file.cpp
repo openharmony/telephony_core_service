@@ -137,7 +137,7 @@ bool IsimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
     bool isFileHandleResponse = true;
     if (sharedObject != nullptr) {
         imsi_ = *sharedObject;
-        TELEPHONY_LOGI("IsimFile::ProcessEvent -MSG_SIM_OBTAIN_IMSI_DONE %{public}s", imsi_.c_str());
+        TELEPHONY_LOGI("IsimFile::ProcessEvent MSG_SIM_OBTAIN_IMSI_DONE");
         if (!imsi_.empty()) {
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
             PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_IMSI, imsi_);
@@ -164,7 +164,7 @@ bool IsimFile::ProcessGetImpiDone(const AppExecFwk::InnerEvent::Pointer &event)
         return isFileProcessResponse ;
     }
     imsi_ = fd->resultData;
-    TELEPHONY_LOGI("ELEMENTARY_FILE_IMPI= %{public}s", imsi_.c_str());
+    TELEPHONY_LOGI("IsimFile::ProcessGetImpiDone success");
     return isFileProcessResponse;
 }
 

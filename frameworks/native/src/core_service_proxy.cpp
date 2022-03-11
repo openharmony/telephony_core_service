@@ -101,7 +101,7 @@ std::u16string CoreServiceProxy::GetOperatorNumeric(int32_t slotId)
     }
     std::u16string result = reply.ReadString16();
     std::string str = Str16ToStr8(result);
-    TELEPHONY_LOGI("CoreServiceProxy GetOperatorNumeric %{public}s\n", str.c_str());
+    TELEPHONY_LOGI("CoreServiceProxy GetOperatorNumeric success");
     return result;
 }
 
@@ -124,7 +124,7 @@ std::u16string CoreServiceProxy::GetOperatorName(int32_t slotId)
     }
     std::u16string result = reply.ReadString16();
     std::string str = Str16ToStr8(result);
-    TELEPHONY_LOGI("GetOperatorName call end: result=%{public}s \n", str.c_str());
+    TELEPHONY_LOGI("GetOperatorName call end");
     return result;
 }
 
@@ -370,7 +370,7 @@ std::u16string CoreServiceProxy::GetIsoCountryCodeForNetwork(int32_t slotId)
     }
     std::u16string result = reply.ReadString16();
     std::string str = Str16ToStr8(result);
-    TELEPHONY_LOGI("GetIsoCountryCodeForNetwork call end: result=%{public}s \n", str.c_str());
+    TELEPHONY_LOGI("GetIsoCountryCodeForNetwork call end");
     return result;
 }
 
@@ -395,7 +395,7 @@ std::u16string CoreServiceProxy::GetImei(int32_t slotId)
     }
     std::u16string result = reply.ReadString16();
     std::string str = Str16ToStr8(result);
-    TELEPHONY_LOGI("CoreServiceProxy::GetImei str = %{public}s", str.c_str());
+    TELEPHONY_LOGI("CoreServiceProxy::GetImei success");
     return result;
 }
 
@@ -420,7 +420,7 @@ std::u16string CoreServiceProxy::GetMeid(int32_t slotId)
     }
     std::u16string result = reply.ReadString16();
     std::string str = Str16ToStr8(result);
-    TELEPHONY_LOGI("CoreServiceProxy::GetMeid str = %{public}s", str.c_str());
+    TELEPHONY_LOGI("CoreServiceProxy::GetMeid success");
     return result;
 }
 
@@ -545,7 +545,7 @@ std::u16string CoreServiceProxy::GetISOCountryCodeForSim(int32_t slotId)
     }
     std::u16string result = reply.ReadString16();
     std::string str = Str16ToStr8(result);
-    TELEPHONY_LOGI("GetISOCountryCodeForSim call end: result=%{public}s \n", str.c_str());
+    TELEPHONY_LOGI("GetISOCountryCodeForSim call end");
     return result;
 }
 
@@ -573,7 +573,7 @@ std::u16string CoreServiceProxy::GetSimOperatorNumeric(int32_t slotId)
     }
     std::u16string result = reply.ReadString16();
     std::string str = Str16ToStr8(result);
-    TELEPHONY_LOGI("GetSimOperatorNumeric call end: result=%{public}s \n", str.c_str());
+    TELEPHONY_LOGI("GetSimOperatorNumeric call end");
     return result;
 }
 
@@ -601,7 +601,7 @@ std::u16string CoreServiceProxy::GetSimSpn(int32_t slotId)
     }
     std::u16string result = reply.ReadString16();
     std::string str = Str16ToStr8(result);
-    TELEPHONY_LOGI("GetSimSpn call end: result=%{public}s \n", str.c_str());
+    TELEPHONY_LOGI("GetSimSpn call end");
     return result;
 }
 
@@ -933,8 +933,7 @@ int32_t CoreServiceProxy::GetPrimarySlotId()
 
 bool CoreServiceProxy::SetShowNumber(int32_t slotId, const std::u16string number)
 {
-    TELEPHONY_LOGI("CoreServiceProxy::SetShowNumber slotId = %{public}d number = %{public}s", slotId,
-        Str16ToStr8(number).c_str());
+    TELEPHONY_LOGI("CoreServiceProxy::SetShowNumber slotId = %{public}d", slotId);
     if (!IsValidSlotId(slotId)) {
         return false;
     }
@@ -993,8 +992,7 @@ std::u16string CoreServiceProxy::GetShowNumber(int32_t slotId)
 
 bool CoreServiceProxy::SetShowName(int32_t slotId, const std::u16string name)
 {
-    TELEPHONY_LOGI(
-        "CoreServiceProxy::SetShowName slotId = %{public}d name = %{public}s", slotId, Str16ToStr8(name).c_str());
+    TELEPHONY_LOGI("CoreServiceProxy::SetShowName slotId = %{public}d", slotId);
     if (!IsValidSlotId(slotId)) {
         return false;
     }
@@ -1080,9 +1078,7 @@ bool CoreServiceProxy::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &
         for (int i = 0; i < size; i++) {
             IccAccountInfo accountInfo;
             accountInfo.ReadFromParcel(reply);
-            TELEPHONY_LOGI(
-                "CoreServiceProxy::GetActiveSimAccountInfoList slotIndex = %{public}d, showName = %{public}s",
-                accountInfo.slotIndex, Str16ToStr8(accountInfo.showName).c_str());
+            TELEPHONY_LOGI("CoreServiceProxy::GetActiveSimAccountInfoList success");
             iccAccountInfoList.emplace_back(accountInfo);
         }
     }

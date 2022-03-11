@@ -280,7 +280,7 @@ void SimFile::ProcessSpnGeneral(const AppExecFwk::InnerEvent::Pointer &event)
         if (spn.empty() || spn.size() == 0) {
             spnStatus_ = SpnStatus::OBTAIN_OPERATOR_NAMESTRING;
         } else {
-            TELEPHONY_LOGI("SimFile Load Spn3Gpp done: %{public}s", spn.c_str());
+            TELEPHONY_LOGI("SimFile Load Spn3Gpp done");
             spnStatus_ = SpnStatus::OBTAIN_SPN_NONE;
         }
     } else {
@@ -331,7 +331,7 @@ void SimFile::ProcessSpnShortCphs(const AppExecFwk::InnerEvent::Pointer &event)
             TELEPHONY_LOGI("SimFile No SPN loaded");
         } else {
             displayConditionOfSpn_ = SPN_COND;
-            TELEPHONY_LOGI("SimFile Load ELEMENTARY_FILE_SPN_SHORT_CPHS: %{public}s", spn.c_str());
+            TELEPHONY_LOGI("SimFile Load ELEMENTARY_FILE_SPN_SHORT_CPHS");
         }
     } else {
         UpdateSPN(IccFileController::NULLSTR);
@@ -362,8 +362,7 @@ std::string SimFile::ParseSpn(const std::string &rawData, int spnStatus)
         return "";
     }
     std::string ret = SIMUtils::DiallingNumberStringFieldConvertToString(bytesNew, offset, length, SPN_CHAR_POS);
-    TELEPHONY_LOGI("SimFile::ParseSpn: rawdata %{public}s, state %{public}d, ret %{public}s",
-        rawData.c_str(), spnStatus, ret.c_str());
+    TELEPHONY_LOGI("SimFile::ParseSpn success");
     return ret;
 }
 
@@ -439,7 +438,6 @@ bool SimFile::ProcessGetMsisdnDone(const AppExecFwk::InnerEvent::Pointer &event)
     }
     msisdn_ = Str16ToStr8(diallingNumber->GetNumber());
     msisdnTag_ = Str16ToStr8(diallingNumber->GetName());
-    TELEPHONY_LOGI("phonenumber: %{public}s name: %{public}s", msisdn_.c_str(), msisdnTag_.c_str());
     return isFileProcessResponse;
 }
 
@@ -542,7 +540,7 @@ bool SimFile::ProcessGetMbdnDone(const AppExecFwk::InnerEvent::Pointer &event)
     }
     voiceMailNum_ = Str16ToStr8(diallingNumber->GetNumber());
     voiceMailTag_ = Str16ToStr8(diallingNumber->GetName());
-    TELEPHONY_LOGI("ProcessGetMbdnDone result %{public}s %{public}s", voiceMailNum_.c_str(), voiceMailTag_.c_str());
+    TELEPHONY_LOGI("ProcessGetMbdnDone success");
     return isFileProcessResponse;
 }
 
@@ -566,7 +564,7 @@ bool SimFile::ProcessGetCphsMailBoxDone(const AppExecFwk::InnerEvent::Pointer &e
 
     voiceMailNum_ = Str16ToStr8(diallingNumber->GetNumber());
     voiceMailTag_ = Str16ToStr8(diallingNumber->GetName());
-    TELEPHONY_LOGI("GetCphsMailBoxDone result %{public}s %{public}s", voiceMailNum_.c_str(), voiceMailTag_.c_str());
+    TELEPHONY_LOGI("GetCphsMailBoxDone success");
     return isFileProcessResponse;
 }
 
@@ -831,7 +829,7 @@ bool SimFile::ProcessGetInfoCphs(const AppExecFwk::InnerEvent::Pointer &event)
         return isFileProcessResponse;
     }
     cphsInfo_ = fd->resultData;
-    TELEPHONY_LOGI("SimFile iCPHS: %{public}s", cphsInfo_.c_str());
+    TELEPHONY_LOGI("SimFile::ProcessGetInfoCphs success");
     return isFileProcessResponse;
 }
 
@@ -882,8 +880,7 @@ bool SimFile::ProcessSetCphsMailbox(const AppExecFwk::InnerEvent::Pointer &event
         voiceMailTag_ = Str16ToStr8(diallingNumber->GetName());
         waitResult_ = true;
         processWait_.notify_all();
-        TELEPHONY_LOGI("set cphs voicemail number: %{public}s name: %{public}s",
-            voiceMailNum_.c_str(), voiceMailTag_.c_str());
+        TELEPHONY_LOGI("set cphs voicemail success");
     } else {
         processWait_.notify_all();
         TELEPHONY_LOGE("set cphs voicemail failed with exception!!");
@@ -953,8 +950,7 @@ bool SimFile::ProcessSetMbdn(const AppExecFwk::InnerEvent::Pointer &event)
         waitResult_ = true;
         processWait_.notify_all();
         hasNotify = true;
-        TELEPHONY_LOGI("set voicemail name: %{public}s number: %{public}s",
-            voiceMailTag_.c_str(), voiceMailNum_.c_str());
+        TELEPHONY_LOGI("set voicemail name success");
     }
 
     if (CphsVoiceMailAvailable()) {

@@ -186,7 +186,7 @@ bool RuimFile::ProcessGetIccidDone(const AppExecFwk::InnerEvent::Pointer &event)
     bool isFileProcessResponse = true;
     if (fd->exception == nullptr) {
         std::string iccData = fd->resultData;
-        TELEPHONY_LOGI("RuimFile::ProcessEvent MSG_SIM_OBTAIN_ICCID_DONE result success %{public}s", iccData.c_str());
+        TELEPHONY_LOGI("RuimFile::ProcessEvent MSG_SIM_OBTAIN_ICCID_DONE result success");
         iccId_ = iccData;
     }
     return isFileProcessResponse;
@@ -198,7 +198,7 @@ bool RuimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
     bool isFileHandleResponse = true;
     if (sharedObject != nullptr) {
         imsi_ = *sharedObject;
-        TELEPHONY_LOGI("RuimFile::ProcessEvent -MSG_SIM_OBTAIN_IMSI_DONE %{public}s", imsi_.c_str());
+        TELEPHONY_LOGI("RuimFile::ProcessEvent MSG_SIM_OBTAIN_IMSI_DONE");
         if (!imsi_.empty()) {
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
             PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_IMSI, imsi_);
@@ -276,7 +276,6 @@ bool RuimFile::ProcessGetSpnDone(const AppExecFwk::InnerEvent::Pointer &event)
         return isFileProcessResponse;
     }
     int dataLen = 0;
-    TELEPHONY_LOGI("EfCsimSpnFileWanted ProcessParseFile data is %{public}s", iccData.c_str());
     std::shared_ptr<unsigned char> fileData = SIMUtils::HexStringConvertToBytes(iccData, dataLen);
     unsigned char* data = fileData.get();
     displayConditionOfCsimSpn_ = ((SPN_FLAG & data[0]) != 0);
