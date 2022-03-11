@@ -1304,7 +1304,6 @@ void NativeGetIMEI(napi_env env, void *data)
     auto context = static_cast<GetIMEIContext *>(data);
     context->getIMEIResult =
         NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImei(context->slotId));
-    TELEPHONY_LOGI("NativeGetIMEI getIMEIResult = %{public}s", context->getIMEIResult.c_str());
     context->resolved = true;
 }
 
