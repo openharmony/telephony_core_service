@@ -1887,7 +1887,9 @@ bool TelRilTest::DemoHandler::GetBoolResult(int32_t eventId)
         return ret;
     }
     if ((resultInfo_ != nullptr) &&
-        ((resultInfo_->error == HRilErrType::NONE) || (resultInfo_->error == HRilErrType::HRIL_ERR_GENERIC_FAILURE))) {
+        ((resultInfo_->error == HRilErrType::NONE) ||
+         (resultInfo_->error == HRilErrType::HRIL_ERR_GENERIC_FAILURE) ||
+         (resultInfo_->error == HRilErrType::HRIL_ERR_INVALID_MODEM_PARAMETER))) {
         ret = true;
     }
     if (resultInfo_ == nullptr) {
