@@ -320,61 +320,6 @@ void NetworkRegister::UpdateCfgTech()
     networkSearchState_->SetCfgTech(cfgTech);
 }
 
-void NetworkRegister::ProcessPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &event) const
-{
-    TELEPHONY_LOGI("NetworkRegister::ProcessPsAttachStatus ok slotId:%{public}d", slotId_);
-    if (event == nullptr) {
-        TELEPHONY_LOGE("NetworkRegister::ProcessPsAttachStatus event is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-
-    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    if (nsm == nullptr) {
-        TELEPHONY_LOGE("NetworkRegister::ProcessPsAttachStatus nsm is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-
-    MessageParcel data;
-    int64_t index = 0;
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
-    if (responseInfo != nullptr) {
-        TELEPHONY_LOGE(
-            "NetworkRegister::ProcessPsAttachStatus HRilRadioResponseInfo error is %{public}d slotId:%{public}d",
-            responseInfo->error, slotId_);
-        index = responseInfo->flag;
-        if (!data.WriteBool(false) || !data.WriteInt32((int32_t)responseInfo->error)) {
-            TELEPHONY_LOGE(
-                "NetworkRegister::ProcessPsAttachStatus WriteBool slotId is false slotId:%{public}d", slotId_);
-            NetworkUtils::RemoveCallbackFromMap(index);
-            return;
-        }
-    } else {
-        index = event->GetParam();
-        TELEPHONY_LOGI("NetworkRegister::ProcessPsAttachStatus index:(%{public}" PRId64 ") slotId:%{public}d",
-            index, slotId_);
-        if (!data.WriteBool(true) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
-            TELEPHONY_LOGE(
-                "NetworkRegister::ProcessPsAttachStatus WriteBool slotId is false slotId:%{public}d", slotId_);
-            NetworkUtils::RemoveCallbackFromMap(index);
-            return;
-        }
-    }
-
-    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo = NetworkUtils::FindNetworkSearchCallback(index);
-    if (callbackInfo != nullptr) {
-        sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchItem_;
-        int32_t psAttachStatus = callbackInfo->param_;
-        TELEPHONY_LOGI("NetworkRegister::ProcessPsAttachStatus psAttachStatus is:%{public}d slotId:%{public}d",
-            psAttachStatus, slotId_);
-        if (callback != nullptr) {
-            callback->OnNetworkSearchCallback(
-                INetworkSearchCallback::NetworkSearchCallback::SET_PS_ATTACH_STATUS_RESULT, data);
-            TELEPHONY_LOGI("NetworkRegister::ProcessPsAttachStatus callback success slotId:%{public}d", slotId_);
-        }
-        NetworkUtils::RemoveCallbackFromMap(index);
-    }
-}
-
 void NetworkRegister::ProcessRestrictedState(const AppExecFwk::InnerEvent::Pointer &event) const {}
 
 RegServiceState NetworkRegister::ConvertRegFromRil(RilRegister code) const

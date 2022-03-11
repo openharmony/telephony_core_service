@@ -27,7 +27,6 @@ ohos_executable("tel_ril_test") {
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/frameworks/native/include",
-    "//base/telephony/core_service/interfaces/innerkits/state_registry",
     "$TELEPHONY_SIM_ROOT/include",
   ]
 
@@ -50,6 +49,7 @@ ohos_executable("tel_ril_test") {
     "ipc:ipc_core",
     "ril_adapter:hril_innerkits",
     "samgr_standard:samgr_proxy",
+    "startup_l2:syspara",
   ]
 
   if (is_standard_system) {

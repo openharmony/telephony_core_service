@@ -61,34 +61,6 @@ bool SimNumberDecode::IsValidNumberString(const std::string &number)
     return true;
 }
 
-std::shared_ptr<unsigned char> SimNumberDecode::NumberConvertToBCD(
-    const std::string &number, int bcdExtType, int &bcdLength)
-{
-    TELEPHONY_LOGI("SimNumberDecode::NumberConvertToBCD begin_A with number,bcdExtType:%{public}d", bcdExtType);
-    std::vector<uint8_t> result;
-    if (!NumberConvertToBCD(number, result, false, bcdExtType)) {
-        TELEPHONY_LOGE("SimNumberDecode::NumberConvertToBCD for number and bcdLength:%{public}d", bcdLength);
-        bcdLength = INIT_VAL;
-        return nullptr;
-    }
-    bcdLength = result.size();
-    if (bcdLength <= 0) {
-        TELEPHONY_LOGE("invalid length :%{public}d", bcdLength);
-        return nullptr;
-    }
-    uint8_t *res = (unsigned char *)calloc(bcdLength, sizeof(unsigned char));
-    if (!res) {
-        TELEPHONY_LOGE("calloc(%{public}d, %{public}zu) fail!", bcdLength, sizeof(uint8_t));
-        return nullptr;
-    }
-    for (const auto &v : result) {
-        *res = v;
-        ++res;
-    }
-    TELEPHONY_LOGI("SimNumberDecode::NumberConvertToBCD success end_A with result");
-    return std::shared_ptr<unsigned char>(res);
-}
-
 const std::string *SimNumberDecode::chooseExtendedByType(const int bcdExtType)
 {
     if (bcdExtType == BCD_TYPE_ADN) {

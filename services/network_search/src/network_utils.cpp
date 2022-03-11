@@ -200,9 +200,9 @@ const std::map<RadioEvent, std::any> EventSender::mapFunctions_ = {
     {RadioEvent::RADIO_GET_IMEI, &ITelRilManager::GetImei},
     {RadioEvent::RADIO_GET_MEID, &ITelRilManager::GetMeid},
     {RadioEvent::RADIO_NETWORK_SEARCH_RESULT, &ITelRilManager::GetNetworkSearchInformation},
-    {RadioEvent::RADIO_SET_PS_ATTACH_STATUS, &ITelRilManager::SetPsAttachStatus},
     {RadioEvent::RADIO_GET_RADIO_CAPABILITY, &ITelRilManager::GetRadioCapability},
-    {RadioEvent::RADIO_SET_RADIO_CAPABILITY, &ITelRilManager::SetRadioCapability},
+    {RadioEvent::RADIO_GET_VOICE_TECH, &ITelRilManager::GetVoiceRadioTechnology},
+    {RadioEvent::RADIO_OPERATOR, &ITelRilManager::GetOperatorInfo},
 };
 
 AppExecFwk::InnerEvent::Pointer EventSender::GetEvent(int32_t slotId, RadioEvent radioEvent, int32_t param)

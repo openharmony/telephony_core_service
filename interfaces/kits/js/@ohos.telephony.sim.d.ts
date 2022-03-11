@@ -172,6 +172,12 @@ declare namespace sim {
   function getVoiceMailNumber(slotId: number): Promise<string>;
 
   /**
+   * Sets the voice mail information.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from {@code 0} to the maximum card slot index number supported by the device.
+   * @param mailName Indicates the name of voice mail.
+   * @param mailNumber Indicates the number of voice mail.
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @systemapi Hide this for inner system use.
    * @since 8

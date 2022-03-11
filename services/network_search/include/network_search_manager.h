@@ -59,6 +59,7 @@ struct NetworkSearchManagerInner {
     NrMode nrMode_ = NrMode::NR_MODE_UNKNOWN;
     FrequencyType freqType_ = FrequencyType::FREQ_TYPE_UNKNOWN;
     RadioCapabilityInfo radioCapability_;
+    std::mutex mutex_;
 
     bool Init()
     {
@@ -127,7 +128,6 @@ public:
     bool SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback) override;
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) override;
     std::u16string GetImei(int32_t slotId) override;
-    bool SetPsAttachStatus(int32_t slotId, int32_t psAttachStatus, NSCALLBACK &callback) override;
     int32_t GetPsRegState(int32_t slotId) override;
     int32_t GetCsRegState(int32_t slotId) override;
     int32_t GetPsRoamingState(int32_t slotId) override;
@@ -174,11 +174,11 @@ public:
     void UpdateCellLocation(int32_t slotId, int32_t techType, int32_t cellId, int32_t lac);
     void SetMeid(int32_t slotId, std::u16string meid);
     int32_t GetRadioCapability(int32_t slotId);
-    bool SetRadioCapability(int32_t slotId, RadioCapabilityInfo &radioCapability);
     void SetNrOptionMode(int32_t slotId, NrMode mode);
     void SetFrequencyType(int32_t slotId, FrequencyType type);
     void GetVoiceTech(int32_t slotId);
     std::shared_ptr<NetworkSearchManagerInner> FindManagerInner(int32_t slotId);
+    void SetLocateUpdate(int32_t slotId);
 
     inline bool GetAirplaneMode()
     {
@@ -228,7 +228,7 @@ public:
 private:
     bool InitPointer(std::shared_ptr<NetworkSearchManagerInner> &inner, int32_t slotId);
     void ClearManagerInner();
-    void AddManagerInner(int32_t slotId, std::shared_ptr<NetworkSearchManagerInner> inner);
+    void AddManagerInner(int32_t slotId, const std::shared_ptr<NetworkSearchManagerInner> &inner);
     bool RemoveManagerInner(int32_t slotId);
 
 private:

@@ -22,6 +22,7 @@
 #include "permission/permission.h"
 #include "permission/permission_kit.h"
 #include "system_ability_definition.h"
+#include "accesstoken_kit.h"
 
 #include "telephony_log_wrapper.h"
 
@@ -55,53 +56,34 @@ bool TelephonyPermission::GetBundleNameByUid(int32_t uid, std::string &bundleNam
  */
 bool TelephonyPermission::CheckPermission(const std::string &permissionName)
 {
-#ifndef SUPPORT_PERMISSION
-    return true;
-#endif
+#ifdef SUPPORT_PERMISSION
     if (permissionName.empty()) {
         TELEPHONY_LOGE("permission check failed，permission name is empty.");
         return false;
     }
-    int32_t uid = IPCSkeleton::GetCallingUid();
-    std::string bundleName = "";
-    bool result = GetBundleNameByUid(uid, bundleName);
-    if (!result || bundleName.empty()) {
-        TELEPHONY_LOGE("permission check failed, cannot get bundle name by uid:%{public}d", uid);
+
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
+    int result = Security::AccessToken::PERMISSION_DENIED;
+
+    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
+        result = Security::AccessToken::AccessTokenKit::VerifyNativeToken(callerToken, permissionName);
+    } else if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
+        result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+    } else {
+        TELEPHONY_LOGE("permission check failed, callerToken:%{public}u, tokenType:%{public}d",
+            callerToken, tokenType);
+    }
+
+    if (result != Security::AccessToken::PERMISSION_GRANTED) {
+        TELEPHONY_LOGE("permission check failed, permission:%{public}s, callerToken:%{public}u, tokenType:%{public}d",
+            permissionName.c_str(), callerToken, tokenType);
         return false;
     }
-
-    result = OHOS::Security::Permission::PermissionKit::VerifyPermission(bundleName, permissionName, 0);
-    if (result != OHOS::Security::Permission::PermissionState::PERMISSION_GRANTED) {
-        TELEPHONY_LOGW("permission = %{public}s, bundleName = %{public}s, result = %{public}d",
-            permissionName.c_str(), bundleName.c_str(), result);
-    }
-
-    return result == OHOS::Security::Permission::PermissionState::PERMISSION_GRANTED;
-}
-
-/**
- * @brief Permission check by callingUid.
- * @param bundleName .
- * @param permissionName permission name.
- * @return Returns true on success, false on failure.
- */
-bool TelephonyPermission::CheckPermission(const std::string &bundleName, const std::string &permissionName)
-{
-#ifndef SUPPORT_PERMISSION
+    return true;
+#else
     return true;
 #endif
-    if (bundleName.empty()) {
-        TELEPHONY_LOGE("permission check failed，bundleName is empty.");
-        return false;
-    }
-
-    bool result = OHOS::Security::Permission::PermissionKit::VerifyPermission(bundleName, permissionName, 0);
-    if (result != OHOS::Security::Permission::PermissionState::PERMISSION_GRANTED) {
-        TELEPHONY_LOGW("permission = %{public}s, bundleName = %{public}s, result = %{public}d",
-            permissionName.c_str(), bundleName.c_str(), result);
-    }
-
-    return result == OHOS::Security::Permission::PermissionState::PERMISSION_GRANTED;
 }
 } // namespace Telephony
 } // namespace OHOS

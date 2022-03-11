@@ -65,7 +65,6 @@ public:
     virtual int32_t GetCsRegState(int32_t slotId) = 0;
     virtual int32_t GetPsRoamingState(int32_t slotId) = 0;
     virtual std::u16string GetImei(int32_t slotId) = 0;
-    virtual bool SetPsAttachStatus(int32_t slotId, int32_t psAttachStatus, NSCALLBACK &callback) = 0;
     virtual bool GetImsRegStatus(int32_t slotId) = 0;
     virtual std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) = 0;
     virtual bool SendUpdateCellLocationRequest(int32_t slotId) = 0;

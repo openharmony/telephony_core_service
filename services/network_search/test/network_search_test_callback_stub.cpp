@@ -89,14 +89,5 @@ void NetworkSearchTestCallbackStub::OnGetPreferredNetworkCallback(
         "errorCode:%{public}d",
         networkMode, errorCode);
 }
-
-void NetworkSearchTestCallbackStub::OnSetPsAttachStatusCallback(
-    const int32_t psAttachStatus, const int32_t errorCode)
-{
-    TELEPHONY_LOGI(
-        "NetworkSearchTestCallbackStub OnSetPsAttachStatusCallback success, result:%{public}d, "
-        "errorCode:%{public}d",
-        psAttachStatus, errorCode);
-}
 } // namespace Telephony
 } // namespace OHOS

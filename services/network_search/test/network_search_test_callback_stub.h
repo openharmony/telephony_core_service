@@ -30,7 +30,6 @@ public:
         const sptr<NetworkSearchResult> &networkSearchResult, const int32_t errorCode) override;
     void OnSetPreferredNetworkCallback(const bool result, const int32_t errorCode) override;
     void OnGetPreferredNetworkCallback(const int32_t networkMode, const int32_t errorCode) override;
-    void OnSetPsAttachStatusCallback(const int32_t psAttachStatus, const int32_t errorCode) override;
 };
 } // namespace Telephony
 } // namespace OHOS

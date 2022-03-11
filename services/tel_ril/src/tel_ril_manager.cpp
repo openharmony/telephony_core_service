@@ -30,7 +30,7 @@ namespace OHOS {
 namespace Telephony {
 const std::string RIL_ADAPTER_SERVICE_NAME = "cellular_radio1";
 constexpr int32_t RIL_ADAPTER_ERROR = 29189;
-TelRilManager::TelRilManager() : IPCObjectStub(std::u16string(u"")) {}
+TelRilManager::TelRilManager() : IPCObjectStub(std::u16string(HRIL_INTERFACE_TOKEN)) {}
 
 int32_t TelRilManager::SetCellularRadioIndication()
 {
@@ -63,6 +63,12 @@ int32_t TelRilManager::SetCellularRadioResponse()
 int32_t TelRilManager::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, OHOS::MessageOption &option)
 {
+    auto selfToken = TelRilManager::GetObjectDescriptor();
+    auto reqToken = data.ReadInterfaceToken();
+    if (selfToken != reqToken) {
+        TELEPHONY_LOGE("descriptor checked fail, code is %{public}d.", code);
+        return CORE_SERVICE_ERROR;
+    }
     int32_t slotId = data.ReadInt32();
     TELEPHONY_LOGI("TelRilManager OnRemoteRequest code:%{public}d, slotId:%{public}d", code, slotId);
     if ((slotId < 0) || (slotId > static_cast<int32_t>(telRilCall_.size()))) {
@@ -565,18 +571,6 @@ int32_t TelRilManager::GetOperatorInfo(int32_t slotId, const AppExecFwk::InnerEv
     return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetOperatorInfo);
 }
 
-int32_t TelRilManager::SetPsAttachStatus(
-    int32_t slotId, int32_t psAttachStatus, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    return TaskSchedule(
-        response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::SetPsAttachStatus, psAttachStatus);
-}
-
-int32_t TelRilManager::GetPsAttachStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetPsAttachStatus);
-}
-
 int32_t TelRilManager::GetNetworkSearchInformation(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(
@@ -619,13 +613,6 @@ int32_t TelRilManager::GetCurrentCellInfo(int32_t slotId, const AppExecFwk::Inne
 int32_t TelRilManager::GetRadioCapability(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetRadioCapability);
-}
-
-int32_t TelRilManager::SetRadioCapability(
-    int32_t slotId, RadioCapabilityInfo &radioCapabilityInfo, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    return TaskSchedule(
-        response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::SetRadioCapability, radioCapabilityInfo);
 }
 
 int32_t TelRilManager::GetPhysicalChannelConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)

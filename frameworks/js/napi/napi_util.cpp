@@ -146,8 +146,7 @@ bool NapiUtil::MatchObjectProperty(
     return true;
 }
 
-bool NapiUtil::MatchOptionPropertyType(
-    napi_env env, napi_value object, napi_valuetype type, std::string propertyName)
+bool NapiUtil::MatchOptionPropertyType(napi_env env, napi_value object, napi_valuetype type, std::string propertyName)
 {
     bool hasProperty = false;
     NAPI_CALL_BASE(env, napi_has_named_property(env, object, propertyName.data(), &hasProperty), false);
@@ -203,8 +202,7 @@ napi_value NapiUtil::HandleAsyncWork(napi_env env, BaseContext *baseContext, con
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_utf8(env, workName.data(), NAPI_AUTO_LENGTH, &resourceName));
     NAPI_CALL(env,
-        napi_create_async_work(
-            env, resource, resourceName, execute, complete, (void *)context.get(), &context->work));
+        napi_create_async_work(env, resource, resourceName, execute, complete, (void *)context.get(), &context->work));
     napi_status queueWorkStatus = napi_queue_async_work(env, context->work);
     if (queueWorkStatus == napi_ok) {
         context.release();
@@ -290,6 +288,22 @@ void NapiUtil::Handle2ValueCallback(napi_env env, BaseContext *baseContext, napi
     delete baseContext;
     baseContext = nullptr;
     TELEPHONY_LOGI("Handle2ValueCallback end");
+}
+
+void NapiUtil::DefineEnumClassByName(
+    napi_env env, napi_value exports, std::string_view enumName, size_t arrSize, const napi_property_descriptor *desc)
+{
+    auto construct = [](napi_env env, napi_callback_info info) -> napi_value { return nullptr; };
+    napi_value result = nullptr;
+    napi_status status =
+        napi_define_class(env, enumName.data(), NAPI_AUTO_LENGTH, construct, nullptr, arrSize, desc, &result);
+    if (status != napi_ok) {
+        TELEPHONY_LOGE("DefineEnumClassByName napi_define_class failed ret = %d", status);
+    }
+    status = napi_set_named_property(env, exports, enumName.data(), result);
+    if (status != napi_ok) {
+        TELEPHONY_LOGE("DefineEnumClassByName napi_set_named_property failed ret = %d", status);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

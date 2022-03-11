@@ -15,10 +15,12 @@
 
 #include "core_service_proxy.h"
 
+#include "parameter.h"
 #include "string_ex.h"
 
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -746,39 +748,6 @@ bool CoreServiceProxy::SetNetworkSelectionMode(int32_t slotId, int32_t selectMod
     int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::SET_NETWORK_SELECTION_MODE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SetNetworkSelectionMode failed, error code is %{public}d \n", st);
-        return false;
-    }
-    return reply.ReadBool();
-}
-
-bool CoreServiceProxy::SetPsAttachStatus(
-    int32_t slotId, int32_t psAttachStatus, const sptr<INetworkSearchCallback> &callback)
-{
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
-    if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("SetPsAttachStatus WriteInterfaceToken is false");
-        return false;
-    }
-    if (!data.WriteInt32(slotId)) {
-        TELEPHONY_LOGE("SetPsAttachStatus WriteInt32 slotId is false");
-        return false;
-    }
-    if (!data.WriteInt32(psAttachStatus)) {
-        TELEPHONY_LOGE("SetPsAttachStatus WriteInt32 psAttachStatus is false");
-        return false;
-    }
-    if (callback != nullptr) {
-        data.WriteRemoteObject(callback->AsObject().GetRefPtr());
-    }
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("SetPsAttachStatus Remote is null");
-        return false;
-    }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::SET_PS_ATTACH_STATUS), data, reply, option);
-    if (st != ERR_NONE) {
-        TELEPHONY_LOGE("SetPsAttachStatus failed, error code is %{public}d \n", st);
         return false;
     }
     return reply.ReadBool();
@@ -1825,26 +1794,10 @@ bool CoreServiceProxy::SetVoiceMailInfo(
 
 int32_t CoreServiceProxy::GetMaxSimCount()
 {
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
-    if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("GetMaxSimCount WriteInterfaceToken is false");
-        return ERROR;
-    }
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("GetMaxSimCount Remote is null");
-        return ERROR;
-    }
-    std::lock_guard<std::mutex> lock(mutex_);
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_MAX_SIM_COUNT), data, reply, option);
-    if (st != ERR_NONE) {
-        TELEPHONY_LOGE("GetMaxSimCount failed, error code is %{public}d \n", st);
-        return ERROR;
-    }
-    int32_t result = reply.ReadInt32();
-    TELEPHONY_LOGI("GetMaxSimCount end: result=%{public}d \n", result);
-    return result;
+    char simSlotCount[SYSPARA_SIZE] = {0};
+    GetParameter(TEL_SIM_SLOT_COUNT.c_str(), DEFAULT_SLOT_COUNT.c_str(), simSlotCount, SYSPARA_SIZE);
+    int32_t slotCount = std::atoi(simSlotCount);
+    return slotCount;
 }
 
 bool CoreServiceProxy::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)

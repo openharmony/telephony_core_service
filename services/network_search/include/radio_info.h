@@ -30,7 +30,6 @@ public:
     void ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessGetMeid(const AppExecFwk::InnerEvent::Pointer &event) const;
-    void ProcessSetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessGetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event) const;
     void UpdatePhone(RadioTech csRadioTech);
     void SetPhoneType(PhoneType phoneType);

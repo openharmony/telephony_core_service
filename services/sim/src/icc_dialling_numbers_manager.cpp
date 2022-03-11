@@ -14,6 +14,7 @@
  */
 
 #include "icc_dialling_numbers_manager.h"
+#include "radio_event.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -51,6 +52,7 @@ void IccDiallingNumbersManager::Init()
     stateDiallingNumbers_ = HandleRunningState::STATE_RUNNING;
 
     diallingNumbersCache_->Init();
+    simFileManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
     TELEPHONY_LOGI("IccDiallingNumbersManager::Init() end");
 }
 
@@ -72,9 +74,21 @@ void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Point
         case MSG_SIM_DIALLING_NUMBERS_DELETE_DONE:
             ProcessDeleteDone(event);
             break;
+        case RadioEvent::RADIO_SIM_RECORDS_LOADED:
+            InitFdnCache();
+            break;
         default:
             break;
     }
+}
+
+void IccDiallingNumbersManager::InitFdnCache()
+{
+    TELEPHONY_LOGI("IccDiallingNumbersManager::InitFdnCache start");
+    std::thread initTask ([&]() {
+        QueryIccDiallingNumbers(DiallingNumbersInfo::SIM_FDN);
+    });
+    initTask.detach();
 }
 
 void IccDiallingNumbersManager::ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
