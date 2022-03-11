@@ -629,7 +629,7 @@ std::u16string MultiSimController::GetShowNumber(int32_t slotId)
 
 bool MultiSimController::SetShowNumber(int32_t slotId, std::u16string number, bool force)
 {
-    TELEPHONY_LOGI("MultiSimController::SetShowNumber number = %{public}s ", Str16ToStr8(number).c_str());
+    TELEPHONY_LOGI("MultiSimController::SetShowNumber number");
     if (!force && GetIccId(slotId).empty()) {
         TELEPHONY_LOGE("MultiSimController::SetShowNumber empty sim operation set failed");
         return false;
