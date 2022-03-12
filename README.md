@@ -4,18 +4,18 @@
 -   [Directory Structure](#section129mcpsimp)
 -   [Constraints](#section133mcpsimp)
 -   [Available APIs](#section139mcpsimp)
-    -   [APIs for the SIM Card Service](#section142mcpsimp)
-    -   [APIs for the Network Search Service](#section198mcpsimp)
+    -   [SimManager APIs](#section142mcpsimp)
+    -   [NetworkSearchManager APIs](#section198mcpsimp)
 
 -   [Usage Guidelines](#section370mcpsimp)
     -   [Network Search](#section393mcpsimp)
-    -   [SIM Card](#section402mcpsimp)
+    -   [SIM Card Management](#section402mcpsimp)
 
 -   [Repositories Involved](#section409mcpsimp)
 
 ## Introduction<a name="section117mcpsimp"></a>
 
-The telephony core service initializes the RIL Manager, SIM card module, and network search module, and provides access to the RIL Adapter service.
+The telephony core service initializes the SimManager, NetworkSearchManager, and TelRilManager modules, and provides access to the RIL Adapter service.
 
 You can implement communication with the RIL Adapter by registering the callback service and implement communication between modules by subscribing to callbacks.
 
@@ -24,108 +24,115 @@ You can implement communication with the RIL Adapter by registering the callback
 
  ![](figures/en-us_architecture-of-the-core_service-module.png)
 
-As shown in the preceding figure, the telephony core service consists of the SIM card service, network search service, and RIL Manager service.
+As shown in the preceding figure, the telephony core service consists of the following:
 
--   SIM card service: Provides services including SIM card initialization, file read/write, loading status notification, and single-SIM/dual-SIM control. These services implement functions such as SIM card status query, SIM card management, SIM card control, STK, contact storage, and SMS storage.
--   Network search service: Provides services including network registration and network status acquisition. These services offer functions such as network registration, network mode query, radio status query, network search management, signal strength query, cell management, registration status management, and time and time zone setting.
--   RIL Manager service: Provides the proactive callback service and query result callback service.
+-   SimManager: provides services including SIM card initialization, file read/write, loading status notification, and single-SIM/dual-SIM control. These services implement functions such as SIM card status query, SIM card management, SIM card control, STK, contact storage, and SMS storage.
+-   NetworkSearchManager: provides services including network registration and network status acquisition. These services offer functions such as network registration, network mode query, radio service status query, radio service management, signal strength query, cell management, registration status management, and time and time zone setting.
+-   TelRilManager: provides the proactive callback service and query result callback service.
 
 ## Directory Structure<a name="section129mcpsimp"></a>
 
-```shell
+```sh
 /base/telphony/core_service
-├── figures                # Resource of Readme
-├── frameworks             # Framework Level Directory
+├── figures                # Figures
+├── frameworks             # Framework layer
 │   ├── js
 │   └── native
 ├── interfaces             # APIs
-│   ├── innerkits          # Internal APIs
-│   └── kits               # External APIs (such as JS APIs)
-├── sa_profile             # Core service startup file directory
+│   ├── innerkits          # Internal APIs
+│   └── kits               # External APIs \(such as JS APIs\)
+├── sa_profile             # SA profile
 ├── services               # Implementation of the telephony core service
-│   ├── etc                # Driver script directory for core services
+├── etc                    # Telephony core service driver scripts
 │   ├── include
-│   ├── network_search     # Search Network Service Code Directory
-│   ├── sim                # SIM card service code directory
+│   ├── network_search     # Network search service
+│   ├── sim                # SIM card service
 │   ├── src
-│   └── tel_ril            # Core service and RIL Adapter communication code directory
-├── test                   # Unit test related code
+│   └── tel_ril            #  Telephony core service and RIL Adapter communication
+└── test                   # Unit test
 │   └── unittest
 └── utils
-    ├── common             # Core service log print directory
+    ├── common             # Telephony core service log
     ├── log
     └── preferences
 ```
 
 ## Constraints<a name="section133mcpsimp"></a>
 
--   Programming language: C++、JavaScript
--   In terms of software, this module needs to work with the RIL adapter service \(ril\_adapter\) and status registration service \(state\_registry\).
--   In terms of hardware, the accommodating device must be equipped with a modem and a SIM card capable of independent cellular communication.
+-   Programming language: C++ and JavaScript.
+-   Software constraints: This module must work with the RIL Adapter service \(ril\_adapter\) and state registry service \(state\_registry\).
+-   Hardware constraints: The accommodating device must be equipped with a modem and a SIM card capable of independent cellular communication.
 
 ## Available APIs<a name="section139mcpsimp"></a>
 
-The telephony core service module needs to provide APIs for related modules, including the SIM card, network search modules.
+The telephony core service module needs to provide APIs for related modules, including the SIM card and radio modules.
 
-### APIs for the SIM Card Service<a name="section142mcpsimp"></a>
+###  SimManager APIs<a name="section142mcpsimp"></a>
 
-| Interface name                                                     | Interface description                                                    | Required permissions                            |
+| Name                                                    | Description                                                   | Required Permission                           |
 | ------------------------------------------------------------ | ----------------------------------------------------------- | ----------------------------------- |
-| function getSimState(slotId: number, callback: AsyncCallback\<SimState>): void; | Get the SIM card status of the specified slot                                     | None                                  |
-| function getSimGid1(slotId: number, callback: AsyncCallback\<string>): void; | Get the GID1 of the SIM card in the specified slot (Group Identifier Level 1)           | ohos.permission.GET_TELEPHONY_STATE |
-| function getSimIccId(slotId: number, callback: AsyncCallback\<string>): void; | Get the ICCID (Integrate Circuit Card Identity) of the SIM card in the specified slot | ohos.permission.GET_TELEPHONY_STATE |
-| function getISOCountryCodeForSim(slotId: number, callback: AsyncCallback\<string>): void; | Get the ISO country code of the SIM card in the specified slot                                | None                                  |
-| function getSimOperatorNumeric(slotId: number, callback: AsyncCallback\<string>): void; | Get the PLMN (Public Land Mobile Network) number of the SIM card in the specified slot | None                                  |
-| function getSimSpn(slotId: number, callback: AsyncCallback\<string>): void; | Get the SPN (Service Provider Name) of the SIM card of the specified slot       | None                                  |
-| function getDefaultVoiceSlotId(callback: AsyncCallback\<number>): void; | Get the default card slot of the voice service                                    | None                                  |
-| function isSimActive(slotId: number, callback: AsyncCallback\<boolean>): void | Check whether the SIM card in the specified slot is activated                           | None                                  |
-| function hasSimCard(slotId: number, callback: AsyncCallback\<boolean>): void  | Check whether the SIM card is inserted into the specified card slot                             | None                                  |
-| function getSimTelephoneNumber(slotId: number, callback: AsyncCallback\<string>): void | Get the MSISDN (Mobile Station Integrated Services Digital Network) of the SIM card in the specified slot|ohos.permission.GET_TELEPHONY_STATE |
-| function getVoiceMailIdentifier(slotId: number, callback: AsyncCallback\<string>): void | Get the voicemail identification of the SIM card in the specified slot | ohos.permission.GET_TELEPHONY_STATE | ohos.permission.GET_TELEPHONY_STATE |
-| function getVoiceMailNumber(slotId: number, callback: AsyncCallback\<string>): void | Get the voice mailbox number of the SIM card in the specified slot | ohos.permission.GET_TELEPHONY_STATE |
-| function getCardType(slotId: number, callback: AsyncCallback\<CardType>): void | Check whether the application (caller) has been granted operator privileges | None |
-| function hasOperatorPrivileges(slotId: number, callback: AsyncCallback\<boolean>): void | Get the type of SIM card in the specified slot | None |
-| function getMaxSimCount(): number | Get the maximum number of SIM cards that can be used simultaneously on the device, that is, the maximum number of SIM card slots. | None |
-| function getPrimarySlotId(callback: AsyncCallback\<number>): void | Get the default primary slot ID | None |
+| function getSimState(slotId: number, callback: AsyncCallback\<SimState>): void; | Obtains the state of the SIM card in a specified slot.                                    | –                                 |
+| function getSimGid1(slotId: number, callback: AsyncCallback\<string>): void; | Obtains the group identifier level 1 \(GID1\) of the SIM card in the specified slot.          | ohos.permission.GET_TELEPHONY_STATE |
+| function getSimIccId(slotId: number, callback: AsyncCallback\<string>): void; | Obtains the integrated circuit card identity \(ICCID\) of the SIM card in the specified slot.| ohos.permission.GET_TELEPHONY_STATE |
+| function getISOCountryCodeForSim(slotId: number, callback: AsyncCallback\<string>): void; | Obtains the ISO country code of the SIM card in the specified slot.                               | –                                 |
+| function getSimOperatorNumeric(slotId: number, callback: AsyncCallback\<string>): void; | Obtains the public land mobile network \(PLMN\) ID of the SIM card in the specified slot. | –                                 |
+| function getSimSpn(slotId: number, callback: AsyncCallback\<string>): void; | Obtains the service provider name \(SPN\) of the SIM card in the specified slot.      | –                                 |
+| function getDefaultVoiceSlotId(callback: AsyncCallback\<number>): void; | Obtains the slot of the default SIM card that provides the voice service.                                   | –                                 |
+| function isSimActive(slotId: number, callback: AsyncCallback\<boolean>): void | Checks whether the SIM card in the specified slot is activated.                          | –                                 |
+| function hasSimCard(slotId: number, callback: AsyncCallback\<boolean>): void  | Checks whether the specified slot is populated with a SIM card.                            | –                                 |
+| function getSimTelephoneNumber(slotId: number, callback: AsyncCallback\<string>): void | Obtains the mobile station integrated services digital network (MSISDN) of the SIM card in the specified slot.|ohos.permission.GET_TELEPHONY_STATE |
+| function getVoiceMailIdentifier(slotId: number, callback: AsyncCallback\<string>): void | Obtains the voice mailbox identifier of the SIM card in the specified slot.| ohos.permission.GET_TELEPHONY_STATE |
+| function getVoiceMailNumber(slotId: number, callback: AsyncCallback\<string>): void | Obtains the voice mailbox number of the SIM card in the specified slot.| ohos.permission.GET_TELEPHONY_STATE |
+| function getCardType(slotId: number, callback: AsyncCallback\<CardType>): void | Obtains the type of the SIM card in the specified slot. | –|
+| function hasOperatorPrivileges(slotId: number, callback: AsyncCallback\<boolean>): void | Checks whether the application (caller) has been granted the operator permission.| –|
+| function getMaxSimCount(): number | Obtains the maximum number of SIM cards, that is, the maximum number of SIM card slots, available on the device.| –|
+
+For details about the complete description of JavaScript APIs and sample code, see [SIM Card Management](https://gitee.com/openharmony/docs/blob/master/en/application-dev/js-reference/apis/js-apis-sim.md).
+
+### NetworkSearchManager APIs<a name="section198mcpsimp"></a>
+
+| Name                                                    | Description                     | Required Permission                           |
+| ------------------------------------------------------------ | ----------------------------- | ----------------------------------- |
+| function getRadioTech(slotId: number, callback: AsyncCallback\<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}>): void; | Obtains the current radio access technology of the SIM card in the specified slot.   | ohos.permission.GET_NETWORK_INFO    |
+| function getSignalInformation(slotId: number, callback: AsyncCallback\<Array\<SignalInformation>>): void; | Obtains the signal information of the SIM card in the specified slot.       | –                                 |
+| function getNetworkState(slotId: number, callback: AsyncCallback\<NetworkState>): void; | Obtains the network status of the SIM card in the specified slot.       | ohos.permission.GET_NETWORK_INFO    |
+| function getISOCountryCodeForNetwork(slotId: number, callback: AsyncCallback\<string>): void; | Obtains the ISO country code of the SIM card in the specified slot.     | –                                 |
+| function getNetworkSearchInformation(slotId: number, callback: AsyncCallback\<NetworkSearchResult>): void; | Obtains the manual network search result of the SIM card in the specified slot.   | ohos.permission.GET_TELEPHONY_STATE |
+| function getNetworkSelectionMode(slotId: number, callback: AsyncCallback\<NetworkSelectionMode>): void; | Obtains the network selection mode of the SIM card in the specified slot.       | –                                 |
+| function setNetworkSelectionMode(options: NetworkSelectionModeOptions, callback: AsyncCallback\<void>): void; | Sets the network selection mode of the SIM card in the specified slot.       | ohos.permission.SET_TELEPHONY_STATE |
+| function isRadioOn(callback: AsyncCallback\<boolean>): void; | Checks whether the radio service is enabled on the primary SIM card.         | ohos.permission.GET_NETWORK_INFO    |
+| function isRadioOn(slotId: number, callback: AsyncCallback\<boolean>): void; | Checks whether the radio service is enabled on the SIM card in the specified slot.| ohos.permission.GET_NETWORK_INFO    |
+| function turnOnRadio(callback: AsyncCallback\<void>): void;  | Enables the radio service on the primary SIM card.                 | ohos.permission.SET_TELEPHONY_STATE |
+| function turnOnRadio(slotId: number, callback: AsyncCallback\<void>): void; | Enables the radio service on the SIM card in the specified slot.        | ohos.permission.SET_TELEPHONY_STATE |
+| function turnOffRadio(callback: AsyncCallback\<void>): void; | Disables the radio service on the primary SIM card.                 | ohos.permission.SET_TELEPHONY_STATE |
+| function turnOffRadio(slotId: number, callback: AsyncCallback\<void>): void; | Disables the radio service on the SIM card in the specified slot.        | ohos.permission.SET_TELEPHONY_STATE |
+| function getOperatorName(slotId: number, callback: AsyncCallback\<string>): void; | Obtains the carrier name of the SIM card in the specified slot.      | –                                 |
+| function setPreferredNetwork(slotId: number, networkMode: PreferredNetworkMode, callback: AsyncCallback\<void>): void; | Sets the preferred network of the SIM card in the specified slot.   | –                                 |
+| function getPreferredNetwork(slotId: number, callback: AsyncCallback\<PreferredNetworkMode>): void; | Obtains the preferred network of the SIM card in the specified slot.   | –                                 |
+| function getCellInformation(slotId: number, callback: AsyncCallback<Array\<CellInformation>>) | Obtains the cell information list.             | ohos.permission.LOCATION            |
+| function sendUpdateCellLocationRequest(callback: AsyncCallback\<void>) | Requests for a cell location update.                 | ohos.permission.LOCATION            |
+| function getIMEI(slotId: number, callback: AsyncCallback\<string>) | Obtains the international mobile equipment identity (IMEI).                     | ohos.permission.GET_TELEPHONY_STATE |
+| function getMEID(slotId: number, callback: AsyncCallback\<string>)| Obtains the mobile equipment identifier (MEID).                     | ohos.permission.GET_TELEPHONY_STATE |
+| function getUniqueDeviceId(slotId: number, callback: AsyncCallback\<string>)| Obtains the unique ID of a device.           | ohos.permission.GET_TELEPHONY_STATE |
+| function getNrOptionMode(slotId: number, callback: AsyncCallback\<NrOptionMode>)| Obtains the 5G mode.                   | ohos.permission.GET_TELEPHONY_STATE |
+| function isNrSupported: boolean;                             | Checks whether 5G is supported.               | –                                 |
 
 
-### APIs for the Network Search Service<a name="section198mcpsimp"></a>
+For details about the complete description of JavaScript APIs and sample code, see [Radio](https://gitee.com/openharmony/docs/blob/master/en/application-dev/js-reference/apis/js-apis-radio.md).
 
-| Interface name                                                     | Interface description                                                    | Required permissions                            |
-| ------------------------------------------------------------ | ----------------------------------------------------------- | ----------------------------------- |
-| function getRadioTech(slotId: number, callback: AsyncCallback\<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}>): void; | Get the current access technology of the specified card slot | ohos.permission.GET_NETWORK_INFO    |
-| function getSignalInformation(slotId: number, callback: AsyncCallback\<Array\<SignalInformation>>): void; | Get the signal list of the specified card slot     | None                                  |
-| function getNetworkState(slotId: number, callback: AsyncCallback\<NetworkState>): void; | Get the network status of the specified card slot     | ohos.permission.GET_NETWORK_INFO    |
-| function getISOCountryCodeForNetwork(slotId: number, callback: AsyncCallback\<string>): void; | Get the network country code of the specified card slot   | None                                  |
-| function getNetworkSearchInformation(slotId: number, callback: AsyncCallback\<NetworkSearchResult>): void; | Get the manual search results of the specified card slot | ohos.permission.GET_TELEPHONY_STATE |
-| function getNetworkSelectionMode(slotId: number, callback: AsyncCallback\<NetworkSelectionMode>): void; | Get the network selection mode of the specified card slot     | None                                  |
-| function setNetworkSelectionMode(options: NetworkSelectionModeOptions, callback: AsyncCallback\<void>): void; | Set the network selection mode of the specified card slot     | ohos.permission.SET_TELEPHONY_STATE |
-| function isRadioOn(callback: AsyncCallback\<boolean>): void; | Determine whether Radio is turned on          | ohos.permission.GET_NETWORK_INFO    |
-| function turnOnRadio(callback: AsyncCallback\<void>): void;  | Turn on Radio                  | ohos.permission.SET_TELEPHONY_STATE |
-| function turnOffRadio(callback: AsyncCallback\<void>): void; | Turn off Radio                  | ohos.permission.SET_TELEPHONY_STATE |
-| function getOperatorName(slotId: number, callback: AsyncCallback\<string>): void; | Get the operator name of the specified card slot   | None                                  |
-| function setPreferredNetwork(slotId: number, networkMode: PreferredNetworkMode, callback: AsyncCallback\<void>): void; | Set the preferred network mode of the specified card slot | None                                  |
-| function getPreferredNetwork(slotId: number, callback: AsyncCallback\<PreferredNetworkMode>): void; | Get the preferred network mode of the specified card slot | None                                  |
-| function getCellInformation(slotId: number, callback: AsyncCallback<Array\<CellInformation>>) | Get cell information list           | ohos.permission.LOCATION            |
-| function sendUpdateCellLocationRequest(callback: AsyncCallback\<void>) | Request cell location               | ohos.permission.LOCATION            |
-| function getIMEI(slotId: number, callback: AsyncCallback\<string>) | Get Imei                   | ohos.permission.GET_TELEPHONY_STATE |
-| function getMeId(slotId: number, callback: AsyncCallback\<string>） | Get Meid                   | ohos.permission.GET_TELEPHONY_STATE |
-| function getUniqueDeviceId(slotId: number, callback: AsyncCallback\<string>） | Get the unique identification code of the device         | ohos.permission.GET_TELEPHONY_STATE |
-| function getNrOptionMode(slotId: number, callback: AsyncCallback\<NrOptionMode>） | Get 5G mode                 | ohos.permission.GET_TELEPHONY_STATE |
-| function isNrSupported: boolean;                             | Whether to support 5g network             | None                                  |
+**NOTE**
 
->**NOTE:**
->The RIL Manager does not provide external APIs and can only be called by modules of the Telephony subsystem.
+>The RIL Manager does not provide external APIs. It can only be called by modules of the Telephony subsystem.
 
 ## Usage Guidelines<a name="section370mcpsimp"></a>
 
-### Network Search<a name="section393mcpsimp"></a>
+### Network Search<a name="section393mcpsimp"></a> 
 
 The function of obtaining the network status is used as an example. The process is as follows:
 
-1.  Query the SIM card in the slot specified by  **slotId**. If  **slotId**  is not set, information about the primary card is queried by default.
-2.  Call the  **GetNetworkStatus**  method in callback or Promise mode.
-3.  Obtain the network status information. The  **GetNetworkStatus**  method works in asynchronous mode. The execution result is returned through the callback.
+1.  Query the SIM card in the slot specified by **slotId**. If **slotId** is not set, information about the primary card is queried by default.
+2.  Call the **getNetworkState** method in callback or promise mode to obtain the network status.
+3.  Obtain the SIM card status information. The **getNetworkState** method works in asynchronous mode. The execution result is returned through the callback.
 
     ```js
     import radio from "@ohos.telephony.radio";
@@ -134,35 +141,35 @@ The function of obtaining the network status is used as an example. The process 
     let slotId = 0;
 
     // Call the API in callback mode.
-    radio.GetNetworkStatus(slotId, (err, value) => {
+    radio.getNetworkState(slotId, (err, value) => {
       if (err) {
-        // If the API call failed, err is not empty.
-        console.error(`failed to GetNetworkStatus because ${err.message}`);
+        // If the API call fails, err is not empty.
+        console.error(`failed to getNetworkState because ${err.message}`);
         return;
       }
-      // If the API call succeeded, err is empty.
-      console.log(`success to GetNetworkStatus: ${value}`);
+      // If the API call is successful, err is empty.
+      console.log(`success to getNetworkState: ${value}`);
     });
 
-    // Call the API in Promise mode.
-    let promise = radio.GetNetworkStatus(slotId);
+    // Call the API in promise mode.
+    let promise = radio.getNetworkState(slotId);
     promise.then((value) => {
-      // The API call succeeded.
-      console.log(`success to GetNetworkStatus: ${value}`);
+      // The API call is successful.
+      console.log(`success to getNetworkState: ${value}`);
     }).catch((err) => {
-      // The API call failed.
-      console.error(`failed to GetNetworkStatus because ${err.message}`);
+      // The API call fails.
+      console.error(`failed to getNetworkState because ${err.message}`);
     });
     ```
 
 
-### SIM Card<a name="section402mcpsimp"></a>
+### SIM Card Management<a name="section402mcpsimp"></a>
 
 The function of querying the status of a specified SIM card is used as an example. The process is as follows:
 
-1.  Set the value of  **slotId**.
-2.  Call the  **getSimState**  method in callback or Promise mode to obtain the SIM card status information.
-3.  This method works in asynchronous mode. The execution result is returned through the callback.
+1.  Set the value of **slotId**.
+2.  Call the **getSimState** method in callback or promise mode to obtain the SIM card status.
+3.  Obtain the SIM card status information. The **getSimState** method works in asynchronous mode. The execution result is returned through the callback.
 
     ```js
     import sim from "@ohos.telephony.sim";
@@ -173,21 +180,21 @@ The function of querying the status of a specified SIM card is used as an exampl
     // Call the API in callback mode.
     sim.getSimState(slotId, (err, value) => {
       if (err) {
-        // If the API call failed, err is not empty.
+        // If the API call fails, err is not empty.
         console.error(`failed to getSimState because ${err.message}`);
         return;
       }
-      // If the API call succeeded, err is empty.
+      // If the API call is successful, err is empty.
       console.log(`success to getSimState: ${value}`);
     });
 
-    // Call the API in Promise mode.
+    // Call the API in promise mode.
     let promise = sim.getSimState(slotId);
     promise.then((value) => {
-      // The API call succeeded.
+      // The API call is successful.
       console.log(`success to getSimState: ${value}`);
     }).catch((err) => {
-      // The API call failed.
+      // The API call fails.
       console.error(`failed to getSimState because ${err.message}`);
     });
     ```
@@ -195,8 +202,10 @@ The function of querying the status of a specified SIM card is used as an exampl
 
 ## Repositories Involved<a name="section409mcpsimp"></a>
 
-[Telephony](https://gitee.com/openharmony/docs/blob/master/en/readme/telephony.md)
+[Telephony Subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/%E7%94%B5%E8%AF%9D%E6%9C%8D%E5%8A%A1%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
 
-**telephony_core_service**
+**telephony\_core\_service**
 
-[telephony_sms_mms](https://gitee.com/openharmony/telephony_sms_mms/blob/master/README.md)
+[telephony\_sms\_mms](https://gitee.com/openharmony/telephony_sms_mms/blob/master/README.md)
+
+[telephony\_ril\_adapter](https://gitee.com/openharmony/telephony_ril_adapter/blob/master/README.md)
