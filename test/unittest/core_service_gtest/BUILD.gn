@@ -54,6 +54,9 @@ ohos_unittest("tel_core_service_gtest") {
   ]
 
   defines = [ "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"" ]
+  if ("${product_name}" == "rk3568" || "${product_name}" == "DAYU") {
+    defines += [ "TEL_TEST_UNSUPPORT" ]
+  }
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
