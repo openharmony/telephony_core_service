@@ -63,6 +63,7 @@ sptr<ICoreService> SimTest::GetProxy()
     }
 }
 
+#ifndef TEL_TEST_UNSUPPORT
 /**
  * @tc.number   Telephony_Sim_GetSimState_0100
  * @tc.name     Get sim state
@@ -1128,5 +1129,22 @@ HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailInfo_0100, Function | MediumTest | L
         EXPECT_TRUE(true);
     }
 }
+
+#else // TEL_TEST_UNSUPPORT
+/**
+ * @tc.number   Telephony_Sim_MockTest_0100
+ * @tc.name     A test mock for unsupported platform
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_MockTest_0100, Function | MediumTest | Level3)
+{
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        SimTest::telephonyService_ = GetProxy();
+    }
+    EXPECT_TRUE(true);
+}
+
+#endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS
