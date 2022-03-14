@@ -551,7 +551,6 @@ void NativeGetSimTelephoneNumber(napi_env env, void *data)
     AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
     asyncContext->callbackVal = NapiUtil::ToUtf8(
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimTelephoneNumber(asyncContext->slotId));
-    TELEPHONY_LOGI("NAPI NativeGetSimTelephoneNumber %{public}s", asyncContext->callbackVal.c_str());
     asyncContext->context.resolved = !(asyncContext->callbackVal.empty());
 }
 
@@ -990,7 +989,6 @@ void NativeGetShowName(napi_env env, void *data)
     AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
     asyncContext->callbackVal =
         NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetShowName(asyncContext->slotId));
-    TELEPHONY_LOGI("NAPI NativeGetShowName %{public}s", asyncContext->callbackVal.c_str());
     asyncContext->context.resolved = !(asyncContext->callbackVal.empty());
 }
 
@@ -1055,7 +1053,6 @@ void NativeGetShowNumber(napi_env env, void *data)
     AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
     asyncContext->callbackVal =
         NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetShowNumber(asyncContext->slotId));
-    TELEPHONY_LOGI("NAPI NativeGetShowNumber %{public}s", asyncContext->callbackVal.c_str());
     asyncContext->context.resolved = !(asyncContext->callbackVal.empty());
 }
 
