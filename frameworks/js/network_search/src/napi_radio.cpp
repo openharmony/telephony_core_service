@@ -1357,7 +1357,6 @@ void NativeGetMEID(napi_env env, void *data)
     context->getMEIDResult =
         NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetMeid(context->slotId));
     TELEPHONY_LOGI("NativeGetMEID context->slotId = %{public}d", context->slotId);
-    TELEPHONY_LOGI("NativeGetMEID countryCode = %{public}s", context->getMEIDResult.c_str());
     context->resolved = true;
 }
 
