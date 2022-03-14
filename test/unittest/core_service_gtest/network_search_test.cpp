@@ -27,9 +27,11 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
+#ifndef TEL_TEST_UNSUPPORT
 constexpr int32_t SLOT_ID = 0;
 constexpr int32_t WAIT_TIME_SECOND = 10;
 constexpr int32_t WAIT_TIME_SECOND_LONG = 60;
+#endif // TEL_TEST_UNSUPPORT
 
 sptr<ICoreService> NetworkSearchTest::telephonyService_ = nullptr;
 void NetworkSearchTest::SetUpTestCase()
@@ -70,6 +72,7 @@ sptr<ICoreService> NetworkSearchTest::GetProxy()
     }
 }
 
+#ifndef TEL_TEST_UNSUPPORT
 /**
  * @tc.number   Telephony_NetworkSearch_GetPsRadioTech_0100
  * @tc.name     Get RAT of the PS domain on the registered network
@@ -536,5 +539,21 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SendUpdateCellLocationReques
         ASSERT_TRUE(result);
     }
 }
+
+#else // TEL_TEST_UNSUPPORT
+/**
+ * @tc.number   Telephony_NetworkSearch_MockTest_0100
+ * @tc.name     A test mock for unsupported platform
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_MockTest_0100, Function | MediumTest | Level3)
+{
+    if (NetworkSearchTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+    }
+    EXPECT_TRUE(true);
+}
+
+#endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS
