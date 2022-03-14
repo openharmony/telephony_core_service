@@ -341,6 +341,9 @@ bool CoreService::IsSimActive(int32_t slotId)
 
 bool CoreService::GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        return false;
+    }
     if (networkSearchManager_ == nullptr) {
         return TELEPHONY_ERROR;
     }
@@ -349,9 +352,6 @@ bool CoreService::GetNetworkSearchInformation(int32_t slotId, const sptr<INetwor
 
 bool CoreService::GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
-    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
-        return TELEPHONY_PERMISSION_ERROR;
-    }
     if (networkSearchManager_ == nullptr) {
         return TELEPHONY_ERROR;
     }
@@ -415,6 +415,9 @@ int32_t CoreService::GetDefaultVoiceSlotId()
 
 bool CoreService::SetPrimarySlotId(int32_t slotId)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        return false;
+    }
     TELEPHONY_LOGI("CoreService::SetPrimarySlotId(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         return false;
@@ -621,6 +624,9 @@ int32_t CoreService::RefreshSimState(int32_t slotId)
 
 bool CoreService::SetActiveSim(int32_t slotId, int32_t enable)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        return false;
+    }
     TELEPHONY_LOGI("CoreService::SetActiveSim(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         return false;
