@@ -39,6 +39,7 @@ void RadioInfo::ProcessGetRadioState(const AppExecFwk::InnerEvent::Pointer &even
     int64_t index = 0;
     bool state = false;
     MessageParcel data;
+    data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
     if (responseInfo != nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetRadioState false slotId:%{public}d", slotId_);
         index = responseInfo->flag;
@@ -90,6 +91,7 @@ void RadioInfo::ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &even
     MessageParcel data;
     int64_t index = 0;
     bool result = true;
+    data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
     if (responseInfo != nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessSetRadioState false slotId:%{public}d", slotId_);
         index = responseInfo->flag;

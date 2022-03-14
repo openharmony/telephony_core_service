@@ -49,6 +49,7 @@ void NetworkType::ProcessGetPreferredNetwork(const AppExecFwk::InnerEvent::Point
     MessageParcel data;
     int64_t index = -1;
     int32_t networkMode = -1;
+    data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
     if (preferredNetworkInfo != nullptr) {
         networkMode = preferredNetworkInfo->preferredNetworkType;
         index = preferredNetworkInfo->flag;
@@ -92,6 +93,7 @@ void NetworkType::ProcessSetPreferredNetwork(const AppExecFwk::InnerEvent::Point
     }
     MessageParcel data;
     int64_t index = -1;
+    data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (responseInfo != nullptr) {
         TELEPHONY_LOGE("NetworkType::ProcessSetPreferredNetwork HRilRadioResponseInfo error is %{public}d",
