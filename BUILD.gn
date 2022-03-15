@@ -103,7 +103,6 @@ ohos_shared_library("tel_core_service") {
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
     "//base/notification/ces_standard/cesfwk/kits/native/include",
-    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
     "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content/",
     "//third_party/icu/icu4c/source/common/unicode",
@@ -131,8 +130,6 @@ ohos_shared_library("tel_core_service") {
     "//base/telephony/core_service/utils:libtel_common",
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
-    "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
-    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
     "//third_party/libxml2:libxml2",
     "//utils/native/base:utils",
@@ -140,6 +137,7 @@ ohos_shared_library("tel_core_service") {
 
   external_deps = [
     "ability_base:want",
+    "ability_base:zuri",
     "ability_runtime:ability_manager",
     "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_core",
