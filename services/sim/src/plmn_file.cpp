@@ -20,8 +20,8 @@ PlmnFile::PlmnFile(unsigned char *bytes, int offset)
 {
     this->plmn_ = SIMUtils::BcdPlmnConvertToString("", offset);
     const char *plmnData = reinterpret_cast<const char *>(bytes);
-    uint32_t aValue = atoi(plmnData + offset + OFFSET_A);
-    uint32_t bValue = atoi(plmnData + offset + OFFSET_B);
+    uint32_t aValue = (uint32_t)atoi(plmnData + offset + OFFSET_A);
+    uint32_t bValue = (uint32_t)atoi(plmnData + offset + OFFSET_B);
     this->rat_ = (aValue << OFFSET_ALL) | bValue;
 }
 

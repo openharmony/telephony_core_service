@@ -119,10 +119,10 @@ void IccDiallingNumbersHandler::ProcessLinearSizeDone(const AppExecFwk::InnerEve
 
     std::shared_ptr<EfLinearResult> object = event->GetSharedObject<EfLinearResult>();
     std::shared_ptr<DiallingNumbersInfo> diallingNumberLoad = nullptr;
-    loadId = object->arg1;
-    id = loadId;
-    loadRequest = FindLoadRequest(loadId);
     if (object != nullptr && (loadRequest != nullptr)) {
+        loadId = object->arg1;
+        id = loadId;
+        loadRequest = FindLoadRequest(loadId);
         if (object->exception == nullptr) {
             std::shared_ptr<void> baseLoad = object->iccLoader;
             int *dataSize = object->valueData;
@@ -218,10 +218,10 @@ void IccDiallingNumbersHandler::ProcessDiallingNumberLoadDone(const AppExecFwk::
 
     std::string iccData = fd->resultData;
     TELEPHONY_LOGI("ProcessDiallingNumberLoadDone handle start");
-    std::shared_ptr<DiallingNumbersInfo> diallingNumber =
-        std::make_shared<DiallingNumbersInfo>(loadRequest->GetElementaryFileId(), loadRequest->GetIndex());
-    FetchDiallingNumberContent(diallingNumber, iccData);
     if (loadRequest != nullptr) {
+        std::shared_ptr<DiallingNumbersInfo> diallingNumber =
+            std::make_shared<DiallingNumbersInfo>(loadRequest->GetElementaryFileId(), loadRequest->GetIndex());
+        FetchDiallingNumberContent(diallingNumber, iccData);
         loadRequest->SetResult(static_cast<std::shared_ptr<void>>(diallingNumber));
     }
 }
@@ -260,7 +260,7 @@ bool IccDiallingNumbersHandler::SendBackResult(int loadId)
         return false;
     }
     auto owner = loadRequest->GetCaller()->GetOwner();
-    int id = loadRequest->GetCaller()->GetInnerEventId();
+    uint32_t id = loadRequest->GetCaller()->GetInnerEventId();
     std::unique_ptr<DiallingNumbersHandleHolder> fd =
         loadRequest->GetCaller()->GetUniqueObject<DiallingNumbersHandleHolder>();
     std::unique_ptr<DiallingNumbersHandlerResult> data = make_unique<DiallingNumbersHandlerResult>(fd.get());
@@ -379,6 +379,8 @@ std::shared_ptr<unsigned char> IccDiallingNumbersHandler::CreateSavingSequence(
         return diallingNumberStringPac;
     } else if (diallingNumber->number_.size() > maxNumberSize) {
         TELEPHONY_LOGE("CreateSavingSequence number length exceed the maximum");
+        free(cache);
+        cache = nullptr;
         return nullptr;
     }
     byteTagPac = CreateNameSequence(diallingNumber->name_, byteTagLen);
@@ -394,6 +396,8 @@ std::shared_ptr<unsigned char> IccDiallingNumbersHandler::CreateSavingSequence(
         return diallingNumberStringPac;
     } else {
         TELEPHONY_LOGE("CreateSavingSequence max data length is %{public}d", offset);
+        free(cache);
+        cache = nullptr;
         return nullptr;
     }
 }

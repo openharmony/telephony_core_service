@@ -88,12 +88,12 @@ const std::string FDN_PIN2_LOCK = "FD";
 
 struct UnlockData {
     UnlockType type;
-    int32_t lockState;
-    int32_t result;
-    int32_t remain;
-    int32_t pinRemain;
-    int32_t pin2Remain;
-    int32_t puk2Remain;
+    int32_t lockState = 0;
+    int32_t result = 0;
+    int32_t remain = 0;
+    int32_t pinRemain = 0;
+    int32_t pin2Remain = 0;
+    int32_t puk2Remain = 0;
 };
 
 class SimStateHandle : public AppExecFwk::EventHandler {

@@ -283,6 +283,7 @@ void NetworkSearchState::NotifyStateChange()
         DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifyNetworkStateUpdated(slotId_, ns);
         networkState_->Marshalling(data);
         networkStateOld_->ReadFromParcel(data);
+        delete ns;
     }
 }
 

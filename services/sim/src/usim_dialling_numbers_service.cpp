@@ -27,7 +27,7 @@ UsimDiallingNumbersService::UsimDiallingNumbersService(const std::shared_ptr<App
 
 void UsimDiallingNumbersService::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    int id = event->GetInnerEventId();
+    uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGI("UsimDiallingNumbersService::ProcessEvent Id is %{public}d", id);
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     if (fd != nullptr) {
@@ -134,7 +134,7 @@ void UsimDiallingNumbersService::LoadPbrFiles()
 
 bool UsimDiallingNumbersService::LoadDiallingNumberFiles(int recId)
 {
-    if (recId >= pbrFiles_.size()) {
+    if (recId >= (int)pbrFiles_.size()) {
         TELEPHONY_LOGI("LoadDiallingNumberFiles finish %{public}d", recId);
         NextStep(MSG_USIM_USIM_ADN_LOAD_DONE);
         return false;
@@ -142,7 +142,7 @@ bool UsimDiallingNumbersService::LoadDiallingNumberFiles(int recId)
 
     std::unique_lock<std::mutex> lock(mtx_);
     std::map<int, std::shared_ptr<TagData>> files = pbrFiles_.at(recId)->fileIds_;
-    if (files.empty() || files.size() == 0) {
+    if (files.empty() || !files.size()) {
         TELEPHONY_LOGI("LoadDiallingNumberFiles empty file %{public}d", recId);
         NextStep(MSG_USIM_USIM_ADN_LOAD_DONE);
         return false;
@@ -287,7 +287,7 @@ void UsimDiallingNumbersService::SendBackResult(
     const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &diallingnumbers)
 {
     auto owner = callerPointer_->GetOwner();
-    int id = callerPointer_->GetInnerEventId();
+    uint32_t id = callerPointer_->GetInnerEventId();
     std::unique_ptr<UsimFetcher> fd = callerPointer_->GetUniqueObject<UsimFetcher>();
     std::unique_ptr<UsimResult> data = std::make_unique<UsimResult>(fd.get());
     data->result = static_cast<std::shared_ptr<void>>(diallingnumbers);

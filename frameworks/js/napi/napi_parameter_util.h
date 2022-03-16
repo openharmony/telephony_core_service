@@ -166,7 +166,7 @@ std::optional<NapiError> MatchParameters(
         theTuple);
 
     if (argc == typeStd.size()) {
-        bool typeMatched = true;
+        uint32_t typeMatched = 1;
         for (size_t i = 0; i < argc; i++) {
             napi_valuetype valueType = napi_undefined;
             napi_typeof(env, argv[i], &valueType);

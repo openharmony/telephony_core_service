@@ -381,7 +381,7 @@ std::shared_ptr<IccDiallingNumbersHandler> SimFileManager::ObtainDiallingNumberH
 
 void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    int id = event->GetInnerEventId();
+    uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGI("SimFileManager::ProcessEvent id %{public}d", id);
     switch (id) {
         case RadioEvent::RADIO_VOICE_TECH_CHANGED: {

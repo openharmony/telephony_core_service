@@ -67,7 +67,7 @@ static bool IsOneTlvCompleted(const std::string_view &s)
         return false;
     }
     auto lenStr = s.substr(FST_POS + TAG_BYTES, LEN_BYTES);
-    int32_t len = INT32_INTVALUE;
+    size_t len = 0;
     std::from_chars(std::addressof(lenStr.front()), std::addressof(lenStr.back()), len, HEX);
     return (s.size() >= ((CHR_BYTES * len) + TAG_BYTES + LEN_BYTES));
 }

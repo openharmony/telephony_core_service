@@ -32,7 +32,7 @@ void NetworkSearchNotify::NotifyNetworkStateUpdated(int32_t slotId, const sptr<N
     int32_t result =
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateNetworkState(slotId, networkState);
     TELEPHONY_LOGI("NotifyNetworkStateUpdated ret %{public}s", networkState->ToString().c_str());
-    if (result != 0) {
+    if (result) {
         TELEPHONY_LOGE("NotifyNetworkStateUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found\n");
     }
 }
@@ -44,7 +44,7 @@ void NetworkSearchNotify::NotifySignalInfoUpdated(
     int32_t result =
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSignalInfo(slotId, signalInfos);
     TELEPHONY_LOGI("NotifySignalInfoUpdated ret %{public}d", result);
-    if (result != 0) {
+    if (result) {
         TELEPHONY_LOGE("NotifySignalInfoUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found\n");
     }
 }
@@ -55,7 +55,7 @@ void NetworkSearchNotify::NotifyCellInfoUpdated(int32_t slotId, const std::vecto
     int32_t result =
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateCellInfo(slotId, cellInfos);
     TELEPHONY_LOGI("NotifyCellInfoUpdated ret %{public}d", result);
-    if (result != 0) {
+    if (result) {
         TELEPHONY_LOGE("NotifySignalInfoUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found\n");
     }
 }

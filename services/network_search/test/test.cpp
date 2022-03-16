@@ -244,7 +244,7 @@ void TestSetRadioState()
     int32_t inputState = 0;
     std::cin >> inputState;
     bool isOn = true;
-    if (inputState == 0) {
+    if (!inputState) {
         isOn = false;
     }
     TELEPHONY_LOGI("radio off(N) or on(Y) :%{public}d", isOn);

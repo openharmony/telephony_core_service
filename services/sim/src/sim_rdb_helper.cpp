@@ -261,7 +261,7 @@ int32_t SimRdbHelper::QueryDataBySlotId(int32_t slotId, SimRdbInfo &simBean)
         return INVALID_VALUE;
     }
     int resultSetNum = result->GoToFirstRow();
-    while (resultSetNum == 0) {
+    while (!resultSetNum) {
         SaveDataToBean(result, simBean);
         resultSetNum = result->GoToNextRow();
     }
@@ -281,7 +281,7 @@ int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)
         return INVALID_VALUE;
     }
     int resultSetNum = result->GoToFirstRow();
-    while (resultSetNum == 0) {
+    while (!resultSetNum) {
         SaveDataToBean(result, simBean);
         resultSetNum = result->GoToNextRow();
     }
@@ -300,7 +300,7 @@ int32_t SimRdbHelper::QueryAllData(std::vector<SimRdbInfo> &vec)
         return INVALID_VALUE;
     }
     int resultSetNum = result->GoToFirstRow();
-    while (resultSetNum == 0) {
+    while (!resultSetNum) {
         SimRdbInfo simBean;
         SaveDataToBean(result, simBean);
         vec.push_back(simBean);
@@ -323,7 +323,7 @@ int32_t SimRdbHelper::QueryAllValidData(std::vector<SimRdbInfo> &vec)
         return INVALID_VALUE;
     }
     int resultSetNum = result->GoToFirstRow();
-    while (resultSetNum == 0) {
+    while (!resultSetNum) {
         SimRdbInfo simBean;
         SaveDataToBean(result, simBean);
         vec.push_back(simBean);

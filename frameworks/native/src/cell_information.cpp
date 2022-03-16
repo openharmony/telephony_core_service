@@ -22,12 +22,12 @@ namespace OHOS {
 namespace Telephony {
 const int32_t MNC_INT_MAX = 999;
 const int32_t MNC_DIGIT_OFFSET = 28;
-const int32_t MNC_VALID_BIT = 0X0FFFFFFF;
+const uint32_t MNC_VALID_BIT = 0X0FFFFFFF;
 void CellInformation::Init(int32_t mcc, int32_t mnc, int32_t cellId)
 {
     if (mnc > MNC_INT_MAX) {
         int mnc_digit = mnc >> MNC_DIGIT_OFFSET;
-        mnc = mnc & MNC_VALID_BIT;
+        mnc =  static_cast<int32_t>(static_cast<uint32_t>(mnc) & MNC_VALID_BIT);
         char mnc_str[MNC_DIGIT_OFFSET] = {0};
         char strFormat[MNC_DIGIT_OFFSET] = {0};
         int size = snprintf_s(strFormat, MNC_DIGIT_OFFSET, MNC_DIGIT_OFFSET - 1, "%s%dd", "%0", mnc_digit);
@@ -42,7 +42,7 @@ void CellInformation::Init(int32_t mcc, int32_t mnc, int32_t cellId)
     }
     mcc_ = std::to_string(mcc);
     cellId_ = cellId;
-    timeStamp_ = time(0);
+    timeStamp_ = static_cast<uint64_t>(time(0));
 }
 
 int32_t CellInformation::GetCellId() const
@@ -73,7 +73,7 @@ int32_t CellInformation::GetSignalLevel() const
 void CellInformation::SetSignalLevel(int32_t signalLevel)
 {
     signalLevel_ = signalLevel;
-    timeStamp_ = time(0);
+    timeStamp_ = static_cast<uint64_t>(time(0));
 }
 
 bool CellInformation::GetIsCamped() const
@@ -84,7 +84,7 @@ bool CellInformation::GetIsCamped() const
 void CellInformation::SetIsCamped(bool isCamped)
 {
     isCamped_ = isCamped;
-    timeStamp_ = time(0);
+    timeStamp_ = static_cast<uint64_t>(time(0));
 }
 
 CellInformation *CellInformation::Unmarshalling(Parcel &parcel)
@@ -211,7 +211,7 @@ bool GsmCellInformation::ReadFromParcel(Parcel &parcel)
     cellId_ = parcel.ReadInt32();
     bsic_ = parcel.ReadInt32();
     lac_ = parcel.ReadInt32();
-    timeStamp_ = parcel.ReadInt64();
+    timeStamp_ = parcel.ReadUint64();
     signalLevel_ = parcel.ReadInt32();
     isCamped_ = parcel.ReadBool();
 
@@ -364,7 +364,7 @@ void LteCellInformation::UpdateLocation(int32_t cellId, int32_t tac)
 {
     cellId_ = cellId;
     tac_ = tac;
-    timeStamp_ = time(0);
+    timeStamp_ = static_cast<uint64_t>(time(0));
 }
 
 std::string LteCellInformation::ToString() const
@@ -628,7 +628,7 @@ bool TdscdmaCellInformation::ReadFromParcel(Parcel &parcel)
     cellId_ = parcel.ReadInt32();
     cpid_ = parcel.ReadInt32();
     lac_ = parcel.ReadInt32();
-    timeStamp_ = parcel.ReadInt64();
+    timeStamp_ = parcel.ReadUint64();
     signalLevel_ = parcel.ReadInt32();
     isCamped_ = parcel.ReadBool();
     return true;

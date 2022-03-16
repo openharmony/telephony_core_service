@@ -546,7 +546,7 @@ bool NetworkSearchManager::SetNetworkSelectionMode(int32_t slotId, int32_t selec
 
 std::u16string NetworkSearchManager::GetIsoCountryCodeForNetwork(int32_t slotId)
 {
-    const int32_t MCC_LEN = 3;
+    const size_t MCC_LEN = 3;
     std::string iso = "";
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
@@ -557,7 +557,7 @@ std::u16string NetworkSearchManager::GetIsoCountryCodeForNetwork(int32_t slotId)
     }
     if (inner->networkSearchState_ != nullptr && inner->networkSearchState_->GetNetworkStatus() != nullptr) {
         std::string plmn = inner->networkSearchState_->GetNetworkStatus()->GetPlmnNumeric();
-        int32_t len = plmn.length();
+        size_t len = plmn.length();
         if (len >= MCC_LEN) {
             std::string mcc = plmn.substr(0, MCC_LEN);
             int32_t value = 0;
@@ -587,16 +587,18 @@ bool NetworkSearchManager::SetPreferredNetwork(int32_t slotId, int32_t networkMo
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
-        int32_t modemRaf = inner->radioCapability_.ratFamily;
-        int32_t raf = NetworkUtils::GetRafFromNetworkMode(static_cast<PreferredNetworkMode>(networkMode));
+        uint32_t modemRaf = static_cast<uint32_t>(inner->radioCapability_.ratFamily);
+        uint32_t raf = static_cast<uint32_t>(NetworkUtils::GetRafFromNetworkMode(
+            static_cast<PreferredNetworkMode>(networkMode)));
         if (modemRaf == RAF_UNKNOWN || raf == RAF_UNKNOWN) {
             TELEPHONY_LOGE(
                 "SetPreferredNetwork failed RadioAccessFamily is unknown!%{public}d %{public}d slotId:%{public}d",
                 modemRaf, raf, slotId);
             return false;
         }
-        int32_t filterRaf = modemRaf & raf;
-        PreferredNetworkMode filterMode = NetworkUtils::GetNetworkModeFromRaf(filterRaf);
+        uint32_t filterRaf = modemRaf & raf;
+        PreferredNetworkMode filterMode = NetworkUtils::GetNetworkModeFromRaf(
+            static_cast<uint32_t>(filterRaf));
         TELEPHONY_LOGI("SetPreferredNetwork RadioAccessFamily is %{public}d %{public}d slotId:%{public}d",
             modemRaf, raf, slotId);
         return eventSender_->SendCallbackEx(
@@ -826,7 +828,8 @@ bool NetworkSearchManager::IsNrSupported(int32_t slotId)
     GetRadioCapability(slotId);
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
-        return (inner->radioCapability_.ratFamily & static_cast<int32_t>(RAF_NR)) == static_cast<int32_t>(RAF_NR);
+        uint32_t modemRaf = static_cast<uint32_t>(inner->radioCapability_.ratFamily);
+        return (modemRaf & static_cast<uint32_t>(RAF_NR)) == static_cast<uint32_t>(RAF_NR);
     }
     return false;
 }

@@ -64,7 +64,7 @@ std::string SimFile::ObtainSimOperator()
             return "";
         }
         int length = MCC_LEN + lengthOfMnc_;
-        int imsiLen = imsi.size();
+        int imsiLen = (int)imsi.size();
         operatorNumeric_ = ((imsiLen >= length) ? imsi.substr(0, MCC_LEN + lengthOfMnc_) : "");
     }
     return operatorNumeric_;
@@ -77,7 +77,7 @@ std::string SimFile::ObtainIsoCountryCode()
         TELEPHONY_LOGE("SimFile ObtainIsoCountryCode: IMSI is null");
         return "";
     }
-    int len = imsi.length();
+    int len = (int)imsi.length();
     if (len >= MCC_LEN) {
         std::string mnc = imsi.substr(0, MCC_LEN);
         std::string iso = MccPool::MccCountryCode(std::stoi(mnc));
@@ -277,7 +277,7 @@ void SimFile::ProcessSpnGeneral(const AppExecFwk::InnerEvent::Pointer &event)
         std::string str = ParseSpn(iccData, spnStatus_);
         UpdateSPN(str);
         std::string spn = ObtainSPN();
-        if (spn.empty() || spn.size() == 0) {
+        if (spn.empty() || !spn.size()) {
             spnStatus_ = SpnStatus::OBTAIN_OPERATOR_NAMESTRING;
         } else {
             TELEPHONY_LOGI("SimFile Load Spn3Gpp done");
@@ -302,7 +302,7 @@ void SimFile::ProcessSpnCphs(const AppExecFwk::InnerEvent::Pointer &event)
         std::string iccData = fd->resultData;
         UpdateSPN(ParseSpn(iccData, spnStatus_));
         std::string spn = ObtainSPN();
-        if (spn.empty() || spn.size() == 0) {
+        if (spn.empty() || !spn.size()) {
             spnStatus_ = SpnStatus::OBTAIN_OPERATOR_NAME_SHORTFORM;
         } else {
             displayConditionOfSpn_ = SPN_COND;
@@ -327,7 +327,7 @@ void SimFile::ProcessSpnShortCphs(const AppExecFwk::InnerEvent::Pointer &event)
         std::string iccData = fd->resultData;
         UpdateSPN(ParseSpn(iccData, spnStatus_));
         std::string spn = ObtainSPN();
-        if (spn.empty() || spn.size() == 0) {
+        if (spn.empty() || !spn.size()) {
             TELEPHONY_LOGI("SimFile No SPN loaded");
         } else {
             displayConditionOfSpn_ = SPN_COND;
@@ -676,7 +676,7 @@ bool SimFile::ProcessGetAdDone(const AppExecFwk::InnerEvent::Pointer &event)
             doneData = false;
         }
         TELEPHONY_LOGI("SimFile ELEMENTARY_FILE_AD: %{public}s", rawData);
-        int dataSize = iccData.size();
+        int dataSize = (int)iccData.size();
         if (dataSize <= MCC_LEN) {
             TELEPHONY_LOGI("SimFile MNC length dataSize = %{public}d", dataSize);
             doneData = false;
@@ -700,7 +700,7 @@ bool SimFile::ProcessGetAdDone(const AppExecFwk::InnerEvent::Pointer &event)
 void SimFile::CheckMncLength()
 {
     std::string imsi = ObtainIMSI();
-    int imsiSize = imsi.size();
+    int imsiSize = (int)imsi.size();
     if (((lengthOfMnc_ == UNINITIALIZED_MNC) || (lengthOfMnc_ == UNKNOWN_MNC) || (lengthOfMnc_ == MNC_LEN)) &&
         ((!imsi.empty()) && (imsiSize >= MCCMNC_LEN))) {
         std::string mccMncCode = imsi.substr(0, MCCMNC_LEN);
@@ -723,7 +723,7 @@ void SimFile::CheckMncLength()
         }
     }
     int lenNum = MCC_LEN + lengthOfMnc_;
-    int sz = imsi.size();
+    int sz = (int)imsi.size();
     bool cond = sz >= lenNum;
     if ((!imsi.empty()) && (lengthOfMnc_ != UNKNOWN_MNC) && cond) {
     }
@@ -1060,8 +1060,8 @@ int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
         cond = SPN_CONDITION_DISPLAY_PLMN;
     } else if (!roaming || !operatorNum.empty()) {
         cond = SPN_CONDITION_DISPLAY_SPN;
-        if ((displayConditionOfSpn_ & SPN_COND_PLMN) == SPN_COND_PLMN) {
-            cond |= SPN_CONDITION_DISPLAY_PLMN;
+        if (((unsigned int)(displayConditionOfSpn_)& (unsigned int)(SPN_COND_PLMN)) == SPN_COND_PLMN) {
+            cond |= (unsigned int)SPN_CONDITION_DISPLAY_PLMN;
         }
     } else {
         cond = SPN_CONDITION_DISPLAY_SPN;
@@ -1087,7 +1087,7 @@ bool SimFile::UpdateVoiceMail(const std::string &mailName, const std::string &ma
     diallingNumber->name_ = Str8ToStr16(mailName);
     diallingNumber->number_ = Str8ToStr16(mailNumber);
 
-    if ((indexOfMailbox_ != 0) && (indexOfMailbox_ != BYTE_NUM)) {
+    if ((indexOfMailbox_) && (indexOfMailbox_ != BYTE_NUM)) {
         std::unique_lock<std::mutex> lock(IccFile::mtx_);
         TELEPHONY_LOGI("UpdateVoiceMail start MBDN");
         AppExecFwk::InnerEvent::Pointer event =
