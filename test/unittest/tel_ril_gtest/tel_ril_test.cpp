@@ -2009,6 +2009,7 @@ std::shared_ptr<TelRilTest::DemoHandler> TelRilTest::GetHandler(void)
     return demohandler;
 }
 
+#ifndef TEL_TEST_UNSUPPORT
 /**
  * @tc.number Telephony_TelRil_NetworkGetRssiTest_0101 to do ...
  * @tc.name Get Rssi information
@@ -2818,5 +2819,16 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioStateTest_0101, Function | MediumT
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE), GetHandler());
     return;
 }
+#else // TEL_TEST_UNSUPPORT
+/**
+ * @tc.number Telephony_TelRil_MockTest_0101 to do ...
+ * @tc.name Testcase for unsupported platform
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_MockTest_0101, Function | MediumTest | Level3)
+{
+    EXPECT_TRUE(true);
+}
+#endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS
