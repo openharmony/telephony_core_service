@@ -1667,8 +1667,6 @@ static napi_value GetCellInformation(napi_env env, napi_callback_info info)
         napi_create_async_work(env, nullptr, resourceName, NativeGetCellInformation, GetCellInformationCallback,
             (void *)asyncContext, &(asyncContext->work)));
     NAPI_CALL(env, napi_queue_async_work(env, asyncContext->work));
-    delete asyncContext;
-    asyncContext = nullptr;
     return result;
 }
 

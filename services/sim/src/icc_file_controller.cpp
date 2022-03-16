@@ -99,7 +99,7 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
         TELEPHONY_LOGE("ProcessRecordSize get error filetype");
     }
     GetFileAndDataSize(fileData, hd->fileSize, size);
-    if (!hd->fileSize) {
+    if (hd->fileSize != 0) {
         hd->countFiles = size / hd->fileSize;
         TELEPHONY_LOGI("origin count file %{public}d", hd->countFiles);
     }

@@ -54,37 +54,37 @@ bool NetworkState::ReadFromParcel(Parcel &parcel)
     const char *readString = parcel.ReadCString();
     if ((readString == nullptr) ||
         (memcpy_s(psOperatorInfo_.fullName, OperatorInformation::NETWORK_MAX_FULL_NAME_LEN, readString,
-        OperatorInformation::NETWORK_MAX_FULL_NAME_LEN))) {
+        OperatorInformation::NETWORK_MAX_FULL_NAME_LEN) != 0)) {
         TELEPHONY_LOGE("fail to copy memory");
         return false;
     }
     if (((readString = parcel.ReadCString()) == nullptr) ||
         (memcpy_s(psOperatorInfo_.shortName, OperatorInformation::NETWORK_MAX_NAME_LEN, readString,
-        OperatorInformation::NETWORK_MAX_NAME_LEN))) {
+        OperatorInformation::NETWORK_MAX_NAME_LEN) != 0)) {
         TELEPHONY_LOGE("fail to copy memory");
         return false;
     }
     if (((readString = parcel.ReadCString()) == nullptr) ||
         (memcpy_s(psOperatorInfo_.operatorNumeric, OperatorInformation::NETWORK_MAX_PLMN_LEN, readString,
-        OperatorInformation::NETWORK_MAX_PLMN_LEN))) {
+        OperatorInformation::NETWORK_MAX_PLMN_LEN) != 0)) {
         TELEPHONY_LOGE("fail to copy memory");
         return false;
     }
     if (((readString = parcel.ReadCString()) == nullptr) ||
         (memcpy_s(csOperatorInfo_.fullName, OperatorInformation::NETWORK_MAX_FULL_NAME_LEN, readString,
-        OperatorInformation::NETWORK_MAX_FULL_NAME_LEN))) {
+        OperatorInformation::NETWORK_MAX_FULL_NAME_LEN) != 0)) {
         TELEPHONY_LOGE("fail to copy memory");
         return false;
     }
     if (((readString = parcel.ReadCString()) == nullptr) ||
         (memcpy_s(csOperatorInfo_.shortName, OperatorInformation::NETWORK_MAX_NAME_LEN, readString,
-        OperatorInformation::NETWORK_MAX_NAME_LEN))) {
+        OperatorInformation::NETWORK_MAX_NAME_LEN) != 0)) {
         TELEPHONY_LOGE("fail to copy memory");
         return false;
     }
     if (((readString = parcel.ReadCString()) == nullptr) ||
         (memcpy_s(csOperatorInfo_.operatorNumeric, OperatorInformation::NETWORK_MAX_PLMN_LEN, readString,
-        OperatorInformation::NETWORK_MAX_PLMN_LEN))) {
+        OperatorInformation::NETWORK_MAX_PLMN_LEN) != 0)) {
         TELEPHONY_LOGE("fail to copy memory");
         return false;
     }
@@ -255,28 +255,28 @@ void NetworkState::SetOperatorInfo(
 {
     if (domainType == DomainType::DOMAIN_TYPE_PS) {
         if (memcpy_s(static_cast<void *>(psOperatorInfo_.fullName), OperatorInformation::NETWORK_MAX_FULL_NAME_LEN,
-            static_cast<const void *>(longName.c_str()), OperatorInformation::NETWORK_MAX_FULL_NAME_LEN)) {
+            static_cast<const void *>(longName.c_str()), OperatorInformation::NETWORK_MAX_FULL_NAME_LEN) != 0) {
             return;
         }
         if (memcpy_s(static_cast<void *>(psOperatorInfo_.shortName), OperatorInformation::NETWORK_MAX_NAME_LEN,
-            static_cast<const void *>(shortName.c_str()), OperatorInformation::NETWORK_MAX_NAME_LEN)) {
+            static_cast<const void *>(shortName.c_str()), OperatorInformation::NETWORK_MAX_NAME_LEN) != 0) {
             return;
         }
         if (memcpy_s(static_cast<void *>(psOperatorInfo_.operatorNumeric), OperatorInformation::NETWORK_MAX_PLMN_LEN,
-            static_cast<const void *>(numeric.c_str()), OperatorInformation::NETWORK_MAX_PLMN_LEN)) {
+            static_cast<const void *>(numeric.c_str()), OperatorInformation::NETWORK_MAX_PLMN_LEN) != 0) {
             return;
         }
     } else {
         if (memcpy_s(static_cast<void *>(csOperatorInfo_.fullName), OperatorInformation::NETWORK_MAX_FULL_NAME_LEN,
-            static_cast<const void *>(longName.c_str()), OperatorInformation::NETWORK_MAX_FULL_NAME_LEN)) {
+            static_cast<const void *>(longName.c_str()), OperatorInformation::NETWORK_MAX_FULL_NAME_LEN) != 0) {
             return;
         }
         if (memcpy_s(static_cast<void *>(csOperatorInfo_.shortName), OperatorInformation::NETWORK_MAX_NAME_LEN,
-            static_cast<const void *>(shortName.c_str()), OperatorInformation::NETWORK_MAX_NAME_LEN)) {
+            static_cast<const void *>(shortName.c_str()), OperatorInformation::NETWORK_MAX_NAME_LEN) != 0) {
             return;
         }
         if (memcpy_s(static_cast<void *>(csOperatorInfo_.operatorNumeric), OperatorInformation::NETWORK_MAX_PLMN_LEN,
-            static_cast<const void *>(numeric.c_str()), OperatorInformation::NETWORK_MAX_PLMN_LEN)) {
+            static_cast<const void *>(numeric.c_str()), OperatorInformation::NETWORK_MAX_PLMN_LEN) != 0) {
             return;
         }
     }
