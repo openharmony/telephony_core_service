@@ -52,7 +52,7 @@ int MccPool::ShortestMncLengthFromMcc(int mcc)
 
 void MccPool::InitMccTables()
 {
-    if (!mccAccessTable_.size()) {
+    if (mccAccessTable_.size() == 0) {
         AddMccForAsia();
         AddMccForEurope();
         AddMccForAfrica();

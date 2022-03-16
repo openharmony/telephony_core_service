@@ -27,7 +27,7 @@ void CellInformation::Init(int32_t mcc, int32_t mnc, int32_t cellId)
 {
     if (mnc > MNC_INT_MAX) {
         int mnc_digit = mnc >> MNC_DIGIT_OFFSET;
-        mnc =  static_cast<int32_t>(static_cast<uint32_t>(mnc) & MNC_VALID_BIT);
+        mnc = static_cast<int32_t>(static_cast<uint32_t>(mnc) & MNC_VALID_BIT);
         char mnc_str[MNC_DIGIT_OFFSET] = {0};
         char strFormat[MNC_DIGIT_OFFSET] = {0};
         int size = snprintf_s(strFormat, MNC_DIGIT_OFFSET, MNC_DIGIT_OFFSET - 1, "%s%dd", "%0", mnc_digit);

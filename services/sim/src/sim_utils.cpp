@@ -38,12 +38,12 @@ std::shared_ptr<unsigned char> SIMUtils::HexStringConvertToBytes(const std::stri
     }
     int id = 0;
     int sz = (int)s.length();
-    if (sz % HALF_LEN) {
+    if (sz % HALF_LEN != 0) {
         return nullptr;
     }
     int outlen = sz / HALF_LEN;
     byteslen = outlen;
-    if (!outlen) {
+    if (outlen == 0) {
         return nullptr;
     }
     unsigned char *cache = (unsigned char *)calloc(outlen, sizeof(unsigned char));
@@ -111,13 +111,13 @@ std::shared_ptr<char16_t> SIMUtils::CharsConvertToChar16(
     }
 
     int id = 0;
-    if (charBytesLen % HALF_LEN) {
+    if (charBytesLen % HALF_LEN != 0) {
         return nullptr;
     }
 
     int outLen = charBytesLen / HALF_LEN;
     outChar16Len = outLen;
-    if (!outChar16Len) {
+    if (outChar16Len == 0) {
         return nullptr;
     }
     char16_t *cache = (char16_t *)calloc(outLen, sizeof(char16_t));
