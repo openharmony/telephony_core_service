@@ -59,7 +59,7 @@ void IccDiallingNumbersCache::Init()
 
 void IccDiallingNumbersCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    int id = 0;
+    uint32_t id = 0;
     id = event->GetInnerEventId();
     TELEPHONY_LOGI("IccDiallingNumbersCache ProcessEvent Id is %{public}d", id);
     switch (id) {
@@ -209,7 +209,7 @@ bool IccDiallingNumbersCache::CheckValueAndOperation(
         auto iter = diallingNumberFileList_.find(fileId);
         if (iter != diallingNumberFileList_.end()) {
             std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &vc = iter->second;
-            int size = vc->size();
+            int size = (int)vc->size();
             if ((index < 1) || (index > size)) { // check index range
                 TELEPHONY_LOGE("error index!!");
                 return false;
@@ -269,7 +269,7 @@ void IccDiallingNumbersCache::SendBackResult(const AppExecFwk::InnerEvent::Point
         return;
     }
     auto owner = callPointer->GetOwner();
-    int id = callPointer->GetInnerEventId();
+    uint32_t id = callPointer->GetInnerEventId();
     std::unique_ptr<ResultObtain> fd = callPointer->GetUniqueObject<ResultObtain>();
     std::unique_ptr<ResponseResult> data = std::make_unique<ResponseResult>(fd.get());
     data->result = static_cast<std::shared_ptr<void>>(ar);

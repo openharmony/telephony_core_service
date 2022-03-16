@@ -37,13 +37,13 @@ std::shared_ptr<unsigned char> SIMUtils::HexStringConvertToBytes(const std::stri
         return nullptr;
     }
     int id = 0;
-    int sz = s.length();
-    if (sz % HALF_LEN != 0) {
+    int sz = (int)s.length();
+    if (sz % HALF_LEN) {
         return nullptr;
     }
     int outlen = sz / HALF_LEN;
     byteslen = outlen;
-    if (outlen == 0) {
+    if (!outlen) {
         return nullptr;
     }
     unsigned char *cache = (unsigned char *)calloc(outlen, sizeof(unsigned char));
@@ -94,7 +94,7 @@ bool SIMUtils::IsShowableAscii(char c)
 
 bool SIMUtils::IsShowableAsciiOnly(const std::string &str)
 {
-    int len = str.length();
+    int len = (int)str.length();
     for (int i = 0; i < len; i++) {
         if (!IsShowableAscii(str.at(i))) {
             return false;
@@ -111,13 +111,13 @@ std::shared_ptr<char16_t> SIMUtils::CharsConvertToChar16(
     }
 
     int id = 0;
-    if (charBytesLen % HALF_LEN != 0) {
+    if (charBytesLen % HALF_LEN) {
         return nullptr;
     }
 
     int outLen = charBytesLen / HALF_LEN;
     outChar16Len = outLen;
-    if (outChar16Len == 0) {
+    if (!outChar16Len) {
         return nullptr;
     }
     char16_t *cache = (char16_t *)calloc(outLen, sizeof(char16_t));
@@ -163,7 +163,7 @@ std::string SIMUtils::DiallingNumberStringFieldConvertToString(
         std::u16string hs(cs.get(), 0, outlen);
         std::u16string rtl = u"";
         if (!hs.empty()) {
-            ucslen = hs.length();
+            ucslen = (int)hs.length();
             wchar_t c = L'\uFFFF';
             while (ucslen > 0 && hs.at(ucslen - 1) == c) {
                 ucslen--;

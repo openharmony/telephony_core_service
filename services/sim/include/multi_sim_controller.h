@@ -86,8 +86,8 @@ private:
     const static int32_t ACTIVE_INIT = -1;
     const static int32_t RETRY_COUNT = 12;
     const static int32_t RETRY_TIME = 5000;
-    int32_t slotId_;
-    int32_t maxCount_;
+    int32_t slotId_ = 0;
+    int32_t maxCount_ = 0;
     static bool ready_;
     inline static const std::string DEFAULT_VOICE_SLOTID_CHANGE_ACTION =
         "com.hos.action.DEFAULT_VOICE_SUBSCRIPTION_CHANGED";
@@ -102,7 +102,7 @@ private:
     inline static const std::string DEFAULT_SMS_SLOT_CHANGED = "defaultSmsSlotChanged";
     inline static const std::string DEFAULT_CELLULAR_DATA_SLOT_CHANGED = "defaultCellularDataChanged";
     inline static const std::string DEFAULT_MAIN_SLOT_CHANGED = "defaultMainSlotChanged";
-    inline static bool lackSim_;
+    inline static bool lackSim_ = false;
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<SimStateManager> simStateManager_ = nullptr;
     std::shared_ptr<SimFileManager> simFileManager_ = nullptr;

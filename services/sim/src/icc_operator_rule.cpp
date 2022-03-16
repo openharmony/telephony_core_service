@@ -50,7 +50,7 @@ static bool readOneByte(std::string::const_iterator &it, const std::string::cons
 static bool parseSimpleTLV(std::string::const_iterator &it, const std::string::const_iterator &ed,
     std::string &tagName, int32_t &len, std::string &value)
 {
-    size_t inputSize = std::distance(it, ed);
+    size_t inputSize = static_cast<long unsigned int>(std::distance(it, ed));
     if (inputSize < IccOperatorRule::TLV_STAG_CHARLEN) {
         std::string temp(it, ed);
         TELEPHONY_LOGE("parseSimpleTLV from '%{public}s' size:%{public}zu < %{public}d", temp.data(), inputSize,

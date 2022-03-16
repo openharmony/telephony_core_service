@@ -75,7 +75,7 @@ void NetworkSearchTestCallbackStub::OnGetRadioStateCallback(const bool setResult
 void NetworkSearchTestCallbackStub::OnGetNetworkSearchInformation(
     const sptr<NetworkSearchResult> &nsResult, const int32_t errorCode)
 {
-    if (errorCode == 0) {
+    if (!errorCode) {
         TELEPHONY_LOGI("NetworkSearchTestCallbackStub OnGetNetworkSearchInformation success");
         sptr<NetworkSearchResult> networkSearchResult = nsResult;
         if (networkSearchResult != nullptr) {

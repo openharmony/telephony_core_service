@@ -26,7 +26,7 @@ MccAccess MccPool::AccessToMcc(int mcc)
     MccAccess m(mcc, "", 0);
     InitMccTables();
     int index = std::find(mccAccessTable_.begin(), mccAccessTable_.end(), m) - mccAccessTable_.begin();
-    int len = mccAccessTable_.size();
+    int len = (int)mccAccessTable_.size();
     if (index >= len) {
         return MccAccess(0, "", 0);
     } else {
@@ -52,7 +52,7 @@ int MccPool::ShortestMncLengthFromMcc(int mcc)
 
 void MccPool::InitMccTables()
 {
-    if (mccAccessTable_.size() == 0) {
+    if (!mccAccessTable_.size()) {
         AddMccForAsia();
         AddMccForEurope();
         AddMccForAfrica();

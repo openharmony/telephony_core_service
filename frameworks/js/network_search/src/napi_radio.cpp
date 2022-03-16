@@ -646,8 +646,7 @@ static napi_value GetNamedProperty(napi_env env, napi_value object, const std::s
 
 static bool MatchSetNetworkSelectionModeParameters(napi_env env, napi_value parameters[], size_t parameterCount)
 {
-    int32_t count = parameterCount;
-    TELEPHONY_LOGI("start MatchSetNetworkSelectionModeParameters parameterCount = %{public}d", count);
+    TELEPHONY_LOGI("start MatchSetNetworkSelectionModeParameters parameterCount = %{public}d", parameterCount);
     switch (parameterCount) {
         case 1: {
             if (!NapiUtil::MatchParameters(env, parameters, {napi_object})) {
@@ -696,13 +695,13 @@ static int32_t WrapJsSelectMode(int32_t jsSelectMode)
 
 static int32_t GetRatTechValue(std::string ratTechStr)
 {
-    if (GSM.compare(ratTechStr) == 0 || GPRS.compare(ratTechStr)) {
+    if (!GSM.compare(ratTechStr) || GPRS.compare(ratTechStr)) {
         return static_cast<int32_t>(NetworkRat::NETWORK_GSM_OR_GPRS);
     }
-    if (WCDMA.compare(ratTechStr) == 0) {
+    if (!WCDMA.compare(ratTechStr)) {
         return static_cast<int32_t>(NetworkRat::NETWORK_WCDMA);
     }
-    if (LTE.compare(ratTechStr) == 0) {
+    if (!LTE.compare(ratTechStr)) {
         return static_cast<int32_t>(NetworkRat::NETWORK_LTE);
     }
     return static_cast<int32_t>(NetworkRat::NETWORK_LTE);
@@ -1604,7 +1603,6 @@ void GetCellInformationCallback(napi_env env, napi_status status, void *data)
             napi_value info = nullptr;
             napi_create_object(env, &info);
             NapiUtil::SetPropertyBoolean(env, info, "isCamped", true);
-            
             uint64_t timeStamp = 0;
             int32_t signalLevel = 0;
             CellInformation::CellType cellType = CellInformation::CellType::CELL_TYPE_NONE;
@@ -1615,13 +1613,11 @@ void GetCellInformationCallback(napi_env env, napi_status status, void *data)
             }
             NapiUtil::SetPropertyInt32(env, info, "timeStamp", timeStamp);
             NapiUtil::SetPropertyInt32(env, info, "networkType", WrapCellInformationType(infoItem));
-            
             napi_value signalInformation = nullptr;
             napi_create_object(env, &signalInformation);
             int32_t signalType = WrapCellInformationType(infoItem);
             NapiUtil::SetPropertyInt32(env, signalInformation, "signalType", signalType);
             NapiUtil::SetPropertyInt32(env, signalInformation, "signalLevel", signalLevel);
-            
             std::string name = "signalInformation";
             napi_set_named_property(env, info, name.c_str(), signalInformation);
             napi_set_named_property(env, info, "data", JudgmentData(env, infoItem, cellType));
@@ -1671,6 +1667,8 @@ static napi_value GetCellInformation(napi_env env, napi_callback_info info)
         napi_create_async_work(env, nullptr, resourceName, NativeGetCellInformation, GetCellInformationCallback,
             (void *)asyncContext, &(asyncContext->work)));
     NAPI_CALL(env, napi_queue_async_work(env, asyncContext->work));
+    delete asyncContext;
+    asyncContext = nullptr;
     return result;
 }
 

@@ -76,6 +76,8 @@ bool CoreService::Init()
     simManager_ = std::make_shared<SimManager>(telRilManager_);
     if (simManager_ != nullptr) {
         simManager_->OnInit(slotCount);
+    } else {
+        return false;
     }
     networkSearchManager_ = std::make_shared<NetworkSearchManager>(telRilManager_, simManager_);
     if (networkSearchManager_ != nullptr) {

@@ -58,7 +58,7 @@ void IccDiallingNumbersManager::Init()
 
 void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    int id = 0;
+    uint32_t id = 0;
     id = event->GetInnerEventId();
     TELEPHONY_LOGI("IccDiallingNumbersManager ProcessEvent Id is %{public}d", id);
     switch (id) {

@@ -61,7 +61,7 @@ private:
     bool ProcessGetSubscriptionDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetSpnDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ParseSpnName(int encodeType, const unsigned char* spnData, int dataLen);
-    const int MCC_LEN = 3;
+    const size_t MCC_LEN = 3;
     const int LOAD_STEP = 1;
     const int SPN_FLAG = 0x01;
     const int ENCODING_POS = 1;

@@ -365,8 +365,8 @@ int32_t TelRilData::SetLinkBandwidthReportingRule(
     dLinkBandwidth.delayMs = linkBandwidth.delayMs;
     dLinkBandwidth.delayUplinkKbps = linkBandwidth.delayUplinkKbps;
     dLinkBandwidth.delayDownlinkKbps = linkBandwidth.delayDownlinkKbps;
-    dLinkBandwidth.maximumUplinkKbpsSize = linkBandwidth.maximumUplinkKbps.size();
-    dLinkBandwidth.maximumDownlinkKbpsSize = linkBandwidth.maximumDownlinkKbps.size();
+    dLinkBandwidth.maximumUplinkKbpsSize = static_cast<int32_t>(linkBandwidth.maximumUplinkKbps.size());
+    dLinkBandwidth.maximumDownlinkKbpsSize = static_cast<int32_t>(linkBandwidth.maximumDownlinkKbps.size());
     dLinkBandwidth.maximumUplinkKbps = linkBandwidth.maximumUplinkKbps;
     dLinkBandwidth.maximumDownlinkKbps = linkBandwidth.maximumDownlinkKbps;
     TELEPHONY_LOGI("maximumUplinkKbpsSize:%{public}d, maximumDownlinkKbpsSize:%{public}d",
