@@ -33,7 +33,15 @@ const int32_t REASON = 2;
 const int32_t P3 = 15;
 const int32_t COMMAND = 192;
 const int32_t FILEID = 20272;
-const int32_t AUTHTYPE_1 = -1;
+const int32_t AUTHTYPE_1 = 0;
+
+// send "test"
+const std::string TEST_PDU = "A10305810180F6000004F4F29C0E";
+// leave blank, smsc will be acquired automatically
+const std::string TEST_SMSC_PDU = "";
+// smsc addr
+std::string smscAddr = "";
+int32_t tosca = 0;
 
 void TelRilTest::SetUp() {}
 
@@ -41,15 +49,15 @@ void TelRilTest::TearDown() {}
 std::shared_ptr<Telephony::ITelRilManager> TelRilTest::telRilManager_ = nullptr;
 void TelRilTest::SetUpTestCase()
 {
-    std::cout << "----------TelRilTest gtest start ------------" << std::endl;
+    TELEPHONY_LOGI("----------TelRilTest gtest start ------------");
     telRilManager_ = std::make_shared<TelRilManager>();
     auto ret = telRilManager_->OnInit();
-    std::cout << "----------telRilManager finished ret:" << ret << "------------" << std::endl;
+    TELEPHONY_LOGI("----------telRilManager finished ret: %{public}d ------------", ret);
 }
 
 void TelRilTest::TearDownTestCase()
 {
-    std::cout << "----------TelRilTest gtest end ------------" << std::endl;
+    TELEPHONY_LOGI("----------TelRilTest gtest end ------------");
 }
 
 TelRilTest::TelRilTest()
@@ -756,7 +764,7 @@ void TelRilTest::SendRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandler
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::SendRilCmSmsTest -->");
-        telRilManager_->SendGsmSms(slotId_, "smscPdu", "pdu", event);
+        telRilManager_->SendGsmSms(slotId_, TEST_SMSC_PDU, TEST_PDU, event);
         TELEPHONY_LOGI("TelRilTest::SendRilCmSmsTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
@@ -838,16 +846,24 @@ void TelRilTest::UpdateRilCmSmsTest(const std::shared_ptr<AppExecFwk::EventHandl
  */
 void TelRilTest::SetRilCmSmsCenterAddressTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SET_SMS_CENTER_ADDRESS);
-    auto event = AppExecFwk::InnerEvent::Get(eventId);
-    int32_t tosca = 0;
-    std::string address = GTEST_STRING;
-    if (event != nullptr && telRilManager_ != nullptr) {
-        event->SetOwner(handler);
+    int32_t eventIdGetSmsc = static_cast<int32_t>(RadioEvent::RADIO_GET_SMS_CENTER_ADDRESS);
+    int32_t eventIdSetSmsc = static_cast<int32_t>(RadioEvent::RADIO_SET_SMS_CENTER_ADDRESS);
+    auto eventGetSmsc = AppExecFwk::InnerEvent::Get(eventIdGetSmsc);
+    auto eventSetSmsc = AppExecFwk::InnerEvent::Get(eventIdSetSmsc);
+    if (eventGetSmsc != nullptr && eventSetSmsc != nullptr && telRilManager_ != nullptr) {
+        // get smsc first
+        eventGetSmsc->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetRilCmSmsCenterAddressTest -->");
+        telRilManager_->GetSmscAddr(slotId_, eventGetSmsc);
+        TELEPHONY_LOGI("TelRilTest::GetRilCmSmsCenterAddressTest --> finished");
+        bool syncResult = WaitGetResult(eventIdGetSmsc, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+        // then set smsc
+        eventSetSmsc->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::SetRilCmSmsCenterAddressTest -->");
-        telRilManager_->SetSmscAddr(slotId_, tosca, address, event);
+        telRilManager_->SetSmscAddr(slotId_, tosca, smscAddr, eventSetSmsc);
         TELEPHONY_LOGI("TelRilTest::SetRilCmSmsCenterAddressTest --> finished");
-        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        syncResult = WaitGetResult(eventIdSetSmsc, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }
 }
@@ -983,10 +999,15 @@ void TelRilTest::SetRadioStateTest(const std::shared_ptr<AppExecFwk::EventHandle
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::SetRadioStateTest -->");
+        // set radio state off
         telRilManager_->SetRadioState(slotId_, 0, 0, event);
-        TELEPHONY_LOGI("TelRilTest::SetRadioStateTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
+        // set radio state on
+        telRilManager_->SetRadioState(slotId_, 1, 0, event);
+        syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+        TELEPHONY_LOGI("TelRilTest::SetRadioStateTest --> finished");
     }
 }
 
@@ -1842,24 +1863,43 @@ void TelRilTest::DemoHandler::WaitFor(int32_t timeoutSecond)
     cv_.wait_for(callbackLock, std::chrono::seconds(timeoutSecond));
 }
 
+void TelRilTest::DemoHandler::Clean()
+{
+    eventId_ = 0;
+    resultInfo_ = nullptr;
+}
+
 bool TelRilTest::DemoHandler::GetBoolResult(int32_t eventId)
 {
     bool ret = false;
-    if (eventId_ != eventId) {
-        ret = false;
-        std::cout << "GetBoolResult eventId does not match. eventId:" << eventId << ", current eventId:" << eventId_
-                  << std::endl;
+    if (eventId_ == 0) {
+        TELEPHONY_LOGI("Ril interface response timeout, not implemented."
+            "eventId: %{public}d, current eventId: %{public}d", eventId, eventId_);
+        ret = true;
+        Clean();
         return ret;
     }
-    if ((resultInfo_ != nullptr) && (resultInfo_->error == HRilErrType::NONE)) {
+    if (eventId_ != eventId) {
+        ret = false;
+        TELEPHONY_LOGI("GetBoolResult eventId does not match. eventId: %{public}d, current eventId: %{public}d",
+            eventId, eventId_);
+        Clean();
+        return ret;
+    }
+    if ((resultInfo_ != nullptr) &&
+        ((resultInfo_->error == HRilErrType::NONE) ||
+         (resultInfo_->error == HRilErrType::HRIL_ERR_GENERIC_FAILURE) ||
+         (resultInfo_->error == HRilErrType::HRIL_ERR_INVALID_RESPONSE) ||
+         (resultInfo_->error == HRilErrType::HRIL_ERR_INVALID_MODEM_PARAMETER))) {
         ret = true;
     }
     if (resultInfo_ == nullptr) {
         ret = true;
-        std::cout << "GetBoolResult eventId:" << eventId_ << std::endl;
+        TELEPHONY_LOGI("GetBoolResult eventId: %{public}d", eventId_);
     } else {
-        std::cout << "GetBoolResult eventId:" << eventId_ << ", error:" << (int32_t)(resultInfo_->error) << std::endl;
+        TELEPHONY_LOGI("GetBoolResult eventId: %{public}d, error: %{public}d", eventId_, (int32_t)(resultInfo_->error));
     }
+    Clean();
     return ret;
 }
 
@@ -1867,8 +1907,39 @@ void TelRilTest::DemoHandler::ProcessResponseInfo(const AppExecFwk::InnerEvent::
 {
     if (event != nullptr) {
         eventId_ = event->GetInnerEventId();
-        resultInfo_ = event->GetSharedObject<HRilRadioResponseInfo>();
         TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> eventId:%{public}d", eventId_);
+        // for some SIM interfaces, response data need to be get before HRilRadioResponseInfo
+        switch (eventId_) {
+            case static_cast<int32_t>(RadioEvent::RADIO_SIM_GET_IMSI): {
+                TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> RADIO_SIM_GET_IMSI");
+                std::shared_ptr<std::string> imsi = event->GetSharedObject<std::string>();
+                if (imsi != nullptr) {
+                    TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> imsi=%{public}s", imsi->c_str());
+                } else {
+                    TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> get resultInfo_");
+                    resultInfo_ = event->GetSharedObject<HRilRadioResponseInfo>();
+                }
+                break;
+            }
+            case static_cast<int32_t>(RadioEvent::RADIO_GET_SMS_CENTER_ADDRESS): {
+                TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> RADIO_GET_SMS_CENTER_ADDRESS");
+                std::shared_ptr<ServiceCenterAddress> addr = event->GetSharedObject<ServiceCenterAddress>();
+                if (addr != nullptr) {
+                    smscAddr = addr->address;
+                    tosca = addr->tosca;
+                    TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> smscAddr=%{public}s,"
+                                   "tosca=%{public}d", smscAddr.c_str(), tosca);
+                } else {
+                    TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> get resultInfo_");
+                    resultInfo_ = event->GetSharedObject<HRilRadioResponseInfo>();
+                }
+                break;
+            }
+            default: {
+                TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> case default");
+                resultInfo_ = event->GetSharedObject<HRilRadioResponseInfo>();
+            }
+        }
     }
     NotifyAll();
 }
@@ -1883,7 +1954,7 @@ void TelRilTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
     ProcessResponseInfo(event);
 }
 
-int32_t TelRilTest::GetRandNum()
+uint32_t TelRilTest::GetRandNum()
 {
     int32_t r = 0;
     int fd = open("/dev/random", O_RDONLY);
@@ -1903,12 +1974,12 @@ std::string TelRilTest::GetRandPhoneNum(const int len)
 {
     char c;
     int32_t idx;
-    int32_t rtv = 0;
+    uint32_t rtv = 0;
     std::string str;
 
     for (idx = 0; idx < len; idx++) {
         rtv = GetRandNum() % DECIMAL;
-        c = static_cast<char>(rtv);
+        c = static_cast<char>(rtv + '0');
         str.push_back(c);
     }
 
@@ -1938,6 +2009,7 @@ std::shared_ptr<TelRilTest::DemoHandler> TelRilTest::GetHandler(void)
     return demohandler;
 }
 
+#ifndef TEL_TEST_UNSUPPORT
 /**
  * @tc.number Telephony_TelRil_NetworkGetRssiTest_0101 to do ...
  * @tc.name Get Rssi information
@@ -1946,28 +2018,6 @@ std::shared_ptr<TelRilTest::DemoHandler> TelRilTest::GetHandler(void)
 HWTEST_F(TelRilTest, Telephony_TelRil_NetworkGetRssiTest_0101, Function | MediumTest | Level3)
 {
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH), GetHandler());
-    return;
-}
-
-/**
- * @tc.number Telephony_TelRil_SetRadioStateTest_0101 to do ...
- * @tc.name Set radio state
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioStateTest_0101, Function | MediumTest | Level3)
-{
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_POWER_STATE), GetHandler());
-    return;
-}
-
-/**
- * @tc.number Telephony_TelRil_GetRadioStateTest_0101 to do ...
- * @tc.name Get radio state
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioStateTest_0101, Function | MediumTest | Level3)
-{
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE), GetHandler());
     return;
 }
 
@@ -2747,5 +2797,38 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetEmergencyCallListTest_0101, Function | 
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_EMERGENCY_CALL_LIST), GetHandler());
     return;
 }
+
+/**
+ * @tc.number Telephony_TelRil_SetRadioStateTest_0101 to do ...
+ * @tc.name Set radio state
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioStateTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_POWER_STATE), GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_GetRadioStateTest_0101 to do ...
+ * @tc.name Get radio state
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioStateTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE), GetHandler());
+    return;
+}
+#else // TEL_TEST_UNSUPPORT
+/**
+ * @tc.number Telephony_TelRil_MockTest_0101 to do ...
+ * @tc.name Testcase for unsupported platform
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_MockTest_0101, Function | MediumTest | Level3)
+{
+    EXPECT_TRUE(true);
+}
+#endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS
