@@ -220,7 +220,7 @@ void OperatorName::NotifyGsmSpnChanged(RegServiceState regStatus, sptr<NetworkSt
     UpdatePlmn(regStatus, networkState, spnRule, plmn, showPlmn);
     UpdateSpn(regStatus, networkState, spnRule, spn, showSpn);
     if (curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn ||
-        curPlmnShow_ != showPlmn || curSpn_.compare(spn) != 0 || curPlmn_.compare(plmn) != 0) {
+        curPlmnShow_ != showPlmn || curSpn_.compare(spn) || curPlmn_.compare(plmn)) {
         TELEPHONY_LOGI("OperatorName::NotifySpnChanged start send broadcast slotId:%{public}d ...", slotId_);
         PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn);
     } else {
@@ -258,7 +258,7 @@ void OperatorName::NotifyCdmaSpnChanged(RegServiceState regStatus, sptr<NetworkS
     }
     showPlmn = !plmn.empty() && (spnRule == SpnShowType::SPN_CONDITION_DISPLAY_PLMN);
     if (curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn ||
-        curPlmnShow_ != showPlmn || curSpn_.compare(spn) != 0 || curPlmn_.compare(plmn) != 0) {
+        curPlmnShow_ != showPlmn || curSpn_.compare(spn) || curPlmn_.compare(plmn)) {
         TELEPHONY_LOGI("OperatorName::NotifySpnChanged start send broadcast slotId:%{public}d...", slotId_);
         PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn);
     } else {

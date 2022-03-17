@@ -154,8 +154,12 @@ int32_t TelRilSim::ErrorIccIoResponse(
 int32_t TelRilSim::ProcessIccIoInfo(
     std::shared_ptr<TelRilRequest> telRilRequest, std::shared_ptr<IccIoResultInfo> iccIoResult)
 {
-    if (telRilRequest == nullptr || telRilRequest->pointer_ == nullptr) {
-        TELEPHONY_LOGE("ERROR :telRilRequest or telRilRequest->pointer_== nullptr !!!");
+    if (telRilRequest == nullptr) {
+        TELEPHONY_LOGE("ERROR :telRilRequest== nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (telRilRequest->pointer_ == nullptr) {
+        TELEPHONY_LOGE("ERROR :telRilRequest->pointer_== nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (telRilRequest->pointer_->GetOwner() == nullptr || iccIoResult == nullptr) {

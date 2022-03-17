@@ -26,7 +26,7 @@ IccFileController::IccFileController(const std::shared_ptr<AppExecFwk::EventRunn
 
 void IccFileController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    int id = 0;
+    uint32_t id = 0;
     id = event->GetInnerEventId();
     TELEPHONY_LOGI("IccFileController ProcessEvent Id is %{public}d", id);
     if (ProcessErrorResponse(event)) {
@@ -60,7 +60,7 @@ void IccFileController::ProcessLinearRecordSize(const AppExecFwk::InnerEvent::Po
 {
     std::string str = IccFileController::NULLSTR;
     std::string path = IccFileController::NULLSTR;
-    auto eventId = event->GetInnerEventId();
+    uint32_t eventId = event->GetInnerEventId();
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     const AppExecFwk::InnerEvent::Pointer &process = rcvMsg->controlHolder->fileLoaded;
     IccFileData *result = &(rcvMsg->fileData);
@@ -408,7 +408,7 @@ void IccFileController::SendResponse(std::shared_ptr<IccControllerHolder> holder
     bool isNull = (response == nullptr);
     auto owner = response->GetOwner();
     std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
-    int id = response->GetInnerEventId();
+    uint32_t id = response->GetInnerEventId();
     bool needShare = (id == MSG_SIM_OBTAIN_ICC_FILE_DONE);
     std::unique_ptr<ControllerToFileMsg> objectUnique = nullptr;
     std::shared_ptr<ControllerToFileMsg> objectShare = nullptr;
@@ -443,7 +443,7 @@ void IccFileController::SendEfLinearResult(
     object->valueData[0] = val[0];
     object->valueData[1] = val[1];
     object->valueData[MAX_FILE_INDEX] = val[MAX_FILE_INDEX];
-    int id = response->GetInnerEventId();
+    uint32_t id = response->GetInnerEventId();
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(id, object, eventParam);
     handler->SendEvent(event);
@@ -457,7 +457,7 @@ void IccFileController::SendMultiRecordResult(
     std::shared_ptr<MultiRecordResult> object = std::make_shared<MultiRecordResult>(cmdData.get());
     object->fileResults.assign(strValue.begin(), strValue.end());
     object->resultLength = strValue.size();
-    int id = response->GetInnerEventId();
+    uint32_t id = response->GetInnerEventId();
     int eventParam = 0;
     TELEPHONY_LOGI("IccFileController::SendMultiRecordResult send end");
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(id, object, eventParam);
@@ -543,7 +543,8 @@ void IccFileController::GetFileAndDataSize(const unsigned char *data, int &fileS
 {
     if (data != nullptr) {
         fileSize = data[LENGTH_OF_RECORD] & BYTE_NUM;
-        dataSize = ((data[SIZE_ONE_OF_FILE] & BYTE_NUM) << OFFSET) + (data[SIZE_TWO_OF_FILE] & BYTE_NUM);
+        dataSize = (((unsigned int)(data[SIZE_ONE_OF_FILE]  &  BYTE_NUM)) <<  OFFSET) +
+                    ((unsigned int)data[SIZE_TWO_OF_FILE] & BYTE_NUM);
     }
 }
 
@@ -572,7 +573,7 @@ bool IccFileController::ProcessErrorResponse(const AppExecFwk::InnerEvent::Point
     }
     AppExecFwk::InnerEvent::Pointer &response = rcvMsg->controlHolder->fileLoaded;
     auto owner = response->GetOwner();
-    int id = response->GetInnerEventId();
+    uint32_t id = response->GetInnerEventId();
     std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
     bool needShare = (id == MSG_SIM_OBTAIN_ICC_FILE_DONE);
     std::unique_ptr<ControllerToFileMsg> objectUnique = nullptr;

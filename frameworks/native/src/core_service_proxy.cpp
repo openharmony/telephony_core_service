@@ -1129,7 +1129,7 @@ bool CoreServiceProxy::IsValidSlotId(int32_t slotId)
 
 bool CoreServiceProxy::IsValidStringLength(std::u16string str)
 {
-    int32_t length = str.length();
+    int32_t length = static_cast<int32_t>(str.length());
     if ((length >= MIN_STRING_LE) && (length <= MAX_STRING_LE)) {
         return true;
     } else {

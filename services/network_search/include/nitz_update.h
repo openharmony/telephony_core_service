@@ -52,7 +52,7 @@ private:
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     bool timeZoneUpdateFlag_ = false;
-    int32_t offset_;
+    int32_t offset_ = 0;
     int32_t slotId_ = 0;
 };
 } // namespace Telephony

@@ -108,7 +108,7 @@ void SimStateHandle::UnlockPuk(int32_t slotId, std::string newPin, std::string p
 void SimStateHandle::AlterPin(int32_t slotId, std::string newPin, std::string oldPin)
 {
     TELEPHONY_LOGI("SimStateHandle::AlterPin() slotId = %{public}d", slotId);
-    int32_t length = newPin.size();
+    int32_t length = (int32_t)newPin.size();
     SimPasswordParam simPinPassword;
     simPinPassword.passwordLength = length;
     simPinPassword.fac = FAC_PIN_LOCK;
@@ -138,7 +138,7 @@ void SimStateHandle::UnlockPuk2(int32_t slotId, std::string newPin2, std::string
 void SimStateHandle::AlterPin2(int32_t slotId, std::string newPin2, std::string oldPin2)
 {
     TELEPHONY_LOGI("SimStateHandle::AlterPin2() slotId = %{public}d", slotId);
-    int32_t length = newPin2.size();
+    int32_t length = (int32_t)newPin2.size();
     SimPasswordParam simPin2Password;
     simPin2Password.passwordLength = length;
     simPin2Password.fac = FDN_PIN_LOCK;
@@ -432,7 +432,7 @@ bool SimStateHandle::PublishSimStateEvent(std::string event, int32_t eventCode, 
 
 void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    int eventId = event->GetInnerEventId();
+    uint32_t eventId = event->GetInnerEventId();
     TELEPHONY_LOGI("SimStateHandle::ProcessEvent(), eventId = %{public}d", eventId);
     TELEPHONY_LOGI("SimStateHandle::ProcessEvent(), slotId_ = %{public}d", slotId_);
     switch (eventId) {

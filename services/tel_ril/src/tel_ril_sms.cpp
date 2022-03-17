@@ -102,7 +102,7 @@ int32_t TelRilSms::SendGsmSms(std::string &smsPdu, std::string &pdu, const AppEx
     mGsmSmsMessageInfo.Marshalling(data);
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    if (cellularRadio_->SendRequest(HREQ_SMS_SEND_GSM_SMS, data, reply, option) != 0) {
+    if (cellularRadio_->SendRequest(HREQ_SMS_SEND_GSM_SMS, data, reply, option)) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
     }
     return TELEPHONY_ERR_SUCCESS;
@@ -124,7 +124,7 @@ int32_t TelRilSms::SendCdmaSms(std::string pdu, const AppExecFwk::InnerEvent::Po
     mCdmaSmsMessageInfo.Marshalling(data);
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    if (cellularRadio_->SendRequest(HREQ_SMS_SEND_CDMA_SMS, data, reply, option) != 0) {
+    if (cellularRadio_->SendRequest(HREQ_SMS_SEND_CDMA_SMS, data, reply, option)) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
     }
     return TELEPHONY_ERR_SUCCESS;
@@ -147,7 +147,7 @@ int32_t TelRilSms::AddSimMessage(
     mGsmSmsMessageInfo.Marshalling(data);
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    if (cellularRadio_->SendRequest(HREQ_SMS_ADD_SIM_MESSAGE, data, reply, option) != 0) {
+    if (cellularRadio_->SendRequest(HREQ_SMS_ADD_SIM_MESSAGE, data, reply, option)) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
     }
     return TELEPHONY_ERR_SUCCESS;
@@ -168,7 +168,7 @@ int32_t TelRilSms::DelSimMessage(int32_t gsmIndex, const AppExecFwk::InnerEvent:
     data.WriteInt32(gsmIndex);
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    if (cellularRadio_->SendRequest(HREQ_SMS_DEL_SIM_MESSAGE, data, reply, option) != 0) {
+    if (cellularRadio_->SendRequest(HREQ_SMS_DEL_SIM_MESSAGE, data, reply, option)) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
     }
     return TELEPHONY_ERR_SUCCESS;
@@ -192,7 +192,7 @@ int32_t TelRilSms::UpdateSimMessage(int32_t gsmIndex, int32_t state, std::string
     smsMessageIOInfo.Marshalling(data);
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    if (cellularRadio_->SendRequest(HREQ_SMS_UPDATE_SIM_MESSAGE, data, reply, option) != 0) {
+    if (cellularRadio_->SendRequest(HREQ_SMS_UPDATE_SIM_MESSAGE, data, reply, option)) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
     }
     return TELEPHONY_ERR_SUCCESS;
@@ -282,7 +282,7 @@ int32_t TelRilSms::SendSmsMoreMode(
     }
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    if (cellularRadio_->SendRequest(HREQ_SMS_SEND_SMS_MORE_MODE, data, reply, option) != 0) {
+    if (cellularRadio_->SendRequest(HREQ_SMS_SEND_SMS_MORE_MODE, data, reply, option)) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -305,7 +305,7 @@ int32_t TelRilSms::SendSmsAck(bool success, int32_t cause, const AppExecFwk::Inn
     mModeData.Marshalling(wData);
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    if (cellularRadio_->SendRequest(HREQ_SMS_SEND_SMS_ACK, wData, reply, option) != 0) {
+    if (cellularRadio_->SendRequest(HREQ_SMS_SEND_SMS_ACK, wData, reply, option)) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -335,7 +335,7 @@ int32_t TelRilSms::SetCBConfig(
     }
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    if (cellularRadio_->SendRequest(HREQ_SMS_SET_CB_CONFIG, data, reply, option) != 0) {
+    if (cellularRadio_->SendRequest(HREQ_SMS_SET_CB_CONFIG, data, reply, option)) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -359,7 +359,7 @@ int32_t TelRilSms::SetCdmaCBConfig(
     }
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    if (cellularRadio_->SendRequest(HREQ_SMS_SET_CDMA_CB_CONFIG, data, reply, option) != 0) {
+    if (cellularRadio_->SendRequest(HREQ_SMS_SET_CDMA_CB_CONFIG, data, reply, option)) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -403,7 +403,7 @@ int32_t TelRilSms::AddCdmaSimMessage(int32_t status, std::string &pdu, const App
     mSmsMessageIOInfo.Marshalling(data);
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    if (cellularRadio_->SendRequest(HREQ_SMS_ADD_CDMA_SIM_MESSAGE, data, reply, option) != 0) {
+    if (cellularRadio_->SendRequest(HREQ_SMS_ADD_CDMA_SIM_MESSAGE, data, reply, option)) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -427,7 +427,7 @@ int32_t TelRilSms::DelCdmaSimMessage(int32_t cdmaIndex, const AppExecFwk::InnerE
 
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    if (cellularRadio_->SendRequest(HREQ_SMS_DEL_CDMA_SIM_MESSAGE, data, reply, option) != 0) {
+    if (cellularRadio_->SendRequest(HREQ_SMS_DEL_CDMA_SIM_MESSAGE, data, reply, option)) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -454,7 +454,7 @@ int32_t TelRilSms::UpdateCdmaSimMessage(
     smsMessageIOInfo.Marshalling(data);
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-    if (cellularRadio_->SendRequest(HREQ_SMS_UPDATE_CDMA_SIM_MESSAGE, data, reply, option) != 0) {
+    if (cellularRadio_->SendRequest(HREQ_SMS_UPDATE_CDMA_SIM_MESSAGE, data, reply, option)) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -477,10 +477,10 @@ uint8_t *TelRilSms::ConvertHexStringToBytes(const uint8_t *hexString, size_t len
     const int32_t HEX_NUM_PER_BYTE = 2;
     const int32_t BIT_NUM_PER_HEX = 4;
 
-    if (length % HEX_NUM_PER_BYTE != 0) {
+    if (length % HEX_NUM_PER_BYTE) {
         return nullptr;
     }
-    int32_t len = length / HEX_NUM_PER_BYTE;
+    int32_t len = (int32_t)length / HEX_NUM_PER_BYTE;
     if (len <= 0) {
         TELEPHONY_LOGE("hexString is null");
         return nullptr;
@@ -499,7 +499,7 @@ uint8_t *TelRilSms::ConvertHexStringToBytes(const uint8_t *hexString, size_t len
             free(bytes);
             return nullptr;
         }
-        bytes[i / HEX_NUM_PER_BYTE] = ((hexCh1 << BIT_NUM_PER_HEX) | hexCh2);
+        bytes[i / HEX_NUM_PER_BYTE] = (((uint32_t)hexCh1 << BIT_NUM_PER_HEX) | hexCh2);
         i += HEX_NUM_PER_BYTE;
     }
     return bytes;
@@ -590,9 +590,9 @@ int32_t TelRilSms::SendGsmSmsResponse(MessageParcel &data)
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGI("serialId_:%{public}d, requestId_:%{public}d, msgRef:%{public}d,", telRilRequest->serialId_,
-        telRilRequest->requestId_, sendSmsResultInfo->msgRef);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        TELEPHONY_LOGI("serialId_:%{public}d, requestId_:%{public}d, msgRef:%{public}d,", telRilRequest->serialId_,
+            telRilRequest->requestId_, sendSmsResultInfo->msgRef);
         if (radioResponseInfo->error == HRilErrType::NONE) {
             sendSmsResultInfo->flag = telRilRequest->pointer_->GetParam();
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
@@ -637,9 +637,9 @@ int32_t TelRilSms::SendCdmaSmsResponse(MessageParcel &data)
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGI("serialId_:%{public}d, requestId_:%{public}d, msgRef:%{public}d,", telRilRequest->serialId_,
-        telRilRequest->requestId_, sendSmsResultInfo->msgRef);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        TELEPHONY_LOGI("serialId_:%{public}d, requestId_:%{public}d, msgRef:%{public}d,", telRilRequest->serialId_,
+            telRilRequest->requestId_, sendSmsResultInfo->msgRef);
         if (radioResponseInfo->error == HRilErrType::NONE) {
             sendSmsResultInfo->flag = telRilRequest->pointer_->GetParam();
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
@@ -673,9 +673,9 @@ int32_t TelRilSms::AddSimMessageResponse(MessageParcel &data)
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGI(
-        "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        TELEPHONY_LOGI(
+            "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
@@ -708,9 +708,9 @@ int32_t TelRilSms::DelSimMessageResponse(MessageParcel &data)
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGI(
-        "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        TELEPHONY_LOGI(
+            "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
@@ -743,9 +743,9 @@ int32_t TelRilSms::UpdateSimMessageResponse(MessageParcel &data)
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGI(
-        "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        TELEPHONY_LOGI(
+            "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
@@ -778,9 +778,9 @@ int32_t TelRilSms::SetSmscAddrResponse(MessageParcel &data)
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGI(
-        "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        TELEPHONY_LOGI(
+            "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
@@ -819,9 +819,9 @@ int32_t TelRilSms::GetSmscAddrResponse(MessageParcel &data)
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGI(
-        "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        TELEPHONY_LOGI(
+            "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
@@ -865,9 +865,9 @@ int32_t TelRilSms::GetCBConfigResponse(MessageParcel &data)
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGI(
-        "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        TELEPHONY_LOGI(
+            "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
@@ -911,9 +911,9 @@ int32_t TelRilSms::GetCdmaCBConfigResponse(MessageParcel &data)
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGI(
-        "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        TELEPHONY_LOGI(
+            "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
@@ -1081,9 +1081,9 @@ int32_t TelRilSms::AddCdmaSimMessageResponse(MessageParcel &data)
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGI(
-        "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        TELEPHONY_LOGI(
+            "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
@@ -1116,9 +1116,9 @@ int32_t TelRilSms::DelCdmaSimMessageResponse(MessageParcel &data)
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGI(
-        "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        TELEPHONY_LOGI(
+            "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
@@ -1151,9 +1151,9 @@ int32_t TelRilSms::UpdateCdmaSimMessageResponse(MessageParcel &data)
     TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
         radioResponseInfo->serial, radioResponseInfo->error);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    TELEPHONY_LOGI(
-        "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        TELEPHONY_LOGI(
+            "serialId_:%{public}d, requestId_:%{public}d,", telRilRequest->serialId_, telRilRequest->requestId_);
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {

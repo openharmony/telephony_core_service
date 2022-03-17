@@ -190,12 +190,13 @@ bool StkController::PublishStkEvent(const AAFwk::Want &want, int eventCode, cons
 
 void StkController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    int id = 0;
-    id = event->GetInnerEventId();
-    TELEPHONY_LOGI("StkController ProcessEvent Id is %{public}d", id);
+    uint32_t id = 0;
     if (event == nullptr) {
         TELEPHONY_LOGE("start ProcessEvent but event is null!");
         return;
+    } else {
+        id = event->GetInnerEventId();
+        TELEPHONY_LOGI("StkController ProcessEvent Id is %{public}d", id);
     }
     switch (id) {
         case RadioEvent::RADIO_SIM_STATE_CHANGE:

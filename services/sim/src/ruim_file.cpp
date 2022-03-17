@@ -73,7 +73,7 @@ std::string RuimFile::ObtainIsoCountryCode()
         TELEPHONY_LOGE("RuimFile ObtainIsoCountryCode: numeric is null");
         return "";
     }
-    int len = numeric.length();
+    size_t len = numeric.length();
     if (len >= MCC_LEN) {
         std::string mnc = numeric.substr(0, MCC_LEN);
         std::string iso = MccPool::MccCountryCode(std::stoi(mnc));
@@ -278,7 +278,7 @@ bool RuimFile::ProcessGetSpnDone(const AppExecFwk::InnerEvent::Pointer &event)
     int dataLen = 0;
     std::shared_ptr<unsigned char> fileData = SIMUtils::HexStringConvertToBytes(iccData, dataLen);
     unsigned char* data = fileData.get();
-    displayConditionOfCsimSpn_ = ((SPN_FLAG & data[0]) != 0);
+    displayConditionOfCsimSpn_ = (((unsigned int)SPN_FLAG & (unsigned int)data[0]) != 0);
 
     int encoding = data[ENCODING_POS];
     int language = data[LANG_POS];
