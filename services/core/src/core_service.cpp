@@ -515,7 +515,7 @@ bool CoreService::UnlockPin(const int32_t slotId, std::u16string pin, LockStatus
         return false;
     }
     TELEPHONY_LOGI(
-        "CoreService::UnlockPin(), pin = %{public}s, slotId = %{public}d", Str16ToStr8(pin).c_str(), slotId);
+        "CoreService::UnlockPin(), pinLen = %{public}d, slotId = %{public}d", pin.length(), slotId);
     if (simManager_ == nullptr) {
         return false;
     }
@@ -527,8 +527,8 @@ bool CoreService::UnlockPuk(const int slotId, std::u16string newPin, std::u16str
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
-    TELEPHONY_LOGI("CoreService::UnlockPuk(), newPin = %{public}s, puk = %{public}s, slotId = %{public}d",
-        Str16ToStr8(newPin).c_str(), Str16ToStr8(puk).c_str(), slotId);
+    TELEPHONY_LOGI("CoreService::UnlockPuk(), newPinLen = %{public}d, pukLen = %{public}d, slotId = %{public}d",
+        newPin.length(), puk.length(), slotId);
     if (simManager_ == nullptr) {
         return false;
     }
@@ -541,8 +541,8 @@ bool CoreService::AlterPin(
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
-    TELEPHONY_LOGI("CoreService::AlterPin(), newPin = %{public}s, oldPin = %{public}s, slotId = %{public}d",
-        Str16ToStr8(newPin).c_str(), Str16ToStr8(oldPin).c_str(), slotId);
+    TELEPHONY_LOGI("CoreService::AlterPin(), newPinLen = %{public}d, oldPinLen = %{public}d, slotId = %{public}d",
+        newPin.length(), oldPin.length(), slotId);
     if (simManager_ == nullptr) {
         return false;
     }
@@ -555,7 +555,7 @@ bool CoreService::UnlockPin2(const int32_t slotId, std::u16string pin2, LockStat
         return false;
     }
     TELEPHONY_LOGI(
-        "CoreService::UnlockPin2(), pin2 = %{public}s, slotId = %{public}d", Str16ToStr8(pin2).c_str(), slotId);
+        "CoreService::UnlockPin2(), pin2Len = %{public}d, slotId = %{public}d", pin2.length(), slotId);
     if (simManager_ == nullptr) {
         return false;
     }
@@ -568,8 +568,9 @@ bool CoreService::UnlockPuk2(
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
-    TELEPHONY_LOGI("CoreService::UnlockPuk2(), newPin2 = %{public}s, puk2 = %{public}s, slotId = %{public}d",
-        Str16ToStr8(newPin2).c_str(), Str16ToStr8(puk2).c_str(), slotId);
+    TELEPHONY_LOGI(
+        "CoreService::UnlockPuk2(), newPin2Len = %{public}d, puk2Len = %{public}d, slotId = %{public}d",
+        newPin2.length(), puk2.length(), slotId);
     if (simManager_ == nullptr) {
         return false;
     }
@@ -582,8 +583,9 @@ bool CoreService::AlterPin2(
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
-    TELEPHONY_LOGI("CoreService::AlterPin2(), newPin2 = %{public}s, oldPin2 = %{public}s, slotId = %{public}d",
-        Str16ToStr8(newPin2).c_str(), Str16ToStr8(oldPin2).c_str(), slotId);
+    TELEPHONY_LOGI(
+        "CoreService::AlterPin2(), newPin2Len = %{public}d, oldPin2Len = %{public}d, slotId = %{public}d",
+        newPin2.length(), oldPin2.length(), slotId);
     if (simManager_ == nullptr) {
         return false;
     }
@@ -597,10 +599,10 @@ bool CoreService::SetLockState(int32_t slotId, const LockInfo &options, LockStat
     }
     std::u16string strPin = options.password;
     TELEPHONY_LOGI(
-        "CoreService::SetLockState(),lockType = %{public}d, pin = %{public}s, lockState = %{public}d, slotId "
+        "CoreService::SetLockState(),lockType = %{public}d, pinLen = %{public}d, lockState = %{public}d, slotId "
         "= "
         "%{public}d",
-        options.lockType, Str16ToStr8(strPin).c_str(), options.lockState, slotId);
+        options.lockType, strPin.length(), options.lockState, slotId);
     if (simManager_ == nullptr) {
         return false;
     }
