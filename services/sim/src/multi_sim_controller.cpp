@@ -537,7 +537,6 @@ bool MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
 int32_t MultiSimController::GetDefaultCellularDataSlotIdUnit()
 {
     TELEPHONY_LOGI("MultiSimController::GetDefaultCellularDataSlotId");
-    std::lock_guard<std::mutex> lock(mutex_);
     if (!IsValidData()) {
         TELEPHONY_LOGE("MultiSimController::GetDefaultCellularDataSlotId InValidData");
         return 0;
