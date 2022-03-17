@@ -330,11 +330,11 @@ void NetworkSearchHandler::GetRilSignalIntensity(bool checkTime)
 void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Pointer &)
 {
     auto networkSearchManager = networkSearchManager_.lock();
-    std::shared_ptr<NetworkSearchState> networkSearchState = networkSearchManager->GetNetworkSearchState(slotId_);
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("failed to get NetworkSearchManager RadioState slotId:%{public}d", slotId_);
         return;
     }
+    std::shared_ptr<NetworkSearchState> networkSearchState = networkSearchManager->GetNetworkSearchState(slotId_);
     if (networkSearchState == nullptr) {
         TELEPHONY_LOGE("networkSearchState is null slotId:%{public}d", slotId_);
         return;

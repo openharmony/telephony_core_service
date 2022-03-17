@@ -37,7 +37,7 @@ std::shared_ptr<unsigned char> SIMUtils::HexStringConvertToBytes(const std::stri
         return nullptr;
     }
     int id = 0;
-    int sz = s.length();
+    int sz = (int)s.length();
     if (sz % HALF_LEN != 0) {
         return nullptr;
     }
@@ -94,7 +94,7 @@ bool SIMUtils::IsShowableAscii(char c)
 
 bool SIMUtils::IsShowableAsciiOnly(const std::string &str)
 {
-    int len = str.length();
+    int len = (int)str.length();
     for (int i = 0; i < len; i++) {
         if (!IsShowableAscii(str.at(i))) {
             return false;
@@ -163,7 +163,7 @@ std::string SIMUtils::DiallingNumberStringFieldConvertToString(
         std::u16string hs(cs.get(), 0, outlen);
         std::u16string rtl = u"";
         if (!hs.empty()) {
-            ucslen = hs.length();
+            ucslen = (int)hs.length();
             wchar_t c = L'\uFFFF';
             while (ucslen > 0 && hs.at(ucslen - 1) == c) {
                 ucslen--;

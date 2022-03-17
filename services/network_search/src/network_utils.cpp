@@ -186,7 +186,7 @@ bool NetworkUtils::RemoveCallbackFromMap(int64_t index)
 {
     TELEPHONY_LOGI("NetworkUtils::RemoveCallbackFromMap index=%{public}" PRId64 "", index);
     std::lock_guard<std::mutex> guard(callbackMapMutex_);
-    return (networkSearchCacheMap_.erase(index) != 0);
+    return (networkSearchCacheMap_.erase(index));
 }
 
 const std::map<RadioEvent, std::any> EventSender::mapFunctions_ = {

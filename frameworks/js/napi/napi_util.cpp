@@ -261,6 +261,7 @@ void NapiUtil::Handle2ValueCallback(napi_env env, BaseContext *baseContext, napi
         std::string errorCode = std::to_string(napi_invalid_arg);
         std::string errorMessage = "error at baseContext is nullptr";
         NAPI_CALL_RETURN_VOID(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        return;
     }
     if (baseContext->callbackRef != nullptr) {
         TELEPHONY_LOGI("Handle2ValueCallback start normal callback");

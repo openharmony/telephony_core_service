@@ -232,7 +232,7 @@ void NetworkRegister::NotifyNrFrequencyChanged()
         TELEPHONY_LOGE("NetworkRegister::ProcessChannelConfigInfo cellularData callback is nullptr");
         return;
     }
-    int32_t size = channelConfigInfos_.size();
+    size_t size = channelConfigInfos_.size();
     for (int i = 0; i < size; ++i) {
         std::vector<int32_t> &cids = channelConfigInfos_[i].contextIds;
         if (!isFreqChanged) {

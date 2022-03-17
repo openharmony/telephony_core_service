@@ -574,8 +574,8 @@ int32_t CoreServiceStub::OnUnlockPin(MessageParcel &data, MessageParcel &reply)
     bool result = UnlockPin(slotId, pin, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
-    ret &= reply.WriteInt32(response.result);
-    ret &= reply.WriteInt32(response.remain);
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.result));
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.remain));
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnUnlockPin write reply failed.");
         return ERR_FLATTEN_OBJECT;
@@ -594,8 +594,8 @@ int32_t CoreServiceStub::OnUnlockPuk(MessageParcel &data, MessageParcel &reply)
     bool result = UnlockPuk(slotId, newPin, puk, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
-    ret &= reply.WriteInt32(response.result);
-    ret &= reply.WriteInt32(response.remain);
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.result));
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.remain));
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnUnlockPuk write reply failed.");
         return ERR_FLATTEN_OBJECT;
@@ -614,8 +614,8 @@ int32_t CoreServiceStub::OnAlterPin(MessageParcel &data, MessageParcel &reply)
     bool result = AlterPin(slotId, newPin, oldPin, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
-    ret &= reply.WriteInt32(response.result);
-    ret &= reply.WriteInt32(response.remain);
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.result));
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.remain));
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnAlterPin write reply failed.");
         return ERR_FLATTEN_OBJECT;
@@ -633,8 +633,8 @@ int32_t CoreServiceStub::OnUnlockPin2(MessageParcel &data, MessageParcel &reply)
     bool result = UnlockPin2(slotId, pin2, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
-    ret &= reply.WriteInt32(response.result);
-    ret &= reply.WriteInt32(response.remain);
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.result));
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.remain));
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnUnlockPin2 write reply failed.");
         return ERR_FLATTEN_OBJECT;
@@ -653,8 +653,8 @@ int32_t CoreServiceStub::OnUnlockPuk2(MessageParcel &data, MessageParcel &reply)
     bool result = UnlockPuk2(slotId, newPin2, puk2, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
-    ret &= reply.WriteInt32(response.result);
-    ret &= reply.WriteInt32(response.remain);
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.result));
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.remain));
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnUnlockPuk2 write reply failed.");
         return ERR_FLATTEN_OBJECT;
@@ -673,8 +673,8 @@ int32_t CoreServiceStub::OnAlterPin2(MessageParcel &data, MessageParcel &reply)
     bool result = AlterPin2(slotId, newPin2, oldPin2, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
-    ret &= reply.WriteInt32(response.result);
-    ret &= reply.WriteInt32(response.remain);
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.result));
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.remain));
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnAlterPin2 write reply failed.");
         return ERR_FLATTEN_OBJECT;
@@ -696,8 +696,8 @@ int32_t CoreServiceStub::OnSetLockState(MessageParcel &data, MessageParcel &repl
     bool result = SetLockState(slotId, options, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
-    ret &= reply.WriteInt32(response.result);
-    ret &= reply.WriteInt32(response.remain);
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.result));
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.remain));
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnSetLockState write reply failed.");
         return ERR_FLATTEN_OBJECT;
@@ -850,10 +850,10 @@ int32_t CoreServiceStub::OnGetActiveSimAccountInfoList(MessageParcel &data, Mess
 {
     std::vector<IccAccountInfo> iccAccountInfoList;
     bool result = GetActiveSimAccountInfoList(iccAccountInfoList);
-    int32_t size = iccAccountInfoList.size();
+    int32_t size = static_cast<int32_t>(iccAccountInfoList.size());
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
-    ret &= reply.WriteInt32(size);
+    ret &= static_cast<uint32_t>(reply.WriteInt32(size));
     if (!ret) {
         TELEPHONY_LOGE("OnGetActiveSimAccountInfoList write reply failed.");
         return ERR_FLATTEN_OBJECT;
@@ -1077,8 +1077,8 @@ int32_t CoreServiceStub::OnUnlockSimLock(MessageParcel &data, MessageParcel &rep
     bool result = UnlockSimLock(slotId, lockInfo, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
-    ret &= reply.WriteInt32(response.result);
-    ret &= reply.WriteInt32(response.remain);
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.result));
+    ret &= static_cast<uint32_t>(reply.WriteInt32(response.remain));
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnUnlockSimLock write reply failed.");
         return ERR_FLATTEN_OBJECT;
