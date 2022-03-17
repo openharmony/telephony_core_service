@@ -569,8 +569,6 @@ int32_t CoreServiceStub::OnUnlockPin(MessageParcel &data, MessageParcel &reply)
     LockStatusResponse response = {0};
     int32_t slotId = data.ReadInt32();
     std::u16string pin = data.ReadString16();
-    TELEPHONY_LOGI(
-        "CoreServiceStub::OnUnlockPin(), pin = %{public}s, slotId = %{public}d", Str16ToStr8(pin).c_str(), slotId);
     bool result = UnlockPin(slotId, pin, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
@@ -589,8 +587,6 @@ int32_t CoreServiceStub::OnUnlockPuk(MessageParcel &data, MessageParcel &reply)
     int32_t slotId = data.ReadInt32();
     std::u16string newPin = data.ReadString16();
     std::u16string puk = data.ReadString16();
-    TELEPHONY_LOGI("CoreServiceStub::OnUnlockPuk(), newPin = %{public}s, puk = %{public}s, slotId = %{public}d",
-        Str16ToStr8(newPin).c_str(), Str16ToStr8(puk).c_str(), slotId);
     bool result = UnlockPuk(slotId, newPin, puk, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
@@ -609,8 +605,6 @@ int32_t CoreServiceStub::OnAlterPin(MessageParcel &data, MessageParcel &reply)
     int32_t slotId = data.ReadInt32();
     std::u16string newPin = data.ReadString16();
     std::u16string oldPin = data.ReadString16();
-    TELEPHONY_LOGI("CoreServiceStub::OnAlterPin(), newPin = %{public}s, oldPin = %{public}s, slotId = %{public}d",
-        Str16ToStr8(newPin).c_str(), Str16ToStr8(oldPin).c_str(), slotId);
     bool result = AlterPin(slotId, newPin, oldPin, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
@@ -628,8 +622,6 @@ int32_t CoreServiceStub::OnUnlockPin2(MessageParcel &data, MessageParcel &reply)
     LockStatusResponse response = {0};
     int32_t slotId = data.ReadInt32();
     std::u16string pin2 = data.ReadString16();
-    TELEPHONY_LOGI(
-        "CoreServiceStub::OnUnlockPin2(), pin2 = %{public}s, slotId = %{public}d", Str16ToStr8(pin2).c_str(), slotId);
     bool result = UnlockPin2(slotId, pin2, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
@@ -648,8 +640,6 @@ int32_t CoreServiceStub::OnUnlockPuk2(MessageParcel &data, MessageParcel &reply)
     int32_t slotId = data.ReadInt32();
     std::u16string newPin2 = data.ReadString16();
     std::u16string puk2 = data.ReadString16();
-    TELEPHONY_LOGI("CoreServiceStub::OnUnlockPuk2(), newPin2 = %{public}s, puk2 = %{public}s, slotId = %{public}d",
-        Str16ToStr8(newPin2).c_str(), Str16ToStr8(puk2).c_str(), slotId);
     bool result = UnlockPuk2(slotId, newPin2, puk2, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
@@ -668,8 +658,6 @@ int32_t CoreServiceStub::OnAlterPin2(MessageParcel &data, MessageParcel &reply)
     int32_t slotId = data.ReadInt32();
     std::u16string newPin2 = data.ReadString16();
     std::u16string oldPin2 = data.ReadString16();
-    TELEPHONY_LOGI("CoreServiceStub::OnAlterPin2(), newPin2 = %{public}s, oldPin2 = %{public}s, slotId = %{public}d",
-        Str16ToStr8(newPin2).c_str(), Str16ToStr8(oldPin2).c_str(), slotId);
     bool result = AlterPin2(slotId, newPin2, oldPin2, response);
     uint32_t ret = 0;
     ret = reply.WriteBool(result);
