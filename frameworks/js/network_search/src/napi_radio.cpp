@@ -1715,7 +1715,7 @@ static void NativeGetUniqueDeviceId(napi_env env, void *data)
     auto context = static_cast<GetUniqueDeviceIdContext *>(data);
     context->getUniqueDeviceId =
         NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetUniqueDeviceId(context->slotId));
-    TELEPHONY_LOGI("NativeGetUniqueDeviceId getUniqueDeviceId = %{public}s", context->getUniqueDeviceId.c_str());
+    TELEPHONY_LOGI("NativeGetUniqueDeviceId len = %{public}d", context->getUniqueDeviceId.length());
     context->resolved = true;
 }
 
