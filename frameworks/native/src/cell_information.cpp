@@ -178,7 +178,7 @@ bool GsmCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(lac_)) {
         return false;
     }
-    if (!parcel.WriteInt64(timeStamp_)) {
+    if (!parcel.WriteUint64(timeStamp_)) {
         return false;
     }
     if (!parcel.WriteInt32(signalLevel_)) {
@@ -595,7 +595,7 @@ bool TdscdmaCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(lac_)) {
         return false;
     }
-    if (!parcel.WriteInt64(timeStamp_)) {
+    if (!parcel.WriteUint64(timeStamp_)) {
         return false;
     }
     if (!parcel.WriteInt32(signalLevel_)) {
@@ -728,7 +728,7 @@ bool CdmaCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(sid_)) {
         return false;
     }
-    if (!parcel.WriteInt64(timeStamp_)) {
+    if (!parcel.WriteUint64(timeStamp_)) {
         return false;
     }
     if (!parcel.WriteInt32(signalLevel_)) {
@@ -760,7 +760,7 @@ bool CdmaCellInformation::ReadFromParcel(Parcel &parcel)
     longitude_ = parcel.ReadInt32();
     nid_ = parcel.ReadInt32();
     sid_ = parcel.ReadInt32();
-    timeStamp_ = parcel.ReadInt64();
+    timeStamp_ = parcel.ReadUint64();
     signalLevel_ = parcel.ReadInt32();
     isCamped_ = parcel.ReadBool();
     return true;

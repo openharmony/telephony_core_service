@@ -419,7 +419,7 @@ void IccDiallingNumbersHandler::FillNumberFiledForDiallingNumber(
     for (int i = 0; i < bcdCodes.size(); ++i) {
         diallingNumberString[offSet + TON_NPI_NUMBER + i] = bcdCodes.at(i);
     }
-    uint index = offSet + BCD_NUMBER_BYTES;
+    int index = offSet + BCD_NUMBER_BYTES;
     unsigned char value = (unsigned char)(bcdCodes.size());
     diallingNumberString[index] = value;
     index = offSet + MORE_FILE_ID;

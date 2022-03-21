@@ -80,7 +80,7 @@ void GsmCellLocation::SetGsmParam(int32_t cellId, int32_t lac, int32_t psc)
     cellId_ = cellId;
     lac_ = lac;
     psc_ = psc;
-    timeStamp_ = time(0);
+    timeStamp_ = static_cast<uint64_t>(time(0));
 }
 
 int32_t GsmCellLocation::GetCellId() const
@@ -118,7 +118,7 @@ bool CdmaCellLocation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(sid_)) {
         return false;
     }
-    if (!parcel.WriteInt64(timeStamp_)) {
+    if (!parcel.WriteUint64(timeStamp_)) {
         return false;
     }
     return true;
@@ -144,7 +144,7 @@ bool CdmaCellLocation::ReadFromParcel(Parcel &parcel)
     longitude_ = parcel.ReadInt32();
     nid_ = parcel.ReadInt32();
     sid_ = parcel.ReadInt32();
-    timeStamp_ = parcel.ReadInt64();
+    timeStamp_ = parcel.ReadUint64();
     return true;
 }
 
@@ -160,7 +160,7 @@ void CdmaCellLocation::SetCdmaParam(int32_t baseId, int32_t latitude, int32_t lo
     longitude_ = longitude;
     nid_ = nid;
     sid_ = sid;
-    timeStamp_ = time(0);
+    timeStamp_ = static_cast<uint64_t>(time(0));
 }
 
 int32_t CdmaCellLocation::GetBaseId() const
