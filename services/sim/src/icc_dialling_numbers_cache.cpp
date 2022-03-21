@@ -59,8 +59,7 @@ void IccDiallingNumbersCache::Init()
 
 void IccDiallingNumbersCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    uint32_t id = 0;
-    id = event->GetInnerEventId();
+    uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGI("IccDiallingNumbersCache ProcessEvent Id is %{public}d", id);
     switch (id) {
         case MSG_SIM_OBTAIN_ADN_DETAILS_DONE:

@@ -280,8 +280,8 @@ bool RuimFile::ProcessGetSpnDone(const AppExecFwk::InnerEvent::Pointer &event)
     unsigned char* data = fileData.get();
     displayConditionOfCsimSpn_ = (((unsigned int)SPN_FLAG & (unsigned int)data[0]) != 0);
 
-    int encoding = data[ENCODING_POS];
-    int language = data[LANG_POS];
+    int encoding = (int)data[ENCODING_POS];
+    int language = (int)data[LANG_POS];
     unsigned char spnData[BUFFER_SIZE] = {0};
 
     int len = ((dataLen - FLAG_NUM) < MAX_DATA_BYTE) ? (dataLen - FLAG_NUM) : MAX_DATA_BYTE;

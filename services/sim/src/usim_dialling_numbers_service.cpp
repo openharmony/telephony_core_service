@@ -274,7 +274,7 @@ void UsimDiallingNumbersService::StorePbrDetailInfo(
         efid <<= BIT_OF_BYTE;
         efid |= *dataIt;
         ++dataIt;
-        int sfi = (dataIt == data.end()) ? 0 : *dataIt;
+        int sfi = (dataIt == data.end()) ? 0 : (int)(*dataIt);
         std::shared_ptr<TagData> deltaFile = std::make_shared<TagData>(parentTag, efid, sfi, count);
         TELEPHONY_LOGI(
             "MakeFiles result[ parentTag:%{public}d, efid:%{public}d, sfi:%{public}d, count:%{public}d ]",

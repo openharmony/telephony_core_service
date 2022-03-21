@@ -53,6 +53,9 @@ static std::string_view Strip(const std::string_view &src)
             break;
         }
     }
+    if (length <= pos) {
+        return "";
+    }
     return src.substr(pos, length - pos);
 }
 

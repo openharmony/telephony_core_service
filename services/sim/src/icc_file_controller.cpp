@@ -26,8 +26,7 @@ IccFileController::IccFileController(const std::shared_ptr<AppExecFwk::EventRunn
 
 void IccFileController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    uint32_t id = 0;
-    id = event->GetInnerEventId();
+    uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGI("IccFileController ProcessEvent Id is %{public}d", id);
     if (ProcessErrorResponse(event)) {
         return;
@@ -456,7 +455,7 @@ void IccFileController::SendMultiRecordResult(
     std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
     std::shared_ptr<MultiRecordResult> object = std::make_shared<MultiRecordResult>(cmdData.get());
     object->fileResults.assign(strValue.begin(), strValue.end());
-    object->resultLength = strValue.size();
+    object->resultLength = (int)strValue.size();
     uint32_t id = response->GetInnerEventId();
     int eventParam = 0;
     TELEPHONY_LOGI("IccFileController::SendMultiRecordResult send end");
