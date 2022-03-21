@@ -160,7 +160,7 @@ void SimFile::OnAllFilesFetched()
     UpdateLoaded(true);
     TELEPHONY_LOGI("SimFile SimFile::OnAllFilesFetched: start notify");
     if (filesFetchedObser_ != nullptr) {
-        filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, &slotId_);
+        filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
     }
     PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_LOADED, "");
     NotifyRegistrySimState(CardType::SINGLE_MODE_USIM_CARD, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
