@@ -38,18 +38,16 @@ public:
 
     void NotifyObserver(int32_t what);
 
-    template<typename T>
-    void NotifyObserver(int32_t what, T *object)
+    void NotifyObserver(int32_t what, int64_t param)
     {
         auto iter = observerHandlerMap_.find(what);
         if (iter == observerHandlerMap_.end()) {
             TELEPHONY_LOGE("ObserverHandler NotifyObserver %{public}d not register", what);
             return;
         }
-        std::shared_ptr<T> msg(object);
 
         for (auto handlers : iter->second) {
-            handlers->SendEvent(what, msg);
+            handlers->SendEvent(what, param, 0);
         }
     }
 
