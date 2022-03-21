@@ -151,7 +151,7 @@ private:
     LockStatusResponse simlockRespon_ = {0};
     IccState iccState_; // icc card states
     SimState externalState_; // need to broadcast sim state;
-    CardType externalType_; // need to broadcast card type;
+    CardType externalType_ = CardType::UNKNOWN_CARD; // need to broadcast card type;
     std::weak_ptr<SimStateManager> simStateManager_;
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr; // ril manager
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
