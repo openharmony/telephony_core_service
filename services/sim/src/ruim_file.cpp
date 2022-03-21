@@ -127,7 +127,7 @@ void RuimFile::ProcessLockedAllFilesFetched()
 void RuimFile::OnAllFilesFetched()
 {
     UpdateLoaded(true);
-    filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, &slotId_);
+    filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
     PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_LOADED, "");
     NotifyRegistrySimState(CardType::SINGLE_MODE_RUIM_CARD, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
 }
