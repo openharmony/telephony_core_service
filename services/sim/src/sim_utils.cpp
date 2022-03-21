@@ -87,8 +87,8 @@ void SIMUtils::ArrayCopy(const unsigned char *src, int srcPos, unsigned char *de
 
 bool SIMUtils::IsShowableAscii(char c)
 {
-    int asciiFirst = 0x20;
-    int asciiLast = 0x7E;
+    char asciiFirst = 0x20;
+    char asciiLast = 0x7E;
     return (asciiFirst <= c && c <= asciiLast) || c == '\r' || c == '\n';
 }
 
