@@ -46,10 +46,11 @@ std::shared_ptr<unsigned char> SIMUtils::HexStringConvertToBytes(const std::stri
     if (outlen == 0) {
         return nullptr;
     }
-    unsigned char *cache = (unsigned char *)calloc(outlen, sizeof(unsigned char));
+    unsigned char *cache = (unsigned char *)calloc(outlen + 1, sizeof(unsigned char));
     if (cache == nullptr) {
         return nullptr;
     }
+    (void)memset_s(cache, (outlen + 1) * sizeof(unsigned char), 0, (outlen + 1) * sizeof(unsigned char));
     std::shared_ptr<unsigned char> ptr(cache, [](unsigned char *ptr) { free(ptr); });
     unsigned char *ret = ptr.get();
     for (int i = 0; i < sz; i += HALF_LEN) {
@@ -120,10 +121,11 @@ std::shared_ptr<char16_t> SIMUtils::CharsConvertToChar16(
     if (outChar16Len == 0) {
         return nullptr;
     }
-    char16_t *cache = (char16_t *)calloc(outLen, sizeof(char16_t));
+    char16_t *cache = (char16_t *)calloc(outLen + 1, sizeof(char16_t));
     if (cache == nullptr) {
         return nullptr;
     }
+    (void)memset_s(cache, (outLen + 1) * sizeof(char16_t), 0, (outLen + 1) * sizeof(char16_t));
     std::shared_ptr<char16_t> ptr(cache, [](char16_t *ptr) { free(ptr); });
     char16_t *ret = ptr.get();
     for (int i = 0; i < charBytesLen; i += HALF_LEN) {
