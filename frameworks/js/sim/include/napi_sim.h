@@ -27,6 +27,7 @@ namespace Telephony {
 namespace {
 constexpr size_t ARRAY_SIZE = 64;
 constexpr size_t IMSI_LOG_LENGTH = 6;
+constexpr size_t kMaxNumberLen = 100;
 } // namespace
 
 template<typename T>
@@ -36,14 +37,13 @@ struct AsyncContext {
     T callbackVal;
 };
 
-template<typename T>
 struct AsyncContext2 {
-    AsyncContext<T> aContext;
+    AsyncContext<bool> asyncContext;
     std::array<char, ARRAY_SIZE> inputStr {};
 };
 
 struct AsyncContextPIN {
-    AsyncContext<napi_value> pinContext;
+    AsyncContext<napi_value> asyncContext;
     int32_t result = ERROR_DEFAULT;
     int32_t remain = ERROR_DEFAULT;
     int32_t pinEnable = ERROR_DEFAULT;
@@ -89,6 +89,10 @@ struct AsyncVoiceMail {
 struct AsyncGetLockState {
     AsyncContext<int32_t> asyncContext;
     int32_t lockType = ERROR_DEFAULT;
+};
+
+struct AsyncDefaultSlotId {
+    AsyncContext<int32_t> asyncContext;
 };
 } // namespace Telephony
 } // namespace OHOS
