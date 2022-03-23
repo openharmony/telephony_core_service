@@ -253,7 +253,7 @@ bool CoreService::HasSimCard(int32_t slotId)
 {
     TELEPHONY_LOGI("CoreService::HasSimCard(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
-        return TELEPHONY_ERROR;
+        return false;
     }
     return simManager_->HasSimCard(slotId);
 }
