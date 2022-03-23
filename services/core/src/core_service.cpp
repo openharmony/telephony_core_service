@@ -127,7 +127,7 @@ bool CoreService::SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
     const sptr<INetworkSearchCallback> &callback)
 {
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
-        return TELEPHONY_PERMISSION_ERROR;
+        return false;
     }
     if (networkSearchManager_ == nullptr) {
         return false;
@@ -175,7 +175,7 @@ const sptr<NetworkState> CoreService::GetNetworkState(int32_t slotId)
 bool CoreService::SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback)
 {
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
-        return TELEPHONY_PERMISSION_ERROR;
+        return false;
     }
     if (networkSearchManager_ == nullptr) {
         return false;
@@ -187,7 +187,7 @@ bool CoreService::SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSe
 bool CoreService::GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
-        return TELEPHONY_PERMISSION_ERROR;
+        return false;
     }
     if (networkSearchManager_ == nullptr) {
         return false;
@@ -348,7 +348,7 @@ bool CoreService::GetNetworkSearchInformation(int32_t slotId, const sptr<INetwor
         return false;
     }
     if (networkSearchManager_ == nullptr) {
-        return TELEPHONY_ERROR;
+        return false;
     }
     return networkSearchManager_->GetNetworkSearchInformation(slotId, callback);
 }
@@ -356,7 +356,7 @@ bool CoreService::GetNetworkSearchInformation(int32_t slotId, const sptr<INetwor
 bool CoreService::GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     if (networkSearchManager_ == nullptr) {
-        return TELEPHONY_ERROR;
+        return false;
     }
     return networkSearchManager_->GetNetworkSelectionMode(slotId, callback);
 }
@@ -642,10 +642,10 @@ bool CoreService::SetActiveSim(int32_t slotId, int32_t enable)
 bool CoreService::GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
-        return TELEPHONY_PERMISSION_ERROR;
+        return false;
     }
     if (networkSearchManager_ == nullptr) {
-        return TELEPHONY_ERROR;
+        return false;
     }
     return networkSearchManager_->GetPreferredNetwork(slotId, callback);
 }
@@ -654,10 +654,10 @@ bool CoreService::SetPreferredNetwork(
     int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback)
 {
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
-        return TELEPHONY_PERMISSION_ERROR;
+        return false;
     }
     if (networkSearchManager_ == nullptr) {
-        return TELEPHONY_ERROR;
+        return false;
     }
     return networkSearchManager_->SetPreferredNetwork(slotId, networkMode, callback);
 }
@@ -820,7 +820,7 @@ bool CoreService::GetImsRegStatus(int32_t slotId)
 {
     TELEPHONY_LOGI("CoreService::GetImsRegStatus --> slotId:%{public}d", slotId);
     if (networkSearchManager_ == nullptr) {
-        return TELEPHONY_ERROR;
+        return false;
     }
     return networkSearchManager_->GetImsRegStatus(slotId);
 }
@@ -839,7 +839,7 @@ std::vector<sptr<CellInformation>> CoreService::GetCellInfoList(int32_t slotId)
 bool CoreService::SendUpdateCellLocationRequest(int32_t slotId)
 {
     if (networkSearchManager_ == nullptr) {
-        return TELEPHONY_ERROR;
+        return false;
     }
     return networkSearchManager_->SendUpdateCellLocationRequest(slotId);
 }
