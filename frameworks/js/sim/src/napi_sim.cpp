@@ -73,10 +73,11 @@ napi_value NapiCreateAsyncWork(napi_env env, napi_callback_info info, std::strin
     return result;
 }
 
-template<typename... Ts>
-napi_value NapiCreateAsyncWork2(const AsyncPara &para, BaseContext &context, std::tuple<Ts...> &theTuple)
+template<typename AsyncContextType, typename... Ts>
+napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncContext, std::tuple<Ts...> &theTuple)
 {
     napi_env env = para.env;
+    BaseContext &context = asyncContext->asyncContext.context;
 
     size_t argc = sizeof...(Ts);
     napi_value argv[sizeof...(Ts)] {nullptr};
@@ -98,11 +99,40 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, BaseContext &context, std
 
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_utf8(env, para.funcName.c_str(), para.funcName.length(), &resourceName));
-    NAPI_CALL(env,
-        napi_create_async_work(
-            env, nullptr, resourceName, para.execute, para.complete, static_cast<void *>(&context), &context.work));
+    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, para.execute, para.complete,
+            static_cast<void *>(asyncContext), &context.work));
     return result;
 }
+
+napi_value NapiCreateAsyncWork4(const AsyncPara &para, AsyncContextPIN *context, napi_ref *ref)
+{
+    napi_env env = para.env;
+    constexpr int ARGC_MAX = 3;
+    size_t argc = ARGC_MAX;
+    napi_value argv[ARGC_MAX] = {nullptr};
+    NAPI_CALL(env, napi_get_cb_info(env, para.info, &argc, argv, nullptr, nullptr));
+
+    napi_get_value_int32(env, argv[0], &context->asyncContext.slotId);
+    napi_create_reference(env, argv[1], 1, ref);
+    if (argc == ARGC_MAX) {
+        napi_create_reference(env, argv[ARGC_MAX - 1], 1, &context->asyncContext.context.callbackRef);
+    }
+
+    napi_value result = nullptr;
+    if (context->asyncContext.context.callbackRef == nullptr) {
+        NAPI_CALL(env, napi_create_promise(env, &context->asyncContext.context.deferred, &result));
+    } else {
+        NAPI_CALL(env, napi_get_undefined(env, &result));
+    }
+
+    napi_value resourceName = nullptr;
+    NAPI_CALL(env, napi_create_string_utf8(env, para.funcName.c_str(), para.funcName.length(), &resourceName));
+    NAPI_CALL(env,
+              napi_create_async_work(env, nullptr, resourceName, para.execute, para.complete,
+                  static_cast<void *>(context), &context->asyncContext.context.work));
+    return result;
+}
+
 
 template<typename T>
 void NapiAsyncCompleteCallback(napi_env env, napi_status status, const AsyncContext<T> &asyncContext,
@@ -231,7 +261,9 @@ void PinInfoParaAnalyze(napi_env env, napi_value arg, AsyncContextPIN &pinContex
 
     napi_value pin = NapiUtil::GetNamedProperty(env, arg, "password");
     if (pin) {
-        NapiValueToCppValue(env, pin, napi_string, std::data(pinContext.inStr1));
+        char tmpStr[kMaxNumberLen + 1] = {0};
+        NapiValueToCppValue(env, pin, napi_string, tmpStr);
+        pinContext.inStr1 = std::string(tmpStr);
     }
 
     napi_value state = NapiUtil::GetNamedProperty(env, arg, "state");
@@ -249,7 +281,9 @@ void PersoLockInfoAnalyze(napi_env env, napi_value arg, AsyncContextPIN &pinCont
 
     napi_value password = NapiUtil::GetNamedProperty(env, arg, "password");
     if (password) {
-        NapiValueToCppValue(env, password, napi_string, std::data(pinContext.inStr1));
+        char tmpStr[kMaxNumberLen + 1] = {0};
+        NapiValueToCppValue(env, password, napi_string, tmpStr);
+        pinContext.inStr1 = std::string(tmpStr);
     }
 }
 
@@ -332,7 +366,7 @@ void NativeGetDefaultVoiceSlotId(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-    AsyncContext<int32_t> *asyncContext = static_cast<AsyncContext<int32_t> *>(data);
+    AsyncContext<int32_t> *asyncContext = &(static_cast<AsyncDefaultSlotId *>(data)->asyncContext);
 
     asyncContext->callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDefaultVoiceSlotId();
     TELEPHONY_LOGI("NAPI NativeGetDefaultVoiceSlotId %{public}d", asyncContext->callbackVal);
@@ -342,14 +376,14 @@ void NativeGetDefaultVoiceSlotId(napi_env env, void *data)
 void GetDefaultVoiceSlotIdCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
-    std::unique_ptr<AsyncContext<int32_t>> context(static_cast<AsyncContext<int32_t> *>(data));
-    NapiAsyncCompleteCallback(env, status, *context, "get default voice slot id failed");
+    std::unique_ptr<AsyncDefaultSlotId> context(static_cast<AsyncDefaultSlotId *>(data));
+    NapiAsyncCompleteCallback(env, status, context->asyncContext, "get default voice slot id failed");
 }
 
 napi_value GetDefaultVoiceSlotId(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncContext<int32_t>> asyncContext = std::make_unique<AsyncContext<int32_t>>();
-    BaseContext &context = asyncContext->context;
+    auto asyncContext = new AsyncDefaultSlotId();
+    BaseContext &context = asyncContext->asyncContext.context;
 
     auto initPara = std::make_tuple(&context.callbackRef);
     AsyncPara para {
@@ -359,9 +393,8 @@ napi_value GetDefaultVoiceSlotId(napi_env env, napi_callback_info info)
         .execute = NativeGetDefaultVoiceSlotId,
         .complete = GetDefaultVoiceSlotIdCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncDefaultSlotId>(para, asyncContext, initPara);
     if (result) {
-        asyncContext.release();
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -644,7 +677,7 @@ void GetSimAccountInfoCallback(napi_env env, napi_status status, void *data)
 
 napi_value GetSimAccountInfo(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncIccAccountInfo> iccAccountInfo = std::make_unique<AsyncIccAccountInfo>();
+    auto iccAccountInfo = new AsyncIccAccountInfo();
     BaseContext &context = iccAccountInfo->asyncContext.context;
 
     auto initPara = std::make_tuple(&iccAccountInfo->asyncContext.slotId, &context.callbackRef);
@@ -655,9 +688,8 @@ napi_value GetSimAccountInfo(napi_env env, napi_callback_info info)
         .execute = NativeGetSimAccountInfo,
         .complete = GetSimAccountInfoCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncIccAccountInfo>(para, iccAccountInfo, initPara);
     if (result) {
-        iccAccountInfo.release();
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -696,13 +728,13 @@ void NativeUnlockPin(napi_env env, void *data)
 
     LockStatusResponse response {ERROR_DEFAULT, ERROR_DEFAULT};
     bool res = DelayedRefSingleton<CoreServiceClient>::GetInstance().UnlockPin(
-        pinContext->pinContext.slotId, NapiUtil::ToUtf16(pinContext->inStr1.data()), response);
+        pinContext->asyncContext.slotId, NapiUtil::ToUtf16(pinContext->inStr1.data()), response);
     TELEPHONY_LOGI("NAPI NativeUnlockPin %{public}d", res);
     if (res) {
         pinContext->result = response.result;
         pinContext->remain = response.remain;
     }
-    pinContext->pinContext.context.resolved = res;
+    pinContext->asyncContext.context.resolved = res;
 }
 
 void UnlockPinCallback(napi_env env, napi_status status, void *data)
@@ -710,17 +742,19 @@ void UnlockPinCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContextPIN> context(static_cast<AsyncContextPIN *>(data));
     const LockStatusResponse res {context->result, context->remain};
-    context->pinContext.callbackVal = PinOrPukUnlockConversion(env, res);
-    NapiAsyncCompleteCallback(env, status, context->pinContext, "unlock pin failed");
+    context->asyncContext.callbackVal = PinOrPukUnlockConversion(env, res);
+    NapiAsyncCompleteCallback(env, status, context->asyncContext, "unlock pin failed");
 }
 
 napi_value UnlockPin(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncContextPIN> pinContext = std::make_unique<AsyncContextPIN>();
-    BaseContext &context = pinContext->pinContext.context;
+    auto pinContext = new AsyncContextPIN();
+    BaseContext &context = pinContext->asyncContext.context;
+    char tmpStr[kMaxNumberLen + 1] = {0};
 
     auto initPara =
-        std::make_tuple(&pinContext->pinContext.slotId, std::data(pinContext->inStr1), &context.callbackRef);
+        std::make_tuple(&pinContext->asyncContext.slotId, tmpStr,
+                        &context.callbackRef);
     AsyncPara para {
         .funcName = "UnlockPin",
         .env = env,
@@ -728,9 +762,9 @@ napi_value UnlockPin(napi_env env, napi_callback_info info)
         .execute = NativeUnlockPin,
         .complete = UnlockPinCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncContextPIN>(para, pinContext, initPara);
     if (result) {
-        pinContext.release();
+        pinContext->inStr1 = std::string(tmpStr);
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -743,14 +777,14 @@ void NativeUnlockPuk(napi_env env, void *data)
     }
     AsyncContextPIN *pukContext = static_cast<AsyncContextPIN *>(data);
     LockStatusResponse response {ERROR_DEFAULT, ERROR_DEFAULT};
-    bool res = DelayedRefSingleton<CoreServiceClient>::GetInstance().UnlockPuk(pukContext->pinContext.slotId,
+    bool res = DelayedRefSingleton<CoreServiceClient>::GetInstance().UnlockPuk(pukContext->asyncContext.slotId,
         NapiUtil::ToUtf16(pukContext->inStr1.data()), NapiUtil::ToUtf16(pukContext->inStr2.data()), response);
     TELEPHONY_LOGI("NAPI NativeUnlockPuk %{public}d", res);
     if (res) {
         pukContext->result = response.result;
         pukContext->remain = response.remain;
     }
-    pukContext->pinContext.context.resolved = res;
+    pukContext->asyncContext.context.resolved = res;
 }
 
 void UnlockPukCallback(napi_env env, napi_status status, void *data)
@@ -758,17 +792,19 @@ void UnlockPukCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContextPIN> context(static_cast<AsyncContextPIN *>(data));
     const LockStatusResponse res {context->result, context->remain};
-    context->pinContext.callbackVal = PinOrPukUnlockConversion(env, res);
-    NapiAsyncCompleteCallback(env, status, context->pinContext, "unlock puk failed");
+    context->asyncContext.callbackVal = PinOrPukUnlockConversion(env, res);
+    NapiAsyncCompleteCallback(env, status, context->asyncContext, "unlock puk failed");
 }
 
 napi_value UnlockPuk(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncContextPIN> pukContext = std::make_unique<AsyncContextPIN>();
-    BaseContext &context = pukContext->pinContext.context;
+    auto pukContext = new AsyncContextPIN();
+    BaseContext &context = pukContext->asyncContext.context;
+    char tmpStr1[kMaxNumberLen + 1] = {0};
+    char tmpStr2[kMaxNumberLen + 1] = {0};
 
-    auto initPara = std::make_tuple(&pukContext->pinContext.slotId, std::data(pukContext->inStr1),
-        std::data(pukContext->inStr2), &context.callbackRef);
+    auto initPara = std::make_tuple(&pukContext->asyncContext.slotId, tmpStr1,
+        tmpStr2, &context.callbackRef);
     AsyncPara para {
         .funcName = "UnlockPuk",
         .env = env,
@@ -776,9 +812,10 @@ napi_value UnlockPuk(napi_env env, napi_callback_info info)
         .execute = NativeUnlockPuk,
         .complete = UnlockPukCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncContextPIN>(para, pukContext, initPara);
     if (result) {
-        pukContext.release();
+        pukContext->inStr1 = std::string(tmpStr1);
+        pukContext->inStr2 = std::string(tmpStr2);
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -789,9 +826,10 @@ void NativeAlterPin(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
+
     AsyncContextPIN *alterPinContext = static_cast<AsyncContextPIN *>(data);
     LockStatusResponse response {ERROR_DEFAULT, ERROR_DEFAULT};
-    bool res = DelayedRefSingleton<CoreServiceClient>::GetInstance().AlterPin(alterPinContext->pinContext.slotId,
+    bool res = DelayedRefSingleton<CoreServiceClient>::GetInstance().AlterPin(alterPinContext->asyncContext.slotId,
         NapiUtil::ToUtf16(alterPinContext->inStr1.data()), NapiUtil::ToUtf16(alterPinContext->inStr2.data()),
         response);
     TELEPHONY_LOGI("NAPI NativeAlterPin %{public}d", res);
@@ -799,7 +837,7 @@ void NativeAlterPin(napi_env env, void *data)
         alterPinContext->result = response.result;
         alterPinContext->remain = response.remain;
     }
-    alterPinContext->pinContext.context.resolved = res;
+    alterPinContext->asyncContext.context.resolved = res;
 }
 
 void AlterPinCallback(napi_env env, napi_status status, void *data)
@@ -807,17 +845,19 @@ void AlterPinCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContextPIN> context(static_cast<AsyncContextPIN *>(data));
     const LockStatusResponse res {context->result, context->remain};
-    context->pinContext.callbackVal = PinOrPukUnlockConversion(env, res);
-    NapiAsyncCompleteCallback(env, status, context->pinContext, "alter pin failed");
+    context->asyncContext.callbackVal = PinOrPukUnlockConversion(env, res);
+    NapiAsyncCompleteCallback(env, status, context->asyncContext, "alter pin failed");
 }
 
 napi_value AlterPin(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncContextPIN> alterPinContext = std::make_unique<AsyncContextPIN>();
-    BaseContext &context = alterPinContext->pinContext.context;
+    auto alterPinContext = new AsyncContextPIN();
+    BaseContext &context = alterPinContext->asyncContext.context;
 
-    auto initPara = std::make_tuple(&alterPinContext->pinContext.slotId, std::data(alterPinContext->inStr1),
-        std::data(alterPinContext->inStr2), &context.callbackRef);
+    char tmpStr1[kMaxNumberLen + 1] = {0};
+    char tmpStr2[kMaxNumberLen + 1] = {0};
+    auto initPara = std::make_tuple(&alterPinContext->asyncContext.slotId, tmpStr1,
+        tmpStr2, &context.callbackRef);
     AsyncPara para {
         .funcName = "AlterPin",
         .env = env,
@@ -825,9 +865,10 @@ napi_value AlterPin(napi_env env, napi_callback_info info)
         .execute = NativeAlterPin,
         .complete = AlterPinCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncContextPIN>(para, alterPinContext, initPara);
     if (result) {
-        alterPinContext.release();
+        alterPinContext->inStr1 = std::string(tmpStr1);
+        alterPinContext->inStr2 = std::string(tmpStr2);
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -841,17 +882,17 @@ void NativeSetLockState(napi_env env, void *data)
     AsyncContextPIN *lockContext = static_cast<AsyncContextPIN *>(data);
     LockStatusResponse response {ERROR_DEFAULT, ERROR_DEFAULT};
     TELEPHONY_LOGI("NativeSetLockState slotId = %{public}d, lockType = %{public}d, state = %{public}d",
-        lockContext->pinContext.slotId, lockContext->result, lockContext->remain);
+        lockContext->asyncContext.slotId, lockContext->result, lockContext->remain);
     const LockInfo info {static_cast<LockType>(lockContext->result), NapiUtil::ToUtf16(lockContext->inStr1.data()),
         static_cast<LockState>(lockContext->remain)};
     bool res = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetLockState(
-        lockContext->pinContext.slotId, info, response);
+        lockContext->asyncContext.slotId, info, response);
     TELEPHONY_LOGI("NAPI NativeSetLockState %{public}d", res);
     if (res) {
         lockContext->result = response.result;
         lockContext->remain = response.remain;
     }
-    lockContext->pinContext.context.resolved = res;
+    lockContext->asyncContext.context.resolved = res;
 }
 
 void SetLockStateCallback(napi_env env, napi_status status, void *data)
@@ -859,17 +900,15 @@ void SetLockStateCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContextPIN> context(static_cast<AsyncContextPIN *>(data));
     const LockStatusResponse res {context->result, context->remain};
-    context->pinContext.callbackVal = PinOrPukUnlockConversion(env, res);
-    NapiAsyncCompleteCallback(env, status, context->pinContext, "set lock state failed");
+    context->asyncContext.callbackVal = PinOrPukUnlockConversion(env, res);
+    NapiAsyncCompleteCallback(env, status, context->asyncContext, "set lock state failed");
 }
 
 napi_value SetLockState(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncContextPIN> lockContext = std::make_unique<AsyncContextPIN>();
-    BaseContext &context = lockContext->pinContext.context;
+    auto context = new AsyncContextPIN;
 
-    napi_value object = NapiUtil::CreateUndefined(env);
-    auto initPara = std::make_tuple(&lockContext->pinContext.slotId, &object, &context.callbackRef);
+    napi_ref ref = nullptr;
     AsyncPara para {
         .funcName = "SetLockState",
         .env = env,
@@ -877,11 +916,14 @@ napi_value SetLockState(napi_env env, napi_callback_info info)
         .execute = NativeSetLockState,
         .complete = SetLockStateCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork4(para, context, &ref);
     if (result) {
-        PinInfoParaAnalyze(env, object, *lockContext);
-        lockContext.release();
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        if (ref != nullptr) {
+            napi_value object = NapiUtil::CreateUndefined(env);
+            napi_get_reference_value(env, ref, &object);
+            PinInfoParaAnalyze(env, object, *context);
+        }
+        NAPI_CALL(env, napi_queue_async_work(env, context->asyncContext.context.work));
     }
     return result;
 }
@@ -944,28 +986,29 @@ void NativeSetShowName(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-    AsyncContext2<bool> *context = static_cast<AsyncContext2<bool> *>(data);
+    AsyncContext2 *context = static_cast<AsyncContext2 *>(data);
     std::u16string name = NapiUtil::ToUtf16(std::data(context->inputStr));
-    context->aContext.callbackVal =
-        DelayedRefSingleton<CoreServiceClient>::GetInstance().SetShowName(context->aContext.slotId, name);
-    TELEPHONY_LOGI("NAPI NativeSetShowName %{public}d", context->aContext.callbackVal);
-    context->aContext.context.resolved = context->aContext.callbackVal;
+    context->asyncContext.callbackVal =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().SetShowName(context->asyncContext.slotId, name);
+    TELEPHONY_LOGI("NAPI NativeSetShowName %{public}d", context->asyncContext.callbackVal);
+    context->asyncContext.context.resolved = context->asyncContext.callbackVal;
 }
 
 void SetShowNameCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
-    std::unique_ptr<AsyncContext2<bool>> context(static_cast<AsyncContext2<bool> *>(data));
-    NapiAsyncCompleteCallback(env, status, context->aContext, "set display name failed", true);
+    std::unique_ptr<AsyncContext2> context(static_cast<AsyncContext2 *>(data));
+    NapiAsyncCompleteCallback(env, status, context->asyncContext, "set display name failed", true);
 }
 
 napi_value SetShowName(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncContext2<bool>> asyncContext = std::make_unique<AsyncContext2<bool>>();
-    BaseContext &context = asyncContext->aContext.context;
+    auto asyncContext = new AsyncContext2();
+    BaseContext &context = asyncContext->asyncContext.context;
 
     auto initPara =
-        std::make_tuple(&asyncContext->aContext.slotId, std::data(asyncContext->inputStr), &context.callbackRef);
+        std::make_tuple(&asyncContext->asyncContext.slotId, std::data(asyncContext->inputStr),
+            &context.callbackRef);
     AsyncPara para {
         .funcName = "SetShowName",
         .env = env,
@@ -973,9 +1016,8 @@ napi_value SetShowName(napi_env env, napi_callback_info info)
         .execute = NativeSetShowName,
         .complete = SetShowNameCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncContext2>(para, asyncContext, initPara);
     if (result) {
-        asyncContext.release();
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -1009,27 +1051,27 @@ void NativeSetShowNumber(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-    AsyncContext2<bool> *context = static_cast<AsyncContext2<bool> *>(data);
-    context->aContext.callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetShowNumber(
-        context->aContext.slotId, NapiUtil::ToUtf16(std::data(context->inputStr)));
-    TELEPHONY_LOGI("NAPI NativeSetShowNumber %{public}d", context->aContext.callbackVal);
-    context->aContext.context.resolved = context->aContext.callbackVal;
+    AsyncContext2 *context = static_cast<AsyncContext2 *>(data);
+    context->asyncContext.callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetShowNumber(
+        context->asyncContext.slotId, NapiUtil::ToUtf16(std::data(context->inputStr)));
+    TELEPHONY_LOGI("NAPI NativeSetShowNumber %{public}d", context->asyncContext.callbackVal);
+    context->asyncContext.context.resolved = context->asyncContext.callbackVal;
 }
 
 void SetShowNumberCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
-    std::unique_ptr<AsyncContext2<bool>> context(static_cast<AsyncContext2<bool> *>(data));
-    NapiAsyncCompleteCallback(env, status, context->aContext, "set show number failed", true);
+    std::unique_ptr<AsyncContext2> context(static_cast<AsyncContext2 *>(data));
+    NapiAsyncCompleteCallback(env, status, context->asyncContext, "set show number failed", true);
 }
 
 napi_value SetShowNumber(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncContext2<bool>> asyncContext = std::make_unique<AsyncContext2<bool>>();
-    BaseContext &context = asyncContext->aContext.context;
+    auto asyncContext = new AsyncContext2();
+    BaseContext &context = asyncContext->asyncContext.context;
 
     auto initPara =
-        std::make_tuple(&asyncContext->aContext.slotId, std::data(asyncContext->inputStr), &context.callbackRef);
+        std::make_tuple(&asyncContext->asyncContext.slotId, std::data(asyncContext->inputStr), &context.callbackRef);
     AsyncPara para {
         .funcName = "SetShowNumber",
         .env = env,
@@ -1037,9 +1079,8 @@ napi_value SetShowNumber(napi_env env, napi_callback_info info)
         .execute = NativeSetShowNumber,
         .complete = SetShowNumberCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncContext2>(para, asyncContext, initPara);
     if (result) {
-        asyncContext.release();
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -1076,13 +1117,13 @@ void NativeUnlockPin2(napi_env env, void *data)
     AsyncContextPIN *pinContext = static_cast<AsyncContextPIN *>(data);
     LockStatusResponse response {ERROR_DEFAULT, ERROR_DEFAULT};
     bool result = DelayedRefSingleton<CoreServiceClient>::GetInstance().UnlockPin2(
-        pinContext->pinContext.slotId, NapiUtil::ToUtf16(pinContext->inStr1.data()), response);
+        pinContext->asyncContext.slotId, NapiUtil::ToUtf16(pinContext->inStr1.data()), response);
     TELEPHONY_LOGI("NAPI NativeUnlockPin2 %{public}d", result);
     if (result) {
         pinContext->result = response.result;
         pinContext->remain = response.remain;
     }
-    pinContext->pinContext.context.resolved = result;
+    pinContext->asyncContext.context.resolved = result;
 }
 
 void UnlockPinCallback2(napi_env env, napi_status status, void *data)
@@ -1090,17 +1131,18 @@ void UnlockPinCallback2(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContextPIN> context(static_cast<AsyncContextPIN *>(data));
     const LockStatusResponse res {context->result, context->remain};
-    context->pinContext.callbackVal = PinOrPukUnlockConversion(env, res);
-    NapiAsyncCompleteCallback(env, status, context->pinContext, "unlock pin2 failed");
+    context->asyncContext.callbackVal = PinOrPukUnlockConversion(env, res);
+    NapiAsyncCompleteCallback(env, status, context->asyncContext, "unlock pin2 failed");
 }
 
 napi_value UnlockPin2(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncContextPIN> pinContext = std::make_unique<AsyncContextPIN>();
-    BaseContext &context = pinContext->pinContext.context;
+    auto pinContext = new AsyncContextPIN();
+    BaseContext &context = pinContext->asyncContext.context;
 
+    char tmpStr[kMaxNumberLen + 1] = {0};
     auto initPara =
-        std::make_tuple(&pinContext->pinContext.slotId, std::data(pinContext->inStr1), &context.callbackRef);
+        std::make_tuple(&pinContext->asyncContext.slotId, tmpStr, &context.callbackRef);
     AsyncPara para {
         .funcName = "UnlockPin2",
         .env = env,
@@ -1108,9 +1150,9 @@ napi_value UnlockPin2(napi_env env, napi_callback_info info)
         .execute = NativeUnlockPin2,
         .complete = UnlockPinCallback2,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2(para, pinContext, initPara);
     if (result) {
-        pinContext.release();
+        pinContext->inStr1 = std::string(tmpStr);
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -1123,14 +1165,14 @@ void NativeUnlockPuk2(napi_env env, void *data)
     }
     AsyncContextPIN *pukContext = static_cast<AsyncContextPIN *>(data);
     LockStatusResponse response {ERROR_DEFAULT, ERROR_DEFAULT};
-    bool result = DelayedRefSingleton<CoreServiceClient>::GetInstance().UnlockPuk2(pukContext->pinContext.slotId,
+    bool result = DelayedRefSingleton<CoreServiceClient>::GetInstance().UnlockPuk2(pukContext->asyncContext.slotId,
         NapiUtil::ToUtf16(pukContext->inStr1.data()), NapiUtil::ToUtf16(pukContext->inStr2.data()), response);
     TELEPHONY_LOGI("NAPI NativeUnlockPuk2 %{public}d", result);
     if (result) {
         pukContext->result = response.result;
         pukContext->remain = response.remain;
     }
-    pukContext->pinContext.context.resolved = result;
+    pukContext->asyncContext.context.resolved = result;
 }
 
 void UnlockPukCallback2(napi_env env, napi_status status, void *data)
@@ -1138,17 +1180,19 @@ void UnlockPukCallback2(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContextPIN> context(static_cast<AsyncContextPIN *>(data));
     const LockStatusResponse res {context->result, context->remain};
-    context->pinContext.callbackVal = PinOrPukUnlockConversion(env, res);
-    NapiAsyncCompleteCallback(env, status, context->pinContext, "unlock puk2 failed");
+    context->asyncContext.callbackVal = PinOrPukUnlockConversion(env, res);
+    NapiAsyncCompleteCallback(env, status, context->asyncContext, "unlock puk2 failed");
 }
 
 napi_value UnlockPuk2(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncContextPIN> pinContext = std::make_unique<AsyncContextPIN>();
-    BaseContext &context = pinContext->pinContext.context;
+    auto pinContext = new AsyncContextPIN();
+    BaseContext &context = pinContext->asyncContext.context;
+    char tmpStr1[kMaxNumberLen + 1] = {0};
+    char tmpStr2[kMaxNumberLen + 1] = {0};
 
-    auto initPara = std::make_tuple(&pinContext->pinContext.slotId, std::data(pinContext->inStr1),
-        std::data(pinContext->inStr2), &context.callbackRef);
+    auto initPara = std::make_tuple(&pinContext->asyncContext.slotId, tmpStr1,
+        tmpStr2, &context.callbackRef);
     AsyncPara para {
         .funcName = "UnlockPuk2",
         .env = env,
@@ -1156,9 +1200,10 @@ napi_value UnlockPuk2(napi_env env, napi_callback_info info)
         .execute = NativeUnlockPuk2,
         .complete = UnlockPukCallback2,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncContextPIN>(para, pinContext, initPara);
     if (result) {
-        pinContext.release();
+        pinContext->inStr1 = std::string(tmpStr1);
+        pinContext->inStr2 = std::string(tmpStr2);
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -1171,14 +1216,14 @@ void NativeAlterPin2(napi_env env, void *data)
     }
     AsyncContextPIN *pinContext = static_cast<AsyncContextPIN *>(data);
     LockStatusResponse response {ERROR_DEFAULT, ERROR_DEFAULT};
-    bool result = DelayedRefSingleton<CoreServiceClient>::GetInstance().AlterPin2(pinContext->pinContext.slotId,
+    bool result = DelayedRefSingleton<CoreServiceClient>::GetInstance().AlterPin2(pinContext->asyncContext.slotId,
         NapiUtil::ToUtf16(pinContext->inStr1.data()), NapiUtil::ToUtf16(pinContext->inStr2.data()), response);
     TELEPHONY_LOGI("NAPI NativeAlterPin2 %{public}d", result);
     if (result) {
         pinContext->result = response.result;
         pinContext->remain = response.remain;
     }
-    pinContext->pinContext.context.resolved = result;
+    pinContext->asyncContext.context.resolved = result;
 }
 
 void AlterPinCallback2(napi_env env, napi_status status, void *data)
@@ -1186,17 +1231,19 @@ void AlterPinCallback2(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContextPIN> context(static_cast<AsyncContextPIN *>(data));
     const LockStatusResponse res {context->result, context->remain};
-    context->pinContext.callbackVal = PinOrPukUnlockConversion(env, res);
-    NapiAsyncCompleteCallback(env, status, context->pinContext, "alter pin2 failed");
+    context->asyncContext.callbackVal = PinOrPukUnlockConversion(env, res);
+    NapiAsyncCompleteCallback(env, status, context->asyncContext, "alter pin2 failed");
 }
 
 napi_value AlterPin2(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncContextPIN> pinContext = std::make_unique<AsyncContextPIN>();
-    BaseContext &context = pinContext->pinContext.context;
+    auto pinContext = new AsyncContextPIN();
+    BaseContext &context = pinContext->asyncContext.context;
+    char tmpStr1[kMaxNumberLen + 1] = {0};
+    char tmpStr2[kMaxNumberLen + 1] = {0};
 
-    auto initPara = std::make_tuple(&pinContext->pinContext.slotId, std::data(pinContext->inStr1),
-        std::data(pinContext->inStr2), &context.callbackRef);
+    auto initPara = std::make_tuple(&pinContext->asyncContext.slotId, tmpStr1,
+        tmpStr2, &context.callbackRef);
     AsyncPara para {
         .funcName = "AlterPin2",
         .env = env,
@@ -1204,9 +1251,10 @@ napi_value AlterPin2(napi_env env, napi_callback_info info)
         .execute = NativeAlterPin2,
         .complete = AlterPinCallback2,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncContextPIN>(para, pinContext, initPara);
     if (result) {
-        pinContext.release();
+        pinContext->inStr1 = std::string(tmpStr1);
+        pinContext->inStr2 = std::string(tmpStr2);
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -1249,7 +1297,7 @@ void GetOperatorConfigsCallback(napi_env env, napi_status status, void *data)
 
 napi_value GetOperatorConfigs(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncOperatorConfig> crrierConfig = std::make_unique<AsyncOperatorConfig>();
+    auto crrierConfig = new AsyncOperatorConfig();
     BaseContext &context = crrierConfig->asyncContext.context;
 
     auto initPara = std::make_tuple(&crrierConfig->asyncContext.slotId, &context.callbackRef);
@@ -1260,9 +1308,8 @@ napi_value GetOperatorConfigs(napi_env env, napi_callback_info info)
         .execute = NativeGetOperatorConfigs,
         .complete = GetOperatorConfigsCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncOperatorConfig>(para, crrierConfig, initPara);
     if (result) {
-        crrierConfig.release();
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -1302,7 +1349,7 @@ void GetActiveSimAccountInfoListCallback(napi_env env, napi_status status, void 
 
 napi_value GetActiveSimAccountInfoList(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncIccAccountInfo> accountInfo = std::make_unique<AsyncIccAccountInfo>();
+    auto accountInfo = new AsyncIccAccountInfo();
     BaseContext &context = accountInfo->asyncContext.context;
 
     auto initPara = std::make_tuple(&context.callbackRef);
@@ -1313,9 +1360,8 @@ napi_value GetActiveSimAccountInfoList(napi_env env, napi_callback_info info)
         .execute = NativeGetActiveSimAccountInfoList,
         .complete = GetActiveSimAccountInfoListCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncIccAccountInfo>(para, accountInfo, initPara);
     if (result) {
-        accountInfo.release();
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -1360,8 +1406,7 @@ void QueryIccDiallingNumbersCallback(napi_env env, napi_status status, void *dat
 
 napi_value QueryIccDiallingNumbers(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncDiallingNumbers<napi_value>> diallingNumbers =
-        std::make_unique<AsyncDiallingNumbers<napi_value>>();
+    auto diallingNumbers = new AsyncDiallingNumbers<napi_value>();
     BaseContext &context = diallingNumbers->asyncContext.context;
 
     auto initPara =
@@ -1373,9 +1418,8 @@ napi_value QueryIccDiallingNumbers(napi_env env, napi_callback_info info)
         .execute = NativeQueryIccDiallingNumbers,
         .complete = QueryIccDiallingNumbersCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncDiallingNumbers<napi_value>>(para, diallingNumbers, initPara);
     if (result) {
-        diallingNumbers.release();
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -1407,7 +1451,7 @@ void AddIccDiallingNumbersCallback(napi_env env, napi_status status, void *data)
 
 napi_value AddIccDiallingNumbers(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncDiallingNumbers<bool>> diallingNumbers = std::make_unique<AsyncDiallingNumbers<bool>>();
+    auto diallingNumbers = new AsyncDiallingNumbers<bool>();
     BaseContext &context = diallingNumbers->asyncContext.context;
 
     napi_value object = NapiUtil::CreateUndefined(env);
@@ -1421,12 +1465,11 @@ napi_value AddIccDiallingNumbers(napi_env env, napi_callback_info info)
         .execute = NativeAddIccDiallingNumbers,
         .complete = AddIccDiallingNumbersCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncDiallingNumbers<bool>>(para, diallingNumbers, initPara);
     if (result) {
         TelNumbersInfo inputInfo;
         DiallingNumberParaAnalyze(env, object, inputInfo);
         diallingNumbers->infoVec.push_back(std::move(inputInfo));
-        diallingNumbers.release();
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -1458,7 +1501,7 @@ void DelIccDiallingNumbersCallback(napi_env env, napi_status status, void *data)
 
 napi_value DelIccDiallingNumbers(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncDiallingNumbers<bool>> diallingNumbers = std::make_unique<AsyncDiallingNumbers<bool>>();
+    auto diallingNumbers = new AsyncDiallingNumbers<bool>();
     BaseContext &context = diallingNumbers->asyncContext.context;
 
     napi_value object = NapiUtil::CreateUndefined(env);
@@ -1471,12 +1514,11 @@ napi_value DelIccDiallingNumbers(napi_env env, napi_callback_info info)
         .execute = NativeDelIccDiallingNumbers,
         .complete = DelIccDiallingNumbersCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2(para, diallingNumbers, initPara);
     if (result) {
         TelNumbersInfo inputInfo;
         DiallingNumberParaAnalyze(env, object, inputInfo);
         diallingNumbers->infoVec.push_back(std::move(inputInfo));
-        diallingNumbers.release();
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -1509,7 +1551,7 @@ void UpdateIccDiallingNumbersCallback(napi_env env, napi_status status, void *da
 
 napi_value UpdateIccDiallingNumbers(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncDiallingNumbers<bool>> diallingNumbers = std::make_unique<AsyncDiallingNumbers<bool>>();
+    auto diallingNumbers = new AsyncDiallingNumbers<bool>();
     BaseContext &context = diallingNumbers->asyncContext.context;
 
     napi_value object = NapiUtil::CreateUndefined(env);
@@ -1523,12 +1565,11 @@ napi_value UpdateIccDiallingNumbers(napi_env env, napi_callback_info info)
         .execute = NativeUpdateIccDiallingNumbers,
         .complete = UpdateIccDiallingNumbersCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncDiallingNumbers<bool>>(para, diallingNumbers, initPara);
     if (result) {
         TelNumbersInfo inputInfo;
         DiallingNumberParaAnalyze(env, object, inputInfo);
         diallingNumbers->infoVec.push_back(std::move(inputInfo));
-        diallingNumbers.release();
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -1559,7 +1600,7 @@ void SetVoiceMailInfoCallback(napi_env env, napi_status status, void *data)
 
 napi_value SetVoiceMailInfo(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncVoiceMail> mailContext = std::make_unique<AsyncVoiceMail>();
+    auto mailContext = new AsyncVoiceMail();
     BaseContext &context = mailContext->asyncContext.context;
 
     auto initPara = std::make_tuple(&mailContext->asyncContext.slotId, std::data(mailContext->mailName),
@@ -1572,9 +1613,8 @@ napi_value SetVoiceMailInfo(napi_env env, napi_callback_info info)
         .execute = NativeSetVoiceMailInfo,
         .complete = SetVoiceMailInfoCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncVoiceMail>(para, mailContext, initPara);
     if (result) {
-        mailContext.release();
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -1585,27 +1625,27 @@ void NativeSendEnvelopeCmd(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-    AsyncContext2<bool> *context = static_cast<AsyncContext2<bool> *>(data);
-    context->aContext.callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().SendEnvelopeCmd(
-        context->aContext.slotId, std::data(context->inputStr));
-    TELEPHONY_LOGI("NAPI NativeSendEnvelopeCmd %{public}d", context->aContext.callbackVal);
-    context->aContext.context.resolved = context->aContext.callbackVal;
+    AsyncContext2 *context = static_cast<AsyncContext2 *>(data);
+    context->asyncContext.callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().SendEnvelopeCmd(
+        context->asyncContext.slotId, std::data(context->inputStr));
+    TELEPHONY_LOGI("NAPI NativeSendEnvelopeCmd %{public}d", context->asyncContext.callbackVal);
+    context->asyncContext.context.resolved = context->asyncContext.callbackVal;
 }
 
 void SendEnvelopeCmdCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
-    std::unique_ptr<AsyncContext2<bool>> context(static_cast<AsyncContext2<bool> *>(data));
-    NapiAsyncCompleteCallback(env, status, context->aContext, "Stk Cmd From App Envelope failed", true);
+    std::unique_ptr<AsyncContext2> context(static_cast<AsyncContext2 *>(data));
+    NapiAsyncCompleteCallback(env, status, context->asyncContext, "Stk Cmd From App Envelope failed", true);
 }
 
 napi_value SendEnvelopeCmd(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncContext2<bool>> asyncContext = std::make_unique<AsyncContext2<bool>>();
-    BaseContext &context = asyncContext->aContext.context;
+    auto asyncContext = new AsyncContext2();
+    BaseContext &context = asyncContext->asyncContext.context;
 
     auto initPara =
-        std::make_tuple(&asyncContext->aContext.slotId, std::data(asyncContext->inputStr), &context.callbackRef);
+        std::make_tuple(&asyncContext->asyncContext.slotId, std::data(asyncContext->inputStr), &context.callbackRef);
     AsyncPara para {
         .funcName = "SendEnvelopeCmd",
         .env = env,
@@ -1613,9 +1653,8 @@ napi_value SendEnvelopeCmd(napi_env env, napi_callback_info info)
         .execute = NativeSendEnvelopeCmd,
         .complete = SendEnvelopeCmdCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncContext2>(para, asyncContext, initPara);
     if (result) {
-        asyncContext.release();
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -1626,27 +1665,27 @@ void NativeSendTerminalResponseCmd(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-    AsyncContext2<bool> *context = static_cast<AsyncContext2<bool> *>(data);
-    context->aContext.callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().SendTerminalResponseCmd(
-        context->aContext.slotId, std::data(context->inputStr));
-    TELEPHONY_LOGI("NAPI NativeSendTerminalResponseCmd %{public}d", context->aContext.callbackVal);
-    context->aContext.context.resolved = context->aContext.callbackVal;
+    AsyncContext2 *context = static_cast<AsyncContext2 *>(data);
+    context->asyncContext.callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().SendTerminalResponseCmd(
+        context->asyncContext.slotId, std::data(context->inputStr));
+    TELEPHONY_LOGI("NAPI NativeSendTerminalResponseCmd %{public}d", context->asyncContext.callbackVal);
+    context->asyncContext.context.resolved = context->asyncContext.callbackVal;
 }
 
 void SendTerminalResponseCmdCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
-    std::unique_ptr<AsyncContext2<bool>> context(static_cast<AsyncContext2<bool> *>(data));
-    NapiAsyncCompleteCallback(env, status, context->aContext, "Stk Cmd From App Envelope failed", true);
+    std::unique_ptr<AsyncContext2> context(static_cast<AsyncContext2 *>(data));
+    NapiAsyncCompleteCallback(env, status, context->asyncContext, "Stk Cmd From App Envelope failed", true);
 }
 
 napi_value SendTerminalResponseCmd(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncContext2<bool>> asyncContext = std::make_unique<AsyncContext2<bool>>();
-    BaseContext &context = asyncContext->aContext.context;
+    auto asyncContext = new AsyncContext2();
+    BaseContext &context = asyncContext->asyncContext.context;
 
     auto initPara =
-        std::make_tuple(&asyncContext->aContext.slotId, std::data(asyncContext->inputStr), &context.callbackRef);
+        std::make_tuple(&asyncContext->asyncContext.slotId, std::data(asyncContext->inputStr), &context.callbackRef);
     AsyncPara para {
         .funcName = "SendTerminalResponseCmd",
         .env = env,
@@ -1654,9 +1693,8 @@ napi_value SendTerminalResponseCmd(napi_env env, napi_callback_info info)
         .execute = NativeSendTerminalResponseCmd,
         .complete = SendTerminalResponseCmdCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncContext2>(para, asyncContext, initPara);
     if (result) {
-        asyncContext.release();
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -1690,7 +1728,7 @@ void GetLockStateCallback(napi_env env, napi_status status, void *data)
 
 napi_value GetLockState(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncGetLockState> lockStateContext = std::make_unique<AsyncGetLockState>();
+    auto lockStateContext = new AsyncGetLockState();
     BaseContext &context = lockStateContext->asyncContext.context;
 
     auto initPara =
@@ -1702,9 +1740,8 @@ napi_value GetLockState(napi_env env, napi_callback_info info)
         .execute = NativeGetLockState,
         .complete = GetLockStateCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncGetLockState>(para, lockStateContext, initPara);
     if (result) {
-        lockStateContext.release();
         NAPI_CALL(env, napi_queue_async_work(env, context.work));
     }
     return result;
@@ -1746,13 +1783,13 @@ void NativeUnlockSimLock(napi_env env, void *data)
     PersoLockInfo lockInfo {
         static_cast<PersoLockType>(asyncContext->pinEnable), NapiUtil::ToUtf16(asyncContext->inStr1.data())};
     bool result = DelayedRefSingleton<CoreServiceClient>::GetInstance().UnlockSimLock(
-        asyncContext->pinContext.slotId, lockInfo, response);
+        asyncContext->asyncContext.slotId, lockInfo, response);
     TELEPHONY_LOGI("NAPI NativeUnlockSimLock %{public}d", result);
     if (result) {
         asyncContext->result = response.result;
         asyncContext->remain = response.remain;
     }
-    asyncContext->pinContext.context.resolved = result;
+    asyncContext->asyncContext.context.resolved = result;
 }
 
 void UnlockSimLockCallback(napi_env env, napi_status status, void *data)
@@ -1760,17 +1797,15 @@ void UnlockSimLockCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContextPIN> context(static_cast<AsyncContextPIN *>(data));
     const LockStatusResponse res {context->result, context->remain};
-    context->pinContext.callbackVal = PinOrPukUnlockConversion(env, res);
-    NapiAsyncCompleteCallback(env, status, context->pinContext, "unlock sim lock failed!");
+    context->asyncContext.callbackVal = PinOrPukUnlockConversion(env, res);
+    NapiAsyncCompleteCallback(env, status, context->asyncContext, "unlock sim lock failed!");
 }
 
 napi_value UnlockSimLock(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<AsyncContextPIN> pinContext = std::make_unique<AsyncContextPIN>();
-    BaseContext &context = pinContext->pinContext.context;
+    auto context = new AsyncContextPIN();
 
-    napi_value object = NapiUtil::CreateUndefined(env);
-    auto initPara = std::make_tuple(&pinContext->pinContext.slotId, &object, &context.callbackRef);
+    napi_ref ref = nullptr;
     AsyncPara para {
         .funcName = "UnlockSimLock",
         .env = env,
@@ -1778,11 +1813,14 @@ napi_value UnlockSimLock(napi_env env, napi_callback_info info)
         .execute = NativeUnlockSimLock,
         .complete = UnlockSimLockCallback,
     };
-    napi_value result = NapiCreateAsyncWork2(para, context, initPara);
+    napi_value result = NapiCreateAsyncWork4(para, context, &ref);
     if (result) {
-        PersoLockInfoAnalyze(env, object, *pinContext);
-        pinContext.release();
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        if (ref != nullptr) {
+            napi_value object = NapiUtil::CreateUndefined(env);
+            napi_get_reference_value(env, ref, &object);
+            PersoLockInfoAnalyze(env, object, *context);
+        }
+        NAPI_CALL(env, napi_queue_async_work(env, context->asyncContext.context.work));
     }
     return result;
 }
