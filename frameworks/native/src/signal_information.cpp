@@ -20,23 +20,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t GSM_RXLEV_MINIMUM = 0;
-constexpr int32_t GSM_RXLEV_MAXIMUM = 63;
-constexpr int32_t GSM_RSSI_INVALID = -111;
-constexpr int32_t CDMA_RSSI_MINIMUM = 0;
-constexpr int32_t CDMA_RSSI_INVALID = -113;
-constexpr int32_t LTE_RSRP_MINIMUM = 0;
-constexpr int32_t LTE_RSRP_MAXIMUM = 99;
-constexpr int32_t LTE_RSSI_INVALID = -141;
-constexpr int32_t WCDMA_RSCP_MINIMUM = 0;
-constexpr int32_t WCDMA_RSCP_MAXIMUM = 99;
-constexpr int32_t WCDMA_RSSI_INVALID = -121;
-constexpr int32_t TD_SCDMA_RSCP_MINIMUM = 25;
-constexpr int32_t TD_SCDMA_RSCP_MAXIMUM = 112;
-constexpr int32_t TD_SCDMA_RSSI_INVALID = -113;
-constexpr int32_t NR_RSRP_MINIMUM = 0;
-constexpr int32_t NR_RSRP_MAXIMUM = 99;
-constexpr int32_t NR_RSSI_INVALID = -141;
+constexpr int32_t SIGNAL_RSSI_MAXIMUM = -1;
 constexpr int32_t SIGNAL_LEVEL_INVALID = 0;
 constexpr int32_t SIGNAL_FIVE_BARS = 5;
 constexpr int32_t SIGNAL_FOUR_BARS = 4;
@@ -104,12 +88,10 @@ int32_t GsmSignalInformation::GetSignalLevel() const
 {
     int32_t level = SIGNAL_LEVEL_INVALID;
     int32_t gsmRxlev = GetRssi();
-    int32_t gsmRssi = GSM_RSSI_INVALID;
     if (ValidateGsmValue()) {
         // Reference: TS 27.007 section 8.69
-        gsmRssi += gsmRxlev;
         for (int32_t i = signalBar_; i >= 0; --i) {
-            if (gsmRssi >= GSM_SIGNAL_THRESHOLD[i]) {
+            if (gsmRxlev >= GSM_SIGNAL_THRESHOLD[i]) {
                 level = i;
                 break;
             }
@@ -180,7 +162,7 @@ bool GsmSignalInformation::ReadFromParcel(Parcel &parcel)
 
 bool GsmSignalInformation::ValidateGsmValue() const
 {
-    return (gsmRxlev_ > GSM_RXLEV_MINIMUM && gsmRxlev_ <= GSM_RXLEV_MAXIMUM);
+    return gsmRxlev_ < SIGNAL_RSSI_MAXIMUM;
 }
 
 void CdmaSignalInformation::SetValue(const int32_t cdmaRssi, const int32_t cdmaEcno)
@@ -203,12 +185,10 @@ int32_t CdmaSignalInformation::GetSignalLevel() const
 {
     int32_t cdmaRssi = GetCdmaRssi();
     int32_t level = SIGNAL_LEVEL_INVALID;
-    int32_t rssi = CDMA_RSSI_INVALID;
     if (ValidateCdmaValue()) {
         // Reference: TS 27.007 section 8.69
-        rssi += cdmaRssi;
         for (int32_t i = signalBar_; i >= 0; --i) {
-            if (rssi >= CDMA_SIGNAL_THRESHOLD[i]) {
+            if (cdmaRssi >= CDMA_SIGNAL_THRESHOLD[i]) {
                 level = i;
                 break;
             }
@@ -277,7 +257,7 @@ bool CdmaSignalInformation::ReadFromParcel(Parcel &parcel)
 
 bool CdmaSignalInformation::ValidateCdmaValue() const
 {
-    return (cdmaRssi_ > CDMA_RSSI_MINIMUM && cdmaRssi_ < -CDMA_RSSI_INVALID);
+    return cdmaRssi_ < SIGNAL_RSSI_MAXIMUM;
 }
 
 bool LteSignalInformation::operator==(const LteSignalInformation &lte) const
@@ -318,12 +298,10 @@ int32_t LteSignalInformation::GetSignalLevel() const
 {
     int32_t level = SIGNAL_LEVEL_INVALID;
     int32_t lteRsrp = GetRsrp();
-    int32_t lteRssi = LTE_RSSI_INVALID;
     if (ValidateLteValue()) {
         // Reference: TS 27.007 section 8.69
-        lteRssi += lteRsrp;
         for (int32_t i = signalBar_; i >= 0; --i) {
-            if (lteRssi >= LTE_SIGNAL_THRESHOLD[i]) {
+            if (lteRsrp >= LTE_SIGNAL_THRESHOLD[i]) {
                 level = i;
                 break;
             }
@@ -406,7 +384,7 @@ bool LteSignalInformation::ReadFromParcel(Parcel &parcel)
 
 bool LteSignalInformation::ValidateLteValue() const
 {
-    return (lteRsrp_ > LTE_RSRP_MINIMUM && lteRsrp_ <= LTE_RSRP_MAXIMUM);
+    return lteRsrp_ < SIGNAL_RSSI_MAXIMUM;
 }
 
 bool WcdmaSignalInformation::operator==(const WcdmaSignalInformation &wcdma) const
@@ -448,12 +426,10 @@ int32_t WcdmaSignalInformation::GetSignalLevel() const
 {
     int32_t level = SIGNAL_LEVEL_INVALID;
     int32_t wcdmaRscp = GetRscp();
-    int32_t wcdmaRssi = WCDMA_RSSI_INVALID;
     if (ValidateWcdmaValue()) {
         // Reference: TS 27.007 section 8.69
-        wcdmaRssi += wcdmaRscp;
         for (int32_t i = signalBar_; i >= 0; --i) {
-            if (wcdmaRssi >= WCDMA_SIGNAL_THRESHOLD[i]) {
+            if (wcdmaRscp >= WCDMA_SIGNAL_THRESHOLD[i]) {
                 level = i;
                 break;
             }
@@ -536,7 +512,7 @@ bool WcdmaSignalInformation::ReadFromParcel(Parcel &parcel)
 
 bool WcdmaSignalInformation::ValidateWcdmaValue() const
 {
-    return (wcdmaRscp_ > WCDMA_RSCP_MINIMUM && wcdmaRscp_ <= WCDMA_RSCP_MAXIMUM);
+    return wcdmaRscp_ < SIGNAL_RSSI_MAXIMUM;
 }
 
 bool TdScdmaSignalInformation::operator==(const TdScdmaSignalInformation &tdScdma) const
@@ -551,20 +527,17 @@ void TdScdmaSignalInformation::SetValue(const int32_t tdScdmaRscp)
 
 int32_t TdScdmaSignalInformation::GetRscp() const
 {
-    return (tdScdmaRscp_ >= TD_SCDMA_RSCP_MINIMUM &&
-        tdScdmaRscp_ <= TD_SCDMA_RSCP_MAXIMUM) ? tdScdmaRscp_ : TD_SCDMA_RSSI_INVALID;
+    return tdScdmaRscp_;
 }
 
 int32_t TdScdmaSignalInformation::GetSignalLevel() const
 {
     int32_t tdScdmaRscp = GetRscp();
     int32_t level = SIGNAL_LEVEL_INVALID;
-    int32_t tdScdmaRssi = TD_SCDMA_RSSI_INVALID;
     if (ValidateTdScdmaValue()) {
         // Reference: TS 27.007 section 8.69
-        tdScdmaRssi += tdScdmaRscp;
         for (int32_t i = signalBar_; i >= 0; --i) {
-            if (tdScdmaRssi >= TD_SCDMA_SIGNAL_THRESHOLD[i]) {
+            if (tdScdmaRscp >= TD_SCDMA_SIGNAL_THRESHOLD[i]) {
                 level = i;
                 break;
             }
@@ -626,7 +599,7 @@ bool TdScdmaSignalInformation::ReadFromParcel(Parcel &parcel)
 
 bool TdScdmaSignalInformation::ValidateTdScdmaValue() const
 {
-    return (tdScdmaRscp_ >= TD_SCDMA_RSCP_MINIMUM && tdScdmaRscp_ <= TD_SCDMA_RSCP_MAXIMUM);
+    return tdScdmaRscp_ < SIGNAL_RSSI_MAXIMUM;
 }
 
 bool NrSignalInformation::operator==(const NrSignalInformation &nr) const
@@ -660,12 +633,10 @@ int32_t NrSignalInformation::GetSignalLevel() const
 {
     int32_t nrRsrp = GetRsrp();
     int32_t level = SIGNAL_LEVEL_INVALID;
-    int32_t rssi = NR_RSSI_INVALID;
     if (ValidateNrValue()) {
         // Reference: TS 27.007 section 8.69
-        rssi += nrRsrp;
         for (int32_t i = signalBar_; i >= 0; --i) {
-            if (rssi >= NR_SIGNAL_THRESHOLD[i]) {
+            if (nrRsrp >= NR_SIGNAL_THRESHOLD[i]) {
                 level = i;
                 break;
             }
@@ -740,7 +711,7 @@ bool NrSignalInformation::ReadFromParcel(Parcel &parcel)
 
 bool NrSignalInformation::ValidateNrValue() const
 {
-    return (nrRsrp_ > NR_RSRP_MINIMUM && nrRsrp_ <= NR_RSRP_MAXIMUM);
+    return nrRsrp_ < SIGNAL_RSSI_MAXIMUM;
 }
 } // namespace Telephony
 } // namespace OHOS
