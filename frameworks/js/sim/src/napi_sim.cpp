@@ -964,7 +964,8 @@ void NativeGetIMSI(napi_env env, void *data)
         std::string imsiLog = asyncContext->callbackVal.substr(0, IMSI_LOG_LENGTH);
         TELEPHONY_LOGI("NAPI NativeGetIMSI success");
     } else {
-        TELEPHONY_LOGE("NAPI NativeGetIMSI IMSI length is invalid %{public}d", asyncContext->callbackVal.length());
+        TELEPHONY_LOGE("NAPI NativeGetIMSI IMSI length is invalid %{public}lu",
+                       (unsigned long)asyncContext->callbackVal.length());
     }
     asyncContext->context.resolved = !(asyncContext->callbackVal.empty());
 }
