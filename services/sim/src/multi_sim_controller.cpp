@@ -241,7 +241,7 @@ bool MultiSimController::GetListFromDataBase()
 void MultiSimController::SortCache()
 {
     size_t count = localCacheInfo_.size();
-    TELEPHONY_LOGI("MultiSimController::SortCache count = %{public}d", count);
+    TELEPHONY_LOGI("MultiSimController::SortCache count = %{public}lu", (unsigned long)count);
     if (count <= 0) {
         TELEPHONY_LOGE("MultiSimController::Sort empty");
         return;
@@ -255,8 +255,8 @@ void MultiSimController::SortCache()
         sortCache.emplace_back(emptyUnit);
     }
     for (size_t j = 0; j < count; j++) {
-        TELEPHONY_LOGI("MultiSimController::index = %{public}d j = %{public}d",
-                       localCacheInfo_[j].slotIndex, j);
+        TELEPHONY_LOGI("MultiSimController::index = %{public}d j = %{public}lu",
+                       localCacheInfo_[j].slotIndex, (unsigned long)j);
         sortCache[localCacheInfo_[j].slotIndex] = localCacheInfo_[j];
     }
     localCacheInfo_ = sortCache;

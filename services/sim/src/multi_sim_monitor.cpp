@@ -63,7 +63,7 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             auto slotId = event->GetParam();
             if (slotId != slotId_) {
                 TELEPHONY_LOGI("MultiSimMonitor::getEvent not right slotId_ = %{public}d,"
-                    "%{public}lld", slotId_, slotId);
+                    "%{public}lld", slotId_, (long long)slotId);
                 return;
             }
             TELEPHONY_LOGI("MultiSimMonitor::INIT_DATA sim icc data slotId_ = %{public}d", slotId_);

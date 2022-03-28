@@ -646,7 +646,8 @@ static napi_value GetNamedProperty(napi_env env, napi_value object, const std::s
 
 static bool MatchSetNetworkSelectionModeParameters(napi_env env, napi_value parameters[], size_t parameterCount)
 {
-    TELEPHONY_LOGI("start MatchSetNetworkSelectionModeParameters parameterCount = %{public}d", parameterCount);
+    TELEPHONY_LOGI("start MatchSetNetworkSelectionModeParameters parameterCount = %{public}lu",
+                   (unsigned long)parameterCount);
     switch (parameterCount) {
         case 1: {
             if (!NapiUtil::MatchParameters(env, parameters, {napi_object})) {
@@ -1711,7 +1712,7 @@ static void NativeGetUniqueDeviceId(napi_env env, void *data)
     auto context = static_cast<GetUniqueDeviceIdContext *>(data);
     context->getUniqueDeviceId =
         NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetUniqueDeviceId(context->slotId));
-    TELEPHONY_LOGI("NativeGetUniqueDeviceId len = %{public}d", context->getUniqueDeviceId.length());
+    TELEPHONY_LOGI("NativeGetUniqueDeviceId len = %{public}lu", (unsigned long)context->getUniqueDeviceId.length());
     context->resolved = true;
 }
 
