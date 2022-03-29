@@ -438,8 +438,7 @@ int32_t CoreServiceStub::OnUnlockPin(MessageParcel &data, MessageParcel &reply)
     LockStatusResponse response = {0};
     std::u16string pin = data.ReadString16();
     int32_t phoneId = data.ReadInt32();
-    TELEPHONY_LOGD("CoreServiceStub::OnUnlockPin(), pin = %{public}s, phoneId = %{public}d",
-        Str16ToStr8(pin).c_str(), phoneId);
+    TELEPHONY_LOGD("CoreServiceStub::OnUnlockPin(), phoneId = %{public}d", phoneId);
     bool result = UnlockPin(pin, response, phoneId);
     ret = reply.WriteBool(result);
     ret = reply.WriteInt32(response.result);
@@ -458,8 +457,6 @@ int32_t CoreServiceStub::OnUnlockPuk(MessageParcel &data, MessageParcel &reply)
     std::u16string newPin = data.ReadString16();
     std::u16string puk = data.ReadString16();
     int32_t phoneId = data.ReadInt32();
-    TELEPHONY_LOGD("CoreServiceStub::OnUnlockPuk(), newPin = %{public}s, puk = %{public}s, phoneId = %{public}d",
-        Str16ToStr8(newPin).c_str(), Str16ToStr8(puk).c_str(), phoneId);
     bool result = UnlockPuk(newPin, puk, response, phoneId);
     ret = reply.WriteBool(result);
     ret = reply.WriteInt32(response.result);
@@ -478,8 +475,7 @@ int32_t CoreServiceStub::OnAlterPin(MessageParcel &data, MessageParcel &reply)
     std::u16string newPin = data.ReadString16();
     std::u16string oldPin = data.ReadString16();
     int32_t phoneId = data.ReadInt32();
-    TELEPHONY_LOGD("CoreServiceStub::OnAlterPin(), newPin = %{public}s, oldPin = %{public}s, phoneId = %{public}d",
-        Str16ToStr8(newPin).c_str(), Str16ToStr8(oldPin).c_str(), phoneId);
+    TELEPHONY_LOGD("CoreServiceStub::OnAlterPin(), phoneId = %{public}d", phoneId);
     bool result = AlterPin(newPin, oldPin, response, phoneId);
     ret = reply.WriteBool(result);
     ret = reply.WriteInt32(response.result);
@@ -498,8 +494,7 @@ int32_t CoreServiceStub::OnSetLockState(MessageParcel &data, MessageParcel &repl
     std::u16string pin = data.ReadString16();
     int32_t mode = data.ReadInt32();
     int32_t phoneId = data.ReadInt32();
-    TELEPHONY_LOGD("CoreServiceStub::OnSetLockState(), pin = %{public}s, mode = %{public}d, phoneId = %{public}d",
-        Str16ToStr8(pin).c_str(), mode, phoneId);
+    TELEPHONY_LOGD("CoreServiceStub::OnSetLockState(), mode = %{public}d, phoneId = %{public}d", mode, phoneId);
     bool result = SetLockState(pin, mode, response, phoneId);
     ret = reply.WriteBool(result);
     ret = reply.WriteInt32(response.result);
