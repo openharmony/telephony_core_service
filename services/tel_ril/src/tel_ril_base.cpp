@@ -20,13 +20,15 @@ namespace Telephony {
 std::atomic_uint TelRilBase::nextSerialId_(1);
 std::unordered_map<int32_t, std::shared_ptr<TelRilRequest>> TelRilBase::requestMap_;
 std::mutex TelRilBase::requestLock_;
+std::shared_ptr<TelRilHandler> TelRilBase::handler_;
 
-TelRilBase::TelRilBase(
-    int32_t slotId, sptr<IRemoteObject> rilAdapterObj, std::shared_ptr<ObserverHandler> observerHandler)
+TelRilBase::TelRilBase(int32_t slotId, sptr<IRemoteObject> rilAdapterObj,
+    std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
 {
     observerHandler_ = observerHandler;
     cellularRadio_ = rilAdapterObj;
     slotId_ = slotId;
+    handler_ = handler;
 }
 
 void TelRilBase::ResetRemoteObject(sptr<IRemoteObject> rilAdapterObj)
@@ -40,6 +42,11 @@ std::shared_ptr<TelRilRequest> TelRilBase::CreateTelRilRequest(
     std::shared_ptr<TelRilRequest> telRilRequest = std::make_shared<TelRilRequest>(GetNextSerialId(), request, result);
     std::lock_guard<std::mutex> lockRequest(TelRilBase::requestLock_);
     TelRilBase::requestMap_.insert(std::make_pair(telRilRequest->serialId_, telRilRequest));
+    if (handler_ != nullptr) {
+        handler_->ApplyRunningLock(TelRilHandler::NORMAL_RUNNING_LOCK);
+    } else {
+        TELEPHONY_LOGE("handler_ is nullptr!!!");
+    }
     return telRilRequest;
 }
 
@@ -122,6 +129,9 @@ std::shared_ptr<TelRilRequest> TelRilBase::FindTelRilRequest(const HRilRadioResp
         TELEPHONY_LOGI("FindTelRilRequest not found serial:%{public}d", serial);
     } else {
         telRilRequest = iter->second;
+        if (handler_ != nullptr) {
+            handler_->ReduceRunningLock(TelRilHandler::NORMAL_RUNNING_LOCK);
+        }
     }
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("Unexpected ack response! sn: %{public}d", serial);

@@ -34,9 +34,9 @@ void TelRilModem::AddHandlerToMap()
     memberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &TelRilModem::GetVoiceRadioTechnologyResponse;
 }
 
-TelRilModem::TelRilModem(
-    int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler)
-    : TelRilBase(slotId, cellularRadio, observerHandler)
+TelRilModem::TelRilModem(int32_t slotId, sptr<IRemoteObject> cellularRadio,
+    std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
+    : TelRilBase(slotId, cellularRadio, observerHandler, handler)
 {
     AddHandlerToMap();
 }

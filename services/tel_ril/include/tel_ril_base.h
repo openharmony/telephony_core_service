@@ -27,6 +27,7 @@
 #include "radio_event.h"
 #include "observer_handler.h"
 #include "tel_ril_common.h"
+#include "tel_ril_handler.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
@@ -49,7 +50,8 @@ private:
 
 class TelRilBase {
 public:
-    TelRilBase(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
+    TelRilBase(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler,
+        std::shared_ptr<TelRilHandler> handler);
     virtual ~TelRilBase() = default;
 
     /**
@@ -182,6 +184,7 @@ private:
     static std::atomic_uint nextSerialId_;
     static std::unordered_map<int32_t, std::shared_ptr<TelRilRequest>> requestMap_;
     static std::mutex requestLock_;
+    static std::shared_ptr<TelRilHandler> handler_;
 };
 
 template<typename... ValueTypes>
