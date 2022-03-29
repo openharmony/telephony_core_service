@@ -69,11 +69,25 @@ int32_t TelRilManager::OnRemoteRequest(
         TELEPHONY_LOGE("descriptor checked fail, code is %{public}d.", code);
         return CORE_SERVICE_ERROR;
     }
-    int32_t slotId = data.ReadInt32();
-    TELEPHONY_LOGI("TelRilManager OnRemoteRequest code:%{public}d, slotId:%{public}d", code, slotId);
+    HRilResponseTypes responseType = HRIL_RESPONSE_NOTICE;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(sizeof(HRilResponseHeadInfo));
+    const HRilResponseHeadInfo *headInfo = reinterpret_cast<const HRilResponseHeadInfo *>(spBuffer);
+    if (headInfo != nullptr) {
+        slotId = headInfo->slotId;
+        responseType = headInfo->type;
+    } else {
+        TELEPHONY_LOGW("TelRilManager code:%{public}d, headInfo parsed is failed.", code);
+    }
+    TELEPHONY_LOGI("TelRilManager OnRemoteRequest code:%{public}d, slotId:%{public}d, type:%{public}d",
+        code, slotId, responseType);
     if ((slotId < 0) || (slotId > static_cast<int32_t>(telRilCall_.size()))) {
         TELEPHONY_LOGE("TelRilManager slotId is invalid:%{public}d", slotId);
         return CORE_SERVICE_ERROR;
+    }
+    if ((responseType == HRIL_RESPONSE_REQUEST_MUST_ACK) || (responseType == HRIL_RESPONSE_NOTICE_MUST_ACK)) {
+        SendAckAndLock();
     }
     if (GetTelRilCall(slotId).IsCallRespOrNotify(code)) {
         return GetTelRilCall(slotId).ProcessRespOrNotify<TelRilCall>(code, data);
@@ -113,6 +127,7 @@ bool TelRilManager::OnInit()
         }
     } while (!res && (i < RIL_INIT_COUNT_MAX));
     if (res) {
+        CreatTelRilHandler();
         for (int32_t slotId = SIM_SLOT_0; slotId < SIM_SLOT_COUNT; slotId++) {
             InitTelModule(slotId);
         }
@@ -160,16 +175,55 @@ bool TelRilManager::ConnectRilAdapterService()
     return true;
 }
 
+void TelRilManager::CreatTelRilHandler(void)
+{
+    eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
+    if (eventLoop_ == nullptr) {
+        TELEPHONY_LOGE("Failed to create EventRunner");
+        return;
+    }
+    handler_ = std::make_shared<TelRilHandler>(eventLoop_);
+    handler_->OnInit();
+    eventLoop_->Run();
+}
+
+void TelRilManager::SendAckAndLock(void)
+{
+    if (handler_ != nullptr) {
+        handler_->ApplyRunningLock(TelRilHandler::ACK_RUNNING_LOCK);
+    }
+    SendResponseAck();
+}
+
+int32_t TelRilManager::SendResponseAck(void)
+{
+    if (rilAdapterRemoteObj_ == nullptr) {
+        TELEPHONY_LOGE("hdf remote object doesn't exist.");
+        return RIL_ADAPTER_ERROR;
+    }
+
+    MessageParcel data;
+    MessageParcel reply;
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    return rilAdapterRemoteObj_->SendRequest(HRIL_ADAPTER_RADIO_SEND_ACK, data, reply, option);
+}
+
 void TelRilManager::InitTelModule(int32_t slotId)
 {
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     observerHandler_.push_back(observerHandler);
-    telRilSms_.push_back(std::make_unique<TelRilSms>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId]));
-    telRilSim_.push_back(std::make_unique<TelRilSim>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId]));
-    telRilCall_.push_back(std::make_unique<TelRilCall>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId]));
-    telRilData_.push_back(std::make_unique<TelRilData>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId]));
-    telRilModem_.push_back(std::make_unique<TelRilModem>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId]));
-    telRilNetwork_.push_back(std::make_unique<TelRilNetwork>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId]));
+    telRilSms_.push_back(
+        std::make_unique<TelRilSms>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId], handler_));
+    telRilSim_.push_back(
+        std::make_unique<TelRilSim>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId], handler_));
+    telRilCall_.push_back(
+        std::make_unique<TelRilCall>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId], handler_));
+    telRilData_.push_back(
+        std::make_unique<TelRilData>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId], handler_));
+    telRilModem_.push_back(
+        std::make_unique<TelRilModem>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId], handler_));
+    telRilNetwork_.push_back(
+        std::make_unique<TelRilNetwork>(slotId, rilAdapterRemoteObj_, observerHandler_[slotId], handler_));
 }
 
 TelRilSms &TelRilManager::GetTelRilSms(int32_t slotId)

@@ -70,9 +70,9 @@ void TelRilCall::AddHandlerToMap()
     memberFuncMap_[HREQ_CALL_GET_FAIL_REASON] = &TelRilCall::GetCallFailReasonResponse;
 }
 
-TelRilCall::TelRilCall(
-    int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler)
-    : TelRilBase(slotId, cellularRadio, observerHandler)
+TelRilCall::TelRilCall(int32_t slotId, sptr<IRemoteObject> cellularRadio,
+    std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
+    : TelRilBase(slotId, cellularRadio, observerHandler, handler)
 {
     AddHandlerToMap();
 }

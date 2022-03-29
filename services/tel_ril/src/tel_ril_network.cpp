@@ -55,9 +55,9 @@ void TelRilNetwork::AddHandlerToMap()
     memberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &TelRilNetwork::SetLocateUpdatesResponse;
 }
 
-TelRilNetwork::TelRilNetwork(
-    int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler)
-    : TelRilBase(slotId, cellularRadio, observerHandler)
+TelRilNetwork::TelRilNetwork(int32_t slotId, sptr<IRemoteObject> cellularRadio,
+    std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
+    : TelRilBase(slotId, cellularRadio, observerHandler, handler)
 {
     AddHandlerToMap();
 }

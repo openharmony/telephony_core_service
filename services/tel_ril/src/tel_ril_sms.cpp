@@ -49,9 +49,9 @@ void TelRilSms::AddHandlerToMap()
     memberFuncMap_[HNOTI_CB_CONFIG_REPORT] = &TelRilSms::CBConfigNotify;
 }
 
-TelRilSms::TelRilSms(
-    int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler)
-    : TelRilBase(slotId, cellularRadio, observerHandler)
+TelRilSms::TelRilSms(int32_t slotId, sptr<IRemoteObject> cellularRadio,
+    std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
+    : TelRilBase(slotId, cellularRadio, observerHandler, handler)
 {
     AddHandlerToMap();
 }

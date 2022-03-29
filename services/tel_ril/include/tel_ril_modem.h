@@ -24,7 +24,8 @@ namespace OHOS {
 namespace Telephony {
 class TelRilModem : public TelRilBase {
 public:
-    TelRilModem(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
+    TelRilModem(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler,
+        std::shared_ptr<TelRilHandler> handler);
     ~TelRilModem() = default;
     /**
      * @brief Turn on and off radio response (for flight mode)

@@ -23,6 +23,7 @@
 #include "i_tel_ril_manager.h"
 #include "tel_ril_call.h"
 #include "tel_ril_data.h"
+#include "tel_ril_handler.h"
 #include "tel_ril_modem.h"
 #include "tel_ril_network.h"
 #include "tel_ril_sim.h"
@@ -302,6 +303,9 @@ public:
     static const int32_t RIL_INIT_COUNT_MAX = 10;
 
 private:
+    void CreatTelRilHandler(void);
+    void SendAckAndLock(void);
+    int32_t SendResponseAck(void);
     void InitTelModule(int32_t slotId);
     TelRilSms &GetTelRilSms(int32_t slotId);
     TelRilSim &GetTelRilSim(int32_t slotId);
@@ -362,6 +366,8 @@ private:
     std::vector<std::unique_ptr<TelRilModem>> telRilModem_;
     std::vector<std::unique_ptr<TelRilNetwork>> telRilNetwork_;
     std::vector<std::shared_ptr<ObserverHandler>> observerHandler_;
+    std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
+    std::shared_ptr<TelRilHandler> handler_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
