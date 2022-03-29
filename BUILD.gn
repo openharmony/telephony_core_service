@@ -85,6 +85,7 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_base.cpp",
     "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_call.cpp",
     "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_data.cpp",
+    "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_handler.cpp",
     "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_manager.cpp",
     "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_modem.cpp",
     "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_network.cpp",
