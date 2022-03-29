@@ -47,6 +47,7 @@ ohos_unittest("tel_ril_gtest") {
     "ces_standard:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
+    "power_manager_native:powermgr_client",
     "ril_adapter:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",

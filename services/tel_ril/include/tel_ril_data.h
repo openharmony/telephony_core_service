@@ -24,7 +24,8 @@ namespace OHOS {
 namespace Telephony {
 class TelRilData : public TelRilBase {
 public:
-    TelRilData(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler);
+    TelRilData(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler,
+        std::shared_ptr<TelRilHandler> handler);
     ~TelRilData() = default;
     DataProfileDataInfo ChangeDPToHalDataProfile(DataProfile dataProfile);
     int32_t DeactivatePdpContext(int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
