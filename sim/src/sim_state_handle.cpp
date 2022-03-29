@@ -69,7 +69,7 @@ int SimStateHandle::GetSimState(int slotId)
 
 void SimStateHandle::UnlockPin(std::string pin, int32_t phoneId)
 {
-    TELEPHONY_LOGD("SimStateHandle::UnlockPin1(), pin=%{public}s", pin.c_str());
+    TELEPHONY_LOGD("SimStateHandle::UnlockPin1()");
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_PIN_DONE);
     event->SetOwner(shared_from_this());
     rilManager_->EnterSimPin(pin, event);
@@ -77,7 +77,6 @@ void SimStateHandle::UnlockPin(std::string pin, int32_t phoneId)
 
 void SimStateHandle::UnlockPuk(std::string newPin, std::string puk, int32_t phoneId)
 {
-    TELEPHONY_LOGD("SimStateHandle::UnlockPuk1(), newPin=%{public}s, puk=%{public}s", newPin.c_str(), puk.c_str());
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_PUK_DONE);
     event->SetOwner(shared_from_this());
     rilManager_->UnlockSimPin(puk, newPin, event);
@@ -85,8 +84,7 @@ void SimStateHandle::UnlockPuk(std::string newPin, std::string puk, int32_t phon
 
 void SimStateHandle::AlterPin(std::string newPin, std::string oldPin, int32_t phoneId)
 {
-    TELEPHONY_LOGD(
-        "SimStateHandle::ChangePin1(), newPin=%{public}s, oldPin=%{public}s", newPin.c_str(), oldPin.c_str());
+    TELEPHONY_LOGD("SimStateHandle::ChangePin1()");
     int32_t length = newPin.size();
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_CHANGE_PIN_DONE);
     event->SetOwner(shared_from_this());
@@ -103,7 +101,7 @@ void SimStateHandle::UnlockRemain(int32_t phoneId)
 
 void SimStateHandle::SetLockState(std::string pin, int32_t enable, int32_t phoneId)
 {
-    TELEPHONY_LOGD("SimStateHandle::SetLockState(), pin=%{public}s", pin.c_str());
+    TELEPHONY_LOGD("SimStateHandle::SetLockState()");
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_ENABLE_PIN_DONE);
     event->SetOwner(shared_from_this());
     rilManager_->SetSimLock(FAC_PIN_LOCK, enable, pin, event);
