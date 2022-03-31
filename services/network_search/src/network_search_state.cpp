@@ -261,12 +261,15 @@ void NetworkSearchState::NotifyStateChange()
         return;
     }
 
+    // We must Update RadioTech(PhoneType) bebore notifying observers,
+    // otherwise observers may get the wrong phone type
+    CsRadioTechChange();
+
     NotifyPsRegStatusChange();
     NotifyPsRoamingStatusChange();
     NotifyPsRadioTechChange();
     NotifyEmergencyChange();
     NotifyNrStateChange();
-    CsRadioTechChange();
 
     if (!(*networkState_ == *networkStateOld_)) {
         TELEPHONY_LOGI(
