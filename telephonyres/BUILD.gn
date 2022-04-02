@@ -22,7 +22,7 @@ ohos_hap("telephonyres_hap") {
   deps = [ ":telephony_res" ]
   hap_profile = "./main/config.json"
   hap_name = "TelephonyResources"
-  module_install_dir = "app"
+  module_install_dir = "app/ohos.telephony.resources"
   certificate_profile = "./TelephonyResources.p7b"
   subsystem_name = "telephony"
   part_name = "core_service"
