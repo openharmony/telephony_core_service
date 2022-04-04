@@ -29,6 +29,8 @@ public:
     virtual ~NitzUpdate() = default;
     void ProcessNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessTimeZone();
+    void AutoTimeChange();
+    void AutoTimeZoneChange();
     struct NetworkTime {
         int32_t year;
         int32_t month;
@@ -42,7 +44,7 @@ public:
 private:
     void ProcessTime(NetworkTime &networkTime);
     void SaveTimeZone(std::string &timeZone);
-    void SaveTime(std::string &time);
+    void SaveTime(int64_t time);
     bool IsAutoTimeZone();
     bool IsAutoTime();
     bool NitzParse(std::string &nitzStr, NetworkTime &networkTime);
@@ -51,9 +53,12 @@ private:
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
-    bool timeZoneUpdateFlag_ = false;
+    int64_t lastUpdateTime_ = 0;
     int32_t offset_ = 0;
     int32_t slotId_ = 0;
+    int64_t curSytemTime_ = 0;
+    int64_t time_ = 0;
+    std::string timeZone_ = "";
 };
 } // namespace Telephony
 } // namespace OHOS

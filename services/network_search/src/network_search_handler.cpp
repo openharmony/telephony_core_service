@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Telephony {
 const int64_t IMS_STATE_REGISTED = 1;
 const int32_t REQ_INTERVAL = 30;
-const std::map<RadioEvent, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandler::memberFuncMap_ = {
+const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandler::memberFuncMap_ = {
     {RadioEvent::RADIO_SIM_STATE_CHANGE, &NetworkSearchHandler::SimStateChange},
     {RadioEvent::RADIO_IMSI_LOADED_READY, &NetworkSearchHandler::ImsiLoadedReady},
     {RadioEvent::RADIO_SIM_RECORDS_LOADED, &NetworkSearchHandler::SimRecordsLoaded},
@@ -53,7 +53,10 @@ const std::map<RadioEvent, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHan
     {RadioEvent::RADIO_CHANNEL_CONFIG_UPDATE, &NetworkSearchHandler::RadioChannelConfigInfo},
     {RadioEvent::RADIO_VOICE_TECH_CHANGED, &NetworkSearchHandler::RadioVoiceTechChange},
     {RadioEvent::RADIO_GET_VOICE_TECH, &NetworkSearchHandler::RadioVoiceTechChange},
-    {RadioEvent::RADIO_SET_DATA_CONNECT_ACTIVE, &NetworkSearchHandler::DcPhysicalLinkActiveUpdate}};
+    {RadioEvent::RADIO_SET_DATA_CONNECT_ACTIVE, &NetworkSearchHandler::DcPhysicalLinkActiveUpdate},
+    {SettingEventCode::MSG_AUTO_TIME, &NetworkSearchHandler::AutoTimeChange},
+    {SettingEventCode::MSG_AUTO_TIMEZONE, &NetworkSearchHandler::AutoTimeZoneChange},
+    {SettingEventCode::MSG_AUTO_AIRPLANE_MODE, &NetworkSearchHandler::AirplaneModeChange}};
 
 NetworkSearchHandler::NetworkSearchHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     const std::weak_ptr<NetworkSearchManager> &networkSearchManager,
@@ -759,6 +762,30 @@ void NetworkSearchHandler::RadioVoiceTechChange(const AppExecFwk::InnerEvent::Po
         radioInfo_->ProcessVoiceTechChange(event);
     }
     TELEPHONY_LOGI("NetworkSearchHandler::RadioVoiceTechChange");
+}
+
+void NetworkSearchHandler::AutoTimeChange(const AppExecFwk::InnerEvent::Pointer &)
+{
+    TELEPHONY_LOGI("NetworkSearchHandler::AutoTimeChange");
+    if (nitzUpdate_ != nullptr) {
+        nitzUpdate_->AutoTimeChange();
+    }
+}
+
+void NetworkSearchHandler::AutoTimeZoneChange(const AppExecFwk::InnerEvent::Pointer &)
+{
+    TELEPHONY_LOGI("NetworkSearchHandler::AutoTimeZoneChange");
+    if (nitzUpdate_ != nullptr) {
+        nitzUpdate_->AutoTimeZoneChange();
+    }
+}
+
+void NetworkSearchHandler::AirplaneModeChange(const AppExecFwk::InnerEvent::Pointer &)
+{
+    TELEPHONY_LOGI("NetworkSearchHandler::AirplaneModeChange");
+    if (radioInfo_ != nullptr) {
+        radioInfo_->AirplaneModeChange();
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -76,6 +76,8 @@ void NetworkType::ProcessGetPreferredNetwork(const AppExecFwk::InnerEvent::Point
             TELEPHONY_LOGI("NetworkType::ProcessGetPreferredNetwork callback success");
         }
         NetworkUtils::RemoveCallbackFromMap(index);
+    } else {
+        TELEPHONY_LOGI("NetworkType::ProcessGetPreferredNetwork has no callbackInfo");
     }
 }
 
@@ -93,6 +95,7 @@ void NetworkType::ProcessSetPreferredNetwork(const AppExecFwk::InnerEvent::Point
     }
     MessageParcel data;
     int64_t index = -1;
+    int64_t networkMode = -1;
     data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (responseInfo != nullptr) {
@@ -105,6 +108,7 @@ void NetworkType::ProcessSetPreferredNetwork(const AppExecFwk::InnerEvent::Point
         }
     } else {
         index = event->GetParam();
+        networkMode = index;
         TELEPHONY_LOGI("NetworkType::ProcessSetPreferredNetwork index:(%{public}" PRId64 ")", index);
         if (!data.WriteBool(true) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
             TELEPHONY_LOGE("NetworkType::ProcessSetPreferredNetwork WriteBool slotId is false");
@@ -115,15 +119,23 @@ void NetworkType::ProcessSetPreferredNetwork(const AppExecFwk::InnerEvent::Point
         NetworkUtils::FindNetworkSearchCallback(index);
     if (callbackInfo != nullptr) {
         sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchItem_;
-        int32_t networkMode = callbackInfo->param_;
+        networkMode = callbackInfo->param_;
         networkSearchManager->SavePreferredNetworkValue(slotId_, networkMode);
-        TELEPHONY_LOGI("NetworkSelection::ProcessSetNetworkSelectionMode NetworkMode is:%{public}d", networkMode);
+        TELEPHONY_LOGI("NetworkSelection::ProcessSetNetworkSelectionMode NetworkMode is:%{public}d",
+            (int32_t)networkMode);
         if (callback != nullptr) {
             callback->OnNetworkSearchCallback(
                 INetworkSearchCallback::NetworkSearchCallback::SET_PREFERRED_NETWORK_MODE_RESULT, data);
             TELEPHONY_LOGI("NetworkSelection::ProcessSetNetworkSelectionMode callback success");
         }
         NetworkUtils::RemoveCallbackFromMap(index);
+    } else {
+        TELEPHONY_LOGI("NetworkType::ProcessSetPreferredNetwork networkMode:%{public}d", (int32_t)networkMode);
+        int64_t minNetworkMode = static_cast<int64_t>(PreferredNetworkMode::CORE_NETWORK_MODE_AUTO);
+        int64_t maxNetworkMode = static_cast<int64_t>(PreferredNetworkMode::CORE_NETWORK_MODE_MAX_VALUE);
+        if (networkMode >= minNetworkMode && networkMode < maxNetworkMode) {
+            networkSearchManager->SavePreferredNetworkValue(slotId_, networkMode);
+        }
     }
 }
 } // namespace Telephony

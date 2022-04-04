@@ -35,7 +35,7 @@ public:
     void SetPhoneType(PhoneType phoneType);
     PhoneType GetPhoneType() const;
     void ProcessVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event);
-
+    void AirplaneModeChange();
 private:
     PhoneType RadioTechToPhoneType(RadioTech radioTech) const;
     PhoneType phoneType_ = PhoneType::PHONE_TYPE_IS_NONE;
