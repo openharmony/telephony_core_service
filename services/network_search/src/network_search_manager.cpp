@@ -20,7 +20,6 @@
 #include <cinttypes>
 
 #include "mcc_pool.h"
-#include "tel_profile_util.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
@@ -33,6 +32,16 @@ NetworkSearchManager::NetworkSearchManager(
     : telRilManager_(telRilManager), simManager_(simManager)
 {
     TELEPHONY_LOGI("NetworkSearchManager");
+}
+
+NetworkSearchManager::~NetworkSearchManager()
+{
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+        std::shared_ptr<NetworkSearchManagerInner> inner = FindManagerInner(slotId);
+        if (inner != nullptr) {
+            inner->UnRegisterSetting();
+        }
+    }
 }
 
 bool NetworkSearchManager::InitPointer(std::shared_ptr<NetworkSearchManagerInner> &inner, int32_t slotId)
@@ -69,6 +78,45 @@ bool NetworkSearchManager::InitPointer(std::shared_ptr<NetworkSearchManagerInner
         TELEPHONY_LOGE("failed to create new NetworkSearchResult slotId:%{public}d", slotId);
         return false;
     }
+
+    return true;
+}
+
+bool NetworkSearchManagerInner::RegisterSetting()
+{
+    settingAutoTimeObserver_ = std::make_unique<AutoTimeObserver>(networkSearchHandler_).release();
+    settingAutoTimezoneObserver_ = std::make_unique<AutoTimezoneObserver>(networkSearchHandler_).release();
+    airplaneModeObserver_ = std::make_unique<AirplaneModeObserver>(networkSearchHandler_).release();
+    std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
+    if (settingAutoTimeObserver_ == nullptr || settingAutoTimezoneObserver_ == nullptr ||
+        airplaneModeObserver_ == nullptr || settingHelper == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::RegisterSetting is null.");
+        return false;
+    }
+
+    Uri autoTimeUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIME_URI);
+    Uri autoTimezoneUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI);
+    Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
+    settingHelper->RegisterSettingsObserver(autoTimeUri, settingAutoTimeObserver_);
+    settingHelper->RegisterSettingsObserver(autoTimezoneUri, settingAutoTimezoneObserver_);
+    settingHelper->RegisterSettingsObserver(airplaneModeUri, airplaneModeObserver_);
+    return true;
+}
+
+bool NetworkSearchManagerInner::UnRegisterSetting()
+{
+    std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::UnRegisterSetting is null.");
+        return false;
+    }
+
+    Uri autoTimeUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIME_URI);
+    Uri autoTimezoneUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI);
+    Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
+    settingHelper->UnRegisterSettingsObserver(autoTimeUri, settingAutoTimeObserver_);
+    settingHelper->UnRegisterSettingsObserver(autoTimezoneUri, settingAutoTimezoneObserver_);
+    settingHelper->UnRegisterSettingsObserver(airplaneModeUri, airplaneModeObserver_);
     return true;
 }
 
@@ -114,6 +162,7 @@ bool NetworkSearchManager::OnInit()
             eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_STATUS);
         }
     }
+    TELEPHONY_LOGI("NetworkSearchManager::Init success");
     return true;
 }
 
@@ -674,23 +723,42 @@ void NetworkSearchManager::SavePreferredNetworkValue(int32_t slotId, int32_t net
 {
     TELEPHONY_LOGI("NetworkSearchManager SavePreferredNetworkValue slotId:%{public}d, networkMode:%{public}d",
         slotId, networkMode);
-    TelProfileUtil *utils = DelayedSingleton<TelProfileUtil>::GetInstance().get();
-    std::string str_key = KEY_DEFAULT_PREFERRED_NETWORK_MODE;
-    str_key.append(std::to_string(slotId));
-    int32_t result = utils->SaveInt(str_key, networkMode);
-    if (result == NativePreferences::E_OK) {
-        utils->Refresh();
+    std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGI("settingHelper is null");
+        return;
+    }
+
+    Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_PREFERRED_NETWORK_MODE_URI);
+    std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE +
+        "_" + std::to_string(slotId);
+    std::string value = std::to_string(networkMode);
+    if (!settingHelper->Update(uri, key, value)) {
+        TELEPHONY_LOGE("Update %{public}s fail", key.c_str());
     }
 }
 
 int32_t NetworkSearchManager::GetPreferredNetworkValue(int32_t slotId) const
 {
-    TelProfileUtil *utils = DelayedSingleton<TelProfileUtil>::GetInstance().get();
-    std::string str_key = KEY_DEFAULT_PREFERRED_NETWORK_MODE;
-    str_key.append(std::to_string(slotId));
-    int32_t networkMode = utils->ObtainInt(str_key, 0);
-    TELEPHONY_LOGI("NetworkSearchManager GetPreferredNetworkValue slotId:%{public}d, networkMode:%{public}d",
-        slotId, networkMode);
+    int32_t networkMode = static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA_GSM);
+    std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGI("settingHelper is null");
+        return networkMode;
+    }
+
+    Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_PREFERRED_NETWORK_MODE_URI);
+    std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE +
+        "_" + std::to_string(slotId);
+    std::string value = "";
+    if (!settingHelper->Query(uri, key, value)) {
+        TELEPHONY_LOGI("Query %{public}s fail", key.c_str());
+        return networkMode;
+    }
+
+    bool succ = StrToInt(value, networkMode);
+    TELEPHONY_LOGI("NetworkSearchManager GetPreferredNetworkValue succ:%{public}d, slotId:%{public}d, "
+        "networkMode:%{public}d", slotId, succ, networkMode);
     return networkMode;
 }
 
@@ -1008,6 +1076,26 @@ void NetworkSearchManager::TriggerTimezoneRefresh(int32_t slotId)
         }
     }
     TELEPHONY_LOGE("NetworkSearchManager::TriggerTimezoneRefresh slotId:%{public}d", slotId);
+}
+
+bool NetworkSearchManager::GetAirplaneMode()
+{
+    std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGI("settingHelper is null");
+        return false;
+    }
+
+    Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
+    std::string value = "";
+    std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE;
+    if (!settingHelper->Query(uri, key, value)) {
+        TELEPHONY_LOGI("Query airplane mode fail");
+        return false;
+    }
+    bool airplaneMode = value == "1";
+    TELEPHONY_LOGI("Get airplane mode:%{public}d", airplaneMode);
+    return airplaneMode;
 }
 } // namespace Telephony
 } // namespace OHOS

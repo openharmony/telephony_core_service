@@ -34,6 +34,7 @@
 #include "event_handler.h"
 #include "network_utils.h"
 #include "radio_event.h"
+#include "setting_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -50,6 +51,9 @@ struct NetworkSearchManagerInner {
     std::shared_ptr<NetworkSearchHandler> networkSearchHandler_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
+    sptr<AutoTimeObserver> settingAutoTimeObserver_;
+    sptr<AutoTimezoneObserver> settingAutoTimezoneObserver_;
+    sptr<AirplaneModeObserver> airplaneModeObserver_;
     HandleRunningState state_ = HandleRunningState::STATE_NOT_START;
     std::unique_ptr<NetworkSearchResult> networkSearchResult_ = nullptr;
     SelectionMode selection_ = SelectionMode::MODE_TYPE_UNKNOWN;
@@ -61,6 +65,8 @@ struct NetworkSearchManagerInner {
     RadioCapabilityInfo radioCapability_;
     std::mutex mutex_;
 
+    bool RegisterSetting();
+    bool UnRegisterSetting();
     bool Init()
     {
         radioCapability_.ratFamily = DEFAULT_RAF;
@@ -71,6 +77,9 @@ struct NetworkSearchManagerInner {
         }
         if (networkSearchHandler_ != nullptr) {
             if (!networkSearchHandler_->Init()) {
+                return false;
+            }
+            if (!RegisterSetting()) {
                 return false;
             }
         }
@@ -101,7 +110,7 @@ struct NetworkSearchManagerInner {
 class NetworkSearchManager : public INetworkSearch, public std::enable_shared_from_this<NetworkSearchManager> {
 public:
     NetworkSearchManager(std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<ISimManager> simManager);
-    virtual ~NetworkSearchManager() = default;
+    virtual ~NetworkSearchManager();
 
     bool OnInit() override;
     void SetRadioState(int32_t slotId, bool isOn, int32_t rst) override;
@@ -179,11 +188,8 @@ public:
     void GetVoiceTech(int32_t slotId);
     std::shared_ptr<NetworkSearchManagerInner> FindManagerInner(int32_t slotId);
     void SetLocateUpdate(int32_t slotId);
+    bool GetAirplaneMode();
 
-    inline bool GetAirplaneMode()
-    {
-        return AirplaneMode_;
-    }
     inline void InitMsgNum(int32_t slotId)
     {
         auto inner = FindManagerInner(slotId);
