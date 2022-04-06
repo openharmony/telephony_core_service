@@ -456,8 +456,6 @@ bool CoreService::UnlockPin(std::u16string pin, LockStatusResponse &response, in
 
 bool CoreService::UnlockPuk(std::u16string newPin, std::u16string puk, LockStatusResponse &response, int phoneId)
 {
-    TELEPHONY_LOGD("CoreService::UnlockPuk(), newPin = %{public}s, puk = %{public}s, phoneId = %{public}d",
-        Str16ToStr8(newPin).c_str(), Str16ToStr8(puk).c_str(), phoneId);
     if (CoreManager::GetInstance().core_.find(phoneId) != CoreManager::GetInstance().core_.end()) {
         if (CoreManager::GetInstance().core_[phoneId] == nullptr) {
             TELEPHONY_LOGE("CoreService::core_ == nullptr.");
@@ -473,8 +471,7 @@ bool CoreService::UnlockPuk(std::u16string newPin, std::u16string puk, LockStatu
 
 bool CoreService::AlterPin(std::u16string newPin, std::u16string oldPin, LockStatusResponse &response, int phoneId)
 {
-    TELEPHONY_LOGD("CoreService::AlterPin(), newPin = %{public}s, oldPin = %{public}s, phoneId = %{public}d",
-        Str16ToStr8(newPin).c_str(), Str16ToStr8(oldPin).c_str(), phoneId);
+    TELEPHONY_LOGD("CoreService::AlterPin(), phoneId = %{public}d", phoneId);
     if (CoreManager::GetInstance().core_.find(phoneId) != CoreManager::GetInstance().core_.end()) {
         if (CoreManager::GetInstance().core_[phoneId] == nullptr) {
             TELEPHONY_LOGE("CoreService::core_ == nullptr.");
@@ -490,8 +487,7 @@ bool CoreService::AlterPin(std::u16string newPin, std::u16string oldPin, LockSta
 
 bool CoreService::SetLockState(std::u16string pin, int32_t enable, LockStatusResponse &response, int32_t phoneId)
 {
-    TELEPHONY_LOGD("CoreService::SetLockState(), pin = %{public}s, enable = %{public}d, phoneId = %{public}d",
-        Str16ToStr8(pin).c_str(), enable, phoneId);
+    TELEPHONY_LOGD("CoreService::SetLockState(), enable = %{public}d, phoneId = %{public}d", enable, phoneId);
     if (CoreManager::GetInstance().core_.find(phoneId) != CoreManager::GetInstance().core_.end()) {
         if (CoreManager::GetInstance().core_[phoneId] == nullptr) {
             TELEPHONY_LOGE("CoreService::core_ == nullptr.");
