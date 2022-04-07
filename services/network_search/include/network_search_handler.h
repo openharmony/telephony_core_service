@@ -118,7 +118,9 @@ private:
     void RadioGetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event);
-
+    void AutoTimeChange(const AppExecFwk::InnerEvent::Pointer &);
+    void AutoTimeZoneChange(const AppExecFwk::InnerEvent::Pointer &);
+    void AirplaneModeChange(const AppExecFwk::InnerEvent::Pointer &);
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     std::unique_ptr<NetworkRegister> networkRegister_ = nullptr;
@@ -131,7 +133,7 @@ private:
     std::unique_ptr<NetworkType> networkType_ = nullptr;
     std::unique_ptr<NitzUpdate> nitzUpdate_ = nullptr;
     std::unique_ptr<CellInfo> cellInfo_ = nullptr;
-    static const std::map<RadioEvent, NsHandlerFunc> memberFuncMap_;
+    static const std::map<uint32_t, NsHandlerFunc> memberFuncMap_;
     int64_t lastTimeSignalReq_ = 0;
     int64_t lastTimeOperatorReq_ = 0;
     int64_t lastTimePsRegistrationReq_ = 0;

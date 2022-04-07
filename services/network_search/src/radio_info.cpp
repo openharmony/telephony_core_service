@@ -288,5 +288,21 @@ PhoneType RadioInfo::RadioTechToPhoneType(RadioTech radioTech) const
     }
     return phoneType;
 }
+
+void RadioInfo::AirplaneModeChange()
+{
+    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
+    if (nsm == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
+    bool airplaneMode = nsm->GetAirplaneMode();
+    if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_OFF && airplaneMode == false) {
+        nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
+    }
+    if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_ON && airplaneMode == true) {
+        nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_OFF), 0);
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

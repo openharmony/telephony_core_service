@@ -139,7 +139,7 @@ static const std::map<PreferredNetworkMode, int32_t> mapRafFromNetworkMode = {
 
 std::unordered_map<int64_t, std::shared_ptr<NetworkSearchCallbackInfo>> NetworkUtils::networkSearchCacheMap_;
 std::mutex NetworkUtils::callbackMapMutex_;
-std::atomic<int64_t> NetworkUtils::callbackIndex64bit_ = 0;
+std::atomic<int64_t> NetworkUtils::callbackIndex64bit_ = MIN_INDEX;
 int32_t NetworkUtils::GetRafFromNetworkMode(PreferredNetworkMode PreferredNetworkMode)
 {
     auto iter = mapRafFromNetworkMode.find(PreferredNetworkMode);
@@ -163,8 +163,8 @@ bool NetworkUtils::AddNetworkSearchCallBack(int64_t index, std::shared_ptr<Netwo
 
 int64_t NetworkUtils::GetCallbackIndex64bit()
 {
-    if (callbackIndex64bit_ > MAX_INDEX) {
-        callbackIndex64bit_ = 0;
+    if (callbackIndex64bit_ > MAX_INDEX || callbackIndex64bit_ < MIN_INDEX) {
+        callbackIndex64bit_ = MIN_INDEX;
     }
     return ++callbackIndex64bit_;
 }
