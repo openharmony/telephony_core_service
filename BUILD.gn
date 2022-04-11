@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -20,6 +20,8 @@ TELEPHONY_NETWORK_SEARCH_ROOT =
     "//base/telephony/core_service/services/network_search"
 TELEPHONY_SIM_ROOT = "//base/telephony/core_service/services/sim"
 TELEPHONY_TEL_RIL_ROOT = "//base/telephony/core_service/services/tel_ril"
+TELEPHONY_IMS_CORE_SERVICE_SRC_PATH =
+    "$TELEPHONY_CORE_SERVICE_ROOT/services/ims_service_interaction/src"
 
 ohos_shared_library("tel_core_service") {
   install_enable = true
@@ -27,6 +29,9 @@ ohos_shared_library("tel_core_service") {
   sources = [
     "$TELEPHONY_CORE_SERVICE_ROOT/services/core/src/core_service.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/core/src/core_service_stub.cpp",
+    "$TELEPHONY_IMS_CORE_SERVICE_SRC_PATH/ims_core_service_callback_stub.cpp",
+    "$TELEPHONY_IMS_CORE_SERVICE_SRC_PATH/ims_core_service_client.cpp",
+    "$TELEPHONY_IMS_CORE_SERVICE_SRC_PATH/ims_core_service_proxy.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/cell_info.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_register.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_callback_proxy.cpp",
@@ -102,19 +107,12 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_NETWORK_SEARCH_ROOT/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/utils/log/include",
     "$TELEPHONY_SIM_ROOT/include",
-    "//utils/native/base/include",
-    "//utils/system/safwk/native/include",
-    "//base/notification/ces_standard/cesfwk/kits/native/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
-    "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content/",
     "//third_party/icu/icu4c/source/common/unicode",
     "//third_party/icu/icu4c/source/common",
-    "//base/global/i18n/interfaces/native/inner_apis/zone/include",
     "//third_party/libphonenumber/cpp/src",
     "//third_party/protobuf/src",
     "//third_party/protobuf/src/google",
     "//third_party/protobuf/src/google/protobuf",
-    "//base/global/resmgr_standard/interfaces/innerkits/include/",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
@@ -125,28 +123,27 @@ ohos_shared_library("tel_core_service") {
   ]
 
   deps = [
-    "$hdf_uhdf_path/hdi:libhdi",
-    "//base/global/i18n/frameworks/zone:zone_util",
-    "//base/miscservices/time/services:time_service",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
     "//base/telephony/core_service/utils:libtel_common",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager:dataobs_manager",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
     "//third_party/libxml2:libxml2",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
     "ability_runtime:wantagent_innerkits",
+    "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
     "ces_standard:cesfwk_services",
+    "device_driver_framework:libhdf_utils",
+    "device_driver_framework:libhdi",
     "eventhandler:libeventhandler",
+    "i18n:zone_util",
     "ipc:ipc_core",
     "native_appdatamgr:native_dataability",
     "native_appdatamgr:native_rdb",
@@ -156,6 +153,8 @@ ohos_shared_library("tel_core_service") {
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
     "startup_l2:syspara",
+    "time_native:time_service",
+    "utils_base:utils",
   ]
 
   if (is_standard_system) {
