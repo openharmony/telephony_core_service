@@ -36,7 +36,7 @@
                 "ces_standard",
                 "device_driver_framework",
                 "dmsfwk_standard",
-                "i18n_standard",
+                "i18n",
                 "ipc",
                 "native_appdatamgr",
                 "power_manager_native",
