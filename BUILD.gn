@@ -109,7 +109,7 @@ ohos_shared_library("tel_core_service") {
     "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content/",
     "//third_party/icu/icu4c/source/common/unicode",
     "//third_party/icu/icu4c/source/common",
-    "//base/global/i18n_standard/interfaces/native/innerkits/zone/include",
+    "//base/global/i18n/interfaces/native/innerkits/zone/include",
     "//third_party/libphonenumber/cpp/src",
     "//third_party/protobuf/src",
     "//third_party/protobuf/src/google",
@@ -126,7 +126,7 @@ ohos_shared_library("tel_core_service") {
 
   deps = [
     "$hdf_uhdf_path/hdi:libhdi",
-    "//base/global/i18n_standard/frameworks/zone:zone_util",
+    "//base/global/i18n/frameworks/zone:zone_util",
     "//base/miscservices/time/services:time_service",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
     "//base/telephony/core_service/utils:libtel_common",
