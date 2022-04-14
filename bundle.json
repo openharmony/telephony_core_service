@@ -47,7 +47,7 @@
                 "startup_l2",
                 "utils_base"
             ],
-            "third_party": [
+            "third_party": [ "libphonenumber"
             ]
         },
         "build": {
