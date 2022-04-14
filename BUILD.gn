@@ -109,7 +109,7 @@ ohos_shared_library("tel_core_service") {
     "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content/",
     "//third_party/icu/icu4c/source/common/unicode",
     "//third_party/icu/icu4c/source/common",
-    "//base/global/i18n/interfaces/native/innerkits/zone/include",
+    "//base/global/i18n/interfaces/native/inner_apis/zone/include",
     "//third_party/libphonenumber/cpp/src",
     "//third_party/protobuf/src",
     "//third_party/protobuf/src/google",
