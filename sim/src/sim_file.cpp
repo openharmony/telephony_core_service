@@ -292,7 +292,7 @@ void SimFile::ProcessSpnGeneral(const AppExecFwk::InnerEvent::Pointer &event)
         if (spn.empty() || spn.size() == 0) {
             spnStatus_ = SpnStatus::OBTAIN_OPERATOR_NAMESTRING;
         } else {
-            TELEPHONY_LOGI("SimFile Load Spn3Gpp done: %{public}s", spn.c_str());
+            TELEPHONY_LOGI("SimFile Load Spn3Gpp done");
             spnStatus_ = SpnStatus::OBTAIN_SPN_NONE;
         }
     } else {
@@ -343,7 +343,7 @@ void SimFile::ProcessSpnShortCphs(const AppExecFwk::InnerEvent::Pointer &event)
             TELEPHONY_LOGI("SimFile No SPN loaded");
         } else {
             displayConditionOfSpn_ = SPN_COND;
-            TELEPHONY_LOGI("SimFile Load ELEMENTARY_FILE_SPN_SHORT_CPHS: %{public}s", spn.c_str());
+            TELEPHONY_LOGI("SimFile Load ELEMENTARY_FILE_SPN_SHORT_CPHS");
         }
     } else {
         UpdateSPN(NULLSTR);
