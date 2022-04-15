@@ -49,7 +49,7 @@ ohos_shared_library("libtel_common") {
   public_configs = [ ":tel_utils_config" ]
 
   public_deps = [
-    "//foundation/distributeddatamgr/appdatamgr/interfaces/innerkits/native_preferences:native_preferences",
+    "//foundation/distributeddatamgr/appdatamgr/interfaces/inner_api/native/preferences:native_preferences",
     "//utils/native/base:utils",
   ]
 
