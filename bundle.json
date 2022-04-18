@@ -64,19 +64,26 @@
             "inner_kits": [
                 {
                     "header": {
-                        "header_base" : "//base/telephony/core_service/interfaces/innerkits/include",
+                        "header_base" : "//base/telephony/core_service/interfaces/innerkits",
                         "header_files": [
-                            "core_service_client.h",
-                            "i_core_service.h",
-                            "telephony_errors.h",
-                            "cell_information.h",
-                            "cell_location.h",
-                            "network_information.h",
-                            "network_search_result.h",
-                            "network_state.h",
-                            "signal_information.h",
-                            "dialling_numbers_info.h",
-                            "sim_state_type.h"
+                            "include/core_service_client.h",
+                            "include/i_core_service.h",
+                            "include/telephony_errors.h",
+                            "include/cell_information.h",
+                            "include/cell_location.h",
+                            "include/network_information.h",
+                            "include/network_search_result.h",
+                            "include/network_state.h",
+                            "include/signal_information.h",
+                            "include/dialling_numbers_info.h",
+                            "include/sim_state_type.h",
+                            "ims/include/ims_core_service_callback_interface.h",
+                            "ims/include/ims_core_service_callback_proxy.h",
+                            "ims/include/ims_core_service_callback_stub.h",
+                            "ims/include/ims_core_service_client.h",
+                            "ims/include/ims_core_service_interface.h",
+                            "ims/include/ims_core_service_proxy.h",
+                            "ims/include/ims_core_service_types.h"
                         ]
                     },
                     "name":"//base/telephony/core_service/interfaces/innerkits:tel_core_service_api"
