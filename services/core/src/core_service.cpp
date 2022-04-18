@@ -20,6 +20,7 @@
 #include "system_ability_definition.h"
 
 #include "core_manager_inner.h"
+#include "ims_core_service_client.h"
 #include "network_search_manager.h"
 #include "sim_manager.h"
 #include "network_search_manager.h"
@@ -89,6 +90,8 @@ bool CoreService::Init()
     }
     simManager_->SetNetworkSearchManager(slotCount, networkSearchManager_);
     CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
+    // connect ims_service
+    DelayedSingleton<ImsCoreServiceClient>::GetInstance()->Init();
     TELEPHONY_LOGI("CoreService::Init success");
     return true;
 }

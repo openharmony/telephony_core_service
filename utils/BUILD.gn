@@ -25,6 +25,7 @@ config("tel_utils_config") {
   include_dirs = [
     "common/include",
     "preferences/include",
+    "log/include",
   ]
 }
 
