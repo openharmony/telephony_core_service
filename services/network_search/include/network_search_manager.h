@@ -64,6 +64,7 @@ struct NetworkSearchManagerInner {
     FrequencyType freqType_ = FrequencyType::FREQ_TYPE_UNKNOWN;
     RadioCapabilityInfo radioCapability_;
     std::mutex mutex_;
+    bool isRadioFirstPowerOn_ = true;
 
     bool RegisterSetting();
     bool UnRegisterSetting();
@@ -189,6 +190,8 @@ public:
     std::shared_ptr<NetworkSearchManagerInner> FindManagerInner(int32_t slotId);
     void SetLocateUpdate(int32_t slotId);
     bool GetAirplaneMode();
+    bool IsRadioFirstPowerOn(int32_t slotId);
+    void SetRadioFirstPowerOn(int32_t slotId, bool isFirstPowerOn);
 
     inline void InitMsgNum(int32_t slotId)
     {
