@@ -90,6 +90,7 @@ void RadioInfo::ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &even
     }
     MessageParcel data;
     int64_t index = 0;
+    ModemPowerState radioState = ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;
     bool result = true;
     data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
     if (responseInfo != nullptr) {
@@ -106,6 +107,7 @@ void RadioInfo::ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &even
     if (object != nullptr) {
         TELEPHONY_LOGI("RadioInfo::ProcessSetRadioState ok slotId:%{public}d", slotId_);
         index = object->flag;
+        radioState = (ModemPowerState)object->flag;
         result = true;
         if (!data.WriteBool(result) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
             NetworkUtils::RemoveCallbackFromMap(index);
@@ -118,6 +120,7 @@ void RadioInfo::ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &even
     if (callbackInfo != nullptr) {
         if (result) {
             nsm->SetRadioStateValue(slotId_, (ModemPowerState)(callbackInfo->param_));
+            radioState = (ModemPowerState)callbackInfo->param_;
         }
         sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchItem_;
         if (callback != nullptr && callback->OnNetworkSearchCallback(
@@ -126,10 +129,31 @@ void RadioInfo::ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &even
         }
         NetworkUtils::RemoveCallbackFromMap(index);
     } else {
-        int32_t networkMode = nsm->GetPreferredNetworkValue(slotId_);
-        nsm->SetPreferredNetwork(slotId_, networkMode);
         nsm->SetLocateUpdate(slotId_);
     }
+    if (result) {
+        RadioFirstPowerOn(nsm, radioState);
+    }
+}
+
+void RadioInfo::RadioFirstPowerOn(std::shared_ptr<NetworkSearchManager> &nsm, ModemPowerState radioState) const
+{
+    TELEPHONY_LOGI("RadioInfo::RadioFirstPowerOn radioState:%{public}d, slotId:%{public}d", (int)radioState, slotId_);
+    if (radioState != ModemPowerState::CORE_SERVICE_POWER_ON) {
+        return;
+    }
+    if (!nsm->IsRadioFirstPowerOn(slotId_)) {
+        return;
+    }
+    nsm->SetRadioFirstPowerOn(slotId_, false);
+
+    UpdatePreferredNetwork(nsm, radioState);
+}
+
+void RadioInfo::UpdatePreferredNetwork(std::shared_ptr<NetworkSearchManager> &nsm, ModemPowerState radioState) const
+{
+    int32_t networkMode = nsm->GetPreferredNetworkValue(slotId_);
+    nsm->SetPreferredNetwork(slotId_, networkMode);
 }
 
 void RadioInfo::ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) const
