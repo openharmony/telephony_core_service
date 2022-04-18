@@ -16,8 +16,6 @@
 #ifndef TEL_RIL_MANAGER_H
 #define TEL_RIL_MANAGER_H
 
-#include <iservice_registry.h>
-#include <iservmgr_hdi.h>
 #include <singleton.h>
 
 #include "i_tel_ril_manager.h"
