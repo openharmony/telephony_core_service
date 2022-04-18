@@ -1017,6 +1017,25 @@ void NetworkSearchManager::DcPhysicalLinkActiveUpdate(int32_t slotId, bool isAct
     }
 }
 
+bool NetworkSearchManager::IsRadioFirstPowerOn(int32_t slotId)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner != nullptr) {
+        std::lock_guard<std::mutex> lock(inner->mutex_);
+        return inner->isRadioFirstPowerOn_;
+    }
+    return false;
+}
+
+void NetworkSearchManager::SetRadioFirstPowerOn(int32_t slotId, bool isFirstPowerOn)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner != nullptr) {
+        std::lock_guard<std::mutex> lock(inner->mutex_);
+        inner->isRadioFirstPowerOn_ = isFirstPowerOn;
+    }
+}
+
 std::shared_ptr<NetworkSearchManagerInner> NetworkSearchManager::FindManagerInner(int32_t slotId)
 {
     {
