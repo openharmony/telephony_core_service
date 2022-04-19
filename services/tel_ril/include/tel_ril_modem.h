@@ -48,9 +48,11 @@ public:
     int32_t GetImei(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetMeid(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetImeiResponse(MessageParcel &data);
     int32_t GetMeidResponse(MessageParcel &data);
     int32_t GetVoiceRadioTechnologyResponse(MessageParcel &data);
+    int32_t GetBasebandVersionResponse(MessageParcel &data);
     bool IsCommonRespOrNotify(uint32_t code);
     ModemPowerState radioState_ = ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;
 
