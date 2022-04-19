@@ -99,6 +99,7 @@ enum class DiffInterfaceId {
     TEST_GET_PREFERRED_NETWORK_TYPE,
     TEST_SET_PREFERRED_NETWORK_TYPE,
     TEST_GET_IMEI,
+    TEST_GET_BASEBAND_VERSION,
     TEST_GET_MEID,
     TEST_GET_IMS_REG_STATUS,
     TEST_GET_IMS_CALL_LIST,
@@ -299,6 +300,7 @@ public:
     void OnRequestSetPreferredNetworkTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetPreferredNetworkTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetImeiTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestGetBasebandVersionTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetMeidTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetImsRegStatusTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetCsRegStatusTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -343,6 +345,7 @@ public:
 
     private:
         int32_t slotId_;
+        void OnRequestGetBasebandVersionTestResponse(const AppExecFwk::InnerEvent::Pointer &event);
     };
 
 private:
@@ -487,6 +490,7 @@ void TelRilTest::OnInitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE] = &TelRilTest::OnRequestSetPreferredNetworkTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_IMS_REG_STATUS] = &TelRilTest::OnRequestGetImsRegStatusTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_IMEI] = &TelRilTest::OnRequestGetImeiTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_BASEBAND_VERSION] = &TelRilTest::OnRequestGetBasebandVersionTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_MEID] = &TelRilTest::OnRequestGetMeidTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_CS_REG_STATUS] = &TelRilTest::OnRequestGetCsRegStatusTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_PS_REG_STATUS] = &TelRilTest::OnRequestGetPsRegStatusTest;
@@ -1549,6 +1553,21 @@ void TelRilTest::OnRequestGetImeiTest(int32_t slotId, const std::shared_ptr<AppE
     }
 }
 
+void TelRilTest::OnRequestGetBasebandVersionTest(int32_t slotId,
+    const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_BASEBAND_VERSION);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestGetBasebandVersionTest -->");
+        telRilManager_->GetBasebandVersion(slotId, event);
+        TELEPHONY_LOGI(
+            "TelRilTest::OnRequestGetBasebandVersionTest --> "
+            "OnRequestGetBasebandVersionTest finished");
+    }
+}
+
 void TelRilTest::OnRequestGetMeidTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
@@ -1975,9 +1994,22 @@ void TelRilTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
             TELEPHONY_LOGI("close logical channel done");
             break;
         }
+        case uint32_t(DiffInterfaceId::TEST_GET_BASEBAND_VERSION): {
+            OnRequestGetBasebandVersionTestResponse(event);
+            break;
+        }
         default:
             break;
     }
+}
+
+void TelRilTest::DemoHandler::OnRequestGetBasebandVersionTestResponse(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<HRilStringParcel> basebandVersion = event->GetSharedObject<HRilStringParcel>();
+    if (basebandVersion != nullptr) {
+        TELEPHONY_LOGI("test get baseband version:%{public}s", basebandVersion->data.c_str());
+    }
+    TELEPHONY_LOGI("test get baseband version done");
 }
 
 void TelRilTest::OnRequestGetImsCallListTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
@@ -2153,6 +2185,7 @@ void Promote()
     cout << (int32_t)DiffInterfaceId::TEST_SET_POWER_STATE << " --> OnRequestSetRadioStateTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_POWER_STATE << " --> OnRequestGetRadioStateTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_IMEI << "--> OnRequestGetImeiTest" << endl;
+    cout << (int32_t)DiffInterfaceId::TEST_GET_BASEBAND_VERSION << "--> OnRequestGetBasebandVersionTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_MEID << "--> OnRequestGetMeidTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO << "--> OnRequestGetVoiceRadioTechnology" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_EXIT << "--> Exit" << endl << endl; // exit

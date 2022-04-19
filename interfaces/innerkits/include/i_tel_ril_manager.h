@@ -142,6 +142,8 @@ public:
 
     virtual int32_t GetPhysicalChannelConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
+    virtual int32_t GetBasebandVersion(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
+
     virtual int32_t SetLocateUpdates(
         int32_t slotId, HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     /**
