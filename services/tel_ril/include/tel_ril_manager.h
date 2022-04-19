@@ -162,6 +162,9 @@ public:
 
     int32_t SetLocateUpdates(
         int32_t slotId, HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response) override;
+
+    int32_t GetBasebandVersion(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+
     /**
      * @brief  Send Sms
      */

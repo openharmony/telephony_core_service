@@ -351,6 +351,11 @@ int32_t TelRilManager::GetMeid(int32_t slotId, const AppExecFwk::InnerEvent::Poi
     return TaskSchedule(response, "TelRilModem", GetTelRilModem(slotId), &TelRilModem::GetMeid);
 }
 
+int32_t TelRilManager::GetBasebandVersion(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilModem", GetTelRilModem(slotId), &TelRilModem::GetBasebandVersion);
+}
+
 /*********************** TelRilModem end ***************************/
 /*********************** TelRilCall start **************************/
 int32_t TelRilManager::Dial(

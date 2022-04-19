@@ -32,6 +32,7 @@ void TelRilModem::AddHandlerToMap()
     memberFuncMap_[HREQ_MODEM_GET_IMEI] = &TelRilModem::GetImeiResponse;
     memberFuncMap_[HREQ_MODEM_GET_MEID] = &TelRilModem::GetMeidResponse;
     memberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &TelRilModem::GetVoiceRadioTechnologyResponse;
+    memberFuncMap_[HREQ_MODEM_GET_BASEBAND_VERSION] = &TelRilModem::GetBasebandVersionResponse;
 }
 
 TelRilModem::TelRilModem(int32_t slotId, sptr<IRemoteObject> cellularRadio,
@@ -106,6 +107,11 @@ int32_t TelRilModem::GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Point
     return Request(TELEPHONY_LOG_FUNC_NAME, response, (uint32_t)HREQ_MODEM_GET_VOICE_RADIO);
 }
 
+int32_t TelRilModem::GetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, (uint32_t)HREQ_MODEM_GET_BASEBAND_VERSION);
+}
+
 int32_t TelRilModem::GetImeiResponse(MessageParcel &data)
 {
     return Response<HRilStringParcel>(TELEPHONY_LOG_FUNC_NAME, data);
@@ -119,6 +125,11 @@ int32_t TelRilModem::GetMeidResponse(MessageParcel &data)
 int32_t TelRilModem::GetVoiceRadioTechnologyResponse(MessageParcel &data)
 {
     return Response<VoiceRadioTechnology>(TELEPHONY_LOG_FUNC_NAME, data);
+}
+
+int32_t TelRilModem::GetBasebandVersionResponse(MessageParcel &data)
+{
+    return Response<HRilStringParcel>(TELEPHONY_LOG_FUNC_NAME, data);
 }
 
 int32_t TelRilModem::RadioStateUpdated(MessageParcel &data)
