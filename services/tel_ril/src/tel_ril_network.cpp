@@ -36,6 +36,7 @@ void TelRilNetwork::AddHandlerToMap()
     memberFuncMap_[HNOTI_NETWORK_IMS_REG_STATUS_UPDATED] = &TelRilNetwork::NetworkImsRegStatusUpdated;
     memberFuncMap_[HNOTI_NETWORK_PS_REG_STATUS_UPDATED] = &TelRilNetwork::NetworkPsRegStatusUpdated;
     memberFuncMap_[HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED] = &TelRilNetwork::NetworkPhyChnlCfgUpdated;
+    memberFuncMap_[HNOTI_NETWORK_CURRENT_CELL_UPDATED] = &TelRilNetwork::NetworkCurrentCellUpdated;
 
     // response
     memberFuncMap_[HREQ_NETWORK_GET_IMS_REG_STATUS] = &TelRilNetwork::GetImsRegStatusResponse;
