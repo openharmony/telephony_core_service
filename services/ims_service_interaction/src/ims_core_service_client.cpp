@@ -41,6 +41,16 @@ void ImsCoreServiceClient::Init()
     RegisterImsCoreServiceCallback();
 }
 
+int32_t ImsCoreServiceClient::GetImsRegistrationStatus(int32_t slotId)
+{
+    if (imsCoreServiceProxy_ != nullptr) {
+        return imsCoreServiceProxy_->GetImsRegistrationStatus(slotId);
+    } else {
+        TELEPHONY_LOGE("imsCoreServiceProxy_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
 sptr<ImsCoreServiceInterface> ImsCoreServiceClient::GetImsCoreServiceProxy()
 {
     if (imsCoreServiceProxy_ != nullptr) {
