@@ -39,6 +39,7 @@ public:
      */
     bool IsConnect() const;
     void Init();
+    int32_t GetImsRegistrationStatus(int32_t slotId);
     int32_t RegisterImsCoreServiceCallback();
 
 private:

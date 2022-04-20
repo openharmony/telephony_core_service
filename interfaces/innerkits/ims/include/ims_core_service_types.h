@@ -27,9 +27,27 @@ enum ImsErrType {
     IMS_FAILED = 1,
 };
 
+enum RadioTechFamily {
+    RADIO_TECH_FAMILY_3GPP = 0,
+    RADIO_TECH_FAMILY_3GPP2 = 1,
+};
+
 struct ImsResponseInfo {
     int32_t slotId;
     ImsErrType error;
+};
+
+struct ImsServiceStatus {
+    bool supportImsVoice;
+    bool supportImsVideo;
+    bool supportImsUt;
+    bool supportImsSms;
+    bool supportImsCallComposer;
+};
+
+struct ImsRegistrationStatus {
+    bool isRegisterd;
+    RadioTechFamily radioTechFamily;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -26,6 +26,38 @@ class ImsCoreServiceCallbackInterface : public IRemoteBroker {
 public:
     virtual ~ImsCoreServiceCallbackInterface() = default;
 
+    enum {
+        /****************** ims core ability ******************/
+        IMS_SERVICE_STATUS_REPORT = 0,
+        IMS_REGISTRATION_STATUS_RESPONSE,
+        IMS_NETWORK_STATE_CHANGE_REPORT,
+    };
+
+    /**
+     * ImsServiceStatusReport
+     *
+     * @param imsServiceStatus contains the ability of ims Voice/Video/Ut/Sms/CallComposer
+     * @return Returns nullptr on failure, others on success.
+     */
+    virtual int32_t ImsServiceStatusReport(int32_t slotId, const ImsServiceStatus &imsServiceStatus) = 0;
+
+    /**
+     * ImsNetworkStateChange
+     *
+     * @param slotId
+     * @return Returns nullptr on failure, others on success.
+     */
+    virtual int32_t ImsNetworkStateChange(int32_t slotId) = 0;
+
+    /**
+     * ImsRegistrationStatusResponse
+     *
+     * @param imsRegStatus
+     * @return Returns nullptr on failure, others on success.
+     */
+    virtual int32_t ImsRegistrationStatusResponse(
+        const ImsResponseInfo &info, const ImsRegistrationStatus &imsRegStatus) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ImsCoreServiceCallback");
 };
