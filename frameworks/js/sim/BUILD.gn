@@ -35,7 +35,7 @@ ohos_shared_library("sim") {
   deps = [
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
-    "//foundation/ace/napi:ace_napi",
+    "//foundation/arkui/napi:ace_napi",
     "//utils/native/base:utils",
   ]
 
