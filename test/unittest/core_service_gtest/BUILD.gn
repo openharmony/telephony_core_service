@@ -46,7 +46,7 @@ ohos_unittest("tel_core_service_gtest") {
   ]
 
   external_deps = [
-    "ces_standard:cesfwk_innerkits",
+    "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "ril_adapter:hril_innerkits",
