@@ -273,7 +273,7 @@ void OperatorName::PublishEvent(const int32_t rule, const RegServiceState state,
     TELEPHONY_LOGI(
         "OperatorName::PublishEvent %{public}s %{public}s slotId:%{public}d", plmn.c_str(), spn.c_str(), slotId_);
     Want want;
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SPN_INFO_UPDATED);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SPN_INFO_CHANGED);
     want.SetParam(CUR_SPN_SHOW_RULE, rule);
     want.SetParam(CUR_REG_STATE, static_cast<int32_t>(state));
     want.SetParam(CUR_PLMN_SHOW, showPlmn);

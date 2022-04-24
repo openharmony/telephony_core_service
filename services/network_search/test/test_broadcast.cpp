@@ -25,7 +25,7 @@ void TestBroadCast::OnReceiveEvent(const CommonEventData &data)
     TELEPHONY_LOGI("TestBroadCast::OnReceiveEvent:event=%{public}s, data=%{public}s, code=%{public}d",
         data.GetWant().GetAction().c_str(), data.GetData().c_str(), data.GetCode());
     auto eventName = data.GetWant().GetAction();
-    if (eventName.compare(EventFwk::CommonEventSupport::COMMON_EVENT_SPN_INFO_UPDATED) == 0 &&
+    if (eventName.compare(EventFwk::CommonEventSupport::COMMON_EVENT_SPN_INFO_CHANGED) == 0 &&
         MSG_NS_SPN_UPDATED == data.GetCode()) {
         std::string target = data.GetData();
         int32_t rule = data.GetWant().GetIntParam(CUR_SPN_SHOW_RULE, 0);
