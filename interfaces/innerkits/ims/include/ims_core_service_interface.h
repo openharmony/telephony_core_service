@@ -29,10 +29,21 @@ enum ImsServiceProxyType {
 class ImsCoreServiceInterface : public IRemoteBroker {
 public:
     enum {
+        /****************** core basic ******************/
+        IMS_GET_REGISTRATION_STATUS = 0,
+
         /****************** callback ******************/
         IMS_REGISTER_CALLBACK = 100,
         IMS_GET_PROXY_OBJECT_PTR,
     };
+
+    /**
+     * GetImsRegistrationStatus
+     *
+     * @param slotId
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t GetImsRegistrationStatus(int32_t slotId) = 0;
 
     /**
      * Register CallBack

@@ -26,6 +26,7 @@ class ImsCoreServiceProxy : public IRemoteProxy<ImsCoreServiceInterface> {
 public:
     explicit ImsCoreServiceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<ImsCoreServiceInterface>(impl) {}
     ~ImsCoreServiceProxy() = default;
+    int32_t GetImsRegistrationStatus(int32_t slotId) override;
     int32_t RegisterImsCoreServiceCallback(const sptr<ImsCoreServiceCallbackInterface> &callback) override;
     sptr<IRemoteObject> GetProxyObjectPtr(ImsServiceProxyType proxyType) override;
 

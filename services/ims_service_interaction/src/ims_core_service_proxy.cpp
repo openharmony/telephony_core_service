@@ -21,6 +21,27 @@
 
 namespace OHOS {
 namespace Telephony {
+int32_t ImsCoreServiceProxy::GetImsRegistrationStatus(int32_t slotId)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    if (!in.WriteInterfaceToken(ImsCoreServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor token fail!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!in.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("write slotId fail!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+
+    int32_t error = Remote()->SendRequest(IMS_GET_REGISTRATION_STATUS, in, out, option);
+    if (error == ERR_NONE) {
+        return out.ReadInt32();
+    }
+    return error;
+}
+
 int32_t ImsCoreServiceProxy::RegisterImsCoreServiceCallback(const sptr<ImsCoreServiceCallbackInterface> &callback)
 {
     if (callback == nullptr) {
