@@ -560,7 +560,7 @@ void Init()
 void InitBroadCast()
 {
     MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SPN_INFO_UPDATED);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SPN_INFO_CHANGED);
     CommonEventSubscribeInfo subscribeInfo(matchingSkills);
     subscribeInfo.SetPriority(1);
     subscriber = std::make_shared<TestBroadCast>(subscribeInfo);
