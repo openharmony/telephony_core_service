@@ -290,6 +290,8 @@ public:
     int32_t SetMute(int32_t slotId, const int32_t mute, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetMute(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetEmergencyCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SetEmergencyCallList(int32_t slotId, std::vector<EmergencyCall>  &eccVec,
+        const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetCallFailReason(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SimOpenLogicalChannel(int32_t slotId, const std::string &appID, const int32_t p2,
         const AppExecFwk::InnerEvent::Pointer &response) override;
