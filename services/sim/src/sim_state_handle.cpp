@@ -439,6 +439,7 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         case RadioEvent::RADIO_STATE_CHANGED:
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
             ObtainIccStatus(slotId_);
+            GetSimCardData(event, slotId_);
             break;
         case MSG_SIM_GET_ICC_STATUS_DONE:
             GetSimCardData(event, slotId_);

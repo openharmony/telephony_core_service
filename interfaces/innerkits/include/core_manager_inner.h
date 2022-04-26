@@ -141,6 +141,8 @@ public:
         const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetEmergencyCallList(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
+    int32_t SetEmergencyCallList(int32_t slotId, int32_t eventId, std::vector<EmergencyCall>  &eccVec,
+        const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetCallFailReason(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetOperatorInfo(

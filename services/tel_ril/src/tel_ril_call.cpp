@@ -67,6 +67,7 @@ void TelRilCall::AddHandlerToMap()
     memberFuncMap_[HREQ_CALL_SET_MUTE] = &TelRilCall::SetMuteResponse;
     memberFuncMap_[HREQ_CALL_GET_MUTE] = &TelRilCall::GetMuteResponse;
     memberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] = &TelRilCall::GetEmergencyCallListResponse;
+    memberFuncMap_[HREQ_CALL_SET_EMERGENCY_LIST] = &TelRilCall::SetEmergencyCallListResponse;
     memberFuncMap_[HREQ_CALL_GET_FAIL_REASON] = &TelRilCall::GetCallFailReasonResponse;
 }
 
@@ -1933,6 +1934,79 @@ int32_t TelRilCall::GetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &
     }
 
     return SendInt32Event(HREQ_CALL_GET_EMERGENCY_LIST, telRilRequest->serialId_);
+}
+
+int32_t TelRilCall::SetEmergencyCallList(std::vector<EmergencyCall>  &eccVec,
+    const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGE("SetEmergencyCallList begin");
+    std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_SET_EMERGENCY_LIST, result);
+    if (telRilRequest == nullptr) {
+        TELEPHONY_LOGE(" SetEmergencyCallList telRilRequest is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("SetEmergencyCallList %{public}s  cellularRadio_ == nullptr", __func__);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    EmergencyInfoList emergencyInfoList;
+    emergencyInfoList.callSize = eccVec.size();
+    emergencyInfoList.flag =  telRilRequest->serialId_;
+    int index = 1;
+    for (EmergencyCall ecc : eccVec) {
+        EmergencyInfo emergencyInfo = {};
+        emergencyInfo.index = index;
+        emergencyInfo.total = eccVec.size();
+        emergencyInfo.eccNum  = ecc.eccNum;
+        emergencyInfo.category = static_cast<int32_t>(ecc.eccType);
+        emergencyInfo.simpresent = static_cast<int32_t>(ecc.simpresent);
+        emergencyInfo.mcc = ecc.mcc;
+        emergencyInfo.abnormalService = static_cast<int32_t>(ecc.abnormalService);
+        index++;
+        emergencyInfoList.calls.push_back(emergencyInfo);
+    }
+
+    for (auto ecc : emergencyInfoList.calls) {
+        TELEPHONY_LOGE("SetEmergencyCallList, data: eccNum %{public}s mcc %{public}s",
+            ecc.eccNum.c_str(), ecc.mcc.c_str());
+    }
+    int32_t ret = SendBufferEvent(HREQ_CALL_SET_EMERGENCY_LIST, emergencyInfoList);
+    TELEPHONY_LOGI("Send (ID:%{public}d) return: %{public}d", HREQ_CALL_SET_EMERGENCY_LIST, ret);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t TelRilCall::SetEmergencyCallListResponse(MessageParcel &data)
+{
+    TELEPHONY_LOGE("SetEmergencyCallListResponse");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : spBuffer is nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    const struct HRilRadioResponseInfo *radioResponseInfo =
+        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
+    if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        if (radioResponseInfo->error == HRilErrType::NONE) {
+            std::shared_ptr<HRilRadioResponseInfo> result = std::make_shared<HRilRadioResponseInfo>();
+            const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR : handler is nullptr !!!");
+                return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            }
+            uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
+            result->error = radioResponseInfo->error;
+            handler->SendEvent(eventId, result);
+        } else {
+            ErrorResponse(telRilRequest, *radioResponseInfo);
+        }
+    } else {
+        TELEPHONY_LOGE("ERROR : telRilRequest is nullptr || radioResponseInfo error !");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t TelRilCall::GetEmergencyCallListResponse(MessageParcel &data)
