@@ -24,7 +24,6 @@ ohos_shared_library("radio") {
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
     "$SUBSYSTEM_DIR/core_service/common/sim",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/include",
     "//foundation/aafwk/standard/frameworks/kits/ability/native/include",
     "//foundation/aafwk/standard/interfaces/innerkits/base/include/ohos/aafwk/base",
   ]

@@ -20,7 +20,6 @@ ohos_shared_library("sim") {
     "$SUBSYSTEM_DIR/core_service/interfaces/kits/native",
     "//utils/native/base/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/include",
     "//foundation/aafwk/standard/frameworks/kits/ability/native/include",
     "//foundation/aafwk/standard/interfaces/innerkits/base/include/ohos/aafwk/base",
   ]
