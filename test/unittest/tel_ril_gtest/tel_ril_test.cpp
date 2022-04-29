@@ -25,6 +25,10 @@ using namespace testing::ext;
 namespace OHOS {
 namespace Telephony {
 const std::string GTEST_STRING = "1234";
+const std::string GTEST_STRING_PIN1 = "1234";
+const std::string GTEST_STRING_PIN2 = "80785121";
+const std::string GTEST_STRING_PUK1 = "19467362";
+const std::string GTEST_STRING_PUK2 = "19467362";
 const int32_t PW_LEN = 4;
 const int32_t DECIMAL = 10;
 const int32_t PHONE_NUM_LEN = 11;
@@ -143,12 +147,18 @@ void TelRilTest::InitSim()
     memberFuncMap_[DiffInterfaceId::TEST_GET_IMSI] = &TelRilTest::SimGetImsiTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_SIM_LOCK_STATUS] = &TelRilTest::GetSimLockStatusTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_SIM_LOCK] = &TelRilTest::SetSimLockTest;
+    memberFuncMap_[DiffInterfaceId::TEST_UNSET_SIM_LOCK] = &TelRilTest::UnSetSimLockTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_CHANGE_SIM_PASSWD] = &TelRilTest::ChangeSimPasswordTest;
     memberFuncMap_[DiffInterfaceId::TEST_ENTER_SIM_PIN] = &TelRilTest::EnterSimPinTest;
+    memberFuncMap_[DiffInterfaceId::TEST_RADIO_RESTART] = &TelRilTest::RadioRestartTest;
+    memberFuncMap_[DiffInterfaceId::TEST_ENTER_ERROR_PIN] = &TelRilTest::EnterErrorPinTest;
     memberFuncMap_[DiffInterfaceId::TEST_UNLOCK_SIM_PIN] = &TelRilTest::UnlockSimPinTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_PIN_INPUT_TIMES] = &TelRilTest::GetSimPinInputTimesTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_PIN2_LOCK] = &TelRilTest::SetPin2LockTest;
     memberFuncMap_[DiffInterfaceId::TEST_ENTER_SIM_PIN2] = &TelRilTest::EnterSimPin2Test;
+    memberFuncMap_[DiffInterfaceId::TEST_ENTER_ERROR_PIN2] = &TelRilTest::EnterErrorPin2Test;
     memberFuncMap_[DiffInterfaceId::TEST_UNLOCK_SIM_PIN2] = &TelRilTest::UnlockSimPin2Test;
+    memberFuncMap_[DiffInterfaceId::TEST_UNSET_PIN2_LOCK] = &TelRilTest::UnSetPin2LockTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_PIN2_INPUT_TIMES] = &TelRilTest::GetSimPin2InputTimesTest;
     memberFuncMap_[DiffInterfaceId::TEST_ENABLE_SIM_CARD] = &TelRilTest::EnableSimCardTest;
 }
@@ -300,7 +310,7 @@ void TelRilTest::GetSimLockStatusTest(const std::shared_ptr<AppExecFwk::EventHan
     auto event = AppExecFwk::InnerEvent::Get(eventId);
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        std::string fac = GTEST_STRING;
+        std::string fac = FAC_PIN_LOCK;
         TELEPHONY_LOGI("TelRilTest::GetSimLockStatusTest -->");
         telRilManager_->GetSimLockStatus(slotId_, fac, event);
         TELEPHONY_LOGI("TelRilTest::GetSimLockStatusTest --> finished");
@@ -321,12 +331,35 @@ void TelRilTest::SetSimLockTest(const std::shared_ptr<AppExecFwk::EventHandler> 
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
         SimLockParam simLockParam;
-        simLockParam.fac = GTEST_STRING;
-        simLockParam.mode = 0;
-        simLockParam.passwd = GTEST_STRING;
+        simLockParam.fac = FAC_PIN_LOCK;
+        simLockParam.mode = static_cast<int32_t>(LockState::LOCK_ON);
+        simLockParam.passwd = GTEST_STRING_PIN1;
         TELEPHONY_LOGI("TelRilTest::SetSimLockTest -->");
         telRilManager_->SetSimLock(slotId_, simLockParam, event);
         TELEPHONY_LOGI("TelRilTest::SetSimLockTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief UnSet SIM card lock status
+ *
+ * @param application
+ */
+void TelRilTest::UnSetSimLockTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SIM_SET_LOCK);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        SimLockParam simLockParam;
+        simLockParam.fac = FAC_PIN_LOCK;
+        simLockParam.mode = static_cast<int32_t>(LockState::LOCK_OFF);
+        simLockParam.passwd = GTEST_STRING_PIN1;
+        TELEPHONY_LOGI("TelRilTest::UnSetSimLockTest -->");
+        telRilManager_->SetSimLock(slotId_, simLockParam, event);
+        TELEPHONY_LOGI("TelRilTest::UnSetSimLockTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }
@@ -345,14 +378,41 @@ void TelRilTest::ChangeSimPasswordTest(const std::shared_ptr<AppExecFwk::EventHa
         event->SetOwner(handler);
         SimPasswordParam simPassword;
         simPassword.passwordLength = PW_LEN;
-        simPassword.fac = GTEST_STRING;
-        simPassword.oldPassword = GTEST_STRING;
-        simPassword.newPassword = GTEST_STRING;
+        simPassword.fac = FAC_PIN_LOCK;
+        simPassword.oldPassword = GTEST_STRING_PIN1;
+        simPassword.newPassword = GTEST_STRING_PIN1;
         TELEPHONY_LOGI("TelRilTest::ChangeSimPasswordTest -->");
         telRilManager_->ChangeSimPassword(slotId_, simPassword, event);
         TELEPHONY_LOGI("TelRilTest::ChangeSimPasswordTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Restart Radio
+ *
+ * @param application
+ */
+void TelRilTest::RadioRestartTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SET_STATUS);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        uint8_t fun_offline = 4;
+        uint8_t rst_offline = 1;
+        telRilManager_->SetRadioState(slotId_, fun_offline, rst_offline, event);
+        TELEPHONY_LOGI("TelRilTest::RadioRestartTest1 -->");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND_LONG);
+        ASSERT_TRUE(syncResult);
+
+        uint8_t fun_reboot = 6;
+        uint8_t rst_reboot = 1;
+        telRilManager_->SetRadioState(slotId_, fun_reboot, rst_reboot, event);
+        TELEPHONY_LOGI("TelRilTest::RadioRestartTest2 -->");
+        bool syncResult2 = WaitGetResult(eventId, handler, WAIT_TIME_SECOND_LONG);
+        ASSERT_TRUE(syncResult2);
     }
 }
 
@@ -367,12 +427,32 @@ void TelRilTest::EnterSimPinTest(const std::shared_ptr<AppExecFwk::EventHandler>
     auto event = AppExecFwk::InnerEvent::Get(eventId);
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        std::string pin = GTEST_STRING;
+        std::string pin = GTEST_STRING_PIN1;
         TELEPHONY_LOGI("TelRilTest::EnterSimPinTest -->");
         telRilManager_->UnlockPin(slotId_, pin, event);
         TELEPHONY_LOGI("TelRilTest::EnterSimPinTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Enter error pin code
+ *
+ * @param application
+ */
+void TelRilTest::EnterErrorPinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+        int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SIM_ENTER_PIN);
+        auto event = AppExecFwk::InnerEvent::Get(eventId);
+        if (event != nullptr && telRilManager_ != nullptr) {
+            event->SetOwner(handler);
+            std::string pin = "1111";
+            TELEPHONY_LOGI("TelRilTest::EnterErrorPinTest -->");
+            telRilManager_->UnlockPin(slotId_, pin, event);
+            TELEPHONY_LOGI("TelRilTest::EnterErrorPinTest --> finished");
+            bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+            ASSERT_TRUE(!syncResult);
     }
 }
 
@@ -387,8 +467,8 @@ void TelRilTest::UnlockSimPinTest(const std::shared_ptr<AppExecFwk::EventHandler
     auto event = AppExecFwk::InnerEvent::Get(eventId);
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        std::string puk = GTEST_STRING;
-        std::string pin = GTEST_STRING;
+        std::string puk = GTEST_STRING_PUK1;
+        std::string pin = GTEST_STRING_PIN1;
         TELEPHONY_LOGI("TelRilTest::UnlockSimPinTest -->");
         telRilManager_->UnlockPuk(slotId_, puk, pin, event);
         TELEPHONY_LOGI("TelRilTest::UnlockSimPinTest --> finished");
@@ -417,6 +497,52 @@ void TelRilTest::GetSimPinInputTimesTest(const std::shared_ptr<AppExecFwk::Event
 }
 
 /**
+ * @brief Set SIM card PIN2 lock status
+ *
+ * @param application
+ */
+void TelRilTest::SetPin2LockTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SIM_SET_LOCK);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        SimLockParam simLockParam;
+        simLockParam.fac = FDN_PIN2_LOCK;
+        simLockParam.mode = static_cast<int32_t>(LockState::LOCK_ON);
+        simLockParam.passwd = GTEST_STRING_PIN2;
+        TELEPHONY_LOGI("TelRilTest::SetPIN2LockTest -->");
+        telRilManager_->SetSimLock(slotId_, simLockParam, event);
+        TELEPHONY_LOGI("TelRilTest::SetPin2LockTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Set SIM card PIN2 lock status
+ *
+ * @param application
+ */
+void TelRilTest::UnSetPin2LockTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SIM_SET_LOCK);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        SimLockParam simLockParam;
+        simLockParam.fac = FDN_PIN2_LOCK;
+        simLockParam.mode = static_cast<int32_t>(LockState::LOCK_OFF);
+        simLockParam.passwd = GTEST_STRING_PIN2;
+        TELEPHONY_LOGI("TelRilTest::UnSetPin2LockTest -->");
+        telRilManager_->SetSimLock(slotId_, simLockParam, event);
+        TELEPHONY_LOGI("TelRilTest::UnSetPin2LockTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
  * @brief Enter SIM card pin2 code
  *
  * @param application
@@ -427,7 +553,7 @@ void TelRilTest::EnterSimPin2Test(const std::shared_ptr<AppExecFwk::EventHandler
     auto event = AppExecFwk::InnerEvent::Get(eventId);
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        std::string pin2 = GTEST_STRING;
+        std::string pin2 = GTEST_STRING_PIN2;
         TELEPHONY_LOGI("TelRilTest::EnterSimPin2Test -->");
         telRilManager_->UnlockPin2(slotId_, pin2, event);
         TELEPHONY_LOGI("TelRilTest::EnterSimPin2Test --> finished");
@@ -435,6 +561,27 @@ void TelRilTest::EnterSimPin2Test(const std::shared_ptr<AppExecFwk::EventHandler
         ASSERT_TRUE(syncResult);
     }
 }
+
+/**
+ * @brief Enter Error pin2 code
+ *
+ * @param application
+ */
+void TelRilTest::EnterErrorPin2Test(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SIM_ENTER_PIN2);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        std::string pin2 = "2222";
+        TELEPHONY_LOGI("TelRilTest::EnterErrorPin2Test -->");
+        telRilManager_->UnlockPin2(slotId_, pin2, event);
+        TELEPHONY_LOGI("TelRilTest::EnterErrorPin2Test --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(!syncResult);
+    }
+}
+
 
 /**
  * @brief Unlock SIM card pin2 code
@@ -447,8 +594,8 @@ void TelRilTest::UnlockSimPin2Test(const std::shared_ptr<AppExecFwk::EventHandle
     auto event = AppExecFwk::InnerEvent::Get(eventId);
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        std::string puk2 = GTEST_STRING;
-        std::string pin2 = GTEST_STRING;
+        std::string puk2 = GTEST_STRING_PUK2;
+        std::string pin2 = GTEST_STRING_PIN2;
         TELEPHONY_LOGI("TelRilTest::UnlockSimPin2Test -->");
         telRilManager_->UnlockPuk2(slotId_, puk2, pin2, event);
         TELEPHONY_LOGI("TelRilTest::UnlockSimPin2Test --> finished");
@@ -2502,6 +2649,17 @@ HWTEST_F(TelRilTest, Telephony_TelRil_ChangeSimPasswordTest_0101, Function | Med
 }
 
 /**
+ * @tc.number Telephony_TelRil_RadioRestartTest_0101 to do ...
+ * @tc.name Restart Radio
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_RadioRestartTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RADIO_RESTART), GetHandler());
+    return;
+}
+
+/**
  * @tc.number Telephony_TelRil_EnterSimPinTest_0101 to do ...
  * @tc.name Enter SIM card pin code
  * @tc.desc Function test
@@ -2513,13 +2671,24 @@ HWTEST_F(TelRilTest, Telephony_TelRil_EnterSimPinTest_0101, Function | MediumTes
 }
 
 /**
- * @tc.number Telephony_TelRil_UnlockSimPinTest_0101 to do ...
- * @tc.name Unlock SIM card pin code
+ * @tc.number Telephony_TelRil_RadioRestartTest_0101 to do ...
+ * @tc.name Restart Radio
  * @tc.desc Function test
  */
-HWTEST_F(TelRilTest, Telephony_TelRil_UnlockSimPinTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_RadioRestartTest_0102, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UNLOCK_SIM_PIN), GetHandler());
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RADIO_RESTART), GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_ErrorPINCodeTest_0101 to do ...
+ * @tc.name Enter Error PIN
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPINTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_ERROR_PIN), GetHandler());
     return;
 }
 
@@ -2535,6 +2704,73 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetSimPinInputTimesTest_0101, Function | M
 }
 
 /**
+ * @tc.number Telephony_TelRil_ErrorPINCodeTest_0102 to do ...
+ * @tc.name Enter Error PIN
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPINTest_0102, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_ERROR_PIN), GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_ErrorPINCodeTest_0103 to do ...
+ * @tc.name Enter Error PIN
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPINTest_0103, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_ERROR_PIN), GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_UnlockSimPinTest_0101 to do ...
+ * @tc.name Unlock SIM card pin code
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_UnlockSimPinTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UNLOCK_SIM_PIN), GetHandler());
+    return;
+}
+
+
+/**
+ * @tc.number Telephony_TelRil_UnSetSimLockTest_0101 to do ...
+ * @tc.name UnSet SIM card lock status
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_UnSetSimLockTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UNSET_SIM_LOCK), GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_SetPIn2LockTest_0101 to do ...
+ * @tc.name Set PIN2 lock status
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SetPIn2LockTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_PIN2_LOCK), GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_RadioRestartTest_0103 to do ...
+ * @tc.name Restart Radio
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_RadioRestartTest_0103, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RADIO_RESTART), GetHandler());
+    return;
+}
+
+/**
  * @tc.number Telephony_TelRil_EnterSimPin2Test_0101 to do ...
  * @tc.name Enter SIM card pin2 code
  * @tc.desc Function test
@@ -2542,6 +2778,72 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetSimPinInputTimesTest_0101, Function | M
 HWTEST_F(TelRilTest, Telephony_TelRil_EnterSimPin2Test_0101, Function | MediumTest | Level3)
 {
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_SIM_PIN2), GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_SetPIn2LockTest_0102 to do ...
+ * @tc.name Set PIN2 lock status
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SetPIn2LockTest_0102, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_PIN2_LOCK), GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_RadioRestartTest_0104 to do ...
+ * @tc.name Restart Radio
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_RadioRestartTest_0104, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RADIO_RESTART), GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_EnterErrorPin2Test_0101 to do ...
+ * @tc.name Enter Error pin2 code
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPin2Test_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_ERROR_PIN2), GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_EnterErrorPin2Test_0102 to do ...
+ * @tc.name Enter Error pin2 code
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPin2Test_0102, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_ERROR_PIN2), GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_GetSimPin2InputTimesTest_0101 to do ...
+ * @tc.name Get SIM card pin2 code input times
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_GetSimPin2InputTimesTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PIN2_INPUT_TIMES), GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_EnterErrorPin2Test_0103 to do ...
+ * @tc.name Enter Error pin2 code
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPin2Test_0103, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_ERROR_PIN2), GetHandler());
     return;
 }
 
@@ -2557,13 +2859,13 @@ HWTEST_F(TelRilTest, Telephony_TelRil_UnlockSimPin2Test_0101, Function | MediumT
 }
 
 /**
- * @tc.number Telephony_TelRil_GetSimPin2InputTimesTest_0101 to do ...
- * @tc.name Get SIM card pin2 code input times
+ * @tc.number Telephony_TelRil_UnSetPIn2LockTest_0101 to do ...
+ * @tc.name UnSet PIN2 lock status
  * @tc.desc Function test
  */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetSimPin2InputTimesTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_UnSetPIn2LockTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PIN2_INPUT_TIMES), GetHandler());
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UNSET_PIN2_LOCK), GetHandler());
     return;
 }
 

@@ -161,7 +161,7 @@ bool IsimFile::ProcessGetImpiDone(const AppExecFwk::InnerEvent::Pointer &event)
     bool isFileProcessResponse = true;
     if (fd->exception != nullptr) {
         TELEPHONY_LOGE("ProcessGetImpiDone get exception");
-        return isFileProcessResponse ;
+        return isFileProcessResponse;
     }
     imsi_ = fd->resultData;
     TELEPHONY_LOGI("IsimFile::ProcessGetImpiDone success");

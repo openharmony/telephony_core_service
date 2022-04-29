@@ -162,6 +162,7 @@ public:
     {
         moreFileToGet = 0;
     }
+
 private:
     int elementaryFileId = 0;
     int extFileId = 0;

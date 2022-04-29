@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 class SetNetworkSearchModeCallback : public INetworkSearchCallbackStub {
 public:
-    SetNetworkSearchModeCallback(SetSelectModeContext *context);
+    explicit SetNetworkSearchModeCallback(SetSelectModeContext *context);
     void OnSetNetworkModeCallback(const bool setResult, const int32_t errorCode) override;
 
 private:

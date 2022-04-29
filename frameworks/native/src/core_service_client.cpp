@@ -18,8 +18,6 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
-#include "iservice_registry.h"
-#include "system_ability_definition.h"
 
 #include "core_service_proxy.h"
 #include "telephony_log_wrapper.h"

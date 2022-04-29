@@ -23,7 +23,6 @@
 #include "ims_core_service_client.h"
 #include "network_search_manager.h"
 #include "sim_manager.h"
-#include "network_search_manager.h"
 #include "tel_ril_manager.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -366,11 +365,11 @@ bool CoreService::GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSea
 
 std::u16string CoreService::GetLocaleFromDefaultSim()
 {
-    int32_t slotId = DEFAULT_SIM_SLOT_ID;
     TELEPHONY_LOGI("CoreService::GetSimAccountInfo()");
     if (simManager_ == nullptr) {
         return std::u16string();
     }
+    int32_t slotId = simManager_->GetPrimarySlotId();
     return simManager_->GetLocaleFromDefaultSim(slotId);
 }
 

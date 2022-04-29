@@ -39,7 +39,7 @@ public:
     std::string GetOperatorNumeric() const;
     int32_t GetRadioTech() const;
     bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
+    bool Marshalling(Parcel &parcel) const override;
     static NetworkInformation *Unmarshalling(Parcel &parcel);
 
 private:

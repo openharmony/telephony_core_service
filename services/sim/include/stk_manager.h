@@ -25,7 +25,7 @@ namespace Telephony {
 class StkManager {
 public:
     StkManager(std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<SimStateManager> simStateManage);
-    ~StkManager() {};
+    ~StkManager() {}
     void Init(int slotId);
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd);
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd);

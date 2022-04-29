@@ -491,7 +491,7 @@ uint8_t *TelRilSms::ConvertHexStringToBytes(const uint8_t *hexString, size_t len
         return nullptr;
     }
     uint8_t *hexStr = (uint8_t *)hexString;
-    size_t i = 0;
+    ssize_t i = 0;
     while (i < length) {
         uint8_t hexCh1 = ConvertHexCharToInt(hexStr[i]);
         uint8_t hexCh2 = ConvertHexCharToInt(hexStr[i + 1]);

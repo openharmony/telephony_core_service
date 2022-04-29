@@ -49,12 +49,12 @@ bool OperatorConf::ParseDoc(const std::string docname, OperatorConfig &poc)
     xmlNodePtr cur;
     TELEPHONY_LOGI("OperatorConf ParseDoc docname = %{public}s", docname.c_str());
     doc = xmlParseFile((const char *)docname.c_str());
-    if (doc == NULL) {
+    if (doc == nullptr) {
         TELEPHONY_LOGE("OperatorConf xml not exist");
         return false;
     }
     cur = xmlDocGetRootElement(doc);
-    if (cur == NULL) {
+    if (cur == nullptr) {
         TELEPHONY_LOGE("OperatorConf xml cur not exist");
         xmlFreeDoc(doc);
         return false;
@@ -65,7 +65,7 @@ bool OperatorConf::ParseDoc(const std::string docname, OperatorConfig &poc)
         return false;
     }
     cur = cur->xmlChildrenNode;
-    while (cur != NULL) {
+    while (cur != nullptr) {
         if (!xmlStrcmp(cur->name, (const xmlChar *)OPERATOR_CONFIG.c_str())) {
             ParseChild(doc, cur, poc);
         }
@@ -81,14 +81,14 @@ void OperatorConf::ParseChild(xmlDocPtr doc, xmlNodePtr cur, OperatorConfig &poc
     xmlChar *name = nullptr;
     xmlChar *value = nullptr;
     cur = cur->xmlChildrenNode;
-    while (cur != NULL) {
+    while (cur != nullptr) {
         text = xmlNodeListGetString(doc, cur->xmlChildrenNode, NODE);
         name = xmlGetProp(cur, (const xmlChar *)CARRIER_NAME.c_str());
         value = xmlGetProp(cur, (const xmlChar *)CARRIER_VALUE.c_str());
         std::string second = "";
-        if (value != NULL) {
+        if (value != nullptr) {
             second = (char *)value;
-        } else if (text != NULL) {
+        } else if (text != nullptr) {
             second = (char *)text;
         }
         TELEPHONY_LOGI(
@@ -96,7 +96,7 @@ void OperatorConf::ParseChild(xmlDocPtr doc, xmlNodePtr cur, OperatorConfig &poc
             "value = %{public}s text = %{public}s ",
             (char *)cur->name, (char *)name, (char *)value, (char *)text);
         std::string arrayName((char *)cur->name);
-        if (name != NULL) {
+        if (name != nullptr) {
             poc.configValue.emplace(
                 std::pair<std::u16string, std::u16string>(Str8ToStr16((char *)name), Str8ToStr16(second)));
         }

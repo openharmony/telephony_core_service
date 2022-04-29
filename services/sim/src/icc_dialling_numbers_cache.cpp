@@ -128,6 +128,9 @@ void IccDiallingNumbersCache::ProcessChangeDiallingNumbersDone(const AppExecFwk:
         } else {
             std::shared_ptr<HRilRadioResponseInfo> responseInfo =
                 std::static_pointer_cast<HRilRadioResponseInfo>(fd->exception);
+            if (responseInfo == nullptr) {
+                return;
+            }
             if (responseInfo->error == HRilErrType::NONE) {
                 diallingNumberFileList_.at(fileId)->at(index - 1) = diallingNumber;
             }
@@ -199,8 +202,8 @@ bool IccDiallingNumbersCache::CheckValueAndOperation(
         for (auto it = list->begin(); it != list->end(); it++) {
             std::shared_ptr<DiallingNumbersInfo> &item = *it;
             count++;
-            if (item->IsEmpty()) {
-                index = count; // find first null position for save
+            if (item->IsEmpty()) {  // find first null position for save
+                index = count;
                 return true;
             }
         }

@@ -119,10 +119,10 @@ void IccDiallingNumbersHandler::ProcessLinearSizeDone(const AppExecFwk::InnerEve
 
     std::shared_ptr<EfLinearResult> object = event->GetSharedObject<EfLinearResult>();
     std::shared_ptr<DiallingNumbersInfo> diallingNumberLoad = nullptr;
+    loadId = object->arg1;
+    id = loadId;
+    loadRequest = FindLoadRequest(loadId);
     if (object != nullptr && (loadRequest != nullptr)) {
-        loadId = object->arg1;
-        id = loadId;
-        loadRequest = FindLoadRequest(loadId);
         if (object->exception == nullptr) {
             std::shared_ptr<void> baseLoad = object->iccLoader;
             int *dataSize = object->valueData;
@@ -144,6 +144,9 @@ void IccDiallingNumbersHandler::ProcessLinearSizeDone(const AppExecFwk::InnerEve
 void IccDiallingNumbersHandler::ProcessUpdateRecordDone(const AppExecFwk::InnerEvent::Pointer &event, int &id)
 {
     std::unique_ptr<ControllerToFileMsg> object = event->GetUniqueObject<ControllerToFileMsg>();
+    if (object == nullptr) {
+        return;
+    }
     int loadId = object->arg1;
     id = loadId;
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest = FindLoadRequest(loadId);
@@ -174,6 +177,9 @@ void IccDiallingNumbersHandler::ProcessDiallingNumberAllLoadDone(
     }
 
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
+    if (object == nullptr) {
+        return;
+    }
     loadId = object->arg1;
     id = loadId;
     loadRequest = FindLoadRequest(loadId);
@@ -218,10 +224,10 @@ void IccDiallingNumbersHandler::ProcessDiallingNumberLoadDone(const AppExecFwk::
 
     std::string iccData = fd->resultData;
     TELEPHONY_LOGI("ProcessDiallingNumberLoadDone handle start");
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber =
+    std::make_shared<DiallingNumbersInfo>(loadRequest->GetElementaryFileId(), loadRequest->GetIndex());
+    FetchDiallingNumberContent(diallingNumber, iccData);
     if (loadRequest != nullptr) {
-        std::shared_ptr<DiallingNumbersInfo> diallingNumber =
-            std::make_shared<DiallingNumbersInfo>(loadRequest->GetElementaryFileId(), loadRequest->GetIndex());
-        FetchDiallingNumberContent(diallingNumber, iccData);
         loadRequest->SetResult(static_cast<std::shared_ptr<void>>(diallingNumber));
     }
 }

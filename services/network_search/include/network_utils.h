@@ -358,6 +358,10 @@ bool EventSender::Send(
         TELEPHONY_LOGE("EventSender::Send event is null.");
         return false;
     }
+    if (telRilManager_.get() == nullptr) {
+        TELEPHONY_LOGE("EventSender::Send telRilManager_.get() is null.");
+        return false;
+    }
     (telRilManager_.get()->*rilFuncPointer)(slotId, args..., event);
     return true;
 }

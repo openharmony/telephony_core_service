@@ -28,7 +28,7 @@ public:
     std::vector<NetworkInformation> GetNetworkSearchInformation() const;
     int32_t GetNetworkSearchInformationSize() const;
     bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
+    bool Marshalling(Parcel &parcel) const override;
     static NetworkSearchResult *Unmarshalling(Parcel &parcel);
 
 private:

@@ -22,6 +22,7 @@
 
 #include "core_service_client.h"
 #include "tel_ril_manager.h"
+#include "sim_state_handle.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -31,9 +32,16 @@ enum class DiffInterfaceId {
     TEST_GET_IMSI,
     TEST_GET_SIM_LOCK_STATUS,
     TEST_SET_SIM_LOCK,
+    TEST_SET_PIN2_LOCK,
+    TEST_UNSET_SIM_LOCK,
+    TEST_UNSET_PIN2_LOCK,
+    TEST_SET_UNPIN2_LOCK,
     TEST_GET_CHANGE_SIM_PASSWD,
     TEST_ENTER_SIM_PIN,
+    TEST_RADIO_RESTART,
     TEST_UNLOCK_SIM_PIN,
+    TEST_ENTER_ERROR_PIN,
+    TEST_ENTER_ERROR_PIN2,
     TEST_GET_PIN_INPUT_TIMES,
     TEST_ENTER_SIM_PIN2,
     TEST_UNLOCK_SIM_PIN2,
@@ -164,11 +172,17 @@ private:
     void SimGetImsiTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetSimLockStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetSimLockTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void UnSetSimLockTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void ChangeSimPasswordTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void EnterSimPinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void RadioRestartTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void EnterErrorPinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void UnlockSimPinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetSimPinInputTimesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void SetPin2LockTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void UnSetPin2LockTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void EnterSimPin2Test(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void EnterErrorPin2Test(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void UnlockSimPin2Test(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetSimPin2InputTimesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void EnableSimCardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
