@@ -31,8 +31,8 @@ namespace OHOS {
 namespace Telephony {
 class TagService {
 public:
-    TagService(const std::string &data);
-    TagService(const std::vector<uint8_t> &data);
+    explicit TagService(const std::string &data);
+    explicit TagService(const std::vector<uint8_t> &data);
     virtual ~TagService();
     bool Next();
     int GetTagCode() const;

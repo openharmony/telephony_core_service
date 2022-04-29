@@ -28,7 +28,7 @@ public:
     void Init();
     bool operator==(const NetworkState &other) const;
     bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
+    bool Marshalling(Parcel &parcel) const override;
     static NetworkState *Unmarshalling(Parcel &parcel);
     void SetOperatorInfo(const std::string &longName, const std::string &shortName, const std::string &numeric,
         DomainType domainType);
@@ -93,6 +93,7 @@ public:
      * @return Returns Access technology .
      */
     RadioTech GetCfgTech() const;
+
 private:
     bool isEmergency_;
     OperatorInformation psOperatorInfo_;

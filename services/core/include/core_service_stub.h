@@ -24,7 +24,7 @@ namespace Telephony {
 class CoreServiceStub : public IRemoteStub<ICoreService> {
 public:
     CoreServiceStub();
-    virtual ~CoreServiceStub() {};
+    virtual ~CoreServiceStub() {}
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:

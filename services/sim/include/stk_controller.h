@@ -30,7 +30,7 @@ const int MSG_SIM_STK_IS_READY = 3;
 
 class StkController : public AppExecFwk::EventHandler {
 public:
-    StkController(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    explicit StkController(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
     ~StkController();
     void Init(int slotId);
     void SetRilAndSimStateManager(std::shared_ptr<Telephony::ITelRilManager> ril,

@@ -152,12 +152,12 @@ void IccFile::UpdateMsisdnNumber(
 
 bool IccFile::ObtainFilesFetched()
 {
-    return (!fileToGet_) && fileQueried_;
+    return (fileToGet_ == 0) && fileQueried_;
 }
 
 bool IccFile::LockQueriedOrNot()
 {
-    return (!fileToGet_) && lockQueried_;
+    return (fileToGet_ == 0) && lockQueried_;
 }
 
 std::string IccFile::ObtainDiallingNumberInfo()

@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 class GetPreferredNetworkCallback : public INetworkSearchCallbackStub {
 public:
-    GetPreferredNetworkCallback(PreferredNetworkModeContext *asyncContext);
+    explicit GetPreferredNetworkCallback(PreferredNetworkModeContext *asyncContext);
     void OnGetPreferredNetworkCallback(const int32_t networkMode, const int32_t errorCode) override;
 
 private:

@@ -232,23 +232,26 @@ void NetworkRegister::NotifyNrFrequencyChanged()
         TELEPHONY_LOGE("NetworkRegister::ProcessChannelConfigInfo cellularData callback is nullptr");
         return;
     }
-    size_t size = channelConfigInfos_.size();
+    ssize_t size = channelConfigInfos_.size();
     for (int i = 0; i < size; ++i) {
         std::vector<int32_t> &cids = channelConfigInfos_[i].contextIds;
-        if (!isFreqChanged) {
-            for (auto &cid : cids) {
-                if (cellularData->HasInternetCapability(slotId_, cid)) {
-                    curFreqType = static_cast<FrequencyType>(channelConfigInfos_[i].freqRange);
-                    isFreqChanged = true;
-                    break;
-                }
+        if (isFreqChanged) {
+            TELEPHONY_LOGE("NetworkRegister::ProcessChannelConfigInfo channelConfigInfos:%{public}d isFreqChanged", i);
+            continue;
+        }
+        for (auto &cid : cids) {
+            if (!cellularData->HasInternetCapability(slotId_, cid)) {
+                TELEPHONY_LOGE("NetworkRegister::ProcessChannelConfigInfo cid:%{public}d hasNoInternetCapability", cid);
+                continue;
             }
+            curFreqType = static_cast<FrequencyType>(channelConfigInfos_[i].freqRange);
+            isFreqChanged = true;
+            break;
         }
         if (isFreqChanged) {
             break;
         }
     }
-
     if (freqType_ != curFreqType) {
         freqType_ = curFreqType;
         networkSearchManager->NotifyNrFrequencyChanged(slotId_);

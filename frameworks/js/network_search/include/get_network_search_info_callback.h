@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 class GetNetworkSearchInfoCallback : public INetworkSearchCallbackStub {
 public:
-    GetNetworkSearchInfoCallback(GetSearchInfoContext *context);
+    explicit GetNetworkSearchInfoCallback(GetSearchInfoContext *context);
     void OnGetNetworkSearchInformation(
         const sptr<NetworkSearchResult> &networkSearchResult, const int32_t errorCode) override;
 

@@ -32,6 +32,8 @@ ohos_unittest("tel_ril_gtest") {
     "//base/telephony/core_service/common/network_search",
     "//base/telephony/core_service/common/core",
     "//base/telephony/core_service/services/tel_ril/include",
+    "//base/telephony/core_service/services/sim/include",
+    "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content/",
     "//utils/native/base/include",
     "//drivers/adapter/uhdf2/include/hdi",
   ]
@@ -44,6 +46,8 @@ ohos_unittest("tel_ril_gtest") {
   ]
 
   external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",

@@ -49,6 +49,7 @@ public:
     virtual bool GetIsCamped() const;
     virtual void SetIsCamped(bool isCamped);
     virtual void SetSignalLevel(int32_t signalLevel);
+
 protected:
     std::string mcc_ = "";
     std::string mnc_ = "";
@@ -169,6 +170,7 @@ public:
     int32_t GetLongitude() const;
     int32_t GetNid() const;
     int32_t GetSid() const;
+
 private:
     int32_t baseId_ = 0;
     int32_t latitude_ = 0;

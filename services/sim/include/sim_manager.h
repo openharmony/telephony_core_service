@@ -31,86 +31,88 @@ namespace Telephony {
 const int32_t SLOT_ID_ZERO = 0;
 class SimManager : public ISimManager {
 public:
-    SimManager(std::shared_ptr<ITelRilManager> telRilManager);
+    explicit SimManager(std::shared_ptr<ITelRilManager> telRilManager);
     virtual ~SimManager();
     // Init
-    virtual bool OnInit(int32_t slotCount) override;
-    virtual void SetNetworkSearchManager(int32_t slotCount,
+    bool OnInit(int32_t slotCount) override;
+    void SetNetworkSearchManager(int32_t slotCount,
             std::shared_ptr<INetworkSearch> networkSearchManager) override;
     // SimState
-    virtual bool HasSimCard(int32_t slotId) override;
-    virtual int32_t GetSimState(int32_t slotId) override;
-    virtual int32_t GetCardType(int32_t slotId) override;
-    virtual bool UnlockPin(int32_t slotId, std::string pin, LockStatusResponse &response) override;
-    virtual bool UnlockPuk(
+    bool HasSimCard(int32_t slotId) override;
+    int32_t GetSimState(int32_t slotId) override;
+    int32_t GetCardType(int32_t slotId) override;
+    bool UnlockPin(int32_t slotId, std::string pin, LockStatusResponse &response) override;
+    bool UnlockPuk(
         int32_t slotId, std::string newPin, std::string puk, LockStatusResponse &response) override;
-    virtual bool AlterPin(
+    bool AlterPin(
         int32_t slotId, std::string newPin, std::string oldPin, LockStatusResponse &response) override;
-    virtual bool SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response) override;
-    virtual int32_t GetLockState(int32_t slotId, LockType lockType) override;
-    virtual int32_t RefreshSimState(int32_t slotId) override;
-    virtual bool UnlockPin2(int32_t slotId, std::string pin2, LockStatusResponse &response) override;
-    virtual bool UnlockPuk2(
+    bool SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response) override;
+    int32_t GetLockState(int32_t slotId, LockType lockType) override;
+    int32_t RefreshSimState(int32_t slotId) override;
+    bool UnlockPin2(int32_t slotId, std::string pin2, LockStatusResponse &response) override;
+    bool UnlockPuk2(
         int32_t slotId, std::string newPin2, std::string puk2, LockStatusResponse &response) override;
-    virtual bool AlterPin2(
+    bool AlterPin2(
         int32_t slotId, std::string newPin2, std::string oldPin2, LockStatusResponse &response) override;
-    virtual bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;
+    bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;
     // SimAccount
-    virtual bool IsSimActive(int32_t slotId) override;
-    virtual bool SetActiveSim(int32_t slotId, int32_t enable) override;
-    virtual bool GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) override;
-    virtual bool SetDefaultVoiceSlotId(int32_t slotId) override;
-    virtual bool SetDefaultSmsSlotId(int32_t slotId) override;
-    virtual bool SetDefaultCellularDataSlotId(int32_t slotId) override;
-    virtual bool SetPrimarySlotId(int32_t slotId) override;
-    virtual bool SetShowNumber(int32_t slotId, const std::u16string number) override;
-    virtual bool SetShowName(int32_t slotId, const std::u16string name) override;
-    virtual int32_t GetDefaultVoiceSlotId() override;
-    virtual int32_t GetDefaultSmsSlotId() override;
-    virtual int32_t GetDefaultCellularDataSlotId() override;
-    virtual int32_t GetPrimarySlotId() override;
-    virtual std::u16string GetShowNumber(int32_t slotId) override;
-    virtual std::u16string GetShowName(int32_t slotId) override;
-    virtual bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
-    virtual bool GetOperatorConfigs(int slotId, OperatorConfig &poc) override;
-    virtual bool HasOperatorPrivileges(const int32_t slotId) override;
+    bool IsSimActive(int32_t slotId) override;
+    bool SetActiveSim(int32_t slotId, int32_t enable) override;
+    bool GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) override;
+    bool SetDefaultVoiceSlotId(int32_t slotId) override;
+    bool SetDefaultSmsSlotId(int32_t slotId) override;
+    bool SetDefaultCellularDataSlotId(int32_t slotId) override;
+    bool SetPrimarySlotId(int32_t slotId) override;
+    bool SetShowNumber(int32_t slotId, const std::u16string number) override;
+    bool SetShowName(int32_t slotId, const std::u16string name) override;
+    int32_t GetDefaultVoiceSlotId() override;
+    int32_t GetDefaultSmsSlotId() override;
+    int32_t GetDefaultCellularDataSlotId() override;
+    int32_t GetPrimarySlotId() override;
+    std::u16string GetShowNumber(int32_t slotId) override;
+    std::u16string GetShowName(int32_t slotId) override;
+    bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
+    bool GetOperatorConfigs(int slotId, OperatorConfig &poc) override;
+    bool HasOperatorPrivileges(const int32_t slotId) override;
     // STK
-    virtual bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
-    virtual bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
+    bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
+    bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
     // SimFile
-    virtual std::u16string GetSimOperatorNumeric(int32_t slotId) override;
-    virtual std::u16string GetISOCountryCodeForSim(int32_t slotId) override;
-    virtual std::u16string GetSimSpn(int32_t slotId) override;
-    virtual std::u16string GetSimIccId(int32_t slotId) override;
-    virtual std::u16string GetIMSI(int32_t slotId) override;
-    virtual std::u16string GetLocaleFromDefaultSim(int32_t slotId) override;
-    virtual std::u16string GetSimGid1(int32_t slotId) override;
-    virtual std::u16string GetSimTelephoneNumber(int32_t slotId) override;
-    virtual std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) override;
-    virtual std::u16string GetVoiceMailIdentifier(int32_t slotId) override;
-    virtual std::u16string GetVoiceMailNumber(int32_t slotId) override;
-    virtual int ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum) override;
-    virtual bool SetVoiceMailInfo(
+    std::u16string GetSimOperatorNumeric(int32_t slotId) override;
+    std::u16string GetISOCountryCodeForSim(int32_t slotId) override;
+    std::u16string GetSimSpn(int32_t slotId) override;
+    std::u16string GetSimIccId(int32_t slotId) override;
+    std::u16string GetIMSI(int32_t slotId) override;
+    std::u16string GetLocaleFromDefaultSim(int32_t slotId) override;
+    std::u16string GetSimGid1(int32_t slotId) override;
+    std::u16string GetSimTelephoneNumber(int32_t slotId) override;
+    std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) override;
+    std::u16string GetVoiceMailIdentifier(int32_t slotId) override;
+    std::u16string GetVoiceMailNumber(int32_t slotId) override;
+    int ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum) override;
+    bool SetVoiceMailInfo(
         int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) override;
     // SimSms
-    virtual bool AddSmsToIcc(int32_t slotId, int status, std::string &pdu, std::string &smsc) override;
-    virtual bool UpdateSmsIcc(
+    bool AddSmsToIcc(int32_t slotId, int status, std::string &pdu, std::string &smsc) override;
+    bool UpdateSmsIcc(
         int32_t slotId, int index, int status, std::string &pduData, std::string &smsc) override;
-    virtual bool DelSmsIcc(int32_t slotId, int index) override;
-    virtual std::vector<std::string> ObtainAllSmsOfIcc(int32_t slotId) override;
+    bool DelSmsIcc(int32_t slotId, int index) override;
+    std::vector<std::string> ObtainAllSmsOfIcc(int32_t slotId) override;
     // IccDiallingNumbers
-    virtual std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int slotId, int type) override;
-    virtual bool AddIccDiallingNumbers(
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int slotId, int type) override;
+    bool AddIccDiallingNumbers(
         int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) override;
-    virtual bool DelIccDiallingNumbers(
+    bool DelIccDiallingNumbers(
         int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) override;
-    virtual bool UpdateIccDiallingNumbers(
+    bool UpdateIccDiallingNumbers(
         int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) override;
     // Event register
-    virtual void RegisterCoreNotify(int32_t slotId, const HANDLE &handler, int what) override;
-    virtual void UnRegisterCoreNotify(int32_t slotId, const HANDLE &observerCallBack, int what) override;
+    void RegisterCoreNotify(int32_t slotId, const HANDLE &handler, int what) override;
+    void UnRegisterCoreNotify(int32_t slotId, const HANDLE &observerCallBack, int what) override;
+
 private:
     bool IsValidSlotId(int32_t slotId);
+
 private:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;

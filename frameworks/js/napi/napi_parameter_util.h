@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace Telephony {
-namespace {
 template<typename T, std::enable_if_t<std::is_same_v<T, int32_t>, int32_t> = 0>
 napi_valuetype GetInputArgvType(T *)
 {
@@ -87,7 +86,6 @@ napi_status NapiValueConverted(napi_env env, napi_value arg, T *npaiValue)
     *npaiValue = arg;
     return napi_ok;
 }
-} // namespace
 
 template<typename T, std::enable_if_t<std::is_same_v<T, bool>, int32_t> = 0>
 napi_value GetNapiValue(napi_env env, T val)

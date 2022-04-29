@@ -202,7 +202,7 @@
 
 ## 相关仓<a name="section409mcpsimp"></a>
 
-[电话服务子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E7%94%B5%E8%AF%9D%E6%9C%8D%E5%8A%A1%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
+[电话服务子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/电话服务子系统.md)
 
 **telephony\_core\_service**
 
