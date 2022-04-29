@@ -44,7 +44,7 @@ enum UsimConstant {
 
 class UsimDiallingNumbersService : public AppExecFwk::EventHandler {
 public:
-    UsimDiallingNumbersService(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    explicit UsimDiallingNumbersService(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
     ~UsimDiallingNumbersService();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     void ObtainUsimElementaryFiles(const AppExecFwk::InnerEvent::Pointer &pointer);

@@ -40,7 +40,7 @@ struct IccControllerHolder {
         : fileId(efId), fileNum(recordNum), getAllFile(false), filePath(path)
     {}
     IccControllerHolder(int efId, std::string path) : fileId(efId), fileNum(1), getAllFile(true), filePath(path) {}
-    IccControllerHolder(int efId) : fileId(efId), fileNum(1), getAllFile(true) {}
+    explicit IccControllerHolder(int efId) : fileId(efId), fileNum(1), getAllFile(true) {}
 };
 
 struct IccFileData {
@@ -74,19 +74,19 @@ struct ControllerToFileMsg : public FileToControllerMsg, IccFileData {
 };
 
 struct IccToRilMsg {
-    IccToRilMsg(std::shared_ptr<IccControllerHolder> holder) : controlHolder(holder) {}
+    explicit  IccToRilMsg(std::shared_ptr<IccControllerHolder> holder) : controlHolder(holder) {}
     std::shared_ptr<IccControllerHolder> controlHolder;
     int arg1 = INVALID_VALUE;
     int arg2 = INVALID_VALUE;
 };
 
 struct IccFromRilMsg : public IccToRilMsg {
-    IccFromRilMsg(std::shared_ptr<IccControllerHolder> &holder) : IccToRilMsg(holder) {}
+    explicit IccFromRilMsg(std::shared_ptr<IccControllerHolder> &holder) : IccToRilMsg(holder) {}
     IccFileData fileData;
 };
 
 struct EfLinearResult : public FileToControllerMsg {
-    EfLinearResult(const FileToControllerMsg *cmd)
+    explicit EfLinearResult(const FileToControllerMsg *cmd)
     {
         if (cmd != nullptr) {
             arg1 = cmd->arg1;
@@ -100,7 +100,7 @@ struct EfLinearResult : public FileToControllerMsg {
 };
 
 struct MultiRecordResult : public FileToControllerMsg {
-    MultiRecordResult(const FileToControllerMsg *cmd)
+    explicit  MultiRecordResult(const FileToControllerMsg *cmd)
     {
         if (cmd != nullptr) {
             arg1 = cmd->arg1;
@@ -125,7 +125,7 @@ struct DiallingNumbersHandleHolder {
 };
 
 struct DiallingNumbersHandlerResult : public DiallingNumbersHandleHolder {
-    DiallingNumbersHandlerResult(const DiallingNumbersHandleHolder *cmd)
+    explicit  DiallingNumbersHandlerResult(const DiallingNumbersHandleHolder *cmd)
     {
         if (cmd != nullptr) {
             fileID = cmd->fileID;
@@ -143,7 +143,7 @@ struct ResultObtain {
 };
 
 struct ResponseResult : public ResultObtain {
-    ResponseResult(const ResultObtain *cmd)
+    explicit ResponseResult(const ResultObtain *cmd)
     {
         if (cmd != nullptr) {
             fileID = cmd->fileID;
@@ -169,7 +169,7 @@ struct UsimFetcher {
 };
 
 struct UsimResult : public UsimFetcher {
-    UsimResult(const UsimFetcher *cmd)
+    explicit UsimResult(const UsimFetcher *cmd)
     {
         if (cmd != nullptr) {
             fileID = cmd->fileID;

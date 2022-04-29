@@ -25,8 +25,8 @@ namespace OHOS {
 namespace Telephony {
 class HdfDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
-    HdfDeathRecipient(sptr<TelRilManager> telRilManager);
-    HdfDeathRecipient(int32_t slotId);
+    explicit HdfDeathRecipient(sptr<TelRilManager> telRilManager);
+    explicit HdfDeathRecipient(int32_t slotId);
     ~HdfDeathRecipient() = default;
     void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
 

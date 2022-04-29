@@ -92,7 +92,7 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
     const char *iccDdata = (result->resultData).c_str();
     char *rawData = const_cast<char *>(iccDdata);
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData); // for unsigned int bitwise
-
+    TELEPHONY_LOGI("ProcessRecordSize --- fileData: --- %{public}s", fileData);
     path = CheckRightPath(hd->filePath, hd->fileId);
     if (!IsValidSizeData(fileData)) {
         TELEPHONY_LOGE("ProcessRecordSize get error filetype");
@@ -100,11 +100,6 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
     GetFileAndDataSize(fileData, hd->fileSize, size);
     if (hd->fileSize != 0) {
         hd->countFiles = size / hd->fileSize;
-        TELEPHONY_LOGI("origin count file %{public}d", hd->countFiles);
-    }
-
-    if (IsFixedNumberType(hd->fileId)) {
-        hd->countFiles = MAX_RECORD_NUM;
     }
     TELEPHONY_LOGI("ProcessRecordSize %{public}d %{public}d %{public}d", size, hd->fileSize, hd->countFiles);
     if (telRilManager_ != nullptr) {
@@ -522,7 +517,9 @@ void IccFileController::ParseFileSize(int val[], int len, const unsigned char *d
     }
     if (len > MAX_FILE_INDEX) {
         GetFileAndDataSize(data, val[0], val[1]);
-        val[MAX_FILE_INDEX] = val[1] / val[0];
+        if (val[0] != 0) {
+            val[MAX_FILE_INDEX] = val[1] / val[0];
+        }
     }
     TELEPHONY_LOGI("ParseFileSize result %{public}d, %{public}d %{public}d", val[0], val[1], val[MAX_FILE_INDEX]);
 }
@@ -541,10 +538,32 @@ bool IccFileController::IsValidSizeData(const unsigned char *data)
 void IccFileController::GetFileAndDataSize(const unsigned char *data, int &fileSize, int &dataSize)
 {
     if (data != nullptr) {
-        fileSize = data[LENGTH_OF_RECORD] & BYTE_NUM;
-        dataSize = (((unsigned int)(data[SIZE_ONE_OF_FILE]  &  BYTE_NUM)) <<  OFFSET) +
-                    ((unsigned int)data[SIZE_TWO_OF_FILE] & BYTE_NUM);
+        int dataCount;
+        fileSize = HexConversionDec(data[INDEX_OF_SIZE], data[INDEX_OF_SIZE + 1]);
+        dataCount = HexConversionDec(data[INDEX_OF_COUNT], data[INDEX_OF_COUNT + 1]);
+        TELEPHONY_LOGI("ParseFileSize result %{public}d %{public}d", fileSize, dataCount);
+        dataSize = fileSize * dataCount;
     }
+}
+
+int IccFileController::HexConversionDec(const unsigned char hexTens, const unsigned char hexSingle)
+{
+    int decTens, decSingle;
+    int four = 4, ten = 10;
+    if (hexTens >= '0' && hexTens <= '9') {
+        decTens = (hexTens - '0') << four;
+    }
+    if (hexTens >= 'A' && hexTens <= 'F') {
+        decTens = (hexTens - 'A' + ten) << four;
+    }
+    if (hexSingle >= '0' && hexSingle <= '9') {
+        decSingle = hexSingle - '0';
+    }
+    if (hexSingle >= 'A' && hexSingle <= 'F') {
+        decSingle = hexSingle - 'A' + ten;
+    }
+    TELEPHONY_LOGI("HexConversionDec result %{public}d %{public}d", decTens, decSingle);
+    return decTens + decSingle;
 }
 
 void IccFileController::SetRilManager(std::shared_ptr<Telephony::ITelRilManager> ril)

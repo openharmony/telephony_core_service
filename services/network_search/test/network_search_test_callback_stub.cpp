@@ -55,17 +55,23 @@ void NetworkSearchTestCallbackStub::OnGetNetworkSearchInformation(
     if (!errorCode) {
         TELEPHONY_LOGI("NetworkSearchTestCallbackStub OnGetNetworkSearchInformation success");
         sptr<NetworkSearchResult> networkSearchResult = nsResult;
-        if (networkSearchResult != nullptr) {
-            std::vector<NetworkInformation> networkStates = networkSearchResult->GetNetworkSearchInformation();
-            if (!networkStates.empty()) {
-                for (auto &networkState : networkStates) {
-                    TELEPHONY_LOGI(
-                        "NetworkSearchTestCallbackStub OnGetNetworkSearchInformation plmnNumeric:%{public}s,"
-                        " shortOperatorName:%{public}s, rat:%{public}d",
-                        networkState.GetOperatorNumeric().c_str(), networkState.GetOperatorShortName().c_str(),
-                        networkState.GetRadioTech());
-                }
-            }
+        if (networkSearchResult == nullptr) {
+            TELEPHONY_LOGI(
+                "NetworkSearchTestCallbackStub OnGetNetworkSearchInformation",
+                "success networkSearchResult  null");
+            return;
+        }
+        std::vector<NetworkInformation> networkStates = networkSearchResult->GetNetworkSearchInformation();
+        if (networkStates.empty()) {
+            TELEPHONY_LOGI("NetworkSearchTestCallbackStub OnGetNetworkSearchInformation success networkStates  emptys");
+            return;
+        }
+        for (auto &networkState : networkStates) {
+            TELEPHONY_LOGI(
+                "NetworkSearchTestCallbackStub OnGetNetworkSearchInformation plmnNumeric:%{public}s,"
+                " shortOperatorName:%{public}s, rat:%{public}d",
+                networkState.GetOperatorNumeric().c_str(), networkState.GetOperatorShortName().c_str(),
+                networkState.GetRadioTech());
         }
     } else {
         TELEPHONY_LOGE(

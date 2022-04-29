@@ -23,8 +23,8 @@
 
 namespace OHOS {
 namespace Telephony {
-NetworkSearchNotify::NetworkSearchNotify() {};
-NetworkSearchNotify::~NetworkSearchNotify() {};
+NetworkSearchNotify::NetworkSearchNotify() {}
+NetworkSearchNotify::~NetworkSearchNotify() {}
 
 void NetworkSearchNotify::NotifyNetworkStateUpdated(int32_t slotId, const sptr<NetworkState> &networkState)
 {

@@ -199,7 +199,7 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
     std::string param = "time";
     AAFwk::Want want;
     want.SetAction(action);
-    want.SetParam(param, static_cast<long>(time));
+    want.SetParam(param, static_cast<int32_t>(time));
     PublishCommonEvent(want);
 }
 

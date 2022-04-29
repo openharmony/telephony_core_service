@@ -234,6 +234,7 @@ public:
     {
         return simManager_;
     }
+
 private:
     bool InitPointer(std::shared_ptr<NetworkSearchManagerInner> &inner, int32_t slotId);
     void ClearManagerInner();

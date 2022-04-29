@@ -28,7 +28,7 @@ namespace Telephony {
 class PlmnFile : public Parcelable {
 public:
     bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
+    bool Marshalling(Parcel &parcel) const override;
     static PlmnFile *UnMarshalling(Parcel &parcel);
     PlmnFile(unsigned char *bytes, int offset);
     ~PlmnFile();

@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Telephony {
 class TestBroadCast : public EventFwk::CommonEventSubscriber {
 public:
-    explicit TestBroadCast(const EventFwk::CommonEventSubscribeInfo &sp) : CommonEventSubscriber(sp) {};
+    explicit TestBroadCast(const EventFwk::CommonEventSubscribeInfo &sp) : CommonEventSubscriber(sp) {}
     virtual void OnReceiveEvent(const EventFwk::CommonEventData &data);
     ~TestBroadCast() = default;
 };

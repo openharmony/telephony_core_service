@@ -44,7 +44,7 @@ static const std::string CARRIER_VALUE = "value";
 
 class OperatorConf {
 public:
-    OperatorConf(std::shared_ptr<SimFileManager> simFileManager);
+    explicit OperatorConf(std::shared_ptr<SimFileManager> simFileManager);
     virtual ~OperatorConf();
     bool GetOperatorConfigs(int32_t slotId, OperatorConfig &poc);
 

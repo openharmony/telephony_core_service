@@ -373,7 +373,40 @@ std::shared_ptr<UsimFunctionHandle> SimFile::ObtainUsimFunctionHandle()
 
 void SimFile::UpdateSimLanguage()
 {
-    UpdateIccLanguage(efLi_, efPl_);
+    AppExecFwk::InnerEvent::Pointer eventLILAN = BuildCallerInfo(MSG_SIM_OBTAIN_LI_LANGUAGE_DONE);
+    fileController_->ObtainBinaryFile(ELEMENTARY_FILE_LI, eventLILAN);
+}
+
+bool SimFile::ProcessObtainLiLanguage(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd != nullptr && fd->exception == nullptr) {
+        efLi_ = fd->resultData;
+        if (efLi_.empty() || !efLi_.size()) {
+            TELEPHONY_LOGI("efLi_ No language loaded");
+            AppExecFwk::InnerEvent::Pointer eventPLLAN = BuildCallerInfo(MSG_SIM_OBTAIN_PL_LANGUAGE_DONE);
+            fileController_->ObtainBinaryFile(ELEMENTARY_FILE_PL, eventPLLAN);
+        } else {
+            TELEPHONY_LOGI("efLi_  language loaded");
+            UpdateIccLanguage(efLi_, efPl_);
+        }
+    }
+    return true;
+}
+
+bool SimFile::ProcessObtainPlLanguage(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd != nullptr && fd->exception == nullptr) {
+        efPl_ = fd->resultData;
+        if (efPl_.empty() || !efPl_.size()) {
+            TELEPHONY_LOGI("efPl_ No language loaded");
+        } else {
+            TELEPHONY_LOGI("efPl_  language loaded");
+            UpdateIccLanguage(efLi_, efPl_);
+        }
+    }
+    return true;
 }
 
 std::string SimFile::AnalysisBcdPlmn(std::string data, std::string description)
@@ -915,7 +948,6 @@ bool SimFile::ProcessGetEhplmnDone(const AppExecFwk::InnerEvent::Pointer &event)
     if (fd->exception != nullptr || iccData.empty()) {
         TELEPHONY_LOGE("Failed fetch Equivalent Home PLMNs");
         return isFileProcessResponse;
-    } else {
     }
     return isFileProcessResponse;
 }
@@ -929,7 +961,6 @@ bool SimFile::ProcessGetFplmnDone(const AppExecFwk::InnerEvent::Pointer &event)
     if (fd->exception != nullptr || iccData.empty()) {
         TELEPHONY_LOGE("Failed to get forbidden PLMNs");
         return loadResponse;
-    } else {
     }
     if (fd->arg1 == ICC_CONTROLLER_REQ_SEND_RESPONSE) {
         TELEPHONY_LOGI("getForbiddenPlmns and send result");
@@ -987,6 +1018,7 @@ bool SimFile::ProcessObtainSpnPhase(const AppExecFwk::InnerEvent::Pointer &event
     ObtainSpnPhase(false, event);
     return loadResponse;
 }
+
 bool SimFile::IsContinueGetSpn(bool start, SpnStatus curStatus, SpnStatus &newStatus)
 {
     if (start) {
@@ -1005,6 +1037,7 @@ bool SimFile::IsContinueGetSpn(bool start, SpnStatus curStatus, SpnStatus &newSt
         return true;
     }
 }
+
 void SimFile::InitMemberFunc()
 {
     memberFuncMap_[RadioEvent::RADIO_SIM_STATE_READY] = &SimFile::ProcessIccReady;
@@ -1021,6 +1054,8 @@ void SimFile::InitMemberFunc()
     memberFuncMap_[MSG_SIM_OBTAIN_VOICE_MAIL_INDICATOR_CPHS_DONE] = &SimFile::ProcessVoiceMailCphs;
     memberFuncMap_[MSG_SIM_OBTAIN_AD_DONE] = &SimFile::ProcessGetAdDone;
     memberFuncMap_[MSG_SIM_OBTAIN_SPN_DONE] = &SimFile::ProcessObtainSpnPhase;
+    memberFuncMap_[MSG_SIM_OBTAIN_LI_LANGUAGE_DONE] = &SimFile::ProcessObtainLiLanguage;
+    memberFuncMap_[MSG_SIM_OBTAIN_PL_LANGUAGE_DONE] = &SimFile::ProcessObtainPlLanguage;
     memberFuncMap_[MSG_SIM_OBTAIN_CFF_DONE] = &SimFile::ProcessGetCffDone;
     memberFuncMap_[MSG_SIM_OBTAIN_SPDI_DONE] = &SimFile::ProcessGetSpdiDone;
     memberFuncMap_[MSG_SIM_UPDATE_DONE] = &SimFile::ProcessUpdateDone;
@@ -1055,7 +1090,7 @@ SimFile::~SimFile()
 
 int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
 {
-    int cond = 0;
+    unsigned int cond = 0;
     if (ObtainSPN().empty() || (displayConditionOfSpn_ == SPN_INVALID)) {
         cond = SPN_CONDITION_DISPLAY_PLMN;
     } else if (!roaming || !operatorNum.empty()) {

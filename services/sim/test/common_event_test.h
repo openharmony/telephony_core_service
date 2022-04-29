@@ -36,8 +36,8 @@ const std::string ACTION_STK_COMMAND = "usual.event.telpnony.STK_COMMAND";
 class CommonEventTest : public EventFwk::CommonEventSubscriber {
 public:
     explicit CommonEventTest(const EventFwk::CommonEventSubscribeInfo &sp)
-        : EventFwk::CommonEventSubscriber(sp) {};
-    ~CommonEventTest() {};
+        : EventFwk::CommonEventSubscriber(sp) {}
+    ~CommonEventTest() {}
 
     void OnReceiveEvent(const EventFwk::CommonEventData &data)
     {

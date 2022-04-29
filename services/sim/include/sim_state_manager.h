@@ -30,7 +30,7 @@ enum SimHandleRun {
 class SimStateManager : public std::enable_shared_from_this<SimStateManager> {
 public:
     using HANDLE = const std::shared_ptr<AppExecFwk::EventHandler>;
-    SimStateManager(std::shared_ptr<ITelRilManager> telRilManager);
+    explicit SimStateManager(std::shared_ptr<ITelRilManager> telRilManager);
     ~SimStateManager();
     void Init(int32_t slotId);
     bool HasSimCard();

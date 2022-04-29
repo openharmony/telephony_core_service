@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 class GetRadioStateCallback : public INetworkSearchCallbackStub {
 public:
-    GetRadioStateCallback(IsRadioOnContext *context);
+    explicit GetRadioStateCallback(IsRadioOnContext *context);
     void OnGetRadioStateCallback(const bool isOn, const int32_t errorCode) override;
 
 private:
