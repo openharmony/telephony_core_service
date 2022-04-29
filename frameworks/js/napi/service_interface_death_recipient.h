@@ -27,7 +27,7 @@ class ServiceInterfaceDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
     ServiceInterfaceDeathRecipient() = default;
     virtual ~ServiceInterfaceDeathRecipient() = default;
-    virtual void OnRemoteDied(const wptr<IRemoteObject> &remote) override
+    void OnRemoteDied(const wptr<IRemoteObject> &remote) override
     {
         TELEPHONY_LOGI("service died, remove the proxy object");
         DelayedSingleton<T>::GetInstance()->ResetServiceProxy();

@@ -531,7 +531,7 @@ void NetworkSearchHandler::GetSignalInfo(std::vector<sptr<SignalInformation>> &s
 bool NetworkSearchHandler::TimeOutCheck(int64_t &lastTime, bool checkTime)
 {
     int64_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    if (!checkTime || (checkTime && (now - lastTime) > REQ_INTERVAL)) {
+    if (!checkTime || (now - lastTime) > REQ_INTERVAL) {
         lastTime = now;
         return true;
     }

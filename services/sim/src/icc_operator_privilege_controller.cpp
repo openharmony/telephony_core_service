@@ -19,7 +19,6 @@
 #include <charconv>
 #include <chrono>
 #include <mutex>
-#include <mutex>
 
 #include "inner_event.h"
 #include "sim_data_type.h"

@@ -96,7 +96,7 @@ void GsmCellInformation::SetGsmParam(int32_t bsic, int32_t lac, int32_t arfcn)
 {
     bsic_ = bsic;
     lac_ = lac;
-    arfcn_= arfcn;
+    arfcn_ = arfcn;
 }
 
 GsmCellInformation::GsmCellInformation(const GsmCellInformation &gsmCell)
@@ -239,7 +239,7 @@ void LteCellInformation::SetLteParam(int32_t pci, int32_t tac, int32_t arfcn)
 {
     pci_ = pci;
     tac_ = tac;
-    earfcn_= arfcn;
+    earfcn_ = arfcn;
 }
 
 LteCellInformation::LteCellInformation(const LteCellInformation &lteCell)
@@ -381,7 +381,7 @@ void WcdmaCellInformation::SetWcdmaParam(int32_t psc, int32_t lac, int32_t arfcn
 {
     psc_ = psc;
     lac_ = lac;
-    uarfcn_= arfcn;
+    uarfcn_ = arfcn;
 }
 
 WcdmaCellInformation::WcdmaCellInformation(const WcdmaCellInformation &wcdmaCell)
@@ -523,7 +523,7 @@ void TdscdmaCellInformation::SetTdscdmaParam(int32_t cpid, int32_t lac, int32_t 
 {
     cpid_ = cpid;
     lac_ = lac;
-    uarfcn_= arfcn;
+    uarfcn_ = arfcn;
 }
 
 TdscdmaCellInformation::TdscdmaCellInformation(const TdscdmaCellInformation &tdscdmaCell)
@@ -665,18 +665,18 @@ void CdmaCellInformation::SetCdmaParam(int32_t baseId, int32_t latitude, int32_t
 {
     baseId_ = baseId;
     latitude_ = latitude;
-    longitude_= longitude;
+    longitude_ = longitude;
     nid_ = nid;
-    sid_= sid;
+    sid_ = sid;
 }
 
 CdmaCellInformation::CdmaCellInformation(const CdmaCellInformation &cdmaCell)
 {
     baseId_ = cdmaCell.baseId_;
     latitude_ = cdmaCell.latitude_;
-    longitude_= cdmaCell.longitude_;
+    longitude_ = cdmaCell.longitude_;
     nid_ = cdmaCell.nid_;
-    sid_= cdmaCell.sid_;
+    sid_ = cdmaCell.sid_;
     timeStamp_ = cdmaCell.timeStamp_;
     signalLevel_ = cdmaCell.signalLevel_;
     isCamped_ = cdmaCell.isCamped_;
@@ -686,9 +686,9 @@ CdmaCellInformation &CdmaCellInformation::operator=(const CdmaCellInformation &c
 {
     baseId_ = cdmaCell.baseId_;
     latitude_ = cdmaCell.latitude_;
-    longitude_= cdmaCell.longitude_;
+    longitude_ = cdmaCell.longitude_;
     nid_ = cdmaCell.nid_;
-    sid_= cdmaCell.sid_;
+    sid_ = cdmaCell.sid_;
     timeStamp_ = cdmaCell.timeStamp_;
     signalLevel_ = cdmaCell.signalLevel_;
     isCamped_ = cdmaCell.isCamped_;
@@ -813,7 +813,7 @@ void NrCellInformation::SetNrParam(int32_t nrArfcn, int32_t pci, int32_t tac, in
 {
     nrArfcn_ = nrArfcn;
     pci_ = pci;
-    tac_= tac;
+    tac_ = tac;
     nci_ = nci;
 }
 

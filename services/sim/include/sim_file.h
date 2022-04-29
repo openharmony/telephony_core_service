@@ -115,6 +115,8 @@ private:
     bool ProcessSetMbdn(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessMarkSms(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessObtainSpnPhase(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessObtainLiLanguage(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessObtainPlLanguage(const AppExecFwk::InnerEvent::Pointer &event);
     void StartObtainSpn();
 
     void CheckMncLength();

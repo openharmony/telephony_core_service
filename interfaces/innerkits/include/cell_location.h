@@ -63,6 +63,7 @@ public:
      * @return primary scrambling code for WCDMA, 0 if unknown or GSM
      */
     int32_t GetPsc() const;
+
 private:
     int32_t cellId_ = 0;
     int32_t lac_ = 0;

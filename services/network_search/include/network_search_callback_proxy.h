@@ -25,7 +25,7 @@ class NetworkSearchCallBackProxy : public IRemoteProxy<INetworkSearchCallback> {
 public:
     explicit NetworkSearchCallBackProxy(const sptr<IRemoteObject> &impl);
     virtual ~NetworkSearchCallBackProxy() = default;
-    virtual int32_t OnNetworkSearchCallback(
+    int32_t OnNetworkSearchCallback(
         NetworkSearchCallback requestId, MessageParcel &callBackParcel) override;
 
 private:

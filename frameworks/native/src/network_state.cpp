@@ -54,37 +54,37 @@ bool NetworkState::ReadFromParcel(Parcel &parcel)
     const char *readString = parcel.ReadCString();
     if ((readString == nullptr) ||
         (memcpy_s(psOperatorInfo_.fullName, OperatorInformation::NETWORK_MAX_FULL_NAME_LEN, readString,
-        OperatorInformation::NETWORK_MAX_FULL_NAME_LEN) != 0)) {
+        OperatorInformation::NETWORK_MAX_FULL_NAME_LEN) != EOK)) {
         TELEPHONY_LOGE("fail to copy memory");
         return false;
     }
     if (((readString = parcel.ReadCString()) == nullptr) ||
         (memcpy_s(psOperatorInfo_.shortName, OperatorInformation::NETWORK_MAX_NAME_LEN, readString,
-        OperatorInformation::NETWORK_MAX_NAME_LEN) != 0)) {
+        OperatorInformation::NETWORK_MAX_NAME_LEN) != EOK)) {
         TELEPHONY_LOGE("fail to copy memory");
         return false;
     }
     if (((readString = parcel.ReadCString()) == nullptr) ||
         (memcpy_s(psOperatorInfo_.operatorNumeric, OperatorInformation::NETWORK_MAX_PLMN_LEN, readString,
-        OperatorInformation::NETWORK_MAX_PLMN_LEN) != 0)) {
+        OperatorInformation::NETWORK_MAX_PLMN_LEN) != EOK)) {
         TELEPHONY_LOGE("fail to copy memory");
         return false;
     }
     if (((readString = parcel.ReadCString()) == nullptr) ||
         (memcpy_s(csOperatorInfo_.fullName, OperatorInformation::NETWORK_MAX_FULL_NAME_LEN, readString,
-        OperatorInformation::NETWORK_MAX_FULL_NAME_LEN) != 0)) {
+        OperatorInformation::NETWORK_MAX_FULL_NAME_LEN) != EOK)) {
         TELEPHONY_LOGE("fail to copy memory");
         return false;
     }
     if (((readString = parcel.ReadCString()) == nullptr) ||
         (memcpy_s(csOperatorInfo_.shortName, OperatorInformation::NETWORK_MAX_NAME_LEN, readString,
-        OperatorInformation::NETWORK_MAX_NAME_LEN) != 0)) {
+        OperatorInformation::NETWORK_MAX_NAME_LEN) != EOK)) {
         TELEPHONY_LOGE("fail to copy memory");
         return false;
     }
     if (((readString = parcel.ReadCString()) == nullptr) ||
         (memcpy_s(csOperatorInfo_.operatorNumeric, OperatorInformation::NETWORK_MAX_PLMN_LEN, readString,
-        OperatorInformation::NETWORK_MAX_PLMN_LEN) != 0)) {
+        OperatorInformation::NETWORK_MAX_PLMN_LEN) != EOK)) {
         TELEPHONY_LOGE("fail to copy memory");
         return false;
     }
