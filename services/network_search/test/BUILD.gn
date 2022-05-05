@@ -30,7 +30,6 @@ ohos_executable("tel_network_search_test") {
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/appexecfwk/standard/services/bundlemgr/include",
     "//foundation/aafwk/standard/services/abilitymgr/include",
-    "//base/notification/common_event_service/cesfwk/kits/native/include",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
