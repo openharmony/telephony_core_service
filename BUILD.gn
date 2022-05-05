@@ -148,7 +148,7 @@ ohos_shared_library("tel_core_service") {
     "native_appdatamgr:native_dataability",
     "native_appdatamgr:native_rdb",
     "power_manager_native:powermgr_client",
-    "resmgr_standard:global_resmgr",
+    "resource_management:global_resmgr",
     "ril_adapter:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
