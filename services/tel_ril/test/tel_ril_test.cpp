@@ -88,6 +88,7 @@ enum class DiffInterfaceId {
     TEST_DEL_CDMA_SMS,
     TEST_UPDATE_CDMA_SMS,
 
+    TEST_SHUT_DOWN,
     TEST_SET_POWER_STATE,
     TEST_GET_POWER_STATE,
     TEST_OPERATOR,
@@ -273,6 +274,8 @@ public:
 
     void OnRequestUpdateRilCmCdmaSmsTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
+    void OnRequestShutDownTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+
     void OnRequestSetRadioStateTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestGetRadioStateTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -346,6 +349,7 @@ public:
     private:
         int32_t slotId_;
         void OnRequestGetBasebandVersionTestResponse(const AppExecFwk::InnerEvent::Pointer &event);
+        void OnRequestShutDownTestResponse(const AppExecFwk::InnerEvent::Pointer &event);
     };
 
 private:
@@ -368,6 +372,7 @@ void TelRilTest::OnInitInterface()
 
     /* --------------------------------- MODEL ----------------------------- */
     memberFuncMap_[DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH] = &TelRilTest::OnRequestNetworkGetRssiTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SHUT_DOWN] = &TelRilTest::OnRequestShutDownTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_POWER_STATE] = &TelRilTest::OnRequestSetRadioStateTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_POWER_STATE] = &TelRilTest::OnRequestGetRadioStateTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_CELL_INFO_LIST] = &TelRilTest::OnRequestGetCellInfoListTest;
@@ -1287,6 +1292,18 @@ void TelRilTest::OnRequestUpdateRilCmCdmaSmsTest(
     }
 }
 
+void TelRilTest::OnRequestShutDownTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_SHUT_DOWN);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestShutDownTest -->");
+        telRilManager_->ShutDown(slotId, event);
+        TELEPHONY_LOGI("TelRilTest::OnRequestShutDownTest --> OnRequestShutDownTest finished");
+    }
+}
+
 void TelRilTest::OnRequestSetRadioStateTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SET_STATUS);
@@ -1998,9 +2015,22 @@ void TelRilTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
             OnRequestGetBasebandVersionTestResponse(event);
             break;
         }
+        case uint32_t(DiffInterfaceId::TEST_SHUT_DOWN): {
+            OnRequestShutDownTestResponse(event);
+            break;
+        }
         default:
             break;
     }
+}
+
+void TelRilTest::DemoHandler::OnRequestShutDownTestResponse(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    if (responseInfo == nullptr) {
+        TELEPHONY_LOGI("OnRequestShutDownTestResponse success");
+    }
+    TELEPHONY_LOGI("test shut down done");
 }
 
 void TelRilTest::DemoHandler::OnRequestGetBasebandVersionTestResponse(const AppExecFwk::InnerEvent::Pointer &event)
@@ -2182,6 +2212,7 @@ void Promote()
     cout << "########################### TEL RIL TEST ######################" << endl;
     cout << "usage:" << endl;
 
+    cout << (int32_t)DiffInterfaceId::TEST_SHUT_DOWN << " --> OnRequestShutDownTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_SET_POWER_STATE << " --> OnRequestSetRadioStateTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_POWER_STATE << " --> OnRequestGetRadioStateTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_IMEI << "--> OnRequestGetImeiTest" << endl;

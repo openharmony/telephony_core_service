@@ -27,6 +27,7 @@ void TelRilModem::AddHandlerToMap()
     memberFuncMap_[HNOTI_MODEM_RADIO_STATE_UPDATED] = &TelRilModem::RadioStateUpdated;
     memberFuncMap_[HNOTI_MODEM_VOICE_TECH_UPDATED] = &TelRilModem::VoiceRadioTechUpdated;
     // response
+    memberFuncMap_[HREQ_MODEM_SHUT_DOWN] = &TelRilModem::ShutDownResponse;
     memberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &TelRilModem::SetRadioStateResponse;
     memberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] = &TelRilModem::GetRadioStateResponse;
     memberFuncMap_[HREQ_MODEM_GET_IMEI] = &TelRilModem::GetImeiResponse;
@@ -57,6 +58,14 @@ bool TelRilModem::IsCommonNotification(uint32_t code)
     return code >= HREQ_COMMON_BASE;
 }
 
+int32_t TelRilModem::ShutDownResponse(MessageParcel &data)
+{
+    auto sendData = [](UserEvent &userEvent) -> int32_t {
+        return userEvent.handler_.SendEvent(userEvent.eventId_);
+    };
+    return Response(TELEPHONY_LOG_FUNC_NAME, data, (UserSendEvent)sendData);
+}
+
 int32_t TelRilModem::SetRadioStateResponse(MessageParcel &data)
 {
     auto sendData = [](UserEvent &userEvent) -> int32_t {
@@ -80,6 +89,11 @@ int32_t TelRilModem::GetRadioStateResponse(MessageParcel &data)
         return userEvent.handler_.SendEvent(userEvent.eventId_, radioState);
     };
     return Response(TELEPHONY_LOG_FUNC_NAME, data, (UserSendEvent)sendData);
+}
+
+int32_t TelRilModem::ShutDown(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, (uint32_t)HREQ_MODEM_SHUT_DOWN);
 }
 
 int32_t TelRilModem::SetRadioState(int32_t fun, int32_t rst, const AppExecFwk::InnerEvent::Pointer &response)
