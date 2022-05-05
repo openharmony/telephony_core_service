@@ -26,7 +26,6 @@ ohos_executable("tel_network_search_test") {
     "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager/include",
     "//foundation/aafwk/standard/services/abilitymgr/include",
-    "//base/notification/common_event_service/cesfwk/kits/native/include",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
