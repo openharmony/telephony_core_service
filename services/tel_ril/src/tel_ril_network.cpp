@@ -261,6 +261,10 @@ int32_t TelRilNetwork::GetNeighboringCellInfoListResponse(MessageParcel &data)
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR : GetNeighboringCellInfoListResponse --> handler == nullptr !!!");
+                return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             TELEPHONY_LOGI("TelRilNetwork::GetNeighboringCellInfoListResponse eventId:%{public}d", eventId);
             handler->SendEvent(eventId, cellListNearbyInfo);
@@ -299,6 +303,10 @@ int32_t TelRilNetwork::GetCurrentCellInfoResponse(MessageParcel &data)
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR : GetCurrentCellInfoResponse --> handler == nullptr !!!");
+                return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             TELEPHONY_LOGI("TelRilNetwork::GetCurrentCellInfoResponse eventId:%{public}d", eventId);
             handler->SendEvent(eventId, currentCellList);
@@ -522,6 +530,10 @@ int32_t TelRilNetwork::GetImsRegStatusResponse(MessageParcel &data)
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR : GetImsRegStatusResponse --> handler == nullptr !!!");
+                return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             TELEPHONY_LOGI("TelRilNetwork::GetImsRegStatusResponse eventId:%{public}d", eventId);
             imsRegStatusInfo->flag = telRilRequest->pointer_->GetParam();
@@ -717,6 +729,10 @@ int32_t TelRilNetwork::GetCsRegStatusResponse(MessageParcel &data)
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR : GetCsRegStatusResponse --> handler == nullptr !!!");
+                return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             TELEPHONY_LOGI("TelRilNetwork::GetCsRegStatusResponse eventId:%{public}d", eventId);
             regStatusInfo->flag = telRilRequest->pointer_->GetParam();
@@ -760,6 +776,10 @@ int32_t TelRilNetwork::GetPsRegStatusResponse(MessageParcel &data)
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR : GetPsRegStatusResponse --> handler == nullptr !!!");
+                return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             TELEPHONY_LOGI("TelRilNetwork::GetPsRegStatusResponse eventId:%{public}d", eventId);
             regStatusInfo->flag = telRilRequest->pointer_->GetParam();
@@ -794,6 +814,10 @@ int32_t TelRilNetwork::GetOperatorInfoResponse(MessageParcel &data)
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR : GetOperatorInfoResponse --> handler == nullptr !!!");
+                return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             TELEPHONY_LOGI("TelRilNetwork::GetOperatorInfoResponse eventId:%{public}d", eventId);
             handler->SendEvent(eventId, operatorInfo);
@@ -828,6 +852,10 @@ int32_t TelRilNetwork::GetNetworkSearchInformationResponse(MessageParcel &data)
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR : GetNetworkSearchInformationResponse --> handler == nullptr !!!");
+                return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             TELEPHONY_LOGI(
                 "TelRilNetwork::GetNetworkSearchInformationResponse eventId:%{public}d, itemNum:%{public}d", eventId,
@@ -869,6 +897,10 @@ int32_t TelRilNetwork::GetNetworkSelectionModeResponse(MessageParcel &data)
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR : GetNetworkSelectionModeResponse --> handler == nullptr !!!");
+                return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             TELEPHONY_LOGI("TelRilNetwork::GetNetworkSelectionModeResponse eventId:%{public}d", eventId);
             setNetworkModeInfo->flag = telRilRequest->pointer_->GetParam();
@@ -974,6 +1006,10 @@ int32_t TelRilNetwork::GetPreferredNetworkResponse(MessageParcel &data)
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR : GetPreferredNetworkResponse --> handler == nullptr !!!");
+                return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             TELEPHONY_LOGI("TelRilNetwork::GetPreferredNetworkResponse eventId:%{public}d", eventId);
             preferredNetworkTypeInfo->flag = telRilRequest->pointer_->GetParam();
@@ -1012,6 +1048,10 @@ int32_t TelRilNetwork::GetRadioCapabilityResponse(MessageParcel &data)
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR : GetRadioCapabilityResponse --> handler == nullptr !!!");
+                return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             TELEPHONY_LOGI("TelRilNetwork::GetRadioCapabilityResponse eventId:%{public}d", eventId);
             handler->SendEvent(eventId, radioCapabilityInfo);
@@ -1052,6 +1092,10 @@ int32_t TelRilNetwork::GetPhysicalChannelConfigResponse(MessageParcel &data)
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         if (radioResponseInfo->error == HRilErrType::NONE) {
             std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR : GetPhysicalChannelConfigResponse --> handler == nullptr !!!");
+                return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
             TELEPHONY_LOGI("GetPhysicalChannelConfigResponse eventId:%{public}d", eventId);
             channelConfigInfoList->flag = telRilRequest->pointer_->GetParam();
