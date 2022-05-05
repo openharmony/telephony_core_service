@@ -33,7 +33,6 @@ ohos_executable("tel_network_search_test") {
   deps = [
     "//base/miscservices/time/services:time_service",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:dummy_classes",
     "//foundation/aafwk/standard/interfaces/innerkits/want:want",
     "//utils/native/base:utils",
   ]
