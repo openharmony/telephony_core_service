@@ -40,7 +40,7 @@
                 "ipc",
                 "native_appdatamgr",
                 "power_manager_native",
-                "resmgr_standard",
+                "resource_management",
                 "ril_adapter",
                 "safwk",
                 "samgr_standard",
