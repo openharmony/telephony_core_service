@@ -33,10 +33,7 @@ public:
      */
     int32_t SetRadioStateResponse(MessageParcel &data);
     int32_t GetRadioStateResponse(MessageParcel &data);
-    int32_t ShutDown(const AppExecFwk::InnerEvent::Pointer &response)
-    {
-        return 0;
-    }
+    int32_t ShutDownResponse(MessageParcel &data);
     int32_t RadioStateUpdated(MessageParcel &data);
     int32_t VoiceRadioTechUpdated(MessageParcel &data);
     /**
@@ -45,6 +42,7 @@ public:
      */
     int32_t SetRadioState(int32_t fun, int32_t rst, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetRadioState(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t ShutDown(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetImei(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetMeid(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Pointer &response);
