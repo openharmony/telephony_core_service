@@ -266,7 +266,7 @@ private:
     using RilManagerAndResponseTestFun = void (TelRilTest::*)(
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     std::map<DiffInterfaceId, RilManagerAndResponseTestFun> memberFuncMap_;
-    constexpr static const int32_t WAIT_TIME_SECOND = 3;
+    constexpr static const int32_t WAIT_TIME_SECOND = 20;
     constexpr static const int32_t WAIT_TIME_SECOND_LONG = 30;
 };
 } // namespace Telephony
