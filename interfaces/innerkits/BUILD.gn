@@ -75,7 +75,7 @@ ohos_shared_library("tel_core_service_api") {
     "ipc:ipc_core",
     "ril_adapter:hril_innerkits",
     "samgr_standard:samgr_proxy",
-    "startup_l2:syspara",
+    "init:libbegetutil",
     "utils_base:utils",
   ]
 

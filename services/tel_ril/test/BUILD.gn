@@ -50,7 +50,7 @@ ohos_executable("tel_ril_test") {
     "power_manager_native:powermgr_client",
     "ril_adapter:hril_innerkits",
     "samgr_standard:samgr_proxy",
-    "startup_l2:syspara",
+    "init:libbegetutil",
   ]
 
   if (is_standard_system) {

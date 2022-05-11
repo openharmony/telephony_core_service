@@ -56,7 +56,7 @@ ohos_shared_library("radio") {
     "ril_adapter:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "startup_l2:syspara",
+    "init:libbegetutil",
   ]
 
   subsystem_name = "telephony"

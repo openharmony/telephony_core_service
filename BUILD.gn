@@ -152,7 +152,7 @@ ohos_shared_library("tel_core_service") {
     "ril_adapter:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "startup_l2:syspara",
+    "init:libbegetutil",
     "time_native:time_service",
     "utils_base:utils",
   ]
