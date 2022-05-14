@@ -549,7 +549,7 @@ void IccFileController::GetFileAndDataSize(const unsigned char *data, int &fileS
 int IccFileController::HexConversionDec(const unsigned char hexTens, const unsigned char hexSingle)
 {
     int decTens, decSingle;
-    int four = 4, ten = 10;
+    unsigned int four = 4, ten = 10;
     if (hexTens >= '0' && hexTens <= '9') {
         decTens = (hexTens - '0') << four;
     }
