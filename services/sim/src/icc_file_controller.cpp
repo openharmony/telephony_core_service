@@ -548,22 +548,22 @@ void IccFileController::GetFileAndDataSize(const unsigned char *data, int &fileS
 
 int IccFileController::HexConversionDec(const unsigned char hexTens, const unsigned char hexSingle)
 {
-    int decTens, decSingle;
+    unsigned int decTens = 0, decSingle = 0;
     unsigned int four = 4, ten = 10;
     if (hexTens >= '0' && hexTens <= '9') {
-        decTens = (hexTens - '0') << four;
+        decTens = (unsigned int)(hexTens - '0') << four;
     }
     if (hexTens >= 'A' && hexTens <= 'F') {
         decTens = (hexTens - 'A' + ten) << four;
     }
     if (hexSingle >= '0' && hexSingle <= '9') {
-        decSingle = hexSingle - '0';
+        decSingle = (unsigned int)(hexSingle - '0');
     }
     if (hexSingle >= 'A' && hexSingle <= 'F') {
         decSingle = hexSingle - 'A' + ten;
     }
     TELEPHONY_LOGI("HexConversionDec result %{public}d %{public}d", decTens, decSingle);
-    return decTens + decSingle;
+    return (int)(decTens + decSingle);
 }
 
 void IccFileController::SetRilManager(std::shared_ptr<Telephony::ITelRilManager> ril)
