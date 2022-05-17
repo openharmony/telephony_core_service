@@ -17,7 +17,7 @@
 #define TEL_RIL_CALL_H
 
 #include "tel_ril_base.h"
-
+#include "telephony_types.h"
 namespace OHOS {
 namespace Telephony {
 class TelRilCall : public TelRilBase {
@@ -435,6 +435,18 @@ public:
      *  @brief get call list
      */
     int32_t GetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &result);
+
+    /**
+     *  @brief get call list
+     */
+    int32_t SetEmergencyCallList(std::vector<EmergencyCall>  &eccVec, const AppExecFwk::InnerEvent::Pointer &result);
+
+    /**
+     * @brief set ussd  response
+     *
+     * @param data is HDF service callback message
+     */
+    int32_t SetEmergencyCallListResponse(MessageParcel &data);
 
     /**
      * @brief get call list response
