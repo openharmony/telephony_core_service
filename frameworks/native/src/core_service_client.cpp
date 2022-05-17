@@ -57,7 +57,7 @@ sptr<ICoreService> CoreServiceClient::GetProxy()
     }
     proxy_ = iface_cast<CoreServiceProxy>(obj);
     deathRecipient_ = dr;
-    TELEPHONY_LOGI("Succeed to connect cellular data service %{public}d", proxy_ == nullptr);
+    TELEPHONY_LOGI("Succeed to connect core service %{public}d", proxy_ == nullptr);
     return proxy_;
 }
 

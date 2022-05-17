@@ -559,6 +559,13 @@ int32_t TelRilManager::GetEmergencyCallList(int32_t slotId, const AppExecFwk::In
     return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetEmergencyCallList);
 }
 
+int32_t TelRilManager::SetEmergencyCallList(int32_t slotId, std::vector<EmergencyCall>  &eccVec,
+    const AppExecFwk::InnerEvent::Pointer &response)
+{
+    TELEPHONY_LOGI("SetEmergencyCallList start");
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetEmergencyCallList, eccVec);
+}
+
 int32_t TelRilManager::GetCallFailReason(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetCallFailReason);

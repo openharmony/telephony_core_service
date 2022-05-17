@@ -1349,6 +1349,7 @@ void TelRilTest::GetDataCallListTest(const std::shared_ptr<AppExecFwk::EventHand
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::GetDataCallListTest -->");
+        sleep(WAIT_TIME_SECOND);
         telRilManager_->GetPdpContextList(slotId_, event);
         TELEPHONY_LOGI("TelRilTest::GetDataCallListTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);

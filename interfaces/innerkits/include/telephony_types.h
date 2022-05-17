@@ -155,6 +155,38 @@ struct SimPasswordParam {
     std::string oldPassword;
     std::string newPassword;
 };
+
+enum class EccType:int32_t {
+    TYPE_CATEGORY = 0,
+    TYPE_POLICE = 1,
+    TYPE_AMBULANCE = 2,
+    TYPE_FIRE = 4,
+    TYPE_SEA = 8,
+    TYPE_MOUNTAIN = 16,
+};
+
+enum class SimpresentType:int32_t {
+    TYPE_NO_CARD = 0,
+    TYPE_HAS_CARD = 1,
+};
+
+enum class AbnormalServiceType:int32_t {
+    TYPE_ALL = 0,
+    TYPE_ONLY_CS = 1,
+};
+
+struct EmergencyCall {
+    std::string eccNum;
+    std::string mcc;
+    EccType eccType;
+    SimpresentType simpresent;
+    AbnormalServiceType abnormalService;
+};
+
+struct SetEccListResponse {
+    int32_t result;
+    int32_t value;
+    };
 } // namespace Telephony
 } // namespace OHOS
 #endif // TELEPHONY_TELEPHONY_TYPES_H
