@@ -23,7 +23,6 @@ ohos_executable("tel_network_search_test") {
   ]
 
   include_dirs = [
-    "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager/include",
     "//foundation/aafwk/standard/services/abilitymgr/include",
   ]
@@ -33,11 +32,11 @@ ohos_executable("tel_network_search_test") {
   deps = [
     "//base/miscservices/time/services:time_service",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
-    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "ability_base:want",
     "ability_runtime:wantagent_innerkits",
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
