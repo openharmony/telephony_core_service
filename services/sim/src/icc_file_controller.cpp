@@ -554,13 +554,13 @@ int IccFileController::HexConversionDec(const unsigned char hexTens, const unsig
         decTens = (unsigned int)(hexTens - '0') << four;
     }
     if (hexTens >= 'A' && hexTens <= 'F') {
-        decTens = (hexTens - 'A' + ten) << four;
+        decTens = (unsigned int)(hexTens - 'A' + ten) << four;
     }
     if (hexSingle >= '0' && hexSingle <= '9') {
         decSingle = (unsigned int)(hexSingle - '0');
     }
     if (hexSingle >= 'A' && hexSingle <= 'F') {
-        decSingle = hexSingle - 'A' + ten;
+        decSingle = (unsigned int)(hexSingle - 'A' + ten);
     }
     TELEPHONY_LOGI("HexConversionDec result %{public}d %{public}d", decTens, decSingle);
     return (int)(decTens + decSingle);
