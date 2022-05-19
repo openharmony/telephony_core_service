@@ -1951,7 +1951,7 @@ int32_t TelRilCall::SetEmergencyCallList(std::vector<EmergencyCall>  &eccVec,
     }
 
     EmergencyInfoList emergencyInfoList;
-    emergencyInfoList.callSize = eccVec.size();
+    emergencyInfoList.callSize = (int32_t)eccVec.size();
     emergencyInfoList.flag =  telRilRequest->serialId_;
     int index = 1;
     for (EmergencyCall ecc : eccVec) {
