@@ -14,6 +14,7 @@
  */
 
 #include "sim_rdb_helper.h"
+#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -151,13 +152,20 @@ int32_t SimRdbHelper::SetDefaultMainCard(int32_t slotId)
     TELEPHONY_LOGI("SimRdbHelper::SetDefaultMainCard = %{public}d", slotId);
     NativeRdb::DataAbilityPredicates predicates;
     NativeRdb::ValuesBucket value;
-    value.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
-    value.PutInt(SimRdbInfo::CARD_TYPE, static_cast<int>(DefaultCardType::MAIN));
     if (helper_ == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::SetDefaultMainCard failed by nullptr");
         return INVALID_VALUE;
     }
+    std::string slot = std::to_string(slotId);
+    value.PutInt(SimRdbInfo::IS_MAIN_CARD, static_cast<int>(CardSeclectedStatus::OFF));
+
+    predicates.NotEqualTo(SimRdbInfo::SLOT_INDEX, slot);
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
+    helper_->Update(defaultUri, value, predicates);
+    value.Clear();
+
+    value.PutInt(SimRdbInfo::IS_MAIN_CARD, static_cast<int>(CardSeclectedStatus::ON));
+    predicates.EqualTo(SimRdbInfo::SLOT_INDEX, slot);
     return helper_->Update(defaultUri, value, predicates);
 }
 
@@ -166,12 +174,35 @@ int32_t SimRdbHelper::SetDefaultVoiceCard(int32_t slotId)
     TELEPHONY_LOGI("SimRdbHelper::SetDefaultVoiceCard = %{public}d", slotId);
     NativeRdb::DataAbilityPredicates predicates;
     NativeRdb::ValuesBucket value;
-    value.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
-    value.PutInt(SimRdbInfo::CARD_TYPE, static_cast<int>(DefaultCardType::VOICE));
     if (helper_ == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::SetDefaultVoiceCard failed by nullptr");
         return INVALID_VALUE;
     }
+    std::string slot = std::to_string(slotId);
+    value.PutInt(SimRdbInfo::IS_VOICE_CARD, static_cast<int>(CardSeclectedStatus::OFF));
+
+    predicates.NotEqualTo(SimRdbInfo::SLOT_INDEX, slot);
+    Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
+    helper_->Update(defaultUri, value, predicates);
+    value.Clear();
+
+    value.PutInt(SimRdbInfo::IS_VOICE_CARD, static_cast<int>(CardSeclectedStatus::ON));
+    predicates.EqualTo(SimRdbInfo::SLOT_INDEX, slot);
+    return helper_->Update(defaultUri, value, predicates);
+}
+
+bool SimRdbHelper::RemoveDefaultVoiceCard()
+{
+    TELEPHONY_LOGI("SimRdbHelper::RemoveDefaultVoiceCard");
+    NativeRdb::DataAbilityPredicates predicates;
+    NativeRdb::ValuesBucket value;
+    if (helper_ == nullptr) {
+        TELEPHONY_LOGE("SimRdbHelper::RemoveDefaultVoiceCard failed by nullptr");
+        return false;
+    }
+    std::string slot = std::to_string(DEFAULT_SIM_SLOT_ID_REMOVE);
+    value.PutInt(SimRdbInfo::IS_VOICE_CARD, static_cast<int>(CardSeclectedStatus::OFF));
+    predicates.NotEqualTo(SimRdbInfo::SLOT_INDEX, slot);
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
     return helper_->Update(defaultUri, value, predicates);
 }
@@ -181,31 +212,78 @@ int32_t SimRdbHelper::SetDefaultMessageCard(int32_t slotId)
     TELEPHONY_LOGI("SimRdbHelper::SetDefaultMessageCard = %{public}d", slotId);
     NativeRdb::DataAbilityPredicates predicates;
     NativeRdb::ValuesBucket value;
-    value.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
-    value.PutInt(SimRdbInfo::CARD_TYPE, static_cast<int>(DefaultCardType::SMS));
     if (helper_ == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::SetDefaultMessageCard failed by nullptr");
         return INVALID_VALUE;
     }
+    std::string slot = std::to_string(slotId);
+    value.PutInt(SimRdbInfo::IS_MESSAGE_CARD, static_cast<int>(CardSeclectedStatus::OFF));
+
+    predicates.NotEqualTo(SimRdbInfo::SLOT_INDEX, slot);
+    Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
+    helper_->Update(defaultUri, value, predicates);
+    value.Clear();
+
+    value.PutInt(SimRdbInfo::IS_MESSAGE_CARD, static_cast<int>(CardSeclectedStatus::ON));
+    predicates.EqualTo(SimRdbInfo::SLOT_INDEX, slot);
+    return helper_->Update(defaultUri, value, predicates);
+}
+
+bool SimRdbHelper::RemoveDefaultMessageCard()
+{
+    TELEPHONY_LOGI("SimRdbHelper::RemoveDefaultVoiceCard");
+    NativeRdb::DataAbilityPredicates predicates;
+    NativeRdb::ValuesBucket value;
+    if (helper_ == nullptr) {
+        TELEPHONY_LOGE("SimRdbHelper::RemoveDefaultVoiceCard failed by nullptr");
+        return false;
+    }
+    std::string slot = std::to_string(DEFAULT_SIM_SLOT_ID_REMOVE);
+    value.PutInt(SimRdbInfo::IS_MESSAGE_CARD, static_cast<int>(CardSeclectedStatus::OFF));
+
+    predicates.NotEqualTo(SimRdbInfo::SLOT_INDEX, slot);
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
     return helper_->Update(defaultUri, value, predicates);
 }
 
 int32_t SimRdbHelper::SetDefaultCellularData(int32_t slotId)
 {
-    TELEPHONY_LOGI("SimRdbHelper::SetDefaultCellularData = %{public}d", slotId);
+    TELEPHONY_LOGI("SimRdbHelper::SetDefaultMessageCard = %{public}d", slotId);
     NativeRdb::DataAbilityPredicates predicates;
     NativeRdb::ValuesBucket value;
-    value.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
-    value.PutInt(SimRdbInfo::CARD_TYPE, static_cast<int>(DefaultCardType::CELLULAR_DATA));
     if (helper_ == nullptr) {
-        TELEPHONY_LOGE("SimRdbHelper::SetDefaultCellularData failed by nullptr");
+        TELEPHONY_LOGE("SimRdbHelper::SetDefaultMessageCard failed by nullptr");
         return INVALID_VALUE;
     }
+    std::string slot = std::to_string(slotId);
+    value.PutInt(SimRdbInfo::IS_CELLULAR_DATA_CARD, static_cast<int>(CardSeclectedStatus::OFF));
+
+    predicates.NotEqualTo(SimRdbInfo::SLOT_INDEX, slot);
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
+    helper_->Update(defaultUri, value, predicates);
+    value.Clear();
+
+    value.PutInt(SimRdbInfo::IS_CELLULAR_DATA_CARD, static_cast<int>(CardSeclectedStatus::ON));
+    predicates.EqualTo(SimRdbInfo::SLOT_INDEX, slot);
     return helper_->Update(defaultUri, value, predicates);
 }
 
+bool SimRdbHelper::RemoveDefaultCellularCard()
+{
+    TELEPHONY_LOGI("SimRdbHelper::RemoveDefaultVoiceCard");
+    NativeRdb::DataAbilityPredicates predicates;
+    NativeRdb::ValuesBucket value;
+    if (helper_ == nullptr) {
+        TELEPHONY_LOGE("SimRdbHelper::RemoveDefaultVoiceCard failed by nullptr");
+        return false;
+    }
+    std::string slot = std::to_string(DEFAULT_SIM_SLOT_ID_REMOVE);
+    value.PutInt(SimRdbInfo::IS_CELLULAR_DATA_CARD, static_cast<int>(CardSeclectedStatus::OFF));
+
+    predicates.NotEqualTo(SimRdbInfo::SLOT_INDEX, slot);
+    Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
+    return helper_->Update(defaultUri, value, predicates);
+}
 int32_t SimRdbHelper::InsertData(int64_t &id, const NativeRdb::ValuesBucket &values)
 {
     TELEPHONY_LOGI("SimRdbHelper::InsertData");

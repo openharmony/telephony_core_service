@@ -488,6 +488,13 @@ public:
      */
     int32_t CallEmergencyNotice(MessageParcel &data);
 
+    /**
+     * @brief call ss notice
+     *
+     * @param data is HDF service callback message
+     */
+    int32_t CallSsNotice(MessageParcel &data);
+
 private:
     bool IsCallResponse(uint32_t code);
     bool IsCallNotification(uint32_t code);
