@@ -101,6 +101,16 @@ bool SimAccountManager::IsSimActive(int32_t slotId)
     return multiSimController_->IsSimActive(slotId);
 }
 
+bool SimAccountManager::IsSimActivatable(int32_t slotId)
+{
+    TELEPHONY_LOGI("SimAccountManager::IsSimActivatable");
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("SimAccountManager::IsSimActivatable failed by nullptr");
+        return false;
+    }
+    return multiSimController_->IsSimActivatable(slotId);
+}
+
 bool SimAccountManager::SetActiveSim(int32_t slotId, int32_t enable)
 {
     TELEPHONY_LOGI("SimAccountManager::SetActiveSim");

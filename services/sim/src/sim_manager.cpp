@@ -91,7 +91,15 @@ bool SimManager::HasSimCard(int32_t slotId)
         TELEPHONY_LOGE("simStateManager is null!");
         return false;
     }
-    return simStateManager_[slotId]->HasSimCard();
+    if (simStateManager_[slotId]->HasSimCard()) {
+        TELEPHONY_LOGE("HasSimCard is true!");
+        return true;
+    }
+    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simAccountManager is null!");
+        return false;
+    }
+    return simAccountManager_[slotId]->IsSimActivatable(slotId);
 }
 
 int32_t SimManager::GetSimState(int32_t slotId)
@@ -231,7 +239,7 @@ bool SimManager::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
 
 bool SimManager::SetDefaultVoiceSlotId(int32_t slotId)
 {
-    if ((!IsValidSlotId(slotId)) || (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr)) {
+    if ((!IsValidSlotIdForDefault(slotId)) || (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr)) {
         TELEPHONY_LOGE("simAccountManager is null!");
         return false;
     }
@@ -240,7 +248,7 @@ bool SimManager::SetDefaultVoiceSlotId(int32_t slotId)
 
 bool SimManager::SetDefaultSmsSlotId(int32_t slotId)
 {
-    if ((!IsValidSlotId(slotId)) || (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr)) {
+    if ((!IsValidSlotIdForDefault(slotId)) || (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr)) {
         TELEPHONY_LOGE("simAccountManager is null!");
         return false;
     }
@@ -249,7 +257,7 @@ bool SimManager::SetDefaultSmsSlotId(int32_t slotId)
 
 bool SimManager::SetDefaultCellularDataSlotId(int32_t slotId)
 {
-    if ((!IsValidSlotId(slotId)) || (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr)) {
+    if ((!IsValidSlotIdForDefault(slotId)) || (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr)) {
         TELEPHONY_LOGE("simAccountManager is null!");
         return false;
     }
@@ -626,6 +634,16 @@ void SimManager::UnRegisterCoreNotify(
 bool SimManager::IsValidSlotId(int32_t slotId)
 {
     if ((slotId < SLOT_ID_ZERO) || (slotId >= slotCount_)) {
+        TELEPHONY_LOGE("slotId is invalid, slotId = %{public}d", slotId);
+        return false;
+    }
+    TELEPHONY_LOGI("slotId is valid, slotId = %{public}d", slotId);
+    return true;
+}
+
+bool SimManager::IsValidSlotIdForDefault(int32_t slotId)
+{
+    if ((slotId < DEFAULT_SIM_SLOT_ID_REMOVE) || (slotId >= slotCount_)) {
         TELEPHONY_LOGE("slotId is invalid, slotId = %{public}d", slotId);
         return false;
     }

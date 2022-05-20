@@ -31,6 +31,7 @@ void TelRilCall::AddHandlerToMap()
     memberFuncMap_[HNOTI_CALL_RINGBACK_VOICE_REPORT] = &TelRilCall::CallRingbackVoiceNotice;
     memberFuncMap_[HNOTI_CALL_SRVCC_STATUS_REPORT] = &TelRilCall::SrvccStatusNotice;
     memberFuncMap_[HNOTI_CALL_EMERGENCY_NUMBER_REPORT] = &TelRilCall::CallEmergencyNotice;
+    memberFuncMap_[HNOTI_CALL_SS_REPORT] = &TelRilCall::CallSsNotice;
 
     // Response
     memberFuncMap_[HREQ_CALL_GET_CALL_LIST] = &TelRilCall::GetCallListResponse;
@@ -556,8 +557,8 @@ int32_t TelRilCall::GetCallTransferInfoResponse(MessageParcel &data)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    std::shared_ptr<CallForwardQueryResult> cFQueryResult = std::make_shared<CallForwardQueryResult>();
-    cFQueryResult->ReadFromParcel(data);
+    std::shared_ptr<CallForwardQueryInfoList> cFQueryList = std::make_shared<CallForwardQueryInfoList>();
+    cFQueryList->ReadFromParcel(data);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
     if (telRilRequest == nullptr || telRilRequest->pointer_ == nullptr) {
         TELEPHONY_LOGE("ERROR : telRilRequest or telRilRequest->pointer_ is nullptr !!!");
@@ -569,7 +570,7 @@ int32_t TelRilCall::GetCallTransferInfoResponse(MessageParcel &data)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
-    handler->SendEvent(eventId, cFQueryResult);
+    handler->SendEvent(eventId, cFQueryList);
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -1814,6 +1815,23 @@ int32_t TelRilCall::CallUssdNotice(MessageParcel &data)
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t TelRilCall::CallSsNotice(MessageParcel &data)
+{
+    std::shared_ptr<SsNoticeInfo> ssNoticeInfo = std::make_shared<SsNoticeInfo>();
+    if (ssNoticeInfo == nullptr) {
+        TELEPHONY_LOGE("ERROR : ssNoticeInfo == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    ssNoticeInfo->ReadFromParcel(data);
+    if (observerHandler_ != nullptr) {
+        observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_SS_NOTICE, ssNoticeInfo);
+    } else {
+        TELEPHONY_LOGE("ERROR : observerHandler_ == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 int32_t TelRilCall::CallRingbackVoiceNotice(MessageParcel &data)
 {
     return NotifyObserver<RingbackVoice>(RadioEvent::RADIO_CALL_RINGBACK_VOICE, data);
@@ -2101,14 +2119,14 @@ int32_t TelRilCall::GetCallFailReasonResponse(MessageParcel &data)
 
 int32_t TelRilCall::CallEmergencyNotice(MessageParcel &data)
 {
-    std::shared_ptr<EmergencyInfo> emergencyInfo = std::make_shared<EmergencyInfo>();
-    if (emergencyInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : emergencyInfo == nullptr !!!");
+    std::shared_ptr<EmergencyInfoList> emergencyInfoList = std::make_shared<EmergencyInfoList>();
+    if (emergencyInfoList == nullptr) {
+        TELEPHONY_LOGE("ERROR : emergencyInfoList == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    emergencyInfo->ReadFromParcel(data);
+    emergencyInfoList->ReadFromParcel(data);
     if (observerHandler_ != nullptr) {
-        observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_EMERGENCY_NUMBER_REPORT, emergencyInfo);
+        observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_EMERGENCY_NUMBER_REPORT, emergencyInfoList);
     } else {
         TELEPHONY_LOGE("ERROR : observerHandler_ == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

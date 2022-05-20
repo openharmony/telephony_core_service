@@ -370,6 +370,9 @@ std::u16string CoreService::GetLocaleFromDefaultSim()
         return std::u16string();
     }
     int32_t slotId = simManager_->GetPrimarySlotId();
+    if (slotId < DEFAULT_SIM_SLOT_ID) {
+        slotId = DEFAULT_SIM_SLOT_ID;
+    }
     return simManager_->GetLocaleFromDefaultSim(slotId);
 }
 

@@ -57,6 +57,7 @@ public:
     std::u16string GetShowName(int32_t slotId);
     bool SetShowName(int32_t slotId, std::u16string name, bool force = false);
     bool IsSimActive(int32_t slotId);
+    bool IsSimActivatable(int32_t slotId);
     bool SetActiveSim(int32_t slotId, int32_t enable, bool force = false);
     bool SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable);
     bool ForgetAllData();
@@ -84,6 +85,7 @@ private:
     const static int32_t EMPTY_VECTOR = 0;
     const static int32_t SUCCESS = 0;
     const static int32_t ACTIVE_INIT = -1;
+    const static int32_t ACTIVATABLE = 2;
     const static int32_t RETRY_COUNT = 12;
     const static int32_t RETRY_TIME = 5000;
     int32_t slotId_ = 0;

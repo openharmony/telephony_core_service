@@ -55,11 +55,9 @@ public:
     int isActive;
 };
 
-enum class DefaultCardType {
-    MAIN,
-    VOICE,
-    SMS,
-    CELLULAR_DATA,
+enum class CardSeclectedStatus {
+    OFF,
+    ON,
 };
 } // namespace Telephony
 } // namespace OHOS

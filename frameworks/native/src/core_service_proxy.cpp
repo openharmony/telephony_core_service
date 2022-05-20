@@ -21,6 +21,7 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_types.h"
+#include "sim_state_type.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -836,7 +837,7 @@ bool CoreServiceProxy::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
 bool CoreServiceProxy::SetDefaultVoiceSlotId(int32_t slotId)
 {
     TELEPHONY_LOGI("CoreServiceProxy::SetDefaultVoiceSlotId slotId = %{public}d", slotId);
-    if (!IsValidSlotId(slotId)) {
+    if (!IsValidSlotIdForDefault(slotId)) {
         return false;
     }
     MessageParcel data;
@@ -1127,6 +1128,17 @@ bool CoreServiceProxy::IsValidSlotId(int32_t slotId)
     }
 }
 
+bool CoreServiceProxy::IsValidSlotIdForDefault(int32_t slotId)
+{
+    int32_t count = GetMaxSimCount();
+    if ((slotId >= DEFAULT_SIM_SLOT_ID_REMOVE) && (slotId < count)) {
+        return true;
+    } else {
+        TELEPHONY_LOGE("SimId is InValid = %{public}d", slotId);
+        return false;
+    }
+}
+
 bool CoreServiceProxy::IsValidStringLength(std::u16string str)
 {
     int32_t length = static_cast<int32_t>(str.length());
@@ -1162,7 +1174,9 @@ bool CoreServiceProxy::UnlockPin(const int32_t slotId, std::u16string pin, LockS
     TELEPHONY_LOGI("UnlockPin successful, error code is %{public}d \n", st);
     bool result = reply.ReadBool();
     response.result = reply.ReadInt32();
-    response.remain = reply.ReadInt32();
+    if (response.result == UNLOCK_INCORRECT) {
+        response.remain = reply.ReadInt32();
+    }
     return result;
 }
 
@@ -1192,7 +1206,9 @@ bool CoreServiceProxy::UnlockPuk(
     TELEPHONY_LOGI("UnlockPuk successful, error code is %{public}d \n", st);
     bool result = reply.ReadBool();
     response.result = reply.ReadInt32();
-    response.remain = reply.ReadInt32();
+    if (response.result == UNLOCK_INCORRECT) {
+        response.remain = reply.ReadInt32();
+    }
     return result;
 }
 
@@ -1222,7 +1238,9 @@ bool CoreServiceProxy::AlterPin(
     TELEPHONY_LOGI("AlterPin successful, error code is %{public}d \n", st);
     bool result = reply.ReadBool();
     response.result = reply.ReadInt32();
-    response.remain = reply.ReadInt32();
+    if (response.result == UNLOCK_INCORRECT) {
+        response.remain = reply.ReadInt32();
+    }
     return result;
 }
 
@@ -1250,7 +1268,9 @@ bool CoreServiceProxy::UnlockPin2(const int32_t slotId, std::u16string pin2, Loc
     TELEPHONY_LOGI("UnlockPin2 successful, error code is %{public}d \n", st);
     bool result = reply.ReadBool();
     response.result = reply.ReadInt32();
-    response.remain = reply.ReadInt32();
+    if (response.result == UNLOCK_INCORRECT) {
+        response.remain = reply.ReadInt32();
+    }
     return result;
 }
 
@@ -1280,7 +1300,9 @@ bool CoreServiceProxy::UnlockPuk2(
     TELEPHONY_LOGI("UnlockPuk2 successful, error code is %{public}d \n", st);
     bool result = reply.ReadBool();
     response.result = reply.ReadInt32();
-    response.remain = reply.ReadInt32();
+    if (response.result == UNLOCK_INCORRECT) {
+        response.remain = reply.ReadInt32();
+    }
     return result;
 }
 
@@ -1310,7 +1332,9 @@ bool CoreServiceProxy::AlterPin2(
     TELEPHONY_LOGI("AlterPin2 successful, error code is %{public}d \n", st);
     bool result = reply.ReadBool();
     response.result = reply.ReadInt32();
-    response.remain = reply.ReadInt32();
+    if (response.result == UNLOCK_INCORRECT) {
+        response.remain = reply.ReadInt32();
+    }
     return result;
 }
 
@@ -1339,8 +1363,12 @@ bool CoreServiceProxy::SetLockState(const int32_t slotId, const LockInfo &option
     }
     TELEPHONY_LOGI("SetLockState successful, error code is %{public}d \n", st);
     bool result = reply.ReadBool();
+    TELEPHONY_LOGI("SetLockState successful, result:%{public}d \n", result);
     response.result = reply.ReadInt32();
-    response.remain = reply.ReadInt32();
+    if (response.result == UNLOCK_INCORRECT) {
+        response.remain = reply.ReadInt32();
+        TELEPHONY_LOGI("SetLockState successful, response.remain code is %{public}d \n", response.remain);
+    }
     return result;
 }
 

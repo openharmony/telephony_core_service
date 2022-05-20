@@ -210,7 +210,7 @@ static bool TestSetPrimarySlotId()
 static bool TestGetPrimarySlotId()
 {
     int32_t result = g_telephonyService->GetPrimarySlotId();
-    string expect = (result != INVALID_VALUE) ? "success" : "fail";
+    string expect = (result >= INVALID_VALUE) ? "success" : "fail";
     std::cout << "TelephonyTestService Remote GetPrimarySlotId result [" << result << "] " << expect
               << std::endl;
     return true;
@@ -228,9 +228,10 @@ static bool TestGetISOCountryCodeForSim()
 
 static bool TestGetSimSpn()
 {
-    std::u16string result = g_telephonyService->GetSimSpn(SLOT_ID);
+    std::u16string result  = u"test";
+    result = g_telephonyService->GetSimSpn(SLOT_ID);
     std::string str = Str16ToStr8(result);
-    string expect = str.empty() ? "fail" : "success";
+    string expect = strcmp(str.c_str(), "test") ? "success" : "fail";
     std::cout << "TelephonyTestService Remote GetSimSpn result [" << str << "] " << expect << std::endl;
     return true;
 }
@@ -509,7 +510,7 @@ static bool TestSetDefaultVoiceSlotId()
 static bool TestGetDefaultVoiceSlotId()
 {
     int32_t result = g_telephonyService->GetDefaultVoiceSlotId();
-    string expect = (result != INVALID_VALUE) ? "success" : "fail";
+    string expect = (result >= INVALID_VALUE) ? "success" : "fail";
     std::cout << "TelephonyTestService Remote GetDefaultVoiceSlotId result [" << result << "] " << expect
               << std::endl;
     return true;

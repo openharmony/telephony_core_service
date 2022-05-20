@@ -26,6 +26,7 @@ namespace Telephony {
 #define SIM_SLOT_COUNT GetMaxSlotCount<int32_t>()
 inline const int32_t SYSPARA_SIZE = 128;
 inline const int32_t DEFAULT_SIM_SLOT_ID = 0;
+inline const int32_t DEFAULT_SIM_SLOT_ID_REMOVE = -1;
 inline const std::string DEFAULT_SLOT_COUNT = "1";
 inline const std::string TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
 

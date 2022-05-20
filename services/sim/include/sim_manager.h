@@ -112,6 +112,7 @@ public:
 
 private:
     bool IsValidSlotId(int32_t slotId);
+    bool IsValidSlotIdForDefault(int32_t slotId);
 
 private:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
