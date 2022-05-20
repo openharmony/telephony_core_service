@@ -66,6 +66,7 @@ public:
     bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
     bool GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) override;
     bool IsValidSlotId(int32_t slotId);
+    bool IsValidSlotIdForDefault(int32_t slotId);
     bool IsValidStringLength(std::u16string str);
 
     bool UnlockPin(const int32_t slotId, std::u16string pin, LockStatusResponse &response) override;
