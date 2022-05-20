@@ -123,8 +123,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimSpn_0100, Function | MediumTest | Level1)
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetSimSpn(SimTest::slotId_));
-        EXPECT_STRNE(result.c_str(), "");
+        std::string result = "testresult";
+        result = Str16ToStr8(SimTest::telephonyService_->GetSimSpn(SimTest::slotId_));
+        EXPECT_STRNE(result.c_str(), "testresult");
     }
 }
 
@@ -187,8 +188,9 @@ HWTEST_F(SimTest, Telephony_GetLocaleFromDefaultSim_0100, Function | MediumTest 
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetLocaleFromDefaultSim());
-        EXPECT_STRNE(result.c_str(), "");
+        std::string result = "test";
+        result = Str16ToStr8(SimTest::telephonyService_->GetLocaleFromDefaultSim());
+        EXPECT_STRNE(result.c_str(), "test");
     }
 }
 
@@ -292,7 +294,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetDefaultVoiceSlotId_0100, Function | MediumTes
         SimTest::telephonyService_ = GetProxy();
     } else {
         int32_t result = SimTest::telephonyService_->GetDefaultVoiceSlotId();
-        EXPECT_GT(result, -1);
+        EXPECT_GT(result, -2);
     }
 }
 
@@ -579,8 +581,9 @@ HWTEST_F(SimTest, Telephony_Sim_getShowNumber_0100, Function | MediumTest | Leve
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetShowNumber(SimTest::slotId_));
-        EXPECT_STRNE(result.c_str(), "");
+        std::string result = "test";
+        result = Str16ToStr8(SimTest::telephonyService_->GetShowNumber(SimTest::slotId_));
+        EXPECT_STRNE(result.c_str(), "test");
     }
 }
 

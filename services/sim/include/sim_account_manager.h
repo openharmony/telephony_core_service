@@ -34,6 +34,7 @@ public:
     void Init(int32_t slotId);
     void SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager);
     bool IsSimActive(int32_t slotId);
+    bool IsSimActivatable(int32_t slotId);
     bool SetActiveSim(int32_t slotId, int32_t enable);
     bool GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
     bool SetDefaultVoiceSlotId(int32_t slotId);
