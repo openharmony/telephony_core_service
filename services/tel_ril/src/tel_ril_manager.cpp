@@ -901,6 +901,20 @@ int32_t TelRilManager::SimTransmitApduLogicalChannel(
         response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimTransmitApduLogicalChannel, reqInfo);
 }
 
+int32_t TelRilManager::SimTransmitApduBasicChannel(
+    int32_t slotId, ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(
+        response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimTransmitApduBasicChannel, reqInfo);
+}
+
+int32_t TelRilManager::SimAuthentication(
+    int32_t slotId, SimAuthenticationRequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(
+        response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimAuthentication, reqInfo);
+}
+
 int32_t TelRilManager::UnlockSimLock(
     int32_t slotId, int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response)
 {
