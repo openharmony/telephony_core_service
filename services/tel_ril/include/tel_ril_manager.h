@@ -299,6 +299,10 @@ public:
         int32_t slotId, const int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SimTransmitApduLogicalChannel(
         int32_t slotId, ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SimTransmitApduBasicChannel(
+        int32_t slotId, ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SimAuthentication(
+        int32_t slotId, SimAuthenticationRequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     static const int32_t INVALID_WAKELOCK = -1;
     static const int32_t FOR_WAKELOCK = 0;

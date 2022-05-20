@@ -126,7 +126,9 @@ enum class DiffInterfaceId {
 enum class CustomMessageID : uint32_t {
     MSG_OPEN_LOGICAL_CHANNEL_DONE = 0x7f000000,
     MSG_TRANSMIT_LOGICAL_CHANNEL_DONE = 0x7f000001,
-    MSG_CLOSE_LOGICAL_CHANNEL_DONE = 0x7f000002
+    MSG_CLOSE_LOGICAL_CHANNEL_DONE = 0x7f000002,
+    MSG_TRANSMIT_BASIC_CHANNEL_DONE = 0x7f000003,
+    MSG_SIM_AUTHENTICATION_DONE = 0x7f000004
 };
 
 using namespace OHOS;
@@ -639,6 +641,44 @@ void TelRilTest::OnRequestTransmitApduLogicalChannelTest(int32_t slotId,
     ApduSimIORequestInfo reqInfo;
     telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, event);
     std::cout << "TelRilTest::OnRequestTransmitApduLogicalChannelTest end" << std::endl;
+}
+
+void TelRilTest::OnRequestTransmitApduBasicChannelTest(int32_t slotId,
+    const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    std::cout << "TelRilTest::OnRequestTransmitApduBasicChannelTest begin:" << std::endl;
+    auto event = AppExecFwk::InnerEvent::Get(uint32_t(CustomMessageID::MSG_TRANSMIT_BASIC_CHANNEL_DONE));
+    if (event == nullptr) {
+        std::cerr << "event is nullptr" << std::endl;
+        return;
+    }
+    event->SetOwner(handler);
+    if (telRilManager_ == nullptr) {
+        std::cerr << "telRilManager is nullptr" << std::endl;
+        return;
+    }
+    ApduSimIORequestInfo reqInfo;
+    telRilManager_->SimTransmitApduBasicChannel(slotId, reqInfo, event);
+    std::cout << "TelRilTest::OnRequestTransmitApduBasicChannelTest end" << std::endl;
+}
+
+void TelRilTest::OnSimAuthenticationTest(int32_t slotId,
+    const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    std::cout << "TelRilTest::OnSimAuthenticationTest begin:" << std::endl;
+    auto event = AppExecFwk::InnerEvent::Get(uint32_t(CustomMessageID::MSG_SIM_AUTHENTICATION_DONE));
+    if (event == nullptr) {
+        std::cerr << "event is nullptr" << std::endl;
+        return;
+    }
+    event->SetOwner(handler);
+    if (telRilManager_ == nullptr) {
+        std::cerr << "telRilManager is nullptr" << std::endl;
+        return;
+    }
+    SimAuthenticationRequestInfo reqInfo;
+    telRilManager_->SimAuthentication(slotId, reqInfo, event);
+    std::cout << "TelRilTest::OnSimAuthenticationTest end" << std::endl;
 }
 
 void TelRilTest::OnRequestCloseLGSimIOTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
@@ -2007,8 +2047,21 @@ void TelRilTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
             TELEPHONY_LOGI("TransmitSimIO response:'%{public}s'", result->response.c_str());
             break;
         }
+        case uint32_t(CustomMessageID::MSG_TRANSMIT_BASIC_CHANNEL_DONE): {
+            auto result = event->GetUniqueObject<IccIoResultInfo>();
+            if (result == nullptr) {
+                TELEPHONY_LOGE("TransmitSimIO response nullptr");
+                break;
+            }
+            TELEPHONY_LOGI("TransmitSimIO response:'%{public}s'", result->response.c_str());
+            break;
+        }
         case uint32_t(CustomMessageID::MSG_CLOSE_LOGICAL_CHANNEL_DONE): {
             TELEPHONY_LOGI("close logical channel done");
+            break;
+        }
+        case uint32_t(CustomMessageID::MSG_SIM_AUTHENTICATION_DONE): {
+            TELEPHONY_LOGI("sim authentication done");
             break;
         }
         case uint32_t(DiffInterfaceId::TEST_GET_BASEBAND_VERSION): {
