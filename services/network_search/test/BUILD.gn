@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/telephony/core_service/core_service_aafwk.gni")
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
@@ -23,15 +24,15 @@ ohos_executable("tel_network_search_test") {
   ]
 
   include_dirs = [
-    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager/include",
-    "//foundation/aafwk/standard/services/abilitymgr/include",
+    "${aafwk_inner_api_path}/ability_manager/include",
+    "${aafwk_services_path}/abilitymgr/include",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
+    "${aafwk_kits_path}/ability/native:abilitykit_native",
     "//base/miscservices/time/services:time_service",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//utils/native/base:utils",
   ]
 

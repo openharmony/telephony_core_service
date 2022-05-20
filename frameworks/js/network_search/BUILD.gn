@@ -10,6 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//base/telephony/core_service/core_service_aafwk.gni")
 import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 
@@ -24,7 +25,7 @@ ohos_shared_library("radio") {
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
     "$SUBSYSTEM_DIR/core_service/common/sim",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native/include",
+    "${aafwk_kits_path}/ability/native/include",
   ]
 
   sources = [

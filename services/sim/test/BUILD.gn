@@ -10,6 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//base/telephony/core_service/core_service_aafwk.gni")
 import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
@@ -57,9 +58,9 @@ ohos_executable("tel_sim_test") {
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
+    "${aafwk_kits_path}/ability/native:abilitykit_native",
     "//base/telephony/core_service:tel_core_service",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//utils/native/base:utils",
   ]
 
