@@ -31,6 +31,7 @@ public:
     int32_t SimStkSessionEndNotify(MessageParcel &data);
     int32_t SimStkProactiveNotify(MessageParcel &data);
     int32_t SimStkAlphaNotify(MessageParcel &data);
+    int32_t SimRefreshNotify(MessageParcel &data);
 
     int32_t GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetImsi(const AppExecFwk::InnerEvent::Pointer &result);
@@ -55,6 +56,10 @@ public:
     int32_t SimCloseLogicalChannel(int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimTransmitApduLogicalChannel(ApduSimIORequestInfo reqInfo,
         const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SimTransmitApduBasicChannel(ApduSimIORequestInfo reqInfo,
+        const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SimAuthentication(SimAuthenticationRequestInfo reqInfo,
+        const AppExecFwk::InnerEvent::Pointer &response);
     int32_t UnlockSimLock(int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response);
 
     int32_t GetSimStatusResponse(MessageParcel &data);
@@ -77,6 +82,8 @@ public:
     int32_t SimOpenLogicalChannelResponse(MessageParcel &data);
     int32_t SimCloseLogicalChannelResponse(MessageParcel &data);
     int32_t SimTransmitApduLogicalChannelResponse(MessageParcel &data);
+    int32_t SimTransmitApduBasicChannelResponse(MessageParcel &data);
+    int32_t SimAuthenticationResponse(MessageParcel &data);
     int32_t UnlockSimLockResponse(MessageParcel &data);
 
     bool IsSimRespOrNotify(uint32_t code);
