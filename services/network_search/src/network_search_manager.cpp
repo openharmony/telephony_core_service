@@ -1099,6 +1099,10 @@ void NetworkSearchManager::TriggerTimezoneRefresh(int32_t slotId)
 
 bool NetworkSearchManager::GetAirplaneMode()
 {
+#ifndef TELEPHONY_SUPPORT_AIRPLANE_MODE
+    TELEPHONY_LOGI("do not support airplane mode, return true");
+    return true;
+#else
     std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGI("settingHelper is null");
@@ -1115,6 +1119,7 @@ bool NetworkSearchManager::GetAirplaneMode()
     bool airplaneMode = value == "1";
     TELEPHONY_LOGI("Get airplane mode:%{public}d", airplaneMode);
     return airplaneMode;
+#endif
 }
 } // namespace Telephony
 } // namespace OHOS
