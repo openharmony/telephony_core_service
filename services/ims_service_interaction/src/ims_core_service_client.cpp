@@ -37,18 +37,16 @@ void ImsCoreServiceClient::Init()
     if (!IsConnect()) {
         GetImsCoreServiceProxy();
     }
-    // register callback
-    RegisterImsCoreServiceCallback();
 }
 
 int32_t ImsCoreServiceClient::GetImsRegistrationStatus(int32_t slotId)
 {
-    if (imsCoreServiceProxy_ != nullptr) {
-        return imsCoreServiceProxy_->GetImsRegistrationStatus(slotId);
-    } else {
-        TELEPHONY_LOGE("imsCoreServiceProxy_ is null!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
+
+    return imsCoreServiceProxy_->GetImsRegistrationStatus(slotId);
 }
 
 sptr<ImsCoreServiceInterface> ImsCoreServiceClient::GetImsCoreServiceProxy()
@@ -71,6 +69,8 @@ sptr<ImsCoreServiceInterface> ImsCoreServiceClient::GetImsCoreServiceProxy()
         TELEPHONY_LOGE("GetImsCoreServiceProxy return, iface_cast is nullptr.");
         return nullptr;
     }
+    // register callback
+    RegisterImsCoreServiceCallback();
     TELEPHONY_LOGI("GetImsCoreServiceProxy success.");
     return imsCoreServiceProxy_;
 }
@@ -97,6 +97,37 @@ int32_t ImsCoreServiceClient::RegisterImsCoreServiceCallback()
         return TELEPHONY_ERR_FAIL;
     }
     TELEPHONY_LOGI("RegisterImsCoreServiceCallback success.");
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t ImsCoreServiceClient::RegisterImsCoreServiceCallbackHandler(int32_t slotId,
+    const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    if (handler == nullptr) {
+        TELEPHONY_LOGE("RegisterImsCoreServiceCallbackHandler return, handler is null.");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    handlerMap_.insert(std::make_pair(slotId, handler));
+    TELEPHONY_LOGI("RegisterImsCoreServiceCallbackHandler success.");
+    return TELEPHONY_SUCCESS;
+}
+
+std::shared_ptr<AppExecFwk::EventHandler> ImsCoreServiceClient::GetHandler(int32_t slotId)
+{
+    return handlerMap_[slotId];
+}
+
+int32_t ImsCoreServiceClient::ReConnectService()
+{
+    if (imsCoreServiceProxy_ == nullptr) {
+        TELEPHONY_LOGI("try to reconnect ims core service now...");
+        GetImsCoreServiceProxy();
+        if (imsCoreServiceProxy_ == nullptr) {
+            TELEPHONY_LOGE("Connect service failed");
+            return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        }
+    }
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony

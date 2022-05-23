@@ -91,7 +91,7 @@ public:
     bool DelIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
     bool UpdateIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
     bool SetVoiceMailInfo(int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber);
-    bool GetImsRegStatus(int32_t slotId);
+    ImsRegInfo GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType);
     int32_t GetMaxSimCount();
     int32_t GetCardType(int32_t slotId);
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd);
@@ -102,6 +102,14 @@ public:
     bool SetPrimarySlotId(int32_t slotId);
     std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId);
     bool SendUpdateCellLocationRequest(int32_t slotId);
+    int32_t RegImsVoiceCallback(int32_t slotId, const sptr<ImsVoiceCallback> &callback);
+    int32_t UnRegImsVoiceCallback(int32_t slotId, const sptr<ImsVoiceCallback> &callback);
+    int32_t RegImsVideoCallback(int32_t slotId, const sptr<ImsVideoCallback> &callback);
+    int32_t UnRegImsVideoCallback(int32_t slotId, const sptr<ImsVideoCallback> &callback);
+    int32_t RegImsUtCallback(int32_t slotId, const sptr<ImsUtCallback> &callback);
+    int32_t UnRegImsUtCallback(int32_t slotId, const sptr<ImsUtCallback> &callback);
+    int32_t RegImsSmsCallback(int32_t slotId, const sptr<ImsSmsCallback> &callback);
+    int32_t UnRegImsSmsCallback(int32_t slotId, const sptr<ImsSmsCallback> &callback);
 
 private:
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {

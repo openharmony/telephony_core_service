@@ -15,6 +15,7 @@
 
 #include "network_search_handler.h"
 
+#include "ims_core_service_client.h"
 #include "network_search_manager.h"
 #include "telephony_log_wrapper.h"
 
@@ -42,8 +43,9 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
     {RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, &NetworkSearchHandler::SetPreferredNetworkResponse},
     {RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE, &NetworkSearchHandler::GetPreferredNetworkResponse},
     {RadioEvent::RADIO_NETWORK_TIME_UPDATE, &NetworkSearchHandler::RadioNitzUpdate},
-    {RadioEvent::RADIO_IMS_REG_STATUS_UPDATE, &NetworkSearchHandler::ImsRegStateUpdate},
     {RadioEvent::RADIO_GET_IMS_REG_STATUS, &NetworkSearchHandler::GetImsRegStatus},
+    {ImsCoreServiceInterface::IMS_SERVICE_STATUS_UPDATE, &NetworkSearchHandler::UpdateImsServiceStatus},
+    {ImsCoreServiceInterface::IMS_REGISTER_STATE_UPDATE, &NetworkSearchHandler::UpdateImsRegisterState},
     {RadioEvent::RADIO_GET_IMEI, &NetworkSearchHandler::RadioGetImei},
     {RadioEvent::RADIO_GET_MEID, &NetworkSearchHandler::RadioGetMeid},
     {RadioEvent::RADIO_GET_NEIGHBORING_CELL_INFO, &NetworkSearchHandler::RadioGetNeighboringCellInfo},
@@ -150,13 +152,19 @@ void NetworkSearchHandler::RegisterEvents()
             telRilManager->RegisterCoreNotify(
                 slotId_, shared_from_this(), RadioEvent::RADIO_NETWORK_TIME_UPDATE, nullptr);
             telRilManager->RegisterCoreNotify(
-                slotId_, shared_from_this(), RadioEvent::RADIO_IMS_REG_STATUS_UPDATE, nullptr);
-            telRilManager->RegisterCoreNotify(
                 slotId_, shared_from_this(), RadioEvent::RADIO_CHANNEL_CONFIG_UPDATE, nullptr);
             telRilManager->RegisterCoreNotify(
                 slotId_, shared_from_this(), RadioEvent::RADIO_VOICE_TECH_CHANGED, nullptr);
             telRilManager->RegisterCoreNotify(
                 slotId_, shared_from_this(), RadioEvent::RADIO_CURRENT_CELL_UPDATE, nullptr);
+        }
+    }
+    // Register IMS
+    {
+        std::shared_ptr< ImsCoreServiceClient> imsCoreServiceClient =
+            DelayedSingleton<ImsCoreServiceClient>::GetInstance();
+        if (imsCoreServiceClient != nullptr) {
+            imsCoreServiceClient->RegisterImsCoreServiceCallbackHandler(slotId_, shared_from_this());
         }
     }
 }
@@ -180,8 +188,6 @@ void NetworkSearchHandler::UnregisterEvents()
                 slotId_, shared_from_this(), RadioEvent::RADIO_SIGNAL_STRENGTH_UPDATE);
             telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_NETWORK_STATE);
             telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_NETWORK_TIME_UPDATE);
-            telRilManager->UnRegisterCoreNotify(
-                slotId_, shared_from_this(), RadioEvent::RADIO_IMS_REG_STATUS_UPDATE);
             telRilManager->UnRegisterCoreNotify(
                 slotId_, shared_from_this(), RadioEvent::RADIO_CHANNEL_CONFIG_UPDATE);
             telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_VOICE_TECH_CHANGED);
@@ -624,34 +630,6 @@ void NetworkSearchHandler::GetImsRegStatus(const AppExecFwk::InnerEvent::Pointer
     }
 }
 
-void NetworkSearchHandler::ImsRegStateUpdate(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    auto networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("ImsRegStateUpdate networkSearchManager is null slotId:%{public}d", slotId_);
-        return;
-    }
-    if (event == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchHandler::ImsRegStateUpdate event is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-    std::shared_ptr<ImsRegStatusInfo> imsRegStatusInfo = event->GetSharedObject<ImsRegStatusInfo>();
-    if (imsRegStatusInfo == nullptr) {
-        TELEPHONY_LOGE(
-            "NetworkSearchHandler::ImsRegStateUpdate imsRegStatusInfo is nullptr slotId:%{public}d", slotId_);
-    } else {
-        TELEPHONY_LOGI(
-            "NetworkSearchHandler::ImsRegStateUpdate  %{public}d-%{public}d-%{public}d slotId:%{public}d",
-            imsRegStatusInfo->notifyType, imsRegStatusInfo->regInfo, imsRegStatusInfo->extInfo, slotId_);
-        std::shared_ptr<NetworkSearchState> networkSearchState =
-            networkSearchManager->GetNetworkSearchState(slotId_);
-        if (networkSearchState != nullptr) {
-            networkSearchState->SetImsStatus(imsRegStatusInfo->regInfo == IMS_STATE_REGISTED);
-        }
-    }
-    networkSearchManager->NotifyImsRegStateChanged(slotId_);
-}
-
 void NetworkSearchHandler::RadioGetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (cellInfo_ != nullptr) {
@@ -754,6 +732,40 @@ void NetworkSearchHandler::DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEve
     }
     TELEPHONY_LOGI("NetworkSearchHandler::DcPhysicalLinkActiveUpdate slotId:%{public}d active:%{public}s",
         slotId_, isActive ? "true" : "false");
+}
+
+void NetworkSearchHandler::UpdateImsServiceStatus(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (event == nullptr) {
+        TELEPHONY_LOGE("UpdateImsServiceStatus event is null slotId:%{public}d", slotId_);
+        return;
+    }
+    std::shared_ptr<ImsServiceStatus> imsServiceStatus = event->GetSharedObject<ImsServiceStatus>();
+    std::shared_ptr<NetworkSearchState> networkSearchState =
+        networkSearchManager->GetNetworkSearchState(slotId_);
+    if (networkSearchState != nullptr) {
+        networkSearchState->SetImsServiceStatus(*imsServiceStatus);
+    }
+    TELEPHONY_LOGI("NetworkSearchHandler::UpdateImsServiceStatus slotId:%{public}d", slotId_);
+}
+
+void NetworkSearchHandler::UpdateImsRegisterState(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (event == nullptr) {
+        TELEPHONY_LOGE("UpdateImsRegisterState event is null slotId:%{public}d", slotId_);
+        return;
+    }
+    bool isRegister = (event->GetParam() == 1) ? true : false;
+    std::shared_ptr<ImsServiceStatus> imsServiceStatus = event->GetSharedObject<ImsServiceStatus>();
+    std::shared_ptr<NetworkSearchState> networkSearchState =
+        networkSearchManager->GetNetworkSearchState(slotId_);
+    if (networkSearchState != nullptr) {
+        networkSearchState->SetImsStatus(isRegister);
+    }
+    TELEPHONY_LOGI("NetworkSearchHandler::UpdateImsRegisterState slotId:%{public}d isRegister:%{public}s",
+        slotId_, isRegister ? "true" : "false");
 }
 
 void NetworkSearchHandler::RadioVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event)

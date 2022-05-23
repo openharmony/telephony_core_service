@@ -50,6 +50,8 @@ void CoreServiceStub::AddHandlerNetWorkToMap()
     memberFuncMap_[uint32_t(InterfaceID::GET_PREFERRED_NETWORK_MODE)] = &CoreServiceStub::OnGetPreferredNetwork;
     memberFuncMap_[uint32_t(InterfaceID::SET_PREFERRED_NETWORK_MODE)] = &CoreServiceStub::OnSetPreferredNetwork;
     memberFuncMap_[uint32_t(InterfaceID::GET_NR_OPTION_MODE)] = &CoreServiceStub::OnGetNrOptionMode;
+    memberFuncMap_[uint32_t(InterfaceID::REG_IMS_CALLBACK)] = &CoreServiceStub::OnRegImsCallback;
+    memberFuncMap_[uint32_t(InterfaceID::UN_REG_IMS_CALLBACK)] = &CoreServiceStub::OnUnRegImsCallback;
 }
 
 void CoreServiceStub::AddHandlerSimToMap()
@@ -1068,9 +1070,11 @@ int32_t CoreServiceStub::OnUnlockSimLock(MessageParcel &data, MessageParcel &rep
 int32_t CoreServiceStub::OnGetImsRegStatus(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    bool result = GetImsRegStatus(slotId);
-    bool ret = reply.WriteBool(result);
-    if (!ret) {
+    int32_t imsSrvType = data.ReadInt32();
+    ImsRegInfo result = GetImsRegStatus(slotId, static_cast<ImsServiceType>(imsSrvType));
+    int32_t retS = reply.WriteInt32(result.imsRegState);
+    int32_t retT = reply.WriteInt32(result.imsRegTech);
+    if (!retS || !retT) {
         TELEPHONY_LOGE("OnGetImsRegStatus write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
@@ -1111,6 +1115,23 @@ int32_t CoreServiceStub::OnHasOperatorPrivileges(MessageParcel &data, MessagePar
         return ERR_FLATTEN_OBJECT;
     }
     return NO_ERROR;
+}
+
+
+int32_t CoreServiceStub::OnRegImsCallback(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    result = RegImsCallback(data);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t CoreServiceStub::OnUnRegImsCallback(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    result = UnRegImsCallback(data);
+    reply.WriteInt32(result);
+    return result;
 }
 } // namespace Telephony
 } // namespace OHOS

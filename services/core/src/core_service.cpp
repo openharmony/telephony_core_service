@@ -80,6 +80,8 @@ bool CoreService::Init()
         TELEPHONY_LOGE("SimManager init is failed!");
         return false;
     }
+    // connect ims_service
+    DelayedSingleton<ImsCoreServiceClient>::GetInstance()->Init();
     networkSearchManager_ = std::make_shared<NetworkSearchManager>(telRilManager_, simManager_);
     if (networkSearchManager_ != nullptr) {
         if (!networkSearchManager_->OnInit()) {
@@ -89,8 +91,6 @@ bool CoreService::Init()
     }
     simManager_->SetNetworkSearchManager(slotCount, networkSearchManager_);
     CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
-    // connect ims_service
-    DelayedSingleton<ImsCoreServiceClient>::GetInstance()->Init();
     TELEPHONY_LOGI("CoreService::Init success");
     return true;
 }
@@ -821,13 +821,13 @@ bool CoreService::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, L
     return simManager_->UnlockSimLock(slotId, lockInfo, response);
 }
 
-bool CoreService::GetImsRegStatus(int32_t slotId)
+ImsRegInfo CoreService::GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType)
 {
-    TELEPHONY_LOGI("CoreService::GetImsRegStatus --> slotId:%{public}d", slotId);
+    TELEPHONY_LOGI("CoreService::GetImsRegStatus --> slotId:%{public}d, imsSrvType:%{public}d", slotId, imsSrvType);
     if (networkSearchManager_ == nullptr) {
-        return false;
+        return ERROR_IMS_REG_INFO;
     }
-    return networkSearchManager_->GetImsRegStatus(slotId);
+    return networkSearchManager_->GetImsRegStatus(slotId, imsSrvType);
 }
 
 std::vector<sptr<CellInformation>> CoreService::GetCellInfoList(int32_t slotId)
@@ -856,6 +856,22 @@ bool CoreService::HasOperatorPrivileges(const int32_t slotId)
         return false;
     }
     return simManager_->HasOperatorPrivileges(slotId);
+}
+
+int32_t CoreService::RegImsCallback(MessageParcel &data)
+{
+    if (networkSearchManager_ == nullptr) {
+        return false;
+    }
+    return networkSearchManager_->RegImsCallback(data);
+}
+
+int32_t CoreService::UnRegImsCallback(MessageParcel &data)
+{
+    if (networkSearchManager_ == nullptr) {
+        return false;
+    }
+    return networkSearchManager_->UnRegImsCallback(data);
 }
 } // namespace Telephony
 } // namespace OHOS
