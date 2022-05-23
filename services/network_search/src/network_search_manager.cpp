@@ -1110,6 +1110,7 @@ bool NetworkSearchManager::GetAirplaneMode()
     TELEPHONY_LOGI("Get airplane mode:%{public}d", airplaneMode);
     return airplaneMode;
 #endif
+}
 
 int32_t NetworkSearchManager::RegImsCallback(MessageParcel &data)
 {
