@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <securec.h>
 #include <sys/time.h>
+#include "singleton.h"
 
 #include "core_service_proxy.h"
 #include "iservice_registry.h"
@@ -24,6 +25,12 @@
 #include "test_broadcast.h"
 #include "telephony_log_wrapper.h"
 #include "time_service_client.h"
+#include "ims_manager_callback.h"
+#include "core_service_client.h"
+#include "ims_voice_callback_test_stub.h"
+#include "ims_video_callback_stub.h"
+#include "ims_ut_callback_stub.h"
+#include "ims_sms_callback_stub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -53,12 +60,18 @@ const int32_t INPUT_GET_CELL_INFO_LIST = 23;
 const int32_t INPUT_REQUEST_CELL_LOCATION = 24;
 const int32_t INPUT_IS_NR_SUPPORTED = 25;
 const int32_t INPUT_GET_NR_OPTION_MODE = 26;
+const int32_t REG_IMS_ST_CALLBACK = 27;
+const int32_t UN_REG_IMS_ST_CALLBACK = 28;
 const int32_t INPUT_INIT_TIME = 99;
 const int32_t INPUT_QUIT = 100;
 const int32_t SLEEP_TIME = 5;
 using NsTestFunc = void (*)();
 std::map<int32_t, NsTestFunc> memberFuncMap_;
 std::shared_ptr<TestBroadCast> subscriber = nullptr;
+std::map<int32_t, sptr<ImsVoiceCallback>> testImsVoiceCallback_;
+std::map<int32_t, sptr<ImsVideoCallback>> testImsVideoCallback_;
+std::map<int32_t, sptr<ImsUtCallback>> testImsUtCallback_;
+std::map<int32_t, sptr<ImsSmsCallback>> testImsSmsCallback_;
 sptr<ICoreService> GetProxy()
 {
     TELEPHONY_LOGI("TelephonyTestService GetProxy ... ");
@@ -353,6 +366,92 @@ void TestGetNrOptionMode()
     }
 }
 
+void TestRegisterImsStateCallback()
+{
+    if (g_telephonyService != nullptr) {
+        int32_t slotId = 0;
+        int32_t imsSrvType = 0;
+        std::cout << "please input slotId:" << std::endl;
+        std::cin >> slotId;
+        std::cout << "please input imsSrvType(TYPE_VOICE = 0,TYPE_VIDEO = 1,"
+            "TYPE_UT = 2,TYPE_SMS = 3):" << std::endl;
+        std::cin >> imsSrvType;
+        ImsRegInfo imsRegInfo = ERROR_IMS_REG_INFO;
+        sptr<ImsVoiceCallbackStub> voiceCallback = std::make_unique<ImsVoiceCallbackTestStub>(imsRegInfo).release();
+        sptr<ImsVideoCallbackStub> videoCallback(new ImsVideoCallbackStub());
+        sptr<ImsUtCallbackStub> utCallback(new ImsUtCallbackStub());
+        sptr<ImsSmsCallbackStub> smsCallback(new ImsSmsCallbackStub());
+        int32_t ret;
+        switch (imsSrvType) {
+            case TYPE_VOICE:
+                testImsVoiceCallback_.emplace(slotId, voiceCallback);
+                if (voiceCallback == nullptr) {
+                    std::cout << "voiceCallback == nullptr" << std::endl;
+                }
+                ret = DelayedRefSingleton<CoreServiceClient>::GetInstance()
+                    .RegImsVoiceCallback(slotId, voiceCallback);
+                break;
+            case TYPE_VIDEO:
+                testImsVideoCallback_.emplace(slotId, videoCallback);
+                ret = DelayedRefSingleton<CoreServiceClient>::GetInstance()
+                    .RegImsVideoCallback(slotId, videoCallback);
+                break;
+            case TYPE_UT:
+                testImsUtCallback_.emplace(slotId, utCallback);
+                ret = DelayedRefSingleton<CoreServiceClient>::GetInstance()
+                    .RegImsUtCallback(slotId, utCallback);
+                break;
+            case TYPE_SMS:
+                testImsSmsCallback_.emplace(slotId, smsCallback);
+                ret = DelayedRefSingleton<CoreServiceClient>::GetInstance()
+                    .RegImsSmsCallback(slotId, smsCallback);
+                break;
+        }
+        std::cout << " ret:" << ret << std::endl;
+    }
+}
+
+void TestUnRegisterImsStateCallback()
+{
+    if (g_telephonyService != nullptr) {
+        int32_t slotId = 0;
+        int32_t imsSrvType = 0;
+        std::cout << "please input slotId:" << std::endl;
+        std::cin >> slotId;
+        std::cout << "please input imsSrvType(TYPE_VOICE = 0,TYPE_VIDEO = 1,"
+            "TYPE_UT = 2,TYPE_SMS = 3):" << std::endl;
+        std::cin >> imsSrvType;
+        sptr<ImsVoiceCallback> voiceCallback = testImsVoiceCallback_[slotId];
+        sptr<ImsVideoCallback> videoCallback = testImsVideoCallback_[slotId];
+        sptr<ImsUtCallback> utCallback = testImsUtCallback_[slotId];
+        sptr<ImsSmsCallback> smsCallback = testImsSmsCallback_[slotId];
+        int32_t ret;
+        switch (imsSrvType) {
+            case TYPE_VOICE:
+                ret = DelayedRefSingleton<CoreServiceClient>::GetInstance()
+                    .UnRegImsVoiceCallback(slotId, voiceCallback);
+                testImsVoiceCallback_.clear();
+                break;
+            case TYPE_VIDEO:
+                ret = DelayedRefSingleton<CoreServiceClient>::GetInstance()
+                    .UnRegImsVideoCallback(slotId, videoCallback);
+                testImsVideoCallback_.clear();
+                break;
+            case TYPE_UT:
+                ret = DelayedRefSingleton<CoreServiceClient>::GetInstance()
+                    .UnRegImsUtCallback(slotId, utCallback);
+                testImsUtCallback_.clear();
+                break;
+            case TYPE_SMS:
+                ret = DelayedRefSingleton<CoreServiceClient>::GetInstance()
+                    .UnRegImsSmsCallback(slotId, smsCallback);
+                testImsSmsCallback_.clear();
+                break;
+        }
+        std::cout << " ret:" << ret << std::endl;
+    }
+}
+
 void TestGetTimeZone()
 {
     std::string timeZoneRes = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetTimeZone();
@@ -387,8 +486,17 @@ void TestInitTimeAndTimeZone()
 void TestGetImsRegStatus()
 {
     if (g_telephonyService != nullptr) {
-        bool result = g_telephonyService->GetImsRegStatus(InputSlotId());
-        TELEPHONY_LOGI("TelephonyTestService::TestGetImsRegStatus result:%{public}d", result);
+        int32_t slotId = 0;
+        int32_t imsSrvType = 0;
+        std::cout << "please input slotId:" << std::endl;
+        std::cin >> slotId;
+        std::cout << "please input imsSrvType(TYPE_VOICE = 0,TYPE_VIDEO = 1,"
+            "TYPE_UT = 2,TYPE_SMS = 3):" << std::endl;
+        std::cin >> imsSrvType;
+        ImsRegInfo result = g_telephonyService->GetImsRegStatus(slotId, static_cast<ImsServiceType>(imsSrvType));
+        std::cout << "imsRegState" << result.imsRegState << "imsRegTech" << result.imsRegTech << std::endl;
+        TELEPHONY_LOGI("TelephonyTestService::TestGetImsRegStatus result:%{public}d, %{public}d",
+            result.imsRegState, result.imsRegTech);
     }
 }
 
@@ -488,6 +596,8 @@ void Prompt()
         "24:SendUpdateCellLocationRequest\n"
         "25:IsNrSupported\n"
         "26:GetNrOptionMode\n"
+        "27:RegisterImsStateCallback\n"
+        "28:UnRegisterImsStateCallback\n"
         "99:InitTimeAndTimeZone\n"
         "100:exit \n");
 }
@@ -555,6 +665,8 @@ void Init()
     memberFuncMap_[INPUT_INIT_TIME] = TestInitTimeAndTimeZone;
     memberFuncMap_[INPUT_IS_NR_SUPPORTED] = TestIsNrSupported;
     memberFuncMap_[INPUT_GET_NR_OPTION_MODE] = TestGetNrOptionMode;
+    memberFuncMap_[REG_IMS_ST_CALLBACK] = TestRegisterImsStateCallback;
+    memberFuncMap_[UN_REG_IMS_ST_CALLBACK] = TestUnRegisterImsStateCallback;
 }
 
 void InitBroadCast()

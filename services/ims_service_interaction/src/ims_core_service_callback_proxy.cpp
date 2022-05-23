@@ -23,7 +23,8 @@ namespace Telephony {
 ImsCoreServiceCallbackProxy::ImsCoreServiceCallbackProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<ImsCoreServiceCallbackInterface>(impl) {}
 
-int32_t ImsCoreServiceCallbackProxy::ImsServiceStatusReport(int32_t slotId, const ImsServiceStatus &imsServiceStatus)
+int32_t ImsCoreServiceCallbackProxy::UpdateImsServiceStatusChanged(
+    int32_t slotId, const ImsServiceStatus &imsServiceStatus)
 {
     MessageOption option;
     MessageParcel in;
@@ -42,37 +43,14 @@ int32_t ImsCoreServiceCallbackProxy::ImsServiceStatusReport(int32_t slotId, cons
     }
     int32_t error = Remote()->SendRequest(IMS_SERVICE_STATUS_REPORT, in, out, option);
     if (error == ERR_NONE) {
+        TELEPHONY_LOGE("send imsServiceStatus fail!");
         return out.ReadInt32();
     }
     return error;
 }
 
-int32_t ImsCoreServiceCallbackProxy::ImsRegistrationStatusResponse(
-    const ImsResponseInfo &info, const ImsRegistrationStatus &imsRegStatus)
-{
-    MessageOption option;
-    MessageParcel in;
-    MessageParcel out;
-    if (!in.WriteInterfaceToken(ImsCoreServiceCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor token fail!");
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteRawData((const void *)&info, sizeof(ImsResponseInfo))) {
-        TELEPHONY_LOGE("write info fail!");
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteRawData((const void *)&imsRegStatus, sizeof(ImsRegistrationStatus))) {
-        TELEPHONY_LOGE("write imsRegStatus fail!");
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(IMS_REGISTRATION_STATUS_RESPONSE, in, out, option);
-    if (error == ERR_NONE) {
-        return out.ReadInt32();
-    }
-    return error;
-}
-
-int32_t ImsCoreServiceCallbackProxy::ImsNetworkStateChange(int32_t slotId)
+int32_t ImsCoreServiceCallbackProxy::GetImsRegistrationStatusResponse(
+    int32_t slotId, const ImsRegistrationStatus &imsRegStatus)
 {
     MessageOption option;
     MessageParcel in;
@@ -82,10 +60,14 @@ int32_t ImsCoreServiceCallbackProxy::ImsNetworkStateChange(int32_t slotId)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     if (!in.WriteInt32(slotId)) {
-        TELEPHONY_LOGE("write slotId fail!");
+        TELEPHONY_LOGE("write info fail!");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(IMS_NETWORK_STATE_CHANGE_REPORT, in, out, option);
+    if (!in.WriteRawData((const void *)&imsRegStatus, sizeof(ImsRegistrationStatus))) {
+        TELEPHONY_LOGE("write imsRegStatus fail!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    int32_t error = Remote()->SendRequest(IMS_GET_REGISTRATION_STATUS, in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }

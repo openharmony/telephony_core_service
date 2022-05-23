@@ -103,6 +103,8 @@ private:
     int32_t OnSendTerminalResponseCmd(MessageParcel &data, MessageParcel &reply);
     int32_t OnHasOperatorPrivileges(MessageParcel &data, MessageParcel &reply);
     int32_t OnUnlockSimLock(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRegImsCallback(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUnRegImsCallback(MessageParcel &data, MessageParcel &reply);
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;

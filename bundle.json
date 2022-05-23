@@ -69,6 +69,7 @@
                         "header_files": [
                             "include/core_service_client.h",
                             "include/i_core_service.h",
+                            "include/ims_reg_types.h",
                             "include/telephony_errors.h",
                             "include/cell_information.h",
                             "include/cell_location.h",

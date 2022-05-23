@@ -1322,13 +1322,13 @@ NrState CoreManagerInner::GetNrState(int32_t slotId) const
     return NrState::NR_STATE_NOT_SUPPORT;
 }
 
-bool CoreManagerInner::GetImsRegStatus(int32_t slotId) const
+ImsRegInfo CoreManagerInner::GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType) const
 {
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager is null!");
-        return false;
+        return ERROR_IMS_REG_INFO;
     }
-    return networkSearchManager_->GetImsRegStatus(slotId);
+    return networkSearchManager_->GetImsRegStatus(slotId, imsSrvType);
 }
 /******************** networkSearchManager end ************************/
 /******************** simManager_ start *******************/

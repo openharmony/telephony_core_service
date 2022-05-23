@@ -23,6 +23,10 @@
 #include "network_state.h"
 #include "signal_information.h"
 #include "cell_information.h"
+#include "ims_voice_callback.h"
+#include "ims_video_callback.h"
+#include "ims_ut_callback.h"
+#include "ims_sms_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -103,7 +107,7 @@ public:
         int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) = 0;
     virtual bool SetVoiceMailInfo(
         const int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) = 0;
-    virtual bool GetImsRegStatus(int32_t slotId) = 0;
+    virtual ImsRegInfo GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType) = 0;
     virtual int32_t GetMaxSimCount() = 0;
     virtual bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) = 0;
     virtual bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) = 0;
@@ -111,6 +115,8 @@ public:
     virtual std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) = 0;
     virtual bool SendUpdateCellLocationRequest(int32_t slotId) = 0;
     virtual bool HasOperatorPrivileges(const int32_t slotId) = 0;
+    virtual int32_t RegImsCallback(MessageParcel &data) = 0;
+    virtual int32_t UnRegImsCallback(MessageParcel &data) = 0;
     enum class InterfaceID {
         GET_PS_RADIO_TECH = 0,
         GET_CS_RADIO_TECH,
@@ -183,6 +189,8 @@ public:
         HAS_OPERATOR_PRIVILEGES,
         IS_NR_SUPPORTED,
         GET_NR_OPTION_MODE,
+        REG_IMS_CALLBACK,
+        UN_REG_IMS_CALLBACK,
     };
 
 protected:

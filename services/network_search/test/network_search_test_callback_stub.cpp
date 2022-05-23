@@ -57,7 +57,7 @@ void NetworkSearchTestCallbackStub::OnGetNetworkSearchInformation(
         sptr<NetworkSearchResult> networkSearchResult = nsResult;
         if (networkSearchResult == nullptr) {
             TELEPHONY_LOGI(
-                "NetworkSearchTestCallbackStub OnGetNetworkSearchInformation",
+                "NetworkSearchTestCallbackStub OnGetNetworkSearchInformation,"
                 "success networkSearchResult  null");
             return;
         }

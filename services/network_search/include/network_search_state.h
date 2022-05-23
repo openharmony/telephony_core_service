@@ -20,6 +20,8 @@
 #include <mutex>
 #include "network_state.h"
 #include "network_type.h"
+#include "ims_core_service_types.h"
+#include "ims_reg_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -40,8 +42,9 @@ public:
     void SetNrState(NrState state);
     void SetCfgTech(RadioTech tech);
     std::unique_ptr<NetworkState> GetNetworkStatus();
-    bool GetImsStatus();
+    ImsRegInfo GetImsStatus(ImsServiceType imsSrvType);
     void SetImsStatus(bool imsRegStatus);
+    void SetImsServiceStatus(const ImsServiceStatus &imsServiceStatus);
     void NotifyStateChange();
     void CsRadioTechChange();
 
@@ -51,6 +54,7 @@ private:
     void NotifyPsRadioTechChange();
     void NotifyEmergencyChange();
     void NotifyNrStateChange();
+    void NotifyImsStateChange(const ImsServiceType imsSrvType, const ImsRegInfo info);
     std::mutex mutex_;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     std::unique_ptr<NetworkState> networkState_ = nullptr;
@@ -58,6 +62,7 @@ private:
     std::mutex imsMutex_;
     bool imsRegStatus_ = false;
     int32_t slotId_ = 0;
+    std::unique_ptr<ImsServiceStatus> imsServiceStatus_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

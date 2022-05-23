@@ -22,6 +22,7 @@
 #include <string>
 #include <cinttypes>
 #include <mutex>
+#include <list>
 
 #include "i_network_search.h"
 #include "i_sim_manager.h"
@@ -35,6 +36,7 @@
 #include "network_utils.h"
 #include "radio_event.h"
 #include "setting_utils.h"
+#include "iremote_stub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -144,7 +146,7 @@ public:
     std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) override;
     bool SendUpdateCellLocationRequest(int32_t slotId) override;
     sptr<CellLocation> GetCellLocation(int32_t slotId) override;
-    bool GetImsRegStatus(int32_t slotId) override;
+    ImsRegInfo GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType) override;
     PhoneType GetPhoneType(int32_t slotId) override;
     std::u16string GetMeid(int32_t slotId) override;
     std::u16string GetUniqueDeviceId(int32_t slotId) override;
@@ -153,6 +155,8 @@ public:
     NrState GetNrState(int32_t slotId) override;
     void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive) override;
     NrMode GetNrOptionMode(int32_t slotId) override;
+    int32_t RegImsCallback(MessageParcel &data) override;
+    int32_t UnRegImsCallback(MessageParcel &data) override;
 
     void NotifyPsRoamingOpenChanged(int32_t slotId);
     void NotifyPsRoamingCloseChanged(int32_t slotId);
@@ -163,7 +167,6 @@ public:
     void NotifyEmergencyCloseChanged(int32_t slotId);
     void NotifyNrStateChanged(int32_t slotId);
     void NotifyNrFrequencyChanged(int32_t slotId);
-    void NotifyImsRegStateChanged(int32_t slotId);
     std::shared_ptr<NetworkSearchState> GetNetworkSearchState(int32_t slotId);
     void TriggerSimRefresh(int32_t slotId);
     void TriggerTimezoneRefresh(int32_t slotId);
@@ -192,6 +195,23 @@ public:
     bool GetAirplaneMode();
     bool IsRadioFirstPowerOn(int32_t slotId);
     void SetRadioFirstPowerOn(int32_t slotId, bool isFirstPowerOn);
+    void NotifyImsCallback(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo info);
+    int32_t RegImsVoiceCallback(int32_t slotId, sptr<ImsVoiceCallback> callback);
+    int32_t UnRegImsVoiceCallback(int32_t slotId, sptr<ImsVoiceCallback> callback);
+    void RemoveAllImsVoiceCallback();
+    void NotifyImsVoiceCallback(int32_t slotId, ImsRegInfo info);
+    int32_t RegImsVideoCallback(int32_t slotId, sptr<ImsVideoCallback> callback);
+    int32_t UnRegImsVideoCallback(int32_t slotId, sptr<ImsVideoCallback> callback);
+    void RemoveAllImsVideoCallback();
+    void NotifyImsVideoCallback(int32_t slotId, ImsRegInfo info);
+    int32_t RegImsUtCallback(int32_t slotId, sptr<ImsUtCallback> callback);
+    int32_t UnRegImsUtCallback(int32_t slotId, sptr<ImsUtCallback> callback);
+    void RemoveAllImsUtCallback();
+    void NotifyImsUtCallback(int32_t slotId, ImsRegInfo info);
+    int32_t RegImsSmsCallback(int32_t slotId, sptr<ImsSmsCallback> callback);
+    int32_t UnRegImsSmsCallback(int32_t slotId, sptr<ImsSmsCallback> callback);
+    void RemoveAllImsSmsCallback();
+    void NotifyImsSmsCallback(int32_t slotId, ImsRegInfo info);
 
     inline void InitMsgNum(int32_t slotId)
     {
@@ -249,6 +269,10 @@ private:
     std::shared_ptr<ISimManager> simManager_ = nullptr;
     std::unique_ptr<EventSender> eventSender_ = nullptr;
     std::map<int32_t, std::shared_ptr<NetworkSearchManagerInner>> mapManagerInner_;
+    std::unordered_map<int32_t, std::list<sptr<ImsVoiceCallback>>> mapImsVoiceCallback_;
+    std::unordered_map<int32_t, std::list<sptr<ImsVideoCallback>>> mapImsVideoCallback_;
+    std::unordered_map<int32_t, std::list<sptr<ImsUtCallback>>> mapImsUtCallback_;
+    std::unordered_map<int32_t, std::list<sptr<ImsSmsCallback>>> mapImsSmsCallback_;
     std::mutex mutexInner_;
 };
 } // namespace Telephony

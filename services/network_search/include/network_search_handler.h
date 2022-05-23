@@ -51,6 +51,8 @@ public:
     void UpdatePhone(RadioTech csRadioTech) const;
     void GetCellInfoList(std::vector<sptr<CellInformation>> &cells);
     void DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEvent::Pointer &event);
+    void UpdateImsServiceStatus(const AppExecFwk::InnerEvent::Pointer &event);
+    void UpdateImsRegisterState(const AppExecFwk::InnerEvent::Pointer &event);
     void SendUpdateCellLocationRequest();
     PhoneType GetPhoneType();
 
@@ -110,7 +112,6 @@ private:
     void SetPreferredNetworkResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void GetImsRegStatus(const AppExecFwk::InnerEvent::Pointer &event);
-    void ImsRegStateUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetImei(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetMeid(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer &event);
