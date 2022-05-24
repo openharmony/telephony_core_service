@@ -149,14 +149,6 @@ void SimStateHandle::AlterPin2(int32_t slotId, std::string newPin2, std::string 
     telRilManager_->ChangeSimPassword(slotId, simPin2Password, event);
 }
 
-void SimStateHandle::UnlockRemain(int32_t slotId)
-{
-    TELEPHONY_LOGI("SimStateHandle::UnlockRemain() slotId = %{public}d", slotId);
-    auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_REMAIN_DONE);
-    event->SetOwner(shared_from_this());
-    telRilManager_->GetSimPinInputTimes(slotId, event);
-}
-
 void SimStateHandle::SetLockState(int32_t slotId, const LockInfo &options)
 {
     TELEPHONY_LOGI("SimStateHandle::SetLockState() slotId = %{public}d", slotId);
@@ -303,41 +295,42 @@ void SimStateHandle::GetSimLockState(const AppExecFwk::InnerEvent::Pointer &even
 void SimStateHandle::GetSetLockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId)
 {
     TELEPHONY_LOGI("SimStateHandle::GetSetLockResult slotId = %{public}d", slotId);
-    int32_t iccUnlockResponse = 0;
-    std::shared_ptr<HRilErrType> param = event->GetSharedObject<HRilErrType>();
+    std::shared_ptr<LockStatusResp> param = event->GetSharedObject<LockStatusResp>();
     std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
         TELEPHONY_LOGE("SimStateHandle::GetSetLockResult() fail");
         return;
     }
     if (param != nullptr) {
-        iccUnlockResponse = static_cast<int32_t>(*param);
+        unlockRespon_.result = param->result;
+        unlockRespon_.remain = param->remain;
+        TELEPHONY_LOGI("SimStateHandle::GetSetLockResult result = %{public}d, remain = %{public}d",
+            unlockRespon_.result, unlockRespon_.remain);
     } else {
-        iccUnlockResponse = static_cast<int32_t>(response->error);
+        unlockRespon_.result = static_cast<int32_t>(response->error);
     }
-    unlockRespon_.result = iccUnlockResponse;
-    TELEPHONY_LOGI("SimStateHandle::GetSetLockResult(), iccUnlockResponse = %{public}d", iccUnlockResponse);
+    TELEPHONY_LOGI("SimStateHandle::GetSetLockResult(), iccUnlockResponse = %{public}d", unlockRespon_.result);
 }
 
-void SimStateHandle::GetUnlockReult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId)
+void SimStateHandle::GetUnlockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId)
 {
     TELEPHONY_LOGI("SimStateHandle::GetUnlockResult slotId = %{public}d", slotId);
-    int32_t iccUnlockResponse = 0;
-    std::shared_ptr<HRilErrType> param = event->GetSharedObject<HRilErrType>();
+    std::shared_ptr<LockStatusResp> param = event->GetSharedObject<LockStatusResp>();
     std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
         TELEPHONY_LOGE("SimStateHandle::GetSimUnlockResult() fail");
         return;
     }
     if (param != nullptr) {
-        iccUnlockResponse = static_cast<int32_t>(*param);
-        TELEPHONY_LOGE("SimStateHandle::GetUnlockReult param is true");
+        unlockRespon_.result = param->result;
+        unlockRespon_.remain = param->remain;
+        TELEPHONY_LOGE("SimStateHandle::GetUnlockReult result:%{public}d, remain:%{public}d",
+            param->result, param->remain);
     } else {
-        TELEPHONY_LOGE("SimStateHandle::GetUnlockReult param is null");
-        iccUnlockResponse = static_cast<int32_t>(response->error);
+        TELEPHONY_LOGE("SimStateHandle::GetUnlockResult param is null");
+        unlockRespon_.result = static_cast<int32_t>(response->error);
     }
-    unlockRespon_.result = iccUnlockResponse;
-    TELEPHONY_LOGI("SimStateHandle::GetSimUnlockResponse(), iccUnlockResponse = %{public}d", iccUnlockResponse);
+    TELEPHONY_LOGI("SimStateHandle::GetSimUnlockResponse(), iccUnlockResponse = %{public}d", unlockRespon_.result);
 }
 
 void SimStateHandle::GetUnlockSimLockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId)
@@ -356,42 +349,6 @@ void SimStateHandle::GetUnlockSimLockResult(const AppExecFwk::InnerEvent::Pointe
     } else {
         TELEPHONY_LOGE("SimStateHandle::GetUnlockSimLockResult param is null");
         simlockRespon_.result = static_cast<int32_t>(response->error);
-    }
-}
-
-void SimStateHandle::GetUnlockRemain(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId)
-{
-    TELEPHONY_LOGI("SimStateHandle::GetUnlockRemain slotId = %{public}d", slotId);
-    SimPinInputTimes iccRemain;
-    int32_t error = 0;
-    std::shared_ptr<SimPinInputTimes> param = event->GetSharedObject<SimPinInputTimes>();
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
-    if ((param == nullptr) && (response == nullptr)) {
-        TELEPHONY_LOGE("SimStateHandle::GetUnlockRemain() fail");
-        return;
-    }
-    if (param != nullptr) {
-        iccRemain.serial = param->serial;
-        iccRemain.code = param->code;
-        iccRemain.times = param->times;
-        iccRemain.pukTimes = param->pukTimes;
-        iccRemain.pinTimes = param->pinTimes;
-        iccRemain.puk2Times = param->puk2Times;
-        iccRemain.pin2Times = param->pin2Times;
-        TELEPHONY_LOGI("SimStateHandle::GetUnlockRemain(), serial = %{public}d", iccRemain.serial);
-        TELEPHONY_LOGI("SimStateHandle::GetUnlockRemain(), codeType = %{public}s", iccRemain.code.c_str());
-        TELEPHONY_LOGI("SimStateHandle::GetUnlockRemain(), currentTimes = %{public}d", iccRemain.times);
-        TELEPHONY_LOGI("SimStateHandle::GetUnlockRemain(), pukTimes = %{public}d", iccRemain.pukTimes);
-        TELEPHONY_LOGI("SimStateHandle::GetUnlockRemain(), pinTimes = %{public}d", iccRemain.pinTimes);
-        TELEPHONY_LOGI("SimStateHandle::GetUnlockRemain(), puk2Times = %{public}d", iccRemain.puk2Times);
-        TELEPHONY_LOGI("SimStateHandle::GetUnlockRemain(), pin2Times = %{public}d", iccRemain.pin2Times);
-        unlockRespon_.remain = iccRemain.times;
-        unlockRespon_.pinRemain = iccRemain.pinTimes;
-        unlockRespon_.pin2Remain = iccRemain.pin2Times;
-        unlockRespon_.puk2Remain = iccRemain.puk2Times;
-    } else {
-        error = static_cast<int32_t>(response->error);
-        TELEPHONY_LOGI("SimStateHandle::GetUnlockRemain(), error = %{public}d", error);
     }
 }
 
@@ -449,16 +406,11 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         case MSG_SIM_UNLOCK_PIN2_DONE:
         case MSG_SIM_UNLOCK_PUK2_DONE:
         case MSG_SIM_CHANGE_PIN2_DONE:
-            GetUnlockReult(event, slotId_);
+            GetUnlockResult(event, slotId_);
             SyncCmdResponse();
             break;
         case MSG_SIM_UNLOCK_SIMLOCK_DONE:
             GetUnlockSimLockResult(event, slotId_);
-            SyncCmdResponse();
-            break;
-        case MSG_SIM_UNLOCK_REMAIN_DONE:
-        case MSG_SIM_UNLOCK_PIN2_REMAIN_DONE:
-            GetUnlockRemain(event, slotId_);
             SyncCmdResponse();
             break;
         case MSG_SIM_ENABLE_PIN_DONE:
