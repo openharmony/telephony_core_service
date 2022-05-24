@@ -1911,7 +1911,7 @@ bool CoreServiceProxy::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockIn
     return result;
 }
 
-bool CoreServiceProxy::GetImsRegStatus(int32_t slotId)
+ImsRegInfo CoreServiceProxy::GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType)
 {
     TELEPHONY_LOGI("CoreServiceProxy GetImsRegStatus slotId:%{public}d", slotId);
     MessageParcel data;
@@ -1919,22 +1919,30 @@ bool CoreServiceProxy::GetImsRegStatus(int32_t slotId)
     MessageOption option;
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("GetImsRegStatus WriteInterfaceToken is false");
-        return false;
+        return ERROR_IMS_REG_INFO;
     }
     if (!data.WriteInt32(slotId)) {
         TELEPHONY_LOGE("GetImsRegStatus WriteInt32 slotId is false");
-        return false;
+        return ERROR_IMS_REG_INFO;
+    }
+    if (!data.WriteInt32(imsSrvType)) {
+        TELEPHONY_LOGE("GetImsRegStatus WriteInt32 imsSrvType is false");
+        return ERROR_IMS_REG_INFO;
     }
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("GetImsRegStatus Remote is null");
-        return false;
+        return ERROR_IMS_REG_INFO;
     }
     int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_IMS_REG_STATUS), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetImsRegStatus failed, error code is %{public}d \n", st);
-        return false;
+        return ERROR_IMS_REG_INFO;
     }
-    return reply.ReadBool();
+    ImsRegInfo imsRegInfo = {
+        static_cast<ImsRegState>(reply.ReadInt32()),
+        static_cast<ImsRegTech>(reply.ReadInt32())
+    };
+    return imsRegInfo;
 }
 
 std::vector<sptr<CellInformation>> CoreServiceProxy::GetCellInfoList(int32_t slotId)
@@ -2089,6 +2097,71 @@ NrMode CoreServiceProxy::GetNrOptionMode(int32_t slotId)
     }
 
     return static_cast<NrMode>(reply.ReadInt32());
+}
+
+int32_t CoreServiceProxy::RegImsCallback(MessageParcel &idata)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t imsSrvType = idata.ReadInt32();
+    int32_t slotId = idata.ReadInt32();
+    sptr<IRemoteObject> callback  = idata.ReadRemoteObject();
+    sptr<ImsVoiceCallback> remote = nullptr;
+    remote = iface_cast<ImsVoiceCallback>(callback);
+    TELEPHONY_LOGI("imsSrvType is %{public}d, slotId is %{public}d", imsSrvType, slotId);
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("RegisterCallBack WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("CoreServiceProxy::RegImsCallback is nullptr");
+        return ERROR;
+    }
+    if (!data.WriteInt32(imsSrvType)) {
+        TELEPHONY_LOGE("WriteInt32 ERROR");
+        return ERROR;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("WriteInt32 ERROR");
+        return ERROR;
+    }
+    if (!data.WriteRemoteObject(remote->AsObject().GetRefPtr())) {
+        TELEPHONY_LOGE("WriteRemoteObject ERROR");
+        return ERROR;
+    }
+    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(InterfaceID::REG_IMS_CALLBACK), data, reply, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Function RegisterCallBack! errCode:%{public}d", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
+
+int32_t CoreServiceProxy::UnRegImsCallback(MessageParcel &idata)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t imsSrvType = idata.ReadInt32();
+    int32_t slotId = idata.ReadInt32();
+    sptr<IRemoteObject> callback  = idata.ReadRemoteObject();
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("RegisterCallBack WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("CoreServiceProxy::RegImsCallback is nullptr");
+    }
+    data.WriteInt32(imsSrvType);
+    data.WriteInt32(slotId);
+    data.WriteRemoteObject(callback);
+    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(InterfaceID::UN_REG_IMS_CALLBACK), data, reply, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Function UnRegImsCallback! errCode:%{public}d", error);
+        return error;
+    }
+    return reply.ReadInt32();
 }
 } // namespace Telephony
 } // namespace OHOS
