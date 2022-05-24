@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/telephony/core_service/core_service_aafwk.gni")
 import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
@@ -127,9 +128,9 @@ ohos_shared_library("tel_core_service") {
   ]
 
   deps = [
+    "${aafwk_inner_api_path}/dataobs_manager:dataobs_manager",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
     "//base/telephony/core_service/utils:libtel_common",
-    "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager:dataobs_manager",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
     "//third_party/libxml2:libxml2",
   ]
