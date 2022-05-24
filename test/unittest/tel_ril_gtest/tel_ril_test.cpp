@@ -153,13 +153,11 @@ void TelRilTest::InitSim()
     memberFuncMap_[DiffInterfaceId::TEST_RADIO_RESTART] = &TelRilTest::RadioRestartTest;
     memberFuncMap_[DiffInterfaceId::TEST_ENTER_ERROR_PIN] = &TelRilTest::EnterErrorPinTest;
     memberFuncMap_[DiffInterfaceId::TEST_UNLOCK_SIM_PIN] = &TelRilTest::UnlockSimPinTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_PIN_INPUT_TIMES] = &TelRilTest::GetSimPinInputTimesTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_PIN2_LOCK] = &TelRilTest::SetPin2LockTest;
     memberFuncMap_[DiffInterfaceId::TEST_ENTER_SIM_PIN2] = &TelRilTest::EnterSimPin2Test;
     memberFuncMap_[DiffInterfaceId::TEST_ENTER_ERROR_PIN2] = &TelRilTest::EnterErrorPin2Test;
     memberFuncMap_[DiffInterfaceId::TEST_UNLOCK_SIM_PIN2] = &TelRilTest::UnlockSimPin2Test;
     memberFuncMap_[DiffInterfaceId::TEST_UNSET_PIN2_LOCK] = &TelRilTest::UnSetPin2LockTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_PIN2_INPUT_TIMES] = &TelRilTest::GetSimPin2InputTimesTest;
     memberFuncMap_[DiffInterfaceId::TEST_ENABLE_SIM_CARD] = &TelRilTest::EnableSimCardTest;
 }
 
@@ -478,25 +476,6 @@ void TelRilTest::UnlockSimPinTest(const std::shared_ptr<AppExecFwk::EventHandler
 }
 
 /**
- * @brief Get SIM card pin code input times
- *
- * @param application
- */
-void TelRilTest::GetSimPinInputTimesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SIM_PIN_INPUT_TIMES);
-    auto event = AppExecFwk::InnerEvent::Get(eventId);
-    if (event != nullptr && telRilManager_ != nullptr) {
-        event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::GetSimPinInputTimesTest -->");
-        telRilManager_->GetSimPinInputTimes(slotId_, event);
-        TELEPHONY_LOGI("TelRilTest::GetSimPinInputTimesTest --> finished");
-        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
-        ASSERT_TRUE(syncResult);
-    }
-}
-
-/**
  * @brief Set SIM card PIN2 lock status
  *
  * @param application
@@ -599,25 +578,6 @@ void TelRilTest::UnlockSimPin2Test(const std::shared_ptr<AppExecFwk::EventHandle
         TELEPHONY_LOGI("TelRilTest::UnlockSimPin2Test -->");
         telRilManager_->UnlockPuk2(slotId_, puk2, pin2, event);
         TELEPHONY_LOGI("TelRilTest::UnlockSimPin2Test --> finished");
-        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
-        ASSERT_TRUE(syncResult);
-    }
-}
-
-/**
- * @brief Get SIM card pin2 code input times
- *
- * @param application
- */
-void TelRilTest::GetSimPin2InputTimesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SIM_PIN2_INPUT_TIMES);
-    auto event = AppExecFwk::InnerEvent::Get(eventId);
-    if (event != nullptr && telRilManager_ != nullptr) {
-        event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::GetSimPin2InputTimesTest -->");
-        telRilManager_->GetSimPin2InputTimes(slotId_, event);
-        TELEPHONY_LOGI("TelRilTest::GetSimPin2InputTimesTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }

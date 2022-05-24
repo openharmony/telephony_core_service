@@ -43,10 +43,8 @@ public:
         int32_t passwordLength, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t UnlockPin(std::string pin, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t UnlockPuk(std::string puk, std::string pin, const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t GetSimPinInputTimes(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t UnlockPin2(std::string pin2, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t UnlockPuk2(std::string puk2, std::string pin2, const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t GetSimPin2InputTimes(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetActiveSim(int32_t index, int32_t enable, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimStkSendTerminalResponse(const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimStkSendEnvelope(const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response);
@@ -70,10 +68,8 @@ public:
     int32_t ChangeSimPasswordResponse(MessageParcel &data);
     int32_t UnlockPinResponse(MessageParcel &data);
     int32_t UnlockPukResponse(MessageParcel &data);
-    int32_t GetSimPinInputTimesResponse(MessageParcel &data);
     int32_t UnlockPin2Response(MessageParcel &data);
     int32_t UnlockPuk2Response(MessageParcel &data);
-    int32_t GetSimPin2InputTimesResponse(MessageParcel &data);
     int32_t SetActiveSimResponse(MessageParcel &data);
     int32_t SimStkSendTerminalResponseResponse(MessageParcel &data);
     int32_t SimStkSendEnvelopeResponse(MessageParcel &data);

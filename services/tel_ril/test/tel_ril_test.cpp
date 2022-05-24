@@ -818,34 +818,6 @@ void TelRilTest::OnRequestUnlockSimPinTest(int32_t slotId, const std::shared_ptr
     }
 }
 
-void TelRilTest::OnRequestGetSimPinInputTimesTest(
-    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_PIN_INPUT_TIMES);
-    if (event != nullptr && telRilManager_ != nullptr) {
-        event->SetOwner(handler);
-
-        TELEPHONY_LOGI("TelRilTest::%{public}s -->", __func__);
-        telRilManager_->GetSimPinInputTimes(slotId, event);
-        TELEPHONY_LOGI("TelRilTest::%{public}s --> finished", __func__);
-    }
-}
-void TelRilTest::OnRequestEnterSimPin2Test(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_ENTER_PIN2);
-    if (event != nullptr && telRilManager_ != nullptr) {
-        event->SetOwner(handler);
-
-        std::string pin2;
-        std::cout << "please enter the SIM PIN2:";
-        std::cin >> pin2;
-
-        TELEPHONY_LOGI("TelRilTest::%{public}s -->", __func__);
-        telRilManager_->UnlockPin2(slotId, pin2, event);
-        TELEPHONY_LOGI("TelRilTest::%{public}s --> finished", __func__);
-    }
-}
-
 void TelRilTest::OnRequestUnlockSimPin2Test(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_UNLOCK_PIN2);
@@ -861,19 +833,6 @@ void TelRilTest::OnRequestUnlockSimPin2Test(int32_t slotId, const std::shared_pt
 
         TELEPHONY_LOGI("TelRilTest::%{public}s -->", __func__);
         telRilManager_->UnlockPuk2(slotId, puk2, pin2, event);
-        TELEPHONY_LOGI("TelRilTest::%{public}s --> finished", __func__);
-    }
-}
-
-void TelRilTest::OnRequestGetSimPin2InputTimesTest(
-    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_PIN2_INPUT_TIMES);
-    if (event != nullptr && telRilManager_ != nullptr) {
-        event->SetOwner(handler);
-
-        TELEPHONY_LOGI("TelRilTest::%{public}s -->", __func__);
-        telRilManager_->GetSimPin2InputTimes(slotId, event);
         TELEPHONY_LOGI("TelRilTest::%{public}s --> finished", __func__);
     }
 }
