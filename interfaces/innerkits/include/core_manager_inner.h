@@ -216,7 +216,7 @@ public:
     sptr<CellLocation> GetCellLocation(int32_t slotId);
     bool GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
-    bool GetImsRegStatus(int32_t slotId) const;
+    ImsRegInfo GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType) const;
     std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId);
     bool SendUpdateCellLocationRequest(int32_t slotId);
 

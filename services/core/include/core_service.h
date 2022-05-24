@@ -168,7 +168,7 @@ public:
     bool SetVoiceMailInfo(
         const int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) override;
 
-    bool GetImsRegStatus(int32_t slotId) override;
+    ImsRegInfo GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType) override;
 
     int32_t GetMaxSimCount() override;
 
@@ -183,6 +183,10 @@ public:
     bool SendUpdateCellLocationRequest(int32_t slotId) override;
 
     bool HasOperatorPrivileges(const int32_t slotId) override;
+
+    int32_t RegImsCallback(MessageParcel &data) override;
+
+    int32_t UnRegImsCallback(MessageParcel &data) override;
 
 private:
     bool Init();

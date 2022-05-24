@@ -18,6 +18,9 @@
 
 #include "singleton.h"
 #include "ims_core_service_interface.h"
+#include "event_handler.h"
+#include "radio_event.h"
+#include "event_runner.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -41,10 +44,23 @@ public:
     void Init();
     int32_t GetImsRegistrationStatus(int32_t slotId);
     int32_t RegisterImsCoreServiceCallback();
+    int32_t RegisterImsCoreServiceCallbackHandler(int32_t slotId,
+        const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+
+    /**
+     * Get Handler
+     *
+     * @param slotId
+     * @return AppExecFwk::EventHandler
+     */
+    std::shared_ptr<AppExecFwk::EventHandler> GetHandler(int32_t slotId);
 
 private:
+    std::mutex mutex_;
     sptr<ImsCoreServiceInterface> imsCoreServiceProxy_ = nullptr;
     sptr<ImsCoreServiceCallbackInterface> imsCoreServiceCallback_ = nullptr;
+    std::map<int32_t, std::shared_ptr<AppExecFwk::EventHandler>> handlerMap_;
+    int32_t ReConnectService();
 };
 } // namespace Telephony
 } // namespace OHOS

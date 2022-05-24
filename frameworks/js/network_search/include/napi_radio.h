@@ -34,6 +34,10 @@
 #include "telephony_napi_hril_error_code.h"
 #include "telephony_napi_common_error.h"
 #include "telephony_types.h"
+#include "napi_ims_video_callback.h"
+#include "napi_ims_voice_callback.h"
+#include "napi_ims_ut_callback.h"
+#include "napi_ims_sms_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -44,6 +48,12 @@ const static std::string GSM = "GSM";
 const static std::string GPRS = "GPRS";
 const static std::string WCDMA = "WCDMA";
 const static std::string LTE = "LTE";
+const int32_t ARRAY_INDEX_FIRST = 0;
+const int32_t ARRAY_INDEX_SECOND = 1;
+const int32_t ARRAY_INDEX_THIRD = 2;
+const int32_t ARRAY_INDEX_FOURTH = 3;
+const int32_t THREE_PARAMETERS = 3;
+const int32_t FOUR_PARAMETERS = 4;
 
 enum NativeSelectionMode {
     NATIVE_NETWORK_SELECTION_AUTOMATIC = 0,
@@ -257,6 +267,49 @@ struct GetNrOptionModeContext : BaseContext {
 struct SetPrimarySlotIdContext : BaseContext {
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
     bool setResult = false;
+};
+
+struct GetImsRegInfoContext : BaseContext {
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    int32_t imsSrvType = DEFAULT_ERROR;
+    ImsRegInfo imsRegInfo = ERROR_IMS_REG_INFO;
+};
+
+struct ImsRegInfoContext : BaseContext {
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    ImsRegInfo imsRegInfo = ERROR_IMS_REG_INFO;
+};
+
+struct ImsStateCallback {
+    ImsStateCallback()
+        :env(nullptr),
+        thisVar(nullptr),
+        callbackRef(nullptr),
+        deferred(nullptr),
+        callbackBeginTime_(0),
+        slotId(0),
+        imsSrvType(TYPE_VOICE),
+        voiceCallback(nullptr),
+        videoCallback(nullptr),
+        utCallback(nullptr),
+        smsCallback(nullptr)
+    {}
+    napi_env env;
+    napi_value thisVar;
+    napi_ref callbackRef;
+    napi_deferred deferred;
+    time_t callbackBeginTime_;
+    int32_t slotId;
+    ImsServiceType imsSrvType;
+    sptr<ImsVoiceCallback> voiceCallback;
+    sptr<ImsVideoCallback> videoCallback;
+    sptr<ImsUtCallback> utCallback;
+    sptr<ImsSmsCallback> smsCallback;
+};
+
+struct ImsStateWorker {
+    ImsRegInfo info;
+    ImsStateCallback callback;
 };
 } // namespace Telephony
 } // namespace OHOS

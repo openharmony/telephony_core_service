@@ -17,6 +17,7 @@
 #define TELEPHONY_IMS_CORE_SERVICE_TYPES_H
 
 #include <stdint.h>
+#include "ims_reg_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -42,7 +43,7 @@ struct ImsServiceStatus {
     bool supportImsVideo;
     bool supportImsUt;
     bool supportImsSms;
-    bool supportImsCallComposer;
+    ImsRegTech imsRegTech;
 };
 
 struct ImsRegistrationStatus {

@@ -19,6 +19,7 @@
 #include "iremote_broker.h"
 
 #include "ims_core_service_types.h"
+#include "ims_reg_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -29,34 +30,25 @@ public:
     enum {
         /****************** ims core ability ******************/
         IMS_SERVICE_STATUS_REPORT = 0,
-        IMS_REGISTRATION_STATUS_RESPONSE,
-        IMS_NETWORK_STATE_CHANGE_REPORT,
+        IMS_GET_REGISTRATION_STATUS,
     };
 
     /**
-     * ImsServiceStatusReport
+     * UpdateImsServiceStatusChanged
      *
      * @param imsServiceStatus contains the ability of ims Voice/Video/Ut/Sms/CallComposer
      * @return Returns nullptr on failure, others on success.
      */
-    virtual int32_t ImsServiceStatusReport(int32_t slotId, const ImsServiceStatus &imsServiceStatus) = 0;
+    virtual int32_t UpdateImsServiceStatusChanged(int32_t slotId, const ImsServiceStatus &imsServiceStatus) = 0;
 
     /**
-     * ImsNetworkStateChange
+     * GetImsRegistrationStatusResponse
      *
      * @param slotId
-     * @return Returns nullptr on failure, others on success.
-     */
-    virtual int32_t ImsNetworkStateChange(int32_t slotId) = 0;
-
-    /**
-     * ImsRegistrationStatusResponse
-     *
      * @param imsRegStatus
      * @return Returns nullptr on failure, others on success.
      */
-    virtual int32_t ImsRegistrationStatusResponse(
-        const ImsResponseInfo &info, const ImsRegistrationStatus &imsRegStatus) = 0;
+    virtual int32_t GetImsRegistrationStatusResponse(int32_t slotId, const ImsRegistrationStatus &imsRegStatus) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ImsCoreServiceCallback");

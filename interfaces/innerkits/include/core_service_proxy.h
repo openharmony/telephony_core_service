@@ -99,7 +99,7 @@ public:
         int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) override;
     bool SetVoiceMailInfo(
         const int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) override;
-    bool GetImsRegStatus(int32_t slotId) override;
+    ImsRegInfo GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType) override;
     int32_t GetMaxSimCount() override;
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
@@ -107,6 +107,8 @@ public:
     std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) override;
     bool SendUpdateCellLocationRequest(int32_t slotId) override;
     bool HasOperatorPrivileges(const int32_t slotId) override;
+    int32_t RegImsCallback(MessageParcel &data) override;
+    int32_t UnRegImsCallback(MessageParcel &data) override;
 
 private:
     template<class T>

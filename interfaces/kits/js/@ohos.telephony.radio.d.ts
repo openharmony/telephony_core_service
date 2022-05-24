@@ -14,6 +14,7 @@
  */
 
 import {AsyncCallback} from "./basic";
+import {Callback} from "./basic";
 
 /**
  * Provides interfaces for applications to obtain the network state, cell information, signal information,
@@ -294,6 +295,28 @@ declare namespace radio {
    */
   function getPreferredNetwork(slotId: number, callback: AsyncCallback<PreferredNetworkMode>): void;
   function getPreferredNetwork(slotId: number): Promise<PreferredNetworkMode>;
+
+  /**
+   * Get the Ims register state info.
+   *
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+   function getImsRegInfo(slotId: number, imsType: ImsServiceType, callback: AsyncCallback<ImsRegInfo>): void;
+   function getImsRegInfo(slotId: number, imsType: ImsServiceType): Promise<ImsRegInfo>;
+
+  /**
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  function on(type: 'imsRegStateChange', slotId: number, imsType: ImsServiceType, callback: Callback<ImsRegInfo>): void;
+
+
+  /**
+    * @systemapi Hide this for inner system use.
+    * @since 9
+    */
+  function off(type: 'imsRegStateChange', slotId: number, imsType: ImsServiceType, callback?: Callback<ImsRegInfo>): void;
 
   /**
    * @systemapi Hide this for inner system use.
@@ -787,6 +810,31 @@ declare namespace radio {
 
     /** Manual network selection modes. */
     NETWORK_SELECTION_MANUAL
+  }
+
+  export enum ImsRegState {
+    IMS_UNREGISTERED,
+    IMS_REGISTERED,
+  }
+
+ export enum ImsRegTech{
+    REGISTRATION_TECH_NONE,
+    REGISTRATION_TECH_LTE,
+    REGISTRATION_TECH_IWLAN,
+    REGISTRATION_TECH_CROSS_SIM,
+    REGISTRATION_TECH_NR,
+  }
+
+ export interface ImsRegInfo {
+    imsRegState: ImsRegState;
+    imsRegTech: ImsRegTech;
+  }
+
+ export enum ImsServiceType {
+    TYPE_VOICE,
+    TYPE_VIDEO,
+    TYPE_UT,
+    TYPE_SMS,
   }
 }
 

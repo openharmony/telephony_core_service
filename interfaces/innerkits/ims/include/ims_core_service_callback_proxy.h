@@ -27,10 +27,8 @@ class ImsCoreServiceCallbackProxy : public IRemoteProxy<ImsCoreServiceCallbackIn
 public:
     explicit ImsCoreServiceCallbackProxy(const sptr<IRemoteObject> &impl);
     virtual ~ImsCoreServiceCallbackProxy() = default;
-    int32_t ImsServiceStatusReport(int32_t slotId, const ImsServiceStatus &imsServiceStatus) override;
-    int32_t ImsRegistrationStatusResponse(
-        const ImsResponseInfo &info, const ImsRegistrationStatus &imsRegStatus) override;
-    int32_t ImsNetworkStateChange(int32_t slotId) override;
+    int32_t UpdateImsServiceStatusChanged(int32_t slotId, const ImsServiceStatus &imsServiceStatus) override;
+    int32_t GetImsRegistrationStatusResponse(int32_t slotId, const ImsRegistrationStatus &imsRegStatus) override;
 
 private:
     static inline BrokerDelegator<ImsCoreServiceCallbackProxy> delegator_;

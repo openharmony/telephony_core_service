@@ -1,0 +1,56 @@
+/*
+ * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef IMS_REG_TYPES_H
+#define IMS_REG_TYPES_H
+
+namespace OHOS {
+namespace Telephony {
+const int32_t ERROR = -1;
+const int32_t SUCCESS = 0;
+const int16_t VALUE_MAXIMUM_LIMIT = 3;
+const int16_t INFO_MAXIMUM_LIMIT = 31;
+const int16_t DATA_LENGTH_ONE = 1;
+const int16_t DATA_LENGTH_TWO = 2;
+
+enum ImsRegState {
+    IMS_UNREGISTERED,
+    IMS_REGISTERED,
+};
+
+enum ImsRegTech {
+    IMS_REG_TECH_NONE = 0,
+    IMS_REG_TECH_LTE = 1,
+    IMS_REG_TECH_IWLAN = 2,
+    IMS_REG_TECH_CROSS_SIM = 3,
+    IMS_REG_TECH_NR = 4,
+};
+
+enum ImsServiceType {
+    TYPE_VOICE = 0,
+    TYPE_VIDEO = 1,
+    TYPE_UT = 2,
+    TYPE_SMS = 3,
+};
+
+struct ImsRegInfo {
+    ImsRegState imsRegState;
+    ImsRegTech imsRegTech;
+};
+
+const ImsRegInfo ERROR_IMS_REG_INFO = {IMS_UNREGISTERED, IMS_REG_TECH_NONE};
+}  // namespace Telephony
+}  // namespace OHOS
+#endif  // IMS_REG_TYPES_H

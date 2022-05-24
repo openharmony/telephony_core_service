@@ -17,6 +17,7 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 ohos_executable("tel_network_search_test") {
   install_enable = true
   sources = [
+    "ims_voice_callback_test_stub.cpp",
     "network_search_test_callback_stub.cpp",
     "test.cpp",
     "test_broadcast.cpp",
