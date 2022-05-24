@@ -838,10 +838,6 @@ int32_t TelRilManager::UnlockPuk(
     return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::UnlockPuk, puk, pin);
 }
 
-int32_t TelRilManager::GetSimPinInputTimes(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::GetSimPinInputTimes);
-}
 int32_t TelRilManager::UnlockPin2(int32_t slotId, std::string pin2, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::UnlockPin2, pin2);
@@ -851,11 +847,6 @@ int32_t TelRilManager::UnlockPuk2(
     int32_t slotId, std::string puk2, std::string pin2, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::UnlockPuk2, puk2, pin2);
-}
-
-int32_t TelRilManager::GetSimPin2InputTimes(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::GetSimPin2InputTimes);
 }
 
 int32_t TelRilManager::SetActiveSim(
