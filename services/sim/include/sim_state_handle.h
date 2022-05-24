@@ -87,13 +87,9 @@ const std::string FDN_PIN_LOCK = "P2";
 const std::string FDN_PIN2_LOCK = "FD";
 
 struct UnlockData {
-    UnlockType type;
-    int32_t lockState = 0;
-    int32_t result = 0;
-    int32_t remain = 0;
-    int32_t pinRemain = 0;
-    int32_t pin2Remain = 0;
-    int32_t puk2Remain = 0;
+    int32_t result;
+    int32_t remain;
+    int32_t lockState;
 };
 
 class SimStateHandle : public AppExecFwk::EventHandler {
@@ -109,7 +105,6 @@ public:
     void UnlockPin(int32_t slotId, std::string pin);
     void UnlockPuk(int32_t slotId, std::string newPin, std::string puk);
     void AlterPin(int32_t slotId, std::string newPin, std::string oldPin);
-    void UnlockRemain(int32_t slotId);
     void SetLockState(int32_t slotId, const LockInfo &options);
     void GetLockState(int32_t slotId, LockType lockType);
     UnlockData GetUnlockData();
@@ -131,7 +126,7 @@ private:
     void GetSimCardData(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
     void GetSimLockState(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
     void GetSetLockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
-    void GetUnlockReult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
+    void GetUnlockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
     void GetUnlockRemain(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessIccCardState(IccState &ar, int32_t slotId);
@@ -147,7 +142,7 @@ private:
     int32_t oldSimType_ = ICC_UNKNOWN_TYPE;
     int32_t oldSimStatus_ = ICC_CONTENT_UNKNOWN;
     int32_t slotId_ = DEFAULT_SIM_SLOT_ID;
-    UnlockData unlockRespon_;
+    UnlockData unlockRespon_ = {0};
     LockStatusResponse simlockRespon_ = {0};
     IccState iccState_; // icc card states
     SimState externalState_; // need to broadcast sim state;

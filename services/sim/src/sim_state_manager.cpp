@@ -112,26 +112,16 @@ bool SimStateManager::UnlockPin(int32_t slotId, std::string pin, LockStatusRespo
             TELEPHONY_LOGI("UnlockPin::wait(), response = false");
             cv_.wait(lck);
         }
-        ret = simStateHandle_->GetUnlockData().result;
-        if (ret != UNLOCK_PIN_PUK_INCORRECT) {
-            TELEPHONY_LOGI("SimStateManager::UnlockPin(), %{public}d", ret);
-            if (ret) {
-                response.result = UNLOCK_FAIL;
-            } else {
-                response.result = UNLOCK_OK;
-            }
-            return true;
+        int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
+        if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+            response.result = UNLOCK_OK;
+        } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+            response.result = UNLOCK_INCORRECT;
+        } else {
+            response.result = UNLOCK_FAIL;
         }
-        responseReady_ = false;
-        simStateHandle_->UnlockRemain(slotId);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("UnlockRemain::wait(), response = false");
-            cv_.wait(lck);
-        }
-        TELEPHONY_LOGI("SimStateManager::UnlockRemain(), response = true");
-        ret = simStateHandle_->GetUnlockData().remain;
-        response.remain = ret;
-        response.result = UNLOCK_INCORRECT;
+        response.remain =  static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+        TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
     }
     TELEPHONY_LOGI("SimStateManager::UnlockPin(), %{public}d", ret);
     return true;
@@ -149,26 +139,16 @@ bool SimStateManager::UnlockPuk(int32_t slotId, std::string newPin, std::string 
             TELEPHONY_LOGI("UnlockPuk::wait(), response = false");
             cv_.wait(lck);
         }
-        ret = simStateHandle_->GetUnlockData().result;
-        if (ret != UNLOCK_PIN_PUK_INCORRECT) {
-            TELEPHONY_LOGI("SimStateManager::UnlockPuk(), %{public}d", ret);
-            if (ret) {
-                response.result = UNLOCK_FAIL;
-            } else {
-                response.result = UNLOCK_OK;
-            }
-            return true;
+        int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
+        if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+            response.result = UNLOCK_OK;
+        } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+            response.result = UNLOCK_INCORRECT;
+        } else {
+            response.result = UNLOCK_FAIL;
         }
-        responseReady_ = false;
-        simStateHandle_->UnlockRemain(slotId);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("UnlockRemain::wait(), response = false");
-            cv_.wait(lck);
-        }
-        TELEPHONY_LOGI("SimStateManager::UnlockRemain(), response = true");
-        ret = simStateHandle_->GetUnlockData().remain;
-        response.result = UNLOCK_INCORRECT;
-        response.remain = ret;
+        response.remain =  static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+        TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
     }
     TELEPHONY_LOGI("SimStateManager::UnlockPuk(), %{public}d", ret);
     return true;
@@ -186,26 +166,17 @@ bool SimStateManager::AlterPin(int32_t slotId, std::string newPin, std::string o
             TELEPHONY_LOGI("AlterPin::wait(), response = false");
             cv_.wait(lck);
         }
-        ret = simStateHandle_->GetUnlockData().result;
-        if (ret != UNLOCK_PIN_PUK_INCORRECT) {
-            TELEPHONY_LOGI("SimStateManager::AlterPin(), %{public}d", ret);
-            if (ret) {
-                response.result = UNLOCK_FAIL;
-            } else {
-                response.result = UNLOCK_OK;
-            }
-            return true;
+
+        int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
+        if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+            response.result = UNLOCK_OK;
+        } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+            response.result = UNLOCK_INCORRECT;
+        } else {
+            response.result = UNLOCK_FAIL;
         }
-        responseReady_ = false;
-        simStateHandle_->UnlockRemain(slotId);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("UnlockRemain::wait(), response = false");
-            cv_.wait(lck);
-        }
-        TELEPHONY_LOGI("SimStateManager::UnlockRemain(), response = true");
-        ret = simStateHandle_->GetUnlockData().pinRemain;
-        response.result = UNLOCK_INCORRECT;
-        response.remain = ret;
+        response.remain =  static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+        TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
     }
     TELEPHONY_LOGI("SimStateManager::AlterPin(), %{public}d", ret);
     return true;
@@ -223,30 +194,17 @@ bool SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, Lock
             TELEPHONY_LOGI("SetLockState::wait(), response = false");
             cv_.wait(lck);
         }
-        ret = simStateHandle_->GetUnlockData().result;
-        if (ret != UNLOCK_PIN_PUK_INCORRECT) {
-            TELEPHONY_LOGI("SimStateManager::SetLockState(), %{public}d", ret);
-            if (ret) {
-                response.result = UNLOCK_FAIL;
-            } else {
-                response.result = UNLOCK_OK;
-            }
-            return true;
-        }
-        responseReady_ = false;
-        simStateHandle_->UnlockRemain(slotId);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("UnlockRemain::wait(), response = false");
-            cv_.wait(lck);
-        }
-        TELEPHONY_LOGI("SimStateManager::UnlockRemain(), response = true");
-        if (LockType::PIN_LOCK == options.lockType) {
-            ret = simStateHandle_->GetUnlockData().pinRemain;
+        int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
+        if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+            response.result = UNLOCK_OK;
+        } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+            response.result = UNLOCK_INCORRECT;
         } else {
-            ret = simStateHandle_->GetUnlockData().pin2Remain;
+            response.result = UNLOCK_FAIL;
         }
-        response.result = UNLOCK_INCORRECT;
-        response.remain = ret;
+        response.remain =  static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+        TELEPHONY_LOGI("SetLockState response.result:%{public}d,response.remain:%{public}d",
+            response.result, response.remain);
     }
     TELEPHONY_LOGI("SimStateManager::SetLockState(), %{public}d", ret);
     return true;
@@ -282,26 +240,16 @@ bool SimStateManager::UnlockPin2(int32_t slotId, std::string pin2, LockStatusRes
             TELEPHONY_LOGI("UnlockPin2::wait(), response = false");
             cv_.wait(lck);
         }
-        ret = simStateHandle_->GetUnlockData().result;
-        if (ret != UNLOCK_PIN_PUK_INCORRECT) {
-            TELEPHONY_LOGI("SimStateManager::UnlockPin2(), %{public}d", ret);
-            if (ret) {
-                response.result = UNLOCK_FAIL;
-            } else {
-                response.result = UNLOCK_OK;
-            }
-            return true;
+        int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
+        if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+            response.result = UNLOCK_OK;
+        } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+            response.result = UNLOCK_INCORRECT;
+        } else {
+            response.result = UNLOCK_FAIL;
         }
-        responseReady_ = false;
-        simStateHandle_->UnlockRemain(slotId);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("UnlockRemain::wait(), response = false");
-            cv_.wait(lck);
-        }
-        TELEPHONY_LOGI("SimStateManager::UnlockRemain(), response = true");
-        ret = simStateHandle_->GetUnlockData().pin2Remain;
-        response.remain = ret;
-        response.result = UNLOCK_INCORRECT;
+        response.remain =  static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+        TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
     }
     TELEPHONY_LOGI("SimStateManager::UnlockPin2(), %{public}d", ret);
     return true;
@@ -320,26 +268,16 @@ bool SimStateManager::UnlockPuk2(
             TELEPHONY_LOGI("UnlockPuk2::wait(), response = false");
             cv_.wait(lck);
         }
-        ret = simStateHandle_->GetUnlockData().result;
-        if (ret != UNLOCK_PIN_PUK_INCORRECT) {
-            TELEPHONY_LOGI("SimStateManager::UnlockPuk2(), %{public}d", ret);
-            if (ret) {
-                response.result = UNLOCK_FAIL;
-            } else {
-                response.result = UNLOCK_OK;
-            }
-            return true;
+        int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
+        if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+            response.result = UNLOCK_OK;
+        } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+            response.result = UNLOCK_INCORRECT;
+        } else {
+            response.result = UNLOCK_FAIL;
         }
-        responseReady_ = false;
-        simStateHandle_->UnlockRemain(slotId);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("UnlockRemain::wait(), response = false");
-            cv_.wait(lck);
-        }
-        TELEPHONY_LOGI("SimStateManager::UnlockRemain(), response = true");
-        ret = simStateHandle_->GetUnlockData().puk2Remain;
-        response.result = UNLOCK_INCORRECT;
-        response.remain = ret;
+        response.remain =  static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+        TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
     }
     TELEPHONY_LOGI("SimStateManager::UnlockPuk2(), %{public}d", ret);
     return true;
@@ -358,26 +296,16 @@ bool SimStateManager::AlterPin2(
             TELEPHONY_LOGI("AlterPin2::wait(), response = false");
             cv_.wait(lck);
         }
-        ret = simStateHandle_->GetUnlockData().result;
-        if (ret != UNLOCK_PIN_PUK_INCORRECT) {
-            TELEPHONY_LOGI("SimStateManager::AlterPin2(), %{public}d", ret);
-            if (ret) {
-                response.result = UNLOCK_FAIL;
-            } else {
-                response.result = UNLOCK_OK;
-            }
-            return true;
+        int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
+        if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+            response.result = UNLOCK_OK;
+        } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+            response.result = UNLOCK_INCORRECT;
+        } else {
+            response.result = UNLOCK_FAIL;
         }
-        responseReady_ = false;
-        simStateHandle_->UnlockRemain(slotId);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("UnlockRemain::wait(), response = false");
-            cv_.wait(lck);
-        }
-        TELEPHONY_LOGI("SimStateManager::UnlockRemain(), response = true");
-        ret = simStateHandle_->GetUnlockData().pin2Remain;
-        response.result = UNLOCK_INCORRECT;
-        response.remain = ret;
+        response.remain =  static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+        TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
     }
     TELEPHONY_LOGI("SimStateManager::AlterPin2(), %{public}d", ret);
     return true;

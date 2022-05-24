@@ -252,11 +252,9 @@ public:
     int32_t UnlockPin(int32_t slotId, std::string pin, const AppExecFwk::InnerEvent::Pointer &result) override;
     int32_t UnlockPuk(
         int32_t slotId, std::string puk, std::string pin, const AppExecFwk::InnerEvent::Pointer &result) override;
-    int32_t GetSimPinInputTimes(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
     int32_t UnlockPin2(int32_t slotId, std::string pin2, const AppExecFwk::InnerEvent::Pointer &result) override;
     int32_t UnlockPuk2(
         int32_t slotId, std::string puk2, std::string pin2, const AppExecFwk::InnerEvent::Pointer &result) override;
-    int32_t GetSimPin2InputTimes(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
     int32_t SetActiveSim(
         int32_t slotId, int32_t index, int32_t enable, const AppExecFwk::InnerEvent::Pointer &result) override;
     int32_t SendTerminalResponseCmd(
