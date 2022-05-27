@@ -111,16 +111,16 @@ ImsRegInfo NetworkSearchState::GetImsStatus(ImsServiceType imsSrvType)
     bool isRegister = false;
     switch (imsSrvType) {
         case ImsServiceType::TYPE_VOICE:
-            isRegister = imsRegStatus_ & imsServiceStatus_->supportImsVoice;
+            isRegister = imsRegStatus_ && imsServiceStatus_->supportImsVoice;
             break;
         case ImsServiceType::TYPE_VIDEO:
-            isRegister = imsRegStatus_ & imsServiceStatus_->supportImsVideo;
+            isRegister = imsRegStatus_ && imsServiceStatus_->supportImsVideo;
             break;
         case ImsServiceType::TYPE_UT:
-            isRegister = imsRegStatus_ & imsServiceStatus_->supportImsUt;
+            isRegister = imsRegStatus_ && imsServiceStatus_->supportImsUt;
             break;
         case ImsServiceType::TYPE_SMS:
-            isRegister = imsRegStatus_ & imsServiceStatus_->supportImsSms;
+            isRegister = imsRegStatus_ && imsServiceStatus_->supportImsSms;
             break;
         default:
             break;
@@ -143,22 +143,22 @@ void NetworkSearchState::SetImsStatus(bool imsRegStatus)
     bool isRegister = false;
     imsRegInfo.imsRegTech = imsServiceStatus_->imsRegTech;
     if (imsServiceStatus_->supportImsVoice) {
-        isRegister = imsRegStatus_ & imsServiceStatus_->supportImsVoice;
+        isRegister = imsRegStatus_ && imsServiceStatus_->supportImsVoice;
         imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
         NotifyImsStateChange(ImsServiceType::TYPE_VOICE, imsRegInfo);
     }
     if (imsServiceStatus_->supportImsVideo) {
-        isRegister = imsRegStatus_ & imsServiceStatus_->supportImsVideo;
+        isRegister = imsRegStatus_ && imsServiceStatus_->supportImsVideo;
         imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
         NotifyImsStateChange(ImsServiceType::TYPE_VIDEO, imsRegInfo);
     }
     if (imsServiceStatus_->supportImsUt) {
-        isRegister = imsRegStatus_ & imsServiceStatus_->supportImsUt;
+        isRegister = imsRegStatus_ && imsServiceStatus_->supportImsUt;
         imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
         NotifyImsStateChange(ImsServiceType::TYPE_UT, imsRegInfo);
     }
     if (imsServiceStatus_->supportImsSms) {
-        isRegister = imsRegStatus_ & imsServiceStatus_->supportImsSms;
+        isRegister = imsRegStatus_ && imsServiceStatus_->supportImsSms;
         imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
         NotifyImsStateChange(ImsServiceType::TYPE_SMS, imsRegInfo);
     }
@@ -186,7 +186,7 @@ void NetworkSearchState::SetImsServiceStatus(const ImsServiceStatus &imsServiceS
     bool isRegister = false;
     imsRegInfo.imsRegTech = imsServiceStatus.imsRegTech;
     if ((voiceChanged && !imsRegStatus_) || radioTechChanged) {
-        isRegister = imsRegStatus_ & imsServiceStatus_->supportImsVoice;
+        isRegister = imsRegStatus_ && imsServiceStatus_->supportImsVoice;
         imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
         NotifyImsStateChange(ImsServiceType::TYPE_VOICE, imsRegInfo);
     }
@@ -195,12 +195,12 @@ void NetworkSearchState::SetImsServiceStatus(const ImsServiceStatus &imsServiceS
         imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
         NotifyImsStateChange(ImsServiceType::TYPE_VIDEO, imsRegInfo);
     }
-    if ((utChanged & !imsRegStatus_) || radioTechChanged) {
+    if ((utChanged && !imsRegStatus_) || radioTechChanged) {
         isRegister = imsRegStatus_ && imsServiceStatus_->supportImsUt;
         imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
         NotifyImsStateChange(ImsServiceType::TYPE_UT, imsRegInfo);
     }
-    if ((smsChanged & !imsRegStatus_) || radioTechChanged) {
+    if ((smsChanged && !imsRegStatus_) || radioTechChanged) {
         isRegister = imsRegStatus_ && imsServiceStatus_->supportImsSms;
         imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
         NotifyImsStateChange(ImsServiceType::TYPE_SMS, imsRegInfo);
