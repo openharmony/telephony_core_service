@@ -26,7 +26,9 @@ enum class DiffInterfaceId {
     TEST_SIM_IO,
     TEST_OPEN_LG_SIMIO,
     TEST_TRANSMIT_APDU_LOGICAL_CHANNEL,
+    TEST_TRANSMIT_APDU_BASIC_CHANNEL,
     TEST_CLOSE_LG_SIMIO,
+    TEST_SIM_AUTH,
     TEST_GET_IMSI,
     TEST_GET_ICCID,
     TEST_GET_SIM_LOCK_STATUS,
@@ -34,10 +36,8 @@ enum class DiffInterfaceId {
     TEST_GET_CHANGE_SIM_PASSWD,
     TEST_ENTER_SIM_PIN,
     TEST_UNLOCK_SIM_PIN,
-    TEST_GET_PIN_INPUT_TIMES,
     TEST_ENTER_SIM_PIN2,
     TEST_UNLOCK_SIM_PIN2,
-    TEST_GET_PIN2_INPUT_TIMES,
     TEST_ENABLE_SIM_CARD,
     TEST_GET_RILCM_VOICE_REGISTRATION_STATE_TEST,
     TEST_GET_RILCM_DATA_REGISTRATION_STATE_TEST,
@@ -170,6 +170,11 @@ public:
     void OnRequestTransmitApduLogicalChannelTest(int32_t slotId,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
+    void OnRequestTransmitApduBasicChannelTest(int32_t slotId,
+        const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+
+    void OnRequestSimAuthenticationTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+
     void OnRequestCloseLGSimIOTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestSimGetImsiTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -184,13 +189,9 @@ public:
 
     void OnRequestUnlockSimPinTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
-    void OnRequestGetSimPinInputTimesTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
     void OnRequestEnterSimPin2Test(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestUnlockSimPin2Test(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    void OnRequestGetSimPin2InputTimesTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestSetActiveSimTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
@@ -469,14 +470,15 @@ void TelRilTest::OnInitSim()
     memberFuncMap_[DiffInterfaceId::TEST_GET_CHANGE_SIM_PASSWD] = &TelRilTest::OnRequestChangeSimPasswordTest;
     memberFuncMap_[DiffInterfaceId::TEST_ENTER_SIM_PIN] = &TelRilTest::OnRequestEnterSimPinTest;
     memberFuncMap_[DiffInterfaceId::TEST_UNLOCK_SIM_PIN] = &TelRilTest::OnRequestUnlockSimPinTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_PIN_INPUT_TIMES] = &TelRilTest::OnRequestGetSimPinInputTimesTest;
     memberFuncMap_[DiffInterfaceId::TEST_ENTER_SIM_PIN2] = &TelRilTest::OnRequestEnterSimPin2Test;
     memberFuncMap_[DiffInterfaceId::TEST_UNLOCK_SIM_PIN2] = &TelRilTest::OnRequestUnlockSimPin2Test;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_PIN2_INPUT_TIMES] = &TelRilTest::OnRequestGetSimPin2InputTimesTest;
     memberFuncMap_[DiffInterfaceId::TEST_ENABLE_SIM_CARD] = &TelRilTest::OnRequestSetActiveSimTest;
     memberFuncMap_[DiffInterfaceId::TEST_OPEN_LG_SIMIO] = &TelRilTest::OnRequestOpenLGSimIOTest;
     memberFuncMap_[DiffInterfaceId::TEST_TRANSMIT_APDU_LOGICAL_CHANNEL] =
         &TelRilTest::OnRequestTransmitApduLogicalChannelTest;
+    memberFuncMap_[DiffInterfaceId::TEST_TRANSMIT_APDU_BASIC_CHANNEL] =
+        &TelRilTest::OnRequestTransmitApduBasicChannelTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SIM_AUTH] = &TelRilTest::OnRequestSimAuthenticationTest;
     memberFuncMap_[DiffInterfaceId::TEST_CLOSE_LG_SIMIO] = &TelRilTest::OnRequestCloseLGSimIOTest;
 }
 
@@ -662,10 +664,10 @@ void TelRilTest::OnRequestTransmitApduBasicChannelTest(int32_t slotId,
     std::cout << "TelRilTest::OnRequestTransmitApduBasicChannelTest end" << std::endl;
 }
 
-void TelRilTest::OnSimAuthenticationTest(int32_t slotId,
+void TelRilTest::OnRequestSimAuthenticationTest(int32_t slotId,
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    std::cout << "TelRilTest::OnSimAuthenticationTest begin:" << std::endl;
+    std::cout << "TelRilTest::OnRequestSimAuthenticationTest begin:" << std::endl;
     auto event = AppExecFwk::InnerEvent::Get(uint32_t(CustomMessageID::MSG_SIM_AUTHENTICATION_DONE));
     if (event == nullptr) {
         std::cerr << "event is nullptr" << std::endl;
@@ -678,7 +680,7 @@ void TelRilTest::OnSimAuthenticationTest(int32_t slotId,
     }
     SimAuthenticationRequestInfo reqInfo;
     telRilManager_->SimAuthentication(slotId, reqInfo, event);
-    std::cout << "TelRilTest::OnSimAuthenticationTest end" << std::endl;
+    std::cout << "TelRilTest::OnRequestSimAuthenticationTest end" << std::endl;
 }
 
 void TelRilTest::OnRequestCloseLGSimIOTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
@@ -2244,7 +2246,10 @@ void SimTest()
     cout << (int32_t)DiffInterfaceId::TEST_OPEN_LG_SIMIO << "--> OnRequestOpenLGSimIOTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_TRANSMIT_APDU_LOGICAL_CHANNEL
          << "--> OnRequestTransmitApduLogicalChannelTest" << endl;
+    cout << (int32_t)DiffInterfaceId::TEST_TRANSMIT_APDU_BASIC_CHANNEL
+         << "--> OnRequestTransmitApduBasicChannelTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_CLOSE_LG_SIMIO << "--> OnRequestCloseLGSimIOTest" << endl;
+    cout << (int32_t)DiffInterfaceId::TEST_SIM_AUTH << "--> OnRequestSimAuthenticationTest" << endl;
 
     cout << (int32_t)DiffInterfaceId::TEST_GET_IMSI << "--> OnRequestSimGetImsiTest" << endl; // pass
     cout << (int32_t)DiffInterfaceId::TEST_GET_ICCID << "--> OnRequestSimGetIccIDTest" << endl; // pass
@@ -2254,12 +2259,8 @@ void SimTest()
          << endl; // pass
     cout << (int32_t)DiffInterfaceId::TEST_ENTER_SIM_PIN << "--> OnRequestEnterSimPinTest" << endl; // pass
     cout << (int32_t)DiffInterfaceId::TEST_UNLOCK_SIM_PIN << "--> OnRequestUnlockSimPinTest" << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_GET_PIN_INPUT_TIMES << "--> OnRequestGetSimPinInputTimesTest"
-         << endl; // pass
     cout << (int32_t)DiffInterfaceId::TEST_ENTER_SIM_PIN2 << "--> OnRequestEnterSimPin2Test" << endl; // pass
     cout << (int32_t)DiffInterfaceId::TEST_UNLOCK_SIM_PIN2 << "--> OnRequestUnlockSimPin2Test" << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_GET_PIN2_INPUT_TIMES << "--> OnRequestGetSimPin2InputTimesTest"
-         << endl; // pass
     cout << (int32_t)DiffInterfaceId::TEST_ENABLE_SIM_CARD << "--> OnRequestSetActiveSimTest" << endl; // pass
 
     cout << (int32_t)DiffInterfaceId::TEST_RILCM_GET_DATA_CALL_LIST_TEST << "--> OnRequestGetDataCallListTest"

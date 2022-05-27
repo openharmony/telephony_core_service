@@ -2654,17 +2654,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPINTest_0101, Function | MediumT
 }
 
 /**
- * @tc.number Telephony_TelRil_GetSimPinInputTimesTest_0101 to do ...
- * @tc.name Get SIM card pin code input times
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetSimPinInputTimesTest_0101, Function | MediumTest | Level3)
-{
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PIN_INPUT_TIMES), GetHandler());
-    return;
-}
-
-/**
  * @tc.number Telephony_TelRil_ErrorPINCodeTest_0102 to do ...
  * @tc.name Enter Error PIN
  * @tc.desc Function test
@@ -2783,17 +2772,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPin2Test_0101, Function | Medium
 HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPin2Test_0102, Function | MediumTest | Level3)
 {
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_ERROR_PIN2), GetHandler());
-    return;
-}
-
-/**
- * @tc.number Telephony_TelRil_GetSimPin2InputTimesTest_0101 to do ...
- * @tc.name Get SIM card pin2 code input times
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetSimPin2InputTimesTest_0101, Function | MediumTest | Level3)
-{
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PIN2_INPUT_TIMES), GetHandler());
     return;
 }
 
