@@ -42,10 +42,8 @@ enum class DiffInterfaceId {
     TEST_UNLOCK_SIM_PIN,
     TEST_ENTER_ERROR_PIN,
     TEST_ENTER_ERROR_PIN2,
-    TEST_GET_PIN_INPUT_TIMES,
     TEST_ENTER_SIM_PIN2,
     TEST_UNLOCK_SIM_PIN2,
-    TEST_GET_PIN2_INPUT_TIMES,
     TEST_ENABLE_SIM_CARD,
     TEST_SET_RILCM_DATA_PROFILE,
     TEST_GET_RILCM_VOICE_REGISTRATION_STATE,
@@ -178,13 +176,11 @@ private:
     void RadioRestartTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void EnterErrorPinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void UnlockSimPinTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void GetSimPinInputTimesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetPin2LockTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void UnSetPin2LockTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void EnterSimPin2Test(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void EnterErrorPin2Test(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void UnlockSimPin2Test(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void GetSimPin2InputTimesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void EnableSimCardTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetActiveSimTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void NetworkGetRssiTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
