@@ -81,6 +81,7 @@ public:
     virtual int ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum) = 0;
     virtual bool SetVoiceMailInfo(
         int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) = 0;
+    virtual std::u16string GetSimEons(int32_t slotId, const std::string plmn, int32_t lac, bool longNameRequired) = 0;
     // SimSms
     virtual bool AddSmsToIcc(int32_t slotId, int status, std::string &pdu, std::string &smsc) = 0;
     virtual bool UpdateSmsIcc(int32_t slotId, int index, int status, std::string &pduData, std::string &smsc) = 0;

@@ -34,6 +34,9 @@ public:
     static const std::string SPN_FORMATS;
     static const std::string EMERGENCY_CALLS_ONLY;
     static const std::string OUT_OF_SERIVCE;
+    static const std::string CMCC;
+    static const std::string CUCC;
+    static const std::string CTCC;
 
     static ResourceUtils &Get();
     bool Init(std::string path);

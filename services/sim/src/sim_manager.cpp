@@ -418,6 +418,16 @@ std::u16string SimManager::GetSimSpn(int32_t slotId)
     return simFileManager_[slotId]->GetSimSpn();
 }
 
+std::u16string SimManager::GetSimEons(int32_t slotId, std::string plmn, int32_t lac, bool longNameRequired)
+{
+    if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null");
+        return std::u16string();
+    }
+
+    return simFileManager_[slotId]->GetSimEons(plmn, lac, longNameRequired);
+}
+
 std::u16string SimManager::GetSimIccId(int32_t slotId)
 {
     if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
