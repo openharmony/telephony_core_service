@@ -63,6 +63,7 @@ public:
     std::string ObtainMsisdnAlphaStatus();
     std::string ObtainVoiceMailNumber();
     std::string ObtainSPN();
+    std::string ObtainEons(std::string plmn, int32_t lac, bool longNameRequired);
     std::string ObtainVoiceMailInfo();
     bool ObtainFilesFetched();
     std::string ObtainIccLanguage();
@@ -76,6 +77,16 @@ public:
     struct IccFileLoaded {
         virtual std::string ObtainElementaryFileName() = 0;
         virtual void ProcessParseFile(const AppExecFwk::InnerEvent::Pointer &event) = 0;
+    };
+    struct PlmnNetworkName {
+        std::string longName = "";
+        std::string shortName = "";
+    };
+    struct OperatorPlmnInfo {
+        std::string plmnNumeric = "";
+        int lacStart = 0;
+        int lacEnd = 0;
+        int pnnRecordId = 0;
     };
     virtual bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber) = 0;
     bool HasSimCard();
@@ -116,6 +127,8 @@ protected:
     PlmnFile *plmnRAT_ = nullptr;
     std::string ehplmns_ = "";
     std::string fplmns_ = "";
+    std::vector<std::shared_ptr<PlmnNetworkName>> pnnFiles_;
+    std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles_;
     int lengthOfMnc_ = DEFAULT_MNC;
     int indexOfMailbox_ = 1;
     int fileToGet_ = 0;

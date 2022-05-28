@@ -21,8 +21,9 @@
 
 namespace OHOS {
 namespace Telephony {
-NetworkSelection::NetworkSelection(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
-    : networkSearchManager_(networkSearchManager), slotId_(slotId)
+NetworkSelection::NetworkSelection(std::shared_ptr<ISimManager> simManager,
+    std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
+    : simManager_(simManager), networkSearchManager_(networkSearchManager), slotId_(slotId)
 {}
 
 void NetworkSelection::ProcessNetworkSearchResult(const AppExecFwk::InnerEvent::Pointer &event) const
@@ -187,7 +188,6 @@ bool NetworkSelection::AvailNetworkResult(
         TELEPHONY_LOGE("NetworkSelection::ProcessNetworkSearchResult nsm is nullptr slotId:%{public}d", slotId_);
         return false;
     }
-
     index = -1;
     if (availNetworkResult != nullptr) {
         int32_t availableSize = availNetworkResult->itemNum;
@@ -199,6 +199,19 @@ bool NetworkSelection::AvailNetworkResult(
                 std::string longName = availableNetworkInfoItem.longName;
                 std::string shortName = availableNetworkInfoItem.shortName;
                 std::string numeric = availableNetworkInfoItem.numeric;
+                if (numeric.empty()) {
+                    continue;
+                }
+                std::string customName = NetworkUtils::GetCustomName(numeric);
+                if (!customName.empty()) {
+                    longName = customName;
+                    shortName = customName;
+                } else {
+                    std::string eonsLongName = NetworkUtils::GetSimEons(slotId_, numeric, true, nsm, simManager_);
+                    longName = eonsLongName.empty() ? longName : eonsLongName;
+                    std::string eonsShortName = NetworkUtils::GetSimEons(slotId_, numeric, false, nsm, simManager_);
+                    shortName = eonsShortName.empty() ? shortName : eonsShortName;
+                }
                 int32_t status = availableNetworkInfoItem.status;
                 int32_t rat = availableNetworkInfoItem.rat;
                 NetworkInformation networkStateItem;
@@ -206,7 +219,6 @@ bool NetworkSelection::AvailNetworkResult(
                 networkInformation.push_back(networkStateItem);
             }
         }
-
         nsm->SetNetworkSearchResultValue(slotId_, availableSize, networkInformation);
         sptr<NetworkSearchResult> networkSearchResult = nsm->GetNetworkSearchInformationValue(slotId_);
         if (networkSearchResult != nullptr) {
