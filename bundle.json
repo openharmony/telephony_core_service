@@ -105,7 +105,8 @@
                 }
             ],
             "test": [
-                "//base/telephony/core_service/test:unittest"
+                "//base/telephony/core_service/test:unittest",
+                "//base/telephony/core_service/test/fuzztest:fuzztest"
             ]
         }
     }

@@ -85,6 +85,31 @@ void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
         "%{public}s slotId:%{public}d",
         operatorInfoResult->longName.c_str(), operatorInfoResult->shortName.c_str(),
         operatorInfoResult->numeric.c_str(), slotId_);
+    if (!operatorInfoResult->numeric.empty()) {
+        std::string customName = NetworkUtils::GetCustomName(operatorInfoResult->numeric);
+        if (!customName.empty()) {
+            TELEPHONY_LOGI("OperatorName::GsmOperatorInfo customName : %{public}s", customName.c_str());
+            operatorInfoResult->longName = customName;
+            operatorInfoResult->shortName = customName;
+        } else {
+            std::shared_ptr<NetworkSearchManager> networkSearchManager = networkSearchManager_.lock();
+            std::string eonsLongName = NetworkUtils::GetSimEons(slotId_, operatorInfoResult->numeric, true,
+                networkSearchManager, simManager_);
+            if (!eonsLongName.empty()) {
+                operatorInfoResult->longName = eonsLongName;
+            }
+            std::string eonsShortName = NetworkUtils::GetSimEons(slotId_, operatorInfoResult->numeric, false,
+                networkSearchManager, simManager_);
+            if (!eonsShortName.empty()) {
+                operatorInfoResult->shortName = eonsShortName;
+            }
+        }
+    }
+    TELEPHONY_LOGI(
+        "OperatorName::GsmOperatorInfo final longName : %{public}s, shortName : %{public}s, numeric : "
+        "%{public}s slotId:%{public}d",
+        operatorInfoResult->longName.c_str(), operatorInfoResult->shortName.c_str(),
+        operatorInfoResult->numeric.c_str(), slotId_);
     if (networkSearchState_ != nullptr) {
         networkSearchState_->SetOperatorInfo(operatorInfoResult->longName, operatorInfoResult->shortName,
             operatorInfoResult->numeric, DomainType::DOMAIN_TYPE_CS);
@@ -151,7 +176,7 @@ void OperatorName::NotifySpnChanged()
     }
     if (networkSearchManager->GetPhoneType(slotId_) == PhoneType::PHONE_TYPE_IS_GSM) {
         NotifyGsmSpnChanged(regStatus, networkState);
-    } else {
+    } else if (networkSearchManager->GetPhoneType(slotId_) == PhoneType::PHONE_TYPE_IS_CDMA) {
         NotifyCdmaSpnChanged(regStatus, networkState);
     }
 }

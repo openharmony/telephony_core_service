@@ -18,6 +18,7 @@
 #include <cinttypes>
 #include "hril_network_parcel.h"
 #include "network_search_manager.h"
+#include "resource_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -147,6 +148,59 @@ int32_t NetworkUtils::GetRafFromNetworkMode(PreferredNetworkMode PreferredNetwor
         return iter->second;
     }
     return RAF_UNKNOWN;
+}
+
+static const std::vector<std::string> cmMccMnc {"46000", "46002", "46004", "46007", "46008"};
+static const std::vector<std::string> cuMccMnc {"46001", "46009"};
+static const std::vector<std::string> ctMccMnc {"46003", "46011"};
+std::string NetworkUtils::GetCustomName(const std::string &numeric)
+{
+    TELEPHONY_LOGI("NetworkUtils::GetCustomName numeric:%{public}s", numeric.c_str());
+    std::string name = "";
+    auto obj = std::find(cmMccMnc.begin(), cmMccMnc.end(), numeric);
+    if (obj != cmMccMnc.end()) {
+        ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::CMCC, name);
+        TELEPHONY_LOGI("NetworkUtils::GetCustomName CMCC:%{public}s", name.c_str());
+        return name;
+    }
+    obj = std::find(cuMccMnc.begin(), cuMccMnc.end(), numeric);
+    if (obj != cuMccMnc.end()) {
+        ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::CUCC, name);
+        TELEPHONY_LOGI("NetworkUtils::GetCustomName CUCC:%{public}s", name.c_str());
+        return name;
+    }
+    obj = std::find(ctMccMnc.begin(), ctMccMnc.end(), numeric);
+    if (obj == ctMccMnc.end()) {
+        ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::CTCC, name);
+        TELEPHONY_LOGI("NetworkUtils::GetCustomName CTCC:%{public}s", name.c_str());
+        return name;
+    }
+    TELEPHONY_LOGI("NetworkUtils::GetCustomName empty:%{public}s", name.c_str());
+    return name;
+}
+
+std::string NetworkUtils::GetSimEons(int32_t slotId, std::string numeric, bool longNameRequired,
+    std::shared_ptr<NetworkSearchManager> networkSearchManager, std::shared_ptr<ISimManager> simManager)
+{
+    if (networkSearchManager == nullptr || simManager == nullptr) {
+        TELEPHONY_LOGE("NetworkUtils::GetSimEons nsm or simManager is nullptr slotId:%{public}d", slotId);
+        return "";
+    }
+    sptr<CellLocation> location = networkSearchManager->GetCellLocation(slotId);
+    if (location == nullptr) {
+        TELEPHONY_LOGE("location is nullptr slotId:%{public}d", slotId);
+        return "";
+    }
+    if (location->GetCellLocationType() != CellLocation::CellType::CELL_TYPE_GSM) {
+        TELEPHONY_LOGE("location type isn't GSM slotId:%{public}d", slotId);
+        return "";
+    }
+    sptr<GsmCellLocation> gsmLocation = sptr<GsmCellLocation>(static_cast<GsmCellLocation *>(location.GetRefPtr()));
+    int32_t lac = gsmLocation->GetLac();
+    std::string eonsName = Str16ToStr8(simManager->GetSimEons(slotId, numeric, lac, longNameRequired));
+    TELEPHONY_LOGI("lac:%{public}d , numeric:%{public}s, longNameRequired:%{public}d, eonsName:%{public}s",
+        lac, numeric.c_str(), longNameRequired, eonsName.c_str());
+    return eonsName;
 }
 
 bool NetworkUtils::AddNetworkSearchCallBack(int64_t index, std::shared_ptr<NetworkSearchCallbackInfo> &callback)

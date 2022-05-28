@@ -81,6 +81,7 @@ public:
     std::u16string GetSimOperatorNumeric(int32_t slotId) override;
     std::u16string GetISOCountryCodeForSim(int32_t slotId) override;
     std::u16string GetSimSpn(int32_t slotId) override;
+    std::u16string GetSimEons(int32_t slotId, const std::string plmn, int32_t lac, bool longNameRequired) override;
     std::u16string GetSimIccId(int32_t slotId) override;
     std::u16string GetIMSI(int32_t slotId) override;
     std::u16string GetLocaleFromDefaultSim(int32_t slotId) override;

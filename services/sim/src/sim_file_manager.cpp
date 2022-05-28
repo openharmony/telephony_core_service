@@ -188,6 +188,18 @@ std::u16string SimFileManager::GetSimSpn()
     return Str8ToStr16(result);
 }
 
+std::u16string SimFileManager::GetSimEons(std::string plmn, int32_t lac, bool longNameRequired)
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::GetEons simFile nullptr");
+        return Str8ToStr16("");
+    }
+
+    std::string result = simFile_->ObtainEons(plmn, lac, longNameRequired);
+    TELEPHONY_LOGI("SimFileManager::GetEons result:%{public}s ", (result.empty() ? "false" : "true"));
+    return Str8ToStr16(result);
+}
+
 std::u16string SimFileManager::GetSimIccId()
 {
     if (simFile_ == nullptr) {

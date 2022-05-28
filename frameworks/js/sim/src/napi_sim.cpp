@@ -1717,13 +1717,15 @@ void NativeGetLockState(napi_env env, void *data)
         asContext.slotId, static_cast<LockType>(lockContext->lockType));
     TELEPHONY_LOGI("NAPI NativeGetLockState %{public}d", asContext.callbackVal);
     asContext.context.resolved = (asContext.callbackVal == static_cast<int32_t>(LockState::LOCK_ON) ||
-        asContext.callbackVal == static_cast<int32_t>(LockState::LOCK_OFF));
+        asContext.callbackVal == static_cast<int32_t>(LockState::LOCK_OFF) ||
+        asContext.callbackVal == static_cast<int32_t>(LockState::LOCK_ERROR));
 }
 
 void GetLockStateCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncGetLockState> context(static_cast<AsyncGetLockState *>(data));
+    TELEPHONY_LOGI("NAPI NativeGetLockState value:%{public}d", context->asyncContext.callbackVal);
     NapiAsyncCompleteCallback(env, status, context->asyncContext, "get lock state failed");
 }
 

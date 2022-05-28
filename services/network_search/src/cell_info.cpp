@@ -435,6 +435,8 @@ bool CellInfo::ProcessCurrentCellGsm(CurrentCellInfo *cellInfo)
         int32_t &lac = cellInfo->ServiceCellParas.gsm.lac;
         cell->Init(cellInfo->mcc, cellInfo->mnc, cellId);
         cell->SetGsmParam(bsic, lac, arfcn);
+        cell->SetIsCamped(true);
+        currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
         TELEPHONY_LOGI(
             "CellInfo::ProcessCurrentCellGsm arfcn:%{public}d cellId:%{private}d"
@@ -455,6 +457,8 @@ bool CellInfo::ProcessCurrentCellLte(CurrentCellInfo *cellInfo)
         int32_t &tac = cellInfo->ServiceCellParas.lte.tac;
         cell->Init(cellInfo->mcc, cellInfo->mnc, cellId);
         cell->SetLteParam(pci, tac, arfcn);
+        cell->SetIsCamped(true);
+        currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
         TELEPHONY_LOGI("CellInfo::ProcessCurrentCellLte arfcn:%{public}d pci:%{private}d", arfcn, pci);
         return true;
@@ -472,6 +476,8 @@ bool CellInfo::ProcessCurrentCellWcdma(CurrentCellInfo *cellInfo)
         int32_t &lac = cellInfo->ServiceCellParas.wcdma.lac;
         cell->Init(cellInfo->mcc, cellInfo->mnc, cellId);
         cell->SetWcdmaParam(psc, lac, arfcn);
+        cell->SetIsCamped(true);
+        currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
         TELEPHONY_LOGI("CellInfo::ProcessCurrentCellWcdma arfcn:%{public}d psc:%{private}d", arfcn, psc);
         return true;
@@ -490,6 +496,8 @@ bool CellInfo::ProcessCurrentCellCdma(CurrentCellInfo *cellInfo)
         int32_t &systemId = cellInfo->ServiceCellParas.cdma.systemId;
         cell->Init(cellInfo->mcc, cellInfo->mnc, baseId);
         cell->SetCdmaParam(baseId, latitude, longitude, networkId, systemId);
+        cell->SetIsCamped(true);
+        currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
         TELEPHONY_LOGI(
             "CellInfo::ProcessCurrentCellCdma baseId:%{public}d networkId:%{private}d", baseId, networkId);
@@ -508,6 +516,8 @@ bool CellInfo::ProcessCurrentCellTdscdma(CurrentCellInfo *cellInfo)
         int32_t &lac = cellInfo->ServiceCellParas.tdscdma.lac;
         cell->Init(cellInfo->mcc, cellInfo->mnc, cellId);
         cell->SetTdscdmaParam(cpid, lac, arfcn);
+        cell->SetIsCamped(true);
+        currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
         TELEPHONY_LOGI("CellInfo::ProcessCurrentCellTdscdma arfcn:%{public}d pci:%{private}d slotId:%{public}d",
             arfcn, cpid, slotId_);
@@ -526,6 +536,8 @@ bool CellInfo::ProcessCurrentCellNr(CurrentCellInfo *cellInfo)
         int64_t &nci = cellInfo->ServiceCellParas.nr.nci;
         cell->Init(cellInfo->mcc, cellInfo->mnc, 0);
         cell->SetNrParam(nrArfcn, pci, tac, nci);
+        cell->SetIsCamped(true);
+        currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
 
         TELEPHONY_LOGI("CellInfo::ProcessCurrentCellNr arfcn:%{public}d pci:%{private}d slotId:%{public}d",

@@ -539,6 +539,31 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SendUpdateCellLocationReques
     }
 }
 
+/**
+ * @tc.number   Telephony_NetworkSearch_GetNetworkSearchInformation_0100
+ * @tc.name     Get Network Search Information
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSearchInformation_0100, Function | MediumTest | Level3)
+{
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+    } else {
+        OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+        bool result = NetworkSearchTest::telephonyService_->GetNetworkSearchInformation(SLOT_ID, callback);
+        if (result) {
+            callback->WaitFor(WAIT_TIME_SECOND_LONG);
+            bool syncResult = callback->GetBoolResult();
+            TELEPHONY_LOGI("TelephonyTestService GetNetworkSearchInformation syncResult: %{public}d", syncResult);
+            ASSERT_TRUE(syncResult);
+        } else {
+            TELEPHONY_LOGI("TelephonyTestService GetNetworkSearchInformation return fail");
+        }
+    }
+}
+
 #else // TEL_TEST_UNSUPPORT
 /**
  * @tc.number   Telephony_NetworkSearch_MockTest_0100

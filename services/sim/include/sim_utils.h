@@ -32,10 +32,32 @@ static const int HALF_LEN = 2;
 static const int HALF_BYTE_LEN = 4;
 static const int UCS_FLAG = 0x81;
 static const int UCS_WIDE_FLAG = 0x82;
+// Full Name IEI from TS 24.008
+static const int LONG_NAME_FLAG = 0x43;
+// Short Name IEI from TS 24.008
+static const int SHORT_NAME_FLAG = 0x45;
+static const int CHAR_GSM_7BIT = 7;
 static const int START_POS = 3;
 static const int END_POS = 4;
 static const int POS_NOT_BLANK = 1;
 static char HEX_CHARS[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+// TS 24.008 Section 10.5.3.5a Network Name
+enum {
+    NETWORK_NAME_IEI,
+    NETWORK_NAME_LENGTH,
+    NETWORK_NAME_CODING_SCHEME,
+    NETWORK_NAME_TEXT_STRING
+};
+// TS 31.102 Section 4.2.59.
+enum {
+    BCD_PLMN_MCC2,
+    BCD_PLMN_MCC1,
+    BCD_PLMN_MNC3,
+    BCD_PLMN_MCC3,
+    BCD_PLMN_MNC2,
+    BCD_PLMN_MNC1,
+    MCCMNC_LEN
+};
 
 class SIMUtils {
 public:
@@ -51,6 +73,7 @@ public:
     static std::shared_ptr<char16_t> CharsConvertToChar16(
         const unsigned char *charBytes, int charBytesLen, int &outChar16Len, bool bigEndian);
     static std::string Trim(std::string& str);
+    static std::string Gsm7bitConvertToString(const unsigned char *bytes, int byteLen);
 
 private:
     static std::string UcsCodeConvertToString(
