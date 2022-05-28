@@ -24,12 +24,14 @@
 
 #include "securec.h"
 #include "i_network_search.h"
+#include "i_sim_manager.h"
 #include "radio_event.h"
 #include "network_search_types.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
+class NetworkSearchManager;
 struct NetworkSearchCallbackInfo {
     int32_t param_;
     sptr<INetworkSearchCallback> networkSearchItem_;
@@ -50,6 +52,9 @@ public:
     static std::shared_ptr<NetworkSearchCallbackInfo> FindNetworkSearchCallback(int64_t index);
     static bool RemoveCallbackFromMap(int64_t index);
     static bool AddNetworkSearchCallBack(int64_t index, std::shared_ptr<NetworkSearchCallbackInfo> &callback);
+    static std::string GetCustomName(const std::string &numeric);
+    static std::string GetSimEons(int32_t slotId, std::string numeric, bool longNameRequired,
+        std::shared_ptr<NetworkSearchManager> networkSearchManager, std::shared_ptr<ISimManager> simManager);
 
     template<typename... Args>
     static std::string FormatString(const std::string &format, Args... args);
@@ -84,7 +89,6 @@ std::string NetworkUtils::FormatString(const std::string &format, Args... args)
     return std::string(buf.get());
 }
 
-class NetworkSearchManager;
 class ITelRilManager;
 struct RadioCapabilityInfo;
 class EventSender {

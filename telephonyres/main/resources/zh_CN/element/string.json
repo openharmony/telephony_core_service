@@ -1,0 +1,24 @@
+{
+    "string": [
+        {
+            "name": "emergency_calls_only",
+            "value": "只能拨打紧急呼救电话"
+        },
+        {
+            "name": "out_of_serivce",
+            "value": "没有服务"
+        },
+        {
+            "name": "cmcc",
+            "value": "中国移动"
+        },
+        {
+            "name": "cucc",
+            "value": "中国联通"
+        },
+        {
+            "name": "ctcc",
+            "value": "中国电信"
+        }
+    ]
+}

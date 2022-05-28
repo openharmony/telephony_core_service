@@ -1,8 +1,24 @@
 {
-    "string":[
+    "string": [
         {
-            "name":"telephony_test",
-            "value":"test"
+            "name": "emergency_calls_only",
+            "value": "Emergency calls only"
+        },
+        {
+            "name": "out_of_serivce",
+            "value": "No service"
+        },
+        {
+            "name": "cmcc",
+            "value": "China Mobile"
+        },
+        {
+            "name": "cucc",
+            "value": "China Unicom"
+        },
+        {
+            "name": "ctcc",
+            "value": "China Telecom"
         }
     ]
 }

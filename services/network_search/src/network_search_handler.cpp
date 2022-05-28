@@ -102,7 +102,7 @@ bool NetworkSearchHandler::Init()
         TELEPHONY_LOGE("failed to create new signalInfo slotId:%{public}d", slotId_);
         return false;
     }
-    networkSelection_ = std::make_unique<NetworkSelection>(networkSearchManager_, slotId_);
+    networkSelection_ = std::make_unique<NetworkSelection>(nsm->GetSimManager(), networkSearchManager_, slotId_);
     if (networkSelection_ == nullptr) {
         TELEPHONY_LOGE("failed to create new networkSelection slotId:%{public}d", slotId_);
         return false;

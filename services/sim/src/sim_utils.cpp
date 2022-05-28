@@ -143,9 +143,50 @@ std::shared_ptr<char16_t> SIMUtils::CharsConvertToChar16(
 
 std::string SIMUtils::BcdPlmnConvertToString(const std::string &data, int offset)
 {
-    (void)data;
-    (void)offset;
-    return "";
+    std::string plmn = "";
+    if (data.size() >= (offset + MCCMNC_LEN) && data.at(offset) != 'F') {
+        plmn.push_back(data[offset + BCD_PLMN_MCC1]);
+        plmn.push_back(data[offset + BCD_PLMN_MCC2]);
+        plmn.push_back(data[offset + BCD_PLMN_MCC3]);
+        plmn.push_back(data[offset + BCD_PLMN_MNC1]);
+        plmn.push_back(data[offset + BCD_PLMN_MNC2]);
+        if (data.at(offset + BCD_PLMN_MNC3) != 'F') {
+            plmn.push_back(data[offset + BCD_PLMN_MNC3]);
+        }
+    }
+    return plmn;
+}
+
+std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byteLen)
+{
+    std::string str = "";
+    int i = 0;
+    int n = 0;
+    int pos = 0;
+    int left = 0;
+    uint8_t high, low;
+    left = BYTE_LENGTH;
+    n = (byteLen * BYTE_LENGTH) / CHAR_GSM_7BIT;
+    TELEPHONY_LOGI("Gsm7bitConvertToString byteLen:%{public}d", byteLen);
+    for (i = 0; i < n; i++) {
+        if (left == BYTE_LENGTH) {
+            str.push_back(bytes[pos] & (~(0xFF << (CHAR_GSM_7BIT))));
+            left -= CHAR_GSM_7BIT;
+        } else if (left == CHAR_GSM_7BIT) {
+            str.push_back((bytes[pos] & (0xFF << (BYTE_LENGTH - left))) >> (BYTE_LENGTH - left));
+            left = BYTE_LENGTH;
+            pos++;
+        } else {
+            low = high = 0;
+            low = (bytes[pos] & (0xFF << (BYTE_LENGTH - left))) >> (BYTE_LENGTH -left);
+            high = (bytes[pos + 1] & (~(0xFF << (CHAR_GSM_7BIT - left)))) << left;
+            str.push_back(high | low);
+            left = BYTE_LENGTH - (CHAR_GSM_7BIT - left);
+            pos++;
+        }
+    }
+    TELEPHONY_LOGI("Gsm7bitConvertToString str:%{public}s", str.c_str());
+    return str;
 }
 
 std::string SIMUtils::DiallingNumberStringFieldConvertToString(

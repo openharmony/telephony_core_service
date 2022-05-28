@@ -221,6 +221,14 @@ void SimFile::LoadSimFiles()
     fileController_->ObtainBinaryFile(ELEMENTARY_FILE_GID1, eventGid1);
     fileToGet_++;
 
+    AppExecFwk::InnerEvent::Pointer eventPnn = BuildCallerInfo(MSG_SIM_OBTAIN_PNN_DONE);
+    fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_PNN, eventPnn);
+    fileToGet_++;
+
+    AppExecFwk::InnerEvent::Pointer eventOpl = BuildCallerInfo(MSG_SIM_OBTAIN_OPL_DONE);
+    fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_OPL, eventOpl);
+    fileToGet_++;
+
     AppExecFwk::InnerEvent::Pointer phoneNumberEvent =
         CreateDiallingNumberPointer(MSG_SIM_OBTAIN_MSISDN_DONE, 0, 0, nullptr);
     diallingNumberHandler_->GetDiallingNumbers(
@@ -364,6 +372,64 @@ std::string SimFile::ParseSpn(const std::string &rawData, int spnStatus)
     std::string ret = SIMUtils::DiallingNumberStringFieldConvertToString(bytesNew, offset, length, SPN_CHAR_POS);
     TELEPHONY_LOGI("SimFile::ParseSpn success");
     return ret;
+}
+
+void SimFile::ParsePnn(const std::vector<std::string> &records)
+{
+    pnnFiles_.clear();
+    for (const auto &dataPnn : records) {
+        TELEPHONY_LOGI("ParsePnn: %{public}s", dataPnn.c_str());
+        int recordLen = 0;
+        std::shared_ptr<unsigned char> data = SIMUtils::HexStringConvertToBytes(dataPnn, recordLen);
+        unsigned char *tlv = data.get();
+        int tlvLen = (int)strlen((char *)tlv);
+        std::shared_ptr<PlmnNetworkName> file = std::make_shared<PlmnNetworkName>();
+        int tagAndLength = NETWORK_NAME_LENGTH + 1;
+        if (tlvLen > tagAndLength) {
+            if (tlvLen >= (tagAndLength + tlv[NETWORK_NAME_LENGTH]) &&
+                tlv[NETWORK_NAME_IEI] == (unsigned char)LONG_NAME_FLAG) {
+                file->longName = SIMUtils::Gsm7bitConvertToString(tlv + NETWORK_NAME_TEXT_STRING,
+                    tlv[NETWORK_NAME_LENGTH] - 1);
+            }
+            int shortNameOffset = tagAndLength + tlv[NETWORK_NAME_LENGTH];
+            if (tlvLen > (shortNameOffset + tagAndLength)) {
+                if (tlvLen >= (shortNameOffset + tagAndLength + tlv[shortNameOffset + NETWORK_NAME_LENGTH]) &&
+                    tlv[shortNameOffset + NETWORK_NAME_IEI] == (unsigned char)SHORT_NAME_FLAG) {
+                    file->shortName =
+                        SIMUtils::Gsm7bitConvertToString(tlv + (shortNameOffset + NETWORK_NAME_TEXT_STRING),
+                        tlv[shortNameOffset + NETWORK_NAME_LENGTH] - 1);
+                }
+            }
+        }
+        TELEPHONY_LOGI("longName: %{public}s, shortName: %{public}s", file->longName.c_str(), file->shortName.c_str());
+        if (!file->longName.empty() || !file->shortName.empty()) {
+            pnnFiles_.push_back(file);
+        }
+    }
+}
+
+void SimFile::ParseOpl(const std::vector<std::string> &records)
+{
+    oplFiles_.clear();
+    for (const auto &dataOpl : records) {
+        TELEPHONY_LOGI("ParseOpl: %{public}s", dataOpl.c_str());
+        if (dataOpl.size() != (BYTE_LENGTH + BYTE_LENGTH)) {
+            continue;
+        }
+        std::string plmn = SIMUtils::BcdPlmnConvertToString(dataOpl, 0);
+        if (plmn.empty()) {
+            continue;
+        }
+        std::shared_ptr<OperatorPlmnInfo> file = std::make_shared<OperatorPlmnInfo>();
+        file->plmnNumeric = plmn;
+        int base = 16; // convert to hexadecimal
+        file->lacStart = stoi(dataOpl.substr(MCCMNC_LEN, HALF_BYTE_LEN), 0, base);
+        file->lacEnd = stoi(dataOpl.substr(MCCMNC_LEN + HALF_BYTE_LEN, HALF_BYTE_LEN), 0, base);
+        file->pnnRecordId = stoi(dataOpl.substr(MCCMNC_LEN + BYTE_LENGTH, HALF_LEN), 0, base);
+        TELEPHONY_LOGI("plmnNumeric: %{public}s, lacStart: %{public}d, lacEnd: %{public}d, pnnRecordId: %{public}d",
+            file->plmnNumeric.c_str(), file->lacStart, file->lacEnd, file->pnnRecordId);
+        oplFiles_.push_back(file);
+    }
 }
 
 std::shared_ptr<UsimFunctionHandle> SimFile::ObtainUsimFunctionHandle()
@@ -883,11 +949,54 @@ bool SimFile::ProcessGetSstDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessGetPnnDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
+    TELEPHONY_LOGI("ProcessGetPnnDone: start");
     bool isFileProcessResponse = true;
-    if (fd->exception != nullptr) {
-        return isFileProcessResponse;
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd != nullptr) {
+        if (fd->exception != nullptr) {
+            TELEPHONY_LOGE("ProcessGetPnnDone: get error result");
+            return isFileProcessResponse;
+        }
+    } else {
+        std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
+        if (object != nullptr) {
+            TELEPHONY_LOGI("ProcessGetPnnDone: %{public}d", object->resultLength);
+            if (object->exception == nullptr) {
+                ParsePnn(object->fileResults);
+            }
+            for (std::string str : object->fileResults) {
+                TELEPHONY_LOGI("ProcessGetPnnDone: %{public}s", str.c_str());
+            }
+        } else {
+            TELEPHONY_LOGE("ProcessGetPnnDone: get null pointer!!!");
+        }
+    }
+    return isFileProcessResponse;
+}
+
+bool SimFile::ProcessGetOplDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("ProcessGetOplDone: start");
+    bool isFileProcessResponse = true;
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd != nullptr) {
+        if (fd->exception != nullptr) {
+            TELEPHONY_LOGE("ProcessGetOplDone: get error result");
+            return isFileProcessResponse;
+        }
+    } else {
+        std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
+        if (object != nullptr) {
+            TELEPHONY_LOGI("ProcessGetOplDone: %{public}d", object->resultLength);
+            if (object->exception == nullptr) {
+                ParseOpl(object->fileResults);
+            }
+            for (std::string str : object->fileResults) {
+                TELEPHONY_LOGI("ProcessGetOplDone: %{public}s", str.c_str());
+            }
+        } else {
+            TELEPHONY_LOGE("ProcessGetOplDone: get null pointer!!!");
+        }
     }
     return isFileProcessResponse;
 }
@@ -1060,6 +1169,7 @@ void SimFile::InitMemberFunc()
     memberFuncMap_[MSG_SIM_OBTAIN_SPDI_DONE] = &SimFile::ProcessGetSpdiDone;
     memberFuncMap_[MSG_SIM_UPDATE_DONE] = &SimFile::ProcessUpdateDone;
     memberFuncMap_[MSG_SIM_OBTAIN_PNN_DONE] = &SimFile::ProcessGetPnnDone;
+    memberFuncMap_[MSG_SIM_OBTAIN_OPL_DONE] = &SimFile::ProcessGetOplDone;
     memberFuncMap_[MSG_SIM_OBTAIN_ALL_SMS_DONE] = &SimFile::ProcessGetAllSmsDone;
     memberFuncMap_[MSG_SIM_MARK_SMS_READ_DONE] = &SimFile::ProcessMarkSms;
     memberFuncMap_[MSG_SIM_SMS_ON_SIM] = &SimFile::ProcessSmsOnSim;

@@ -19,8 +19,8 @@
 
 namespace OHOS {
 namespace Telephony {
-const std::string ResourceUtils::RESOURCE_HAP_BUNDLE_NAME = "ohos.global.systemres";
-const std::string ResourceUtils::RESOURCE_INDEX_PATH = "/data/accounts/account_0/applications/" +
+const std::string ResourceUtils::RESOURCE_HAP_BUNDLE_NAME = "ohos.telephony.resources";
+const std::string ResourceUtils::RESOURCE_INDEX_PATH = "/data/app/el1/bundle/public/" +
     ResourceUtils::RESOURCE_HAP_BUNDLE_NAME + "/" + ResourceUtils::RESOURCE_HAP_BUNDLE_NAME +
     "/assets/entry/resources.index";
 
@@ -30,6 +30,9 @@ const std::string ResourceUtils::IS_SWITCH_PHONE_REG_CHANGE = "is_switch_phone_r
 const std::string ResourceUtils::SPN_FORMATS = "spn_formats";
 const std::string ResourceUtils::EMERGENCY_CALLS_ONLY = "emergency_calls_only";
 const std::string ResourceUtils::OUT_OF_SERIVCE = "out_of_serivce";
+const std::string ResourceUtils::CMCC = "cmcc";
+const std::string ResourceUtils::CUCC = "cucc";
+const std::string ResourceUtils::CTCC = "ctcc";
 
 const std::map<std::string, ResourceUtils::ResourceType> ResourceUtils::mapResourceNameType_ = {
     {ResourceUtils::IS_NOTIFY_USER_RESTRICTIED_CHANGE, ResourceUtils::ResourceType::ResourceTypeBoolean},
@@ -38,6 +41,9 @@ const std::map<std::string, ResourceUtils::ResourceType> ResourceUtils::mapResou
     {ResourceUtils::SPN_FORMATS, ResourceUtils::ResourceType::ResourceTypeArrayString},
     {ResourceUtils::EMERGENCY_CALLS_ONLY, ResourceUtils::ResourceType::ResourceTypeString},
     {ResourceUtils::OUT_OF_SERIVCE, ResourceUtils::ResourceType::ResourceTypeString},
+    {ResourceUtils::CMCC, ResourceUtils::ResourceType::ResourceTypeString},
+    {ResourceUtils::CUCC, ResourceUtils::ResourceType::ResourceTypeString},
+    {ResourceUtils::CTCC, ResourceUtils::ResourceType::ResourceTypeString},
 };
 
 ResourceUtils &ResourceUtils::Get()
