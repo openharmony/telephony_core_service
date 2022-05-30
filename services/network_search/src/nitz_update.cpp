@@ -176,7 +176,9 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
 
     auto &powerMgrClient = PowerMgrClient::GetInstance();
     auto runningLock = powerMgrClient.CreateRunningLock("runninglock", RunningLockType::RUNNINGLOCK_BACKGROUND);
-    runningLock->Lock();
+    if (runningLock != nullptr) {
+        runningLock->Lock();
+    }
 
     struct tm t;
     (void)memset_s(&t, sizeof(t), 0, sizeof(t));
@@ -194,7 +196,9 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
         std::to_string(networkTime.day) + " " + std::to_string(networkTime.hour) + ":" +
         std::to_string(networkTime.minute) + ":" + std::to_string(networkTime.second));
     SaveTime(time);
-    runningLock->UnLock();
+    if (runningLock != nullptr) {
+        runningLock->UnLock();
+    }
     std::string action = "usual.event.NITZ_TIME_UPDATED";
     std::string param = "time";
     AAFwk::Want want;
@@ -258,11 +262,15 @@ void NitzUpdate::SaveTime(int64_t time)
 
     auto &powerMgrClient = PowerMgrClient::GetInstance();
     auto runningLock = powerMgrClient.CreateRunningLock("runninglock", RunningLockType::RUNNINGLOCK_BACKGROUND);
-    runningLock->Lock();
+    if (runningLock != nullptr) {
+        runningLock->Lock();
+    }
 
     bool result = OHOS::MiscServices::TimeServiceClient::GetInstance()->SetTime(time * MILLI_TO_BASE);
     TELEPHONY_LOGI("NitzUpdate::ProcessTime result:%{public}d slotId:%{public}d", result, slotId_);
-    runningLock->UnLock();
+    if (runningLock != nullptr) {
+        runningLock->UnLock();
+    }
     std::string action = "usual.event.NITZ_TIME_UPDATED";
     std::string param = "time";
     AAFwk::Want want;
