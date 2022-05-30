@@ -222,7 +222,7 @@ std::string IccFile::ObtainEons(std::string plmn, int32_t lac, bool longNameRequ
         }
     }
     std::string eons = "";
-    if (pnnIndex >= 1 && pnnIndex <= pnnFiles_.size()) {
+    if (pnnIndex >= 1 && pnnIndex <= (int)pnnFiles_.size()) {
         TELEPHONY_LOGI("ObtainEons longNameRequired:%{public}d, longName:%{public}s, shortName:%{public}s,",
             longNameRequired, pnnFiles_.at(pnnIndex - 1)->longName.c_str(),
             pnnFiles_.at(pnnIndex - 1)->shortName.c_str());
