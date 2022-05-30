@@ -112,6 +112,10 @@ void TelRilHandler::ReduceRunningLock(int32_t lockType)
 
 void TelRilHandler::ReleaseRunningLock(int32_t lockType)
 {
+    if (reqRunningLock_ == nullptr || ackRunningLock_ == nullptr) {
+        TELEPHONY_LOGE("reqRunningLock_ or ackRunningLock_ is nullptr");
+        return;
+    }
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
     TELEPHONY_LOGI("ReleaseRunningLock,lockType:%{public}d", lockType);
     if (lockType == NORMAL_RUNNING_LOCK) {
