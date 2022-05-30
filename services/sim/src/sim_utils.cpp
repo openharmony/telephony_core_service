@@ -144,7 +144,7 @@ std::shared_ptr<char16_t> SIMUtils::CharsConvertToChar16(
 std::string SIMUtils::BcdPlmnConvertToString(const std::string &data, int offset)
 {
     std::string plmn = "";
-    if (data.size() >= (offset + MCCMNC_LEN) && data.at(offset) != 'F') {
+    if ((int)data.size() >= (offset + MCCMNC_LEN) && data.at(offset) != 'F') {
         plmn.push_back(data[offset + BCD_PLMN_MCC1]);
         plmn.push_back(data[offset + BCD_PLMN_MCC2]);
         plmn.push_back(data[offset + BCD_PLMN_MCC3]);
@@ -178,8 +178,8 @@ std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byt
             pos++;
         } else {
             low = high = 0;
-            low = (bytes[pos] & (0xFF << (BYTE_LENGTH - left))) >> (BYTE_LENGTH -left);
-            high = (bytes[pos + 1] & (~(0xFF << (CHAR_GSM_7BIT - left)))) << left;
+            low = (bytes[pos] & (unsigned char)(0xFF << (BYTE_LENGTH - left))) >> (BYTE_LENGTH -left);
+            high = (bytes[pos + 1] & (unsigned char)(~(0xFF << (CHAR_GSM_7BIT - left)))) << left;
             str.push_back(high | low);
             left = BYTE_LENGTH - (CHAR_GSM_7BIT - left);
             pos++;

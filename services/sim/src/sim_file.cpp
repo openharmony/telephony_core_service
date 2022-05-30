@@ -393,7 +393,7 @@ void SimFile::ParsePnn(const std::vector<std::string> &records)
             }
             int shortNameOffset = tagAndLength + tlv[NETWORK_NAME_LENGTH];
             if (tlvLen > (shortNameOffset + tagAndLength)) {
-                if (tlvLen >= (shortNameOffset + tagAndLength + tlv[shortNameOffset + NETWORK_NAME_LENGTH]) &&
+                if (tlvLen >= (shortNameOffset + tagAndLength + (int)tlv[shortNameOffset + NETWORK_NAME_LENGTH]) &&
                     tlv[shortNameOffset + NETWORK_NAME_IEI] == (unsigned char)SHORT_NAME_FLAG) {
                     file->shortName =
                         SIMUtils::Gsm7bitConvertToString(tlv + (shortNameOffset + NETWORK_NAME_TEXT_STRING),
