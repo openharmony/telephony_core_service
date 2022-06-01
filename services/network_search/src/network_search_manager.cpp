@@ -1168,7 +1168,6 @@ int32_t NetworkSearchManager::UnRegImsCallback(MessageParcel &data)
         TELEPHONY_LOGE("callback ptr is nullptr.");
         return ERROR;
     }
-    remote->AsInterface();
     switch (type) {
         case TYPE_VOICE:
             voiceCallback = iface_cast<ImsVoiceCallback>(remote);
