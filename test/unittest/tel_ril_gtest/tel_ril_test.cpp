@@ -1579,7 +1579,7 @@ void TelRilTest::CallJoinTest(const std::shared_ptr<AppExecFwk::EventHandler> &h
  */
 void TelRilTest::CallSplitTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    int32_t callIndex = 0;
+    int32_t callIndex = 1;
     int32_t callType = 0; /* call type
                            * 0: Voice call
                            * 1: Video call: send one-way video

@@ -1072,7 +1072,7 @@ int32_t TelRilCall::SeparateConference(
     }
 
     int32_t ret = SendInt32sEvent(
-        HREQ_CALL_SET_CALL_WAITING, HRIL_EVENT_COUNT_3, telRilRequest->serialId_, callIndex, callType);
+        HREQ_CALL_SEPARATE_CONFERENCE, HRIL_EVENT_COUNT_3, telRilRequest->serialId_, callIndex, callType);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("function is failed, error: %{public}d", ret);
     }
