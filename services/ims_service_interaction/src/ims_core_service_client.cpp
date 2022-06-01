@@ -19,6 +19,7 @@
 #include "telephony_log_wrapper.h"
 #include "telephony_errors.h"
 #include "ims_core_service_callback_stub.h"
+#include "ims_core_service_death_recipient.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -51,6 +52,7 @@ int32_t ImsCoreServiceClient::GetImsRegistrationStatus(int32_t slotId)
 
 sptr<ImsCoreServiceInterface> ImsCoreServiceClient::GetImsCoreServiceProxy()
 {
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     if (imsCoreServiceProxy_ != nullptr) {
         return imsCoreServiceProxy_;
     }
@@ -64,6 +66,16 @@ sptr<ImsCoreServiceInterface> ImsCoreServiceClient::GetImsCoreServiceProxy()
         TELEPHONY_LOGE("GetImsCoreServiceProxy return, remote service not exists.");
         return nullptr;
     }
+    death_ = sptr<OHOS::IPCObjectStub::DeathRecipient>(new ImsCoreServiceDeathRecipient());
+    if (death_ == nullptr) {
+        TELEPHONY_LOGE("GetImsCoreServiceProxy return, death_ is nullptr.");
+        return nullptr;
+    }
+    if (!remoteObjectPtr->AddDeathRecipient(death_)) {
+        TELEPHONY_LOGE("GetImsCoreServiceProxy return, AddDeathRecipient failed");
+        return nullptr;
+    }
+
     imsCoreServiceProxy_ = iface_cast<ImsCoreServiceInterface>(remoteObjectPtr);
     if (imsCoreServiceProxy_ == nullptr) {
         TELEPHONY_LOGE("GetImsCoreServiceProxy return, iface_cast is nullptr.");
@@ -129,6 +141,23 @@ int32_t ImsCoreServiceClient::ReConnectService()
         }
     }
     return TELEPHONY_SUCCESS;
+}
+
+void ImsCoreServiceClient::Clean()
+{
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
+    if (death_ != nullptr) {
+        death_.clear();
+        death_ = nullptr;
+    }
+    if (imsCoreServiceProxy_ != nullptr) {
+        imsCoreServiceProxy_.clear();
+        imsCoreServiceProxy_ = nullptr;
+    }
+    if (imsCoreServiceCallback_ != nullptr) {
+        imsCoreServiceCallback_.clear();
+        imsCoreServiceCallback_ = nullptr;
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
