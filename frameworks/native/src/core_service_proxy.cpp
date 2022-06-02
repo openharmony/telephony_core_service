@@ -2107,14 +2107,12 @@ int32_t CoreServiceProxy::RegImsCallback(MessageParcel &idata)
     int32_t imsSrvType = idata.ReadInt32();
     int32_t slotId = idata.ReadInt32();
     sptr<IRemoteObject> callback  = idata.ReadRemoteObject();
-    sptr<ImsVoiceCallback> remote = nullptr;
-    remote = iface_cast<ImsVoiceCallback>(callback);
     TELEPHONY_LOGI("imsSrvType is %{public}d, slotId is %{public}d", imsSrvType, slotId);
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("RegisterCallBack WriteInterfaceToken is false");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    if (remote == nullptr) {
+    if (callback == nullptr) {
         TELEPHONY_LOGE("CoreServiceProxy::RegImsCallback is nullptr");
         return ERROR;
     }
@@ -2126,7 +2124,7 @@ int32_t CoreServiceProxy::RegImsCallback(MessageParcel &idata)
         TELEPHONY_LOGE("WriteInt32 ERROR");
         return ERROR;
     }
-    if (!data.WriteRemoteObject(remote->AsObject().GetRefPtr())) {
+    if (!data.WriteRemoteObject(callback)) {
         TELEPHONY_LOGE("WriteRemoteObject ERROR");
         return ERROR;
     }

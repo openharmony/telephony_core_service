@@ -17,10 +17,12 @@
 #define TELEPHONY_IMS_CORE_SERVICE_CLIENT_H
 
 #include "singleton.h"
+#include "rwlock.h"
 #include "ims_core_service_interface.h"
 #include "event_handler.h"
 #include "radio_event.h"
 #include "event_runner.h"
+#include "iremote_stub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -54,13 +56,19 @@ public:
      * @return AppExecFwk::EventHandler
      */
     std::shared_ptr<AppExecFwk::EventHandler> GetHandler(int32_t slotId);
+    int32_t ReConnectService();
+    void Clean();
+
+public:
+    static const int32_t RE_CONNECT_SERVICE_COUNT_MAX = 10;
 
 private:
     std::mutex mutex_;
+    sptr<OHOS::IPCObjectStub::DeathRecipient> death_;
     sptr<ImsCoreServiceInterface> imsCoreServiceProxy_ = nullptr;
     sptr<ImsCoreServiceCallbackInterface> imsCoreServiceCallback_ = nullptr;
     std::map<int32_t, std::shared_ptr<AppExecFwk::EventHandler>> handlerMap_;
-    int32_t ReConnectService();
+    Utils::RWLock rwClientLock_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -66,6 +66,7 @@ void NapiImsCallbackManager::UnRegImsStateCallback(napi_env env, int32_t slotId,
             && (iter->imsSrvType == imsSrvType)
             && (iter->callbackRef)) {
                 UnRegCallback(imsSrvType, slotId, iter);
+                listStateCallback_.erase(iter);
         }
     }
 }
@@ -79,6 +80,7 @@ void NapiImsCallbackManager::UnRegAllImsStateCallbackOfType(
             && (iter->imsSrvType == imsSrvType)
             && (iter->callbackRef)) {
                 UnRegCallback(imsSrvType, slotId, iter);
+                listStateCallback_.erase(iter);
         }
     }
 }
