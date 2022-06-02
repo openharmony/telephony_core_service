@@ -102,6 +102,7 @@ enum RadioEvent {
     RADIO_DEL_CDMA_SMS,
     RADIO_UPDATE_CDMA_SMS,
     RADIO_SET_IMS_SMS,
+    RADIO_GET_IMS_SMS,
 
     // Network Search
     RADIO_NETWORK_STATE = 301,
