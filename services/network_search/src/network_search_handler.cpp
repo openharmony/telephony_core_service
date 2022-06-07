@@ -289,6 +289,12 @@ void NetworkSearchHandler::RadioRestrictedState(const AppExecFwk::InnerEvent::Po
 
 void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr ||
+        networkSearchManager->GetRadioState(slotId_) == (int)ModemPowerState::CORE_SERVICE_POWER_OFF) {
+        TELEPHONY_LOGI("radio is power off, no need update data reg state");
+        return;
+    }
     if (networkRegister_ != nullptr) {
         networkRegister_->ProcessPsRegister(event);
     }
@@ -297,6 +303,12 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
 
 void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr ||
+        networkSearchManager->GetRadioState(slotId_) == (int)ModemPowerState::CORE_SERVICE_POWER_OFF) {
+        TELEPHONY_LOGI("radio is power off, no need update voice reg state");
+        return;
+    }
     if (networkRegister_ != nullptr) {
         networkRegister_->ProcessCsRegister(event);
     }
