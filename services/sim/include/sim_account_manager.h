@@ -56,6 +56,7 @@ public:
 
 private:
     bool IsValidSlotId(int32_t);
+    bool IsValidSlotIdForDefault(int32_t);
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<SimStateManager> simStateManager_ = nullptr;
     std::shared_ptr<SimFileManager> simFileManager_ = nullptr;

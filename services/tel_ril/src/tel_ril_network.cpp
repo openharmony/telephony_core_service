@@ -54,6 +54,8 @@ void TelRilNetwork::AddHandlerToMap()
     memberFuncMap_[HREQ_NETWORK_GET_RADIO_CAPABILITY] = &TelRilNetwork::GetRadioCapabilityResponse;
     memberFuncMap_[HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG] = &TelRilNetwork::GetPhysicalChannelConfigResponse;
     memberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &TelRilNetwork::SetLocateUpdatesResponse;
+    memberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &TelRilNetwork::SetNotificationFilterResponse;
+    memberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &TelRilNetwork::SetDeviceStateResponse;
 }
 
 TelRilNetwork::TelRilNetwork(int32_t slotId, sptr<IRemoteObject> cellularRadio,
@@ -657,6 +659,55 @@ int32_t TelRilNetwork::SetLocateUpdates(HRilRegNotifyMode mode, const AppExecFwk
     }
 }
 
+int32_t TelRilNetwork::SetNotificationFilter(int32_t newFilter, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_NETWORK_SET_NOTIFICATION_FILTER, response);
+    if (telRilRequest == nullptr) {
+        TELEPHONY_LOGE("TelRilNetwork SetNotificationFilter::telRilRequest is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (cellularRadio_ != nullptr) {
+        MessageParcel data;
+        MessageParcel reply;
+        data.WriteInt32(slotId_);
+        data.WriteInt32(telRilRequest->serialId_);
+        data.WriteInt32(static_cast<int32_t>(newFilter));
+        OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+        cellularRadio_->SendRequest(HREQ_NETWORK_SET_NOTIFICATION_FILTER, data, reply, option);
+        TELEPHONY_LOGI("TelRilNetwork::SetNotificationFilter: %{public}d", newFilter);
+        return TELEPHONY_ERR_SUCCESS;
+    } else {
+        TELEPHONY_LOGE("%{public}s cellularRadio_ == nullptr", __func__);
+        return ErrorResponse(telRilRequest->serialId_, HRilErrType::HRIL_ERR_INVALID_RESPONSE);
+    }
+}
+
+int32_t TelRilNetwork::SetDeviceState(
+    int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_NETWORK_SET_DEVICE_STATE, response);
+    if (telRilRequest == nullptr) {
+        TELEPHONY_LOGE("TelRilNetwork SetDeviceState::telRilRequest is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (cellularRadio_ != nullptr) {
+        MessageParcel data;
+        MessageParcel reply;
+        data.WriteInt32(slotId_);
+        data.WriteInt32(telRilRequest->serialId_);
+        data.WriteInt32(static_cast<int32_t>(deviceStateType));
+        data.WriteInt32(static_cast<int32_t>(deviceStateOn));
+        OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+        cellularRadio_->SendRequest(HREQ_NETWORK_SET_DEVICE_STATE, data, reply, option);
+        TELEPHONY_LOGI("TelRilNetwork::SetDeviceState deviceStateType:%{public}d, deviceState:%{public}d",
+            deviceStateType, deviceStateOn);
+        return TELEPHONY_ERR_SUCCESS;
+    } else {
+        TELEPHONY_LOGE("%{public}s cellularRadio_ == nullptr", __func__);
+        return ErrorResponse(telRilRequest->serialId_, HRilErrType::HRIL_ERR_INVALID_RESPONSE);
+    }
+}
+
 int32_t TelRilNetwork::GetSignalStrengthResponse(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
@@ -1130,6 +1181,72 @@ int32_t TelRilNetwork::SetLocateUpdatesResponse(MessageParcel &data)
             const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
                 TELEPHONY_LOGE("ERROR : SetLocateUpdatesResponse --> handler == nullptr !!!");
+                return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            }
+            handler->SendEvent(telRilRequest->pointer_);
+            return TELEPHONY_ERR_SUCCESS;
+        } else {
+            return ErrorResponse(telRilRequest, *radioResponseInfo);
+        }
+    } else {
+        TELEPHONY_LOGE("telRilRequest or pointer_ == nullptr !");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t TelRilNetwork::SetNotificationFilterResponse(MessageParcel &data)
+{
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("TelRilNetwork::SetNotificationFilterResponse read spBuffer failed");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    const struct HRilRadioResponseInfo *radioResponseInfo =
+        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    if (radioResponseInfo == nullptr) {
+        TELEPHONY_LOGE("ERROR : SetNotificationFilterResponse --> radioResponseInfo == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
+    if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        if (radioResponseInfo->error == HRilErrType::NONE) {
+            const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("SetNotificationFilterResponse handler is nullptr: this is the expected result");
+                return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            }
+            handler->SendEvent(telRilRequest->pointer_);
+            return TELEPHONY_ERR_SUCCESS;
+        } else {
+            return ErrorResponse(telRilRequest, *radioResponseInfo);
+        }
+    } else {
+        TELEPHONY_LOGE("telRilRequest or pointer_ == nullptr !");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t TelRilNetwork::SetDeviceStateResponse(MessageParcel &data)
+{
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("TelRilNetwork::SetDeviceStateResponse read spBuffer failed");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    const struct HRilRadioResponseInfo *radioResponseInfo =
+        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    if (radioResponseInfo == nullptr) {
+        TELEPHONY_LOGE("ERROR : SetDeviceStateResponse --> radioResponseInfo == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
+    if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        if (radioResponseInfo->error == HRilErrType::NONE) {
+            const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("SetDeviceStateResponse handler is nullptr: this is the expected result");
                 return TELEPHONY_ERR_LOCAL_PTR_NULL;
             }
             handler->SendEvent(telRilRequest->pointer_);

@@ -40,6 +40,7 @@ NetworkSearchManager::~NetworkSearchManager()
         std::shared_ptr<NetworkSearchManagerInner> inner = FindManagerInner(slotId);
         if (inner != nullptr) {
             inner->UnRegisterSetting();
+            inner->UnRegisterDeviceStateObserver();
         }
     }
 }
@@ -76,6 +77,11 @@ bool NetworkSearchManager::InitPointer(std::shared_ptr<NetworkSearchManagerInner
     inner->networkSearchResult_ = std::make_unique<NetworkSearchResult>();
     if (inner->networkSearchResult_ == nullptr) {
         TELEPHONY_LOGE("failed to create new NetworkSearchResult slotId:%{public}d", slotId);
+        return false;
+    }
+    inner->deviceStateHandler_ = std::make_shared<DeviceStateHandler>(shared_from_this(), telRilManager_, slotId);
+    if (inner->deviceStateHandler_ == nullptr) {
+        TELEPHONY_LOGE("failed to create new DeviceStateHandler slotId:%{public}d", slotId);
         return false;
     }
 
@@ -117,6 +123,23 @@ bool NetworkSearchManagerInner::UnRegisterSetting()
     settingHelper->UnRegisterSettingsObserver(autoTimeUri, settingAutoTimeObserver_);
     settingHelper->UnRegisterSettingsObserver(autoTimezoneUri, settingAutoTimezoneObserver_);
     settingHelper->UnRegisterSettingsObserver(airplaneModeUri, airplaneModeObserver_);
+    return true;
+}
+
+bool NetworkSearchManagerInner::RegisterDeviceStateObserver()
+{
+    deviceStateObserver_ = std::make_shared<DeviceStateObserver>();
+    deviceStateObserver_->StartEventSubscriber(deviceStateHandler_);
+    return true;
+}
+
+bool NetworkSearchManagerInner::UnRegisterDeviceStateObserver()
+{
+    if (deviceStateObserver_ == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::UnRegisterDeviceStateObserver deviceStateObserver_ is null.");
+        return false;
+    }
+    deviceStateObserver_->StopEventSubscriber();
     return true;
 }
 

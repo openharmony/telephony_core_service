@@ -87,6 +87,7 @@ public:
     void UpdateCellLocation(int32_t techType, int32_t cellId, int32_t lac);
     sptr<CellLocation> GetCellLocation();
     void TimezoneRefresh();
+    void SetCellRequestMinInterval(uint32_t minInterval);
 
 private:
     void RadioOnState();
@@ -123,6 +124,7 @@ private:
     void AutoTimeChange(const AppExecFwk::InnerEvent::Pointer &);
     void AutoTimeZoneChange(const AppExecFwk::InnerEvent::Pointer &);
     void AirplaneModeChange(const AppExecFwk::InnerEvent::Pointer &);
+
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     std::unique_ptr<NetworkRegister> networkRegister_ = nullptr;
@@ -142,6 +144,8 @@ private:
     int64_t lastTimeCsRegistrationReq_ = 0;
     bool firstInit_ = true;
     int32_t slotId_ = 0;
+    uint32_t cellRequestMinInterval_ = 2; // This is the minimum interval in seconds for cell requests
+    uint32_t lastCellRequestTime_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
