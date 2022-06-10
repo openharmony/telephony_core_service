@@ -285,6 +285,11 @@ public:
         int32_t slotId, ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t SimAuthentication(
         int32_t slotId, SimAuthenticationRequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response) = 0;
+
+    virtual int32_t SetNotificationFilter(
+        int32_t slotId, int32_t newFilter, const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t SetDeviceState(int32_t slotId, int32_t deviceStateType, bool deviceStateOn,
+        const AppExecFwk::InnerEvent::Pointer &response) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

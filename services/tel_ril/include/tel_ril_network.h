@@ -44,6 +44,9 @@ public:
     int32_t GetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetLocateUpdates(HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetNotificationFilter(int32_t newFilter, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetDeviceState(
+        int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &response);
 
     // ril unsol
     int32_t SignalStrengthUpdated(MessageParcel &data);
@@ -81,6 +84,8 @@ public:
     int32_t GetPreferredNetworkResponse(MessageParcel &data);
     int32_t GetPhysicalChannelConfigResponse(MessageParcel &data);
     int32_t SetLocateUpdatesResponse(MessageParcel &data);
+    int32_t SetNotificationFilterResponse(MessageParcel &data);
+    int32_t SetDeviceStateResponse(MessageParcel &data);
 
     /**
      * @brief Current operator ons or eons response
