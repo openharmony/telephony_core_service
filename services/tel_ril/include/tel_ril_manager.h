@@ -163,6 +163,25 @@ public:
     int32_t SetLocateUpdates(
         int32_t slotId, HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response) override;
 
+    /**
+     * @param slotId is the card slot index number
+     * @param newFilter is the notification filter with bits in HRilNotificationFilter
+     * @param response is the feedback info after setting notification filter
+     * @return int32_t Indicates if notification filter is set successfully
+     */
+    int32_t SetNotificationFilter(
+        int32_t slotId, int32_t newFilter, const AppExecFwk::InnerEvent::Pointer &response) override;
+
+    /**
+     * @param slotId is the card slot index number
+     * @param deviceStateType is the device state type in HRilDeviceStateType
+     * @param deviceStateOn Indicates the specific device state is on
+     * @param response is the feedback info after setting device state
+     * @return int32_t Indicates if device state is set successfully
+     */
+    int32_t SetDeviceState(int32_t slotId, int32_t deviceStateType, bool deviceStateOn,
+        const AppExecFwk::InnerEvent::Pointer &response) override;
+
     int32_t GetBasebandVersion(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     /**

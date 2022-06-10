@@ -114,6 +114,8 @@ enum class DiffInterfaceId {
     TEST_GET_VOICE_RADIO_INFO,
     TEST_GET_PHYSICAL_CHANNEL_CONFIG,
     TEST_SET_LOCATE_UPDATES,
+    TEST_SET_NOTIFICATION_FILTER,
+    TEST_SET_DEVICE_STATE,
     TEST_SET_USSD,
     TEST_GET_USSD,
     TEST_SET_MUTE,
@@ -315,6 +317,8 @@ public:
     void OnRequestGetVoiceRadioTechnology(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetPhysicalChannelConfig(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestSetLocateUpdatesTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestSetNotificationFilterTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestSetDeviceStateTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestGetImsCallListTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestSetCallPreferenceModeTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -507,6 +511,8 @@ void TelRilTest::OnInitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO] = &TelRilTest::OnRequestGetVoiceRadioTechnology;
     memberFuncMap_[DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG] = &TelRilTest::OnRequestGetPhysicalChannelConfig;
     memberFuncMap_[DiffInterfaceId::TEST_SET_LOCATE_UPDATES] = &TelRilTest::OnRequestSetLocateUpdatesTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_NOTIFICATION_FILTER] = &TelRilTest::OnRequestSetNotificationFilterTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_DEVICE_STATE] = &TelRilTest::OnRequestSetDeviceStateTest;
 }
 
 void TelRilTest::OnInitForRegister(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
@@ -1696,6 +1702,39 @@ void TelRilTest::OnRequestSetLocateUpdatesTest(
     }
 }
 
+void TelRilTest::OnRequestSetNotificationFilterTest(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        int32_t filter = 0;
+        std::cout << "Please input filter: " << endl;
+        std::cin >> filter;
+        TELEPHONY_LOGI("TelRilTest::OnRequestSetNotificationFilterTest -->");
+        telRilManager_->SetNotificationFilter(slotId, filter, event);
+        TELEPHONY_LOGI("TelRilTest::OnRequestSetNotificationFilterTest --> finished");
+    }
+}
+
+void TelRilTest::OnRequestSetDeviceStateTest(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        int32_t deviceStateType = 0;
+        std::cout << "Please input deviceStateType: " << endl;
+        std::cin >> deviceStateType;
+        bool deviceStateOn = true;
+        std::cout << "Please input deviceStateOn: " << endl;
+        std::cin >> deviceStateOn;
+        TELEPHONY_LOGI("TelRilTest::OnRequestSetDeviceStateTest -->");
+        telRilManager_->SetDeviceState(slotId, deviceStateType, deviceStateOn, event);
+        TELEPHONY_LOGI("TelRilTest::OnRequestSetDeviceStateTest --> finished");
+    }
+}
+
 void TelRilTest::OnRequestCallJoinTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     int32_t callType = 0; /* call type
@@ -2374,6 +2413,8 @@ void NetworkTest()
     cout << (int32_t)DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG << "--> OnRequestGetPhysicalChannelConfig"
          << endl;
     cout << (int32_t)DiffInterfaceId::TEST_SET_LOCATE_UPDATES << "--> OnRequestSetLocateUpdatesTest" << endl;
+    cout << (int32_t)DiffInterfaceId::TEST_SET_NOTIFICATION_FILTER << "--> OnRequestSetNotificationFilterTest" << endl;
+    cout << (int32_t)DiffInterfaceId::TEST_SET_DEVICE_STATE << "--> OnRequestSetDeviceStateTest" << endl;
 }
 } // namespace
 } // namespace Telephony
