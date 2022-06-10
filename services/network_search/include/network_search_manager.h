@@ -37,6 +37,8 @@
 #include "radio_event.h"
 #include "setting_utils.h"
 #include "iremote_stub.h"
+#include "device_state_handler.h"
+#include "device_state_observer.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -53,6 +55,8 @@ struct NetworkSearchManagerInner {
     std::shared_ptr<NetworkSearchHandler> networkSearchHandler_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
+    std::shared_ptr<DeviceStateHandler> deviceStateHandler_ = nullptr;
+    std::shared_ptr<DeviceStateObserver> deviceStateObserver_ = nullptr;
     sptr<AutoTimeObserver> settingAutoTimeObserver_;
     sptr<AutoTimezoneObserver> settingAutoTimezoneObserver_;
     sptr<AirplaneModeObserver> airplaneModeObserver_;
@@ -70,6 +74,8 @@ struct NetworkSearchManagerInner {
 
     bool RegisterSetting();
     bool UnRegisterSetting();
+    bool RegisterDeviceStateObserver();
+    bool UnRegisterDeviceStateObserver();
     bool Init()
     {
         radioCapability_.ratFamily = DEFAULT_RAF;
@@ -83,6 +89,11 @@ struct NetworkSearchManagerInner {
                 return false;
             }
             if (!RegisterSetting()) {
+                return false;
+            }
+        }
+        if (deviceStateHandler_ != nullptr) {
+            if (!RegisterDeviceStateObserver()) {
                 return false;
             }
         }

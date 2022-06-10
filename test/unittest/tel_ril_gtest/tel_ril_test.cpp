@@ -201,6 +201,8 @@ void TelRilTest::InitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO] = &TelRilTest::GetVoiceRadioTechnologyTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG] = &TelRilTest::GetPhysicalChannelConfigTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_LOCATE_UPDATES] = &TelRilTest::SetLocateUpdatesTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_NOTIFICATION_FILTER] = &TelRilTest::SetNotificationFilterTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_DEVICE_STATE] = &TelRilTest::SetDeviceStateTest;
 }
 
 void TelRilTest::InitModem()
@@ -1542,6 +1544,47 @@ void TelRilTest::SetLocateUpdatesTest(const std::shared_ptr<AppExecFwk::EventHan
         HRilRegNotifyMode mode = REG_NOTIFY_STAT_LAC_CELLID;
         telRilManager_->SetLocateUpdates(slotId_, mode, event);
         TELEPHONY_LOGI("TelRilTest::SetLocateUpdatesTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Set notification fiter
+ *
+ * @param handler
+ */
+void TelRilTest::SetNotificationFilterTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_SET_NOTIFICATION_FILTER);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        int32_t filter = 1;
+        TELEPHONY_LOGI("TelRilTest::SetNotificationFilterTest -->");
+        telRilManager_->SetNotificationFilter(slotId_, filter, event);
+        TELEPHONY_LOGI("TelRilTest::SetNotificationFilterTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Set device state
+ *
+ * @param handler
+ */
+void TelRilTest::SetDeviceStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_SET_DEVICE_STATE);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        int32_t deviceStateType = 0;
+        bool deviceStateOn = true;
+        TELEPHONY_LOGI("TelRilTest::SetDeviceStateTest -->");
+        telRilManager_->SetDeviceState(slotId_, deviceStateType, deviceStateOn, event);
+        TELEPHONY_LOGI("TelRilTest::SetDeviceStateTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }
@@ -2981,6 +3024,28 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetPhysicalChannelConfigTest_0101, Functio
 HWTEST_F(TelRilTest, Telephony_TelRil_SetLocateUpdatesTest_0101, Function | MediumTest | Level3)
 {
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_LOCATE_UPDATES), GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_SetNotificationFilterTest_0101 to do ...
+ * @tc.name Set notification filter
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SetNotificationFilterTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_NOTIFICATION_FILTER), GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_SetDeviceStateTest_0101 to do ...
+ * @tc.name Set device state
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SetDeviceStateTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_DEVICE_STATE), GetHandler());
     return;
 }
 

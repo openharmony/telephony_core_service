@@ -136,6 +136,10 @@ bool SimAccountManager::SetDefaultVoiceSlotId(int32_t slotId)
         TELEPHONY_LOGE("SimAccountManager::SetDefaultVoiceSlotId failed by nullptr");
         return false;
     }
+    if (!IsValidSlotIdForDefault(slotId)) {
+        TELEPHONY_LOGE("SimAccountManager::SetDefaultVoiceSlotId invalid slotId = %{public}d", slotId);
+        return false;
+    }
     return multiSimController_->SetDefaultVoiceSlotId(slotId);
 }
 
@@ -145,7 +149,7 @@ bool SimAccountManager::SetDefaultSmsSlotId(int32_t slotId)
         TELEPHONY_LOGE("SimAccountManager::SetDefaultSmsSlotId failed by nullptr");
         return false;
     }
-    if (!IsValidSlotId(slotId)) {
+    if (!IsValidSlotIdForDefault(slotId)) {
         TELEPHONY_LOGE("SimAccountManager::SetDefaultSmsSlotId invalid slotId = %{public}d", slotId);
         return false;
     }
@@ -177,7 +181,7 @@ bool SimAccountManager::SetDefaultCellularDataSlotId(int32_t slotId)
         TELEPHONY_LOGE("SimAccountManager::SetDefaultCellularDataSlotId failed by nullptr");
         return false;
     }
-    if (!IsValidSlotId(slotId)) {
+    if (!IsValidSlotIdForDefault(slotId)) {
         TELEPHONY_LOGE("SimAccountManager::SetDefaultCellularDataSlotId invalid slotId = %{public}d", slotId);
         return false;
     }
@@ -302,6 +306,16 @@ bool SimAccountManager::IsValidSlotId(int32_t slotId)
         return true;
     } else {
         TELEPHONY_LOGE("SimAccountManager slotId is InValid = %{public}d", slotId);
+        return false;
+    }
+}
+
+bool SimAccountManager::IsValidSlotIdForDefault(int32_t slotId)
+{
+    int32_t count = SIM_SLOT_COUNT;
+    if ((slotId >= DEFAULT_SIM_SLOT_ID_REMOVE) && (slotId < count)) {
+        return true;
+    } else {
         return false;
     }
 }
