@@ -79,15 +79,15 @@ void DeviceStateHandler::ProcessDeviceState()
         SetDeviceState(LOW_DATA_STATE, isLowData_);
     }
 
-    int32_t newFilter = NONE;
+    int32_t newFilter = NOTIFICATION_FILTER_NONE;
     if (IsSignalStrengthNotificationExpected()) {
-        newFilter |= SIGNAL_STRENGTH;
+        newFilter |= NOTIFICATION_FILTER_SIGNAL_STRENGTH;
     }
 
     if (IsHighPowerConsumption()) {
-        newFilter |= NETWORK_STATE;
-        newFilter |= DATA_CALL;
-        newFilter |= PHYSICAL_CHANNEL_CONFIG;
+        newFilter |= NOTIFICATION_FILTER_NETWORK_STATE;
+        newFilter |= NOTIFICATION_FILTER_DATA_CALL;
+        newFilter |= NOTIFICATION_FILTER_PHYSICAL_CHANNEL_CONFIG;
     }
 
     SetNotificationFilter(newFilter, false);
