@@ -139,7 +139,11 @@ void SignalInfo::ProcessSignalIntensity(int32_t slotId, const AppExecFwk::InnerE
         std::vector<sptr<SignalInformation>> signals;
         GetSignalInfoList(signals);
         DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifySignalInfoUpdated(slotId, signals);
-        WriteSignalLevelHiSysEvent(slotId, signals[0]->GetSignalLevel());
+        int level = 0;
+        if (signals.size() != 0) {
+            level = signals[0]->GetSignalLevel();
+        }
+        WriteSignalLevelHiSysEvent(slotId, level);
     }
     PrintfLog(*signalIntensity);
 }
