@@ -957,6 +957,7 @@ int32_t TelRilSim::GetSimLockStatus(std::string fac, const AppExecFwk::InnerEven
     simLockInfo.serial = telRilRequest->serialId_;
     simLockInfo.fac = fac;
     simLockInfo.mode = MODE;
+    simLockInfo.classx = 0;
     simLockInfo.Marshalling(data);
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
@@ -981,6 +982,7 @@ int32_t TelRilSim::SetSimLock(
     simLockInfo.fac = fac;
     simLockInfo.mode = mode;
     simLockInfo.passwd = passwd;
+    simLockInfo.classx = 0;
     simLockInfo.Marshalling(data);
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
