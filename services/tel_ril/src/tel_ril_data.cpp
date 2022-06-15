@@ -100,7 +100,7 @@ int32_t TelRilData::DeactivatePdpContext(int32_t cid, int32_t reason, const AppE
     uniInfo.gsmIndex = cid;
     uniInfo.arg1 = reason;
     int32_t ret = SendBufferEvent(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, uniInfo);
-    if (ret != HDF_SUCCESS) {
+    if (ret != 0) {
         TELEPHONY_LOGE("Send HREQ_DATA_DEACTIVATE_PDP_CONTEXT return: %{public}d", ret);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -131,7 +131,7 @@ int32_t TelRilData::ActivatePdpContext(int32_t radioTechnology, DataProfile data
     dataCallInfo.roamingAllowed = allowRoaming;
     dataCallInfo.isRoaming = isRoaming;
     int32_t ret = SendBufferEvent(HREQ_DATA_ACTIVATE_PDP_CONTEXT, dataCallInfo);
-    if (ret != HDF_SUCCESS) {
+    if (ret != 0) {
         TELEPHONY_LOGE("Send HREQ_DATA_ACTIVATE_PDP_CONTEXT return: %{public}d", ret);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -188,7 +188,7 @@ int32_t TelRilData::GetPdpContextList(const AppExecFwk::InnerEvent::Pointer &res
     UniInfo uniInfo;
     uniInfo.serial = telRilRequest->serialId_;
     int32_t ret = SendBufferEvent(HREQ_DATA_GET_PDP_CONTEXT_LIST, uniInfo);
-    if (ret != HDF_SUCCESS) {
+    if (ret != 0) {
         TELEPHONY_LOGE("HREQ_DATA_GET_PDP_CONTEXT_LIST return: %{public}d", ret);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -262,7 +262,7 @@ int32_t TelRilData::SetInitApnInfo(const DataProfile &dataProfile, const AppExec
     dataProfileInfo.serial = telRilRequest->serialId_;
 
     int32_t ret = SendBufferEvent(HREQ_DATA_SET_INIT_APN_INFO, dataProfileInfo);
-    if (ret != HDF_SUCCESS) {
+    if (ret != 0) {
         TELEPHONY_LOGE("Send HREQ_DATA_ACTIVATE_PDP_CONTEXT return: %{public}d", ret);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -372,7 +372,7 @@ int32_t TelRilData::SetLinkBandwidthReportingRule(
     TELEPHONY_LOGI("maximumUplinkKbpsSize:%{public}d, maximumDownlinkKbpsSize:%{public}d",
         dLinkBandwidth.maximumUplinkKbpsSize, dLinkBandwidth.maximumDownlinkKbpsSize);
     int32_t ret = SendBufferEvent(HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE, dLinkBandwidth);
-    if (ret != HDF_SUCCESS) {
+    if (ret != 0) {
         TELEPHONY_LOGE("HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE return: %{public}d", ret);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
