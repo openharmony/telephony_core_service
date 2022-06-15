@@ -41,7 +41,11 @@ int32_t ImsCoreServiceCallbackProxy::UpdateImsServiceStatusChanged(
         TELEPHONY_LOGE("write imsServiceStatus fail!");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(IMS_SERVICE_STATUS_REPORT, in, out, option);
+    sptr<IRemoteObject> remote = Remote();
+    if (remote== nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(IMS_SERVICE_STATUS_REPORT, in, out, option);
     if (error == ERR_NONE) {
         TELEPHONY_LOGE("send imsServiceStatus fail!");
         return out.ReadInt32();
@@ -67,7 +71,11 @@ int32_t ImsCoreServiceCallbackProxy::GetImsRegistrationStatusResponse(
         TELEPHONY_LOGE("write imsRegStatus fail!");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(IMS_GET_REGISTRATION_STATUS, in, out, option);
+    sptr<IRemoteObject> remote = Remote();
+    if (remote== nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(IMS_GET_REGISTRATION_STATUS, in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }

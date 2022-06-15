@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -377,7 +377,7 @@ void TestRegisterImsStateCallback()
             "TYPE_UT = 2,TYPE_SMS = 3):" << std::endl;
         std::cin >> imsSrvType;
         ImsRegInfo imsRegInfo = ERROR_IMS_REG_INFO;
-        sptr<ImsVoiceCallbackStub> voiceCallback = std::make_unique<ImsVoiceCallbackTestStub>(imsRegInfo).release();
+        sptr<ImsVoiceCallbackStub> voiceCallback = new ImsVoiceCallbackTestStub(imsRegInfo);
         sptr<ImsVideoCallbackStub> videoCallback(new ImsVideoCallbackStub());
         sptr<ImsUtCallbackStub> utCallback(new ImsUtCallbackStub());
         sptr<ImsSmsCallbackStub> smsCallback(new ImsSmsCallbackStub());

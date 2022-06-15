@@ -18,7 +18,6 @@
 
 #include <securec.h>
 #include <uv.h>
-#include <ctime>
 #include "singleton.h"
 
 #include "napi_util.h"
@@ -29,15 +28,15 @@ namespace OHOS {
 namespace Telephony {
 class NapiImsCallbackManager {
 public:
-    void RegImsStateCallback(ImsStateCallback stateCallback);
+    void RegImsStateCallback(const ImsStateCallback &stateCallback);
     void UnRegImsStateCallback(napi_env env, int32_t slotId, ImsServiceType imsSrvType);
-    void UnRegAllImsStateCallbackOfType(napi_env env, int32_t slotId, ImsServiceType imsSrvType);
+    void UnRegAllImsStateCallbackOfType(int32_t slotId, ImsServiceType imsSrvType);
     int32_t UpdateImsState(ImsServiceType imsSrvType, const ImsRegInfo &info);
 private:
-    void UnRegCallback(ImsServiceType imsSrvType, int32_t slotId, std::list<ImsStateCallback>::iterator iter);
-    int32_t UpdateImsStateInfo(ImsStateCallback stateCallback, const ImsRegInfo &info);
+    void UnRegCallback(ImsServiceType imsSrvType, int32_t slotId, ImsStateCallback stateCallback);
+    int32_t UpdateImsStateInfo(const ImsStateCallback &stateCallback, const ImsRegInfo &info);
     static void ReportImsStateWork(uv_work_t *work, int32_t status);
-    static int32_t ReportImsState(ImsRegInfo &info, ImsStateCallback stateCallback);
+    static int32_t ReportImsState(const ImsRegInfo &info, const ImsStateCallback &stateCallback);
     ImsStateCallback stateCallback_;
     std::list<ImsStateCallback> listStateCallback_;
 };

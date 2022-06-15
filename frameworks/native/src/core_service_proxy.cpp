@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1929,11 +1929,12 @@ ImsRegInfo CoreServiceProxy::GetImsRegStatus(int32_t slotId, ImsServiceType imsS
         TELEPHONY_LOGE("GetImsRegStatus WriteInt32 imsSrvType is false");
         return ERROR_IMS_REG_INFO;
     }
-    if (Remote() == nullptr) {
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetImsRegStatus Remote is null");
         return ERROR_IMS_REG_INFO;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_IMS_REG_STATUS), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_IMS_REG_STATUS), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetImsRegStatus failed, error code is %{public}d \n", st);
         return ERROR_IMS_REG_INFO;
@@ -2108,13 +2109,13 @@ int32_t CoreServiceProxy::RegImsCallback(MessageParcel &idata)
     int32_t slotId = idata.ReadInt32();
     sptr<IRemoteObject> callback  = idata.ReadRemoteObject();
     TELEPHONY_LOGI("imsSrvType is %{public}d, slotId is %{public}d", imsSrvType, slotId);
-    if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("RegisterCallBack WriteInterfaceToken is false");
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
     if (callback == nullptr) {
         TELEPHONY_LOGE("CoreServiceProxy::RegImsCallback is nullptr");
         return ERROR;
+    }
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("RegisterCallBack WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     if (!data.WriteInt32(imsSrvType)) {
         TELEPHONY_LOGE("WriteInt32 ERROR");
@@ -2128,7 +2129,11 @@ int32_t CoreServiceProxy::RegImsCallback(MessageParcel &idata)
         TELEPHONY_LOGE("WriteRemoteObject ERROR");
         return ERROR;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(InterfaceID::REG_IMS_CALLBACK), data, reply, option);
+    sptr<OHOS::IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(InterfaceID::REG_IMS_CALLBACK), data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function RegisterCallBack! errCode:%{public}d", error);
         return error;
@@ -2144,17 +2149,21 @@ int32_t CoreServiceProxy::UnRegImsCallback(MessageParcel &idata)
     int32_t imsSrvType = idata.ReadInt32();
     int32_t slotId = idata.ReadInt32();
     sptr<IRemoteObject> callback  = idata.ReadRemoteObject();
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("CoreServiceProxy::RegImsCallback is nullptr");
+    }
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("RegisterCallBack WriteInterfaceToken is false");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("CoreServiceProxy::RegImsCallback is nullptr");
-    }
     data.WriteInt32(imsSrvType);
     data.WriteInt32(slotId);
     data.WriteRemoteObject(callback);
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(InterfaceID::UN_REG_IMS_CALLBACK), data, reply, option);
+    sptr<OHOS::IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(InterfaceID::UN_REG_IMS_CALLBACK), data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function UnRegImsCallback! errCode:%{public}d", error);
         return error;

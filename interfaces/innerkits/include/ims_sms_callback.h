@@ -22,7 +22,6 @@ namespace OHOS {
 namespace Telephony {
 class ImsSmsCallback : public ImsManagerCallback {
 public:
-    ~ImsSmsCallback() = default;
     virtual int32_t OnImsStateCallback(const ImsRegInfo &info) = 0;
 };
 }  // namespace Telephony
