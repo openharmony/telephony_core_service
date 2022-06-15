@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,11 +15,10 @@
 
 #include "network_search_handler.h"
 
-#include <ctime>
-
 #include "ims_core_service_client.h"
 #include "network_search_manager.h"
 #include "telephony_log_wrapper.h"
+
 namespace OHOS {
 namespace Telephony {
 const int64_t IMS_STATE_REGISTED = 1;
@@ -162,7 +161,7 @@ void NetworkSearchHandler::RegisterEvents()
     }
     // Register IMS
     {
-        std::shared_ptr< ImsCoreServiceClient> imsCoreServiceClient =
+        std::shared_ptr<ImsCoreServiceClient> imsCoreServiceClient =
             DelayedSingleton<ImsCoreServiceClient>::GetInstance();
         if (imsCoreServiceClient != nullptr) {
             imsCoreServiceClient->RegisterImsCoreServiceCallbackHandler(slotId_, shared_from_this());
@@ -749,7 +748,7 @@ void NetworkSearchHandler::DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEve
     if (event == nullptr) {
         return;
     }
-    bool isActive = (event->GetParam() == 1) ? true : false;
+    bool isActive = (event->GetParam() == 1);
     if (networkRegister_ != nullptr) {
         networkRegister_->DcPhysicalLinkActiveUpdate(isActive);
     }
@@ -780,7 +779,7 @@ void NetworkSearchHandler::UpdateImsRegisterState(const AppExecFwk::InnerEvent::
         TELEPHONY_LOGE("UpdateImsRegisterState event is null slotId:%{public}d", slotId_);
         return;
     }
-    bool isRegister = (event->GetParam() == 1) ? true : false;
+    bool isRegister = (event->GetParam() == 1);
     std::shared_ptr<ImsServiceStatus> imsServiceStatus = event->GetSharedObject<ImsServiceStatus>();
     std::shared_ptr<NetworkSearchState> networkSearchState =
         networkSearchManager->GetNetworkSearchState(slotId_);

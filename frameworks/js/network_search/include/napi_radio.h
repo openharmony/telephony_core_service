@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -281,30 +281,17 @@ struct ImsRegInfoContext : BaseContext {
 };
 
 struct ImsStateCallback {
-    ImsStateCallback()
-        :env(nullptr),
-        thisVar(nullptr),
-        callbackRef(nullptr),
-        deferred(nullptr),
-        callbackBeginTime_(0),
-        slotId(0),
-        imsSrvType(TYPE_VOICE),
-        voiceCallback(nullptr),
-        videoCallback(nullptr),
-        utCallback(nullptr),
-        smsCallback(nullptr)
-    {}
-    napi_env env;
-    napi_value thisVar;
-    napi_ref callbackRef;
-    napi_deferred deferred;
-    time_t callbackBeginTime_;
-    int32_t slotId;
-    ImsServiceType imsSrvType;
-    sptr<ImsVoiceCallback> voiceCallback;
-    sptr<ImsVideoCallback> videoCallback;
-    sptr<ImsUtCallback> utCallback;
-    sptr<ImsSmsCallback> smsCallback;
+    napi_env env = nullptr;
+    napi_value thisVar = nullptr;
+    napi_ref callbackRef = nullptr;
+    napi_deferred deferred = nullptr;
+    time_t callbackBeginTime_ = 0;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    ImsServiceType imsSrvType = TYPE_VOICE;
+    sptr<ImsVoiceCallback> voiceCallback = nullptr;
+    sptr<ImsVideoCallback> videoCallback = nullptr;
+    sptr<ImsUtCallback> utCallback = nullptr;
+    sptr<ImsSmsCallback> smsCallback = nullptr;
 };
 
 struct ImsStateWorker {
