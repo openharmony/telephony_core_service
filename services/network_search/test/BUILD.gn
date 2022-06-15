@@ -13,7 +13,7 @@
 
 import("//base/telephony/core_service/core_service_aafwk.gni")
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_executable("tel_network_search_test") {
   install_enable = true
