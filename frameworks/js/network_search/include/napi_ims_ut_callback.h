@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef NAPI_IMS_UT_CALL_BACK_H
-#define NAPI_IMS_UT_CALL_BACK_H
+#ifndef NAPI_IMS_UT_CALLBACK_H
+#define NAPI_IMS_UT_CALLBACK_H
 
 #include "ims_ut_callback_stub.h"
 
@@ -22,11 +22,11 @@ namespace OHOS {
 namespace Telephony {
 class NapiImsUtCallback : public ImsUtCallbackStub {
 public:
-    explicit NapiImsUtCallback(ImsRegInfo info);
+    explicit NapiImsUtCallback(const ImsRegInfo &info);
     void OnImsUtStateChange(const ImsRegInfo &info) override;
 private:
     ImsRegInfo info_;
 };
 }  // namespace Telephony
 }  // namespace OHOS
-#endif  // NAPI_IMS_UT_CALL_BACK_H
+#endif  // NAPI_IMS_UT_CALLBACK_H

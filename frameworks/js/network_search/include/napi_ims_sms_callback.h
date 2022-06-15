@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Telephony {
 class NapiImsSmsCallback : public ImsSmsCallbackStub {
 public:
-    explicit NapiImsSmsCallback(ImsRegInfo info);
+    explicit NapiImsSmsCallback(const ImsRegInfo &info);
     void OnImsSmsStateChange(const ImsRegInfo &info) override;
 private:
     ImsRegInfo info_;

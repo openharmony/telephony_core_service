@@ -18,11 +18,12 @@
 
 namespace OHOS {
 namespace Telephony {
-NapiImsVoiceCallback::NapiImsVoiceCallback(ImsRegInfo info) : info_(info)
+NapiImsVoiceCallback::NapiImsVoiceCallback(const ImsRegInfo &info) : info_(info)
 {}
+
 void NapiImsVoiceCallback::OnImsVoiceStateChange(const ImsRegInfo &info)
 {
-    TELEPHONY_LOGE("NapiImsVoiceCallback Enter!");
+    TELEPHONY_LOGI("NapiImsVoiceCallback Enter!");
     info_ = info;
     int32_t ret = DelayedSingleton<NapiImsCallbackManager>::GetInstance()->
         UpdateImsState(ImsServiceType::TYPE_VOICE, info);

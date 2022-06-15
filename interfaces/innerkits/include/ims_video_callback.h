@@ -22,7 +22,6 @@ namespace OHOS {
 namespace Telephony {
 class ImsVideoCallback : public ImsManagerCallback {
 public:
-    ~ImsVideoCallback() = default;
     virtual int32_t OnImsStateCallback(const ImsRegInfo &info) = 0;
 };
 }  // namespace Telephony
