@@ -2035,18 +2035,15 @@ void TelRilTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
         "TelRilTest::DemoHandler::ProcessEvent --> eventId:%{public}d, slotId:%{public}d", eventId, this->slotId_);
     switch (eventId) {
         case uint32_t(CustomMessageID::MSG_OPEN_LOGICAL_CHANNEL_DONE): {
-            TELEPHONY_LOGI("open logical channel done");
-            break;
-        }
-        case uint32_t(CustomMessageID::MSG_TRANSMIT_LOGICAL_CHANNEL_DONE): {
-            auto result = event->GetUniqueObject<IccIoResultInfo>();
+            auto result = event->GetUniqueObject<OpenLogicalChannelResponse>();
             if (result == nullptr) {
-                TELEPHONY_LOGE("TransmitSimIO response nullptr");
+                TELEPHONY_LOGE("Open logical response nullptr");
                 break;
             }
-            TELEPHONY_LOGI("TransmitSimIO response:'%{public}s'", result->response.c_str());
+            TELEPHONY_LOGI("Open logical response channel:'%{public}d'", result->channelId);
             break;
         }
+        case uint32_t(CustomMessageID::MSG_TRANSMIT_LOGICAL_CHANNEL_DONE):
         case uint32_t(CustomMessageID::MSG_TRANSMIT_BASIC_CHANNEL_DONE): {
             auto result = event->GetUniqueObject<IccIoResultInfo>();
             if (result == nullptr) {
