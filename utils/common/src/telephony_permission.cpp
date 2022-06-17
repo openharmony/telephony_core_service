@@ -19,8 +19,6 @@
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
-#include "permission/permission.h"
-#include "permission/permission_kit.h"
 #include "system_ability_definition.h"
 #include "accesstoken_kit.h"
 
