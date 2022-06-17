@@ -13,7 +13,7 @@
 
 import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 TELEPHONY_CORE_SERVICE_ROOT = "//base/telephony/core_service"
 TELEPHONY_SIM_ROOT = "//base/telephony/core_service/services/sim"

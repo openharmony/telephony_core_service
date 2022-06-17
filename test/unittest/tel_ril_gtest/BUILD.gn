@@ -34,7 +34,7 @@ ohos_unittest("tel_ril_gtest") {
     "//base/telephony/core_service/services/tel_ril/include",
     "//base/telephony/core_service/services/sim/include",
     "//utils/native/base/include",
-    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
   ]
 
   deps = [

@@ -23,12 +23,5 @@ typedef enum {
     CORE_SERVICE_CDMA_LTE_PHONE = 3
 } CoreServiceTelephonyType;
 
-typedef enum {
-    HDF_SUCCESS = 0, /* The operation is successful. */
-    HDF_FAILURE = -1, /* Failed to invoke the OS underlying function. */
-    HDF_ERR_NOT_SUPPORT = -2, /* Not supported. */
-    HDF_ERR_INVALID_PARAM = -3 /* Invalid parameter. */
-} HDF_STATUS;
-
 typedef enum { CORE_SERVICE_SUCCESS = 0, CORE_SERVICE_ERROR = 1 } CoreServiceLteOptStatus;
 #endif
