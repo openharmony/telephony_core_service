@@ -18,18 +18,18 @@
 
 #include <vector>
 
-#include "iservice_registry.h"
-#include "system_ability_definition.h"
+#include "abs_shared_result_set.h"
 #include "data_ability_helper.h"
 #include "data_ability_predicates.h"
-#include "abs_shared_result_set.h"
-#include "values_bucket.h"
+#include "iservice_registry.h"
 #include "result_set.h"
-#include "uri.h"
-#include "sim_utils.h"
 #include "sim_constant.h"
 #include "sim_rdb_info.h"
+#include "sim_utils.h"
+#include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
+#include "uri.h"
+#include "values_bucket.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -44,9 +44,6 @@ public:
     int32_t SetDefaultVoiceCard(int32_t slotId);
     int32_t SetDefaultMessageCard(int32_t slotId);
     int32_t SetDefaultCellularData(int32_t slotId);
-    bool RemoveDefaultVoiceCard();
-    bool RemoveDefaultMessageCard();
-    bool RemoveDefaultCellularCard();
 
     int32_t InsertData(int64_t &id, const NativeRdb::ValuesBucket &values);
     int32_t QueryDataBySlotId(int32_t slotId, SimRdbInfo &simBean);
@@ -61,8 +58,8 @@ public:
 private:
     std::shared_ptr<AppExecFwk::DataAbilityHelper> CreateDataAHelper();
     int Insert(const NativeRdb::ValuesBucket &values);
-    std::shared_ptr<NativeRdb::AbsSharedResultSet> Query(std::vector<std::string> &columns,
-                                                         const NativeRdb::DataAbilityPredicates &predicates);
+    std::shared_ptr<NativeRdb::AbsSharedResultSet> Query(
+        std::vector<std::string> &columns, const NativeRdb::DataAbilityPredicates &predicates);
     int Update(const NativeRdb::ValuesBucket &value, const NativeRdb::DataAbilityPredicates &predicates);
     int Delete(const NativeRdb::DataAbilityPredicates &predicates);
     void SaveDataToBean(std::shared_ptr<NativeRdb::AbsSharedResultSet> result, SimRdbInfo &simBean);
@@ -70,6 +67,13 @@ private:
     inline const static std::string MAIN_CARD = "1";
     const static int32_t SUCCESS = 1;
     std::shared_ptr<AppExecFwk::DataAbilityHelper> helper_ = nullptr;
+};
+
+enum class DefaultCardType {
+    MAIN,
+    VOICE,
+    SMS,
+    DATA,
 };
 } // namespace Telephony
 } // namespace OHOS

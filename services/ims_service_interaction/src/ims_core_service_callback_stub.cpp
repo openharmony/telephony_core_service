@@ -76,6 +76,7 @@ int32_t ImsCoreServiceCallbackStub::OnImsServiceStatusReportInner(MessageParcel 
 int32_t ImsCoreServiceCallbackStub::UpdateImsServiceStatusChanged(
     int32_t slotId, const ImsServiceStatus &imsServiceStatus)
 {
+    TELEPHONY_LOGI("ImsCoreServiceCallbackStub::UpdateImsServiceStatusChanged entry");
     std::shared_ptr<ImsCoreServiceClient> imsCoreServiceClient = DelayedSingleton<ImsCoreServiceClient>::GetInstance();
     std::unique_ptr<ImsServiceStatus> info = std::make_unique<ImsServiceStatus>();
     if (info.get() == nullptr) {
@@ -86,7 +87,6 @@ int32_t ImsCoreServiceCallbackStub::UpdateImsServiceStatusChanged(
     *info = imsServiceStatus;
     imsCoreServiceClient->GetHandler(slotId)->SendEvent(
         ImsCoreServiceInterface::IMS_SERVICE_STATUS_UPDATE, std::move(info));
-    TELEPHONY_LOGI("ImsCoreServiceCallbackStub::UpdateImsServiceStatusChanged entry");
     return TELEPHONY_SUCCESS;
 }
 
@@ -106,11 +106,11 @@ int32_t ImsCoreServiceCallbackStub::OnGetImsRegistrationStatusResponseInner(Mess
 int32_t ImsCoreServiceCallbackStub::GetImsRegistrationStatusResponse(
     int32_t slotId, const ImsRegistrationStatus &imsRegStatus)
 {
+    TELEPHONY_LOGI("ImsCoreServiceCallbackStub::GetImsRegistrationStatusResponse entry");
     std::shared_ptr<ImsCoreServiceClient> imsCoreServiceClient = DelayedSingleton<ImsCoreServiceClient>::GetInstance();
     int32_t isRegisterd = imsRegStatus.isRegisterd ? 1 : 0;
     imsCoreServiceClient->GetHandler(slotId)->SendEvent(
         ImsCoreServiceInterface::IMS_REGISTER_STATE_UPDATE, isRegisterd);
-    TELEPHONY_LOGI("ImsCoreServiceCallbackStub::GetImsRegistrationStatusResponse entry");
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony

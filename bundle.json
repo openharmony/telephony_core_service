@@ -34,11 +34,12 @@
                 "ability_runtime",
                 "appexecfwk_standard",
                 "common_event_service",
-                "device_driver_framework",
+                "hdf_core",
                 "dmsfwk_standard",
                 "i18n",
                 "ipc",
                 "relational_store",
+                "netmanager_base",
                 "power_manager_native",
                 "resource_management",
                 "ril_adapter",
@@ -93,6 +94,7 @@
                     "header": {
                         "header_base" : "//base/telephony/core_service/utils",
                         "header_files": [
+                            "common/include/telephony_hisysevent.h",
                             "common/include/str_convert.h",
                             "common/include/telephony_permission.h",
                             "log/include/telephony_log_c.h",

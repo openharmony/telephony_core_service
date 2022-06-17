@@ -24,6 +24,7 @@
 #include "telephony_log_wrapper.h"
 #include "i_network_search_callback.h"
 #include "resource_utils.h"
+#include "telephony_hisysevent.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -127,6 +128,8 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
         networkSearchState_->NotifyStateChange();
     }
+    WriteNetworkStateHiSysEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_CS),
+        static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
 }
 
 void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &event)
@@ -177,6 +180,8 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
         networkSearchState_->NotifyStateChange();
     }
+    WriteNetworkStateHiSysEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_PS),
+        static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
 }
 
 void NetworkRegister::ProcessChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event)

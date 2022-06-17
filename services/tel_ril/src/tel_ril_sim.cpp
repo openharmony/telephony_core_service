@@ -686,27 +686,31 @@ int32_t TelRilSim::SimOpenLogicalChannelResponse(MessageParcel &data)
         TELEPHONY_LOGE("spBuffer == nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::unique_ptr<OpenLogicalChannelResponse> openLogicalChannelResult =
+        std::make_unique<OpenLogicalChannelResponse>();
+    openLogicalChannelResult->ReadFromParcel(data);
+
     const struct HRilRadioResponseInfo *radioResponseInfo =
         reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     if (radioResponseInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR :radioResponseInfo == nullptr");
+        TELEPHONY_LOGE("ERROR :radioResponseInfo == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
-    if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
-        if (radioResponseInfo->error == HRilErrType::NONE) {
-            const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
-            if (handler == nullptr) {
-                TELEPHONY_LOGE("ERROR :handler == nullptr");
-                return TELEPHONY_ERR_LOCAL_PTR_NULL;
-            }
-            uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
-            std::shared_ptr<HRilErrType> errorCode = std::make_shared<HRilErrType>();
-            *errorCode = radioResponseInfo->error;
-            handler->SendEvent(eventId, errorCode);
-        } else {
-            return ErrorResponse(telRilRequest, *radioResponseInfo);
-        }
+    if (telRilRequest == nullptr || telRilRequest->pointer_ == nullptr) {
+        TELEPHONY_LOGE("ERROR :telRilRequest == nullptr || radioResponseInfo  error");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
+    if (handler == nullptr) {
+        TELEPHONY_LOGE("ERROR :handler == nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (radioResponseInfo->error == HRilErrType::NONE) {
+        uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
+        handler->SendEvent(eventId, openLogicalChannelResult);
+    } else {
+        return ErrorResponse(telRilRequest, *radioResponseInfo);
     }
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -957,6 +961,7 @@ int32_t TelRilSim::GetSimLockStatus(std::string fac, const AppExecFwk::InnerEven
     simLockInfo.serial = telRilRequest->serialId_;
     simLockInfo.fac = fac;
     simLockInfo.mode = MODE;
+    simLockInfo.classx = 0;
     simLockInfo.Marshalling(data);
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
@@ -981,6 +986,7 @@ int32_t TelRilSim::SetSimLock(
     simLockInfo.fac = fac;
     simLockInfo.mode = mode;
     simLockInfo.passwd = passwd;
+    simLockInfo.classx = 0;
     simLockInfo.Marshalling(data);
     MessageParcel reply;
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};

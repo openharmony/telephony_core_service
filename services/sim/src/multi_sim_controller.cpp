@@ -14,6 +14,7 @@
  */
 
 #include "multi_sim_controller.h"
+
 #include "string_ex.h"
 
 namespace OHOS {
@@ -121,9 +122,9 @@ bool MultiSimController::InitActive(int slotId)
     if (IsSimActive(slotId) && !simStateManager_->HasSimCard()) {
         if (result && SetActiveSim(slotId, DEACTIVE, true)) {
             result = true;
-        }  else {
+        } else {
             result = false;
-        }  // force set to database DEACTIVE and avoid duplicate
+        } // force set to database DEACTIVE and avoid duplicate
     }
     return result;
 }
@@ -251,8 +252,8 @@ void MultiSimController::SortCache()
         sortCache.emplace_back(emptyUnit);
     }
     for (size_t j = 0; j < count; j++) {
-        TELEPHONY_LOGI("MultiSimController::index = %{public}d j = %{public}lu",
-                       localCacheInfo_[j].slotIndex, (unsigned long)j);
+        TELEPHONY_LOGI(
+            "MultiSimController::index = %{public}d j = %{public}lu", localCacheInfo_[j].slotIndex, (unsigned long)j);
         sortCache[localCacheInfo_[j].slotIndex] = localCacheInfo_[j];
     }
     localCacheInfo_ = sortCache;
@@ -436,19 +437,7 @@ bool MultiSimController::SetDefaultVoiceSlotId(int32_t slotId)
         TELEPHONY_LOGE("MultiSimController::SetDefaultVoiceSlotId failed by nullptr");
         return false;
     }
-    if (slotId == DEFAULT_SIM_SLOT_ID_REMOVE) {
-        int32_t result = simDbHelper_->RemoveDefaultVoiceCard();
-        if (result == INVALID_VALUE) {
-            TELEPHONY_LOGE("MultiSimController::SetDefaultVoiceSlotId get Data Base failed");
-            return false;
-        }
-        int32_t i = DEFAULT_SIM_SLOT_ID;
-        for (; i < maxCount_; i++) {
-            localCacheInfo_[i].isVoiceCard = NOT_MAIN;
-        }
-        return AnnounceDefaultVoiceSlotIdChanged(slotId);
-    }
-    if ((uint32_t)slotId >= localCacheInfo_.size() || (int32_t)slotId < DEFAULT_SIM_SLOT_ID_REMOVE) {
+    if (slotId >= (int32_t)localCacheInfo_.size() || slotId < DEFAULT_SIM_SLOT_ID_REMOVE) {
         TELEPHONY_LOGE("MultiSimController::SetDefaultVoiceSlotId failed by out of range");
         return false;
     }
@@ -501,19 +490,7 @@ bool MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
         TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId failed by nullptr");
         return false;
     }
-    if (slotId == DEFAULT_SIM_SLOT_ID_REMOVE) {
-        int32_t result = simDbHelper_->RemoveDefaultMessageCard();
-        if (result == INVALID_VALUE) {
-            TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId get Data Base failed");
-            return false;
-        }
-        int32_t i = DEFAULT_SIM_SLOT_ID;
-        for (; i < maxCount_; i++) {
-            localCacheInfo_[i].isMessageCard = NOT_MAIN;
-        }
-        return AnnounceDefaultSmsSlotIdChanged(slotId);
-    }
-    if ((uint32_t)slotId >= localCacheInfo_.size() || (int32_t)slotId < DEFAULT_SIM_SLOT_ID_REMOVE) {
+    if (slotId >= (int32_t)localCacheInfo_.size() || slotId < DEFAULT_SIM_SLOT_ID_REMOVE) {
         TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId failed by out of range");
         return false;
     }
@@ -553,19 +530,7 @@ bool MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
         TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId failed by nullptr");
         return false;
     }
-    if (slotId == DEFAULT_SIM_SLOT_ID_REMOVE) {
-        int32_t result = simDbHelper_->RemoveDefaultCellularCard();
-        if (result == INVALID_VALUE) {
-            TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId get Data Base failed");
-            return false;
-        }
-        int32_t i = DEFAULT_SIM_SLOT_ID;
-        for (; i < maxCount_; i++) {
-            localCacheInfo_[i].isCellularDataCard = NOT_MAIN;
-        }
-        return AnnounceDefaultCellularDataSlotIdChanged(slotId);
-    }
-    if ((uint32_t)slotId >= localCacheInfo_.size() || (int32_t)slotId < DEFAULT_SIM_SLOT_ID_REMOVE) {
+    if (slotId >= (int32_t)localCacheInfo_.size() || slotId < DEFAULT_SIM_SLOT_ID_REMOVE) {
         TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId failed by out of range");
         return false;
     }
@@ -793,8 +758,7 @@ bool MultiSimController::SetIccId(int32_t slotId, std::u16string iccId)
 
 bool MultiSimController::SetRadioProtocol(int32_t slotId, int32_t protocol)
 {
-    TELEPHONY_LOGI(
-        "MultiSimController::SetRadioProtocol slotId = %{public}d protocol = %{public}d", slotId, protocol);
+    TELEPHONY_LOGI("MultiSimController::SetRadioProtocol slotId = %{public}d protocol = %{public}d", slotId, protocol);
     if (radioCapController_ == nullptr) {
         TELEPHONY_LOGE("MultiSimController::SetRadioProtocol failed by nullptr");
         return false;

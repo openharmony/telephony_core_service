@@ -30,8 +30,11 @@ config("tel_utils_config") {
 }
 
 ohos_shared_library("libtel_common") {
+  include_dirs = [ "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include" ]
+
   sources = [
     "common/src/str_convert.cpp",
+    "common/src/telephony_hisysevent.cpp",
     "common/src/telephony_permission.cpp",
     "preferences/src/tel_profile_util.cpp",
   ]
@@ -69,6 +72,7 @@ ohos_shared_library("libtel_common") {
     "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
+    "hisysevent_native:libhisysevent",
     "ipc:ipc_single",
     "permission_standard:libpermissionsdk_standard",
     "safwk:system_ability_fwk",
