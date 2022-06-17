@@ -13,7 +13,7 @@
 
 import("//base/telephony/core_service/core_service_aafwk.gni")
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_executable("tel_network_search_test") {
   install_enable = true
@@ -44,7 +44,7 @@ ohos_executable("tel_network_search_test") {
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
-    "ril_adapter:hril_innerkits",
+    "ril_device_driver_interface:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]

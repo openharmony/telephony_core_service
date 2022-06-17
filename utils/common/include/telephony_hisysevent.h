@@ -13,23 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef IMS_UT_CALLBACK_STUB_H
-#define IMS_UT_CALLBACK_STUB_H
+#ifndef TELEPHONY_HISYSEVENT_H
+#define TELEPHONY_HISYSEVENT_H
 
-#include <cstdint>
-#include "ims_ut_callback.h"
-#include "iremote_stub.h"
+#include <string>
 
 namespace OHOS {
 namespace Telephony {
-class ImsUtCallbackStub : public IRemoteStub<ImsUtCallback> {
-public:
-    virtual ~ImsUtCallbackStub() = default;
-    virtual void OnImsUtStateChange(const ImsRegInfo &info);
-    int32_t OnImsStateCallback(const ImsRegInfo &info) override;
-    int OnRemoteRequest(
-        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override final;
-};
+// CoreService HiSysEvent
+void WriteSignalLevelHiSysEvent(const int32_t slotId, const int32_t level);
+void WriteNetworkStateHiSysEvent(const int32_t slotId, const int32_t domain, const int32_t tech, const int32_t state);
 }  // namespace Telephony
 }  // namespace OHOS
-#endif  // IMS_UT_CALLBACK_STUB_H
+#endif // TELEPHONY_HISYSEVENT_H

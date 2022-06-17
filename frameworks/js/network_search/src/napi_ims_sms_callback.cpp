@@ -18,8 +18,9 @@
 
 namespace OHOS {
 namespace Telephony {
-NapiImsSmsCallback::NapiImsSmsCallback(ImsRegInfo info) : info_(info)
+NapiImsSmsCallback::NapiImsSmsCallback(const ImsRegInfo &info) : info_(info)
 {}
+
 void NapiImsSmsCallback::OnImsSmsStateChange(const ImsRegInfo &info)
 {
     info_ = info;

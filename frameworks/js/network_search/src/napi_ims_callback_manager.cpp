@@ -17,7 +17,7 @@
 
 namespace OHOS {
 namespace Telephony {
-void NapiImsCallbackManager::RegImsStateCallback(ImsStateCallback stateCallback)
+void NapiImsCallbackManager::RegImsStateCallback(const ImsStateCallback &stateCallback)
 {
     if (stateCallback.voiceCallback != nullptr
         || stateCallback.videoCallback != nullptr
@@ -28,28 +28,32 @@ void NapiImsCallbackManager::RegImsStateCallback(ImsStateCallback stateCallback)
 }
 
 void NapiImsCallbackManager::UnRegCallback(
-    ImsServiceType imsSrvType, int32_t slotId, std::list<ImsStateCallback>::iterator iter)
+    ImsServiceType imsSrvType, int32_t slotId, ImsStateCallback stateCallback)
 {
     switch (imsSrvType) {
         case ImsServiceType::TYPE_VOICE:
             DelayedRefSingleton<CoreServiceClient>::GetInstance()
-                .UnRegImsVoiceCallback(slotId, iter->voiceCallback);
-            (void)memset_s(&iter->voiceCallback, sizeof(ImsStateCallback), 0, sizeof(ImsStateCallback));
+                .UnRegImsVoiceCallback(slotId, stateCallback.voiceCallback);
+            delete stateCallback.voiceCallback;
+            stateCallback.voiceCallback = nullptr;
             break;
         case ImsServiceType::TYPE_VIDEO:
             DelayedRefSingleton<CoreServiceClient>::GetInstance()
-                .UnRegImsVideoCallback(slotId, iter->videoCallback);
-            (void)memset_s(&iter->videoCallback, sizeof(ImsStateCallback), 0, sizeof(ImsStateCallback));
+                .UnRegImsVideoCallback(slotId, stateCallback.videoCallback);
+            delete stateCallback.videoCallback;
+            stateCallback.videoCallback = nullptr;
             break;
         case ImsServiceType::TYPE_UT:
             DelayedRefSingleton<CoreServiceClient>::GetInstance()
-                .UnRegImsUtCallback(slotId, iter->utCallback);
-            (void)memset_s(&iter->utCallback, sizeof(ImsStateCallback), 0, sizeof(ImsStateCallback));
+                .UnRegImsUtCallback(slotId, stateCallback.utCallback);
+            delete stateCallback.utCallback;
+            stateCallback.utCallback = nullptr;
             break;
         case ImsServiceType::TYPE_SMS:
             DelayedRefSingleton<CoreServiceClient>::GetInstance()
-                .UnRegImsSmsCallback(slotId, iter->smsCallback);
-            (void)memset_s(&iter->smsCallback, sizeof(ImsStateCallback), 0, sizeof(ImsStateCallback));
+                .UnRegImsSmsCallback(slotId, stateCallback.smsCallback);
+            delete stateCallback.smsCallback;
+            stateCallback.smsCallback = nullptr;
             break;
         default:
             TELEPHONY_LOGE("%{public}d type is error!", imsSrvType);
@@ -65,21 +69,21 @@ void NapiImsCallbackManager::UnRegImsStateCallback(napi_env env, int32_t slotId,
             && (iter->slotId == slotId)
             && (iter->imsSrvType == imsSrvType)
             && (iter->callbackRef)) {
-                UnRegCallback(imsSrvType, slotId, iter);
+                UnRegCallback(imsSrvType, slotId, *iter);
                 listStateCallback_.erase(iter);
         }
     }
 }
 
 void NapiImsCallbackManager::UnRegAllImsStateCallbackOfType(
-    napi_env env, int32_t slotId, ImsServiceType imsSrvType)
+    int32_t slotId, ImsServiceType imsSrvType)
 {
     auto iter = listStateCallback_.begin();
     for (; iter != listStateCallback_.end(); ++iter) {
         if ((iter->slotId == slotId)
             && (iter->imsSrvType == imsSrvType)
             && (iter->callbackRef)) {
-                UnRegCallback(imsSrvType, slotId, iter);
+                UnRegCallback(imsSrvType, slotId, *iter);
                 listStateCallback_.erase(iter);
         }
     }
@@ -87,21 +91,20 @@ void NapiImsCallbackManager::UnRegAllImsStateCallbackOfType(
 
 int32_t NapiImsCallbackManager::UpdateImsState(ImsServiceType imsSrvType, const ImsRegInfo &info)
 {
-    int32_t ret;
-    auto iter = listStateCallback_.begin();
-    for (; iter != listStateCallback_.end(); ++iter) {
-        if (iter->imsSrvType == imsSrvType) {
-            UpdateImsStateInfo(*iter, info);
+    int32_t ret = ERROR;
+    for (auto iter : listStateCallback_) {
+        if (iter.imsSrvType == imsSrvType) {
+            UpdateImsStateInfo(iter, info);
             ret = SUCCESS;
-        } else {
-            TELEPHONY_LOGE("%{public}d type is null!", imsSrvType);
-            ret = ERROR;
         }
+    }
+    if (ret == ERROR) {
+        TELEPHONY_LOGE("%{public}d type is null!", imsSrvType);
     }
     return ret;
 }
 
-int32_t NapiImsCallbackManager::UpdateImsStateInfo(ImsStateCallback stateCallback, const ImsRegInfo &info)
+int32_t NapiImsCallbackManager::UpdateImsStateInfo(const ImsStateCallback &stateCallback, const ImsRegInfo &info)
 {
     if (stateCallback.thisVar == nullptr) {
         TELEPHONY_LOGE("stateCallback is null!");
@@ -111,21 +114,13 @@ int32_t NapiImsCallbackManager::UpdateImsStateInfo(ImsStateCallback stateCallbac
 #if NAPI_VERSION >= 2
     napi_get_uv_event_loop(stateCallback.env, &loop);
 #endif
-    ImsStateWorker *dataWorker = std::make_unique<ImsStateWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
-        return ERROR;
-    }
-    dataWorker->info = info;
-    dataWorker->callback = stateCallback;
-    uv_work_t *work = std::make_unique<uv_work_t>().release();
-    if (work == nullptr) {
-        TELEPHONY_LOGE("work is nullptr!");
-        return ERROR;
-    }
-    work->data = (void *)dataWorker;
+    ImsStateWorker dataWorker;
+    dataWorker.info = info;
+    dataWorker.callback = stateCallback;
+    uv_work_t work;
+    work.data = (void*)(&dataWorker);
     uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportImsStateWork);
+        loop, &work, [](uv_work_t *work) {}, ReportImsStateWork);
     return SUCCESS;
 }
 
@@ -134,6 +129,8 @@ void NapiImsCallbackManager::ReportImsStateWork(uv_work_t *work, int32_t status)
     ImsStateWorker *dataWorkerData = (ImsStateWorker *)work->data;
     if (dataWorkerData == nullptr) {
         TELEPHONY_LOGE("dataWorkerData is nullptr!");
+        delete work;
+        work = nullptr;
         return;
     }
     int32_t ret = ReportImsState(dataWorkerData->info, dataWorkerData->callback);
@@ -143,7 +140,8 @@ void NapiImsCallbackManager::ReportImsStateWork(uv_work_t *work, int32_t status)
     delete work;
     work = nullptr;
 }
-int32_t NapiImsCallbackManager::ReportImsState(ImsRegInfo &info, ImsStateCallback stateCallback)
+
+int32_t NapiImsCallbackManager::ReportImsState(const ImsRegInfo &info, const ImsStateCallback &stateCallback)
 {
     napi_value callbackFunc = nullptr;
     napi_env env = stateCallback.env;
@@ -154,11 +152,11 @@ int32_t NapiImsCallbackManager::ReportImsState(ImsRegInfo &info, ImsStateCallbac
     NapiUtil::SetPropertyInt32(
         env, callbackValues[0], "imsRegTech", static_cast<int32_t>(info.imsRegTech));
     napi_get_reference_value(env, stateCallback.callbackRef, &callbackFunc);
-    napi_value callbackResult = nullptr;
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
         return ERROR;
     }
+    napi_value callbackResult = nullptr;
     napi_call_function(env, stateCallback.thisVar, callbackFunc, 1, callbackValues, &callbackResult);
     return SUCCESS;
 }

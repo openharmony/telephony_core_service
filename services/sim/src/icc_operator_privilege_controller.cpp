@@ -37,7 +37,6 @@ constexpr int32_t P3 = 0x00;
 constexpr int32_t INT32_INTVALUE = 0;
 constexpr int32_t INT32_ZERO = 0;
 constexpr int32_t INT32_FST_NEGATIVE = -1;
-constexpr int32_t INT32_FST_POSITIVE = 1;
 constexpr size_t FST_POS = 0;
 
 static std::string_view Strip(const std::string_view &src)
@@ -318,7 +317,16 @@ void IccOperatorPrivilegeController::ProcessOpenLogicalChannelDone(const AppExec
         return;
     }
     TELEPHONY_LOGI("Will to SimTransmitApduLogicalChannel");
-    state_->currentChannelId = INT32_FST_POSITIVE;
+    auto resultPtr = event->GetUniqueObject<OpenLogicalChannelResponse>();
+    if (resultPtr == nullptr) {
+        TELEPHONY_LOGE("the data of result is nullptr! then will Close Logical Channel");
+        return;
+    }
+    state_->currentChannelId = resultPtr->channelId;
+    if (state_->currentChannelId <= INT32_ZERO) {
+        TELEPHONY_LOGE("the logical channel transmit Unexpected shutdown");
+        return;
+    }
     auto transmitEvent = GenCallBackEvent(shared_from_this(), MSG_TRANSMIT_LOGICAL_CHANNEL_DONE);
     ApduSimIORequestInfo reqInfo;
     reqInfo.channelId = state_->currentChannelId;

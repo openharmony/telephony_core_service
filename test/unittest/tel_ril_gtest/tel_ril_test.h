@@ -112,6 +112,8 @@ enum class DiffInterfaceId {
     TEST_GET_VOICE_RADIO_INFO,
     TEST_GET_PHYSICAL_CHANNEL_CONFIG,
     TEST_SET_LOCATE_UPDATES,
+    TEST_SET_NOTIFICATION_FILTER,
+    TEST_SET_DEVICE_STATE,
     TEST_SET_USSD,
     TEST_GET_USSD,
     TEST_SET_CMUT,
@@ -246,6 +248,8 @@ private:
     void GetVoiceRadioTechnologyTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetPhysicalChannelConfigTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetLocateUpdatesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void SetNotificationFilterTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void SetDeviceStateTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetUssdTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetUssdTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetMuteTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);

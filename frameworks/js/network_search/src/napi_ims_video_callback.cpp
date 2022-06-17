@@ -18,8 +18,9 @@
 
 namespace OHOS {
 namespace Telephony {
-NapiImsVideoCallback::NapiImsVideoCallback(ImsRegInfo info) : info_(info)
+NapiImsVideoCallback::NapiImsVideoCallback(const ImsRegInfo &info) : info_(info)
 {}
+
 void NapiImsVideoCallback::OnImsVideoStateChange(const ImsRegInfo &info)
 {
     info_ = info;

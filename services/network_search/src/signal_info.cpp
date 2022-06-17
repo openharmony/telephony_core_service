@@ -17,6 +17,7 @@
 
 #include "network_search_notify.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_hisysevent.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -138,6 +139,11 @@ void SignalInfo::ProcessSignalIntensity(int32_t slotId, const AppExecFwk::InnerE
         std::vector<sptr<SignalInformation>> signals;
         GetSignalInfoList(signals);
         DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifySignalInfoUpdated(slotId, signals);
+        int level = 0;
+        if (signals.size() != 0) {
+            level = signals[0]->GetSignalLevel();
+        }
+        WriteSignalLevelHiSysEvent(slotId, level);
     }
     PrintfLog(*signalIntensity);
 }

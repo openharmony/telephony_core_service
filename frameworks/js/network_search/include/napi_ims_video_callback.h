@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Telephony {
 class NapiImsVideoCallback : public ImsVideoCallbackStub {
 public:
-    explicit NapiImsVideoCallback(ImsRegInfo info);
+    explicit NapiImsVideoCallback(const ImsRegInfo &info);
     void OnImsVideoStateChange(const ImsRegInfo &info) override;
 private:
     ImsRegInfo info_;

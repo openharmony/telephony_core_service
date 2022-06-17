@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -161,7 +161,7 @@ void NetworkSearchHandler::RegisterEvents()
     }
     // Register IMS
     {
-        std::shared_ptr< ImsCoreServiceClient> imsCoreServiceClient =
+        std::shared_ptr<ImsCoreServiceClient> imsCoreServiceClient =
             DelayedSingleton<ImsCoreServiceClient>::GetInstance();
         if (imsCoreServiceClient != nullptr) {
             imsCoreServiceClient->RegisterImsCoreServiceCallbackHandler(slotId_, shared_from_this());
@@ -274,6 +274,10 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
     }
     if (radioState == CORE_SERVICE_POWER_ON || radioState == CORE_SERVICE_POWER_OFF) {
         networkSearchManager->SetRadioStateValue(slotId_, (ModemPowerState)radioState);
+        auto inner = networkSearchManager->FindManagerInner(slotId_);
+        if (inner != nullptr && inner->deviceStateHandler_ != nullptr) {
+            inner->deviceStateHandler_->ProcessRadioState();
+        }
     } else {
         networkSearchManager->SetRadioStateValue(slotId_, CORE_SERVICE_POWER_NOT_AVAILABLE);
     }
@@ -690,10 +694,16 @@ void NetworkSearchHandler::TimezoneRefresh()
 
 void NetworkSearchHandler::SendUpdateCellLocationRequest()
 {
+    uint32_t curTime = (uint32_t)time(0);
+    if ((curTime - lastCellRequestTime_) < cellRequestMinInterval_) {
+        TELEPHONY_LOGE("NetworkSearchHandler::SendUpdateCellLocationRequest interval is too short");
+        return;
+    }
     TELEPHONY_LOGI("NetworkSearchHandler::SendUpdateCellLocationRequest slotId:%{public}d", slotId_);
     std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_GET_CURRENT_CELL_INFO);
     if (event != nullptr && telRilManager != nullptr) {
+        lastCellRequestTime_ = curTime;
         event->SetOwner(shared_from_this());
         telRilManager->GetCurrentCellInfo(slotId_, event);
     }
@@ -738,7 +748,7 @@ void NetworkSearchHandler::DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEve
     if (event == nullptr) {
         return;
     }
-    bool isActive = (event->GetParam() == 1) ? true : false;
+    bool isActive = (event->GetParam() == 1);
     if (networkRegister_ != nullptr) {
         networkRegister_->DcPhysicalLinkActiveUpdate(isActive);
     }
@@ -769,7 +779,7 @@ void NetworkSearchHandler::UpdateImsRegisterState(const AppExecFwk::InnerEvent::
         TELEPHONY_LOGE("UpdateImsRegisterState event is null slotId:%{public}d", slotId_);
         return;
     }
-    bool isRegister = (event->GetParam() == 1) ? true : false;
+    bool isRegister = (event->GetParam() == 1);
     std::shared_ptr<ImsServiceStatus> imsServiceStatus = event->GetSharedObject<ImsServiceStatus>();
     std::shared_ptr<NetworkSearchState> networkSearchState =
         networkSearchManager->GetNetworkSearchState(slotId_);
@@ -810,6 +820,11 @@ void NetworkSearchHandler::AirplaneModeChange(const AppExecFwk::InnerEvent::Poin
     if (radioInfo_ != nullptr) {
         radioInfo_->AirplaneModeChange();
     }
+}
+
+void NetworkSearchHandler::SetCellRequestMinInterval(uint32_t minInterval)
+{
+    cellRequestMinInterval_ = minInterval;
 }
 } // namespace Telephony
 } // namespace OHOS
