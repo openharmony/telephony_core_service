@@ -34,7 +34,7 @@
                 "ability_runtime",
                 "appexecfwk_standard",
                 "common_event_service",
-                "device_driver_framework",
+                "hdf_core",
                 "dmsfwk_standard",
                 "i18n",
                 "ipc",
