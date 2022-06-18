@@ -22,12 +22,11 @@ namespace OHOS {
 namespace Telephony {
 #define MSG_NS_SPN_UPDATED 0xF1
 const std::string SPN_INFO_UPDATED_ACTION = "ohos.action.telephonySpnInfoUpdated";
-const std::string CUR_PLMN = "CUR_PLMN";
+const std::string CUR_SLOT_ID = "CUR_SLOT_ID";
 const std::string CUR_PLMN_SHOW = "CUR_PLMN_SHOW";
-const std::string CUR_SPN = "CUR_SPN";
+const std::string CUR_PLMN = "CUR_PLMN";
 const std::string CUR_SPN_SHOW = "CUR_SPN_SHOW";
-const std::string CUR_REG_STATE = "CUR_REG_STATE";
-const std::string CUR_SPN_SHOW_RULE = "CUR_SPN_SHOW_RULE";
+const std::string CUR_SPN = "CUR_SPN";
 
 enum class DomainType {
     DOMAIN_TYPE_PS,
@@ -126,7 +125,7 @@ enum class RadioTech {
 /**
  * Describes the nsa sa state.
  */
-enum class  NrState {
+enum class NrState {
     /**
      * Indicates that a device is idle under or is connected to an LTE cell that does not support NSA.
      */
@@ -171,12 +170,9 @@ enum class NrMode {
 
     /** Indicates that the NR networking mode is NSA and SA. */
     NR_MODE_NSA_AND_SA,
- };
-
-enum class FrequencyType {
-    FREQ_TYPE_UNKNOWN = 0,
-    FREQ_TYPE_MMWAVE
 };
+
+enum class FrequencyType { FREQ_TYPE_UNKNOWN = 0, FREQ_TYPE_MMWAVE };
 
 enum class PhoneType { PHONE_TYPE_IS_NONE, PHONE_TYPE_IS_GSM, PHONE_TYPE_IS_CDMA };
 
