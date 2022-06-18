@@ -17,18 +17,17 @@
 #define NETWORK_SEARCH_INCLUDE_NETWORK_SELECTION_H
 
 #include <memory>
+
 #include "event_handler.h"
-#include "iremote_stub.h"
 #include "hril_network_parcel.h"
-#include "i_sim_manager.h"
+#include "iremote_stub.h"
 
 namespace OHOS {
 namespace Telephony {
 class NetworkSearchManager;
 class NetworkSelection {
 public:
-    NetworkSelection(std::shared_ptr<ISimManager> simManager,
-        std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId);
+    NetworkSelection(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId);
     virtual ~NetworkSelection() = default;
     void ProcessNetworkSearchResult(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessGetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &event) const;
@@ -46,7 +45,6 @@ private:
     bool ResponseInfoOfSet(
         std::shared_ptr<HRilRadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const;
 
-    std::shared_ptr<ISimManager> simManager_ = nullptr;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     int32_t slotId_ = 0;
 };
