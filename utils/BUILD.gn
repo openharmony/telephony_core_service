@@ -74,7 +74,6 @@ ohos_shared_library("libtel_common") {
     "bundle_framework:appexecfwk_core",
     "hisysevent_native:libhisysevent",
     "ipc:ipc_single",
-    "permission_standard:libpermissionsdk_standard",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
