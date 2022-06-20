@@ -16,9 +16,9 @@
 #include "network_utils.h"
 
 #include <cinttypes>
+
 #include "hril_network_parcel.h"
 #include "network_search_manager.h"
-#include "resource_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -52,42 +52,42 @@ const int32_t RAF_5G = NR;
 const int32_t RAF_AUTO = RAF_2G | RAF_3G | RAF_4G | RAF_5G;
 
 static const std::map<int32_t, PreferredNetworkMode> mapNetworkModeFromRaf = {
-    {RAF_AUTO, PreferredNetworkMode::CORE_NETWORK_MODE_AUTO},
-    {GSM, PreferredNetworkMode::CORE_NETWORK_MODE_GSM},
-    {WCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_WCDMA},
-    {LTE, PreferredNetworkMode::CORE_NETWORK_MODE_LTE},
-    {LTE | WCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA},
-    {LTE | WCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA_GSM},
-    {CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_CDMA},
-    {WCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_WCDMA_GSM},
-    {EVDO, PreferredNetworkMode::CORE_NETWORK_MODE_EVDO},
-    {EVDO | CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_EVDO_CDMA},
-    {WCDMA | GSM | EVDO | CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_WCDMA_GSM_EVDO_CDMA},
-    {LTE | EVDO | CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_EVDO_CDMA},
-    {LTE | WCDMA | GSM | EVDO | CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA_GSM_EVDO_CDMA},
-    {RAF_TD_SCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA},
-    {RAF_TD_SCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_GSM},
-    {RAF_TD_SCDMA | WCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_WCDMA},
-    {RAF_TD_SCDMA | WCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_WCDMA_GSM},
-    {LTE | RAF_TD_SCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA},
-    {LTE | RAF_TD_SCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_GSM},
-    {LTE | RAF_TD_SCDMA | WCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA},
-    {LTE | RAF_TD_SCDMA | WCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM},
-    {RAF_TD_SCDMA | WCDMA | GSM | EVDO | CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_WCDMA_GSM_EVDO_CDMA},
-    {LTE | RAF_TD_SCDMA | WCDMA | GSM | EVDO | CDMA,
-        PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA},
-    {NR, PreferredNetworkMode::CORE_NETWORK_MODE_NR},
-    {NR | LTE, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE},
-    {NR | LTE | WCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA},
-    {NR | LTE | WCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA_GSM},
-    {NR | LTE | EVDO | CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_EVDO_CDMA},
-    {NR | LTE | WCDMA | GSM | EVDO | CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA_GSM_EVDO_CDMA},
-    {NR | LTE | RAF_TD_SCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA},
-    {NR | LTE | RAF_TD_SCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_GSM},
-    {NR | LTE | RAF_TD_SCDMA | WCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA},
-    {NR | LTE | RAF_TD_SCDMA | WCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM},
-    {NR | LTE | RAF_TD_SCDMA | GSM | EVDO | CDMA,
-        PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA},
+    { RAF_AUTO, PreferredNetworkMode::CORE_NETWORK_MODE_AUTO },
+    { GSM, PreferredNetworkMode::CORE_NETWORK_MODE_GSM },
+    { WCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_WCDMA },
+    { LTE, PreferredNetworkMode::CORE_NETWORK_MODE_LTE },
+    { LTE | WCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA },
+    { LTE | WCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA_GSM },
+    { CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_CDMA },
+    { WCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_WCDMA_GSM },
+    { EVDO, PreferredNetworkMode::CORE_NETWORK_MODE_EVDO },
+    { EVDO | CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_EVDO_CDMA },
+    { WCDMA | GSM | EVDO | CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_WCDMA_GSM_EVDO_CDMA },
+    { LTE | EVDO | CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_EVDO_CDMA },
+    { LTE | WCDMA | GSM | EVDO | CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA_GSM_EVDO_CDMA },
+    { RAF_TD_SCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA },
+    { RAF_TD_SCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_GSM },
+    { RAF_TD_SCDMA | WCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_WCDMA },
+    { RAF_TD_SCDMA | WCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_WCDMA_GSM },
+    { LTE | RAF_TD_SCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA },
+    { LTE | RAF_TD_SCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_GSM },
+    { LTE | RAF_TD_SCDMA | WCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA },
+    { LTE | RAF_TD_SCDMA | WCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM },
+    { RAF_TD_SCDMA | WCDMA | GSM | EVDO | CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_WCDMA_GSM_EVDO_CDMA },
+    { LTE | RAF_TD_SCDMA | WCDMA | GSM | EVDO | CDMA,
+        PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA },
+    { NR, PreferredNetworkMode::CORE_NETWORK_MODE_NR },
+    { NR | LTE, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE },
+    { NR | LTE | WCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA },
+    { NR | LTE | WCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA_GSM },
+    { NR | LTE | EVDO | CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_EVDO_CDMA },
+    { NR | LTE | WCDMA | GSM | EVDO | CDMA, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA_GSM_EVDO_CDMA },
+    { NR | LTE | RAF_TD_SCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA },
+    { NR | LTE | RAF_TD_SCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_GSM },
+    { NR | LTE | RAF_TD_SCDMA | WCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA },
+    { NR | LTE | RAF_TD_SCDMA | WCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM },
+    { NR | LTE | RAF_TD_SCDMA | GSM | EVDO | CDMA,
+        PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA },
 };
 
 PreferredNetworkMode NetworkUtils::GetNetworkModeFromRaf(int32_t raf)
@@ -100,42 +100,42 @@ PreferredNetworkMode NetworkUtils::GetNetworkModeFromRaf(int32_t raf)
 }
 
 static const std::map<PreferredNetworkMode, int32_t> mapRafFromNetworkMode = {
-    {PreferredNetworkMode::CORE_NETWORK_MODE_AUTO, RAF_AUTO},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_GSM, GSM},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_WCDMA, WCDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_LTE, LTE},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA, LTE | WCDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA_GSM, LTE | WCDMA | GSM},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_WCDMA_GSM, WCDMA | GSM},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_CDMA, CDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_EVDO, EVDO},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_EVDO_CDMA, EVDO | CDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_WCDMA_GSM_EVDO_CDMA, WCDMA | GSM | EVDO | CDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_LTE_EVDO_CDMA, LTE | EVDO | CDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA_GSM_EVDO_CDMA, LTE | WCDMA | GSM | EVDO | CDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA, RAF_TD_SCDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_GSM, RAF_TD_SCDMA | GSM},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_WCDMA, RAF_TD_SCDMA | WCDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_WCDMA_GSM, RAF_TD_SCDMA | WCDMA | GSM},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA, LTE | RAF_TD_SCDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_GSM, LTE | RAF_TD_SCDMA | GSM},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA, LTE | RAF_TD_SCDMA | WCDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM, LTE | RAF_TD_SCDMA | WCDMA | GSM},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_WCDMA_GSM_EVDO_CDMA, RAF_TD_SCDMA | WCDMA | GSM | EVDO | CDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA,
-        LTE | RAF_TD_SCDMA | WCDMA | GSM | EVDO | CDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_NR, NR},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE, NR | LTE},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA, NR | LTE | WCDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA_GSM, NR | LTE | WCDMA | GSM},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_EVDO_CDMA, NR | LTE | EVDO | CDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA_GSM_EVDO_CDMA, NR | LTE | WCDMA | GSM | EVDO | CDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA, NR | LTE | RAF_TD_SCDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_GSM, NR | LTE | RAF_TD_SCDMA | GSM},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA, NR | LTE | RAF_TD_SCDMA | WCDMA},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM, NR | LTE | RAF_TD_SCDMA | WCDMA | GSM},
-    {PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA,
-        NR | LTE | RAF_TD_SCDMA | GSM | EVDO | CDMA},
+    { PreferredNetworkMode::CORE_NETWORK_MODE_AUTO, RAF_AUTO },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_GSM, GSM },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_WCDMA, WCDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_LTE, LTE },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA, LTE | WCDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA_GSM, LTE | WCDMA | GSM },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_WCDMA_GSM, WCDMA | GSM },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_CDMA, CDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_EVDO, EVDO },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_EVDO_CDMA, EVDO | CDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_WCDMA_GSM_EVDO_CDMA, WCDMA | GSM | EVDO | CDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_LTE_EVDO_CDMA, LTE | EVDO | CDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA_GSM_EVDO_CDMA, LTE | WCDMA | GSM | EVDO | CDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA, RAF_TD_SCDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_GSM, RAF_TD_SCDMA | GSM },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_WCDMA, RAF_TD_SCDMA | WCDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_WCDMA_GSM, RAF_TD_SCDMA | WCDMA | GSM },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA, LTE | RAF_TD_SCDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_GSM, LTE | RAF_TD_SCDMA | GSM },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA, LTE | RAF_TD_SCDMA | WCDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM, LTE | RAF_TD_SCDMA | WCDMA | GSM },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_WCDMA_GSM_EVDO_CDMA, RAF_TD_SCDMA | WCDMA | GSM | EVDO | CDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA,
+        LTE | RAF_TD_SCDMA | WCDMA | GSM | EVDO | CDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_NR, NR },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE, NR | LTE },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA, NR | LTE | WCDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA_GSM, NR | LTE | WCDMA | GSM },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_EVDO_CDMA, NR | LTE | EVDO | CDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA_GSM_EVDO_CDMA, NR | LTE | WCDMA | GSM | EVDO | CDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA, NR | LTE | RAF_TD_SCDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_GSM, NR | LTE | RAF_TD_SCDMA | GSM },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA, NR | LTE | RAF_TD_SCDMA | WCDMA },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM, NR | LTE | RAF_TD_SCDMA | WCDMA | GSM },
+    { PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA,
+        NR | LTE | RAF_TD_SCDMA | GSM | EVDO | CDMA },
 };
 
 std::unordered_map<int64_t, std::shared_ptr<NetworkSearchCallbackInfo>> NetworkUtils::networkSearchCacheMap_;
@@ -148,59 +148,6 @@ int32_t NetworkUtils::GetRafFromNetworkMode(PreferredNetworkMode PreferredNetwor
         return iter->second;
     }
     return RAF_UNKNOWN;
-}
-
-static const std::vector<std::string> cmMccMnc {"46000", "46002", "46004", "46007", "46008"};
-static const std::vector<std::string> cuMccMnc {"46001", "46009"};
-static const std::vector<std::string> ctMccMnc {"46003", "46011"};
-std::string NetworkUtils::GetCustomName(const std::string &numeric)
-{
-    TELEPHONY_LOGI("NetworkUtils::GetCustomName numeric:%{public}s", numeric.c_str());
-    std::string name = "";
-    auto obj = std::find(cmMccMnc.begin(), cmMccMnc.end(), numeric);
-    if (obj != cmMccMnc.end()) {
-        ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::CMCC, name);
-        TELEPHONY_LOGI("NetworkUtils::GetCustomName CMCC:%{public}s", name.c_str());
-        return name;
-    }
-    obj = std::find(cuMccMnc.begin(), cuMccMnc.end(), numeric);
-    if (obj != cuMccMnc.end()) {
-        ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::CUCC, name);
-        TELEPHONY_LOGI("NetworkUtils::GetCustomName CUCC:%{public}s", name.c_str());
-        return name;
-    }
-    obj = std::find(ctMccMnc.begin(), ctMccMnc.end(), numeric);
-    if (obj == ctMccMnc.end()) {
-        ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::CTCC, name);
-        TELEPHONY_LOGI("NetworkUtils::GetCustomName CTCC:%{public}s", name.c_str());
-        return name;
-    }
-    TELEPHONY_LOGI("NetworkUtils::GetCustomName empty:%{public}s", name.c_str());
-    return name;
-}
-
-std::string NetworkUtils::GetSimEons(int32_t slotId, std::string numeric, bool longNameRequired,
-    std::shared_ptr<NetworkSearchManager> networkSearchManager, std::shared_ptr<ISimManager> simManager)
-{
-    if (networkSearchManager == nullptr || simManager == nullptr) {
-        TELEPHONY_LOGE("NetworkUtils::GetSimEons nsm or simManager is nullptr slotId:%{public}d", slotId);
-        return "";
-    }
-    sptr<CellLocation> location = networkSearchManager->GetCellLocation(slotId);
-    if (location == nullptr) {
-        TELEPHONY_LOGE("location is nullptr slotId:%{public}d", slotId);
-        return "";
-    }
-    if (location->GetCellLocationType() != CellLocation::CellType::CELL_TYPE_GSM) {
-        TELEPHONY_LOGE("location type isn't GSM slotId:%{public}d", slotId);
-        return "";
-    }
-    sptr<GsmCellLocation> gsmLocation = sptr<GsmCellLocation>(static_cast<GsmCellLocation *>(location.GetRefPtr()));
-    int32_t lac = gsmLocation->GetLac();
-    std::string eonsName = Str16ToStr8(simManager->GetSimEons(slotId, numeric, lac, longNameRequired));
-    TELEPHONY_LOGI("lac:%{public}d , numeric:%{public}s, longNameRequired:%{public}d, eonsName:%{public}s",
-        lac, numeric.c_str(), longNameRequired, eonsName.c_str());
-    return eonsName;
 }
 
 bool NetworkUtils::AddNetworkSearchCallBack(int64_t index, std::shared_ptr<NetworkSearchCallbackInfo> &callback)
@@ -244,19 +191,19 @@ bool NetworkUtils::RemoveCallbackFromMap(int64_t index)
 }
 
 const std::map<RadioEvent, std::any> EventSender::mapFunctions_ = {
-    {RadioEvent::RADIO_GET_NETWORK_SELECTION_MODE, &ITelRilManager::GetNetworkSelectionMode},
-    {RadioEvent::RADIO_SET_NETWORK_SELECTION_MODE, &ITelRilManager::SetNetworkSelectionMode},
-    {RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE, &ITelRilManager::GetPreferredNetwork},
-    {RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, &ITelRilManager::SetPreferredNetwork},
-    {RadioEvent::RADIO_SET_STATUS, &ITelRilManager::SetRadioState},
-    {RadioEvent::RADIO_GET_STATUS, &ITelRilManager::GetRadioState},
-    {RadioEvent::RADIO_GET_IMS_REG_STATUS, &ITelRilManager::GetImsRegStatus},
-    {RadioEvent::RADIO_GET_IMEI, &ITelRilManager::GetImei},
-    {RadioEvent::RADIO_GET_MEID, &ITelRilManager::GetMeid},
-    {RadioEvent::RADIO_NETWORK_SEARCH_RESULT, &ITelRilManager::GetNetworkSearchInformation},
-    {RadioEvent::RADIO_GET_RADIO_CAPABILITY, &ITelRilManager::GetRadioCapability},
-    {RadioEvent::RADIO_GET_VOICE_TECH, &ITelRilManager::GetVoiceRadioTechnology},
-    {RadioEvent::RADIO_OPERATOR, &ITelRilManager::GetOperatorInfo},
+    { RadioEvent::RADIO_GET_NETWORK_SELECTION_MODE, &ITelRilManager::GetNetworkSelectionMode },
+    { RadioEvent::RADIO_SET_NETWORK_SELECTION_MODE, &ITelRilManager::SetNetworkSelectionMode },
+    { RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE, &ITelRilManager::GetPreferredNetwork },
+    { RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, &ITelRilManager::SetPreferredNetwork },
+    { RadioEvent::RADIO_SET_STATUS, &ITelRilManager::SetRadioState },
+    { RadioEvent::RADIO_GET_STATUS, &ITelRilManager::GetRadioState },
+    { RadioEvent::RADIO_GET_IMS_REG_STATUS, &ITelRilManager::GetImsRegStatus },
+    { RadioEvent::RADIO_GET_IMEI, &ITelRilManager::GetImei },
+    { RadioEvent::RADIO_GET_MEID, &ITelRilManager::GetMeid },
+    { RadioEvent::RADIO_NETWORK_SEARCH_RESULT, &ITelRilManager::GetNetworkSearchInformation },
+    { RadioEvent::RADIO_GET_RADIO_CAPABILITY, &ITelRilManager::GetRadioCapability },
+    { RadioEvent::RADIO_GET_VOICE_TECH, &ITelRilManager::GetVoiceRadioTechnology },
+    { RadioEvent::RADIO_OPERATOR, &ITelRilManager::GetOperatorInfo },
 };
 
 AppExecFwk::InnerEvent::Pointer EventSender::GetEvent(int32_t slotId, RadioEvent radioEvent, int32_t param)
@@ -356,8 +303,7 @@ bool EventSender::SendBase(int32_t slotId, RadioEvent radioEvent, RadioCapabilit
     auto fun = GetFunctionOfEvent<RilFunc_Capability_Event>(radioEvent);
     std::tuple<int32_t, RadioEvent, int32_t, const sptr<INetworkSearchCallback> *, RilFunc_Capability_Event> parameters(
         slotId, radioEvent, 0, nullptr, fun);
-    return Send<EventGetMode::GET_EVENT_BY_PARAM, RilFunc_Capability_Event, RadioCapabilityInfo &>(
-        parameters, param);
+    return Send<EventGetMode::GET_EVENT_BY_PARAM, RilFunc_Capability_Event, RadioCapabilityInfo &>(parameters, param);
 }
 
 bool EventSender::SendBase(int32_t slotId, RadioEvent radioEvent, int32_t firstParam, int32_t secondParam)
@@ -395,14 +341,13 @@ bool EventSender::SendCallback(
     return Send<EventGetMode::GET_EVENT_BY_PARAM, RilFunc_Event>(parameters);
 }
 
-bool EventSender::SendCallback(int32_t slotId, RadioEvent radioEvent, const sptr<INetworkSearchCallback> *callback,
-    RadioCapabilityInfo &param)
+bool EventSender::SendCallback(
+    int32_t slotId, RadioEvent radioEvent, const sptr<INetworkSearchCallback> *callback, RadioCapabilityInfo &param)
 {
     auto fun = GetFunctionOfEvent<RilFunc_Capability_Event>(radioEvent);
     std::tuple<int32_t, RadioEvent, int32_t, const sptr<INetworkSearchCallback> *, RilFunc_Capability_Event> parameters(
         slotId, radioEvent, 0, callback, fun);
-    return Send<EventGetMode::GET_EVENT_BY_INDEX, RilFunc_Capability_Event, RadioCapabilityInfo &>(
-        parameters, param);
+    return Send<EventGetMode::GET_EVENT_BY_INDEX, RilFunc_Capability_Event, RadioCapabilityInfo &>(parameters, param);
 }
 
 bool EventSender::SendCallbackEx(
