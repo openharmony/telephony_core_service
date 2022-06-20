@@ -16,22 +16,20 @@
 #ifndef NETWORK_UTILS_H
 #define NETWORK_UTILS_H
 
+#include <any>
+#include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
-#include <memory>
-#include <any>
-#include <mutex>
 
-#include "securec.h"
 #include "i_network_search.h"
-#include "i_sim_manager.h"
-#include "radio_event.h"
 #include "network_search_types.h"
+#include "radio_event.h"
+#include "securec.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-class NetworkSearchManager;
 struct NetworkSearchCallbackInfo {
     int32_t param_;
     sptr<INetworkSearchCallback> networkSearchItem_;
@@ -52,9 +50,6 @@ public:
     static std::shared_ptr<NetworkSearchCallbackInfo> FindNetworkSearchCallback(int64_t index);
     static bool RemoveCallbackFromMap(int64_t index);
     static bool AddNetworkSearchCallBack(int64_t index, std::shared_ptr<NetworkSearchCallbackInfo> &callback);
-    static std::string GetCustomName(const std::string &numeric);
-    static std::string GetSimEons(int32_t slotId, std::string numeric, bool longNameRequired,
-        std::shared_ptr<NetworkSearchManager> networkSearchManager, std::shared_ptr<ISimManager> simManager);
 
     template<typename... Args>
     static std::string FormatString(const std::string &format, Args... args);
@@ -89,12 +84,13 @@ std::string NetworkUtils::FormatString(const std::string &format, Args... args)
     return std::string(buf.get());
 }
 
+class NetworkSearchManager;
 class ITelRilManager;
 struct RadioCapabilityInfo;
 class EventSender {
 public:
-    EventSender(std::shared_ptr<ITelRilManager> &telRilManager,
-        const std::weak_ptr<NetworkSearchManager> &networkSearchManager)
+    EventSender(
+        std::shared_ptr<ITelRilManager> &telRilManager, const std::weak_ptr<NetworkSearchManager> &networkSearchManager)
         : telRilManager_(telRilManager), networkSearchManager_(networkSearchManager)
     {}
     virtual ~EventSender() = default;
@@ -280,8 +276,8 @@ private:
      * @return false fail
      */
     template<EventGetMode eventGetMode, typename T, typename... Args>
-    bool Send(std::tuple<int32_t, RadioEvent, int32_t, const sptr<INetworkSearchCallback> *, T> &parameters,
-        Args... args);
+    bool Send(
+        std::tuple<int32_t, RadioEvent, int32_t, const sptr<INetworkSearchCallback> *, T> &parameters, Args... args);
 
     /**
      * @brief Get the Event object

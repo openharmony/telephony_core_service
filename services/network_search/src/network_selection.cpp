@@ -21,9 +21,8 @@
 
 namespace OHOS {
 namespace Telephony {
-NetworkSelection::NetworkSelection(std::shared_ptr<ISimManager> simManager,
-    std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
-    : simManager_(simManager), networkSearchManager_(networkSearchManager), slotId_(slotId)
+NetworkSelection::NetworkSelection(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
+    : networkSearchManager_(networkSearchManager), slotId_(slotId)
 {}
 
 void NetworkSelection::ProcessNetworkSearchResult(const AppExecFwk::InnerEvent::Pointer &event) const
@@ -41,8 +40,7 @@ void NetworkSelection::ProcessNetworkSearchResult(const AppExecFwk::InnerEvent::
     std::shared_ptr<AvailableNetworkList> availNetworkResult = event->GetSharedObject<AvailableNetworkList>();
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (availNetworkResult == nullptr && responseInfo == nullptr) {
-        TELEPHONY_LOGE(
-            "NetworkSelection::ProcessNetworkSearchResult object is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("NetworkSelection::ProcessNetworkSearchResult object is nullptr slotId:%{public}d", slotId_);
         return;
     }
 
@@ -58,20 +56,17 @@ void NetworkSelection::ProcessNetworkSearchResult(const AppExecFwk::InnerEvent::
             return;
         }
     }
-    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
-        NetworkUtils::FindNetworkSearchCallback(index);
+    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo = NetworkUtils::FindNetworkSearchCallback(index);
     if (callbackInfo != nullptr) {
         sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchItem_;
         if (callback != nullptr) {
             callback->OnNetworkSearchCallback(
                 INetworkSearchCallback::NetworkSearchCallback::GET_AVAILABLE_RESULT, data);
-            TELEPHONY_LOGI(
-                "NetworkSelection::ProcessNetworkSearchResult callback success slotId:%{public}d", slotId_);
+            TELEPHONY_LOGI("NetworkSelection::ProcessNetworkSearchResult callback success slotId:%{public}d", slotId_);
         }
         NetworkUtils::RemoveCallbackFromMap(index);
     } else {
-        TELEPHONY_LOGE(
-            "NetworkSelection::ProcessNetworkSearchResult callbackInfo is null slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("NetworkSelection::ProcessNetworkSearchResult callbackInfo is null slotId:%{public}d", slotId_);
     }
 }
 
@@ -79,8 +74,7 @@ void NetworkSelection::ProcessGetNetworkSelectionMode(const AppExecFwk::InnerEve
 {
     TELEPHONY_LOGI("NetworkSelection::ProcessGetNetworkSelectionMode slotId:%{public}d", slotId_);
     if (event == nullptr) {
-        TELEPHONY_LOGE(
-            "NetworkSelection::ProcessGetNetworkSelectionMode event is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("NetworkSelection::ProcessGetNetworkSelectionMode event is nullptr slotId:%{public}d", slotId_);
         return;
     }
 
@@ -94,7 +88,8 @@ void NetworkSelection::ProcessGetNetworkSelectionMode(const AppExecFwk::InnerEve
     if (selectModeResult == nullptr && responseInfo == nullptr) {
         TELEPHONY_LOGE(
             "NetworkSelection::ProcessGetNetworkSelectionMode SelectModeResultInfo, NetworkSearchManager"
-            "or HRilRadioResponseInfo is nullptr slotId:%{public}d", slotId_);
+            "or HRilRadioResponseInfo is nullptr slotId:%{public}d",
+            slotId_);
         return;
     }
 
@@ -111,8 +106,7 @@ void NetworkSelection::ProcessGetNetworkSelectionMode(const AppExecFwk::InnerEve
         }
     }
 
-    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
-        NetworkUtils::FindNetworkSearchCallback(index);
+    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo = NetworkUtils::FindNetworkSearchCallback(index);
     if (callbackInfo != nullptr) {
         sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchItem_;
         if (callback != nullptr) {
@@ -135,8 +129,7 @@ void NetworkSelection::ProcessSetNetworkSelectionMode(const AppExecFwk::InnerEve
 {
     TELEPHONY_LOGI("NetworkSelection::ProcessSetNetworkSelectionMode ok slotId:%{public}d", slotId_);
     if (event == nullptr) {
-        TELEPHONY_LOGE(
-            "NetworkSelection::ProcessSetNetworkSelectionMode event is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("NetworkSelection::ProcessSetNetworkSelectionMode event is nullptr slotId:%{public}d", slotId_);
         return;
     }
 
@@ -155,14 +148,12 @@ void NetworkSelection::ProcessSetNetworkSelectionMode(const AppExecFwk::InnerEve
         return;
     }
 
-    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
-        NetworkUtils::FindNetworkSearchCallback(index);
+    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo = NetworkUtils::FindNetworkSearchCallback(index);
     if (callbackInfo != nullptr) {
         sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchItem_;
         int32_t selectMode = callbackInfo->param_;
         nsm->SetNetworkSelectionValue(slotId_, static_cast<SelectionMode>(selectMode));
-        TELEPHONY_LOGI(
-            "NetworkSelection::ProcessSetNetworkSelectionMode SelectionMode is:%{public}d slotId:%{public}d",
+        TELEPHONY_LOGI("NetworkSelection::ProcessSetNetworkSelectionMode SelectionMode is:%{public}d slotId:%{public}d",
             selectMode, slotId_);
         if (callback != nullptr) {
             callback->OnNetworkSearchCallback(
@@ -199,19 +190,6 @@ bool NetworkSelection::AvailNetworkResult(
                 std::string longName = availableNetworkInfoItem.longName;
                 std::string shortName = availableNetworkInfoItem.shortName;
                 std::string numeric = availableNetworkInfoItem.numeric;
-                if (numeric.empty()) {
-                    continue;
-                }
-                std::string customName = NetworkUtils::GetCustomName(numeric);
-                if (!customName.empty()) {
-                    longName = customName;
-                    shortName = customName;
-                } else {
-                    std::string eonsLongName = NetworkUtils::GetSimEons(slotId_, numeric, true, nsm, simManager_);
-                    longName = eonsLongName.empty() ? longName : eonsLongName;
-                    std::string eonsShortName = NetworkUtils::GetSimEons(slotId_, numeric, false, nsm, simManager_);
-                    shortName = eonsShortName.empty() ? shortName : eonsShortName;
-                }
                 int32_t status = availableNetworkInfoItem.status;
                 int32_t rat = availableNetworkInfoItem.rat;
                 NetworkInformation networkStateItem;
@@ -264,14 +242,12 @@ bool NetworkSelection::ResponseInfoOfGet(
         index = responseInfo->flag;
         if (!data.WriteInt32(static_cast<int32_t>(SelectionMode::MODE_TYPE_UNKNOWN))) {
             TELEPHONY_LOGE(
-                "NetworkSelection::RilRadioResponseInfoOfGet WriteInt32 slotId is false slotId:%{public}d",
-                slotId_);
+                "NetworkSelection::RilRadioResponseInfoOfGet WriteInt32 slotId is false slotId:%{public}d", slotId_);
             return false;
         }
         if (!data.WriteInt32((int32_t)responseInfo->error)) {
             TELEPHONY_LOGE(
-                "NetworkSelection::RilRadioResponseInfoOfGet WriteInt32 errorCode is false slotId:%{public}d",
-                slotId_);
+                "NetworkSelection::RilRadioResponseInfoOfGet WriteInt32 errorCode is false slotId:%{public}d", slotId_);
             return false;
         }
     }
@@ -294,8 +270,7 @@ bool NetworkSelection::ResponseInfoOfSet(
         }
         if (!data.WriteInt32((int32_t)responseInfo->error)) {
             TELEPHONY_LOGE(
-                "NetworkSelection::RilRadioResponseInfoOfSet WriteInt32 errorCode is false slotId:%{public}d",
-                slotId_);
+                "NetworkSelection::RilRadioResponseInfoOfSet WriteInt32 errorCode is false slotId:%{public}d", slotId_);
             return false;
         }
     } else {
@@ -306,8 +281,7 @@ bool NetworkSelection::ResponseInfoOfSet(
         }
         if (!data.WriteInt32(TELEPHONY_SUCCESS)) {
             TELEPHONY_LOGE(
-                "NetworkSelection::RilRadioResponseInfoOfSet WriteInt32 errorCode is false slotId:%{public}d",
-                slotId_);
+                "NetworkSelection::RilRadioResponseInfoOfSet WriteInt32 errorCode is false slotId:%{public}d", slotId_);
             return false;
         }
     }
@@ -333,8 +307,7 @@ bool NetworkSelection::SelectModeResult(
     nsm->SetNetworkSelectionValue(slotId_, static_cast<SelectionMode>(selectMode));
     if (!data.WriteInt32(selectMode)) {
         TELEPHONY_LOGE(
-            "NetworkSelection::ProcessGetNetworkSelectionMode WriteInt32 slotId is false slotId:%{public}d",
-            slotId_);
+            "NetworkSelection::ProcessGetNetworkSelectionMode WriteInt32 slotId is false slotId:%{public}d", slotId_);
         return false;
     }
     if (!data.WriteInt32(TELEPHONY_SUCCESS)) {

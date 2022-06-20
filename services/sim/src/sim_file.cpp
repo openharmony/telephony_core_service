@@ -361,8 +361,8 @@ std::string SimFile::ParseSpn(const std::string &rawData, int spnStatus)
     if (spnStatus == OBTAIN_SPN_GENERAL) {
         offset = 0;
         length -= INVALID_BYTES_NUM;
-        bytesNew = std::shared_ptr<unsigned char>(bytesRaw.get() + INVALID_BYTES_NUM,
-            [bytesRaw](unsigned char *) {}); // first is 0, +1
+        bytesNew = std::shared_ptr<unsigned char>(
+            bytesRaw.get() + INVALID_BYTES_NUM, [bytesRaw](unsigned char *) {}); // first is 0, +1
     } else if ((spnStatus == OBTAIN_OPERATOR_NAMESTRING) || (spnStatus == OBTAIN_OPERATOR_NAME_SHORTFORM)) {
         offset = 0;
         bytesNew = bytesRaw;
@@ -377,19 +377,27 @@ std::string SimFile::ParseSpn(const std::string &rawData, int spnStatus)
 void SimFile::ParsePnn(const std::vector<std::string> &records)
 {
     pnnFiles_.clear();
+    if (records.empty()) {
+        TELEPHONY_LOGI("ParsePnn records is empty");
+        return;
+    }
     for (const auto &dataPnn : records) {
         TELEPHONY_LOGI("ParsePnn: %{public}s", dataPnn.c_str());
         int recordLen = 0;
         std::shared_ptr<unsigned char> data = SIMUtils::HexStringConvertToBytes(dataPnn, recordLen);
+        if (data == nullptr) {
+            TELEPHONY_LOGI("ParsePnn data is nullptr");
+            continue;
+        }
         unsigned char *tlv = data.get();
         int tlvLen = (int)strlen((char *)tlv);
         std::shared_ptr<PlmnNetworkName> file = std::make_shared<PlmnNetworkName>();
         int tagAndLength = NETWORK_NAME_LENGTH + 1;
         if (tlvLen > tagAndLength) {
-            if (tlvLen >= (tagAndLength + tlv[NETWORK_NAME_LENGTH]) &&
+            if (tlvLen >= (tagAndLength + (int)tlv[NETWORK_NAME_LENGTH]) &&
                 tlv[NETWORK_NAME_IEI] == (unsigned char)LONG_NAME_FLAG) {
-                file->longName = SIMUtils::Gsm7bitConvertToString(tlv + NETWORK_NAME_TEXT_STRING,
-                    tlv[NETWORK_NAME_LENGTH] - 1);
+                file->longName =
+                    SIMUtils::Gsm7bitConvertToString(tlv + NETWORK_NAME_TEXT_STRING, tlv[NETWORK_NAME_LENGTH] - 1);
             }
             int shortNameOffset = tagAndLength + tlv[NETWORK_NAME_LENGTH];
             if (tlvLen > (shortNameOffset + tagAndLength)) {
@@ -397,7 +405,7 @@ void SimFile::ParsePnn(const std::vector<std::string> &records)
                     tlv[shortNameOffset + NETWORK_NAME_IEI] == (unsigned char)SHORT_NAME_FLAG) {
                     file->shortName =
                         SIMUtils::Gsm7bitConvertToString(tlv + (shortNameOffset + NETWORK_NAME_TEXT_STRING),
-                        tlv[shortNameOffset + NETWORK_NAME_LENGTH] - 1);
+                            tlv[shortNameOffset + NETWORK_NAME_LENGTH] - 1);
                 }
             }
         }
@@ -411,6 +419,10 @@ void SimFile::ParsePnn(const std::vector<std::string> &records)
 void SimFile::ParseOpl(const std::vector<std::string> &records)
 {
     oplFiles_.clear();
+    if (records.empty()) {
+        TELEPHONY_LOGI("ParseOpl records is empty");
+        return;
+    }
     for (const auto &dataOpl : records) {
         TELEPHONY_LOGI("ParseOpl: %{public}s", dataOpl.c_str());
         if (dataOpl.size() != (BYTE_LENGTH + BYTE_LENGTH)) {
@@ -608,8 +620,7 @@ bool SimFile::ProcessGetMbiDone(const AppExecFwk::InnerEvent::Pointer &event)
     }
     TELEPHONY_LOGI("ELEMENTARY_FILE_MBI data is:%{public}s id: %{public}d", fileData, indexOfMailbox_);
     fileToGet_ += LOAD_STEP;
-    AppExecFwk::InnerEvent::Pointer mbdnEvent =
-        CreateDiallingNumberPointer(MSG_SIM_OBTAIN_MBDN_DONE, 0, 0, nullptr);
+    AppExecFwk::InnerEvent::Pointer mbdnEvent = CreateDiallingNumberPointer(MSG_SIM_OBTAIN_MBDN_DONE, 0, 0, nullptr);
     diallingNumberHandler_->GetDiallingNumbers(ELEMENTARY_FILE_MBDN, ELEMENTARY_FILE_EXT6, indexOfMailbox_, mbdnEvent);
     return isFileProcessResponse;
 }
@@ -1205,7 +1216,7 @@ int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
         cond = SPN_CONDITION_DISPLAY_PLMN;
     } else if (!roaming || !operatorNum.empty()) {
         cond = SPN_CONDITION_DISPLAY_SPN;
-        if (((unsigned int)(displayConditionOfSpn_)& (unsigned int)(SPN_COND_PLMN)) == SPN_COND_PLMN) {
+        if (((unsigned int)(displayConditionOfSpn_) & (unsigned int)(SPN_COND_PLMN)) == SPN_COND_PLMN) {
             cond |= (unsigned int)SPN_CONDITION_DISPLAY_PLMN;
         }
     } else {
@@ -1235,8 +1246,7 @@ bool SimFile::UpdateVoiceMail(const std::string &mailName, const std::string &ma
     if ((indexOfMailbox_) && (indexOfMailbox_ != BYTE_NUM)) {
         std::unique_lock<std::mutex> lock(IccFile::mtx_);
         TELEPHONY_LOGI("UpdateVoiceMail start MBDN");
-        AppExecFwk::InnerEvent::Pointer event =
-            CreateDiallingNumberPointer(MSG_SIM_SET_MBDN_DONE, 0, 0, nullptr);
+        AppExecFwk::InnerEvent::Pointer event = CreateDiallingNumberPointer(MSG_SIM_SET_MBDN_DONE, 0, 0, nullptr);
         DiallingNumberUpdateInfor infor;
         infor.diallingNumber = diallingNumber;
         infor.fileId = ELEMENTARY_FILE_MBDN;
@@ -1268,8 +1278,7 @@ bool SimFile::CphsVoiceMailAvailable()
     if (!cphsInfo_.empty()) {
         int dataLen = 0;
         std::shared_ptr<unsigned char> dataByte = SIMUtils::HexStringConvertToBytes(cphsInfo_, dataLen);
-        available = (dataByte != nullptr) ? (dataByte.get()[1] & CPHS_VOICE_MAIL_MASK) ==
-            CPHS_VOICE_MAIL_EXSIT : false;
+        available = (dataByte != nullptr) ? (dataByte.get()[1] & CPHS_VOICE_MAIL_MASK) == CPHS_VOICE_MAIL_EXSIT : false;
     }
     return available;
 }
