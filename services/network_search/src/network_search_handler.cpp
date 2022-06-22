@@ -86,10 +86,7 @@ bool NetworkSearchHandler::Init()
         return false;
     }
     networkRegister_->InitNrConversionConfig();
-    operatorName_ = std::make_unique<OperatorName>(
-        nsm->GetNetworkSearchState(slotId_), nsm->GetSimManager(), networkSearchManager_, slotId_);
-    if (operatorName_ == nullptr) {
-        TELEPHONY_LOGE("failed to create new operatorName slotId:%{public}d", slotId_);
+    if (!InitOperatorName()) {
         return false;
     }
     radioInfo_ = std::make_unique<RadioInfo>(nsm, slotId_);
@@ -124,6 +121,25 @@ bool NetworkSearchHandler::Init()
     }
     signalInfo_->InitSignalBar();
     RegisterEvents();
+    return true;
+}
+
+bool NetworkSearchHandler::InitOperatorName()
+{
+    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    operatorName_ = std::make_shared<OperatorName>(
+        subscriberInfo, nsm->GetNetworkSearchState(slotId_), nsm->GetSimManager(), networkSearchManager_, slotId_);
+    if (operatorName_ == nullptr) {
+        TELEPHONY_LOGE("failed to create new operatorName slotId:%{public}d", slotId_);
+        return false;
+    }
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(operatorName_)) {
+        TELEPHONY_LOGE("failed to subscribe COMMON_EVENT_OPERATOR_CONFIG_CHANGED slotId:%{public}d", slotId_);
+        return false;
+    }
     return true;
 }
 
