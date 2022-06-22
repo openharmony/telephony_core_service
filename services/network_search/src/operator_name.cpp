@@ -19,6 +19,7 @@
 #include <common_event_manager.h>
 
 #include "common_event_support.h"
+#include "core_manager_inner.h"
 #include "hril_network_parcel.h"
 #include "network_search_manager.h"
 #include "resource_utils.h"
@@ -30,15 +31,45 @@ using namespace OHOS::EventFwk;
 namespace OHOS {
 namespace Telephony {
 const int32_t FORMAT_IDX_SPN_CS = 0;
-OperatorName::OperatorName(std::shared_ptr<NetworkSearchState> networkSearchState,
-    std::shared_ptr<ISimManager> simManager, std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
-    : networkSearchState_(networkSearchState), simManager_(simManager), networkSearchManager_(networkSearchManager),
-      slotId_(slotId)
+const int32_t PNN_OVERRIDE_STRING_SIZE = 2;
+const int32_t OPL_OVERRIDE_STRING_SIZE = 4;
+const std::string KEY_ENABLE_OPERATOR_NAME_OVERRIDE_BOOL = "enable_operator_name_override_bool";
+const std::string KEY_OPERATOR_NAME_OVERRIDE_STRING = "operator_name_override_string";
+const std::string KEY_SPN_DISPLAY_CONDITION_OVERRIDE_INT = "spn_display_condition_override_int";
+const std::string KEY_PNN_OVERRIDE_STRING_ARRAY = "pnn_override_string_array";
+const std::string KEY_OPL_OVERRIDE_STRING_ARRAY = "opl_override_string_array";
+
+OperatorName::OperatorName(const EventFwk::CommonEventSubscribeInfo &sp,
+    std::shared_ptr<NetworkSearchState> networkSearchState, std::shared_ptr<ISimManager> simManager,
+    std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
+    : CommonEventSubscriber(sp), networkSearchState_(networkSearchState), simManager_(simManager),
+      networkSearchManager_(networkSearchManager), slotId_(slotId)
 {
     std::vector<std::string> vecSpnFormats;
     ResourceUtils::Get().GetValueByName<std::vector<std::string>>(ResourceUtils::SPN_FORMATS, vecSpnFormats);
     if (vecSpnFormats.size() > FORMAT_IDX_SPN_CS) {
         csSpnFormat_ = vecSpnFormats[FORMAT_IDX_SPN_CS];
+    }
+    UpdateOperatorConfig();
+}
+
+void OperatorName::OnReceiveEvent(const EventFwk::CommonEventData &data)
+{
+    const AAFwk::Want &want = data.GetWant();
+    std::string action = want.GetAction();
+    if (action == CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED) {
+        int32_t slotId = want.GetIntParam("slotId", 0);
+        if (slotId_ != slotId) {
+            return;
+        }
+        UpdateOperatorConfig();
+        sptr<NetworkState> networkState = GetNetworkStatus();
+        if (networkState != nullptr && networkState->GetRegStatus() == RegServiceState::REG_STATE_IN_SERVICE) {
+            NotifySpnChanged();
+        }
+    } else {
+        TELEPHONY_LOGI("OperatorName::OnReceiveEvent Slot%{public}d: action=%{public}s code=%{public}d", slotId_,
+            action.c_str(), data.GetCode());
     }
 }
 
@@ -138,7 +169,7 @@ void OperatorName::NotifySpnChanged()
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("OperatorName::HandleOperatorInfo networkSearchManager is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("OperatorName::NotifySpnChanged networkSearchManager is nullptr slotId:%{public}d", slotId_);
     }
     TELEPHONY_LOGI("OperatorName::NotifySpnChanged slotId:%{public}d", slotId_);
     RegServiceState regStatus = RegServiceState::REG_STATE_UNKNOWN;
@@ -187,17 +218,23 @@ void OperatorName::UpdatePlmn(
 void OperatorName::UpdateSpn(
     RegServiceState regStatus, sptr<NetworkState> &networkState, int32_t spnRule, std::string &spn, bool &showSpn)
 {
-    std::u16string result = Str8ToStr16("");
-    if (simManager_ != nullptr) {
-        result = simManager_->GetSimSpn(slotId_);
-    }
-    spn = Str16ToStr8(result);
-    if (!csSpnFormat_.empty()) {
-        spn = NetworkUtils::FormatString(csSpnFormat_, spn.c_str());
-    }
-    showSpn = !spn.empty() &&
-              (((uint32_t)spnRule & SpnShowType::SPN_CONDITION_DISPLAY_SPN) == SpnShowType::SPN_CONDITION_DISPLAY_SPN);
-    if (regStatus != RegServiceState::REG_STATE_IN_SERVICE) {
+    if (regStatus == RegServiceState::REG_STATE_IN_SERVICE) {
+        if (enableOverride_ && !spnOverride_.empty()) {
+            spn = spnOverride_;
+        }
+        if (spn.empty()) {
+            std::u16string result = Str8ToStr16("");
+            if (simManager_ != nullptr) {
+                result = simManager_->GetSimSpn(slotId_);
+            }
+            spn = Str16ToStr8(result);
+        }
+        if (!csSpnFormat_.empty()) {
+            spn = NetworkUtils::FormatString(csSpnFormat_, spn.c_str());
+        }
+        showSpn = !spn.empty() && (((uint32_t)spnRule & SpnShowType::SPN_CONDITION_DISPLAY_SPN) ==
+                                      SpnShowType::SPN_CONDITION_DISPLAY_SPN);
+    } else {
         spn = "";
         showSpn = false;
     }
@@ -205,12 +242,18 @@ void OperatorName::UpdateSpn(
 
 void OperatorName::NotifyGsmSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState)
 {
+    if (networkState == nullptr) {
+        TELEPHONY_LOGE("OperatorName::NotifyGsmSpnChanged networkState is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
     int32_t spnRule = 0;
     std::string plmn = "";
     std::string spn = "";
     bool showPlmn = false;
     bool showSpn = false;
-    if (networkState != nullptr) {
+    if (enableOverride_ && spnRuleOverride_ != 0) {
+        spnRule = spnRuleOverride_;
+    } else {
         bool roaming = networkState->IsRoaming();
         std::string numeric = networkState->GetPlmnNumeric();
         if (simManager_ != nullptr) {
@@ -220,51 +263,58 @@ void OperatorName::NotifyGsmSpnChanged(RegServiceState regStatus, sptr<NetworkSt
     UpdatePlmn(regStatus, networkState, spnRule, plmn, showPlmn);
     UpdateSpn(regStatus, networkState, spnRule, spn, showSpn);
     TELEPHONY_LOGI(
-        "OperatorName::NotifySpnChanged showSpn:%{public}d curSpn_:%{public}s spn:%{public}s showPlmn:%{public}d "
+        "OperatorName::NotifyGsmSpnChanged showSpn:%{public}d curSpn_:%{public}s spn:%{public}s showPlmn:%{public}d "
         "curPlmn_:%{public}s plmn:%{public}s slotId:%{public}d",
         showSpn, curSpn_.c_str(), spn.c_str(), showPlmn, curPlmn_.c_str(), plmn.c_str(), slotId_);
     if (curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn || curPlmnShow_ != showPlmn ||
         curSpn_.compare(spn) || curPlmn_.compare(plmn)) {
+        TELEPHONY_LOGI("OperatorName::NotifyGsmSpnChanged start send broadcast slotId:%{public}d...", slotId_);
         PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn);
     } else {
-        TELEPHONY_LOGI("OperatorName::NotifySpnChanged spn no changed, not need to update slotId:%{public}d", slotId_);
+        TELEPHONY_LOGI(
+            "OperatorName::NotifyGsmSpnChanged spn no changed, not need to update slotId:%{public}d", slotId_);
     }
 }
 
 void OperatorName::NotifyCdmaSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState)
 {
+    if (networkState == nullptr) {
+        TELEPHONY_LOGE("OperatorName::NotifyCdmaSpnChanged networkState is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
     int32_t spnRule = 0;
     std::string plmn = "";
     std::string spn = "";
     bool showPlmn = false;
     bool showSpn = false;
-    if (networkState != nullptr) {
+    if (enableOverride_ && spnRuleOverride_ != 0) {
+        spnRule = spnRuleOverride_;
+    } else {
         bool roaming = networkState->IsRoaming();
         std::string numeric = networkState->GetPlmnNumeric();
         if (simManager_ != nullptr) {
             spnRule = simManager_->ObtainSpnCondition(slotId_, roaming, numeric);
         }
     }
-    if (networkState != nullptr) {
-        if (regStatus == RegServiceState::REG_STATE_IN_SERVICE) {
-            plmn = networkState->GetLongOperatorName();
-            if (!csSpnFormat_.empty()) {
-                plmn = NetworkUtils::FormatString(csSpnFormat_, plmn.c_str());
-            }
-        } else if (regStatus == RegServiceState::REG_STATE_NO_SERVICE) {
-            ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::OUT_OF_SERIVCE, plmn);
-        } else {
-            plmn = "";
+    if (regStatus == RegServiceState::REG_STATE_IN_SERVICE) {
+        plmn = networkState->GetLongOperatorName();
+        if (!csSpnFormat_.empty()) {
+            plmn = NetworkUtils::FormatString(csSpnFormat_, plmn.c_str());
         }
+    } else if (regStatus == RegServiceState::REG_STATE_NO_SERVICE) {
+        ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::OUT_OF_SERIVCE, plmn);
+    } else {
+        plmn = "";
     }
     showPlmn = !plmn.empty() && (((uint32_t)spnRule & SpnShowType::SPN_CONDITION_DISPLAY_PLMN) ==
                                     SpnShowType::SPN_CONDITION_DISPLAY_PLMN);
     if (curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn || curPlmnShow_ != showPlmn ||
         curSpn_.compare(spn) || curPlmn_.compare(plmn)) {
-        TELEPHONY_LOGI("OperatorName::NotifySpnChanged start send broadcast slotId:%{public}d...", slotId_);
+        TELEPHONY_LOGI("OperatorName::NotifyCdmaSpnChanged start send broadcast slotId:%{public}d...", slotId_);
         PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn);
     } else {
-        TELEPHONY_LOGI("OperatorName::NotifySpnChanged spn no changed, not need to update slotId:%{public}d", slotId_);
+        TELEPHONY_LOGI(
+            "OperatorName::NotifyCdmaSpnChanged spn no changed, not need to update slotId:%{public}d", slotId_);
     }
 }
 
@@ -287,55 +337,102 @@ void OperatorName::PublishEvent(const int32_t rule, const RegServiceState state,
     CommonEventPublishInfo publishInfo;
     publishInfo.SetOrdered(true);
     bool publishResult = CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    TELEPHONY_LOGI(
-        "OperatorName::PublishEvent PublishSimEvent result : %{public}d slotId:%{public}d", publishResult, slotId_);
-    curRegState_ = state;
-    curSpnRule_ = rule;
-    curSpn_ = spn;
-    curSpnShow_ = showSpn;
-    curPlmn_ = plmn;
-    curPlmnShow_ = showPlmn;
+    TELEPHONY_LOGI("OperatorName::PublishEvent result : %{public}d slotId:%{public}d", publishResult, slotId_);
+    if (publishResult) {
+        curRegState_ = state;
+        curSpnRule_ = rule;
+        curSpn_ = spn;
+        curSpnShow_ = showSpn;
+        curPlmn_ = plmn;
+        curPlmnShow_ = showPlmn;
+    }
 }
 
-std::string OperatorName::GetPlmn(sptr<NetworkState> &networkState, bool longNameRequired)
+std::string OperatorName::GetPlmn(const sptr<NetworkState> &networkState, bool longNameRequired)
 {
-    std::string plmn = "";
-    if (networkState != nullptr) {
-        std::string numeric = networkState->GetPlmnNumeric();
-        int32_t lac = GetCurrentLac();
-        plmn = GetCustomName(numeric);
-        if (plmn.empty()) {
-            plmn = GetOverrideEons(numeric, lac, longNameRequired);
-        }
-        if (plmn.empty()) {
-            plmn = GetEons(numeric, lac, longNameRequired);
-        }
-        if (plmn.empty()) {
-            plmn = networkState->GetLongOperatorName();
-        }
-        TELEPHONY_LOGI("GetPlmn lac:%{public}d , numeric:%{public}s, longNameRequired:%{public}d, plmn:%{public}s", lac,
-            numeric.c_str(), longNameRequired, plmn.c_str());
+    if (networkState == nullptr) {
+        TELEPHONY_LOGE("OperatorName::GetPlmn networkState is nullptr slotId:%{public}d", slotId_);
+        return "";
     }
+    std::string plmn = "";
+    std::string numeric = networkState->GetPlmnNumeric();
+    bool roaming = networkState->IsRoaming();
+    int32_t lac = GetCurrentLac();
+    plmn = GetCustomName(numeric);
+    if (plmn.empty()) {
+        plmn = GetOverrideEons(numeric, lac, roaming, longNameRequired);
+    }
+    if (plmn.empty()) {
+        plmn = GetEons(numeric, lac, longNameRequired);
+    }
+    if (plmn.empty()) {
+        plmn = networkState->GetLongOperatorName();
+    }
+    TELEPHONY_LOGI(
+        "OperatorName::GetPlmn lac:%{public}d, numeric:%{public}s, longNameRequired:%{public}d, plmn:%{public}s", lac,
+        numeric.c_str(), longNameRequired, plmn.c_str());
     return plmn;
 }
 
 std::string OperatorName::GetEons(const std::string &numeric, int32_t lac, bool longNameRequired)
 {
     if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("OperatorName::GetEons simManager_ is nullptr slotId:%{public}d", slotId_);
         return "";
     }
     return Str16ToStr8(simManager_->GetSimEons(slotId_, numeric, lac, longNameRequired));
 }
 
-std::string OperatorName::GetOverrideEons(const std::string &numeric, int32_t lac, bool longNameRequired)
+std::string OperatorName::GetOverrideEons(const std::string &numeric, int32_t lac, bool roaming, bool longNameRequired)
 {
+    if (!enableOverride_ || numeric.empty() || pnnOverride_.empty()) {
+        TELEPHONY_LOGI("OperatorName::GetOverrideEons Override not enable, plmn or pnnFiles is empty");
+        return "";
+    }
+    int32_t pnnIndex = -1;
+    if (oplOverride_.empty()) {
+        TELEPHONY_LOGI("OperatorName::GetOverrideEons oplOverride_ is empty");
+        if (roaming) {
+            return "";
+        } else {
+            pnnIndex = 1;
+        }
+    } else {
+        for (std::shared_ptr<OperatorPlmnInfo> opl : oplOverride_) {
+            TELEPHONY_LOGI(
+                "OperatorName::GetOverrideEons numeric:%{public}s, opl->plmnNumeric:%{public}s, lac:%{public}d, "
+                "opl->lacStart:%{public}d, opl->lacEnd:%{public}d, "
+                "opl->pnnRecordId:%{public}d",
+                numeric.c_str(), opl->plmnNumeric.c_str(), lac, opl->lacStart, opl->lacEnd, opl->pnnRecordId);
+            if (numeric.compare(opl->plmnNumeric) == 0 &&
+                ((opl->lacStart == 0 && opl->lacEnd == 0xfffe) || (opl->lacStart <= lac && opl->lacEnd >= lac))) {
+                if (opl->pnnRecordId == 0) {
+                    return "";
+                }
+                pnnIndex = opl->pnnRecordId;
+                break;
+            }
+        }
+    }
+    TELEPHONY_LOGI("OperatorName::GetOverrideEons pnnIndex:%{public}d", pnnIndex);
     std::string overrideEonsName = "";
+    if (pnnIndex >= 1 && pnnIndex <= (int32_t)pnnOverride_.size()) {
+        TELEPHONY_LOGI(
+            "OperatorName::GetOverrideEons longNameRequired:%{public}d, longName:%{public}s, shortName:%{public}s,",
+            longNameRequired, pnnOverride_.at(pnnIndex - 1)->longName.c_str(),
+            pnnOverride_.at(pnnIndex - 1)->shortName.c_str());
+        if (longNameRequired) {
+            overrideEonsName = pnnOverride_.at(pnnIndex - 1)->longName;
+        } else {
+            overrideEonsName = pnnOverride_.at(pnnIndex - 1)->shortName;
+        }
+    }
     return overrideEonsName;
 }
 
 std::string OperatorName::GetCustomName(const std::string &numeric)
 {
-    TELEPHONY_LOGI("GetCustomName numeric:%{public}s", numeric.c_str());
+    TELEPHONY_LOGI("OperatorName::GetCustomName numeric:%{public}s", numeric.c_str());
     std::string name = "";
     if (numeric.empty()) {
         return name;
@@ -343,22 +440,21 @@ std::string OperatorName::GetCustomName(const std::string &numeric)
     auto obj = std::find(cmMccMnc_.begin(), cmMccMnc_.end(), numeric);
     if (obj != cmMccMnc_.end()) {
         ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::CMCC, name);
-        TELEPHONY_LOGI("GetCustomName CMCC:%{public}s", name.c_str());
+        TELEPHONY_LOGI("OperatorName::GetCustomName CMCC:%{public}s", name.c_str());
         return name;
     }
     obj = std::find(cuMccMnc_.begin(), cuMccMnc_.end(), numeric);
     if (obj != cuMccMnc_.end()) {
         ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::CUCC, name);
-        TELEPHONY_LOGI("GetCustomName CUCC:%{public}s", name.c_str());
+        TELEPHONY_LOGI("OperatorName::GetCustomName CUCC:%{public}s", name.c_str());
         return name;
     }
     obj = std::find(ctMccMnc_.begin(), ctMccMnc_.end(), numeric);
     if (obj != ctMccMnc_.end()) {
         ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::CTCC, name);
-        TELEPHONY_LOGI("GetCustomName CTCC:%{public}s", name.c_str());
+        TELEPHONY_LOGI("OperatorName::GetCustomName CTCC:%{public}s", name.c_str());
         return name;
     }
-    TELEPHONY_LOGI("GetCustomName empty:%{public}s", name.c_str());
     return name;
 }
 
@@ -366,24 +462,87 @@ int32_t OperatorName::GetCurrentLac()
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("GetCurrentLac networkSearchManager is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("OperatorName::GetCurrentLac networkSearchManager is nullptr slotId:%{public}d", slotId_);
         return 0;
     }
     sptr<CellLocation> location = networkSearchManager->GetCellLocation(slotId_);
     if (location == nullptr) {
-        TELEPHONY_LOGE("GetCurrentLac location is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("OperatorName::GetCurrentLac location is nullptr slotId:%{public}d", slotId_);
         return 0;
     }
     if (location->GetCellLocationType() != CellLocation::CellType::CELL_TYPE_GSM) {
-        TELEPHONY_LOGE("GetCurrentLac location type isn't GSM slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("OperatorName::GetCurrentLac location type isn't GSM slotId:%{public}d", slotId_);
         return 0;
     }
     sptr<GsmCellLocation> gsmLocation = sptr<GsmCellLocation>(static_cast<GsmCellLocation *>(location.GetRefPtr()));
     if (gsmLocation == nullptr) {
-        TELEPHONY_LOGE("GetCurrentLac gsmLocation is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("OperatorName::GetCurrentLac gsmLocation is nullptr slotId:%{public}d", slotId_);
         return 0;
     }
     return gsmLocation->GetLac();
+}
+
+void OperatorName::UpdateOperatorConfig()
+{
+    OperatorConfig operatorConfig;
+    CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, operatorConfig);
+}
+
+void OperatorName::UpdatePnnOverride(const std::vector<std::string> &pnnOverride)
+{
+    pnnOverride_.clear();
+    if (pnnOverride.empty()) {
+        TELEPHONY_LOGE("OperatorName::UpdatePnnOverride pnnOverride is empty slotId:%{public}d", slotId_);
+        return;
+    }
+    for (const auto &data : pnnOverride) {
+        TELEPHONY_LOGI("OperatorName::UpdatePnnOverride: %{public}s", data.c_str());
+        std::vector<std::string> pnnString = NetworkUtils::Split(data, ",");
+        if (pnnString.size() != PNN_OVERRIDE_STRING_SIZE) {
+            continue;
+        }
+        std::shared_ptr<PlmnNetworkName> pnn = std::make_shared<PlmnNetworkName>();
+        pnn->shortName = pnnString.back();
+        pnnString.pop_back();
+        pnn->longName = pnnString.back();
+        if (!pnn->longName.empty() || !pnn->shortName.empty()) {
+            pnnOverride_.push_back(pnn);
+        }
+    }
+}
+
+void OperatorName::UpdateOplOverride(const std::vector<std::string> &oplOverride)
+{
+    oplOverride_.clear();
+    if (oplOverride.empty()) {
+        TELEPHONY_LOGE("OperatorName::UpdateOplOverride oplOverride is empty slotId:%{public}d", slotId_);
+        return;
+    }
+    for (const auto &data : oplOverride) {
+        TELEPHONY_LOGI("OperatorName::UpdateOplOverride: %{public}s", data.c_str());
+        std::vector<std::string> oplString = NetworkUtils::Split(data, ",");
+        if (oplString.size() != OPL_OVERRIDE_STRING_SIZE || oplString.back().empty()) {
+            continue;
+        }
+        std::shared_ptr<OperatorPlmnInfo> opl = std::make_shared<OperatorPlmnInfo>();
+        int32_t base = 16; // convert to hexadecimal
+        opl->pnnRecordId = stoi(oplString.back(), 0, base);
+        oplString.pop_back();
+        if (oplString.back().empty()) {
+            continue;
+        }
+        opl->lacEnd = stoi(oplString.back(), 0, base);
+        oplString.pop_back();
+        if (oplString.back().empty()) {
+            continue;
+        }
+        opl->lacStart = stoi(oplString.back(), 0, base);
+        oplString.pop_back();
+        opl->plmnNumeric = oplString.back();
+        if (!opl->plmnNumeric.empty()) {
+            oplOverride_.push_back(opl);
+        }
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

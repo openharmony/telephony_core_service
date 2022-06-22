@@ -16,28 +16,27 @@
 #ifndef OHOS_ICC_FILE_H
 #define OHOS_ICC_FILE_H
 
+#include "common_event.h"
+#include "common_event_manager.h"
 #include "event_handler.h"
 #include "event_runner.h"
 #include "i_tel_ril_manager.h"
+#include "icc_dialling_numbers_handler.h"
+#include "icc_file_controller.h"
 #include "mcc_pool.h"
 #include "observer_handler.h"
 #include "plmn_file.h"
 #include "sim_constant.h"
-#include "icc_file_controller.h"
 #include "sim_state_manager.h"
 #include "telephony_log_wrapper.h"
 #include "usim_function_handle.h"
-#include "common_event.h"
-#include "common_event_manager.h"
 #include "want.h"
-#include "icc_dialling_numbers_handler.h"
 
 namespace OHOS {
 namespace Telephony {
 class IccFile : public AppExecFwk::EventHandler {
 public:
-    IccFile(
-        const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager);
+    IccFile(const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager);
     virtual void Init();
     virtual void StartLoad();
     std::string ObtainIMSI();
@@ -73,20 +72,10 @@ public:
     virtual void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     virtual void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
     void SetRilAndFileController(const std::shared_ptr<Telephony::ITelRilManager> &ril,
-         const std::shared_ptr<IccFileController> &file, const std::shared_ptr<IccDiallingNumbersHandler> &handler);
+        const std::shared_ptr<IccFileController> &file, const std::shared_ptr<IccDiallingNumbersHandler> &handler);
     struct IccFileLoaded {
         virtual std::string ObtainElementaryFileName() = 0;
         virtual void ProcessParseFile(const AppExecFwk::InnerEvent::Pointer &event) = 0;
-    };
-    struct PlmnNetworkName {
-        std::string longName = "";
-        std::string shortName = "";
-    };
-    struct OperatorPlmnInfo {
-        std::string plmnNumeric = "";
-        int lacStart = 0;
-        int lacEnd = 0;
-        int pnnRecordId = 0;
     };
     virtual bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber) = 0;
     bool HasSimCard();

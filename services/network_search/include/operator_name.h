@@ -18,18 +18,22 @@
 
 #include <memory>
 
+#include "common_event_subscriber.h"
 #include "event_handler.h"
 #include "i_sim_manager.h"
 #include "network_search_state.h"
+#include "telephony_types.h"
 #include "want.h"
 
 namespace OHOS {
 namespace Telephony {
-class OperatorName {
+class OperatorName : public EventFwk::CommonEventSubscriber {
 public:
-    OperatorName(std::shared_ptr<NetworkSearchState> networkSearchState, std::shared_ptr<ISimManager> simManager,
-        std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId);
+    OperatorName(const EventFwk::CommonEventSubscribeInfo &sp, std::shared_ptr<NetworkSearchState> networkSearchState,
+        std::shared_ptr<ISimManager> simManager, std::weak_ptr<NetworkSearchManager> networkSearchManager,
+        int32_t slotId);
     virtual ~OperatorName() = default;
+    void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     void HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void NotifySpnChanged();
 
@@ -49,8 +53,11 @@ private:
     int32_t GetCurrentLac();
     std::string GetCustomName(const std::string &numeric);
     std::string GetEons(const std::string &numeric, int32_t lac, bool longNameRequired);
-    std::string GetOverrideEons(const std::string &numeric, int32_t lac, bool longNameRequired);
-    std::string GetPlmn(sptr<NetworkState> &networkState, bool longNameRequired);
+    std::string GetOverrideEons(const std::string &numeric, int32_t lac, bool roaming, bool longNameRequired);
+    std::string GetPlmn(const sptr<NetworkState> &networkState, bool longNameRequired);
+    void UpdatePnnOverride(const std::vector<std::string> &pnnOverride);
+    void UpdateOplOverride(const std::vector<std::string> &oplOverride);
+    void UpdateOperatorConfig();
 
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
@@ -68,6 +75,11 @@ private:
     const std::vector<std::string> cmMccMnc_ { "46000", "46002", "46004", "46007", "46008" };
     const std::vector<std::string> cuMccMnc_ { "46001", "46009" };
     const std::vector<std::string> ctMccMnc_ { "46003", "46011" };
+    bool enableOverride_ = false;
+    std::string spnOverride_ = "";
+    int32_t spnRuleOverride_ = 0;
+    std::vector<std::shared_ptr<PlmnNetworkName>> pnnOverride_;
+    std::vector<std::shared_ptr<OperatorPlmnInfo>> oplOverride_;
 };
 } // namespace Telephony
 } // namespace OHOS
