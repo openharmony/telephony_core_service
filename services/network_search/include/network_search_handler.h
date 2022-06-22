@@ -18,18 +18,18 @@
 
 #include <memory>
 
-#include "i_tel_ril_manager.h"
+#include "cell_info.h"
 #include "event_handler.h"
-#include "radio_event.h"
 #include "i_sim_manager.h"
-#include "radio_info.h"
-#include "signal_info.h"
-#include "operator_name.h"
+#include "i_tel_ril_manager.h"
 #include "network_register.h"
 #include "network_selection.h"
 #include "network_type.h"
 #include "nitz_update.h"
-#include "cell_info.h"
+#include "operator_name.h"
+#include "radio_event.h"
+#include "radio_info.h"
+#include "signal_info.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -124,11 +124,12 @@ private:
     void AutoTimeChange(const AppExecFwk::InnerEvent::Pointer &);
     void AutoTimeZoneChange(const AppExecFwk::InnerEvent::Pointer &);
     void AirplaneModeChange(const AppExecFwk::InnerEvent::Pointer &);
+    bool InitOperatorName();
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     std::unique_ptr<NetworkRegister> networkRegister_ = nullptr;
-    std::unique_ptr<OperatorName> operatorName_ = nullptr;
+    std::shared_ptr<OperatorName> operatorName_ = nullptr;
     std::unique_ptr<RadioInfo> radioInfo_ = nullptr;
     std::unique_ptr<SignalInfo> signalInfo_ = nullptr;
     std::unique_ptr<NetworkSelection> networkSelection_ = nullptr;
