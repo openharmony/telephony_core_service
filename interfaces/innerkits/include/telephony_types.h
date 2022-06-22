@@ -33,7 +33,7 @@ inline const std::string TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
 template<typename T>
 inline T GetMaxSlotCount()
 {
-    char simSlotCount[SYSPARA_SIZE] = {0};
+    char simSlotCount[SYSPARA_SIZE] = { 0 };
     GetParameter(TEL_SIM_SLOT_COUNT.c_str(), DEFAULT_SLOT_COUNT.c_str(), simSlotCount, SYSPARA_SIZE);
     T slotCount = std::atoi(simSlotCount);
     return slotCount;
@@ -46,11 +46,7 @@ enum SimSlotId {
     SIM_SLOT_3,
 };
 
-enum ModemPowerState {
-    CORE_SERVICE_POWER_NOT_AVAILABLE = -1,
-    CORE_SERVICE_POWER_OFF = 0,
-    CORE_SERVICE_POWER_ON = 1
-};
+enum ModemPowerState { CORE_SERVICE_POWER_NOT_AVAILABLE = -1, CORE_SERVICE_POWER_OFF = 0, CORE_SERVICE_POWER_ON = 1 };
 
 template<typename T>
 struct TelRilResponseInfo {
@@ -157,7 +153,7 @@ struct SimPasswordParam {
     std::string newPassword;
 };
 
-enum class EccType:int32_t {
+enum class EccType : int32_t {
     TYPE_CATEGORY = 0,
     TYPE_POLICE = 1,
     TYPE_AMBULANCE = 2,
@@ -166,12 +162,12 @@ enum class EccType:int32_t {
     TYPE_MOUNTAIN = 16,
 };
 
-enum class SimpresentType:int32_t {
+enum class SimpresentType : int32_t {
     TYPE_NO_CARD = 0,
     TYPE_HAS_CARD = 1,
 };
 
-enum class AbnormalServiceType:int32_t {
+enum class AbnormalServiceType : int32_t {
     TYPE_ALL = 0,
     TYPE_ONLY_CS = 1,
 };
@@ -187,7 +183,18 @@ struct EmergencyCall {
 struct SetEccListResponse {
     int32_t result;
     int32_t value;
-    };
+};
+
+struct PlmnNetworkName {
+    std::string longName = "";
+    std::string shortName = "";
+};
+struct OperatorPlmnInfo {
+    std::string plmnNumeric = "";
+    int32_t lacStart = 0;
+    int32_t lacEnd = 0;
+    int32_t pnnRecordId = 0;
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // TELEPHONY_TELEPHONY_TYPES_H

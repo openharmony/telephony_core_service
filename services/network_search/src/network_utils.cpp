@@ -150,6 +150,25 @@ int32_t NetworkUtils::GetRafFromNetworkMode(PreferredNetworkMode PreferredNetwor
     return RAF_UNKNOWN;
 }
 
+std::vector<std::string> NetworkUtils::Split(const std::string &input, const std::string &flag)
+{
+    std::vector<std::string> vec;
+    if (input.empty()) {
+        TELEPHONY_LOGE("input is null");
+        return vec;
+    }
+    std::string::size_type start = 0;
+    std::string::size_type pos = 0;
+    while ((pos = input.find(flag, start)) != std::string::npos) {
+        vec.push_back(input.substr(start, pos - start));
+        start = pos + flag.size();
+    }
+    if (start != input.size()) {
+        vec.push_back(input.substr(start, input.size() - start));
+    }
+    return vec;
+}
+
 bool NetworkUtils::AddNetworkSearchCallBack(int64_t index, std::shared_ptr<NetworkSearchCallbackInfo> &callback)
 {
     TELEPHONY_LOGI("NetworkUtils::AddNetworkSearchCallBack index=(%{public}" PRId64 ")", index);
