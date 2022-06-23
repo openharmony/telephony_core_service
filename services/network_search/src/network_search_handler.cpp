@@ -271,7 +271,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
     switch (radioState) {
         case CORE_SERVICE_POWER_NOT_AVAILABLE:
         case CORE_SERVICE_POWER_OFF: {
-            RadioOffState();
+            RadioOffOrUnavailableState(radioState);
             break;
         }
         case CORE_SERVICE_POWER_ON: {
@@ -380,8 +380,9 @@ void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Poi
     ModemPowerState radioState = static_cast<ModemPowerState>(networkSearchManager->GetRadioState(slotId_));
     TELEPHONY_LOGI("NetworkSearchHandler GetRadioState : %{public}d slotId:%{public}d", radioState, slotId_);
     switch (radioState) {
+        case CORE_SERVICE_POWER_NOT_AVAILABLE:
         case CORE_SERVICE_POWER_OFF:
-            RadioOffState();
+            RadioOffOrUnavailableState(radioState);
             break;
         case CORE_SERVICE_POWER_ON:
             RadioOnState();
@@ -392,13 +393,13 @@ void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Poi
     }
 }
 
-void NetworkSearchHandler::RadioOffState() const
+void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
 {
-    TELEPHONY_LOGI("RadioOffState enter... slotId:%{public}d", slotId_);
+    TELEPHONY_LOGI("RadioOffOrUnavailableState enter... slotId:%{public}d", slotId_);
 
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("RadioOffState NetworkSearchHandler is null slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("RadioOffOrUnavailableState NetworkSearchHandler is null slotId:%{public}d", slotId_);
         return;
     }
     std::shared_ptr<NetworkSearchState> networkSearchState = networkSearchManager->GetNetworkSearchState(slotId_);
@@ -408,6 +409,10 @@ void NetworkSearchHandler::RadioOffState() const
     }
 
     networkSearchState->SetInitial();
+    RegServiceState regState = radioState == CORE_SERVICE_POWER_OFF ?
+        RegServiceState::REG_STATE_POWER_OFF : RegServiceState::REG_STATE_NO_SERVICE;
+    networkSearchState->SetNetworkState(regState, DomainType::DOMAIN_TYPE_CS);
+    networkSearchState->SetNetworkState(regState, DomainType::DOMAIN_TYPE_PS);
     if (signalInfo_ != nullptr) {
         signalInfo_->Reset();
     }
@@ -416,7 +421,7 @@ void NetworkSearchHandler::RadioOffState() const
     }
     networkSearchState->NotifyStateChange();
     networkSearchManager->SetNrOptionMode(slotId_, NrMode::NR_MODE_UNKNOWN);
-    if (!networkSearchManager->GetAirplaneMode()) {
+    if (!networkSearchManager->GetAirplaneMode() && radioState == CORE_SERVICE_POWER_OFF) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
     }
     sptr<NetworkSearchCallBackBase> cellularData = networkSearchManager->GetCellularDataCallBack();

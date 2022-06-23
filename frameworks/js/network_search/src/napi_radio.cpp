@@ -288,20 +288,17 @@ static int32_t WrapRegState(int32_t nativeState)
 {
     RegServiceState state = static_cast<RegServiceState>(nativeState);
     switch (state) {
-        case RegServiceState::REG_STATE_NO_SERVICE: {
-            return RegStatus::REGISTRATION_STATE_NO_SERVICE;
-        }
         case RegServiceState::REG_STATE_IN_SERVICE: {
             return RegStatus::REGISTRATION_STATE_IN_SERVICE;
         }
         case RegServiceState::REG_STATE_EMERGENCY_ONLY: {
             return RegStatus::REGISTRATION_STATE_EMERGENCY_CALL_ONLY;
         }
-        case RegServiceState::REG_STATE_UNKNOWN: {
+        case RegServiceState::REG_STATE_POWER_OFF: {
             return RegStatus::REGISTRATION_STATE_POWER_OFF;
         }
         default:
-            return RegStatus::REGISTRATION_STATE_POWER_OFF;
+            return RegStatus::REGISTRATION_STATE_NO_SERVICE;
     }
 }
 

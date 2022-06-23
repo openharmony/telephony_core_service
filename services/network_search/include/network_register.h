@@ -47,12 +47,12 @@ public:
         REG_STATE_EMERGENCY_ONLY = 6
     };
     enum class ConnectServiceCell {
+        /** Connection status is unknown. */
+        CONNECTION_UNKNOWN = 0,
         /** UE has connection to primary cell cell(3GPP 36.331).*/
         CONNECTION_PRIMARY_CELL = 1,
         /** UE has connectionto secondary cell cell(3GPP 36.331).*/
-        CONNECTION_SECONDARY_CELL = 2,
-        /** Connection status is unknown. */
-        CONNECTION_UNKNOWN = 10
+        CONNECTION_SECONDARY_CELL = 2
     };
 
 private:
