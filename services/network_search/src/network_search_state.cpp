@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,8 +23,7 @@
 
 namespace OHOS {
 namespace Telephony {
-NetworkSearchState::NetworkSearchState(
-    const std::weak_ptr<NetworkSearchManager> &networkSearchManager, int32_t slotId)
+NetworkSearchState::NetworkSearchState(const std::weak_ptr<NetworkSearchManager> &networkSearchManager, int32_t slotId)
     : networkSearchManager_(networkSearchManager), slotId_(slotId)
 {}
 
@@ -55,9 +54,8 @@ void NetworkSearchState::SetOperatorInfo(
     std::lock_guard<std::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->SetOperatorInfo(longName, shortName, numeric, domainType);
-        TELEPHONY_LOGI(
-            "NetworkSearchState::SetOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : "
-            "%{public}s, %{public}p slotId:%{public}d",
+        TELEPHONY_LOGI("NetworkSearchState::SetOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : "
+                       "%{public}s, %{public}p slotId:%{public}d",
             networkState_->GetLongOperatorName().c_str(), networkState_->GetShortOperatorName().c_str(),
             networkState_->GetPlmnNumeric().c_str(), networkState_.get(), slotId_);
     }
@@ -168,15 +166,12 @@ void NetworkSearchState::SetImsServiceStatus(const ImsServiceStatus &imsServiceS
 {
     std::lock_guard<std::mutex> lock(imsMutex_);
     bool voiceChanged = imsServiceStatus_->supportImsVoice != imsServiceStatus.supportImsVoice;
-    bool videoChanged =  imsServiceStatus_->supportImsVideo != imsServiceStatus.supportImsVideo;
+    bool videoChanged = imsServiceStatus_->supportImsVideo != imsServiceStatus.supportImsVideo;
     bool utChanged = imsServiceStatus_->supportImsUt != imsServiceStatus.supportImsUt;
     bool smsChanged = imsServiceStatus_->supportImsSms != imsServiceStatus.supportImsSms;
     bool radioTechChanged = imsServiceStatus_->imsRegTech != imsServiceStatus.imsRegTech;
-    if (!voiceChanged
-        && !videoChanged
-        && !utChanged
-        && !smsChanged
-        && !radioTechChanged) {
+    if (!voiceChanged && !videoChanged && !utChanged && !smsChanged && !radioTechChanged) {
+        TELEPHONY_LOGI("NetworkSearchState::SetImsServiceStatus nothing need update for slotId:%{public}d", slotId_);
         return;
     }
 
