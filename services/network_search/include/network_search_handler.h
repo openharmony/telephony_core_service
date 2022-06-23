@@ -47,7 +47,6 @@ public:
     void UnregisterEvents();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void GetSignalInfo(std::vector<sptr<SignalInformation>> &signals);
-    void RadioOffState() const;
     void UpdatePhone(RadioTech csRadioTech) const;
     void GetCellInfoList(std::vector<sptr<CellInformation>> &cells);
     void DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEvent::Pointer &event);
@@ -91,6 +90,7 @@ public:
 
 private:
     void RadioOnState();
+    void RadioOffOrUnavailableState(int32_t radioState) const;
     void GetRadioStateResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void SetRadioStateResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void SimStateChange(const AppExecFwk::InnerEvent::Pointer &);
