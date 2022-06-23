@@ -16,7 +16,6 @@
 #include "core_manager_inner.h"
 
 #include "parameter.h"
-
 #include "radio_event.h"
 #include "telephony_log_wrapper.h"
 
@@ -44,9 +43,6 @@ void CoreManagerInner::OnInit(std::shared_ptr<INetworkSearch> networkSearchManag
 
 bool CoreManagerInner::IsInitFinished(void)
 {
-    if (!isInitAllObj_) {
-        TELEPHONY_LOGI("CoreManagerInner is %{public}p, for InitAllObj!", this);
-    }
     return isInitAllObj_;
 }
 
@@ -58,7 +54,7 @@ void CoreManagerInner::SetTelRilMangerObj(std::shared_ptr<ITelRilManager> telRil
 bool CoreManagerInner::IsInitFinishedForTelRil(void)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGI("CoreManagerInner is %{public}p, for telrilmanager!", this);
+        TELEPHONY_LOGE("CoreManagerInner is %{public}p, for telrilmanager!", this);
     }
     return telRilManager_ != nullptr;
 }
@@ -70,7 +66,7 @@ int32_t CoreManagerInner::GetDefaultSlotId(void)
 
 int32_t CoreManagerInner::GetMaxSimCount(void)
 {
-    char simSlotCount[SYSPARA_SIZE] = {0};
+    char simSlotCount[SYSPARA_SIZE] = { 0 };
     GetParameter(TEL_SIM_SLOT_COUNT.c_str(), DEFAULT_SLOT_COUNT.c_str(), simSlotCount, SYSPARA_SIZE);
     int32_t slotCount = std::atoi(simSlotCount);
     return slotCount;
@@ -85,8 +81,7 @@ int32_t CoreManagerInner::RegisterCoreNotify(
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         networkSearchManager_->RegisterCoreNotify(slotId, handler, what);
-    } else if ((what >= RadioEvent::RADIO_SIM_STATE_CHANGE) &&
-        (what <= RadioEvent::RADIO_SIM_ACCOUNT_LOADED)) {
+    } else if ((what >= RadioEvent::RADIO_SIM_STATE_CHANGE) && (what <= RadioEvent::RADIO_SIM_ACCOUNT_LOADED)) {
         if (simManager_ == nullptr) {
             TELEPHONY_LOGE("simManager_ is null");
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -224,8 +219,7 @@ int32_t CoreManagerInner::GetEmergencyCallList(
     return telRilManager_->GetEmergencyCallList(slotId, response);
 }
 
-int32_t CoreManagerInner::SetEmergencyCallList(
-    int32_t slotId, int32_t eventId, std::vector<EmergencyCall>  &eccVec,
+int32_t CoreManagerInner::SetEmergencyCallList(int32_t slotId, int32_t eventId, std::vector<EmergencyCall> &eccVec,
     const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     TELEPHONY_LOGI("SetEmergencyCallList start");
@@ -1780,8 +1774,7 @@ bool CoreManagerInner::UnlockPuk2(int32_t slotId, std::string newPin2, std::stri
     return simManager_->UnlockPuk2(slotId, newPin2, puk2, response);
 }
 
-bool CoreManagerInner::AlterPin2(
-    int32_t slotId, std::string newPin2, std::string oldPin2, LockStatusResponse &response)
+bool CoreManagerInner::AlterPin2(int32_t slotId, std::string newPin2, std::string oldPin2, LockStatusResponse &response)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
