@@ -23,6 +23,7 @@
 #include "radio_event.h"
 #include "event_runner.h"
 #include "iremote_stub.h"
+#include "system_ability_status_change_stub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -44,6 +45,7 @@ public:
      */
     bool IsConnect() const;
     void Init();
+    void UnInit();
     int32_t GetImsRegistrationStatus(int32_t slotId);
     int32_t RegisterImsCoreServiceCallback();
     int32_t RegisterImsCoreServiceCallbackHandler(int32_t slotId,
@@ -59,16 +61,23 @@ public:
     int32_t ReConnectService();
     void Clean();
 
-public:
-    static const int32_t RE_CONNECT_SERVICE_COUNT_MAX = 10;
+private:
+    class SystemAbilityListener : public SystemAbilityStatusChangeStub {
+    public:
+        SystemAbilityListener() {}
+        ~SystemAbilityListener() {}
+    public:
+        void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+        void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+    };
 
 private:
     std::mutex mutex_;
-    sptr<OHOS::IPCObjectStub::DeathRecipient> death_;
     sptr<ImsCoreServiceInterface> imsCoreServiceProxy_ = nullptr;
     sptr<ImsCoreServiceCallbackInterface> imsCoreServiceCallback_ = nullptr;
     std::map<int32_t, std::shared_ptr<AppExecFwk::EventHandler>> handlerMap_;
     Utils::RWLock rwClientLock_;
+    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
