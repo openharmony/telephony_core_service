@@ -32,7 +32,7 @@ ohos_executable("tel_network_search_test") {
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
-    "${aafwk_kits_path}/ability/native:abilitykit_native",
+    "${aafwk_path}/frameworks/native/ability/native:abilitykit_native",
     "//base/miscservices/time/services:time_service",
     "//utils/native/base:utils",
   ]
