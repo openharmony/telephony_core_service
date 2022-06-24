@@ -143,6 +143,7 @@ ohos_shared_library("tel_core_service") {
     "ability_base:zuri",
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
+    "ability_runtime:data_ability_helper",
     "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
