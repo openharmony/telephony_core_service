@@ -16,6 +16,8 @@
 #ifndef IMS_REG_TYPES_H
 #define IMS_REG_TYPES_H
 
+#include <stdint.h>
+
 namespace OHOS {
 namespace Telephony {
 const int32_t ERROR = -1;
