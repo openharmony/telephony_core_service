@@ -16,9 +16,8 @@
 #ifndef IMS_MANAGER_CALLBACK_H
 #define IMS_MANAGER_CALLBACK_H
 
-#include <iremote_proxy.h>
-
 #include "ims_reg_types.h"
+#include "iremote_proxy.h"
 
 namespace OHOS {
 namespace Telephony {

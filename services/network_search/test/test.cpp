@@ -381,7 +381,7 @@ void TestRegisterImsStateCallback()
         sptr<ImsVideoCallbackStub> videoCallback(new ImsVideoCallbackStub());
         sptr<ImsUtCallbackStub> utCallback(new ImsUtCallbackStub());
         sptr<ImsSmsCallbackStub> smsCallback(new ImsSmsCallbackStub());
-        int32_t ret;
+        int32_t ret = -1;
         switch (imsSrvType) {
             case TYPE_VOICE:
                 testImsVoiceCallback_.emplace(slotId, voiceCallback);
@@ -406,6 +406,9 @@ void TestRegisterImsStateCallback()
                 ret = DelayedRefSingleton<CoreServiceClient>::GetInstance()
                     .RegImsSmsCallback(slotId, smsCallback);
                 break;
+            default:
+                TELEPHONY_LOGE("Unknown ims service type:%{public}d", imsSrvType);
+                break;
         }
         std::cout << " ret:" << ret << std::endl;
     }
@@ -425,7 +428,7 @@ void TestUnRegisterImsStateCallback()
         sptr<ImsVideoCallback> videoCallback = testImsVideoCallback_[slotId];
         sptr<ImsUtCallback> utCallback = testImsUtCallback_[slotId];
         sptr<ImsSmsCallback> smsCallback = testImsSmsCallback_[slotId];
-        int32_t ret;
+        int32_t ret = -1;
         switch (imsSrvType) {
             case TYPE_VOICE:
                 ret = DelayedRefSingleton<CoreServiceClient>::GetInstance()
@@ -446,6 +449,9 @@ void TestUnRegisterImsStateCallback()
                 ret = DelayedRefSingleton<CoreServiceClient>::GetInstance()
                     .UnRegImsSmsCallback(slotId, smsCallback);
                 testImsSmsCallback_.clear();
+                break;
+            default:
+                TELEPHONY_LOGE("Unknown ims service type:%{public}d", imsSrvType);
                 break;
         }
         std::cout << " ret:" << ret << std::endl;
