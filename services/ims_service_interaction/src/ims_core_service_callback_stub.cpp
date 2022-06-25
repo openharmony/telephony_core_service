@@ -14,10 +14,10 @@
  */
 
 #include "ims_core_service_callback_stub.h"
-#include "ims_core_service_client.h"
 
-#include "telephony_log_wrapper.h"
+#include "ims_core_service_client.h"
 #include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -36,8 +36,7 @@ void ImsCoreServiceCallbackStub::InitFuncMap()
 {
     /****************** ims basic ability ******************/
     requestFuncMap_[IMS_SERVICE_STATUS_REPORT] = &ImsCoreServiceCallbackStub::OnImsServiceStatusReportInner;
-    requestFuncMap_[IMS_GET_REGISTRATION_STATUS] =
-        &ImsCoreServiceCallbackStub::OnGetImsRegistrationStatusResponseInner;
+    requestFuncMap_[IMS_GET_REGISTRATION_STATUS] = &ImsCoreServiceCallbackStub::OnGetImsRegistrationStatusResponseInner;
 }
 
 int32_t ImsCoreServiceCallbackStub::OnRemoteRequest(
@@ -78,15 +77,15 @@ int32_t ImsCoreServiceCallbackStub::UpdateImsServiceStatusChanged(
 {
     TELEPHONY_LOGI("ImsCoreServiceCallbackStub::UpdateImsServiceStatusChanged entry");
     std::shared_ptr<ImsCoreServiceClient> imsCoreServiceClient = DelayedSingleton<ImsCoreServiceClient>::GetInstance();
-    std::unique_ptr<ImsServiceStatus> info = std::make_unique<ImsServiceStatus>();
-    if (info.get() == nullptr) {
-        TELEPHONY_LOGE("make_unique ImsServiceStatus failed!");
+    std::shared_ptr<ImsServiceStatus> imsServiceState = std::make_shared<ImsServiceStatus>();
+    if (imsServiceState.get() == nullptr) {
+        TELEPHONY_LOGE("make_shared ImsServiceStatus failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    *info = imsServiceStatus;
+    *imsServiceState = imsServiceStatus;
     imsCoreServiceClient->GetHandler(slotId)->SendEvent(
-        ImsCoreServiceInterface::IMS_SERVICE_STATUS_UPDATE, std::move(info));
+        ImsCoreServiceInterface::IMS_SERVICE_STATUS_UPDATE, imsServiceState);
     return TELEPHONY_SUCCESS;
 }
 
