@@ -21,7 +21,7 @@ ohos_shared_library("sim") {
     "$SUBSYSTEM_DIR/core_service/interfaces/kits/native",
     "//utils/native/base/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "${ability_runtime_kits_path}/ability/native/include",
+    "${ability_runtime_path}/interfaces/kits/native/ability/native",
   ]
 
   sources = [

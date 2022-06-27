@@ -38,7 +38,6 @@
                 "dmsfwk_standard",
                 "i18n",
                 "ipc",
-                "dataability",
                 "relational_store",
                 "netmanager_base",
                 "power_manager_native",
