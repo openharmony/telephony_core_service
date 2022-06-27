@@ -38,7 +38,8 @@ enum class RegServiceState {
     REG_STATE_IN_SERVICE,
     REG_STATE_NO_SERVICE,
     REG_STATE_EMERGENCY_ONLY,
-    REG_STATE_SEARCH
+    REG_STATE_SEARCH,
+    REG_STATE_POWER_OFF
 };
 
 enum class RoamingType {

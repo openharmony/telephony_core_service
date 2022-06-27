@@ -99,6 +99,7 @@ void CoreService::OnStop()
 {
     state_ = ServiceRunningState::STATE_NOT_START;
     registerToService_ = false;
+    DelayedSingleton<ImsCoreServiceClient>::GetInstance()->UnInit();
     TELEPHONY_LOGI("CoreService Stop success");
 }
 

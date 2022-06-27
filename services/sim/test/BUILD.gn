@@ -58,7 +58,7 @@ ohos_executable("tel_sim_test") {
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
-    "${ability_runtime_kits_path}/ability/native:abilitykit_native",
+    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
     "//base/telephony/core_service:tel_core_service",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
     "//utils/native/base:utils",
@@ -68,9 +68,9 @@ ohos_executable("tel_sim_test") {
     "ability_base:want",
     "bundle_framework:appexecfwk_core",
     "common_event_service:cesfwk_innerkits",
-    "dataability:native_dataability",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
+    "relational_store:native_dataability",
     "relational_store:native_rdb",
     "ril_device_driver_interface:hril_innerkits",
     "safwk:system_ability_fwk",

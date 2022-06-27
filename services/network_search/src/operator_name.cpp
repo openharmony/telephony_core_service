@@ -207,6 +207,7 @@ void OperatorName::UpdatePlmn(
                 showPlmn = true;
                 break;
             case RegServiceState::REG_STATE_UNKNOWN:
+            case RegServiceState::REG_STATE_POWER_OFF:
             default:
                 ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::OUT_OF_SERIVCE, plmn);
                 showPlmn = true;
