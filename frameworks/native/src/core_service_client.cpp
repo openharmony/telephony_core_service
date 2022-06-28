@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -655,14 +655,14 @@ bool CoreServiceClient::SetVoiceMailInfo(
     return proxy->SetVoiceMailInfo(slotId, mailName, mailNumber);
 }
 
-ImsRegInfo CoreServiceClient::GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType)
+int32_t CoreServiceClient::GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return ERROR_IMS_REG_INFO;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetImsRegStatus(slotId, imsSrvType);
+    return proxy->GetImsRegStatus(slotId, imsSrvType, info);
 }
 
 int32_t CoreServiceClient::GetMaxSimCount()
