@@ -1911,39 +1911,42 @@ bool CoreServiceProxy::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockIn
     return result;
 }
 
-ImsRegInfo CoreServiceProxy::GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType)
+int32_t CoreServiceProxy::GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info)
 {
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("invalid slotId!");
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
     TELEPHONY_LOGI("CoreServiceProxy GetImsRegStatus slotId:%{public}d", slotId);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("GetImsRegStatus WriteInterfaceToken is false");
-        return ERROR_IMS_REG_INFO;
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     if (!data.WriteInt32(slotId)) {
         TELEPHONY_LOGE("GetImsRegStatus WriteInt32 slotId is false");
-        return ERROR_IMS_REG_INFO;
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!data.WriteInt32(imsSrvType)) {
         TELEPHONY_LOGE("GetImsRegStatus WriteInt32 imsSrvType is false");
-        return ERROR_IMS_REG_INFO;
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("GetImsRegStatus Remote is null");
-        return ERROR_IMS_REG_INFO;
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_IMS_REG_STATUS), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetImsRegStatus failed, error code is %{public}d \n", st);
-        return ERROR_IMS_REG_INFO;
+        return st;
     }
-    ImsRegInfo imsRegInfo = {
-        static_cast<ImsRegState>(reply.ReadInt32()),
-        static_cast<ImsRegTech>(reply.ReadInt32())
-    };
-    return imsRegInfo;
+    int32_t ret = reply.ReadInt32();
+    info.imsRegState = static_cast<ImsRegState>(reply.ReadInt32());
+    info.imsRegTech = static_cast<ImsRegTech>(reply.ReadInt32());
+    return ret;
 }
 
 std::vector<sptr<CellInformation>> CoreServiceProxy::GetCellInfoList(int32_t slotId)

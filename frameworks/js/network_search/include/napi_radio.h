@@ -272,12 +272,12 @@ struct SetPrimarySlotIdContext : BaseContext {
 struct GetImsRegInfoContext : BaseContext {
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
     int32_t imsSrvType = DEFAULT_ERROR;
-    ImsRegInfo imsRegInfo = ERROR_IMS_REG_INFO;
+    ImsRegInfo imsRegInfo;
 };
 
 struct ImsRegInfoContext : BaseContext {
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
-    ImsRegInfo imsRegInfo = ERROR_IMS_REG_INFO;
+    ImsRegInfo imsRegInfo;
 };
 
 struct ImsStateCallback {

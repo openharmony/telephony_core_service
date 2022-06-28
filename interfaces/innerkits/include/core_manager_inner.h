@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -114,8 +114,6 @@ public:
     int32_t SendDTMF(int32_t slotId, int32_t eventId, const DtmfParam &dtmfParam,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
-    int32_t GetImsRegStatus(
-        int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetSignalStrength(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetCsRegStatus(
@@ -216,7 +214,7 @@ public:
     sptr<CellLocation> GetCellLocation(int32_t slotId);
     bool GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
-    ImsRegInfo GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType) const;
+    int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) const;
     std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId);
     bool SendUpdateCellLocationRequest(int32_t slotId);
 
