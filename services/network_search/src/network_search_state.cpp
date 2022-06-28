@@ -19,6 +19,7 @@
 
 #include "network_search_manager.h"
 #include "network_search_notify.h"
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -102,10 +103,9 @@ void NetworkSearchState::SetNetworkStateToRoaming(RoamingType roamingType, Domai
     }
 }
 
-ImsRegInfo NetworkSearchState::GetImsStatus(ImsServiceType imsSrvType)
+int32_t NetworkSearchState::GetImsStatus(ImsServiceType imsSrvType, ImsRegInfo &info)
 {
     std::lock_guard<std::mutex> lock(imsMutex_);
-    ImsRegInfo imsRegInfo;
     bool isRegister = false;
     switch (imsSrvType) {
         case ImsServiceType::TYPE_VOICE:
@@ -121,11 +121,12 @@ ImsRegInfo NetworkSearchState::GetImsStatus(ImsServiceType imsSrvType)
             isRegister = imsRegStatus_ && imsServiceStatus_->supportImsSms;
             break;
         default:
-            break;
+            TELEPHONY_LOGE("%{public}d unkunow ims service type!", imsSrvType);
+            return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
-    imsRegInfo.imsRegTech = imsServiceStatus_->imsRegTech;
-    return imsRegInfo;
+    info.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
+    info.imsRegTech = imsServiceStatus_->imsRegTech;
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 void NetworkSearchState::SetImsStatus(bool imsRegStatus)

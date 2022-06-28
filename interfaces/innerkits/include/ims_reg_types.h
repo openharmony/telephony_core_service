@@ -36,8 +36,7 @@ enum ImsRegTech {
     IMS_REG_TECH_NONE = 0,
     IMS_REG_TECH_LTE = 1,
     IMS_REG_TECH_IWLAN = 2,
-    IMS_REG_TECH_CROSS_SIM = 3,
-    IMS_REG_TECH_NR = 4,
+    IMS_REG_TECH_NR = 3,
 };
 
 enum ImsServiceType {
@@ -48,11 +47,9 @@ enum ImsServiceType {
 };
 
 struct ImsRegInfo {
-    ImsRegState imsRegState;
-    ImsRegTech imsRegTech;
+    ImsRegState imsRegState = IMS_UNREGISTERED;
+    ImsRegTech imsRegTech = IMS_REG_TECH_NONE;
 };
-
-const ImsRegInfo ERROR_IMS_REG_INFO = {IMS_UNREGISTERED, IMS_REG_TECH_NONE};
 }  // namespace Telephony
 }  // namespace OHOS
 #endif  // IMS_REG_TYPES_H

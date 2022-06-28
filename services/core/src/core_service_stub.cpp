@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1085,11 +1085,13 @@ int32_t CoreServiceStub::OnGetImsRegStatus(MessageParcel &data, MessageParcel &r
 {
     int32_t slotId = data.ReadInt32();
     int32_t imsSrvType = data.ReadInt32();
-    ImsRegInfo result = GetImsRegStatus(slotId, static_cast<ImsServiceType>(imsSrvType));
-    int32_t retS = reply.WriteInt32(result.imsRegState);
-    int32_t retT = reply.WriteInt32(result.imsRegTech);
-    if (!retS || !retT) {
-        TELEPHONY_LOGE("OnGetImsRegStatus write reply failed.");
+    ImsRegInfo info;
+    int32_t result = GetImsRegStatus(slotId, static_cast<ImsServiceType>(imsSrvType), info);
+    bool ret = reply.WriteInt32(result);
+    ret = (ret && reply.WriteInt32(info.imsRegState));
+    ret = (ret && reply.WriteInt32(info.imsRegTech));
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
     return NO_ERROR;
