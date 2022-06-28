@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -69,7 +69,7 @@ public:
     virtual int32_t GetCsRegState(int32_t slotId) = 0;
     virtual int32_t GetPsRoamingState(int32_t slotId) = 0;
     virtual std::u16string GetImei(int32_t slotId) = 0;
-    virtual ImsRegInfo GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType) = 0;
+    virtual int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) = 0;
     virtual std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) = 0;
     virtual bool SendUpdateCellLocationRequest(int32_t slotId) = 0;
     virtual sptr<CellLocation> GetCellLocation(int32_t slotId) = 0;

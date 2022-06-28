@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -789,19 +789,19 @@ void NetworkSearchManager::UpdatePhone(int32_t slotId, RadioTech csRadioTech)
     }
 }
 
-ImsRegInfo NetworkSearchManager::GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType)
+int32_t NetworkSearchManager::GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info)
 {
+    TELEPHONY_LOGI("slotId:%{public}d, imsSrvType:%{public}d", slotId, imsSrvType);
     auto inner = FindManagerInner(slotId);
-    if (inner != nullptr) {
-        if (inner->networkSearchState_ == nullptr) {
-            TELEPHONY_LOGE(
-                "GetImsRegStatus networkSearchState is null, slotId:%{public}d, imsSrvType:%{public}d",
-                slotId, imsSrvType);
-            return ERROR_IMS_REG_INFO;
-        }
-        return inner->networkSearchState_->GetImsStatus(imsSrvType);
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManagerInner is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return ERROR_IMS_REG_INFO;
+    if (inner->networkSearchState_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchState is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return inner->networkSearchState_->GetImsStatus(imsSrvType, info);
 }
 
 void NetworkSearchManager::SetImei(int32_t slotId, std::u16string imei)

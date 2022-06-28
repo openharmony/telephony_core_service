@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -107,7 +107,7 @@ public:
         int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) = 0;
     virtual bool SetVoiceMailInfo(
         const int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) = 0;
-    virtual ImsRegInfo GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType) = 0;
+    virtual int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) = 0;
     virtual int32_t GetMaxSimCount() = 0;
     virtual bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) = 0;
     virtual bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) = 0;

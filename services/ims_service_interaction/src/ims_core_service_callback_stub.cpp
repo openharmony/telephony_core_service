@@ -107,7 +107,8 @@ int32_t ImsCoreServiceCallbackStub::GetImsRegistrationStatusResponse(
 {
     TELEPHONY_LOGI("ImsCoreServiceCallbackStub::GetImsRegistrationStatusResponse entry");
     std::shared_ptr<ImsCoreServiceClient> imsCoreServiceClient = DelayedSingleton<ImsCoreServiceClient>::GetInstance();
-    int32_t isRegisterd = imsRegStatus.isRegisterd ? 1 : 0;
+    std::shared_ptr<int32_t> isRegisterd = std::make_shared<int32_t>();
+    *isRegisterd = imsRegStatus.isRegisterd ? 1 : 0;
     imsCoreServiceClient->GetHandler(slotId)->SendEvent(
         ImsCoreServiceInterface::IMS_REGISTER_STATE_UPDATE, isRegisterd);
     return TELEPHONY_SUCCESS;

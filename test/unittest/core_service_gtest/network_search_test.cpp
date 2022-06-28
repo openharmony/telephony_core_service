@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,14 +15,16 @@
 
 #include "network_search_test.h"
 
-#include <unistd.h>
 #include <gtest/gtest.h>
 #include <string_ex.h>
-#include "iservice_registry.h"
-#include "system_ability_definition.h"
-#include "telephony_log_wrapper.h"
+#include <unistd.h>
+
 #include "core_service_client.h"
+#include "iservice_registry.h"
 #include "network_search_test_callback_stub.h"
+#include "system_ability_definition.h"
+#include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -31,6 +33,8 @@ using namespace testing::ext;
 constexpr int32_t SLOT_ID = 0;
 constexpr int32_t WAIT_TIME_SECOND = 10;
 constexpr int32_t WAIT_TIME_SECOND_LONG = 60;
+constexpr int32_t INVALID_SLOT_ID = -1;
+constexpr int32_t INVALID_TYPE = -1;
 #endif // TEL_TEST_UNSUPPORT
 
 sptr<ICoreService> NetworkSearchTest::telephonyService_ = nullptr;
@@ -561,6 +565,78 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSearchInformation_
         } else {
             TELEPHONY_LOGI("TelephonyTestService GetNetworkSearchInformation return fail");
         }
+    }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetImsRegStatus_0100
+ * @tc.name     Get ims register status
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0100, Function | MediumTest | Level2)
+{
+    int ret = ERROR;
+    if (NetworkSearchTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        EXPECT_EQ(SUCCESS, ret);
+    } else {
+        ImsRegInfo info;
+        ret = telephonyService_->GetImsRegStatus(SLOT_ID, ImsServiceType::TYPE_VOICE, info);
+        EXPECT_EQ(SUCCESS, ret);
+    }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetImsRegStatus_0200
+ * @tc.name     Get ims register status, but slot id is invalid -1
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0200, Function | MediumTest | Level2)
+{
+    int ret = ERROR;
+    if (NetworkSearchTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        EXPECT_EQ(SUCCESS, ret);
+    } else {
+        ImsRegInfo info;
+        ret = telephonyService_->GetImsRegStatus(INVALID_SLOT_ID, ImsServiceType::TYPE_VOICE, info);
+        EXPECT_EQ(TELEPHONY_ERR_SLOTID_INVALID, ret);
+    }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetImsRegStatus_0300
+ * @tc.name     Get ims register status, but slot id is invalid, out of max size
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0300, Function | MediumTest | Level2)
+{
+    int ret = ERROR;
+    if (NetworkSearchTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        EXPECT_EQ(SUCCESS, ret);
+    } else {
+        ImsRegInfo info;
+        ret = telephonyService_->GetImsRegStatus(SLOT_ID + 100, ImsServiceType::TYPE_VOICE, info);
+        EXPECT_EQ(TELEPHONY_ERR_SLOTID_INVALID, ret);
+    }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetImsRegStatus_0400
+ * @tc.name     Get ims register status, but ImsServiceType is error
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0400, Function | MediumTest | Level2)
+{
+    int ret = ERROR;
+    if (NetworkSearchTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        EXPECT_EQ(SUCCESS, ret);
+    } else {
+        ImsRegInfo info;
+        ret = telephonyService_->GetImsRegStatus(SLOT_ID, static_cast<ImsServiceType>(INVALID_TYPE), info);
+        EXPECT_EQ(TELEPHONY_ERR_ARGUMENT_INVALID, ret);
     }
 }
 
