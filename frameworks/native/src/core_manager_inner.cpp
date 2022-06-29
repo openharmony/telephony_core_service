@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include "parameter.h"
 #include "radio_event.h"
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 using namespace OHOS::Telephony;
@@ -1012,18 +1013,6 @@ int32_t CoreManagerInner::GetSignalStrength(
     return telRilManager_->GetSignalStrength(slotId, response);
 }
 
-int32_t CoreManagerInner::GetImsRegStatus(
-    int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
-{
-    if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
-    response->SetOwner(handler);
-    return telRilManager_->GetImsRegStatus(slotId, response);
-}
-
 int32_t CoreManagerInner::GetCsRegStatus(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
@@ -1316,13 +1305,13 @@ NrState CoreManagerInner::GetNrState(int32_t slotId) const
     return NrState::NR_STATE_NOT_SUPPORT;
 }
 
-ImsRegInfo CoreManagerInner::GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType) const
+int32_t CoreManagerInner::GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) const
 {
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager is null!");
-        return ERROR_IMS_REG_INFO;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return networkSearchManager_->GetImsRegStatus(slotId, imsSrvType);
+    return networkSearchManager_->GetImsRegStatus(slotId, imsSrvType, info);
 }
 /******************** networkSearchManager end ************************/
 /******************** simManager_ start *******************/

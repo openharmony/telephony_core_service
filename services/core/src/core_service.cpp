@@ -822,13 +822,18 @@ bool CoreService::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, L
     return simManager_->UnlockSimLock(slotId, lockInfo, response);
 }
 
-ImsRegInfo CoreService::GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType)
+int32_t CoreService::GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info)
 {
     TELEPHONY_LOGI("CoreService::GetImsRegStatus --> slotId:%{public}d, imsSrvType:%{public}d", slotId, imsSrvType);
-    if (networkSearchManager_ == nullptr) {
-        return ERROR_IMS_REG_INFO;
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    return networkSearchManager_->GetImsRegStatus(slotId, imsSrvType);
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("failed! network search manager is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->GetImsRegStatus(slotId, imsSrvType, info);
 }
 
 std::vector<sptr<CellInformation>> CoreService::GetCellInfoList(int32_t slotId)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,7 +42,7 @@ public:
     void SetNrState(NrState state);
     void SetCfgTech(RadioTech tech);
     std::unique_ptr<NetworkState> GetNetworkStatus();
-    ImsRegInfo GetImsStatus(ImsServiceType imsSrvType);
+    int32_t GetImsStatus(ImsServiceType imsSrvType, ImsRegInfo &info);
     void SetImsStatus(bool imsRegStatus);
     void SetImsServiceStatus(const ImsServiceStatus &imsServiceStatus);
     void NotifyStateChange();

@@ -297,8 +297,13 @@ declare namespace radio {
   function getPreferredNetwork(slotId: number): Promise<PreferredNetworkMode>;
 
   /**
-   * Get the Ims register state info.
+   * Get the IMS registration state info of specificed IMS service type.
    *
+   * @param slotId Indicates the card slot index number,
+   *   ranging from 0 to the maximum card slot index number supported by the device.
+   * @param imsType Indicates the ims service type of the {@link ImsServiceType}.
+   * @param callback including an instance of the {@link ImsRegInfo} class.
+   * @permission ohos.permission.GET_TELEPHONY_STATE
    * @systemapi Hide this for inner system use.
    * @since 9
    */
@@ -306,6 +311,14 @@ declare namespace radio {
    function getImsRegInfo(slotId: number, imsType: ImsServiceType): Promise<ImsRegInfo>;
 
   /**
+   * Called when the IMS registration state of specificed IMS service type corresponding
+   *   to a monitored {@code slotId} updates.
+   *
+   * @param slotId Indicates the card slot index number,
+   *   ranging from 0 to the maximum card slot index number supported by the device.
+   * @param imsType Indicates the ims service type of the {@link ImsServiceType}.
+   * @param callback including an instance of the {@link ImsRegInfo} class.
+   * @permission ohos.permission.GET_TELEPHONY_STATE
    * @systemapi Hide this for inner system use.
    * @since 9
    */
@@ -313,9 +326,10 @@ declare namespace radio {
 
 
   /**
-    * @systemapi Hide this for inner system use.
-    * @since 9
-    */
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
   function off(type: 'imsRegStateChange', slotId: number, imsType: ImsServiceType, callback?: Callback<ImsRegInfo>): void;
 
   /**
@@ -812,25 +826,40 @@ declare namespace radio {
     NETWORK_SELECTION_MANUAL
   }
 
-  export enum ImsRegState {
+  /**
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+   export enum ImsRegState {
     IMS_UNREGISTERED,
     IMS_REGISTERED,
   }
 
- export enum ImsRegTech{
+  /**
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  export enum ImsRegTech {
     REGISTRATION_TECH_NONE,
     REGISTRATION_TECH_LTE,
     REGISTRATION_TECH_IWLAN,
-    REGISTRATION_TECH_CROSS_SIM,
     REGISTRATION_TECH_NR,
   }
 
- export interface ImsRegInfo {
+  /**
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  export interface ImsRegInfo {
     imsRegState: ImsRegState;
     imsRegTech: ImsRegTech;
   }
 
- export enum ImsServiceType {
+  /**
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  export enum ImsServiceType {
     TYPE_VOICE,
     TYPE_VIDEO,
     TYPE_UT,

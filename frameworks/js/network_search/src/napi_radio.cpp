@@ -20,7 +20,6 @@
 #include <chrono>
 #include <unistd.h>
 
-#include "telephony_log_wrapper.h"
 #include "get_network_search_mode_callback.h"
 #include "set_network_search_mode_callback.h"
 #include "get_radio_state_callback.h"
@@ -30,6 +29,8 @@
 #include "set_preferred_network_callback.h"
 #include "core_service_client.h"
 #include "napi_ims_callback_manager.h"
+#include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1900,30 +1901,52 @@ static napi_value SetPrimarySlotId(napi_env env, napi_callback_info info)
 static void NativeGetImsRegInfo(napi_env env, void *data)
 {
     auto context = static_cast<GetImsRegInfoContext *>(data);
-    context->imsRegInfo = DelayedRefSingleton<CoreServiceClient>::GetInstance()
-        .GetImsRegStatus(context->slotId, static_cast<ImsServiceType>(context->imsSrvType));
-    TELEPHONY_LOGI("context->imsSrvType = %{public}d", context->imsSrvType);
-    context->resolved = true;
+    int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImsRegStatus(
+        context->slotId, static_cast<ImsServiceType>(context->imsSrvType), context->imsRegInfo);
+    TELEPHONY_LOGI("result is %{public}d", errorCode);
+    if (errorCode != TELEPHONY_SUCCESS) {
+        context->errorCode = ERROR_NATIVE_API_EXECUTE_FAIL;
+        context->resolved = false;
+    } else {
+        context->resolved = true;
+    }
 }
 
 static void GetImsRegInfoCallback(napi_env env, napi_status status, void *data)
 {
+    TELEPHONY_LOGI("status = %{public}d", status);
     auto context = static_cast<GetImsRegInfoContext *>(data);
     napi_value callbackValue = nullptr;
     if (status == napi_ok) {
+        TELEPHONY_LOGI("context->resolved = %{public}d", context->resolved);
         if (context->resolved) {
-            napi_get_undefined(env, &callbackValue);
+            napi_create_object(env, &callbackValue);
             NapiUtil::SetPropertyInt32(
                 env, callbackValue, "imsRegState", static_cast<int32_t>(context->imsRegInfo.imsRegState));
             NapiUtil::SetPropertyInt32(
                 env, callbackValue, "imsRegTech", static_cast<int32_t>(context->imsRegInfo.imsRegTech));
         } else {
-            callbackValue = NapiUtil::CreateErrorMessage(env, "GetImsRegInfo error");
+            callbackValue = NapiUtil::CreateErrorMessage(
+                env, "GetImsRegInfo failed! error code is " + std::to_string(context->errorCode));
         }
     } else {
         callbackValue = ParseErrorValue(env, context->errorCode, "GetImsRegInfoCallback error");
     }
-    NapiUtil::Handle1ValueCallback(env, context, callbackValue);
+    NapiUtil::Handle2ValueCallback(env, context, callbackValue);
+}
+
+static bool MatchGetImsRegInfoParameter(napi_env env, napi_value parameters[], size_t parameterCount)
+{
+    switch (parameterCount) {
+        case 2: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number });
+        }
+        case 3: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number, napi_function });
+        }
+        default:
+            return false;
+    }
 }
 
 static napi_value GetImsRegInfo(napi_env env, napi_callback_info info)
@@ -1933,7 +1956,7 @@ static napi_value GetImsRegInfo(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    NAPI_ASSERT(env, MatchSetPreferredNetworkParameter(env, parameters, parameterCount), "type mismatch");
+    NAPI_ASSERT(env, MatchGetImsRegInfoParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<GetImsRegInfoContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
     NAPI_CALL(env, napi_get_value_int32(env, parameters[1], &asyncContext->imsSrvType));
@@ -1948,7 +1971,7 @@ static void RegImsCallback(napi_env env, napi_value thisVar, int32_t slotId, int
 {
     int32_t ret = ERROR;
     ImsStateCallback imsStateCallback;
-    ImsRegInfo imsRegInfo = ERROR_IMS_REG_INFO;
+    ImsRegInfo imsRegInfo;
     imsStateCallback.env = env;
     imsStateCallback.thisVar = thisVar;
     imsStateCallback.slotId = slotId;
@@ -2281,6 +2304,46 @@ static napi_value InitEnumNrOptionMode(napi_env env, napi_value exports)
     return exports;
 }
 
+static napi_value InitEnumImsRegState(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "IMS_UNREGISTERED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(IMS_UNREGISTERED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "IMS_REGISTERED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(IMS_REGISTERED))),
+    };
+    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    return exports;
+}
+
+static napi_value InitEnumImsRegTech(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "REGISTRATION_TECH_NONE", NapiUtil::ToInt32Value(env, static_cast<int32_t>(IMS_REG_TECH_NONE))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "REGISTRATION_TECH_LTE", NapiUtil::ToInt32Value(env, static_cast<int32_t>(IMS_REG_TECH_LTE))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "REGISTRATION_TECH_IWLAN", NapiUtil::ToInt32Value(env, static_cast<int32_t>(IMS_REG_TECH_IWLAN))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "REGISTRATION_TECH_NR", NapiUtil::ToInt32Value(env, static_cast<int32_t>(IMS_REG_TECH_NR))),
+    };
+    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    return exports;
+}
+
+static napi_value InitEnumImsServiceType(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_VOICE", NapiUtil::ToInt32Value(env, static_cast<int32_t>(TYPE_VOICE))),
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_VIDEO", NapiUtil::ToInt32Value(env, static_cast<int32_t>(TYPE_VIDEO))),
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_UT", NapiUtil::ToInt32Value(env, static_cast<int32_t>(TYPE_UT))),
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_SMS", NapiUtil::ToInt32Value(env, static_cast<int32_t>(TYPE_SMS))),
+    };
+    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    return exports;
+}
+
 static napi_value CreateEnumConstructor(napi_env env, napi_callback_info info)
 {
     napi_value thisArg = nullptr;
@@ -2531,8 +2594,56 @@ static napi_value CreateNrOptionMode(napi_env env, napi_value exports)
     return exports;
 }
 
-EXTERN_C_START
-napi_value InitNapiRadioNetwork(napi_env env, napi_value exports)
+static napi_value CreateImsServiceType(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_VOICE", NapiUtil::ToInt32Value(env, static_cast<int32_t>(TYPE_VOICE))),
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_VIDEO", NapiUtil::ToInt32Value(env, static_cast<int32_t>(TYPE_VIDEO))),
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_UT", NapiUtil::ToInt32Value(env, static_cast<int32_t>(TYPE_UT))),
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_SMS", NapiUtil::ToInt32Value(env, static_cast<int32_t>(TYPE_SMS))),
+    };
+    napi_value result = nullptr;
+    napi_define_class(env, "ImsServiceType", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result);
+    napi_set_named_property(env, exports, "ImsServiceType", result);
+    return exports;
+}
+
+static napi_value CreateImsRegTech(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "REGISTRATION_TECH_NONE", NapiUtil::ToInt32Value(env, static_cast<int32_t>(IMS_REG_TECH_NONE))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "REGISTRATION_TECH_LTE", NapiUtil::ToInt32Value(env, static_cast<int32_t>(IMS_REG_TECH_LTE))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "REGISTRATION_TECH_IWLAN", NapiUtil::ToInt32Value(env, static_cast<int32_t>(IMS_REG_TECH_IWLAN))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "REGISTRATION_TECH_NR", NapiUtil::ToInt32Value(env, static_cast<int32_t>(IMS_REG_TECH_NR))),
+    };
+    napi_value result = nullptr;
+    napi_define_class(env, "ImsRegTech", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr, sizeof(desc) / sizeof(*desc),
+        desc, &result);
+    napi_set_named_property(env, exports, "ImsRegTech", result);
+    return exports;
+}
+
+static napi_value CreateImsRegState(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "IMS_UNREGISTERED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(IMS_UNREGISTERED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "IMS_REGISTERED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(IMS_REGISTERED))),
+    };
+    napi_value result = nullptr;
+    napi_define_class(env, "ImsRegState", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result);
+    napi_set_named_property(env, exports, "ImsRegState", result);
+    return exports;
+}
+
+static napi_value CreateFunctions(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("getRadioTech", GetRadioTech),
@@ -2562,6 +2673,13 @@ napi_value InitNapiRadioNetwork(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("off", ObserverOff),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    return exports;
+}
+
+EXTERN_C_START
+napi_value InitNapiRadioNetwork(napi_env env, napi_value exports)
+{
+    CreateFunctions(env, exports);
     InitEnumRadioType(env, exports);
     InitEnumNetworkType(env, exports);
     InitEnumRegStatus(env, exports);
@@ -2570,6 +2688,12 @@ napi_value InitNapiRadioNetwork(napi_env env, napi_value exports)
     InitEnumNetworkInformationState(env, exports);
     InitEnumPreferredNetwork(env, exports);
     InitEnumNrOptionMode(env, exports);
+    InitEnumImsRegState(env, exports);
+    InitEnumImsRegTech(env, exports);
+    InitEnumImsServiceType(env, exports);
+    CreateImsServiceType(env, exports);
+    CreateImsRegTech(env, exports);
+    CreateImsRegState(env, exports);
     CreateNrOptionMode(env, exports);
     CreatePreferredNetwork(env, exports);
     CreateNetworkInformationState(env, exports);
