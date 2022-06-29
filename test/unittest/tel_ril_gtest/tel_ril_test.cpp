@@ -452,7 +452,7 @@ void TelRilTest::EnterErrorPinTest(const std::shared_ptr<AppExecFwk::EventHandle
             telRilManager_->UnlockPin(slotId_, pin, event);
             TELEPHONY_LOGI("TelRilTest::EnterErrorPinTest --> finished");
             bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
-            ASSERT_TRUE(!syncResult);
+            ASSERT_TRUE(syncResult);
     }
 }
 
@@ -559,7 +559,7 @@ void TelRilTest::EnterErrorPin2Test(const std::shared_ptr<AppExecFwk::EventHandl
         telRilManager_->UnlockPin2(slotId_, pin2, event);
         TELEPHONY_LOGI("TelRilTest::EnterErrorPin2Test --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
-        ASSERT_TRUE(!syncResult);
+        ASSERT_TRUE(syncResult);
     }
 }
 
