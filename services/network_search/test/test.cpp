@@ -376,7 +376,7 @@ void TestRegisterImsStateCallback()
         std::cout << "please input imsSrvType(TYPE_VOICE = 0,TYPE_VIDEO = 1,"
             "TYPE_UT = 2,TYPE_SMS = 3):" << std::endl;
         std::cin >> imsSrvType;
-        ImsRegInfo imsRegInfo = ERROR_IMS_REG_INFO;
+        ImsRegInfo imsRegInfo;
         sptr<ImsVoiceCallbackStub> voiceCallback = new ImsVoiceCallbackTestStub(imsRegInfo);
         sptr<ImsVideoCallbackStub> videoCallback(new ImsVideoCallbackStub());
         sptr<ImsUtCallbackStub> utCallback(new ImsUtCallbackStub());
@@ -499,10 +499,13 @@ void TestGetImsRegStatus()
         std::cout << "please input imsSrvType(TYPE_VOICE = 0,TYPE_VIDEO = 1,"
             "TYPE_UT = 2,TYPE_SMS = 3):" << std::endl;
         std::cin >> imsSrvType;
-        ImsRegInfo result = g_telephonyService->GetImsRegStatus(slotId, static_cast<ImsServiceType>(imsSrvType));
-        std::cout << "imsRegState" << result.imsRegState << "imsRegTech" << result.imsRegTech << std::endl;
-        TELEPHONY_LOGI("TelephonyTestService::TestGetImsRegStatus result:%{public}d, %{public}d",
-            result.imsRegState, result.imsRegTech);
+        ImsRegInfo info;
+        int32_t ret = g_telephonyService->GetImsRegStatus(slotId, static_cast<ImsServiceType>(imsSrvType), info);
+        if (ret != SUCCESS) {
+            std::cout << "get ims register info failed! error code is" << ret << std::endl;
+        } else {
+            std::cout << "imsRegState" << info.imsRegState << "imsRegTech" << info.imsRegTech << std::endl;
+        }
     }
 }
 
