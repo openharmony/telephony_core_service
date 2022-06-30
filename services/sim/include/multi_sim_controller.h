@@ -69,6 +69,8 @@ private:
     bool InitShowNumber(int slotId);
     bool InitActive(int slotId);
     bool InitIccId(int slotId);
+    int32_t UpdateDataByIccId(int slotId, std::string newIccId);
+    int32_t InsertData(int slotId, std::string newIccId);
     bool GetListFromDataBase();
     void SortCache();
     std::u16string GetIccId(int32_t slotId);

@@ -56,6 +56,7 @@ enum class InputCmd {
     INPUT_GETSIMSUB = 10,
     INPUT_SETDEFAULTCALL = 11,
     INPUT_GETDEFAULTCALL = 12,
+    INPUT_GETSIMEONS = 13,
     INPUT_UNLOCK_PIN = 21,
     INPUT_UNLOCK_PUK = 22,
     INPUT_ALTER_PIN = 23,
@@ -245,6 +246,27 @@ static bool TestGetSimIccId()
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote GetSimIccId result [" << str << "] " << expect << std::endl;
+    return true;
+}
+
+static bool TestGetSimEons()
+{
+    int32_t slotId = 0;
+    std::cout << "please input soltId:"<< std::endl;
+    std::cin >> slotId;
+    std::string plmn = "46001";
+    std::cout << "please input plmn:"<< std::endl;
+    std::cin >> plmn;
+    int32_t lac = 1;
+    std::cout << "please input lac:"<< std::endl;
+    std::cin >> lac;
+    bool longNameRequired = true;
+    std::cout << "please input longNameRequired:"<< std::endl;
+    std::cin >> longNameRequired;
+    std::u16string result = g_telephonyService->GetSimEons(slotId, plmn, lac, longNameRequired);
+    std::string str = Str16ToStr8(result);
+    string expect = str.empty() ? "fail" : "success";
+    std::cout << "TelephonyTestService Remote GetSimEons result [" << str << "] " << expect << std::endl;
     return true;
 }
 
@@ -952,6 +974,7 @@ static void Prompt()
                  "10:GetSimAccountInfo\n"
                  "11:SetDefaultVoiceSlotId\n"
                  "12:GetDefaultVoiceSlotId\n"
+                 "13:GetSimEons\n"
                  "21:UnlockPin\n"
                  "22:UnlockPuk\n"
                  "23:AlterPin\n"
@@ -996,29 +1019,38 @@ static void InitFuncMap()
     g_funcMap[InputCmd::INPUT_GETISOCOUNTRYCODE] = TestGetISOCountryCodeForSim;
     g_funcMap[InputCmd::INPUT_GETSPN] = TestGetSimSpn;
     g_funcMap[InputCmd::INPUT_GETICCID] = TestGetSimIccId;
-    g_funcMap[InputCmd::INPUT_GETIMSI] = TestGetIMSI;
+    g_funcMap[InputCmd::INPUT_GETSIMEONS] = TestGetSimEons;
     g_funcMap[InputCmd::INPUT_ISSIMACTIVE] = TestIsSimActive;
     g_funcMap[InputCmd::INPUT_GETSIMOPERATOR] = TestGetSimOperatorNumeric;
     g_funcMap[InputCmd::INPUT_GETGID1] = TestGetSimGid1;
     g_funcMap[InputCmd::INPUT_GETSIMSUB] = TestGetSimSubscriptionInfo;
+    g_funcMap[InputCmd::INPUT_SET_ACTIVE_SIM] = TestSetActiveSim;
+    g_funcMap[InputCmd::INPUT_GETACTIVEACCOUNTLIST] = TestGetActiveSimAccountInfoList;
+    g_funcMap[InputCmd::INPUT_REFRESHSIMSTATE] = TestRefreshSimState;
+    g_funcMap[InputCmd::INPUT_GET_MAX_SIM_COUNT] = TestGetMaxSimCount;
+    g_funcMap[InputCmd::INPUT_GET_PHONENUMBER] = TestGetSimTelephoneNumber;
+    g_funcMap[InputCmd::INPUT_GET_SIM_TELENUMBER_IDENTIFIER] = TestGetSimTeleNumberIdentifier;
+    g_funcMap[InputCmd::INPUT_UNLOCK_SIMLOCK] = TestUnlockSimLock;
+}
+
+static void InitFuncMapExt()
+{
+    g_funcMap[InputCmd::INPUT_GETIMSI] = TestGetIMSI;
     g_funcMap[InputCmd::INPUT_SETDEFAULTCALL] = TestSetDefaultVoiceSlotId;
     g_funcMap[InputCmd::INPUT_GETDEFAULTCALL] = TestGetDefaultVoiceSlotId;
     g_funcMap[InputCmd::INPUT_UNLOCK_PIN] = TestUnlockPin;
     g_funcMap[InputCmd::INPUT_UNLOCK_PUK] = TestUnlockPuk;
     g_funcMap[InputCmd::INPUT_ALTER_PIN] = TestAlterPin;
+    g_funcMap[InputCmd::INPUT_SETSHOWNAME] = TestSetShowName;
+    g_funcMap[InputCmd::INPUT_SETSHOWNUMBER] = TestSetShowNumber;
     g_funcMap[InputCmd::INPUT_CHECK_LOCK] = TestGetLockState;
     g_funcMap[InputCmd::INPUT_ENABLE_LOCK] = TestSetLockState;
     g_funcMap[InputCmd::INPUT_UNLOCK_PIN2] = TestUnlockPin2;
     g_funcMap[InputCmd::INPUT_UNLOCK_PUK2] = TestUnlockPuk2;
     g_funcMap[InputCmd::INPUT_ALTER_PIN2] = TestAlterPin2;
-    g_funcMap[InputCmd::INPUT_SET_ACTIVE_SIM] = TestSetActiveSim;
-    g_funcMap[InputCmd::INPUT_SETSHOWNUMBER] = TestSetShowNumber;
-    g_funcMap[InputCmd::INPUT_SETSHOWNAME] = TestSetShowName;
     g_funcMap[InputCmd::INPUT_GETSHOWNUMBER] = TestGetShowNumber;
     g_funcMap[InputCmd::INPUT_GETSHOWNAME] = TestGetShowName;
-    g_funcMap[InputCmd::INPUT_GETACTIVEACCOUNTLIST] = TestGetActiveSimAccountInfoList;
     g_funcMap[InputCmd::INPUT_GETOPERATORCONFIG] = TestGetOperatorConfig;
-    g_funcMap[InputCmd::INPUT_REFRESHSIMSTATE] = TestRefreshSimState;
     g_funcMap[InputCmd::INPUT_GET_VOICEMAIL_NAME] = TestGetVoiceMailIdentifier;
     g_funcMap[InputCmd::INPUT_GET_VOICEMAIL_NUMBER] = TestGetVoiceMailNumber;
     g_funcMap[InputCmd::INPUT_DIALLING_NUMBERS_GET] = TestQueryIccDiallingNumbers;
@@ -1026,14 +1058,13 @@ static void InitFuncMap()
     g_funcMap[InputCmd::INPUT_DIALLING_NUMBERS_DELETE] = TestDelIccDiallingNumbers;
     g_funcMap[InputCmd::INPUT_DIALLING_NUMBERS_UPDATE] = TestUpdateIccDiallingNumbers;
     g_funcMap[InputCmd::INPUT_SET_VOICEMAIL] = TestSetVoiceMailInfo;
-    g_funcMap[InputCmd::INPUT_GET_MAX_SIM_COUNT] = TestGetMaxSimCount;
     g_funcMap[InputCmd::INPUT_STK_CMD_FROM_APP] = TestSendEnvelopeCmd;
     g_funcMap[InputCmd::INPUT_STK_TERMINAL_RESPONSE] = TestSendTerminalResponseCmd;
-    g_funcMap[InputCmd::INPUT_GET_PHONENUMBER] = TestGetSimTelephoneNumber;
-    g_funcMap[InputCmd::INPUT_GET_SIM_TELENUMBER_IDENTIFIER] = TestGetSimTeleNumberIdentifier;
+    g_funcMap[InputCmd::INPUT_STK_CALL_SETUP_REQUEST_RESULT_FROM_APP] = TestSendCallSetupRequestResult;
+    g_funcMap[InputCmd::INPUT_GET_OPKEY] = TestGetOpKey;
+    g_funcMap[InputCmd::INPUT_GET_OPNAME] = TestGetOpName;
     g_funcMap[InputCmd::INPUT_GET_CARD_TYPE] = TestGetCardType;
     g_funcMap[InputCmd::INPUT_HAS_OPERATOR_PRIVILEGES] = TestHasOperatorPrivileges;
-    g_funcMap[InputCmd::INPUT_UNLOCK_SIMLOCK] = TestUnlockSimLock;
     g_funcMap[InputCmd::INPUT_SET_PRIMARY_SLOTID] = TestSetPrimarySlotId;
     g_funcMap[InputCmd::INPUT_GET_PRIMARY_SLOTID] = TestGetPrimarySlotId;
     g_funcMap[InputCmd::INPUT_QUIT] = TestQuit;
@@ -1086,6 +1117,7 @@ int main()
     OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(subScriber);
 
     InitFuncMap();
+    InitFuncMapExt();
     bool loopFlag = true;
     while (loopFlag) {
         Prompt();

@@ -299,7 +299,6 @@ void SimFile::ProcessSpnGeneral(const AppExecFwk::InnerEvent::Pointer &event)
         AppExecFwk::InnerEvent::Pointer eventCphs = BuildCallerInfo(MSG_SIM_OBTAIN_SPN_DONE);
         fileController_->ObtainBinaryFile(ELEMENTARY_FILE_SPN_CPHS, eventCphs);
         fileToGet_++;
-        displayConditionOfSpn_ = SPN_INVALID;
     }
 }
 
@@ -313,7 +312,7 @@ void SimFile::ProcessSpnCphs(const AppExecFwk::InnerEvent::Pointer &event)
         if (spn.empty() || !spn.size()) {
             spnStatus_ = SpnStatus::OBTAIN_OPERATOR_NAME_SHORTFORM;
         } else {
-            displayConditionOfSpn_ = SPN_COND;
+            displayConditionOfSpn_ = 0;
             TELEPHONY_LOGI("SimFile Load ELEMENTARY_FILE_SPN_CPHS done: %{public}s", spn.c_str());
             spnStatus_ = SpnStatus::OBTAIN_SPN_NONE;
         }
@@ -338,7 +337,7 @@ void SimFile::ProcessSpnShortCphs(const AppExecFwk::InnerEvent::Pointer &event)
         if (spn.empty() || !spn.size()) {
             TELEPHONY_LOGI("SimFile No SPN loaded");
         } else {
-            displayConditionOfSpn_ = SPN_COND;
+            displayConditionOfSpn_ = 0;
             TELEPHONY_LOGI("SimFile Load ELEMENTARY_FILE_SPN_SHORT_CPHS");
         }
     } else {
@@ -390,18 +389,17 @@ void SimFile::ParsePnn(const std::vector<std::string> &records)
             continue;
         }
         unsigned char *tlv = data.get();
-        int tlvLen = (int)strlen((char *)tlv);
         std::shared_ptr<PlmnNetworkName> file = std::make_shared<PlmnNetworkName>();
         int tagAndLength = NETWORK_NAME_LENGTH + 1;
-        if (tlvLen > tagAndLength) {
-            if (tlvLen >= (tagAndLength + (int)tlv[NETWORK_NAME_LENGTH]) &&
+        if (recordLen > tagAndLength) {
+            if (recordLen >= (tagAndLength + (int)tlv[NETWORK_NAME_LENGTH]) &&
                 tlv[NETWORK_NAME_IEI] == (unsigned char)LONG_NAME_FLAG) {
                 file->longName =
                     SIMUtils::Gsm7bitConvertToString(tlv + NETWORK_NAME_TEXT_STRING, tlv[NETWORK_NAME_LENGTH] - 1);
             }
             int shortNameOffset = tagAndLength + tlv[NETWORK_NAME_LENGTH];
-            if (tlvLen > (shortNameOffset + tagAndLength)) {
-                if (tlvLen >= (shortNameOffset + tagAndLength + (int)tlv[shortNameOffset + NETWORK_NAME_LENGTH]) &&
+            if (recordLen > (shortNameOffset + tagAndLength)) {
+                if (recordLen >= (shortNameOffset + tagAndLength + (int)tlv[shortNameOffset + NETWORK_NAME_LENGTH]) &&
                     tlv[shortNameOffset + NETWORK_NAME_IEI] == (unsigned char)SHORT_NAME_FLAG) {
                     file->shortName =
                         SIMUtils::Gsm7bitConvertToString(tlv + (shortNameOffset + NETWORK_NAME_TEXT_STRING),
@@ -1208,15 +1206,19 @@ SimFile::~SimFile()
 int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
 {
     unsigned int cond = 0;
-    if (ObtainSPN().empty() || (displayConditionOfSpn_ == SPN_INVALID)) {
+    if (displayConditionOfSpn_ <= SPN_INVALID) {
+        return cond;
+    }
+    if (roaming) {
         cond = SPN_CONDITION_DISPLAY_PLMN;
-    } else if (!roaming || !operatorNum.empty()) {
+        if (((unsigned int)(displayConditionOfSpn_) & (unsigned int)(SPN_COND)) == 0) {
+            cond |= (unsigned int)SPN_CONDITION_DISPLAY_SPN;
+        }
+    } else {
         cond = SPN_CONDITION_DISPLAY_SPN;
         if (((unsigned int)(displayConditionOfSpn_) & (unsigned int)(SPN_COND_PLMN)) == SPN_COND_PLMN) {
             cond |= (unsigned int)SPN_CONDITION_DISPLAY_PLMN;
         }
-    } else {
-        cond = SPN_CONDITION_DISPLAY_SPN;
     }
     return cond;
 }

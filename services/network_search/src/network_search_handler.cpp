@@ -293,6 +293,9 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
     } else {
         networkSearchManager->SetRadioStateValue(slotId_, CORE_SERVICE_POWER_NOT_AVAILABLE);
     }
+    if (operatorName_ != nullptr) {
+        operatorName_->NotifySpnChanged();
+    }
 }
 
 void NetworkSearchHandler::RadioRestrictedState(const AppExecFwk::InnerEvent::Pointer &event)

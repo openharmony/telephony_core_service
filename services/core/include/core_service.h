@@ -91,6 +91,8 @@ public:
 
     std::u16string GetSimGid1(int32_t slotId) override;
 
+    std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired) override;
+
     bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
         const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
         const sptr<INetworkSearchCallback> &callback) override;
@@ -183,6 +185,9 @@ public:
     bool SendUpdateCellLocationRequest(int32_t slotId) override;
 
     bool HasOperatorPrivileges(const int32_t slotId) override;
+
+    int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
+        SimAuthenticationResponse &response) override;
 
     int32_t RegImsCallback(MessageParcel &data) override;
 

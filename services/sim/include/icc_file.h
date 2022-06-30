@@ -62,7 +62,7 @@ public:
     std::string ObtainMsisdnAlphaStatus();
     std::string ObtainVoiceMailNumber();
     std::string ObtainSPN();
-    std::string ObtainEons(std::string plmn, int32_t lac, bool longNameRequired);
+    std::string ObtainEons(const std::string &plmn, int32_t lac, bool longNameRequired);
     std::string ObtainVoiceMailInfo();
     bool ObtainFilesFetched();
     std::string ObtainIccLanguage();

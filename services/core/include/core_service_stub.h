@@ -30,6 +30,7 @@ public:
 private:
     void AddHandlerNetWorkToMap();
     void AddHandlerSimToMap();
+    void AddHandlerSimToMapExt();
 
 private:
     using CoreServiceFunc = int32_t (CoreServiceStub::*)(MessageParcel &data, MessageParcel &reply);
@@ -64,7 +65,7 @@ private:
     int32_t OnIsSimActive(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetLocaleFromDefaultSim(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimGid1(MessageParcel &data, MessageParcel &reply);
-
+    int32_t OnGetSimEons(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimSubscriptionInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetDefaultVoiceSlotId(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetDefaultVoiceSlotId(MessageParcel &data, MessageParcel &reply);
@@ -102,6 +103,7 @@ private:
     int32_t OnSendEnvelopeCmd(MessageParcel &data, MessageParcel &reply);
     int32_t OnSendTerminalResponseCmd(MessageParcel &data, MessageParcel &reply);
     int32_t OnHasOperatorPrivileges(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSimAuthentication(MessageParcel &data, MessageParcel &reply);
     int32_t OnUnlockSimLock(MessageParcel &data, MessageParcel &reply);
     int32_t OnRegImsCallback(MessageParcel &data, MessageParcel &reply);
     int32_t OnUnRegImsCallback(MessageParcel &data, MessageParcel &reply);

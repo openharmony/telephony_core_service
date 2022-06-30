@@ -373,6 +373,17 @@ bool SimManager::HasOperatorPrivileges(const int32_t slotId)
     return simAccountManager_[slotId]->HasOperatorPrivileges(slotId);
 }
 
+int32_t SimManager::SimAuthentication(
+    int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response)
+{
+    TELEPHONY_LOGI("SimManager::SimAuthentication slotId:%{public}d", slotId);
+    if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simStateManager_ can not be null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simStateManager_[slotId]->SimAuthentication(slotId, aid, authData, response);
+}
+
 bool SimManager::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
 {
     if ((!IsValidSlotId(slotId)) || (stkManager_[slotId] == nullptr)) {
@@ -418,7 +429,8 @@ std::u16string SimManager::GetSimSpn(int32_t slotId)
     return simFileManager_[slotId]->GetSimSpn();
 }
 
-std::u16string SimManager::GetSimEons(int32_t slotId, std::string plmn, int32_t lac, bool longNameRequired)
+std::u16string SimManager::GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac,
+    bool longNameRequired)
 {
     if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simFileManager is null");
