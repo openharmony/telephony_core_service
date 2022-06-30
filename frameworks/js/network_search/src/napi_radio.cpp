@@ -15,9 +15,9 @@
 
 #include "napi_radio.h"
 
+#include <chrono>
 #include <cstring>
 #include <memory>
-#include <chrono>
 #include <unistd.h>
 
 #include "get_network_search_mode_callback.h"
