@@ -110,7 +110,7 @@ bool SimNumberDecode::BcdToChar(const uint8_t bcdCode, char &result, const int b
         TELEPHONY_LOGE("Unknow bcdExtType:[%{public}d]", bcdExtType);
         return false;
     }
-    if (surplus >= extendedPtr->size()) {
+    if (static_cast<size_t>(surplus) >= extendedPtr->size()) {
         TELEPHONY_LOGE("Unknow bcdCode:[%{public}d]", bcdCode);
         return false;
     }
