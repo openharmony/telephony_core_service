@@ -1064,6 +1064,12 @@ std::shared_ptr<NetworkSearchManagerInner> NetworkSearchManager::FindManagerInne
 
 void NetworkSearchManager::ClearManagerInner()
 {
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+        auto inner = FindManagerInner(slotId);
+        if (inner != nullptr) {
+            inner->networkSearchHandler_->UnregisterEvents();
+        }
+    }
     std::lock_guard<std::mutex> lock(mutexInner_);
     mapManagerInner_.clear();
 }

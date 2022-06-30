@@ -68,11 +68,6 @@ NetworkSearchHandler::NetworkSearchHandler(const std::shared_ptr<AppExecFwk::Eve
       simManager_(simManager), slotId_(slotId)
 {}
 
-NetworkSearchHandler::~NetworkSearchHandler()
-{
-    UnregisterEvents();
-}
-
 bool NetworkSearchHandler::Init()
 {
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
@@ -136,10 +131,8 @@ bool NetworkSearchHandler::InitOperatorName()
         TELEPHONY_LOGE("failed to create new operatorName slotId:%{public}d", slotId_);
         return false;
     }
-    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(operatorName_)) {
-        TELEPHONY_LOGE("failed to subscribe COMMON_EVENT_OPERATOR_CONFIG_CHANGED slotId:%{public}d", slotId_);
-        return false;
-    }
+    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(operatorName_);
+    TELEPHONY_LOGI("NetworkSearchHandler::InitOperatorName subscribeResult = %{public}d", subscribeResult);
     return true;
 }
 
