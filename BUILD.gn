@@ -152,6 +152,7 @@ ohos_shared_library("tel_core_service") {
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "i18n:zone_util",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "netmanager_base:net_conn_manager_if",
     "power_manager_native:powermgr_client",
@@ -161,7 +162,6 @@ ohos_shared_library("tel_core_service") {
     "ril_device_driver_interface:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "startup_l2:syspara",
     "time_native:time_service",
     "utils_base:utils",
   ]

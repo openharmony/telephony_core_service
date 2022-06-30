@@ -76,10 +76,10 @@ ohos_shared_library("tel_core_service_api") {
 
   external_deps = [
     "eventhandler:libeventhandler",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "ril_device_driver_interface:hril_innerkits",
     "samgr_standard:samgr_proxy",
-    "startup_l2:syspara",
     "utils_base:utils",
   ]
 
