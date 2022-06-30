@@ -77,7 +77,8 @@ static bool parseSimpleTLV(std::string::const_iterator &it, const std::string::c
     /* begin parse value */
     value.clear();
     const auto valueCharLen = len + len;
-    if (inputSize < IccOperatorRule::TLV_STAG_CHARLEN + IccOperatorRule::TLV_LEN_CHARLEN + valueCharLen) {
+    if (static_cast<int>(inputSize) <
+        IccOperatorRule::TLV_STAG_CHARLEN + IccOperatorRule::TLV_LEN_CHARLEN + valueCharLen) {
         std::string temp(it, ed);
         TELEPHONY_LOGE("parseSimpleTLV from '%{public}s' size:%{public}zu < %{public}d", temp.data(), inputSize,
             IccOperatorRule::TLV_STAG_CHARLEN + IccOperatorRule::TLV_LEN_CHARLEN + valueCharLen);

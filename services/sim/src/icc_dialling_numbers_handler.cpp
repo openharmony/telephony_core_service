@@ -422,7 +422,7 @@ void IccDiallingNumbersHandler::FillNumberFiledForDiallingNumber(
         return;
     }
     TELEPHONY_LOGI(" get result from SimNumberDecode::NumberConvertToBCD !! size:%{public}zu", bcdCodes.size());
-    for (int i = 0; i < bcdCodes.size(); ++i) {
+    for (size_t i = 0; i < bcdCodes.size(); ++i) {
         diallingNumberString[offSet + TON_NPI_NUMBER + i] = bcdCodes.at(i);
     }
     int index = offSet + BCD_NUMBER_BYTES;
