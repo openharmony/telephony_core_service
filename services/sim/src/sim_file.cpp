@@ -603,7 +603,6 @@ bool SimFile::ProcessGetMbiDone(const AppExecFwk::InnerEvent::Pointer &event)
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
-    bool isValidMbdn = false;
     char *rawData = const_cast<char *>(iccData.c_str());
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
     if (fd->exception == nullptr) {
@@ -613,9 +612,6 @@ bool SimFile::ProcessGetMbiDone(const AppExecFwk::InnerEvent::Pointer &event)
         if (index != 0 && index != BYTE_NUM) {
             indexOfMailbox_ = index;
             TELEPHONY_LOGI("fetch valid mailbox number for MBDN");
-            isValidMbdn = true;
-        } else {
-            isValidMbdn = true;
         }
     }
     TELEPHONY_LOGI("ELEMENTARY_FILE_MBI data is:%{public}s id: %{public}d", fileData, indexOfMailbox_);
