@@ -509,8 +509,7 @@ void NativeGetCardType(napi_env env, void *data)
         return;
     }
     AsyncContext<int32_t> *asyncContext = static_cast<AsyncContext<int32_t> *>(data);
-    asyncContext->callbackVal =
-        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCardType(asyncContext->slotId);
+    asyncContext->callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCardType(asyncContext->slotId);
     asyncContext->context.resolved = true;
 }
 
@@ -752,9 +751,7 @@ napi_value UnlockPin(napi_env env, napi_callback_info info)
     BaseContext &context = pinContext->asyncContext.context;
     char tmpStr[kMaxNumberLen + 1] = {0};
 
-    auto initPara =
-        std::make_tuple(&pinContext->asyncContext.slotId, tmpStr,
-                        &context.callbackRef);
+    auto initPara = std::make_tuple(&pinContext->asyncContext.slotId, tmpStr, &context.callbackRef);
     AsyncPara para {
         .funcName = "UnlockPin",
         .env = env,
@@ -803,8 +800,7 @@ napi_value UnlockPuk(napi_env env, napi_callback_info info)
     char tmpStr1[kMaxNumberLen + 1] = {0};
     char tmpStr2[kMaxNumberLen + 1] = {0};
 
-    auto initPara = std::make_tuple(&pukContext->asyncContext.slotId, tmpStr1,
-        tmpStr2, &context.callbackRef);
+    auto initPara = std::make_tuple(&pukContext->asyncContext.slotId, tmpStr1, tmpStr2, &context.callbackRef);
     AsyncPara para {
         .funcName = "UnlockPuk",
         .env = env,
@@ -830,8 +826,7 @@ void NativeAlterPin(napi_env env, void *data)
     AsyncContextPIN *alterPinContext = static_cast<AsyncContextPIN *>(data);
     LockStatusResponse response {ERROR_DEFAULT, ERROR_DEFAULT};
     bool res = DelayedRefSingleton<CoreServiceClient>::GetInstance().AlterPin(alterPinContext->asyncContext.slotId,
-        NapiUtil::ToUtf16(alterPinContext->inStr1.data()), NapiUtil::ToUtf16(alterPinContext->inStr2.data()),
-        response);
+        NapiUtil::ToUtf16(alterPinContext->inStr1.data()), NapiUtil::ToUtf16(alterPinContext->inStr2.data()), response);
     TELEPHONY_LOGI("NAPI NativeAlterPin %{public}d", res);
     if (res) {
         alterPinContext->result = response.result;
@@ -856,8 +851,7 @@ napi_value AlterPin(napi_env env, napi_callback_info info)
 
     char tmpStr1[kMaxNumberLen + 1] = {0};
     char tmpStr2[kMaxNumberLen + 1] = {0};
-    auto initPara = std::make_tuple(&alterPinContext->asyncContext.slotId, tmpStr1,
-        tmpStr2, &context.callbackRef);
+    auto initPara = std::make_tuple(&alterPinContext->asyncContext.slotId, tmpStr1, tmpStr2, &context.callbackRef);
     AsyncPara para {
         .funcName = "AlterPin",
         .env = env,
@@ -1142,8 +1136,7 @@ napi_value UnlockPin2(napi_env env, napi_callback_info info)
     BaseContext &context = pinContext->asyncContext.context;
 
     char tmpStr[kMaxNumberLen + 1] = {0};
-    auto initPara =
-        std::make_tuple(&pinContext->asyncContext.slotId, tmpStr, &context.callbackRef);
+    auto initPara = std::make_tuple(&pinContext->asyncContext.slotId, tmpStr, &context.callbackRef);
     AsyncPara para {
         .funcName = "UnlockPin2",
         .env = env,
@@ -1243,8 +1236,7 @@ napi_value AlterPin2(napi_env env, napi_callback_info info)
     char tmpStr1[kMaxNumberLen + 1] = {0};
     char tmpStr2[kMaxNumberLen + 1] = {0};
 
-    auto initPara = std::make_tuple(&pinContext->asyncContext.slotId, tmpStr1,
-        tmpStr2, &context.callbackRef);
+    auto initPara = std::make_tuple(&pinContext->asyncContext.slotId, tmpStr1, tmpStr2, &context.callbackRef);
     AsyncPara para {
         .funcName = "AlterPin2",
         .env = env,
@@ -1783,8 +1775,8 @@ void NativeUnlockSimLock(napi_env env, void *data)
     AsyncContextPIN *asyncContext = static_cast<AsyncContextPIN *>(data);
 
     LockStatusResponse response {ERROR_DEFAULT, ERROR_DEFAULT};
-    PersoLockInfo lockInfo {
-        static_cast<PersoLockType>(asyncContext->pinEnable), NapiUtil::ToUtf16(asyncContext->inStr1.data())};
+    PersoLockInfo lockInfo { static_cast<PersoLockType>(asyncContext->pinEnable),
+        NapiUtil::ToUtf16(asyncContext->inStr1.data()) };
     bool result = DelayedRefSingleton<CoreServiceClient>::GetInstance().UnlockSimLock(
         asyncContext->asyncContext.slotId, lockInfo, response);
     TELEPHONY_LOGI("NAPI NativeUnlockSimLock %{public}d", result);
