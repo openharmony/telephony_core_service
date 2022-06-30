@@ -41,7 +41,7 @@ public:
         const std::weak_ptr<NetworkSearchManager> &networkSearchManager,
         const std::weak_ptr<ITelRilManager> &telRilManager, const std::weak_ptr<ISimManager> &simManager,
         int32_t slotId);
-    virtual ~NetworkSearchHandler();
+    virtual ~NetworkSearchHandler() = default;
     bool Init();
     void RegisterEvents();
     void UnregisterEvents();
