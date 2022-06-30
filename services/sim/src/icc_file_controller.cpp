@@ -89,17 +89,28 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     IccFileData *result = &(rcvMsg->fileData);
     std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
-    const char *iccDdata = (result->resultData).c_str();
-    char *rawData = const_cast<char *>(iccDdata);
-    unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData); // for unsigned int bitwise
-    TELEPHONY_LOGI("ProcessRecordSize --- fileData: --- %{public}s", fileData);
-    path = CheckRightPath(hd->filePath, hd->fileId);
-    if (!IsValidSizeData(fileData)) {
-        TELEPHONY_LOGE("ProcessRecordSize get error filetype");
+    if (result == nullptr) {
+        TELEPHONY_LOGE("result is nullptr");
+        return;
     }
-    GetFileAndDataSize(fileData, hd->fileSize, size);
-    if (hd->fileSize != 0) {
-        hd->countFiles = size / hd->fileSize;
+    TELEPHONY_LOGI("ProcessRecordSize --- resultData: --- %{public}s", result->resultData.c_str());
+    int recordLen = 0;
+    std::shared_ptr<unsigned char> rawData = SIMUtils::HexStringConvertToBytes(result->resultData, recordLen);
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr");
+        return;
+    }
+    unsigned char *fileData = rawData.get();
+    path = CheckRightPath(hd->filePath, hd->fileId);
+    if (recordLen > LENGTH_OF_RECORD) {
+        if (!IsValidSizeData(fileData)) {
+            TELEPHONY_LOGE("ProcessRecordSize get error filetype");
+            return;
+        }
+        GetFileAndDataSize(fileData, hd->fileSize, size);
+        if (hd->fileSize != 0) {
+            hd->countFiles = size / hd->fileSize;
+        }
     }
     TELEPHONY_LOGI("ProcessRecordSize %{public}d %{public}d %{public}d", size, hd->fileSize, hd->countFiles);
     if (telRilManager_ != nullptr) {
@@ -533,6 +544,10 @@ void IccFileController::ParseFileSize(int val[], int len, const unsigned char *d
 }
 bool IccFileController::IsValidSizeData(const unsigned char *data)
 {
+    if (data == nullptr) {
+        TELEPHONY_LOGE("IccFileTypeMismatch ERROR nullptr");
+        return false;
+    }
     if (ICC_ELEMENTARY_FILE != data[TYPE_OF_FILE]) {
         TELEPHONY_LOGE("IccFileTypeMismatch ERROR TYPE_OF_FILE");
         return false;
@@ -545,33 +560,11 @@ bool IccFileController::IsValidSizeData(const unsigned char *data)
 }
 void IccFileController::GetFileAndDataSize(const unsigned char *data, int &fileSize, int &dataSize)
 {
-    if (data != nullptr) {
-        int dataCount;
-        fileSize = HexConversionDec(data[INDEX_OF_SIZE], data[INDEX_OF_SIZE + 1]);
-        dataCount = HexConversionDec(data[INDEX_OF_COUNT], data[INDEX_OF_COUNT + 1]);
-        TELEPHONY_LOGI("ParseFileSize result %{public}d %{public}d", fileSize, dataCount);
-        dataSize = fileSize * dataCount;
+    if (data == nullptr) {
+        return;
     }
-}
-
-int IccFileController::HexConversionDec(const unsigned char hexTens, const unsigned char hexSingle)
-{
-    unsigned int decTens = 0, decSingle = 0;
-    unsigned int four = 4, ten = 10;
-    if (hexTens >= '0' && hexTens <= '9') {
-        decTens = (unsigned int)(hexTens - '0') << four;
-    }
-    if (hexTens >= 'A' && hexTens <= 'F') {
-        decTens = (unsigned int)(hexTens - 'A' + ten) << four;
-    }
-    if (hexSingle >= '0' && hexSingle <= '9') {
-        decSingle = (unsigned int)(hexSingle - '0');
-    }
-    if (hexSingle >= 'A' && hexSingle <= 'F') {
-        decSingle = (unsigned int)(hexSingle - 'A' + ten);
-    }
-    TELEPHONY_LOGI("HexConversionDec result %{public}d %{public}d", decTens, decSingle);
-    return (int)(decTens + decSingle);
+    fileSize = data[LENGTH_OF_RECORD] & BYTE_NUM;
+    dataSize = ((data[SIZE_ONE_OF_FILE] & BYTE_NUM) << OFFSET) + (data[SIZE_TWO_OF_FILE] & BYTE_NUM);
 }
 
 void IccFileController::SetRilManager(std::shared_ptr<Telephony::ITelRilManager> ril)

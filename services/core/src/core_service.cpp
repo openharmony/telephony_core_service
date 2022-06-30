@@ -389,6 +389,15 @@ std::u16string CoreService::GetSimGid1(int32_t slotId)
     return simManager_->GetSimGid1(slotId);
 }
 
+std::u16string CoreService::GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired)
+{
+    TELEPHONY_LOGI("CoreService::GetSimEons(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        return std::u16string();
+    }
+    return simManager_->GetSimEons(slotId, plmn, lac, longNameRequired);
+}
+
 bool CoreService::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
@@ -862,6 +871,19 @@ bool CoreService::HasOperatorPrivileges(const int32_t slotId)
         return false;
     }
     return simManager_->HasOperatorPrivileges(slotId);
+}
+
+int32_t CoreService::SimAuthentication(
+    int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    TELEPHONY_LOGI("CoreService::SimAuthentication(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        return false;
+    }
+    return simManager_->SimAuthentication(slotId, aid, authData, response);
 }
 
 int32_t CoreService::RegImsCallback(MessageParcel &data)

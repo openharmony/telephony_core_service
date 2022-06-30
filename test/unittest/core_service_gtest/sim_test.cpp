@@ -1115,6 +1115,38 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockSimLock_0100, Function | MediumTest | Leve
 }
 
 /**
+ * @tc.number   Telephony_Sim_SimAuthentication_0100
+ * @tc.name     Sim authentication
+ * @tc.desc     Function test
+ */
+void SimAuthenticationTestFunc(CoreServiceTestHelper &helper)
+{
+    SimAuthenticationResponse response = { 0 };
+    std::string aid = "aa";
+    std::string authData = "1234";
+    int32_t result = SimTest::telephonyService_->SimAuthentication(SimTest::slotId_, aid, authData, response);
+    helper.SetBoolResult(result == 0);
+    helper.NotifyAll();
+}
+
+HWTEST_F(SimTest, Telephony_Sim_SimAuthentication_0100, Function | MediumTest | Level3)
+{
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        SimTest::telephonyService_ = GetProxy();
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(SimAuthenticationTestFunc, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            bool result = helper.GetBoolResult();
+            EXPECT_TRUE(result);
+        }
+    }
+}
+
+/**
  * @tc.number   Telephony_Sim_SetPrimarySlotId_0100
  * @tc.name     Set primary slotId
  * @tc.desc     Function test

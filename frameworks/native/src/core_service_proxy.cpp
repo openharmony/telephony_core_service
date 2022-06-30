@@ -804,6 +804,35 @@ std::u16string CoreServiceProxy::GetSimGid1(int32_t slotId)
     return result;
 }
 
+std::u16string CoreServiceProxy::GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac,
+    bool longNameRequired)
+{
+    if (!IsValidSlotId(slotId)) {
+        return Str8ToStr16("");
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetSimEons WriteInterfaceToken is false");
+        return Str8ToStr16("");
+    }
+    data.WriteInt32(slotId);
+    data.WriteString(plmn);
+    data.WriteInt32(lac);
+    data.WriteBool(longNameRequired);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("GetSimEons Remote is null");
+        return Str8ToStr16("");
+    }
+    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_EONS), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetSimEons failed, error code is %{public}d", st);
+        return Str8ToStr16("");
+    }
+    return reply.ReadString16();
+}
+
 bool CoreServiceProxy::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
 {
     TELEPHONY_LOGI("GetSimAccountInfo slotId = %{public}d", slotId);
@@ -2059,6 +2088,35 @@ bool CoreServiceProxy::HasOperatorPrivileges(const int32_t slotId)
     bool result = reply.ReadBool();
     TELEPHONY_LOGI("HasOperatorPrivileges end: result=%{public}d \n", result);
     return result;
+}
+
+int32_t CoreServiceProxy::SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
+    SimAuthenticationResponse &response)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("SimAuthentication WriteInterfaceToken is false");
+        return ERROR;
+    }
+    data.WriteInt32(slotId);
+    data.WriteString(aid);
+    data.WriteString(authData);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("SimAuthentication Remote is null");
+        return ERROR;
+    }
+    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::SIM_AUTHENTICATION), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("SimAuthentication failed, error code is %{public}d", st);
+        return ERROR;
+    }
+    response.sw1 = reply.ReadInt32();
+    response.sw2 = reply.ReadInt32();
+    response.response = reply.ReadString();
+    TELEPHONY_LOGI("SimAuthentication end: result=%{public}d", st);
+    return ERR_NONE;
 }
 
 bool CoreServiceProxy::IsNrSupported(int32_t slotId)

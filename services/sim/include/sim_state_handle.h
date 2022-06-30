@@ -79,6 +79,8 @@ const int MSG_SIM_UNLOCK_PIN2_REMAIN_DONE = 34;
 // Unlock simlock
 const int MSG_SIM_UNLOCK_SIMLOCK_DONE = 51;
 
+const int MSG_SIM_AUTHENTICATION_DONE = 61;
+
 // pin lock type
 const std::string FAC_PIN_LOCK = "SC";
 // change pin2 type
@@ -119,6 +121,8 @@ public:
     bool IsIccReady();
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
+    int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData);
+    SimAuthenticationResponse GetSimAuthenticationResponse();
 
 private:
     void SyncCmdResponse();
@@ -137,12 +141,14 @@ private:
     void SimLockStateEscape(int32_t simState, int32_t slotId, LockReason &reason);
     void NotifySimLock(int slotId);
     void GetUnlockSimLockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
+    void GetSimAuthenticationResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     int32_t oldSimType_ = ICC_UNKNOWN_TYPE;
     int32_t oldSimStatus_ = ICC_CONTENT_UNKNOWN;
     int32_t slotId_ = DEFAULT_SIM_SLOT_ID;
     UnlockData unlockRespon_ = {0};
+    SimAuthenticationResponse simAuthRespon_ = {0};
     LockStatusResponse simlockRespon_ = {0};
     IccState iccState_; // icc card states
     SimState externalState_; // need to broadcast sim state;

@@ -221,6 +221,8 @@ enum LockMsg {
     MSG_SIM_SPN_UPDATED = 0xf5
 };
 
+enum SpnType { SPN_INVALID = -1, SPN_COND_PLMN = 1, SPN_COND = 2 };
+
 enum SpnShowType {
     SPN_CONDITION_DISPLAY_SPN = 0x01,
     SPN_CONDITION_DISPLAY_PLMN = 0x02

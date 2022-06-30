@@ -23,7 +23,6 @@
 #include "hril_network_parcel.h"
 #include "network_search_manager.h"
 #include "resource_utils.h"
-#include "sim_constant.h"
 #include "telephony_log_wrapper.h"
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;
@@ -31,13 +30,45 @@ using namespace OHOS::EventFwk;
 namespace OHOS {
 namespace Telephony {
 const int32_t FORMAT_IDX_SPN_CS = 0;
-const int32_t PNN_OVERRIDE_STRING_SIZE = 2;
-const int32_t OPL_OVERRIDE_STRING_SIZE = 4;
-const std::string KEY_ENABLE_OPERATOR_NAME_OVERRIDE_BOOL = "enable_operator_name_override_bool";
-const std::string KEY_OPERATOR_NAME_OVERRIDE_STRING = "operator_name_override_string";
-const std::string KEY_SPN_DISPLAY_CONDITION_OVERRIDE_INT = "spn_display_condition_override_int";
-const std::string KEY_PNN_OVERRIDE_STRING_ARRAY = "pnn_override_string_array";
-const std::string KEY_OPL_OVERRIDE_STRING_ARRAY = "opl_override_string_array";
+const int32_t PNN_CUST_STRING_SIZE = 2;
+const int32_t OPL_CUST_STRING_SIZE = 4;
+/**
+ * If true, customize the items related to operator name
+ */
+const std::string KEY_ENABLE_OPERATOR_NAME_CUST_BOOL = "enable_operator_name_cust_bool";
+/**
+ * Customize the operatoer name if #KEY_ENABLE_OPERATOR_NAME_CUST_BOOL is true.
+ */
+const std::string KEY_OPERATOR_NAME_CUST_STRING = "operator_name_cust_string";
+/**
+ * Customize the SPN Display Condition bits if #KEY_ENABLE_OPERATOR_NAME_CUST_BOOL is true. The default value '-1' means
+ * this field is not set.
+ * b1 = 0: display of registered PLMN name not required when registered PLMN is either HPLMN or a PLMN in the service
+ * provider PLMN list (see EF_SPDI).
+ * b1 = 1: display of registered PLMN name required when registered PLMN is either HPLMN or a PLMN in the service
+ * provider PLMN list(see EF_SPDI).
+ * b2 = 0: display of the service provider name is required when registered PLMN is neither HPLMN nor a PLMN in the
+ * service provider PLMN list(see EF_SPDI).
+ * b2 = 1: display of the service provider name is not required when registered PLMN is neither HPLMN nor a PLMN in the
+ * service provider PLMN list(see EF_SPDI).
+ *
+ * See 3GPP TS 31.102 v15.2.0 Section 4.2.12 EF_SPN.
+ */
+const std::string KEY_SPN_DISPLAY_CONDITION_CUST_INT = "spn_display_condition_cust_int";
+/**
+ * Customize the PNN - a string array of comma-separated long and short names:
+ * "long_name1,short_name1".
+ *
+ * See 3GPP TS 31.102 v15.2.0 Section 4.2.58 EF_PNN.
+ */
+const std::string KEY_PNN_CUST_STRING_ARRAY = "pnn_cust_string_array";
+/**
+ * Customize the OPL - a string array of OPL records, each with comma-delimited data fields as follows:
+ * "plmn1,lac_start,lac_end,index".
+ *
+ * See 3GPP TS 31.102 v15.2.0 Section 4.2.59 EF_OPL.
+ */
+const std::string KEY_OPL_CUST_STRING_ARRAY = "opl_cust_string_array";
 
 OperatorName::OperatorName(const EventFwk::CommonEventSubscribeInfo &sp,
     std::shared_ptr<NetworkSearchState> networkSearchState, std::shared_ptr<ISimManager> simManager,
@@ -220,8 +251,8 @@ void OperatorName::UpdateSpn(
     RegServiceState regStatus, sptr<NetworkState> &networkState, int32_t spnRule, std::string &spn, bool &showSpn)
 {
     if (regStatus == RegServiceState::REG_STATE_IN_SERVICE) {
-        if (enableOverride_ && !spnOverride_.empty()) {
-            spn = spnOverride_;
+        if (enableCust_ && !spnCust_.empty()) {
+            spn = spnCust_;
         }
         if (spn.empty()) {
             std::u16string result = Str8ToStr16("");
@@ -252,10 +283,10 @@ void OperatorName::NotifyGsmSpnChanged(RegServiceState regStatus, sptr<NetworkSt
     std::string spn = "";
     bool showPlmn = false;
     bool showSpn = false;
-    if (enableOverride_ && spnRuleOverride_ != 0) {
-        spnRule = spnRuleOverride_;
+    bool roaming = networkState->IsRoaming();
+    if (enableCust_ && displayConditionCust_ != SPN_INVALID) {
+        spnRule = GetCustSpnRule(roaming);
     } else {
-        bool roaming = networkState->IsRoaming();
         std::string numeric = networkState->GetPlmnNumeric();
         if (simManager_ != nullptr) {
             spnRule = simManager_->ObtainSpnCondition(slotId_, roaming, numeric);
@@ -288,10 +319,10 @@ void OperatorName::NotifyCdmaSpnChanged(RegServiceState regStatus, sptr<NetworkS
     std::string spn = "";
     bool showPlmn = false;
     bool showSpn = false;
-    if (enableOverride_ && spnRuleOverride_ != 0) {
-        spnRule = spnRuleOverride_;
+    bool roaming = networkState->IsRoaming();
+    if (enableCust_ && displayConditionCust_ != SPN_INVALID) {
+        spnRule = GetCustSpnRule(roaming);
     } else {
-        bool roaming = networkState->IsRoaming();
         std::string numeric = networkState->GetPlmnNumeric();
         if (simManager_ != nullptr) {
             spnRule = simManager_->ObtainSpnCondition(slotId_, roaming, numeric);
@@ -361,7 +392,7 @@ std::string OperatorName::GetPlmn(const sptr<NetworkState> &networkState, bool l
     int32_t lac = GetCurrentLac();
     plmn = GetCustomName(numeric);
     if (plmn.empty()) {
-        plmn = GetOverrideEons(numeric, lac, roaming, longNameRequired);
+        plmn = GetCustEons(numeric, lac, roaming, longNameRequired);
     }
     if (plmn.empty()) {
         plmn = GetEons(numeric, lac, longNameRequired);
@@ -384,24 +415,44 @@ std::string OperatorName::GetEons(const std::string &numeric, int32_t lac, bool 
     return Str16ToStr8(simManager_->GetSimEons(slotId_, numeric, lac, longNameRequired));
 }
 
-std::string OperatorName::GetOverrideEons(const std::string &numeric, int32_t lac, bool roaming, bool longNameRequired)
+unsigned int OperatorName::GetCustSpnRule(bool roaming)
 {
-    if (!enableOverride_ || numeric.empty() || pnnOverride_.empty()) {
-        TELEPHONY_LOGI("OperatorName::GetOverrideEons Override not enable, plmn or pnnFiles is empty");
+    unsigned int cond = 0;
+    if (displayConditionCust_ <= SPN_INVALID) {
+        return cond;
+    }
+    if (roaming) {
+        cond = SPN_CONDITION_DISPLAY_PLMN;
+        if (((unsigned int)(displayConditionCust_) & (unsigned int)(SPN_COND)) == 0) {
+            cond |= (unsigned int)SPN_CONDITION_DISPLAY_SPN;
+        }
+    } else {
+        cond = SPN_CONDITION_DISPLAY_SPN;
+        if (((unsigned int)(displayConditionCust_) & (unsigned int)(SPN_COND_PLMN)) == SPN_COND_PLMN) {
+            cond |= (unsigned int)SPN_CONDITION_DISPLAY_PLMN;
+        }
+    }
+    return cond;
+}
+
+std::string OperatorName::GetCustEons(const std::string &numeric, int32_t lac, bool roaming, bool longNameRequired)
+{
+    if (!enableCust_ || numeric.empty() || pnnCust_.empty()) {
+        TELEPHONY_LOGI("OperatorName::GetCustEons Cust not enable, plmn or pnnFiles is empty");
         return "";
     }
     int32_t pnnIndex = -1;
-    if (oplOverride_.empty()) {
-        TELEPHONY_LOGI("OperatorName::GetOverrideEons oplOverride_ is empty");
+    if (oplCust_.empty()) {
+        TELEPHONY_LOGI("OperatorName::GetCustEons oplCust_ is empty");
         if (roaming) {
             return "";
         } else {
             pnnIndex = 1;
         }
     } else {
-        for (std::shared_ptr<OperatorPlmnInfo> opl : oplOverride_) {
+        for (std::shared_ptr<OperatorPlmnInfo> opl : oplCust_) {
             TELEPHONY_LOGI(
-                "OperatorName::GetOverrideEons numeric:%{public}s, opl->plmnNumeric:%{public}s, lac:%{public}d, "
+                "OperatorName::GetCustEons numeric:%{public}s, opl->plmnNumeric:%{public}s, lac:%{public}d, "
                 "opl->lacStart:%{public}d, opl->lacEnd:%{public}d, "
                 "opl->pnnRecordId:%{public}d",
                 numeric.c_str(), opl->plmnNumeric.c_str(), lac, opl->lacStart, opl->lacEnd, opl->pnnRecordId);
@@ -415,20 +466,20 @@ std::string OperatorName::GetOverrideEons(const std::string &numeric, int32_t la
             }
         }
     }
-    TELEPHONY_LOGI("OperatorName::GetOverrideEons pnnIndex:%{public}d", pnnIndex);
-    std::string overrideEonsName = "";
-    if (pnnIndex >= 1 && pnnIndex <= (int32_t)pnnOverride_.size()) {
+    TELEPHONY_LOGI("OperatorName::GetCustEons pnnIndex:%{public}d", pnnIndex);
+    std::string custEonsName = "";
+    if (pnnIndex >= 1 && pnnIndex <= (int32_t)pnnCust_.size()) {
         TELEPHONY_LOGI(
-            "OperatorName::GetOverrideEons longNameRequired:%{public}d, longName:%{public}s, shortName:%{public}s,",
-            longNameRequired, pnnOverride_.at(pnnIndex - 1)->longName.c_str(),
-            pnnOverride_.at(pnnIndex - 1)->shortName.c_str());
+            "OperatorName::GetCustEons longNameRequired:%{public}d, longName:%{public}s, shortName:%{public}s,",
+            longNameRequired, pnnCust_.at(pnnIndex - 1)->longName.c_str(),
+            pnnCust_.at(pnnIndex - 1)->shortName.c_str());
         if (longNameRequired) {
-            overrideEonsName = pnnOverride_.at(pnnIndex - 1)->longName;
+            custEonsName = pnnCust_.at(pnnIndex - 1)->longName;
         } else {
-            overrideEonsName = pnnOverride_.at(pnnIndex - 1)->shortName;
+            custEonsName = pnnCust_.at(pnnIndex - 1)->shortName;
         }
     }
-    return overrideEonsName;
+    return custEonsName;
 }
 
 std::string OperatorName::GetCustomName(const std::string &numeric)
@@ -489,17 +540,17 @@ void OperatorName::UpdateOperatorConfig()
     CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, operatorConfig);
 }
 
-void OperatorName::UpdatePnnOverride(const std::vector<std::string> &pnnOverride)
+void OperatorName::UpdatePnnCust(const std::vector<std::string> &pnnCust)
 {
-    pnnOverride_.clear();
-    if (pnnOverride.empty()) {
-        TELEPHONY_LOGE("OperatorName::UpdatePnnOverride pnnOverride is empty slotId:%{public}d", slotId_);
+    pnnCust_.clear();
+    if (pnnCust.empty()) {
+        TELEPHONY_LOGE("OperatorName::UpdatePnnCust pnnCust is empty slotId:%{public}d", slotId_);
         return;
     }
-    for (const auto &data : pnnOverride) {
-        TELEPHONY_LOGI("OperatorName::UpdatePnnOverride: %{public}s", data.c_str());
+    for (const auto &data : pnnCust) {
+        TELEPHONY_LOGI("OperatorName::UpdatePnnCust: %{public}s", data.c_str());
         std::vector<std::string> pnnString = NetworkUtils::Split(data, ",");
-        if (pnnString.size() != PNN_OVERRIDE_STRING_SIZE) {
+        if (pnnString.size() != PNN_CUST_STRING_SIZE) {
             continue;
         }
         std::shared_ptr<PlmnNetworkName> pnn = std::make_shared<PlmnNetworkName>();
@@ -507,22 +558,22 @@ void OperatorName::UpdatePnnOverride(const std::vector<std::string> &pnnOverride
         pnnString.pop_back();
         pnn->longName = pnnString.back();
         if (!pnn->longName.empty() || !pnn->shortName.empty()) {
-            pnnOverride_.push_back(pnn);
+            pnnCust_.push_back(pnn);
         }
     }
 }
 
-void OperatorName::UpdateOplOverride(const std::vector<std::string> &oplOverride)
+void OperatorName::UpdateOplCust(const std::vector<std::string> &oplCust)
 {
-    oplOverride_.clear();
-    if (oplOverride.empty()) {
-        TELEPHONY_LOGE("OperatorName::UpdateOplOverride oplOverride is empty slotId:%{public}d", slotId_);
+    oplCust_.clear();
+    if (oplCust.empty()) {
+        TELEPHONY_LOGE("OperatorName::UpdateOplCust oplCust is empty slotId:%{public}d", slotId_);
         return;
     }
-    for (const auto &data : oplOverride) {
-        TELEPHONY_LOGI("OperatorName::UpdateOplOverride: %{public}s", data.c_str());
+    for (const auto &data : oplCust) {
+        TELEPHONY_LOGI("OperatorName::UpdateOplCust: %{public}s", data.c_str());
         std::vector<std::string> oplString = NetworkUtils::Split(data, ",");
-        if (oplString.size() != OPL_OVERRIDE_STRING_SIZE || oplString.back().empty()) {
+        if (oplString.size() != OPL_CUST_STRING_SIZE || oplString.back().empty()) {
             continue;
         }
         std::shared_ptr<OperatorPlmnInfo> opl = std::make_shared<OperatorPlmnInfo>();
@@ -541,7 +592,7 @@ void OperatorName::UpdateOplOverride(const std::vector<std::string> &oplOverride
         oplString.pop_back();
         opl->plmnNumeric = oplString.back();
         if (!opl->plmnNumeric.empty()) {
-            oplOverride_.push_back(opl);
+            oplCust_.push_back(opl);
         }
     }
 }
