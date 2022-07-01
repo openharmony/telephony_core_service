@@ -130,7 +130,7 @@ ohos_shared_library("tel_core_service") {
   ]
 
   deps = [
-    "${aafwk_inner_api_path}/dataobs_manager:dataobs_manager",
+    "${ability_runtime_inner_api_path}/dataobs_manager:dataobs_manager",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
     "//base/telephony/core_service/utils:libtel_common",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
