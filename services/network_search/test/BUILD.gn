@@ -25,14 +25,14 @@ ohos_executable("tel_network_search_test") {
   ]
 
   include_dirs = [
-    "${aafwk_inner_api_path}/ability_manager/include",
-    "${aafwk_services_path}/abilitymgr/include",
+    "${ability_runtime_inner_api_path}/ability_manager/include",
+    "${ability_runtime_services_path}/abilitymgr/include",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
-    "${aafwk_path}/frameworks/native/ability/native:abilitykit_native",
+    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
     "//base/miscservices/time/services:time_service",
     "//utils/native/base:utils",
   ]
