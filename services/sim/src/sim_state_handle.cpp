@@ -248,6 +248,20 @@ void SimStateHandle::ObtainRealtimeIccStatus(int32_t slotId)
     telRilManager_->GetSimStatus(slotId, event); // get sim card state
 }
 
+int32_t SimStateHandle::SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData)
+{
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("SimStateHandle::SimAuthentication() telRilManager_ is nullptr!!");
+        return SIM_AUTH_FAIL;
+    }
+    auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_AUTHENTICATION_DONE);
+    event->SetOwner(shared_from_this());
+    SimAuthenticationRequestInfo requireInfo;
+    requireInfo.aid = aid;
+    requireInfo.authData = authData;
+    return telRilManager_->SimAuthentication(slotId, requireInfo, event);
+}
+
 void SimStateHandle::GetSimCardData(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId)
 {
     TELEPHONY_LOGI("SimStateHandle::GetSimCardData slotId = %{public}d", slotId);
@@ -352,6 +366,24 @@ void SimStateHandle::GetUnlockSimLockResult(const AppExecFwk::InnerEvent::Pointe
     }
 }
 
+void SimStateHandle::GetSimAuthenticationResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("SimStateHandle::GetSimAuthenticationResult slotId = %{public}d", slotId);
+    auto response = event->GetUniqueObject<IccIoResultInfo>();
+    if (response == nullptr) {
+        TELEPHONY_LOGE("SimStateHandle::GetSimAuthenticationResult() fail");
+        return;
+    }
+    simAuthRespon_.sw1 = response->sw1;
+    simAuthRespon_.sw2 = response->sw2;
+    simAuthRespon_.response = response->response;
+}
+
+SimAuthenticationResponse SimStateHandle::GetSimAuthenticationResponse()
+{
+    return simAuthRespon_;
+}
+
 UnlockData SimStateHandle::GetUnlockData()
 {
     return unlockRespon_;
@@ -423,6 +455,10 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             break;
         case MSG_SIM_GET_REALTIME_ICC_STATUS_DONE:
             GetSimCardData(event, slotId_);
+            SyncCmdResponse();
+            break;
+        case MSG_SIM_AUTHENTICATION_DONE:
+            GetSimAuthenticationResult(slotId_, event);
             SyncCmdResponse();
             break;
         default:

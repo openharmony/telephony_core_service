@@ -85,14 +85,13 @@ protected:
 
 private:
     const int RECORD_NUM = 3;
+    const uint32_t OFFSET = 8;
+    const uint8_t BYTE_NUM = 0xff;
     const int MAX_FILE_INDEX = 2;
     const int ICC_FILE_CURRENT_MODE = 4;
-    const int INDEX_OF_SIZE = 14;
-    const int INDEX_OF_COUNT = 16;
     void ParseFileSize(int val[], int len, const unsigned char *data);
     bool IsValidSizeData(const unsigned char *data);
     void GetFileAndDataSize(const unsigned char *data, int &dataSize, int &fileSize);
-    int HexConversionDec(const unsigned char hexTens, const unsigned char hexSingle);
     std::string CheckRightPath(const std::string &path, int fileId);
     bool ProcessErrorResponse(const AppExecFwk::InnerEvent::Pointer &event);
     bool IsFixedNumberType(int);

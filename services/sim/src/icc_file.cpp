@@ -190,7 +190,7 @@ std::string IccFile::ObtainSPN()
     return spn_;
 }
 
-std::string IccFile::ObtainEons(std::string plmn, int32_t lac, bool longNameRequired)
+std::string IccFile::ObtainEons(const std::string &plmn, int32_t lac, bool longNameRequired)
 {
     if (plmn.empty() || pnnFiles_.empty()) {
         TELEPHONY_LOGE("ObtainEons plmn or pnnFiles is empty");

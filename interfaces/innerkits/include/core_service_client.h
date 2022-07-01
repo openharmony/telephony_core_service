@@ -57,6 +57,7 @@ public:
     bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     std::u16string GetLocaleFromDefaultSim();
     std::u16string GetSimGid1(int32_t slotId);
+    std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired);
     bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
         const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
         const sptr<INetworkSearchCallback> &callback);
@@ -98,6 +99,8 @@ public:
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd);
     bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response);
     bool HasOperatorPrivileges(const int32_t slotId);
+    int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
+        SimAuthenticationResponse &response);
     int32_t GetPrimarySlotId();
     bool SetPrimarySlotId(int32_t slotId);
     std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId);

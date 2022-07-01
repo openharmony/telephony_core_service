@@ -22,6 +22,7 @@
 #include "event_handler.h"
 #include "i_sim_manager.h"
 #include "network_search_state.h"
+#include "sim_constant.h"
 #include "telephony_types.h"
 #include "want.h"
 
@@ -52,11 +53,12 @@ private:
         RegServiceState regStatus, sptr<NetworkState> &networkState, int32_t spnRule, std::string &spn, bool &showSpn);
     int32_t GetCurrentLac();
     std::string GetCustomName(const std::string &numeric);
+    unsigned int GetCustSpnRule(bool roaming);
     std::string GetEons(const std::string &numeric, int32_t lac, bool longNameRequired);
-    std::string GetOverrideEons(const std::string &numeric, int32_t lac, bool roaming, bool longNameRequired);
+    std::string GetCustEons(const std::string &numeric, int32_t lac, bool roaming, bool longNameRequired);
     std::string GetPlmn(const sptr<NetworkState> &networkState, bool longNameRequired);
-    void UpdatePnnOverride(const std::vector<std::string> &pnnOverride);
-    void UpdateOplOverride(const std::vector<std::string> &oplOverride);
+    void UpdatePnnCust(const std::vector<std::string> &pnnCust);
+    void UpdateOplCust(const std::vector<std::string> &oplCust);
     void UpdateOperatorConfig();
 
 private:
@@ -67,7 +69,7 @@ private:
     std::string curSpn_ = "";
     bool curSpnShow_ = false;
     RegServiceState curRegState_ = RegServiceState::REG_STATE_UNKNOWN;
-    int32_t curSpnRule_ = -1;
+    int32_t curSpnRule_ = 0;
     sptr<NetworkState> networkState_ = nullptr;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     int32_t slotId_ = 0;
@@ -75,11 +77,11 @@ private:
     const std::vector<std::string> cmMccMnc_ { "46000", "46002", "46004", "46007", "46008" };
     const std::vector<std::string> cuMccMnc_ { "46001", "46009" };
     const std::vector<std::string> ctMccMnc_ { "46003", "46011" };
-    bool enableOverride_ = false;
-    std::string spnOverride_ = "";
-    int32_t spnRuleOverride_ = 0;
-    std::vector<std::shared_ptr<PlmnNetworkName>> pnnOverride_;
-    std::vector<std::shared_ptr<OperatorPlmnInfo>> oplOverride_;
+    bool enableCust_ = false;
+    std::string spnCust_ = "";
+    int32_t displayConditionCust_ = SPN_INVALID;
+    std::vector<std::shared_ptr<PlmnNetworkName>> pnnCust_;
+    std::vector<std::shared_ptr<OperatorPlmnInfo>> oplCust_;
 };
 } // namespace Telephony
 } // namespace OHOS
