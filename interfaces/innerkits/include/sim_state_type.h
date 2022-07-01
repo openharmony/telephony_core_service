@@ -151,12 +151,23 @@ struct PersoLockInfo {
 enum UnlockResult {
     UNLOCK_FAIL = -2, // unlock fail
     UNLOCK_INCORRECT = -1, // password error
-    UNLOCK_OK = 0, // unlock sucessful
+    UNLOCK_OK = 0, // unlock successful
 };
 
 struct LockStatusResponse {
     int32_t result;
     int32_t remain;
+};
+
+struct SimAuthenticationResponse {
+    int32_t sw1;
+    int32_t sw2;
+    std::string response;
+};
+
+enum SimAuthResult {
+    SIM_AUTH_FAIL = -1,
+    SIM_AUTH_SUCCESS = 0,
 };
 
 struct OperatorConfig : public Parcelable {

@@ -74,6 +74,8 @@ public:
     bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
     bool GetOperatorConfigs(int slotId, OperatorConfig &poc) override;
     bool HasOperatorPrivileges(const int32_t slotId) override;
+    int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
+        SimAuthenticationResponse &response) override;
     // STK
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
@@ -81,7 +83,7 @@ public:
     std::u16string GetSimOperatorNumeric(int32_t slotId) override;
     std::u16string GetISOCountryCodeForSim(int32_t slotId) override;
     std::u16string GetSimSpn(int32_t slotId) override;
-    std::u16string GetSimEons(int32_t slotId, const std::string plmn, int32_t lac, bool longNameRequired) override;
+    std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired) override;
     std::u16string GetSimIccId(int32_t slotId) override;
     std::u16string GetIMSI(int32_t slotId) override;
     std::u16string GetLocaleFromDefaultSim(int32_t slotId) override;

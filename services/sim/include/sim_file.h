@@ -128,8 +128,7 @@ private:
     const int LOAD_STEP = 1;
     const int INVALID_BYTES_NUM = 1;
     const int SPN_CHAR_POS = 0;
-    const int MAIL_DELAY_TIME = 50*1000;
-    enum SpnType { SPN_INVALID = -1, SPN_COND_PLMN = 1, SPN_COND = 2 };
+    const int MAIL_DELAY_TIME = 50 * 1000;
     static const uint8_t CPHS_VOICE_MAIL_MASK = 0x30;
     static const uint8_t CPHS_VOICE_MAIL_EXSIT = 0x30;
     int ObtainExtensionElementaryFile(int ef);

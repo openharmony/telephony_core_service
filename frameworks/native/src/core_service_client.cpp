@@ -332,6 +332,17 @@ std::u16string CoreServiceClient::GetSimGid1(int32_t slotId)
     return proxy->GetSimGid1(slotId);
 }
 
+std::u16string CoreServiceClient::GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac,
+    bool longNameRequired)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return std::u16string();
+    }
+    return proxy->GetSimEons(slotId, plmn, lac, longNameRequired);
+}
+
 bool CoreServiceClient::SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
     const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
     const sptr<INetworkSearchCallback> &callback)
@@ -721,6 +732,17 @@ bool CoreServiceClient::HasOperatorPrivileges(const int32_t slotId)
         return false;
     }
     return proxy->HasOperatorPrivileges(slotId);
+}
+
+int32_t CoreServiceClient::SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
+    SimAuthenticationResponse &response)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return false;
+    }
+    return proxy->SimAuthentication(slotId, aid, authData, response);
 }
 
 int32_t CoreServiceClient::GetPrimarySlotId()

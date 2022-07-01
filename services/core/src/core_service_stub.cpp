@@ -24,6 +24,7 @@ CoreServiceStub::CoreServiceStub()
 {
     AddHandlerNetWorkToMap();
     AddHandlerSimToMap();
+    AddHandlerSimToMapExt();
 }
 
 void CoreServiceStub::AddHandlerNetWorkToMap()
@@ -66,13 +67,11 @@ void CoreServiceStub::AddHandlerSimToMap()
     memberFuncMap_[uint32_t(InterfaceID::IS_SIM_ACTIVE)] = &CoreServiceStub::OnIsSimActive;
     memberFuncMap_[uint32_t(InterfaceID::GET_SIM_LANGUAGE)] = &CoreServiceStub::OnGetLocaleFromDefaultSim;
     memberFuncMap_[uint32_t(InterfaceID::GET_SIM_GID1)] = &CoreServiceStub::OnGetSimGid1;
-
     memberFuncMap_[uint32_t(InterfaceID::GET_SIM_SUB_INFO)] = &CoreServiceStub::OnGetSimSubscriptionInfo;
     memberFuncMap_[uint32_t(InterfaceID::SET_DEFAULT_VOICE_SLOTID)] = &CoreServiceStub::OnSetDefaultVoiceSlotId;
     memberFuncMap_[uint32_t(InterfaceID::GET_DEFAULT_VOICE_SLOTID)] = &CoreServiceStub::OnGetDefaultVoiceSlotId;
     memberFuncMap_[uint32_t(InterfaceID::SET_PRIMARY_SLOTID)] = &CoreServiceStub::OnSetPrimarySlotId;
     memberFuncMap_[uint32_t(InterfaceID::GET_PRIMARY_SLOTID)] = &CoreServiceStub::OnGetPrimarySlotId;
-
     memberFuncMap_[uint32_t(InterfaceID::SET_SHOW_NUMBER)] = &CoreServiceStub::OnSetShowNumber;
     memberFuncMap_[uint32_t(InterfaceID::GET_SHOW_NUMBER)] = &CoreServiceStub::OnGetShowNumber;
     memberFuncMap_[uint32_t(InterfaceID::SET_SHOW_NAME)] = &CoreServiceStub::OnSetShowName;
@@ -101,13 +100,19 @@ void CoreServiceStub::AddHandlerSimToMap()
     memberFuncMap_[uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_DELETE)] = &CoreServiceStub::OnDelIccDiallingNumbers;
     memberFuncMap_[uint32_t(InterfaceID::SET_VOICE_MAIL)] = &CoreServiceStub::OnSetVoiceMailInfo;
     memberFuncMap_[uint32_t(InterfaceID::GET_MAX_SIM_COUNT)] = &CoreServiceStub::OnGetMaxSimCount;
-    memberFuncMap_[uint32_t(InterfaceID::STK_CMD_FROM_APP_ENVELOPE)] = &CoreServiceStub::OnSendEnvelopeCmd;
-    memberFuncMap_[uint32_t(InterfaceID::STK_CMD_FROM_APP_TERMINAL_RESPONSE)] =
-        &CoreServiceStub::OnSendTerminalResponseCmd;
     memberFuncMap_[uint32_t(InterfaceID::GET_CARD_TYPE)] = &CoreServiceStub::OnGetCardType;
     memberFuncMap_[uint32_t(InterfaceID::UNLOCK_SIMLOCK)] = &CoreServiceStub::OnUnlockSimLock;
     memberFuncMap_[uint32_t(InterfaceID::HAS_OPERATOR_PRIVILEGES)] = &CoreServiceStub::OnHasOperatorPrivileges;
     memberFuncMap_[uint32_t(InterfaceID::IS_NR_SUPPORTED)] = &CoreServiceStub::OnIsNrSupported;
+}
+
+void CoreServiceStub::AddHandlerSimToMapExt()
+{
+    memberFuncMap_[uint32_t(InterfaceID::STK_CMD_FROM_APP_ENVELOPE)] = &CoreServiceStub::OnSendEnvelopeCmd;
+    memberFuncMap_[uint32_t(InterfaceID::STK_CMD_FROM_APP_TERMINAL_RESPONSE)] =
+        &CoreServiceStub::OnSendTerminalResponseCmd;
+    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_EONS)] = &CoreServiceStub::OnGetSimEons;
+    memberFuncMap_[uint32_t(InterfaceID::SIM_AUTHENTICATION)] = &CoreServiceStub::OnSimAuthentication;
 }
 
 int32_t CoreServiceStub::OnRemoteRequest(
@@ -498,6 +503,21 @@ int32_t CoreServiceStub::OnGetSimGid1(MessageParcel &data, MessageParcel &reply)
     bool ret = reply.WriteString16(result);
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::GetSimGid1 write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetSimEons(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    const std::string plmn = data.ReadString();
+    int32_t lac = data.ReadInt32();
+    bool longNameRequired = data.ReadBool();
+    std::u16string result = GetSimEons(slotId, plmn, lac, longNameRequired);
+    bool ret = reply.WriteString16(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::GetSimEons write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
     return NO_ERROR;
@@ -1133,6 +1153,19 @@ int32_t CoreServiceStub::OnHasOperatorPrivileges(MessageParcel &data, MessagePar
     return NO_ERROR;
 }
 
+int32_t CoreServiceStub::OnSimAuthentication(MessageParcel &data, MessageParcel &reply)
+{
+    const int32_t slotId = data.ReadInt32();
+    const std::string aid = data.ReadString();
+    const std::string authData = data.ReadString();
+    SimAuthenticationResponse response = {0};
+    int32_t result = SimAuthentication(slotId, aid, authData, response);
+    reply.WriteInt32(response.sw1);
+    reply.WriteInt32(response.sw2);
+    reply.WriteString(response.response);
+
+    return result;
+}
 
 int32_t CoreServiceStub::OnRegImsCallback(MessageParcel &data, MessageParcel &reply)
 {

@@ -53,6 +53,8 @@ public:
         int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response);
     void RegisterCoreNotify(const HANDLE &handler, int what);
     void UnRegisterCoreNotify(const HANDLE &observerCallBack, int what);
+    int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
+        SimAuthenticationResponse &response);
 
 public:
     static bool responseReady_;

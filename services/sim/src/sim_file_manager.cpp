@@ -188,7 +188,7 @@ std::u16string SimFileManager::GetSimSpn()
     return Str8ToStr16(result);
 }
 
-std::u16string SimFileManager::GetSimEons(std::string plmn, int32_t lac, bool longNameRequired)
+std::u16string SimFileManager::GetSimEons(const std::string &plmn, int32_t lac, bool longNameRequired)
 {
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::GetEons simFile nullptr");

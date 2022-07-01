@@ -150,29 +150,66 @@ bool MultiSimController::InitIccId(int slotId)
     SimRdbInfo simRdbInfo;
     simDbHelper_->QueryDataByIccId(newIccId, simRdbInfo);
     if (!simRdbInfo.iccId.empty()) { // already have this card, reactive it
-        TELEPHONY_LOGI("MultiSimController::InitIccId update");
-        NativeRdb::ValuesBucket values;
-        values.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
-        result = simDbHelper_->UpdateDataByIccId(newIccId, values); // finish re active
+        result = UpdateDataByIccId(slotId, newIccId);
     } else { // insert a new data for new IccId
-        TELEPHONY_LOGI("MultiSimController::InitIccId insert");
-        int64_t id;
-        NativeRdb::ValuesBucket values;
-        values.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
-        values.PutString(SimRdbInfo::ICC_ID, newIccId);
-        values.PutString(SimRdbInfo::CARD_ID, newIccId); // iccId == cardId by now
-        values.PutInt(SimData::IS_MAIN_CARD, NOT_MAIN);
-        values.PutInt(SimData::IS_VOICE_CARD, NOT_MAIN);
-        values.PutInt(SimData::IS_MESSAGE_CARD, NOT_MAIN);
-        values.PutInt(SimData::IS_CELLULAR_DATA_CARD, NOT_MAIN);
-        result = simDbHelper_->InsertData(id, values);
+        result = InsertData(slotId, newIccId);
     }
     if (result == INVALID_VALUE) {
-        TELEPHONY_LOGE("MultiSimController::InitIccId failed to insert a new data");
+        TELEPHONY_LOGE("MultiSimController::InitIccId failed to init data");
         return false;
     } else {
         return true;
     }
+}
+
+int32_t MultiSimController::UpdateDataByIccId(int slotId, std::string newIccId)
+{
+    TELEPHONY_LOGI("MultiSimController::InitIccId UpdateDataByIccId");
+    if (simDbHelper_ == nullptr) {
+        TELEPHONY_LOGE("MultiSimController::UpdateDataByIccId failed by nullptr");
+        return INVALID_VALUE;
+    }
+    SimRdbInfo simRdbInfo;
+    simDbHelper_->QueryDataByIccId(newIccId, simRdbInfo);
+    NativeRdb::ValuesBucket values;
+    values.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
+    const int32_t slotSingle = 1;
+    if (SIM_SLOT_COUNT == slotSingle) {
+        values.PutInt(SimData::IS_MAIN_CARD, MAIN_CARD);
+        values.PutInt(SimData::IS_VOICE_CARD, MAIN_CARD);
+        values.PutInt(SimData::IS_MESSAGE_CARD, MAIN_CARD);
+        values.PutInt(SimData::IS_CELLULAR_DATA_CARD, MAIN_CARD);
+    }
+    return simDbHelper_->UpdateDataByIccId(newIccId, values); // finish re active
+}
+
+int32_t MultiSimController::InsertData(int slotId, std::string newIccId)
+{
+    TELEPHONY_LOGI("MultiSimController::InitIccId InsertData");
+    if (simDbHelper_ == nullptr) {
+        TELEPHONY_LOGE("MultiSimController::InsertData failed by nullptr");
+        return INVALID_VALUE;
+    }
+    SimRdbInfo simRdbInfo;
+    simDbHelper_->QueryDataByIccId(newIccId, simRdbInfo);
+    NativeRdb::ValuesBucket values;
+    values.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
+    values.PutString(SimRdbInfo::ICC_ID, newIccId);
+    values.PutString(SimRdbInfo::CARD_ID, newIccId); // iccId == cardId by now
+    const int32_t slotSingle = 1;
+    if (SIM_SLOT_COUNT == slotSingle) {
+        values.PutInt(SimData::IS_MAIN_CARD, MAIN_CARD);
+        values.PutInt(SimData::IS_VOICE_CARD, MAIN_CARD);
+        values.PutInt(SimData::IS_MESSAGE_CARD, MAIN_CARD);
+        values.PutInt(SimData::IS_CELLULAR_DATA_CARD, MAIN_CARD);
+    } else {
+        values.PutInt(SimData::IS_MAIN_CARD, NOT_MAIN);
+        values.PutInt(SimData::IS_VOICE_CARD, NOT_MAIN);
+        values.PutInt(SimData::IS_MESSAGE_CARD, NOT_MAIN);
+        values.PutInt(SimData::IS_CELLULAR_DATA_CARD, NOT_MAIN);
+    }
+    int64_t id;
+    return simDbHelper_->InsertData(id, values);
 }
 
 bool MultiSimController::InitShowName(int slotId)
@@ -283,7 +320,7 @@ bool MultiSimController::RefreshActiveIccAccountInfoList()
         iccAccountInfoList_.clear();
     }
     while (it != localCacheInfo_.end()) { // loop data list
-        if (it->isActive != DEACTIVE) { // pick Active item
+        if (it->isActive == ACTIVE) { // pick Active item
             iccAccountInfo_.Init(it->simId, it->slotIndex);
             iccAccountInfo_.showName = Str8ToStr16(it->showName);
             iccAccountInfo_.showNumber = Str8ToStr16(it->phoneNumber);
@@ -555,11 +592,11 @@ int32_t MultiSimController::GetDefaultCellularDataSlotIdUnit()
     TELEPHONY_LOGI("MultiSimController::GetDefaultCellularDataSlotId");
     if (!IsValidData()) {
         TELEPHONY_LOGE("MultiSimController::GetDefaultCellularDataSlotId InValidData");
-        return 0;
+        return INVALID_VALUE;
     }
     if (localCacheInfo_.size() <= EMPTY_VECTOR) {
         TELEPHONY_LOGE("MultiSimController::GetDefaultCellularDataSlotId failed by nullptr");
-        return 0;
+        return INVALID_VALUE;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
     for (; i < maxCount_; i++) {
@@ -567,7 +604,7 @@ int32_t MultiSimController::GetDefaultCellularDataSlotIdUnit()
             return i;
         }
     }
-    return 0;
+    return INVALID_VALUE;
 }
 
 int32_t MultiSimController::GetPrimarySlotId()

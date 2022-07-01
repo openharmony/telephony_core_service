@@ -362,6 +362,29 @@ bool SimStateManager::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInf
     return true;
 }
 
+int32_t SimStateManager::SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
+    SimAuthenticationResponse &response)
+{
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGE("SimAuthentication(), simStateHandle_ is nullptr!!!");
+        return SIM_AUTH_FAIL;
+    }
+    std::unique_lock<std::mutex> lck(ctx_);
+    responseReady_ = false;
+    int32_t ret = SIM_AUTH_FAIL;
+    ret = simStateHandle_->SimAuthentication(slotId, aid, authData);
+    while (!responseReady_) {
+        TELEPHONY_LOGI("SimAuthentication::wait(), response = false");
+        cv_.wait(lck);
+    }
+    response.sw1 = simStateHandle_->GetSimAuthenticationResponse().sw1;
+    response.sw2 = simStateHandle_->GetSimAuthenticationResponse().sw2;
+    response.response = simStateHandle_->GetSimAuthenticationResponse().response;
+    TELEPHONY_LOGI("SimStateManager::SimAuthentication(), sw1: %{public}d, sw2: %{public}d, response: %{public}s",
+        response.sw1, response.sw2, response.response.c_str());
+    return ret;
+}
+
 SimStateManager::~SimStateManager() {}
 } // namespace Telephony
 } // namespace OHOS

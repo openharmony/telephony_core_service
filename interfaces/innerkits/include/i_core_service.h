@@ -74,6 +74,7 @@ public:
     virtual bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual std::u16string GetLocaleFromDefaultSim() = 0;
     virtual std::u16string GetSimGid1(int32_t slotId) = 0;
+    virtual std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired) = 0;
     virtual bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
         const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
         const sptr<INetworkSearchCallback> &callback) = 0;
@@ -115,6 +116,8 @@ public:
     virtual std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) = 0;
     virtual bool SendUpdateCellLocationRequest(int32_t slotId) = 0;
     virtual bool HasOperatorPrivileges(const int32_t slotId) = 0;
+    virtual int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
+        SimAuthenticationResponse &response) = 0;
     virtual int32_t RegImsCallback(MessageParcel &data) = 0;
     virtual int32_t UnRegImsCallback(MessageParcel &data) = 0;
     enum class InterfaceID {
@@ -187,10 +190,12 @@ public:
         GET_CARD_TYPE,
         UNLOCK_SIMLOCK,
         HAS_OPERATOR_PRIVILEGES,
+        SIM_AUTHENTICATION,
         IS_NR_SUPPORTED,
         GET_NR_OPTION_MODE,
         REG_IMS_CALLBACK,
         UN_REG_IMS_CALLBACK,
+        GET_SIM_EONS,
     };
 
 protected:
