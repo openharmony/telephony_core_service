@@ -75,10 +75,10 @@ ohos_shared_library("tel_core_service_api") {
   public_configs = [ ":tel_core_service_api_config" ]
 
   external_deps = [
+    "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "ril_device_driver_interface:hril_innerkits",
     "samgr_standard:samgr_proxy",
     "utils_base:utils",
   ]

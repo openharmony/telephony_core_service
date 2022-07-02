@@ -47,9 +47,9 @@ ohos_unittest("tel_core_service_gtest") {
 
   external_deps = [
     "common_event_service:cesfwk_innerkits",
+    "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
-    "ril_device_driver_interface:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
