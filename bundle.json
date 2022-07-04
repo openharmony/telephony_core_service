@@ -23,6 +23,9 @@
             "SystemCapability.Telephony.CoreService"
         ],
         "features": [],
+        "hisysevent_config": [
+            "//base/telephony/core_service/hisysevent.yaml"
+        ],
         "adapted_system_type": [
             "standard"
         ],
