@@ -26,6 +26,7 @@ enum NapiError : int32_t {
     ERROR_PARAMETER_COUNTS_INVALID = -4,
     ERROR_PARAMETER_TYPE_INVALID = -5,
     ERROR_NATIVE_API_EXECUTE_FAIL = -6,
+    ERROR_SLOT_ID_INVALID = 202,
 };
 } // namespace Telephony
 } // namespace OHOS

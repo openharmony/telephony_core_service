@@ -93,6 +93,11 @@ static int32_t GetDefaultSlotId()
     return DEFAULT_SIM_SLOT_ID;
 }
 
+static bool IsValidSlotId(int32_t slotId)
+{
+    return slotId >= DEFAULT_SIM_SLOT_ID && slotId < SIM_SLOT_COUNT;
+}
+
 static napi_value ParseErrorValue(napi_env env, const int32_t rilErrorCode, const std::string &funcName)
 {
     TELEPHONY_LOGI("rilErrorCode = %{public}d", rilErrorCode);
@@ -211,6 +216,10 @@ static napi_value GetRadioTech(napi_env env, napi_callback_info info)
 static void NativeGetSignalInfoList(napi_env env, void *data)
 {
     auto asyncContext = static_cast<SignalInfoListContext *>(data);
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeGetSignalInfoList slotId is invalid");
+        return;
+    }
     asyncContext->signalInfoList =
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSignalInfoList(asyncContext->slotId);
     TELEPHONY_LOGI("NativeGetSignalInfoList size = %{public}zu", asyncContext->signalInfoList.size());
@@ -247,7 +256,7 @@ static void GetSignalInfoListCallback(napi_env env, napi_status status, void *da
                 signalType, signalLevel);
         }
     } else {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "get signal info list failed");
+        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGI("GetSignalInfoListCallback end");
@@ -818,6 +827,10 @@ static napi_value SetNetworkSelectionMode(napi_env env, napi_callback_info info)
 static void NativeGetCountryCode(napi_env env, void *data)
 {
     auto context = static_cast<GetISOCountryCodeContext *>(data);
+    if (!IsValidSlotId(context->slotId)) {
+        TELEPHONY_LOGE("NativeGetCountryCode slotId is invalid");
+        return;
+    }
     context->countryCode = NapiUtil::ToUtf8(
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetIsoCountryCodeForNetwork(context->slotId));
     TELEPHONY_LOGI("NativeGetCountryCode countryCode = %{public}s", context->countryCode.c_str());
@@ -836,7 +849,7 @@ static void GetCountryCodeCallback(napi_env env, napi_status status, void *data)
         }
     } else {
         callbackValue =
-            NapiUtil::CreateErrorMessage(env, "get iso country code error,napi_status = " + std ::to_string(status));
+            NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
     }
     NapiUtil::Handle2ValueCallback(env, context, callbackValue);
 }
@@ -1085,6 +1098,10 @@ static napi_value TurnOffRadio(napi_env env, napi_callback_info info)
 static void NativeGetOperatorName(napi_env env, void *data)
 {
     auto context = static_cast<GetOperatorNameContext *>(data);
+    if (!IsValidSlotId(context->slotId)) {
+        TELEPHONY_LOGE("NativeGetOperatorName slotId is invalid");
+        return;
+    }
     std::u16string u16OperatorName =
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOperatorName(context->slotId);
     std::string operatorName = NapiUtil::ToUtf8(u16OperatorName);
@@ -1105,7 +1122,7 @@ static void GetOperatorNameCallback(napi_env env, napi_status status, void *data
     if (context->resolved) {
         napi_create_string_utf8(env, context->operatorName, context->operatorNameLength, &callbackValue);
     } else {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "get operator name failed");
+        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
     }
     NapiUtil::Handle2ValueCallback(env, context, callbackValue);
 }

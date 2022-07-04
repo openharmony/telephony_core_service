@@ -21,6 +21,8 @@
 #include <vector>
 #include "base_context.h"
 #include "sim_state_type.h"
+#include "telephony_napi_common_error.h"
+#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
