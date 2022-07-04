@@ -752,7 +752,7 @@ void NetworkSearchManager::SavePreferredNetworkValue(int32_t slotId, int32_t net
 
 int32_t NetworkSearchManager::GetPreferredNetworkValue(int32_t slotId) const
 {
-    int32_t networkMode = static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA_GSM);
+    int32_t networkMode = PREFERRED_NETWORK_TYPE;
     std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGI("settingHelper is null");
