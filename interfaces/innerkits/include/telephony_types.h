@@ -24,11 +24,14 @@
 namespace OHOS {
 namespace Telephony {
 #define SIM_SLOT_COUNT GetMaxSlotCount<int32_t>()
+#define PREFERRED_NETWORK_TYPE GetPreferredNetworkType<int32_t>()
 inline const int32_t SYSPARA_SIZE = 128;
 inline const int32_t DEFAULT_SIM_SLOT_ID = 0;
 inline const int32_t DEFAULT_SIM_SLOT_ID_REMOVE = -1;
 inline const std::string DEFAULT_SLOT_COUNT = "1";
 inline const std::string TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
+inline const std::string DEFAULT_PREFERRED_NETWORK_TYPE = "5"; // CORE_NETWORK_MODE_LTE_WCDMA_GSM
+inline const std::string TEL_PREFERRED_NETWORK_TYPE = "const.telephony.preferredNetworkType";
 
 template<typename T>
 inline T GetMaxSlotCount()
@@ -37,6 +40,16 @@ inline T GetMaxSlotCount()
     GetParameter(TEL_SIM_SLOT_COUNT.c_str(), DEFAULT_SLOT_COUNT.c_str(), simSlotCount, SYSPARA_SIZE);
     T slotCount = std::atoi(simSlotCount);
     return slotCount;
+}
+
+template<typename T>
+inline T GetPreferredNetworkType()
+{
+    char preferredNetworkType[SYSPARA_SIZE] = { 0 };
+    GetParameter(
+        TEL_PREFERRED_NETWORK_TYPE.c_str(), DEFAULT_PREFERRED_NETWORK_TYPE.c_str(), preferredNetworkType, SYSPARA_SIZE);
+    T networkType = std::atoi(preferredNetworkType);
+    return networkType;
 }
 
 enum SimSlotId {
