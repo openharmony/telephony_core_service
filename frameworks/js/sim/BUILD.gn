@@ -39,10 +39,10 @@ ohos_shared_library("sim") {
   ]
 
   external_deps = [
+    "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "ril_device_driver_interface:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
