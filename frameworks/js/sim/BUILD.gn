@@ -43,10 +43,10 @@ ohos_shared_library("sim") {
     "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "init:libbegetutil",
   ]
 
   subsystem_name = "telephony"
