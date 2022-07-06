@@ -138,10 +138,9 @@ napi_value NapiCreateAsyncWork4(const AsyncPara &para, AsyncContextPIN *context,
     return result;
 }
 
-
 template<typename T>
 void NapiAsyncCompleteCallback(napi_env env, napi_status status, const AsyncContext<T> &asyncContext,
-    std::string errMessage, bool funcIgnoreReturnVal = false)
+    std::string errMessage, bool funcIgnoreReturnVal = false, int errorCode = ERROR_DEFAULT)
 {
     if (status != napi_ok) {
         napi_throw_type_error(env, nullptr, "excute failed");
@@ -151,7 +150,7 @@ void NapiAsyncCompleteCallback(napi_env env, napi_status status, const AsyncCont
     const BaseContext &context = asyncContext.context;
     if (context.deferred != nullptr) {
         if (!context.resolved) {
-            napi_value errorMessage = NapiUtil::CreateErrorMessage(env, errMessage);
+            napi_value errorMessage = NapiUtil::CreateErrorMessage(env, errMessage, errorCode);
             NAPI_CALL_RETURN_VOID(env, napi_reject_deferred(env, context.deferred, errorMessage));
         } else {
             napi_value res =
@@ -163,7 +162,7 @@ void NapiAsyncCompleteCallback(napi_env env, napi_status status, const AsyncCont
             (funcIgnoreReturnVal ? NapiUtil::CreateUndefined(env) : GetNapiValue(env, asyncContext.callbackVal));
         napi_value callbackValue[] {NapiUtil::CreateUndefined(env), res};
         if (!context.resolved) {
-            callbackValue[0] = NapiUtil::CreateErrorMessage(env, errMessage);
+            callbackValue[0] = NapiUtil::CreateErrorMessage(env, errMessage, errorCode);
             callbackValue[1] = NapiUtil::CreateUndefined(env);
         }
         napi_value undefined = nullptr;
@@ -300,6 +299,7 @@ void NativeIsSimActive(napi_env env, void *data)
     AsyncContext<bool> *reVal = static_cast<AsyncContext<bool> *>(data);
     if (!IsValidSlotId(reVal->slotId)) {
         TELEPHONY_LOGE("NativeIsSimActive slotId is invalid");
+        reVal->context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
     reVal->callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().IsSimActive(reVal->slotId);
@@ -312,7 +312,11 @@ void IsSimActiveCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContext<bool>> context(static_cast<AsyncContext<bool> *>(data));
-    NapiAsyncCompleteCallback(env, status, *context, "slotId is invalid");
+    if (context->context.errorCode == ERROR_SLOT_ID_INVALID) {
+        NapiAsyncCompleteCallback(env, status, *context, "slotId is invalid", false, ERROR_SLOT_ID_INVALID);
+    } else {
+        NapiAsyncCompleteCallback(env, status, *context, "get simActive state failed");
+    }
 }
 
 napi_value IsSimActive(napi_env env, napi_callback_info info)
@@ -520,6 +524,7 @@ void NativeGetCardType(napi_env env, void *data)
     AsyncContext<int32_t> *asyncContext = static_cast<AsyncContext<int32_t> *>(data);
     if (!IsValidSlotId(asyncContext->slotId)) {
         TELEPHONY_LOGE("NativeGetCardType slotId is invalid");
+        asyncContext->context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
     asyncContext->callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCardType(asyncContext->slotId);
@@ -530,7 +535,11 @@ void GetCardTypeCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContext<int32_t>> context(static_cast<AsyncContext<int32_t> *>(data));
-    NapiAsyncCompleteCallback(env, status, *context, "slotId is invalid");
+    if (context->context.errorCode == ERROR_SLOT_ID_INVALID) {
+        NapiAsyncCompleteCallback(env, status, *context, "slotId is invalid", false, ERROR_SLOT_ID_INVALID);
+    } else {
+        NapiAsyncCompleteCallback(env, status, *context, "get card type failed");
+    }
 }
 
 napi_value GetCardType(napi_env env, napi_callback_info info)
@@ -943,6 +952,7 @@ void NativeHasSimCard(napi_env env, void *data)
     AsyncContext<bool> *reVal = static_cast<AsyncContext<bool> *>(data);
     if (!IsValidSlotId(reVal->slotId)) {
         TELEPHONY_LOGE("NativeHasSimCard slotId is invalid");
+        reVal->context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
     reVal->callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(reVal->slotId);
@@ -955,7 +965,11 @@ void HasSimCardCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContext<bool>> context(static_cast<AsyncContext<bool> *>(data));
-    NapiAsyncCompleteCallback(env, status, *context, "slotId is invalid");
+    if (context->context.errorCode == ERROR_SLOT_ID_INVALID) {
+        NapiAsyncCompleteCallback(env, status, *context, "slotId is invalid", false, ERROR_SLOT_ID_INVALID);
+    } else {
+        NapiAsyncCompleteCallback(env, status, *context, "has sim card state failed");
+    }
 }
 
 napi_value HasSimCard(napi_env env, napi_callback_info info)
