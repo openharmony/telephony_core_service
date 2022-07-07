@@ -72,14 +72,14 @@ std::string SimFile::ObtainSimOperator()
 
 std::string SimFile::ObtainIsoCountryCode()
 {
-    std::string imsi = ObtainSimOperator();
-    if (imsi.empty()) {
-        TELEPHONY_LOGE("SimFile ObtainIsoCountryCode: IMSI is null");
+    std::string numeric = ObtainSimOperator();
+    if (numeric.empty()) {
+        TELEPHONY_LOGE("SimFile ObtainIsoCountryCode: numeric is null");
         return "";
     }
-    int len = (int)imsi.length();
+    int len = (int)numeric.length();
     if (len >= MCC_LEN) {
-        std::string mnc = imsi.substr(0, MCC_LEN);
+        std::string mnc = numeric.substr(0, MCC_LEN);
         std::string iso = MccPool::MccCountryCode(std::stoi(mnc));
         return iso;
     } else {
