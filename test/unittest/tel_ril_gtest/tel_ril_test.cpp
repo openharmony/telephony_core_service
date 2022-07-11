@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -196,7 +196,6 @@ void TelRilTest::InitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE] = &TelRilTest::SetPreferredNetworkParaTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_IMEI] = &TelRilTest::GetImeiTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_MEID] = &TelRilTest::GetMeidTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_IMS_REG_STATUS] = &TelRilTest::GetImsRegStatusTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_RADIO_CAPABILITY] = &TelRilTest::GetRadioCapabilityTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO] = &TelRilTest::GetVoiceRadioTechnologyTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG] = &TelRilTest::GetPhysicalChannelConfigTest;
@@ -1448,25 +1447,6 @@ void TelRilTest::GetMeidTest(const std::shared_ptr<AppExecFwk::EventHandler> &ha
         TELEPHONY_LOGI("TelRilTest::GetMeidTest -->");
         telRilManager_->GetMeid(slotId_, event);
         TELEPHONY_LOGI("TelRilTest::GetMeidTest --> finished");
-        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
-        ASSERT_TRUE(syncResult);
-    }
-}
-
-/**
- * @brief Get IMS register state
- *
- * @param application
- */
-void TelRilTest::GetImsRegStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMS_REG_STATUS);
-    auto event = AppExecFwk::InnerEvent::Get(eventId);
-    if (event != nullptr && telRilManager_ != nullptr) {
-        event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::GetImsRegStatusTest -->");
-        telRilManager_->GetImsRegStatus(slotId_, event);
-        TELEPHONY_LOGI("TelRilTest::GetImsRegStatusTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }
@@ -2969,17 +2949,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetImeiTest_0101, Function | MediumTest | 
 HWTEST_F(TelRilTest, Telephony_TelRil_GetMeidTest_0101, Function | MediumTest | Level3)
 {
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_MEID), GetHandler());
-    return;
-}
-
-/**
- * @tc.number Telephony_TelRil_GetImsRegStatusTest_0101 to do ...
- * @tc.name Get Ims register status
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetImsRegStatusTest_0101, Function | MediumTest | Level3)
-{
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMS_REG_STATUS), GetHandler());
     return;
 }
 

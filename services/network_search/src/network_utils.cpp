@@ -216,7 +216,6 @@ const std::map<RadioEvent, std::any> EventSender::mapFunctions_ = {
     { RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, &ITelRilManager::SetPreferredNetwork },
     { RadioEvent::RADIO_SET_STATUS, &ITelRilManager::SetRadioState },
     { RadioEvent::RADIO_GET_STATUS, &ITelRilManager::GetRadioState },
-    { RadioEvent::RADIO_GET_IMS_REG_STATUS, &ITelRilManager::GetImsRegStatus },
     { RadioEvent::RADIO_GET_IMEI, &ITelRilManager::GetImei },
     { RadioEvent::RADIO_GET_MEID, &ITelRilManager::GetMeid },
     { RadioEvent::RADIO_NETWORK_SEARCH_RESULT, &ITelRilManager::GetNetworkSearchInformation },
