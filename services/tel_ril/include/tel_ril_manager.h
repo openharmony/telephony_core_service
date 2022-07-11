@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -139,8 +139,6 @@ public:
     int32_t StopDtmf(int32_t slotId, int32_t index, const AppExecFwk::InnerEvent::Pointer &result) override;
 
     int32_t GetSignalStrength(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
-
-    int32_t GetImsRegStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t GetCsRegStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
@@ -292,13 +290,9 @@ public:
         int32_t slotId, int32_t preferredNetworkType, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetPreferredNetwork(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    int32_t GetImsCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SetCallPreferenceMode(
         int32_t slotId, const int32_t mode, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetCallPreferenceMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
-    int32_t SetLteImsSwitchStatus(
-        int32_t slotId, const int32_t active, const AppExecFwk::InnerEvent::Pointer &response) override;
-    int32_t GetLteImsSwitchStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SetRadioProtocol(
         int32_t slotId, SimProtocolRequest data, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SetUssd(

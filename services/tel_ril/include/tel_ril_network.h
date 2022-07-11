@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,8 @@
 #ifndef TEL_RIL_NETWORK_H
 #define TEL_RIL_NETWORK_H
 
-#include "tel_ril_base.h"
 #include "hril_network_parcel.h"
+#include "tel_ril_base.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -29,7 +29,6 @@ public:
 
     // send  command
     int32_t GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t GetImsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetSignalStrength(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
@@ -54,10 +53,8 @@ public:
     int32_t NetworkPsRegStatusUpdated(MessageParcel &data);
     int32_t NetworkTimeZoneUpdated(MessageParcel &data);
     int32_t NetworkTimeUpdated(MessageParcel &data);
-    int32_t NetworkImsRegStatusUpdated(MessageParcel &data);
     int32_t NetworkPhyChnlCfgUpdated(MessageParcel &data);
     int32_t NetworkCurrentCellUpdated(MessageParcel &data);
-    int32_t GetImsRegStatusResponse(MessageParcel &data);
     int32_t GetRadioCapabilityResponse(MessageParcel &data);
     /**
      * @brief Get signal intensity response

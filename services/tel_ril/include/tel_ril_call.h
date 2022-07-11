@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -306,18 +306,6 @@ public:
     bool IsCallRespOrNotify(uint32_t code);
 
     /**
-     *  @brief get Ims call list
-     */
-    int32_t GetImsCallList(const AppExecFwk::InnerEvent::Pointer &result);
-
-    /**
-     * @brief get Ims call list response
-     *
-     * @param data is HDF service callback message
-     */
-    int32_t GetImsCallListResponse(MessageParcel &data);
-
-    /**
      *  @brief set voice call preference mode
      */
     int32_t SetCallPreferenceMode(const int32_t mode, const AppExecFwk::InnerEvent::Pointer &result);
@@ -340,30 +328,6 @@ public:
      * @param data is HDF service callback message
      */
     int32_t GetCallPreferenceResponse(MessageParcel &data);
-
-    /**
-     *  @brief set IMS service capability switch
-     */
-    int32_t SetLteImsSwitchStatus(const int32_t active, const AppExecFwk::InnerEvent::Pointer &result);
-
-    /**
-     * @brief set IMS service capability switch
-     *
-     * @param data is HDF service callback message
-     */
-    int32_t SetLteImsSwitchStatusResponse(MessageParcel &data);
-
-    /**
-     *  @brief get IMS service capability switch
-     */
-    int32_t GetLteImsSwitchStatus(const AppExecFwk::InnerEvent::Pointer &result);
-
-    /**
-     * @brief get IMS service capability switch
-     *
-     * @param data is HDF service callback message
-     */
-    int32_t GetLteImsSwitchStatusResponse(MessageParcel &data);
 
     /**
      *  @brief set ussd
@@ -392,13 +356,6 @@ public:
      * @param data is HDF service callback message
      */
     int32_t CallStateUpdated(MessageParcel &data);
-
-    /**
-     * @brief call Ims service status notice
-     *
-     * @param data is HDF service callback message
-     */
-    int32_t CallImsServiceStatusNotice(MessageParcel &data);
 
     /**
      * @brief call ussd notice
@@ -439,7 +396,7 @@ public:
     /**
      *  @brief get call list
      */
-    int32_t SetEmergencyCallList(std::vector<EmergencyCall>  &eccVec, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetEmergencyCallList(std::vector<EmergencyCall> &eccVec, const AppExecFwk::InnerEvent::Pointer &result);
 
     /**
      * @brief set ussd  response

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -107,7 +107,6 @@ enum class DiffInterfaceId {
     TEST_SET_PREFERRED_NETWORK_TYPE,
     TEST_GET_IMEI,
     TEST_GET_MEID,
-    TEST_GET_IMS_REG_STATUS,
     TEST_GET_RADIO_CAPABILITY,
     TEST_GET_VOICE_RADIO_INFO,
     TEST_GET_PHYSICAL_CHANNEL_CONFIG,
@@ -244,7 +243,6 @@ private:
     void GetPreferredNetworkParaTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetImeiTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetMeidTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void GetImsRegStatusTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetVoiceRadioTechnologyTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetPhysicalChannelConfigTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetLocateUpdatesTest(const std::shared_ptr<AppExecFwk::EventHandler> &handler);

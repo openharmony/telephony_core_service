@@ -120,15 +120,9 @@ public:
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetPsRegStatus(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t GetImsCallList(
-        int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t SetCallPreferenceMode(int32_t slotId, int32_t eventId, int32_t mode,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetCallPreferenceMode(
-        int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t SetLteImsSwitchStatus(int32_t slotId, int32_t eventId, int32_t active,
-        const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t GetLteImsSwitchStatus(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t SetUssd(int32_t slotId, int32_t eventId, const std::string str,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
