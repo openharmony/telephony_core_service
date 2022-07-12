@@ -35,10 +35,6 @@ public:
         /****************** callback ******************/
         IMS_REGISTER_CALLBACK = 100,
         IMS_GET_PROXY_OBJECT_PTR,
-
-        /****************** update register ******************/
-        IMS_SERVICE_STATUS_UPDATE = 10000,
-        IMS_REGISTER_STATE_UPDATE,
     };
 
     /**

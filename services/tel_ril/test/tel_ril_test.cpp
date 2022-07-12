@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -102,12 +102,8 @@ enum class DiffInterfaceId {
     TEST_GET_IMEI,
     TEST_GET_BASEBAND_VERSION,
     TEST_GET_MEID,
-    TEST_GET_IMS_REG_STATUS,
-    TEST_GET_IMS_CALL_LIST,
     TEST_SET_CALL_PREFERENCE_MODE,
     TEST_GET_CALL_PREFERENCE_MODE,
-    TEST_SET_LTE_IMS_SWITCH_STATUS,
-    TEST_GET_LTE_IMS_SWITCH_STATUS,
     TEST_GET_CS_REG_STATUS,
     TEST_GET_PS_REG_STATUS,
     TEST_GET_RADIO_CAPABILITY,
@@ -310,7 +306,6 @@ public:
     void OnRequestGetImeiTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetBasebandVersionTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetMeidTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void OnRequestGetImsRegStatusTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetCsRegStatusTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetPsRegStatusTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetRadioCapabilityTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -320,11 +315,8 @@ public:
     void OnRequestSetNotificationFilterTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestSetDeviceStateTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
-    void OnRequestGetImsCallListTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestSetCallPreferenceModeTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetCallPreferenceModeTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void OnRequestSetLteImsSwitchStatusTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void OnRequestGetLteImsSwitchStatusTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestSetUssdTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetUssdTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestSetMuteTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -428,11 +420,8 @@ void TelRilTest::OnInitCall()
     memberFuncMap_[DiffInterfaceId::TEST_SEND_DTMF] = &TelRilTest::OnRequestSendDtmfTest;
     memberFuncMap_[DiffInterfaceId::TEST_START_DTMF] = &TelRilTest::OnRequestStartDtmfTest;
     memberFuncMap_[DiffInterfaceId::TEST_STOP_DTMF] = &TelRilTest::OnRequestStopDtmfTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_IMS_CALL_LIST] = &TelRilTest::OnRequestGetImsCallListTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_PREFERENCE_MODE] = &TelRilTest::OnRequestSetCallPreferenceModeTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_PREFERENCE_MODE] = &TelRilTest::OnRequestGetCallPreferenceModeTest;
-    memberFuncMap_[DiffInterfaceId::TEST_SET_LTE_IMS_SWITCH_STATUS] = &TelRilTest::OnRequestSetLteImsSwitchStatusTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_LTE_IMS_SWITCH_STATUS] = &TelRilTest::OnRequestGetLteImsSwitchStatusTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_USSD] = &TelRilTest::OnRequestSetUssdTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_USSD] = &TelRilTest::OnRequestGetUssdTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_MUTE] = &TelRilTest::OnRequestSetMuteTest;
@@ -501,7 +490,6 @@ void TelRilTest::OnInitNetwork()
         &TelRilTest::OnRequestSetNetworkSelectionModeTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE] = &TelRilTest::OnRequestGetPreferredNetworkTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE] = &TelRilTest::OnRequestSetPreferredNetworkTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_IMS_REG_STATUS] = &TelRilTest::OnRequestGetImsRegStatusTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_IMEI] = &TelRilTest::OnRequestGetImeiTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_BASEBAND_VERSION] = &TelRilTest::OnRequestGetBasebandVersionTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_MEID] = &TelRilTest::OnRequestGetMeidTest;
@@ -552,8 +540,6 @@ void TelRilTest::OnInitForRegister(int32_t slotId, const std::shared_ptr<AppExec
     telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_GET_IMS_CALL_LIST, nullptr);
     telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_SET_CALL_PREFERENCE_MODE, nullptr);
     telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_GET_CALL_PREFERENCE_MODE, nullptr);
-    telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_SET_LTE_IMS_SWITCH_STATUS, nullptr);
-    telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_GET_LTE_IMS_SWITCH_STATUS, nullptr);
     telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_SET_USSD, nullptr);
     telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_GET_USSD, nullptr);
 }
@@ -1605,19 +1591,6 @@ void TelRilTest::OnRequestGetMeidTest(int32_t slotId, const std::shared_ptr<AppE
     }
 }
 
-void TelRilTest::OnRequestGetImsRegStatusTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
-    if (event != nullptr && telRilManager_ != nullptr) {
-        event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::OnRequestGetImsRegStatusTest -->");
-        telRilManager_->GetImsRegStatus(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetImsRegStatusTest --> "
-            "OnRequestGetImsRegStatusTest finished");
-    }
-}
-
 void TelRilTest::OnRequestGetCsRegStatusTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
@@ -2092,19 +2065,6 @@ void TelRilTest::DemoHandler::OnRequestGetBasebandVersionTestResponse(const AppE
     TELEPHONY_LOGI("test get baseband version done");
 }
 
-void TelRilTest::OnRequestGetImsCallListTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_GET_IMS_CALL_LIST);
-    if (event != nullptr && telRilManager_ != nullptr) {
-        event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::OnRequestGetImsCallListTest -->");
-        telRilManager_->GetImsCallList(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetImsCallListTest --> "
-            "OnRequestGetImsCallListTest finished");
-    }
-}
-
 void TelRilTest::OnRequestSetCallPreferenceModeTest(
     int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
@@ -2134,38 +2094,6 @@ void TelRilTest::OnRequestGetCallPreferenceModeTest(
         TELEPHONY_LOGI(
             "TelRilTest::OnRequestGetCallPreferenceModeTest --> "
             "OnRequestGetCallPreferenceModeTest finished");
-    }
-}
-
-void TelRilTest::OnRequestSetLteImsSwitchStatusTest(
-    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SET_LTE_IMS_SWITCH_STATUS);
-    if (event != nullptr && telRilManager_ != nullptr) {
-        int32_t active = 0;
-        event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::OnRequestSetLteImsSwitchStatusTest -->");
-        std::cout << "Please enter to set the Let IMS switch state operation,[0/1]: ";
-        std::cin >> active;
-        TELEPHONY_LOGI("TelRilTest::OnRequestSetLteImsSwitchStatusTest --> active = [%{public}d]", active);
-        telRilManager_->SetLteImsSwitchStatus(slotId, active, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSetLteImsSwitchStatusTest --> "
-            "OnRequestSetLteImsSwitchStatusTest finished");
-    }
-}
-
-void TelRilTest::OnRequestGetLteImsSwitchStatusTest(
-    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_GET_LTE_IMS_SWITCH_STATUS);
-    if (event != nullptr && telRilManager_ != nullptr) {
-        event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::OnRequestGetLteImsSwitchStatusTest -->");
-        telRilManager_->GetLteImsSwitchStatus(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetLteImsSwitchStatusTest --> "
-            "OnRequestGetLteImsSwitchStatusTest finished");
     }
 }
 
@@ -2341,14 +2269,9 @@ void CallTest()
     cout << (int32_t)DiffInterfaceId::TEST_SEND_DTMF << " --> OnRequestSendDtmfTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_START_DTMF << " --> OnRequestStartDtmfTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_STOP_DTMF << " --> OnRequestStopDtmfTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_IMS_CALL_LIST << " --> OnRequestGetImsCallListTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_SET_CALL_PREFERENCE_MODE << "--> OnRequestSetCallPreferenceModeTest"
          << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_CALL_PREFERENCE_MODE << "--> OnRequestGetCallPreferenceModeTest"
-         << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_LTE_IMS_SWITCH_STATUS << " --> OnRequestSetLteImsSwitchStatusTest"
-         << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_LTE_IMS_SWITCH_STATUS << " --> OnRequestGetLteImsSwitchStatusTest"
          << endl;
     cout << (int32_t)DiffInterfaceId::TEST_SET_USSD << " --> OnRequestSetUssdTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_USSD << " --> OnRequestGetUssdTest" << endl;
@@ -2392,7 +2315,6 @@ void NetworkTest()
          << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE << "--> OnRequestGetPreferredNetworkTest"
          << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_IMS_REG_STATUS << "--> OnRequestGetImsRegStatusTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_CURRENT_CELL_INFO << " --> OnRequestGetCurrentCellInfoTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_CELL_INFO_LIST << " --> OnRequestGetCellInfoListTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_OPERATOR << " --> OnRequestNetworkOperatorTest"

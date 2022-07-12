@@ -15,10 +15,12 @@
 
 #include "ims_core_service_client.h"
 
-#include "iservice_registry.h"
-#include "telephony_log_wrapper.h"
-#include "telephony_errors.h"
 #include "ims_core_service_callback_stub.h"
+#include "iservice_registry.h"
+#include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
+#include "telephony_types.h"
+
 
 namespace OHOS {
 namespace Telephony {
@@ -130,6 +132,11 @@ int32_t ImsCoreServiceClient::RegisterImsCoreServiceCallback()
         TELEPHONY_LOGE("RegisterImsCoreServiceCallback return, register callback error.");
         return TELEPHONY_ERR_FAIL;
     }
+    for (int32_t slotId = SimSlotId::SIM_SLOT_0; slotId < SIM_SLOT_COUNT; slotId++) {
+        if (GetHandler(slotId) != nullptr) {
+            GetImsRegistrationStatus(slotId);
+        }
+    }
     TELEPHONY_LOGI("RegisterImsCoreServiceCallback success.");
     return TELEPHONY_SUCCESS;
 }
@@ -143,6 +150,9 @@ int32_t ImsCoreServiceClient::RegisterImsCoreServiceCallbackHandler(int32_t slot
     }
 
     handlerMap_.insert(std::make_pair(slotId, handler));
+    if (IsConnect()) {
+        GetImsRegistrationStatus(slotId);
+    }
     TELEPHONY_LOGI("RegisterImsCoreServiceCallbackHandler success.");
     return TELEPHONY_SUCCESS;
 }
