@@ -770,7 +770,7 @@ int32_t NetworkSearchManager::GetPreferredNetworkValue(int32_t slotId) const
 
     bool succ = StrToInt(value, networkMode);
     TELEPHONY_LOGI("NetworkSearchManager GetPreferredNetworkValue succ:%{public}d, slotId:%{public}d, "
-        "networkMode:%{public}d", slotId, succ, networkMode);
+        "networkMode:%{public}d", succ, slotId, networkMode);
     return networkMode;
 }
 
