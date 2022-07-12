@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,8 +81,8 @@ enum RadioEvent {
     RADIO_GET_IMS_CALL_LIST,
     RADIO_SET_CALL_PREFERENCE_MODE,
     RADIO_GET_CALL_PREFERENCE_MODE,
-    RADIO_SET_LTE_IMS_SWITCH_STATUS,
-    RADIO_GET_LTE_IMS_SWITCH_STATUS,
+    RADIO_SET_IMS_SWITCH_STATUS,
+    RADIO_GET_IMS_SWITCH_STATUS,
     RADIO_SET_USSD,
     RADIO_GET_USSD,
     RADIO_SET_CMUT,
@@ -185,5 +185,19 @@ enum RadioEvent {
 
     // Card
     RADIO_CARD_TYPE_CHANGE,
+
+    // IMS core service
+    RADIO_IMS_SERVICE_STATUS_UPDATE = 1000,
+    RADIO_IMS_REGISTER_STATE_UPDATE,
+
+    // IMS call
+    RADIO_IMS_GET_CALL_DATA,
+
+    // IMS supplement
+    RADIO_IMS_SET_CLIP,
+    RADIO_IMS_SET_COLR,
+    RADIO_IMS_GET_COLR,
+    RADIO_IMS_SET_COLP,
+    RADIO_IMS_GET_COLP,
 };
 #endif // RADIO_EVENT_H

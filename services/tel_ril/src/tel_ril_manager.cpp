@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -506,11 +506,6 @@ int32_t TelRilManager::StopDtmf(int32_t slotId, int32_t index, const AppExecFwk:
     return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::StopDtmf, index);
 }
 
-int32_t TelRilManager::GetImsCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetImsCallList);
-}
-
 int32_t TelRilManager::SetCallPreferenceMode(
     int32_t slotId, const int32_t mode, const AppExecFwk::InnerEvent::Pointer &response)
 {
@@ -520,17 +515,6 @@ int32_t TelRilManager::SetCallPreferenceMode(
 int32_t TelRilManager::GetCallPreferenceMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetCallPreferenceMode);
-}
-
-int32_t TelRilManager::SetLteImsSwitchStatus(
-    int32_t slotId, const int32_t active, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetLteImsSwitchStatus, active);
-}
-
-int32_t TelRilManager::GetLteImsSwitchStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetLteImsSwitchStatus);
 }
 
 int32_t TelRilManager::SetUssd(
@@ -612,11 +596,6 @@ int32_t TelRilManager::GetLinkBandwidthInfo(
 
 /*********************** TelRilData end ****************************/
 /*********************** TelRilNetwork start ***********************/
-int32_t TelRilManager::GetImsRegStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetImsRegStatus);
-}
-
 int32_t TelRilManager::GetSignalStrength(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetSignalStrength);

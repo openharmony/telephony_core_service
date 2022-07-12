@@ -245,18 +245,6 @@ int32_t CoreManagerInner::GetCallFailReason(
     return telRilManager_->GetCallFailReason(slotId, response);
 }
 
-int32_t CoreManagerInner::GetImsCallList(
-    int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
-{
-    if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
-    response->SetOwner(handler);
-    return telRilManager_->GetImsCallList(slotId, response);
-}
-
 int32_t CoreManagerInner::SetCallPreferenceMode(
     int32_t slotId, int32_t eventId, int32_t mode, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
@@ -279,30 +267,6 @@ int32_t CoreManagerInner::GetCallPreferenceMode(
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     response->SetOwner(handler);
     return telRilManager_->GetCallPreferenceMode(slotId, response);
-}
-
-int32_t CoreManagerInner::SetLteImsSwitchStatus(
-    int32_t slotId, int32_t eventId, int32_t active, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
-{
-    if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
-    response->SetOwner(handler);
-    return telRilManager_->SetLteImsSwitchStatus(slotId, active, response);
-}
-
-int32_t CoreManagerInner::GetLteImsSwitchStatus(
-    int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
-{
-    if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
-    response->SetOwner(handler);
-    return telRilManager_->GetLteImsSwitchStatus(slotId, response);
 }
 
 int32_t CoreManagerInner::SetPreferredNetworkPara(int32_t slotId, int32_t eventId, int32_t preferredNetworkType,
