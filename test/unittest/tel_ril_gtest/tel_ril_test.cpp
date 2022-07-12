@@ -2488,7 +2488,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetRilCmCBConfigTest_0101, Function | Medi
     return;
 }
 
-
 /**
  * @tc.number Telephony_TelRil_GetRilCmCBConfigTest_0101 to do ...
  * @tc.name Get SMS cell broadcast
@@ -2606,7 +2605,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SimGetImsiTest_0101, Function | MediumTest
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetSimLockStatusTest_0101, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIM_LOCK_STATUS), GetHandler());
+#endif
     return;
 }
 
@@ -2617,7 +2618,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetSimLockStatusTest_0101, Function | Medi
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetSimLockTest_0101, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_SIM_LOCK), GetHandler());
+#endif
     return;
 }
 
@@ -2628,7 +2631,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetSimLockTest_0101, Function | MediumTest
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_ChangeSimPasswordTest_0101, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CHANGE_SIM_PASSWD), GetHandler());
+#endif
     return;
 }
 
@@ -2639,7 +2644,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_ChangeSimPasswordTest_0101, Function | Med
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_RadioRestartTest_0101, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RADIO_RESTART), GetHandler());
+#endif
     return;
 }
 
@@ -2650,7 +2657,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_RadioRestartTest_0101, Function | MediumTe
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_EnterSimPinTest_0101, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_SIM_PIN), GetHandler());
+#endif
     return;
 }
 
@@ -2661,7 +2670,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_EnterSimPinTest_0101, Function | MediumTes
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_RadioRestartTest_0102, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RADIO_RESTART), GetHandler());
+#endif
     return;
 }
 
@@ -2672,7 +2683,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_RadioRestartTest_0102, Function | MediumTe
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPINTest_0101, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_ERROR_PIN), GetHandler());
+#endif
     return;
 }
 
@@ -2683,7 +2696,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPINTest_0101, Function | MediumT
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPINTest_0102, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_ERROR_PIN), GetHandler());
+#endif
     return;
 }
 
@@ -2694,7 +2709,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPINTest_0102, Function | MediumT
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPINTest_0103, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_ERROR_PIN), GetHandler());
+#endif
     return;
 }
 
@@ -2705,10 +2722,11 @@ HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPINTest_0103, Function | MediumT
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_UnlockSimPinTest_0101, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UNLOCK_SIM_PIN), GetHandler());
+#endif
     return;
 }
-
 
 /**
  * @tc.number Telephony_TelRil_UnSetSimLockTest_0101 to do ...
@@ -2717,7 +2735,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_UnlockSimPinTest_0101, Function | MediumTe
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_UnSetSimLockTest_0101, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UNSET_SIM_LOCK), GetHandler());
+#endif
     return;
 }
 
@@ -2728,7 +2748,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_UnSetSimLockTest_0101, Function | MediumTe
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetPIn2LockTest_0101, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_PIN2_LOCK), GetHandler());
+#endif
     return;
 }
 
@@ -2739,7 +2761,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetPIn2LockTest_0101, Function | MediumTes
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_RadioRestartTest_0103, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RADIO_RESTART), GetHandler());
+#endif
     return;
 }
 
@@ -2750,7 +2774,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_RadioRestartTest_0103, Function | MediumTe
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_EnterSimPin2Test_0101, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_SIM_PIN2), GetHandler());
+#endif
     return;
 }
 
@@ -2761,7 +2787,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_EnterSimPin2Test_0101, Function | MediumTe
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetPIn2LockTest_0102, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_PIN2_LOCK), GetHandler());
+#endif
     return;
 }
 
@@ -2772,7 +2800,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetPIn2LockTest_0102, Function | MediumTes
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_RadioRestartTest_0104, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RADIO_RESTART), GetHandler());
+#endif
     return;
 }
 
@@ -2783,7 +2813,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_RadioRestartTest_0104, Function | MediumTe
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPin2Test_0101, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_ERROR_PIN2), GetHandler());
+#endif
     return;
 }
 
@@ -2794,7 +2826,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPin2Test_0101, Function | Medium
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPin2Test_0102, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_ERROR_PIN2), GetHandler());
+#endif
     return;
 }
 
@@ -2805,7 +2839,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPin2Test_0102, Function | Medium
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPin2Test_0103, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_ERROR_PIN2), GetHandler());
+#endif
     return;
 }
 
@@ -2816,7 +2852,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_EnterErrorPin2Test_0103, Function | Medium
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_UnlockSimPin2Test_0101, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UNLOCK_SIM_PIN2), GetHandler());
+#endif
     return;
 }
 
@@ -2827,7 +2865,9 @@ HWTEST_F(TelRilTest, Telephony_TelRil_UnlockSimPin2Test_0101, Function | MediumT
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_UnSetPIn2LockTest_0101, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UNSET_PIN2_LOCK), GetHandler());
+#endif
     return;
 }
 
