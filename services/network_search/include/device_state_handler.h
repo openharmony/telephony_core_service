@@ -49,7 +49,7 @@ private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     std::weak_ptr<ITelRilManager> telRilManager_;
     int32_t slotId_ = 0;
-    int32_t notificationFilter_ = 0;
+    int32_t notificationFilter_ = NOTIFICATION_FILTER_ALL;
     uint32_t cellRequestMinInterval_ = 2;
     bool isWifiConnected_ = false;
     bool isLowData_ = false;
