@@ -15,7 +15,9 @@
 
 #include "device_state_handler.h"
 
+#include "battery_srv_client.h"
 #include "network_search_manager.h"
+#include "power_mgr_client.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -27,7 +29,18 @@ DeviceStateHandler::DeviceStateHandler(
     const std::weak_ptr<NetworkSearchManager> &networkSearchManager,
     const std::weak_ptr<ITelRilManager> &telRilManager, int32_t slotId)
     : networkSearchManager_(networkSearchManager), telRilManager_(telRilManager), slotId_(slotId)
-{}
+{
+    auto &batterySrvClient = PowerMgr::BatterySrvClient::GetInstance();
+    auto chargingStatus = batterySrvClient.GetChargingStatus();
+    isCharging_ = chargingStatus == PowerMgr::BatteryChargeState::CHARGE_STATE_ENABLE ||
+        chargingStatus == PowerMgr::BatteryChargeState::CHARGE_STATE_FULL;
+    auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
+    auto powerSaveMode = powerMgrClient.GetDeviceMode();
+    isPowerSaveModeOn_ = powerSaveMode == PowerMgr::PowerMgrClient::POWER_SAVE_MODE ||
+        powerSaveMode == PowerMgr::PowerMgrClient::EXTREME_POWER_SAVE_MODE;
+    TELEPHONY_LOGI("DeviceStateHandler isCharging_=%{public}d, isPowerSaveModeOn_=%{public}d",
+        isCharging_, isPowerSaveModeOn_);
+}
 
 void DeviceStateHandler::ProcessWifiState(bool isWifiConnected)
 {
