@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 #ifndef LOG_DOMAIN
-#define LOG_DOMAIN 0xD002B01
+#define LOG_DOMAIN 0xD001F00
 #endif
 #ifndef LOG_TAG
 #define LOG_TAG "TelephonySubsystem"

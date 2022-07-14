@@ -66,8 +66,8 @@ ohos_shared_library("tel_core_service_api") {
   ]
 
   defines += [
-    "TELEPHONY_LOG_TAG = \"CoreService\"",
-    "LOG_DOMAIN = 0xD002B01",
+    "TELEPHONY_LOG_TAG = \"CoreServiceApi\"",
+    "LOG_DOMAIN = 0xD001F04",
   ]
 
   configs = [ "$TELEPHONY_CORE_SERVICE_ROOT/utils:telephony_log_config" ]
