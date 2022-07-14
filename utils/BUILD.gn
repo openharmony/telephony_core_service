@@ -40,8 +40,8 @@ ohos_shared_library("libtel_common") {
   ]
 
   defines = [
-    "TELEPHONY_LOG_TAG = \"TELEPHONY_COMMON\"",
-    "LOG_DOMAIN = 0xD002B01",
+    "TELEPHONY_LOG_TAG = \"TelephonyCommon\"",
+    "LOG_DOMAIN = 0xD001F04",
   ]
 
   if (is_standard_system) {

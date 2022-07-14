@@ -51,8 +51,8 @@ ohos_executable("tel_sim_test") {
   ]
 
   defines += [
-    "TELEPHONY_LOG_TAG = \"CoreServiceApi\"",
-    "LOG_DOMAIN = 0xD002B01",
+    "TELEPHONY_LOG_TAG = \"CoreServiceSimTest\"",
+    "LOG_DOMAIN = 0xD000F00",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]

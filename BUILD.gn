@@ -126,7 +126,7 @@ ohos_shared_library("tel_core_service") {
 
   defines += [
     "TELEPHONY_LOG_TAG = \"CoreService\"",
-    "LOG_DOMAIN = 0xD002B01",
+    "LOG_DOMAIN = 0xD001F04",
   ]
 
   deps = [

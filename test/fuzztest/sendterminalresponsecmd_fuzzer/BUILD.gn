@@ -40,7 +40,10 @@ ohos_fuzztest("SendTerminalResponseCmdFuzzTest") {
     "samgr_standard:samgr_proxy",
     "utils_base:utils",
   ]
-
+  defines += [
+    "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
   } else {
