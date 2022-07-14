@@ -21,11 +21,14 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include "accesstoken_kit.h"
+#include "privacy_kit.h"
 
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace Security::AccessToken;
+
 /**
  * @brief Get bundleName by callingUid.
  * @param callingUid.
@@ -60,19 +63,34 @@ bool TelephonyPermission::CheckPermission(const std::string &permissionName)
     }
 
     auto callerToken = IPCSkeleton::GetCallingTokenID();
-    auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
-    int result = Security::AccessToken::PERMISSION_DENIED;
+    auto tokenType = AccessTokenKit::GetTokenTypeFlag(callerToken);
+    int result = PermissionState::PERMISSION_DENIED;
 
-    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
-        result = Security::AccessToken::AccessTokenKit::VerifyNativeToken(callerToken, permissionName);
-    } else if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
-        result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+    if (tokenType == ATokenTypeEnum::TOKEN_NATIVE) {
+        result = AccessTokenKit::VerifyNativeToken(callerToken, permissionName);
+    } else if (tokenType == ATokenTypeEnum::TOKEN_HAP) {
+        result = AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
     } else {
         TELEPHONY_LOGE("permission check failed, callerToken:%{public}u, tokenType:%{public}d",
             callerToken, tokenType);
     }
 
-    if (result != Security::AccessToken::PERMISSION_GRANTED) {
+    if (permissionName == Permission::ANSWER_CALL || permissionName == Permission::READ_CALL_LOG
+        || permissionName == Permission::READ_CONTACTS || permissionName == Permission::WRITE_CONTACTS
+        || permissionName == Permission::SEND_MESSAGES) {
+        if (tokenType == ATokenTypeEnum::TOKEN_HAP) {
+            bool status = result == PermissionState::PERMISSION_GRANTED;
+            int32_t successCount = status ? 1 : 0;
+            int32_t failCount = status ? 0 : 1;
+            int32_t ret = PrivacyKit::AddPermissionUsedRecord(callerToken, permissionName, successCount, failCount);
+            if (ret != 0) {
+                TELEPHONY_LOGE("AddPermissionUsedRecord failed, permission:%{public}s, "
+                    "successCount:%{public}d, failCount:%{public}d", permissionName.c_str(), successCount, failCount);
+            }
+        }
+    }
+
+    if (result != PermissionState::PERMISSION_GRANTED) {
         TELEPHONY_LOGE("permission check failed, permission:%{public}s, callerToken:%{public}u, tokenType:%{public}d",
             permissionName.c_str(), callerToken, tokenType);
         return false;
