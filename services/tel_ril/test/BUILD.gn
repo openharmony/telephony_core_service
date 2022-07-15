@@ -49,7 +49,7 @@ ohos_executable("tel_ril_test") {
     "eventhandler:libeventhandler",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "power_manager_native:powermgr_client",
+    "power_manager:powermgr_client",
     "samgr_standard:samgr_proxy",
   ]
 
