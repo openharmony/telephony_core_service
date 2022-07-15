@@ -48,7 +48,10 @@ ohos_shared_library("sim") {
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
-
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceSimJsApi\"",
+    "LOG_DOMAIN = 0xD001F04",
+  ]
   subsystem_name = "telephony"
   part_name = "core_service"
   relative_install_dir = "module/telephony"
