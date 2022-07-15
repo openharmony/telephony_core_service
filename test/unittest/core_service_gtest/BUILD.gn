@@ -53,8 +53,10 @@ ohos_unittest("tel_core_service_gtest") {
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
-
-  defines = [ "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"" ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
   if ("${product_name}" == "rk3568" || "${product_name}" == "DAYU") {
     defines += [ "TEL_TEST_UNSUPPORT" ]
   }

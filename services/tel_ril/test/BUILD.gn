@@ -31,8 +31,8 @@ ohos_executable("tel_ril_test") {
   ]
 
   defines += [
-    "TELEPHONY_LOG_TAG = \"TelRilTest\"",
-    "LOG_DOMAIN = 0xD002B01",
+    "TELEPHONY_LOG_TAG = \"CoreServiceRilTest\"",
+    "LOG_DOMAIN = 0xD000F00",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
