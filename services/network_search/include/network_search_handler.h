@@ -30,6 +30,7 @@
 #include "radio_event.h"
 #include "radio_info.h"
 #include "signal_info.h"
+#include "system_ability_status_change_stub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -41,7 +42,7 @@ public:
         const std::weak_ptr<NetworkSearchManager> &networkSearchManager,
         const std::weak_ptr<ITelRilManager> &telRilManager, const std::weak_ptr<ISimManager> &simManager,
         int32_t slotId);
-    virtual ~NetworkSearchHandler() = default;
+    virtual ~NetworkSearchHandler();
     bool Init();
     void RegisterEvents();
     void UnregisterEvents();
@@ -146,6 +147,19 @@ private:
     int32_t slotId_ = 0;
     uint32_t cellRequestMinInterval_ = 2; // This is the minimum interval in seconds for cell requests
     uint32_t lastCellRequestTime_ = 0;
+    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
+
+private:
+    class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
+    public:
+        explicit SystemAbilityStatusChangeListener(std::shared_ptr<OperatorName> &operatorName);
+        ~SystemAbilityStatusChangeListener() = default;
+        virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+        virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+
+    private:
+        std::shared_ptr<OperatorName> opName_ = nullptr;
+    };
 };
 } // namespace Telephony
 } // namespace OHOS

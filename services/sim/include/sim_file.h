@@ -35,7 +35,7 @@ public:
     void UpdateMsisdnNumber(
         const std::string &alphaTag, const std::string &number, const AppExecFwk::InnerEvent::Pointer &onComplete);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
-    ~SimFile();
+    ~SimFile() = default;
     bool ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event);
     bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber);
     void UnInit();

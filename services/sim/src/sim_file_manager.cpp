@@ -31,7 +31,12 @@ SimFileManager::SimFileManager(const std::shared_ptr<AppExecFwk::EventRunner> &r
     TELEPHONY_LOGI("SIM manager SimFileManager::SimFileManager started ");
 }
 
-SimFileManager::~SimFileManager() {}
+SimFileManager::~SimFileManager()
+{
+    if (simFile_ != nullptr) {
+        simFile_->UnInit();
+    }
+}
 
 void SimFileManager::Init(int slotId)
 {
