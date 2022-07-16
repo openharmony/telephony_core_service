@@ -22,6 +22,7 @@
 #include "device_state_handler.h"
 #include "net_all_capabilities.h"
 #include "net_supplier_info.h"
+#include "system_ability_status_change_stub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -73,6 +74,19 @@ public:
 
 private:
     std::shared_ptr<DeviceStateEventSubscriber> subscriber_;
+    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
+
+private:
+    class SystemAbilityStatusChangeListener : public SystemAbilityStatusChangeStub {
+    public:
+        explicit SystemAbilityStatusChangeListener(std::shared_ptr<DeviceStateEventSubscriber> &subscriber);
+        ~SystemAbilityStatusChangeListener() = default;
+        virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+        virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+
+    private:
+        std::shared_ptr<DeviceStateEventSubscriber> sub_ = nullptr;
+    };
 };
 } // namespace Telephony
 } // namespace OHOS

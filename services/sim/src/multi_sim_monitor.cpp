@@ -41,11 +41,6 @@ MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<AppExecFwk::EventRunner> 
     }
 }
 
-MultiSimMonitor::~MultiSimMonitor()
-{
-    UnRegisterForIccLoaded();
-}
-
 void MultiSimMonitor::Init()
 {
     SendEvent(MSG_SIM_FORGET_ALLDATA);

@@ -1194,15 +1194,6 @@ void SimFile::InitMemberFunc()
     memberFuncMap_[MSG_SIM_OBTAIN_FPLMN_DONE] = &SimFile::ProcessGetFplmnDone;
 }
 
-SimFile::~SimFile()
-{
-    if (stateManager_ != nullptr) {
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
-    }
-}
-
 int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
 {
     unsigned int cond = 0;

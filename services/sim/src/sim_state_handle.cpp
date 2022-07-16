@@ -225,7 +225,7 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
     }
 }
 
-SimStateHandle::~SimStateHandle()
+void SimStateHandle::UnInit()
 {
     if (telRilManager_ != nullptr) {
         telRilManager_->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
