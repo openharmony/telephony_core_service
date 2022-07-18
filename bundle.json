@@ -44,7 +44,7 @@
                 "ipc",
                 "relational_store",
                 "netmanager_base",
-                "power_manager_native",
+                "power_manager",
                 "resource_management",
                 "ril_adapter",
                 "safwk",
