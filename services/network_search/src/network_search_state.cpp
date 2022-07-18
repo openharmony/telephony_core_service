@@ -205,6 +205,10 @@ void NetworkSearchState::SetImsServiceStatus(const ImsServiceStatus &imsServiceS
 
 std::unique_ptr<NetworkState> NetworkSearchState::GetNetworkStatus()
 {
+    if (networkState_ == nullptr) {
+        TELEPHONY_LOGE("GetNetworkStatus networkState_ is null slotId:%{public}d", slotId_);
+        return nullptr;
+    }
     std::lock_guard<std::mutex> lock(mutex_);
     MessageParcel data;
     networkState_->Marshalling(data);
