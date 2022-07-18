@@ -25,7 +25,15 @@ SimAccountManager::SimAccountManager(std::shared_ptr<Telephony::ITelRilManager> 
     TELEPHONY_LOGI("SimAccountManager construct");
 }
 
-SimAccountManager::~SimAccountManager() {}
+SimAccountManager::~SimAccountManager()
+{
+    if (multiSimMonitor_ != nullptr) {
+        multiSimMonitor_->UnRegisterForIccLoaded();
+    }
+    if (simStateTracker_ != nullptr) {
+        simStateTracker_->UnRegisterForIccLoaded();
+    }
+}
 
 void SimAccountManager::Init(int32_t slotId)
 {

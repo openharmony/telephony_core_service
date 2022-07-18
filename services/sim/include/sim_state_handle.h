@@ -98,8 +98,9 @@ class SimStateHandle : public AppExecFwk::EventHandler {
 public:
     SimStateHandle(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
         const std::weak_ptr<SimStateManager> &simStateManager);
-    ~SimStateHandle();
+    ~SimStateHandle() = default;
     void Init(int32_t slotId);
+    void UnInit();
     SimState GetSimState();
     CardType GetCardType();
     bool HasSimCard();

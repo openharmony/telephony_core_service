@@ -66,6 +66,14 @@ NetworkSearchHandler::NetworkSearchHandler(const std::shared_ptr<AppExecFwk::Eve
       simManager_(simManager), slotId_(slotId)
 {}
 
+NetworkSearchHandler::~NetworkSearchHandler()
+{
+    if (statusChangeListener_ != nullptr) {
+        statusChangeListener_.clear();
+        statusChangeListener_ = nullptr;
+    }
+}
+
 bool NetworkSearchHandler::Init()
 {
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
@@ -129,8 +137,17 @@ bool NetworkSearchHandler::InitOperatorName()
         TELEPHONY_LOGE("failed to create new operatorName slotId:%{public}d", slotId_);
         return false;
     }
-    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(operatorName_);
-    TELEPHONY_LOGI("NetworkSearchHandler::InitOperatorName subscribeResult = %{public}d", subscribeResult);
+    if (EventFwk::CommonEventManager::SubscribeCommonEvent(operatorName_)) {
+        return true;
+    }
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(operatorName_);
+    if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
+        TELEPHONY_LOGE("InitOperatorName samgrProxy or statusChangeListener_ is nullptr");
+    } else {
+        int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+        TELEPHONY_LOGI("InitOperatorName SubscribeSystemAbility result:%{public}d", ret);
+    }
     return true;
 }
 
@@ -797,6 +814,40 @@ void NetworkSearchHandler::AirplaneModeChange(const AppExecFwk::InnerEvent::Poin
 void NetworkSearchHandler::SetCellRequestMinInterval(uint32_t minInterval)
 {
     cellRequestMinInterval_ = minInterval;
+}
+
+NetworkSearchHandler::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(
+    std::shared_ptr<OperatorName> &operatorName) : opName_(operatorName)
+{}
+
+void NetworkSearchHandler::SystemAbilityStatusChangeListener::OnAddSystemAbility(
+    int32_t systemAbilityId, const std::string& deviceId)
+{
+    if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
+        TELEPHONY_LOGE("systemAbilityId is not COMMON_EVENT_SERVICE_ID");
+        return;
+    }
+    if (opName_ == nullptr) {
+        TELEPHONY_LOGE("OnAddSystemAbility COMMON_EVENT_SERVICE_ID opName_ is nullptr");
+        return;
+    }
+    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(opName_);
+    TELEPHONY_LOGI("NetworkSearchHandler::OnAddSystemAbility subscribeResult = %{public}d", subscribeResult);
+}
+
+void NetworkSearchHandler::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
+    int32_t systemAbilityId, const std::string& deviceId)
+{
+    if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
+        TELEPHONY_LOGE("systemAbilityId is not COMMON_EVENT_SERVICE_ID");
+        return;
+    }
+    if (opName_ == nullptr) {
+        TELEPHONY_LOGE("OnRemoveSystemAbility COMMON_EVENT_SERVICE_ID opName_ is nullptr");
+        return;
+    }
+    bool subscribeResult = CommonEventManager::UnSubscribeCommonEvent(opName_);
+    TELEPHONY_LOGI("NetworkSearchHandler::OnRemoveSystemAbility subscribeResult = %{public}d", subscribeResult);
 }
 } // namespace Telephony
 } // namespace OHOS

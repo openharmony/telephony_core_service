@@ -34,7 +34,7 @@ public:
             std::shared_ptr<SimStateManager> simStateManager,
             std::shared_ptr<SimFileManager> simFileManager,
             int32_t slotId);
-    virtual ~MultiSimMonitor();
+    virtual ~MultiSimMonitor() = default;
     void Init();
     bool RegisterForIccLoaded();
     bool UnRegisterForIccLoaded();

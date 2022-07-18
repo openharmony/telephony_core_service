@@ -16,6 +16,8 @@
 #include "device_state_observer.h"
 
 #include "telephony_log_wrapper.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -38,8 +40,18 @@ void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceState
     subscriber_ = std::make_shared<DeviceStateEventSubscriber>(subscriberInfo);
     subscriber_->SetEventHandler(deviceStateHandler);
     subscriber_->InitEventMap();
-    bool subscribeResult = CommonEventManager::SubscribeCommonEvent(subscriber_);
-    TELEPHONY_LOGI("DeviceStateObserver::StartEventSubscriber subscribeResult = %{public}d", subscribeResult);
+    if (CommonEventManager::SubscribeCommonEvent(subscriber_)) {
+        TELEPHONY_LOGI("DeviceStateObserver::StartEventSubscriber subscribe success");
+        return;
+    }
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(subscriber_);
+    if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
+        TELEPHONY_LOGE("StartEventSubscriber samgrProxy or statusChangeListener_ is nullptr");
+        return;
+    }
+    int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+    TELEPHONY_LOGI("StartEventSubscriber SubscribeSystemAbility result:%{public}d", ret);
 }
 
 void DeviceStateObserver::StopEventSubscriber()
@@ -125,6 +137,40 @@ void DeviceStateEventSubscriber::InitEventMap()
         {CommonEventSupport::COMMON_EVENT_WIFI_AP_STA_JOIN, COMMON_EVENT_WIFI_AP_STA_JOIN},
         {CommonEventSupport::COMMON_EVENT_WIFI_AP_STA_LEAVE, COMMON_EVENT_WIFI_AP_STA_LEAVE},
     };
+}
+
+DeviceStateObserver::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(
+    std::shared_ptr<DeviceStateEventSubscriber> &sub) : sub_(sub)
+{}
+
+void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
+    int32_t systemAbilityId, const std::string& deviceId)
+{
+    if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
+        TELEPHONY_LOGE("systemAbilityId is not COMMON_EVENT_SERVICE_ID");
+        return;
+    }
+    if (sub_ == nullptr) {
+        TELEPHONY_LOGE("OnAddSystemAbility COMMON_EVENT_SERVICE_ID sub_ is nullptr");
+        return;
+    }
+    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(sub_);
+    TELEPHONY_LOGI("DeviceStateObserver::OnAddSystemAbility subscribeResult = %{public}d", subscribeResult);
+}
+
+void DeviceStateObserver::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
+    int32_t systemAbilityId, const std::string& deviceId)
+{
+    if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
+        TELEPHONY_LOGE("systemAbilityId is not COMMON_EVENT_SERVICE_ID");
+        return;
+    }
+    if (sub_ == nullptr) {
+        TELEPHONY_LOGE("OnRemoveSystemAbility COMMON_EVENT_SERVICE_ID opName_ is nullptr");
+        return;
+    }
+    bool subscribeResult = CommonEventManager::UnSubscribeCommonEvent(sub_);
+    TELEPHONY_LOGI("DeviceStateObserver::OnRemoveSystemAbility subscribeResult = %{public}d", subscribeResult);
 }
 } // namespace Telephony
 } // namespace OHOS
