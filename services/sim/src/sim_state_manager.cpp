@@ -385,6 +385,11 @@ int32_t SimStateManager::SimAuthentication(int32_t slotId, const std::string &ai
     return ret;
 }
 
-SimStateManager::~SimStateManager() {}
+SimStateManager::~SimStateManager()
+{
+    if (simStateHandle_ != nullptr) {
+        simStateHandle_->UnInit();
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
