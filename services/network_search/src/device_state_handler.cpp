@@ -35,11 +35,12 @@ DeviceStateHandler::DeviceStateHandler(
     isCharging_ = chargingStatus == PowerMgr::BatteryChargeState::CHARGE_STATE_ENABLE ||
         chargingStatus == PowerMgr::BatteryChargeState::CHARGE_STATE_FULL;
     auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
+    isScreenOn_ = powerMgrClient.IsScreenOn();
     auto powerSaveMode = powerMgrClient.GetDeviceMode();
     isPowerSaveModeOn_ = powerSaveMode == PowerMgr::PowerMgrClient::POWER_SAVE_MODE ||
         powerSaveMode == PowerMgr::PowerMgrClient::EXTREME_POWER_SAVE_MODE;
-    TELEPHONY_LOGI("DeviceStateHandler isCharging_=%{public}d, isPowerSaveModeOn_=%{public}d",
-        isCharging_, isPowerSaveModeOn_);
+    TELEPHONY_LOGI("DeviceStateHandler isCharging_=%{public}d, isScreenOn_=%{public}d, isPowerSaveModeOn_=%{public}d",
+        isCharging_, isScreenOn_, isPowerSaveModeOn_);
 }
 
 void DeviceStateHandler::ProcessWifiState(bool isWifiConnected)
@@ -82,12 +83,16 @@ void DeviceStateHandler::ProcessRadioState()
 void DeviceStateHandler::ProcessDeviceState()
 {
     uint32_t newCellRequestMinInterval = GetCellRequestMinInterval();
+    TELEPHONY_LOGI(
+        "ProcessDeviceState isCharging_=%{public}d, isPowerSaveModeOn_=%{public}d, isNetSharingOn_=%{public}d, "
+        "isScreenOn_=%{public}d, isWifiConnected_=%{public}d, newCellRequestMinInterval=%{public}d",
+        isCharging_, isPowerSaveModeOn_, isNetSharingOn_, isScreenOn_, isWifiConnected_, newCellRequestMinInterval);
     if (cellRequestMinInterval_ != newCellRequestMinInterval) {
         cellRequestMinInterval_ = newCellRequestMinInterval;
         SetCellRequestMinInterval(cellRequestMinInterval_);
     }
 
-    if (isLowData_ != !IsHighPowerConsumption()) {
+    if (isLowData_ != IsLowPowerConsumption()) {
         isLowData_ = !isLowData_;
         SetDeviceState(LOW_DATA_STATE, isLowData_);
     }
@@ -97,9 +102,10 @@ void DeviceStateHandler::ProcessDeviceState()
         newFilter |= NOTIFICATION_FILTER_SIGNAL_STRENGTH;
     }
 
-    if (IsHighPowerConsumption()) {
+    if (!IsLowPowerConsumption()) {
         newFilter |= NOTIFICATION_FILTER_NETWORK_STATE;
         newFilter |= NOTIFICATION_FILTER_DATA_CALL;
+        newFilter |= NOTIFICATION_FILTER_LINK_CAPACITY;
         newFilter |= NOTIFICATION_FILTER_PHYSICAL_CHANNEL_CONFIG;
     }
 
@@ -111,9 +117,9 @@ bool DeviceStateHandler::IsSignalStrengthNotificationExpected() const
     return isCharging_ || isScreenOn_;
 }
 
-bool DeviceStateHandler::IsHighPowerConsumption() const
+bool DeviceStateHandler::IsLowPowerConsumption() const
 {
-    return isCharging_ || isScreenOn_ || isNetSharingOn_;
+    return !isCharging_ && !isScreenOn_ && !isNetSharingOn_;
 }
 
 uint32_t DeviceStateHandler::GetCellRequestMinInterval() const

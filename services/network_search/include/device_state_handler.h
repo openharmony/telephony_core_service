@@ -37,7 +37,7 @@ public:
 
 private:
     uint32_t GetCellRequestMinInterval() const;
-    bool IsHighPowerConsumption() const;
+    bool IsLowPowerConsumption() const;
     bool IsSignalStrengthNotificationExpected() const;
     void SetCellRequestMinInterval(uint32_t minInterval) const;
     void ProcessDeviceState();

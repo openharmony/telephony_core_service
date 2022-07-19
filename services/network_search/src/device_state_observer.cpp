@@ -40,10 +40,6 @@ void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceState
     subscriber_ = std::make_shared<DeviceStateEventSubscriber>(subscriberInfo);
     subscriber_->SetEventHandler(deviceStateHandler);
     subscriber_->InitEventMap();
-    if (CommonEventManager::SubscribeCommonEvent(subscriber_)) {
-        TELEPHONY_LOGI("DeviceStateObserver::StartEventSubscriber subscribe success");
-        return;
-    }
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(subscriber_);
     if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
