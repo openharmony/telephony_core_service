@@ -39,7 +39,7 @@
                 "batterysrv_client",
                 "common_event_service",
                 "hdf_core",
-                "dmsfwk_standard",
+                "dmsfwk",
                 "i18n",
                 "ipc",
                 "relational_store",
