@@ -159,7 +159,11 @@ int32_t ImsCoreServiceClient::RegisterImsCoreServiceCallbackHandler(int32_t slot
 
 std::shared_ptr<AppExecFwk::EventHandler> ImsCoreServiceClient::GetHandler(int32_t slotId)
 {
-    return handlerMap_[slotId];
+    auto itor = handlerMap_.find(slotId);
+    if (itor != handlerMap_.end()) {
+        return itor->second;
+    }
+    return nullptr;
 }
 
 int32_t ImsCoreServiceClient::ReConnectService()
