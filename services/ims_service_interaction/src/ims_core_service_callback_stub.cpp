@@ -78,6 +78,10 @@ int32_t ImsCoreServiceCallbackStub::UpdateImsServiceStatusChanged(
 {
     TELEPHONY_LOGI("ImsCoreServiceCallbackStub::UpdateImsServiceStatusChanged entry");
     std::shared_ptr<ImsCoreServiceClient> imsCoreServiceClient = DelayedSingleton<ImsCoreServiceClient>::GetInstance();
+    if (imsCoreServiceClient->GetHandler(slotId) == nullptr) {
+        TELEPHONY_LOGE("get handler was null! slotId is %{public}d", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     std::shared_ptr<ImsServiceStatus> imsServiceState = std::make_shared<ImsServiceStatus>();
     if (imsServiceState.get() == nullptr) {
         TELEPHONY_LOGE("make_shared ImsServiceStatus failed!");
@@ -107,6 +111,10 @@ int32_t ImsCoreServiceCallbackStub::GetImsRegistrationStatusResponse(
 {
     TELEPHONY_LOGI("ImsCoreServiceCallbackStub::GetImsRegistrationStatusResponse entry");
     std::shared_ptr<ImsCoreServiceClient> imsCoreServiceClient = DelayedSingleton<ImsCoreServiceClient>::GetInstance();
+    if (imsCoreServiceClient->GetHandler(slotId) == nullptr) {
+        TELEPHONY_LOGE("get handler was null! slotId is %{public}d", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     std::shared_ptr<int32_t> isRegisterd = std::make_shared<int32_t>();
     *isRegisterd = imsRegStatus.isRegisterd ? 1 : 0;
     imsCoreServiceClient->GetHandler(slotId)->SendEvent(RadioEvent::RADIO_IMS_REGISTER_STATE_UPDATE, isRegisterd);
