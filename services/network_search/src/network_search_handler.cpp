@@ -137,9 +137,6 @@ bool NetworkSearchHandler::InitOperatorName()
         TELEPHONY_LOGE("failed to create new operatorName slotId:%{public}d", slotId_);
         return false;
     }
-    if (EventFwk::CommonEventManager::SubscribeCommonEvent(operatorName_)) {
-        return true;
-    }
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(operatorName_);
     if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
