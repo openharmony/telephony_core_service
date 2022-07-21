@@ -33,7 +33,7 @@ ohos_executable("tel_network_search_test") {
 
   deps = [
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-    "//base/miscservices/time/services:time_service",
+    "//base/time/time_service/services:time_service",
     "//utils/native/base:utils",
   ]
 
