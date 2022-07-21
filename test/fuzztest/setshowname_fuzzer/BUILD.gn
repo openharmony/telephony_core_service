@@ -38,7 +38,7 @@ ohos_fuzztest("SetShowNameFuzzTest") {
 
   external_deps = [
     "ipc:ipc_core",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
     "utils_base:utils",
   ]
   defines += [

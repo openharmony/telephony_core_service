@@ -79,7 +79,7 @@ ohos_shared_library("tel_core_service_api") {
     "eventhandler:libeventhandler",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
     "utils_base:utils",
   ]
 
