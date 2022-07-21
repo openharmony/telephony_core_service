@@ -162,7 +162,7 @@ ohos_shared_library("tel_core_service") {
     "relational_store:native_rdb",
     "resource_management:global_resmgr",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
     "time_native:time_service",
     "utils_base:utils",
   ]

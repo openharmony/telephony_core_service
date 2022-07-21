@@ -37,7 +37,7 @@ ohos_fuzztest("UpdateIccDiallingNumbersFuzzTest") {
 
   external_deps = [
     "ipc:ipc_core",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
     "utils_base:utils",
   ]
   defines += [
