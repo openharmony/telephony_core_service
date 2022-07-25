@@ -1847,8 +1847,8 @@ bool CoreServiceProxy::SetVoiceMailInfo(
 
 int32_t CoreServiceProxy::GetMaxSimCount()
 {
-    char simSlotCount[SYSPARA_SIZE] = {0};
-    GetParameter(TEL_SIM_SLOT_COUNT.c_str(), DEFAULT_SLOT_COUNT.c_str(), simSlotCount, SYSPARA_SIZE);
+    char simSlotCount[SYSPARA_SIZE] = { 0 };
+    GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
     int32_t slotCount = std::atoi(simSlotCount);
     return slotCount;
 }
