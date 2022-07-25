@@ -28,16 +28,16 @@ namespace Telephony {
 inline const int32_t SYSPARA_SIZE = 128;
 inline const int32_t DEFAULT_SIM_SLOT_ID = 0;
 inline const int32_t DEFAULT_SIM_SLOT_ID_REMOVE = -1;
-inline const std::string DEFAULT_SLOT_COUNT = "1";
-inline const std::string TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
-inline const std::string DEFAULT_PREFERRED_NETWORK_TYPE = "5"; // CORE_NETWORK_MODE_LTE_WCDMA_GSM
-inline const std::string TEL_PREFERRED_NETWORK_TYPE = "const.telephony.preferredNetworkType";
+inline constexpr const char *DEFAULT_SLOT_COUNT = "1";
+inline constexpr const char *TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
+inline constexpr const char *DEFAULT_PREFERRED_NETWORK_TYPE = "5"; // CORE_NETWORK_MODE_LTE_WCDMA_GSM
+inline constexpr const char *TEL_PREFERRED_NETWORK_TYPE = "const.telephony.preferredNetworkType";
 
 template<typename T>
 inline T GetMaxSlotCount()
 {
     char simSlotCount[SYSPARA_SIZE] = { 0 };
-    GetParameter(TEL_SIM_SLOT_COUNT.c_str(), DEFAULT_SLOT_COUNT.c_str(), simSlotCount, SYSPARA_SIZE);
+    GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
     T slotCount = std::atoi(simSlotCount);
     return slotCount;
 }
@@ -46,8 +46,7 @@ template<typename T>
 inline T GetPreferredNetworkType()
 {
     char preferredNetworkType[SYSPARA_SIZE] = { 0 };
-    GetParameter(
-        TEL_PREFERRED_NETWORK_TYPE.c_str(), DEFAULT_PREFERRED_NETWORK_TYPE.c_str(), preferredNetworkType, SYSPARA_SIZE);
+    GetParameter(TEL_PREFERRED_NETWORK_TYPE, DEFAULT_PREFERRED_NETWORK_TYPE, preferredNetworkType, SYSPARA_SIZE);
     T networkType = std::atoi(preferredNetworkType);
     return networkType;
 }

@@ -21,12 +21,11 @@
 namespace OHOS {
 namespace Telephony {
 #define MSG_NS_SPN_UPDATED 0xF1
-const std::string SPN_INFO_UPDATED_ACTION = "ohos.action.telephonySpnInfoUpdated";
-const std::string CUR_SLOT_ID = "CUR_SLOT_ID";
-const std::string CUR_PLMN_SHOW = "CUR_PLMN_SHOW";
-const std::string CUR_PLMN = "CUR_PLMN";
-const std::string CUR_SPN_SHOW = "CUR_SPN_SHOW";
-const std::string CUR_SPN = "CUR_SPN";
+constexpr const char *CUR_SLOT_ID = "CUR_SLOT_ID";
+constexpr const char *CUR_PLMN_SHOW = "CUR_PLMN_SHOW";
+constexpr const char *CUR_PLMN = "CUR_PLMN";
+constexpr const char *CUR_SPN_SHOW = "CUR_SPN_SHOW";
+constexpr const char *CUR_SPN = "CUR_SPN";
 
 enum class DomainType {
     DOMAIN_TYPE_PS,
