@@ -18,6 +18,7 @@
 
 #include "common_event.h"
 #include "common_event_manager.h"
+#include "common_event_support.h"
 #include "event_handler.h"
 #include "event_runner.h"
 #include "i_tel_ril_manager.h"
@@ -129,7 +130,6 @@ protected:
     std::condition_variable processWait_;
     const uint8_t BYTE_NUM = 0xff;
     const int DATA_STEP = 2;
-    const std::string SIM_STATE_ACTION = "com.hos.action.SIM_STATE_CHANGED";
     static std::unique_ptr<ObserverHandler> filesFetchedObser_;
     std::unique_ptr<ObserverHandler> lockedFilesFetchedObser_ = nullptr;
     std::unique_ptr<ObserverHandler> networkLockedFilesFetchedObser_ = nullptr;

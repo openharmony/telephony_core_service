@@ -118,7 +118,6 @@ public:
     void AlterPin2(int32_t slotId, std::string newPin2, std::string oldPin2);
     void UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo);
     void SetRilManager(std::shared_ptr<Telephony::ITelRilManager> telRilManager);
-    const std::string SIM_STATE_ACTION = "com.hos.action.SIM_STATE_CHANGED";
     bool IsIccReady();
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
