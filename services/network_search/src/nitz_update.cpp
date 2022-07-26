@@ -199,10 +199,9 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
     if (runningLock != nullptr) {
         runningLock->UnLock();
     }
-    std::string action = "usual.event.NITZ_TIME_UPDATED";
     std::string param = "time";
     AAFwk::Want want;
-    want.SetAction(action);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_NITZ_TIME_CHANGED);
     want.SetParam(param, static_cast<int32_t>(time));
     PublishCommonEvent(want);
 }
@@ -246,10 +245,9 @@ void NitzUpdate::SaveTimeZone(std::string &timeZone)
     TELEPHONY_LOGI("NitzUpdate::ProcessTimeZone result:%{public}d timezone:%{public}s slotId:%{public}d",
         result, timeZone.c_str(), slotId_);
 
-    std::string action = "usual.event.NITZ_TIMEZONE_UPDATED";
     std::string param = "time-zone";
     AAFwk::Want want;
-    want.SetAction(action);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_NITZ_TIMEZONE_CHANGED);
     want.SetParam(param, timeZone);
     PublishCommonEvent(want);
 }
@@ -271,10 +269,9 @@ void NitzUpdate::SaveTime(int64_t time)
     if (runningLock != nullptr) {
         runningLock->UnLock();
     }
-    std::string action = "usual.event.NITZ_TIME_UPDATED";
     std::string param = "time";
     AAFwk::Want want;
-    want.SetAction(action);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_NITZ_TIME_CHANGED);
     want.SetParam(param, static_cast<long>(time));
     PublishCommonEvent(want);
 }

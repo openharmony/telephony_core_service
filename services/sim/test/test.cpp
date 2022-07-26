@@ -1100,11 +1100,11 @@ int main()
     }
 
     OHOS::EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(SIM_STATE_CHANGE_ACTION);
-    matchingSkills.AddEvent(DEFAULT_VOICE_SLOTID_CHANGE_ACTION);
-    matchingSkills.AddEvent(DEFAULT_SMS_SLOTID_CHANGE_ACTION);
-    matchingSkills.AddEvent(DEFAULT_DATA_SLOTID_CHANGE_ACTION);
-    matchingSkills.AddEvent(DEFAULT_MAIN_SLOTID_CHANGE_ACTION);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_VOICE_SUBSCRIPTION_CHANGED);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_SMS_SUBSCRIPTION_CHANGED);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_MAIN_SUBSCRIPTION_CHANGED);
     // STK
     matchingSkills.AddEvent(ACTION_SESSION_END);
     matchingSkills.AddEvent(ACTION_STK_COMMAND);
