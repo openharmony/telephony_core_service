@@ -18,6 +18,7 @@
 
 #include <singleton.h>
 
+#include "hdf_service_status_listener.h"
 #include "i_tel_ril_manager.h"
 #include "tel_ril_call.h"
 #include "tel_ril_data.h"
@@ -52,9 +53,10 @@ public:
     bool OnInit() override;
     bool ConnectRilAdapterService() override;
     bool ResetRemoteObject(void) override;
+    bool DeInit();
 
-    int32_t RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what,
-        int32_t *obj) override;
+    int32_t RegisterCoreNotify(
+        int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what, int32_t *obj) override;
     int32_t UnRegisterCoreNotify(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int32_t what) override;
 
@@ -75,8 +77,8 @@ public:
      * @param string address
      * @param int32_t clirMode
      */
-    int32_t Dial(int32_t slotId, std::string address, int32_t clirMode,
-        const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t Dial(
+        int32_t slotId, std::string address, int32_t clirMode, const AppExecFwk::InnerEvent::Pointer &result) override;
 
     /**
      * @brief  Reject the Call
@@ -98,8 +100,7 @@ public:
 
     int32_t SwitchCall(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    int32_t CombineConference(
-        int32_t slotId, int32_t callType, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t CombineConference(int32_t slotId, int32_t callType, const AppExecFwk::InnerEvent::Pointer &result) override;
 
     int32_t SeparateConference(
         int32_t slotId, int32_t callIndex, int32_t callType, const AppExecFwk::InnerEvent::Pointer &result) override;
@@ -114,8 +115,8 @@ public:
     int32_t GetCallTransferInfo(
         int32_t slotId, const int32_t reason, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    int32_t SetCallTransferInfo(int32_t slotId, const CallTransferParam &callTransfer,
-        const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t SetCallTransferInfo(
+        int32_t slotId, const CallTransferParam &callTransfer, const AppExecFwk::InnerEvent::Pointer &result) override;
 
     int32_t GetClip(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
 
@@ -125,8 +126,7 @@ public:
 
     int32_t SetClir(int32_t slotId, const int32_t action, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    int32_t GetCallRestriction(
-        int32_t slotId, std::string fac, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t GetCallRestriction(int32_t slotId, std::string fac, const AppExecFwk::InnerEvent::Pointer &result) override;
 
     int32_t SetCallRestriction(int32_t slotId, const CallRestrictionParam &callRestriction,
         const AppExecFwk::InnerEvent::Pointer &result) override;
@@ -185,8 +185,8 @@ public:
     /**
      * @brief  Send Sms
      */
-    int32_t SendGsmSms(int32_t slotId, std::string smscPdu, std::string pdu,
-        const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SendGsmSms(
+        int32_t slotId, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     /**
      * @brief  Send CDMA Sms
@@ -226,8 +226,8 @@ public:
     /**
      * @brief Send Sms ExpectMore
      */
-    int32_t SendSmsMoreMode(int32_t slotId, std::string smscPdu, std::string pdu,
-        const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SendSmsMoreMode(
+        int32_t slotId, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t SendSmsAck(
         int32_t slotId, bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response) override;
@@ -241,8 +241,8 @@ public:
     /* PDP start */
     int32_t SetInitApnInfo(
         int32_t slotId, const DataProfile &dataProfile, const AppExecFwk::InnerEvent::Pointer &response) override;
-    int32_t ActivatePdpContext(int32_t slotId, const ActivateDataParam &activeData,
-        const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t ActivatePdpContext(
+        int32_t slotId, const ActivateDataParam &activeData, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t DeactivatePdpContext(
         int32_t slotId, int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetPdpContextList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
@@ -295,14 +295,13 @@ public:
     int32_t GetCallPreferenceMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SetRadioProtocol(
         int32_t slotId, SimProtocolRequest data, const AppExecFwk::InnerEvent::Pointer &response) override;
-    int32_t SetUssd(
-        int32_t slotId, const std::string str, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SetUssd(int32_t slotId, const std::string str, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetUssd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SetMute(int32_t slotId, const int32_t mute, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetMute(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetEmergencyCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
-    int32_t SetEmergencyCallList(int32_t slotId, std::vector<EmergencyCall>  &eccVec,
-        const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SetEmergencyCallList(
+        int32_t slotId, std::vector<EmergencyCall> &eccVec, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetCallFailReason(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SimOpenLogicalChannel(int32_t slotId, const std::string &appID, const int32_t p2,
         const AppExecFwk::InnerEvent::Pointer &response) override;
@@ -315,10 +314,37 @@ public:
     int32_t SimAuthentication(
         int32_t slotId, SimAuthenticationRequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response) override;
 
+    /**
+     * ReConnect riladapter service
+     *
+     * @return:True is reconnect riladapter service success, false is fail
+     */
+    bool ReConnectRilAdapterService();
+
+    /**
+     * DisConnect riladapter service
+     *
+     * @return:True is release success, false is fail
+     */
+    bool DisConnectRilAdapterService();
+
+    /**
+     * Register hdf status listener
+     *
+     * @return:True is Register HdfStatusListener success, false is fail
+     */
+    bool RegisterHdfStatusListener();
+
+    /**
+     * UnRegister hdf status listener
+     *
+     * @return:True is UnRegister HdfStatusListener success, false is fail
+     */
+    bool UnRegisterHdfStatusListener();
+
     static const int32_t INVALID_WAKELOCK = -1;
     static const int32_t FOR_WAKELOCK = 0;
     static const int32_t FOR_ACK_WAKELOCK = 1;
-    static const int32_t RIL_INIT_COUNT_MAX = 10;
 
 private:
     void CreatTelRilHandler(void);
@@ -357,8 +383,8 @@ private:
      * @return true/false - success/fail
      */
     template<typename ResponsePtr, typename ClassTypePtr, typename FuncType, typename... ParamTypes>
-    inline int32_t TaskSchedule(ResponsePtr &_result, const std::string _module, ClassTypePtr &_obj,
-        FuncType &&_func, ParamTypes &&..._args) const
+    inline int32_t TaskSchedule(ResponsePtr &_result, const std::string _module, ClassTypePtr &_obj, FuncType &&_func,
+        ParamTypes &&..._args) const
     {
         if (_func != nullptr) {
             // The reason for using native member function access here is to
@@ -374,9 +400,8 @@ private:
 
 private:
     std::mutex mutex_;
-    sptr<IRemoteObject> rilAdapterRemoteObj_;
-    sptr<OHOS::IPCObjectStub> telRilCallback_;
-    sptr<OHOS::IPCObjectStub::DeathRecipient> death_;
+    sptr<IRemoteObject> rilAdapterRemoteObj_ = nullptr;
+    sptr<OHOS::IPCObjectStub> telRilCallback_ = nullptr;
     std::vector<std::unique_ptr<TelRilSim>> telRilSim_;
     std::vector<std::unique_ptr<TelRilSms>> telRilSms_;
     std::vector<std::unique_ptr<TelRilCall>> telRilCall_;
@@ -386,6 +411,8 @@ private:
     std::vector<std::shared_ptr<ObserverHandler>> observerHandler_;
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
     std::shared_ptr<TelRilHandler> handler_ = nullptr;
+    sptr<OHOS::HDI::ServiceManager::V1_0::IServiceManager> servMgr_ = nullptr;
+    sptr<HdfServiceStatusListener::IServStatListener> hdfListener_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

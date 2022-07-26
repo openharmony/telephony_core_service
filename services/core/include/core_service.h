@@ -25,6 +25,7 @@
 #include "i_network_search.h"
 #include "i_sim_manager.h"
 #include "i_tel_ril_manager.h"
+#include "tel_ril_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -203,7 +204,7 @@ private:
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
     std::shared_ptr<Telephony::ISimManager> simManager_ = nullptr;
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
-    std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
+    std::shared_ptr<TelRilManager> telRilManager_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
