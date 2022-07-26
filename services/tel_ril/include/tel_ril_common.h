@@ -16,6 +16,8 @@
 #ifndef TEL_RIL_COMMON_H
 #define TEL_RIL_COMMON_H
 
+namespace OHOS {
+namespace Telephony {
 typedef enum {
     CORE_SERVICE_NO_PHONE = 0,
     CORE_SERVICE_GSM_PHONE = 1,
@@ -24,4 +26,6 @@ typedef enum {
 } CoreServiceTelephonyType;
 
 typedef enum { CORE_SERVICE_SUCCESS = 0, CORE_SERVICE_ERROR = 1 } CoreServiceLteOptStatus;
+} // namespace Telephony
+} // namespace OHOS
 #endif

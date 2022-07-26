@@ -23,7 +23,6 @@
 #include "ims_core_service_client.h"
 #include "network_search_manager.h"
 #include "sim_manager.h"
-#include "tel_ril_manager.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
@@ -100,6 +99,7 @@ void CoreService::OnStop()
     state_ = ServiceRunningState::STATE_NOT_START;
     registerToService_ = false;
     DelayedSingleton<ImsCoreServiceClient>::GetInstance()->UnInit();
+    telRilManager_->DeInit();
     TELEPHONY_LOGI("CoreService Stop success");
 }
 

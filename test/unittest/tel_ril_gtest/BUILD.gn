@@ -33,13 +33,14 @@ ohos_unittest("tel_ril_gtest") {
     "//base/telephony/core_service/common/core",
     "//base/telephony/core_service/services/tel_ril/include",
     "//base/telephony/core_service/services/sim/include",
-    "//utils/native/base/include",
     "//drivers/hdf_core/adapter/uhdf2/include/hdi",
+    "//utils/native/base/include",
   ]
 
   deps = [
     "//base/telephony/core_service:tel_core_service",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
+    "//drivers/hdf_core/adapter/uhdf2/hdi:libhdi",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
