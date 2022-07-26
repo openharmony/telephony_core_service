@@ -82,11 +82,11 @@ const int MSG_SIM_UNLOCK_SIMLOCK_DONE = 51;
 const int MSG_SIM_AUTHENTICATION_DONE = 61;
 
 // pin lock type
-const std::string FAC_PIN_LOCK = "SC";
+constexpr const char *FAC_PIN_LOCK = "SC";
 // change pin2 type
-const std::string FDN_PIN_LOCK = "P2";
+constexpr const char *FDN_PIN_LOCK = "P2";
 // FDN lock type
-const std::string FDN_PIN2_LOCK = "FD";
+constexpr const char *FDN_PIN2_LOCK = "FD";
 
 struct UnlockData {
     int32_t result;
