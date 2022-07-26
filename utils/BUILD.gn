@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/distributeddatamgr/preferences/preferences.gni")
 
 group("common_target") {
   deps = [ ":libtel_common" ]
@@ -53,7 +54,7 @@ ohos_shared_library("libtel_common") {
   public_configs = [ ":tel_utils_config" ]
 
   public_deps = [
-    "//foundation/distributeddatamgr/appdatamgr/preferences/interfaces/inner_api:native_preferences",
+    "${preferences_innerapi_path}:native_preferences",
     "//utils/native/base:utils",
   ]
 
