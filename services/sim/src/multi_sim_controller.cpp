@@ -15,10 +15,13 @@
 
 #include "multi_sim_controller.h"
 
+#include "common_event_manager.h"
+#include "common_event_support.h"
 #include "string_ex.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace OHOS::EventFwk;
 std::mutex MultiSimController::mutex_;
 std::vector<SimRdbInfo> MultiSimController::localCacheInfo_;
 bool MultiSimController::ready_ = false;
@@ -819,7 +822,7 @@ bool MultiSimController::AnnounceDefaultVoiceSlotIdChanged(int32_t slotId)
 {
     AAFwk::Want want;
     want.SetParam(PARAM_SLOTID, slotId);
-    want.SetAction(DEFAULT_VOICE_SLOTID_CHANGE_ACTION);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_VOICE_SUBSCRIPTION_CHANGED);
     int32_t eventCode = EVENT_CODE;
     std::string eventData(DEFAULT_VOICE_SLOT_CHANGED);
     return PublishSimFileEvent(want, eventCode, eventData);
@@ -829,7 +832,7 @@ bool MultiSimController::AnnounceDefaultSmsSlotIdChanged(int32_t slotId)
 {
     AAFwk::Want want;
     want.SetParam(PARAM_SLOTID, slotId);
-    want.SetAction(DEFAULT_SMS_SLOTID_CHANGE_ACTION);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_SMS_SUBSCRIPTION_CHANGED);
     int32_t eventCode = EVENT_CODE;
     std::string eventData(DEFAULT_SMS_SLOT_CHANGED);
     return PublishSimFileEvent(want, eventCode, eventData);
@@ -839,7 +842,7 @@ bool MultiSimController::AnnounceDefaultCellularDataSlotIdChanged(int32_t slotId
 {
     AAFwk::Want want;
     want.SetParam(PARAM_SLOTID, slotId);
-    want.SetAction(DEFAULT_DATA_SLOTID_CHANGE_ACTION);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED);
     int32_t eventCode = EVENT_CODE;
     std::string eventData(DEFAULT_CELLULAR_DATA_SLOT_CHANGED);
     return PublishSimFileEvent(want, eventCode, eventData);
@@ -849,7 +852,7 @@ bool MultiSimController::AnnounceDefaultMainSlotIdChanged(int32_t slotId)
 {
     AAFwk::Want want;
     want.SetParam(PARAM_SLOTID, slotId);
-    want.SetAction(DEFAULT_MAIN_SLOTID_CHANGE_ACTION);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_MAIN_SUBSCRIPTION_CHANGED);
     int32_t eventCode = EVENT_CODE;
     std::string eventData(DEFAULT_MAIN_SLOT_CHANGED);
     return PublishSimFileEvent(want, eventCode, eventData);
