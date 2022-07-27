@@ -297,7 +297,8 @@ void IccFile::RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> event
         if (imsiReadyObser_ != nullptr) {
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
         }
-        PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_IMSI, ObtainIMSI());
+        PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED,
+            ICC_STATE_IMSI, ObtainIMSI());
     }
 }
 
@@ -320,7 +321,7 @@ void IccFile::RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> e
         if (filesFetchedObser_ != nullptr) {
             filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
         }
-        PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_LOADED, "");
+        PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_LOADED, "");
     }
 }
 

@@ -16,9 +16,12 @@
 #include "isim_file.h"
 
 #include "radio_event.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
 
 using namespace std;
 using namespace OHOS::AppExecFwk;
+using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
@@ -90,7 +93,7 @@ void IsimFile::ProcessLockedAllFilesFetched() {}
 void IsimFile::OnAllFilesFetched()
 {
     filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
-    PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_LOADED, "");
+    PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_LOADED, "");
 }
 
 bool IsimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
@@ -140,7 +143,7 @@ bool IsimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGI("IsimFile::ProcessEvent MSG_SIM_OBTAIN_IMSI_DONE");
         if (!imsi_.empty()) {
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
-            PublishSimFileEvent(SIM_STATE_ACTION, ICC_STATE_IMSI, imsi_);
+            PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_IMSI, imsi_);
         }
     }
     return isFileHandleResponse;

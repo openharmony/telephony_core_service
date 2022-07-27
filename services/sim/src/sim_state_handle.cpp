@@ -494,24 +494,24 @@ void SimStateHandle::SimStateEscape(
     switch (simState) {
         case ICC_CARD_ABSENT:
             externalState_ = SimState::SIM_STATE_NOT_PRESENT;
-            PublishSimStateEvent(SIM_STATE_ACTION, ICC_STATE_ABSENT, "");
+            PublishSimStateEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_ABSENT, "");
             break;
         case ICC_CONTENT_READY:
             externalState_ = SimState::SIM_STATE_READY;
             observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_READY);
-            PublishSimStateEvent(SIM_STATE_ACTION, ICC_STATE_READY, "");
+            PublishSimStateEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_READY, "");
             break;
         case ICC_CONTENT_PIN:
             externalState_ = SimState::SIM_STATE_LOCKED;
             reason = LockReason::SIM_PIN;
             observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_LOCKED);
-            PublishSimStateEvent(SIM_STATE_ACTION, ICC_STATE_PIN, "");
+            PublishSimStateEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_PIN, "");
             break;
         case ICC_CONTENT_PUK:
             externalState_ = SimState::SIM_STATE_LOCKED;
             reason = LockReason::SIM_PUK;
             observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_LOCKED);
-            PublishSimStateEvent(SIM_STATE_ACTION, ICC_STATE_PUK, "");
+            PublishSimStateEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_PUK, "");
             break;
         default:
             SimLockStateEscape(simState, slotId, reason);
@@ -546,7 +546,8 @@ void SimStateHandle::SimLockStateEscape(
         default:
             isSimLockState = false;
             externalState_ = SimState::SIM_STATE_UNKNOWN;
-            PublishSimStateEvent(SIM_STATE_ACTION, ICC_STATE_NOT_READY, "");
+            PublishSimStateEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED,
+                ICC_STATE_NOT_READY, "");
             break;
     }
     if (isSimLockState) {
@@ -558,7 +559,7 @@ void SimStateHandle::NotifySimLock(int slotId)
 {
     externalState_ = SimState::SIM_STATE_LOCKED;
     observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_SIMLOCK);
-    PublishSimStateEvent(SIM_STATE_ACTION, ICC_STATE_SIMLOCK, "");
+    PublishSimStateEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_SIMLOCK, "");
 }
 
 void SimStateHandle::CardTypeEscape(int32_t simType, int slotId)
