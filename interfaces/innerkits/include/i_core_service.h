@@ -21,6 +21,7 @@
 #include "sim_state_type.h"
 #include "network_search_result.h"
 #include "network_state.h"
+#include "operator_config_types.h"
 #include "signal_information.h"
 #include "cell_information.h"
 #include "ims_voice_callback.h"
@@ -74,6 +75,7 @@ public:
     virtual bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual std::u16string GetLocaleFromDefaultSim() = 0;
     virtual std::u16string GetSimGid1(int32_t slotId) = 0;
+    virtual std::u16string GetSimGid2(int32_t slotId) = 0;
     virtual std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired) = 0;
     virtual bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
         const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
@@ -110,6 +112,9 @@ public:
         const int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) = 0;
     virtual int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) = 0;
     virtual int32_t GetMaxSimCount() = 0;
+    virtual std::u16string GetOpKey(int32_t slotId) = 0;
+    virtual std::u16string GetOpKeyExt(int32_t slotId) = 0;
+    virtual std::u16string GetOpName(int32_t slotId) = 0;
     virtual bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) = 0;
     virtual bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) = 0;
     virtual bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) = 0;
@@ -155,6 +160,7 @@ public:
         GET_NETWORK_SELECTION_MODE,
         GET_SIM_LANGUAGE,
         GET_SIM_GID1,
+        GET_SIM_GID2,
         SET_NETWORK_SELECTION_MODE,
         GET_CELL_LOCATION,
         GET_SIM_SUB_INFO,
@@ -184,6 +190,9 @@ public:
         ICC_DIALLING_NUMBERS_UPDATE,
         SET_VOICE_MAIL,
         GET_MAX_SIM_COUNT,
+        GET_OPKEY,
+        GET_OPKEY_EXT,
+        GET_OPNAME,
         GET_IMS_REG_STATUS,
         STK_CMD_FROM_APP_ENVELOPE,
         STK_CMD_FROM_APP_TERMINAL_RESPONSE,
