@@ -17,6 +17,7 @@
 
 #include "parameter.h"
 #include "radio_event.h"
+#include "string_ex.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
@@ -1590,6 +1591,52 @@ std::u16string CoreManagerInner::GetSimGid1(int32_t slotId)
         return u"";
     }
     return simManager_->GetSimGid1(slotId);
+}
+
+std::u16string CoreManagerInner::GetSimGid2(int32_t slotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return u"";
+    }
+    return simManager_->GetSimGid2(slotId);
+}
+
+std::u16string CoreManagerInner::GetOpName(int32_t slotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return u"";
+    }
+    return simManager_->GetOpName(slotId);
+}
+
+std::u16string CoreManagerInner::GetOpKeyExt(int32_t slotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return u"";
+    }
+    return simManager_->GetOpKeyExt(slotId);
+}
+
+std::u16string CoreManagerInner::GetOpKey()
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return u"";
+    }
+    int32_t slotId = simManager_->GetPrimarySlotId();
+    return GetOpKey(slotId);
+}
+
+std::u16string CoreManagerInner::GetOpKey(int32_t slotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return u"";
+    }
+    return simManager_->GetOpKey(slotId);
 }
 
 std::u16string CoreManagerInner::GetSimTelephoneNumber(int32_t slotId)

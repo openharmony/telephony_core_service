@@ -224,6 +224,8 @@ void SimRdbHelper::SaveDataToBean(std::shared_ptr<NativeRdb::AbsSharedResultSet>
     result->GetString(index, simBean.iccId);
     result->GetColumnIndex(SimRdbInfo::CARD_ID, index);
     result->GetString(index, simBean.cardId);
+    result->GetColumnIndex(SimRdbInfo::IMS_SWITCH, index);
+    result->GetInt(index, simBean.imsSwitch);
     result->GetColumnIndex(SimRdbInfo::SLOT_INDEX, index);
     result->GetInt(index, simBean.slotIndex);
     result->GetColumnIndex(SimRdbInfo::CARD_TYPE, index);

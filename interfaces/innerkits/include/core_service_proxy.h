@@ -50,6 +50,7 @@ public:
     bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
     std::u16string GetLocaleFromDefaultSim() override;
     std::u16string GetSimGid1(int32_t slotId) override;
+    std::u16string GetSimGid2(int32_t slotId) override;
     std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired) override;
     bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
         const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
@@ -102,6 +103,9 @@ public:
         const int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) override;
     int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) override;
     int32_t GetMaxSimCount() override;
+    std::u16string GetOpKey(int32_t slotId) override;
+    std::u16string GetOpKeyExt(int32_t slotId) override;
+    std::u16string GetOpName(int32_t slotId) override;
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
     bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;

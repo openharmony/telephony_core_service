@@ -16,13 +16,14 @@
 #ifndef OHOS_SIM_ACCOUNT_MANAGER_H
 #define OHOS_SIM_ACCOUNT_MANAGER_H
 
+#include "i_tel_ril_manager.h"
+#include "icc_operator_privilege_controller.h"
 #include "multi_sim_controller.h"
 #include "multi_sim_monitor.h"
-#include "i_tel_ril_manager.h"
-#include "sim_state_manager.h"
+#include "operator_config_cache.h"
 #include "sim_file_manager.h"
+#include "sim_state_manager.h"
 #include "sim_state_tracker.h"
-#include "icc_operator_privilege_controller.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -63,6 +64,7 @@ private:
     std::shared_ptr<MultiSimController> multiSimController_ = nullptr;
     std::shared_ptr<MultiSimMonitor> multiSimMonitor_ = nullptr;
     std::shared_ptr<SimStateTracker> simStateTracker_ = nullptr;
+    std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
     std::vector<IccAccountInfo> activeInfos_;
     std::shared_ptr<IccOperatorPrivilegeController> privilegeController_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> controllerRunner_;
