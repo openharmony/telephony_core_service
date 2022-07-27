@@ -89,8 +89,8 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     IccFileData *result = &(rcvMsg->fileData);
     std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
-    if (result == nullptr) {
-        TELEPHONY_LOGE("result is nullptr");
+    if (result == nullptr || hd == nullptr) {
+        TELEPHONY_LOGE("result or hd is nullptr");
         return;
     }
     TELEPHONY_LOGI("ProcessRecordSize --- resultData: --- %{public}s", result->resultData.c_str());
@@ -98,6 +98,7 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
     std::shared_ptr<unsigned char> rawData = SIMUtils::HexStringConvertToBytes(result->resultData, recordLen);
     if (rawData == nullptr) {
         TELEPHONY_LOGE("rawData is nullptr");
+        SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
         return;
     }
     unsigned char *fileData = rawData.get();
@@ -105,6 +106,7 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
     if (recordLen > LENGTH_OF_RECORD) {
         if (!IsValidSizeData(fileData)) {
             TELEPHONY_LOGE("ProcessRecordSize get error filetype");
+            SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
             return;
         }
         GetFileAndDataSize(fileData, hd->fileSize, size);
