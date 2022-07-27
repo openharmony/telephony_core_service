@@ -395,11 +395,20 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGI("SimFileManager::ProcessEvent id %{public}d", id);
+    if (simStateManager_ == nullptr) {
+        TELEPHONY_LOGE("simStateManager_ is nullptr");
+        return;
+    }
     switch (id) {
         case RadioEvent::RADIO_VOICE_TECH_CHANGED: {
             TELEPHONY_LOGI("SimFileManager receive RADIO_VOICE_TECH_CHANGED");
             std::shared_ptr<VoiceRadioTechnology> tech = event->GetSharedObject<VoiceRadioTechnology>();
             SimFileManager::IccType iccType = GetIccTypeByTech(tech);
+            if (iccType == SimFileManager::IccType::ICC_TYPE_CDMA &&
+                simStateManager_->GetCardType() == CardType::SINGLE_MODE_USIM_CARD) {
+                iccType = SimFileManager::IccType::ICC_TYPE_USIM;
+                TELEPHONY_LOGI("SimFileManager change iccType to USIM");
+            }
             ChangeSimFileByCardType(iccType);
             break;
         }
