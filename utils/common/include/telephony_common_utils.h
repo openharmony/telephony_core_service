@@ -13,17 +13,14 @@
  * limitations under the License.
  */
 
-#ifndef IMS_UT_CALLBACK_H
-#define IMS_UT_CALLBACK_H
+#ifndef TELEPHONY_COMMON_UTILS_H
+#define TELEPHONY_COMMON_UTILS_H
 
-#include "ims_manager_callback.h"
+#include <string>
 
 namespace OHOS {
 namespace Telephony {
-class ImsUtCallback : public ImsManagerCallback {
-public:
-    virtual int32_t OnImsStateCallback(const ImsRegInfo &info) = 0;
-};
-}  // namespace Telephony
-}  // namespace OHOS
-#endif  // IMS_UT_CALLBACK_H
+std::string GetBundleName();
+} // namespace Telephony
+} // namespace OHOS
+#endif // TELEPHONY_COMMON_UTILS_H

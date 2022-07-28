@@ -13,23 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef IMS_UT_CALLBACK_PROXY_H
-#define IMS_UT_CALLBACK_PROXY_H
+#include "telephony_common_utils.h"
 
-#include "ims_ut_callback.h"
-#include "telephony_log_wrapper.h"
+#include "ipc_skeleton.h"
+#include "telephony_permission.h"
 
 namespace OHOS {
 namespace Telephony {
-class ImsUtCallbackProxy : public IRemoteProxy<ImsUtCallback> {
-public:
-    explicit ImsUtCallbackProxy(const sptr<IRemoteObject> &impl);
-    virtual ~ImsUtCallbackProxy() = default;
-    int32_t OnImsStateCallback(const ImsRegInfo &info) override;
-
-private:
-    static inline BrokerDelegator<ImsUtCallbackProxy> delegator_;
-};
-}  // namespace Telephony
-}  // namespace OHOS
-#endif  // IMS_UT_CALLBACK_PROXY_H
+std::string GetBundleName()
+{
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    std::string bundleName = "";
+    TelephonyPermission::GetBundleNameByUid(uid, bundleName);
+    if (bundleName.empty()) {
+        bundleName.append(std::to_string(uid));
+        bundleName.append(std::to_string(IPCSkeleton::GetCallingPid()));
+    }
+    return bundleName;
+}
+} // namespace Telephony
+} // namespace OHOS

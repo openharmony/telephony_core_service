@@ -13,23 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef IMS_VIDEO_CALLBACK_PROXY_H
-#define IMS_VIDEO_CALLBACK_PROXY_H
+#include "ims_reg_info_callback_gtest.h"
 
-#include "ims_video_callback.h"
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-class ImsVideoCallbackProxy : public IRemoteProxy<ImsVideoCallback> {
-public:
-    explicit ImsVideoCallbackProxy(const sptr<IRemoteObject> &impl);
-    virtual ~ImsVideoCallbackProxy() = default;
-    int32_t OnImsStateCallback(const ImsRegInfo &info) override;
-
-private:
-    static inline BrokerDelegator<ImsVideoCallbackProxy> delegator_;
-};
-}  // namespace Telephony
-}  // namespace OHOS
-#endif  // IMS_VIDEO_CALLBACK_PROXY_H
+int32_t ImsRegInfoCallbackGtest::OnImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info)
+{
+    TELEPHONY_LOGI(
+        "slotId is %{public}d, imsSrvType is %{public}d, imsRegState is %{public}d,  imsRegTech is %{public}d", slotId,
+        imsSrvType, info.imsRegState, info.imsRegTech);
+    return TELEPHONY_SUCCESS;
+}
+} // namespace Telephony
+} // namespace OHOS
