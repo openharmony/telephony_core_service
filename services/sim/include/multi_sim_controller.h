@@ -93,14 +93,6 @@ private:
     int32_t slotId_ = 0;
     int32_t maxCount_ = 0;
     static bool ready_;
-    inline static const std::string DEFAULT_VOICE_SLOTID_CHANGE_ACTION =
-        "com.hos.action.DEFAULT_VOICE_SUBSCRIPTION_CHANGED";
-    inline static const std::string DEFAULT_SMS_SLOTID_CHANGE_ACTION =
-        "com.hos.action.DEFAULT_SMS_SUBSCRIPTION_CHANGED";
-    inline static const std::string DEFAULT_DATA_SLOTID_CHANGE_ACTION =
-        "com.hos.action.DEFAULT_DATA_SUBSCRIPTION_CHANGED";
-    inline static const std::string DEFAULT_MAIN_SLOTID_CHANGE_ACTION =
-        "com.hos.action.MAIN_SUBSCRIPTION_CHANGED";
     inline static const std::string PARAM_SLOTID = "slotId";
     inline static const std::string DEFAULT_VOICE_SLOT_CHANGED = "defaultVoiceSlotChanged";
     inline static const std::string DEFAULT_SMS_SLOT_CHANGED = "defaultSmsSlotChanged";

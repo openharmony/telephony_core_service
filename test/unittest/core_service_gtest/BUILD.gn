@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -23,17 +23,22 @@ ohos_unittest("tel_core_service_gtest") {
   sources = [
     "//base/telephony/core_service/frameworks/native/src/i_network_search_callback_stub.cpp",
     "core_service_test_helper.cpp",
+    "ims_reg_info_callback_gtest.cpp",
     "network_search_test.cpp",
     "network_search_test_callback_stub.cpp",
+    "sim_operator_brocast_test.cpp",
     "sim_test.cpp",
   ]
 
   include_dirs = [
+    "//base/telephony/core_service/services/core/include",
     "//base/telephony/core_service/utils/log/include",
     "//base/telephony/core_service/common/sim",
+    "//base/telephony/core_service/services/sim/include",
     "//base/telephony/core_service/common/network_search",
     "//base/telephony/core_service/common/core",
     "//utils/native/base/include",
+    "//base/telephony/core_service/services/tel_ril/include",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
@@ -42,16 +47,19 @@ ohos_unittest("tel_core_service_gtest") {
     "//base/telephony/core_service:tel_core_service",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
     "//third_party/googletest:gtest_main",
+    "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "ability_base:want",
     "common_event_service:cesfwk_innerkits",
     "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "startup_l2:syspara",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",

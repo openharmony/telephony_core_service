@@ -15,15 +15,14 @@
 
 #include "core_service.h"
 
-#include "parameter.h"
-#include "string_ex.h"
-#include "system_ability_definition.h"
-
 #include "core_manager_inner.h"
 #include "ims_core_service_client.h"
 #include "network_search_manager.h"
+#include "parameter.h"
 #include "sim_manager.h"
-#include "tel_ril_manager.h"
+#include "string_ex.h"
+#include "system_ability_definition.h"
+#include "telephony_common_utils.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
@@ -100,6 +99,7 @@ void CoreService::OnStop()
     state_ = ServiceRunningState::STATE_NOT_START;
     registerToService_ = false;
     DelayedSingleton<ImsCoreServiceClient>::GetInstance()->UnInit();
+    telRilManager_->DeInit();
     TELEPHONY_LOGI("CoreService Stop success");
 }
 
@@ -389,6 +389,18 @@ std::u16string CoreService::GetSimGid1(int32_t slotId)
     return simManager_->GetSimGid1(slotId);
 }
 
+std::u16string CoreService::GetSimGid2(int32_t slotId)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        return std::u16string();
+    }
+    TELEPHONY_LOGI("CoreService::GetSimGid2(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        return std::u16string();
+    }
+    return simManager_->GetSimGid2(slotId);
+}
+
 std::u16string CoreService::GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired)
 {
     TELEPHONY_LOGI("CoreService::GetSimEons(), slotId = %{public}d", slotId);
@@ -550,8 +562,7 @@ bool CoreService::UnlockPuk(const int slotId, std::u16string newPin, std::u16str
     return simManager_->UnlockPuk(slotId, Str16ToStr8(newPin), Str16ToStr8(puk), response);
 }
 
-bool CoreService::AlterPin(
-    const int slotId, std::u16string newPin, std::u16string oldPin, LockStatusResponse &response)
+bool CoreService::AlterPin(const int slotId, std::u16string newPin, std::u16string oldPin, LockStatusResponse &response)
 {
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
@@ -583,8 +594,7 @@ bool CoreService::UnlockPuk2(
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
-    TELEPHONY_LOGI(
-        "CoreService::UnlockPuk2(), newPin2Len = %{public}lu, puk2Len = %{public}lu, slotId = %{public}d",
+    TELEPHONY_LOGI("CoreService::UnlockPuk2(), newPin2Len = %{public}lu, puk2Len = %{public}lu, slotId = %{public}d",
         (unsigned long)newPin2.length(), (unsigned long)puk2.length(), slotId);
     if (simManager_ == nullptr) {
         return false;
@@ -598,8 +608,7 @@ bool CoreService::AlterPin2(
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
-    TELEPHONY_LOGI(
-        "CoreService::AlterPin2(), newPin2Len = %{public}lu, oldPin2Len = %{public}lu, slotId = %{public}d",
+    TELEPHONY_LOGI("CoreService::AlterPin2(), newPin2Len = %{public}lu, oldPin2Len = %{public}lu, slotId = %{public}d",
         (unsigned long)newPin2.length(), (unsigned long)oldPin2.length(), slotId);
     if (simManager_ == nullptr) {
         return false;
@@ -665,8 +674,7 @@ bool CoreService::GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchC
     return networkSearchManager_->GetPreferredNetwork(slotId, callback);
 }
 
-bool CoreService::SetPreferredNetwork(
-    int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback)
+bool CoreService::SetPreferredNetwork(int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback)
 {
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
@@ -794,6 +802,33 @@ int32_t CoreService::GetMaxSimCount()
     return slotCount;
 }
 
+std::u16string CoreService::GetOpKey(int32_t slotId)
+{
+    TELEPHONY_LOGI("CoreService::GetOpKey(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        return std::u16string();
+    }
+    return simManager_->GetOpKey(slotId);
+}
+
+std::u16string CoreService::GetOpKeyExt(int32_t slotId)
+{
+    TELEPHONY_LOGI("CoreService::GetOpKeyExt(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        return std::u16string();
+    }
+    return simManager_->GetOpKeyExt(slotId);
+}
+
+std::u16string CoreService::GetOpName(int32_t slotId)
+{
+    TELEPHONY_LOGI("CoreService::GetOpName(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        return std::u16string();
+    }
+    return simManager_->GetOpName(slotId);
+}
+
 bool CoreService::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
 {
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
@@ -886,20 +921,31 @@ int32_t CoreService::SimAuthentication(
     return simManager_->SimAuthentication(slotId, aid, authData, response);
 }
 
-int32_t CoreService::RegImsCallback(MessageParcel &data)
+int32_t CoreService::RegisterImsRegInfoCallback(
+    int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback)
 {
-    if (networkSearchManager_ == nullptr) {
-        return ERROR;
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    return networkSearchManager_->RegImsCallback(data);
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("failed! network search manager is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->RegisterImsRegInfoCallback(slotId, imsSrvType, GetBundleName(), callback);
 }
 
-int32_t CoreService::UnRegImsCallback(MessageParcel &data)
+int32_t CoreService::UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType)
 {
-    if (networkSearchManager_ == nullptr) {
-        return ERROR;
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    return networkSearchManager_->UnRegImsCallback(data);
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("failed! network search manager is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->UnregisterImsRegInfoCallback(slotId, imsSrvType, GetBundleName());
 }
 } // namespace Telephony
 } // namespace OHOS

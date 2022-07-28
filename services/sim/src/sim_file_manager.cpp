@@ -254,6 +254,18 @@ std::u16string SimFileManager::GetSimGid1()
     return Str8ToStr16(result);
 }
 
+std::u16string SimFileManager::GetSimGid2()
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::GetSimGid2 simFile nullptr");
+        return Str8ToStr16("");
+    }
+
+    std::string result = simFile_->ObtainGid2();
+    TELEPHONY_LOGI("SimFileManager::GetSimGid2 result:%{public}s ", (result.empty() ? "false" : "true"));
+    return Str8ToStr16(result);
+}
+
 std::u16string SimFileManager::GetSimTelephoneNumber()
 {
     if (simFile_ == nullptr) {
@@ -304,6 +316,36 @@ std::u16string SimFileManager::GetVoiceMailNumber()
     return Str8ToStr16(result);
 }
 
+std::u16string SimFileManager::GetOpName()
+{
+    return Str8ToStr16(opName_);
+}
+
+std::u16string SimFileManager::GetOpKey()
+{
+    return Str8ToStr16(opKey_);
+}
+
+std::u16string SimFileManager::GetOpKeyExt()
+{
+    return Str8ToStr16(opKeyExt_);
+}
+
+void SimFileManager::SetOpName(std::string opName)
+{
+    opName_ = opName;
+}
+
+void SimFileManager::SetOpKey(std::string opKey)
+{
+    opKey_ = opKey;
+}
+
+void SimFileManager::SetOpKeyExt(std::string opKeyExt)
+{
+    opKeyExt_ = opKeyExt;
+}
+
 int SimFileManager::ObtainSpnCondition(bool roaming, std::string operatorNum)
 {
     if (simFile_ == nullptr) {
@@ -328,6 +370,10 @@ std::shared_ptr<IccFileController> SimFileManager::GetIccFileController()
 
 void SimFileManager::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {
+    if (what == RadioEvent::RADIO_SIM_STATE_CHANGE && simStateManager_ != nullptr) {
+        simStateManager_->RegisterCoreNotify(handler, what);
+        return;
+    }
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::RegisterCoreNotify simFile nullptr");
         return;
@@ -337,6 +383,10 @@ void SimFileManager::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventH
 
 void SimFileManager::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {
+    if (what == RadioEvent::RADIO_SIM_STATE_CHANGE && simStateManager_ != nullptr) {
+        simStateManager_->UnRegisterCoreNotify(handler, what);
+        return;
+    }
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::UnRegisterCoreNotify simFile nullptr");
         return;
@@ -355,7 +405,7 @@ void SimFileManager::SetImsi(std::string imsi)
 
 bool SimFileManager::SetVoiceMailInfo(const std::u16string &mailName, const std::u16string &mailNumber)
 {
-    if (simFile_ == nullptr || !simStateManager_->HasSimCard()) {
+    if (simFile_ == nullptr || !HasSimCard()) {
         TELEPHONY_LOGE("SimFileManager::SetVoiceMail simFile nullptr");
         return false;
     }
@@ -363,6 +413,17 @@ bool SimFileManager::SetVoiceMailInfo(const std::u16string &mailName, const std:
     std::string number = Str16ToStr8(mailNumber);
     bool result = simFile_->UpdateVoiceMail(name, number);
     TELEPHONY_LOGI("SimFileManager::SetVoiceMail result:%{public}s ", (!result ? "false" : "true"));
+    return result;
+}
+
+bool SimFileManager::HasSimCard()
+{
+    if (simStateManager_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::HasSimCard simStateManager_ nullptr");
+        return false;
+    }
+    bool result = simStateManager_->HasSimCard();
+    TELEPHONY_LOGI("SimFileManager::HasSimCard result:%{public}s ", (result ? "true" : "false"));
     return result;
 }
 

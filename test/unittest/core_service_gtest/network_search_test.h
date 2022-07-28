@@ -17,9 +17,16 @@
 #define NETWORK_SEARCH_TEST_H
 
 #include <gtest/gtest.h>
+#include <list>
+
 #include "core_service_client.h"
 namespace OHOS {
 namespace Telephony {
+struct ImsRegStateCallback {
+    int32_t slotId;
+    ImsServiceType imsSrvType;
+    sptr<ImsRegInfoCallback> imsCallback = nullptr;
+};
 class NetworkSearchTest : public testing::Test {
 public:
     // execute before first testcase
@@ -31,6 +38,7 @@ public:
 
 public:
     static sptr<ICoreService> telephonyService_;
+    static std::list<ImsRegStateCallback> imsRegStateCallbackList_;
 };
 } // namespace Telephony
 } // namespace OHOS

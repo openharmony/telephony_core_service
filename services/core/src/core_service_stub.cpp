@@ -14,6 +14,7 @@
  */
 
 #include "core_service_stub.h"
+
 #include "string_ex.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -51,8 +52,8 @@ void CoreServiceStub::AddHandlerNetWorkToMap()
     memberFuncMap_[uint32_t(InterfaceID::GET_PREFERRED_NETWORK_MODE)] = &CoreServiceStub::OnGetPreferredNetwork;
     memberFuncMap_[uint32_t(InterfaceID::SET_PREFERRED_NETWORK_MODE)] = &CoreServiceStub::OnSetPreferredNetwork;
     memberFuncMap_[uint32_t(InterfaceID::GET_NR_OPTION_MODE)] = &CoreServiceStub::OnGetNrOptionMode;
-    memberFuncMap_[uint32_t(InterfaceID::REG_IMS_CALLBACK)] = &CoreServiceStub::OnRegImsCallback;
-    memberFuncMap_[uint32_t(InterfaceID::UN_REG_IMS_CALLBACK)] = &CoreServiceStub::OnUnRegImsCallback;
+    memberFuncMap_[uint32_t(InterfaceID::REG_IMS_CALLBACK)] = &CoreServiceStub::OnRegisterImsRegInfoCallback;
+    memberFuncMap_[uint32_t(InterfaceID::UN_REG_IMS_CALLBACK)] = &CoreServiceStub::OnUnregisterImsRegInfoCallback;
 }
 
 void CoreServiceStub::AddHandlerSimToMap()
@@ -67,11 +68,15 @@ void CoreServiceStub::AddHandlerSimToMap()
     memberFuncMap_[uint32_t(InterfaceID::IS_SIM_ACTIVE)] = &CoreServiceStub::OnIsSimActive;
     memberFuncMap_[uint32_t(InterfaceID::GET_SIM_LANGUAGE)] = &CoreServiceStub::OnGetLocaleFromDefaultSim;
     memberFuncMap_[uint32_t(InterfaceID::GET_SIM_GID1)] = &CoreServiceStub::OnGetSimGid1;
+    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_GID2)] = &CoreServiceStub::OnGetSimGid2;
+    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_EONS)] = &CoreServiceStub::OnGetSimEons;
+
     memberFuncMap_[uint32_t(InterfaceID::GET_SIM_SUB_INFO)] = &CoreServiceStub::OnGetSimSubscriptionInfo;
     memberFuncMap_[uint32_t(InterfaceID::SET_DEFAULT_VOICE_SLOTID)] = &CoreServiceStub::OnSetDefaultVoiceSlotId;
     memberFuncMap_[uint32_t(InterfaceID::GET_DEFAULT_VOICE_SLOTID)] = &CoreServiceStub::OnGetDefaultVoiceSlotId;
     memberFuncMap_[uint32_t(InterfaceID::SET_PRIMARY_SLOTID)] = &CoreServiceStub::OnSetPrimarySlotId;
     memberFuncMap_[uint32_t(InterfaceID::GET_PRIMARY_SLOTID)] = &CoreServiceStub::OnGetPrimarySlotId;
+
     memberFuncMap_[uint32_t(InterfaceID::SET_SHOW_NUMBER)] = &CoreServiceStub::OnSetShowNumber;
     memberFuncMap_[uint32_t(InterfaceID::GET_SHOW_NUMBER)] = &CoreServiceStub::OnGetShowNumber;
     memberFuncMap_[uint32_t(InterfaceID::SET_SHOW_NAME)] = &CoreServiceStub::OnSetShowName;
@@ -87,6 +92,10 @@ void CoreServiceStub::AddHandlerSimToMap()
     memberFuncMap_[uint32_t(InterfaceID::UNLOCK_PIN2)] = &CoreServiceStub::OnUnlockPin2;
     memberFuncMap_[uint32_t(InterfaceID::UNLOCK_PUK2)] = &CoreServiceStub::OnUnlockPuk2;
     memberFuncMap_[uint32_t(InterfaceID::ALTER_PIN2)] = &CoreServiceStub::OnAlterPin2;
+}
+
+void CoreServiceStub::AddHandlerSimToMapExt()
+{
     memberFuncMap_[uint32_t(InterfaceID::REFRESH_SIM_STATE)] = &CoreServiceStub::OnRefreshSimState;
     memberFuncMap_[uint32_t(InterfaceID::SET_SIM_ACTIVE)] = &CoreServiceStub::OnSetActiveSim;
     memberFuncMap_[uint32_t(InterfaceID::GET_SIM_PHONE_NUMBER)] = &CoreServiceStub::OnGetSimPhoneNumber;
@@ -100,19 +109,17 @@ void CoreServiceStub::AddHandlerSimToMap()
     memberFuncMap_[uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_DELETE)] = &CoreServiceStub::OnDelIccDiallingNumbers;
     memberFuncMap_[uint32_t(InterfaceID::SET_VOICE_MAIL)] = &CoreServiceStub::OnSetVoiceMailInfo;
     memberFuncMap_[uint32_t(InterfaceID::GET_MAX_SIM_COUNT)] = &CoreServiceStub::OnGetMaxSimCount;
-    memberFuncMap_[uint32_t(InterfaceID::GET_CARD_TYPE)] = &CoreServiceStub::OnGetCardType;
-    memberFuncMap_[uint32_t(InterfaceID::UNLOCK_SIMLOCK)] = &CoreServiceStub::OnUnlockSimLock;
-    memberFuncMap_[uint32_t(InterfaceID::HAS_OPERATOR_PRIVILEGES)] = &CoreServiceStub::OnHasOperatorPrivileges;
-    memberFuncMap_[uint32_t(InterfaceID::IS_NR_SUPPORTED)] = &CoreServiceStub::OnIsNrSupported;
-}
-
-void CoreServiceStub::AddHandlerSimToMapExt()
-{
+    memberFuncMap_[uint32_t(InterfaceID::GET_OPKEY)] = &CoreServiceStub::OnGetOpKey;
+    memberFuncMap_[uint32_t(InterfaceID::GET_OPNAME)] = &CoreServiceStub::OnGetOpName;
+    memberFuncMap_[uint32_t(InterfaceID::GET_OPKEY_EXT)] = &CoreServiceStub::OnGetOpKeyExt;
     memberFuncMap_[uint32_t(InterfaceID::STK_CMD_FROM_APP_ENVELOPE)] = &CoreServiceStub::OnSendEnvelopeCmd;
     memberFuncMap_[uint32_t(InterfaceID::STK_CMD_FROM_APP_TERMINAL_RESPONSE)] =
         &CoreServiceStub::OnSendTerminalResponseCmd;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_EONS)] = &CoreServiceStub::OnGetSimEons;
+    memberFuncMap_[uint32_t(InterfaceID::GET_CARD_TYPE)] = &CoreServiceStub::OnGetCardType;
+    memberFuncMap_[uint32_t(InterfaceID::UNLOCK_SIMLOCK)] = &CoreServiceStub::OnUnlockSimLock;
+    memberFuncMap_[uint32_t(InterfaceID::HAS_OPERATOR_PRIVILEGES)] = &CoreServiceStub::OnHasOperatorPrivileges;
     memberFuncMap_[uint32_t(InterfaceID::SIM_AUTHENTICATION)] = &CoreServiceStub::OnSimAuthentication;
+    memberFuncMap_[uint32_t(InterfaceID::IS_NR_SUPPORTED)] = &CoreServiceStub::OnIsNrSupported;
 }
 
 int32_t CoreServiceStub::OnRemoteRequest(
@@ -508,6 +515,18 @@ int32_t CoreServiceStub::OnGetSimGid1(MessageParcel &data, MessageParcel &reply)
     return NO_ERROR;
 }
 
+int32_t CoreServiceStub::OnGetSimGid2(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string result = GetSimGid2(slotId);
+    bool ret = reply.WriteString16(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::GetSimGid2 write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
 int32_t CoreServiceStub::OnGetSimEons(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
@@ -588,13 +607,13 @@ int32_t CoreServiceStub::OnGetPrimarySlotId(MessageParcel &data, MessageParcel &
 
 int32_t CoreServiceStub::OnUnlockPin(MessageParcel &data, MessageParcel &reply)
 {
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
     int32_t slotId = data.ReadInt32();
     std::u16string pin = data.ReadString16();
     bool result = UnlockPin(slotId, pin, response);
     bool ret = reply.WriteBool(result);
-    TELEPHONY_LOGI("OnUnlockPin, response.result :%{public}d, response.remain :%{public}d",
-        response.result, response.remain);
+    TELEPHONY_LOGI(
+        "OnUnlockPin, response.result :%{public}d, response.remain :%{public}d", response.result, response.remain);
     ret = (ret && reply.WriteInt32(response.result));
     ret = (ret && reply.WriteInt32(response.remain));
     if (!ret) {
@@ -606,14 +625,14 @@ int32_t CoreServiceStub::OnUnlockPin(MessageParcel &data, MessageParcel &reply)
 
 int32_t CoreServiceStub::OnUnlockPuk(MessageParcel &data, MessageParcel &reply)
 {
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
     int32_t slotId = data.ReadInt32();
     std::u16string newPin = data.ReadString16();
     std::u16string puk = data.ReadString16();
     bool result = UnlockPuk(slotId, newPin, puk, response);
     bool ret = reply.WriteBool(result);
-    TELEPHONY_LOGI("OnUnlockPuk, response.result :%{public}d, response.remain :%{public}d",
-        response.result, response.remain);
+    TELEPHONY_LOGI(
+        "OnUnlockPuk, response.result :%{public}d, response.remain :%{public}d", response.result, response.remain);
     ret = (ret && reply.WriteInt32(response.result));
     ret = (ret && reply.WriteInt32(response.remain));
     if (!ret) {
@@ -625,14 +644,14 @@ int32_t CoreServiceStub::OnUnlockPuk(MessageParcel &data, MessageParcel &reply)
 
 int32_t CoreServiceStub::OnAlterPin(MessageParcel &data, MessageParcel &reply)
 {
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
     int32_t slotId = data.ReadInt32();
     std::u16string newPin = data.ReadString16();
     std::u16string oldPin = data.ReadString16();
     bool result = AlterPin(slotId, newPin, oldPin, response);
     bool ret = reply.WriteBool(result);
-    TELEPHONY_LOGI("OnAlterPin, response.result :%{public}d, response.remain :%{public}d",
-        response.result, response.remain);
+    TELEPHONY_LOGI(
+        "OnAlterPin, response.result :%{public}d, response.remain :%{public}d", response.result, response.remain);
     ret = (ret && reply.WriteInt32(response.result));
     ret = (ret && reply.WriteInt32(response.remain));
     if (!ret) {
@@ -644,13 +663,13 @@ int32_t CoreServiceStub::OnAlterPin(MessageParcel &data, MessageParcel &reply)
 
 int32_t CoreServiceStub::OnUnlockPin2(MessageParcel &data, MessageParcel &reply)
 {
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
     int32_t slotId = data.ReadInt32();
     std::u16string pin2 = data.ReadString16();
     bool result = UnlockPin2(slotId, pin2, response);
     bool ret = reply.WriteBool(result);
-    TELEPHONY_LOGI("OnUnlockPin2, response.result :%{public}d, response.remain :%{public}d",
-        response.result, response.remain);
+    TELEPHONY_LOGI(
+        "OnUnlockPin2, response.result :%{public}d, response.remain :%{public}d", response.result, response.remain);
     ret = (ret && reply.WriteInt32(response.result));
     ret = (ret && reply.WriteInt32(response.remain));
     if (!ret) {
@@ -662,14 +681,14 @@ int32_t CoreServiceStub::OnUnlockPin2(MessageParcel &data, MessageParcel &reply)
 
 int32_t CoreServiceStub::OnUnlockPuk2(MessageParcel &data, MessageParcel &reply)
 {
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
     int32_t slotId = data.ReadInt32();
     std::u16string newPin2 = data.ReadString16();
     std::u16string puk2 = data.ReadString16();
     bool result = UnlockPuk2(slotId, newPin2, puk2, response);
     bool ret = reply.WriteBool(result);
-    TELEPHONY_LOGI("OnUnlockPuk2, response.result :%{public}d, response.remain :%{public}d",
-        response.result, response.remain);
+    TELEPHONY_LOGI(
+        "OnUnlockPuk2, response.result :%{public}d, response.remain :%{public}d", response.result, response.remain);
     ret = (ret && reply.WriteInt32(response.result));
     ret = (ret && reply.WriteInt32(response.remain));
     if (!ret) {
@@ -681,14 +700,14 @@ int32_t CoreServiceStub::OnUnlockPuk2(MessageParcel &data, MessageParcel &reply)
 
 int32_t CoreServiceStub::OnAlterPin2(MessageParcel &data, MessageParcel &reply)
 {
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
     int32_t slotId = data.ReadInt32();
     std::u16string newPin2 = data.ReadString16();
     std::u16string oldPin2 = data.ReadString16();
     bool result = AlterPin2(slotId, newPin2, oldPin2, response);
     bool ret = reply.WriteBool(result);
-    TELEPHONY_LOGI("OnAlterPin2, response.result :%{public}d, response.remain :%{public}d",
-        response.result, response.remain);
+    TELEPHONY_LOGI(
+        "OnAlterPin2, response.result :%{public}d, response.remain :%{public}d", response.result, response.remain);
     ret = (ret && reply.WriteInt32(response.result));
     ret = (ret && reply.WriteInt32(response.remain));
     if (!ret) {
@@ -705,14 +724,14 @@ int32_t CoreServiceStub::OnSetLockState(MessageParcel &data, MessageParcel &repl
     options.lockType = static_cast<LockType>(data.ReadInt32());
     options.lockState = static_cast<LockState>(data.ReadInt32());
     options.password = data.ReadString16();
-    LockStatusResponse response = {0};
-    TELEPHONY_LOGI(
-        "CoreServiceStub::OnSetLockState(), lockType = %{public}d, lockState = %{public}d, "
-        "slotId = %{public}d", options.lockType, options.lockState, slotId);
+    LockStatusResponse response = { 0 };
+    TELEPHONY_LOGI("CoreServiceStub::OnSetLockState(), lockType = %{public}d, lockState = %{public}d, "
+                   "slotId = %{public}d",
+        options.lockType, options.lockState, slotId);
     bool result = SetLockState(slotId, options, response);
     bool ret = reply.WriteBool(result);
-    TELEPHONY_LOGI("OnSetLockState, response.result :%{public}d, response.remain :%{public}d",
-        response.result, response.remain);
+    TELEPHONY_LOGI(
+        "OnSetLockState, response.result :%{public}d, response.remain :%{public}d", response.result, response.remain);
     ret = (ret && reply.WriteInt32(response.result));
     ret = (ret && reply.WriteInt32(response.remain));
     if (!ret) {
@@ -1053,6 +1072,42 @@ int32_t CoreServiceStub::OnGetMaxSimCount(MessageParcel &data, MessageParcel &re
     return NO_ERROR;
 }
 
+int32_t CoreServiceStub::OnGetOpKey(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string result = GetOpKey(slotId);
+    bool ret = reply.WriteString16(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetOpKey write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetOpKeyExt(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string result = GetOpKeyExt(slotId);
+    bool ret = reply.WriteString16(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetOpKeyExt write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetOpName(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string result = GetOpName(slotId);
+    bool ret = reply.WriteString16(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetOpName write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
 int32_t CoreServiceStub::OnSendEnvelopeCmd(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
@@ -1087,7 +1142,7 @@ int32_t CoreServiceStub::OnUnlockSimLock(MessageParcel &data, MessageParcel &rep
     int32_t slotId = data.ReadInt32();
     lockInfo.lockType = static_cast<PersoLockType>(data.ReadInt32());
     lockInfo.password = data.ReadString16();
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
 
     TELEPHONY_LOGI("CoreServiceStub::OnUnlockSimLock(), lockType = %{public}d", lockInfo.lockType);
     bool result = UnlockSimLock(slotId, lockInfo, response);
@@ -1158,7 +1213,7 @@ int32_t CoreServiceStub::OnSimAuthentication(MessageParcel &data, MessageParcel 
     const int32_t slotId = data.ReadInt32();
     const std::string aid = data.ReadString();
     const std::string authData = data.ReadString();
-    SimAuthenticationResponse response = {0};
+    SimAuthenticationResponse response = { 0 };
     int32_t result = SimAuthentication(slotId, aid, authData, response);
     reply.WriteInt32(response.sw1);
     reply.WriteInt32(response.sw2);
@@ -1167,18 +1222,27 @@ int32_t CoreServiceStub::OnSimAuthentication(MessageParcel &data, MessageParcel 
     return result;
 }
 
-int32_t CoreServiceStub::OnRegImsCallback(MessageParcel &data, MessageParcel &reply)
+int32_t CoreServiceStub::OnRegisterImsRegInfoCallback(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t result = TELEPHONY_ERR_FAIL;
-    result = RegImsCallback(data);
+    int32_t slotId = data.ReadInt32();
+    ImsServiceType imsSrvType = static_cast<ImsServiceType>(data.ReadInt32());
+    sptr<ImsRegInfoCallback> callback = iface_cast<ImsRegInfoCallback>(data.ReadRemoteObject());
+    int32_t result;
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("callback is nullptr!");
+        result = TELEPHONY_ERR_ARGUMENT_NULL;
+    } else {
+        result = RegisterImsRegInfoCallback(slotId, imsSrvType, callback);
+    }
     reply.WriteInt32(result);
     return result;
 }
 
-int32_t CoreServiceStub::OnUnRegImsCallback(MessageParcel &data, MessageParcel &reply)
+int32_t CoreServiceStub::OnUnregisterImsRegInfoCallback(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t result = TELEPHONY_ERR_FAIL;
-    result = UnRegImsCallback(data);
+    int32_t slotId = data.ReadInt32();
+    ImsServiceType imsSrvType = static_cast<ImsServiceType>(data.ReadInt32());
+    int32_t result = UnregisterImsRegInfoCallback(slotId, imsSrvType);
     reply.WriteInt32(result);
     return result;
 }

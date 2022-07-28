@@ -17,32 +17,30 @@
 #define NAPI_RADIO_H
 
 #include <codecvt>
-#include <locale>
-#include <string>
-#include <mutex>
 #include <condition_variable>
+#include <locale>
+#include <mutex>
+#include <string>
 
 #include "cell_information.h"
-#include "napi_radio_types.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "napi_ims_reg_info_callback.h"
+#include "napi_radio_types.h"
 #include "napi_util.h"
-#include "network_state.h"
-#include "signal_information.h"
 #include "network_information.h"
 #include "network_search_result.h"
-#include "telephony_napi_hril_error_code.h"
+#include "network_state.h"
+#include "signal_information.h"
 #include "telephony_napi_common_error.h"
+#include "telephony_napi_hril_error_code.h"
 #include "telephony_types.h"
-#include "napi_ims_video_callback.h"
-#include "napi_ims_voice_callback.h"
-#include "napi_ims_ut_callback.h"
-#include "napi_ims_sms_callback.h"
 
 namespace OHOS {
 namespace Telephony {
 constexpr int DEFAULT_ERROR = ERROR_SERVICE_UNAVAILABLE;
 constexpr int BUF_SIZE = 32;
+constexpr int CALLBACK_VALUES_SIZE = 1;
 constexpr int WAIT_TIME_SECOND = 60 * 3;
 const static std::string GSM = "GSM";
 const static std::string GPRS = "GPRS";
@@ -52,13 +50,8 @@ const int32_t ARRAY_INDEX_FIRST = 0;
 const int32_t ARRAY_INDEX_SECOND = 1;
 const int32_t ARRAY_INDEX_THIRD = 2;
 const int32_t ARRAY_INDEX_FOURTH = 3;
-const int32_t THREE_PARAMETERS = 3;
-const int32_t FOUR_PARAMETERS = 4;
 
-enum NativeSelectionMode {
-    NATIVE_NETWORK_SELECTION_AUTOMATIC = 0,
-    NATIVE_NETWORK_SELECTION_MANUAL = 1
-};
+enum NativeSelectionMode { NATIVE_NETWORK_SELECTION_AUTOMATIC = 0, NATIVE_NETWORK_SELECTION_MANUAL = 1 };
 
 enum NetworkSelectionMode {
     /** Unknown network selection modes. */
@@ -220,7 +213,7 @@ struct SwitchRadioContext : CallbackContext {
 
 struct GetOperatorNameContext : BaseContext {
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
-    char operatorName[BUF_SIZE + 1] = {0};
+    char operatorName[BUF_SIZE + 1] = { 0 };
     size_t operatorNameLength = 0;
 };
 
@@ -280,23 +273,18 @@ struct ImsRegInfoContext : BaseContext {
     ImsRegInfo imsRegInfo;
 };
 
-struct ImsStateCallback {
+struct ImsRegStateCallback {
     napi_env env = nullptr;
-    napi_value thisVar = nullptr;
+    napi_ref thisVar = nullptr;
     napi_ref callbackRef = nullptr;
-    napi_deferred deferred = nullptr;
-    time_t callbackBeginTime_ = 0;
-    int32_t slotId = DEFAULT_SIM_SLOT_ID;
-    ImsServiceType imsSrvType = TYPE_VOICE;
-    sptr<ImsVoiceCallback> voiceCallback = nullptr;
-    sptr<ImsVideoCallback> videoCallback = nullptr;
-    sptr<ImsUtCallback> utCallback = nullptr;
-    sptr<ImsSmsCallback> smsCallback = nullptr;
+    int32_t slotId;
+    ImsServiceType imsSrvType;
+    sptr<ImsRegInfoCallback> imsCallback = nullptr;
 };
 
 struct ImsStateWorker {
     ImsRegInfo info;
-    ImsStateCallback callback;
+    ImsRegStateCallback callback;
 };
 } // namespace Telephony
 } // namespace OHOS

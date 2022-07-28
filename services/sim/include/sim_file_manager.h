@@ -48,10 +48,17 @@ public:
     std::u16string GetIMSI();
     std::u16string GetLocaleFromDefaultSim();
     std::u16string GetSimGid1();
+    std::u16string GetSimGid2();
     std::u16string GetSimTelephoneNumber();
     std::u16string GetSimTeleNumberIdentifier();
     std::u16string GetVoiceMailIdentifier();
     std::u16string GetVoiceMailNumber();
+    std::u16string GetOpName();
+    std::u16string GetOpKey();
+    std::u16string GetOpKeyExt();
+    void SetOpName(std::string opName);
+    void SetOpKey(std::string opKey);
+    void SetOpKeyExt(std::string opKeyExt);
     int ObtainSpnCondition(bool roaming, std::string operatorNum);
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
@@ -60,6 +67,7 @@ public:
     std::shared_ptr<IccFileController> GetIccFileController();
     std::shared_ptr<IccDiallingNumbersHandler> ObtainDiallingNumberHandler();
     bool SetVoiceMailInfo(const std::u16string &mailName, const std::u16string &mailNumber);
+    bool HasSimCard();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     static std::shared_ptr<SimFileManager> CreateInstance(
         const std::shared_ptr<Telephony::ITelRilManager> &ril,
@@ -90,6 +98,9 @@ private:
     bool InitIccFileController(IccType type);
     void ChangeSimFileByCardType(IccType type);
     bool IsValidType(IccType type);
+    std::string opName_;
+    std::string opKey_;
+    std::string opKeyExt_;
 };
 } // namespace Telephony
 } // namespace OHOS

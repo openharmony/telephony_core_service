@@ -16,12 +16,11 @@
 #include "core_service_proxy.h"
 
 #include "parameter.h"
+#include "sim_state_type.h"
 #include "string_ex.h"
-
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_types.h"
-#include "sim_state_type.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -804,6 +803,32 @@ std::u16string CoreServiceProxy::GetSimGid1(int32_t slotId)
     return result;
 }
 
+std::u16string CoreServiceProxy::GetSimGid2(int32_t slotId)
+{
+    if (!IsValidSlotId(slotId)) {
+        return Str8ToStr16("");
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetSimGid2 WriteInterfaceToken is false");
+        return Str8ToStr16("");
+    }
+    data.WriteInt32(slotId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("GetSimGid2 Remote is null");
+        return Str8ToStr16("");
+    }
+    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_GID2), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetSimGid2 failed, error code is %{public}d", st);
+        return Str8ToStr16("");
+    }
+    std::u16string result = reply.ReadString16();
+    return result;
+}
+
 std::u16string CoreServiceProxy::GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac,
     bool longNameRequired)
 {
@@ -1136,7 +1161,7 @@ bool CoreServiceProxy::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
     std::lock_guard<std::mutex> lock(mutex_);
     int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_OPERATOR_CONFIG), data, reply, option);
     if (st != ERR_NONE) {
-        TELEPHONY_LOGE("GetOperatorConfigs failed, error code is %{public}d \n", st);
+        TELEPHONY_LOGE("GetOperatorConfigs failed, error code is %{public}d", st);
         return false;
     }
     bool result = reply.ReadBool();
@@ -1151,10 +1176,10 @@ bool CoreServiceProxy::IsValidSlotId(int32_t slotId)
     int32_t count = GetMaxSimCount();
     if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < count)) {
         return true;
-    } else {
-        TELEPHONY_LOGE("SimId is InValid = %{public}d", slotId);
-        return false;
     }
+
+    TELEPHONY_LOGE("SlotId is InValid = %{public}d", slotId);
+    return false;
 }
 
 bool CoreServiceProxy::IsValidSlotIdForDefault(int32_t slotId)
@@ -1162,10 +1187,10 @@ bool CoreServiceProxy::IsValidSlotIdForDefault(int32_t slotId)
     int32_t count = GetMaxSimCount();
     if ((slotId >= DEFAULT_SIM_SLOT_ID_REMOVE) && (slotId < count)) {
         return true;
-    } else {
-        TELEPHONY_LOGE("SimId is InValid = %{public}d", slotId);
-        return false;
     }
+
+    TELEPHONY_LOGE("SlotId is InValid = %{public}d", slotId);
+    return false;
 }
 
 bool CoreServiceProxy::IsValidStringLength(std::u16string str)
@@ -1173,10 +1198,20 @@ bool CoreServiceProxy::IsValidStringLength(std::u16string str)
     int32_t length = static_cast<int32_t>(str.length());
     if ((length >= MIN_STRING_LE) && (length <= MAX_STRING_LE)) {
         return true;
-    } else {
-        TELEPHONY_LOGE("string length is InValid = %{public}s", Str16ToStr8(str).c_str());
+    }
+
+    TELEPHONY_LOGE("string length is InValid = %{public}s", Str16ToStr8(str).c_str());
+    return false;
+}
+
+bool CoreServiceProxy::IsValidServiceType(ImsServiceType serviceType)
+{
+    if (serviceType < ImsServiceType::TYPE_VOICE || serviceType > ImsServiceType::TYPE_SMS) {
+        TELEPHONY_LOGE("ServiceType is InValid = %{public}d", serviceType);
         return false;
     }
+
+    return true;
 }
 
 bool CoreServiceProxy::UnlockPin(const int32_t slotId, std::u16string pin, LockStatusResponse &response)
@@ -1845,6 +1880,81 @@ bool CoreServiceProxy::SetVoiceMailInfo(
     return reply.ReadBool();
 }
 
+std::u16string CoreServiceProxy::GetOpKey(int32_t slotId)
+{
+    if (!IsValidSlotId(slotId)) {
+        return u"";
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetOpKey WriteInterfaceToken is false");
+        return u"";
+    }
+    data.WriteInt32(slotId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("GetOpKey Remote is null");
+        return u"";
+    }
+    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_OPKEY), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetOpKey failed, error code is %{public}d", st);
+        return u"";
+    }
+    return reply.ReadString16();
+}
+
+std::u16string CoreServiceProxy::GetOpKeyExt(int32_t slotId)
+{
+    if (!IsValidSlotId(slotId)) {
+        return u"";
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetOpKeyExt WriteInterfaceToken is false");
+        return u"";
+    }
+    data.WriteInt32(slotId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("GetOpKeyExt Remote is null");
+        return u"";
+    }
+    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_OPKEY_EXT), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetOpKeyExt failed, error code is %{public}d", st);
+        return u"";
+    }
+    return reply.ReadString16();
+}
+
+std::u16string CoreServiceProxy::GetOpName(int32_t slotId)
+{
+    if (!IsValidSlotId(slotId)) {
+        return u"";
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetOpName WriteInterfaceToken is false");
+        return u"";
+    }
+    data.WriteInt32(slotId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("GetOpName Remote is null");
+        return u"";
+    }
+    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_OPNAME), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetOpName failed, error code is %{public}d", st);
+        return u"";
+    }
+    return reply.ReadString16();
+}
+
 int32_t CoreServiceProxy::GetMaxSimCount()
 {
     char simSlotCount[SYSPARA_SIZE] = { 0 };
@@ -2090,8 +2200,8 @@ bool CoreServiceProxy::HasOperatorPrivileges(const int32_t slotId)
     return result;
 }
 
-int32_t CoreServiceProxy::SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
-    SimAuthenticationResponse &response)
+int32_t CoreServiceProxy::SimAuthentication(
+    int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -2161,75 +2271,84 @@ NrMode CoreServiceProxy::GetNrOptionMode(int32_t slotId)
     return static_cast<NrMode>(reply.ReadInt32());
 }
 
-int32_t CoreServiceProxy::RegImsCallback(MessageParcel &idata)
+int32_t CoreServiceProxy::RegisterImsRegInfoCallback(
+    int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback)
 {
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("callback is nullptr!");
+        return TELEPHONY_ERR_ARGUMENT_NULL;
+    }
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    int32_t imsSrvType = idata.ReadInt32();
-    int32_t slotId = idata.ReadInt32();
-    sptr<IRemoteObject> callback  = idata.ReadRemoteObject();
-    TELEPHONY_LOGI("imsSrvType is %{public}d, slotId is %{public}d", imsSrvType, slotId);
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("CoreServiceProxy::RegImsCallback is nullptr");
-        return ERROR;
+    int32_t ret = SerializeImsRegInfoData(slotId, imsSrvType, data);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("serialize data failed, result is %{public}d", ret);
+        return ret;
     }
-    if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("RegisterCallBack WriteInterfaceToken is false");
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!data.WriteInt32(imsSrvType)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteInt32(slotId)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteRemoteObject(callback)) {
-        TELEPHONY_LOGE("WriteRemoteObject ERROR");
-        return ERROR;
+    if (!data.WriteRemoteObject(callback->AsObject().GetRefPtr())) {
+        TELEPHONY_LOGE("write remote object failed!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     sptr<OHOS::IRemoteObject> remote = Remote();
     if (remote == nullptr) {
+        TELEPHONY_LOGE("remote is nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = remote->SendRequest(static_cast<uint32_t>(InterfaceID::REG_IMS_CALLBACK), data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("Function RegisterCallBack! errCode:%{public}d", error);
+        TELEPHONY_LOGE("error! errCode:%{public}d", error);
         return error;
     }
     return reply.ReadInt32();
 }
 
-int32_t CoreServiceProxy::UnRegImsCallback(MessageParcel &idata)
+int32_t CoreServiceProxy::UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType)
 {
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    int32_t imsSrvType = idata.ReadInt32();
-    int32_t slotId = idata.ReadInt32();
-    sptr<IRemoteObject> callback  = idata.ReadRemoteObject();
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("CoreServiceProxy::RegImsCallback is nullptr");
+    int32_t ret = SerializeImsRegInfoData(slotId, imsSrvType, data);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("serialize data failed, result is %{public}d", ret);
+        return ret;
     }
-    if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("RegisterCallBack WriteInterfaceToken is false");
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    data.WriteInt32(imsSrvType);
-    data.WriteInt32(slotId);
-    data.WriteRemoteObject(callback);
     sptr<OHOS::IRemoteObject> remote = Remote();
     if (remote == nullptr) {
+        TELEPHONY_LOGE("remote is nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = remote->SendRequest(static_cast<uint32_t>(InterfaceID::UN_REG_IMS_CALLBACK), data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("Function UnRegImsCallback! errCode:%{public}d", error);
+        TELEPHONY_LOGE("error! errCode:%{public}d", error);
         return error;
     }
     return reply.ReadInt32();
+}
+
+int32_t CoreServiceProxy::SerializeImsRegInfoData(int32_t slotId, ImsServiceType imsSrvType, MessageParcel &data)
+{
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("invalid slotId");
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+    if (!IsValidServiceType(imsSrvType)) {
+        TELEPHONY_LOGE("invalid serviceType!");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("write slotId failed!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteInt32(static_cast<int32_t>(imsSrvType))) {
+        TELEPHONY_LOGE("write imsSrvType failed!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

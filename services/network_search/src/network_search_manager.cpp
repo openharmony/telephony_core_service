@@ -15,9 +15,9 @@
 
 #include "network_search_manager.h"
 
+#include <cinttypes>
 #include <securec.h>
 #include <string_ex.h>
-#include <cinttypes>
 
 #include "mcc_pool.h"
 #include "telephony_errors.h"
@@ -168,8 +168,7 @@ bool NetworkSearchManager::OnInit()
         }
         if (inner != nullptr) {
             if (inner->state_ == HandleRunningState::STATE_RUNNING) {
-                TELEPHONY_LOGE(
-                    "NetworkSearchManager::Init HandleRunningState is running. slotId:%{public}d", slotId);
+                TELEPHONY_LOGE("NetworkSearchManager::Init HandleRunningState is running. slotId:%{public}d", slotId);
                 continue;
             }
             if (!InitPointer(inner, slotId)) {
@@ -370,8 +369,7 @@ int32_t NetworkSearchManager::GetPsRadioTech(int32_t slotId)
     if (inner != nullptr) {
         if (inner->networkSearchState_ != nullptr && inner->networkSearchState_->GetNetworkStatus() != nullptr) {
             auto event = static_cast<int32_t>(inner->networkSearchState_->GetNetworkStatus()->GetPsRadioTech());
-            TELEPHONY_LOGI(
-                "NetworkSearchManager::GetPsRadioTech result=%{public}d slotId:%{public}d", event, slotId);
+            TELEPHONY_LOGI("NetworkSearchManager::GetPsRadioTech result=%{public}d slotId:%{public}d", event, slotId);
             return event;
         }
         TELEPHONY_LOGE("NetworkSearchManager::GetPsRadioTech failed due to nullptr!");
@@ -386,8 +384,7 @@ int32_t NetworkSearchManager::GetCsRadioTech(int32_t slotId)
     if (inner != nullptr) {
         if (inner->networkSearchState_ != nullptr && inner->networkSearchState_->GetNetworkStatus() != nullptr) {
             auto event = static_cast<int32_t>(inner->networkSearchState_->GetNetworkStatus()->GetCsRadioTech());
-            TELEPHONY_LOGI(
-                "NetworkSearchManager::GetCsRadioTech result=%{public}d slotId:%{public}d", event, slotId);
+            TELEPHONY_LOGI("NetworkSearchManager::GetCsRadioTech result=%{public}d slotId:%{public}d", event, slotId);
             return event;
         }
         TELEPHONY_LOGE("NetworkSearchManager::GetCsRadioTech failed due to nullptr!");
@@ -402,8 +399,7 @@ int32_t NetworkSearchManager::GetPsRegState(int32_t slotId)
     if (inner != nullptr) {
         if (inner->networkSearchState_ != nullptr && inner->networkSearchState_->GetNetworkStatus() != nullptr) {
             auto event = static_cast<int32_t>(inner->networkSearchState_->GetNetworkStatus()->GetPsRegStatus());
-            TELEPHONY_LOGI(
-                "NetworkSearchManager::GetPsRegState result=%{public}d slotId:%{public}d", event, slotId);
+            TELEPHONY_LOGI("NetworkSearchManager::GetPsRegState result=%{public}d slotId:%{public}d", event, slotId);
             return event;
         }
         TELEPHONY_LOGE("NetworkSearchManager::GetPsRegState failed due to nullptr!");
@@ -418,8 +414,7 @@ int32_t NetworkSearchManager::GetCsRegState(int32_t slotId)
     if (inner != nullptr) {
         if (inner->networkSearchState_ != nullptr && inner->networkSearchState_->GetNetworkStatus() != nullptr) {
             auto event = static_cast<int32_t>(inner->networkSearchState_->GetNetworkStatus()->GetCsRegStatus());
-            TELEPHONY_LOGI(
-                "NetworkSearchManager::GetCsRegState result=%{public}d slotId:%{public}d", event, slotId);
+            TELEPHONY_LOGI("NetworkSearchManager::GetCsRegState result=%{public}d slotId:%{public}d", event, slotId);
             return event;
         }
         TELEPHONY_LOGE("NetworkSearchManager::GetCsRegState failed due to nullptr!");
@@ -453,8 +448,8 @@ std::u16string NetworkSearchManager::GetOperatorNumeric(int32_t slotId)
         if (inner->networkSearchState_ != nullptr && inner->networkSearchState_->GetNetworkStatus() != nullptr) {
             auto event = inner->networkSearchState_->GetNetworkStatus()->GetPlmnNumeric();
             str = Str8ToStr16(event);
-            TELEPHONY_LOGI("NetworkSearchManager::GetOperatorNumeric result=%{public}s slotId:%{public}d",
-                event.c_str(), slotId);
+            TELEPHONY_LOGI(
+                "NetworkSearchManager::GetOperatorNumeric result=%{public}s slotId:%{public}d", event.c_str(), slotId);
         }
     }
     return str;
@@ -465,12 +460,11 @@ std::u16string NetworkSearchManager::GetOperatorName(int32_t slotId)
     std::u16string str;
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
-        if (inner->networkSearchState_ != nullptr &&
-            inner->networkSearchState_->GetNetworkStatus() != nullptr) {
+        if (inner->networkSearchState_ != nullptr && inner->networkSearchState_->GetNetworkStatus() != nullptr) {
             auto event = inner->networkSearchState_->GetNetworkStatus()->GetLongOperatorName();
             str = Str8ToStr16(event);
-            TELEPHONY_LOGI("NetworkSearchManager::GetOperatorName result=%{public}s slotId:%{public}d",
-                event.c_str(), slotId);
+            TELEPHONY_LOGI(
+                "NetworkSearchManager::GetOperatorName result=%{public}s slotId:%{public}d", event.c_str(), slotId);
         }
     }
     return str;
@@ -567,14 +561,12 @@ sptr<NetworkSearchResult> NetworkSearchManager::GetNetworkSearchInformationValue
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
         if (inner->networkSearchResult_ == nullptr) {
-            TELEPHONY_LOGE(
-                "GetNetworkSearchInformationValue networkSearchResult_ is null slotId:%{public}d", slotId);
+            TELEPHONY_LOGE("GetNetworkSearchInformationValue networkSearchResult_ is null slotId:%{public}d", slotId);
             return nullptr;
         }
 
         int32_t listSize = inner->networkSearchResult_->GetNetworkSearchInformationSize();
-        std::vector<NetworkInformation> operatorInfoList =
-            inner->networkSearchResult_->GetNetworkSearchInformation();
+        std::vector<NetworkInformation> operatorInfoList = inner->networkSearchResult_->GetNetworkSearchInformation();
         networkSearchResult->SetNetworkSearchResultValue(listSize, operatorInfoList);
         return networkSearchResult;
     }
@@ -603,8 +595,8 @@ bool NetworkSearchManager::GetNetworkSelectionMode(int32_t slotId, NSCALLBACK &c
 bool NetworkSearchManager::SetNetworkSelectionMode(
     int32_t slotId, int32_t selectMode, const sptr<NetworkInformation> &networkInformation, bool resumeSelection)
 {
-    TELEPHONY_LOGI("NetworkSearchManager SetNetworkSelectionMode selectMode:%{public}d slotId:%{public}d",
-        selectMode, slotId);
+    TELEPHONY_LOGI(
+        "NetworkSearchManager SetNetworkSelectionMode selectMode:%{public}d slotId:%{public}d", selectMode, slotId);
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         return false;
@@ -619,8 +611,8 @@ bool NetworkSearchManager::SetNetworkSelectionMode(
 bool NetworkSearchManager::SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
     const sptr<NetworkInformation> &networkInformation, bool resumeSelection, NSCALLBACK &callback)
 {
-    TELEPHONY_LOGI("NetworkSearchManager SetNetworkSelectionMode selectMode:%{public}d slotId:%{public}d",
-        selectMode, slotId);
+    TELEPHONY_LOGI(
+        "NetworkSearchManager SetNetworkSelectionMode selectMode:%{public}d slotId:%{public}d", selectMode, slotId);
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         return false;
@@ -681,8 +673,8 @@ bool NetworkSearchManager::SetPreferredNetwork(int32_t slotId, int32_t networkMo
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
         uint32_t modemRaf = static_cast<uint32_t>(inner->radioCapability_.ratFamily);
-        uint32_t raf = static_cast<uint32_t>(NetworkUtils::GetRafFromNetworkMode(
-            static_cast<PreferredNetworkMode>(networkMode)));
+        uint32_t raf =
+            static_cast<uint32_t>(NetworkUtils::GetRafFromNetworkMode(static_cast<PreferredNetworkMode>(networkMode)));
         if (modemRaf == RAF_UNKNOWN || raf == RAF_UNKNOWN) {
             TELEPHONY_LOGE(
                 "SetPreferredNetwork failed RadioAccessFamily is unknown!%{public}d %{public}d slotId:%{public}d",
@@ -690,10 +682,9 @@ bool NetworkSearchManager::SetPreferredNetwork(int32_t slotId, int32_t networkMo
             return false;
         }
         uint32_t filterRaf = modemRaf & raf;
-        PreferredNetworkMode filterMode = NetworkUtils::GetNetworkModeFromRaf(
-            static_cast<uint32_t>(filterRaf));
-        TELEPHONY_LOGI("SetPreferredNetwork RadioAccessFamily is %{public}d %{public}d slotId:%{public}d",
-            modemRaf, raf, slotId);
+        PreferredNetworkMode filterMode = NetworkUtils::GetNetworkModeFromRaf(static_cast<uint32_t>(filterRaf));
+        TELEPHONY_LOGI(
+            "SetPreferredNetwork RadioAccessFamily is %{public}d %{public}d slotId:%{public}d", modemRaf, raf, slotId);
         return eventSender_->SendCallbackEx(
             slotId, RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, &callback, static_cast<int32_t>(filterMode));
     }
@@ -733,8 +724,8 @@ bool NetworkSearchManager::SetPreferredNetwork(int32_t slotId, int32_t networkMo
 }
 void NetworkSearchManager::SavePreferredNetworkValue(int32_t slotId, int32_t networkMode)
 {
-    TELEPHONY_LOGI("NetworkSearchManager SavePreferredNetworkValue slotId:%{public}d, networkMode:%{public}d",
-        slotId, networkMode);
+    TELEPHONY_LOGI("NetworkSearchManager SavePreferredNetworkValue slotId:%{public}d, networkMode:%{public}d", slotId,
+        networkMode);
     std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGI("settingHelper is null");
@@ -742,8 +733,7 @@ void NetworkSearchManager::SavePreferredNetworkValue(int32_t slotId, int32_t net
     }
 
     Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_PREFERRED_NETWORK_MODE_URI);
-    std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE +
-        "_" + std::to_string(slotId);
+    std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE + "_" + std::to_string(slotId);
     std::string value = std::to_string(networkMode);
     if (!settingHelper->Update(uri, key, value)) {
         TELEPHONY_LOGE("Update %{public}s fail", key.c_str());
@@ -760,8 +750,7 @@ int32_t NetworkSearchManager::GetPreferredNetworkValue(int32_t slotId) const
     }
 
     Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_PREFERRED_NETWORK_MODE_URI);
-    std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE +
-        "_" + std::to_string(slotId);
+    std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE + "_" + std::to_string(slotId);
     std::string value = "";
     if (!settingHelper->Query(uri, key, value)) {
         TELEPHONY_LOGI("Query %{public}s fail", key.c_str());
@@ -769,8 +758,10 @@ int32_t NetworkSearchManager::GetPreferredNetworkValue(int32_t slotId) const
     }
 
     bool succ = StrToInt(value, networkMode);
-    TELEPHONY_LOGI("NetworkSearchManager GetPreferredNetworkValue succ:%{public}d, slotId:%{public}d, "
-        "networkMode:%{public}d", succ, slotId, networkMode);
+    TELEPHONY_LOGI(
+        "NetworkSearchManager GetPreferredNetworkValue succ:%{public}d, slotId:%{public}d, "
+        "networkMode:%{public}d",
+        slotId, succ, networkMode);
     return networkMode;
 }
 
@@ -929,8 +920,7 @@ PhoneType NetworkSearchManager::GetPhoneType(int32_t slotId)
             phoneType = inner->networkSearchHandler_->GetPhoneType();
         }
     }
-    TELEPHONY_LOGI("NetworkSearchManager::GetPhoneType type:%{public}d start slotId:%{public}d",
-        phoneType, slotId);
+    TELEPHONY_LOGI("NetworkSearchManager::GetPhoneType type:%{public}d start slotId:%{public}d", phoneType, slotId);
     return phoneType;
 }
 
@@ -1067,6 +1057,7 @@ void NetworkSearchManager::ClearManagerInner()
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
         auto inner = FindManagerInner(slotId);
         if (inner != nullptr) {
+            std::lock_guard<std::mutex> lock(inner->mutex_);
             inner->networkSearchHandler_->UnregisterEvents();
         }
     }
@@ -1079,8 +1070,7 @@ void NetworkSearchManager::AddManagerInner(int32_t slotId, const std::shared_ptr
     if (inner != nullptr) {
         std::lock_guard<std::mutex> lock(mutexInner_);
         mapManagerInner_.emplace(slotId, inner);
-        TELEPHONY_LOGE(
-            "NetworkSearchManager::AddManagerInner %{public}d %{public}zu", slotId, mapManagerInner_.size());
+        TELEPHONY_LOGE("NetworkSearchManager::AddManagerInner %{public}d %{public}zu", slotId, mapManagerInner_.size());
     }
 }
 
@@ -1088,8 +1078,7 @@ bool NetworkSearchManager::RemoveManagerInner(int32_t slotId)
 {
     std::lock_guard<std::mutex> lock(mutexInner_);
     bool ret = (mapManagerInner_.erase(slotId) != 0);
-    TELEPHONY_LOGE(
-        "NetworkSearchManager::RemoveManagerInner %{public}d %{public}zu", slotId, mapManagerInner_.size());
+    TELEPHONY_LOGE("NetworkSearchManager::RemoveManagerInner %{public}d %{public}zu", slotId, mapManagerInner_.size());
     return ret;
 }
 
@@ -1099,8 +1088,7 @@ void NetworkSearchManager::TriggerSimRefresh(int32_t slotId)
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr && simManager_ != nullptr) {
         if (inner->networkSearchHandler_ != nullptr) {
-            simManager_->RegisterCoreNotify(slotId, inner->networkSearchHandler_,
-                RadioEvent::RADIO_IMSI_LOADED_READY);
+            simManager_->RegisterCoreNotify(slotId, inner->networkSearchHandler_, RadioEvent::RADIO_IMSI_LOADED_READY);
         }
     }
 }
@@ -1136,357 +1124,76 @@ bool NetworkSearchManager::GetAirplaneMode()
     return airplaneMode;
 }
 
-int32_t NetworkSearchManager::RegImsCallback(MessageParcel &data)
-{
-    int32_t imsSrvType = data.ReadInt32();
-    ImsServiceType type = static_cast<ImsServiceType>(imsSrvType);
-    int32_t slotId = data.ReadInt32();
-    TELEPHONY_LOGI("slotId is %{public}d", slotId);
-    sptr<IRemoteObject> callback = data.ReadRemoteObject();
-    sptr<ImsVoiceCallback> voiceCallback = nullptr;
-    sptr<ImsVideoCallback> videoCallback = nullptr;
-    sptr<ImsUtCallback> utCallback = nullptr;
-    sptr<ImsSmsCallback> smsCallback = nullptr;
-    int32_t ret;
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("callback ptr is nullptr.");
-        return ERROR;
-    }
-    switch (type) {
-        case TYPE_VOICE:
-            voiceCallback = iface_cast<ImsVoiceCallback>(callback);
-            ret = RegImsVoiceCallback(slotId, voiceCallback);
-            break;
-        case TYPE_VIDEO:
-            videoCallback = iface_cast<ImsVideoCallback>(callback);
-            ret = RegImsVideoCallback(slotId, videoCallback);
-            break;
-        case TYPE_UT:
-            utCallback = iface_cast<ImsUtCallback>(callback);
-            ret = RegImsUtCallback(slotId, utCallback);
-            break;
-        case TYPE_SMS:
-            smsCallback = iface_cast<ImsSmsCallback>(callback);
-            ret = RegImsSmsCallback(slotId, smsCallback);
-            break;
-        default:
-            TELEPHONY_LOGE("%{public}d unkunow ims service type!", type);
-            return ERROR;
-            break;
-    }
-    return ret;
-}
-
-int32_t NetworkSearchManager::UnRegImsCallback(MessageParcel &data)
-{
-    int32_t imsSrvType = data.ReadInt32();
-    ImsServiceType type = static_cast<ImsServiceType>(imsSrvType);
-    int32_t slotId = data.ReadInt32();
-    sptr<IRemoteObject> remote  = data.ReadRemoteObject();
-    sptr<ImsVoiceCallback> voiceCallback = nullptr;
-    sptr<ImsVideoCallback> videoCallback = nullptr;
-    sptr<ImsUtCallback> utCallback = nullptr;
-    sptr<ImsSmsCallback> smsCallback = nullptr;
-    int32_t ret;
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("callback ptr is nullptr.");
-        return ERROR;
-    }
-    switch (type) {
-        case TYPE_VOICE:
-            voiceCallback = iface_cast<ImsVoiceCallback>(remote);
-            ret = UnRegImsVoiceCallback(slotId, voiceCallback);
-            break;
-        case TYPE_VIDEO:
-            videoCallback = iface_cast<ImsVideoCallback>(remote);
-            ret = UnRegImsVideoCallback(slotId, videoCallback);
-            break;
-        case TYPE_UT:
-            utCallback = iface_cast<ImsUtCallback>(remote);
-            ret = UnRegImsUtCallback(slotId, utCallback);
-            break;
-        case TYPE_SMS:
-            smsCallback = iface_cast<ImsSmsCallback>(remote);
-            ret = UnRegImsSmsCallback(slotId, smsCallback);
-            break;
-        default:
-            TELEPHONY_LOGE("%{public}d unkunow ims service type!", type);
-            return ERROR;
-            break;
-    }
-    return ret;
-}
-
-void NetworkSearchManager::NotifyImsCallback(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo info)
-{
-    switch (imsSrvType) {
-        case TYPE_VOICE:
-            NotifyImsVoiceCallback(slotId, info);
-            break;
-        case TYPE_VIDEO:
-            NotifyImsVideoCallback(slotId, info);
-            break;
-        case TYPE_UT:
-            NotifyImsUtCallback(slotId, info);
-            break;
-        case TYPE_SMS:
-            NotifyImsSmsCallback(slotId, info);
-            break;
-        default:
-            TELEPHONY_LOGE("%{public}d unkunow ims service type!", imsSrvType);
-            break;
-    }
-}
-
-int32_t NetworkSearchManager::RegImsVoiceCallback(int32_t slotId, sptr<ImsVoiceCallback> callback)
+int32_t NetworkSearchManager::RegisterImsRegInfoCallback(
+    int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName, const sptr<ImsRegInfoCallback> &callback)
 {
     if (callback == nullptr) {
-        TELEPHONY_LOGE("RegImsVoiceCallback:callback is nullptr");
-        return ERROR;
+        TELEPHONY_LOGE("callback is nullptr");
+        return TELEPHONY_ERR_ARGUMENT_NULL;
     }
-    auto iter = mapImsVoiceCallback_.find(slotId);
-    if (iter != mapImsVoiceCallback_.end()) {
-        std::list<sptr<ImsVoiceCallback>> &callbacks = iter->second;
-        auto it = find(callbacks.begin(), callbacks.end(), callback);
-        if (it == callbacks.end()) {
-            callbacks.push_back(callback);
+    bool isExisted = false;
+    std::lock_guard<std::mutex> lock(mutexInner_);
+    for (auto iter : listImsRegInfoCallbackRecord_) {
+        if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType) && (iter.bundleName == bundleName)) {
+            isExisted = true;
+            break;
         }
-        TELEPHONY_LOGI("NetworkSearchManager::RegImsVoiceCallBack update callback what: %{public}d,"
-            " list size: %{public}zu", slotId, callbacks.size());
-    } else {
-        TELEPHONY_LOGI("NetworkSearchManager::RegImsVoiceCallBack callback what: %{public}d", slotId);
-        std::list<sptr<ImsVoiceCallback>> callbacks;
-        callbacks.push_back(callback);
-        mapImsVoiceCallback_.emplace(slotId, callbacks);
     }
-    return SUCCESS;
+    if (isExisted) {
+        TELEPHONY_LOGE("Register failed, callback is existent");
+        return TELEPHONY_ERROR;
+    }
+
+    ImsRegInfoCallbackRecord imsRecord;
+    imsRecord.slotId = slotId;
+    imsRecord.imsSrvType = imsSrvType;
+    imsRecord.bundleName = bundleName;
+    imsRecord.imsCallback = callback;
+    listImsRegInfoCallbackRecord_.push_back(imsRecord);
+    TELEPHONY_LOGI("Register successfully, callback list size is %{public}zu", listImsRegInfoCallbackRecord_.size());
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t NetworkSearchManager::UnRegImsVoiceCallback(int32_t slotId, sptr<ImsVoiceCallback> callback)
+int32_t NetworkSearchManager::UnregisterImsRegInfoCallback(
+    int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName)
 {
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("UnRegImsVoiceCallback:callback is nullptr");
-        return ERROR;
-    }
-
-    auto iter = mapImsVoiceCallback_.find(slotId);
-    if (iter != mapImsVoiceCallback_.end()) {
-        std::list<sptr<ImsVoiceCallback>> &callbacks = iter->second;
-        auto it = find(callbacks.begin(), callbacks.end(), callback);
-        if (it != callbacks.end()) {
-            callbacks.erase(it);
+    bool isSuccess = false;
+    std::lock_guard<std::mutex> lock(mutexInner_);
+    auto iter = listImsRegInfoCallbackRecord_.begin();
+    for (; iter != listImsRegInfoCallbackRecord_.end(); ++iter) {
+        if ((iter->slotId == slotId) && (iter->imsSrvType == imsSrvType) && (iter->bundleName == bundleName)) {
+            listImsRegInfoCallbackRecord_.erase(iter);
+            isSuccess = true;
+            break;
         }
-        TELEPHONY_LOGI("NetworkSearchManager::UnRegImsVoiceCallBack Remove callbacks list: "
-            "%{public}zu", callbacks.size());
     }
-    return SUCCESS;
+    if (!isSuccess) {
+        TELEPHONY_LOGE("Unregister failed, callback is nonexistent");
+        return TELEPHONY_ERR_UNREGISTER_CALLBACK_FAIL;
+    }
+    TELEPHONY_LOGI("Unregister successfully, callback list size is  %{public}zu", listImsRegInfoCallbackRecord_.size());
+    return TELEPHONY_SUCCESS;
 }
 
-void NetworkSearchManager::RemoveAllImsVoiceCallback()
+void NetworkSearchManager::NotifyImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo info)
 {
-    mapImsVoiceCallback_.clear();
-}
-
-void NetworkSearchManager::NotifyImsVoiceCallback(int32_t slotId, ImsRegInfo info)
-{
-    auto iter = mapImsVoiceCallback_.find(slotId);
-    if (iter == mapImsVoiceCallback_.end()) {
-        TELEPHONY_LOGE("this %{public}d slot not register ImsVoiceCallback", slotId);
-        return;
-    }
-    for (auto callback : iter->second) {
-        TELEPHONY_LOGI("NotifyImsVoiceCallback slotId:%{public}d, ImsRegState:%{public}d, "
-            "ImsRegTech:%{public}d", slotId, info.imsRegState, info.imsRegTech);
-        callback->OnImsStateCallback(info);
-    }
-}
-
-int32_t NetworkSearchManager::RegImsVideoCallback(int32_t slotId, sptr<ImsVideoCallback> callback)
-{
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("RegImsVideoCallback:callback is nullptr");
-        return ERROR;
-    }
-    auto iter = mapImsVideoCallback_.find(slotId);
-    if (iter != mapImsVideoCallback_.end()) {
-        std::list<sptr<ImsVideoCallback>> &callbacks = iter->second;
-        auto it = find(callbacks.begin(), callbacks.end(), callback);
-        if (it == callbacks.end()) {
-            callbacks.push_back(callback);
+    TELEPHONY_LOGI(
+        "slotId:%{public}d, ImsRegState:%{public}d,  ImsRegTech:%{public}d", slotId, info.imsRegState, info.imsRegTech);
+    bool isExisted = false;
+    std::lock_guard<std::mutex> lock(mutexInner_);
+    for (auto iter : listImsRegInfoCallbackRecord_) {
+        if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType)) {
+            if (iter.imsCallback == nullptr) {
+                TELEPHONY_LOGE("imsCallback is nullptr from listImsRegInfoCallbackRecord_");
+                return;
+            }
+            iter.imsCallback->OnImsRegInfoChanged(slotId, imsSrvType, info);
+            isExisted = true;
+            break;
         }
-        TELEPHONY_LOGI("NetworkSearchManager::RegImsVideoCallback update callback what: %{public}d,"
-            " list size: %{public}zu", slotId, callbacks.size());
-    } else {
-        TELEPHONY_LOGI("NetworkSearchManager::RegImsVideoCallback callback what: %{public}d", slotId);
-        std::list<sptr<ImsVideoCallback>> callbacks;
-        callbacks.push_back(callback);
-        mapImsVideoCallback_.emplace(slotId, callbacks);
     }
-    return SUCCESS;
-}
-
-int32_t NetworkSearchManager::UnRegImsVideoCallback(int32_t slotId, sptr<ImsVideoCallback> callback)
-{
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("UnRegImsVideoCallback:callback is nullptr!");
-        return ERROR;
-    }
-
-    auto iter = mapImsVideoCallback_.find(slotId);
-    if (iter != mapImsVideoCallback_.end()) {
-        std::list<sptr<ImsVideoCallback>> &callbacks = iter->second;
-        auto it = find(callbacks.begin(), callbacks.end(), callback);
-        if (it != callbacks.end()) {
-            callbacks.erase(it);
-        }
-        TELEPHONY_LOGI("NetworkSearchManager::UnRegImsVideoCallback Remove callbacks list: "
-            "%{public}zu", callbacks.size());
-    }
-    return SUCCESS;
-}
-
-void NetworkSearchManager::RemoveAllImsVideoCallback()
-{
-    mapImsVideoCallback_.clear();
-}
-
-void NetworkSearchManager::NotifyImsVideoCallback(int32_t slotId, ImsRegInfo info)
-{
-    auto iter = mapImsVideoCallback_.find(slotId);
-    if (iter == mapImsVideoCallback_.end()) {
-        TELEPHONY_LOGE("this %{public}d slot not register ImsVideoCallback", slotId);
-        return;
-    }
-    for (auto callback : iter->second) {
-        TELEPHONY_LOGI("NotifyImsVideoCallback slotId:%{public}d, ImsRegState:%{public}d, "
-            "ImsRegTech:%{public}d", slotId, info.imsRegState, info.imsRegTech);
-        callback->OnImsStateCallback(info);
-    }
-}
-
-int32_t NetworkSearchManager::RegImsUtCallback(int32_t slotId, sptr<ImsUtCallback> callback)
-{
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("RegImsUtCallback:callback is nullptr");
-        return ERROR;
-    }
-    auto iter = mapImsUtCallback_.find(slotId);
-    if (iter != mapImsUtCallback_.end()) {
-        std::list<sptr<ImsUtCallback>> &callbacks = iter->second;
-        auto it = find(callbacks.begin(), callbacks.end(), callback);
-        if (it == callbacks.end()) {
-            callbacks.push_back(callback);
-        }
-        TELEPHONY_LOGI("NetworkSearchManager::RegImsUtCallback update callback what: %{public}d,"
-            " list size: %{public}zu", slotId, callbacks.size());
-    } else {
-        TELEPHONY_LOGI("NetworkSearchManager::RegImsUtCallback callback what: %{public}d", slotId);
-        std::list<sptr<ImsUtCallback>> callbacks;
-        callbacks.push_back(callback);
-        mapImsUtCallback_.emplace(slotId, callbacks);
-    }
-    return SUCCESS;
-}
-
-int32_t NetworkSearchManager::UnRegImsUtCallback(int32_t slotId, sptr<ImsUtCallback> callback)
-{
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("UnRegImsUtCallback:callback is nullptr!");
-        return ERROR;
-    }
-
-    auto iter = mapImsUtCallback_.find(slotId);
-    if (iter != mapImsUtCallback_.end()) {
-        std::list<sptr<ImsUtCallback>> &callbacks = iter->second;
-        auto it = find(callbacks.begin(), callbacks.end(), callback);
-        if (it != callbacks.end()) {
-            callbacks.erase(it);
-        }
-        TELEPHONY_LOGI("NetworkSearchManager::UnRegImsUtCallback Remove callbacks list: "
-            "%{public}zu", callbacks.size());
-    }
-    return SUCCESS;
-}
-
-void NetworkSearchManager::RemoveAllImsUtCallback()
-{
-    mapImsUtCallback_.clear();
-}
-
-void NetworkSearchManager::NotifyImsUtCallback(int32_t slotId, ImsRegInfo info)
-{
-    auto iter = mapImsUtCallback_.find(slotId);
-    if (iter == mapImsUtCallback_.end()) {
-        TELEPHONY_LOGE("this %{public}d slot not register ImsUtCallback", slotId);
-        return;
-    }
-    for (auto callback : iter->second) {
-        TELEPHONY_LOGI("NotifyImsUtCallback slotId:%{public}d, ImsRegState:%{public}d, "
-            "ImsRegTech:%{public}d", slotId, info.imsRegState, info.imsRegTech);
-        callback->OnImsStateCallback(info);
-    }
-}
-
-int32_t NetworkSearchManager::RegImsSmsCallback(int32_t slotId, sptr<ImsSmsCallback> callback)
-{
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("RegImsSmsCallback:callback is nullptr");
-        return ERROR;
-    }
-    auto iter = mapImsSmsCallback_.find(slotId);
-    if (iter != mapImsSmsCallback_.end()) {
-        std::list<sptr<ImsSmsCallback>> &callbacks = iter->second;
-        auto it = find(callbacks.begin(), callbacks.end(), callback);
-        if (it == callbacks.end()) {
-            callbacks.push_back(callback);
-        }
-        TELEPHONY_LOGI("NetworkSearchManager::RegImsSmsCallback update callback what: %{public}d,"
-            " list size: %{public}zu", slotId, callbacks.size());
-    } else {
-        TELEPHONY_LOGI("NetworkSearchManager::RegImsSmsCallback callback what: %{public}d", slotId);
-        std::list<sptr<ImsSmsCallback>> callbacks;
-        callbacks.push_back(callback);
-        mapImsSmsCallback_.emplace(slotId, callbacks);
-    }
-    return SUCCESS;
-}
-
-int32_t NetworkSearchManager::UnRegImsSmsCallback(int32_t slotId, sptr<ImsSmsCallback> callback)
-{
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("UnRegImsSmsCallback:callback is nullptr!");
-        return ERROR;
-    }
-
-    auto iter = mapImsSmsCallback_.find(slotId);
-    if (iter != mapImsSmsCallback_.end()) {
-        std::list<sptr<ImsSmsCallback>> &callbacks = iter->second;
-        auto it = find(callbacks.begin(), callbacks.end(), callback);
-        if (it != callbacks.end()) {
-            callbacks.erase(it);
-        }
-        TELEPHONY_LOGI("NetworkSearchManager::UnRegImsSmsCallback Remove callbacks list: "
-            "%{public}zu", callbacks.size());
-    }
-    return SUCCESS;
-}
-
-void NetworkSearchManager::RemoveAllImsSmsCallback()
-{
-    mapImsSmsCallback_.clear();
-}
-
-void NetworkSearchManager::NotifyImsSmsCallback(int32_t slotId, ImsRegInfo info)
-{
-    auto iter = mapImsSmsCallback_.find(slotId);
-    if (iter == mapImsSmsCallback_.end()) {
-        TELEPHONY_LOGE("this %{public}d slot not register ImsSmsCallback", slotId);
-        return;
-    }
-    for (auto callback : iter->second) {
-        TELEPHONY_LOGI("NotifyImsSmsCallback slotId:%{public}d, ImsRegState:%{public}d, "
-            "ImsRegTech:%{public}d", slotId, info.imsRegState, info.imsRegTech);
-        callback->OnImsStateCallback(info);
+    if (!isExisted) {
+        TELEPHONY_LOGI("this slot id %{public}d, ims service type %{public}d is not registered", slotId, imsSrvType);
     }
 }
 } // namespace Telephony

@@ -30,6 +30,7 @@ public:
     static void SetUpTestCase();
     void SetUp();
     void TearDown();
+    static void InitBroadCast();
     static void TearDownTestCase();
     static sptr<ICoreService> GetProxy();
     static sptr<ICoreService> telephonyService_;

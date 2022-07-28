@@ -53,6 +53,7 @@ enum class InputCmd {
     INPUT_ISSIMACTIVE = 6,
     INPUT_GETSIMOPERATOR = 7,
     INPUT_GETGID1 = 8,
+    INPUT_GETGID2 = 9,
     INPUT_GETSIMSUB = 10,
     INPUT_SETDEFAULTCALL = 11,
     INPUT_GETDEFAULTCALL = 12,
@@ -83,12 +84,16 @@ enum class InputCmd {
     INPUT_GET_MAX_SIM_COUNT = 56,
     INPUT_STK_CMD_FROM_APP = 57,
     INPUT_STK_TERMINAL_RESPONSE = 58,
-    INPUT_GET_PHONENUMBER = 60,
-    INPUT_GET_SIM_TELENUMBER_IDENTIFIER = 61,
-    INPUT_GET_CARD_TYPE = 62,
-    INPUT_UNLOCK_SIMLOCK = 63,
-    INPUT_SET_PRIMARY_SLOTID = 64,
-    INPUT_GET_PRIMARY_SLOTID = 65,
+    INPUT_STK_CALL_SETUP_REQUEST_RESULT_FROM_APP = 59,
+    INPUT_GET_OPKEY = 60,
+    INPUT_GET_PHONENUMBER = 61,
+    INPUT_GET_SIM_TELENUMBER_IDENTIFIER = 62,
+    INPUT_GET_CARD_TYPE = 63,
+    INPUT_UNLOCK_SIMLOCK = 64,
+    INPUT_SET_PRIMARY_SLOTID = 65,
+    INPUT_GET_PRIMARY_SLOTID = 66,
+    INPUT_GET_OPNAME = 67,
+    INPUT_GET_OPKEY_EXT = 68,
     INPUT_HAS_OPERATOR_PRIVILEGES = 70,
     INPUT_QUIT = 100,
 };
@@ -305,6 +310,15 @@ static bool TestGetSimGid1()
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote GetSimGid1 result [" << str << "] " << expect << std::endl;
+    return true;
+}
+
+static bool TestGetSimGid2()
+{
+    std::u16string result = g_telephonyService->GetSimGid2(SLOT_ID);
+    std::string str = Str16ToStr8(result);
+    string expect = str.empty() ? "fail" : "success";
+    std::cout << "TelephonyTestService Remote GetSimGid2 result [" << str << "] " << expect << std::endl;
     return true;
 }
 
@@ -827,29 +841,29 @@ static bool TestGetMaxSimCount()
     return true;
 }
 
-static bool TestSendEnvelopeCmd()
+static bool TestGetOpKey()
 {
-    int32_t slotId = DEFAULT_SIM_SLOT_ID;
-    std::cout << "please input sim Id" << endl;
-    std::cin >> slotId;
-    std::string cmd = "";
-    std::cout << "input envelope cmd:" << std::endl;
-    std::cin >> cmd;
-    bool result = g_telephonyService->SendEnvelopeCmd(slotId, cmd);
-    std::cout << "TelephonyTestService Remote SendEnvelopeCmd result [" << result << "] " << std::endl;
+    std::u16string result = g_telephonyService->GetOpKey(SLOT_ID);
+    std::string str = Str16ToStr8(result);
+    string expect = str.empty() ? "fail" : "success";
+    std::cout << "TestGetOpKey Remote GetOpKey result [" << str << "] " << expect << std::endl;
     return true;
 }
 
-static bool TestSendTerminalResponseCmd()
+static bool TestGetOpName()
 {
-    int32_t slotId = DEFAULT_SIM_SLOT_ID;
-    std::cout << "please input sim Id" << endl;
-    std::cin >> slotId;
-    std::string cmd = "";
-    std::cout << "input terminal response:" << std::endl;
-    std::cin >> cmd;
-    bool result = g_telephonyService->SendTerminalResponseCmd(slotId, cmd);
-    std::cout << "TelephonyTestService Remote SendTerminalResponseCmd result [" << result << "] " << std::endl;
+    std::u16string result = g_telephonyService->GetOpName(SLOT_ID);
+    std::string str = Str16ToStr8(result);
+    string expect = str.empty() ? "fail" : "success";
+    std::cout << "TestGetOpName Remote GetOpName result [" << str << "] " << expect << std::endl;
+    return true;
+}
+
+static bool TestGetOpKeyExt()
+{
+    std::u16string result = g_telephonyService->GetOpKeyExt(SLOT_ID);
+    std::string str = Str16ToStr8(result);
+    std::cout << "TestGetOpKeyExt Remote GetOpKeyExt result [" << str << "] " << std::endl;
     return true;
 }
 
@@ -960,19 +974,13 @@ static bool TestQuit()
 
 static void Prompt()
 {
-    std::cout << "\n start \n"
-                 "usage:please input a cmd num:\n"
-                 "0:HasSimCard\n"
-                 "1:GetSimState\n"
-                 "2:GetISOCountryCodeForSim\n"
-                 "3:GetSimSpn\n"
-                 "4:GetSimIccId\n"
-                 "5:GetIMSI\n"
-                 "6:IsSimActive\n"
-                 "7:GetSimOperatorNumeric\n"
-                 "8:GetSimGid1\n"
-                 "10:GetSimAccountInfo\n"
-                 "11:SetDefaultVoiceSlotId\n"
+    std::cout << "\n start \nusage:please input a cmd num:\n"
+                 "0:HasSimCard\n1:GetSimState\n"
+                 "2:GetISOCountryCodeForSim\n3:GetSimSpn\n"
+                 "4:GetSimIccId\n5:GetIMSI\n"
+                 "6:IsSimActive\n7:GetSimOperatorNumeric\n"
+                 "8:GetSimGid1\n9:GetSimGid2\n"
+                 "10:GetSimAccountInfo\n11:SetDefaultVoiceSlotId\n"
                  "12:GetDefaultVoiceSlotId\n"
                  "13:GetSimEons\n"
                  "21:UnlockPin\n"
@@ -1001,12 +1009,16 @@ static void Prompt()
                  "56:GetMaxSimCount\n"
                  "57:TestSendEnvelopeCmd\n"
                  "58:TestSendTerminalResponseCmd\n"
-                 "60:GetSimTelephoneNumber\n"
-                 "61:GetSimTeleNumberIdentifier\n"
-                 "62:GetCardType\n"
-                 "63:UnlockSimLock\n"
-                 "64:SetPrimarySlotId\n"
-                 "65:GetPrimarySlotId\n"
+                 "59:TestSendCallSetupRequestResult\n"
+                 "60:GetOpKey\n"
+                 "61:GetSimTelephoneNumber\n"
+                 "62:GetSimTeleNumberIdentifier\n"
+                 "63:GetCardType\n"
+                 "64:UnlockSimLock\n"
+                 "65:SetPrimarySlotId\n"
+                 "66:GetPrimarySlotId\n"
+                 "67:GetOpName\n"
+                 "68:GetOpKeyExt\n"
                  "70:HasOperatorPrivileges\n"
                  "100:exit\n"
               << std::endl;
@@ -1023,6 +1035,7 @@ static void InitFuncMap()
     g_funcMap[InputCmd::INPUT_ISSIMACTIVE] = TestIsSimActive;
     g_funcMap[InputCmd::INPUT_GETSIMOPERATOR] = TestGetSimOperatorNumeric;
     g_funcMap[InputCmd::INPUT_GETGID1] = TestGetSimGid1;
+    g_funcMap[InputCmd::INPUT_GETGID2] = TestGetSimGid2;
     g_funcMap[InputCmd::INPUT_GETSIMSUB] = TestGetSimSubscriptionInfo;
     g_funcMap[InputCmd::INPUT_SET_ACTIVE_SIM] = TestSetActiveSim;
     g_funcMap[InputCmd::INPUT_GETACTIVEACCOUNTLIST] = TestGetActiveSimAccountInfoList;
@@ -1063,6 +1076,7 @@ static void InitFuncMapExt()
     g_funcMap[InputCmd::INPUT_STK_CALL_SETUP_REQUEST_RESULT_FROM_APP] = TestSendCallSetupRequestResult;
     g_funcMap[InputCmd::INPUT_GET_OPKEY] = TestGetOpKey;
     g_funcMap[InputCmd::INPUT_GET_OPNAME] = TestGetOpName;
+    g_funcMap[InputCmd::INPUT_GET_OPKEY_EXT] = TestGetOpKeyExt;
     g_funcMap[InputCmd::INPUT_GET_CARD_TYPE] = TestGetCardType;
     g_funcMap[InputCmd::INPUT_HAS_OPERATOR_PRIVILEGES] = TestHasOperatorPrivileges;
     g_funcMap[InputCmd::INPUT_SET_PRIMARY_SLOTID] = TestSetPrimarySlotId;
@@ -1100,11 +1114,11 @@ int main()
     }
 
     OHOS::EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(SIM_STATE_CHANGE_ACTION);
-    matchingSkills.AddEvent(DEFAULT_VOICE_SLOTID_CHANGE_ACTION);
-    matchingSkills.AddEvent(DEFAULT_SMS_SLOTID_CHANGE_ACTION);
-    matchingSkills.AddEvent(DEFAULT_DATA_SLOTID_CHANGE_ACTION);
-    matchingSkills.AddEvent(DEFAULT_MAIN_SLOTID_CHANGE_ACTION);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_VOICE_SUBSCRIPTION_CHANGED);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_SMS_SUBSCRIPTION_CHANGED);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_MAIN_SUBSCRIPTION_CHANGED);
     // STK
     matchingSkills.AddEvent(ACTION_SESSION_END);
     matchingSkills.AddEvent(ACTION_STK_COMMAND);
