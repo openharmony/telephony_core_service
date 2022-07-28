@@ -389,6 +389,18 @@ std::u16string CoreService::GetSimGid1(int32_t slotId)
     return simManager_->GetSimGid1(slotId);
 }
 
+std::u16string CoreService::GetSimGid2(int32_t slotId)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        return std::u16string();
+    }
+    TELEPHONY_LOGI("CoreService::GetSimGid2(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        return std::u16string();
+    }
+    return simManager_->GetSimGid2(slotId);
+}
+
 std::u16string CoreService::GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired)
 {
     TELEPHONY_LOGI("CoreService::GetSimEons(), slotId = %{public}d", slotId);
@@ -792,6 +804,33 @@ int32_t CoreService::GetMaxSimCount()
     GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
     int32_t slotCount = std::atoi(simSlotCount);
     return slotCount;
+}
+
+std::u16string CoreService::GetOpKey(int32_t slotId)
+{
+    TELEPHONY_LOGI("CoreService::GetOpKey(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        return std::u16string();
+    }
+    return simManager_->GetOpKey(slotId);
+}
+
+std::u16string CoreService::GetOpKeyExt(int32_t slotId)
+{
+    TELEPHONY_LOGI("CoreService::GetOpKeyExt(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        return std::u16string();
+    }
+    return simManager_->GetOpKeyExt(slotId);
+}
+
+std::u16string CoreService::GetOpName(int32_t slotId)
+{
+    TELEPHONY_LOGI("CoreService::GetOpName(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        return std::u16string();
+    }
+    return simManager_->GetOpName(slotId);
 }
 
 bool CoreService::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)

@@ -14,6 +14,7 @@
  */
 
 #include "sim_account_manager.h"
+
 #include "string_ex.h"
 
 namespace OHOS {
@@ -32,6 +33,9 @@ SimAccountManager::~SimAccountManager()
     }
     if (simStateTracker_ != nullptr) {
         simStateTracker_->UnRegisterForIccLoaded();
+    }
+    if (operatorConfigCache_ != nullptr) {
+        operatorConfigCache_->UnRegisterForIccChange();
     }
 }
 
@@ -66,13 +70,19 @@ void SimAccountManager::Init(int32_t slotId)
     }
     multiSimMonitor_ = std::make_shared<MultiSimMonitor>(
         monitorRunner_, multiSimController_, simStateManager_, simFileManager_, slotId);
-    simStateTracker_ = std::make_shared<SimStateTracker>(monitorRunner_, simFileManager_, slotId);
     if (multiSimMonitor_ == nullptr) {
         TELEPHONY_LOGE("SimAccountManager:: multiSimMonitor is null");
         return;
     }
     multiSimMonitor_->Init();
     multiSimMonitor_->RegisterForIccLoaded();
+    operatorConfigCache_ = std::make_shared<OperatorConfigCache>(monitorRunner_, simFileManager_, slotId);
+    if (operatorConfigCache_ == nullptr) {
+        TELEPHONY_LOGE("SimAccountManager::operatorConfigCache_ is null");
+        return;
+    }
+    operatorConfigCache_->RegisterForIccChange();
+    simStateTracker_ = std::make_shared<SimStateTracker>(monitorRunner_, simFileManager_, operatorConfigCache_, slotId);
     if (simStateTracker_ == nullptr) {
         TELEPHONY_LOGE("SimAccountManager::simStateTracker_ is null");
         return;
@@ -300,11 +310,11 @@ bool SimAccountManager::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> 
 bool SimAccountManager::GetOperatorConfigs(int slotId, OHOS::Telephony::OperatorConfig &poc)
 {
     TELEPHONY_LOGI("SimAccountManager::GetOperatorConfigs");
-    if (simStateTracker_ == nullptr) {
-        TELEPHONY_LOGE("SimAccountManager::GetOperatorConfigs failed by nullptr");
+    if (operatorConfigCache_ == nullptr) {
+        TELEPHONY_LOGE("SimAccountManager::GetOperatorConfigs operatorConfigCache_ is null");
         return false;
     }
-    return simStateTracker_->GetOperatorConfigs(slotId, poc);
+    return operatorConfigCache_->GetOperatorConfigs(static_cast<int32_t>(slotId), poc);
 }
 
 bool SimAccountManager::IsValidSlotId(int32_t slotId)

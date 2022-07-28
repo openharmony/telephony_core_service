@@ -17,6 +17,7 @@
 
 #include "telephony_errors.h"
 #include "radio_event.h"
+
 namespace OHOS {
 namespace Telephony {
 SimManager::SimManager(std::shared_ptr<ITelRilManager> telRilManager) : telRilManager_(telRilManager)
@@ -474,6 +475,42 @@ std::u16string SimManager::GetSimGid1(int32_t slotId)
         return u"";
     }
     return simFileManager_[slotId]->GetSimGid1();
+}
+
+std::u16string SimManager::GetSimGid2(int32_t slotId)
+{
+    if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return u"";
+    }
+    return simFileManager_[slotId]->GetSimGid2();
+}
+
+std::u16string SimManager::GetOpName(int32_t slotId)
+{
+    if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return u"";
+    }
+    return simFileManager_[slotId]->GetOpName();
+}
+
+std::u16string SimManager::GetOpKey(int32_t slotId)
+{
+    if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return u"";
+    }
+    return simFileManager_[slotId]->GetOpKey();
+}
+
+std::u16string SimManager::GetOpKeyExt(int32_t slotId)
+{
+    if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return u"";
+    }
+    return simFileManager_[slotId]->GetOpKeyExt();
 }
 
 std::u16string SimManager::GetSimTelephoneNumber(int32_t slotId)

@@ -224,6 +224,10 @@ void SimFile::LoadSimFiles()
     fileController_->ObtainBinaryFile(ELEMENTARY_FILE_GID1, eventGid1);
     fileToGet_++;
 
+    AppExecFwk::InnerEvent::Pointer eventGid2 = BuildCallerInfo(MSG_SIM_OBTAIN_GID2_DONE);
+    fileController_->ObtainBinaryFile(ELEMENTARY_FILE_GID2, eventGid2);
+    fileToGet_++;
+
     AppExecFwk::InnerEvent::Pointer eventPnn = BuildCallerInfo(MSG_SIM_OBTAIN_PNN_DONE);
     fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_PNN, eventPnn);
     fileToGet_++;

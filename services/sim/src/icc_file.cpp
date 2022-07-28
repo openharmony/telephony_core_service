@@ -520,6 +520,7 @@ void IccFile::UnInit()
     indexOfMailbox_ = 1;
     msisdn_ = "";
     gid1_ = "";
+    gid2_ = "";
     msisdnTag_ = "";
 }
 } // namespace Telephony

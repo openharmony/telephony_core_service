@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,29 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef SIM_TEST_H
-#define SIM_TEST_H
+#ifndef SIM_OPERATOR_BROCAST_TEST_H
+#define SIM_OPERATOR_BROCAST_TEST_H
 
 #include <gtest/gtest.h>
 
+#include "common_event_manager.h"
+#include "common_event_support.h"
 #include "core_service_client.h"
+#include "operator_config_cache.h"
 
 namespace OHOS {
 namespace Telephony {
-using namespace testing::ext;
-
-class SimTest : public testing::Test {
+class SimOperatorBrocastTest : public EventFwk::CommonEventSubscriber {
 public:
-    // execute before first testcase
-    static void SetUpTestCase();
-    void SetUp();
-    void TearDown();
-    static void InitBroadCast();
-    static void TearDownTestCase();
-    static sptr<ICoreService> GetProxy();
+    explicit SimOperatorBrocastTest(const EventFwk::CommonEventSubscribeInfo &sp) : CommonEventSubscriber(sp) {}
+    virtual void OnReceiveEvent(const EventFwk::CommonEventData &data);
+    ~SimOperatorBrocastTest() = default;
     static sptr<ICoreService> telephonyService_;
-    static const int32_t slotId_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // SIM_TEST_H
+#endif // NETWORK_SEARCH_TEST_BROADCAST_H

@@ -15,71 +15,21 @@
 
 #include "sim_state_tracker.h"
 
+#include "core_manager_inner.h"
 #include "radio_event.h"
 
 namespace OHOS {
 namespace Telephony {
 SimStateTracker::SimStateTracker(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    std::shared_ptr<SimFileManager> simFileManager, int32_t slotId)
-    : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), slotId_(slotId)
+    std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache,
+    int32_t slotId)
+    : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), operatorConfigCache_(operatorConfigCache),
+      slotId_(slotId)
 {
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("can not make OperatorConf");
+        TELEPHONY_LOGE("can not make OperatorConfigLoader");
     }
-    operatorConf_ = std::make_unique<OperatorConf>(simFileManager);
-}
-
-SimStateTracker::~SimStateTracker()
-{
-    UnRegisterForIccLoaded();
-}
-
-bool SimStateTracker::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
-{
-    TELEPHONY_LOGI("SimStateTracker::GetOperatorConfigs");
-    // if we already have the data get from local
-    if (conf_.configValue.size() > 0) {
-        TELEPHONY_LOGI("SimStateTracker::GetOperatorConfigs from cache");
-        auto valueIt = conf_.configValue.begin();
-        while (valueIt != conf_.configValue.end()) {
-            poc.configValue.emplace(
-                std::pair<std::u16string, std::u16string>(valueIt->first, valueIt->second));
-            valueIt++;
-        }
-        return true;
-    }
-    // or we need to get data now
-    if (operatorConf_ == nullptr) {
-        TELEPHONY_LOGE("SimStateTracker::GetOperatorConfigs operatorConf_ is null");
-        return false;
-    }
-    TELEPHONY_LOGI("SimStateTracker::GetOperatorConfigs from new");
-    if (!operatorConf_->GetOperatorConfigs(slotId, conf_)) {
-        TELEPHONY_LOGE("SimStateTracker::GetOperatorConfigs can not get from xml");
-        return false;
-    }
-    auto valueIt = conf_.configValue.begin();
-    while (valueIt != conf_.configValue.end()) {
-        poc.configValue.emplace(
-            std::pair<std::u16string, std::u16string>(valueIt->first, valueIt->second));
-        valueIt++;
-    }
-    return AnnounceOperatorConfigChanged();
-}
-
-bool SimStateTracker::AnnounceOperatorConfigChanged()
-{
-    AAFwk::Want want;
-    want.SetAction(COMMON_EVENT_TELEPHONY_OPERATOR_CONFIG_CHANGED);
-    std::string eventData(OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventData data;
-    data.SetWant(want);
-    data.SetData(eventData);
-    EventFwk::CommonEventPublishInfo publishInfo;
-    publishInfo.SetOrdered(true);
-    bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    TELEPHONY_LOGI("SimStateTracker::PublishSimFileEvent end###publishResult = %{public}d\n", publishResult);
-    return publishResult;
+    operatorConfigLoader_ = std::make_unique<OperatorConfigLoader>(simFileManager, operatorConfigCache);
 }
 
 void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -88,15 +38,17 @@ void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("start ProcessEvent but event is null!");
         return;
     }
-    auto eventCode = event->GetInnerEventId();
-    switch (eventCode) {
-        case RadioEvent::RADIO_SIM_RECORDS_LOADED:
-            TELEPHONY_LOGI("SimStateTracker::Refresh config");
-            conf_.configValue.clear();
-            GetOperatorConfigs(slotId_, conf_);
-            break;
-        default:
-            break;
+    if (operatorConfigLoader_ == nullptr) {
+        TELEPHONY_LOGE("operatorConfigLoader_ is null!");
+        return;
+    }
+    if (event->GetInnerEventId() == RadioEvent::RADIO_SIM_RECORDS_LOADED) {
+        TELEPHONY_LOGI("SimStateTracker::Refresh config");
+        if (!CoreManagerInner::GetInstance().IsSimActive(slotId_)) {
+            TELEPHONY_LOGE("sim is not active");
+            return;
+        }
+        operatorConfigLoader_->LoadOperatorConfig(slotId_);
     }
 }
 

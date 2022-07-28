@@ -92,6 +92,8 @@ public:
 
     std::u16string GetSimGid1(int32_t slotId) override;
 
+    std::u16string GetSimGid2(int32_t slotId) override;
+
     std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired) override;
 
     bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
@@ -174,6 +176,12 @@ public:
     int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) override;
 
     int32_t GetMaxSimCount() override;
+
+    std::u16string GetOpKey(int32_t slotId) override;
+
+    std::u16string GetOpKeyExt(int32_t slotId) override;
+
+    std::u16string GetOpName(int32_t slotId) override;
 
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
 
