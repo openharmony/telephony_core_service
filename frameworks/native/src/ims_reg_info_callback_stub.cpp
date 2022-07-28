@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,27 +13,21 @@
  * limitations under the License.
  */
 
-#include "ims_video_callback_stub.h"
+#include "ims_reg_info_callback_stub.h"
+
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-int ImsVideoCallbackStub::OnRemoteRequest(
+int32_t ImsRegInfoCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    TELEPHONY_LOGI("ImsVideoCallbackStub Enter!");
+    TELEPHONY_LOGI("Type is %{public}d", code);
+    int32_t slotId = data.ReadInt32();
     int32_t imsRegState = data.ReadInt32();
     int32_t imsRegTech = data.ReadInt32();
-    const ImsRegInfo info = {static_cast<ImsRegState>(imsRegState), static_cast<ImsRegTech>(imsRegTech)};
-    return OnImsStateCallback(info);
+    const ImsRegInfo info = { static_cast<ImsRegState>(imsRegState), static_cast<ImsRegTech>(imsRegTech) };
+    return OnImsRegInfoChanged(slotId, static_cast<ImsServiceType>(code), info);
 }
-
-int32_t ImsVideoCallbackStub::OnImsStateCallback(const ImsRegInfo &info)
-{
-    OnImsVideoStateChange(info);
-    return SUCCESS;
-}
-
-void ImsVideoCallbackStub::OnImsVideoStateChange(const ImsRegInfo &info) {}
-}  // namespace Telephony
-}  // namespace OHOS
+} // namespace Telephony
+} // namespace OHOS

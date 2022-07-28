@@ -51,9 +51,8 @@ public:
     std::u16string GetLocaleFromDefaultSim() override;
     std::u16string GetSimGid1(int32_t slotId) override;
     std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired) override;
-    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
-        const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
-        const sptr<INetworkSearchCallback> &callback) override;
+    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode, const sptr<NetworkInformation> &networkInformation,
+        bool resumeSelection, const sptr<INetworkSearchCallback> &callback) override;
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) override;
     bool GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) override;
     bool SetDefaultVoiceSlotId(int32_t slotId) override;
@@ -69,6 +68,7 @@ public:
     bool IsValidSlotId(int32_t slotId);
     bool IsValidSlotIdForDefault(int32_t slotId);
     bool IsValidStringLength(std::u16string str);
+    bool IsValidServiceType(ImsServiceType serviceType);
 
     bool UnlockPin(const int32_t slotId, std::u16string pin, LockStatusResponse &response) override;
     bool UnlockPuk(
@@ -110,8 +110,9 @@ public:
     bool HasOperatorPrivileges(const int32_t slotId) override;
     int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
         SimAuthenticationResponse &response) override;
-    int32_t RegImsCallback(MessageParcel &data) override;
-    int32_t UnRegImsCallback(MessageParcel &data) override;
+    int32_t RegisterImsRegInfoCallback(
+        int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback) override;
+    int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType) override;
 
 private:
     template<class T>
@@ -123,10 +124,13 @@ private:
             cells.emplace_back(cell.release());
         }
     }
-    static inline BrokerDelegator<CoreServiceProxy> delegator_;
     bool WriteInterfaceToken(MessageParcel &data);
     void ProcessSignalInfo(MessageParcel &reply, std::vector<sptr<SignalInformation>> &result);
     void ProcessCellInfo(MessageParcel &reply, std::vector<sptr<CellInformation>> &cells);
+    int32_t SerializeImsRegInfoData(int32_t slotId, ImsServiceType imsSrvType, MessageParcel &data);
+
+private:
+    static inline BrokerDelegator<CoreServiceProxy> delegator_;
     std::vector<IccAccountInfo> activeIccAccountInfo_;
     std::mutex mutex_;
 };

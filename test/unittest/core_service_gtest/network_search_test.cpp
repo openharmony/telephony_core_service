@@ -15,11 +15,7 @@
 
 #include "network_search_test.h"
 
-#include <gtest/gtest.h>
-#include <string_ex.h>
-#include <unistd.h>
-
-#include "core_service_client.h"
+#include "ims_reg_info_callback_gtest.h"
 #include "iservice_registry.h"
 #include "network_search_test_callback_stub.h"
 #include "system_ability_definition.h"
@@ -31,13 +27,15 @@ namespace Telephony {
 using namespace testing::ext;
 #ifndef TEL_TEST_UNSUPPORT
 constexpr int32_t SLOT_ID = 0;
-constexpr int32_t WAIT_TIME_SECOND = 10;
-constexpr int32_t WAIT_TIME_SECOND_LONG = 60;
+constexpr ImsServiceType DEFAULT_TYPE = TYPE_VOICE;
 constexpr int32_t INVALID_SLOT_ID = -1;
 constexpr int32_t INVALID_TYPE = -1;
+constexpr int32_t WAIT_TIME_SECOND = 10;
+constexpr int32_t WAIT_TIME_SECOND_LONG = 60;
 #endif // TEL_TEST_UNSUPPORT
 
 sptr<ICoreService> NetworkSearchTest::telephonyService_ = nullptr;
+std::list<ImsRegStateCallback> NetworkSearchTest::imsRegStateCallbackList_;
 void NetworkSearchTest::SetUpTestCase()
 {
     TELEPHONY_LOGI("----------NetworkSearch gtest start ------------");
@@ -59,8 +57,7 @@ void NetworkSearchTest::TearDown() {}
 sptr<ICoreService> NetworkSearchTest::GetProxy()
 {
     TELEPHONY_LOGI("TelephonyTestService GetProxy ... ");
-    sptr<ISystemAbilityManager> systemAbilityMgr =
-        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityMgr == nullptr) {
         TELEPHONY_LOGI("TelephonyTestService Get ISystemAbilityManager failed!!!");
         return nullptr;
@@ -271,8 +268,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0100
         sptr<NetworkInformation> networkInfo = new (std::nothrow) NetworkInformation();
         int32_t selectionMode = 1;
         bool isUpdateDatabase = true;
-        networkInfo->SetOperateInformation(
-            "CHINA MOBILE", "CMCC", "46000", static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
+        networkInfo->SetOperateInformation("CHINA MOBILE", "CMCC", "46000",
+            static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
             static_cast<int32_t>(NetworkRat::NETWORK_LTE));
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
         bool result = NetworkSearchTest::telephonyService_->SetNetworkSelectionMode(
@@ -313,8 +310,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0200
         sptr<NetworkInformation> networkInfo = new (std::nothrow) NetworkInformation();
         int32_t selectionMode = 0;
         bool isUpdateDatabase = true;
-        networkInfo->SetOperateInformation(
-            "CHINA MOBILE", "CMCC", "46000", static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
+        networkInfo->SetOperateInformation("CHINA MOBILE", "CMCC", "46000",
+            static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
             static_cast<int32_t>(NetworkRat::NETWORK_LTE));
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
         bool result = NetworkSearchTest::telephonyService_->SetNetworkSelectionMode(
@@ -345,8 +342,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0200
         sptr<NetworkInformation> networkInfo = new (std::nothrow) NetworkInformation();
         int32_t selectionMode = 0;
         bool isUpdateDatabase = true;
-        networkInfo->SetOperateInformation(
-            "CHINA MOBILE", "CMCC", "46000", static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
+        networkInfo->SetOperateInformation("CHINA MOBILE", "CMCC", "46000",
+            static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
             static_cast<int32_t>(NetworkRat::NETWORK_LTE));
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
         bool result = NetworkSearchTest::telephonyService_->SetNetworkSelectionMode(
@@ -575,28 +572,28 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSearchInformation_
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0100, Function | MediumTest | Level2)
 {
-    int ret = ERROR;
+    int ret = TELEPHONY_ERROR;
     if (NetworkSearchTest::telephonyService_ == nullptr) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
-        EXPECT_EQ(SUCCESS, ret);
+        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
     } else {
         ImsRegInfo info;
         ret = telephonyService_->GetImsRegStatus(SLOT_ID, ImsServiceType::TYPE_VOICE, info);
-        EXPECT_EQ(SUCCESS, ret);
+        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
     }
 }
 
 /**
  * @tc.number   Telephony_NetworkSearch_GetImsRegStatus_0200
- * @tc.name     Get ims register status, but slot id is invalid -1
+ * @tc.name     Get ims register status, but slot id is invalid
  * @tc.desc     Function test
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0200, Function | MediumTest | Level2)
 {
-    int ret = ERROR;
+    int ret = TELEPHONY_ERROR;
     if (NetworkSearchTest::telephonyService_ == nullptr) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
-        EXPECT_EQ(SUCCESS, ret);
+        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
     } else {
         ImsRegInfo info;
         ret = telephonyService_->GetImsRegStatus(INVALID_SLOT_ID, ImsServiceType::TYPE_VOICE, info);
@@ -606,38 +603,193 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0200, Functi
 
 /**
  * @tc.number   Telephony_NetworkSearch_GetImsRegStatus_0300
- * @tc.name     Get ims register status, but slot id is invalid, out of max size
+ * @tc.name     Get ims register status, but ImsServiceType is invalid
  * @tc.desc     Function test
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0300, Function | MediumTest | Level2)
 {
-    int ret = ERROR;
+    int ret = TELEPHONY_ERROR;
     if (NetworkSearchTest::telephonyService_ == nullptr) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
-        EXPECT_EQ(SUCCESS, ret);
-    } else {
-        ImsRegInfo info;
-        ret = telephonyService_->GetImsRegStatus(SLOT_ID + 100, ImsServiceType::TYPE_VOICE, info);
-        EXPECT_EQ(TELEPHONY_ERR_SLOTID_INVALID, ret);
-    }
-}
-
-/**
- * @tc.number   Telephony_NetworkSearch_GetImsRegStatus_0400
- * @tc.name     Get ims register status, but ImsServiceType is error
- * @tc.desc     Function test
- */
-HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0400, Function | MediumTest | Level2)
-{
-    int ret = ERROR;
-    if (NetworkSearchTest::telephonyService_ == nullptr) {
-        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
-        EXPECT_EQ(SUCCESS, ret);
+        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
     } else {
         ImsRegInfo info;
         ret = telephonyService_->GetImsRegStatus(SLOT_ID, static_cast<ImsServiceType>(INVALID_TYPE), info);
         EXPECT_EQ(TELEPHONY_ERR_ARGUMENT_INVALID, ret);
     }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_RegImsRegInfoCallback_0100
+ * @tc.name     Register ims registation info callback
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0100, Function | MediumTest | Level2)
+{
+    int ret = TELEPHONY_ERROR;
+    if (NetworkSearchTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
+        return;
+    }
+    ImsRegStateCallback imsRegStateCallback;
+    imsRegStateCallback.slotId = SLOT_ID;
+    imsRegStateCallback.imsSrvType = DEFAULT_TYPE;
+    imsRegStateCallback.imsCallback = new ImsRegInfoCallbackGtest();
+    ret = NetworkSearchTest::telephonyService_->RegisterImsRegInfoCallback(
+        imsRegStateCallback.slotId, imsRegStateCallback.imsSrvType, imsRegStateCallback.imsCallback);
+    if (ret == TELEPHONY_SUCCESS) {
+        NetworkSearchTest::imsRegStateCallbackList_.push_back(imsRegStateCallback);
+    } else {
+        if (imsRegStateCallback.imsCallback != nullptr) {
+            delete imsRegStateCallback.imsCallback;
+            imsRegStateCallback.imsCallback = nullptr;
+        }
+    }
+    EXPECT_EQ(TELEPHONY_SUCCESS, ret);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_RegImsRegInfoCallback_0200
+ * @tc.name     Register ims registation info callback, but slot id is invalid
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0200, Function | MediumTest | Level2)
+{
+    int ret = TELEPHONY_ERROR;
+    if (NetworkSearchTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
+        return;
+    }
+    sptr<ImsRegInfoCallback> imsRegInfoCallback = new ImsRegInfoCallbackGtest();
+    ret = NetworkSearchTest::telephonyService_->RegisterImsRegInfoCallback(
+        INVALID_SLOT_ID, DEFAULT_TYPE, imsRegInfoCallback);
+    delete imsRegInfoCallback;
+    imsRegInfoCallback = nullptr;
+    EXPECT_EQ(TELEPHONY_ERR_SLOTID_INVALID, ret);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_RegImsRegInfoCallback_0300
+ * @tc.name     Register ims registation info callback, but ims service type is invalid
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0300, Function | MediumTest | Level2)
+{
+    int ret = TELEPHONY_ERROR;
+    if (NetworkSearchTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
+        return;
+    }
+    sptr<ImsRegInfoCallback> imsRegInfoCallback = new ImsRegInfoCallbackGtest();
+    ret = NetworkSearchTest::telephonyService_->RegisterImsRegInfoCallback(
+        SLOT_ID, static_cast<ImsServiceType>(INVALID_TYPE), imsRegInfoCallback);
+    delete imsRegInfoCallback;
+    imsRegInfoCallback = nullptr;
+    EXPECT_EQ(TELEPHONY_ERR_ARGUMENT_INVALID, ret);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_RegImsRegInfoCallback_0400
+ * @tc.name     Register ims registation info callback, but callback is nullptr
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0400, Function | MediumTest | Level2)
+{
+    int ret = TELEPHONY_ERROR;
+    if (NetworkSearchTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
+        return;
+    }
+    ret = NetworkSearchTest::telephonyService_->RegisterImsRegInfoCallback(SLOT_ID, DEFAULT_TYPE, nullptr);
+    EXPECT_EQ(TELEPHONY_ERR_ARGUMENT_NULL, ret);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_UnRegImsRegInfoCallback_0100
+ * @tc.name     Unregister ims registation info callback
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0100, Function | MediumTest | Level2)
+{
+    int ret = TELEPHONY_ERROR;
+    if (NetworkSearchTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
+        return;
+    }
+    ret = NetworkSearchTest::telephonyService_->UnregisterImsRegInfoCallback(SLOT_ID, DEFAULT_TYPE);
+    if (ret != TELEPHONY_SUCCESS) {
+        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
+        return;
+    }
+    auto itor = NetworkSearchTest::imsRegStateCallbackList_.begin();
+    for (; itor != NetworkSearchTest::imsRegStateCallbackList_.end(); ++itor) {
+        if (itor->slotId == SLOT_ID && itor->imsSrvType == DEFAULT_TYPE) {
+            if (itor->imsCallback != nullptr) {
+                delete itor->imsCallback;
+                itor->imsCallback = nullptr;
+            }
+            NetworkSearchTest::imsRegStateCallbackList_.erase(itor);
+            break;
+        }
+    }
+    EXPECT_EQ(TELEPHONY_SUCCESS, ret);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_UnRegImsRegInfoCallback_0200
+ * @tc.name     Unregister ims registation info callback, but the callback it not registed
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0200, Function | MediumTest | Level2)
+{
+    int ret = TELEPHONY_ERROR;
+    if (NetworkSearchTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
+        return;
+    }
+    ret = NetworkSearchTest::telephonyService_->UnregisterImsRegInfoCallback(SLOT_ID, TYPE_VIDEO);
+    EXPECT_EQ(TELEPHONY_ERR_UNREGISTER_CALLBACK_FAIL, ret);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_UnRegImsRegInfoCallback_0300
+ * @tc.name     Unregister ims registation info callback, but slot id is invalid
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0300, Function | MediumTest | Level2)
+{
+    int ret = TELEPHONY_ERROR;
+    if (NetworkSearchTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
+        return;
+    }
+    ret = NetworkSearchTest::telephonyService_->UnregisterImsRegInfoCallback(INVALID_SLOT_ID, DEFAULT_TYPE);
+    EXPECT_EQ(TELEPHONY_ERR_SLOTID_INVALID, ret);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_UnRegImsRegInfoCallback_0400
+ * @tc.name     Unregister ims registation info callback, but ims service type is invalid
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0400, Function | MediumTest | Level2)
+{
+    int ret = TELEPHONY_ERROR;
+    if (NetworkSearchTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
+        return;
+    }
+    ret = NetworkSearchTest::telephonyService_->UnregisterImsRegInfoCallback(
+        SLOT_ID, static_cast<ImsServiceType>(INVALID_TYPE));
+    EXPECT_EQ(TELEPHONY_ERR_ARGUMENT_INVALID, ret);
 }
 
 #else // TEL_TEST_UNSUPPORT

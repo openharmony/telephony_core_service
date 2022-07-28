@@ -55,8 +55,9 @@ void NetworkSearchState::SetOperatorInfo(
     std::lock_guard<std::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->SetOperatorInfo(longName, shortName, numeric, domainType);
-        TELEPHONY_LOGI("NetworkSearchState::SetOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : "
-                       "%{public}s, %{public}p slotId:%{public}d",
+        TELEPHONY_LOGI(
+            "NetworkSearchState::SetOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : "
+            "%{public}s, %{public}p slotId:%{public}d",
             networkState_->GetLongOperatorName().c_str(), networkState_->GetShortOperatorName().c_str(),
             networkState_->GetPlmnNumeric().c_str(), networkState_.get(), slotId_);
     }
@@ -126,7 +127,7 @@ int32_t NetworkSearchState::GetImsStatus(ImsServiceType imsSrvType, ImsRegInfo &
     }
     info.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
     info.imsRegTech = imsServiceStatus_->imsRegTech;
-    return TELEPHONY_ERR_SUCCESS;
+    return TELEPHONY_SUCCESS;
 }
 
 void NetworkSearchState::SetImsStatus(bool imsRegStatus)
@@ -172,31 +173,35 @@ void NetworkSearchState::SetImsServiceStatus(const ImsServiceStatus &imsServiceS
     bool smsChanged = imsServiceStatus_->supportImsSms != imsServiceStatus.supportImsSms;
     bool radioTechChanged = imsServiceStatus_->imsRegTech != imsServiceStatus.imsRegTech;
     if (!voiceChanged && !videoChanged && !utChanged && !smsChanged && !radioTechChanged) {
-        TELEPHONY_LOGI("NetworkSearchState::SetImsServiceStatus nothing need update for slotId:%{public}d", slotId_);
+        TELEPHONY_LOGI("Nothing need update for slotId:%{public}d", slotId_);
         return;
     }
 
     *imsServiceStatus_ = imsServiceStatus;
 
+    if (!imsRegStatus_) {
+        TELEPHONY_LOGI("Nothing need to do since IMS haven't register");
+        return;
+    }
     ImsRegInfo imsRegInfo;
     bool isRegister = false;
     imsRegInfo.imsRegTech = imsServiceStatus.imsRegTech;
-    if ((voiceChanged && !imsRegStatus_) || radioTechChanged) {
+    if (voiceChanged || (radioTechChanged && imsServiceStatus_->supportImsVoice)) {
         isRegister = imsRegStatus_ && imsServiceStatus_->supportImsVoice;
         imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
         NotifyImsStateChange(ImsServiceType::TYPE_VOICE, imsRegInfo);
     }
-    if ((videoChanged && !imsRegStatus_) || radioTechChanged) {
+    if (videoChanged || (radioTechChanged && imsServiceStatus_->supportImsVideo)) {
         isRegister = imsRegStatus_ && imsServiceStatus_->supportImsVideo;
         imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
         NotifyImsStateChange(ImsServiceType::TYPE_VIDEO, imsRegInfo);
     }
-    if ((utChanged && !imsRegStatus_) || radioTechChanged) {
+    if (utChanged || (radioTechChanged && imsServiceStatus_->supportImsUt)) {
         isRegister = imsRegStatus_ && imsServiceStatus_->supportImsUt;
         imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
         NotifyImsStateChange(ImsServiceType::TYPE_UT, imsRegInfo);
     }
-    if ((smsChanged && !imsRegStatus_) || radioTechChanged) {
+    if (smsChanged || (radioTechChanged && imsServiceStatus_->supportImsSms)) {
         isRegister = imsRegStatus_ && imsServiceStatus_->supportImsSms;
         imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
         NotifyImsStateChange(ImsServiceType::TYPE_SMS, imsRegInfo);
@@ -354,14 +359,14 @@ void NetworkSearchState::NotifyImsStateChange(const ImsServiceType imsSrvType, c
     std::lock_guard<std::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("NotifyImsStateChange NetworkSearchManager is null slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("networkSearchManager is null slotId:%{public}d", slotId_);
         return;
     }
     if (networkState_ == nullptr) {
-        TELEPHONY_LOGE("NotifyImsStateChange networkState_ is null slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("networkState_ is null slotId:%{public}d", slotId_);
         return;
     }
-    networkSearchManager->NotifyImsCallback(slotId_, imsSrvType, info);
+    networkSearchManager->NotifyImsRegInfoChanged(slotId_, imsSrvType, info);
 }
 
 void NetworkSearchState::NotifyStateChange()

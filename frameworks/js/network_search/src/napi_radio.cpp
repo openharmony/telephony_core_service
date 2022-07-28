@@ -20,15 +20,15 @@
 #include <memory>
 #include <unistd.h>
 
-#include "get_network_search_mode_callback.h"
-#include "set_network_search_mode_callback.h"
-#include "get_radio_state_callback.h"
-#include "set_radio_state_callback.h"
-#include "get_network_search_info_callback.h"
-#include "get_preferred_network_callback.h"
-#include "set_preferred_network_callback.h"
 #include "core_service_client.h"
-#include "napi_ims_callback_manager.h"
+#include "get_network_search_info_callback.h"
+#include "get_network_search_mode_callback.h"
+#include "get_preferred_network_callback.h"
+#include "get_radio_state_callback.h"
+#include "napi_ims_reg_info_callback_manager.h"
+#include "set_network_search_mode_callback.h"
+#include "set_preferred_network_callback.h"
+#include "set_radio_state_callback.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
@@ -1693,10 +1693,10 @@ static napi_value GetCellInformation(napi_env env, napi_callback_info info)
         NAPI_CALL(env, napi_get_undefined(env, &result));
     }
     napi_value resourceName = nullptr;
-    NAPI_CALL(env, napi_create_string_utf8(env, "GetCellInformation", NAPI_AUTO_LENGTH, &resourceName));
-    NAPI_CALL(env,
-        napi_create_async_work(env, nullptr, resourceName, NativeGetCellInformation, GetCellInformationCallback,
-            (void *)asyncContext, &(asyncContext->work)));
+    NAPI_CALL(env, napi_create_string_utf8(env, "GetCellInformation",
+                                           NAPI_AUTO_LENGTH, &resourceName));
+    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, NativeGetCellInformation,
+                       GetCellInformationCallback, (void *)asyncContext, &(asyncContext->work)));
     NAPI_CALL(env, napi_queue_async_work(env, asyncContext->work));
     return result;
 }
@@ -1998,125 +1998,101 @@ static napi_value GetImsRegInfo(napi_env env, napi_callback_info info)
         env, asyncContext.release(), "GetImsRegInfo", NativeGetImsRegInfo, GetImsRegInfoCallback);
 }
 
-static void RegImsCallback(napi_env env, napi_value thisVar, int32_t slotId, int32_t imsSrvType, napi_value argv[])
+static int32_t RegisterImsRegStateCallback(
+    napi_env env, napi_value thisVar, int32_t slotId, int32_t imsSrvType, napi_value argv[])
 {
-    int32_t ret = ERROR;
-    ImsStateCallback imsStateCallback;
-    ImsRegInfo imsRegInfo;
-    imsStateCallback.env = env;
-    imsStateCallback.thisVar = thisVar;
-    imsStateCallback.slotId = slotId;
-    imsStateCallback.imsSrvType = static_cast<ImsServiceType>(imsSrvType);
-    switch (static_cast<ImsServiceType>(imsSrvType)) {
-        case ImsServiceType::TYPE_VOICE:
-            imsStateCallback.voiceCallback = new NapiImsVoiceCallback(imsRegInfo);
-            ret = DelayedRefSingleton<CoreServiceClient>::GetInstance()
-                .RegImsVoiceCallback(slotId, imsStateCallback.voiceCallback);
-            break;
-        case ImsServiceType::TYPE_VIDEO:
-            imsStateCallback.videoCallback = new NapiImsVideoCallback(imsRegInfo);
-            ret = DelayedRefSingleton<CoreServiceClient>::GetInstance()
-                .RegImsVideoCallback(slotId, imsStateCallback.videoCallback);
-            break;
-        case ImsServiceType::TYPE_UT:
-            imsStateCallback.utCallback = new NapiImsUtCallback(imsRegInfo);
-            ret = DelayedRefSingleton<CoreServiceClient>::GetInstance()
-                .RegImsUtCallback(slotId, imsStateCallback.utCallback);
-            break;
-        case ImsServiceType::TYPE_SMS:
-            imsStateCallback.smsCallback = new NapiImsSmsCallback(imsRegInfo);
-            ret = DelayedRefSingleton<CoreServiceClient>::GetInstance()
-                .RegImsSmsCallback(slotId, imsStateCallback.smsCallback);
-            break;
-        default:
-            ret = ERROR;
-            TELEPHONY_LOGE("ImsServiceType Error!");
-            break;
-        }
-    if (ret != SUCCESS) {
-        TELEPHONY_LOGE("RegisterCallBack failed!");
-    } else {
-        napi_create_reference(env, argv[ARRAY_INDEX_FOURTH], DATA_LENGTH_ONE, &imsStateCallback.callbackRef);
-        DelayedSingleton<NapiImsCallbackManager>::GetInstance()->RegImsStateCallback(imsStateCallback);
-        TELEPHONY_LOGI("RegisterCallBack success!");
-    }
+    ImsRegStateCallback stateCallback;
+    stateCallback.env = env;
+    stateCallback.slotId = slotId;
+    stateCallback.imsSrvType = static_cast<ImsServiceType>(imsSrvType);
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(stateCallback.thisVar));
+    napi_create_reference(env, argv[ARRAY_INDEX_FOURTH], DEFAULT_REF_COUNT, &(stateCallback.callbackRef));
+    return DelayedSingleton<NapiImsRegInfoCallbackManager>::GetInstance()
+        ->RegisterImsRegStateCallback(stateCallback);
 }
 
 static napi_value ObserverOn(napi_env env, napi_callback_info info)
 {
     size_t argc = 4;
-    napi_value result = nullptr;
     napi_value argv[4];
     napi_value thisVar;
-    char callbackType[INFO_MAXIMUM_LIMIT + 1];
-    int32_t slotId;
-    int32_t imsSrvType;
     if (napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL) != napi_ok) {
-        TELEPHONY_LOGE("ObserverOn Can not get thisVar value");
-        return result;
-    }
-    if (napi_get_value_string_utf8(env, argv[ARRAY_INDEX_FIRST],
-        callbackType, INFO_MAXIMUM_LIMIT, NULL) != napi_ok) {
-            TELEPHONY_LOGE("ObserverOn Can not get callbackType value");
-            return result;
-    }
-    if (napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &slotId) != napi_ok) {
-        TELEPHONY_LOGE("ObserverOn Can not get slotId value");
-        return result;
-    }
-    if (napi_get_value_int32(env, argv[ARRAY_INDEX_THIRD], &imsSrvType) != napi_ok) {
-        TELEPHONY_LOGE("ObserverOn Can not get imsSrvType value");
-        return result;
+        TELEPHONY_LOGE("Can not get thisVar value");
+        return nullptr;
     }
     bool matchFlag = NapiUtil::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string);
     NAPI_ASSERT(env, matchFlag, "Type error, should be string type");
-    std::string tmpStr = callbackType;
-    TELEPHONY_LOGI("callbackType == %{public}s", tmpStr.c_str());
-    if (tmpStr.compare("imsRegStateChange") == 0) {
-        RegImsCallback(env, thisVar, slotId, imsSrvType, argv);
+    size_t strLength = 0;
+    char callbackType[INFO_MAXIMUM_LIMIT + 1];
+    if (napi_get_value_string_utf8(env, argv[ARRAY_INDEX_FIRST], callbackType, INFO_MAXIMUM_LIMIT, &strLength) !=
+        napi_ok) {
+        TELEPHONY_LOGE("Can not get callbackType value");
+        return nullptr;
     }
+    std::string tmpStr = callbackType;
+    if (tmpStr.compare("imsRegStateChange") != 0) {
+        TELEPHONY_LOGE("callbackType is not imsRegStateChange and is %{public}s", tmpStr.c_str());
+        return nullptr;
+    }
+    int32_t slotId;
+    if (napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("Can not get slotId value");
+        return nullptr;
+    }
+    int32_t imsSrvType;
+    if (napi_get_value_int32(env, argv[ARRAY_INDEX_THIRD], &imsSrvType) != napi_ok) {
+        TELEPHONY_LOGE("Can not get imsSrvType value");
+        return nullptr;
+    }
+    int32_t ret = ret = RegisterImsRegStateCallback(env, thisVar, slotId, imsSrvType, argv);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Register imsRegState callback failed");
+        return nullptr;
+    }
+    napi_value result = nullptr;
+    napi_get_undefined(env, &result);
     return result;
 }
 
 static napi_value ObserverOff(napi_env env, napi_callback_info info)
 {
     size_t argc = 4;
-    napi_value result = nullptr;
     napi_value argv[4];
     napi_value thisVar;
-    char callbackType[INFO_MAXIMUM_LIMIT + 1];
-    int32_t slotId;
-    int32_t imsSrvType;
     if (napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL) != napi_ok) {
-        TELEPHONY_LOGE("ObserverOn Can not get thisVar value");
-        return result;
+        TELEPHONY_LOGE("Can not get thisVar value");
+        return nullptr;
     }
-    if (napi_get_value_string_utf8(env, argv[ARRAY_INDEX_FIRST],
-        callbackType, INFO_MAXIMUM_LIMIT, NULL) != napi_ok) {
-            TELEPHONY_LOGE("ObserverOn Can not get callbackType value");
-            return result;
-    }
-    if (napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &slotId) != napi_ok) {
-        TELEPHONY_LOGE("ObserverOn Can not get slotId value");
-        return result;
-    }
-    if (napi_get_value_int32(env, argv[ARRAY_INDEX_THIRD], &imsSrvType) != napi_ok) {
-        TELEPHONY_LOGE("ObserverOn Can not get imsSrvType value");
-        return result;
-    }
-    std::string tmpStr = callbackType;
     bool matchFlag = NapiUtil::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string);
     NAPI_ASSERT(env, matchFlag, "Type error, should be string type");
-    TELEPHONY_LOGI("callbackType == %{public}s", tmpStr.c_str());
+    size_t strLength = 0;
+    char callbackType[INFO_MAXIMUM_LIMIT + 1];
+    if (napi_get_value_string_utf8(env, argv[ARRAY_INDEX_FIRST], callbackType, INFO_MAXIMUM_LIMIT, &strLength) !=
+        napi_ok) {
+        TELEPHONY_LOGE("Can not get callbackType value");
+        return nullptr;
+    }
+    int32_t slotId;
+    if (napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("Can not get slotId value");
+        return nullptr;
+    }
+    int32_t imsSrvType;
+    if (napi_get_value_int32(env, argv[ARRAY_INDEX_THIRD], &imsSrvType) != napi_ok) {
+        TELEPHONY_LOGE("Can not get imsSrvType value");
+        return nullptr;
+    }
+    std::string tmpStr = callbackType;
+    TELEPHONY_LOGI("callbackType is %{public}s", tmpStr.c_str());
     if (tmpStr == "imsRegStateChange") {
-        if (argc == FOUR_PARAMETERS) {
-            DelayedSingleton<NapiImsCallbackManager>::GetInstance()->
-                UnRegImsStateCallback(env, slotId, static_cast<ImsServiceType>(imsSrvType));
-        } else if (argc == THREE_PARAMETERS) {
-            DelayedSingleton<NapiImsCallbackManager>::GetInstance()->
-                UnRegAllImsStateCallbackOfType(slotId, static_cast<ImsServiceType>(imsSrvType));
+        int32_t ret = DelayedSingleton<NapiImsRegInfoCallbackManager>::GetInstance()->UnregisterImsRegStateCallback(
+            env, slotId, static_cast<ImsServiceType>(imsSrvType));
+        if (ret != TELEPHONY_SUCCESS) {
+            return nullptr;
         }
     }
+    napi_value result = nullptr;
+    napi_get_undefined(env, &result);
     return result;
 }
 

@@ -16,17 +16,14 @@
 #ifndef I_BASE_PHONE_SERVICE_H
 #define I_BASE_PHONE_SERVICE_H
 
+#include "cell_information.h"
 #include "dialling_numbers_info.h"
 #include "i_network_search_callback.h"
-#include "sim_state_type.h"
+#include "ims_reg_info_callback.h"
 #include "network_search_result.h"
 #include "network_state.h"
 #include "signal_information.h"
-#include "cell_information.h"
-#include "ims_voice_callback.h"
-#include "ims_video_callback.h"
-#include "ims_ut_callback.h"
-#include "ims_sms_callback.h"
+#include "sim_state_type.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -53,8 +50,7 @@ public:
     virtual int32_t GetSimState(int32_t slotId) = 0;
     virtual int32_t GetCardType(int32_t slotId) = 0;
     virtual bool UnlockPin(int32_t slotId, std::u16string pin, LockStatusResponse &response) = 0;
-    virtual bool UnlockPuk(
-        int32_t slotId, std::u16string newPin, std::u16string puk, LockStatusResponse &response) = 0;
+    virtual bool UnlockPuk(int32_t slotId, std::u16string newPin, std::u16string puk, LockStatusResponse &response) = 0;
     virtual bool AlterPin(
         int32_t slotId, std::u16string newPin, std::u16string oldPin, LockStatusResponse &response) = 0;
     virtual bool UnlockPin2(int32_t slotId, std::u16string pin2, LockStatusResponse &response) = 0;
@@ -116,10 +112,11 @@ public:
     virtual std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) = 0;
     virtual bool SendUpdateCellLocationRequest(int32_t slotId) = 0;
     virtual bool HasOperatorPrivileges(const int32_t slotId) = 0;
-    virtual int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
-        SimAuthenticationResponse &response) = 0;
-    virtual int32_t RegImsCallback(MessageParcel &data) = 0;
-    virtual int32_t UnRegImsCallback(MessageParcel &data) = 0;
+    virtual int32_t SimAuthentication(
+        int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response) = 0;
+    virtual int32_t RegisterImsRegInfoCallback(
+        int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback) = 0;
+    virtual int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType) = 0;
     enum class InterfaceID {
         GET_PS_RADIO_TECH = 0,
         GET_CS_RADIO_TECH,
