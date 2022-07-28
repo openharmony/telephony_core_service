@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,8 @@
 #ifndef BASE_PHONE_SERVICE_STUB_H
 #define BASE_PHONE_SERVICE_STUB_H
 
-#include "iremote_stub.h"
 #include "i_core_service.h"
+#include "iremote_stub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -65,7 +65,11 @@ private:
     int32_t OnIsSimActive(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetLocaleFromDefaultSim(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimGid1(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetSimGid2(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimEons(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetOpName(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetOpKey(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetOpKeyExt(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimSubscriptionInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetDefaultVoiceSlotId(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetDefaultVoiceSlotId(MessageParcel &data, MessageParcel &reply);
@@ -105,8 +109,8 @@ private:
     int32_t OnHasOperatorPrivileges(MessageParcel &data, MessageParcel &reply);
     int32_t OnSimAuthentication(MessageParcel &data, MessageParcel &reply);
     int32_t OnUnlockSimLock(MessageParcel &data, MessageParcel &reply);
-    int32_t OnRegImsCallback(MessageParcel &data, MessageParcel &reply);
-    int32_t OnUnRegImsCallback(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRegisterImsRegInfoCallback(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUnregisterImsRegInfoCallback(MessageParcel &data, MessageParcel &reply);
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;

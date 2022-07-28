@@ -16,9 +16,10 @@
 #ifndef OHOS_I_SIM_MANAGER_H
 #define OHOS_I_SIM_MANAGER_H
 
-#include "sim_state_type.h"
 #include "dialling_numbers_info.h"
 #include "i_network_search.h"
+#include "operator_config_types.h"
+#include "sim_state_type.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -76,6 +77,10 @@ public:
     virtual std::u16string GetIMSI(int32_t slotId) = 0;
     virtual std::u16string GetLocaleFromDefaultSim(int32_t slotId) = 0;
     virtual std::u16string GetSimGid1(int32_t slotId) = 0;
+    virtual std::u16string GetSimGid2(int32_t slotId) = 0;
+    virtual std::u16string GetOpName(int32_t slotId) = 0;
+    virtual std::u16string GetOpKey(int32_t slotId) = 0;
+    virtual std::u16string GetOpKeyExt(int32_t slotId) = 0;
     virtual std::u16string GetSimTelephoneNumber(int32_t slotId) = 0;
     virtual std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) = 0;
     virtual std::u16string GetVoiceMailIdentifier(int32_t slotId) = 0;

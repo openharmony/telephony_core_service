@@ -30,6 +30,7 @@ public:
     static constexpr const char *LANGUAGE = "language";
     static constexpr const char *IMSI = "imsi";
     static constexpr const char *CARD_TYPE = "card_type";
+    static constexpr const char *IMS_SWITCH = "ims_switch";
     static constexpr const char *IS_ACTIVE = "is_active";
     static constexpr const char *IS_MAIN_CARD = "is_main_card";
     static constexpr const char *IS_VOICE_CARD = "is_voice_card";
@@ -43,6 +44,7 @@ public:
     std::string cardId;
     int slotIndex;
     int cardType;
+    int imsSwitch;
     std::string showName;
     std::string phoneNumber;
     std::string countryCode;

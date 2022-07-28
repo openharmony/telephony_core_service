@@ -14,14 +14,13 @@
  */
 
 #include "core_service_client.h"
+
+#include "core_service_proxy.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-
-
-#include "core_service_proxy.h"
-#include "telephony_log_wrapper.h"
 #include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -330,6 +329,16 @@ std::u16string CoreServiceClient::GetSimGid1(int32_t slotId)
         return std::u16string();
     }
     return proxy->GetSimGid1(slotId);
+}
+
+std::u16string CoreServiceClient::GetSimGid2(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return std::u16string();
+    }
+    return proxy->GetSimGid2(slotId);
 }
 
 std::u16string CoreServiceClient::GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac,
@@ -686,6 +695,36 @@ int32_t CoreServiceClient::GetMaxSimCount()
     return proxy->GetMaxSimCount();
 }
 
+std::u16string CoreServiceClient::GetOpKey(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return u"";
+    }
+    return proxy->GetOpKey(slotId);
+}
+
+std::u16string CoreServiceClient::GetOpKeyExt(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return u"";
+    }
+    return proxy->GetOpKeyExt(slotId);
+}
+
+std::u16string CoreServiceClient::GetOpName(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return u"";
+    }
+    return proxy->GetOpName(slotId);
+}
+
 int32_t CoreServiceClient::GetCardType(int32_t slotId)
 {
     auto proxy = GetProxy();
@@ -734,8 +773,8 @@ bool CoreServiceClient::HasOperatorPrivileges(const int32_t slotId)
     return proxy->HasOperatorPrivileges(slotId);
 }
 
-int32_t CoreServiceClient::SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
-    SimAuthenticationResponse &response)
+int32_t CoreServiceClient::SimAuthentication(
+    int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -787,228 +826,29 @@ bool CoreServiceClient::SendUpdateCellLocationRequest(int32_t slotId)
     return proxy->SendUpdateCellLocationRequest(slotId);
 }
 
-int32_t CoreServiceClient::RegImsVoiceCallback(int32_t slotId, const sptr<ImsVoiceCallback> &callback)
+int32_t CoreServiceClient::RegisterImsRegInfoCallback(
+    int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback)
 {
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("callback is nullptr");
+        return TELEPHONY_ERR_ARGUMENT_NULL;
+    }
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    MessageParcel data;
-    int32_t imsSrvType = static_cast<int32_t>(ImsServiceType::TYPE_VOICE);
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("ImsVoiceCallback is nullptr");
-        return ERROR;
-    }
-    if (!data.WriteInt32(imsSrvType)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteInt32(slotId)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteRemoteObject(callback->AsObject().GetRefPtr())) {
-        TELEPHONY_LOGE("WriteRemoteObject ERROR");
-        return ERROR;
-    }
-    return proxy->RegImsCallback(data);
+    return proxy->RegisterImsRegInfoCallback(slotId, imsSrvType, callback);
 }
 
-int32_t CoreServiceClient::UnRegImsVoiceCallback(int32_t slotId, const sptr<ImsVoiceCallback> &callback)
+int32_t CoreServiceClient::UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    MessageParcel data;
-    int32_t imsSrvType = static_cast<int32_t>(ImsServiceType::TYPE_VOICE);
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("ImsVoiceCallback is nullptr");
-        return ERROR;
-    }
-    if (!data.WriteInt32(imsSrvType)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteInt32(slotId)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteRemoteObject(callback->AsObject().GetRefPtr())) {
-        TELEPHONY_LOGE("WriteRemoteObject ERROR");
-        return ERROR;
-    }
-    return proxy->UnRegImsCallback(data);
-}
-
-int32_t CoreServiceClient::RegImsVideoCallback(int32_t slotId, const sptr<ImsVideoCallback> &callback)
-{
-    auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    MessageParcel data;
-    int32_t imsSrvType = static_cast<int32_t>(ImsServiceType::TYPE_VIDEO);
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("ImsVideoCallback is nullptr");
-        return ERROR;
-    }
-    if (!data.WriteInt32(imsSrvType)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteInt32(slotId)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteRemoteObject(callback->AsObject().GetRefPtr())) {
-        TELEPHONY_LOGE("WriteRemoteObject ERROR");
-        return ERROR;
-    }
-    return proxy->RegImsCallback(data);
-}
-
-int32_t CoreServiceClient::UnRegImsVideoCallback(int32_t slotId, const sptr<ImsVideoCallback> &callback)
-{
-    auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    MessageParcel data;
-    int32_t imsSrvType = static_cast<int32_t>(ImsServiceType::TYPE_VIDEO);
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("ImsVideoCallback is nullptr");
-        return ERROR;
-    }
-    if (!data.WriteInt32(imsSrvType)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteInt32(slotId)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteRemoteObject(callback->AsObject().GetRefPtr())) {
-        TELEPHONY_LOGE("WriteRemoteObject ERROR");
-        return ERROR;
-    }
-    return proxy->UnRegImsCallback(data);
-}
-
-int32_t CoreServiceClient::RegImsUtCallback(int32_t slotId, const sptr<ImsUtCallback> &callback)
-{
-    auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    MessageParcel data;
-    int32_t imsSrvType = static_cast<int32_t>(ImsServiceType::TYPE_UT);
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("ImsUtCallback is nullptr");
-        return ERROR;
-    }
-    if (!data.WriteInt32(imsSrvType)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteInt32(slotId)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteRemoteObject(callback->AsObject().GetRefPtr())) {
-        TELEPHONY_LOGE("WriteRemoteObject ERROR");
-        return ERROR;
-    }
-    return proxy->RegImsCallback(data);
-}
-
-int32_t CoreServiceClient::UnRegImsUtCallback(int32_t slotId, const sptr<ImsUtCallback> &callback)
-{
-    auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    MessageParcel data;
-    int32_t imsSrvType = static_cast<int32_t>(ImsServiceType::TYPE_UT);
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("ImsUtCallback is nullptr");
-        return ERROR;
-    }
-    if (!data.WriteInt32(imsSrvType)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteInt32(slotId)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteRemoteObject(callback->AsObject().GetRefPtr())) {
-        TELEPHONY_LOGE("WriteRemoteObject ERROR");
-        return ERROR;
-    }
-    return proxy->UnRegImsCallback(data);
-}
-
-int32_t CoreServiceClient::RegImsSmsCallback(int32_t slotId, const sptr<ImsSmsCallback> &callback)
-{
-    auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    MessageParcel data;
-    int32_t imsSrvType = static_cast<int32_t>(ImsServiceType::TYPE_SMS);
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("ImsSmsCallback is nullptr");
-        return ERROR;
-    }
-    if (!data.WriteInt32(imsSrvType)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteInt32(slotId)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteRemoteObject(callback->AsObject().GetRefPtr())) {
-        TELEPHONY_LOGE("WriteRemoteObject ERROR");
-        return ERROR;
-    }
-    return proxy->RegImsCallback(data);
-}
-
-int32_t CoreServiceClient::UnRegImsSmsCallback(int32_t slotId, const sptr<ImsSmsCallback> &callback)
-{
-    auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    MessageParcel data;
-    int32_t imsSrvType = static_cast<int32_t>(ImsServiceType::TYPE_SMS);
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("ImsSmsCallback is nullptr");
-        return ERROR;
-    }
-    if (!data.WriteInt32(imsSrvType)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteInt32(slotId)) {
-        TELEPHONY_LOGE("WriteInt32 ERROR");
-        return ERROR;
-    }
-    if (!data.WriteRemoteObject(callback->AsObject().GetRefPtr())) {
-        TELEPHONY_LOGE("WriteRemoteObject ERROR");
-        return ERROR;
-    }
-    return proxy->UnRegImsCallback(data);
+    return proxy->UnregisterImsRegInfoCallback(slotId, imsSrvType);
 }
 } // namespace Telephony
 } // namespace OHOS

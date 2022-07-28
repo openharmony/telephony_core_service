@@ -18,31 +18,30 @@
 
 #include <string>
 
+#include "operator_config_cache.h"
+#include "operator_config_loader.h"
 #include "telephony_log_wrapper.h"
-#include "operator_conf.h"
 
 namespace OHOS {
 namespace Telephony {
 class SimStateTracker : public AppExecFwk::EventHandler {
 public:
     SimStateTracker(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-            std::shared_ptr<SimFileManager> simFileManager, int32_t slotId);
-    virtual ~SimStateTracker();
-    bool GetOperatorConfigs(int32_t slotId, OperatorConfig &poc);
+        std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache,
+        int32_t slotId);
+    virtual ~SimStateTracker() = default;
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     bool RegisterForIccLoaded();
     bool UnRegisterForIccLoaded();
 
-    std::unique_ptr<OperatorConf> operatorConf_ = nullptr;
+    std::unique_ptr<OperatorConfigLoader> operatorConfigLoader_ = nullptr;
 
 private:
-    bool AnnounceOperatorConfigChanged();
-    inline static const std::string COMMON_EVENT_TELEPHONY_OPERATOR_CONFIG_CHANGED =
-            "com.hos.action.OPERATOR_CONFIG_CHANGED";
     inline static const std::string OPERATOR_CONFIG_CHANGED = "operatorConfigChanged";
     std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
+    std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
     int32_t slotId_;
-    OperatorConfig conf_;
+    OperatorConfig config_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -57,10 +57,10 @@ public:
     bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     std::u16string GetLocaleFromDefaultSim();
     std::u16string GetSimGid1(int32_t slotId);
+    std::u16string GetSimGid2(int32_t slotId);
     std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired);
-    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
-        const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
-        const sptr<INetworkSearchCallback> &callback);
+    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode, const sptr<NetworkInformation> &networkInformation,
+        bool resumeSelection, const sptr<INetworkSearchCallback> &callback);
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId);
     bool GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
     bool SetDefaultVoiceSlotId(int32_t slotId);
@@ -94,25 +94,23 @@ public:
     bool SetVoiceMailInfo(int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber);
     int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info);
     int32_t GetMaxSimCount();
+    std::u16string GetOpKey(int32_t slotId);
+    std::u16string GetOpKeyExt(int32_t slotId);
+    std::u16string GetOpName(int32_t slotId);
     int32_t GetCardType(int32_t slotId);
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd);
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd);
     bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response);
     bool HasOperatorPrivileges(const int32_t slotId);
-    int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
-        SimAuthenticationResponse &response);
+    int32_t SimAuthentication(
+        int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response);
     int32_t GetPrimarySlotId();
     bool SetPrimarySlotId(int32_t slotId);
     std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId);
     bool SendUpdateCellLocationRequest(int32_t slotId);
-    int32_t RegImsVoiceCallback(int32_t slotId, const sptr<ImsVoiceCallback> &callback);
-    int32_t UnRegImsVoiceCallback(int32_t slotId, const sptr<ImsVoiceCallback> &callback);
-    int32_t RegImsVideoCallback(int32_t slotId, const sptr<ImsVideoCallback> &callback);
-    int32_t UnRegImsVideoCallback(int32_t slotId, const sptr<ImsVideoCallback> &callback);
-    int32_t RegImsUtCallback(int32_t slotId, const sptr<ImsUtCallback> &callback);
-    int32_t UnRegImsUtCallback(int32_t slotId, const sptr<ImsUtCallback> &callback);
-    int32_t RegImsSmsCallback(int32_t slotId, const sptr<ImsSmsCallback> &callback);
-    int32_t UnRegImsSmsCallback(int32_t slotId, const sptr<ImsSmsCallback> &callback);
+    int32_t RegisterImsRegInfoCallback(
+        int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback);
+    int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType);
 
 private:
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {
@@ -130,8 +128,8 @@ private:
 
 private:
     std::mutex mutexProxy_;
-    sptr<ICoreService> proxy_ {nullptr};
-    sptr<IRemoteObject::DeathRecipient> deathRecipient_ {nullptr};
+    sptr<ICoreService> proxy_ { nullptr };
+    sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
 };
 } // namespace Telephony
 } // namespace OHOS

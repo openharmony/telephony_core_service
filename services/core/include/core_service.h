@@ -25,6 +25,7 @@
 #include "i_network_search.h"
 #include "i_sim_manager.h"
 #include "i_tel_ril_manager.h"
+#include "tel_ril_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -91,11 +92,12 @@ public:
 
     std::u16string GetSimGid1(int32_t slotId) override;
 
+    std::u16string GetSimGid2(int32_t slotId) override;
+
     std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired) override;
 
-    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
-        const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
-        const sptr<INetworkSearchCallback> &callback) override;
+    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode, const sptr<NetworkInformation> &networkInformation,
+        bool resumeSelection, const sptr<INetworkSearchCallback> &callback) override;
 
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) override;
 
@@ -107,8 +109,7 @@ public:
 
     bool UnlockPin2(int32_t slotId, std::u16string pin2, LockStatusResponse &response) override;
 
-    bool UnlockPuk2(
-        int32_t slotId, std::u16string newPin2, std::u16string puk2, LockStatusResponse &response) override;
+    bool UnlockPuk2(int32_t slotId, std::u16string newPin2, std::u16string puk2, LockStatusResponse &response) override;
 
     bool AlterPin2(
         int32_t slotId, std::u16string newPin2, std::u16string oldPin2, LockStatusResponse &response) override;
@@ -174,6 +175,12 @@ public:
 
     int32_t GetMaxSimCount() override;
 
+    std::u16string GetOpKey(int32_t slotId) override;
+
+    std::u16string GetOpKeyExt(int32_t slotId) override;
+
+    std::u16string GetOpName(int32_t slotId) override;
+
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
 
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
@@ -189,9 +196,10 @@ public:
     int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
         SimAuthenticationResponse &response) override;
 
-    int32_t RegImsCallback(MessageParcel &data) override;
+    int32_t RegisterImsRegInfoCallback(
+        int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback) override;
 
-    int32_t UnRegImsCallback(MessageParcel &data) override;
+    int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType) override;
 
 private:
     bool Init();
@@ -203,7 +211,7 @@ private:
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
     std::shared_ptr<Telephony::ISimManager> simManager_ = nullptr;
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
-    std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
+    std::shared_ptr<TelRilManager> telRilManager_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

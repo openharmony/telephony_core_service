@@ -251,6 +251,11 @@ public:
     std::u16string GetIMSI(int32_t slotId);
     std::u16string GetLocaleFromDefaultSim(int32_t slotId);
     std::u16string GetSimGid1(int32_t slotId);
+    std::u16string GetSimGid2(int32_t slotId);
+    std::u16string GetOpName(int32_t slotId);
+    std::u16string GetOpKeyExt(int32_t slotId);
+    std::u16string GetOpKey();
+    std::u16string GetOpKey(int32_t slotId);
     std::u16string GetSimTelephoneNumber(int32_t slotId);
     std::u16string GetSimTeleNumberIdentifier(const int32_t slotId);
     std::u16string GetVoiceMailIdentifier(int32_t slotId);

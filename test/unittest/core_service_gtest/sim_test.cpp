@@ -14,14 +14,21 @@
  */
 
 #include "sim_test.h"
-#include "core_service_test_helper.h"
 
+#include <string>
+#include <unistd.h>
+
+#include "core_manager_inner.h"
+#include "core_service_client.h"
+#include "core_service_test_helper.h"
 #include "iservice_registry.h"
+#include "operator_config_cache.h"
+#include "operator_file_parser.h"
+#include "sim_operator_brocast_test.h"
+#include "sim_state_type.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
-#include "sim_state_type.h"
-
 namespace OHOS {
 namespace Telephony {
 sptr<ICoreService> SimTest::telephonyService_ = nullptr;
@@ -31,7 +38,18 @@ void SimTest::SetUpTestCase()
     if (telephonyService_ == nullptr) {
         telephonyService_ = GetProxy();
     }
-    TELEPHONY_LOGI("Sim connect coreservice  server success!!!");
+    InitBroadCast();
+}
+
+void SimTest::InitBroadCast()
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
+    subscribeInfo.SetPriority(1);
+    std::shared_ptr<SimOperatorBrocastTest> subscriber = std::make_shared<SimOperatorBrocastTest>(subscribeInfo);
+    EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber);
+    SimOperatorBrocastTest::telephonyService_ = telephonyService_;
 }
 
 void SimTest::TearDownTestCase()
@@ -46,8 +64,7 @@ void SimTest::TearDown() {}
 sptr<ICoreService> SimTest::GetProxy()
 {
     TELEPHONY_LOGI("TelephonyTestService GetProxy ... ");
-    sptr<ISystemAbilityManager> systemAbilityMgr =
-        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityMgr == nullptr) {
         TELEPHONY_LOGI("TelephonyTestService Get ISystemAbilityManager failed!!!");
         return nullptr;
@@ -64,6 +81,128 @@ sptr<ICoreService> SimTest::GetProxy()
 }
 
 #ifndef TEL_TEST_UNSUPPORT
+/**
+ * @tc.number  Telephony_Sim_ParseOperatorConf_0100
+ * @tc.name  ParseOperatorConf
+ * @tc.desc Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_ParseOperatorConf_0100, Function | MediumTest | Level1)
+{
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+        TELEPHONY_LOGE("Telephony_Sim_ParseOperatorConf_0100 TelephonyTestService Remote service is null");
+        return;
+    }
+    const std::string rawJson = R"({ "string": "JSON中国", "long": 2147483699, "int": 88, "bool": true,
+        "strA": ["street", "city", "country"], "longA": [ 2147483699, 2147483900, 2147499999],
+        "intA": [1, 2, 3]})";
+    JSONCPP_STRING err;
+    Json::Value root;
+    Json::CharReaderBuilder builder;
+    Json::CharReader *reader(builder.newCharReader());
+    if (!reader->parse(rawJson.c_str(), rawJson.c_str() + rawJson.length(), &root, &err)) {
+        TELEPHONY_LOGE("ParserUtil::ParserPdpProfileJson reader is error!\n");
+        return;
+    }
+    delete reader;
+    OperatorConfigCache ofpc(nullptr, nullptr, SimTest::slotId_);
+    OperatorFileParser ofp;
+    OperatorConfig poc;
+    const std::string iccid = Str16ToStr8(SimTest::telephonyService_->GetSimIccId(SimTest::slotId_));
+    std::string filename = ofpc.EncryptIccId(iccid) + ".json";
+    ofp.WriteOperatorConfigJson(filename, root);
+    Json::Value ret;
+    ofp.ParseOperatorConfigFromFile(poc, filename, ret);
+    if (poc.stringArrayValue.find("string") != poc.stringArrayValue.end()) {
+        EXPECT_EQ("JSON中国", poc.stringValue["string"]);
+    }
+    if (poc.stringArrayValue.find("long") != poc.stringArrayValue.end()) {
+        EXPECT_EQ(2147483699, poc.longValue["long"]);
+    }
+    if (poc.stringArrayValue.find("int") != poc.stringArrayValue.end()) {
+        EXPECT_EQ(88, poc.intValue["int"]);
+    }
+    if (poc.stringArrayValue.find("bool") != poc.stringArrayValue.end()) {
+        EXPECT_EQ(true, poc.boolValue["bool"]);
+    }
+    if (poc.stringArrayValue.find("strA") != poc.stringArrayValue.end()) {
+        EXPECT_EQ("street", poc.stringArrayValue["strA"][0]);
+    }
+    if (poc.intArrayValue.find("intA") != poc.intArrayValue.end()) {
+        EXPECT_EQ(2, poc.intArrayValue["intA"][1]);
+    }
+    if (poc.longArrayValue.find("longA") != poc.longArrayValue.end()) {
+        EXPECT_EQ(2147499999, poc.longArrayValue["longA"][2]);
+    }
+}
+
+/**
+ * @tc.number  Telephony_Sim_ParseFromCustomSystem_0100
+ * @tc.name  ParseOperatorConf
+ * @tc.desc Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_ParseFromCustomSystem_0100, Function | MediumTest | Level1)
+{
+    TELEPHONY_LOGI("Telephony_Sim_ParseFromCustomSystem_0100 start");
+    bool isCanGetFromDefaultCustomSystemNormal = false;
+    std::vector<const char *> defaultPath { "/system/operator_config.json", "/chipset/operator_config.json",
+        "/sys_prod/operator_config.json", "/chip_prod/operator_config.json" };
+    int32_t fileExit = 0;
+    for (auto path : defaultPath) {
+        if (access(path, R_OK) == fileExit) {
+            isCanGetFromDefaultCustomSystemNormal = true;
+        } else {
+            TELEPHONY_LOGI("%{public}s not exit", path);
+        }
+    }
+    OperatorConfig opc;
+    OperatorFileParser parser;
+    Json::Value opcJsonValue;
+    if (isCanGetFromDefaultCustomSystemNormal) {
+        EXPECT_EQ(
+            parser.ParseFromCustomSystem(SimTest::slotId_, opc, opcJsonValue), isCanGetFromDefaultCustomSystemNormal);
+    }
+}
+
+/**
+ * @tc.number  Telephony_Sim_ParseOperatorConf_0100
+ * @tc.name  ParseOperatorConf
+ * @tc.desc Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetOperatorConf_0200, Function | MediumTest | Level1)
+{
+    OperatorFileParser ofp;
+    OperatorConfig poc;
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+        TELEPHONY_LOGE("Telephony_Sim_GetOperatorConf_0200 TelephonyTestService Remote service is null");
+        SimTest::telephonyService_ = GetProxy();
+    } else {
+        TELEPHONY_LOGI("Telephony_Sim_GetOperatorConf_0200 TelephonyTestService Remote service start");
+        SimTest::telephonyService_->GetOperatorConfigs(SimTest::slotId_, poc);
+        CoreManagerInner::GetInstance().GetOperatorConfigs(SimTest::slotId_, poc);
+        if (poc.stringArrayValue.find("string") != poc.stringArrayValue.end()) {
+            EXPECT_EQ("JSON中国", poc.stringValue["string"]);
+        }
+        if (poc.stringArrayValue.find("long") != poc.stringArrayValue.end()) {
+            EXPECT_EQ(2147483699, poc.longValue["long"]);
+        }
+        if (poc.stringArrayValue.find("int") != poc.stringArrayValue.end()) {
+            EXPECT_EQ(88, poc.intValue["int"]);
+        }
+        if (poc.stringArrayValue.find("bool") != poc.stringArrayValue.end()) {
+            EXPECT_EQ(true, poc.boolValue["bool"]);
+        }
+        if (poc.stringArrayValue.find("strA") != poc.stringArrayValue.end()) {
+            EXPECT_EQ("street", poc.stringArrayValue["strA"][0]);
+        }
+        if (poc.intArrayValue.find("intA") != poc.intArrayValue.end()) {
+            EXPECT_EQ(2, poc.intArrayValue["intA"][1]);
+        }
+        if (poc.longArrayValue.find("longA") != poc.longArrayValue.end()) {
+            EXPECT_EQ(2147499999, poc.longArrayValue["longA"][2]);
+        }
+    }
+}
+
 /**
  * @tc.number   Telephony_Sim_GetSimState_0100
  * @tc.name     Get sim state
@@ -211,6 +350,22 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimGid1_0100, Function | MediumTest | Level1)
 }
 
 /**
+ * @tc.number   Telephony_Sim_GetSimGid2_0100
+ * @tc.name     Get sim gid2
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetSimGid2_0100, Function | MediumTest | Level1)
+{
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        SimTest::telephonyService_ = GetProxy();
+    } else {
+        std::string result = Str16ToStr8(SimTest::telephonyService_->GetSimGid2(SimTest::slotId_));
+        EXPECT_STRNE(result.c_str(), "");
+    }
+}
+
+/**
  * @tc.number   Telephony_Sim_GetSimTelephoneNumber_0100
  * @tc.name     Get sim telephony number
  * @tc.desc     Function test
@@ -318,7 +473,6 @@ HWTEST_F(SimTest, Telephony_Sim_SetDefaultVoiceSlotId_0100, Function | MediumTes
  * @tc.number   Telephony_Sim_RefreshSimState_0100
  * @tc.name     Refresh sim state
  * @tc.desc     Function test
- */
 HWTEST_F(SimTest, Telephony_Sim_RefreshSimState_0100, Function | MediumTest | Level0)
 {
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -329,6 +483,7 @@ HWTEST_F(SimTest, Telephony_Sim_RefreshSimState_0100, Function | MediumTest | Le
         EXPECT_GT(result, -1);
     }
 }
+ */
 
 /**
  * @tc.number   Telephony_Sim_GetOperatorConfig_0100
@@ -372,15 +527,14 @@ HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0100, Function | Med
 HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     EXPECT_TRUE(true);
-/*     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
         std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-            SimTest::telephonyService_->QueryIccDiallingNumbers(
-                SimTest::slotId_, DiallingNumbersInfo::SIM_ADN);
+            SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId_, DiallingNumbersInfo::SIM_ADN);
         EXPECT_TRUE(true);
-    } */
+    }
 }
 
 /**
@@ -391,7 +545,7 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0100, Function | Medi
 HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     EXPECT_TRUE(true);
-/*     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
@@ -402,7 +556,7 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0100, Function | Medium
         bool result = SimTest::telephonyService_->AddIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
         EXPECT_TRUE(result);
-    } */
+    }
 }
 
 /**
@@ -413,7 +567,7 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0100, Function | Medium
 HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     EXPECT_TRUE(true);
-/*     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
@@ -425,7 +579,7 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0100, Function | Med
         bool result = SimTest::telephonyService_->UpdateIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
         EXPECT_TRUE(result);
-    } */
+    }
 }
 
 /**
@@ -436,7 +590,7 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0100, Function | Med
 HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     EXPECT_TRUE(true);
-/*     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
@@ -446,7 +600,7 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0100, Function | Medium
         bool result = SimTest::telephonyService_->DelIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
         EXPECT_TRUE(result);
-    } */
+    }
 }
 
 /**
@@ -457,15 +611,14 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0100, Function | Medium
 HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     EXPECT_TRUE(true);
-/*     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
         std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-            SimTest::telephonyService_->QueryIccDiallingNumbers(
-                SimTest::slotId_, DiallingNumbersInfo::SIM_FDN);
+            SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId_, DiallingNumbersInfo::SIM_FDN);
         EXPECT_TRUE(true);
-    } */
+    }
 }
 
 /**
@@ -476,7 +629,7 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0100, Function | Medi
 HWTEST_F(SimTest, Telephony_Sim_AddIccFdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     EXPECT_TRUE(true);
-/*     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
@@ -488,7 +641,7 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccFdnDiallingNumbers_0100, Function | Medium
         SimTest::telephonyService_->AddIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
         EXPECT_TRUE(true);
-    } */
+    }
 }
 
 /**
@@ -499,7 +652,7 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccFdnDiallingNumbers_0100, Function | Medium
 HWTEST_F(SimTest, Telephony_Sim_UpdateIccFdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     EXPECT_TRUE(true);
-/*     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
@@ -512,7 +665,7 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccFdnDiallingNumbers_0100, Function | Med
         SimTest::telephonyService_->UpdateIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
         EXPECT_TRUE(true);
-    } */
+    }
 }
 
 /**
@@ -523,7 +676,7 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccFdnDiallingNumbers_0100, Function | Med
 HWTEST_F(SimTest, Telephony_Sim_DelIccFdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     EXPECT_TRUE(true);
-/*     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
@@ -534,7 +687,7 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccFdnDiallingNumbers_0100, Function | Medium
         SimTest::telephonyService_->DelIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
         EXPECT_TRUE(true);
-    } */
+    }
 }
 
 /**
@@ -642,19 +795,19 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimAccountInfo_0100, Function | MediumTest | 
  * @tc.name     Set sim PIN lock state
  * @tc.desc     Function test
  */
- 
+
 void SetLockStateTestFunc(CoreServiceTestHelper &helper)
 {
     LockInfo testInfo;
     testInfo.lockType = LockType::PIN_LOCK;
     testInfo.password = Str8ToStr16("1234");
     testInfo.lockState = LockState::LOCK_OFF;
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
     bool result = SimTest::telephonyService_->SetLockState(SimTest::slotId_, testInfo, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
- 
+
 HWTEST_F(SimTest, Telephony_Sim_SetLockState_0100, Function | MediumTest | Level3)
 {
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
@@ -683,7 +836,7 @@ void SetFDNStateTestFunc(CoreServiceTestHelper &helper)
     testInfo.lockType = LockType::FDN_LOCK;
     testInfo.password = Str8ToStr16("1234");
     testInfo.lockState = LockState::LOCK_OFF;
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
     bool result = SimTest::telephonyService_->SetLockState(SimTest::slotId_, testInfo, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
@@ -775,7 +928,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetFDNState_0100, Function | MediumTest | Level3
 void UnlockPinTestFunc(CoreServiceTestHelper &helper)
 {
     const std::u16string pin = Str8ToStr16("1234");
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
     bool result = SimTest::telephonyService_->UnlockPin(SimTest::slotId_, pin, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
@@ -807,7 +960,7 @@ void UnlockPukTestFunc(CoreServiceTestHelper &helper)
 {
     const std::u16string pin = Str8ToStr16("1234");
     const std::u16string puk = Str8ToStr16("42014264");
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
     bool result = SimTest::telephonyService_->UnlockPuk(SimTest::slotId_, pin, puk, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
@@ -839,7 +992,7 @@ void AlterPinTestFunc(CoreServiceTestHelper &helper)
 {
     const std::u16string newpin = Str8ToStr16("1234");
     const std::u16string oldpin = Str8ToStr16("4321");
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
     bool result = SimTest::telephonyService_->UnlockPuk2(SimTest::slotId_, newpin, oldpin, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
@@ -870,7 +1023,7 @@ HWTEST_F(SimTest, Telephony_Sim_AlterPin_0100, Function | MediumTest | Level3)
 void UnlockPin2TestFunc(CoreServiceTestHelper &helper)
 {
     const std::u16string pin2 = Str8ToStr16("12345678");
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
     bool result = SimTest::telephonyService_->UnlockPin2(SimTest::slotId_, pin2, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
@@ -902,7 +1055,7 @@ void UnlockPuk2TestFunc(CoreServiceTestHelper &helper)
 {
     const std::u16string pin2 = Str8ToStr16("12345678");
     const std::u16string puk2 = Str8ToStr16("42014264");
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
     bool result = SimTest::telephonyService_->UnlockPuk2(SimTest::slotId_, pin2, puk2, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
@@ -934,7 +1087,7 @@ void AlterPin2TestFunc(CoreServiceTestHelper &helper)
 {
     const std::u16string newpin2 = Str8ToStr16("12345678");
     const std::u16string oldpin2 = Str8ToStr16("42014264");
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
     bool result = SimTest::telephonyService_->UnlockPuk2(SimTest::slotId_, newpin2, oldpin2, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
@@ -1034,6 +1187,57 @@ HWTEST_F(SimTest, Telephony_Sim_GetMaxSimCount_0100, Function | MediumTest | Lev
 }
 
 /**
+ * @tc.number   Telephony_Sim_GetOpKey_0100
+ * @tc.name     Get opkey for current sim card
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetOpKey_0100, Function | MediumTest | Level1)
+{
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        SimTest::telephonyService_ = GetProxy();
+    } else {
+        std::string result = "testresult";
+        result = Str16ToStr8(SimTest::telephonyService_->GetOpKey(SimTest::slotId_));
+        EXPECT_STRNE(result.c_str(), "testresult");
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_GetOpKeyExt_0100
+ * @tc.name     Get opkey for current sim card
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetOpKeyExt_0100, Function | MediumTest | Level1)
+{
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        SimTest::telephonyService_ = GetProxy();
+    } else {
+        std::string result = "testresult";
+        result = Str16ToStr8(SimTest::telephonyService_->GetOpKeyExt(SimTest::slotId_));
+        EXPECT_STRNE(result.c_str(), "testresult");
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_GetOpName_0100
+ * @tc.name     Get opname for current sim card
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetOpName_0100, Function | MediumTest | Level1)
+{
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        SimTest::telephonyService_ = GetProxy();
+    } else {
+        std::string result = "testresult";
+        result = Str16ToStr8(SimTest::telephonyService_->GetOpName(SimTest::slotId_));
+        EXPECT_STRNE(result.c_str(), "testresult");
+    }
+}
+
+/**
  * @tc.number   Telephony_Sim_HasOperatorPrivileges_0100
  * @tc.name     Whether has operator privileges
  * @tc.desc     Function test
@@ -1091,7 +1295,7 @@ void UnlockSimLockTestFunc(CoreServiceTestHelper &helper)
     PersoLockInfo lockInfo;
     lockInfo.lockType = PersoLockType::PN_PIN_LOCK;
     lockInfo.password = Str8ToStr16("1234");
-    LockStatusResponse response = {0};
+    LockStatusResponse response = { 0 };
     bool result = SimTest::telephonyService_->UnlockSimLock(SimTest::slotId_, lockInfo, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();

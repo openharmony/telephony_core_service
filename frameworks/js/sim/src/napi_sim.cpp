@@ -1729,6 +1729,52 @@ napi_value GetMaxSimCount(napi_env env, napi_callback_info)
     return GetNapiValue(env, DelayedRefSingleton<CoreServiceClient>::GetInstance().GetMaxSimCount());
 }
 
+void NativeGetOpKey(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
+    asyncContext->callbackVal =
+        NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpKey(asyncContext->slotId));
+    asyncContext->context.resolved = !(asyncContext->callbackVal.empty());
+}
+
+void GetOpKeyCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncContext<std::string>> context(static_cast<AsyncContext<std::string> *>(data));
+    NapiAsyncCompleteCallback(env, status, *context, "get operator key failed");
+}
+
+napi_value GetOpKey(napi_env env, napi_callback_info info)
+{
+    return NapiCreateAsyncWork<std::string, NativeGetOpKey, GetOpKeyCallback>(env, info, "GetOpKey");
+}
+
+void NativeGetOpName(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    AsyncContext<std::string> *asyncContext = static_cast<AsyncContext<std::string> *>(data);
+    asyncContext->callbackVal =
+        NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpName(asyncContext->slotId));
+    asyncContext->context.resolved = !(asyncContext->callbackVal.empty());
+}
+
+void GetOpNameCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncContext<std::string>> context(static_cast<AsyncContext<std::string> *>(data));
+    NapiAsyncCompleteCallback(env, status, *context, "get operator name failed");
+}
+
+napi_value GetOpName(napi_env env, napi_callback_info info)
+{
+    return NapiCreateAsyncWork<std::string, NativeGetOpName, GetOpNameCallback>(env, info, "GetOpName");
+}
+
 void NativeGetLockState(napi_env env, void *data)
 {
     if (data == nullptr) {
@@ -2035,6 +2081,8 @@ napi_status InitSimInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("sendTerminalResponseCmd", SendTerminalResponseCmd),
         DECLARE_NAPI_FUNCTION("getMaxSimCount", GetMaxSimCount),
         DECLARE_NAPI_FUNCTION("hasOperatorPrivileges", HasOperatorPrivileges),
+        DECLARE_NAPI_FUNCTION("getOpKey", GetOpKey),
+        DECLARE_NAPI_FUNCTION("getOpName", GetOpName),
     };
     return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }

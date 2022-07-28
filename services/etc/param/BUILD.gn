@@ -13,9 +13,24 @@
 import("//build/ohos.gni")
 
 ## Install telephony.para to /system/etc/param/telephony.para
+## Install telephony.para.dac to /system/etc/param/telephony.para.dac
+
+group("param_files") {
+  deps = [
+    ":telephony.para",
+    ":telephony.para.dac",
+  ]
+}
 
 ohos_prebuilt_etc("telephony.para") {
   source = "telephony.para"
+  relative_install_dir = "param"
+  part_name = "core_service"
+  subsystem_name = "telephony"
+}
+
+ohos_prebuilt_etc("telephony.para.dac") {
+  source = "telephony.para.dac"
   relative_install_dir = "param"
   part_name = "core_service"
   subsystem_name = "telephony"
