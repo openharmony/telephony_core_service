@@ -59,6 +59,7 @@ ohos_shared_library("tel_core_service_api") {
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/network_information.cpp",
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/network_search_result.cpp",
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/network_state.cpp",
+    "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/operator_config_types.cpp",
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/signal_information.cpp",
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/telephony_state_registry_client.cpp",
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/telephony_state_registry_proxy.cpp",

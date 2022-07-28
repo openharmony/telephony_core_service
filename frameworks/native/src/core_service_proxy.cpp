@@ -804,6 +804,32 @@ std::u16string CoreServiceProxy::GetSimGid1(int32_t slotId)
     return result;
 }
 
+std::u16string CoreServiceProxy::GetSimGid2(int32_t slotId)
+{
+    if (!IsValidSlotId(slotId)) {
+        return Str8ToStr16("");
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetSimGid2 WriteInterfaceToken is false");
+        return Str8ToStr16("");
+    }
+    data.WriteInt32(slotId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("GetSimGid2 Remote is null");
+        return Str8ToStr16("");
+    }
+    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_GID2), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetSimGid2 failed, error code is %{public}d", st);
+        return Str8ToStr16("");
+    }
+    std::u16string result = reply.ReadString16();
+    return result;
+}
+
 std::u16string CoreServiceProxy::GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac,
     bool longNameRequired)
 {
@@ -1136,7 +1162,7 @@ bool CoreServiceProxy::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
     std::lock_guard<std::mutex> lock(mutex_);
     int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_OPERATOR_CONFIG), data, reply, option);
     if (st != ERR_NONE) {
-        TELEPHONY_LOGE("GetOperatorConfigs failed, error code is %{public}d \n", st);
+        TELEPHONY_LOGE("GetOperatorConfigs failed, error code is %{public}d", st);
         return false;
     }
     bool result = reply.ReadBool();
@@ -1843,6 +1869,81 @@ bool CoreServiceProxy::SetVoiceMailInfo(
         return false;
     }
     return reply.ReadBool();
+}
+
+std::u16string CoreServiceProxy::GetOpKey(int32_t slotId)
+{
+    if (!IsValidSlotId(slotId)) {
+        return u"";
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetOpKey WriteInterfaceToken is false");
+        return u"";
+    }
+    data.WriteInt32(slotId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("GetOpKey Remote is null");
+        return u"";
+    }
+    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_OPKEY), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetOpKey failed, error code is %{public}d", st);
+        return u"";
+    }
+    return reply.ReadString16();
+}
+
+std::u16string CoreServiceProxy::GetOpKeyExt(int32_t slotId)
+{
+    if (!IsValidSlotId(slotId)) {
+        return u"";
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetOpKeyExt WriteInterfaceToken is false");
+        return u"";
+    }
+    data.WriteInt32(slotId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("GetOpKeyExt Remote is null");
+        return u"";
+    }
+    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_OPKEY_EXT), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetOpKeyExt failed, error code is %{public}d", st);
+        return u"";
+    }
+    return reply.ReadString16();
+}
+
+std::u16string CoreServiceProxy::GetOpName(int32_t slotId)
+{
+    if (!IsValidSlotId(slotId)) {
+        return u"";
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetOpName WriteInterfaceToken is false");
+        return u"";
+    }
+    data.WriteInt32(slotId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("GetOpName Remote is null");
+        return u"";
+    }
+    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_OPNAME), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetOpName failed, error code is %{public}d", st);
+        return u"";
+    }
+    return reply.ReadString16();
 }
 
 int32_t CoreServiceProxy::GetMaxSimCount()

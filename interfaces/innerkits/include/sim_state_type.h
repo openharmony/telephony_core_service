@@ -16,11 +16,10 @@
 #ifndef OHOS_SIM_STATE_TYPE_H
 #define OHOS_SIM_STATE_TYPE_H
 
-#include <string>
 #include <map>
-
-#include "parcel.h"
-
+#include <parcel.h>
+#include <string>
+#include <vector>
 namespace OHOS {
 namespace Telephony {
 enum class CardType {
@@ -168,51 +167,6 @@ struct SimAuthenticationResponse {
 enum SimAuthResult {
     SIM_AUTH_FAIL = -1,
     SIM_AUTH_SUCCESS = 0,
-};
-
-struct OperatorConfig : public Parcelable {
-    std::map<std::u16string, std::u16string> configValue;
-
-    bool Marshalling(Parcel &parcel) const
-    {
-        if (!parcel.WriteInt32(configValue.size())) {
-            return false;
-        }
-        auto valueIt = configValue.begin();
-        while (valueIt != configValue.end()) {
-            if (!parcel.WriteString16(valueIt->first)) {
-                return false;
-            }
-            if (!parcel.WriteString16(valueIt->second)) {
-                return false;
-            }
-            valueIt++;
-        }
-        return true;
-    };
-
-    std::shared_ptr<OperatorConfig> UnMarshalling(Parcel &parcel)
-    {
-        std::shared_ptr<OperatorConfig> param = std::make_shared<OperatorConfig>();
-        if (param == nullptr || !param->ReadFromParcel(parcel)) {
-            param = nullptr;
-        }
-        return param;
-    };
-
-    bool ReadFromParcel(Parcel &parcel)
-    {
-        configValue.clear();
-        int32_t valueSize = parcel.ReadInt32();
-        int32_t k = 0;
-        while (valueSize > k) {
-            std::u16string first = parcel.ReadString16();
-            std::u16string second = parcel.ReadString16();
-            configValue.emplace(std::pair<std::u16string, std::u16string>(first, second));
-            k++;
-        }
-        return true;
-    };
 };
 
 struct IccAccountInfo : public Parcelable {

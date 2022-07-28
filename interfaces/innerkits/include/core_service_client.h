@@ -57,6 +57,7 @@ public:
     bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     std::u16string GetLocaleFromDefaultSim();
     std::u16string GetSimGid1(int32_t slotId);
+    std::u16string GetSimGid2(int32_t slotId);
     std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired);
     bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
         const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
@@ -94,6 +95,9 @@ public:
     bool SetVoiceMailInfo(int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber);
     int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info);
     int32_t GetMaxSimCount();
+    std::u16string GetOpKey(int32_t slotId);
+    std::u16string GetOpKeyExt(int32_t slotId);
+    std::u16string GetOpName(int32_t slotId);
     int32_t GetCardType(int32_t slotId);
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd);
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd);

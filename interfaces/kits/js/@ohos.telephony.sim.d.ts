@@ -446,6 +446,30 @@ declare namespace sim {
   function unlockSimLock(slotId: number, lockInfo: PersoLockInfo): Promise<LockStatusResponse>;
 
   /**
+   * Obtains the opkey of the SIM card in a specified slot.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @return Returns the opkey; returns "-1" if no SIM card is inserted or
+   * no opkey matched.
+   * @since 9
+   */
+    function getOpKey(slotId: number, callback: AsyncCallback<string>): void;
+    function getOpKey(slotId: number): Promise<string>;
+
+  /**
+   * Obtains the opname of the SIM card in a specified slot.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @return Returns the opname; returns null if no SIM card is inserted or
+   * no opname matched.
+   * @since 9
+   */
+    function getOpName(slotId: number, callback: AsyncCallback<string>): void;
+    function getOpName(slotId: number): Promise<string>;
+
+  /**
    * @systemapi Hide this for inner system use.
    * @since 8
    */
@@ -654,6 +678,32 @@ declare namespace sim {
     PC_PUK_LOCK,
     SIM_PIN_LOCK, //SIM/USIM personalisation (refer 3GPP TS 22.022 [33])
     SIM_PUK_LOCK,
+  }
+
+  /**
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+   export enum OperatorConfigKey {
+    KEY_VOICE_MAIL_NUMBER_STRING = "voice_mail_number_string",
+    KEY_IMS_SWITCH_ON_BY_DEFAULT_BOOL = "ims_switch_on_by_default_bool",
+    KEY_HIDE_IMS_SWITCH_BOOL = "hide_ims_switch_bool",
+    KEY_VOLTE_SUPPORTED_BOOL = "volte_supported_bool",
+    KEY_NR_MODE_SUPPORTED_LIST_INT_ARRAY = "nr_mode_supported_list_int_array",
+    KEY_VOLTE_PROVISIONING_SUPPORTED_BOOL = "volte_provisioning_supported_bool",
+    KEY_SS_OVER_UT_SUPPORTED_BOOL = "ss_over_ut_supported_bool",
+    KEY_IMS_GBA_REQUIRED_BOOL = "ims_gba_required_bool",
+    KEY_UT_PROVISIONING_SUPPORTED_BOOL = "ut_provisioning_supported_bool",
+    KEY_IMS_PREFER_FOR_EMERGENCY_BOOL = "ims_prefer_for_emergency_bool",
+    KEY_CALL_WAITING_SERVICE_CLASS_INT = "call_waiting_service_class_int",
+    KEY_CALL_TRANSFER_VISIBILITY_BOOL = "call_transfer_visibility_bool",
+    KEY_IMS_CALL_DISCONNECT_REASONINFO_MAPPING_STRING_ARRAY = "ims_call_disconnect_reasoninfo_mapping_string_array",
+    KEY_FORCE_VOLTE_SWITCH_ON_BOOL = "force_volte_switch_on_bool",
+    KEY_ENABLE_OPERATOR_NAME_CUST_BOOL = "enable_operator_name_cust_bool",
+    KEY_OPERATOR_NAME_CUST_STRING = "operator_name_cust_string",
+    KEY_SPN_DISPLAY_CONDITION_CUST_INT = "spn_display_condition_cust_int",
+    KEY_PNN_CUST_STRING_ARRAY = "pnn_cust_string_array",
+    KEY_OPL_CUST_STRING_ARRAY = "opl_cust_string_array",
   }
 }
 
