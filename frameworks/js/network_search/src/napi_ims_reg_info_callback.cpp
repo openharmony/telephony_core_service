@@ -13,17 +13,25 @@
  * limitations under the License.
  */
 
-#include "ims_voice_callback_test_stub.h"
+#include "napi_ims_reg_info_callback.h"
+
+#include "napi_ims_reg_info_callback_manager.h"
+#include "singleton.h"
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-ImsVoiceCallbackTestStub::ImsVoiceCallbackTestStub(ImsRegInfo info) : info_(info)
-{}
-void ImsVoiceCallbackTestStub::OnImsVoiceStateChange(const ImsRegInfo &info)
+int32_t NapiImsRegInfoCallback::OnImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info)
 {
-    TELEPHONY_LOGI("ImsVoiceCallbackTestStub Enter!");
-    info_ = info;
+    int32_t ret =
+        DelayedSingleton<NapiImsRegInfoCallbackManager>::GetInstance()->ReportImsRegInfo(slotId, imsSrvType, info);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("success! state:%{public}d, tech:%{public}d", info.imsRegState, info.imsRegTech);
+    }
+    return ret;
 }
-}  // namespace Telephony
-}  // namespace OHOS
+} // namespace Telephony
+} // namespace OHOS

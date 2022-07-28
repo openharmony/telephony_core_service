@@ -17,18 +17,16 @@
 #define I_NETWORK_SEARCH_H
 
 #include <vector>
+
+#include "cell_information.h"
+#include "cell_location.h"
 #include "event_handler.h"
+#include "i_network_search_callback.h"
+#include "ims_reg_info_callback.h"
+#include "network_search_callback_base.h"
 #include "network_search_result.h"
 #include "network_state.h"
 #include "signal_information.h"
-#include "i_network_search_callback.h"
-#include "network_search_callback_base.h"
-#include "cell_information.h"
-#include "cell_location.h"
-#include "ims_voice_callback.h"
-#include "ims_video_callback.h"
-#include "ims_ut_callback.h"
-#include "ims_sms_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -79,8 +77,10 @@ public:
     virtual NrMode GetNrOptionMode(int32_t slotId) = 0;
     virtual FrequencyType GetFrequencyType(int32_t slotId) = 0;
     virtual NrState GetNrState(int32_t slotId) = 0;
-    virtual int32_t RegImsCallback(MessageParcel &data) = 0;
-    virtual int32_t UnRegImsCallback(MessageParcel &data) = 0;
+    virtual int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName,
+        const sptr<ImsRegInfoCallback> &callback) = 0;
+    virtual int32_t UnregisterImsRegInfoCallback(
+        int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName) = 0;
     /**
      * @brief support Nr network or not
      *

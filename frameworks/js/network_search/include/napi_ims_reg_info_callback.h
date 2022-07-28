@@ -13,23 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef IMS_VIDEO_CALLBACK_STUB_H
-#define IMS_VIDEO_CALLBACK_STUB_H
+#ifndef NAPI_IMS_REG_INFO_CALLBACK_H
+#define NAPI_IMS_REG_INFO_CALLBACK_H
 
-#include <cstdint>
-#include "ims_video_callback.h"
-#include "iremote_stub.h"
+#include "ims_reg_info_callback_stub.h"
 
 namespace OHOS {
 namespace Telephony {
-class ImsVideoCallbackStub : public IRemoteStub<ImsVideoCallback> {
+class NapiImsRegInfoCallback : public ImsRegInfoCallbackStub {
 public:
-    ~ImsVideoCallbackStub() = default;
-    virtual void OnImsVideoStateChange(const ImsRegInfo &info);
-    int32_t OnImsStateCallback(const ImsRegInfo &info) override;
-    int OnRemoteRequest(
-        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override final;
+    int32_t OnImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info) override;
 };
-}  // namespace Telephony
-}  // namespace OHOS
-#endif  // IMS_VIDEO_CALLBACK_STUB_H
+} // namespace Telephony
+} // namespace OHOS
+#endif // NAPI_IMS_REG_INFO_CALLBACK_H

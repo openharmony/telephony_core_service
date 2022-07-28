@@ -96,9 +96,8 @@ public:
 
     std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired) override;
 
-    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
-        const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
-        const sptr<INetworkSearchCallback> &callback) override;
+    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode, const sptr<NetworkInformation> &networkInformation,
+        bool resumeSelection, const sptr<INetworkSearchCallback> &callback) override;
 
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) override;
 
@@ -110,8 +109,7 @@ public:
 
     bool UnlockPin2(int32_t slotId, std::u16string pin2, LockStatusResponse &response) override;
 
-    bool UnlockPuk2(
-        int32_t slotId, std::u16string newPin2, std::u16string puk2, LockStatusResponse &response) override;
+    bool UnlockPuk2(int32_t slotId, std::u16string newPin2, std::u16string puk2, LockStatusResponse &response) override;
 
     bool AlterPin2(
         int32_t slotId, std::u16string newPin2, std::u16string oldPin2, LockStatusResponse &response) override;
@@ -198,9 +196,10 @@ public:
     int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
         SimAuthenticationResponse &response) override;
 
-    int32_t RegImsCallback(MessageParcel &data) override;
+    int32_t RegisterImsRegInfoCallback(
+        int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback) override;
 
-    int32_t UnRegImsCallback(MessageParcel &data) override;
+    int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType) override;
 
 private:
     bool Init();

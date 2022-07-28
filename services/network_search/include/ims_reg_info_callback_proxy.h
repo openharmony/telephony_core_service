@@ -13,23 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef IMS_UT_CALLBACK_STUB_H
-#define IMS_UT_CALLBACK_STUB_H
+#ifndef IMS_REG_INFO_CALLBACK_PROXY_H
+#define IMS_REG_INFO_CALLBACK_PROXY_H
 
-#include <cstdint>
-#include "ims_ut_callback.h"
-#include "iremote_stub.h"
+#include "ims_reg_info_callback.h"
 
 namespace OHOS {
 namespace Telephony {
-class ImsUtCallbackStub : public IRemoteStub<ImsUtCallback> {
+class ImsRegInfoCallbackProxy : public IRemoteProxy<ImsRegInfoCallback> {
 public:
-    virtual ~ImsUtCallbackStub() = default;
-    virtual void OnImsUtStateChange(const ImsRegInfo &info);
-    int32_t OnImsStateCallback(const ImsRegInfo &info) override;
-    int OnRemoteRequest(
-        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override final;
+    explicit ImsRegInfoCallbackProxy(const sptr<IRemoteObject> &impl);
+    int32_t OnImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info) override;
+
+private:
+    static inline BrokerDelegator<ImsRegInfoCallbackProxy> delegator_;
 };
-}  // namespace Telephony
-}  // namespace OHOS
-#endif  // IMS_UT_CALLBACK_STUB_H
+} // namespace Telephony
+} // namespace OHOS
+#endif // IMS_REG_INFO_CALLBACK_PROXY_H

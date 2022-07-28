@@ -13,26 +13,31 @@
  * limitations under the License.
  */
 
-#include "ims_voice_callback_proxy.h"
+#include "ims_reg_info_callback_proxy.h"
+
+#include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-ImsVoiceCallbackProxy::ImsVoiceCallbackProxy(const sptr<IRemoteObject> &impl)
-    : IRemoteProxy<ImsVoiceCallback>(impl)
+ImsRegInfoCallbackProxy::ImsRegInfoCallbackProxy(const sptr<IRemoteObject> &impl)
+    : IRemoteProxy<ImsRegInfoCallback>(impl)
 {}
-int32_t ImsVoiceCallbackProxy::OnImsStateCallback(const ImsRegInfo &info)
+
+int32_t ImsRegInfoCallbackProxy::OnImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info)
 {
-    TELEPHONY_LOGI("ImsVoiceCallbackProxy ENTER!!  ");
     MessageParcel data;
     MessageOption option;
     MessageParcel replyParcel;
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
-        TELEPHONY_LOGE("remote is null!");
+        TELEPHONY_LOGE("remote is nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
+    data.WriteInt32(slotId);
     data.WriteInt32(static_cast<int32_t>(info.imsRegState));
     data.WriteInt32(static_cast<int32_t>(info.imsRegTech));
-    return remote->SendRequest(IMS_VOICE, data, replyParcel, option);
+    return remote->SendRequest(imsSrvType, data, replyParcel, option);
 }
-}  // namespace Telephony
-}  // namespace OHOS
+} // namespace Telephony
+} // namespace OHOS

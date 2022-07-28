@@ -13,23 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef IMS_SMS_CALLBACK_STUB_H
-#define IMS_SMS_CALLBACK_STUB_H
+#ifndef IMS_REG_INFO_CALLBACK_TEST_H
+#define IMS_REG_INFO_CALLBACK_TEST_H
 
-#include <cstdint>
-#include "ims_sms_callback.h"
-#include "iremote_stub.h"
+#include "ims_reg_info_callback_stub.h"
 
 namespace OHOS {
 namespace Telephony {
-class ImsSmsCallbackStub : public IRemoteStub<ImsSmsCallback> {
+class ImsRegInfoCallbackTest : public ImsRegInfoCallbackStub {
 public:
-    virtual ~ImsSmsCallbackStub() = default;
-    virtual void OnImsSmsStateChange(const ImsRegInfo &info);
-    int32_t OnImsStateCallback(const ImsRegInfo &info) override;
-    int OnRemoteRequest(
-        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override final;
+    int32_t OnImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info) override;
 };
-}  // namespace Telephony
-}  // namespace OHOS
-#endif  // IMS_SMS_CALLBACK_STUB_H
+} // namespace Telephony
+} // namespace OHOS
+#endif // IMS_REG_INFO_CALLBACK_TEST_H

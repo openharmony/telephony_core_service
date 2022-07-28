@@ -13,25 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef IMS_MANAGER_CALLBACK_H
-#define IMS_MANAGER_CALLBACK_H
+#ifndef IMS_REG_INFO_CALLBACK_GTEST_H
+#define IMS_REG_INFO_CALLBACK_GTEST_H
 
-#include "ims_reg_types.h"
-#include "iremote_proxy.h"
+#include "ims_reg_info_callback_stub.h"
 
 namespace OHOS {
 namespace Telephony {
-class ImsManagerCallback : public IRemoteBroker {
+class ImsRegInfoCallbackGtest : public ImsRegInfoCallbackStub {
 public:
-    ImsManagerCallback() = default;
-    ~ImsManagerCallback() = default;
-
-    const int32_t IMS_VOICE = 0;
-    const int32_t IMS_VIDEO = 1;
-    const int32_t IMS_UT = 2;
-    const int32_t IMS_SMS = 3;
-    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ImsManagerCallback");
+    int32_t OnImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info) override;
 };
-}  // namespace Telephony
-}  // namespace OHOS
-#endif  // IMS_MANAGER_CALLBACK_H
+} // namespace Telephony
+} // namespace OHOS
+#endif // IMS_REG_INFO_CALLBACK_GTEST_H

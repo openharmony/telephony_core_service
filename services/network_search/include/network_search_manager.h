@@ -16,29 +16,29 @@
 #ifndef NETWORK_SEARCH_INCLUDE_NETWORK_SEARCH_MANAGER_H
 #define NETWORK_SEARCH_INCLUDE_NETWORK_SEARCH_MANAGER_H
 
-#include <tuple>
-#include <map>
 #include <any>
-#include <string>
 #include <cinttypes>
-#include <mutex>
 #include <list>
+#include <map>
+#include <mutex>
+#include <string>
+#include <tuple>
 
+#include "device_state_handler.h"
+#include "device_state_observer.h"
+#include "event_handler.h"
 #include "i_network_search.h"
 #include "i_sim_manager.h"
 #include "i_tel_ril_manager.h"
-#include "network_search_notify.h"
-#include "observer_handler.h"
-#include "network_search_state.h"
+#include "iremote_stub.h"
 #include "network_search_handler.h"
+#include "network_search_notify.h"
 #include "network_search_result.h"
-#include "event_handler.h"
+#include "network_search_state.h"
 #include "network_utils.h"
+#include "observer_handler.h"
 #include "radio_event.h"
 #include "setting_utils.h"
-#include "iremote_stub.h"
-#include "device_state_handler.h"
-#include "device_state_observer.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -145,8 +145,8 @@ public:
     void UnRegisterCellularCallObject(const sptr<NetworkSearchCallBackBase> &callback) override;
     bool GetNetworkSearchInformation(int32_t slotId, NSCALLBACK &callback) override;
     bool GetNetworkSelectionMode(int32_t slotId, NSCALLBACK &callback) override;
-    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
-        const sptr<NetworkInformation> &networkInformation, bool resumeSelection, NSCALLBACK &callback) override;
+    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode, const sptr<NetworkInformation> &networkInformation,
+        bool resumeSelection, NSCALLBACK &callback) override;
     bool GetPreferredNetwork(int32_t slotId, NSCALLBACK &callback) override;
     bool SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback) override;
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) override;
@@ -166,8 +166,10 @@ public:
     NrState GetNrState(int32_t slotId) override;
     void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive) override;
     NrMode GetNrOptionMode(int32_t slotId) override;
-    int32_t RegImsCallback(MessageParcel &data) override;
-    int32_t UnRegImsCallback(MessageParcel &data) override;
+    int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName,
+        const sptr<ImsRegInfoCallback> &callback) override;
+    int32_t UnregisterImsRegInfoCallback(
+        int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName) override;
 
     void NotifyPsRoamingOpenChanged(int32_t slotId);
     void NotifyPsRoamingCloseChanged(int32_t slotId);
@@ -181,12 +183,11 @@ public:
     std::shared_ptr<NetworkSearchState> GetNetworkSearchState(int32_t slotId);
     void TriggerSimRefresh(int32_t slotId);
     void TriggerTimezoneRefresh(int32_t slotId);
-    void SetNetworkSearchResultValue(
-        int32_t slotId, int32_t listSize, std::vector<NetworkInformation> &operatorInfo);
+    void SetNetworkSearchResultValue(int32_t slotId, int32_t listSize, std::vector<NetworkInformation> &operatorInfo);
     sptr<NetworkSearchResult> GetNetworkSearchInformationValue(int32_t slotId);
     int32_t GetNetworkSelectionMode(int32_t slotId);
-    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
-        const sptr<NetworkInformation> &networkInformation, bool resumeSelection);
+    bool SetNetworkSelectionMode(
+        int32_t slotId, int32_t selectMode, const sptr<NetworkInformation> &networkInformation, bool resumeSelection);
     void SetRadioStateValue(int32_t slotId, ModemPowerState radioState);
     void SetNetworkSelectionValue(int32_t slotId, SelectionMode selection);
     bool GetPreferredNetwork(int32_t slotId);
@@ -206,23 +207,7 @@ public:
     bool GetAirplaneMode();
     bool IsRadioFirstPowerOn(int32_t slotId);
     void SetRadioFirstPowerOn(int32_t slotId, bool isFirstPowerOn);
-    void NotifyImsCallback(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo info);
-    int32_t RegImsVoiceCallback(int32_t slotId, sptr<ImsVoiceCallback> callback);
-    int32_t UnRegImsVoiceCallback(int32_t slotId, sptr<ImsVoiceCallback> callback);
-    void RemoveAllImsVoiceCallback();
-    void NotifyImsVoiceCallback(int32_t slotId, ImsRegInfo info);
-    int32_t RegImsVideoCallback(int32_t slotId, sptr<ImsVideoCallback> callback);
-    int32_t UnRegImsVideoCallback(int32_t slotId, sptr<ImsVideoCallback> callback);
-    void RemoveAllImsVideoCallback();
-    void NotifyImsVideoCallback(int32_t slotId, ImsRegInfo info);
-    int32_t RegImsUtCallback(int32_t slotId, sptr<ImsUtCallback> callback);
-    int32_t UnRegImsUtCallback(int32_t slotId, sptr<ImsUtCallback> callback);
-    void RemoveAllImsUtCallback();
-    void NotifyImsUtCallback(int32_t slotId, ImsRegInfo info);
-    int32_t RegImsSmsCallback(int32_t slotId, sptr<ImsSmsCallback> callback);
-    int32_t UnRegImsSmsCallback(int32_t slotId, sptr<ImsSmsCallback> callback);
-    void RemoveAllImsSmsCallback();
-    void NotifyImsSmsCallback(int32_t slotId, ImsRegInfo info);
+    void NotifyImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo info);
 
     inline void InitMsgNum(int32_t slotId)
     {
@@ -273,6 +258,13 @@ private:
     bool RemoveManagerInner(int32_t slotId);
 
 private:
+    struct ImsRegInfoCallbackRecord {
+        int32_t slotId;
+        ImsServiceType imsSrvType;
+        std::string bundleName;
+        sptr<ImsRegInfoCallback> imsCallback;
+    };
+
     bool AirplaneMode_ = false;
     sptr<NetworkSearchCallBackBase> cellularDataCallBack_ = nullptr;
     sptr<NetworkSearchCallBackBase> cellularCallCallBack_ = nullptr;
@@ -280,10 +272,7 @@ private:
     std::shared_ptr<ISimManager> simManager_ = nullptr;
     std::unique_ptr<EventSender> eventSender_ = nullptr;
     std::map<int32_t, std::shared_ptr<NetworkSearchManagerInner>> mapManagerInner_;
-    std::unordered_map<int32_t, std::list<sptr<ImsVoiceCallback>>> mapImsVoiceCallback_;
-    std::unordered_map<int32_t, std::list<sptr<ImsVideoCallback>>> mapImsVideoCallback_;
-    std::unordered_map<int32_t, std::list<sptr<ImsUtCallback>>> mapImsUtCallback_;
-    std::unordered_map<int32_t, std::list<sptr<ImsSmsCallback>>> mapImsSmsCallback_;
+    std::list<ImsRegInfoCallbackRecord> listImsRegInfoCallbackRecord_;
     std::mutex mutexInner_;
 };
 } // namespace Telephony
