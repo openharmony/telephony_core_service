@@ -13,20 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef NAPI_IMS_UT_CALLBACK_H
-#define NAPI_IMS_UT_CALLBACK_H
+#include "ims_reg_info_callback_test.h"
 
-#include "ims_ut_callback_stub.h"
+#include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-class NapiImsUtCallback : public ImsUtCallbackStub {
-public:
-    explicit NapiImsUtCallback(const ImsRegInfo &info);
-    void OnImsUtStateChange(const ImsRegInfo &info) override;
-private:
-    ImsRegInfo info_;
-};
-}  // namespace Telephony
-}  // namespace OHOS
-#endif  // NAPI_IMS_UT_CALLBACK_H
+int32_t ImsRegInfoCallbackTest::OnImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info)
+{
+    TELEPHONY_LOGI("slotId: %{public}d, imsSrvType: %{public}d, ImsRegState: %{public}d, ImsRegTech: %{public}d",
+        slotId, imsSrvType, info.imsRegState, info.imsRegTech);
+    return TELEPHONY_SUCCESS;
+}
+} // namespace Telephony
+} // namespace OHOS

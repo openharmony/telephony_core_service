@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef NAPI_IMS_VIDEO_CALLBACK_H
-#define NAPI_IMS_VIDEO_CALLBACK_H
+#ifndef IMS_REG_INFO_CALLBACK_H
+#define IMS_REG_INFO_CALLBACK_H
 
-#include "ims_video_callback_stub.h"
+#include "ims_reg_types.h"
+#include "iremote_proxy.h"
 
 namespace OHOS {
 namespace Telephony {
-class NapiImsVideoCallback : public ImsVideoCallbackStub {
+class ImsRegInfoCallback : public IRemoteBroker {
 public:
-    explicit NapiImsVideoCallback(const ImsRegInfo &info);
-    void OnImsVideoStateChange(const ImsRegInfo &info) override;
-private:
-    ImsRegInfo info_;
+    virtual int32_t OnImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info) = 0;
+
+    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ImsRegInfoCallback");
 };
-}  // namespace Telephony
-}  // namespace OHOS
-#endif  // NAPI_IMS_VIDEO_CALLBACK_H
+} // namespace Telephony
+} // namespace OHOS
+#endif // IMS_REG_INFO_CALLBACK_H

@@ -20,8 +20,6 @@
 
 namespace OHOS {
 namespace Telephony {
-const int32_t ERROR = -1;
-const int32_t SUCCESS = 0;
 const int16_t VALUE_MAXIMUM_LIMIT = 3;
 const int16_t INFO_MAXIMUM_LIMIT = 31;
 const int16_t DATA_LENGTH_ONE = 1;
@@ -50,6 +48,6 @@ struct ImsRegInfo {
     ImsRegState imsRegState = IMS_UNREGISTERED;
     ImsRegTech imsRegTech = IMS_REG_TECH_NONE;
 };
-}  // namespace Telephony
-}  // namespace OHOS
+} // namespace Telephony
+} // namespace OHOS
 #endif  // IMS_REG_TYPES_H
