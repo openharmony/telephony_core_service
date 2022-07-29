@@ -345,6 +345,26 @@ bool CoreService::IsSimActive(int32_t slotId)
     return simManager_->IsSimActive(slotId);
 }
 
+int32_t CoreService::GetSlotId(int32_t simId)
+{
+    TELEPHONY_LOGI("CoreService::GetSlotId(), simId = %{public}d", simId);
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("CoreService::GetSlotId(), simManager_ is nullptr!");
+        return TELEPHONY_ERROR;
+    }
+    return simManager_->GetSlotId(simId);
+}
+
+int32_t CoreService::GetSimId(int32_t slotId)
+{
+    TELEPHONY_LOGI("CoreService::GetSimId(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("CoreService::GetSimId(), simManager_ is nullptr!");
+        return TELEPHONY_ERROR;
+    }
+    return simManager_->GetSimId(slotId);
+}
+
 bool CoreService::GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {

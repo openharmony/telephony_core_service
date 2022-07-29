@@ -1584,6 +1584,24 @@ std::u16string CoreManagerInner::GetLocaleFromDefaultSim(int32_t slotId)
     return simManager_->GetLocaleFromDefaultSim(slotId);
 }
 
+std::int32_t CoreManagerInner::GetSlotId(int32_t simId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERROR;
+    }
+    return simManager_->GetSlotId(simId);
+}
+
+std::int32_t CoreManagerInner::GetSimId(int32_t slotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERROR;
+    }
+    return simManager_->GetSimId(slotId);
+}
+
 std::u16string CoreManagerInner::GetSimGid1(int32_t slotId)
 {
     if (simManager_ == nullptr) {

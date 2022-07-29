@@ -63,6 +63,8 @@ private:
     int32_t OnGetSimOperatorNumeric(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetIMSI(MessageParcel &data, MessageParcel &reply);
     int32_t OnIsSimActive(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetSlotId(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetSimId(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetLocaleFromDefaultSim(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimGid1(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimGid2(MessageParcel &data, MessageParcel &reply);

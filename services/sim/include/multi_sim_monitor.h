@@ -38,10 +38,14 @@ public:
     void Init();
     bool RegisterForIccLoaded();
     bool UnRegisterForIccLoaded();
+    bool RegisterForSimStateChanged();
+    bool UnRegisterForSimStateChanged();
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
 
 private:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    void RefreshData();
+    void InitData();
     int32_t slotId_;
     static bool ready_;
     const static int32_t RETRY_COUNT = 30;
