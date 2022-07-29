@@ -244,6 +244,10 @@ bool SimManager::SetDefaultVoiceSlotId(int32_t slotId)
         TELEPHONY_LOGE("simAccountManager is null!");
         return false;
     }
+    if (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsSimActive(slotId)) {
+        TELEPHONY_LOGE("SetDefaultVoiceSlotId slotId is not active!");
+        return false;
+    }
     return simAccountManager_[DEFAULT_SIM_SLOT_ID]->SetDefaultVoiceSlotId(slotId);
 }
 
@@ -251,6 +255,10 @@ bool SimManager::SetDefaultSmsSlotId(int32_t slotId)
 {
     if ((!IsValidSlotIdForDefault(slotId)) || (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr)) {
         TELEPHONY_LOGE("simAccountManager is null!");
+        return false;
+    }
+    if (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsSimActive(slotId)) {
+        TELEPHONY_LOGE("SetDefaultSmsSlotId slotId is not active!");
         return false;
     }
     return simAccountManager_[DEFAULT_SIM_SLOT_ID]->SetDefaultSmsSlotId(slotId);
@@ -262,6 +270,10 @@ bool SimManager::SetDefaultCellularDataSlotId(int32_t slotId)
         TELEPHONY_LOGE("simAccountManager is null!");
         return false;
     }
+    if (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsSimActive(slotId)) {
+        TELEPHONY_LOGE("SetDefaultSmsSlotId slotId is not active!");
+        return false;
+    }
     return simAccountManager_[DEFAULT_SIM_SLOT_ID]->SetDefaultCellularDataSlotId(slotId);
 }
 
@@ -269,6 +281,10 @@ bool SimManager::SetPrimarySlotId(int32_t slotId)
 {
     if ((!IsValidSlotId(slotId)) || (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr)) {
         TELEPHONY_LOGE("simAccountManager is null!");
+        return false;
+    }
+    if (!IsSimActive(slotId)) {
+        TELEPHONY_LOGE("SetPrimarySlotId slotId is not active!");
         return false;
     }
     return simAccountManager_[DEFAULT_SIM_SLOT_ID]->SetPrimarySlotId(slotId);
@@ -353,6 +369,25 @@ bool SimManager::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAcc
         return false;
     }
     return simAccountManager_[DEFAULT_SIM_SLOT_ID]->GetActiveSimAccountInfoList(iccAccountInfoList);
+}
+
+int32_t SimManager::GetSlotId(int32_t simId)
+{
+    if (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr) {
+        TELEPHONY_LOGE("simAccountManager is null!");
+        return TELEPHONY_ERROR;
+    }
+    return simAccountManager_[DEFAULT_SIM_SLOT_ID]->GetSlotId(simId);
+}
+
+int32_t SimManager::GetSimId(int32_t slotId)
+{
+    IccAccountInfo accountInfo;
+    if (GetSimAccountInfo(slotId, accountInfo)) {
+        return accountInfo.simId;
+    }
+    TELEPHONY_LOGE("GetSimAccountInfo fail!");
+    return TELEPHONY_ERROR;
 }
 
 bool SimManager::GetOperatorConfigs(int slotId, OperatorConfig &poc)

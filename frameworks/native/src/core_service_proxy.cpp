@@ -684,6 +684,58 @@ bool CoreServiceProxy::IsSimActive(int32_t slotId)
     return reply.ReadBool();
 }
 
+int32_t CoreServiceProxy::GetSlotId(int32_t simId)
+{
+    if (simId <= 0) {
+        TELEPHONY_LOGE("CoreServiceProxy::GetSlotId invalid simId");
+        return ERROR;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetSlotId WriteInterfaceToken is false");
+        return ERROR;
+    }
+    data.WriteInt32(simId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("GetSlotId Remote is null");
+        return ERROR;
+    }
+    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_SLOTID), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetSlotId failed, error code is %{public}d", st);
+        return ERROR;
+    }
+    return reply.ReadInt32();
+}
+
+int32_t CoreServiceProxy::GetSimId(int32_t slotId)
+{
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("CoreServiceProxy::GetSimId invalid slotId");
+        return ERROR;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetSimId WriteInterfaceToken is false");
+        return ERROR;
+    }
+    data.WriteInt32(slotId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("GetSimId Remote is null");
+        return ERROR;
+    }
+    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_SIMID), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetSimId failed, error code is %{public}d", st);
+        return ERROR;
+    }
+    return reply.ReadInt32();
+}
+
 bool CoreServiceProxy::GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     MessageParcel data;

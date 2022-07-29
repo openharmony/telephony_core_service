@@ -84,6 +84,10 @@ public:
 
     bool IsSimActive(int32_t slotId) override;
 
+    int32_t GetSlotId(int32_t simId) override;
+
+    int32_t GetSimId(int32_t slotId) override;
+
     bool GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 
     bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;

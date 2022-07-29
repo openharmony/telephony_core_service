@@ -61,17 +61,19 @@ public:
     bool SetActiveSim(int32_t slotId, int32_t enable, bool force = false);
     bool SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable);
     bool ForgetAllData();
+    int32_t GetSlotId(int32_t simId);
     std::vector<IccAccountInfo> iccAccountInfoList_;
+    bool GetListFromDataBase();
 
 private:
     bool IsValidData();
+    int32_t GetFirstActivedSlotId();
     bool InitShowName(int slotId);
     bool InitShowNumber(int slotId);
     bool InitActive(int slotId);
     bool InitIccId(int slotId);
     int32_t UpdateDataByIccId(int slotId, std::string newIccId);
     int32_t InsertData(int slotId, std::string newIccId);
-    bool GetListFromDataBase();
     void SortCache();
     std::u16string GetIccId(int32_t slotId);
     bool SetIccId(int32_t slotId, std::u16string iccId);

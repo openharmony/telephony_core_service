@@ -95,6 +95,8 @@ enum class InputCmd {
     INPUT_GET_OPNAME = 67,
     INPUT_GET_OPKEY_EXT = 68,
     INPUT_HAS_OPERATOR_PRIVILEGES = 70,
+    INPUT_GETSIMID = 71,
+    INPUT_GETSLOTID = 72,
     INPUT_QUIT = 100,
 };
 
@@ -251,6 +253,30 @@ static bool TestGetSimIccId()
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote GetSimIccId result [" << str << "] " << expect << std::endl;
+    return true;
+}
+
+static bool TestGetSlotId()
+{
+    int32_t simId = 0;
+    std::cout << "please input simId:" << std::endl;
+    std::cin >> simId;
+    int32_t result = -1;
+    result = g_telephonyService->GetSlotId(simId);
+    string expect = (result == -1) ? "fail" : "success";
+    std::cout << "TelephonyTestService Remote GetSlotId result [" << result << "] " << expect << std::endl;
+    return true;
+}
+
+static bool TestGetSimId()
+{
+    int32_t slotId = 0;
+    std::cout << "please input slotId:" << std::endl;
+    std::cin >> slotId;
+    int32_t result = -1;
+    result = g_telephonyService->GetSimId(slotId);
+    string expect = (result == -1) ? "fail" : "success";
+    std::cout << "TelephonyTestService Remote GetSimId result [" << result << "] " << expect << std::endl;
     return true;
 }
 
@@ -975,51 +1001,22 @@ static bool TestQuit()
 static void Prompt()
 {
     std::cout << "\n start \nusage:please input a cmd num:\n"
-                 "0:HasSimCard\n1:GetSimState\n"
-                 "2:GetISOCountryCodeForSim\n3:GetSimSpn\n"
-                 "4:GetSimIccId\n5:GetIMSI\n"
-                 "6:IsSimActive\n7:GetSimOperatorNumeric\n"
-                 "8:GetSimGid1\n9:GetSimGid2\n"
-                 "10:GetSimAccountInfo\n11:SetDefaultVoiceSlotId\n"
-                 "12:GetDefaultVoiceSlotId\n"
-                 "13:GetSimEons\n"
-                 "21:UnlockPin\n"
-                 "22:UnlockPuk\n"
-                 "23:AlterPin\n"
-                 "24:GetLockState\n"
-                 "25:SetLockState\n"
-                 "26:RefreshSimState\n"
-                 "31:UnlockPin2\n"
-                 "32:UnlockPuk2\n"
-                 "33:AlterPin2\n"
-                 "34:SetActiveSim\n"
-                 "42:SetShowNumber\n"
-                 "43:GetShowNumber\n"
-                 "44:SetShowName\n"
-                 "45:GetShowName\n"
-                 "46:GetActiveSimAccountInfoList\n"
-                 "47:GetOperatorConfigs\n"
-                 "49:GetVoiceMailIdentifier\n"
-                 "50:GetVoiceMailNumber\n"
-                 "51:QueryIccDiallingNumbers\n"
-                 "52:AddIccDiallingNumbers\n"
-                 "53:DelIccDiallingNumbers\n"
-                 "54:UpdateIccDiallingNumbers\n"
-                 "55:SetVoiceMailInfo\n"
-                 "56:GetMaxSimCount\n"
-                 "57:TestSendEnvelopeCmd\n"
-                 "58:TestSendTerminalResponseCmd\n"
-                 "59:TestSendCallSetupRequestResult\n"
-                 "60:GetOpKey\n"
-                 "61:GetSimTelephoneNumber\n"
-                 "62:GetSimTeleNumberIdentifier\n"
-                 "63:GetCardType\n"
-                 "64:UnlockSimLock\n"
-                 "65:SetPrimarySlotId\n"
-                 "66:GetPrimarySlotId\n"
-                 "67:GetOpName\n"
-                 "68:GetOpKeyExt\n"
-                 "70:HasOperatorPrivileges\n"
+                 "0:HasSimCard\n1:GetSimState\n2:GetISOCountryCodeForSim\n3:GetSimSpn\n"
+                 "4:GetSimIccId\n5:GetIMSI\n6:IsSimActive\n7:GetSimOperatorNumeric\n"
+                 "8:GetSimGid1\n9:GetSimGid2\n10:GetSimAccountInfo\n11:SetDefaultVoiceSlotId\n"
+                 "12:GetDefaultVoiceSlotId\n13:GetSimEons\n21:UnlockPin\n"
+                 "22:UnlockPuk\n23:AlterPin\n24:GetLockState\n25:SetLockState\n"
+                 "26:RefreshSimState\n31:UnlockPin2\n32:UnlockPuk2\n"
+                 "33:AlterPin2\n34:SetActiveSim\n42:SetShowNumber\n"
+                 "43:GetShowNumber\n44:SetShowName\n45:GetShowName\n"
+                 "46:GetActiveSimAccountInfoList\n47:GetOperatorConfigs\n"
+                 "49:GetVoiceMailIdentifier\n50:GetVoiceMailNumber\n51:QueryIccDiallingNumbers\n"
+                 "52:AddIccDiallingNumbers\n53:DelIccDiallingNumbers\n54:UpdateIccDiallingNumbers\n"
+                 "55:SetVoiceMailInfo\n56:GetMaxSimCount\n57:TestSendEnvelopeCmd\n"
+                 "58:TestSendTerminalResponseCmd\n59:TestSendCallSetupRequestResult\n60:GetOpKey\n"
+                 "61:GetSimTelephoneNumber\n62:GetSimTeleNumberIdentifier\n63:GetCardType\n"
+                 "64:UnlockSimLock\n65:SetPrimarySlotId\n66:GetPrimarySlotId\n67:GetOpName\n"
+                 "68:GetOpKeyExt\n70:HasOperatorPrivileges\n71:TestGetSimId\n72:TestGetSlotId\n"
                  "100:exit\n"
               << std::endl;
 }
@@ -1081,6 +1078,8 @@ static void InitFuncMapExt()
     g_funcMap[InputCmd::INPUT_HAS_OPERATOR_PRIVILEGES] = TestHasOperatorPrivileges;
     g_funcMap[InputCmd::INPUT_SET_PRIMARY_SLOTID] = TestSetPrimarySlotId;
     g_funcMap[InputCmd::INPUT_GET_PRIMARY_SLOTID] = TestGetPrimarySlotId;
+    g_funcMap[InputCmd::INPUT_GETSIMID] = TestGetSimId;
+    g_funcMap[InputCmd::INPUT_GETSLOTID] = TestGetSlotId;
     g_funcMap[InputCmd::INPUT_QUIT] = TestQuit;
 }
 

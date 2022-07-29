@@ -76,6 +76,8 @@ public:
     virtual std::u16string GetSimIccId(int32_t slotId) = 0;
     virtual std::u16string GetIMSI(int32_t slotId) = 0;
     virtual std::u16string GetLocaleFromDefaultSim(int32_t slotId) = 0;
+    virtual int32_t GetSlotId(int32_t simId) = 0;
+    virtual int32_t GetSimId(int32_t slotId) = 0;
     virtual std::u16string GetSimGid1(int32_t slotId) = 0;
     virtual std::u16string GetSimGid2(int32_t slotId) = 0;
     virtual std::u16string GetOpName(int32_t slotId) = 0;

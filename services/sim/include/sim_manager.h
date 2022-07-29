@@ -71,6 +71,8 @@ public:
     int32_t GetPrimarySlotId() override;
     std::u16string GetShowNumber(int32_t slotId) override;
     std::u16string GetShowName(int32_t slotId) override;
+    int32_t GetSlotId(int32_t simId) override;
+    int32_t GetSimId(int32_t slotId) override;
     bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
     bool GetOperatorConfigs(int slotId, OperatorConfig &poc) override;
     bool HasOperatorPrivileges(const int32_t slotId) override;
