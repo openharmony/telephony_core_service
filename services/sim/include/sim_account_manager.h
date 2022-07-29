@@ -50,6 +50,7 @@ public:
     int32_t GetPrimarySlotId();
     std::u16string GetShowNumber(int32_t slotId);
     std::u16string GetShowName(int32_t slotId);
+    int32_t GetSlotId(int32_t simId);
     bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList);
     bool GetOperatorConfigs(int slotId, OperatorConfig &poc);
     bool HasOperatorPrivileges(const int32_t slotId);
