@@ -30,6 +30,7 @@ SimAccountManager::~SimAccountManager()
 {
     if (multiSimMonitor_ != nullptr) {
         multiSimMonitor_->UnRegisterForIccLoaded();
+        multiSimMonitor_->UnRegisterForSimStateChanged();
     }
     if (simStateTracker_ != nullptr) {
         simStateTracker_->UnRegisterForIccLoaded();
@@ -76,6 +77,7 @@ void SimAccountManager::Init(int32_t slotId)
     }
     multiSimMonitor_->Init();
     multiSimMonitor_->RegisterForIccLoaded();
+    multiSimMonitor_->RegisterForSimStateChanged();
     operatorConfigCache_ = std::make_shared<OperatorConfigCache>(monitorRunner_, simFileManager_, slotId);
     if (operatorConfigCache_ == nullptr) {
         TELEPHONY_LOGE("SimAccountManager::operatorConfigCache_ is null");
@@ -278,6 +280,16 @@ std::u16string SimAccountManager::GetShowName(int32_t slotId)
         return u"";
     }
     return multiSimController_->GetShowName(slotId);
+}
+
+int32_t SimAccountManager::GetSlotId(int32_t simId)
+{
+    TELEPHONY_LOGI("SimAccountManager::GetSlotId");
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("SimAccountManager::GetSlotId failed by nullptr");
+        return INVALID_VALUE;
+    }
+    return multiSimController_->GetSlotId(simId);
 }
 
 bool SimAccountManager::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList)

@@ -120,6 +120,8 @@ void CoreServiceStub::AddHandlerSimToMapExt()
     memberFuncMap_[uint32_t(InterfaceID::HAS_OPERATOR_PRIVILEGES)] = &CoreServiceStub::OnHasOperatorPrivileges;
     memberFuncMap_[uint32_t(InterfaceID::SIM_AUTHENTICATION)] = &CoreServiceStub::OnSimAuthentication;
     memberFuncMap_[uint32_t(InterfaceID::IS_NR_SUPPORTED)] = &CoreServiceStub::OnIsNrSupported;
+    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_SLOTID)] = &CoreServiceStub::OnGetSlotId;
+    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_SIMID)] = &CoreServiceStub::OnGetSimId;
 }
 
 int32_t CoreServiceStub::OnRemoteRequest(
@@ -411,10 +413,36 @@ int32_t CoreServiceStub::OnIsSimActive(MessageParcel &data, MessageParcel &reply
 {
     int32_t slotId = data.ReadInt32();
     bool result = IsSimActive(slotId);
-    TELEPHONY_LOGI("OnRemoteRequest::IsSimActive result is %{public}s", result ? "true" : "false");
+    TELEPHONY_LOGI("OnRemoteRequest::IsSimActive result is %{public}d", result);
     bool ret = reply.WriteBool(result);
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::IsSimActive write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetSlotId(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t simId = data.ReadInt32();
+    int32_t result = GetSlotId(simId);
+    TELEPHONY_LOGI("OnRemoteRequest::OnGetSlotId result is %{public}d", result);
+    bool ret = reply.WriteInt32(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetSlotId write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetSimId(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t result = GetSimId(slotId);
+    TELEPHONY_LOGI("OnRemoteRequest::OnGetSimId result is %{public}d", result);
+    bool ret = reply.WriteInt32(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetSimId write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
     return NO_ERROR;
