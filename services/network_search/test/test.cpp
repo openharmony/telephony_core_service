@@ -304,20 +304,26 @@ void TestGetNetworkSelectionMode()
 
 void TestSetNetworkSelectionMode()
 {
-    if (g_telephonyService != nullptr) {
-        sptr<NetworkInformation> networkInfo = new (std::nothrow) NetworkInformation();
-        int32_t selectionMode = 1;
-        bool isUpdateDatabase = true;
-        std::cout << "please enter the selectionMode (0:Automatic mode , 1:Manual mode) :";
-        std::cin >> selectionMode;
-        networkInfo->SetOperateInformation("CHINA MOBILE", "CMCC", "46000",
-            static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
-            static_cast<int32_t>(NetworkRat::NETWORK_LTE));
-        OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-        bool result = g_telephonyService->SetNetworkSelectionMode(
-            InputSlotId(), selectionMode, networkInfo, isUpdateDatabase, callback);
-        TELEPHONY_LOGI("TelephonyTestService::TestSetNetworkSelectionMode result:%{public}d", result);
+    if (g_telephonyService == nullptr) {
+        TELEPHONY_LOGE("g_telephonyService is nullptr");
+        return;
     }
+    sptr<NetworkState> networkState = g_telephonyService->GetNetworkState(InputSlotId());
+    if (networkState == nullptr) {
+        TELEPHONY_LOGE("networkState is nullptr");
+        return;
+    }
+    sptr<NetworkInformation> networkInfo = new (std::nothrow) NetworkInformation();
+    int32_t selectionMode = 1;
+    std::cout << "please enter the selectionMode (0:Automatic mode , 1:Manual mode) :";
+    std::cin >> selectionMode;
+    networkInfo->SetOperateInformation("CHINA MOBILE", "CMCC", networkState->GetPlmnNumeric().c_str(),
+        static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
+        static_cast<int32_t>(NetworkRat::NETWORK_LTE));
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    bool result = g_telephonyService->SetNetworkSelectionMode(
+        InputSlotId(), selectionMode, networkInfo, true, callback);
+    TELEPHONY_LOGI("TelephonyTestService::TestSetNetworkSelectionMode result:%{public}d", result);
 }
 
 void TestGetIsoCountryCodeForNetwork()
