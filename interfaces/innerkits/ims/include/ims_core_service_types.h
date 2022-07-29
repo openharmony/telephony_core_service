@@ -22,8 +22,6 @@
 
 namespace OHOS {
 namespace Telephony {
-// move TELEPHONY_IMS_SYS_ABILITY_ID to system_ability_definition.h
-const int32_t TELEPHONY_IMS_SYS_ABILITY_ID = 4014;
 enum ImsErrType {
     IMS_SUCCESS = 0,
     IMS_FAILED = 1,
