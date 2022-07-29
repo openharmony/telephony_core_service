@@ -537,7 +537,6 @@ void TelRilTest::OnInitForRegister(int32_t slotId, const std::shared_ptr<AppExec
     telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_START_DTMF, nullptr);
     telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_STOP_DTMF, nullptr);
     telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_REJECT_CALL, nullptr);
-    telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_GET_IMS_CALL_LIST, nullptr);
     telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_SET_CALL_PREFERENCE_MODE, nullptr);
     telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_GET_CALL_PREFERENCE_MODE, nullptr);
     telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_SET_USSD, nullptr);
