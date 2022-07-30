@@ -589,5 +589,16 @@ bool SimFileManager::IsValidType(SimFileManager::IccType type)
     }
     return false;
 }
+
+std::u16string SimFileManager::GetSimIst()
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::GetSimIst simFile nullptr");
+        return Str8ToStr16("");
+    }
+    std::string result = static_cast<IsimFile *>(simFile_.get())->ObtainIsimIst();
+    TELEPHONY_LOGI("SimFileManager::GetSimIst result:%{public}s ", (result.empty() ? "false" : "true"));
+    return Str8ToStr16(result);
+}
 } // namespace Telephony
 } // namespace OHOS

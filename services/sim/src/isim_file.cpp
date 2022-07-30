@@ -119,6 +119,10 @@ void IsimFile::LoadIsimFiles()
     AppExecFwk::InnerEvent::Pointer eventImpi = BuildCallerInfo(MSG_SIM_OBTAIN_IMPI_DONE);
     fileController_->ObtainBinaryFile(ELEMENTARY_FILE_IMPI, eventImpi);
     fileToGet_++;
+
+    AppExecFwk::InnerEvent::Pointer eventIst = BuildCallerInfo(MSG_SIM_OBTAIN_IST_DONE);
+    fileController_->ObtainBinaryFile(ELEMENTARY_FILE_IST, eventIst);
+    fileToGet_++;
 }
 
 
@@ -156,6 +160,7 @@ void IsimFile::InitMemberFunc()
     memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] = &IsimFile::ProcessGetImsiDone;
     memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] = &IsimFile::ProcessGetIccidDone;
     memberFuncMap_[MSG_SIM_OBTAIN_IMPI_DONE] = &IsimFile::ProcessGetImpiDone;
+    memberFuncMap_[MSG_SIM_OBTAIN_IST_DONE] = &IsimFile::ProcessGetIstDone;
 }
 
 bool IsimFile::ProcessGetImpiDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -168,6 +173,19 @@ bool IsimFile::ProcessGetImpiDone(const AppExecFwk::InnerEvent::Pointer &event)
     }
     imsi_ = fd->resultData;
     TELEPHONY_LOGI("IsimFile::ProcessGetImpiDone success");
+    return isFileProcessResponse;
+}
+
+bool IsimFile::ProcessGetIstDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    bool isFileProcessResponse = true;
+    if (fd->exception != nullptr) {
+        TELEPHONY_LOGE("ProcessGetIstDone get exception");
+        return isFileProcessResponse;
+    }
+    ist_ = fd->resultData;
+    TELEPHONY_LOGI("IsimFile::ProcessGetIstDone success");
     return isFileProcessResponse;
 }
 

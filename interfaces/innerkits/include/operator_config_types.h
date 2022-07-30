@@ -29,19 +29,19 @@ const int32_t DEFAULT_CALL_WAITING_SERVICE_CLASS_CONFIG = 1;
 const std::vector<std::string> IMS_CALL_DISCONNECT_REASONINFO_MAPPING_CONFIG = std::vector<std::string> {};
 const int32_t CARRIER_NR_AVAILABILITY_NSA = 1;
 const int32_t CARRIER_NR_AVAILABILITY_SA = 2;
-const std::string KEY_IMS_SWITCH_ON_BY_DEFAULT_BOOL = "ims_switch_on_by_default_bool";
-const std::string KEY_HIDE_IMS_SWITCH_BOOL = "hide_ims_switch_bool";
-const std::string KEY_VOLTE_SUPPORTED_BOOL = "volte_supported_bool";
-const std::string KEY_NR_MODE_SUPPORTED_LIST_INT_ARRAY = "nr_mode_supported_list_int_array";
-const std::string KEY_VOLTE_PROVISIONING_SUPPORTED_BOOL = "volte_provisioning_supported_bool";
-const std::string KEY_SS_OVER_UT_SUPPORTED_BOOL = "ss_over_ut_supported_bool";
-const std::string KEY_IMS_GBA_REQUIRED_BOOL = "ims_gba_required_bool";
-const std::string KEY_UT_PROVISIONING_SUPPORTED_BOOL = "ut_provisioning_supported_bool";
-const std::string KEY_IMS_PREFER_FOR_EMERGENCY_BOOL = "ims_prefer_for_emergency_bool";
-const std::string KEY_CALL_WAITING_SERVICE_CLASS_INT = "call_waiting_service_class_int";
-const std::string KEY_IMS_CALL_DISCONNECT_REASONINFO_MAPPING_STRING_ARRAY =
+constexpr const char *KEY_IMS_SWITCH_ON_BY_DEFAULT_BOOL = "ims_switch_on_by_default_bool";
+constexpr const char *KEY_HIDE_IMS_SWITCH_BOOL = "hide_ims_switch_bool";
+constexpr const char *KEY_VOLTE_SUPPORTED_BOOL = "volte_supported_bool";
+constexpr const char *KEY_NR_MODE_SUPPORTED_LIST_INT_ARRAY = "nr_mode_supported_list_int_array";
+constexpr const char *KEY_VOLTE_PROVISIONING_SUPPORTED_BOOL = "volte_provisioning_supported_bool";
+constexpr const char *KEY_SS_OVER_UT_SUPPORTED_BOOL = "ss_over_ut_supported_bool";
+constexpr const char *KEY_IMS_GBA_REQUIRED_BOOL = "ims_gba_required_bool";
+constexpr const char *KEY_UT_PROVISIONING_SUPPORTED_BOOL = "ut_provisioning_supported_bool";
+constexpr const char *KEY_IMS_PREFER_FOR_EMERGENCY_BOOL = "ims_prefer_for_emergency_bool";
+constexpr const char *KEY_CALL_WAITING_SERVICE_CLASS_INT = "call_waiting_service_class_int";
+constexpr const char *KEY_IMS_CALL_DISCONNECT_REASONINFO_MAPPING_STRING_ARRAY =
     "ims_call_disconnect_reasoninfo_mapping_string_array";
-const std::string KEY_FORCE_VOLTE_SWITCH_ON_BOOL = "force_volte_switch_on_bool";
+constexpr const char *KEY_FORCE_VOLTE_SWITCH_ON_BOOL = "force_volte_switch_on_bool";
 struct OperatorConfig : public Parcelable {
     std::map<std::u16string, std::u16string> configValue;
     std::map<std::string, std::string> stringValue;
