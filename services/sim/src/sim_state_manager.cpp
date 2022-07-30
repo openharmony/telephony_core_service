@@ -14,6 +14,7 @@
  */
 
 #include "sim_state_manager.h"
+
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -40,7 +41,7 @@ void SimStateManager::Init(int32_t slotId)
     }
     eventLoop_ = AppExecFwk::EventRunner::Create("SimStateHandle");
     if (eventLoop_.get() == nullptr) {
-        TELEPHONY_LOGE("SimStateHandle  failed to create EventRunner");
+        TELEPHONY_LOGE("SimStateHandle failed to create EventRunner");
         return;
     }
     simStateHandle_ = std::make_shared<SimStateHandle>(eventLoop_, shared_from_this());
@@ -51,7 +52,7 @@ void SimStateManager::Init(int32_t slotId)
     simStateHandle_->SetRilManager(telRilManager_);
     simStateHandle_->Init(slotId);
     eventLoop_->Run();
-    TELEPHONY_LOGI("SimStateManager::eventLoop_  is running");
+    TELEPHONY_LOGI("SimStateManager::eventLoop_ is running");
     simStateRun_ = STATE_RUNNING;
 }
 
@@ -110,7 +111,9 @@ bool SimStateManager::UnlockPin(int32_t slotId, std::string pin, LockStatusRespo
         simStateHandle_->UnlockPin(slotId, pin);
         while (!responseReady_) {
             TELEPHONY_LOGI("UnlockPin::wait(), response = false");
-            cv_.wait(lck);
+            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+                break;
+            }
         }
         int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
         if (unlockResult == HRIL_UNLOCK_SUCCESS) {
@@ -120,7 +123,7 @@ bool SimStateManager::UnlockPin(int32_t slotId, std::string pin, LockStatusRespo
         } else {
             response.result = UNLOCK_FAIL;
         }
-        response.remain =  static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+        response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
         TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
     }
     TELEPHONY_LOGI("SimStateManager::UnlockPin(), %{public}d", ret);
@@ -137,7 +140,9 @@ bool SimStateManager::UnlockPuk(int32_t slotId, std::string newPin, std::string 
         simStateHandle_->UnlockPuk(slotId, newPin, puk);
         while (!responseReady_) {
             TELEPHONY_LOGI("UnlockPuk::wait(), response = false");
-            cv_.wait(lck);
+            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+                break;
+            }
         }
         int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
         if (unlockResult == HRIL_UNLOCK_SUCCESS) {
@@ -147,7 +152,7 @@ bool SimStateManager::UnlockPuk(int32_t slotId, std::string newPin, std::string 
         } else {
             response.result = UNLOCK_FAIL;
         }
-        response.remain =  static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+        response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
         TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
     }
     TELEPHONY_LOGI("SimStateManager::UnlockPuk(), %{public}d", ret);
@@ -164,7 +169,9 @@ bool SimStateManager::AlterPin(int32_t slotId, std::string newPin, std::string o
         simStateHandle_->AlterPin(slotId, newPin, oldPin);
         while (!responseReady_) {
             TELEPHONY_LOGI("AlterPin::wait(), response = false");
-            cv_.wait(lck);
+            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+                break;
+            }
         }
 
         int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
@@ -175,7 +182,7 @@ bool SimStateManager::AlterPin(int32_t slotId, std::string newPin, std::string o
         } else {
             response.result = UNLOCK_FAIL;
         }
-        response.remain =  static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+        response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
         TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
     }
     TELEPHONY_LOGI("SimStateManager::AlterPin(), %{public}d", ret);
@@ -192,7 +199,9 @@ bool SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, Lock
         simStateHandle_->SetLockState(slotId, options);
         while (!responseReady_) {
             TELEPHONY_LOGI("SetLockState::wait(), response = false");
-            cv_.wait(lck);
+            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+                break;
+            }
         }
         int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
         if (unlockResult == HRIL_UNLOCK_SUCCESS) {
@@ -202,9 +211,9 @@ bool SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, Lock
         } else {
             response.result = UNLOCK_FAIL;
         }
-        response.remain =  static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
-        TELEPHONY_LOGI("SetLockState response.result:%{public}d,response.remain:%{public}d",
-            response.result, response.remain);
+        response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+        TELEPHONY_LOGI(
+            "SetLockState response.result:%{public}d,response.remain:%{public}d", response.result, response.remain);
     }
     TELEPHONY_LOGI("SimStateManager::SetLockState(), %{public}d", ret);
     return true;
@@ -220,7 +229,9 @@ int32_t SimStateManager::GetLockState(int32_t slotId, LockType lockType)
         simStateHandle_->GetLockState(slotId, lockType);
         while (!responseReady_) {
             TELEPHONY_LOGI("GetLockState::wait(), response = false");
-            cv_.wait(lck);
+            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+                break;
+            }
         }
         ret = simStateHandle_->GetUnlockData().lockState;
     }
@@ -238,7 +249,9 @@ bool SimStateManager::UnlockPin2(int32_t slotId, std::string pin2, LockStatusRes
         simStateHandle_->UnlockPin2(slotId, pin2);
         while (!responseReady_) {
             TELEPHONY_LOGI("UnlockPin2::wait(), response = false");
-            cv_.wait(lck);
+            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+                break;
+            }
         }
         int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
         if (unlockResult == HRIL_UNLOCK_SUCCESS) {
@@ -248,15 +261,14 @@ bool SimStateManager::UnlockPin2(int32_t slotId, std::string pin2, LockStatusRes
         } else {
             response.result = UNLOCK_FAIL;
         }
-        response.remain =  static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+        response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
         TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
     }
     TELEPHONY_LOGI("SimStateManager::UnlockPin2(), %{public}d", ret);
     return true;
 }
 
-bool SimStateManager::UnlockPuk2(
-    int32_t slotId, std::string newPin2, std::string puk2, LockStatusResponse &response)
+bool SimStateManager::UnlockPuk2(int32_t slotId, std::string newPin2, std::string puk2, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {
@@ -266,7 +278,9 @@ bool SimStateManager::UnlockPuk2(
         simStateHandle_->UnlockPuk2(slotId, newPin2, puk2);
         while (!responseReady_) {
             TELEPHONY_LOGI("UnlockPuk2::wait(), response = false");
-            cv_.wait(lck);
+            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+                break;
+            }
         }
         int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
         if (unlockResult == HRIL_UNLOCK_SUCCESS) {
@@ -276,15 +290,14 @@ bool SimStateManager::UnlockPuk2(
         } else {
             response.result = UNLOCK_FAIL;
         }
-        response.remain =  static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+        response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
         TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
     }
     TELEPHONY_LOGI("SimStateManager::UnlockPuk2(), %{public}d", ret);
     return true;
 }
 
-bool SimStateManager::AlterPin2(
-    int32_t slotId, std::string newPin2, std::string oldPin2, LockStatusResponse &response)
+bool SimStateManager::AlterPin2(int32_t slotId, std::string newPin2, std::string oldPin2, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {
@@ -294,7 +307,9 @@ bool SimStateManager::AlterPin2(
         simStateHandle_->AlterPin2(slotId, newPin2, oldPin2);
         while (!responseReady_) {
             TELEPHONY_LOGI("AlterPin2::wait(), response = false");
-            cv_.wait(lck);
+            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+                break;
+            }
         }
         int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
         if (unlockResult == HRIL_UNLOCK_SUCCESS) {
@@ -304,7 +319,7 @@ bool SimStateManager::AlterPin2(
         } else {
             response.result = UNLOCK_FAIL;
         }
-        response.remain =  static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+        response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
         TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
     }
     TELEPHONY_LOGI("SimStateManager::AlterPin2(), %{public}d", ret);
@@ -321,7 +336,9 @@ int32_t SimStateManager::RefreshSimState(int32_t slotId)
         simStateHandle_->ObtainRealtimeIccStatus(slotId);
         while (!responseReady_) {
             TELEPHONY_LOGI("RefreshSimState::wait(), response = false");
-            cv_.wait(lck);
+            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+                break;
+            }
         }
         ret = static_cast<int32_t>(simStateHandle_->GetSimState());
     }
@@ -329,8 +346,7 @@ int32_t SimStateManager::RefreshSimState(int32_t slotId)
     return ret;
 }
 
-bool SimStateManager::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo,
-    LockStatusResponse &response)
+bool SimStateManager::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response)
 {
     if (simStateHandle_ == nullptr) {
         TELEPHONY_LOGE("UnlockSimLock(), simStateHandle_ is nullptr!!!");
@@ -343,7 +359,9 @@ bool SimStateManager::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInf
     simStateHandle_->UnlockSimLock(slotId, lockInfo);
     while (!responseReady_) {
         TELEPHONY_LOGI("UnlockSimLock::wait(), response = false");
-        cv_.wait(lck);
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
     }
     ret = simStateHandle_->GetSimlockResponse().result;
     TELEPHONY_LOGI("SimStateManager::UnlockSimLock(), remain: %{public}d", response.remain);
@@ -362,8 +380,8 @@ bool SimStateManager::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInf
     return true;
 }
 
-int32_t SimStateManager::SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
-    SimAuthenticationResponse &response)
+int32_t SimStateManager::SimAuthentication(
+    int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response)
 {
     if (simStateHandle_ == nullptr) {
         TELEPHONY_LOGE("SimAuthentication(), simStateHandle_ is nullptr!!!");
@@ -375,7 +393,9 @@ int32_t SimStateManager::SimAuthentication(int32_t slotId, const std::string &ai
     ret = simStateHandle_->SimAuthentication(slotId, aid, authData);
     while (!responseReady_) {
         TELEPHONY_LOGI("SimAuthentication::wait(), response = false");
-        cv_.wait(lck);
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
     }
     response.sw1 = simStateHandle_->GetSimAuthenticationResponse().sw1;
     response.sw2 = simStateHandle_->GetSimAuthenticationResponse().sw2;
