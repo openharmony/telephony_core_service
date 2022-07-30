@@ -70,6 +70,7 @@ private:
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
     SimHandleRun simStateRun_ = STATE_NOT_START;
     static std::mutex mtx_;
+    constexpr static const int32_t WAIT_TIME_SECOND = 1;
 };
 } // namespace Telephony
 } // namespace OHOS
