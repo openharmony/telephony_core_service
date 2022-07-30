@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -373,6 +373,24 @@ bool SimAccountManager::HasOperatorPrivileges(const int32_t slotId)
     controller->Init(slotId);
     privilegeController_ = controller;
     return controller->HasOperatorPrivileges();
+}
+
+int32_t SimAccountManager::SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue)
+{
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("failed by nullptr");
+        return TELEPHONY_ERROR;
+    }
+    return multiSimController_->SaveImsSwitch(slotId, imsSwitchValue);
+}
+
+int32_t SimAccountManager::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue)
+{
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("failed by nullptr");
+        return TELEPHONY_ERROR;
+    }
+    return multiSimController_->QueryImsSwitch(slotId, imsSwitchValue);
 }
 } // namespace Telephony
 } // namespace OHOS

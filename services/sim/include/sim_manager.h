@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -98,6 +98,7 @@ public:
     std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) override;
     std::u16string GetVoiceMailIdentifier(int32_t slotId) override;
     std::u16string GetVoiceMailNumber(int32_t slotId) override;
+    std::u16string GetSimIst(int32_t slotId) override;
     int ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum) override;
     bool SetVoiceMailInfo(
         int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) override;
@@ -118,6 +119,9 @@ public:
     // Event register
     void RegisterCoreNotify(int32_t slotId, const HANDLE &handler, int what) override;
     void UnRegisterCoreNotify(int32_t slotId, const HANDLE &observerCallBack, int what) override;
+    // Ims Switch
+    int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue) override;
+    int32_t QueryImsSwitch(int32_t, int32_t &imsSwitchValue) override;
 
 private:
     bool IsValidSlotId(int32_t slotId);

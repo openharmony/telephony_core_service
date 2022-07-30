@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -745,6 +745,32 @@ bool SimManager::IsValidSlotIdForDefault(int32_t slotId)
     return true;
 }
 
+std::u16string SimManager::GetSimIst(int32_t slotId)
+{
+    if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return u"";
+    }
+    return simFileManager_[slotId]->GetSimIst();
+}
+
+int32_t SimManager::SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue)
+{
+    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simAccountManager_ is null!");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    return simAccountManager_[slotId]->SaveImsSwitch(slotId, imsSwitchValue);
+}
+
+int32_t SimManager::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue)
+{
+    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simAccountManager_ is null!");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    return simAccountManager_[slotId]->QueryImsSwitch(slotId, imsSwitchValue);
+}
 SimManager::~SimManager() {}
 } // namespace Telephony
 } // namespace OHOS
