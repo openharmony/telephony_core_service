@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "parameters.h"
 #include "string_ex.h"
 
 namespace OHOS {
@@ -868,6 +869,36 @@ bool MultiSimController::PublishSimFileEvent(const AAFwk::Want &want, int eventC
     bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
     TELEPHONY_LOGI("MultiSimController::PublishSimFileEvent end###publishResult = %{public}d\n", publishResult);
     return publishResult;
+}
+
+int32_t MultiSimController::SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue)
+{
+    TELEPHONY_LOGI("entry");
+    if (static_cast<std::size_t>(slotId) >= localCacheInfo_.size() || simDbHelper_ == nullptr) {
+        TELEPHONY_LOGE(
+            "failed by out of range or simDbHelper is nullptr, slotId = %{public}d localCacheInfo size = %{public}zu",
+            slotId, localCacheInfo_.size());
+        return TELEPHONY_ERROR;
+    }
+    NativeRdb::ValuesBucket values;
+    values.PutInt(SimRdbInfo::IMS_SWITCH, imsSwitchValue);
+    return simDbHelper_->UpdateDataByIccId(localCacheInfo_[slotId].iccId, values);
+}
+
+int32_t MultiSimController::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue)
+{
+    TELEPHONY_LOGI("entry");
+    if (static_cast<std::size_t>(slotId) >= localCacheInfo_.size() || simDbHelper_ == nullptr) {
+        TELEPHONY_LOGE(
+            "failed by out of range or simDbHelper is nullptr, slotId = %{public}d localCacheInfo size = %{public}zu",
+            slotId, localCacheInfo_.size());
+        imsSwitchValue = IMS_SWITCH_VALUE_UNKNOWN;
+        return TELEPHONY_ERROR;
+    }
+    SimRdbInfo simRdbInfo;
+    simDbHelper_->QueryDataByIccId(localCacheInfo_[slotId].iccId, simRdbInfo);
+    imsSwitchValue = simRdbInfo.imsSwitch;
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS
