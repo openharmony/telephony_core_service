@@ -1837,6 +1837,33 @@ bool CoreManagerInner::HasOperatorPrivileges(const int32_t slotId)
     }
     return simManager_->HasOperatorPrivileges(slotId);
 }
+
+std::u16string CoreManagerInner::GetSimIst(int32_t slotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return u"";
+    }
+    return simManager_->GetSimIst(slotId);
+}
+
+int32_t CoreManagerInner::SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERROR;
+    }
+    return simManager_->SaveImsSwitch(slotId, imsSwitchValue);
+}
+
+int32_t CoreManagerInner::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERROR;
+    }
+    return simManager_->QueryImsSwitch(slotId, imsSwitchValue);
+}
 /******************** simManager_ end ************************/
 } // namespace Telephony
 } // namespace OHOS
