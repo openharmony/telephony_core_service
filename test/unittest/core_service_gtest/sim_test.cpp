@@ -560,6 +560,43 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0100, Function | Medium
 }
 
 /**
+ * @tc.number   Telephony_Sim_AddIccAdnDiallingNumbers_0200
+ * @tc.name     Add icc dialling numbers
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0200, Function | MediumTest | Level3)
+{
+    EXPECT_TRUE(true);
+    bool flag = false;
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        SimTest::telephonyService_ = GetProxy();
+    } else {
+        std::shared_ptr<DiallingNumbersInfo> diallingNumber =
+            std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_ADN, 0);
+        diallingNumber->name_ = Str8ToStr16("电话卡");
+        diallingNumber->number_ = Str8ToStr16("00000000000");
+        SimTest::telephonyService_->AddIccDiallingNumbers(
+            SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
+        std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
+            SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId_, DiallingNumbersInfo::SIM_ADN);
+        std::u16string name = u"电话卡";
+        for (size_t i = 0; i < diallingNumbers.size(); i++) {
+            if (diallingNumbers[i] == nullptr) {
+                continue;
+            }
+            if (diallingNumbers[i]->name_.compare(name) == 0) {
+                TELEPHONY_LOGE("Telephony_Sim_AddIccAdnDiallingNumbers_0200 true");
+                flag = true;
+            } else {
+                TELEPHONY_LOGE("Telephony_Sim_AddIccAdnDiallingNumbers_0200 failed");
+            }
+        }
+        EXPECT_TRUE(flag);
+    }
+}
+
+/**
  * @tc.number   Telephony_Sim_UpdateIccAdnDiallingNumbers_0100
  * @tc.name     Update icc dialling numbers
  * @tc.desc     Function test
