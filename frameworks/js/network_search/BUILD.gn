@@ -22,7 +22,7 @@ ohos_shared_library("radio") {
     "include",
     "$SUBSYSTEM_DIR/core_service/interfaces/kits/native",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
     "$SUBSYSTEM_DIR/core_service/common/sim",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
@@ -49,10 +49,10 @@ ohos_shared_library("radio") {
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
     "//foundation/arkui/napi:ace_napi",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",

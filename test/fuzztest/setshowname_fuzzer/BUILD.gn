@@ -37,9 +37,9 @@ ohos_fuzztest("SetShowNameFuzzTest") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
-    "utils_base:utils",
   ]
   defines += [
     "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",

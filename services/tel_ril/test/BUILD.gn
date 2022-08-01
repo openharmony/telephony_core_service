@@ -40,10 +40,10 @@ ohos_executable("tel_ril_test") {
   deps = [
     "$hdf_uhdf_path/hdi:libhdi",
     "//base/telephony/core_service:tel_core_service",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",

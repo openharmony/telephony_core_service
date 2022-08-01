@@ -67,6 +67,8 @@ public:
     virtual std::u16string GetSimIccId(int32_t slotId) = 0;
     virtual std::u16string GetIMSI(int32_t slotId) = 0;
     virtual bool IsSimActive(int32_t slotId) = 0;
+    virtual int32_t GetSlotId(int32_t simId) = 0;
+    virtual int32_t GetSimId(int32_t slotId) = 0;
     virtual bool GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual std::u16string GetLocaleFromDefaultSim() = 0;
@@ -202,6 +204,8 @@ public:
         REG_IMS_CALLBACK,
         UN_REG_IMS_CALLBACK,
         GET_SIM_EONS,
+        GET_SIM_SLOTID,
+        GET_SIM_SIMID,
     };
 
 protected:

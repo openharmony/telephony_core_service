@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -76,6 +76,8 @@ public:
     virtual std::u16string GetSimIccId(int32_t slotId) = 0;
     virtual std::u16string GetIMSI(int32_t slotId) = 0;
     virtual std::u16string GetLocaleFromDefaultSim(int32_t slotId) = 0;
+    virtual int32_t GetSlotId(int32_t simId) = 0;
+    virtual int32_t GetSimId(int32_t slotId) = 0;
     virtual std::u16string GetSimGid1(int32_t slotId) = 0;
     virtual std::u16string GetSimGid2(int32_t slotId) = 0;
     virtual std::u16string GetOpName(int32_t slotId) = 0;
@@ -85,6 +87,7 @@ public:
     virtual std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) = 0;
     virtual std::u16string GetVoiceMailIdentifier(int32_t slotId) = 0;
     virtual std::u16string GetVoiceMailNumber(int32_t slotId) = 0;
+    virtual std::u16string GetSimIst(int32_t slotId) = 0;
     virtual int ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum) = 0;
     virtual bool SetVoiceMailInfo(
         int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) = 0;
@@ -105,6 +108,9 @@ public:
     // Event register
     virtual void RegisterCoreNotify(int32_t slotId, const HANDLE &handler, int what) = 0;
     virtual void UnRegisterCoreNotify(int32_t slotId, const HANDLE &observerCallBack, int what) = 0;
+    // Ims Switch
+    virtual int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue) = 0;
+    virtual int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

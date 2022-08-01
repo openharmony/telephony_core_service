@@ -291,6 +291,26 @@ bool CoreServiceClient::IsSimActive(int32_t slotId)
     return proxy->IsSimActive(slotId);
 }
 
+int32_t CoreServiceClient::GetSlotId(int32_t simId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERROR;
+    }
+    return proxy->GetSlotId(simId);
+}
+
+int32_t CoreServiceClient::GetSimId(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERROR;
+    }
+    return proxy->GetSimId(slotId);
+}
+
 bool CoreServiceClient::GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     auto proxy = GetProxy();

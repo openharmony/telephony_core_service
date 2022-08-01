@@ -53,6 +53,8 @@ public:
     std::u16string GetSimIccId(int32_t slotId);
     std::u16string GetIMSI(int32_t slotId);
     bool IsSimActive(int32_t slotId);
+    int32_t GetSlotId(int32_t simId);
+    int32_t GetSimId(int32_t slotId);
     bool GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     std::u16string GetLocaleFromDefaultSim();
