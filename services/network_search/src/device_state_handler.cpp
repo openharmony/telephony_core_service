@@ -30,12 +30,9 @@ DeviceStateHandler::DeviceStateHandler(
     const std::weak_ptr<ITelRilManager> &telRilManager, int32_t slotId)
     : networkSearchManager_(networkSearchManager), telRilManager_(telRilManager), slotId_(slotId)
 {
-    auto &batterySrvClient = PowerMgr::BatterySrvClient::GetInstance();
-    auto chargingStatus = batterySrvClient.GetChargingStatus();
-    isCharging_ = chargingStatus == PowerMgr::BatteryChargeState::CHARGE_STATE_ENABLE ||
-        chargingStatus == PowerMgr::BatteryChargeState::CHARGE_STATE_FULL;
+    isCharging_ = true;
     auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
-    isScreenOn_ = powerMgrClient.IsScreenOn();
+    isScreenOn_ = true;
     auto powerSaveMode = powerMgrClient.GetDeviceMode();
     isPowerSaveModeOn_ = powerSaveMode == PowerMgr::PowerMgrClient::POWER_SAVE_MODE ||
         powerSaveMode == PowerMgr::PowerMgrClient::EXTREME_POWER_SAVE_MODE;
