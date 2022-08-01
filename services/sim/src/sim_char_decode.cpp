@@ -25,7 +25,7 @@ bool SimCharDecode::IsChineseString(const std::string &str)
 {
     uint32_t len = str.length();
     for (uint32_t i = 0; i < len; i++) {
-        if (str[i] > CHINESE_FLAG) {
+        if (str[i] & CHINESE_FLAG) {
             return true;
         }
     }
