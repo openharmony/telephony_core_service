@@ -148,6 +148,7 @@ ohos_shared_library("tel_core_service") {
     "battery_manager:batterysrv_client",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "common_event_service:cesfwk_services",
     "config_policy:configpolicy_util",
@@ -167,7 +168,6 @@ ohos_shared_library("tel_core_service") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "time_service:time_service",
-    "utils_base:utils",
   ]
 
   if (is_standard_system) {

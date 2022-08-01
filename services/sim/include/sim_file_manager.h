@@ -51,6 +51,7 @@ public:
     std::u16string GetSimGid2();
     std::u16string GetSimTelephoneNumber();
     std::u16string GetSimTeleNumberIdentifier();
+    std::u16string GetSimIst();
     std::u16string GetVoiceMailIdentifier();
     std::u16string GetVoiceMailNumber();
     std::u16string GetOpName();

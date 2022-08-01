@@ -73,12 +73,12 @@ ohos_shared_library("tel_core_service_api") {
   public_configs = [ ":tel_core_service_api_config" ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
     "init:libbegetutil",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
-    "utils_base:utils",
   ]
 
   if (is_standard_system) {

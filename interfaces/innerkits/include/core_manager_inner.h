@@ -250,6 +250,8 @@ public:
     std::u16string GetSimIccId(int32_t slotId);
     std::u16string GetIMSI(int32_t slotId);
     std::u16string GetLocaleFromDefaultSim(int32_t slotId);
+    int32_t GetSlotId(int32_t simId);
+    int32_t GetSimId(int32_t slotId);
     std::u16string GetSimGid1(int32_t slotId);
     std::u16string GetSimGid2(int32_t slotId);
     std::u16string GetOpName(int32_t slotId);
@@ -260,6 +262,7 @@ public:
     std::u16string GetSimTeleNumberIdentifier(const int32_t slotId);
     std::u16string GetVoiceMailIdentifier(int32_t slotId);
     std::u16string GetVoiceMailNumber(int32_t slotId);
+    std::u16string GetSimIst(int32_t slotId);
     bool AddIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
     bool DelIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
     bool UpdateIccDiallingNumbers(int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
@@ -280,7 +283,9 @@ public:
     int32_t GetDefaultSmsSlotId();
     int32_t GetDefaultCellularDataSlotId();
     int32_t GetPrimarySlotId();
-/******************** simManager end *****************************/
+    int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue);
+    int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue);
+    /******************** simManager end *****************************/
 private:
     CoreManagerInner();
 

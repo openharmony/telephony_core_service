@@ -53,11 +53,12 @@ private:
     bool ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetIccidDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetImpiDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessGetIstDone(const AppExecFwk::InnerEvent::Pointer &event);
     const int LOAD_STEP = 1;
     // see 3GPP TS 31.103
     std::string impi_ = "";
     std::string domain_ = "";
-    std::string* impu_ = nullptr;
+    std::string *impu_ = nullptr;
     std::string ist_ = "";
     std::string* pcscf_ = nullptr;
     std::string authRsp_ = "";

@@ -17,6 +17,7 @@
 
 #include "ims_core_service_callback_stub.h"
 #include "iservice_registry.h"
+#include "system_ability_definition.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_types.h"

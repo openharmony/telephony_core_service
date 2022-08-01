@@ -704,6 +704,7 @@ declare namespace sim {
     KEY_SPN_DISPLAY_CONDITION_CUST_INT = "spn_display_condition_cust_int",
     KEY_PNN_CUST_STRING_ARRAY = "pnn_cust_string_array",
     KEY_OPL_CUST_STRING_ARRAY = "opl_cust_string_array",
+    KEY_EMERGENCY_CALL_STRING_ARRAY = "emergency_call_string_array",
   }
 }
 

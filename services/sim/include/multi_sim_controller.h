@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,16 +18,17 @@
 
 #include <list>
 
-#include "want.h"
-#include "if_system_ability_manager.h"
-#include "sim_state_manager.h"
-#include "sim_file_manager.h"
 #include "i_network_search.h"
-#include "sim_constant.h"
-#include "sim_rdb_helper.h"
-#include "sim_data.h"
-#include "rdb_sim_helper.h"
+#include "if_system_ability_manager.h"
 #include "radio_cap_controller.h"
+#include "rdb_sim_helper.h"
+#include "sim_constant.h"
+#include "sim_data.h"
+#include "sim_file_manager.h"
+#include "sim_rdb_helper.h"
+#include "sim_state_manager.h"
+#include "telephony_errors.h"
+#include "want.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -61,17 +62,21 @@ public:
     bool SetActiveSim(int32_t slotId, int32_t enable, bool force = false);
     bool SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable);
     bool ForgetAllData();
+    int32_t GetSlotId(int32_t simId);
     std::vector<IccAccountInfo> iccAccountInfoList_;
+    bool GetListFromDataBase();
+    int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue);
+    int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue);
 
 private:
     bool IsValidData();
+    int32_t GetFirstActivedSlotId();
     bool InitShowName(int slotId);
     bool InitShowNumber(int slotId);
     bool InitActive(int slotId);
     bool InitIccId(int slotId);
     int32_t UpdateDataByIccId(int slotId, std::string newIccId);
     int32_t InsertData(int slotId, std::string newIccId);
-    bool GetListFromDataBase();
     void SortCache();
     std::u16string GetIccId(int32_t slotId);
     bool SetIccId(int32_t slotId, std::u16string iccId);
@@ -108,6 +113,7 @@ private:
     static std::vector<SimRdbInfo> localCacheInfo_;
     static std::mutex mutex_;
     std::shared_ptr<RadioCapController> radioCapController_ = nullptr;
+    const int32_t IMS_SWITCH_VALUE_UNKNOWN = -1;
 };
 } // namespace Telephony
 } // namespace OHOS

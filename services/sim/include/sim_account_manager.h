@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,10 +50,13 @@ public:
     int32_t GetPrimarySlotId();
     std::u16string GetShowNumber(int32_t slotId);
     std::u16string GetShowName(int32_t slotId);
+    int32_t GetSlotId(int32_t simId);
     bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList);
     bool GetOperatorConfigs(int slotId, OperatorConfig &poc);
     bool HasOperatorPrivileges(const int32_t slotId);
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue);
+    int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue);
 
 private:
     bool IsValidSlotId(int32_t);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -244,6 +244,10 @@ bool SimManager::SetDefaultVoiceSlotId(int32_t slotId)
         TELEPHONY_LOGE("simAccountManager is null!");
         return false;
     }
+    if (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsSimActive(slotId)) {
+        TELEPHONY_LOGE("SetDefaultVoiceSlotId slotId is not active!");
+        return false;
+    }
     return simAccountManager_[DEFAULT_SIM_SLOT_ID]->SetDefaultVoiceSlotId(slotId);
 }
 
@@ -251,6 +255,10 @@ bool SimManager::SetDefaultSmsSlotId(int32_t slotId)
 {
     if ((!IsValidSlotIdForDefault(slotId)) || (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr)) {
         TELEPHONY_LOGE("simAccountManager is null!");
+        return false;
+    }
+    if (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsSimActive(slotId)) {
+        TELEPHONY_LOGE("SetDefaultSmsSlotId slotId is not active!");
         return false;
     }
     return simAccountManager_[DEFAULT_SIM_SLOT_ID]->SetDefaultSmsSlotId(slotId);
@@ -262,6 +270,10 @@ bool SimManager::SetDefaultCellularDataSlotId(int32_t slotId)
         TELEPHONY_LOGE("simAccountManager is null!");
         return false;
     }
+    if (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsSimActive(slotId)) {
+        TELEPHONY_LOGE("SetDefaultSmsSlotId slotId is not active!");
+        return false;
+    }
     return simAccountManager_[DEFAULT_SIM_SLOT_ID]->SetDefaultCellularDataSlotId(slotId);
 }
 
@@ -269,6 +281,10 @@ bool SimManager::SetPrimarySlotId(int32_t slotId)
 {
     if ((!IsValidSlotId(slotId)) || (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr)) {
         TELEPHONY_LOGE("simAccountManager is null!");
+        return false;
+    }
+    if (!IsSimActive(slotId)) {
+        TELEPHONY_LOGE("SetPrimarySlotId slotId is not active!");
         return false;
     }
     return simAccountManager_[DEFAULT_SIM_SLOT_ID]->SetPrimarySlotId(slotId);
@@ -353,6 +369,25 @@ bool SimManager::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAcc
         return false;
     }
     return simAccountManager_[DEFAULT_SIM_SLOT_ID]->GetActiveSimAccountInfoList(iccAccountInfoList);
+}
+
+int32_t SimManager::GetSlotId(int32_t simId)
+{
+    if (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr) {
+        TELEPHONY_LOGE("simAccountManager is null!");
+        return TELEPHONY_ERROR;
+    }
+    return simAccountManager_[DEFAULT_SIM_SLOT_ID]->GetSlotId(simId);
+}
+
+int32_t SimManager::GetSimId(int32_t slotId)
+{
+    IccAccountInfo accountInfo;
+    if (GetSimAccountInfo(slotId, accountInfo)) {
+        return accountInfo.simId;
+    }
+    TELEPHONY_LOGE("GetSimAccountInfo fail!");
+    return TELEPHONY_ERROR;
 }
 
 bool SimManager::GetOperatorConfigs(int slotId, OperatorConfig &poc)
@@ -710,6 +745,32 @@ bool SimManager::IsValidSlotIdForDefault(int32_t slotId)
     return true;
 }
 
+std::u16string SimManager::GetSimIst(int32_t slotId)
+{
+    if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return u"";
+    }
+    return simFileManager_[slotId]->GetSimIst();
+}
+
+int32_t SimManager::SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue)
+{
+    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simAccountManager_ is null!");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    return simAccountManager_[slotId]->SaveImsSwitch(slotId, imsSwitchValue);
+}
+
+int32_t SimManager::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue)
+{
+    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simAccountManager_ is null!");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    return simAccountManager_[slotId]->QueryImsSwitch(slotId, imsSwitchValue);
+}
 SimManager::~SimManager() {}
 } // namespace Telephony
 } // namespace OHOS
