@@ -67,7 +67,9 @@ bool TelephonyPermission::CheckPermission(const std::string &permissionName)
     int result = PermissionState::PERMISSION_DENIED;
 
     if (tokenType == ATokenTypeEnum::TOKEN_NATIVE) {
-        result = AccessTokenKit::VerifyNativeToken(callerToken, permissionName);
+#ifdef TELEPHONY_SUPPORT_NATIVE_PERMISSION
+        result = AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+#endif
     } else if (tokenType == ATokenTypeEnum::TOKEN_HAP) {
         result = AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
     } else {
