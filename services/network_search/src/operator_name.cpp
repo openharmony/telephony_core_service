@@ -22,6 +22,7 @@
 #include "core_manager_inner.h"
 #include "hril_network_parcel.h"
 #include "network_search_manager.h"
+#include "operator_config_types.h"
 #include "resource_utils.h"
 #include "telephony_log_wrapper.h"
 using namespace OHOS::AppExecFwk;
@@ -32,43 +33,6 @@ namespace Telephony {
 const int32_t FORMAT_IDX_SPN_CS = 0;
 const int32_t PNN_CUST_STRING_SIZE = 2;
 const int32_t OPL_CUST_STRING_SIZE = 4;
-/**
- * If true, customize the items related to operator name
- */
-const std::string KEY_ENABLE_OPERATOR_NAME_CUST_BOOL = "enable_operator_name_cust_bool";
-/**
- * Customize the operatoer name if #KEY_ENABLE_OPERATOR_NAME_CUST_BOOL is true.
- */
-const std::string KEY_OPERATOR_NAME_CUST_STRING = "operator_name_cust_string";
-/**
- * Customize the SPN Display Condition bits if #KEY_ENABLE_OPERATOR_NAME_CUST_BOOL is true. The default value '-1' means
- * this field is not set.
- * b1 = 0: display of registered PLMN name not required when registered PLMN is either HPLMN or a PLMN in the service
- * provider PLMN list (see EF_SPDI).
- * b1 = 1: display of registered PLMN name required when registered PLMN is either HPLMN or a PLMN in the service
- * provider PLMN list(see EF_SPDI).
- * b2 = 0: display of the service provider name is required when registered PLMN is neither HPLMN nor a PLMN in the
- * service provider PLMN list(see EF_SPDI).
- * b2 = 1: display of the service provider name is not required when registered PLMN is neither HPLMN nor a PLMN in the
- * service provider PLMN list(see EF_SPDI).
- *
- * See 3GPP TS 31.102 v15.2.0 Section 4.2.12 EF_SPN.
- */
-const std::string KEY_SPN_DISPLAY_CONDITION_CUST_INT = "spn_display_condition_cust_int";
-/**
- * Customize the PNN - a string array of comma-separated long and short names:
- * "long_name1,short_name1".
- *
- * See 3GPP TS 31.102 v15.2.0 Section 4.2.58 EF_PNN.
- */
-const std::string KEY_PNN_CUST_STRING_ARRAY = "pnn_cust_string_array";
-/**
- * Customize the OPL - a string array of OPL records, each with comma-delimited data fields as follows:
- * "plmn1,lac_start,lac_end,index".
- *
- * See 3GPP TS 31.102 v15.2.0 Section 4.2.59 EF_OPL.
- */
-const std::string KEY_OPL_CUST_STRING_ARRAY = "opl_cust_string_array";
 
 OperatorName::OperatorName(const EventFwk::CommonEventSubscribeInfo &sp,
     std::shared_ptr<NetworkSearchState> networkSearchState, std::shared_ptr<ISimManager> simManager,
@@ -538,6 +502,21 @@ void OperatorName::UpdateOperatorConfig()
 {
     OperatorConfig operatorConfig;
     CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, operatorConfig);
+    if (operatorConfig.boolValue.find(KEY_ENABLE_OPERATOR_NAME_CUST_BOOL) != operatorConfig.boolValue.end()) {
+        enableCust_ = operatorConfig.boolValue[KEY_ENABLE_OPERATOR_NAME_CUST_BOOL];
+    }
+    if (operatorConfig.stringValue.find(KEY_OPERATOR_NAME_CUST_STRING) != operatorConfig.stringValue.end()) {
+        spnCust_ = operatorConfig.stringValue[KEY_OPERATOR_NAME_CUST_STRING];
+    }
+    if (operatorConfig.intValue.find(KEY_SPN_DISPLAY_CONDITION_CUST_INT) != operatorConfig.intValue.end()) {
+        displayConditionCust_ = operatorConfig.intValue[KEY_SPN_DISPLAY_CONDITION_CUST_INT];
+    }
+    if (operatorConfig.stringArrayValue.find(KEY_PNN_CUST_STRING_ARRAY) != operatorConfig.stringArrayValue.end()) {
+        UpdatePnnCust(operatorConfig.stringArrayValue[KEY_PNN_CUST_STRING_ARRAY]);
+    }
+    if (operatorConfig.stringArrayValue.find(KEY_OPL_CUST_STRING_ARRAY) != operatorConfig.stringArrayValue.end()) {
+        UpdateOplCust(operatorConfig.stringArrayValue[KEY_OPL_CUST_STRING_ARRAY]);
+    }
 }
 
 void OperatorName::UpdatePnnCust(const std::vector<std::string> &pnnCust)
