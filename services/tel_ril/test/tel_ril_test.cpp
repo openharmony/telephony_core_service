@@ -67,6 +67,8 @@ enum class DiffInterfaceId {
     TEST_SET_CALL_FORWARD,
     TEST_GET_CALL_DEAL_CLIP,
     TEST_SET_CALL_CLIP,
+    TEST_GET_CALL_DEAL_CLIR,
+    TEST_SET_CALL_CLIR,
     TEST_GET_CALL_RESTRICTION,
     TEST_SET_CALL_RESTRICTION,
     TEST_SEND_DTMF,
@@ -226,6 +228,10 @@ public:
     void OnRequestStopDtmfTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestSetClipTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+
+    void OnRequestGetClirTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+
+    void OnRequestSetClirTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestGetCallRestrictionTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
@@ -415,6 +421,8 @@ void TelRilTest::OnInitCall()
     memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_FORWARD] = &TelRilTest::OnRequestSetCallForwardTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_DEAL_CLIP] = &TelRilTest::OnRequestGetClipTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_CLIP] = &TelRilTest::OnRequestSetClipTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_DEAL_CLIR] = &TelRilTest::OnRequestGetClirTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_CLIR] = &TelRilTest::OnRequestSetClirTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_RESTRICTION] = &TelRilTest::OnRequestGetCallRestrictionTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_RESTRICTION] = &TelRilTest::OnRequestSetCallRestrictionTest;
     memberFuncMap_[DiffInterfaceId::TEST_SEND_DTMF] = &TelRilTest::OnRequestSendDtmfTest;
@@ -1915,6 +1923,31 @@ void TelRilTest::OnRequestSetClipTest(int32_t slotId, const std::shared_ptr<AppE
     }
 }
 
+void TelRilTest::OnRequestGetClirTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_GET_CALL_CLIR);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestGetClirTest -->");
+        telRilManager_->GetClir(slotId, event);
+        TELEPHONY_LOGI("TelRilTest::OnRequestGetClirTest --> finished");
+    }
+}
+
+void TelRilTest::OnRequestSetClirTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SET_CALL_CLIR);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        int32_t action;
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestSetClirTest -->");
+        std::cout << "please input call set clir action: ";
+        std::cin >> action;
+        telRilManager_->SetClip(slotId, action, event);
+        TELEPHONY_LOGI("TelRilTest::OnRequestSetClirTest --> finished");
+    }
+}
+
 void TelRilTest::OnRequestGetCallRestrictionTest(
     int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
@@ -2263,6 +2296,8 @@ void CallTest()
     cout << (int32_t)DiffInterfaceId::TEST_SET_CALL_FORWARD << " --> OnRequestSetCallForwardTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_CALL_DEAL_CLIP << " --> OnRequestGetClipTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_SET_CALL_CLIP << " --> OnRequestSetClipTest" << endl;
+    cout << (int32_t)DiffInterfaceId::TEST_GET_CALL_DEAL_CLIR << " --> OnRequestGetClirTest" << endl;
+    cout << (int32_t)DiffInterfaceId::TEST_SET_CALL_CLIR << " --> OnRequestSetClirTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_CALL_RESTRICTION << " --> OnRequestGetCallRestrictionTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_SET_CALL_RESTRICTION << " --> OnRequestSetCallRestrictionTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_SEND_DTMF << " --> OnRequestSendDtmfTest" << endl;
