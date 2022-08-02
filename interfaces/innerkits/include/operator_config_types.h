@@ -42,6 +42,44 @@ constexpr const char *KEY_CALL_WAITING_SERVICE_CLASS_INT = "call_waiting_service
 constexpr const char *KEY_IMS_CALL_DISCONNECT_REASONINFO_MAPPING_STRING_ARRAY =
     "ims_call_disconnect_reasoninfo_mapping_string_array";
 constexpr const char *KEY_FORCE_VOLTE_SWITCH_ON_BOOL = "force_volte_switch_on_bool";
+/**
+ * If true, customize the items related to operator name.
+ */
+constexpr const char *KEY_ENABLE_OPERATOR_NAME_CUST_BOOL = "enable_operator_name_cust_bool";
+/**
+ * Customize the operatoer name if #KEY_ENABLE_OPERATOR_NAME_CUST_BOOL is true.
+ */
+constexpr const char *KEY_OPERATOR_NAME_CUST_STRING = "operator_name_cust_string";
+/**
+ * Customize the SPN Display Condition bits if #KEY_ENABLE_OPERATOR_NAME_CUST_BOOL is true. The default value '-1' means
+ * this field is not set.
+ * b1 = 0: display of registered PLMN name not required when registered PLMN is either HPLMN or a PLMN in the service
+ * provider PLMN list (see EF_SPDI).
+ * b1 = 1: display of registered PLMN name required when registered PLMN is either HPLMN or a PLMN in the service
+ * provider PLMN list(see EF_SPDI).
+ * b2 = 0: display of the service provider name required when registered PLMN is neither HPLMN nor a PLMN in the
+ * service provider PLMN list(see EF_SPDI).
+ * b2 = 1: display of the service provider name not required when registered PLMN is neither HPLMN nor a PLMN in the
+ * service provider PLMN list(see EF_SPDI).
+ *
+ * See 3GPP TS 31.102 v15.2.0 Section 4.2.12 EF_SPN.
+ */
+constexpr const char *KEY_SPN_DISPLAY_CONDITION_CUST_INT = "spn_display_condition_cust_int";
+/**
+ * Customize the PNN - a string array of comma-separated long and short names:
+ * "long_name1,short_name1".
+ *
+ * See 3GPP TS 31.102 v15.2.0 Section 4.2.58 EF_PNN.
+ */
+constexpr const char *KEY_PNN_CUST_STRING_ARRAY = "pnn_cust_string_array";
+/**
+ * Customize the OPL - a string array of OPL records, each with comma-delimited data fields as follows:
+ * "plmn1,lac_start,lac_end,index".
+ *
+ * See 3GPP TS 31.102 v15.2.0 Section 4.2.59 EF_OPL.
+ */
+constexpr const char *KEY_OPL_CUST_STRING_ARRAY = "opl_cust_string_array";
+
 struct OperatorConfig : public Parcelable {
     std::map<std::u16string, std::u16string> configValue;
     std::map<std::string, std::string> stringValue;
