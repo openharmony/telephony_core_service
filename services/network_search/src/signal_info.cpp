@@ -15,9 +15,9 @@
 
 #include "signal_info.h"
 
+#include "core_service_hisysevent.h"
 #include "network_search_notify.h"
 #include "telephony_log_wrapper.h"
-#include "telephony_hisysevent.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -143,7 +143,7 @@ void SignalInfo::ProcessSignalIntensity(int32_t slotId, const AppExecFwk::InnerE
         if (signals.size() != 0) {
             level = signals[0]->GetSignalLevel();
         }
-        WriteSignalLevelHiSysEvent(slotId, level);
+        CoreServiceHiSysEvent::SignalLevelBehaviorEvent(slotId, level);
     }
     PrintfLog(*signalIntensity);
 }
