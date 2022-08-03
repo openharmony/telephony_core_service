@@ -29,6 +29,7 @@
 #include "common_event_support.h"
 #include "common_event.h"
 #include "common_event_manager.h"
+#include "core_service_hisysevent.h"
 #include "telephony_state_registry_client.h"
 
 using namespace OHOS::EventFwk;
@@ -64,6 +65,7 @@ void SimStateHandle::Init(int32_t slotId)
         return;
     }
     externalState_ = SimState::SIM_STATE_UNKNOWN;
+    CoreServiceHiSysEvent::SimStateBehaviorEvent(slotId, static_cast<int32_t>(externalState_));
     externalType_ = CardType::UNKNOWN_CARD;
 }
 
@@ -517,6 +519,7 @@ void SimStateHandle::SimStateEscape(
             SimLockStateEscape(simState, slotId, reason);
             break;
     }
+    CoreServiceHiSysEvent::SimStateBehaviorEvent(slotId, static_cast<int32_t>(externalState_));
 }
 
 void SimStateHandle::SimLockStateEscape(
@@ -546,6 +549,7 @@ void SimStateHandle::SimLockStateEscape(
         default:
             isSimLockState = false;
             externalState_ = SimState::SIM_STATE_UNKNOWN;
+            CoreServiceHiSysEvent::SimStateBehaviorEvent(slotId, static_cast<int32_t>(externalState_));
             PublishSimStateEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED,
                 ICC_STATE_NOT_READY, "");
             break;
@@ -558,6 +562,7 @@ void SimStateHandle::SimLockStateEscape(
 void SimStateHandle::NotifySimLock(int slotId)
 {
     externalState_ = SimState::SIM_STATE_LOCKED;
+    CoreServiceHiSysEvent::SimStateBehaviorEvent(slotId, static_cast<int32_t>(externalState_));
     observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_SIMLOCK);
     PublishSimStateEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_SIMLOCK, "");
 }

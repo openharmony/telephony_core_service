@@ -18,6 +18,7 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "parameters.h"
+#include "core_service_hisysevent.h"
 #include "string_ex.h"
 
 namespace OHOS {
@@ -599,6 +600,7 @@ bool MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
         }
         localCacheInfo_[i].isCellularDataCard = NOT_MAIN;
     }
+    CoreServiceHiSysEvent::DefaultDataSlotIdBehaviorEvent(slotId);
     return AnnounceDefaultCellularDataSlotIdChanged(slotId);
 }
 
