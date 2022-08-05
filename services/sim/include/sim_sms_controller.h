@@ -55,13 +55,14 @@ protected:
     std::shared_ptr<SimFileManager> fileManager_ = nullptr;
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<SimStateManager> stateManager_ = nullptr;
-    bool result_ = false;
+    bool responseReady_ = false;
     int slotId_ = 0;
 
 private:
     bool IsCdmaCardType() const;
     std::vector<std::string> smsList_;
     static std::mutex mtx_;
+    constexpr static const int32_t WAIT_TIME_SECOND = 1;
     std::condition_variable processWait_;
     void ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event);
