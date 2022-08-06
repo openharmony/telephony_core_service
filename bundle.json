@@ -48,7 +48,7 @@
                 "resource_management",
                 "ril_adapter",
                 "safwk",
-                "samgr_standard",
+                "samgr",
                 "startup_l2",
                 "c_utils"
             ],
