@@ -58,7 +58,7 @@ ohos_unittest("tel_core_service_gtest") {
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
     "startup_l2:syspara",
   ]
   defines = [

@@ -55,7 +55,7 @@ ohos_unittest("tel_ril_gtest") {
     "ipc:ipc_core",
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
