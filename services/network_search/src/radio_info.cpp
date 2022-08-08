@@ -237,33 +237,28 @@ PhoneType RadioInfo::GetPhoneType() const
 
 void RadioInfo::UpdatePhone(RadioTech csRadioTech)
 {
-    TELEPHONY_LOGI("NetworkType::UpdatePhone");
+    TELEPHONY_LOGI("RadioInfo::UpdatePhone");
     std::shared_ptr<NetworkSearchManager> networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("NetworkType::ProcessSetPreferredNetwork networkSearchManager is nullptr\n");
+        TELEPHONY_LOGE("RadioInfo::UpdatePhone networkSearchManager is nullptr");
         return;
     }
     PhoneType phoneType = RadioTechToPhoneType(csRadioTech);
     if (phoneType_ == phoneType) {
-        TELEPHONY_LOGI("NetworkType::UpdatePhone No Change");
+        TELEPHONY_LOGI("RadioInfo::UpdatePhone No Change");
         return;
     }
     if (phoneType == PhoneType::PHONE_TYPE_IS_NONE) {
-        TELEPHONY_LOGE("NetworkType::UpdatePhone phoneType is UNKNOWN");
+        TELEPHONY_LOGE("RadioInfo::UpdatePhone phoneType is UNKNOWN");
         return;
     }
-    TELEPHONY_LOGI("NetworkType::UpdatePhone SetPhoneType is success %{public}d", phoneType);
+    TELEPHONY_LOGI("RadioInfo::UpdatePhone SetPhoneType is success %{public}d", phoneType);
     SetPhoneType(phoneType);
 
     int radioState = networkSearchManager->GetRadioState(slotId_);
     if (static_cast<ModemPowerState>(radioState) != CORE_SERVICE_POWER_NOT_AVAILABLE) {
-        if (phoneType == PhoneType::PHONE_TYPE_IS_GSM) {
-            networkSearchManager->GetImei(slotId_);
-            networkSearchManager->SetMeid(slotId_, u"");
-        } else {
-            networkSearchManager->GetMeid(slotId_);
-            networkSearchManager->SetImei(slotId_, u"");
-        }
+        networkSearchManager->GetImei(slotId_);
+        networkSearchManager->GetMeid(slotId_);
         networkSearchManager->GetRadioCapability(slotId_);
         if (static_cast<ModemPowerState>(radioState) == CORE_SERVICE_POWER_ON) {
             networkSearchManager->GetVoiceTech(slotId_);
