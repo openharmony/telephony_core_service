@@ -56,17 +56,23 @@
             ]
         },
         "build": {
-            "sub_component": [
-                "//base/telephony/core_service:tel_core_service",
-                "//base/telephony/core_service/sa_profile:core_service_sa_profile",
-                "//base/telephony/core_service/services/etc/init:telephony.cfg",
-                "//base/telephony/core_service/services/etc/carrier:operator_config",
-                "//base/telephony/core_service/services/etc/param:param_files",
-                "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
-                "//base/telephony/core_service/frameworks/js/network_search:radio",
-                "//base/telephony/core_service/frameworks/js/sim:sim",
-                "//base/telephony/core_service/telephonyres:telephonyres_hap"
-            ],
+            "group_type": {
+                "base_group": [
+                ],
+                "fwk_group": [
+                    "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
+                    "//base/telephony/core_service/frameworks/js/network_search:radio",
+                    "//base/telephony/core_service/frameworks/js/sim:sim"
+                ],
+                "service_group": [
+                    "//base/telephony/core_service:tel_core_service",
+                    "//base/telephony/core_service/sa_profile:core_service_sa_profile",
+                    "//base/telephony/core_service/services/etc/init:telephony.cfg",
+                    "//base/telephony/core_service/services/etc/carrier:operator_config",
+                    "//base/telephony/core_service/services/etc/param:telephony.para",
+                    "//base/telephony/core_service/telephonyres:telephonyres_hap"
+                ]
+            },
             "inner_kits": [
                 {
                     "header": {
