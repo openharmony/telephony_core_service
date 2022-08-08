@@ -771,11 +771,6 @@ void NetworkSearchManager::UpdatePhone(int32_t slotId, RadioTech csRadioTech)
     if (inner != nullptr) {
         if (inner->networkSearchHandler_ != nullptr) {
             inner->networkSearchHandler_->UpdatePhone(csRadioTech);
-            if (inner->networkSearchHandler_->GetPhoneType() == PhoneType::PHONE_TYPE_IS_CDMA) {
-                SetImei(slotId, u"");
-            } else {
-                SetMeid(slotId, u"");
-            }
         }
     }
 }
@@ -807,11 +802,14 @@ std::u16string NetworkSearchManager::GetImei(int32_t slotId)
 {
     TELEPHONY_LOGI("NetworkSearchManager::GetImei start slotId:%{public}d", slotId);
     auto inner = FindManagerInner(slotId);
-    if (inner != nullptr) {
-        eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_IMEI);
-        return inner->imei_;
+    if (inner == nullptr) {
+        return std::u16string();
     }
-    return std::u16string();
+    if (inner->imei_.empty()) {
+        eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_IMEI);
+        return std::u16string();
+    }
+    return inner->imei_;
 }
 
 std::vector<sptr<CellInformation>> NetworkSearchManager::GetCellInfoList(int32_t slotId)
@@ -873,11 +871,14 @@ std::u16string NetworkSearchManager::GetMeid(int32_t slotId)
 {
     TELEPHONY_LOGI("NetworkSearchManager::GetMeid start slotId:%{public}d", slotId);
     auto inner = FindManagerInner(slotId);
-    if (inner != nullptr) {
-        eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_MEID);
-        return inner->meid_;
+    if (inner == nullptr) {
+        return std::u16string();
     }
-    return std::u16string();
+    if (inner->meid_.empty()) {
+        eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_MEID);
+        return std::u16string();
+    }
+    return inner->meid_;
 }
 
 void NetworkSearchManager::SetLocateUpdate(int32_t slotId)
@@ -900,10 +901,14 @@ std::u16string NetworkSearchManager::GetUniqueDeviceId(int32_t slotId)
 {
     TELEPHONY_LOGI("NetworkSearchManager::GetUniqueDeviceId start slotId:%{public}d", slotId);
     auto inner = FindManagerInner(slotId);
-    if (inner != nullptr) {
+    if (inner == nullptr) {
+        return std::u16string();
+    }
+    if (GetPhoneType(slotId) == PhoneType::PHONE_TYPE_IS_GSM) {
         if (!inner->imei_.empty()) {
             return inner->imei_;
         }
+    } else {
         if (!inner->meid_.empty()) {
             return inner->meid_;
         }
