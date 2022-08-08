@@ -75,11 +75,11 @@ void SimSmsController::ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &ev
 
 void SimSmsController::ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    result_ = true;
+    responseReady_ = true;
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (responseInfo != nullptr) {
         TELEPHONY_LOGE("SimSmsController::ProcessUpdateDone error %{public}d", responseInfo->error);
-        result_ = (responseInfo->error == HRilErrType::NONE);
+        responseReady_ = (responseInfo->error == HRilErrType::NONE);
     }
     TELEPHONY_LOGI("SimSmsController::ProcessUpdateDone: end");
     processWait_.notify_all();
@@ -87,11 +87,11 @@ void SimSmsController::ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &
 
 void SimSmsController::ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    result_ = true;
+    responseReady_ = true;
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (responseInfo != nullptr) {
         TELEPHONY_LOGE("SimSmsController::ProcessWriteDone error %{public}d", responseInfo->error);
-        result_ = (responseInfo->error == HRilErrType::NONE);
+        responseReady_ = (responseInfo->error == HRilErrType::NONE);
     }
     TELEPHONY_LOGI("SimSmsController::ProcessWriteDone: end");
     processWait_.notify_all();
@@ -99,11 +99,11 @@ void SimSmsController::ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &e
 
 void SimSmsController::ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    result_ = true;
+    responseReady_ = true;
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (responseInfo != nullptr) {
         TELEPHONY_LOGE("SimSmsController::ProcessDeleteDone error %{public}d", responseInfo->error);
-        result_ = (responseInfo->error == HRilErrType::NONE);
+        responseReady_ = (responseInfo->error == HRilErrType::NONE);
     }
     TELEPHONY_LOGI("SimSmsController::ProcessDeleteDone: end");
     processWait_.notify_all();
@@ -112,49 +112,55 @@ void SimSmsController::ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &
 bool SimSmsController::UpdateSmsIcc(int index, int status, std::string &pduData, std::string &smsc)
 {
     std::unique_lock<std::mutex> lock(mtx_);
-    result_ = false;
     bool isCDMA = IsCdmaCardType();
     TELEPHONY_LOGI("UpdateSmsIcc start: %{public}d, %{public}d", index, isCDMA);
     if (!isCDMA) {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_UPDATE_COMPLETED);
         SimMessageParam param {index, status, smsc, pduData};
         telRilManager_->UpdateSimMessage(slotId_, param, response);
-        processWait_.wait(lock);
     } else {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_UPDATE_COMPLETED);
         CdmaSimMessageParam param {index, status, pduData};
         telRilManager_->UpdateCdmaSimMessage(slotId_, param, response);
-        processWait_.wait(lock);
     }
-    TELEPHONY_LOGI("SimSmsController::UpdateSmsIcc OK return %{public}d", result_);
-    return result_;
+    responseReady_ = false;
+    while (!responseReady_) {
+        TELEPHONY_LOGI("UpdateSmsIcc::wait(), response = false");
+        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
+    TELEPHONY_LOGI("SimSmsController::UpdateSmsIcc OK return %{public}d", responseReady_);
+    return responseReady_;
 }
 
 bool SimSmsController::DelSmsIcc(int index)
 {
     std::unique_lock<std::mutex> lock(mtx_);
-    result_ = false;
     bool isCDMA = IsCdmaCardType();
     TELEPHONY_LOGI("DelSmsIcc start: %{public}d, %{public}d", index, isCDMA);
     if (!isCDMA) {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_DELETE_COMPLETED);
         telRilManager_->DelSimMessage(slotId_, index, response);
-        processWait_.wait(lock);
-        TELEPHONY_LOGI("SimSmsController::DelSmsIcc OK return %{public}d", result_);
-        return result_;
+        TELEPHONY_LOGI("SimSmsController::DelSmsIcc OK return %{public}d", responseReady_);
     } else {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_DELETE_COMPLETED);
         telRilManager_->DelCdmaSimMessage(slotId_, index, response);
-        processWait_.wait(lock);
-        TELEPHONY_LOGI("SimSmsController::DelCdmaSimMessage OK return %{public}d", result_);
-        return result_;
+        TELEPHONY_LOGI("SimSmsController::DelCdmaSimMessage OK return %{public}d", responseReady_);
     }
+    responseReady_ = false;
+    while (!responseReady_) {
+        TELEPHONY_LOGI("DelSmsIcc::wait(), response = false");
+        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
+    return responseReady_;
 }
 
 bool SimSmsController::AddSmsToIcc(int status, std::string &pdu, std::string &smsc)
 {
     std::unique_lock<std::mutex> lock(mtx_);
-    result_ = false;
     bool isCDMA = IsCdmaCardType();
     TELEPHONY_LOGI("AddSmsToIcc start: %{public}d, %{public}d", status, isCDMA);
     if (!isCDMA) {
@@ -165,9 +171,15 @@ bool SimSmsController::AddSmsToIcc(int status, std::string &pdu, std::string &sm
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_WRITE_COMPLETED);
         telRilManager_->AddCdmaSimMessage(slotId_, status, pdu, response);
     }
-    processWait_.wait(lock);
-    TELEPHONY_LOGI("SimSmsController::AddSmsToIcc OK return %{public}d", result_);
-    return result_;
+    responseReady_ = false;
+    while (!responseReady_) {
+        TELEPHONY_LOGI("AddSmsToIcc::wait(), response = false");
+        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
+    TELEPHONY_LOGI("SimSmsController::AddSmsToIcc OK return %{public}d", responseReady_);
+    return responseReady_;
 }
 
 void SimSmsController::Init(int slodId)
