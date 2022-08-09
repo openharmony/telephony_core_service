@@ -157,8 +157,8 @@ void DeviceStateHandler::SetNotificationFilter(int32_t newFilter, bool force)
     }
     std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
     if (telRilManager != nullptr) {
-        TELEPHONY_LOGI("DeviceStateHandler::SetNotificationFilter old filter:%{public}d, new filter:%{public}d",
-            notificationFilter_, newFilter);
+        TELEPHONY_LOGI("DeviceStateHandler::SetNotificationFilter old filter:%{public}d, new filter:%{public}d,"
+            " slotId_:%{public}d", notificationFilter_, newFilter, slotId_);
         telRilManager->SetNotificationFilter(slotId_, newFilter, event);
         notificationFilter_ = newFilter;
     }
@@ -173,8 +173,8 @@ void DeviceStateHandler::SetDeviceState(int32_t deviceStateType, bool deviceStat
     }
     std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
     if (telRilManager != nullptr) {
-        TELEPHONY_LOGI("DeviceStateHandler::SetDeviceState type:%{public}d state:%{public}d",
-            deviceStateType, deviceStateOn);
+        TELEPHONY_LOGI("DeviceStateHandler::SetDeviceState type:%{public}d state:%{public}d, slotId_:%{public}d",
+            deviceStateType, deviceStateOn, slotId_);
         telRilManager->SetDeviceState(slotId_, deviceStateType, deviceStateOn, event);
     }
 }
