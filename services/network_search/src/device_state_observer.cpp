@@ -15,9 +15,11 @@
 
 #include "device_state_observer.h"
 
-#include "telephony_log_wrapper.h"
+#include "battery_srv_client.h"
 #include "iservice_registry.h"
+#include "power_mgr_client.h"
 #include "system_ability_definition.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -47,7 +49,11 @@ void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceState
         return;
     }
     int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
-    TELEPHONY_LOGI("StartEventSubscriber SubscribeSystemAbility result:%{public}d", ret);
+    TELEPHONY_LOGI("StartEventSubscriber SubscribeSystemAbility COMMON_EVENT_SERVICE_ID result:%{public}d", ret);
+    ret = samgrProxy->SubscribeSystemAbility(POWER_MANAGER_SERVICE_ID, statusChangeListener_);
+    TELEPHONY_LOGI("StartEventSubscriber SubscribeSystemAbility POWER_MANAGER_SERVICE_ID result:%{public}d", ret);
+    ret = samgrProxy->SubscribeSystemAbility(POWER_MANAGER_BATT_SERVICE_ID, statusChangeListener_);
+    TELEPHONY_LOGI("StartEventSubscriber SubscribeSystemAbility POWER_MANAGER_BATT_SERVICE_ID result:%{public}d", ret);
 }
 
 void DeviceStateObserver::StopEventSubscriber()
@@ -110,6 +116,11 @@ void DeviceStateEventSubscriber::SetEventHandler(const std::shared_ptr<DeviceSta
     deviceStateHandler_ = deviceStateHandler;
 }
 
+std::shared_ptr<DeviceStateHandler> DeviceStateEventSubscriber::GetEventHandler()
+{
+    return deviceStateHandler_;
+}
+
 DeviceStateEventIntValue DeviceStateEventSubscriber::GetDeviceStateEventIntValue(std::string &event) const
 {
     auto iter = deviceStateEventMapIntValues_.find(event);
@@ -142,16 +153,46 @@ DeviceStateObserver::SystemAbilityStatusChangeListener::SystemAbilityStatusChang
 void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
     int32_t systemAbilityId, const std::string& deviceId)
 {
-    if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
-        TELEPHONY_LOGE("systemAbilityId is not COMMON_EVENT_SERVICE_ID");
-        return;
-    }
     if (sub_ == nullptr) {
-        TELEPHONY_LOGE("OnAddSystemAbility COMMON_EVENT_SERVICE_ID sub_ is nullptr");
+        TELEPHONY_LOGE("OnAddSystemAbility sub_ is nullptr");
         return;
     }
-    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(sub_);
-    TELEPHONY_LOGI("DeviceStateObserver::OnAddSystemAbility subscribeResult = %{public}d", subscribeResult);
+    switch (systemAbilityId) {
+        case POWER_MANAGER_SERVICE_ID: {
+            TELEPHONY_LOGI("DeviceStateObserver systemAbilityId is POWER_MANAGER_SERVICE_ID");
+            if (sub_->GetEventHandler() == nullptr) {
+                TELEPHONY_LOGE("DeviceStateObserver OnAddSystemAbility eventHandler is nullptr");
+                return;
+            }
+            auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
+            sub_->GetEventHandler()->ProcessScreenDisplay(powerMgrClient.IsScreenOn());
+            auto powerSaveMode = powerMgrClient.GetDeviceMode();
+            sub_->GetEventHandler()->ProcessPowerSaveMode(
+                powerSaveMode == PowerMgr::PowerMgrClient::POWER_SAVE_MODE ||
+                powerSaveMode == PowerMgr::PowerMgrClient::EXTREME_POWER_SAVE_MODE);
+            break;
+        }
+        case POWER_MANAGER_BATT_SERVICE_ID: {
+            TELEPHONY_LOGI("DeviceStateObserver systemAbilityId is POWER_MANAGER_BATT_SERVICE_ID");
+            if (sub_->GetEventHandler() == nullptr) {
+                TELEPHONY_LOGE("DeviceStateObserver OnAddSystemAbility eventHandler is nullptr");
+                return;
+            }
+            auto &batterySrvClient = PowerMgr::BatterySrvClient::GetInstance();
+            auto chargingStatus = batterySrvClient.GetChargingStatus();
+            sub_->GetEventHandler()->ProcessChargingState(
+                chargingStatus == PowerMgr::BatteryChargeState::CHARGE_STATE_ENABLE);
+            break;
+        }
+        case COMMON_EVENT_SERVICE_ID: {
+            bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(sub_);
+            TELEPHONY_LOGI("DeviceStateObserver::OnAddSystemAbility subscribeResult = %{public}d", subscribeResult);
+            break;
+        }
+        default:
+            TELEPHONY_LOGE("systemAbilityId is invalid");
+            break;
+    }
 }
 
 void DeviceStateObserver::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
@@ -162,7 +203,7 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnRemoveSystemAbili
         return;
     }
     if (sub_ == nullptr) {
-        TELEPHONY_LOGE("OnRemoveSystemAbility COMMON_EVENT_SERVICE_ID opName_ is nullptr");
+        TELEPHONY_LOGE("DeviceStateObserver::OnRemoveSystemAbility sub_ is nullptr");
         return;
     }
     bool subscribeResult = CommonEventManager::UnSubscribeCommonEvent(sub_);

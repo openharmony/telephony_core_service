@@ -55,6 +55,7 @@ public:
     ~DeviceStateEventSubscriber() = default;
     void OnReceiveEvent(const CommonEventData &data) override;
     void SetEventHandler(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler);
+    std::shared_ptr<DeviceStateHandler> GetEventHandler();
     void InitEventMap();
 
 private:
