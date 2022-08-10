@@ -907,8 +907,8 @@ int32_t TelRilSim::GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result)
 int32_t TelRilSim::GetSimIO(SimIoRequestInfo simIoInfo, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_GET_SIM_IO, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
@@ -949,8 +949,8 @@ int32_t TelRilSim::GetImsi(const AppExecFwk::InnerEvent::Pointer &result)
 int32_t TelRilSim::GetSimLockStatus(std::string fac, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_GET_SIM_LOCK_STATUS, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     const int32_t MODE = 2;
@@ -975,8 +975,8 @@ int32_t TelRilSim::SetSimLock(
     std::string fac, int32_t mode, std::string passwd, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_SET_SIM_LOCK, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
@@ -1000,8 +1000,8 @@ int32_t TelRilSim::ChangeSimPassword(std::string fac, std::string oldPassword, s
     int32_t passwordLength, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_CHANGE_SIM_PASSWORD, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
@@ -1024,8 +1024,8 @@ int32_t TelRilSim::ChangeSimPassword(std::string fac, std::string oldPassword, s
 int32_t TelRilSim::UnlockPin(std::string pin, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_UNLOCK_PIN, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
@@ -1043,8 +1043,8 @@ int32_t TelRilSim::UnlockPin(std::string pin, const AppExecFwk::InnerEvent::Poin
 int32_t TelRilSim::UnlockPuk(std::string puk, std::string pin, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_UNLOCK_PUK, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
@@ -1063,8 +1063,8 @@ int32_t TelRilSim::UnlockPuk(std::string puk, std::string pin, const AppExecFwk:
 int32_t TelRilSim::UnlockPin2(std::string pin2, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_UNLOCK_PIN2, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
@@ -1082,8 +1082,8 @@ int32_t TelRilSim::UnlockPin2(std::string pin2, const AppExecFwk::InnerEvent::Po
 int32_t TelRilSim::UnlockPuk2(std::string puk2, std::string pin2, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_UNLOCK_PUK2, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
@@ -1102,8 +1102,8 @@ int32_t TelRilSim::UnlockPuk2(std::string puk2, std::string pin2, const AppExecF
 int32_t TelRilSim::SetActiveSim(int32_t index, int32_t enable, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_SET_ACTIVE_SIM, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
@@ -1168,8 +1168,8 @@ int32_t TelRilSim::SimStkSendTerminalResponse(
     const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_STK_SEND_TERMINAL_RESPONSE, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
@@ -1187,8 +1187,8 @@ int32_t TelRilSim::SimStkSendTerminalResponse(
 int32_t TelRilSim::SimStkSendEnvelope(const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_STK_SEND_ENVELOPE, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
@@ -1221,8 +1221,8 @@ int32_t TelRilSim::SetRadioProtocol(
     SimProtocolRequest simProtocolData, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_RADIO_PROTOCOL, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
@@ -1245,8 +1245,8 @@ int32_t TelRilSim::SimOpenLogicalChannel(
     std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_OPEN_LOGICAL_CHANNEL, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
@@ -1265,8 +1265,8 @@ int32_t TelRilSim::SimOpenLogicalChannel(
 int32_t TelRilSim::SimCloseLogicalChannel(int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_CLOSE_LOGICAL_CHANNEL, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
@@ -1355,8 +1355,8 @@ int32_t TelRilSim::UnlockSimLock(
     int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_UNLOCK_SIM_LOCK, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
