@@ -94,6 +94,10 @@ int32_t TelRilSms::SendGsmSms(std::string &smsPdu, std::string &pdu, const AppEx
         TELEPHONY_LOGE("telRilRequest is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("cellularRadio_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
     MessageParcel data;
     data.WriteInt32(slotId_);
@@ -115,6 +119,10 @@ int32_t TelRilSms::SendCdmaSms(std::string pdu, const AppExecFwk::InnerEvent::Po
         TELEPHONY_LOGE("telRilRequest is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("cellularRadio_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
     SendCdmaSmsMessageInfo mCdmaSmsMessageInfo = {};
     MessageParcel data;
@@ -134,8 +142,8 @@ int32_t TelRilSms::AddSimMessage(
     int32_t status, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SMS_ADD_SIM_MESSAGE, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
@@ -156,12 +164,11 @@ int32_t TelRilSms::AddSimMessage(
 int32_t TelRilSms::DelSimMessage(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SMS_DEL_SIM_MESSAGE, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
-
     MessageParcel data;
     data.WriteInt32(slotId_);
     data.WriteInt32(telRilRequest->serialId_);
@@ -178,8 +185,8 @@ int32_t TelRilSms::UpdateSimMessage(int32_t gsmIndex, int32_t state, std::string
     const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SMS_UPDATE_SIM_MESSAGE, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
@@ -201,8 +208,8 @@ int32_t TelRilSms::UpdateSimMessage(int32_t gsmIndex, int32_t state, std::string
 int32_t TelRilSms::SetSmscAddr(int32_t tosca, std::string address, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SMS_SET_SMSC_ADDR, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
@@ -224,12 +231,11 @@ int32_t TelRilSms::SetSmscAddr(int32_t tosca, std::string address, const AppExec
 int32_t TelRilSms::GetSmscAddr(const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SMS_GET_SMSC_ADDR, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
-
     MessageParcel data;
     data.WriteInt32(slotId_);
     data.WriteInt32(telRilRequest->serialId_);
@@ -245,12 +251,11 @@ int32_t TelRilSms::GetSmscAddr(const AppExecFwk::InnerEvent::Pointer &response)
 int32_t TelRilSms::GetCdmaCBConfig(const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SMS_GET_CDMA_CB_CONFIG, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
-
     MessageParcel data;
     data.WriteInt32(slotId_);
     data.WriteInt32(telRilRequest->serialId_);
@@ -267,8 +272,8 @@ int32_t TelRilSms::SendSmsMoreMode(
     std::string &smscPdu, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SMS_SEND_SMS_MORE_MODE, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     // Do not log function arg for privacy
@@ -292,8 +297,8 @@ int32_t TelRilSms::SendSmsMoreMode(
 int32_t TelRilSms::SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SMS_SEND_SMS_ACK, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel wData;
@@ -317,8 +322,8 @@ int32_t TelRilSms::SetCBConfig(
     int32_t mode, std::string idList, std::string dcsList, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SMS_SET_CB_CONFIG, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     // Do not log function arg for privacy
@@ -346,8 +351,8 @@ int32_t TelRilSms::SetCdmaCBConfig(
     CdmaCBConfigInfoList &cdmaCBConfigInfoList, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SMS_SET_CDMA_CB_CONFIG, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     // Do not log function arg for privacy
@@ -373,13 +378,11 @@ int32_t TelRilSms::GetCBConfig(const AppExecFwk::InnerEvent::Pointer &result)
         TELEPHONY_LOGE("telRilRequest is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-
     if (cellularRadio_ == nullptr) {
         TELEPHONY_LOGE("%{public}s  cellularRadio_ == nullptr", __func__);
         ErrorResponse(telRilRequest->serialId_, HRilErrType::HRIL_ERR_INVALID_RESPONSE);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-
     TELEPHONY_LOGI("HREQ_SMS_GET_CB_CONFIG:%{public}d", telRilRequest->serialId_);
     SendInt32Event(HREQ_SMS_GET_CB_CONFIG, telRilRequest->serialId_);
     return TELEPHONY_ERR_SUCCESS;
@@ -388,11 +391,10 @@ int32_t TelRilSms::GetCBConfig(const AppExecFwk::InnerEvent::Pointer &result)
 int32_t TelRilSms::AddCdmaSimMessage(int32_t status, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SMS_ADD_CDMA_SIM_MESSAGE, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-
     TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
     MessageParcel data;
     data.WriteInt32(slotId_);
@@ -414,8 +416,8 @@ int32_t TelRilSms::AddCdmaSimMessage(int32_t status, std::string &pdu, const App
 int32_t TelRilSms::DelCdmaSimMessage(int32_t cdmaIndex, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SMS_DEL_CDMA_SIM_MESSAGE, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
@@ -431,7 +433,6 @@ int32_t TelRilSms::DelCdmaSimMessage(int32_t cdmaIndex, const AppExecFwk::InnerE
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -439,8 +440,8 @@ int32_t TelRilSms::UpdateCdmaSimMessage(
     int32_t cdmaIndex, int32_t state, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SMS_UPDATE_CDMA_SIM_MESSAGE, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
