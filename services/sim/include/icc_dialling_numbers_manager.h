@@ -55,7 +55,6 @@ protected:
     std::shared_ptr<IccDiallingNumbersCache> diallingNumbersCache_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopDiallingNumbers_ = nullptr;
     HandleRunningState stateDiallingNumbers_ = HandleRunningState::STATE_NOT_START;
-    bool result_ = false;
 
 private:
     std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
@@ -63,6 +62,7 @@ private:
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbersList_;
     std::mutex mtx_;
     bool hasEventDone_ = false;
+    constexpr static const int32_t WAIT_TIME_SECOND = 1;
     std::condition_variable processWait_;
     void ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event);
