@@ -245,6 +245,10 @@ void SimFile::LoadSimFiles()
     AppExecFwk::InnerEvent::Pointer eventMBI = BuildCallerInfo(MSG_SIM_OBTAIN_MBI_DONE);
     fileController_->ObtainLinearFixedFile(ELEMENTARY_FILE_MBI, 1, eventMBI);
     fileToGet_++;
+
+    AppExecFwk::InnerEvent::Pointer eventAD = BuildCallerInfo(MSG_SIM_OBTAIN_AD_DONE);
+    fileController_->ObtainBinaryFile(ELEMENTARY_FILE_AD, eventAD);
+    fileToGet_++;
 }
 
 void SimFile::ObtainSpnPhase(bool start, const AppExecFwk::InnerEvent::Pointer &event)
@@ -837,6 +841,7 @@ void SimFile::CheckMncLength()
     int sz = (int)imsi.size();
     bool cond = sz >= lenNum;
     if ((!imsi.empty()) && (lengthOfMnc_ != UNKNOWN_MNC) && cond) {
+        operatorNumeric_ = imsi.substr(0, lenNum);
     }
 }
 
