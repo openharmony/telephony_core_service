@@ -40,8 +40,10 @@ const int32_t P3 = 15;
 const int32_t COMMAND = 192;
 const int32_t FILEID = 20272;
 const int32_t AUTHTYPE_1 = 0;
+#ifndef TEL_TEST_UNSUPPORT
 const int32_t SLOT_ID_0 = 0;
 const int32_t SLOT_ID_1 = 1;
+#endif // TEL_TEST_UNSUPPORT
 
 // send "test"
 const std::string TEST_PDU = "A10305810180F6000004F4F29C0E";
