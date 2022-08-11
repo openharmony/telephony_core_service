@@ -141,7 +141,9 @@ bool TelRilManager::ConnectRilAdapterService()
 {
     std::lock_guard<std::mutex> lock_l(mutex_);
     rilAdapterRemoteObj_ = nullptr;
-    telRilCallback_ = this;
+    if (telRilCallback_ == nullptr) {
+        telRilCallback_ = this;
+    }
     servMgr_ = OHOS::HDI::ServiceManager::V1_0::IServiceManager::Get();
     if (servMgr_ == nullptr) {
         TELEPHONY_LOGI("Get service manager error!");
@@ -998,10 +1000,7 @@ bool TelRilManager::DisConnectRilAdapterService()
             "disconnected!");
         return true;
     }
-    rilAdapterRemoteObj_.clear();
     rilAdapterRemoteObj_ = nullptr;
-    telRilCallback_.clear();
-    telRilCallback_ = nullptr;
     if (!ResetRemoteObject()) {
         TELEPHONY_LOGE("TelRilManager::DisconnectRilAdapterService, Reset remote object failed!");
         return false;
