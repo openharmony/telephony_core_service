@@ -44,6 +44,7 @@ private:
     inline static const int MODE_SLOT_0 = 11;
     inline static const int MODE_SLOT_1 = 12;
     inline static const int SUCCESS = 0;
+    inline static const int MAX_BYTE_LEN = 10 * 1024 * 1024;
 };
 } // namespace Telephony
 } // namespace OHOS
