@@ -1439,7 +1439,7 @@ static void NativeSendUpdateCellLocationRequest(napi_env env, void *data)
 {
     auto asyncContext = static_cast<SendUpdateCellLocationRequest *>(data);
     asyncContext->sendRequest =
-        DelayedRefSingleton<CoreServiceClient>::GetInstance().SendUpdateCellLocationRequest(SIM_SLOT_0);
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().SendUpdateCellLocationRequest(asyncContext->slotId);
     TELEPHONY_LOGI("asyncContext->sendRequest = %{public}d", asyncContext->sendRequest);
     asyncContext->resolved = true;
     TELEPHONY_LOGI("NativeSendUpdateCellLocationRequest end");
@@ -1461,15 +1461,27 @@ static void SendUpdateCellLocationRequestCallback(napi_env env, napi_status stat
 
 static napi_value SendUpdateCellLocationRequest(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 1;
-    napi_value parameters[1] = {0};
+    size_t parameterCount = 2;
+    napi_value parameters[2] = { 0 };
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchSwitchRadioParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<SwitchRadioContext>();
-    if (parameterCount == 1) {
-        NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+    if (parameterCount == 0) {
+        asyncContext->slotId = GetDefaultSlotId();
+    } else if (parameterCount == 1) {
+        napi_valuetype valueType = napi_undefined;
+        NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
+        if (valueType == napi_number) {
+            NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+        } else if (valueType == napi_function) {
+            asyncContext->slotId = GetDefaultSlotId();
+            NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+        }
+    } else if (parameterCount == 2) {
+        NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+        NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "SendUpdateCellLocationRequest",
         NativeSendUpdateCellLocationRequest, SendUpdateCellLocationRequestCallback);
