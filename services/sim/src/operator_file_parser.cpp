@@ -110,7 +110,7 @@ bool OperatorFileParser::ParseOperatorConfigFromFile(OperatorConfig &opc, const 
     }
     const int contentLength = strlen(content);
     const std::string rawJson(content);
-    delete content;
+    free(content);
     content = nullptr;
     JSONCPP_STRING err;
     Json::CharReaderBuilder builder;
@@ -181,15 +181,22 @@ bool OperatorFileParser::LoaderJsonFile(char *&content, const std::string &path)
         return false;
     }
     ifs.seekg(0, std::ios::end);
-    uint64_t len = ifs.tellg();
-    if (len == 0 || len > ULONG_MAX) {
-        TELEPHONY_LOGE("LoaderJsonFile len <= 0 or len > LONG_MAX!");
+    uint64_t len = static_cast<uint64_t>(ifs.tellg());
+    if (len == 0 || len > MAX_BYTE_LEN) {
+        TELEPHONY_LOGE("LoaderJsonFile len <= 0 or len > MAX_BYTE_LEN!");
         ifs.close();
         return false;
     }
-    content = static_cast<char *>(malloc(len));
+    content = static_cast<char *>(malloc(len + 1));
     if (content == nullptr) {
         TELEPHONY_LOGE("LoaderJsonFile malloc content fail!");
+        ifs.close();
+        return false;
+    }
+    if (memset_s(content, len + 1, 0, len + 1) != EOK) {
+        TELEPHONY_LOGE("LoaderJsonFile memset_s failed");
+        free(content);
+        content = nullptr;
         ifs.close();
         return false;
     }
