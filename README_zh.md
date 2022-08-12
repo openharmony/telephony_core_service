@@ -27,32 +27,34 @@
 上图示中核心服务关联的业务服务包括SIM卡服务、搜网服务、RIL通信管理。
 
 -   SIM卡服务：主要是SIM卡初始化，文件读写，加载状态通知，单双卡控制，包括SIM卡状态查询、SIM卡管理、SIM卡控制、STK、联系人存储、短信存储。
--   搜网服务：主要是网络注册，网络状态获取，包括网络注册、网络模式查询、Radio状态查询、搜网管理、信号强度查询、小区管理、驻网管理、时间时区更新。
+-   搜网服务：主要是网络注册，网络状态获取，包括网络注册、网络模式查询、IMS网络状态上报、Radio状态查询、搜网管理、信号强度查询、小区管理、驻网管理、时间时区更新。
 -   RIL管理：提供主动回调服务，查询结果回调服务等。
 
 ## 目录<a name="section129mcpsimp"></a>
 
 ```sh
 /base/telphony/core_service
-├── figures                # Readme资源文件
-├── frameworks             # 框架层目录
+├── figures                       # Readme资源文件
+├── frameworks                    # 框架层目录
 │   ├── js
 │   └── native
-├── interfaces             # 接口目录
-│   ├── innerkits          # 部件间的内部接口
-│   └── kits               # 对应用提供的接口（例如JS接口）
-├── sa_profile             # 核心服务的启动文件目录
-├── services               # 核心服务实现代码目录
-│   ├── etc                # 核心服务的驱动脚本目录
+├── interfaces                    # 接口目录
+│   ├── innerkits                 # 部件间的内部接口
+|   |    ├── ims                  # IMS网络状态上报接口
+│   └── kits                      # 对应用提供的接口（例如JS接口）
+├── sa_profile                    # 核心服务的启动文件目录
+├── services                      # 核心服务实现代码目录
+│   ├── etc                       # 核心服务的驱动脚本目录
+|   ├── ims_service_interaction   # IMS网络状态上报实现代码目录
 │   ├── include
-│   ├── network_search     # 搜网服务代码目录
-│   ├── sim                # SIM卡服务代码目录
+│   ├── network_search            # 搜网服务代码目录
+│   ├── sim                       # SIM卡服务代码目录
 │   ├── src
-│   └── tel_ril            # 核心服务与RIL Adapter通信代码目录
-├── test                   # 单元测试相关代码
+│   └── tel_ril                   # 核心服务与RIL Adapter通信代码目录
+├── test                          # 单元测试相关代码
 │   └── unittest
 └── utils
-    ├── common             # 核心服务日志打印目录
+    ├── common                    # 核心服务日志打印目录
     ├── log
     └── preferences
 ```
@@ -107,15 +109,18 @@
 | function turnOffRadio(callback: AsyncCallback\<void>): void; | 关闭主卡Radio                 | ohos.permission.SET_TELEPHONY_STATE |
 | function turnOffRadio(slotId: number, callback: AsyncCallback\<void>): void; | 关闭指定卡槽位的Radio         | ohos.permission.SET_TELEPHONY_STATE |
 | function getOperatorName(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽的运营商名称      | 无                                  |
-| function setPreferredNetwork(slotId: number, networkMode: PreferredNetworkMode, callback: AsyncCallback\<void>): void; | 设置指定卡槽的优选网络模式    | 无                                  |
-| function getPreferredNetwork(slotId: number, callback: AsyncCallback\<PreferredNetworkMode>): void; | 获取指定卡槽的优选网络模式    | 无                                  |
+| function setPreferredNetwork(slotId: number, networkMode: PreferredNetworkMode, callback: AsyncCallback\<void>): void; | 设置指定卡槽的优选网络模式    | ohos.permission.SET_TELEPHONY_STATE |
+| function getPreferredNetwork(slotId: number, callback: AsyncCallback\<PreferredNetworkMode>): void; | 获取指定卡槽的优选网络模式    | ohos.permission.GET_TELEPHONY_STATE |
 | function getCellInformation(slotId: number, callback: AsyncCallback<Array\<CellInformation>>) | 获取小区信息列表              | ohos.permission.LOCATION            |
-| function sendUpdateCellLocationRequest(callback: AsyncCallback\<void>) | 请求小区位置                  | ohos.permission.LOCATION            |
+| function sendUpdateCellLocationRequest(slotId: number, callback: AsyncCallback\<void>) | 请求小区位置                  | 无            |
 | function getIMEI(slotId: number, callback: AsyncCallback\<string>) | 获取Imei                      | ohos.permission.GET_TELEPHONY_STATE |
 | function getMEID(slotId: number, callback: AsyncCallback\<string>） | 获取Meid                      | ohos.permission.GET_TELEPHONY_STATE |
 | function getUniqueDeviceId(slotId: number, callback: AsyncCallback\<string>） | 获取设备唯一标识码            | ohos.permission.GET_TELEPHONY_STATE |
-| function getNrOptionMode(slotId: number, callback: AsyncCallback\<NrOptionMode>） | 获取5G模式                    | ohos.permission.GET_TELEPHONY_STATE |
+| function getNrOptionMode(slotId: number, callback: AsyncCallback\<NrOptionMode>） | 获取5G模式                    | 无 |
 | function isNrSupported: boolean;                             | 是否支持5g网络                | 无                                  |
+| function getImsRegInfo(slotId: number, imsType: ImsServiceType, callback: AsyncCallback\<ImsRegInfo>): void; | 获取IMS注册测状态信息  | ohos.permission.GET_TELEPHONY_STATE  |
+| function on(type: 'imsRegStateChange', slotId: number, imsType: ImsServiceType, callback: Callback\<ImsRegInfo>): void; | 注册IMS网络状态变化回调  | ohos.permission.GET_TELEPHONY_STATE  |
+| function off(type: 'imsRegStateChange', slotId: number, imsType: ImsServiceType, callback?: Callback\<ImsRegInfo>): void; | 反注册IMS网络状态变化回调   | ohos.permission.GET_TELEPHONY_STATE  |
 
 
 完整的JS API说明以及实例代码请参考：[网络搜索](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/js-reference/apis/js-apis-radio.md)。

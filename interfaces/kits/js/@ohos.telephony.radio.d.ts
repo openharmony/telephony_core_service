@@ -76,7 +76,8 @@ declare namespace radio {
    * @since 8
    */
   function sendUpdateCellLocationRequest(callback: AsyncCallback<void>): void;
-  function sendUpdateCellLocationRequest(): Promise<void>;
+  function sendUpdateCellLocationRequest(slotId: number, callback: AsyncCallback<void>): void;
+  function sendUpdateCellLocationRequest(slotId?: number): Promise<void>;
 
   /**
    * @permission ohos.permission.LOCATION
