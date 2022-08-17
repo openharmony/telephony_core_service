@@ -92,6 +92,8 @@ public:
     int32_t SetCallRestriction(int32_t slotId, int32_t eventId, const CallRestrictionParam &callRestriction,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     /* PDP start */
+    int32_t SetDataPermitted(int32_t slotId, int32_t eventId, int32_t ataPermitted,
+        const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t SetInitApnInfo(int32_t slotId, int32_t eventId, const DataProfile &dataProfile,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t ActivatePdpContext(int32_t slotId, int32_t eventId, const ActivateDataParam &activateData,
