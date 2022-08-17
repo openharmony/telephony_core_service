@@ -15,6 +15,7 @@
 
 #include "tel_ril_data.h"
 
+#include "core_service_hisysevent.h"
 #include "hril_modem_parcel.h"
 #include "hril_notification.h"
 #include "hril_request.h"
@@ -92,6 +93,9 @@ int32_t TelRilData::DeactivatePdpContext(int32_t cid, int32_t reason, const AppE
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, response);
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("telRilRequest is nullptr");
+        CoreServiceHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_OFF,
+            CellularDataErrorCode::DATA_ERROR_PDP_DEACTIVATE_FAIL,
+            "Create HREQ_DATA_DEACTIVATE_PDP_CONTEXT request fail");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
@@ -102,6 +106,8 @@ int32_t TelRilData::DeactivatePdpContext(int32_t cid, int32_t reason, const AppE
     int32_t ret = SendBufferEvent(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, uniInfo);
     if (ret != 0) {
         TELEPHONY_LOGE("Send HREQ_DATA_DEACTIVATE_PDP_CONTEXT return: %{public}d", ret);
+        CoreServiceHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_OFF,
+            CellularDataErrorCode::DATA_ERROR_PDP_DEACTIVATE_FAIL, "Send HREQ_DATA_DEACTIVATE_PDP_CONTEXT event fail");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return TELEPHONY_ERR_SUCCESS;
@@ -122,6 +128,8 @@ int32_t TelRilData::ActivatePdpContext(int32_t radioTechnology, DataProfile data
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_DATA_ACTIVATE_PDP_CONTEXT, response);
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("telRilRequest is nullptr");
+        CoreServiceHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
+            CellularDataErrorCode::DATA_ERROR_PDP_ACTIVATE_FAIL, "Create HREQ_DATA_ACTIVATE_PDP_CONTEXT request fail");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     DataCallInfo dataCallInfo;
@@ -133,6 +141,8 @@ int32_t TelRilData::ActivatePdpContext(int32_t radioTechnology, DataProfile data
     int32_t ret = SendBufferEvent(HREQ_DATA_ACTIVATE_PDP_CONTEXT, dataCallInfo);
     if (ret != 0) {
         TELEPHONY_LOGE("Send HREQ_DATA_ACTIVATE_PDP_CONTEXT return: %{public}d", ret);
+        CoreServiceHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
+            CellularDataErrorCode::DATA_ERROR_PDP_ACTIVATE_FAIL, "Send HREQ_DATA_ACTIVATE_PDP_CONTEXT event fail");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return TELEPHONY_ERR_SUCCESS;
