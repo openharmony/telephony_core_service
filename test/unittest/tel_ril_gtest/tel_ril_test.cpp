@@ -174,6 +174,7 @@ void TelRilTest::InitData()
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_GET_LINK_BANDWIDTH_INFO] = &TelRilTest::GetLinkBandwidthInfoTest;
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE] =
         &TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST] = &TelRilTest::SetDataPermittedTest;
 }
 
 void TelRilTest::InitSim()
@@ -1356,6 +1357,20 @@ void TelRilTest::GetDataCallListTest(int32_t slotId, const std::shared_ptr<AppEx
     }
 }
 
+void TelRilTest::SetDataPermittedTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::SetDataPermittedTest -->");
+        telRilManager_->SetDataPermitted(slotId, true, event);
+        TELEPHONY_LOGI("TelRilTest::SetDataPermittedTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
 /**
  * @brief Search for carrier information
  *
@@ -2323,6 +2338,16 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetLinkBandwidthReportingRuleTest_0201, Fu
 {
     ProcessTest(
         static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE), SLOT_ID_1, GetHandler());
+}
+
+/**
+ * @tc.number Telephony_TelRil_SetDataPermittedTest_0101 to do ...
+ * @tc.name Set data permitted to modem
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SetDataPermittedTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST), GetHandler());
 }
 
 /**

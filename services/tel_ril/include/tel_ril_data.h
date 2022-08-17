@@ -44,6 +44,8 @@ public:
     int32_t SetLinkBandwidthReportingRule(
         LinkBandwidthRule linkBandwidth, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetLinkBandwidthReportingRuleResponse(MessageParcel &data);
+    int32_t SetDataPermitted(const int32_t dataPermitted, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetDataPermittedResponse(MessageParcel &data);
 
 private:
     bool IsDataResponse(uint32_t code);

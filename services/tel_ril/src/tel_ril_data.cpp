@@ -33,6 +33,7 @@ void TelRilData::AddHandlerToMap()
     memberFuncMap_[HREQ_DATA_GET_PDP_CONTEXT_LIST] = &TelRilData::GetPdpContextListResponse;
     memberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &TelRilData::GetLinkBandwidthInfoResponse;
     memberFuncMap_[HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE] = &TelRilData::SetLinkBandwidthReportingRuleResponse;
+    memberFuncMap_[HREQ_DATA_SET_DATA_PERMITTED] = &TelRilData::SetDataPermittedResponse;
 }
 
 TelRilData::TelRilData(int32_t slotId, sptr<IRemoteObject> cellularRadio,
@@ -380,6 +381,31 @@ int32_t TelRilData::SetLinkBandwidthReportingRule(
 }
 
 int32_t TelRilData::SetLinkBandwidthReportingRuleResponse(MessageParcel &data)
+{
+    return TelRilOnlyReportResponseInfo(data);
+}
+
+int32_t TelRilData::SetDataPermitted(const int32_t dataPermitted, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("cellularRadio_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_DATA_SET_DATA_PERMITTED, response);
+    if (telRilRequest == nullptr) {
+        TELEPHONY_LOGE("telRilRequest is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t ret =
+        SendInt32sEvent(HREQ_DATA_SET_DATA_PERMITTED, HRIL_EVENT_COUNT_2, telRilRequest->serialId_, dataPermitted);
+    if (ret != 0) {
+        TELEPHONY_LOGE("Send HREQ_DATA_SET_DATA_PERMITTED return: %{public}d", ret);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t TelRilData::SetDataPermittedResponse(MessageParcel &data)
 {
     return TelRilOnlyReportResponseInfo(data);
 }
