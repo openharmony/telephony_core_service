@@ -49,6 +49,7 @@ enum class DiffInterfaceId {
     TEST_RILCM_GET_DATA_CALL_LIST_TEST,
     TEST_RILCM_GET_LINK_BANDWIDTH_INFO,
     TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE,
+    TEST_RILCM_SET_DATA_PERMITTED_TEST,
     /* =========== Cellular Data End ============= */
     TEST_GET_SIGNAL_STRENGTH,
     TEST_CALL_DIAL,
@@ -300,6 +301,7 @@ public:
     void OnRequestGetLinkBandwidthInfoTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestSetLinkBandwidthReportingRuleTest(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestSetDataPermittedTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestGetNetworkSearchInformationTest(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -393,6 +395,7 @@ void TelRilTest::OnInitInterface()
         &TelRilTest::OnRequestGetLinkBandwidthInfoTest;
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE] =
         &TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST] = &TelRilTest::OnRequestSetDataPermittedTest;
 
     OnInitCall();
 
@@ -1486,6 +1489,18 @@ void TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest(
     }
 }
 
+void TelRilTest::OnRequestSetDataPermittedTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestSetDataPermittedTest -->");
+        telRilManager_->SetDataPermitted(slotId, true, event);
+        TELEPHONY_LOGI("TelRilTest::OnRequestSetDataPermittedTest --> finished");
+    }
+}
+
 void TelRilTest::OnRequestGetNetworkSearchInformationTest(
     int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
@@ -2276,7 +2291,7 @@ void DataTest(void)
          << endl;
     cout << (int32_t)DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE
          << "--> OnRequestSetLinkBandwidthReportingRuleTest" << endl;
-
+    cout << (int32_t)DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST << "--> OnRequestSetDataPermittedTest" << endl;
     cout << "=========== Cellular Data End =============" << endl;
 }
 

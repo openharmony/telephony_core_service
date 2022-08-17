@@ -894,6 +894,18 @@ int32_t CoreManagerInner::StopDTMF(
     return telRilManager_->StopDtmf(slotId, index, response);
 }
 
+int32_t CoreManagerInner::SetDataPermitted(
+    int32_t slotId, int32_t eventId, int32_t dataPermitted, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("telRilManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    response->SetOwner(handler);
+    return telRilManager_->SetDataPermitted(slotId, dataPermitted, response);
+}
+
 int32_t CoreManagerInner::SetInitApnInfo(int32_t slotId, int32_t eventId, const DataProfile &dataProfile,
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
