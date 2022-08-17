@@ -15,6 +15,7 @@
 
 #include "tel_ril_call.h"
 
+#include "core_service_hisysevent.h"
 #include "hril_call_parcel.h"
 #include "hril_notification.h"
 #include "hril_request.h"
@@ -96,6 +97,9 @@ int32_t TelRilCall::AnswerResponse(MessageParcel &data)
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("TelRilCall read spBuffer failed");
+        CoreServiceHiSysEvent::WriteAnswerCallFaultEvent(slotId_,
+            static_cast<int32_t>(CallErrorCode::CALL_ERROR_CALL_LOCAL_PTR_NULL),
+            "TelRilCall AnswerResponse read spBuffer failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     const struct HRilRadioResponseInfo *radioResponseInfo =
@@ -117,6 +121,11 @@ int32_t TelRilCall::AnswerResponse(MessageParcel &data)
     uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
     std::shared_ptr<HRilRadioResponseInfo> result = std::make_shared<HRilRadioResponseInfo>();
     result->error = radioResponseInfo->error;
+    if (result->error != HRilErrType::NONE) {
+        CoreServiceHiSysEvent::WriteAnswerCallFaultEvent(slotId_,
+            static_cast<int32_t>(CallErrorCode::CALL_ERROR_RADIO_RESPONSEINFO_ERROR),
+            "HRilErrType " + std::to_string(static_cast<int32_t>(result->error)));
+    }
     handler->SendEvent(eventId, result);
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -261,6 +270,9 @@ int32_t TelRilCall::DialResponse(MessageParcel &data)
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("TelRilCall DialResponse read spBuffer failed");
+        CoreServiceHiSysEvent::WriteDialCallFaultEvent(slotId_,
+            static_cast<int32_t>(CallErrorCode::CALL_ERROR_CALL_LOCAL_PTR_NULL),
+            "TelRilCall DialResponse read spBuffer failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     const struct HRilRadioResponseInfo *radioResponseInfo =
@@ -283,6 +295,11 @@ int32_t TelRilCall::DialResponse(MessageParcel &data)
     uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
     std::shared_ptr<HRilRadioResponseInfo> result = std::make_shared<HRilRadioResponseInfo>();
     result->error = radioResponseInfo->error;
+    if (result->error != HRilErrType::NONE) {
+        CoreServiceHiSysEvent::WriteDialCallFaultEvent(slotId_,
+            static_cast<int32_t>(CallErrorCode::CALL_ERROR_RADIO_RESPONSEINFO_ERROR),
+            "HRilErrType " + std::to_string(static_cast<int32_t>(result->error)));
+    }
     handler->SendEvent(eventId, result);
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -293,6 +310,9 @@ int32_t TelRilCall::HangupResponse(MessageParcel &data)
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("TelRilCall HangupResponse read spBuffer failed");
+        CoreServiceHiSysEvent::WriteHangUpFaultEvent(slotId_,
+            static_cast<int32_t>(CallErrorCode::CALL_ERROR_CALL_LOCAL_PTR_NULL),
+            "TelRilCall HangupResponse read spBuffer failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     const struct HRilRadioResponseInfo *radioResponseInfo =
@@ -314,6 +334,11 @@ int32_t TelRilCall::HangupResponse(MessageParcel &data)
     uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
     std::shared_ptr<HRilRadioResponseInfo> result = std::make_shared<HRilRadioResponseInfo>();
     result->error = radioResponseInfo->error;
+    if (result->error != HRilErrType::NONE) {
+        CoreServiceHiSysEvent::WriteHangUpFaultEvent(slotId_,
+            static_cast<int32_t>(CallErrorCode::CALL_ERROR_RADIO_RESPONSEINFO_ERROR),
+            "HRilErrType " + std::to_string(static_cast<int32_t>(result->error)));
+    }
     handler->SendEvent(eventId, result);
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -324,6 +349,9 @@ int32_t TelRilCall::RejectResponse(MessageParcel &data)
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("TelRilCall RejectResponse read spBuffer failed");
+        CoreServiceHiSysEvent::WriteHangUpFaultEvent(slotId_,
+            static_cast<int32_t>(CallErrorCode::CALL_ERROR_CALL_LOCAL_PTR_NULL),
+            "TelRilCall RejectResponse read spBuffer failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     const struct HRilRadioResponseInfo *radioResponseInfo =
@@ -345,6 +373,11 @@ int32_t TelRilCall::RejectResponse(MessageParcel &data)
     uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
     std::shared_ptr<HRilRadioResponseInfo> result = std::make_shared<HRilRadioResponseInfo>();
     result->error = radioResponseInfo->error;
+    if (result->error != HRilErrType::NONE) {
+        CoreServiceHiSysEvent::WriteHangUpFaultEvent(slotId_,
+            static_cast<int32_t>(CallErrorCode::CALL_ERROR_RADIO_RESPONSEINFO_ERROR),
+            "HRilErrType " + std::to_string(static_cast<int32_t>(result->error)));
+    }
     handler->SendEvent(eventId, result);
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -875,6 +908,8 @@ int32_t TelRilCall::Dial(const std::string address, int32_t clirMode, const AppE
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_DIAL, result);
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("telRilRequest is nullptr");
+        CoreServiceHiSysEvent::WriteDialCallFaultEvent(slotId_,
+            static_cast<int32_t>(CallErrorCode::CALL_ERROR_CREATE_REQUEST_FAIL), "Create HREQ_CALL_DIAL request fail");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
@@ -889,6 +924,10 @@ int32_t TelRilCall::Dial(const std::string address, int32_t clirMode, const AppE
     dialInfo.serial = telRilRequest->serialId_;
     int32_t ret = SendBufferEvent(HREQ_CALL_DIAL, dialInfo);
     TELEPHONY_LOGI("Send (ID:%{public}d) return: %{public}d", HREQ_CALL_DIAL, ret);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        CoreServiceHiSysEvent::WriteDialCallFaultEvent(
+            slotId_, static_cast<int32_t>(CallErrorCode::CALL_ERROR_SEND_REQUEST_FAIL), "ID HREQ_CALL_DIAL");
+    }
     return ret;
 }
 
@@ -897,6 +936,9 @@ int32_t TelRilCall::Reject(const AppExecFwk::InnerEvent::Pointer &result)
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_REJECT, result);
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("telRilRequest is nullptr");
+        CoreServiceHiSysEvent::WriteHangUpFaultEvent(slotId_,
+            static_cast<int32_t>(CallErrorCode::CALL_ERROR_CREATE_REQUEST_FAIL),
+            "Create HREQ_CALL_REJECT request fail");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
@@ -905,7 +947,13 @@ int32_t TelRilCall::Reject(const AppExecFwk::InnerEvent::Pointer &result)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    return SendInt32Event(HREQ_CALL_REJECT, telRilRequest->serialId_);
+    int32_t ret = SendInt32Event(HREQ_CALL_REJECT, telRilRequest->serialId_);
+    TELEPHONY_LOGI("Send (ID:%{public}d) return: %{public}d", HREQ_CALL_REJECT, ret);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        CoreServiceHiSysEvent::WriteHangUpFaultEvent(
+            slotId_, static_cast<int32_t>(CallErrorCode::CALL_ERROR_SEND_REQUEST_FAIL), "ID HREQ_CALL_REJECT");
+    }
+    return ret;
 }
 
 int32_t TelRilCall::Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &result)
@@ -913,6 +961,9 @@ int32_t TelRilCall::Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Point
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_HANGUP, result);
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("telRilRequest is nullptr");
+        CoreServiceHiSysEvent::WriteHangUpFaultEvent(slotId_,
+            static_cast<int32_t>(CallErrorCode::CALL_ERROR_CREATE_REQUEST_FAIL),
+            "Create HREQ_CALL_HANGUP request fail");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (cellularRadio_ == nullptr) {
@@ -929,6 +980,8 @@ int32_t TelRilCall::Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Point
     int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_HANGUP, data, reply, option);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("function is failed, error: %{public}d", ret);
+        CoreServiceHiSysEvent::WriteHangUpFaultEvent(
+            slotId_, static_cast<int32_t>(CallErrorCode::CALL_ERROR_SEND_REQUEST_FAIL), "ID HREQ_CALL_HANGUP");
     }
     return ret;
 }
@@ -938,6 +991,9 @@ int32_t TelRilCall::Answer(const AppExecFwk::InnerEvent::Pointer &result)
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_CALL_ANSWER, result);
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("telRilRequest is nullptr");
+        CoreServiceHiSysEvent::WriteAnswerCallFaultEvent(slotId_,
+            static_cast<int32_t>(CallErrorCode::CALL_ERROR_CREATE_REQUEST_FAIL),
+            "Create HREQ_CALL_ANSWER request fail");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (cellularRadio_ == nullptr) {
@@ -946,6 +1002,10 @@ int32_t TelRilCall::Answer(const AppExecFwk::InnerEvent::Pointer &result)
     }
 
     int32_t ret = SendInt32Event(HREQ_CALL_ANSWER, telRilRequest->serialId_);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        CoreServiceHiSysEvent::WriteAnswerCallFaultEvent(
+            slotId_, static_cast<int32_t>(CallErrorCode::CALL_ERROR_SEND_REQUEST_FAIL), "ID HREQ_CALL_ANSWER");
+    }
     TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_CALL_ANSWER, ret);
     return ret;
 }

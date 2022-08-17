@@ -34,7 +34,6 @@ ohos_shared_library("libtel_common") {
   include_dirs = [ "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include" ]
 
   sources = [
-    "common/src/core_service_hisysevent.cpp",
     "common/src/str_convert.cpp",
     "common/src/telephony_common_utils.cpp",
     "common/src/telephony_permission.cpp",

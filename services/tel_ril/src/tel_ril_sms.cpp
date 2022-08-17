@@ -15,6 +15,7 @@
 
 #include "tel_ril_sms.h"
 
+#include "core_service_hisysevent.h"
 #include "hril_notification.h"
 #include "hril_request.h"
 #include "radio_event.h"
@@ -92,6 +93,8 @@ int32_t TelRilSms::SendGsmSms(std::string &smsPdu, std::string &pdu, const AppEx
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SMS_SEND_GSM_SMS, response);
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("telRilRequest is nullptr");
+        CoreServiceHiSysEvent::WriteSmsSendFaultEvent(slotId_, SmsMmsMessageType::SMS_SHORT_MESSAGE,
+            SmsMmsErrorCode::SMS_ERROR_CREATE_REQUEST_FAIL, "Create HREQ_SMS_SEND_GSM_SMS request fail");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (cellularRadio_ == nullptr) {
@@ -108,6 +111,8 @@ int32_t TelRilSms::SendGsmSms(std::string &smsPdu, std::string &pdu, const AppEx
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
     if (cellularRadio_->SendRequest(HREQ_SMS_SEND_GSM_SMS, data, reply, option)) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
+        CoreServiceHiSysEvent::WriteSmsSendFaultEvent(slotId_, SmsMmsMessageType::SMS_SHORT_MESSAGE,
+            SmsMmsErrorCode::SMS_ERROR_SEND_REQUEST_FAIL, "ID HREQ_SMS_SEND_GSM_SMS");
     }
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -117,6 +122,8 @@ int32_t TelRilSms::SendCdmaSms(std::string pdu, const AppExecFwk::InnerEvent::Po
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SMS_SEND_CDMA_SMS, response);
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("telRilRequest is nullptr");
+        CoreServiceHiSysEvent::WriteSmsSendFaultEvent(slotId_, SmsMmsMessageType::SMS_SHORT_MESSAGE,
+            SmsMmsErrorCode::SMS_ERROR_CREATE_REQUEST_FAIL, "Create HREQ_SMS_SEND_CDMA_SMS request fail");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (cellularRadio_ == nullptr) {
@@ -134,6 +141,8 @@ int32_t TelRilSms::SendCdmaSms(std::string pdu, const AppExecFwk::InnerEvent::Po
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
     if (cellularRadio_->SendRequest(HREQ_SMS_SEND_CDMA_SMS, data, reply, option)) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
+        CoreServiceHiSysEvent::WriteSmsSendFaultEvent(slotId_, SmsMmsMessageType::SMS_SHORT_MESSAGE,
+            SmsMmsErrorCode::SMS_ERROR_SEND_REQUEST_FAIL, "ID HREQ_SMS_SEND_CDMA_SMS");
     }
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -509,7 +518,10 @@ uint8_t *TelRilSms::ConvertHexStringToBytes(const uint8_t *hexString, size_t len
 int32_t TelRilSms::NewSmsNotify(MessageParcel &data)
 {
     std::shared_ptr<SmsMessageInfo> smsMessageInfo = std::make_shared<SmsMessageInfo>();
-    smsMessageInfo->ReadFromParcel(data);
+    if (!smsMessageInfo->ReadFromParcel(data)) {
+        CoreServiceHiSysEvent::WriteSmsReceiveFaultEvent(slotId_, SmsMmsMessageType::MMS_SHORT_MESSAGE,
+            SmsMmsErrorCode::SMS_ERROR_MESSAGE_READ_FAIL, "HNOTI_SMS_NEW_SMS read gsm message fail");
+    }
     int32_t indicationType = smsMessageInfo->indicationType;
     TELEPHONY_LOGI("indicationType:%{public}d, size:%{public}d, PDU size:%{public}zu", indicationType,
         smsMessageInfo->size, smsMessageInfo->pdu.size());
@@ -523,7 +535,10 @@ int32_t TelRilSms::NewSmsNotify(MessageParcel &data)
 int32_t TelRilSms::NewCdmaSmsNotify(MessageParcel &data)
 {
     std::shared_ptr<SmsMessageInfo> smsMessageInfo = std::make_shared<SmsMessageInfo>();
-    smsMessageInfo->ReadFromParcel(data);
+    if (!smsMessageInfo->ReadFromParcel(data)) {
+        CoreServiceHiSysEvent::WriteSmsReceiveFaultEvent(slotId_, SmsMmsMessageType::MMS_SHORT_MESSAGE,
+            SmsMmsErrorCode::SMS_ERROR_MESSAGE_READ_FAIL, "HNOTI_SMS_NEW_SMS read cdma message fail");
+    }
     if (smsMessageInfo->pdu.empty()) {
         TELEPHONY_LOGE("NewCdmaSmsNotify readFromParcel fail");
     }
@@ -564,7 +579,10 @@ int32_t TelRilSms::NewSmsStoredOnSimNotify(MessageParcel &data)
 int32_t TelRilSms::CBConfigNotify(MessageParcel &data)
 {
     std::shared_ptr<CBConfigReportInfo> cellBroadcastInfo = std::make_shared<CBConfigReportInfo>();
-    cellBroadcastInfo->ReadFromParcel(data);
+    if (!cellBroadcastInfo->ReadFromParcel(data)) {
+        CoreServiceHiSysEvent::WriteSmsReceiveFaultEvent(slotId_, SmsMmsMessageType::CELL_BROAD_CAST,
+            SmsMmsErrorCode::SMS_ERROR_MESSAGE_READ_FAIL, "HNOTI_SMS_NEW_SMS read cell broadcast fail");
+    }
     int32_t indicationType = cellBroadcastInfo->indicationType;
     TELEPHONY_LOGI("indicationType:%{public}d, data:%{public}s, dcs :%{public}s, pdu :%{public}s", indicationType,
         cellBroadcastInfo->data.c_str(), cellBroadcastInfo->dcs.c_str(), cellBroadcastInfo->pdu.c_str());
@@ -581,6 +599,8 @@ int32_t TelRilSms::SendGsmSmsResponse(MessageParcel &data)
     const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("read spBuffer failed");
+        CoreServiceHiSysEvent::WriteSmsSendFaultEvent(slotId_, SmsMmsMessageType::SMS_SHORT_MESSAGE,
+            SmsMmsErrorCode::SMS_ERROR_NULL_POINTER, "TelRilSms SendGsmSmsResponse read spBuffer failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::shared_ptr<SendSmsResultInfo> sendSmsResultInfo = std::make_shared<SendSmsResultInfo>();
@@ -606,6 +626,9 @@ int32_t TelRilSms::SendGsmSmsResponse(MessageParcel &data)
             TELEPHONY_LOGI("GetInnerEventId:%{public}d, ret=%{public}d", eventId, ret);
             return ret;
         } else {
+            CoreServiceHiSysEvent::WriteSmsSendFaultEvent(slotId_, SmsMmsMessageType::SMS_SHORT_MESSAGE,
+                SmsMmsErrorCode::SMS_ERROR_SEND_REQUEST_FAIL,
+                "HRilErrType " + std::to_string(static_cast<int32_t>(radioResponseInfo->error)));
             return ErrorResponse(telRilRequest, *radioResponseInfo);
         }
     } else {
@@ -625,6 +648,8 @@ int32_t TelRilSms::SendCdmaSmsResponse(MessageParcel &data)
     std::shared_ptr<SendSmsResultInfo> sendSmsResultInfo = std::make_shared<SendSmsResultInfo>();
     if (sendSmsResultInfo == nullptr) {
         TELEPHONY_LOGE("ERROR :sendSmsResultInfo == nullptr !!!");
+        CoreServiceHiSysEvent::WriteSmsSendFaultEvent(slotId_, SmsMmsMessageType::SMS_SHORT_MESSAGE,
+            SmsMmsErrorCode::SMS_ERROR_NULL_POINTER, "TelRilSms SendCdmaSmsResponse read spBuffer failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     sendSmsResultInfo->ReadFromParcel(data);
@@ -653,6 +678,9 @@ int32_t TelRilSms::SendCdmaSmsResponse(MessageParcel &data)
             TELEPHONY_LOGI("GetInnerEventId:%{public}d, ret=%{public}d", eventId, ret);
             return ret;
         } else {
+            CoreServiceHiSysEvent::WriteSmsSendFaultEvent(slotId_, SmsMmsMessageType::SMS_SHORT_MESSAGE,
+                SmsMmsErrorCode::SMS_ERROR_SEND_REQUEST_FAIL,
+                "HRilErrType " + std::to_string(static_cast<int32_t>(radioResponseInfo->error)));
             return ErrorResponse(telRilRequest, *radioResponseInfo);
         }
     } else {

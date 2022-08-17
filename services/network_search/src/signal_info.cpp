@@ -143,7 +143,7 @@ void SignalInfo::ProcessSignalIntensity(int32_t slotId, const AppExecFwk::InnerE
         if (signals.size() != 0) {
             level = signals[0]->GetSignalLevel();
         }
-        CoreServiceHiSysEvent::SignalLevelBehaviorEvent(slotId, level);
+        CoreServiceHiSysEvent::WriteSignalLevelBehaviorEvent(slotId, level);
     }
     PrintfLog(*signalIntensity);
 }
