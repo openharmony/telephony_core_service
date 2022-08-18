@@ -600,7 +600,7 @@ bool MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
         }
         localCacheInfo_[i].isCellularDataCard = NOT_MAIN;
     }
-    CoreServiceHiSysEvent::DefaultDataSlotIdBehaviorEvent(slotId);
+    CoreServiceHiSysEvent::WriteDefaultDataSlotIdBehaviorEvent(slotId);
     return AnnounceDefaultCellularDataSlotIdChanged(slotId);
 }
 

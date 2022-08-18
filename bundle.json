@@ -105,8 +105,8 @@
                     "header": {
                         "header_base" : "//base/telephony/core_service/utils",
                         "header_files": [
-                            "common/include/core_service_hisysevent.h",
                             "common/include/str_convert.h",
+                            "common/include/telephony_hisysevent.h",
                             "common/include/telephony_permission.h",
                             "log/include/telephony_log_c.h",
                             "log/include/telephony_log_wrapper.h",

@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-domain: CORE_SERVICE
+domain: TELEPHONY
 
 SIGNAL_LEVEL:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: signal level}
@@ -33,3 +33,121 @@ SIM_STATE_CHANGE:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: sim state}
   SLOT_ID: {type: INT32, desc: slot id}
   STATE: {type: INT32, desc: sim state}
+
+SMS_RECEIVE_FAILED:
+  __BASE: {type: FAULT, level: CRITICAL, tag: PowerStats, desc: receive sms failed event}
+  MODULE: {type: STRING, desc: module name}
+  SLOT_ID: {type: INT32, desc: slot id}
+  MSG_TYPE: {type: INT32, desc: the type of sms}
+  ERROR_TYPE: {type: INT32, desc: receive sms event error code}
+  ERROR_MSG: {type: STRING, desc: add supplements to error code}
+
+SMS_SEND_FAILED:
+  __BASE: {type: FAULT, level: CRITICAL, tag: PowerStats, desc: send sms failed event}
+  MODULE: {type: STRING, desc: module name}
+  SLOT_ID: {type: INT32, desc: slot id}
+  MSG_TYPE: {type: INT32, desc: the type of sms}
+  ERROR_TYPE: {type: INT32, desc: send sms event error code}
+  ERROR_MSG: {type: STRING, desc: add supplements to error code}
+
+SMS_SEND:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: send sms event}
+  SLOT_ID: {type: INT32, desc: slot id}
+  MSG_TYPE: {type: INT32, desc: the type of sms}
+
+SMS_RECEIVE:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: receive sms event}
+  SLOT_ID: {type: INT32, desc: slot id}
+  MSG_TYPE: {type: INT32, desc: the type of sms}
+
+DATA_CONNECTION_STATE:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: data connection status}
+  STATE: {type: INT32, desc: 0_OFF 1_ON}
+
+DATA_DEACTIVED:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: data disconnection type}
+  SLOT_ID: {type: INT32, desc: slot id}
+  TYPE: {type: INT32, desc: 0 NETWORK_DISCONNECTION 1 USER_INITIATED 2 HAS_HIGN_PRIORITY_NETWORK}
+
+ROAMING_DATA_CONNECTION_STATE:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: roaming data connection state}
+  STATE: {type: INT32, desc: 0_OFF 1_ON}
+
+DATA_ACTIVATE_FAILED:
+  __BASE: {type: FAULT, level: CRITICAL, tag: PowerStats, desc: data active failed}
+  SLOT_ID: {type: INT32, desc: slot id}
+  DATA_SWITCH: {type: INT32, desc: switch}
+  UPLINK_DATA: {type: INT32, desc: uplink data}
+  DOWNLINK_DATA: {type: INT32, desc: downlink data}
+  DATASTATE: {type: INT32, desc: cellular data state}
+  ERROR_TYPE: {type: INT32, desc: error code}
+  ERROR_MSG: {type: STRING, desc: add supplements to error code}
+
+CALL_STATE:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: call state}
+  SLOT_ID: {type: INT32, desc: slot id}
+  STATE: {type: INT32, desc: call state}
+  INDEX_ID: {type: INT32, desc: differentiate multiple calls simultaneously}
+
+CALL_END_EXCEPTION:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: phone hang up call event}
+  SLOT_ID: {type: INT32, desc: slot id}
+  FAIL_CAUSE: {type: INT32, desc: reason for end of call}
+
+DIAL:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: phone outgoing call event}
+  SLOT_ID: {type: INT32, desc: slot id}
+  CALL_TYPE: {type: INT32, desc: 0 IMS_VOICE 1 IMS_VIDEO 2 CS_VOICE}
+  RESULT: {type: INT32, desc: dial result}
+
+ANSWER:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: phone answering event}
+  SLOT_ID: {type: INT32, desc: slot id}
+  CALL_TYPE: {type: INT32, desc: 0 IMS_VOICE 1 IMS_VIDEO_TO_VOICE 2 IMS_VIDEO_TO_VIDEO 3 CS_VOICE}
+  RESULT: {type: INT32, desc: answer result}
+
+HANG_UP:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: phone hang up call event}
+  SLOT_ID: {type: INT32, desc: slot id}
+  CALL_TYPE: {type: INT32, desc: 0 IMS_VOICE 1 IMS_VIDEO 2 CS_VOICE}
+  RESULT: {type: INT32, desc: hang up result}
+
+INCOMING_CALL:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: phone incoming call event}
+  SLOT_ID: {type: INT32, desc: slot id}
+  CALL_TYPE: {type: INT32, desc: 0 IMS_VOICE 1 IMS_VIDEO 2 CS_VOICE}
+
+CALL_DIAL_FAILED:
+  __BASE: {type: FAULT, level: CRITICAL, tag: PowerStats, desc: call outgoing failed event}
+  MODULE: {type: STRING, desc: module name}
+  SLOT_ID: {type: INT32, desc: slot id}
+  CALL_TYPE: {type: INT32, desc: call type}
+  VIDEO_STATE: {type: INT32, desc: voice or video}
+  ERROR_TYPE: {type: INT32, desc: error code}
+  ERROR_MSG: {type: STRING, desc: add supplements to error code}
+
+CALL_INCOMING_FAILED:
+  __BASE: {type: FAULT, level: CRITICAL, tag: PowerStats, desc: call incoming failed event}
+  MODULE: {type: STRING, desc: module name}
+  SLOT_ID: {type: INT32, desc: slot id}
+  VIDEO_STATE: {type: INT32, desc: voice or video}
+  CALL_TYPE: {type: INT32, desc: call type}
+  ERROR_TYPE: {type: INT32, desc: error code}
+  ERROR_MSG: {type: STRING, desc: add supplements to error code}
+
+CALL_ANSWER_FAILED:
+  __BASE: {type: FAULT, level: CRITICAL, tag: PowerStats, desc: call answer failed event}
+  MODULE: {type: STRING, desc: module name}
+  SLOT_ID: {type: INT32, desc: slot id}
+  CALL_ID: {type: INT32, desc: phone call id}
+  VIDEO_STATE: {type: INT32, desc: voice or video}
+  ERROR_TYPE: {type: INT32, desc: error code}
+  ERROR_MSG: {type: STRING, desc: add supplements to error code}
+
+CALL_HANGUP_FAILED:
+  __BASE: {type: FAULT, level: CRITICAL, tag: PowerStats, desc: call hangup failed event}
+  MODULE: {type: STRING, desc: module name}
+  SLOT_ID: {type: INT32, desc: slot id}
+  CALL_ID: {type: INT32, desc: phone call id}
+  ERROR_TYPE: {type: INT32, desc: error code}
+  ERROR_MSG: {type: STRING, desc: add supplements to error code}

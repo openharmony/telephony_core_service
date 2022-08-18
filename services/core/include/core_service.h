@@ -17,14 +17,12 @@
 #define BASE_PHONE_SERVICE_H
 
 #include "core_service_stub.h"
-
-#include "if_system_ability_manager.h"
-#include "singleton.h"
-#include "system_ability.h"
-
 #include "i_network_search.h"
 #include "i_sim_manager.h"
 #include "i_tel_ril_manager.h"
+#include "if_system_ability_manager.h"
+#include "singleton.h"
+#include "system_ability.h"
 #include "tel_ril_manager.h"
 
 namespace OHOS {

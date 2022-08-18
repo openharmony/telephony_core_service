@@ -129,7 +129,7 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
         networkSearchState_->NotifyStateChange();
     }
-    CoreServiceHiSysEvent::NetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_CS),
+    CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_CS),
         static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
 }
 
@@ -181,7 +181,7 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
         networkSearchState_->NotifyStateChange();
     }
-    CoreServiceHiSysEvent::NetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_PS),
+    CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_PS),
         static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
 }
 
