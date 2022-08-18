@@ -1,0 +1,121 @@
+/*
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef TELEPHONY_HISYSEVENT_H
+#define TELEPHONY_HISYSEVENT_H
+
+#include <string>
+
+#include "hisysevent.h"
+
+namespace OHOS {
+namespace Telephony {
+using EventType = OHOS::HiviewDFX::HiSysEvent::EventType;
+static constexpr const char *DOMAIN_NAME = "TELEPHONY";
+static const int32_t INVALID_PARAMETER = -1;
+
+enum class CallErrorCode {
+    CALL_ERROR_NONE = 0,
+    CALL_ERROR_PERMISSION_ERR = 1,
+    CALL_ERROR_PHONE_NUMBER_EMPTY,
+    CALL_ERROR_NUMBER_OUT_OF_RANGE,
+    CALL_ERROR_CALL_LOCAL_PTR_NULL,
+    CALL_ERROR_UNKNOW_DIAL_TYPE,
+    CALL_ERROR_INVALID_SLOT_ID,
+    CALL_ERROR_UNKNOW_CALL_TYPE,
+    CALL_ERROR_INVALID_DIAL_SCENE,
+    CALL_ERROR_INVALID_VIDEO_STATE,
+    CALL_ERROR_INVALID_CALLID,
+    CALL_ERROR_DIAL_IS_BUSY = 11,
+    CALL_ERROR_DIAL_TIME_OUT,
+    CALL_ERROR_INCOMING_TIME_OUT,
+    CALL_ERROR_ANSWER_TIME_OUT,
+    CALL_ERROR_SYSTEM_EVENT_HANDLE_FAILURE,
+    CALL_ERROR_INVALID_FDN_NUMBER,
+    CALL_ERROR_DEVICE_NOT_DIALING,
+    CALL_ERROR_MEMSET_FAIL,
+    CALL_ERROR_MEMCPY_FAIL,
+    CALL_ERROR_IPC_CONNECT_STUB_FAIL,
+    CALL_ERROR_IPC_WRITE_DESCRIPTOR_TOKEN_FAIL = 21,
+    CALL_ERROR_IPC_WRITE_DATA_FAIL,
+    CALL_ERROR_IPC_SEND_REQUEST_FAIL,
+    CALL_ERROR_ILLEGAL_CALL_OPERATION,
+    CALL_ERROR_PHONE_CALLSTATE_NOTIFY_FAILED,
+    CALL_ERROR_CALL_ALREADY_EXISTS,
+    CALL_ERROR_UNSUPPORTED_NETWORK_TYPE,
+    CALL_ERROR_CREATE_REQUEST_FAIL,
+    CALL_ERROR_SEND_REQUEST_FAIL,
+    CALL_ERROR_CALL_OBJECT_IS_NULL,
+    CALL_ERROR_UNEXPECTED_SRVCC_STATE = 31,
+    CALL_ERROR_CALL_COUNTS_EXCEED_LIMIT,
+    CALL_ERROR_GET_RADIO_STATE_FAILED,
+    CALL_ERROR_RESOURCE_UNAVAILABLE,
+    CALL_ERROR_CALL_CONNECTION_NOT_EXIST,
+    CALL_ERROR_ARGUMENT_INVALID,
+    CALL_ERROR_IMS_SERVICE_NOT_EXIST,
+    CALL_ERROR_RADIO_RESPONSEINFO_ERROR,
+};
+
+enum class SmsMmsErrorCode {
+    SMS_ERROR_PERMISSION_ERROR = 100,
+    SMS_ERROR_NULL_POINTER,
+    SMS_ERROR_EMPTY_INPUT_PARAMETER,
+    SMS_ERROR_UNKNOWN_NETWORK_TYPE,
+    SMS_ERROR_PDU_ENCODEING_FAIL,
+    SMS_ERROR_EXCEED_MAX_SEGMENT_NUM,
+    SMS_ERROR_SENDSMS_NOT_IN_SERVICE,
+    SMS_ERROR_SMS_CAPABLE_UNSUPPORTED,
+    SMS_ERROR_ADD_TO_DATABASE_FAIL,
+    SMS_ERROR_REPEATED_ERROR,
+    SMS_ERROR_PUBLISH_COMMON_EVENT_FAIL,
+    SMS_ERROR_PDU_DECODE_FAIL,
+    SMS_ERROR_CELL_BROADCAST_PUD_ANALYSIS_FAIL,
+    SMS_ERROR_CREATE_REQUEST_FAIL,
+    SMS_ERROR_SEND_REQUEST_FAIL,
+    SMS_ERROR_MESSAGE_READ_FAIL,
+};
+
+enum class CellularDataErrorCode {
+    DATA_ERROR_PERMISSION_ERROR = 200,
+    DATA_ERROR_DATABASE_WRITE_ERROR,
+    DATA_ERROR_PS_NOT_ATTACH,
+    DATA_ERROR_SIM_NOT_READY,
+    DATA_ERROR_CELLULAR_DATA_SLOT_ID_MISMATCH,
+    DATA_ERROR_ROAMING_SWITCH_OFF_AND_ROAMING,
+    DATA_ERROR_CALL_AND_DATA_NOT_CONCURRENCY,
+    DATA_ERROR_HAS_HIGHER_PRIORITY_CONNECTION,
+    DATA_ERROR_PDP_ACTIVATE_FAIL,
+    DATA_ERROR_PDP_DEACTIVATE_FAIL,
+    DATA_ERROR_DATA_ACTIVATE_TIME_OUT,
+    DATA_ERROR_RADIO_RESPONSEINFO_ERROR,
+};
+
+class TelephonyHiSysEvent {
+public:
+    template<typename... Types>
+    static void HiWriteBehaviorEvent(const std::string &eventName, Types... args)
+    {
+        OHOS::HiviewDFX::HiSysEvent::Write(DOMAIN_NAME, eventName, EventType::BEHAVIOR, args...);
+    }
+
+    template<typename... Types>
+    static void HiWriteFaultEvent(const std::string &eventName, Types... args)
+    {
+        OHOS::HiviewDFX::HiSysEvent::Write(DOMAIN_NAME, eventName, EventType::FAULT, args...);
+    }
+};
+} // namespace Telephony
+} // namespace OHOS
+#endif // TELEPHONY_HISYSEVENT_H
