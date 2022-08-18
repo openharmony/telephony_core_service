@@ -2347,7 +2347,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetLinkBandwidthReportingRuleTest_0201, Fu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetDataPermittedTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST), GetHandler());
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST), SLOT_ID_0, GetHandler());
 }
 
 /**
