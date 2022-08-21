@@ -57,8 +57,9 @@ void TelRilSim::AddHandlerToMap()
 }
 
 TelRilSim::TelRilSim(int32_t slotId, sptr<IRemoteObject> cellularRadio,
-    std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
-    : TelRilBase(slotId, cellularRadio, observerHandler, handler)
+    sptr<HDI::Ril::V1_0::IRilInterface> rilInterface, std::shared_ptr<ObserverHandler> observerHandler,
+    std::shared_ptr<TelRilHandler> handler)
+    : TelRilBase(slotId, cellularRadio, rilInterface, observerHandler, handler)
 {
     AddHandlerToMap();
 }
