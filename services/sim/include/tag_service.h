@@ -39,6 +39,7 @@ public:
     void GetValue(std::vector<uint8_t> &result) const;
     uint8_t GetLength() const;
     constexpr static uint8_t HEX_TYPE = 16;
+    constexpr static int32_t ERR = -1;
 
 private:
     uint8_t length_ = 0;

@@ -21,6 +21,8 @@
 namespace OHOS {
 namespace Telephony {
 std::string GetBundleName();
+bool IsValidDecValue(const std::string &inputValue);
+bool IsValidHexValue(const std::string &inputValue);
 } // namespace Telephony
 } // namespace OHOS
 #endif // TELEPHONY_COMMON_UTILS_H

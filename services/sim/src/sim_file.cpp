@@ -17,9 +17,10 @@
 
 #include <unistd.h>
 
-#include "radio_event.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "radio_event.h"
+#include "telephony_common_utils.h"
 
 using namespace std;
 using namespace OHOS::AppExecFwk;
@@ -81,9 +82,9 @@ std::string SimFile::ObtainIsoCountryCode()
         return "";
     }
     int len = (int)numeric.length();
-    if (len >= MCC_LEN) {
-        std::string mnc = numeric.substr(0, MCC_LEN);
-        std::string iso = MccPool::MccCountryCode(std::stoi(mnc));
+    std::string mcc = numeric.substr(0, MCC_LEN);
+    if (len >= MCC_LEN && IsValidDecValue(mcc)) {
+        std::string iso = MccPool::MccCountryCode(std::stoi(mcc));
         return iso;
     } else {
         return "";
