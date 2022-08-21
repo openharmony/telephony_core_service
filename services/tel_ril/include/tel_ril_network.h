@@ -23,8 +23,8 @@ namespace OHOS {
 namespace Telephony {
 class TelRilNetwork : public TelRilBase {
 public:
-    TelRilNetwork(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler,
-        std::shared_ptr<TelRilHandler> handler);
+    TelRilNetwork(int32_t slotId, sptr<IRemoteObject> cellularRadio, sptr<HDI::Ril::V1_0::IRilInterface> rilInterface,
+        std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     ~TelRilNetwork() = default;
 
     // send  command

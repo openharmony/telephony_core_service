@@ -24,35 +24,45 @@ namespace OHOS {
 namespace Telephony {
 class TelRilData : public TelRilBase {
 public:
-    TelRilData(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler,
-        std::shared_ptr<TelRilHandler> handler);
+    TelRilData(int32_t slotId, sptr<IRemoteObject> cellularRadio, sptr<HDI::Ril::V1_0::IRilInterface> rilInterface,
+        std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     ~TelRilData() = default;
-    DataProfileDataInfo ChangeDPToHalDataProfile(DataProfile dataProfile);
+
+    HDI::Ril::V1_0::IDataProfileDataInfo ChangeDPToHalDataProfile(DataProfile dataProfile);
     int32_t DeactivatePdpContext(int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t DeactivatePdpContextResponse(MessageParcel &data);
+    int32_t DeactivatePdpContextResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
     int32_t SetInitApnInfo(const DataProfile &dataProfile, const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t SetInitApnInfoResponse(MessageParcel &data);
+    int32_t SetInitApnInfoResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
     int32_t ActivatePdpContext(int32_t radioTechnology, DataProfile dataProfile, bool isRoaming, bool allowRoaming,
         const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t ActivatePdpContextResponse(MessageParcel &data);
+    int32_t ActivatePdpContextResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ISetupDataCallResultInfo &iSetupDataCallResultInfo);
     int32_t GetPdpContextList(const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t GetPdpContextListResponse(MessageParcel &data);
-    int32_t PdpContextListUpdated(MessageParcel &data);
+    int32_t GetPdpContextListResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IDataCallResultList &iDataCallResultList);
+    int32_t PdpContextListUpdated(const HDI::Ril::V1_0::IDataCallResultList &iDataCallResultList);
     bool IsDataRespOrNotify(uint32_t code);
     int32_t GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t GetLinkBandwidthInfoResponse(MessageParcel &data);
+    int32_t GetLinkBandwidthInfoResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IDataLinkBandwidthInfo &iDataLinkBandwidthInfo);
     int32_t SetLinkBandwidthReportingRule(
         LinkBandwidthRule linkBandwidth, const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t SetLinkBandwidthReportingRuleResponse(MessageParcel &data);
+    int32_t SetLinkBandwidthReportingRuleResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
     int32_t SetDataPermitted(const int32_t dataPermitted, const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t SetDataPermittedResponse(MessageParcel &data);
+    int32_t SetDataPermittedResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
 
 private:
     bool IsDataResponse(uint32_t code);
     bool IsDataNotification(uint32_t code);
-    void AddHandlerToMap();
     void DataResponseError(HRilErrType errCode, const AppExecFwk::InnerEvent::Pointer &response);
+    void BuildDataCallResultList(std::shared_ptr<DataCallResultList> dataCallResultList,
+        const HDI::Ril::V1_0::IDataCallResultList &iDataCallResultList);
+    void BuildDataCallResultInfo(std::shared_ptr<SetupDataCallResultInfo> dataCallResult,
+        const HDI::Ril::V1_0::ISetupDataCallResultInfo &iSetupDataCallResultInfo);
+    void BuildDataLinkBandwidthInfo(std::shared_ptr<DataLinkBandwidthInfo> dataLinkBandwidthInfo,
+        const HDI::Ril::V1_0::IDataLinkBandwidthInfo &iDataLinkBandwidthInfo);
 
+private:
     std::mutex responseErrorLock_;
 };
 } // namespace Telephony

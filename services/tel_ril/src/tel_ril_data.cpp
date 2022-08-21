@@ -23,26 +23,11 @@
 
 namespace OHOS {
 namespace Telephony {
-void TelRilData::AddHandlerToMap()
-{
-    // Notification
-    memberFuncMap_[HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED] = &TelRilData::PdpContextListUpdated;
-    // response
-    memberFuncMap_[HREQ_DATA_SET_INIT_APN_INFO] = &TelRilData::SetInitApnInfoResponse;
-    memberFuncMap_[HREQ_DATA_ACTIVATE_PDP_CONTEXT] = &TelRilData::ActivatePdpContextResponse;
-    memberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &TelRilData::DeactivatePdpContextResponse;
-    memberFuncMap_[HREQ_DATA_GET_PDP_CONTEXT_LIST] = &TelRilData::GetPdpContextListResponse;
-    memberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &TelRilData::GetLinkBandwidthInfoResponse;
-    memberFuncMap_[HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE] = &TelRilData::SetLinkBandwidthReportingRuleResponse;
-    memberFuncMap_[HREQ_DATA_SET_DATA_PERMITTED] = &TelRilData::SetDataPermittedResponse;
-}
-
 TelRilData::TelRilData(int32_t slotId, sptr<IRemoteObject> cellularRadio,
-    std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
-    : TelRilBase(slotId, cellularRadio, observerHandler, handler)
-{
-    AddHandlerToMap();
-}
+    sptr<HDI::Ril::V1_0::IRilInterface> rilInterface, std::shared_ptr<ObserverHandler> observerHandler,
+    std::shared_ptr<TelRilHandler> handler)
+    : TelRilBase(slotId, cellularRadio, rilInterface, observerHandler, handler)
+{}
 
 bool TelRilData::IsDataResponse(uint32_t code)
 {
@@ -72,9 +57,9 @@ void TelRilData::DataResponseError(HRilErrType errCode, const AppExecFwk::InnerE
     }
 }
 
-DataProfileDataInfo TelRilData::ChangeDPToHalDataProfile(DataProfile dataProfile)
+HDI::Ril::V1_0::IDataProfileDataInfo TelRilData::ChangeDPToHalDataProfile(DataProfile dataProfile)
 {
-    DataProfileDataInfo dataProfileInfo;
+    HDI::Ril::V1_0::IDataProfileDataInfo dataProfileInfo;
     dataProfileInfo.profileId = dataProfile.profileId;
     dataProfileInfo.password = dataProfile.password;
     dataProfileInfo.verType = dataProfile.verType;
@@ -87,24 +72,20 @@ DataProfileDataInfo TelRilData::ChangeDPToHalDataProfile(DataProfile dataProfile
 
 int32_t TelRilData::DeactivatePdpContext(int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    if (cellularRadio_ == nullptr) {
-        TELEPHONY_LOGE("cellularRadio_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || rilInterface_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or rilInterface_ is nullptr");
         CoreServiceHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_OFF,
             CellularDataErrorCode::DATA_ERROR_PDP_DEACTIVATE_FAIL,
             "Create HREQ_DATA_DEACTIVATE_PDP_CONTEXT request fail");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
-    UniInfo uniInfo;
+    HDI::Ril::V1_0::IUniInfo uniInfo;
     uniInfo.serial = telRilRequest->serialId_;
     uniInfo.gsmIndex = cid;
     uniInfo.arg1 = reason;
-    int32_t ret = SendBufferEvent(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, uniInfo);
+    int32_t ret = rilInterface_->DeactivatePdpContext(slotId_, telRilRequest->serialId_, uniInfo);
     if (ret != 0) {
         TELEPHONY_LOGE("Send HREQ_DATA_DEACTIVATE_PDP_CONTEXT return: %{public}d", ret);
         CoreServiceHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_OFF,
@@ -114,32 +95,29 @@ int32_t TelRilData::DeactivatePdpContext(int32_t cid, int32_t reason, const AppE
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilData::DeactivatePdpContextResponse(MessageParcel &data)
+int32_t TelRilData::DeactivatePdpContextResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
 {
-    return TelRilOnlyReportResponseInfo(data);
+    return TelRilOnlyReportResponseInfo(responseInfo);
 }
 
 int32_t TelRilData::ActivatePdpContext(int32_t radioTechnology, DataProfile dataProfile, bool isRoaming,
     bool allowRoaming, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    if (cellularRadio_ == nullptr) {
-        TELEPHONY_LOGE("cellularRadio_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_DATA_ACTIVATE_PDP_CONTEXT, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
-        CoreServiceHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
-            CellularDataErrorCode::DATA_ERROR_PDP_ACTIVATE_FAIL, "Create HREQ_DATA_ACTIVATE_PDP_CONTEXT request fail");
+    if (telRilRequest == nullptr || rilInterface_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or rilInterface_ is nullptr");
+        CoreServiceHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_OFF,
+            CellularDataErrorCode::DATA_ERROR_PDP_DEACTIVATE_FAIL,
+            "Create HREQ_DATA_DEACTIVATE_PDP_CONTEXT request fail");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    DataCallInfo dataCallInfo;
+    HDI::Ril::V1_0::IDataCallInfo dataCallInfo;
     dataCallInfo.serial = telRilRequest->serialId_;
     dataCallInfo.radioTechnology = radioTechnology;
     dataCallInfo.dataProfileInfo = ChangeDPToHalDataProfile(dataProfile);
     dataCallInfo.roamingAllowed = allowRoaming;
     dataCallInfo.isRoaming = isRoaming;
-    int32_t ret = SendBufferEvent(HREQ_DATA_ACTIVATE_PDP_CONTEXT, dataCallInfo);
+    int32_t ret = rilInterface_->ActivatePdpContext(slotId_, telRilRequest->serialId_, dataCallInfo);
     if (ret != 0) {
         TELEPHONY_LOGE("Send HREQ_DATA_ACTIVATE_PDP_CONTEXT return: %{public}d", ret);
         CoreServiceHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
@@ -149,24 +127,21 @@ int32_t TelRilData::ActivatePdpContext(int32_t radioTechnology, DataProfile data
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilData::ActivatePdpContextResponse(MessageParcel &data)
+int32_t TelRilData::ActivatePdpContextResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::ISetupDataCallResultInfo &iSetupDataCallResultInfo)
 {
-    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
-    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
-    if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("ERROR : spBuffer is nullptr !!!");
+    std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
+    if (setupDataCallResultInfo == nullptr) {
+        TELEPHONY_LOGE("ERROR : setupDataCallResultInfo is nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
-    setupDataCallResultInfo->ReadFromParcel(data);
-
-    const struct HRilRadioResponseInfo *radioResponseInfo =
-        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
-    TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
-        radioResponseInfo->serial, radioResponseInfo->error);
-    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
+    BuildDataCallResultInfo(setupDataCallResultInfo, iSetupDataCallResultInfo);
+    const struct HRilRadioResponseInfo radioResponseInfo = BuildHRilRadioResponseInfo(responseInfo);
+    TELEPHONY_LOGI("radioResponseInfo.serial:%{public}d, radioResponseInfo.error:%{public}d", radioResponseInfo.serial,
+        radioResponseInfo.error);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(radioResponseInfo);
     if (telRilRequest == nullptr || telRilRequest->pointer_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : telRilRequest is nullptr || radioResponseInfo error !");
+        TELEPHONY_LOGE("ERROR : telRilRequest or telRilRequest->pointer_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
@@ -174,8 +149,8 @@ int32_t TelRilData::ActivatePdpContextResponse(MessageParcel &data)
         TELEPHONY_LOGE("ERROR : handler is nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (radioResponseInfo->error != HRilErrType::NONE) {
-        ErrorResponse(telRilRequest, *radioResponseInfo);
+    if (radioResponseInfo.error != HRilErrType::NONE) {
+        ErrorResponse(telRilRequest, radioResponseInfo);
     } else {
         uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
         setupDataCallResultInfo->flag = telRilRequest->pointer_->GetParam();
@@ -186,8 +161,8 @@ int32_t TelRilData::ActivatePdpContextResponse(MessageParcel &data)
 
 int32_t TelRilData::GetPdpContextList(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    if (cellularRadio_ == nullptr) {
-        TELEPHONY_LOGE("cellularRadio_ is nullptr");
+    if (rilInterface_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d rilInterface_ is nullptr", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_DATA_GET_PDP_CONTEXT_LIST, response);
@@ -196,9 +171,9 @@ int32_t TelRilData::GetPdpContextList(const AppExecFwk::InnerEvent::Pointer &res
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
-    UniInfo uniInfo;
+    HDI::Ril::V1_0::IUniInfo uniInfo;
     uniInfo.serial = telRilRequest->serialId_;
-    int32_t ret = SendBufferEvent(HREQ_DATA_GET_PDP_CONTEXT_LIST, uniInfo);
+    int32_t ret = rilInterface_->GetPdpContextList(slotId_, telRilRequest->serialId_, uniInfo);
     if (ret != 0) {
         TELEPHONY_LOGE("HREQ_DATA_GET_PDP_CONTEXT_LIST return: %{public}d", ret);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -206,37 +181,25 @@ int32_t TelRilData::GetPdpContextList(const AppExecFwk::InnerEvent::Pointer &res
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilData::GetPdpContextListResponse(MessageParcel &data)
+int32_t TelRilData::GetPdpContextListResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::IDataCallResultList &iDataCallResultList)
 {
-    size_t readSpSize = 0;
-    const uint8_t *spBuffer = nullptr;
-    const struct HRilRadioResponseInfo *radioResponseInfo = nullptr;
-    std::shared_ptr<TelRilRequest> telRilRequest;
-    std::shared_ptr<DataCallResultList> dataCallResultList;
-
-    readSpSize = sizeof(struct HRilRadioResponseInfo);
-    spBuffer = data.ReadUnpadBuffer(readSpSize);
-    if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("ERROR : spBuffer is nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    dataCallResultList = std::make_shared<DataCallResultList>();
+    std::shared_ptr<DataCallResultList> dataCallResultList = std::make_shared<DataCallResultList>();
     if (dataCallResultList == nullptr) {
         TELEPHONY_LOGE("dataCallResultList is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataCallResultList->ReadFromParcel(data);
-
-    radioResponseInfo = reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
-    if (radioResponseInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : radioResponseInfo is nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    if (iDataCallResultList.size != (int32_t)iDataCallResultList.dcList.size()) {
+        TELEPHONY_LOGE("Slot%{public}d iDataCallResultList.size is invalid", slotId_);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    TELEPHONY_LOGI("radioResponseInfo->serial:%{public}d, radioResponseInfo->error:%{public}d",
-        radioResponseInfo->serial, radioResponseInfo->error);
-    telRilRequest = FindTelRilRequest(*radioResponseInfo);
+    BuildDataCallResultList(dataCallResultList, iDataCallResultList);
+    const struct HRilRadioResponseInfo radioResponseInfo = BuildHRilRadioResponseInfo(responseInfo);
+    TELEPHONY_LOGI("radioResponseInfo.serial:%{public}d, radioResponseInfo.error:%{public}d", radioResponseInfo.serial,
+        radioResponseInfo.error);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(radioResponseInfo);
     if (telRilRequest == nullptr || telRilRequest->pointer_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : telRilRequest is nullptr || radioResponseInfo error !");
+        TELEPHONY_LOGE("ERROR : telRilRequest or telRilRequest->pointer_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
@@ -244,8 +207,8 @@ int32_t TelRilData::GetPdpContextListResponse(MessageParcel &data)
         TELEPHONY_LOGE("ERROR : handler is nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (radioResponseInfo->error != HRilErrType::NONE) {
-        ErrorResponse(telRilRequest, *radioResponseInfo);
+    if (radioResponseInfo.error != HRilErrType::NONE) {
+        ErrorResponse(telRilRequest, radioResponseInfo);
     } else {
         int32_t param = telRilRequest->pointer_->GetParam();
         for (auto &setupDataCallResultInfo : dataCallResultList->dcList) {
@@ -259,8 +222,8 @@ int32_t TelRilData::GetPdpContextListResponse(MessageParcel &data)
 
 int32_t TelRilData::SetInitApnInfo(const DataProfile &dataProfile, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    if (cellularRadio_ == nullptr) {
-        TELEPHONY_LOGE("cellularRadio_ is nullptr");
+    if (rilInterface_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d rilInterface_ is nullptr", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_DATA_SET_INIT_APN_INFO, response);
@@ -268,27 +231,34 @@ int32_t TelRilData::SetInitApnInfo(const DataProfile &dataProfile, const AppExec
         TELEPHONY_LOGE("telRilRequest is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    TELEPHONY_LOGI(" telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
-    DataProfileDataInfo dataProfileInfo = ChangeDPToHalDataProfile(dataProfile);
+    TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
+    HDI::Ril::V1_0::IDataProfileDataInfo dataProfileInfo = ChangeDPToHalDataProfile(dataProfile);
     dataProfileInfo.serial = telRilRequest->serialId_;
-
-    int32_t ret = SendBufferEvent(HREQ_DATA_SET_INIT_APN_INFO, dataProfileInfo);
+    int32_t ret = rilInterface_->SetInitApnInfo(slotId_, telRilRequest->serialId_, dataProfileInfo);
     if (ret != 0) {
-        TELEPHONY_LOGE("Send HREQ_DATA_ACTIVATE_PDP_CONTEXT return: %{public}d", ret);
+        TELEPHONY_LOGE("Send HREQ_DATA_SET_INIT_APN_INFO return: %{public}d", ret);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilData::SetInitApnInfoResponse(MessageParcel &data)
+int32_t TelRilData::SetInitApnInfoResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
 {
-    return TelRilOnlyReportResponseInfo(data);
+    return TelRilOnlyReportResponseInfo(responseInfo);
 }
 
-int32_t TelRilData::PdpContextListUpdated(MessageParcel &data)
+int32_t TelRilData::PdpContextListUpdated(const HDI::Ril::V1_0::IDataCallResultList &iDataCallResultList)
 {
     std::shared_ptr<DataCallResultList> dataCallResultList = std::make_shared<DataCallResultList>();
-    dataCallResultList->ReadFromParcel(data);
+    if (dataCallResultList == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d dataCallResultList is nullptr", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (iDataCallResultList.size != (int32_t)iDataCallResultList.dcList.size()) {
+        TELEPHONY_LOGE("Slot%{public}d iDataCallResultList.size is invalid", slotId_);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    BuildDataCallResultList(dataCallResultList, iDataCallResultList);
     if (observerHandler_ != nullptr) {
         TELEPHONY_LOGI("NotifyObserver RADIO_DATA_CALL_LIST_CHANGED");
         observerHandler_->NotifyObserver(RadioEvent::RADIO_DATA_CALL_LIST_CHANGED, dataCallResultList);
@@ -299,17 +269,16 @@ int32_t TelRilData::PdpContextListUpdated(MessageParcel &data)
 
 int32_t TelRilData::GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &response)
 {
+    if (rilInterface_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d rilInterface_ is nullptr", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_DATA_GET_LINK_BANDWIDTH_INFO, response);
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("telRilRequest is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (cellularRadio_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : cellularRadio_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    int32_t ret =
-        SendInt32sEvent(HREQ_DATA_GET_LINK_BANDWIDTH_INFO, HRIL_EVENT_COUNT_2, telRilRequest->serialId_, cid);
+    int32_t ret = rilInterface_->GetLinkBandwidthInfo(slotId_, telRilRequest->serialId_, cid);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("function is failed, error: %{public}d", ret);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -317,33 +286,22 @@ int32_t TelRilData::GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::In
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilData::GetLinkBandwidthInfoResponse(MessageParcel &data)
+int32_t TelRilData::GetLinkBandwidthInfoResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::IDataLinkBandwidthInfo &iDataLinkBandwidthInfo)
 {
-    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
-    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
-    if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("ERROR : spBuffer is nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
     std::shared_ptr<DataLinkBandwidthInfo> dataLinkBandwidthInfo = std::make_shared<DataLinkBandwidthInfo>();
     if (dataLinkBandwidthInfo == nullptr) {
         TELEPHONY_LOGE("ERROR : dataLinkBandwidthInfo == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataLinkBandwidthInfo->ReadFromParcel(data);
-
-    const struct HRilRadioResponseInfo *radioResponseInfo =
-        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
-    if (radioResponseInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : radioResponseInfo is nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
+    BuildDataLinkBandwidthInfo(dataLinkBandwidthInfo, iDataLinkBandwidthInfo);
+    const struct HRilRadioResponseInfo radioResponseInfo = BuildHRilRadioResponseInfo(responseInfo);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(radioResponseInfo);
     if (telRilRequest == nullptr || telRilRequest->pointer_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : telRilRequest or telRilRequest->pointer_ == nullptr !!!");
+        TELEPHONY_LOGE("ERROR : telRilRequest or telRilRequest->pointer_ is nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (radioResponseInfo->error == HRilErrType::NONE) {
+    if (radioResponseInfo.error == HRilErrType::NONE) {
         const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
         if (handler == nullptr) {
             TELEPHONY_LOGE("ERROR : handler is nullptr !!!");
@@ -352,7 +310,7 @@ int32_t TelRilData::GetLinkBandwidthInfoResponse(MessageParcel &data)
         uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
         handler->SendEvent(eventId, dataLinkBandwidthInfo);
     } else {
-        ErrorResponse(telRilRequest, *radioResponseInfo);
+        ErrorResponse(telRilRequest, radioResponseInfo);
     }
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -360,17 +318,18 @@ int32_t TelRilData::GetLinkBandwidthInfoResponse(MessageParcel &data)
 int32_t TelRilData::SetLinkBandwidthReportingRule(
     LinkBandwidthRule linkBandwidth, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    if (cellularRadio_ == nullptr) {
-        TELEPHONY_LOGE("cellularRadio_ is nullptr");
+    if (rilInterface_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d rilInterface_ is nullptr", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_DATA_SET_INIT_APN_INFO, response);
+    std::shared_ptr<TelRilRequest> telRilRequest =
+        CreateTelRilRequest(HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE, response);
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("telRilRequest is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    TELEPHONY_LOGI(" telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
-    DataLinkBandwidthReportingRule dLinkBandwidth;
+    TELEPHONY_LOGI("telRilRequest->serialId_:%{public}d", telRilRequest->serialId_);
+    HDI::Ril::V1_0::IDataLinkBandwidthReportingRule dLinkBandwidth;
     dLinkBandwidth.serial = telRilRequest->serialId_;
     dLinkBandwidth.rat = linkBandwidth.rat;
     dLinkBandwidth.delayMs = linkBandwidth.delayMs;
@@ -382,7 +341,7 @@ int32_t TelRilData::SetLinkBandwidthReportingRule(
     dLinkBandwidth.maximumDownlinkKbps = linkBandwidth.maximumDownlinkKbps;
     TELEPHONY_LOGI("maximumUplinkKbpsSize:%{public}d, maximumDownlinkKbpsSize:%{public}d",
         dLinkBandwidth.maximumUplinkKbpsSize, dLinkBandwidth.maximumDownlinkKbpsSize);
-    int32_t ret = SendBufferEvent(HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE, dLinkBandwidth);
+    int32_t ret = rilInterface_->SetLinkBandwidthReportingRule(slotId_, telRilRequest->serialId_, dLinkBandwidth);
     if (ret != 0) {
         TELEPHONY_LOGE("HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE return: %{public}d", ret);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -390,15 +349,15 @@ int32_t TelRilData::SetLinkBandwidthReportingRule(
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilData::SetLinkBandwidthReportingRuleResponse(MessageParcel &data)
+int32_t TelRilData::SetLinkBandwidthReportingRuleResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
 {
-    return TelRilOnlyReportResponseInfo(data);
+    return TelRilOnlyReportResponseInfo(responseInfo);
 }
 
 int32_t TelRilData::SetDataPermitted(const int32_t dataPermitted, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    if (cellularRadio_ == nullptr) {
-        TELEPHONY_LOGE("cellularRadio_ is nullptr");
+    if (rilInterface_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d rilInterface_ is nullptr", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_DATA_SET_DATA_PERMITTED, response);
@@ -406,8 +365,7 @@ int32_t TelRilData::SetDataPermitted(const int32_t dataPermitted, const AppExecF
         TELEPHONY_LOGE("telRilRequest is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t ret =
-        SendInt32sEvent(HREQ_DATA_SET_DATA_PERMITTED, HRIL_EVENT_COUNT_2, telRilRequest->serialId_, dataPermitted);
+    int32_t ret = rilInterface_->SetDataPermitted(slotId_, telRilRequest->serialId_, dataPermitted);
     if (ret != 0) {
         TELEPHONY_LOGE("Send HREQ_DATA_SET_DATA_PERMITTED return: %{public}d", ret);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -415,9 +373,69 @@ int32_t TelRilData::SetDataPermitted(const int32_t dataPermitted, const AppExecF
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilData::SetDataPermittedResponse(MessageParcel &data)
+int32_t TelRilData::SetDataPermittedResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
 {
-    return TelRilOnlyReportResponseInfo(data);
+    return TelRilOnlyReportResponseInfo(responseInfo);
+}
+
+void TelRilData::BuildDataCallResultList(std::shared_ptr<DataCallResultList> dataCallResultList,
+    const HDI::Ril::V1_0::IDataCallResultList &iDataCallResultList)
+{
+    dataCallResultList->size = iDataCallResultList.size;
+    for (auto dc : iDataCallResultList.dcList) {
+        SetupDataCallResultInfo dataCallResultInfo;
+        dataCallResultInfo.flag = dc.flag;
+        dataCallResultInfo.reason = dc.reason;
+        dataCallResultInfo.retryTime = dc.retryTime;
+        dataCallResultInfo.cid = dc.cid;
+        dataCallResultInfo.active = dc.active;
+        dataCallResultInfo.type = dc.type;
+        dataCallResultInfo.netPortName = dc.netPortName;
+        dataCallResultInfo.address = dc.address;
+        dataCallResultInfo.dns = dc.dns;
+        dataCallResultInfo.dnsSec = dc.dnsSec;
+        dataCallResultInfo.gateway = dc.gateway;
+        dataCallResultInfo.maxTransferUnit = dc.maxTransferUnit;
+        dataCallResultInfo.pCscfPrimAddr = dc.pCscfPrimAddr;
+        dataCallResultInfo.pCscfSecAddr = dc.pCscfSecAddr;
+        dataCallResultInfo.pduSessionId = dc.pduSessionId;
+        dataCallResultList->dcList.push_back(dataCallResultInfo);
+    }
+}
+
+void TelRilData::BuildDataCallResultInfo(std::shared_ptr<SetupDataCallResultInfo> dataCallResult,
+    const HDI::Ril::V1_0::ISetupDataCallResultInfo &iSetupDataCallResultInfo)
+{
+    dataCallResult->flag = iSetupDataCallResultInfo.flag;
+    dataCallResult->reason = iSetupDataCallResultInfo.reason;
+    dataCallResult->retryTime = iSetupDataCallResultInfo.retryTime;
+    dataCallResult->cid = iSetupDataCallResultInfo.cid;
+    dataCallResult->active = iSetupDataCallResultInfo.active;
+    dataCallResult->type = iSetupDataCallResultInfo.type;
+    dataCallResult->netPortName = iSetupDataCallResultInfo.netPortName;
+    dataCallResult->address = iSetupDataCallResultInfo.address;
+    dataCallResult->dns = iSetupDataCallResultInfo.dns;
+    dataCallResult->dnsSec = iSetupDataCallResultInfo.dnsSec;
+    dataCallResult->gateway = iSetupDataCallResultInfo.gateway;
+    dataCallResult->maxTransferUnit = iSetupDataCallResultInfo.maxTransferUnit;
+    dataCallResult->pCscfPrimAddr = iSetupDataCallResultInfo.pCscfPrimAddr;
+    dataCallResult->pCscfSecAddr = iSetupDataCallResultInfo.pCscfSecAddr;
+    dataCallResult->pduSessionId = iSetupDataCallResultInfo.pduSessionId;
+}
+
+void TelRilData::BuildDataLinkBandwidthInfo(std::shared_ptr<DataLinkBandwidthInfo> dataLinkBandwidthInfo,
+    const HDI::Ril::V1_0::IDataLinkBandwidthInfo &iDataLinkBandwidthInfo)
+{
+    dataLinkBandwidthInfo->serial = iDataLinkBandwidthInfo.serial;
+    dataLinkBandwidthInfo->cid = iDataLinkBandwidthInfo.cid;
+    dataLinkBandwidthInfo->qi = iDataLinkBandwidthInfo.qi;
+    dataLinkBandwidthInfo->dlGfbr = iDataLinkBandwidthInfo.dlGfbr;
+    dataLinkBandwidthInfo->ulGfbr = iDataLinkBandwidthInfo.ulGfbr;
+    dataLinkBandwidthInfo->dlMfbr = iDataLinkBandwidthInfo.dlMfbr;
+    dataLinkBandwidthInfo->ulMfbr = iDataLinkBandwidthInfo.ulMfbr;
+    dataLinkBandwidthInfo->ulSambr = iDataLinkBandwidthInfo.ulSambr;
+    dataLinkBandwidthInfo->dlSambr = iDataLinkBandwidthInfo.dlSambr;
+    dataLinkBandwidthInfo->averagingWindow = iDataLinkBandwidthInfo.averagingWindow;
 }
 } // namespace Telephony
 } // namespace OHOS

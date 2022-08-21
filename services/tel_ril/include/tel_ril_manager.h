@@ -17,6 +17,7 @@
 #define TEL_RIL_MANAGER_H
 
 #include <singleton.h>
+#include <v1_0/iril_interface.h>
 
 #include "hdf_service_status_listener.h"
 #include "i_tel_ril_manager.h"
@@ -66,30 +67,13 @@ public:
 
     int32_t ShutDown(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    /**
-     * @brief Get current Calls
-     */
     int32_t GetCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    /**
-     * @brief Dial a call
-     *
-     * @param string address
-     * @param int32_t clirMode
-     */
     int32_t Dial(
         int32_t slotId, std::string address, int32_t clirMode, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    /**
-     * @brief  Reject the Call
-     */
     int32_t Reject(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
 
-    /**
-     *  @brief Hang up the call
-     *
-     *  @param :int32_t gsmIndex
-     */
     int32_t Hangup(int32_t slotId, int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &result) override;
 
     int32_t Answer(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
@@ -344,6 +328,14 @@ public:
      */
     bool UnRegisterHdfStatusListener();
 
+    TelRilSms &GetTelRilSms(int32_t slotId);
+    TelRilSim &GetTelRilSim(int32_t slotId);
+    TelRilCall &GetTelRilCall(int32_t slotId);
+    TelRilData &GetTelRilData(int32_t slotId);
+    TelRilNetwork &GetTelRilNetwork(int32_t slotId);
+    TelRilModem &GetTelRilModem(int32_t slotId);
+
+public:
     static const int32_t INVALID_WAKELOCK = -1;
     static const int32_t FOR_WAKELOCK = 0;
     static const int32_t FOR_ACK_WAKELOCK = 1;
@@ -353,12 +345,12 @@ private:
     void SendAckAndLock(void);
     int32_t SendResponseAck(void);
     void InitTelModule(int32_t slotId);
-    TelRilSms &GetTelRilSms(int32_t slotId);
-    TelRilSim &GetTelRilSim(int32_t slotId);
-    TelRilCall &GetTelRilCall(int32_t slotId);
-    TelRilData &GetTelRilData(int32_t slotId);
-    TelRilNetwork &GetTelRilNetwork(int32_t slotId);
-    TelRilModem &GetTelRilModem(int32_t slotId);
+    bool ConnectRilInterface();
+    bool ResetRilInterface(void);
+    void HandleRilInterfaceStatusCallback(const OHOS::HDI::ServiceManager::V1_0::ServiceStatus &status);
+    bool ReConnectRilInterface();
+    bool DisConnectRilInterface();
+
     std::shared_ptr<ObserverHandler> GetObserverHandler(int32_t slotId);
     /**
      * Send the request of CellularRadioIndication
@@ -415,6 +407,7 @@ private:
     std::shared_ptr<TelRilHandler> handler_ = nullptr;
     sptr<OHOS::HDI::ServiceManager::V1_0::IServiceManager> servMgr_ = nullptr;
     sptr<HdfServiceStatusListener::IServStatListener> hdfListener_ = nullptr;
+    sptr<HDI::Ril::V1_0::IRilInterface> rilInterface_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
