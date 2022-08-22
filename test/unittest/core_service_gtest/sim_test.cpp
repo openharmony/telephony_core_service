@@ -85,6 +85,7 @@ sptr<ICoreService> SimTest::GetProxy()
  * @tc.number  Telephony_Sim_ParseOperatorConf_0100
  * @tc.name  ParseOperatorConf
  * @tc.desc Function test
+ * @tc.require: issueI5J919
  */
 HWTEST_F(SimTest, Telephony_Sim_ParseOperatorConf_0100, Function | MediumTest | Level1)
 {
@@ -193,6 +194,7 @@ HWTEST_F(SimTest, Telephony_Sim_ParseOperatorConf_0200, Function | MediumTest | 
  * @tc.number  Telephony_Sim_ParseFromCustomSystem_0100
  * @tc.name  ParseOperatorConf
  * @tc.desc Function test
+ * @tc.require: issueI5J919
  */
 HWTEST_F(SimTest, Telephony_Sim_ParseFromCustomSystem_0100, Function | MediumTest | Level1)
 {
@@ -225,6 +227,7 @@ HWTEST_F(SimTest, Telephony_Sim_ParseFromCustomSystem_0100, Function | MediumTes
  * @tc.number  Telephony_Sim_ParseOperatorConf_0200
  * @tc.name  ParseOperatorConf
  * @tc.desc Function test
+ * @tc.require: issueI5J919
  */
 HWTEST_F(SimTest, Telephony_Sim_GetOperatorConf_0200, Function | MediumTest | Level1)
 {
@@ -612,6 +615,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimGid1_0200, Function | MediumTest | Level1)
  * @tc.number   Telephony_Sim_GetSimGid2_0100
  * @tc.name     Get sim gid2
  * @tc.desc     Function test
+ * @tc.require: issueI5J919
  */
 HWTEST_F(SimTest, Telephony_Sim_GetSimGid2_0100, Function | MediumTest | Level1)
 {
@@ -2304,6 +2308,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetMaxSimCount_0100, Function | MediumTest | Lev
  * @tc.number   Telephony_Sim_GetOpKey_0100
  * @tc.name     Get opkey for current sim card
  * @tc.desc     Function test
+ * @tc.require: issueI5J919
  */
 HWTEST_F(SimTest, Telephony_Sim_GetOpKey_0100, Function | MediumTest | Level1)
 {
@@ -2338,6 +2343,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetOpKey_0200, Function | MediumTest | Level1)
  * @tc.number   Telephony_Sim_GetOpKeyExt_0100
  * @tc.name     Get opkey for current sim card
  * @tc.desc     Function test
+ * @tc.require: issueI5J919
  */
 HWTEST_F(SimTest, Telephony_Sim_GetOpKeyExt_0100, Function | MediumTest | Level1)
 {
@@ -2372,6 +2378,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetOpKeyExt_0200, Function | MediumTest | Level1
  * @tc.number   Telephony_Sim_GetOpName_0100
  * @tc.name     Get opname for current sim card
  * @tc.desc     Function test
+ * @tc.require: issueI5J919
  */
 HWTEST_F(SimTest, Telephony_Sim_GetOpName_0100, Function | MediumTest | Level1)
 {
