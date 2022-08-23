@@ -1258,8 +1258,8 @@ int32_t TelRilSim::SimStkSendCallSetupRequestResult(bool accept, const AppExecFw
 {
     std::shared_ptr<TelRilRequest> telRilRequest =
         CreateTelRilRequest(HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr");
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
