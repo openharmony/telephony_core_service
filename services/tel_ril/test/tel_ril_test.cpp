@@ -42,6 +42,9 @@ enum class DiffInterfaceId {
     TEST_GET_RILCM_VOICE_REGISTRATION_STATE_TEST,
     TEST_GET_RILCM_DATA_REGISTRATION_STATE_TEST,
     TEST_ACKNOWLEDGE_RILCM_LAST_INCOMING_GSM_SMS_TEST,
+    TEST_STK_SEND_TERMINAL_RESPONSE,
+    TEST_STK_SEND_ENVELOPE,
+    TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT,
     /* =========== Cellular Data Start ============= */
     TEST_RILCM_SET_INIT_APN_INFO_TEST,
     TEST_RILCM_SETUP_DATA_CALL_TEST,
@@ -195,6 +198,13 @@ public:
     void OnRequestUnlockSimPin2Test(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestSetActiveSimTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+
+    void OnRequestSendTerminalResponseCmdTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+
+    void OnRequestSendEnvelopeCmdTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+
+    void OnRequestSendCallSetupRequestResultTest(
+        int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestNetworkGetRssiTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
@@ -484,6 +494,11 @@ void TelRilTest::OnInitSim()
         &TelRilTest::OnRequestTransmitApduBasicChannelTest;
     memberFuncMap_[DiffInterfaceId::TEST_SIM_AUTH] = &TelRilTest::OnRequestSimAuthenticationTest;
     memberFuncMap_[DiffInterfaceId::TEST_CLOSE_LG_SIMIO] = &TelRilTest::OnRequestCloseLGSimIOTest;
+    memberFuncMap_[DiffInterfaceId::TEST_STK_SEND_TERMINAL_RESPONSE] =
+        &TelRilTest::OnRequestSendTerminalResponseCmdTest;
+    memberFuncMap_[DiffInterfaceId::TEST_STK_SEND_ENVELOPE] = &TelRilTest::OnRequestSendEnvelopeCmdTest;
+    memberFuncMap_[DiffInterfaceId::TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT] =
+        &TelRilTest::OnRequestSendCallSetupRequestResultTest;
 }
 
 void TelRilTest::OnInitNetwork()
@@ -859,6 +874,56 @@ void TelRilTest::OnRequestSetActiveSimTest(int32_t slotId, const std::shared_ptr
         telRilManager_->SetActiveSim(slotId, index, enable, event);
         TELEPHONY_LOGI("TelRilTest::%{public}s --> finished", __func__);
     }
+}
+
+void TelRilTest::OnRequestSendTerminalResponseCmdTest(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_SEND_TERMINAL_RESPONSE);
+    if (event == nullptr || telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("TelRilTest::OnRequestSendTerminalResponseCmdTest failed!!!!");
+        return;
+    }
+    event->SetOwner(handler);
+    std::string strCmd;
+    std::cout << "please enter the command string:";
+    std::cin >> strCmd;
+    TELEPHONY_LOGI("TelRilTest::OnRequestSendTerminalResponseCmdTest -->");
+    telRilManager_->SendTerminalResponseCmd(slotId, strCmd, event);
+    TELEPHONY_LOGI("TelRilTest::OnRequestSendTerminalResponseCmdTest --> finished");
+}
+
+void TelRilTest::OnRequestSendEnvelopeCmdTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_SEND_ENVELOPE);
+    if (event == nullptr || telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("TelRilTest::OnRequestSendEnvelopeCmdTest failed!!!!");
+        return;
+    }
+    event->SetOwner(handler);
+    std::string strCmd;
+    std::cout << "please enter the command string:";
+    std::cin >> strCmd;
+    TELEPHONY_LOGI("TelRilTest::OnRequestSendEnvelopeCmdTest -->");
+    telRilManager_->SendEnvelopeCmd(slotId, strCmd, event);
+    TELEPHONY_LOGI("TelRilTest::OnRequestSendEnvelopeCmdTest --> finished");
+}
+
+void TelRilTest::OnRequestSendCallSetupRequestResultTest(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_SEND_CALL_SETUP_REQUEST_RESULT);
+    if (event == nullptr || telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("TelRilTest::OnRequestSendCallSetupRequestResultTest failed!!!!");
+        return;
+    }
+    event->SetOwner(handler);
+    int32_t accept;
+    std::cout << "please enter the call setup request result:";
+    std::cin >> accept;
+    TELEPHONY_LOGI("TelRilTest::OnRequestSendCallSetupRequestResultTest -->");
+    telRilManager_->SendCallSetupRequestResult(slotId, accept, event);
+    TELEPHONY_LOGI("TelRilTest::OnRequestSendCallSetupRequestResultTest --> finished");
 }
 
 /************************************** SIM test func *******************************************/
@@ -2278,6 +2343,11 @@ void SimTest()
          << endl; // pass
     cout << (int32_t)DiffInterfaceId::TEST_ACKNOWLEDGE_RILCM_LAST_INCOMING_GSM_SMS_TEST
          << "--> OnRequestSmsAcknowledgeTest" << endl;
+    cout << (int32_t)DiffInterfaceId::TEST_STK_SEND_TERMINAL_RESPONSE << "--> OnRequestSendTerminalResponseCmdTest"
+         << endl; // pass
+    cout << (int32_t)DiffInterfaceId::TEST_STK_SEND_ENVELOPE << "--> OnRequestSendEnvelopeCmdTest" << endl; // pass
+    cout << (int32_t)DiffInterfaceId::TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT
+         << "--> OnRequestSendCallSetupRequestResultTest" << endl; // pass
 }
 
 void DataTest(void)

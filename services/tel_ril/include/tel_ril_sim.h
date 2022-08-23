@@ -31,6 +31,8 @@ public:
     int32_t SimStkSessionEndNotify(MessageParcel &data);
     int32_t SimStkProactiveNotify(MessageParcel &data);
     int32_t SimStkAlphaNotify(MessageParcel &data);
+    int32_t SimStkEventNotify(MessageParcel &data);
+    int32_t SimStkCallSetupNotify(MessageParcel &data);
     int32_t SimRefreshNotify(MessageParcel &data);
 
     int32_t GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result);
@@ -48,6 +50,7 @@ public:
     int32_t SetActiveSim(int32_t index, int32_t enable, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimStkSendTerminalResponse(const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimStkSendEnvelope(const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SimStkSendCallSetupRequestResult(bool accept, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimStkIsReady(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetRadioProtocol(SimProtocolRequest simProtocolData, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimOpenLogicalChannel(std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response);
@@ -73,6 +76,7 @@ public:
     int32_t SetActiveSimResponse(MessageParcel &data);
     int32_t SimStkSendTerminalResponseResponse(MessageParcel &data);
     int32_t SimStkSendEnvelopeResponse(MessageParcel &data);
+    int32_t SimStkSendCallSetupRequestResultResponse(MessageParcel &data);
     int32_t SimStkIsReadyResponse(MessageParcel &data);
     int32_t SetRadioProtocolResponse(MessageParcel &data);
     int32_t SimOpenLogicalChannelResponse(MessageParcel &data);

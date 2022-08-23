@@ -94,6 +94,10 @@ struct AsyncGetLockState {
 struct AsyncDefaultSlotId {
     AsyncContext<int32_t> asyncContext;
 };
+
+struct AsyncStkCallSetupResult {
+    AsyncContext<bool> asyncContext;
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_NAPI_SIM_H

@@ -108,6 +108,7 @@ private:
     int32_t OnGetImsRegStatus(MessageParcel &data, MessageParcel &reply);
     int32_t OnSendEnvelopeCmd(MessageParcel &data, MessageParcel &reply);
     int32_t OnSendTerminalResponseCmd(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSendCallSetupRequestResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnHasOperatorPrivileges(MessageParcel &data, MessageParcel &reply);
     int32_t OnSimAuthentication(MessageParcel &data, MessageParcel &reply);
     int32_t OnUnlockSimLock(MessageParcel &data, MessageParcel &reply);

@@ -2037,6 +2037,104 @@ napi_value SendTerminalResponseCmd(napi_env env, napi_callback_info info)
     return result;
 }
 
+void NativeAcceptCallSetupRequest(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    AsyncStkCallSetupResult *context = static_cast<AsyncStkCallSetupResult *>(data);
+    if (!IsValidSlotId(context->asyncContext.slotId)) {
+        TELEPHONY_LOGE("NativeAcceptCallSetupRequest slotId is invalid");
+        context->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
+    context->asyncContext.callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().
+        SendCallSetupRequestResult(context->asyncContext.slotId, true);
+    TELEPHONY_LOGI("NAPI NativeAcceptCallSetupRequest %{public}d", context->asyncContext.callbackVal);
+    context->asyncContext.context.resolved = context->asyncContext.callbackVal;
+}
+
+void AcceptCallSetupRequestCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncStkCallSetupResult> context(static_cast<AsyncStkCallSetupResult *>(data));
+    if (context->asyncContext.context.errorCode == ERROR_SLOT_ID_INVALID) {
+        NapiAsyncCompleteCallback(
+            env, status, context->asyncContext, "slotId is invalid", false, ERROR_SLOT_ID_INVALID);
+    } else {
+        NapiAsyncCompleteCallback(env, status, context->asyncContext, "Stk Call Setup Response From App failed", true);
+    }
+}
+
+napi_value AcceptCallSetupRequest(napi_env env, napi_callback_info info)
+{
+    auto asyncContext = new AsyncStkCallSetupResult();
+    BaseContext &context = asyncContext->asyncContext.context;
+
+    auto initPara = std::make_tuple(&asyncContext->asyncContext.slotId, &context.callbackRef);
+    AsyncPara para {
+        .funcName = "AcceptCallSetupRequest",
+        .env = env,
+        .info = info,
+        .execute = NativeAcceptCallSetupRequest,
+        .complete = AcceptCallSetupRequestCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2<AsyncStkCallSetupResult>(para, asyncContext, initPara);
+    if (result) {
+        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+    }
+    return result;
+}
+
+void NativeRejectCallSetupRequest(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    AsyncStkCallSetupResult *context = static_cast<AsyncStkCallSetupResult *>(data);
+    if (!IsValidSlotId(context->asyncContext.slotId)) {
+        TELEPHONY_LOGE("NativeRejectCallSetupRequest slotId is invalid");
+        context->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
+    context->asyncContext.callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().
+        SendCallSetupRequestResult(context->asyncContext.slotId, false);
+    TELEPHONY_LOGI("NAPI NativeRejectCallSetupRequest %{public}d", context->asyncContext.callbackVal);
+    context->asyncContext.context.resolved = context->asyncContext.callbackVal;
+}
+
+void RejectCallSetupRequestCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncStkCallSetupResult> context(static_cast<AsyncStkCallSetupResult *>(data));
+    if (context->asyncContext.context.errorCode == ERROR_SLOT_ID_INVALID) {
+        NapiAsyncCompleteCallback(
+            env, status, context->asyncContext, "slotId is invalid", false, ERROR_SLOT_ID_INVALID);
+    } else {
+        NapiAsyncCompleteCallback(env, status, context->asyncContext, "Stk Call Setup Response From App failed", true);
+    }
+}
+
+napi_value RejectCallSetupRequest(napi_env env, napi_callback_info info)
+{
+    auto asyncContext = new AsyncStkCallSetupResult();
+    BaseContext &context = asyncContext->asyncContext.context;
+
+    auto initPara = std::make_tuple(&asyncContext->asyncContext.slotId, &context.callbackRef);
+    AsyncPara para {
+        .funcName = "RejectCallSetupRequest",
+        .env = env,
+        .info = info,
+        .execute = NativeRejectCallSetupRequest,
+        .complete = RejectCallSetupRequestCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2<AsyncStkCallSetupResult>(para, asyncContext, initPara);
+    if (result) {
+        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+    }
+    return result;
+}
+
 napi_value GetMaxSimCount(napi_env env, napi_callback_info)
 {
     return GetNapiValue(env, DelayedRefSingleton<CoreServiceClient>::GetInstance().GetMaxSimCount());
@@ -2438,6 +2536,8 @@ napi_status InitSimInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getSimTelephoneNumber", GetSimTelephoneNumber),
         DECLARE_NAPI_FUNCTION("sendEnvelopeCmd", SendEnvelopeCmd),
         DECLARE_NAPI_FUNCTION("sendTerminalResponseCmd", SendTerminalResponseCmd),
+        DECLARE_NAPI_FUNCTION("acceptCallSetupRequest", AcceptCallSetupRequest),
+        DECLARE_NAPI_FUNCTION("rejectCallSetupRequest", RejectCallSetupRequest),
         DECLARE_NAPI_FUNCTION("getMaxSimCount", GetMaxSimCount),
         DECLARE_NAPI_FUNCTION("hasOperatorPrivileges", HasOperatorPrivileges),
         DECLARE_NAPI_FUNCTION("getOpKey", GetOpKey),

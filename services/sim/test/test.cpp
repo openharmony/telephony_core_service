@@ -247,7 +247,7 @@ static bool TestGetSimSpn()
 static bool TestGetSimIccId()
 {
     int32_t slotId = 0;
-    std::cout << "please input soltid:"<<std::endl;
+    std::cout << "please input soltid:"<< std::endl;
     std::cin >> slotId;
     std::u16string result = g_telephonyService->GetSimIccId(slotId);
     std::string str = Str16ToStr8(result);
@@ -991,6 +991,45 @@ static bool TestHasOperatorPrivileges()
     return true;
 }
 
+static bool TestSendTerminalResponseCmd()
+{
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    std::cout << "please input slotId" << endl;
+    std::cin >> slotId;
+    std::string cmd = "";
+    std::cout << "input terminal response command" << std::endl;
+    std::cin >> cmd;
+    bool result = g_telephonyService->SendTerminalResponseCmd(slotId, cmd);
+    std::cout << "TelephonyTestService Remote SendTerminalResponseCmd result [" << result << "] " << std::endl;
+    return true;
+}
+
+static bool TestSendEnvelopeCmd()
+{
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    std::cout << "please input slotId" << endl;
+    std::cin >> slotId;
+    std::string cmd = "";
+    std::cout << "input envelope command" << std::endl;
+    std::cin >> cmd;
+    bool result = g_telephonyService->SendEnvelopeCmd(slotId, cmd);
+    std::cout << "TelephonyTestService Remote SendEnvelopeCmd result [" << result << "] " << std::endl;
+    return true;
+}
+
+static bool TestSendCallSetupRequestResult()
+{
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    std::cout << "please input slotId" << endl;
+    std::cin >> slotId;
+    int32_t accept = 0;
+    std::cout << "input call setup request result" << std::endl;
+    std::cin >> accept;
+    bool result = g_telephonyService->SendCallSetupRequestResult(slotId, accept);
+    std::cout << "TelephonyTestService Remote SendCallSetupRequestResult result [" << result << "] " << std::endl;
+    return true;
+}
+
 static bool TestQuit()
 {
     std::cout << "exit..." << std::endl;
@@ -1119,11 +1158,10 @@ int main()
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_MAIN_SUBSCRIPTION_CHANGED);
     // STK
-    matchingSkills.AddEvent(ACTION_SESSION_END);
-    matchingSkills.AddEvent(ACTION_STK_COMMAND);
-    matchingSkills.AddEvent(ACTION_ALPHA_IDENTIFIER);
-    matchingSkills.AddEvent(ACTION_CARD_STATUS_INFORM);
-
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_STK_SESSION_END);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_STK_COMMAND);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_STK_ALPHA_IDENTIFIER);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_STK_CARD_STATE_CHANGED);
     OHOS::EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
     subscribeInfo.SetPriority(1);
     std::shared_ptr<CommonEventTest> subScriber = std::make_shared<CommonEventTest>(subscribeInfo);
