@@ -24,11 +24,12 @@ namespace OHOS {
 namespace Telephony {
 class TelRilModem : public TelRilBase {
 public:
-    TelRilModem(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler,
-        std::shared_ptr<TelRilHandler> handler);
+    TelRilModem(int32_t slotId, sptr<IRemoteObject> cellularRadio, sptr<HDI::Ril::V1_0::IRilInterface> rilInterface,
+        std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     ~TelRilModem() = default;
+
     /**
-     * @brief Turn on and off radio response (for flight mode)
+     * Turn on and off radio response (for flight mode)
      * @param data is HDF service callback message
      */
     int32_t SetRadioStateResponse(MessageParcel &data);
@@ -36,8 +37,9 @@ public:
     int32_t ShutDownResponse(MessageParcel &data);
     int32_t RadioStateUpdated(MessageParcel &data);
     int32_t VoiceRadioTechUpdated(MessageParcel &data);
+
     /**
-     * @brief Radio Status Change response
+     * Radio Status Change response
      * @param data is HDF service callback message
      */
     int32_t SetRadioState(int32_t fun, int32_t rst, const AppExecFwk::InnerEvent::Pointer &response);

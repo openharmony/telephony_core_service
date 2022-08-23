@@ -20,16 +20,16 @@
 #include <mutex>
 
 #include "event_runner.h"
-#include "iremote_broker.h"
-
 #include "hril_base_parcel.h"
 #include "hril_types.h"
-#include "radio_event.h"
+#include "iremote_broker.h"
 #include "observer_handler.h"
+#include "radio_event.h"
 #include "tel_ril_common.h"
 #include "tel_ril_handler.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "v1_0/iril_interface.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -50,8 +50,8 @@ private:
 
 class TelRilBase {
 public:
-    TelRilBase(int32_t slotId, sptr<IRemoteObject> cellularRadio, std::shared_ptr<ObserverHandler> observerHandler,
-        std::shared_ptr<TelRilHandler> handler);
+    TelRilBase(int32_t slotId, sptr<IRemoteObject> cellularRadio, sptr<HDI::Ril::V1_0::IRilInterface> rilInterface,
+        std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     virtual ~TelRilBase() = default;
 
     /**
@@ -117,11 +117,13 @@ public:
      */
 
     void ResetRemoteObject(sptr<IRemoteObject> rilAdapterObj);
+    void ResetRilInterface(sptr<HDI::Ril::V1_0::IRilInterface> rilInterface);
     static std::shared_ptr<TelRilRequest> FindTelRilRequest(const HRilRadioResponseInfo &responseInfo);
 
     int32_t ErrorResponse(const int32_t serial, const HRilErrType err);
     int32_t ErrorResponse(std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo);
     int32_t TelRilOnlyReportResponseInfo(MessageParcel &data);
+    int32_t TelRilOnlyReportResponseInfo(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
     template<typename T>
     int32_t NotifyObserver(int32_t what, MessageParcel &data);
     template<typename T>
@@ -143,23 +145,27 @@ protected:
     using SendEvent = int32_t (TelRilBase::*)(const char *funcName, EventHandler &handler, MessageParcel &data,
         uint32_t eventId);
 
-    // Respond to "request" events from the upper layer of tel_ril.
     template<typename... ValueTypes>
     int32_t Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response, uint32_t requestId,
         ValueTypes &&...vals);
-    // Respond to the "reply" event sent by the hril layer.
+    template<typename FuncType, typename... ParamTypes>
+    inline int32_t Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response, int32_t requestId,
+        FuncType &&_func, ParamTypes &&... _args);
     int32_t Response(const char *funcName, MessageParcel &data, UserSendEvent send);
-    // Respond to the "reply" event sent by the hril layer.
     template<typename T>
     int32_t Response(const char *funcName, MessageParcel &data);
-    // Respond to "active reporting" events sent by the hril layer.
+
     template<typename T>
     int32_t Notify(const char *funcName, MessageParcel &data, RadioEvent notifyId);
 
-    // std::any type: int32_t (T::*)(MessageParcel &data);
+    HRilRadioResponseInfo BuildHRilRadioResponseInfo(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo);
+
+protected:
     std::map<uint32_t, std::any> memberFuncMap_;
     std::shared_ptr<ObserverHandler> observerHandler_;
     sptr<IRemoteObject> cellularRadio_;
+    sptr<HDI::Ril::V1_0::IRilInterface> rilInterface_;
     int32_t slotId_;
 
 private:

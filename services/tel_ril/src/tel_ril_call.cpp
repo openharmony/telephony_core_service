@@ -30,7 +30,6 @@ void TelRilCall::AddHandlerToMap()
     memberFuncMap_[HNOTI_CALL_USSD_REPORT] = &TelRilCall::CallUssdNotice;
     memberFuncMap_[HNOTI_CALL_RINGBACK_VOICE_REPORT] = &TelRilCall::CallRingbackVoiceNotice;
     memberFuncMap_[HNOTI_CALL_SRVCC_STATUS_REPORT] = &TelRilCall::SrvccStatusNotice;
-    memberFuncMap_[HNOTI_CALL_EMERGENCY_NUMBER_REPORT] = &TelRilCall::CallEmergencyNotice;
     memberFuncMap_[HNOTI_CALL_SS_REPORT] = &TelRilCall::CallSsNotice;
 
     // Response
@@ -64,14 +63,13 @@ void TelRilCall::AddHandlerToMap()
     memberFuncMap_[HREQ_CALL_GET_USSD] = &TelRilCall::GetUssdResponse;
     memberFuncMap_[HREQ_CALL_SET_MUTE] = &TelRilCall::SetMuteResponse;
     memberFuncMap_[HREQ_CALL_GET_MUTE] = &TelRilCall::GetMuteResponse;
-    memberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] = &TelRilCall::GetEmergencyCallListResponse;
-    memberFuncMap_[HREQ_CALL_SET_EMERGENCY_LIST] = &TelRilCall::SetEmergencyCallListResponse;
     memberFuncMap_[HREQ_CALL_GET_FAIL_REASON] = &TelRilCall::GetCallFailReasonResponse;
 }
 
 TelRilCall::TelRilCall(int32_t slotId, sptr<IRemoteObject> cellularRadio,
-    std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
-    : TelRilBase(slotId, cellularRadio, observerHandler, handler)
+    sptr<HDI::Ril::V1_0::IRilInterface> rilInterface, std::shared_ptr<ObserverHandler> observerHandler,
+    std::shared_ptr<TelRilHandler> handler)
+    : TelRilBase(slotId, cellularRadio, rilInterface, observerHandler, handler)
 {
     AddHandlerToMap();
 }
@@ -1819,12 +1817,11 @@ int32_t TelRilCall::GetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &
         TELEPHONY_LOGE("TelRilManager GetEmergencyCallList :telRilRequest is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (cellularRadio_ == nullptr) {
-        TELEPHONY_LOGE("%{public}s  cellularRadio_ == nullptr", __func__);
+    if (rilInterface_ == nullptr) {
+        TELEPHONY_LOGE("%{public}s  rilInterface_ == nullptr", __func__);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-
-    return SendInt32Event(HREQ_CALL_GET_EMERGENCY_LIST, telRilRequest->serialId_);
+    return rilInterface_->GetEmergencyCallList(slotId_, telRilRequest->serialId_);
 }
 
 int32_t TelRilCall::SetEmergencyCallList(
@@ -1836,51 +1833,35 @@ int32_t TelRilCall::SetEmergencyCallList(
         TELEPHONY_LOGE(" SetEmergencyCallList telRilRequest is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (cellularRadio_ == nullptr) {
-        TELEPHONY_LOGE("SetEmergencyCallList %{public}s  cellularRadio_ == nullptr", __func__);
+    if (rilInterface_ == nullptr) {
+        TELEPHONY_LOGE("SetEmergencyCallList %{public}s  rilInterface_ == nullptr", __func__);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    EmergencyInfoList emergencyInfoList;
+    HDI::Ril::V1_0::IEmergencyInfoList emergencyInfoList;
     emergencyInfoList.callSize = (int32_t)eccVec.size();
-    emergencyInfoList.flag = telRilRequest->serialId_;
     int index = 1;
     for (EmergencyCall ecc : eccVec) {
-        EmergencyInfo emergencyInfo = {};
-        emergencyInfo.index = index;
-        emergencyInfo.total = eccVec.size();
-        emergencyInfo.eccNum = ecc.eccNum;
-        emergencyInfo.category = static_cast<int32_t>(ecc.eccType);
-        emergencyInfo.simpresent = static_cast<int32_t>(ecc.simpresent);
-        emergencyInfo.mcc = ecc.mcc;
-        emergencyInfo.abnormalService = static_cast<int32_t>(ecc.abnormalService);
+        HDI::Ril::V1_0::IEmergencyCall emergencyCall = {};
+        emergencyCall.index = index;
+        emergencyCall.total = eccVec.size();
+        emergencyCall.eccNum = ecc.eccNum;
+        emergencyCall.eccType = (HDI::Ril::V1_0::IEccType)(ecc.eccType);
+        emergencyCall.simpresent = (HDI::Ril::V1_0::ISimpresentType)(ecc.simpresent);
+        emergencyCall.mcc = ecc.mcc;
+        emergencyCall.abnormalService = (HDI::Ril::V1_0::IAbnormalServiceType)(ecc.abnormalService);
         index++;
-        emergencyInfoList.calls.push_back(emergencyInfo);
+        emergencyInfoList.calls.push_back(emergencyCall);
     }
-
-    for (auto ecc : emergencyInfoList.calls) {
-        TELEPHONY_LOGE(
-            "SetEmergencyCallList, data: eccNum %{public}s mcc %{public}s", ecc.eccNum.c_str(), ecc.mcc.c_str());
-    }
-    int32_t ret = SendBufferEvent(HREQ_CALL_SET_EMERGENCY_LIST, emergencyInfoList);
-    TELEPHONY_LOGI("Send (ID:%{public}d) return: %{public}d", HREQ_CALL_SET_EMERGENCY_LIST, ret);
-    return TELEPHONY_ERR_SUCCESS;
+    return rilInterface_->SetEmergencyCallList(slotId_, telRilRequest->serialId_, emergencyInfoList);
 }
 
-int32_t TelRilCall::SetEmergencyCallListResponse(MessageParcel &data)
+int32_t TelRilCall::SetEmergencyCallListResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
 {
-    TELEPHONY_LOGE("SetEmergencyCallListResponse");
-    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
-    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
-    if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("ERROR : spBuffer is nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    const struct HRilRadioResponseInfo *radioResponseInfo =
-        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
-    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
+    const struct HRilRadioResponseInfo radioResponseInfo = BuildHRilRadioResponseInfo(responseInfo);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(radioResponseInfo);
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
-        if (radioResponseInfo->error == HRilErrType::NONE) {
+        if (radioResponseInfo.error == HRilErrType::NONE) {
             std::shared_ptr<HRilRadioResponseInfo> result = std::make_shared<HRilRadioResponseInfo>();
             const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
             if (handler == nullptr) {
@@ -1888,10 +1869,10 @@ int32_t TelRilCall::SetEmergencyCallListResponse(MessageParcel &data)
                 return TELEPHONY_ERR_LOCAL_PTR_NULL;
             }
             uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
-            result->error = radioResponseInfo->error;
+            result->error = radioResponseInfo.error;
             handler->SendEvent(eventId, result);
         } else {
-            ErrorResponse(telRilRequest, *radioResponseInfo);
+            ErrorResponse(telRilRequest, radioResponseInfo);
         }
     } else {
         TELEPHONY_LOGE("ERROR : telRilRequest is nullptr || radioResponseInfo error !");
@@ -1900,34 +1881,23 @@ int32_t TelRilCall::SetEmergencyCallListResponse(MessageParcel &data)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilCall::GetEmergencyCallListResponse(MessageParcel &data)
+int32_t TelRilCall::GetEmergencyCallListResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::IEmergencyInfoList &emergencyInfoList)
 {
-    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
-    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
-    if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("spBuffer == nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
     std::shared_ptr<EmergencyInfoList> emergencyCallList = std::make_shared<EmergencyInfoList>();
     if (emergencyCallList == nullptr) {
         TELEPHONY_LOGE("ERROR : callInfo == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    emergencyCallList->ReadFromParcel(data);
-
-    const struct HRilRadioResponseInfo *radioResponseInfo =
-        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
-    if (radioResponseInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : radioResponseInfo == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
+    BuildEmergencyInfoList(emergencyCallList, emergencyInfoList);
+    const struct HRilRadioResponseInfo radioResponseInfo = BuildHRilRadioResponseInfo(responseInfo);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(radioResponseInfo);
     if (telRilRequest == nullptr || telRilRequest->pointer_ == nullptr) {
         TELEPHONY_LOGE("ERROR : telRilRequest or telRilRequest->pointer_ == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     emergencyCallList->flag = telRilRequest->pointer_->GetParam();
-    if (radioResponseInfo->error == HRilErrType::NONE) {
+    if (radioResponseInfo.error == HRilErrType::NONE) {
         const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
         if (handler == nullptr) {
             TELEPHONY_LOGE("ERROR : handler == nullptr !!!");
@@ -1936,7 +1906,7 @@ int32_t TelRilCall::GetEmergencyCallListResponse(MessageParcel &data)
         uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
         handler->SendEvent(eventId, emergencyCallList);
     } else {
-        ErrorResponse(telRilRequest, *radioResponseInfo);
+        ErrorResponse(telRilRequest, radioResponseInfo);
     }
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -1990,21 +1960,33 @@ int32_t TelRilCall::GetCallFailReasonResponse(MessageParcel &data)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilCall::CallEmergencyNotice(MessageParcel &data)
+int32_t TelRilCall::CallEmergencyNotice(const HDI::Ril::V1_0::IEmergencyInfoList &emergencyInfoList)
 {
-    std::shared_ptr<EmergencyInfoList> emergencyInfoList = std::make_shared<EmergencyInfoList>();
-    if (emergencyInfoList == nullptr) {
-        TELEPHONY_LOGE("ERROR : emergencyInfoList == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    emergencyInfoList->ReadFromParcel(data);
+    std::shared_ptr<EmergencyInfoList> mEmergencyInfoList = std::make_shared<EmergencyInfoList>();
+    BuildEmergencyInfoList(mEmergencyInfoList, emergencyInfoList);
     if (observerHandler_ != nullptr) {
-        observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_EMERGENCY_NUMBER_REPORT, emergencyInfoList);
+        observerHandler_->NotifyObserver(RadioEvent::RADIO_CALL_EMERGENCY_NUMBER_REPORT, mEmergencyInfoList);
     } else {
         TELEPHONY_LOGE("ERROR : observerHandler_ == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return TELEPHONY_ERR_SUCCESS;
+}
+
+void TelRilCall::BuildEmergencyInfoList(
+    std::shared_ptr<EmergencyInfoList> emergencyCallList, const HDI::Ril::V1_0::IEmergencyInfoList &emergencyInfoList)
+{
+    emergencyCallList->callSize = emergencyInfoList.callSize;
+    for (auto ecc : emergencyInfoList.calls) {
+        EmergencyInfo call;
+        call.index = ecc.index;
+        call.total = ecc.total;
+        call.eccNum = ecc.eccNum;
+        call.category = ecc.simpresent;
+        call.mcc = ecc.mcc;
+        call.abnormalService = ecc.abnormalService;
+        emergencyCallList->calls.push_back(call);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

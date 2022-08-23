@@ -23,17 +23,21 @@ std::mutex TelRilBase::requestLock_;
 std::shared_ptr<TelRilHandler> TelRilBase::handler_;
 
 TelRilBase::TelRilBase(int32_t slotId, sptr<IRemoteObject> rilAdapterObj,
-    std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
+    sptr<HDI::Ril::V1_0::IRilInterface> rilInterface, std::shared_ptr<ObserverHandler> observerHandler,
+    std::shared_ptr<TelRilHandler> handler)
+    : observerHandler_(observerHandler), cellularRadio_(rilAdapterObj), rilInterface_(rilInterface), slotId_(slotId)
 {
-    observerHandler_ = observerHandler;
-    cellularRadio_ = rilAdapterObj;
-    slotId_ = slotId;
     handler_ = handler;
 }
 
 void TelRilBase::ResetRemoteObject(sptr<IRemoteObject> rilAdapterObj)
 {
     cellularRadio_ = rilAdapterObj;
+}
+
+void TelRilBase::ResetRilInterface(sptr<HDI::Ril::V1_0::IRilInterface> rilInterface)
+{
+    rilInterface_ = rilInterface;
 }
 
 std::shared_ptr<TelRilRequest> TelRilBase::CreateTelRilRequest(
@@ -282,6 +286,35 @@ int32_t TelRilBase::TelRilOnlyReportResponseInfo(MessageParcel &data)
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t TelRilBase::TelRilOnlyReportResponseInfo(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    const struct HRilRadioResponseInfo radioResponseInfo = BuildHRilRadioResponseInfo(responseInfo);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(radioResponseInfo);
+    if (telRilRequest == nullptr || telRilRequest->pointer_ == nullptr) {
+        TELEPHONY_LOGE("ERROR : telRilRequest or telRilRequest->pointer_ == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
+    if (handler == nullptr) {
+        TELEPHONY_LOGE("ERROR : handler is nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
+    std::shared_ptr<HRilRadioResponseInfo> result = std::make_shared<HRilRadioResponseInfo>();
+    if (result == nullptr) {
+        TELEPHONY_LOGE("ERROR : result is nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    result->flag = telRilRequest->pointer_->GetParam();
+    result->error = radioResponseInfo.error;
+    result->serial = radioResponseInfo.serial;
+    if (!handler->SendEvent(eventId, result)) {
+        TELEPHONY_LOGE("Send eventId:%{public}d is failed!", eventId);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 void TelRilBase::PrintErrorForEmptyPointer(void)
 {
     TELEPHONY_LOGE("ERROR : it is empty pointer!!!");
@@ -302,6 +335,17 @@ const HRilRadioResponseInfo &TelRilBase::GetHRilRadioResponse(MessageParcel &dat
         return invalidResponse;
     }
     return *radioResponseInfo;
+}
+
+HRilRadioResponseInfo TelRilBase::BuildHRilRadioResponseInfo(
+    const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo)
+{
+    HRilRadioResponseInfo responseInfo = { 0 };
+    responseInfo.flag = iResponseInfo.flag;
+    responseInfo.serial = iResponseInfo.serial;
+    responseInfo.error = (HRilErrType)iResponseInfo.error;
+    responseInfo.type = (HRilResponseTypes)iResponseInfo.type;
+    return responseInfo;
 }
 } // namespace Telephony
 } // namespace OHOS
