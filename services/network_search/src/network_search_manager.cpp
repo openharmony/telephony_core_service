@@ -27,6 +27,11 @@ namespace OHOS {
 namespace Telephony {
 const std::string KEY_DEFAULT_PREFERRED_NETWORK_MODE = "preferred_network_mode";
 
+const int32_t AIRPLANE_MODE_UNSUPPORT = 0;
+const int32_t AIRPLANE_MODE_SUPPORT = 1;
+const std::string SUPPORT_AIRPLANE_MODE_PARAM = "persist.sys.support_air_plane_mode";
+const int32_t IS_SUPPORT_AIRPLANE_MODE = system::GetIntParameter(SUPPORT_AIRPLANE_MODE_PARAM, AIRPLANE_MODE_UNSUPPORT);
+
 NetworkSearchManager::NetworkSearchManager(
     std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<ISimManager> simManager)
     : telRilManager_(telRilManager), simManager_(simManager)
@@ -1111,6 +1116,10 @@ void NetworkSearchManager::TriggerTimezoneRefresh(int32_t slotId)
 
 bool NetworkSearchManager::GetAirplaneMode()
 {
+    if (IS_SUPPORT_AIRPLANE_MODE == AIRPLANE_MODE_SUPPORT) {
+        TELEPHONY_LOGI("support airplane mode, return true");
+        return true;
+    }
     std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGI("settingHelper is null");
