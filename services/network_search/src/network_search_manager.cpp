@@ -16,6 +16,7 @@
 #include "network_search_manager.h"
 
 #include <cinttypes>
+#include <parameters.h>
 #include <securec.h>
 #include <string_ex.h>
 
