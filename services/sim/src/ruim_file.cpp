@@ -15,9 +15,10 @@
 
 #include "ruim_file.h"
 
-#include "radio_event.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "radio_event.h"
+#include "telephony_common_utils.h"
 
 using namespace std;
 using namespace OHOS::AppExecFwk;
@@ -61,9 +62,9 @@ std::string RuimFile::ObtainSimOperator()
         if ((lengthOfMnc_ != UNINITIALIZED_MNC) && (lengthOfMnc_ != UNKNOWN_MNC)) {
             operatorNumeric_ = imsi.substr(0, MCC_LEN + lengthOfMnc_);
         }
-        if (operatorNumeric_.empty()) {
-            int mcc = std::stoi(imsi.substr(0, MCC_LEN));
-            operatorNumeric_ = imsi.substr(0, MCC_LEN + MccPool::ShortestMncLengthFromMcc(mcc));
+        std::string mcc = imsi.substr(0, MCC_LEN);
+        if (operatorNumeric_.empty() && IsValidDecValue(mcc)) {
+            operatorNumeric_ = imsi.substr(0, MCC_LEN + MccPool::ShortestMncLengthFromMcc(std::stoi(mcc)));
         }
     }
     return operatorNumeric_;
@@ -77,9 +78,9 @@ std::string RuimFile::ObtainIsoCountryCode()
         return "";
     }
     size_t len = numeric.length();
-    if (len >= MCC_LEN) {
-        std::string mnc = numeric.substr(0, MCC_LEN);
-        std::string iso = MccPool::MccCountryCode(std::stoi(mnc));
+    std::string mcc = numeric.substr(0, MCC_LEN);
+    if (len >= MCC_LEN && IsValidDecValue(mcc)) {
+        std::string iso = MccPool::MccCountryCode(std::stoi(mcc));
         return iso;
     } else {
         return "";
