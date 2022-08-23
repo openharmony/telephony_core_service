@@ -115,6 +115,7 @@ public:
     virtual std::u16string GetOpName(int32_t slotId) = 0;
     virtual bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) = 0;
     virtual bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) = 0;
+    virtual bool SendCallSetupRequestResult(int32_t slotId, bool accept) = 0;
     virtual bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) = 0;
     virtual std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) = 0;
     virtual bool SendUpdateCellLocationRequest(int32_t slotId) = 0;
@@ -195,6 +196,7 @@ public:
         GET_IMS_REG_STATUS,
         STK_CMD_FROM_APP_ENVELOPE,
         STK_CMD_FROM_APP_TERMINAL_RESPONSE,
+        STK_RESULT_FROM_APP_CALL_SETUP_REQUEST,
         GET_CARD_TYPE,
         UNLOCK_SIMLOCK,
         HAS_OPERATOR_PRIVILEGES,

@@ -851,26 +851,41 @@ std::u16string CoreService::GetOpName(int32_t slotId)
 
 bool CoreService::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
 {
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("CoreService::SendEnvelopeCmd simManager_ is nullptr");
+        return false;
+    }
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::SendEnvelopeCmd(), slotId = %{public}d", slotId);
-    if (simManager_ == nullptr) {
-        return false;
-    }
     return simManager_->SendEnvelopeCmd(slotId, cmd);
 }
 
 bool CoreService::SendTerminalResponseCmd(int32_t slotId, const std::string &cmd)
 {
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("CoreService::SendEnvelopeCmd simManager_ is nullptr");
+        return false;
+    }
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return false;
     }
     TELEPHONY_LOGI("CoreService::SendTerminalResponseCmd(), slotId = %{public}d", slotId);
+    return simManager_->SendTerminalResponseCmd(slotId, cmd);
+}
+
+bool CoreService::SendCallSetupRequestResult(int32_t slotId, bool accept)
+{
     if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("CoreService::SendEnvelopeCmd simManager_ is nullptr");
         return false;
     }
-    return simManager_->SendTerminalResponseCmd(slotId, cmd);
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        return false;
+    }
+    TELEPHONY_LOGI("CoreService::SendCallSetupRequestResult(), slotId = %{public}d", slotId);
+    return simManager_->SendCallSetupRequestResult(slotId, accept);
 }
 
 bool CoreService::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response)

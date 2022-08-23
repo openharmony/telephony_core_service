@@ -245,6 +245,8 @@ public:
         int32_t slotId, const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t SendEnvelopeCmd(
         int32_t slotId, const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t SendCallSetupRequestResult(
+        int32_t slotId, bool accept, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t SimStkIsReady(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t UnlockSimLock(
         int32_t slotId, int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response) = 0;

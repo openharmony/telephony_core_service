@@ -16,27 +16,26 @@
 #ifndef OHOS_STK_MANAGER_H
 #define OHOS_STK_MANAGER_H
 
-#include "sim_state_manager.h"
 #include "i_tel_ril_manager.h"
+#include "sim_state_manager.h"
 #include "stk_controller.h"
 
 namespace OHOS {
 namespace Telephony {
 class StkManager {
 public:
-    StkManager(std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<SimStateManager> simStateManage);
-    ~StkManager() {}
+    StkManager(std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<SimStateManager> simStateManager);
+    virtual ~StkManager();
     void Init(int slotId);
-    bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd);
-    bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd);
+    bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) const;
+    bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) const;
+    bool SendCallSetupRequestResult(int32_t slotId, bool accept) const;
 
 private:
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<SimStateManager> simStateManager_ = nullptr;
     std::shared_ptr<StkController> stkController_ = nullptr;
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoopStkController_ = nullptr;
-    enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
-    HandleRunningState stateStkMgr_ = HandleRunningState::STATE_NOT_START;
+    std::shared_ptr<AppExecFwk::EventRunner> stkEventLoop_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

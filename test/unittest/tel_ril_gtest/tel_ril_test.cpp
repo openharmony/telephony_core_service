@@ -197,6 +197,10 @@ void TelRilTest::InitSim()
     memberFuncMap_[DiffInterfaceId::TEST_UNLOCK_SIM_PIN2] = &TelRilTest::UnlockSimPin2Test;
     memberFuncMap_[DiffInterfaceId::TEST_UNSET_PIN2_LOCK] = &TelRilTest::UnSetPin2LockTest;
     memberFuncMap_[DiffInterfaceId::TEST_ENABLE_SIM_CARD] = &TelRilTest::EnableSimCardTest;
+    memberFuncMap_[DiffInterfaceId::TEST_STK_SEND_TERMINAL_RESPONSE] = &TelRilTest::SendTerminalResponseCmdTest;
+    memberFuncMap_[DiffInterfaceId::TEST_STK_SEND_ENVELOPE] = &TelRilTest::SendEnvelopeCmdTest;
+    memberFuncMap_[DiffInterfaceId::TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT] =
+        &TelRilTest::SendCallSetupRequestResultTest;
 }
 
 void TelRilTest::InitSms()
@@ -637,6 +641,63 @@ void TelRilTest::EnableSimCardTest(int32_t slotId, const std::shared_ptr<AppExec
         TELEPHONY_LOGI("TelRilTest::EnableSimCardTest -->");
         telRilManager_->SetActiveSim(slotId, index, enable, event);
         TELEPHONY_LOGI("TelRilTest::EnableSimCardTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Send terminal response command
+ *
+ * @param handler
+ */
+void TelRilTest::SendTerminalResponseCmdTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_STK_SEND_TERMINAL_RESPONSE);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::SendTerminalResponseCmdTest -->");
+        telRilManager_->SendTerminalResponseCmd(slotId, "", event);
+        TELEPHONY_LOGI("TelRilTest::SendTerminalResponseCmdTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Send envelope command
+ *
+ * @param handler
+ */
+void TelRilTest::SendEnvelopeCmdTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_STK_SEND_ENVELOPE);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::SendEnvelopeCmdTest -->");
+        telRilManager_->SendEnvelopeCmd(slotId, "", event);
+        TELEPHONY_LOGI("TelRilTest::SendEnvelopeCmdTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Send Call Setup Request Result command
+ *
+ * @param handler
+ */
+void TelRilTest::SendCallSetupRequestResultTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_STK_SEND_CALL_SETUP_REQUEST_RESULT);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::SendCallSetupRequestResultTest -->");
+        telRilManager_->SendCallSetupRequestResult(slotId, true, event);
+        TELEPHONY_LOGI("TelRilTest::SendCallSetupRequestResultTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }
@@ -3685,6 +3746,74 @@ HWTEST_F(TelRilTest, Telephony_TelRil_UnSetPIn2LockTest_0201, Function | MediumT
 HWTEST_F(TelRilTest, Telephony_TelRil_EnableSimCardTest_0201, Function | MediumTest | Level3)
 {
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENABLE_SIM_CARD), SLOT_ID_1, GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_SendTerminalResponseCmdTest_0101 to do ...
+ * @tc.name Send terminal response command of the card 1
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SendTerminalResponseCmdTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_TERMINAL_RESPONSE), SLOT_ID_0, GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_SendTerminalResponseCmdTest_0201 to do ...
+ * @tc.name Send terminal response command of the card 2
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SendTerminalResponseCmdTest_0201, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_TERMINAL_RESPONSE), SLOT_ID_1, GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_SendEnvelopeCmdTest_0101 to do ...
+ * @tc.name Send envelope command of the card 1
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SendEnvelopeCmdTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_ENVELOPE), SLOT_ID_0, GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_SendEnvelopeCmdTest_0201 to do ...
+ * @tc.name Send envelope command of the card 2
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SendEnvelopeCmdTest_0201, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_ENVELOPE), SLOT_ID_1, GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_SendCallSetupRequestResultTest_0101 to do ...
+ * @tc.name Send Call Setup Request Result command of the card 1
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SendCallSetupRequestResultTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT), SLOT_ID_0, GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_SendCallSetupRequestResultTest_0201 to do ...
+ * @tc.name Send Call Setup Request Result command of the card 2
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SendCallSetupRequestResultTest_0201, Function | MediumTest | Level3)
+{
+    ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT), SLOT_ID_1, GetHandler());
     return;
 }
 

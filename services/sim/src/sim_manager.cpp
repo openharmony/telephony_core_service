@@ -438,6 +438,15 @@ bool SimManager::SendTerminalResponseCmd(int32_t slotId, const std::string &cmd)
     return stkManager_[slotId]->SendTerminalResponseCmd(slotId, cmd);
 }
 
+bool SimManager::SendCallSetupRequestResult(int32_t slotId, bool accept)
+{
+    if ((!IsValidSlotId(slotId)) || (stkManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("stkManager is null!");
+        return false;
+    }
+    return stkManager_[slotId]->SendCallSetupRequestResult(slotId, accept);
+}
+
 std::u16string SimManager::GetSimOperatorNumeric(int32_t slotId)
 {
     if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {

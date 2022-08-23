@@ -1831,6 +1831,15 @@ bool CoreManagerInner::SendTerminalResponseCmd(int32_t slotId, const std::string
     return simManager_->SendTerminalResponseCmd(slotId, cmd);
 }
 
+bool CoreManagerInner::SendCallSetupRequestResult(int32_t slotId, bool accept)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return false;
+    }
+    return simManager_->SendCallSetupRequestResult(slotId, accept);
+}
+
 bool CoreManagerInner::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response)
 {
     if (simManager_ == nullptr) {

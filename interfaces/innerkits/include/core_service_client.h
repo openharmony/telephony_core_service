@@ -102,6 +102,7 @@ public:
     int32_t GetCardType(int32_t slotId);
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd);
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd);
+    bool SendCallSetupRequestResult(int32_t slotId, bool accept);
     bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response);
     bool HasOperatorPrivileges(const int32_t slotId);
     int32_t SimAuthentication(
