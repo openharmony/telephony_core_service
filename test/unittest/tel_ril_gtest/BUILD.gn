@@ -42,6 +42,7 @@ ohos_unittest("tel_ril_gtest") {
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
     "//drivers/hdf_core/adapter/uhdf2/hdi:libhdi",
     "//third_party/googletest:gtest_main",
+    "//utils/native/base:utils",
   ]
 
   external_deps = [
@@ -50,6 +51,7 @@ ohos_unittest("tel_ril_gtest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "drivers_interface_ril:hril_innerkits",
+    "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
     "init:libbegetutil",
     "ipc:ipc_core",
