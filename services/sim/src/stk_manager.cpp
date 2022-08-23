@@ -14,70 +14,79 @@
  */
 
 #include "stk_manager.h"
+
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-StkManager::StkManager(std::shared_ptr<ITelRilManager> telRilManager,
-    std::shared_ptr<Telephony::SimStateManager> simStateManager)
+StkManager::StkManager(std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<SimStateManager> simStateManager)
     : telRilManager_(telRilManager), simStateManager_(simStateManager)
 {
     TELEPHONY_LOGI("StkManager::StkManager()");
 }
 
-void StkManager::Init(int slotId)
+StkManager::~StkManager()
 {
-    TELEPHONY_LOGI("StkManager::Init() started");
-    if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("StkManager::StkManager get ril_Manager fail");
-        return;
+    if (stkController_ != nullptr) {
+        stkController_->UnRegisterEvents();
     }
-
-    if (stateStkMgr_ == HandleRunningState::STATE_RUNNING) {
-        TELEPHONY_LOGI("StkManager::Init stateStkCtrl_ started.");
-        return;
-    }
-
-    eventLoopStkController_ = AppExecFwk::EventRunner::Create("StkHandler");
-    if (eventLoopStkController_.get() == nullptr) {
-        TELEPHONY_LOGE("StkHandler failed to create EventRunner");
-        return;
-    }
-    stkController_ = std::make_shared<StkController>(eventLoopStkController_);
-    if (stkController_ == nullptr) {
-        TELEPHONY_LOGE("StkManager::Init stkController_ create nullptr.");
-        return;
-    }
-    stkController_->SetRilAndSimStateManager(telRilManager_, simStateManager_);
-    stkController_->Init(slotId);
-    eventLoopStkController_->Run();
-    stateStkMgr_ = HandleRunningState::STATE_RUNNING;
-    TELEPHONY_LOGI("StkManager::Init() end");
 }
 
-bool StkManager::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
+void StkManager::Init(int slotId)
 {
-    TELEPHONY_LOGI("StkManager::SendEnvelopeCmd()");
+    if (telRilManager_ == nullptr || simStateManager_ == nullptr) {
+        TELEPHONY_LOGE("StkManager[%{public}d]::Init() telRilManager or simStateManager_ is nullptr", slotId);
+        return;
+    }
+    std::string name = "StkController_";
+    name.append(std::to_string(slotId));
+    stkEventLoop_ = AppExecFwk::EventRunner::Create(name.c_str());
+    if (stkEventLoop_.get() == nullptr) {
+        TELEPHONY_LOGE("StkManager[%{public}d]::Init() failed to create EventRunner", slotId);
+        return;
+    }
+    stkController_ = std::make_shared<StkController>(stkEventLoop_, telRilManager_, simStateManager_, slotId);
     if (stkController_ == nullptr) {
-        TELEPHONY_LOGE("StkManager::stkController_ is nullptr");
+        TELEPHONY_LOGE("StkManager[%{public}d]::Init() failed to create StkController", slotId);
+        return;
+    }
+    stkController_->Init();
+    stkEventLoop_->Run();
+    TELEPHONY_LOGI("StkManager[%{public}d]::Init() success", slotId);
+}
+
+bool StkManager::SendEnvelopeCmd(int32_t slotId, const std::string &cmd) const
+{
+    if (stkController_ == nullptr) {
+        TELEPHONY_LOGE("StkManager[%{public}d]::SendEnvelopeCmd() stkController_ is nullptr", slotId);
         return false;
     }
-    bool result = stkController_->SendEnvelopeCmd(slotId, cmd);
-    TELEPHONY_LOGI("StkManager::SendEnvelopeCmd result:%{public}s ",
-        (result ? "true" : "false"));
+    bool result = stkController_->SendEnvelopeCmd(cmd);
+    TELEPHONY_LOGI("StkManager[%{public}d]::SendEnvelopeCmd() result:%{public}s", slotId, (result ? "true" : "false"));
     return result;
 }
 
-bool StkManager::SendTerminalResponseCmd(int32_t slotId, const std::string &cmd)
+bool StkManager::SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) const
 {
-    TELEPHONY_LOGI("StkManager::SendTerminalResponseCmd()");
     if (stkController_ == nullptr) {
-        TELEPHONY_LOGE("StkManager::stkController_ is nullptr");
+        TELEPHONY_LOGE("StkManager[%{public}d]::SendTerminalResponseCmd() stkController_ is nullptr", slotId);
         return false;
     }
-    bool result = stkController_->SendTerminalResponseCmd(slotId, cmd);
-    TELEPHONY_LOGI("StkManager::SendTerminalResponseCmd result:%{public}s ",
-        (result ? "true" : "false"));
+    bool result = stkController_->SendTerminalResponseCmd(cmd);
+    TELEPHONY_LOGI("StkManager[%{public}d]::SendTerminalResponseCmd() result:%{public}s",
+        slotId, (result ? "true" : "false"));
+    return result;
+}
+
+bool StkManager::SendCallSetupRequestResult(int32_t slotId, bool accept) const
+{
+    if (stkController_ == nullptr) {
+        TELEPHONY_LOGE("StkManager[%{public}d]::SendCallSetupRequestResult() stkController_ is nullptr", slotId);
+        return false;
+    }
+    bool result = stkController_->SendCallSetupRequestResult(accept);
+    TELEPHONY_LOGI("StkManager[%{public}d]::SendCallSetupRequestResult() result:%{public}s",
+        slotId, (result ? "true" : "false"));
     return result;
 }
 } // namespace Telephony

@@ -30,6 +30,8 @@ void TelRilSim::AddHandlerToMap()
     memberFuncMap_[HNOTI_SIM_STK_SESSION_END_NOTIFY] = &TelRilSim::SimStkSessionEndNotify;
     memberFuncMap_[HNOTI_SIM_STK_PROACTIVE_NOTIFY] = &TelRilSim::SimStkProactiveNotify;
     memberFuncMap_[HNOTI_SIM_STK_ALPHA_NOTIFY] = &TelRilSim::SimStkAlphaNotify;
+    memberFuncMap_[HNOTI_SIM_STK_EVENT_NOTIFY] = &TelRilSim::SimStkEventNotify;
+    memberFuncMap_[HNOTI_SIM_STK_CALL_SETUP_NOTIFY] = &TelRilSim::SimStkCallSetupNotify;
     memberFuncMap_[HNOTI_SIM_REFRESH_NOTIFY] = &TelRilSim::SimRefreshNotify;
 
     // response
@@ -46,6 +48,7 @@ void TelRilSim::AddHandlerToMap()
     memberFuncMap_[HREQ_SIM_SET_ACTIVE_SIM] = &TelRilSim::SetActiveSimResponse;
     memberFuncMap_[HREQ_SIM_STK_SEND_TERMINAL_RESPONSE] = &TelRilSim::SimStkSendTerminalResponseResponse;
     memberFuncMap_[HREQ_SIM_STK_SEND_ENVELOPE] = &TelRilSim::SimStkSendEnvelopeResponse;
+    memberFuncMap_[HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT] = &TelRilSim::SimStkSendCallSetupRequestResultResponse;
     memberFuncMap_[HREQ_SIM_STK_IS_READY] = &TelRilSim::SimStkIsReadyResponse;
     memberFuncMap_[HREQ_SIM_RADIO_PROTOCOL] = &TelRilSim::SetRadioProtocolResponse;
     memberFuncMap_[HREQ_SIM_OPEN_LOGICAL_CHANNEL] = &TelRilSim::SimOpenLogicalChannelResponse;
@@ -79,6 +82,7 @@ bool TelRilSim::IsSimRespOrNotify(uint32_t code)
     return IsSimResponse(code) || IsSimNotification(code);
 }
 
+// notification
 int32_t TelRilSim::SimStateUpdated(MessageParcel &data)
 {
     if (observerHandler_ == nullptr) {
@@ -87,6 +91,75 @@ int32_t TelRilSim::SimStateUpdated(MessageParcel &data)
     }
 
     observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_CHANGE);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t TelRilSim::SimStkSessionEndNotify(MessageParcel &data)
+{
+    if (observerHandler_ == nullptr) {
+        TELEPHONY_LOGE("TelRilSim::SimStkSessionEndNotify() observerHandler_ is null!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    observerHandler_->NotifyObserver(RadioEvent::RADIO_STK_SESSION_END);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t TelRilSim::SimStkProactiveNotify(MessageParcel &data)
+{
+    if (observerHandler_ == nullptr) {
+        TELEPHONY_LOGE("TelRilSim::SimStkProactiveNotify() observerHandler_ is null!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    const char *buffer = data.ReadCString();
+    std::shared_ptr<std::string> stkMessage = std::make_shared<std::string>(buffer);
+    TELEPHONY_LOGI("TelRilSim::SimStkProactiveNotify(), stkMessage = %{public}s", stkMessage->c_str());
+    observerHandler_->NotifyObserver(RadioEvent::RADIO_STK_PROACTIVE_COMMAND, stkMessage);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t TelRilSim::SimStkAlphaNotify(MessageParcel &data)
+{
+    if (observerHandler_ == nullptr) {
+        TELEPHONY_LOGE("TelRilSim::SimStkAlphaNotify() observerHandler_ is null!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    const char *buffer = data.ReadCString();
+    std::shared_ptr<std::string> alphaMessage = std::make_shared<std::string>(buffer);
+    TELEPHONY_LOGI("TelRilSim::SimStkAlphaNotify(), alphaMessage = %{public}s", alphaMessage->c_str());
+    observerHandler_->NotifyObserver(RadioEvent::RADIO_STK_ALPHA_NOTIFY, alphaMessage);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t TelRilSim::SimStkEventNotify(MessageParcel &data)
+{
+    if (observerHandler_ == nullptr) {
+        TELEPHONY_LOGE("TelRilSim::SimStkEventNotify() observerHandler_ is null!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    const char *buffer = data.ReadCString();
+    std::shared_ptr<std::string> eventMessage = std::make_shared<std::string>(buffer);
+    TELEPHONY_LOGI("TelRilSim::SimStkEventNotify(), eventMessage = %{public}s", eventMessage->c_str());
+    observerHandler_->NotifyObserver(RadioEvent::RADIO_STK_EVENT_NOTIFY, eventMessage);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t TelRilSim::SimStkCallSetupNotify(MessageParcel &data)
+{
+    if (observerHandler_ == nullptr) {
+        TELEPHONY_LOGE("TelRilSim::SimStkCallSetupNotify() observerHandler_ is null!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    observerHandler_->NotifyObserver(RadioEvent::RADIO_STK_CALL_SETUP);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t TelRilSim::SimRefreshNotify(MessageParcel &data)
+{
+    if (observerHandler_ == nullptr) {
+        TELEPHONY_LOGE("TelRilSim::SimRefreshNotify() observerHandler_ is null!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    observerHandler_->NotifyObserver(RadioEvent::RADIO_ICC_REFRESH);
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -564,10 +637,7 @@ int32_t TelRilSim::SimStkSendTerminalResponseResponse(MessageParcel &data)
                 TELEPHONY_LOGE("ERROR :handler == nullptr !!!");
                 return TELEPHONY_ERR_LOCAL_PTR_NULL;
             }
-            uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
-            std::shared_ptr<HRilErrType> errorCode = std::make_shared<HRilErrType>();
-            *errorCode = radioResponseInfo->error;
-            handler->SendEvent(eventId, errorCode);
+            handler->SendEvent(telRilRequest->pointer_);
         } else {
             return ErrorResponse(telRilRequest, *radioResponseInfo);
         }
@@ -597,10 +667,37 @@ int32_t TelRilSim::SimStkSendEnvelopeResponse(MessageParcel &data)
                 TELEPHONY_LOGE("ERROR :handler == nullptr !!!");
                 return TELEPHONY_ERR_LOCAL_PTR_NULL;
             }
-            uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
-            std::shared_ptr<HRilErrType> errorCode = std::make_shared<HRilErrType>();
-            *errorCode = radioResponseInfo->error;
-            handler->SendEvent(eventId, errorCode);
+            handler->SendEvent(telRilRequest->pointer_);
+        } else {
+            return ErrorResponse(telRilRequest, *radioResponseInfo);
+        }
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t TelRilSim::SimStkSendCallSetupRequestResultResponse(MessageParcel &data)
+{
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("spBuffer == nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    const struct HRilRadioResponseInfo *radioResponseInfo =
+        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    if (radioResponseInfo == nullptr) {
+        TELEPHONY_LOGE("ERROR :radioResponseInfo == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(*radioResponseInfo);
+    if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
+        if (radioResponseInfo->error == HRilErrType::NONE) {
+            const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("ERROR :handler == nullptr !!!");
+                return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            }
+            handler->SendEvent(telRilRequest->pointer_);
         } else {
             return ErrorResponse(telRilRequest, *radioResponseInfo);
         }
@@ -630,10 +727,7 @@ int32_t TelRilSim::SimStkIsReadyResponse(MessageParcel &data)
                 TELEPHONY_LOGE("ERROR :handler == nullptr !!!");
                 return TELEPHONY_ERR_LOCAL_PTR_NULL;
             }
-            uint32_t eventId = telRilRequest->pointer_->GetInnerEventId();
-            std::shared_ptr<HRilErrType> errorCode = std::make_shared<HRilErrType>();
-            *errorCode = radioResponseInfo->error;
-            handler->SendEvent(eventId, errorCode);
+            handler->SendEvent(telRilRequest->pointer_);
         } else {
             return ErrorResponse(telRilRequest, *radioResponseInfo);
         }
@@ -889,8 +983,8 @@ int32_t TelRilSim::UnlockSimLockResponse(MessageParcel &data)
     }
     return TELEPHONY_ERR_SUCCESS;
 }
-// request
 
+// request
 int32_t TelRilSim::GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(HREQ_SIM_GET_SIM_STATUS, result);
@@ -1120,51 +1214,6 @@ int32_t TelRilSim::SetActiveSim(int32_t index, int32_t enable, const AppExecFwk:
     return TELEPHONY_ERR_SUCCESS;
 }
 
-// stk call back
-int32_t TelRilSim::SimStkSessionEndNotify(MessageParcel &data)
-{
-    if (observerHandler_ == nullptr) {
-        TELEPHONY_LOGE("TelRilSim::SimStkSessionEndNotify() observerHandler_ is null!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    observerHandler_->NotifyObserver(RadioEvent::RADIO_STK_SESSION_END);
-    return TELEPHONY_ERR_SUCCESS;
-}
-
-int32_t TelRilSim::SimStkProactiveNotify(MessageParcel &data)
-{
-    if (observerHandler_ == nullptr) {
-        TELEPHONY_LOGE("TelRilSim::SimStkProactiveNotify() observerHandler_ is null!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    const char *buffer = data.ReadCString();
-    std::shared_ptr<std::string> stkMessage = std::make_shared<std::string>(buffer);
-    TELEPHONY_LOGI("TelRilSim::StkProactiveCommandNotify(), stkMessage = %{public}s\n", stkMessage->c_str());
-    observerHandler_->NotifyObserver(RadioEvent::RADIO_STK_PROACTIVE_COMMAND, stkMessage);
-    return TELEPHONY_ERR_SUCCESS;
-}
-
-int32_t TelRilSim::SimStkAlphaNotify(MessageParcel &data)
-{
-    if (observerHandler_ == nullptr) {
-        TELEPHONY_LOGE("TelRilSim::SimStkAlphaNotify() observerHandler_ is null!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    observerHandler_->NotifyObserver(RadioEvent::RADIO_STK_ALPHA_NOTIFY);
-    return TELEPHONY_ERR_SUCCESS;
-}
-
-int32_t TelRilSim::SimRefreshNotify(MessageParcel &data)
-{
-    if (observerHandler_ == nullptr) {
-        TELEPHONY_LOGE("TelRilSim::SimRefreshNotify() observerHandler_ is null!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    observerHandler_->NotifyObserver(RadioEvent::RADIO_ICC_REFRESH);
-    return TELEPHONY_ERR_SUCCESS;
-}
-
-// ril interface
 int32_t TelRilSim::SimStkSendTerminalResponse(
     const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response)
 {
@@ -1181,6 +1230,7 @@ int32_t TelRilSim::SimStkSendTerminalResponse(
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
     if (cellularRadio_->SendRequest(HREQ_SIM_STK_SEND_TERMINAL_RESPONSE, data, reply, option) != 0) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
+        return ErrorResponse(telRilRequest->serialId_, HRilErrType::HRIL_ERR_INVALID_RESPONSE);
     }
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -1200,6 +1250,28 @@ int32_t TelRilSim::SimStkSendEnvelope(const std::string &strCmd, const AppExecFw
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
     if (cellularRadio_->SendRequest(HREQ_SIM_STK_SEND_ENVELOPE, data, reply, option) != 0) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
+        return ErrorResponse(telRilRequest->serialId_, HRilErrType::HRIL_ERR_INVALID_RESPONSE);
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t TelRilSim::SimStkSendCallSetupRequestResult(bool accept, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    std::shared_ptr<TelRilRequest> telRilRequest =
+        CreateTelRilRequest(HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT, response);
+    if (telRilRequest == nullptr || cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or cellularRadio_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    MessageParcel data;
+    data.WriteInt32(slotId_);
+    data.WriteInt32(telRilRequest->serialId_);
+    data.WriteInt32(accept);
+    MessageParcel reply;
+    OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
+    if (cellularRadio_->SendRequest(HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT, data, reply, option) != 0) {
+        TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
+        return ErrorResponse(telRilRequest->serialId_, HRilErrType::HRIL_ERR_INVALID_RESPONSE);
     }
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -1211,9 +1283,9 @@ int32_t TelRilSim::SimStkIsReady(const AppExecFwk::InnerEvent::Pointer &response
         TELEPHONY_LOGE("telRilRequest is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-
     if (SendInt32Event(HREQ_SIM_STK_IS_READY, telRilRequest->serialId_) != 0) {
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
+        return ErrorResponse(telRilRequest->serialId_, HRilErrType::HRIL_ERR_INVALID_RESPONSE);
     }
     return TELEPHONY_ERR_SUCCESS;
 }

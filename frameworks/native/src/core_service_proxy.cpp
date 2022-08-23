@@ -2070,6 +2070,33 @@ bool CoreServiceProxy::SendTerminalResponseCmd(int32_t slotId, const std::string
     return result;
 }
 
+bool CoreServiceProxy::SendCallSetupRequestResult(int32_t slotId, bool accept)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("SendCallSetupRequestResult WriteInterfaceToken is false");
+        return ERROR;
+    }
+    data.WriteInt32(slotId);
+    data.WriteInt32(accept);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("SendCallSetupRequestResult Remote is null");
+        return ERROR;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    int32_t st = Remote()->SendRequest(
+        uint32_t(InterfaceID::STK_RESULT_FROM_APP_CALL_SETUP_REQUEST), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("SendCallSetupRequestResult failed, error code is %{public}d", st);
+        return false;
+    }
+    bool result = reply.ReadBool();
+    TELEPHONY_LOGI("SendCallSetupRequestResult end: result=%{public}d", result);
+    return result;
+}
+
 bool CoreServiceProxy::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response)
 {
     TELEPHONY_LOGI("CoreServiceProxy::UnlockSimLock(), slotId = %{public}d", slotId);

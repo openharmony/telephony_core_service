@@ -81,6 +81,7 @@ public:
     // STK
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
+    bool SendCallSetupRequestResult(int32_t slotId, bool accept) override;
     // SimFile
     std::u16string GetSimOperatorNumeric(int32_t slotId) override;
     std::u16string GetISOCountryCodeForSim(int32_t slotId) override;

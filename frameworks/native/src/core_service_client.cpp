@@ -764,6 +764,7 @@ bool CoreServiceClient::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
     }
     return proxy->SendEnvelopeCmd(slotId, cmd);
 }
+
 bool CoreServiceClient::SendTerminalResponseCmd(int32_t slotId, const std::string &cmd)
 {
     auto proxy = GetProxy();
@@ -773,6 +774,17 @@ bool CoreServiceClient::SendTerminalResponseCmd(int32_t slotId, const std::strin
     }
     return proxy->SendTerminalResponseCmd(slotId, cmd);
 }
+
+bool CoreServiceClient::SendCallSetupRequestResult(int32_t slotId, bool accept)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return false;
+    }
+    return proxy->SendCallSetupRequestResult(slotId, accept);
+}
+
 bool CoreServiceClient::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response)
 {
     auto proxy = GetProxy();

@@ -69,6 +69,7 @@ public:
     // STK
     virtual bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) = 0;
     virtual bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) = 0;
+    virtual bool SendCallSetupRequestResult(int32_t slotId, bool accept) = 0;
     // SimFile
     virtual std::u16string GetSimOperatorNumeric(int32_t slotId) = 0;
     virtual std::u16string GetISOCountryCodeForSim(int32_t slotId) = 0;

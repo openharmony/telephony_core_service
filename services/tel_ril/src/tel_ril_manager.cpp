@@ -879,6 +879,13 @@ int32_t TelRilManager::SendEnvelopeCmd(
     return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimStkSendEnvelope, strCmd);
 }
 
+int32_t TelRilManager::SendCallSetupRequestResult(
+    int32_t slotId, bool accept, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(
+        response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimStkSendCallSetupRequestResult, accept);
+}
+
 int32_t TelRilManager::SimStkIsReady(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimStkIsReady);
