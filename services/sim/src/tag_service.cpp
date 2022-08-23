@@ -15,6 +15,8 @@
 
 #include "tag_service.h"
 
+#include "telephony_common_utils.h"
+
 namespace OHOS {
 namespace Telephony {
 TagService::TagService(const std::string &data)
@@ -36,6 +38,9 @@ TagService::~TagService() {}
 int TagService::GetTagCode() const
 {
     TELEPHONY_LOGI("GetTagCode : %{public}s", tag_.c_str());
+    if (IsValidHexValue(tag_)) {
+        return ERR;
+    }
     int i = std::stoi(tag_, nullptr, HEX_TYPE);
     return i;
 }
