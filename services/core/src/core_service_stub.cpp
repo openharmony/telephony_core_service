@@ -115,6 +115,8 @@ void CoreServiceStub::AddHandlerSimToMapExt()
     memberFuncMap_[uint32_t(InterfaceID::STK_CMD_FROM_APP_ENVELOPE)] = &CoreServiceStub::OnSendEnvelopeCmd;
     memberFuncMap_[uint32_t(InterfaceID::STK_CMD_FROM_APP_TERMINAL_RESPONSE)] =
         &CoreServiceStub::OnSendTerminalResponseCmd;
+    memberFuncMap_[uint32_t(InterfaceID::STK_RESULT_FROM_APP_CALL_SETUP_REQUEST)] =
+        &CoreServiceStub::OnSendCallSetupRequestResult;
     memberFuncMap_[uint32_t(InterfaceID::GET_CARD_TYPE)] = &CoreServiceStub::OnGetCardType;
     memberFuncMap_[uint32_t(InterfaceID::UNLOCK_SIMLOCK)] = &CoreServiceStub::OnUnlockSimLock;
     memberFuncMap_[uint32_t(InterfaceID::HAS_OPERATOR_PRIVILEGES)] = &CoreServiceStub::OnHasOperatorPrivileges;
@@ -1159,6 +1161,20 @@ int32_t CoreServiceStub::OnSendTerminalResponseCmd(MessageParcel &data, MessageP
     bool ret = reply.WriteBool(result);
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::OnSendTerminalResponseCmd write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnSendCallSetupRequestResult(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    bool accept = data.ReadInt32();
+    bool result = SendCallSetupRequestResult(slotId, accept);
+    TELEPHONY_LOGI("OnRemoteRequest::OnSendCallSetupRequestResult result is %{public}s", result ? "true" : "false");
+    bool ret = reply.WriteBool(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnSendCallSetupRequestResult write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
     return NO_ERROR;

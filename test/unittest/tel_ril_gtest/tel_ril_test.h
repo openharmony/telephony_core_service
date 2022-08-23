@@ -48,6 +48,9 @@ enum class DiffInterfaceId {
     TEST_SET_RILCM_DATA_PROFILE,
     TEST_GET_RILCM_VOICE_REGISTRATION_STATE,
     TEST_GET_RILCM_DATA_REGISTRATION_STATE,
+    TEST_STK_SEND_TERMINAL_RESPONSE,
+    TEST_STK_SEND_ENVELOPE,
+    TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT,
     TEST_SEND_SMS_ACK,
     TEST_RILCM_SET_INIT_APN_INFO,
     TEST_RILCM_SETUP_DATA_CALL,
@@ -186,6 +189,9 @@ private:
     void UnlockSimPin2Test(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void EnableSimCardTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetActiveSimTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void SendTerminalResponseCmdTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void SendEnvelopeCmdTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void SendCallSetupRequestResultTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void NetworkGetRssiTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void RefusedCallTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetCallWaitTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);

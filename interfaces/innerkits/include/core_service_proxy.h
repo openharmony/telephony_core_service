@@ -110,6 +110,7 @@ public:
     std::u16string GetOpName(int32_t slotId) override;
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
+    bool SendCallSetupRequestResult(int32_t slotId, bool accept) override;
     bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;
     std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) override;
     bool SendUpdateCellLocationRequest(int32_t slotId) override;
