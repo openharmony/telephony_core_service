@@ -194,6 +194,7 @@ enum RadioEvent {
     RADIO_IMS_REGISTER_STATE_UPDATE,
 
     // IMS call
+    RADIO_IMS_CALL_STATUS_INFO,
     RADIO_IMS_GET_CALL_DATA,
 
     // IMS supplement
