@@ -14,7 +14,21 @@
  */
 
 #include "telephony_state_registry_proxy.h"
-#include "state_registry_errors.h"
+
+#include "cell_information.h"
+#include "i_telephony_state_notify.h"
+#include "ipc_types.h"
+#include "iremote_object.h"
+#include "message_option.h"
+#include "message_parcel.h"
+#include "network_state.h"
+#include "refbase.h"
+#include "signal_information.h"
+#include "sim_state_type.h"
+#include "string"
+#include "telephony_errors.h"
+#include "telephony_observer_broker.h"
+#include "vector"
 
 namespace OHOS {
 namespace Telephony {
