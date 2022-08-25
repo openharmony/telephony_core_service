@@ -15,8 +15,15 @@
 
 #include "cell_information.h"
 
+#include <cstdint>
 #include <ctime>
+#include <memory>
 #include <securec.h>
+
+#include "iosfwd"
+#include "new"
+#include "parcel.h"
+#include "string"
 
 namespace OHOS {
 namespace Telephony {
