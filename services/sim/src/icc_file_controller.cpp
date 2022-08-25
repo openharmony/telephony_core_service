@@ -202,6 +202,10 @@ void IccFileController::ProcessReadBinary(const AppExecFwk::InnerEvent::Pointer 
 {
     TELEPHONY_LOGI("IccFileController MSG_SIM_OBTAIN_TRANSPARENT_ELEMENTARY_FILE_DONE");
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr || rcvMsg->controlHolder == nullptr) {
+        TELEPHONY_LOGE("rcvMsg or rcvMsg->controlHolder is nullptr");
+        return;
+    }
     SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
 }
 

@@ -336,16 +336,5 @@ const HRilRadioResponseInfo &TelRilBase::GetHRilRadioResponse(MessageParcel &dat
     }
     return *radioResponseInfo;
 }
-
-HRilRadioResponseInfo TelRilBase::BuildHRilRadioResponseInfo(
-    const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo)
-{
-    HRilRadioResponseInfo responseInfo = { 0 };
-    responseInfo.flag = iResponseInfo.flag;
-    responseInfo.serial = iResponseInfo.serial;
-    responseInfo.error = (HRilErrType)iResponseInfo.error;
-    responseInfo.type = (HRilResponseTypes)iResponseInfo.type;
-    return responseInfo;
-}
 } // namespace Telephony
 } // namespace OHOS

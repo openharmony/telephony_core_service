@@ -21,140 +21,134 @@
 
 namespace OHOS {
 namespace Telephony {
-void TelRilModem::AddHandlerToMap()
-{
-    // indication
-    memberFuncMap_[HNOTI_MODEM_RADIO_STATE_UPDATED] = &TelRilModem::RadioStateUpdated;
-    memberFuncMap_[HNOTI_MODEM_VOICE_TECH_UPDATED] = &TelRilModem::VoiceRadioTechUpdated;
-    // response
-    memberFuncMap_[HREQ_MODEM_SHUT_DOWN] = &TelRilModem::ShutDownResponse;
-    memberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &TelRilModem::SetRadioStateResponse;
-    memberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] = &TelRilModem::GetRadioStateResponse;
-    memberFuncMap_[HREQ_MODEM_GET_IMEI] = &TelRilModem::GetImeiResponse;
-    memberFuncMap_[HREQ_MODEM_GET_MEID] = &TelRilModem::GetMeidResponse;
-    memberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &TelRilModem::GetVoiceRadioTechnologyResponse;
-    memberFuncMap_[HREQ_MODEM_GET_BASEBAND_VERSION] = &TelRilModem::GetBasebandVersionResponse;
-}
-
 TelRilModem::TelRilModem(int32_t slotId, sptr<IRemoteObject> cellularRadio,
     sptr<HDI::Ril::V1_0::IRilInterface> rilInterface, std::shared_ptr<ObserverHandler> observerHandler,
     std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, cellularRadio, rilInterface, observerHandler, handler)
-{
-    AddHandlerToMap();
-}
+{}
 
-bool TelRilModem::IsCommonRespOrNotify(uint32_t code)
+int32_t TelRilModem::SetRadioStateResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
 {
-    return IsCommonResponse(code) || IsCommonNotification(code);
-}
-
-bool TelRilModem::IsCommonResponse(uint32_t code)
-{
-    return code >= HREQ_COMMON_BASE;
-}
-
-bool TelRilModem::IsCommonNotification(uint32_t code)
-{
-    return code >= HREQ_COMMON_BASE;
-}
-
-int32_t TelRilModem::ShutDownResponse(MessageParcel &data)
-{
-    auto sendData = [](UserEvent &userEvent) -> int32_t {
-        return userEvent.handler_.SendEvent(userEvent.eventId_);
+    auto getDataFunc = [&responseInfo](std::shared_ptr<TelRilRequest> telRilRequest) {
+        std::shared_ptr<HRilRadioStateInfo> radioState = std::make_shared<HRilRadioStateInfo>();
+        radioState->flag = telRilRequest->pointer_->GetParam();
+        radioState->state = static_cast<int32_t>(responseInfo.error);
+        return radioState;
     };
-    return Response(TELEPHONY_LOG_FUNC_NAME, data, (UserSendEvent)sendData);
+    return Response<HRilRadioStateInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
 }
 
-int32_t TelRilModem::SetRadioStateResponse(MessageParcel &data)
+int32_t TelRilModem::GetRadioStateResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, int32_t state)
 {
-    auto sendData = [](UserEvent &userEvent) -> int32_t {
-        std::unique_ptr<HRilRadioStateInfo> radioState = std::make_unique<HRilRadioStateInfo>();
-        radioState->flag = userEvent.telRilRequest_.pointer_->GetParam();
-        radioState->state = (int32_t)(userEvent.radioResponseInfo_.error);
-        return userEvent.handler_.SendEvent(userEvent.eventId_, radioState);
+    auto getDataFunc = [state](std::shared_ptr<TelRilRequest> telRilRequest) {
+        std::shared_ptr<HRilRadioStateInfo> radioState = std::make_shared<HRilRadioStateInfo>();
+        radioState->flag = telRilRequest->pointer_->GetParam();
+        radioState->state = state;
+        return radioState;
     };
-    return Response(TELEPHONY_LOG_FUNC_NAME, data, (UserSendEvent)sendData);
-}
-
-int32_t TelRilModem::GetRadioStateResponse(MessageParcel &data)
-{
-    auto sendData = [](UserEvent &userEvent) -> int32_t {
-        std::shared_ptr<HRilInt32Parcel> state = std::make_shared<HRilInt32Parcel>();
-        state->ReadFromParcel(userEvent.data_);
-
-        std::unique_ptr<HRilRadioStateInfo> radioState = std::make_unique<HRilRadioStateInfo>();
-        radioState->flag = userEvent.telRilRequest_.pointer_->GetParam();
-        radioState->state = state->data;
-        return userEvent.handler_.SendEvent(userEvent.eventId_, radioState);
-    };
-    return Response(TELEPHONY_LOG_FUNC_NAME, data, (UserSendEvent)sendData);
+    return Response<HRilRadioStateInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
 }
 
 int32_t TelRilModem::ShutDown(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, (uint32_t)HREQ_MODEM_SHUT_DOWN);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_MODEM_SHUT_DOWN, &HDI::Ril::V1_0::IRilInterface::ShutDown);
 }
 
 int32_t TelRilModem::SetRadioState(int32_t fun, int32_t rst, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, (uint32_t)HREQ_MODEM_SET_RADIO_STATUS, fun, rst);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_MODEM_SET_RADIO_STATUS,
+        &HDI::Ril::V1_0::IRilInterface::SetRadioState, fun, rst);
 }
 
 int32_t TelRilModem::GetRadioState(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, (uint32_t)HREQ_MODEM_GET_RADIO_STATUS);
+    return Request(
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_MODEM_GET_RADIO_STATUS, &HDI::Ril::V1_0::IRilInterface::GetRadioState);
 }
 
 int32_t TelRilModem::GetImei(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, (uint32_t)HREQ_MODEM_GET_IMEI);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_MODEM_GET_IMEI, &HDI::Ril::V1_0::IRilInterface::GetImei);
 }
 
 int32_t TelRilModem::GetMeid(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, (uint32_t)HREQ_MODEM_GET_MEID);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_MODEM_GET_MEID, &HDI::Ril::V1_0::IRilInterface::GetMeid);
 }
 
 int32_t TelRilModem::GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, (uint32_t)HREQ_MODEM_GET_VOICE_RADIO);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_MODEM_GET_VOICE_RADIO,
+        &HDI::Ril::V1_0::IRilInterface::GetVoiceRadioTechnology);
 }
 
 int32_t TelRilModem::GetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, (uint32_t)HREQ_MODEM_GET_BASEBAND_VERSION);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_MODEM_GET_BASEBAND_VERSION,
+        &HDI::Ril::V1_0::IRilInterface::GetBasebandVersion);
 }
 
-int32_t TelRilModem::GetImeiResponse(MessageParcel &data)
+int32_t TelRilModem::ShutDownResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo responseInfo)
 {
-    return Response<HRilStringParcel>(TELEPHONY_LOG_FUNC_NAME, data);
+    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilModem::GetMeidResponse(MessageParcel &data)
+int32_t TelRilModem::GetImeiResponse(
+    const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const std::string &imei)
 {
-    return Response<HRilStringParcel>(TELEPHONY_LOG_FUNC_NAME, data);
+    return Response<HRilStringParcel>(TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<HRilStringParcel>(imei));
 }
 
-int32_t TelRilModem::GetVoiceRadioTechnologyResponse(MessageParcel &data)
+int32_t TelRilModem::GetMeidResponse(
+    const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const std::string &meid)
 {
-    return Response<VoiceRadioTechnology>(TELEPHONY_LOG_FUNC_NAME, data);
+    return Response<HRilStringParcel>(TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<HRilStringParcel>(meid));
 }
 
-int32_t TelRilModem::GetBasebandVersionResponse(MessageParcel &data)
+int32_t TelRilModem::GetVoiceRadioTechnologyResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::IVoiceRadioTechnology &voiceRadioTechnology)
 {
-    return Response<HRilStringParcel>(TELEPHONY_LOG_FUNC_NAME, data);
+    std::shared_ptr<VoiceRadioTechnology> mVoiceRadioTechnology = std::make_shared<VoiceRadioTechnology>();
+    BuildVoiceRadioTechnology(voiceRadioTechnology, mVoiceRadioTechnology);
+    return Response<VoiceRadioTechnology>(TELEPHONY_LOG_FUNC_NAME, responseInfo, mVoiceRadioTechnology);
 }
 
-int32_t TelRilModem::RadioStateUpdated(MessageParcel &data)
+int32_t TelRilModem::GetBasebandVersionResponse(
+    const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const std::string &basebandVersion)
 {
-    return Notify<HRilInt32Parcel>(TELEPHONY_LOG_FUNC_NAME, data, RadioEvent::RADIO_STATE_CHANGED);
+    return Response<HRilStringParcel>(
+        TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<HRilStringParcel>(basebandVersion));
 }
 
-int32_t TelRilModem::VoiceRadioTechUpdated(MessageParcel &data)
+int32_t TelRilModem::RadioStateUpdated(int32_t state)
 {
-    return Notify<VoiceRadioTechnology>(TELEPHONY_LOG_FUNC_NAME, data, RadioEvent::RADIO_VOICE_TECH_CHANGED);
+    return Notify<HRilInt32Parcel>(
+        TELEPHONY_LOG_FUNC_NAME, std::make_shared<HRilInt32Parcel>(state), RadioEvent::RADIO_STATE_CHANGED);
+}
+
+int32_t TelRilModem::VoiceRadioTechUpdated(const HDI::Ril::V1_0::IVoiceRadioTechnology &voiceRadioTechnology)
+{
+    std::shared_ptr<VoiceRadioTechnology> mVoiceRadioTechnology = std::make_shared<VoiceRadioTechnology>();
+    BuildVoiceRadioTechnology(voiceRadioTechnology, mVoiceRadioTechnology);
+    return Notify<VoiceRadioTechnology>(
+        TELEPHONY_LOG_FUNC_NAME, mVoiceRadioTechnology, RadioEvent::RADIO_VOICE_TECH_CHANGED);
+}
+
+void TelRilModem::BuildVoiceRadioTechnology(const HDI::Ril::V1_0::IVoiceRadioTechnology &voiceRadioTechnology,
+    std::shared_ptr<VoiceRadioTechnology> &mVoiceRadioTechnology)
+{
+    if (mVoiceRadioTechnology == nullptr) {
+        return;
+    }
+    mVoiceRadioTechnology->srvStatus = static_cast<HRilSrvStatus>(voiceRadioTechnology.srvStatus);
+    mVoiceRadioTechnology->srvDomain = static_cast<HRilSrvDomain>(voiceRadioTechnology.srvDomain);
+    mVoiceRadioTechnology->roamStatus = static_cast<HRilRoamStatus>(voiceRadioTechnology.roamStatus);
+    mVoiceRadioTechnology->simStatus = static_cast<HRilSimStatus>(voiceRadioTechnology.simStatus);
+    mVoiceRadioTechnology->lockStatus = static_cast<HRilSimLockStatus>(voiceRadioTechnology.lockStatus);
+    mVoiceRadioTechnology->sysMode = static_cast<HRilSysMode>(voiceRadioTechnology.sysMode);
+    mVoiceRadioTechnology->sysModeName = voiceRadioTechnology.sysModeName;
+    mVoiceRadioTechnology->actType = static_cast<HRilRadioTech>(voiceRadioTechnology.actType);
+    mVoiceRadioTechnology->actName = voiceRadioTechnology.actName;
 }
 } // namespace Telephony
 } // namespace OHOS
