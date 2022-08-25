@@ -14,7 +14,9 @@
  */
 
 #include "cell_location.h"
-#include <ctime>
+
+#include "new"
+#include "parcel.h"
 
 namespace OHOS {
 namespace Telephony {
