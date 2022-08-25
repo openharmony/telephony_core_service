@@ -20,6 +20,7 @@
 #include <mutex>
 
 #include "event_runner.h"
+#include "functional"
 #include "hril_base_parcel.h"
 #include "hril_types.h"
 #include "iremote_broker.h"
@@ -151,15 +152,28 @@ protected:
     template<typename FuncType, typename... ParamTypes>
     inline int32_t Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response, int32_t requestId,
         FuncType &&_func, ParamTypes &&... _args);
+    inline HRilRadioResponseInfo BuildHRilRadioResponseInfo(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo);
     int32_t Response(const char *funcName, MessageParcel &data, UserSendEvent send);
     template<typename T>
     int32_t Response(const char *funcName, MessageParcel &data);
-
+    inline int32_t Response(const char *funcName, const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo);
+    template<typename T>
+    inline int32_t Response(const char *funcName, const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo, T data);
+    template<typename T>
+    inline int32_t Response(
+        const char *funcName, const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo, std::shared_ptr<T> data);
+    template<typename T>
+    inline int32_t Response(const char *funcName, const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo,
+        std::function<std::shared_ptr<T>(std::shared_ptr<TelRilRequest>)> getDataFunc);
+    template<typename T>
+    inline int32_t Response(const char *funcName, const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo,
+        std::function<T(std::shared_ptr<TelRilRequest>)> getDataFunc);
     template<typename T>
     int32_t Notify(const char *funcName, MessageParcel &data, RadioEvent notifyId);
-
-    HRilRadioResponseInfo BuildHRilRadioResponseInfo(
-        const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo);
+    inline int32_t Notify(const char *funcName, RadioEvent notifyId);
+    template<typename T>
+    inline int32_t Notify(const char *funcName, std::shared_ptr<T> data, RadioEvent notifyId);
 
 protected:
     std::map<uint32_t, std::any> memberFuncMap_;
@@ -185,6 +199,12 @@ private:
     int32_t Response(const char *funcName, MessageParcel &data, SendEvent send);
     // Get the event pointer of the current thread: thread variable.
     SendEvent &SelfSendEvent(void);
+    template<typename T>
+    inline int32_t SendHandlerEvent(const char *funcName, std::shared_ptr<TelRilRequest> telRilRequest,
+        std::function<T(std::shared_ptr<TelRilRequest>)> getDataFunc);
+    template<typename T>
+    inline int32_t SendEventData(
+        const char *funcName, uint32_t eventId, std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler, T data);
 
 private:
     static std::atomic_uint nextSerialId_;
@@ -212,6 +232,22 @@ int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::InnerEvent::
     }
     TELEPHONY_LOGE("%{public}s() get serial fail: eventid=%{public}d", funcName, requestId);
     return TELEPHONY_ERR_ARGUMENT_INVALID;
+}
+
+template<typename FuncType, typename... ParamTypes>
+inline int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response,
+    int32_t requestId, FuncType &&_func, ParamTypes &&... _args)
+{
+    std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(requestId, response);
+    if (telRilRequest == nullptr) {
+        TELEPHONY_LOGE("%{public}s() telRilRequest is null: eventid=%{public}d", funcName, requestId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (rilInterface_ == nullptr) {
+        TELEPHONY_LOGE("%{public}s() rilInterface_ is null: eventid=%{public}d", funcName, requestId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return (rilInterface_->*(_func))(slotId_, telRilRequest->serialId_, std::forward<ParamTypes>(_args)...);
 }
 
 template<typename F>
@@ -256,6 +292,85 @@ int32_t TelRilBase::Response(const char *funcName, MessageParcel &data)
     return Response(funcName, data, (SendEvent)&TelRilBase::SendData<T>);
 }
 
+inline int32_t TelRilBase::Response(const char *funcName, const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo)
+{
+    auto getDataFunc = [&iResponseInfo](std::shared_ptr<TelRilRequest> telRilRequest) {
+        std::shared_ptr<HRilRadioResponseInfo> result = std::make_shared<HRilRadioResponseInfo>();
+        result->flag = telRilRequest->pointer_->GetParam();
+        result->error = static_cast<HRilErrType>(iResponseInfo.error);
+        result->serial = iResponseInfo.serial;
+        return result;
+    };
+    return Response<HRilRadioResponseInfo>(funcName, iResponseInfo, getDataFunc);
+}
+
+template<typename T>
+inline int32_t TelRilBase::Response(
+    const char *funcName, const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo, T data)
+{
+    auto getDataFunc = [data](std::shared_ptr<TelRilRequest> telRilRequest) { return data; };
+    return Response<T>(funcName, iResponseInfo, getDataFunc);
+}
+
+template<typename T>
+inline int32_t TelRilBase::Response(
+    const char *funcName, const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo, std::shared_ptr<T> data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("Response func %{public}s data  is null", funcName);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    auto getDataFunc = [&data](std::shared_ptr<TelRilRequest> telRilRequest) { return data; };
+    return Response<T>(funcName, iResponseInfo, getDataFunc);
+}
+
+template<typename T>
+inline int32_t TelRilBase::Response(const char *funcName, const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo,
+    std::function<std::shared_ptr<T>(std::shared_ptr<TelRilRequest>)> getDataFunc)
+{
+    return Response<std::shared_ptr<T>>(funcName, iResponseInfo, getDataFunc);
+}
+
+template<typename T>
+inline int32_t TelRilBase::Response(const char *funcName, const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo,
+    std::function<T(std::shared_ptr<TelRilRequest>)> getDataFunc)
+{
+    const auto &radioResponseInfo = BuildHRilRadioResponseInfo(iResponseInfo);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(radioResponseInfo);
+    if (telRilRequest == nullptr || telRilRequest->pointer_ == nullptr) {
+        TELEPHONY_LOGE("func %{public}s telRilReques or telRilRequest->pointer or data is null", funcName);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if (radioResponseInfo.error != HRilErrType::NONE) {
+        return ErrorResponse(telRilRequest, radioResponseInfo);
+    }
+    return SendHandlerEvent<T>(funcName, telRilRequest, getDataFunc);
+}
+
+template<typename T>
+inline int32_t TelRilBase::SendHandlerEvent(const char *funcName, std::shared_ptr<TelRilRequest> telRilRequest,
+    std::function<T(std::shared_ptr<TelRilRequest>)> getDataFunc)
+{
+    auto handler = telRilRequest->pointer_->GetOwner();
+    if (handler == nullptr) {
+        TELEPHONY_LOGE("func %{public}s handler == nullptr !!!", funcName);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return SendEventData<T>(funcName, telRilRequest->pointer_->GetInnerEventId(), handler, getDataFunc(telRilRequest));
+}
+
+template<typename T>
+inline int32_t TelRilBase::SendEventData(
+    const char *funcName, uint32_t eventId, std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler, T data)
+{
+    if (!handler->SendEvent(eventId, data)) {
+        TELEPHONY_LOGE("func %{public}s Send eventId:%{public}d is failed!", funcName, eventId);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    TELEPHONY_LOGI("func %{public}s Send eventId:%{public}d finish", funcName, eventId);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 template<typename T>
 int32_t TelRilBase::SendData(const char *funcName, EventHandler &handler, MessageParcel &data, uint32_t eventId)
 {
@@ -280,6 +395,40 @@ int32_t TelRilBase::Notify(const char *funcName, MessageParcel &data, RadioEvent
         funcName, notifyId, t->ToString(), ret, slotId_);
     observerHandler_->NotifyObserver(notifyId, t);
     return TELEPHONY_ERR_SUCCESS;
+}
+
+template<typename T>
+inline int32_t TelRilBase::Notify(const char *funcName, std::shared_ptr<T> data, RadioEvent notifyId)
+{
+    if (observerHandler_ == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("%{public}s() observerHandler_ or data is nullptr", funcName);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    TELEPHONY_LOGI("%{public}s() notify event %{public}d notifyId slotId:%{public}d", funcName, notifyId, slotId_);
+    observerHandler_->NotifyObserver(notifyId, data);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+inline int32_t TelRilBase::Notify(const char *funcName, RadioEvent notifyId)
+{
+    if (observerHandler_ == nullptr) {
+        TELEPHONY_LOGE("%{public}s() observerHandler_  is nullptr", funcName);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    TELEPHONY_LOGI("%{public}s() notify event %{public}d notifyId slotId:%{public}d", funcName, notifyId, slotId_);
+    observerHandler_->NotifyObserver(notifyId);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+inline HRilRadioResponseInfo TelRilBase::BuildHRilRadioResponseInfo(
+    const HDI::Ril::V1_0::IHRilRadioResponseInfo &iResponseInfo)
+{
+    HRilRadioResponseInfo responseInfo = { 0 };
+    responseInfo.flag = iResponseInfo.flag;
+    responseInfo.serial = iResponseInfo.serial;
+    responseInfo.error = (HRilErrType)iResponseInfo.error;
+    responseInfo.type = (HRilResponseTypes)iResponseInfo.type;
+    return responseInfo;
 }
 } // namespace Telephony
 } // namespace OHOS

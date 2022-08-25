@@ -27,13 +27,13 @@ public:
         std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     ~TelRilSim() = default;
 
-    int32_t SimStateUpdated(MessageParcel &data);
-    int32_t SimStkSessionEndNotify(MessageParcel &data);
-    int32_t SimStkProactiveNotify(MessageParcel &data);
-    int32_t SimStkAlphaNotify(MessageParcel &data);
-    int32_t SimStkEventNotify(MessageParcel &data);
-    int32_t SimStkCallSetupNotify(MessageParcel &data);
-    int32_t SimRefreshNotify(MessageParcel &data);
+    int32_t SimStateUpdated();
+    int32_t SimStkSessionEndNotify();
+    int32_t SimStkProactiveNotify(const std::string &response);
+    int32_t SimStkAlphaNotify(const std::string &response);
+    int32_t SimStkEventNotify(const std::string &response);
+    int32_t SimStkCallSetupNotify();
+    int32_t SimRefreshNotify();
 
     int32_t GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetImsi(const AppExecFwk::InnerEvent::Pointer &result);
@@ -63,39 +63,61 @@ public:
         const AppExecFwk::InnerEvent::Pointer &response);
     int32_t UnlockSimLock(int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response);
 
-    int32_t GetSimStatusResponse(MessageParcel &data);
-    int32_t GetImsiResponse(MessageParcel &data);
-    int32_t GetSimIOResponse(MessageParcel &data);
-    int32_t GetSimLockStatusResponse(MessageParcel &data);
-    int32_t SetSimLockResponse(MessageParcel &data);
-    int32_t ChangeSimPasswordResponse(MessageParcel &data);
-    int32_t UnlockPinResponse(MessageParcel &data);
-    int32_t UnlockPukResponse(MessageParcel &data);
-    int32_t UnlockPin2Response(MessageParcel &data);
-    int32_t UnlockPuk2Response(MessageParcel &data);
-    int32_t SetActiveSimResponse(MessageParcel &data);
-    int32_t SimStkSendTerminalResponseResponse(MessageParcel &data);
-    int32_t SimStkSendEnvelopeResponse(MessageParcel &data);
-    int32_t SimStkSendCallSetupRequestResultResponse(MessageParcel &data);
-    int32_t SimStkIsReadyResponse(MessageParcel &data);
-    int32_t SetRadioProtocolResponse(MessageParcel &data);
-    int32_t SimOpenLogicalChannelResponse(MessageParcel &data);
-    int32_t SimCloseLogicalChannelResponse(MessageParcel &data);
-    int32_t SimTransmitApduLogicalChannelResponse(MessageParcel &data);
-    int32_t SimTransmitApduBasicChannelResponse(MessageParcel &data);
-    int32_t SimAuthenticationResponse(MessageParcel &data);
-    int32_t UnlockSimLockResponse(MessageParcel &data);
-
-    bool IsSimRespOrNotify(uint32_t code);
+    int32_t GetSimStatusResponse(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::ICardStatusInfo &result);
+    int32_t GetImsiResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const std::string &result);
+    int32_t GetSimIOResponse(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::IIccIoResultInfo &result);
+    int32_t GetSimLockStatusResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, int32_t simLockStatus);
+    int32_t SetSimLockResponse(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::ILockStatusResp &lockStatus);
+    int32_t ChangeSimPasswordResponse(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::ILockStatusResp &lockStatus);
+    int32_t UnlockPinResponse(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::ILockStatusResp &lockStatus);
+    int32_t UnlockPukResponse(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::ILockStatusResp &lockStatus);
+    int32_t UnlockPin2Response(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::ILockStatusResp &lockStatus);
+    int32_t UnlockPuk2Response(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::ILockStatusResp &lockStatus);
+    int32_t SetActiveSimResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t SimStkSendTerminalResponseResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t SimStkSendEnvelopeResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t SimStkSendCallSetupRequestResultResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t SimStkIsReadyResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t SetRadioProtocolResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ISimProtocolResponse &pSimProtocol);
+    int32_t SimOpenLogicalChannelResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IOpenLogicalChannelResponse &pOpenLogicalChannelResponse);
+    int32_t SimCloseLogicalChannelResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t SimTransmitApduLogicalChannelResponse(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::IIccIoResultInfo &result);
+    int32_t SimTransmitApduBasicChannelResponse(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::IIccIoResultInfo &result);
+    int32_t SimAuthenticationResponse(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::IIccIoResultInfo &result);
+    int32_t UnlockSimLockResponse(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::ILockStatusResp &lockStatus);
 
 private:
-    bool IsSimResponse(uint32_t code);
-    bool IsSimNotification(uint32_t code);
-    void AddHandlerToMap();
     int32_t ProcessIccIoInfo(
         std::shared_ptr<TelRilRequest> telRilRequest, std::shared_ptr<IccIoResultInfo> iccIoResult);
     int32_t ErrorIccIoResponse(
         std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo);
+    void BuildIccIoResult(std::shared_ptr<IccIoResultInfo> iccIoResult, const HDI::Ril::V1_0::IIccIoResultInfo &result);
+    void BuildCardStatusInfo(
+        std::shared_ptr<CardStatusInfo> cardStatusInfo, const HDI::Ril::V1_0::ICardStatusInfo &result);
+    void BuildLockStatusResp(
+        std::shared_ptr<LockStatusResp> lockStatusResp, const HDI::Ril::V1_0::ILockStatusResp &lockStatus);
+    void BuildSimProtocolResp(std::shared_ptr<SimProtocolResponse> simProtocolResponse,
+        const HDI::Ril::V1_0::ISimProtocolResponse &pSimProtocol);
+    void BuildOpenLogicalChannelResp(std::shared_ptr<OpenLogicalChannelResponse> openLogicalChannelResp,
+        const HDI::Ril::V1_0::IOpenLogicalChannelResponse &pOpenLogicalChannelResponse);
+    void BuildApduRequestInfo(
+        OHOS::HDI::Ril::V1_0::IApduSimIORequestInfo &ApduRequestInfo, const ApduSimIORequestInfo &reqInfo);
+    int32_t ResponseIccIo(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::IIccIoResultInfo &result);
 };
 } // namespace Telephony
 } // namespace OHOS
