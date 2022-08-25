@@ -35,6 +35,10 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t DEFAULT_REF_COUNT = 1;
+constexpr int16_t PARAMETER_COUNT_ZERO = 0;
+constexpr int16_t PARAMETER_COUNT_ONE = 1;
+constexpr int16_t PARAMETER_COUNT_TWO = 2;
+
 static int32_t WrapRadioTech(int32_t radioTechType)
 {
     RadioTech techType = static_cast<RadioTech>(radioTechType);
@@ -205,15 +209,15 @@ static bool MatchGetRadioTechParameter(napi_env env, const napi_value parameters
 
 static napi_value GetRadioTech(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchGetRadioTechParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<RadioTechContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-    if (parameterCount == 2) {
+    if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(
@@ -290,15 +294,15 @@ static bool MatchGetSignalInfoListParameter(napi_env env, napi_value parameter[]
 
 static napi_value GetSignalInfoList(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchGetSignalInfoListParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<SignalInfoListContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &(asyncContext->slotId)));
-    if (parameterCount == 2) {
+    if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(
@@ -446,16 +450,16 @@ static bool MatchIsNrSupportedParameter(napi_env env, napi_value parameter[], si
 
 static napi_value GetNetworkState(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchGetNetworkStateParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<GetStateContext>();
-    if (parameterCount == 0) {
+    if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
-    } else if (parameterCount == 1) {
+    } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
         if (valueType == napi_number) {
@@ -464,7 +468,7 @@ static napi_value GetNetworkState(napi_env env, napi_callback_info info)
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
         }
-    } else if (parameterCount == 2) {
+    } else if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
@@ -510,15 +514,15 @@ static void GetNetworkSelectionModeCallback(napi_env env, napi_status status, vo
 
 static napi_value GetNetworkSelectionMode(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchGetRadioTechParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<GetSelectModeContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-    if (parameterCount == 2) {
+    if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "GetNetworkSelectionMode",
@@ -635,15 +639,15 @@ static bool MatchGetNetworkSearchInformation(napi_env env, const napi_value para
 
 static napi_value GetNetworkSearchInformation(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchGetNetworkSearchInformation(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<GetSearchInfoContext>().release();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-    if (parameterCount == 2) {
+    if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(env, asyncContext, "GetNetworkSearchInformation",
@@ -847,15 +851,15 @@ static void ParseNetworkSelectionParameter(napi_env env, napi_value object, SetS
 
 static napi_value SetNetworkSelectionMode(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchSetNetworkSelectionModeParameters(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<SetSelectModeContext>();
     ParseNetworkSelectionParameter(env, parameters[0], *asyncContext);
-    if (parameterCount == 2) {
+    if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "SetNetworkSelectionMode",
@@ -912,15 +916,15 @@ static bool MatchGetISOCountryCodeForNetworkParameter(napi_env env, napi_value p
 
 static napi_value GetISOCountryCodeForNetwork(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchGetISOCountryCodeForNetworkParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<GetISOCountryCodeContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-    if (parameterCount == 2) {
+    if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(
@@ -982,16 +986,16 @@ static void IsRadioOnCallback(napi_env env, napi_status status, void *data)
 
 static napi_value IsRadioOn(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchIsRadioOnParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<IsRadioOnContext>();
-    if (parameterCount == 0) {
+    if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
-    } else if (parameterCount == 1) {
+    } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
         if (valueType == napi_number) {
@@ -1001,7 +1005,7 @@ static napi_value IsRadioOn(napi_env env, napi_callback_info info)
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
         }
-    } else if (parameterCount == 2) {
+    } else if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
@@ -1063,16 +1067,16 @@ static bool MatchSwitchRadioParameter(napi_env env, napi_value parameters[], siz
 
 static napi_value TurnOnRadio(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchIsRadioOnParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<SwitchRadioContext>();
-    if (parameterCount == 0) {
+    if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
-    } else if (parameterCount == 1) {
+    } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
         if (valueType == napi_number) {
@@ -1082,7 +1086,7 @@ static napi_value TurnOnRadio(napi_env env, napi_callback_info info)
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
         }
-    } else if (parameterCount == 2) {
+    } else if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
@@ -1127,16 +1131,16 @@ static void TurnOffRadioCallback(napi_env env, napi_status status, void *data)
 
 static napi_value TurnOffRadio(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchIsRadioOnParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<SwitchRadioContext>();
-    if (parameterCount == 0) {
+    if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
-    } else if (parameterCount == 1) {
+    } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
         if (valueType == napi_number) {
@@ -1146,7 +1150,7 @@ static napi_value TurnOffRadio(napi_env env, napi_callback_info info)
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
         }
-    } else if (parameterCount == 2) {
+    } else if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
@@ -1207,15 +1211,15 @@ static bool MatchGetOperatorNameParameter(napi_env env, napi_value parameters[],
 
 static napi_value GetOperatorName(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchGetOperatorNameParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<GetOperatorNameContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-    if (parameterCount == 2) {
+    if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(
@@ -1374,15 +1378,15 @@ static bool MatchGetPreferredNetworkParameter(napi_env env, napi_value parameter
 
 static napi_value GetPreferredNetwork(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchGetPreferredNetworkParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<PreferredNetworkModeContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-    if (parameterCount == 2) {
+    if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "GetPreferredNetworkMode",
@@ -1423,16 +1427,16 @@ void GetIMEICallback(napi_env env, napi_status status, void *data)
 
 static napi_value GetIMEI(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchGetIMEIParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<GetIMEIContext>();
-    if (parameterCount == 0) {
+    if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
-    } else if (parameterCount == 1) {
+    } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
         if (valueType == napi_number) {
@@ -1441,7 +1445,7 @@ static napi_value GetIMEI(napi_env env, napi_callback_info info)
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
         }
-    } else if (parameterCount == 2) {
+    } else if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
@@ -1483,16 +1487,16 @@ void GetMEIDCallback(napi_env env, napi_status status, void *data)
 
 static napi_value GetMEID(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchGetIMEIParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<GetMEIDContext>();
-    if (parameterCount == 0) {
+    if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
-    } else if (parameterCount == 1) {
+    } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
         if (valueType == napi_number) {
@@ -1502,7 +1506,7 @@ static napi_value GetMEID(napi_env env, napi_callback_info info)
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
         }
-    } else if (parameterCount == 2) {
+    } else if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
@@ -1541,16 +1545,16 @@ static void SendUpdateCellLocationRequestCallback(napi_env env, napi_status stat
 
 static napi_value SendUpdateCellLocationRequest(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = { 0 };
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchSwitchRadioParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<SwitchRadioContext>();
-    if (parameterCount == 0) {
+    if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
-    } else if (parameterCount == 1) {
+    } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
         if (valueType == napi_number) {
@@ -1559,7 +1563,7 @@ static napi_value SendUpdateCellLocationRequest(napi_env env, napi_callback_info
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
         }
-    } else if (parameterCount == 2) {
+    } else if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
@@ -1762,16 +1766,16 @@ void GetCellInformationCallback(napi_env env, napi_status status, void *data)
 
 static napi_value GetCellInformation(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchGetNetworkStateParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = new CellInformationContext();
-    if (parameterCount == 0) {
+    if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
-    } else if (parameterCount == 1) {
+    } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
         if (valueType == napi_number) {
@@ -1780,7 +1784,7 @@ static napi_value GetCellInformation(napi_env env, napi_callback_info info)
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], 1, &asyncContext->callbackRef));
         }
-    } else if (parameterCount == 2) {
+    } else if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         NAPI_CALL(env, napi_create_reference(env, parameters[1], 1, &asyncContext->callbackRef));
     }
@@ -1821,14 +1825,14 @@ void GetPrimarySlotIdCallback(napi_env env, napi_status status, void *data)
 
 static napi_value GetPrimarySlotId(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 1;
-    napi_value parameters[1] = {0};
+    size_t parameterCount = PARAMETER_COUNT_ONE;
+    napi_value parameters[PARAMETER_COUNT_ONE] = {0};
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchSwitchRadioParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<SwitchRadioContext>();
-    if (parameterCount == 1) {
+    if (parameterCount == PARAMETER_COUNT_ONE) {
         NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(
@@ -1871,16 +1875,16 @@ void GetUniqueDeviceIdCallback(napi_env env, napi_status status, void *data)
 
 static napi_value GetUniqueDeviceId(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchGetIMEIParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<GetIMEIContext>();
-    if (parameterCount == 0) {
+    if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
-    } else if (parameterCount == 1) {
+    } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
         if (valueType == napi_number) {
@@ -1889,7 +1893,7 @@ static napi_value GetUniqueDeviceId(napi_env env, napi_callback_info info)
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
         }
-    } else if (parameterCount == 2) {
+    } else if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
@@ -1950,16 +1954,16 @@ static void GetNrOptionModeCallback(napi_env env, napi_status status, void *data
 
 static napi_value GetNrOptionMode(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchGetNrOptionModeParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<GetNrOptionModeContext>();
-    if (parameterCount == 0) {
+    if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
-    } else if (parameterCount == 1) {
+    } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
         if (valueType == napi_number) {
@@ -1968,7 +1972,7 @@ static napi_value GetNrOptionMode(napi_env env, napi_callback_info info)
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
         }
-    } else if (parameterCount == 2) {
+    } else if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
@@ -1978,8 +1982,8 @@ static napi_value GetNrOptionMode(napi_env env, napi_callback_info info)
 
 static napi_value IsNrSupported(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 1;
-    napi_value parameters[1] = {0};
+    size_t parameterCount = PARAMETER_COUNT_ONE;
+    napi_value parameters[PARAMETER_COUNT_ONE] = {0};
     void *data = nullptr;
     napi_value thisVar = nullptr;
     napi_value result = nullptr;
@@ -1987,7 +1991,7 @@ static napi_value IsNrSupported(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchIsNrSupportedParameter(env, parameters, parameterCount), "type mismatch");
     int32_t slotId = SIM_SLOT_0;
-    if (parameterCount == 1) {
+    if (parameterCount == PARAMETER_COUNT_ONE) {
         NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &slotId));
     }
     if (!IsValidSlotId(slotId)) {
@@ -2035,15 +2039,15 @@ static void SetPrimarySlotIdCallback(napi_env env, napi_status status, void *dat
 
 static napi_value SetPrimarySlotId(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 2;
-    napi_value parameters[2] = {0};
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchGetISOCountryCodeForNetworkParameter(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<SetPrimarySlotIdContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-    if (parameterCount == 2) {
+    if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(

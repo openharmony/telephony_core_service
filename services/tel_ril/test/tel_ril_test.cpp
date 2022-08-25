@@ -612,16 +612,16 @@ void TelRilTest::OnRequestSimIccIoTest(int32_t slotId, const std::shared_ptr<App
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestSimIccIoTest -->");
-        SimIoRequestInfo msg;
-        msg.command = COMMAND;
-        msg.fileId = FILEID;
-        msg.p1 = 0;
-        msg.p2 = 0;
-        msg.p3 = P3;
-        msg.data = "";
-        msg.path = "3F007F105F3A";
-        msg.pin2 = "";
-        telRilManager_->GetSimIO(slotId, msg, event);
+        SimIoRequestInfo simIoRequestInfo;
+        simIoRequestInfo.command = COMMAND;
+        simIoRequestInfo.fileId = FILEID;
+        simIoRequestInfo.p1 = 0;
+        simIoRequestInfo.p2 = 0;
+        simIoRequestInfo.p3 = P3;
+        simIoRequestInfo.data = "";
+        simIoRequestInfo.path = "3F007F105F3A";
+        simIoRequestInfo.pin2 = "";
+        telRilManager_->GetSimIO(slotId, simIoRequestInfo, event);
         TELEPHONY_LOGI("TelRilTest::OnRequestSimIccIoTest --> OnRequestSimIccIoTest finished");
     }
 }
