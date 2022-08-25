@@ -28,8 +28,6 @@ public:
         std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     ~TelRilCall() = default;
 
-    bool IsCallRespOrNotify(uint32_t code);
-
     int32_t GetCallList(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t Dial(const std::string address, int32_t clirMode, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t Reject(const AppExecFwk::InnerEvent::Pointer &result);
@@ -58,62 +56,73 @@ public:
     int32_t SendDtmf(char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t StartDtmf(char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t StopDtmf(int32_t index, const AppExecFwk::InnerEvent::Pointer &result);
-    int32_t AnswerResponse(MessageParcel &data);
-    int32_t GetCallListResponse(MessageParcel &data);
-    int32_t DialResponse(MessageParcel &data);
-    int32_t HangupResponse(MessageParcel &data);
-    int32_t RejectResponse(MessageParcel &data);
-    int32_t HoldCallResponse(MessageParcel &data);
-    int32_t UnHoldCallResponse(MessageParcel &data);
-    int32_t SwitchCallResponse(MessageParcel &data);
-    int32_t CombineConferenceResponse(MessageParcel &data);
-    int32_t SeparateConferenceResponse(MessageParcel &data);
-    int32_t CallSupplementResponse(MessageParcel &data);
-    int32_t GetCallWaitingResponse(MessageParcel &data);
-    int32_t SetCallTransferInfoResponse(MessageParcel &data);
-    int32_t GetCallTransferInfoResponse(MessageParcel &data);
-    int32_t GetClipResponse(MessageParcel &data);
-    int32_t SetClipResponse(MessageParcel &data);
-    int32_t GetClirResponse(MessageParcel &data);
-    int32_t SetClirResponse(MessageParcel &data);
-    int32_t GetCallRestrictionResponse(MessageParcel &data);
-    int32_t SetCallRestrictionResponse(MessageParcel &data);
-    int32_t SetCallWaitingResponse(MessageParcel &data);
-    int32_t SendDtmfResponse(MessageParcel &data);
-    int32_t StartDtmfResponse(MessageParcel &data);
-    int32_t StopDtmfResponse(MessageParcel &data);
     int32_t SetCallPreferenceMode(const int32_t mode, const AppExecFwk::InnerEvent::Pointer &result);
-    int32_t SetCallPreferenceResponse(MessageParcel &data);
     int32_t GetCallPreferenceMode(const AppExecFwk::InnerEvent::Pointer &result);
-    int32_t GetCallPreferenceResponse(MessageParcel &data);
     int32_t SetUssd(const std::string str, const AppExecFwk::InnerEvent::Pointer &result);
-    int32_t SetUssdResponse(MessageParcel &data);
     int32_t GetUssd(const AppExecFwk::InnerEvent::Pointer &result);
-    int32_t GetUssdResponse(MessageParcel &data);
-    int32_t CallStateUpdated(MessageParcel &data);
-    int32_t CallUssdNotice(MessageParcel &data);
     int32_t SetMute(const int32_t mute, const AppExecFwk::InnerEvent::Pointer &result);
-    int32_t SetMuteResponse(MessageParcel &data);
     int32_t GetMute(const AppExecFwk::InnerEvent::Pointer &result);
-    int32_t GetMuteResponse(MessageParcel &data);
     int32_t GetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetEmergencyCallList(std::vector<EmergencyCall> &eccVec, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetCallFailReason(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetBarringPassword(std::string fac, std::string oldPassword,
+        std::string newPassword, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t AnswerResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t GetCallListResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ICallInfoList &callList);
+    int32_t DialResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t HangupResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t RejectResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t HoldCallResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t UnHoldCallResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t SwitchCallResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t CombineConferenceResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t SeparateConferenceResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t CallSupplementResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t GetCallWaitingResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ICallWaitResult &callWaitResult);
+    int32_t SetCallTransferInfoResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t GetCallTransferInfoResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ICallForwardQueryInfoList &cFQueryList);
+    int32_t GetClipResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IGetClipResult &getClipResult);
+    int32_t SetClipResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t GetClirResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IGetClirResult &getClirResult);
+    int32_t SetClirResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t GetCallRestrictionResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ICallRestrictionResult &result);
+    int32_t SetCallRestrictionResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t SetCallWaitingResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t SendDtmfResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t StartDtmfResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t StopDtmfResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t SetCallPreferenceModeResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t GetCallPreferenceModeResponse(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, int32_t mode);
+    int32_t SetUssdResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t GetUssdResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, int32_t cusd);
+    int32_t SetMuteResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t GetMuteResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, int32_t mute);
     int32_t GetEmergencyCallListResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_0::IEmergencyInfoList &emergencyInfoList);
-    int32_t SetEmergencyCallList(std::vector<EmergencyCall> &eccVec, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SetEmergencyCallListResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
-    int32_t GetCallFailReason(const AppExecFwk::InnerEvent::Pointer &result);
-    int32_t GetCallFailReasonResponse(MessageParcel &data);
-    int32_t CallRingbackVoiceNotice(MessageParcel &data);
-    int32_t SrvccStatusNotice(MessageParcel &data);
+    int32_t GetCallFailReasonResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, int32_t callFail);
+    int32_t SetBarringPasswordResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t CallStateUpdated(int32_t type);
+    int32_t CallUssdNotice(const HDI::Ril::V1_0::IUssdNoticeInfo &ussdNoticeInfo);
+    int32_t CallSsNotice(const HDI::Ril::V1_0::ISsNoticeInfo &ssNoticeInfo);
+    int32_t CallRingbackVoiceNotice(const HDI::Ril::V1_0::IRingbackVoice &ringbackVoice);
+    int32_t CallSrvccStatusNotice(const HDI::Ril::V1_0::ISrvccStatus &srvccStatus);
     int32_t CallEmergencyNotice(const HDI::Ril::V1_0::IEmergencyInfoList &emergencyInfoList);
-    int32_t CallSsNotice(MessageParcel &data);
 
 private:
-    bool IsCallResponse(uint32_t code);
-    bool IsCallNotification(uint32_t code);
-    void AddHandlerToMap();
     void BuildEmergencyInfoList(std::shared_ptr<EmergencyInfoList> emergencyCallList,
         const HDI::Ril::V1_0::IEmergencyInfoList &emergencyInfoList);
+    void BuildCallInfoList(std::shared_ptr<CallInfoList> callInfoList,
+        const HDI::Ril::V1_0::ICallInfoList &iCallInfoList);
+    void BuildCFQueryInfoList(std::shared_ptr<CallForwardQueryInfoList> cFQueryInfoList,
+        const HDI::Ril::V1_0::ICallForwardQueryInfoList &cFQueryList);
 };
 } // namespace Telephony
 } // namespace OHOS

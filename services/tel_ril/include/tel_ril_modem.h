@@ -28,38 +28,31 @@ public:
         std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     ~TelRilModem() = default;
 
-    /**
-     * Turn on and off radio response (for flight mode)
-     * @param data is HDF service callback message
-     */
-    int32_t SetRadioStateResponse(MessageParcel &data);
-    int32_t GetRadioStateResponse(MessageParcel &data);
-    int32_t ShutDownResponse(MessageParcel &data);
-    int32_t RadioStateUpdated(MessageParcel &data);
-    int32_t VoiceRadioTechUpdated(MessageParcel &data);
-
-    /**
-     * Radio Status Change response
-     * @param data is HDF service callback message
-     */
+    int32_t SetRadioStateResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t GetRadioStateResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, int32_t state);
+    int32_t ShutDown(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t ShutDownResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo responseInfo);
+    int32_t RadioStateUpdated(int32_t state);
+    int32_t VoiceRadioTechUpdated(const HDI::Ril::V1_0::IVoiceRadioTechnology &voiceRadioTechnology);
     int32_t SetRadioState(int32_t fun, int32_t rst, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetRadioState(const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t ShutDown(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetImei(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetMeid(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t GetImeiResponse(MessageParcel &data);
-    int32_t GetMeidResponse(MessageParcel &data);
-    int32_t GetVoiceRadioTechnologyResponse(MessageParcel &data);
-    int32_t GetBasebandVersionResponse(MessageParcel &data);
-    bool IsCommonRespOrNotify(uint32_t code);
+    int32_t GetImeiResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const std::string &imei);
+    int32_t GetMeidResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const std::string &meid);
+    int32_t GetVoiceRadioTechnologyResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IVoiceRadioTechnology &voiceRadioTechnology);
+    int32_t GetBasebandVersionResponse(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const std::string &basebandVersion);
+
+public:
     ModemPowerState radioState_ = ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;
 
 private:
-    void AddHandlerToMap();
-    bool IsCommonResponse(uint32_t code);
-    bool IsCommonNotification(uint32_t code);
+    void BuildVoiceRadioTechnology(const HDI::Ril::V1_0::IVoiceRadioTechnology &voiceRadioTechnology,
+        std::shared_ptr<VoiceRadioTechnology> &mVoiceRadioTechnology);
 };
 } // namespace Telephony
 } // namespace OHOS

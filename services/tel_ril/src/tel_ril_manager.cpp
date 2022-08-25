@@ -91,24 +91,14 @@ int32_t TelRilManager::OnRemoteRequest(
     if ((responseType == HRIL_RESPONSE_REQUEST_MUST_ACK) || (responseType == HRIL_RESPONSE_NOTICE_MUST_ACK)) {
         SendAckAndLock();
     }
-    if (GetTelRilCall(slotId).IsCallRespOrNotify(code)) {
-        return GetTelRilCall(slotId).ProcessRespOrNotify<TelRilCall>(code, data);
-    }
     if (GetTelRilSms(slotId).IsSmsRespOrNotify(code)) {
         return GetTelRilSms(slotId).ProcessRespOrNotify<TelRilSms>(code, data);
-    }
-    if (GetTelRilSim(slotId).IsSimRespOrNotify(code)) {
-        return GetTelRilSim(slotId).ProcessRespOrNotify<TelRilSim>(code, data);
     }
     if (GetTelRilNetwork(slotId).IsNetworkRespOrNotify(code)) {
         return GetTelRilNetwork(slotId).ProcessRespOrNotify<TelRilNetwork>(code, data);
     }
     if (GetTelRilData(slotId).IsDataRespOrNotify(code)) {
         return GetTelRilData(slotId).ProcessRespOrNotify<TelRilData>(code, data);
-    }
-    /* The common notice should be placed last. */
-    if (GetTelRilModem(slotId).IsCommonRespOrNotify(code)) {
-        return GetTelRilModem(slotId).ProcessRespOrNotify<TelRilModem>(code, data);
     }
     TELEPHONY_LOGE("TelRilManager not find code:%{public}d", code);
     return CORE_SERVICE_ERROR;
@@ -987,7 +977,7 @@ bool TelRilManager::RegisterHdfStatusListener()
                 return;
             }
 
-            if (status.status != SERVIE_STATUS_START || status.status == SERVIE_STATUS_STOP) {
+            if (status.status != SERVIE_STATUS_START && status.status != SERVIE_STATUS_STOP) {
                 TELEPHONY_LOGI("TelRilManager::RegisterHdfStatusListener, status is not start or stop");
                 return;
             }
