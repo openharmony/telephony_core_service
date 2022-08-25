@@ -15,6 +15,10 @@
 
 #include "network_information.h"
 
+#include "iosfwd"
+#include "memory"
+#include "parcel.h"
+#include "string"
 #include "string_ex.h"
 
 namespace OHOS {
