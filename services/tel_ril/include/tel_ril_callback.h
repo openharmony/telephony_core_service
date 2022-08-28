@@ -158,6 +158,74 @@ public:
     int32_t UnlockSimLockResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_0::ILockStatusResp &lockStatus) override;
 
+    // Network
+    int32_t NetworkCsRegStatusUpdated(int32_t slotId, const HDI::Ril::V1_0::ICsRegStatusInfo &csRegStatusInfo) override;
+    int32_t NetworkPsRegStatusUpdated(int32_t slotId, const HDI::Ril::V1_0::IPsRegStatusInfo &psRegStatusInfo) override;
+    int32_t SignalStrengthUpdated(int32_t slotId, const HDI::Ril::V1_0::IRssi &rssi) override;
+    int32_t NetworkTimeZoneUpdated(int32_t slotId, const  std::string &timeZoneStr) override;
+    int32_t NetworkTimeUpdated(int32_t slotId, const std::string &timeStr) override;
+    int32_t NetworkPhyChnlCfgUpdated(
+        int32_t slotId, const HDI::Ril::V1_0::IChannelConfigInfoList &channelConfigInfoList) override;
+    int32_t NetworkCurrentCellUpdated(
+        int32_t slotId, const HDI::Ril::V1_0::ICellListCurrentInfo &cellListCurrentInfo) override;
+    int32_t GetSignalStrengthResponse(
+        const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::IRssi &rssi) override;
+    int32_t GetCsRegStatusResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ICsRegStatusInfo &csRegStatusInfo) override;
+    int32_t GetPsRegStatusResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IPsRegStatusInfo &psRegStatusInfo) override;
+    int32_t GetOperatorInfoResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IOperatorInfo &operatorInfo) override;
+    int32_t GetNetworkSearchInformationResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IAvailableNetworkList &availableNetworkList) override;
+    int32_t GetNetworkSelectionModeResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ISetNetworkModeInfo &setNetworkModeInfo) override;
+    int32_t SetNetworkSelectionModeResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+    int32_t GetNeighboringCellInfoListResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ICellListNearbyInfo &cellInfoList) override;
+    int32_t GetCurrentCellInfoResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ICellListCurrentInfo &cellInfoList) override;
+    int32_t SetPreferredNetworkResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+    int32_t GetPreferredNetworkResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IPreferredNetworkTypeInfo &preferredNetworkTypeInfo) override;
+    int32_t GetRadioCapabilityResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IRadioCapabilityInfo &radioCapabilityInfo) override;
+    int32_t GetPhysicalChannelConfigResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IChannelConfigInfoList &channelConfigInfoList) override;
+    int32_t SetLocateUpdatesResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+    int32_t SetNotificationFilterResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+    int32_t SetDeviceStateResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+
+    // Sms
+    int32_t NewSmsNotify(int32_t slotId, const HDI::Ril::V1_0::ISmsMessageInfo &smsMessageInfo) override;
+    int32_t NewCdmaSmsNotify(int32_t slotId, const HDI::Ril::V1_0::ISmsMessageInfo &smsMessageInfo) override;
+    int32_t SmsStatusReportNotify(int32_t slotId, const HDI::Ril::V1_0::ISmsMessageInfo &smsMessageInfo) override;
+    int32_t NewSmsStoredOnSimNotify(int32_t slotId, int32_t recordNumber, int32_t indicationType) override;
+    int32_t CBConfigNotify(
+        int32_t slotId, const HDI::Ril::V1_0::ICBConfigReportInfo &cellBroadConfigReportInfo) override;
+    int32_t SendGsmSmsResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ISendSmsResultInfo &sendSmsResultInfo) override;
+    int32_t SendCdmaSmsResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ISendSmsResultInfo &sendSmsResultInfo) override;
+    int32_t AddSimMessageResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+    int32_t DelSimMessageResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+    int32_t UpdateSimMessageResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+    int32_t AddCdmaSimMessageResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+    int32_t DelCdmaSimMessageResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+    int32_t UpdateCdmaSimMessageResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+    int32_t SetSmscAddrResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+    int32_t GetSmscAddrResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IServiceCenterAddress &serviceCenterAddress) override;
+    int32_t SetCBConfigResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+    int32_t GetCBConfigResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ICBConfigInfo &cellBroadcastInfo) override;
+    int32_t SetCdmaCBConfigResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+    int32_t GetCdmaCBConfigResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ICdmaCBConfigInfo &cdmaCBConfigInfo) override;
+    int32_t SendSmsMoreModeResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ISendSmsResultInfo &sendSmsResultInfo) override;
+    int32_t SendSmsAckResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+
 private:
     template<typename FuncType, typename ModuleFuncType, typename... ParamTypes>
     inline int32_t TaskSchedule(

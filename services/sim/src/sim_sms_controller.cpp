@@ -114,6 +114,7 @@ bool SimSmsController::UpdateSmsIcc(int index, int status, std::string &pduData,
     std::unique_lock<std::mutex> lock(mtx_);
     bool isCDMA = IsCdmaCardType();
     TELEPHONY_LOGI("UpdateSmsIcc start: %{public}d, %{public}d", index, isCDMA);
+    responseReady_ = false;
     if (!isCDMA) {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_UPDATE_COMPLETED);
         SimMessageParam param {index, status, smsc, pduData};
@@ -123,7 +124,6 @@ bool SimSmsController::UpdateSmsIcc(int index, int status, std::string &pduData,
         CdmaSimMessageParam param {index, status, pduData};
         telRilManager_->UpdateCdmaSimMessage(slotId_, param, response);
     }
-    responseReady_ = false;
     while (!responseReady_) {
         TELEPHONY_LOGI("UpdateSmsIcc::wait(), response = false");
         if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
@@ -139,6 +139,7 @@ bool SimSmsController::DelSmsIcc(int index)
     std::unique_lock<std::mutex> lock(mtx_);
     bool isCDMA = IsCdmaCardType();
     TELEPHONY_LOGI("DelSmsIcc start: %{public}d, %{public}d", index, isCDMA);
+    responseReady_ = false;
     if (!isCDMA) {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_DELETE_COMPLETED);
         telRilManager_->DelSimMessage(slotId_, index, response);
@@ -148,7 +149,6 @@ bool SimSmsController::DelSmsIcc(int index)
         telRilManager_->DelCdmaSimMessage(slotId_, index, response);
         TELEPHONY_LOGI("SimSmsController::DelCdmaSimMessage OK return %{public}d", responseReady_);
     }
-    responseReady_ = false;
     while (!responseReady_) {
         TELEPHONY_LOGI("DelSmsIcc::wait(), response = false");
         if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
@@ -163,6 +163,7 @@ bool SimSmsController::AddSmsToIcc(int status, std::string &pdu, std::string &sm
     std::unique_lock<std::mutex> lock(mtx_);
     bool isCDMA = IsCdmaCardType();
     TELEPHONY_LOGI("AddSmsToIcc start: %{public}d, %{public}d", status, isCDMA);
+    responseReady_ = false;
     if (!isCDMA) {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_WRITE_COMPLETED);
         SimMessageParam param {0, status, smsc, pdu};
@@ -171,7 +172,6 @@ bool SimSmsController::AddSmsToIcc(int status, std::string &pdu, std::string &sm
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_WRITE_COMPLETED);
         telRilManager_->AddCdmaSimMessage(slotId_, status, pdu, response);
     }
-    responseReady_ = false;
     while (!responseReady_) {
         TELEPHONY_LOGI("AddSmsToIcc::wait(), response = false");
         if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {

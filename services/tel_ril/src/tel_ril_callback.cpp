@@ -557,5 +557,285 @@ int32_t TelRilCallback::UnlockSimLockResponse(
     return TaskSchedule(
         responseInfo.slotId, &TelRilManager::GetTelRilSim, &TelRilSim::UnlockSimLockResponse, responseInfo, lockStatus);
 }
+
+// Network
+int32_t TelRilCallback::NetworkCsRegStatusUpdated(
+    int32_t slotId, const HDI::Ril::V1_0::ICsRegStatusInfo &csRegStatusInfo)
+{
+    return TaskSchedule(
+        slotId, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::NetworkCsRegStatusUpdated, csRegStatusInfo);
+}
+
+int32_t TelRilCallback::NetworkPsRegStatusUpdated(
+    int32_t slotId, const HDI::Ril::V1_0::IPsRegStatusInfo &psRegStatusInfo)
+{
+    return TaskSchedule(
+        slotId, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::NetworkPsRegStatusUpdated, psRegStatusInfo);
+}
+
+int32_t TelRilCallback::SignalStrengthUpdated(int32_t slotId, const HDI::Ril::V1_0::IRssi &rssi)
+{
+    return TaskSchedule(slotId, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::SignalStrengthUpdated, rssi);
+}
+
+int32_t TelRilCallback::NetworkTimeZoneUpdated(int32_t slotId, const std::string &timeZoneStr)
+{
+    return TaskSchedule(slotId, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::NetworkTimeZoneUpdated, timeZoneStr);
+}
+
+int32_t TelRilCallback::NetworkTimeUpdated(int32_t slotId, const std::string &timeStr)
+{
+    return TaskSchedule(slotId, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::NetworkTimeUpdated, timeStr);
+}
+
+int32_t TelRilCallback::NetworkPhyChnlCfgUpdated(
+    int32_t slotId, const HDI::Ril::V1_0::IChannelConfigInfoList &channelConfigInfoList)
+{
+    return TaskSchedule(
+        slotId, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::NetworkPhyChnlCfgUpdated, channelConfigInfoList);
+}
+
+int32_t TelRilCallback::NetworkCurrentCellUpdated(
+    int32_t slotId, const HDI::Ril::V1_0::ICellListCurrentInfo &cellListCurrentInfo)
+{
+    return TaskSchedule(
+        slotId, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::NetworkCurrentCellUpdated, cellListCurrentInfo);
+}
+
+int32_t TelRilCallback::GetSignalStrengthResponse(
+    const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::IRssi &rssi)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::GetSignalStrengthResponse, responseInfo, rssi);
+}
+
+int32_t TelRilCallback::GetCsRegStatusResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::ICsRegStatusInfo &csRegStatusInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::GetCsRegStatusResponse, responseInfo, csRegStatusInfo);
+}
+
+int32_t TelRilCallback::GetPsRegStatusResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::IPsRegStatusInfo &psRegStatusInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::GetPsRegStatusResponse, responseInfo, psRegStatusInfo);
+}
+
+int32_t TelRilCallback::GetOperatorInfoResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::IOperatorInfo &operatorInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::GetOperatorInfoResponse, responseInfo, operatorInfo);
+}
+
+int32_t TelRilCallback::GetNetworkSearchInformationResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::IAvailableNetworkList &availableNetworkList)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::GetNetworkSearchInformationResponse, responseInfo, availableNetworkList);
+}
+
+int32_t TelRilCallback::GetNetworkSelectionModeResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::ISetNetworkModeInfo &setNetworkModeInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::GetNetworkSelectionModeResponse, responseInfo, setNetworkModeInfo);
+}
+
+int32_t TelRilCallback::SetNetworkSelectionModeResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::SetNetworkSelectionModeResponse, responseInfo);
+}
+
+int32_t TelRilCallback::GetNeighboringCellInfoListResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::ICellListNearbyInfo &cellInfoList)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::GetNeighboringCellInfoListResponse, responseInfo, cellInfoList);
+}
+
+int32_t TelRilCallback::GetCurrentCellInfoResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::ICellListCurrentInfo &cellInfoList)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::GetCurrentCellInfoResponse, responseInfo, cellInfoList);
+}
+
+int32_t TelRilCallback::SetPreferredNetworkResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::SetPreferredNetworkResponse, responseInfo);
+}
+
+int32_t TelRilCallback::GetPreferredNetworkResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::IPreferredNetworkTypeInfo &preferredNetworkTypeInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::GetPreferredNetworkResponse, responseInfo, preferredNetworkTypeInfo);
+}
+
+int32_t TelRilCallback::GetRadioCapabilityResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::IRadioCapabilityInfo &radioCapabilityInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::GetRadioCapabilityResponse, responseInfo, radioCapabilityInfo);
+}
+
+int32_t TelRilCallback::GetPhysicalChannelConfigResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::IChannelConfigInfoList &channelConfigInfoList)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::GetPhysicalChannelConfigResponse, responseInfo, channelConfigInfoList);
+}
+
+int32_t TelRilCallback::SetLocateUpdatesResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::SetLocateUpdatesResponse, responseInfo);
+}
+
+int32_t TelRilCallback::SetNotificationFilterResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::SetNotificationFilterResponse, responseInfo);
+}
+
+int32_t TelRilCallback::SetDeviceStateResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::SetDeviceStateResponse, responseInfo);
+}
+
+int32_t TelRilCallback::NewSmsNotify(int32_t slotId, const HDI::Ril::V1_0::ISmsMessageInfo &smsMessageInfo)
+{
+    return TaskSchedule(slotId, &TelRilManager::GetTelRilSms, &TelRilSms::NewSmsNotify, smsMessageInfo);
+}
+
+int32_t TelRilCallback::NewCdmaSmsNotify(int32_t slotId, const HDI::Ril::V1_0::ISmsMessageInfo &smsMessageInfo)
+{
+    return TaskSchedule(slotId, &TelRilManager::GetTelRilSms, &TelRilSms::NewCdmaSmsNotify, smsMessageInfo);
+}
+
+int32_t TelRilCallback::SmsStatusReportNotify(int32_t slotId, const HDI::Ril::V1_0::ISmsMessageInfo &smsMessageInfo)
+{
+    return TaskSchedule(slotId, &TelRilManager::GetTelRilSms, &TelRilSms::SmsStatusReportNotify, smsMessageInfo);
+}
+
+int32_t TelRilCallback::NewSmsStoredOnSimNotify(int32_t slotId, int32_t recordNumber, int32_t indicationType)
+{
+    return TaskSchedule(
+        slotId, &TelRilManager::GetTelRilSms, &TelRilSms::NewSmsStoredOnSimNotify, recordNumber, indicationType);
+}
+
+int32_t TelRilCallback::CBConfigNotify(
+    int32_t slotId, const HDI::Ril::V1_0::ICBConfigReportInfo &cellBroadConfigReportInfo)
+{
+    return TaskSchedule(slotId, &TelRilManager::GetTelRilSms, &TelRilSms::CBConfigNotify, cellBroadConfigReportInfo);
+}
+
+int32_t TelRilCallback::SendGsmSmsResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::ISendSmsResultInfo &sendSmsResultInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::SendGsmSmsResponse, responseInfo,
+        sendSmsResultInfo);
+}
+
+int32_t TelRilCallback::SendCdmaSmsResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::ISendSmsResultInfo &sendSmsResultInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::SendCdmaSmsResponse,
+        responseInfo, sendSmsResultInfo);
+}
+
+int32_t TelRilCallback::AddSimMessageResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    return TaskSchedule(
+        responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::AddSimMessageResponse, responseInfo);
+}
+
+int32_t TelRilCallback::DelSimMessageResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    return TaskSchedule(
+        responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::DelSimMessageResponse, responseInfo);
+}
+
+int32_t TelRilCallback::UpdateSimMessageResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    return TaskSchedule(
+        responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::UpdateSimMessageResponse, responseInfo);
+}
+
+int32_t TelRilCallback::AddCdmaSimMessageResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    return TaskSchedule(
+        responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::AddCdmaSimMessageResponse, responseInfo);
+}
+
+int32_t TelRilCallback::DelCdmaSimMessageResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    return TaskSchedule(
+        responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::DelCdmaSimMessageResponse, responseInfo);
+}
+
+int32_t TelRilCallback::UpdateCdmaSimMessageResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    return TaskSchedule(
+        responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::UpdateCdmaSimMessageResponse, responseInfo);
+}
+
+int32_t TelRilCallback::SetSmscAddrResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    return TaskSchedule(
+        responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::SetSmscAddrResponse, responseInfo);
+}
+
+int32_t TelRilCallback::GetSmscAddrResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::IServiceCenterAddress &serviceCenterAddress)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::GetSmscAddrResponse,
+        responseInfo, serviceCenterAddress);
+}
+
+int32_t TelRilCallback::SetCBConfigResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    return TaskSchedule(
+        responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::SetCBConfigResponse, responseInfo);
+}
+
+int32_t TelRilCallback::GetCBConfigResponse(
+    const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::ICBConfigInfo &cellBroadcastInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::GetCBConfigResponse,
+        responseInfo, cellBroadcastInfo);
+}
+
+int32_t TelRilCallback::SetCdmaCBConfigResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    return TaskSchedule(
+        responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::SetCdmaCBConfigResponse, responseInfo);
+}
+
+int32_t TelRilCallback::GetCdmaCBConfigResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::ICdmaCBConfigInfo &cdmaCBConfigInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::GetCdmaCBConfigResponse,
+        responseInfo, cdmaCBConfigInfo);
+}
+
+int32_t TelRilCallback::SendSmsMoreModeResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::ISendSmsResultInfo &sendSmsResultInfo)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::SendSmsMoreModeResponse,
+        responseInfo, sendSmsResultInfo);
+}
+
+int32_t TelRilCallback::SendSmsAckResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+{
+    return TaskSchedule(
+        responseInfo.slotId, &TelRilManager::GetTelRilSms, &TelRilSms::SendSmsAckResponse, responseInfo);
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -94,9 +94,6 @@ int32_t TelRilManager::OnRemoteRequest(
     if (GetTelRilSms(slotId).IsSmsRespOrNotify(code)) {
         return GetTelRilSms(slotId).ProcessRespOrNotify<TelRilSms>(code, data);
     }
-    if (GetTelRilNetwork(slotId).IsNetworkRespOrNotify(code)) {
-        return GetTelRilNetwork(slotId).ProcessRespOrNotify<TelRilNetwork>(code, data);
-    }
     if (GetTelRilData(slotId).IsDataRespOrNotify(code)) {
         return GetTelRilData(slotId).ProcessRespOrNotify<TelRilData>(code, data);
     }
