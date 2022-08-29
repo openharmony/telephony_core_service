@@ -63,10 +63,8 @@ ohos_unittest("tel_ril_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
-  if ("${product_name}" == "rk3568" || "${product_name}" == "DAYU") {
-    defines += [ "TEL_TEST_UNSUPPORT" ]
-    #   defines += [ "TEL_TEST_PIN_PUK" ]
-  }
+
+  # defines += [ "TEL_TEST_PIN_PUK" ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
