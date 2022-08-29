@@ -48,55 +48,74 @@ public:
         int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &response);
 
     // ril unsol
-    int32_t SignalStrengthUpdated(MessageParcel &data);
-    int32_t NetworkCsRegStatusUpdated(MessageParcel &data);
-    int32_t NetworkPsRegStatusUpdated(MessageParcel &data);
-    int32_t NetworkTimeZoneUpdated(MessageParcel &data);
-    int32_t NetworkTimeUpdated(MessageParcel &data);
-    int32_t NetworkPhyChnlCfgUpdated(MessageParcel &data);
-    int32_t NetworkCurrentCellUpdated(MessageParcel &data);
-    int32_t GetRadioCapabilityResponse(MessageParcel &data);
-    /**
-     * @brief Get signal intensity response
-     * @param data is HDF service callback message
-     */
-    int32_t GetSignalStrengthResponse(MessageParcel &data);
+    int32_t SignalStrengthUpdated(const HDI::Ril::V1_0::IRssi &rssi);
+    int32_t NetworkCsRegStatusUpdated(const HDI::Ril::V1_0::ICsRegStatusInfo &csRegStatusInfo);
+    int32_t NetworkPsRegStatusUpdated(const HDI::Ril::V1_0::IPsRegStatusInfo &psRegStatusInfo);
+    int32_t NetworkTimeZoneUpdated(const std::string &timeZoneStr);
+    int32_t NetworkTimeUpdated(const std::string &timeStr);
+    int32_t NetworkPhyChnlCfgUpdated(const HDI::Ril::V1_0::IChannelConfigInfoList &channelConfigInfoList);
+    int32_t NetworkCurrentCellUpdated(const HDI::Ril::V1_0::ICellListCurrentInfo &cellListCurrentInfo);
 
-    /**
-     * @brief Current voice registration status response
-     * @param data is HDF service callback message
-     */
-    int32_t GetCsRegStatusResponse(MessageParcel &data);
-
-    /**
-     * @brief Get network registration status response
-     * @param data is HDF service callback message
-     */
-    int32_t GetPsRegStatusResponse(MessageParcel &data);
-
-    int32_t GetNetworkSearchInformationResponse(MessageParcel &data);
-    int32_t GetNetworkSelectionModeResponse(MessageParcel &data);
-    int32_t SetNetworkSelectionModeResponse(MessageParcel &data);
-    int32_t SetPreferredNetworkResponse(MessageParcel &data);
-    int32_t GetPreferredNetworkResponse(MessageParcel &data);
-    int32_t GetPhysicalChannelConfigResponse(MessageParcel &data);
-    int32_t SetLocateUpdatesResponse(MessageParcel &data);
-    int32_t SetNotificationFilterResponse(MessageParcel &data);
-    int32_t SetDeviceStateResponse(MessageParcel &data);
-
-    /**
-     * @brief Current operator ons or eons response
-     * @param data is HDF service callback message
-     */
-    int32_t GetOperatorInfoResponse(MessageParcel &data);
-    int32_t GetNeighboringCellInfoListResponse(MessageParcel &data);
-    int32_t GetCurrentCellInfoResponse(MessageParcel &data);
-    bool IsNetworkRespOrNotify(uint32_t code);
+    int32_t GetSignalStrengthResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IRssi &rssi);
+    int32_t GetCsRegStatusResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ICsRegStatusInfo &csRegStatusInfo);
+    int32_t GetPsRegStatusResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IPsRegStatusInfo &psRegStatusInfo);
+    int32_t GetOperatorInfoResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IOperatorInfo &operatorInfo);
+    int32_t GetNetworkSearchInformationResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IAvailableNetworkList &availableNetworkList);
+    int32_t GetNetworkSelectionModeResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ISetNetworkModeInfo &setNetworkModeInfo);
+    int32_t SetNetworkSelectionModeResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t GetNeighboringCellInfoListResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ICellListNearbyInfo &cellInfoList);
+    int32_t GetCurrentCellInfoResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::ICellListCurrentInfo &cellInfoList);
+    int32_t SetPreferredNetworkResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t GetPreferredNetworkResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IPreferredNetworkTypeInfo &preferredNetworkTypeInfo);
+    int32_t GetRadioCapabilityResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IRadioCapabilityInfo &radioCapabilityInfo);
+    int32_t GetPhysicalChannelConfigResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IChannelConfigInfoList &channelConfigInfoList);
+    int32_t SetLocateUpdatesResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t SetNotificationFilterResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t SetDeviceStateResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
 
 private:
-    void AddHandlerToMap();
-    bool IsNetworkResponse(uint32_t code);
-    bool IsNetworkNotification(uint32_t code);
+    void BuildSignalStrength(std::shared_ptr<Rssi> signalStrength, const HDI::Ril::V1_0::IRssi &rssi);
+    void BuildCsRegStatusInfo(
+        std::shared_ptr<CsRegStatusInfo> regStatusInfo, const HDI::Ril::V1_0::ICsRegStatusInfo &csRegStatusInfo);
+    void BuildPsRegStatusInfo(
+        std::shared_ptr<PsRegStatusResultInfo> regStatusInfo, const HDI::Ril::V1_0::IPsRegStatusInfo &psRegStatusInfo);
+    void BuildOperatorInfo(
+        std::shared_ptr<OperatorInfoResult> operatorInfoResult, const HDI::Ril::V1_0::IOperatorInfo &operatorInfo);
+    void BuildAvailableNetworkList(std::shared_ptr<AvailableNetworkList> availableNetworkInfos,
+        const HDI::Ril::V1_0::IAvailableNetworkList &availableNetworkList);
+    void BuildNetworkModeInfo(std::shared_ptr<SetNetworkModeInfo> networkModeInfo,
+        const HDI::Ril::V1_0::ISetNetworkModeInfo &setNetworkModeInfo);
+    void BuildNeighboringCellInfoList(std::shared_ptr<CellListNearbyInfo> cellListNearbyInfo,
+        const HDI::Ril::V1_0::ICellListNearbyInfo &cellInfoList);
+    void FillGsmCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::ICellNearbyInfo &info);
+    void FillLteCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::ICellNearbyInfo &info);
+    void FillWcdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::ICellNearbyInfo &info);
+    void FillCdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::ICellNearbyInfo &info);
+    void FillTdscdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::ICellNearbyInfo &info);
+    void FillNrCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::ICellNearbyInfo &info);
+    void FillCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::ICellNearbyInfo &info);
+    void BuildCurrentCellInfoList(std::shared_ptr<CellListCurrentInfo> currentCellList,
+        const HDI::Ril::V1_0::ICellListCurrentInfo &cellInfoList);
+    void FillCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::ICurrentCellInfo &info);
+    void FillGsmCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::ICurrentCellInfo &info);
+    void FillLteCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::ICurrentCellInfo &info);
+    void FillWcdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::ICurrentCellInfo &info);
+    void FillCdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::ICurrentCellInfo &info);
+    void FillTdscdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::ICurrentCellInfo &info);
+    void FillNrCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::ICurrentCellInfo &info);
+    void BuildChannelConfigInfoList(std::shared_ptr<ChannelConfigInfoList> channelConfigList,
+        const HDI::Ril::V1_0::IChannelConfigInfoList &channelConfigInfoList);
 };
 } // namespace Telephony
 } // namespace OHOS
