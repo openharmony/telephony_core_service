@@ -310,6 +310,10 @@ bool SimManager::SetShowName(int32_t slotId, const std::u16string name)
 
 int32_t SimManager::GetDefaultVoiceSlotId()
 {
+    if (slotCount_ == std::atoi(DEFAULT_SLOT_COUNT)) {
+        TELEPHONY_LOGI("default slotId is 0 for single card version");
+        return DEFAULT_SIM_SLOT_ID;
+    }
     if (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr) {
         TELEPHONY_LOGE("simAccountManager is null!");
         return TELEPHONY_ERROR;
@@ -319,6 +323,10 @@ int32_t SimManager::GetDefaultVoiceSlotId()
 
 int32_t SimManager::GetDefaultSmsSlotId()
 {
+    if (slotCount_ == std::atoi(DEFAULT_SLOT_COUNT)) {
+        TELEPHONY_LOGI("default slotId is 0 for single card version");
+        return DEFAULT_SIM_SLOT_ID;
+    }
     if (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr) {
         TELEPHONY_LOGE("simAccountManager is null!");
         return TELEPHONY_ERROR;
@@ -328,6 +336,10 @@ int32_t SimManager::GetDefaultSmsSlotId()
 
 int32_t SimManager::GetDefaultCellularDataSlotId()
 {
+    if (slotCount_ == std::atoi(DEFAULT_SLOT_COUNT)) {
+        TELEPHONY_LOGI("default slotId is 0 for single card version");
+        return DEFAULT_SIM_SLOT_ID;
+    }
     if (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr) {
         TELEPHONY_LOGE("simAccountManager is null!");
         return TELEPHONY_ERROR;
@@ -337,6 +349,10 @@ int32_t SimManager::GetDefaultCellularDataSlotId()
 
 int32_t SimManager::GetPrimarySlotId()
 {
+    if (slotCount_ == std::atoi(DEFAULT_SLOT_COUNT)) {
+        TELEPHONY_LOGI(" default slotId is 0 for single card version");
+        return DEFAULT_SIM_SLOT_ID;
+    }
     if (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr) {
         TELEPHONY_LOGE("simAccountManager is null!");
         return TELEPHONY_ERROR;
