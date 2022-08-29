@@ -16,6 +16,7 @@
 #include "core_service.h"
 
 #include "core_manager_inner.h"
+#include "core_service_dump_helper.h"
 #include "ims_core_service_client.h"
 #include "network_search_manager.h"
 #include "parameter.h"
@@ -38,6 +39,9 @@ CoreService::~CoreService() {}
 
 void CoreService::OnStart()
 {
+    bindTime_ =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
+            .count();
     if (state_ == ServiceRunningState::STATE_RUNNING) {
         TELEPHONY_LOGE("CoreService has already started.");
         return;
@@ -57,6 +61,9 @@ void CoreService::OnStart()
         return;
     }
     state_ = ServiceRunningState::STATE_RUNNING;
+    endTime_ =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
+            .count();
     TELEPHONY_LOGI("CoreService start success");
 }
 
@@ -981,6 +988,47 @@ int32_t CoreService::UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return networkSearchManager_->UnregisterImsRegInfoCallback(slotId, imsSrvType, GetBundleName());
+}
+
+int32_t CoreService::Dump(std::int32_t fd, const std::vector<std::u16string> &args)
+{
+    if (fd < 0) {
+        TELEPHONY_LOGE("dump fd invalid");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    std::vector<std::string> argsInStr;
+    for (const auto &arg : args) {
+        TELEPHONY_LOGI("Dump args: %s", Str16ToStr8(arg).c_str());
+        argsInStr.emplace_back(Str16ToStr8(arg));
+    }
+    std::string result;
+    CoreServiceDumpHelper dumpHelper;
+    if (dumpHelper.Dump(argsInStr, result)) {
+        TELEPHONY_LOGI("%s", result.c_str());
+        std::int32_t ret = dprintf(fd, "%s", result.c_str());
+        if (ret < 0) {
+            TELEPHONY_LOGE("dprintf to dump fd failed");
+            return -1;
+        }
+        return 0;
+    }
+    TELEPHONY_LOGW("dumpHelper failed");
+    return -1;
+}
+
+int64_t CoreService::GetBindTime()
+{
+    return bindTime_;
+}
+
+int64_t CoreService::GetEndTime()
+{
+    return endTime_;
+}
+
+int64_t CoreService::GetSpendTime()
+{
+    return endTime_ - bindTime_;
 }
 } // namespace Telephony
 } // namespace OHOS

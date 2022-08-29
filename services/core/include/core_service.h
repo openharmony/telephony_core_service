@@ -205,6 +205,14 @@ public:
 
     int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType) override;
 
+    int32_t Dump(std::int32_t fd, const std::vector<std::u16string> &args) override;
+
+    int64_t GetBindTime();
+
+    int64_t GetEndTime();
+
+    int64_t GetSpendTime();
+
 private:
     bool Init();
 
@@ -216,6 +224,9 @@ private:
     std::shared_ptr<Telephony::ISimManager> simManager_ = nullptr;
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
     std::shared_ptr<TelRilManager> telRilManager_ = nullptr;
+    int64_t spendTime_ = 0;
+    int64_t bindTime_ = 0;
+    int64_t endTime_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
