@@ -28,14 +28,16 @@ class ImsCoreServiceCallbackStub : public IRemoteStub<ImsCoreServiceCallbackInte
 public:
     ImsCoreServiceCallbackStub();
     virtual ~ImsCoreServiceCallbackStub();
-    void InitFuncMap();
     int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
     int32_t UpdateImsServiceStatusChanged(int32_t slotId, const ImsServiceStatus &imsServiceStatus) override;
     int32_t GetImsRegistrationStatusResponse(int32_t slotId, const ImsRegistrationStatus &imsRegStatus) override;
 
 private:
+    void InitFuncMap();
     int32_t OnImsServiceStatusReportInner(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetImsRegistrationStatusResponseInner(MessageParcel &data, MessageParcel &reply);
+
+private:
     using RequestFuncType = int32_t (ImsCoreServiceCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, RequestFuncType> requestFuncMap_;
 };
