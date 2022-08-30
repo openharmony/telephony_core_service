@@ -1551,6 +1551,7 @@ void SetLockStateTestFunc(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_SetLockState_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -1564,6 +1565,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetLockState_0100, Function | MediumTest | Level
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
@@ -1585,6 +1587,7 @@ void SetLockStateTestFunc1(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_SetLockState_0200, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -1598,6 +1601,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetLockState_0200, Function | MediumTest | Level
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
@@ -1804,6 +1808,7 @@ void UnlockPinTestFunc(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_UnlockPin_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -1817,6 +1822,7 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPin_0100, Function | MediumTest | Level3)
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
@@ -1835,6 +1841,7 @@ void UnlockPinTestFunc1(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_UnlockPin_0200, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -1848,6 +1855,7 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPin_0200, Function | MediumTest | Level3)
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
@@ -1867,6 +1875,7 @@ void UnlockPukTestFunc(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_UnlockPuk_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -1880,6 +1889,7 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPuk_0100, Function | MediumTest | Level3)
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
@@ -1899,6 +1909,7 @@ void UnlockPukTestFunc1(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_UnlockPuk_0200, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -1912,6 +1923,7 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPuk_0200, Function | MediumTest | Level3)
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
@@ -1931,6 +1943,7 @@ void AlterPinTestFunc(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_AlterPin_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -1944,6 +1957,7 @@ HWTEST_F(SimTest, Telephony_Sim_AlterPin_0100, Function | MediumTest | Level3)
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
@@ -1963,6 +1977,7 @@ void AlterPinTestFunc1(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_AlterPin_0200, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -1976,6 +1991,7 @@ HWTEST_F(SimTest, Telephony_Sim_AlterPin_0200, Function | MediumTest | Level3)
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
@@ -1994,6 +2010,7 @@ void UnlockPin2TestFunc(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_UnlockPin2_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -2007,6 +2024,7 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPin2_0100, Function | MediumTest | Level3)
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
@@ -2025,6 +2043,7 @@ void UnlockPin2TestFunc1(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_UnlockPin2_0200, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -2038,6 +2057,7 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPin2_0200, Function | MediumTest | Level3)
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
@@ -2057,6 +2077,7 @@ void UnlockPuk2TestFunc(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_UnlockPuk2_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -2070,6 +2091,7 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPuk2_0100, Function | MediumTest | Level3)
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
@@ -2089,6 +2111,7 @@ void UnlockPuk2TestFunc1(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_UnlockPuk2_0200, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -2102,6 +2125,7 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPuk2_0200, Function | MediumTest | Level3)
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
@@ -2121,6 +2145,7 @@ void AlterPin2TestFunc(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_AlterPin2_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -2134,6 +2159,7 @@ HWTEST_F(SimTest, Telephony_Sim_AlterPin2_0100, Function | MediumTest | Level3)
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
@@ -2153,6 +2179,7 @@ void AlterPin2TestFunc1(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_AlterPin2_0200, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -2166,6 +2193,7 @@ HWTEST_F(SimTest, Telephony_Sim_AlterPin2_0200, Function | MediumTest | Level3)
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
@@ -2523,6 +2551,7 @@ void UnlockSimLockTestFunc(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_UnlockSimLock_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -2536,6 +2565,7 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockSimLock_0100, Function | MediumTest | Leve
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
@@ -2556,6 +2586,7 @@ void UnlockSimLockTestFunc1(CoreServiceTestHelper &helper)
 
 HWTEST_F(SimTest, Telephony_Sim_UnlockSimLock_0200, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -2569,6 +2600,7 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockSimLock_0200, Function | MediumTest | Leve
             EXPECT_TRUE(result);
         }
     }
+#endif
 }
 
 /**
