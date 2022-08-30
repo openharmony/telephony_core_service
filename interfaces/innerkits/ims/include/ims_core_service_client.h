@@ -38,16 +38,8 @@ public:
      */
     sptr<ImsCoreServiceInterface> GetImsCoreServiceProxy();
 
-    /**
-     * Is Connect ImsCoreService Remote Object
-     *
-     * @return bool
-     */
-    bool IsConnect() const;
     void Init();
     void UnInit();
-    int32_t GetImsRegistrationStatus(int32_t slotId);
-    int32_t RegisterImsCoreServiceCallback();
     int32_t RegisterImsCoreServiceCallbackHandler(int32_t slotId,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
@@ -58,8 +50,8 @@ public:
      * @return AppExecFwk::EventHandler
      */
     std::shared_ptr<AppExecFwk::EventHandler> GetHandler(int32_t slotId);
-    int32_t ReConnectService();
-    void Clean();
+
+    int32_t GetImsRegistrationStatus(int32_t slotId);
 
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
@@ -70,6 +62,16 @@ private:
         void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
         void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     };
+
+    /**
+     * Is Connect ImsCoreService Remote Object
+     *
+     * @return bool
+     */
+    bool IsConnect() const;
+    int32_t RegisterImsCoreServiceCallback();
+    int32_t ReConnectService();
+    void Clean();
 
 private:
     std::mutex mutex_;
