@@ -85,6 +85,7 @@ enum class SmsMmsErrorCode {
     SMS_ERROR_CREATE_REQUEST_FAIL,
     SMS_ERROR_SEND_REQUEST_FAIL,
     SMS_ERROR_MESSAGE_READ_FAIL,
+    SMS_ERROR_BROADCAST_TIME_OUT,
 };
 
 enum class CellularDataErrorCode {
