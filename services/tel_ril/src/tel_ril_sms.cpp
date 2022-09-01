@@ -406,7 +406,6 @@ void TelRilSms::BuildSendSmsResultInfo(
     sendSmsResultInfo->msgRef = iSendSmsResultInfo.msgRef;
     sendSmsResultInfo->pdu = iSendSmsResultInfo.pdu;
     sendSmsResultInfo->errCode = iSendSmsResultInfo.errCode;
-    sendSmsResultInfo->flag = iSendSmsResultInfo.flag;
 }
 
 void TelRilSms::BuildCBConfigInfo(
@@ -461,13 +460,13 @@ void TelRilSms::BuildCBConfigReportInfo(std::shared_ptr<CBConfigReportInfo> cell
 int32_t TelRilSms::ResponseSendSms(
     const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::ISendSmsResultInfo &result)
 {
-    std::shared_ptr<SendSmsResultInfo> sendSmsResultInfo = std::make_shared<SendSmsResultInfo>();
-    if (sendSmsResultInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : sendSmsResultInfo == nullptr !!!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    BuildSendSmsResultInfo(sendSmsResultInfo, result);
-    return Response<SendSmsResultInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, sendSmsResultInfo);
+    auto getDataFunc = [&result, this](std::shared_ptr<TelRilRequest> telRilRequest) {
+        std::shared_ptr<SendSmsResultInfo> sendSmsResultInfo = std::make_shared<SendSmsResultInfo>();
+        this->BuildSendSmsResultInfo(sendSmsResultInfo, result);
+        sendSmsResultInfo->flag = telRilRequest->pointer_->GetParam();
+        return sendSmsResultInfo;
+    };
+    return Response<SendSmsResultInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
 }
 } // namespace Telephony
 } // namespace OHOS
