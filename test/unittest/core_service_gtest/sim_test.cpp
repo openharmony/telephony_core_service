@@ -1017,10 +1017,8 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0200, Function | Medium
                 continue;
             }
             if (diallingNumbers[i]->name_.compare(name) == 0) {
-                TELEPHONY_LOGE("Telephony_Sim_AddIccAdnDiallingNumbers_0200 true");
+                TELEPHONY_LOGI("Telephony_Sim_AddIccAdnDiallingNumbers_0200 true");
                 flag = true;
-            } else {
-                TELEPHONY_LOGE("Telephony_Sim_AddIccAdnDiallingNumbers_0200 failed");
             }
         }
         EXPECT_TRUE(flag);
