@@ -29,7 +29,7 @@ enum class SmsMmsMessageType {
     SMS_SHORT_MESSAGE,
     MMS_SHORT_MESSAGE,
     CELL_BROAD_CAST,
-    WPA_PUSH,
+    WAP_PUSH,
 };
 
 class CoreServiceHiSysEvent : public TelephonyHiSysEvent {
