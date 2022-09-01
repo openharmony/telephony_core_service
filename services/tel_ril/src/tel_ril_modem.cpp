@@ -30,23 +30,23 @@ TelRilModem::TelRilModem(int32_t slotId, sptr<IRemoteObject> cellularRadio,
 int32_t TelRilModem::SetRadioStateResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
 {
     auto getDataFunc = [&responseInfo](std::shared_ptr<TelRilRequest> telRilRequest) {
-        std::shared_ptr<HRilRadioStateInfo> radioState = std::make_shared<HRilRadioStateInfo>();
+        std::unique_ptr<HRilRadioStateInfo> radioState = std::make_unique<HRilRadioStateInfo>();
         radioState->flag = telRilRequest->pointer_->GetParam();
         radioState->state = static_cast<int32_t>(responseInfo.error);
         return radioState;
     };
-    return Response<HRilRadioStateInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
+    return Response<std::unique_ptr<HRilRadioStateInfo>>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
 }
 
 int32_t TelRilModem::GetRadioStateResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, int32_t state)
 {
     auto getDataFunc = [state](std::shared_ptr<TelRilRequest> telRilRequest) {
-        std::shared_ptr<HRilRadioStateInfo> radioState = std::make_shared<HRilRadioStateInfo>();
+        std::unique_ptr<HRilRadioStateInfo> radioState = std::make_unique<HRilRadioStateInfo>();
         radioState->flag = telRilRequest->pointer_->GetParam();
         radioState->state = state;
         return radioState;
     };
-    return Response<HRilRadioStateInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
+    return Response<std::unique_ptr<HRilRadioStateInfo>>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
 }
 
 int32_t TelRilModem::ShutDown(const AppExecFwk::InnerEvent::Pointer &response)
