@@ -33,30 +33,29 @@
 ## 目录<a name="section129mcpsimp"></a>
 
 ```sh
-/base/telphony/core_service
+/base/telephony/core_service
 ├── figures                       # Readme资源文件
 ├── frameworks                    # 框架层目录
-│   ├── js
-│   └── native
+│   ├── js                        # js相关代码
+│   └── native                    # native相关代码
 ├── interfaces                    # 接口目录
-│   ├── innerkits                 # 部件间的内部接口
-|   |    ├── ims                  # IMS网络状态上报接口
-│   └── kits                      # 对应用提供的接口（例如JS接口）
+│   ├── innerkits                 # 部件间的内部接口
+│   └── kits                      # 对应用提供的接口（例如JS接口）
 ├── sa_profile                    # 核心服务的启动文件目录
 ├── services                      # 核心服务实现代码目录
-│   ├── etc                       # 核心服务的驱动脚本目录
+│   ├── core                      # 核心服务的核心文件目录
+│   ├── etc                       # 核心服务的驱动脚本目录
 |   ├── ims_service_interaction   # IMS网络状态上报实现代码目录
-│   ├── include
-│   ├── network_search            # 搜网服务代码目录
-│   ├── sim                       # SIM卡服务代码目录
-│   ├── src
-│   └── tel_ril                   # 核心服务与RIL Adapter通信代码目录
-├── test                          # 单元测试相关代码
-│   └── unittest
-└── utils
-    ├── common                    # 核心服务日志打印目录
-    ├── log
-    └── preferences
+│   ├── network_search            # 搜网服务代码目录
+│   ├── sim                       # SIM卡服务代码目录
+│   └── tel_ril                   # 核心服务与RIL Adapter通信代码目录
+├── test                          # 核心服务测试代码目录
+│   ├── fuzztest                  # 模糊测试相关代码
+│   └── unittest                  # 单元测试相关代码
+└── utils                         # 核心服务工具代码目录
+    ├── common                    # 核心服务通用工具目录
+    ├── log                       # 核心服务日志工具目录
+    └── preferences               # 核心服务属性偏好工具目录
 ```
 
 ## 约束<a name="section133mcpsimp"></a>
@@ -123,7 +122,7 @@
 | function off(type: 'imsRegStateChange', slotId: number, imsType: ImsServiceType, callback?: Callback\<ImsRegInfo>): void; | 反注册IMS网络状态变化回调   | ohos.permission.GET_TELEPHONY_STATE  |
 
 
-完整的JS API说明以及实例代码请参考：[网络搜索](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/js-reference/apis/js-apis-radio.md)。
+完整的JS API说明以及实例代码请参考：[网络搜索](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis/js-apis-radio.md)。
 
 **说明：**
 
