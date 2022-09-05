@@ -27,32 +27,34 @@ You can implement communication with the RIL Adapter by registering the callback
 As shown in the preceding figure, the telephony core service consists of the following:
 
 -   SimManager: provides services including SIM card initialization, file read/write, loading status notification, and single-SIM/dual-SIM control. These services implement functions such as SIM card status query, SIM card management, SIM card control, STK, contact storage, and SMS storage.
--   NetworkSearchManager: provides services including network registration and network status acquisition. These services offer functions such as network registration, network mode query, radio service status query, radio service management, signal strength query, cell management, registration status management, and time and time zone setting.
+-   NetworkSearchManager: provides services including network registration and network status acquisition. These services offer functions such as network registration, network mode query, IMS network status reporting, radio service status query, radio service management, signal strength query, cell management, registration status management, and time and time zone setting.
 -   TelRilManager: provides the proactive callback service and query result callback service.
 
 ## Directory Structure<a name="section129mcpsimp"></a>
 
 ```sh
 /base/telphony/core_service
-├── figures                # Figures
-├── frameworks             # Framework layer
-│   ├── js
-│   └── native
-├── interfaces             # APIs
-│   ├── innerkits          # Internal APIs
-│   └── kits               # External APIs \(such as JS APIs\)
-├── sa_profile             # SA profile
-├── services               # Implementation of the telephony core service
-├── etc                    # Telephony core service driver scripts
-│   ├── include
-│   ├── network_search     # Network search service
-│   ├── sim                # SIM card service
-│   ├── src
-│   └── tel_ril            #  Telephony core service and RIL Adapter communication
-└── test                   # Unit test
-│   └── unittest
+├── figures                       # Figures of readme files
+├── frameworks                    # Framework layer
+│   ├── js
+│   └── native
+├── interfaces                    # APIs
+│   ├── innerkits                 # Internal APIs
+|   |    ├── ims                  # IMS network status reporting APIs
+│   └── kits                      # External APIs \(such as JS APIs\)
+├── sa_profile                    # SA profile
+├── services                      # Implementation of the telephony core service
+│   ├── etc                       # Telephony core service driver scripts
+|   ├── ims_service_interaction   # IMS service interaction (for status reporting)
+│   ├── include
+│   ├── network_search            # Network search service
+│   ├── sim                       # SIM card service
+│   ├── src
+│   └── tel_ril                   # Telephony core service and RIL Adapter communication
+├─ test                            # Test code
+│   └── unittest
 └── utils
-    ├── common             # Telephony core service log
+    ├── common                    # Telephony core service log
     ├── log
     └── preferences
 ```
