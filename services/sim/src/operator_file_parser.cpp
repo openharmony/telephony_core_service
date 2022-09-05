@@ -41,6 +41,10 @@ bool OperatorFileParser::WriteOperatorConfigJson(std::string filename, const Jso
     }
     std::fstream ofs;
     ofs.open(GetOperatorConfigFilePath(filename).c_str(), std::ios::ate | std::ios::out);
+    if (!ofs.is_open()) {
+        TELEPHONY_LOGE("OpenFileFailed");
+        return false;
+    }
     Json::StreamWriterBuilder jswBuilder;
     jswBuilder["emitUTF8"] = true;
     std::unique_ptr<Json::StreamWriter> jsWriter(jswBuilder.newStreamWriter());
@@ -103,12 +107,11 @@ bool OperatorFileParser::ParseFromCustomSystem(int32_t slotId, OperatorConfig &o
 bool OperatorFileParser::ParseOperatorConfigFromFile(OperatorConfig &opc, const std::string &path, Json::Value &opcJson)
 {
     char *content = nullptr;
-    bool ret = LoaderJsonFile(content, path);
-    if (!ret) {
-        TELEPHONY_LOGE("ParseOperatorConfigFromFile path %{public}s is fail!", path.c_str());
+    int contentLength = LoaderJsonFile(content, path);
+    if (contentLength == LOADER_JSON_ERROR) {
+        TELEPHONY_LOGE("ParseOperatorConfigFromFile  %{public}s is fail!", path.c_str());
         return false;
     }
-    const int contentLength = strlen(content);
     const std::string rawJson(content);
     free(content);
     content = nullptr;
@@ -172,38 +175,38 @@ void OperatorFileParser::ParseOperatorConfigFromJson(const Json::Value &root, Op
     }
 }
 
-bool OperatorFileParser::LoaderJsonFile(char *&content, const std::string &path)
+int32_t OperatorFileParser::LoaderJsonFile(char *&content, const std::string &path)
 {
     std::ifstream ifs;
     ifs.open(path);
     if (ifs.fail()) {
         TELEPHONY_LOGE("LoaderJsonFile path PATH: %{public}s failed", path.c_str());
-        return false;
+        return LOADER_JSON_ERROR;
     }
     ifs.seekg(0, std::ios::end);
     uint64_t len = static_cast<uint64_t>(ifs.tellg());
     if (len == 0 || len > MAX_BYTE_LEN) {
         TELEPHONY_LOGE("LoaderJsonFile len <= 0 or len > MAX_BYTE_LEN!");
         ifs.close();
-        return false;
+        return LOADER_JSON_ERROR;
     }
     content = static_cast<char *>(malloc(len + 1));
     if (content == nullptr) {
         TELEPHONY_LOGE("LoaderJsonFile malloc content fail!");
         ifs.close();
-        return false;
+        return LOADER_JSON_ERROR;
     }
     if (memset_s(content, len + 1, 0, len + 1) != EOK) {
         TELEPHONY_LOGE("LoaderJsonFile memset_s failed");
         free(content);
         content = nullptr;
         ifs.close();
-        return false;
+        return LOADER_JSON_ERROR;
     }
     ifs.seekg(0, std::ios::beg);
     ifs.read(content, len);
     ifs.close();
-    return true;
+    return len;
 }
 
 bool OperatorFileParser::CloseFile(FILE *f)
