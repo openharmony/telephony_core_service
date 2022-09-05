@@ -35,8 +35,19 @@ OperatorConfigCache::OperatorConfigCache(const std::shared_ptr<AppExecFwk::Event
 
 void OperatorConfigCache::ClearAllCache(int32_t slotId)
 {
+    ClearOperatorValue(slotId);
     ClearMemoryCache(slotId);
     parser_.ClearFilesCache();
+}
+
+void OperatorConfigCache::ClearOperatorValue(int32_t slotId)
+{
+    std::string key;
+    std::string initialOpkey = INITIAL_OPKEY;
+    SetParameter(key.append(OPKEY_PROP_PREFIX).append(std::to_string(slotId)).c_str(), initialOpkey.c_str());
+    simFileManager_->SetOpKey("");
+    simFileManager_->SetOpName("");
+    simFileManager_->SetOpKeyExt("");
 }
 
 void OperatorConfigCache::ClearMemoryCache(int32_t slotId)
@@ -170,6 +181,7 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
         TELEPHONY_LOGI("OperatorConfigCache::Sim state change");
         if (simState == static_cast<int32_t>(SimState::SIM_STATE_NOT_PRESENT) ||
             simState == static_cast<int32_t>(SimState::SIM_STATE_LOCKED)) {
+            ClearOperatorValue(slotId_);
             ClearMemoryCache(slotId_);
             OperatorConfig opc;
             LoadOperatorConfig(slotId_, opc);
