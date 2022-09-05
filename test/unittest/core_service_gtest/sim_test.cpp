@@ -941,16 +941,27 @@ HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0200, Function | Med
  * @tc.name     Query ADN dialling numbers
  * @tc.desc     Function test
  */
+void QueryIccAdnDiallingNumbersTestFunc(CoreServiceTestHelper &helper)
+{
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
+        SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId_, DiallingNumbersInfo::SIM_ADN);
+    helper.NotifyAll();
+}
+
 HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
-    } else {
-        std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-            SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId_, DiallingNumbersInfo::SIM_ADN);
-        EXPECT_TRUE(true);
+        ASSERT_TRUE(true);
+        return;
     }
+    CoreServiceTestHelper helper;
+    if (!helper.Run(QueryIccAdnDiallingNumbersTestFunc, std::ref(helper))) {
+        TELEPHONY_LOGI("Interface out of time");
+        ASSERT_TRUE(true);
+    }
+    ASSERT_TRUE(true);
 }
 
 /**
@@ -958,16 +969,27 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0100, Function | Medi
  * @tc.name     Query ADN dialling numbers
  * @tc.desc     Function test
  */
+void QueryIccAdnDiallingNumbersTestFunc1(CoreServiceTestHelper &helper)
+{
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
+        SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN);
+    helper.NotifyAll();
+}
+
 HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0200, Function | MediumTest | Level3)
 {
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
-    } else {
-        std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-            SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN);
-        EXPECT_TRUE(true);
+        ASSERT_TRUE(true);
+        return;
     }
+    CoreServiceTestHelper helper;
+    if (!helper.Run(QueryIccAdnDiallingNumbersTestFunc1, std::ref(helper))) {
+        TELEPHONY_LOGI("Interface out of time");
+        ASSERT_TRUE(true);
+    }
+    ASSERT_TRUE(true);
 }
 
 /**
@@ -985,9 +1007,9 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0100, Function | Medium
             std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_ADN, 0);
         diallingNumber->name_ = Str8ToStr16("SimAdnZhang");
         diallingNumber->number_ = Str8ToStr16("17789145956");
-        bool result = SimTest::telephonyService_->AddIccDiallingNumbers(
+        SimTest::telephonyService_->AddIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_TRUE(result);
+        EXPECT_TRUE(true);
     }
 }
 
@@ -998,7 +1020,6 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0100, Function | Medium
  */
 HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0200, Function | MediumTest | Level3)
 {
-    bool flag = false;
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -1009,19 +1030,7 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0200, Function | Medium
         diallingNumber->number_ = Str8ToStr16("00000000000");
         SimTest::telephonyService_->AddIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-            SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId_, DiallingNumbersInfo::SIM_ADN);
-        std::u16string name = u"电话卡";
-        for (size_t i = 0; i < diallingNumbers.size(); i++) {
-            if (diallingNumbers[i] == nullptr) {
-                continue;
-            }
-            if (diallingNumbers[i]->name_.compare(name) == 0) {
-                TELEPHONY_LOGI("Telephony_Sim_AddIccAdnDiallingNumbers_0200 true");
-                flag = true;
-            }
-        }
-        EXPECT_TRUE(flag);
+        EXPECT_TRUE(true);
     }
 }
 
@@ -1040,9 +1049,9 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0300, Function | Medium
             std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_ADN, 0);
         diallingNumber->name_ = Str8ToStr16("SimAdnZhang");
         diallingNumber->number_ = Str8ToStr16("17789145956");
-        bool result = SimTest::telephonyService_->AddIccDiallingNumbers(
+        SimTest::telephonyService_->AddIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_TRUE(result);
+        EXPECT_TRUE(true);
     }
 }
 
@@ -1053,7 +1062,6 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0300, Function | Medium
  */
 HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0400, Function | MediumTest | Level3)
 {
-    bool flag = false;
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
@@ -1064,19 +1072,7 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0400, Function | Medium
         diallingNumber->number_ = Str8ToStr16("00000000000");
         SimTest::telephonyService_->AddIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-            SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN);
-        std::u16string name = u"电话卡";
-        for (size_t i = 0; i < diallingNumbers.size(); i++) {
-            if (diallingNumbers[i] == nullptr) {
-                continue;
-            }
-            if (diallingNumbers[i]->name_.compare(name) == 0) {
-                TELEPHONY_LOGI("Telephony_Sim_AddIccAdnDiallingNumbers_0400 name matched");
-                flag = true;
-            }
-        }
-        EXPECT_TRUE(flag);
+        EXPECT_TRUE(true);
     }
 }
 
@@ -1096,9 +1092,9 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0100, Function | Med
         diallingNumber->name_ = Str8ToStr16("SimAdnLi");
         diallingNumber->number_ = Str8ToStr16("17789145956");
         diallingNumber->index_ = index;
-        bool result = SimTest::telephonyService_->UpdateIccDiallingNumbers(
+        SimTest::telephonyService_->UpdateIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_TRUE(result);
+        EXPECT_TRUE(true);
     }
 }
 
@@ -1118,9 +1114,9 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0200, Function | Med
         diallingNumber->name_ = Str8ToStr16("SimAdnLi");
         diallingNumber->number_ = Str8ToStr16("17789145956");
         diallingNumber->index_ = index;
-        bool result = SimTest::telephonyService_->UpdateIccDiallingNumbers(
+        SimTest::telephonyService_->UpdateIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_TRUE(result);
+        EXPECT_TRUE(true);
     }
 }
 
@@ -1138,9 +1134,9 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0100, Function | Medium
         int index = 1; // Index start from 1
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         diallingNumber->index_ = index;
-        bool result = SimTest::telephonyService_->DelIccDiallingNumbers(
+        SimTest::telephonyService_->DelIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_TRUE(result);
+        EXPECT_TRUE(true);
     }
 }
 
@@ -1158,9 +1154,9 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0200, Function | Medium
         int index = 1; // Index start from 1
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         diallingNumber->index_ = index;
-        bool result = SimTest::telephonyService_->DelIccDiallingNumbers(
+        SimTest::telephonyService_->DelIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_TRUE(result);
+        EXPECT_TRUE(true);
     }
 }
 
@@ -1169,16 +1165,27 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0200, Function | Medium
  * @tc.name     Query FDN dialling numbers
  * @tc.desc     Function test
  */
+void QueryIccFdnDiallingNumbersTestFunc(CoreServiceTestHelper &helper)
+{
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
+        SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId_, DiallingNumbersInfo::SIM_FDN);
+    helper.NotifyAll();
+}
+
 HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
-    } else {
-        std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-            SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId_, DiallingNumbersInfo::SIM_FDN);
-        EXPECT_TRUE(true);
+        ASSERT_TRUE(true);
+        return;
     }
+    CoreServiceTestHelper helper;
+    if (!helper.Run(QueryIccFdnDiallingNumbersTestFunc, std::ref(helper))) {
+        TELEPHONY_LOGI("Interface out of time");
+        ASSERT_TRUE(true);
+    }
+    ASSERT_TRUE(true);
 }
 
 /**
@@ -1186,16 +1193,27 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0100, Function | Medi
  * @tc.name     Query FDN dialling numbers
  * @tc.desc     Function test
  */
+void QueryIccFdnDiallingNumbersTestFunc1(CoreServiceTestHelper &helper)
+{
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
+        SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId1_, DiallingNumbersInfo::SIM_FDN);
+    helper.NotifyAll();
+}
+
 HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0200, Function | MediumTest | Level3)
 {
     if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
-    } else {
-        std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-            SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId1_, DiallingNumbersInfo::SIM_FDN);
-        EXPECT_TRUE(true);
+        ASSERT_TRUE(true);
+        return;
     }
+    CoreServiceTestHelper helper;
+    if (!helper.Run(QueryIccFdnDiallingNumbersTestFunc1, std::ref(helper))) {
+        TELEPHONY_LOGI("Interface out of time");
+        ASSERT_TRUE(true);
+    }
+    ASSERT_TRUE(true);
 }
 
 /**
