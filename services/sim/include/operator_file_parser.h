@@ -36,7 +36,7 @@ public:
 
 private:
     void ParseOperatorConfigFromJson(const Json::Value &root, OperatorConfig &poc);
-    bool LoaderJsonFile(char *&content, const std::string &path);
+    int32_t LoaderJsonFile(char *&content, const std::string &path);
     void ParseArray(const std::string key, const Json::Value &arrayValue_, OperatorConfig &poc);
     bool CloseFile(FILE *f);
     inline static const char *DEFAULT_OPERATE_CONFIG_PATH = "etc/operator_config.json";
@@ -45,6 +45,7 @@ private:
     inline static const int MODE_SLOT_1 = 12;
     inline static const int SUCCESS = 0;
     inline static const int MAX_BYTE_LEN = 10 * 1024 * 1024;
+    inline static const int LOADER_JSON_ERROR = -1;
 };
 } // namespace Telephony
 } // namespace OHOS

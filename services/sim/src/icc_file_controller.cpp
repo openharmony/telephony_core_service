@@ -74,7 +74,7 @@ void IccFileController::ProcessLinearRecordSize(const AppExecFwk::InnerEvent::Po
     } else {
         TELEPHONY_LOGI("IccFileTypeMismatch Error type %{public}d", eventId);
     }
-    int fileSize[] = {0, 0, 0};
+    int fileSize[] = { 0, 0, 0 };
     if (!result->resultData.empty()) {
         ParseFileSize(fileSize, RECORD_NUM, fileData);
     }
@@ -276,8 +276,7 @@ void IccFileController::ObtainLinearFixedFile(
     int fileId, const std::string &path, int fileNum, const AppExecFwk::InnerEvent::Pointer &event)
 {
     std::string filePath = CheckRightPath(path, fileId);
-    std::shared_ptr<IccControllerHolder> ctrlHolder =
-        std::make_shared<IccControllerHolder>(fileId, fileNum, filePath);
+    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(fileId, fileNum, filePath);
     ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(event));
     AppExecFwk::InnerEvent::Pointer process =
         BuildCallerInfo(MSG_SIM_OBTAIN_SIZE_OF_FIXED_ELEMENTARY_FILE_DONE, ctrlHolder);
@@ -453,8 +452,7 @@ void IccFileController::SendResponse(std::shared_ptr<IccControllerHolder> holder
     TELEPHONY_LOGI("IccFileController::SendResponse send end");
 }
 
-void IccFileController::SendEfLinearResult(
-    const AppExecFwk::InnerEvent::Pointer &response, const int val[], int len)
+void IccFileController::SendEfLinearResult(const AppExecFwk::InnerEvent::Pointer &response, const int val[], int len)
 {
     std::shared_ptr<AppExecFwk::EventHandler> handler = response->GetOwner();
     std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
