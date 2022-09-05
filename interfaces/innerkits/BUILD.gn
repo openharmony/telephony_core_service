@@ -86,8 +86,6 @@ ohos_shared_library("tel_core_service_api") {
   } else {
     external_deps += [ "hilog:libhilog" ]
   }
-  install_images = [ system_base_dir ]
-  relative_install_dir = "platformsdk"
   part_name = "core_service"
   subsystem_name = "telephony"
 }
