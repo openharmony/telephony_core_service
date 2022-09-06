@@ -38,8 +38,8 @@ public:
     static const uint32_t RUNNING_LOCK_TIMEOUT_EVENT_ID = 0;
     static const uint32_t ACK_RUNNING_LOCK_TIMEOUT_EVENT_ID = 1;
 
-    static const int64_t RUNNING_LOCK_DEFAULT_TIMEOUT_MS = 60 * 1000;
-    static const int64_t ACK_RUNNING_LOCK_DEFAULT_TIMEOUT_MS = 60 * 1000;
+    static const int64_t RUNNING_LOCK_DEFAULT_TIMEOUT_MS = 60 * 1000; // 60s
+    static const int64_t ACK_RUNNING_LOCK_DEFAULT_TIMEOUT_MS = 200; // 200ms
     static const int32_t NORMAL_RUNNING_LOCK = 100;
     static const int32_t ACK_RUNNING_LOCK = 101;
 
