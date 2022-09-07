@@ -42,7 +42,6 @@ ohos_unittest("tel_ril_gtest") {
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
     "//drivers/hdf_core/adapter/uhdf2/hdi:libhdi",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
