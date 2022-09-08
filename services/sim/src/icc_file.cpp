@@ -294,8 +294,8 @@ void IccFile::RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> event
         imsiReadyObser_->RegObserver(eventCode, eventHandler);
     }
     if (!ObtainIMSI().empty()) {
-        if (imsiReadyObser_ != nullptr) {
-            imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
+        if (eventHandler != nullptr) {
+            eventHandler->SendEvent(RadioEvent::RADIO_IMSI_LOADED_READY);
         }
         PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED,
             ICC_STATE_IMSI, ObtainIMSI());
@@ -318,10 +318,11 @@ void IccFile::RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> e
     TELEPHONY_LOGI("IccFile::RegisterAllFilesLoaded: registerd");
     if (ObtainFilesFetched()) {
         TELEPHONY_LOGI("IccFile::RegisterAllFilesLoaded: notify");
-        if (filesFetchedObser_ != nullptr) {
-            filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
+        if (eventHandler != nullptr) {
+            eventHandler->SendEvent(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
         }
-        PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_LOADED, "");
+        PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED,
+            static_cast<int32_t>(SimState::SIM_STATE_LOADED), "");
     }
 }
 

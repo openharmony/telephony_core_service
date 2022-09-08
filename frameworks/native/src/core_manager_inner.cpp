@@ -294,18 +294,6 @@ int32_t CoreManagerInner::GetPreferredNetworkPara(
     return telRilManager_->GetPreferredNetwork(slotId, response);
 }
 
-int32_t CoreManagerInner::GetRadioCapability(
-    int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
-{
-    if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
-    response->SetOwner(handler);
-    return telRilManager_->GetRadioCapability(slotId, response);
-}
-
 int32_t CoreManagerInner::GetOperatorInfo(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {

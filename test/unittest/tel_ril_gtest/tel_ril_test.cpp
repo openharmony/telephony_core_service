@@ -201,6 +201,8 @@ void TelRilTest::InitSim()
     memberFuncMap_[DiffInterfaceId::TEST_STK_SEND_ENVELOPE] = &TelRilTest::SendEnvelopeCmdTest;
     memberFuncMap_[DiffInterfaceId::TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT] =
         &TelRilTest::SendCallSetupRequestResultTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_RADIO_PROTOCOL] = &TelRilTest::GetRadioProtocolTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_RADIO_PROTOCOL] = &TelRilTest::SetRadioProtocolTest;
 }
 
 void TelRilTest::InitSms()
@@ -238,7 +240,6 @@ void TelRilTest::InitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE] = &TelRilTest::SetPreferredNetworkParaTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_IMEI] = &TelRilTest::GetImeiTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_MEID] = &TelRilTest::GetMeidTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_RADIO_CAPABILITY] = &TelRilTest::GetRadioCapabilityTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO] = &TelRilTest::GetVoiceRadioTechnologyTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG] = &TelRilTest::GetPhysicalChannelConfigTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_LOCATE_UPDATES] = &TelRilTest::SetLocateUpdatesTest;
@@ -647,6 +648,54 @@ void TelRilTest::EnableSimCardTest(int32_t slotId, const std::shared_ptr<AppExec
 }
 
 /**
+ * @brief Get radio protocol
+ *
+ * @param handler
+ */
+void TelRilTest::GetRadioProtocolTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_SET_RADIO_PROTOCOL);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event == nullptr || telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("TelRilTest::GetRadioProtocolTest telRilManager_ or event is nullptr");
+        return;
+    }
+    event->SetOwner(handler);
+    TELEPHONY_LOGI("TelRilTest::GetRadioProtocolTest -->");
+    telRilManager_->GetRadioProtocol(slotId, event);
+    TELEPHONY_LOGI("TelRilTest::GetRadioProtocolTest --> finished");
+    bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+    ASSERT_TRUE(syncResult);
+}
+
+/**
+ * @brief Set radio protocol
+ *
+ * @param handler
+ */
+void TelRilTest::SetRadioProtocolTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_RADIO_PROTOCOL);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event == nullptr || telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("TelRilTest::SetRadioProtocolTest telRilManager_ or event is nullptr");
+        return;
+    }
+    event->SetOwner(handler);
+    TELEPHONY_LOGI("TelRilTest::SetRadioProtocolTest -->");
+    RadioProtocol protocol;
+    protocol.sessionId = 1;
+    protocol.phase = RadioProtocolPhase::RADIO_PROTOCOL_PHASE_CHECK;
+    protocol.technology = (int32_t)RadioProtocolTech::RADIO_PROTOCOL_TECH_LTE;
+    protocol.modemId = 0;
+    protocol.status = RadioProtocolStatus::RADIO_PROTOCOL_STATUS_NONE;
+    telRilManager_->SetRadioProtocol(slotId, protocol, event);
+    TELEPHONY_LOGI("TelRilTest::SetRadioProtocolTest --> finished");
+    bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+    ASSERT_TRUE(syncResult);
+}
+
+/**
  * @brief Send terminal response command
  *
  * @param handler
@@ -689,7 +738,8 @@ void TelRilTest::SendEnvelopeCmdTest(int32_t slotId, const std::shared_ptr<AppEx
  *
  * @param handler
  */
-void TelRilTest::SendCallSetupRequestResultTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void TelRilTest::SendCallSetupRequestResultTest(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_STK_SEND_CALL_SETUP_REQUEST_RESULT);
     auto event = AppExecFwk::InnerEvent::Get(eventId);
@@ -1562,25 +1612,6 @@ void TelRilTest::GetMeidTest(int32_t slotId, const std::shared_ptr<AppExecFwk::E
         TELEPHONY_LOGI("TelRilTest::GetMeidTest -->");
         telRilManager_->GetMeid(slotId, event);
         TELEPHONY_LOGI("TelRilTest::GetMeidTest --> finished");
-        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
-        ASSERT_TRUE(syncResult);
-    }
-}
-
-/**
- * @brief Get radio capability
- *
- * @param handler
- */
-void TelRilTest::GetRadioCapabilityTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_RADIO_CAPABILITY);
-    auto event = AppExecFwk::InnerEvent::Get(eventId);
-    if (event != nullptr && telRilManager_ != nullptr) {
-        event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::GetRadioCapabilityTest -->");
-        telRilManager_->GetRadioCapability(slotId, event);
-        TELEPHONY_LOGI("TelRilTest::GetRadioCapabilityTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }
@@ -3750,6 +3781,50 @@ HWTEST_F(TelRilTest, Telephony_TelRil_EnableSimCardTest_0201, Function | MediumT
 }
 
 /**
+ * @tc.number Telephony_TelRil_GetRadioProtocolTest_0101 to do ...
+ * @tc.name Get radio capability of the card 1
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioProtocolTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RADIO_PROTOCOL), SLOT_ID_0, GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_GetRadioProtocolTest_0201 to do ...
+ * @tc.name Get radio capability of the card 2
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioProtocolTest_0201, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RADIO_PROTOCOL), SLOT_ID_1, GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_SetRadioProtocolTest_0101 to do ...
+ * @tc.name Set radio capability of the card 1
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioProtocolTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_RADIO_PROTOCOL), SLOT_ID_0, GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_SetRadioProtocolTest_0201 to do ...
+ * @tc.name Set radio capability of the card 2
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioProtocolTest_0201, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_RADIO_PROTOCOL), SLOT_ID_1, GetHandler());
+    return;
+}
+
+/**
  * @tc.number Telephony_TelRil_SendTerminalResponseCmdTest_0101 to do ...
  * @tc.name Send terminal response command of the card 1
  * @tc.desc Function test
@@ -4036,28 +4111,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetMeidTest_0101, Function | MediumTest | 
 HWTEST_F(TelRilTest, Telephony_TelRil_GetMeidTest_0201, Function | MediumTest | Level3)
 {
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_MEID), SLOT_ID_1, GetHandler());
-    return;
-}
-
-/**
- * @tc.number Telephony_TelRil_GetRadioCapabilityTest_0101 to do ...
- * @tc.name Get radio capability of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioCapabilityTest_0101, Function | MediumTest | Level3)
-{
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RADIO_CAPABILITY), SLOT_ID_0, GetHandler());
-    return;
-}
-
-/**
- * @tc.number Telephony_TelRil_GetRadioCapabilityTest_0201 to do ...
- * @tc.name Get radio capability of the card 2
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioCapabilityTest_0201, Function | MediumTest | Level3)
-{
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RADIO_CAPABILITY), SLOT_ID_1, GetHandler());
     return;
 }
 

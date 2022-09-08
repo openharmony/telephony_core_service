@@ -202,29 +202,6 @@ void RadioInfo::ProcessGetMeid(const AppExecFwk::InnerEvent::Pointer &event) con
     nsm->SetMeid(slotId_, Str8ToStr16(meid->data));
 }
 
-void RadioInfo::ProcessGetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event) const
-{
-    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    TELEPHONY_LOGI("RadioInfo::ProcessGetRadioCapability slotId:%{public}d", slotId_);
-    if (event == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetRadioCapability event is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-    if (nsm == nullptr) {
-        TELEPHONY_LOGE("NetworkSelection::ProcessGetRadioCapability nsm is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-
-    std::shared_ptr<RadioCapabilityInfo> rc = event->GetSharedObject<RadioCapabilityInfo>();
-    if (rc == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetRadioCapability rc is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-    TELEPHONY_LOGI("RadioInfo::ProcessGetRadioCapability RadioCapability : %{public}d slotId:%{public}d",
-        rc->ratFamily, slotId_);
-    nsm->SetCapability(slotId_, *rc);
-}
-
 void RadioInfo::SetPhoneType(PhoneType phoneType)
 {
     phoneType_ = phoneType;
@@ -257,9 +234,9 @@ void RadioInfo::UpdatePhone(RadioTech csRadioTech)
 
     int radioState = networkSearchManager->GetRadioState(slotId_);
     if (static_cast<ModemPowerState>(radioState) != CORE_SERVICE_POWER_NOT_AVAILABLE) {
+        networkSearchManager->InitSimRadioProtocol(slotId_);
         networkSearchManager->GetImei(slotId_);
         networkSearchManager->GetMeid(slotId_);
-        networkSearchManager->GetRadioCapability(slotId_);
         if (static_cast<ModemPowerState>(radioState) == CORE_SERVICE_POWER_ON) {
             networkSearchManager->GetVoiceTech(slotId_);
         }

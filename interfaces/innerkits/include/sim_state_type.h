@@ -20,6 +20,7 @@
 #include <parcel.h>
 #include <string>
 #include <vector>
+
 namespace OHOS {
 namespace Telephony {
 enum class CardType {
@@ -268,38 +269,6 @@ struct IccAccountInfo : public Parcelable {
     {
         return (slotIndex == p.slotIndex && simId == p.simId);
     }
-};
-
-struct RadioProtocolResponse : public Parcelable {
-    bool result;
-    int32_t reason;
-
-    bool Marshalling(Parcel &parcel) const
-    {
-        if (!parcel.WriteBool(result)) {
-            return false;
-        }
-        if (!parcel.WriteInt32(reason)) {
-            return false;
-        }
-        return true;
-    };
-
-    std::shared_ptr<RadioProtocolResponse> UnMarshalling(Parcel &parcel)
-    {
-        std::shared_ptr<RadioProtocolResponse> param = std::make_shared<RadioProtocolResponse>();
-        if (param == nullptr || !param->ReadFromParcel(parcel)) {
-            param = nullptr;
-        }
-        return param;
-    };
-
-    bool ReadFromParcel(Parcel &parcel)
-    {
-        parcel.ReadBool(result);
-        parcel.ReadInt32(reason);
-        return true;
-    };
 };
 } // namespace Telephony
 } // namespace OHOS

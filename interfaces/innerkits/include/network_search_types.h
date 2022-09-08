@@ -225,19 +225,21 @@ struct OperatorInformation {
     char shortName[NETWORK_MAX_NAME_LEN + 1];
 };
 
-// RadioAccessFamily defines
-const int32_t RAF_UNKNOWN = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_UNKNOWN);
-const int32_t RAF_GSM = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_GSM);
-const int32_t RAF_1XRTT = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_1XRTT);
-const int32_t RAF_WCDMA = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_WCDMA);
-const int32_t RAF_HSPA = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_HSPA);
-const int32_t RAF_HSPAP = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_HSPAP);
-const int32_t RAF_TD_SCDMA = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_TD_SCDMA);
-const int32_t RAF_EVDO = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_EVDO);
-const int32_t RAF_EHRPD = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_EHRPD);
-const int32_t RAF_LTE = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_LTE);
-const int32_t RAF_LTE_CA = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_LTE_CA);
-const int32_t RAF_NR = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_NR);
+enum class RadioProtocolTech {
+    RADIO_PROTOCOL_TECH_UNKNOWN = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_UNKNOWN),
+    RADIO_PROTOCOL_TECH_GSM = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_GSM),
+    RADIO_PROTOCOL_TECH_1XRTT = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_1XRTT),
+    RADIO_PROTOCOL_TECH_WCDMA = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_WCDMA),
+    RADIO_PROTOCOL_TECH_HSPA = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_HSPA),
+    RADIO_PROTOCOL_TECH_HSPAP = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_HSPAP),
+    RADIO_PROTOCOL_TECH_TD_SCDMA = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_TD_SCDMA),
+    RADIO_PROTOCOL_TECH_EVDO = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_EVDO),
+    RADIO_PROTOCOL_TECH_EHRPD = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_EHRPD),
+    RADIO_PROTOCOL_TECH_LTE = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_LTE),
+    RADIO_PROTOCOL_TECH_LTE_CA = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_LTE_CA),
+    RADIO_PROTOCOL_TECH_IWLAN = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_IWLAN),
+    RADIO_PROTOCOL_TECH_NR = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_NR),
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // NETWORK_SEARCH_TYPES_H

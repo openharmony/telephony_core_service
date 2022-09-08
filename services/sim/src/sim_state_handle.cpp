@@ -220,7 +220,7 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
             "will to NotifyIccStateChanged at newSimStatus[%{public}d] observerHandler_ is nullptr[%{public}d] ",
             newSimStatus, (observerHandler_ == nullptr));
         if (observerHandler_ != nullptr) {
-            observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_CHANGE);
+            observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_CHANGE, slotId);
         }
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSimState(
             slotId, externalType_, externalState_, reason);
@@ -626,9 +626,9 @@ void SimStateHandle::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventH
         case RadioEvent::RADIO_SIM_STATE_READY:
             TELEPHONY_LOGI("SimStateHandle::RegisterIccReady()");
             observerHandler_->RegObserver(RadioEvent::RADIO_SIM_STATE_READY, handler);
-            if (IsIccReady()) {
+            if (IsIccReady() && handler != nullptr) {
                 TELEPHONY_LOGI("SimStateHandle::RegisterIccReady() OK send");
-                observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_READY);
+                handler->SendEvent(RadioEvent::RADIO_SIM_STATE_READY);
             }
             break;
         case RadioEvent::RADIO_SIM_STATE_LOCKED:

@@ -32,12 +32,6 @@ TelRilNetwork::TelRilNetwork(int32_t slotId, sptr<IRemoteObject> cellularRadio,
     : TelRilBase(slotId, cellularRadio, rilInterface, observerHandler, handler)
 {}
 
-int32_t TelRilNetwork::GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response)
-{
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_RADIO_CAPABILITY,
-        &HDI::Ril::V1_0::IRilInterface::GetRadioCapability);
-}
-
 int32_t TelRilNetwork::GetSignalStrength(const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_SIGNAL_STRENGTH,
@@ -282,15 +276,6 @@ int32_t TelRilNetwork::GetPreferredNetworkResponse(const HDI::Ril::V1_0::IHRilRa
         return preferredTypeInfo;
     };
     return Response<PreferredNetworkTypeInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
-}
-
-int32_t TelRilNetwork::GetRadioCapabilityResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
-    const HDI::Ril::V1_0::IRadioCapabilityInfo &radioCapabilityInfo)
-{
-    std::shared_ptr<RadioCapabilityInfo> radioCapability = std::make_shared<RadioCapabilityInfo>();
-    radioCapability->ratFamily = radioCapabilityInfo.ratFamily;
-    radioCapability->modemId = radioCapabilityInfo.modemId;
-    return Response<RadioCapabilityInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, radioCapability);
 }
 
 int32_t TelRilNetwork::GetPhysicalChannelConfigResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,

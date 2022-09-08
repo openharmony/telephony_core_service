@@ -19,6 +19,8 @@
 #include "event_handler.h"
 #include "i_sim_manager.h"
 #include "i_tel_ril_manager.h"
+#include "multi_sim_controller.h"
+#include "multi_sim_monitor.h"
 #include "sim_state_manager.h"
 #include "sim_file_manager.h"
 #include "sim_sms_manager.h"
@@ -35,8 +37,7 @@ public:
     virtual ~SimManager();
     // Init
     bool OnInit(int32_t slotCount) override;
-    void SetNetworkSearchManager(int32_t slotCount,
-            std::shared_ptr<INetworkSearch> networkSearchManager) override;
+    void SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager) override;
     // SimState
     bool HasSimCard(int32_t slotId) override;
     int32_t GetSimState(int32_t slotId) override;
@@ -78,6 +79,8 @@ public:
     bool HasOperatorPrivileges(const int32_t slotId) override;
     int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
         SimAuthenticationResponse &response) override;
+    int32_t GetRadioProtocolTech(int32_t slotId) override;
+    void GetRadioProtocol(int32_t slotId) override;
     // STK
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
@@ -127,6 +130,8 @@ public:
 private:
     bool IsValidSlotId(int32_t slotId);
     bool IsValidSlotIdForDefault(int32_t slotId);
+    void InitMultiSimObject();
+    void InitSingleSimObject();
 
 private:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
@@ -136,6 +141,10 @@ private:
     std::vector<std::shared_ptr<Telephony::SimAccountManager>> simAccountManager_;
     std::vector<std::shared_ptr<Telephony::IccDiallingNumbersManager>> iccDiallingNumbersManager_;
     std::vector<std::shared_ptr<Telephony::StkManager>> stkManager_;
+    std::shared_ptr<MultiSimController> multiSimController_ = nullptr;
+    std::shared_ptr<MultiSimMonitor> multiSimMonitor_ = nullptr;
+    std::shared_ptr<AppExecFwk::EventRunner> controllerRunner_ = nullptr;
+    std::shared_ptr<AppExecFwk::EventRunner> monitorRunner_;
     int32_t slotCount_ = SLOT_ID_ZERO;
 };
 } // namespace Telephony
