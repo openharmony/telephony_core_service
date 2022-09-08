@@ -18,6 +18,7 @@
 
 #include "hril_sim_parcel.h"
 #include "tel_ril_base.h"
+#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -34,6 +35,7 @@ public:
     int32_t SimStkEventNotify(const std::string &response);
     int32_t SimStkCallSetupNotify();
     int32_t SimRefreshNotify();
+    int32_t SimRadioProtocolUpdated(const HDI::Ril::V1_0::IRadioProtocol &radioProtocol);
 
     int32_t GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetImsi(const AppExecFwk::InnerEvent::Pointer &result);
@@ -52,7 +54,8 @@ public:
     int32_t SimStkSendEnvelope(const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimStkSendCallSetupRequestResult(bool accept, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimStkIsReady(const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t SetRadioProtocol(SimProtocolRequest simProtocolData, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetRadioProtocol(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetRadioProtocol(RadioProtocol radioProtocol, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimOpenLogicalChannel(std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimCloseLogicalChannel(int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimTransmitApduLogicalChannel(ApduSimIORequestInfo reqInfo,
@@ -86,8 +89,10 @@ public:
     int32_t SimStkSendEnvelopeResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
     int32_t SimStkSendCallSetupRequestResultResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
     int32_t SimStkIsReadyResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
+    int32_t GetRadioProtocolResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IRadioProtocol &radioProtocol);
     int32_t SetRadioProtocolResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
-        const HDI::Ril::V1_0::ISimProtocolResponse &pSimProtocol);
+        const HDI::Ril::V1_0::IRadioProtocol &radioProtocol);
     int32_t SimOpenLogicalChannelResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_0::IOpenLogicalChannelResponse &pOpenLogicalChannelResponse);
     int32_t SimCloseLogicalChannelResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
@@ -110,8 +115,8 @@ private:
         std::shared_ptr<CardStatusInfo> cardStatusInfo, const HDI::Ril::V1_0::ICardStatusInfo &result);
     void BuildLockStatusResp(
         std::shared_ptr<LockStatusResp> lockStatusResp, const HDI::Ril::V1_0::ILockStatusResp &lockStatus);
-    void BuildSimProtocolResp(std::shared_ptr<SimProtocolResponse> simProtocolResponse,
-        const HDI::Ril::V1_0::ISimProtocolResponse &pSimProtocol);
+    void BuildRadioProtocol(std::shared_ptr<RadioProtocol> protocol,
+        const HDI::Ril::V1_0::IRadioProtocol &radioProtocol);
     void BuildOpenLogicalChannelResp(std::shared_ptr<OpenLogicalChannelResponse> openLogicalChannelResp,
         const HDI::Ril::V1_0::IOpenLogicalChannelResponse &pOpenLogicalChannelResponse);
     void BuildApduRequestInfo(

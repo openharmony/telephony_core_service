@@ -118,7 +118,6 @@ private:
     void RadioGetNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioCurrentCellInfoUpdate(const AppExecFwk::InnerEvent::Pointer &event);
-    void RadioGetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event);
     void AutoTimeChange(const AppExecFwk::InnerEvent::Pointer &);

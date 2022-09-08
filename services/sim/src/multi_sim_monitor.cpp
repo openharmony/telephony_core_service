@@ -21,18 +21,15 @@
 
 namespace OHOS {
 namespace Telephony {
-bool MultiSimMonitor::ready_ = false;
-std::unique_ptr<ObserverHandler> MultiSimMonitor::observerHandler_ = nullptr;
+static const int32_t RETRY_COUNT = 30;
 
 MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-                                 const std::shared_ptr<MultiSimController> &controller,
-                                 std::shared_ptr<SimStateManager> simStateManager,
-                                 std::shared_ptr<SimFileManager> simFileManager,
-                                 int32_t slotId)
+    const std::shared_ptr<MultiSimController> &controller,
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager)
     : AppExecFwk::EventHandler(runner), controller_(controller),
       simStateManager_(simStateManager), simFileManager_(simFileManager)
 {
-    slotId_ = slotId;
     if (runner != nullptr) {
         runner->Run();
     }
@@ -56,22 +53,12 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     switch (eventCode) {
         case RadioEvent::RADIO_SIM_RECORDS_LOADED: {
             auto slotId = event->GetParam();
-            if (slotId != slotId_) {
-                TELEPHONY_LOGI(
-                    "MultiSimMonitor::getEvent not right slotId_ = %{public}d, %{public}d", slotId_, (int32_t)slotId);
-                return;
-            }
-            InitData();
+            InitData(slotId);
             break;
         }
         case RadioEvent::RADIO_SIM_STATE_CHANGE: {
             auto slotId = event->GetParam();
-            if (slotId != slotId_) {
-                TELEPHONY_LOGI(
-                    "MultiSimMonitor::getEvent not right slotId_ = %{public}d, %{public}d", slotId_, (int32_t)slotId);
-                return;
-            }
-            RefreshData();
+            RefreshData(slotId);
             break;
         }
         case MSG_SIM_FORGET_ALLDATA:
@@ -83,95 +70,107 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
 }
 
-void MultiSimMonitor::InitData()
+void MultiSimMonitor::InitData(int32_t slotId)
 {
-    TELEPHONY_LOGI("MultiSimMonitor::INIT_DATA sim icc data slotId_ = %{public}d", slotId_);
+    TELEPHONY_LOGI("MultiSimMonitor::InitData slotId = %{public}d", slotId);
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("MultiSimMonitor::InitData slotId is invalid");
+        return;
+    }
     if (controller_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimMonitor::INIT_DATA failed by nullptr");
+        TELEPHONY_LOGE("MultiSimMonitor::InitData controller_ is nullptr");
         return;
     }
     for (int i = 0; i < RETRY_COUNT; i++) {
         if (ready_) {
-            TELEPHONY_LOGI("MultiSimMonitor::dataAbility ready");
+            TELEPHONY_LOGI("MultiSimMonitor::InitData dataAbility is ready");
             break;
         }
     }
-    if (!controller_->InitData(slotId_)) {
+    if (!controller_->InitData(slotId)) {
         TELEPHONY_LOGE("MultiSimMonitor::InitData failed");
         return;
     }
     if (observerHandler_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimMonitor::can not notify RADIO_SIM_ACCOUNT_LOADED by nullptr");
+        TELEPHONY_LOGE("MultiSimMonitor::InitData observerHandler_ is nullptr");
         return;
     }
-    observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, slotId_);
+    observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, slotId);
 }
 
-void MultiSimMonitor::RefreshData()
+void MultiSimMonitor::RefreshData(int32_t slotId)
 {
-    TELEPHONY_LOGI("MultiSimMonitor::RefreshData slotId_ = %{public}d", slotId_);
-    if (controller_ == nullptr || simStateManager_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimMonitor::INIT_DATA failed by nullptr");
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("MultiSimMonitor::RefreshData slotId is invalid");
         return;
     }
-    if (simStateManager_->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) {
-        TELEPHONY_LOGI("MultiSimMonitor::clear data when sim is absent");
-        controller_->ForgetAllData();
+    if (controller_ == nullptr || simStateManager_[slotId] == nullptr) {
+        TELEPHONY_LOGE("MultiSimMonitor::RefreshData controller_ or simStateManager_ is nullptr");
+        return;
+    }
+    if (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) {
+        TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when sim is absent");
+        controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
     }
 }
 
-bool MultiSimMonitor::RegisterForIccLoaded()
+bool MultiSimMonitor::RegisterForIccLoaded(int32_t slotId)
 {
     TELEPHONY_LOGI("MultiSimMonitor::RegisterForIccLoaded");
-    if (simFileManager_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimMonitor::can not get SimFileManager");
+    if (simFileManager_[slotId] == nullptr) {
+        TELEPHONY_LOGE("MultiSimMonitor::RegisterForIccLoaded simFileManager_ is nullptr");
         return false;
     }
-    simFileManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    simFileManager_[slotId]->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
     return true;
 }
 
-bool MultiSimMonitor::UnRegisterForIccLoaded()
+bool MultiSimMonitor::UnRegisterForIccLoaded(int32_t slotId)
 {
     TELEPHONY_LOGI("MultiSimMonitor::UnRegisterForIccLoaded");
-    if (simFileManager_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimMonitor::can not get SimFileManager");
+    if (simFileManager_[slotId] == nullptr) {
+        TELEPHONY_LOGE("MultiSimMonitor::UnRegisterForIccLoaded simFileManager_ is nullptr");
         return false;
     }
-    simFileManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    simFileManager_[slotId]->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
     return true;
 }
 
-bool MultiSimMonitor::RegisterForSimStateChanged()
+bool MultiSimMonitor::RegisterForSimStateChanged(int32_t slotId)
 {
     TELEPHONY_LOGI("MultiSimMonitor::RegisterForSimStateChanged");
-    if (simFileManager_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimMonitor::can not get SimFileManager");
+    if (simFileManager_[slotId] == nullptr) {
+        TELEPHONY_LOGE("MultiSimMonitor::RegisterForSimStateChanged simFileManager_ is nullptr");
         return false;
     }
-    simFileManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+    simFileManager_[slotId]->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     return true;
 }
 
-bool MultiSimMonitor::UnRegisterForSimStateChanged()
+bool MultiSimMonitor::UnRegisterForSimStateChanged(int32_t slotId)
 {
     TELEPHONY_LOGI("MultiSimMonitor::UnRegisterForSimStateChanged");
-    if (simFileManager_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimMonitor::can not get SimFileManager");
+    if (simFileManager_[slotId] == nullptr) {
+        TELEPHONY_LOGE("MultiSimMonitor::UnRegisterForSimStateChanged simFileManager_ is nullptr");
         return false;
     }
-    simFileManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+    simFileManager_[slotId]->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     return true;
 }
 
 void MultiSimMonitor::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {
     if (observerHandler_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimMonitor::can not RegisterCoreNotify by nullptr");
+        TELEPHONY_LOGE("MultiSimMonitor::RegisterCoreNotify observerHandler_ is nullptr");
         return;
     }
     observerHandler_->RegObserver(what, handler);
+}
+
+bool MultiSimMonitor::IsValidSlotId(int32_t slotId)
+{
+    return (slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT);
 }
 } // namespace Telephony
 } // namespace OHOS

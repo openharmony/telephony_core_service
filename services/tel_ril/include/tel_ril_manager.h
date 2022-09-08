@@ -205,8 +205,6 @@ public:
         const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t GetCBConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
-
-    int32_t GetRadioCapability(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     /**
      * @brief Send Sms ExpectMore
      */
@@ -269,6 +267,9 @@ public:
     int32_t SimStkIsReady(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t UnlockSimLock(int32_t slotId, int32_t lockType, std::string password,
         const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetRadioProtocol(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SetRadioProtocol(
+        int32_t slotId, RadioProtocol radioProtocol, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t GetNetworkSearchInformation(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
     int32_t GetNetworkSelectionMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
@@ -281,8 +282,6 @@ public:
     int32_t SetCallPreferenceMode(
         int32_t slotId, const int32_t mode, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetCallPreferenceMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
-    int32_t SetRadioProtocol(
-        int32_t slotId, SimProtocolRequest data, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SetUssd(int32_t slotId, const std::string str, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetUssd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SetMute(int32_t slotId, const int32_t mute, const AppExecFwk::InnerEvent::Pointer &response) override;

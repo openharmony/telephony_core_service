@@ -15,6 +15,7 @@
 
 #include "sim_rdb_helper.h"
 
+#include "telephony_errors.h"
 #include "telephony_types.h"
 
 namespace OHOS {
@@ -94,7 +95,7 @@ int32_t SimRdbHelper::GetDefaultMainCardSlotId()
     int32_t mainCardSlotId = INVALID_VALUE;
     std::vector<std::string> colume;
     NativeRdb::DataAbilityPredicates predicates;
-    predicates.EqualTo(SimRdbInfo::IS_MAIN_CARD, MAIN_CARD);
+    predicates.EqualTo(SimRdbInfo::IS_MAIN_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
     std::shared_ptr<NativeRdb::AbsSharedResultSet> result = Query(colume, predicates);
     int index = 0;
     if (result == nullptr) {
@@ -114,7 +115,7 @@ int32_t SimRdbHelper::GetDefaultMessageCardSlotId()
     int32_t messageCardSlotId = INVALID_VALUE;
     std::vector<std::string> colume;
     NativeRdb::DataAbilityPredicates predicates;
-    predicates.EqualTo(SimRdbInfo::IS_MESSAGE_CARD, MAIN_CARD);
+    predicates.EqualTo(SimRdbInfo::IS_MESSAGE_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
     std::shared_ptr<NativeRdb::AbsSharedResultSet> result = Query(colume, predicates);
     int index = 0;
     if (result == nullptr) {
@@ -134,7 +135,7 @@ int32_t SimRdbHelper::GetDefaultCellularDataCardSlotId()
     int32_t cellularDataCardSlotId = INVALID_VALUE;
     std::vector<std::string> colume;
     NativeRdb::DataAbilityPredicates predicates;
-    predicates.EqualTo(SimRdbInfo::IS_CELLULAR_DATA_CARD, MAIN_CARD);
+    predicates.EqualTo(SimRdbInfo::IS_CELLULAR_DATA_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
     std::shared_ptr<NativeRdb::AbsSharedResultSet> result = Query(colume, predicates);
     int index = 0;
     if (result == nullptr) {
@@ -270,7 +271,7 @@ int32_t SimRdbHelper::QueryDataBySlotId(int32_t slotId, SimRdbInfo &simBean)
         resultSetNum = result->GoToNextRow();
     }
     result->Close();
-    return SUCCESS;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)
@@ -290,7 +291,7 @@ int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)
         resultSetNum = result->GoToNextRow();
     }
     result->Close();
-    return SUCCESS;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t SimRdbHelper::QueryAllData(std::vector<SimRdbInfo> &vec)
@@ -311,7 +312,7 @@ int32_t SimRdbHelper::QueryAllData(std::vector<SimRdbInfo> &vec)
         resultSetNum = result->GoToNextRow();
     }
     result->Close();
-    return SUCCESS;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t SimRdbHelper::QueryAllValidData(std::vector<SimRdbInfo> &vec)
@@ -334,7 +335,7 @@ int32_t SimRdbHelper::QueryAllValidData(std::vector<SimRdbInfo> &vec)
         resultSetNum = result->GoToNextRow();
     }
     result->Close();
-    return SUCCESS;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t SimRdbHelper::UpdateDataBySlotId(int32_t slotId, const NativeRdb::ValuesBucket &values)
@@ -358,6 +359,16 @@ int32_t SimRdbHelper::ForgetAllData()
 {
     TELEPHONY_LOGI("SimRdbHelper::ForgetAllData");
     NativeRdb::DataAbilityPredicates predicates;
+    NativeRdb::ValuesBucket values;
+    values.PutInt(SimRdbInfo::SLOT_INDEX, INVALID_VALUE);
+    return Update(values, predicates);
+}
+
+int32_t SimRdbHelper::ForgetAllData(int32_t slotId)
+{
+    TELEPHONY_LOGI("SimRdbHelper::ForgetAllData slotId = %{public}d", slotId);
+    NativeRdb::DataAbilityPredicates predicates;
+    predicates.EqualTo(SimRdbInfo::SLOT_INDEX, std::to_string(slotId));
     NativeRdb::ValuesBucket values;
     values.PutInt(SimRdbInfo::SLOT_INDEX, INVALID_VALUE);
     return Update(values, predicates);

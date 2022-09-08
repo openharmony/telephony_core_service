@@ -49,7 +49,6 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
     { RadioEvent::RADIO_GET_NEIGHBORING_CELL_INFO, &NetworkSearchHandler::RadioGetNeighboringCellInfo },
     { RadioEvent::RADIO_GET_CURRENT_CELL_INFO, &NetworkSearchHandler::RadioGetCurrentCellInfo },
     { RadioEvent::RADIO_CURRENT_CELL_UPDATE, &NetworkSearchHandler::RadioCurrentCellInfoUpdate },
-    { RadioEvent::RADIO_GET_RADIO_CAPABILITY, &NetworkSearchHandler::RadioGetRadioCapability },
     { RadioEvent::RADIO_CHANNEL_CONFIG_UPDATE, &NetworkSearchHandler::RadioChannelConfigInfo },
     { RadioEvent::RADIO_VOICE_TECH_CHANGED, &NetworkSearchHandler::RadioVoiceTechChange },
     { RadioEvent::RADIO_GET_VOICE_TECH, &NetworkSearchHandler::RadioVoiceTechChange },
@@ -295,6 +294,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
         if (inner != nullptr && inner->deviceStateHandler_ != nullptr) {
             inner->deviceStateHandler_->ProcessRadioState();
         }
+        networkSearchManager->InitSimRadioProtocol(slotId_);
     } else {
         networkSearchManager->SetRadioStateValue(slotId_, CORE_SERVICE_POWER_NOT_AVAILABLE);
     }
@@ -711,15 +711,6 @@ PhoneType NetworkSearchHandler::GetPhoneType()
         return radioInfo_->GetPhoneType();
     }
     return PhoneType::PHONE_TYPE_IS_NONE;
-}
-
-void NetworkSearchHandler::RadioGetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    if (radioInfo_ != nullptr) {
-        radioInfo_->ProcessGetRadioCapability(event);
-    } else {
-        TELEPHONY_LOGE("RadioGetRadioCapability radioInfo_ is null slotId:%{public}d", slotId_);
-    }
 }
 
 void NetworkSearchHandler::RadioChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event)

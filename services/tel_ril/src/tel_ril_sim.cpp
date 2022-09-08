@@ -68,6 +68,13 @@ int32_t TelRilSim::SimRefreshNotify()
     return Notify(TELEPHONY_LOG_FUNC_NAME, RadioEvent::RADIO_ICC_REFRESH);
 }
 
+int32_t TelRilSim::SimRadioProtocolUpdated(const HDI::Ril::V1_0::IRadioProtocol &radioProtocol)
+{
+    std::shared_ptr<RadioProtocol> protocol = std::make_shared<RadioProtocol>();
+    BuildRadioProtocol(protocol, radioProtocol);
+    return Notify<RadioProtocol>(TELEPHONY_LOG_FUNC_NAME, protocol, RADIO_SIM_RADIO_PROTOCOL_NOTIFY);
+}
+
 // response
 int32_t TelRilSim::GetSimIOResponse(
     const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::IIccIoResultInfo &result)
@@ -235,12 +242,20 @@ int32_t TelRilSim::SimStkIsReadyResponse(const HDI::Ril::V1_0::IHRilRadioRespons
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilSim::SetRadioProtocolResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
-    const HDI::Ril::V1_0::ISimProtocolResponse &pSimProtocol)
+int32_t TelRilSim::GetRadioProtocolResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::IRadioProtocol &radioProtocol)
 {
-    std::shared_ptr<SimProtocolResponse> simProtocolResponse = std::make_shared<SimProtocolResponse>();
-    BuildSimProtocolResp(simProtocolResponse, pSimProtocol);
-    return Response<SimProtocolResponse>(TELEPHONY_LOG_FUNC_NAME, responseInfo, simProtocolResponse);
+    std::shared_ptr<RadioProtocol> protocol = std::make_shared<RadioProtocol>();
+    BuildRadioProtocol(protocol, radioProtocol);
+    return Response<RadioProtocol>(TELEPHONY_LOG_FUNC_NAME, responseInfo, protocol);
+}
+
+int32_t TelRilSim::SetRadioProtocolResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::IRadioProtocol &radioProtocol)
+{
+    std::shared_ptr<RadioProtocol> protocol = std::make_shared<RadioProtocol>();
+    BuildRadioProtocol(protocol, radioProtocol);
+    return Response<RadioProtocol>(TELEPHONY_LOG_FUNC_NAME, responseInfo, protocol);
 }
 
 int32_t TelRilSim::SimOpenLogicalChannelResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
@@ -398,15 +413,23 @@ int32_t TelRilSim::SimStkIsReady(const AppExecFwk::InnerEvent::Pointer &response
         TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_STK_IS_READY, &HDI::Ril::V1_0::IRilInterface::SimStkIsReady);
 }
 
-int32_t TelRilSim::SetRadioProtocol(
-    SimProtocolRequest simProtocolData, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilSim::GetRadioProtocol(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    OHOS::HDI::Ril::V1_0::ISimProtocolRequest protocolRequestInfo;
-    protocolRequestInfo.phase = simProtocolData.phase;
-    protocolRequestInfo.protocol = simProtocolData.protocol;
-    protocolRequestInfo.slotId = simProtocolData.slotId;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_RADIO_PROTOCOL,
-        &HDI::Ril::V1_0::IRilInterface::SetRadioProtocol, protocolRequestInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_GET_RADIO_PROTOCOL,
+        &HDI::Ril::V1_0::IRilInterface::GetRadioProtocol);
+}
+
+int32_t TelRilSim::SetRadioProtocol(RadioProtocol radioProtocol, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    HDI::Ril::V1_0::IRadioProtocol protocol;
+    protocol.slotId = radioProtocol.slotId;
+    protocol.sessionId = radioProtocol.sessionId;
+    protocol.phase = static_cast<HDI::Ril::V1_0::IRadioProtocolPhase>(radioProtocol.phase);
+    protocol.technology = radioProtocol.technology;
+    protocol.modemId = radioProtocol.modemId;
+    protocol.status = static_cast<HDI::Ril::V1_0::IRadioProtocolStatus>(radioProtocol.status);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_SET_RADIO_PROTOCOL,
+        &HDI::Ril::V1_0::IRilInterface::SetRadioProtocol, protocol);
 }
 
 int32_t TelRilSim::SimOpenLogicalChannel(
@@ -480,12 +503,15 @@ void TelRilSim::BuildLockStatusResp(
     lockStatusResp->remain = lockStatus.remain;
 }
 
-void TelRilSim::BuildSimProtocolResp(
-    std::shared_ptr<SimProtocolResponse> simProtocolResponse, const HDI::Ril::V1_0::ISimProtocolResponse &pSimProtocol)
+void TelRilSim::BuildRadioProtocol(std::shared_ptr<RadioProtocol> protocol,
+    const HDI::Ril::V1_0::IRadioProtocol &radioProtocol)
 {
-    simProtocolResponse->phase = pSimProtocol.phase;
-    simProtocolResponse->result = pSimProtocol.result;
-    simProtocolResponse->slotId = pSimProtocol.slotId;
+    protocol->slotId = radioProtocol.slotId;
+    protocol->sessionId = radioProtocol.sessionId;
+    protocol->phase = static_cast<RadioProtocolPhase>(radioProtocol.phase);
+    protocol->technology = radioProtocol.technology;
+    protocol->modemId = radioProtocol.modemId;
+    protocol->status = static_cast<RadioProtocolStatus>(radioProtocol.status);
 }
 
 void TelRilSim::BuildOpenLogicalChannelResp(std::shared_ptr<OpenLogicalChannelResponse> openLogicalChannelResp,

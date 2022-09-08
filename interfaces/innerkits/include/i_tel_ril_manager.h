@@ -185,7 +185,6 @@ public:
 
     virtual int32_t GetCBConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) = 0;
 
-    virtual int32_t GetRadioCapability(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     /**
      * @brief Send Sms ExpectMore
      */
@@ -250,6 +249,9 @@ public:
     virtual int32_t SimStkIsReady(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t UnlockSimLock(
         int32_t slotId, int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t GetRadioProtocol(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t SetRadioProtocol(
+        int32_t slotId, RadioProtocol radioProtocol, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
     virtual int32_t GetNetworkSearchInformation(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) = 0;
     virtual int32_t GetNetworkSelectionMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) = 0;
@@ -262,8 +264,6 @@ public:
     virtual int32_t SetCallPreferenceMode(
         int32_t slotId, const int32_t mode, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t GetCallPreferenceMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
-    virtual int32_t SetRadioProtocol(
-        int32_t slotId, SimProtocolRequest data, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t SetUssd(
         int32_t slotId, const std::string str, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t GetUssd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;

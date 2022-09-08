@@ -268,15 +268,10 @@ enum IccDiallingNumberConstant {
     CSIM_SPN_7BIT_ALPHABET = 0x09
 };
 
-enum RadioCapControllerConstant {
-    MIN_PROTOCOL = 0,
-    MAX_PROTOCOL = 12,
-    MSG_SIM_TIME_OUT_PROTOCOL = 2000,
-    MSG_SIM_SET_RADIO_PROTOCOL = 2001,
-    MSG_SIM_UPDATE_RADIO_PROTOCOL = 2002,
-    MSG_SIM_TIME_OUT_ACTIVE = 2003,
-    MSG_SIM_SET_ACTIVE = 2004,
-    MSG_SIM_FORGET_ALLDATA = 2005,
+enum RadioProtocolEvent {
+    MSG_SIM_TIME_OUT_ACTIVE = 2000,
+    MSG_SIM_SET_ACTIVE = 2001,
+    MSG_SIM_FORGET_ALLDATA = 2002,
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -25,19 +25,37 @@ SimManager::SimManager(std::shared_ptr<ITelRilManager> telRilManager) : telRilMa
     TELEPHONY_LOGI("SimManager::SimManager()");
 }
 
+SimManager::~SimManager()
+{
+    if (multiSimMonitor_ != nullptr) {
+        for (int32_t slotId = 0; slotId < slotCount_; slotId++) {
+            multiSimMonitor_->UnRegisterForIccLoaded(slotId);
+            multiSimMonitor_->UnRegisterForSimStateChanged(slotId);
+        }
+    }
+}
+
 bool SimManager::OnInit(int32_t slotCount)
 {
     TELEPHONY_LOGI("SimManager OnInit, slotCount = %{public}d", slotCount);
     slotCount_ = slotCount;
+    InitMultiSimObject();
+    InitSingleSimObject();
+    TELEPHONY_LOGI("SimManager OnInit success");
+    return true;
+}
+
+void SimManager::InitMultiSimObject()
+{
     // Program memory
-    simStateManager_.resize(slotCount);
-    simFileManager_.resize(slotCount);
-    simSmsManager_.resize(slotCount);
-    simAccountManager_.resize(slotCount);
-    iccDiallingNumbersManager_.resize(slotCount);
-    stkManager_.resize(slotCount);
+    simStateManager_.resize(slotCount_);
+    simFileManager_.resize(slotCount_);
+    simSmsManager_.resize(slotCount_);
+    simAccountManager_.resize(slotCount_);
+    iccDiallingNumbersManager_.resize(slotCount_);
+    stkManager_.resize(slotCount_);
     // Many card create
-    for (int32_t slotId = 0; slotId < slotCount; slotId++) {
+    for (int32_t slotId = 0; slotId < slotCount_; slotId++) {
         simStateManager_[slotId] = std::make_shared<SimStateManager>(telRilManager_);
         if (simStateManager_[slotId] != nullptr) {
             simStateManager_[slotId]->Init(slotId);
@@ -69,20 +87,49 @@ bool SimManager::OnInit(int32_t slotCount)
             simStateManager_[DEFAULT_SIM_SLOT_ID]->RefreshSimState(DEFAULT_SIM_SLOT_ID);
         }
     }
-    TELEPHONY_LOGI("SimManager OnInit success");
-    return true;
 }
 
-void SimManager::SetNetworkSearchManager(int32_t slotCount, std::shared_ptr<INetworkSearch> networkSearchManager)
+void SimManager::InitSingleSimObject()
+{
+    controllerRunner_ = AppExecFwk::EventRunner::Create("MultiSimController");
+    if (controllerRunner_.get() == nullptr) {
+        TELEPHONY_LOGE("SimManager::InitSingleSimObject get controllerRunner_ failed");
+        return;
+    }
+    multiSimController_ = std::make_shared<MultiSimController>(
+        telRilManager_, simStateManager_, simFileManager_, controllerRunner_);
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("SimManager::InitSingleSimObject multiSimController init failed");
+        return;
+    }
+    multiSimController_->Init();
+
+    monitorRunner_ = AppExecFwk::EventRunner::Create("MultiSimMonitor");
+    if (monitorRunner_.get() == nullptr) {
+        TELEPHONY_LOGE("get monitorRunner_ failed");
+        return;
+    }
+    multiSimMonitor_ = std::make_shared<MultiSimMonitor>(
+        monitorRunner_, multiSimController_, simStateManager_, simFileManager_);
+    if (multiSimMonitor_ == nullptr) {
+        TELEPHONY_LOGE("SimAccountManager:: multiSimMonitor is null");
+        return;
+    }
+    multiSimMonitor_->Init();
+    for (int32_t slotId = 0; slotId < slotCount_; slotId++) {
+        multiSimMonitor_->RegisterForIccLoaded(slotId);
+        multiSimMonitor_->RegisterForSimStateChanged(slotId);
+    }
+}
+
+void SimManager::SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager)
 {
     TELEPHONY_LOGI("SimManager::SetNetworkSearchManager");
-    for (int32_t slotId = 0; slotId < slotCount; slotId++) {
-        if (simAccountManager_[slotId] == nullptr) {
-            TELEPHONY_LOGE("SimManager::SetNetworkSearchManager failed by nullptr");
-            return;
-        }
-        simAccountManager_[slotId]->SetNetworkSearchManager(networkSearchManager);
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("SimManager::SetNetworkSearchManager multiSimController_ is nullptr");
+        return;
     }
+    multiSimController_->SetNetworkSearchManager(networkSearchManager);
     return;
 }
 
@@ -96,11 +143,11 @@ bool SimManager::HasSimCard(int32_t slotId)
         TELEPHONY_LOGE("HasSimCard is true!");
         return true;
     }
-    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return false;
     }
-    return simAccountManager_[slotId]->IsSimActivatable(slotId);
+    return multiSimController_->IsSimActivatable(slotId);
 }
 
 int32_t SimManager::GetSimState(int32_t slotId)
@@ -213,99 +260,99 @@ bool SimManager::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, Lo
 
 bool SimManager::IsSimActive(int32_t slotId)
 {
-    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return false;
     }
-    return simAccountManager_[slotId]->IsSimActive(slotId);
+    return multiSimController_->IsSimActive(slotId);
 }
 
 bool SimManager::SetActiveSim(int32_t slotId, int32_t enable)
 {
-    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return false;
     }
-    return simAccountManager_[slotId]->SetActiveSim(slotId, enable);
+    return multiSimController_->SetActiveSim(slotId, enable);
 }
 
 bool SimManager::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
 {
-    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return false;
     }
-    return simAccountManager_[slotId]->GetSimAccountInfo(slotId, info);
+    return multiSimController_->GetSimAccountInfo(slotId, info);
 }
 
 bool SimManager::SetDefaultVoiceSlotId(int32_t slotId)
 {
-    if ((!IsValidSlotIdForDefault(slotId)) || (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr)) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if ((!IsValidSlotIdForDefault(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid for default or multiSimController_ is nullptr");
         return false;
     }
     if (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsSimActive(slotId)) {
         TELEPHONY_LOGE("SetDefaultVoiceSlotId slotId is not active!");
         return false;
     }
-    return simAccountManager_[DEFAULT_SIM_SLOT_ID]->SetDefaultVoiceSlotId(slotId);
+    return multiSimController_->SetDefaultVoiceSlotId(slotId);
 }
 
 bool SimManager::SetDefaultSmsSlotId(int32_t slotId)
 {
-    if ((!IsValidSlotIdForDefault(slotId)) || (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr)) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if ((!IsValidSlotIdForDefault(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid for default or multiSimController_ is nullptr");
         return false;
     }
     if (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsSimActive(slotId)) {
         TELEPHONY_LOGE("SetDefaultSmsSlotId slotId is not active!");
         return false;
     }
-    return simAccountManager_[DEFAULT_SIM_SLOT_ID]->SetDefaultSmsSlotId(slotId);
+    return multiSimController_->SetDefaultSmsSlotId(slotId);
 }
 
 bool SimManager::SetDefaultCellularDataSlotId(int32_t slotId)
 {
-    if ((!IsValidSlotIdForDefault(slotId)) || (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr)) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if ((!IsValidSlotIdForDefault(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid for default or multiSimController_ is nullptr");
         return false;
     }
     if (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsSimActive(slotId)) {
         TELEPHONY_LOGE("SetDefaultSmsSlotId slotId is not active!");
         return false;
     }
-    return simAccountManager_[DEFAULT_SIM_SLOT_ID]->SetDefaultCellularDataSlotId(slotId);
+    return multiSimController_->SetDefaultCellularDataSlotId(slotId);
 }
 
 bool SimManager::SetPrimarySlotId(int32_t slotId)
 {
-    if ((!IsValidSlotId(slotId)) || (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr)) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return false;
     }
     if (!IsSimActive(slotId)) {
         TELEPHONY_LOGE("SetPrimarySlotId slotId is not active!");
         return false;
     }
-    return simAccountManager_[DEFAULT_SIM_SLOT_ID]->SetPrimarySlotId(slotId);
+    return multiSimController_->SetPrimarySlotId(slotId);
 }
 
 bool SimManager::SetShowNumber(int32_t slotId, const std::u16string number)
 {
-    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return false;
     }
-    return simAccountManager_[slotId]->SetShowNumber(slotId, number);
+    return multiSimController_->SetShowNumber(slotId, number);
 }
 
 bool SimManager::SetShowName(int32_t slotId, const std::u16string name)
 {
-    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return false;
     }
-    return simAccountManager_[slotId]->SetShowName(slotId, name);
+    return multiSimController_->SetShowName(slotId, name);
 }
 
 int32_t SimManager::GetDefaultVoiceSlotId()
@@ -314,11 +361,11 @@ int32_t SimManager::GetDefaultVoiceSlotId()
         TELEPHONY_LOGI("default slotId is 0 for single card version");
         return DEFAULT_SIM_SLOT_ID;
     }
-    if (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
         return TELEPHONY_ERROR;
     }
-    return simAccountManager_[DEFAULT_SIM_SLOT_ID]->GetDefaultVoiceSlotId();
+    return multiSimController_->GetDefaultVoiceSlotId();
 }
 
 int32_t SimManager::GetDefaultSmsSlotId()
@@ -327,11 +374,11 @@ int32_t SimManager::GetDefaultSmsSlotId()
         TELEPHONY_LOGI("default slotId is 0 for single card version");
         return DEFAULT_SIM_SLOT_ID;
     }
-    if (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
         return TELEPHONY_ERROR;
     }
-    return simAccountManager_[DEFAULT_SIM_SLOT_ID]->GetDefaultSmsSlotId();
+    return multiSimController_->GetDefaultSmsSlotId();
 }
 
 int32_t SimManager::GetDefaultCellularDataSlotId()
@@ -340,11 +387,11 @@ int32_t SimManager::GetDefaultCellularDataSlotId()
         TELEPHONY_LOGI("default slotId is 0 for single card version");
         return DEFAULT_SIM_SLOT_ID;
     }
-    if (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
         return TELEPHONY_ERROR;
     }
-    return simAccountManager_[DEFAULT_SIM_SLOT_ID]->GetDefaultCellularDataSlotId();
+    return multiSimController_->GetDefaultCellularDataSlotId();
 }
 
 int32_t SimManager::GetPrimarySlotId()
@@ -353,47 +400,47 @@ int32_t SimManager::GetPrimarySlotId()
         TELEPHONY_LOGI(" default slotId is 0 for single card version");
         return DEFAULT_SIM_SLOT_ID;
     }
-    if (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
         return TELEPHONY_ERROR;
     }
-    return simAccountManager_[DEFAULT_SIM_SLOT_ID]->GetPrimarySlotId();
+    return multiSimController_->GetPrimarySlotId();
 }
 
 std::u16string SimManager::GetShowNumber(int32_t slotId)
 {
-    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return u"";
     }
-    return simAccountManager_[slotId]->GetShowNumber(slotId);
+    return multiSimController_->GetShowNumber(slotId);
 }
 
 std::u16string SimManager::GetShowName(int32_t slotId)
 {
-    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return u"";
     }
-    return simAccountManager_[slotId]->GetShowName(slotId);
+    return multiSimController_->GetShowName(slotId);
 }
 
 bool SimManager::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList)
 {
-    if (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
         return false;
     }
-    return simAccountManager_[DEFAULT_SIM_SLOT_ID]->GetActiveSimAccountInfoList(iccAccountInfoList);
+    return multiSimController_->GetActiveSimAccountInfoList(iccAccountInfoList);
 }
 
 int32_t SimManager::GetSlotId(int32_t simId)
 {
-    if (simAccountManager_[DEFAULT_SIM_SLOT_ID] == nullptr) {
-        TELEPHONY_LOGE("simAccountManager is null!");
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
         return TELEPHONY_ERROR;
     }
-    return simAccountManager_[DEFAULT_SIM_SLOT_ID]->GetSlotId(simId);
+    return multiSimController_->GetSlotId(simId);
 }
 
 int32_t SimManager::GetSimId(int32_t slotId)
@@ -434,6 +481,26 @@ int32_t SimManager::SimAuthentication(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simStateManager_[slotId]->SimAuthentication(slotId, aid, authData, response);
+}
+
+int32_t SimManager::GetRadioProtocolTech(int32_t slotId)
+{
+    TELEPHONY_LOGI("SimManager::GetRadioProtocolTech slotId:%{public}d", slotId);
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
+        return static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN);
+    }
+    return multiSimController_->GetRadioProtocolTech(slotId);
+}
+
+void SimManager::GetRadioProtocol(int32_t slotId)
+{
+    TELEPHONY_LOGI("SimManager::GetRadioProtocol slotId:%{public}d", slotId);
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
+        return;
+    }
+    return multiSimController_->GetRadioProtocol(slotId);
 }
 
 bool SimManager::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
@@ -708,23 +775,23 @@ void SimManager::RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExe
 {
     if ((what >= RadioEvent::RADIO_IMSI_LOADED_READY) && (what <= RadioEvent::RADIO_SIM_RECORDS_LOADED)) {
         if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
-            TELEPHONY_LOGE("simFileManager is null");
+            TELEPHONY_LOGE("slotId is invalid or simFileManager_ is nullptr");
             return;
         }
         simFileManager_[slotId]->RegisterCoreNotify(handler, what);
     } else if ((what >= RadioEvent::RADIO_SIM_STATE_CHANGE) &&
         (what <= RadioEvent::RADIO_SIM_STATE_SIMLOCK)) {
         if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {
-            TELEPHONY_LOGE("simStateManager_ is null");
+            TELEPHONY_LOGE("slotId is invalid or simStateManager_ is nullptr");
             return;
         }
         simStateManager_[slotId]->RegisterCoreNotify(handler, what);
     } else if (what == RadioEvent::RADIO_SIM_ACCOUNT_LOADED) {
-        if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
-            TELEPHONY_LOGE("simAccountManager_ RegisterCoreNotify is null");
+        if ((!IsValidSlotId(slotId)) || (multiSimMonitor_ == nullptr)) {
+            TELEPHONY_LOGE("slotId is invalid or multiSimMonitor_ is nullptr");
             return;
         }
-        simAccountManager_[slotId]->RegisterCoreNotify(handler, what);
+        multiSimMonitor_->RegisterCoreNotify(handler, what);
     } else {
         TELEPHONY_LOGE("SimManager::RegisterCoreNotify faild");
     }
@@ -781,21 +848,20 @@ std::u16string SimManager::GetSimIst(int32_t slotId)
 
 int32_t SimManager::SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue)
 {
-    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simAccountManager_ is null!");
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    return simAccountManager_[slotId]->SaveImsSwitch(slotId, imsSwitchValue);
+    return multiSimController_->SaveImsSwitch(slotId, imsSwitchValue);
 }
 
 int32_t SimManager::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue)
 {
-    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simAccountManager_ is null!");
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    return simAccountManager_[slotId]->QueryImsSwitch(slotId, imsSwitchValue);
+    return multiSimController_->QueryImsSwitch(slotId, imsSwitchValue);
 }
-SimManager::~SimManager() {}
 } // namespace Telephony
 } // namespace OHOS
