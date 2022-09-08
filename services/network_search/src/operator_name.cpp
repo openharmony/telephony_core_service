@@ -331,7 +331,7 @@ void OperatorName::PublishEvent(const int32_t rule, const RegServiceState state,
     data.SetData(spn);
 
     CommonEventPublishInfo publishInfo;
-    publishInfo.SetOrdered(true);
+    publishInfo.SetSticky(true);
     bool publishResult = CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
     TELEPHONY_LOGI("OperatorName::PublishEvent result : %{public}d slotId:%{public}d", publishResult, slotId_);
     if (publishResult) {
