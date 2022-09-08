@@ -33,7 +33,6 @@ public:
     void UpdatePreferredNetwork(std::shared_ptr<NetworkSearchManager> &nsm, ModemPowerState radioState) const;
     void ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessGetMeid(const AppExecFwk::InnerEvent::Pointer &event) const;
-    void ProcessGetRadioCapability(const AppExecFwk::InnerEvent::Pointer &event) const;
     void UpdatePhone(RadioTech csRadioTech);
     void SetPhoneType(PhoneType phoneType);
     PhoneType GetPhoneType() const;

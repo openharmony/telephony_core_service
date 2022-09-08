@@ -409,6 +409,11 @@ int32_t TelRilCallback::SimRefreshNotify(int32_t slotId)
     return TaskSchedule(slotId, &TelRilManager::GetTelRilSim, &TelRilSim::SimRefreshNotify);
 }
 
+int32_t TelRilCallback::SimRadioProtocolUpdated(int32_t slotId, const HDI::Ril::V1_0::IRadioProtocol &radioProtocol)
+{
+    return TaskSchedule(slotId, &TelRilManager::GetTelRilSim, &TelRilSim::SimRadioProtocolUpdated, radioProtocol);
+}
+
 int32_t TelRilCallback::GetSimIOResponse(
     const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::IIccIoResultInfo &result)
 {
@@ -510,11 +515,18 @@ int32_t TelRilCallback::SimStkIsReadyResponse(const HDI::Ril::V1_0::IHRilRadioRe
         responseInfo.slotId, &TelRilManager::GetTelRilSim, &TelRilSim::SimStkIsReadyResponse, responseInfo);
 }
 
+int32_t TelRilCallback::GetRadioProtocolResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::IRadioProtocol &radioProtocol)
+{
+    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilSim, &TelRilSim::GetRadioProtocolResponse,
+        responseInfo, radioProtocol);
+}
+
 int32_t TelRilCallback::SetRadioProtocolResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
-    const HDI::Ril::V1_0::ISimProtocolResponse &pSimProtocol)
+    const HDI::Ril::V1_0::IRadioProtocol &radioProtocol)
 {
     return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilSim, &TelRilSim::SetRadioProtocolResponse,
-        responseInfo, pSimProtocol);
+        responseInfo, radioProtocol);
 }
 
 int32_t TelRilCallback::SimOpenLogicalChannelResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
@@ -675,13 +687,6 @@ int32_t TelRilCallback::GetPreferredNetworkResponse(const HDI::Ril::V1_0::IHRilR
 {
     return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
         &TelRilNetwork::GetPreferredNetworkResponse, responseInfo, preferredNetworkTypeInfo);
-}
-
-int32_t TelRilCallback::GetRadioCapabilityResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
-    const HDI::Ril::V1_0::IRadioCapabilityInfo &radioCapabilityInfo)
-{
-    return TaskSchedule(responseInfo.slotId, &TelRilManager::GetTelRilNetwork,
-        &TelRilNetwork::GetRadioCapabilityResponse, responseInfo, radioCapabilityInfo);
 }
 
 int32_t TelRilCallback::GetPhysicalChannelConfigResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,

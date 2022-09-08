@@ -112,7 +112,8 @@ enum class DiffInterfaceId {
     TEST_GET_CALL_PREFERENCE_MODE,
     TEST_GET_CS_REG_STATUS,
     TEST_GET_PS_REG_STATUS,
-    TEST_GET_RADIO_CAPABILITY,
+    TEST_GET_RADIO_PROTOCOL,
+    TEST_SET_RADIO_PROTOCOL,
     TEST_GET_VOICE_RADIO_INFO,
     TEST_GET_PHYSICAL_CHANNEL_CONFIG,
     TEST_SET_LOCATE_UPDATES,
@@ -198,6 +199,10 @@ public:
     void OnRequestUnlockSimPin2Test(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestSetActiveSimTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+
+    void OnRequestGetRadioProtocolTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+
+    void OnRequestSetRadioProtocolTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestSendTerminalResponseCmdTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
@@ -326,7 +331,6 @@ public:
     void OnRequestGetMeidTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetCsRegStatusTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetPsRegStatusTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void OnRequestGetRadioCapabilityTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetVoiceRadioTechnology(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetPhysicalChannelConfig(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestSetLocateUpdatesTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -499,6 +503,8 @@ void TelRilTest::OnInitSim()
     memberFuncMap_[DiffInterfaceId::TEST_STK_SEND_ENVELOPE] = &TelRilTest::OnRequestSendEnvelopeCmdTest;
     memberFuncMap_[DiffInterfaceId::TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT] =
         &TelRilTest::OnRequestSendCallSetupRequestResultTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_RADIO_PROTOCOL] = &TelRilTest::OnRequestGetRadioProtocolTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_RADIO_PROTOCOL] = &TelRilTest::OnRequestSetRadioProtocolTest;
 }
 
 void TelRilTest::OnInitNetwork()
@@ -521,7 +527,6 @@ void TelRilTest::OnInitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_GET_MEID] = &TelRilTest::OnRequestGetMeidTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_CS_REG_STATUS] = &TelRilTest::OnRequestGetCsRegStatusTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_PS_REG_STATUS] = &TelRilTest::OnRequestGetPsRegStatusTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_RADIO_CAPABILITY] = &TelRilTest::OnRequestGetRadioCapabilityTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO] = &TelRilTest::OnRequestGetVoiceRadioTechnology;
     memberFuncMap_[DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG] = &TelRilTest::OnRequestGetPhysicalChannelConfig;
     memberFuncMap_[DiffInterfaceId::TEST_SET_LOCATE_UPDATES] = &TelRilTest::OnRequestSetLocateUpdatesTest;
@@ -874,6 +879,58 @@ void TelRilTest::OnRequestSetActiveSimTest(int32_t slotId, const std::shared_ptr
         telRilManager_->SetActiveSim(slotId, index, enable, event);
         TELEPHONY_LOGI("TelRilTest::%{public}s --> finished", __func__);
     }
+}
+
+void TelRilTest::OnRequestGetRadioProtocolTest(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
+    if (event == nullptr || telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("TelRilTest::OnRequestGetRadioProtocolTest telRilManager_ or event is nullptr");
+        return;
+    }
+    event->SetOwner(handler);
+    TELEPHONY_LOGI("TelRilTest::OnRequestGetRadioProtocolTest -->");
+    telRilManager_->GetRadioProtocol(slotId, event);
+    TELEPHONY_LOGI("TelRilTest::OnRequestGetRadioProtocolTest --> finished");
+}
+
+void TelRilTest::OnRequestSetRadioProtocolTest(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
+    if (event == nullptr || telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("TelRilTest::OnRequestSetRadioProtocolTest telRilManager_ or event is nullptr");
+        return;
+    }
+    event->SetOwner(handler);
+
+    int32_t sessionId;
+    int32_t phase;
+    int32_t technology;
+    int32_t modemId;
+    int32_t status;
+    std::cout << "please enter the Radio Protocol sessionId:";
+    std::cin >> sessionId;
+    std::cout << "please enter the Radio Protocol phase(0-4):";
+    std::cin >> phase;
+    std::cout << "please enter the Radio Protocol technology(0-12):";
+    std::cin >> technology;
+    std::cout << "please enter the Radio Protocol modemId:";
+    std::cin >> modemId;
+    std::cout << "please enter the Radio Protocol status(0-2):";
+    std::cin >> status;
+
+    RadioProtocol protocol;
+    protocol.sessionId = sessionId;
+    protocol.phase = static_cast<RadioProtocolPhase>(phase);
+    protocol.technology = technology;
+    protocol.modemId = modemId;
+    protocol.status = static_cast<RadioProtocolStatus>(status);
+
+    TELEPHONY_LOGI("TelRilTest::OnRequestSetRadioProtocolTest -->");
+    telRilManager_->SetRadioProtocol(slotId, protocol, event);
+    TELEPHONY_LOGI("TelRilTest::OnRequestSetRadioProtocolTest --> finished");
 }
 
 void TelRilTest::OnRequestSendTerminalResponseCmdTest(
@@ -1700,18 +1757,6 @@ void TelRilTest::OnRequestGetPsRegStatusTest(int32_t slotId, const std::shared_p
     }
 }
 
-void TelRilTest::OnRequestGetRadioCapabilityTest(
-    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-{
-    auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
-    if (event != nullptr && telRilManager_ != nullptr) {
-        event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::OnRequestGetRadioCapabilityTest -->");
-        telRilManager_->GetRadioCapability(slotId, event);
-        TELEPHONY_LOGI("TelRilTest::OnRequestGetRadioCapabilityTest --> finished");
-    }
-}
-
 void TelRilTest::OnRequestGetVoiceRadioTechnology(
     int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
@@ -2348,6 +2393,8 @@ void SimTest()
     cout << (int32_t)DiffInterfaceId::TEST_STK_SEND_ENVELOPE << "--> OnRequestSendEnvelopeCmdTest" << endl; // pass
     cout << (int32_t)DiffInterfaceId::TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT
          << "--> OnRequestSendCallSetupRequestResultTest" << endl; // pass
+    cout << (int32_t)DiffInterfaceId::TEST_GET_RADIO_PROTOCOL << "--> OnRequestGetRadioProtocolTest" << endl;
+    cout << (int32_t)DiffInterfaceId::TEST_SET_RADIO_PROTOCOL << "--> OnRequestSetRadioProtocolTest" << endl;
 }
 
 void DataTest(void)
@@ -2447,7 +2494,6 @@ void NetworkTest()
     cout << (int32_t)DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH << "--> OnRequestNetworkGetRssiTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_CS_REG_STATUS << "--> OnRequestGetCsRegStatusTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_PS_REG_STATUS << "--> OnRequestGetPsRegStatusTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_RADIO_CAPABILITY << "--> OnRequestGetRadioCapabilityTest" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG << "--> OnRequestGetPhysicalChannelConfig"
          << endl;
     cout << (int32_t)DiffInterfaceId::TEST_SET_LOCATE_UPDATES << "--> OnRequestSetLocateUpdatesTest" << endl;

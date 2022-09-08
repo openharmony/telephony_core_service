@@ -111,7 +111,8 @@ enum class DiffInterfaceId {
     TEST_SET_PREFERRED_NETWORK_TYPE,
     TEST_GET_IMEI,
     TEST_GET_MEID,
-    TEST_GET_RADIO_CAPABILITY,
+    TEST_GET_RADIO_PROTOCOL,
+    TEST_SET_RADIO_PROTOCOL,
     TEST_GET_VOICE_RADIO_INFO,
     TEST_GET_PHYSICAL_CHANNEL_CONFIG,
     TEST_SET_LOCATE_UPDATES,
@@ -213,7 +214,8 @@ private:
     void SetCallRestrictionTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void NetworkVoiceRegistrationStateTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void NetworkDataRegistrationStateTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void GetRadioCapabilityTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void GetRadioProtocolTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void SetRadioProtocolTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetCallForwardTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void SetCallForwardTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void NetworkOperatorTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);

@@ -117,6 +117,7 @@ public:
     int32_t SimStkEventNotify(int32_t slotId, const std::string &response) override;
     int32_t SimStkCallSetupNotify(int32_t slotId) override;
     int32_t SimRefreshNotify(int32_t slotId) override;
+    int32_t SimRadioProtocolUpdated(int32_t slotId, const HDI::Ril::V1_0::IRadioProtocol &radioProtocol) override;
     // sim response
     int32_t GetSimIOResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_0::IIccIoResultInfo &result) override;
@@ -144,8 +145,10 @@ public:
     int32_t SimStkSendCallSetupRequestResultResponse(
         const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
     int32_t SimStkIsReadyResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
+    int32_t GetRadioProtocolResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_0::IRadioProtocol &radioProtocol) override;
     int32_t SetRadioProtocolResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
-        const HDI::Ril::V1_0::ISimProtocolResponse &pSimProtocol) override;
+        const HDI::Ril::V1_0::IRadioProtocol &radioProtocol) override;
     int32_t SimOpenLogicalChannelResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_0::IOpenLogicalChannelResponse &pOpenLogicalChannelResponse) override;
     int32_t SimCloseLogicalChannelResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
@@ -188,8 +191,6 @@ public:
     int32_t SetPreferredNetworkResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;
     int32_t GetPreferredNetworkResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_0::IPreferredNetworkTypeInfo &preferredNetworkTypeInfo) override;
-    int32_t GetRadioCapabilityResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
-        const HDI::Ril::V1_0::IRadioCapabilityInfo &radioCapabilityInfo) override;
     int32_t GetPhysicalChannelConfigResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_0::IChannelConfigInfoList &channelConfigInfoList) override;
     int32_t SetLocateUpdatesResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo) override;

@@ -28,7 +28,7 @@ public:
     using HANDLE = const std::shared_ptr<AppExecFwk::EventHandler>;
     // Init
     virtual bool OnInit(int32_t slotCount) = 0;
-    virtual void SetNetworkSearchManager(int32_t slotCount, std::shared_ptr<INetworkSearch> networkSearchManager) = 0;
+    virtual void SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager) = 0;
     // SimState
     virtual bool HasSimCard(int32_t slotId) = 0;
     virtual int32_t GetSimState(int32_t slotId) = 0;
@@ -66,6 +66,8 @@ public:
     virtual bool HasOperatorPrivileges(const int32_t slotId) = 0;
     virtual int32_t SimAuthentication(
         int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response) = 0;
+    virtual int32_t GetRadioProtocolTech(int32_t slotId) = 0;
+    virtual void GetRadioProtocol(int32_t slotId) = 0;
     // STK
     virtual bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) = 0;
     virtual bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) = 0;

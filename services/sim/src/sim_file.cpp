@@ -166,7 +166,6 @@ void SimFile::OnAllFilesFetched()
     if (filesFetchedObser_ != nullptr) {
         filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
     }
-    PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_LOADED, "");
     NotifyRegistrySimState(CardType::SINGLE_MODE_USIM_CARD, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
 }
 

@@ -54,8 +54,6 @@ public:
     int32_t GetRadioState(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t ShutDown(int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    int32_t GetRadioCapability(
-        int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t Dial(int32_t slotId, int32_t eventId, std::string address, int clirMode,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t Reject(int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);

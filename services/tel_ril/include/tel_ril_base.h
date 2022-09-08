@@ -26,6 +26,7 @@
 #include "iremote_broker.h"
 #include "observer_handler.h"
 #include "radio_event.h"
+#include "sim_constant.h"
 #include "tel_ril_common.h"
 #include "tel_ril_handler.h"
 #include "telephony_errors.h"
