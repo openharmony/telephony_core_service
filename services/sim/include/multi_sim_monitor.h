@@ -30,29 +30,30 @@ namespace Telephony {
 class MultiSimMonitor : public AppExecFwk::EventHandler {
 public:
     MultiSimMonitor(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-            const std::shared_ptr<MultiSimController> &controller,
-            std::shared_ptr<SimStateManager> simStateManager,
-            std::shared_ptr<SimFileManager> simFileManager,
-            int32_t slotId);
+        const std::shared_ptr<MultiSimController> &controller,
+        std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
+        std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager);
     virtual ~MultiSimMonitor() = default;
+
     void Init();
-    bool RegisterForIccLoaded();
-    bool UnRegisterForIccLoaded();
-    bool RegisterForSimStateChanged();
-    bool UnRegisterForSimStateChanged();
+    bool RegisterForIccLoaded(int32_t slotId);
+    bool UnRegisterForIccLoaded(int32_t slotId);
+    bool RegisterForSimStateChanged(int32_t slotId);
+    bool UnRegisterForSimStateChanged(int32_t slotId);
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
 
 private:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
-    void RefreshData();
-    void InitData();
-    int32_t slotId_;
-    static bool ready_;
-    const static int32_t RETRY_COUNT = 30;
+    void RefreshData(int32_t slotId);
+    void InitData(int32_t slotId);
+    bool IsValidSlotId(int32_t slotId);
+
+private:
+    bool ready_ = false;
     std::shared_ptr<MultiSimController> controller_ = nullptr;
-    std::shared_ptr<SimStateManager> simStateManager_ = nullptr;
-    std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
-    static std::unique_ptr<ObserverHandler> observerHandler_;
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
+    std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -663,10 +663,6 @@ int32_t TelRilManager::GetCurrentCellInfo(int32_t slotId, const AppExecFwk::Inne
 {
     return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetCurrentCellInfo);
 }
-int32_t TelRilManager::GetRadioCapability(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetRadioCapability);
-}
 
 int32_t TelRilManager::GetPhysicalChannelConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
@@ -916,10 +912,15 @@ int32_t TelRilManager::UnlockSimLock(
     return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::UnlockSimLock, lockType, password);
 }
 
-int32_t TelRilManager::SetRadioProtocol(
-    int32_t slotId, SimProtocolRequest data, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetRadioProtocol(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SetRadioProtocol, data);
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::GetRadioProtocol);
+}
+
+int32_t TelRilManager::SetRadioProtocol(
+    int32_t slotId, RadioProtocol radioProtocol, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SetRadioProtocol, radioProtocol);
 }
 /*********************** TelRilSim end ********************************/
 

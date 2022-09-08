@@ -93,7 +93,7 @@ void IsimFile::ProcessLockedAllFilesFetched() {}
 void IsimFile::OnAllFilesFetched()
 {
     filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
-    PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_LOADED, "");
+    NotifyRegistrySimState(CardType::SINGLE_MODE_ISIM_CARD, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
 }
 
 bool IsimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)

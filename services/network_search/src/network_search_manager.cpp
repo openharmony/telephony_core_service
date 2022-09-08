@@ -676,25 +676,27 @@ bool NetworkSearchManager::GetPreferredNetwork(int32_t slotId, NSCALLBACK &callb
 
 bool NetworkSearchManager::SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback)
 {
-    auto inner = FindManagerInner(slotId);
-    if (inner != nullptr) {
-        uint32_t modemRaf = static_cast<uint32_t>(inner->radioCapability_.ratFamily);
-        uint32_t raf =
-            static_cast<uint32_t>(NetworkUtils::GetRafFromNetworkMode(static_cast<PreferredNetworkMode>(networkMode)));
-        if (modemRaf == RAF_UNKNOWN || raf == RAF_UNKNOWN) {
-            TELEPHONY_LOGE(
-                "SetPreferredNetwork failed RadioAccessFamily is unknown!%{public}d %{public}d slotId:%{public}d",
-                modemRaf, raf, slotId);
-            return false;
-        }
-        uint32_t filterRaf = modemRaf & raf;
-        PreferredNetworkMode filterMode = NetworkUtils::GetNetworkModeFromRaf(static_cast<uint32_t>(filterRaf));
-        TELEPHONY_LOGI(
-            "SetPreferredNetwork RadioAccessFamily is %{public}d %{public}d slotId:%{public}d", modemRaf, raf, slotId);
-        return eventSender_->SendCallbackEx(
-            slotId, RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, &callback, static_cast<int32_t>(filterMode));
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("SetPreferredNetwork simManager_ is nullptr");
+        return false;
     }
-    return false;
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("SetPreferredNetwork inner is nullptr");
+        return false;
+    }
+
+    int32_t modemRaf = simManager_->GetRadioProtocolTech(slotId);
+    int32_t raf = NetworkUtils::GetRafFromNetworkMode(static_cast<PreferredNetworkMode>(networkMode));
+    if (modemRaf == static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN) ||
+        raf == static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN)) {
+        TELEPHONY_LOGE("SetPreferredNetwork failed modemRaf:%{public}d raf:%{public}d slotId:%{public}d",
+            modemRaf, raf, slotId);
+        return false;
+    }
+    int32_t filterMode = static_cast<int32_t>(NetworkUtils::GetNetworkModeFromRaf(modemRaf & raf));
+    TELEPHONY_LOGI("SetPreferredNetwork filterMode:%{public}d slotId:%{public}d", filterMode, slotId);
+    return eventSender_->SendCallbackEx(slotId, RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, &callback, filterMode);
 }
 
 bool NetworkSearchManager::GetPreferredNetwork(int32_t slotId)
@@ -709,25 +711,29 @@ bool NetworkSearchManager::GetPreferredNetwork(int32_t slotId)
 
 bool NetworkSearchManager::SetPreferredNetwork(int32_t slotId, int32_t networkMode)
 {
-    TELEPHONY_LOGI(
-        "NetworkSearchManager SetPreferredNetwork networkMode:%{public}d slotId:%{public}d", networkMode, slotId);
-    auto inner = FindManagerInner(slotId);
-    if (inner != nullptr) {
-        int32_t modemRaf = inner->radioCapability_.ratFamily;
-        int32_t raf = NetworkUtils::GetRafFromNetworkMode(static_cast<PreferredNetworkMode>(networkMode));
-        if (modemRaf == RAF_UNKNOWN || raf == RAF_UNKNOWN) {
-            TELEPHONY_LOGE(
-                "SetPreferredNetwork failed RadioAccessFamily is unknown!%{public}d %{public}d slotId:%{public}d",
-                modemRaf, raf, slotId);
-            return false;
-        }
-        int32_t filterRaf = modemRaf & raf;
-        PreferredNetworkMode filterMode = NetworkUtils::GetNetworkModeFromRaf(filterRaf);
-        return eventSender_->SendBase(
-            slotId, RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, static_cast<int32_t>(filterMode));
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("SetPreferredNetwork simManager_ is nullptr");
+        return false;
     }
-    return false;
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("SetPreferredNetwork inner is nullptr");
+        return false;
+    }
+
+    int32_t modemRaf = simManager_->GetRadioProtocolTech(slotId);
+    int32_t raf = NetworkUtils::GetRafFromNetworkMode(static_cast<PreferredNetworkMode>(networkMode));
+    if (modemRaf == static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN) ||
+        raf == static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN)) {
+        TELEPHONY_LOGE("SetPreferredNetwork failed modemRaf:%{public}d raf:%{public}d slotId:%{public}d",
+            modemRaf, raf, slotId);
+        return false;
+    }
+    int32_t filterMode = static_cast<int32_t>(NetworkUtils::GetNetworkModeFromRaf(modemRaf & raf));
+    TELEPHONY_LOGI("SetPreferredNetwork filterMode:%{public}d slotId:%{public}d", filterMode, slotId);
+    return eventSender_->SendBase(slotId, RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, filterMode);
 }
+
 void NetworkSearchManager::SavePreferredNetworkValue(int32_t slotId, int32_t networkMode)
 {
     TELEPHONY_LOGI("NetworkSearchManager SavePreferredNetworkValue slotId:%{public}d, networkMode:%{public}d", slotId,
@@ -947,23 +953,13 @@ void NetworkSearchManager::GetVoiceTech(int32_t slotId)
 
 bool NetworkSearchManager::IsNrSupported(int32_t slotId)
 {
-    auto inner = FindManagerInner(slotId);
-    if (inner == nullptr) {
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is nullptr");
         return false;
     }
-    GetRadioCapability(slotId);
-    uint32_t modemRaf = static_cast<uint32_t>(inner->radioCapability_.ratFamily);
-    return (modemRaf & static_cast<uint32_t>(RAF_NR)) == static_cast<uint32_t>(RAF_NR);
-}
-
-int32_t NetworkSearchManager::GetRadioCapability(int32_t slotId)
-{
-    auto inner = FindManagerInner(slotId);
-    if (inner == nullptr) {
-        return NetworkSearchManagerInner::DEFAULT_RAF;
-    }
-    eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_RADIO_CAPABILITY);
-    return inner->radioCapability_.ratFamily;
+    int32_t modemRaf = simManager_->GetRadioProtocolTech(slotId);
+    return (modemRaf & static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_NR)) ==
+        static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_NR);
 }
 
 NrMode NetworkSearchManager::GetNrOptionMode(int32_t slotId)
@@ -1210,6 +1206,15 @@ void NetworkSearchManager::NotifyImsRegInfoChanged(int32_t slotId, ImsServiceTyp
     if (!isExisted) {
         TELEPHONY_LOGI("this slot id %{public}d, ims service type %{public}d is not registered", slotId, imsSrvType);
     }
+}
+
+void NetworkSearchManager::InitSimRadioProtocol(int32_t slotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::InitSimRadioProtocol simManager_ is nullptr");
+        return;
+    }
+    simManager_->GetRadioProtocol(slotId);
 }
 } // namespace Telephony
 } // namespace OHOS

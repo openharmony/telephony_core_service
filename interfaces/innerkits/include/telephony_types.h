@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include "network_search_types.h"
 #include "operator_config_types.h"
 #include "parameter.h"
 
@@ -209,11 +210,35 @@ struct PlmnNetworkName {
     std::string longName = "";
     std::string shortName = "";
 };
+
 struct OperatorPlmnInfo {
     std::string plmnNumeric = "";
     int32_t lacStart = 0;
     int32_t lacEnd = 0;
     int32_t pnnRecordId = 0;
+};
+
+enum class RadioProtocolPhase {
+    RADIO_PROTOCOL_PHASE_INITIAL,
+    RADIO_PROTOCOL_PHASE_CHECK,
+    RADIO_PROTOCOL_PHASE_UPDATE,
+    RADIO_PROTOCOL_PHASE_NOTIFY,
+    RADIO_PROTOCOL_PHASE_COMPLETE,
+};
+
+enum class RadioProtocolStatus {
+    RADIO_PROTOCOL_STATUS_NONE,
+    RADIO_PROTOCOL_STATUS_SUCCESS,
+    RADIO_PROTOCOL_STATUS_FAIL,
+};
+
+struct RadioProtocol {
+    int32_t slotId;
+    int32_t sessionId;
+    RadioProtocolPhase phase;
+    int32_t technology;
+    int32_t modemId;
+    RadioProtocolStatus status;
 };
 } // namespace Telephony
 } // namespace OHOS

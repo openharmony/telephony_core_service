@@ -87,7 +87,6 @@ std::string NetworkUtils::FormatString(const std::string &format, Args... args)
 
 class NetworkSearchManager;
 class ITelRilManager;
-struct RadioCapabilityInfo;
 class EventSender {
 public:
     EventSender(
@@ -145,17 +144,6 @@ public:
      *
      * @param slotId sim card id
      * @param radioEvent see RadioEvent
-     * @param param used for call function
-     * @return true success
-     * @return false fail
-     */
-    bool SendBase(int32_t slotId, RadioEvent radioEvent, RadioCapabilityInfo &param);
-
-    /**
-     * @brief send event to RilBaseManager
-     *
-     * @param slotId sim card id
-     * @param radioEvent see RadioEvent
      * @param firstParam used for get event and call function
      * @param secondParam used for call function
      * @return true success
@@ -198,19 +186,6 @@ public:
      */
     bool SendCallback(
         int32_t slotId, RadioEvent radioEvent, const sptr<INetworkSearchCallback> *callback, int32_t param);
-
-    /**
-     * @brief send event to RilBaseManager with callback
-     *
-     * @param slotId sim card id
-     * @param radioEvent see RadioEvent
-     * @param callback pointer to callback interface
-     * @param param used for get event and call function
-     * @return true success
-     * @return false fail
-     */
-    bool SendCallback(int32_t slotId, RadioEvent radioEvent, const sptr<INetworkSearchCallback> *callback,
-        RadioCapabilityInfo &param);
 
     /**
      * @brief send event to RilBaseManager with callback

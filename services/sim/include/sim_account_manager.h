@@ -18,8 +18,6 @@
 
 #include "i_tel_ril_manager.h"
 #include "icc_operator_privilege_controller.h"
-#include "multi_sim_controller.h"
-#include "multi_sim_monitor.h"
 #include "operator_config_cache.h"
 #include "sim_file_manager.h"
 #include "sim_state_manager.h"
@@ -32,46 +30,23 @@ public:
     SimAccountManager(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
         std::shared_ptr<SimStateManager> simStateManager, std::shared_ptr<SimFileManager> simFileManager);
     ~SimAccountManager();
+
     void Init(int32_t slotId);
-    void SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager);
-    bool IsSimActive(int32_t slotId);
-    bool IsSimActivatable(int32_t slotId);
-    bool SetActiveSim(int32_t slotId, int32_t enable);
-    bool GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
-    bool SetDefaultVoiceSlotId(int32_t slotId);
-    bool SetDefaultSmsSlotId(int32_t slotId);
-    bool SetDefaultCellularDataSlotId(int32_t slotId);
-    bool SetPrimarySlotId(int32_t slotId);
-    bool SetShowNumber(int32_t slotId, std::u16string Number);
-    bool SetShowName(int32_t slotId, std::u16string name);
-    int32_t GetDefaultVoiceSlotId();
-    int32_t GetDefaultSmsSlotId();
-    int32_t GetDefaultCellularDataSlotId();
-    int32_t GetPrimarySlotId();
-    std::u16string GetShowNumber(int32_t slotId);
-    std::u16string GetShowName(int32_t slotId);
-    int32_t GetSlotId(int32_t simId);
-    bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList);
     bool GetOperatorConfigs(int slotId, OperatorConfig &poc);
     bool HasOperatorPrivileges(const int32_t slotId);
-    void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
-    int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue);
-    int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue);
 
 private:
     bool IsValidSlotId(int32_t);
     bool IsValidSlotIdForDefault(int32_t);
+
+private:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<SimStateManager> simStateManager_ = nullptr;
     std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
-    std::shared_ptr<MultiSimController> multiSimController_ = nullptr;
-    std::shared_ptr<MultiSimMonitor> multiSimMonitor_ = nullptr;
     std::shared_ptr<SimStateTracker> simStateTracker_ = nullptr;
     std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
-    std::vector<IccAccountInfo> activeInfos_;
     std::shared_ptr<IccOperatorPrivilegeController> privilegeController_ = nullptr;
-    std::shared_ptr<AppExecFwk::EventRunner> controllerRunner_;
-    std::shared_ptr<AppExecFwk::EventRunner> monitorRunner_;
+    std::shared_ptr<AppExecFwk::EventRunner> simAccountRunner_;
     std::shared_ptr<AppExecFwk::EventRunner> privilegesRunner_;
 };
 } // namespace Telephony

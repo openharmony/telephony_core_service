@@ -68,7 +68,6 @@ struct NetworkSearchManagerInner {
     std::u16string meid_;
     NrMode nrMode_ = NrMode::NR_MODE_UNKNOWN;
     FrequencyType freqType_ = FrequencyType::FREQ_TYPE_UNKNOWN;
-    RadioCapabilityInfo radioCapability_;
     std::mutex mutex_;
     bool isRadioFirstPowerOn_ = true;
 
@@ -78,7 +77,6 @@ struct NetworkSearchManagerInner {
     bool UnRegisterDeviceStateObserver();
     bool Init()
     {
-        radioCapability_.ratFamily = DEFAULT_RAF;
         if (networkSearchState_ != nullptr) {
             if (!networkSearchState_->Init()) {
                 return false;
@@ -198,7 +196,6 @@ public:
     void SetImei(int32_t slotId, std::u16string imei);
     void UpdateCellLocation(int32_t slotId, int32_t techType, int32_t cellId, int32_t lac);
     void SetMeid(int32_t slotId, std::u16string meid);
-    int32_t GetRadioCapability(int32_t slotId);
     void SetNrOptionMode(int32_t slotId, NrMode mode);
     void SetFrequencyType(int32_t slotId, FrequencyType type);
     void GetVoiceTech(int32_t slotId);
@@ -208,6 +205,7 @@ public:
     bool IsRadioFirstPowerOn(int32_t slotId);
     void SetRadioFirstPowerOn(int32_t slotId, bool isFirstPowerOn);
     void NotifyImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo info);
+    void InitSimRadioProtocol(int32_t slotId);
 
     inline void InitMsgNum(int32_t slotId)
     {
@@ -229,13 +227,6 @@ public:
         auto inner = FindManagerInner(slotId);
         if (inner != nullptr) {
             inner->decMsgNum();
-        }
-    }
-    inline void SetCapability(int32_t slotId, RadioCapabilityInfo &radioCapability)
-    {
-        auto inner = FindManagerInner(slotId);
-        if (inner != nullptr) {
-            inner->radioCapability_ = radioCapability;
         }
     }
     inline sptr<NetworkSearchCallBackBase> GetCellularDataCallBack()

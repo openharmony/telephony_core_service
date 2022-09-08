@@ -28,7 +28,6 @@ public:
     ~TelRilNetwork() = default;
 
     // send  command
-    int32_t GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetSignalStrength(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
@@ -76,8 +75,6 @@ public:
     int32_t SetPreferredNetworkResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
     int32_t GetPreferredNetworkResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_0::IPreferredNetworkTypeInfo &preferredNetworkTypeInfo);
-    int32_t GetRadioCapabilityResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
-        const HDI::Ril::V1_0::IRadioCapabilityInfo &radioCapabilityInfo);
     int32_t GetPhysicalChannelConfigResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_0::IChannelConfigInfoList &channelConfigInfoList);
     int32_t SetLocateUpdatesResponse(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo);
