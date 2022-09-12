@@ -1527,6 +1527,19 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimAccountInfo_0100, Function | MediumTest | 
     } else {
         IccAccountInfo info;
         bool result = SimTest::telephonyService_->GetSimAccountInfo(SimTest::slotId_, info);
+        IccAccountInfo mInfo;
+        mInfo.Init(SimTest::simId, SimTest::slotId_);
+        mInfo.SetIsEsim(false);
+        mInfo.SetIsActive(true);
+        mInfo.SetIccId(u"");
+        mInfo.SetShowName(u"");
+        mInfo.SetShowNumber(u"");
+        bool ret = mInfo == info;
+        TELEPHONY_LOGI("mInfo == info is %{public}d", ret);
+        MessageParcel parcel;
+        mInfo.Marshalling(parcel);
+        mInfo.ReadFromParcel(parcel);
+        mInfo.UnMarshalling(parcel);
         EXPECT_TRUE(result);
     }
 }
