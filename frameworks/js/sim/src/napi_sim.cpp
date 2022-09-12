@@ -2220,8 +2220,7 @@ void NativeGetLockState(napi_env env, void *data)
         asContext.slotId, static_cast<LockType>(lockContext->lockType));
     TELEPHONY_LOGI("NAPI NativeGetLockState %{public}d", asContext.callbackVal);
     asContext.context.resolved = (asContext.callbackVal == static_cast<int32_t>(LockState::LOCK_ON) ||
-        asContext.callbackVal == static_cast<int32_t>(LockState::LOCK_OFF) ||
-        asContext.callbackVal == static_cast<int32_t>(LockState::LOCK_ERROR));
+                                  asContext.callbackVal == static_cast<int32_t>(LockState::LOCK_OFF));
 }
 
 void GetLockStateCallback(napi_env env, napi_status status, void *data)

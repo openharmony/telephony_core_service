@@ -1403,7 +1403,8 @@ void NativeGetIMEI(napi_env env, void *data)
     }
     context->getIMEIResult =
         NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImei(context->slotId));
-    context->resolved = true;
+    TELEPHONY_LOGI("NativeGetIMEI len = %{public}lu", (unsigned long)context->getIMEIResult.length());
+    context->resolved = !(context->getIMEIResult.empty());
 }
 
 void GetIMEICallback(napi_env env, napi_status status, void *data)
@@ -1462,8 +1463,8 @@ void NativeGetMEID(napi_env env, void *data)
     }
     context->getMEIDResult =
         NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetMeid(context->slotId));
-    TELEPHONY_LOGI("NativeGetMEID context->slotId = %{public}d", context->slotId);
-    context->resolved = true;
+    TELEPHONY_LOGI("NativeGetMEID len = %{public}lu", (unsigned long)context->getMEIDResult.length());
+    context->resolved = !(context->getMEIDResult.empty());
 }
 
 void GetMEIDCallback(napi_env env, napi_status status, void *data)
@@ -1720,6 +1721,8 @@ static void NativeGetCellInformation(napi_env env, void *data)
     asyncContext->cellInformations =
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCellInfoList(asyncContext->slotId);
     asyncContext->resolved = true;
+    TELEPHONY_LOGI("NativeGetCellInformation len = %{public}lu", (unsigned long)asyncContext->cellInformations.size());
+    asyncContext->resolved = (asyncContext->cellInformations.size() != 0);
 }
 
 void GetCellInformationCallback(napi_env env, napi_status status, void *data)
@@ -1850,7 +1853,7 @@ static void NativeGetUniqueDeviceId(napi_env env, void *data)
     context->getUniqueDeviceId =
         NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetUniqueDeviceId(context->slotId));
     TELEPHONY_LOGI("NativeGetUniqueDeviceId len = %{public}lu", (unsigned long)context->getUniqueDeviceId.length());
-    context->resolved = true;
+    context->resolved = !(context->getUniqueDeviceId.empty());
 }
 
 void GetUniqueDeviceIdCallback(napi_env env, napi_status status, void *data)

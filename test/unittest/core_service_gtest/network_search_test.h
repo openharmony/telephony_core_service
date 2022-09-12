@@ -35,6 +35,23 @@ public:
     void TearDown();
     static void TearDownTestCase();
     static sptr<ICoreService> GetProxy();
+    void PrintCellInformation(std::vector<sptr<CellInformation>> cellList);
+    void PrintSignalInformation(std::vector<sptr<SignalInformation>> signalList);
+    void PrintNetworkStateInformation(sptr<NetworkState> result);
+
+private:
+    void PrintGsmCellInformation(sptr<CellInformation> cell);
+    void PrintCdmaCellInformation(sptr<CellInformation> cell);
+    void PrintWcdmaCellInformation(sptr<CellInformation> cell);
+    void PrintTdscdmaCellInformation(sptr<CellInformation> cell);
+    void PrintLteCellInformation(sptr<CellInformation> cell);
+    void PrintNrCellInformation(sptr<CellInformation> cell);
+    void PrintGsmSignalInformation(sptr<SignalInformation> signal);
+    void PrintCdmaSignalInformation(sptr<SignalInformation> signal);
+    void PrintWcdmaSignalInformation(sptr<SignalInformation> signal);
+    void PrintTdScdmaSignalInformation(sptr<SignalInformation> signal);
+    void PrintLteSignalInformation(sptr<SignalInformation> signal);
+    void PrintNrSignalInformation(sptr<SignalInformation> signal);
 
 public:
     static sptr<ICoreService> telephonyService_;
