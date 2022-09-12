@@ -34,8 +34,8 @@ DeviceStateHandler::DeviceStateHandler(
     auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
     isScreenOn_ = true;
     auto powerSaveMode = powerMgrClient.GetDeviceMode();
-    isPowerSaveModeOn_ = powerSaveMode == PowerMgr::PowerMgrClient::POWER_SAVE_MODE ||
-        powerSaveMode == PowerMgr::PowerMgrClient::EXTREME_POWER_SAVE_MODE;
+    isPowerSaveModeOn_ = powerSaveMode == PowerMgr::PowerMode::POWER_SAVE_MODE ||
+        powerSaveMode == PowerMgr::PowerMode::EXTREME_POWER_SAVE_MODE;
     TELEPHONY_LOGI("DeviceStateHandler isCharging_=%{public}d, isScreenOn_=%{public}d, isPowerSaveModeOn_=%{public}d",
         isCharging_, isScreenOn_, isPowerSaveModeOn_);
 }
