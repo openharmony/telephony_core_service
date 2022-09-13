@@ -2,11 +2,11 @@
     "string": [
         {
             "name": "emergency_calls_only",
-            "value": "只能拨打紧急呼救电话"
+            "value": "仅限紧急呼叫"
         },
         {
             "name": "out_of_serivce",
-            "value": "没有服务"
+            "value": "无服务"
         },
         {
             "name": "cmcc",
