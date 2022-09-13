@@ -234,7 +234,6 @@ void RadioInfo::UpdatePhone(RadioTech csRadioTech)
 
     int radioState = networkSearchManager->GetRadioState(slotId_);
     if (static_cast<ModemPowerState>(radioState) != CORE_SERVICE_POWER_NOT_AVAILABLE) {
-        networkSearchManager->InitSimRadioProtocol(slotId_);
         networkSearchManager->GetImei(slotId_);
         networkSearchManager->GetMeid(slotId_);
         if (static_cast<ModemPowerState>(radioState) == CORE_SERVICE_POWER_ON) {
