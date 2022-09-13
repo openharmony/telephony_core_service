@@ -49,7 +49,7 @@ void RadioProtocolController::Init()
         protocol.slotId = i;
         protocol.sessionId = 0;
         protocol.phase = RadioProtocolPhase::RADIO_PROTOCOL_PHASE_INITIAL;
-        protocol.technology = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN);
+        protocol.technology = 0xFFFFFFFF;
         protocol.modemId = 0;
         protocol.status = RadioProtocolStatus::RADIO_PROTOCOL_STATUS_NONE;
         radioProtocol_.emplace_back(protocol);
