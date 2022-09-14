@@ -15,6 +15,7 @@
 
 #include "network_search_test.h"
 
+#include "cell_location.h"
 #include "ims_reg_info_callback_gtest.h"
 #include "iservice_registry.h"
 #include "network_search_test_callback_stub.h"
@@ -71,6 +72,255 @@ sptr<ICoreService> NetworkSearchTest::GetProxy()
         TELEPHONY_LOGI("TelephonyTestService Get TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID fail ...");
         return nullptr;
     }
+}
+
+void NetworkSearchTest::PrintCellInformation(std::vector<sptr<CellInformation>> cellList)
+{
+    for (const auto &cell : cellList) {
+        switch (cell->GetNetworkType()) {
+            case CellInformation::CellType::CELL_TYPE_GSM: {
+                PrintGsmCellInformation(cell);
+                break;
+            }
+            case CellInformation::CellType::CELL_TYPE_CDMA: {
+                PrintCdmaCellInformation(cell);
+                break;
+            }
+            case CellInformation::CellType::CELL_TYPE_WCDMA: {
+                PrintWcdmaCellInformation(cell);
+                break;
+            }
+            case CellInformation::CellType::CELL_TYPE_TDSCDMA: {
+                PrintTdscdmaCellInformation(cell);
+                break;
+            }
+            case CellInformation::CellType::CELL_TYPE_LTE: {
+                PrintLteCellInformation(cell);
+                break;
+            }
+            case CellInformation::CellType::CELL_TYPE_NR: {
+                PrintNrCellInformation(cell);
+                break;
+            }
+            default:
+                TELEPHONY_LOGE("CellInformation::CellType type error");
+                break;
+        }
+    }
+}
+
+void NetworkSearchTest::PrintGsmCellInformation(sptr<CellInformation> cell)
+{
+    GsmCellInformation *gsm = reinterpret_cast<GsmCellInformation *>(cell.GetRefPtr());
+    TELEPHONY_LOGI("CellInformation type:%{public}d, lac:%{public}d, bsic:%{public}d, arfcn:%{public}d",
+        static_cast<int32_t>(gsm->GetNetworkType()), gsm->GetLac(), gsm->GetBsic(), gsm->GetArfcn());
+    TELEPHONY_LOGI("CellInformation result:%{public}s", gsm->ToString().c_str());
+
+    sptr<GsmCellInformation> gsmCell = new GsmCellInformation;
+    gsmCell->UpdateLocation(0, 0);
+    gsmCell->SetGsmParam(0, 0, 0);
+    TELEPHONY_LOGI("CellInformation gsm is same as gsmCell:%{public}d", *gsmCell == *gsm);
+    gsmCell->Init(0, 0, 0);
+
+    sptr<GsmCellLocation> cellLocation = new GsmCellLocation;
+    cellLocation->SetGsmParam(gsm->GetCellId(), gsm->GetLac());
+    TELEPHONY_LOGI("GsmCellLocation type:%{public}d, lac:%{public}d, psc:%{public}d,",
+        static_cast<int32_t>(cellLocation->GetCellLocationType()), cellLocation->GetLac(), cellLocation->GetPsc());
+}
+
+void NetworkSearchTest::PrintCdmaCellInformation(sptr<CellInformation> cell)
+{
+    CdmaCellInformation *cdma = reinterpret_cast<CdmaCellInformation *>(cell.GetRefPtr());
+    TELEPHONY_LOGI("CellInformation type:%{public}d, baseId:%{public}d, latitude:%{public}d, longitude:%{public}d"
+        "nid:%{public}d, sid:%{public}d", static_cast<int32_t>(cdma->GetNetworkType()), cdma->GetBaseId(),
+        cdma->GetLatitude(), cdma->GetLongitude(), cdma->GetNid(), cdma->GetSid());
+    TELEPHONY_LOGI("CellInformation result:%{public}s", cdma->ToString().c_str());
+
+    sptr<CdmaCellInformation> cdmaCell = new CdmaCellInformation;
+    cdmaCell->UpdateLocation(0, 0, 0);
+    cdmaCell->SetCdmaParam(0, 0, 0, 0, 0);
+    TELEPHONY_LOGI("CellInformation cdma is same as cdmaCell:%{public}d", *cdmaCell == *cdma);
+
+    sptr<CdmaCellLocation> cellLocation = new CdmaCellLocation;
+    cellLocation->SetCdmaParam(cdma->GetBaseId(), cdma->GetLatitude(), cdma->GetLongitude(), cdma->GetNid(),
+        cdma->GetSid());
+    TELEPHONY_LOGI("CdmaCellLocation type:%{public}d, BaseId:%{public}d, Latitude:%{public}d, Longitude:%{public}d,"
+        "Nid:%{public}d, Sid:%{public}d",
+        static_cast<int32_t>(cellLocation->GetCellLocationType()), cellLocation->GetBaseId(),
+        cellLocation->GetLatitude(), cellLocation->GetLongitude(), cellLocation->GetNid(), cellLocation->GetSid());
+}
+
+void NetworkSearchTest::PrintWcdmaCellInformation(sptr<CellInformation> cell)
+{
+    WcdmaCellInformation *wcdma = reinterpret_cast<WcdmaCellInformation *>(cell.GetRefPtr());
+    TELEPHONY_LOGI("CellInformation type:%{public}d, psc:%{public}d, lac:%{public}d, arfcn:%{public}d",
+        static_cast<int32_t>(wcdma->GetNetworkType()), wcdma->GetPsc(), wcdma->GetLac(), wcdma->GetArfcn());
+    TELEPHONY_LOGI("CellInformation result:%{public}s", wcdma->ToString().c_str());
+    sptr<WcdmaCellInformation> wcdmaCell = new WcdmaCellInformation;
+    wcdmaCell->UpdateLocation(0, 0);
+    wcdmaCell->SetWcdmaParam(0, 0, 0);
+    TELEPHONY_LOGI("CellInformation wcdma is same as wcdmaCell:%{public}d", *wcdmaCell == *wcdma);
+}
+
+void NetworkSearchTest::PrintTdscdmaCellInformation(sptr<CellInformation> cell)
+{
+    TdscdmaCellInformation *tdscdma = reinterpret_cast<TdscdmaCellInformation *>(cell.GetRefPtr());
+    TELEPHONY_LOGI("CellInformation type:%{public}d, cpid:%{public}d, lac:%{public}d, arfcn:%{public}d",
+        static_cast<int32_t>(tdscdma->GetNetworkType()), tdscdma->GetCpid(), tdscdma->GetLac(), tdscdma->GetArfcn());
+    TELEPHONY_LOGI("CellInformation result:%{public}s", tdscdma->ToString().c_str());
+    sptr<TdscdmaCellInformation> tdscdmaCell = new TdscdmaCellInformation;
+    tdscdmaCell->UpdateLocation(0, 0);
+    tdscdmaCell->SetTdscdmaParam(0, 0, 0);
+    TELEPHONY_LOGI("CellInformation tdscdma is same as tdscdmaCell:%{public}d", *tdscdmaCell == *tdscdma);
+}
+
+void NetworkSearchTest::PrintLteCellInformation(sptr<CellInformation> cell)
+{
+    LteCellInformation *lte = reinterpret_cast<LteCellInformation *>(cell.GetRefPtr());
+    TELEPHONY_LOGI("CellInformation type:%{public}d, pci:%{public}d, tac:%{public}d, arfcn:%{public}d",
+        static_cast<int32_t>(lte->GetNetworkType()), lte->GetPci(), lte->GetTac(), lte->GetArfcn());
+    TELEPHONY_LOGI("CellInformation result:%{public}s", lte->ToString().c_str());
+    sptr<LteCellInformation> lteCell = new LteCellInformation;
+    lteCell->UpdateLocation(0, 0);
+    lteCell->SetLteParam(0, 0, 0);
+    TELEPHONY_LOGI("CellInformation lte is same as lteCell:%{public}d", *lteCell == *lte);
+}
+
+void NetworkSearchTest::PrintNrCellInformation(sptr<CellInformation> cell)
+{
+    NrCellInformation *nr = reinterpret_cast<NrCellInformation *>(cell.GetRefPtr());
+    TELEPHONY_LOGI("CellInformation type:%{public}d, pci:%{public}d, tac:%{public}d, arfcn:%{public}d,"
+        "nci:%{public}d", static_cast<int32_t>(nr->GetNetworkType()), nr->GetPci(), nr->GetTac(),
+        nr->GetArfcn(), (int32_t)nr->GetNci());
+    TELEPHONY_LOGI("CellInformation result:%{public}s", nr->ToString().c_str());
+    sptr<NrCellInformation> nrCell = new NrCellInformation;
+    nrCell->UpdateLocation(0, 0);
+    nrCell->SetNrParam(0, 0, 0, 0);
+    TELEPHONY_LOGI("CellInformation nr is same as nrCell:%{public}d", *nrCell == *nr);
+}
+
+void NetworkSearchTest::PrintSignalInformation(std::vector<sptr<SignalInformation>> signalList)
+{
+    for (const auto &signal : signalList) {
+        switch (signal->GetNetworkType()) {
+            case SignalInformation::NetworkType::GSM: {
+                PrintGsmSignalInformation(signal);
+                break;
+            }
+            case SignalInformation::NetworkType::CDMA: {
+                PrintCdmaSignalInformation(signal);
+                break;
+            }
+            case SignalInformation::NetworkType::WCDMA: {
+                PrintWcdmaSignalInformation(signal);
+                break;
+            }
+            case SignalInformation::NetworkType::TDSCDMA: {
+                PrintTdScdmaSignalInformation(signal);
+                break;
+            }
+            case SignalInformation::NetworkType::LTE: {
+                PrintLteSignalInformation(signal);
+                break;
+            }
+            case SignalInformation::NetworkType::NR: {
+                PrintNrSignalInformation(signal);
+                break;
+            }
+            default:
+                TELEPHONY_LOGE("SignalInformation::NetworkType type error");
+                break;
+        }
+    }
+}
+
+void NetworkSearchTest::PrintGsmSignalInformation(sptr<SignalInformation> signal)
+{
+    GsmSignalInformation *gsm = reinterpret_cast<GsmSignalInformation *>(signal.GetRefPtr());
+    TELEPHONY_LOGI("SignalInformation type:%{public}d, rssi:%{public}d, gsmBer:%{public}d, signalLevel:%{public}d,"
+        "value:%{public}d", static_cast<int32_t>(gsm->GetNetworkType()), gsm->GetRssi(), gsm->GetGsmBer(),
+        gsm->GetSignalLevel(), gsm->ValidateGsmValue());
+    sptr<GsmSignalInformation> gsmSignal = new GsmSignalInformation;
+    gsmSignal->SetValue(0, 0);
+    TELEPHONY_LOGI("SignalInformation gsm is same as gsmSignal:%{public}d", *gsmSignal == *gsm);
+}
+
+void NetworkSearchTest::PrintCdmaSignalInformation(sptr<SignalInformation> signal)
+{
+    CdmaSignalInformation *cdma = reinterpret_cast<CdmaSignalInformation *>(signal.GetRefPtr());
+    TELEPHONY_LOGI("SignalInformation type:%{public}d, cdmaRssi:%{public}d, signalLevel:%{public}d, value:%{public}d",
+        static_cast<int32_t>(cdma->GetNetworkType()), cdma->GetCdmaRssi(), cdma->GetSignalLevel(),
+        cdma->ValidateCdmaValue());
+    sptr<CdmaSignalInformation> cdmaSignal = new CdmaSignalInformation;
+    cdmaSignal->SetValue(0, 0);
+    TELEPHONY_LOGI("SignalInformation cdma is same as cdmaSignal:%{public}d", *cdmaSignal == *cdma);
+}
+
+void NetworkSearchTest::PrintWcdmaSignalInformation(sptr<SignalInformation> signal)
+{
+    WcdmaSignalInformation *wcdma = reinterpret_cast<WcdmaSignalInformation *>(signal.GetRefPtr());
+    TELEPHONY_LOGI("SignalInformation type:%{public}d, Rxlev:%{public}d, Rscp:%{public}d, Ecno:%{public}d,"
+        "Ber:%{public}d, signalLevel:%{public}d, value:%{public}d", static_cast<int32_t>(wcdma->GetNetworkType()),
+        wcdma->GetRxlev(), wcdma->GetRscp(), wcdma->GetEcno(), wcdma->GetBer(), wcdma->GetSignalLevel(),
+        wcdma->ValidateWcdmaValue());
+    sptr<WcdmaSignalInformation> wcdmaSignal = new WcdmaSignalInformation;
+    wcdmaSignal->SetValue(0, 0, 0, 0);
+    TELEPHONY_LOGI("SignalInformation wcdma is same as wcdmaSignal:%{public}d", *wcdmaSignal == *wcdma);
+}
+
+void NetworkSearchTest::PrintTdScdmaSignalInformation(sptr<SignalInformation> signal)
+{
+    TdScdmaSignalInformation *tdscdma = reinterpret_cast<TdScdmaSignalInformation *>(signal.GetRefPtr());
+    TELEPHONY_LOGI("SignalInformation type:%{public}d, Rscp:%{public}d, signalLevel:%{public}d, value:%{public}d",
+        static_cast<int32_t>(tdscdma->GetNetworkType()), tdscdma->GetRscp(), tdscdma->GetSignalLevel(),
+        tdscdma->ValidateTdScdmaValue());
+    sptr<TdScdmaSignalInformation> tdscdmaSignal = new TdScdmaSignalInformation;
+    tdscdmaSignal->SetValue(0);
+    TELEPHONY_LOGI("SignalInformation tdscdma is same as tdscdmaSignal:%{public}d", *tdscdmaSignal == *tdscdma);
+}
+
+void NetworkSearchTest::PrintLteSignalInformation(sptr<SignalInformation> signal)
+{
+    LteSignalInformation *lte = reinterpret_cast<LteSignalInformation *>(signal.GetRefPtr());
+    TELEPHONY_LOGI("SignalInformation type:%{public}d, Rxlev:%{public}d, Rsrp:%{public}d, Rsrq:%{public}d,"
+        "Snr:%{public}d, signalLevel:%{public}d, value:%{public}d", static_cast<int32_t>(lte->GetNetworkType()),
+        lte->GetRxlev(), lte->GetRsrp(), lte->GetRsrq(), lte->GetSnr(), lte->GetSignalLevel(),
+        lte->ValidateLteValue());
+    sptr<LteSignalInformation> lteSignal = new LteSignalInformation;
+    lteSignal->SetValue(0, 0, 0, 0);
+    TELEPHONY_LOGI("SignalInformation lte is same as lteSignal:%{public}d", *lteSignal == *lte);
+}
+
+void NetworkSearchTest::PrintNrSignalInformation(sptr<SignalInformation> signal)
+{
+    NrSignalInformation *nr = reinterpret_cast<NrSignalInformation *>(signal.GetRefPtr());
+    TELEPHONY_LOGI("SignalInformation type:%{public}d, Rsrp:%{public}d, Rsrq:%{public}d, Sinr:%{public}d,"
+        "SignalLevel:%{public}d, value:%{public}d", static_cast<int32_t>(nr->GetNetworkType()), nr->GetRsrp(),
+        nr->GetRsrq(), nr->GetSinr(), nr->GetSignalLevel(), nr->ValidateNrValue());
+    sptr<NrSignalInformation> nrSignal = new NrSignalInformation;
+    nrSignal->SetValue(0, 0, 0);
+    TELEPHONY_LOGI("SignalInformation nr is same as nrSignal:%{public}d", *nrSignal == *nr);
+}
+
+void NetworkSearchTest::PrintNetworkStateInformation(sptr<NetworkState> result)
+{
+    TELEPHONY_LOGI("NetworkState PsRegStatus:%{public}d, CsRegStatus:%{public}d, PsRoamingStatus:%{public}d,"
+        "CsRoamingStatus:%{public}d, PsRadioTech:%{public}d, CsRadioTech:%{public}d, NrState:%{public}d,"
+        "CfgTech:%{public}d, IsEmergency:%{public}d, IsRoaming:%{public}d",
+        static_cast<int32_t>(result->GetPsRegStatus()), static_cast<int32_t>(result->GetCsRegStatus()),
+        static_cast<int32_t>(result->GetPsRoamingStatus()), static_cast<int32_t>(result->GetCsRoamingStatus()),
+        static_cast<int32_t>(result->GetPsRadioTech()), static_cast<int32_t>(result->GetCsRadioTech()),
+        static_cast<int32_t>(result->GetNrState()), static_cast<int32_t>(result->GetCfgTech()),
+        result->IsEmergency(), result->IsRoaming());
+    sptr<NetworkState> networkState = new NetworkState;
+    result->SetOperatorInfo("", "", "", DomainType::DOMAIN_TYPE_CS);
+    result->SetEmergency(true);
+    result->SetNetworkType(RadioTech::RADIO_TECHNOLOGY_LTE, DomainType::DOMAIN_TYPE_CS);
+    result->SetRoaming(RoamingType::ROAMING_STATE_UNKNOWN, DomainType::DOMAIN_TYPE_CS);
+    result->SetNetworkState(RegServiceState::REG_STATE_POWER_OFF, DomainType::DOMAIN_TYPE_CS);
+    result->SetNrState(NrState::NR_STATE_NOT_SUPPORT);
+    result->SetCfgTech(RadioTech::RADIO_TECHNOLOGY_LTE);
+    TELEPHONY_LOGI("NetworkState result is same as networkState:%{public}d", *result == *networkState);
 }
 
 #ifndef TEL_TEST_UNSUPPORT
@@ -164,6 +414,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0100, Functi
             EXPECT_STRNE(result->GetLongOperatorName().c_str(), "");
             EXPECT_STRNE(result->GetShortOperatorName().c_str(), "");
             EXPECT_STRNE(result->GetPlmnNumeric().c_str(), "");
+            PrintNetworkStateInformation(result);
         }
     }
 }
@@ -294,6 +545,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetSignalInfoList_0100, Func
                 EXPECT_STRNE(wcdma->ToString().c_str(), "");
             }
         }
+        PrintSignalInformation(result);
     }
 }
 
@@ -327,7 +579,44 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetSignalInfoList_0200, Func
                 EXPECT_STRNE(wcdma->ToString().c_str(), "");
             }
         }
+        PrintSignalInformation(result);
     }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetCellInfoList_0100
+ * @tc.name     Get Cell Info List
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCellInfoList_0100, Function | MediumTest | Level3)
+{
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+        return;
+    }
+    std::vector<sptr<CellInformation>> cellList = NetworkSearchTest::telephonyService_->GetCellInfoList(SLOT_ID);
+    PrintCellInformation(cellList);
+    ASSERT_TRUE(!cellList.empty());
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetCellInfoList_0200
+ * @tc.name     Get Cell Info List
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCellInfoList_0200, Function | MediumTest | Level3)
+{
+    if (NetworkSearchTest::telephonyService_ == nullptr ||
+        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+        return;
+    }
+    std::vector<sptr<CellInformation>> cellList = NetworkSearchTest::telephonyService_->GetCellInfoList(SLOT_ID);
+    PrintCellInformation(cellList);
+    ASSERT_TRUE(!cellList.empty());
 }
 
 /**

@@ -36,6 +36,7 @@ public:
     static sptr<ICoreService> telephonyService_;
     static const int32_t slotId_ = 0;
     static const int32_t slotId1_ = 1;
+    static const int32_t simId = 1;
 };
 } // namespace Telephony
 } // namespace OHOS

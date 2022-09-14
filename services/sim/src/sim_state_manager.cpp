@@ -191,6 +191,16 @@ bool SimStateManager::AlterPin(int32_t slotId, std::string newPin, std::string o
 
 bool SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response)
 {
+    if (options.lockType != LockType::PIN_LOCK && options.lockType != LockType::FDN_LOCK) {
+        TELEPHONY_LOGE("SetLockState lockType is error");
+        response.result = UNLOCK_FAIL;
+        return false;
+    }
+    if (options.lockState != LockState::LOCK_OFF && options.lockState != LockState::LOCK_ON) {
+        TELEPHONY_LOGE("SetLockState lockState is error");
+        response.result = UNLOCK_FAIL;
+        return false;
+    }
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {
         std::unique_lock<std::mutex> lck(ctx_);
@@ -221,6 +231,10 @@ bool SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, Lock
 
 int32_t SimStateManager::GetLockState(int32_t slotId, LockType lockType)
 {
+    if (lockType != LockType::PIN_LOCK && lockType != LockType::FDN_LOCK) {
+        TELEPHONY_LOGE("GetLockState lockType is error");
+        return static_cast<int32_t>(LockState::LOCK_ERROR);
+    }
     int32_t ret = 0;
     if (simStateHandle_ != nullptr) {
         std::unique_lock<std::mutex> lck(ctx_);
