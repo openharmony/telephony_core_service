@@ -160,7 +160,7 @@ bool TelRilManager::ConnectRilAdapterService()
 
 bool TelRilManager::ConnectRilInterface()
 {
-    rilInterface_ = HDI::Ril::V1_0::IRilInterface::Get();
+    rilInterface_ = HDI::Ril::V1_0::IRil::Get();
     if (rilInterface_ == nullptr) {
         TELEPHONY_LOGE("TelRilManager not find RilInterfaceService");
         return false;

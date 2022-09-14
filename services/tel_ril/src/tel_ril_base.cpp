@@ -22,9 +22,8 @@ std::unordered_map<int32_t, std::shared_ptr<TelRilRequest>> TelRilBase::requestM
 std::mutex TelRilBase::requestLock_;
 std::shared_ptr<TelRilHandler> TelRilBase::handler_;
 
-TelRilBase::TelRilBase(int32_t slotId, sptr<IRemoteObject> rilAdapterObj,
-    sptr<HDI::Ril::V1_0::IRilInterface> rilInterface, std::shared_ptr<ObserverHandler> observerHandler,
-    std::shared_ptr<TelRilHandler> handler)
+TelRilBase::TelRilBase(int32_t slotId, sptr<IRemoteObject> rilAdapterObj, sptr<HDI::Ril::V1_0::IRil> rilInterface,
+    std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : observerHandler_(observerHandler), cellularRadio_(rilAdapterObj), rilInterface_(rilInterface), slotId_(slotId)
 {
     handler_ = handler;
@@ -35,7 +34,7 @@ void TelRilBase::ResetRemoteObject(sptr<IRemoteObject> rilAdapterObj)
     cellularRadio_ = rilAdapterObj;
 }
 
-void TelRilBase::ResetRilInterface(sptr<HDI::Ril::V1_0::IRilInterface> rilInterface)
+void TelRilBase::ResetRilInterface(sptr<HDI::Ril::V1_0::IRil> rilInterface)
 {
     rilInterface_ = rilInterface;
 }
@@ -286,7 +285,7 @@ int32_t TelRilBase::TelRilOnlyReportResponseInfo(MessageParcel &data)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t TelRilBase::TelRilOnlyReportResponseInfo(const HDI::Ril::V1_0::IHRilRadioResponseInfo &responseInfo)
+int32_t TelRilBase::TelRilOnlyReportResponseInfo(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     const struct HRilRadioResponseInfo radioResponseInfo = BuildHRilRadioResponseInfo(responseInfo);
     std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(radioResponseInfo);
