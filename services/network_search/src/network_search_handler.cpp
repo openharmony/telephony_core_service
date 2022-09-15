@@ -294,6 +294,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
         if (inner != nullptr && inner->deviceStateHandler_ != nullptr) {
             inner->deviceStateHandler_->ProcessRadioState();
         }
+        networkSearchManager->InitSimRadioProtocol(slotId_);
     } else {
         networkSearchManager->SetRadioStateValue(slotId_, CORE_SERVICE_POWER_NOT_AVAILABLE);
     }
