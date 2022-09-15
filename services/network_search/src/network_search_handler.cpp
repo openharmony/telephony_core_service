@@ -680,8 +680,12 @@ void NetworkSearchHandler::TimezoneRefresh()
 
 void NetworkSearchHandler::SendUpdateCellLocationRequest()
 {
+    std::vector<sptr<CellInformation>> cells;
+    if (cellInfo_ != nullptr) {
+        cellInfo_->GetCellInfoList(cells);
+    }
     uint32_t curTime = (uint32_t)time(0);
-    if ((curTime - lastCellRequestTime_) < cellRequestMinInterval_) {
+    if ((curTime - lastCellRequestTime_) < cellRequestMinInterval_ && cells.size() != 0) {
         TELEPHONY_LOGE("NetworkSearchHandler::SendUpdateCellLocationRequest interval is too short");
         return;
     }
