@@ -18,6 +18,9 @@
 #include "hril_notification.h"
 #include "hril_request.h"
 #include "radio_event.h"
+#include "want.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -119,6 +122,13 @@ int32_t TelRilModem::GetBasebandVersionResponse(
 
 int32_t TelRilModem::RadioStateUpdated(int32_t state)
 {
+    AAFwk::Want want;
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_RADIO_STATE_CHANGE);
+    EventFwk::CommonEventData commonEventData;
+    commonEventData.SetWant(want);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    bool retsult = EventFwk::CommonEventManager::PublishCommonEvent(commonEventData, publishInfo, nullptr);
+    TELEPHONY_LOGI("publish modem subscribed event result : %{public}d", retsult);
     return Notify<HRilInt32Parcel>(
         TELEPHONY_LOG_FUNC_NAME, std::make_shared<HRilInt32Parcel>(state), RadioEvent::RADIO_STATE_CHANGED);
 }
