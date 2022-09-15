@@ -33,20 +33,14 @@ ohos_shared_library("sim") {
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
-    "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
     "//foundation/arkui/napi:ace_napi",
   ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_ril:hril_innerkits",
-    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceSimJsApi\"",
