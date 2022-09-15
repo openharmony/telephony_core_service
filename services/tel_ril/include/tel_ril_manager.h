@@ -17,7 +17,7 @@
 #define TEL_RIL_MANAGER_H
 
 #include <singleton.h>
-#include <v1_0/iril_interface.h>
+#include <v1_0/iril.h>
 
 #include "hdf_service_status_listener.h"
 #include "i_tel_ril_manager.h"
@@ -408,7 +408,7 @@ private:
     std::shared_ptr<TelRilHandler> handler_ = nullptr;
     sptr<OHOS::HDI::ServiceManager::V1_0::IServiceManager> servMgr_ = nullptr;
     sptr<HdfServiceStatusListener::IServStatListener> hdfListener_ = nullptr;
-    sptr<HDI::Ril::V1_0::IRilInterface> rilInterface_ = nullptr;
+    sptr<HDI::Ril::V1_0::IRil> rilInterface_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
