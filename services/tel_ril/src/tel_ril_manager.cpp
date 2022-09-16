@@ -29,7 +29,7 @@ using OHOS::sptr;
 namespace OHOS {
 namespace Telephony {
 const std::string RIL_ADAPTER_SERVICE_NAME = "cellular_radio1";
-constexpr const char *RIL_INTERFACE_SERVICE_NAME = "ril_interface_service";
+constexpr const char *RIL_INTERFACE_SERVICE_NAME = "ril_service";
 constexpr int32_t RIL_ADAPTER_ERROR = 29189;
 constexpr int32_t STATUS_OK = 0;
 TelRilManager::TelRilManager() : IPCObjectStub(std::u16string(HRIL_INTERFACE_TOKEN)) {}
