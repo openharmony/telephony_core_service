@@ -16,7 +16,6 @@
 #include "cell_information.h"
 
 #include <cstdint>
-#include <ctime>
 #include <memory>
 #include <securec.h>
 
@@ -24,6 +23,7 @@
 #include "new"
 #include "parcel.h"
 #include "string"
+#include "ctime"
 
 namespace OHOS {
 namespace Telephony {
