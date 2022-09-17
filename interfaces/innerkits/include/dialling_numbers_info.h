@@ -25,8 +25,10 @@ namespace OHOS {
 namespace Telephony {
 class DiallingNumbersInfo : public Parcelable {
 public:
-    static const int SIM_ADN = 1;
-    static const int SIM_FDN = 2;
+    enum : uint32_t {
+        SIM_ADN = 1;
+        SIM_FDN = 2;
+    };
     int32_t elementaryFileId_ = 0;
     int32_t index_ = 0;
     std::u16string name_ = u"";
