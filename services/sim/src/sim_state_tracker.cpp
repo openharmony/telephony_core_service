@@ -44,8 +44,13 @@ void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
     if (event->GetInnerEventId() == RadioEvent::RADIO_SIM_RECORDS_LOADED) {
         TELEPHONY_LOGI("SimStateTracker::Refresh config");
-        if (!CoreManagerInner::GetInstance().IsSimActive(slotId_)) {
-            TELEPHONY_LOGE("sim is not active");
+        auto slotId = event->GetParam();
+        if (slotId != slotId_) {
+            TELEPHONY_LOGE("is not current slotId");
+            return;
+        }
+        if (!CoreManagerInner::GetInstance().HasSimCard(slotId_)) {
+            TELEPHONY_LOGE("sim is not exist");
             return;
         }
         operatorConfigLoader_->LoadOperatorConfig(slotId_);

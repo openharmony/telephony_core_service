@@ -466,7 +466,7 @@ declare namespace sim {
    *
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @return Returns the opkey; returns "-1" if no SIM card is inserted or
+   * @return Returns the opkey; returns an empty string if no SIM card is inserted or
    * no opkey matched.
    * @since 9
    */
@@ -478,7 +478,7 @@ declare namespace sim {
    *
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @return Returns the opname; returns null if no SIM card is inserted or
+   * @return Returns the opname; returns an empty string if no SIM card is inserted or
    * no opname matched.
    * @since 9
    */
