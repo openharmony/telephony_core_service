@@ -26,8 +26,8 @@ namespace Telephony {
 class DiallingNumbersInfo : public Parcelable {
 public:
     enum : uint32_t {
-        SIM_ADN = 1;
-        SIM_FDN = 2;
+        SIM_ADN = 1,
+        SIM_FDN = 2,
     };
     int32_t elementaryFileId_ = 0;
     int32_t index_ = 0;
