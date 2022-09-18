@@ -2397,7 +2397,7 @@ void SimTest()
     cout << (int32_t)DiffInterfaceId::TEST_SET_RADIO_PROTOCOL << "--> OnRequestSetRadioProtocolTest" << endl;
 }
 
-void DataTest(void)
+void DataTest()
 {
     cout << "=========== Cellular Data Start =============" << endl;
     cout << (int32_t)DiffInterfaceId::TEST_RILCM_SET_INIT_APN_INFO_TEST << "--> OnRequestSetInitApnInfoTest" << endl;
