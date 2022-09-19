@@ -54,10 +54,7 @@ ohos_shared_library("libtel_common") {
 
   public_configs = [ ":tel_utils_config" ]
 
-  public_deps = [
-    "${preferences_innerapi_path}:native_preferences",
-    "//commonlibrary/c_utils/base:utils",
-  ]
+  public_deps = [ "//commonlibrary/c_utils/base:utils" ]
 
   if (is_double_framework) {
     cflags_cc = [ "-DCONFIG_DUAL_FRAMEWORK" ]
@@ -70,13 +67,12 @@ ohos_shared_library("libtel_common") {
   }
 
   external_deps += [
-    "ability_base:want",
     "access_token:libaccesstoken_sdk",
     "access_token:libprivacy_sdk",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
-    "hisysevent_native:libhisysevent",
     "ipc:ipc_single",
+    "preferences:native_preferences",
     "samgr:samgr_proxy",
   ]
 
