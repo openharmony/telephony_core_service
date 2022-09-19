@@ -14,7 +14,7 @@
     "author": {},
     "contributors": [],
     "segment": {
-        "destPath": "//base/telephony/core_service"
+        "destPath": "base/telephony/core_service"
     },
     "component": {
         "name": "core_service",
