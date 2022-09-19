@@ -283,27 +283,23 @@ void OperatorName::NotifyCdmaSpnChanged(RegServiceState regStatus, sptr<NetworkS
     std::string spn = "";
     bool showPlmn = false;
     bool showSpn = false;
-    bool roaming = networkState->IsRoaming();
-    if (enableCust_ && displayConditionCust_ != SPN_INVALID) {
-        spnRule = GetCustSpnRule(roaming);
-    } else {
-        std::string numeric = networkState->GetPlmnNumeric();
-        if (simManager_ != nullptr) {
-            spnRule = simManager_->ObtainSpnCondition(slotId_, roaming, numeric);
-        }
-    }
+    std::string numeric = networkState->GetPlmnNumeric();
     if (regStatus == RegServiceState::REG_STATE_IN_SERVICE) {
-        plmn = networkState->GetLongOperatorName();
+        plmn = GetCustomName(numeric);
+        if (plmn.empty()) {
+            plmn = networkState->GetLongOperatorName();
+        }
         if (!csSpnFormat_.empty()) {
             plmn = NetworkUtils::FormatString(csSpnFormat_, plmn.c_str());
         }
-    } else if (regStatus == RegServiceState::REG_STATE_NO_SERVICE) {
+    } else if (regStatus != RegServiceState::REG_STATE_POWER_OFF) {
         ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::OUT_OF_SERIVCE, plmn);
-    } else {
-        plmn = "";
     }
-    showPlmn = !plmn.empty() && (((uint32_t)spnRule & SpnShowType::SPN_CONDITION_DISPLAY_PLMN) ==
-                                    SpnShowType::SPN_CONDITION_DISPLAY_PLMN);
+    showPlmn = !plmn.empty();
+    TELEPHONY_LOGI(
+        "OperatorName::NotifyCdmaSpnChanged showSpn:%{public}d curSpn_:%{public}s spn:%{public}s "
+        "showPlmn:%{public}d curPlmn_:%{public}s plmn:%{public}s slotId:%{public}d",
+        showSpn, curSpn_.c_str(), spn.c_str(), showPlmn, curPlmn_.c_str(), plmn.c_str(), slotId_);
     if (curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn || curPlmnShow_ != showPlmn ||
         curSpn_.compare(spn) || curPlmn_.compare(plmn)) {
         TELEPHONY_LOGI("OperatorName::NotifyCdmaSpnChanged start send broadcast slotId:%{public}d...", slotId_);
@@ -324,11 +320,8 @@ void OperatorName::PublishEvent(const int32_t rule, const RegServiceState state,
     want.SetParam(CUR_PLMN, plmn);
     want.SetParam(CUR_SPN_SHOW, showSpn);
     want.SetParam(CUR_SPN, spn);
-
     CommonEventData data;
     data.SetWant(want);
-    data.SetCode(MSG_NS_SPN_UPDATED);
-    data.SetData(spn);
 
     CommonEventPublishInfo publishInfo;
     publishInfo.SetSticky(true);
