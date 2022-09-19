@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Telephony {
-#define MSG_NS_SPN_UPDATED 0xF1
 constexpr const char *CUR_SLOT_ID = "CUR_SLOT_ID";
 constexpr const char *CUR_PLMN_SHOW = "CUR_PLMN_SHOW";
 constexpr const char *CUR_PLMN = "CUR_PLMN";

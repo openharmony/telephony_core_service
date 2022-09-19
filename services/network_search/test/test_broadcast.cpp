@@ -23,12 +23,9 @@ namespace Telephony {
 using namespace OHOS::EventFwk;
 void TestBroadCast::OnReceiveEvent(const CommonEventData &data)
 {
-    TELEPHONY_LOGI("TestBroadCast::OnReceiveEvent:event=%{public}s, data=%{public}s, code=%{public}d",
-        data.GetWant().GetAction().c_str(), data.GetData().c_str(), data.GetCode());
+    TELEPHONY_LOGI("TestBroadCast::OnReceiveEvent:event=%{public}s", data.GetWant().GetAction().c_str());
     auto eventName = data.GetWant().GetAction();
-    if (eventName.compare(EventFwk::CommonEventSupport::COMMON_EVENT_SPN_INFO_CHANGED) == 0 &&
-        MSG_NS_SPN_UPDATED == data.GetCode()) {
-        std::string target = data.GetData();
+    if (eventName.compare(EventFwk::CommonEventSupport::COMMON_EVENT_SPN_INFO_CHANGED) == 0) {
         int32_t slotId = data.GetWant().GetIntParam(CUR_SLOT_ID, 0);
         bool showPlmn = data.GetWant().GetBoolParam(CUR_PLMN_SHOW, false);
         std::string plmn = data.GetWant().GetStringParam(CUR_PLMN);
