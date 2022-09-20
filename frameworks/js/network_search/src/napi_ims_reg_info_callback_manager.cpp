@@ -132,7 +132,7 @@ void NapiImsRegInfoCallbackManager::ReportImsRegInfoWork(uv_work_t *work, int32_
     delete work;
     work = nullptr;
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("ReportImsRegInfo falied,result: %{public}d", ret);
+        TELEPHONY_LOGE("ReportImsRegInfo failed, result: %{public}d", ret);
         return;
     }
     TELEPHONY_LOGI("ReportImsRegInfo successfully");
