@@ -434,7 +434,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetISOCountryCodeForSim_0200, Function | MediumT
 
 /**
  * @tc.number   Telephony_Sim_GetSimSpn_0100
- * @tc.name     Get sim service privode name
+ * @tc.name     Get sim service provider name
  * @tc.desc     Function test
  */
 HWTEST_F(SimTest, Telephony_Sim_GetSimSpn_0100, Function | MediumTest | Level1)
@@ -451,7 +451,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimSpn_0100, Function | MediumTest | Level1)
 
 /**
  * @tc.number   Telephony_Sim_GetSimSpn_0200
- * @tc.name     Get sim service privode name
+ * @tc.name     Get sim service provider name
  * @tc.desc     Function test
  */
 HWTEST_F(SimTest, Telephony_Sim_GetSimSpn_0200, Function | MediumTest | Level1)
