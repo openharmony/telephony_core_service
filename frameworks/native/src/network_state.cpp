@@ -33,13 +33,15 @@ void NetworkState::Init()
     psRoaming_ = RoamingType::ROAMING_STATE_UNKNOWN;
     psRegStatus_ = RegServiceState::REG_STATE_UNKNOWN;
     csRegStatus_ = RegServiceState::REG_STATE_UNKNOWN;
-    memset_s(psOperatorInfo_.fullName, sizeof(psOperatorInfo_.fullName), 0x00, sizeof(psOperatorInfo_.fullName));
-    memset_s(csOperatorInfo_.fullName, sizeof(csOperatorInfo_.fullName), 0x00, sizeof(csOperatorInfo_.fullName));
-    memset_s(psOperatorInfo_.shortName, sizeof(psOperatorInfo_.shortName), 0x00, sizeof(psOperatorInfo_.shortName));
-    memset_s(csOperatorInfo_.shortName, sizeof(csOperatorInfo_.shortName), 0x00, sizeof(csOperatorInfo_.shortName));
-    memset_s(psOperatorInfo_.operatorNumeric, sizeof(psOperatorInfo_.operatorNumeric), 0x00,
+    (void)memset_s(psOperatorInfo_.fullName, sizeof(psOperatorInfo_.fullName), 0x00, sizeof(psOperatorInfo_.fullName));
+    (void)memset_s(csOperatorInfo_.fullName, sizeof(csOperatorInfo_.fullName), 0x00, sizeof(csOperatorInfo_.fullName));
+    (void)memset_s(psOperatorInfo_.shortName, sizeof(psOperatorInfo_.shortName), 0x00,
+        sizeof(psOperatorInfo_.shortName));
+    (void)memset_s(csOperatorInfo_.shortName, sizeof(csOperatorInfo_.shortName), 0x00,
+        sizeof(csOperatorInfo_.shortName));
+    (void)memset_s(psOperatorInfo_.operatorNumeric, sizeof(psOperatorInfo_.operatorNumeric), 0x00,
         sizeof(psOperatorInfo_.operatorNumeric));
-    memset_s(csOperatorInfo_.operatorNumeric, sizeof(csOperatorInfo_.operatorNumeric), 0x00,
+    (void)memset_s(csOperatorInfo_.operatorNumeric, sizeof(csOperatorInfo_.operatorNumeric), 0x00,
         sizeof(csOperatorInfo_.operatorNumeric));
     psRadioTech_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
     csRadioTech_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
