@@ -168,8 +168,8 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
             sub_->GetEventHandler()->ProcessScreenDisplay(powerMgrClient.IsScreenOn());
             auto powerSaveMode = powerMgrClient.GetDeviceMode();
             sub_->GetEventHandler()->ProcessPowerSaveMode(
-                powerSaveMode == PowerMgr::PowerMgrClient::POWER_SAVE_MODE ||
-                powerSaveMode == PowerMgr::PowerMgrClient::EXTREME_POWER_SAVE_MODE);
+                powerSaveMode == PowerMgr::PowerMode::POWER_SAVE_MODE ||
+                powerSaveMode == PowerMgr::PowerMode::EXTREME_POWER_SAVE_MODE);
             break;
         }
         case POWER_MANAGER_BATT_SERVICE_ID: {
