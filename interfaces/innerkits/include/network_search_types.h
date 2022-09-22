@@ -216,12 +216,9 @@ enum class PreferredNetworkMode {
 };
 
 struct OperatorInformation {
-    static const int32_t NETWORK_MAX_NAME_LEN = 15;
-    static const int32_t NETWORK_MAX_FULL_NAME_LEN = 31;
-    static const int32_t NETWORK_MAX_PLMN_LEN = 31;
-    char operatorNumeric[NETWORK_MAX_PLMN_LEN + 1];
-    char fullName[NETWORK_MAX_FULL_NAME_LEN + 1];
-    char shortName[NETWORK_MAX_NAME_LEN + 1];
+    std::string operatorNumeric;
+    std::string fullName;
+    std::string shortName;
 };
 
 enum class RadioProtocolTech {
