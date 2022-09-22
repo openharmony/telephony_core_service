@@ -33,16 +33,12 @@ void NetworkState::Init()
     psRoaming_ = RoamingType::ROAMING_STATE_UNKNOWN;
     psRegStatus_ = RegServiceState::REG_STATE_UNKNOWN;
     csRegStatus_ = RegServiceState::REG_STATE_UNKNOWN;
-    (void)memset_s(psOperatorInfo_.fullName, sizeof(psOperatorInfo_.fullName), 0x00, sizeof(psOperatorInfo_.fullName));
-    (void)memset_s(csOperatorInfo_.fullName, sizeof(csOperatorInfo_.fullName), 0x00, sizeof(csOperatorInfo_.fullName));
-    (void)memset_s(psOperatorInfo_.shortName, sizeof(psOperatorInfo_.shortName), 0x00,
-        sizeof(psOperatorInfo_.shortName));
-    (void)memset_s(csOperatorInfo_.shortName, sizeof(csOperatorInfo_.shortName), 0x00,
-        sizeof(csOperatorInfo_.shortName));
-    (void)memset_s(psOperatorInfo_.operatorNumeric, sizeof(psOperatorInfo_.operatorNumeric), 0x00,
-        sizeof(psOperatorInfo_.operatorNumeric));
-    (void)memset_s(csOperatorInfo_.operatorNumeric, sizeof(csOperatorInfo_.operatorNumeric), 0x00,
-        sizeof(csOperatorInfo_.operatorNumeric));
+    psOperatorInfo_.fullName = "";
+    csOperatorInfo_.fullName = "";
+    psOperatorInfo_.shortName = "";
+    csOperatorInfo_.shortName = "";
+    psOperatorInfo_.operatorNumeric = "";
+    csOperatorInfo_.operatorNumeric = "";
     psRadioTech_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
     csRadioTech_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
     cfgTech_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
@@ -55,44 +51,23 @@ bool NetworkState::ReadFromParcel(Parcel &parcel)
         return false;
     }
 
-    const char *readString = parcel.ReadCString();
-    if ((readString == nullptr) ||
-        (strncpy_s(psOperatorInfo_.fullName, sizeof(psOperatorInfo_.fullName), readString,
-        strlen(readString)) != EOK)) {
-        TELEPHONY_LOGE("fail to copy memory");
-        return false;
-    }
-    if (((readString = parcel.ReadCString()) == nullptr) ||
-        (strncpy_s(psOperatorInfo_.shortName, sizeof(psOperatorInfo_.shortName), readString,
-        strlen(readString)) != EOK)) {
-        TELEPHONY_LOGE("fail to copy memory");
-        return false;
-    }
-    if (((readString = parcel.ReadCString()) == nullptr) ||
-        (strncpy_s(psOperatorInfo_.operatorNumeric, sizeof(psOperatorInfo_.operatorNumeric), readString,
-        strlen(readString)) != EOK)) {
-        TELEPHONY_LOGE("fail to copy memory");
-        return false;
-    }
-    if (((readString = parcel.ReadCString()) == nullptr) ||
-        (strncpy_s(csOperatorInfo_.fullName, sizeof(csOperatorInfo_.fullName), readString,
-        strlen(readString)) != EOK)) {
-        TELEPHONY_LOGE("fail to copy memory");
-        return false;
-    }
-    if (((readString = parcel.ReadCString()) == nullptr) ||
-        (strncpy_s(csOperatorInfo_.shortName, sizeof(csOperatorInfo_.shortName), readString,
-        strlen(readString)) != EOK)) {
-        TELEPHONY_LOGE("fail to copy memory");
-        return false;
-    }
-    if (((readString = parcel.ReadCString()) == nullptr) ||
-        (strncpy_s(csOperatorInfo_.operatorNumeric, sizeof(csOperatorInfo_.operatorNumeric), readString,
-        strlen(readString)) != EOK)) {
-        TELEPHONY_LOGE("fail to copy memory");
-        return false;
-    }
+    std::string readString = parcel.ReadString();
+    psOperatorInfo_.fullName = readString;
 
+    readString = parcel.ReadString();
+    psOperatorInfo_.shortName = readString;
+
+    readString = parcel.ReadString();
+    psOperatorInfo_.operatorNumeric = readString;
+
+    readString = parcel.ReadString();
+    csOperatorInfo_.fullName = readString;
+
+    readString = parcel.ReadString();
+    csOperatorInfo_.shortName = readString;
+
+    readString = parcel.ReadString();
+    csOperatorInfo_.operatorNumeric = readString;
     csRoaming_ = static_cast<RoamingType>(parcel.ReadInt32());
     psRoaming_ = static_cast<RoamingType>(parcel.ReadInt32());
     psRegStatus_ = static_cast<RegServiceState>(parcel.ReadInt32());
@@ -110,14 +85,12 @@ bool NetworkState::operator==(const NetworkState &other) const
         psRegStatus_ == other.psRegStatus_ && csRegStatus_ == other.csRegStatus_ &&
         psRadioTech_ == other.psRadioTech_ && csRadioTech_ == other.csRadioTech_ &&
         cfgTech_ == other.cfgTech_ && nrState_ == other.nrState_ &&
-        !memcmp(psOperatorInfo_.operatorNumeric, other.psOperatorInfo_.operatorNumeric,
-            strlen(psOperatorInfo_.operatorNumeric)) &&
-        !memcmp(psOperatorInfo_.fullName, other.psOperatorInfo_.fullName, strlen(psOperatorInfo_.fullName)) &&
-        !memcmp(psOperatorInfo_.shortName, other.psOperatorInfo_.shortName, strlen(psOperatorInfo_.shortName)) &&
-        !memcmp(csOperatorInfo_.operatorNumeric, other.csOperatorInfo_.operatorNumeric,
-            strlen(csOperatorInfo_.operatorNumeric)) &&
-        !memcmp(csOperatorInfo_.fullName, other.csOperatorInfo_.fullName, strlen(csOperatorInfo_.fullName)) &&
-        !memcmp(csOperatorInfo_.shortName, other.csOperatorInfo_.shortName, strlen(csOperatorInfo_.shortName));
+        psOperatorInfo_.operatorNumeric == other.psOperatorInfo_.operatorNumeric &&
+        psOperatorInfo_.fullName == other.psOperatorInfo_.fullName &&
+        psOperatorInfo_.shortName == other.psOperatorInfo_.shortName &&
+        csOperatorInfo_.operatorNumeric == other.csOperatorInfo_.operatorNumeric &&
+        csOperatorInfo_.fullName == other.csOperatorInfo_.fullName &&
+        csOperatorInfo_.shortName == other.csOperatorInfo_.shortName;
 }
 
 bool NetworkState::Marshalling(Parcel &parcel) const
@@ -125,22 +98,23 @@ bool NetworkState::Marshalling(Parcel &parcel) const
     if (!parcel.WriteBool(isEmergency_)) {
         return false;
     }
-    if (!parcel.WriteCString(psOperatorInfo_.fullName)) {
+
+    if (!parcel.WriteString(psOperatorInfo_.fullName)) {
         return false;
     }
-    if (!parcel.WriteCString(psOperatorInfo_.shortName)) {
+    if (!parcel.WriteString(psOperatorInfo_.shortName)) {
         return false;
     }
-    if (!parcel.WriteCString(psOperatorInfo_.operatorNumeric)) {
+    if (!parcel.WriteString(psOperatorInfo_.operatorNumeric)) {
         return false;
     }
-    if (!parcel.WriteCString(csOperatorInfo_.fullName)) {
+    if (!parcel.WriteString(csOperatorInfo_.fullName)) {
         return false;
     }
-    if (!parcel.WriteCString(csOperatorInfo_.shortName)) {
+    if (!parcel.WriteString(csOperatorInfo_.shortName)) {
         return false;
     }
-    if (!parcel.WriteCString(csOperatorInfo_.operatorNumeric)) {
+    if (!parcel.WriteString(csOperatorInfo_.operatorNumeric)) {
         return false;
     }
     if (!parcel.WriteInt32(static_cast<int32_t>(csRoaming_))) {
@@ -184,28 +158,28 @@ NetworkState *NetworkState::Unmarshalling(Parcel &parcel)
 
 std::string NetworkState::GetLongOperatorName() const
 {
-    if (strlen(psOperatorInfo_.fullName) > 0) {
-        return std::string(psOperatorInfo_.fullName);
+    if (!psOperatorInfo_.fullName.empty()) {
+        return psOperatorInfo_.fullName;
     } else {
-        return std::string(csOperatorInfo_.fullName);
+        return csOperatorInfo_.fullName;
     }
 }
 
 std::string NetworkState::GetShortOperatorName() const
 {
-    if (strlen(psOperatorInfo_.shortName) > 0) {
-        return std::string(psOperatorInfo_.shortName);
+    if (!psOperatorInfo_.shortName.empty()) {
+        return psOperatorInfo_.shortName;
     } else {
-        return std::string(csOperatorInfo_.shortName);
+        return csOperatorInfo_.shortName;
     }
 }
 
 std::string NetworkState::GetPlmnNumeric() const
 {
-    if (strlen(psOperatorInfo_.operatorNumeric) > 0) {
-        return std::string(psOperatorInfo_.operatorNumeric);
+    if (!psOperatorInfo_.operatorNumeric.empty()) {
+        return psOperatorInfo_.operatorNumeric;
     } else {
-        return std::string(csOperatorInfo_.operatorNumeric);
+        return csOperatorInfo_.operatorNumeric;
     }
 }
 
@@ -258,31 +232,13 @@ void NetworkState::SetOperatorInfo(
     const std::string &longName, const std::string &shortName, const std::string &numeric, DomainType domainType)
 {
     if (domainType == DomainType::DOMAIN_TYPE_PS) {
-        if (strncpy_s(psOperatorInfo_.fullName, sizeof(psOperatorInfo_.fullName),
-            longName.c_str(), longName.length()) != 0) {
-            return;
-        }
-        if (strncpy_s(psOperatorInfo_.shortName, sizeof(psOperatorInfo_.shortName),
-            shortName.c_str(), shortName.length()) != 0) {
-            return;
-        }
-        if (strncpy_s(psOperatorInfo_.operatorNumeric, sizeof(psOperatorInfo_.operatorNumeric),
-            numeric.c_str(), numeric.length()) != 0) {
-            return;
-        }
+        psOperatorInfo_.fullName = longName;
+        psOperatorInfo_.shortName = shortName;
+        psOperatorInfo_.operatorNumeric = numeric;
     } else {
-        if (strncpy_s(csOperatorInfo_.fullName, sizeof(psOperatorInfo_.fullName),
-            longName.c_str(), longName.length()) != 0) {
-            return;
-        }
-        if (strncpy_s(csOperatorInfo_.shortName, sizeof(psOperatorInfo_.shortName),
-            shortName.c_str(), shortName.length()) != 0) {
-            return;
-        }
-        if (strncpy_s(csOperatorInfo_.operatorNumeric, sizeof(psOperatorInfo_.operatorNumeric),
-            numeric.c_str(), numeric.length()) != 0) {
-            return;
-        }
+        csOperatorInfo_.fullName = longName;
+        csOperatorInfo_.shortName = shortName;
+        csOperatorInfo_.operatorNumeric = numeric;
     }
 }
 
@@ -338,14 +294,10 @@ std::string NetworkState::ToString() const
     int32_t csRadioTech = static_cast<int32_t>(csRadioTech_);
     int32_t cfgTech = static_cast<int32_t>(cfgTech_);
     int32_t nrState = static_cast<int32_t>(nrState_);
-    std::string psFullName(psOperatorInfo_.fullName);
-    std::string psOperatorNumeric(psOperatorInfo_.operatorNumeric);
-    std::string psShortName(psOperatorInfo_.shortName);
-    std::string psOperatorInfoStr = psFullName + "|" + psOperatorNumeric + "|" + psShortName;
-    std::string csFullName(csOperatorInfo_.fullName);
-    std::string csOperatorNumeric(csOperatorInfo_.operatorNumeric);
-    std::string csShortName(csOperatorInfo_.shortName);
-    std::string csOperatorInfoStr = csFullName + "|" + csOperatorNumeric + "|" + csShortName;
+    std::string psOperatorInfoStr =
+        psOperatorInfo_.fullName + "|" + psOperatorInfo_.operatorNumeric + "|" + psOperatorInfo_.shortName;
+    std::string csOperatorInfoStr =
+        csOperatorInfo_.fullName + "|" + csOperatorInfo_.operatorNumeric + "|" + csOperatorInfo_.shortName;
     std::string content("isEmergency_:" + std::to_string(isEmergency_ ? 0 : 1) +
         ",psOperatorInfo:" + psOperatorInfoStr + ",csOperatorInfo:" + csOperatorInfoStr +
         ",csRoaming:" + std::to_string(csRoaming) + ",psRoaming:" + std::to_string(psRoaming) +
