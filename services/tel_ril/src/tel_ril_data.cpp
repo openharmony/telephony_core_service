@@ -23,25 +23,10 @@
 
 namespace OHOS {
 namespace Telephony {
-TelRilData::TelRilData(int32_t slotId, sptr<IRemoteObject> cellularRadio, sptr<HDI::Ril::V1_0::IRil> rilInterface,
+TelRilData::TelRilData(int32_t slotId, sptr<HDI::Ril::V1_0::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
-    : TelRilBase(slotId, cellularRadio, rilInterface, observerHandler, handler)
+    : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {}
-
-bool TelRilData::IsDataResponse(uint32_t code)
-{
-    return ((code >= HREQ_DATA_BASE) && (code < HREQ_NETWORK_BASE));
-}
-
-bool TelRilData::IsDataNotification(uint32_t code)
-{
-    return ((code >= HNOTI_DATA_BASE) && (code < HNOTI_NETWORK_BASE));
-}
-
-bool TelRilData::IsDataRespOrNotify(uint32_t code)
-{
-    return IsDataResponse(code) || IsDataNotification(code);
-}
 
 void TelRilData::DataResponseError(HRilErrType errCode, const AppExecFwk::InnerEvent::Pointer &response)
 {

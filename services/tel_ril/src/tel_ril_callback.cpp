@@ -775,5 +775,17 @@ int32_t TelRilCallback::SendSmsAckResponse(const HDI::Ril::V1_0::RilRadioRespons
 {
     return Response(responseInfo, &TelRilManager::GetTelRilSms, &TelRilSms::SendSmsAckResponse);
 }
+
+int32_t TelRilCallback::CommonErrorResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
+{
+    TELEPHONY_LOGE("CommonErrorResponse slotId: %{public}d serial: %{public}d error: %{public}d", responseInfo.slotId,
+        responseInfo.serial, responseInfo.error);
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("telRilManager_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    telRilManager_->ReduceRunningLock();
+    return TELEPHONY_ERR_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS
