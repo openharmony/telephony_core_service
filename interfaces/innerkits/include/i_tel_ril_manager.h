@@ -27,13 +27,8 @@ namespace OHOS {
 namespace Telephony {
 class ITelRilManager {
 public:
-    // RilBaseCommands
-    /**
-     * @brief Deal with the init_event,get ril_adapter service .
-     */
     virtual bool OnInit() = 0;
-    virtual bool ConnectRilAdapterService() = 0;
-    virtual bool ResetRemoteObject(void) = 0;
+    virtual ~ITelRilManager() = default;
 
     virtual int32_t RegisterCoreNotify(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what, int32_t *obj) = 0;
@@ -46,30 +41,13 @@ public:
 
     virtual int32_t ShutDown(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
-    /**
-     * @brief Get current Calls
-     */
     virtual int32_t GetCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) = 0;
 
-    /**
-     * @brief Dial a call
-     *
-     * @param string address
-     * @param int32_t clirMode
-     */
     virtual int32_t Dial(
         int32_t slotId, std::string address, int32_t clirMode, const AppExecFwk::InnerEvent::Pointer &result) = 0;
 
-    /**
-     * @brief  Reject the Call
-     */
     virtual int32_t Reject(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) = 0;
 
-    /**
-     *  @brief Hang up the call
-     *
-     *  @param :int32_t gsmIndex
-     */
     virtual int32_t Hangup(int32_t slotId, int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &result) = 0;
 
     virtual int32_t Answer(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) = 0;
@@ -144,26 +122,15 @@ public:
 
     virtual int32_t SetLocateUpdates(
         int32_t slotId, HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response) = 0;
-    /**
-     * @brief  Send Sms
-     */
+
     virtual int32_t SendGsmSms(
         int32_t slotId, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
-    /**
-     * @brief  Send CDMA Sms
-     */
     virtual int32_t SendCdmaSms(int32_t slotId, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
-    /**
-     * @brief  Storage Sms
-     */
     virtual int32_t AddSimMessage(
         int32_t slotId, const SimMessageParam &simMessage, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
-    /**
-     * @brief  Delete Sms
-     */
     virtual int32_t DelSimMessage(
         int32_t slotId, int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
@@ -185,9 +152,6 @@ public:
 
     virtual int32_t GetCBConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) = 0;
 
-    /**
-     * @brief Send Sms ExpectMore
-     */
     virtual int32_t SendSmsMoreMode(
         int32_t slotId, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
@@ -217,11 +181,6 @@ public:
 
     /* PDP end */
 
-    /**
-     * @brief Get IMSI
-     *
-     * @param :string aid
-     */
     virtual int32_t GetSimStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) = 0;
     virtual int32_t GetSimIO(
         int32_t slotId, SimIoRequestInfo data, const AppExecFwk::InnerEvent::Pointer &response) = 0;
