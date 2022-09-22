@@ -243,16 +243,20 @@ public:
         const HDI::Ril::V1_0::SendSmsResultInfo &sendSmsResultInfo) override;
     int32_t SendSmsAckResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
 
-    int32_t CommonErrorResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override
-    {
-        return 0;
-    }
+    int32_t CommonErrorResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
 
 private:
     template<typename FuncType, typename ModuleFuncType, typename... ParamTypes>
     inline int32_t Response(const HDI::Ril::V1_0::RilRadioResponseInfo responseInfo, FuncType &&_func,
         ModuleFuncType _moduleFunc, ParamTypes &&... _args) const
     {
+        if (telRilManager_ == nullptr) {
+            TELEPHONY_LOGE("telRilManager_ is nullptr");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        if (responseInfo.type == HDI::Ril::V1_0::RilResponseTypes::RIL_RESPONSE_REQUEST_MUST_ACK) {
+            telRilManager_->SendAckAndLock();
+        }
         return TaskSchedule(responseInfo.slotId, _func, _moduleFunc, responseInfo, std::forward<ParamTypes>(_args)...);
     }
 
@@ -260,6 +264,13 @@ private:
     inline int32_t Notify(const HDI::Ril::V1_0::RilRadioResponseInfo responseInfo, FuncType &&_func,
         ModuleFuncType _moduleFunc, ParamTypes &&... _args) const
     {
+        if (telRilManager_ == nullptr) {
+            TELEPHONY_LOGE("telRilManager_ is nullptr");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        if (responseInfo.type == HDI::Ril::V1_0::RilResponseTypes::RIL_RESPONSE_NOTICE_MUST_ACK) {
+            telRilManager_->SendAckAndLock();
+        }
         return TaskSchedule(responseInfo.slotId, _func, _moduleFunc, std::forward<ParamTypes>(_args)...);
     }
 
@@ -267,8 +278,12 @@ private:
     inline int32_t TaskSchedule(
         int32_t slotId, FuncType &&_func, ModuleFuncType _moduleFunc, ParamTypes &&... _args) const
     {
+        if (slotId < SIM_SLOT_0 || slotId >= SIM_SLOT_COUNT) {
+            TELEPHONY_LOGE("slotId:%{public}d is inValid ", slotId);
+            return TELEPHONY_ERR_ARGUMENT_INVALID;
+        }
         if (telRilManager_ == nullptr || _func == nullptr || _moduleFunc == nullptr) {
-            TELEPHONY_LOGE("telRilManager_  or _func or _moduleFunc is nullptr ");
+            TELEPHONY_LOGE("telRilManager_ or _func or _moduleFunc is nullptr");
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         return ((telRilManager_.get()->*(_func))(slotId).*(_moduleFunc))(std::forward<ParamTypes>(_args)...);

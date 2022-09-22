@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 class TelRilCall : public TelRilBase {
 public:
-    TelRilCall(int32_t slotId, sptr<IRemoteObject> cellularRadio, sptr<HDI::Ril::V1_0::IRil> rilInterface,
+    TelRilCall(int32_t slotId, sptr<HDI::Ril::V1_0::IRil> rilInterface,
         std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     ~TelRilCall() = default;
 

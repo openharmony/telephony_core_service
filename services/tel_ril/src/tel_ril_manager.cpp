@@ -28,84 +28,13 @@ using OHOS::IRemoteObject;
 using OHOS::sptr;
 namespace OHOS {
 namespace Telephony {
-const std::string RIL_ADAPTER_SERVICE_NAME = "cellular_radio1";
 constexpr const char *RIL_INTERFACE_SERVICE_NAME = "ril_service";
-constexpr int32_t RIL_ADAPTER_ERROR = 29189;
 constexpr int32_t STATUS_OK = 0;
-TelRilManager::TelRilManager() : IPCObjectStub(std::u16string(HRIL_INTERFACE_TOKEN)) {}
-
-int32_t TelRilManager::SetCellularRadioIndication()
-{
-    if (rilAdapterRemoteObj_ == nullptr) {
-        TELEPHONY_LOGE("hdf remote object doesn't exist.");
-        return RIL_ADAPTER_ERROR;
-    }
-
-    MessageParcel data;
-    MessageParcel reply;
-    data.WriteRemoteObject(telRilCallback_);
-    OHOS::MessageOption option = { OHOS::MessageOption::TF_ASYNC };
-    return rilAdapterRemoteObj_->SendRequest(HRIL_ADAPTER_RADIO_INDICATION, data, reply, option);
-}
-
-int32_t TelRilManager::SetCellularRadioResponse()
-{
-    if (rilAdapterRemoteObj_ == nullptr) {
-        TELEPHONY_LOGE("hdf remote object doesn't exist.");
-        return RIL_ADAPTER_ERROR;
-    }
-
-    MessageParcel data;
-    MessageParcel reply;
-    data.WriteRemoteObject(telRilCallback_);
-    OHOS::MessageOption option = { OHOS::MessageOption::TF_ASYNC };
-    return rilAdapterRemoteObj_->SendRequest(HRIL_ADAPTER_RADIO_RESPONSE, data, reply, option);
-}
-
-int32_t TelRilManager::OnRemoteRequest(
-    uint32_t code, MessageParcel &data, MessageParcel &reply, OHOS::MessageOption &option)
-{
-    auto selfToken = TelRilManager::GetObjectDescriptor();
-    auto reqToken = data.ReadInterfaceToken();
-    if (selfToken != reqToken) {
-        TELEPHONY_LOGE("descriptor checked fail, code is %{public}d.", code);
-        return CORE_SERVICE_ERROR;
-    }
-    HRilResponseTypes responseType = HRIL_RESPONSE_NOTICE;
-    int32_t slotId = DEFAULT_SIM_SLOT_ID;
-
-    const uint8_t *spBuffer = data.ReadUnpadBuffer(sizeof(HRilResponseHeadInfo));
-    const HRilResponseHeadInfo *headInfo = reinterpret_cast<const HRilResponseHeadInfo *>(spBuffer);
-    if (headInfo != nullptr) {
-        slotId = headInfo->slotId;
-        responseType = headInfo->type;
-    } else {
-        TELEPHONY_LOGW("TelRilManager code:%{public}d, headInfo parsed is failed.", code);
-    }
-    TELEPHONY_LOGI("TelRilManager OnRemoteRequest code:%{public}d, slotId:%{public}d, type:%{public}d", code, slotId,
-        responseType);
-    if ((slotId < 0) || (slotId > static_cast<int32_t>(telRilCall_.size()))) {
-        TELEPHONY_LOGE("TelRilManager slotId is invalid:%{public}d", slotId);
-        return CORE_SERVICE_ERROR;
-    }
-    if ((responseType == HRIL_RESPONSE_REQUEST_MUST_ACK) || (responseType == HRIL_RESPONSE_NOTICE_MUST_ACK)) {
-        SendAckAndLock();
-    }
-    if (GetTelRilSms(slotId).IsSmsRespOrNotify(code)) {
-        return GetTelRilSms(slotId).ProcessRespOrNotify<TelRilSms>(code, data);
-    }
-    if (GetTelRilData(slotId).IsDataRespOrNotify(code)) {
-        return GetTelRilData(slotId).ProcessRespOrNotify<TelRilData>(code, data);
-    }
-    TELEPHONY_LOGE("TelRilManager not find code:%{public}d", code);
-    return CORE_SERVICE_ERROR;
-}
+TelRilManager::TelRilManager() {}
 
 bool TelRilManager::OnInit()
 {
-    bool res = ConnectRilAdapterService();
-    TELEPHONY_LOGI("TelRilManager, connect ril adapter service result is %{public}d", res);
-    res = ConnectRilInterface();
+    int32_t res = ConnectRilInterface();
     TELEPHONY_LOGI("TelRilManager, connect ril interface result is %{public}d", res);
     res = RegisterHdfStatusListener();
     CreatTelRilHandler();
@@ -123,38 +52,6 @@ bool TelRilManager::DeInit()
         return false;
     }
     TELEPHONY_LOGI("TelRilManager, deInit successfully!");
-    return true;
-}
-
-bool TelRilManager::ConnectRilAdapterService()
-{
-    std::lock_guard<std::mutex> lock_l(mutex_);
-    rilAdapterRemoteObj_ = nullptr;
-    if (telRilCallback_ == nullptr) {
-        telRilCallback_ = this;
-    }
-    servMgr_ = OHOS::HDI::ServiceManager::V1_0::IServiceManager::Get();
-    if (servMgr_ == nullptr) {
-        TELEPHONY_LOGI("Get service manager error!");
-        return false;
-    }
-
-    rilAdapterRemoteObj_ = servMgr_->GetService(RIL_ADAPTER_SERVICE_NAME.c_str());
-    if (rilAdapterRemoteObj_ == nullptr) {
-        TELEPHONY_LOGE("bind hdf error!");
-        return false;
-    }
-
-    int32_t ret = SetCellularRadioIndication();
-    if (ret != CORE_SERVICE_SUCCESS) {
-        TELEPHONY_LOGE("SetCellularRadioIndication error, ret:%{public}d", ret);
-        return false;
-    }
-    ret = SetCellularRadioResponse();
-    if (ret != CORE_SERVICE_SUCCESS) {
-        TELEPHONY_LOGE("SetCellularRadioResponse error, ret:%{public}d", ret);
-        return false;
-    }
     return true;
 }
 
@@ -181,43 +78,38 @@ void TelRilManager::CreatTelRilHandler(void)
     eventLoop_->Run();
 }
 
+void TelRilManager::ReduceRunningLock()
+{
+    if (handler_ == nullptr) {
+        TELEPHONY_LOGE("handler_ is null");
+        return;
+    }
+    handler_->ReduceRunningLock(TelRilHandler::NORMAL_RUNNING_LOCK);
+}
+
 void TelRilManager::SendAckAndLock(void)
 {
     if (handler_ != nullptr) {
         handler_->ApplyRunningLock(TelRilHandler::ACK_RUNNING_LOCK);
     }
-    SendResponseAck();
-}
-
-int32_t TelRilManager::SendResponseAck(void)
-{
-    if (rilAdapterRemoteObj_ == nullptr) {
-        TELEPHONY_LOGE("hdf remote object doesn't exist.");
-        return RIL_ADAPTER_ERROR;
+    if (rilInterface_ == nullptr) {
+        TELEPHONY_LOGE("rilInterface_ is null");
+        return;
     }
-
-    MessageParcel data;
-    MessageParcel reply;
-    OHOS::MessageOption option = { OHOS::MessageOption::TF_ASYNC };
-    return rilAdapterRemoteObj_->SendRequest(HRIL_ADAPTER_RADIO_SEND_ACK, data, reply, option);
+    rilInterface_->SendRilAck();
 }
 
 void TelRilManager::InitTelModule(int32_t slotId)
 {
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     observerHandler_.push_back(observerHandler);
-    telRilSms_.push_back(
-        std::make_unique<TelRilSms>(slotId, rilAdapterRemoteObj_, rilInterface_, observerHandler_[slotId], handler_));
-    telRilSim_.push_back(
-        std::make_unique<TelRilSim>(slotId, rilAdapterRemoteObj_, rilInterface_, observerHandler_[slotId], handler_));
-    telRilCall_.push_back(
-        std::make_unique<TelRilCall>(slotId, rilAdapterRemoteObj_, rilInterface_, observerHandler_[slotId], handler_));
-    telRilData_.push_back(
-        std::make_unique<TelRilData>(slotId, rilAdapterRemoteObj_, rilInterface_, observerHandler_[slotId], handler_));
-    telRilModem_.push_back(
-        std::make_unique<TelRilModem>(slotId, rilAdapterRemoteObj_, rilInterface_, observerHandler_[slotId], handler_));
-    telRilNetwork_.push_back(std::make_unique<TelRilNetwork>(
-        slotId, rilAdapterRemoteObj_, rilInterface_, observerHandler_[slotId], handler_));
+    telRilSms_.push_back(std::make_unique<TelRilSms>(slotId, rilInterface_, observerHandler_[slotId], handler_));
+    telRilSim_.push_back(std::make_unique<TelRilSim>(slotId, rilInterface_, observerHandler_[slotId], handler_));
+    telRilCall_.push_back(std::make_unique<TelRilCall>(slotId, rilInterface_, observerHandler_[slotId], handler_));
+    telRilData_.push_back(std::make_unique<TelRilData>(slotId, rilInterface_, observerHandler_[slotId], handler_));
+    telRilModem_.push_back(std::make_unique<TelRilModem>(slotId, rilInterface_, observerHandler_[slotId], handler_));
+    telRilNetwork_.push_back(
+        std::make_unique<TelRilNetwork>(slotId, rilInterface_, observerHandler_[slotId], handler_));
 }
 TelRilSms &TelRilManager::GetTelRilSms(int32_t slotId)
 {
@@ -252,20 +144,6 @@ TelRilModem &TelRilManager::GetTelRilModem(int32_t slotId)
 std::shared_ptr<ObserverHandler> TelRilManager::GetObserverHandler(int32_t slotId)
 {
     return observerHandler_[slotId];
-}
-
-bool TelRilManager::ResetRemoteObject(void)
-{
-    int32_t size = static_cast<int32_t>(telRilCall_.size());
-    for (int32_t slotId = 0; slotId < size; slotId++) {
-        GetTelRilSms(slotId).ResetRemoteObject(rilAdapterRemoteObj_);
-        GetTelRilSim(slotId).ResetRemoteObject(rilAdapterRemoteObj_);
-        GetTelRilCall(slotId).ResetRemoteObject(rilAdapterRemoteObj_);
-        GetTelRilData(slotId).ResetRemoteObject(rilAdapterRemoteObj_);
-        GetTelRilModem(slotId).ResetRemoteObject(rilAdapterRemoteObj_);
-        GetTelRilNetwork(slotId).ResetRemoteObject(rilAdapterRemoteObj_);
-    }
-    return true;
 }
 
 bool TelRilManager::ResetRilInterface(void)
@@ -966,37 +844,6 @@ bool TelRilManager::RegisterHdfStatusListener()
     hdfListener_ = new HdfServiceStatusListener(
         HdfServiceStatusListener::StatusCallback([&](const OHOS::HDI::ServiceManager::V1_0::ServiceStatus &status) {
             HandleRilInterfaceStatusCallback(status);
-            if (status.serviceName != std::string(RIL_ADAPTER_SERVICE_NAME)) {
-                return;
-            }
-
-            if (status.deviceClass != DEVICE_CLASS_DEFAULT) {
-                TELEPHONY_LOGE("TelRilManager::RegisterHdfStatusListener, deviceClass mismatch");
-                return;
-            }
-
-            if (status.status != SERVIE_STATUS_START && status.status != SERVIE_STATUS_STOP) {
-                TELEPHONY_LOGI("TelRilManager::RegisterHdfStatusListener, status is not start or stop");
-                return;
-            }
-
-            if (status.status == SERVIE_STATUS_START) {
-                if (!ReConnectRilAdapterService()) {
-                    TELEPHONY_LOGE("TelRilManager::RegisterHdfStatusListener, ReConnectRilAdapterService fail");
-                    return;
-                }
-                TELEPHONY_LOGI("TelRilManager::RegisterHdfStatusListener, reconnect riladapter service success");
-                return;
-            }
-
-            if (status.status == SERVIE_STATUS_STOP) {
-                if (!DisConnectRilAdapterService()) {
-                    TELEPHONY_LOGE("TelRilManager::RegisterHdfStatusListener, DisConnectRilAdapterService fail");
-                    return;
-                }
-                TELEPHONY_LOGI("TelRilManager::RegisterHdfStatusListener, disconnect riladapter service successfully!");
-                return;
-            }
         }));
 
     int status = servMgr_->RegisterServiceStatusListener(hdfListener_, DEVICE_CLASS_DEFAULT);
@@ -1031,27 +878,6 @@ bool TelRilManager::UnRegisterHdfStatusListener()
     return true;
 }
 
-bool TelRilManager::ReConnectRilAdapterService()
-{
-    if (rilAdapterRemoteObj_ != nullptr) {
-        TELEPHONY_LOGI(
-            "TelRilManager::ReConnectRilAdapterService, riladapter service has been successfully connected!");
-        return true;
-    }
-
-    if (!ConnectRilAdapterService()) {
-        TELEPHONY_LOGE("TelRilManager::ReConnectRilAdapterService, Connect riladapter service failed!");
-        return false;
-    }
-
-    if (!ResetRemoteObject()) {
-        TELEPHONY_LOGE("TelRilManager::ReConnectRilAdapterService, Reset remote object failed!");
-        return false;
-    }
-    TELEPHONY_LOGI("TelRilManager::ReConnectRilAdapterService, Connect riladapter service successfully!");
-    return true;
-}
-
 bool TelRilManager::ReConnectRilInterface()
 {
     if (rilInterface_ != nullptr) {
@@ -1069,22 +895,6 @@ bool TelRilManager::ReConnectRilInterface()
         return false;
     }
     TELEPHONY_LOGI("TelRilManager::ReConnectRilInterface, Connect riladapter service successfully!");
-    return true;
-}
-
-bool TelRilManager::DisConnectRilAdapterService()
-{
-    if (rilAdapterRemoteObj_ == nullptr) {
-        TELEPHONY_LOGI(
-            "TelRilManager::DisconnectRilAdapterService, riladapter service has been successfully disconnected!");
-        return true;
-    }
-    rilAdapterRemoteObj_ = nullptr;
-    if (!ResetRemoteObject()) {
-        TELEPHONY_LOGE("TelRilManager::DisconnectRilAdapterService, Reset remote object failed!");
-        return false;
-    }
-    TELEPHONY_LOGI("TelRilManager::DisconnectRilAdapterService, disconnect riladapter service successfully");
     return true;
 }
 

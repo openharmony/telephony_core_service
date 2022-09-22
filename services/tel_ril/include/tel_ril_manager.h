@@ -31,29 +31,12 @@
 
 namespace OHOS {
 namespace Telephony {
-class TelRilManager : public ITelRilManager,
-                      public OHOS::IPCObjectStub,
-                      public std::enable_shared_from_this<TelRilManager> {
+class TelRilManager : public ITelRilManager, public std::enable_shared_from_this<TelRilManager> {
 public:
     TelRilManager();
-    ~TelRilManager() = default;
-    /**
-     * @brief Oem Remote Request
-     * @param code Number of retries remaining, must be equal to -1 if unknown
-     * @param data is HDF service callback message
-     * @param reply is HDF service callback message
-     * @param option is HDF service callback message
-     * @return int32_t type
-     */
-    int32_t OnRemoteRequest(
-        uint32_t code, MessageParcel &data, MessageParcel &reply, OHOS::MessageOption &option) override;
+    ~TelRilManager() override = default;
 
-    /**
-     * @brief Deal with the init_event,get ril_adapter service .
-     */
     bool OnInit() override;
-    bool ConnectRilAdapterService() override;
-    bool ResetRemoteObject(void) override;
     bool DeInit();
 
     int32_t RegisterCoreNotify(
@@ -166,26 +149,14 @@ public:
 
     int32_t GetBasebandVersion(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    /**
-     * @brief  Send Sms
-     */
     int32_t SendGsmSms(
         int32_t slotId, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    /**
-     * @brief  Send CDMA Sms
-     */
     int32_t SendCdmaSms(int32_t slotId, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    /**
-     * @brief  Storage Sms
-     */
     int32_t AddSimMessage(
         int32_t slotId, const SimMessageParam &simMessage, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    /**
-     * @brief  Delete Sms
-     */
     int32_t DelSimMessage(int32_t slotId, int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t UpdateSimMessage(
@@ -205,9 +176,7 @@ public:
         const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t GetCBConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
-    /**
-     * @brief Send Sms ExpectMore
-     */
+
     int32_t SendSmsMoreMode(
         int32_t slotId, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) override;
 
@@ -220,7 +189,6 @@ public:
     int32_t UpdateCdmaSimMessage(int32_t slotId, const CdmaSimMessageParam &cdmaSimMsg,
         const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    /* PDP start */
     int32_t SetInitApnInfo(
         int32_t slotId, const DataProfile &dataProfile, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t ActivatePdpContext(
@@ -235,13 +203,6 @@ public:
     int32_t SetDataPermitted(
         int32_t slotId, int32_t dataPermitted, const AppExecFwk::InnerEvent::Pointer &response) override;
 
-    /* PDP end */
-
-    /**
-     * @brief Get IMSI
-     *
-     * @param :string aid
-     */
     int32_t GetSimStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
     int32_t GetSimIO(int32_t slotId, SimIoRequestInfo data, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetImsi(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
@@ -302,20 +263,6 @@ public:
         int32_t slotId, SimAuthenticationRequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     /**
-     * ReConnect riladapter service
-     *
-     * @return:True is reconnect riladapter service success, false is fail
-     */
-    bool ReConnectRilAdapterService();
-
-    /**
-     * DisConnect riladapter service
-     *
-     * @return:True is release success, false is fail
-     */
-    bool DisConnectRilAdapterService();
-
-    /**
      * Register hdf status listener
      *
      * @return:True is Register HdfStatusListener success, false is fail
@@ -335,6 +282,8 @@ public:
     TelRilData &GetTelRilData(int32_t slotId);
     TelRilNetwork &GetTelRilNetwork(int32_t slotId);
     TelRilModem &GetTelRilModem(int32_t slotId);
+    void SendAckAndLock(void);
+    void ReduceRunningLock();
 
 public:
     static const int32_t INVALID_WAKELOCK = -1;
@@ -343,7 +292,6 @@ public:
 
 private:
     void CreatTelRilHandler(void);
-    void SendAckAndLock(void);
     int32_t SendResponseAck(void);
     void InitTelModule(int32_t slotId);
     bool ConnectRilInterface();
@@ -353,18 +301,6 @@ private:
     bool DisConnectRilInterface();
 
     std::shared_ptr<ObserverHandler> GetObserverHandler(int32_t slotId);
-    /**
-     * Send the request of CellularRadioIndication
-     *
-     * @return:Returns the value of the send_result.
-     */
-    int32_t SetCellularRadioIndication();
-
-    /**
-     * Send the request of CellularRadioResponse
-     *
-     */
-    int32_t SetCellularRadioResponse();
 
     /**
      * @brief Task schedule. The function of this function is to unify the input interface.
@@ -395,8 +331,6 @@ private:
 
 private:
     std::mutex mutex_;
-    sptr<IRemoteObject> rilAdapterRemoteObj_ = nullptr;
-    sptr<OHOS::IPCObjectStub> telRilCallback_ = nullptr;
     std::vector<std::unique_ptr<TelRilSim>> telRilSim_;
     std::vector<std::unique_ptr<TelRilSms>> telRilSms_;
     std::vector<std::unique_ptr<TelRilCall>> telRilCall_;
