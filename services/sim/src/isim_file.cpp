@@ -147,7 +147,6 @@ bool IsimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGI("IsimFile::ProcessEvent MSG_SIM_OBTAIN_IMSI_DONE");
         if (!imsi_.empty()) {
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
-            PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_IMSI, imsi_);
         }
     }
     return isFileHandleResponse;
