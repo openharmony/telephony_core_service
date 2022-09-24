@@ -751,7 +751,6 @@ bool SimFile::ProcessObtainIMSIDone(const AppExecFwk::InnerEvent::Pointer &event
         TELEPHONY_LOGI("SimFile::ObtainIsoCountryCode result success");
         if (!imsi_.empty()) {
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
-            PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_IMSI, imsi_);
         }
     }
     return isFileProcessResponse;
