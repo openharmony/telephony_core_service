@@ -509,6 +509,11 @@ int32_t TelRilCall::CallSrvccStatusNotice(const HDI::Ril::V1_0::SrvccStatus &srv
         TELEPHONY_LOG_FUNC_NAME, srvccStatusInfo, RadioEvent::RADIO_CALL_SRVCC_STATUS);
 }
 
+int32_t TelRilCall::CallRsrvccStatusNotify()
+{
+    return Notify(TELEPHONY_LOG_FUNC_NAME, RadioEvent::RADIO_CALL_RSRVCC_STATUS);
+}
+
 int32_t TelRilCall::SetMute(const int32_t mute, const AppExecFwk::InnerEvent::Pointer &result)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SET_MUTE, &HDI::Ril::V1_0::IRil::SetMute, mute);

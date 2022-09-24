@@ -114,6 +114,7 @@ public:
     int32_t CallRingbackVoiceNotice(const HDI::Ril::V1_0::RingbackVoice &ringbackVoice);
     int32_t CallSrvccStatusNotice(const HDI::Ril::V1_0::SrvccStatus &srvccStatus);
     int32_t CallEmergencyNotice(const HDI::Ril::V1_0::EmergencyInfoList &emergencyInfoList);
+    int32_t CallRsrvccStatusNotify();
 
 private:
     void BuildEmergencyInfoList(std::shared_ptr<EmergencyInfoList> emergencyCallList,
