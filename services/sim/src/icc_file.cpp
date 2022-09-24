@@ -297,8 +297,6 @@ void IccFile::RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> event
         if (eventHandler != nullptr) {
             eventHandler->SendEvent(RadioEvent::RADIO_IMSI_LOADED_READY);
         }
-        PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED,
-            ICC_STATE_IMSI, ObtainIMSI());
     }
 }
 
