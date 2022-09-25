@@ -192,7 +192,7 @@ public:
     bool SetPreferredNetwork(int32_t slotId, int32_t networkMode);
     void SavePreferredNetworkValue(int32_t slotId, int32_t networkMode);
     int32_t GetPreferredNetworkValue(int32_t slotId) const;
-    void UpdatePhone(int32_t slotId, RadioTech csRadioTech);
+    void UpdatePhone(int32_t slotId, RadioTech csRadioTech, RadioTech psRadioTech);
     void SetImei(int32_t slotId, std::u16string imei);
     void UpdateCellLocation(int32_t slotId, int32_t techType, int32_t cellId, int32_t lac);
     void SetMeid(int32_t slotId, std::u16string meid);
