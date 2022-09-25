@@ -59,46 +59,35 @@ void CoreServiceDumpHelper::ShowCoreServiceInfo(std::string &result) const
     result.append("Ohos core_service service:\n");
     result.append("BindTime = ");
     result.append(std::to_string(DelayedSingleton<CoreService>::GetInstance()->GetBindTime()));
-    result.append("\n");
-    result.append("EndTime = ");
+    result.append("\nEndTime = ");
     result.append(std::to_string(DelayedSingleton<CoreService>::GetInstance()->GetEndTime()));
-    result.append("\n");
-    result.append("SpendTime = ");
+    result.append("\nSpendTime = ");
     result.append(std::to_string(DelayedSingleton<CoreService>::GetInstance()->GetSpendTime()));
     result.append("\n");
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
         if (DelayedSingleton<CoreService>::GetInstance()->HasSimCard(i)) {
             result.append("SlotId = ");
             result.append(std::to_string(i));
-            result.append("\n");
-            result.append("IsSimActive = ");
+            result.append("\nIsSimActive = ");
             result.append(GetBoolValue(DelayedSingleton<CoreService>::GetInstance()->IsSimActive(i)));
-            result.append("\n");
-            result.append("IsNrSupported = ");
+            result.append("\nIsNrSupported = ");
             result.append(GetBoolValue(DelayedSingleton<CoreService>::GetInstance()->IsNrSupported(i)));
-            result.append("\n");
-            result.append("SignalLevel = ");
+            result.append("\nSignalLevel = ");
             std::vector<sptr<SignalInformation>> signals =
                 DelayedSingleton<CoreService>::GetInstance()->GetSignalInfoList(i);
             result.append(std::to_string(signals[0]->GetSignalLevel()));
-            result.append("\n");
-            result.append("CardType = ");
+            result.append("\nCardType = ");
             result.append(GetCardType(DelayedSingleton<CoreService>::GetInstance()->GetCardType(i)));
-            result.append("\n");
-            result.append("SimState = ");
+            result.append("\nSimState = ");
             result.append(GetSimState(DelayedSingleton<CoreService>::GetInstance()->GetSimState(i)));
-            result.append("\n");
-            result.append("Spn = ");
+            result.append("\nSpn = ");
             result.append(to_utf8(DelayedSingleton<CoreService>::GetInstance()->GetSimSpn(i)));
-            result.append("\n");
-            result.append("OperatorName = ");
+            result.append("\nOperatorName = ");
             result.append(to_utf8(DelayedSingleton<CoreService>::GetInstance()->GetOperatorName(i)));
-            result.append("\n");
-            result.append("PsRadioTech = ");
+            result.append("\nPsRadioTech = ");
             result.append(
                 GetCellularDataConnectionNetworkType(DelayedSingleton<CoreService>::GetInstance()->GetPsRadioTech(i)));
-            result.append("\n");
-            result.append("CsRadioTech = ");
+            result.append("\nCsRadioTech = ");
             result.append(
                 GetCellularDataConnectionNetworkType(DelayedSingleton<CoreService>::GetInstance()->GetCsRadioTech(i)));
             result.append("\n");

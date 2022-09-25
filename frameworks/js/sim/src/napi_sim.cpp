@@ -1962,7 +1962,7 @@ void SendEnvelopeCmdCallback(napi_env env, napi_status status, void *data)
         NapiAsyncCompleteCallback(
             env, status, context->asyncContext, "slotId is invalid", false, ERROR_SLOT_ID_INVALID);
     } else {
-        NapiAsyncCompleteCallback(env, status, context->asyncContext, "Stk Cmd From App Envelope failed", true);
+        NapiAsyncCompleteCallback(env, status, context->asyncContext, "Stk Send Envelope Cmd failed", true);
     }
 }
 
@@ -2012,7 +2012,7 @@ void SendTerminalResponseCmdCallback(napi_env env, napi_status status, void *dat
         NapiAsyncCompleteCallback(
             env, status, context->asyncContext, "slotId is invalid", false, ERROR_SLOT_ID_INVALID);
     } else {
-        NapiAsyncCompleteCallback(env, status, context->asyncContext, "Stk Cmd From App Envelope failed", true);
+        NapiAsyncCompleteCallback(env, status, context->asyncContext, "Stk Send Terminal Response Cmd failed", true);
     }
 }
 
@@ -2062,7 +2062,7 @@ void AcceptCallSetupRequestCallback(napi_env env, napi_status status, void *data
         NapiAsyncCompleteCallback(
             env, status, context->asyncContext, "slotId is invalid", false, ERROR_SLOT_ID_INVALID);
     } else {
-        NapiAsyncCompleteCallback(env, status, context->asyncContext, "Stk Call Setup Response From App failed", true);
+        NapiAsyncCompleteCallback(env, status, context->asyncContext, "Stk Accept Call Setup Request failed", true);
     }
 }
 
@@ -2111,7 +2111,7 @@ void RejectCallSetupRequestCallback(napi_env env, napi_status status, void *data
         NapiAsyncCompleteCallback(
             env, status, context->asyncContext, "slotId is invalid", false, ERROR_SLOT_ID_INVALID);
     } else {
-        NapiAsyncCompleteCallback(env, status, context->asyncContext, "Stk Call Setup Response From App failed", true);
+        NapiAsyncCompleteCallback(env, status, context->asyncContext, "Stk Reject Call Setup Request failed", true);
     }
 }
 
