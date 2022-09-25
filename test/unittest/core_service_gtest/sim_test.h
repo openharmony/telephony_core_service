@@ -30,12 +30,14 @@ public:
     static void SetUpTestCase();
     void SetUp();
     void TearDown();
+    void ParseOperatorConf(int32_t slotId);
     static void InitBroadCast();
     static void TearDownTestCase();
     static sptr<ICoreService> GetProxy();
     static sptr<ICoreService> telephonyService_;
     static const int32_t slotId_ = 0;
     static const int32_t slotId1_ = 1;
+    static const int32_t slotIdErr_ = -1;
     static const int32_t simId = 1;
 };
 } // namespace Telephony
