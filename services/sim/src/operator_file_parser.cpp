@@ -70,6 +70,10 @@ bool OperatorFileParser::isCachePathExit()
 
 std::string OperatorFileParser::GetOperatorConfigFilePath(std::string filename)
 {
+    if (filename.empty()) {
+        TELEPHONY_LOGE("filename is empty");
+        return filename;
+    }
     return std::string(DEFAULT_OPERATE_CONFIG_DIR) + "/" + filename;
 }
 
