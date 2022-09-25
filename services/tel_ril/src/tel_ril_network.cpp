@@ -431,7 +431,7 @@ void TelRilNetwork::FillCdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::
 }
 
 void TelRilNetwork::FillTdscdmaCellNearbyInfo(
-    CellNearbyInfo &cellNearbyInfo, const HDI::Ril::V1_0::CellNearbyInfo &info)
+    CellNearbyInfo &cellNearbyInfo, const HDI::Ril::V1_0::ICellNearbyInfo &info)
 {
     cellNearbyInfo.ServiceCellParas.tdscdma.arfcn = info.serviceCells.tdscdma.arfcn;
     cellNearbyInfo.ServiceCellParas.tdscdma.syncId = info.serviceCells.tdscdma.syncId;
@@ -571,7 +571,7 @@ void TelRilNetwork::FillCdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI
 }
 
 void TelRilNetwork::FillTdscdmaCurrentCellInfo(
-    CurrentCellInfo &currentCellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info)
+    CurrentCellInfo &currentCellInfo, const HDI::Ril::V1_0::ICurrentCellInfo &info)
 {
     currentCellInfo.ServiceCellParas.tdscdma.arfcn = info.serviceCells.tdscdma.arfcn;
     currentCellInfo.ServiceCellParas.tdscdma.syncId = info.serviceCells.tdscdma.syncId;
