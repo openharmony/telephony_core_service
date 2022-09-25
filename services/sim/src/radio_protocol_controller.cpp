@@ -353,7 +353,8 @@ void RadioProtocolController::ProcessCommunicationResponse(bool result)
     radioProtocolCv_.notify_all();
 }
 
-void RadioProtocolController::UnRegisterEvents() {
+void RadioProtocolController::UnRegisterEvents()
+{
     if (telRilManager_ == nullptr) {
         TELEPHONY_LOGE("RadioProtocolController::UnRegisterEvents telRilManager_ is nullptr");
         return;
