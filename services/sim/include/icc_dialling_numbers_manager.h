@@ -62,7 +62,6 @@ private:
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbersList_;
     std::mutex mtx_;
     bool hasEventDone_ = false;
-    constexpr static const int32_t WAIT_TIME_SECOND = 1;
     std::condition_variable processWait_;
     void ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event);

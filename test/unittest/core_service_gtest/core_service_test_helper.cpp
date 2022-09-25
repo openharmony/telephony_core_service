@@ -19,6 +19,8 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr static const int32_t WAIT_TIME_SECOND = 2;
+
 bool CoreServiceTestHelper::Run(void (*func)(CoreServiceTestHelper &), CoreServiceTestHelper &helper)
 {
     std::thread t(func, std::ref(helper));

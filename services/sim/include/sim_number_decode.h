@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t NEW_WIDTH = 2;
 const int MAX_NUMBER_CHAR = 20;
 enum SectionPosition { POS_START = 1, POS_BRACE = 2, POS_BRACKET = 3, POS_PARENTHESIS = 4, POS_END = 5 };
 enum CommonConstant { MIN_LENGTH = 2, SHIFT_FLAG = 4, CHAR_START = 0xa, HALF_BYTE = 0xf, BYTE_HIGH = 0xf0 };
