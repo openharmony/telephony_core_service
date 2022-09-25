@@ -89,51 +89,7 @@ sptr<ICoreService> SimTest::GetProxy()
  */
 HWTEST_F(SimTest, Telephony_Sim_ParseOperatorConf_0100, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGE("Telephony_Sim_ParseOperatorConf_0100 TelephonyTestService Remote service is null");
-        return;
-    }
-    const std::string rawJson = R"({ "string": "JSON中国", "long": 2147483699, "int": 88, "bool": true,
-        "strA": ["street", "city", "country"], "longA": [ 2147483699, 2147483900, 2147499999],
-        "intA": [1, 2, 3]})";
-    JSONCPP_STRING err;
-    Json::Value root;
-    Json::CharReaderBuilder builder;
-    Json::CharReader *reader(builder.newCharReader());
-    if (!reader->parse(rawJson.c_str(), rawJson.c_str() + rawJson.length(), &root, &err)) {
-        TELEPHONY_LOGE("ParserUtil::ParserPdpProfileJson reader is error!\n");
-        return;
-    }
-    delete reader;
-    OperatorConfigCache ofpc(nullptr, nullptr, SimTest::slotId_);
-    OperatorFileParser ofp;
-    OperatorConfig poc;
-    const std::string iccid = Str16ToStr8(SimTest::telephonyService_->GetSimIccId(SimTest::slotId_));
-    std::string filename = ofpc.EncryptIccId(iccid) + ".json";
-    ofp.WriteOperatorConfigJson(filename, root);
-    Json::Value ret;
-    ofp.ParseOperatorConfigFromFile(poc, filename, ret);
-    if (poc.stringArrayValue.find("string") != poc.stringArrayValue.end()) {
-        EXPECT_EQ("JSON中国", poc.stringValue["string"]);
-    }
-    if (poc.stringArrayValue.find("long") != poc.stringArrayValue.end()) {
-        EXPECT_EQ(2147483699, poc.longValue["long"]);
-    }
-    if (poc.stringArrayValue.find("int") != poc.stringArrayValue.end()) {
-        EXPECT_EQ(88, poc.intValue["int"]);
-    }
-    if (poc.stringArrayValue.find("bool") != poc.stringArrayValue.end()) {
-        EXPECT_EQ(true, poc.boolValue["bool"]);
-    }
-    if (poc.stringArrayValue.find("strA") != poc.stringArrayValue.end()) {
-        EXPECT_EQ("street", poc.stringArrayValue["strA"][0]);
-    }
-    if (poc.intArrayValue.find("intA") != poc.intArrayValue.end()) {
-        EXPECT_EQ(2, poc.intArrayValue["intA"][1]);
-    }
-    if (poc.longArrayValue.find("longA") != poc.longArrayValue.end()) {
-        EXPECT_EQ(2147499999, poc.longArrayValue["longA"][2]);
-    }
+    ParseOperatorConf(SimTest::slotId_);
 }
 
 /**
@@ -143,8 +99,23 @@ HWTEST_F(SimTest, Telephony_Sim_ParseOperatorConf_0100, Function | MediumTest | 
  */
 HWTEST_F(SimTest, Telephony_Sim_ParseOperatorConf_0200, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGE("Telephony_Sim_ParseOperatorConf_0200 TelephonyTestService Remote service is null");
+    ParseOperatorConf(SimTest::slotId1_);
+}
+
+/**
+ * @tc.number  Telephony_Sim_ParseOperatorConf_0300
+ * @tc.name  ParseOperatorConf
+ * @tc.desc Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_ParseOperatorConf_0300, Function | MediumTest | Level1)
+{
+    ParseOperatorConf(SimTest::slotIdErr_);
+}
+
+void SimTest::ParseOperatorConf(int32_t slotId)
+{
+    if (SimTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGE("ParseOperatorConf TelephonyTestService Remote service is null");
         return;
     }
     const std::string rawJson = R"({ "string": "JSON中国", "long": 2147483699, "int": 88, "bool": true,
@@ -159,14 +130,21 @@ HWTEST_F(SimTest, Telephony_Sim_ParseOperatorConf_0200, Function | MediumTest | 
         return;
     }
     delete reader;
-    OperatorConfigCache ofpc(nullptr, nullptr, SimTest::slotId1_);
+    OperatorConfigCache ofpc(nullptr, nullptr, slotId);
     OperatorFileParser ofp;
     OperatorConfig poc;
-    const std::string iccid = Str16ToStr8(SimTest::telephonyService_->GetSimIccId(SimTest::slotId1_));
+    const std::string iccid = Str16ToStr8(SimTest::telephonyService_->GetSimIccId(slotId));
     std::string filename = ofpc.EncryptIccId(iccid) + ".json";
+    if (slotId == SimTest::slotIdErr_) {
+        filename = "";
+    }
     ofp.WriteOperatorConfigJson(filename, root);
     Json::Value ret;
     ofp.ParseOperatorConfigFromFile(poc, filename, ret);
+    if (slotId == SimTest::slotIdErr_) {
+        EXPECT_TRUE(true);
+        return;
+    }
     if (poc.stringArrayValue.find("string") != poc.stringArrayValue.end()) {
         EXPECT_EQ("JSON中国", poc.stringValue["string"]);
     }
