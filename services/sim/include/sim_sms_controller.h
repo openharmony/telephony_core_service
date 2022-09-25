@@ -62,7 +62,6 @@ private:
     bool IsCdmaCardType() const;
     std::vector<std::string> smsList_;
     static std::mutex mtx_;
-    constexpr static const int32_t WAIT_TIME_SECOND = 1;
     std::condition_variable processWait_;
     void ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event);
