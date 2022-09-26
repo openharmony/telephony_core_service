@@ -250,7 +250,8 @@ void NetworkSearchHandler::SimRecordsLoaded(const AppExecFwk::InnerEvent::Pointe
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager != nullptr) {
         RadioTech csRadioTech = static_cast<RadioTech>(networkSearchManager->GetCsRadioTech(slotId_));
-        UpdatePhone(csRadioTech);
+        RadioTech psRadioTech = static_cast<RadioTech>(networkSearchManager->GetPsRadioTech(slotId_));
+        UpdatePhone(csRadioTech, psRadioTech);
     }
 
     if (operatorName_ != nullptr) {
@@ -624,10 +625,10 @@ void NetworkSearchHandler::RadioGetMeid(const AppExecFwk::InnerEvent::Pointer &e
     }
 }
 
-void NetworkSearchHandler::UpdatePhone(RadioTech csRadioTech) const
+void NetworkSearchHandler::UpdatePhone(RadioTech csRadioTech, RadioTech psRadioTech) const
 {
     if (radioInfo_ != nullptr) {
-        radioInfo_->UpdatePhone(csRadioTech);
+        radioInfo_->UpdatePhone(csRadioTech, psRadioTech);
     } else {
         TELEPHONY_LOGE("UpdatePhone networkType is null slotId:%{public}d", slotId_);
     }

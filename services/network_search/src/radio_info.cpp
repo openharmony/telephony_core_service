@@ -212,7 +212,7 @@ PhoneType RadioInfo::GetPhoneType() const
     return phoneType_;
 }
 
-void RadioInfo::UpdatePhone(RadioTech csRadioTech)
+void RadioInfo::UpdatePhone(RadioTech csRadioTech, RadioTech psRadioTech)
 {
     TELEPHONY_LOGI("RadioInfo::UpdatePhone");
     std::shared_ptr<NetworkSearchManager> networkSearchManager = networkSearchManager_.lock();
@@ -220,7 +220,7 @@ void RadioInfo::UpdatePhone(RadioTech csRadioTech)
         TELEPHONY_LOGE("RadioInfo::UpdatePhone networkSearchManager is nullptr");
         return;
     }
-    PhoneType phoneType = RadioTechToPhoneType(csRadioTech);
+    PhoneType phoneType = RadioTechToPhoneType(csRadioTech, psRadioTech);
     if (phoneType_ == phoneType) {
         TELEPHONY_LOGI("RadioInfo::UpdatePhone No Change");
         return;
@@ -245,23 +245,28 @@ void RadioInfo::UpdatePhone(RadioTech csRadioTech)
 
 void RadioInfo::ProcessVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("NetworkType::ProcessVoiceTechChange ok");
     if (event == nullptr) {
-        TELEPHONY_LOGE("NetworkType::ProcessVoiceTechChange event is nullptr");
+        TELEPHONY_LOGE("RadioInfo::ProcessVoiceTechChange event is nullptr");
         return;
     }
-    std::shared_ptr<VoiceRadioTechnology> radioTech = event->GetSharedObject<VoiceRadioTechnology>();
-    if (radioTech == nullptr) {
-        TELEPHONY_LOGE("NetworkType::ProcessVoiceTechChange radioTech is nullptr");
+    std::shared_ptr<VoiceRadioTechnology> csRadioTech = event->GetSharedObject<VoiceRadioTechnology>();
+    if (csRadioTech == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessVoiceTechChange csRadioTech is nullptr");
         return;
     }
-    UpdatePhone(static_cast<RadioTech>(radioTech->actType));
+    std::shared_ptr<NetworkSearchManager> networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessVoiceTechChange networkSearchManager is nullptr");
+        return;
+    }
+    RadioTech psRadioTech = static_cast<RadioTech>(networkSearchManager->GetPsRadioTech(slotId_));
+    UpdatePhone(static_cast<RadioTech>(csRadioTech->actType), psRadioTech);
 }
 
-PhoneType RadioInfo::RadioTechToPhoneType(RadioTech radioTech) const
+PhoneType RadioInfo::RadioTechToPhoneType(RadioTech csRadioTech, RadioTech psRadioTech) const
 {
     PhoneType phoneType = PhoneType::PHONE_TYPE_IS_NONE;
-    switch (radioTech) {
+    switch (csRadioTech) {
         case RadioTech::RADIO_TECHNOLOGY_GSM:
         case RadioTech::RADIO_TECHNOLOGY_WCDMA:
         case RadioTech::RADIO_TECHNOLOGY_HSPA:
@@ -279,7 +284,10 @@ PhoneType RadioInfo::RadioTechToPhoneType(RadioTech radioTech) const
             break;
         case RadioTech::RADIO_TECHNOLOGY_UNKNOWN:
         default:
-            phoneType = PhoneType::PHONE_TYPE_IS_NONE;
+            if (psRadioTech == RadioTech::RADIO_TECHNOLOGY_LTE || psRadioTech == RadioTech::RADIO_TECHNOLOGY_LTE_CA ||
+                psRadioTech == RadioTech::RADIO_TECHNOLOGY_NR) {
+                phoneType = PhoneType::PHONE_TYPE_IS_GSM;
+            }
             break;
     }
     return phoneType;
