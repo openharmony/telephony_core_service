@@ -959,7 +959,7 @@ bool NetworkSearchManager::IsNrSupported(int32_t slotId)
     }
     int32_t modemRaf = simManager_->GetRadioProtocolTech(slotId);
     return (static_cast<uint32_t>(modemRaf) & static_cast<uint32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_NR)) ==
-           static_cast<uint32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_NR);
+        static_cast<uint32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_NR);
 }
 
 NrMode NetworkSearchManager::GetNrOptionMode(int32_t slotId)
