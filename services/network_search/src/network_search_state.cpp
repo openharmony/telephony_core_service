@@ -424,7 +424,7 @@ void NetworkSearchState::CsRadioTechChange()
     }
 
     if (networkState_->GetCsRadioTech() != networkStateOld_->GetCsRadioTech()) {
-        networkSearchManager->UpdatePhone(slotId_, networkState_->GetCsRadioTech());
+        networkSearchManager->UpdatePhone(slotId_, networkState_->GetCsRadioTech(), networkState_->GetPsRadioTech());
     }
 }
 } // namespace Telephony
