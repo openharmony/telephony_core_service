@@ -23,6 +23,15 @@
 namespace OHOS {
 namespace Telephony {
 using CommonEventSupport = OHOS::EventFwk::CommonEventSupport;
+const int32_t DEFAULT_PARAM = -1;
+const std::string PARAM_SLOTID = "slotId";
+const std::string PARAM_STATE = "state";
+const std::string PARAM_REASON = "reason";
+const std::string PARAM_STK_SLOTID = "slotId";
+const std::string PARAM_STK_MSG_CMD = "msgCmd";
+const std::string PARAM_STK_CARD_STATUS = "cardStatus";
+const std::string PARAM_STK_REFRESH_RESULT = "refreshResult";
+const std::string PARAM_STK_ALPHA_STRING = "alphaString";
 
 enum CommentEventTestIntValue {
     COMMON_EVENT_SIM_STATE_CHANGED,
@@ -61,43 +70,36 @@ public:
                 std::cout << "receive a CommonEvent action = " << action
                           << ", slotId = " << want.GetIntParam(PARAM_SLOTID, DEFAULT_PARAM)
                           << ", state = " << want.GetIntParam(PARAM_STATE, DEFAULT_PARAM)
-                          << ", reason = " << want.GetStringParam(PARAM_REASON)
-                          << ", code = " << data.GetCode()
-                          << ", event = " << data.GetData()
-                          << std::endl;
+                          << ", reason = " << want.GetStringParam(PARAM_REASON) << ", code = " << data.GetCode()
+                          << ", event = " << data.GetData() << std::endl;
                 break;
             case COMMON_EVENT_SIM_CARD_DEFAULT_VOICE_SUBSCRIPTION_CHANGED:
             case COMMON_EVENT_SIM_CARD_DEFAULT_SMS_SUBSCRIPTION_CHANGED:
             case COMMON_EVENT_SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED:
             case COMMON_EVENT_SIM_CARD_DEFAULT_MAIN_SUBSCRIPTION_CHANGED:
-                std::cout << "receive a CommonEvent action = " << action
-                          << ", code = " << data.GetCode() << ", event = " << data.GetData()
-                          << ", slotId = " << want.GetIntParam(PARAM_SLOTID, DEFAULT_PARAM)
-                          << std::endl;
+                std::cout << "receive a CommonEvent action = " << action << ", code = " << data.GetCode()
+                          << ", event = " << data.GetData()
+                          << ", slotId = " << want.GetIntParam(PARAM_SLOTID, DEFAULT_PARAM) << std::endl;
                 break;
             case COMMON_EVENT_STK_SESSION_END:
                 std::cout << "receive a CommonEvent action = " << action
-                          << ", slotId = " << want.GetIntParam(PARAM_STK_SLOTID, DEFAULT_PARAM)
-                          << std::endl;
+                          << ", slotId = " << want.GetIntParam(PARAM_STK_SLOTID, DEFAULT_PARAM) << std::endl;
                 break;
             case COMMON_EVENT_STK_COMMAND:
                 std::cout << "receive a CommonEvent action = " << action
                           << ", slotId = " << want.GetIntParam(PARAM_SLOTID, DEFAULT_PARAM)
-                          << ", stkData = " << want.GetStringParam(PARAM_STK_MSG_CMD)
-                          << std::endl;
+                          << ", stkData = " << want.GetStringParam(PARAM_STK_MSG_CMD) << std::endl;
                 break;
             case COMMON_EVENT_STK_ALPHA_IDENTIFIER:
                 std::cout << "receive a CommonEvent action = " << action
                           << ", slotId = " << want.GetIntParam(PARAM_SLOTID, DEFAULT_PARAM)
-                          << ", alphaData = " << want.GetStringParam(PARAM_STK_ALPHA_STRING)
-                          << std::endl;
+                          << ", alphaData = " << want.GetStringParam(PARAM_STK_ALPHA_STRING) << std::endl;
                 break;
             case COMMON_EVENT_STK_CARD_STATE_CHANGED:
                 std::cout << "receive a CommonEvent action = " << action
                           << ", slotId = " << want.GetIntParam(PARAM_SLOTID, DEFAULT_PARAM)
                           << ", newSimState = " << want.GetStringParam(PARAM_STK_CARD_STATUS)
-                          << ", refreshResult = " << want.GetStringParam(PARAM_STK_REFRESH_RESULT)
-                          << std::endl;
+                          << ", refreshResult = " << want.GetStringParam(PARAM_STK_REFRESH_RESULT) << std::endl;
                 break;
             default:
                 std::cout << "receive a CommonEvent action = " << action << std::endl;
@@ -106,15 +108,6 @@ public:
     };
 
 private:
-    const int32_t DEFAULT_PARAM = -1;
-    const std::string PARAM_SLOTID = "slotId";
-    const std::string PARAM_STATE = "state";
-    const std::string PARAM_REASON = "reason";
-    const std::string PARAM_STK_SLOTID = "slotId";
-    const std::string PARAM_STK_MSG_CMD = "msgCmd";
-    const std::string PARAM_STK_CARD_STATUS = "cardStatus";
-    const std::string PARAM_STK_REFRESH_RESULT = "refreshResult";
-    const std::string PARAM_STK_ALPHA_STRING = "alphaString";
     const std::map<std::string, CommentEventTestIntValue> commentEventTestIntValues_ = {
         {CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, COMMON_EVENT_SIM_STATE_CHANGED},
         {CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_VOICE_SUBSCRIPTION_CHANGED,

@@ -26,7 +26,7 @@ static std::string HexToStr(const std::vector<uint8_t> &arr)
 {
     std::stringstream ss;
     for (const auto &v : arr) {
-        ss << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << v;
+        ss << std::hex << std::uppercase << std::setw(NEW_WIDTH) << std::setfill('0') << v;
     }
     return ss.str();
 }

@@ -40,6 +40,21 @@ const int32_t P3 = 15;
 const int32_t COMMAND = 192;
 const int32_t FILEID = 20272;
 const int32_t AUTHTYPE_1 = 0;
+constexpr static const int32_t WAIT_TIME_SECOND = 20;
+constexpr static const int32_t WAIT_TIME_SECOND_LONG = 30;
+const int BANDWIDTH_HYSTERESIS_MS = 3000;
+const int BANDWIDTH_HYSTERESIS_KBPS = 50;
+const int MAX_DOWNLINK_LINK_BANDWIDTH[] = { 100, // VoIP
+    500, // Web
+    1000, // SD
+    5000, // HD
+    10000, // file
+    20000, // 4K
+    50000, // LTE
+    100000,
+    200000, // 5G
+    500000, 1000000 };
+const int MAX_UPLINK_LINK_BANDWIDTH[] = { 100, 500, 1000, 5000, 10000, 20000, 50000, 100000, 200000 };
 #ifndef TEL_TEST_UNSUPPORT
 const int32_t SLOT_ID_0 = 0;
 const int32_t SLOT_ID_1 = 1;
@@ -50,7 +65,7 @@ const std::string TEST_PDU = "A10305810180F6000004F4F29C0E";
 // leave blank, smsc will be acquired automatically
 const std::string TEST_SMSC_PDU = "";
 // smsc addr
-std::string smscAddr = "";
+std::string g_smscAddr = "";
 int32_t tosca = 0;
 std::shared_ptr<Telephony::ITelRilManager> TelRilTest::telRilManager_ = nullptr;
 sptr<ICoreService> TelRilTest::telephonyService_ = nullptr;
@@ -442,16 +457,16 @@ void TelRilTest::RadioRestartTest(int32_t slotId, const std::shared_ptr<AppExecF
     auto event = AppExecFwk::InnerEvent::Get(eventId);
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        uint8_t fun_offline = 4;
-        uint8_t rst_offline = 1;
-        telRilManager_->SetRadioState(slotId, fun_offline, rst_offline, event);
+        uint8_t funOffline = 4;
+        uint8_t rstOffline = 1;
+        telRilManager_->SetRadioState(slotId, funOffline, rstOffline, event);
         TELEPHONY_LOGI("TelRilTest::RadioRestartTest1 -->");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND_LONG);
         ASSERT_TRUE(syncResult);
 
-        uint8_t fun_reboot = 6;
-        uint8_t rst_reboot = 1;
-        telRilManager_->SetRadioState(slotId, fun_reboot, rst_reboot, event);
+        uint8_t funReboot = 6;
+        uint8_t rstReboot = 1;
+        telRilManager_->SetRadioState(slotId, funReboot, rstReboot, event);
         TELEPHONY_LOGI("TelRilTest::RadioRestartTest2 -->");
         bool syncResult2 = WaitGetResult(eventId, handler, WAIT_TIME_SECOND_LONG);
         ASSERT_TRUE(syncResult2);
@@ -845,8 +860,9 @@ void TelRilTest::SetCallWaitTest(int32_t slotId, const std::shared_ptr<AppExecFw
 {
     int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SET_CALL_WAIT);
     auto event = AppExecFwk::InnerEvent::Get(eventId);
-    if (event == nullptr || telRilManager_ == nullptr)
+    if (event == nullptr || telRilManager_ == nullptr) {
         return;
+    }
     event->SetOwner(handler);
     int32_t operating = 0;
     TELEPHONY_LOGI("TelRilTest::SetCallWaitTest -->");
@@ -1119,7 +1135,7 @@ void TelRilTest::SetRilCmSmsCenterAddressTest(int32_t slotId, const std::shared_
         // then set smsc
         eventSetSmsc->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::SetRilCmSmsCenterAddressTest -->");
-        telRilManager_->SetSmscAddr(slotId, tosca, smscAddr, eventSetSmsc);
+        telRilManager_->SetSmscAddr(slotId, tosca, g_smscAddr, eventSetSmsc);
         TELEPHONY_LOGI("TelRilTest::SetRilCmSmsCenterAddressTest --> finished");
         syncResult = WaitGetResult(eventIdSetSmsc, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
@@ -2043,29 +2059,6 @@ void TelRilTest::GetEmergencyCallListTest(int32_t slotId, const std::shared_ptr<
 void TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest(
     int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    const int BANDWIDTH_HYSTERESIS_MS = 3000;
-    const int BANDWIDTH_HYSTERESIS_KBPS = 50;
-    const int MAX_DOWNLINK_LINK_BANDWIDTH[] = {100, // VoIP
-        500, // Web
-        1000, // SD
-        5000, // HD
-        10000, // file
-        20000, // 4K
-        50000, // LTE
-        100000,
-        200000, // 5G
-        500000,
-        1000000};
-    const int MAX_UPLINK_LINK_BANDWIDTH[] = {
-        100,
-        500,
-        1000,
-        5000,
-        10000,
-        20000,
-        50000,
-        100000,
-        200000};
     int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE);
     auto event = AppExecFwk::InnerEvent::Get(eventId);
     if (event != nullptr && telRilManager_ != nullptr) {
@@ -2201,10 +2194,11 @@ void TelRilTest::DemoHandler::ProcessResponseInfo(const AppExecFwk::InnerEvent::
                 TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> RADIO_GET_SMS_CENTER_ADDRESS");
                 std::shared_ptr<ServiceCenterAddress> addr = event->GetSharedObject<ServiceCenterAddress>();
                 if (addr != nullptr) {
-                    smscAddr = addr->address;
+                    g_smscAddr = addr->address;
                     tosca = addr->tosca;
-                    TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> smscAddr=%{public}s,"
-                                   "tosca=%{public}d", smscAddr.c_str(), tosca);
+                    TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> g_smscAddr=%{public}s,"
+                                   "tosca=%{public}d",
+                        g_smscAddr.c_str(), tosca);
                 } else {
                     TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> get resultInfo_");
                     resultInfo_ = event->GetSharedObject<HRilRadioResponseInfo>();
