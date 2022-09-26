@@ -48,7 +48,7 @@ public:
     void UnregisterEvents();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void GetSignalInfo(std::vector<sptr<SignalInformation>> &signals);
-    void UpdatePhone(RadioTech csRadioTech) const;
+    void UpdatePhone(RadioTech csRadioTech, RadioTech psRadioTech) const;
     void GetCellInfoList(std::vector<sptr<CellInformation>> &cells);
     void DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void UpdateImsServiceStatus(const AppExecFwk::InnerEvent::Pointer &event);
