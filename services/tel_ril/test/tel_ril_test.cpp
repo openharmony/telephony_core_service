@@ -357,6 +357,19 @@ public:
     const int32_t COMMAND = 192;
     const int32_t FILEID = 20272;
     const int32_t AUTHTYPE_1 = 0;
+    const int32_t BANDWIDTH_HYSTERESIS_MS = 3000;
+    const int32_t BANDWIDTH_HYSTERESIS_KBPS = 50;
+    const int32_t MAX_DOWNLINK_LINK_BANDWIDTH[] = { 100, // VoIP
+        500, // Web
+        1000, // SD
+        5000, // HD
+        10000, // file
+        20000, // 4K
+        50000, // LTE
+        100000,
+        200000, // 5G
+        500000, 1000000 };
+    const int32_t MAX_UPLINK_LINK_BANDWIDTH[] = { 100, 500, 1000, 5000, 10000, 20000, 50000, 100000, 200000 };
     class DemoHandler : public AppExecFwk::EventHandler {
     public:
         explicit DemoHandler(int32_t slotId, const std::shared_ptr<AppExecFwk::EventRunner> &runner)
@@ -1048,8 +1061,9 @@ void TelRilTest::OnRequestGetCallWaitTest(int32_t slotId, const std::shared_ptr<
 void TelRilTest::OnRequestSetCallWaitTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SET_CALL_WAIT);
-    if (event == nullptr || telRilManager_ == nullptr)
+    if (event == nullptr || telRilManager_ == nullptr) {
         return;
+    }
 
     event->SetOwner(handler);
     int32_t operating;
@@ -1572,22 +1586,6 @@ void TelRilTest::OnRequestGetLinkBandwidthInfoTest(
 void TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest(
     int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    const int32_t BANDWIDTH_HYSTERESIS_MS = 3000;
-    const int32_t BANDWIDTH_HYSTERESIS_KBPS = 50;
-    const int32_t MAX_DOWNLINK_LINK_BANDWIDTH[] = {
-        100,    // VoIP
-        500,    // Web
-        1000,   // SD
-        5000,   // HD
-        10000,  // file
-        20000,  // 4K
-        50000,  // LTE
-        100000,
-        200000, // 5G
-        500000,
-        1000000
-    };
-    const int32_t MAX_UPLINK_LINK_BANDWIDTH[] = {100, 500, 1000, 5000, 10000, 20000, 50000, 100000, 200000};
     int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE);
     auto event = AppExecFwk::InnerEvent::Get(eventId);
     if (event != nullptr && telRilManager_ != nullptr) {

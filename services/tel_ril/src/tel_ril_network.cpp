@@ -429,17 +429,18 @@ void TelRilNetwork::FillCdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::
     cellInfo.ServiceCellParas.cdma.latitude = info.serviceCells.cdma.latitude;
 }
 
-void TelRilNetwork::FillTdscdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::CellNearbyInfo &info)
+void TelRilNetwork::FillTdscdmaCellNearbyInfo(
+    CellNearbyInfo &cellNearbyInfo, const HDI::Ril::V1_0::CellNearbyInfo &info)
 {
-    cellInfo.ServiceCellParas.tdscdma.arfcn = info.serviceCells.tdscdma.arfcn;
-    cellInfo.ServiceCellParas.tdscdma.syncId = info.serviceCells.tdscdma.syncId;
-    cellInfo.ServiceCellParas.tdscdma.sc = info.serviceCells.tdscdma.sc;
-    cellInfo.ServiceCellParas.tdscdma.cellId = info.serviceCells.tdscdma.cellId;
-    cellInfo.ServiceCellParas.tdscdma.lac = info.serviceCells.tdscdma.lac;
-    cellInfo.ServiceCellParas.tdscdma.rscp = info.serviceCells.tdscdma.rscp;
-    cellInfo.ServiceCellParas.tdscdma.drx = info.serviceCells.tdscdma.drx;
-    cellInfo.ServiceCellParas.tdscdma.rac = info.serviceCells.tdscdma.rac;
-    cellInfo.ServiceCellParas.tdscdma.cpid = info.serviceCells.tdscdma.cpid;
+    cellNearbyInfo.ServiceCellParas.tdscdma.arfcn = info.serviceCells.tdscdma.arfcn;
+    cellNearbyInfo.ServiceCellParas.tdscdma.syncId = info.serviceCells.tdscdma.syncId;
+    cellNearbyInfo.ServiceCellParas.tdscdma.sc = info.serviceCells.tdscdma.sc;
+    cellNearbyInfo.ServiceCellParas.tdscdma.cellId = info.serviceCells.tdscdma.cellId;
+    cellNearbyInfo.ServiceCellParas.tdscdma.lac = info.serviceCells.tdscdma.lac;
+    cellNearbyInfo.ServiceCellParas.tdscdma.rscp = info.serviceCells.tdscdma.rscp;
+    cellNearbyInfo.ServiceCellParas.tdscdma.drx = info.serviceCells.tdscdma.drx;
+    cellNearbyInfo.ServiceCellParas.tdscdma.rac = info.serviceCells.tdscdma.rac;
+    cellNearbyInfo.ServiceCellParas.tdscdma.cpid = info.serviceCells.tdscdma.cpid;
 }
 
 void TelRilNetwork::FillNrCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::CellNearbyInfo &info)
@@ -568,17 +569,18 @@ void TelRilNetwork::FillCdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI
     cellInfo.ServiceCellParas.cdma.latitude = info.serviceCells.cdma.latitude;
 }
 
-void TelRilNetwork::FillTdscdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info)
+void TelRilNetwork::FillTdscdmaCurrentCellInfo(
+    CurrentCellInfo &currentCellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info)
 {
-    cellInfo.ServiceCellParas.tdscdma.arfcn = info.serviceCells.tdscdma.arfcn;
-    cellInfo.ServiceCellParas.tdscdma.syncId = info.serviceCells.tdscdma.syncId;
-    cellInfo.ServiceCellParas.tdscdma.sc = info.serviceCells.tdscdma.sc;
-    cellInfo.ServiceCellParas.tdscdma.cellId = info.serviceCells.tdscdma.cellId;
-    cellInfo.ServiceCellParas.tdscdma.lac = info.serviceCells.tdscdma.lac;
-    cellInfo.ServiceCellParas.tdscdma.rscp = info.serviceCells.tdscdma.rscp;
-    cellInfo.ServiceCellParas.tdscdma.drx = info.serviceCells.tdscdma.drx;
-    cellInfo.ServiceCellParas.tdscdma.rac = info.serviceCells.tdscdma.rac;
-    cellInfo.ServiceCellParas.tdscdma.cpid = info.serviceCells.tdscdma.cpid;
+    currentCellInfo.ServiceCellParas.tdscdma.arfcn = info.serviceCells.tdscdma.arfcn;
+    currentCellInfo.ServiceCellParas.tdscdma.syncId = info.serviceCells.tdscdma.syncId;
+    currentCellInfo.ServiceCellParas.tdscdma.sc = info.serviceCells.tdscdma.sc;
+    currentCellInfo.ServiceCellParas.tdscdma.cellId = info.serviceCells.tdscdma.cellId;
+    currentCellInfo.ServiceCellParas.tdscdma.lac = info.serviceCells.tdscdma.lac;
+    currentCellInfo.ServiceCellParas.tdscdma.rscp = info.serviceCells.tdscdma.rscp;
+    currentCellInfo.ServiceCellParas.tdscdma.drx = info.serviceCells.tdscdma.drx;
+    currentCellInfo.ServiceCellParas.tdscdma.rac = info.serviceCells.tdscdma.rac;
+    currentCellInfo.ServiceCellParas.tdscdma.cpid = info.serviceCells.tdscdma.cpid;
 }
 
 void TelRilNetwork::FillNrCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info)
