@@ -142,7 +142,7 @@ std::string OperatorConfigCache::GetOpKey(int32_t slotId)
 {
     char simOpKey[SYSPARA_SIZE] = { 0 };
     std::string key;
-    GetParameter(key.append(OPKEY_PROP_PREFIX).append(std::to_string(slotId)).c_str(), DEFAULT_OPERATOR_KEY.c_str(),
+    GetParameter(key.append(OPKEY_PROP_PREFIX).append(std::to_string(slotId)).c_str(), DEFAULT_OPERATOR_KEY,
         simOpKey, SYSPARA_SIZE);
     key.shrink_to_fit();
     return simOpKey;
