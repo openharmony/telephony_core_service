@@ -18,6 +18,8 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr static const int32_t WAIT_TIME_SECOND = 1;
+
 IccDiallingNumbersManager::IccDiallingNumbersManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simState)
     : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), simStateManager_(simState)

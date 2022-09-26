@@ -18,6 +18,7 @@
 namespace OHOS {
 namespace Telephony {
 std::mutex SimSmsController::mtx_;
+constexpr static const int32_t WAIT_TIME_SECOND = 1;
 
 SimSmsController::SimSmsController(
     const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager)
