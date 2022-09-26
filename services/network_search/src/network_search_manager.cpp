@@ -777,12 +777,12 @@ int32_t NetworkSearchManager::GetPreferredNetworkValue(int32_t slotId) const
     return networkMode;
 }
 
-void NetworkSearchManager::UpdatePhone(int32_t slotId, RadioTech csRadioTech)
+void NetworkSearchManager::UpdatePhone(int32_t slotId, RadioTech csRadioTech, RadioTech psRadioTech)
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
         if (inner->networkSearchHandler_ != nullptr) {
-            inner->networkSearchHandler_->UpdatePhone(csRadioTech);
+            inner->networkSearchHandler_->UpdatePhone(csRadioTech, psRadioTech);
         }
     }
 }
