@@ -15,6 +15,7 @@
 
 #include "network_search_test.h"
 
+#include "accesstoken_kit.h"
 #include "cell_location.h"
 #include "ims_reg_info_callback_gtest.h"
 #include "iservice_registry.h"
@@ -22,6 +23,7 @@
 #include "system_ability_definition.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "token_setproc.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -331,6 +333,7 @@ void NetworkSearchTest::PrintNetworkStateInformation(sptr<NetworkState> result)
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetPsRadioTech_0100, Function | MediumTest | Level1)
 {
+    AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
@@ -349,6 +352,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetPsRadioTech_0100, Functio
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetPsRadioTech_0200, Function | MediumTest | Level1)
 {
+    AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
@@ -367,6 +371,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetPsRadioTech_0200, Functio
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCsRadioTech_0100, Function | MediumTest | Level1)
 {
+    AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
@@ -384,6 +389,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCsRadioTech_0100, Functio
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCsRadioTech_0200, Function | MediumTest | Level1)
 {
+    AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
@@ -401,6 +407,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCsRadioTech_0200, Functio
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
@@ -426,6 +433,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0100, Functi
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
@@ -590,6 +598,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetSignalInfoList_0200, Func
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCellInfoList_0100, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
@@ -608,6 +617,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCellInfoList_0100, Functi
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCellInfoList_0200, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
@@ -936,6 +946,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0400
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0100, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
@@ -960,6 +971,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0100, Function
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0200, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
@@ -984,6 +996,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0200, Function
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0300, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
@@ -1008,6 +1021,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0300, Function
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0400, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
@@ -1032,6 +1046,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0400, Function
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0100, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
@@ -1066,6 +1081,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0100, Function
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0200, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
@@ -1100,6 +1116,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0200, Function
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0300, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
@@ -1134,6 +1151,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0300, Function
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0400, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
@@ -1168,6 +1186,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0400, Function
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
@@ -1187,6 +1206,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0100, Function | Med
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
@@ -1206,6 +1226,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0200, Function | Med
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetMeid_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
@@ -1224,6 +1245,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetMeid_0100, Function | Med
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetMeid_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
@@ -1242,6 +1264,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetMeid_0200, Function | Med
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetUniqueDeviceId_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
@@ -1261,6 +1284,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetUniqueDeviceId_0100, Func
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetUniqueDeviceId_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr ||
         !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
@@ -1454,6 +1478,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0500, Functi
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     int ret = TELEPHONY_SUCCESS;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
@@ -1484,6 +1509,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0100, 
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     int ret = TELEPHONY_ERROR;
     if (NetworkSearchTest::telephonyService_ == nullptr) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
@@ -1505,6 +1531,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0200, 
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0300, Function | MediumTest | Level2)
 {
+    AccessToken token;
     int ret = TELEPHONY_SUCCESS;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
@@ -1526,6 +1553,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0300, 
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0400, Function | MediumTest | Level2)
 {
+    AccessToken token;
     int ret = TELEPHONY_SUCCESS;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
@@ -1543,6 +1571,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0400, 
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0500, Function | MediumTest | Level2)
 {
+    AccessToken token;
     int ret = TELEPHONY_SUCCESS;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
@@ -1573,6 +1602,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0500, 
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0600, Function | MediumTest | Level2)
 {
+    AccessToken token;
     int ret = TELEPHONY_SUCCESS;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
@@ -1594,6 +1624,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0600, 
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0700, Function | MediumTest | Level2)
 {
+    AccessToken token;
     int ret = TELEPHONY_SUCCESS;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
@@ -1611,6 +1642,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0700, 
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     int ret = TELEPHONY_SUCCESS;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
@@ -1643,6 +1675,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0100
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     int ret = TELEPHONY_SUCCESS;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
@@ -1660,6 +1693,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0200
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0300, Function | MediumTest | Level2)
 {
+    AccessToken token;
     int ret = TELEPHONY_ERROR;
     if (NetworkSearchTest::telephonyService_ == nullptr) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
@@ -1677,6 +1711,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0300
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0400, Function | MediumTest | Level2)
 {
+    AccessToken token;
     int ret = TELEPHONY_SUCCESS;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
@@ -1695,6 +1730,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0400
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0500, Function | MediumTest | Level2)
 {
+    AccessToken token;
     int ret = TELEPHONY_SUCCESS;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
@@ -1727,6 +1763,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0500
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0600, Function | MediumTest | Level2)
 {
+    AccessToken token;
     int ret = TELEPHONY_SUCCESS;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
@@ -1744,6 +1781,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0600
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0700, Function | MediumTest | Level2)
 {
+    AccessToken token;
     int ret = TELEPHONY_SUCCESS;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
