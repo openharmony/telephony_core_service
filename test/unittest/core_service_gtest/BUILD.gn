@@ -52,6 +52,9 @@ ohos_unittest("tel_core_service_gtest") {
 
   external_deps = [
     "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "drivers_interface_ril:hril_innerkits",
