@@ -20,6 +20,7 @@
 #include "common_event_support.h"
 #include "common_event_manager.h"
 #include "device_state_handler.h"
+#include "sharing_event_callback_stub.h"
 #include "net_all_capabilities.h"
 #include "net_supplier_info.h"
 #include "system_ability_status_change_stub.h"
@@ -43,9 +44,6 @@ enum DeviceStateEventIntValue {
     COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED,
     COMMON_EVENT_CHARGING,
     COMMON_EVENT_DISCHARGING,
-    COMMON_EVENT_WIFI_HOTSPOT_STATE,
-    COMMON_EVENT_WIFI_AP_STA_JOIN,
-    COMMON_EVENT_WIFI_AP_STA_LEAVE,
     COMMON_EVENT_UNKNOWN,
 };
 
@@ -66,6 +64,19 @@ private:
     std::map<std::string, DeviceStateEventIntValue> deviceStateEventMapIntValues_;
 };
 
+class SharingEventCallback : public NetManagerStandard::SharingEventCallbackStub {
+public:
+    explicit SharingEventCallback(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler);
+    ~SharingEventCallback() = default;
+    void OnSharingStateChanged(const bool &isRunning) override;
+    void OnInterfaceSharingStateChanged(const NetManagerStandard::SharingIfaceType &type, const std::string &iface,
+        const NetManagerStandard::SharingIfaceState &state) override {}
+    void OnSharingUpstreamChanged(const sptr<NetManagerStandard::NetHandle> netHandle) override {}
+
+    private:
+        std::shared_ptr<DeviceStateHandler> handler_ = nullptr;
+};
+
 class DeviceStateObserver {
 public:
     DeviceStateObserver() = default;
@@ -75,18 +86,21 @@ public:
 
 private:
     std::shared_ptr<DeviceStateEventSubscriber> subscriber_;
+    sptr<NetManagerStandard::ISharingEventCallback> sharingEventCallback_ = nullptr;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
 
 private:
     class SystemAbilityStatusChangeListener : public SystemAbilityStatusChangeStub {
     public:
-        explicit SystemAbilityStatusChangeListener(std::shared_ptr<DeviceStateEventSubscriber> &subscriber);
+        SystemAbilityStatusChangeListener(std::shared_ptr<DeviceStateEventSubscriber> &subscriber,
+            sptr<NetManagerStandard::ISharingEventCallback> &callback);
         ~SystemAbilityStatusChangeListener() = default;
         virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
         virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 
     private:
         std::shared_ptr<DeviceStateEventSubscriber> sub_ = nullptr;
+        sptr<NetManagerStandard::ISharingEventCallback> callback_ = nullptr;
     };
 };
 } // namespace Telephony
