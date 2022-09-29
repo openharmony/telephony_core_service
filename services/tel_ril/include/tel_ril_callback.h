@@ -39,6 +39,7 @@ public:
         const HDI::Ril::V1_0::UssdNoticeInfo &ussdNoticeInfo) override;
     int32_t CallSsNotice(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_0::SsNoticeInfo &ssNoticeInfo) override;
+    int32_t CallRsrvccStatusNotify(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
 
     int32_t SetEmergencyCallListResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
     int32_t GetEmergencyCallListResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,

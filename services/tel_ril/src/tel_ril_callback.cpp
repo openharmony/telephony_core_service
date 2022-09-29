@@ -67,6 +67,11 @@ int32_t TelRilCallback::CallSsNotice(
     return Notify(responseInfo, &TelRilManager::GetTelRilCall, &TelRilCall::CallSsNotice, ssNoticeInfo);
 }
 
+int32_t TelRilCallback::CallRsrvccStatusNotify(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
+{
+    return Notify(responseInfo, &TelRilManager::GetTelRilCall, &TelRilCall::CallRsrvccStatusNotify);
+}
+
 int32_t TelRilCallback::GetCallListResponse(
     const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::CallInfoList &callList)
 {
