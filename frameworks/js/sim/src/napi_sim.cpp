@@ -1647,6 +1647,12 @@ void NativeQueryIccDiallingNumbers(napi_env env, void *data)
         diallingNumbers->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
+    if (diallingNumbers->type != static_cast<int32_t>(ContactType::GENERAL_CONTACT) &&
+        diallingNumbers->type != static_cast<int32_t>(ContactType::FIXED_DIALING)) {
+        TELEPHONY_LOGE("NativeQueryIccDiallingNumbers type is invalid");
+        diallingNumbers->asyncContext.context.errorCode = ERROR_PARAMETER_VALUE_INVALID;
+        return;
+    }
     std::vector<std::shared_ptr<DiallingNumbersInfo>> result =
         DelayedRefSingleton<CoreServiceClient>::GetInstance().QueryIccDiallingNumbers(
             diallingNumbers->asyncContext.slotId, diallingNumbers->type);
