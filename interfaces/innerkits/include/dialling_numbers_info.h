@@ -29,8 +29,9 @@ public:
         SIM_ADN = 1,
         SIM_FDN = 2,
     };
+    static const int EMPTY_INDEX = 0;
     int32_t elementaryFileId_ = 0;
-    int32_t index_ = 0;
+    int32_t index_ = EMPTY_INDEX;
     std::u16string name_ = u"";
     std::u16string number_ = u"";
     std::vector<std::u16string> emails_;
