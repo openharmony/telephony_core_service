@@ -405,6 +405,12 @@ bool MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool force
         TELEPHONY_LOGE("MultiSimController::SetActiveSim failed by out of range");
         return false;
     }
+
+    if (!IsValidData(slotId)) {
+        TELEPHONY_LOGE("MultiSimController::SetActiveSim invalid slotid or sim card absent.");
+        return false;
+    }
+
     if (!force && !SetActiveSimToRil(slotId, ENTITY_CARD, enable)) {
         TELEPHONY_LOGE("MultiSimController::SetActiveSim SetActiveSimToRil failed");
         return false;
