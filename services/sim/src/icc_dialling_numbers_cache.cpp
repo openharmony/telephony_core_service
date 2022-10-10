@@ -171,7 +171,13 @@ void IccDiallingNumbersCache::UpdateDiallingNumberToIcc(int fileId,
         TELEPHONY_LOGE("WriteDiallingNumberToSim not load at first");
         return;
     }
-
+    if (diallingNumberInfor == nullptr) {
+        TELEPHONY_LOGE("diallingNumberInfor is nullptr!");
+        return;
+    }
+    if (isDel && index == DiallingNumbersInfo::EMPTY_INDEX) {
+        SearchIndexByNameAndNumber(oldDiallingNumberList, diallingNumberInfor, index);
+    }
     if (!CheckValueAndOperation(oldDiallingNumberList, diallingNumberInfor, index, fileId)) {
         SendExceptionResult(caller, LOADER_ERROR);
         return;
@@ -227,6 +233,19 @@ bool IccDiallingNumbersCache::CheckValueAndOperation(
         }
     }
     return true;
+}
+
+void IccDiallingNumbersCache::SearchIndexByNameAndNumber(
+    const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &list,
+    const std::shared_ptr<DiallingNumbersInfo> &info, int &index)
+{
+    for (auto it = list->begin(); it != list->end(); it++) {
+        std::shared_ptr<DiallingNumbersInfo> &item = *it;
+        if (IsDiallingNumberEqual(info, item)) {
+            index = item->GetIndex();
+            TELEPHONY_LOGI("Search index is %{public}d", index);
+        }
+    }
 }
 
 void IccDiallingNumbersCache::ObtainAllDiallingNumberFiles(
