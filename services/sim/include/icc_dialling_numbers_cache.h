@@ -74,6 +74,8 @@ private:
     bool ArrayEqual(const std::vector<std::u16string> &mailsSrc, const std::vector<std::u16string> &mailsDest);
     bool CheckValueAndOperation(const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &list,
         const std::shared_ptr<DiallingNumbersInfo> &info, int &index, int fileId);
+    void SearchIndexByNameAndNumber(const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &list,
+        const std::shared_ptr<DiallingNumbersInfo> &info, int &index);
     void InitFileTypeMap();
 };
 } // namespace Telephony
