@@ -67,7 +67,7 @@ struct AsyncOperatorConfig {
 };
 
 struct TelNumbersInfo {
-    int32_t recordNumber = ERROR_DEFAULT;
+    int32_t recordNumber = ERROR_NONE;
     std::array<char, ARRAY_SIZE> alphaTag {};
     std::array<char, ARRAY_SIZE> number {};
     std::array<char, ARRAY_SIZE> pin2 {};
