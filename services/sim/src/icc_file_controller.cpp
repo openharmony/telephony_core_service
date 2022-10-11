@@ -57,25 +57,24 @@ void IccFileController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &even
 
 void IccFileController::ProcessLinearRecordSize(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::string str = IccFileController::NULLSTR;
-    std::string path = IccFileController::NULLSTR;
-    uint32_t eventId = event->GetInnerEventId();
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    const AppExecFwk::InnerEvent::Pointer &process = rcvMsg->controlHolder->fileLoaded;
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return;
+    }
     IccFileData *result = &(rcvMsg->fileData);
     std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
-    path = hd->filePath;
-    const char *iccDdata = (result->resultData).c_str();
-    char *rawData = const_cast<char *>(iccDdata);
-    unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData); // for unsigned int bitwise
-
-    if (IsValidSizeData(fileData)) {
-        TELEPHONY_LOGI("ProcessLinearRecordSize valid data");
-    } else {
-        TELEPHONY_LOGI("IccFileTypeMismatch Error type %{public}d", eventId);
+    if (result == nullptr || hd == nullptr) {
+        TELEPHONY_LOGE("result or hd is nullptr");
+        return;
     }
+    const AppExecFwk::InnerEvent::Pointer &process = hd->fileLoaded;
+    TELEPHONY_LOGI("ProcessLinearRecordSize --- resultData: --- %{public}s", result->resultData.c_str());
+    int recordLen = 0;
     int fileSize[] = { 0, 0, 0 };
-    if (!result->resultData.empty()) {
+    std::shared_ptr<unsigned char> rawData = SIMUtils::HexStringConvertToBytes(result->resultData, recordLen);
+    if (recordLen > LENGTH_OF_RECORD) {
+        unsigned char *fileData = rawData.get();
         ParseFileSize(fileSize, RECORD_NUM, fileData);
     }
     SendEfLinearResult(process, fileSize, RECORD_NUM);
