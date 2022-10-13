@@ -40,6 +40,7 @@ public:
         std::shared_ptr<Telephony::SimStateManager> state);
     virtual ~SimFileManager();
     void Init(int slotId);
+    void ClearData();
     std::u16string GetSimOperatorNumeric();
     std::u16string GetISOCountryCodeForSim();
     std::u16string GetSimSpn();

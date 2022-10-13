@@ -104,7 +104,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         TELEPHONY_LOGE("MultiSimMonitor::RefreshData slotId is invalid");
         return;
     }
-    if (controller_ == nullptr || simStateManager_[slotId] == nullptr) {
+    if (controller_ == nullptr || simStateManager_[slotId] == nullptr || simFileManager_[slotId] == nullptr) {
         TELEPHONY_LOGE("MultiSimMonitor::RefreshData controller_ or simStateManager_ is nullptr");
         return;
     }
@@ -112,6 +112,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when sim is absent");
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
+        simFileManager_[slotId]->ClearData();
     }
 }
 

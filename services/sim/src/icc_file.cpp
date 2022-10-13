@@ -81,7 +81,14 @@ IccFile::IccFile(
     TELEPHONY_LOGI("simmgr IccFile::IccFile finish");
 }
 
-void IccFile::Init() {}
+void IccFile::Init()
+{
+    if (stateManager_ != nullptr) {
+        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
+        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
+        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
+    }
+}
 
 void IccFile::StartLoad()
 {
@@ -507,7 +514,7 @@ bool IccFile::HasSimCard()
     return (stateManager_ != nullptr) ? stateManager_->HasSimCard() : false;
 }
 
-void IccFile::UnInit()
+void IccFile::ClearData()
 {
     imsi_ = "";
     iccId_ = "";
@@ -521,6 +528,16 @@ void IccFile::UnInit()
     gid1_ = "";
     gid2_ = "";
     msisdnTag_ = "";
+    fileQueried_ = false;
+}
+void IccFile::UnInit()
+{
+    if (stateManager_ != nullptr) {
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
+    }
+    ClearData();
 }
 } // namespace Telephony
 } // namespace OHOS

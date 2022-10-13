@@ -33,17 +33,6 @@ IsimFile::IsimFile(
     InitMemberFunc();
 }
 
-void IsimFile::Init()
-{
-    TELEPHONY_LOGI("IsimFile:::Init():start");
-    IccFile::Init();
-    if (stateManager_ != nullptr) {
-        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
-        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
-        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
-    }
-}
-
 void IsimFile::StartLoad()
 {
     TELEPHONY_LOGI("IsimFile::StartLoad() start");
@@ -224,6 +213,7 @@ std::string IsimFile::ObtainIsoCountryCode()
 {
     return "";
 }
+
 IsimFile::~IsimFile() {}
 } // namespace Telephony
 } // namespace OHOS
