@@ -509,6 +509,10 @@ bool SimManager::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
         TELEPHONY_LOGE("stkManager is null!");
         return false;
     }
+    if (!HasSimCard(slotId)) {
+        TELEPHONY_LOGE("SendEnvelopeCmd has no sim card!");
+        return false;
+    }
     return stkManager_[slotId]->SendEnvelopeCmd(slotId, cmd);
 }
 
@@ -518,6 +522,10 @@ bool SimManager::SendTerminalResponseCmd(int32_t slotId, const std::string &cmd)
         TELEPHONY_LOGE("stkManager is null!");
         return false;
     }
+    if (!HasSimCard(slotId)) {
+        TELEPHONY_LOGE("SendTerminalResponseCmd has no sim card!");
+        return false;
+    }
     return stkManager_[slotId]->SendTerminalResponseCmd(slotId, cmd);
 }
 
@@ -525,6 +533,10 @@ bool SimManager::SendCallSetupRequestResult(int32_t slotId, bool accept)
 {
     if ((!IsValidSlotId(slotId)) || (stkManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("stkManager is null!");
+        return false;
+    }
+    if (!HasSimCard(slotId)) {
+        TELEPHONY_LOGE("SendCallSetupRequestResult has no sim card!");
         return false;
     }
     return stkManager_[slotId]->SendCallSetupRequestResult(slotId, accept);
