@@ -997,9 +997,26 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0100, Function | Medium
         std::shared_ptr<DiallingNumbersInfo> diallingNumber =
             std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_ADN, 0);
         diallingNumber->name_ = Str8ToStr16("SimAdnZhang");
-        diallingNumber->number_ = Str8ToStr16("17789145956");
+        diallingNumber->number_ = Str8ToStr16("12345678901");
         SimTest::telephonyService_->AddIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
+        DiallingNumbersInfo mInfo = DiallingNumbersInfo();
+        mInfo.UpdateNumber(Str8ToStr16("12345678901"));
+        std::vector<std::u16string> emails = mInfo.GetEmails();
+        mInfo.UpdateEmails(emails);
+        TELEPHONY_LOGI("DiallingNumbersInfo field is %{public}d, index is %{public}d, mInfo is empty %{public}d.",
+            mInfo.GetFileId(), mInfo.GetIndex(), mInfo.IsEmpty());
+        DiallingNumbersInfo mInfoTemp = DiallingNumbersInfo(0, 0);
+        std::u16string nameTemp = diallingNumber->GetName();
+        std::u16string numberTemp = diallingNumber->GetNumber();
+        mInfoTemp = DiallingNumbersInfo(nameTemp, numberTemp);
+        mInfoTemp = DiallingNumbersInfo(nameTemp, numberTemp, emails);
+        mInfoTemp = DiallingNumbersInfo(0, 0, nameTemp, numberTemp);
+        mInfoTemp = DiallingNumbersInfo(0, 0, nameTemp, numberTemp, emails);
+        MessageParcel parcel;
+        mInfoTemp.Marshalling(parcel);
+        mInfoTemp.ReadFromParcel(parcel);
+        mInfoTemp.UnMarshalling(parcel);
         EXPECT_TRUE(true);
     }
 }
@@ -1039,7 +1056,7 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0300, Function | Medium
         std::shared_ptr<DiallingNumbersInfo> diallingNumber =
             std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_ADN, 0);
         diallingNumber->name_ = Str8ToStr16("SimAdnZhang");
-        diallingNumber->number_ = Str8ToStr16("17789145956");
+        diallingNumber->number_ = Str8ToStr16("12345678901");
         SimTest::telephonyService_->AddIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
         EXPECT_TRUE(true);
@@ -1081,7 +1098,7 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0100, Function | Med
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         int index = 1; // Index start from 1
         diallingNumber->name_ = Str8ToStr16("SimAdnLi");
-        diallingNumber->number_ = Str8ToStr16("17789145956");
+        diallingNumber->number_ = Str8ToStr16("12345678901");
         diallingNumber->index_ = index;
         SimTest::telephonyService_->UpdateIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
@@ -1103,7 +1120,7 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0200, Function | Med
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         int index = 1; // Index start from 1
         diallingNumber->name_ = Str8ToStr16("SimAdnLi");
-        diallingNumber->number_ = Str8ToStr16("17789145956");
+        diallingNumber->number_ = Str8ToStr16("12345678901");
         diallingNumber->index_ = index;
         SimTest::telephonyService_->UpdateIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
@@ -1221,7 +1238,7 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccFdnDiallingNumbers_0100, Function | Medium
         std::shared_ptr<DiallingNumbersInfo> diallingNumber =
             std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_FDN, 0);
         diallingNumber->name_ = Str8ToStr16("SimAdnZhang");
-        diallingNumber->number_ = Str8ToStr16("17789145956");
+        diallingNumber->number_ = Str8ToStr16("12345678901");
         diallingNumber->pin2_ = Str8ToStr16("1234");
         SimTest::telephonyService_->AddIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
@@ -1243,7 +1260,7 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccFdnDiallingNumbers_0200, Function | Medium
         std::shared_ptr<DiallingNumbersInfo> diallingNumber =
             std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_FDN, 0);
         diallingNumber->name_ = Str8ToStr16("SimAdnZhang");
-        diallingNumber->number_ = Str8ToStr16("17789145956");
+        diallingNumber->number_ = Str8ToStr16("12345678901");
         diallingNumber->pin2_ = Str8ToStr16("1234");
         SimTest::telephonyService_->AddIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
@@ -1265,7 +1282,7 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccFdnDiallingNumbers_0100, Function | Med
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         int index = 1; // Index start from 1
         diallingNumber->name_ = Str8ToStr16("SimAdnLi");
-        diallingNumber->number_ = Str8ToStr16("17789145956");
+        diallingNumber->number_ = Str8ToStr16("12345678901");
         diallingNumber->pin2_ = Str8ToStr16("1234");
         diallingNumber->index_ = index;
         SimTest::telephonyService_->UpdateIccDiallingNumbers(
@@ -1288,7 +1305,7 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccFdnDiallingNumbers_0200, Function | Med
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         int index = 1; // Index start from 1
         diallingNumber->name_ = Str8ToStr16("SimAdnLi");
-        diallingNumber->number_ = Str8ToStr16("17789145956");
+        diallingNumber->number_ = Str8ToStr16("12345678901");
         diallingNumber->pin2_ = Str8ToStr16("1234");
         diallingNumber->index_ = index;
         SimTest::telephonyService_->UpdateIccDiallingNumbers(
@@ -1457,7 +1474,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowNumber_0100, Function | MediumTest | Leve
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
-        const std::u16string cardNumber = Str8ToStr16("SimNumber17789145956");
+        const std::u16string cardNumber = Str8ToStr16("SimNumber12345678901");
         bool result = SimTest::telephonyService_->SetShowNumber(SimTest::slotId_, cardNumber);
         EXPECT_TRUE(result);
     }
@@ -1475,7 +1492,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowNumber_0200, Function | MediumTest | Leve
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
-        const std::u16string cardNumber = Str8ToStr16("SimNumber17789145956");
+        const std::u16string cardNumber = Str8ToStr16("SimNumber12345678901");
         bool result = SimTest::telephonyService_->SetShowNumber(SimTest::slotId1_, cardNumber);
         EXPECT_TRUE(result);
     }
