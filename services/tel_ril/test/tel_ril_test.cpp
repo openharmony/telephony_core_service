@@ -136,6 +136,30 @@ enum class CustomMessageID : uint32_t {
     MSG_SIM_AUTHENTICATION_DONE = 0x7f000004
 };
 
+const int32_t CID = 1;
+const int32_t REASON = 2;
+const int32_t TYPE = 7;
+const int32_t MAXCONNSTIME = 8;
+const int32_t MAXCONNS = 9;
+const int32_t TYPESBITMAP = 12;
+const int32_t P3 = 15;
+const int32_t COMMAND = 192;
+const int32_t FILEID = 20272;
+const int32_t AUTHTYPE_1 = 0;
+const int32_t BANDWIDTH_HYSTERESIS_MS = 3000;
+const int32_t BANDWIDTH_HYSTERESIS_KBPS = 50;
+const int32_t MAX_DOWNLINK_LINK_BANDWIDTH[] = { 100, // VoIP
+    500, // Web
+    1000, // SD
+    5000, // HD
+    10000, // file
+    20000, // 4K
+    50000, // LTE
+    100000,
+    200000, // 5G
+    500000, 1000000 };
+const int32_t MAX_UPLINK_LINK_BANDWIDTH[] = { 100, 500, 1000, 5000, 10000, 20000, 50000, 100000, 200000 };
+
 using namespace OHOS;
 using namespace OHOS::Telephony;
 using namespace std;
@@ -346,30 +370,6 @@ public:
     void OnRequestGetEmergencyCallListTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetCallFailReasonTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
-    const int32_t CID = 1;
-    const int32_t REASON = 2;
-    const int32_t TYPE = 7;
-    const int32_t MAXCONNSTIME = 8;
-    const int32_t MAXCONNS = 9;
-    const int32_t EVENT_11 = 11;
-    const int32_t TYPESBITMAP = 12;
-    const int32_t P3 = 15;
-    const int32_t COMMAND = 192;
-    const int32_t FILEID = 20272;
-    const int32_t AUTHTYPE_1 = 0;
-    const int32_t BANDWIDTH_HYSTERESIS_MS = 3000;
-    const int32_t BANDWIDTH_HYSTERESIS_KBPS = 50;
-    const int32_t MAX_DOWNLINK_LINK_BANDWIDTH[] = { 100, // VoIP
-        500, // Web
-        1000, // SD
-        5000, // HD
-        10000, // file
-        20000, // 4K
-        50000, // LTE
-        100000,
-        200000, // 5G
-        500000, 1000000 };
-    const int32_t MAX_UPLINK_LINK_BANDWIDTH[] = { 100, 500, 1000, 5000, 10000, 20000, 50000, 100000, 200000 };
     class DemoHandler : public AppExecFwk::EventHandler {
     public:
         explicit DemoHandler(int32_t slotId, const std::shared_ptr<AppExecFwk::EventRunner> &runner)
@@ -851,6 +851,22 @@ void TelRilTest::OnRequestUnlockSimPinTest(int32_t slotId, const std::shared_ptr
 
         TELEPHONY_LOGI("TelRilTest::%{public}s -->", __func__);
         telRilManager_->UnlockPuk(slotId, puk, pin, event);
+        TELEPHONY_LOGI("TelRilTest::%{public}s --> finished", __func__);
+    }
+}
+
+void TelRilTest::OnRequestEnterSimPin2Test(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_ENTER_PIN2);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+
+        std::string pin2;
+        std::cout << "please enter the SIM PIN2:";
+        std::cin >> pin2;
+
+        TELEPHONY_LOGI("TelRilTest::%{public}s -->", __func__);
+        telRilManager_->UnlockPin2(slotId, pin2, event);
         TELEPHONY_LOGI("TelRilTest::%{public}s --> finished", __func__);
     }
 }
