@@ -31,6 +31,12 @@ void TestBroadCast::OnReceiveEvent(const CommonEventData &data)
         std::string plmn = data.GetWant().GetStringParam(CUR_PLMN);
         bool showSpn = data.GetWant().GetBoolParam(CUR_SPN_SHOW, false);
         std::string spn = data.GetWant().GetStringParam(CUR_SPN);
+        std::cout << "OnReceiveEvent COMMON_EVENT_SPN_INFO_CHANGED:" << std::endl;
+        std::cout << "CUR_SLOT_ID: " << slotId << std::endl;
+        std::cout << "CUR_PLMN_SHOW: " << showPlmn << std::endl;
+        std::cout << "CUR_PLMN: " << plmn.c_str() << std::endl;
+        std::cout << "CUR_SPN_SHOW: " << showSpn << std::endl;
+        std::cout << "CUR_SPN: " << spn.c_str() << std::endl;
         TELEPHONY_LOGI(
             "TestBroadCast::OnReceiveEvent slotId:%{public}d, showPlmn:%{public}d, plmn:%{public}s, "
             "showSpn:%{public}d, spn:%{public}s,",
