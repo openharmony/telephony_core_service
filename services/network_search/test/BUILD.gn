@@ -49,7 +49,7 @@ ohos_executable("tel_network_search_test") {
     "samgr:samgr_proxy",
   ]
 
-  defines += [
+  defines = [
     "TELEPHONY_LOG_TAG = \"NetworkSearchTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
