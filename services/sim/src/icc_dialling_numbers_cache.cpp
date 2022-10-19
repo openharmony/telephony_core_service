@@ -192,7 +192,7 @@ void IccDiallingNumbersCache::UpdateDiallingNumberToIcc(int fileId,
     infor.fileId = fileId;
     infor.extFile = ExtendedElementFile(fileId);
     infor.index = index;
-    infor.pin2 = pin2;
+    infor.pin2 = (fileId == ELEMENTARY_FILE_ADN) ? nullptr : pin2;
     infor.isDel = isDel;
     AppExecFwk::InnerEvent::Pointer event =
         BuildCallerInfo(MSG_SIM_CHANGE_DIALLING_NUMBERS_DONE, fileId, index, diallingNumberInfor, caller);
