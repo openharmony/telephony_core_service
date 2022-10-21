@@ -14,6 +14,8 @@
  */
 
 #include "i_network_search_callback_stub.h"
+
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -126,7 +128,7 @@ int INetworkSearchCallbackStub::OnRemoteRequest(
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (myDescriptor != remoteDescriptor) {
         TELEPHONY_LOGE("descriptor check fail!");
-        return DEFAULT_ERROR;
+        return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
     }
     return OnNetworkSearchCallback(static_cast<NetworkSearchCallback>(code), data);
 }
