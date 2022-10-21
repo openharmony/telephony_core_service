@@ -134,7 +134,7 @@ int32_t CoreServiceStub::OnRemoteRequest(
     std::u16string remoteDescripter = data.ReadInterfaceToken();
     if (myDescripter != remoteDescripter) {
         TELEPHONY_LOGE("descriptor checked fail");
-        return TELEPHONY_ERROR;
+        return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
     }
     auto itFunc = memberFuncMap_.find(code);
     if (itFunc != memberFuncMap_.end()) {

@@ -22,6 +22,10 @@ namespace Telephony {
 int32_t ImsRegInfoCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != GetDescriptor()) {
+        TELEPHONY_LOGE("descriptor checked fail");
+        return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
+    }
     TELEPHONY_LOGI("Type is %{public}d", code);
     int32_t slotId = data.ReadInt32();
     int32_t imsRegState = data.ReadInt32();
