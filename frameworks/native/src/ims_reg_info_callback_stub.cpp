@@ -16,6 +16,7 @@
 #include "ims_reg_info_callback_stub.h"
 
 #include "telephony_log_wrapper.h"
+#include "telephony_errors.h"
 
 namespace OHOS {
 namespace Telephony {
