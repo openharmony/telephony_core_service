@@ -29,7 +29,7 @@ public:
     void Init(int slotId);
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) const;
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) const;
-    bool SendCallSetupRequestResult(int32_t slotId, bool accept) const;
+    int32_t SendCallSetupRequestResult(int32_t slotId, bool accept) const;
 
 private:
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;

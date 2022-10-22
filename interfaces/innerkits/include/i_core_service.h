@@ -110,12 +110,12 @@ public:
         const int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) = 0;
     virtual int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) = 0;
     virtual int32_t GetMaxSimCount() = 0;
-    virtual std::u16string GetOpKey(int32_t slotId) = 0;
-    virtual std::u16string GetOpKeyExt(int32_t slotId) = 0;
-    virtual std::u16string GetOpName(int32_t slotId) = 0;
+    virtual int32_t GetOpKey(int32_t slotId, std::u16string &opkey) = 0;
+    virtual int32_t GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt) = 0;
+    virtual int32_t GetOpName(int32_t slotId, std::u16string &opname) = 0;
     virtual bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) = 0;
     virtual bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) = 0;
-    virtual bool SendCallSetupRequestResult(int32_t slotId, bool accept) = 0;
+    virtual int32_t SendCallSetupRequestResult(int32_t slotId, bool accept) = 0;
     virtual bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) = 0;
     virtual std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) = 0;
     virtual bool SendUpdateCellLocationRequest(int32_t slotId) = 0;

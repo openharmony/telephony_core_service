@@ -96,13 +96,13 @@ public:
     bool SetVoiceMailInfo(int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber);
     int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info);
     int32_t GetMaxSimCount();
-    std::u16string GetOpKey(int32_t slotId);
-    std::u16string GetOpKeyExt(int32_t slotId);
-    std::u16string GetOpName(int32_t slotId);
+    int32_t GetOpKey(int32_t slotId, std::u16string &opkey);
+    int32_t GetOpKeyExt(int32_t slotId, std::u16string &opkey);
+    int32_t GetOpName(int32_t slotId, std::u16string &opname);
     int32_t GetCardType(int32_t slotId);
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd);
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd);
-    bool SendCallSetupRequestResult(int32_t slotId, bool accept);
+    int32_t SendCallSetupRequestResult(int32_t slotId, bool accept);
     bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response);
     bool HasOperatorPrivileges(const int32_t slotId);
     int32_t SimAuthentication(
