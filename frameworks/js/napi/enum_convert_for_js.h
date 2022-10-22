@@ -1,0 +1,116 @@
+/*
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef ENUM_CONVERT_FOR_JS_H
+#define ENUM_CONVERT_FOR_JS_H
+
+#include "telephony_errors.h"
+
+namespace OHOS {
+namespace Telephony {
+enum CallManagerErrorCode {
+    // call data error
+    CALL_ERR_INVALID_SLOT_ID = CALL_ERR_OFFSET, // invalid slot id
+    CALL_ERR_INVALID_CALLID,
+    CALL_ERR_PHONE_NUMBER_EMPTY,
+    CALL_ERR_NUMBER_OUT_OF_RANGE,
+    CALL_ERR_UNSUPPORTED_NETWORK_TYPE,
+    CALL_ERR_INVALID_DIAL_SCENE,
+    CALL_ERR_INVALID_VIDEO_STATE,
+    CALL_ERR_UNKNOW_DIAL_TYPE,
+    CALL_ERR_UNKNOW_CALL_TYPE,
+    CALL_ERR_VIDEO_ILLEGAL_CALL_TYPE,
+    // call interface error
+    CALL_ERR_NOT_NEW_STATE,
+    CALL_ERR_CALL_OBJECT_IS_NULL,
+    CALL_ERR_DIAL_IS_BUSY,
+    CALL_ERR_CALL_IS_NOT_ACTIVATED,
+    CALL_ERR_CALL_IS_NOT_ON_HOLDING,
+    CALL_ERR_ILLEGAL_CALL_OPERATION,
+    CALL_ERR_CALL_STATE_MISMATCH_OPERATION,
+    CALL_ERR_CONFERENCE_NOT_EXISTS,
+    CALL_ERR_CONFERENCE_CALL_EXCEED_LIMIT,
+    CALL_ERR_CALL_STATE, // call state error
+    CALL_ERR_CALL_COUNTS_EXCEED_LIMIT, // call count exceed limit
+    CALL_ERR_CALL_CONNECTION_NOT_EXIST, // Connection is null
+    CALL_ERR_GET_RADIO_STATE_FAILED, // radio state error
+    CALL_ERR_EMERGENCY_UNSUPPORT_CONFERENCEABLE,
+    CALL_ERR_PHONE_ANSWER_IS_BUSY,
+    CALL_ERR_PHONE_CALL_ALREADY_EXISTS,
+    CALL_ERR_PHONE_CALLS_TOO_FEW,
+    CALL_ERR_PHONE_TYPE_UNEXPECTED,
+    CALL_ERR_PHONE_CALLSTATE_NOTIFY_FAILED,
+    CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE,
+    CALL_ERR_VIDEO_IN_PROGRESS,
+    CALL_ERR_VIDEO_ILLEAGAL_SCENARIO,
+    CALL_ERR_VIDEO_MODE_CHANGE_NOTIFY_FAILED,
+    CALL_ERR_DIAL_FAILED,
+    CALL_ERR_ANSWER_FAILED,
+    CALL_ERR_REJECT_FAILED,
+    CALL_ERR_HOLD_FAILED,
+    CALL_ERR_UNHOLD_FAILED,
+    CALL_ERR_HANGUP_FAILED,
+    CALL_ERR_CONFERENCE_SEPERATE_FAILED,
+    CALL_ERR_STARTRTT_FAILED,
+    CALL_ERR_STOPRTT_FAILED,
+    // call audio error
+    CALL_ERR_BLUETOOTH_CONNECTION_FAILED,
+    CALL_ERR_SETTING_AUDIO_DEVICE_FAILED,
+    CALL_ERR_AUDIO_UNKNOWN_TONE,
+    CALL_ERR_AUDIO_TONE_PLAY_FAILED,
+    CALL_ERR_AUDIO_TONE_STOP_FAILED,
+    CALL_ERR_AUDIO_SETTING_MUTE_FAILED,
+    CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED,
+    CALL_ERR_AUDIO_START_VIBRATE_FAILED,
+    CALL_ERR_AUDIO_CANCEL_VIBRATE_FAILED,
+    // call video error
+    CALL_ERR_VIDEO_INVALID_COORDINATES,
+    CALL_ERR_VIDEO_INVALID_ZOOM,
+    CALL_ERR_VIDEO_INVALID_ROTATION,
+    CALL_ERR_VIDEO_INVALID_CAMERA_ID,
+    CALL_ERR_INVALID_PATH,
+    CALL_ERR_CAMERA_NOT_TURNED_ON,
+    // call napi error
+    CALL_ERR_CALLBACK_ALREADY_EXIST,
+    CALL_ERR_CALLBACK_NOT_EXIST,
+    CALL_ERR_NAPI_INTERFACE_FAILED,
+    CALL_ERR_DTMF_EXCEED_LIMIT,
+    // call setting error
+    CALL_ERR_INVALID_RESTRICTION_TYPE,
+    CALL_ERR_INVALID_RESTRICTION_MODE,
+    CALL_ERR_INVALID_TRANSFER_TYPE,
+    CALL_ERR_INVALID_TRANSFER_SETTING_TYPE,
+    // call utils error
+    CALL_ERR_FORMAT_PHONE_NUMBER_FAILED,
+    // common error
+    CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE,
+    CALL_ERR_SERVICE_DUMP_FAILED,
+    CALL_ERR_FUNCTION_NOT_SUPPORTED,
+    CALL_ERR_VIDEO_NOT_SUPPORTED,
+};
+
+// 3GPP TS 24.008 V3.9.0 (2001-09)  10.5.4.11 Cause
+enum PROTOCOL_ERROR_TYPE {
+    CALL_ERR_PARAMETER_OUT_OF_RANGE = PROTOCOL_ERR_OFFSET, // (e.g. parameter out of range)
+    CALL_ERR_CALL_ALREADY_EXISTS, // Call completed elsewhere
+    CALL_ERR_RADIO_STATE, // Radio state error, Network out of order
+    CALL_ERR_RESOURCE_UNAVAILABLE, // Resources unavailable, unspecified
+    CALL_ERR_OPTION_NOT_AVAILABLE, // service or option not available
+    CALL_ERR_OPTION_NOT_IMPLEMENTED, // service or option not implemented
+};
+} // namespace Telephony
+} // namespace OHOS
+
+#endif // ENUM_CONVERT_FOR_JS_H

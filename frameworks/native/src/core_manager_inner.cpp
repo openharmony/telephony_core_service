@@ -1620,41 +1620,41 @@ std::u16string CoreManagerInner::GetSimGid2(int32_t slotId)
     return simManager_->GetSimGid2(slotId);
 }
 
-std::u16string CoreManagerInner::GetOpName(int32_t slotId)
+int32_t CoreManagerInner::GetOpName(int32_t slotId, std::u16string &opname)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return u"";
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetOpName(slotId);
+    return simManager_->GetOpName(slotId, opname);
 }
 
-std::u16string CoreManagerInner::GetOpKeyExt(int32_t slotId)
+int32_t CoreManagerInner::GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return u"";
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetOpKeyExt(slotId);
+    return simManager_->GetOpKeyExt(slotId, opkeyExt);
 }
 
-std::u16string CoreManagerInner::GetOpKey()
+int32_t CoreManagerInner::GetOpKey(std::u16string &opkey)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return u"";
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int32_t slotId = simManager_->GetPrimarySlotId();
-    return GetOpKey(slotId);
+    return GetOpKey(slotId, opkey);
 }
 
-std::u16string CoreManagerInner::GetOpKey(int32_t slotId)
+int32_t CoreManagerInner::GetOpKey(int32_t slotId, std::u16string &opkey)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return u"";
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetOpKey(slotId);
+    return simManager_->GetOpKey(slotId, opkey);
 }
 
 std::u16string CoreManagerInner::GetSimTelephoneNumber(int32_t slotId)
@@ -1819,11 +1819,11 @@ bool CoreManagerInner::SendTerminalResponseCmd(int32_t slotId, const std::string
     return simManager_->SendTerminalResponseCmd(slotId, cmd);
 }
 
-bool CoreManagerInner::SendCallSetupRequestResult(int32_t slotId, bool accept)
+int32_t CoreManagerInner::SendCallSetupRequestResult(int32_t slotId, bool accept)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simManager_->SendCallSetupRequestResult(slotId, accept);
 }

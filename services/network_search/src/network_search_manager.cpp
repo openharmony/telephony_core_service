@@ -1139,7 +1139,7 @@ int32_t NetworkSearchManager::RegisterImsRegInfoCallback(
     int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName, const sptr<ImsRegInfoCallback> &callback)
 {
     if (callback == nullptr) {
-        TELEPHONY_LOGE("callback is nullptr");
+        TELEPHONY_LOGE("[slot%{public}d] callback is nullptr", slotId);
         return TELEPHONY_ERR_ARGUMENT_NULL;
     }
     bool isExisted = false;
@@ -1151,8 +1151,8 @@ int32_t NetworkSearchManager::RegisterImsRegInfoCallback(
         }
     }
     if (isExisted) {
-        TELEPHONY_LOGE("Register failed, callback is existent");
-        return TELEPHONY_ERROR;
+        TELEPHONY_LOGI("[slot%{public}d] Ignore register action, since callback is existent", slotId);
+        return TELEPHONY_SUCCESS;
     }
 
     ImsRegInfoCallbackRecord imsRecord;
@@ -1161,7 +1161,8 @@ int32_t NetworkSearchManager::RegisterImsRegInfoCallback(
     imsRecord.bundleName = bundleName;
     imsRecord.imsCallback = callback;
     listImsRegInfoCallbackRecord_.push_back(imsRecord);
-    TELEPHONY_LOGI("Register successfully, callback list size is %{public}zu", listImsRegInfoCallbackRecord_.size());
+    TELEPHONY_LOGI("[slot%{public}d] Register successfully, callback list size is %{public}zu", slotId,
+        listImsRegInfoCallbackRecord_.size());
     return TELEPHONY_SUCCESS;
 }
 
@@ -1179,10 +1180,11 @@ int32_t NetworkSearchManager::UnregisterImsRegInfoCallback(
         }
     }
     if (!isSuccess) {
-        TELEPHONY_LOGE("Unregister failed, callback is nonexistent");
-        return TELEPHONY_ERR_UNREGISTER_CALLBACK_FAIL;
+        TELEPHONY_LOGI("[slot%{public}d] Ignore unregister action, since callback is nonexistent", slotId);
+        return TELEPHONY_SUCCESS;
     }
-    TELEPHONY_LOGI("Unregister successfully, callback list size is  %{public}zu", listImsRegInfoCallbackRecord_.size());
+    TELEPHONY_LOGI("[slot%{public}d] Unregister successfully, callback list size is  %{public}zu", slotId,
+        listImsRegInfoCallbackRecord_.size());
     return TELEPHONY_SUCCESS;
 }
 
