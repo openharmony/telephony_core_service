@@ -96,7 +96,7 @@ struct AsyncDefaultSlotId {
 };
 
 struct AsyncStkCallSetupResult {
-    AsyncContext<bool> asyncContext;
+    AsyncContext<int32_t> asyncContext;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -715,34 +715,34 @@ int32_t CoreServiceClient::GetMaxSimCount()
     return proxy->GetMaxSimCount();
 }
 
-std::u16string CoreServiceClient::GetOpKey(int32_t slotId)
+int32_t CoreServiceClient::GetOpKey(int32_t slotId, std::u16string &opkey)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return u"";
+        return TELEPHONY_ERR_UNINIT;
     }
-    return proxy->GetOpKey(slotId);
+    return proxy->GetOpKey(slotId, opkey);
 }
 
-std::u16string CoreServiceClient::GetOpKeyExt(int32_t slotId)
+int32_t CoreServiceClient::GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return u"";
+        return TELEPHONY_ERR_UNINIT;
     }
-    return proxy->GetOpKeyExt(slotId);
+    return proxy->GetOpKeyExt(slotId, opkeyExt);
 }
 
-std::u16string CoreServiceClient::GetOpName(int32_t slotId)
+int32_t CoreServiceClient::GetOpName(int32_t slotId, std::u16string &opname)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return u"";
+        return TELEPHONY_ERR_UNINIT;
     }
-    return proxy->GetOpName(slotId);
+    return proxy->GetOpName(slotId, opname);
 }
 
 int32_t CoreServiceClient::GetCardType(int32_t slotId)
@@ -775,12 +775,12 @@ bool CoreServiceClient::SendTerminalResponseCmd(int32_t slotId, const std::strin
     return proxy->SendTerminalResponseCmd(slotId, cmd);
 }
 
-bool CoreServiceClient::SendCallSetupRequestResult(int32_t slotId, bool accept)
+int32_t CoreServiceClient::SendCallSetupRequestResult(int32_t slotId, bool accept)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return false;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->SendCallSetupRequestResult(slotId, accept);
 }

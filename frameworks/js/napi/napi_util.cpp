@@ -23,9 +23,23 @@
 #include <memory>
 
 #include "telephony_log_wrapper.h"
+#include "enum_convert_for_js.h"
 
 namespace OHOS {
 namespace Telephony {
+static constexpr const char *JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING =
+    "BusinessError 401: Parameter error. The type of parameter should match or the number of parameters must match.";
+static constexpr const char *JS_ERROR_TELEPHONY_UNKNOW_ERROR_STRING = "Unknown error code.";
+static constexpr const char *JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING = "Invalid parameter value.";
+static constexpr const char *JS_ERROR_TELEPHONY_SERVICE_ERROR_STRING = "Operation failed. Cannot connect to service.";
+static constexpr const char *JS_ERROR_TELEPHONY_SYSTEM_ERROR_STRING = "System internal error.";
+static constexpr const char *JS_ERROR_CALL_DIAL_POLICY_NOT_MET_STRING = "The dialing policy is not met.";
+static constexpr const char *JS_ERROR_CALL_WRONG_MOBILE_NUMBER_STRING = "Wrong mobile number format.";
+static constexpr const char *JS_ERROR_CALL_ABNORMAL_CALL_STATUS_STRING = "Abnormal call status.";
+static constexpr const char *JS_ERROR_CALL_ABNORMAL_VIDEO_CALL_STATUS_STRING = "Abnormal video call status.";
+static constexpr const char *JS_ERROR_DEVICE_NOT_SUPPORT_THIS_API_STRING = "The device does not support this API.";
+static constexpr const char *JS_ERROR_TELEPHONY_NO_SIM_CARD_STRING = "Do not have sim card.";
+
 std::string NapiUtil::ToUtf8(std::u16string str16)
 {
     return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.to_bytes(str16);
@@ -307,6 +321,156 @@ void NapiUtil::DefineEnumClassByName(
     if (status != napi_ok) {
         TELEPHONY_LOGE("DefineEnumClassByName napi_set_named_property failed ret = %d", status);
     }
+}
+
+JsError NapiUtil::ConverErrorMessageForJs(int32_t errorCode)
+{
+    JsError error = {};
+    if (CreateParameterErrorMessageForJs(errorCode, error)) {
+        return error;
+    }
+
+    if (!CreateCommonErrorMessageForJs(errorCode, error) && !CreateCallErrorMessageForJs(errorCode, error)) {
+        error.errorCode = JS_ERROR_TELEPHONY_UNKNOW_ERROR;
+        error.errorMessage = JS_ERROR_TELEPHONY_UNKNOW_ERROR_STRING;
+        TELEPHONY_LOGE("NapiUtil::ConverErrorMessageForJs errorCode is out of range");
+    }
+
+    return error;
+}
+
+bool NapiUtil::CreateParameterErrorMessageForJs(int32_t errorCode, JsError &error)
+{
+    bool flag = true;
+    switch (errorCode) {
+        case ERROR_PARAMETER_COUNTS_INVALID:
+        case ERROR_PARAMETER_TYPE_INVALID:
+        case napi_status::napi_generic_failure:
+        case napi_status::napi_invalid_arg:
+            error.errorCode = JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER;
+            error.errorMessage = JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING;
+            break;
+        case ERROR_SLOT_ID_INVALID:
+            error.errorCode = JS_ERROR_TELEPHONY_ARGUMENT_ERROR;
+            error.errorMessage = JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING;
+            break;
+        default:
+            flag = false;
+            break;
+    }
+
+    return flag;
+}
+
+bool NapiUtil::CreateCommonErrorMessageForJs(int32_t errorCode, JsError &error)
+{
+    if ((errorCode < COMMON_ERR_OFFSET || errorCode >= CALL_ERR_OFFSET)) {
+        return false;
+    }
+    bool flag = true;
+
+    switch (errorCode) {
+        case TELEPHONY_ERR_ARGUMENT_MISMATCH:
+        case TELEPHONY_ERR_ARGUMENT_INVALID:
+        case TELEPHONY_ERR_ARGUMENT_NULL:
+        case TELEPHONY_ERR_SLOTID_INVALID:
+            error.errorCode = JS_ERROR_TELEPHONY_ARGUMENT_ERROR;
+            error.errorMessage = JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING;
+            break;
+        case TELEPHONY_ERR_DESCRIPTOR_MISMATCH:
+        case TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL:
+        case TELEPHONY_ERR_WRITE_DATA_FAIL:
+        case TELEPHONY_ERR_WRITE_REPLY_FAIL:
+        case TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL:
+        case TELEPHONY_ERR_REGISTER_CALLBACK_FAIL:
+        case TELEPHONY_ERR_UNINIT:
+        case TELEPHONY_ERR_UNREGISTER_CALLBACK_FAIL:
+            error.errorCode = JS_ERROR_TELEPHONY_SERVICE_ERROR;
+            error.errorMessage = JS_ERROR_TELEPHONY_SERVICE_ERROR_STRING;
+            break;
+        case TELEPHONY_ERR_FAIL:
+        case TELEPHONY_ERR_MEMCPY_FAIL:
+        case TELEPHONY_ERR_MEMSET_FAIL:
+        case TELEPHONY_ERR_STRCPY_FAIL:
+        case TELEPHONY_ERR_LOCAL_PTR_NULL:
+        case TELEPHONY_ERR_SUBSCRIBE_BROADCAST_FAIL:
+        case TELEPHONY_ERR_ADD_DEATH_RECIPIENT_FAIL:
+        case TELEPHONY_ERR_STRTOINT_FAIL:
+            error.errorCode = JS_ERROR_TELEPHONY_SYSTEM_ERROR;
+            error.errorMessage = JS_ERROR_TELEPHONY_SYSTEM_ERROR_STRING;
+            break;
+        case TELEPHONY_ERR_NO_SIM_CARD:
+            error.errorCode = JS_ERROR_TELEPHONY_NO_SIM_CARD;
+            error.errorMessage = JS_ERROR_TELEPHONY_NO_SIM_CARD_STRING;
+            break;
+        default:
+            flag = false;
+            break;
+    }
+    return flag;
+}
+
+bool NapiUtil::CreateCallErrorMessageForJs(int32_t errorCode, JsError &error)
+{
+    if ((errorCode < CALL_ERR_OFFSET || errorCode >= CELLULAR_DATA_ERR_OFFSET)) {
+        return false;
+    }
+    bool flag = true;
+
+    switch (errorCode) {
+        case CALL_ERR_INVALID_DIAL_SCENE:
+        case CALL_ERR_INVALID_VIDEO_STATE:
+        case CALL_ERR_UNKNOW_DIAL_TYPE:
+        case CALL_ERR_UNKNOW_CALL_TYPE:
+        case CALL_ERR_DIAL_IS_BUSY:
+            error.errorCode = JS_ERROR_CALL_DIAL_POLICY_NOT_MET;
+            error.errorMessage = JS_ERROR_CALL_DIAL_POLICY_NOT_MET_STRING;
+            break;
+        case CALL_ERR_NUMBER_OUT_OF_RANGE:
+        case CALL_ERR_PHONE_NUMBER_EMPTY:
+            error.errorCode = JS_ERROR_CALL_WRONG_MOBILE_NUMBER;
+            error.errorMessage = JS_ERROR_CALL_WRONG_MOBILE_NUMBER_STRING;
+            break;
+        case CALL_ERR_INVALID_CALLID:
+        case CALL_ERR_CALL_STATE:
+        case CALL_ERR_CALL_IS_NOT_ACTIVATED:
+        case CALL_ERR_CALL_IS_NOT_ON_HOLDING:
+        case CALL_ERR_ILLEGAL_CALL_OPERATION:
+        case CALL_ERR_DIAL_FAILED:
+        case CALL_ERR_ANSWER_FAILED:
+        case CALL_ERR_REJECT_FAILED:
+        case CALL_ERR_HOLD_FAILED:
+            error.errorCode = JS_ERROR_CALL_ABNORMAL_CALL_STATUS;
+            error.errorMessage = JS_ERROR_CALL_ABNORMAL_CALL_STATUS_STRING;
+            break;
+        case CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE:
+        case CALL_ERR_VIDEO_IN_PROGRESS:
+        case CALL_ERR_VIDEO_ILLEAGAL_SCENARIO:
+        case CALL_ERR_VIDEO_MODE_CHANGE_NOTIFY_FAILED:
+            error.errorCode = JS_ERROR_CALL_ABNORMAL_VIDEO_CALL_STATUS;
+            error.errorMessage = JS_ERROR_CALL_ABNORMAL_VIDEO_CALL_STATUS_STRING;
+            break;
+        case CALL_ERR_FUNCTION_NOT_SUPPORTED:
+            error.errorCode = JS_ERROR_DEVICE_NOT_SUPPORT_THIS_API;
+            error.errorMessage = JS_ERROR_DEVICE_NOT_SUPPORT_THIS_API_STRING;
+            break;
+        default:
+            flag = false;
+            break;
+    }
+    return flag;
+}
+
+JsError NapiUtil::ConverErrorMessageWithPermissionForJs(int32_t errorCode, std::string funcName, std::string permission)
+{
+    if (errorCode == TELEPHONY_ERR_PERMISSION_ERR) {
+        JsError error = {};
+        error.errorCode = JS_ERROR_TELEPHONY_PERMISSION_DENIED;
+        error.errorMessage = "BusinessError 201: Permission denied. An attempt was made to " + funcName +
+                             " forbidden by permission: " + permission;
+        return error;
+    }
+    return ConverErrorMessageForJs(errorCode);
 }
 } // namespace Telephony
 } // namespace OHOS

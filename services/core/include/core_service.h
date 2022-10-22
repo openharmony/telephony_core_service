@@ -177,17 +177,17 @@ public:
 
     int32_t GetMaxSimCount() override;
 
-    std::u16string GetOpKey(int32_t slotId) override;
+    int32_t GetOpKey(int32_t slotId, std::u16string &opkey) override;
 
-    std::u16string GetOpKeyExt(int32_t slotId) override;
+    int32_t GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt) override;
 
-    std::u16string GetOpName(int32_t slotId) override;
+    int32_t GetOpName(int32_t slotId, std::u16string &opname) override;
 
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
 
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
 
-    bool SendCallSetupRequestResult(int32_t slotId, bool accept) override;
+    int32_t SendCallSetupRequestResult(int32_t slotId, bool accept) override;
 
     bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;
 
