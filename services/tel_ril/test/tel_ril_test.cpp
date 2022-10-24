@@ -148,7 +148,7 @@ const int32_t FILEID = 20272;
 const int32_t AUTHTYPE_1 = 0;
 const int32_t BANDWIDTH_HYSTERESIS_MS = 3000;
 const int32_t BANDWIDTH_HYSTERESIS_KBPS = 50;
-const int32_t MAX_DOWNLINK_LINK_BANDWIDTH[] = { 100, // VoIP
+const int32_t MAX_DOWNLINK_LINK_BANDWIDTH[11] = { 100, // VoIP
     500, // Web
     1000, // SD
     5000, // HD
@@ -158,7 +158,7 @@ const int32_t MAX_DOWNLINK_LINK_BANDWIDTH[] = { 100, // VoIP
     100000,
     200000, // 5G
     500000, 1000000 };
-const int32_t MAX_UPLINK_LINK_BANDWIDTH[] = { 100, 500, 1000, 5000, 10000, 20000, 50000, 100000, 200000 };
+const int32_t MAX_UPLINK_LINK_BANDWIDTH[9] = { 100, 500, 1000, 5000, 10000, 20000, 50000, 100000, 200000 };
 
 using namespace OHOS;
 using namespace OHOS::Telephony;
@@ -2361,158 +2361,185 @@ void Promote()
     cout << "########################### TEL RIL TEST ######################" << endl;
     cout << "usage:" << endl;
 
-    cout << (int32_t)DiffInterfaceId::TEST_SHUT_DOWN << " --> OnRequestShutDownTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_POWER_STATE << " --> OnRequestSetRadioStateTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_POWER_STATE << " --> OnRequestGetRadioStateTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_IMEI << "--> OnRequestGetImeiTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_BASEBAND_VERSION << "--> OnRequestGetBasebandVersionTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_MEID << "--> OnRequestGetMeidTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO << "--> OnRequestGetVoiceRadioTechnology" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_EXIT << "--> Exit" << endl << endl; // exit
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SHUT_DOWN) << " --> OnRequestShutDownTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_POWER_STATE) << " --> OnRequestSetRadioStateTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE) << " --> OnRequestGetRadioStateTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMEI) << "--> OnRequestGetImeiTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_BASEBAND_VERSION) << "--> OnRequestGetBasebandVersionTest"
+         << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_MEID) << "--> OnRequestGetMeidTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO) << "--> OnRequestGetVoiceRadioTechnology"
+         << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_EXIT) << "--> Exit" << endl << endl; // exit
 }
 
 void SimTest()
 {
     /*-----------------------------------------------SIM-------------------------------------*/
     cout << "please input a cmd num: " << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_SIM_CARD_STATUS << "--> OnRequestSimGetSimStatusTest" << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_SIM_IO << "--> OnRequestSimIccIoTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIM_CARD_STATUS) << "--> OnRequestSimGetSimStatusTest"
+         << endl; // pass
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SIM_IO) << "--> OnRequestSimIccIoTest" << endl;
 
-    cout << (int32_t)DiffInterfaceId::TEST_OPEN_LG_SIMIO << "--> OnRequestOpenLGSimIOTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_TRANSMIT_APDU_LOGICAL_CHANNEL
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_OPEN_LG_SIMIO) << "--> OnRequestOpenLGSimIOTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_TRANSMIT_APDU_LOGICAL_CHANNEL)
          << "--> OnRequestTransmitApduLogicalChannelTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_TRANSMIT_APDU_BASIC_CHANNEL
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_TRANSMIT_APDU_BASIC_CHANNEL)
          << "--> OnRequestTransmitApduBasicChannelTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_CLOSE_LG_SIMIO << "--> OnRequestCloseLGSimIOTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SIM_AUTH << "--> OnRequestSimAuthenticationTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_CLOSE_LG_SIMIO) << "--> OnRequestCloseLGSimIOTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SIM_AUTH) << "--> OnRequestSimAuthenticationTest" << endl;
 
-    cout << (int32_t)DiffInterfaceId::TEST_GET_IMSI << "--> OnRequestSimGetImsiTest" << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_GET_ICCID << "--> OnRequestSimGetIccIDTest" << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_GET_SIM_LOCK_STATUS << "--> OnRequestGetSimLockStatusTest" << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_SET_SIM_LOCK << "--> OnRequestSetSimLockTest" << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_GET_CHANGE_SIM_PASSWD << "--> OnRequestChangeSimPasswordTest"
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMSI) << "--> OnRequestSimGetImsiTest" << endl; // pass
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_ICCID) << "--> OnRequestSimGetIccIDTest" << endl; // pass
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIM_LOCK_STATUS) << "--> OnRequestGetSimLockStatusTest"
          << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_ENTER_SIM_PIN << "--> OnRequestEnterSimPinTest" << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_UNLOCK_SIM_PIN << "--> OnRequestUnlockSimPinTest" << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_ENTER_SIM_PIN2 << "--> OnRequestEnterSimPin2Test" << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_UNLOCK_SIM_PIN2 << "--> OnRequestUnlockSimPin2Test" << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_ENABLE_SIM_CARD << "--> OnRequestSetActiveSimTest" << endl; // pass
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_SIM_LOCK) << "--> OnRequestSetSimLockTest" << endl; // pass
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_CHANGE_SIM_PASSWD) << "--> OnRequestChangeSimPasswordTest"
+         << endl; // pass
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_SIM_PIN) << "--> OnRequestEnterSimPinTest" << endl; // pass
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_UNLOCK_SIM_PIN) << "--> OnRequestUnlockSimPinTest"
+         << endl; // pass
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_ENTER_SIM_PIN2) << "--> OnRequestEnterSimPin2Test"
+         << endl; // pass
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_UNLOCK_SIM_PIN2) << "--> OnRequestUnlockSimPin2Test"
+         << endl; // pass
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_ENABLE_SIM_CARD) << "--> OnRequestSetActiveSimTest"
+         << endl; // pass
 
-    cout << (int32_t)DiffInterfaceId::TEST_RILCM_GET_DATA_CALL_LIST_TEST << "--> OnRequestGetDataCallListTest"
-         << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_ACKNOWLEDGE_RILCM_LAST_INCOMING_GSM_SMS_TEST
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_DATA_CALL_LIST_TEST)
+         << "--> OnRequestGetDataCallListTest" << endl; // pass
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_ACKNOWLEDGE_RILCM_LAST_INCOMING_GSM_SMS_TEST)
          << "--> OnRequestSmsAcknowledgeTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_STK_SEND_TERMINAL_RESPONSE << "--> OnRequestSendTerminalResponseCmdTest"
-         << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_STK_SEND_ENVELOPE << "--> OnRequestSendEnvelopeCmdTest" << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_TERMINAL_RESPONSE)
+         << "--> OnRequestSendTerminalResponseCmdTest" << endl; // pass
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_ENVELOPE)
+         << "--> OnRequestSendEnvelopeCmdTest" << endl; // pass
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT)
          << "--> OnRequestSendCallSetupRequestResultTest" << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_GET_RADIO_PROTOCOL << "--> OnRequestGetRadioProtocolTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_RADIO_PROTOCOL << "--> OnRequestSetRadioProtocolTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_RADIO_PROTOCOL)
+         << "--> OnRequestGetRadioProtocolTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_RADIO_PROTOCOL)
+         << "--> OnRequestSetRadioProtocolTest" << endl;
 }
 
 void DataTest()
 {
     cout << "=========== Cellular Data Start =============" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_RILCM_SET_INIT_APN_INFO_TEST << "--> OnRequestSetInitApnInfoTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_RILCM_SETUP_DATA_CALL_TEST << "--> OnRequestDataSetupDataCallTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_RILCM_DEACTIVATE_DATA_CALL_TEST << "--> OnRequestDataDisableDataCallTest"
-         << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_RILCM_GET_LINK_BANDWIDTH_INFO << "--> OnRequestGetLinkBandwidthInfoTest"
-         << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_INIT_APN_INFO_TEST)
+         << "--> OnRequestSetInitApnInfoTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SETUP_DATA_CALL_TEST)
+         << "--> OnRequestDataSetupDataCallTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_DEACTIVATE_DATA_CALL_TEST)
+         << "--> OnRequestDataDisableDataCallTest" << endl; // pass
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_BANDWIDTH_INFO)
+         << "--> OnRequestGetLinkBandwidthInfoTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE)
          << "--> OnRequestSetLinkBandwidthReportingRuleTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST << "--> OnRequestSetDataPermittedTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST)
+         << "--> OnRequestSetDataPermittedTest" << endl;
     cout << "=========== Cellular Data End =============" << endl;
 }
 
 void CallTest()
 {
     /* --------------------------------- CALL -------------------------- */
-    cout << (int32_t)DiffInterfaceId::TEST_CALL_DIAL << " --> OnRequestCallDialTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_HANDUP_CONNECT << " --> OnRequestCallHangupTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_ACCEPT_CALL << "--> OnRequestCallAnswerTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_CURRENT_CALLS << "--> OnRequestCallGetCurrentCallsStatusTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_REJECT_CALL << "--> OnRequestRefusedCallTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_JOIN_CALL << "--> OnRequestCallJoinTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SPLIT_CALL << "--> OnRequestSeparateConferenceTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_CALL_WAIT << " --> OnRequestGetCallWaitTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_CALL_WAIT << " --> OnRequestSetCallWaitTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_CALL_FORWARD << " --> OnRequestGetCallForwardTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_CALL_FORWARD << " --> OnRequestSetCallForwardTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_CALL_DEAL_CLIP << " --> OnRequestGetClipTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_CALL_CLIP << " --> OnRequestSetClipTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_CALL_DEAL_CLIR << " --> OnRequestGetClirTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_CALL_CLIR << " --> OnRequestSetClirTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_CALL_RESTRICTION << " --> OnRequestGetCallRestrictionTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_CALL_RESTRICTION << " --> OnRequestSetCallRestrictionTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SEND_DTMF << " --> OnRequestSendDtmfTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_START_DTMF << " --> OnRequestStartDtmfTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_STOP_DTMF << " --> OnRequestStopDtmfTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_CALL_PREFERENCE_MODE << "--> OnRequestSetCallPreferenceModeTest"
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_CALL_DIAL) << " --> OnRequestCallDialTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_HANDUP_CONNECT) << " --> OnRequestCallHangupTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_ACCEPT_CALL) << "--> OnRequestCallAnswerTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_CURRENT_CALLS) << "--> OnRequestCallGetCurrentCallsStatusTest"
          << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_CALL_PREFERENCE_MODE << "--> OnRequestGetCallPreferenceModeTest"
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_REJECT_CALL) << "--> OnRequestRefusedCallTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_JOIN_CALL) << "--> OnRequestCallJoinTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SPLIT_CALL) << "--> OnRequestSeparateConferenceTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_WAIT) << " --> OnRequestGetCallWaitTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_CALL_WAIT) << " --> OnRequestSetCallWaitTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_FORWARD) << " --> OnRequestGetCallForwardTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_CALL_FORWARD) << " --> OnRequestSetCallForwardTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_DEAL_CLIP) << " --> OnRequestGetClipTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_CALL_CLIP) << " --> OnRequestSetClipTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_DEAL_CLIR) << " --> OnRequestGetClirTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_CALL_CLIR) << " --> OnRequestSetClirTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_RESTRICTION) << " --> OnRequestGetCallRestrictionTest"
          << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_USSD << " --> OnRequestSetUssdTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_USSD << " --> OnRequestGetUssdTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_MUTE << " --> OnRequestSetMuteTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_MUTE << " --> OnRequestGetMuteTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_XLEMA << " --> OnRequestGetEmergencyCallListTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_CALL_FAIL << " --> OnRequestGetCallFailReasonTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_CALL_RESTRICTION) << " --> OnRequestSetCallRestrictionTest"
+         << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SEND_DTMF) << " --> OnRequestSendDtmfTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_START_DTMF) << " --> OnRequestStartDtmfTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_STOP_DTMF) << " --> OnRequestStopDtmfTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_CALL_PREFERENCE_MODE)
+         << "--> OnRequestSetCallPreferenceModeTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_PREFERENCE_MODE)
+         << "--> OnRequestGetCallPreferenceModeTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_USSD) << " --> OnRequestSetUssdTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_USSD) << " --> OnRequestGetUssdTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_MUTE) << " --> OnRequestSetMuteTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_MUTE) << " --> OnRequestGetMuteTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_XLEMA) << " --> OnRequestGetEmergencyCallListTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_FAIL) << " --> OnRequestGetCallFailReasonTest" << endl;
 }
 
 void SmsTest()
 {
     /* --------------------------------- SMS -------------------------- */
-    cout << (int32_t)DiffInterfaceId::TEST_SEND_SMS << "--> OnRequestSendRilCmSmsTest"
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS) << "--> OnRequestSendRilCmSmsTest"
          << endl; // failed, Sim not inserted, radioResponseInfo->error : 2
-    cout << (int32_t)DiffInterfaceId::TEST_SEND_CDMA_SMS << "--> OnRequestSendRilCmCdmaSmsTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_STORAGE_SMS << "--> OnRequestStorageRilCmSmsTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_DELETE_SMS << "--> OnRequestDeleteRilCmSmsTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_UPDATE_SMS << "--> OnRequestUpdateRilCmSmsTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_SMS_CENTER_ADDRESS << "--> OnRequestSetRilCmSmsCenterAddressTest"
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SEND_CDMA_SMS) << "--> OnRequestSendRilCmCdmaSmsTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_STORAGE_SMS) << "--> OnRequestStorageRilCmSmsTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_DELETE_SMS) << "--> OnRequestDeleteRilCmSmsTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_UPDATE_SMS) << "--> OnRequestUpdateRilCmSmsTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_SMS_CENTER_ADDRESS)
+         << "--> OnRequestSetRilCmSmsCenterAddressTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_SMS_CENTER_ADDRESS)
+         << "--> OnRequestGetRilCmSmsCenterAddressTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_CB_CONFIG) << "--> OnRequestSetRilCBConfigTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_CB_CONFIG) << "--> OnRequestGetRilCBConfigTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_CDMA_CB_CONFIG) << "--> OnRequestGetRilCdmaCBConfigTest"
          << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_SMS_CENTER_ADDRESS << "--> OnRequestGetRilCmSmsCenterAddressTest"
-         << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_CB_CONFIG << "--> OnRequestSetRilCBConfigTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_CB_CONFIG << "--> OnRequestGetRilCBConfigTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_CDMA_CB_CONFIG << "--> OnRequestGetRilCdmaCBConfigTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SEND_SMS_EXPECT_MORE << " --> OnRequestSmsSendSmsExpectMoreTest"
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS_EXPECT_MORE) << " --> OnRequestSmsSendSmsExpectMoreTest"
          << endl; // failed, Sim not inserted, radioResponseInfo->error : 2
-    cout << (int32_t)DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE_TEST
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE_TEST)
          << "--> OnRequestNetworkVoiceRegistrationStateTest" << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_GET_RILCM_DATA_REGISTRATION_STATE_TEST
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_DATA_REGISTRATION_STATE_TEST)
          << "--> OnRequestNetworkDataRegistrationStateTest" << endl; // pass
-    cout << (int32_t)DiffInterfaceId::TEST_ADD_CDMA_SMS << "--> OnRequestAddRilCmCdmaSmsTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_DEL_CDMA_SMS << "--> OnRequestDelRilCmCdmaSmsTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_UPDATE_CDMA_SMS << "--> OnRequestUpdateRilCmCdmaSmsTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_ADD_CDMA_SMS) << "--> OnRequestAddRilCmCdmaSmsTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_DEL_CDMA_SMS) << "--> OnRequestDelRilCmCdmaSmsTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_UPDATE_CDMA_SMS) << "--> OnRequestUpdateRilCmCdmaSmsTest"
+         << endl;
 }
 
 void NetworkTest()
 {
     /* --------------------------------- Network -------------------------- */
-    cout << (int32_t)DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE << "--> OnRequestSetPreferredNetworkTest"
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE)
+         << "--> OnRequestSetPreferredNetworkTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE)
+         << "--> OnRequestGetPreferredNetworkTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_CURRENT_CELL_INFO) << " --> OnRequestGetCurrentCellInfoTest"
          << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE << "--> OnRequestGetPreferredNetworkTest"
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_CELL_INFO_LIST) << " --> OnRequestGetCellInfoListTest"
          << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_CURRENT_CELL_INFO << " --> OnRequestGetCurrentCellInfoTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_CELL_INFO_LIST << " --> OnRequestGetCellInfoListTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_OPERATOR << " --> OnRequestNetworkOperatorTest"
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_OPERATOR) << " --> OnRequestNetworkOperatorTest"
          << endl; // failed, Invalid response: nullptr, radioResponseInfo->error : 2
-    cout << (int32_t)DiffInterfaceId::TEST_GET_NETWORKS_TO_USE << "--> OnRequestGetNetworkSearchInformationTest"
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_NETWORKS_TO_USE)
+         << "--> OnRequestGetNetworkSearchInformationTest"
          << endl; // failed, Invalid response: nullptr, radioResponseInfo->error : 2
-    cout << (int32_t)DiffInterfaceId::TEST_GET_SELECTION_MOD_FOR_NETWORKS << "--> OnRequestGetNetworkSelectionModeTest"
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_SELECTION_MOD_FOR_NETWORKS)
+         << "--> OnRequestGetNetworkSelectionModeTest"
          << endl; // failed, Invalid response: nullptr, radioResponseInfo->error : 2
-    cout << (int32_t)DiffInterfaceId::TEST_SET_MODE_AUTOMATIC_NETWORKS << "--> OnRequestSetNetworkSelectionModeTest"
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_MODE_AUTOMATIC_NETWORKS)
+         << "--> OnRequestSetNetworkSelectionModeTest"
          << endl; // failed, Invalid response: nullptr, radioResponseInfo->error : 2
-    cout << (int32_t)DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH << "--> OnRequestNetworkGetRssiTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_CS_REG_STATUS << "--> OnRequestGetCsRegStatusTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_PS_REG_STATUS << "--> OnRequestGetPsRegStatusTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG << "--> OnRequestGetPhysicalChannelConfig"
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH) << "--> OnRequestNetworkGetRssiTest"
          << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_LOCATE_UPDATES << "--> OnRequestSetLocateUpdatesTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_NOTIFICATION_FILTER << "--> OnRequestSetNotificationFilterTest" << endl;
-    cout << (int32_t)DiffInterfaceId::TEST_SET_DEVICE_STATE << "--> OnRequestSetDeviceStateTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_CS_REG_STATUS) << "--> OnRequestGetCsRegStatusTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_PS_REG_STATUS) << "--> OnRequestGetPsRegStatusTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG)
+         << "--> OnRequestGetPhysicalChannelConfig" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_LOCATE_UPDATES) << "--> OnRequestSetLocateUpdatesTest"
+         << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_NOTIFICATION_FILTER)
+         << "--> OnRequestSetNotificationFilterTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_DEVICE_STATE) << "--> OnRequestSetDeviceStateTest" << endl;
 }
 } // namespace
 } // namespace Telephony
