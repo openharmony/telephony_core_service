@@ -2412,11 +2412,14 @@ void SimTest()
          << "--> OnRequestSmsAcknowledgeTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_TERMINAL_RESPONSE)
          << "--> OnRequestSendTerminalResponseCmdTest" << endl; // pass
-    cout << static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_ENVELOPE) << "--> OnRequestSendEnvelopeCmdTest" << endl; // pass
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_ENVELOPE)
+         << "--> OnRequestSendEnvelopeCmdTest" << endl; // pass
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT)
          << "--> OnRequestSendCallSetupRequestResultTest" << endl; // pass
-    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_RADIO_PROTOCOL) << "--> OnRequestGetRadioProtocolTest" << endl;
-    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_RADIO_PROTOCOL) << "--> OnRequestSetRadioProtocolTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_RADIO_PROTOCOL)
+         << "--> OnRequestGetRadioProtocolTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_RADIO_PROTOCOL)
+         << "--> OnRequestSetRadioProtocolTest" << endl;
 }
 
 void DataTest()
