@@ -539,5 +539,12 @@ void IccFile::UnInit()
     }
     ClearData();
 }
+
+void IccFile::SaveCountryCode()
+{
+    std::string countryCode = ObtainIsoCountryCode();
+    std::string key = COUNTRY_CODE_KEY + std::to_string(slotId_);
+    SetParameter(key.c_str(), countryCode.c_str());
+}
 } // namespace Telephony
 } // namespace OHOS
