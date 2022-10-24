@@ -34,8 +34,12 @@ int32_t ImsCoreServiceProxy::GetImsRegistrationStatus(int32_t slotId)
         TELEPHONY_LOGE("write slotId fail!");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-
-    int32_t error = Remote()->SendRequest(IMS_GET_REGISTRATION_STATUS, in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote is null");
+        return TELEPHONY_ERR_FAIL;
+    }
+    int32_t error = remote->SendRequest(IMS_GET_REGISTRATION_STATUS, in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -60,7 +64,12 @@ int32_t ImsCoreServiceProxy::RegisterImsCoreServiceCallback(const sptr<ImsCoreSe
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
 
-    int32_t error = Remote()->SendRequest(IMS_REGISTER_CALLBACK, in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_FAIL;
+    }
+    int32_t error = remote->SendRequest(IMS_REGISTER_CALLBACK, in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -77,11 +86,12 @@ sptr<IRemoteObject> ImsCoreServiceProxy::GetProxyObjectPtr(ImsServiceProxyType p
         return nullptr;
     }
     dataParcel.WriteInt32(static_cast<int32_t>(proxyType));
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return nullptr;
     }
-    int32_t error = Remote()->SendRequest(IMS_GET_PROXY_OBJECT_PTR, dataParcel, replyParcel, option);
+    int32_t error = remote->SendRequest(IMS_GET_PROXY_OBJECT_PTR, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function GetProxyObjectPtr failed! errCode:%{public}d", error);
         return nullptr;
