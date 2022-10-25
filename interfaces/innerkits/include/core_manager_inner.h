@@ -228,7 +228,7 @@ public:
     bool HasOperatorPrivileges(const int32_t slotId);
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd);
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd);
-    bool SendCallSetupRequestResult(int32_t slotId, bool accept);
+    int32_t SendCallSetupRequestResult(int32_t slotId, bool accept);
     bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response);
     bool HasSimCard(int32_t slotId);
     int32_t GetSimState(int32_t slotId);
@@ -255,10 +255,10 @@ public:
     int32_t GetSimId(int32_t slotId);
     std::u16string GetSimGid1(int32_t slotId);
     std::u16string GetSimGid2(int32_t slotId);
-    std::u16string GetOpName(int32_t slotId);
-    std::u16string GetOpKeyExt(int32_t slotId);
-    std::u16string GetOpKey();
-    std::u16string GetOpKey(int32_t slotId);
+    int32_t GetOpName(int32_t slotId, std::u16string &opname);
+    int32_t GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt);
+    int32_t GetOpKey(std::u16string &opkey);
+    int32_t GetOpKey(int32_t slotId, std::u16string &opkey);
     std::u16string GetSimTelephoneNumber(int32_t slotId);
     std::u16string GetSimTeleNumberIdentifier(const int32_t slotId);
     std::u16string GetVoiceMailIdentifier(int32_t slotId);

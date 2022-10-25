@@ -71,7 +71,7 @@ public:
     // STK
     virtual bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) = 0;
     virtual bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) = 0;
-    virtual bool SendCallSetupRequestResult(int32_t slotId, bool accept) = 0;
+    virtual int32_t SendCallSetupRequestResult(int32_t slotId, bool accept) = 0;
     // SimFile
     virtual std::u16string GetSimOperatorNumeric(int32_t slotId) = 0;
     virtual std::u16string GetISOCountryCodeForSim(int32_t slotId) = 0;
@@ -83,9 +83,9 @@ public:
     virtual int32_t GetSimId(int32_t slotId) = 0;
     virtual std::u16string GetSimGid1(int32_t slotId) = 0;
     virtual std::u16string GetSimGid2(int32_t slotId) = 0;
-    virtual std::u16string GetOpName(int32_t slotId) = 0;
-    virtual std::u16string GetOpKey(int32_t slotId) = 0;
-    virtual std::u16string GetOpKeyExt(int32_t slotId) = 0;
+    virtual int32_t GetOpName(int32_t slotId, std::u16string &opname) = 0;
+    virtual int32_t GetOpKey(int32_t slotId, std::u16string &opkey) = 0;
+    virtual int32_t GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt) = 0;
     virtual std::u16string GetSimTelephoneNumber(int32_t slotId) = 0;
     virtual std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) = 0;
     virtual std::u16string GetVoiceMailIdentifier(int32_t slotId) = 0;

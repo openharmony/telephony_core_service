@@ -841,31 +841,31 @@ int32_t CoreService::GetMaxSimCount()
     return slotCount;
 }
 
-std::u16string CoreService::GetOpKey(int32_t slotId)
+int32_t CoreService::GetOpKey(int32_t slotId, std::u16string &opkey)
 {
     TELEPHONY_LOGI("CoreService::GetOpKey(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
-        return std::u16string();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetOpKey(slotId);
+    return simManager_->GetOpKey(slotId, opkey);
 }
 
-std::u16string CoreService::GetOpKeyExt(int32_t slotId)
+int32_t CoreService::GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt)
 {
     TELEPHONY_LOGI("CoreService::GetOpKeyExt(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
-        return std::u16string();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetOpKeyExt(slotId);
+    return simManager_->GetOpKeyExt(slotId, opkeyExt);
 }
 
-std::u16string CoreService::GetOpName(int32_t slotId)
+int32_t CoreService::GetOpName(int32_t slotId, std::u16string &opname)
 {
     TELEPHONY_LOGI("CoreService::GetOpName(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
-        return std::u16string();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetOpName(slotId);
+    return simManager_->GetOpName(slotId, opname);
 }
 
 bool CoreService::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
@@ -894,14 +894,15 @@ bool CoreService::SendTerminalResponseCmd(int32_t slotId, const std::string &cmd
     return simManager_->SendTerminalResponseCmd(slotId, cmd);
 }
 
-bool CoreService::SendCallSetupRequestResult(int32_t slotId, bool accept)
+int32_t CoreService::SendCallSetupRequestResult(int32_t slotId, bool accept)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("CoreService::SendEnvelopeCmd simManager_ is nullptr");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
-        return false;
+        TELEPHONY_LOGE("CoreService::SendCallSetupRequestResult, Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
     }
     TELEPHONY_LOGI("CoreService::SendCallSetupRequestResult(), slotId = %{public}d", slotId);
     return simManager_->SendCallSetupRequestResult(slotId, accept);

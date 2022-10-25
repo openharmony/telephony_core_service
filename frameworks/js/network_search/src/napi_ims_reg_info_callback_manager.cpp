@@ -29,30 +29,29 @@ int32_t NapiImsRegInfoCallbackManager::RegisterImsRegStateCallback(ImsRegStateCa
     std::lock_guard<std::mutex> lock(mutex_);
     for (auto iter : listImsRegStateCallback_) {
         if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType)) {
-            TELEPHONY_LOGE(
-                "Register imsRegState callback failed, callback is existent, slotId %{public}d, type %{public}d",
+            TELEPHONY_LOGI("[slot%{public}d] Ignore register action, since callback is existent, type %{public}d",
                 slotId, imsSrvType);
-            return TELEPHONY_ERROR;
+            return TELEPHONY_SUCCESS;
         }
     }
     stateCallback.imsCallback = new NapiImsRegInfoCallback();
     if (stateCallback.imsCallback == nullptr) {
-        TELEPHONY_LOGE("Creat ImsRegInfoCallback failed, slotId %{public}d, type %{public}d,", slotId, imsSrvType);
-        return TELEPHONY_ERROR;
+        TELEPHONY_LOGE("[slot%{public}d] Creat ImsRegInfoCallback failed, type %{public}d,", slotId, imsSrvType);
+        return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
     }
     int32_t ret = DelayedRefSingleton<CoreServiceClient>::GetInstance().RegisterImsRegInfoCallback(
         slotId, imsSrvType, stateCallback.imsCallback);
     if (ret == TELEPHONY_SUCCESS) {
         listImsRegStateCallback_.push_back(stateCallback);
         TELEPHONY_LOGI(
-            "Register imsRegState callback successfully, slotId %{public}d, type %{public}d", slotId, imsSrvType);
+            "[slot%{public}d] Register imsRegState callback successfully, type %{public}d", slotId, imsSrvType);
     } else {
         if (stateCallback.imsCallback != nullptr) {
             delete stateCallback.imsCallback;
             stateCallback.imsCallback = nullptr;
         }
-        TELEPHONY_LOGE("Register imsRegState callback failed, slotId %{public}d, type %{public}d, ret %{public}d",
-            slotId, imsSrvType, ret);
+        TELEPHONY_LOGE("[slot%{public}d] Register imsRegState callback failed, type %{public}d, ret %{public}d", slotId,
+            imsSrvType, ret);
     }
     return ret;
 }
@@ -60,19 +59,12 @@ int32_t NapiImsRegInfoCallbackManager::RegisterImsRegStateCallback(ImsRegStateCa
 int32_t NapiImsRegInfoCallbackManager::UnregisterImsRegStateCallback(
     napi_env env, int32_t slotId, ImsServiceType imsSrvType)
 {
-    int32_t ret = TELEPHONY_ERROR;
+    int32_t ret = TELEPHONY_SUCCESS;
     std::lock_guard<std::mutex> lock(mutex_);
+    ret = DelayedRefSingleton<CoreServiceClient>::GetInstance().UnregisterImsRegInfoCallback(slotId, imsSrvType);
     auto iter = listImsRegStateCallback_.begin();
     for (; iter != listImsRegStateCallback_.end(); ++iter) {
         if ((iter->slotId == slotId) && (iter->imsSrvType == imsSrvType)) {
-            ret =
-                DelayedRefSingleton<CoreServiceClient>::GetInstance().UnregisterImsRegInfoCallback(slotId, imsSrvType);
-            if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE(
-                    "Unregister imsRegState callback Failed, slotId %{public}d, type %{public}d, ret %{public}d",
-                    slotId, imsSrvType, ret);
-                return ret;
-            }
             if (iter->imsCallback != nullptr) {
                 delete iter->imsCallback;
                 iter->imsCallback = nullptr;
@@ -82,7 +74,7 @@ int32_t NapiImsRegInfoCallbackManager::UnregisterImsRegStateCallback(
         }
     }
     TELEPHONY_LOGI(
-        "Unregister imsRegState callback successfully, slotId %{public}d, type %{public}d", slotId, imsSrvType);
+        "[slot%{public}d] Unregister imsRegState callback successfully, type %{public}d", slotId, imsSrvType);
     return ret;
 }
 
@@ -98,11 +90,11 @@ int32_t NapiImsRegInfoCallbackManager::ReportImsRegInfo(
         }
     }
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("Report imsRegState callback failed, slotId %{public}d, type %{public}d, ret %{public}d", slotId,
+        TELEPHONY_LOGE("[slot%{public}d] Report imsRegState callback failed, type %{public}d, ret %{public}d", slotId,
             imsSrvType, ret);
         return ret;
     }
-    TELEPHONY_LOGI("Report imsRegState callback successfully, slotId %{public}d, type %{public}d", slotId, imsSrvType);
+    TELEPHONY_LOGI("[slot%{public}d] Report imsRegState callback successfully, type %{public}d", slotId, imsSrvType);
     return ret;
 }
 

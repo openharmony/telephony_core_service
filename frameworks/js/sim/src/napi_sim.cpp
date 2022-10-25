@@ -16,6 +16,7 @@
 #include "napi_sim.h"
 
 #include <memory>
+#include <string>
 #include <string_view>
 #include "core_service_client.h"
 #include "napi_parameter_util.h"
@@ -24,6 +25,7 @@
 #include "network_state.h"
 #include "sim_state_type.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_permission.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -58,8 +60,8 @@ napi_value NapiCreateAsyncWork(napi_env env, napi_callback_info info, std::strin
     auto inParaTp = std::make_tuple(&asyncContext->slotId, &context.callbackRef);
     std::optional<NapiError> errCode = MatchParameters(env, argv, argc, inParaTp);
     if (errCode.has_value()) {
-        const std::string errMsg = "type of input parameters error : " + std::to_string(errCode.value());
-        napi_throw_error(env, nullptr, errMsg.c_str());
+        JsError error = NapiUtil::ConverErrorMessageForJs(errCode.value());
+        napi_throw_error(env, std::to_string(error.errorCode).c_str(), error.errorMessage.c_str());
         return nullptr;
     }
 
@@ -95,8 +97,8 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncCo
 
     std::optional<NapiError> errCode = MatchParameters(env, argv, argc, theTuple);
     if (errCode.has_value()) {
-        const std::string errMsg = "type of input parameters error : " + std::to_string(errCode.value());
-        napi_throw_error(env, nullptr, errMsg.c_str());
+        JsError error = NapiUtil::ConverErrorMessageForJs(errCode.value());
+        napi_throw_error(env, std::to_string(error.errorCode).c_str(), error.errorMessage.c_str());
         return nullptr;
     }
 
@@ -180,6 +182,70 @@ void NapiAsyncCompleteCallback(napi_env env, napi_status status, const AsyncCont
         NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, context.callbackRef));
     }
     NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context.work));
+}
+
+template<typename T>
+void NapiAsyncBaseCompleteCallback(
+    napi_env env, const AsyncContext<T> &asyncContext, JsError error, bool funcIgnoreReturnVal = false)
+{
+    const BaseContext &context = asyncContext.context;
+    if (context.deferred != nullptr && !context.resolved) {
+        napi_value errorMessage = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
+        NAPI_CALL_RETURN_VOID(env, napi_reject_deferred(env, context.deferred, errorMessage));
+        NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context.work));
+        return;
+    }
+
+    if (context.deferred != nullptr && context.resolved) {
+        napi_value res =
+            (funcIgnoreReturnVal ? NapiUtil::CreateUndefined(env) : GetNapiValue(env, asyncContext.callbackVal));
+        NAPI_CALL_RETURN_VOID(env, napi_resolve_deferred(env, context.deferred, res));
+        NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context.work));
+        return;
+    }
+
+    napi_value res =
+        (funcIgnoreReturnVal ? NapiUtil::CreateUndefined(env) : GetNapiValue(env, asyncContext.callbackVal));
+    napi_value callbackValue[] { NapiUtil::CreateUndefined(env), res };
+    if (!context.resolved) {
+        callbackValue[0] = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
+        callbackValue[1] = NapiUtil::CreateUndefined(env);
+    }
+    napi_value undefined = nullptr;
+    napi_value callback = nullptr;
+    napi_value result = nullptr;
+    NAPI_CALL_RETURN_VOID(env, napi_get_undefined(env, &undefined));
+    NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, context.callbackRef, &callback));
+    NAPI_CALL_RETURN_VOID(
+        env, napi_call_function(env, undefined, callback, std::size(callbackValue), callbackValue, &result));
+    NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, context.callbackRef));
+    NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context.work));
+}
+
+template<typename T>
+void NapiAsyncPermissionCompleteCallback(
+    napi_env env, napi_status status, const AsyncContext<T> &asyncContext, std::string func, std::string permission)
+{
+    if (status != napi_ok) {
+        napi_throw_type_error(env, nullptr, "excute failed");
+        return;
+    }
+
+    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(asyncContext.context.errorCode, func, permission);
+    NapiAsyncBaseCompleteCallback(env, asyncContext, error, true);
+}
+
+template<typename T>
+void NapiAsyncCommomCompleteCallback(
+    napi_env env, napi_status status, const AsyncContext<T> &asyncContext, bool funcIgnoreReturnVal)
+{
+    if (status != napi_ok) {
+        napi_throw_type_error(env, nullptr, "excute failed");
+        return;
+    }
+
+    JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext.context.errorCode);
+    NapiAsyncBaseCompleteCallback(env, asyncContext, error, funcIgnoreReturnVal);
 }
 
 napi_value IccAccountInfoConversion(napi_env env, const IccAccountInfo &iccAccountInfo)
@@ -2054,22 +2120,19 @@ void NativeAcceptCallSetupRequest(napi_env env, void *data)
         context->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    context->asyncContext.callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().
-        SendCallSetupRequestResult(context->asyncContext.slotId, true);
-    TELEPHONY_LOGI("NAPI NativeAcceptCallSetupRequest %{public}d", context->asyncContext.callbackVal);
-    context->asyncContext.context.resolved = context->asyncContext.callbackVal;
+    int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SendCallSetupRequestResult(
+        context->asyncContext.slotId, true);
+    TELEPHONY_LOGI("NAPI NativeAcceptCallSetupRequest %{public}d", errorCode);
+    context->asyncContext.context.errorCode = errorCode;
+    context->asyncContext.context.resolved = errorCode == ERROR_NONE;
 }
 
 void AcceptCallSetupRequestCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncStkCallSetupResult> context(static_cast<AsyncStkCallSetupResult *>(data));
-    if (context->asyncContext.context.errorCode == ERROR_SLOT_ID_INVALID) {
-        NapiAsyncCompleteCallback(
-            env, status, context->asyncContext, "slotId is invalid", false, ERROR_SLOT_ID_INVALID);
-    } else {
-        NapiAsyncCompleteCallback(env, status, context->asyncContext, "Stk Accept Call Setup Request failed", true);
-    }
+    NapiAsyncPermissionCompleteCallback(
+        env, status, context->asyncContext, "acceptCallSetup", Permission::SET_TELEPHONY_STATE);
 }
 
 napi_value AcceptCallSetupRequest(napi_env env, napi_callback_info info)
@@ -2103,22 +2166,19 @@ void NativeRejectCallSetupRequest(napi_env env, void *data)
         context->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    context->asyncContext.callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().
-        SendCallSetupRequestResult(context->asyncContext.slotId, false);
-    TELEPHONY_LOGI("NAPI NativeRejectCallSetupRequest %{public}d", context->asyncContext.callbackVal);
-    context->asyncContext.context.resolved = context->asyncContext.callbackVal;
+    int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SendCallSetupRequestResult(
+        context->asyncContext.slotId, false);
+    TELEPHONY_LOGI("NAPI NativeRejectCallSetupRequest %{public}d", errorCode);
+    context->asyncContext.context.errorCode = errorCode;
+    context->asyncContext.context.resolved = errorCode == ERROR_NONE;
 }
 
 void RejectCallSetupRequestCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncStkCallSetupResult> context(static_cast<AsyncStkCallSetupResult *>(data));
-    if (context->asyncContext.context.errorCode == ERROR_SLOT_ID_INVALID) {
-        NapiAsyncCompleteCallback(
-            env, status, context->asyncContext, "slotId is invalid", false, ERROR_SLOT_ID_INVALID);
-    } else {
-        NapiAsyncCompleteCallback(env, status, context->asyncContext, "Stk Reject Call Setup Request failed", true);
-    }
+    NapiAsyncPermissionCompleteCallback(
+        env, status, context->asyncContext, "rejectCallSetup", Permission::SET_TELEPHONY_STATE);
 }
 
 napi_value RejectCallSetupRequest(napi_env env, napi_callback_info info)
@@ -2157,20 +2217,22 @@ void NativeGetOpKey(napi_env env, void *data)
         asyncContext->context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    asyncContext->callbackVal =
-        NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpKey(asyncContext->slotId));
-    asyncContext->context.resolved = !(asyncContext->callbackVal.empty());
+    std::u16string opkey;
+    int32_t code = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpKey(asyncContext->slotId, opkey);
+    if (code == ERROR_NONE) {
+        asyncContext->callbackVal = NapiUtil::ToUtf8(opkey);
+        asyncContext->context.resolved = true;
+        return;
+    }
+    asyncContext->context.errorCode = code;
+    asyncContext->context.resolved = false;
 }
 
 void GetOpKeyCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContext<std::string>> context(static_cast<AsyncContext<std::string> *>(data));
-    if (context->context.errorCode == ERROR_SLOT_ID_INVALID) {
-        NapiAsyncCompleteCallback(env, status, *context, "slotId is invalid", false, ERROR_SLOT_ID_INVALID);
-    } else {
-        NapiAsyncCompleteCallback(env, status, *context, "get operator key failed");
-    }
+    NapiAsyncCommomCompleteCallback(env, status, *context, false);
 }
 
 napi_value GetOpKey(napi_env env, napi_callback_info info)
@@ -2189,20 +2251,22 @@ void NativeGetOpName(napi_env env, void *data)
         asyncContext->context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    asyncContext->callbackVal =
-        NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpName(asyncContext->slotId));
-    asyncContext->context.resolved = !(asyncContext->callbackVal.empty());
+    std::u16string opname;
+    int32_t code = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpName(asyncContext->slotId, opname);
+    if (code == ERROR_NONE) {
+        asyncContext->callbackVal = NapiUtil::ToUtf8(opname);
+        asyncContext->context.resolved = true;
+        return;
+    }
+    asyncContext->context.errorCode = code;
+    asyncContext->context.resolved = false;
 }
 
 void GetOpNameCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContext<std::string>> context(static_cast<AsyncContext<std::string> *>(data));
-    if (context->context.errorCode == ERROR_SLOT_ID_INVALID) {
-        NapiAsyncCompleteCallback(env, status, *context, "slotId is invalid", false, ERROR_SLOT_ID_INVALID);
-    } else {
-        NapiAsyncCompleteCallback(env, status, *context, "get operator name failed");
-    }
+    NapiAsyncCommomCompleteCallback(env, status, *context, false);
 }
 
 napi_value GetOpName(napi_env env, napi_callback_info info)
