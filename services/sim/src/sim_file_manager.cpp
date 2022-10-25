@@ -600,5 +600,14 @@ std::u16string SimFileManager::GetSimIst()
     TELEPHONY_LOGI("SimFileManager::GetSimIst result:%{public}s ", (result.empty() ? "false" : "true"));
     return Str8ToStr16(result);
 }
+
+void SimFileManager::ClearData()
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::ClearData simFile nullptr");
+        return;
+    }
+    simFile_->ClearData();
+}
 } // namespace Telephony
 } // namespace OHOS

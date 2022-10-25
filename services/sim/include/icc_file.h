@@ -38,7 +38,7 @@ namespace Telephony {
 class IccFile : public AppExecFwk::EventHandler {
 public:
     IccFile(const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager);
-    virtual void Init();
+    void Init();
     virtual void StartLoad();
     std::string ObtainIMSI();
     void UpdateImsi(std::string imsi);
@@ -80,7 +80,8 @@ public:
     };
     virtual bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber) = 0;
     bool HasSimCard();
-    virtual void UnInit();
+    void UnInit();
+    void ClearData();
     void SetId(int id)
     {
         slotId_ = id;
@@ -92,6 +93,7 @@ protected:
     virtual void OnAllFilesFetched() = 0;
     bool LockQueriedOrNot();
     void UpdateSPN(const std::string spn);
+    void SaveCountryCode();
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<IccFileController> fileController_ = nullptr;
     std::shared_ptr<SimStateManager> stateManager_ = nullptr;

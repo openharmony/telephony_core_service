@@ -34,17 +34,6 @@ RuimFile::RuimFile(
     InitMemberFunc();
 }
 
-void RuimFile::Init()
-{
-    TELEPHONY_LOGI("RuimFile:::Init():start");
-    IccFile::Init();
-    if (stateManager_ != nullptr) {
-        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
-        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
-        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
-    }
-}
-
 void RuimFile::StartLoad()
 {
     TELEPHONY_LOGI("RuimFile::StartLoad() start");
@@ -132,7 +121,7 @@ void RuimFile::OnAllFilesFetched()
 {
     UpdateLoaded(true);
     filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
-    NotifyRegistrySimState(CardType::SINGLE_MODE_RUIM_CARD, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
+    PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_LOADED, "");
 }
 
 bool RuimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
@@ -202,6 +191,7 @@ bool RuimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
     if (sharedObject != nullptr) {
         imsi_ = *sharedObject;
         TELEPHONY_LOGI("RuimFile::ProcessEvent MSG_SIM_OBTAIN_IMSI_DONE");
+        SaveCountryCode();
         if (!imsi_.empty()) {
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
         }
@@ -352,16 +342,6 @@ bool RuimFile::UpdateVoiceMail(const std::string &mailName, const std::string &m
 {
     // cdma not support
     return false;
-}
-
-void RuimFile::UnInit()
-{
-    if (stateManager_ != nullptr) {
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
-    }
-    IccFile::UnInit();
 }
 
 RuimFile::~RuimFile() {}

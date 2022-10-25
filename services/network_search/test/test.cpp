@@ -60,6 +60,7 @@ const int32_t INPUT_IS_NR_SUPPORTED = 25;
 const int32_t INPUT_GET_NR_OPTION_MODE = 26;
 const int32_t REG_IMS_ST_CALLBACK = 27;
 const int32_t UN_REG_IMS_ST_CALLBACK = 28;
+const int32_t INPUT_NOTIFY_SPN_CHANGE = 29;
 const int32_t INPUT_INIT_TIME = 99;
 const int32_t INPUT_QUIT = 100;
 const int32_t SLEEP_TIME = 5;
@@ -272,6 +273,14 @@ void TestGetRadioState()
     OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
     int32_t result = g_telephonyService->GetRadioState(InputSlotId(), callback);
     TELEPHONY_LOGI("TelephonyTestService Remote GetRadioState result:%{public}d", result);
+}
+
+void TestNotifySpnChanged()
+{
+    TestSetRadioState();
+    std::cout << "please wait for SPN_INFO_CHANGED, or input any key to exit" << std::endl;
+    int32_t inputToExit = 0;
+    std::cin >> inputToExit;
 }
 
 void TestNotifyNetworkStateChange()

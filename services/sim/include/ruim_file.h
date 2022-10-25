@@ -22,9 +22,7 @@ namespace OHOS {
 namespace Telephony {
 class RuimFile : public IccFile {
 public:
-    RuimFile(
-        const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager);
-    void Init();
+    RuimFile(const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager);
     void StartLoad();
     std::string ObtainSimOperator();
     std::string ObtainIsoCountryCode();
@@ -42,7 +40,6 @@ public:
     bool ObtainCsimSpnDisplayCondition();
     int ObtainSpnCondition(bool roaming, const std::string &operatorNum);
     bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber);
-    void UnInit();
 
 protected:
     void ProcessIccRefresh(int msgId);
