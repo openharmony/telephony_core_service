@@ -1251,8 +1251,7 @@ bool CoreServiceProxy::IsValidStringLength(std::u16string str)
     if ((length >= MIN_STRING_LE) && (length <= MAX_STRING_LE)) {
         return true;
     }
-
-    TELEPHONY_LOGE("string length is InValid = %{public}s", Str16ToStr8(str).c_str());
+    TELEPHONY_LOGE("string length is InValid = %{public}d", length);
     return false;
 }
 

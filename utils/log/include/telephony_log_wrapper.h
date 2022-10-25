@@ -96,6 +96,7 @@ inline constexpr const char *GetRawFileName(const char *path)
 #define TELEPHONY_LOGW(fmt, ...) PRINT_TELEPHONY_LOG(Warn, fmt, ##__VA_ARGS__)
 #define TELEPHONY_LOGI(fmt, ...) PRINT_TELEPHONY_LOG(Info, fmt, ##__VA_ARGS__)
 #define TELEPHONY_LOGF(fmt, ...) PRINT_TELEPHONY_LOG(Fatal, fmt, ##__VA_ARGS__)
+#define TELEPHONY_LOGD(fmt, ...) PRINT_TELEPHONY_LOG(Debug, fmt, ##__VA_ARGS__)
 #endif // CONFIG_HILOG
 } // namespace Telephony
 } // namespace OHOS
