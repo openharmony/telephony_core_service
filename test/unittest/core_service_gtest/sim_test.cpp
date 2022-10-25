@@ -2408,9 +2408,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetOpKey_0100, Function | MediumTest | Level1)
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
-        std::string result = "testresult";
-        result = Str16ToStr8(SimTest::telephonyService_->GetOpKey(SimTest::slotId_));
-        EXPECT_STRNE(result.c_str(), "testresult");
+        std::u16string opkey;
+        int32_t result = SimTest::telephonyService_->GetOpKey(SimTest::slotId_, opkey);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -2425,9 +2425,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetOpKey_0200, Function | MediumTest | Level1)
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
-        std::string result = "testresult";
-        result = Str16ToStr8(SimTest::telephonyService_->GetOpKey(SimTest::slotId1_));
-        EXPECT_STRNE(result.c_str(), "testresult");
+        std::u16string opkey;
+        int32_t result = SimTest::telephonyService_->GetOpKey(SimTest::slotId1_, opkey);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -2443,9 +2443,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetOpKeyExt_0100, Function | MediumTest | Level1
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
-        std::string result = "testresult";
-        result = Str16ToStr8(SimTest::telephonyService_->GetOpKeyExt(SimTest::slotId_));
-        EXPECT_STRNE(result.c_str(), "testresult");
+        std::u16string opkeyExt;
+        int32_t result = SimTest::telephonyService_->GetOpKeyExt(SimTest::slotId_, opkeyExt);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -2460,9 +2460,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetOpKeyExt_0200, Function | MediumTest | Level1
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
-        std::string result = "testresult";
-        result = Str16ToStr8(SimTest::telephonyService_->GetOpKeyExt(SimTest::slotId1_));
-        EXPECT_STRNE(result.c_str(), "testresult");
+        std::u16string opkeyExt;
+        int32_t result = SimTest::telephonyService_->GetOpKey(SimTest::slotId1_, opkeyExt);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -2478,9 +2478,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetOpName_0100, Function | MediumTest | Level1)
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
-        std::string result = "testresult";
-        result = Str16ToStr8(SimTest::telephonyService_->GetOpName(SimTest::slotId_));
-        EXPECT_STRNE(result.c_str(), "testresult");
+        std::u16string opname;
+        int32_t result = SimTest::telephonyService_->GetOpName(SimTest::slotId_, opname);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -2495,9 +2495,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetOpName_0200, Function | MediumTest | Level1)
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
-        std::string result = "testresult";
-        result = Str16ToStr8(SimTest::telephonyService_->GetOpName(SimTest::slotId1_));
-        EXPECT_STRNE(result.c_str(), "testresult");
+        std::u16string opname;
+        int32_t result = SimTest::telephonyService_->GetOpName(SimTest::slotId1_, opname);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -2852,8 +2852,8 @@ void SendCallSetupRequestResultTestFunc(CoreServiceTestHelper &helper)
     AccessToken token;
     int32_t slotId = 0;
     bool accept = true;
-    bool result = SimTest::telephonyService_->SendCallSetupRequestResult(slotId, accept);
-    helper.SetBoolResult(result);
+    int32_t result = SimTest::telephonyService_->SendCallSetupRequestResult(slotId, accept);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2873,8 +2873,40 @@ HWTEST_F(SimTest, Telephony_Sim_SendCallSetupRequestResult_0100, Function | Medi
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, 0);
+        }
+    }
+}
+
+void SendCallSetupRequestResultTestFunc1(CoreServiceTestHelper &helper)
+{
+    AccessToken token;
+    int32_t slotId = 1;
+    bool accept = true;
+    bool result = SimTest::telephonyService_->SendCallSetupRequestResult(slotId, accept);
+    helper.SetIntResult(result);
+    helper.NotifyAll();
+}
+
+/**
+ * @tc.number   Telephony_Sim_SendCallSetupRequestResult_0200
+ * @tc.name     Send Call Setup Request Result Command
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SendCallSetupRequestResult_0200, Function | MediumTest | Level3)
+{
+    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        SimTest::telephonyService_ = GetProxy();
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(SendCallSetupRequestResultTestFunc1, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, 0);
         }
     }
 }
