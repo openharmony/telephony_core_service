@@ -220,7 +220,7 @@ bool IccDiallingNumbersManager::AddIccDiallingNumbers(
     hasEventDone_ = false;
     diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, ADD_FLAG, false, response);
     while (!hasEventDone_) {
-        TELEPHONY_LOGI("DelIccDiallingNumbers::wait(), response = false");
+        TELEPHONY_LOGI("AddIccDiallingNumbers::wait(), response = false");
         if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
             break;
         }
