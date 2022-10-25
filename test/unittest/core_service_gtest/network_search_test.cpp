@@ -114,7 +114,7 @@ void NetworkSearchTest::PrintCellInformation(std::vector<sptr<CellInformation>> 
 void NetworkSearchTest::PrintGsmCellInformation(sptr<CellInformation> cell)
 {
     GsmCellInformation *gsm = reinterpret_cast<GsmCellInformation *>(cell.GetRefPtr());
-    TELEPHONY_LOGI("CellInformation type:%{public}d, lac:%{public}d, bsic:%{public}d, arfcn:%{public}d",
+    TELEPHONY_LOGD("CellInformation type:%{private}d, lac:%{private}d, bsic:%{private}d, arfcn:%{private}d",
         static_cast<int32_t>(gsm->GetNetworkType()), gsm->GetLac(), gsm->GetBsic(), gsm->GetArfcn());
     TELEPHONY_LOGI("CellInformation result:%{public}s", gsm->ToString().c_str());
 
@@ -126,15 +126,15 @@ void NetworkSearchTest::PrintGsmCellInformation(sptr<CellInformation> cell)
 
     sptr<GsmCellLocation> cellLocation = new GsmCellLocation;
     cellLocation->SetGsmParam(gsm->GetCellId(), gsm->GetLac());
-    TELEPHONY_LOGI("GsmCellLocation type:%{public}d, lac:%{public}d, psc:%{public}d,",
+    TELEPHONY_LOGD("GsmCellLocation type:%{private}d, lac:%{private}d, psc:%{private}d,",
         static_cast<int32_t>(cellLocation->GetCellLocationType()), cellLocation->GetLac(), cellLocation->GetPsc());
 }
 
 void NetworkSearchTest::PrintCdmaCellInformation(sptr<CellInformation> cell)
 {
     CdmaCellInformation *cdma = reinterpret_cast<CdmaCellInformation *>(cell.GetRefPtr());
-    TELEPHONY_LOGI("CellInformation type:%{public}d, baseId:%{public}d, latitude:%{public}d, longitude:%{public}d"
-        "nid:%{public}d, sid:%{public}d", static_cast<int32_t>(cdma->GetNetworkType()), cdma->GetBaseId(),
+    TELEPHONY_LOGD("CellInformation type:%{private}d, baseId:%{private}d, latitude:%{private}d, longitude:%{private}d"
+        "nid:%{private}d, sid:%{private}d", static_cast<int32_t>(cdma->GetNetworkType()), cdma->GetBaseId(),
         cdma->GetLatitude(), cdma->GetLongitude(), cdma->GetNid(), cdma->GetSid());
     TELEPHONY_LOGI("CellInformation result:%{public}s", cdma->ToString().c_str());
 
@@ -146,8 +146,9 @@ void NetworkSearchTest::PrintCdmaCellInformation(sptr<CellInformation> cell)
     sptr<CdmaCellLocation> cellLocation = new CdmaCellLocation;
     cellLocation->SetCdmaParam(cdma->GetBaseId(), cdma->GetLatitude(), cdma->GetLongitude(), cdma->GetNid(),
         cdma->GetSid());
-    TELEPHONY_LOGI("CdmaCellLocation type:%{public}d, BaseId:%{public}d, Latitude:%{public}d, Longitude:%{public}d,"
-        "Nid:%{public}d, Sid:%{public}d",
+    TELEPHONY_LOGD(
+        "CdmaCellLocation type:%{private}d, BaseId:%{private}d, Latitude:%{private}d, Longitude:%{private}d,"
+        "Nid:%{private}d, Sid:%{private}d",
         static_cast<int32_t>(cellLocation->GetCellLocationType()), cellLocation->GetBaseId(),
         cellLocation->GetLatitude(), cellLocation->GetLongitude(), cellLocation->GetNid(), cellLocation->GetSid());
 }
@@ -155,7 +156,7 @@ void NetworkSearchTest::PrintCdmaCellInformation(sptr<CellInformation> cell)
 void NetworkSearchTest::PrintWcdmaCellInformation(sptr<CellInformation> cell)
 {
     WcdmaCellInformation *wcdma = reinterpret_cast<WcdmaCellInformation *>(cell.GetRefPtr());
-    TELEPHONY_LOGI("CellInformation type:%{public}d, psc:%{public}d, lac:%{public}d, arfcn:%{public}d",
+    TELEPHONY_LOGD("CellInformation type:%{private}d, psc:%{private}d, lac:%{private}d, arfcn:%{private}d",
         static_cast<int32_t>(wcdma->GetNetworkType()), wcdma->GetPsc(), wcdma->GetLac(), wcdma->GetArfcn());
     TELEPHONY_LOGI("CellInformation result:%{public}s", wcdma->ToString().c_str());
     sptr<WcdmaCellInformation> wcdmaCell = new WcdmaCellInformation;
@@ -167,7 +168,7 @@ void NetworkSearchTest::PrintWcdmaCellInformation(sptr<CellInformation> cell)
 void NetworkSearchTest::PrintTdscdmaCellInformation(sptr<CellInformation> cell)
 {
     TdscdmaCellInformation *tdscdma = reinterpret_cast<TdscdmaCellInformation *>(cell.GetRefPtr());
-    TELEPHONY_LOGI("CellInformation type:%{public}d, cpid:%{public}d, lac:%{public}d, arfcn:%{public}d",
+    TELEPHONY_LOGD("CellInformation type:%{private}d, cpid:%{private}d, lac:%{private}d, arfcn:%{private}d",
         static_cast<int32_t>(tdscdma->GetNetworkType()), tdscdma->GetCpid(), tdscdma->GetLac(), tdscdma->GetArfcn());
     TELEPHONY_LOGI("CellInformation result:%{public}s", tdscdma->ToString().c_str());
     sptr<TdscdmaCellInformation> tdscdmaCell = new TdscdmaCellInformation;
@@ -179,7 +180,7 @@ void NetworkSearchTest::PrintTdscdmaCellInformation(sptr<CellInformation> cell)
 void NetworkSearchTest::PrintLteCellInformation(sptr<CellInformation> cell)
 {
     LteCellInformation *lte = reinterpret_cast<LteCellInformation *>(cell.GetRefPtr());
-    TELEPHONY_LOGI("CellInformation type:%{public}d, pci:%{public}d, tac:%{public}d, arfcn:%{public}d",
+    TELEPHONY_LOGD("CellInformation type:%{private}d, pci:%{private}d, tac:%{private}d, arfcn:%{private}d",
         static_cast<int32_t>(lte->GetNetworkType()), lte->GetPci(), lte->GetTac(), lte->GetArfcn());
     TELEPHONY_LOGI("CellInformation result:%{public}s", lte->ToString().c_str());
     sptr<LteCellInformation> lteCell = new LteCellInformation;
@@ -191,8 +192,8 @@ void NetworkSearchTest::PrintLteCellInformation(sptr<CellInformation> cell)
 void NetworkSearchTest::PrintNrCellInformation(sptr<CellInformation> cell)
 {
     NrCellInformation *nr = reinterpret_cast<NrCellInformation *>(cell.GetRefPtr());
-    TELEPHONY_LOGI("CellInformation type:%{public}d, pci:%{public}d, tac:%{public}d, arfcn:%{public}d,"
-        "nci:%{public}d", static_cast<int32_t>(nr->GetNetworkType()), nr->GetPci(), nr->GetTac(),
+    TELEPHONY_LOGD("CellInformation type:%{private}d, pci:%{private}d, tac:%{private}d, arfcn:%{private}d,"
+        "nci:%{private}d", static_cast<int32_t>(nr->GetNetworkType()), nr->GetPci(), nr->GetTac(),
         nr->GetArfcn(), (int32_t)nr->GetNci());
     TELEPHONY_LOGI("CellInformation result:%{public}s", nr->ToString().c_str());
     sptr<NrCellInformation> nrCell = new NrCellInformation;
