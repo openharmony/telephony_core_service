@@ -37,6 +37,7 @@ inline constexpr const char *DEFAULT_PREFERRED_NETWORK_TYPE = "5"; // CORE_NETWO
 inline constexpr const char *TEL_PREFERRED_NETWORK_TYPE = "const.telephony.preferredNetworkType";
 inline constexpr const char *DEFAULT_OPERATOR_KEY = "";
 inline constexpr const char *OPKEY_PROP_PREFIX = "persist.telephony.opkey";
+inline constexpr const char *COUNTRY_CODE_KEY = "telephony.sim.countryCode";
 
 template<typename T>
 inline T GetMaxSlotCount()

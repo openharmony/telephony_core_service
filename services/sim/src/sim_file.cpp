@@ -38,17 +38,6 @@ SimFile::SimFile(
     InitMemberFunc();
 }
 
-void SimFile::Init()
-{
-    TELEPHONY_LOGI("SimFile:::Init():start");
-    IccFile::Init();
-    if (stateManager_ != nullptr) {
-        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
-        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
-        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
-    }
-}
-
 void SimFile::StartLoad()
 {
     TELEPHONY_LOGI("SimFile::StartLoad() start");
@@ -166,7 +155,7 @@ void SimFile::OnAllFilesFetched()
     if (filesFetchedObser_ != nullptr) {
         filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
     }
-    NotifyRegistrySimState(CardType::SINGLE_MODE_USIM_CARD, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
+    PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_LOADED, "");
 }
 
 bool SimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
@@ -747,7 +736,7 @@ bool SimFile::ProcessObtainIMSIDone(const AppExecFwk::InnerEvent::Pointer &event
     if (sharedObject != nullptr) {
         imsi_ = *sharedObject;
         TELEPHONY_LOGI("SimFile::ProcessEvent IMSI received success");
-        std::string iso = ObtainIsoCountryCode();
+        SaveCountryCode();
         TELEPHONY_LOGI("SimFile::ObtainIsoCountryCode result success");
         if (!imsi_.empty()) {
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
@@ -1281,16 +1270,6 @@ bool SimFile::CphsVoiceMailAvailable()
         available = (dataByte != nullptr) ? (dataByte.get()[1] & CPHS_VOICE_MAIL_MASK) == CPHS_VOICE_MAIL_EXSIT : false;
     }
     return available;
-}
-
-void SimFile::UnInit()
-{
-    if (stateManager_ != nullptr) {
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
-    }
-    IccFile::UnInit();
 }
 } // namespace Telephony
 } // namespace OHOS

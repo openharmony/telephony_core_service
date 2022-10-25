@@ -61,7 +61,7 @@
 ## 约束<a name="section133mcpsimp"></a>
 
 -   开发语言：C++ 、Java Script。
--   软件约束：需要与以下服务配合使用：RIL适配（ril\_adapter），状态注册服务（state\_registry）。
+-   软件约束：需要与以下服务配合使用：HDF(drivers\_interface，driver\_peripheral)，RIL适配（ril\_adapter），状态注册服务（state\_registry）。
 -   硬件约束：需要搭载的设备支持以下硬件：可以进行独立蜂窝通信的Modem以及SIM卡。
 
 ## 接口说明<a name="section139mcpsimp"></a>
@@ -79,7 +79,7 @@
 | function getSimOperatorNumeric(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽SIM卡的归属PLMN（Public Land Mobile Network）号 | 无                                  |
 | function getSimSpn(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽SIM卡的运营商SPN（Service Provider Name）       | 无                                  |
 | function getDefaultVoiceSlotId(callback: AsyncCallback\<number>): void; | 获取语音业务的默认卡卡槽                                    | 无                                  |
-| function isSimActive(slotId: number, callback: AsyncCallback\<boolean>): void | 检查指定卡槽的SIM卡是否激活                           | 无                                  |
+| function isSimActive(slotId: number, callback: AsyncCallback\<boolean>): void | 检查指定卡槽的SIM卡是否激活                           | 无 |
 | function hasSimCard(slotId: number, callback: AsyncCallback\<boolean>): void  | 检查SIM卡是否插入指定卡槽                             | 无                                  |
 | function getSimTelephoneNumber(slotId: number, callback: AsyncCallback\<string>): void | 获取指定卡槽SIM卡的MSISDN（Mobile Station Integrated Services Digital Network）|ohos.permission.GET_TELEPHONY_STATE |
 | function getVoiceMailIdentifier(slotId: number, callback: AsyncCallback\<string>): void | 获取指定卡槽SIM卡语音信箱的身份标识 | ohos.permission.GET_TELEPHONY_STATE |
@@ -211,5 +211,9 @@
 **telephony\_core\_service**
 
 [telephony\_sms\_mms](https://gitee.com/openharmony/telephony_sms_mms/blob/master/README_zh.md)
+
+[drivers_interface](https://gitee.com/openharmony/drivers_interface)
+
+[drivers_peripheral](https://gitee.com/openharmony/drivers_peripheral)
 
 [telephony\_ril\_adapter](https://gitee.com/openharmony/telephony_ril_adapter/blob/master/README_zh.md)
