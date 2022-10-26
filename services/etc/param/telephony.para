@@ -12,5 +12,5 @@
 # limitations under the License.
 
 const.telephony.slotCount=1
-persist.telephony.opkey0=-1
-persist.telephony.opkey1=-1
+telephony.sim.opkey0=-1
+telephony.sim.opkey1=-1
