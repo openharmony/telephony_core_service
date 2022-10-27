@@ -103,7 +103,7 @@ PermissionDef testSimPermWriteContactsDef  = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testSimPermWriteContacts  = {
+PermissionStateFull testSimPermWriteContacts = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -111,7 +111,7 @@ PermissionStateFull testSimPermWriteContacts  = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testSimPermReadContactsDef  = {
+PermissionDef testSimPermReadContactsDef = {
     .permissionName = "ohos.permission.READ_CONTACTS",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -122,7 +122,7 @@ PermissionDef testSimPermReadContactsDef  = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testSimPermReadContacts  = {
+PermissionStateFull testSimPermReadContacts = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
