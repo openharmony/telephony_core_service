@@ -122,7 +122,7 @@ PermissionDef testSimPermReadContacts = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testPermReadContacts = {
+PermissionStateFull testSimPermReadContacts = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
