@@ -20,6 +20,7 @@
 
 #include "operator_config_cache.h"
 #include "operator_config_loader.h"
+#include "system_ability_status_change_stub.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -30,18 +31,33 @@ public:
         std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache,
         int32_t slotId);
     virtual ~SimStateTracker() = default;
+    void InitListener();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     bool RegisterForIccLoaded();
     bool UnRegisterForIccLoaded();
 
-    std::unique_ptr<OperatorConfigLoader> operatorConfigLoader_ = nullptr;
+    std::shared_ptr<OperatorConfigLoader> operatorConfigLoader_ = nullptr;
 
 private:
     inline static const std::string OPERATOR_CONFIG_CHANGED = "operatorConfigChanged";
     std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
+    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
     int32_t slotId_;
     OperatorConfig config_;
+
+private:
+    class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
+    public:
+        explicit SystemAbilityStatusChangeListener(int32_t slotId, std::shared_ptr<OperatorConfigLoader> configLoader);
+        ~SystemAbilityStatusChangeListener() = default;
+        virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+        virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+
+    private:
+        const int32_t slotId_;
+        std::shared_ptr<OperatorConfigLoader> configLoader_ = nullptr;
+    };
 };
 } // namespace Telephony
 } // namespace OHOS
