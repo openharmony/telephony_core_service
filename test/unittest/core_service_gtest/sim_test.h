@@ -92,7 +92,7 @@ PermissionStateFull testPermGetNetworkInfo = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testPermWriteContactsDef = {
+PermissionDef testSimPermWriteContactsDef  = {
     .permissionName = "ohos.permission.WRITE_CONTACTS",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -103,7 +103,7 @@ PermissionDef testPermWriteContactsDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testPermWriteContacts = {
+PermissionStateFull testSimPermWriteContacts  = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -111,7 +111,7 @@ PermissionStateFull testPermWriteContacts = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testPermReadContactsDef = {
+PermissionDef testSimPermReadContactsDef  = {
     .permissionName = "ohos.permission.READ_CONTACTS",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -122,7 +122,7 @@ PermissionDef testPermReadContactsDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testPermReadContacts = {
+PermissionStateFull testSimPermReadContacts  = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -134,9 +134,9 @@ HapPolicyParams testPolicyParams = {
     .apl = APL_SYSTEM_BASIC,
     .domain = "test.domain",
     .permList = { testPermGetTelephonyStateDef, testPermSetTelephonyStateDef, testPermGetNetworkInfoDef,
-        testPermWriteContactsDef, testPermReadContactsDef },
-    .permStateList = { testGetTelephonyState, testSetTelephonyState, testPermGetNetworkInfo, testPermWriteContacts,
-        testPermReadContacts },
+        testSimPermWriteContactsDef, testSimPermReadContactsDef },
+    .permStateList = { testGetTelephonyState, testSetTelephonyState, testPermGetNetworkInfo, testSimPermWriteContacts,
+        testSimPermReadContacts },
 };
 
 class AccessToken {
