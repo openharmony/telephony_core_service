@@ -58,14 +58,16 @@ private:
     std::shared_ptr<AppExecFwk::DataAbilityHelper> CreateOpKeyHelper();
     std::string GetOpKey(std::shared_ptr<NativeRdb::AbsSharedResultSet> resultSet, int32_t slotId);
     bool MatchOperatorRule(std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet, int row);
+
+private:
     std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
     std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> opKeyDataAbilityHelper = nullptr;
-    std::string iccidFromSim;
-    std::string imsiFromSim;
-    std::string spnFromSim;
-    std::string gid1FromSim;
-    std::string gid2FromSim;
+    std::shared_ptr<AppExecFwk::DataAbilityHelper> opKeyDataAbilityHelper_ = nullptr;
+    std::string iccidFromSim_;
+    std::string imsiFromSim_;
+    std::string spnFromSim_;
+    std::string gid1FromSim_;
+    std::string gid2FromSim_;
 };
 } // namespace Telephony
 } // namespace OHOS
