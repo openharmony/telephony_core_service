@@ -21,6 +21,7 @@ namespace OHOS {
 namespace Telephony {
 std::mutex SimStateManager::mtx_;
 constexpr static const int32_t WAIT_TIME_SECOND = 1;
+constexpr static const int32_t WAIT_TIME_LONG_SECOND = 20;
 
 SimStateManager::SimStateManager(std::shared_ptr<ITelRilManager> telRilManager)
     : telRilManager_(telRilManager), simStateRun_(STATE_NOT_START)
@@ -210,7 +211,7 @@ bool SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, Lock
         simStateHandle_->SetLockState(slotId, options);
         while (!responseReady_) {
             TELEPHONY_LOGI("SetLockState::wait(), response = false");
-            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == std::cv_status::timeout) {
                 break;
             }
         }
