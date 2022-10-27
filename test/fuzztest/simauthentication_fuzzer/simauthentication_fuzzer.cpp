@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "updateiccdiallingnumbers_fuzzer.h"
+#include "simauthentication_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -32,22 +32,16 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
 
     int32_t slotId = static_cast<int32_t>(size % 2);
-    int32_t type = 0 - size % 8;
-    std::string number(reinterpret_cast<const char *>(data), size);
-    std::string name(reinterpret_cast<const char *>(data), size);
-    std::string pin2(reinterpret_cast<const char *>(data), size);
-    std::shared_ptr<DiallingNumbersInfo> telNumber = std::make_shared<DiallingNumbersInfo>();
-    telNumber->index_ = size;
-    telNumber->name_ = Str8ToStr16(name);
-    telNumber->number_ = Str8ToStr16(number);
-    telNumber->pin2_ = Str8ToStr16(pin2);
+    std::string aid(reinterpret_cast<const char *>(data), size);
+    std::string authData(reinterpret_cast<const char *>(data), size);
+    SimAuthenticationResponse response;
 
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().UpdateIccDiallingNumbers(slotId, type, telNumber);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().SimAuthentication(slotId, aid, authData, response);
     return;
 }
-}  // namespace OHOS
+} // namespace OHOS
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCoreServiceTokenFuzzer token;
     /* Run your code on data */
