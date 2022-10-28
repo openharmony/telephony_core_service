@@ -445,6 +445,8 @@ declare namespace sim {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300004 - Do not have sim card.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 9
    */
@@ -459,6 +461,8 @@ declare namespace sim {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300004 - Do not have sim card.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 9
    */
@@ -484,6 +488,8 @@ declare namespace sim {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300004 - Do not have sim card.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * @return Returns the opkey; returns an empty string if no SIM card is inserted or
    * no opkey matched.
    * @since 9
@@ -502,6 +508,8 @@ declare namespace sim {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300004 - Do not have sim card.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * @return Returns the opname; returns an empty string if no SIM card is inserted or
    * no opname matched.
    * @since 9
