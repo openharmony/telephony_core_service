@@ -26,8 +26,6 @@ TelRilSms::TelRilSms(int32_t slotId, sptr<HDI::Ril::V1_0::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {
-    // slotId_ = slotId;
-    TELEPHONY_LOGI("slotId_: %{public}d", slotId_);
 }
 
 bool TelRilSms::IsSmsResponse(uint32_t code)

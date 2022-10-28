@@ -1407,7 +1407,7 @@ void NativeGetIMEI(napi_env env, void *data)
     }
     context->getIMEIResult =
         NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImei(context->slotId));
-    TELEPHONY_LOGI("NativeGetIMEI len = %{public}lu", (unsigned long)context->getIMEIResult.length());
+    TELEPHONY_LOGI("NativeGetIMEI len = %{public}lu", static_cast<unsigned long>(context->getIMEIResult.length()));
     context->resolved = !(context->getIMEIResult.empty());
 }
 
@@ -1467,7 +1467,7 @@ void NativeGetMEID(napi_env env, void *data)
     }
     context->getMEIDResult =
         NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetMeid(context->slotId));
-    TELEPHONY_LOGI("NativeGetMEID len = %{public}lu", (unsigned long)context->getMEIDResult.length());
+    TELEPHONY_LOGI("NativeGetMEID len = %{public}lu", static_cast<unsigned long>(context->getMEIDResult.length()));
     context->resolved = !(context->getMEIDResult.empty());
 }
 
