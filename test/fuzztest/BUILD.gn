@@ -23,4 +23,7 @@ group("fuzztest") {
   deps += [ "updateiccdiallingnumbers_fuzzer:fuzztest" ]
   deps += [ "setvoicemailinfo_fuzzer:fuzztest" ]
   deps += [ "sendterminalresponsecmd_fuzzer:fuzztest" ]
+  deps += [ "sendenvelopecmd_fuzzer:fuzztest" ]
+  deps += [ "getsimeons_fuzzer:fuzztest" ]
+  deps += [ "simauthentication_fuzzer:fuzztest" ]
 }

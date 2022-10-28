@@ -14,31 +14,35 @@
  */
 
 #include "setshowname_fuzzer.h"
+
 #include <cstddef>
 #include <cstdint>
-#include "napi_util.h"
+
+#include "addcoreservicetoken_fuzzer.h"
 #include "core_service_client.h"
+#include "napi_util.h"
 #include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-    bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
-    {
-        std::string number(reinterpret_cast<const char*>(data), size);
-        if (data == nullptr || size <= 0) {
-            return false;
-        }
-
-        int32_t slotId = static_cast<int32_t>(size % 2);
-        auto numberU16 = Str8ToStr16(number);
-        bool result = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetShowName(slotId, numberU16);
-
-        return result;
+void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
+{
+    if (data == nullptr || size <= 0) {
+        return;
     }
+
+    int32_t slotId = static_cast<int32_t>(size % 2);
+    std::string number(reinterpret_cast<const char *>(data), size);
+    auto numberU16 = Str8ToStr16(number);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().SetShowName(slotId, numberU16);
+
+    return;
+}
 }  // namespace OHOS
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
+    OHOS::AddCoreServiceTokenFuzzer token;
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
