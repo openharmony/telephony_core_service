@@ -72,6 +72,7 @@ declare namespace radio {
   /**
    * Proactively requests to update location information.
    *
+   * @permission ohos.permission.LOCATION
    * @systemapi Hide this for inner system use.
    * @since 8
    */
