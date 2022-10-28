@@ -39,6 +39,7 @@ CoreService::~CoreService() {}
 
 void CoreService::OnStart()
 {
+    TELEPHONY_LOGE("yoyo testing testing!!");
     if (state_ == ServiceRunningState::STATE_RUNNING) {
         TELEPHONY_LOGE("CoreService has already started.");
         return;
