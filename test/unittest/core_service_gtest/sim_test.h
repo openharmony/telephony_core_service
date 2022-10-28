@@ -111,7 +111,7 @@ PermissionStateFull testSimPermWriteContacts = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testSimPermReadContacts = {
+PermissionDef testSimPermReadContactsDef = {
     .permissionName = "ohos.permission.READ_CONTACTS",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT
