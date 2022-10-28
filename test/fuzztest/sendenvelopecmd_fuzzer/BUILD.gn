@@ -18,10 +18,11 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("UpdateIccDiallingNumbersFuzzTest") {
-  module_output_path = "core_service/UpdateIccDiallingNumbersFuzzTest"
+ohos_fuzztest("SendEnvelopeCmdFuzzTest") {
+  module_output_path = "core_service/SendEnvelopeCmdFuzzTest"
   module_out_path = module_output_path
-  fuzz_config_file = "//base/telephony/core_service/test/fuzztest/updateiccdiallingnumbers_fuzzer"
+  fuzz_config_file =
+      "//base/telephony/core_service/test/fuzztest/sendenvelopecmd_fuzzer"
 
   include_dirs = [
     "//base/telephony/core_service/frameworks/js/napi/include",
@@ -63,7 +64,7 @@ ohos_fuzztest("UpdateIccDiallingNumbersFuzzTest") {
   sources = [
     "//base/telephony/core_service/frameworks/js/napi/napi_util.cpp",
     "//base/telephony/core_service/test/fuzztest/common_fuzzer/addcoreservicetoken_fuzzer.cpp",
-    "updateiccdiallingnumbers_fuzzer.cpp",
+    "sendenvelopecmd_fuzzer.cpp",
   ]
 }
 
@@ -73,7 +74,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":UpdateIccDiallingNumbersFuzzTest",
+    ":SendEnvelopeCmdFuzzTest",
   ]
 }
 ###############################################################################
