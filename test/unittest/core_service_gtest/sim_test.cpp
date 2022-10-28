@@ -2856,6 +2856,28 @@ HWTEST_F(SimTest, Telephony_Sim_SendTerminalResponseCmd_0100, Function | MediumT
     }
 }
 
+/**
+ * @tc.number   Telephony_Sim_SendTerminalResponseCmd_0200
+ * @tc.name     Send Terminal Response Command
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SendTerminalResponseCmd_0200, Function | MediumTest | Level3)
+{
+    if (SimTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        SimTest::telephonyService_ = GetProxy();
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(SendTerminalResponseCmdTestFunc, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            bool result = helper.GetBoolResult();
+            EXPECT_FALSE(result);
+        }
+    }
+}
+
 void SendEnvelopeCmdTestFunc(CoreServiceTestHelper &helper)
 {
     AccessToken token;
@@ -2884,6 +2906,28 @@ HWTEST_F(SimTest, Telephony_Sim_SendEnvelopeCmd_0100, Function | MediumTest | Le
         } else {
             bool result = helper.GetBoolResult();
             EXPECT_TRUE(result);
+        }
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_SendEnvelopeCmd_0200
+ * @tc.name     Send Envelope Command
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SendEnvelopeCmd_0200, Function | MediumTest | Level3)
+{
+    if (SimTest::telephonyService_ == nullptr) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        SimTest::telephonyService_ = GetProxy();
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(SendEnvelopeCmdTestFunc, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            bool result = helper.GetBoolResult();
+            EXPECT_FALSE(result);
         }
     }
 }
@@ -2920,16 +2964,6 @@ HWTEST_F(SimTest, Telephony_Sim_SendCallSetupRequestResult_0100, Function | Medi
     }
 }
 
-void SendCallSetupRequestResultTestFunc1(CoreServiceTestHelper &helper)
-{
-    AccessToken token;
-    int32_t slotId = 1;
-    bool accept = true;
-    bool result = SimTest::telephonyService_->SendCallSetupRequestResult(slotId, accept);
-    helper.SetIntResult(result);
-    helper.NotifyAll();
-}
-
 /**
  * @tc.number   Telephony_Sim_SendCallSetupRequestResult_0200
  * @tc.name     Send Call Setup Request Result Command
@@ -2937,17 +2971,17 @@ void SendCallSetupRequestResultTestFunc1(CoreServiceTestHelper &helper)
  */
 HWTEST_F(SimTest, Telephony_Sim_SendCallSetupRequestResult_0200, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
+    if (SimTest::telephonyService_ == nullptr) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
         CoreServiceTestHelper helper;
-        if (!helper.Run(SendCallSetupRequestResultTestFunc1, std::ref(helper))) {
+        if (!helper.Run(SendCallSetupRequestResultTestFunc, std::ref(helper))) {
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, 0);
+            EXPECT_NE(result, 0);
         }
     }
 }
