@@ -18,7 +18,9 @@
 
 #include <string>
 #include <vector>
+
 #include "base_context.h"
+#include "js_error_code.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "telephony_napi_common_error.h"
@@ -54,6 +56,12 @@ public:
     static void Handle2ValueCallback(napi_env env, BaseContext *context, napi_value callbackValue);
     static void DefineEnumClassByName(napi_env env, napi_value exports, std::string_view enumName,
         size_t arrSize, const napi_property_descriptor *desc);
+    static JsError ConverErrorMessageForJs(int32_t errorCode);
+    static bool CreateParameterErrorMessageForJs(int32_t errorCode, JsError &error);
+    static bool CreateCommonErrorMessageForJs(int32_t errorCode, JsError &error);
+    static bool CreateCallErrorMessageForJs(int32_t errorCode, JsError &error);
+    static JsError ConverErrorMessageWithPermissionForJs(
+        int32_t errorCode, std::string funcName, std::string permission);
 };
 } // namespace Telephony
 } // namespace OHOS

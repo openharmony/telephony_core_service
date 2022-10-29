@@ -155,7 +155,13 @@ template<typename... Ts, size_t N>
 std::optional<NapiError> MatchParameters(
     napi_env env, const napi_value (&argv)[N], size_t argc, std::tuple<Ts...> &theTuple)
 {
-    std::vector<napi_valuetype> typeStd(argc, napi_undefined);
+    int32_t typeSize = sizeof...(Ts);
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, argv[typeSize - 1], &valueType);
+    if (valueType != napi_function) {
+        typeSize--;
+    }
+    std::vector<napi_valuetype> typeStd(typeSize, napi_undefined);
     std::apply(
         [argc, &argv, &typeStd](Ts &...tupleArgs) {
             size_t index {0};

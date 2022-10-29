@@ -38,6 +38,10 @@ constexpr int32_t DEFAULT_REF_COUNT = 1;
 constexpr int16_t PARAMETER_COUNT_ZERO = 0;
 constexpr int16_t PARAMETER_COUNT_ONE = 1;
 constexpr int16_t PARAMETER_COUNT_TWO = 2;
+constexpr int16_t PARAMETER_COUNT_THREE = 3;
+constexpr int16_t PARAMETER_COUNT_FOUR = 4;
+
+static constexpr const char *GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHONY_STATE";
 
 static int32_t WrapRadioTech(int32_t radioTechType)
 {
@@ -2063,18 +2067,13 @@ static void NativeGetImsRegInfo(napi_env env, void *data)
     auto context = static_cast<GetImsRegInfoContext *>(data);
     if (!IsValidSlotId(context->slotId)) {
         TELEPHONY_LOGE("NativeGetImsRegInfo slotId is invalid");
-        context->errorCode = ERROR_SLOT_ID_INVALID;
+        context->errorCode = TELEPHONY_ERR_SLOTID_INVALID;
         return;
     }
-    int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImsRegStatus(
+    context->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImsRegStatus(
         context->slotId, static_cast<ImsServiceType>(context->imsSrvType), context->imsRegInfo);
-    TELEPHONY_LOGI("result is %{public}d", errorCode);
-    if (errorCode != TELEPHONY_SUCCESS) {
-        context->errorCode = ERROR_NATIVE_API_EXECUTE_FAIL;
-        context->resolved = false;
-    } else {
-        context->resolved = true;
-    }
+    TELEPHONY_LOGI("result is %{public}d", context->errorCode);
+    context->resolved = (context->errorCode == TELEPHONY_SUCCESS);
 }
 
 static void GetImsRegInfoCallback(napi_env env, napi_status status, void *data)
@@ -2082,6 +2081,7 @@ static void GetImsRegInfoCallback(napi_env env, napi_status status, void *data)
     TELEPHONY_LOGI("status = %{public}d", status);
     auto context = static_cast<GetImsRegInfoContext *>(data);
     napi_value callbackValue = nullptr;
+    JsError error = {};
     if (status == napi_ok) {
         TELEPHONY_LOGI("context->resolved = %{public}d", context->resolved);
         if (context->resolved) {
@@ -2091,13 +2091,14 @@ static void GetImsRegInfoCallback(napi_env env, napi_status status, void *data)
             NapiUtil::SetPropertyInt32(
                 env, callbackValue, "imsRegTech", static_cast<int32_t>(context->imsRegInfo.imsRegTech));
         } else {
-            callbackValue = NapiUtil::CreateErrorMessage(
-                env, "GetImsRegInfo failed! error code is " + std::to_string(context->errorCode));
+            error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+                context->errorCode, "getImsRegInfo", GET_TELEPHONY_STATE);
+            callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
         }
-    } else if (context->errorCode == ERROR_SLOT_ID_INVALID) {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
     } else {
-        callbackValue = ParseErrorValue(env, context->errorCode, "GetImsRegInfoCallback failed");
+        error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            ERROR_NATIVE_API_EXECUTE_FAIL, "getImsRegInfo", GET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, context, callbackValue);
 }
@@ -2105,36 +2106,56 @@ static void GetImsRegInfoCallback(napi_env env, napi_status status, void *data)
 static bool MatchGetImsRegInfoParameter(napi_env env, napi_value parameters[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 2: {
+        case PARAMETER_COUNT_TWO: {
             return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number });
         }
-        case 3: {
+        case PARAMETER_COUNT_THREE: {
             return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number, napi_function });
         }
-        default:
+        default: {
             return false;
+        }
     }
+}
+
+static void ReportFunctionFailed(napi_env env, int32_t resultCode, std::string funcName)
+{
+    JsError error = {};
+    switch (resultCode) {
+        case TELEPHONY_ERR_PERMISSION_ERR:
+            error = NapiUtil::ConverErrorMessageWithPermissionForJs(resultCode, funcName, GET_TELEPHONY_STATE);
+            break;
+        default:
+            error = NapiUtil::ConverErrorMessageForJs(resultCode);
+            break;
+    }
+    NAPI_CALL_RETURN_VOID(
+        env, napi_throw_error(env, std::to_string(error.errorCode).c_str(), error.errorMessage.c_str()));
 }
 
 static napi_value GetImsRegInfo(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 3;
-    napi_value parameters[3] = {0};
+    size_t parameterCount = PARAMETER_COUNT_THREE;
+    napi_value parameters[PARAMETER_COUNT_THREE] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    NAPI_ASSERT(env, MatchGetImsRegInfoParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchGetImsRegInfoParameter(env, parameters, parameterCount)) {
+        ReportFunctionFailed(env, ERROR_PARAMETER_COUNTS_INVALID, "GetImsRegInfo");
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<GetImsRegInfoContext>();
-    NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-    NAPI_CALL(env, napi_get_value_int32(env, parameters[1], &asyncContext->imsSrvType));
-    if (parameterCount == 3) {
-        NAPI_CALL(env, napi_create_reference(env, parameters[2], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+    NAPI_CALL(env, napi_get_value_int32(env, parameters[ARRAY_INDEX_FIRST], &asyncContext->slotId));
+    NAPI_CALL(env, napi_get_value_int32(env, parameters[ARRAY_INDEX_SECOND], &asyncContext->imsSrvType));
+    if (parameterCount == PARAMETER_COUNT_THREE) {
+        NAPI_CALL(env,
+            napi_create_reference(env, parameters[ARRAY_INDEX_THIRD], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(
         env, asyncContext.release(), "GetImsRegInfo", NativeGetImsRegInfo, GetImsRegInfoCallback);
 }
 
-static int32_t RegisterImsRegStateCallback(
+static bool RegisterImsRegStateCallback(
     napi_env env, napi_value thisVar, int32_t slotId, int32_t imsSrvType, napi_value argv[])
 {
     ImsRegStateCallback stateCallback;
@@ -2143,21 +2164,76 @@ static int32_t RegisterImsRegStateCallback(
     stateCallback.imsSrvType = static_cast<ImsServiceType>(imsSrvType);
     napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(stateCallback.thisVar));
     napi_create_reference(env, argv[ARRAY_INDEX_FOURTH], DEFAULT_REF_COUNT, &(stateCallback.callbackRef));
-    return DelayedSingleton<NapiImsRegInfoCallbackManager>::GetInstance()
-        ->RegisterImsRegStateCallback(stateCallback);
+
+    int32_t ret =
+        DelayedSingleton<NapiImsRegInfoCallbackManager>::GetInstance()->RegisterImsRegStateCallback(stateCallback);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Register imsRegState callback failed");
+        ReportFunctionFailed(env, ret, "on_imsRegStateChange");
+        return false;
+    }
+    return true;
+}
+
+static bool MatchObserverOnParameter(napi_env env, napi_value parameters[], size_t parameterCount)
+{
+    switch (parameterCount) {
+        case PARAMETER_COUNT_FOUR: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_string, napi_number, napi_number, napi_function });
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
+static bool MatchObserverOffParameter(napi_env env, napi_value parameters[], size_t parameterCount)
+{
+    switch (parameterCount) {
+        case PARAMETER_COUNT_THREE: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_string, napi_number, napi_number });
+        }
+        case PARAMETER_COUNT_FOUR: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_string, napi_number, napi_number, napi_function });
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
+static bool IsValidImsSrvType(napi_env env, int32_t imsSrvType, std::string funcName)
+{
+    bool flag = true;
+    switch (imsSrvType) {
+        case ImsServiceType::TYPE_VOICE:
+        case ImsServiceType::TYPE_VIDEO:
+        case ImsServiceType::TYPE_UT:
+        case ImsServiceType::TYPE_SMS:
+            break;
+        default:
+            TELEPHONY_LOGE("imsSrvType %{public}d is invalid", imsSrvType);
+            ReportFunctionFailed(env, TELEPHONY_ERR_ARGUMENT_INVALID, funcName);
+            flag = false;
+            break;
+    }
+
+    return flag;
 }
 
 static napi_value ObserverOn(napi_env env, napi_callback_info info)
 {
-    size_t argc = 4;
-    napi_value argv[4];
+    size_t argc = PARAMETER_COUNT_FOUR;
+    napi_value argv[PARAMETER_COUNT_FOUR];
     napi_value thisVar;
     if (napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL) != napi_ok) {
         TELEPHONY_LOGE("Can not get thisVar value");
         return nullptr;
     }
-    bool matchFlag = NapiUtil::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be string type");
+    if (!MatchObserverOnParameter(env, argv, argc)) {
+        ReportFunctionFailed(env, ERROR_PARAMETER_COUNTS_INVALID, "on_imsRegStateChange");
+        return nullptr;
+    }
     size_t strLength = 0;
     char callbackType[INFO_MAXIMUM_LIMIT + 1];
     if (napi_get_value_string_utf8(env, argv[ARRAY_INDEX_FIRST], callbackType, INFO_MAXIMUM_LIMIT, &strLength) !=
@@ -2168,6 +2244,7 @@ static napi_value ObserverOn(napi_env env, napi_callback_info info)
     std::string tmpStr = callbackType;
     if (tmpStr.compare("imsRegStateChange") != 0) {
         TELEPHONY_LOGE("callbackType is not imsRegStateChange and is %{public}s", tmpStr.c_str());
+        ReportFunctionFailed(env, TELEPHONY_ERR_ARGUMENT_INVALID, "on_imsRegStateChange");
         return nullptr;
     }
     int32_t slotId;
@@ -2175,14 +2252,20 @@ static napi_value ObserverOn(napi_env env, napi_callback_info info)
         TELEPHONY_LOGE("Can not get slotId value");
         return nullptr;
     }
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("slotId%{public}d is invalid", slotId);
+        ReportFunctionFailed(env, TELEPHONY_ERR_ARGUMENT_INVALID, "on_imsRegStateChange");
+        return nullptr;
+    }
     int32_t imsSrvType;
     if (napi_get_value_int32(env, argv[ARRAY_INDEX_THIRD], &imsSrvType) != napi_ok) {
         TELEPHONY_LOGE("Can not get imsSrvType value");
         return nullptr;
     }
-    int32_t ret = ret = RegisterImsRegStateCallback(env, thisVar, slotId, imsSrvType, argv);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("Register imsRegState callback failed");
+    if (!IsValidImsSrvType(env, imsSrvType, "on_imsRegStateChange")) {
+        return nullptr;
+    }
+    if (!RegisterImsRegStateCallback(env, thisVar, slotId, imsSrvType, argv)) {
         return nullptr;
     }
     napi_value result = nullptr;
@@ -2190,17 +2273,30 @@ static napi_value ObserverOn(napi_env env, napi_callback_info info)
     return result;
 }
 
+static bool UnregisterImsRegStateCallback(napi_env env, int32_t slotId, ImsServiceType imsSrvType)
+{
+    int32_t ret = DelayedSingleton<NapiImsRegInfoCallbackManager>::GetInstance()->UnregisterImsRegStateCallback(
+        env, slotId, imsSrvType);
+    if (ret != TELEPHONY_SUCCESS) {
+        ReportFunctionFailed(env, ret, "off_imsRegStateChange");
+        return false;
+    }
+    return true;
+}
+
 static napi_value ObserverOff(napi_env env, napi_callback_info info)
 {
-    size_t argc = 4;
-    napi_value argv[4];
+    size_t argc = PARAMETER_COUNT_FOUR;
+    napi_value argv[PARAMETER_COUNT_FOUR];
     napi_value thisVar;
     if (napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL) != napi_ok) {
         TELEPHONY_LOGE("Can not get thisVar value");
         return nullptr;
     }
-    bool matchFlag = NapiUtil::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be string type");
+    if (!MatchObserverOffParameter(env, argv, argc)) {
+        ReportFunctionFailed(env, ERROR_PARAMETER_COUNTS_INVALID, "off_imsRegStateChange");
+        return nullptr;
+    }
     size_t strLength = 0;
     char callbackType[INFO_MAXIMUM_LIMIT + 1];
     if (napi_get_value_string_utf8(env, argv[ARRAY_INDEX_FIRST], callbackType, INFO_MAXIMUM_LIMIT, &strLength) !=
@@ -2208,9 +2304,20 @@ static napi_value ObserverOff(napi_env env, napi_callback_info info)
         TELEPHONY_LOGE("Can not get callbackType value");
         return nullptr;
     }
+    std::string tmpStr = callbackType;
+    if (tmpStr.compare("imsRegStateChange") != 0) {
+        TELEPHONY_LOGE("callbackType is not imsRegStateChange and is %{public}s", tmpStr.c_str());
+        ReportFunctionFailed(env, TELEPHONY_ERR_ARGUMENT_INVALID, "off_imsRegStateChange");
+        return nullptr;
+    }
     int32_t slotId;
     if (napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &slotId) != napi_ok) {
         TELEPHONY_LOGE("Can not get slotId value");
+        return nullptr;
+    }
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("slotId%{public}d is invalid", slotId);
+        ReportFunctionFailed(env, TELEPHONY_ERR_ARGUMENT_INVALID, "off_imsRegStateChange");
         return nullptr;
     }
     int32_t imsSrvType;
@@ -2218,14 +2325,11 @@ static napi_value ObserverOff(napi_env env, napi_callback_info info)
         TELEPHONY_LOGE("Can not get imsSrvType value");
         return nullptr;
     }
-    std::string tmpStr = callbackType;
-    TELEPHONY_LOGI("callbackType is %{public}s", tmpStr.c_str());
-    if (tmpStr == "imsRegStateChange") {
-        int32_t ret = DelayedSingleton<NapiImsRegInfoCallbackManager>::GetInstance()->UnregisterImsRegStateCallback(
-            env, slotId, static_cast<ImsServiceType>(imsSrvType));
-        if (ret != TELEPHONY_SUCCESS) {
-            return nullptr;
-        }
+    if (!IsValidImsSrvType(env, imsSrvType, "off_imsRegStateChange")) {
+        return nullptr;
+    }
+    if (!UnregisterImsRegStateCallback(env, slotId, static_cast<ImsServiceType>(imsSrvType))) {
+        return nullptr;
     }
     napi_value result = nullptr;
     napi_get_undefined(env, &result);

@@ -16,11 +16,12 @@
 #include "stk_controller.h"
 
 #include "common_event_data.h"
-#include "common_event_publish_info.h"
 #include "common_event_manager.h"
+#include "common_event_publish_info.h"
 #include "common_event_support.h"
 #include "hril_types.h"
 #include "radio_event.h"
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -316,22 +317,22 @@ bool StkController::SendEnvelopeCmd(const std::string &strCmd)
     return envelopeResponseResult_;
 }
 
-bool StkController::SendCallSetupRequestResult(bool accept)
+int32_t StkController::SendCallSetupRequestResult(bool accept)
 {
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_SEND_CALL_SETUP_REQUEST_RESULT);
     if (event == nullptr) {
         TELEPHONY_LOGE("StkController[%{public}d]::SendCallSetupRequestResult() event is nullptr", slotId_);
-        return false;
+        return TELEPHONY_ERR_FAIL;
     }
     event->SetOwner(shared_from_this());
     std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
     if (telRilManager == nullptr) {
         TELEPHONY_LOGE("StkController[%{public}d]::SendCallSetupRequestResult() telRilManager is nullptr", slotId_);
-        return false;
+        return TELEPHONY_ERR_FAIL;
     }
 
     std::unique_lock<std::mutex> callSetupRequestlock(stkMutex_);
-    callSetupResponseResult_ = 0;
+    callSetupResponseResult_ = TELEPHONY_ERR_FAIL;
     responseFinished_ = false;
     telRilManager->SendCallSetupRequestResult(slotId_, accept, event);
     while (!responseFinished_) {
@@ -392,7 +393,7 @@ void StkController::OnSendCallSetupRequestResult(const AppExecFwk::InnerEvent::P
         TELEPHONY_LOGE("StkController[%{public}d]::OnSendCallSetupRequestResult() response is nullptr", slotId_);
         return;
     }
-    callSetupResponseResult_ = response->error == HRilErrType::NONE;
+    callSetupResponseResult_ = response->error == HRilErrType::NONE ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_FAIL;
     TELEPHONY_LOGI("StkController[%{public}d]::OnSendCallSetupRequestResult(), result = %{public}d",
         slotId_, callSetupResponseResult_);
     responseFinished_ = true;
