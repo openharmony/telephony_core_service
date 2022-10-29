@@ -48,7 +48,7 @@ public:
     int32_t GetDefaultSlotId(void);
     int32_t GetMaxSimCount(void);
 
-/******************** telRilManager start *******************/
+    /******************** telRilManager start *******************/
     int32_t SetRadioState(
         int32_t slotId, int32_t eventId, int fun, int rst, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t GetRadioState(
@@ -90,7 +90,7 @@ public:
     int32_t SetCallRestriction(int32_t slotId, int32_t eventId, const CallRestrictionParam &callRestriction,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     /* PDP start */
-    int32_t SetDataPermitted(int32_t slotId, int32_t eventId, int32_t ataPermitted,
+    int32_t SetDataPermitted(int32_t slotId, int32_t eventId, int32_t dataPermitted,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t SetInitApnInfo(int32_t slotId, int32_t eventId, const DataProfile &dataProfile,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -120,20 +120,19 @@ public:
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetPsRegStatus(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t SetCallPreferenceMode(int32_t slotId, int32_t eventId, int32_t mode,
-        const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
+    int32_t SetCallPreferenceMode(
+        int32_t slotId, int32_t eventId, int32_t mode, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetCallPreferenceMode(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t SetUssd(int32_t slotId, int32_t eventId, const std::string str,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t GetUssd(
-        int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
+    int32_t GetUssd(int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetMute(int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t SetMute(int32_t slotId, int32_t eventId, int32_t mute,
-        const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
+    int32_t SetMute(
+        int32_t slotId, int32_t eventId, int32_t mute, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetEmergencyCallList(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t SetEmergencyCallList(int32_t slotId, int32_t eventId, std::vector<EmergencyCall>  &eccVec,
+    int32_t SetEmergencyCallList(int32_t slotId, int32_t eventId, std::vector<EmergencyCall> &eccVec,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetCallFailReason(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
@@ -183,16 +182,15 @@ public:
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int slotId, int type);
 
-/******************** telRilManager end *******************/
-/******************** networkSearchManager start *******************/
+    /******************** telRilManager end *******************/
+    /******************** networkSearchManager start *******************/
     int32_t GetPsRadioTech(int32_t slotId);
     int32_t GetCsRadioTech(int32_t slotId);
     int32_t GetPsRegState(int32_t slotId);
     int32_t GetCsRegState(int32_t slotId);
     int32_t GetPsRoamingState(int32_t slotId);
-    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
-        const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
-        const sptr<INetworkSearchCallback> &callback);
+    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode, const sptr<NetworkInformation> &networkInformation,
+        bool resumeSelection, const sptr<INetworkSearchCallback> &callback);
     std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId);
     std::u16string GetOperatorNumeric(int32_t slotId);
     std::u16string GetOperatorName(int32_t slotId);
@@ -220,8 +218,8 @@ public:
     FrequencyType GetFrequencyType(int32_t slotId) const;
     NrState GetNrState(int32_t slotId) const;
     void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive);
-/******************** networkSearchManager end *******************/
-/******************** simManager start ***************************/
+    /******************** networkSearchManager end *******************/
+    /******************** simManager start ***************************/
     int32_t ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum);
     std::u16string GetSpn(int32_t slotId);
     bool SetVoiceMailInfo(int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber);
@@ -233,15 +231,16 @@ public:
     bool HasSimCard(int32_t slotId);
     int32_t GetSimState(int32_t slotId);
     int32_t GetCardType(int32_t slotId);
-    bool UnlockPin(int32_t slotId, std::string pin, LockStatusResponse &response);
-    bool UnlockPuk(int32_t slotId, std::string newPin, std::string puk, LockStatusResponse &response);
-    bool AlterPin(int32_t slotId, std::string newPin, std::string oldPin, LockStatusResponse &response);
+    bool UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response);
+    bool UnlockPuk(int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response);
+    bool AlterPin(int32_t slotId, const std::string &newPin, const std::string &oldPin, LockStatusResponse &response);
     bool SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response);
     int32_t GetLockState(int32_t slotId, LockType lockType);
     int32_t RefreshSimState(int32_t slotId);
-    bool UnlockPin2(int32_t slotId, std::string pin2, LockStatusResponse &response);
-    bool UnlockPuk2(int32_t slotId, std::string newPin2, std::string puk2, LockStatusResponse &response);
-    bool AlterPin2(int32_t slotId, std::string newPin2, std::string oldPin2, LockStatusResponse &response);
+    bool UnlockPin2(int32_t slotId, const std::string &pin2, LockStatusResponse &response);
+    bool UnlockPuk2(int32_t slotId, const std::string &newPin2, const std::string &puk2, LockStatusResponse &response);
+    bool AlterPin2(
+        int32_t slotId, const std::string &newPin2, const std::string &oldPin2, LockStatusResponse &response);
     std::u16string GetShowNumber(int32_t slotId);
     std::u16string GetShowName(int32_t slotId);
     bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList);
@@ -278,8 +277,8 @@ public:
     bool SetDefaultSmsSlotId(int32_t slotId);
     bool SetDefaultCellularDataSlotId(int32_t slotId);
     bool SetPrimarySlotId(int32_t slotId);
-    bool SetShowNumber(int32_t slotId, const std::u16string number);
-    bool SetShowName(int32_t slotId, const std::u16string name);
+    bool SetShowNumber(int32_t slotId, const std::u16string &number);
+    bool SetShowName(int32_t slotId, const std::u16string &name);
     int32_t GetDefaultVoiceSlotId();
     int32_t GetDefaultSmsSlotId();
     int32_t GetDefaultCellularDataSlotId();

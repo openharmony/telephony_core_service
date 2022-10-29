@@ -34,20 +34,19 @@ enum class SmsMmsMessageType {
 
 class CoreServiceHiSysEvent : public TelephonyHiSysEvent {
 public:
-    static void WriteSignalLevelBehaviorEvent(const int32_t slotId, const int32_t level);
-    static void WriteNetworkStateBehaviorEvent(
-        const int32_t slotId, const int32_t domain, const int32_t tech, const int32_t state);
-    static void WriteDefaultDataSlotIdBehaviorEvent(const int32_t slotId);
-    static void WriteSimStateBehaviorEvent(const int32_t slotId, const int32_t state);
-    static void WriteDialCallFaultEvent(const int32_t slotId, const int32_t errCode, const std::string &desc);
-    static void WriteAnswerCallFaultEvent(const int32_t slotId, const int32_t errCode, const std::string &desc);
-    static void WriteHangUpFaultEvent(const int32_t slotId, const int32_t errCode, const std::string &desc);
+    static void WriteSignalLevelBehaviorEvent(int32_t slotId, int32_t level);
+    static void WriteNetworkStateBehaviorEvent(int32_t slotId, int32_t domain, int32_t tech, int32_t state);
+    static void WriteDefaultDataSlotIdBehaviorEvent(int32_t slotId);
+    static void WriteSimStateBehaviorEvent(int32_t slotId, int32_t state);
+    static void WriteDialCallFaultEvent(int32_t slotId, int32_t errCode, const std::string &desc);
+    static void WriteAnswerCallFaultEvent(int32_t slotId, int32_t errCode, const std::string &desc);
+    static void WriteHangUpFaultEvent(int32_t slotId, int32_t errCode, const std::string &desc);
     static void WriteSmsSendFaultEvent(
-        const int32_t slotId, const SmsMmsMessageType type, const SmsMmsErrorCode errorCode, const std::string &desc);
+        int32_t slotId, SmsMmsMessageType type, SmsMmsErrorCode errorCode, const std::string &desc);
     static void WriteSmsReceiveFaultEvent(
-        const int32_t slotId, const SmsMmsMessageType type, const SmsMmsErrorCode errorCode, const std::string &desc);
-    static void WriteDataActivateFaultEvent(const int32_t slotId, const int32_t switchState,
-        const CellularDataErrorCode errorType, const std::string &errorMsg);
+        int32_t slotId, SmsMmsMessageType type, SmsMmsErrorCode errorCode, const std::string &desc);
+    static void WriteDataActivateFaultEvent(
+        int32_t slotId, int32_t switchState, CellularDataErrorCode errorType, const std::string &errorMsg);
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -181,7 +181,8 @@ public:
     std::shared_ptr<NetworkSearchState> GetNetworkSearchState(int32_t slotId);
     void TriggerSimRefresh(int32_t slotId);
     void TriggerTimezoneRefresh(int32_t slotId);
-    void SetNetworkSearchResultValue(int32_t slotId, int32_t listSize, std::vector<NetworkInformation> &operatorInfo);
+    void SetNetworkSearchResultValue(
+        int32_t slotId, int32_t listSize, const std::vector<NetworkInformation> &operatorInfo);
     sptr<NetworkSearchResult> GetNetworkSearchInformationValue(int32_t slotId);
     int32_t GetNetworkSelectionMode(int32_t slotId);
     bool SetNetworkSelectionMode(
@@ -192,7 +193,7 @@ public:
     bool SetPreferredNetwork(int32_t slotId, int32_t networkMode);
     void SavePreferredNetworkValue(int32_t slotId, int32_t networkMode);
     int32_t GetPreferredNetworkValue(int32_t slotId) const;
-    void UpdatePhone(int32_t slotId, RadioTech csRadioTech, RadioTech psRadioTech);
+    void UpdatePhone(int32_t slotId, RadioTech csRadioTech, const RadioTech &psRadioTech);
     void SetImei(int32_t slotId, std::u16string imei);
     void UpdateCellLocation(int32_t slotId, int32_t techType, int32_t cellId, int32_t lac);
     void SetMeid(int32_t slotId, std::u16string meid);
@@ -204,7 +205,7 @@ public:
     bool GetAirplaneMode();
     bool IsRadioFirstPowerOn(int32_t slotId);
     void SetRadioFirstPowerOn(int32_t slotId, bool isFirstPowerOn);
-    void NotifyImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo info);
+    void NotifyImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info);
     void InitSimRadioProtocol(int32_t slotId);
 
     inline void InitMsgNum(int32_t slotId)

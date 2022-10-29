@@ -37,7 +37,7 @@ std::shared_ptr<unsigned char> SIMUtils::HexStringConvertToBytes(const std::stri
         return nullptr;
     }
     int id = 0;
-    int sz = (int)s.length();
+    int sz = static_cast<int>(s.length());
     if (sz % HALF_LEN != 0) {
         return nullptr;
     }
@@ -55,8 +55,7 @@ std::shared_ptr<unsigned char> SIMUtils::HexStringConvertToBytes(const std::stri
     unsigned char *ret = ptr.get();
     for (int i = 0; i < sz; i += HALF_LEN) {
         id = i / HALF_LEN;
-        ret[id] =
-            (unsigned char)((HexCharConvertToInt(s.at(i)) << HALF_BYTE_LEN) | HexCharConvertToInt(s.at(i + 1)));
+        ret[id] = (unsigned char)((HexCharConvertToInt(s.at(i)) << HALF_BYTE_LEN) | HexCharConvertToInt(s.at(i + 1)));
     }
     return ptr;
 }
@@ -95,7 +94,7 @@ bool SIMUtils::IsShowableAscii(char c)
 
 bool SIMUtils::IsShowableAsciiOnly(const std::string &str)
 {
-    int len = (int)str.length();
+    int len = static_cast<int>(str.length());
     for (int i = 0; i < len; i++) {
         if (!IsShowableAscii(str.at(i))) {
             return false;
@@ -144,7 +143,7 @@ std::shared_ptr<char16_t> SIMUtils::CharsConvertToChar16(
 std::string SIMUtils::BcdPlmnConvertToString(const std::string &data, int offset)
 {
     std::string plmn = "";
-    if ((int)data.size() >= (offset + MCCMNC_LEN) && data.at(offset) != 'F') {
+    if (static_cast<int>(data.size()) >= (offset + MCCMNC_LEN) && data.at(offset) != 'F') {
         plmn.push_back(data[offset + BCD_PLMN_MCC1]);
         plmn.push_back(data[offset + BCD_PLMN_MCC2]);
         plmn.push_back(data[offset + BCD_PLMN_MCC3]);
@@ -164,7 +163,8 @@ std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byt
     int n = 0;
     int pos = 0;
     int left = 0;
-    uint8_t high, low;
+    uint8_t high = 0;
+    uint8_t low = 0;
     left = BYTE_LENGTH;
     n = (byteLen * BYTE_LENGTH) / CHAR_GSM_7BIT;
     TELEPHONY_LOGI("Gsm7bitConvertToString byteLen:%{public}d", byteLen);
@@ -177,8 +177,7 @@ std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byt
             left = BYTE_LENGTH;
             pos++;
         } else {
-            low = high = 0;
-            low = (bytes[pos] & (unsigned char)(0xFF << (BYTE_LENGTH - left))) >> (BYTE_LENGTH -left);
+            low = (bytes[pos] & (unsigned char)(0xFF << (BYTE_LENGTH - left))) >> (BYTE_LENGTH - left);
             high = (bytes[pos + 1] & (unsigned char)(~(0xFF << (CHAR_GSM_7BIT - left)))) << left;
             str.push_back(high | low);
             left = BYTE_LENGTH - (CHAR_GSM_7BIT - left);
@@ -206,7 +205,7 @@ std::string SIMUtils::DiallingNumberStringFieldConvertToString(
         std::u16string hs(cs.get(), 0, outlen);
         std::u16string rtl = u"";
         if (!hs.empty()) {
-            ucslen = (int)hs.length();
+            ucslen = static_cast<int>(hs.length());
             wchar_t c = L'\uFFFF';
             while (ucslen > 0 && hs.at(ucslen - 1) == c) {
                 ucslen--;
@@ -235,8 +234,7 @@ std::string SIMUtils::DiallingNumberStringFieldConvertToString(
     return UcsCodeConvertToString(array, offset, length, offPos);
 }
 
-std::string SIMUtils::UcsCodeConvertToString(
-    std::shared_ptr<unsigned char> array, int offset, int length, int offPos)
+std::string SIMUtils::UcsCodeConvertToString(std::shared_ptr<unsigned char> array, int offset, int length, int offPos)
 {
     bool isucs2 = false;
     char base = '\0';
@@ -255,8 +253,7 @@ std::string SIMUtils::UcsCodeConvertToString(
         if (len > length - END_POS)
             len = length - END_POS;
 
-        base =
-            (char)(((data[offset + HALF_LEN] & BYTE_VALUE) << BYTE_BIT) | (data[offset + START_POS] & BYTE_VALUE));
+        base = (char)(((data[offset + HALF_LEN] & BYTE_VALUE) << BYTE_BIT) | (data[offset + START_POS] & BYTE_VALUE));
         offset += END_POS;
         isucs2 = true;
     }
@@ -288,7 +285,7 @@ std::string SIMUtils::UcsCodeConvertToString(
     return defaultCharset;
 }
 
-std::string SIMUtils::Trim(std::string& str)
+std::string SIMUtils::Trim(std::string &str)
 {
     string::size_type pos = str.find_last_not_of(' ');
     if (pos != string::npos) {

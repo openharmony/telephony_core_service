@@ -103,18 +103,21 @@ public:
 
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) override;
 
-    bool UnlockPin(int32_t slotId, std::u16string pin, LockStatusResponse &response) override;
+    bool UnlockPin(int32_t slotId, const std::u16string &pin, LockStatusResponse &response) override;
 
-    bool UnlockPuk(int32_t slotId, std::u16string newPin, std::u16string puk, LockStatusResponse &response) override;
+    bool UnlockPuk(
+        int32_t slotId, const std::u16string &newPin, const std::u16string &puk, LockStatusResponse &response) override;
 
-    bool AlterPin(int32_t slotId, std::u16string newPin, std::u16string oldPin, LockStatusResponse &response) override;
+    bool AlterPin(int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin,
+        LockStatusResponse &response) override;
 
-    bool UnlockPin2(int32_t slotId, std::u16string pin2, LockStatusResponse &response) override;
+    bool UnlockPin2(int32_t slotId, const std::u16string &pin2, LockStatusResponse &response) override;
 
-    bool UnlockPuk2(int32_t slotId, std::u16string newPin2, std::u16string puk2, LockStatusResponse &response) override;
+    bool UnlockPuk2(int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2,
+        LockStatusResponse &response) override;
 
-    bool AlterPin2(
-        int32_t slotId, std::u16string newPin2, std::u16string oldPin2, LockStatusResponse &response) override;
+    bool AlterPin2(int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2,
+        LockStatusResponse &response) override;
 
     bool SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response) override;
 
@@ -130,11 +133,11 @@ public:
 
     int32_t GetPrimarySlotId() override;
 
-    bool SetShowNumber(int32_t slotId, const std::u16string number) override;
+    bool SetShowNumber(int32_t slotId, const std::u16string &number) override;
 
     std::u16string GetShowNumber(int32_t slotId) override;
 
-    bool SetShowName(int32_t slotId, const std::u16string name) override;
+    bool SetShowName(int32_t slotId, const std::u16string &name) override;
 
     std::u16string GetShowName(int32_t slotId) override;
 

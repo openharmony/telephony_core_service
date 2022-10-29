@@ -461,7 +461,8 @@ bool NapiUtil::CreateCallErrorMessageForJs(int32_t errorCode, JsError &error)
     return flag;
 }
 
-JsError NapiUtil::ConverErrorMessageWithPermissionForJs(int32_t errorCode, std::string funcName, std::string permission)
+JsError NapiUtil::ConverErrorMessageWithPermissionForJs(
+    int32_t errorCode, const std::string &funcName, const std::string &permission)
 {
     if (errorCode == TELEPHONY_ERR_PERMISSION_ERR) {
         JsError error = {};

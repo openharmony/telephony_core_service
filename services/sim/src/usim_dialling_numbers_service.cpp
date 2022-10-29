@@ -27,6 +27,10 @@ UsimDiallingNumbersService::UsimDiallingNumbersService(const std::shared_ptr<App
 
 void UsimDiallingNumbersService::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGI("UsimDiallingNumbersService::ProcessEvent event is null");
+        return;
+    }
     uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGI("UsimDiallingNumbersService::ProcessEvent Id is %{public}d", id);
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
@@ -134,7 +138,7 @@ void UsimDiallingNumbersService::LoadPbrFiles()
 
 bool UsimDiallingNumbersService::LoadDiallingNumberFiles(int recId)
 {
-    if (recId >= (int)pbrFiles_.size()) {
+    if (recId >= static_cast<int>(pbrFiles_.size())) {
         TELEPHONY_LOGI("LoadDiallingNumberFiles finish %{public}d", recId);
         NextStep(MSG_USIM_USIM_ADN_LOAD_DONE);
         return false;
@@ -274,7 +278,7 @@ void UsimDiallingNumbersService::StorePbrDetailInfo(
         efid <<= BIT_OF_BYTE;
         efid |= *dataIt;
         ++dataIt;
-        int sfi = (dataIt == data.end()) ? 0 : (int)(*dataIt);
+        int sfi = (dataIt == data.end()) ? 0 : static_cast<int>((*dataIt));
         std::shared_ptr<TagData> deltaFile = std::make_shared<TagData>(parentTag, efid, sfi, count);
         TELEPHONY_LOGI(
             "MakeFiles result[ parentTag:%{public}d, efid:%{public}d, sfi:%{public}d, count:%{public}d ]",
