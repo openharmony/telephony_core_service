@@ -31,9 +31,14 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % 2);
+    int32_t slotId = static_cast<int32_t>(size);
     std::string number(reinterpret_cast<const char *>(data), size);
     auto numberU16 = Str8ToStr16(number);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetShowName(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimSpn(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimIccId(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetIMSI(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().IsSimActive(slotId);
     DelayedRefSingleton<CoreServiceClient>::GetInstance().SetShowName(slotId, numberU16);
 
     return;
