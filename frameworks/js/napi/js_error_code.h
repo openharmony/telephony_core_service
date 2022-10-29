@@ -47,7 +47,7 @@ enum JsErrorCode {
     /**
      * The input parameter value is out of range.
      */
-    JS_ERROR_TELEPHONY_ARGUMENT_ERROR = 8300001,
+    JS_ERROR_TELEPHONY_ARGUMENT_ERROR,
 
     /**
      * Operation failed. Cannot connect to service.
@@ -60,14 +60,14 @@ enum JsErrorCode {
     JS_ERROR_TELEPHONY_SYSTEM_ERROR,
 
     /**
-     * Unknown error code.
-     */
-    JS_ERROR_TELEPHONY_UNKNOW_ERROR,
-
-    /**
      * Do not have sim card.
      */
     JS_ERROR_TELEPHONY_NO_SIM_CARD,
+
+    /**
+     * Unknown error code.
+     */
+    JS_ERROR_TELEPHONY_UNKNOW_ERROR = 8300999,
 
     /**
      * Sim module base error code.
@@ -87,37 +87,37 @@ enum JsErrorCode {
     /**
      * The dialing policy is not met.
      */
-    JS_ERROR_CALL_DIAL_POLICY_NOT_MET = 8401001,
+    JS_ERROR_CALL_DIAL_POLICY_NOT_MET,
 
     /**
      * Wrong mobile number format.
      */
-    JS_ERROR_CALL_WRONG_MOBILE_NUMBER = 8401002,
+    JS_ERROR_CALL_WRONG_MOBILE_NUMBER,
 
     /**
      * Abnormal call status.
      */
-    JS_ERROR_CALL_ABNORMAL_CALL_STATUS = 8401003,
+    JS_ERROR_CALL_ABNORMAL_CALL_STATUS,
 
     /**
      * Abnormal conference call.
      */
-    JS_ERROR_CALL_ABNORMAL_CONFERENCE_CALL = 8401004,
+    JS_ERROR_CALL_ABNORMAL_CONFERENCE_CALL,
 
     /**
      * Supplementary service exception.
      */
-    JS_ERROR_SUPPLEMENTARY_SERVICE_EXCEPTION = 8401005,
+    JS_ERROR_SUPPLEMENTARY_SERVICE_EXCEPTION,
 
     /**
      * Abnormal call parameters.
      */
-    JS_ERROR_CALL_ABNORMAL_CALL_PARAMETERS = 8401006,
+    JS_ERROR_CALL_ABNORMAL_CALL_PARAMETERS,
 
     /**
      * Abnormal video call status.
      */
-    JS_ERROR_CALL_ABNORMAL_VIDEO_CALL_STATUS = 8401007,
+    JS_ERROR_CALL_ABNORMAL_VIDEO_CALL_STATUS,
 
     /**
      * Cellular call module cs base error code.

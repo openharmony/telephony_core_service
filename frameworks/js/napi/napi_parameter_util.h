@@ -157,7 +157,7 @@ std::optional<NapiError> MatchParameters(
 {
     int32_t typeSize = sizeof...(Ts);
     napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, argv[argc - 1], &valueType);
+    napi_typeof(env, argv[typeSize - 1], &valueType);
     if (valueType != napi_function) {
         typeSize--;
     }
