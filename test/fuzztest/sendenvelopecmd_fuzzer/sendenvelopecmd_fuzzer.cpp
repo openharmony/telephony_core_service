@@ -31,8 +31,12 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % 2);
+    int32_t slotId = static_cast<int32_t>(size);
     std::string cmd(reinterpret_cast<const char *>(data), size);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetUniqueDeviceId(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetMeid(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOperatorNumeric(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOperatorName(slotId);
     DelayedRefSingleton<CoreServiceClient>::GetInstance().SendEnvelopeCmd(slotId, cmd);
     return;
 }

@@ -31,10 +31,14 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % 2);
+    int32_t slotId = static_cast<int32_t>(size);
     std::string plmn(reinterpret_cast<const char *>(data), size);
     int32_t fac = static_cast<int32_t>(size);
     bool longNameRequired = size % 2;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().IsNrSupported(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPsRadioTech(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCsRadioTech(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNrOptionMode(slotId);
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimEons(slotId, plmn, fac, longNameRequired);
     return;
 }
