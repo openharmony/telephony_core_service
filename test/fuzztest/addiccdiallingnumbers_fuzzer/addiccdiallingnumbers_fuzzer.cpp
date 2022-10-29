@@ -31,7 +31,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % 2);
+    int32_t slotId = static_cast<int32_t>(size);
     int32_t type = size % 2 + 1; // SIM_ADN 1  SIM_FDN 2
     std::string number(reinterpret_cast<const char *>(data), size);
     std::string name(reinterpret_cast<const char *>(data), size);

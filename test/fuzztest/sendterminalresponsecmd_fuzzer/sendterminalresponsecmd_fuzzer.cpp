@@ -31,9 +31,12 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % 2);
+    int32_t slotId = static_cast<int32_t>(size);
     std::string cmd(reinterpret_cast<const char *>(data), size);
-
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkState(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImei(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimOperatorNumeric(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(slotId);
     DelayedRefSingleton<CoreServiceClient>::GetInstance().SendTerminalResponseCmd(slotId, cmd.data());
     return;
 }

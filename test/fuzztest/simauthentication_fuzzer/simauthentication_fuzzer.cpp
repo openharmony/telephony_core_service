@@ -31,11 +31,14 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % 2);
+    int32_t slotId = static_cast<int32_t>(size);
     std::string aid(reinterpret_cast<const char *>(data), size);
     std::string authData(reinterpret_cast<const char *>(data), size);
     SimAuthenticationResponse response;
-
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimTelephoneNumber(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetVoiceMailIdentifier(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetVoiceMailNumber(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().QueryIccDiallingNumbers(slotId, size);
     DelayedRefSingleton<CoreServiceClient>::GetInstance().SimAuthentication(slotId, aid, authData, response);
     return;
 }
