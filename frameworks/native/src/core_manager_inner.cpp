@@ -1449,7 +1449,7 @@ bool CoreManagerInner::SetPrimarySlotId(int32_t slotId)
     return simManager_->SetPrimarySlotId(slotId);
 }
 
-bool CoreManagerInner::SetShowNumber(int32_t slotId, const std::u16string number)
+bool CoreManagerInner::SetShowNumber(int32_t slotId, const std::u16string &number)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -1458,7 +1458,7 @@ bool CoreManagerInner::SetShowNumber(int32_t slotId, const std::u16string number
     return simManager_->SetShowNumber(slotId, number);
 }
 
-bool CoreManagerInner::SetShowName(int32_t slotId, const std::u16string name)
+bool CoreManagerInner::SetShowName(int32_t slotId, const std::u16string &name)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -1720,7 +1720,7 @@ int32_t CoreManagerInner::GetCardType(int32_t slotId)
     return static_cast<int32_t>(simManager_->GetCardType(slotId));
 }
 
-bool CoreManagerInner::UnlockPin(int32_t slotId, std::string pin, LockStatusResponse &response)
+bool CoreManagerInner::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -1729,7 +1729,8 @@ bool CoreManagerInner::UnlockPin(int32_t slotId, std::string pin, LockStatusResp
     return simManager_->UnlockPin(slotId, pin, response);
 }
 
-bool CoreManagerInner::UnlockPuk(int32_t slotId, std::string newPin, std::string puk, LockStatusResponse &response)
+bool CoreManagerInner::UnlockPuk(
+    int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -1738,7 +1739,8 @@ bool CoreManagerInner::UnlockPuk(int32_t slotId, std::string newPin, std::string
     return simManager_->UnlockPuk(slotId, newPin, puk, response);
 }
 
-bool CoreManagerInner::AlterPin(int32_t slotId, std::string newPin, std::string oldPin, LockStatusResponse &response)
+bool CoreManagerInner::AlterPin(
+    int32_t slotId, const std::string &newPin, const std::string &oldPin, LockStatusResponse &response)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -1774,7 +1776,7 @@ int32_t CoreManagerInner::RefreshSimState(int32_t slotId)
     return simManager_->RefreshSimState(slotId);
 }
 
-bool CoreManagerInner::UnlockPin2(int32_t slotId, std::string pin2, LockStatusResponse &response)
+bool CoreManagerInner::UnlockPin2(int32_t slotId, const std::string &pin2, LockStatusResponse &response)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -1783,7 +1785,8 @@ bool CoreManagerInner::UnlockPin2(int32_t slotId, std::string pin2, LockStatusRe
     return simManager_->UnlockPin2(slotId, pin2, response);
 }
 
-bool CoreManagerInner::UnlockPuk2(int32_t slotId, std::string newPin2, std::string puk2, LockStatusResponse &response)
+bool CoreManagerInner::UnlockPuk2(
+    int32_t slotId, const std::string &newPin2, const std::string &puk2, LockStatusResponse &response)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -1792,7 +1795,8 @@ bool CoreManagerInner::UnlockPuk2(int32_t slotId, std::string newPin2, std::stri
     return simManager_->UnlockPuk2(slotId, newPin2, puk2, response);
 }
 
-bool CoreManagerInner::AlterPin2(int32_t slotId, std::string newPin2, std::string oldPin2, LockStatusResponse &response)
+bool CoreManagerInner::AlterPin2(
+    int32_t slotId, const std::string &newPin2, const std::string &oldPin2, LockStatusResponse &response)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");

@@ -30,9 +30,11 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
+namespace {
 const int32_t FORMAT_IDX_SPN_CS = 0;
 const int32_t PNN_CUST_STRING_SIZE = 2;
 const int32_t OPL_CUST_STRING_SIZE = 4;
+} // namespace
 
 OperatorName::OperatorName(const EventFwk::CommonEventSubscribeInfo &sp,
     std::shared_ptr<NetworkSearchState> networkSearchState, std::shared_ptr<ISimManager> simManager,
@@ -165,6 +167,7 @@ void OperatorName::NotifySpnChanged()
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("OperatorName::NotifySpnChanged networkSearchManager is nullptr slotId:%{public}d", slotId_);
+        return;
     }
     TELEPHONY_LOGI("OperatorName::NotifySpnChanged slotId:%{public}d", slotId_);
     RegServiceState regStatus = RegServiceState::REG_STATE_UNKNOWN;
@@ -188,8 +191,9 @@ void OperatorName::UpdatePlmn(
         switch (regStatus) {
             case RegServiceState::REG_STATE_IN_SERVICE:
                 plmn = GetPlmn(networkState, true);
-                showPlmn = !plmn.empty() && (((uint32_t)spnRule & SpnShowType::SPN_CONDITION_DISPLAY_PLMN) ==
-                                                SpnShowType::SPN_CONDITION_DISPLAY_PLMN);
+                showPlmn =
+                    !plmn.empty() && ((static_cast<uint32_t>(spnRule) & SpnShowType::SPN_CONDITION_DISPLAY_PLMN) ==
+                                         SpnShowType::SPN_CONDITION_DISPLAY_PLMN);
                 break;
             case RegServiceState::REG_STATE_NO_SERVICE:
             case RegServiceState::REG_STATE_EMERGENCY_ONLY:
@@ -228,7 +232,7 @@ void OperatorName::UpdateSpn(
         if (!csSpnFormat_.empty()) {
             spn = NetworkUtils::FormatString(csSpnFormat_, spn.c_str());
         }
-        showSpn = !spn.empty() && (((uint32_t)spnRule & SpnShowType::SPN_CONDITION_DISPLAY_SPN) ==
+        showSpn = !spn.empty() && ((static_cast<uint32_t>(spnRule) & SpnShowType::SPN_CONDITION_DISPLAY_SPN) ==
                                       SpnShowType::SPN_CONDITION_DISPLAY_SPN);
     } else {
         spn = "";
@@ -380,13 +384,14 @@ unsigned int OperatorName::GetCustSpnRule(bool roaming)
     }
     if (roaming) {
         cond = SPN_CONDITION_DISPLAY_PLMN;
-        if (((unsigned int)(displayConditionCust_) & (unsigned int)(SPN_COND)) == 0) {
-            cond |= (unsigned int)SPN_CONDITION_DISPLAY_SPN;
+        if ((static_cast<unsigned int>(displayConditionCust_) & static_cast<unsigned int>(SPN_COND)) == 0) {
+            cond |= static_cast<unsigned int>(SPN_CONDITION_DISPLAY_SPN);
         }
     } else {
         cond = SPN_CONDITION_DISPLAY_SPN;
-        if (((unsigned int)(displayConditionCust_) & (unsigned int)(SPN_COND_PLMN)) == SPN_COND_PLMN) {
-            cond |= (unsigned int)SPN_CONDITION_DISPLAY_PLMN;
+        if ((static_cast<unsigned int>(displayConditionCust_) & static_cast<unsigned int>(SPN_COND_PLMN)) ==
+            SPN_COND_PLMN) {
+            cond |= static_cast<unsigned int>(SPN_CONDITION_DISPLAY_PLMN);
         }
     }
     return cond;
@@ -394,33 +399,25 @@ unsigned int OperatorName::GetCustSpnRule(bool roaming)
 
 std::string OperatorName::GetCustEons(const std::string &numeric, int32_t lac, bool roaming, bool longNameRequired)
 {
-    if (!enableCust_ || numeric.empty() || pnnCust_.empty()) {
-        TELEPHONY_LOGI("OperatorName::GetCustEons Cust not enable, plmn or pnnFiles is empty");
+    if (!enableCust_ || numeric.empty() || pnnCust_.empty() || (oplCust_.empty() && roaming)) {
+        TELEPHONY_LOGI("OperatorName::GetCustEons is empty");
         return "";
     }
-    int32_t pnnIndex = -1;
-    if (oplCust_.empty()) {
-        TELEPHONY_LOGI("OperatorName::GetCustEons oplCust_ is empty");
-        if (roaming) {
-            return "";
-        } else {
-            pnnIndex = 1;
+    int32_t pnnIndex = 1;
+    for (std::shared_ptr<OperatorPlmnInfo> opl : oplCust_) {
+        if (opl == nullptr) {
+            continue;
         }
-    } else {
-        for (std::shared_ptr<OperatorPlmnInfo> opl : oplCust_) {
-            TELEPHONY_LOGI(
-                "OperatorName::GetCustEons numeric:%{public}s, opl->plmnNumeric:%{public}s, lac:%{public}d, "
-                "opl->lacStart:%{public}d, opl->lacEnd:%{public}d, "
-                "opl->pnnRecordId:%{public}d",
-                numeric.c_str(), opl->plmnNumeric.c_str(), lac, opl->lacStart, opl->lacEnd, opl->pnnRecordId);
-            if (numeric.compare(opl->plmnNumeric) == 0 &&
-                ((opl->lacStart == 0 && opl->lacEnd == 0xfffe) || (opl->lacStart <= lac && opl->lacEnd >= lac))) {
-                if (opl->pnnRecordId == 0) {
-                    return "";
-                }
-                pnnIndex = opl->pnnRecordId;
-                break;
-            }
+        pnnIndex = -1;
+        TELEPHONY_LOGI(
+            "OperatorName::GetCustEons numeric:%{public}s, opl->plmnNumeric:%{public}s, lac:%{public}d, "
+            "opl->lacStart:%{public}d, opl->lacEnd:%{public}d, "
+            "opl->pnnRecordId:%{public}d",
+            numeric.c_str(), opl->plmnNumeric.c_str(), lac, opl->lacStart, opl->lacEnd, opl->pnnRecordId);
+        if (numeric.compare(opl->plmnNumeric) == 0 &&
+            ((opl->lacStart == 0 && opl->lacEnd == 0xfffe) || (opl->lacStart <= lac && opl->lacEnd >= lac))) {
+            pnnIndex = opl->pnnRecordId;
+            break;
         }
     }
     TELEPHONY_LOGI("OperatorName::GetCustEons pnnIndex:%{public}d", pnnIndex);
@@ -521,7 +518,7 @@ void OperatorName::UpdatePnnCust(const std::vector<std::string> &pnnCust)
     }
     for (const auto &data : pnnCust) {
         TELEPHONY_LOGI("OperatorName::UpdatePnnCust: %{public}s", data.c_str());
-        std::vector<std::string> pnnString = NetworkUtils::Split(data, ",");
+        std::vector<std::string> pnnString = NetworkUtils::SplitString(data, ",");
         if (pnnString.size() != PNN_CUST_STRING_SIZE) {
             continue;
         }
@@ -544,7 +541,7 @@ void OperatorName::UpdateOplCust(const std::vector<std::string> &oplCust)
     }
     for (const auto &data : oplCust) {
         TELEPHONY_LOGI("OperatorName::UpdateOplCust: %{public}s", data.c_str());
-        std::vector<std::string> oplString = NetworkUtils::Split(data, ",");
+        std::vector<std::string> oplString = NetworkUtils::SplitString(data, ",");
         if (oplString.size() != OPL_CUST_STRING_SIZE || oplString.back().empty()) {
             continue;
         }

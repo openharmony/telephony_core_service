@@ -67,19 +67,23 @@ public:
     bool GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
     bool SetDefaultVoiceSlotId(int32_t slotId);
     int32_t GetDefaultVoiceSlotId();
-    bool SetShowNumber(int32_t slotId, const std::u16string number);
+    bool SetShowNumber(int32_t slotId, const std::u16string &number);
     std::u16string GetShowNumber(int32_t slotId);
-    bool SetShowName(int32_t slotId, const std::u16string name);
+    bool SetShowName(int32_t slotId, const std::u16string &name);
     std::u16string GetShowName(int32_t slotId);
     bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList);
     bool GetOperatorConfigs(int32_t slotId, OperatorConfig &poc);
 
-    bool UnlockPin(int32_t slotId, std::u16string pin, LockStatusResponse &response);
-    bool UnlockPuk(int32_t slotId, std::u16string newPin, std::u16string puk, LockStatusResponse &response);
-    bool AlterPin(int32_t slotId, std::u16string newPin, std::u16string oldPin, LockStatusResponse &response);
-    bool UnlockPin2(int32_t slotId, std::u16string pin2, LockStatusResponse &response);
-    bool UnlockPuk2(int32_t slotId, std::u16string newPin2, std::u16string puk2, LockStatusResponse &response);
-    bool AlterPin2(int32_t slotId, std::u16string newPin2, std::u16string oldPin2, LockStatusResponse &response);
+    bool UnlockPin(int32_t slotId, const std::u16string &pin, LockStatusResponse &response);
+    bool UnlockPuk(
+        int32_t slotId, const std::u16string &newPin, const std::u16string &puk, LockStatusResponse &response);
+    bool AlterPin(
+        int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin, LockStatusResponse &response);
+    bool UnlockPin2(int32_t slotId, const std::u16string &pin2, LockStatusResponse &response);
+    bool UnlockPuk2(
+        int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2, LockStatusResponse &response);
+    bool AlterPin2(
+        int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2, LockStatusResponse &response);
     bool SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response);
     int32_t GetLockState(int32_t slotId, LockType lockType);
     int32_t RefreshSimState(int32_t slotId);

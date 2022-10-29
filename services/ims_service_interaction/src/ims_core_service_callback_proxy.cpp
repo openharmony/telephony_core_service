@@ -29,6 +29,7 @@ int32_t ImsCoreServiceCallbackProxy::UpdateImsServiceStatusChanged(
     MessageParcel in;
     int32_t ret = WriteCommonInfo(__FUNCTION__, in, slotId);
     if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("[slot%{public}d]Write imsServiceStatus fail!", slotId);
         return ret;
     }
     if (!in.WriteRawData((const void *)&imsServiceStatus, sizeof(ImsServiceStatus))) {
@@ -44,6 +45,7 @@ int32_t ImsCoreServiceCallbackProxy::GetImsRegistrationStatusResponse(
     MessageParcel in;
     int32_t ret = WriteCommonInfo(__FUNCTION__, in, slotId);
     if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("[slot%{public}d]Write WriteCommonInfo fail!", slotId);
         return ret;
     }
     if (!in.WriteRawData((const void *)&imsRegStatus, sizeof(ImsRegistrationStatus))) {

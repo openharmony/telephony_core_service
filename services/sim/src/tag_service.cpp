@@ -38,7 +38,7 @@ TagService::~TagService() {}
 int TagService::GetTagCode() const
 {
     TELEPHONY_LOGI("GetTagCode : %{public}s", tag_.c_str());
-    if (IsValidHexValue(tag_)) {
+    if (!IsValidHexValue(tag_)) {
         return ERR;
     }
     int i = std::stoi(tag_, nullptr, HEX_TYPE);

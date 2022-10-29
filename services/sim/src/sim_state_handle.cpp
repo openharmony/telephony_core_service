@@ -91,7 +91,7 @@ CardType SimStateHandle::GetCardType()
     return externalType_;
 }
 
-void SimStateHandle::UnlockPin(int32_t slotId, std::string pin)
+void SimStateHandle::UnlockPin(int32_t slotId, const std::string &pin)
 {
     TELEPHONY_LOGI("SimStateHandle::UnlockPin1() slotId = %{public}d", slotId);
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_PIN_DONE);
@@ -99,7 +99,7 @@ void SimStateHandle::UnlockPin(int32_t slotId, std::string pin)
     telRilManager_->UnlockPin(slotId, pin, event);
 }
 
-void SimStateHandle::UnlockPuk(int32_t slotId, std::string newPin, std::string puk)
+void SimStateHandle::UnlockPuk(int32_t slotId, const std::string &newPin, const std::string &puk)
 {
     TELEPHONY_LOGI("SimStateHandle::UnlockPuk1() slotId = %{public}d", slotId);
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_PUK_DONE);
@@ -107,7 +107,7 @@ void SimStateHandle::UnlockPuk(int32_t slotId, std::string newPin, std::string p
     telRilManager_->UnlockPuk(slotId, puk, newPin, event);
 }
 
-void SimStateHandle::AlterPin(int32_t slotId, std::string newPin, std::string oldPin)
+void SimStateHandle::AlterPin(int32_t slotId, const std::string &newPin, const std::string &oldPin)
 {
     TELEPHONY_LOGI("SimStateHandle::AlterPin() slotId = %{public}d", slotId);
     int32_t length = (int32_t)newPin.size();
@@ -121,7 +121,7 @@ void SimStateHandle::AlterPin(int32_t slotId, std::string newPin, std::string ol
     telRilManager_->ChangeSimPassword(slotId, simPinPassword, event);
 }
 
-void SimStateHandle::UnlockPin2(int32_t slotId, std::string pin2)
+void SimStateHandle::UnlockPin2(int32_t slotId, const std::string &pin2)
 {
     TELEPHONY_LOGI("SimStateHandle::UnlockPin2() slotId = %{public}d", slotId);
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_PIN2_DONE);
@@ -129,7 +129,7 @@ void SimStateHandle::UnlockPin2(int32_t slotId, std::string pin2)
     telRilManager_->UnlockPin2(slotId, pin2, event);
 }
 
-void SimStateHandle::UnlockPuk2(int32_t slotId, std::string newPin2, std::string puk2)
+void SimStateHandle::UnlockPuk2(int32_t slotId, const std::string &newPin2, const std::string &puk2)
 {
     TELEPHONY_LOGI("SimStateHandle::UnlockPuk2() slotId = %{public}d", slotId);
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_PUK2_DONE);
@@ -137,7 +137,7 @@ void SimStateHandle::UnlockPuk2(int32_t slotId, std::string newPin2, std::string
     telRilManager_->UnlockPuk2(slotId, puk2, newPin2, event);
 }
 
-void SimStateHandle::AlterPin2(int32_t slotId, std::string newPin2, std::string oldPin2)
+void SimStateHandle::AlterPin2(int32_t slotId, const std::string &newPin2, const std::string &oldPin2)
 {
     TELEPHONY_LOGI("SimStateHandle::AlterPin2() slotId = %{public}d", slotId);
     int32_t length = (int32_t)newPin2.size();

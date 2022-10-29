@@ -28,8 +28,10 @@ using OHOS::IRemoteObject;
 using OHOS::sptr;
 namespace OHOS {
 namespace Telephony {
+namespace {
 constexpr const char *RIL_INTERFACE_SERVICE_NAME = "ril_service";
 constexpr int32_t STATUS_OK = 0;
+} // namespace
 TelRilManager::TelRilManager() {}
 
 bool TelRilManager::OnInit()
@@ -37,6 +39,7 @@ bool TelRilManager::OnInit()
     int32_t res = ConnectRilInterface();
     TELEPHONY_LOGI("TelRilManager, connect ril interface result is %{public}d", res);
     res = RegisterHdfStatusListener();
+    TELEPHONY_LOGI("TelRilManager, register hdf status is %{public}d", res);
     CreatTelRilHandler();
     for (int32_t slotId = SIM_SLOT_0; slotId < SIM_SLOT_COUNT; slotId++) {
         InitTelModule(slotId);
@@ -424,7 +427,7 @@ int32_t TelRilManager::GetEmergencyCallList(int32_t slotId, const AppExecFwk::In
 }
 
 int32_t TelRilManager::SetEmergencyCallList(
-    int32_t slotId, std::vector<EmergencyCall> &eccVec, const AppExecFwk::InnerEvent::Pointer &response)
+    int32_t slotId, const std::vector<EmergencyCall> &eccVec, const AppExecFwk::InnerEvent::Pointer &response)
 {
     TELEPHONY_LOGI("SetEmergencyCallList start");
     return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetEmergencyCallList, eccVec);
@@ -700,24 +703,26 @@ int32_t TelRilManager::ChangeSimPassword(
         simPassword.oldPassword, simPassword.newPassword, simPassword.passwordLength);
 }
 
-int32_t TelRilManager::UnlockPin(int32_t slotId, std::string pin, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::UnlockPin(
+    int32_t slotId, const std::string &pin, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::UnlockPin, pin);
 }
 
 int32_t TelRilManager::UnlockPuk(
-    int32_t slotId, std::string puk, std::string pin, const AppExecFwk::InnerEvent::Pointer &response)
+    int32_t slotId, const std::string &puk, const std::string &pin, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::UnlockPuk, puk, pin);
 }
 
-int32_t TelRilManager::UnlockPin2(int32_t slotId, std::string pin2, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::UnlockPin2(
+    int32_t slotId, const std::string &pin2, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::UnlockPin2, pin2);
 }
 
 int32_t TelRilManager::UnlockPuk2(
-    int32_t slotId, std::string puk2, std::string pin2, const AppExecFwk::InnerEvent::Pointer &response)
+    int32_t slotId, const std::string &puk2, const std::string &pin2, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::UnlockPuk2, puk2, pin2);
 }
@@ -766,20 +771,20 @@ int32_t TelRilManager::SimCloseLogicalChannel(
 }
 
 int32_t TelRilManager::SimTransmitApduLogicalChannel(
-    int32_t slotId, ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
+    int32_t slotId, const ApduSimIORequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(
         response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimTransmitApduLogicalChannel, reqInfo);
 }
 
 int32_t TelRilManager::SimTransmitApduBasicChannel(
-    int32_t slotId, ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
+    int32_t slotId, const ApduSimIORequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimTransmitApduBasicChannel, reqInfo);
 }
 
 int32_t TelRilManager::SimAuthentication(
-    int32_t slotId, SimAuthenticationRequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
+    int32_t slotId, const SimAuthenticationRequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimAuthentication, reqInfo);
 }

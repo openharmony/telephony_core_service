@@ -26,6 +26,7 @@
 
 namespace OHOS {
 namespace Telephony {
+namespace {
 const int32_t ICC_CARD_STATE_ABSENT = 0;
 const int32_t ICC_CARD_STATE_PRESENT = 1;
 const int32_t WAIT_TIME_SECOND = 2; // Set the timeout for sending the stk command
@@ -34,6 +35,7 @@ const std::string PARAM_MSG_CMD = "msgCmd";
 const std::string PARAM_CARD_STATUS = "cardStatus";
 const std::string PARAM_ALPHA_STRING = "alphaString";
 const std::string PARAM_REFRESH_RESULT = "refreshResult";
+} // namespace
 
 StkController::StkController(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     const std::weak_ptr<Telephony::ITelRilManager> &telRilManager,

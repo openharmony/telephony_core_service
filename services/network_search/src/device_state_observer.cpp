@@ -25,7 +25,9 @@
 
 namespace OHOS {
 namespace Telephony {
+namespace {
 const std::string NET_TYPE = "NetType";
+}
 
 void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler)
 {

@@ -57,7 +57,7 @@ std::string SimFile::ObtainSimOperator()
             return "";
         }
         int length = MCC_LEN + lengthOfMnc_;
-        int imsiLen = (int)imsi.size();
+        int imsiLen = static_cast<int>(imsi.size());
         operatorNumeric_ = ((imsiLen >= length) ? imsi.substr(0, MCC_LEN + lengthOfMnc_) : "");
     }
     return operatorNumeric_;
@@ -70,7 +70,7 @@ std::string SimFile::ObtainIsoCountryCode()
         TELEPHONY_LOGE("SimFile ObtainIsoCountryCode: numeric is null");
         return "";
     }
-    int len = (int)numeric.length();
+    int len = static_cast<int>(numeric.length());
     std::string mcc = numeric.substr(0, MCC_LEN);
     if (len >= MCC_LEN && IsValidDecValue(mcc)) {
         std::string iso = MccPool::MccCountryCode(std::stoi(mcc));
@@ -392,14 +392,15 @@ void SimFile::ParsePnn(const std::vector<std::string> &records)
         std::shared_ptr<PlmnNetworkName> file = std::make_shared<PlmnNetworkName>();
         int tagAndLength = NETWORK_NAME_LENGTH + 1;
         if (recordLen > tagAndLength) {
-            if (recordLen >= (tagAndLength + (int)tlv[NETWORK_NAME_LENGTH]) &&
+            if (recordLen >= (tagAndLength + static_cast<int>(tlv[NETWORK_NAME_LENGTH])) &&
                 tlv[NETWORK_NAME_IEI] == (unsigned char)LONG_NAME_FLAG) {
                 file->longName =
                     SIMUtils::Gsm7bitConvertToString(tlv + NETWORK_NAME_TEXT_STRING, tlv[NETWORK_NAME_LENGTH] - 1);
             }
             int shortNameOffset = tagAndLength + tlv[NETWORK_NAME_LENGTH];
             if (recordLen > (shortNameOffset + tagAndLength)) {
-                if (recordLen >= (shortNameOffset + tagAndLength + (int)tlv[shortNameOffset + NETWORK_NAME_LENGTH]) &&
+                if (recordLen >= (shortNameOffset + tagAndLength +
+                                     static_cast<int>(tlv[shortNameOffset + NETWORK_NAME_LENGTH])) &&
                     tlv[shortNameOffset + NETWORK_NAME_IEI] == (unsigned char)SHORT_NAME_FLAG) {
                     file->shortName =
                         SIMUtils::Gsm7bitConvertToString(tlv + (shortNameOffset + NETWORK_NAME_TEXT_STRING),
@@ -779,7 +780,7 @@ bool SimFile::ProcessGetAdDone(const AppExecFwk::InnerEvent::Pointer &event)
             doneData = false;
         }
         TELEPHONY_LOGI("SimFile ELEMENTARY_FILE_AD: %{public}s", rawData);
-        int dataSize = (int)iccData.size();
+        int dataSize = static_cast<int>(iccData.size());
         if (dataSize <= MCC_LEN) {
             TELEPHONY_LOGI("SimFile MNC length dataSize = %{public}d", dataSize);
             doneData = false;
@@ -803,7 +804,7 @@ bool SimFile::ProcessGetAdDone(const AppExecFwk::InnerEvent::Pointer &event)
 void SimFile::CheckMncLength()
 {
     std::string imsi = ObtainIMSI();
-    int imsiSize = (int)imsi.size();
+    int imsiSize = static_cast<int>(imsi.size());
     if (((lengthOfMnc_ == UNINITIALIZED_MNC) || (lengthOfMnc_ == UNKNOWN_MNC) || (lengthOfMnc_ == MNC_LEN)) &&
         ((!imsi.empty()) && (imsiSize >= MCCMNC_LEN))) {
         std::string mccMncCode = imsi.substr(0, MCCMNC_LEN);
@@ -826,7 +827,7 @@ void SimFile::CheckMncLength()
         }
     }
     int lenNum = MCC_LEN + lengthOfMnc_;
-    int sz = (int)imsi.size();
+    int sz = static_cast<int>(imsi.size());
     bool cond = sz >= lenNum;
     if ((!imsi.empty()) && (lengthOfMnc_ != UNKNOWN_MNC) && cond) {
         operatorNumeric_ = imsi.substr(0, lenNum);
@@ -1202,13 +1203,14 @@ int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
     }
     if (roaming) {
         cond = SPN_CONDITION_DISPLAY_PLMN;
-        if (((unsigned int)(displayConditionOfSpn_) & (unsigned int)(SPN_COND)) == 0) {
-            cond |= (unsigned int)SPN_CONDITION_DISPLAY_SPN;
+        if ((static_cast<unsigned int>(displayConditionOfSpn_) & static_cast<unsigned int>(SPN_COND)) == 0) {
+            cond |= static_cast<unsigned int>(SPN_CONDITION_DISPLAY_SPN);
         }
     } else {
         cond = SPN_CONDITION_DISPLAY_SPN;
-        if (((unsigned int)(displayConditionOfSpn_) & (unsigned int)(SPN_COND_PLMN)) == SPN_COND_PLMN) {
-            cond |= (unsigned int)SPN_CONDITION_DISPLAY_PLMN;
+        if ((static_cast<unsigned int>(displayConditionOfSpn_) & static_cast<unsigned int>(SPN_COND_PLMN)) ==
+            SPN_COND_PLMN) {
+            cond |= static_cast<unsigned int>(SPN_CONDITION_DISPLAY_PLMN);
         }
     }
     return cond;
