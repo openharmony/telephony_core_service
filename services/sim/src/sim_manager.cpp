@@ -529,15 +529,19 @@ bool SimManager::SendTerminalResponseCmd(int32_t slotId, const std::string &cmd)
     return stkManager_[slotId]->SendTerminalResponseCmd(slotId, cmd);
 }
 
-bool SimManager::SendCallSetupRequestResult(int32_t slotId, bool accept)
+int32_t SimManager::SendCallSetupRequestResult(int32_t slotId, bool accept)
 {
-    if ((!IsValidSlotId(slotId)) || (stkManager_[slotId] == nullptr)) {
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("slotId is invalid!");
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+    if (stkManager_[slotId] == nullptr) {
         TELEPHONY_LOGE("stkManager is null!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!HasSimCard(slotId)) {
         TELEPHONY_LOGE("SendCallSetupRequestResult has no sim card!");
-        return false;
+        return TELEPHONY_ERR_NO_SIM_CARD;
     }
     return stkManager_[slotId]->SendCallSetupRequestResult(slotId, accept);
 }
@@ -625,31 +629,46 @@ std::u16string SimManager::GetSimGid2(int32_t slotId)
     return simFileManager_[slotId]->GetSimGid2();
 }
 
-std::u16string SimManager::GetOpName(int32_t slotId)
+int32_t SimManager::GetOpName(int32_t slotId, std::u16string &opname)
 {
-    if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simFileManager is null!");
-        return u"";
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("slotId is invalid! %{public}d", slotId);
+        return TELEPHONY_ERR_SLOTID_INVALID;
     }
-    return simFileManager_[slotId]->GetOpName();
+    if (simFileManager_[slotId] == nullptr) {
+        TELEPHONY_LOGE("simFileManager is null! %{public}d", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    opname = simFileManager_[slotId]->GetOpName();
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-std::u16string SimManager::GetOpKey(int32_t slotId)
+int32_t SimManager::GetOpKey(int32_t slotId, std::u16string &opkey)
 {
-    if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simFileManager is null!");
-        return u"";
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("slotId is invalid! %{public}d", slotId);
+        return TELEPHONY_ERR_SLOTID_INVALID;
     }
-    return simFileManager_[slotId]->GetOpKey();
+    if (simFileManager_[slotId] == nullptr) {
+        TELEPHONY_LOGE("simFileManager is null! %{public}d", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    opkey = simFileManager_[slotId]->GetOpKey();
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-std::u16string SimManager::GetOpKeyExt(int32_t slotId)
+int32_t SimManager::GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt)
 {
-    if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simFileManager is null!");
-        return u"";
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("slotId is invalid! %{public}d", slotId);
+        return TELEPHONY_ERR_SLOTID_INVALID;
     }
-    return simFileManager_[slotId]->GetOpKeyExt();
+    if (simFileManager_[slotId] == nullptr) {
+        TELEPHONY_LOGE("simFileManager is null! %{public}d", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    opkeyExt = simFileManager_[slotId]->GetOpKeyExt();
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 std::u16string SimManager::GetSimTelephoneNumber(int32_t slotId)

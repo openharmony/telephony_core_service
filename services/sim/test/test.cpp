@@ -18,20 +18,157 @@
 #include <iostream>
 #include <map>
 
+#include "ability_context.h"
+#include "accesstoken_kit.h"
+#include "common_event_manager.h"
 #include "common_event_test.h"
 #include "core_service_client.h"
-#include "common_event_manager.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
-#include "string_ex.h"
-#include "system_ability_definition.h"
-#include "want.h"
 #include "sim_account_manager.h"
 #include "sim_state_type.h"
+#include "string_ex.h"
+#include "system_ability_definition.h"
+#include "token_setproc.h"
+#include "want.h"
 
 using namespace std;
 using namespace OHOS::Telephony;
+using namespace OHOS::Security::AccessToken;
+using OHOS::Security::AccessToken::AccessTokenID;
+
+HapInfoParams testInfoParams = {
+    .bundleName = "tel_sim_test",
+    .userID = 1,
+    .instIndex = 0,
+    .appIDDesc = "test",
+};
+
+PermissionDef testPermGetTelephonyStateDef = {
+    .permissionName = "ohos.permission.GET_TELEPHONY_STATE",
+    .bundleName = "tel_sim_test",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test core service",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testGetTelephonyState = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.GET_TELEPHONY_STATE",
+    .resDeviceID = { "local" },
+};
+
+PermissionDef testPermSetTelephonyStateDef = {
+    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
+    .bundleName = "tel_sim_test",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test core service",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testSetTelephonyState = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
+    .resDeviceID = { "local" },
+};
+
+PermissionDef testPermGetNetworkInfoDef = {
+    .permissionName = "ohos.permission.GET_NETWORK_INFO",
+    .bundleName = "tel_core_service_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test core service",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testPermGetNetworkInfo = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.GET_NETWORK_INFO",
+    .resDeviceID = { "local" },
+};
+
+PermissionDef testPermReadContactsDef = {
+    .permissionName = "ohos.permission.READ_CONTACTS",
+    .bundleName = "tel_sim_test",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test core service",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testPermReadContacts = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.READ_CONTACTS",
+    .resDeviceID = { "local" },
+};
+
+PermissionDef testPermWriteContactsDef = {
+    .permissionName = "ohos.permission.WRITE_CONTACTS",
+    .bundleName = "tel_sim_test",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test core service",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testPermWriteContacts = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.WRITE_CONTACTS",
+    .resDeviceID = { "local" },
+};
+
+HapPolicyParams testPolicyParams = {
+    .apl = APL_SYSTEM_BASIC,
+    .domain = "test.domain",
+    .permList = { testPermGetTelephonyStateDef, testPermSetTelephonyStateDef, testPermGetNetworkInfoDef,
+        testPermReadContactsDef, testPermWriteContactsDef },
+    .permStateList = { testGetTelephonyState, testSetTelephonyState, testPermGetNetworkInfo, testPermReadContacts,
+        testPermWriteContacts },
+};
+
+class AccessToken {
+public:
+    AccessToken()
+    {
+        currentID_ = GetSelfTokenID();
+        AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(testInfoParams, testPolicyParams);
+        accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
+        SetSelfTokenID(accessID_);
+    }
+    ~AccessToken()
+    {
+        AccessTokenKit::DeleteToken(accessID_);
+        SetSelfTokenID(currentID_);
+    }
+
+private:
+    AccessTokenID currentID_ = 0;
+    AccessTokenID accessID_ = 0;
+};
+
 namespace OHOS {
 namespace Telephony {
 using CmdProcessFunc = bool (*)();
@@ -167,6 +304,7 @@ static bool AmongLock(int mid, PinLockEnable min, PinLockEnable max)
 
 static bool TestHasSimCard()
 {
+    AccessToken token;
     bool result = g_telephonyService->HasSimCard(SLOT_ID);
     string expect = result ? "success" : "fail";
     std::cout << "TelephonyTestService Remote HasSimCard result [" << result << "] " << expect << std::endl;
@@ -189,6 +327,7 @@ static bool AmongPersoLockType(int mid, PersoLockTypeTest min, PersoLockTypeTest
 
 static bool TestGetSimState()
 {
+    AccessToken token;
     const int simReady = 4;
     int32_t result = static_cast<int32_t>(g_telephonyService->GetSimState(SLOT_ID));
     string expect = (result == simReady) ? "success" : "fail";
@@ -198,6 +337,7 @@ static bool TestGetSimState()
 
 static bool TestGetCardType()
 {
+    AccessToken token;
     int32_t result = static_cast<int32_t>(g_telephonyService->GetCardType(SLOT_ID));
     std::cout << "TelephonyTestService Remote GetCardType result [" << result << "] " << std::endl;
     return true;
@@ -205,6 +345,7 @@ static bool TestGetCardType()
 
 static bool TestSetPrimarySlotId()
 {
+    AccessToken token;
     static int32_t testDefaultPrimarySlot = SLOT_ID;
     std::cout << "please input Primary Slot Id" << std::endl;
     std::cin >> testDefaultPrimarySlot;
@@ -217,6 +358,7 @@ static bool TestSetPrimarySlotId()
 
 static bool TestGetPrimarySlotId()
 {
+    AccessToken token;
     int32_t result = g_telephonyService->GetPrimarySlotId();
     string expect = (result >= INVALID_VALUE) ? "success" : "fail";
     std::cout << "TelephonyTestService Remote GetPrimarySlotId result [" << result << "] " << expect
@@ -226,6 +368,7 @@ static bool TestGetPrimarySlotId()
 
 static bool TestGetISOCountryCodeForSim()
 {
+    AccessToken token;
     std::u16string result = g_telephonyService->GetISOCountryCodeForSim(SLOT_ID);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
@@ -236,6 +379,7 @@ static bool TestGetISOCountryCodeForSim()
 
 static bool TestGetSimSpn()
 {
+    AccessToken token;
     std::u16string result  = u"test";
     result = g_telephonyService->GetSimSpn(SLOT_ID);
     std::string str = Str16ToStr8(result);
@@ -246,6 +390,7 @@ static bool TestGetSimSpn()
 
 static bool TestGetSimIccId()
 {
+    AccessToken token;
     int32_t slotId = 0;
     std::cout << "please input soltid:"<< std::endl;
     std::cin >> slotId;
@@ -258,6 +403,7 @@ static bool TestGetSimIccId()
 
 static bool TestGetSlotId()
 {
+    AccessToken token;
     int32_t simId = 0;
     std::cout << "please input simId:" << std::endl;
     std::cin >> simId;
@@ -270,6 +416,7 @@ static bool TestGetSlotId()
 
 static bool TestGetSimId()
 {
+    AccessToken token;
     int32_t slotId = 0;
     std::cout << "please input slotId:" << std::endl;
     std::cin >> slotId;
@@ -282,6 +429,7 @@ static bool TestGetSimId()
 
 static bool TestGetSimEons()
 {
+    AccessToken token;
     int32_t slotId = 0;
     std::cout << "please input soltId:"<< std::endl;
     std::cin >> slotId;
@@ -303,6 +451,7 @@ static bool TestGetSimEons()
 
 static bool TestGetSimOperatorNumeric()
 {
+    AccessToken token;
     std::u16string result = g_telephonyService->GetSimOperatorNumeric(SLOT_ID);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
@@ -312,6 +461,7 @@ static bool TestGetSimOperatorNumeric()
 
 static bool TestGetIMSI()
 {
+    AccessToken token;
     std::u16string result = g_telephonyService->GetIMSI(SLOT_ID);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
@@ -321,6 +471,7 @@ static bool TestGetIMSI()
 
 static bool TestIsSimActive()
 {
+    AccessToken token;
     std::cout << "please input slot Id" << std::endl;
     int testSim = DEFAULT_VALUE;
     std::cin >> testSim;
@@ -332,6 +483,7 @@ static bool TestIsSimActive()
 
 static bool TestGetSimGid1()
 {
+    AccessToken token;
     std::u16string result = g_telephonyService->GetSimGid1(SLOT_ID);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
@@ -341,6 +493,7 @@ static bool TestGetSimGid1()
 
 static bool TestGetSimGid2()
 {
+    AccessToken token;
     std::u16string result = g_telephonyService->GetSimGid2(SLOT_ID);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
@@ -350,6 +503,7 @@ static bool TestGetSimGid2()
 
 static bool TestGetSimTelephoneNumber()
 {
+    AccessToken token;
     std::u16string result = g_telephonyService->GetSimTelephoneNumber(SLOT_ID);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
@@ -359,6 +513,7 @@ static bool TestGetSimTelephoneNumber()
 
 static bool TestGetSimTeleNumberIdentifier()
 {
+    AccessToken token;
     std::u16string result = g_telephonyService->GetSimTeleNumberIdentifier(SLOT_ID);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
@@ -369,6 +524,7 @@ static bool TestGetSimTeleNumberIdentifier()
 
 static bool TestGetVoiceMailIdentifier()
 {
+    AccessToken token;
     std::u16string result = g_telephonyService->GetVoiceMailIdentifier(SLOT_ID);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
@@ -379,6 +535,7 @@ static bool TestGetVoiceMailIdentifier()
 
 static bool TestGetVoiceMailNumber()
 {
+    AccessToken token;
     std::u16string result = g_telephonyService->GetVoiceMailNumber(SLOT_ID);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
@@ -388,6 +545,7 @@ static bool TestGetVoiceMailNumber()
 
 static bool TestQueryIccDiallingNumbers()
 {
+    AccessToken token;
     int testType = 0;
     int type = DiallingNumbersInfo::SIM_ADN;
     std::cout << "please select type: 1.public dialling numbers 2.fix dialing numbers" << std::endl;
@@ -419,6 +577,7 @@ static bool TestQueryIccDiallingNumbers()
 
 static bool TestAddIccDiallingNumbers()
 {
+    AccessToken token;
     if (!g_simDiallingNumbersRead) {
         std::cout << "you need run QueryIccDiallingNumbers once at least" << std::endl;
         return true;
@@ -454,6 +613,7 @@ static bool TestAddIccDiallingNumbers()
 
 static bool TestDelIccDiallingNumbers()
 {
+    AccessToken token;
     if (!g_simDiallingNumbersRead) {
         std::cout << "you need run QueryIccDiallingNumbers once at least" << std::endl;
         return true;
@@ -483,6 +643,7 @@ static bool TestDelIccDiallingNumbers()
 
 static bool TestUpdateIccDiallingNumbers()
 {
+    AccessToken token;
     if (!g_simDiallingNumbersRead) {
         std::cout << "you need run QueryIccDiallingNumbers once at least" << std::endl;
         return true;
@@ -520,6 +681,7 @@ static bool TestUpdateIccDiallingNumbers()
 
 static bool TestSetVoiceMailInfo()
 {
+    AccessToken token;
     std::string name = "";
     std::string number = "";
     std::cout << "input name:" << std::endl;
@@ -535,6 +697,7 @@ static bool TestSetVoiceMailInfo()
 
 static bool TestGetSimSubscriptionInfo()
 {
+    AccessToken token;
     const std::u16string defaultName = u"testShowName";
     const std::u16string defaultNumber = u"testShowNumber";
     std::cout << "please input Sub Id" << std::endl;
@@ -559,6 +722,7 @@ static bool TestGetSimSubscriptionInfo()
 
 static bool TestSetDefaultVoiceSlotId()
 {
+    AccessToken token;
     static int32_t testDefaultVoiceSlot = SLOT_ID;
     std::cout << "please input Default Voice Slot Id" << std::endl;
     std::cin >> testDefaultVoiceSlot;
@@ -571,6 +735,7 @@ static bool TestSetDefaultVoiceSlotId()
 
 static bool TestGetDefaultVoiceSlotId()
 {
+    AccessToken token;
     int32_t result = g_telephonyService->GetDefaultVoiceSlotId();
     string expect = (result >= INVALID_VALUE) ? "success" : "fail";
     std::cout << "TelephonyTestService Remote GetDefaultVoiceSlotId result [" << result << "] " << expect
@@ -580,6 +745,7 @@ static bool TestGetDefaultVoiceSlotId()
 
 static bool TestSetShowNumber()
 {
+    AccessToken token;
     int32_t slot;
     std::cout << "please input Slot Id" << std::endl;
     std::cin >> slot;
@@ -594,6 +760,7 @@ static bool TestSetShowNumber()
 
 static bool TestSetShowName()
 {
+    AccessToken token;
     int32_t slot;
     std::cout << "please input Slot Id" << std::endl;
     std::cin >> slot;
@@ -608,6 +775,7 @@ static bool TestSetShowName()
 
 static bool TestGetShowNumber()
 {
+    AccessToken token;
     int32_t slot;
     std::cout << "please input Slot Id" << std::endl;
     std::cin >> slot;
@@ -620,6 +788,7 @@ static bool TestGetShowNumber()
 
 static bool TestGetShowName()
 {
+    AccessToken token;
     int32_t slot;
     std::cout << "please input Slot Id" << std::endl;
     std::cin >> slot;
@@ -632,6 +801,7 @@ static bool TestGetShowName()
 
 static bool TestGetActiveSimAccountInfoList()
 {
+    AccessToken token;
     std::vector<IccAccountInfo> iccAccountInfoList;
     bool result = g_telephonyService->GetActiveSimAccountInfoList(iccAccountInfoList);
     string expect = result ? "success" : "fail";
@@ -653,6 +823,7 @@ static bool TestGetActiveSimAccountInfoList()
 
 static bool TestGetOperatorConfig()
 {
+    AccessToken token;
     OperatorConfig oc;
     bool result = g_telephonyService->GetOperatorConfigs(DEFAULT_SIM_SLOT_ID, oc);
     string expect = result ? "success" : "fail";
@@ -668,6 +839,7 @@ static bool TestGetOperatorConfig()
 
 static bool TestUnlockPin()
 {
+    AccessToken token;
     LockStatusResponse response = {0};
     std::string pin = " ";
     int size = 0;
@@ -684,6 +856,7 @@ static bool TestUnlockPin()
 
 static bool TestUnlockPuk()
 {
+    AccessToken token;
     LockStatusResponse response = {0};
     std::string newPin = " ";
     std::string puk = " ";
@@ -707,6 +880,7 @@ static bool TestUnlockPuk()
 
 static bool TestAlterPin()
 {
+    AccessToken token;
     LockStatusResponse response = {0};
     std::string oldPin = " ";
     std::string newPin = " ";
@@ -730,6 +904,7 @@ static bool TestAlterPin()
 
 static bool TestUnlockPin2()
 {
+    AccessToken token;
     LockStatusResponse response = {0};
     std::string pin2 = " ";
     int size = 0;
@@ -746,6 +921,7 @@ static bool TestUnlockPin2()
 
 static bool TestUnlockPuk2()
 {
+    AccessToken token;
     LockStatusResponse response = {0};
     std::string newPin2 = " ";
     std::string puk2 = " ";
@@ -769,6 +945,7 @@ static bool TestUnlockPuk2()
 
 static bool TestAlterPin2()
 {
+    AccessToken token;
     LockStatusResponse response = {0};
     std::string oldPin2 = " ";
     std::string newPin2 = " ";
@@ -792,6 +969,7 @@ static bool TestAlterPin2()
 
 static bool TestSetLockState()
 {
+    AccessToken token;
     LockStatusResponse response = {0};
     int32_t testType = -1;
     std::string testPin = " ";
@@ -827,6 +1005,7 @@ static bool TestSetLockState()
 
 static bool TestGetLockState()
 {
+    AccessToken token;
     int32_t testType = -1;
     while (!AmongLockType(testType, LockTypeTest::PIN_LOCK_TYPE, LockTypeTest::FDN_LOCK_TTPE)) {
         std::cout << "\n Set lock switch, Please input lock type (1. PIN_LOCK  2. FDN_LOCK)\n";
@@ -840,6 +1019,7 @@ static bool TestGetLockState()
 
 static bool TestRefreshSimState()
 {
+    AccessToken token;
     int32_t ret = g_telephonyService->RefreshSimState(SLOT_ID);
     std::cout << "TestRefreshSimState()" << ret << endl;
     return true;
@@ -847,6 +1027,7 @@ static bool TestRefreshSimState()
 
 static bool TestSetActiveSim()
 {
+    AccessToken token;
     int32_t enable = ACTIVE;
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::cout << "please input sim Id" << endl;
@@ -861,6 +1042,7 @@ static bool TestSetActiveSim()
 
 static bool TestGetMaxSimCount()
 {
+    AccessToken token;
     int32_t result = g_telephonyService->GetMaxSimCount();
     string expect = (result != INVALID_VALUE) ? "success" : "fail";
     std::cout << "TelephonyTestService Remote GetMaxSimCount result [" << result << "] " << expect << std::endl;
@@ -869,32 +1051,40 @@ static bool TestGetMaxSimCount()
 
 static bool TestGetOpKey()
 {
-    std::u16string result = g_telephonyService->GetOpKey(SLOT_ID);
-    std::string str = Str16ToStr8(result);
-    string expect = str.empty() ? "fail" : "success";
+    AccessToken token;
+    std::u16string opkey;
+    int32_t result = g_telephonyService->GetOpKey(SLOT_ID, opkey);
+    std::string str = Str16ToStr8(opkey);
+    string expect = (result == TELEPHONY_ERR_SUCCESS) ? "success" : "fail";
     std::cout << "TestGetOpKey Remote GetOpKey result [" << str << "] " << expect << std::endl;
     return true;
 }
 
 static bool TestGetOpName()
 {
-    std::u16string result = g_telephonyService->GetOpName(SLOT_ID);
-    std::string str = Str16ToStr8(result);
-    string expect = str.empty() ? "fail" : "success";
+    AccessToken token;
+    std::u16string opname;
+    int32_t result = g_telephonyService->GetOpName(SLOT_ID, opname);
+    std::string str = Str16ToStr8(opname);
+    string expect = (result == TELEPHONY_ERR_SUCCESS) ? "success" : "fail";
     std::cout << "TestGetOpName Remote GetOpName result [" << str << "] " << expect << std::endl;
     return true;
 }
 
 static bool TestGetOpKeyExt()
 {
-    std::u16string result = g_telephonyService->GetOpKeyExt(SLOT_ID);
-    std::string str = Str16ToStr8(result);
-    std::cout << "TestGetOpKeyExt Remote GetOpKeyExt result [" << str << "] " << std::endl;
+    AccessToken token;
+    std::u16string opkeyExt;
+    int32_t result = g_telephonyService->GetOpKeyExt(SLOT_ID, opkeyExt);
+    std::string str = Str16ToStr8(opkeyExt);
+    string expect = (result == TELEPHONY_ERR_SUCCESS) ? "success" : "fail";
+    std::cout << "TestGetOpKeyExt Remote GetOpKeyExt result [" << str << "] " << expect << std::endl;
     return true;
 }
 
 static int32_t GetSimLockType()
 {
+    AccessToken token;
     int32_t testType = -1;
     while (!AmongPersoLockType(testType, PersoLockTypeTest::SIM_PN_PIN_TYPE,
         PersoLockTypeTest::SIM_SIM_PUK_TYPE)) {
@@ -916,6 +1106,7 @@ static int32_t GetSimLockType()
 
 static std::string GetSimLockPassword(int32_t testType)
 {
+    AccessToken token;
     std::string password = "";
     int size = 0;
     while (!Among(size, PinWordSize::PIN_MIN_SIZE, PinWordSize::PIN_MAX_SIZE)) {
@@ -962,6 +1153,7 @@ static std::string GetSimLockPassword(int32_t testType)
 
 static bool TestUnlockSimLock()
 {
+    AccessToken token;
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::cout << "please input sim Id" << endl;
     std::cin >> slotId;
@@ -983,6 +1175,7 @@ static bool TestUnlockSimLock()
 
 static bool TestHasOperatorPrivileges()
 {
+    AccessToken token;
     std::cout << "input slotId:" << std::endl;
     int32_t slotId = 0;
     std::cin >> slotId;
@@ -993,6 +1186,7 @@ static bool TestHasOperatorPrivileges()
 
 static bool TestSendTerminalResponseCmd()
 {
+    AccessToken token;
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::cout << "please input slotId" << endl;
     std::cin >> slotId;
@@ -1006,6 +1200,7 @@ static bool TestSendTerminalResponseCmd()
 
 static bool TestSendEnvelopeCmd()
 {
+    AccessToken token;
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::cout << "please input slotId" << endl;
     std::cin >> slotId;
@@ -1019,13 +1214,14 @@ static bool TestSendEnvelopeCmd()
 
 static bool TestSendCallSetupRequestResult()
 {
+    AccessToken token;
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::cout << "please input slotId" << endl;
     std::cin >> slotId;
     int32_t accept = 0;
     std::cout << "input call setup request result" << std::endl;
     std::cin >> accept;
-    bool result = g_telephonyService->SendCallSetupRequestResult(slotId, accept);
+    int32_t result = g_telephonyService->SendCallSetupRequestResult(slotId, accept);
     std::cout << "TelephonyTestService Remote SendCallSetupRequestResult result [" << result << "] " << std::endl;
     return true;
 }

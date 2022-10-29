@@ -84,7 +84,7 @@ public:
     // STK
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
-    bool SendCallSetupRequestResult(int32_t slotId, bool accept) override;
+    int32_t SendCallSetupRequestResult(int32_t slotId, bool accept) override;
     // SimFile
     std::u16string GetSimOperatorNumeric(int32_t slotId) override;
     std::u16string GetISOCountryCodeForSim(int32_t slotId) override;
@@ -95,9 +95,9 @@ public:
     std::u16string GetLocaleFromDefaultSim(int32_t slotId) override;
     std::u16string GetSimGid1(int32_t slotId) override;
     std::u16string GetSimGid2(int32_t slotId) override;
-    std::u16string GetOpName(int32_t slotId) override;
-    std::u16string GetOpKey(int32_t slotId) override;
-    std::u16string GetOpKeyExt(int32_t slotId) override;
+    int32_t GetOpName(int32_t slotId, std::u16string &opname) override;
+    int32_t GetOpKey(int32_t slotId, std::u16string &opkey) override;
+    int32_t GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt) override;
     std::u16string GetSimTelephoneNumber(int32_t slotId) override;
     std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) override;
     std::u16string GetVoiceMailIdentifier(int32_t slotId) override;

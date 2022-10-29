@@ -33,7 +33,7 @@ public:
     void Init();
     bool SendTerminalResponseCmd(const std::string &strCmd);
     bool SendEnvelopeCmd(const std::string &strCmd);
-    bool SendCallSetupRequestResult(bool accept);
+    int32_t SendCallSetupRequestResult(bool accept);
     void UnRegisterEvents();
 
 private:

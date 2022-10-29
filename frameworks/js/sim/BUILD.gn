@@ -39,6 +39,7 @@ ohos_shared_library("sim") {
 
   external_deps = [
     "c_utils:utils",
+    "core_service:libtel_common",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
   ]

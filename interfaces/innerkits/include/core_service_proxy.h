@@ -105,12 +105,12 @@ public:
         const int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) override;
     int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) override;
     int32_t GetMaxSimCount() override;
-    std::u16string GetOpKey(int32_t slotId) override;
-    std::u16string GetOpKeyExt(int32_t slotId) override;
-    std::u16string GetOpName(int32_t slotId) override;
+    int32_t GetOpKey(int32_t slotId, std::u16string &opkey) override;
+    int32_t GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt) override;
+    int32_t GetOpName(int32_t slotId, std::u16string &opname) override;
     bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
     bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
-    bool SendCallSetupRequestResult(int32_t slotId, bool accept) override;
+    int32_t SendCallSetupRequestResult(int32_t slotId, bool accept) override;
     bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;
     std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) override;
     bool SendUpdateCellLocationRequest(int32_t slotId) override;
