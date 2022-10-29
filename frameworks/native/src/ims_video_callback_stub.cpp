@@ -14,6 +14,7 @@
  */
 
 #include "ims_video_callback_stub.h"
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -22,6 +23,10 @@ int ImsVideoCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     TELEPHONY_LOGI("ImsVideoCallbackStub Enter!");
+    if (data.ReadInterfaceToken() != GetDescriptor()) {
+        TELEPHONY_LOGE("descriptor checked fail");
+        return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
+    }
     int32_t imsRegState = data.ReadInt32();
     int32_t imsRegTech = data.ReadInt32();
     const ImsRegInfo info = {static_cast<ImsRegState>(imsRegState), static_cast<ImsRegTech>(imsRegTech)};
