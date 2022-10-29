@@ -23,13 +23,17 @@
 namespace OHOS {
 AddCoreServiceTokenFuzzer::AddCoreServiceTokenFuzzer()
 {
-    const char **perms = new const char *[2];
+    const char **perms = new const char *[6];
     perms[0] = "ohos.permission.WRITE_CONTACTS";
     perms[1] = "ohos.permission.SET_TELEPHONY_STATE";
+    perms[2] = "ohos.permission.GET_TELEPHONY_STATE";
+    perms[3] = "ohos.permission.READ_CONTACTS";
+    perms[4] = "ohos.permission.WRITE_CONTACTS";
+    perms[5] = "ohos.permission.LOCATION";
 
     NativeTokenInfoParams testCoreServiceInfoParams = {
         .dcapsNum = 0,
-        .permsNum = 2,
+        .permsNum = 6,
         .aclsNum = 0,
         .dcaps = nullptr,
         .perms = perms,
