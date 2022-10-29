@@ -31,13 +31,18 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % 2);
+    int32_t slotId = static_cast<int32_t>(size);
     std::string mailNumber(reinterpret_cast<const char *>(data), size);
     std::string mailName(reinterpret_cast<const char *>(data), size);
 
     auto mailNameU16 = Str8ToStr16(mailName);
     auto mailNumberU16 = Str8ToStr16(mailNumber);
-
+    std::vector<IccAccountInfo> iccAccountInfoList;
+    OperatorConfig poc;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDefaultVoiceSlotId();
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOperatorConfigs(slotId, poc);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetLockState(slotId, static_cast<LockType>(size % 2));
     DelayedRefSingleton<CoreServiceClient>::GetInstance().SetVoiceMailInfo(slotId, mailNameU16, mailNumberU16);
     return;
 }
