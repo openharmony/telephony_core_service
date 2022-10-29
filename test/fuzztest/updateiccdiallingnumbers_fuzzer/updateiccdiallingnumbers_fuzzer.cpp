@@ -31,7 +31,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % 2);
+    int32_t slotId = static_cast<int32_t>(size);
     int32_t type = 0 - size % 8;
     std::string number(reinterpret_cast<const char *>(data), size);
     std::string name(reinterpret_cast<const char *>(data), size);
@@ -41,7 +41,14 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     telNumber->name_ = Str8ToStr16(name);
     telNumber->number_ = Str8ToStr16(number);
     telNumber->pin2_ = Str8ToStr16(pin2);
-
+    std::u16string opKey;
+    std::u16string opName;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpKey(slotId, opKey);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpKeyExt(slotId, opKey);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpName(slotId, opName);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().SendCallSetupRequestResult(slotId, size % 2);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().HasOperatorPrivileges(slotId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCellInfoList(slotId);
     DelayedRefSingleton<CoreServiceClient>::GetInstance().UpdateIccDiallingNumbers(slotId, type, telNumber);
     return;
 }
