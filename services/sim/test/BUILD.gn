@@ -31,13 +31,13 @@ ohos_executable("tel_sim_test") {
   ]
 
   include_dirs = [
-    "//base/telephony/data_storage/sim/include",
-    "//base/telephony/data_storage/common/include",
+    "//base/telephony/telephony_data/sim/include",
+    "//base/telephony/telephony_data/common/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/base/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/state_registry",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/data_storage",
+    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/telephony_data",
     "$TELEPHONY_SIM_ROOT/include",
 
     "$HDF_FRAMEWORKS/ability/sbuf/include",
