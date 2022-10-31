@@ -42,12 +42,8 @@ AddCoreServiceTokenFuzzer::AddCoreServiceTokenFuzzer()
         .aplStr = "system_basic",
     };
     currentID_ = GetAccessTokenId(&testCoreServiceInfoParams);
-    std::cout << "AddCoreServiceTokenFuzzer currentID_ : " << currentID_ << std::endl;
     SetSelfTokenID(currentID_);
     Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
-AddCoreServiceTokenFuzzer::~AddCoreServiceTokenFuzzer()
-{
-    std::cout << "AddCoreServiceTokenFuzzer ~AddCoreServiceTokenFuzzer" << std::endl;
-}
+AddCoreServiceTokenFuzzer::~AddCoreServiceTokenFuzzer() {}
 } // namespace OHOS
