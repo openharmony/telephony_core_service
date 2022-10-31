@@ -160,7 +160,7 @@ static void NativeGetRadioTech(napi_env env, void *data)
 
 static void GetRadioTechCallback(napi_env env, napi_status status, void *data)
 {
-    auto asyncContext = (RadioTechContext *)data;
+    auto asyncContext = static_cast<RadioTechContext *>(data);
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
         napi_create_object(env, &callbackValue);
@@ -503,7 +503,7 @@ static void NativeGetNetworkSelectionMode(napi_env env, void *data)
 
 static void GetNetworkSelectionModeCallback(napi_env env, napi_status status, void *data)
 {
-    auto asyncContext = (GetSelectModeContext *)data;
+    auto asyncContext = static_cast<GetSelectModeContext *>(data);
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
         napi_create_int32(env, asyncContext->selectMode, &callbackValue);
@@ -1716,7 +1716,7 @@ napi_value JudgmentData(napi_env env, sptr<CellInformation> infoItem, CellInform
 
 static void NativeGetCellInformation(napi_env env, void *data)
 {
-    auto asyncContext = (CellInformationContext *)data;
+    auto asyncContext = static_cast<CellInformationContext *>(data);
     if (!IsValidSlotId(asyncContext->slotId)) {
         TELEPHONY_LOGE("NativeGetCellInformation slotId is invalid");
         asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
@@ -1805,14 +1805,14 @@ static napi_value GetCellInformation(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_create_string_utf8(env, "GetCellInformation",
                                            NAPI_AUTO_LENGTH, &resourceName));
     NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, NativeGetCellInformation,
-                       GetCellInformationCallback, (void *)asyncContext, &(asyncContext->work)));
+                       GetCellInformationCallback, static_cast<void *>(asyncContext), &(asyncContext->work)));
     NAPI_CALL(env, napi_queue_async_work(env, asyncContext->work));
     return result;
 }
 
 static void NativeGetPrimarySlotId(napi_env env, void *data)
 {
-    auto asyncContext = (GetPrimarySlotIdContext *)data;
+    auto asyncContext = static_cast<GetPrimarySlotIdContext *>(data);
     asyncContext->slotId = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPrimarySlotId();
     TELEPHONY_LOGI("GetPrimarySlotId = %{public}d", asyncContext->slotId);
     asyncContext->resolved = (asyncContext->slotId >= 0);

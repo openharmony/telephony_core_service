@@ -754,9 +754,9 @@ bool SimManager::DelSmsIcc(int32_t slotId, int index)
 
 std::vector<std::string> SimManager::ObtainAllSmsOfIcc(int32_t slotId)
 {
-    std::vector<std::string> result;
     if ((!IsValidSlotId(slotId)) || (simSmsManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simSmsManager_ is null!");
+        std::vector<std::string> result;
         return result;
     }
     return simSmsManager_[slotId]->ObtainAllSmsOfIcc();
@@ -764,9 +764,9 @@ std::vector<std::string> SimManager::ObtainAllSmsOfIcc(int32_t slotId)
 
 std::vector<std::shared_ptr<DiallingNumbersInfo>> SimManager::QueryIccDiallingNumbers(int slotId, int type)
 {
-    std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
     if ((!IsValidSlotId(slotId)) || (iccDiallingNumbersManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("iccDiallingNumbersManager is null!");
+        std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
         return result;
     }
     return iccDiallingNumbersManager_[slotId]->QueryIccDiallingNumbers(type);

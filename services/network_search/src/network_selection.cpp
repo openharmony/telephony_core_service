@@ -181,7 +181,7 @@ bool NetworkSelection::AvailNetworkResult(
     if (availNetworkResult != nullptr) {
         int32_t availableSize = availNetworkResult->itemNum;
         index = availNetworkResult->flag;
-        std::vector<AvailableNetworkInfo> &availableNetworkInfo = availNetworkResult->availableNetworkInfo;
+        const std::vector<AvailableNetworkInfo> &availableNetworkInfo = availNetworkResult->availableNetworkInfo;
         std::vector<NetworkInformation> networkInformation;
         if (availableSize > 0) {
             for (auto &availableNetworkInfoItem : availableNetworkInfo) {
