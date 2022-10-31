@@ -108,8 +108,8 @@ ohos_shared_library("tel_core_service") {
   ]
 
   include_dirs = [
-    "//base/telephony/data_storage/sim/include",
-    "//base/telephony/data_storage/common/include",
+    "//base/telephony/telephony_data/sim/include",
+    "//base/telephony/telephony_data/common/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/core/include",
     "$TELEPHONY_TEL_RIL_ROOT/include",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/include",
