@@ -148,7 +148,7 @@ int32_t TelRilSms::SetCBConfig(
 }
 
 int32_t TelRilSms::SetCdmaCBConfig(
-    CdmaCBConfigInfoList &cdmaCBConfigInfoList, const AppExecFwk::InnerEvent::Pointer &response)
+    const CdmaCBConfigInfoList &cdmaCBConfigInfoList, const AppExecFwk::InnerEvent::Pointer &response)
 {
     HDI::Ril::V1_0::CdmaCBConfigInfoList iCdmaCBConfigInfoList;
     iCdmaCBConfigInfoList.size = cdmaCBConfigInfoList.size;

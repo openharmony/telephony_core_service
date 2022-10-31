@@ -73,6 +73,7 @@ void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &eve
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("OperatorName::HandleOperatorInfo networkSearchManager is nullptr slotId:%{public}d", slotId_);
+        return;
     }
     PhoneType type = networkSearchManager->GetPhoneType(slotId_);
     if (type == PhoneType::PHONE_TYPE_IS_GSM) {
