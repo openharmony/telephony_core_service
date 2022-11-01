@@ -398,10 +398,6 @@ LockStatusResponse SimStateHandle::GetSimlockResponse()
 
 void SimStateHandle::SyncCmdResponse()
 {
-    std::shared_ptr<SimStateManager> simStateManager = simStateManager_.lock();
-    if (simStateManager == nullptr) {
-        TELEPHONY_LOGE("SimStateHandle::SyncCmdResponse simStateManager is nullptr.");
-    }
     std::unique_lock<std::mutex> lck(SimStateManager::ctx_);
     SimStateManager::responseReady_ = true;
     TELEPHONY_LOGI(
