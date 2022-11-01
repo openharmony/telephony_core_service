@@ -1112,6 +1112,7 @@ int32_t CoreServiceStub::OnGetOpKey(MessageParcel &data, MessageParcel &reply)
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     if (result != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetOpKey failed.");
         return result;
     }
     if (!reply.WriteString16(opkey)) {
@@ -1131,6 +1132,7 @@ int32_t CoreServiceStub::OnGetOpKeyExt(MessageParcel &data, MessageParcel &reply
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     if (result != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetOpKeyExt  failed.");
         return result;
     }
     if (!reply.WriteString16(opkeyExt)) {
@@ -1150,6 +1152,7 @@ int32_t CoreServiceStub::OnGetOpName(MessageParcel &data, MessageParcel &reply)
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     if (result != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetOpName failed.");
         return result;
     }
     if (!reply.WriteString16(opname)) {
@@ -1263,7 +1266,7 @@ int32_t CoreServiceStub::OnGetCellLocation(MessageParcel &data, MessageParcel &r
 
 int32_t CoreServiceStub::OnHasOperatorPrivileges(MessageParcel &data, MessageParcel &reply)
 {
-    const int32_t slotId = data.ReadInt32();
+    int32_t slotId = data.ReadInt32();
     bool result = HasOperatorPrivileges(slotId);
     bool ret = reply.WriteBool(result);
     if (!ret) {
@@ -1275,9 +1278,9 @@ int32_t CoreServiceStub::OnHasOperatorPrivileges(MessageParcel &data, MessagePar
 
 int32_t CoreServiceStub::OnSimAuthentication(MessageParcel &data, MessageParcel &reply)
 {
-    const int32_t slotId = data.ReadInt32();
-    const std::string aid = data.ReadString();
-    const std::string authData = data.ReadString();
+    int32_t slotId = data.ReadInt32();
+    std::string aid = data.ReadString();
+    std::string authData = data.ReadString();
     SimAuthenticationResponse response = { 0 };
     int32_t result = SimAuthentication(slotId, aid, authData, response);
     reply.WriteInt32(response.sw1);

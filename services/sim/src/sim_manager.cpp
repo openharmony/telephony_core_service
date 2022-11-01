@@ -168,7 +168,7 @@ int32_t SimManager::GetCardType(int32_t slotId)
     return static_cast<int32_t>(simStateManager_[slotId]->GetCardType());
 }
 
-bool SimManager::UnlockPin(int32_t slotId, std::string pin, LockStatusResponse &response)
+bool SimManager::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
 {
     if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simStateManager is null!");
@@ -177,7 +177,8 @@ bool SimManager::UnlockPin(int32_t slotId, std::string pin, LockStatusResponse &
     return simStateManager_[slotId]->UnlockPin(slotId, pin, response);
 }
 
-bool SimManager::UnlockPuk(int32_t slotId, std::string newPin, std::string puk, LockStatusResponse &response)
+bool SimManager::UnlockPuk(
+    int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response)
 {
     if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simStateManager is null!");
@@ -186,7 +187,8 @@ bool SimManager::UnlockPuk(int32_t slotId, std::string newPin, std::string puk, 
     return simStateManager_[slotId]->UnlockPuk(slotId, newPin, puk, response);
 }
 
-bool SimManager::AlterPin(int32_t slotId, std::string newPin, std::string oldPin, LockStatusResponse &response)
+bool SimManager::AlterPin(
+    int32_t slotId, const std::string &newPin, const std::string &oldPin, LockStatusResponse &response)
 {
     if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simStateManager is null!");
@@ -222,7 +224,7 @@ int32_t SimManager::RefreshSimState(int32_t slotId)
     return simStateManager_[slotId]->RefreshSimState(slotId);
 }
 
-bool SimManager::UnlockPin2(int32_t slotId, std::string pin2, LockStatusResponse &response)
+bool SimManager::UnlockPin2(int32_t slotId, const std::string &pin2, LockStatusResponse &response)
 {
     if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simStateManager is null!");
@@ -231,7 +233,8 @@ bool SimManager::UnlockPin2(int32_t slotId, std::string pin2, LockStatusResponse
     return simStateManager_[slotId]->UnlockPin2(slotId, pin2, response);
 }
 
-bool SimManager::UnlockPuk2(int32_t slotId, std::string newPin2, std::string puk2, LockStatusResponse &response)
+bool SimManager::UnlockPuk2(
+    int32_t slotId, const std::string &newPin2, const std::string &puk2, LockStatusResponse &response)
 {
     if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simStateManager is null!");
@@ -240,7 +243,8 @@ bool SimManager::UnlockPuk2(int32_t slotId, std::string newPin2, std::string puk
     return simStateManager_[slotId]->UnlockPuk2(slotId, newPin2, puk2, response);
 }
 
-bool SimManager::AlterPin2(int32_t slotId, std::string newPin2, std::string oldPin2, LockStatusResponse &response)
+bool SimManager::AlterPin2(
+    int32_t slotId, const std::string &newPin2, const std::string &oldPin2, LockStatusResponse &response)
 {
     if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simStateManager is null!");
@@ -337,7 +341,7 @@ bool SimManager::SetPrimarySlotId(int32_t slotId)
     return multiSimController_->SetPrimarySlotId(slotId);
 }
 
-bool SimManager::SetShowNumber(int32_t slotId, const std::u16string number)
+bool SimManager::SetShowNumber(int32_t slotId, const std::u16string &number)
 {
     if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
         TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
@@ -346,7 +350,7 @@ bool SimManager::SetShowNumber(int32_t slotId, const std::u16string number)
     return multiSimController_->SetShowNumber(slotId, number);
 }
 
-bool SimManager::SetShowName(int32_t slotId, const std::u16string name)
+bool SimManager::SetShowName(int32_t slotId, const std::u16string &name)
 {
     if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
         TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
@@ -754,9 +758,9 @@ bool SimManager::DelSmsIcc(int32_t slotId, int index)
 
 std::vector<std::string> SimManager::ObtainAllSmsOfIcc(int32_t slotId)
 {
-    std::vector<std::string> result;
     if ((!IsValidSlotId(slotId)) || (simSmsManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simSmsManager_ is null!");
+        std::vector<std::string> result;
         return result;
     }
     return simSmsManager_[slotId]->ObtainAllSmsOfIcc();
@@ -764,9 +768,9 @@ std::vector<std::string> SimManager::ObtainAllSmsOfIcc(int32_t slotId)
 
 std::vector<std::shared_ptr<DiallingNumbersInfo>> SimManager::QueryIccDiallingNumbers(int slotId, int type)
 {
-    std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
     if ((!IsValidSlotId(slotId)) || (iccDiallingNumbersManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("iccDiallingNumbersManager is null!");
+        std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
         return result;
     }
     return iccDiallingNumbersManager_[slotId]->QueryIccDiallingNumbers(type);

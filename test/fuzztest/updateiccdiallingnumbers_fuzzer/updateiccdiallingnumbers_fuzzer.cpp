@@ -27,7 +27,7 @@ using namespace OHOS::Telephony;
 namespace OHOS {
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
-    if (data == nullptr || size <= 0) {
+    if (data == nullptr || size == 0) {
         return;
     }
 
@@ -43,6 +43,9 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     telNumber->pin2_ = Str8ToStr16(pin2);
     std::u16string opKey;
     std::u16string opName;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpKey(slotId, opKey);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpKeyExt(slotId, opKey);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpName(slotId, opName);
     DelayedRefSingleton<CoreServiceClient>::GetInstance().SendCallSetupRequestResult(slotId, size % 2);
     DelayedRefSingleton<CoreServiceClient>::GetInstance().HasOperatorPrivileges(slotId);
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCellInfoList(slotId);

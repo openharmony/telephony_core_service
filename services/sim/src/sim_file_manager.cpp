@@ -331,22 +331,22 @@ std::u16string SimFileManager::GetOpKeyExt()
     return Str8ToStr16(opKeyExt_);
 }
 
-void SimFileManager::SetOpName(std::string opName)
+void SimFileManager::SetOpName(const std::string &opName)
 {
     opName_ = opName;
 }
 
-void SimFileManager::SetOpKey(std::string opKey)
+void SimFileManager::SetOpKey(const std::string &opKey)
 {
     opKey_ = opKey;
 }
 
-void SimFileManager::SetOpKeyExt(std::string opKeyExt)
+void SimFileManager::SetOpKeyExt(const std::string &opKeyExt)
 {
     opKeyExt_ = opKeyExt;
 }
 
-int SimFileManager::ObtainSpnCondition(bool roaming, std::string operatorNum)
+int SimFileManager::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
 {
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::ObtainSpnCondition simFile nullptr");

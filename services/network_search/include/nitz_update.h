@@ -43,8 +43,9 @@ public:
 
 private:
     void ProcessTime(NetworkTime &networkTime);
+    bool IsValidTime(int64_t networkTime);
     void SaveTimeZone(std::string &timeZone);
-    void SaveTime(int64_t time);
+    void SaveTime(int64_t networkTime);
     bool IsAutoTimeZone();
     bool IsAutoTime();
     bool NitzParse(std::string &nitzStr, NetworkTime &networkTime);
@@ -53,12 +54,11 @@ private:
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
-    int64_t lastUpdateTime_ = 0;
-    int32_t offset_ = 0;
+    static int64_t lastSystemTime_;
     int32_t slotId_ = 0;
-    int64_t curSytemTime_ = 0;
-    int64_t time_ = 0;
-    std::string timeZone_ = "";
+    static int32_t offset_;
+    static int64_t lastNetworkTime_;
+    static std::string timeZone_;
 };
 } // namespace Telephony
 } // namespace OHOS

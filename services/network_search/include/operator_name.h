@@ -41,8 +41,8 @@ public:
 private:
     void GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const;
     void CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const;
-    void PublishEvent(const int32_t rule, const RegServiceState state, const bool showPlmn, const std::string &plmn,
-        const bool showSpn, const std::string &spn);
+    void PublishEvent(int32_t rule, RegServiceState state, bool showPlmn, const std::string &plmn, bool showSpn,
+        const std::string &spn);
     sptr<NetworkState> GetNetworkStatus();
     void NotifyGsmSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState);
     void NotifyCdmaSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState);

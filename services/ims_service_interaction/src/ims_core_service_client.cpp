@@ -123,11 +123,7 @@ int32_t ImsCoreServiceClient::RegisterImsCoreServiceCallback()
         TELEPHONY_LOGE("imsCoreServiceProxy_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    imsCoreServiceCallback_ = (std::make_unique<ImsCoreServiceCallbackStub>()).release();
-    if (imsCoreServiceCallback_ == nullptr) {
-        TELEPHONY_LOGE("RegisterImsCoreServiceCallback return, make unique error.");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
+    imsCoreServiceCallback_ = new ImsCoreServiceCallbackStub();
     int32_t ret = imsCoreServiceProxy_->RegisterImsCoreServiceCallback(imsCoreServiceCallback_);
     if (ret) {
         TELEPHONY_LOGE("RegisterImsCoreServiceCallback return, register callback error.");

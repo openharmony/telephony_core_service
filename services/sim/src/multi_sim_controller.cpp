@@ -185,7 +185,7 @@ bool MultiSimController::InitIccId(int slotId)
     }
 }
 
-int32_t MultiSimController::UpdateDataByIccId(int slotId, std::string newIccId)
+int32_t MultiSimController::UpdateDataByIccId(int slotId, const std::string &newIccId)
 {
     if (simDbHelper_ == nullptr) {
         TELEPHONY_LOGE("MultiSimController::UpdateDataByIccId failed by nullptr");
@@ -205,7 +205,7 @@ int32_t MultiSimController::UpdateDataByIccId(int slotId, std::string newIccId)
     return simDbHelper_->UpdateDataByIccId(newIccId, values); // finish re active
 }
 
-int32_t MultiSimController::InsertData(int slotId, std::string newIccId)
+int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
 {
     if (simDbHelper_ == nullptr) {
         TELEPHONY_LOGE("MultiSimController::InsertData failed by nullptr");
@@ -294,7 +294,7 @@ bool MultiSimController::GetListFromDataBase()
 void MultiSimController::SortCache()
 {
     size_t count = localCacheInfo_.size();
-    TELEPHONY_LOGI("MultiSimController::SortCache count = %{public}lu", (unsigned long)count);
+    TELEPHONY_LOGI("MultiSimController::SortCache count = %{public}lu", static_cast<unsigned long>(count));
     if (count <= 0) {
         TELEPHONY_LOGE("MultiSimController::Sort empty");
         return;
@@ -308,8 +308,8 @@ void MultiSimController::SortCache()
         sortCache.emplace_back(emptyUnit);
     }
     for (size_t j = 0; j < count; j++) {
-        TELEPHONY_LOGI(
-            "MultiSimController::index = %{public}d j = %{public}lu", localCacheInfo_[j].slotIndex, (unsigned long)j);
+        TELEPHONY_LOGI("MultiSimController::index = %{public}d j = %{public}lu", localCacheInfo_[j].slotIndex,
+            static_cast<unsigned long>(j));
         sortCache[localCacheInfo_[j].slotIndex] = localCacheInfo_[j];
     }
     localCacheInfo_ = sortCache;
@@ -377,7 +377,7 @@ bool MultiSimController::IsSimActive(int32_t slotId)
         TELEPHONY_LOGE("MultiSimController::IsSimActive InValidData");
         return false;
     }
-    if ((uint32_t)slotId >= localCacheInfo_.size()) {
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("MultiSimController::IsSimActive failed by out of range");
         return false;
     }
@@ -387,7 +387,7 @@ bool MultiSimController::IsSimActive(int32_t slotId)
 bool MultiSimController::IsSimActivatable(int32_t slotId)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if ((uint32_t)slotId >= localCacheInfo_.size()) {
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("MultiSimController::IsSimActivatable failed by out of range");
         return false;
     }
@@ -401,7 +401,7 @@ bool MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool force
         return false;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    if ((uint32_t)slotId >= localCacheInfo_.size() && enable != ACTIVE) {
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size() && enable != ACTIVE) {
         TELEPHONY_LOGE("MultiSimController::SetActiveSim failed by out of range");
         return false;
     }
@@ -458,7 +458,7 @@ bool MultiSimController::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
         TELEPHONY_LOGE("MultiSimController::GetSimAccountInfo InValidData");
         return false;
     }
-    if ((uint32_t)slotId >= localCacheInfo_.size()) {
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("MultiSimController::GetSimAccountInfo failed by out of range");
         return false;
     }
@@ -648,7 +648,7 @@ int32_t MultiSimController::GetPrimarySlotId()
 bool MultiSimController::SetPrimarySlotId(int32_t slotId)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if ((uint32_t)slotId >= localCacheInfo_.size()) {
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId failed by out of range");
         return false;
     }
@@ -687,7 +687,7 @@ std::u16string MultiSimController::GetShowNumber(int32_t slotId)
         TELEPHONY_LOGE("MultiSimController::GetShowNumber InValidData");
         return u"";
     }
-    if ((uint32_t)slotId >= localCacheInfo_.size()) {
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("MultiSimController::GetShowNumber failed by nullptr");
         return u"";
     }
@@ -705,7 +705,7 @@ bool MultiSimController::SetShowNumber(int32_t slotId, std::u16string number, bo
         TELEPHONY_LOGE("MultiSimController::SetShowNumber InValidData");
         return false;
     }
-    if ((uint32_t)slotId >= localCacheInfo_.size()) {
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("MultiSimController::SetShowNumber failed by out of range");
         return false;
     }
@@ -731,7 +731,7 @@ std::u16string MultiSimController::GetShowName(int32_t slotId)
         TELEPHONY_LOGE("MultiSimController::GetShowNumber InValidData");
         return u"";
     }
-    if ((uint32_t)slotId >= localCacheInfo_.size()) {
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("MultiSimController::GetShowName failed by nullptr");
         return u"";
     }
@@ -749,7 +749,7 @@ bool MultiSimController::SetShowName(int32_t slotId, std::u16string name, bool f
         TELEPHONY_LOGE("MultiSimController::SetShowNumber InValidData");
         return false;
     }
-    if ((uint32_t)slotId >= localCacheInfo_.size()) {
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("MultiSimController::SetShowName failed by out of range");
         return false;
     }
@@ -771,7 +771,7 @@ bool MultiSimController::SetShowName(int32_t slotId, std::u16string name, bool f
 std::u16string MultiSimController::GetIccId(int32_t slotId)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if ((uint32_t)slotId >= localCacheInfo_.size()) {
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("MultiSimController::GetIccId failed by nullptr");
         return u"";
     }
@@ -781,7 +781,7 @@ std::u16string MultiSimController::GetIccId(int32_t slotId)
 bool MultiSimController::SetIccId(int32_t slotId, std::u16string iccId)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if ((uint32_t)slotId >= localCacheInfo_.size()) {
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("MultiSimController::SetIccId failed by out of range");
         return false;
     }
