@@ -190,12 +190,23 @@ void IccDiallingNumbersHandler::ProcessDiallingNumberAllLoadDone(
         }
         return;
     }
-    std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList = nullptr;
-    if (loadRequest != nullptr) {
-        loadRequest->ClearCount();
-        diallingNumberList = std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
-        loadRequest->SetResult(static_cast<std::shared_ptr<void>>(diallingNumberList));
+
+    ProcessDiallingNumber(loadRequest, object);
+}
+
+void IccDiallingNumbersHandler::ProcessDiallingNumber(
+    const std::shared_ptr<DiallingNumberLoadRequest> &loadRequest, const std::shared_ptr<MultiRecordResult> &object)
+{
+    if (loadRequest == nullptr || object == nullptr) {
+        TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessDiallingNumber loadRequest or object is nullptr");
+        return;
     }
+    std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList = nullptr;
+
+    loadRequest->ClearCount();
+    diallingNumberList = std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
+    loadRequest->SetResult(static_cast<std::shared_ptr<void>>(diallingNumberList));
+
     std::vector<std::string> &dataList = object->fileResults;
     TELEPHONY_LOGI("ProcessDiallingNumberAllLoadDone start: %{public}zu", dataList.size());
     int i = 0;
@@ -224,12 +235,14 @@ void IccDiallingNumbersHandler::ProcessDiallingNumberLoadDone(const AppExecFwk::
 
     std::string iccData = fd->resultData;
     TELEPHONY_LOGI("ProcessDiallingNumberLoadDone handle start");
+    if (loadRequest == nullptr) {
+        TELEPHONY_LOGE("ProcessDiallingNumberLoadDone loadRequest is nullptr");
+        return;
+    }
     std::shared_ptr<DiallingNumbersInfo> diallingNumber =
     std::make_shared<DiallingNumbersInfo>(loadRequest->GetElementaryFileId(), loadRequest->GetIndex());
     FetchDiallingNumberContent(diallingNumber, iccData);
-    if (loadRequest != nullptr) {
-        loadRequest->SetResult(static_cast<std::shared_ptr<void>>(diallingNumber));
-    }
+    loadRequest->SetResult(static_cast<std::shared_ptr<void>>(diallingNumber));
 }
 
 void IccDiallingNumbersHandler::SendUpdateCommand(const std::shared_ptr<DiallingNumbersInfo> &diallingNumber,

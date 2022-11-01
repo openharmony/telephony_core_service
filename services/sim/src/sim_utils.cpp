@@ -202,18 +202,16 @@ std::string SIMUtils::DiallingNumberStringFieldConvertToString(
         int ucslen = (length - 1) / HALF_LEN;
         int outlen = 0;
         std::shared_ptr<char16_t> cs = CharsConvertToChar16(data + 1, ucslen * HALF_LEN, outlen, true);
-        std::string ns = "";
         std::u16string hs(cs.get(), 0, outlen);
-        std::u16string rtl = u"";
         if (!hs.empty()) {
             ucslen = (int)hs.length();
             wchar_t c = L'\uFFFF';
             while (ucslen > 0 && hs.at(ucslen - 1) == c) {
                 ucslen--;
             }
-            rtl = hs.substr(0, ucslen);
+            std::u16string rtl = hs.substr(0, ucslen);
             std::string uz = Str16ToStr8(hs);
-            ns = Str16ToStr8(rtl);
+            std::string ns = Str16ToStr8(rtl);
             TELEPHONY_LOGI("16be result %{public}s, %{public}s", uz.c_str(), ns.c_str());
             return ns;
         }

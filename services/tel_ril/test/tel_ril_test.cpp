@@ -2553,9 +2553,11 @@ int main()
     std::vector<std::shared_ptr<TelRilTest::DemoHandler>> demohandler;
     TELEPHONY_LOGI("TelRilTest::main function entry -->");
     std::unique_ptr<TelRilTest> rilManagerAndResponseTest = std::make_unique<TelRilTest>();
-    if (rilManagerAndResponseTest != nullptr) {
-        rilManagerAndResponseTest->OnInitInterface();
+    if (rilManagerAndResponseTest == nullptr) {
+        TELEPHONY_LOGE("rilManagerAndResponseTest is nullptr.");
+        return -1;
     }
+    rilManagerAndResponseTest->OnInitInterface();
     TELEPHONY_LOGI("make_shared<ITelRilManager>(telRilManager) --> success");
     std::shared_ptr<AppExecFwk::EventRunner> eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
     if (eventRunner == nullptr) {
