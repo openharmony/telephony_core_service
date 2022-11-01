@@ -138,7 +138,8 @@ void RadioInfo::ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &even
 
 void RadioInfo::RadioFirstPowerOn(std::shared_ptr<NetworkSearchManager> &nsm, ModemPowerState radioState) const
 {
-    TELEPHONY_LOGI("RadioInfo::RadioFirstPowerOn radioState:%{public}d, slotId:%{public}d", (int)radioState, slotId_);
+    TELEPHONY_LOGI(
+        "RadioInfo::RadioFirstPowerOn radioState:%{public}d, slotId:%{public}d", static_cast<int>(radioState), slotId_);
     if (radioState != ModemPowerState::CORE_SERVICE_POWER_ON) {
         return;
     }
@@ -212,7 +213,7 @@ PhoneType RadioInfo::GetPhoneType() const
     return phoneType_;
 }
 
-void RadioInfo::UpdatePhone(RadioTech csRadioTech, RadioTech psRadioTech)
+void RadioInfo::UpdatePhone(RadioTech csRadioTech, const RadioTech &psRadioTech)
 {
     TELEPHONY_LOGI("RadioInfo::UpdatePhone");
     std::shared_ptr<NetworkSearchManager> networkSearchManager = networkSearchManager_.lock();
@@ -263,7 +264,7 @@ void RadioInfo::ProcessVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &ev
     UpdatePhone(static_cast<RadioTech>(csRadioTech->actType), psRadioTech);
 }
 
-PhoneType RadioInfo::RadioTechToPhoneType(RadioTech csRadioTech, RadioTech psRadioTech) const
+PhoneType RadioInfo::RadioTechToPhoneType(RadioTech csRadioTech, const RadioTech &psRadioTech) const
 {
     PhoneType phoneType = PhoneType::PHONE_TYPE_IS_NONE;
     switch (csRadioTech) {

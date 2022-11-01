@@ -424,7 +424,7 @@ int32_t CoreServiceClient::GetDefaultVoiceSlotId()
     return proxy->GetDefaultVoiceSlotId();
 }
 
-bool CoreServiceClient::SetShowNumber(int32_t slotId, const std::u16string number)
+bool CoreServiceClient::SetShowNumber(int32_t slotId, const std::u16string &number)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -444,7 +444,7 @@ std::u16string CoreServiceClient::GetShowNumber(int32_t slotId)
     return proxy->GetShowNumber(slotId);
 }
 
-bool CoreServiceClient::SetShowName(int32_t slotId, const std::u16string name)
+bool CoreServiceClient::SetShowName(int32_t slotId, const std::u16string &name)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -484,7 +484,7 @@ bool CoreServiceClient::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
     return proxy->GetOperatorConfigs(slotId, poc);
 }
 
-bool CoreServiceClient::UnlockPin(int32_t slotId, std::u16string pin, LockStatusResponse &response)
+bool CoreServiceClient::UnlockPin(int32_t slotId, const std::u16string &pin, LockStatusResponse &response)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -495,7 +495,7 @@ bool CoreServiceClient::UnlockPin(int32_t slotId, std::u16string pin, LockStatus
 }
 
 bool CoreServiceClient::UnlockPuk(
-    int32_t slotId, std::u16string newPin, std::u16string puk, LockStatusResponse &response)
+    int32_t slotId, const std::u16string &newPin, const std::u16string &puk, LockStatusResponse &response)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -506,7 +506,7 @@ bool CoreServiceClient::UnlockPuk(
 }
 
 bool CoreServiceClient::AlterPin(
-    int32_t slotId, std::u16string newPin, std::u16string oldPin, LockStatusResponse &response)
+    int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin, LockStatusResponse &response)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -516,7 +516,7 @@ bool CoreServiceClient::AlterPin(
     return proxy->AlterPin(slotId, newPin, oldPin, response);
 }
 
-bool CoreServiceClient::UnlockPin2(int32_t slotId, std::u16string pin2, LockStatusResponse &response)
+bool CoreServiceClient::UnlockPin2(int32_t slotId, const std::u16string &pin2, LockStatusResponse &response)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -527,7 +527,7 @@ bool CoreServiceClient::UnlockPin2(int32_t slotId, std::u16string pin2, LockStat
 }
 
 bool CoreServiceClient::UnlockPuk2(
-    int32_t slotId, std::u16string newPin2, std::u16string puk2, LockStatusResponse &response)
+    int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2, LockStatusResponse &response)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -538,7 +538,7 @@ bool CoreServiceClient::UnlockPuk2(
 }
 
 bool CoreServiceClient::AlterPin2(
-    int32_t slotId, std::u16string newPin2, std::u16string oldPin2, LockStatusResponse &response)
+    int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2, LockStatusResponse &response)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {

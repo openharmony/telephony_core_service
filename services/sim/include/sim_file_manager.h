@@ -58,10 +58,10 @@ public:
     std::u16string GetOpName();
     std::u16string GetOpKey();
     std::u16string GetOpKeyExt();
-    void SetOpName(std::string opName);
-    void SetOpKey(std::string opKey);
-    void SetOpKeyExt(std::string opKeyExt);
-    int ObtainSpnCondition(bool roaming, std::string operatorNum);
+    void SetOpName(const std::string &opName);
+    void SetOpKey(const std::string &opKey);
+    void SetOpKeyExt(const std::string &opKeyExt);
+    int ObtainSpnCondition(bool roaming, const std::string &operatorNum);
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
     void SetImsi(std::string imsi);

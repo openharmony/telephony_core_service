@@ -78,8 +78,8 @@ private:
     bool InitShowNumber(int slotId);
     bool InitActive(int slotId);
     bool InitIccId(int slotId);
-    int32_t UpdateDataByIccId(int slotId, std::string newIccId);
-    int32_t InsertData(int slotId, std::string newIccId);
+    int32_t UpdateDataByIccId(int slotId, const std::string &newIccId);
+    int32_t InsertData(int slotId, const std::string &newIccId);
     void SortCache();
     std::u16string GetIccId(int32_t slotId);
     bool SetIccId(int32_t slotId, std::u16string iccId);

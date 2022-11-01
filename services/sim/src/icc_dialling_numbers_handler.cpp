@@ -145,6 +145,7 @@ void IccDiallingNumbersHandler::ProcessUpdateRecordDone(const AppExecFwk::InnerE
 {
     std::unique_ptr<ControllerToFileMsg> object = event->GetUniqueObject<ControllerToFileMsg>();
     if (object == nullptr) {
+        TELEPHONY_LOGE("object is nullptr!");
         return;
     }
     int loadId = object->arg1;
@@ -178,6 +179,7 @@ void IccDiallingNumbersHandler::ProcessDiallingNumberAllLoadDone(
 
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
     if (object == nullptr) {
+        TELEPHONY_LOGE("object is nullptr!");
         return;
     }
     loadId = object->arg1;

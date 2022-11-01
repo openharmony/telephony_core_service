@@ -1725,7 +1725,8 @@ static void NativeGetCellInformation(napi_env env, void *data)
     asyncContext->cellInformations =
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCellInfoList(asyncContext->slotId);
     asyncContext->resolved = true;
-    TELEPHONY_LOGI("NativeGetCellInformation len = %{public}lu", (unsigned long)asyncContext->cellInformations.size());
+    TELEPHONY_LOGI("NativeGetCellInformation len = %{public}lu",
+        static_cast<unsigned long>(asyncContext->cellInformations.size()));
     asyncContext->resolved = (asyncContext->cellInformations.size() != 0);
 }
 
@@ -1943,19 +1944,13 @@ static void GetNrOptionModeCallback(napi_env env, napi_status status, void *data
 {
     auto context = static_cast<GetNrOptionModeContext *>(data);
     TELEPHONY_LOGI("GetNrOptionModeCallback resolved = %{public}d", context->resolved);
-    napi_value callbackValue = nullptr;
+    napi_value callbackValue = ParseErrorValue(env, context->errorCode, "GetNrOptionMode");
     if (status == napi_ok) {
         if (context->resolved) {
             napi_create_int32(env, context->nrOptionMode, &callbackValue);
-        } else {
-            if (context->errorCode == ERROR_SLOT_ID_INVALID) {
-                callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
-            } else {
-                callbackValue = ParseErrorValue(env, context->errorCode, "getNrOptionMode error");
-            }
+        } else if (context->errorCode == ERROR_SLOT_ID_INVALID) {
+            callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
         }
-    } else {
-        callbackValue = ParseErrorValue(env, context->errorCode, "getNrOptionMode failed");
     }
     NapiUtil::Handle2ValueCallback(env, context, callbackValue);
 }
