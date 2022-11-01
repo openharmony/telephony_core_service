@@ -26,7 +26,7 @@ MccAccess MccPool::AccessToMcc(int mcc)
     MccAccess m(mcc, "", 0);
     InitMccTables();
     int index = std::find(mccAccessTable_.begin(), mccAccessTable_.end(), m) - mccAccessTable_.begin();
-    int len = (int)mccAccessTable_.size();
+    int len = static_cast<int>(mccAccessTable_.size());
     if (index >= len) {
         return MccAccess(0, "", 0);
     } else {

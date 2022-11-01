@@ -211,12 +211,12 @@ public:
         int32_t slotId, const SimLockParam &simLock, const AppExecFwk::InnerEvent::Pointer &result) override;
     int32_t ChangeSimPassword(
         int32_t slotId, const SimPasswordParam &simPassword, const AppExecFwk::InnerEvent::Pointer &result) override;
-    int32_t UnlockPin(int32_t slotId, std::string pin, const AppExecFwk::InnerEvent::Pointer &result) override;
-    int32_t UnlockPuk(
-        int32_t slotId, std::string puk, std::string pin, const AppExecFwk::InnerEvent::Pointer &result) override;
-    int32_t UnlockPin2(int32_t slotId, std::string pin2, const AppExecFwk::InnerEvent::Pointer &result) override;
-    int32_t UnlockPuk2(
-        int32_t slotId, std::string puk2, std::string pin2, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t UnlockPin(int32_t slotId, const std::string &pin, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t UnlockPuk(int32_t slotId, const std::string &puk, const std::string &pin,
+        const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t UnlockPin2(int32_t slotId, const std::string &pin2, const AppExecFwk::InnerEvent::Pointer &result) override;
+    int32_t UnlockPuk2(int32_t slotId, const std::string &puk2, const std::string &pin2,
+        const AppExecFwk::InnerEvent::Pointer &result) override;
     int32_t SetActiveSim(
         int32_t slotId, int32_t index, int32_t enable, const AppExecFwk::InnerEvent::Pointer &result) override;
     int32_t SendTerminalResponseCmd(
@@ -248,19 +248,19 @@ public:
     int32_t SetMute(int32_t slotId, const int32_t mute, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetMute(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetEmergencyCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
-    int32_t SetEmergencyCallList(
-        int32_t slotId, std::vector<EmergencyCall> &eccVec, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SetEmergencyCallList(int32_t slotId, const std::vector<EmergencyCall> &eccVec,
+        const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetCallFailReason(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SimOpenLogicalChannel(int32_t slotId, const std::string &appID, const int32_t p2,
         const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SimCloseLogicalChannel(
         int32_t slotId, const int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SimTransmitApduLogicalChannel(
-        int32_t slotId, ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response) override;
+        int32_t slotId, const ApduSimIORequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SimTransmitApduBasicChannel(
-        int32_t slotId, ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response) override;
-    int32_t SimAuthentication(
-        int32_t slotId, SimAuthenticationRequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response) override;
+        int32_t slotId, const ApduSimIORequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SimAuthentication(int32_t slotId, const SimAuthenticationRequestInfo &reqInfo,
+        const AppExecFwk::InnerEvent::Pointer &response) override;
 
     /**
      * Register hdf status listener
@@ -315,7 +315,7 @@ private:
      */
     template<typename ResponsePtr, typename ClassTypePtr, typename FuncType, typename... ParamTypes>
     inline int32_t TaskSchedule(ResponsePtr &_result, const std::string _module, ClassTypePtr &_obj, FuncType &&_func,
-        ParamTypes &&..._args) const
+        ParamTypes &&... _args) const
     {
         if (_func != nullptr) {
             // The reason for using native member function access here is to

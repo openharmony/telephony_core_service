@@ -191,7 +191,7 @@ std::shared_ptr<AppExecFwk::DataAbilityHelper> OperatorConfigLoader::CreateDataA
         return nullptr;
     }
     auto remoteObj = saManager->GetSystemAbility(systemAbilityId);
-    while (remoteObj == nullptr) {
+    if (remoteObj == nullptr) {
         TELEPHONY_LOGE("OperatorConfigLoader GetSystemAbility Service Failed");
         return nullptr;
     }

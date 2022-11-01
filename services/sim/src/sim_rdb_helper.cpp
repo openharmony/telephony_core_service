@@ -36,7 +36,7 @@ std::shared_ptr<AppExecFwk::DataAbilityHelper> SimRdbHelper::CreateDataAHelper()
         return nullptr;
     }
     auto remoteObj = saManager->GetSystemAbility(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID);
-    while (remoteObj == nullptr) {
+    if (remoteObj == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper GetSystemAbility Service Failed.");
         return nullptr;
     }

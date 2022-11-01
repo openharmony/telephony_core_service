@@ -32,24 +32,26 @@ public:
     static const int32_t MAX_TEXT_LENGTH = 4096;
     static std::string ToUtf8(std::u16string str16);
     static std::u16string ToUtf16(std::string str);
-    static napi_value CreateErrorMessage(napi_env env, std::string message, int32_t errorCode = ERROR_DEFAULT);
+    static napi_value CreateErrorMessage(napi_env env, const std::string &message, int32_t errorCode = ERROR_DEFAULT);
     static napi_value CreateUndefined(napi_env env);
     static bool MatchValueType(napi_env env, napi_value value, napi_valuetype targetType);
     static bool MatchParameters(
         napi_env env, const napi_value parameters[], std::initializer_list<napi_valuetype> valueTypes);
-    static void SetPropertyInt32(napi_env env, napi_value object, std::string name, int32_t value);
-    static void SetPropertyInt64(napi_env env, napi_value object, std::string name, int64_t value);
-    static void SetPropertyStringUtf8(napi_env env, napi_value object, std::string name, std::string value);
-    static void SetPropertyBoolean(napi_env env, napi_value object, std::string name, bool value);
+    static void SetPropertyInt32(napi_env env, napi_value object, const std::string &name, int32_t value);
+    static void SetPropertyInt64(napi_env env, napi_value object, const std::string &name, int64_t value);
+    static void SetPropertyStringUtf8(
+        napi_env env, napi_value object, const std::string &name, const std::string &value);
+    static void SetPropertyBoolean(napi_env env, napi_value object, const std::string &name, bool value);
     static napi_value ToInt32Value(napi_env env, int value);
-    static bool HasNamedProperty(napi_env env, napi_value object, std::string propertyName);
-    static bool HasNamedTypeProperty(napi_env env, napi_value object, napi_valuetype type, std::string propertyName);
+    static bool HasNamedProperty(napi_env env, napi_value object, const std::string &propertyName);
+    static bool HasNamedTypeProperty(
+        napi_env env, napi_value object, napi_valuetype type, const std::string &propertyName);
     static bool MatchObjectProperty(
         napi_env env, napi_value object, std::initializer_list<std::pair<std::string, napi_valuetype>> pairList);
     static bool MatchOptionPropertyType(
-        napi_env env, napi_value object, napi_valuetype type, std::string propertyName);
+        napi_env env, napi_value object, napi_valuetype type, const std::string &propertyName);
     static std::string GetStringFromValue(napi_env env, napi_value value);
-    static napi_value GetNamedProperty(napi_env env, napi_value object, std::string propertyName);
+    static napi_value GetNamedProperty(napi_env env, napi_value object, const std::string &propertyName);
     static napi_value HandleAsyncWork(napi_env env, BaseContext *context, const std::string &workName,
         napi_async_execute_callback execute, napi_async_complete_callback complete);
     static void Handle1ValueCallback(napi_env env, BaseContext *context, napi_value callbackValue);

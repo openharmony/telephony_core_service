@@ -26,7 +26,7 @@ public:
     bool WaitForResult(int32_t timeoutSecond);
     void SetBoolResult(bool result);
     void SetIntResult(int32_t result);
-    void SetStringResult(std::string &str);
+    void SetStringResult(const std::string &str);
     bool GetBoolResult();
     int32_t GetIntResult();
     std::string GetStringResult();

@@ -43,11 +43,12 @@ int32_t CoreServiceProxy::GetPsRadioTech(int32_t slotId)
         return TELEPHONY_ERROR;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetPsRadioTech Remote is null");
         return TELEPHONY_ERROR;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_PS_RADIO_TECH), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_PS_RADIO_TECH), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetPsRadioTech failed, error code is %{public}d ", st);
         return TELEPHONY_ERROR;
@@ -66,11 +67,12 @@ int32_t CoreServiceProxy::GetCsRadioTech(int32_t slotId)
         return TELEPHONY_ERROR;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetCsRadioTech Remote is null");
         return TELEPHONY_ERROR;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_CS_RADIO_TECH), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_CS_RADIO_TECH), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetCsRadioTech failed, error code is %{public}d \n", st);
         return TELEPHONY_ERROR;
@@ -90,11 +92,12 @@ std::u16string CoreServiceProxy::GetOperatorNumeric(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetOperatorNumeric Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_OPERATOR_NUMERIC), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_OPERATOR_NUMERIC), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetCsRadioTech failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -114,10 +117,11 @@ std::u16string CoreServiceProxy::GetOperatorName(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_OPERATOR_NAME), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_OPERATOR_NAME), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGI("GetOperatorName failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -142,10 +146,11 @@ bool CoreServiceProxy::GetNetworkSearchInformation(int32_t slotId, const sptr<IN
     if (callback != nullptr) {
         data.WriteRemoteObject(callback->AsObject().GetRefPtr());
     }
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_NETWORK_SEARCH_RESULT), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_NETWORK_SEARCH_RESULT), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetNetworkSearchInformation failed, error code is: %{public}d \n", st);
         return false;
@@ -163,11 +168,12 @@ const sptr<NetworkState> CoreServiceProxy::GetNetworkState(int32_t slotId)
         return nullptr;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetNetworkState Remote is null");
         return nullptr;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_NETWORK_STATE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_NETWORK_STATE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetNetworkState failed, error code is %{public}d \n", st);
         return nullptr;
@@ -192,11 +198,12 @@ std::vector<sptr<SignalInformation>> CoreServiceProxy::GetSignalInfoList(int32_t
         return result;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetSignalInfoList Remote is null");
         return result;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIGNAL_INFO_LIST), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_SIGNAL_INFO_LIST), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetSignalInfoList failed, error code is %{public}d\n", st);
         return result;
@@ -312,11 +319,12 @@ bool CoreServiceProxy::SetRadioState(int32_t slotId, bool isOn, const sptr<INetw
         data.WriteRemoteObject(callback->AsObject().GetRefPtr());
     }
     data.WriteBool(isOn);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("SetRadioState Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::SET_RADIO_STATE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::SET_RADIO_STATE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SetRadioState failed, error code is %{public}d \n", st);
         return false;
@@ -337,11 +345,12 @@ bool CoreServiceProxy::GetRadioState(int32_t slotId, const sptr<INetworkSearchCa
     if (callback != nullptr) {
         data.WriteRemoteObject(callback->AsObject().GetRefPtr());
     }
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetRadioState Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_RADIO_STATE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_RADIO_STATE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetRadioState failed, error code is %{public}d \n", st);
         return false;
@@ -359,11 +368,12 @@ std::u16string CoreServiceProxy::GetIsoCountryCodeForNetwork(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetIsoCountryCodeForNetwork Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_ISO_COUNTRY_CODE_FOR_NETWORK), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_ISO_COUNTRY_CODE_FOR_NETWORK), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetIsoCountryCodeForNetwork failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -384,11 +394,12 @@ std::u16string CoreServiceProxy::GetImei(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetImei Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_IMEI), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_IMEI), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetImei failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -409,11 +420,12 @@ std::u16string CoreServiceProxy::GetMeid(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetMeid Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_MEID), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_MEID), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetMeid failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -434,11 +446,12 @@ std::u16string CoreServiceProxy::GetUniqueDeviceId(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetUniqueDeviceId Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_UNIQUE_DEVICE_ID), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_UNIQUE_DEVICE_ID), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetUniqueDeviceId failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -459,11 +472,12 @@ bool CoreServiceProxy::HasSimCard(int32_t slotId)
         return false;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("HasSimCard Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::HAS_SIM_CARD), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::HAS_SIM_CARD), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("HasSimCard failed, error code is %{public}d \n", st);
         return false;
@@ -482,11 +496,12 @@ int32_t CoreServiceProxy::GetSimState(int32_t slotId)
         return TELEPHONY_ERROR;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetSimState Remote is null");
         return TELEPHONY_ERROR;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_STATE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_SIM_STATE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetSimState failed, error code is %{public}d \n", st);
         return st;
@@ -507,11 +522,12 @@ int32_t CoreServiceProxy::GetCardType(int32_t slotId)
         return TELEPHONY_ERROR;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetCardType Remote is null");
         return TELEPHONY_ERROR;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_CARD_TYPE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_CARD_TYPE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetCardType failed, error code is %{public}d \n", st);
         return st;
@@ -534,11 +550,12 @@ std::u16string CoreServiceProxy::GetISOCountryCodeForSim(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetISOCountryCodeForSim Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_ISO_COUNTRY_CODE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_ISO_COUNTRY_CODE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetISOCountryCodeForSim failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -562,11 +579,12 @@ std::u16string CoreServiceProxy::GetSimOperatorNumeric(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetSimOperatorNumeric Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_OPERATOR_NUMERIC), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_SIM_OPERATOR_NUMERIC), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetSimOperatorNumeric failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -590,11 +608,12 @@ std::u16string CoreServiceProxy::GetSimSpn(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetSimSpn Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SPN), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_SPN), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetSimSpn failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -618,11 +637,12 @@ std::u16string CoreServiceProxy::GetSimIccId(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetSimIccId Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_ICCID), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_ICCID), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetSimIccId failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -644,11 +664,12 @@ std::u16string CoreServiceProxy::GetIMSI(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetIMSI Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_IMSI), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_IMSI), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetIMSI failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -672,11 +693,12 @@ bool CoreServiceProxy::IsSimActive(int32_t slotId)
         return false;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("IsSimActive Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::IS_SIM_ACTIVE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::IS_SIM_ACTIVE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("IsSimActive failed, error code is %{public}d \n", st);
         return false;
@@ -698,11 +720,12 @@ int32_t CoreServiceProxy::GetSlotId(int32_t simId)
         return ERROR;
     }
     data.WriteInt32(simId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetSlotId Remote is null");
         return ERROR;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_SLOTID), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_SIM_SLOTID), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetSlotId failed, error code is %{public}d", st);
         return ERROR;
@@ -724,11 +747,12 @@ int32_t CoreServiceProxy::GetSimId(int32_t slotId)
         return ERROR;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetSimId Remote is null");
         return ERROR;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_SIMID), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_SIM_SIMID), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetSimId failed, error code is %{public}d", st);
         return ERROR;
@@ -752,11 +776,12 @@ bool CoreServiceProxy::GetNetworkSelectionMode(int32_t slotId, const sptr<INetwo
     if (callback != nullptr) {
         data.WriteRemoteObject(callback->AsObject().GetRefPtr());
     }
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetNetworkSelectionMode Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_NETWORK_SELECTION_MODE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_NETWORK_SELECTION_MODE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetNetworkSelectionMode failed, error code is %{public}d \n", st);
         return false;
@@ -793,11 +818,12 @@ bool CoreServiceProxy::SetNetworkSelectionMode(int32_t slotId, int32_t selectMod
     if (networkInformation != nullptr) {
         networkInformation->Marshalling(data);
     }
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("SetNetworkSelectionMode Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::SET_NETWORK_SELECTION_MODE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::SET_NETWORK_SELECTION_MODE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SetNetworkSelectionMode failed, error code is %{public}d \n", st);
         return false;
@@ -816,11 +842,12 @@ std::u16string CoreServiceProxy::GetLocaleFromDefaultSim()
     }
 
     data.WriteInt32(DEFAULT_SIM_SLOT_ID);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetLocaleFromDefaultSim Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_LANGUAGE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_SIM_LANGUAGE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetLocaleFromDefaultSim failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -842,11 +869,12 @@ std::u16string CoreServiceProxy::GetSimGid1(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetSimGid1 Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_GID1), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_SIM_GID1), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetSimGid1 failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -868,11 +896,12 @@ std::u16string CoreServiceProxy::GetSimGid2(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetSimGid2 Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_GID2), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_SIM_GID2), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetSimGid2 failed, error code is %{public}d", st);
         return Str8ToStr16("");
@@ -881,8 +910,7 @@ std::u16string CoreServiceProxy::GetSimGid2(int32_t slotId)
     return result;
 }
 
-std::u16string CoreServiceProxy::GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac,
-    bool longNameRequired)
+std::u16string CoreServiceProxy::GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired)
 {
     if (!IsValidSlotId(slotId)) {
         return Str8ToStr16("");
@@ -898,11 +926,12 @@ std::u16string CoreServiceProxy::GetSimEons(int32_t slotId, const std::string &p
     data.WriteString(plmn);
     data.WriteInt32(lac);
     data.WriteBool(longNameRequired);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetSimEons Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_EONS), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_SIM_EONS), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetSimEons failed, error code is %{public}d", st);
         return Str8ToStr16("");
@@ -924,11 +953,12 @@ bool CoreServiceProxy::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
         return false;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetSimAccountInfo Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_SUB_INFO), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_SIM_SUB_INFO), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetSimAccountInfo failed, error code is %{public}d \n", st);
         return false;
@@ -954,11 +984,12 @@ bool CoreServiceProxy::SetDefaultVoiceSlotId(int32_t slotId)
         return false;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("SetDefaultVoiceSlotId Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::SET_DEFAULT_VOICE_SLOTID), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::SET_DEFAULT_VOICE_SLOTID), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SetDefaultVoiceSlotId failed, error code is %{public}d \n", st);
         return false;
@@ -975,11 +1006,12 @@ int32_t CoreServiceProxy::GetDefaultVoiceSlotId()
         TELEPHONY_LOGE("GetDefaultVoiceSlotId WriteInterfaceToken is false");
         return ERROR;
     }
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetDefaultVoiceSlotId Remote is null");
         return ERROR;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_DEFAULT_VOICE_SLOTID), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_DEFAULT_VOICE_SLOTID), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetDefaultVoiceSlotId failed, error code is %{public}d \n", st);
         return ERROR;
@@ -1003,11 +1035,12 @@ bool CoreServiceProxy::SetPrimarySlotId(int32_t slotId)
         return false;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("SetPrimarySlotId Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::SET_PRIMARY_SLOTID), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::SET_PRIMARY_SLOTID), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SetPrimarySlotId failed, error code is %{public}d \n", st);
         return false;
@@ -1024,11 +1057,12 @@ int32_t CoreServiceProxy::GetPrimarySlotId()
         TELEPHONY_LOGE("GetPrimarySlotId WriteInterfaceToken is false");
         return ERROR;
     }
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetPrimarySlotId Remote is null");
         return ERROR;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_PRIMARY_SLOTID), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_PRIMARY_SLOTID), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetPrimarySlotId failed, error code is %{public}d \n", st);
         return ERROR;
@@ -1038,7 +1072,7 @@ int32_t CoreServiceProxy::GetPrimarySlotId()
     return result;
 }
 
-bool CoreServiceProxy::SetShowNumber(int32_t slotId, const std::u16string number)
+bool CoreServiceProxy::SetShowNumber(int32_t slotId, const std::u16string &number)
 {
     TELEPHONY_LOGI("CoreServiceProxy::SetShowNumber slotId = %{public}d", slotId);
     if (!IsValidSlotId(slotId)) {
@@ -1056,11 +1090,12 @@ bool CoreServiceProxy::SetShowNumber(int32_t slotId, const std::u16string number
     }
     data.WriteInt32(slotId);
     data.WriteString16(number);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("SetShowNumber Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::SET_SHOW_NUMBER), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::SET_SHOW_NUMBER), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SetShowNumber failed, error code is %{public}d \n", st);
         return false;
@@ -1084,11 +1119,12 @@ std::u16string CoreServiceProxy::GetShowNumber(int32_t slotId)
         return u"";
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetShowNumber Remote is null");
         return u"";
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SHOW_NUMBER), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_SHOW_NUMBER), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetShowNumber failed, error code is %{public}d \n", st);
         return u"";
@@ -1097,7 +1133,7 @@ std::u16string CoreServiceProxy::GetShowNumber(int32_t slotId)
     return result;
 }
 
-bool CoreServiceProxy::SetShowName(int32_t slotId, const std::u16string name)
+bool CoreServiceProxy::SetShowName(int32_t slotId, const std::u16string &name)
 {
     TELEPHONY_LOGI("CoreServiceProxy::SetShowName slotId = %{public}d", slotId);
     if (!IsValidSlotId(slotId)) {
@@ -1115,11 +1151,12 @@ bool CoreServiceProxy::SetShowName(int32_t slotId, const std::u16string name)
     }
     data.WriteInt32(slotId);
     data.WriteString16(name);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("SetShowName Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::SET_SHOW_NAME), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::SET_SHOW_NAME), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SetShowName failed, error code is %{public}d \n", st);
         return false;
@@ -1143,11 +1180,12 @@ std::u16string CoreServiceProxy::GetShowName(int32_t slotId)
         return u"";
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetShowName Remote is null");
         return u"";
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SHOW_NAME), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_SHOW_NAME), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetShowName failed, error code is %{public}d \n", st);
         return u"";
@@ -1165,11 +1203,12 @@ bool CoreServiceProxy::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &
         TELEPHONY_LOGE("GetActiveSimAccountInfoList WriteInterfaceToken is false");
         return false;
     }
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetActiveSimAccountInfoList Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_ACTIVE_ACCOUNT_INFO_LIST), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_ACTIVE_ACCOUNT_INFO_LIST), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetActiveSimAccountInfoList failed, error code is %{public}d \n", st);
         return false;
@@ -1206,12 +1245,13 @@ bool CoreServiceProxy::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
         return false;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetOperatorConfigs Remote is null");
         return false;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_OPERATOR_CONFIG), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_OPERATOR_CONFIG), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetOperatorConfigs failed, error code is %{public}d", st);
         return false;
@@ -1265,7 +1305,7 @@ bool CoreServiceProxy::IsValidServiceType(ImsServiceType serviceType)
     return true;
 }
 
-bool CoreServiceProxy::UnlockPin(const int32_t slotId, std::u16string pin, LockStatusResponse &response)
+bool CoreServiceProxy::UnlockPin(const int32_t slotId, const std::u16string &pin, LockStatusResponse &response)
 {
     TELEPHONY_LOGI("CoreServiceProxy::UnlockPin(), pin = %{public}d", slotId);
     MessageParcel data;
@@ -1277,11 +1317,12 @@ bool CoreServiceProxy::UnlockPin(const int32_t slotId, std::u16string pin, LockS
     }
     data.WriteInt32(slotId);
     data.WriteString16(pin);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("UnlockPin Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::UNLOCK_PIN), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::UNLOCK_PIN), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("UnlockPin failed, error code is %{public}d \n", st);
         return false;
@@ -1296,7 +1337,7 @@ bool CoreServiceProxy::UnlockPin(const int32_t slotId, std::u16string pin, LockS
 }
 
 bool CoreServiceProxy::UnlockPuk(
-    const int32_t slotId, std::u16string newPin, std::u16string puk, LockStatusResponse &response)
+    const int32_t slotId, const std::u16string &newPin, const std::u16string &puk, LockStatusResponse &response)
 {
     TELEPHONY_LOGI("CoreServiceProxy::UnlockPuk(), slotId = %{public}d", slotId);
     MessageParcel data;
@@ -1309,11 +1350,12 @@ bool CoreServiceProxy::UnlockPuk(
     data.WriteInt32(slotId);
     data.WriteString16(newPin);
     data.WriteString16(puk);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("UnlockPuk Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::UNLOCK_PUK), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::UNLOCK_PUK), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("UnlockPuk failed, error code is %{public}d \n", st);
         return false;
@@ -1328,7 +1370,7 @@ bool CoreServiceProxy::UnlockPuk(
 }
 
 bool CoreServiceProxy::AlterPin(
-    const int32_t slotId, std::u16string newPin, std::u16string oldPin, LockStatusResponse &response)
+    const int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin, LockStatusResponse &response)
 {
     TELEPHONY_LOGI("CoreServiceProxy::AlterPin(), slotId = %{public}d", slotId);
     MessageParcel data;
@@ -1341,11 +1383,12 @@ bool CoreServiceProxy::AlterPin(
     data.WriteInt32(slotId);
     data.WriteString16(newPin);
     data.WriteString16(oldPin);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("AlterPin Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::ALTER_PIN), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::ALTER_PIN), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("AlterPin failed, error code is %{public}d \n", st);
         return false;
@@ -1359,7 +1402,7 @@ bool CoreServiceProxy::AlterPin(
     return result;
 }
 
-bool CoreServiceProxy::UnlockPin2(const int32_t slotId, std::u16string pin2, LockStatusResponse &response)
+bool CoreServiceProxy::UnlockPin2(const int32_t slotId, const std::u16string &pin2, LockStatusResponse &response)
 {
     TELEPHONY_LOGI("CoreServiceProxy::UnlockPin2(), pin = %{public}d", slotId);
     MessageParcel data;
@@ -1371,11 +1414,12 @@ bool CoreServiceProxy::UnlockPin2(const int32_t slotId, std::u16string pin2, Loc
     }
     data.WriteInt32(slotId);
     data.WriteString16(pin2);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("UnlockPin2 Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::UNLOCK_PIN2), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::UNLOCK_PIN2), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("UnlockPin2 failed, error code is %{public}d \n", st);
         return false;
@@ -1390,7 +1434,7 @@ bool CoreServiceProxy::UnlockPin2(const int32_t slotId, std::u16string pin2, Loc
 }
 
 bool CoreServiceProxy::UnlockPuk2(
-    const int32_t slotId, std::u16string newPin2, std::u16string puk2, LockStatusResponse &response)
+    const int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2, LockStatusResponse &response)
 {
     TELEPHONY_LOGI("CoreServiceProxy::UnlockPuk2(), slotId = %{public}d", slotId);
     MessageParcel data;
@@ -1403,11 +1447,12 @@ bool CoreServiceProxy::UnlockPuk2(
     data.WriteInt32(slotId);
     data.WriteString16(newPin2);
     data.WriteString16(puk2);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("UnlockPuk2 Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::UNLOCK_PUK2), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::UNLOCK_PUK2), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("UnlockPuk2 failed, error code is %{public}d \n", st);
         return false;
@@ -1422,7 +1467,7 @@ bool CoreServiceProxy::UnlockPuk2(
 }
 
 bool CoreServiceProxy::AlterPin2(
-    const int32_t slotId, std::u16string newPin2, std::u16string oldPin2, LockStatusResponse &response)
+    const int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2, LockStatusResponse &response)
 {
     TELEPHONY_LOGI("CoreServiceProxy::AlterPin2(), slotId = %{public}d", slotId);
     MessageParcel data;
@@ -1435,11 +1480,12 @@ bool CoreServiceProxy::AlterPin2(
     data.WriteInt32(slotId);
     data.WriteString16(newPin2);
     data.WriteString16(oldPin2);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("AlterPin2 Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::ALTER_PIN2), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::ALTER_PIN2), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("AlterPin2 failed, error code is %{public}d \n", st);
         return false;
@@ -1467,11 +1513,12 @@ bool CoreServiceProxy::SetLockState(const int32_t slotId, const LockInfo &option
     data.WriteInt32(static_cast<int32_t>(options.lockType));
     data.WriteInt32(static_cast<int32_t>(options.lockState));
     data.WriteString16(options.password);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("SetLockState Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::SWITCH_LOCK), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::SWITCH_LOCK), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SetLockState failed, error code is %{public}d \n", st);
         return false;
@@ -1500,12 +1547,13 @@ int32_t CoreServiceProxy::GetLockState(int32_t slotId, LockType lockType)
     TELEPHONY_LOGI("GetLockState WriteInterfaceToken is true");
     data.WriteInt32(slotId);
     data.WriteInt32(static_cast<int32_t>(lockType));
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetLockState Remote is null");
         return TELEPHONY_ERROR;
     }
     TELEPHONY_LOGI("GetLockState Remote is  != null");
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::CHECK_LOCK), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::CHECK_LOCK), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetLockState failed, error code is %{public}d \n", st);
         return TELEPHONY_ERROR;
@@ -1527,11 +1575,12 @@ int32_t CoreServiceProxy::RefreshSimState(int32_t slotId)
         return TELEPHONY_ERROR;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("RefreshSimState Remote is null");
         return TELEPHONY_ERROR;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::REFRESH_SIM_STATE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::REFRESH_SIM_STATE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("RefreshSimState failed, error code is %{public}d \n", st);
         return TELEPHONY_ERROR;
@@ -1563,11 +1612,12 @@ bool CoreServiceProxy::SetActiveSim(int32_t slotId, int32_t enable)
     }
     data.WriteInt32(slotId);
     data.WriteInt32(enable);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("SetActiveSim Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::SET_SIM_ACTIVE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::SET_SIM_ACTIVE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SetActiveSim failed, error code is %{public}d \n", st);
         return false;
@@ -1594,11 +1644,12 @@ bool CoreServiceProxy::GetPreferredNetwork(int32_t slotId, const sptr<INetworkSe
     if (callback != nullptr) {
         data.WriteRemoteObject(callback->AsObject().GetRefPtr());
     }
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetPreferredNetwork Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_PREFERRED_NETWORK_MODE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_PREFERRED_NETWORK_MODE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetPreferredNetwork failed, error code is %{public}d \n", st);
         return false;
@@ -1627,11 +1678,12 @@ bool CoreServiceProxy::SetPreferredNetwork(
     if (callback != nullptr) {
         data.WriteRemoteObject(callback->AsObject().GetRefPtr());
     }
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("SetPreferredNetwork Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::SET_PREFERRED_NETWORK_MODE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::SET_PREFERRED_NETWORK_MODE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SetPreferredNetwork failed, error code is %{public}d \n", st);
         return false;
@@ -1652,11 +1704,12 @@ std::u16string CoreServiceProxy::GetSimTelephoneNumber(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetSimTelephoneNumber Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_PHONE_NUMBER), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_SIM_PHONE_NUMBER), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetSimTelephoneNumber failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -1678,11 +1731,12 @@ std::u16string CoreServiceProxy::GetSimTeleNumberIdentifier(const int32_t slotId
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetSimTeleNumberIdentifier Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_SIM_TELENUMBER_IDENTIFIER), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_SIM_TELENUMBER_IDENTIFIER), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetSimTeleNumberIdentifier failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -1704,11 +1758,12 @@ std::u16string CoreServiceProxy::GetVoiceMailIdentifier(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetVoiceMailIdentifier Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_VOICE_MAIL_TAG), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_VOICE_MAIL_TAG), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetVoiceMailIdentifier failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -1730,11 +1785,12 @@ std::u16string CoreServiceProxy::GetVoiceMailNumber(int32_t slotId)
         return Str8ToStr16("");
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetVoiceMailNumber Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_VOICE_MAIL_NUMBER), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_VOICE_MAIL_NUMBER), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetVoiceMailNumber failed, error code is %{public}d \n", st);
         return Str8ToStr16("");
@@ -1764,11 +1820,12 @@ std::vector<std::shared_ptr<DiallingNumbersInfo>> CoreServiceProxy::QueryIccDial
         TELEPHONY_LOGE("QueryIccDiallingNumbers WriteInt32 type is false");
         return result;
     }
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("QueryIccDiallingNumbers Remote is null");
         return result;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_GET), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_GET), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("QueryIccDiallingNumbers failed, error code is %{public}d\n", st);
         return result;
@@ -1807,11 +1864,12 @@ bool CoreServiceProxy::AddIccDiallingNumbers(
     if (diallingNumber != nullptr) {
         diallingNumber->Marshalling(data);
     }
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("AddIccDiallingNumbers Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_INSERT), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_INSERT), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("AddIccDiallingNumbers failed, error code is %{public}d \n", st);
         return false;
@@ -1844,11 +1902,12 @@ bool CoreServiceProxy::DelIccDiallingNumbers(
     if (diallingNumber != nullptr) {
         diallingNumber->Marshalling(data);
     }
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("DelIccDiallingNumbers Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_DELETE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_DELETE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("DelIccDiallingNumbers failed, error code is %{public}d \n", st);
         return false;
@@ -1881,11 +1940,12 @@ bool CoreServiceProxy::UpdateIccDiallingNumbers(
     if (diallingNumber != nullptr) {
         diallingNumber->Marshalling(data);
     }
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("UpdateIccDiallingNumbers Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_UPDATE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_UPDATE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("UpdateIccDiallingNumbers failed, error code is %{public}d \n", st);
         return false;
@@ -1919,11 +1979,12 @@ bool CoreServiceProxy::SetVoiceMailInfo(
         TELEPHONY_LOGE("SetVoiceMailInfo WriteString16 mailNumber is false");
         return false;
     }
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("SetVoiceMailInfo Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::SET_VOICE_MAIL), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::SET_VOICE_MAIL), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SetVoiceMailInfo failed, error code is %{public}d \n", st);
         return false;
@@ -1944,11 +2005,12 @@ int32_t CoreServiceProxy::GetOpKey(int32_t slotId, std::u16string &opkey)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetOpKey Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(uint32_t(InterfaceID::GET_OPKEY), data, reply, option);
+    int32_t error = remote->SendRequest(uint32_t(InterfaceID::GET_OPKEY), data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetOpKey failed, error code is %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -1973,11 +2035,12 @@ int32_t CoreServiceProxy::GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetOpKeyExt Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(uint32_t(InterfaceID::GET_OPKEY_EXT), data, reply, option);
+    int32_t error = remote->SendRequest(uint32_t(InterfaceID::GET_OPKEY_EXT), data, reply, option);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("GetOpKeyExt failed, error code is %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -2002,11 +2065,12 @@ int32_t CoreServiceProxy::GetOpName(int32_t slotId, std::u16string &opname)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetOpName Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(uint32_t(InterfaceID::GET_OPNAME), data, reply, option);
+    int32_t error = remote->SendRequest(uint32_t(InterfaceID::GET_OPNAME), data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetOpName failed, error code is %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -2040,12 +2104,13 @@ bool CoreServiceProxy::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
     }
     data.WriteInt32(slotId);
     data.WriteString(cmd);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("SendEnvelopeCmd Remote is null");
         return ERROR;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::STK_CMD_FROM_APP_ENVELOPE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::STK_CMD_FROM_APP_ENVELOPE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SendEnvelopeCmd failed, error code is %{public}d \n", st);
         return false;
@@ -2066,12 +2131,13 @@ bool CoreServiceProxy::SendTerminalResponseCmd(int32_t slotId, const std::string
     }
     data.WriteInt32(slotId);
     data.WriteString(cmd);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("SendTerminalResponseCmd Remote is null");
         return ERROR;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::STK_CMD_FROM_APP_TERMINAL_RESPONSE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::STK_CMD_FROM_APP_TERMINAL_RESPONSE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SendTerminalResponseCmd failed, error code is %{public}d \n", st);
         return false;
@@ -2092,13 +2158,14 @@ int32_t CoreServiceProxy::SendCallSetupRequestResult(int32_t slotId, bool accept
     }
     data.WriteInt32(slotId);
     data.WriteInt32(accept);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("SendCallSetupRequestResult Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t st = Remote()->SendRequest(
-        uint32_t(InterfaceID::STK_RESULT_FROM_APP_CALL_SETUP_REQUEST), data, reply, option);
+    int32_t st =
+        remote->SendRequest(uint32_t(InterfaceID::STK_RESULT_FROM_APP_CALL_SETUP_REQUEST), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SendCallSetupRequestResult failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -2124,11 +2191,12 @@ bool CoreServiceProxy::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockIn
     data.WriteInt32(slotId);
     data.WriteInt32(static_cast<int32_t>(lockInfo.lockType));
     data.WriteString16(lockInfo.password);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("UnlockSimLock Remote is null");
         return false;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::UNLOCK_SIMLOCK), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::UNLOCK_SIMLOCK), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("UnlockSimLock failed, error code is %{public}d \n", st);
         return false;
@@ -2189,11 +2257,12 @@ std::vector<sptr<CellInformation>> CoreServiceProxy::GetCellInfoList(int32_t slo
         return cells;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetCellInfoList Remote is null");
         return cells;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_CELL_INFO_LIST), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_CELL_INFO_LIST), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetCellInfoList failed, error code is %{public}d\n", st);
         return cells;
@@ -2251,12 +2320,13 @@ bool CoreServiceProxy::SendUpdateCellLocationRequest(int32_t slotId)
         TELEPHONY_LOGE("SendUpdateCellLocationRequest WriteInterfaceToken is false");
         return false;
     }
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("SendUpdateCellLocationRequest Remote is null");
         return false;
     }
     data.WriteInt32(slotId);
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::GET_CELL_LOCATION), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_CELL_LOCATION), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SendUpdateCellLocationRequest failed, error code is %{public}d \n", st);
         return false;
@@ -2275,12 +2345,13 @@ bool CoreServiceProxy::HasOperatorPrivileges(const int32_t slotId)
         return ERROR;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("HasOperatorPrivileges Remote is null");
         return ERROR;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::HAS_OPERATOR_PRIVILEGES), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::HAS_OPERATOR_PRIVILEGES), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("HasOperatorPrivileges failed, error code is %{public}d \n", st);
         return false;
@@ -2303,11 +2374,12 @@ int32_t CoreServiceProxy::SimAuthentication(
     data.WriteInt32(slotId);
     data.WriteString(aid);
     data.WriteString(authData);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("SimAuthentication Remote is null");
         return ERROR;
     }
-    int32_t st = Remote()->SendRequest(uint32_t(InterfaceID::SIM_AUTHENTICATION), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::SIM_AUTHENTICATION), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SimAuthentication failed, error code is %{public}d", st);
         return ERROR;
@@ -2328,8 +2400,13 @@ bool CoreServiceProxy::IsNrSupported(int32_t slotId)
         TELEPHONY_LOGE("IsNrSupported WriteInterfaceToken is false");
         return false;
     }
+    auto remote = Remote();
     data.WriteInt32(slotId);
-    int32_t st = Remote()->SendRequest(static_cast<uint32_t>(InterfaceID::IS_NR_SUPPORTED), data, reply, option);
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("SimAuthentication Remote is null");
+        return ERROR;
+    }
+    int32_t st = remote->SendRequest(static_cast<uint32_t>(InterfaceID::IS_NR_SUPPORTED), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("IsNrSupported failed, error code is %{public}d \n", st);
         return false;
@@ -2348,11 +2425,12 @@ NrMode CoreServiceProxy::GetNrOptionMode(int32_t slotId)
         return NrMode::NR_MODE_UNKNOWN;
     }
     data.WriteInt32(slotId);
-    if (Remote() == nullptr) {
+    auto remote = Remote();
+    if (remote == nullptr) {
         TELEPHONY_LOGE("GetNrOptionMode Remote is null");
         return NrMode::NR_MODE_UNKNOWN;
     }
-    int32_t st = Remote()->SendRequest(static_cast<uint32_t>(InterfaceID::GET_NR_OPTION_MODE), data, reply, option);
+    int32_t st = remote->SendRequest(static_cast<uint32_t>(InterfaceID::GET_NR_OPTION_MODE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetNrOptionMode failed, error code is %{public}d \n", st);
         return NrMode::NR_MODE_UNKNOWN;
