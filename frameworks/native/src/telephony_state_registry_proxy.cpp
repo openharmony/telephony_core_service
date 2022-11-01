@@ -36,7 +36,8 @@ int32_t TelephonyStateRegistryProxy::UpdateCellularDataConnectState(
     int32_t slotId, int32_t dataStatus, int32_t networkForm)
 {
     MessageOption option;
-    MessageParcel in, out;
+    MessageParcel in;
+    MessageParcel out;
     if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
         return TELEPHONY_ERR_FAIL;
     }
@@ -66,7 +67,8 @@ int32_t TelephonyStateRegistryProxy::UpdateCellularDataFlow(
     int32_t slotId, int32_t dataFlowType)
 {
     MessageOption option;
-    MessageParcel in, out;
+    MessageParcel in;
+    MessageParcel out;
     if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
         return TELEPHONY_ERR_FAIL;
     }
@@ -93,7 +95,8 @@ int32_t TelephonyStateRegistryProxy::UpdateCallState(
     int32_t slotId, int32_t callStatus, const std::u16string &number)
 {
     MessageOption option;
-    MessageParcel in, out;
+    MessageParcel in;
+    MessageParcel out;
     if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
         return TELEPHONY_ERR_FAIL;
     }
@@ -123,7 +126,8 @@ int32_t TelephonyStateRegistryProxy::UpdateCallStateForSlotId(
     int32_t slotId, int32_t callId, int32_t callStatus, const std::u16string &number)
 {
     MessageOption option;
-    MessageParcel in, out;
+    MessageParcel in;
+    MessageParcel out;
     if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
         return TELEPHONY_ERR_FAIL;
     }
@@ -156,7 +160,8 @@ int32_t TelephonyStateRegistryProxy::UpdateSignalInfo(
     int32_t slotId, const std::vector<sptr<SignalInformation>> &vec)
 {
     MessageOption option;
-    MessageParcel in, out;
+    MessageParcel in;
+    MessageParcel out;
     if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
         return TELEPHONY_ERR_FAIL;
     }
@@ -190,7 +195,8 @@ int32_t TelephonyStateRegistryProxy::UpdateCellInfo(
     int32_t slotId, const std::vector<sptr<CellInformation>> &vec)
 {
     MessageOption option;
-    MessageParcel in, out;
+    MessageParcel in;
+    MessageParcel out;
     if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
         return TELEPHONY_ERR_FAIL;
     }
@@ -224,7 +230,8 @@ int32_t TelephonyStateRegistryProxy::UpdateNetworkState(
     int32_t slotId, const sptr<NetworkState> &networkState)
 {
     MessageOption option;
-    MessageParcel in, out;
+    MessageParcel in;
+    MessageParcel out;
     if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
         return TELEPHONY_ERR_FAIL;
     }
@@ -251,7 +258,8 @@ int32_t TelephonyStateRegistryProxy::UpdateSimState(
     int32_t slotId, CardType type, SimState state, LockReason reason)
 {
     MessageOption option;
-    MessageParcel in, out;
+    MessageParcel in;
+    MessageParcel out;
     if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
         return TELEPHONY_ERR_FAIL;
     }
@@ -284,7 +292,8 @@ int32_t TelephonyStateRegistryProxy::RegisterStateChange(
     const sptr<TelephonyObserverBroker> &callback, int32_t slotId, uint32_t mask, bool isUpdate)
 {
     MessageOption option;
-    MessageParcel in, out;
+    MessageParcel in;
+    MessageParcel out;
     if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
         return TELEPHONY_ERR_FAIL;
     }
@@ -317,7 +326,8 @@ int32_t TelephonyStateRegistryProxy::UnregisterStateChange(
     int32_t slotId, uint32_t mask)
 {
     MessageOption option;
-    MessageParcel in, out;
+    MessageParcel in;
+    MessageParcel out;
     if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
         return TELEPHONY_ERR_FAIL;
     }

@@ -45,7 +45,7 @@ class NetworkUtils {
 public:
     static PreferredNetworkMode GetNetworkModeFromRaf(int32_t raf);
     static int32_t GetRafFromNetworkMode(PreferredNetworkMode PreferredNetworkMode);
-    static std::vector<std::string> Split(const std::string &input, const std::string &flag);
+    static std::vector<std::string> SplitString(const std::string &inputString, const std::string &flag);
 
     static int64_t GetCallbackIndex64bit();
     static std::shared_ptr<NetworkSearchCallbackInfo> FindNetworkSearchCallback(int64_t index);

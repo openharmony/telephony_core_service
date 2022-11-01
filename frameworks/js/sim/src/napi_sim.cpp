@@ -30,6 +30,7 @@
 namespace OHOS {
 namespace Telephony {
 namespace {
+constexpr int ARGC_MAX = 3;
 struct AsyncPara {
     std::string funcName = "";
     napi_env env = nullptr;
@@ -119,7 +120,6 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncCo
 napi_value NapiCreateAsyncWork4(const AsyncPara &para, AsyncContextPIN *context, napi_ref *ref)
 {
     napi_env env = para.env;
-    constexpr int ARGC_MAX = 3;
     size_t argc = ARGC_MAX;
     napi_value argv[ARGC_MAX] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, para.info, &argc, argv, nullptr, nullptr));
@@ -147,7 +147,7 @@ napi_value NapiCreateAsyncWork4(const AsyncPara &para, AsyncContextPIN *context,
 
 template<typename T>
 void NapiAsyncCompleteCallback(napi_env env, napi_status status, const AsyncContext<T> &asyncContext,
-    std::string errMessage, bool funcIgnoreReturnVal = false, int errorCode = ERROR_DEFAULT)
+    const std::string &errMessage, bool funcIgnoreReturnVal = false, int errorCode = ERROR_DEFAULT)
 {
     if (status != napi_ok) {
         napi_throw_type_error(env, nullptr, "excute failed");
@@ -296,7 +296,7 @@ napi_value DiallingNumbersConversion(napi_env env, const TelNumbersInfo &info)
     return val;
 }
 
-void GetDiallingNumberInfo(std::shared_ptr<DiallingNumbersInfo> &telNumber, const TelNumbersInfo &info)
+void GetDiallingNumberInfo(const std::shared_ptr<DiallingNumbersInfo> &telNumber, const TelNumbersInfo &info)
 {
     telNumber->index_ = info.recordNumber;
     telNumber->name_ = NapiUtil::ToUtf16(info.alphaTag.data());
@@ -1220,7 +1220,7 @@ void NativeGetIMSI(napi_env env, void *data)
         TELEPHONY_LOGI("NAPI NativeGetIMSI success");
     } else {
         TELEPHONY_LOGE("NAPI NativeGetIMSI IMSI length is invalid %{public}lu",
-                       (unsigned long)asyncContext->callbackVal.length());
+            static_cast<unsigned long>(asyncContext->callbackVal.length()));
     }
     asyncContext->context.resolved = !(asyncContext->callbackVal.empty());
 }

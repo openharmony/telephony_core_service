@@ -120,15 +120,16 @@ sptr<ICoreService> TelRilTest::GetProxy()
 
 void TelRilTest::ProcessTest(int32_t index, int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
-    if (!(telephonyService_->HasSimCard(slotId))) {
-        TELEPHONY_LOGE("TelRilTest::ProcessTest no sim card %{public}d", slotId);
-        return;
-    }
     if (telephonyService_ == nullptr) {
         TELEPHONY_LOGE("TelRilTest::ProcessTest telephonyService_ is nullptr");
         telephonyService_ = GetProxy();
         return;
     }
+    if (!(telephonyService_->HasSimCard(slotId))) {
+        TELEPHONY_LOGE("TelRilTest::ProcessTest no sim card %{public}d", slotId);
+        return;
+    }
+
     for (auto itFunc : memberFuncMap_) {
         int32_t val = static_cast<int32_t>(itFunc.first);
         if (val == index) {

@@ -29,6 +29,7 @@
 
 namespace OHOS {
 namespace Telephony {
+namespace {
 const char *TELEPHONY_NR_CONVERSION_CONFIG_INDEX = "persist.telephony.nr.config.index"; // "A/B/C/D"
 /**
  * System configuration format
@@ -41,6 +42,8 @@ const char *TELEPHONY_NR_CONVERSION_CONFIG_D = "persist.telephony.nr.config.d";
 const int32_t SYS_PARAMETER_SIZE = 256;
 const int32_t NR_STATE_NUM = 6;
 const int32_t KEY_VALUE_NUM = 2;
+const int32_t MAX_SIZE = 100;
+} // namespace
 
 NetworkRegister::NetworkRegister(std::shared_ptr<NetworkSearchState> networkSearchState,
     std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
@@ -51,7 +54,7 @@ NetworkRegister::NetworkRegister(std::shared_ptr<NetworkSearchState> networkSear
 
 void NetworkRegister::InitNrConversionConfig()
 {
-    char prase[SYS_PARAMETER_SIZE] = {0};
+    char prase[SYS_PARAMETER_SIZE] = { 0 };
     int code = GetParameter(TELEPHONY_NR_CONVERSION_CONFIG_INDEX, "A", prase, SYS_PARAMETER_SIZE);
     if (code <= 0 || prase[0] > 'D' || prase[0] < 'A') {
         TELEPHONY_LOGE(
@@ -80,9 +83,8 @@ void NetworkRegister::InitNrConversionConfig()
     strNrConfig = prase;
     if (code <= 0 || strNrConfig.empty()) {
         TELEPHONY_LOGI("Failed to get system properties err:%{public}d use default config a", code);
-        strNrConfig =
-            "NOT_SUPPORT:4g,NO_DETECT:4g,CONNECTED_DETECT:4g,"
-            "IDLE_DETECT:4g,DUAL_CONNECTED:5g,SA_ATTACHED:5g";
+        strNrConfig = "NOT_SUPPORT:4g,NO_DETECT:4g,CONNECTED_DETECT:4g,"
+                      "IDLE_DETECT:4g,DUAL_CONNECTED:5g,SA_ATTACHED:5g";
     }
     NrConfigParse(strNrConfig);
 }
@@ -91,8 +93,7 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE(
-            "NetworkRegister::ProcessCsRegister networkSearchManager is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister networkSearchManager is nullptr slotId:%{public}d", slotId_);
         return;
     }
     networkSearchManager->decMsgNum(slotId_);
@@ -108,8 +109,7 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
     RilRegister registrationStatus = static_cast<RilRegister>(csRegStateResult->regStatus);
     RegServiceState regStatus = ConvertRegFromRil(registrationStatus);
     if (networkSearchState_ == nullptr) {
-        TELEPHONY_LOGE(
-            "NetworkRegister::ProcessCsRegister networkSearchState_ is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister networkSearchState_ is nullptr slotId:%{public}d", slotId_);
         return;
     }
     networkSearchState_->SetNetworkState(regStatus, DomainType::DOMAIN_TYPE_CS);
@@ -148,15 +148,13 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
 
     std::shared_ptr<PsRegStatusResultInfo> psRegStatusResult = event->GetSharedObject<PsRegStatusResultInfo>();
     if (psRegStatusResult == nullptr) {
-        TELEPHONY_LOGE(
-            "NetworkRegister::ProcessPsRegister psRegStatusResult is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister psRegStatusResult is nullptr slotId:%{public}d", slotId_);
         return;
     }
     RilRegister registrationStatus = static_cast<RilRegister>(psRegStatusResult->regStatus);
     RegServiceState regStatus = ConvertRegFromRil(registrationStatus);
     if (networkSearchState_ == nullptr) {
-        TELEPHONY_LOGE(
-            "NetworkRegister::ProcessPsRegister networkSearchState_ is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister networkSearchState_ is nullptr slotId:%{public}d", slotId_);
         return;
     }
     networkSearchState_->SetNetworkState(regStatus, DomainType::DOMAIN_TYPE_PS);
@@ -194,8 +192,11 @@ void NetworkRegister::ProcessChannelConfigInfo(const AppExecFwk::InnerEvent::Poi
         return;
     }
     int32_t size = channelConfigInfoList->itemNum;
-    TELEPHONY_LOGI(
-        "NetworkRegister::ProcessChannelConfigInfo num size:%{public}d slotId:%{public}d", size, slotId_);
+    TELEPHONY_LOGI("NetworkRegister::ProcessChannelConfigInfo num size:%{public}d slotId:%{public}d", size, slotId_);
+    if (size >= MAX_SIZE) {
+        TELEPHONY_LOGE("NetworkRegister::ProcessChannelConfigInfo num over max size");
+        return;
+    }
     if (channelConfigInfoList->channelConfigInfos.size() > 0 &&
         static_cast<int32_t>(channelConfigInfoList->channelConfigInfos.size()) == size) {
         std::vector<PhysicalChannelConfig> &configs = channelConfigInfoList->channelConfigInfos;
@@ -210,7 +211,7 @@ void NetworkRegister::ProcessChannelConfigInfo(const AppExecFwk::InnerEvent::Poi
     for (int i = 0; i < size; ++i) {
         if (static_cast<RadioTech>(channelConfigInfos_[i].ratType) == RadioTech::RADIO_TECHNOLOGY_NR &&
             static_cast<ConnectServiceCell>(channelConfigInfos_[i].cellConnStatus) ==
-            ConnectServiceCell::CONNECTION_SECONDARY_CELL) {
+                ConnectServiceCell::CONNECTION_SECONDARY_CELL) {
             isNrSecondaryCell = true;
             break;
         }
@@ -386,7 +387,7 @@ void NetworkRegister::NrConfigParse(std::string &cfgStr)
     /**
      * parse string
      * NOT_SUPPORT：4g,NO_DETECT:4g,CONNECTED_DETECT:4g,IDLE_DETECT:4g,DUAL_CONNECTED:5g,SA_ATTACHED:5g
-    */
+     */
     std::string strSep = ",";
     std::vector<std::string> strsRet;
     SplitStr(cfgStr, strSep, strsRet);
@@ -401,8 +402,7 @@ void NetworkRegister::NrConfigParse(std::string &cfgStr)
         strSep = ":";
         SplitStr(state, strSep, nrStateKv);
         if (static_cast<int>(nrStateKv.size()) != KEY_VALUE_NUM) {
-            TELEPHONY_LOGE("NetworkRegister::NrConfigParse key value string error slotId:%{public}d",
-                slotId_);
+            TELEPHONY_LOGE("NetworkRegister::NrConfigParse key value string error slotId:%{public}d", slotId_);
             return;
         }
         NrState nrState = ConvertStringToNrState(nrStateKv[0]);

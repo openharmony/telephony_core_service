@@ -34,24 +34,25 @@ using RilFunc_Int_String_Event = int32_t (ITelRilManager::*)(
     int32_t, int32_t, std::string, const AppExecFwk::InnerEvent::Pointer &);
 
 // group
-const int32_t GSM = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_GSM);
-const int32_t CDMA = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_1XRTT);
-const int32_t EVDO = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_EVDO) |
-    static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_EHRPD);
-const int32_t WCDMA = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_WCDMA) |
-    static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_HSPA) |
-    static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_HSPAP);
-const int32_t TDSCDMA = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_TD_SCDMA);
-const int32_t LTE = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_LTE) |
-    static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_LTE_CA);
-const int32_t NR = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_NR);
-// nG
-const int32_t RAF_2G = GSM | CDMA;
-const int32_t RAF_3G = WCDMA | EVDO | TDSCDMA;
-const int32_t RAF_4G = LTE;
-const int32_t RAF_5G = NR;
+static const int32_t GSM = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_GSM);
+static const int32_t CDMA = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_1XRTT);
+static const int32_t EVDO = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_EVDO) |
+                            static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_EHRPD);
+static const int32_t WCDMA = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_WCDMA) |
+                             static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_HSPA) |
+                             static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_HSPAP);
+static const int32_t TDSCDMA = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_TD_SCDMA);
+static const int32_t LTE = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_LTE) |
+                           static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_LTE_CA);
+static const int32_t NR = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_NR);
+
+// generation
+static const int32_t RAF_2G = GSM | CDMA;
+static const int32_t RAF_3G = WCDMA | EVDO | TDSCDMA;
+static const int32_t RAF_4G = LTE;
+static const int32_t RAF_5G = NR;
 // auto mode , support all radio mode
-const int32_t RAF_AUTO = RAF_2G | RAF_3G | RAF_4G | RAF_5G;
+static const int32_t RAF_AUTO = RAF_2G | RAF_3G | RAF_4G | RAF_5G;
 
 static const std::map<int32_t, PreferredNetworkMode> mapNetworkModeFromRaf = {
     { RAF_AUTO, PreferredNetworkMode::CORE_NETWORK_MODE_AUTO },
@@ -152,23 +153,23 @@ int32_t NetworkUtils::GetRafFromNetworkMode(PreferredNetworkMode PreferredNetwor
     return static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN);
 }
 
-std::vector<std::string> NetworkUtils::Split(const std::string &input, const std::string &flag)
+std::vector<std::string> NetworkUtils::SplitString(const std::string &inputString, const std::string &flag)
 {
-    std::vector<std::string> vec;
-    if (input.empty()) {
-        TELEPHONY_LOGE("input is null");
-        return vec;
+    std::vector<std::string> result;
+    if (inputString.empty()) {
+        TELEPHONY_LOGE("inputString is null");
+        return result;
     }
     std::string::size_type start = 0;
-    std::string::size_type pos = 0;
-    while ((pos = input.find(flag, start)) != std::string::npos) {
-        vec.push_back(input.substr(start, pos - start));
-        start = pos + flag.size();
+    std::string::size_type position = 0;
+    while ((position = inputString.find(flag, start)) != std::string::npos) {
+        result.push_back(inputString.substr(start, position - start));
+        start = position + flag.size();
     }
-    if (start != input.size()) {
-        vec.push_back(input.substr(start, input.size() - start));
+    if (start != inputString.size()) {
+        result.push_back(inputString.substr(start, inputString.size() - start));
     }
-    return vec;
+    return result;
 }
 
 bool NetworkUtils::AddNetworkSearchCallBack(int64_t index, std::shared_ptr<NetworkSearchCallbackInfo> &callback)

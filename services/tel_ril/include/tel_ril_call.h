@@ -63,7 +63,8 @@ public:
     int32_t SetMute(const int32_t mute, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetMute(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &result);
-    int32_t SetEmergencyCallList(std::vector<EmergencyCall> &eccVec, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetEmergencyCallList(
+        const std::vector<EmergencyCall> &eccVec, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetCallFailReason(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SetBarringPassword(std::string fac, std::string oldPassword,
         std::string newPassword, const AppExecFwk::InnerEvent::Pointer &result);
