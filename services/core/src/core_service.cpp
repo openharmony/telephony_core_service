@@ -393,6 +393,10 @@ bool CoreService::GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSea
 
 std::u16string CoreService::GetLocaleFromDefaultSim()
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("CoreService::GetLocaleFromDefaultSim, Permission denied!");
+        return std::u16string();
+    }
     TELEPHONY_LOGI("CoreService::GetSimAccountInfo()");
     if (simManager_ == nullptr) {
         return std::u16string();
@@ -662,6 +666,10 @@ bool CoreService::SetLockState(int32_t slotId, const LockInfo &options, LockStat
 
 int32_t CoreService::GetLockState(int32_t slotId, LockType lockType)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("CoreService::GetLockState, Permission denied!");
+        return TELEPHONY_PERMISSION_ERROR;
+    }
     TELEPHONY_LOGI("CoreService::GetLockState(), lockType = %{public}d, slotId = %{public}d", lockType, slotId);
     if (simManager_ == nullptr) {
         return TELEPHONY_ERROR;
@@ -726,6 +734,10 @@ std::u16string CoreService::GetSimTelephoneNumber(int32_t slotId)
 
 std::u16string CoreService::GetSimTeleNumberIdentifier(const int32_t slotId)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("CoreService::GetSimTeleNumberIdentifier, Permission denied!");
+        return std::u16string();
+    }
     TELEPHONY_LOGI("CoreService::GetSimTeleNumberIdentifier(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         return std::u16string();
@@ -936,6 +948,10 @@ std::vector<sptr<CellInformation>> CoreService::GetCellInfoList(int32_t slotId)
 
 bool CoreService::SendUpdateCellLocationRequest(int32_t slotId)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::CELL_LOCATION)) {
+        TELEPHONY_LOGE("CoreService::SendUpdateCellLocationRequest, Permission denied!");
+        return false;
+    }
     if (networkSearchManager_ == nullptr) {
         return false;
     }
