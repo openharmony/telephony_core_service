@@ -64,6 +64,8 @@ public:
     static bool CreateCallErrorMessageForJs(int32_t errorCode, JsError &error);
     static JsError ConverErrorMessageWithPermissionForJs(
         int32_t errorCode, const std::string &funcName, const std::string &permission);
+    static napi_value CreateError(napi_env env, int32_t err, const std::string &msg);
+    static void ThrowError(napi_env env, int32_t errorCode, const std::string &message);
 };
 } // namespace Telephony
 } // namespace OHOS

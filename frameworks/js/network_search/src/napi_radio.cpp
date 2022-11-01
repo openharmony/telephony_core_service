@@ -2124,8 +2124,7 @@ static void ReportFunctionFailed(napi_env env, int32_t resultCode, std::string f
             error = NapiUtil::ConverErrorMessageForJs(resultCode);
             break;
     }
-    NAPI_CALL_RETURN_VOID(
-        env, napi_throw_error(env, std::to_string(error.errorCode).c_str(), error.errorMessage.c_str()));
+    NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
 }
 
 static napi_value GetImsRegInfo(napi_env env, napi_callback_info info)

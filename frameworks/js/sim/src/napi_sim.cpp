@@ -62,7 +62,7 @@ napi_value NapiCreateAsyncWork(napi_env env, napi_callback_info info, std::strin
     std::optional<NapiError> errCode = MatchParameters(env, argv, argc, inParaTp);
     if (errCode.has_value()) {
         JsError error = NapiUtil::ConverErrorMessageForJs(errCode.value());
-        napi_throw_error(env, std::to_string(error.errorCode).c_str(), error.errorMessage.c_str());
+        NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
         return nullptr;
     }
 
@@ -99,7 +99,7 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncCo
     std::optional<NapiError> errCode = MatchParameters(env, argv, argc, theTuple);
     if (errCode.has_value()) {
         JsError error = NapiUtil::ConverErrorMessageForJs(errCode.value());
-        napi_throw_error(env, std::to_string(error.errorCode).c_str(), error.errorMessage.c_str());
+        NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
         return nullptr;
     }
 
