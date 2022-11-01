@@ -22,8 +22,9 @@ std::string GetBoolValue(int32_t value)
     std::string result = "";
     if (value == 0) {
         result = "FALSE";
+    } else {
+        result = "TRUE";
     }
-    result = "TRUE";
     return result;
 }
 
