@@ -339,6 +339,8 @@ JsError NapiUtil::ConverErrorMessageForJs(int32_t errorCode)
         TELEPHONY_LOGE("NapiUtil::ConverErrorMessageForJs errorCode is out of range");
     }
 
+    TELEPHONY_LOGI(
+        "NapiUtil::ConverErrorMessageForJs errorCode from %{public}d to %{public}d", errorCode, error.errorCode);
     return error;
 }
 
@@ -475,6 +477,24 @@ JsError NapiUtil::ConverErrorMessageWithPermissionForJs(
         return error;
     }
     return ConverErrorMessageForJs(errorCode);
+}
+
+napi_value NapiUtil::CreateError(napi_env env, int32_t err, const std::string &msg)
+{
+    napi_value businessError = nullptr;
+    napi_value errorCode = nullptr;
+    NAPI_CALL(env, napi_create_int32(env, err, &errorCode));
+    napi_value errorMessage = nullptr;
+    NAPI_CALL(env, napi_create_string_utf8(env, msg.c_str(), NAPI_AUTO_LENGTH, &errorMessage));
+    napi_create_error(env, nullptr, errorMessage, &businessError);
+    napi_set_named_property(env, businessError, "code", errorCode);
+    return businessError;
+}
+
+void NapiUtil::ThrowError(napi_env env, int32_t errorCode, const std::string &message)
+{
+    napi_value error = CreateError(env, errorCode, message);
+    napi_throw(env, error);
 }
 } // namespace Telephony
 } // namespace OHOS
