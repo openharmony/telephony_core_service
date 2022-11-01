@@ -296,7 +296,7 @@ napi_value DiallingNumbersConversion(napi_env env, const TelNumbersInfo &info)
     return val;
 }
 
-void GetDiallingNumberInfo(std::shared_ptr<DiallingNumbersInfo> &telNumber, const TelNumbersInfo &info)
+void GetDiallingNumberInfo(const std::shared_ptr<DiallingNumbersInfo> &telNumber, const TelNumbersInfo &info)
 {
     telNumber->index_ = info.recordNumber;
     telNumber->name_ = NapiUtil::ToUtf16(info.alphaTag.data());

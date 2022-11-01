@@ -50,7 +50,7 @@ std::u16string NapiUtil::ToUtf16(std::string str)
     return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.from_bytes(str);
 }
 
-napi_value NapiUtil::CreateErrorMessage(napi_env env, std::string msg, int32_t errorCode)
+napi_value NapiUtil::CreateErrorMessage(napi_env env, const std::string &msg, int32_t errorCode)
 {
     napi_value result = nullptr;
     napi_value message = nullptr;
@@ -93,28 +93,28 @@ bool NapiUtil::MatchParameters(
     return true;
 }
 
-void NapiUtil::SetPropertyInt32(napi_env env, napi_value object, std::string name, int32_t value)
+void NapiUtil::SetPropertyInt32(napi_env env, napi_value object, const std::string &name, int32_t value)
 {
     napi_value propertyValue = nullptr;
     NAPI_CALL_RETURN_VOID(env, napi_create_int32(env, value, &propertyValue));
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), propertyValue));
 }
 
-void NapiUtil::SetPropertyInt64(napi_env env, napi_value object, std::string name, int64_t value)
+void NapiUtil::SetPropertyInt64(napi_env env, napi_value object, const std::string &name, int64_t value)
 {
     napi_value propertyValue = nullptr;
     NAPI_CALL_RETURN_VOID(env, napi_create_int64(env, value, &propertyValue));
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), propertyValue));
 }
 
-void NapiUtil::SetPropertyStringUtf8(napi_env env, napi_value object, std::string name, std::string value)
+void NapiUtil::SetPropertyStringUtf8(napi_env env, napi_value object, const std::string &name, const std::string &value)
 {
     napi_value propertyValue = nullptr;
     NAPI_CALL_RETURN_VOID(env, napi_create_string_utf8(env, value.c_str(), value.length(), &propertyValue));
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), propertyValue));
 }
 
-void NapiUtil::SetPropertyBoolean(napi_env env, napi_value object, std::string name, bool value)
+void NapiUtil::SetPropertyBoolean(napi_env env, napi_value object, const std::string &name, bool value)
 {
     napi_value propertyValue = nullptr;
     NAPI_CALL_RETURN_VOID(env, napi_get_boolean(env, value, &propertyValue));
@@ -128,14 +128,15 @@ napi_value NapiUtil::ToInt32Value(napi_env env, int32_t value)
     return staticValue;
 }
 
-bool NapiUtil::HasNamedProperty(napi_env env, napi_value object, std::string propertyName)
+bool NapiUtil::HasNamedProperty(napi_env env, napi_value object, const std::string &propertyName)
 {
     bool hasProperty = false;
     NAPI_CALL_BASE(env, napi_has_named_property(env, object, propertyName.data(), &hasProperty), false);
     return hasProperty;
 }
 
-bool NapiUtil::HasNamedTypeProperty(napi_env env, napi_value object, napi_valuetype type, std::string propertyName)
+bool NapiUtil::HasNamedTypeProperty(
+    napi_env env, napi_value object, napi_valuetype type, const std::string &propertyName)
 {
     bool hasProperty = false;
     NAPI_CALL_BASE(env, napi_has_named_property(env, object, propertyName.data(), &hasProperty), false);
@@ -161,7 +162,8 @@ bool NapiUtil::MatchObjectProperty(
     return true;
 }
 
-bool NapiUtil::MatchOptionPropertyType(napi_env env, napi_value object, napi_valuetype type, std::string propertyName)
+bool NapiUtil::MatchOptionPropertyType(
+    napi_env env, napi_value object, napi_valuetype type, const std::string &propertyName)
 {
     bool hasProperty = false;
     NAPI_CALL_BASE(env, napi_has_named_property(env, object, propertyName.data(), &hasProperty), false);
@@ -186,7 +188,7 @@ std::string NapiUtil::GetStringFromValue(napi_env env, napi_value value)
     }
 }
 
-napi_value NapiUtil::GetNamedProperty(napi_env env, napi_value object, std::string propertyName)
+napi_value NapiUtil::GetNamedProperty(napi_env env, napi_value object, const std::string &propertyName)
 {
     napi_value value = nullptr;
     bool hasProperty = false;
@@ -206,6 +208,7 @@ napi_value NapiUtil::HandleAsyncWork(napi_env env, BaseContext *baseContext, con
         std::string errorCode = std::to_string(napi_invalid_arg);
         std::string errorMessage = "error at baseContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        return nullptr;
     }
     napi_value result = nullptr;
     if (context->callbackRef == nullptr) {

@@ -1311,9 +1311,9 @@ bool CoreManagerInner::SetVoiceMailInfo(
 
 std::vector<std::shared_ptr<DiallingNumbersInfo>> CoreManagerInner::QueryIccDiallingNumbers(int slotId, int type)
 {
-    std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("iccDiallingNumbersManager is null!");
+        std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
         return result;
     }
     return simManager_->QueryIccDiallingNumbers(slotId, type);
@@ -1369,9 +1369,9 @@ bool CoreManagerInner::UpdateSmsIcc(int slotId, int index, int status, std::stri
 
 std::vector<std::string> CoreManagerInner::ObtainAllSmsOfIcc(int slotId)
 {
-    std::vector<std::string> result;
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
+        std::vector<std::string> result;
         return result;
     }
     return simManager_->ObtainAllSmsOfIcc(slotId);
