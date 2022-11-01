@@ -203,10 +203,9 @@ void IccDiallingNumbersHandler::ProcessDiallingNumber(
         TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessDiallingNumber loadRequest or object is nullptr");
         return;
     }
-    std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList = nullptr;
-
     loadRequest->ClearCount();
-    diallingNumberList = std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
+    std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList =
+        std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
     loadRequest->SetResult(static_cast<std::shared_ptr<void>>(diallingNumberList));
 
     std::vector<std::string> &dataList = object->fileResults;

@@ -151,10 +151,6 @@ void RuimFile::LoadRuimFiles()
 {
     TELEPHONY_LOGI("LoadRuimFiles started");
     fileQueried_ = true;
-    std::shared_ptr<RuimFile> owner = std::static_pointer_cast<RuimFile>(shared_from_this());
-    if (owner == nullptr) {
-        TELEPHONY_LOGE("RuimFile::LoadRuimFiles owner is nullptr.");
-    }
 
     AppExecFwk::InnerEvent::Pointer eventIMSI = BuildCallerInfo(MSG_SIM_OBTAIN_IMSI_DONE);
     telRilManager_->GetImsi(slotId_, eventIMSI);
