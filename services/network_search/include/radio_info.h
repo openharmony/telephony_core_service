@@ -33,13 +33,13 @@ public:
     void UpdatePreferredNetwork(std::shared_ptr<NetworkSearchManager> &nsm, ModemPowerState radioState) const;
     void ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessGetMeid(const AppExecFwk::InnerEvent::Pointer &event) const;
-    void UpdatePhone(RadioTech csRadioTech, RadioTech psRadioTech);
+    void UpdatePhone(RadioTech csRadioTech, const RadioTech &psRadioTech);
     void SetPhoneType(PhoneType phoneType);
     PhoneType GetPhoneType() const;
     void ProcessVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event);
     void AirplaneModeChange();
 private:
-    PhoneType RadioTechToPhoneType(RadioTech csRadioTech, RadioTech psRadioTech) const;
+    PhoneType RadioTechToPhoneType(RadioTech csRadioTech, const RadioTech &psRadioTech) const;
     PhoneType phoneType_ = PhoneType::PHONE_TYPE_IS_NONE;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     int32_t slotId_ = 0;

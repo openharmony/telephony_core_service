@@ -63,7 +63,7 @@ public:
     static bool CreateCommonErrorMessageForJs(int32_t errorCode, JsError &error);
     static bool CreateCallErrorMessageForJs(int32_t errorCode, JsError &error);
     static JsError ConverErrorMessageWithPermissionForJs(
-        int32_t errorCode, std::string funcName, std::string permission);
+        int32_t errorCode, const std::string &funcName, const std::string &permission);
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -42,19 +42,19 @@ public:
     bool HasSimCard(int32_t slotId) override;
     int32_t GetSimState(int32_t slotId) override;
     int32_t GetCardType(int32_t slotId) override;
-    bool UnlockPin(int32_t slotId, std::string pin, LockStatusResponse &response) override;
+    bool UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response) override;
     bool UnlockPuk(
-        int32_t slotId, std::string newPin, std::string puk, LockStatusResponse &response) override;
+        int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response) override;
     bool AlterPin(
-        int32_t slotId, std::string newPin, std::string oldPin, LockStatusResponse &response) override;
+        int32_t slotId, const std::string &newPin, const std::string &oldPin, LockStatusResponse &response) override;
     bool SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response) override;
     int32_t GetLockState(int32_t slotId, LockType lockType) override;
     int32_t RefreshSimState(int32_t slotId) override;
-    bool UnlockPin2(int32_t slotId, std::string pin2, LockStatusResponse &response) override;
+    bool UnlockPin2(int32_t slotId, const std::string &pin2, LockStatusResponse &response) override;
     bool UnlockPuk2(
-        int32_t slotId, std::string newPin2, std::string puk2, LockStatusResponse &response) override;
+        int32_t slotId, const std::string &newPin2, const std::string &puk2, LockStatusResponse &response) override;
     bool AlterPin2(
-        int32_t slotId, std::string newPin2, std::string oldPin2, LockStatusResponse &response) override;
+        int32_t slotId, const std::string &newPin2, const std::string &oldPin2, LockStatusResponse &response) override;
     bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;
     // SimAccount
     bool IsSimActive(int32_t slotId) override;
@@ -64,8 +64,8 @@ public:
     bool SetDefaultSmsSlotId(int32_t slotId) override;
     bool SetDefaultCellularDataSlotId(int32_t slotId) override;
     bool SetPrimarySlotId(int32_t slotId) override;
-    bool SetShowNumber(int32_t slotId, const std::u16string number) override;
-    bool SetShowName(int32_t slotId, const std::u16string name) override;
+    bool SetShowNumber(int32_t slotId, const std::u16string &number) override;
+    bool SetShowName(int32_t slotId, const std::u16string &name) override;
     int32_t GetDefaultVoiceSlotId() override;
     int32_t GetDefaultSmsSlotId() override;
     int32_t GetDefaultCellularDataSlotId() override;

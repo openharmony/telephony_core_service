@@ -103,7 +103,7 @@ CardType SimStateManager::GetCardType()
     return ret;
 }
 
-bool SimStateManager::UnlockPin(int32_t slotId, std::string pin, LockStatusResponse &response)
+bool SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {
@@ -132,7 +132,8 @@ bool SimStateManager::UnlockPin(int32_t slotId, std::string pin, LockStatusRespo
     return true;
 }
 
-bool SimStateManager::UnlockPuk(int32_t slotId, std::string newPin, std::string puk, LockStatusResponse &response)
+bool SimStateManager::UnlockPuk(
+    int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {
@@ -161,7 +162,8 @@ bool SimStateManager::UnlockPuk(int32_t slotId, std::string newPin, std::string 
     return true;
 }
 
-bool SimStateManager::AlterPin(int32_t slotId, std::string newPin, std::string oldPin, LockStatusResponse &response)
+bool SimStateManager::AlterPin(
+    int32_t slotId, const std::string &newPin, const std::string &oldPin, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {
@@ -255,7 +257,7 @@ int32_t SimStateManager::GetLockState(int32_t slotId, LockType lockType)
     return ret;
 }
 
-bool SimStateManager::UnlockPin2(int32_t slotId, std::string pin2, LockStatusResponse &response)
+bool SimStateManager::UnlockPin2(int32_t slotId, const std::string &pin2, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {
@@ -284,7 +286,8 @@ bool SimStateManager::UnlockPin2(int32_t slotId, std::string pin2, LockStatusRes
     return true;
 }
 
-bool SimStateManager::UnlockPuk2(int32_t slotId, std::string newPin2, std::string puk2, LockStatusResponse &response)
+bool SimStateManager::UnlockPuk2(
+    int32_t slotId, const std::string &newPin2, const std::string &puk2, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {
@@ -313,7 +316,8 @@ bool SimStateManager::UnlockPuk2(int32_t slotId, std::string newPin2, std::strin
     return true;
 }
 
-bool SimStateManager::AlterPin2(int32_t slotId, std::string newPin2, std::string oldPin2, LockStatusResponse &response)
+bool SimStateManager::AlterPin2(
+    int32_t slotId, const std::string &newPin2, const std::string &oldPin2, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {

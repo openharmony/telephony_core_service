@@ -199,54 +199,38 @@ std::string IccFile::ObtainSPN()
 
 std::string IccFile::ObtainEons(const std::string &plmn, int32_t lac, bool longNameRequired)
 {
-    if (plmn.empty() || pnnFiles_.empty()) {
-        TELEPHONY_LOGE("ObtainEons plmn or pnnFiles is empty");
+    bool roaming = (plmn.compare(operatorNumeric_) == 0 ? false : true);
+    TELEPHONY_LOGI("ObtainEons roaming:%{public}d", roaming);
+    if (plmn.empty() || pnnFiles_.empty() || (oplFiles_.empty() && roaming)) {
+        TELEPHONY_LOGE("ObtainEons is empty");
         return "";
     }
-    int pnnIndex = -1;
-    bool isHPLMN = (plmn.compare(operatorNumeric_) == 0 ? true : false);
-    TELEPHONY_LOGI("ObtainEons isHPLMN:%{public}d", isHPLMN);
-    if (oplFiles_.empty()) {
-        TELEPHONY_LOGI("ObtainEons oplFiles is empty");
-        if (isHPLMN) {
-            pnnIndex = 1;
-        } else {
-            return "";
+    int pnnIndex = 1;
+    for (std::shared_ptr<OperatorPlmnInfo> opl : oplFiles_) {
+        if (opl == nullptr) {
+            continue;
         }
-    } else {
-        for (std::shared_ptr<OperatorPlmnInfo> opl : oplFiles_) {
-            TELEPHONY_LOGI("ObtainEons plmn:%{public}s, opl->plmnNumeric:%{public}s, lac:%{public}d, "
-                "opl->lacStart:%{public}d, opl->lacEnd:%{public}d, opl->pnnRecordId:%{public}d",
-                plmn.c_str(), opl->plmnNumeric.c_str(), lac, opl->lacStart, opl->lacEnd, opl->pnnRecordId);
-            if (plmn.compare(opl->plmnNumeric) == 0 &&
-                ((opl->lacStart == 0 && opl->lacEnd == 0xfffe) || (opl->lacStart <= lac && opl->lacEnd >= lac))) {
-                if (opl->pnnRecordId == 0) {
-                    return "";
-                }
-                pnnIndex = opl->pnnRecordId;
-                break;
-            }
+        pnnIndex = -1;
+        TELEPHONY_LOGI(
+            "ObtainEons plmn:%{public}s, opl->plmnNumeric:%{public}s, lac:%{public}d, "
+            "opl->lacStart:%{public}d, opl->lacEnd:%{public}d, opl->pnnRecordId:%{public}d",
+            plmn.c_str(), opl->plmnNumeric.c_str(), lac, opl->lacStart, opl->lacEnd, opl->pnnRecordId);
+        if (plmn.compare(opl->plmnNumeric) == 0 &&
+            ((opl->lacStart == 0 && opl->lacEnd == 0xfffe) || (opl->lacStart <= lac && opl->lacEnd >= lac))) {
+            pnnIndex = opl->pnnRecordId;
+            break;
         }
     }
     std::string eons = "";
-    if (pnnIndex >= 1 && pnnIndex <= (int)pnnFiles_.size()) {
+    if (pnnIndex >= 1 && pnnIndex <= static_cast<int>(pnnFiles_.size())) {
         TELEPHONY_LOGI("ObtainEons longNameRequired:%{public}d, longName:%{public}s, shortName:%{public}s,",
             longNameRequired, pnnFiles_.at(pnnIndex - 1)->longName.c_str(),
             pnnFiles_.at(pnnIndex - 1)->shortName.c_str());
         if (longNameRequired) {
             eons = pnnFiles_.at(pnnIndex - 1)->longName;
-            if (eons.empty()) {
-                eons = pnnFiles_.at(pnnIndex - 1)->shortName;
-            }
         } else {
             eons = pnnFiles_.at(pnnIndex - 1)->shortName;
-            if (eons.empty()) {
-                eons = pnnFiles_.at(pnnIndex - 1)->longName;
-            }
         }
-    }
-    if (eons.empty() && !spn_.empty() && isHPLMN) {
-        eons = spn_;
     }
     return eons;
 }

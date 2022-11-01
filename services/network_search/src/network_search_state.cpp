@@ -354,7 +354,7 @@ void NetworkSearchState::NotifyNrStateChange()
     }
 }
 
-void NetworkSearchState::NotifyImsStateChange(const ImsServiceType imsSrvType, const ImsRegInfo info)
+void NetworkSearchState::NotifyImsStateChange(ImsServiceType imsSrvType, const ImsRegInfo &info)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();

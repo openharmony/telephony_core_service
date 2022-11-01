@@ -24,7 +24,7 @@ class NetworkSearchResult : public Parcelable {
 public:
     NetworkSearchResult();
     virtual ~NetworkSearchResult() = default;
-    void SetNetworkSearchResultValue(int32_t listSize, std::vector<NetworkInformation> &operatorInfo);
+    void SetNetworkSearchResultValue(int32_t listSize, const std::vector<NetworkInformation> &operatorInfo);
     std::vector<NetworkInformation> GetNetworkSearchInformation() const;
     int32_t GetNetworkSearchInformationSize() const;
     bool ReadFromParcel(Parcel &parcel);
