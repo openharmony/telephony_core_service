@@ -219,6 +219,8 @@ private:
     AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId, int loadId);
     AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId, std::shared_ptr<void> pobj, int loadId);
     void ProcessDiallingNumberAllLoadDone(const AppExecFwk::InnerEvent::Pointer &event, int &id);
+    void ProcessDiallingNumber(const std::shared_ptr<DiallingNumberLoadRequest> &loadRequest,
+        const std::shared_ptr<MultiRecordResult> &object);
     void ProcessDiallingNumberLoadDone(const AppExecFwk::InnerEvent::Pointer &event, int &id);
     void ProcessLinearSizeDone(const AppExecFwk::InnerEvent::Pointer &event, int &id);
     void ProcessUpdateRecordDone(const AppExecFwk::InnerEvent::Pointer &event, int &id);

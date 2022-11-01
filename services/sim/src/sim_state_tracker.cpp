@@ -26,10 +26,26 @@ SimStateTracker::SimStateTracker(const std::shared_ptr<AppExecFwk::EventRunner> 
     : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), operatorConfigCache_(operatorConfigCache),
       slotId_(slotId)
 {
+    if (runner != nullptr) {
+        runner->Run();
+    }
     if (simFileManager == nullptr) {
         TELEPHONY_LOGE("can not make OperatorConfigLoader");
     }
-    operatorConfigLoader_ = std::make_unique<OperatorConfigLoader>(simFileManager, operatorConfigCache);
+    operatorConfigLoader_ = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
+    InitListener();
+}
+
+void SimStateTracker::InitListener()
+{
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(slotId_, operatorConfigLoader_);
+    if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
+        TELEPHONY_LOGE("samgrProxy or statusChangeListener_ is nullptr");
+        return;
+    }
+    int32_t ret = samgrProxy->SubscribeSystemAbility(ACCESSIBILITY_MANAGER_SERVICE_ID, statusChangeListener_);
+    TELEPHONY_LOGI("SubscribeSystemAbility ACCESSIBILITY_MANAGER_SERVICE_ID result:%{public}d", ret);
 }
 
 void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -77,6 +93,28 @@ bool SimStateTracker::UnRegisterForIccLoaded()
     }
     simFileManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
     return true;
+}
+
+SimStateTracker::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(
+    int32_t slotId, std::shared_ptr<OperatorConfigLoader> configLoader)
+    : slotId_(slotId), configLoader_(configLoader)
+{}
+
+void SimStateTracker::SystemAbilityStatusChangeListener::OnAddSystemAbility(
+    int32_t systemAbilityId, const std::string &deviceId)
+{
+    if (systemAbilityId == ACCESSIBILITY_MANAGER_SERVICE_ID && configLoader_ != nullptr) {
+        TELEPHONY_LOGI("SystemAbilityStatusChangeListener::LoadOperatorConfig");
+        configLoader_->LoadOperatorConfig(slotId_);
+    }
+}
+
+void SimStateTracker::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
+    int32_t systemAbilityId, const std::string &deviceId)
+{
+    if (systemAbilityId == ACCESSIBILITY_MANAGER_SERVICE_ID) {
+        TELEPHONY_LOGE("ACCESSIBILITY_MANAGER_SERVICE_ID stopped");
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

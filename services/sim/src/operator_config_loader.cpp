@@ -82,11 +82,11 @@ std::string OperatorConfigLoader::GetOpKey(std::shared_ptr<NativeRdb::AbsSharedR
         TELEPHONY_LOGE("GetOpKey simFileManager_ is nullptr");
         return DEFAULT_OPERATOR_KEY;
     }
-    iccidFromSim = Str16ToStr8(simFileManager_->GetSimIccId());
-    imsiFromSim = Str16ToStr8(simFileManager_->GetIMSI());
-    spnFromSim = Str16ToStr8(simFileManager_->GetSimSpn());
-    gid1FromSim = Str16ToStr8(simFileManager_->GetSimGid1());
-    gid2FromSim = Str16ToStr8(simFileManager_->GetSimGid2());
+    iccidFromSim_ = Str16ToStr8(simFileManager_->GetSimIccId());
+    imsiFromSim_ = Str16ToStr8(simFileManager_->GetIMSI());
+    spnFromSim_ = Str16ToStr8(simFileManager_->GetSimSpn());
+    gid1FromSim_ = Str16ToStr8(simFileManager_->GetSimGid1());
+    gid2FromSim_ = Str16ToStr8(simFileManager_->GetSimGid2());
     int count;
     resultSet->GetRowCount(count);
     TELEPHONY_LOGI("GetOpKey count: %{public}d", count);
@@ -131,7 +131,7 @@ bool OperatorConfigLoader::MatchOperatorRule(std::shared_ptr<NativeRdb::AbsShare
     resultSet->GetColumnIndex(ICCID, columnIndex);
     resultSet->GetString(columnIndex, strVal);
     if (!strVal.empty()) {
-        isAllRuleMatch = OperatorMatchingRule::IccidRegexMatch(iccidFromSim, strVal);
+        isAllRuleMatch = OperatorMatchingRule::IccidRegexMatch(iccidFromSim_, strVal);
     }
     if (!isAllRuleMatch) {
         return false;
@@ -139,7 +139,7 @@ bool OperatorConfigLoader::MatchOperatorRule(std::shared_ptr<NativeRdb::AbsShare
     resultSet->GetColumnIndex(IMSI, columnIndex);
     resultSet->GetString(columnIndex, strVal);
     if (!strVal.empty()) {
-        isAllRuleMatch = OperatorMatchingRule::ImsiRegexMatch(imsiFromSim, strVal);
+        isAllRuleMatch = OperatorMatchingRule::ImsiRegexMatch(imsiFromSim_, strVal);
     }
     if (!isAllRuleMatch) {
         return false;
@@ -147,7 +147,7 @@ bool OperatorConfigLoader::MatchOperatorRule(std::shared_ptr<NativeRdb::AbsShare
     resultSet->GetColumnIndex(SPN, columnIndex);
     resultSet->GetString(columnIndex, strVal);
     if (!strVal.empty()) {
-        isAllRuleMatch = OperatorMatchingRule::SpnRegexMatch(spnFromSim, strVal);
+        isAllRuleMatch = OperatorMatchingRule::SpnRegexMatch(spnFromSim_, strVal);
     }
     if (!isAllRuleMatch) {
         return false;
@@ -155,7 +155,7 @@ bool OperatorConfigLoader::MatchOperatorRule(std::shared_ptr<NativeRdb::AbsShare
     resultSet->GetColumnIndex(GID1, columnIndex);
     resultSet->GetString(columnIndex, strVal);
     if (!strVal.empty()) {
-        isAllRuleMatch = OperatorMatchingRule::PrefixMatch(gid1FromSim, strVal);
+        isAllRuleMatch = OperatorMatchingRule::PrefixMatch(gid1FromSim_, strVal);
     }
     if (!isAllRuleMatch) {
         return false;
@@ -163,36 +163,36 @@ bool OperatorConfigLoader::MatchOperatorRule(std::shared_ptr<NativeRdb::AbsShare
     resultSet->GetColumnIndex(GID2, columnIndex);
     resultSet->GetString(columnIndex, strVal);
     if (!strVal.empty()) {
-        isAllRuleMatch = OperatorMatchingRule::PrefixMatch(gid2FromSim, strVal);
+        isAllRuleMatch = OperatorMatchingRule::PrefixMatch(gid2FromSim_, strVal);
     }
     return isAllRuleMatch;
 }
 
 std::shared_ptr<AppExecFwk::DataAbilityHelper> OperatorConfigLoader::CreateOpKeyHelper()
 {
-    if (opKeyDataAbilityHelper == nullptr) {
+    if (opKeyDataAbilityHelper_ == nullptr) {
         std::shared_ptr<Uri> dataAbilityUri = std::make_shared<Uri>(OPKEY_URI);
         if (dataAbilityUri == nullptr) {
             TELEPHONY_LOGE("CreateOpKeyHelper dataAbilityUri is nullptr");
             return nullptr;
         }
-        opKeyDataAbilityHelper = CreateDataAHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, dataAbilityUri);
+        opKeyDataAbilityHelper_ = CreateDataAHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, dataAbilityUri);
     }
-    return opKeyDataAbilityHelper;
+    return opKeyDataAbilityHelper_;
 }
 
 std::shared_ptr<AppExecFwk::DataAbilityHelper> OperatorConfigLoader::CreateDataAHelper(
     int32_t systemAbilityId, std::shared_ptr<Uri> dataAbilityUri) const
 {
-    TELEPHONY_LOGI("DataSimRdbHelper::CreateDataAHelper ");
+    TELEPHONY_LOGI("OperatorConfigLoader::CreateDataAHelper");
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
-        TELEPHONY_LOGE("DataSimRdbHelper Get system ability mgr failed.");
+        TELEPHONY_LOGE("OperatorConfigLoader Get system ability mgr failed");
         return nullptr;
     }
     auto remoteObj = saManager->GetSystemAbility(systemAbilityId);
-    while (remoteObj == nullptr) {
-        TELEPHONY_LOGE("DataSimRdbHelper GetSystemAbility Service Failed.");
+    if (remoteObj == nullptr) {
+        TELEPHONY_LOGE("OperatorConfigLoader GetSystemAbility Service Failed");
         return nullptr;
     }
     return AppExecFwk::DataAbilityHelper::Creator(remoteObj, dataAbilityUri);

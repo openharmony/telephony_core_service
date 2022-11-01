@@ -53,64 +53,61 @@ static constexpr const char *DATASTATE_KEY = "DATASTATE";
 // VALUE
 static constexpr const char *CORE_SERVICE_MODULE = "CORE_SERVICE";
 
-void CoreServiceHiSysEvent::WriteSignalLevelBehaviorEvent(const int32_t slotId, const int32_t level)
+void CoreServiceHiSysEvent::WriteSignalLevelBehaviorEvent(int32_t slotId, int32_t level)
 {
     HiWriteBehaviorEvent(SIGNAL_LEVEL_EVENT, SLOT_ID_KEY, slotId, SIGANL_LEVEL_KEY, level);
 }
 
-void CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(
-    const int32_t slotId, const int32_t domain, const int32_t tech, const int32_t state)
+void CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(int32_t slotId, int32_t domain, int32_t tech, int32_t state)
 {
     HiWriteBehaviorEvent(NETWORK_REGISTER_EVENT, SLOT_ID_KEY, slotId, NETWORK_DOMAIN_KEY, domain, NETWORK_TECH_KEY,
         tech, NETWORK_STATE_KEY, state);
 }
 
-void CoreServiceHiSysEvent::WriteDefaultDataSlotIdBehaviorEvent(const int32_t slotId)
+void CoreServiceHiSysEvent::WriteDefaultDataSlotIdBehaviorEvent(int32_t slotId)
 {
     HiWriteBehaviorEvent(SET_DEFAULT_CELLULAR_DATA_EVENT, SLOT_ID_KEY, slotId);
 }
 
-void CoreServiceHiSysEvent::WriteSimStateBehaviorEvent(const int32_t slotId, const int32_t state)
+void CoreServiceHiSysEvent::WriteSimStateBehaviorEvent(int32_t slotId, int32_t state)
 {
     HiWriteBehaviorEvent(SIM_STATE_CHANGE_EVENT, SLOT_ID_KEY, slotId, STATE_KEY, state);
 }
 
-void CoreServiceHiSysEvent::WriteDialCallFaultEvent(
-    const int32_t slotId, const int32_t errCode, const std::string &desc)
+void CoreServiceHiSysEvent::WriteDialCallFaultEvent(int32_t slotId, int32_t errCode, const std::string &desc)
 {
     HiWriteFaultEvent(CALL_DIAL_FAILED_EVENT, MODULE_NAME_KEY, CORE_SERVICE_MODULE, SLOT_ID_KEY, slotId, CALL_TYPE_KEY,
         INVALID_PARAMETER, VIDEO_STATE_KEY, INVALID_PARAMETER, ERROR_TYPE_KEY, errCode, ERROR_MSG_KEY, desc);
 }
 
-void CoreServiceHiSysEvent::WriteAnswerCallFaultEvent(
-    const int32_t slotId, const int32_t errCode, const std::string &desc)
+void CoreServiceHiSysEvent::WriteAnswerCallFaultEvent(int32_t slotId, int32_t errCode, const std::string &desc)
 {
     HiWriteFaultEvent(CALL_ANSWER_FAILED_EVENT, MODULE_NAME_KEY, CORE_SERVICE_MODULE, SLOT_ID_KEY, slotId, CALL_ID_KEY,
         INVALID_PARAMETER, VIDEO_STATE_KEY, INVALID_PARAMETER, ERROR_TYPE_KEY, errCode, ERROR_MSG_KEY, desc);
 }
 
-void CoreServiceHiSysEvent::WriteHangUpFaultEvent(const int32_t slotId, const int32_t errCode, const std::string &desc)
+void CoreServiceHiSysEvent::WriteHangUpFaultEvent(int32_t slotId, int32_t errCode, const std::string &desc)
 {
     HiWriteFaultEvent(CALL_HANGUP_FAILED_EVENT, MODULE_NAME_KEY, CORE_SERVICE_MODULE, SLOT_ID_KEY, slotId, CALL_ID_KEY,
         INVALID_PARAMETER, ERROR_TYPE_KEY, errCode, ERROR_MSG_KEY, desc);
 }
 
 void CoreServiceHiSysEvent::WriteSmsSendFaultEvent(
-    const int32_t slotId, const SmsMmsMessageType type, const SmsMmsErrorCode errorCode, const std::string &desc)
+    int32_t slotId, SmsMmsMessageType type, SmsMmsErrorCode errorCode, const std::string &desc)
 {
     HiWriteFaultEvent(SMS_SEND_FAILED_EVENT, MODULE_NAME_KEY, CORE_SERVICE_MODULE, SLOT_ID_KEY, slotId, MSG_TYPE_KEY,
         static_cast<int32_t>(type), ERROR_TYPE_KEY, static_cast<int32_t>(errorCode), ERROR_MSG_KEY, desc);
 }
 
 void CoreServiceHiSysEvent::WriteSmsReceiveFaultEvent(
-    const int32_t slotId, const SmsMmsMessageType type, const SmsMmsErrorCode errorCode, const std::string &desc)
+    int32_t slotId, SmsMmsMessageType type, SmsMmsErrorCode errorCode, const std::string &desc)
 {
     HiWriteFaultEvent(SMS_RECEIVE_FAILED_EVENT, MODULE_NAME_KEY, CORE_SERVICE_MODULE, SLOT_ID_KEY, slotId, MSG_TYPE_KEY,
         static_cast<int32_t>(type), ERROR_TYPE_KEY, static_cast<int32_t>(errorCode), ERROR_MSG_KEY, desc);
 }
 
 void CoreServiceHiSysEvent::WriteDataActivateFaultEvent(
-    const int32_t slotId, const int32_t switchState, const CellularDataErrorCode errorType, const std::string &errorMsg)
+    int32_t slotId, int32_t switchState, CellularDataErrorCode errorType, const std::string &errorMsg)
 {
     HiWriteFaultEvent(DATA_ACTIVATE_FAILED_EVENT, MODULE_NAME_KEY, CORE_SERVICE_MODULE, SLOT_ID_KEY, slotId,
         DATA_SWITCH_KEY, switchState, UPLINK_DATA_KEY, INVALID_PARAMETER, DOWNLINK_DATA_KEY, INVALID_PARAMETER,

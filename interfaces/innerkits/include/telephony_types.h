@@ -36,7 +36,10 @@ inline constexpr const char *TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
 inline constexpr const char *DEFAULT_PREFERRED_NETWORK_TYPE = "5"; // CORE_NETWORK_MODE_LTE_WCDMA_GSM
 inline constexpr const char *TEL_PREFERRED_NETWORK_TYPE = "const.telephony.preferredNetworkType";
 inline constexpr const char *DEFAULT_OPERATOR_KEY = "";
-inline constexpr const char *OPKEY_PROP_PREFIX = "persist.telephony.opkey";
+inline constexpr const char *INITIAL_OPKEY = "-1";
+inline constexpr const char *DEFAULT_OPERATOR_CONFIG = "default_operator_config.json";
+inline constexpr const char *OPKEY_PROP_PREFIX = "telephony.sim.opkey";
+inline constexpr const char *COUNTRY_CODE_KEY = "telephony.sim.countryCode";
 
 template<typename T>
 inline T GetMaxSlotCount()

@@ -151,7 +151,6 @@ void RuimFile::LoadRuimFiles()
 {
     TELEPHONY_LOGI("LoadRuimFiles started");
     fileQueried_ = true;
-    std::shared_ptr<RuimFile> owner = std::static_pointer_cast<RuimFile>(shared_from_this());
 
     AppExecFwk::InnerEvent::Pointer eventIMSI = BuildCallerInfo(MSG_SIM_OBTAIN_IMSI_DONE);
     telRilManager_->GetImsi(slotId_, eventIMSI);
@@ -191,6 +190,7 @@ bool RuimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
     if (sharedObject != nullptr) {
         imsi_ = *sharedObject;
         TELEPHONY_LOGI("RuimFile::ProcessEvent MSG_SIM_OBTAIN_IMSI_DONE");
+        SaveCountryCode();
         if (!imsi_.empty()) {
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
         }
@@ -269,10 +269,10 @@ bool RuimFile::ProcessGetSpnDone(const AppExecFwk::InnerEvent::Pointer &event)
     int dataLen = 0;
     std::shared_ptr<unsigned char> fileData = SIMUtils::HexStringConvertToBytes(iccData, dataLen);
     unsigned char* data = fileData.get();
-    displayConditionOfCsimSpn_ = (((unsigned int)SPN_FLAG & (unsigned int)data[0]) != 0);
+    displayConditionOfCsimSpn_ = ((static_cast<unsigned int>(SPN_FLAG) & static_cast<unsigned int>(data[0])) != 0);
 
-    int encoding = (int)data[ENCODING_POS];
-    int language = (int)data[LANG_POS];
+    int encoding = static_cast<int>(data[ENCODING_POS]);
+    int language = static_cast<int>(data[LANG_POS]);
     unsigned char spnData[BUFFER_SIZE] = {0};
 
     int len = ((dataLen - FLAG_NUM) < MAX_DATA_BYTE) ? (dataLen - FLAG_NUM) : MAX_DATA_BYTE;

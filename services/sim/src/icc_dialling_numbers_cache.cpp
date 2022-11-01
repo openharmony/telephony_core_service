@@ -129,6 +129,7 @@ void IccDiallingNumbersCache::ProcessChangeDiallingNumbersDone(const AppExecFwk:
             std::shared_ptr<HRilRadioResponseInfo> responseInfo =
                 std::static_pointer_cast<HRilRadioResponseInfo>(fd->exception);
             if (responseInfo == nullptr) {
+                TELEPHONY_LOGE("responseInfo is nullptr");
                 return;
             }
             if (responseInfo->error == HRilErrType::NONE) {
@@ -217,7 +218,7 @@ bool IccDiallingNumbersCache::CheckValueAndOperation(
         auto iter = diallingNumberFileList_.find(fileId);
         if (iter != diallingNumberFileList_.end()) {
             std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &vc = iter->second;
-            int size = (int)vc->size();
+            int size = static_cast<int>(vc->size());
             if ((index < 1) || (index > size)) { // check index range
                 TELEPHONY_LOGE("error index!!");
                 return false;
@@ -241,6 +242,9 @@ void IccDiallingNumbersCache::SearchIndexByNameAndNumber(
 {
     for (auto it = list->begin(); it != list->end(); it++) {
         std::shared_ptr<DiallingNumbersInfo> &item = *it;
+        if (item == nullptr) {
+            continue;
+        }
         if (IsDiallingNumberEqual(info, item)) {
             index = item->GetIndex();
             TELEPHONY_LOGI("Search index is %{public}d", index);

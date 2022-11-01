@@ -53,7 +53,7 @@ void CoreServiceTestHelper::SetIntResult(int32_t result)
     result_ = result;
 }
 
-void CoreServiceTestHelper::SetStringResult(std::string &str)
+void CoreServiceTestHelper::SetStringResult(const std::string &str)
 {
     strResult_ = str;
 }

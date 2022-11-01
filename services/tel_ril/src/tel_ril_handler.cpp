@@ -29,7 +29,7 @@ void TelRilHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     auto serial = event->GetParam();
     TELEPHONY_LOGI(
         "ProcessEvent, id:%{public}d, serial:%{public}d, reqLockSerialNum_:%{public}d, ackLockSerialNum_:%{public}d",
-        id, (int)serial, (int)reqLockSerialNum_, (int)ackLockSerialNum_);
+        id, static_cast<int>(serial), static_cast<int>(reqLockSerialNum_), static_cast<int>(ackLockSerialNum_));
     switch (id) {
         case RUNNING_LOCK_TIMEOUT_EVENT_ID:
             if (serial == reqLockSerialNum_) {
@@ -81,13 +81,14 @@ void TelRilHandler::ApplyRunningLock(int32_t lockType)
         reqRunningLockCount_++;
         reqLockSerialNum_++;
         reqRunningLock_->Lock();
-        TELEPHONY_LOGI("ApplyRunningLock,reqLockSerialNum_:%{public}d", (int)reqLockSerialNum_);
+        TELEPHONY_LOGI("ApplyRunningLock,reqLockSerialNum_:%{public}d", static_cast<int>(reqLockSerialNum_));
         this->SendEvent(RUNNING_LOCK_TIMEOUT_EVENT_ID, reqLockSerialNum_, RUNNING_LOCK_DEFAULT_TIMEOUT_MS);
     } else if (ackRunningLock_ != nullptr && lockType == ACK_RUNNING_LOCK) {
         ackLockSerialNum_++;
         ackRunningLock_->Lock();
-        TELEPHONY_LOGI("ApplyRunningLock,ackLockSerialNum_:%{public}d", (int)ackLockSerialNum_);
+        TELEPHONY_LOGI("ApplyRunningLock,ackLockSerialNum_:%{public}d", static_cast<int>(ackLockSerialNum_));
         this->SendEvent(ACK_RUNNING_LOCK_TIMEOUT_EVENT_ID, ackLockSerialNum_, ACK_RUNNING_LOCK_DEFAULT_TIMEOUT_MS);
+
     } else {
         TELEPHONY_LOGE("ApplyRunningLock,lockType:%{public}d is invalid", lockType);
     }
@@ -96,7 +97,7 @@ void TelRilHandler::ApplyRunningLock(int32_t lockType)
 void TelRilHandler::ReduceRunningLock(int32_t lockType)
 {
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
-    TELEPHONY_LOGI("ReduceRunningLock,reqRunningLockCount_:%{public}d", (int)reqRunningLockCount_);
+    TELEPHONY_LOGI("ReduceRunningLock,reqRunningLockCount_:%{public}d", static_cast<int>(reqRunningLockCount_));
     if ((reqRunningLock_ != nullptr) && (lockType == NORMAL_RUNNING_LOCK)) {
         if (reqRunningLockCount_ > 1) {
             reqRunningLockCount_--;
