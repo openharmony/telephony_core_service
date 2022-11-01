@@ -2555,14 +2555,14 @@ int main()
     std::unique_ptr<TelRilTest> rilManagerAndResponseTest = std::make_unique<TelRilTest>();
     if (rilManagerAndResponseTest == nullptr) {
         TELEPHONY_LOGE("rilManagerAndResponseTest is nullptr.");
-        return -1;
+        return TELEPHONY_ERROR;
     }
     rilManagerAndResponseTest->OnInitInterface();
     TELEPHONY_LOGI("make_shared<ITelRilManager>(telRilManager) --> success");
     std::shared_ptr<AppExecFwk::EventRunner> eventRunner = AppExecFwk::EventRunner::Create("DemoHandler");
     if (eventRunner == nullptr) {
         TELEPHONY_LOGE("ERROR : AppExecFwk::EventRunner::Create(\"DemoHandler\") --> nullptr !!!");
-        return -1;
+        return TELEPHONY_ERROR;
     }
     TELEPHONY_LOGI("AppExecFwk::EventRunner::Create(\"DemoHandler\") --> success");
     for (slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
