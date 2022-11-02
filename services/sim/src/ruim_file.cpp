@@ -78,6 +78,10 @@ std::string RuimFile::ObtainIsoCountryCode()
 
 void RuimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     auto id = event->GetInnerEventId();
     TELEPHONY_LOGI("RuimFile::ProcessEvent id %{public}d", id);
     auto itFunc = memberFuncMap_.find(id);
@@ -173,8 +177,16 @@ bool RuimFile::ProcessGetSubscriptionDone(const AppExecFwk::InnerEvent::Pointer 
 
 bool RuimFile::ProcessGetIccidDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     if (fd->exception == nullptr) {
         std::string iccData = fd->resultData;
         TELEPHONY_LOGI("RuimFile::ProcessEvent MSG_SIM_OBTAIN_ICCID_DONE result success");
@@ -185,8 +197,16 @@ bool RuimFile::ProcessGetIccidDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool RuimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::shared_ptr<std::string> sharedObject = event->GetSharedObject<std::string>();
     bool isFileHandleResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileHandleResponse;
+    }
+    std::shared_ptr<std::string> sharedObject = event->GetSharedObject<std::string>();
+    if (sharedObject == nullptr) {
+        TELEPHONY_LOGE("sharedObject is nullptr!");
+        return isFileHandleResponse;
+    }
     if (sharedObject != nullptr) {
         imsi_ = *sharedObject;
         TELEPHONY_LOGI("RuimFile::ProcessEvent MSG_SIM_OBTAIN_IMSI_DONE");
@@ -255,8 +275,16 @@ void RuimFile::InitMemberFunc()
 
 bool RuimFile::ProcessGetSpnDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     if (fd->exception != nullptr) {
         TELEPHONY_LOGE("EfCsimSpnFileWanted ProcessParseFile get exception");
         return isFileProcessResponse;

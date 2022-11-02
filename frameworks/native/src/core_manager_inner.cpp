@@ -169,6 +169,10 @@ int32_t CoreManagerInner::SetUssd(int32_t slotId, int32_t eventId, const std::st
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetUssd(slotId, str, response);
 }
@@ -181,6 +185,10 @@ int32_t CoreManagerInner::GetUssd(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetUssd(slotId, response);
 }
@@ -193,6 +201,10 @@ int32_t CoreManagerInner::GetMute(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetMute(slotId, response);
 }
@@ -205,6 +217,10 @@ int32_t CoreManagerInner::SetMute(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetMute(slotId, mute, response);
 }
@@ -217,6 +233,10 @@ int32_t CoreManagerInner::GetEmergencyCallList(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetEmergencyCallList(slotId, response);
 }
@@ -230,6 +250,10 @@ int32_t CoreManagerInner::SetEmergencyCallList(int32_t slotId, int32_t eventId, 
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetEmergencyCallList(slotId, eccVec, response);
 }
@@ -242,6 +266,10 @@ int32_t CoreManagerInner::GetCallFailReason(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetCallFailReason(slotId, response);
 }
@@ -254,6 +282,10 @@ int32_t CoreManagerInner::SetCallPreferenceMode(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetCallPreferenceMode(slotId, mode, response);
 }
@@ -266,6 +298,10 @@ int32_t CoreManagerInner::GetCallPreferenceMode(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetCallPreferenceMode(slotId, response);
 }
@@ -278,6 +314,10 @@ int32_t CoreManagerInner::SetPreferredNetworkPara(int32_t slotId, int32_t eventI
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetPreferredNetwork(slotId, preferredNetworkType, response);
 }
@@ -290,6 +330,10 @@ int32_t CoreManagerInner::GetPreferredNetworkPara(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetPreferredNetwork(slotId, response);
 }
@@ -302,6 +346,10 @@ int32_t CoreManagerInner::GetOperatorInfo(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetOperatorInfo(slotId, response);
 }
@@ -314,6 +362,10 @@ int32_t CoreManagerInner::GetCellInfoList(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetCellInfoList(slotId, response);
 }
@@ -326,6 +378,10 @@ int32_t CoreManagerInner::GetCurrentCellInfo(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetCurrentCellInfo(slotId, response);
 }
@@ -338,6 +394,10 @@ int32_t CoreManagerInner::SendGsmSms(int32_t slotId, int32_t eventId, GsmSimMess
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId, gsmMessage.refId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SendGsmSms(slotId, gsmMessage.smscPdu, gsmMessage.pdu, response);
 }
@@ -350,6 +410,10 @@ int32_t CoreManagerInner::SendCdmaSms(int32_t slotId, int32_t eventId, std::stri
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId, refId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SendCdmaSms(slotId, pdu, response);
 }
@@ -362,6 +426,10 @@ int32_t CoreManagerInner::AddSimMessage(int32_t slotId, int32_t eventId, const S
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->AddSimMessage(slotId, simMessage, response);
 }
@@ -374,6 +442,10 @@ int32_t CoreManagerInner::DelSimMessage(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->DelSimMessage(slotId, gsmIndex, response);
 }
@@ -386,6 +458,10 @@ int32_t CoreManagerInner::GetSmscAddr(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetSmscAddr(slotId, response);
 }
@@ -398,6 +474,10 @@ int32_t CoreManagerInner::SetSmscAddr(int32_t slotId, int32_t eventId, int32_t t
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetSmscAddr(slotId, tosca, address, response);
 }
@@ -410,6 +490,10 @@ int32_t CoreManagerInner::SetCBConfig(int32_t slotId, int32_t eventId, const CBC
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetCBConfig(slotId, cbConfig, response);
 }
@@ -422,6 +506,10 @@ int32_t CoreManagerInner::SetCdmaCBConfig(int32_t slotId, int32_t eventId, CdmaC
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetCdmaCBConfig(slotId, cdmaCBConfigInfoList, response);
 }
@@ -434,6 +522,10 @@ int32_t CoreManagerInner::GetCBConfig(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetCBConfig(slotId, response);
 }
@@ -446,6 +538,10 @@ int32_t CoreManagerInner::GetCdmaCBConfig(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetCdmaCBConfig(slotId, response);
 }
@@ -458,6 +554,10 @@ int32_t CoreManagerInner::SendSmsMoreMode(int32_t slotId, int32_t eventId, GsmSi
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId, gsmMessage.refId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SendSmsMoreMode(slotId, gsmMessage.smscPdu, gsmMessage.pdu, response);
 }
@@ -470,6 +570,10 @@ int32_t CoreManagerInner::SendSmsAck(int32_t slotId, int32_t eventId, bool succe
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SendSmsAck(slotId, success, cause, response);
 }
@@ -482,6 +586,10 @@ int32_t CoreManagerInner::AddCdmaSimMessage(int32_t slotId, int32_t eventId, int
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->AddCdmaSimMessage(slotId, status, pdu, response);
 }
@@ -494,6 +602,10 @@ int32_t CoreManagerInner::DelCdmaSimMessage(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->DelCdmaSimMessage(slotId, cdmaIndex, response);
 }
@@ -506,6 +618,10 @@ int32_t CoreManagerInner::UpdateCdmaSimMessage(int32_t slotId, int32_t eventId, 
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->UpdateCdmaSimMessage(slotId, cdmaSimMsg, response);
 }
@@ -518,6 +634,10 @@ int32_t CoreManagerInner::GetNetworkSearchInformation(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetNetworkSearchInformation(slotId, response);
 }
@@ -530,6 +650,10 @@ int32_t CoreManagerInner::GetNetworkSelectionMode(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetNetworkSelectionMode(slotId, response);
 }
@@ -542,6 +666,10 @@ int32_t CoreManagerInner::SetNetworkSelectionMode(int32_t slotId, int32_t eventI
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetNetworkSelectionMode(slotId, automaticFlag, oper, response);
 }
@@ -554,6 +682,10 @@ int32_t CoreManagerInner::SetRadioState(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetRadioState(slotId, fun, rst, response);
 }
@@ -566,6 +698,10 @@ int32_t CoreManagerInner::GetRadioState(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetRadioState(slotId, response);
 }
@@ -578,6 +714,10 @@ int32_t CoreManagerInner::ShutDown(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->ShutDown(slotId, response);
 }
@@ -590,6 +730,10 @@ int32_t CoreManagerInner::Dial(int32_t slotId, int32_t eventId, std::string addr
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->Dial(slotId, address, clirMode, response);
 }
@@ -602,6 +746,10 @@ int32_t CoreManagerInner::Reject(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->Reject(slotId, response);
 }
@@ -614,6 +762,10 @@ int32_t CoreManagerInner::Hangup(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->Hangup(slotId, gsmIndex, response);
 }
@@ -626,6 +778,10 @@ int32_t CoreManagerInner::Answer(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->Answer(slotId, response);
 }
@@ -638,6 +794,10 @@ int32_t CoreManagerInner::GetCallList(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetCallList(slotId, response);
 }
@@ -650,6 +810,10 @@ int32_t CoreManagerInner::HoldCall(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->HoldCall(slotId, response);
 }
@@ -662,6 +826,10 @@ int32_t CoreManagerInner::UnHoldCall(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->UnHoldCall(slotId, response);
 }
@@ -674,6 +842,10 @@ int32_t CoreManagerInner::SwitchCall(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SwitchCall(slotId, response);
 }
@@ -686,6 +858,10 @@ int32_t CoreManagerInner::CombineConference(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->CombineConference(slotId, callType, response);
 }
@@ -698,6 +874,10 @@ int32_t CoreManagerInner::SeparateConference(int32_t slotId, int32_t eventId, in
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SeparateConference(slotId, callIndex, callType, response);
 }
@@ -710,6 +890,10 @@ int32_t CoreManagerInner::CallSupplement(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->CallSupplement(slotId, type, response);
 }
@@ -722,6 +906,10 @@ int32_t CoreManagerInner::GetClip(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetClip(slotId, response);
 }
@@ -734,6 +922,10 @@ int32_t CoreManagerInner::SetClip(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetClip(slotId, action, response);
 }
@@ -746,6 +938,10 @@ int32_t CoreManagerInner::GetClir(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetClir(slotId, response);
 }
@@ -758,6 +954,10 @@ int32_t CoreManagerInner::SetClir(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetClir(slotId, action, response);
 }
@@ -770,6 +970,10 @@ int32_t CoreManagerInner::SetCallWaiting(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetCallWaiting(slotId, activate, response);
 }
@@ -782,6 +986,10 @@ int32_t CoreManagerInner::SetCallTransferInfo(int32_t slotId, int32_t eventId, c
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetCallTransferInfo(slotId, callTransfer, response);
 }
@@ -794,6 +1002,10 @@ int32_t CoreManagerInner::GetCallTransferInfo(int32_t slotId, int32_t eventId, c
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetCallTransferInfo(slotId, reason, response);
 }
@@ -806,6 +1018,10 @@ int32_t CoreManagerInner::GetCallWaiting(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetCallWaiting(slotId, response);
 }
@@ -818,6 +1034,10 @@ int32_t CoreManagerInner::GetCallRestriction(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetCallRestriction(slotId, fac, response);
 }
@@ -830,6 +1050,10 @@ int32_t CoreManagerInner::SetCallRestriction(int32_t slotId, int32_t eventId,
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetCallRestriction(slotId, callRestriction, response);
 }
@@ -842,6 +1066,10 @@ int32_t CoreManagerInner::SendDTMF(int32_t slotId, int32_t eventId, const DtmfPa
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SendDtmf(slotId, dtmfParam, response);
 }
@@ -854,6 +1082,10 @@ int32_t CoreManagerInner::SendDTMF(int32_t slotId, int32_t eventId, char cDTMFCo
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SendDtmf(slotId, cDTMFCode, index, response);
 }
@@ -866,6 +1098,10 @@ int32_t CoreManagerInner::StartDTMF(int32_t slotId, int32_t eventId, char cDTMFC
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->StartDtmf(slotId, cDTMFCode, index, response);
 }
@@ -878,6 +1114,10 @@ int32_t CoreManagerInner::StopDTMF(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->StopDtmf(slotId, index, response);
 }
@@ -890,6 +1130,10 @@ int32_t CoreManagerInner::SetDataPermitted(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetDataPermitted(slotId, dataPermitted, response);
 }
@@ -902,6 +1146,10 @@ int32_t CoreManagerInner::SetInitApnInfo(int32_t slotId, int32_t eventId, const 
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetInitApnInfo(slotId, dataProfile, response);
 }
@@ -914,6 +1162,10 @@ int32_t CoreManagerInner::ActivatePdpContext(int32_t slotId, int32_t eventId, co
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId, activateData.param);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->ActivatePdpContext(slotId, activateData, response);
 }
@@ -926,6 +1178,10 @@ int32_t CoreManagerInner::DeactivatePdpContext(int32_t slotId, int32_t eventId,
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId, deactivateData.param);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->DeactivatePdpContext(slotId, deactivateData.cid, deactivateData.reason, response);
 }
@@ -938,6 +1194,10 @@ int32_t CoreManagerInner::GetPdpContextList(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetPdpContextList(slotId, response);
 }
@@ -950,6 +1210,10 @@ int32_t CoreManagerInner::SetLinkBandwidthReportingRule(int32_t slotId, int32_t 
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->SetLinkBandwidthReportingRule(slotId, linkBandwidth, response);
 }
@@ -962,6 +1226,10 @@ int32_t CoreManagerInner::GetLinkBandwidthInfo(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetLinkBandwidthInfo(slotId, cid, response);
 }
@@ -974,6 +1242,10 @@ int32_t CoreManagerInner::GetSignalStrength(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetSignalStrength(slotId, response);
 }
@@ -986,6 +1258,10 @@ int32_t CoreManagerInner::GetCsRegStatus(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetCsRegStatus(slotId, response);
 }
@@ -998,6 +1274,10 @@ int32_t CoreManagerInner::GetPsRegStatus(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     response->SetOwner(handler);
     return telRilManager_->GetPsRegStatus(slotId, response);
 }

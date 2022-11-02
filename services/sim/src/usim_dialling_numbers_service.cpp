@@ -133,6 +133,10 @@ void UsimDiallingNumbersService::LoadPbrFiles()
 {
     std::unique_lock<std::mutex> lock(mtx_);
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_USIM_PBR_LOAD_DONE);
+    if (fileController_ == nullptr) {
+        TELEPHONY_LOGE("LoadPbrFiles fileController_ is nullptr");
+        return;
+    }
     fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_PBR, event);
 }
 
@@ -157,6 +161,10 @@ bool UsimDiallingNumbersService::LoadDiallingNumberFiles(int recId)
         TELEPHONY_LOGI("UsimDiallingNumbersService::LoadDiallingNumberFiles start %{public}d", recId);
         int efId = files.at(TAG_SIM_USIM_ADN)->fileId;
         AppExecFwk::InnerEvent::Pointer event = CreateHandlerPointer(MSG_USIM_USIM_ADN_LOAD_DONE, efId, 0, nullptr);
+        if (diallingNumbersHandler_ == nullptr) {
+            TELEPHONY_LOGE("LoadDiallingNumberFiles diallingNumbersHandler_ is nullptr");
+            return false;
+        }
         diallingNumbersHandler_->GetAllDiallingNumbers(efId, extEf, event);
         return true;
     } else {
@@ -203,6 +211,10 @@ AppExecFwk::InnerEvent::Pointer UsimDiallingNumbersService::BuildCallerInfo(int 
     std::unique_ptr<FileToControllerMsg> object = std::make_unique<FileToControllerMsg>();
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(shared_from_this());
     return event;
 }
@@ -216,6 +228,10 @@ AppExecFwk::InnerEvent::Pointer UsimDiallingNumbersService::CreateHandlerPointer
     holder->diallingNumber = pobj;
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventid, holder, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(shared_from_this());
     return event;
 }
