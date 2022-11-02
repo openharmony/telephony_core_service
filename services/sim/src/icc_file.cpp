@@ -262,6 +262,10 @@ int IccFile::ObtainLengthOfMnc()
 
 void IccFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     auto id = event->GetInnerEventId();
     bool result = false;
     TELEPHONY_LOGI("IccFile::ProcessEvent id %{public}d", id);
@@ -363,6 +367,10 @@ AppExecFwk::InnerEvent::Pointer IccFile::BuildCallerInfo(int eventId)
     std::unique_ptr<FileToControllerMsg> object = std::make_unique<FileToControllerMsg>();
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(shared_from_this());
     return event;
 }
@@ -374,6 +382,10 @@ AppExecFwk::InnerEvent::Pointer IccFile::BuildCallerInfo(int eventId, int arg1, 
     object->arg2 = arg2;
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(shared_from_this());
     return event;
 }
@@ -384,6 +396,10 @@ AppExecFwk::InnerEvent::Pointer IccFile::BuildCallerInfo(int eventId, std::share
     object->iccLoader = loader;
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(shared_from_this());
     return event;
 }
@@ -481,6 +497,10 @@ AppExecFwk::InnerEvent::Pointer IccFile::CreateDiallingNumberPointer(
     holder->diallingNumber = pobj;
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventid, holder, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(shared_from_this());
     return event;
 }

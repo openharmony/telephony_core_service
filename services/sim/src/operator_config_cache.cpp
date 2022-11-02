@@ -45,6 +45,10 @@ void OperatorConfigCache::ClearAllCache(int32_t slotId)
 
 void OperatorConfigCache::ClearOperatorValue(int32_t slotId)
 {
+    if (simFileManager_ == nullptr) {
+        TELEPHONY_LOGE("simFileManager_ is nullptr");
+        return;
+    }
     std::string key;
     std::string initialOpkey = INITIAL_OPKEY;
     SetParameter(key.append(OPKEY_PROP_PREFIX).append(std::to_string(slotId)).c_str(), initialOpkey.c_str());

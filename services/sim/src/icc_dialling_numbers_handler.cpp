@@ -56,6 +56,10 @@ std::string IccDiallingNumbersHandler::GetFilePath(int elementaryFileId)
 void IccDiallingNumbersHandler::GetDiallingNumbers(
     int ef, int exid, int index, AppExecFwk::InnerEvent::Pointer &response)
 {
+    if (fileController_ == nullptr) {
+        TELEPHONY_LOGE("fileController_ is null pointer");
+        return;
+    }
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest = CreateLoadRequest(ef, exid, index, "", response);
     AppExecFwk::InnerEvent::Pointer ptDiallingNumberRead =
         BuildCallerInfo(MSG_SIM_OBTAIN_ADN_DONE, loadRequest->GetLoadId());
@@ -64,6 +68,10 @@ void IccDiallingNumbersHandler::GetDiallingNumbers(
 
 void IccDiallingNumbersHandler::GetAllDiallingNumbers(int ef, int exid, AppExecFwk::InnerEvent::Pointer &response)
 {
+    if (fileController_ == nullptr) {
+        TELEPHONY_LOGE("fileController_ is null pointer");
+        return;
+    }
     TELEPHONY_LOGI("IccDiallingNumbersHandler::GetAllDiallingNumbers start");
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest = CreateLoadRequest(ef, exid, 0, "", response);
     AppExecFwk::InnerEvent::Pointer ptDiallingNumberReadAll =
@@ -74,6 +82,10 @@ void IccDiallingNumbersHandler::GetAllDiallingNumbers(int ef, int exid, AppExecF
 void IccDiallingNumbersHandler::UpdateDiallingNumbers(
     const DiallingNumberUpdateInfor &infor, AppExecFwk::InnerEvent::Pointer &response)
 {
+    if (fileController_ == nullptr) {
+        TELEPHONY_LOGE("fileController_ is null pointer");
+        return;
+    }
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest =
         CreateLoadRequest(infor.fileId, infor.extFile, infor.index, infor.pin2, response);
     loadRequest->SetIsDelete(infor.isDel);
@@ -86,6 +98,10 @@ void IccDiallingNumbersHandler::UpdateDiallingNumbers(
 
 void IccDiallingNumbersHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     auto id = event->GetInnerEventId();
     int loadId = 0;
     TELEPHONY_LOGI("IccDiallingNumbersHandler::ProcessEvent id %{public}d", id);
@@ -103,6 +119,10 @@ void IccDiallingNumbersHandler::ProcessEvent(const AppExecFwk::InnerEvent::Point
 
 void IccDiallingNumbersHandler::ProcessLinearSizeDone(const AppExecFwk::InnerEvent::Pointer &event, int &id)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     std::unique_ptr<ControllerToFileMsg> fdError = event->GetUniqueObject<ControllerToFileMsg>();
     int loadId = 0;
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest = nullptr;
@@ -116,33 +136,39 @@ void IccDiallingNumbersHandler::ProcessLinearSizeDone(const AppExecFwk::InnerEve
         TELEPHONY_LOGE("ProcessLinearSizeDone error occured");
         return;
     }
-
     std::shared_ptr<EfLinearResult> object = event->GetSharedObject<EfLinearResult>();
+    if (object == nullptr) {
+        TELEPHONY_LOGE("object is nullptr!");
+        return;
+    }
     std::shared_ptr<DiallingNumbersInfo> diallingNumberLoad = nullptr;
     loadId = object->arg1;
     id = loadId;
     loadRequest = FindLoadRequest(loadId);
-    if (object != nullptr && (loadRequest != nullptr)) {
-        if (object->exception == nullptr) {
-            std::shared_ptr<void> baseLoad = object->iccLoader;
-            int *dataSize = object->valueData;
-            if (baseLoad != nullptr) {
-                diallingNumberLoad = std::static_pointer_cast<DiallingNumbersInfo>(baseLoad);
-            }
-            if (!FormatNameAndNumber(diallingNumberLoad, loadRequest->GetIsDelete())) {
-                loadRequest->SetException(static_cast<std::shared_ptr<void>>(MakeExceptionResult(
-                    PARAMETER_INCORRECT)));
-                return;
-            }
-            SendUpdateCommand(diallingNumberLoad, dataSize[0], loadRequest, loadId);
+    if (loadRequest == nullptr) {
+        TELEPHONY_LOGE("loadRequest is nullptr!");
+        return;
+    }
+    if (object->exception == nullptr) {
+        std::shared_ptr<void> baseLoad = object->iccLoader;
+        int *dataSize = object->valueData;
+        if (baseLoad != nullptr) {
+            diallingNumberLoad = std::static_pointer_cast<DiallingNumbersInfo>(baseLoad);
         }
-    } else {
-        TELEPHONY_LOGE("ProcessLinearSizeDone: get null pointer!!!");
+        if (!FormatNameAndNumber(diallingNumberLoad, loadRequest->GetIsDelete())) {
+            loadRequest->SetException(static_cast<std::shared_ptr<void>>(MakeExceptionResult(PARAMETER_INCORRECT)));
+            return;
+        }
+        SendUpdateCommand(diallingNumberLoad, dataSize[0], loadRequest, loadId);
     }
 }
 
 void IccDiallingNumbersHandler::ProcessUpdateRecordDone(const AppExecFwk::InnerEvent::Pointer &event, int &id)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     std::unique_ptr<ControllerToFileMsg> object = event->GetUniqueObject<ControllerToFileMsg>();
     if (object == nullptr) {
         TELEPHONY_LOGE("object is nullptr!");
@@ -163,6 +189,10 @@ void IccDiallingNumbersHandler::ProcessUpdateRecordDone(const AppExecFwk::InnerE
 void IccDiallingNumbersHandler::ProcessDiallingNumberAllLoadDone(
     const AppExecFwk::InnerEvent::Pointer &event, int &id)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     std::unique_ptr<ControllerToFileMsg> fdError = event->GetUniqueObject<ControllerToFileMsg>();
     int loadId = 0;
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest = nullptr;
@@ -222,6 +252,10 @@ void IccDiallingNumbersHandler::ProcessDiallingNumber(
 
 void IccDiallingNumbersHandler::ProcessDiallingNumberLoadDone(const AppExecFwk::InnerEvent::Pointer &event, int &id)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     int loadId = fd->arg1;
     id = loadId;
@@ -283,6 +317,10 @@ bool IccDiallingNumbersHandler::SendBackResult(int loadId)
     uint32_t id = loadRequest->GetCaller()->GetInnerEventId();
     std::unique_ptr<DiallingNumbersHandleHolder> fd =
         loadRequest->GetCaller()->GetUniqueObject<DiallingNumbersHandleHolder>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return false;
+    }
     std::unique_ptr<DiallingNumbersHandlerResult> data = make_unique<DiallingNumbersHandlerResult>(fd.get());
     data->result = loadRequest->GetResult();
     data->exception = loadRequest->GetException();
@@ -302,6 +340,10 @@ AppExecFwk::InnerEvent::Pointer IccDiallingNumbersHandler::BuildCallerInfo(int e
     object->arg1 = loadId;
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(shared_from_this());
     return event;
 }
@@ -314,6 +356,10 @@ AppExecFwk::InnerEvent::Pointer IccDiallingNumbersHandler::BuildCallerInfo(
     object->iccLoader = pobj;
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(shared_from_this());
     return event;
 }
@@ -469,6 +515,10 @@ std::shared_ptr<unsigned char> IccDiallingNumbersHandler::CreateNameSequence(
 bool IccDiallingNumbersHandler::FormatNameAndNumber(
     std::shared_ptr<DiallingNumbersInfo> &diallingNumber, bool isDel)
 {
+    if (diallingNumber == nullptr) {
+        TELEPHONY_LOGE("diallingNumber is nullptr!");
+        return false;
+    }
     if (isDel) {
         diallingNumber->number_ = u"";
         diallingNumber->name_ = u"";

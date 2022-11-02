@@ -77,6 +77,10 @@ static AppExecFwk::InnerEvent::Pointer GenCallBackEvent(
     const std::shared_ptr<AppExecFwk::EventHandler> &owner, const uint32_t eventId)
 {
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(owner);
     return event;
 }
@@ -249,6 +253,10 @@ bool IccOperatorPrivilegeController::HasOperatorPrivileges(
 
 void IccOperatorPrivilegeController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     const uint32_t id = event->GetInnerEventId();
     switch (id) {
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
