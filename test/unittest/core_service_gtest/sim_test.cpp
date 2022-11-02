@@ -66,7 +66,7 @@ sptr<ICoreService> SimTest::GetProxy()
     TELEPHONY_LOGI("TelephonyTestService GetProxy ... ");
     sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityMgr == nullptr) {
-        TELEPHONY_LOGI("TelephonyTestService Get ISystemAbilityManager failed!!!");
+        TELEPHONY_LOGE("TelephonyTestService Get ISystemAbilityManager failed!!!");
         return nullptr;
     }
 
@@ -75,7 +75,7 @@ sptr<ICoreService> SimTest::GetProxy()
         sptr<ICoreService> telephonyService = iface_cast<ICoreService>(remote);
         return telephonyService;
     } else {
-        TELEPHONY_LOGI("TelephonyTestService Get TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID fail ...");
+        TELEPHONY_LOGE("TelephonyTestService Get TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID fail ...");
         return nullptr;
     }
 }
@@ -1254,7 +1254,6 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0200, Function | Medi
     CoreServiceTestHelper helper;
     if (!helper.Run(QueryIccFdnDiallingNumbersTestFunc1, std::ref(helper))) {
         TELEPHONY_LOGI("Interface out of time");
-        ASSERT_TRUE(true);
     }
     ASSERT_TRUE(true);
 }

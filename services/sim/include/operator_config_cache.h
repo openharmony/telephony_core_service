@@ -45,7 +45,6 @@ private:
     bool AnnounceOperatorConfigChanged(int32_t slotId);
     inline static const std::string KEY_SLOTID = "slotId";
     inline static const std::string OPERATOR_CONFIG_CHANGED = "operatorConfigChanged";
-    inline static const std::string INITIAL_OPKEY = "-1";
     OperatorConfig opc_;
     int32_t slotId_;
     std::mutex mutex_;

@@ -31,27 +31,15 @@ class ImsCoreServiceClient {
     DECLARE_DELAYED_SINGLETON(ImsCoreServiceClient);
 
 public:
-    /**
-     * Get ImsCoreService Remote Object
-     *
-     * @return sptr<ImsCoreServiceInterface>
-     */
-    sptr<ImsCoreServiceInterface> GetImsCoreServiceProxy();
-
     void Init();
     void UnInit();
-    int32_t RegisterImsCoreServiceCallbackHandler(int32_t slotId,
-        const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
-    /**
-     * Get Handler
-     *
-     * @param slotId
-     * @return AppExecFwk::EventHandler
-     */
+    int32_t RegisterImsCoreServiceCallbackHandler(
+        int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     std::shared_ptr<AppExecFwk::EventHandler> GetHandler(int32_t slotId);
-
     int32_t GetImsRegistrationStatus(int32_t slotId);
+
+public:
+    sptr<ImsCoreServiceInterface> GetImsCoreServiceProxy();
 
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
@@ -63,11 +51,7 @@ private:
         void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     };
 
-    /**
-     * Is Connect ImsCoreService Remote Object
-     *
-     * @return bool
-     */
+private:
     bool IsConnect() const;
     int32_t RegisterImsCoreServiceCallback();
     int32_t ReConnectService();

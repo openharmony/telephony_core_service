@@ -438,7 +438,7 @@ int32_t TelRilSim::SimCloseLogicalChannel(int32_t channelId, const AppExecFwk::I
 }
 
 int32_t TelRilSim::SimTransmitApduLogicalChannel(
-    ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
+    const ApduSimIORequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
 {
     OHOS::HDI::Ril::V1_0::ApduSimIORequestInfo ApduRequestInfo;
     BuildApduRequestInfo(ApduRequestInfo, reqInfo);
@@ -447,7 +447,7 @@ int32_t TelRilSim::SimTransmitApduLogicalChannel(
 }
 
 int32_t TelRilSim::SimTransmitApduBasicChannel(
-    ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
+    const ApduSimIORequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
 {
     OHOS::HDI::Ril::V1_0::ApduSimIORequestInfo ApduRequestInfo;
     BuildApduRequestInfo(ApduRequestInfo, reqInfo);
@@ -456,7 +456,7 @@ int32_t TelRilSim::SimTransmitApduBasicChannel(
 }
 
 int32_t TelRilSim::SimAuthentication(
-    SimAuthenticationRequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
+    const SimAuthenticationRequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
 {
     OHOS::HDI::Ril::V1_0::SimAuthenticationRequestInfo simAuthInfo;
     simAuthInfo.aid = reqInfo.aid;

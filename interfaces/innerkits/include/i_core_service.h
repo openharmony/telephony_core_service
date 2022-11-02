@@ -50,15 +50,16 @@ public:
     virtual bool HasSimCard(int32_t slotId) = 0;
     virtual int32_t GetSimState(int32_t slotId) = 0;
     virtual int32_t GetCardType(int32_t slotId) = 0;
-    virtual bool UnlockPin(int32_t slotId, std::u16string pin, LockStatusResponse &response) = 0;
-    virtual bool UnlockPuk(int32_t slotId, std::u16string newPin, std::u16string puk, LockStatusResponse &response) = 0;
+    virtual bool UnlockPin(int32_t slotId, const std::u16string &pin, LockStatusResponse &response) = 0;
+    virtual bool UnlockPuk(
+        int32_t slotId, const std::u16string &newPin, const std::u16string &puk, LockStatusResponse &response) = 0;
     virtual bool AlterPin(
-        int32_t slotId, std::u16string newPin, std::u16string oldPin, LockStatusResponse &response) = 0;
-    virtual bool UnlockPin2(int32_t slotId, std::u16string pin2, LockStatusResponse &response) = 0;
+        int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin, LockStatusResponse &response) = 0;
+    virtual bool UnlockPin2(int32_t slotId, const std::u16string &pin2, LockStatusResponse &response) = 0;
     virtual bool UnlockPuk2(
-        int32_t slotId, std::u16string newPin2, std::u16string puk2, LockStatusResponse &response) = 0;
+        int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2, LockStatusResponse &response) = 0;
     virtual bool AlterPin2(
-        int32_t slotId, std::u16string newPin2, std::u16string oldPin2, LockStatusResponse &response) = 0;
+        int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2, LockStatusResponse &response) = 0;
     virtual bool SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response) = 0;
     virtual int32_t GetLockState(int32_t slotId, LockType lockType) = 0;
     virtual std::u16string GetSimOperatorNumeric(int32_t slotId) = 0;
@@ -84,9 +85,9 @@ public:
     virtual int32_t GetDefaultVoiceSlotId() = 0;
     virtual bool SetPrimarySlotId(int32_t slotId) = 0;
     virtual int32_t GetPrimarySlotId() = 0;
-    virtual bool SetShowNumber(int32_t slotId, const std::u16string number) = 0;
+    virtual bool SetShowNumber(int32_t slotId, const std::u16string &number) = 0;
     virtual std::u16string GetShowNumber(int32_t slotId) = 0;
-    virtual bool SetShowName(int32_t slotId, const std::u16string name) = 0;
+    virtual bool SetShowName(int32_t slotId, const std::u16string &name) = 0;
     virtual std::u16string GetShowName(int32_t slotId) = 0;
     virtual bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) = 0;
     virtual bool GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) = 0;

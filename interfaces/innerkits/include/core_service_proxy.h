@@ -62,9 +62,9 @@ public:
     int32_t GetDefaultVoiceSlotId() override;
     int32_t GetPrimarySlotId() override;
     bool SetPrimarySlotId(int32_t slotId) override;
-    bool SetShowNumber(int32_t slotId, const std::u16string number) override;
+    bool SetShowNumber(int32_t slotId, const std::u16string &number) override;
     std::u16string GetShowNumber(int32_t slotId) override;
-    bool SetShowName(int32_t slotId, const std::u16string name) override;
+    bool SetShowName(int32_t slotId, const std::u16string &name) override;
     std::u16string GetShowName(int32_t slotId) override;
     bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
     bool GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) override;
@@ -73,16 +73,16 @@ public:
     bool IsValidStringLength(std::u16string str);
     bool IsValidServiceType(ImsServiceType serviceType);
 
-    bool UnlockPin(const int32_t slotId, std::u16string pin, LockStatusResponse &response) override;
-    bool UnlockPuk(
-        const int32_t slotId, std::u16string newPin, std::u16string puk, LockStatusResponse &response) override;
-    bool AlterPin(
-        const int32_t slotId, std::u16string newPin, std::u16string oldPin, LockStatusResponse &response) override;
-    bool UnlockPin2(const int32_t slotId, std::u16string pin2, LockStatusResponse &response) override;
-    bool UnlockPuk2(
-        const int32_t slotId, std::u16string newPin2, std::u16string puk2, LockStatusResponse &response) override;
-    bool AlterPin2(
-        const int32_t slotId, std::u16string newPin2, std::u16string oldPin2, LockStatusResponse &response) override;
+    bool UnlockPin(const int32_t slotId, const std::u16string &pin, LockStatusResponse &response) override;
+    bool UnlockPuk(const int32_t slotId, const std::u16string &newPin, const std::u16string &puk,
+        LockStatusResponse &response) override;
+    bool AlterPin(const int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin,
+        LockStatusResponse &response) override;
+    bool UnlockPin2(const int32_t slotId, const std::u16string &pin2, LockStatusResponse &response) override;
+    bool UnlockPuk2(const int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2,
+        LockStatusResponse &response) override;
+    bool AlterPin2(const int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2,
+        LockStatusResponse &response) override;
     bool SetLockState(const int32_t slotId, const LockInfo &options, LockStatusResponse &response) override;
     int32_t GetLockState(int32_t slotId, LockType lockType) override;
     int32_t RefreshSimState(int32_t slotId) override;

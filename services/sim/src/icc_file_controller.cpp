@@ -472,7 +472,7 @@ void IccFileController::SendMultiRecordResult(
     std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
     std::shared_ptr<MultiRecordResult> object = std::make_shared<MultiRecordResult>(cmdData.get());
     object->fileResults.assign(strValue.begin(), strValue.end());
-    object->resultLength = (int)strValue.size();
+    object->resultLength = static_cast<int>(strValue.size());
     uint32_t id = response->GetInnerEventId();
     int eventParam = 0;
     TELEPHONY_LOGI("IccFileController::SendMultiRecordResult send end");
@@ -564,6 +564,7 @@ bool IccFileController::IsValidSizeData(const unsigned char *data)
 void IccFileController::GetFileAndDataSize(const unsigned char *data, int &fileSize, int &dataSize)
 {
     if (data == nullptr) {
+        TELEPHONY_LOGE("GetFileAndDataSize null data");
         return;
     }
     fileSize = data[LENGTH_OF_RECORD] & BYTE_NUM;

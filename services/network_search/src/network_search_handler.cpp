@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
-const int32_t REQ_INTERVAL = 30;
+static const int32_t REQ_INTERVAL = 30;
 const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandler::memberFuncMap_ = {
     { RadioEvent::RADIO_SIM_STATE_CHANGE, &NetworkSearchHandler::SimStateChange },
     { RadioEvent::RADIO_IMSI_LOADED_READY, &NetworkSearchHandler::ImsiLoadedReady },
@@ -316,7 +316,7 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr ||
-        networkSearchManager->GetRadioState(slotId_) == (int)ModemPowerState::CORE_SERVICE_POWER_OFF) {
+        networkSearchManager->GetRadioState(slotId_) == static_cast<int>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
         TELEPHONY_LOGI("radio is power off, no need update data reg state");
         return;
     }
@@ -330,7 +330,7 @@ void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::P
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr ||
-        networkSearchManager->GetRadioState(slotId_) == (int)ModemPowerState::CORE_SERVICE_POWER_OFF) {
+        networkSearchManager->GetRadioState(slotId_) == static_cast<int>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
         TELEPHONY_LOGI("radio is power off, no need update voice reg state");
         return;
     }
@@ -625,7 +625,7 @@ void NetworkSearchHandler::RadioGetMeid(const AppExecFwk::InnerEvent::Pointer &e
     }
 }
 
-void NetworkSearchHandler::UpdatePhone(RadioTech csRadioTech, RadioTech psRadioTech) const
+void NetworkSearchHandler::UpdatePhone(RadioTech csRadioTech, const RadioTech &psRadioTech) const
 {
     if (radioInfo_ != nullptr) {
         radioInfo_->UpdatePhone(csRadioTech, psRadioTech);
@@ -686,7 +686,7 @@ void NetworkSearchHandler::SendUpdateCellLocationRequest()
     if (cellInfo_ != nullptr) {
         cellInfo_->GetCellInfoList(cells);
     }
-    uint32_t curTime = (uint32_t)time(0);
+    uint32_t curTime = static_cast<uint32_t>(time(0));
     if ((curTime - lastCellRequestTime_) < cellRequestMinInterval_ && cells.size() != 0) {
         TELEPHONY_LOGE("NetworkSearchHandler::SendUpdateCellLocationRequest interval is too short");
         return;
@@ -763,7 +763,6 @@ void NetworkSearchHandler::UpdateImsRegisterState(const AppExecFwk::InnerEvent::
     }
     auto registerInfo = event->GetSharedObject<int32_t>();
     bool isRegister = (*registerInfo == 1);
-    std::shared_ptr<ImsServiceStatus> imsServiceStatus = event->GetSharedObject<ImsServiceStatus>();
     std::shared_ptr<NetworkSearchState> networkSearchState = networkSearchManager->GetNetworkSearchState(slotId_);
     if (networkSearchState != nullptr) {
         networkSearchState->SetImsStatus(isRegister);

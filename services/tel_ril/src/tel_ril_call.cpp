@@ -441,8 +441,8 @@ int32_t TelRilCall::GetUssd(const AppExecFwk::InnerEvent::Pointer &result)
     return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_GET_USSD, &HDI::Ril::V1_0::IRil::GetUssd);
 }
 
-int32_t TelRilCall::SetBarringPassword(std::string fac, std::string oldPassword,
-    std::string newPassword, const AppExecFwk::InnerEvent::Pointer &result)
+int32_t TelRilCall::SetBarringPassword(
+    std::string fac, std::string oldPassword, std::string newPassword, const AppExecFwk::InnerEvent::Pointer &result)
 {
     HDI::Ril::V1_0::SetBarringInfo setBarringInfo = {};
     setBarringInfo.fac = fac;
@@ -466,8 +466,7 @@ int32_t TelRilCall::CallUssdNotice(const HDI::Ril::V1_0::UssdNoticeInfo &ussdNot
     }
     ussdNotice->m = ussdNoticeInfo.type;
     ussdNotice->str = ussdNoticeInfo.message;
-    return Notify<UssdNoticeInfo>(
-        TELEPHONY_LOG_FUNC_NAME, ussdNotice, RadioEvent::RADIO_CALL_USSD_NOTICE);
+    return Notify<UssdNoticeInfo>(TELEPHONY_LOG_FUNC_NAME, ussdNotice, RadioEvent::RADIO_CALL_USSD_NOTICE);
 }
 
 int32_t TelRilCall::CallSsNotice(const HDI::Ril::V1_0::SsNoticeInfo &ssNoticeInfo)
@@ -481,8 +480,7 @@ int32_t TelRilCall::CallSsNotice(const HDI::Ril::V1_0::SsNoticeInfo &ssNoticeInf
     ssNotice->requestType = ssNoticeInfo.requestType;
     ssNotice->serviceClass = ssNoticeInfo.serviceClass;
     ssNotice->result = ssNoticeInfo.result;
-    return Notify<SsNoticeInfo>(
-        TELEPHONY_LOG_FUNC_NAME, ssNotice, RadioEvent::RADIO_CALL_SS_NOTICE);
+    return Notify<SsNoticeInfo>(TELEPHONY_LOG_FUNC_NAME, ssNotice, RadioEvent::RADIO_CALL_SS_NOTICE);
 }
 
 int32_t TelRilCall::CallRingbackVoiceNotice(const HDI::Ril::V1_0::RingbackVoice &ringbackVoice)
@@ -493,8 +491,7 @@ int32_t TelRilCall::CallRingbackVoiceNotice(const HDI::Ril::V1_0::RingbackVoice 
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     ringbackVoiceInfo->status = ringbackVoice.status;
-    return Notify<RingbackVoice>(
-        TELEPHONY_LOG_FUNC_NAME, ringbackVoiceInfo, RadioEvent::RADIO_CALL_RINGBACK_VOICE);
+    return Notify<RingbackVoice>(TELEPHONY_LOG_FUNC_NAME, ringbackVoiceInfo, RadioEvent::RADIO_CALL_RINGBACK_VOICE);
 }
 
 int32_t TelRilCall::CallSrvccStatusNotice(const HDI::Ril::V1_0::SrvccStatus &srvccStatus)
@@ -505,8 +502,7 @@ int32_t TelRilCall::CallSrvccStatusNotice(const HDI::Ril::V1_0::SrvccStatus &srv
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     srvccStatusInfo->status = srvccStatus.status;
-    return Notify<SrvccStatus>(
-        TELEPHONY_LOG_FUNC_NAME, srvccStatusInfo, RadioEvent::RADIO_CALL_SRVCC_STATUS);
+    return Notify<SrvccStatus>(TELEPHONY_LOG_FUNC_NAME, srvccStatusInfo, RadioEvent::RADIO_CALL_SRVCC_STATUS);
 }
 
 int32_t TelRilCall::CallRsrvccStatusNotify()
@@ -531,10 +527,10 @@ int32_t TelRilCall::GetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &
 }
 
 int32_t TelRilCall::SetEmergencyCallList(
-    std::vector<EmergencyCall> &eccVec, const AppExecFwk::InnerEvent::Pointer &result)
+    const std::vector<EmergencyCall> &eccVec, const AppExecFwk::InnerEvent::Pointer &result)
 {
     HDI::Ril::V1_0::EmergencyInfoList emergencyInfoList;
-    emergencyInfoList.callSize = (int32_t)eccVec.size();
+    emergencyInfoList.callSize = static_cast<int32_t>(eccVec.size());
     int index = 1;
     for (EmergencyCall ecc : eccVec) {
         HDI::Ril::V1_0::EmergencyCall emergencyCall = {};
