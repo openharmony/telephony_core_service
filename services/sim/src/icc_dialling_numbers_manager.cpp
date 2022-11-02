@@ -60,6 +60,10 @@ void IccDiallingNumbersManager::Init()
 
 void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGI("IccDiallingNumbersManager ProcessEvent Id is %{public}d", id);
     switch (id) {
@@ -254,6 +258,10 @@ AppExecFwk::InnerEvent::Pointer IccDiallingNumbersManager::BuildCallerInfo(int e
     std::unique_ptr<ResultObtain> object = std::make_unique<ResultObtain>();
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(shared_from_this());
     return event;
 }
