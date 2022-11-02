@@ -1701,7 +1701,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0200
         return;
     }
     ret = NetworkSearchTest::telephonyService_->UnregisterImsRegInfoCallback(SLOT_ID, TYPE_VIDEO);
-    EXPECT_EQ(TELEPHONY_ERR_UNREGISTER_CALLBACK_FAIL, ret);
+    EXPECT_EQ(TELEPHONY_SUCCESS, ret);
 }
 
 /**
