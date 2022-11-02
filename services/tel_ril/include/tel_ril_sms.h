@@ -41,7 +41,7 @@ public:
     int32_t SetSmscAddr(int32_t tosca, std::string address, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetSmscAddr(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetCdmaCBConfig(
-        CdmaCBConfigInfoList &cdmaCBConfigInfoList, const AppExecFwk::InnerEvent::Pointer &response);
+        const CdmaCBConfigInfoList &cdmaCBConfigInfoList, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetCdmaCBConfig(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetCBConfig(
         int32_t mode, std::string idList, std::string dcsList, const AppExecFwk::InnerEvent::Pointer &response);

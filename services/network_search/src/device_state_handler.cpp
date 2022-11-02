@@ -22,8 +22,10 @@
 
 namespace OHOS {
 namespace Telephony {
+namespace {
 const uint32_t CELL_REQUEST_SHORT_INTERVAL = 2; // This is the minimum interval in seconds for cell requests
 const uint32_t CELL_REQUEST_LONG_INTERVAL = 10; // This is the maximum interval in seconds for cell requests
+} // namespace
 
 DeviceStateHandler::DeviceStateHandler(
     const std::weak_ptr<NetworkSearchManager> &networkSearchManager,
@@ -132,10 +134,12 @@ void DeviceStateHandler::SetCellRequestMinInterval(uint32_t minInterval) const
 {
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
     if (nsm == nullptr) {
+        TELEPHONY_LOGE("DeviceStateHandler::SetCellRequestMinInterval nsm is null");
         return;
     }
     auto inner = nsm->FindManagerInner(slotId_);
     if (inner == nullptr) {
+        TELEPHONY_LOGE("DeviceStateHandler::SetCellRequestMinInterval inner is null");
         return;
     }
     if (inner->networkSearchHandler_ != nullptr) {

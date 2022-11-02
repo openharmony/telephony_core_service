@@ -92,7 +92,7 @@ PermissionStateFull testPermGetNetworkInfo = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testSimPermWriteContactsDef = {
+PermissionDef testSimPermWriteContactsDef  = {
     .permissionName = "ohos.permission.WRITE_CONTACTS",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT

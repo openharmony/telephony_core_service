@@ -24,7 +24,7 @@ namespace Telephony {
 NetworkSearchResult::NetworkSearchResult() {}
 
 void NetworkSearchResult::SetNetworkSearchResultValue(
-    int32_t listSize, std::vector<NetworkInformation> &operatorInfo)
+    int32_t listSize, const std::vector<NetworkInformation> &operatorInfo)
 {
     listSize_ = listSize;
     operatorInfoList_ = operatorInfo;

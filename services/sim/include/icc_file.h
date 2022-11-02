@@ -93,6 +93,7 @@ protected:
     virtual void OnAllFilesFetched() = 0;
     bool LockQueriedOrNot();
     void UpdateSPN(const std::string spn);
+    void SaveCountryCode();
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<IccFileController> fileController_ = nullptr;
     std::shared_ptr<SimStateManager> stateManager_ = nullptr;

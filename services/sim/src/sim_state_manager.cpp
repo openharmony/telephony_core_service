@@ -21,6 +21,7 @@ namespace OHOS {
 namespace Telephony {
 std::mutex SimStateManager::mtx_;
 constexpr static const int32_t WAIT_TIME_SECOND = 1;
+constexpr static const int32_t WAIT_TIME_LONG_SECOND = 20;
 
 SimStateManager::SimStateManager(std::shared_ptr<ITelRilManager> telRilManager)
     : telRilManager_(telRilManager), simStateRun_(STATE_NOT_START)
@@ -102,7 +103,7 @@ CardType SimStateManager::GetCardType()
     return ret;
 }
 
-bool SimStateManager::UnlockPin(int32_t slotId, std::string pin, LockStatusResponse &response)
+bool SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {
@@ -131,7 +132,8 @@ bool SimStateManager::UnlockPin(int32_t slotId, std::string pin, LockStatusRespo
     return true;
 }
 
-bool SimStateManager::UnlockPuk(int32_t slotId, std::string newPin, std::string puk, LockStatusResponse &response)
+bool SimStateManager::UnlockPuk(
+    int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {
@@ -160,7 +162,8 @@ bool SimStateManager::UnlockPuk(int32_t slotId, std::string newPin, std::string 
     return true;
 }
 
-bool SimStateManager::AlterPin(int32_t slotId, std::string newPin, std::string oldPin, LockStatusResponse &response)
+bool SimStateManager::AlterPin(
+    int32_t slotId, const std::string &newPin, const std::string &oldPin, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {
@@ -210,7 +213,7 @@ bool SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, Lock
         simStateHandle_->SetLockState(slotId, options);
         while (!responseReady_) {
             TELEPHONY_LOGI("SetLockState::wait(), response = false");
-            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == std::cv_status::timeout) {
                 break;
             }
         }
@@ -254,7 +257,7 @@ int32_t SimStateManager::GetLockState(int32_t slotId, LockType lockType)
     return ret;
 }
 
-bool SimStateManager::UnlockPin2(int32_t slotId, std::string pin2, LockStatusResponse &response)
+bool SimStateManager::UnlockPin2(int32_t slotId, const std::string &pin2, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {
@@ -283,7 +286,8 @@ bool SimStateManager::UnlockPin2(int32_t slotId, std::string pin2, LockStatusRes
     return true;
 }
 
-bool SimStateManager::UnlockPuk2(int32_t slotId, std::string newPin2, std::string puk2, LockStatusResponse &response)
+bool SimStateManager::UnlockPuk2(
+    int32_t slotId, const std::string &newPin2, const std::string &puk2, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {
@@ -312,7 +316,8 @@ bool SimStateManager::UnlockPuk2(int32_t slotId, std::string newPin2, std::strin
     return true;
 }
 
-bool SimStateManager::AlterPin2(int32_t slotId, std::string newPin2, std::string oldPin2, LockStatusResponse &response)
+bool SimStateManager::AlterPin2(
+    int32_t slotId, const std::string &newPin2, const std::string &oldPin2, LockStatusResponse &response)
 {
     int32_t ret = UNLOCK_OK;
     if (simStateHandle_ != nullptr) {

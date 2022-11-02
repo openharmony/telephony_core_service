@@ -12,3 +12,4 @@
 # limitations under the License.
 
 persist.telephony.="radio:radio:775"
+telephony.="radio:radio:775"

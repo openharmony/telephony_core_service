@@ -26,60 +26,65 @@ ImsCoreServiceCallbackProxy::ImsCoreServiceCallbackProxy(const sptr<IRemoteObjec
 int32_t ImsCoreServiceCallbackProxy::UpdateImsServiceStatusChanged(
     int32_t slotId, const ImsServiceStatus &imsServiceStatus)
 {
-    MessageOption option;
     MessageParcel in;
-    MessageParcel out;
-    if (!in.WriteInterfaceToken(ImsCoreServiceCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor token fail!");
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        TELEPHONY_LOGE("write slotId fail!");
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t ret = WriteCommonInfo(__FUNCTION__, in, slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("[slot%{public}d]Write imsServiceStatus fail!", slotId);
+        return ret;
     }
     if (!in.WriteRawData((const void *)&imsServiceStatus, sizeof(ImsServiceStatus))) {
-        TELEPHONY_LOGE("write imsServiceStatus fail!");
+        TELEPHONY_LOGE("[slot%{public}d]Write imsServiceStatus fail!", slotId);
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    sptr<IRemoteObject> remote = Remote();
-    if (remote== nullptr) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = remote->SendRequest(IMS_SERVICE_STATUS_REPORT, in, out, option);
-    if (error == ERR_NONE) {
-        TELEPHONY_LOGE("send imsServiceStatus fail!");
-        return out.ReadInt32();
-    }
-    return error;
+    return SendRequest(in, slotId, IMS_SERVICE_STATUS_REPORT);
 }
 
 int32_t ImsCoreServiceCallbackProxy::GetImsRegistrationStatusResponse(
     int32_t slotId, const ImsRegistrationStatus &imsRegStatus)
 {
-    MessageOption option;
     MessageParcel in;
-    MessageParcel out;
+    int32_t ret = WriteCommonInfo(__FUNCTION__, in, slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("[slot%{public}d]Write WriteCommonInfo fail!", slotId);
+        return ret;
+    }
+    if (!in.WriteRawData((const void *)&imsRegStatus, sizeof(ImsRegistrationStatus))) {
+        TELEPHONY_LOGE("[slot%{public}d]Write imsRegStatus fail!", slotId);
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    return SendRequest(in, slotId, IMS_GET_REGISTRATION_STATUS);
+}
+
+int32_t ImsCoreServiceCallbackProxy::WriteCommonInfo(std::string funcName, MessageParcel &in, int32_t slotId)
+{
     if (!in.WriteInterfaceToken(ImsCoreServiceCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor token fail!");
+        TELEPHONY_LOGE("[slot%{public}d] %{public}s Write descriptor token fail!", slotId, funcName.c_str());
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     if (!in.WriteInt32(slotId)) {
-        TELEPHONY_LOGE("write info fail!");
+        TELEPHONY_LOGE("[slot%{public}d] %{public}s Write slotId fail!", slotId, funcName.c_str());
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteRawData((const void *)&imsRegStatus, sizeof(ImsRegistrationStatus))) {
-        TELEPHONY_LOGE("write imsRegStatus fail!");
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t ImsCoreServiceCallbackProxy::SendRequest(MessageParcel &in, int32_t slotId, int32_t eventId)
+{
+    MessageParcel out;
+    MessageOption option;
+
     sptr<IRemoteObject> remote = Remote();
-    if (remote== nullptr) {
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("[slot%{public}d]Remote is null, eventId:%{public}d", slotId, eventId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = remote->SendRequest(IMS_GET_REGISTRATION_STATUS, in, out, option);
+
+    int32_t error = remote->SendRequest(eventId, in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
-    return error;
+    TELEPHONY_LOGE("[slot%{public}d]SendRequest fail, eventId:%{public}d, error:%{public}d", slotId, eventId, error);
+    return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -54,7 +54,9 @@ private:
     void NotifyPsRadioTechChange();
     void NotifyEmergencyChange();
     void NotifyNrStateChange();
-    void NotifyImsStateChange(const ImsServiceType imsSrvType, const ImsRegInfo info);
+    void NotifyImsStateChange(ImsServiceType imsSrvType, const ImsRegInfo &info);
+
+private:
     std::mutex mutex_;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     std::unique_ptr<NetworkState> networkState_ = nullptr;

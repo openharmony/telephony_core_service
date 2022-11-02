@@ -148,7 +148,7 @@ int32_t TelRilSms::SetCBConfig(
 }
 
 int32_t TelRilSms::SetCdmaCBConfig(
-    CdmaCBConfigInfoList &cdmaCBConfigInfoList, const AppExecFwk::InnerEvent::Pointer &response)
+    const CdmaCBConfigInfoList &cdmaCBConfigInfoList, const AppExecFwk::InnerEvent::Pointer &response)
 {
     HDI::Ril::V1_0::CdmaCBConfigInfoList iCdmaCBConfigInfoList;
     iCdmaCBConfigInfoList.size = cdmaCBConfigInfoList.size;
@@ -232,7 +232,7 @@ uint8_t *TelRilSms::ConvertHexStringToBytes(const uint8_t *hexString, size_t len
             free(bytes);
             return nullptr;
         }
-        bytes[i / HEX_NUM_PER_BYTE] = (((uint32_t)hexCh1 << BIT_NUM_PER_HEX) | hexCh2);
+        bytes[i / HEX_NUM_PER_BYTE] = ((hexCh1 << BIT_NUM_PER_HEX) | hexCh2);
         i += HEX_NUM_PER_BYTE;
     }
     return bytes;

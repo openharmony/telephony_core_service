@@ -47,15 +47,24 @@ void SimAccountManager::Init(int32_t slotId)
         TELEPHONY_LOGE("SimAccountManager::init SimAccountManager invalid slotId = %{public}d", slotId);
         return;
     }
-    simAccountRunner_ = AppExecFwk::EventRunner::Create("SimAccountManager");
-    operatorConfigCache_ = std::make_shared<OperatorConfigCache>(simAccountRunner_, simFileManager_, slotId);
+    operatorConfigCacheRunner_ = AppExecFwk::EventRunner::Create("OperatorConfigCache");
+    if (operatorConfigCacheRunner_.get() == nullptr) {
+        TELEPHONY_LOGE("SimAccountManager::Init operatorConfigCacheRunner_ failed");
+        return;
+    }
+    operatorConfigCache_ = std::make_shared<OperatorConfigCache>(operatorConfigCacheRunner_, simFileManager_, slotId);
     if (operatorConfigCache_ == nullptr) {
         TELEPHONY_LOGE("SimAccountManager::operatorConfigCache_ is null");
         return;
     }
     operatorConfigCache_->RegisterForIccChange();
-    simStateTracker_ = std::make_shared<SimStateTracker>(
-        simAccountRunner_, simFileManager_, operatorConfigCache_, slotId);
+    simStateTrackerRunner_ = AppExecFwk::EventRunner::Create("SimStateTracker");
+    if (simStateTrackerRunner_.get() == nullptr) {
+        TELEPHONY_LOGE("SimAccountManager::Init simStateTrackerRunner_ failed");
+        return;
+    }
+    simStateTracker_ =
+        std::make_shared<SimStateTracker>(simStateTrackerRunner_, simFileManager_, operatorConfigCache_, slotId);
     if (simStateTracker_ == nullptr) {
         TELEPHONY_LOGE("SimAccountManager::simStateTracker_ is null");
         return;

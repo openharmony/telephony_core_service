@@ -30,6 +30,9 @@ OperatorConfigCache::OperatorConfigCache(const std::shared_ptr<AppExecFwk::Event
     std::shared_ptr<SimFileManager> simFileManager, int32_t slotId)
     : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), slotId_(slotId)
 {
+    if (runner != nullptr) {
+        runner->Run();
+    }
     TELEPHONY_LOGI("OperatorConfigCache create");
 }
 
@@ -71,28 +74,35 @@ bool OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &poc
     std::lock_guard<std::mutex> lock(mutex_);
     std::string iccid = Str16ToStr8(simFileManager_->GetSimIccId());
     std::string filename = EncryptIccId(iccid) + ".json";
+    std::string opkey = GetOpKey(slotId);
+    if (opkey == std::string(INITIAL_OPKEY)) {
+        TELEPHONY_LOGI("load default operator config");
+        filename = DEFAULT_OPERATOR_CONFIG;
+    }
+    int32_t simState = CoreManagerInner::GetInstance().GetSimState(slotId);
+    TELEPHONY_LOGI("LoadOperatorConfig simState = %{public}d", simState);
+    bool canAnnounceChanged = (simState == static_cast<int32_t>(SimState::SIM_STATE_NOT_PRESENT) ||
+                               simState == static_cast<int32_t>(SimState::SIM_STATE_READY));
     Json::Value opcJson;
-    int32_t simState = CoreManagerInner::GetInstance().GetSimState(slotId_);
-    bool canReadOrSaveCache = !(iccid.empty()) && simState != static_cast<int32_t>(SimState::SIM_STATE_NOT_PRESENT) &&
-        simState != static_cast<int32_t>(SimState::SIM_STATE_LOCKED);
-    if (canReadOrSaveCache &&
-        parser_.ParseOperatorConfigFromFile(poc, parser_.GetOperatorConfigFilePath(filename), opcJson)) {
+    if (parser_.ParseOperatorConfigFromFile(poc, parser_.GetOperatorConfigFilePath(filename), opcJson)) {
         TELEPHONY_LOGI("load from file success opc size %{public}zu", poc.configValue.size());
         if (poc.configValue.size() > 0) {
             CopyOperatorConfig(poc, opc_);
-            AnnounceOperatorConfigChanged(slotId);
+            if (canAnnounceChanged) {
+                AnnounceOperatorConfigChanged(slotId);
+            }
             return true;
         }
     }
     if (parser_.ParseFromCustomSystem(slotId, poc, opcJson)) {
         TELEPHONY_LOGI("load from custom system success");
-        if (canReadOrSaveCache) {
-            TELEPHONY_LOGI("save cache");
-            parser_.WriteOperatorConfigJson(filename, opcJson);
-        }
+        parser_.WriteOperatorConfigJson(filename, opcJson);
+
         if (poc.configValue.size() > 0) {
             CopyOperatorConfig(poc, opc_);
-            AnnounceOperatorConfigChanged(slotId);
+            if (canAnnounceChanged) {
+                AnnounceOperatorConfigChanged(slotId);
+            }
             return true;
         }
     }
