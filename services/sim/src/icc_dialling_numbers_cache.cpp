@@ -59,6 +59,10 @@ void IccDiallingNumbersCache::Init()
 
 void IccDiallingNumbersCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGI("IccDiallingNumbersCache ProcessEvent Id is %{public}d", id);
     switch (id) {
@@ -79,6 +83,10 @@ void IccDiallingNumbersCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
 void IccDiallingNumbersCache::ProcessObtainPbrDetailsDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     std::unique_ptr<UsimResult> fd = event->GetUniqueObject<UsimResult>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return;
+    }
     int fileId = fd->fileID;
     std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList =
         std::static_pointer_cast<std::vector<std::shared_ptr<DiallingNumbersInfo>>>(fd->result);
@@ -96,6 +104,10 @@ void IccDiallingNumbersCache::ProcessObtainPbrDetailsDone(const AppExecFwk::Inne
 void IccDiallingNumbersCache::ProcessObtainAdnDetailsDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     std::unique_ptr<DiallingNumbersHandlerResult> fd = event->GetUniqueObject<DiallingNumbersHandlerResult>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return;
+    }
     int fileId = fd->fileID;
     std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList =
         std::static_pointer_cast<std::vector<std::shared_ptr<DiallingNumbersInfo>>>(fd->result);
@@ -118,6 +130,10 @@ void IccDiallingNumbersCache::ProcessObtainAdnDetailsDone(const AppExecFwk::Inne
 void IccDiallingNumbersCache::ProcessChangeDiallingNumbersDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     std::unique_ptr<DiallingNumbersHandlerResult> fd = event->GetUniqueObject<DiallingNumbersHandlerResult>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return;
+    }
     int fileId = fd->fileID;
     int index = fd->index;
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::static_pointer_cast<DiallingNumbersInfo>(fd->result);
@@ -325,6 +341,10 @@ AppExecFwk::InnerEvent::Pointer IccDiallingNumbersCache::BuildCallerInfo(
     holder->callerCache->caller = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(caller));
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventid, holder, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(shared_from_this());
     return event;
 }
@@ -338,6 +358,10 @@ AppExecFwk::InnerEvent::Pointer IccDiallingNumbersCache::CreateUsimPointer(
     holder->callerCache->caller = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(caller));
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventid, holder, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(shared_from_this());
     return event;
 }
@@ -345,6 +369,10 @@ AppExecFwk::InnerEvent::Pointer IccDiallingNumbersCache::CreateUsimPointer(
 bool IccDiallingNumbersCache::IsDiallingNumberEqual(
     const std::shared_ptr<DiallingNumbersInfo> &src, const std::shared_ptr<DiallingNumbersInfo> &dest)
 {
+    if (src == nullptr) {
+        TELEPHONY_LOGE("src is nullptr!");
+        return false;
+    }
     return (StringEqual(src->name_, dest->name_) &&
         StringEqual(src->number_, dest->number_) && ArrayEqual(src->emails_, dest->emails_));
 }

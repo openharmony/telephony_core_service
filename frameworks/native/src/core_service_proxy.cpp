@@ -24,6 +24,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t MAX_SIZE = 1000;
 bool CoreServiceProxy::WriteInterfaceToken(MessageParcel &data)
 {
     if (!data.WriteInterfaceToken(CoreServiceProxy::GetDescriptor())) {
@@ -270,6 +271,10 @@ void CoreServiceProxy::ProcessSignalInfo(MessageParcel &reply, std::vector<sptr<
 {
     int32_t size = reply.ReadInt32();
     TELEPHONY_LOGI("CoreServiceProxy::GetSignalInfoList size:%{public}d\n", size);
+    if (size >= MAX_SIZE) {
+        TELEPHONY_LOGE("CoreServiceProxy::GetSignalInfoList over max size");
+        return;
+    }
     SignalInformation::NetworkType type;
     for (int i = 0; i < size; ++i) {
         type = static_cast<SignalInformation::NetworkType>(reply.ReadInt32());
@@ -1832,6 +1837,10 @@ std::vector<std::shared_ptr<DiallingNumbersInfo>> CoreServiceProxy::QueryIccDial
     }
     int32_t size = reply.ReadInt32();
     TELEPHONY_LOGI("CoreServiceProxy::QueryIccDiallingNumbers size:%{public}d\n", size);
+    if (size >= MAX_SIZE) {
+        TELEPHONY_LOGE("CoreServiceProxy::QueryIccDiallingNumbers over max size");
+        return result;
+    }
     for (int i = 0; i < size; i++) {
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = DiallingNumbersInfo::UnMarshalling(reply);
         result.emplace_back(diallingNumber);
@@ -2277,6 +2286,10 @@ void CoreServiceProxy::ProcessCellInfo(MessageParcel &reply, std::vector<sptr<Ce
 {
     int32_t size = reply.ReadInt32();
     TELEPHONY_LOGI("CoreServiceProxy::ProcessCellInfo size:%{public}d\n", size);
+    if (size >= MAX_SIZE) {
+        TELEPHONY_LOGE("CoreServiceProxy::ProcessCellInfo over max size");
+        return;
+    }
     CellInformation::CellType type;
     for (int i = 0; i < size; ++i) {
         type = static_cast<CellInformation::CellType>(reply.ReadInt32());

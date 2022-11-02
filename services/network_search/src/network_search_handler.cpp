@@ -261,6 +261,10 @@ void NetworkSearchHandler::SimRecordsLoaded(const AppExecFwk::InnerEvent::Pointe
 
 void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioStateChange event is nullptr!");
+        return;
+    }
     std::shared_ptr<HRilInt32Parcel> object = event->GetSharedObject<HRilInt32Parcel>();
     if (object == nullptr) {
         TELEPHONY_LOGE("NetworkSearchHandler::RadioStateChange object is nullptr!");
@@ -306,6 +310,10 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
 
 void NetworkSearchHandler::RadioRestrictedState(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioRestrictedState event is nullptr!");
+        return;
+    }
     if (networkRegister_ != nullptr) {
         networkRegister_->ProcessRestrictedState(event);
     }
@@ -314,6 +322,10 @@ void NetworkSearchHandler::RadioRestrictedState(const AppExecFwk::InnerEvent::Po
 
 void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioRilDataRegState event is nullptr!");
+        return;
+    }
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr ||
         networkSearchManager->GetRadioState(slotId_) == static_cast<int>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
@@ -328,6 +340,10 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
 
 void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioRilVoiceRegState event is nullptr!");
+        return;
+    }
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr ||
         networkSearchManager->GetRadioState(slotId_) == static_cast<int>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
@@ -342,6 +358,10 @@ void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::P
 
 void NetworkSearchHandler::RadioSignalStrength(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioSignalStrength event is nullptr!");
+        return;
+    }
     if (signalInfo_ != nullptr) {
         signalInfo_->ProcessSignalIntensity(slotId_, event);
     }
@@ -350,6 +370,10 @@ void NetworkSearchHandler::RadioSignalStrength(const AppExecFwk::InnerEvent::Poi
 
 void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioRilOperator event is nullptr!");
+        return;
+    }
     if (operatorName_ != nullptr) {
         operatorName_->HandleOperatorInfo(event);
     }
@@ -457,6 +481,10 @@ void NetworkSearchHandler::RadioOnState()
 
 void NetworkSearchHandler::GetRadioStateResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::GetRadioStateResponse event is nullptr!");
+        return;
+    }
     if (radioInfo_ == nullptr) {
         TELEPHONY_LOGE("RadioInfo is null slotId:%{public}d", slotId_);
         return;
@@ -466,6 +494,10 @@ void NetworkSearchHandler::GetRadioStateResponse(const AppExecFwk::InnerEvent::P
 
 void NetworkSearchHandler::SetRadioStateResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::SetRadioStateResponse event is nullptr!");
+        return;
+    }
     if (radioInfo_ == nullptr) {
         TELEPHONY_LOGE("RadioInfo is null slotId:%{public}d", slotId_);
         return;
@@ -536,6 +568,10 @@ void NetworkSearchHandler::GetRilCsRegistration(bool checkTime)
 
 void NetworkSearchHandler::NetworkSearchResult(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::NetworkSearchResult event is nullptr!");
+        return;
+    }
     if (networkSelection_ == nullptr) {
         TELEPHONY_LOGE("NetworkSearchResult NetworkSelection is null slotId:%{public}d", slotId_);
         return;
@@ -545,6 +581,10 @@ void NetworkSearchHandler::NetworkSearchResult(const AppExecFwk::InnerEvent::Poi
 
 void NetworkSearchHandler::SetNetworkSelectionModeResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::SetNetworkSelectionModeResponse event is nullptr!");
+        return;
+    }
     if (networkSelection_ == nullptr) {
         TELEPHONY_LOGE("SetNetworkSelectionModeResponse NetworkSelection is null slotId:%{public}d", slotId_);
         return;
@@ -554,6 +594,10 @@ void NetworkSearchHandler::SetNetworkSelectionModeResponse(const AppExecFwk::Inn
 
 void NetworkSearchHandler::GetNetworkSelectionModeResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::GetNetworkSelectionModeResponse event is nullptr!");
+        return;
+    }
     if (networkSelection_ == nullptr) {
         TELEPHONY_LOGE("GetNetworkSelectionModeResponse NetworkSelection is null slotId:%{public}d", slotId_);
         return;
@@ -580,6 +624,10 @@ bool NetworkSearchHandler::TimeOutCheck(int64_t &lastTime, bool checkTime)
 
 void NetworkSearchHandler::GetPreferredNetworkResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::GetPreferredNetworkResponse event is nullptr!");
+        return;
+    }
     if (networkType_ != nullptr) {
         networkType_->ProcessGetPreferredNetwork(event);
     } else {
@@ -589,6 +637,10 @@ void NetworkSearchHandler::GetPreferredNetworkResponse(const AppExecFwk::InnerEv
 
 void NetworkSearchHandler::SetPreferredNetworkResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::SetPreferredNetworkResponse event is nullptr!");
+        return;
+    }
     if (networkType_ != nullptr) {
         networkType_->ProcessSetPreferredNetwork(event);
     } else {
@@ -598,6 +650,10 @@ void NetworkSearchHandler::SetPreferredNetworkResponse(const AppExecFwk::InnerEv
 
 void NetworkSearchHandler::RadioNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioNitzUpdate event is nullptr!");
+        return;
+    }
     if (nitzUpdate_ != nullptr) {
         nitzUpdate_->ProcessNitzUpdate(event);
     } else {
@@ -607,6 +663,10 @@ void NetworkSearchHandler::RadioNitzUpdate(const AppExecFwk::InnerEvent::Pointer
 
 void NetworkSearchHandler::RadioGetImei(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioGetImei event is nullptr!");
+        return;
+    }
     TELEPHONY_LOGI("NetworkSearchHandler::RadioGetImei start slotId:%{public}d", slotId_);
     if (radioInfo_ != nullptr) {
         radioInfo_->ProcessGetImei(event);
@@ -618,6 +678,10 @@ void NetworkSearchHandler::RadioGetImei(const AppExecFwk::InnerEvent::Pointer &e
 void NetworkSearchHandler::RadioGetMeid(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("NetworkSearchHandler::RadioGetMeid start slotId:%{public}d", slotId_);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioGetMeid event is nullptr!");
+        return;
+    }
     if (radioInfo_ != nullptr) {
         radioInfo_->ProcessGetMeid(event);
     } else {
@@ -636,6 +700,10 @@ void NetworkSearchHandler::UpdatePhone(RadioTech csRadioTech, const RadioTech &p
 
 void NetworkSearchHandler::RadioGetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioGetCurrentCellInfo event is nullptr!");
+        return;
+    }
     if (cellInfo_ != nullptr) {
         cellInfo_->ProcessCurrentCellInfo(event);
     }
@@ -643,6 +711,10 @@ void NetworkSearchHandler::RadioGetCurrentCellInfo(const AppExecFwk::InnerEvent:
 
 void NetworkSearchHandler::RadioCurrentCellInfoUpdate(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioCurrentCellInfoUpdate event is nullptr!");
+        return;
+    }
     if (cellInfo_ != nullptr) {
         cellInfo_->ProcessCurrentCellInfo(event);
     }
@@ -650,6 +722,10 @@ void NetworkSearchHandler::RadioCurrentCellInfoUpdate(const AppExecFwk::InnerEve
 
 void NetworkSearchHandler::RadioGetNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioGetNeighboringCellInfo event is nullptr!");
+        return;
+    }
     if (cellInfo_ != nullptr) {
         cellInfo_->ProcessNeighboringCellInfo(event);
     }
@@ -720,6 +796,10 @@ PhoneType NetworkSearchHandler::GetPhoneType()
 
 void NetworkSearchHandler::RadioChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioChannelConfigInfo event is nullptr!");
+        return;
+    }
     if (networkRegister_ != nullptr) {
         networkRegister_->ProcessChannelConfigInfo(event);
     }
@@ -773,6 +853,10 @@ void NetworkSearchHandler::UpdateImsRegisterState(const AppExecFwk::InnerEvent::
 
 void NetworkSearchHandler::RadioVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioVoiceTechChange event is nullptr!");
+        return;
+    }
     if (radioInfo_ != nullptr) {
         radioInfo_->ProcessVoiceTechChange(event);
     }
