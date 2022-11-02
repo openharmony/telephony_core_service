@@ -1626,6 +1626,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimAccountInfo_0200, Function | MediumTest | 
  */
 void SetLockStateTestFunc(CoreServiceTestHelper &helper)
 {
+    AccessToken token;
     LockInfo testInfo;
     testInfo.lockType = LockType::PIN_LOCK;
     testInfo.password = Str8ToStr16("1234");
@@ -1662,6 +1663,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetLockState_0100, Function | MediumTest | Level
  */
 void SetLockStateTestFunc1(CoreServiceTestHelper &helper)
 {
+    AccessToken token;
     LockInfo testInfo;
     testInfo.lockType = LockType::PIN_LOCK;
     testInfo.password = Str8ToStr16("1234");
@@ -1768,6 +1770,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetFDNState_0200, Function | MediumTest | Level2
  */
 void GetLockStateTestFunc(CoreServiceTestHelper &helper)
 {
+    AccessToken token;
     LockType lockType = LockType::PIN_LOCK;
     int32_t result = SimTest::telephonyService_->GetLockState(SimTest::slotId_, lockType);
     helper.SetIntResult(result);
@@ -1798,6 +1801,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetLockState_0100, Function | MediumTest | Level
  */
 void GetLockStateTestFunc1(CoreServiceTestHelper &helper)
 {
+    AccessToken token;
     LockType lockType = LockType::PIN_LOCK;
     int32_t result = SimTest::telephonyService_->GetLockState(SimTest::slotId1_, lockType);
     helper.SetIntResult(result);
@@ -1828,6 +1832,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetLockState_0200, Function | MediumTest | Level
  */
 void GetFDNStateTestFunc(CoreServiceTestHelper &helper)
 {
+    AccessToken token;
     LockType lockType = LockType::FDN_LOCK;
     int32_t result = SimTest::telephonyService_->GetLockState(SimTest::slotId_, lockType);
     helper.SetIntResult(result);
@@ -1858,6 +1863,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetFDNState_0100, Function | MediumTest | Level3
  */
 void GetFDNStateTestFunc1(CoreServiceTestHelper &helper)
 {
+    AccessToken token;
     LockType lockType = LockType::FDN_LOCK;
     int32_t result = SimTest::telephonyService_->GetLockState(SimTest::slotId1_, lockType);
     helper.SetIntResult(result);
@@ -1888,6 +1894,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetFDNState_0200, Function | MediumTest | Level3
  */
 void UnlockPinTestFunc(CoreServiceTestHelper &helper)
 {
+    AccessToken token;
     const std::u16string pin = Str8ToStr16("1234");
     LockStatusResponse response = { 0 };
     bool result = SimTest::telephonyService_->UnlockPin(SimTest::slotId_, pin, response);
@@ -2644,6 +2651,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetCardType_0200, Function | MediumTest | Level3
  */
 void UnlockSimLockTestFunc(CoreServiceTestHelper &helper)
 {
+    AccessToken token;
     PersoLockInfo lockInfo;
     lockInfo.lockType = PersoLockType::PN_PIN_LOCK;
     lockInfo.password = Str8ToStr16("1234");
@@ -2679,6 +2687,7 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockSimLock_0100, Function | MediumTest | Leve
  */
 void UnlockSimLockTestFunc1(CoreServiceTestHelper &helper)
 {
+    AccessToken token;
     PersoLockInfo lockInfo;
     lockInfo.lockType = PersoLockType::PN_PIN_LOCK;
     lockInfo.password = Str8ToStr16("1234");
