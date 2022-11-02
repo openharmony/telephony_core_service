@@ -410,7 +410,7 @@ bool CellInfo::ProcessNeighboringCellTdscdma(CellNearbyInfo *cellInfo)
 bool CellInfo::ProcessNeighboringCellNr(CellNearbyInfo *cellInfo)
 {
     sptr<NrCellInformation> cell = new NrCellInformation;
-    if (cell != nullptr) {
+    if (cell != nullptr && cellInfo != nullptr) {
         int32_t &nrArfcn = cellInfo->ServiceCellParas.nr.nrArfcn;
         int32_t &pci = cellInfo->ServiceCellParas.nr.pci;
         int32_t &tac = cellInfo->ServiceCellParas.nr.tac;
@@ -529,7 +529,7 @@ bool CellInfo::ProcessCurrentCellTdscdma(CurrentCellInfo *cellInfo)
 bool CellInfo::ProcessCurrentCellNr(CurrentCellInfo *cellInfo)
 {
     sptr<NrCellInformation> cell = new NrCellInformation;
-    if (cell != nullptr) {
+    if (cell != nullptr && cellInfo != nullptr) {
         int32_t &nrArfcn = cellInfo->ServiceCellParas.nr.nrArfcn;
         int32_t &pci = cellInfo->ServiceCellParas.nr.pci;
         int32_t &tac = cellInfo->ServiceCellParas.nr.tac;

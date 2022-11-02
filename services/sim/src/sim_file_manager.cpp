@@ -459,6 +459,10 @@ std::shared_ptr<IccDiallingNumbersHandler> SimFileManager::ObtainDiallingNumberH
 
 void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGI("SimFileManager::ProcessEvent id %{public}d", id);
     if (simStateManager_ == nullptr) {

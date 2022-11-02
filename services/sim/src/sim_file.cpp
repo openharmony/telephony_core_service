@@ -91,6 +91,10 @@ void SimFile::UpdateMsisdnNumber(
 
 void SimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     auto id = event->GetInnerEventId();
     TELEPHONY_LOGI("SimFile::ProcessEvent id %{public}d", id);
     auto itFunc = memberFuncMap_.find(id);
@@ -272,6 +276,10 @@ void SimFile::StartObtainSpn()
 
 void SimFile::ProcessSpnGeneral(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     if (fd != nullptr && fd->exception == nullptr) {
         std::string iccData = fd->resultData;
@@ -304,6 +312,10 @@ void SimFile::ProcessSpnGeneral(const AppExecFwk::InnerEvent::Pointer &event)
 
 void SimFile::ProcessSpnCphs(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     if (fd != nullptr && fd->exception == nullptr) {
         std::string iccData = fd->resultData;
@@ -329,6 +341,10 @@ void SimFile::ProcessSpnCphs(const AppExecFwk::InnerEvent::Pointer &event)
 
 void SimFile::ProcessSpnShortCphs(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     if (fd != nullptr && fd->exception == nullptr) {
         std::string iccData = fd->resultData;
@@ -456,6 +472,10 @@ void SimFile::UpdateSimLanguage()
 
 bool SimFile::ProcessObtainLiLanguage(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return true;
+    }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     if (fd != nullptr && fd->exception == nullptr) {
         efLi_ = fd->resultData;
@@ -473,6 +493,10 @@ bool SimFile::ProcessObtainLiLanguage(const AppExecFwk::InnerEvent::Pointer &eve
 
 bool SimFile::ProcessObtainPlLanguage(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return true;
+    }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     if (fd != nullptr && fd->exception == nullptr) {
         efPl_ = fd->resultData;
@@ -501,9 +525,17 @@ void SimFile::ProcessSms(std::string data) {}
 
 bool SimFile::ProcessObtainGid1Done(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     char *rawData = const_cast<char *>(iccData.c_str());
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
 
@@ -520,9 +552,17 @@ bool SimFile::ProcessObtainGid1Done(const AppExecFwk::InnerEvent::Pointer &event
 
 bool SimFile::ProcessObtainGid2Done(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     char *rawData = const_cast<char *>(iccData.c_str());
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
 
@@ -539,9 +579,17 @@ bool SimFile::ProcessObtainGid2Done(const AppExecFwk::InnerEvent::Pointer &event
 
 bool SimFile::ProcessGetMsisdnDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<DiallingNumbersHandlerResult> fd = event->GetUniqueObject<DiallingNumbersHandlerResult>();
-    std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::static_pointer_cast<DiallingNumbersInfo>(fd->result);
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<DiallingNumbersHandlerResult> fd = event->GetUniqueObject<DiallingNumbersHandlerResult>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::static_pointer_cast<DiallingNumbersInfo>(fd->result);
     if (fd->exception != nullptr) {
         TELEPHONY_LOGE("SimFile Invalid or missing EF[MSISDN]");
         return isFileProcessResponse;
@@ -553,9 +601,17 @@ bool SimFile::ProcessGetMsisdnDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessSetMsisdnDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = false;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     if (fd->exception == nullptr) {
         msisdn_ = lastMsisdn_;
         msisdnTag_ = lastMsisdnTag_;
@@ -566,9 +622,17 @@ bool SimFile::ProcessSetMsisdnDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessGetSpdiDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     char *rawData = const_cast<char *>(iccData.c_str());
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
 
@@ -582,9 +646,17 @@ bool SimFile::ProcessGetSpdiDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessGetCfisDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     char *rawData = const_cast<char *>(iccData.c_str());
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
 
@@ -599,9 +671,17 @@ bool SimFile::ProcessGetCfisDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessGetMbiDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     char *rawData = const_cast<char *>(iccData.c_str());
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
     if (fd->exception == nullptr) {
@@ -622,8 +702,16 @@ bool SimFile::ProcessGetMbiDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessGetMbdnDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<DiallingNumbersHandlerResult> fd = event->GetUniqueObject<DiallingNumbersHandlerResult>();
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<DiallingNumbersHandlerResult> fd = event->GetUniqueObject<DiallingNumbersHandlerResult>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     bool hasException = fd->exception == nullptr;
     TELEPHONY_LOGI("ProcessGetMbdnDone start %{public}d", hasException);
     voiceMailNum_ = IccFileController::NULLSTR;
@@ -651,8 +739,16 @@ bool SimFile::ProcessGetMbdnDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessGetCphsMailBoxDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<DiallingNumbersHandlerResult> fd = event->GetUniqueObject<DiallingNumbersHandlerResult>();
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<DiallingNumbersHandlerResult> fd = event->GetUniqueObject<DiallingNumbersHandlerResult>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     bool hasException = fd->exception == nullptr;
     TELEPHONY_LOGI("ProcessGetCphsMailBoxDone start %{public}d", hasException);
     voiceMailNum_ = IccFileController::NULLSTR;
@@ -683,9 +779,17 @@ void SimFile::GetCphsMailBox()
 
 bool SimFile::ProcessGetMwisDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     char *rawData = const_cast<char *>(iccData.c_str());
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
     TELEPHONY_LOGI("SimFile ELEMENTARY_FILE_MWIS : %{public}s", rawData);
@@ -704,9 +808,17 @@ bool SimFile::ProcessGetMwisDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessVoiceMailCphs(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     char *rawData = const_cast<char *>(iccData.c_str());
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
     TELEPHONY_LOGI("SimFile ELEMENTARY_FILE_CPHS_MWI: %{public}s", rawData);
@@ -720,8 +832,16 @@ bool SimFile::ProcessVoiceMailCphs(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessGetIccIdDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     if (fd->exception == nullptr) {
         std::string iccData = fd->resultData;
         TELEPHONY_LOGI("SimFile::ProcessEvent ICCID result success");
@@ -732,8 +852,16 @@ bool SimFile::ProcessGetIccIdDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessObtainIMSIDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::shared_ptr<std::string> sharedObject = event->GetSharedObject<std::string>();
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::shared_ptr<std::string> sharedObject = event->GetSharedObject<std::string>();
+    if (sharedObject == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     if (sharedObject != nullptr) {
         imsi_ = *sharedObject;
         TELEPHONY_LOGI("SimFile::ProcessEvent IMSI received success");
@@ -748,9 +876,17 @@ bool SimFile::ProcessObtainIMSIDone(const AppExecFwk::InnerEvent::Pointer &event
 
 bool SimFile::ProcessGetCffDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     char *rawData = const_cast<char *>(iccData.c_str());
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
     if (fd->exception != nullptr) {
@@ -764,9 +900,17 @@ bool SimFile::ProcessGetCffDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessGetAdDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     bool doneData = true;
     if (!ObtainIMSI().empty()) {
         std::string imsi = ObtainIMSI();
@@ -836,10 +980,18 @@ void SimFile::CheckMncLength()
 
 bool SimFile::ProcessSmsOnSim(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    bool isFileProcessResponse = false;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     std::string iccData = fd->resultData;
     int index = atoi(iccData.c_str());
-    bool isFileProcessResponse = false;
     if (fd->exception != nullptr || index == INVALID_VALUE) {
         TELEPHONY_LOGE("exception on SMS_ON_SIM with index: %{public}d", index);
     } else {
@@ -852,9 +1004,17 @@ bool SimFile::ProcessSmsOnSim(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessGetAllSmsDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     if (fd->exception != nullptr) {
         return isFileProcessResponse;
     }
@@ -864,9 +1024,17 @@ bool SimFile::ProcessGetAllSmsDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessGetSmsDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = false;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     if (fd->exception == nullptr) {
         ProcessSms(iccData);
     } else {
@@ -877,9 +1045,17 @@ bool SimFile::ProcessGetSmsDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessGetPlmnActDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     char *rawData = const_cast<char *>(iccData.c_str());
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
 
@@ -894,9 +1070,17 @@ bool SimFile::ProcessGetPlmnActDone(const AppExecFwk::InnerEvent::Pointer &event
 // Process operator plmn
 bool SimFile::ProcessGetOplmnActDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     char *rawData = const_cast<char *>(iccData.c_str());
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
 
@@ -910,9 +1094,17 @@ bool SimFile::ProcessGetOplmnActDone(const AppExecFwk::InnerEvent::Pointer &even
 
 bool SimFile::ProcessGetCspCphs(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     char *rawData = const_cast<char *>(iccData.c_str());
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
 
@@ -928,8 +1120,16 @@ bool SimFile::ProcessGetCspCphs(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessGetInfoCphs(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     if (fd->exception != nullptr) {
         return isFileProcessResponse;
     }
@@ -940,9 +1140,17 @@ bool SimFile::ProcessGetInfoCphs(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessGetSstDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     char *rawData = const_cast<char *>(iccData.c_str());
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
 
@@ -1009,9 +1217,17 @@ bool SimFile::ProcessGetOplDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = false;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     if (fd->exception != nullptr) {
         TELEPHONY_LOGE("SimFile failed to update");
     }
@@ -1039,9 +1255,17 @@ bool SimFile::ProcessSetCphsMailbox(const AppExecFwk::InnerEvent::Pointer &event
 // Process forbidden PLMNs
 bool SimFile::ProcessGetHplmActDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     char *rawData = const_cast<char *>(iccData.c_str());
     unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
 
@@ -1057,9 +1281,17 @@ bool SimFile::ProcessGetHplmActDone(const AppExecFwk::InnerEvent::Pointer &event
 // Process Equivalent Home PLMNs
 bool SimFile::ProcessGetEhplmnDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::string iccData = fd->resultData;
     if (fd->exception != nullptr || iccData.empty()) {
         TELEPHONY_LOGE("Failed fetch Equivalent Home PLMNs");
         return isFileProcessResponse;
@@ -1070,9 +1302,17 @@ bool SimFile::ProcessGetEhplmnDone(const AppExecFwk::InnerEvent::Pointer &event)
 // Process forbidden PLMNs
 bool SimFile::ProcessGetFplmnDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    std::string iccData = fd->resultData;
     bool loadResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return loadResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return loadResponse;
+    }
+    std::string iccData = fd->resultData;
     if (fd->exception != nullptr || iccData.empty()) {
         TELEPHONY_LOGE("Failed to get forbidden PLMNs");
         return loadResponse;
