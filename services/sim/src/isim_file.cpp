@@ -41,6 +41,10 @@ void IsimFile::StartLoad()
 
 void IsimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     auto id = event->GetInnerEventId();
     bool isFileHandleResponse = false;
     TELEPHONY_LOGI("IsimFile::ProcessEvent id %{public}d", id);
@@ -88,6 +92,10 @@ void IsimFile::OnAllFilesFetched()
 bool IsimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("IsimFile::SIM_STATE_READY --received");
+    if (stateManager_ == nullptr) {
+        TELEPHONY_LOGE("stateManager_ is nullptr!");
+        return false;
+    }
     if (stateManager_->GetCardType() != CardType::SINGLE_MODE_ISIM_CARD) {
         TELEPHONY_LOGI("invalid IsimFile::SIM_STATE_READY received");
         return false;
@@ -117,8 +125,16 @@ void IsimFile::LoadIsimFiles()
 
 bool IsimFile::ProcessGetIccidDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     if (fd->exception == nullptr) {
         std::string iccData = fd->resultData;
         TELEPHONY_LOGI("IsimFile::ProcessEvent MSG_SIM_OBTAIN_ICCID_DONE result success");
@@ -129,8 +145,16 @@ bool IsimFile::ProcessGetIccidDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool IsimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::shared_ptr<std::string> sharedObject = event->GetSharedObject<std::string>();
     bool isFileHandleResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileHandleResponse;
+    }
+    std::shared_ptr<std::string> sharedObject = event->GetSharedObject<std::string>();
+    if (sharedObject == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileHandleResponse;
+    }
     if (sharedObject != nullptr) {
         imsi_ = *sharedObject;
         TELEPHONY_LOGI("IsimFile::ProcessEvent MSG_SIM_OBTAIN_IMSI_DONE");
@@ -154,8 +178,16 @@ void IsimFile::InitMemberFunc()
 
 bool IsimFile::ProcessGetImpiDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     if (fd->exception != nullptr) {
         TELEPHONY_LOGE("ProcessGetImpiDone get exception");
         return isFileProcessResponse;
@@ -167,8 +199,16 @@ bool IsimFile::ProcessGetImpiDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool IsimFile::ProcessGetIstDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     if (fd->exception != nullptr) {
         TELEPHONY_LOGE("ProcessGetIstDone get exception");
         return isFileProcessResponse;

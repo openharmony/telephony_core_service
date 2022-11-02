@@ -95,6 +95,10 @@ void SimStateHandle::UnlockPin(int32_t slotId, const std::string &pin)
 {
     TELEPHONY_LOGI("SimStateHandle::UnlockPin1() slotId = %{public}d", slotId);
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_PIN_DONE);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     event->SetOwner(shared_from_this());
     telRilManager_->UnlockPin(slotId, pin, event);
 }
@@ -103,6 +107,10 @@ void SimStateHandle::UnlockPuk(int32_t slotId, const std::string &newPin, const 
 {
     TELEPHONY_LOGI("SimStateHandle::UnlockPuk1() slotId = %{public}d", slotId);
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_PUK_DONE);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     event->SetOwner(shared_from_this());
     telRilManager_->UnlockPuk(slotId, puk, newPin, event);
 }
@@ -117,6 +125,10 @@ void SimStateHandle::AlterPin(int32_t slotId, const std::string &newPin, const s
     simPinPassword.oldPassword = oldPin;
     simPinPassword.newPassword = newPin;
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_CHANGE_PIN_DONE);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     event->SetOwner(shared_from_this());
     telRilManager_->ChangeSimPassword(slotId, simPinPassword, event);
 }
@@ -125,6 +137,10 @@ void SimStateHandle::UnlockPin2(int32_t slotId, const std::string &pin2)
 {
     TELEPHONY_LOGI("SimStateHandle::UnlockPin2() slotId = %{public}d", slotId);
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_PIN2_DONE);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     event->SetOwner(shared_from_this());
     telRilManager_->UnlockPin2(slotId, pin2, event);
 }
@@ -133,6 +149,10 @@ void SimStateHandle::UnlockPuk2(int32_t slotId, const std::string &newPin2, cons
 {
     TELEPHONY_LOGI("SimStateHandle::UnlockPuk2() slotId = %{public}d", slotId);
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_PUK2_DONE);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     event->SetOwner(shared_from_this());
     telRilManager_->UnlockPuk2(slotId, puk2, newPin2, event);
 }
@@ -147,6 +167,10 @@ void SimStateHandle::AlterPin2(int32_t slotId, const std::string &newPin2, const
     simPin2Password.oldPassword = oldPin2;
     simPin2Password.newPassword = newPin2;
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_CHANGE_PIN2_DONE);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     event->SetOwner(shared_from_this());
     telRilManager_->ChangeSimPassword(slotId, simPin2Password, event);
 }
@@ -158,6 +182,10 @@ void SimStateHandle::SetLockState(int32_t slotId, const LockInfo &options)
     simLock.mode = static_cast<int32_t>(options.lockState);
     simLock.passwd = Str16ToStr8(options.password);
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_ENABLE_PIN_DONE);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     event->SetOwner(shared_from_this());
     if (LockType::PIN_LOCK == options.lockType) {
         simLock.fac = FAC_PIN_LOCK;
@@ -171,6 +199,10 @@ void SimStateHandle::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo
 {
     TELEPHONY_LOGI("SimStateHandle::UnlockSimLock() slotId = %{public}d", slotId);
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_SIMLOCK_DONE);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     event->SetOwner(shared_from_this());
     if (telRilManager_ == nullptr) {
         TELEPHONY_LOGE("SimStateHandle telRilManager_ is nullptr!!");
@@ -192,6 +224,10 @@ void SimStateHandle::GetLockState(int32_t slotId, LockType lockType)
 {
     TELEPHONY_LOGI("SimStateHandle::GetLockState() slotId = %{public}d", slotId);
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_CHECK_PIN_DONE);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     event->SetOwner(shared_from_this());
     if (LockType::PIN_LOCK == lockType) {
         telRilManager_->GetSimLockStatus(slotId, FAC_PIN_LOCK, event);
@@ -239,6 +275,10 @@ void SimStateHandle::ObtainIccStatus(int32_t slotId)
 {
     TELEPHONY_LOGI("SimStateHandle::ObtainIccStatus() slotId = %{public}d", slotId);
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_GET_ICC_STATUS_DONE);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     event->SetOwner(shared_from_this());
     telRilManager_->GetSimStatus(slotId, event); // get sim card state
 }
@@ -246,6 +286,10 @@ void SimStateHandle::ObtainIccStatus(int32_t slotId)
 void SimStateHandle::ObtainRealtimeIccStatus(int32_t slotId)
 {
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_GET_REALTIME_ICC_STATUS_DONE);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     event->SetOwner(shared_from_this());
     telRilManager_->GetSimStatus(slotId, event); // get sim card state
 }
@@ -257,6 +301,10 @@ int32_t SimStateHandle::SimAuthentication(int32_t slotId, const std::string &aid
         return SIM_AUTH_FAIL;
     }
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_AUTHENTICATION_DONE);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return SIM_AUTH_FAIL;
+    }
     event->SetOwner(shared_from_this());
     SimAuthenticationRequestInfo requireInfo;
     requireInfo.aid = aid;

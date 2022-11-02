@@ -26,6 +26,10 @@ IccFileController::IccFileController(const std::shared_ptr<AppExecFwk::EventRunn
 
 void IccFileController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGI("IccFileController ProcessEvent Id is %{public}d", id);
     if (ProcessErrorResponse(event)) {
@@ -462,6 +466,10 @@ void IccFileController::SendEfLinearResult(const AppExecFwk::InnerEvent::Pointer
     uint32_t id = response->GetInnerEventId();
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(id, object, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     handler->SendEvent(event);
 }
 
@@ -477,6 +485,10 @@ void IccFileController::SendMultiRecordResult(
     int eventParam = 0;
     TELEPHONY_LOGI("IccFileController::SendMultiRecordResult send end");
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(id, object, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     handler->SendEvent(event);
 }
 
@@ -490,6 +502,10 @@ AppExecFwk::InnerEvent::Pointer IccFileController::BuildCallerInfo(
     }
     int64_t eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, msgTo, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(shared_from_this());
     return event;
 }
@@ -506,6 +522,10 @@ AppExecFwk::InnerEvent::Pointer IccFileController::BuildCallerInfo(
     msgTo->arg2 = arg2;
     int64_t eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, msgTo, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(shared_from_this());
     return event;
 }
@@ -527,6 +547,10 @@ AppExecFwk::InnerEvent::Pointer IccFileController::BuildCallerInfo(
     msgTo->arg2 = arg2;
     int64_t eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, msgTo, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(shared_from_this());
     return event;
 }
