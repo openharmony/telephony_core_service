@@ -27,6 +27,10 @@ SimSmsController::SimSmsController(
 
 void SimSmsController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("SimSmsController ProcessEvent event is nullptr");
+        return;
+    }
     uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGI("SimSmsController ProcessEvent Id is %{public}d", id);
     switch (id) {
@@ -50,6 +54,10 @@ void SimSmsController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event
 void SimSmsController::ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("SimSmsController::ProcessLoadDone: start");
+    if (event == nullptr) {
+        TELEPHONY_LOGE("SimSmsController ProcessLoadDone event is nullptr");
+        return;
+    }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     if (fd != nullptr) {
         if (fd->exception != nullptr) {
@@ -76,6 +84,10 @@ void SimSmsController::ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &ev
 
 void SimSmsController::ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("SimSmsController ProcessUpdateDone event is nullptr");
+        return;
+    }
     responseReady_ = true;
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (responseInfo != nullptr) {
@@ -88,6 +100,10 @@ void SimSmsController::ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &
 
 void SimSmsController::ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("SimSmsController ProcessWriteDone event is nullptr");
+        return;
+    }
     responseReady_ = true;
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (responseInfo != nullptr) {
@@ -100,6 +116,10 @@ void SimSmsController::ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &e
 
 void SimSmsController::ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("SimSmsController ProcessDeleteDone event is nullptr");
+        return;
+    }
     responseReady_ = true;
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (responseInfo != nullptr) {
@@ -224,6 +244,10 @@ AppExecFwk::InnerEvent::Pointer SimSmsController::BuildCallerInfo(int eventId)
     std::unique_ptr<FileToControllerMsg> object = std::make_unique<FileToControllerMsg>();
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     event->SetOwner(shared_from_this());
     return event;
 }

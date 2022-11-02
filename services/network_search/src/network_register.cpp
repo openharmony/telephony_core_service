@@ -240,6 +240,10 @@ void NetworkRegister::NotifyNrFrequencyChanged()
         return;
     }
     ssize_t size = channelConfigInfos_.size();
+    if (size >= MAX_SIZE) {
+        TELEPHONY_LOGE("NetworkRegister::ProcessChannelConfigInfo channelConfigInfos_ over max size");
+        return;
+    }
     for (int i = 0; i < size; ++i) {
         std::vector<int32_t> &cids = channelConfigInfos_[i].contextIds;
         if (isFreqChanged) {
@@ -321,6 +325,11 @@ void NetworkRegister::UpdateCfgTech()
 {
     if (nrConfigMap_.find(nrState_) == nrConfigMap_.end()) {
         TELEPHONY_LOGE("NetworkRegister::UpdateCfgTech not find nr state slotId:%{public}d", slotId_);
+        return;
+    }
+
+    if (networkSearchState_ == nullptr) {
+        TELEPHONY_LOGE("NetworkRegister::UpdateCfgTech networkSearchState_ is nullptr slotId:%{public}d", slotId_);
         return;
     }
     RadioTech cfgTech = nrConfigMap_[nrState_];

@@ -29,6 +29,10 @@ RadioInfo::RadioInfo(std::weak_ptr<NetworkSearchManager> networkSearchManager, i
 
 void RadioInfo::ProcessGetRadioState(const AppExecFwk::InnerEvent::Pointer &event) const
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetRadioState event is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
     std::unique_ptr<HRilRadioStateInfo> object = event->GetUniqueObject<HRilRadioStateInfo>();
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
@@ -81,6 +85,10 @@ void RadioInfo::ProcessGetRadioState(const AppExecFwk::InnerEvent::Pointer &even
 
 void RadioInfo::ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &event) const
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessSetRadioState event is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
     std::unique_ptr<HRilRadioStateInfo> object = event->GetUniqueObject<HRilRadioStateInfo>();
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();

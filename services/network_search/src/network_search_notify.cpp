@@ -28,35 +28,38 @@ NetworkSearchNotify::~NetworkSearchNotify() {}
 
 void NetworkSearchNotify::NotifyNetworkStateUpdated(int32_t slotId, const sptr<NetworkState> &networkState)
 {
-    TELEPHONY_LOGI("NotifyNetworkStateUpdated~~~\n");
+    if (networkState == nullptr) {
+        TELEPHONY_LOGE("NotifyNetworkStateUpdated networkState is nullptr");
+        return;
+    }
     int32_t result =
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateNetworkState(slotId, networkState);
     TELEPHONY_LOGI("NotifyNetworkStateUpdated ret %{public}s", networkState->ToString().c_str());
     if (result) {
-        TELEPHONY_LOGE("NotifyNetworkStateUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found\n");
+        TELEPHONY_LOGE("NotifyNetworkStateUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found");
     }
 }
 
 void NetworkSearchNotify::NotifySignalInfoUpdated(
     int32_t slotId, const std::vector<sptr<SignalInformation>> &signalInfos)
 {
-    TELEPHONY_LOGI("NotifySignalInfoUpdated~~~ signalInfos size=%{public}zu\n", signalInfos.size());
+    TELEPHONY_LOGI("NotifySignalInfoUpdated~~~ signalInfos size=%{public}zu", signalInfos.size());
     int32_t result =
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSignalInfo(slotId, signalInfos);
     TELEPHONY_LOGI("NotifySignalInfoUpdated ret %{public}d", result);
     if (result) {
-        TELEPHONY_LOGE("NotifySignalInfoUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found\n");
+        TELEPHONY_LOGE("NotifySignalInfoUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found");
     }
 }
 
 void NetworkSearchNotify::NotifyCellInfoUpdated(int32_t slotId, const std::vector<sptr<CellInformation>> &cellInfos)
 {
-    TELEPHONY_LOGI("NotifyCellInfoUpdated~~~ cell size=%{public}zu\n", cellInfos.size());
+    TELEPHONY_LOGI("NotifyCellInfoUpdated~~~ cell size=%{public}zu", cellInfos.size());
     int32_t result =
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateCellInfo(slotId, cellInfos);
     TELEPHONY_LOGI("NotifyCellInfoUpdated ret %{public}d", result);
     if (result) {
-        TELEPHONY_LOGE("NotifySignalInfoUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found\n");
+        TELEPHONY_LOGE("NotifySignalInfoUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found");
     }
 }
 } // namespace Telephony
