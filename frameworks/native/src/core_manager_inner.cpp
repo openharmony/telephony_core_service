@@ -56,7 +56,7 @@ void CoreManagerInner::SetTelRilMangerObj(std::shared_ptr<ITelRilManager> telRil
 bool CoreManagerInner::IsInitFinishedForTelRil(void)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("CoreManagerInner is %{public}p, for telrilmanager!", this);
+        TELEPHONY_LOGE("telrilmanager is null");
     }
     return telRilManager_ != nullptr;
 }
