@@ -200,8 +200,7 @@ std::shared_ptr<NetworkSearchState> NetworkSearchManager::GetNetworkSearchState(
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
-        TELEPHONY_LOGI("NetworkSearchManager::GetNetworkSearchState %{public}p slotId:%{public}d",
-            inner->networkSearchState_.get(), slotId);
+        TELEPHONY_LOGI("NetworkSearchManager::GetNetworkSearchState slotId:%{public}d", slotId);
         return inner->networkSearchState_;
     }
     return nullptr;
