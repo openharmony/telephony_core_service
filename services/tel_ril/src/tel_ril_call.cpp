@@ -206,7 +206,9 @@ int32_t TelRilCall::SetCallPreferenceModeResponse(const HDI::Ril::V1_0::RilRadio
 int32_t TelRilCall::GetCallPreferenceModeResponse(
     const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, int32_t mode)
 {
-    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo, mode);
+    std::shared_ptr<int32_t> result = std::make_shared<int32_t>();
+    *result = mode;
+    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo, result);
 }
 
 int32_t TelRilCall::SetUssdResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
@@ -216,7 +218,9 @@ int32_t TelRilCall::SetUssdResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &
 
 int32_t TelRilCall::GetUssdResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, int32_t cusd)
 {
-    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo, cusd);
+    std::shared_ptr<int32_t> usdResult = std::make_shared<int32_t>();
+    *usdResult = cusd;
+    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo, usdResult);
 }
 
 int32_t TelRilCall::SetMuteResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
@@ -226,13 +230,17 @@ int32_t TelRilCall::SetMuteResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &
 
 int32_t TelRilCall::GetMuteResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, int32_t mute)
 {
-    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo, mute);
+    std::shared_ptr<int32_t> muteResult = std::make_shared<int32_t>();
+    *muteResult = mute;
+    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo, muteResult);
 }
 
 int32_t TelRilCall::GetCallFailReasonResponse(
     const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, int32_t callFail)
 {
-    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo, callFail);
+    std::shared_ptr<int32_t> failCause = std::make_shared<int32_t>();
+    *failCause = callFail;
+    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo, failCause);
 }
 
 int32_t TelRilCall::SetBarringPasswordResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
