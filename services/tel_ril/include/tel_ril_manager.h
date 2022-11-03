@@ -324,7 +324,7 @@ private:
             //   _obj is a smart pointer, not a native pointer.
             return (_obj.*(_func))(std::forward<ParamTypes>(_args)..., _result);
         } else {
-            TELEPHONY_LOGE("%{public}s - this %{public}p: %{public}s", _module.c_str(), &_obj, "null pointer");
+            TELEPHONY_LOGE("%{public}s - func: %{public}s", _module.c_str(), "null pointer");
             return HRIL_ERR_NULL_POINT;
         }
     }
