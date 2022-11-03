@@ -55,11 +55,10 @@ void NetworkSearchState::SetOperatorInfo(
     std::lock_guard<std::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->SetOperatorInfo(longName, shortName, numeric, domainType);
-        TELEPHONY_LOGI(
-            "NetworkSearchState::SetOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : "
-            "%{public}s, %{public}p slotId:%{public}d",
+        TELEPHONY_LOGI("NetworkSearchState::SetOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : "
+                       "%{public}s, slotId:%{public}d",
             networkState_->GetLongOperatorName().c_str(), networkState_->GetShortOperatorName().c_str(),
-            networkState_->GetPlmnNumeric().c_str(), networkState_.get(), slotId_);
+            networkState_->GetPlmnNumeric().c_str(), slotId_);
     }
 }
 
