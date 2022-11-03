@@ -141,7 +141,7 @@ int32_t TelRilBase::ErrorResponse(
         DfxWriteCallFaultEvent(telRilRequest, static_cast<int32_t>(responseInfo.error));
         return handler->SendEvent(eventId, respInfo);
     } else {
-        TELEPHONY_LOGE("ERROR : telRilRequest  == %p !!!", telRilRequest.get());
+        TELEPHONY_LOGE("ERROR : telRilRequest  or telRilRequest->pointer_ is null !!!");
     }
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
