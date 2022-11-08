@@ -31,10 +31,7 @@ ohos_executable("tel_network_search_test") {
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
-  deps = [
-    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-    "//base/time/time_service/services:time_service",
-  ]
+  deps = [ "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native" ]
 
   external_deps = [
     "ability_base:want",
@@ -47,6 +44,7 @@ ohos_executable("tel_network_search_test") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "time_service:time_client",
   ]
 
   defines = [
