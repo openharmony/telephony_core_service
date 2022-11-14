@@ -216,6 +216,8 @@ public:
 
     int64_t GetSpendTime();
 
+    int32_t GetServiceRunningState();
+
 private:
     bool Init();
 

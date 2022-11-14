@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef SETVOICEMAILINFO_FUZZER_H_
-#define SETVOICEMAILINFO_FUZZER_H_
+#ifndef SETVOICEMAILINFO_FUZZER_H
+#define SETVOICEMAILINFO_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "setvoicemailinfo_fuzzer"
 
-#endif // SETVOICEMAILINFO_FUZZER_H_
+#endif // SETVOICEMAILINFO_FUZZER_H
 

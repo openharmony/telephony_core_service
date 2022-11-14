@@ -17,35 +17,143 @@
 
 #include <cstddef>
 #include <cstdint>
-
+#define private public
 #include "addcoreservicetoken_fuzzer.h"
-#include "core_service_client.h"
+#include "core_service.h"
+#include "core_service_stub.h"
 #include "napi_util.h"
+#include "string_ex.h"
 #include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
+static bool g_isInited = false;
+constexpr int32_t SLOT_NUM = 2;
+
+bool IsServiceInited()
+{
+    if (!g_isInited) {
+        DelayedSingleton<CoreService>::GetInstance()->OnStart();
+        if (DelayedSingleton<CoreService>::GetInstance()->GetServiceRunningState() ==
+            static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
+            g_isInited = true;
+        }
+    }
+    return g_isInited;
+}
+
+void GetShowName(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetShowName(dataMessageParcel, reply);
+}
+
+void GetSimSpn(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetSimSpn(dataMessageParcel, reply);
+}
+
+void GetSimIccId(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetSimIccId(dataMessageParcel, reply);
+}
+
+void GetIMSI(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetIMSI(dataMessageParcel, reply);
+}
+
+void IsSimActive(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnIsSimActive(dataMessageParcel, reply);
+}
+
+void SetShowName(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    std::string message(reinterpret_cast<const char *>(data), size);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteString16(Str8ToStr16(message));
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnSetShowName(dataMessageParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size);
-    std::string number(reinterpret_cast<const char *>(data), size);
-    auto numberU16 = Str8ToStr16(number);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetShowName(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimSpn(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimIccId(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetIMSI(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().IsSimActive(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().SetShowName(slotId, numberU16);
-
-    return;
+    GetShowName(data, size);
+    GetSimSpn(data, size);
+    GetSimIccId(data, size);
+    GetIMSI(data, size);
+    IsSimActive(data, size);
+    SetShowName(data, size);
 }
-}  // namespace OHOS
+} // namespace OHOS
+
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCoreServiceTokenFuzzer token;
     /* Run your code on data */
