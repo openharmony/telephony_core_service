@@ -17,32 +17,144 @@
 
 #include <cstddef>
 #include <cstdint>
-
+#define private public
 #include "addcoreservicetoken_fuzzer.h"
-#include "core_service_client.h"
+#include "core_service.h"
 #include "napi_util.h"
 #include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
+static bool g_isInited = false;
+constexpr int32_t SLOT_NUM = 2;
+
+bool IsServiceInited()
+{
+    DelayedSingleton<CoreService>::GetInstance()->OnStart();
+    if (!g_isInited && (static_cast<int32_t>(DelayedSingleton<CoreService>::GetInstance()->state_) ==
+                         static_cast<int32_t>(ServiceRunningState::STATE_RUNNING))) {
+        g_isInited = true;
+    }
+    return g_isInited;
+}
+
+void OnRemoteRequest(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    size_t dataSize = size - sizeof(uint32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(uint32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(size);
+    MessageParcel reply;
+    MessageOption option;
+    DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+}
+
+void GetNetworkState(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetNetworkState(dataMessageParcel, reply);
+}
+
+void GetImei(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetImei(dataMessageParcel, reply);
+}
+
+void GetSimOperatorNumeric(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetSimOperatorNumeric(dataMessageParcel, reply);
+}
+
+void GetISOCountryCodeForSim(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetISOCountryCodeForSim(dataMessageParcel, reply);
+}
+
+void SendTerminalResponseCmd(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    std::string cmd(reinterpret_cast<const char *>(data), size);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteString(cmd);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnSendTerminalResponseCmd(dataMessageParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size);
-    std::string cmd(reinterpret_cast<const char *>(data), size);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkState(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImei(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimOperatorNumeric(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().SendTerminalResponseCmd(slotId, cmd.data());
+    OnRemoteRequest(data, size);
+    GetNetworkState(data, size);
+    GetImei(data, size);
+    GetNetworkState(data, size);
+    GetISOCountryCodeForSim(data, size);
+    SendTerminalResponseCmd(data, size);
     return;
 }
-}  // namespace OHOS
+} // namespace OHOS
+
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCoreServiceTokenFuzzer token;
     /* Run your code on data */
