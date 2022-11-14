@@ -12,10 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef ADDICCDIALLINGNUMBERS_FUZZER_H_
-#define ADDICCDIALLINGNUMBERS_FUZZER_H_
+#ifndef ADDICCDIALLINGNUMBERS_FUZZER_H
+#define ADDICCDIALLINGNUMBERS_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "addiccdiallingnumbers_fuzzer"
 
-#endif // ADDICCDIALLINGNUMBERS_FUZZER_H_
+#endif // ADDICCDIALLINGNUMBERS_FUZZER_H
 

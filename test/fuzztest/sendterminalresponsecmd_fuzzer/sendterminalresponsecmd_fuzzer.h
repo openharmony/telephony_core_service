@@ -12,10 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef SENDTERMINALRESPONSECMD_FUZZER_H_
-#define SENDTERMINALRESPONSECMD_FUZZER_H_
+#ifndef SENDTERMINALRESPONSECMD_FUZZER_H
+#define SENDTERMINALRESPONSECMD_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "sendterminalresponsecmd_fuzzer"
 
-#endif // SENDTERMINALRESPONSECMD_FUZZER_H_
+#endif // SENDTERMINALRESPONSECMD_FUZZER_H
 
