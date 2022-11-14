@@ -12,10 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef SETSHOWNAME_FUZZER_H_
-#define SETSHOWNAME_FUZZER_H_
+#ifndef SETSHOWNAME_FUZZER_H
+#define SETSHOWNAME_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "setshowname_fuzzer"
 
-#endif // SETSHOWNAME_FUZZER_H_
+#endif // SETSHOWNAME_FUZZER_H
 

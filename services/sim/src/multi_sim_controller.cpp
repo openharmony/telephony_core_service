@@ -517,6 +517,10 @@ bool MultiSimController::SetDefaultVoiceSlotId(int32_t slotId)
         TELEPHONY_LOGE("MultiSimController::SetDefaultVoiceSlotId failed by out of range");
         return false;
     }
+    if (slotId == DEFAULT_SIM_SLOT_ID_REMOVE && localCacheInfo_.empty()) {
+        TELEPHONY_LOGE("MultiSimController::SetDefaultVoiceSlotId no active sim");
+        return false;
+    }
     int32_t result = simDbHelper_->SetDefaultVoiceCard(slotId);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("MultiSimController::SetDefaultVoiceSlotId get Data Base failed");
@@ -561,6 +565,12 @@ bool MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
         TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId failed by out of range");
         return false;
     }
+
+    if (slotId == DEFAULT_SIM_SLOT_ID_REMOVE && localCacheInfo_.empty()) {
+        TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId no active sim");
+        return false;
+    }
+
     int32_t result = simDbHelper_->SetDefaultMessageCard(slotId);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId get Data Base failed");
@@ -595,6 +605,12 @@ bool MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
         TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId failed by out of range");
         return false;
     }
+
+    if (slotId == DEFAULT_SIM_SLOT_ID_REMOVE && localCacheInfo_.empty()) {
+        TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId no active sim");
+        return false;
+    }
+
     int32_t result = simDbHelper_->SetDefaultCellularData(slotId);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId get Data Base failed");
