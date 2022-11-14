@@ -288,7 +288,10 @@ void IccDiallingNumbersHandler::SendUpdateCommand(const std::shared_ptr<Dialling
         dataLen = RECORD_LENGTH;
     }
     TELEPHONY_LOGI("DiallingNumbersHandler::SendUpdateCommand start!! %{public}d %{public}d", dataLen, length);
-    std::shared_ptr<unsigned char> dataDiallingNumber = CreateSavingSequence(diallingNumber, dataLen);
+    std::shared_ptr<unsigned char> dataDiallingNumber = nullptr;
+    if (dataLen > 0) {
+        dataDiallingNumber = CreateSavingSequence(diallingNumber, dataLen);
+    }
     if (dataDiallingNumber != nullptr) {
         std::string data = SIMUtils::BytesConvertToHexString(dataDiallingNumber.get(), dataLen);
         AppExecFwk::InnerEvent::Pointer event =
