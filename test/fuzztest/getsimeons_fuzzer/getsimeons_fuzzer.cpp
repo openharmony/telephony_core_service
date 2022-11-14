@@ -17,32 +17,162 @@
 
 #include <cstddef>
 #include <cstdint>
-
+#define private public
 #include "addcoreservicetoken_fuzzer.h"
-#include "core_service_client.h"
+#include "core_service.h"
+#include "core_service_stub.h"
 #include "napi_util.h"
 #include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
+static bool g_isInited = false;
+constexpr int32_t SLOT_NUM = 2;
+constexpr int32_t CHOICE_NUM = 2;
+
+bool IsServiceInited()
+{
+    if (!g_isInited) {
+        DelayedSingleton<CoreService>::GetInstance()->OnStart();
+        if (DelayedSingleton<CoreService>::GetInstance()->GetServiceRunningState() ==
+            static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
+            g_isInited = true;
+        }
+    }
+    return g_isInited;
+}
+
+void IsNrSupported(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnIsNrSupported(dataMessageParcel, reply);
+}
+
+void GetPsRadioTech(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetPsRadioTech(dataMessageParcel, reply);
+}
+
+void GetCsRadioTech(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetCsRadioTech(dataMessageParcel, reply);
+}
+
+void GetNrOptionMode(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetNrOptionMode(dataMessageParcel, reply);
+}
+
+void GetSimEons(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    bool longNameRequired = static_cast<int32_t>(size % CHOICE_NUM);
+    std::string plmn(reinterpret_cast<const char *>(data), size);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteString(plmn);
+    dataMessageParcel.WriteInt32(size);
+    dataMessageParcel.WriteBool(longNameRequired);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetSimEons(dataMessageParcel, reply);
+}
+
+void GetIsoCountryCodeForNetwork(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetIsoCountryCodeForNetwork(dataMessageParcel, reply);
+}
+
+void GetSignalInfoList(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetSignalInfoList(dataMessageParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size);
-    std::string plmn(reinterpret_cast<const char *>(data), size);
-    int32_t fac = static_cast<int32_t>(size);
-    bool longNameRequired = size % 2;
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().IsNrSupported(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPsRadioTech(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCsRadioTech(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNrOptionMode(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimEons(slotId, plmn, fac, longNameRequired);
-    return;
+    IsNrSupported(data, size);
+    GetPsRadioTech(data, size);
+    GetCsRadioTech(data, size);
+    GetNrOptionMode(data, size);
+    GetSimEons(data, size);
+    GetIsoCountryCodeForNetwork(data, size);
+    GetSignalInfoList(data, size);
 }
 } // namespace OHOS
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
