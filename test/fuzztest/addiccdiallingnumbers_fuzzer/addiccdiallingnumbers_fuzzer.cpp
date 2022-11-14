@@ -17,44 +17,196 @@
 
 #include <cstddef>
 #include <cstdint>
-
+#define private public
 #include "addcoreservicetoken_fuzzer.h"
-#include "core_service_client.h"
+#include "core_service.h"
 #include "napi_util.h"
 #include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
+static bool g_isInited = false;
+constexpr int32_t SLOT_NUM = 2;
+constexpr int32_t SIM_TYPE_NUM = 2;
+constexpr int32_t TWO_INT_NUM = 2;
+
+bool IsServiceInited()
+{
+    DelayedSingleton<CoreService>::GetInstance()->OnStart();
+    if (!g_isInited && (static_cast<int32_t>(DelayedSingleton<CoreService>::GetInstance()->state_) ==
+                         static_cast<int32_t>(ServiceRunningState::STATE_RUNNING))) {
+        g_isInited = true;
+    }
+    return g_isInited;
+}
+
+void OnRemoteRequest(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    size_t dataSize = size - sizeof(uint32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(uint32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(size);
+    MessageParcel reply;
+    MessageOption option;
+    DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+}
+
+void GetSimGid1(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetSimGid1(dataMessageParcel, reply);
+}
+
+void GetSimGid2(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetSimGid2(dataMessageParcel, reply);
+}
+
+void GetSimAccountInfo(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetSimSubscriptionInfo(dataMessageParcel, reply);
+}
+
+void GetPrimarySlotId(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetPrimarySlotId(dataMessageParcel, reply);
+}
+
+void GetCardType(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetCardType(dataMessageParcel, reply);
+}
+
+void GetSimState(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetSimState(dataMessageParcel, reply);
+}
+
+void HasSimCard(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnHasSimCard(dataMessageParcel, reply);
+}
+
+void AddIccDiallingNumbers(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t type = size % SIM_TYPE_NUM + 1; // SIM_ADN 1  SIM_FDN 2
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteInt32(type);
+    size_t dataSize = size - sizeof(int32_t) * TWO_INT_NUM;
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t) * TWO_INT_NUM, dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnAddIccDiallingNumbers(dataMessageParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size);
-    int32_t type = size % 2 + 1; // SIM_ADN 1  SIM_FDN 2
-    std::string number(reinterpret_cast<const char *>(data), size);
-    std::string name(reinterpret_cast<const char *>(data), size);
-    std::string pin2(reinterpret_cast<const char *>(data), size);
-    std::shared_ptr<DiallingNumbersInfo> telNumber = std::make_shared<DiallingNumbersInfo>();
-    telNumber->index_ = size;
-    telNumber->name_ = Str8ToStr16(name);
-    telNumber->number_ = Str8ToStr16(number);
-    telNumber->pin2_ = Str8ToStr16(pin2);
-    IccAccountInfo info;
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimGid1(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimGid2(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimAccountInfo(slotId, info);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPrimarySlotId();
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCardType(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimState(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().AddIccDiallingNumbers(slotId, type, telNumber);
+    OnRemoteRequest(data, size);
+    GetSimGid1(data, size);
+    GetSimGid2(data, size);
+    GetSimAccountInfo(data, size);
+    GetPrimarySlotId(data, size);
+    GetCardType(data, size);
+    GetSimState(data, size);
+    HasSimCard(data, size);
+    AddIccDiallingNumbers(data, size);
     return;
 }
-}  // namespace OHOS
+} // namespace OHOS
+
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCoreServiceTokenFuzzer token;
     /* Run your code on data */

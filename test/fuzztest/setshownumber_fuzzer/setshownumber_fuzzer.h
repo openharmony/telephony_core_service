@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef SETSHOWNUMBER_FUZZER_H_
-#define SETSHOWNUMBER_FUZZER_H_
+#ifndef SETSHOWNUMBER_FUZZER_H
+#define SETSHOWNUMBER_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "setshownumber_fuzzer"
 
-#endif // SETSHOWNUMBER_FUZZER_H_
+#endif // SETSHOWNUMBER_FUZZER_H
 

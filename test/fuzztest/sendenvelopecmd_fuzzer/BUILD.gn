@@ -27,22 +27,36 @@ ohos_fuzztest("SendEnvelopeCmdFuzzTest") {
   include_dirs = [
     "//base/telephony/core_service/frameworks/js/napi/include",
     "//base/telephony/core_service/frameworks/js/napi",
+    "//base/telephony/core_service/services/core/include",
+    "//base/telephony/core_service/services/network_search/include",
+    "//base/telephony/core_service/services/sim/include",
     "//base/telephony/core_service/test/fuzztest/common_fuzzer",
+    "//base/telephony/core_service/services/tel_ril/include",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
+    "//base/telephony/core_service:tel_core_service",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
     "//foundation/arkui/napi:ace_napi",
   ]
 
   external_deps = [
+    "ability_runtime:ability_manager",
+    "ability_runtime:data_ability_helper",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "c_utils:utils",
+    "drivers_interface_ril:hril_innerkits",
+    "drivers_interface_ril:ril_idl_headers",
+    "init:libbegetutil",
     "ipc:ipc_core",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_ext:net_tether_manager_if",
+    "power_manager:powermgr_client",
+    "relational_store:native_rdb",
     "samgr:samgr_proxy",
   ]
   defines += [
