@@ -110,6 +110,11 @@ void CoreService::OnStop()
     TELEPHONY_LOGI("CoreService Stop success");
 }
 
+int32_t CoreService::GetServiceRunningState()
+{
+    return static_cast<int32_t>(state_);
+}
+
 int32_t CoreService::GetPsRadioTech(int32_t slotId)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
