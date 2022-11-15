@@ -20,11 +20,13 @@
 #include "networkshare_client.h"
 #include "networkshare_constants.h"
 #include "power_mgr_client.h"
+#include "power_mode_info.h"
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
+using PowerMode = OHOS::PowerMgr::PowerMode;
 namespace {
 const std::string NET_TYPE = "NetType";
 }
@@ -36,7 +38,6 @@ void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceState
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SCREEN_ON);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_POWER_SAVE_MODE_CHANGED);
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_CHARGING);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_DISCHARGING);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
@@ -94,12 +95,7 @@ void DeviceStateEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     TELEPHONY_LOGI("DeviceStateEventSubscriber::OnReceiveEvent: action = %{public}s", action.c_str());
     switch (GetDeviceStateEventIntValue(action)) {
         case COMMON_EVENT_CONNECTIVITY_CHANGE:
-            if (data.GetWant().GetIntParam(NET_TYPE, NetBearType::BEARER_DEFAULT) == NetBearType::BEARER_WIFI) {
-                bool isWifiConnected = data.GetCode() == NetConnState::NET_CONN_STATE_CONNECTED;
-                deviceStateHandler_->ProcessWifiState(isWifiConnected);
-                TELEPHONY_LOGI("DeviceStateEventSubscriber:: wifi %{public}s",
-                    isWifiConnected ? "connected" : "no connected");
-            }
+            ProcessWifiState(data);
             break;
         case COMMON_EVENT_SCREEN_ON:
             deviceStateHandler_->ProcessScreenDisplay(true);
@@ -108,10 +104,7 @@ void DeviceStateEventSubscriber::OnReceiveEvent(const CommonEventData &data)
             deviceStateHandler_->ProcessScreenDisplay(false);
             break;
         case COMMON_EVENT_POWER_SAVE_MODE_CHANGED:
-            deviceStateHandler_->ProcessPowerSaveMode(true);
-            break;
-        case COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED:
-            deviceStateHandler_->ProcessPowerSaveMode(false);
+            ProcessPowerSaveMode(data);
             break;
         case COMMON_EVENT_CHARGING:
             deviceStateHandler_->ProcessChargingState(true);
@@ -123,6 +116,42 @@ void DeviceStateEventSubscriber::OnReceiveEvent(const CommonEventData &data)
             TELEPHONY_LOGE("DeviceStateEventSubscriber::OnReceiveEvent: invalid event");
             break;
     }
+}
+
+void DeviceStateEventSubscriber::ProcessWifiState(const CommonEventData &data)
+{
+    if (deviceStateHandler_ == nullptr) {
+        TELEPHONY_LOGE("DeviceStateEventSubscriber::ProcessWifiState networkSearchHandler_ is nullptr");
+        return;
+    }
+    if (data.GetWant().GetIntParam(NET_TYPE, NetBearType::BEARER_DEFAULT) == NetBearType::BEARER_WIFI) {
+        bool isWifiConnected = data.GetCode() == NetConnState::NET_CONN_STATE_CONNECTED;
+        deviceStateHandler_->ProcessWifiState(isWifiConnected);
+        TELEPHONY_LOGI("DeviceStateEventSubscriber wifi %{public}s", isWifiConnected ? "connected" : "no connected");
+    }
+}
+
+void DeviceStateEventSubscriber::ProcessPowerSaveMode(const CommonEventData &data)
+{
+    if (deviceStateHandler_ == nullptr) {
+        TELEPHONY_LOGE("DeviceStateEventSubscriber::ProcessPowerSaveMode networkSearchHandler_ is nullptr");
+        return;
+    }
+    PowerMode powerModeCode = static_cast<PowerMode>(data.GetCode());
+    switch (powerModeCode) {
+        case PowerMode::POWER_SAVE_MODE:
+        case PowerMode::EXTREME_POWER_SAVE_MODE:
+            deviceStateHandler_->ProcessPowerSaveMode(true);
+            break;
+        case PowerMode::PERFORMANCE_MODE:
+        case PowerMode::NORMAL_MODE:
+            deviceStateHandler_->ProcessPowerSaveMode(false);
+            break;
+        default:
+            TELEPHONY_LOGE("DeviceStateEventSubscriber::ProcessPowerSaveMode invalid event");
+            break;
+    }
+    TELEPHONY_LOGI("ProcessPowerSaveMode powerModeCode %{public}d", static_cast<int32_t>(powerModeCode));
 }
 
 void DeviceStateEventSubscriber::SetEventHandler(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler)
@@ -151,7 +180,6 @@ void DeviceStateEventSubscriber::InitEventMap()
         {CommonEventSupport::COMMON_EVENT_SCREEN_ON, COMMON_EVENT_SCREEN_ON},
         {CommonEventSupport::COMMON_EVENT_SCREEN_OFF, COMMON_EVENT_SCREEN_OFF},
         {CommonEventSupport::COMMON_EVENT_POWER_SAVE_MODE_CHANGED, COMMON_EVENT_POWER_SAVE_MODE_CHANGED},
-        {CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED, COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED},
         {CommonEventSupport::COMMON_EVENT_CHARGING, COMMON_EVENT_CHARGING},
         {CommonEventSupport::COMMON_EVENT_DISCHARGING, COMMON_EVENT_DISCHARGING},
     };
