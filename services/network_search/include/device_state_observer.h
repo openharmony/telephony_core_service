@@ -41,7 +41,6 @@ enum DeviceStateEventIntValue {
     COMMON_EVENT_SCREEN_ON,
     COMMON_EVENT_SCREEN_OFF,
     COMMON_EVENT_POWER_SAVE_MODE_CHANGED,
-    COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED,
     COMMON_EVENT_CHARGING,
     COMMON_EVENT_DISCHARGING,
     COMMON_EVENT_UNKNOWN,
@@ -58,6 +57,8 @@ public:
 
 private:
     DeviceStateEventIntValue GetDeviceStateEventIntValue(std::string &event) const;
+    void ProcessWifiState(const CommonEventData &data);
+    void ProcessPowerSaveMode(const CommonEventData &data);
 
 private:
     std::shared_ptr<DeviceStateHandler> deviceStateHandler_;
