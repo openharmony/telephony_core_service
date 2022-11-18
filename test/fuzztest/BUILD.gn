@@ -26,4 +26,9 @@ group("fuzztest") {
   deps += [ "sendenvelopecmd_fuzzer:fuzztest" ]
   deps += [ "getsimeons_fuzzer:fuzztest" ]
   deps += [ "simauthentication_fuzzer:fuzztest" ]
+  deps += [ "setaccesslimit_fuzzer:fuzztest" ]
+  deps += [ "unmarshalling_fuzzer:fuzztest" ]
+  deps += [ "isvalidnumberstring_fuzzer:fuzztest" ]
+  deps += [ "hexvectohexstr_fuzzer:fuzztest" ]
+  deps += [ "isshowableasciionly_fuzzer:fuzztest" ]
 }
