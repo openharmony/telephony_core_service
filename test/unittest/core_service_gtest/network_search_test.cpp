@@ -118,13 +118,20 @@ void NetworkSearchTest::PrintGsmCellInformation(sptr<CellInformation> cell)
         static_cast<int32_t>(gsm->GetNetworkType()), gsm->GetLac(), gsm->GetBsic(), gsm->GetArfcn());
     TELEPHONY_LOGI("CellInformation result:%{public}s", gsm->ToString().c_str());
 
+    MessageParcel data;
+    gsm->Marshalling(data);
+    gsm->Unmarshalling(data);
     sptr<GsmCellInformation> gsmCell = new GsmCellInformation;
     gsmCell->UpdateLocation(0, 0);
     gsmCell->SetGsmParam(0, 0, 0);
-    TELEPHONY_LOGI("CellInformation gsm is same as gsmCell:%{public}d", *gsmCell == *gsm);
+    GsmCellInformation gsmCellInformation = *gsm;
+    TELEPHONY_LOGI("CellInformation gsm is same as gsmCell:%{public}d", *gsmCell == gsmCellInformation);
     gsmCell->Init(0, 0, 0);
 
     sptr<GsmCellLocation> cellLocation = new GsmCellLocation;
+    MessageParcel locationData;
+    cellLocation->Marshalling(locationData);
+    cellLocation->Unmarshalling(locationData);
     cellLocation->SetGsmParam(gsm->GetCellId(), gsm->GetLac());
     TELEPHONY_LOGD("GsmCellLocation type:%{private}d, lac:%{private}d, psc:%{private}d,",
         static_cast<int32_t>(cellLocation->GetCellLocationType()), cellLocation->GetLac(), cellLocation->GetPsc());
@@ -138,12 +145,18 @@ void NetworkSearchTest::PrintCdmaCellInformation(sptr<CellInformation> cell)
         cdma->GetLatitude(), cdma->GetLongitude(), cdma->GetNid(), cdma->GetSid());
     TELEPHONY_LOGI("CellInformation result:%{public}s", cdma->ToString().c_str());
 
+    MessageParcel data;
+    cdma->Marshalling(data);
+    cdma->Unmarshalling(data);
     sptr<CdmaCellInformation> cdmaCell = new CdmaCellInformation;
     cdmaCell->UpdateLocation(0, 0, 0);
     cdmaCell->SetCdmaParam(0, 0, 0, 0, 0);
-    TELEPHONY_LOGI("CellInformation cdma is same as cdmaCell:%{public}d", *cdmaCell == *cdma);
-
+    CdmaCellInformation cdmaCellInformation = *cdma;
+    TELEPHONY_LOGI("CellInformation cdma is same as cdmaCell:%{public}d", *cdmaCell == cdmaCellInformation);
     sptr<CdmaCellLocation> cellLocation = new CdmaCellLocation;
+    MessageParcel locationData;
+    cellLocation->Marshalling(locationData);
+    cellLocation->Unmarshalling(locationData);
     cellLocation->SetCdmaParam(cdma->GetBaseId(), cdma->GetLatitude(), cdma->GetLongitude(), cdma->GetNid(),
         cdma->GetSid());
     TELEPHONY_LOGD(
@@ -159,10 +172,14 @@ void NetworkSearchTest::PrintWcdmaCellInformation(sptr<CellInformation> cell)
     TELEPHONY_LOGD("CellInformation type:%{private}d, psc:%{private}d, lac:%{private}d, arfcn:%{private}d",
         static_cast<int32_t>(wcdma->GetNetworkType()), wcdma->GetPsc(), wcdma->GetLac(), wcdma->GetArfcn());
     TELEPHONY_LOGI("CellInformation result:%{public}s", wcdma->ToString().c_str());
-    sptr<WcdmaCellInformation> wcdmaCell = new WcdmaCellInformation;
+    MessageParcel data;
+    wcdma->Marshalling(data);
+    wcdma->Unmarshalling(data);
+    sptr<WcdmaCellInformation> wcdmaCell = new WcdmaCellInformation();
     wcdmaCell->UpdateLocation(0, 0);
     wcdmaCell->SetWcdmaParam(0, 0, 0);
-    TELEPHONY_LOGI("CellInformation wcdma is same as wcdmaCell:%{public}d", *wcdmaCell == *wcdma);
+    WcdmaCellInformation wcdmaCellInformation = *wcdma;
+    TELEPHONY_LOGI("CellInformation wcdma is same as wcdmaCell:%{public}d", *wcdmaCell == wcdmaCellInformation);
 }
 
 void NetworkSearchTest::PrintTdscdmaCellInformation(sptr<CellInformation> cell)
@@ -171,10 +188,14 @@ void NetworkSearchTest::PrintTdscdmaCellInformation(sptr<CellInformation> cell)
     TELEPHONY_LOGD("CellInformation type:%{private}d, cpid:%{private}d, lac:%{private}d, arfcn:%{private}d",
         static_cast<int32_t>(tdscdma->GetNetworkType()), tdscdma->GetCpid(), tdscdma->GetLac(), tdscdma->GetArfcn());
     TELEPHONY_LOGI("CellInformation result:%{public}s", tdscdma->ToString().c_str());
+    MessageParcel data;
+    tdscdma->Marshalling(data);
+    tdscdma->Unmarshalling(data);
     sptr<TdscdmaCellInformation> tdscdmaCell = new TdscdmaCellInformation;
     tdscdmaCell->UpdateLocation(0, 0);
     tdscdmaCell->SetTdscdmaParam(0, 0, 0);
-    TELEPHONY_LOGI("CellInformation tdscdma is same as tdscdmaCell:%{public}d", *tdscdmaCell == *tdscdma);
+    TdscdmaCellInformation tdscdmaCellInformation = *tdscdma;
+    TELEPHONY_LOGI("CellInformation tdscdma is same as tdscdmaCell:%{public}d", *tdscdmaCell == tdscdmaCellInformation);
 }
 
 void NetworkSearchTest::PrintLteCellInformation(sptr<CellInformation> cell)
@@ -183,9 +204,13 @@ void NetworkSearchTest::PrintLteCellInformation(sptr<CellInformation> cell)
     TELEPHONY_LOGD("CellInformation type:%{private}d, pci:%{private}d, tac:%{private}d, arfcn:%{private}d",
         static_cast<int32_t>(lte->GetNetworkType()), lte->GetPci(), lte->GetTac(), lte->GetArfcn());
     TELEPHONY_LOGI("CellInformation result:%{public}s", lte->ToString().c_str());
+    MessageParcel data;
+    lte->Marshalling(data);
+    lte->Unmarshalling(data);
     sptr<LteCellInformation> lteCell = new LteCellInformation;
     lteCell->UpdateLocation(0, 0);
     lteCell->SetLteParam(0, 0, 0);
+    LteCellInformation lteCellInformation = *lte;
     TELEPHONY_LOGI("CellInformation lte is same as lteCell:%{public}d", *lteCell == *lte);
 }
 
@@ -196,10 +221,14 @@ void NetworkSearchTest::PrintNrCellInformation(sptr<CellInformation> cell)
         "nci:%{private}d", static_cast<int32_t>(nr->GetNetworkType()), nr->GetPci(), nr->GetTac(),
         nr->GetArfcn(), (int32_t)nr->GetNci());
     TELEPHONY_LOGI("CellInformation result:%{public}s", nr->ToString().c_str());
+    MessageParcel data;
+    nr->Marshalling(data);
+    nr->Unmarshalling(data);
     sptr<NrCellInformation> nrCell = new NrCellInformation;
     nrCell->UpdateLocation(0, 0);
     nrCell->SetNrParam(0, 0, 0, 0);
-    TELEPHONY_LOGI("CellInformation nr is same as nrCell:%{public}d", *nrCell == *nr);
+    NrCellInformation nrCellInformation = *nr;
+    TELEPHONY_LOGI("CellInformation nr is same as nrCell:%{public}d", *nrCell == nrCellInformation);
 }
 
 void NetworkSearchTest::PrintSignalInformation(std::vector<sptr<SignalInformation>> signalList)
@@ -244,6 +273,9 @@ void NetworkSearchTest::PrintGsmSignalInformation(sptr<SignalInformation> signal
         "value:%{public}d", static_cast<int32_t>(gsm->GetNetworkType()), gsm->GetRssi(), gsm->GetGsmBer(),
         gsm->GetSignalLevel(), gsm->ValidateGsmValue());
     sptr<GsmSignalInformation> gsmSignal = new GsmSignalInformation;
+    MessageParcel data;
+    gsmSignal->Marshalling(data);
+    gsmSignal->Unmarshalling(data);
     gsmSignal->SetValue(0, 0);
     TELEPHONY_LOGI("SignalInformation gsm is same as gsmSignal:%{public}d", *gsmSignal == *gsm);
 }
@@ -255,6 +287,10 @@ void NetworkSearchTest::PrintCdmaSignalInformation(sptr<SignalInformation> signa
         static_cast<int32_t>(cdma->GetNetworkType()), cdma->GetCdmaRssi(), cdma->GetSignalLevel(),
         cdma->ValidateCdmaValue());
     sptr<CdmaSignalInformation> cdmaSignal = new CdmaSignalInformation;
+    cdmaSignal->NewInstance();
+    MessageParcel data;
+    cdmaSignal->Marshalling(data);
+    cdmaSignal->Unmarshalling(data);
     cdmaSignal->SetValue(0, 0);
     TELEPHONY_LOGI("SignalInformation cdma is same as cdmaSignal:%{public}d", *cdmaSignal == *cdma);
 }
@@ -267,6 +303,10 @@ void NetworkSearchTest::PrintWcdmaSignalInformation(sptr<SignalInformation> sign
         wcdma->GetRxlev(), wcdma->GetRscp(), wcdma->GetEcno(), wcdma->GetBer(), wcdma->GetSignalLevel(),
         wcdma->ValidateWcdmaValue());
     sptr<WcdmaSignalInformation> wcdmaSignal = new WcdmaSignalInformation;
+    wcdmaSignal->NewInstance();
+    MessageParcel data;
+    wcdmaSignal->Marshalling(data);
+    wcdmaSignal->Unmarshalling(data);
     wcdmaSignal->SetValue(0, 0, 0, 0);
     TELEPHONY_LOGI("SignalInformation wcdma is same as wcdmaSignal:%{public}d", *wcdmaSignal == *wcdma);
 }
@@ -278,6 +318,10 @@ void NetworkSearchTest::PrintTdScdmaSignalInformation(sptr<SignalInformation> si
         static_cast<int32_t>(tdscdma->GetNetworkType()), tdscdma->GetRscp(), tdscdma->GetSignalLevel(),
         tdscdma->ValidateTdScdmaValue());
     sptr<TdScdmaSignalInformation> tdscdmaSignal = new TdScdmaSignalInformation;
+    tdscdmaSignal->NewInstance();
+    MessageParcel data;
+    tdscdmaSignal->Marshalling(data);
+    tdscdmaSignal->Unmarshalling(data);
     tdscdmaSignal->SetValue(0);
     TELEPHONY_LOGI("SignalInformation tdscdma is same as tdscdmaSignal:%{public}d", *tdscdmaSignal == *tdscdma);
 }
@@ -290,6 +334,9 @@ void NetworkSearchTest::PrintLteSignalInformation(sptr<SignalInformation> signal
         lte->GetRxlev(), lte->GetRsrp(), lte->GetRsrq(), lte->GetSnr(), lte->GetSignalLevel(),
         lte->ValidateLteValue());
     sptr<LteSignalInformation> lteSignal = new LteSignalInformation;
+    MessageParcel data;
+    lteSignal->Marshalling(data);
+    lteSignal->Unmarshalling(data);
     lteSignal->SetValue(0, 0, 0, 0);
     TELEPHONY_LOGI("SignalInformation lte is same as lteSignal:%{public}d", *lteSignal == *lte);
 }
@@ -301,6 +348,10 @@ void NetworkSearchTest::PrintNrSignalInformation(sptr<SignalInformation> signal)
         "SignalLevel:%{public}d, value:%{public}d", static_cast<int32_t>(nr->GetNetworkType()), nr->GetRsrp(),
         nr->GetRsrq(), nr->GetSinr(), nr->GetSignalLevel(), nr->ValidateNrValue());
     sptr<NrSignalInformation> nrSignal = new NrSignalInformation;
+    nrSignal->NewInstance();
+    MessageParcel data;
+    nrSignal->Marshalling(data);
+    nrSignal->Unmarshalling(data);
     nrSignal->SetValue(0, 0, 0);
     TELEPHONY_LOGI("SignalInformation nr is same as nrSignal:%{public}d", *nrSignal == *nr);
 }
@@ -593,6 +644,42 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetSignalInfoList_0200, Func
 }
 
 /**
+ * @tc.number   Telephony_NetworkSearch_PrintSignalInfo_0100
+ * @tc.name     Get Signal Info List
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_PrintSignalInfo_0100, Function | MediumTest | Level3)
+{
+    sptr<GsmSignalInformation> gsm = new GsmSignalInformation();
+    EXPECT_STRNE(gsm->ToString().c_str(), "");
+    PrintGsmSignalInformation(gsm);
+
+    sptr<WcdmaSignalInformation> wcdma = new WcdmaSignalInformation();
+    EXPECT_STRNE(wcdma->ToString().c_str(), "");
+    PrintWcdmaSignalInformation(wcdma);
+
+    sptr<TdScdmaSignalInformation> tsScdma = new TdScdmaSignalInformation();
+    EXPECT_STRNE(tsScdma->ToString().c_str(), "");
+    PrintTdScdmaSignalInformation(tsScdma);
+
+    sptr<NrSignalInformation> nr = new NrSignalInformation();
+    EXPECT_STRNE(nr->ToString().c_str(), "");
+    PrintNrSignalInformation(nr);
+
+    sptr<LteSignalInformation> lte = new LteSignalInformation();
+    EXPECT_STRNE(lte->ToString().c_str(), "");
+    PrintLteSignalInformation(lte);
+
+    sptr<CdmaSignalInformation> cdma = new CdmaSignalInformation();
+    EXPECT_STRNE(cdma->ToString().c_str(), "");
+    PrintCdmaSignalInformation(cdma);
+
+    sptr<NetworkSearchResult> networkSearchResult = new NetworkSearchResult();
+    networkSearchResult->GetNetworkSearchInformation();
+    networkSearchResult->GetNetworkSearchInformationSize();
+}
+
+/**
  * @tc.number   Telephony_NetworkSearch_GetCellInfoList_0100
  * @tc.name     Get Cell Info List
  * @tc.desc     Function test
@@ -628,6 +715,38 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCellInfoList_0200, Functi
     std::vector<sptr<CellInformation>> cellList = NetworkSearchTest::telephonyService_->GetCellInfoList(SLOT_ID);
     PrintCellInformation(cellList);
     ASSERT_TRUE(!cellList.empty());
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_PrintCellInfoList_0100
+ * @tc.name     Get Cell Info List
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_PrintCellInfoList_0100, Function | MediumTest | Level3)
+{
+    sptr<GsmCellInformation> gsm = new GsmCellInformation();
+    EXPECT_STRNE(gsm->ToString().c_str(), "");
+    PrintGsmCellInformation(gsm);
+
+    sptr<CdmaCellInformation> cdma = new CdmaCellInformation();
+    EXPECT_STRNE(cdma->ToString().c_str(), "");
+    PrintCdmaCellInformation(cdma);
+
+    sptr<WcdmaCellInformation> wcdma = new WcdmaCellInformation();
+    EXPECT_STRNE(wcdma->ToString().c_str(), "");
+    PrintWcdmaCellInformation(wcdma);
+
+    sptr<TdscdmaCellInformation> tdscdma = new TdscdmaCellInformation();
+    EXPECT_STRNE(tdscdma->ToString().c_str(), "");
+    PrintTdscdmaCellInformation(tdscdma);
+
+    sptr<LteCellInformation> lte = new LteCellInformation();
+    EXPECT_STRNE(lte->ToString().c_str(), "");
+    PrintLteCellInformation(lte);
+
+    sptr<NrCellInformation> nr = new NrCellInformation();
+    EXPECT_STRNE(nr->ToString().c_str(), "");
+    PrintNrCellInformation(nr);
 }
 
 /**
