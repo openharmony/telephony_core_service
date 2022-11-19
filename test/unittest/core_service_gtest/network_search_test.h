@@ -194,8 +194,6 @@ public:
     void PrintCellInformation(std::vector<sptr<CellInformation>> cellList);
     void PrintSignalInformation(std::vector<sptr<SignalInformation>> signalList);
     void PrintNetworkStateInformation(sptr<NetworkState> result);
-
-private:
     void PrintGsmCellInformation(sptr<CellInformation> cell);
     void PrintCdmaCellInformation(sptr<CellInformation> cell);
     void PrintWcdmaCellInformation(sptr<CellInformation> cell);
