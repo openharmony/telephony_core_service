@@ -161,6 +161,11 @@ void NetworkSearchTestCallbackStub::OnGetNetworkSearchInformation(
             networkState.GetOperatorNumeric().c_str(), networkState.GetOperatorShortName().c_str(),
             networkState.GetOperatorLongName().c_str(), networkState.GetRadioTech(), networkState.GetNetworkState());
     }
+    sptr<NetworkSearchResult> newResult = new NetworkSearchResult();
+    Parcel parcel;
+    newResult->ReadFromParcel(parcel);
+    newResult->Marshalling(parcel);
+    newResult->Unmarshalling(parcel);
 }
 
 void NetworkSearchTestCallbackStub::OnSetPreferredNetworkCallback(const bool result, const int32_t errorCode)
