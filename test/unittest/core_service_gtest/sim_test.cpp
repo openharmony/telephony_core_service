@@ -28,7 +28,9 @@
 #include "sim_state_type.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
+#include "tel_profile_util.h"
 #include "telephony_log_wrapper.h"
+
 namespace OHOS {
 namespace Telephony {
 sptr<ICoreService> SimTest::telephonyService_ = nullptr;
@@ -134,7 +136,7 @@ void SimTest::ParseOperatorConf(int32_t slotId)
     OperatorConfigCache ofpc(nullptr, nullptr, slotId);
     OperatorFileParser ofp;
     OperatorConfig poc;
-    const std::string iccid = Str16ToStr8(SimTest::telephonyService_->GetSimIccId(slotId));
+    const std::string iccid = Str16ToStr8(CoreServiceClient::GetInstance().GetSimIccId(slotId));
     std::string filename = ofpc.EncryptIccId(iccid) + ".json";
     if (slotId == SimTest::slotIdErr_) {
         filename = "";
@@ -178,7 +180,7 @@ void SimTest::ParseOperatorConf(int32_t slotId)
 HWTEST_F(SimTest, Telephony_Sim_ParseFromCustomSystem_0100, Function | MediumTest | Level1)
 {
     TELEPHONY_LOGI("Telephony_Sim_ParseFromCustomSystem_0100 start");
-    if (!(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+    if (!(CoreServiceClient::GetInstance().HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGE("Telephony_Sim_GetOperatorConf_0100 Sim card is null");
     } else {
         bool isCanGetFromDefaultCustomSystemNormal = false;
@@ -212,12 +214,11 @@ HWTEST_F(SimTest, Telephony_Sim_GetOperatorConf_0200, Function | MediumTest | Le
 {
     OperatorFileParser ofp;
     OperatorConfig poc;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGE("Telephony_Sim_GetOperatorConf_0200 TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!(CoreServiceClient::GetInstance().HasSimCard(SimTest::slotId_))) {
+        TELEPHONY_LOGE("Telephony_Sim_GetOperatorConf_0200 TelephonyTestService has no sim card");
     } else {
         TELEPHONY_LOGI("Telephony_Sim_GetOperatorConf_0200 TelephonyTestService Remote service start");
-        SimTest::telephonyService_->GetOperatorConfigs(SimTest::slotId_, poc);
+        CoreServiceClient::GetInstance().GetOperatorConfigs(SimTest::slotId_, poc);
         CoreManagerInner::GetInstance().GetOperatorConfigs(SimTest::slotId_, poc);
         if (poc.stringArrayValue.find("string") != poc.stringArrayValue.end()) {
             EXPECT_EQ("JSON中国", poc.stringValue["string"]);
@@ -251,7 +252,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetOperatorConf_0200, Function | MediumTest | Le
 HWTEST_F(SimTest, Telephony_Sim_ParseFromCustomSystem_0300, Function | MediumTest | Level1)
 {
     TELEPHONY_LOGI("Telephony_Sim_ParseFromCustomSystem_0300 start");
-    if (!(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
+    if (!(CoreServiceClient::GetInstance().HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGE("Telephony_Sim_GetOperatorConf_0300 Sim card is null");
     } else {
         bool isCanGetFromDefaultCustomSystemNormal = false;
@@ -284,12 +285,12 @@ HWTEST_F(SimTest, Telephony_Sim_GetOperatorConf_0400, Function | MediumTest | Le
 {
     OperatorFileParser ofp;
     OperatorConfig poc;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGE("Telephony_Sim_GetOperatorConf_0400 TelephonyTestService Remote service is null");
+    if (!(CoreServiceClient::GetInstance().HasSimCard(SimTest::slotId1_))) {
+        TELEPHONY_LOGE("Telephony_Sim_GetOperatorConf_0400 TelephonyTestService has no sim card");
         SimTest::telephonyService_ = GetProxy();
     } else {
         TELEPHONY_LOGI("Telephony_Sim_GetOperatorConf_0400 TelephonyTestService Remote service start");
-        SimTest::telephonyService_->GetOperatorConfigs(SimTest::slotId1_, poc);
+        CoreServiceClient::GetInstance().GetOperatorConfigs(SimTest::slotId1_, poc);
         CoreManagerInner::GetInstance().GetOperatorConfigs(SimTest::slotId1_, poc);
         if (poc.stringArrayValue.find("string") != poc.stringArrayValue.end()) {
             EXPECT_EQ("JSON中国", poc.stringValue["string"]);
@@ -322,11 +323,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetOperatorConf_0400, Function | MediumTest | Le
  */
 HWTEST_F(SimTest, Telephony_Sim_GetSimState_0100, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        int32_t result = SimTest::telephonyService_->GetSimState(SimTest::slotId_);
+        int32_t result = CoreServiceClient::GetInstance().GetSimState(SimTest::slotId_);
         EXPECT_GT(result, -1);
     }
 }
@@ -338,11 +338,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimState_0100, Function | MediumTest | Level1
  */
 HWTEST_F(SimTest, Telephony_Sim_GetSimState_0200, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        int32_t result = SimTest::telephonyService_->GetSimState(SimTest::slotId1_);
+        int32_t result = CoreServiceClient::GetInstance().GetSimState(SimTest::slotId1_);
         EXPECT_GT(result, -1);
     }
 }
@@ -354,11 +353,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimState_0200, Function | MediumTest | Level1
  */
 HWTEST_F(SimTest, Telephony_Sim_HasSimCard_0100, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        int32_t result = SimTest::telephonyService_->HasSimCard(SimTest::slotId_);
+        int32_t result = CoreServiceClient::GetInstance().HasSimCard(SimTest::slotId_);
         EXPECT_GT(result, -1);
     }
 }
@@ -370,11 +368,10 @@ HWTEST_F(SimTest, Telephony_Sim_HasSimCard_0100, Function | MediumTest | Level1)
  */
 HWTEST_F(SimTest, Telephony_Sim_HasSimCard_0200, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        int32_t result = SimTest::telephonyService_->HasSimCard(SimTest::slotId1_);
+        int32_t result = CoreServiceClient::GetInstance().HasSimCard(SimTest::slotId1_);
         EXPECT_GT(result, -1);
     }
 }
@@ -386,11 +383,10 @@ HWTEST_F(SimTest, Telephony_Sim_HasSimCard_0200, Function | MediumTest | Level1)
  */
 HWTEST_F(SimTest, Telephony_Sim_GetISOCountryCodeForSim_0100, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetISOCountryCodeForSim(SimTest::slotId_));
+        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetISOCountryCodeForSim(SimTest::slotId_));
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -402,11 +398,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetISOCountryCodeForSim_0100, Function | MediumT
  */
 HWTEST_F(SimTest, Telephony_Sim_GetISOCountryCodeForSim_0200, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetISOCountryCodeForSim(SimTest::slotId1_));
+        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetISOCountryCodeForSim(SimTest::slotId1_));
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -418,12 +413,11 @@ HWTEST_F(SimTest, Telephony_Sim_GetISOCountryCodeForSim_0200, Function | MediumT
  */
 HWTEST_F(SimTest, Telephony_Sim_GetSimSpn_0100, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::string result = "testresult";
-        result = Str16ToStr8(SimTest::telephonyService_->GetSimSpn(SimTest::slotId_));
+        result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimSpn(SimTest::slotId_));
         EXPECT_STRNE(result.c_str(), "testresult");
     }
 }
@@ -435,12 +429,11 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimSpn_0100, Function | MediumTest | Level1)
  */
 HWTEST_F(SimTest, Telephony_Sim_GetSimSpn_0200, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::string result = "testresult";
-        result = Str16ToStr8(SimTest::telephonyService_->GetSimSpn(SimTest::slotId1_));
+        result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimSpn(SimTest::slotId1_));
         EXPECT_STRNE(result.c_str(), "testresult");
     }
 }
@@ -453,11 +446,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimSpn_0200, Function | MediumTest | Level1)
 HWTEST_F(SimTest, Telephony_Sim_GetSimIccId_0100, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetSimIccId(SimTest::slotId_));
+        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimIccId(SimTest::slotId_));
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -470,11 +462,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimIccId_0100, Function | MediumTest | Level1
 HWTEST_F(SimTest, Telephony_Sim_GetSimIccId_0200, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetSimIccId(SimTest::slotId1_));
+        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimIccId(SimTest::slotId1_));
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -486,11 +477,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimIccId_0200, Function | MediumTest | Level1
  */
 HWTEST_F(SimTest, Telephony_Sim_GetSimOperatorNumeric_0100, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetSimOperatorNumeric(SimTest::slotId_));
+        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimOperatorNumeric(SimTest::slotId_));
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -502,11 +492,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimOperatorNumeric_0100, Function | MediumTes
  */
 HWTEST_F(SimTest, Telephony_Sim_GetSimOperatorNumeric_0200, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetSimOperatorNumeric(SimTest::slotId1_));
+        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimOperatorNumeric(SimTest::slotId1_));
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -519,11 +508,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimOperatorNumeric_0200, Function | MediumTes
 HWTEST_F(SimTest, Telephony_Sim_GetIMSI_0100, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetIMSI(SimTest::slotId_));
+        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetIMSI(SimTest::slotId_));
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -536,11 +524,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetIMSI_0100, Function | MediumTest | Level1)
 HWTEST_F(SimTest, Telephony_Sim_GetIMSI_0200, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetIMSI(SimTest::slotId1_));
+        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetIMSI(SimTest::slotId1_));
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -557,7 +544,7 @@ HWTEST_F(SimTest, Telephony_GetLocaleFromDefaultSim_0100, Function | MediumTest 
         SimTest::telephonyService_ = GetProxy();
     } else {
         std::string result = "test";
-        result = Str16ToStr8(SimTest::telephonyService_->GetLocaleFromDefaultSim());
+        result = Str16ToStr8(CoreServiceClient::GetInstance().GetLocaleFromDefaultSim());
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -570,11 +557,10 @@ HWTEST_F(SimTest, Telephony_GetLocaleFromDefaultSim_0100, Function | MediumTest 
 HWTEST_F(SimTest, Telephony_Sim_GetSimGid1_0100, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetSimGid1(SimTest::slotId_));
+        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimGid1(SimTest::slotId_));
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -587,11 +573,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimGid1_0100, Function | MediumTest | Level1)
 HWTEST_F(SimTest, Telephony_Sim_GetSimGid1_0200, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetSimGid1(SimTest::slotId1_));
+        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimGid1(SimTest::slotId1_));
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -605,11 +590,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimGid1_0200, Function | MediumTest | Level1)
 HWTEST_F(SimTest, Telephony_Sim_GetSimGid2_0100, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetSimGid2(SimTest::slotId_));
+        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimGid2(SimTest::slotId_));
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -622,11 +606,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimGid2_0100, Function | MediumTest | Level1)
 HWTEST_F(SimTest, Telephony_Sim_GetSimGid2_0200, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetSimGid2(SimTest::slotId1_));
+        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimGid2(SimTest::slotId1_));
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -638,13 +621,12 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimGid2_0200, Function | MediumTest | Level1)
  */
 HWTEST_F(SimTest, Telephony_Sim_GetSimTelephoneNumber_0100, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         // Interface may return empty string, as sim file has not information(TelephoneNumber)
         std::string result = "test";
-        result = Str16ToStr8(SimTest::telephonyService_->GetSimTelephoneNumber(SimTest::slotId_));
+        result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimTelephoneNumber(SimTest::slotId_));
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -656,13 +638,12 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimTelephoneNumber_0100, Function | MediumTes
  */
 HWTEST_F(SimTest, Telephony_Sim_GetSimTelephoneNumber_0200, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         // Interface may return empty string, as sim file has not information(TelephoneNumber)
         std::string result = "test";
-        result = Str16ToStr8(SimTest::telephonyService_->GetSimTelephoneNumber(SimTest::slotId1_));
+        result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimTelephoneNumber(SimTest::slotId1_));
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -674,7 +655,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimTelephoneNumber_0200, Function | MediumTes
  */
 HWTEST_F(SimTest, Telephony_Sim_GetSimTeleNumberIdentifier_0100, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
+    if (SimTest::telephonyService_ == nullptr || !CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
@@ -692,7 +673,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimTeleNumberIdentifier_0100, Function | Medi
  */
 HWTEST_F(SimTest, Telephony_Sim_GetSimTeleNumberIdentifier_0200, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
+    if (SimTest::telephonyService_ == nullptr || !CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
@@ -710,13 +691,12 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimTeleNumberIdentifier_0200, Function | Medi
  */
 HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailIdentifier_0100, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         // Interface may return empty string, as sim file has not information(VoiceMailIdentifier)
         std::string result = "test";
-        result = Str16ToStr8(SimTest::telephonyService_->GetVoiceMailIdentifier(SimTest::slotId_));
+        result = Str16ToStr8(CoreServiceClient::GetInstance().GetVoiceMailIdentifier(SimTest::slotId_));
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -728,13 +708,12 @@ HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailIdentifier_0100, Function | MediumTe
  */
 HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailIdentifier_0200, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         // Interface may return empty string, as sim file has not information(VoiceMailIdentifier)
         std::string result = "test";
-        result = Str16ToStr8(SimTest::telephonyService_->GetVoiceMailIdentifier(SimTest::slotId1_));
+        result = Str16ToStr8(CoreServiceClient::GetInstance().GetVoiceMailIdentifier(SimTest::slotId1_));
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -746,13 +725,12 @@ HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailIdentifier_0200, Function | MediumTe
  */
 HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailNumber_0100, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         // Interface may return empty string, as sim file has not information(VoiceMailNumber)
         std::string result = "test";
-        result = Str16ToStr8(SimTest::telephonyService_->GetVoiceMailNumber(SimTest::slotId_));
+        result = Str16ToStr8(CoreServiceClient::GetInstance().GetVoiceMailNumber(SimTest::slotId_));
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -764,13 +742,12 @@ HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailNumber_0100, Function | MediumTest |
  */
 HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailNumber_0200, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         // Interface may return empty string, as sim file has not information(VoiceMailNumber)
         std::string result = "test";
-        result = Str16ToStr8(SimTest::telephonyService_->GetVoiceMailNumber(SimTest::slotId1_));
+        result = Str16ToStr8(CoreServiceClient::GetInstance().GetVoiceMailNumber(SimTest::slotId1_));
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -786,7 +763,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetDefaultVoiceSlotId_0100, Function | MediumTes
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
-        int32_t result = SimTest::telephonyService_->GetDefaultVoiceSlotId();
+        int32_t result = CoreServiceClient::GetInstance().GetDefaultVoiceSlotId();
         EXPECT_GT(result, -2);
     }
 }
@@ -799,11 +776,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetDefaultVoiceSlotId_0100, Function | MediumTes
 HWTEST_F(SimTest, Telephony_Sim_SetDefaultVoiceSlotId_0100, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        bool result = SimTest::telephonyService_->SetDefaultVoiceSlotId(SimTest::slotId_);
+        bool result = CoreServiceClient::GetInstance().SetDefaultVoiceSlotId(SimTest::slotId_);
         EXPECT_TRUE(result);
     }
 }
@@ -816,11 +792,10 @@ HWTEST_F(SimTest, Telephony_Sim_SetDefaultVoiceSlotId_0100, Function | MediumTes
 HWTEST_F(SimTest, Telephony_Sim_SetDefaultVoiceSlotId_0200, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        bool result = SimTest::telephonyService_->SetDefaultVoiceSlotId(SimTest::slotId1_);
+        bool result = CoreServiceClient::GetInstance().SetDefaultVoiceSlotId(SimTest::slotId1_);
         EXPECT_TRUE(result);
     }
 }
@@ -831,11 +806,10 @@ HWTEST_F(SimTest, Telephony_Sim_SetDefaultVoiceSlotId_0200, Function | MediumTes
  * @tc.desc     Function test
 HWTEST_F(SimTest, Telephony_Sim_RefreshSimState_0100, Function | MediumTest | Level0)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        int32_t result = SimTest::telephonyService_->RefreshSimState(SimTest::slotId_);
+        int32_t result =CoreServiceClient::GetInstance().RefreshSimState(SimTest::slotId_);
         EXPECT_GT(result, -1);
     }
 }
@@ -848,11 +822,10 @@ HWTEST_F(SimTest, Telephony_Sim_RefreshSimState_0100, Function | MediumTest | Le
  */
 HWTEST_F(SimTest, Telephony_Sim_RefreshSimState_0200, Function | MediumTest | Level0)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        int32_t result = SimTest::telephonyService_->RefreshSimState(SimTest::slotId1_);
+        int32_t result = CoreServiceClient::GetInstance().RefreshSimState(SimTest::slotId1_);
         EXPECT_GT(result, -1);
     }
 }
@@ -864,12 +837,11 @@ HWTEST_F(SimTest, Telephony_Sim_RefreshSimState_0200, Function | MediumTest | Le
  */
 HWTEST_F(SimTest, Telephony_Sim_GetOperatorConfig_0100, Function | MediumTest | Level2)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         OperatorConfig oc;
-        SimTest::telephonyService_->GetOperatorConfigs(SimTest::slotId_, oc);
+        CoreServiceClient::GetInstance().GetOperatorConfigs(SimTest::slotId_, oc);
         EXPECT_TRUE(true);
     }
 }
@@ -881,12 +853,11 @@ HWTEST_F(SimTest, Telephony_Sim_GetOperatorConfig_0100, Function | MediumTest | 
  */
 HWTEST_F(SimTest, Telephony_Sim_GetOperatorConfig_0200, Function | MediumTest | Level2)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         OperatorConfig oc;
-        SimTest::telephonyService_->GetOperatorConfigs(SimTest::slotId1_, oc);
+        CoreServiceClient::GetInstance().GetOperatorConfigs(SimTest::slotId1_, oc);
         EXPECT_TRUE(true);
     }
 }
@@ -899,12 +870,11 @@ HWTEST_F(SimTest, Telephony_Sim_GetOperatorConfig_0200, Function | MediumTest | 
 HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0100, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::vector<IccAccountInfo> iccAccountInfoList;
-        bool result = SimTest::telephonyService_->GetActiveSimAccountInfoList(iccAccountInfoList);
+        bool result = CoreServiceClient::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
         EXPECT_TRUE(result);
     }
 }
@@ -917,12 +887,11 @@ HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0100, Function | Med
 HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0200, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::vector<IccAccountInfo> iccAccountInfoList;
-        bool result = SimTest::telephonyService_->GetActiveSimAccountInfoList(iccAccountInfoList);
+        bool result = CoreServiceClient::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
         EXPECT_TRUE(result);
     }
 }
@@ -935,16 +904,15 @@ HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0200, Function | Med
 void QueryIccAdnDiallingNumbersTestFunc(CoreServiceTestHelper &helper)
 {
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-        SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId_, DiallingNumbersInfo::SIM_ADN);
+        CoreServiceClient::GetInstance().QueryIccDiallingNumbers(SimTest::slotId_, DiallingNumbersInfo::SIM_ADN);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!(CoreServiceClient::GetInstance().HasSimCard(SimTest::slotId_))) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
         ASSERT_TRUE(true);
         return;
     }
@@ -964,16 +932,15 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0100, Function | Medi
 void QueryIccAdnDiallingNumbersTestFunc1(CoreServiceTestHelper &helper)
 {
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-        SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN);
+        CoreServiceClient::GetInstance().QueryIccDiallingNumbers(SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!(CoreServiceClient::GetInstance().HasSimCard(SimTest::slotId1_))) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
         ASSERT_TRUE(true);
         return;
     }
@@ -993,15 +960,14 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0200, Function | Medi
 HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::shared_ptr<DiallingNumbersInfo> diallingNumber =
             std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_ADN, 0);
         diallingNumber->name_ = Str8ToStr16("SimAdnZhang");
         diallingNumber->number_ = Str8ToStr16("12345678901");
-        SimTest::telephonyService_->AddIccDiallingNumbers(
+        CoreServiceClient::GetInstance().AddIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
         DiallingNumbersInfo mInfo = DiallingNumbersInfo();
         mInfo.UpdateNumber(Str8ToStr16("12345678901"));
@@ -1032,15 +998,14 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0100, Function | Medium
 HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::shared_ptr<DiallingNumbersInfo> diallingNumber =
             std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_ADN, 0);
         diallingNumber->name_ = Str8ToStr16("电话卡");
         diallingNumber->number_ = Str8ToStr16("00000000000");
-        SimTest::telephonyService_->AddIccDiallingNumbers(
+        CoreServiceClient::GetInstance().AddIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
         EXPECT_TRUE(true);
     }
@@ -1054,15 +1019,14 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0200, Function | Medium
 HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0300, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::shared_ptr<DiallingNumbersInfo> diallingNumber =
             std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_ADN, 0);
         diallingNumber->name_ = Str8ToStr16("SimAdnZhang");
         diallingNumber->number_ = Str8ToStr16("12345678901");
-        SimTest::telephonyService_->AddIccDiallingNumbers(
+        CoreServiceClient::GetInstance().AddIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
         EXPECT_TRUE(true);
     }
@@ -1076,15 +1040,14 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0300, Function | Medium
 HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0400, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::shared_ptr<DiallingNumbersInfo> diallingNumber =
             std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_ADN, 0);
         diallingNumber->name_ = Str8ToStr16("电话卡");
         diallingNumber->number_ = Str8ToStr16("00000000000");
-        SimTest::telephonyService_->AddIccDiallingNumbers(
+        CoreServiceClient::GetInstance().AddIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
         EXPECT_TRUE(true);
     }
@@ -1098,16 +1061,15 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0400, Function | Medium
 HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         int index = 1; // Index start from 1
         diallingNumber->name_ = Str8ToStr16("SimAdnLi");
         diallingNumber->number_ = Str8ToStr16("12345678901");
         diallingNumber->index_ = index;
-        SimTest::telephonyService_->UpdateIccDiallingNumbers(
+        CoreServiceClient::GetInstance().UpdateIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
         EXPECT_TRUE(true);
     }
@@ -1121,16 +1083,15 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0100, Function | Med
 HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         int index = 1; // Index start from 1
         diallingNumber->name_ = Str8ToStr16("SimAdnLi");
         diallingNumber->number_ = Str8ToStr16("12345678901");
         diallingNumber->index_ = index;
-        SimTest::telephonyService_->UpdateIccDiallingNumbers(
+        CoreServiceClient::GetInstance().UpdateIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
         EXPECT_TRUE(true);
     }
@@ -1144,14 +1105,13 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0200, Function | Med
 HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         int index = 1; // Index start from 1
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         diallingNumber->index_ = index;
-        SimTest::telephonyService_->DelIccDiallingNumbers(
+        CoreServiceClient::GetInstance().DelIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
         EXPECT_TRUE(true);
     }
@@ -1165,14 +1125,13 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0100, Function | Medium
 HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         int index = 1; // Index start from 1
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         diallingNumber->index_ = index;
-        SimTest::telephonyService_->DelIccDiallingNumbers(
+        CoreServiceClient::GetInstance().DelIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
         EXPECT_TRUE(true);
     }
@@ -1186,16 +1145,15 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0200, Function | Medium
 HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0300, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         int index = 0;
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         diallingNumber->index_ = index;
         diallingNumber->name_ = Str8ToStr16("电话卡");
         diallingNumber->number_ = Str8ToStr16("00000000000");
-        bool result = SimTest::telephonyService_->DelIccDiallingNumbers(
+        bool result = CoreServiceClient::GetInstance().DelIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
         EXPECT_TRUE(result);
     }
@@ -1209,16 +1167,15 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0300, Function | Medium
 void QueryIccFdnDiallingNumbersTestFunc(CoreServiceTestHelper &helper)
 {
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-        SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId_, DiallingNumbersInfo::SIM_FDN);
+        CoreServiceClient::GetInstance().QueryIccDiallingNumbers(SimTest::slotId_, DiallingNumbersInfo::SIM_FDN);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!(CoreServiceClient::GetInstance().HasSimCard(SimTest::slotId_))) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
         ASSERT_TRUE(true);
         return;
     }
@@ -1238,16 +1195,15 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0100, Function | Medi
 void QueryIccFdnDiallingNumbersTestFunc1(CoreServiceTestHelper &helper)
 {
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-        SimTest::telephonyService_->QueryIccDiallingNumbers(SimTest::slotId1_, DiallingNumbersInfo::SIM_FDN);
+        CoreServiceClient::GetInstance().QueryIccDiallingNumbers(SimTest::slotId1_, DiallingNumbersInfo::SIM_FDN);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!(CoreServiceClient::GetInstance().HasSimCard(SimTest::slotId1_))) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
         ASSERT_TRUE(true);
         return;
     }
@@ -1266,16 +1222,15 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0200, Function | Medi
 HWTEST_F(SimTest, Telephony_Sim_AddIccFdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::shared_ptr<DiallingNumbersInfo> diallingNumber =
             std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_FDN, 0);
         diallingNumber->name_ = Str8ToStr16("SimAdnZhang");
         diallingNumber->number_ = Str8ToStr16("12345678901");
         diallingNumber->pin2_ = Str8ToStr16("1234");
-        SimTest::telephonyService_->AddIccDiallingNumbers(
+        CoreServiceClient::GetInstance().AddIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
         EXPECT_TRUE(true);
     }
@@ -1289,16 +1244,15 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccFdnDiallingNumbers_0100, Function | Medium
 HWTEST_F(SimTest, Telephony_Sim_AddIccFdnDiallingNumbers_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::shared_ptr<DiallingNumbersInfo> diallingNumber =
             std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_FDN, 0);
         diallingNumber->name_ = Str8ToStr16("SimAdnZhang");
         diallingNumber->number_ = Str8ToStr16("12345678901");
         diallingNumber->pin2_ = Str8ToStr16("1234");
-        SimTest::telephonyService_->AddIccDiallingNumbers(
+        CoreServiceClient::GetInstance().AddIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
         EXPECT_TRUE(true);
     }
@@ -1312,9 +1266,8 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccFdnDiallingNumbers_0200, Function | Medium
 HWTEST_F(SimTest, Telephony_Sim_UpdateIccFdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         int index = 1; // Index start from 1
@@ -1322,7 +1275,7 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccFdnDiallingNumbers_0100, Function | Med
         diallingNumber->number_ = Str8ToStr16("12345678901");
         diallingNumber->pin2_ = Str8ToStr16("1234");
         diallingNumber->index_ = index;
-        SimTest::telephonyService_->UpdateIccDiallingNumbers(
+        CoreServiceClient::GetInstance().UpdateIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
         EXPECT_TRUE(true);
     }
@@ -1336,9 +1289,8 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccFdnDiallingNumbers_0100, Function | Med
 HWTEST_F(SimTest, Telephony_Sim_UpdateIccFdnDiallingNumbers_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         int index = 1; // Index start from 1
@@ -1346,7 +1298,7 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccFdnDiallingNumbers_0200, Function | Med
         diallingNumber->number_ = Str8ToStr16("12345678901");
         diallingNumber->pin2_ = Str8ToStr16("1234");
         diallingNumber->index_ = index;
-        SimTest::telephonyService_->UpdateIccDiallingNumbers(
+        CoreServiceClient::GetInstance().UpdateIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
         EXPECT_TRUE(true);
     }
@@ -1360,15 +1312,14 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccFdnDiallingNumbers_0200, Function | Med
 HWTEST_F(SimTest, Telephony_Sim_DelIccFdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         int index = 1; // Index start from 1
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         diallingNumber->pin2_ = Str8ToStr16("1234");
         diallingNumber->index_ = index;
-        SimTest::telephonyService_->DelIccDiallingNumbers(
+        CoreServiceClient::GetInstance().DelIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
         EXPECT_TRUE(true);
     }
@@ -1382,15 +1333,14 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccFdnDiallingNumbers_0100, Function | Medium
 HWTEST_F(SimTest, Telephony_Sim_DelIccFdnDiallingNumbers_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         int index = 1; // Index start from 1
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         diallingNumber->pin2_ = Str8ToStr16("1234");
         diallingNumber->index_ = index;
-        SimTest::telephonyService_->DelIccDiallingNumbers(
+        CoreServiceClient::GetInstance().DelIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
         EXPECT_TRUE(true);
     }
@@ -1404,12 +1354,11 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccFdnDiallingNumbers_0200, Function | Medium
 HWTEST_F(SimTest, Telephony_Sim_SetShowName_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         const std::u16string cardName = Str8ToStr16("SimNameZhang");
-        bool result = SimTest::telephonyService_->SetShowName(SimTest::slotId_, cardName);
+        bool result = CoreServiceClient::GetInstance().SetShowName(SimTest::slotId_, cardName);
         EXPECT_TRUE(result);
     }
 }
@@ -1422,12 +1371,11 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowName_0100, Function | MediumTest | Level3
 HWTEST_F(SimTest, Telephony_Sim_SetShowName_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         const std::u16string cardName = Str8ToStr16("SimNameZhang");
-        bool result = SimTest::telephonyService_->SetShowName(SimTest::slotId1_, cardName);
+        bool result = CoreServiceClient::GetInstance().SetShowName(SimTest::slotId1_, cardName);
         EXPECT_TRUE(result);
     }
 }
@@ -1440,11 +1388,10 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowName_0200, Function | MediumTest | Level3
 HWTEST_F(SimTest, Telephony_Sim_getShowName_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetShowName(SimTest::slotId_));
+        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetShowName(SimTest::slotId_));
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -1457,11 +1404,10 @@ HWTEST_F(SimTest, Telephony_Sim_getShowName_0100, Function | MediumTest | Level3
 HWTEST_F(SimTest, Telephony_Sim_getShowName_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(SimTest::telephonyService_->GetShowName(SimTest::slotId1_));
+        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetShowName(SimTest::slotId1_));
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -1474,12 +1420,11 @@ HWTEST_F(SimTest, Telephony_Sim_getShowName_0200, Function | MediumTest | Level3
 HWTEST_F(SimTest, Telephony_Sim_getShowNumber_0100, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::string result = "test";
-        result = Str16ToStr8(SimTest::telephonyService_->GetShowNumber(SimTest::slotId_));
+        result = Str16ToStr8(CoreServiceClient::GetInstance().GetShowNumber(SimTest::slotId_));
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -1492,12 +1437,11 @@ HWTEST_F(SimTest, Telephony_Sim_getShowNumber_0100, Function | MediumTest | Leve
 HWTEST_F(SimTest, Telephony_Sim_getShowNumber_0200, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::string result = "test";
-        result = Str16ToStr8(SimTest::telephonyService_->GetShowNumber(SimTest::slotId1_));
+        result = Str16ToStr8(CoreServiceClient::GetInstance().GetShowNumber(SimTest::slotId1_));
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -1510,12 +1454,11 @@ HWTEST_F(SimTest, Telephony_Sim_getShowNumber_0200, Function | MediumTest | Leve
 HWTEST_F(SimTest, Telephony_Sim_SetShowNumber_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         const std::u16string cardNumber = Str8ToStr16("SimNumber12345678901");
-        bool result = SimTest::telephonyService_->SetShowNumber(SimTest::slotId_, cardNumber);
+        bool result = CoreServiceClient::GetInstance().SetShowNumber(SimTest::slotId_, cardNumber);
         EXPECT_TRUE(result);
     }
 }
@@ -1528,12 +1471,11 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowNumber_0100, Function | MediumTest | Leve
 HWTEST_F(SimTest, Telephony_Sim_SetShowNumber_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         const std::u16string cardNumber = Str8ToStr16("SimNumber12345678901");
-        bool result = SimTest::telephonyService_->SetShowNumber(SimTest::slotId1_, cardNumber);
+        bool result = CoreServiceClient::GetInstance().SetShowNumber(SimTest::slotId1_, cardNumber);
         EXPECT_TRUE(result);
     }
 }
@@ -1545,11 +1487,10 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowNumber_0200, Function | MediumTest | Leve
  */
 HWTEST_F(SimTest, Telephony_Sim_IsSimActive_0100, Function | MediumTest | Level2)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        int32_t result = SimTest::telephonyService_->IsSimActive(SimTest::slotId_);
+        int32_t result = CoreServiceClient::GetInstance().IsSimActive(SimTest::slotId_);
         EXPECT_GT(result, -1);
     }
 }
@@ -1561,11 +1502,10 @@ HWTEST_F(SimTest, Telephony_Sim_IsSimActive_0100, Function | MediumTest | Level2
  */
 HWTEST_F(SimTest, Telephony_Sim_IsSimActive_0200, Function | MediumTest | Level2)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        int32_t result = SimTest::telephonyService_->IsSimActive(SimTest::slotId1_);
+        int32_t result = CoreServiceClient::GetInstance().IsSimActive(SimTest::slotId1_);
         EXPECT_GT(result, -1);
     }
 }
@@ -1578,12 +1518,11 @@ HWTEST_F(SimTest, Telephony_Sim_IsSimActive_0200, Function | MediumTest | Level2
 HWTEST_F(SimTest, Telephony_Sim_GetSimAccountInfo_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         IccAccountInfo info;
-        bool result = SimTest::telephonyService_->GetSimAccountInfo(SimTest::slotId_, info);
+        bool result = CoreServiceClient::GetInstance().GetSimAccountInfo(SimTest::slotId_, info);
         IccAccountInfo mInfo;
         mInfo.Init(SimTest::simId, SimTest::slotId_);
         mInfo.SetIsEsim(false);
@@ -1609,12 +1548,11 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimAccountInfo_0100, Function | MediumTest | 
 HWTEST_F(SimTest, Telephony_Sim_GetSimAccountInfo_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         IccAccountInfo info;
-        bool result = SimTest::telephonyService_->GetSimAccountInfo(SimTest::slotId1_, info);
+        bool result = CoreServiceClient::GetInstance().GetSimAccountInfo(SimTest::slotId1_, info);
         EXPECT_TRUE(result);
     }
 }
@@ -1632,7 +1570,7 @@ void SetLockStateTestFunc(CoreServiceTestHelper &helper)
     testInfo.password = Str8ToStr16("1234");
     testInfo.lockState = LockState::LOCK_OFF;
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->SetLockState(SimTest::slotId_, testInfo, response);
+    bool result = CoreServiceClient::GetInstance().SetLockState(SimTest::slotId_, testInfo, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -1640,9 +1578,8 @@ void SetLockStateTestFunc(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_SetLockState_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(SetLockStateTestFunc, std::ref(helper))) {
@@ -1669,7 +1606,7 @@ void SetLockStateTestFunc1(CoreServiceTestHelper &helper)
     testInfo.password = Str8ToStr16("1234");
     testInfo.lockState = LockState::LOCK_OFF;
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->SetLockState(SimTest::slotId1_, testInfo, response);
+    bool result = CoreServiceClient::GetInstance().SetLockState(SimTest::slotId1_, testInfo, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -1677,9 +1614,8 @@ void SetLockStateTestFunc1(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_SetLockState_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(SetLockStateTestFunc1, std::ref(helper))) {
@@ -1706,16 +1642,15 @@ void SetFDNStateTestFunc(CoreServiceTestHelper &helper)
     testInfo.password = Str8ToStr16("1234");
     testInfo.lockState = LockState::LOCK_OFF;
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->SetLockState(SimTest::slotId_, testInfo, response);
+    bool result = CoreServiceClient::GetInstance().SetLockState(SimTest::slotId_, testInfo, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_SetFDNState_0100, Function | MediumTest | Level2)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(SetFDNStateTestFunc, std::ref(helper))) {
@@ -1741,16 +1676,15 @@ void SetFDNStateTestFunc1(CoreServiceTestHelper &helper)
     testInfo.password = Str8ToStr16("1234");
     testInfo.lockState = LockState::LOCK_OFF;
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->SetLockState(SimTest::slotId1_, testInfo, response);
+    bool result = CoreServiceClient::GetInstance().SetLockState(SimTest::slotId1_, testInfo, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_SetFDNState_0200, Function | MediumTest | Level2)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(SetFDNStateTestFunc1, std::ref(helper))) {
@@ -1772,16 +1706,15 @@ void GetLockStateTestFunc(CoreServiceTestHelper &helper)
 {
     AccessToken token;
     LockType lockType = LockType::PIN_LOCK;
-    int32_t result = SimTest::telephonyService_->GetLockState(SimTest::slotId_, lockType);
+    int32_t result = CoreServiceClient::GetInstance().GetLockState(SimTest::slotId_, lockType);
     helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_GetLockState_0100, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(GetLockStateTestFunc, std::ref(helper))) {
@@ -1803,16 +1736,15 @@ void GetLockStateTestFunc1(CoreServiceTestHelper &helper)
 {
     AccessToken token;
     LockType lockType = LockType::PIN_LOCK;
-    int32_t result = SimTest::telephonyService_->GetLockState(SimTest::slotId1_, lockType);
+    int32_t result = CoreServiceClient::GetInstance().GetLockState(SimTest::slotId1_, lockType);
     helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_GetLockState_0200, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(GetLockStateTestFunc1, std::ref(helper))) {
@@ -1834,16 +1766,15 @@ void GetFDNStateTestFunc(CoreServiceTestHelper &helper)
 {
     AccessToken token;
     LockType lockType = LockType::FDN_LOCK;
-    int32_t result = SimTest::telephonyService_->GetLockState(SimTest::slotId_, lockType);
+    int32_t result = CoreServiceClient::GetInstance().GetLockState(SimTest::slotId_, lockType);
     helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_GetFDNState_0100, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(GetFDNStateTestFunc, std::ref(helper))) {
@@ -1865,16 +1796,15 @@ void GetFDNStateTestFunc1(CoreServiceTestHelper &helper)
 {
     AccessToken token;
     LockType lockType = LockType::FDN_LOCK;
-    int32_t result = SimTest::telephonyService_->GetLockState(SimTest::slotId1_, lockType);
+    int32_t result = CoreServiceClient::GetInstance().GetLockState(SimTest::slotId1_, lockType);
     helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_GetFDNState_0200, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(GetFDNStateTestFunc1, std::ref(helper))) {
@@ -1897,7 +1827,7 @@ void UnlockPinTestFunc(CoreServiceTestHelper &helper)
     AccessToken token;
     const std::u16string pin = Str8ToStr16("1234");
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->UnlockPin(SimTest::slotId_, pin, response);
+    bool result = CoreServiceClient::GetInstance().UnlockPin(SimTest::slotId_, pin, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -1905,9 +1835,8 @@ void UnlockPinTestFunc(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_UnlockPin_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(UnlockPinTestFunc, std::ref(helper))) {
@@ -1931,7 +1860,7 @@ void UnlockPinTestFunc1(CoreServiceTestHelper &helper)
     AccessToken token;
     const std::u16string pin = Str8ToStr16("1234");
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->UnlockPin(SimTest::slotId1_, pin, response);
+    bool result = CoreServiceClient::GetInstance().UnlockPin(SimTest::slotId1_, pin, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -1939,9 +1868,8 @@ void UnlockPinTestFunc1(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_UnlockPin_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(UnlockPinTestFunc1, std::ref(helper))) {
@@ -1966,7 +1894,7 @@ void UnlockPukTestFunc(CoreServiceTestHelper &helper)
     const std::u16string pin = Str8ToStr16("1234");
     const std::u16string puk = Str8ToStr16("42014264");
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->UnlockPuk(SimTest::slotId_, pin, puk, response);
+    bool result = CoreServiceClient::GetInstance().UnlockPuk(SimTest::slotId_, pin, puk, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -1974,9 +1902,8 @@ void UnlockPukTestFunc(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_UnlockPuk_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(UnlockPukTestFunc, std::ref(helper))) {
@@ -2001,7 +1928,7 @@ void UnlockPukTestFunc1(CoreServiceTestHelper &helper)
     const std::u16string pin = Str8ToStr16("1234");
     const std::u16string puk = Str8ToStr16("42014264");
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->UnlockPuk(SimTest::slotId1_, pin, puk, response);
+    bool result = CoreServiceClient::GetInstance().UnlockPuk(SimTest::slotId1_, pin, puk, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -2009,9 +1936,8 @@ void UnlockPukTestFunc1(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_UnlockPuk_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(UnlockPukTestFunc1, std::ref(helper))) {
@@ -2036,7 +1962,7 @@ void AlterPinTestFunc(CoreServiceTestHelper &helper)
     const std::u16string newpin = Str8ToStr16("1234");
     const std::u16string oldpin = Str8ToStr16("4321");
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->AlterPin(SimTest::slotId_, newpin, oldpin, response);
+    bool result = CoreServiceClient::GetInstance().AlterPin(SimTest::slotId_, newpin, oldpin, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -2044,9 +1970,8 @@ void AlterPinTestFunc(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_AlterPin_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(AlterPinTestFunc, std::ref(helper))) {
@@ -2071,7 +1996,7 @@ void AlterPinTestFunc1(CoreServiceTestHelper &helper)
     const std::u16string newpin = Str8ToStr16("1234");
     const std::u16string oldpin = Str8ToStr16("4321");
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->AlterPin(SimTest::slotId1_, newpin, oldpin, response);
+    bool result = CoreServiceClient::GetInstance().AlterPin(SimTest::slotId1_, newpin, oldpin, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -2079,9 +2004,8 @@ void AlterPinTestFunc1(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_AlterPin_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(AlterPinTestFunc1, std::ref(helper))) {
@@ -2105,7 +2029,7 @@ void UnlockPin2TestFunc(CoreServiceTestHelper &helper)
     AccessToken token;
     const std::u16string pin2 = Str8ToStr16("12345678");
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->UnlockPin2(SimTest::slotId_, pin2, response);
+    bool result = CoreServiceClient::GetInstance().UnlockPin2(SimTest::slotId_, pin2, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -2113,9 +2037,8 @@ void UnlockPin2TestFunc(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_UnlockPin2_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(UnlockPin2TestFunc, std::ref(helper))) {
@@ -2139,7 +2062,7 @@ void UnlockPin2TestFunc1(CoreServiceTestHelper &helper)
     AccessToken token;
     const std::u16string pin2 = Str8ToStr16("12345678");
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->UnlockPin2(SimTest::slotId1_, pin2, response);
+    bool result = CoreServiceClient::GetInstance().UnlockPin2(SimTest::slotId1_, pin2, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -2147,9 +2070,8 @@ void UnlockPin2TestFunc1(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_UnlockPin2_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(UnlockPin2TestFunc1, std::ref(helper))) {
@@ -2174,7 +2096,7 @@ void UnlockPuk2TestFunc(CoreServiceTestHelper &helper)
     const std::u16string pin2 = Str8ToStr16("12345678");
     const std::u16string puk2 = Str8ToStr16("42014264");
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->UnlockPuk2(SimTest::slotId_, pin2, puk2, response);
+    bool result = CoreServiceClient::GetInstance().UnlockPuk2(SimTest::slotId_, pin2, puk2, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -2182,9 +2104,8 @@ void UnlockPuk2TestFunc(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_UnlockPuk2_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(UnlockPuk2TestFunc, std::ref(helper))) {
@@ -2209,7 +2130,7 @@ void UnlockPuk2TestFunc1(CoreServiceTestHelper &helper)
     const std::u16string pin2 = Str8ToStr16("12345678");
     const std::u16string puk2 = Str8ToStr16("42014264");
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->UnlockPuk2(SimTest::slotId1_, pin2, puk2, response);
+    bool result = CoreServiceClient::GetInstance().UnlockPuk2(SimTest::slotId1_, pin2, puk2, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -2217,9 +2138,8 @@ void UnlockPuk2TestFunc1(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_UnlockPuk2_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(UnlockPuk2TestFunc1, std::ref(helper))) {
@@ -2244,7 +2164,7 @@ void AlterPin2TestFunc(CoreServiceTestHelper &helper)
     const std::u16string newpin2 = Str8ToStr16("12345678");
     const std::u16string oldpin2 = Str8ToStr16("42014264");
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->AlterPin2(SimTest::slotId_, newpin2, oldpin2, response);
+    bool result = CoreServiceClient::GetInstance().AlterPin2(SimTest::slotId_, newpin2, oldpin2, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -2252,9 +2172,8 @@ void AlterPin2TestFunc(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_AlterPin2_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(AlterPin2TestFunc, std::ref(helper))) {
@@ -2279,7 +2198,7 @@ void AlterPin2TestFunc1(CoreServiceTestHelper &helper)
     const std::u16string newpin2 = Str8ToStr16("12345678");
     const std::u16string oldpin2 = Str8ToStr16("42014264");
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->AlterPin2(SimTest::slotId1_, newpin2, oldpin2, response);
+    bool result = CoreServiceClient::GetInstance().AlterPin2(SimTest::slotId1_, newpin2, oldpin2, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -2287,9 +2206,8 @@ void AlterPin2TestFunc1(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_AlterPin2_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(AlterPin2TestFunc1, std::ref(helper))) {
@@ -2312,16 +2230,15 @@ void SetActiveSimTestFunc(CoreServiceTestHelper &helper)
 {
     AccessToken token;
     int enable = 1;
-    bool result = SimTest::telephonyService_->SetActiveSim(SimTest::slotId_, enable);
+    bool result = CoreServiceClient::GetInstance().SetActiveSim(SimTest::slotId_, enable);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_SetActiveSim_0100, Function | MediumTest | Level2)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(SetActiveSimTestFunc, std::ref(helper))) {
@@ -2343,16 +2260,15 @@ void SetActiveSimTestFunc1(CoreServiceTestHelper &helper)
 {
     AccessToken token;
     int enable = 1;
-    bool result = SimTest::telephonyService_->SetActiveSim(SimTest::slotId1_, enable);
+    bool result = CoreServiceClient::GetInstance().SetActiveSim(SimTest::slotId1_, enable);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_SetActiveSim_0200, Function | MediumTest | Level2)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(SetActiveSimTestFunc1, std::ref(helper))) {
@@ -2374,16 +2290,15 @@ void ReSetActiveSimTestFunc(CoreServiceTestHelper &helper)
 {
     AccessToken token;
     int enable = 1;
-    bool result = SimTest::telephonyService_->SetActiveSim(SimTest::slotId_, enable);
+    bool result = CoreServiceClient::GetInstance().SetActiveSim(SimTest::slotId_, enable);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSim_0100, Function | MediumTest | Level2)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(ReSetActiveSimTestFunc, std::ref(helper))) {
@@ -2405,16 +2320,15 @@ void ReSetActiveSimTestFunc1(CoreServiceTestHelper &helper)
 {
     AccessToken token;
     int enable = 1;
-    bool result = SimTest::telephonyService_->SetActiveSim(SimTest::slotId1_, enable);
+    bool result = CoreServiceClient::GetInstance().SetActiveSim(SimTest::slotId1_, enable);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSim_0200, Function | MediumTest | Level2)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(ReSetActiveSimTestFunc1, std::ref(helper))) {
@@ -2438,7 +2352,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetMaxSimCount_0100, Function | MediumTest | Lev
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         SimTest::telephonyService_ = GetProxy();
     } else {
-        int32_t result = SimTest::telephonyService_->GetMaxSimCount();
+        int32_t result = CoreServiceClient::GetInstance().GetMaxSimCount();
         EXPECT_GT(result, -1);
     }
 }
@@ -2451,12 +2365,11 @@ HWTEST_F(SimTest, Telephony_Sim_GetMaxSimCount_0100, Function | MediumTest | Lev
  */
 HWTEST_F(SimTest, Telephony_Sim_GetOpKey_0100, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::u16string opkey;
-        int32_t result = SimTest::telephonyService_->GetOpKey(SimTest::slotId_, opkey);
+        int32_t result = CoreServiceClient::GetInstance().GetOpKey(SimTest::slotId_, opkey);
         EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
@@ -2468,12 +2381,11 @@ HWTEST_F(SimTest, Telephony_Sim_GetOpKey_0100, Function | MediumTest | Level1)
  */
 HWTEST_F(SimTest, Telephony_Sim_GetOpKey_0200, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::u16string opkey;
-        int32_t result = SimTest::telephonyService_->GetOpKey(SimTest::slotId1_, opkey);
+        int32_t result = CoreServiceClient::GetInstance().GetOpKey(SimTest::slotId1_, opkey);
         EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
@@ -2486,12 +2398,11 @@ HWTEST_F(SimTest, Telephony_Sim_GetOpKey_0200, Function | MediumTest | Level1)
  */
 HWTEST_F(SimTest, Telephony_Sim_GetOpKeyExt_0100, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::u16string opkeyExt;
-        int32_t result = SimTest::telephonyService_->GetOpKeyExt(SimTest::slotId_, opkeyExt);
+        int32_t result = CoreServiceClient::GetInstance().GetOpKeyExt(SimTest::slotId_, opkeyExt);
         EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
@@ -2503,12 +2414,11 @@ HWTEST_F(SimTest, Telephony_Sim_GetOpKeyExt_0100, Function | MediumTest | Level1
  */
 HWTEST_F(SimTest, Telephony_Sim_GetOpKeyExt_0200, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::u16string opkeyExt;
-        int32_t result = SimTest::telephonyService_->GetOpKey(SimTest::slotId1_, opkeyExt);
+        int32_t result = CoreServiceClient::GetInstance().GetOpKey(SimTest::slotId1_, opkeyExt);
         EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
@@ -2521,12 +2431,11 @@ HWTEST_F(SimTest, Telephony_Sim_GetOpKeyExt_0200, Function | MediumTest | Level1
  */
 HWTEST_F(SimTest, Telephony_Sim_GetOpName_0100, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::u16string opname;
-        int32_t result = SimTest::telephonyService_->GetOpName(SimTest::slotId_, opname);
+        int32_t result = CoreServiceClient::GetInstance().GetOpName(SimTest::slotId_, opname);
         EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
@@ -2538,12 +2447,11 @@ HWTEST_F(SimTest, Telephony_Sim_GetOpName_0100, Function | MediumTest | Level1)
  */
 HWTEST_F(SimTest, Telephony_Sim_GetOpName_0200, Function | MediumTest | Level1)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::u16string opname;
-        int32_t result = SimTest::telephonyService_->GetOpName(SimTest::slotId1_, opname);
+        int32_t result = CoreServiceClient::GetInstance().GetOpName(SimTest::slotId1_, opname);
         EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
@@ -2556,18 +2464,17 @@ HWTEST_F(SimTest, Telephony_Sim_GetOpName_0200, Function | MediumTest | Level1)
 void HasOperatorPrivileges(CoreServiceTestHelper &helper)
 {
     constexpr int32_t slotId = 0;
-    bool result = SimTest::telephonyService_->HasOperatorPrivileges(slotId);
+    bool result = CoreServiceClient::GetInstance().HasOperatorPrivileges(slotId);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_HasOperatorPrivileges_0100, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_)) ||
-        (SimTest::telephonyService_->GetSimState(SimTest::slotId_) !=
+    if (!(CoreServiceClient::GetInstance().HasSimCard(SimTest::slotId_)) ||
+        (CoreServiceClient::GetInstance().GetSimState(SimTest::slotId_) !=
             static_cast<int32_t>(SimState::SIM_STATE_READY))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(HasOperatorPrivileges, std::ref(helper))) {
@@ -2588,18 +2495,17 @@ HWTEST_F(SimTest, Telephony_Sim_HasOperatorPrivileges_0100, Function | MediumTes
 void HasOperatorPrivileges1(CoreServiceTestHelper &helper)
 {
     constexpr int32_t slotId = 1;
-    bool result = SimTest::telephonyService_->HasOperatorPrivileges(slotId);
+    bool result = CoreServiceClient::GetInstance().HasOperatorPrivileges(slotId);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_HasOperatorPrivileges_0200, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_)) ||
-        (SimTest::telephonyService_->GetSimState(SimTest::slotId1_) !=
+    if (!(CoreServiceClient::GetInstance().HasSimCard(SimTest::slotId1_)) ||
+        (CoreServiceClient::GetInstance().GetSimState(SimTest::slotId1_) !=
             static_cast<int32_t>(SimState::SIM_STATE_READY))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(HasOperatorPrivileges1, std::ref(helper))) {
@@ -2619,11 +2525,10 @@ HWTEST_F(SimTest, Telephony_Sim_HasOperatorPrivileges_0200, Function | MediumTes
  */
 HWTEST_F(SimTest, Telephony_Sim_GetCardType_0100, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        int32_t result = SimTest::telephonyService_->GetCardType(SimTest::slotId_);
+        int32_t result = CoreServiceClient::GetInstance().GetCardType(SimTest::slotId_);
         EXPECT_GT(result, -1);
     }
 }
@@ -2635,11 +2540,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetCardType_0100, Function | MediumTest | Level3
  */
 HWTEST_F(SimTest, Telephony_Sim_GetCardType_0200, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        int32_t result = SimTest::telephonyService_->GetCardType(SimTest::slotId1_);
+        int32_t result = CoreServiceClient::GetInstance().GetCardType(SimTest::slotId1_);
         EXPECT_GT(result, -1);
     }
 }
@@ -2656,7 +2560,7 @@ void UnlockSimLockTestFunc(CoreServiceTestHelper &helper)
     lockInfo.lockType = PersoLockType::PN_PIN_LOCK;
     lockInfo.password = Str8ToStr16("1234");
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->UnlockSimLock(SimTest::slotId_, lockInfo, response);
+    bool result = CoreServiceClient::GetInstance().UnlockSimLock(SimTest::slotId_, lockInfo, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -2664,9 +2568,8 @@ void UnlockSimLockTestFunc(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_UnlockSimLock_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(UnlockSimLockTestFunc, std::ref(helper))) {
@@ -2692,7 +2595,7 @@ void UnlockSimLockTestFunc1(CoreServiceTestHelper &helper)
     lockInfo.lockType = PersoLockType::PN_PIN_LOCK;
     lockInfo.password = Str8ToStr16("1234");
     LockStatusResponse response = { 0 };
-    bool result = SimTest::telephonyService_->UnlockSimLock(SimTest::slotId1_, lockInfo, response);
+    bool result = CoreServiceClient::GetInstance().UnlockSimLock(SimTest::slotId1_, lockInfo, response);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -2700,9 +2603,8 @@ void UnlockSimLockTestFunc1(CoreServiceTestHelper &helper)
 HWTEST_F(SimTest, Telephony_Sim_UnlockSimLock_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(UnlockSimLockTestFunc1, std::ref(helper))) {
@@ -2727,16 +2629,15 @@ void SimAuthenticationTestFunc(CoreServiceTestHelper &helper)
     SimAuthenticationResponse response = { 0 };
     std::string aid = "aa";
     std::string authData = "1234";
-    int32_t result = SimTest::telephonyService_->SimAuthentication(SimTest::slotId_, aid, authData, response);
+    int32_t result = CoreServiceClient::GetInstance().SimAuthentication(SimTest::slotId_, aid, authData, response);
     helper.SetBoolResult(result == 0);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_SimAuthentication_0100, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(SimAuthenticationTestFunc, std::ref(helper))) {
@@ -2760,16 +2661,15 @@ void SimAuthenticationTestFunc1(CoreServiceTestHelper &helper)
     SimAuthenticationResponse response = { 0 };
     std::string aid = "aa";
     std::string authData = "1234";
-    int32_t result = SimTest::telephonyService_->SimAuthentication(SimTest::slotId1_, aid, authData, response);
+    int32_t result = CoreServiceClient::GetInstance().SimAuthentication(SimTest::slotId1_, aid, authData, response);
     helper.SetBoolResult(result == 0);
     helper.NotifyAll();
 }
 
 HWTEST_F(SimTest, Telephony_Sim_SimAuthentication_0200, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(SimAuthenticationTestFunc1, std::ref(helper))) {
@@ -2790,11 +2690,10 @@ HWTEST_F(SimTest, Telephony_Sim_SimAuthentication_0200, Function | MediumTest | 
 HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        bool result = SimTest::telephonyService_->SetPrimarySlotId(SimTest::slotId_);
+        bool result = CoreServiceClient::GetInstance().SetPrimarySlotId(SimTest::slotId_);
         EXPECT_TRUE(result);
     }
 }
@@ -2807,11 +2706,10 @@ HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0100, Function | MediumTest | L
 HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        bool result = SimTest::telephonyService_->SetPrimarySlotId(SimTest::slotId1_);
+        bool result = CoreServiceClient::GetInstance().SetPrimarySlotId(SimTest::slotId1_);
         EXPECT_TRUE(result);
     }
 }
@@ -2823,11 +2721,10 @@ HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0200, Function | MediumTest | L
  */
 HWTEST_F(SimTest, Telephony_Sim_GetPrimarySlotId_0100, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        int32_t result = SimTest::telephonyService_->GetPrimarySlotId();
+        int32_t result = CoreServiceClient::GetInstance().GetPrimarySlotId();
         EXPECT_GT(result, -1);
     }
 }
@@ -2837,7 +2734,7 @@ void SendTerminalResponseCmdTestFunc(CoreServiceTestHelper &helper)
     AccessToken token;
     int32_t slotId = 0;
     std::string cmd = "send terminal response";
-    bool result = SimTest::telephonyService_->SendTerminalResponseCmd(slotId, cmd);
+    bool result = CoreServiceClient::GetInstance().SendTerminalResponseCmd(slotId, cmd);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -2849,9 +2746,8 @@ void SendTerminalResponseCmdTestFunc(CoreServiceTestHelper &helper)
  */
 HWTEST_F(SimTest, Telephony_Sim_SendTerminalResponseCmd_0100, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(SendTerminalResponseCmdTestFunc, std::ref(helper))) {
@@ -2862,6 +2758,16 @@ HWTEST_F(SimTest, Telephony_Sim_SendTerminalResponseCmd_0100, Function | MediumT
             EXPECT_TRUE(result);
         }
     }
+}
+
+void SendTerminalResponseCmdTestFunc1(CoreServiceTestHelper &helper)
+{
+    AccessToken token;
+    int32_t slotId = 1;
+    std::string cmd = "send terminal response";
+    bool result = CoreServiceClient::GetInstance().SendTerminalResponseCmd(slotId, cmd);
+    helper.SetBoolResult(result);
+    helper.NotifyAll();
 }
 
 /**
@@ -2876,7 +2782,7 @@ HWTEST_F(SimTest, Telephony_Sim_SendTerminalResponseCmd_0200, Function | MediumT
         SimTest::telephonyService_ = GetProxy();
     } else {
         CoreServiceTestHelper helper;
-        if (!helper.Run(SendTerminalResponseCmdTestFunc, std::ref(helper))) {
+        if (!helper.Run(SendTerminalResponseCmdTestFunc1, std::ref(helper))) {
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
@@ -2891,7 +2797,7 @@ void SendEnvelopeCmdTestFunc(CoreServiceTestHelper &helper)
     AccessToken token;
     int32_t slotId = 0;
     std::string cmd = "send envelope";
-    bool result = SimTest::telephonyService_->SendEnvelopeCmd(slotId, cmd);
+    bool result = CoreServiceClient::GetInstance().SendEnvelopeCmd(slotId, cmd);
     helper.SetBoolResult(result);
     helper.NotifyAll();
 }
@@ -2903,9 +2809,8 @@ void SendEnvelopeCmdTestFunc(CoreServiceTestHelper &helper)
  */
 HWTEST_F(SimTest, Telephony_Sim_SendEnvelopeCmd_0100, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(SendEnvelopeCmdTestFunc, std::ref(helper))) {
@@ -2918,6 +2823,16 @@ HWTEST_F(SimTest, Telephony_Sim_SendEnvelopeCmd_0100, Function | MediumTest | Le
     }
 }
 
+void SendEnvelopeCmdTestFunc1(CoreServiceTestHelper &helper)
+{
+    AccessToken token;
+    int32_t slotId = 1;
+    std::string cmd = "send envelope";
+    bool result = CoreServiceClient::GetInstance().SendEnvelopeCmd(slotId, cmd);
+    helper.SetBoolResult(result);
+    helper.NotifyAll();
+}
+
 /**
  * @tc.number   Telephony_Sim_SendEnvelopeCmd_0200
  * @tc.name     Send Envelope Command
@@ -2925,12 +2840,11 @@ HWTEST_F(SimTest, Telephony_Sim_SendEnvelopeCmd_0100, Function | MediumTest | Le
  */
 HWTEST_F(SimTest, Telephony_Sim_SendEnvelopeCmd_0200, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
-        if (!helper.Run(SendEnvelopeCmdTestFunc, std::ref(helper))) {
+        if (!helper.Run(SendEnvelopeCmdTestFunc1, std::ref(helper))) {
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
@@ -2945,7 +2859,7 @@ void SendCallSetupRequestResultTestFunc(CoreServiceTestHelper &helper)
     AccessToken token;
     int32_t slotId = 0;
     bool accept = true;
-    int32_t result = SimTest::telephonyService_->SendCallSetupRequestResult(slotId, accept);
+    int32_t result = CoreServiceClient::GetInstance().SendCallSetupRequestResult(slotId, accept);
     helper.SetIntResult(result);
     helper.NotifyAll();
 }
@@ -2957,9 +2871,8 @@ void SendCallSetupRequestResultTestFunc(CoreServiceTestHelper &helper)
  */
 HWTEST_F(SimTest, Telephony_Sim_SendCallSetupRequestResult_0100, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(SendCallSetupRequestResultTestFunc, std::ref(helper))) {
@@ -2972,6 +2885,16 @@ HWTEST_F(SimTest, Telephony_Sim_SendCallSetupRequestResult_0100, Function | Medi
     }
 }
 
+void SendCallSetupRequestResultTestFunc1(CoreServiceTestHelper &helper)
+{
+    AccessToken token;
+    int32_t slotId = 1;
+    bool accept = true;
+    int32_t result = CoreServiceClient::GetInstance().SendCallSetupRequestResult(slotId, accept);
+    helper.SetIntResult(result);
+    helper.NotifyAll();
+}
+
 /**
  * @tc.number   Telephony_Sim_SendCallSetupRequestResult_0200
  * @tc.name     Send Call Setup Request Result Command
@@ -2979,12 +2902,11 @@ HWTEST_F(SimTest, Telephony_Sim_SendCallSetupRequestResult_0100, Function | Medi
  */
 HWTEST_F(SimTest, Telephony_Sim_SendCallSetupRequestResult_0200, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         CoreServiceTestHelper helper;
-        if (!helper.Run(SendCallSetupRequestResultTestFunc, std::ref(helper))) {
+        if (!helper.Run(SendCallSetupRequestResultTestFunc1, std::ref(helper))) {
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
@@ -3002,13 +2924,12 @@ HWTEST_F(SimTest, Telephony_Sim_SendCallSetupRequestResult_0200, Function | Medi
 HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailInfo_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         const std::u16string mailName = Str8ToStr16("张三");
         const std::u16string mailnumber = Str8ToStr16("13123456789");
-        bool result = SimTest::telephonyService_->SetVoiceMailInfo(SimTest::slotId_, mailName, mailnumber);
+        bool result = CoreServiceClient::GetInstance().SetVoiceMailInfo(SimTest::slotId_, mailName, mailnumber);
         EXPECT_TRUE(result);
     }
 }
@@ -3021,15 +2942,138 @@ HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailInfo_0100, Function | MediumTest | L
 HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailInfo_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId1_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         const std::u16string mailName = Str8ToStr16("张三");
         const std::u16string mailnumber = Str8ToStr16("13123456789");
-        bool result = SimTest::telephonyService_->SetVoiceMailInfo(SimTest::slotId1_, mailName, mailnumber);
+        bool result = CoreServiceClient::GetInstance().SetVoiceMailInfo(SimTest::slotId1_, mailName, mailnumber);
         EXPECT_TRUE(result);
     }
+}
+
+/**
+ * @tc.number   Telephony_Sim_GetSlotId_0100
+ * @tc.name     Get slot id
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetSlotId_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        int32_t simId = 1;
+        int32_t result = CoreServiceClient::GetInstance().GetSlotId(simId);
+        EXPECT_GT(result, -1);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_GetSimId_0100
+ * @tc.name     Get sim id
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetSimId_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        int32_t slotId = 0;
+        int32_t result = CoreServiceClient::GetInstance().GetSimId(slotId);
+        EXPECT_GT(result, 0);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_GetSimEons_0100
+ * @tc.name     Get sim eons
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetSimEons_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        std::string plmn = "46001";
+        int32_t lac = 1;
+        bool longNameRequired = true;
+        string result = "test";
+        result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimEons(slotId_, plmn, lac, longNameRequired));
+        EXPECT_NE(result, "test");
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_IsNrSupported_0100
+ * @tc.name     Is nr  supported
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_IsNrSupported_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceClient::GetInstance().IsNrSupported(slotId_);
+        ASSERT_TRUE(true);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_GetNrOptionMode_0100
+ * @tc.name     get nr option mode
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetNrOptionMode_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card or Nr not supported");
+    } else {
+        int result = (int)(CoreServiceClient::GetInstance().GetNrOptionMode(slotId_));
+        ASSERT_GT(result, -1);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_TestTelProfileUtil_0100
+ * @tc.name     TestTelProfileUtil
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_TestTelProfileUtil_0100, Function | MediumTest | Level3)
+{
+    auto telProfileUtil = DelayedSingleton<TelProfileUtil>::GetInstance();
+    std::string key = "";
+    std::string value = "";
+    std::string defValue = "";
+    int saveValue = 1;
+    int getValue = 1;
+    bool saveBool = true;
+    bool getBool = true;
+    int64_t longValue = 1;
+    int64_t getLongValue = 1;
+    float saveFloatValue = 1;
+    float getFloatValue = 1;
+    telProfileUtil->SaveString(key, value);
+    telProfileUtil->ObtainString(key, defValue);
+    telProfileUtil->SaveInt(key, saveValue);
+    telProfileUtil->ObtainInt(key, getValue);
+    telProfileUtil->SaveBool(key, saveBool);
+    telProfileUtil->ObtainBool(key, getBool);
+    telProfileUtil->SaveLong(key, longValue);
+    telProfileUtil->ObtainLong(key, getLongValue);
+    telProfileUtil->SaveFloat(key, saveFloatValue);
+    telProfileUtil->ObtainFloat(key, getFloatValue);
+    telProfileUtil->IsExistKey(key);
+    telProfileUtil->RemoveKey(key);
+    telProfileUtil->RemoveAll();
+    telProfileUtil->Refresh();
+    telProfileUtil->RefreshSync();
+    telProfileUtil->DeleteProfiles();
+    EXPECT_TRUE(true);
 }
 
 #else // TEL_TEST_UNSUPPORT
@@ -3040,9 +3084,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailInfo_0200, Function | MediumTest | L
  */
 HWTEST_F(SimTest, Telephony_Sim_MockTest_0100, Function | MediumTest | Level3)
 {
-    if (SimTest::telephonyService_ == nullptr || !(SimTest::telephonyService_->HasSimCard(SimTest::slotId_))) {
-        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
-        SimTest::telephonyService_ = GetProxy();
+    if (!(CoreServiceClient::GetInstance().HasSimCard(SimTest::slotId_))) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
     }
     EXPECT_TRUE(true);
 }
