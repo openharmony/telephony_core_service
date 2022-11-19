@@ -33,6 +33,7 @@ ohos_unittest("tel_core_service_gtest") {
   include_dirs = [
     "//base/telephony/core_service/services/core/include",
     "//base/telephony/core_service/utils/log/include",
+    "//base/telephony/core_service/utils/preferences/include",
     "//base/telephony/core_service/common/sim",
     "//base/telephony/core_service/services/sim/include",
     "//base/telephony/core_service/common/network_search",
@@ -46,6 +47,7 @@ ohos_unittest("tel_core_service_gtest") {
   deps = [
     "//base/telephony/core_service:tel_core_service",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
+    "//base/telephony/core_service/utils:libtel_common",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
   ]
