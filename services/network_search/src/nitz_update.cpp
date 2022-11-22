@@ -194,12 +194,12 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
     t.tm_min = networkTime.minute;
     t.tm_sec = networkTime.second;
 
-    if (!IsValidTime(static_cast<int64_t>(mktime(&t)))) {
+    if (!IsValidTime(static_cast<int64_t>(timegm(&t)))) {
         TELEPHONY_LOGE("NitzUpdate::ProcessTime invalid time, slotId:%{public}d", slotId_);
         return;
     }
 
-    SaveTime(static_cast<int64_t>(mktime(&t)));
+    SaveTime(static_cast<int64_t>(timegm(&t)));
     if (runningLock != nullptr) {
         runningLock->UnLock();
     }
