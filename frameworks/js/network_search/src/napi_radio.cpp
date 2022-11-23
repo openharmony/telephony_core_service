@@ -161,6 +161,9 @@ static void NativeGetRadioTech(napi_env env, void *data)
 static void GetRadioTechCallback(napi_env env, napi_status status, void *data)
 {
     auto asyncContext = static_cast<RadioTechContext *>(data);
+    if (asyncContext == nullptr) {
+        return;
+    }
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
         napi_create_object(env, &callbackValue);

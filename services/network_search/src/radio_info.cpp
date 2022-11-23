@@ -47,7 +47,6 @@ void RadioInfo::ProcessGetRadioState(const AppExecFwk::InnerEvent::Pointer &even
     if (responseInfo != nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetRadioState false slotId:%{public}d", slotId_);
         index = responseInfo->flag;
-        state = false;
         if (!data.WriteBool(state) || !data.WriteInt32((int32_t)responseInfo->error)) {
             NetworkUtils::RemoveCallbackFromMap(index);
             return;
@@ -56,8 +55,7 @@ void RadioInfo::ProcessGetRadioState(const AppExecFwk::InnerEvent::Pointer &even
     if (object != nullptr) {
         index = object->flag;
         int32_t radioState = object->state;
-        TELEPHONY_LOGI(
-            "RadioInfo::ProcessGetRadioState RadioState is:%{public}d slotId:%{public}d", radioState, slotId_);
+        TELEPHONY_LOGI("ProcessGetRadioState RadioState is:%{public}d slotId:%{public}d", radioState, slotId_);
         state = (radioState == ModemPowerState::CORE_SERVICE_POWER_ON) ? true : false;
         nsm->SetRadioStateValue(slotId_, (ModemPowerState)radioState);
         if (!data.WriteBool(state) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
