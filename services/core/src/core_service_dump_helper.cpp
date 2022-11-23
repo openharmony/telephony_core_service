@@ -75,7 +75,7 @@ void CoreServiceDumpHelper::ShowCoreServiceInfo(std::string &result) const
             result.append("\nSignalLevel = ");
             std::vector<sptr<SignalInformation>> signals =
                 DelayedSingleton<CoreService>::GetInstance()->GetSignalInfoList(i);
-            if (signals[0] != nullptr) {
+            if (signals.size() != 0 && signals[0] != nullptr) {
                 result.append(std::to_string(signals[0]->GetSignalLevel()));
             }
             result.append("\nCardType = ");
