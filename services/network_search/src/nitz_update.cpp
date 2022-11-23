@@ -20,7 +20,7 @@
 #include "common_event.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
-#include "core_service.h"
+#include "core_manager_inner.h"
 #include "network_search_manager.h"
 #include "power_mgr_client.h"
 #include "setting_utils.h"
@@ -247,7 +247,7 @@ void NitzUpdate::ProcessTimeZone()
         TELEPHONY_LOGE("failed to get NetworkSearchManager slotId:%{public}d", slotId_);
         return;
     }
-    int32_t primarySlotId = DelayedSingleton<CoreService>::GetInstance()->GetPrimarySlotId();
+    int32_t primarySlotId = CoreManagerInner::GetInstance().GetPrimarySlotId();
     if (primarySlotId == INVALID_VALUE) {
         TELEPHONY_LOGI("primarySlotId %{public}d is invalid slotId:%{public}d", primarySlotId, slotId_);
         return;
