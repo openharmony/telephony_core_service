@@ -97,12 +97,16 @@ int32_t SimRdbHelper::GetDefaultMainCardSlotId()
     NativeRdb::DataAbilityPredicates predicates;
     predicates.EqualTo(SimRdbInfo::IS_MAIN_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
     std::shared_ptr<NativeRdb::AbsSharedResultSet> result = Query(colume, predicates);
-    int index = 0;
     if (result == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::get nothing");
         return mainCardSlotId;
     }
-    result->GoToFirstRow();
+    int resultSetNum = result->GoToFirstRow();
+    if (resultSetNum != 0) {
+        TELEPHONY_LOGI("SimRdbHelper::GetDefaultMainCardSlotId not found main card");
+        return mainCardSlotId;
+    }
+    int index = 0;
     result->GetColumnIndex(SimRdbInfo::SLOT_INDEX, index);
     result->GetInt(index, mainCardSlotId);
     result->Close();
