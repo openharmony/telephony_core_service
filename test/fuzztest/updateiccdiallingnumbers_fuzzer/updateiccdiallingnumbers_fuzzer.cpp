@@ -17,11 +17,14 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <thread>
+
 #define private public
 #include "addcoreservicetoken_fuzzer.h"
 #include "core_service.h"
 #include "napi_util.h"
 #include "system_ability_definition.h"
+#include "unistd.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -30,13 +33,20 @@ constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t ACCEPT_TYPE = 2;
 constexpr int32_t SIM_TYPE_NUM = 2;
 constexpr int32_t TWO_INT_NUM = 2;
+constexpr int32_t SLEEP_TIME_SECONDS = 10;
 
 bool IsServiceInited()
 {
-    DelayedSingleton<CoreService>::GetInstance()->OnStart();
-    if (!g_isInited && (static_cast<int32_t>(DelayedSingleton<CoreService>::GetInstance()->state_) ==
-                         static_cast<int32_t>(ServiceRunningState::STATE_RUNNING))) {
-        g_isInited = true;
+    if (!g_isInited) {
+        auto onStart = [] { DelayedSingleton<CoreService>::GetInstance()->OnStart(); };
+        std::thread startThread(onStart);
+        startThread.join();
+
+        sleep(SLEEP_TIME_SECONDS);
+        if (DelayedSingleton<CoreService>::GetInstance()->GetServiceRunningState() ==
+            static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
+            g_isInited = true;
+        }
     }
     return g_isInited;
 }
