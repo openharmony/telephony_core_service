@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Telephony {
+static const int32_t DEFAULT_MAIN_SLOT_ID = 0;
 static const int32_t EVENT_CODE = 1;
 static const int32_t ACTIVATABLE = 2;
 static const int32_t RETRY_COUNT = 12;
@@ -645,8 +646,11 @@ int32_t MultiSimController::GetPrimarySlotId()
     TELEPHONY_LOGI("MultiSimController::GetPrimarySlotId");
     std::lock_guard<std::mutex> lock(mutex_);
     if (localCacheInfo_.empty()) {
-        TELEPHONY_LOGE("MultiSimController::GetPrimarySlotId failed by nullptr");
-        return INVALID_VALUE;
+        if (simDbHelper_ == nullptr) {
+            TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId failed by nullptr");
+            return DEFAULT_MAIN_SLOT_ID;
+        }
+        return simDbHelper_->GetDefaultMainCardSlotId();
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
     for (; i < maxCount_; i++) {
