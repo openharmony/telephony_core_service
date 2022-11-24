@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Telephony {
 using EventType = OHOS::HiviewDFX::HiSysEvent::EventType;
-static constexpr const char *DOMAIN_NAME = "TELEPHONY";
+static constexpr const char *DOMAIN_NAME = OHOS::HiviewDFX::HiSysEvent::Domain::TELEPHONY;
 static const int32_t INVALID_PARAMETER = -1;
 
 enum class CallErrorCode {
@@ -108,13 +108,13 @@ public:
     template<typename... Types>
     static void HiWriteBehaviorEvent(const std::string &eventName, Types... args)
     {
-        OHOS::HiviewDFX::HiSysEvent::Write(DOMAIN_NAME, eventName, EventType::BEHAVIOR, args...);
+        HiSysEventWrite(DOMAIN_NAME, eventName, EventType::BEHAVIOR, args...);
     }
 
     template<typename... Types>
     static void HiWriteFaultEvent(const std::string &eventName, Types... args)
     {
-        OHOS::HiviewDFX::HiSysEvent::Write(DOMAIN_NAME, eventName, EventType::FAULT, args...);
+        HiSysEventWrite(DOMAIN_NAME, eventName, EventType::FAULT, args...);
     }
 };
 } // namespace Telephony
