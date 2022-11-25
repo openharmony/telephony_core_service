@@ -92,7 +92,7 @@ int SimRdbHelper::Delete(const NativeRdb::DataAbilityPredicates &predicates)
 int32_t SimRdbHelper::GetDefaultMainCardSlotId()
 {
     TELEPHONY_LOGI("SimRdbHelper::GetDefaultMainCardSlotId");
-    int32_t mainCardSlotId = INVALID_VALUE;
+    int32_t mainCardSlotId = 0;
     std::vector<std::string> colume;
     NativeRdb::DataAbilityPredicates predicates;
     predicates.EqualTo(SimRdbInfo::IS_MAIN_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
