@@ -2683,38 +2683,6 @@ HWTEST_F(SimTest, Telephony_Sim_SimAuthentication_0200, Function | MediumTest | 
 }
 
 /**
- * @tc.number   Telephony_Sim_SetPrimarySlotId_0100
- * @tc.name     Set primary slotId
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        bool result = CoreServiceClient::GetInstance().SetPrimarySlotId(SimTest::slotId_);
-        EXPECT_TRUE(result);
-    }
-}
-
-/**
- * @tc.number   Telephony_Sim_SetPrimarySlotId_0200
- * @tc.name     Set primary slotId
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0200, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        bool result = CoreServiceClient::GetInstance().SetPrimarySlotId(SimTest::slotId1_);
-        EXPECT_TRUE(result);
-    }
-}
-
-/**
  * @tc.number   Telephony_Sim_GetPrimarySlotId_0100
  * @tc.name     Get primary slotId
  * @tc.desc     Function test
@@ -3074,6 +3042,39 @@ HWTEST_F(SimTest, Telephony_Sim_TestTelProfileUtil_0100, Function | MediumTest |
     telProfileUtil->RefreshSync();
     telProfileUtil->DeleteProfiles();
     EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.number   Telephony_Sim_SetPrimarySlotId_0100
+ * @tc.name     Set primary slotId
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId_) ||
+        CoreServiceClient::GetInstance().GetMaxSimCount() == 1) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card or single card version");
+    } else {
+        bool result = CoreServiceClient::GetInstance().SetPrimarySlotId(SimTest::slotId_);
+        EXPECT_TRUE(result);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_SetPrimarySlotId_0200
+ * @tc.name     Set primary slotId
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0200, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        bool result = CoreServiceClient::GetInstance().SetPrimarySlotId(SimTest::slotId1_);
+        EXPECT_TRUE(result);
+    }
 }
 
 #else // TEL_TEST_UNSUPPORT
