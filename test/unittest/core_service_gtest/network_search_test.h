@@ -183,6 +183,7 @@ struct ImsRegStateCallback {
     ImsServiceType imsSrvType;
     sptr<ImsRegInfoCallback> imsCallback = nullptr;
 };
+
 class NetworkSearchTest : public testing::Test {
 public:
     // execute before first testcase
