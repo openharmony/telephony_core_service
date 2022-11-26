@@ -119,7 +119,7 @@ int32_t CoreService::GetPsRadioTech(int32_t slotId)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
         TELEPHONY_LOGE("permission denied!");
-        return TELEPHONY_PERMISSION_ERROR;
+        return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager_ is null");
@@ -132,7 +132,7 @@ int32_t CoreService::GetCsRadioTech(int32_t slotId)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
         TELEPHONY_LOGE("permission denied!");
-        return TELEPHONY_PERMISSION_ERROR;
+        return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager_ is null");
@@ -753,7 +753,7 @@ int32_t CoreService::GetLockState(int32_t slotId, LockType lockType)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("CoreService::GetLockState, Permission denied!");
-        return TELEPHONY_PERMISSION_ERROR;
+        return TELEPHONY_ERR_PERMISSION_ERR;
     }
     TELEPHONY_LOGI("CoreService::GetLockState(), lockType = %{public}d, slotId = %{public}d", lockType, slotId);
     if (simManager_ == nullptr) {
