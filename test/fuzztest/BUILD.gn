@@ -31,4 +31,6 @@ group("fuzztest") {
   deps += [ "isvalidnumberstring_fuzzer:fuzztest" ]
   deps += [ "hexvectohexstr_fuzzer:fuzztest" ]
   deps += [ "isshowableasciionly_fuzzer:fuzztest" ]
+  deps += [ "updatesmsicc_fuzzer:fuzztest" ]
+  deps += [ "updatevoicemail_fuzzer:fuzztest" ]
 }
