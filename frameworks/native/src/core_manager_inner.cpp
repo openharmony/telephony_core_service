@@ -160,6 +160,25 @@ void CoreManagerInner::UnRegisterCellularCallObject(const sptr<NetworkSearchCall
     networkSearchManager_->UnRegisterCellularCallObject(callback);
 }
 
+int32_t CoreManagerInner::RegisterSimAccountCallback(
+    const std::string &bundleName, const sptr<SimAccountCallback> &callback)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->RegisterSimAccountCallback(bundleName, callback);
+}
+
+int32_t CoreManagerInner::UnregisterSimAccountCallback(const std::string &bundleName)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->UnregisterSimAccountCallback(bundleName);
+}
+
 /******************** telRilManager start *******************/
 int32_t CoreManagerInner::SetUssd(int32_t slotId, int32_t eventId, const std::string str,
     const std::shared_ptr<AppExecFwk::EventHandler> &handler) const

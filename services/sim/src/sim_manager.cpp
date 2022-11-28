@@ -325,7 +325,11 @@ bool SimManager::SetDefaultCellularDataSlotId(int32_t slotId)
         TELEPHONY_LOGE("SetDefaultSmsSlotId slotId is not active!");
         return false;
     }
-    return multiSimController_->SetDefaultCellularDataSlotId(slotId);
+    int32_t ret = multiSimController_->SetDefaultCellularDataSlotId(slotId);
+    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
+        multiSimMonitor_->NotifySimAccountChanged();
+    }
+    return ret;
 }
 
 bool SimManager::SetPrimarySlotId(int32_t slotId)
@@ -897,6 +901,24 @@ int32_t SimManager::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue)
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     return multiSimController_->QueryImsSwitch(slotId, imsSwitchValue);
+}
+
+int32_t SimManager::RegisterSimAccountCallback(const std::string &bundleName, const sptr<SimAccountCallback> &callback)
+{
+    if (multiSimMonitor_ == nullptr) {
+        TELEPHONY_LOGE("multiSimMonitor is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return multiSimMonitor_->RegisterSimAccountCallback(bundleName, callback);
+}
+
+int32_t SimManager::UnregisterSimAccountCallback(const std::string &bundleName)
+{
+    if (multiSimMonitor_ == nullptr) {
+        TELEPHONY_LOGE("multiSimMonitor is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return multiSimMonitor_->UnregisterSimAccountCallback(bundleName);
 }
 } // namespace Telephony
 } // namespace OHOS
