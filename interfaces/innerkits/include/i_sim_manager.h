@@ -19,6 +19,7 @@
 #include "dialling_numbers_info.h"
 #include "i_network_search.h"
 #include "operator_config_types.h"
+#include "sim_account_callback.h"
 #include "sim_state_type.h"
 
 namespace OHOS {
@@ -60,6 +61,9 @@ public:
     virtual int32_t GetDefaultVoiceSlotId() = 0;
     virtual int32_t GetDefaultSmsSlotId() = 0;
     virtual int32_t GetDefaultCellularDataSlotId() = 0;
+    virtual int32_t RegisterSimAccountCallback(
+        const std::string &bundleName, const sptr<SimAccountCallback> &callback) = 0;
+    virtual int32_t UnregisterSimAccountCallback(const std::string &bundleName) = 0;
     virtual int32_t GetPrimarySlotId() = 0;
     virtual std::u16string GetShowNumber(int32_t slotId) = 0;
     virtual std::u16string GetShowName(int32_t slotId) = 0;
