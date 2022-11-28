@@ -16,12 +16,13 @@
 #ifndef IMPL_CORE_MANAGER_INNER_H
 #define IMPL_CORE_MANAGER_INNER_H
 
-#include <unistd.h>
 #include <thread>
+#include <unistd.h>
 
 #include "i_network_search.h"
 #include "i_sim_manager.h"
 #include "i_tel_ril_manager.h"
+#include "sim_account_callback.h"
 #include "telephony_errors.h"
 #include "telephony_types.h"
 
@@ -47,6 +48,8 @@ public:
     bool IsInitFinishedForTelRil(void);
     int32_t GetDefaultSlotId(void);
     int32_t GetMaxSimCount(void);
+    int32_t RegisterSimAccountCallback(const std::string &bundleName, const sptr<SimAccountCallback> &callback);
+    int32_t UnregisterSimAccountCallback(const std::string &bundleName);
 
     /******************** telRilManager start *******************/
     int32_t SetRadioState(
