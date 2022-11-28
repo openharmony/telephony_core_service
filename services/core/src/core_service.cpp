@@ -1096,7 +1096,7 @@ int32_t CoreService::SimAuthentication(
     TELEPHONY_LOGI("CoreService::SimAuthentication(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simManager_->SimAuthentication(slotId, aid, authData, response);
 }
