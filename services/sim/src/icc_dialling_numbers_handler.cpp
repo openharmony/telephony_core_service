@@ -241,7 +241,7 @@ void IccDiallingNumbersHandler::ProcessDiallingNumber(
     std::vector<std::string> &dataList = object->fileResults;
     TELEPHONY_LOGI("ProcessDiallingNumberAllLoadDone start: %{public}zu", dataList.size());
     int i = 0;
-    for (std::vector<std::string>::iterator it = dataList.begin(); it != dataList.end(); it++, i++) {
+    for (std::vector<std::string>::iterator it = dataList.begin(); it != dataList.end(); ++it, i++) {
         std::string item = *it;
         std::shared_ptr<DiallingNumbersInfo> diallingNumber =
             std::make_shared<DiallingNumbersInfo>(loadRequest->GetElementaryFileId(), 1 + i);
@@ -435,7 +435,12 @@ std::shared_ptr<unsigned char> IccDiallingNumbersHandler::CreateSavingSequence(
     if (cache == nullptr) {
         return nullptr;
     }
-    diallingNumberStringPac = std::shared_ptr<unsigned char>(cache);
+    diallingNumberStringPac = std::shared_ptr<unsigned char>(cache, [](unsigned char *ptr) {
+        if (ptr != nullptr) {
+            free(ptr);
+            ptr = nullptr;
+        }
+    });
     diallingNumberString = diallingNumberStringPac.get();
     for (int i = 0; i < dataLength; i++) {
         diallingNumberString[i] = (unsigned char)BYTE_VALUE;
@@ -448,8 +453,6 @@ std::shared_ptr<unsigned char> IccDiallingNumbersHandler::CreateSavingSequence(
         return diallingNumberStringPac;
     } else if (diallingNumber->number_.size() > maxNumberSize) {
         TELEPHONY_LOGE("CreateSavingSequence number length exceed the maximum");
-        free(cache);
-        cache = nullptr;
         return nullptr;
     }
     byteTagPac = CreateNameSequence(diallingNumber->name_, byteTagLen);
@@ -465,8 +468,6 @@ std::shared_ptr<unsigned char> IccDiallingNumbersHandler::CreateSavingSequence(
         return diallingNumberStringPac;
     } else {
         TELEPHONY_LOGE("CreateSavingSequence max data length is %{public}d", offset);
-        free(cache);
-        cache = nullptr;
         return nullptr;
     }
 }
