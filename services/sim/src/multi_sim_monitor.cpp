@@ -95,6 +95,7 @@ void MultiSimMonitor::InitData(int32_t slotId)
         TELEPHONY_LOGE("MultiSimMonitor::InitData observerHandler_ is nullptr");
         return;
     }
+    NotifySimAccountChanged();
     observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, slotId);
 }
 
@@ -113,6 +114,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         controller_->GetListFromDataBase();
         simFileManager_[slotId]->ClearData();
     }
+    NotifySimAccountChanged();
 }
 
 bool MultiSimMonitor::RegisterForIccLoaded(int32_t slotId)
@@ -171,6 +173,72 @@ void MultiSimMonitor::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::Event
 bool MultiSimMonitor::IsValidSlotId(int32_t slotId)
 {
     return (slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT);
+}
+
+int32_t MultiSimMonitor::RegisterSimAccountCallback(
+    const std::string &bundleName, const sptr<SimAccountCallback> &callback)
+{
+    if (callback == nullptr) {
+        TELEPHONY_LOGE(" callback is nullptr");
+        return TELEPHONY_ERR_ARGUMENT_NULL;
+    }
+    bool isExisted = false;
+    std::lock_guard<std::mutex> lock(mutexInner_);
+    for (auto iter : listSimAccountCallbackRecord_) {
+        if ((iter.bundleName == bundleName)) {
+            iter.simAccountCallback = callback;
+            isExisted = true;
+            break;
+        }
+    }
+    if (isExisted) {
+        TELEPHONY_LOGI("Ignore register action, since callback is existent");
+        return TELEPHONY_SUCCESS;
+    }
+
+    SimAccountCallbackRecord simAccountRecord;
+    simAccountRecord.bundleName = bundleName;
+    simAccountRecord.simAccountCallback = callback;
+    listSimAccountCallbackRecord_.push_back(simAccountRecord);
+    TELEPHONY_LOGI("Register successfully, callback list size is %{public}zu", listSimAccountCallbackRecord_.size());
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t MultiSimMonitor::UnregisterSimAccountCallback(const std::string &bundleName)
+{
+    bool isSuccess = false;
+    std::lock_guard<std::mutex> lock(mutexInner_);
+    auto iter = listSimAccountCallbackRecord_.begin();
+    for (; iter != listSimAccountCallbackRecord_.end();) {
+        if ((iter->bundleName == bundleName)) {
+            iter = listSimAccountCallbackRecord_.erase(iter);
+            isSuccess = true;
+            break;
+        }
+        iter++;
+    }
+    if (!isSuccess) {
+        TELEPHONY_LOGE("Ignore unregister action, since callback is nonexistent");
+        return TELEPHONY_ERROR;
+    }
+    TELEPHONY_LOGI("Unregister successfully, callback list size is %{public}zu", listSimAccountCallbackRecord_.size());
+    return TELEPHONY_SUCCESS;
+}
+
+void MultiSimMonitor::NotifySimAccountChanged()
+{
+    TELEPHONY_LOGI("NotifySimAccountChanged");
+    bool isExisted = false;
+    std::lock_guard<std::mutex> lock(mutexInner_);
+    for (auto iter : listSimAccountCallbackRecord_) {
+        if (iter.simAccountCallback != nullptr) {
+            isExisted = true;
+            iter.simAccountCallback->OnSimAccountChanged();
+        }
+    }
+    if (!isExisted) {
+        TELEPHONY_LOGI("SimAccountCallback has not been registered");
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
