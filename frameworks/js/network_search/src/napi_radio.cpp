@@ -2199,7 +2199,7 @@ static bool MatchObserverOffParameter(napi_env env, napi_value parameters[], siz
     }
 }
 
-static bool IsValidImsSrvType(napi_env env, int32_t imsSrvType, std::string funcName)
+static bool IsValidImsSrvType(napi_env env, int32_t imsSrvType, const std::string &funcName)
 {
     bool flag = true;
     switch (imsSrvType) {

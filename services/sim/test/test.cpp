@@ -563,7 +563,7 @@ static bool TestQueryIccDiallingNumbers()
     }
     int id = 0;
     for (std::vector<std::shared_ptr<DiallingNumbersInfo>>::iterator it = diallingNumbers.begin();
-         it != diallingNumbers.end(); it++) {
+         it != diallingNumbers.end(); ++it) {
         std::shared_ptr<DiallingNumbersInfo> item = *it;
         std::string name = Str16ToStr8(item->GetName());
         std::string number = Str16ToStr8(item->GetNumber());
@@ -832,7 +832,7 @@ static bool TestGetOperatorConfig()
     while (valueIt != oc.configValue.end()) {
         std::cout << "configValue key = " << Str16ToStr8(valueIt->first).c_str() << std::endl
                   << "configValue value = " << Str16ToStr8(valueIt->second).c_str() << std::endl;
-        valueIt++;
+        ++valueIt;
     }
     return true;
 }
