@@ -41,6 +41,9 @@ public:
     bool RegisterForSimStateChanged(int32_t slotId);
     bool UnRegisterForSimStateChanged(int32_t slotId);
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    int32_t RegisterSimAccountCallback(const std::string &bundleName, const sptr<SimAccountCallback> &callback);
+    int32_t UnregisterSimAccountCallback(const std::string &bundleName);
+    void NotifySimAccountChanged();
 
 private:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
@@ -49,11 +52,18 @@ private:
     bool IsValidSlotId(int32_t slotId);
 
 private:
+    struct SimAccountCallbackRecord {
+        std::string bundleName;
+        sptr<SimAccountCallback> simAccountCallback;
+    };
+
     bool ready_ = false;
     std::shared_ptr<MultiSimController> controller_ = nullptr;
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
+    std::list<SimAccountCallbackRecord> listSimAccountCallbackRecord_;
+    std::mutex mutexInner_;
 };
 } // namespace Telephony
 } // namespace OHOS
