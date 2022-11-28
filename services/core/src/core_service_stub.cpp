@@ -931,7 +931,7 @@ int32_t CoreServiceStub::OnGetActiveSimAccountInfoList(MessageParcel &data, Mess
             TELEPHONY_LOGE("OnGetActiveSimAccountInfoList IccAccountInfo reply Marshalling is false");
             return ERR_FLATTEN_OBJECT;
         }
-        it++;
+        ++it;
     }
     return NO_ERROR;
 }
