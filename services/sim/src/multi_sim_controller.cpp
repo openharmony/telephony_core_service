@@ -348,7 +348,7 @@ bool MultiSimController::RefreshActiveIccAccountInfoList()
             iccAccountInfo_.isActive = it->isActive;
             iccAccountInfoList_.emplace_back(iccAccountInfo_);
         }
-        it++;
+        ++it;
     }
     return true;
 }
@@ -366,7 +366,7 @@ int32_t MultiSimController::GetSlotId(int32_t simId)
         if (it->isActive == ACTIVE && it->simId == simId) { // pick Active item
             return it->slotIndex;
         }
-        it++;
+        ++it;
     }
     return INVALID_VALUE;
 }
@@ -910,7 +910,7 @@ bool MultiSimController::GetActiveSimAccountInfoList(std::vector<IccAccountInfo>
     while (it != iccAccountInfoList_.end()) {
         TELEPHONY_LOGI("MultiSimController::GetActiveSimAccountInfoList slotIndex=%{public}d", it->slotIndex);
         iccAccountInfoList.emplace_back(*it);
-        it++;
+        ++it;
     }
     return iccAccountInfoList.size() > 0;
 }
