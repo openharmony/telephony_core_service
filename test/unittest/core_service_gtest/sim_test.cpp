@@ -21,11 +21,13 @@
 #include "core_manager_inner.h"
 #include "core_service_client.h"
 #include "core_service_test_helper.h"
+#include "enum_convert.h"
 #include "iservice_registry.h"
 #include "operator_config_cache.h"
 #include "operator_file_parser.h"
 #include "sim_operator_brocast_test.h"
 #include "sim_state_type.h"
+#include "str_convert.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
 #include "tel_profile_util.h"
@@ -3014,8 +3016,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetNrOptionMode_0100, Function | MediumTest | Le
 HWTEST_F(SimTest, Telephony_Sim_TestTelProfileUtil_0100, Function | MediumTest | Level3)
 {
     auto telProfileUtil = DelayedSingleton<TelProfileUtil>::GetInstance();
-    std::string key = "";
-    std::string value = "";
+    std::string key = "test";
+    std::string key1 = "test1";
+    std::string value = "test";
     std::string defValue = "";
     int saveValue = 1;
     int getValue = 1;
@@ -3033,15 +3036,151 @@ HWTEST_F(SimTest, Telephony_Sim_TestTelProfileUtil_0100, Function | MediumTest |
     telProfileUtil->ObtainBool(key, getBool);
     telProfileUtil->SaveLong(key, longValue);
     telProfileUtil->ObtainLong(key, getLongValue);
-    telProfileUtil->SaveFloat(key, saveFloatValue);
-    telProfileUtil->ObtainFloat(key, getFloatValue);
-    telProfileUtil->IsExistKey(key);
-    telProfileUtil->RemoveKey(key);
-    telProfileUtil->RemoveAll();
+    telProfileUtil->SaveFloat(key1, saveFloatValue);
+    telProfileUtil->ObtainFloat(key1, getFloatValue);
+    EXPECT_TRUE(telProfileUtil->IsExistKey(key));
+    EXPECT_GT(telProfileUtil->RemoveKey(key), -1);
+    EXPECT_GT(telProfileUtil->RemoveAll(), -1);
     telProfileUtil->Refresh();
-    telProfileUtil->RefreshSync();
-    telProfileUtil->DeleteProfiles();
-    EXPECT_TRUE(true);
+    EXPECT_GT(telProfileUtil->RefreshSync(), -1);
+    EXPECT_GT(telProfileUtil->DeleteProfiles(), -1);
+}
+
+/**
+ * @tc.number   Telephony_Sim_TestEnumCovert_0100
+ * @tc.name     Enum_Covert
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_TestEnumCovert_0100, Function | MediumTest | Level3)
+{
+    int32_t errorSimState = 7;
+    int32_t errorCallState = 9;
+    int32_t errorTelephonyCardType = 1;
+    EXPECT_EQ(GetBoolValue(0), "FALSE");
+    EXPECT_EQ(GetBoolValue(1), "TRUE");
+    EXPECT_EQ(GetSimState(static_cast<int32_t>(TelephonySimState::SIM_STATE_UNKNOWN)), "SIM_STATE_UNKNOWN");
+    EXPECT_EQ(GetSimState(static_cast<int32_t>(TelephonySimState::SIM_STATE_NOT_PRESENT)), "SIM_STATE_NOT_PRESENT");
+    EXPECT_EQ(GetSimState(static_cast<int32_t>(TelephonySimState::SIM_STATE_LOCKED)), "SIM_STATE_LOCKED");
+    EXPECT_EQ(GetSimState(static_cast<int32_t>(TelephonySimState::SIM_STATE_NOT_READY)), "SIM_STATE_NOT_READY");
+    EXPECT_EQ(GetSimState(static_cast<int32_t>(TelephonySimState::SIM_STATE_READY)), "SIM_STATE_READY");
+    EXPECT_EQ(GetSimState(static_cast<int32_t>(TelephonySimState::SIM_STATE_LOADED)), "SIM_STATE_LOADED");
+    EXPECT_EQ(GetSimState(errorSimState), "");
+    EXPECT_EQ(GetCallState(static_cast<int32_t>(TelephonyCallState::CALL_STATUS_ACTIVE)), "CALL_STATUS_ACTIVE");
+    EXPECT_EQ(GetCallState(static_cast<int32_t>(TelephonyCallState::CALL_STATUS_HOLDING)), "CALL_STATUS_HOLDING");
+    EXPECT_EQ(GetCallState(static_cast<int32_t>(TelephonyCallState::CALL_STATUS_DIALING)), "CALL_STATUS_DIALING");
+    EXPECT_EQ(GetCallState(static_cast<int32_t>(TelephonyCallState::CALL_STATUS_ALERTING)), "CALL_STATUS_ALERTING");
+    EXPECT_EQ(GetCallState(static_cast<int32_t>(TelephonyCallState::CALL_STATUS_INCOMING)), "CALL_STATUS_INCOMING");
+    EXPECT_EQ(GetCallState(static_cast<int32_t>(TelephonyCallState::CALL_STATUS_WAITING)), "CALL_STATUS_WAITING");
+    EXPECT_EQ(
+        GetCallState(static_cast<int32_t>(TelephonyCallState::CALL_STATUS_DISCONNECTED)), "CALL_STATUS_DISCONNECTED");
+    EXPECT_EQ(
+        GetCallState(static_cast<int32_t>(TelephonyCallState::CALL_STATUS_DISCONNECTING)), "CALL_STATUS_DISCONNECTING");
+    EXPECT_EQ(GetCallState(static_cast<int32_t>(TelephonyCallState::CALL_STATUS_IDLE)), "CALL_STATUS_IDLE");
+    EXPECT_EQ(GetCallState(errorCallState), "CALL_STATUS_IDLE");
+    EXPECT_EQ(GetCardType(static_cast<int32_t>(TelephonyCardType::UNKNOWN_CARD)), "UNKNOWN_CARD");
+    EXPECT_EQ(GetCardType(static_cast<int32_t>(TelephonyCardType::SINGLE_MODE_SIM_CARD)), "SINGLE_MODE_SIM_CARD");
+    EXPECT_EQ(GetCardType(static_cast<int32_t>(TelephonyCardType::SINGLE_MODE_USIM_CARD)), "SINGLE_MODE_USIM_CARD");
+    EXPECT_EQ(GetCardType(static_cast<int32_t>(TelephonyCardType::SINGLE_MODE_RUIM_CARD)), "SINGLE_MODE_RUIM_CARD");
+    EXPECT_EQ(GetCardType(static_cast<int32_t>(TelephonyCardType::DUAL_MODE_CG_CARD)), "DUAL_MODE_CG_CARD");
+    EXPECT_EQ(
+        GetCardType(static_cast<int32_t>(TelephonyCardType::CT_NATIONAL_ROAMING_CARD)), "CT_NATIONAL_ROAMING_CARD");
+    EXPECT_EQ(GetCardType(static_cast<int32_t>(TelephonyCardType::CU_DUAL_MODE_CARD)), "CU_DUAL_MODE_CARD");
+    EXPECT_EQ(
+        GetCardType(static_cast<int32_t>(TelephonyCardType::DUAL_MODE_TELECOM_LTE_CARD)), "DUAL_MODE_TELECOM_LTE_CARD");
+    EXPECT_EQ(GetCardType(static_cast<int32_t>(TelephonyCardType::DUAL_MODE_UG_CARD)), "DUAL_MODE_UG_CARD");
+    EXPECT_EQ(GetCardType(static_cast<int32_t>(TelephonyCardType::SINGLE_MODE_ISIM_CARD)), "SINGLE_MODE_ISIM_CARD");
+    EXPECT_EQ(GetCardType(errorTelephonyCardType), "");
+}
+
+/**
+ * @tc.number   Telephony_Sim_TestEnumCovert_0200
+ * @tc.name     Enum_Covert
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_TestEnumCovert_0200, Function | MediumTest | Level3)
+{
+    int32_t errorTelephonyCellDataFlowType = 5;
+    int32_t errorDataConnectStatus = 13;
+    EXPECT_EQ(GetCellularDataFlow(static_cast<int32_t>(TelephonyCellDataFlowType::DATA_FLOW_TYPE_NONE)),
+        "DATA_FLOW_TYPE_NONE");
+    EXPECT_EQ(GetCellularDataFlow(static_cast<int32_t>(TelephonyCellDataFlowType::DATA_FLOW_TYPE_DOWN)),
+        "DATA_FLOW_TYPE_DOWN");
+    EXPECT_EQ(
+        GetCellularDataFlow(static_cast<int32_t>(TelephonyCellDataFlowType::DATA_FLOW_TYPE_UP)), "DATA_FLOW_TYPE_UP");
+    EXPECT_EQ(GetCellularDataFlow(static_cast<int32_t>(TelephonyCellDataFlowType::DATA_FLOW_TYPE_UP_DOWN)),
+        "DATA_FLOW_TYPE_UP_DOWN");
+    EXPECT_EQ(GetCellularDataFlow(static_cast<int32_t>(TelephonyCellDataFlowType::DATA_FLOW_TYPE_DORMANT)),
+        "DATA_FLOW_TYPE_DORMANT");
+    EXPECT_EQ(GetCellularDataFlow(errorTelephonyCellDataFlowType), "");
+    EXPECT_EQ(GetCellularDataConnectionNetworkType(static_cast<int32_t>(TelephonyRadioTech::RADIO_TECHNOLOGY_UNKNOWN)),
+        "RADIO_TECHNOLOGY_UNKNOWN");
+    EXPECT_EQ(GetCellularDataConnectionNetworkType(static_cast<int32_t>(TelephonyRadioTech::RADIO_TECHNOLOGY_GSM)),
+        "RADIO_TECHNOLOGY_GSM");
+    EXPECT_EQ(GetCellularDataConnectionNetworkType(static_cast<int32_t>(TelephonyRadioTech::RADIO_TECHNOLOGY_1XRTT)),
+        "RADIO_TECHNOLOGY_1XRTT");
+    EXPECT_EQ(GetCellularDataConnectionNetworkType(static_cast<int32_t>(TelephonyRadioTech::RADIO_TECHNOLOGY_WCDMA)),
+        "RADIO_TECHNOLOGY_WCDMA");
+    EXPECT_EQ(GetCellularDataConnectionNetworkType(static_cast<int32_t>(TelephonyRadioTech::RADIO_TECHNOLOGY_HSPA)),
+        "RADIO_TECHNOLOGY_HSPA");
+    EXPECT_EQ(GetCellularDataConnectionNetworkType(static_cast<int32_t>(TelephonyRadioTech::RADIO_TECHNOLOGY_HSPAP)),
+        "RADIO_TECHNOLOGY_HSPAP");
+    EXPECT_EQ(GetCellularDataConnectionNetworkType(static_cast<int32_t>(TelephonyRadioTech::RADIO_TECHNOLOGY_TD_SCDMA)),
+        "RADIO_TECHNOLOGY_TD_SCDMA");
+    EXPECT_EQ(GetCellularDataConnectionNetworkType(static_cast<int32_t>(TelephonyRadioTech::RADIO_TECHNOLOGY_EVDO)),
+        "RADIO_TECHNOLOGY_EVDO");
+    EXPECT_EQ(GetCellularDataConnectionNetworkType(static_cast<int32_t>(TelephonyRadioTech::RADIO_TECHNOLOGY_EHRPD)),
+        "RADIO_TECHNOLOGY_EHRPD");
+    EXPECT_EQ(GetCellularDataConnectionNetworkType(static_cast<int32_t>(TelephonyRadioTech::RADIO_TECHNOLOGY_LTE)),
+        "RADIO_TECHNOLOGY_LTE");
+    EXPECT_EQ(GetCellularDataConnectionNetworkType(static_cast<int32_t>(TelephonyRadioTech::RADIO_TECHNOLOGY_LTE_CA)),
+        "RADIO_TECHNOLOGY_LTE_CA");
+    EXPECT_EQ(GetCellularDataConnectionNetworkType(static_cast<int32_t>(TelephonyRadioTech::RADIO_TECHNOLOGY_IWLAN)),
+        "RADIO_TECHNOLOGY_IWLAN");
+    EXPECT_EQ(GetCellularDataConnectionNetworkType(static_cast<int32_t>(TelephonyRadioTech::RADIO_TECHNOLOGY_NR)),
+        "RADIO_TECHNOLOGY_NR");
+    EXPECT_EQ(GetCellularDataConnectionNetworkType(errorDataConnectStatus), "");
+}
+
+/**
+ * @tc.number   Telephony_Sim_TestEnumCovert_0300
+ * @tc.name     Enum_Covert
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_TestEnumCovert_0300, Function | MediumTest | Level3)
+{
+    int32_t errorTelephonyLockReason = 13;
+    EXPECT_EQ(GetLockReason(static_cast<int32_t>(TelephonyLockReason::SIM_NONE)), "SIM_NONE");
+    EXPECT_EQ(GetLockReason(static_cast<int32_t>(TelephonyLockReason::SIM_PIN)), "SIM_PIN");
+    EXPECT_EQ(GetLockReason(static_cast<int32_t>(TelephonyLockReason::SIM_PUK)), "SIM_PUK");
+    EXPECT_EQ(GetLockReason(static_cast<int32_t>(TelephonyLockReason::SIM_PN_PIN)), "SIM_PN_PIN");
+    EXPECT_EQ(GetLockReason(static_cast<int32_t>(TelephonyLockReason::SIM_PN_PUK)), "SIM_PN_PUK");
+    EXPECT_EQ(GetLockReason(static_cast<int32_t>(TelephonyLockReason::SIM_PU_PIN)), "SIM_PU_PIN");
+    EXPECT_EQ(GetLockReason(static_cast<int32_t>(TelephonyLockReason::SIM_PU_PUK)), "SIM_PU_PUK");
+    EXPECT_EQ(GetLockReason(static_cast<int32_t>(TelephonyLockReason::SIM_PP_PIN)), "SIM_PP_PIN");
+    EXPECT_EQ(GetLockReason(static_cast<int32_t>(TelephonyLockReason::SIM_PP_PUK)), "SIM_PP_PUK");
+    EXPECT_EQ(GetLockReason(static_cast<int32_t>(TelephonyLockReason::SIM_PC_PIN)), "SIM_PC_PIN");
+    EXPECT_EQ(GetLockReason(static_cast<int32_t>(TelephonyLockReason::SIM_PC_PUK)), "SIM_PC_PUK");
+    EXPECT_EQ(GetLockReason(static_cast<int32_t>(TelephonyLockReason::SIM_SIM_PIN)), "SIM_SIM_PIN");
+    EXPECT_EQ(GetLockReason(static_cast<int32_t>(TelephonyLockReason::SIM_SIM_PUK)), "SIM_SIM_PUK");
+    EXPECT_EQ(GetLockReason(errorTelephonyLockReason), "");
+}
+
+/**
+ * @tc.number   Telephony_Sim_TestStrCovert_0100
+ * @tc.name     Enum_Covert
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_TestStrCovert_0100, Function | MediumTest | Level3)
+{
+    std::string testU8Str = "test";
+    std::u16string testU16Str = u"test";
+    std::u32string testU32Str = U"test";
+    std::wstring testWstr = L"test";
+    EXPECT_EQ(ToUtf16(testU8Str), testU16Str);
+    EXPECT_EQ(ToUtf8(testU16Str), testU8Str);
+    EXPECT_EQ(ToUtf32(testU8Str), testU32Str);
+    EXPECT_EQ(ToUtf8(testU32Str), testU8Str);
+    EXPECT_EQ(ToUtf8(testWstr), testU8Str);
 }
 
 /**
