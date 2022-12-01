@@ -236,7 +236,7 @@ declare namespace radio {
    * @returns Returns {@code true} if the device supports 5G NR; returns {@code false} otherwise.
    * @since 8
    */
-  function isNrSupported(slotId?: number): boolean;
+  function isNrSupported(slotId: number): boolean;
 
   /**
    * Checks whether the radio service is enabled.
