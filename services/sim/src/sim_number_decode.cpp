@@ -246,7 +246,7 @@ bool SimNumberDecode::BCDConvertToString(const std::vector<uint8_t>::const_itera
         return true;
     }
     while ((numIt != number.end()) && isPlusNumber(*numIt)) {
-        numIt++;
+        ++numIt;
     }
     /*  start with [#*] ;assume the data after last;insert head of data a + */
     if ((numIt != number.end()) && (numIt + INC_ONE != number.end()) && isSharpStar(*numIt)) {
