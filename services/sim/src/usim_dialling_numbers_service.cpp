@@ -108,8 +108,7 @@ void UsimDiallingNumbersService::FillDiallingNumbersRecords(
     const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &list)
 {
     if (list != nullptr) {
-        for (std::vector<std::shared_ptr<DiallingNumbersInfo>>::iterator it = list->begin(); it != list->end();
-             it++) {
+        for (std::vector<std::shared_ptr<DiallingNumbersInfo>>::iterator it = list->begin(); it != list->end(); ++it) {
             diallingNumbersFiles_.push_back(*it);
         }
         TELEPHONY_LOGI(
