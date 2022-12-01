@@ -110,8 +110,8 @@
 | function getOperatorName(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽的运营商名称      | 无                                  |
 | function setPreferredNetwork(slotId: number, networkMode: PreferredNetworkMode, callback: AsyncCallback\<void>): void; | 设置指定卡槽的优选网络模式    | ohos.permission.SET_TELEPHONY_STATE |
 | function getPreferredNetwork(slotId: number, callback: AsyncCallback\<PreferredNetworkMode>): void; | 获取指定卡槽的优选网络模式    | ohos.permission.GET_TELEPHONY_STATE |
-| function getCellInformation(slotId: number, callback: AsyncCallback<Array\<CellInformation>>) | 获取小区信息列表              | ohos.permission.LOCATION            |
-| function sendUpdateCellLocationRequest(slotId: number, callback: AsyncCallback\<void>) | 请求小区位置                  | 无            |
+| function getCellInformation(slotId: number, callback: AsyncCallback<Array\<CellInformation>>) | 获取小区信息列表              | ohos.permission.LOCATION 和 ohos.permission.APPROXIMATELY_LOCATION          |
+| function sendUpdateCellLocationRequest(slotId: number, callback: AsyncCallback\<void>) | 请求小区位置                  | ohos.permission.LOCATION 和 ohos.permission.APPROXIMATELY_LOCATION            |
 | function getIMEI(slotId: number, callback: AsyncCallback\<string>) | 获取Imei                      | ohos.permission.GET_TELEPHONY_STATE |
 | function getMEID(slotId: number, callback: AsyncCallback\<string>） | 获取Meid                      | ohos.permission.GET_TELEPHONY_STATE |
 | function getUniqueDeviceId(slotId: number, callback: AsyncCallback\<string>） | 获取设备唯一标识码            | ohos.permission.GET_TELEPHONY_STATE |

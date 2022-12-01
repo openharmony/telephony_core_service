@@ -127,8 +127,6 @@ declare namespace sim {
    * <p>The ICCID is a unique identifier of a SIM card. It consists of 20 digits
    * and is recorded in the EFICCID file of the SIM card.
    *
-   * <p>Requires Permission: {@code ohos.permission.GET_TELEPHONY_STATE}.
-   *
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @param callback Returns the ICCID; returns an empty string if no SIM card is inserted.
@@ -141,8 +139,6 @@ declare namespace sim {
 
   /**
    * Obtains the alpha identifier of the voice mailbox of the SIM card in a specified slot.
-   *
-   * <p>Only applications with the {@code ohos.permission.GET_TELEPHONY_STATE} permission can call this method.
    *
    * @param slotId Indicates the card slot index number,
    * ranging from {@code 0} to the maximum card slot index number supported by the device.
@@ -157,8 +153,6 @@ declare namespace sim {
 
   /**
    * Obtains the voice mailbox number of the SIM card in a specified slot.
-   *
-   * <p>Only applications with the {@code ohos.permission.GET_TELEPHONY_STATE} permission can call this method.
    *
    * @param slotId Indicates the card slot index number,
    * ranging from {@code 0} to the maximum card slot index number supported by the device.
@@ -189,8 +183,6 @@ declare namespace sim {
    * Obtains the MSISDN of the SIM card in a specified slot.
    * The MSISDN is recorded in the EFMSISDN file of the SIM card.
    *
-   * <p>Requires Permission: {@code ohos.permission.GET_TELEPHONY_STATE}.
-   *
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @param callback Returns the MSISDN; returns an empty string if no SIM card is inserted or
@@ -205,8 +197,6 @@ declare namespace sim {
   /**
    * Obtains the Group Identifier Level 1 (GID1) of the SIM card in a specified slot.
    * The GID1 is recorded in the EFGID1 file of the SIM card.
-   *
-   * <p>Requires Permission: {@code ohos.permission.GET_TELEPHONY_STATE}.
    *
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
@@ -223,7 +213,7 @@ declare namespace sim {
    * Obtains the maximum number of SIM cards that can be used simultaneously on the device,
    * that is, the maximum number of SIM card slots.
    *
-   * @return Returns the maximum number of SIM card slots.
+   * @returns Returns the maximum number of SIM card slots.
    * @since 7
    */
   function getMaxSimCount(): number;
@@ -319,6 +309,12 @@ declare namespace sim {
   function getShowNumber(slotId: number): Promise<string>;
 
   /**
+   * Obtains the operatorconfigs of the SIM card in a specified slot.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns Returns the operatorconfigs in a specified slot; returns empty  OperatorConfig
+   * if no SIM card is inserted
    * @permission ohos.permission.GET_TELEPHONY_STATE
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -483,7 +479,6 @@ declare namespace sim {
    *
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @throws {BusinessError} 201 - Permission denied.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 801 - Capability not supported.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
@@ -491,19 +486,18 @@ declare namespace sim {
    * @throws {BusinessError} 8300003 - System internal error.
    * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
-   * @return Returns the opkey; returns an empty string if no SIM card is inserted or
+   * @returns Returns the opkey; returns an empty string if no SIM card is inserted or
    * no opkey matched.
    * @since 9
    */
-    function getOpKey(slotId: number, callback: AsyncCallback<string>): void;
-    function getOpKey(slotId: number): Promise<string>;
+  function getOpKey(slotId: number, callback: AsyncCallback<string>): void;
+  function getOpKey(slotId: number): Promise<string>;
 
   /**
    * Obtains the opname of the SIM card in a specified slot.
    *
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @throws {BusinessError} 201 - Permission denied.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 801 - Capability not supported.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
@@ -511,12 +505,12 @@ declare namespace sim {
    * @throws {BusinessError} 8300003 - System internal error.
    * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
-   * @return Returns the opname; returns an empty string if no SIM card is inserted or
+   * @returns Returns the opname; returns an empty string if no SIM card is inserted or
    * no opname matched.
    * @since 9
    */
-    function getOpName(slotId: number, callback: AsyncCallback<string>): void;
-    function getOpName(slotId: number): Promise<string>;
+  function getOpName(slotId: number, callback: AsyncCallback<string>): void;
+  function getOpName(slotId: number): Promise<string>;
 
   /**
    * @systemapi Hide this for inner system use.
@@ -733,7 +727,7 @@ declare namespace sim {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
-   export enum OperatorConfigKey {
+  export enum OperatorConfigKey {
     KEY_VOICE_MAIL_NUMBER_STRING = "voice_mail_number_string",
     KEY_IMS_SWITCH_ON_BY_DEFAULT_BOOL = "ims_switch_on_by_default_bool",
     KEY_HIDE_IMS_SWITCH_BOOL = "hide_ims_switch_bool",
