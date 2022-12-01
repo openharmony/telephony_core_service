@@ -223,6 +223,14 @@ declare namespace radio {
   /**
    * Checks whether the device supports 5G New Radio (NR).
    *
+   * @returns Returns {@code true} if the device supports 5G NR; returns {@code false} otherwise.
+   * @since 7
+   */
+  function isNrSupported(): boolean;
+
+  /**
+   * Checks whether the device supports 5G New Radio (NR).
+   *
    * @param slotId Indicates the card slot index number, ranging from 0 to the maximum card slot index number
    * supported by the device.
    * @returns Returns {@code true} if the device supports 5G NR; returns {@code false} otherwise.
