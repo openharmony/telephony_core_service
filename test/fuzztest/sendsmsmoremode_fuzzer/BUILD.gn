@@ -1,0 +1,106 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//base/telephony/core_service/telephony.gni")
+import("//build/config/features.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+##############################fuzztest##########################################
+ohos_fuzztest("SendSmsMoreModeFuzzTest") {
+  module_output_path = "core_service/SendSmsMoreModeFuzzTest"
+  module_out_path = module_output_path
+  fuzz_config_file =
+      "//base/telephony/core_service/test/fuzztest/sendsmsmoremode_fuzzer"
+
+  include_dirs = [
+    "//base/telephony/core_service/frameworks/js/napi/include",
+    "//base/telephony/core_service/frameworks/js/napi",
+    "//base/telephony/core_service/services/core/include",
+    "//base/telephony/core_service/services/network_search/include",
+    "//base/telephony/core_service/services/sim/include",
+    "//base/telephony/core_service/test/fuzztest/common_fuzzer",
+    "//base/telephony/core_service/services/tel_ril/include",
+  ]
+
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+
+  deps = [
+    "//base/telephony/core_service:tel_core_service",
+    "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
+    "//foundation/arkui/napi:ace_napi",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:data_ability_helper",
+    "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "battery_manager:batterysrv_client",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "config_policy:configpolicy_util",
+    "drivers_interface_ril:hril_innerkits",
+    "drivers_interface_ril:libril_proxy_1.0",
+    "eventhandler:libeventhandler",
+    "hdf_core:libhdi",
+    "hisysevent_native:libhisysevent",
+    "i18n:zone_util",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_ext:net_tether_manager_if",
+    "power_manager:powermgr_client",
+    "relational_store:native_dataability",
+    "relational_store:native_rdb",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+  defines += [
+    "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  if (is_standard_system) {
+    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps += [ "hilog:libhilog" ]
+  }
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [
+    "//base/telephony/core_service/frameworks/js/napi/napi_util.cpp",
+    "//base/telephony/core_service/test/fuzztest/common_fuzzer/addcoreservicetoken_fuzzer.cpp",
+    "sendsmsmoremode_fuzzer.cpp",
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+  deps = []
+  deps += [
+    # deps file
+    ":SendSmsMoreModeFuzzTest",
+  ]
+}
+###############################################################################
