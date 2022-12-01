@@ -109,15 +109,18 @@ For details about the complete description of JavaScript APIs and sample code, s
 | function turnOffRadio(callback: AsyncCallback\<void>): void; | Disables the radio service on the primary SIM card.                 | ohos.permission.SET_TELEPHONY_STATE |
 | function turnOffRadio(slotId: number, callback: AsyncCallback\<void>): void; | Disables the radio service on the SIM card in the specified slot.        | ohos.permission.SET_TELEPHONY_STATE |
 | function getOperatorName(slotId: number, callback: AsyncCallback\<string>): void; | Obtains the carrier name of the SIM card in the specified slot.      | –                                 |
-| function setPreferredNetwork(slotId: number, networkMode: PreferredNetworkMode, callback: AsyncCallback\<void>): void; | Sets the preferred network of the SIM card in the specified slot.   | –                                 |
-| function getPreferredNetwork(slotId: number, callback: AsyncCallback\<PreferredNetworkMode>): void; | Obtains the preferred network of the SIM card in the specified slot.   | –                                 |
-| function getCellInformation(slotId: number, callback: AsyncCallback<Array\<CellInformation>>) | Obtains the cell information list.             | ohos.permission.LOCATION            |
-| function sendUpdateCellLocationRequest(callback: AsyncCallback\<void>) | Requests for a cell location update.                 | ohos.permission.LOCATION            |
+| function setPreferredNetwork(slotId: number, networkMode: PreferredNetworkMode, callback: AsyncCallback\<void>): void; | Sets the preferred network of the SIM card in the specified slot.   | ohos.permission.SET_TELEPHONY_STATE                                 |
+| function getPreferredNetwork(slotId: number, callback: AsyncCallback\<PreferredNetworkMode>): void; | Obtains the preferred network of the SIM card in the specified slot.   | ohos.permission.GET_TELEPHONY_STATE                                 |
+| function getCellInformation(slotId: number, callback: AsyncCallback<Array\<CellInformation>>) | Obtains the cell information list.             | ohos.permission.LOCATION and ohos.permission.APPROXIMATELY_LOCATION         |
+| function sendUpdateCellLocationRequest(slotId: number, callback: AsyncCallback\<void>) | Requests for a cell location update.                 | ohos.permission.LOCATION and ohos.permission.APPROXIMATELY_LOCATION            |
 | function getIMEI(slotId: number, callback: AsyncCallback\<string>) | Obtains the international mobile equipment identity (IMEI).                     | ohos.permission.GET_TELEPHONY_STATE |
 | function getMEID(slotId: number, callback: AsyncCallback\<string>)| Obtains the mobile equipment identifier (MEID).                     | ohos.permission.GET_TELEPHONY_STATE |
 | function getUniqueDeviceId(slotId: number, callback: AsyncCallback\<string>)| Obtains the unique ID of a device.           | ohos.permission.GET_TELEPHONY_STATE |
-| function getNrOptionMode(slotId: number, callback: AsyncCallback\<NrOptionMode>)| Obtains the 5G mode.                   | ohos.permission.GET_TELEPHONY_STATE |
+| function getNrOptionMode(slotId: number, callback: AsyncCallback\<NrOptionMode>)| Obtains the 5G mode.                   | – |
 | function isNrSupported: boolean;                             | Checks whether 5G is supported.               | –                                 |
+| function getImsRegInfo(slotId: number, imsType: ImsServiceType, callback: AsyncCallback\<ImsRegInfo>): void; | Gets IMS register status info  | ohos.permission.GET_TELEPHONY_STATE                     |
+| function on(type: 'imsRegStateChange', slotId: number, imsType: ImsServiceType, callback: Callback\<ImsRegInfo>): void; | Registers IMS network status callback  | ohos.permission.GET_TELEPHONY_STATE     |
+| function off(type: 'imsRegStateChange', slotId: number, imsType: ImsServiceType, callback?: Callback\<ImsRegInfo>): void; | Unregisters IMS network status callback  | ohos.permission.GET_TELEPHONY_STATE  |
 
 
 For details about the complete description of JavaScript APIs and sample code, see [Radio](https://gitee.com/openharmony/docs/blob/master/en/application-dev/js-reference/apis/js-apis-radio.md).
