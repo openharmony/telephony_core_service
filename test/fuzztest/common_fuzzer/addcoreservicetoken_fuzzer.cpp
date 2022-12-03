@@ -21,24 +21,27 @@
 #include "token_setproc.h"
 
 namespace OHOS {
+const int PERMS_NUM = 11;
+
 AddCoreServiceTokenFuzzer::AddCoreServiceTokenFuzzer()
 {
-    const char **perms = new const char *[11];
-    perms[0] = "ohos.permission.WRITE_CONTACTS";
-    perms[1] = "ohos.permission.SET_TELEPHONY_STATE";
-    perms[2] = "ohos.permission.GET_TELEPHONY_STATE";
-    perms[3] = "ohos.permission.READ_CONTACTS";
-    perms[4] = "ohos.permission.WRITE_CONTACTS";
-    perms[5] = "ohos.permission.LOCATION";
-    perms[6] = "ohos.permission.COMMONEVENT_STICKY";
-    perms[7] = "ohos.permission.CONNECTIVITY_INTERNAL";
-    perms[8] = "ohos.permission.PERMISSION_USED_STATS";
-    perms[9] = "ohos.permission.RECEIVE_SMS";
-    perms[10] = "ohos.permission.MANAGE_SECURE_SETTINGS";
+    const char *perms[PERMS_NUM] = {
+        "ohos.permission.WRITE_CONTACTS",
+        "ohos.permission.SET_TELEPHONY_STATE",
+        "ohos.permission.GET_TELEPHONY_STATE",
+        "ohos.permission.READ_CONTACTS",
+        "ohos.permission.WRITE_CONTACTS",
+        "ohos.permission.LOCATION",
+        "ohos.permission.COMMONEVENT_STICKY",
+        "ohos.permission.CONNECTIVITY_INTERNAL",
+        "ohos.permission.PERMISSION_USED_STATS",
+        "ohos.permission.RECEIVE_SMS",
+        "ohos.permission.MANAGE_SECURE_SETTINGS",
+    };
 
     NativeTokenInfoParams testCoreServiceInfoParams = {
         .dcapsNum = 0,
-        .permsNum = 11,
+        .permsNum = PERMS_NUM,
         .aclsNum = 0,
         .dcaps = nullptr,
         .perms = perms,

@@ -19,6 +19,16 @@
 
 namespace OHOS {
 namespace Telephony {
+static const int CONTINUE = 0;
+static const int FINISH = 1;
+static const int ERROR = -1;
+static const size_t FIRST = 0;
+static const size_t SECOND = 1;
+static const uint8_t BYTE_ZERO = 0;
+static const uint8_t WORD_LEN = 2;
+constexpr size_t BUFF_SIZE = 3;
+constexpr size_t CHAR_LEN = 2;
+
 TagService::TagService(const std::string &data)
 {
     if (data.empty() || data.size() % CHINESE_POS) {
@@ -58,52 +68,43 @@ uint8_t TagService::GetLength() const
     return length_;
 }
 
-static const int kCONTINUE = 0;
-static const int kFINISH = 1;
-static const int kERROR = -1;
-static const size_t kFst = 0;
-static const size_t kSnd = 1;
-static const uint8_t BYTE_ZERO = 0;
-static const uint8_t WORD_LEN = 2;
 static int TagFunc(const uint8_t arg, const size_t order, std::string &tag)
 {
-    constexpr size_t BuffSize = 3;
-    constexpr size_t CharLen = 2;
     switch (order) {
-        case kFst:
+        case FIRST:
             if (arg == BYTE_ZERO || arg == UINT8_MAX) {
-                return kERROR;
+                return ERROR;
             } else {
-                char buff[BuffSize] = {BYTE_ZERO, BYTE_ZERO, BYTE_ZERO};
-                std::to_chars(buff, buff + CharLen, arg, TagService::HEX_TYPE);
+                char buff[BUFF_SIZE] = {BYTE_ZERO, BYTE_ZERO, BYTE_ZERO};
+                std::to_chars(buff, buff + CHAR_LEN, arg, TagService::HEX_TYPE);
                 tag.append(std::begin(buff), std::end(buff));
-                return kFINISH;
+                return FINISH;
             }
         default:
             break;
     }
-    return kERROR;
+    return ERROR;
 }
 
 static int LengthFunc(const uint8_t arg, const size_t order, uint8_t &len)
 {
     switch (order) {
-        case kFst:
+        case FIRST:
             if (arg < CHINESE_FLAG) {
                 len = arg;
-                return kFINISH;
+                return FINISH;
             } else if (arg == UCS_FLAG) {
                 len = BYTE_ZERO;
-                return kCONTINUE;
+                return CONTINUE;
             }
             break;
-        case kSnd:
+        case SECOND:
             len = arg;
-            return kFINISH;
+            return FINISH;
         default:
             break;
     }
-    return kERROR;
+    return ERROR;
 }
 
 static std::string HexVecToHexStr(const std::vector<uint8_t> &arr)
