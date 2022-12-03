@@ -31,30 +31,30 @@ static std::string HexToStr(const std::vector<uint8_t> &arr)
     return ss.str();
 }
 
-inline static bool isNumber(const char num)
+inline static bool IsNumber(const char num)
 {
     return (num >= '0' && num <= '9');
 }
 
-inline static bool isPlusNumber(const char num)
+inline static bool IsPlusNumber(const char num)
 {
-    return isNumber(num) || (num == '+');
+    return IsNumber(num) || (num == '+');
 }
 
-inline static bool isSharpStar(const char num)
+inline static bool IsSharpStar(const char num)
 {
     return num == '#' || num == '*';
 }
 
-inline static bool isValidNumberChar(const char num)
+inline static bool IsValidNumberChar(const char num)
 {
-    return isPlusNumber(num) || isSharpStar(num);
+    return IsPlusNumber(num) || IsSharpStar(num);
 }
 
 bool SimNumberDecode::IsValidNumberString(const std::string &number)
 {
     for (const auto &num : number) {
-        if (!isValidNumberChar(num)) {
+        if (!IsValidNumberChar(num)) {
             return false;
         }
     }
@@ -235,21 +235,21 @@ bool SimNumberDecode::BCDConvertToString(const std::vector<uint8_t>::const_itera
 
     std::string::const_iterator numIt = number.begin();
     /* not start with [#*] just prepend '+' */
-    if (!isSharpStar(number.front())) {
+    if (!IsSharpStar(number.front())) {
         number.insert(number.begin(), '+');
         return true;
     }
     ++numIt;
     /* started with two [#*] ends with # ,just append a +  */
-    if (isSharpStar(*numIt) && (number.back() == '#')) {
+    if (IsSharpStar(*numIt) && (number.back() == '#')) {
         number.push_back('+');
         return true;
     }
-    while ((numIt != number.end()) && isPlusNumber(*numIt)) {
+    while ((numIt != number.end()) && IsPlusNumber(*numIt)) {
         ++numIt;
     }
     /*  start with [#*] ;assume the data after last;insert head of data a + */
-    if ((numIt != number.end()) && (numIt + INC_ONE != number.end()) && isSharpStar(*numIt)) {
+    if ((numIt != number.end()) && (numIt + INC_ONE != number.end()) && IsSharpStar(*numIt)) {
         number.insert(numIt + INC_ONE, '+');
     }
     return true;
