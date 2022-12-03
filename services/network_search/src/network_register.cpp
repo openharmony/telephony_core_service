@@ -29,7 +29,6 @@
 
 namespace OHOS {
 namespace Telephony {
-namespace {
 const char *TELEPHONY_NR_CONVERSION_CONFIG_INDEX = "persist.telephony.nr.config.index"; // "A/B/C/D"
 /**
  * System configuration format
@@ -43,7 +42,6 @@ const int32_t SYS_PARAMETER_SIZE = 256;
 const int32_t NR_STATE_NUM = 6;
 const int32_t KEY_VALUE_NUM = 2;
 const int32_t MAX_SIZE = 100;
-} // namespace
 
 NetworkRegister::NetworkRegister(std::shared_ptr<NetworkSearchState> networkSearchState,
     std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
@@ -211,7 +209,7 @@ void NetworkRegister::ProcessChannelConfigInfo(const AppExecFwk::InnerEvent::Poi
     for (int i = 0; i < size; ++i) {
         if (static_cast<RadioTech>(channelConfigInfos_[i].ratType) == RadioTech::RADIO_TECHNOLOGY_NR &&
             static_cast<ConnectServiceCell>(channelConfigInfos_[i].cellConnStatus) ==
-                ConnectServiceCell::CONNECTION_SECONDARY_CELL) {
+            ConnectServiceCell::CONNECTION_SECONDARY_CELL) {
             isNrSecondaryCell = true;
             break;
         }
