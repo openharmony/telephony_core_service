@@ -93,13 +93,13 @@ static const std::map<int32_t, PreferredNetworkMode> mapNetworkModeFromRaf = {
         PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA },
 };
 
-static const int32_t allRaf[] = { GSM, CDMA, EVDO, WCDMA, TDSCDMA, LTE, NR };
+static const int32_t ALL_RAF[] = { GSM, CDMA, EVDO, WCDMA, TDSCDMA, LTE, NR };
 
 PreferredNetworkMode NetworkUtils::GetNetworkModeFromRaf(int32_t raf)
 {
-    for (int32_t i = 0; i < sizeof(allRaf) / sizeof(allRaf[0]); i++) {
-        if (static_cast<uint32_t>(allRaf[i]) & static_cast<uint32_t>(raf)) {
-            raf = static_cast<int32_t>(static_cast<uint32_t>(allRaf[i]) | static_cast<uint32_t>(raf));
+    for (int32_t i = 0; i < sizeof(ALL_RAF) / sizeof(ALL_RAF[0]); i++) {
+        if (static_cast<uint32_t>(ALL_RAF[i]) & static_cast<uint32_t>(raf)) {
+            raf = static_cast<int32_t>(static_cast<uint32_t>(ALL_RAF[i]) | static_cast<uint32_t>(raf));
         }
     }
 
