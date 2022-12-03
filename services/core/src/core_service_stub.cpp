@@ -1283,6 +1283,7 @@ int32_t CoreServiceStub::OnSimAuthentication(MessageParcel &data, MessageParcel 
     std::string authData = data.ReadString();
     SimAuthenticationResponse response = { 0 };
     int32_t result = SimAuthentication(slotId, aid, authData, response);
+    reply.WriteInt32(result);
     reply.WriteInt32(response.sw1);
     reply.WriteInt32(response.sw2);
     reply.WriteString(response.response);
