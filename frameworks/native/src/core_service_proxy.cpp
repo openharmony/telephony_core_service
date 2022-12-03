@@ -2397,11 +2397,12 @@ int32_t CoreServiceProxy::SimAuthentication(
         TELEPHONY_LOGE("SimAuthentication failed, error code is %{public}d", st);
         return ERROR;
     }
+    int32_t ret = reply.ReadInt32();
     response.sw1 = reply.ReadInt32();
     response.sw2 = reply.ReadInt32();
     response.response = reply.ReadString();
-    TELEPHONY_LOGI("SimAuthentication end: result=%{public}d", st);
-    return ERR_NONE;
+    TELEPHONY_LOGI("SimAuthentication end: result=%{public}d", ret);
+    return ret;
 }
 
 bool CoreServiceProxy::IsNrSupported(int32_t slotId)
