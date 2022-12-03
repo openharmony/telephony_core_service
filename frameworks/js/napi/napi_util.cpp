@@ -39,6 +39,7 @@ static constexpr const char *JS_ERROR_CALL_ABNORMAL_CALL_STATUS_STRING = "Abnorm
 static constexpr const char *JS_ERROR_CALL_ABNORMAL_VIDEO_CALL_STATUS_STRING = "Abnormal video call status.";
 static constexpr const char *JS_ERROR_DEVICE_NOT_SUPPORT_THIS_API_STRING = "The device does not support this API.";
 static constexpr const char *JS_ERROR_TELEPHONY_NO_SIM_CARD_STRING = "Do not have sim card.";
+static const int32_t MAX_TEXT_LENGTH = 4096;
 
 std::string NapiUtil::ToUtf8(std::u16string str16)
 {

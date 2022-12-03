@@ -38,6 +38,10 @@ constexpr int32_t INT32_INTVALUE = 0;
 constexpr int32_t INT32_ZERO = 0;
 constexpr int32_t INT32_FST_NEGATIVE = -1;
 constexpr size_t FST_POS = 0;
+constexpr size_t TAG_BYTES = 4;
+constexpr size_t LEN_BYTES = 2;
+constexpr size_t CHR_BYTES = 2;
+constexpr int32_t HEX = 16;
 
 static std::string_view Strip(const std::string_view &src)
 {
@@ -59,11 +63,6 @@ static std::string_view Strip(const std::string_view &src)
 
 static bool IsOneTlvCompleted(const std::string_view &s)
 {
-    constexpr size_t TAG_BYTES = 4;
-    constexpr size_t LEN_BYTES = 2;
-    constexpr size_t CHR_BYTES = 2;
-    constexpr int32_t HEX = 16;
-
     if (s.size() < (TAG_BYTES + LEN_BYTES)) {
         return false;
     }

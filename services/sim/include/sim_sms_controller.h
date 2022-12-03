@@ -56,6 +56,7 @@ protected:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<SimStateManager> stateManager_ = nullptr;
     bool responseReady_ = false;
+    bool loadDone_ = false;
     int slotId_ = 0;
 
 private:

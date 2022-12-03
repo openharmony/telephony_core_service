@@ -19,6 +19,7 @@ namespace OHOS {
 namespace Telephony {
 std::mutex SimSmsController::mtx_;
 constexpr static const int32_t WAIT_TIME_SECOND = 1;
+constexpr static const int32_t WAIT_TIME_TEN_SECOND = 10;
 
 SimSmsController::SimSmsController(
     const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager)
@@ -79,6 +80,7 @@ void SimSmsController::ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &ev
             TELEPHONY_LOGE("ProcessLoadDone: get null pointer!!!");
         }
     }
+    loadDone_ = true;
     processWait_.notify_all();
 }
 
@@ -212,6 +214,7 @@ std::vector<std::string> SimSmsController::ObtainAllSmsOfIcc()
 {
     std::unique_lock<std::mutex> lock(mtx_);
     std::shared_ptr<IccFileController> fileController = fileManager_->GetIccFileController();
+    loadDone_ = false;
     if (fileController == nullptr) {
         TELEPHONY_LOGE("Cannot load Sms records. No icc card?");
         std::vector<std::string> nullVector;
@@ -221,7 +224,12 @@ std::vector<std::string> SimSmsController::ObtainAllSmsOfIcc()
     TELEPHONY_LOGI("ObtainAllSmsOfIcc start!!");
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(SIM_SMS_GET_COMPLETED);
     fileController->ObtainAllLinearFixedFile(ELEMENTARY_FILE_SMS, event);
-    processWait_.wait(lock);
+    while (!loadDone_) {
+        TELEPHONY_LOGI("ObtainAllSmsOfIcc::wait(), response = false");
+        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_TEN_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
     TELEPHONY_LOGI("SimSmsController::ObtainAllSmsOfIcc: end");
     return smsList_;
 }
