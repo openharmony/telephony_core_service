@@ -35,7 +35,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     std::vector<uint8_t> parameter;
     parameter.push_back(result);
     auto tagService = std::make_shared<TagService>(parameter);
-    std::string tag(reinterpret_cast<const char *>(data), size);
     tagService->GetValue(parameter);
     tagService->GetTagCode();
     tagService->Next();
