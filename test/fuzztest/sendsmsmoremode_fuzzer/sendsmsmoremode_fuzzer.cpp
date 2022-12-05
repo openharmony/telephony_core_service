@@ -107,9 +107,6 @@ void GetCallList(const uint8_t *data, size_t size)
     telRilCall->Dial(address, index, result);
     telRilCall->Reject(result);
     telRilCall->Hangup(index, result);
-    telRilCall->HoldCall(result);
-    telRilCall->UnHoldCall(result);
-    telRilCall->SwitchCall(result);
     telRilCall->SeparateConference(index, index, result);
     telRilCall->CombineConference(index, result);
     telRilCall->CallSupplement(index, result);
@@ -133,6 +130,9 @@ void GetCallList(const uint8_t *data, size_t size)
 void AnswerResponse(const uint8_t *data, size_t size)
 {
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t resultId = static_cast<int32_t>(size);
+    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(*data);
+    AppExecFwk::InnerEvent::Pointer result = AppExecFwk::InnerEvent::Get(resultId, object);
     HDI::Ril::V1_0::RilRadioResponseInfo responseInfo;
     responseInfo.slotId = slotId;
     auto rilInterface_ = HDI::Ril::V1_0::IRil::Get();
@@ -144,6 +144,9 @@ void AnswerResponse(const uint8_t *data, size_t size)
     }
     auto handler_ = std::make_shared<TelRilHandler>(eventLoop_);
     auto telRilCall = std::make_shared<TelRilCall>(slotId, rilInterface_, observerHandler, handler_);
+    telRilCall->HoldCall(result);
+    telRilCall->UnHoldCall(result);
+    telRilCall->SwitchCall(result);
     telRilCall->AnswerResponse(responseInfo);
     telRilCall->HoldCallResponse(responseInfo);
     telRilCall->UnHoldCallResponse(responseInfo);
