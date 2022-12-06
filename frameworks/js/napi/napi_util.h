@@ -29,7 +29,6 @@ namespace OHOS {
 namespace Telephony {
 class NapiUtil {
 public:
-    static const int32_t MAX_TEXT_LENGTH = 4096;
     static std::string ToUtf8(std::u16string str16);
     static std::u16string ToUtf16(std::string str);
     static napi_value CreateErrorMessage(napi_env env, const std::string &message, int32_t errorCode = ERROR_DEFAULT);

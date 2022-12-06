@@ -40,7 +40,13 @@ bool OperatorFileParser::WriteOperatorConfigJson(std::string filename, const Jso
         }
     }
     std::fstream ofs;
-    ofs.open(GetOperatorConfigFilePath(filename).c_str(), std::ios::ate | std::ios::out);
+    std::string path = GetOperatorConfigFilePath(filename);
+    char realPath[PATH_MAX] = { 0 };
+    if (path.empty() || realpath(path.c_str(), realPath) == nullptr) {
+        TELEPHONY_LOGE("path or realPath is NULL");
+        return false;
+    }
+    ofs.open(realPath, std::ios::ate | std::ios::out);
     if (!ofs.is_open()) {
         TELEPHONY_LOGE("OpenFileFailed");
         return false;
@@ -182,7 +188,12 @@ void OperatorFileParser::ParseOperatorConfigFromJson(const Json::Value &root, Op
 int32_t OperatorFileParser::LoaderJsonFile(char *&content, const std::string &path)
 {
     std::ifstream ifs;
-    ifs.open(path);
+    char realPath[PATH_MAX] = { 0 };
+    if (path.empty() || realpath(path.c_str(), realPath) == nullptr) {
+        TELEPHONY_LOGE("path or realPath is NULL");
+        return LOADER_JSON_ERROR;
+    }
+    ifs.open(realPath);
     if (ifs.fail()) {
         TELEPHONY_LOGE("LoaderJsonFile path PATH: %{public}s failed", path.c_str());
         return LOADER_JSON_ERROR;
