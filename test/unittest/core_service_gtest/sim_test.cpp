@@ -1331,6 +1331,12 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0300, Function | Medium
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
+        std::shared_ptr<DiallingNumbersInfo> diallingNumbers =
+            std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_ADN, 0);
+        diallingNumbers->name_ = Str8ToStr16("电话卡");
+        diallingNumbers->number_ = Str8ToStr16("00000000000");
+        SimTest::telephonyService_->AddIccDiallingNumbers(
+            SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumbers);
         int index = 0;
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         diallingNumber->index_ = index;
@@ -3481,6 +3487,15 @@ HWTEST_F(SimTest, Telephony_Sim_SendCallSetupRequestResult_0300, Function | Medi
     }
 }
 
+void SetVoiceMailInfoTestFunc(CoreServiceTestHelper &helper)
+{
+    const std::u16string mailName = Str8ToStr16("张三");
+    const std::u16string mailnumber = Str8ToStr16("13123456789");
+    bool result = CoreServiceClient::GetInstance().SetVoiceMailInfo(SimTest::slotId_, mailName, mailnumber);
+    helper.SetBoolResult(result);
+    helper.NotifyAll();
+}
+
 /**
  * @tc.number   Telephony_Sim_SetVoiceMailInfo_0100
  * @tc.name     Set voice mail info
@@ -3492,11 +3507,24 @@ HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailInfo_0100, Function | MediumTest | L
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        const std::u16string mailName = Str8ToStr16("张三");
-        const std::u16string mailnumber = Str8ToStr16("13123456789");
-        bool result = CoreServiceClient::GetInstance().SetVoiceMailInfo(SimTest::slotId_, mailName, mailnumber);
-        EXPECT_TRUE(result);
+        CoreServiceTestHelper helper;
+        if (!helper.Run(SetVoiceMailInfoTestFunc, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            bool result = helper.GetBoolResult();
+            EXPECT_FALSE(result);
+        }
     }
+}
+
+void SetVoiceMailInfoTestFunc1(CoreServiceTestHelper &helper)
+{
+    const std::u16string mailName = Str8ToStr16("张三");
+    const std::u16string mailnumber = Str8ToStr16("13123456789");
+    bool result = CoreServiceClient::GetInstance().SetVoiceMailInfo(SimTest::slotId1_, mailName, mailnumber);
+    helper.SetBoolResult(result);
+    helper.NotifyAll();
 }
 
 /**
@@ -3510,10 +3538,14 @@ HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailInfo_0200, Function | MediumTest | L
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        const std::u16string mailName = Str8ToStr16("张三");
-        const std::u16string mailnumber = Str8ToStr16("13123456789");
-        bool result = CoreServiceClient::GetInstance().SetVoiceMailInfo(SimTest::slotId1_, mailName, mailnumber);
-        EXPECT_TRUE(result);
+        CoreServiceTestHelper helper;
+        if (!helper.Run(SetVoiceMailInfoTestFunc1, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            bool result = helper.GetBoolResult();
+            EXPECT_TRUE(result);
+        }
     }
 }
 
@@ -3527,10 +3559,14 @@ HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailInfo_0300, Function | MediumTest | L
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        const std::u16string mailName = Str8ToStr16("张三");
-        const std::u16string mailnumber = Str8ToStr16("13123456789");
-        bool result = CoreServiceClient::GetInstance().SetVoiceMailInfo(SimTest::slotId_, mailName, mailnumber);
-        EXPECT_FALSE(result);
+        CoreServiceTestHelper helper;
+        if (!helper.Run(SetVoiceMailInfoTestFunc, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            bool result = helper.GetBoolResult();
+            EXPECT_FALSE(result);
+        }
     }
 }
 
@@ -3646,11 +3682,11 @@ HWTEST_F(SimTest, Telephony_Sim_TestTelProfileUtil_0100, Function | MediumTest |
     telProfileUtil->SaveFloat(key1, saveFloatValue);
     telProfileUtil->ObtainFloat(key1, getFloatValue);
     EXPECT_TRUE(telProfileUtil->IsExistKey(key));
-    EXPECT_GT(telProfileUtil->RemoveKey(key), -1);
-    EXPECT_GT(telProfileUtil->RemoveAll(), -1);
+    EXPECT_NE(telProfileUtil->RemoveKey(key), -1);
+    EXPECT_NE(telProfileUtil->RemoveAll(), -1);
     telProfileUtil->Refresh();
-    EXPECT_GT(telProfileUtil->RefreshSync(), -1);
-    EXPECT_GT(telProfileUtil->DeleteProfiles(), -1);
+    EXPECT_NE(telProfileUtil->RefreshSync(), -1);
+    EXPECT_NE(telProfileUtil->DeleteProfiles(), -1);
 }
 
 /**
