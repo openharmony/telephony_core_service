@@ -74,24 +74,19 @@ public:
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t CallSupplement(
         int32_t slotId, int32_t eventId, int32_t type, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    int32_t GetClip(int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t SetClip(
-        int32_t slotId, int32_t eventId, int32_t action, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    int32_t GetClir(int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t SetClir(
-        int32_t slotId, int32_t eventId, int32_t action, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    int32_t SetCallWaiting(
-        int32_t slotId, int32_t eventId, int32_t activate, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    int32_t SetCallTransferInfo(int32_t slotId, int32_t eventId, const CallTransferParam &callTransfer,
-        const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    int32_t GetCallTransferInfo(int32_t slotId, int32_t eventId, const int32_t reason,
-        const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t GetCallWaiting(
-        int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t GetCallRestriction(int32_t slotId, int32_t eventId, std::string fac,
-        const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t SetCallRestriction(int32_t slotId, int32_t eventId, const CallRestrictionParam &callRestriction,
-        const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    int32_t GetClip(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) const;
+    int32_t SetClip(int32_t slotId, int32_t action, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetClir(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) const;
+    int32_t SetClir(int32_t slotId, int32_t action, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetCallWaiting(int32_t slotId, int32_t activate, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetCallTransferInfo(
+        int32_t slotId, const CallTransferParam &callTransfer, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetCallTransferInfo(
+        int32_t slotId, const int32_t reason, const AppExecFwk::InnerEvent::Pointer &response) const;
+    int32_t GetCallWaiting(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) const;
+    int32_t GetCallRestriction(int32_t slotId, std::string fac, const AppExecFwk::InnerEvent::Pointer &response) const;
+    int32_t SetCallRestriction(
+        int32_t slotId, const CallRestrictionParam &callRestriction, const AppExecFwk::InnerEvent::Pointer &response);
     /* PDP start */
     int32_t SetDataPermitted(int32_t slotId, int32_t eventId, int32_t dataPermitted,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);

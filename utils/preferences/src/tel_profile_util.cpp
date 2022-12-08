@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,9 @@ int TelProfileUtil::SaveString(const std::string &key, const std::string &value)
     if (ptr == nullptr) {
         return NativePreferences::E_ERROR;
     }
-    return ptr->PutString(key, value);
+    int ret = ptr->PutString(key, value);
+    ptr->Flush();
+    return ret;
 }
 
 std::string TelProfileUtil::ObtainString(const std::string &key, const std::string &defValue)
@@ -55,7 +57,9 @@ int TelProfileUtil::SaveInt(const std::string &key, int value)
     if (ptr == nullptr) {
         return NativePreferences::E_ERROR;
     }
-    return ptr->PutInt(key, value);
+    int ret = ptr->PutInt(key, value);
+    ptr->Flush();
+    return ret;
 }
 
 int TelProfileUtil::ObtainInt(const std::string &key, int defValue)
@@ -73,7 +77,9 @@ int TelProfileUtil::SaveBool(const std::string &key, bool value)
     if (ptr == nullptr) {
         return NativePreferences::E_ERROR;
     }
-    return ptr->PutBool(key, value);
+    int ret = ptr->PutBool(key, value);
+    ptr->Flush();
+    return ret;
 }
 
 bool TelProfileUtil::ObtainBool(const std::string &key, bool defValue)
@@ -91,7 +97,9 @@ int TelProfileUtil::SaveLong(const std::string &key, int64_t value)
     if (ptr == nullptr) {
         return NativePreferences::E_ERROR;
     }
-    return ptr->PutLong(key, value);
+    int ret = ptr->PutLong(key, value);
+    ptr->Flush();
+    return ret;
 }
 
 int64_t TelProfileUtil::ObtainLong(const std::string &key, int64_t defValue)
@@ -109,7 +117,9 @@ int TelProfileUtil::SaveFloat(const std::string &key, float value)
     if (ptr == nullptr) {
         return NativePreferences::E_ERROR;
     }
-    return ptr->PutFloat(key, value);
+    int ret = ptr->PutFloat(key, value);
+    ptr->Flush();
+    return ret;
 }
 
 float TelProfileUtil::ObtainFloat(const std::string &key, float defValue)

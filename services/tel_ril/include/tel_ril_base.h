@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,7 @@
 #include "tel_ril_handler.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_types.h"
 #include "v1_0/iril.h"
 
 namespace OHOS {
@@ -82,6 +83,8 @@ protected:
     inline int32_t Notify(const char *funcName, RadioEvent notifyId);
     template<typename T>
     inline int32_t Notify(const char *funcName, std::shared_ptr<T> data, RadioEvent notifyId);
+    inline int32_t ConfirmSupplementOfTelRilRequestInfo(
+        const char *funcName, std::shared_ptr<TelRilRequest> telRilRequest);
 
 protected:
     std::shared_ptr<ObserverHandler> observerHandler_;
@@ -233,6 +236,21 @@ inline HRilRadioResponseInfo TelRilBase::BuildHRilRadioResponseInfo(
     responseInfo.error = (HRilErrType)iResponseInfo.error;
     responseInfo.type = (HRilResponseTypes)iResponseInfo.type;
     return responseInfo;
+}
+
+inline int32_t TelRilBase::ConfirmSupplementOfTelRilRequestInfo(
+    const char *funcName, std::shared_ptr<TelRilRequest> telRilRequest)
+{
+    if (telRilRequest == nullptr || telRilRequest->pointer_ == nullptr) {
+        TELEPHONY_LOGE("func %{public}s telRilReques or telRilRequest->pointer or data is null", funcName);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    auto handler = telRilRequest->pointer_->GetOwner();
+    if (handler == nullptr) {
+        TELEPHONY_LOGE("func %{public}s handler is nullptr !!!", funcName);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS
