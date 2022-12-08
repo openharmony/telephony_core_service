@@ -28,6 +28,7 @@ ohos_unittest("tel_core_service_gtest") {
     "network_search_test_callback_stub.cpp",
     "sim_operator_brocast_test.cpp",
     "sim_test.cpp",
+    "zero_branch_test.cpp",
   ]
 
   include_dirs = [
@@ -36,10 +37,12 @@ ohos_unittest("tel_core_service_gtest") {
     "//base/telephony/core_service/utils/preferences/include",
     "//base/telephony/core_service/common/sim",
     "//base/telephony/core_service/services/sim/include",
+    "//base/telephony/core_service/services/network_search/include",
     "//base/telephony/core_service/common/network_search",
     "//base/telephony/core_service/common/core",
     "//commonlibrary/c_utils/base/include",
     "//base/telephony/core_service/services/tel_ril/include",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
@@ -60,9 +63,11 @@ ohos_unittest("tel_core_service_gtest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "drivers_interface_ril:hril_innerkits",
+    "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
     "init:libbegetutil",
     "ipc:ipc_core",
+    "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
