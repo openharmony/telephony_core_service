@@ -470,7 +470,7 @@ void TestInitTimeAndTimeZone()
     std::string timeZoneSet("America/Santiago");
     result = OHOS::MiscServices::TimeServiceClient::GetInstance()->SetTimeZone(timeZoneSet);
     ret = result ? "ture" : "false";
-    TELEPHONY_LOGI("TelephonyTestService::TestInitTimeAndTimeZone SetTimeZone result : %{public}d", ret.c_str());
+    TELEPHONY_LOGI("TelephonyTestService::TestInitTimeAndTimeZone SetTimeZone result : %{public}s", ret.c_str());
 
     std::string timeZoneRes = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetTimeZone();
     std::cout << " timezone:" << timeZoneRes << std::endl;

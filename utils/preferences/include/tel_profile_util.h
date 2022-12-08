@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,7 +51,7 @@ private:
     std::shared_ptr<NativePreferences::Preferences> GetProfiles(const std::string &path, int &errCode);
 
 private:
-    std::string path_ = "/data/telephony/data_storage/telephonyProperties.xml";
+    std::string path_ = "/data/service/el1/public/telephony/telephonyProperties.xml";
     int errCode_ = NativePreferences::E_OK;
     const std::string error_ = "error";
 };

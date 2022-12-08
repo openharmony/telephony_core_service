@@ -1900,7 +1900,7 @@ void TelRilTest::SetCallRestrictionTest(int32_t slotId, const std::shared_ptr<Ap
         CallRestrictionParam callRestriction;
         callRestriction.mode = 0;
         callRestriction.fac = GTEST_STRING;
-        callRestriction.password = GTEST_STRING;
+        callRestriction.pw = GTEST_STRING;
         TELEPHONY_LOGI("TelRilTest::SetCallRestrictionTest -->");
         telRilManager_->SetCallRestriction(slotId, callRestriction, event);
         TELEPHONY_LOGI("TelRilTest::SetCallRestrictionTest --> finished");

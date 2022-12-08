@@ -18,7 +18,6 @@
 
 #include "hril_call_parcel.h"
 #include "tel_ril_base.h"
-#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -124,6 +123,7 @@ private:
         const HDI::Ril::V1_0::CallInfoList &iCallInfoList);
     void BuildCFQueryInfoList(std::shared_ptr<CallForwardQueryInfoList> cFQueryInfoList,
         const HDI::Ril::V1_0::CallForwardQueryInfoList &cFQueryList);
+    int32_t ResponseSupplement(const char *funcName, const HDI::Ril::V1_0::RilRadioResponseInfo &iResponseInfo);
 };
 } // namespace Telephony
 } // namespace OHOS
