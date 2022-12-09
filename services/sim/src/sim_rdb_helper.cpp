@@ -116,17 +116,21 @@ int32_t SimRdbHelper::GetDefaultMainCardSlotId()
 int32_t SimRdbHelper::GetDefaultMessageCardSlotId()
 {
     TELEPHONY_LOGI("SimRdbHelper::GetDefaultMessageCardSlotId");
-    int32_t messageCardSlotId = INVALID_VALUE;
+    int32_t messageCardSlotId = 0;
     std::vector<std::string> colume;
     NativeRdb::DataAbilityPredicates predicates;
     predicates.EqualTo(SimRdbInfo::IS_MESSAGE_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
     std::shared_ptr<NativeRdb::AbsSharedResultSet> result = Query(colume, predicates);
-    int index = 0;
     if (result == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::get nothing");
         return messageCardSlotId;
     }
-    result->GoToFirstRow();
+    int resultSetNum = result->GoToFirstRow();
+    if (resultSetNum != 0) {
+        TELEPHONY_LOGI("SimRdbHelper::GetDefaultMessageCardSlotId not found default sms card");
+        return cellularDataCardSlotId;
+    }
+    int index = 0;
     result->GetColumnIndex(SimRdbInfo::SLOT_INDEX, index);
     result->GetInt(index, messageCardSlotId);
     result->Close();
@@ -136,21 +140,49 @@ int32_t SimRdbHelper::GetDefaultMessageCardSlotId()
 int32_t SimRdbHelper::GetDefaultCellularDataCardSlotId()
 {
     TELEPHONY_LOGI("SimRdbHelper::GetDefaultCellularDataCardSlotId");
-    int32_t cellularDataCardSlotId = INVALID_VALUE;
+    int32_t cellularDataCardSlotId = 0;
     std::vector<std::string> colume;
     NativeRdb::DataAbilityPredicates predicates;
     predicates.EqualTo(SimRdbInfo::IS_CELLULAR_DATA_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
     std::shared_ptr<NativeRdb::AbsSharedResultSet> result = Query(colume, predicates);
-    int index = 0;
     if (result == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::get nothing");
         return cellularDataCardSlotId;
     }
-    result->GoToFirstRow();
+    int resultSetNum = result->GoToFirstRow();
+    if (resultSetNum != 0) {
+        TELEPHONY_LOGI("SimRdbHelper::GetDefaultCellularDataCardSlotId not found default data card");
+        return cellularDataCardSlotId;
+    }
+    int index = 0;
     result->GetColumnIndex(SimRdbInfo::SLOT_INDEX, index);
     result->GetInt(index, cellularDataCardSlotId);
     result->Close();
     return cellularDataCardSlotId;
+}
+
+int32_t SimRdbHelper::GetDefaultVoiceCardSlotId()
+{
+    TELEPHONY_LOGI("SimRdbHelper::GetDefaultVoiceCardSlotId");
+    int32_t voiceCardSlotId = 0;
+    std::vector<std::string> colume;
+    NativeRdb::DataAbilityPredicates predicates;
+    predicates.EqualTo(SimRdbInfo::IS_VOICE_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
+    std::shared_ptr<NativeRdb::AbsSharedResultSet> result = Query(colume, predicates);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("SimRdbHelper::get nothing");
+        return messageCardSlotId;
+    }
+    int resultSetNum = result->GoToFirstRow();
+    if (resultSetNum != 0) {
+        TELEPHONY_LOGI("SimRdbHelper::GetDefaultVoiceCardSlotId not found default voice card");
+        return voiceCardSlotId;
+    }
+    int index = 0;
+    result->GetColumnIndex(SimRdbInfo::SLOT_INDEX, index);
+    result->GetInt(index, voiceCardSlotId);
+    result->Close();
+    return voiceCardSlotId;
 }
 
 int32_t SimRdbHelper::SetDefaultMainCard(int32_t slotId)

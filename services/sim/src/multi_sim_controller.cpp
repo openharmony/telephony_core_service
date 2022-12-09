@@ -543,7 +543,11 @@ int32_t MultiSimController::GetDefaultSmsSlotId()
     std::lock_guard<std::mutex> lock(mutex_);
     if (localCacheInfo_.empty()) {
         TELEPHONY_LOGE("MultiSimController::GetDefaultSmsSlotId failed by nullptr");
-        return INVALID_VALUE;
+        if (simDbHelper_ == nullptr) {
+            TELEPHONY_LOGE("MultiSimController::GetDefaultSmsSlotId simDbHelper is nullptr");
+            return DEFAULT_MAIN_SLOT_ID;
+        }
+        return simDbHelper_->GetDefaultMessageCardSlotId();
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
     for (; i < maxCount_; i++) {
@@ -630,7 +634,11 @@ int32_t MultiSimController::GetDefaultCellularDataSlotIdUnit()
 {
     if (localCacheInfo_.empty()) {
         TELEPHONY_LOGE("MultiSimController::GetDefaultCellularDataSlotId failed by nullptr");
-        return INVALID_VALUE;
+        if (simDbHelper_ == nullptr) {
+            TELEPHONY_LOGE("MultiSimController::GetDefaultCellularDataSlotIdUnit simDbHelper is nullptr");
+            return DEFAULT_MAIN_SLOT_ID;
+        }
+        return simDbHelper_->GetDefaultCellularDataCardSlotId();
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
     for (; i < maxCount_; i++) {
