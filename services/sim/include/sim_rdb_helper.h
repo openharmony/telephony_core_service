@@ -40,6 +40,7 @@ public:
 
     int32_t GetDefaultMainCardSlotId();
     int32_t GetDefaultMessageCardSlotId();
+    int32_t GetDefaultVoiceCardSlotId();
     int32_t GetDefaultCellularDataCardSlotId();
     int32_t SetDefaultMainCard(int32_t slotId);
     int32_t SetDefaultVoiceCard(int32_t slotId);
