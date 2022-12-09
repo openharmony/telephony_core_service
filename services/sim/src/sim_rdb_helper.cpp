@@ -128,7 +128,7 @@ int32_t SimRdbHelper::GetDefaultMessageCardSlotId()
     int resultSetNum = result->GoToFirstRow();
     if (resultSetNum != 0) {
         TELEPHONY_LOGI("SimRdbHelper::GetDefaultMessageCardSlotId not found default sms card");
-        return cellularDataCardSlotId;
+        return messageCardSlotId;
     }
     int index = 0;
     result->GetColumnIndex(SimRdbInfo::SLOT_INDEX, index);
