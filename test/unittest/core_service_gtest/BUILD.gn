@@ -31,6 +31,8 @@ ohos_unittest("tel_core_service_gtest") {
   ]
 
   include_dirs = [
+    "//base/telephony/telephony_data/sim/include",
+    "//base/telephony/telephony_data/common/include",
     "//base/telephony/core_service/services/core/include",
     "//base/telephony/core_service/utils/log/include",
     "//base/telephony/core_service/utils/preferences/include",
@@ -54,15 +56,23 @@ ohos_unittest("tel_core_service_gtest") {
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:ability_manager",
+    "ability_runtime:data_ability_helper",
+    "ability_runtime:wantagent_innerkits",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "config_policy:configpolicy_util",
     "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
     "init:libbegetutil",
     "ipc:ipc_core",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_ext:net_tether_manager_if",
+    "relational_store:native_dataability",
+    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
