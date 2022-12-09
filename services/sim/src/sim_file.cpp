@@ -1165,6 +1165,10 @@ bool SimFile::ProcessGetPnnDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("ProcessGetPnnDone: start");
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     if (fd != nullptr) {
         if (fd->exception != nullptr) {
@@ -1192,6 +1196,10 @@ bool SimFile::ProcessGetOplDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("ProcessGetOplDone: start");
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     if (fd != nullptr) {
         if (fd->exception != nullptr) {
@@ -1237,6 +1245,10 @@ bool SimFile::ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event)
 bool SimFile::ProcessSetCphsMailbox(const AppExecFwk::InnerEvent::Pointer &event)
 {
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
     std::unique_ptr<DiallingNumbersHandlerResult> fd = event->GetUniqueObject<DiallingNumbersHandlerResult>();
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::static_pointer_cast<DiallingNumbersInfo>(fd->result);
     if (fd->exception == nullptr) {
@@ -1327,6 +1339,10 @@ bool SimFile::ProcessGetFplmnDone(const AppExecFwk::InnerEvent::Pointer &event)
 bool SimFile::ProcessSetMbdn(const AppExecFwk::InnerEvent::Pointer &event)
 {
     bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
     bool hasNotify = false;
     std::unique_ptr<DiallingNumbersHandlerResult> fd = event->GetUniqueObject<DiallingNumbersHandlerResult>();
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::static_pointer_cast<DiallingNumbersInfo>(fd->result);
@@ -1370,6 +1386,10 @@ bool SimFile::ProcessMarkSms(const AppExecFwk::InnerEvent::Pointer &event)
 bool SimFile::ProcessObtainSpnPhase(const AppExecFwk::InnerEvent::Pointer &event)
 {
     bool loadResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return loadResponse;
+    }
     ObtainSpnPhase(false, event);
     return loadResponse;
 }
