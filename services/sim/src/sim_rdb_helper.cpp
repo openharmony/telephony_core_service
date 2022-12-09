@@ -171,7 +171,7 @@ int32_t SimRdbHelper::GetDefaultVoiceCardSlotId()
     std::shared_ptr<NativeRdb::AbsSharedResultSet> result = Query(colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::get nothing");
-        return messageCardSlotId;
+        return voiceCardSlotId;
     }
     int resultSetNum = result->GoToFirstRow();
     if (resultSetNum != 0) {
