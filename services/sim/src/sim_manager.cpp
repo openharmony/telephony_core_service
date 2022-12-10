@@ -325,8 +325,8 @@ bool SimManager::SetDefaultCellularDataSlotId(int32_t slotId)
         TELEPHONY_LOGE("SetDefaultSmsSlotId slotId is not active!");
         return false;
     }
-    int32_t ret = multiSimController_->SetDefaultCellularDataSlotId(slotId);
-    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
+    bool ret = multiSimController_->SetDefaultCellularDataSlotId(slotId);
+    if (ret && multiSimMonitor_ != nullptr) {
         multiSimMonitor_->NotifySimAccountChanged();
     }
     return ret;
