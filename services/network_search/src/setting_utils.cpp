@@ -23,14 +23,16 @@ namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;
 
+const std::string SettingUtils::NETWORK_SEARCH_SETTING_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 const std::string SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIME_URI =
-    "dataability:///com.ohos.settingsdata.DataAbility/auto_time";
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=auto_time";
 const std::string SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI =
-    "dataability:///com.ohos.settingsdata.DataAbility/auto_timezone";
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=auto_timezone";
 const std::string SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI =
-    "dataability:///com.ohos.settingsdata.DataAbility/airplane_mode";
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=airplane_mode";
 const std::string SettingUtils::NETWORK_SEARCH_SETTING_PREFERRED_NETWORK_MODE_URI =
-    "dataability:///com.ohos.settingsdata.DataAbility/preferred_network_mode";
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=preferred_network_mode";
 
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIME = "settings.telephony.autotime";
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIMEZONE = "settings.telephony.autotimezone";
@@ -40,12 +42,12 @@ const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE =
 
 SettingUtils::SettingUtils()
 {
-    settingHelper_ = CreateDataAbilityHelper();
+    settingHelper_ = CreateDataShareHelper();
 }
 
 SettingUtils::~SettingUtils() = default;
 
-std::shared_ptr<AppExecFwk::DataAbilityHelper> SettingUtils::CreateDataAbilityHelper()
+std::shared_ptr<DataShare::DataShareHelper> SettingUtils::CreateDataShareHelper()
 {
     sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
@@ -57,7 +59,7 @@ std::shared_ptr<AppExecFwk::DataAbilityHelper> SettingUtils::CreateDataAbilityHe
         TELEPHONY_LOGE("SettingUtils: GetSystemAbility Service Failed.");
         return nullptr;
     }
-    return AppExecFwk::DataAbilityHelper::Creator(remoteObj);
+    return DataShare::DataShareHelper::Creator(remoteObj, NETWORK_SEARCH_SETTING_URI);
 }
 
 bool SettingUtils::UnRegisterSettingsObserver(
@@ -93,9 +95,9 @@ bool SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
     }
 
     std::vector<std::string> columns;
-    NativeRdb::DataAbilityPredicates predicates;
+    DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTING_KEY, key);
-    std::shared_ptr<NativeRdb::AbsSharedResultSet> result = settingHelper_->Query(uri, columns, predicates);
+    auto result = settingHelper_->Query(uri, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("SettingUtils: query error, result is null");
         return false;
@@ -121,9 +123,11 @@ bool SettingUtils::Insert(Uri uri, const std::string &key, const std::string &va
         TELEPHONY_LOGE("settingHelper_ is null");
         return false;
     }
-    NativeRdb::ValuesBucket valuesBucket;
-    valuesBucket.PutString(SETTING_KEY, key);
-    valuesBucket.PutString(SETTING_VALUE, value);
+    DataShare::DataShareValuesBucket valuesBucket;
+    DataShare::DataShareValueObject keyObj(key);
+    DataShare::DataShareValueObject valueObj(value);
+    valuesBucket.Put(SETTING_KEY, keyObj);
+    valuesBucket.Put(SETTING_VALUE, valueObj);
     int32_t result = settingHelper_->Insert(uri, valuesBucket);
     if (result == RDB_INVALID_VALUE) {
         return false;
@@ -146,11 +150,12 @@ bool SettingUtils::Update(Uri uri, const std::string &key, const std::string &va
         return Insert(uri, key, value);
     }
 
-    NativeRdb::ValuesBucket valuesBucket;
-    valuesBucket.PutString(SETTING_VALUE, value);
-    NativeRdb::DataAbilityPredicates predicates;
+    DataShare::DataShareValuesBucket valuesBucket;
+    DataShare::DataShareValueObject valueObj(value);
+    valuesBucket.Put(SETTING_VALUE, valueObj);
+    DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTING_KEY, key);
-    int32_t result = settingHelper_->Update(uri, valuesBucket, predicates);
+    int32_t result = settingHelper_->Update(uri, predicates, valuesBucket);
     if (result == RDB_INVALID_VALUE) {
         return false;
     }
