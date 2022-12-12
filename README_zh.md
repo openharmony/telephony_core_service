@@ -61,7 +61,7 @@
 ## 约束<a name="section133mcpsimp"></a>
 
 -   开发语言：C++ 、Java Script。
--   软件约束：需要与以下服务配合使用：HDF(drivers\_interface，driver\_peripheral)，RIL适配（ril\_adapter），状态注册服务（state\_registry）。
+-   软件约束：需要与以下服务配合使用：HDF(drivers\_interface，drivers\_peripheral)，RIL适配（ril\_adapter），状态注册服务（state\_registry）。
 -   硬件约束：需要搭载的设备支持以下硬件：可以进行独立蜂窝通信的Modem以及SIM卡。
 
 ## 接口说明<a name="section139mcpsimp"></a>
