@@ -62,7 +62,7 @@ As shown in the preceding figure, the telephony core service consists of the fol
 ## Constraints<a name="section133mcpsimp"></a>
 
 -   Programming language: C++ and JavaScript.
--   Software constraints: This module must work with the RIL Adapter service \(ril\_adapter\) and state registry service \(state\_registry\).
+-   Software constraints: This module must work with the HDF (drivers\_interface and drivers\_peripheral), RIL Adapter service \(ril\_adapter\), and state registry service \(state\_registry\).
 -   Hardware constraints: The accommodating device must be equipped with a modem and a SIM card capable of independent cellular communication.
 
 ## Available APIs<a name="section139mcpsimp"></a>
@@ -212,5 +212,9 @@ The function of querying the status of a specified SIM card is used as an exampl
 **telephony\_core\_service**
 
 [telephony\_sms\_mms](https://gitee.com/openharmony/telephony_sms_mms/blob/master/README.md)
+
+[drivers_interface](https://gitee.com/openharmony/drivers_interface)
+
+[drivers_peripheral](https://gitee.com/openharmony/drivers_peripheral)
 
 [telephony\_ril\_adapter](https://gitee.com/openharmony/telephony_ril_adapter/blob/master/README.md)
