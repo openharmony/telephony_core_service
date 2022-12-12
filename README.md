@@ -62,7 +62,7 @@ As shown in the preceding figure, the telephony core service consists of the fol
 ## Constraints<a name="section133mcpsimp"></a>
 
 -   Programming language: C++ and JavaScript.
--   Software constraints: This module must work with the HDF (drivers\_interface，driver\_peripheral), RIL Adapter service \(ril\_adapter\), and state registry service \(state\_registry\).
+-   Software constraints: This module must work with the HDF (drivers\_interface and driver\_peripheral), RIL Adapter service \(ril\_adapter\), and state registry service \(state\_registry\).
 -   Hardware constraints: The accommodating device must be equipped with a modem and a SIM card capable of independent cellular communication.
 
 ## Available APIs<a name="section139mcpsimp"></a>
