@@ -15,15 +15,19 @@
 
 #include "resource_utils.h"
 
+#include <sys/stat.h>
+
+#include "bundle_mgr_interface.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+#include "singleton.h"
+#include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t HAP_USER_ID = 100;
 const std::string ResourceUtils::RESOURCE_HAP_BUNDLE_NAME = "ohos.telephony.resources";
-const std::string ResourceUtils::RESOURCE_INDEX_PATH =
-    "/data/app/el1/bundle/public/" + ResourceUtils::RESOURCE_HAP_BUNDLE_NAME + "/" +
-    ResourceUtils::RESOURCE_HAP_BUNDLE_NAME + "/assets/entry/resources.index";
-
 const std::string ResourceUtils::IS_NOTIFY_USER_RESTRICTIED_CHANGE = "is_notify_user_restrictied_change";
 const std::string ResourceUtils::IS_CS_CAPABLE = "is_cs_capable";
 const std::string ResourceUtils::IS_SWITCH_PHONE_REG_CHANGE = "is_switch_phone_reg_change";
@@ -337,7 +341,7 @@ const std::map<DisconnectedReasons, std::string> ResourceUtils::callFailedResour
 ResourceUtils &ResourceUtils::Get()
 {
     static ResourceUtils utils_;
-    if (!utils_.Init(RESOURCE_INDEX_PATH)) {
+    if (!utils_.Init()) {
         TELEPHONY_LOGE("ResourceUtils::Get init failed.");
     }
     return utils_;
@@ -348,20 +352,56 @@ ResourceUtils::ResourceUtils()
     resourceManager_ = std::unique_ptr<Global::Resource::ResourceManager>(Global::Resource::CreateResourceManager());
 }
 
-bool ResourceUtils::Init(std::string path)
+bool ResourceUtils::Init()
 {
     std::lock_guard<std::mutex> locker(mutex_);
     if (beSourceAdd_) {
         return true;
     }
     if (resourceManager_ == nullptr) {
-        TELEPHONY_LOGE("ResourceUtils Init failed , resourceManager is null.  %{public}s", path.c_str());
+        TELEPHONY_LOGE("ResourceUtils Init failed , resourceManager is null.");
         beSourceAdd_ = false;
         return false;
     }
-    beSourceAdd_ = resourceManager_->AddResource(path.c_str());
-    TELEPHONY_LOGI(
-        "ResourceUtils add resource %{public}s %{public}d", path.c_str(), static_cast<int32_t>(beSourceAdd_));
+
+    OHOS::sptr<OHOS::ISystemAbilityManager> systemAbilityManager =
+        OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityManager == nullptr) {
+        TELEPHONY_LOGE("systemAbilityManager is null.");
+        return false;
+    }
+    OHOS::sptr<OHOS::IRemoteObject> remoteObject =
+        systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+
+    sptr<AppExecFwk::IBundleMgr> iBundleMgr = OHOS::iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
+    if (iBundleMgr == nullptr) {
+        TELEPHONY_LOGE("iBundleMgr is null.");
+        return false;
+    }
+    AppExecFwk::BundleInfo bundleInfo;
+    iBundleMgr->GetBundleInfo(
+        RESOURCE_HAP_BUNDLE_NAME.c_str(), AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT, bundleInfo, HAP_USER_ID);
+    std::string hapPath;
+    std::string resPath;
+    if (!bundleInfo.hapModuleInfos.empty()) {
+        hapPath = bundleInfo.hapModuleInfos[0].hapPath;
+    }
+    if (!bundleInfo.moduleResPaths.empty()) {
+        resPath = bundleInfo.moduleResPaths[0];
+    }
+
+    if (IsFileExist(hapPath)) {
+        beSourceAdd_ = resourceManager_->AddResource(hapPath.c_str());
+        TELEPHONY_LOGI(
+            "ResourceUtils add hap path %{public}s %{public}d", hapPath.c_str(), static_cast<int32_t>(beSourceAdd_));
+    } else if (IsFileExist(resPath)) {
+        beSourceAdd_ = resourceManager_->AddResource(resPath.c_str());
+        TELEPHONY_LOGI("ResourceUtils add resource path %{public}s %{public}d", resPath.c_str(),
+            static_cast<int32_t>(beSourceAdd_));
+    } else {
+        TELEPHONY_LOGE("moduleResPath and moduleHapPath is invalid");
+    }
+
     if (beSourceAdd_) {
         SaveAllValue();
     }
@@ -524,6 +564,12 @@ bool ResourceUtils::GetStringValueByName(std::string name, std::string &value)
     }
     value = std::any_cast<std::string>(itor->second);
     return true;
+}
+
+bool ResourceUtils::IsFileExist(const std::string &filePath)
+{
+    struct stat buffer;
+    return (stat(filePath.c_str(), &buffer) == 0);
 }
 } // namespace Telephony
 } // namespace OHOS
