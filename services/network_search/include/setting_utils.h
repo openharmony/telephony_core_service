@@ -20,15 +20,15 @@
 #include <singleton.h>
 #include <utility>
 
-#include "abs_shared_result_set.h"
-#include "data_ability_helper.h"
-#include "data_ability_predicates.h"
+#include "datashare_helper.h"
+#include "datashare_predicates.h"
+#include "datashare_result_set.h"
+#include "datashare_values_bucket.h"
 #include "data_ability_observer_stub.h"
 #include "iservice_registry.h"
 #include "result_set.h"
 #include "system_ability_definition.h"
 #include "uri.h"
-#include "values_bucket.h"
 
 #include "network_search_handler.h"
 
@@ -37,6 +37,7 @@ namespace Telephony {
 class SettingUtils : public DelayedSingleton<SettingUtils> {
     DECLARE_DELAYED_SINGLETON(SettingUtils);
 public:
+    static const std::string NETWORK_SEARCH_SETTING_URI;
     static const std::string NETWORK_SEARCH_SETTING_AUTO_TIME_URI;
     static const std::string NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI;
     static const std::string NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI;
@@ -51,11 +52,12 @@ public:
     bool Query(Uri uri, const std::string &key, std::string &value);
     bool Insert(Uri uri, const std::string &key, const std::string &value);
     bool Update(Uri uri, const std::string &key, const std::string &value);
-private:
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> CreateDataAbilityHelper();
 
 private:
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> settingHelper_;
+    std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
+
+private:
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper_;
     const std::string SETTING_KEY = "KEYWORD";
     const std::string SETTING_VALUE = "VALUE";
     const int32_t RDB_INVALID_VALUE = -1;
