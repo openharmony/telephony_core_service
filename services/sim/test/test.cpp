@@ -305,7 +305,10 @@ static bool AmongLock(int mid, PinLockEnable min, PinLockEnable max)
 static bool TestHasSimCard()
 {
     AccessToken token;
-    bool result = g_telephonyService->HasSimCard(SLOT_ID);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    bool result = g_telephonyService->HasSimCard(testSlot);
     string expect = result ? "success" : "fail";
     std::cout << "TelephonyTestService Remote HasSimCard result [" << result << "] " << expect << std::endl;
     return true;
@@ -329,7 +332,10 @@ static bool TestGetSimState()
 {
     AccessToken token;
     const int simReady = 4;
-    int32_t result = static_cast<int32_t>(g_telephonyService->GetSimState(SLOT_ID));
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    int32_t result = static_cast<int32_t>(g_telephonyService->GetSimState(testSlot));
     string expect = (result == simReady) ? "success" : "fail";
     std::cout << "TelephonyTestService Remote GetSimState result [" << result << "] " << expect << std::endl;
     return true;
@@ -338,7 +344,10 @@ static bool TestGetSimState()
 static bool TestGetCardType()
 {
     AccessToken token;
-    int32_t result = static_cast<int32_t>(g_telephonyService->GetCardType(SLOT_ID));
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    int32_t result = static_cast<int32_t>(g_telephonyService->GetCardType(testSlot));
     std::cout << "TelephonyTestService Remote GetCardType result [" << result << "] " << std::endl;
     return true;
 }
@@ -369,7 +378,10 @@ static bool TestGetPrimarySlotId()
 static bool TestGetISOCountryCodeForSim()
 {
     AccessToken token;
-    std::u16string result = g_telephonyService->GetISOCountryCodeForSim(SLOT_ID);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    std::u16string result = g_telephonyService->GetISOCountryCodeForSim(testSlot);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote GetISOCountryCodeForSim result [" << str << "] " << expect
@@ -380,8 +392,11 @@ static bool TestGetISOCountryCodeForSim()
 static bool TestGetSimSpn()
 {
     AccessToken token;
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
     std::u16string result  = u"test";
-    result = g_telephonyService->GetSimSpn(SLOT_ID);
+    result = g_telephonyService->GetSimSpn(testSlot);
     std::string str = Str16ToStr8(result);
     string expect = strcmp(str.c_str(), "test") ? "success" : "fail";
     std::cout << "TelephonyTestService Remote GetSimSpn result [" << str << "] " << expect << std::endl;
@@ -452,7 +467,10 @@ static bool TestGetSimEons()
 static bool TestGetSimOperatorNumeric()
 {
     AccessToken token;
-    std::u16string result = g_telephonyService->GetSimOperatorNumeric(SLOT_ID);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    std::u16string result = g_telephonyService->GetSimOperatorNumeric(testSlot);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote GetSimOperatorNumeric result [" << str << "] " << expect << std::endl;
@@ -462,7 +480,10 @@ static bool TestGetSimOperatorNumeric()
 static bool TestGetIMSI()
 {
     AccessToken token;
-    std::u16string result = g_telephonyService->GetIMSI(SLOT_ID);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    std::u16string result = g_telephonyService->GetIMSI(testSlot);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote GetIMSI result [" << str << "] " << expect << std::endl;
@@ -484,7 +505,10 @@ static bool TestIsSimActive()
 static bool TestGetSimGid1()
 {
     AccessToken token;
-    std::u16string result = g_telephonyService->GetSimGid1(SLOT_ID);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    std::u16string result = g_telephonyService->GetSimGid1(testSlot);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote GetSimGid1 result [" << str << "] " << expect << std::endl;
@@ -494,7 +518,10 @@ static bool TestGetSimGid1()
 static bool TestGetSimGid2()
 {
     AccessToken token;
-    std::u16string result = g_telephonyService->GetSimGid2(SLOT_ID);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    std::u16string result = g_telephonyService->GetSimGid2(testSlot);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote GetSimGid2 result [" << str << "] " << expect << std::endl;
@@ -504,7 +531,10 @@ static bool TestGetSimGid2()
 static bool TestGetSimTelephoneNumber()
 {
     AccessToken token;
-    std::u16string result = g_telephonyService->GetSimTelephoneNumber(SLOT_ID);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    std::u16string result = g_telephonyService->GetSimTelephoneNumber(testSlot);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote GetSimTelephoneNumber result [" << str << "] " << expect << std::endl;
@@ -514,7 +544,10 @@ static bool TestGetSimTelephoneNumber()
 static bool TestGetSimTeleNumberIdentifier()
 {
     AccessToken token;
-    std::u16string result = g_telephonyService->GetSimTeleNumberIdentifier(SLOT_ID);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    std::u16string result = g_telephonyService->GetSimTeleNumberIdentifier(testSlot);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote getSimTeleNumberIdentifier result [" << str << "] " << expect
@@ -525,7 +558,10 @@ static bool TestGetSimTeleNumberIdentifier()
 static bool TestGetVoiceMailIdentifier()
 {
     AccessToken token;
-    std::u16string result = g_telephonyService->GetVoiceMailIdentifier(SLOT_ID);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    std::u16string result = g_telephonyService->GetVoiceMailIdentifier(testSlot);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote GetVoiceMailIdentifier result [" << str << "] " << expect
@@ -536,7 +572,10 @@ static bool TestGetVoiceMailIdentifier()
 static bool TestGetVoiceMailNumber()
 {
     AccessToken token;
-    std::u16string result = g_telephonyService->GetVoiceMailNumber(SLOT_ID);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    std::u16string result = g_telephonyService->GetVoiceMailNumber(testSlot);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote GetVoiceMailNumber result [" << str << "] " << expect << std::endl;
@@ -547,6 +586,9 @@ static bool TestQueryIccDiallingNumbers()
 {
     AccessToken token;
     int testType = 0;
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
     int type = DiallingNumbersInfo::SIM_ADN;
     std::cout << "please select type: 1.public dialling numbers 2.fix dialing numbers" << std::endl;
     std::cin >> testType;
@@ -555,7 +597,7 @@ static bool TestQueryIccDiallingNumbers()
     }
     std::cout << "TestQueryIccDiallingNumbers loading " << testType << std::endl;
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-        g_telephonyService->QueryIccDiallingNumbers(SLOT_ID, type);
+        g_telephonyService->QueryIccDiallingNumbers(testSlot, type);
     g_simDiallingNumbersRead = true;
     if (diallingNumbers.empty()) {
         std::cout << "no dialling numbers in sim" << std::endl;
@@ -586,6 +628,9 @@ static bool TestAddIccDiallingNumbers()
     std::string number = "";
     std::string pin2 = "";
     int type = 0;
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
     std::cout << "input name:" << std::endl;
     std::cin >> name;
     std::cout << "input number:" << std::endl;
@@ -606,7 +651,7 @@ static bool TestAddIccDiallingNumbers()
     diallingNumber->pin2_ = Str8ToStr16(pin2);
     std::cout << "start insert " << Str16ToStr8(diallingNumber->name_) << " "
               << Str16ToStr8(diallingNumber->number_) << std::endl;
-    bool result = g_telephonyService->AddIccDiallingNumbers(SLOT_ID, type, diallingNumber);
+    bool result = g_telephonyService->AddIccDiallingNumbers(testSlot, type, diallingNumber);
     std::cout << "TelephonyTestService Remote TestAddIccDiallingNumbers result [" << result << "] " << std::endl;
     return true;
 }
@@ -621,6 +666,9 @@ static bool TestDelIccDiallingNumbers()
     int type = 0;
     int index = 0;
     std::string pin2 = "";
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
     std::cout << "select id:" << std::endl;
     std::cin >> index;
     std::cout << "please select type: 1.public dialling numbers 2.fix dialing numbers" << std::endl;
@@ -636,7 +684,7 @@ static bool TestDelIccDiallingNumbers()
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>(type, 0);
     diallingNumber->index_ = index;
     diallingNumber->pin2_ = Str8ToStr16(pin2);
-    bool result = g_telephonyService->DelIccDiallingNumbers(SLOT_ID, type, diallingNumber);
+    bool result = g_telephonyService->DelIccDiallingNumbers(testSlot, type, diallingNumber);
     std::cout << "TelephonyTestService Remote DelIccDiallingNumbers result [" << result << "] " << std::endl;
     return true;
 }
@@ -653,6 +701,9 @@ static bool TestUpdateIccDiallingNumbers()
     std::string pin2 = "";
     int type = 0;
     int index = 0;
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
     std::cout << "select id:" << std::endl;
     std::cin >> index;
     std::cout << "input name:" << std::endl;
@@ -674,7 +725,7 @@ static bool TestUpdateIccDiallingNumbers()
     diallingNumber->number_ = Str8ToStr16(number);
     diallingNumber->pin2_ = Str8ToStr16(pin2);
     diallingNumber->index_ = index;
-    bool result = g_telephonyService->UpdateIccDiallingNumbers(SLOT_ID, type, diallingNumber);
+    bool result = g_telephonyService->UpdateIccDiallingNumbers(testSlot, type, diallingNumber);
     std::cout << "TelephonyTestService Remote UpdateIccDiallingNumbers result [" << result << "] " << std::endl;
     return true;
 }
@@ -682,6 +733,9 @@ static bool TestUpdateIccDiallingNumbers()
 static bool TestSetVoiceMailInfo()
 {
     AccessToken token;
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
     std::string name = "";
     std::string number = "";
     std::cout << "input name:" << std::endl;
@@ -690,7 +744,7 @@ static bool TestSetVoiceMailInfo()
     std::cin >> number;
     std::u16string mailName = Str8ToStr16(name);
     std::u16string mailNumber = Str8ToStr16(number);
-    bool result = g_telephonyService->SetVoiceMailInfo(SLOT_ID, mailName, mailNumber);
+    bool result = g_telephonyService->SetVoiceMailInfo(testSlot, mailName, mailNumber);
     std::cout << "TelephonyTestService Remote SetVoiceMailInfo result [" << result << "] " << std::endl;
     return true;
 }
@@ -843,13 +897,16 @@ static bool TestUnlockPin()
     LockStatusResponse response = {0};
     std::string pin = " ";
     int size = 0;
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
     while (!Among(size, PinWordSize::PIN_MIN_SIZE, PinWordSize::PIN_MAX_SIZE)) {
         std::cout << "\n Unlock pin start, Please input pin \n";
         std::cin >> pin;
         size = pin.size();
     }
     std::cout << "Unlock pin: pin = " << pin << endl;
-    g_telephonyService->UnlockPin(SLOT_ID, Str8ToStr16(pin.c_str()), response);
+    g_telephonyService->UnlockPin(testSlot, Str8ToStr16(pin.c_str()), response);
     std::cout << "Unlock pin complete:" << response.result << " " << response.remain << std::endl;
     return true;
 }
@@ -861,6 +918,9 @@ static bool TestUnlockPuk()
     std::string newPin = " ";
     std::string puk = " ";
     int size = 0;
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
     while (!Among(size, PinWordSize::PIN_MIN_SIZE, PinWordSize::PIN_MAX_SIZE)) {
         std::cout << "\n Unlock puk start, Please input new pin \n";
         std::cin >> newPin;
@@ -873,7 +933,7 @@ static bool TestUnlockPuk()
         size = puk.size();
     }
     std::cout << "Unlock puk: newPin = " << newPin << "  puk = " << puk << endl;
-    g_telephonyService->UnlockPuk(SLOT_ID, Str8ToStr16(newPin.c_str()), Str8ToStr16(puk.c_str()), response);
+    g_telephonyService->UnlockPuk(testSlot, Str8ToStr16(newPin.c_str()), Str8ToStr16(puk.c_str()), response);
     std::cout << "Unlock puk complete:" << response.result << " " << response.remain << std::endl;
     return true;
 }
@@ -885,6 +945,9 @@ static bool TestAlterPin()
     std::string oldPin = " ";
     std::string newPin = " ";
     int size = 0;
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
     while (!Among(size, PinWordSize::PIN_MIN_SIZE, PinWordSize::PIN_MAX_SIZE)) {
         std::cout << "\n Alter pin start, Please input old pin \n";
         std::cin >> oldPin;
@@ -897,7 +960,7 @@ static bool TestAlterPin()
         size = newPin.size();
     }
     std::cout << "Unlock pin: oldPin = " << oldPin << "  newPin = " << newPin << endl;
-    g_telephonyService->AlterPin(SLOT_ID, Str8ToStr16(newPin.c_str()), Str8ToStr16(oldPin.c_str()), response);
+    g_telephonyService->AlterPin(testSlot, Str8ToStr16(newPin.c_str()), Str8ToStr16(oldPin.c_str()), response);
     std::cout << "Alter pin complete:" << response.result << " " << response.remain << std::endl;
     return true;
 }
@@ -908,13 +971,16 @@ static bool TestUnlockPin2()
     LockStatusResponse response = {0};
     std::string pin2 = " ";
     int size = 0;
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
     while (!Among(size, PinWordSize::PIN_MIN_SIZE, PinWordSize::PIN_MAX_SIZE)) {
         std::cout << "\n Unlock pin2 start, Please input pin2 \n";
         std::cin >> pin2;
         size = pin2.size();
     }
     std::cout << "Unlock pin2: pin2 = " << pin2 << endl;
-    g_telephonyService->UnlockPin2(SLOT_ID, Str8ToStr16(pin2.c_str()), response);
+    g_telephonyService->UnlockPin2(testSlot, Str8ToStr16(pin2.c_str()), response);
     std::cout << "Unlock pin2 complete:" << response.result << " " << response.remain << std::endl;
     return true;
 }
@@ -926,6 +992,9 @@ static bool TestUnlockPuk2()
     std::string newPin2 = " ";
     std::string puk2 = " ";
     int size = 0;
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
     while (!Among(size, PinWordSize::PIN_MIN_SIZE, PinWordSize::PIN_MAX_SIZE)) {
         std::cout << "\n Unlock puk2 start, Please input new pin2 \n";
         std::cin >> newPin2;
@@ -938,7 +1007,7 @@ static bool TestUnlockPuk2()
         size = puk2.size();
     }
     std::cout << "Unlock puk2: newPin2 = " << newPin2 << "  puk2 = " << puk2 << endl;
-    g_telephonyService->UnlockPuk2(SLOT_ID, Str8ToStr16(newPin2.c_str()), Str8ToStr16(puk2.c_str()), response);
+    g_telephonyService->UnlockPuk2(testSlot, Str8ToStr16(newPin2.c_str()), Str8ToStr16(puk2.c_str()), response);
     std::cout << "Unlock puk complete:" << response.result << " " << response.remain << std::endl;
     return true;
 }
@@ -950,6 +1019,9 @@ static bool TestAlterPin2()
     std::string oldPin2 = " ";
     std::string newPin2 = " ";
     int size = 0;
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
     while (!Among(size, PinWordSize::PIN_MIN_SIZE, PinWordSize::PIN_MAX_SIZE)) {
         std::cout << "\n Alter pin2 start, Please input old pin2 \n";
         std::cin >> oldPin2;
@@ -962,7 +1034,7 @@ static bool TestAlterPin2()
         size = newPin2.size();
     }
     std::cout << "Unlock pin2: oldPin2 = " << oldPin2 << "  newPin2 = " << newPin2 << endl;
-    g_telephonyService->AlterPin2(SLOT_ID, Str8ToStr16(newPin2.c_str()), Str8ToStr16(oldPin2.c_str()), response);
+    g_telephonyService->AlterPin2(testSlot, Str8ToStr16(newPin2.c_str()), Str8ToStr16(oldPin2.c_str()), response);
     std::cout << "Alter pin2 complete:" << response.result << " " << response.remain << std::endl;
     return true;
 }
@@ -998,7 +1070,10 @@ static bool TestSetLockState()
     testInfo.password = Str8ToStr16(testPin);
     testInfo.lockState = static_cast<LockState>(mode);
     testInfo.lockType = static_cast<LockType>(testType);
-    g_telephonyService->SetLockState(SLOT_ID, testInfo, response);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    g_telephonyService->SetLockState(testSlot, testInfo, response);
     std::cout << "Set Lock complete:" << response.result << " " << response.remain << std::endl;
     return true;
 }
@@ -1012,7 +1087,10 @@ static bool TestGetLockState()
         std::cin >> testType;
     }
     LockType lockType = static_cast<LockType>(testType);
-    int32_t ret = g_telephonyService->GetLockState(SLOT_ID, lockType);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    int32_t ret = g_telephonyService->GetLockState(testSlot, lockType);
     std::cout << "TestGetLockState()" << ret << endl;
     return true;
 }
@@ -1020,7 +1098,10 @@ static bool TestGetLockState()
 static bool TestRefreshSimState()
 {
     AccessToken token;
-    int32_t ret = g_telephonyService->RefreshSimState(SLOT_ID);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    int32_t ret = g_telephonyService->RefreshSimState(testSlot);
     std::cout << "TestRefreshSimState()" << ret << endl;
     return true;
 }
@@ -1053,7 +1134,10 @@ static bool TestGetOpKey()
 {
     AccessToken token;
     std::u16string opkey;
-    int32_t result = g_telephonyService->GetOpKey(SLOT_ID, opkey);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    int32_t result = g_telephonyService->GetOpKey(testSlot, opkey);
     std::string str = Str16ToStr8(opkey);
     string expect = (result == TELEPHONY_ERR_SUCCESS) ? "success" : "fail";
     std::cout << "TestGetOpKey Remote GetOpKey result [" << str << "] " << expect << std::endl;
@@ -1064,7 +1148,10 @@ static bool TestGetOpName()
 {
     AccessToken token;
     std::u16string opname;
-    int32_t result = g_telephonyService->GetOpName(SLOT_ID, opname);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    int32_t result = g_telephonyService->GetOpName(testSlot, opname);
     std::string str = Str16ToStr8(opname);
     string expect = (result == TELEPHONY_ERR_SUCCESS) ? "success" : "fail";
     std::cout << "TestGetOpName Remote GetOpName result [" << str << "] " << expect << std::endl;
@@ -1075,7 +1162,10 @@ static bool TestGetOpKeyExt()
 {
     AccessToken token;
     std::u16string opkeyExt;
-    int32_t result = g_telephonyService->GetOpKeyExt(SLOT_ID, opkeyExt);
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    int32_t result = g_telephonyService->GetOpKeyExt(testSlot, opkeyExt);
     std::string str = Str16ToStr8(opkeyExt);
     string expect = (result == TELEPHONY_ERR_SUCCESS) ? "success" : "fail";
     std::cout << "TestGetOpKeyExt Remote GetOpKeyExt result [" << str << "] " << expect << std::endl;
