@@ -206,7 +206,7 @@ public:
     static const std::string CALL_FAILED_UNKNOWN;
 
     static ResourceUtils &Get();
-    bool Init(std::string path);
+    bool Init();
     void ShowAllValue();
     ~ResourceUtils() = default;
 
@@ -223,6 +223,7 @@ private:
     bool GetBooleanByName(std::string name, bool &value);
     bool GetStringArrayByName(std::string name, std::vector<std::string> &value);
     bool GetIntArrayByName(std::string name, std::vector<int32_t> &value);
+    bool IsFileExist(const std::string &filePath);
 
 private:
     std::unique_ptr<Global::Resource::ResourceManager> resourceManager_ = nullptr;
