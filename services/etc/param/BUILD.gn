@@ -23,15 +23,15 @@ group("param_files") {
 }
 
 ohos_prebuilt_etc("telephony.para") {
-  source = "telephony.para"
-  relative_install_dir = "param"
+  source = "//base/telephony/core_service/services/etc/param/telephony.para"
   part_name = "core_service"
   subsystem_name = "telephony"
+  module_install_dir = "etc/param"
 }
 
 ohos_prebuilt_etc("telephony.para.dac") {
-  source = "telephony.para.dac"
-  relative_install_dir = "param"
+  source = "//base/telephony/core_service/services/etc/param/telephony.para.dac"
   part_name = "core_service"
   subsystem_name = "telephony"
+  module_install_dir = "etc/param"
 }
