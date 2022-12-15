@@ -60,12 +60,20 @@ void SimStateManager::Init(int32_t slotId)
 
 void SimStateManager::RegisterCoreNotify(const HANDLE &handler, int what)
 {
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGE("RegisterCoreNotify(), simStateHandle_ is nullptr!!!");
+        return;
+    }
     std::lock_guard<std::mutex> lck(mtx_);
     simStateHandle_->RegisterCoreNotify(handler, what);
 }
 
 void SimStateManager::UnRegisterCoreNotify(const HANDLE &handler, int what)
 {
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGE("UnRegisterCoreNotify(), simStateHandle_ is nullptr!!!");
+        return;
+    }
     std::lock_guard<std::mutex> lck(mtx_);
     simStateHandle_->UnRegisterCoreNotify(handler, what);
 }
