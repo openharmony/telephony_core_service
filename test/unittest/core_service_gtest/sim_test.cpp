@@ -19,6 +19,7 @@
 #include <unistd.h>
 
 #include "core_manager_inner.h"
+#include "core_service.h"
 #include "core_service_client.h"
 #include "core_service_test_helper.h"
 #include "enum_convert.h"
@@ -3824,6 +3825,20 @@ HWTEST_F(SimTest, Telephony_Sim_TestStrCovert_0100, Function | MediumTest | Leve
     EXPECT_EQ(ToUtf32(testU8Str), testU32Str);
     EXPECT_EQ(ToUtf8(testU32Str), testU8Str);
     EXPECT_EQ(ToUtf8(testWstr), testU8Str);
+}
+
+/**
+ * @tc.number   Telephony_Sim_TestDump_0100
+ * @tc.name    TestDump
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_TestDump_0100, Function | MediumTest | Level3)
+{
+    std::vector<std::u16string> emptyArgs = {};
+    std::vector<std::u16string> args = { u"test", u"test1" };
+    EXPECT_EQ(DelayedSingleton<CoreService>::GetInstance()->Dump(-1, args), TELEPHONY_ERR_ARGUMENT_INVALID);
+    EXPECT_EQ(DelayedSingleton<CoreService>::GetInstance()->Dump(0, emptyArgs), 0);
+    EXPECT_EQ(DelayedSingleton<CoreService>::GetInstance()->Dump(0, args), 0);
 }
 
 /**
