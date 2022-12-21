@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -125,7 +125,7 @@ struct CallTransferParam {
 
 struct CallRestrictionParam {
     int32_t mode;
-    std::string password;
+    std::string pw;
     std::string fac;
 };
 
@@ -243,6 +243,71 @@ struct RadioProtocol {
     int32_t technology;
     int32_t modemId;
     RadioProtocolStatus status;
+};
+
+struct SsBaseResult {
+    int32_t index; /* command index, use for find the ss command to retry */
+    int32_t result; /* the result of execute command */
+    int32_t reason; /* This use for remaind message code */
+    std::string message = ""; /* This use for remaind message */
+};
+
+struct GetClipResult {
+    SsBaseResult result; /* query results */
+    int32_t action; /* parameter sets/shows the result code presentation status in the TA */
+    int32_t clipStat; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
+};
+
+struct GetClirResult {
+    SsBaseResult result; /* query results */
+    int32_t action; /* parameter sets/shows the result code presentation status in the TA */
+    int32_t clirStat; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
+};
+
+struct GetColrResult {
+    SsBaseResult result; /* query results */
+    int32_t action; /* parameter sets/shows the result code presentation status in the TA */
+    int32_t colrStat; /* parameter shows the subscriber COLR service status in the network, <0-4> */
+};
+
+struct GetColpResult {
+    SsBaseResult result; /* query results */
+    int32_t action; /* parameter sets/shows the result code presentation status in the TA */
+    int32_t colpStat; /* parameter shows the subscriber COLP service status in the network, <0-4> */
+};
+
+struct CallWaitResult {
+    SsBaseResult result; /* query results */
+    int32_t status; /* parameter sets/shows the result code presentation status in the TA */
+    int32_t classCw; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
+};
+
+struct CallRestrictionResult {
+    SsBaseResult result; /* query results */
+    int32_t status; /* parameter sets/shows the result code presentation status in the TA */
+    int32_t classCw; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
+};
+
+struct CallForwardQueryResult {
+    int32_t serial;
+    int32_t result; /* query results */
+    int32_t status;
+    int32_t classx;
+    std::string number;
+    int32_t type;
+    int32_t reason;
+    int32_t time;
+    int32_t startHour;
+    int32_t startMinute;
+    int32_t endHour;
+    int32_t endMinute;
+};
+
+struct CallForwardQueryInfoList {
+    SsBaseResult result;
+    int32_t callSize;
+    int32_t flag;
+    std::vector<CallForwardQueryResult> calls;
 };
 } // namespace Telephony
 } // namespace OHOS

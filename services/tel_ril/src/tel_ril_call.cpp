@@ -98,20 +98,30 @@ int32_t TelRilCall::GetCallWaitingResponse(
         TELEPHONY_LOGE("ERROR : callWaitInfoResult == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    callWaitInfoResult->result = callWaitResult.result;
+    callWaitInfoResult->result.result = callWaitResult.result;
     callWaitInfoResult->status = callWaitResult.status;
     callWaitInfoResult->classCw = callWaitResult.classCw;
-    return Response<CallWaitResult>(TELEPHONY_LOG_FUNC_NAME, responseInfo, callWaitInfoResult);
+    const auto &radioResponseInfo = BuildHRilRadioResponseInfo(responseInfo);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(radioResponseInfo);
+    int32_t ret = ConfirmSupplementOfTelRilRequestInfo(TELEPHONY_LOG_FUNC_NAME, telRilRequest);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    } else if (radioResponseInfo.error != HRilErrType::NONE) {
+        callWaitInfoResult->result.result = TELEPHONY_ERR_FAIL;
+    }
+    callWaitInfoResult->result.index = telRilRequest->pointer_->GetParam();
+    return telRilRequest->pointer_->GetOwner()->SendEvent(
+        telRilRequest->pointer_->GetInnerEventId(), callWaitInfoResult);
 }
 
 int32_t TelRilCall::SetCallWaitingResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
-    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
+    return ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
 int32_t TelRilCall::SetCallTransferInfoResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
-    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
+    return ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
 int32_t TelRilCall::GetCallTransferInfoResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
@@ -122,8 +132,18 @@ int32_t TelRilCall::GetCallTransferInfoResponse(const HDI::Ril::V1_0::RilRadioRe
         TELEPHONY_LOGE("ERROR : cFQueryInfoList == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    const auto &radioResponseInfo = BuildHRilRadioResponseInfo(responseInfo);
     BuildCFQueryInfoList(cFQueryInfoList, cFQueryList);
-    return Response<CallForwardQueryInfoList>(TELEPHONY_LOG_FUNC_NAME, responseInfo, cFQueryInfoList);
+    cFQueryInfoList->result.result = TELEPHONY_SUCCESS;
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(radioResponseInfo);
+    int32_t ret = ConfirmSupplementOfTelRilRequestInfo(TELEPHONY_LOG_FUNC_NAME, telRilRequest);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    } else if (radioResponseInfo.error != HRilErrType::NONE) {
+        cFQueryInfoList->result.result = TELEPHONY_ERR_FAIL;
+    }
+    cFQueryInfoList->result.index = telRilRequest->pointer_->GetParam();
+    return telRilRequest->pointer_->GetOwner()->SendEvent(telRilRequest->pointer_->GetInnerEventId(), cFQueryInfoList);
 }
 
 int32_t TelRilCall::GetClipResponse(
@@ -134,15 +154,24 @@ int32_t TelRilCall::GetClipResponse(
         TELEPHONY_LOGE("ERROR : clipResult == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    clipResult->result = getClipResult.result;
+    clipResult->result.result = getClipResult.result;
     clipResult->action = getClipResult.action;
     clipResult->clipStat = getClipResult.clipStat;
-    return Response<GetClipResult>(TELEPHONY_LOG_FUNC_NAME, responseInfo, clipResult);
+    const auto &radioResponseInfo = BuildHRilRadioResponseInfo(responseInfo);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(radioResponseInfo);
+    int32_t ret = ConfirmSupplementOfTelRilRequestInfo(TELEPHONY_LOG_FUNC_NAME, telRilRequest);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    } else if (radioResponseInfo.error != HRilErrType::NONE) {
+        clipResult->result.result = TELEPHONY_ERR_FAIL;
+    }
+    clipResult->result.index = telRilRequest->pointer_->GetParam();
+    return telRilRequest->pointer_->GetOwner()->SendEvent(telRilRequest->pointer_->GetInnerEventId(), clipResult);
 }
 
 int32_t TelRilCall::SetClipResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
-    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
+    return ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
 int32_t TelRilCall::GetClirResponse(
@@ -153,15 +182,24 @@ int32_t TelRilCall::GetClirResponse(
         TELEPHONY_LOGE("ERROR : result == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    result->result = getClirResult.result;
+    result->result.result = getClirResult.result;
     result->action = getClirResult.action;
     result->clirStat = getClirResult.clirStat;
-    return Response<GetClirResult>(TELEPHONY_LOG_FUNC_NAME, responseInfo, result);
+    const auto &radioResponseInfo = BuildHRilRadioResponseInfo(responseInfo);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(radioResponseInfo);
+    int32_t ret = ConfirmSupplementOfTelRilRequestInfo(TELEPHONY_LOG_FUNC_NAME, telRilRequest);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    } else if (radioResponseInfo.error != HRilErrType::NONE) {
+        result->result.result = TELEPHONY_ERR_FAIL;
+    }
+    result->result.index = telRilRequest->pointer_->GetParam();
+    return telRilRequest->pointer_->GetOwner()->SendEvent(telRilRequest->pointer_->GetInnerEventId(), result);
 }
 
 int32_t TelRilCall::SetClirResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
-    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
+    return ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
 int32_t TelRilCall::GetCallRestrictionResponse(
@@ -172,15 +210,25 @@ int32_t TelRilCall::GetCallRestrictionResponse(
         TELEPHONY_LOGE("ERROR : callRestrictionResult == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    callRestrictionResult->result = result.result;
+    callRestrictionResult->result.result = result.result;
     callRestrictionResult->status = result.status;
     callRestrictionResult->classCw = result.classCw;
-    return Response<CallRestrictionResult>(TELEPHONY_LOG_FUNC_NAME, responseInfo, callRestrictionResult);
+    const auto &radioResponseInfo = BuildHRilRadioResponseInfo(responseInfo);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(radioResponseInfo);
+    int32_t ret = ConfirmSupplementOfTelRilRequestInfo(TELEPHONY_LOG_FUNC_NAME, telRilRequest);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    } else if (radioResponseInfo.error != HRilErrType::NONE) {
+        callRestrictionResult->result.result = TELEPHONY_ERR_FAIL;
+    }
+    callRestrictionResult->result.index = telRilRequest->pointer_->GetParam();
+    return telRilRequest->pointer_->GetOwner()->SendEvent(
+        telRilRequest->pointer_->GetInnerEventId(), callRestrictionResult);
 }
 
 int32_t TelRilCall::SetCallRestrictionResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
-    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
+    return ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
 int32_t TelRilCall::SendDtmfResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
@@ -639,6 +687,23 @@ void TelRilCall::BuildCFQueryInfoList(std::shared_ptr<CallForwardQueryInfoList> 
         call.time = info.time;
         cFQueryInfoList->calls.push_back(call);
     }
+}
+
+int32_t TelRilCall::ResponseSupplement(const char *funcName, const HDI::Ril::V1_0::RilRadioResponseInfo &iResponseInfo)
+{
+    const auto &radioResponseInfo = BuildHRilRadioResponseInfo(iResponseInfo);
+    auto telRilRequest = FindTelRilRequest(radioResponseInfo);
+    int32_t ret = ConfirmSupplementOfTelRilRequestInfo(TELEPHONY_LOG_FUNC_NAME, telRilRequest);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    }
+    auto resultInfo = std::make_shared<SsBaseResult>();
+    resultInfo->index = telRilRequest->pointer_->GetParam();
+    resultInfo->result = TELEPHONY_SUCCESS;
+    if (radioResponseInfo.error != HRilErrType::NONE) {
+        resultInfo->result = TELEPHONY_ERR_FAIL;
+    }
+    return telRilRequest->pointer_->GetOwner()->SendEvent(telRilRequest->pointer_->GetInnerEventId(), resultInfo);
 }
 } // namespace Telephony
 } // namespace OHOS

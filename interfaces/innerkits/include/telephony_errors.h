@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,7 @@ enum {
     TELEPHONY_CORE_SERVICE_NETWORK_SEARCH = 0x08,
     TELEPHONY_CORE_SERVICE_CORE = 0x09,
     TELEPHONY_DATA_STORAGE = 0x10,
+    TELEPHONY_IMS = 0x11,
 };
 
 // Error code for common
@@ -97,6 +98,9 @@ constexpr ErrCode CORE_SERVICE_CORE_ERR_OFFSET = ErrCodeOffset(SUBSYS_TELEPONY, 
 
 // Error code for telephony data storage
 constexpr ErrCode CORE_DATA_STORAGE_ERR_OFFSET = ErrCodeOffset(SUBSYS_TELEPONY, TELEPHONY_DATA_STORAGE);
+
+// Error code for telephony ims
+constexpr ErrCode IMS_ERR_OFFSET = ErrCodeOffset(SUBSYS_TELEPONY, TELEPHONY_IMS);
 } // namespace Telephony
 } // namespace OHOS
 #endif // TELEPHONY_ERRORS_H
