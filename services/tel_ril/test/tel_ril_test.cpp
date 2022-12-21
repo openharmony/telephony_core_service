@@ -2122,7 +2122,7 @@ void TelRilTest::OnRequestSetCallRestrictionTest(
         TELEPHONY_LOGI("TelRilTest::%{public}s -->", __func__);
         restriction.fac = fac;
         restriction.mode = mode;
-        restriction.password = code;
+        restriction.pw = code;
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestSetCallRestrictionTest -->");
         telRilManager_->SetCallRestriction(slotId, restriction, event);
