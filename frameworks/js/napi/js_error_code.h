@@ -29,6 +29,11 @@ enum JsErrorCode {
     JS_ERROR_TELEPHONY_PERMISSION_DENIED = 201,
 
     /**
+     * Non system applications use system APIs.
+     */
+    JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API = 202,
+
+    /**
      * Invalid parameter value. The types of parameters should match, or the number of parameters must match.
      */
     JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER = 401,
@@ -75,9 +80,29 @@ enum JsErrorCode {
     JS_ERROR_SIM_BASE_ERROR = 8301000,
 
     /**
+     * SIM card is not activated.
+     */
+    JS_ERROR_SIM_CARD_IS_NOT_ACTIVE,
+
+    /**
      * Network search module base error code.
      */
     JS_ERROR_NETWORK_SEARCH_BASE_ERROR = 8302000,
+
+    /**
+     * IMEI is empty.
+     */
+    JS_ERROR_NETWORK_SEARCH_EMPTY_IMEI,
+
+    /**
+     * MEID is empty.
+     */
+    JS_ERROR_NETWORK_SEARCH_EMPTY_MEID,
+
+    /**
+     * Interval time is too short.
+     */
+    JS_ERROR_NETWORK_SEARCH_INTERVAL_TIME_TOO_SHORT,
 
     /**
      * Call manager module base error code.
@@ -100,6 +125,11 @@ enum JsErrorCode {
     JS_ERROR_CALL_ABNORMAL_CALL_STATUS,
 
     /**
+     * Abnormal call type.
+     */
+    JS_ERROR_CALL_ABNORMAL_CALL_TYPE,
+
+    /**
      * Abnormal conference call.
      */
     JS_ERROR_CALL_ABNORMAL_CONFERENCE_CALL,
@@ -120,6 +150,16 @@ enum JsErrorCode {
     JS_ERROR_CALL_ABNORMAL_VIDEO_CALL_STATUS,
 
     /**
+     * Volte does not support or disable.
+     */
+    JS_ERROR_CALL_VOLTE_NOT_SUPPORT_OR_DISABLED,
+
+    /**
+     * Abnormal video parameters.
+     */
+    JS_ERROR_CALL_ABNORMAL_VIDEO_PARAMETERS,
+
+    /**
      * Cellular call module cs base error code.
      */
     JS_ERROR_CELLULAR_CALL_CS_BASE_ERROR = 8501000,
@@ -133,6 +173,11 @@ enum JsErrorCode {
      * Cellular data module base error code.
      */
     JS_ERROR_CELLULAR_DATA_BASE_ERROR = 8601000,
+
+    /**
+     * Switch status mismatch.
+     */
+    JS_ERROR_CELLULAR_DATA_SWITCH_STATUS_MISMATCH,
 
     /**
      * Sms mms module base error code.
