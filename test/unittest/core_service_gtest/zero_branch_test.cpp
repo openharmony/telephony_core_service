@@ -18,11 +18,13 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_manager_inner.h"
+#include "csim_file_controller.h"
 #include "gtest/gtest.h"
 #include "network_register.h"
 #include "network_search_manager.h"
 #include "network_search_state.h"
 #include "operator_name.h"
+#include "radio_protocol_controller.h"
 #include "sim_file_manager.h"
 #include "sim_manager.h"
 #include "sim_state_manager.h"
@@ -1265,6 +1267,182 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_002, Function | MediumTest |
         TELEPHONY_ERR_ARGUMENT_NULL);
     EXPECT_EQ(networkSearchManager->UnregisterImsRegInfoCallback(INVALID_SLOTID, ImsServiceType::TYPE_SMS, bundleName),
         TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearchHandler_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = nullptr;
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto runner = AppExecFwk::EventRunner::Create("test");
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(runner, networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE, 1);
+    networkSearchHandler->GetRadioStateResponse(event);
+    networkSearchHandler->SetRadioStateResponse(event);
+    networkSearchHandler->GetNetworkSelectionModeResponse(event);
+    networkSearchHandler->SetNetworkSelectionModeResponse(event);
+    EXPECT_TRUE(networkSearchHandler->Init());
+    networkSearchHandler->UnregisterEvents();
+    networkSearchHandler->DcPhysicalLinkActiveUpdate(event);
+    networkSearchHandler->ProcessEvent(event);
+    networkSearchHandler->RadioStateChange(event);
+    networkSearchHandler->RadioRestrictedState(event);
+    networkSearchHandler->RadioRilDataRegState(event);
+    networkSearchHandler->RadioRilVoiceRegState(event);
+    networkSearchHandler->RadioSignalStrength(event);
+    networkSearchHandler->RadioRilOperator(event);
+    networkSearchHandler->GetPreferredNetworkResponse(event);
+    networkSearchHandler->SetPreferredNetworkResponse(event);
+    networkSearchHandler->RadioGetImei(event);
+    networkSearchHandler->RadioGetMeid(event);
+    event = nullptr;
+    networkSearchHandler->ProcessEvent(event);
+    networkSearchHandler->DcPhysicalLinkActiveUpdate(event);
+    networkSearchHandler->UpdateImsServiceStatus(event);
+    networkSearchHandler->UpdateImsRegisterState(event);
+    networkSearchHandler->GetRadioStateResponse(event);
+    networkSearchHandler->SetRadioStateResponse(event);
+    networkSearchHandler->ImsiLoadedReady(event);
+    networkSearchHandler->RadioStateChange(event);
+    networkSearchHandler->RadioRestrictedState(event);
+    networkSearchHandler->RadioRilDataRegState(event);
+    networkSearchHandler->RadioRilVoiceRegState(event);
+    networkSearchHandler->RadioSignalStrength(event);
+    networkSearchHandler->RadioRilOperator(event);
+    networkSearchHandler->GetNetworkSelectionModeResponse(event);
+    networkSearchHandler->SetNetworkSelectionModeResponse(event);
+    networkSearchHandler->GetPreferredNetworkResponse(event);
+    networkSearchHandler->SetPreferredNetworkResponse(event);
+    networkSearchHandler->RadioNitzUpdate(event);
+    networkSearchHandler->RadioGetImei(event);
+    networkSearchHandler->RadioGetMeid(event);
+    EXPECT_TRUE(networkSearchHandler->GetCellLocation() == nullptr);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearchHandler_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = nullptr;
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto runner = AppExecFwk::EventRunner::Create("test");
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(runner, networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE, 1);
+    std::vector<sptr<SignalInformation>> signals;
+    std::vector<sptr<CellInformation>> cells;
+    EXPECT_TRUE(networkSearchHandler->Init());
+    networkSearchHandler->RadioGetCurrentCellInfo(event);
+    networkSearchHandler->RadioCurrentCellInfoUpdate(event);
+    networkSearchHandler->RadioChannelConfigInfo(event);
+    networkSearchHandler->RadioVoiceTechChange(event);
+    networkSearchHandler->SimStateChange(event);
+    networkSearchHandler->SimRecordsLoaded(event);
+    networkSearchHandler->AutoTimeChange(event);
+    networkSearchHandler->AutoTimeZoneChange(event);
+    networkSearchHandler->AirplaneModeChange(event);
+    event = nullptr;
+    networkSearchHandler->RadioGetCurrentCellInfo(event);
+    networkSearchHandler->RadioCurrentCellInfoUpdate(event);
+    networkSearchHandler->RadioChannelConfigInfo(event);
+    networkSearchHandler->RadioVoiceTechChange(event);
+    networkSearchHandler->RadioOnState();
+    networkSearchHandler->GetSignalInfo(signals);
+    networkSearchHandler->GetCellInfoList(cells);
+    networkSearchHandler->UpdateCellLocation(1, 1, 1);
+    networkSearchHandler->TimezoneRefresh();
+    networkSearchHandler->SetCellRequestMinInterval(1);
+    networkSearchHandler->RadioOffOrUnavailableState(1);
+    networkSearchHandler->RadioGetNeighboringCellInfo(event);
+    EXPECT_EQ(networkSearchHandler->GetPhoneType(), PhoneType::PHONE_TYPE_IS_NONE);
+}
+
+/**
+ * @tc.number   Telephony_CsimFileController_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CsimFileController_001, Function | MediumTest | Level1)
+{
+    auto runner = AppExecFwk::EventRunner::Create("test");
+    auto csimFileController = std::make_shared<CsimFileController>(runner, INVALID_SLOTID);
+    EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_SMS), "");
+    EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CST), "");
+    EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_FDN), "");
+    EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_MSISDN), "");
+    EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_RUIM_SPN), "");
+    EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CSIM_LI), "");
+    EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CSIM_MDN), "");
+    EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CSIM_IMSIM), "");
+    EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CSIM_CDMAHOME), "");
+    EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CSIM_EPRL), "");
+    EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CSIM_MIPUPP), "");
+    EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_PCSCF), "");
+}
+
+/**
+ * @tc.number   Telephony_RadioProtocolController_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_RadioProtocolController_001, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(INVALID_SLOTID, 1);
+    auto radioProtocolController = std::make_shared<RadioProtocolController>(telRilManager, runner);
+    radioProtocolController->UnRegisterEvents();
+    radioProtocolController->ProcessGetRadioProtocol(event);
+    radioProtocolController->ProcessCheckRadioProtocol(event);
+    radioProtocolController->ProcessSetRadioProtocolComplete(event);
+    radioProtocolController->communicatingSlotCount_ = 1;
+    radioProtocolController->ProcessCheckRadioProtocol(event);
+    radioProtocolController->communicatingSlotCount_ = true;
+    radioProtocolController->ProcessCheckRadioProtocol(event);
+    radioProtocolController->ProcessRadioProtocolNotify(event);
+    radioProtocolController->ProcessSetRadioProtocolTimeout(event);
+    radioProtocolController->ProcessActiveSimToRilResponse(event);
+    event = nullptr;
+    radioProtocolController->ProcessEvent(event);
+    radioProtocolController->ProcessGetRadioProtocol(event);
+    radioProtocolController->ProcessCheckRadioProtocol(event);
+    radioProtocolController->ProcessUpdateRadioProtocol(event);
+    radioProtocolController->ProcessRadioProtocolNotify(event);
+    radioProtocolController->ProcessSetRadioProtocolComplete(event);
+    radioProtocolController->ProcessSetRadioProtocolTimeout(event);
+    radioProtocolController->ProcessActiveSimToRilResponse(event);
+    radioProtocolController->BuildRadioProtocolForCommunication(
+        RadioProtocolPhase::RADIO_PROTOCOL_PHASE_CHECK, RadioProtocolStatus::RADIO_PROTOCOL_STATUS_FAIL);
+    radioProtocolController->BuildRadioProtocolForCommunication(
+        RadioProtocolPhase::RADIO_PROTOCOL_PHASE_COMPLETE, RadioProtocolStatus::RADIO_PROTOCOL_STATUS_FAIL);
+    radioProtocolController->BuildRadioProtocolForCommunication(
+        RadioProtocolPhase::RADIO_PROTOCOL_PHASE_INITIAL, RadioProtocolStatus::RADIO_PROTOCOL_STATUS_FAIL);
+    radioProtocolController->BuildRadioProtocolForCommunication(
+        RadioProtocolPhase::RADIO_PROTOCOL_PHASE_NOTIFY, RadioProtocolStatus::RADIO_PROTOCOL_STATUS_FAIL);
+    radioProtocolController->BuildRadioProtocolForCommunication(
+        RadioProtocolPhase::RADIO_PROTOCOL_PHASE_UPDATE, RadioProtocolStatus::RADIO_PROTOCOL_STATUS_FAIL);
+    EXPECT_TRUE(radioProtocolController->RadioProtocolControllerPoll());
+    EXPECT_FALSE(radioProtocolController->SetRadioProtocol(INVALID_SLOTID));
+    radioProtocolController->isCommunicating_ = true;
+    EXPECT_FALSE(radioProtocolController->SetRadioProtocol(INVALID_SLOTID));
+    radioProtocolController->telRilManager_ = nullptr;
+    std::vector<RadioProtocol> radioProtocol;
+    radioProtocolController->SendRadioProtocolEvent(radioProtocol, 1);
+    radioProtocolController->UnRegisterEvents();
+    radioProtocolController->GetRadioProtocol(INVALID_SLOTID);
+    EXPECT_FALSE(radioProtocolController->SetActiveSimToRil(INVALID_SLOTID, 1, 1));
 }
 
 /**
