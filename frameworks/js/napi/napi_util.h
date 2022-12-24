@@ -58,13 +58,23 @@ public:
     static void DefineEnumClassByName(napi_env env, napi_value exports, std::string_view enumName,
         size_t arrSize, const napi_property_descriptor *desc);
     static JsError ConverErrorMessageForJs(int32_t errorCode);
-    static bool CreateParameterErrorMessageForJs(int32_t errorCode, JsError &error);
-    static bool CreateCommonErrorMessageForJs(int32_t errorCode, JsError &error);
-    static bool CreateCallErrorMessageForJs(int32_t errorCode, JsError &error);
     static JsError ConverErrorMessageWithPermissionForJs(
         int32_t errorCode, const std::string &funcName, const std::string &permission);
-    static napi_value CreateError(napi_env env, int32_t err, const std::string &msg);
     static void ThrowError(napi_env env, int32_t errorCode, const std::string &message);
+    static void ThrowParameterError(napi_env env);
+
+private:
+    static bool CreateParameterErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateNetworkSearchErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateSimErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateCommonErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateCallErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateCommonCallErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateVideoCallErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateSupplementServiceCallErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateDataErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static napi_value CreateError(napi_env env, int32_t err, const std::string &msg);
+    static std::string GetErrorMessage(int32_t errorCode);
 };
 } // namespace Telephony
 } // namespace OHOS
