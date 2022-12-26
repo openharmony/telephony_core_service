@@ -38,10 +38,14 @@ static constexpr const char *JS_ERROR_DEVICE_NOT_SUPPORT_THIS_API_STRING = "The 
 static constexpr const char *JS_ERROR_TELEPHONY_SUCCESS_STRING = "Success.";
 static constexpr const char *JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING = "Invalid parameter value.";
 static constexpr const char *JS_ERROR_TELEPHONY_SERVICE_ERROR_STRING = "Operation failed. Cannot connect to service.";
+static constexpr const char *JS_ERROR_TELEPHONY_RIL_ERROR_STRING = "Operation failed. RIL command error.";
 static constexpr const char *JS_ERROR_TELEPHONY_SYSTEM_ERROR_STRING = "System internal error.";
 static constexpr const char *JS_ERROR_TELEPHONY_NO_SIM_CARD_STRING = "Do not have sim card.";
 static constexpr const char *JS_ERROR_TELEPHONY_UNKNOW_ERROR_STRING = "Unknown error code.";
 static constexpr const char *JS_ERROR_SIM_BASE_ERROR_STRING = "Sim module base error.";
+static constexpr const char *JS_ERROR_SIM_CARD_IS_NOT_ACTIVE_STRING = "SIM card is not activated.";
+static constexpr const char *JS_ERROR_SIM_CARD_OPERATION_ERROR_STRING = "SIM card operation error.";
+static constexpr const char *JS_ERROR_OPERATOR_CONFIG_ERROR_STRING = "Operator config error.";
 static constexpr const char *JS_ERROR_NETWORK_SEARCH_BASE_ERROR_STRING = "Network search module base error.";
 static constexpr const char *JS_ERROR_CALL_MANAGER_BASE_ERROR_STRING = "Call manager module base error.";
 static constexpr const char *JS_ERROR_CALL_DIAL_POLICY_NOT_MET_STRING = "The dialing policy is not met.";
@@ -68,10 +72,14 @@ static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_SUCCESS, JS_ERROR_TELEPHONY_SUCCESS_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_ARGUMENT_ERROR, JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_SERVICE_ERROR, JS_ERROR_TELEPHONY_SERVICE_ERROR_STRING },
+    { JsErrorCode::JS_ERROR_TELEPHONY_RIL_ERROR, JS_ERROR_TELEPHONY_RIL_ERROR_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_SYSTEM_ERROR, JS_ERROR_TELEPHONY_SYSTEM_ERROR_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_NO_SIM_CARD, JS_ERROR_TELEPHONY_NO_SIM_CARD_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_UNKNOW_ERROR, JS_ERROR_TELEPHONY_UNKNOW_ERROR_STRING },
     { JsErrorCode::JS_ERROR_SIM_BASE_ERROR, JS_ERROR_SIM_BASE_ERROR_STRING },
+    { JsErrorCode::JS_ERROR_SIM_CARD_IS_NOT_ACTIVE, JS_ERROR_SIM_CARD_IS_NOT_ACTIVE_STRING },
+    { JsErrorCode::JS_ERROR_SIM_CARD_OPERATION_ERROR, JS_ERROR_SIM_CARD_OPERATION_ERROR_STRING },
+    { JsErrorCode::JS_ERROR_OPERATOR_CONFIG_ERROR, JS_ERROR_OPERATOR_CONFIG_ERROR_STRING },
     { JsErrorCode::JS_ERROR_NETWORK_SEARCH_BASE_ERROR, JS_ERROR_NETWORK_SEARCH_BASE_ERROR_STRING },
     { JsErrorCode::JS_ERROR_CALL_MANAGER_BASE_ERROR, JS_ERROR_CALL_MANAGER_BASE_ERROR_STRING },
     { JsErrorCode::JS_ERROR_CALL_DIAL_POLICY_NOT_MET, JS_ERROR_CALL_DIAL_POLICY_NOT_MET_STRING },
@@ -477,6 +485,14 @@ bool NapiUtil::CreateSimErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErro
         case CORE_SERVICE_SIM_CARD_IS_NOT_ACTIVE:
             jsErrorCode = JS_ERROR_SIM_CARD_IS_NOT_ACTIVE;
             break;
+        case CORE_ERR_SIM_CARD_LOAD_FAILED:
+        case CORE_ERR_SIM_CARD_UPDATE_FAILED:
+            jsErrorCode = JS_ERROR_SIM_CARD_OPERATION_ERROR;
+            break;
+        case CORE_ERR_OPERATOR_KEY_NOT_EXIT:
+        case CORE_ERR_OPERATOR_CONF_NOT_EXIT:
+            jsErrorCode = JS_ERROR_OPERATOR_CONFIG_ERROR;
+            break;
         default:
             flag = false;
             break;
@@ -503,11 +519,15 @@ bool NapiUtil::CreateCommonErrorMessageForJs(int32_t errorCode, JsErrorCode &jsE
         case TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL:
         case TELEPHONY_ERR_WRITE_DATA_FAIL:
         case TELEPHONY_ERR_WRITE_REPLY_FAIL:
+        case TELEPHONY_ERR_READ_DATA_FAIL:
         case TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL:
         case TELEPHONY_ERR_REGISTER_CALLBACK_FAIL:
         case TELEPHONY_ERR_UNINIT:
         case TELEPHONY_ERR_UNREGISTER_CALLBACK_FAIL:
             jsErrorCode = JS_ERROR_TELEPHONY_SERVICE_ERROR;
+            break;
+        case TELEPHONY_ERR_RIL_CMD_FAIL:
+            jsErrorCode = JS_ERROR_TELEPHONY_RIL_ERROR;
             break;
         case TELEPHONY_ERR_FAIL:
         case TELEPHONY_ERR_MEMCPY_FAIL:
