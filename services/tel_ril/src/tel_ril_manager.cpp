@@ -355,7 +355,7 @@ int32_t TelRilManager::SetCallRestriction(
     int32_t slotId, const CallRestrictionParam &callRestriction, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetCallRestriction,
-        callRestriction.fac, callRestriction.mode, callRestriction.pw);
+        callRestriction.fac, callRestriction.mode, callRestriction.password);
 }
 
 int32_t TelRilManager::SendDtmf(

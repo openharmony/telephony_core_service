@@ -20,6 +20,7 @@
 
 #include "iservice_registry.h"
 #include "radio_event.h"
+#include "securec.h"
 #include "system_ability_definition.h"
 
 using namespace testing::ext;
@@ -1900,7 +1901,10 @@ void TelRilTest::SetCallRestrictionTest(int32_t slotId, const std::shared_ptr<Ap
         CallRestrictionParam callRestriction;
         callRestriction.mode = 0;
         callRestriction.fac = GTEST_STRING;
-        callRestriction.pw = GTEST_STRING;
+        if (strcpy_s(callRestriction.password, strlen(GTEST_STRING.c_str()) + 1, GTEST_STRING.c_str()) != EOK) {
+            TELEPHONY_LOGE("TelRilTest::SetCallRestrictionTest stop by strcpy_s fail.");
+            return;
+        }
         TELEPHONY_LOGI("TelRilTest::SetCallRestrictionTest -->");
         telRilManager_->SetCallRestriction(slotId, callRestriction, event);
         TELEPHONY_LOGI("TelRilTest::SetCallRestrictionTest --> finished");
