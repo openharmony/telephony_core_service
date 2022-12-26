@@ -15,6 +15,7 @@
 
 #include "core_service_proxy.h"
 
+#include "network_search_types.h"
 #include "parameter.h"
 #include "sim_state_type.h"
 #include "string_ex.h"
@@ -41,18 +42,18 @@ int32_t CoreServiceProxy::GetPsRadioTech(int32_t slotId)
     MessageOption option;
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("GetPsRadioTech WriteInterfaceToken is false");
-        return TELEPHONY_ERROR;
+        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     }
     data.WriteInt32(slotId);
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("GetPsRadioTech Remote is null");
-        return TELEPHONY_ERROR;
+        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     }
     int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_PS_RADIO_TECH), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetPsRadioTech failed, error code is %{public}d ", st);
-        return TELEPHONY_ERROR;
+        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     }
     int32_t result = reply.ReadInt32();
     return result;
@@ -65,18 +66,18 @@ int32_t CoreServiceProxy::GetCsRadioTech(int32_t slotId)
     MessageOption option;
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("GetCsRadioTech WriteInterfaceToken is false");
-        return TELEPHONY_ERROR;
+        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     }
     data.WriteInt32(slotId);
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("GetCsRadioTech Remote is null");
-        return TELEPHONY_ERROR;
+        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     }
     int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_CS_RADIO_TECH), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetCsRadioTech failed, error code is %{public}d \n", st);
-        return TELEPHONY_ERROR;
+        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     }
     int32_t result = reply.ReadInt32();
     TELEPHONY_LOGI("GetCsRadioTech call end: result=%{public}d \n", result);

@@ -125,8 +125,7 @@ static napi_value ParseErrorValue(napi_env env, const int32_t rilErrorCode, cons
             return NapiUtil::CreateErrorMessage(
                 env, funcName + " error because hril err cmd send failure", rilErrorCode);
         case HRIL_ERR_CMD_NO_CARRIER:
-            return NapiUtil::CreateErrorMessage(
-                env, funcName + " error because hril err cmd no carrier", rilErrorCode);
+            return NapiUtil::CreateErrorMessage(env, funcName + " error because hril err cmd no carrier", rilErrorCode);
         case HRIL_ERR_INVALID_RESPONSE:
             return NapiUtil::CreateErrorMessage(
                 env, funcName + " error because hril err invalid response", rilErrorCode);
@@ -145,12 +144,12 @@ static void NativeGetRadioTech(napi_env env, void *data)
         asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    int32_t psRadioTech = DEFAULT_ERROR;
-    int32_t csRadioTech = DEFAULT_ERROR;
-    psRadioTech = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPsRadioTech(asyncContext->slotId);
-    csRadioTech = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCsRadioTech(asyncContext->slotId);
-    auto napiRadioTechUnknown = static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_UNKNOWN);
-    if ((psRadioTech >= napiRadioTechUnknown) && (csRadioTech >= napiRadioTechUnknown)) {
+    int32_t psRadioTech = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPsRadioTech(asyncContext->slotId);
+    int32_t csRadioTech = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCsRadioTech(asyncContext->slotId);
+    if ((psRadioTech > static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_INVALID)) &&
+        (csRadioTech > static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_INVALID)) &&
+        (psRadioTech <= static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_MAX)) &&
+        (csRadioTech <= static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_MAX))) {
         asyncContext->resolved = true;
         asyncContext->csTech = WrapRadioTech(csRadioTech);
         asyncContext->psTech = WrapRadioTech(psRadioTech);
@@ -179,7 +178,7 @@ static void GetRadioTechCallback(napi_env env, napi_status status, void *data)
             napi_value recv = NapiUtil::CreateUndefined(env);
             napi_value callbackFunc = nullptr;
             napi_get_reference_value(env, asyncContext->callbackRef, &callbackFunc);
-            napi_value callbackValues[] = {nullptr, nullptr};
+            napi_value callbackValues[] = { nullptr, nullptr };
             callbackValues[0] = NapiUtil::CreateErrorMessage(env, "get radio tech failed");
             napi_create_object(env, &callbackValues[1]);
             napi_value psTechValue = NapiUtil::CreateUndefined(env);
@@ -204,10 +203,10 @@ static bool MatchGetRadioTechParameter(napi_env env, const napi_value parameters
 {
     switch (parameterCount) {
         case 1: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number});
+            return NapiUtil::MatchParameters(env, parameters, { napi_number });
         }
         case 2: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number, napi_function});
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_function });
         }
         default: {
             return false;
@@ -249,7 +248,7 @@ static void NativeGetSignalInfoList(napi_env env, void *data)
 static void GetSignalInfoListCallback(napi_env env, napi_status status, void *data)
 {
     auto asyncContext = static_cast<SignalInfoListContext *>(data);
-    TELEPHONY_LOGI("GetSignalInfoListCallback size = %{public}zu,resolved = %{public}d",
+    TELEPHONY_LOGI("GetSignalInfoListCallback size = %{public}zu, resolved = %{public}d",
         asyncContext->signalInfoList.size(), asyncContext->resolved);
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {

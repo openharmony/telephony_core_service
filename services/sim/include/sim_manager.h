@@ -62,7 +62,7 @@ public:
     bool GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) override;
     bool SetDefaultVoiceSlotId(int32_t slotId) override;
     bool SetDefaultSmsSlotId(int32_t slotId) override;
-    bool SetDefaultCellularDataSlotId(int32_t slotId) override;
+    int32_t SetDefaultCellularDataSlotId(int32_t slotId) override;
     bool SetPrimarySlotId(int32_t slotId) override;
     bool SetShowNumber(int32_t slotId, const std::u16string &number) override;
     bool SetShowName(int32_t slotId, const std::u16string &name) override;

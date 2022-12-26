@@ -21,6 +21,7 @@
 #include <string_ex.h>
 
 #include "mcc_pool.h"
+#include "network_search_types.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
@@ -384,7 +385,7 @@ int32_t NetworkSearchManager::GetPsRadioTech(int32_t slotId)
         TELEPHONY_LOGE("NetworkSearchManager::GetPsRadioTech failed due to nullptr!");
     }
     TELEPHONY_LOGE("NetworkSearchManager::GetPsRadioTech Failed slotId:%{public}d", slotId);
-    return TELEPHONY_ERROR;
+    return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
 }
 
 int32_t NetworkSearchManager::GetCsRadioTech(int32_t slotId)
@@ -399,7 +400,7 @@ int32_t NetworkSearchManager::GetCsRadioTech(int32_t slotId)
         TELEPHONY_LOGE("NetworkSearchManager::GetCsRadioTech failed due to nullptr!");
     }
     TELEPHONY_LOGE("NetworkSearchManager::GetCsRadioTech Failed slotId:%{public}d", slotId);
-    return TELEPHONY_ERROR;
+    return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
 }
 
 int32_t NetworkSearchManager::GetPsRegState(int32_t slotId)

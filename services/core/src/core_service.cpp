@@ -19,6 +19,7 @@
 #include "core_service_dump_helper.h"
 #include "ims_core_service_client.h"
 #include "network_search_manager.h"
+#include "network_search_types.h"
 #include "parameter.h"
 #include "sim_manager.h"
 #include "string_ex.h"
@@ -119,11 +120,11 @@ int32_t CoreService::GetPsRadioTech(int32_t slotId)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
         TELEPHONY_LOGE("permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
+        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     }
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager_ is null");
-        return TELEPHONY_ERROR;
+        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     }
     return networkSearchManager_->GetPsRadioTech(slotId);
 }
@@ -132,11 +133,11 @@ int32_t CoreService::GetCsRadioTech(int32_t slotId)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
         TELEPHONY_LOGE("permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
+        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     }
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager_ is null");
-        return TELEPHONY_ERROR;
+        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     }
     return networkSearchManager_->GetCsRadioTech(slotId);
 }
