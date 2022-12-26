@@ -54,7 +54,7 @@ public:
     virtual bool GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) = 0;
     virtual bool SetDefaultVoiceSlotId(int32_t slotId) = 0;
     virtual bool SetDefaultSmsSlotId(int32_t slotId) = 0;
-    virtual bool SetDefaultCellularDataSlotId(int32_t slotId) = 0;
+    virtual int32_t SetDefaultCellularDataSlotId(int32_t slotId) = 0;
     virtual bool SetPrimarySlotId(int32_t slotId) = 0;
     virtual bool SetShowNumber(int32_t slotId, const std::u16string &number) = 0;
     virtual bool SetShowName(int32_t slotId, const std::u16string &name) = 0;

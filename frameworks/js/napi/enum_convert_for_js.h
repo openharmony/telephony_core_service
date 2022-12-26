@@ -16,6 +16,7 @@
 #ifndef ENUM_CONVERT_FOR_JS_H
 #define ENUM_CONVERT_FOR_JS_H
 
+#include "core_service_errors.h"
 #include "telephony_errors.h"
 
 namespace OHOS {

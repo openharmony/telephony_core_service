@@ -15,8 +15,9 @@
 
 #include "sim_manager.h"
 
-#include "telephony_errors.h"
+#include "core_service_errors.h"
 #include "radio_event.h"
+#include "telephony_errors.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -315,18 +316,22 @@ bool SimManager::SetDefaultSmsSlotId(int32_t slotId)
     return multiSimController_->SetDefaultSmsSlotId(slotId);
 }
 
-bool SimManager::SetDefaultCellularDataSlotId(int32_t slotId)
+int32_t SimManager::SetDefaultCellularDataSlotId(int32_t slotId)
 {
-    if ((!IsValidSlotIdForDefault(slotId)) || (multiSimController_ == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid for default or multiSimController_ is nullptr");
-        return false;
+    if (!IsValidSlotIdForDefault(slotId)) {
+        TELEPHONY_LOGE("slotId is invalid for default.");
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr.");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsSimActive(slotId)) {
         TELEPHONY_LOGE("SetDefaultSmsSlotId slotId is not active!");
-        return false;
+        return CORE_SERVICE_SIM_CARD_IS_NOT_ACTIVE;
     }
-    bool ret = multiSimController_->SetDefaultCellularDataSlotId(slotId);
-    if (ret && multiSimMonitor_ != nullptr) {
+    int32_t ret = multiSimController_->SetDefaultCellularDataSlotId(slotId);
+    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
         multiSimMonitor_->NotifySimAccountChanged();
     }
     return ret;

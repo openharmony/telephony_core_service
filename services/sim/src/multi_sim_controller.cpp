@@ -17,6 +17,7 @@
 
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "core_service_errors.h"
 #include "core_service_hisysevent.h"
 #include "parameters.h"
 #include "string_ex.h"
@@ -600,27 +601,28 @@ int32_t MultiSimController::GetDefaultCellularDataSlotId()
     return GetDefaultCellularDataSlotIdUnit();
 }
 
-bool MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
+int32_t MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
 {
     std::lock_guard<std::mutex> lock(mutex_);
+    TELEPHONY_LOGI("MultiSimController::SetDefaultCellularDataSlotId slotId = %{public}d", slotId);
     if (simDbHelper_ == nullptr) {
         TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId failed by nullptr");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (slotId >= (int32_t)localCacheInfo_.size() || slotId < DEFAULT_SIM_SLOT_ID_REMOVE) {
         TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId failed by out of range");
-        return false;
+        return TELEPHONY_ERR_SLOTID_INVALID;
     }
 
     if (slotId == DEFAULT_SIM_SLOT_ID_REMOVE && localCacheInfo_.empty()) {
         TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId no active sim");
-        return false;
+        return CORE_SERVICE_SIM_CARD_IS_NOT_ACTIVE;
     }
 
     int32_t result = simDbHelper_->SetDefaultCellularData(slotId);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId get Data Base failed");
-        return false;
+        return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
     for (; i < maxCount_; i++) { // save to cache
@@ -631,7 +633,11 @@ bool MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
         localCacheInfo_[i].isCellularDataCard = NOT_MAIN;
     }
     CoreServiceHiSysEvent::WriteDefaultDataSlotIdBehaviorEvent(slotId);
-    return AnnounceDefaultCellularDataSlotIdChanged(slotId);
+    if (!AnnounceDefaultCellularDataSlotIdChanged(slotId)) {
+        TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId publish broadcast failed");
+        return TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t MultiSimController::GetDefaultCellularDataSlotIdUnit()

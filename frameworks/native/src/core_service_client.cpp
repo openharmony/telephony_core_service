@@ -18,6 +18,7 @@
 #include "core_service_proxy.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
+#include "network_search_types.h"
 #include "system_ability_definition.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -84,7 +85,7 @@ int32_t CoreServiceClient::GetPsRadioTech(int32_t slotId)
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     }
     return proxy->GetPsRadioTech(slotId);
 }
@@ -94,7 +95,7 @@ int32_t CoreServiceClient::GetCsRadioTech(int32_t slotId)
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     }
     return proxy->GetCsRadioTech(slotId);
 }
