@@ -15,8 +15,9 @@
 
 #include <iostream>
 
-#include "tel_ril_manager.h"
 #include "radio_event.h"
+#include "securec.h"
+#include "tel_ril_manager.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -2122,7 +2123,12 @@ void TelRilTest::OnRequestSetCallRestrictionTest(
         TELEPHONY_LOGI("TelRilTest::%{public}s -->", __func__);
         restriction.fac = fac;
         restriction.mode = mode;
-        restriction.pw = code;
+        size_t cpyLen = strlen(code.c_str()) + 1;
+        size_t maxCpyLen = sizeof(restriction.password);
+        if (strcpy_s(restriction.password, cpyLen > maxCpyLen ? maxCpyLen : cpyLen, code.c_str()) != EOK) {
+            TELEPHONY_LOGE("Test stop by strcpy_s fail.");
+            return;
+        }
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestSetCallRestrictionTest -->");
         telRilManager_->SetCallRestriction(slotId, restriction, event);
