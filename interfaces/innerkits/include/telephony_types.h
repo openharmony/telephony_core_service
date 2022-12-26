@@ -32,6 +32,7 @@ inline const int32_t DEFAULT_SIM_SLOT_ID = 0;
 inline const int32_t DEFAULT_SIM_SLOT_ID_REMOVE = -1;
 inline const int32_t INVALID_MAIN_CARD_SLOTID = -2;
 inline const int32_t ERROR_SLOT_OPKEY = -2;
+inline const size_t MAX_PARAMETER_LENGTH = 100;
 inline constexpr const char *DEFAULT_SLOT_COUNT = "1";
 inline constexpr const char *TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
 inline constexpr const char *DEFAULT_PREFERRED_NETWORK_TYPE = "5"; // CORE_NETWORK_MODE_LTE_WCDMA_GSM
@@ -125,7 +126,7 @@ struct CallTransferParam {
 
 struct CallRestrictionParam {
     int32_t mode;
-    std::string pw;
+    char password[MAX_PARAMETER_LENGTH + 1];
     std::string fac;
 };
 
