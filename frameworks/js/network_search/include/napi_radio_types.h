@@ -61,6 +61,11 @@ enum class NetworkType : int32_t {
 
 enum class RatType : int32_t {
     /**
+     * Indicates the invalid value.
+     */
+    RADIO_TECHNOLOGY_INVALID = -1,
+
+    /**
      * Indicates unknown radio access technology (RAT).
      */
     RADIO_TECHNOLOGY_UNKNOWN = 0,
@@ -132,7 +137,12 @@ enum class RatType : int32_t {
     /**
      * Indicates that RAT is 5G new radio (NR).
      */
-    RADIO_TECHNOLOGY_NR = 12
+    RADIO_TECHNOLOGY_NR = 12,
+
+    /**
+     * Indicates the max value.
+     */
+    RADIO_TECHNOLOGY_MAX = RADIO_TECHNOLOGY_NR,
 };
 
 enum class NsaState : int32_t {

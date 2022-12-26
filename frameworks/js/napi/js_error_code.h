@@ -70,6 +70,11 @@ enum JsErrorCode {
     JS_ERROR_TELEPHONY_NO_SIM_CARD,
 
     /**
+     * Operation failed. RIL command error.
+     */
+    JS_ERROR_TELEPHONY_RIL_ERROR,
+
+    /**
      * Unknown error code.
      */
     JS_ERROR_TELEPHONY_UNKNOW_ERROR = 8300999,
@@ -83,6 +88,16 @@ enum JsErrorCode {
      * SIM card is not activated.
      */
     JS_ERROR_SIM_CARD_IS_NOT_ACTIVE,
+
+    /**
+     * SIM card operation error.
+     */
+    JS_ERROR_SIM_CARD_OPERATION_ERROR,
+
+    /**
+     * Operator config error.
+     */
+    JS_ERROR_OPERATOR_CONFIG_ERROR,
 
     /**
      * Network search module base error code.

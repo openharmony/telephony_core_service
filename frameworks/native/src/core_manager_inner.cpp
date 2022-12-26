@@ -15,6 +15,7 @@
 
 #include "core_manager_inner.h"
 
+#include "network_search_types.h"
 #include "parameter.h"
 #include "radio_event.h"
 #include "string_ex.h"
@@ -1241,7 +1242,7 @@ int32_t CoreManagerInner::GetPsRadioTech(int32_t slotId)
 {
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager is null!");
-        return NETWORK_IS_NULL;
+        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     }
     return networkSearchManager_->GetPsRadioTech(slotId);
 }
@@ -1250,7 +1251,7 @@ int32_t CoreManagerInner::GetCsRadioTech(int32_t slotId)
 {
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager is null!");
-        return NETWORK_IS_NULL;
+        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     }
     return networkSearchManager_->GetCsRadioTech(slotId);
 }
@@ -1665,11 +1666,11 @@ bool CoreManagerInner::SetDefaultSmsSlotId(int32_t slotId)
     return simManager_->SetDefaultSmsSlotId(slotId);
 }
 
-bool CoreManagerInner::SetDefaultCellularDataSlotId(int32_t slotId)
+int32_t CoreManagerInner::SetDefaultCellularDataSlotId(int32_t slotId)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simManager_->SetDefaultCellularDataSlotId(slotId);
 }

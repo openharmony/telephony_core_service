@@ -50,7 +50,7 @@ public:
     bool SetDefaultSmsSlotId(int32_t slotId);
     bool GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
     int32_t GetDefaultCellularDataSlotId();
-    bool SetDefaultCellularDataSlotId(int32_t slotId);
+    int32_t SetDefaultCellularDataSlotId(int32_t slotId);
     int32_t GetPrimarySlotId();
     bool SetPrimarySlotId(int32_t slotId);
     std::u16string GetShowNumber(int32_t slotId);

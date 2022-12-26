@@ -273,7 +273,7 @@ public:
     bool GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
     bool SetDefaultVoiceSlotId(int32_t slotId);
     bool SetDefaultSmsSlotId(int32_t slotId);
-    bool SetDefaultCellularDataSlotId(int32_t slotId);
+    int32_t SetDefaultCellularDataSlotId(int32_t slotId);
     bool SetPrimarySlotId(int32_t slotId);
     bool SetShowNumber(int32_t slotId, const std::u16string &number);
     bool SetShowName(int32_t slotId, const std::u16string &name);
