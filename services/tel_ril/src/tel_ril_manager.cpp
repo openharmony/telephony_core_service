@@ -38,13 +38,12 @@ bool TelRilManager::OnInit()
 {
     int32_t res = ConnectRilInterface();
     TELEPHONY_LOGI("TelRilManager, connect ril interface result is %{public}d", res);
-    res = RegisterHdfStatusListener();
-    TELEPHONY_LOGI("TelRilManager, register hdf status is %{public}d", res);
     CreatTelRilHandler();
     for (int32_t slotId = SIM_SLOT_0; slotId < SIM_SLOT_COUNT; slotId++) {
         InitTelModule(slotId);
     }
-    TELEPHONY_LOGI("TelRilManager, OnInit successfully!");
+    res = RegisterHdfStatusListener();
+    TELEPHONY_LOGI("TelRilManager, OnInit successfully! register hdf status is %{public}d", res);
     return true;
 }
 
