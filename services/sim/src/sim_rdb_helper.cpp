@@ -355,9 +355,9 @@ int32_t SimRdbHelper::QueryAllValidData(std::vector<SimRdbInfo> &vec)
 {
     TELEPHONY_LOGI("SimRdbHelper::QueryAllValidData");
     std::vector<std::string> colume;
-    std::string id = std::to_string(INVALID_VALUE);
+    std::string id = std::to_string(DEACTIVE);
     NativeRdb::DataAbilityPredicates predicates;
-    predicates.GreaterThan(SimRdbInfo::SLOT_INDEX, id);
+    predicates.GreaterThan(SimRdbInfo::IS_ACTIVE, id);
     std::shared_ptr<NativeRdb::AbsSharedResultSet> result = Query(colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::QueryAllValidData get nothing");
@@ -396,7 +396,7 @@ int32_t SimRdbHelper::ForgetAllData()
     TELEPHONY_LOGI("SimRdbHelper::ForgetAllData");
     NativeRdb::DataAbilityPredicates predicates;
     NativeRdb::ValuesBucket values;
-    values.PutInt(SimRdbInfo::SLOT_INDEX, INVALID_VALUE);
+    values.PutInt(SimRdbInfo::IS_ACTIVE, DEACTIVE);
     return Update(values, predicates);
 }
 
@@ -406,7 +406,7 @@ int32_t SimRdbHelper::ForgetAllData(int32_t slotId)
     NativeRdb::DataAbilityPredicates predicates;
     predicates.EqualTo(SimRdbInfo::SLOT_INDEX, std::to_string(slotId));
     NativeRdb::ValuesBucket values;
-    values.PutInt(SimRdbInfo::SLOT_INDEX, INVALID_VALUE);
+    values.PutInt(SimRdbInfo::IS_ACTIVE, DEACTIVE);
     return Update(values, predicates);
 }
 
