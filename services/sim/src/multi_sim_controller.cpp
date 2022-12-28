@@ -197,6 +197,7 @@ int32_t MultiSimController::UpdateDataByIccId(int slotId, const std::string &new
     simDbHelper_->QueryDataByIccId(newIccId, simRdbInfo);
     NativeRdb::ValuesBucket values;
     values.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
+    values.PutInt(SimRdbInfo::IS_ACTIVE, ACTIVE);
     const int32_t slotSingle = 1;
     if (SIM_SLOT_COUNT == slotSingle) {
         values.PutInt(SimData::IS_MAIN_CARD, MAIN_CARD);
@@ -219,6 +220,7 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
     values.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
     values.PutString(SimRdbInfo::ICC_ID, newIccId);
     values.PutString(SimRdbInfo::CARD_ID, newIccId); // iccId == cardId by now
+    values.PutInt(SimRdbInfo::IS_ACTIVE, ACTIVE);
     const int32_t slotSingle = 1;
     if (SIM_SLOT_COUNT == slotSingle) {
         values.PutInt(SimData::IS_MAIN_CARD, MAIN_CARD);
