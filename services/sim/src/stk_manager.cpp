@@ -57,24 +57,24 @@ void StkManager::Init(int slotId)
     TELEPHONY_LOGI("StkManager[%{public}d]::Init() success", slotId);
 }
 
-bool StkManager::SendEnvelopeCmd(int32_t slotId, const std::string &cmd) const
+int32_t StkManager::SendEnvelopeCmd(int32_t slotId, const std::string &cmd) const
 {
     if (stkController_ == nullptr) {
         TELEPHONY_LOGE("StkManager[%{public}d]::SendEnvelopeCmd() stkController_ is nullptr", slotId);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool result = stkController_->SendEnvelopeCmd(cmd);
+    int32_t result = stkController_->SendEnvelopeCmd(cmd);
     TELEPHONY_LOGI("StkManager[%{public}d]::SendEnvelopeCmd() result:%{public}s", slotId, (result ? "true" : "false"));
     return result;
 }
 
-bool StkManager::SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) const
+int32_t StkManager::SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) const
 {
     if (stkController_ == nullptr) {
         TELEPHONY_LOGE("StkManager[%{public}d]::SendTerminalResponseCmd() stkController_ is nullptr", slotId);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool result = stkController_->SendTerminalResponseCmd(cmd);
+    int32_t result = stkController_->SendTerminalResponseCmd(cmd);
     TELEPHONY_LOGI("StkManager[%{public}d]::SendTerminalResponseCmd() result:%{public}s",
         slotId, (result ? "true" : "false"));
     return result;

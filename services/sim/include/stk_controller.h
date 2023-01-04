@@ -31,8 +31,8 @@ public:
         const std::weak_ptr<Telephony::SimStateManager> &simStateManager, int32_t slotId);
     virtual ~StkController() = default;
     void Init();
-    bool SendTerminalResponseCmd(const std::string &strCmd);
-    bool SendEnvelopeCmd(const std::string &strCmd);
+    int32_t SendTerminalResponseCmd(const std::string &strCmd);
+    int32_t SendEnvelopeCmd(const std::string &strCmd);
     int32_t SendCallSetupRequestResult(bool accept);
     void UnRegisterEvents();
 

@@ -27,8 +27,8 @@ public:
     StkManager(std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<SimStateManager> simStateManager);
     virtual ~StkManager();
     void Init(int slotId);
-    bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) const;
-    bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) const;
+    int32_t SendEnvelopeCmd(int32_t slotId, const std::string &cmd) const;
+    int32_t SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) const;
     int32_t SendCallSetupRequestResult(int32_t slotId, bool accept) const;
 
 private:

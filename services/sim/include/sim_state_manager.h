@@ -33,17 +33,19 @@ public:
     bool HasSimCard();
     SimState GetSimState();
     CardType GetCardType();
-    bool UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response);
-    bool UnlockPuk(int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response);
-    bool AlterPin(int32_t slotId, const std::string &newPin, const std::string &oldPin, LockStatusResponse &response);
-    bool SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response);
-    int32_t GetLockState(int32_t slotId, LockType lockType);
+    int32_t UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response);
+    int32_t UnlockPuk(int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response);
+    int32_t AlterPin(
+        int32_t slotId, const std::string &newPin, const std::string &oldPin, LockStatusResponse &response);
+    int32_t SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response);
+    int32_t GetLockState(int32_t slotId, LockType lockType, LockState &lockState);
     int32_t RefreshSimState(int32_t slotId);
-    bool UnlockPin2(int32_t slotId, const std::string &pin2, LockStatusResponse &response);
-    bool UnlockPuk2(int32_t slotId, const std::string &newPin2, const std::string &puk2, LockStatusResponse &response);
-    bool AlterPin2(
+    int32_t UnlockPin2(int32_t slotId, const std::string &pin2, LockStatusResponse &response);
+    int32_t UnlockPuk2(
+        int32_t slotId, const std::string &newPin2, const std::string &puk2, LockStatusResponse &response);
+    int32_t AlterPin2(
         int32_t slotId, const std::string &newPin2, const std::string &oldPin2, LockStatusResponse &response);
-    bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response);
+    int32_t UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response);
     void RegisterCoreNotify(const HANDLE &handler, int what);
     void UnRegisterCoreNotify(const HANDLE &observerCallBack, int what);
     int32_t SimAuthentication(
