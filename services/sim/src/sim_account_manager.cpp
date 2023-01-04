@@ -72,12 +72,12 @@ void SimAccountManager::Init(int32_t slotId)
     simStateTracker_->RegisterForIccLoaded();
 }
 
-bool SimAccountManager::GetOperatorConfigs(int slotId, OHOS::Telephony::OperatorConfig &poc)
+int32_t SimAccountManager::GetOperatorConfigs(int32_t slotId, OHOS::Telephony::OperatorConfig &poc)
 {
     TELEPHONY_LOGI("SimAccountManager::GetOperatorConfigs");
     if (operatorConfigCache_ == nullptr) {
         TELEPHONY_LOGE("SimAccountManager::GetOperatorConfigs operatorConfigCache_ is null");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return operatorConfigCache_->GetOperatorConfigs(static_cast<int32_t>(slotId), poc);
 }

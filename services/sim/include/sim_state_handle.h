@@ -32,6 +32,7 @@
 #include "icc_state.h"
 #include "observer_handler.h"
 #include "sim_state_type.h"
+#include "telephony_errors.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -147,9 +148,9 @@ private:
     int32_t oldSimType_ = ICC_UNKNOWN_TYPE;
     int32_t oldSimStatus_ = ICC_CONTENT_UNKNOWN;
     int32_t slotId_ = DEFAULT_SIM_SLOT_ID;
-    UnlockData unlockRespon_ = {0};
-    SimAuthenticationResponse simAuthRespon_ = {0};
-    LockStatusResponse simlockRespon_ = {0};
+    UnlockData unlockRespon_ = { UNLOCK_FAIL, TELEPHONY_ERROR, static_cast<int32_t>(LockState::LOCK_ERROR) };
+    SimAuthenticationResponse simAuthRespon_ = { 0 };
+    LockStatusResponse simlockRespon_ = { UNLOCK_FAIL, TELEPHONY_ERROR };
     IccState iccState_; // icc card states
     SimState externalState_; // need to broadcast sim state;
     CardType externalType_ = CardType::UNKNOWN_CARD; // need to broadcast card type;

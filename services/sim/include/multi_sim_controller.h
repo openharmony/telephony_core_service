@@ -45,21 +45,21 @@ public:
     void SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager);
     bool RefreshActiveIccAccountInfoList();
     int32_t GetDefaultVoiceSlotId();
-    bool SetDefaultVoiceSlotId(int32_t slotId);
+    int32_t SetDefaultVoiceSlotId(int32_t slotId);
     int32_t GetDefaultSmsSlotId();
     bool SetDefaultSmsSlotId(int32_t slotId);
-    bool GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
+    int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
     int32_t GetDefaultCellularDataSlotId();
     int32_t SetDefaultCellularDataSlotId(int32_t slotId);
     int32_t GetPrimarySlotId();
     bool SetPrimarySlotId(int32_t slotId);
-    std::u16string GetShowNumber(int32_t slotId);
-    bool SetShowNumber(int32_t slotId, std::u16string Number, bool force = false);
-    std::u16string GetShowName(int32_t slotId);
-    bool SetShowName(int32_t slotId, std::u16string name, bool force = false);
+    int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber);
+    int32_t SetShowNumber(int32_t slotId, std::u16string Number, bool force = false);
+    int32_t GetShowName(int32_t slotId, std::u16string &showName);
+    int32_t SetShowName(int32_t slotId, std::u16string name, bool force = false);
     bool IsSimActive(int32_t slotId);
     bool IsSimActivatable(int32_t slotId);
-    bool SetActiveSim(int32_t slotId, int32_t enable, bool force = false);
+    int32_t SetActiveSim(int32_t slotId, int32_t enable, bool force = false);
     bool SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable);
     bool ForgetAllData();
     bool ForgetAllData(int32_t slotId);
@@ -67,7 +67,7 @@ public:
     int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue);
     int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue);
     bool GetListFromDataBase();
-    bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList);
+    int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList);
     int32_t GetRadioProtocolTech(int32_t slotId);
     void GetRadioProtocol(int32_t slotId);
 

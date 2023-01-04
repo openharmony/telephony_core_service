@@ -69,11 +69,11 @@ void OperatorConfigCache::ClearMemoryCache(int32_t slotId)
     opc_.configValue.clear();
 }
 
-bool OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &poc)
+int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &poc)
 {
     if (simFileManager_ == nullptr) {
         TELEPHONY_LOGE("simFileManager_ is nullptr");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
     std::string iccid = Str16ToStr8(simFileManager_->GetSimIccId());
@@ -95,7 +95,7 @@ bool OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &poc
             if (canAnnounceChanged) {
                 AnnounceOperatorConfigChanged(slotId);
             }
-            return true;
+            return TELEPHONY_ERR_SUCCESS;
         }
     }
     if (parser_.ParseFromCustomSystem(slotId, poc, opcJson)) {
@@ -107,18 +107,18 @@ bool OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &poc
             if (canAnnounceChanged) {
                 AnnounceOperatorConfigChanged(slotId);
             }
-            return true;
+            return TELEPHONY_ERR_SUCCESS;
         }
     }
-    return false;
+    return CORE_ERR_OPERATOR_CONF_NOT_EXIT;
 }
 
-bool OperatorConfigCache::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
+int32_t OperatorConfigCache::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
 {
     if (opc_.configValue.size() > 0) {
         TELEPHONY_LOGI("get from memory");
         CopyOperatorConfig(opc_, poc);
-        return true;
+        return TELEPHONY_ERR_SUCCESS;
     }
     TELEPHONY_LOGI("reload operator config");
     return LoadOperatorConfig(slotId, poc);
