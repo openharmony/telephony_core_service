@@ -139,7 +139,9 @@ void SimTest::ParseOperatorConf(int32_t slotId)
     OperatorConfigCache ofpc(nullptr, nullptr, slotId);
     OperatorFileParser ofp;
     OperatorConfig poc;
-    const std::string iccid = Str16ToStr8(CoreServiceClient::GetInstance().GetSimIccId(slotId));
+    std::u16string result;
+    CoreServiceClient::GetInstance().GetSimIccId(slotId, result);
+    const std::string iccid = Str16ToStr8(result);
     std::string filename = ofpc.EncryptIccId(iccid) + ".json";
     if (slotId == SimTest::slotIdErr_) {
         filename = "";
@@ -452,7 +454,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimIccId_0100, Function | MediumTest | Level1
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimIccId(SimTest::slotId_));
+        std::u16string iccId;
+        CoreServiceClient::GetInstance().GetSimIccId(SimTest::slotId_, iccId);
+        std::string result = Str16ToStr8(iccId);
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -468,7 +472,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimIccId_0200, Function | MediumTest | Level1
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimIccId(SimTest::slotId1_));
+        std::u16string iccId;
+        CoreServiceClient::GetInstance().GetSimIccId(SimTest::slotId1_, iccId);
+        std::string result = Str16ToStr8(iccId);
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -483,7 +489,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimIccId_0300, Function | MediumTest | Level1
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimIccId(SimTest::slotId_));
+        std::u16string iccId;
+        CoreServiceClient::GetInstance().GetSimIccId(SimTest::slotId_, iccId);
+        std::string result = Str16ToStr8(iccId);
         EXPECT_STREQ(result.c_str(), "");
     }
 }
@@ -529,7 +537,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetIMSI_0100, Function | MediumTest | Level1)
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetIMSI(SimTest::slotId_));
+        std::u16string imsi;
+        CoreServiceClient::GetInstance().GetIMSI(SimTest::slotId_, imsi);
+        std::string result = Str16ToStr8(imsi);
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -545,7 +555,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetIMSI_0200, Function | MediumTest | Level1)
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetIMSI(SimTest::slotId1_));
+        std::u16string imsi;
+        CoreServiceClient::GetInstance().GetIMSI(SimTest::slotId1_, imsi);
+        std::string result = Str16ToStr8(imsi);
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -560,7 +572,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetIMSI_0300, Function | MediumTest | Level1)
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetIMSI(SimTest::slotId_));
+        std::u16string imsi;
+        CoreServiceClient::GetInstance().GetIMSI(SimTest::slotId_, imsi);
+        std::string result = Str16ToStr8(imsi);
         EXPECT_STREQ(result.c_str(), "");
     }
 }
@@ -593,7 +607,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimGid1_0100, Function | MediumTest | Level1)
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimGid1(SimTest::slotId_));
+        std::u16string gid1;
+        CoreServiceClient::GetInstance().GetSimGid1(SimTest::slotId_, gid1);
+        std::string result = Str16ToStr8(gid1);
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -609,7 +625,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimGid1_0200, Function | MediumTest | Level1)
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimGid1(SimTest::slotId1_));
+        std::u16string gid1;
+        CoreServiceClient::GetInstance().GetSimGid1(SimTest::slotId1_, gid1);
+        std::string result = Str16ToStr8(gid1);
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -624,7 +642,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimGid1_0300, Function | MediumTest | Level1)
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimGid1(SimTest::slotId_));
+        std::u16string gid1;
+        CoreServiceClient::GetInstance().GetSimGid1(SimTest::slotId_, gid1);
+        std::string result = Str16ToStr8(gid1);
         EXPECT_STREQ(result.c_str(), "");
     }
 }
@@ -690,8 +710,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimTelephoneNumber_0100, Function | MediumTes
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         // Interface may return empty string, as sim file has not information(TelephoneNumber)
-        std::string result = "test";
-        result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimTelephoneNumber(SimTest::slotId_));
+        std::u16string telephoneNumber;
+        CoreServiceClient::GetInstance().GetSimTelephoneNumber(SimTest::slotId_, telephoneNumber);
+        std::string result = Str16ToStr8(telephoneNumber);
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -708,8 +729,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimTelephoneNumber_0200, Function | MediumTes
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         // Interface may return empty string, as sim file has not information(TelephoneNumber)
-        std::string result = "test";
-        result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimTelephoneNumber(SimTest::slotId1_));
+        std::u16string telephoneNumber;
+        CoreServiceClient::GetInstance().GetSimTelephoneNumber(SimTest::slotId1_, telephoneNumber);
+        std::string result = Str16ToStr8(telephoneNumber);
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -725,7 +747,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimTelephoneNumber_0300, Function | MediumTes
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         // has no permission
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimTelephoneNumber(SimTest::slotId_));
+        std::u16string telephoneNumber;
+        CoreServiceClient::GetInstance().GetSimTelephoneNumber(SimTest::slotId_, telephoneNumber);
+        std::string result = Str16ToStr8(telephoneNumber);
         EXPECT_STREQ(result.c_str(), "");
     }
 }
@@ -797,8 +821,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailIdentifier_0100, Function | MediumTe
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         // Interface may return empty string, as sim file has not information(VoiceMailIdentifier)
-        std::string result = "test";
-        result = Str16ToStr8(CoreServiceClient::GetInstance().GetVoiceMailIdentifier(SimTest::slotId_));
+        std::u16string voiceMailIdentifier;
+        CoreServiceClient::GetInstance().GetVoiceMailIdentifier(SimTest::slotId_, voiceMailIdentifier);
+        std::string result = Str16ToStr8(voiceMailIdentifier);
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -815,8 +840,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailIdentifier_0200, Function | MediumTe
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         // Interface may return empty string, as sim file has not information(VoiceMailIdentifier)
-        std::string result = "test";
-        result = Str16ToStr8(CoreServiceClient::GetInstance().GetVoiceMailIdentifier(SimTest::slotId1_));
+        std::u16string voiceMailIdentifier;
+        CoreServiceClient::GetInstance().GetVoiceMailIdentifier(SimTest::slotId1_, voiceMailIdentifier);
+        std::string result = Str16ToStr8(voiceMailIdentifier);
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -831,7 +857,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailIdentifier_0300, Function | MediumTe
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetVoiceMailIdentifier(SimTest::slotId_));
+        std::u16string voiceMailIdentifier;
+        CoreServiceClient::GetInstance().GetVoiceMailIdentifier(SimTest::slotId_, voiceMailIdentifier);
+        std::string result = Str16ToStr8(voiceMailIdentifier);
         EXPECT_STREQ(result.c_str(), "");
     }
 }
@@ -848,8 +876,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailNumber_0100, Function | MediumTest |
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         // Interface may return empty string, as sim file has not information(VoiceMailNumber)
-        std::string result = "test";
-        result = Str16ToStr8(CoreServiceClient::GetInstance().GetVoiceMailNumber(SimTest::slotId_));
+        std::u16string voiceMailNumber;
+        CoreServiceClient::GetInstance().GetVoiceMailNumber(SimTest::slotId_, voiceMailNumber);
+        std::string result = Str16ToStr8(voiceMailNumber);
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -866,8 +895,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailNumber_0200, Function | MediumTest |
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         // Interface may return empty string, as sim file has not information(VoiceMailNumber)
-        std::string result = "test";
-        result = Str16ToStr8(CoreServiceClient::GetInstance().GetVoiceMailNumber(SimTest::slotId1_));
+        std::u16string voiceMailNumber;
+        CoreServiceClient::GetInstance().GetVoiceMailNumber(SimTest::slotId1_, voiceMailNumber);
+        std::string result = Str16ToStr8(voiceMailNumber);
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -882,7 +912,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailNumber_0300, Function | MediumTest |
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetVoiceMailNumber(SimTest::slotId_));
+        std::u16string voiceMailNumber;
+        CoreServiceClient::GetInstance().GetVoiceMailNumber(SimTest::slotId_, voiceMailNumber);
+        std::string result = Str16ToStr8(voiceMailNumber);
         EXPECT_STREQ(result.c_str(), "");
     }
 }
@@ -914,8 +946,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetDefaultVoiceSlotId_0100, Function | MediumTes
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        bool result = CoreServiceClient::GetInstance().SetDefaultVoiceSlotId(SimTest::slotId_);
-        EXPECT_TRUE(result);
+        int32_t result = CoreServiceClient::GetInstance().SetDefaultVoiceSlotId(SimTest::slotId_);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -930,8 +962,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetDefaultVoiceSlotId_0200, Function | MediumTes
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        bool result = CoreServiceClient::GetInstance().SetDefaultVoiceSlotId(SimTest::slotId1_);
-        EXPECT_TRUE(result);
+        int32_t result = CoreServiceClient::GetInstance().SetDefaultVoiceSlotId(SimTest::slotId1_);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -945,8 +977,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetDefaultVoiceSlotId_0300, Function | MediumTes
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        bool result = CoreServiceClient::GetInstance().SetDefaultVoiceSlotId(SimTest::slotId_);
-        EXPECT_FALSE(result);
+        int32_t result = CoreServiceClient::GetInstance().SetDefaultVoiceSlotId(SimTest::slotId_);
+        EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -992,8 +1024,8 @@ HWTEST_F(SimTest, Telephony_Sim_GetOperatorConfig_0100, Function | MediumTest | 
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         OperatorConfig oc;
-        bool result = CoreServiceClient::GetInstance().GetOperatorConfigs(SimTest::slotId_, oc);
-        EXPECT_TRUE(result);
+        int32_t result = CoreServiceClient::GetInstance().GetOperatorConfigs(SimTest::slotId_, oc);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1009,8 +1041,8 @@ HWTEST_F(SimTest, Telephony_Sim_GetOperatorConfig_0200, Function | MediumTest | 
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         OperatorConfig oc;
-        bool result = CoreServiceClient::GetInstance().GetOperatorConfigs(SimTest::slotId1_, oc);
-        EXPECT_TRUE(result);
+        int32_t result = CoreServiceClient::GetInstance().GetOperatorConfigs(SimTest::slotId1_, oc);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1025,8 +1057,8 @@ HWTEST_F(SimTest, Telephony_Sim_GetOperatorConfig_0300, Function | MediumTest | 
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         OperatorConfig oc;
-        bool result = CoreServiceClient::GetInstance().GetOperatorConfigs(SimTest::slotId_, oc);
-        EXPECT_FALSE(result);
+        int32_t result = CoreServiceClient::GetInstance().GetOperatorConfigs(SimTest::slotId_, oc);
+        EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1042,8 +1074,8 @@ HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0100, Function | Med
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::vector<IccAccountInfo> iccAccountInfoList;
-        bool result = CoreServiceClient::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
-        EXPECT_TRUE(result);
+        int32_t result = CoreServiceClient::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1059,8 +1091,8 @@ HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0200, Function | Med
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::vector<IccAccountInfo> iccAccountInfoList;
-        bool result = CoreServiceClient::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
-        EXPECT_TRUE(result);
+        int32_t result = CoreServiceClient::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1075,8 +1107,8 @@ HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0300, Function | Med
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::vector<IccAccountInfo> iccAccountInfoList;
-        bool result = CoreServiceClient::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
-        EXPECT_FALSE(result);
+        int32_t result = CoreServiceClient::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
+        EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1087,8 +1119,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0300, Function | Med
  */
 void QueryIccAdnDiallingNumbersTestFunc(CoreServiceTestHelper &helper)
 {
-    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-        CoreServiceClient::GetInstance().QueryIccDiallingNumbers(SimTest::slotId_, DiallingNumbersInfo::SIM_ADN);
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers;
+    CoreServiceClient::GetInstance().QueryIccDiallingNumbers(
+        SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumbers);
     helper.NotifyAll();
 }
 
@@ -1115,8 +1148,9 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0100, Function | Medi
  */
 void QueryIccAdnDiallingNumbersTestFunc1(CoreServiceTestHelper &helper)
 {
-    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-        CoreServiceClient::GetInstance().QueryIccDiallingNumbers(SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN);
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers;
+    CoreServiceClient::GetInstance().QueryIccDiallingNumbers(
+        SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumbers);
     helper.NotifyAll();
 }
 
@@ -1343,9 +1377,9 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0300, Function | Medium
         diallingNumber->index_ = index;
         diallingNumber->name_ = Str8ToStr16("电话卡");
         diallingNumber->number_ = Str8ToStr16("00000000000");
-        bool result = CoreServiceClient::GetInstance().DelIccDiallingNumbers(
+        int32_t result = CoreServiceClient::GetInstance().DelIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_TRUE(result);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1356,8 +1390,9 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0300, Function | Medium
  */
 void QueryIccFdnDiallingNumbersTestFunc(CoreServiceTestHelper &helper)
 {
-    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-        CoreServiceClient::GetInstance().QueryIccDiallingNumbers(SimTest::slotId_, DiallingNumbersInfo::SIM_FDN);
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers;
+    CoreServiceClient::GetInstance().QueryIccDiallingNumbers(
+        SimTest::slotId_, DiallingNumbersInfo::SIM_FDN, diallingNumbers);
     helper.NotifyAll();
 }
 
@@ -1384,8 +1419,9 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0100, Function | Medi
  */
 void QueryIccFdnDiallingNumbersTestFunc1(CoreServiceTestHelper &helper)
 {
-    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-        CoreServiceClient::GetInstance().QueryIccDiallingNumbers(SimTest::slotId1_, DiallingNumbersInfo::SIM_FDN);
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers;
+    CoreServiceClient::GetInstance().QueryIccDiallingNumbers(
+        SimTest::slotId1_, DiallingNumbersInfo::SIM_FDN, diallingNumbers);
     helper.NotifyAll();
 }
 
@@ -1548,8 +1584,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowName_0100, Function | MediumTest | Level3
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         const std::u16string cardName = Str8ToStr16("SimNameZhang");
-        bool result = CoreServiceClient::GetInstance().SetShowName(SimTest::slotId_, cardName);
-        EXPECT_TRUE(result);
+        int32_t result = CoreServiceClient::GetInstance().SetShowName(SimTest::slotId_, cardName);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1565,8 +1601,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowName_0200, Function | MediumTest | Level3
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         const std::u16string cardName = Str8ToStr16("SimNameZhang");
-        bool result = CoreServiceClient::GetInstance().SetShowName(SimTest::slotId1_, cardName);
-        EXPECT_TRUE(result);
+        int32_t result = CoreServiceClient::GetInstance().SetShowName(SimTest::slotId1_, cardName);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1581,8 +1617,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowName_0300, Function | MediumTest | Level3
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         const std::u16string cardName = Str8ToStr16("SimNameZhang");
-        bool result = CoreServiceClient::GetInstance().SetShowName(SimTest::slotId_, cardName);
-        EXPECT_FALSE(result);
+        int32_t result = CoreServiceClient::GetInstance().SetShowName(SimTest::slotId_, cardName);
+        EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1597,7 +1633,9 @@ HWTEST_F(SimTest, Telephony_Sim_getShowName_0100, Function | MediumTest | Level3
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetShowName(SimTest::slotId_));
+        std::u16string showName;
+        CoreServiceClient::GetInstance().GetShowName(SimTest::slotId_, showName);
+        std::string result = Str16ToStr8(showName);
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -1613,7 +1651,9 @@ HWTEST_F(SimTest, Telephony_Sim_getShowName_0200, Function | MediumTest | Level3
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetShowName(SimTest::slotId1_));
+        std::u16string showName;
+        CoreServiceClient::GetInstance().GetShowName(SimTest::slotId1_, showName);
+        std::string result = Str16ToStr8(showName);
         EXPECT_STRNE(result.c_str(), "");
     }
 }
@@ -1628,7 +1668,9 @@ HWTEST_F(SimTest, Telephony_Sim_getShowName_0300, Function | MediumTest | Level3
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetShowName(SimTest::slotId_));
+        std::u16string showName;
+        CoreServiceClient::GetInstance().GetShowName(SimTest::slotId_, showName);
+        std::string result = Str16ToStr8(showName);
         EXPECT_STREQ(result.c_str(), "");
     }
 }
@@ -1644,8 +1686,9 @@ HWTEST_F(SimTest, Telephony_Sim_getShowNumber_0100, Function | MediumTest | Leve
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = "test";
-        result = Str16ToStr8(CoreServiceClient::GetInstance().GetShowNumber(SimTest::slotId_));
+        std::u16string showNumber;
+        CoreServiceClient::GetInstance().GetShowNumber(SimTest::slotId_, showNumber);
+        std::string result = Str16ToStr8(showNumber);
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -1661,8 +1704,9 @@ HWTEST_F(SimTest, Telephony_Sim_getShowNumber_0200, Function | MediumTest | Leve
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId1_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = "test";
-        result = Str16ToStr8(CoreServiceClient::GetInstance().GetShowNumber(SimTest::slotId1_));
+        std::u16string showNumber;
+        CoreServiceClient::GetInstance().GetShowNumber(SimTest::slotId1_, showNumber);
+        std::string result = Str16ToStr8(showNumber);
         EXPECT_STRNE(result.c_str(), "test");
     }
 }
@@ -1677,7 +1721,9 @@ HWTEST_F(SimTest, Telephony_Sim_getShowNumber_0300, Function | MediumTest | Leve
     if (!CoreServiceClient::GetInstance().HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetShowNumber(SimTest::slotId_));
+        std::u16string showNumber;
+        CoreServiceClient::GetInstance().GetShowNumber(SimTest::slotId_, showNumber);
+        std::string result = Str16ToStr8(showNumber);
         EXPECT_STREQ(result.c_str(), "");
     }
 }
@@ -1694,8 +1740,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowNumber_0100, Function | MediumTest | Leve
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         const std::u16string cardNumber = Str8ToStr16("SimNumber12345678901");
-        bool result = CoreServiceClient::GetInstance().SetShowNumber(SimTest::slotId_, cardNumber);
-        EXPECT_TRUE(result);
+        int32_t result = CoreServiceClient::GetInstance().SetShowNumber(SimTest::slotId_, cardNumber);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1711,8 +1757,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowNumber_0200, Function | MediumTest | Leve
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         const std::u16string cardNumber = Str8ToStr16("SimNumber12345678901");
-        bool result = CoreServiceClient::GetInstance().SetShowNumber(SimTest::slotId1_, cardNumber);
-        EXPECT_TRUE(result);
+        int32_t result = CoreServiceClient::GetInstance().SetShowNumber(SimTest::slotId1_, cardNumber);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1727,8 +1773,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowNumber_0300, Function | MediumTest | Leve
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         const std::u16string cardNumber = Str8ToStr16("SimNumber12345678901");
-        bool result = CoreServiceClient::GetInstance().SetShowNumber(SimTest::slotId_, cardNumber);
-        EXPECT_FALSE(result);
+        int32_t result = CoreServiceClient::GetInstance().SetShowNumber(SimTest::slotId_, cardNumber);
+        EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1774,7 +1820,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimAccountInfo_0100, Function | MediumTest | 
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         IccAccountInfo info;
-        bool result = CoreServiceClient::GetInstance().GetSimAccountInfo(SimTest::slotId_, info);
+        int32_t result = CoreServiceClient::GetInstance().GetSimAccountInfo(SimTest::slotId_, info);
         IccAccountInfo mInfo;
         mInfo.Init(SimTest::simId, SimTest::slotId_);
         mInfo.SetIsEsim(false);
@@ -1788,7 +1834,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimAccountInfo_0100, Function | MediumTest | 
         mInfo.Marshalling(parcel);
         mInfo.ReadFromParcel(parcel);
         mInfo.UnMarshalling(parcel);
-        EXPECT_TRUE(result);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1804,8 +1850,8 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimAccountInfo_0200, Function | MediumTest | 
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         IccAccountInfo info;
-        bool result = CoreServiceClient::GetInstance().GetSimAccountInfo(SimTest::slotId1_, info);
-        EXPECT_TRUE(result);
+        int32_t result = CoreServiceClient::GetInstance().GetSimAccountInfo(SimTest::slotId1_, info);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1820,8 +1866,8 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimAccountInfo_0300, Function | MediumTest | 
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         IccAccountInfo info;
-        bool result = CoreServiceClient::GetInstance().GetSimAccountInfo(SimTest::slotId_, info);
-        EXPECT_FALSE(result);
+        int32_t result = CoreServiceClient::GetInstance().GetSimAccountInfo(SimTest::slotId_, info);
+        EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1836,9 +1882,9 @@ void SetLockStateTestFunc(CoreServiceTestHelper &helper)
     testInfo.lockType = LockType::PIN_LOCK;
     testInfo.password = Str8ToStr16("1234");
     testInfo.lockState = LockState::LOCK_OFF;
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().SetLockState(SimTest::slotId_, testInfo, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().SetLockState(SimTest::slotId_, testInfo, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -1854,8 +1900,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetLockState_0100, Function | MediumTest | Level
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -1873,9 +1919,9 @@ void SetLockStateTestFunc1(CoreServiceTestHelper &helper)
     testInfo.lockType = LockType::PIN_LOCK;
     testInfo.password = Str8ToStr16("1234");
     testInfo.lockState = LockState::LOCK_OFF;
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().SetLockState(SimTest::slotId1_, testInfo, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().SetLockState(SimTest::slotId1_, testInfo, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -1890,8 +1936,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetLockState_0200, Function | MediumTest | Level
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -1929,9 +1975,9 @@ void SetFDNStateTestFunc(CoreServiceTestHelper &helper)
     testInfo.lockType = LockType::FDN_LOCK;
     testInfo.password = Str8ToStr16("1234");
     testInfo.lockState = LockState::LOCK_OFF;
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().SetLockState(SimTest::slotId_, testInfo, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().SetLockState(SimTest::slotId_, testInfo, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -1946,8 +1992,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetFDNState_0100, Function | MediumTest | Level2
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -1964,9 +2010,9 @@ void SetFDNStateTestFunc1(CoreServiceTestHelper &helper)
     testInfo.lockType = LockType::FDN_LOCK;
     testInfo.password = Str8ToStr16("1234");
     testInfo.lockState = LockState::LOCK_OFF;
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().SetLockState(SimTest::slotId1_, testInfo, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().SetLockState(SimTest::slotId1_, testInfo, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -1980,8 +2026,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetFDNState_0200, Function | MediumTest | Level2
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -2014,8 +2060,9 @@ HWTEST_F(SimTest, Telephony_Sim_SetFDNState_0300, Function | MediumTest | Level2
  */
 void GetLockStateTestFunc(CoreServiceTestHelper &helper)
 {
+    LockState lockState = LockState::LOCK_ERROR;
     LockType lockType = LockType::PIN_LOCK;
-    int32_t result = CoreServiceClient::GetInstance().GetLockState(SimTest::slotId_, lockType);
+    int32_t result = CoreServiceClient::GetInstance().GetLockState(SimTest::slotId_, lockType, lockState);
     helper.SetIntResult(result);
     helper.NotifyAll();
 }
@@ -2045,8 +2092,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetLockState_0100, Function | MediumTest | Level
 void GetLockStateTestFunc1(CoreServiceTestHelper &helper)
 {
     AccessToken token;
+    LockState lockState = LockState::LOCK_ERROR;
     LockType lockType = LockType::PIN_LOCK;
-    int32_t result = CoreServiceClient::GetInstance().GetLockState(SimTest::slotId1_, lockType);
+    int32_t result = CoreServiceClient::GetInstance().GetLockState(SimTest::slotId1_, lockType, lockState);
     helper.SetIntResult(result);
     helper.NotifyAll();
 }
@@ -2095,8 +2143,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetLockState_0300, Function | MediumTest | Level
  */
 void GetFDNStateTestFunc(CoreServiceTestHelper &helper)
 {
+    LockState lockState = LockState::LOCK_ERROR;
     LockType lockType = LockType::FDN_LOCK;
-    int32_t result = CoreServiceClient::GetInstance().GetLockState(SimTest::slotId_, lockType);
+    int32_t result = CoreServiceClient::GetInstance().GetLockState(SimTest::slotId_, lockType, lockState);
     helper.SetIntResult(result);
     helper.NotifyAll();
 }
@@ -2126,8 +2175,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetFDNState_0100, Function | MediumTest | Level3
 void GetFDNStateTestFunc1(CoreServiceTestHelper &helper)
 {
     AccessToken token;
+    LockState lockState = LockState::LOCK_ERROR;
     LockType lockType = LockType::FDN_LOCK;
-    int32_t result = CoreServiceClient::GetInstance().GetLockState(SimTest::slotId1_, lockType);
+    int32_t result = CoreServiceClient::GetInstance().GetLockState(SimTest::slotId1_, lockType, lockState);
     helper.SetIntResult(result);
     helper.NotifyAll();
 }
@@ -2177,9 +2227,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetFDNState_0300, Function | MediumTest | Level3
 void UnlockPinTestFunc(CoreServiceTestHelper &helper)
 {
     const std::u16string pin = Str8ToStr16("1234");
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().UnlockPin(SimTest::slotId_, pin, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().UnlockPin(SimTest::slotId_, pin, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2195,8 +2245,8 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPin_0100, Function | MediumTest | Level3)
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -2211,9 +2261,9 @@ void UnlockPinTestFunc1(CoreServiceTestHelper &helper)
 {
     AccessToken token;
     const std::u16string pin = Str8ToStr16("1234");
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().UnlockPin(SimTest::slotId1_, pin, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().UnlockPin(SimTest::slotId1_, pin, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2228,8 +2278,8 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPin_0200, Function | MediumTest | Level3)
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -2265,9 +2315,9 @@ void UnlockPukTestFunc(CoreServiceTestHelper &helper)
 {
     const std::u16string pin = Str8ToStr16("1234");
     const std::u16string puk = Str8ToStr16("42014264");
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().UnlockPuk(SimTest::slotId_, pin, puk, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().UnlockPuk(SimTest::slotId_, pin, puk, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2283,8 +2333,8 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPuk_0100, Function | MediumTest | Level3)
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -2300,9 +2350,9 @@ void UnlockPukTestFunc1(CoreServiceTestHelper &helper)
     AccessToken token;
     const std::u16string pin = Str8ToStr16("1234");
     const std::u16string puk = Str8ToStr16("42014264");
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().UnlockPuk(SimTest::slotId1_, pin, puk, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().UnlockPuk(SimTest::slotId1_, pin, puk, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2317,8 +2367,8 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPuk_0200, Function | MediumTest | Level3)
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -2354,9 +2404,9 @@ void AlterPinTestFunc(CoreServiceTestHelper &helper)
 {
     const std::u16string newpin = Str8ToStr16("1234");
     const std::u16string oldpin = Str8ToStr16("4321");
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().AlterPin(SimTest::slotId_, newpin, oldpin, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().AlterPin(SimTest::slotId_, newpin, oldpin, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2372,8 +2422,8 @@ HWTEST_F(SimTest, Telephony_Sim_AlterPin_0100, Function | MediumTest | Level3)
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -2389,9 +2439,9 @@ void AlterPinTestFunc1(CoreServiceTestHelper &helper)
     AccessToken token;
     const std::u16string newpin = Str8ToStr16("1234");
     const std::u16string oldpin = Str8ToStr16("4321");
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().AlterPin(SimTest::slotId1_, newpin, oldpin, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().AlterPin(SimTest::slotId1_, newpin, oldpin, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2406,8 +2456,8 @@ HWTEST_F(SimTest, Telephony_Sim_AlterPin_0200, Function | MediumTest | Level3)
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -2442,9 +2492,9 @@ HWTEST_F(SimTest, Telephony_Sim_AlterPin_0300, Function | MediumTest | Level3)
 void UnlockPin2TestFunc(CoreServiceTestHelper &helper)
 {
     const std::u16string pin2 = Str8ToStr16("12345678");
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().UnlockPin2(SimTest::slotId_, pin2, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().UnlockPin2(SimTest::slotId_, pin2, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2460,8 +2510,8 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPin2_0100, Function | MediumTest | Level3)
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -2476,9 +2526,9 @@ void UnlockPin2TestFunc1(CoreServiceTestHelper &helper)
 {
     AccessToken token;
     const std::u16string pin2 = Str8ToStr16("12345678");
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().UnlockPin2(SimTest::slotId1_, pin2, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().UnlockPin2(SimTest::slotId1_, pin2, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2493,8 +2543,8 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPin2_0200, Function | MediumTest | Level3)
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -2530,9 +2580,9 @@ void UnlockPuk2TestFunc(CoreServiceTestHelper &helper)
 {
     const std::u16string pin2 = Str8ToStr16("12345678");
     const std::u16string puk2 = Str8ToStr16("42014264");
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().UnlockPuk2(SimTest::slotId_, pin2, puk2, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().UnlockPuk2(SimTest::slotId_, pin2, puk2, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2548,8 +2598,8 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPuk2_0100, Function | MediumTest | Level3)
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -2565,9 +2615,9 @@ void UnlockPuk2TestFunc1(CoreServiceTestHelper &helper)
     AccessToken token;
     const std::u16string pin2 = Str8ToStr16("12345678");
     const std::u16string puk2 = Str8ToStr16("42014264");
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().UnlockPuk2(SimTest::slotId1_, pin2, puk2, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().UnlockPuk2(SimTest::slotId1_, pin2, puk2, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2582,8 +2632,8 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockPuk2_0200, Function | MediumTest | Level3)
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -2619,9 +2669,9 @@ void AlterPin2TestFunc(CoreServiceTestHelper &helper)
 {
     const std::u16string newpin2 = Str8ToStr16("12345678");
     const std::u16string oldpin2 = Str8ToStr16("42014264");
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().AlterPin2(SimTest::slotId_, newpin2, oldpin2, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().AlterPin2(SimTest::slotId_, newpin2, oldpin2, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2637,8 +2687,8 @@ HWTEST_F(SimTest, Telephony_Sim_AlterPin2_0100, Function | MediumTest | Level3)
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -2654,9 +2704,9 @@ void AlterPin2TestFunc1(CoreServiceTestHelper &helper)
     AccessToken token;
     const std::u16string newpin2 = Str8ToStr16("12345678");
     const std::u16string oldpin2 = Str8ToStr16("42014264");
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().AlterPin2(SimTest::slotId1_, newpin2, oldpin2, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().AlterPin2(SimTest::slotId1_, newpin2, oldpin2, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2671,8 +2721,8 @@ HWTEST_F(SimTest, Telephony_Sim_AlterPin2_0200, Function | MediumTest | Level3)
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -2707,8 +2757,8 @@ HWTEST_F(SimTest, Telephony_Sim_AlterPin2_0300, Function | MediumTest | Level3)
 void SetActiveSimTestFunc(CoreServiceTestHelper &helper)
 {
     int enable = 1;
-    bool result = CoreServiceClient::GetInstance().SetActiveSim(SimTest::slotId_, enable);
-    helper.SetBoolResult(result);
+    int32_t result = CoreServiceClient::GetInstance().SetActiveSim(SimTest::slotId_, enable);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2723,8 +2773,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetActiveSim_0100, Function | MediumTest | Level
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -2738,8 +2788,8 @@ void SetActiveSimTestFunc1(CoreServiceTestHelper &helper)
 {
     AccessToken token;
     int enable = 1;
-    bool result = CoreServiceClient::GetInstance().SetActiveSim(SimTest::slotId1_, enable);
-    helper.SetBoolResult(result);
+    int32_t result = CoreServiceClient::GetInstance().SetActiveSim(SimTest::slotId1_, enable);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2753,8 +2803,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetActiveSim_0200, Function | MediumTest | Level
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -2789,8 +2839,8 @@ void ReSetActiveSimTestFunc(CoreServiceTestHelper &helper)
 {
     AccessToken token;
     int enable = 1;
-    bool result = CoreServiceClient::GetInstance().SetActiveSim(SimTest::slotId_, enable);
-    helper.SetBoolResult(result);
+    int32_t result = CoreServiceClient::GetInstance().SetActiveSim(SimTest::slotId_, enable);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2804,8 +2854,8 @@ HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSim_0100, Function | MediumTest | Lev
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -2819,8 +2869,8 @@ void ReSetActiveSimTestFunc1(CoreServiceTestHelper &helper)
 {
     AccessToken token;
     int enable = 1;
-    bool result = CoreServiceClient::GetInstance().SetActiveSim(SimTest::slotId1_, enable);
-    helper.SetBoolResult(result);
+    int32_t result = CoreServiceClient::GetInstance().SetActiveSim(SimTest::slotId1_, enable);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -2834,8 +2884,8 @@ HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSim_0200, Function | MediumTest | Lev
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -3057,9 +3107,9 @@ void UnlockSimLockTestFunc(CoreServiceTestHelper &helper)
     PersoLockInfo lockInfo;
     lockInfo.lockType = PersoLockType::PN_PIN_LOCK;
     lockInfo.password = Str8ToStr16("1234");
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().UnlockSimLock(SimTest::slotId_, lockInfo, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().UnlockSimLock(SimTest::slotId_, lockInfo, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -3075,8 +3125,8 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockSimLock_0100, Function | MediumTest | Leve
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -3093,9 +3143,9 @@ void UnlockSimLockTestFunc1(CoreServiceTestHelper &helper)
     PersoLockInfo lockInfo;
     lockInfo.lockType = PersoLockType::PN_PIN_LOCK;
     lockInfo.password = Str8ToStr16("1234");
-    LockStatusResponse response = { 0 };
-    bool result = CoreServiceClient::GetInstance().UnlockSimLock(SimTest::slotId1_, lockInfo, response);
-    helper.SetBoolResult(result);
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+    int32_t result = CoreServiceClient::GetInstance().UnlockSimLock(SimTest::slotId1_, lockInfo, response);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -3110,8 +3160,8 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockSimLock_0200, Function | MediumTest | Leve
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 #endif
@@ -3242,8 +3292,8 @@ void SendTerminalResponseCmdTestFunc(CoreServiceTestHelper &helper)
 {
     int32_t slotId = 0;
     std::string cmd = "send terminal response";
-    bool result = CoreServiceClient::GetInstance().SendTerminalResponseCmd(slotId, cmd);
-    helper.SetBoolResult(result);
+    int32_t result = CoreServiceClient::GetInstance().SendTerminalResponseCmd(slotId, cmd);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -3263,8 +3313,8 @@ HWTEST_F(SimTest, Telephony_Sim_SendTerminalResponseCmd_0100, Function | MediumT
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -3274,8 +3324,8 @@ void SendTerminalResponseCmdTestFunc1(CoreServiceTestHelper &helper)
     AccessToken token;
     int32_t slotId = 1;
     std::string cmd = "send terminal response";
-    bool result = CoreServiceClient::GetInstance().SendTerminalResponseCmd(slotId, cmd);
-    helper.SetBoolResult(result);
+    int32_t result = CoreServiceClient::GetInstance().SendTerminalResponseCmd(slotId, cmd);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -3295,8 +3345,8 @@ HWTEST_F(SimTest, Telephony_Sim_SendTerminalResponseCmd_0200, Function | MediumT
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_FALSE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -3326,8 +3376,8 @@ void SendEnvelopeCmdTestFunc(CoreServiceTestHelper &helper)
 {
     int32_t slotId = 0;
     std::string cmd = "send envelope";
-    bool result = CoreServiceClient::GetInstance().SendEnvelopeCmd(slotId, cmd);
-    helper.SetBoolResult(result);
+    int32_t result = CoreServiceClient::GetInstance().SendEnvelopeCmd(slotId, cmd);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -3347,8 +3397,8 @@ HWTEST_F(SimTest, Telephony_Sim_SendEnvelopeCmd_0100, Function | MediumTest | Le
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -3358,8 +3408,8 @@ void SendEnvelopeCmdTestFunc1(CoreServiceTestHelper &helper)
     AccessToken token;
     int32_t slotId = 1;
     std::string cmd = "send envelope";
-    bool result = CoreServiceClient::GetInstance().SendEnvelopeCmd(slotId, cmd);
-    helper.SetBoolResult(result);
+    int32_t result = CoreServiceClient::GetInstance().SendEnvelopeCmd(slotId, cmd);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -3378,8 +3428,8 @@ HWTEST_F(SimTest, Telephony_Sim_SendEnvelopeCmd_0200, Function | MediumTest | Le
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_FALSE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -3492,8 +3542,8 @@ void SetVoiceMailInfoTestFunc(CoreServiceTestHelper &helper)
 {
     const std::u16string mailName = Str8ToStr16("张三");
     const std::u16string mailnumber = Str8ToStr16("13123456789");
-    bool result = CoreServiceClient::GetInstance().SetVoiceMailInfo(SimTest::slotId_, mailName, mailnumber);
-    helper.SetBoolResult(result);
+    int32_t result = CoreServiceClient::GetInstance().SetVoiceMailInfo(SimTest::slotId_, mailName, mailnumber);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -3513,8 +3563,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailInfo_0100, Function | MediumTest | L
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_FALSE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -3523,8 +3573,8 @@ void SetVoiceMailInfoTestFunc1(CoreServiceTestHelper &helper)
 {
     const std::u16string mailName = Str8ToStr16("张三");
     const std::u16string mailnumber = Str8ToStr16("13123456789");
-    bool result = CoreServiceClient::GetInstance().SetVoiceMailInfo(SimTest::slotId1_, mailName, mailnumber);
-    helper.SetBoolResult(result);
+    int32_t result = CoreServiceClient::GetInstance().SetVoiceMailInfo(SimTest::slotId1_, mailName, mailnumber);
+    helper.SetIntResult(result);
     helper.NotifyAll();
 }
 
@@ -3544,8 +3594,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailInfo_0200, Function | MediumTest | L
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -3565,8 +3615,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailInfo_0300, Function | MediumTest | L
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_FALSE(result);
+            int32_t result = helper.GetIntResult();
+            EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }

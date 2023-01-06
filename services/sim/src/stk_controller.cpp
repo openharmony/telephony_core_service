@@ -263,18 +263,18 @@ bool StkController::PublishStkEvent(const AAFwk::Want &want) const
     return EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
 }
 
-bool StkController::SendTerminalResponseCmd(const std::string &strCmd)
+int32_t StkController::SendTerminalResponseCmd(const std::string &strCmd)
 {
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_SEND_TERMINAL_RESPONSE);
     if (event == nullptr) {
         TELEPHONY_LOGE("StkController[%{public}d]::SendTerminalResponseCmd() event is nullptr", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     event->SetOwner(shared_from_this());
     std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
     if (telRilManager == nullptr) {
         TELEPHONY_LOGE("StkController[%{public}d]::SendTerminalResponseCmd() telRilManager is nullptr", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     std::unique_lock<std::mutex> terminalResponselock(stkMutex_);
@@ -285,24 +285,28 @@ bool StkController::SendTerminalResponseCmd(const std::string &strCmd)
         TELEPHONY_LOGI("StkController[%{public}d]::SendTerminalResponseCmd() wait for the response to finish", slotId_);
         if (stkCv_.wait_for(terminalResponselock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
             TELEPHONY_LOGE("StkController[%{public}d]::SendTerminalResponseCmd() wait timeout", slotId_);
-            responseFinished_ = true;
+            break;
         }
     }
-    return terminalResponseResult_;
+    if (!responseFinished_) {
+        TELEPHONY_LOGE("ril cmd fail");
+        return TELEPHONY_ERR_RIL_CMD_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
-bool StkController::SendEnvelopeCmd(const std::string &strCmd)
+int32_t StkController::SendEnvelopeCmd(const std::string &strCmd)
 {
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_SEND_ENVELOPE);
     if (event == nullptr) {
         TELEPHONY_LOGE("StkController[%{public}d]::SendEnvelopeCmd() event is nullptr", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     event->SetOwner(shared_from_this());
     std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
     if (telRilManager == nullptr) {
         TELEPHONY_LOGE("StkController[%{public}d]::SendEnvelopeCmd() telRilManager is nullptr", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     std::unique_lock<std::mutex> envelopelock(stkMutex_);
@@ -313,10 +317,14 @@ bool StkController::SendEnvelopeCmd(const std::string &strCmd)
         TELEPHONY_LOGI("StkController[%{public}d]::SendEnvelopeCmd() wait for the response to finish", slotId_);
         if (stkCv_.wait_for(envelopelock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
             TELEPHONY_LOGE("StkController[%{public}d]::SendEnvelopeCmd() wait timeout", slotId_);
-            responseFinished_ = true;
+            break;
         }
     }
-    return envelopeResponseResult_;
+    if (!responseFinished_) {
+        TELEPHONY_LOGE("ril cmd fail");
+        return TELEPHONY_ERR_RIL_CMD_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t StkController::SendCallSetupRequestResult(bool accept)
