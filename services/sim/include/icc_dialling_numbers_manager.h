@@ -39,10 +39,10 @@ public:
         std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simState);
     ~IccDiallingNumbersManager();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
-    std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int type);
-    bool AddIccDiallingNumbers(int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
-    bool DelIccDiallingNumbers(int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
-    bool UpdateIccDiallingNumbers(int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
+    int32_t QueryIccDiallingNumbers(int type, std::vector<std::shared_ptr<DiallingNumbersInfo>> &result);
+    int32_t AddIccDiallingNumbers(int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
+    int32_t DelIccDiallingNumbers(int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
+    int32_t UpdateIccDiallingNumbers(int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
     void Init();
     static std::shared_ptr<IccDiallingNumbersManager> CreateInstance(
         const std::shared_ptr<SimFileManager> &simFile, const std::shared_ptr<SimStateManager> &simState);

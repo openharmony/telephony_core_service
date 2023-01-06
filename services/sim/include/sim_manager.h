@@ -42,70 +42,69 @@ public:
     bool HasSimCard(int32_t slotId) override;
     int32_t GetSimState(int32_t slotId) override;
     int32_t GetCardType(int32_t slotId) override;
-    bool UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response) override;
-    bool UnlockPuk(
+    int32_t UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response) override;
+    int32_t UnlockPuk(
         int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response) override;
-    bool AlterPin(
+    int32_t AlterPin(
         int32_t slotId, const std::string &newPin, const std::string &oldPin, LockStatusResponse &response) override;
-    bool SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response) override;
-    int32_t GetLockState(int32_t slotId, LockType lockType) override;
+    int32_t SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response) override;
+    int32_t GetLockState(int32_t slotId, LockType lockType, LockState &lockState) override;
     int32_t RefreshSimState(int32_t slotId) override;
-    bool UnlockPin2(int32_t slotId, const std::string &pin2, LockStatusResponse &response) override;
-    bool UnlockPuk2(
+    int32_t UnlockPin2(int32_t slotId, const std::string &pin2, LockStatusResponse &response) override;
+    int32_t UnlockPuk2(
         int32_t slotId, const std::string &newPin2, const std::string &puk2, LockStatusResponse &response) override;
-    bool AlterPin2(
+    int32_t AlterPin2(
         int32_t slotId, const std::string &newPin2, const std::string &oldPin2, LockStatusResponse &response) override;
-    bool UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;
+    int32_t UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;
     // SimAccount
     bool IsSimActive(int32_t slotId) override;
-    bool SetActiveSim(int32_t slotId, int32_t enable) override;
-    bool GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) override;
-    bool SetDefaultVoiceSlotId(int32_t slotId) override;
+    int32_t SetActiveSim(int32_t slotId, int32_t enable) override;
+    int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) override;
+    int32_t SetDefaultVoiceSlotId(int32_t slotId) override;
     bool SetDefaultSmsSlotId(int32_t slotId) override;
     int32_t SetDefaultCellularDataSlotId(int32_t slotId) override;
     bool SetPrimarySlotId(int32_t slotId) override;
-    bool SetShowNumber(int32_t slotId, const std::u16string &number) override;
-    bool SetShowName(int32_t slotId, const std::u16string &name) override;
+    int32_t SetShowNumber(int32_t slotId, const std::u16string &number) override;
+    int32_t SetShowName(int32_t slotId, const std::u16string &name) override;
     int32_t GetDefaultVoiceSlotId() override;
     int32_t GetDefaultSmsSlotId() override;
     int32_t GetDefaultCellularDataSlotId() override;
     int32_t GetPrimarySlotId() override;
-    std::u16string GetShowNumber(int32_t slotId) override;
-    std::u16string GetShowName(int32_t slotId) override;
+    int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber) override;
+    int32_t GetShowName(int32_t slotId, std::u16string &showName) override;
     int32_t GetSlotId(int32_t simId) override;
     int32_t GetSimId(int32_t slotId) override;
-    bool GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
-    bool GetOperatorConfigs(int slotId, OperatorConfig &poc) override;
+    int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
+    int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) override;
     bool HasOperatorPrivileges(const int32_t slotId) override;
     int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
         SimAuthenticationResponse &response) override;
     int32_t GetRadioProtocolTech(int32_t slotId) override;
     void GetRadioProtocol(int32_t slotId) override;
     // STK
-    bool SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
-    bool SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
+    int32_t SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
+    int32_t SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
     int32_t SendCallSetupRequestResult(int32_t slotId, bool accept) override;
     // SimFile
     std::u16string GetSimOperatorNumeric(int32_t slotId) override;
     std::u16string GetISOCountryCodeForSim(int32_t slotId) override;
     std::u16string GetSimSpn(int32_t slotId) override;
     std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired) override;
-    std::u16string GetSimIccId(int32_t slotId) override;
-    std::u16string GetIMSI(int32_t slotId) override;
+    int32_t GetSimIccId(int32_t slotId, std::u16string &iccId) override;
+    int32_t GetIMSI(int32_t slotId, std::u16string &imsi) override;
     std::u16string GetLocaleFromDefaultSim(int32_t slotId) override;
-    std::u16string GetSimGid1(int32_t slotId) override;
+    int32_t GetSimGid1(int32_t slotId, std::u16string &gid1) override;
     std::u16string GetSimGid2(int32_t slotId) override;
     int32_t GetOpName(int32_t slotId, std::u16string &opname) override;
     int32_t GetOpKey(int32_t slotId, std::u16string &opkey) override;
     int32_t GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt) override;
-    std::u16string GetSimTelephoneNumber(int32_t slotId) override;
+    int32_t GetSimTelephoneNumber(int32_t slotId, std::u16string &telephoneNumber) override;
     std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) override;
-    std::u16string GetVoiceMailIdentifier(int32_t slotId) override;
-    std::u16string GetVoiceMailNumber(int32_t slotId) override;
+    int32_t GetVoiceMailIdentifier(int32_t slotId, std::u16string &voiceMailIdentifier) override;
+    int32_t GetVoiceMailNumber(int32_t slotId, std::u16string &voiceMailNumber) override;
     std::u16string GetSimIst(int32_t slotId) override;
     int ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum) override;
-    bool SetVoiceMailInfo(
-        int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) override;
+    int32_t SetVoiceMailInfo(int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) override;
     // SimSms
     bool AddSmsToIcc(int32_t slotId, int status, std::string &pdu, std::string &smsc) override;
     bool UpdateSmsIcc(
@@ -113,12 +112,13 @@ public:
     bool DelSmsIcc(int32_t slotId, int index) override;
     std::vector<std::string> ObtainAllSmsOfIcc(int32_t slotId) override;
     // IccDiallingNumbers
-    std::vector<std::shared_ptr<DiallingNumbersInfo>> QueryIccDiallingNumbers(int slotId, int type) override;
-    bool AddIccDiallingNumbers(
+    int32_t QueryIccDiallingNumbers(
+        int slotId, int type, std::vector<std::shared_ptr<DiallingNumbersInfo>> &result) override;
+    int32_t AddIccDiallingNumbers(
         int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) override;
-    bool DelIccDiallingNumbers(
+    int32_t DelIccDiallingNumbers(
         int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) override;
-    bool UpdateIccDiallingNumbers(
+    int32_t UpdateIccDiallingNumbers(
         int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) override;
     // Event register
     void RegisterCoreNotify(int32_t slotId, const HANDLE &handler, int what) override;

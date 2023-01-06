@@ -21,8 +21,7 @@
 namespace OHOS {
 namespace Telephony {
 enum CoreServiceErrorCode {
-    CORE_ERR_OPERATE_CONF_KEY_NOT_EXIT = CORE_SERVICE_CORE_ERR_OFFSET,
-    CORE_ERR_RESPONSE_TIMEOUT,
+    CORE_ERR_RESPONSE_TIMEOUT = CORE_SERVICE_CORE_ERR_OFFSET,
 };
 
 enum CoreServiceSimErrorCode {

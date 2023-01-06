@@ -14,7 +14,10 @@
  */
 
 #include "icc_dialling_numbers_manager.h"
+
+#include "core_service_errors.h"
 #include "radio_event.h"
+#include "telephony_errors.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -90,8 +93,9 @@ void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Point
 void IccDiallingNumbersManager::InitFdnCache()
 {
     TELEPHONY_LOGI("IccDiallingNumbersManager::InitFdnCache start");
-    std::thread initTask ([&]() {
-        QueryIccDiallingNumbers(DiallingNumbersInfo::SIM_FDN);
+    std::thread initTask([&]() {
+        std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers;
+        QueryIccDiallingNumbers(DiallingNumbersInfo::SIM_FDN, diallingNumbers);
     });
     initTask.detach();
 }
@@ -122,13 +126,14 @@ void IccDiallingNumbersManager::ProcessLoadDone(const AppExecFwk::InnerEvent::Po
 
 void IccDiallingNumbersManager::ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    hasEventDone_ = true;
     std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
     if (object->exception != nullptr) {
         std::shared_ptr<HRilRadioResponseInfo> responseInfo =
             std::static_pointer_cast<HRilRadioResponseInfo>(object->exception);
         TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessUpdateDone error %{public}d", responseInfo->error);
         hasEventDone_ = (responseInfo->error == HRilErrType::NONE);
+    } else {
+        hasEventDone_ = true;
     }
     TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessUpdateDone: end");
     processWait_.notify_all();
@@ -136,13 +141,14 @@ void IccDiallingNumbersManager::ProcessUpdateDone(const AppExecFwk::InnerEvent::
 
 void IccDiallingNumbersManager::ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    hasEventDone_ = true;
     std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
     if (object->exception != nullptr) {
         std::shared_ptr<HRilRadioResponseInfo> responseInfo =
             std::static_pointer_cast<HRilRadioResponseInfo>(object->exception);
         TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessWriteDone error %{public}d", responseInfo->error);
         hasEventDone_ = (responseInfo->error == HRilErrType::NONE);
+    } else {
+        hasEventDone_ = true;
     }
     TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessWriteDone: end");
     processWait_.notify_all();
@@ -150,25 +156,31 @@ void IccDiallingNumbersManager::ProcessWriteDone(const AppExecFwk::InnerEvent::P
 
 void IccDiallingNumbersManager::ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    hasEventDone_ = true;
     std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
     if (object->exception != nullptr) {
         std::shared_ptr<HRilRadioResponseInfo> responseInfo =
             std::static_pointer_cast<HRilRadioResponseInfo>(object->exception);
         TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessDeleteDone error %{public}d", responseInfo->error);
         hasEventDone_ = (responseInfo->error == HRilErrType::NONE);
+    } else {
+        hasEventDone_ = true;
     }
     TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessDeleteDone: end");
     processWait_.notify_all();
 }
 
-bool IccDiallingNumbersManager::UpdateIccDiallingNumbers(
+int32_t IccDiallingNumbersManager::UpdateIccDiallingNumbers(
     int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     std::unique_lock<std::mutex> lock(mtx_);
-    if (!IsValidType(type) || diallingNumber == nullptr || !HasSimCard() ||
-        !IsValidParam(type, diallingNumber)) {
-        return false;
+    if (diallingNumber == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (!HasSimCard()) {
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if (!IsValidType(type) || !IsValidParam(type, diallingNumber)) {
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     int index = diallingNumber->GetIndex();
     TELEPHONY_LOGI("UpdateIccDiallingNumbers start: %{public}d %{public}d", type, index);
@@ -183,16 +195,21 @@ bool IccDiallingNumbersManager::UpdateIccDiallingNumbers(
         }
     }
     TELEPHONY_LOGI("IccDiallingNumbersManager::UpdateIccDiallingNumbers OK return %{public}d", hasEventDone_);
-    return hasEventDone_;
+    return hasEventDone_ ? TELEPHONY_SUCCESS : CORE_ERR_SIM_CARD_UPDATE_FAILED;
 }
 
-bool IccDiallingNumbersManager::DelIccDiallingNumbers(
+int32_t IccDiallingNumbersManager::DelIccDiallingNumbers(
     int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     std::unique_lock<std::mutex> lock(mtx_);
-    if (!IsValidType(type) || diallingNumber == nullptr || !HasSimCard() ||
-        !IsValidParam(type, diallingNumber)) {
-        return false;
+    if (diallingNumber == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (!HasSimCard()) {
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if (!IsValidType(type) || !IsValidParam(type, diallingNumber)) {
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     int index = diallingNumber->GetIndex();
     TELEPHONY_LOGI("DelIccDiallingNumbers start: %{public}d %{public}d", type, index);
@@ -207,17 +224,22 @@ bool IccDiallingNumbersManager::DelIccDiallingNumbers(
         }
     }
     TELEPHONY_LOGI("IccDiallingNumbersManager::DelIccDiallingNumbers OK return %{public}d", hasEventDone_);
-    return hasEventDone_;
+    return hasEventDone_ ? TELEPHONY_SUCCESS : CORE_ERR_SIM_CARD_UPDATE_FAILED;
 }
 
-bool IccDiallingNumbersManager::AddIccDiallingNumbers(
+int32_t IccDiallingNumbersManager::AddIccDiallingNumbers(
     int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     std::unique_lock<std::mutex> lock(mtx_);
     TELEPHONY_LOGI("AddIccDiallingNumbers start:%{public}d", type);
-    if (!IsValidType(type) || diallingNumber == nullptr || !HasSimCard() ||
-        !IsValidParam(type, diallingNumber)) {
-        return false;
+    if (diallingNumber == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (!HasSimCard()) {
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if (!IsValidType(type) || !IsValidParam(type, diallingNumber)) {
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_WRITE_DONE);
     int fileId = GetFileIdForType(type);
@@ -230,17 +252,22 @@ bool IccDiallingNumbersManager::AddIccDiallingNumbers(
         }
     }
     TELEPHONY_LOGI("IccDiallingNumbersManager::AddIccDiallingNumbers OK return %{public}d", hasEventDone_);
-    return hasEventDone_;
+    return hasEventDone_ ? TELEPHONY_SUCCESS : CORE_ERR_SIM_CARD_UPDATE_FAILED;
 }
 
-std::vector<std::shared_ptr<DiallingNumbersInfo>> IccDiallingNumbersManager::QueryIccDiallingNumbers(
-    int type)
+int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
+    int type, std::vector<std::shared_ptr<DiallingNumbersInfo>> &result)
 {
     std::unique_lock<std::mutex> lock(mtx_);
     ClearRecords();
-    if (diallingNumbersCache_ == nullptr || !IsValidType(type) || !HasSimCard()) {
-        TELEPHONY_LOGE("Cannot load DiallingNumbersInfo records. no sim inserted?");
-        return diallingNumbersList_;
+    if (diallingNumbersCache_ == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (!HasSimCard()) {
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if (!IsValidType(type)) {
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     TELEPHONY_LOGI("QueryIccDiallingNumbers start:%{public}d", type);
     int fileId = GetFileIdForType(type);
@@ -250,7 +277,10 @@ std::vector<std::shared_ptr<DiallingNumbersInfo>> IccDiallingNumbersManager::Que
     diallingNumbersCache_->ObtainAllDiallingNumberFiles(fileId, extensionEf, event);
     processWait_.wait(lock, [this] { return hasEventDone_ == true; });
     TELEPHONY_LOGI("IccDiallingNumbersManager::QueryIccDiallingNumbers: end");
-    return diallingNumbersList_;
+    if (!diallingNumbersList_.empty()) {
+        result = diallingNumbersList_;
+    }
+    return hasEventDone_ ? TELEPHONY_SUCCESS : CORE_ERR_SIM_CARD_LOAD_FAILED;
 }
 
 AppExecFwk::InnerEvent::Pointer IccDiallingNumbersManager::BuildCallerInfo(int eventId)
