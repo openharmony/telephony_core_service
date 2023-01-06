@@ -236,7 +236,8 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
                 TELEPHONY_LOGE("DeviceStateObserver OnAddSystemAbility networkShareClient is nullptr");
                 return;
             }
-            auto isSharing = networkShareClient->IsSharing();
+            int32_t isSharing = 0;
+            networkShareClient->IsSharing(isSharing);
             sub_->GetEventHandler()->ProcessNetSharingState(isSharing == NetManagerStandard::NETWORKSHARE_IS_SHARING);
             networkShareClient->RegisterSharingEvent(callback_);
             break;
