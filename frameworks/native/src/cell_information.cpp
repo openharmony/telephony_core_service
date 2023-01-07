@@ -72,6 +72,17 @@ uint64_t CellInformation::GetTimeStamp() const
     return timeStamp_;
 }
 
+int32_t CellInformation::GetSignalIntensity() const
+{
+    return signalIntensity_;
+}
+
+void CellInformation::SetSignalIntensity(int32_t signalIntensity)
+{
+    signalIntensity_ = signalIntensity;
+    timeStamp_ = static_cast<uint64_t>(time(0));
+}
+
 int32_t CellInformation::GetSignalLevel() const
 {
     return signalLevel_;

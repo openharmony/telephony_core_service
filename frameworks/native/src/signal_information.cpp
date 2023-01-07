@@ -21,6 +21,7 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t SIGNAL_RSSI_MAXIMUM = -1;
+constexpr int32_t SIGNAL_INTENSITY_INVALID = 0;
 constexpr int32_t SIGNAL_LEVEL_INVALID = 0;
 constexpr int32_t SIGNAL_FIVE_BARS = 5;
 constexpr int32_t SIGNAL_FOUR_BARS = 4;
@@ -84,6 +85,19 @@ int32_t GsmSignalInformation::GetGsmBer() const
     return gsmBer_;
 }
 
+int32_t GsmSignalInformation::GetSignalIntensity() const
+{
+    int32_t signalIntensity = SIGNAL_INTENSITY_INVALID;
+
+    if (ValidateGsmValue()) {
+        signalIntensity = GetRssi();
+    } else {
+        TELEPHONY_LOGE("GsmSignalInformation::GetSignalIntensity Value is Invalid.");
+    }
+
+    return signalIntensity;
+}
+
 int32_t GsmSignalInformation::GetSignalLevel() const
 {
     int32_t level = SIGNAL_LEVEL_INVALID;
@@ -97,7 +111,7 @@ int32_t GsmSignalInformation::GetSignalLevel() const
             }
         }
     } else {
-        TELEPHONY_LOGE("GsmSignalInformation::GetSignalLevel Value is Invalid\n");
+        TELEPHONY_LOGE("GsmSignalInformation::GetSignalLevel Value is Invalid.");
     }
     return level;
 }
@@ -179,6 +193,19 @@ bool CdmaSignalInformation::operator==(const CdmaSignalInformation &cdma) const
 int32_t CdmaSignalInformation::GetCdmaRssi() const
 {
     return cdmaRssi_;
+}
+
+int32_t CdmaSignalInformation::GetSignalIntensity() const
+{
+    int32_t signalIntensity = SIGNAL_INTENSITY_INVALID;
+
+    if (ValidateCdmaValue()) {
+        signalIntensity = GetCdmaRssi();
+    } else {
+        TELEPHONY_LOGE("CdmaSignalInformation::GetSignalIntensity Value is Invalid.");
+    }
+
+    return signalIntensity;
 }
 
 int32_t CdmaSignalInformation::GetSignalLevel() const
@@ -294,6 +321,19 @@ int32_t LteSignalInformation::GetSnr() const
     return lteSnr_;
 }
 
+int32_t LteSignalInformation::GetSignalIntensity() const
+{
+    int32_t signalIntensity = SIGNAL_INTENSITY_INVALID;
+
+    if (ValidateLteValue()) {
+        signalIntensity = GetRsrp();
+    } else {
+        TELEPHONY_LOGE("LteSignalInformation::GetSignalIntensity Value is Invalid.");
+    }
+
+    return signalIntensity;
+}
+
 int32_t LteSignalInformation::GetSignalLevel() const
 {
     int32_t level = SIGNAL_LEVEL_INVALID;
@@ -307,7 +347,7 @@ int32_t LteSignalInformation::GetSignalLevel() const
             }
         }
     } else {
-        TELEPHONY_LOGE("LteSignalInformation::GetSignalLevel Value is Invalid\n");
+        TELEPHONY_LOGE("LteSignalInformation::GetSignalLevel Value is Invalid.");
     }
     return level;
 }
@@ -422,6 +462,19 @@ int32_t WcdmaSignalInformation::GetBer() const
     return wcdmaBer_;
 }
 
+int32_t WcdmaSignalInformation::GetSignalIntensity() const
+{
+    int32_t signalIntensity = SIGNAL_INTENSITY_INVALID;
+
+    if (ValidateWcdmaValue()) {
+        signalIntensity = GetRscp();
+    } else {
+        TELEPHONY_LOGE("WcdmaSignalInformation::GetSignalIntensity Value is Invalid.");
+    }
+
+    return signalIntensity;
+}
+
 int32_t WcdmaSignalInformation::GetSignalLevel() const
 {
     int32_t level = SIGNAL_LEVEL_INVALID;
@@ -435,7 +488,7 @@ int32_t WcdmaSignalInformation::GetSignalLevel() const
             }
         }
     } else {
-        TELEPHONY_LOGE("WcdmaSignalInformation::GetSignalLevel Value is Invalid\n");
+        TELEPHONY_LOGE("WcdmaSignalInformation::GetSignalLevel Value is Invalid.");
     }
     return level;
 }
@@ -528,6 +581,19 @@ void TdScdmaSignalInformation::SetValue(const int32_t tdScdmaRscp)
 int32_t TdScdmaSignalInformation::GetRscp() const
 {
     return tdScdmaRscp_;
+}
+
+int32_t TdScdmaSignalInformation::GetSignalIntensity() const
+{
+    int32_t signalIntensity = SIGNAL_INTENSITY_INVALID;
+
+    if (ValidateTdScdmaValue()) {
+        signalIntensity = GetRscp();
+    } else {
+        TELEPHONY_LOGE("TdScdmaSignalInformation::GetSignalIntensity Value is Invalid.");
+    }
+
+    return signalIntensity;
 }
 
 int32_t TdScdmaSignalInformation::GetSignalLevel() const
@@ -627,6 +693,19 @@ int32_t NrSignalInformation::GetRsrq() const
 int32_t NrSignalInformation::GetSinr() const
 {
     return nrSinr_;
+}
+
+int32_t NrSignalInformation::GetSignalIntensity() const
+{
+    int32_t signalIntensity = SIGNAL_INTENSITY_INVALID;
+
+    if (ValidateNrValue()) {
+        signalIntensity = GetRsrp();
+    } else {
+        TELEPHONY_LOGE("NrSignalInformation::GetSignalIntensity Value is Invalid.");
+    }
+
+    return signalIntensity;
 }
 
 int32_t NrSignalInformation::GetSignalLevel() const

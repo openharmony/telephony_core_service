@@ -46,8 +46,10 @@ public:
     virtual std::string GetMnc() const;
     virtual uint64_t GetTimeStamp() const;
     virtual int32_t GetSignalLevel() const;
+    virtual int32_t GetSignalIntensity() const;
     virtual bool GetIsCamped() const;
     virtual void SetIsCamped(bool isCamped);
+    virtual void SetSignalIntensity(int32_t signalIntensity);
     virtual void SetSignalLevel(int32_t signalLevel);
 
 protected:
@@ -55,6 +57,7 @@ protected:
     std::string mnc_ = "";
     int32_t cellId_ = 0;
     uint64_t timeStamp_ = 0;
+    int32_t signalIntensity_ = 0;
     int32_t signalLevel_ = 0;
     bool isCamped_ = false;
 };

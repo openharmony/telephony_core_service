@@ -44,6 +44,7 @@ public:
     static void InitSignalBar(const int32_t bar = 5);
     static std::unique_ptr<SignalInformation> Unmarshalling(Parcel &parcel);
     virtual bool ReadFromParcel(Parcel &parcel) = 0;
+    virtual int32_t GetSignalIntensity() const = 0;
     virtual int32_t GetSignalLevel() const = 0;
     virtual std::string ToString() const = 0;
     virtual sptr<SignalInformation> NewInstance() const = 0;
@@ -62,6 +63,7 @@ public:
     bool operator==(const GsmSignalInformation &gsm) const;
     int32_t GetRssi() const;
     int32_t GetGsmBer() const;
+    int32_t GetSignalIntensity() const override;
     int32_t GetSignalLevel() const override;
     std::string ToString() const override;
     sptr<SignalInformation> NewInstance() const override;
@@ -83,6 +85,7 @@ public:
     void SetValue(const int32_t cdmaRssi = 0, const int32_t cdmaEcno = 0);
     bool operator==(const CdmaSignalInformation &cdma) const;
     int32_t GetCdmaRssi() const;
+    int32_t GetSignalIntensity() const override;
     int32_t GetSignalLevel() const override;
     std::string ToString() const override;
     SignalInformation::NetworkType GetNetworkType() const override;
@@ -108,6 +111,7 @@ public:
     int32_t GetRsrp() const;
     int32_t GetRsrq() const;
     int32_t GetSnr() const;
+    int32_t GetSignalIntensity() const override;
     int32_t GetSignalLevel() const override;
     std::string ToString() const override;
     SignalInformation::NetworkType GetNetworkType() const override;
@@ -135,6 +139,7 @@ public:
     int32_t GetRscp() const;
     int32_t GetEcno() const;
     int32_t GetBer() const;
+    int32_t GetSignalIntensity() const override;
     int32_t GetSignalLevel() const override;
     std::string ToString() const override;
     SignalInformation::NetworkType GetNetworkType() const override;
@@ -158,6 +163,7 @@ public:
     void SetValue(const int32_t tdScdmaRscp = 0);
     bool operator==(const TdScdmaSignalInformation &tdScdma) const;
     int32_t GetRscp() const;
+    int32_t GetSignalIntensity() const override;
     int32_t GetSignalLevel() const override;
     std::string ToString() const override;
     SignalInformation::NetworkType GetNetworkType() const override;
@@ -180,6 +186,7 @@ public:
     int32_t GetRsrp() const;
     int32_t GetRsrq() const;
     int32_t GetSinr() const;
+    int32_t GetSignalIntensity() const override;
     int32_t GetSignalLevel() const override;
     std::string ToString() const override;
     SignalInformation::NetworkType GetNetworkType() const override;
