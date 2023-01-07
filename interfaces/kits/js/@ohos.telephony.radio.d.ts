@@ -480,6 +480,12 @@ declare namespace radio {
      * Obtains the signal level of the current network.
      */
     signalLevel: number;
+
+    /**
+     * rsrp for LTE and NR; dbm for CDMA and EVDO; rscp for WCDMA; rssi for GSM.
+     * @since 9
+     */
+    dBm: number;
   }
 
   /**

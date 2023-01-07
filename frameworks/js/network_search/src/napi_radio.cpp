@@ -259,20 +259,21 @@ static void GetSignalInfoListCallback(napi_env env, napi_status status, void *da
             napi_value info = nullptr;
             napi_create_object(env, &info);
             int32_t signalType = static_cast<int32_t>(NetworkType::NETWORK_TYPE_UNKNOWN);
-            if (infoItem) {
+            int32_t signalLevel = 0;
+            int32_t signalIntensity = 0;
+            if (infoItem != nullptr) {
                 signalType = WrapSignalInformationType(infoItem->GetNetworkType());
+                signalLevel = infoItem->GetSignalLevel();
+                signalIntensity = infoItem->GetSignalIntensity();
             }
             NapiUtil::SetPropertyInt32(env, info, "signalType", signalType);
-            int32_t signalLevel = 0;
-            if (infoItem != nullptr) {
-                signalLevel = infoItem->GetSignalLevel();
-            }
             NapiUtil::SetPropertyInt32(env, info, "signalLevel", signalLevel);
+            NapiUtil::SetPropertyInt32(env, info, "dBm", signalIntensity);
             napi_set_element(env, callbackValue, i, info);
             i++;
             TELEPHONY_LOGI(
-                "GetSignalInfoListCallback when resovled signalType  = %{public}d, signalLevel = %{public}d",
-                signalType, signalLevel);
+                "GetSignalInfoListCallback signalType:%{public}d, signalIntensity:%{public}d, signalLevel:%{public}d",
+                signalType, signalIntensity, signalLevel);
         }
     } else {
         if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
@@ -1747,11 +1748,13 @@ void GetCellInformationCallback(napi_env env, napi_status status, void *data)
             napi_create_object(env, &info);
             NapiUtil::SetPropertyBoolean(env, info, "isCamped", true);
             uint64_t timeStamp = 0;
+            int32_t signalIntensity = 0;
             int32_t signalLevel = 0;
             CellInformation::CellType cellType = CellInformation::CellType::CELL_TYPE_NONE;
             if (infoItem != nullptr) {
                 timeStamp = infoItem->GetTimeStamp();
                 signalLevel = infoItem->GetSignalLevel();
+                signalIntensity = infoItem->GetSignalIntensity();
                 cellType = infoItem->GetNetworkType();
             }
             NapiUtil::SetPropertyInt32(env, info, "timeStamp", timeStamp);
@@ -1761,6 +1764,7 @@ void GetCellInformationCallback(napi_env env, napi_status status, void *data)
             int32_t signalType = WrapCellInformationType(infoItem);
             NapiUtil::SetPropertyInt32(env, signalInformation, "signalType", signalType);
             NapiUtil::SetPropertyInt32(env, signalInformation, "signalLevel", signalLevel);
+            NapiUtil::SetPropertyInt32(env, signalInformation, "dBm", signalIntensity);
             std::string name = "signalInformation";
             napi_set_named_property(env, info, name.c_str(), signalInformation);
             napi_set_named_property(env, info, "data", JudgmentData(env, infoItem, cellType));
