@@ -49,8 +49,9 @@ OperatorConfig OperatorConfigLoader::LoadOperatorConfig(int32_t slotId)
 
 std::string OperatorConfigLoader::LoadOpKeyOnMccMnc(int32_t slotId)
 {
-    int32_t simState = CoreManagerInner::GetInstance().GetSimState(slotId);
-    if (simState != static_cast<int32_t>(SimState::SIM_STATE_READY)) {
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    CoreManagerInner::GetInstance().GetSimState(slotId, simState);
+    if (simState != SimState::SIM_STATE_READY) {
         TELEPHONY_LOGE("LoadOpKeyOnMccMnc simState not ready");
         return DEFAULT_OPERATOR_KEY;
     }

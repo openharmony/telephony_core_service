@@ -65,7 +65,9 @@ void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             TELEPHONY_LOGE("is not current slotId");
             return;
         }
-        if (!CoreManagerInner::GetInstance().HasSimCard(slotId_)) {
+        bool hasSimCard = false;
+        CoreManagerInner::GetInstance().HasSimCard(slotId_, hasSimCard);
+        if (!hasSimCard) {
             TELEPHONY_LOGE("sim is not exist");
             return;
         }
