@@ -3992,8 +3992,10 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0200, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->GetPrimarySlotId(), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetPsRadioTech(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetCsRadioTech(0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetSimState(0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetCardType(0), TELEPHONY_ERR_SUCCESS);
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    EXPECT_NE(mCoreService->GetSimState(0, simState), TELEPHONY_ERR_SUCCESS);
+    CardType cardType = CardType::UNKNOWN_CARD;
+    EXPECT_NE(mCoreService->GetCardType(0, cardType), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetSlotId(1), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetSimId(0), TELEPHONY_ERR_SUCCESS);
 }
@@ -4012,9 +4014,9 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0300, Function | MediumTest | Level3
     EXPECT_EQ(mCoreService->GetSignalInfoList(0), mSignalInfoList);
     EXPECT_EQ(mCoreService->GetOperatorNumeric(0), testU16Str);
     EXPECT_EQ(mCoreService->GetOperatorName(0), testU16Str);
-    EXPECT_EQ(mCoreService->GetSimOperatorNumeric(0), testU16Str);
-    EXPECT_EQ(mCoreService->GetISOCountryCodeForSim(0), testU16Str);
-    EXPECT_EQ(mCoreService->GetSimSpn(0), testU16Str);
+    EXPECT_NE(mCoreService->GetSimOperatorNumeric(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetISOCountryCodeForSim(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetSimSpn(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(mCoreService->GetLocaleFromDefaultSim(), testU16Str);
     EXPECT_EQ(mCoreService->GetSimGid2(0), testU16Str);
     std::string plmn = "46001";
@@ -4029,8 +4031,9 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0300, Function | MediumTest | Level3
     EXPECT_FALSE(mCoreService->GetNetworkSelectionMode(0, callback));
     EXPECT_FALSE(mCoreService->IsNrSupported(0));
     EXPECT_FALSE(mCoreService->IsSimActive(0));
-    EXPECT_FALSE(mCoreService->HasSimCard(0));
-    EXPECT_FALSE(mCoreService->HasOperatorPrivileges(0));
+    bool hasValue = false;
+    EXPECT_NE(mCoreService->HasSimCard(0, hasValue), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->HasOperatorPrivileges(0, hasValue), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -4124,8 +4127,10 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0500, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->GetPrimarySlotId(), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetPsRadioTech(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetCsRadioTech(0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetSimState(0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetCardType(0), TELEPHONY_ERR_SUCCESS);
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    EXPECT_NE(mCoreService->GetSimState(0, simState), TELEPHONY_ERR_SUCCESS);
+    CardType cardType = CardType::UNKNOWN_CARD;
+    EXPECT_NE(mCoreService->GetCardType(0, cardType), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetSlotId(1), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetSimId(0), TELEPHONY_ERR_SUCCESS);
 }
@@ -4145,9 +4150,9 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0600, Function | MediumTest | Level3
     EXPECT_EQ(mCoreService->GetSignalInfoList(0), mSignalInfoList);
     EXPECT_EQ(mCoreService->GetOperatorNumeric(0), testU16Str);
     EXPECT_EQ(mCoreService->GetOperatorName(0), testU16Str);
-    EXPECT_EQ(mCoreService->GetSimOperatorNumeric(0), testU16Str);
-    EXPECT_EQ(mCoreService->GetISOCountryCodeForSim(0), testU16Str);
-    EXPECT_EQ(mCoreService->GetSimSpn(0), testU16Str);
+    EXPECT_NE(mCoreService->GetSimOperatorNumeric(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetISOCountryCodeForSim(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetSimSpn(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(mCoreService->GetLocaleFromDefaultSim(), testU16Str);
     EXPECT_EQ(mCoreService->GetSimGid2(0), testU16Str);
     std::string plmn = "46001";
@@ -4162,8 +4167,9 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0600, Function | MediumTest | Level3
     EXPECT_FALSE(mCoreService->GetNetworkSelectionMode(0, callback));
     EXPECT_FALSE(mCoreService->IsNrSupported(0));
     EXPECT_FALSE(mCoreService->IsSimActive(0));
-    EXPECT_FALSE(mCoreService->HasSimCard(0));
-    EXPECT_FALSE(mCoreService->HasOperatorPrivileges(0));
+    bool hasValue = false;
+    EXPECT_NE(mCoreService->HasSimCard(0, hasValue), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->HasOperatorPrivileges(0, hasValue), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
