@@ -143,10 +143,11 @@ bool MultiSimController::InitActive(int slotId)
 {
     bool result = true;
     if (!IsSimActive(slotId) && simStateManager_[slotId]->HasSimCard()) {
-        result = SetActiveSim(slotId, ACTIVE, true); // force set to database ACTIVE and avoid duplicate
+        // force set to database ACTIVE and avoid duplicate
+        result = (SetActiveSim(slotId, ACTIVE, true) == TELEPHONY_ERR_SUCCESS);
     }
     if (IsSimActive(slotId) && !simStateManager_[slotId]->HasSimCard()) {
-        if (result && SetActiveSim(slotId, DEACTIVE, true)) {
+        if (result && (SetActiveSim(slotId, DEACTIVE, true) == TELEPHONY_ERR_SUCCESS)) {
             result = true;
         } else {
             result = false;

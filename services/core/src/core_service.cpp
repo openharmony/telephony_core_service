@@ -292,57 +292,57 @@ NrMode CoreService::GetNrOptionMode(int32_t slotId)
     return networkSearchManager_->GetNrOptionMode(slotId);
 }
 
-bool CoreService::HasSimCard(int32_t slotId)
+int32_t CoreService::HasSimCard(int32_t slotId, bool &hasSimCard)
 {
     TELEPHONY_LOGI("CoreService::HasSimCard(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->HasSimCard(slotId);
+    return simManager_->HasSimCard(slotId, hasSimCard);
 }
 
-int32_t CoreService::GetSimState(int32_t slotId)
+int32_t CoreService::GetSimState(int32_t slotId, SimState &simState)
 {
     TELEPHONY_LOGI("CoreService::GetSimState(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
-        return TELEPHONY_ERROR;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    return simManager_->GetSimState(slotId);
+    return simManager_->GetSimState(slotId, simState);
 }
 
-int32_t CoreService::GetCardType(int32_t slotId)
+int32_t CoreService::GetCardType(int32_t slotId, CardType &cardType)
 {
     TELEPHONY_LOGI("CoreService::GetCardType(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
-        return TELEPHONY_ERROR;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    return simManager_->GetCardType(slotId);
+    return simManager_->GetCardType(slotId, cardType);
 }
 
-std::u16string CoreService::GetISOCountryCodeForSim(int32_t slotId)
+int32_t CoreService::GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode)
 {
     TELEPHONY_LOGI("CoreService::GetISOCountryCodeForSim(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
-        return std::u16string();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    return simManager_->GetISOCountryCodeForSim(slotId);
+    return simManager_->GetISOCountryCodeForSim(slotId, countryCode);
 }
 
-std::u16string CoreService::GetSimSpn(int32_t slotId)
+int32_t CoreService::GetSimSpn(int32_t slotId, std::u16string &spn)
 {
     TELEPHONY_LOGI("CoreService::GetSimSpn(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
-        return std::u16string();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetSimSpn(slotId);
+    return simManager_->GetSimSpn(slotId, spn);
 }
 
 int32_t CoreService::GetSimIccId(int32_t slotId, std::u16string &iccId)
@@ -359,14 +359,14 @@ int32_t CoreService::GetSimIccId(int32_t slotId, std::u16string &iccId)
     return simManager_->GetSimIccId(slotId, iccId);
 }
 
-std::u16string CoreService::GetSimOperatorNumeric(int32_t slotId)
+int32_t CoreService::GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric)
 {
     TELEPHONY_LOGI("CoreService::GetSimOperatorNumeric(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
-        return std::u16string();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetSimOperatorNumeric(slotId);
+    return simManager_->GetSimOperatorNumeric(slotId, operatorNumeric);
 }
 
 int32_t CoreService::GetIMSI(int32_t slotId, std::u16string &imsi)
@@ -1079,14 +1079,14 @@ bool CoreService::SendUpdateCellLocationRequest(int32_t slotId)
     return networkSearchManager_->SendUpdateCellLocationRequest(slotId);
 }
 
-bool CoreService::HasOperatorPrivileges(const int32_t slotId)
+int32_t CoreService::HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges)
 {
     TELEPHONY_LOGI("CoreService::HasOperatorPrivileges(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->HasOperatorPrivileges(slotId);
+    return simManager_->HasOperatorPrivileges(slotId, hasOperatorPrivileges);
 }
 
 int32_t CoreService::SimAuthentication(

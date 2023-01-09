@@ -64,17 +64,17 @@ public:
 
     NrMode GetNrOptionMode(int32_t slotId) override;
 
-    bool HasSimCard(int32_t slotId) override;
+    int32_t HasSimCard(int32_t slotId, bool &hasSimCard) override;
 
-    int32_t GetSimState(int32_t slotId) override;
+    int32_t GetSimState(int32_t slotId, SimState &simState) override;
 
-    int32_t GetCardType(int32_t slotId) override;
+    int32_t GetCardType(int32_t slotId, CardType &cardType) override;
 
-    std::u16string GetSimOperatorNumeric(int32_t slotId) override;
+    int32_t GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric) override;
 
-    std::u16string GetISOCountryCodeForSim(int32_t slotId) override;
+    int32_t GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode) override;
 
-    std::u16string GetSimSpn(int32_t slotId) override;
+    int32_t GetSimSpn(int32_t slotId, std::u16string &spn) override;
 
     int32_t GetSimIccId(int32_t slotId, std::u16string &iccId) override;
 
@@ -199,7 +199,7 @@ public:
 
     bool SendUpdateCellLocationRequest(int32_t slotId) override;
 
-    bool HasOperatorPrivileges(const int32_t slotId) override;
+    int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) override;
 
     int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
         SimAuthenticationResponse &response) override;

@@ -103,11 +103,11 @@ bool SimAccountManager::IsValidSlotIdForDefault(int32_t slotId)
     }
 }
 
-bool SimAccountManager::HasOperatorPrivileges(const int32_t slotId)
+int32_t SimAccountManager::HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges)
 {
     TELEPHONY_LOGI("SimAccountManager::HasOperatorPrivileges begin");
     if (privilegeController_ != nullptr) {
-        return privilegeController_->HasOperatorPrivileges();
+        return privilegeController_->HasOperatorPrivileges(hasOperatorPrivileges);
     }
     if (privilegesRunner_.get() == nullptr) {
         TELEPHONY_LOGE("make privilegesRunner_");
@@ -115,17 +115,17 @@ bool SimAccountManager::HasOperatorPrivileges(const int32_t slotId)
     }
     if ((privilegesRunner_ == nullptr) || (telRilManager_ == nullptr) || (simStateManager_ == nullptr)) {
         TELEPHONY_LOGE("has nullptr at privilegesRunner_ or telRilManager_ or simStateManager_");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     auto controller =
         std::make_shared<IccOperatorPrivilegeController>(privilegesRunner_, telRilManager_, simStateManager_);
     if (controller == nullptr) {
         TELEPHONY_LOGE("Make IccOperatorPrivilegeController fail!!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     controller->Init(slotId);
     privilegeController_ = controller;
-    return controller->HasOperatorPrivileges();
+    return controller->HasOperatorPrivileges(hasOperatorPrivileges);
 }
 } // namespace Telephony
 } // namespace OHOS
