@@ -20,20 +20,27 @@
 #include "core_manager_inner.h"
 #include "csim_file_controller.h"
 #include "gtest/gtest.h"
+#include "isim_file_controller.h"
+#include "multi_sim_controller.h"
 #include "network_register.h"
 #include "network_search_manager.h"
 #include "network_search_state.h"
 #include "operator_name.h"
 #include "radio_protocol_controller.h"
+#include "ruim_file_controller.h"
+#include "sim_file_controller.h"
 #include "sim_file_manager.h"
 #include "sim_manager.h"
+#include "sim_sms_controller.h"
 #include "sim_state_manager.h"
 #include "stk_controller.h"
 #include "stk_manager.h"
+#include "tag_service.h"
 #include "tel_ril_manager.h"
 #include "telephony_errors.h"
 #include "telephony_hisysevent.h"
 #include "telephony_log_wrapper.h"
+#include "usim_file_controller.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -753,6 +760,172 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_005, Function | MediumTest | Lev
 }
 
 /**
+ * @tc.number   Telephony_CoreManagerInner_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CoreManagerInner_006, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    event = nullptr;
+    EXPECT_GT(mInner.GetClip(0, event), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.SetClip(0, 0, event), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetClir(0, event), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.SetClir(0, 0, event), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.SetCallWaiting(0, 0, event), TELEPHONY_ERR_SUCCESS);
+    CallTransferParam mCallTransferParam;
+    EXPECT_GT(mInner.SetCallTransferInfo(0, mCallTransferParam, event), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetCallTransferInfo(0, 0, event), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetCallWaiting(0, event), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetCallRestriction(0, "", event), TELEPHONY_ERR_SUCCESS);
+    CallRestrictionParam mCallRestrictionParam;
+    EXPECT_GT(mInner.SetCallRestriction(0, mCallRestrictionParam, event), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_TagService_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_TagService_001, Function | MediumTest | Level1)
+{
+    std::vector<uint8_t> parameter = {};
+    std::string testEmptyStr = "";
+    std::string testStr = "12345";
+    std::string testCnStr = "123456";
+    std::shared_ptr<TagService> tagService = std::make_shared<TagService>(testEmptyStr);
+    std::shared_ptr<TagService> tagService1 = std::make_shared<TagService>(testStr);
+    std::shared_ptr<TagService> tagService2 = std::make_shared<TagService>(testCnStr);
+    EXPECT_NE(tagService->GetTagCode(), 1);
+    EXPECT_NE(tagService1->GetTagCode(), 1);
+    EXPECT_NE(tagService2->GetTagCode(), 1);
+    EXPECT_FALSE(tagService->Next());
+    EXPECT_FALSE(tagService1->Next());
+    EXPECT_FALSE(tagService2->Next());
+}
+
+/**
+ * @tc.number   Telephony_SimSmsController_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SimSmsController_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->OnInit();
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("SimSmsController");
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::SimSmsController> simSmsController =
+        std::make_shared<SimSmsController>(runner, simStateManager);
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    auto eventGet = simSmsController->BuildCallerInfo(SIM_SMS_GET_COMPLETED);
+    auto eventUpdate = simSmsController->BuildCallerInfo(SIM_SMS_UPDATE_COMPLETED);
+    auto eventWrite = simSmsController->BuildCallerInfo(SIM_SMS_WRITE_COMPLETED);
+    auto eventDelete = simSmsController->BuildCallerInfo(SIM_SMS_DELETE_COMPLETED);
+    simSmsController->ProcessLoadDone(event);
+    simSmsController->ProcessUpdateDone(event);
+    simSmsController->ProcessWriteDone(event);
+    simSmsController->ProcessDeleteDone(event);
+    simSmsController->ProcessDeleteDone(event);
+    simSmsController->ProcessEvent(event);
+    simSmsController->ProcessEvent(eventGet);
+    simSmsController->ProcessEvent(eventUpdate);
+    simSmsController->ProcessEvent(eventWrite);
+    simSmsController->ProcessEvent(eventDelete);
+    std::shared_ptr<Telephony::SimFileManager> simFileManager =
+        std::make_shared<SimFileManager>(runner, telRilManager, simStateManager);
+    simSmsController->SetRilAndFileManager(telRilManager, simFileManager);
+    simFileManager = nullptr;
+    simSmsController->SetRilAndFileManager(telRilManager, simFileManager);
+    telRilManager = nullptr;
+    simSmsController->SetRilAndFileManager(telRilManager, simFileManager);
+    std::string smsc = "";
+    std::string pdu = "";
+    EXPECT_FALSE(simSmsController->IsCdmaCardType());
+}
+
+/**
+ * @tc.number   Telephony_MultiSimController_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("MultiSimController");
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager, runner);
+    multiSimController->SortCache();
+    std::shared_ptr<RadioProtocolController> radioProtocolController = nullptr;
+    EXPECT_FALSE(multiSimController->InitData(0));
+    EXPECT_FALSE(multiSimController->SetDefaultSmsSlotId(0));
+    EXPECT_FALSE(multiSimController->RefreshActiveIccAccountInfoList());
+    EXPECT_FALSE(multiSimController->IsSimActive(0));
+    EXPECT_FALSE(multiSimController->IsSimActivatable(0));
+    EXPECT_FALSE(multiSimController->ForgetAllData());
+    EXPECT_FALSE(multiSimController->ForgetAllData(0));
+    EXPECT_FALSE(multiSimController->IsValidData(0));
+    EXPECT_TRUE(multiSimController->AnnounceDefaultMainSlotIdChanged(0));
+    EXPECT_TRUE(multiSimController->AnnounceDefaultVoiceSlotIdChanged(0));
+    EXPECT_TRUE(multiSimController->AnnounceDefaultSmsSlotIdChanged(0));
+    EXPECT_TRUE(multiSimController->AnnounceDefaultCellularDataSlotIdChanged(0));
+    AAFwk::Want want;
+    EXPECT_FALSE(multiSimController->PublishSimFileEvent(want, 0, ""));
+    EXPECT_FALSE(multiSimController->InitShowName(0));
+    EXPECT_FALSE(multiSimController->InitShowNumber(0));
+    EXPECT_FALSE(multiSimController->InitIccId(0));
+    EXPECT_FALSE(multiSimController->GetListFromDataBase());
+    EXPECT_FALSE(multiSimController->SetIccId(0, u""));
+}
+
+/**
+ * @tc.number   Telephony_MultiSimController_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | Level1)
+{
+    std::u16string testU16Str = u"";
+    std::string testStr = "";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("MultiSimController");
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager, runner);
+    multiSimController->GetDefaultVoiceSlotId();
+    EXPECT_NE(multiSimController->SetDefaultVoiceSlotId(0), TELEPHONY_ERR_SUCCESS);
+    multiSimController->GetDefaultSmsSlotId();
+    IccAccountInfo mIccAccountInfo;
+    EXPECT_NE(multiSimController->GetSimAccountInfo(0, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
+    multiSimController->GetDefaultCellularDataSlotId();
+    EXPECT_NE(multiSimController->SetDefaultCellularDataSlotId(0), TELEPHONY_ERR_SUCCESS);
+    multiSimController->GetPrimarySlotId();
+    multiSimController->SetPrimarySlotId(0);
+    EXPECT_NE(multiSimController->GetShowNumber(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->SetShowNumber(0, testU16Str, false), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->GetShowName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->SetShowName(0, testU16Str, false), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->SetActiveSim(0, 1, false), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->GetSlotId(1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->SaveImsSwitch(0, 1), TELEPHONY_ERR_SUCCESS);
+    int32_t imsSwitchValue;
+    EXPECT_NE(multiSimController->QueryImsSwitch(0, imsSwitchValue), TELEPHONY_ERR_SUCCESS);
+    std::vector<IccAccountInfo> iccAccountInfoList = {};
+    EXPECT_NE(multiSimController->GetActiveSimAccountInfoList(iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
+    multiSimController->radioProtocolController_ = nullptr;
+    EXPECT_NE(multiSimController->GetRadioProtocolTech(0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->GetFirstActivedSlotId(), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->UpdateDataByIccId(0, testStr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->InsertData(0, testStr), TELEPHONY_ERR_SUCCESS);
+    multiSimController->GetDefaultCellularDataSlotIdUnit();
+    EXPECT_EQ(multiSimController->GetIccId(0), u"");
+}
+
+/**
  * @tc.number   Telephony_SimManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1375,6 +1548,37 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
 }
 
 /**
+ * @tc.number   Telephony_SimFileController_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SimFileController_001, Function | MediumTest | Level1)
+{
+    auto runner = AppExecFwk::EventRunner::Create("test");
+    auto simFileController = std::make_shared<SimFileController>(runner, INVALID_SLOTID);
+    EXPECT_EQ(simFileController->ObtainElementFilePath(0), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_SMS), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_VOICE_MAIL_INDICATOR_CPHS), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_CFF_CPHS), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_SPN_CPHS), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_INFO_CPHS), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_MAILBOX_CPHS), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_SPN_SHORT_CPHS), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_SST), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_GID1), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_GID2), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_SPN), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_AD), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_PNN), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_MBDN), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_EXT6), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_MBI), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_MWIS), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_CFIS), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_CSP_CPHS), "");
+}
+
+/**
  * @tc.number   Telephony_CsimFileController_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1383,6 +1587,7 @@ HWTEST_F(BranchTest, Telephony_CsimFileController_001, Function | MediumTest | L
 {
     auto runner = AppExecFwk::EventRunner::Create("test");
     auto csimFileController = std::make_shared<CsimFileController>(runner, INVALID_SLOTID);
+    EXPECT_NE(csimFileController->ObtainElementFilePath(0), "");
     EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_SMS), "");
     EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CST), "");
     EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_FDN), "");
@@ -1395,6 +1600,92 @@ HWTEST_F(BranchTest, Telephony_CsimFileController_001, Function | MediumTest | L
     EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CSIM_EPRL), "");
     EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CSIM_MIPUPP), "");
     EXPECT_NE(csimFileController->ObtainElementFilePath(ELEMENTARY_FILE_PCSCF), "");
+}
+
+/**
+ * @tc.number   Telephony_RuimFileController_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_RuimFileController_001, Function | MediumTest | Level1)
+{
+    auto runner = AppExecFwk::EventRunner::Create("test");
+    auto rUimFileController = std::make_shared<RuimFileController>(runner, INVALID_SLOTID);
+    EXPECT_EQ(rUimFileController->ObtainElementFilePath(0), "");
+    EXPECT_NE(rUimFileController->ObtainElementFilePath(ELEMENTARY_FILE_SMS), "");
+    EXPECT_NE(rUimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CST), "");
+    EXPECT_NE(rUimFileController->ObtainElementFilePath(ELEMENTARY_FILE_RUIM_SPN), "");
+    EXPECT_NE(rUimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CSIM_LI), "");
+    EXPECT_NE(rUimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CSIM_MDN), "");
+    EXPECT_NE(rUimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CSIM_IMSIM), "");
+    EXPECT_NE(rUimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CSIM_CDMAHOME), "");
+    EXPECT_NE(rUimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CSIM_EPRL), "");
+}
+
+/**
+ * @tc.number   Telephony_IsimFileController_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_IsimFileController_001, Function | MediumTest | Level1)
+{
+    auto runner = AppExecFwk::EventRunner::Create("test");
+    auto iSimFileController = std::make_shared<IsimFileController>(runner, INVALID_SLOTID);
+    EXPECT_EQ(iSimFileController->ObtainElementFilePath(0), "");
+    EXPECT_NE(iSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_IMPI), "");
+    EXPECT_NE(iSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_IMPU), "");
+    EXPECT_NE(iSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_DOMAIN), "");
+    EXPECT_NE(iSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_IST), "");
+    EXPECT_NE(iSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_PCSCF), "");
+}
+
+/**
+ * @tc.number   Telephony_UsimFileController_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_UsimFileController_001, Function | MediumTest | Level1)
+{
+    auto runner = AppExecFwk::EventRunner::Create("test");
+    auto uSimFileController = std::make_shared<UsimFileController>(runner, INVALID_SLOTID);
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(0), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_IMPI), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_SMS), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_EXT5), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_EXT6), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_MWIS), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_MBI), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_SPN), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_AD), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_MBDN), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_PNN), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_OPL), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_SPDI), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_SST), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CFIS), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_MAILBOX_CPHS), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_VOICE_MAIL_INDICATOR_CPHS), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CFF_CPHS), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_SPN_CPHS), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_SPN_SHORT_CPHS), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_FDN), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_SDN), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_EXT3), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_MSISDN), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_EXT2), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_INFO_CPHS), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CSP_CPHS), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_GID1), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_GID2), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_LI), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_PLMN_W_ACT), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_OPLMN_W_ACT), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_HPLMN_W_ACT), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_EHPLMN), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_FPLMN), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_LRPLMNSI), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_HPPLMN), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_PBR), "");
 }
 
 /**
