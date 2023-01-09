@@ -23,8 +23,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "enum_convert_for_js.h"
 #include "core_service_errors.h"
+#include "enum_convert_for_js.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -38,7 +38,6 @@ static constexpr const char *JS_ERROR_DEVICE_NOT_SUPPORT_THIS_API_STRING = "The 
 static constexpr const char *JS_ERROR_TELEPHONY_SUCCESS_STRING = "Success.";
 static constexpr const char *JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING = "Invalid parameter value.";
 static constexpr const char *JS_ERROR_TELEPHONY_SERVICE_ERROR_STRING = "Operation failed. Cannot connect to service.";
-static constexpr const char *JS_ERROR_TELEPHONY_RIL_ERROR_STRING = "Operation failed. RIL command error.";
 static constexpr const char *JS_ERROR_TELEPHONY_SYSTEM_ERROR_STRING = "System internal error.";
 static constexpr const char *JS_ERROR_TELEPHONY_NO_SIM_CARD_STRING = "Do not have sim card.";
 static constexpr const char *JS_ERROR_TELEPHONY_UNKNOW_ERROR_STRING = "Unknown error code.";
@@ -48,7 +47,6 @@ static constexpr const char *JS_ERROR_SIM_CARD_OPERATION_ERROR_STRING = "SIM car
 static constexpr const char *JS_ERROR_OPERATOR_CONFIG_ERROR_STRING = "Operator config error.";
 static constexpr const char *JS_ERROR_NETWORK_SEARCH_BASE_ERROR_STRING = "Network search module base error.";
 static constexpr const char *JS_ERROR_CALL_MANAGER_BASE_ERROR_STRING = "Call manager module base error.";
-static constexpr const char *JS_ERROR_CALL_DIAL_POLICY_NOT_MET_STRING = "The dialing policy is not met.";
 static constexpr const char *JS_ERROR_CALL_WRONG_MOBILE_NUMBER_STRING = "Wrong mobile number format.";
 static constexpr const char *JS_ERROR_CALL_ABNORMAL_CALL_STATUS_STRING = "Abnormal call status.";
 static constexpr const char *JS_ERROR_CALL_ABNORMAL_CONFERENCE_CALL_STRING = "Abnormal conference call.";
@@ -72,7 +70,6 @@ static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_SUCCESS, JS_ERROR_TELEPHONY_SUCCESS_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_ARGUMENT_ERROR, JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_SERVICE_ERROR, JS_ERROR_TELEPHONY_SERVICE_ERROR_STRING },
-    { JsErrorCode::JS_ERROR_TELEPHONY_RIL_ERROR, JS_ERROR_TELEPHONY_RIL_ERROR_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_SYSTEM_ERROR, JS_ERROR_TELEPHONY_SYSTEM_ERROR_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_NO_SIM_CARD, JS_ERROR_TELEPHONY_NO_SIM_CARD_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_UNKNOW_ERROR, JS_ERROR_TELEPHONY_UNKNOW_ERROR_STRING },
@@ -82,7 +79,6 @@ static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_OPERATOR_CONFIG_ERROR, JS_ERROR_OPERATOR_CONFIG_ERROR_STRING },
     { JsErrorCode::JS_ERROR_NETWORK_SEARCH_BASE_ERROR, JS_ERROR_NETWORK_SEARCH_BASE_ERROR_STRING },
     { JsErrorCode::JS_ERROR_CALL_MANAGER_BASE_ERROR, JS_ERROR_CALL_MANAGER_BASE_ERROR_STRING },
-    { JsErrorCode::JS_ERROR_CALL_DIAL_POLICY_NOT_MET, JS_ERROR_CALL_DIAL_POLICY_NOT_MET_STRING },
     { JsErrorCode::JS_ERROR_CALL_WRONG_MOBILE_NUMBER, JS_ERROR_CALL_WRONG_MOBILE_NUMBER_STRING },
     { JsErrorCode::JS_ERROR_CALL_ABNORMAL_CALL_STATUS, JS_ERROR_CALL_ABNORMAL_CALL_STATUS_STRING },
     { JsErrorCode::JS_ERROR_CALL_ABNORMAL_CALL_TYPE, JS_ERROR_CALL_ABNORMAL_CALL_TYPE_STRING },
@@ -447,23 +443,12 @@ bool NapiUtil::CreateParameterErrorMessageForJs(int32_t errorCode, JsErrorCode &
 
 bool NapiUtil::CreateNetworkSearchErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode)
 {
-    if ((errorCode < CORE_SERVICE_NETWORK_SEARCH_ERR_OFFSET || errorCode >= CORE_SERVICE_SIM_ERR_OFFSET)) {
+    if ((errorCode < CORE_SERVICE_NETWORK_SEARCH_ERR_OFFSET || errorCode >= CORE_SERVICE_CORE_ERR_OFFSET)) {
         return false;
     }
     bool flag = true;
     switch (errorCode) {
-        case CORE_SERVICE_EMPTY_IMEI:
-            jsErrorCode = JS_ERROR_NETWORK_SEARCH_EMPTY_IMEI;
-            break;
-        case CORE_SERVICE_EMPTY_MEID:
-            jsErrorCode = JS_ERROR_NETWORK_SEARCH_EMPTY_MEID;
-            break;
-        case CORE_SERVICE_INTERVAL_TIME_TOO_SHORT:
-            jsErrorCode = JS_ERROR_NETWORK_SEARCH_INTERVAL_TIME_TOO_SHORT;
-            break;
         case CORE_SERVICE_SEND_CALLBACK_FAILED:
-            jsErrorCode = JS_ERROR_TELEPHONY_SYSTEM_ERROR;
-            break;
         case CORE_SERVICE_RADIO_PROTOCOL_TECH_UNKNOWN:
             jsErrorCode = JS_ERROR_TELEPHONY_SYSTEM_ERROR;
             break;
@@ -526,9 +511,6 @@ bool NapiUtil::CreateCommonErrorMessageForJs(int32_t errorCode, JsErrorCode &jsE
         case TELEPHONY_ERR_UNREGISTER_CALLBACK_FAIL:
             jsErrorCode = JS_ERROR_TELEPHONY_SERVICE_ERROR;
             break;
-        case TELEPHONY_ERR_RIL_CMD_FAIL:
-            jsErrorCode = JS_ERROR_TELEPHONY_RIL_ERROR;
-            break;
         case TELEPHONY_ERR_FAIL:
         case TELEPHONY_ERR_MEMCPY_FAIL:
         case TELEPHONY_ERR_MEMSET_FAIL:
@@ -538,12 +520,17 @@ bool NapiUtil::CreateCommonErrorMessageForJs(int32_t errorCode, JsErrorCode &jsE
         case TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL:
         case TELEPHONY_ERR_ADD_DEATH_RECIPIENT_FAIL:
         case TELEPHONY_ERR_STRTOINT_FAIL:
+        case TELEPHONY_ERR_RIL_CMD_FAIL:
         case TELEPHONY_ERR_DATABASE_WRITE_FAIL:
         case TELEPHONY_ERR_DATABASE_READ_FAIL:
+        case TELEPHONY_ERR_UNKNOWN_NETWORK_TYPE:
             jsErrorCode = JS_ERROR_TELEPHONY_SYSTEM_ERROR;
             break;
         case TELEPHONY_ERR_NO_SIM_CARD:
             jsErrorCode = JS_ERROR_TELEPHONY_NO_SIM_CARD;
+            break;
+        case TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API:
+            jsErrorCode = JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API;
             break;
         default:
             flag = false;
@@ -597,6 +584,9 @@ bool NapiUtil::CreateCommonCallErrorMessageForJs(int32_t errorCode, JsErrorCode 
         case CALL_ERR_VOLTE_PROVISIONING_DISABLED:
             jsErrorCode = JS_ERROR_CALL_VOLTE_NOT_SUPPORT_OR_DISABLED;
             break;
+        case CALL_ERR_FORMAT_PHONE_NUMBER_FAILED:
+            jsErrorCode = JS_ERROR_TELEPHONY_ARGUMENT_ERROR;
+            break;
         default:
             flag = false;
             break;
@@ -640,11 +630,20 @@ bool NapiUtil::CreateSupplementServiceCallErrorMessageForJs(int32_t errorCode, J
         case CALL_ERR_INVALID_RESTRICTION_MODE:
         case CALL_ERR_INVALID_TRANSFER_TYPE:
         case CALL_ERR_INVALID_TRANSFER_SETTING_TYPE:
-        case CALL_ERR_INVALID_TRANSFER_TIME:
-            jsErrorCode = JS_ERROR_SUPPLEMENTARY_SERVICE_EXCEPTION;
+            jsErrorCode = JS_ERROR_TELEPHONY_ARGUMENT_ERROR;
             break;
         case CALL_ERR_FUNCTION_NOT_SUPPORTED:
             jsErrorCode = JS_ERROR_DEVICE_NOT_SUPPORT_THIS_API;
+            break;
+        case CALL_ERR_INVALID_TRANSFER_TIME:
+        case CALL_ERR_NAPI_INTERFACE_FAILED:
+        case CALL_ERR_CALLBACK_ALREADY_EXIST:
+        case CALL_ERR_RESOURCE_UNAVAILABLE:
+            jsErrorCode = JS_ERROR_TELEPHONY_SYSTEM_ERROR;
+            break;
+        case CALL_ERR_UT_NO_CONNECTION:
+            jsErrorCode = JS_ERROR_CALL_UT_NO_CONNECTION;
+            break;
         default:
             flag = false;
             break;
