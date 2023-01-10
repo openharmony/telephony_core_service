@@ -333,11 +333,15 @@ int32_t SimManager::SetDefaultCellularDataSlotId(int32_t slotId)
     return ret;
 }
 
-bool SimManager::SetPrimarySlotId(int32_t slotId)
+int32_t SimManager::SetPrimarySlotId(int32_t slotId)
 {
-    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
-        return false;
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("slotId is invalid for default.");
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr.");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return multiSimController_->SetPrimarySlotId(slotId);
 }

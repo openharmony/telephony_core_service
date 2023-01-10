@@ -126,7 +126,7 @@ public:
 
     bool OnInit() override;
     void SetRadioState(int32_t slotId, bool isOn, int32_t rst) override;
-    bool SetRadioState(int32_t slotId, bool isOn, int32_t rst, NSCALLBACK &callback) override;
+    int32_t SetRadioState(int32_t slotId, bool isOn, int32_t rst, NSCALLBACK &callback) override;
     int32_t GetRadioState(int32_t slotId) override;
     bool GetRadioState(int32_t slotId, NSCALLBACK &callback) override;
     int32_t GetPsRadioTech(int32_t slotId) override;
@@ -141,29 +141,29 @@ public:
     void UnRegisterCellularDataObject(const sptr<NetworkSearchCallBackBase> &callback) override;
     void RegisterCellularCallObject(const sptr<NetworkSearchCallBackBase> &callback) override;
     void UnRegisterCellularCallObject(const sptr<NetworkSearchCallBackBase> &callback) override;
-    bool GetNetworkSearchInformation(int32_t slotId, NSCALLBACK &callback) override;
+    int32_t GetNetworkSearchInformation(int32_t slotId, NSCALLBACK &callback) override;
     bool GetNetworkSelectionMode(int32_t slotId, NSCALLBACK &callback) override;
-    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode, const sptr<NetworkInformation> &networkInformation,
-        bool resumeSelection, NSCALLBACK &callback) override;
-    bool GetPreferredNetwork(int32_t slotId, NSCALLBACK &callback) override;
-    bool SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback) override;
+    int32_t SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
+        const sptr<NetworkInformation> &networkInformation, bool resumeSelection, NSCALLBACK &callback) override;
+    int32_t GetPreferredNetwork(int32_t slotId, NSCALLBACK &callback) override;
+    int32_t SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback) override;
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) override;
-    std::u16string GetImei(int32_t slotId) override;
+    int32_t GetImei(int32_t slotId, std::u16string &imei) override;
     int32_t GetPsRegState(int32_t slotId) override;
     int32_t GetCsRegState(int32_t slotId) override;
     int32_t GetPsRoamingState(int32_t slotId) override;
-    std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) override;
-    bool SendUpdateCellLocationRequest(int32_t slotId) override;
+    int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) override;
+    int32_t SendUpdateCellLocationRequest(int32_t slotId) override;
     sptr<CellLocation> GetCellLocation(int32_t slotId) override;
     int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) override;
     PhoneType GetPhoneType(int32_t slotId) override;
-    std::u16string GetMeid(int32_t slotId) override;
-    std::u16string GetUniqueDeviceId(int32_t slotId) override;
+    int32_t GetMeid(int32_t slotId, std::u16string &meid) override;
+    int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) override;
     bool IsNrSupported(int32_t slotId) override;
     FrequencyType GetFrequencyType(int32_t slotId) override;
     NrState GetNrState(int32_t slotId) override;
     void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive) override;
-    NrMode GetNrOptionMode(int32_t slotId) override;
+    int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) override;
     int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName,
         const sptr<ImsRegInfoCallback> &callback) override;
     int32_t UnregisterImsRegInfoCallback(

@@ -535,7 +535,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_001, Function | MediumTest | Lev
     EXPECT_FALSE(mInner.IsInitFinishedForTelRil());
     EXPECT_EQ(mInner.GetDefaultSlotId(), 0);
     EXPECT_GT(mInner.GetMaxSimCount(), 0);
-    EXPECT_FALSE(mInner.SetRadioState(0, 0, 0, nullptr));
+    EXPECT_GT(mInner.SetRadioState(0, 0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetRadioState(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.ShutDown(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.Dial(0, 0, "", 0, nullptr), TELEPHONY_ERR_SUCCESS);
@@ -638,27 +638,35 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_003, Function | MediumTest | Lev
     sptr<NetworkInformation> networkInfo = new (std::nothrow) NetworkInformation();
     sptr<INetworkSearchCallback> callback = nullptr;
     EXPECT_FALSE(mInner.SetNetworkSelectionMode(0, 1, networkInfo, true, callback));
-    EXPECT_FALSE(mInner.SetRadioState(0, true, 0, callback));
+    EXPECT_NE(mInner.SetRadioState(0, true, 0, callback), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(mInner.GetRadioState(0, callback));
-    EXPECT_FALSE(mInner.GetNetworkSearchInformation(0, callback));
+    EXPECT_NE(mInner.GetNetworkSearchInformation(0, callback), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(mInner.GetNetworkSelectionMode(0, callback));
-    EXPECT_FALSE(mInner.GetPreferredNetwork(0, callback));
-    EXPECT_FALSE(mInner.SetPreferredNetwork(0, 0, callback));
+    EXPECT_NE(mInner.GetPreferredNetwork(0, callback), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mInner.SetPreferredNetwork(0, 0, callback), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(mInner.GetSignalInfoList(0), std::vector<sptr<SignalInformation>>());
-    EXPECT_EQ(mInner.GetCellInfoList(0), std::vector<sptr<CellInformation>>());
+    std::vector<sptr<CellInformation>> cellInfo;
+    EXPECT_EQ(mInner.GetCellInfoList(0, cellInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    ASSERT_TRUE(cellInfo.empty());
     EXPECT_EQ(mInner.GetOperatorNumeric(0), std::u16string());
     EXPECT_EQ(mInner.GetOperatorName(0), std::u16string());
     EXPECT_EQ(mInner.GetIsoCountryCodeForNetwork(0), std::u16string());
-    EXPECT_EQ(mInner.GetImei(0), std::u16string());
-    EXPECT_EQ(mInner.GetMeid(0), std::u16string());
-    EXPECT_EQ(mInner.GetUniqueDeviceId(0), std::u16string());
+    std::u16string result = u"";
+    EXPECT_NE(mInner.GetImei(0, result), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(result, std::u16string());
+    EXPECT_NE(mInner.GetMeid(0, result), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(result, std::u16string());
+    EXPECT_NE(mInner.GetUniqueDeviceId(0, result), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(result, std::u16string());
     EXPECT_EQ(mInner.GetNetworkStatus(0), nullptr);
     EXPECT_EQ(mInner.GetCellLocation(0), nullptr);
     EXPECT_EQ(mInner.GetPhoneType(0), PhoneType::PHONE_TYPE_IS_NONE);
-    EXPECT_EQ(mInner.GetNrOptionMode(0), NrMode::NR_MODE_UNKNOWN);
+    NrMode mode = NrMode::NR_MODE_UNKNOWN;
+    EXPECT_NE(mInner.GetNrOptionMode(0, mode), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(mode, NrMode::NR_MODE_UNKNOWN);
     EXPECT_EQ(mInner.GetFrequencyType(0), FrequencyType::FREQ_TYPE_UNKNOWN);
     EXPECT_EQ(mInner.GetNrState(0), NrState::NR_STATE_NOT_SUPPORT);
-    EXPECT_FALSE(mInner.SendUpdateCellLocationRequest(0));
+    EXPECT_NE(mInner.SendUpdateCellLocationRequest(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(mInner.IsNrSupported(0));
 }
 
@@ -1360,22 +1368,29 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     sptr<INetworkSearchCallback> networkSearchCallback = nullptr;
     networkSearchManager->SetRadioState(INVALID_SLOTID, true, 1);
     EXPECT_EQ(networkSearchManager->GetRadioState(INVALID_SLOTID), ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
-    EXPECT_FALSE(networkSearchManager->GetNetworkSearchInformation(INVALID_SLOTID, networkSearchCallback));
+    EXPECT_NE(networkSearchManager->GetNetworkSearchInformation(INVALID_SLOTID, networkSearchCallback),
+        TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(networkSearchManager->SetNetworkSelectionMode(INVALID_SLOTID, 1, networkInfo, true));
-    EXPECT_FALSE(networkSearchManager->GetPreferredNetwork(INVALID_SLOTID, networkSearchCallback));
-    EXPECT_FALSE(networkSearchManager->SetPreferredNetwork(INVALID_SLOTID, 1, networkSearchCallback));
+    EXPECT_NE(networkSearchManager->GetPreferredNetwork(INVALID_SLOTID, networkSearchCallback), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(
+        networkSearchManager->SetPreferredNetwork(INVALID_SLOTID, 1, networkSearchCallback), TELEPHONY_ERR_SUCCESS);
+    std::u16string result = u"";
     EXPECT_EQ(networkSearchManager->GetIsoCountryCodeForNetwork(INVALID_SLOTID), testStr);
-    EXPECT_EQ(networkSearchManager->GetImei(INVALID_SLOTID), testStr);
+    EXPECT_NE(networkSearchManager->GetImei(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(result, testStr);
     EXPECT_EQ(networkSearchManager->GetImsRegStatus(INVALID_SLOTID, ImsServiceType::TYPE_SMS, info),
         TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(networkSearchManager->GetUniqueDeviceId(INVALID_SLOTID), testStr);
-    EXPECT_EQ(networkSearchManager->GetMeid(INVALID_SLOTID), testStr);
+    EXPECT_NE(networkSearchManager->GetUniqueDeviceId(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(result, testStr);
+    EXPECT_NE(networkSearchManager->GetMeid(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(result, testStr);
     EXPECT_FALSE(networkSearchManager->IsNrSupported(INVALID_SLOTID));
+    NrMode mode = NrMode::NR_MODE_UNKNOWN;
+    EXPECT_NE(networkSearchManager->GetNrOptionMode(INVALID_SLOTID, mode), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(mode, NrMode::NR_MODE_UNKNOWN);
     networkSearchManager->AddManagerInner(INVALID_SLOTID, inner);
     EXPECT_EQ(networkSearchManager->GetFrequencyType(INVALID_SLOTID), FrequencyType::FREQ_TYPE_UNKNOWN);
-    EXPECT_EQ(networkSearchManager->GetNrOptionMode(INVALID_SLOTID), NrMode::NR_MODE_UNKNOWN);
     EXPECT_EQ(networkSearchManager->GetNrState(INVALID_SLOTID), NrState::NR_STATE_NOT_SUPPORT);
-    EXPECT_EQ(networkSearchManager->GetUniqueDeviceId(INVALID_SLOTID), testStr);
     EXPECT_EQ(networkSearchManager->GetPsRegState(INVALID_SLOTID), TELEPHONY_ERROR);
     EXPECT_EQ(networkSearchManager->GetCsRegState(INVALID_SLOTID), TELEPHONY_ERROR);
     EXPECT_EQ(networkSearchManager->GetPsRoamingState(INVALID_SLOTID), TELEPHONY_ERROR);
@@ -1388,8 +1403,10 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     EXPECT_EQ(networkSearchManager->GetOperatorName(INVALID_SLOTID), testStr);
     EXPECT_TRUE(networkSearchManager->GetNetworkStatus(INVALID_SLOTID) == nullptr);
     EXPECT_TRUE(networkSearchManager->GetSignalInfoList(INVALID_SLOTID).empty());
-    EXPECT_TRUE(networkSearchManager->GetCellInfoList(INVALID_SLOTID).empty());
-    EXPECT_FALSE(networkSearchManager->SendUpdateCellLocationRequest(INVALID_SLOTID));
+    std::vector<sptr<CellInformation>> cellInfo;
+    networkSearchManager->GetCellInfoList(INVALID_SLOTID, cellInfo);
+    EXPECT_TRUE(cellInfo.empty());
+    EXPECT_NE(networkSearchManager->SendUpdateCellLocationRequest(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
     EXPECT_TRUE(networkSearchManager->GetCellLocation(INVALID_SLOTID) == nullptr);
 }
 

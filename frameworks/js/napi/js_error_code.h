@@ -70,11 +70,6 @@ enum JsErrorCode {
     JS_ERROR_TELEPHONY_NO_SIM_CARD,
 
     /**
-     * Operation failed. RIL command error.
-     */
-    JS_ERROR_TELEPHONY_RIL_ERROR,
-
-    /**
      * Unknown error code.
      */
     JS_ERROR_TELEPHONY_UNKNOW_ERROR = 8300999,
@@ -105,16 +100,6 @@ enum JsErrorCode {
     JS_ERROR_NETWORK_SEARCH_BASE_ERROR = 8302000,
 
     /**
-     * IMEI is empty.
-     */
-    JS_ERROR_NETWORK_SEARCH_EMPTY_IMEI,
-
-    /**
-     * MEID is empty.
-     */
-    JS_ERROR_NETWORK_SEARCH_EMPTY_MEID,
-
-    /**
      * Interval time is too short.
      */
     JS_ERROR_NETWORK_SEARCH_INTERVAL_TIME_TOO_SHORT,
@@ -125,9 +110,9 @@ enum JsErrorCode {
     JS_ERROR_CALL_MANAGER_BASE_ERROR = 8401000,
 
     /**
-     * The dialing policy is not met.
+     * UT is not connected.
      */
-    JS_ERROR_CALL_DIAL_POLICY_NOT_MET,
+    JS_ERROR_CALL_UT_NO_CONNECTION,
 
     /**
      * Wrong mobile number format.

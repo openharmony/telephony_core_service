@@ -192,26 +192,26 @@ public:
     std::u16string GetOperatorNumeric(int32_t slotId);
     std::u16string GetOperatorName(int32_t slotId);
     sptr<NetworkState> GetNetworkStatus(int32_t slotId);
-    bool SetRadioState(int32_t slotId, bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback);
+    int32_t SetRadioState(int32_t slotId, bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback);
     int32_t GetRadioState(int32_t slotId);
     bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId);
-    std::u16string GetImei(int32_t slotId);
-    std::u16string GetMeid(int32_t slotId);
-    std::u16string GetUniqueDeviceId(int32_t slotId);
+    int32_t GetImei(int32_t slotId, std::u16string &imei);
+    int32_t GetMeid(int32_t slotId, std::u16string &meid);
+    int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId);
     PhoneType GetPhoneType(int32_t slotId);
     sptr<CellLocation> GetCellLocation(int32_t slotId);
-    bool GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+    int32_t GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) const;
-    std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId);
-    bool SendUpdateCellLocationRequest(int32_t slotId);
+    int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo);
+    int32_t SendUpdateCellLocationRequest(int32_t slotId);
 
-    bool GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
-    bool SetPreferredNetwork(int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback);
+    int32_t GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+    int32_t SetPreferredNetwork(int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback);
 
     bool IsNrSupported(int32_t slotId);
-    NrMode GetNrOptionMode(int32_t slotId);
+    int32_t GetNrOptionMode(int32_t slotId, NrMode &mode);
     FrequencyType GetFrequencyType(int32_t slotId) const;
     NrState GetNrState(int32_t slotId) const;
     void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive);
@@ -276,7 +276,7 @@ public:
     int32_t SetDefaultVoiceSlotId(int32_t slotId);
     bool SetDefaultSmsSlotId(int32_t slotId);
     int32_t SetDefaultCellularDataSlotId(int32_t slotId);
-    bool SetPrimarySlotId(int32_t slotId);
+    int32_t SetPrimarySlotId(int32_t slotId);
     int32_t SetShowNumber(int32_t slotId, const std::u16string &number);
     int32_t SetShowName(int32_t slotId, const std::u16string &name);
     int32_t GetDefaultVoiceSlotId();

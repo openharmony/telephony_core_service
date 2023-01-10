@@ -40,13 +40,13 @@ public:
     virtual std::u16string GetOperatorName(int32_t slotId) = 0;
     virtual std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId) = 0;
     virtual const sptr<NetworkState> GetNetworkState(int32_t slotId) = 0;
-    virtual bool SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual int32_t SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
-    virtual std::u16string GetImei(int32_t slotId) = 0;
-    virtual std::u16string GetMeid(int32_t slotId) = 0;
-    virtual std::u16string GetUniqueDeviceId(int32_t slotId) = 0;
+    virtual int32_t GetImei(int32_t slotId, std::u16string &imei) = 0;
+    virtual int32_t GetMeid(int32_t slotId, std::u16string &meid) = 0;
+    virtual int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) = 0;
     virtual bool IsNrSupported(int32_t slotId) = 0;
-    virtual NrMode GetNrOptionMode(int32_t slotId) = 0;
+    virtual int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) = 0;
     virtual bool HasSimCard(int32_t slotId) = 0;
     virtual int32_t GetSimState(int32_t slotId) = 0;
     virtual int32_t GetCardType(int32_t slotId) = 0;
@@ -70,20 +70,20 @@ public:
     virtual bool IsSimActive(int32_t slotId) = 0;
     virtual int32_t GetSlotId(int32_t simId) = 0;
     virtual int32_t GetSimId(int32_t slotId) = 0;
-    virtual bool GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual int32_t GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual std::u16string GetLocaleFromDefaultSim() = 0;
     virtual int32_t GetSimGid1(int32_t slotId, std::u16string &gid1) = 0;
     virtual std::u16string GetSimGid2(int32_t slotId) = 0;
     virtual std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired) = 0;
-    virtual bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
+    virtual int32_t SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
         const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
         const sptr<INetworkSearchCallback> &callback) = 0;
     virtual std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) = 0;
     virtual int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) = 0;
     virtual int32_t SetDefaultVoiceSlotId(int32_t slotId) = 0;
     virtual int32_t GetDefaultVoiceSlotId() = 0;
-    virtual bool SetPrimarySlotId(int32_t slotId) = 0;
+    virtual int32_t SetPrimarySlotId(int32_t slotId) = 0;
     virtual int32_t GetPrimarySlotId() = 0;
     virtual int32_t SetShowNumber(int32_t slotId, const std::u16string &number) = 0;
     virtual int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber) = 0;
@@ -93,8 +93,8 @@ public:
     virtual int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) = 0;
     virtual int32_t RefreshSimState(int32_t slotId) = 0;
     virtual int32_t SetActiveSim(int32_t slotId, int32_t enable) = 0;
-    virtual bool GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
-    virtual bool SetPreferredNetwork(
+    virtual int32_t GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual int32_t SetPreferredNetwork(
         int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual int32_t GetSimTelephoneNumber(int32_t slotId, std::u16string &telephoneNumber) = 0;
     virtual std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) = 0;
@@ -119,8 +119,8 @@ public:
     virtual int32_t SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) = 0;
     virtual int32_t SendCallSetupRequestResult(int32_t slotId, bool accept) = 0;
     virtual int32_t UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) = 0;
-    virtual std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) = 0;
-    virtual bool SendUpdateCellLocationRequest(int32_t slotId) = 0;
+    virtual int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) = 0;
+    virtual int32_t SendUpdateCellLocationRequest(int32_t slotId) = 0;
     virtual bool HasOperatorPrivileges(const int32_t slotId) = 0;
     virtual int32_t SimAuthentication(
         int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response) = 0;

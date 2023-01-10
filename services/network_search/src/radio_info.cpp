@@ -242,8 +242,10 @@ void RadioInfo::UpdatePhone(RadioTech csRadioTech, const RadioTech &psRadioTech)
     int radioState = networkSearchManager->GetRadioState(slotId_);
     if (static_cast<ModemPowerState>(radioState) != CORE_SERVICE_POWER_NOT_AVAILABLE) {
         networkSearchManager->InitSimRadioProtocol(slotId_);
-        networkSearchManager->GetImei(slotId_);
-        networkSearchManager->GetMeid(slotId_);
+        std::u16string meid = u"";
+        std::u16string imei = u"";
+        networkSearchManager->GetImei(slotId_, imei);
+        networkSearchManager->GetMeid(slotId_, meid);
         if (static_cast<ModemPowerState>(radioState) == CORE_SERVICE_POWER_ON) {
             networkSearchManager->GetVoiceTech(slotId_);
         }
