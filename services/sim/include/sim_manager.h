@@ -63,7 +63,7 @@ public:
     int32_t SetDefaultVoiceSlotId(int32_t slotId) override;
     bool SetDefaultSmsSlotId(int32_t slotId) override;
     int32_t SetDefaultCellularDataSlotId(int32_t slotId) override;
-    bool SetPrimarySlotId(int32_t slotId) override;
+    int32_t SetPrimarySlotId(int32_t slotId) override;
     int32_t SetShowNumber(int32_t slotId, const std::u16string &number) override;
     int32_t SetShowName(int32_t slotId, const std::u16string &name) override;
     int32_t GetDefaultVoiceSlotId() override;
