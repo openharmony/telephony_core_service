@@ -49,11 +49,11 @@ public:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void GetSignalInfo(std::vector<sptr<SignalInformation>> &signals);
     void UpdatePhone(RadioTech csRadioTech, const RadioTech &psRadioTech) const;
-    void GetCellInfoList(std::vector<sptr<CellInformation>> &cells);
+    int32_t GetCellInfoList(std::vector<sptr<CellInformation>> &cells);
     void DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void UpdateImsServiceStatus(const AppExecFwk::InnerEvent::Pointer &event);
     void UpdateImsRegisterState(const AppExecFwk::InnerEvent::Pointer &event);
-    void SendUpdateCellLocationRequest();
+    int32_t SendUpdateCellLocationRequest();
     PhoneType GetPhoneType();
 
     /**

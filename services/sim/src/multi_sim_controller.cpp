@@ -695,27 +695,27 @@ int32_t MultiSimController::GetPrimarySlotId()
     return GetDefaultCellularDataSlotIdUnit();
 }
 
-bool MultiSimController::SetPrimarySlotId(int32_t slotId)
+int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
 {
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId failed by out of range");
-        return false;
+        return TELEPHONY_ERR_SLOTID_INVALID;
     }
     if (simDbHelper_ == nullptr) {
         TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId failed by nullptr");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     // change protocol for default cellulardata slotId
     if (radioProtocolController_ == nullptr || !radioProtocolController_->SetRadioProtocol(slotId)) {
         TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId SetRadioProtocol failed");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
     int32_t setMainResult = simDbHelper_->SetDefaultMainCard(slotId);
     int32_t setDataResult = simDbHelper_->SetDefaultCellularData(slotId);
     if (setMainResult == INVALID_VALUE || setDataResult == INVALID_VALUE) {
         TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId failed by invalid result");
-        return false;
+        return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
     for (; i < maxCount_; i++) { // save to cache
@@ -727,7 +727,11 @@ bool MultiSimController::SetPrimarySlotId(int32_t slotId)
         localCacheInfo_[i].isMainCard = NOT_MAIN;
         localCacheInfo_[i].isCellularDataCard = NOT_MAIN;
     }
-    return AnnounceDefaultMainSlotIdChanged(slotId);
+    if (!AnnounceDefaultMainSlotIdChanged(slotId)) {
+        TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId publish broadcast failed");
+        return TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t MultiSimController::GetShowNumber(int32_t slotId, std::u16string &showNumber)

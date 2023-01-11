@@ -20,8 +20,6 @@
 
 namespace OHOS {
 namespace Telephony {
-enum CoreServiceErrorCode {};
-
 enum CoreServiceSimErrorCode {
     CORE_SERVICE_SIM_CARD_IS_NOT_ACTIVE = CORE_SERVICE_SIM_ERR_OFFSET,
     CORE_ERR_SIM_CARD_LOAD_FAILED,

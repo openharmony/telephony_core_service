@@ -36,15 +36,15 @@ public:
     bool IsNrSupported(int32_t slotId);
     int32_t GetPsRadioTech(int32_t slotId);
     int32_t GetCsRadioTech(int32_t slotId);
-    NrMode GetNrOptionMode(int32_t slotId);
-    std::u16string GetUniqueDeviceId(int32_t slotId);
-    std::u16string GetMeid(int32_t slotId);
+    int32_t GetNrOptionMode(int32_t slotId, NrMode &mode);
+    int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId);
+    int32_t GetMeid(int32_t slotId, std::u16string &meid);
     std::u16string GetOperatorNumeric(int32_t slotId);
     std::u16string GetOperatorName(int32_t slotId);
     const sptr<NetworkState> GetNetworkState(int32_t slotId);
-    bool SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback);
+    int32_t SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback);
     bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
-    std::u16string GetImei(int32_t slotId);
+    int32_t GetImei(int32_t slotId, std::u16string &imei);
     int32_t HasSimCard(int32_t slotId, bool &hasSimCard);
     int32_t GetSimState(int32_t slotId, SimState &simState);
     int32_t GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric);
@@ -55,14 +55,15 @@ public:
     bool IsSimActive(int32_t slotId);
     int32_t GetSlotId(int32_t simId);
     int32_t GetSimId(int32_t slotId);
-    bool GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+    int32_t GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     std::u16string GetLocaleFromDefaultSim();
     int32_t GetSimGid1(int32_t slotId, std::u16string &gid1);
     std::u16string GetSimGid2(int32_t slotId);
     std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired);
-    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode, const sptr<NetworkInformation> &networkInformation,
-        bool resumeSelection, const sptr<INetworkSearchCallback> &callback);
+    int32_t SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
+        const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
+        const sptr<INetworkSearchCallback> &callback);
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId);
     int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
     int32_t SetDefaultVoiceSlotId(int32_t slotId);
@@ -88,8 +89,8 @@ public:
     int32_t GetLockState(int32_t slotId, LockType lockType, LockState &lockState);
     int32_t RefreshSimState(int32_t slotId);
     int32_t SetActiveSim(const int32_t slotId, int32_t enable);
-    bool GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
-    bool SetPreferredNetwork(int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback);
+    int32_t GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+    int32_t SetPreferredNetwork(int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback);
     int32_t GetSimTelephoneNumber(int32_t slotId, std::u16string &telephoneNumber);
     int32_t GetVoiceMailIdentifier(int32_t slotId, std::u16string &voiceMailIdentifier);
     int32_t GetVoiceMailNumber(int32_t slotId, std::u16string &voiceMailNumber);
@@ -112,9 +113,9 @@ public:
     int32_t SimAuthentication(
         int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response);
     int32_t GetPrimarySlotId();
-    bool SetPrimarySlotId(int32_t slotId);
-    std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId);
-    bool SendUpdateCellLocationRequest(int32_t slotId);
+    int32_t SetPrimarySlotId(int32_t slotId);
+    int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo);
+    int32_t SendUpdateCellLocationRequest(int32_t slotId);
     int32_t RegisterImsRegInfoCallback(
         int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback);
     int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType);

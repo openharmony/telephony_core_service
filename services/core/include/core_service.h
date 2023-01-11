@@ -50,19 +50,19 @@ public:
 
     const sptr<NetworkState> GetNetworkState(int32_t slotId) override;
 
-    bool SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback) override;
+    int32_t SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback) override;
 
     bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 
-    std::u16string GetImei(int32_t slotId) override;
+    int32_t GetImei(int32_t slotId, std::u16string &imei) override;
 
-    std::u16string GetMeid(int32_t slotId) override;
+    int32_t GetMeid(int32_t slotId, std::u16string &meid) override;
 
-    std::u16string GetUniqueDeviceId(int32_t slotId) override;
+    int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) override;
 
     bool IsNrSupported(int32_t slotId) override;
 
-    NrMode GetNrOptionMode(int32_t slotId) override;
+    int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) override;
 
     int32_t HasSimCard(int32_t slotId, bool &hasSimCard) override;
 
@@ -86,7 +86,7 @@ public:
 
     int32_t GetSimId(int32_t slotId) override;
 
-    bool GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
+    int32_t GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 
     bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 
@@ -98,8 +98,9 @@ public:
 
     std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired) override;
 
-    bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode, const sptr<NetworkInformation> &networkInformation,
-        bool resumeSelection, const sptr<INetworkSearchCallback> &callback) override;
+    int32_t SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
+        const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
+        const sptr<INetworkSearchCallback> &callback) override;
 
     std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) override;
 
@@ -129,7 +130,7 @@ public:
 
     int32_t GetDefaultVoiceSlotId() override;
 
-    bool SetPrimarySlotId(int32_t slotId) override;
+    int32_t SetPrimarySlotId(int32_t slotId) override;
 
     int32_t GetPrimarySlotId() override;
 
@@ -145,9 +146,9 @@ public:
 
     int32_t SetActiveSim(int32_t slotId, int32_t enable) override;
 
-    bool GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
+    int32_t GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 
-    bool SetPreferredNetwork(
+    int32_t SetPreferredNetwork(
         int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback) override;
 
     int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
@@ -195,9 +196,9 @@ public:
 
     int32_t UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;
 
-    std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) override;
+    int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) override;
 
-    bool SendUpdateCellLocationRequest(int32_t slotId) override;
+    int32_t SendUpdateCellLocationRequest(int32_t slotId) override;
 
     int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) override;
 

@@ -16,6 +16,7 @@
 #include "get_preferred_network_callback.h"
 
 #include "napi_radio.h"
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -46,10 +47,8 @@ void GetPreferredNetworkCallback::OnGetPreferredNetworkCallback(const int32_t ne
     asyncContext_->resolved = errorCode == HRIL_ERR_SUCCESS;
     if (asyncContext_->resolved) {
         asyncContext_->preferredNetworkMode = WrapNativeNetworkMode(networkMode);
-    } else if (errorCode == SLOTID_INPUT_ERROR) {
-        asyncContext_->errorCode = SLOTID_INPUT_ERROR;
     } else {
-        asyncContext_->errorCode = errorCode;
+        asyncContext_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
     asyncContext_->callbackEnd = true;
     asyncContext_->cv.notify_all();
