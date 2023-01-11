@@ -3723,8 +3723,10 @@ HWTEST_F(SimTest, Telephony_Sim_GetNrOptionMode_0100, Function | MediumTest | Le
     if (!SimTest::HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card or Nr not supported");
     } else {
-        int result = (int)(CoreServiceClient::GetInstance().GetNrOptionMode(slotId_));
-        ASSERT_GT(result, -1);
+        NrMode nrMode = NrMode::NR_MODE_UNKNOWN;
+        int result = CoreServiceClient::GetInstance().GetNrOptionMode(slotId_, nrMode);
+        ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
+        ASSERT_GT(static_cast<int>(nrMode), -1);
     }
 }
 
@@ -4197,8 +4199,9 @@ HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0100, Function | MediumTest | L
     if (!SimTest::HasSimCard(slotId_) || CoreServiceClient::GetInstance().GetMaxSimCount() == 1) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card or one card version");
     } else {
-        bool result = CoreServiceClient::GetInstance().SetPrimarySlotId(SimTest::slotId_);
-        EXPECT_TRUE(result);
+        int32_t result = CoreServiceClient::GetInstance().SetPrimarySlotId(SimTest::slotId_);
+        TELEPHONY_LOGI("TelephonyTestService SetPrimarySlotId_0100 result: %{public}d", result);
+        EXPECT_NE(TELEPHONY_ERR_SUCCESS, result);
     }
 }
 
@@ -4213,8 +4216,9 @@ HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0200, Function | MediumTest | L
     if (!SimTest::HasSimCard(slotId1_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        bool result = CoreServiceClient::GetInstance().SetPrimarySlotId(SimTest::slotId1_);
-        EXPECT_TRUE(result);
+        int32_t result = CoreServiceClient::GetInstance().SetPrimarySlotId(SimTest::slotId1_);
+        TELEPHONY_LOGI("TelephonyTestService SetPrimarySlotId_0200 result: %{public}d", result);
+        EXPECT_NE(TELEPHONY_ERR_SUCCESS, result);
     }
 }
 
@@ -4228,8 +4232,9 @@ HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0300, Function | MediumTest | L
     if (!SimTest::HasSimCard(slotId_) || CoreServiceClient::GetInstance().GetMaxSimCount() == 1) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card or one card version");
     } else {
-        bool result = CoreServiceClient::GetInstance().SetPrimarySlotId(SimTest::slotId_);
-        EXPECT_FALSE(result);
+        int32_t result = CoreServiceClient::GetInstance().SetPrimarySlotId(SimTest::slotId_);
+        TELEPHONY_LOGI("TelephonyTestService SetPrimarySlotId_0300 result: %{public}d", result);
+        EXPECT_EQ(TELEPHONY_ERR_PERMISSION_ERR, result);
     }
 }
 

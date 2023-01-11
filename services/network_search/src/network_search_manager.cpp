@@ -20,6 +20,7 @@
 #include <securec.h>
 #include <string_ex.h>
 
+#include "core_service_errors.h"
 #include "mcc_pool.h"
 #include "network_search_types.h"
 #include "telephony_errors.h"
@@ -219,17 +220,21 @@ void NetworkSearchManager::SetRadioState(int32_t slotId, bool isOn, int32_t rst)
     eventSender_->SendBase(slotId, RadioEvent::RADIO_SET_STATUS, fun, rst);
 }
 
-bool NetworkSearchManager::SetRadioState(int32_t slotId, bool isOn, int32_t rst, NSCALLBACK &callback)
+int32_t NetworkSearchManager::SetRadioState(int32_t slotId, bool isOn, int32_t rst, NSCALLBACK &callback)
 {
     TELEPHONY_LOGI("NetworkSearchManager SetRadioState isOn:%{public}d slotId:%{public}d", isOn, slotId);
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AirplaneMode_ = isOn ? false : true;
     int32_t fun = static_cast<int32_t>(isOn);
-    return eventSender_->SendCallback(slotId, RadioEvent::RADIO_SET_STATUS, &callback, fun, rst);
+    if (!eventSender_->SendCallback(slotId, RadioEvent::RADIO_SET_STATUS, &callback, fun, rst)) {
+        TELEPHONY_LOGE("slotId:%{public}d SetRadioState SendCallback failed.", slotId);
+        return CORE_SERVICE_SEND_CALLBACK_FAILED;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 void NetworkSearchManager::RegisterCoreNotify(int32_t slotId, HANDLE &handler, int32_t what)
@@ -540,14 +545,18 @@ std::vector<sptr<SignalInformation>> NetworkSearchManager::GetSignalInfoList(int
     return vec;
 }
 
-bool NetworkSearchManager::GetNetworkSearchInformation(int32_t slotId, NSCALLBACK &callback)
+int32_t NetworkSearchManager::GetNetworkSearchInformation(int32_t slotId, NSCALLBACK &callback)
 {
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return eventSender_->SendCallback(slotId, RadioEvent::RADIO_NETWORK_SEARCH_RESULT, &callback);
+    if (!eventSender_->SendCallback(slotId, RadioEvent::RADIO_NETWORK_SEARCH_RESULT, &callback)) {
+        TELEPHONY_LOGE("slotId:%{public}d GetNetworkSearchInformation SendCallback failed.", slotId);
+        return CORE_SERVICE_SEND_CALLBACK_FAILED;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 void NetworkSearchManager::SetNetworkSearchResultValue(
@@ -622,7 +631,7 @@ bool NetworkSearchManager::SetNetworkSelectionMode(
     return eventSender_->SendBase(slotId, RadioEvent::RADIO_SET_NETWORK_SELECTION_MODE, selectMode, plmnNumeric);
 }
 
-bool NetworkSearchManager::SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
+int32_t NetworkSearchManager::SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
     const sptr<NetworkInformation> &networkInformation, bool resumeSelection, NSCALLBACK &callback)
 {
     TELEPHONY_LOGI(
@@ -630,14 +639,19 @@ bool NetworkSearchManager::SetNetworkSelectionMode(int32_t slotId, int32_t selec
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::string plmnNumeric = "";
     if (networkInformation != nullptr) {
         plmnNumeric = networkInformation->GetOperatorNumeric();
     }
-    return eventSender_->SendCallback(
+    bool ret = eventSender_->SendCallback(
         slotId, RadioEvent::RADIO_SET_NETWORK_SELECTION_MODE, &callback, selectMode, plmnNumeric);
+    if (!ret) {
+        TELEPHONY_LOGE("slotId:%{public}d SetPreferredNetwork SendCallback failed.", slotId);
+        return CORE_SERVICE_SEND_CALLBACK_FAILED;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 std::u16string NetworkSearchManager::GetIsoCountryCodeForNetwork(int32_t slotId)
@@ -674,39 +688,49 @@ std::u16string NetworkSearchManager::GetIsoCountryCodeForNetwork(int32_t slotId)
     return Str8ToStr16(iso);
 }
 
-bool NetworkSearchManager::GetPreferredNetwork(int32_t slotId, NSCALLBACK &callback)
+int32_t NetworkSearchManager::GetPreferredNetwork(int32_t slotId, NSCALLBACK &callback)
 {
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return eventSender_->SendCallback(slotId, RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE, &callback);
+    if (!eventSender_->SendCallback(slotId, RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE, &callback)) {
+        TELEPHONY_LOGE("slotId:%{public}d GetPreferredNetwork SendCallback failed.", slotId);
+        return CORE_SERVICE_SEND_CALLBACK_FAILED;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-bool NetworkSearchManager::SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback)
+int32_t NetworkSearchManager::SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("SetPreferredNetwork simManager_ is nullptr");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         TELEPHONY_LOGE("SetPreferredNetwork inner is nullptr");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     int32_t modemRaf = simManager_->GetRadioProtocolTech(slotId);
     int32_t raf = NetworkUtils::GetRafFromNetworkMode(static_cast<PreferredNetworkMode>(networkMode));
-    if (modemRaf == static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN) ||
-        raf == static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN)) {
-        TELEPHONY_LOGE(
-            "SetPreferredNetwork failed modemRaf:%{public}d raf:%{public}d slotId:%{public}d", modemRaf, raf, slotId);
-        return false;
+    if (modemRaf == static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN)) {
+        TELEPHONY_LOGE("SetPreferredNetwork failed modemRaf:%{public}d slotId:%{public}d", modemRaf, slotId);
+        return CORE_SERVICE_RADIO_PROTOCOL_TECH_UNKNOWN;
+    }
+    if (raf == static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN)) {
+        TELEPHONY_LOGE("SetPreferredNetwork failed raf:%{public}d slotId:%{public}d", raf, slotId);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     int32_t filterMode = static_cast<int32_t>(NetworkUtils::GetNetworkModeFromRaf(modemRaf & raf));
     TELEPHONY_LOGI("SetPreferredNetwork filterMode:%{public}d slotId:%{public}d", filterMode, slotId);
-    return eventSender_->SendCallbackEx(slotId, RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, &callback, filterMode);
+    if (!eventSender_->SendCallbackEx(slotId, RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, &callback, filterMode)) {
+        TELEPHONY_LOGE("slotId:%{public}d SetPreferredNetwork SendCallback failed.", slotId);
+        return CORE_SERVICE_SEND_CALLBACK_FAILED;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 bool NetworkSearchManager::GetPreferredNetwork(int32_t slotId)
@@ -715,9 +739,13 @@ bool NetworkSearchManager::GetPreferredNetwork(int32_t slotId)
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE);
+    if (!eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE)) {
+        TELEPHONY_LOGE("slotId:%{public}d GetPreferredNetwork SendCallback failed.", slotId);
+        return CORE_SERVICE_SEND_CALLBACK_FAILED;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 bool NetworkSearchManager::SetPreferredNetwork(int32_t slotId, int32_t networkMode)
@@ -820,45 +848,45 @@ void NetworkSearchManager::SetImei(int32_t slotId, std::u16string imei)
     }
 }
 
-std::u16string NetworkSearchManager::GetImei(int32_t slotId)
+int32_t NetworkSearchManager::GetImei(int32_t slotId, std::u16string &imei)
 {
     TELEPHONY_LOGI("NetworkSearchManager::GetImei start slotId:%{public}d", slotId);
+    imei = u"";
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
-        return std::u16string();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (inner->imei_.empty()) {
         eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_IMEI);
-        return std::u16string();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return inner->imei_;
+    imei = inner->imei_;
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-std::vector<sptr<CellInformation>> NetworkSearchManager::GetCellInfoList(int32_t slotId)
+int32_t NetworkSearchManager::GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo)
 {
-    std::vector<sptr<CellInformation>> vec;
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
         if (inner->networkSearchHandler_ != nullptr) {
-            inner->networkSearchHandler_->GetCellInfoList(vec);
+            inner->networkSearchHandler_->GetCellInfoList(cellInfo);
+            return TELEPHONY_ERR_SUCCESS;
         }
     }
-    return vec;
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
-bool NetworkSearchManager::SendUpdateCellLocationRequest(int32_t slotId)
+int32_t NetworkSearchManager::SendUpdateCellLocationRequest(int32_t slotId)
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
         if (inner->networkSearchHandler_ == nullptr || GetRadioState(slotId) == CORE_SERVICE_POWER_OFF) {
-            return false;
-        } else {
-            inner->networkSearchHandler_->SendUpdateCellLocationRequest();
-            return true;
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
+        return inner->networkSearchHandler_->SendUpdateCellLocationRequest();
     }
-    return false;
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
 void NetworkSearchManager::UpdateCellLocation(int32_t slotId, int32_t techType, int32_t cellId, int32_t lac)
@@ -890,19 +918,21 @@ void NetworkSearchManager::SetMeid(int32_t slotId, std::u16string meid)
     }
 }
 
-std::u16string NetworkSearchManager::GetMeid(int32_t slotId)
+int32_t NetworkSearchManager::GetMeid(int32_t slotId, std::u16string &meid)
 {
     TELEPHONY_LOGI("NetworkSearchManager::GetMeid start slotId:%{public}d", slotId);
+    meid = u"";
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
-        return std::u16string();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (inner->meid_.empty()) {
         eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_MEID);
-        return std::u16string();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return inner->meid_;
+    meid = inner->meid_;
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 void NetworkSearchManager::SetLocateUpdate(int32_t slotId)
@@ -921,24 +951,28 @@ void NetworkSearchManager::SetLocateUpdate(int32_t slotId)
     }
 }
 
-std::u16string NetworkSearchManager::GetUniqueDeviceId(int32_t slotId)
+int32_t NetworkSearchManager::GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId)
 {
     TELEPHONY_LOGI("NetworkSearchManager::GetUniqueDeviceId start slotId:%{public}d", slotId);
+    deviceId = u"";
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
-        return std::u16string();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (GetPhoneType(slotId) == PhoneType::PHONE_TYPE_IS_GSM) {
         if (!inner->imei_.empty()) {
-            return inner->imei_;
+            deviceId = inner->imei_;
+            return TELEPHONY_ERR_SUCCESS;
         }
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     } else {
         if (!inner->meid_.empty()) {
-            return inner->meid_;
+            deviceId = inner->meid_;
+            return TELEPHONY_ERR_SUCCESS;
         }
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return std::u16string();
 }
 
 PhoneType NetworkSearchManager::GetPhoneType(int32_t slotId)
@@ -976,14 +1010,15 @@ bool NetworkSearchManager::IsNrSupported(int32_t slotId)
         static_cast<uint32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_NR);
 }
 
-NrMode NetworkSearchManager::GetNrOptionMode(int32_t slotId)
+int32_t NetworkSearchManager::GetNrOptionMode(int32_t slotId, NrMode &mode)
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
         std::lock_guard<std::mutex> lock(inner->mutex_);
-        return inner->nrMode_;
+        mode = inner->nrMode_;
+        return TELEPHONY_ERR_SUCCESS;
     }
-    return NrMode::NR_MODE_UNKNOWN;
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
 void NetworkSearchManager::SetNrOptionMode(int32_t slotId, NrMode mode)
