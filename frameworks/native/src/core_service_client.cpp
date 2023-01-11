@@ -213,54 +213,54 @@ int32_t CoreServiceClient::GetImei(int32_t slotId, std::u16string &imei)
     return proxy->GetImei(slotId, imei);
 }
 
-bool CoreServiceClient::HasSimCard(int32_t slotId)
-{
-    auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
-        return false;
-    }
-    return proxy->HasSimCard(slotId);
-}
-
-int32_t CoreServiceClient::GetSimState(int32_t slotId)
+int32_t CoreServiceClient::HasSimCard(int32_t slotId, bool &hasSimCard)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetSimState(slotId);
+    return proxy->HasSimCard(slotId, hasSimCard);
 }
 
-std::u16string CoreServiceClient::GetSimOperatorNumeric(int32_t slotId)
+int32_t CoreServiceClient::GetSimState(int32_t slotId, SimState &simState)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return std::u16string();
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetSimOperatorNumeric(slotId);
+    return proxy->GetSimState(slotId, simState);
 }
 
-std::u16string CoreServiceClient::GetISOCountryCodeForSim(int32_t slotId)
+int32_t CoreServiceClient::GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return std::u16string();
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetISOCountryCodeForSim(slotId);
+    return proxy->GetSimOperatorNumeric(slotId, operatorNumeric);
 }
 
-std::u16string CoreServiceClient::GetSimSpn(int32_t slotId)
+int32_t CoreServiceClient::GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return std::u16string();
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetSimSpn(slotId);
+    return proxy->GetISOCountryCodeForSim(slotId, countryCode);
+}
+
+int32_t CoreServiceClient::GetSimSpn(int32_t slotId, std::u16string &spn)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetSimSpn(slotId, spn);
 }
 
 int32_t CoreServiceClient::GetSimIccId(int32_t slotId, std::u16string &iccId)
@@ -746,14 +746,14 @@ int32_t CoreServiceClient::GetOpName(int32_t slotId, std::u16string &opname)
     return proxy->GetOpName(slotId, opname);
 }
 
-int32_t CoreServiceClient::GetCardType(int32_t slotId)
+int32_t CoreServiceClient::GetCardType(int32_t slotId, CardType &cardType)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetCardType(slotId);
+    return proxy->GetCardType(slotId, cardType);
 }
 
 int32_t CoreServiceClient::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
@@ -796,14 +796,14 @@ int32_t CoreServiceClient::UnlockSimLock(int32_t slotId, const PersoLockInfo &lo
     return proxy->UnlockSimLock(slotId, lockInfo, response);
 }
 
-bool CoreServiceClient::HasOperatorPrivileges(const int32_t slotId)
+int32_t CoreServiceClient::HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return false;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->HasOperatorPrivileges(slotId);
+    return proxy->HasOperatorPrivileges(slotId, hasOperatorPrivileges);
 }
 
 int32_t CoreServiceClient::SimAuthentication(

@@ -37,12 +37,12 @@ public:
     int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) override;
     bool IsNrSupported(int32_t slotId) override;
     int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) override;
-    bool HasSimCard(int32_t slotId) override;
-    int32_t GetSimState(int32_t slotId) override;
-    int32_t GetCardType(int32_t slotId) override;
-    std::u16string GetSimOperatorNumeric(int32_t slotId) override;
-    std::u16string GetISOCountryCodeForSim(int32_t slotId) override;
-    std::u16string GetSimSpn(int32_t slotId) override;
+    int32_t HasSimCard(int32_t slotId, bool &hasSimCard) override;
+    int32_t GetSimState(int32_t slotId, SimState &simState) override;
+    int32_t GetCardType(int32_t slotId, CardType &cardType) override;
+    int32_t GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric) override;
+    int32_t GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode) override;
+    int32_t GetSimSpn(int32_t slotId, std::u16string &spn) override;
     int32_t GetSimIccId(int32_t slotId, std::u16string &iccId) override;
     int32_t GetIMSI(int32_t slotId, std::u16string &imsi) override;
     bool IsSimActive(int32_t slotId) override;
@@ -116,7 +116,7 @@ public:
     int32_t UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;
     int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) override;
     int32_t SendUpdateCellLocationRequest(int32_t slotId) override;
-    bool HasOperatorPrivileges(const int32_t slotId) override;
+    int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) override;
     int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
         SimAuthenticationResponse &response) override;
     int32_t RegisterImsRegInfoCallback(

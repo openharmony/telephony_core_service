@@ -31,9 +31,9 @@ public:
     virtual bool OnInit(int32_t slotCount) = 0;
     virtual void SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager) = 0;
     // SimState
-    virtual bool HasSimCard(int32_t slotId) = 0;
-    virtual int32_t GetSimState(int32_t slotId) = 0;
-    virtual int32_t GetCardType(int32_t slotId) = 0;
+    virtual int32_t HasSimCard(int32_t slotId, bool &hasSimCard) = 0;
+    virtual int32_t GetSimState(int32_t slotId, SimState &simState) = 0;
+    virtual int32_t GetCardType(int32_t slotId, CardType &cardType) = 0;
     virtual int32_t UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response) = 0;
     virtual int32_t UnlockPuk(
         int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response) = 0;
@@ -69,7 +69,7 @@ public:
     virtual int32_t GetShowName(int32_t slotId, std::u16string &showName) = 0;
     virtual int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) = 0;
     virtual int32_t GetOperatorConfigs(int slotId, OperatorConfig &poc) = 0;
-    virtual bool HasOperatorPrivileges(const int32_t slotId) = 0;
+    virtual int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) = 0;
     virtual int32_t SimAuthentication(
         int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response) = 0;
     virtual int32_t GetRadioProtocolTech(int32_t slotId) = 0;
@@ -79,9 +79,9 @@ public:
     virtual int32_t SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) = 0;
     virtual int32_t SendCallSetupRequestResult(int32_t slotId, bool accept) = 0;
     // SimFile
-    virtual std::u16string GetSimOperatorNumeric(int32_t slotId) = 0;
-    virtual std::u16string GetISOCountryCodeForSim(int32_t slotId) = 0;
-    virtual std::u16string GetSimSpn(int32_t slotId) = 0;
+    virtual int32_t GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric) = 0;
+    virtual int32_t GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode) = 0;
+    virtual int32_t GetSimSpn(int32_t slotId, std::u16string &spn) = 0;
     virtual int32_t GetSimIccId(int32_t slotId, std::u16string &iccId) = 0;
     virtual int32_t GetIMSI(int32_t slotId, std::u16string &imsi) = 0;
     virtual std::u16string GetLocaleFromDefaultSim(int32_t slotId) = 0;

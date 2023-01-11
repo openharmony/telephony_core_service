@@ -47,9 +47,9 @@ public:
     virtual int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) = 0;
     virtual bool IsNrSupported(int32_t slotId) = 0;
     virtual int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) = 0;
-    virtual bool HasSimCard(int32_t slotId) = 0;
-    virtual int32_t GetSimState(int32_t slotId) = 0;
-    virtual int32_t GetCardType(int32_t slotId) = 0;
+    virtual int32_t HasSimCard(int32_t slotId, bool &hasSimCard) = 0;
+    virtual int32_t GetSimState(int32_t slotId, SimState &simState) = 0;
+    virtual int32_t GetCardType(int32_t slotId, CardType &cardType) = 0;
     virtual int32_t UnlockPin(int32_t slotId, const std::u16string &pin, LockStatusResponse &response) = 0;
     virtual int32_t UnlockPuk(
         int32_t slotId, const std::u16string &newPin, const std::u16string &puk, LockStatusResponse &response) = 0;
@@ -62,9 +62,9 @@ public:
         int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2, LockStatusResponse &response) = 0;
     virtual int32_t SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response) = 0;
     virtual int32_t GetLockState(int32_t slotId, LockType lockType, LockState &lockState) = 0;
-    virtual std::u16string GetSimOperatorNumeric(int32_t slotId) = 0;
-    virtual std::u16string GetISOCountryCodeForSim(int32_t slotId) = 0;
-    virtual std::u16string GetSimSpn(int32_t slotId) = 0;
+    virtual int32_t GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric) = 0;
+    virtual int32_t GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode) = 0;
+    virtual int32_t GetSimSpn(int32_t slotId, std::u16string &spn) = 0;
     virtual int32_t GetSimIccId(int32_t slotId, std::u16string &iccId) = 0;
     virtual int32_t GetIMSI(int32_t slotId, std::u16string &imsi) = 0;
     virtual bool IsSimActive(int32_t slotId) = 0;
@@ -121,7 +121,7 @@ public:
     virtual int32_t UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) = 0;
     virtual int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) = 0;
     virtual int32_t SendUpdateCellLocationRequest(int32_t slotId) = 0;
-    virtual bool HasOperatorPrivileges(const int32_t slotId) = 0;
+    virtual int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) = 0;
     virtual int32_t SimAuthentication(
         int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response) = 0;
     virtual int32_t RegisterImsRegInfoCallback(

@@ -192,6 +192,7 @@ public:
     void TearDown();
     static void TearDownTestCase();
     static sptr<ICoreService> GetProxy();
+    static bool HasSimCard(int32_t slotId);
     void PrintCellInformation(std::vector<sptr<CellInformation>> cellList);
     void PrintSignalInformation(std::vector<sptr<SignalInformation>> signalList);
     void PrintNetworkStateInformation(sptr<NetworkState> result);
