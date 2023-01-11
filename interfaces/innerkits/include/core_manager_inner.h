@@ -218,16 +218,16 @@ public:
     /******************** networkSearchManager end *******************/
     /******************** simManager start ***************************/
     int32_t ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum);
-    std::u16string GetSpn(int32_t slotId);
+    int32_t GetSimSpn(int32_t slotId, std::u16string &spn);
     int32_t SetVoiceMailInfo(int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber);
-    bool HasOperatorPrivileges(const int32_t slotId);
+    int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges);
     int32_t SendEnvelopeCmd(int32_t slotId, const std::string &cmd);
     int32_t SendTerminalResponseCmd(int32_t slotId, const std::string &cmd);
     int32_t SendCallSetupRequestResult(int32_t slotId, bool accept);
     int32_t UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response);
-    bool HasSimCard(int32_t slotId);
-    int32_t GetSimState(int32_t slotId);
-    int32_t GetCardType(int32_t slotId);
+    int32_t HasSimCard(int32_t slotId, bool &hasSimCard);
+    int32_t GetSimState(int32_t slotId, SimState &simState);
+    int32_t GetCardType(int32_t slotId, CardType &cardType);
     int32_t UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response);
     int32_t UnlockPuk(int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response);
     int32_t AlterPin(
@@ -244,8 +244,8 @@ public:
     int32_t GetShowName(int32_t slotId, std::u16string &showName);
     int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList);
     int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc);
-    std::u16string GetSimOperatorNumeric(int32_t slotId);
-    std::u16string GetISOCountryCodeForSim(int32_t slotId);
+    int32_t GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric);
+    int32_t GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode);
     int32_t GetSimIccId(int32_t slotId, std::u16string &iccId);
     int32_t GetIMSI(int32_t slotId, std::u16string &imsi);
     std::u16string GetLocaleFromDefaultSim(int32_t slotId);

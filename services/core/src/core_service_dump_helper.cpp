@@ -65,7 +65,9 @@ void CoreServiceDumpHelper::ShowCoreServiceInfo(std::string &result) const
     result.append(std::to_string(DelayedSingleton<CoreService>::GetInstance()->GetSpendTime()));
     result.append("\n");
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
-        if (DelayedSingleton<CoreService>::GetInstance()->HasSimCard(i)) {
+        bool hasSimCard = false;
+        DelayedSingleton<CoreService>::GetInstance()->HasSimCard(i, hasSimCard);
+        if (hasSimCard) {
             result.append("SlotId = ");
             result.append(std::to_string(i));
             result.append("\nIsSimActive = ");
@@ -79,11 +81,17 @@ void CoreServiceDumpHelper::ShowCoreServiceInfo(std::string &result) const
                 result.append(std::to_string(signals[0]->GetSignalLevel()));
             }
             result.append("\nCardType = ");
-            result.append(GetCardType(DelayedSingleton<CoreService>::GetInstance()->GetCardType(i)));
+            CardType cardType = CardType::UNKNOWN_CARD;
+            DelayedSingleton<CoreService>::GetInstance()->GetCardType(i, cardType);
+            result.append(GetCardType(static_cast<int32_t>(cardType)));
             result.append("\nSimState = ");
-            result.append(GetSimState(DelayedSingleton<CoreService>::GetInstance()->GetSimState(i)));
+            SimState simState = SimState::SIM_STATE_UNKNOWN;
+            DelayedSingleton<CoreService>::GetInstance()->GetSimState(i, simState);
+            result.append(GetSimState(static_cast<int32_t>(simState)));
             result.append("\nSpn = ");
-            result.append(to_utf8(DelayedSingleton<CoreService>::GetInstance()->GetSimSpn(i)));
+            std::u16string spn;
+            DelayedSingleton<CoreService>::GetInstance()->GetSimSpn(i, spn);
+            result.append(to_utf8(spn));
             result.append("\nOperatorName = ");
             result.append(to_utf8(DelayedSingleton<CoreService>::GetInstance()->GetOperatorName(i)));
             result.append("\nPsRadioTech = ");

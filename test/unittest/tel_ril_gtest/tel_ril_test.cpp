@@ -126,7 +126,9 @@ void TelRilTest::ProcessTest(int32_t index, int32_t slotId, const std::shared_pt
         telephonyService_ = GetProxy();
         return;
     }
-    if (!(telephonyService_->HasSimCard(slotId))) {
+    bool hasSimCard = false;
+    telephonyService_->HasSimCard(slotId, hasSimCard);
+    if (!hasSimCard) {
         TELEPHONY_LOGE("TelRilTest::ProcessTest no sim card %{public}d", slotId);
         return;
     }

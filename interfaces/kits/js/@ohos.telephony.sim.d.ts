@@ -51,6 +51,12 @@ declare namespace sim {
    * @param slotId Indicates the ID of the SIM card slot.
    * @param callback Returns {@code true} if your application has been granted the operator permissions;
    * returns {@code false} otherwise.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300004 - Do not have sim card.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * @since 7
    */
   function hasOperatorPrivileges(slotId: number, callback: AsyncCallback<boolean>): void;
@@ -62,6 +68,12 @@ declare namespace sim {
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @param callback Returns the country code defined in ISO 3166-2; returns an empty string if no SIM card is inserted.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300004 - Do not have sim card.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    */
   function getISOCountryCodeForSim(slotId: number, callback: AsyncCallback<string>): void;
   function getISOCountryCodeForSim(slotId: number): Promise<string>;
@@ -75,6 +87,12 @@ declare namespace sim {
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @param callback Returns the PLMN number; returns an empty string if no SIM card is inserted.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300004 - Do not have sim card.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    */
   function getSimOperatorNumeric(slotId: number, callback: AsyncCallback<string>): void;
   function getSimOperatorNumeric(slotId: number): Promise<string>;
@@ -89,6 +107,12 @@ declare namespace sim {
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @param callback Returns the SPN; returns an empty string if no SIM card is inserted or
    * no EFSPN file in the SIM card.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300004 - Do not have sim card.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    */
   function getSimSpn(slotId: number, callback: AsyncCallback<string>): void;
   function getSimSpn(slotId: number): Promise<string>;
@@ -107,6 +131,12 @@ declare namespace sim {
    * <li>{@code SimState#SIM_STATE_READY}
    * <li>{@code SimState#SIM_STATE_LOADED}
    * </ul>
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300004 - Do not have sim card.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    */
   function getSimState(slotId: number, callback: AsyncCallback<SimState>): void;
   function getSimState(slotId: number): Promise<SimState>;
@@ -116,6 +146,12 @@ declare namespace sim {
    *
    * @param slotId Indicates the ID of the specified slot.
    * @param callback Returns the SIM card type.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300004 - Do not have sim card.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * @since 7
    */
   function getCardType(slotId: number, callback: AsyncCallback<CardType>): void;
@@ -281,6 +317,12 @@ declare namespace sim {
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @param callback Returns true if a SIM card is inserted; return false otherwise.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300004 - Do not have sim card.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * @since 7
    */
   function hasSimCard(slotId: number, callback: AsyncCallback<boolean>): void;

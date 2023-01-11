@@ -169,6 +169,7 @@ public:
     static void InitBroadCast();
     static void TearDownTestCase();
     static sptr<ICoreService> GetProxy();
+    static bool HasSimCard(int32_t slotId);
     static sptr<ICoreService> telephonyService_;
     static const int32_t slotId_ = 0;
     static const int32_t slotId1_ = 1;
