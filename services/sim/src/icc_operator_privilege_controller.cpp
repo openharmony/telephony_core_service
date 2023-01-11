@@ -208,15 +208,15 @@ void IccOperatorPrivilegeController::Init(const int32_t slotId)
     /* try to load data */
     ProcessSimStateChanged();
 }
-bool IccOperatorPrivilegeController::HasOperatorPrivileges()
+int32_t IccOperatorPrivilegeController::HasOperatorPrivileges(bool &hasOperatorPrivileges)
 {
     constexpr std::string_view certHash = "ABCD92CBB156B280FA4E1429A6ECEEB6E5C1BFE4";
     constexpr std::string_view packageName = "com.ohos.openharmony";
-    return HasOperatorPrivileges(certHash, packageName);
+    return HasOperatorPrivileges(certHash, packageName, hasOperatorPrivileges);
 }
 
-bool IccOperatorPrivilegeController::HasOperatorPrivileges(
-    const std::string_view &certHash, const std::string_view &packageName)
+int32_t IccOperatorPrivilegeController::HasOperatorPrivileges(
+    const std::string_view &certHash, const std::string_view &packageName, bool &hasOperatorPrivileges)
 {
     TELEPHONY_LOGI("IccOperatorPrivilegeController::HasOperatorPrivileges begin");
     constexpr int32_t RETRY_TIMES = 3;
@@ -230,24 +230,29 @@ bool IccOperatorPrivilegeController::HasOperatorPrivileges(
             ProcessSimStateChanged(); // retry to load
         }
     }
-    if (!state_->IsSimAvailable() || rules_.empty()) {
+    if (!state_->IsSimAvailable()) {
         TELEPHONY_LOGE(
             "IccOperatorPrivilegeController::HasOperatorPrivileges false with rules.size:%{public}zu and "
             "simState:%{public}d",
             rules_.size(),
             ((simStateManager_ == nullptr) ? SimState::SIM_STATE_UNKNOWN : simStateManager_->GetSimState()));
-        return false;
+        hasOperatorPrivileges = false;
+        return TELEPHONY_ERR_NO_SIM_CARD;
     }
-    auto hash = Strip(certHash);
-    auto package = Strip(packageName);
-    for (const auto &rule : rules_) {
-        if (rule.Matche(hash, package)) {
-            TELEPHONY_LOGI("already found rule to match then return true");
-            return true;
+    if (!rules_.empty()) {
+        auto hash = Strip(certHash);
+        auto package = Strip(packageName);
+        for (const auto &rule : rules_) {
+            if (rule.Matche(hash, package)) {
+                TELEPHONY_LOGI("already found rule to match then return true");
+                hasOperatorPrivileges = true;
+                return TELEPHONY_ERR_SUCCESS;
+            }
         }
     }
     TELEPHONY_LOGE("no rule can match then return false");
-    return false;
+    hasOperatorPrivileges = false;
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 void IccOperatorPrivilegeController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)

@@ -45,11 +45,11 @@ public:
     bool SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback);
     bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     std::u16string GetImei(int32_t slotId);
-    bool HasSimCard(int32_t slotId);
-    int32_t GetSimState(int32_t slotId);
-    std::u16string GetSimOperatorNumeric(int32_t slotId);
-    std::u16string GetISOCountryCodeForSim(int32_t slotId);
-    std::u16string GetSimSpn(int32_t slotId);
+    int32_t HasSimCard(int32_t slotId, bool &hasSimCard);
+    int32_t GetSimState(int32_t slotId, SimState &simState);
+    int32_t GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric);
+    int32_t GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode);
+    int32_t GetSimSpn(int32_t slotId, std::u16string &spn);
     int32_t GetSimIccId(int32_t slotId, std::u16string &iccId);
     int32_t GetIMSI(int32_t slotId, std::u16string &imsi);
     bool IsSimActive(int32_t slotId);
@@ -103,12 +103,12 @@ public:
     int32_t GetOpKey(int32_t slotId, std::u16string &opkey);
     int32_t GetOpKeyExt(int32_t slotId, std::u16string &opkey);
     int32_t GetOpName(int32_t slotId, std::u16string &opname);
-    int32_t GetCardType(int32_t slotId);
+    int32_t GetCardType(int32_t slotId, CardType &cardType);
     int32_t SendEnvelopeCmd(int32_t slotId, const std::string &cmd);
     int32_t SendTerminalResponseCmd(int32_t slotId, const std::string &cmd);
     int32_t SendCallSetupRequestResult(int32_t slotId, bool accept);
     int32_t UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response);
-    bool HasOperatorPrivileges(const int32_t slotId);
+    int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges);
     int32_t SimAuthentication(
         int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response);
     int32_t GetPrimarySlotId();

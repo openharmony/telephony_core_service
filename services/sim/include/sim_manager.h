@@ -39,9 +39,9 @@ public:
     bool OnInit(int32_t slotCount) override;
     void SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager) override;
     // SimState
-    bool HasSimCard(int32_t slotId) override;
-    int32_t GetSimState(int32_t slotId) override;
-    int32_t GetCardType(int32_t slotId) override;
+    int32_t HasSimCard(int32_t slotId, bool &hasSimCard) override;
+    int32_t GetSimState(int32_t slotId, SimState &simState) override;
+    int32_t GetCardType(int32_t slotId, CardType &cardType) override;
     int32_t UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response) override;
     int32_t UnlockPuk(
         int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response) override;
@@ -76,7 +76,7 @@ public:
     int32_t GetSimId(int32_t slotId) override;
     int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
     int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) override;
-    bool HasOperatorPrivileges(const int32_t slotId) override;
+    int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) override;
     int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
         SimAuthenticationResponse &response) override;
     int32_t GetRadioProtocolTech(int32_t slotId) override;
@@ -86,9 +86,9 @@ public:
     int32_t SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
     int32_t SendCallSetupRequestResult(int32_t slotId, bool accept) override;
     // SimFile
-    std::u16string GetSimOperatorNumeric(int32_t slotId) override;
-    std::u16string GetISOCountryCodeForSim(int32_t slotId) override;
-    std::u16string GetSimSpn(int32_t slotId) override;
+    int32_t GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric) override;
+    int32_t GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode) override;
+    int32_t GetSimSpn(int32_t slotId, std::u16string &spn) override;
     std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired) override;
     int32_t GetSimIccId(int32_t slotId, std::u16string &iccId) override;
     int32_t GetIMSI(int32_t slotId, std::u16string &imsi) override;
@@ -135,6 +135,7 @@ private:
     bool IsValidSlotIdForDefault(int32_t slotId);
     void InitMultiSimObject();
     void InitSingleSimObject();
+    bool HasSimCardInner(int32_t slotId);
 
 private:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;

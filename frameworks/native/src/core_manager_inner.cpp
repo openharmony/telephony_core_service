@@ -1525,13 +1525,13 @@ int32_t CoreManagerInner::ObtainSpnCondition(int32_t slotId, bool roaming, std::
     return simManager_->ObtainSpnCondition(slotId, roaming, operatorNum);
 }
 
-std::u16string CoreManagerInner::GetSpn(int32_t slotId)
+int32_t CoreManagerInner::GetSimSpn(int32_t slotId, std::u16string &spn)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
-        return std::u16string();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetSimSpn(slotId);
+    return simManager_->GetSimSpn(slotId, spn);
 }
 
 int32_t CoreManagerInner::SetVoiceMailInfo(
@@ -1774,22 +1774,22 @@ int32_t CoreManagerInner::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc
     return simManager_->GetOperatorConfigs(slotId, poc);
 }
 
-std::u16string CoreManagerInner::GetSimOperatorNumeric(int32_t slotId)
+int32_t CoreManagerInner::GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return u"";
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetSimOperatorNumeric(slotId);
+    return simManager_->GetSimOperatorNumeric(slotId, operatorNumeric);
 }
 
-std::u16string CoreManagerInner::GetISOCountryCodeForSim(int32_t slotId)
+int32_t CoreManagerInner::GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return u"";
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetISOCountryCodeForSim(slotId);
+    return simManager_->GetISOCountryCodeForSim(slotId, countryCode);
 }
 
 int32_t CoreManagerInner::GetSimIccId(int32_t slotId, std::u16string &iccId)
@@ -1928,31 +1928,31 @@ int32_t CoreManagerInner::GetVoiceMailNumber(int32_t slotId, std::u16string &voi
     return simManager_->GetVoiceMailNumber(slotId, voiceMailNumber);
 }
 
-bool CoreManagerInner::HasSimCard(int32_t slotId)
+int32_t CoreManagerInner::HasSimCard(int32_t slotId, bool &hasSimCard)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->HasSimCard(slotId);
+    return simManager_->HasSimCard(slotId, hasSimCard);
 }
 
-int32_t CoreManagerInner::GetSimState(int32_t slotId)
+int32_t CoreManagerInner::GetSimState(int32_t slotId, SimState &simState)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return TELEPHONY_ERROR;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return static_cast<int32_t>(simManager_->GetSimState(slotId));
+    return simManager_->GetSimState(slotId, simState);
 }
 
-int32_t CoreManagerInner::GetCardType(int32_t slotId)
+int32_t CoreManagerInner::GetCardType(int32_t slotId, CardType &cardType)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return TELEPHONY_ERROR;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return static_cast<int32_t>(simManager_->GetCardType(slotId));
+    return simManager_->GetCardType(slotId, cardType);
 }
 
 int32_t CoreManagerInner::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
@@ -2076,14 +2076,14 @@ int32_t CoreManagerInner::UnlockSimLock(int32_t slotId, const PersoLockInfo &loc
     return simManager_->UnlockSimLock(slotId, lockInfo, response);
 }
 
-bool CoreManagerInner::HasOperatorPrivileges(const int32_t slotId)
+int32_t CoreManagerInner::HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges)
 {
     TELEPHONY_LOGI("CoreManagerInner::HasOperatorPrivileges slotId:%{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ can not be null!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->HasOperatorPrivileges(slotId);
+    return simManager_->HasOperatorPrivileges(slotId, hasOperatorPrivileges);
 }
 
 std::u16string CoreManagerInner::GetSimIst(int32_t slotId)

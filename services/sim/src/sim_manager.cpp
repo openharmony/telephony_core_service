@@ -134,44 +134,59 @@ void SimManager::SetNetworkSearchManager(std::shared_ptr<INetworkSearch> network
     return;
 }
 
-bool SimManager::HasSimCard(int32_t slotId)
+int32_t SimManager::HasSimCard(int32_t slotId, bool &hasSimCard)
 {
     if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simStateManager is null!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (simStateManager_[slotId]->HasSimCard()) {
         TELEPHONY_LOGE("HasSimCard is true!");
-        return true;
+        hasSimCard = true;
+        return TELEPHONY_ERR_SUCCESS;
     }
     if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
         TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return multiSimController_->IsSimActivatable(slotId);
+    if (multiSimController_->IsSimActivatable(slotId)) {
+        hasSimCard = true;
+    } else {
+        hasSimCard = false;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t SimManager::GetSimState(int32_t slotId)
+bool SimManager::HasSimCardInner(int32_t slotId)
 {
-    if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simStateManager is null!");
-        return TELEPHONY_ERROR;
-    }
-    return static_cast<int32_t>(simStateManager_[slotId]->GetSimState());
+    bool hasSimCard = false;
+    HasSimCard(slotId, hasSimCard);
+    return hasSimCard;
 }
 
-int32_t SimManager::GetCardType(int32_t slotId)
+int32_t SimManager::GetSimState(int32_t slotId, SimState &simState)
 {
-    if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simStateManager is null!");
-        return TELEPHONY_ERROR;
+    if (!HasSimCardInner(slotId)) {
+        TELEPHONY_LOGE("GetSimState has no sim card!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
     }
-    return static_cast<int32_t>(simStateManager_[slotId]->GetCardType());
+    simState = simStateManager_[slotId]->GetSimState();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::GetCardType(int32_t slotId, CardType &cardType)
+{
+    if (!HasSimCardInner(slotId)) {
+        TELEPHONY_LOGE("GetCardType has no sim card!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    cardType = simStateManager_[slotId]->GetCardType();
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t SimManager::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("UnlockPin has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -181,7 +196,7 @@ int32_t SimManager::UnlockPin(int32_t slotId, const std::string &pin, LockStatus
 int32_t SimManager::UnlockPuk(
     int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("UnlockPuk has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -191,7 +206,7 @@ int32_t SimManager::UnlockPuk(
 int32_t SimManager::AlterPin(
     int32_t slotId, const std::string &newPin, const std::string &oldPin, LockStatusResponse &response)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("AlterPin has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -200,7 +215,7 @@ int32_t SimManager::AlterPin(
 
 int32_t SimManager::SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("SetLockState has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -209,7 +224,7 @@ int32_t SimManager::SetLockState(int32_t slotId, const LockInfo &options, LockSt
 
 int32_t SimManager::GetLockState(int32_t slotId, LockType lockType, LockState &lockState)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("GetLockState has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -227,7 +242,7 @@ int32_t SimManager::RefreshSimState(int32_t slotId)
 
 int32_t SimManager::UnlockPin2(int32_t slotId, const std::string &pin2, LockStatusResponse &response)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("UnlockPin2 has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -237,7 +252,7 @@ int32_t SimManager::UnlockPin2(int32_t slotId, const std::string &pin2, LockStat
 int32_t SimManager::UnlockPuk2(
     int32_t slotId, const std::string &newPin2, const std::string &puk2, LockStatusResponse &response)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("UnlockPuk2 has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -247,7 +262,7 @@ int32_t SimManager::UnlockPuk2(
 int32_t SimManager::AlterPin2(
     int32_t slotId, const std::string &newPin2, const std::string &oldPin2, LockStatusResponse &response)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("AlterPin2 has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -256,7 +271,7 @@ int32_t SimManager::AlterPin2(
 
 int32_t SimManager::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("UnlockSimLock has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -467,14 +482,14 @@ int32_t SimManager::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
     return simAccountManager_[slotId]->GetOperatorConfigs(slotId, poc);
 }
 
-bool SimManager::HasOperatorPrivileges(const int32_t slotId)
+int32_t SimManager::HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges)
 {
     TELEPHONY_LOGI("SimManager::HasOperatorPrivileges slotId:%{public}d", slotId);
     if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simAccountManager_ can not be null!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simAccountManager_[slotId]->HasOperatorPrivileges(slotId);
+    return simAccountManager_[slotId]->HasOperatorPrivileges(slotId, hasOperatorPrivileges);
 }
 
 int32_t SimManager::SimAuthentication(
@@ -514,7 +529,7 @@ int32_t SimManager::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
         TELEPHONY_LOGE("stkManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("SendEnvelopeCmd has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -527,7 +542,7 @@ int32_t SimManager::SendTerminalResponseCmd(int32_t slotId, const std::string &c
         TELEPHONY_LOGE("stkManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("SendTerminalResponseCmd has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -544,38 +559,53 @@ int32_t SimManager::SendCallSetupRequestResult(int32_t slotId, bool accept)
         TELEPHONY_LOGE("stkManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("SendCallSetupRequestResult has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     return stkManager_[slotId]->SendCallSetupRequestResult(slotId, accept);
 }
 
-std::u16string SimManager::GetSimOperatorNumeric(int32_t slotId)
+int32_t SimManager::GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric)
 {
+    if (!HasSimCardInner(slotId)) {
+        TELEPHONY_LOGE("GetSimOperatorNumeric has no sim card!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
     if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simFileManager is null!");
-        return u"";
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simFileManager_[slotId]->GetSimOperatorNumeric();
+    operatorNumeric = simFileManager_[slotId]->GetSimOperatorNumeric();
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-std::u16string SimManager::GetISOCountryCodeForSim(int32_t slotId)
+int32_t SimManager::GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode)
 {
+    if (!HasSimCardInner(slotId)) {
+        TELEPHONY_LOGE("GetISOCountryCodeForSim has no sim card!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
     if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simFileManager is null!");
-        return u"";
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simFileManager_[slotId]->GetISOCountryCodeForSim();
+    countryCode = simFileManager_[slotId]->GetISOCountryCodeForSim();
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-std::u16string SimManager::GetSimSpn(int32_t slotId)
+int32_t SimManager::GetSimSpn(int32_t slotId, std::u16string &spn)
 {
+    if (!HasSimCardInner(slotId)) {
+        TELEPHONY_LOGE("GetSimSpn has no sim card!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
     if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simFileManager is null");
-        return std::u16string();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simFileManager_[slotId]->GetSimSpn();
+    spn = simFileManager_[slotId]->GetSimSpn();
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 std::u16string SimManager::GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac,
@@ -591,7 +621,7 @@ std::u16string SimManager::GetSimEons(int32_t slotId, const std::string &plmn, i
 
 int32_t SimManager::GetSimIccId(int32_t slotId, std::u16string &iccId)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("GetSimIccId has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -605,7 +635,7 @@ int32_t SimManager::GetSimIccId(int32_t slotId, std::u16string &iccId)
 
 int32_t SimManager::GetIMSI(int32_t slotId, std::u16string &imsi)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("GetIMSI has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -628,7 +658,7 @@ std::u16string SimManager::GetLocaleFromDefaultSim(int32_t slotId)
 
 int32_t SimManager::GetSimGid1(int32_t slotId, std::u16string &gid1)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("GetSimGid1 has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -693,7 +723,7 @@ int32_t SimManager::GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt)
 
 int32_t SimManager::GetSimTelephoneNumber(int32_t slotId, std::u16string &telephoneNumber)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("GetSimTelephoneNumber has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -716,7 +746,7 @@ std::u16string SimManager::GetSimTeleNumberIdentifier(const int32_t slotId)
 
 int32_t SimManager::GetVoiceMailIdentifier(int32_t slotId, std::u16string &voiceMailIdentifier)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("GetVoiceMailIdentifier has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -730,7 +760,7 @@ int32_t SimManager::GetVoiceMailIdentifier(int32_t slotId, std::u16string &voice
 
 int32_t SimManager::GetVoiceMailNumber(int32_t slotId, std::u16string &voiceMailNumber)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("GetVoiceMailNumber has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -753,7 +783,7 @@ int32_t SimManager::ObtainSpnCondition(int32_t slotId, bool roaming, std::string
 
 int32_t SimManager::SetVoiceMailInfo(int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber)
 {
-    if (!HasSimCard(slotId)) {
+    if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("SetVoiceMailInfo has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
