@@ -308,7 +308,8 @@ static bool TestHasSimCard()
     static int32_t testSlot = SLOT_ID;
     std::cout << "please input Slot Id" << std::endl;
     std::cin >> testSlot;
-    bool result = g_telephonyService->HasSimCard(testSlot);
+    bool result = false;
+    g_telephonyService->HasSimCard(testSlot, result);
     string expect = result ? "success" : "fail";
     std::cout << "TelephonyTestService Remote HasSimCard result [" << result << "] " << expect << std::endl;
     return true;
@@ -335,7 +336,9 @@ static bool TestGetSimState()
     static int32_t testSlot = SLOT_ID;
     std::cout << "please input Slot Id" << std::endl;
     std::cin >> testSlot;
-    int32_t result = static_cast<int32_t>(g_telephonyService->GetSimState(testSlot));
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    g_telephonyService->GetSimState(testSlot, simState);
+    int32_t result = static_cast<int32_t>(simState);
     string expect = (result == simReady) ? "success" : "fail";
     std::cout << "TelephonyTestService Remote GetSimState result [" << result << "] " << expect << std::endl;
     return true;
@@ -347,7 +350,9 @@ static bool TestGetCardType()
     static int32_t testSlot = SLOT_ID;
     std::cout << "please input Slot Id" << std::endl;
     std::cin >> testSlot;
-    int32_t result = static_cast<int32_t>(g_telephonyService->GetCardType(testSlot));
+    CardType cardType = CardType::UNKNOWN_CARD;
+    g_telephonyService->GetCardType(testSlot, cardType);
+    int32_t result = static_cast<int32_t>(cardType);
     std::cout << "TelephonyTestService Remote GetCardType result [" << result << "] " << std::endl;
     return true;
 }
@@ -381,7 +386,8 @@ static bool TestGetISOCountryCodeForSim()
     static int32_t testSlot = SLOT_ID;
     std::cout << "please input Slot Id" << std::endl;
     std::cin >> testSlot;
-    std::u16string result = g_telephonyService->GetISOCountryCodeForSim(testSlot);
+    std::u16string result;
+    g_telephonyService->GetISOCountryCodeForSim(testSlot, result);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote GetISOCountryCodeForSim result [" << str << "] " << expect
@@ -396,7 +402,7 @@ static bool TestGetSimSpn()
     std::cout << "please input Slot Id" << std::endl;
     std::cin >> testSlot;
     std::u16string result  = u"test";
-    result = g_telephonyService->GetSimSpn(testSlot);
+    g_telephonyService->GetSimSpn(testSlot, result);
     std::string str = Str16ToStr8(result);
     string expect = strcmp(str.c_str(), "test") ? "success" : "fail";
     std::cout << "TelephonyTestService Remote GetSimSpn result [" << str << "] " << expect << std::endl;
@@ -471,7 +477,8 @@ static bool TestGetSimOperatorNumeric()
     static int32_t testSlot = SLOT_ID;
     std::cout << "please input Slot Id" << std::endl;
     std::cin >> testSlot;
-    std::u16string result = g_telephonyService->GetSimOperatorNumeric(testSlot);
+    std::u16string result;
+    g_telephonyService->GetSimOperatorNumeric(testSlot, result);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote GetSimOperatorNumeric result [" << str << "] " << expect << std::endl;
@@ -1281,7 +1288,8 @@ static bool TestHasOperatorPrivileges()
     std::cout << "input slotId:" << std::endl;
     int32_t slotId = 0;
     std::cin >> slotId;
-    bool result = g_telephonyService->HasOperatorPrivileges(slotId);
+    bool hasOperatorPrivileges = false;
+    int32_t result = g_telephonyService->HasOperatorPrivileges(slotId, hasOperatorPrivileges);
     std::cout << "TelephonyTestService Remote TestHasOperatorPrivileges result [" << result << "] " << std::endl;
     return true;
 }

@@ -19,6 +19,7 @@
 #include "i_tel_ril_manager.h"
 #include "sim_state_handle.h"
 #include "sim_state_type.h"
+#include "telephony_errors.h"
 
 namespace OHOS {
 namespace Telephony {

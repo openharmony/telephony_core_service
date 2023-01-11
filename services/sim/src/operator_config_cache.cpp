@@ -83,10 +83,10 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
         TELEPHONY_LOGI("load default operator config");
         filename = DEFAULT_OPERATOR_CONFIG;
     }
-    int32_t simState = CoreManagerInner::GetInstance().GetSimState(slotId);
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    CoreManagerInner::GetInstance().GetSimState(slotId, simState);
     TELEPHONY_LOGI("LoadOperatorConfig simState = %{public}d", simState);
-    bool canAnnounceChanged = (simState == static_cast<int32_t>(SimState::SIM_STATE_NOT_PRESENT) ||
-                               simState == static_cast<int32_t>(SimState::SIM_STATE_READY));
+    bool canAnnounceChanged = (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_READY);
     Json::Value opcJson;
     if (parser_.ParseOperatorConfigFromFile(poc, parser_.GetOperatorConfigFilePath(filename), opcJson)) {
         TELEPHONY_LOGI("load from file success opc size %{public}zu", poc.configValue.size());
@@ -190,11 +190,11 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
         TELEPHONY_LOGE("start ProcessEvent but event is null!");
         return;
     }
-    int32_t simState = CoreManagerInner::GetInstance().GetSimState(slotId_);
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
     if (event->GetInnerEventId() == RadioEvent::RADIO_SIM_STATE_CHANGE) {
         TELEPHONY_LOGI("OperatorConfigCache::Sim state change");
-        if (simState == static_cast<int32_t>(SimState::SIM_STATE_NOT_PRESENT) ||
-            simState == static_cast<int32_t>(SimState::SIM_STATE_LOCKED)) {
+        if (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_LOCKED) {
             ClearOperatorValue(slotId_);
             ClearMemoryCache(slotId_);
             OperatorConfig opc;

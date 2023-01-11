@@ -43,8 +43,9 @@ public:
     virtual ~IccOperatorPrivilegeController();
 
     void Init(const int32_t slotId);
-    bool HasOperatorPrivileges();
-    bool HasOperatorPrivileges(const std::string_view &certHash, const std::string_view &packageName);
+    int32_t HasOperatorPrivileges(bool &hasOperatorPrivileges);
+    int32_t HasOperatorPrivileges(
+        const std::string_view &certHash, const std::string_view &packageName, bool &hasOperatorPrivileges);
 
 protected:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
