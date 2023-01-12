@@ -1584,20 +1584,20 @@ int32_t CoreManagerInner::UpdateIccDiallingNumbers(
     return simManager_->UpdateIccDiallingNumbers(slotId, type, diallingNumber);
 }
 
-bool CoreManagerInner::AddSmsToIcc(int slotId, int status, std::string &pdu, std::string &smsc)
+int32_t CoreManagerInner::AddSmsToIcc(int slotId, int status, std::string &pdu, std::string &smsc)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simManager_->AddSmsToIcc(slotId, status, pdu, smsc);
 }
 
-bool CoreManagerInner::UpdateSmsIcc(int slotId, int index, int status, std::string &pduData, std::string &smsc)
+int32_t CoreManagerInner::UpdateSmsIcc(int slotId, int index, int status, std::string &pduData, std::string &smsc)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simManager_->UpdateSmsIcc(slotId, index, status, pduData, smsc);
 }
@@ -1612,11 +1612,11 @@ std::vector<std::string> CoreManagerInner::ObtainAllSmsOfIcc(int slotId)
     return simManager_->ObtainAllSmsOfIcc(slotId);
 }
 
-bool CoreManagerInner::DelSmsIcc(int slotId, int index)
+int32_t CoreManagerInner::DelSmsIcc(int slotId, int index)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simManager_->DelSmsIcc(slotId, index);
 }
@@ -1657,11 +1657,11 @@ int32_t CoreManagerInner::SetDefaultVoiceSlotId(int32_t slotId)
     return simManager_->SetDefaultVoiceSlotId(slotId);
 }
 
-bool CoreManagerInner::SetDefaultSmsSlotId(int32_t slotId)
+int32_t CoreManagerInner::SetDefaultSmsSlotId(int32_t slotId)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simManager_->SetDefaultSmsSlotId(slotId);
 }

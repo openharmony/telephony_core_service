@@ -47,7 +47,7 @@ public:
     int32_t GetDefaultVoiceSlotId();
     int32_t SetDefaultVoiceSlotId(int32_t slotId);
     int32_t GetDefaultSmsSlotId();
-    bool SetDefaultSmsSlotId(int32_t slotId);
+    int32_t SetDefaultSmsSlotId(int32_t slotId);
     int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
     int32_t GetDefaultCellularDataSlotId();
     int32_t SetDefaultCellularDataSlotId(int32_t slotId);

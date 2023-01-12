@@ -67,6 +67,8 @@ private:
     static bool CreateParameterErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
     static bool CreateNetworkSearchErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
     static bool CreateSimErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateSmsErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateObserverErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
     static bool CreateCommonErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
     static bool CreateCallErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
     static bool CreateCommonCallErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);

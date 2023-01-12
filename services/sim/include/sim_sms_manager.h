@@ -30,9 +30,9 @@ public:
         std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simStateManager);
     virtual ~SimSmsManager();
     void Init(int slotId);
-    bool AddSmsToIcc(int status, std::string &pdu, std::string &smsc);
-    bool UpdateSmsIcc(int index, int status, std::string &pduData, std::string &smsc);
-    bool DelSmsIcc(int index);
+    int32_t AddSmsToIcc(int status, std::string &pdu, std::string &smsc);
+    int32_t UpdateSmsIcc(int index, int status, std::string &pduData, std::string &smsc);
+    int32_t DelSmsIcc(int index);
     std::vector<std::string> ObtainAllSmsOfIcc();
     enum class HandleRunningState {
         STATE_NOT_START,

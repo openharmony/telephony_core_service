@@ -121,6 +121,12 @@ enum PROTOCOL_ERROR_TYPE {
     CALL_ERR_OPTION_NOT_AVAILABLE, // service or option not available
     CALL_ERR_OPTION_NOT_IMPLEMENTED, // service or option not implemented
 };
+
+enum SmsMmsErrorCode {
+    SMS_MMS_DECODE_DATA_EMPTY = SMS_MMS_ERR_OFFSET,
+    SMS_MMS_UNKNOWN_SIM_MESSAGE_STATUS,
+    SMS_MMS_MESSAGE_LENGTH_OUT_OF_RANGE,
+};
 } // namespace Telephony
 } // namespace OHOS
 
