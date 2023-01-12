@@ -318,15 +318,15 @@ int32_t SimManager::SetDefaultVoiceSlotId(int32_t slotId)
     return multiSimController_->SetDefaultVoiceSlotId(slotId);
 }
 
-bool SimManager::SetDefaultSmsSlotId(int32_t slotId)
+int32_t SimManager::SetDefaultSmsSlotId(int32_t slotId)
 {
-    if ((!IsValidSlotIdForDefault(slotId)) || (multiSimController_ == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid for default or multiSimController_ is nullptr");
-        return false;
+    if (!IsValidSlotIdForDefault(slotId)) {
+        TELEPHONY_LOGE("slotId is invalid for default.");
+        return TELEPHONY_ERR_SLOTID_INVALID;
     }
-    if (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsSimActive(slotId)) {
-        TELEPHONY_LOGE("SetDefaultSmsSlotId slotId is not active!");
-        return false;
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr.");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return multiSimController_->SetDefaultSmsSlotId(slotId);
 }
@@ -801,29 +801,29 @@ int32_t SimManager::SetVoiceMailInfo(int32_t slotId, const std::u16string &mailN
     return TELEPHONY_ERR_SUCCESS;
 }
 
-bool SimManager::AddSmsToIcc(int32_t slotId, int status, std::string &pdu, std::string &smsc)
+int32_t SimManager::AddSmsToIcc(int32_t slotId, int status, std::string &pdu, std::string &smsc)
 {
     if ((!IsValidSlotId(slotId)) || (simSmsManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simSmsManager_ is null!");
-        return false;
+        return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simSmsManager_[slotId]->AddSmsToIcc(status, pdu, smsc);
 }
 
-bool SimManager::UpdateSmsIcc(int32_t slotId, int index, int status, std::string &pduData, std::string &smsc)
+int32_t SimManager::UpdateSmsIcc(int32_t slotId, int index, int status, std::string &pduData, std::string &smsc)
 {
     if ((!IsValidSlotId(slotId)) || (simSmsManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simSmsManager_ is null!");
-        return false;
+        return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simSmsManager_[slotId]->UpdateSmsIcc(index, status, pduData, smsc);
 }
 
-bool SimManager::DelSmsIcc(int32_t slotId, int index)
+int32_t SimManager::DelSmsIcc(int32_t slotId, int index)
 {
     if ((!IsValidSlotId(slotId)) || (simSmsManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simSmsManager_ is null!");
-        return false;
+        return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simSmsManager_[slotId]->DelSmsIcc(index);
 }

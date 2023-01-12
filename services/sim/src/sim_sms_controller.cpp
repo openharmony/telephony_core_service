@@ -15,6 +15,8 @@
 
 #include "sim_sms_controller.h"
 
+#include "core_service_errors.h"
+
 namespace OHOS {
 namespace Telephony {
 std::mutex SimSmsController::mtx_;
@@ -132,7 +134,7 @@ void SimSmsController::ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &
     processWait_.notify_all();
 }
 
-bool SimSmsController::UpdateSmsIcc(int index, int status, std::string &pduData, std::string &smsc)
+int32_t SimSmsController::UpdateSmsIcc(int index, int status, std::string &pduData, std::string &smsc)
 {
     std::unique_lock<std::mutex> lock(mtx_);
     bool isCDMA = IsCdmaCardType();
@@ -140,11 +142,11 @@ bool SimSmsController::UpdateSmsIcc(int index, int status, std::string &pduData,
     responseReady_ = false;
     if (!isCDMA) {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_UPDATE_COMPLETED);
-        SimMessageParam param {index, status, smsc, pduData};
+        SimMessageParam param { index, status, smsc, pduData };
         telRilManager_->UpdateSimMessage(slotId_, param, response);
     } else {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_UPDATE_COMPLETED);
-        CdmaSimMessageParam param {index, status, pduData};
+        CdmaSimMessageParam param { index, status, pduData };
         telRilManager_->UpdateCdmaSimMessage(slotId_, param, response);
     }
     while (!responseReady_) {
@@ -154,10 +156,14 @@ bool SimSmsController::UpdateSmsIcc(int index, int status, std::string &pduData,
         }
     }
     TELEPHONY_LOGI("SimSmsController::UpdateSmsIcc OK return %{public}d", responseReady_);
-    return responseReady_;
+    if (responseReady_) {
+        return TELEPHONY_ERR_SUCCESS;
+    } else {
+        return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+    }
 }
 
-bool SimSmsController::DelSmsIcc(int index)
+int32_t SimSmsController::DelSmsIcc(int index)
 {
     std::unique_lock<std::mutex> lock(mtx_);
     bool isCDMA = IsCdmaCardType();
@@ -178,10 +184,14 @@ bool SimSmsController::DelSmsIcc(int index)
             break;
         }
     }
-    return responseReady_;
+    if (responseReady_) {
+        return TELEPHONY_ERR_SUCCESS;
+    } else {
+        return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+    }
 }
 
-bool SimSmsController::AddSmsToIcc(int status, std::string &pdu, std::string &smsc)
+int32_t SimSmsController::AddSmsToIcc(int status, std::string &pdu, std::string &smsc)
 {
     std::unique_lock<std::mutex> lock(mtx_);
     bool isCDMA = IsCdmaCardType();
@@ -189,7 +199,7 @@ bool SimSmsController::AddSmsToIcc(int status, std::string &pdu, std::string &sm
     responseReady_ = false;
     if (!isCDMA) {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_WRITE_COMPLETED);
-        SimMessageParam param {0, status, smsc, pdu};
+        SimMessageParam param { 0, status, smsc, pdu };
         telRilManager_->AddSimMessage(slotId_, param, response);
     } else {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_WRITE_COMPLETED);
@@ -202,7 +212,11 @@ bool SimSmsController::AddSmsToIcc(int status, std::string &pdu, std::string &sm
         }
     }
     TELEPHONY_LOGI("SimSmsController::AddSmsToIcc OK return %{public}d", responseReady_);
-    return responseReady_;
+    if (responseReady_) {
+        return TELEPHONY_ERR_SUCCESS;
+    } else {
+        return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+    }
 }
 
 void SimSmsController::Init(int slodId)
