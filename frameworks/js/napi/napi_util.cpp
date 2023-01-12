@@ -25,6 +25,7 @@
 
 #include "core_service_errors.h"
 #include "enum_convert_for_js.h"
+#include "state_registry_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -406,7 +407,9 @@ JsError NapiUtil::ConverErrorMessageForJs(int32_t errorCode)
         !CreateCallErrorMessageForJs(errorCode, error.errorCode) &&
         !CreateDataErrorMessageForJs(errorCode, error.errorCode) &&
         !CreateNetworkSearchErrorMessageForJs(errorCode, error.errorCode) &&
-        !CreateSimErrorMessageForJs(errorCode, error.errorCode)) {
+        !CreateSimErrorMessageForJs(errorCode, error.errorCode) &&
+        !CreateSmsErrorMessageForJs(errorCode, error.errorCode) &&
+        !CreateObserverErrorMessageForJs(errorCode, error.errorCode)) {
         error.errorCode = JS_ERROR_TELEPHONY_UNKNOW_ERROR;
         TELEPHONY_LOGE("NapiUtil::ConverErrorMessageForJs errorCode is out of range");
     }
@@ -477,6 +480,53 @@ bool NapiUtil::CreateSimErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErro
         case CORE_ERR_OPERATOR_KEY_NOT_EXIT:
         case CORE_ERR_OPERATOR_CONF_NOT_EXIT:
             jsErrorCode = JS_ERROR_OPERATOR_CONFIG_ERROR;
+            break;
+        default:
+            flag = false;
+            break;
+    }
+
+    return flag;
+}
+
+bool NapiUtil::CreateSmsErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode)
+{
+    if ((errorCode < SMS_MMS_ERR_OFFSET || errorCode >= STATE_REGISTRY_ERR_OFFSET)) {
+        return false;
+    }
+    bool flag = true;
+    switch (errorCode) {
+        case SMS_MMS_DECODE_DATA_EMPTY:
+        case SMS_MMS_UNKNOWN_SIM_MESSAGE_STATUS:
+        case SMS_MMS_MESSAGE_LENGTH_OUT_OF_RANGE:
+            jsErrorCode = JS_ERROR_TELEPHONY_SYSTEM_ERROR;
+            break;
+        default:
+            flag = false;
+            break;
+    }
+
+    return flag;
+}
+
+bool NapiUtil::CreateObserverErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode)
+{
+    if ((errorCode < STATE_REGISTRY_ERR_OFFSET || errorCode >= NET_MANAGER_ERR_OFFSET)) {
+        return false;
+    }
+    bool flag = true;
+    switch (errorCode) {
+        case TELEPHONY_STATE_REGISTRY_SLODID_ERROR:
+            jsErrorCode = JS_ERROR_TELEPHONY_ARGUMENT_ERROR;
+            break;
+        case TELEPHONY_STATE_REGISTRY_PERMISSION_DENIED:
+            jsErrorCode = JS_ERROR_TELEPHONY_PERMISSION_DENIED;
+            break;
+        case TELEPHONY_STATE_REGISTRY_DATA_NOT_EXIST:
+        case TELEPHONY_STATE_UNREGISTRY_DATA_NOT_EXIST:
+        case TELEPHONY_STATE_REGISTRY_DATA_EXIST:
+        case TELEPHONY_STATE_REGISTRY_NOT_IMPLEMENTED:
+            jsErrorCode = JS_ERROR_TELEPHONY_SYSTEM_ERROR;
             break;
         default:
             flag = false;

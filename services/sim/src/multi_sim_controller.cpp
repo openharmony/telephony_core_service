@@ -577,26 +577,29 @@ int32_t MultiSimController::GetDefaultSmsSlotId()
     return GetFirstActivedSlotId();
 }
 
-bool MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
+int32_t MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
 {
-    if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId failed by nullptr");
-        return false;
+    if (slotId == DEFAULT_SIM_SLOT_ID_REMOVE && localCacheInfo_.empty()) {
+        TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId no sim card");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsSimActive(slotId)) {
+        TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId slotId is not active!");
+        return CORE_SERVICE_SIM_CARD_IS_NOT_ACTIVE;
     }
     if (slotId >= (int32_t)localCacheInfo_.size() || slotId < DEFAULT_SIM_SLOT_ID_REMOVE) {
         TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId failed by out of range");
-        return false;
+        return TELEPHONY_ERR_SLOTID_INVALID;
     }
-
-    if (slotId == DEFAULT_SIM_SLOT_ID_REMOVE && localCacheInfo_.empty()) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId no active sim");
-        return false;
+    if (simDbHelper_ == nullptr) {
+        TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId failed by nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
     int32_t result = simDbHelper_->SetDefaultMessageCard(slotId);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId get Data Base failed");
-        return false;
+        return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
     for (; i < maxCount_; i++) { // save to cache
@@ -606,7 +609,10 @@ bool MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
         }
         localCacheInfo_[i].isMessageCard = NOT_MAIN;
     }
-    return AnnounceDefaultSmsSlotIdChanged(slotId);
+    if (!AnnounceDefaultSmsSlotIdChanged(slotId)) {
+        return TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t MultiSimController::GetDefaultCellularDataSlotId()
