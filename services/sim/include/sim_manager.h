@@ -61,7 +61,7 @@ public:
     int32_t SetActiveSim(int32_t slotId, int32_t enable) override;
     int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) override;
     int32_t SetDefaultVoiceSlotId(int32_t slotId) override;
-    bool SetDefaultSmsSlotId(int32_t slotId) override;
+    int32_t SetDefaultSmsSlotId(int32_t slotId) override;
     int32_t SetDefaultCellularDataSlotId(int32_t slotId) override;
     int32_t SetPrimarySlotId(int32_t slotId) override;
     int32_t SetShowNumber(int32_t slotId, const std::u16string &number) override;
@@ -106,10 +106,10 @@ public:
     int ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum) override;
     int32_t SetVoiceMailInfo(int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) override;
     // SimSms
-    bool AddSmsToIcc(int32_t slotId, int status, std::string &pdu, std::string &smsc) override;
-    bool UpdateSmsIcc(
+    int32_t AddSmsToIcc(int32_t slotId, int status, std::string &pdu, std::string &smsc) override;
+    int32_t UpdateSmsIcc(
         int32_t slotId, int index, int status, std::string &pduData, std::string &smsc) override;
-    bool DelSmsIcc(int32_t slotId, int index) override;
+    int32_t DelSmsIcc(int32_t slotId, int index) override;
     std::vector<std::string> ObtainAllSmsOfIcc(int32_t slotId) override;
     // IccDiallingNumbers
     int32_t QueryIccDiallingNumbers(
