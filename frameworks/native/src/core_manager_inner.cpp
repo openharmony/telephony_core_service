@@ -25,7 +25,8 @@
 using namespace OHOS::Telephony;
 namespace OHOS {
 namespace Telephony {
-const int NETWORK_IS_NULL = -1;
+constexpr int NETWORK_IS_NULL = -1;
+constexpr int32_t INVALID_VALUE = -1;
 
 CoreManagerInner::CoreManagerInner() {}
 
@@ -1238,22 +1239,22 @@ int32_t CoreManagerInner::GetPsRegStatus(
 }
 /******************** telRilManager end *******************/
 /******************** networkSearchManager start *******************/
-int32_t CoreManagerInner::GetPsRadioTech(int32_t slotId)
+int32_t CoreManagerInner::GetPsRadioTech(int32_t slotId, int32_t &psRadioTech)
 {
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager is null!");
-        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return networkSearchManager_->GetPsRadioTech(slotId);
+    return networkSearchManager_->GetPsRadioTech(slotId, psRadioTech);
 }
 
-int32_t CoreManagerInner::GetCsRadioTech(int32_t slotId)
+int32_t CoreManagerInner::GetCsRadioTech(int32_t slotId, int32_t &csRadioTech)
 {
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager is null!");
-        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return networkSearchManager_->GetCsRadioTech(slotId);
+    return networkSearchManager_->GetCsRadioTech(slotId, csRadioTech);
 }
 
 int32_t CoreManagerInner::GetPsRegState(int32_t slotId)
@@ -1295,13 +1296,13 @@ bool CoreManagerInner::SetNetworkSelectionMode(int32_t slotId, int32_t selectMod
         slotId, selectMode, networkInformation, resumeSelection, callback);
 }
 
-std::vector<sptr<SignalInformation>> CoreManagerInner::GetSignalInfoList(int32_t slotId)
+int32_t CoreManagerInner::GetSignalInfoList(int32_t slotId, std::vector<sptr<SignalInformation>> &signals)
 {
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager is null!");
-        return std::vector<sptr<SignalInformation>>();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return networkSearchManager_->GetSignalInfoList(slotId);
+    return networkSearchManager_->GetSignalInfoList(slotId, signals);
 }
 
 std::u16string CoreManagerInner::GetOperatorNumeric(int32_t slotId)
@@ -1313,22 +1314,22 @@ std::u16string CoreManagerInner::GetOperatorNumeric(int32_t slotId)
     return networkSearchManager_->GetOperatorNumeric(slotId);
 }
 
-std::u16string CoreManagerInner::GetOperatorName(int32_t slotId)
+int32_t CoreManagerInner::GetOperatorName(int32_t slotId, std::u16string &operatorName)
 {
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager is null!");
-        return std::u16string();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return networkSearchManager_->GetOperatorName(slotId);
+    return networkSearchManager_->GetOperatorName(slotId, operatorName);
 }
 
-sptr<NetworkState> CoreManagerInner::GetNetworkStatus(int32_t slotId)
+int32_t CoreManagerInner::GetNetworkStatus(int32_t slotId, sptr<NetworkState> &networkState)
 {
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager is null!");
-        return nullptr;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return networkSearchManager_->GetNetworkStatus(slotId);
+    return networkSearchManager_->GetNetworkStatus(slotId, networkState);
 }
 
 int32_t CoreManagerInner::SetRadioState(
@@ -1350,22 +1351,22 @@ int32_t CoreManagerInner::GetRadioState(int32_t slotId)
     return networkSearchManager_->GetRadioState(slotId);
 }
 
-bool CoreManagerInner::GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+int32_t CoreManagerInner::GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager is null!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return networkSearchManager_->GetRadioState(slotId, callback);
 }
 
-std::u16string CoreManagerInner::GetIsoCountryCodeForNetwork(int32_t slotId)
+int32_t CoreManagerInner::GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode)
 {
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager is null!");
-        return std::u16string();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return networkSearchManager_->GetIsoCountryCodeForNetwork(slotId);
+    return networkSearchManager_->GetIsoCountryCodeForNetwork(slotId, countryCode);
 }
 
 int32_t CoreManagerInner::GetImei(int32_t slotId, std::u16string &imei)
@@ -1422,11 +1423,11 @@ int32_t CoreManagerInner::GetNetworkSearchInformation(int32_t slotId, const sptr
     return networkSearchManager_->GetNetworkSearchInformation(slotId, callback);
 }
 
-bool CoreManagerInner::GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+int32_t CoreManagerInner::GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     if (networkSearchManager_ == nullptr) {
         TELEPHONY_LOGE("networkSearchManager is null!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return networkSearchManager_->GetNetworkSelectionMode(slotId, callback);
 }
@@ -1729,13 +1730,13 @@ int32_t CoreManagerInner::GetDefaultCellularDataSlotId()
     return simManager_->GetDefaultCellularDataSlotId();
 }
 
-int32_t CoreManagerInner::GetPrimarySlotId()
+int32_t CoreManagerInner::GetPrimarySlotId(int32_t &slotId)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return TELEPHONY_ERROR;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetPrimarySlotId();
+    return simManager_->GetPrimarySlotId(slotId);
 }
 
 int32_t CoreManagerInner::GetShowNumber(int32_t slotId, std::u16string &showNumber)
@@ -1879,7 +1880,8 @@ int32_t CoreManagerInner::GetOpKey(std::u16string &opkey)
         TELEPHONY_LOGE("simManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t slotId = simManager_->GetPrimarySlotId();
+    int32_t slotId = INVALID_VALUE;
+    simManager_->GetPrimarySlotId(slotId);
     return GetOpKey(slotId, opkey);
 }
 

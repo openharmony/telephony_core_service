@@ -38,21 +38,21 @@ public:
 
     void OnStop() override;
 
-    int32_t GetPsRadioTech(int32_t slotId) override;
+    int32_t GetPsRadioTech(int32_t slotId, int32_t &psRadioTech) override;
 
-    int32_t GetCsRadioTech(int32_t slotId) override;
+    int32_t GetCsRadioTech(int32_t slotId, int32_t &csRadioTech) override;
 
-    std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId) override;
+    int32_t GetSignalInfoList(int32_t slotId, std::vector<sptr<SignalInformation>> &signals) override;
 
     std::u16string GetOperatorNumeric(int32_t slotId) override;
 
-    std::u16string GetOperatorName(int32_t slotId) override;
+    int32_t GetOperatorName(int32_t slotId, std::u16string &operatorName) override;
 
-    const sptr<NetworkState> GetNetworkState(int32_t slotId) override;
+    int32_t GetNetworkState(int32_t slotId, sptr<NetworkState> &networkState) override;
 
     int32_t SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback) override;
 
-    bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
+    int32_t GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 
     int32_t GetImei(int32_t slotId, std::u16string &imei) override;
 
@@ -88,7 +88,7 @@ public:
 
     int32_t GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 
-    bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
+    int32_t GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 
     std::u16string GetLocaleFromDefaultSim() override;
 
@@ -102,7 +102,7 @@ public:
         const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
         const sptr<INetworkSearchCallback> &callback) override;
 
-    std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) override;
+    int32_t GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode) override;
 
     int32_t UnlockPin(int32_t slotId, const std::u16string &pin, LockStatusResponse &response) override;
 
@@ -132,7 +132,7 @@ public:
 
     int32_t SetPrimarySlotId(int32_t slotId) override;
 
-    int32_t GetPrimarySlotId() override;
+    int32_t GetPrimarySlotId(int32_t &slotId) override;
 
     int32_t SetShowNumber(int32_t slotId, const std::u16string &number) override;
 

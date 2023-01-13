@@ -250,9 +250,11 @@ void NetworkSearchHandler::SimRecordsLoaded(const AppExecFwk::InnerEvent::Pointe
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager != nullptr) {
-        RadioTech csRadioTech = static_cast<RadioTech>(networkSearchManager->GetCsRadioTech(slotId_));
-        RadioTech psRadioTech = static_cast<RadioTech>(networkSearchManager->GetPsRadioTech(slotId_));
-        UpdatePhone(csRadioTech, psRadioTech);
+        int32_t csRadioTech = 0;
+        int32_t psRadioTech = 0;
+        networkSearchManager->GetCsRadioTech(slotId_, csRadioTech);
+        networkSearchManager->GetPsRadioTech(slotId_, psRadioTech);
+        UpdatePhone(static_cast<RadioTech>(csRadioTech), static_cast<RadioTech>(psRadioTech));
     }
 
     if (operatorName_ != nullptr) {

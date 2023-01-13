@@ -33,7 +33,7 @@ void GetRadioStateCallback::OnGetRadioStateCallback(const bool isOn, const int32
     if (asyncContext_->resolved) {
         asyncContext_->isRadioOn = isOn;
     } else {
-        asyncContext_->errorCode = errorCode;
+        asyncContext_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
     asyncContext_->callbackEnd = true;
     asyncContext_->cv.notify_all();

@@ -32,18 +32,18 @@ public:
     sptr<ICoreService> GetProxy();
     void OnRemoteDied(const wptr<IRemoteObject> &remote);
 
-    std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId);
+    int32_t GetSignalInfoList(int32_t slotId, std::vector<sptr<SignalInformation>> &signals);
     bool IsNrSupported(int32_t slotId);
-    int32_t GetPsRadioTech(int32_t slotId);
-    int32_t GetCsRadioTech(int32_t slotId);
+    int32_t GetPsRadioTech(int32_t slotId, int32_t &psRadioTech);
+    int32_t GetCsRadioTech(int32_t slotId, int32_t &csRadioTech);
     int32_t GetNrOptionMode(int32_t slotId, NrMode &mode);
     int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId);
     int32_t GetMeid(int32_t slotId, std::u16string &meid);
     std::u16string GetOperatorNumeric(int32_t slotId);
-    std::u16string GetOperatorName(int32_t slotId);
-    const sptr<NetworkState> GetNetworkState(int32_t slotId);
+    int32_t GetOperatorName(int32_t slotId, std::u16string &operatorName);
+    int32_t GetNetworkState(int32_t slotId, sptr<NetworkState> &networkState);
     int32_t SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback);
-    bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+    int32_t GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     int32_t GetImei(int32_t slotId, std::u16string &imei);
     int32_t HasSimCard(int32_t slotId, bool &hasSimCard);
     int32_t GetSimState(int32_t slotId, SimState &simState);
@@ -56,7 +56,7 @@ public:
     int32_t GetSlotId(int32_t simId);
     int32_t GetSimId(int32_t slotId);
     int32_t GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
-    bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+    int32_t GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     std::u16string GetLocaleFromDefaultSim();
     int32_t GetSimGid1(int32_t slotId, std::u16string &gid1);
     std::u16string GetSimGid2(int32_t slotId);
@@ -64,7 +64,7 @@ public:
     int32_t SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
         const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
         const sptr<INetworkSearchCallback> &callback);
-    std::u16string GetIsoCountryCodeForNetwork(int32_t slotId);
+    int32_t GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode);
     int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
     int32_t SetDefaultVoiceSlotId(int32_t slotId);
     int32_t GetDefaultVoiceSlotId();
@@ -112,7 +112,7 @@ public:
     int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges);
     int32_t SimAuthentication(
         int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response);
-    int32_t GetPrimarySlotId();
+    int32_t GetPrimarySlotId(int32_t &slotId);
     int32_t SetPrimarySlotId(int32_t slotId);
     int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo);
     int32_t SendUpdateCellLocationRequest(int32_t slotId);
