@@ -198,7 +198,8 @@ void CellInfo::UpdateSignalLevel(sptr<CellInformation> &cell, CellInformation::C
         return;
     }
 
-    std::vector<sptr<SignalInformation>> signals = nsm->GetSignalInfoList(slotId_);
+    std::vector<sptr<SignalInformation>> signals;
+    nsm->GetSignalInfoList(slotId_, signals);
     int32_t signalLevel = 0;
     for (const auto &v : signals) {
         if (ConvertToCellType(v->GetNetworkType()) == cellType) {

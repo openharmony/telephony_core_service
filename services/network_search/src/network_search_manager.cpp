@@ -378,34 +378,36 @@ void NetworkSearchManager::NotifyNrFrequencyChanged(int32_t slotId)
     }
 }
 
-int32_t NetworkSearchManager::GetPsRadioTech(int32_t slotId)
+int32_t NetworkSearchManager::GetPsRadioTech(int32_t slotId, int32_t &psRadioTech)
 {
     auto inner = FindManagerInner(slotId);
-    if (inner != nullptr) {
-        if (inner->networkSearchState_ != nullptr && inner->networkSearchState_->GetNetworkStatus() != nullptr) {
-            auto event = static_cast<int32_t>(inner->networkSearchState_->GetNetworkStatus()->GetPsRadioTech());
-            TELEPHONY_LOGI("NetworkSearchManager::GetPsRadioTech result=%{public}d slotId:%{public}d", event, slotId);
-            return event;
-        }
-        TELEPHONY_LOGE("NetworkSearchManager::GetPsRadioTech failed due to nullptr!");
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::GetPsRadioTech Failed slotId:%{public}d", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    TELEPHONY_LOGE("NetworkSearchManager::GetPsRadioTech Failed slotId:%{public}d", slotId);
-    return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    if ((inner->networkSearchState_ == nullptr) || (inner->networkSearchState_->GetNetworkStatus() == nullptr)) {
+        TELEPHONY_LOGE("NetworkSearchManager::GetPsRadioTech failed due to nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    psRadioTech = static_cast<int32_t>(inner->networkSearchState_->GetNetworkStatus()->GetPsRadioTech());
+    TELEPHONY_LOGI("NetworkSearchManager::GetPsRadioTech result=%{public}d slotId:%{public}d", psRadioTech, slotId);
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t NetworkSearchManager::GetCsRadioTech(int32_t slotId)
+int32_t NetworkSearchManager::GetCsRadioTech(int32_t slotId, int32_t &csRadioTech)
 {
     auto inner = FindManagerInner(slotId);
-    if (inner != nullptr) {
-        if (inner->networkSearchState_ != nullptr && inner->networkSearchState_->GetNetworkStatus() != nullptr) {
-            auto event = static_cast<int32_t>(inner->networkSearchState_->GetNetworkStatus()->GetCsRadioTech());
-            TELEPHONY_LOGI("NetworkSearchManager::GetCsRadioTech result=%{public}d slotId:%{public}d", event, slotId);
-            return event;
-        }
-        TELEPHONY_LOGE("NetworkSearchManager::GetCsRadioTech failed due to nullptr!");
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::GetCsRadioTech Failed slotId:%{public}d", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    TELEPHONY_LOGE("NetworkSearchManager::GetCsRadioTech Failed slotId:%{public}d", slotId);
-    return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    if ((inner->networkSearchState_ == nullptr) || (inner->networkSearchState_->GetNetworkStatus() == nullptr)) {
+        TELEPHONY_LOGE("NetworkSearchManager::GetCsRadioTech failed due to nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    csRadioTech = static_cast<int32_t>(inner->networkSearchState_->GetNetworkStatus()->GetCsRadioTech());
+    TELEPHONY_LOGI("NetworkSearchManager::GetCsRadioTech result=%{public}d slotId:%{public}d", csRadioTech, slotId);
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t NetworkSearchManager::GetPsRegState(int32_t slotId)
@@ -470,31 +472,32 @@ std::u16string NetworkSearchManager::GetOperatorNumeric(int32_t slotId)
     return str;
 }
 
-std::u16string NetworkSearchManager::GetOperatorName(int32_t slotId)
+int32_t NetworkSearchManager::GetOperatorName(int32_t slotId, std::u16string &operatorName)
 {
-    std::u16string str;
+    operatorName = u"";
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
         if (inner->networkSearchState_ != nullptr && inner->networkSearchState_->GetNetworkStatus() != nullptr) {
-            auto event = inner->networkSearchState_->GetNetworkStatus()->GetLongOperatorName();
-            str = Str8ToStr16(event);
-            TELEPHONY_LOGI(
-                "NetworkSearchManager::GetOperatorName result=%{public}s slotId:%{public}d", event.c_str(), slotId);
+            auto longOperatorName = inner->networkSearchState_->GetNetworkStatus()->GetLongOperatorName();
+            operatorName = Str8ToStr16(longOperatorName);
+            TELEPHONY_LOGI("NetworkSearchManager::GetOperatorName result:%{public}s slotId:%{public}d",
+                longOperatorName.c_str(), slotId);
+            return TELEPHONY_ERR_SUCCESS;
         }
     }
-    return str;
+    return TELEPHONY_ERR_SLOTID_INVALID;
 }
 
-sptr<NetworkState> NetworkSearchManager::GetNetworkStatus(int32_t slotId)
+int32_t NetworkSearchManager::GetNetworkStatus(int32_t slotId, sptr<NetworkState> &networkState)
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
         if (inner->networkSearchState_ != nullptr) {
-            auto networkState = inner->networkSearchState_->GetNetworkStatus().release();
-            return networkState;
+            networkState = inner->networkSearchState_->GetNetworkStatus().release();
+            return TELEPHONY_ERR_SUCCESS;
         }
     }
-    return nullptr;
+    return TELEPHONY_ERR_SLOTID_INVALID;
 }
 
 void NetworkSearchManager::SetRadioStateValue(int32_t slotId, ModemPowerState radioState)
@@ -522,27 +525,30 @@ int32_t NetworkSearchManager::GetRadioState(int32_t slotId)
     return ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;
 }
 
-bool NetworkSearchManager::GetRadioState(int32_t slotId, NSCALLBACK &callback)
+int32_t NetworkSearchManager::GetRadioState(int32_t slotId, NSCALLBACK &callback)
 {
     TELEPHONY_LOGI("NetworkSearchManager::GetRadioState... slotId:%{public}d", slotId);
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return eventSender_->SendCallback(slotId, RadioEvent::RADIO_GET_STATUS, &callback);
+    if (!eventSender_->SendCallback(slotId, RadioEvent::RADIO_GET_STATUS, &callback)) {
+        TELEPHONY_LOGE("slotId:%{public}d GetRadioState SendCallback failed.", slotId);
+        return CORE_SERVICE_SEND_CALLBACK_FAILED;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-std::vector<sptr<SignalInformation>> NetworkSearchManager::GetSignalInfoList(int32_t slotId)
+int32_t NetworkSearchManager::GetSignalInfoList(int32_t slotId, std::vector<sptr<SignalInformation>> &signals)
 {
-    std::vector<sptr<SignalInformation>> vec;
     auto inner = FindManagerInner(slotId);
-    if (inner != nullptr) {
-        if (inner->networkSearchHandler_ != nullptr) {
-            inner->networkSearchHandler_->GetSignalInfo(vec);
-        }
+    if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return vec;
+    inner->networkSearchHandler_->GetSignalInfo(signals);
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t NetworkSearchManager::GetNetworkSearchInformation(int32_t slotId, NSCALLBACK &callback)
@@ -604,14 +610,20 @@ int32_t NetworkSearchManager::GetNetworkSelectionMode(int32_t slotId)
     return static_cast<int32_t>(SelectionMode::MODE_TYPE_UNKNOWN);
 }
 
-bool NetworkSearchManager::GetNetworkSelectionMode(int32_t slotId, NSCALLBACK &callback)
+int32_t NetworkSearchManager::GetNetworkSelectionMode(int32_t slotId, NSCALLBACK &callback)
 {
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return eventSender_->SendCallback(slotId, RadioEvent::RADIO_GET_NETWORK_SELECTION_MODE, &callback);
+
+    bool ret = eventSender_->SendCallback(slotId, RadioEvent::RADIO_GET_NETWORK_SELECTION_MODE, &callback);
+    if (!ret) {
+        TELEPHONY_LOGE("slotId:%{public}d GetNetworkSelectionMode SendCallback failed.", slotId);
+        return CORE_SERVICE_SEND_CALLBACK_FAILED;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 bool NetworkSearchManager::SetNetworkSelectionMode(
@@ -654,38 +666,39 @@ int32_t NetworkSearchManager::SetNetworkSelectionMode(int32_t slotId, int32_t se
     return TELEPHONY_ERR_SUCCESS;
 }
 
-std::u16string NetworkSearchManager::GetIsoCountryCodeForNetwork(int32_t slotId)
+int32_t NetworkSearchManager::GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode)
 {
     std::string iso = "";
+    countryCode = u"";
     auto inner = FindManagerInner(slotId);
-    if (inner == nullptr) {
+    if ((inner == nullptr) || (inner->networkSearchHandler_ == nullptr)) {
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
-        return Str8ToStr16(iso);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (inner->networkSearchHandler_ == nullptr) {
-        return Str8ToStr16(iso);
-    }
-    if (inner->networkSearchState_ != nullptr && inner->networkSearchState_->GetNetworkStatus() != nullptr) {
-        std::string plmn = inner->networkSearchState_->GetNetworkStatus()->GetPlmnNumeric();
-        size_t len = plmn.length();
-        if (len >= MCC_LEN) {
-            std::string mcc = plmn.substr(0, MCC_LEN);
-            int32_t value = 0;
-            bool succ = StrToInt(mcc, value);
-            if (succ) {
-                iso = MccPool::MccCountryCode(value);
-            } else {
-                TELEPHONY_LOGE("GetIsoCountryCodeForNetwork parse Failed!! slotId:%{public}d", slotId);
-            }
-            TELEPHONY_LOGI(
-                "NetworkSearchManager::GetIsoCountryCodeForNetwork mcc=%{public}s code=%{public}d slotId:%{public}d",
-                mcc.c_str(), value, slotId);
-        }
-    } else {
+
+    if (inner->networkSearchState_ == nullptr || inner->networkSearchState_->GetNetworkStatus() == nullptr) {
         TELEPHONY_LOGE(
             "NetworkSearchManager::GetIsoCountryCodeForNetwork Failed due to nullptr, slotId:%{public}d", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return Str8ToStr16(iso);
+    std::string plmn = inner->networkSearchState_->GetNetworkStatus()->GetPlmnNumeric();
+    size_t len = plmn.length();
+    if (len >= MCC_LEN) {
+        std::string mcc = plmn.substr(0, MCC_LEN);
+        int32_t value = 0;
+        bool succ = StrToInt(mcc, value);
+        if (succ) {
+            iso = MccPool::MccCountryCode(value);
+        } else {
+            TELEPHONY_LOGE("GetIsoCountryCodeForNetwork parse Failed!! slotId:%{public}d", slotId);
+        }
+        TELEPHONY_LOGI(
+            "NetworkSearchManager::GetIsoCountryCodeForNetwork mcc=%{public}s code=%{public}d slotId:%{public}d",
+            mcc.c_str(), value, slotId);
+    }
+
+    countryCode = Str8ToStr16(iso);
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t NetworkSearchManager::GetPreferredNetwork(int32_t slotId, NSCALLBACK &callback)

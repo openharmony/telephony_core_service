@@ -181,28 +181,28 @@ public:
 
     /******************** telRilManager end *******************/
     /******************** networkSearchManager start *******************/
-    int32_t GetPsRadioTech(int32_t slotId);
-    int32_t GetCsRadioTech(int32_t slotId);
+    int32_t GetPsRadioTech(int32_t slotId, int32_t &psRadioTech);
+    int32_t GetCsRadioTech(int32_t slotId, int32_t &csRadioTech);
     int32_t GetPsRegState(int32_t slotId);
     int32_t GetCsRegState(int32_t slotId);
     int32_t GetPsRoamingState(int32_t slotId);
     bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode, const sptr<NetworkInformation> &networkInformation,
         bool resumeSelection, const sptr<INetworkSearchCallback> &callback);
-    std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId);
+    int32_t GetSignalInfoList(int32_t slotId, std::vector<sptr<SignalInformation>> &signals);
     std::u16string GetOperatorNumeric(int32_t slotId);
-    std::u16string GetOperatorName(int32_t slotId);
-    sptr<NetworkState> GetNetworkStatus(int32_t slotId);
+    int32_t GetOperatorName(int32_t slotId, std::u16string &operatorName);
+    int32_t GetNetworkStatus(int32_t slotId, sptr<NetworkState> &networkState);
     int32_t SetRadioState(int32_t slotId, bool isOn, int32_t rst, const sptr<INetworkSearchCallback> &callback);
     int32_t GetRadioState(int32_t slotId);
-    bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
-    std::u16string GetIsoCountryCodeForNetwork(int32_t slotId);
+    int32_t GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+    int32_t GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode);
     int32_t GetImei(int32_t slotId, std::u16string &imei);
     int32_t GetMeid(int32_t slotId, std::u16string &meid);
     int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId);
     PhoneType GetPhoneType(int32_t slotId);
     sptr<CellLocation> GetCellLocation(int32_t slotId);
     int32_t GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
-    bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+    int32_t GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) const;
     int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo);
     int32_t SendUpdateCellLocationRequest(int32_t slotId);
@@ -282,7 +282,7 @@ public:
     int32_t GetDefaultVoiceSlotId();
     int32_t GetDefaultSmsSlotId();
     int32_t GetDefaultCellularDataSlotId();
-    int32_t GetPrimarySlotId();
+    int32_t GetPrimarySlotId(int32_t &slotId);
     int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue);
     int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue);
     /******************** simManager end *****************************/

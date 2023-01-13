@@ -64,7 +64,7 @@ public:
     virtual int32_t RegisterSimAccountCallback(
         const std::string &bundleName, const sptr<SimAccountCallback> &callback) = 0;
     virtual int32_t UnregisterSimAccountCallback(const std::string &bundleName) = 0;
-    virtual int32_t GetPrimarySlotId() = 0;
+    virtual int32_t GetPrimarySlotId(int32_t &slotId) = 0;
     virtual int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber) = 0;
     virtual int32_t GetShowName(int32_t slotId, std::u16string &showName) = 0;
     virtual int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) = 0;
