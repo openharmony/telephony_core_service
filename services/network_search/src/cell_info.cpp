@@ -330,9 +330,8 @@ bool CellInfo::ProcessNeighboringCellGsm(CellNearbyInfo *cellInfo)
         cell->Init(0, 0, cellId);
         cell->SetGsmParam(bsic, lac, arfcn);
         cellInfos_.emplace_back(cell);
-        TELEPHONY_LOGD(
-            "CellInfo::ProcessNeighboringCellGsm arfcn:%{private}d cellId:%{private}d"
-            "bsic:%{private}d lac:%{private}d slotId:%{public}d",
+        TELEPHONY_LOGI("CellInfo::ProcessNeighboringCellGsm arfcn:%{private}d cellId:%{private}d"
+                       "bsic:%{private}d lac:%{private}d slotId:%{public}d",
             arfcn, cellId, bsic, lac, slotId_);
         return true;
     }
@@ -348,8 +347,7 @@ bool CellInfo::ProcessNeighboringCellLte(CellNearbyInfo *cellInfo)
         cell->Init(0, 0, 0);
         cell->SetLteParam(pci, 0, arfcn);
         cellInfos_.emplace_back(cell);
-        TELEPHONY_LOGD(
-            "CellInfo::ProcessLte arfcn:%{private}d pci:%{private}d slotId:%{public}d", arfcn, pci, slotId_);
+        TELEPHONY_LOGI("CellInfo::ProcessLte arfcn:%{private}d pci:%{private}d slotId:%{public}d", arfcn, pci, slotId_);
         return true;
     }
     return false;
@@ -364,7 +362,7 @@ bool CellInfo::ProcessNeighboringCellWcdma(CellNearbyInfo *cellInfo)
         cell->Init(0, 0, 0);
         cell->SetWcdmaParam(psc, 0, arfcn);
         cellInfos_.emplace_back(cell);
-        TELEPHONY_LOGD(
+        TELEPHONY_LOGI(
             "CellInfo::ProcessWcdma arfcn:%{private}d psc:%{private}d slotId:%{public}d", arfcn, psc, slotId_);
         return true;
     }
@@ -383,7 +381,7 @@ bool CellInfo::ProcessNeighboringCellCdma(CellNearbyInfo *cellInfo)
         cell->Init(0, 0, 0);
         cell->SetCdmaParam(baseId, latitude, longitude, networkId, systemId);
         cellInfos_.emplace_back(cell);
-        TELEPHONY_LOGD(
+        TELEPHONY_LOGI(
             "CellInfo::ProcessCdma baseId:%{private}d psc:%{private}d slotId:%{public}d", baseId, systemId, slotId_);
         return true;
     }
@@ -400,7 +398,7 @@ bool CellInfo::ProcessNeighboringCellTdscdma(CellNearbyInfo *cellInfo)
         cell->Init(0, 0, 0);
         cell->SetTdscdmaParam(cpid, lac, arfcn);
         cellInfos_.emplace_back(cell);
-        TELEPHONY_LOGD(
+        TELEPHONY_LOGI(
             "CellInfo::ProcessTdscdma arfcn:%{private}d psc:%{private}d slotId:%{public}d", arfcn, cpid, slotId_);
         return true;
     }
@@ -418,7 +416,7 @@ bool CellInfo::ProcessNeighboringCellNr(CellNearbyInfo *cellInfo)
         cell->Init(0, 0, 0);
         cell->SetNrParam(nrArfcn, pci, tac, nci);
         cellInfos_.emplace_back(cell);
-        TELEPHONY_LOGD("CellInfo::ProcessNeighboringCellNr arfcn:%{private}d pci:%{private}d slotId:%{public}d",
+        TELEPHONY_LOGI("CellInfo::ProcessNeighboringCellNr arfcn:%{private}d pci:%{private}d slotId:%{public}d",
             nrArfcn, pci, slotId_);
         return true;
     }
@@ -438,9 +436,8 @@ bool CellInfo::ProcessCurrentCellGsm(CurrentCellInfo *cellInfo)
         cell->SetIsCamped(true);
         currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
-        TELEPHONY_LOGD(
-            "CellInfo::ProcessCurrentCellGsm arfcn:%{private}d cellId:%{private}d"
-            "bsic:%{private}d lac:%{private}d slotId:%{public}d",
+        TELEPHONY_LOGI("CellInfo::ProcessCurrentCellGsm arfcn:%{private}d cellId:%{private}d"
+                       "bsic:%{private}d lac:%{private}d slotId:%{public}d",
             arfcn, cellId, bsic, lac, slotId_);
         return true;
     }
@@ -460,7 +457,7 @@ bool CellInfo::ProcessCurrentCellLte(CurrentCellInfo *cellInfo)
         cell->SetIsCamped(true);
         currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
-        TELEPHONY_LOGD("CellInfo::ProcessCurrentCellLte arfcn:%{private}d pci:%{private}d", arfcn, pci);
+        TELEPHONY_LOGI("CellInfo::ProcessCurrentCellLte arfcn:%{private}d pci:%{private}d", arfcn, pci);
         return true;
     }
     return false;
@@ -479,7 +476,7 @@ bool CellInfo::ProcessCurrentCellWcdma(CurrentCellInfo *cellInfo)
         cell->SetIsCamped(true);
         currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
-        TELEPHONY_LOGD("CellInfo::ProcessCurrentCellWcdma arfcn:%{private}d psc:%{private}d", arfcn, psc);
+        TELEPHONY_LOGI("CellInfo::ProcessCurrentCellWcdma arfcn:%{private}d psc:%{private}d", arfcn, psc);
         return true;
     }
     return false;
@@ -499,8 +496,7 @@ bool CellInfo::ProcessCurrentCellCdma(CurrentCellInfo *cellInfo)
         cell->SetIsCamped(true);
         currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
-        TELEPHONY_LOGD(
-            "CellInfo::ProcessCurrentCellCdma baseId:%{private}d networkId:%{private}d", baseId, networkId);
+        TELEPHONY_LOGI("CellInfo::ProcessCurrentCellCdma baseId:%{private}d networkId:%{private}d", baseId, networkId);
         return true;
     }
     return false;
@@ -519,8 +515,8 @@ bool CellInfo::ProcessCurrentCellTdscdma(CurrentCellInfo *cellInfo)
         cell->SetIsCamped(true);
         currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
-        TELEPHONY_LOGD("CellInfo::ProcessCurrentCellTdscdma arfcn:%{private}d pci:%{private}d slotId:%{public}d",
-            arfcn, cpid, slotId_);
+        TELEPHONY_LOGI("CellInfo::ProcessCurrentCellTdscdma arfcn:%{private}d pci:%{private}d slotId:%{public}d", arfcn,
+            cpid, slotId_);
         return true;
     }
     return false;
@@ -540,8 +536,8 @@ bool CellInfo::ProcessCurrentCellNr(CurrentCellInfo *cellInfo)
         currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
 
-        TELEPHONY_LOGD("CellInfo::ProcessCurrentCellNr arfcn:%{private}d pci:%{private}d slotId:%{public}d",
-            nrArfcn, pci, slotId_);
+        TELEPHONY_LOGI("CellInfo::ProcessCurrentCellNr arfcn:%{private}d pci:%{private}d slotId:%{public}d", nrArfcn,
+            pci, slotId_);
         return true;
     }
     return false;
