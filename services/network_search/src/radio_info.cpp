@@ -268,8 +268,9 @@ void RadioInfo::ProcessVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &ev
         TELEPHONY_LOGE("RadioInfo::ProcessVoiceTechChange networkSearchManager is nullptr");
         return;
     }
-    RadioTech psRadioTech = static_cast<RadioTech>(networkSearchManager->GetPsRadioTech(slotId_));
-    UpdatePhone(static_cast<RadioTech>(csRadioTech->actType), psRadioTech);
+    int32_t psRadioTech = 0;
+    networkSearchManager->GetPsRadioTech(slotId_, psRadioTech);
+    UpdatePhone(static_cast<RadioTech>(csRadioTech->actType), static_cast<RadioTech>(psRadioTech));
 }
 
 PhoneType RadioInfo::RadioTechToPhoneType(RadioTech csRadioTech, const RadioTech &psRadioTech) const

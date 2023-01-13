@@ -128,13 +128,13 @@ public:
     void SetRadioState(int32_t slotId, bool isOn, int32_t rst) override;
     int32_t SetRadioState(int32_t slotId, bool isOn, int32_t rst, NSCALLBACK &callback) override;
     int32_t GetRadioState(int32_t slotId) override;
-    bool GetRadioState(int32_t slotId, NSCALLBACK &callback) override;
-    int32_t GetPsRadioTech(int32_t slotId) override;
-    int32_t GetCsRadioTech(int32_t slotId) override;
+    int32_t GetRadioState(int32_t slotId, NSCALLBACK &callback) override;
+    int32_t GetPsRadioTech(int32_t slotId, int32_t &psRadioTech) override;
+    int32_t GetCsRadioTech(int32_t slotId, int32_t &csRadioTech) override;
     std::u16string GetOperatorNumeric(int32_t slotId) override;
-    std::u16string GetOperatorName(int32_t slotId) override;
-    sptr<NetworkState> GetNetworkStatus(int32_t slotId) override;
-    std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId) override;
+    int32_t GetOperatorName(int32_t slotId, std::u16string &operatorName) override;
+    int32_t GetNetworkStatus(int32_t slotId, sptr<NetworkState> &networkState) override;
+    int32_t GetSignalInfoList(int32_t slotId, std::vector<sptr<SignalInformation>> &signals) override;
     void RegisterCoreNotify(int32_t slotId, HANDLE &handler, int32_t what) override;
     void UnRegisterCoreNotify(int32_t slotId, HANDLE &handler, int32_t what) override;
     void RegisterCellularDataObject(const sptr<NetworkSearchCallBackBase> &callback) override;
@@ -142,12 +142,12 @@ public:
     void RegisterCellularCallObject(const sptr<NetworkSearchCallBackBase> &callback) override;
     void UnRegisterCellularCallObject(const sptr<NetworkSearchCallBackBase> &callback) override;
     int32_t GetNetworkSearchInformation(int32_t slotId, NSCALLBACK &callback) override;
-    bool GetNetworkSelectionMode(int32_t slotId, NSCALLBACK &callback) override;
+    int32_t GetNetworkSelectionMode(int32_t slotId, NSCALLBACK &callback) override;
     int32_t SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
         const sptr<NetworkInformation> &networkInformation, bool resumeSelection, NSCALLBACK &callback) override;
     int32_t GetPreferredNetwork(int32_t slotId, NSCALLBACK &callback) override;
     int32_t SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback) override;
-    std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) override;
+    int32_t GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode) override;
     int32_t GetImei(int32_t slotId, std::u16string &imei) override;
     int32_t GetPsRegState(int32_t slotId) override;
     int32_t GetCsRegState(int32_t slotId) override;

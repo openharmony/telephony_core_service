@@ -18,7 +18,7 @@
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -35,7 +35,7 @@ void NetworkSearchNotify::NotifyNetworkStateUpdated(int32_t slotId, const sptr<N
     int32_t result =
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateNetworkState(slotId, networkState);
     TELEPHONY_LOGI("NotifyNetworkStateUpdated ret %{public}s", networkState->ToString().c_str());
-    if (result) {
+    if (result != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("NotifyNetworkStateUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found");
     }
 }
@@ -47,7 +47,7 @@ void NetworkSearchNotify::NotifySignalInfoUpdated(
     int32_t result =
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSignalInfo(slotId, signalInfos);
     TELEPHONY_LOGI("NotifySignalInfoUpdated ret %{public}d", result);
-    if (result) {
+    if (result != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("NotifySignalInfoUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found");
     }
 }
@@ -58,8 +58,8 @@ void NetworkSearchNotify::NotifyCellInfoUpdated(int32_t slotId, const std::vecto
     int32_t result =
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateCellInfo(slotId, cellInfos);
     TELEPHONY_LOGI("NotifyCellInfoUpdated ret %{public}d", result);
-    if (result) {
-        TELEPHONY_LOGE("NotifySignalInfoUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found");
+    if (result != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("NotifyCellInfoUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found.");
     }
 }
 } // namespace Telephony

@@ -36,6 +36,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace OHOS::EventFwk;
 sptr<ICoreService> g_telephonyService = nullptr;
+const int32_t INVALID_VALUE = -1;
 const int32_t INPUT_GET_PS_RADIO_TECH = 0;
 const int32_t INPUT_GET_CS_RADIO_TECH = 1;
 const int32_t INPUT_GET_OPERATOR_NUMERIC = 2;
@@ -114,7 +115,8 @@ void TestGetNetworkState()
 {
     AccessToken token;
     TELEPHONY_LOGI("TelephonyTestService Remote GetNetworkState");
-    sptr<NetworkState> result = g_telephonyService->GetNetworkState(InputSlotId());
+    sptr<NetworkState> result;
+    g_telephonyService->GetNetworkState(InputSlotId(), result);
     if (result == nullptr) {
         TELEPHONY_LOGE("result is null");
     } else {
@@ -134,15 +136,17 @@ void TestGetNetworkState()
 void TestGetPsRadioTech()
 {
     AccessToken token;
-    int32_t result = g_telephonyService->GetPsRadioTech(InputSlotId());
-    TELEPHONY_LOGI("TelephonyTestService Remote GetPsRadioTech result:%{public}d", result);
+    int32_t radioTech = INVALID_VALUE;
+    g_telephonyService->GetPsRadioTech(InputSlotId(), radioTech);
+    TELEPHONY_LOGI("TelephonyTestService Remote GetPsRadioTech radioTech:%{public}d", radioTech);
 }
 
 void TestGetCsRadioTech()
 {
     AccessToken token;
-    int32_t result = g_telephonyService->GetCsRadioTech(InputSlotId());
-    TELEPHONY_LOGI("TelephonyTestService Remote GetCsRadioTech result:%{public}d", result);
+    int32_t radioTech = INVALID_VALUE;
+    g_telephonyService->GetCsRadioTech(InputSlotId(), radioTech);
+    TELEPHONY_LOGI("TelephonyTestService Remote GetCsRadioTech radioTech:%{public}d", radioTech);
 }
 
 void TestGetOperatorNumeric()
@@ -154,8 +158,9 @@ void TestGetOperatorNumeric()
 
 void TestGetOperatorName()
 {
-    std::u16string result = g_telephonyService->GetOperatorName(InputSlotId());
-    std::string str = Str16ToStr8(result);
+    std::u16string operatorName = u"";
+    g_telephonyService->GetOperatorName(InputSlotId(), operatorName);
+    std::string str = Str16ToStr8(operatorName);
     TELEPHONY_LOGI("TelephonyTestService Remote GetOperatorName result:%{public}s", str.c_str());
 }
 
@@ -222,9 +227,10 @@ void TestNrSignalInformation(const NrSignalInformation &nr)
 
 void TestGetSignalInfoList()
 {
-    auto result = g_telephonyService->GetSignalInfoList(InputSlotId());
+    std::vector<sptr<SignalInformation>> signals;
+    g_telephonyService->GetSignalInfoList(InputSlotId(), signals);
     SignalInformation::NetworkType type;
-    for (const auto &v : result) {
+    for (const auto &v : signals) {
         type = v->GetNetworkType();
         TELEPHONY_LOGI("TelephonyTestService Remote SignalInformation result NetworkTypeId:%{public}d",
             static_cast<int32_t>(type));
@@ -248,7 +254,7 @@ void TestGetSignalInfoList()
             TestNrSignalInformation(*nr);
         }
     }
-    TELEPHONY_LOGI("TelephonyTestService Remote TestGetSignalInfoList size:%{public}zu", result.size());
+    TELEPHONY_LOGI("TelephonyTestService Remote TestGetSignalInfoList size:%{public}zu", signals.size());
 }
 
 void TestSetRadioState()
@@ -322,7 +328,8 @@ void TestSetNetworkSelectionMode()
         TELEPHONY_LOGE("g_telephonyService is nullptr");
         return;
     }
-    sptr<NetworkState> networkState = g_telephonyService->GetNetworkState(InputSlotId());
+    sptr<NetworkState> networkState;
+    g_telephonyService->GetNetworkState(InputSlotId(), networkState);
     if (networkState == nullptr) {
         TELEPHONY_LOGE("networkState is nullptr");
         return;
@@ -343,7 +350,8 @@ void TestSetNetworkSelectionMode()
 void TestGetIsoCountryCodeForNetwork()
 {
     if (g_telephonyService != nullptr) {
-        std::u16string result = g_telephonyService->GetIsoCountryCodeForNetwork(InputSlotId());
+        std::u16string result;
+        g_telephonyService->GetIsoCountryCodeForNetwork(InputSlotId(), result);
         std::string str = Str16ToStr8(result);
         TELEPHONY_LOGI("TestGetIsoCountryCodeForNetwork result:%{public}s", str.c_str());
     }

@@ -69,7 +69,7 @@ public:
     int32_t GetDefaultVoiceSlotId() override;
     int32_t GetDefaultSmsSlotId() override;
     int32_t GetDefaultCellularDataSlotId() override;
-    int32_t GetPrimarySlotId() override;
+    int32_t GetPrimarySlotId(int32_t &slotId) override;
     int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber) override;
     int32_t GetShowName(int32_t slotId, std::u16string &showName) override;
     int32_t GetSlotId(int32_t simId) override;
