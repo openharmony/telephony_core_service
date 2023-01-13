@@ -38,6 +38,7 @@
 namespace OHOS {
 namespace Telephony {
 sptr<ICoreService> SimTest::telephonyService_ = nullptr;
+
 void SimTest::SetUpTestCase()
 {
     TELEPHONY_LOGI("----------Sim gtest start ------------");
@@ -3309,8 +3310,9 @@ HWTEST_F(SimTest, Telephony_Sim_GetPrimarySlotId_0100, Function | MediumTest | L
     if (!SimTest::HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
-        int32_t result = CoreServiceClient::GetInstance().GetPrimarySlotId();
-        EXPECT_GT(result, -1);
+        int32_t result = TELEPHONY_ERROR;
+        CoreServiceClient::GetInstance().GetPrimarySlotId(result);
+        EXPECT_GT(result, TELEPHONY_ERROR);
     }
 }
 
@@ -3991,9 +3993,11 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0200, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->GetOpKey(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetOpKeyExt(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetOpName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetPrimarySlotId(), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetPsRadioTech(0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetCsRadioTech(0), TELEPHONY_ERR_SUCCESS);
+    int32_t slotId = TELEPHONY_ERROR;
+    EXPECT_NE(mCoreService->GetPrimarySlotId(slotId), TELEPHONY_ERR_SUCCESS);
+    int32_t radioTech = TELEPHONY_ERROR;
+    EXPECT_NE(mCoreService->GetPsRadioTech(0, radioTech), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetCsRadioTech(0, radioTech), TELEPHONY_ERR_SUCCESS);
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     EXPECT_NE(mCoreService->GetSimState(0, simState), TELEPHONY_ERR_SUCCESS);
     CardType cardType = CardType::UNKNOWN_CARD;
@@ -4013,9 +4017,9 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0300, Function | MediumTest | Level3
     std::string testStr = "";
     std::u16string testU16Str = u"";
     std::vector<sptr<SignalInformation>> mSignalInfoList = {};
-    EXPECT_EQ(mCoreService->GetSignalInfoList(0), mSignalInfoList);
+    EXPECT_NE(mCoreService->GetSignalInfoList(0, mSignalInfoList), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(mCoreService->GetOperatorNumeric(0), testU16Str);
-    EXPECT_EQ(mCoreService->GetOperatorName(0), testU16Str);
+    EXPECT_NE(mCoreService->GetOperatorName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetSimOperatorNumeric(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetISOCountryCodeForSim(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetSimSpn(0, testU16Str), TELEPHONY_ERR_SUCCESS);
@@ -4025,12 +4029,13 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0300, Function | MediumTest | Level3
     int32_t lac = 1;
     bool longNameRequired = true;
     EXPECT_EQ(mCoreService->GetSimEons(0, plmn, lac, longNameRequired), testU16Str);
-    EXPECT_EQ(mCoreService->GetIsoCountryCodeForNetwork(0), testU16Str);
+    EXPECT_NE(mCoreService->GetIsoCountryCodeForNetwork(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(mCoreService->GetSimTeleNumberIdentifier(0), testU16Str);
-    EXPECT_EQ(mCoreService->GetNetworkState(0), nullptr);
+    sptr<NetworkState> networkState = nullptr;
+    EXPECT_NE(mCoreService->GetNetworkState(0, networkState), TELEPHONY_ERR_SUCCESS);
     sptr<INetworkSearchCallback> callback = nullptr;
-    EXPECT_FALSE(mCoreService->GetRadioState(0, callback));
-    EXPECT_FALSE(mCoreService->GetNetworkSelectionMode(0, callback));
+    EXPECT_NE(mCoreService->GetRadioState(0, callback), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetNetworkSelectionMode(0, callback), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(mCoreService->IsNrSupported(0));
     EXPECT_FALSE(mCoreService->IsSimActive(0));
     bool hasValue = false;
@@ -4126,9 +4131,11 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0500, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->GetOpKey(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetOpKeyExt(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetOpName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetPrimarySlotId(), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetPsRadioTech(0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetCsRadioTech(0), TELEPHONY_ERR_SUCCESS);
+    int32_t slotId = TELEPHONY_ERROR;
+    EXPECT_NE(mCoreService->GetPrimarySlotId(slotId), TELEPHONY_ERR_SUCCESS);
+    int32_t radioTech = TELEPHONY_ERROR;
+    EXPECT_NE(mCoreService->GetPsRadioTech(0, radioTech), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetCsRadioTech(0, radioTech), TELEPHONY_ERR_SUCCESS);
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     EXPECT_NE(mCoreService->GetSimState(0, simState), TELEPHONY_ERR_SUCCESS);
     CardType cardType = CardType::UNKNOWN_CARD;
@@ -4149,9 +4156,9 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0600, Function | MediumTest | Level3
     std::string testStr = "";
     std::u16string testU16Str = u"";
     std::vector<sptr<SignalInformation>> mSignalInfoList = {};
-    EXPECT_EQ(mCoreService->GetSignalInfoList(0), mSignalInfoList);
+    EXPECT_NE(mCoreService->GetSignalInfoList(0, mSignalInfoList), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(mCoreService->GetOperatorNumeric(0), testU16Str);
-    EXPECT_EQ(mCoreService->GetOperatorName(0), testU16Str);
+    EXPECT_NE(mCoreService->GetOperatorName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetSimOperatorNumeric(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetISOCountryCodeForSim(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetSimSpn(0, testU16Str), TELEPHONY_ERR_SUCCESS);
@@ -4161,12 +4168,13 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0600, Function | MediumTest | Level3
     int32_t lac = 1;
     bool longNameRequired = true;
     EXPECT_EQ(mCoreService->GetSimEons(0, plmn, lac, longNameRequired), testU16Str);
-    EXPECT_EQ(mCoreService->GetIsoCountryCodeForNetwork(0), testU16Str);
+    EXPECT_NE(mCoreService->GetIsoCountryCodeForNetwork(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(mCoreService->GetSimTeleNumberIdentifier(0), testU16Str);
-    EXPECT_EQ(mCoreService->GetNetworkState(0), nullptr);
+    sptr<NetworkState> networkState = nullptr;
+    EXPECT_NE(mCoreService->GetNetworkState(0, networkState), TELEPHONY_ERR_SUCCESS);
     sptr<INetworkSearchCallback> callback = nullptr;
-    EXPECT_FALSE(mCoreService->GetRadioState(0, callback));
-    EXPECT_FALSE(mCoreService->GetNetworkSelectionMode(0, callback));
+    EXPECT_NE(mCoreService->GetRadioState(0, callback), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetNetworkSelectionMode(0, callback), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(mCoreService->IsNrSupported(0));
     EXPECT_FALSE(mCoreService->IsSimActive(0));
     bool hasValue = false;

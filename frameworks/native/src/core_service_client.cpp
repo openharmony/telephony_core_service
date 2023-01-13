@@ -25,6 +25,8 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t INVALID_VALUE = -1;
+
 CoreServiceClient::CoreServiceClient() = default;
 CoreServiceClient::~CoreServiceClient() = default;
 
@@ -80,24 +82,24 @@ void CoreServiceClient::OnRemoteDied(const wptr<IRemoteObject> &remote)
     }
 }
 
-int32_t CoreServiceClient::GetPsRadioTech(int32_t slotId)
+int32_t CoreServiceClient::GetPsRadioTech(int32_t slotId, int32_t &psRadioTech)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetPsRadioTech(slotId);
+    return proxy->GetPsRadioTech(slotId, psRadioTech);
 }
 
-int32_t CoreServiceClient::GetCsRadioTech(int32_t slotId)
+int32_t CoreServiceClient::GetCsRadioTech(int32_t slotId, int32_t &csRadioTech)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetCsRadioTech(slotId);
+    return proxy->GetCsRadioTech(slotId, csRadioTech);
 }
 
 int32_t CoreServiceClient::GetMeid(int32_t slotId, std::u16string &meid)
@@ -140,16 +142,15 @@ int32_t CoreServiceClient::GetNrOptionMode(int32_t slotId, NrMode &mode)
     return proxy->GetNrOptionMode(slotId, mode);
 }
 
-std::vector<sptr<SignalInformation>> CoreServiceClient::GetSignalInfoList(int32_t slotId)
+int32_t CoreServiceClient::GetSignalInfoList(int32_t slotId, std::vector<sptr<SignalInformation>> &signals)
 {
+    signals.clear();
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        std::vector<sptr<SignalInformation>> vec;
-        vec.clear();
-        return vec;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetSignalInfoList(slotId);
+    return proxy->GetSignalInfoList(slotId, signals);
 }
 
 std::u16string CoreServiceClient::GetOperatorNumeric(int32_t slotId)
@@ -162,25 +163,24 @@ std::u16string CoreServiceClient::GetOperatorNumeric(int32_t slotId)
     return proxy->GetOperatorNumeric(slotId);
 }
 
-std::u16string CoreServiceClient::GetOperatorName(int32_t slotId)
+int32_t CoreServiceClient::GetOperatorName(int32_t slotId, std::u16string &operatorName)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return std::u16string();
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetOperatorName(slotId);
+    return proxy->GetOperatorName(slotId, operatorName);
 }
 
-const sptr<NetworkState> CoreServiceClient::GetNetworkState(int32_t slotId)
+int32_t CoreServiceClient::GetNetworkState(int32_t slotId, sptr<NetworkState> &networkState)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        const sptr<NetworkState> vec = nullptr;
-        return vec;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetNetworkState(slotId);
+    return proxy->GetNetworkState(slotId, networkState);
 }
 
 int32_t CoreServiceClient::SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback)
@@ -193,12 +193,12 @@ int32_t CoreServiceClient::SetRadioState(int32_t slotId, bool isOn, const sptr<I
     return proxy->SetRadioState(slotId, isOn, callback);
 }
 
-bool CoreServiceClient::GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+int32_t CoreServiceClient::GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return false;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->GetRadioState(slotId, callback);
 }
@@ -323,12 +323,12 @@ int32_t CoreServiceClient::GetNetworkSearchInformation(int32_t slotId, const spt
     return proxy->GetNetworkSearchInformation(slotId, callback);
 }
 
-bool CoreServiceClient::GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+int32_t CoreServiceClient::GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return false;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->GetNetworkSelectionMode(slotId, callback);
 }
@@ -386,14 +386,14 @@ int32_t CoreServiceClient::SetNetworkSelectionMode(int32_t slotId, int32_t selec
     return proxy->SetNetworkSelectionMode(slotId, selectMode, networkInformation, resumeSelection, callback);
 }
 
-std::u16string CoreServiceClient::GetIsoCountryCodeForNetwork(int32_t slotId)
+int32_t CoreServiceClient::GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return std::u16string();
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetIsoCountryCodeForNetwork(slotId);
+    return proxy->GetIsoCountryCodeForNetwork(slotId, countryCode);
 }
 
 int32_t CoreServiceClient::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
@@ -817,14 +817,15 @@ int32_t CoreServiceClient::SimAuthentication(
     return proxy->SimAuthentication(slotId, aid, authData, response);
 }
 
-int32_t CoreServiceClient::GetPrimarySlotId()
+int32_t CoreServiceClient::GetPrimarySlotId(int32_t &slotId)
 {
+    slotId = INVALID_VALUE;
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetPrimarySlotId();
+    return proxy->GetPrimarySlotId(slotId);
 }
 
 int32_t CoreServiceClient::SetPrimarySlotId(int32_t slotId)

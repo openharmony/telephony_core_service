@@ -247,12 +247,14 @@ void NitzUpdate::ProcessTimeZone()
         TELEPHONY_LOGE("failed to get NetworkSearchManager slotId:%{public}d", slotId_);
         return;
     }
-    int32_t primarySlotId = CoreManagerInner::GetInstance().GetPrimarySlotId();
+    int32_t primarySlotId = INVALID_VALUE;
+    CoreManagerInner::GetInstance().GetPrimarySlotId(primarySlotId);
     if (primarySlotId == INVALID_VALUE) {
         TELEPHONY_LOGI("primarySlotId %{public}d is invalid slotId:%{public}d", primarySlotId, slotId_);
         return;
     }
-    std::u16string iso = nsm->GetIsoCountryCodeForNetwork(primarySlotId);
+    std::u16string iso;
+    nsm->GetIsoCountryCodeForNetwork(primarySlotId, iso);
     std::string countryCode = Str16ToStr8(iso);
     if (countryCode.empty()) {
         TELEPHONY_LOGE("NitzUpdate::ProcessCountryCode countryCode is null slotId:%{public}d", slotId_);

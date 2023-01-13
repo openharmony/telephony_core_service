@@ -24,14 +24,14 @@ class CoreServiceProxy : public IRemoteProxy<ICoreService> {
 public:
     explicit CoreServiceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<ICoreService>(impl) {}
     virtual ~CoreServiceProxy() = default;
-    int32_t GetPsRadioTech(int32_t slotId) override;
-    int32_t GetCsRadioTech(int32_t slotId) override;
-    std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId) override;
+    int32_t GetPsRadioTech(int32_t slotId, int32_t &psRadioTech) override;
+    int32_t GetCsRadioTech(int32_t slotId, int32_t &csRadioTech) override;
+    int32_t GetSignalInfoList(int32_t slotId, std::vector<sptr<SignalInformation>> &signals) override;
     std::u16string GetOperatorNumeric(int32_t slotId) override;
-    std::u16string GetOperatorName(int32_t slotId) override;
-    const sptr<NetworkState> GetNetworkState(int32_t slotId) override;
+    int32_t GetOperatorName(int32_t slotId, std::u16string &operatorName) override;
+    int32_t GetNetworkState(int32_t slotId, sptr<NetworkState> &networkState) override;
     int32_t SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback) override;
-    bool GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
+    int32_t GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
     int32_t GetImei(int32_t slotId, std::u16string &imei) override;
     int32_t GetMeid(int32_t slotId, std::u16string &meid) override;
     int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) override;
@@ -49,7 +49,7 @@ public:
     int32_t GetSlotId(int32_t simId) override;
     int32_t GetSimId(int32_t slotId) override;
     int32_t GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
-    bool GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
+    int32_t GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
     std::u16string GetLocaleFromDefaultSim() override;
     int32_t GetSimGid1(int32_t slotId, std::u16string &gid1) override;
     std::u16string GetSimGid2(int32_t slotId) override;
@@ -57,11 +57,11 @@ public:
     int32_t SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
         const sptr<NetworkInformation> &networkInformation, bool resumeSelection,
         const sptr<INetworkSearchCallback> &callback) override;
-    std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) override;
+    int32_t GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode) override;
     int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) override;
     int32_t SetDefaultVoiceSlotId(int32_t slotId) override;
     int32_t GetDefaultVoiceSlotId() override;
-    int32_t GetPrimarySlotId() override;
+    int32_t GetPrimarySlotId(int32_t &slotId) override;
     int32_t SetPrimarySlotId(int32_t slotId) override;
     int32_t SetShowNumber(int32_t slotId, const std::u16string &number) override;
     int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber) override;

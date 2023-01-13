@@ -250,7 +250,7 @@ bool MultiSimController::InitShowName(int slotId)
         TELEPHONY_LOGE("MultiSimController::InitShowName failed by nullptr");
         return false;
     }
-    showName = networkSearchManager_->GetOperatorName(slotId);
+    networkSearchManager_->GetOperatorName(slotId, showName);
     int32_t result = TELEPHONY_ERROR;
     if (!showName.empty()) {
         result = SetShowName(slotId, showName, true);
@@ -703,17 +703,25 @@ int32_t MultiSimController::GetPrimarySlotId()
 
 int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
 {
+    if (localCacheInfo_.empty() || !IsValidData(slotId)) {
+        TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId no sim card");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId failed by out of range");
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
-    if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    if (!IsSimActive(slotId)) {
+        TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId slotId is not active");
+        return CORE_SERVICE_SIM_CARD_IS_NOT_ACTIVE;
     }
     // change protocol for default cellulardata slotId
     if (radioProtocolController_ == nullptr || !radioProtocolController_->SetRadioProtocol(slotId)) {
         TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId SetRadioProtocol failed");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (simDbHelper_ == nullptr) {
+        TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId failed by nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);

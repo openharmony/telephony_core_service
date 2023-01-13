@@ -664,6 +664,9 @@ bool NapiUtil::CreateVideoCallErrorMessageForJs(int32_t errorCode, JsErrorCode &
         case CALL_ERR_CAMERA_NOT_TURNED_ON:
             jsErrorCode = JS_ERROR_CALL_ABNORMAL_VIDEO_PARAMETERS;
             break;
+        case CALL_ERR_SETTING_AUDIO_DEVICE_FAILED:
+            jsErrorCode = JS_ERROR_TELEPHONY_SYSTEM_ERROR;
+            break;
         default:
             flag = false;
             break;

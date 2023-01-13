@@ -418,17 +418,19 @@ int32_t SimManager::GetDefaultCellularDataSlotId()
     return multiSimController_->GetDefaultCellularDataSlotId();
 }
 
-int32_t SimManager::GetPrimarySlotId()
+int32_t SimManager::GetPrimarySlotId(int32_t &slotId)
 {
     if (slotCount_ == std::atoi(DEFAULT_SLOT_COUNT)) {
         TELEPHONY_LOGI(" default slotId is 0 for single card version");
-        return DEFAULT_SIM_SLOT_ID;
+        slotId = DEFAULT_SIM_SLOT_ID;
+        return TELEPHONY_ERR_SUCCESS;
     }
     if (multiSimController_ == nullptr) {
         TELEPHONY_LOGE("multiSimController_ is nullptr");
-        return TELEPHONY_ERROR;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return multiSimController_->GetPrimarySlotId();
+    slotId = multiSimController_->GetPrimarySlotId();
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t SimManager::GetShowNumber(int32_t slotId, std::u16string &showNumber)
