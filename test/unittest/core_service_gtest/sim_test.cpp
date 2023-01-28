@@ -3918,6 +3918,13 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0100, Function | MediumTest | Level3
     sptr<INetworkSearchCallback> callback = nullptr;
     mCoreService->SetRadioState(0, true, callback);
     std::u16string testU16Str = u"";
+    EXPECT_NE(mCoreService->GetImei(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetMeid(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetUniqueDeviceId(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    NrMode mNrMode;
+    EXPECT_NE(mCoreService->GetNrOptionMode(0, mNrMode), TELEPHONY_ERR_SUCCESS);
+    std::vector<sptr<CellInformation>> cellInfo = {};
+    EXPECT_NE(mCoreService->GetCellInfoList(0, cellInfo), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetSimIccId(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetIMSI(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     mCoreService->GetNetworkSearchInformation(0, callback);
@@ -4055,6 +4062,13 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0400, Function | MediumTest | Level3
     sptr<INetworkSearchCallback> callback = nullptr;
     mCoreService->SetRadioState(0, true, callback);
     std::u16string testU16Str = u"";
+    EXPECT_NE(mCoreService->GetImei(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetMeid(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetUniqueDeviceId(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    NrMode mNrMode;
+    EXPECT_NE(mCoreService->GetNrOptionMode(0, mNrMode), TELEPHONY_ERR_SUCCESS);
+    std::vector<sptr<CellInformation>> cellInfo = {};
+    EXPECT_NE(mCoreService->GetCellInfoList(0, cellInfo), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetSimIccId(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetIMSI(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     mCoreService->GetNetworkSearchInformation(0, callback);
