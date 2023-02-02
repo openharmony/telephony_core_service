@@ -2931,6 +2931,7 @@ static napi_value CreateFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getPrimarySlotId", GetPrimarySlotId),
         DECLARE_NAPI_FUNCTION("getUniqueDeviceId", GetUniqueDeviceId),
         DECLARE_NAPI_FUNCTION("getNrOptionMode", GetNrOptionMode),
+        DECLARE_NAPI_FUNCTION("isNrSupported", IsNrSupported),
         DECLARE_NAPI_FUNCTION("isNRSupported", IsNrSupported),
         DECLARE_NAPI_FUNCTION("setPrimarySlotId", SetPrimarySlotId),
         DECLARE_NAPI_FUNCTION("getImsRegInfo", GetImsRegInfo),
