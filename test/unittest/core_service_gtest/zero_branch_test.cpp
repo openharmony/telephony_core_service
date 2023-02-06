@@ -711,7 +711,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_004, Function | MediumTest | Lev
     EXPECT_GT(mInner.SendEnvelopeCmd(0, ""), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.SendTerminalResponseCmd(0, ""), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.SendTerminalResponseCmd(0, ""), TELEPHONY_ERR_SUCCESS);
-    EXPECT_FALSE(mInner.DelSmsIcc(0, 0));
+    EXPECT_GT(mInner.DelSmsIcc(0, 0), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(mInner.IsSimActive(0));
     EXPECT_GT(mInner.SetShowName(0, u""), TELEPHONY_ERR_SUCCESS);
     LockStatusResponse response;
@@ -776,8 +776,8 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_005, Function | MediumTest | Lev
     EXPECT_EQ(mInner.ObtainAllSmsOfIcc(0), result);
     std::string pduData = "test";
     std::string smsc = "test";
-    EXPECT_FALSE(mInner.UpdateSmsIcc(0, 0, 0, pduData, smsc));
-    EXPECT_FALSE(mInner.AddSmsToIcc(0, 0, pduData, smsc));
+    EXPECT_GT(mInner.UpdateSmsIcc(0, 0, 0, pduData, smsc), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.AddSmsToIcc(0, 0, pduData, smsc), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -882,7 +882,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | L
     multiSimController->SortCache();
     std::shared_ptr<RadioProtocolController> radioProtocolController = nullptr;
     EXPECT_FALSE(multiSimController->InitData(0));
-    EXPECT_FALSE(multiSimController->SetDefaultSmsSlotId(0));
+    EXPECT_GT(multiSimController->SetDefaultSmsSlotId(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(multiSimController->RefreshActiveIccAccountInfoList());
     EXPECT_FALSE(multiSimController->IsSimActive(0));
     EXPECT_FALSE(multiSimController->IsSimActivatable(0));
@@ -1106,12 +1106,12 @@ HWTEST_F(BranchTest, Telephony_SimManager_003, Function | MediumTest | Level1)
     EXPECT_NE(simManager->SendCallSetupRequestResult(0, true), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->SendCallSetupRequestResult(INVALID_SLOTID, true), TELEPHONY_ERR_SUCCESS);
     std::string testAddress = "";
-    EXPECT_FALSE(simManager->AddSmsToIcc(0, 1, testAddress, testAddress));
-    EXPECT_FALSE(simManager->AddSmsToIcc(INVALID_SLOTID, 1, testAddress, testAddress));
-    EXPECT_FALSE(simManager->UpdateSmsIcc(0, 1, 1, testAddress, testAddress));
-    EXPECT_FALSE(simManager->UpdateSmsIcc(INVALID_SLOTID, 1, 1, testAddress, testAddress));
-    EXPECT_FALSE(simManager->DelSmsIcc(0, 1));
-    EXPECT_FALSE(simManager->DelSmsIcc(INVALID_SLOTID, 1));
+    EXPECT_GT(simManager->AddSmsToIcc(0, 1, testAddress, testAddress), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->AddSmsToIcc(INVALID_SLOTID, 1, testAddress, testAddress), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->UpdateSmsIcc(0, 1, 1, testAddress, testAddress), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->UpdateSmsIcc(INVALID_SLOTID, 1, 1, testAddress, testAddress), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->DelSmsIcc(0, 1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->DelSmsIcc(INVALID_SLOTID, 1), TELEPHONY_ERR_SUCCESS);
     std::vector<std::string> result;
     EXPECT_EQ(simManager->ObtainAllSmsOfIcc(0), result);
     EXPECT_EQ(simManager->ObtainAllSmsOfIcc(INVALID_SLOTID), result);
