@@ -31,6 +31,7 @@ using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t BOOL_NUM = 2;
+bool g_flag = false;
 
 void SendSmsMoreMode(const uint8_t *data, size_t size)
 {
@@ -285,6 +286,10 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
+    if (g_flag) {
+        return;
+    }
+    g_flag = true;
 
     SendSmsMoreMode(data, size);
     GetCallList(data, size);

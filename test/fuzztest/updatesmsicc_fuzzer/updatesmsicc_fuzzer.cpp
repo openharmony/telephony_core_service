@@ -30,11 +30,17 @@
 
 using namespace OHOS::Telephony;
 namespace OHOS {
+bool g_flag = false;
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return;
     }
+    if (g_flag) {
+        return;
+    }
+    g_flag = true;
 
     auto telRilManager_ = std::make_shared<TelRilManager>();
     auto stateManager_ = std::make_shared<SimStateManager>(telRilManager_);
