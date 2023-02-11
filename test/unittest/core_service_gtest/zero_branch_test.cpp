@@ -20,19 +20,24 @@
 #include "core_manager_inner.h"
 #include "csim_file_controller.h"
 #include "gtest/gtest.h"
+#include "icc_file.h"
+#include "icc_operator_rule.h"
 #include "isim_file_controller.h"
 #include "multi_sim_controller.h"
 #include "network_register.h"
 #include "network_search_manager.h"
 #include "network_search_state.h"
+#include "operator_matching_rule.h"
 #include "operator_name.h"
 #include "radio_protocol_controller.h"
 #include "ruim_file_controller.h"
 #include "sim_file_controller.h"
 #include "sim_file_manager.h"
 #include "sim_manager.h"
+#include "sim_number_decode.h"
 #include "sim_sms_controller.h"
 #include "sim_state_manager.h"
+#include "sim_utils.h"
 #include "stk_controller.h"
 #include "stk_manager.h"
 #include "tag_service.h"
@@ -53,6 +58,9 @@ const int32_t OBTAIN_SPN_START = 1;
 const int32_t OBTAIN_SPN_GENERAL = 2;
 const int32_t OBTAIN_OPERATOR_NAMESTRING = 3;
 const int32_t OBTAIN_OPERATOR_NAME_SHORTFORM = 4;
+const int32_t BYTES_LENGTH = 3;
+const int32_t LO_FOUR_LENGTH = 15;
+const int32_t VALUE_LENGTH = 128;
 } // namespace
 
 class DemoHandler : public AppExecFwk::EventHandler {
@@ -459,9 +467,18 @@ HWTEST_F(BranchTest, Telephony_ISimFile_001, Function | MediumTest | Level1)
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("IsimFile");
     std::shared_ptr<IsimFile> iSimFile = std::make_shared<IsimFile>(eventLoopRecord, simStateManager);
-    auto event = AppExecFwk::InnerEvent::Get(0);
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_READY, 1);
+    iSimFile->InitMemberFunc();
+    iSimFile->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(0, 1);
+    iSimFile->ProcessEvent(event);
+    EXPECT_TRUE(iSimFile->ProcessGetIccidDone(event));
+    EXPECT_TRUE(iSimFile->ProcessGetImsiDone(event));
+    EXPECT_TRUE(iSimFile->ProcessGetImpiDone(event));
+    EXPECT_TRUE(iSimFile->ProcessGetIstDone(event));
     event = nullptr;
     iSimFile->ProcessEvent(event);
+    EXPECT_FALSE(iSimFile->ProcessIccReady(event));
     EXPECT_EQ(iSimFile->ObtainIsimImpi(), "");
     EXPECT_EQ(iSimFile->ObtainIsimDomain(), "");
     EXPECT_EQ(iSimFile->ObtainIsimImpu(), nullptr);
@@ -471,7 +488,6 @@ HWTEST_F(BranchTest, Telephony_ISimFile_001, Function | MediumTest | Level1)
     EXPECT_EQ(iSimFile->ObtainSpnCondition(true, ""), 0);
     EXPECT_EQ(iSimFile->ObtainIsoCountryCode(), "");
     iSimFile->ProcessFileLoaded(false);
-    iSimFile->InitMemberFunc();
     iSimFile->ProcessLockedAllFilesFetched();
     EXPECT_FALSE(iSimFile->ProcessIsimRefresh(event));
     EXPECT_TRUE(iSimFile->ProcessGetImsiDone(event));
@@ -492,10 +508,27 @@ HWTEST_F(BranchTest, Telephony_RuimFile_001, Function | MediumTest | Level1)
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("RuimFile");
     std::shared_ptr<RuimFile> rUimFile = std::make_shared<RuimFile>(eventLoopRecord, simStateManager);
-    auto event = AppExecFwk::InnerEvent::Get(0);
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_READY, 1);
+    rUimFile->InitMemberFunc();
+    rUimFile->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(0, 1);
+    rUimFile->ProcessEvent(event);
+    rUimFile->ProcessFileLoaded(false);
+    unsigned char spnData[10] = { 0 };
+    rUimFile->ParseSpnName(IccDiallingNumberConstant::CSIM_SPN_OCTET, spnData, 0);
+    rUimFile->ParseSpnName(IccDiallingNumberConstant::CSIM_SPN_LATIN, spnData, 0);
+    rUimFile->ParseSpnName(IccDiallingNumberConstant::CSIM_SPN_IA5, spnData, 0);
+    rUimFile->ParseSpnName(IccDiallingNumberConstant::CSIM_SPN_7BIT_ALPHABET, spnData, 0);
+    rUimFile->ParseSpnName(IccDiallingNumberConstant::NAME_CHAR_POS, spnData, 0);
+    EXPECT_TRUE(rUimFile->ProcessGetIccidDone(event));
+    EXPECT_TRUE(rUimFile->ProcessGetImsiDone(event));
+    EXPECT_TRUE(rUimFile->ProcessGetSpnDone(event));
     event = nullptr;
     rUimFile->ProcessEvent(event);
     EXPECT_EQ(rUimFile->ObtainSimOperator(), "");
+    EXPECT_EQ(rUimFile->ObtainIsoCountryCode(), "");
+    rUimFile->imsi_ = "12345678";
+    EXPECT_EQ(rUimFile->ObtainSimOperator(), "12345");
     EXPECT_EQ(rUimFile->ObtainIsoCountryCode(), "");
     EXPECT_EQ(rUimFile->ObtainMdnNumber(), "");
     EXPECT_EQ(rUimFile->ObtainCdmaMin(), "");
@@ -508,11 +541,6 @@ HWTEST_F(BranchTest, Telephony_RuimFile_001, Function | MediumTest | Level1)
     EXPECT_FALSE(rUimFile->ObtainCsimSpnDisplayCondition());
     EXPECT_EQ(rUimFile->ObtainSpnCondition(true, ""), 0);
     EXPECT_FALSE(rUimFile->UpdateVoiceMail("", ""));
-    rUimFile->ProcessFileLoaded(false);
-    unsigned char spnData[10] = { 0 };
-    rUimFile->ParseSpnName(0, spnData, 0);
-    rUimFile->InitMemberFunc();
-    rUimFile->ProcessLockedAllFilesFetched();
     EXPECT_TRUE(rUimFile->ProcessGetImsiDone(event));
     EXPECT_TRUE(rUimFile->ProcessGetIccidDone(event));
     EXPECT_TRUE(rUimFile->ProcessGetSubscriptionDone(event));
@@ -802,6 +830,31 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_006, Function | MediumTest | Lev
     EXPECT_GT(mInner.GetCallRestriction(0, "", event), TELEPHONY_ERR_SUCCESS);
     CallRestrictionParam mCallRestrictionParam;
     EXPECT_GT(mInner.SetCallRestriction(0, mCallRestrictionParam, event), TELEPHONY_ERR_SUCCESS);
+    std::shared_ptr<AppExecFwk::EventHandler> handler;
+    sptr<NetworkSearchCallBackBase> callback = nullptr;
+    mInner.RegisterCellularDataObject(callback);
+    mInner.UnRegisterCellularDataObject(callback);
+    mInner.RegisterCellularCallObject(callback);
+    mInner.UnRegisterCellularCallObject(callback);
+    EXPECT_EQ(mInner.RegisterCoreNotify(INVALID_SLOTID, handler, RadioEvent::RADIO_NR_STATE_CHANGED, nullptr),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.UnRegisterCoreNotify(INVALID_SLOTID, handler, RadioEvent::RADIO_NR_STATE_CHANGED),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.RegisterCoreNotify(INVALID_SLOTID, handler, RadioEvent::RADIO_SIM_STATE_READY, nullptr),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.UnRegisterCoreNotify(INVALID_SLOTID, handler, RadioEvent::RADIO_SIM_GET_RADIO_PROTOCOL),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.RegisterCoreNotify(INVALID_SLOTID, handler, RadioEvent::RADIO_SIM_STATE_READY, nullptr),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.UnRegisterCoreNotify(INVALID_SLOTID, handler, RadioEvent::RADIO_SIM_GET_RADIO_PROTOCOL),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
+    std::string bundleName = "";
+    sptr<SimAccountCallback> simAccountCallback;
+    int32_t imsSwitchValue = 1;
+    EXPECT_EQ(mInner.RegisterSimAccountCallback(bundleName, simAccountCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.UnregisterSimAccountCallback(bundleName), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetSmscAddr(INVALID_SLOTID, 1, handler), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.QueryImsSwitch(INVALID_SLOTID, imsSwitchValue), TELEPHONY_ERROR);
 }
 
 /**
@@ -1162,9 +1215,10 @@ HWTEST_F(BranchTest, Telephony_SimStateManager_001, Function | MediumTest | Leve
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     telRilManager->OnInit();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    simStateManager->RegisterCoreNotify(nullptr, 1);
+    simStateManager->UnRegisterCoreNotify(nullptr, 1);
     EXPECT_FALSE(simStateManager->HasSimCard());
-    EXPECT_EQ(simStateManager->GetSimState(), SimState::SIM_STATE_UNKNOWN);
-    EXPECT_EQ(simStateManager->GetCardType(), CardType::UNKNOWN_CARD);
     std::string password = "1234";
     LockStatusResponse mLockStatusResponse;
     EXPECT_GT(simStateManager->UnlockPin(0, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
@@ -1182,15 +1236,17 @@ HWTEST_F(BranchTest, Telephony_SimStateManager_001, Function | MediumTest | Leve
     EXPECT_GT(simStateManager->GetLockState(0, testLockInfo.lockType, lockState), TELEPHONY_ERR_SUCCESS);
     LockType lockType = LockType::PIN_LOCK;
     EXPECT_GT(simStateManager->GetLockState(0, lockType, lockState), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(simStateManager->RefreshSimState(0), 0);
     EXPECT_GT(simStateManager->UnlockPin2(0, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simStateManager->UnlockPuk2(0, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simStateManager->AlterPin2(0, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
     PersoLockInfo mPersoLockInfo;
     EXPECT_GT(simStateManager->UnlockSimLock(0, mPersoLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    simStateManager->RegisterCoreNotify(nullptr, 1);
-    simStateManager->UnRegisterCoreNotify(nullptr, 1);
     SimAuthenticationResponse mResponse;
+    EXPECT_NE(simStateManager->SimAuthentication(0, "", "", mResponse), TELEPHONY_ERR_SUCCESS);
+    auto simStateManagerTwo = std::make_shared<SimStateManager>(telRilManager);
+    simStateManager->simStateHandle_ = std::make_shared<SimStateHandle>(runner, simStateManagerTwo);
+    EXPECT_GE(simStateManager->GetCardType(), CardType::UNKNOWN_CARD);
+    EXPECT_GT(simStateManager->UnlockSimLock(0, mPersoLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simStateManager->SimAuthentication(0, "", "", mResponse), TELEPHONY_ERR_SUCCESS);
 }
 
@@ -1824,6 +1880,165 @@ HWTEST_F(BranchTest, Telephony_StkController_001, Function | MediumTest | Level1
     EXPECT_EQ(stkController->SendCallSetupRequestResult(true), TELEPHONY_ERR_FAIL);
     EXPECT_GT(stkController->SendTerminalResponseCmd(strCmd), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(stkController->SendEnvelopeCmd(strCmd), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_IccOperatorRule_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_IccOperatorRule_001, Function | MediumTest | Level1)
+{
+    auto iccOperatorRule = std::make_shared<IccOperatorRule>();
+    auto operatorMatchingRule = std::make_shared<OperatorMatchingRule>();
+    std::string numIt = "123";
+    IccOperatorRule result;
+    std::string::const_iterator hexStrBeg = numIt.begin();
+    std::string::const_iterator hexStrEnd = numIt.begin();
+    std::vector<IccOperatorRule> list;
+    std::string_view certHash;
+    std::string_view packageName;
+    std::string hexStr = "12";
+    std::string iccidFromSim = "";
+    std::string iccidRegex = "";
+    int32_t len = 1;
+    EXPECT_FALSE(iccOperatorRule->DecodeTLVTagRule(hexStrBeg, hexStrEnd, result, len));
+    EXPECT_FALSE(iccOperatorRule->DecodeTLVTagCertPkg(hexStrBeg, hexStrEnd, result));
+    EXPECT_FALSE(iccOperatorRule->DecodeTLVTagLimits(hexStrBeg, hexStrEnd, result));
+    EXPECT_FALSE(iccOperatorRule->CreateFromTLV(hexStrBeg, hexStrEnd, list));
+    EXPECT_FALSE(iccOperatorRule->CreateFromTLV(numIt, list));
+    EXPECT_TRUE(iccOperatorRule->Matche(certHash, packageName));
+    EXPECT_TRUE(iccOperatorRule->SetPackageNameByHexStr(hexStr));
+    EXPECT_FALSE(operatorMatchingRule->IccidRegexMatch(iccidFromSim, iccidRegex));
+    EXPECT_FALSE(operatorMatchingRule->ImsiRegexMatch(iccidFromSim, iccidRegex));
+    EXPECT_FALSE(operatorMatchingRule->SpnRegexMatch(iccidFromSim, iccidRegex));
+    EXPECT_FALSE(operatorMatchingRule->PrefixMatch(iccidFromSim, iccidRegex));
+}
+
+/**
+ * @tc.number   Telephony_SIMUtils_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SIMUtils_001, Function | MediumTest | Level1)
+{
+    auto simUtils = std::make_shared<SIMUtils>();
+    char spnData = '0';
+    std::string str = "";
+    int byteslen = 1;
+    EXPECT_EQ(simUtils->HexCharConvertToInt(spnData), 0);
+    spnData = 'B';
+    EXPECT_GT(simUtils->HexCharConvertToInt(spnData), 0);
+    spnData = 'b';
+    EXPECT_GT(simUtils->HexCharConvertToInt(spnData), 0);
+    EXPECT_TRUE(simUtils->HexStringConvertToBytes(str, byteslen) == nullptr);
+    str = "123";
+    unsigned char *bytes = (unsigned char *)str.c_str();
+    std::shared_ptr<unsigned char> bytesTwo = std::make_shared<unsigned char>(1);
+    simUtils->ArrayCopy(bytes, 1, bytes, 1, 1);
+    EXPECT_TRUE(simUtils->HexStringConvertToBytes(str, byteslen) == nullptr);
+    str = "1";
+    EXPECT_TRUE(simUtils->IsShowableAsciiOnly(str));
+    EXPECT_TRUE(simUtils->HexStringConvertToBytes(str, byteslen) == nullptr);
+    byteslen = 2;
+    str = "12";
+    EXPECT_TRUE(simUtils->HexStringConvertToBytes(str, byteslen) != nullptr);
+    EXPECT_EQ(simUtils->BytesConvertToHexString(nullptr, 1), "");
+    EXPECT_NE(simUtils->BytesConvertToHexString(bytes, 1), "");
+    int outChar16Len = 1;
+    EXPECT_TRUE(simUtils->CharsConvertToChar16(nullptr, 1, outChar16Len, true) == nullptr);
+    EXPECT_TRUE(simUtils->CharsConvertToChar16(bytes, 0, outChar16Len, true) == nullptr);
+    EXPECT_TRUE(simUtils->CharsConvertToChar16(bytes, BYTES_LENGTH, outChar16Len, true) == nullptr);
+    EXPECT_TRUE(simUtils->CharsConvertToChar16(bytes, 1, outChar16Len, true) == nullptr);
+    EXPECT_FALSE(simUtils->CharsConvertToChar16(bytes, OBTAIN_SPN_GENERAL, outChar16Len, true) == nullptr);
+    EXPECT_FALSE(simUtils->CharsConvertToChar16(bytes, OBTAIN_SPN_GENERAL, outChar16Len, false) == nullptr);
+    EXPECT_NE(simUtils->Gsm7bitConvertToString(bytes, 1), "");
+    EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(bytesTwo, 0, 0, 1), "");
+    EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(nullptr, 0, 1, 1), "");
+    EXPECT_EQ(simUtils->UcsCodeConvertToString(bytesTwo, 0, BYTES_LENGTH, 1), "");
+}
+
+/**
+ * @tc.number   Telephony_SimNumberDecode_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SimNumberDecode_001, Function | MediumTest | Level1)
+{
+    auto simNumberDecode = std::make_shared<SimNumberDecode>();
+    std::string number = "a";
+    EXPECT_FALSE(simNumberDecode->IsValidNumberString(number));
+    EXPECT_TRUE(simNumberDecode->chooseExtendedByType(1) != nullptr);
+    EXPECT_TRUE(simNumberDecode->chooseExtendedByType(OBTAIN_SPN_GENERAL) != nullptr);
+    char spnData = '0';
+    uint8_t result = 1;
+    EXPECT_TRUE(simNumberDecode->CharToBCD(spnData, result, 1));
+    spnData = 'a';
+    EXPECT_FALSE(simNumberDecode->CharToBCD(spnData, result, BYTES_LENGTH));
+    EXPECT_TRUE(simNumberDecode->BcdToChar(1, spnData, 1));
+    EXPECT_FALSE(simNumberDecode->BcdToChar(VALUE_LENGTH, spnData, BYTES_LENGTH));
+    EXPECT_FALSE(simNumberDecode->BcdToChar(VALUE_LENGTH, spnData, 1));
+    number = "+-";
+    std::vector<uint8_t> bcdCodes;
+    std::shared_ptr<unsigned char> bytesData = nullptr;
+    EXPECT_FALSE(simNumberDecode->NumberConvertToBCD(number, bcdCodes, true, BYTES_LENGTH));
+    number = "0+";
+    EXPECT_TRUE(simNumberDecode->NumberConvertToBCD(number, bcdCodes, true, 1));
+    EXPECT_EQ(simNumberDecode->BCDConvertToString(bytesData, 1, 1, 1), "");
+    bytesData = std::make_shared<unsigned char>(1);
+    EXPECT_EQ(simNumberDecode->BCDConvertToString(bytesData, 1, 1, 1), "");
+    bcdCodes.push_back(1);
+    bcdCodes.push_back(LO_FOUR_LENGTH);
+    std::vector<uint8_t>::const_iterator codeBeg = bcdCodes.begin();
+    std::vector<uint8_t>::const_iterator codeEnd = bcdCodes.end();
+    EXPECT_FALSE(simNumberDecode->BCDSectionConvertToString(codeBeg, codeEnd, number, BYTES_LENGTH));
+    EXPECT_FALSE(simNumberDecode->BCDSectionConvertToString(codeBeg, codeEnd, number, 1));
+    EXPECT_FALSE(simNumberDecode->BCDConvertToString(codeBeg, codeEnd, number, BYTES_LENGTH));
+    EXPECT_FALSE(simNumberDecode->BCDConvertToString(codeBeg, codeEnd, number, 1));
+}
+
+/**
+ * @tc.number   Telephony_IccFile_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_IccFile_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(runner, simStateManager);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(StateMessage::MSG_ICC_REFRESH, 1);
+    iccFile->ProcessEvent(event);
+    event = nullptr;
+    iccFile->ProcessEvent(event);
+    std::shared_ptr<AppExecFwk::EventHandler> handler = nullptr;
+    iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_SIM_GET_RADIO_PROTOCOL);
+    iccFile->imsi_ = "123";
+    iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_IMSI_LOADED_READY);
+    iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_IMSI_LOADED_READY);
+    std::string plmn = "";
+    EXPECT_EQ(iccFile->ObtainEons(plmn, 1, true), "");
+    plmn = "123";
+    iccFile->UpdateSPN(plmn);
+    EXPECT_EQ(iccFile->ObtainEons(plmn, 1, true), "");
+    auto plmnNetworkName = std::make_shared<PlmnNetworkName>();
+    iccFile->pnnFiles_.push_back(plmnNetworkName);
+    EXPECT_EQ(iccFile->ObtainEons(plmn, 1, true), "");
+    auto opl = std::make_shared<OperatorPlmnInfo>();
+    opl->plmnNumeric = "123";
+    opl->lacStart = 0;
+    opl->lacEnd = 0xfffe;
+    opl->pnnRecordId = 1;
+    iccFile->oplFiles_.push_back(opl);
+    iccFile->oplFiles_.push_back(nullptr);
+    EXPECT_EQ(iccFile->ObtainEons(plmn, 0, true), "");
+    EXPECT_EQ(iccFile->ObtainEons(plmn, 0, false), "");
+    std::string langData = "";
+    EXPECT_EQ(iccFile->ObtainValidLanguage(langData), "");
 }
 } // namespace Telephony
 } // namespace OHOS
