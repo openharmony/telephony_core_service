@@ -488,6 +488,10 @@ static void GetNetworkSelectionModeCallback(napi_env env, napi_status status, vo
     if (asyncContext->resolved) {
         napi_create_int32(env, asyncContext->selectMode, &callbackValue);
     } else {
+        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("GetNetworkSelectionModeCallback time out, errorCode = %{public}d", asyncContext->errorCode);
+            asyncContext->errorCode = TELEPHONY_ERR_FAIL;
+        }
         JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->errorCode);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
@@ -601,6 +605,10 @@ static void GetNetworkSearchInformationCallback(napi_env env, napi_status status
         }
         napi_set_named_property(env, callbackValue, "networkSearchResult", searchResultArray);
     } else {
+        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("GetNetworkSearchInformationCallback time out, errorCode = %{public}d", asyncContext->errorCode);
+            asyncContext->errorCode = TELEPHONY_ERR_FAIL;
+        }
         JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
             asyncContext->errorCode, "getNetworkSearchInformation", GET_TELEPHONY_STATE);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
@@ -799,6 +807,10 @@ static void SetNetworkSelectionModeCallback(napi_env env, napi_status status, vo
     if (asyncContext->resolved) {
         napi_get_undefined(env, &callbackValue);
     } else {
+        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("SetNetworkSelectionModeCallback time out, errorCode = %{public}d", asyncContext->errorCode);
+            asyncContext->errorCode = TELEPHONY_ERR_FAIL;
+        }
         JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
             asyncContext->errorCode, "setNetworkSelectionMode", SET_TELEPHONY_STATE);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
@@ -969,6 +981,10 @@ static void IsRadioOnCallback(napi_env env, napi_status status, void *data)
     if (asyncContext->resolved) {
         napi_get_boolean(env, asyncContext->isRadioOn, &callbackValue);
     } else {
+        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("IsRadioOnCallback time out, errorCode = %{public}d", asyncContext->errorCode);
+            asyncContext->errorCode = TELEPHONY_ERR_FAIL;
+        }
         JsError error =
             NapiUtil::ConverErrorMessageWithPermissionForJs(asyncContext->errorCode, "isRadioOn", GET_NETWORK_INFO);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
@@ -1041,6 +1057,10 @@ static void TurnOnRadioCallback(napi_env env, napi_status status, void *data)
     if (asyncContext->resolved) {
         napi_get_undefined(env, &callbackValue);
     } else {
+        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("TurnOnRadioCallback time out, errorCode = %{public}d", asyncContext->errorCode);
+            asyncContext->errorCode = TELEPHONY_ERR_FAIL;
+        }
         JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
             asyncContext->errorCode, "turnOnRadio", SET_TELEPHONY_STATE);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
@@ -1127,6 +1147,10 @@ static void TurnOffRadioCallback(napi_env env, napi_status status, void *data)
     if (asyncContext->resolved) {
         napi_get_undefined(env, &callbackValue);
     } else {
+        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("TurnOffRadioCallback time out, errorCode = %{public}d", asyncContext->errorCode);
+            asyncContext->errorCode = TELEPHONY_ERR_FAIL;
+        }
         JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
             asyncContext->errorCode, "turnOffRadio", SET_TELEPHONY_STATE);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
@@ -1266,6 +1290,10 @@ static void SetPreferredNetworkCallback(napi_env env, napi_status status, void *
     if (context->resolved) {
         napi_get_undefined(env, &callbackValue);
     } else {
+        if (context->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("SetPreferredNetworkCallback time out, errorCode = %{public}d", context->errorCode);
+            context->errorCode = TELEPHONY_ERR_FAIL;
+        }
         JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
             context->errorCode, "setPreferredNetwork", SET_TELEPHONY_STATE);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
@@ -1338,6 +1366,10 @@ static void GetPreferredNetworkCallback(napi_env env, napi_status status, void *
     if (context->resolved) {
         napi_create_int32(env, context->preferredNetworkMode, &callbackValue);
     } else {
+        if (context->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("GetPreferredNetworkCallback time out, errorCode = %{public}d", context->errorCode);
+            context->errorCode = TELEPHONY_ERR_FAIL;
+        }
         JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
             context->errorCode, "getPreferredNetwork", GET_TELEPHONY_STATE);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);

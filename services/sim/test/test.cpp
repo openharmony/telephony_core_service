@@ -373,7 +373,9 @@ static bool TestSetPrimarySlotId()
 static bool TestGetPrimarySlotId()
 {
     AccessToken token;
-    int32_t result = g_telephonyService->GetPrimarySlotId();
+    int32_t slotId;
+    int32_t result = INVALID_VALUE;
+    g_telephonyService->GetPrimarySlotId(slotId);
     string expect = (result >= INVALID_VALUE) ? "success" : "fail";
     std::cout << "TelephonyTestService Remote GetPrimarySlotId result [" << result << "] " << expect
               << std::endl;
