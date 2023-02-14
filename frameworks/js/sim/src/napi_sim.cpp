@@ -31,6 +31,7 @@
 namespace OHOS {
 namespace Telephony {
 namespace {
+constexpr const char *JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING = "Invalid parameter value.";
 struct AsyncPara {
     std::string funcName = "";
     napi_env env = nullptr;
@@ -356,7 +357,8 @@ void IsSimActiveCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContext<bool>> context(static_cast<AsyncContext<bool> *>(data));
     if (context->context.errorCode == ERROR_SLOT_ID_INVALID) {
-        NapiAsyncCompleteCallback(env, status, *context, "slotId is invalid", false, ERROR_SLOT_ID_INVALID);
+        NapiAsyncCompleteCallback(
+            env, status, *context, JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING, false, JS_ERROR_TELEPHONY_ARGUMENT_ERROR);
     } else {
         NapiAsyncCompleteCallback(env, status, *context, "get simActive state failed");
     }
