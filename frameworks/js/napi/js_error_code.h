@@ -100,11 +100,6 @@ enum JsErrorCode {
     JS_ERROR_NETWORK_SEARCH_BASE_ERROR = 8302000,
 
     /**
-     * Interval time is too short.
-     */
-    JS_ERROR_NETWORK_SEARCH_INTERVAL_TIME_TOO_SHORT,
-
-    /**
      * Call manager module base error code.
      */
     JS_ERROR_CALL_MANAGER_BASE_ERROR = 8401000,
@@ -113,51 +108,6 @@ enum JsErrorCode {
      * UT is not connected.
      */
     JS_ERROR_CALL_UT_NO_CONNECTION,
-
-    /**
-     * Wrong mobile number format.
-     */
-    JS_ERROR_CALL_WRONG_MOBILE_NUMBER,
-
-    /**
-     * Abnormal call status.
-     */
-    JS_ERROR_CALL_ABNORMAL_CALL_STATUS,
-
-    /**
-     * Abnormal call type.
-     */
-    JS_ERROR_CALL_ABNORMAL_CALL_TYPE,
-
-    /**
-     * Abnormal conference call.
-     */
-    JS_ERROR_CALL_ABNORMAL_CONFERENCE_CALL,
-
-    /**
-     * Supplementary service exception.
-     */
-    JS_ERROR_SUPPLEMENTARY_SERVICE_EXCEPTION,
-
-    /**
-     * Abnormal call parameters.
-     */
-    JS_ERROR_CALL_ABNORMAL_CALL_PARAMETERS,
-
-    /**
-     * Abnormal video call status.
-     */
-    JS_ERROR_CALL_ABNORMAL_VIDEO_CALL_STATUS,
-
-    /**
-     * Volte does not support or disable.
-     */
-    JS_ERROR_CALL_VOLTE_NOT_SUPPORT_OR_DISABLED,
-
-    /**
-     * Abnormal video parameters.
-     */
-    JS_ERROR_CALL_ABNORMAL_VIDEO_PARAMETERS,
 
     /**
      * Cellular call module cs base error code.
@@ -173,11 +123,6 @@ enum JsErrorCode {
      * Cellular data module base error code.
      */
     JS_ERROR_CELLULAR_DATA_BASE_ERROR = 8601000,
-
-    /**
-     * Switch status mismatch.
-     */
-    JS_ERROR_CELLULAR_DATA_SWITCH_STATUS_MISMATCH,
 
     /**
      * Sms mms module base error code.

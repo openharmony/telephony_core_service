@@ -34,7 +34,7 @@ static constexpr int32_t MAX_TEXT_LENGTH = 4096;
 static constexpr const char *JS_ERROR_TELEPHONY_PERMISSION_DENIED_STRING = "Permission denied.";
 static constexpr const char *JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API_STRING = "Non system applications use system APIs.";
 static constexpr const char *JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING =
-    "BusinessError 401: Parameter error. The type of parameter should match or the number of parameters must match.";
+    "Parameter error. The type of parameter should match or the number of parameters must match.";
 static constexpr const char *JS_ERROR_DEVICE_NOT_SUPPORT_THIS_API_STRING = "The device does not support this API.";
 static constexpr const char *JS_ERROR_TELEPHONY_SUCCESS_STRING = "Success.";
 static constexpr const char *JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING = "Invalid parameter value.";
@@ -48,20 +48,11 @@ static constexpr const char *JS_ERROR_SIM_CARD_OPERATION_ERROR_STRING = "SIM car
 static constexpr const char *JS_ERROR_OPERATOR_CONFIG_ERROR_STRING = "Operator config error.";
 static constexpr const char *JS_ERROR_NETWORK_SEARCH_BASE_ERROR_STRING = "Network search module base error.";
 static constexpr const char *JS_ERROR_CALL_MANAGER_BASE_ERROR_STRING = "Call manager module base error.";
-static constexpr const char *JS_ERROR_CALL_WRONG_MOBILE_NUMBER_STRING = "Wrong mobile number format.";
-static constexpr const char *JS_ERROR_CALL_ABNORMAL_CALL_STATUS_STRING = "Abnormal call status.";
-static constexpr const char *JS_ERROR_CALL_ABNORMAL_CONFERENCE_CALL_STRING = "Abnormal conference call.";
-static constexpr const char *JS_ERROR_SUPPLEMENTARY_SERVICE_EXCEPTION_STRING = "Supplementary service exception.";
-static constexpr const char *JS_ERROR_CALL_ABNORMAL_CALL_PARAMETERS_STRING = "Abnormal call parameters.";
-static constexpr const char *JS_ERROR_CALL_ABNORMAL_VIDEO_CALL_STATUS_STRING = "Abnormal video call status.";
-static constexpr const char *JS_ERROR_CALL_ABNORMAL_VIDEO_PARAMETERS_STRING = "Abnormal video parameters.";
 static constexpr const char *JS_ERROR_CELLULAR_CALL_CS_BASE_ERROR_STRING = "Cellular call module cs base error.";
 static constexpr const char *JS_ERROR_CELLULAR_CALL_IMS_BASE_ERROR_STRING = "Cellular call module ims base error.";
 static constexpr const char *JS_ERROR_CELLULAR_DATA_BASE_ERROR_STRING = "Cellular data module base error.";
 static constexpr const char *JS_ERROR_SMS_MMS_BASE_ERROR_STRING = "Sms mms module base error.";
 static constexpr const char *JS_ERROR_STATE_REGISTRY_BASE_ERROR_STRING = "State registry module base error.";
-static constexpr const char *JS_ERROR_CALL_ABNORMAL_CALL_TYPE_STRING = "Abnormal call type.";
-static constexpr const char *JS_ERROR_CALL_VOLTE_NOT_SUPPORT_OR_DISABLED_STRING = "Volte does not support or disable.";
 
 static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_PERMISSION_DENIED, JS_ERROR_TELEPHONY_PERMISSION_DENIED_STRING },
@@ -80,15 +71,6 @@ static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_OPERATOR_CONFIG_ERROR, JS_ERROR_OPERATOR_CONFIG_ERROR_STRING },
     { JsErrorCode::JS_ERROR_NETWORK_SEARCH_BASE_ERROR, JS_ERROR_NETWORK_SEARCH_BASE_ERROR_STRING },
     { JsErrorCode::JS_ERROR_CALL_MANAGER_BASE_ERROR, JS_ERROR_CALL_MANAGER_BASE_ERROR_STRING },
-    { JsErrorCode::JS_ERROR_CALL_WRONG_MOBILE_NUMBER, JS_ERROR_CALL_WRONG_MOBILE_NUMBER_STRING },
-    { JsErrorCode::JS_ERROR_CALL_ABNORMAL_CALL_STATUS, JS_ERROR_CALL_ABNORMAL_CALL_STATUS_STRING },
-    { JsErrorCode::JS_ERROR_CALL_ABNORMAL_CALL_TYPE, JS_ERROR_CALL_ABNORMAL_CALL_TYPE_STRING },
-    { JsErrorCode::JS_ERROR_CALL_ABNORMAL_CONFERENCE_CALL, JS_ERROR_CALL_ABNORMAL_CONFERENCE_CALL_STRING },
-    { JsErrorCode::JS_ERROR_SUPPLEMENTARY_SERVICE_EXCEPTION, JS_ERROR_SUPPLEMENTARY_SERVICE_EXCEPTION_STRING },
-    { JsErrorCode::JS_ERROR_CALL_ABNORMAL_CALL_PARAMETERS, JS_ERROR_CALL_ABNORMAL_CALL_PARAMETERS_STRING },
-    { JsErrorCode::JS_ERROR_CALL_ABNORMAL_VIDEO_CALL_STATUS, JS_ERROR_CALL_ABNORMAL_VIDEO_CALL_STATUS_STRING },
-    { JsErrorCode::JS_ERROR_CALL_VOLTE_NOT_SUPPORT_OR_DISABLED, JS_ERROR_CALL_VOLTE_NOT_SUPPORT_OR_DISABLED_STRING },
-    { JsErrorCode::JS_ERROR_CALL_ABNORMAL_VIDEO_PARAMETERS, JS_ERROR_CALL_ABNORMAL_VIDEO_PARAMETERS_STRING },
     { JsErrorCode::JS_ERROR_CELLULAR_CALL_CS_BASE_ERROR, JS_ERROR_CELLULAR_CALL_CS_BASE_ERROR_STRING },
     { JsErrorCode::JS_ERROR_CELLULAR_CALL_IMS_BASE_ERROR, JS_ERROR_CELLULAR_CALL_IMS_BASE_ERROR_STRING },
     { JsErrorCode::JS_ERROR_CELLULAR_DATA_BASE_ERROR, JS_ERROR_CELLULAR_DATA_BASE_ERROR_STRING },
@@ -609,33 +591,25 @@ bool NapiUtil::CreateCommonCallErrorMessageForJs(int32_t errorCode, JsErrorCode 
     switch (errorCode) {
         case CALL_ERR_NUMBER_OUT_OF_RANGE:
         case CALL_ERR_PHONE_NUMBER_EMPTY:
-            jsErrorCode = JS_ERROR_CALL_WRONG_MOBILE_NUMBER;
+        case CALL_ERR_FORMAT_PHONE_NUMBER_FAILED:
+            jsErrorCode = JS_ERROR_TELEPHONY_ARGUMENT_ERROR;
+            break;
+        case CALL_ERR_PARAMETER_OUT_OF_RANGE:
+        case CALL_ERR_INVALID_SLOT_ID:
+            jsErrorCode = JS_ERROR_TELEPHONY_ARGUMENT_ERROR;
             break;
         case CALL_ERR_CALL_IS_NOT_ACTIVATED:
         case CALL_ERR_ILLEGAL_CALL_OPERATION:
         case CALL_ERR_AUDIO_SETTING_MUTE_FAILED:
         case CALL_ERR_CALL_IS_NOT_ON_HOLDING:
         case CALL_ERR_PHONE_CALLS_TOO_FEW:
-            jsErrorCode = JS_ERROR_CALL_ABNORMAL_CALL_STATUS;
-            break;
         case CALL_ERR_VIDEO_ILLEGAL_CALL_TYPE:
-            jsErrorCode = JS_ERROR_CALL_ABNORMAL_CALL_TYPE;
-            break;
-        case CALL_ERR_PARAMETER_OUT_OF_RANGE:
-        case CALL_ERR_INVALID_SLOT_ID:
-            jsErrorCode = JS_ERROR_TELEPHONY_ARGUMENT_ERROR;
-            break;
         case CALL_ERR_CONFERENCE_NOT_EXISTS:
         case CALL_ERR_CONFERENCE_CALL_EXCEED_LIMIT:
         case CALL_ERR_EMERGENCY_UNSUPPORT_CONFERENCEABLE:
-            jsErrorCode = JS_ERROR_CALL_ABNORMAL_CONFERENCE_CALL;
-            break;
         case CALL_ERR_VOLTE_NOT_SUPPORT:
         case CALL_ERR_VOLTE_PROVISIONING_DISABLED:
-            jsErrorCode = JS_ERROR_CALL_VOLTE_NOT_SUPPORT_OR_DISABLED;
-            break;
-        case CALL_ERR_FORMAT_PHONE_NUMBER_FAILED:
-            jsErrorCode = JS_ERROR_TELEPHONY_ARGUMENT_ERROR;
+            jsErrorCode = JS_ERROR_TELEPHONY_SYSTEM_ERROR;
             break;
         default:
             flag = false;
@@ -654,17 +628,13 @@ bool NapiUtil::CreateVideoCallErrorMessageForJs(int32_t errorCode, JsErrorCode &
         case CALL_ERR_VIDEO_ILLEAGAL_SCENARIO:
         case CALL_ERR_VIDEO_MODE_CHANGE_NOTIFY_FAILED:
         case CALL_ERR_VIDEO_NOT_SUPPORTED:
-            jsErrorCode = JS_ERROR_CALL_ABNORMAL_VIDEO_CALL_STATUS;
-            break;
+        case CALL_ERR_SETTING_AUDIO_DEVICE_FAILED:
         case CALL_ERR_VIDEO_INVALID_COORDINATES:
         case CALL_ERR_VIDEO_INVALID_ZOOM:
         case CALL_ERR_VIDEO_INVALID_ROTATION:
         case CALL_ERR_VIDEO_INVALID_CAMERA_ID:
         case CALL_ERR_INVALID_PATH:
         case CALL_ERR_CAMERA_NOT_TURNED_ON:
-            jsErrorCode = JS_ERROR_CALL_ABNORMAL_VIDEO_PARAMETERS;
-            break;
-        case CALL_ERR_SETTING_AUDIO_DEVICE_FAILED:
         case CALL_ERR_INVALID_DIAL_SCENE:
         case CALL_ERR_INVALID_VIDEO_STATE:
         case CALL_ERR_UNKNOW_DIAL_TYPE:
