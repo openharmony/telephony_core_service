@@ -29,6 +29,11 @@ enum JsErrorCode {
     JS_ERROR_TELEPHONY_PERMISSION_DENIED = 201,
 
     /**
+     * Non system applications use system APIs.
+     */
+    JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API = 202,
+
+    /**
      * Invalid parameter value. The types of parameters should match, or the number of parameters must match.
      */
     JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER = 401,
@@ -75,6 +80,21 @@ enum JsErrorCode {
     JS_ERROR_SIM_BASE_ERROR = 8301000,
 
     /**
+     * SIM card is not activated.
+     */
+    JS_ERROR_SIM_CARD_IS_NOT_ACTIVE,
+
+    /**
+     * SIM card operation error.
+     */
+    JS_ERROR_SIM_CARD_OPERATION_ERROR,
+
+    /**
+     * Operator config error.
+     */
+    JS_ERROR_OPERATOR_CONFIG_ERROR,
+
+    /**
      * Network search module base error code.
      */
     JS_ERROR_NETWORK_SEARCH_BASE_ERROR = 8302000,
@@ -85,39 +105,9 @@ enum JsErrorCode {
     JS_ERROR_CALL_MANAGER_BASE_ERROR = 8401000,
 
     /**
-     * The dialing policy is not met.
+     * UT is not connected.
      */
-    JS_ERROR_CALL_DIAL_POLICY_NOT_MET,
-
-    /**
-     * Wrong mobile number format.
-     */
-    JS_ERROR_CALL_WRONG_MOBILE_NUMBER,
-
-    /**
-     * Abnormal call status.
-     */
-    JS_ERROR_CALL_ABNORMAL_CALL_STATUS,
-
-    /**
-     * Abnormal conference call.
-     */
-    JS_ERROR_CALL_ABNORMAL_CONFERENCE_CALL,
-
-    /**
-     * Supplementary service exception.
-     */
-    JS_ERROR_SUPPLEMENTARY_SERVICE_EXCEPTION,
-
-    /**
-     * Abnormal call parameters.
-     */
-    JS_ERROR_CALL_ABNORMAL_CALL_PARAMETERS,
-
-    /**
-     * Abnormal video call status.
-     */
-    JS_ERROR_CALL_ABNORMAL_VIDEO_CALL_STATUS,
+    JS_ERROR_CALL_UT_NO_CONNECTION,
 
     /**
      * Cellular call module cs base error code.

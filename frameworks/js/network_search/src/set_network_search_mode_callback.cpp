@@ -32,7 +32,7 @@ void SetNetworkSearchModeCallback::OnSetNetworkModeCallback(const bool setResult
     TELEPHONY_LOGI("OnSetNetworkModeCallback setResult = %{public}d ,errorCode = %{public}d", setResult, errorCode);
     std::unique_lock<std::mutex> callbackLock(asyncContext_->callbackMutex);
     asyncContext_->setResult = setResult;
-    asyncContext_->errorCode = errorCode;
+    asyncContext_->errorCode = ((errorCode == HRIL_ERR_SUCCESS) ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_RIL_CMD_FAIL);
     asyncContext_->callbackEnd = true;
     asyncContext_->cv.notify_all();
 }

@@ -242,8 +242,10 @@ void RadioInfo::UpdatePhone(RadioTech csRadioTech, const RadioTech &psRadioTech)
     int radioState = networkSearchManager->GetRadioState(slotId_);
     if (static_cast<ModemPowerState>(radioState) != CORE_SERVICE_POWER_NOT_AVAILABLE) {
         networkSearchManager->InitSimRadioProtocol(slotId_);
-        networkSearchManager->GetImei(slotId_);
-        networkSearchManager->GetMeid(slotId_);
+        std::u16string meid = u"";
+        std::u16string imei = u"";
+        networkSearchManager->GetImei(slotId_, imei);
+        networkSearchManager->GetMeid(slotId_, meid);
         if (static_cast<ModemPowerState>(radioState) == CORE_SERVICE_POWER_ON) {
             networkSearchManager->GetVoiceTech(slotId_);
         }
@@ -266,8 +268,9 @@ void RadioInfo::ProcessVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &ev
         TELEPHONY_LOGE("RadioInfo::ProcessVoiceTechChange networkSearchManager is nullptr");
         return;
     }
-    RadioTech psRadioTech = static_cast<RadioTech>(networkSearchManager->GetPsRadioTech(slotId_));
-    UpdatePhone(static_cast<RadioTech>(csRadioTech->actType), psRadioTech);
+    int32_t psRadioTech = 0;
+    networkSearchManager->GetPsRadioTech(slotId_, psRadioTech);
+    UpdatePhone(static_cast<RadioTech>(csRadioTech->actType), static_cast<RadioTech>(psRadioTech));
 }
 
 PhoneType RadioInfo::RadioTechToPhoneType(RadioTech csRadioTech, const RadioTech &psRadioTech) const

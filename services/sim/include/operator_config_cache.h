@@ -30,8 +30,8 @@ public:
     void ClearAllCache(int32_t slotId);
     void ClearMemoryCache(int32_t slotId);
     void ClearOperatorValue(int32_t slotId);
-    bool LoadOperatorConfig(int32_t slotId, OperatorConfig &poc);
-    bool GetOperatorConfigs(int32_t slotId, OperatorConfig &poc);
+    int32_t LoadOperatorConfig(int32_t slotId, OperatorConfig &poc);
+    int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc);
     std::string EncryptIccId(const std::string iccid);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     bool RegisterForIccChange();

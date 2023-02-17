@@ -48,7 +48,7 @@ void GetNetworkSearchModeCallback::OnGetNetworkModeCallback(const int32_t search
     if (asyncContext_->resolved) {
         asyncContext_->selectMode = WrapNetworkSelectionMode(searchModel);
     } else {
-        asyncContext_->errorCode = errorCode;
+        asyncContext_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
     asyncContext_->callbackEnd = true;
     asyncContext_->cv.notify_all();

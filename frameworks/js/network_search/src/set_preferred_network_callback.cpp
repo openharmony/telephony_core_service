@@ -15,6 +15,7 @@
 
 #include "set_preferred_network_callback.h"
 
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -34,15 +35,7 @@ void SetPreferredNetworkCallback::OnSetPreferredNetworkCallback(const bool setRe
         errorCode);
     asyncContext_->resolved = (errorCode == HRIL_ERR_SUCCESS) && setResult;
     if (!asyncContext_->resolved) {
-        if (errorCode == HRIL_ERR_SUCCESS) {
-            asyncContext_->errorCode = HRIL_ERR_GENERIC_FAILURE;
-        } else if (errorCode == SLOTID_INPUT_ERROR) {
-            asyncContext_->errorCode = SLOTID_INPUT_ERROR;
-        } else if (errorCode == ENUMERATION_INPUT_ERROR) {
-            asyncContext_->errorCode = ENUMERATION_INPUT_ERROR;
-        } else {
-            asyncContext_->errorCode = errorCode;
-        }
+        asyncContext_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
     asyncContext_->callbackEnd = true;
     asyncContext_->cv.notify_all();

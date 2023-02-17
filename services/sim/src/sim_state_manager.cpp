@@ -15,6 +15,8 @@
 
 #include "sim_state_manager.h"
 
+#include "core_service_errors.h"
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -111,247 +113,290 @@ CardType SimStateManager::GetCardType()
     return ret;
 }
 
-bool SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
+int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
 {
-    int32_t ret = UNLOCK_OK;
-    if (simStateHandle_ != nullptr) {
-        std::unique_lock<std::mutex> lck(ctx_);
-        TELEPHONY_LOGI("SimStateManager::UnlockPin()");
-        responseReady_ = false;
-        simStateHandle_->UnlockPin(slotId, pin);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("UnlockPin::wait(), response = false");
-            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
-                break;
-            }
-        }
-        int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
-        if (unlockResult == HRIL_UNLOCK_SUCCESS) {
-            response.result = UNLOCK_OK;
-        } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
-            response.result = UNLOCK_INCORRECT;
-        } else {
-            response.result = UNLOCK_FAIL;
-        }
-        response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
-        TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGE("simStateHandle_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    TELEPHONY_LOGI("SimStateManager::UnlockPin(), %{public}d", ret);
-    return true;
+    std::unique_lock<std::mutex> lck(ctx_);
+    TELEPHONY_LOGI("SimStateManager::UnlockPin()");
+    responseReady_ = false;
+    simStateHandle_->UnlockPin(slotId, pin);
+    while (!responseReady_) {
+        TELEPHONY_LOGI("UnlockPin::wait(), response = false");
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
+    if (!responseReady_) {
+        TELEPHONY_LOGE("sim update failed");
+        return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+    }
+    int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
+    if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+        response.result = UNLOCK_OK;
+    } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+        response.result = UNLOCK_INCORRECT;
+    } else {
+        response.result = UNLOCK_FAIL;
+    }
+    response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+    TELEPHONY_LOGI("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
+    return (response.result == UNLOCK_FAIL) ? TELEPHONY_ERR_RIL_CMD_FAIL : TELEPHONY_SUCCESS;
 }
 
-bool SimStateManager::UnlockPuk(
+int32_t SimStateManager::UnlockPuk(
     int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response)
 {
-    int32_t ret = UNLOCK_OK;
-    if (simStateHandle_ != nullptr) {
-        std::unique_lock<std::mutex> lck(ctx_);
-        TELEPHONY_LOGI("SimStateManager::UnlockPuk()");
-        responseReady_ = false;
-        simStateHandle_->UnlockPuk(slotId, newPin, puk);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("UnlockPuk::wait(), response = false");
-            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
-                break;
-            }
-        }
-        int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
-        if (unlockResult == HRIL_UNLOCK_SUCCESS) {
-            response.result = UNLOCK_OK;
-        } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
-            response.result = UNLOCK_INCORRECT;
-        } else {
-            response.result = UNLOCK_FAIL;
-        }
-        response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
-        TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGE("simStateHandle_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    TELEPHONY_LOGI("SimStateManager::UnlockPuk(), %{public}d", ret);
-    return true;
+    std::unique_lock<std::mutex> lck(ctx_);
+    TELEPHONY_LOGI("SimStateManager::UnlockPuk()");
+    responseReady_ = false;
+    simStateHandle_->UnlockPuk(slotId, newPin, puk);
+    while (!responseReady_) {
+        TELEPHONY_LOGI("UnlockPuk::wait(), response = false");
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
+    if (!responseReady_) {
+        TELEPHONY_LOGE("sim update failed");
+        return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+    }
+    int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
+    if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+        response.result = UNLOCK_OK;
+    } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+        response.result = UNLOCK_INCORRECT;
+    } else {
+        response.result = UNLOCK_FAIL;
+    }
+    response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+    TELEPHONY_LOGI("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
+    return (response.result == UNLOCK_FAIL) ? TELEPHONY_ERR_RIL_CMD_FAIL : TELEPHONY_SUCCESS;
 }
 
-bool SimStateManager::AlterPin(
+int32_t SimStateManager::AlterPin(
     int32_t slotId, const std::string &newPin, const std::string &oldPin, LockStatusResponse &response)
 {
-    int32_t ret = UNLOCK_OK;
-    if (simStateHandle_ != nullptr) {
-        std::unique_lock<std::mutex> lck(ctx_);
-        TELEPHONY_LOGI("SimStateManager::AlterPin()");
-        responseReady_ = false;
-        simStateHandle_->AlterPin(slotId, newPin, oldPin);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("AlterPin::wait(), response = false");
-            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
-                break;
-            }
-        }
-
-        int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
-        if (unlockResult == HRIL_UNLOCK_SUCCESS) {
-            response.result = UNLOCK_OK;
-        } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
-            response.result = UNLOCK_INCORRECT;
-        } else {
-            response.result = UNLOCK_FAIL;
-        }
-        response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
-        TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGE("simStateHandle_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    TELEPHONY_LOGI("SimStateManager::AlterPin(), %{public}d", ret);
-    return true;
+    std::unique_lock<std::mutex> lck(ctx_);
+    TELEPHONY_LOGI("SimStateManager::AlterPin()");
+    responseReady_ = false;
+    simStateHandle_->AlterPin(slotId, newPin, oldPin);
+    while (!responseReady_) {
+        TELEPHONY_LOGI("AlterPin::wait(), response = false");
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
+    if (!responseReady_) {
+        TELEPHONY_LOGE("sim update failed");
+        return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+    }
+    int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
+    if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+        response.result = UNLOCK_OK;
+    } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+        response.result = UNLOCK_INCORRECT;
+    } else {
+        response.result = UNLOCK_FAIL;
+    }
+    response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+    TELEPHONY_LOGI("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
+    return (response.result == UNLOCK_FAIL) ? TELEPHONY_ERR_RIL_CMD_FAIL : TELEPHONY_SUCCESS;
 }
 
-bool SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response)
+int32_t SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response)
 {
     if (options.lockType != LockType::PIN_LOCK && options.lockType != LockType::FDN_LOCK) {
         TELEPHONY_LOGE("SetLockState lockType is error");
         response.result = UNLOCK_FAIL;
-        return false;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (options.lockState != LockState::LOCK_OFF && options.lockState != LockState::LOCK_ON) {
         TELEPHONY_LOGE("SetLockState lockState is error");
         response.result = UNLOCK_FAIL;
-        return false;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    int32_t ret = UNLOCK_OK;
-    if (simStateHandle_ != nullptr) {
-        std::unique_lock<std::mutex> lck(ctx_);
-        TELEPHONY_LOGI("SimStateManager::SetLockState()");
-        responseReady_ = false;
-        simStateHandle_->SetLockState(slotId, options);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("SetLockState::wait(), response = false");
-            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == std::cv_status::timeout) {
-                break;
-            }
-        }
-        int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
-        if (unlockResult == HRIL_UNLOCK_SUCCESS) {
-            response.result = UNLOCK_OK;
-        } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
-            response.result = UNLOCK_INCORRECT;
-        } else {
-            response.result = UNLOCK_FAIL;
-        }
-        response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
-        TELEPHONY_LOGI(
-            "SetLockState response.result:%{public}d,response.remain:%{public}d", response.result, response.remain);
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGE("simStateHandle_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    TELEPHONY_LOGI("SimStateManager::SetLockState(), %{public}d", ret);
-    return true;
+    std::unique_lock<std::mutex> lck(ctx_);
+    TELEPHONY_LOGI("SimStateManager::SetLockState()");
+    responseReady_ = false;
+    simStateHandle_->SetLockState(slotId, options);
+    while (!responseReady_) {
+        TELEPHONY_LOGI("SetLockState::wait(), response = false");
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
+    if (!responseReady_) {
+        TELEPHONY_LOGE("sim update failed");
+        return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+    }
+    int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
+    if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+        response.result = UNLOCK_OK;
+    } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+        response.result = UNLOCK_INCORRECT;
+    } else {
+        response.result = UNLOCK_FAIL;
+    }
+    response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+    TELEPHONY_LOGI(
+        "SetLockState response.result:%{public}d,response.remain:%{public}d", response.result, response.remain);
+    return (response.result == UNLOCK_FAIL) ? TELEPHONY_ERR_RIL_CMD_FAIL : TELEPHONY_SUCCESS;
 }
 
-int32_t SimStateManager::GetLockState(int32_t slotId, LockType lockType)
+int32_t SimStateManager::GetLockState(int32_t slotId, LockType lockType, LockState &lockState)
 {
     if (lockType != LockType::PIN_LOCK && lockType != LockType::FDN_LOCK) {
         TELEPHONY_LOGE("GetLockState lockType is error");
-        return static_cast<int32_t>(LockState::LOCK_ERROR);
+        lockState = LockState::LOCK_ERROR;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    int32_t ret = 0;
-    if (simStateHandle_ != nullptr) {
-        std::unique_lock<std::mutex> lck(ctx_);
-        TELEPHONY_LOGI("SimStateManager::GetLockState()");
-        responseReady_ = false;
-        simStateHandle_->GetLockState(slotId, lockType);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("GetLockState::wait(), response = false");
-            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
-                break;
-            }
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGE("simStateHandle_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::unique_lock<std::mutex> lck(ctx_);
+    TELEPHONY_LOGI("SimStateManager::GetLockState()");
+    responseReady_ = false;
+    simStateHandle_->GetLockState(slotId, lockType);
+    while (!responseReady_) {
+        TELEPHONY_LOGI("GetLockState::wait(), response = false");
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
         }
-        ret = simStateHandle_->GetUnlockData().lockState;
     }
-    TELEPHONY_LOGI("SimStateManager::GetLockState(), %{public}d", ret);
-    return ret;
+    if (!responseReady_) {
+        TELEPHONY_LOGE("sim load failed");
+        return CORE_ERR_SIM_CARD_LOAD_FAILED;
+    }
+    switch (simStateHandle_->GetUnlockData().lockState) {
+        case static_cast<int32_t>(LockState::LOCK_OFF):
+            lockState = LockState::LOCK_OFF;
+            break;
+        case static_cast<int32_t>(LockState::LOCK_ON):
+            lockState = LockState::LOCK_ON;
+            break;
+        default:
+            lockState = LockState::LOCK_ERROR;
+            break;
+    }
+    TELEPHONY_LOGI("SimStateManager::GetLockState(), %{public}d", lockState);
+    return TELEPHONY_SUCCESS;
 }
 
-bool SimStateManager::UnlockPin2(int32_t slotId, const std::string &pin2, LockStatusResponse &response)
+int32_t SimStateManager::UnlockPin2(int32_t slotId, const std::string &pin2, LockStatusResponse &response)
 {
-    int32_t ret = UNLOCK_OK;
-    if (simStateHandle_ != nullptr) {
-        std::unique_lock<std::mutex> lck(ctx_);
-        TELEPHONY_LOGI("SimStateManager::UnlockPin2()");
-        responseReady_ = false;
-        simStateHandle_->UnlockPin2(slotId, pin2);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("UnlockPin2::wait(), response = false");
-            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
-                break;
-            }
-        }
-        int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
-        if (unlockResult == HRIL_UNLOCK_SUCCESS) {
-            response.result = UNLOCK_OK;
-        } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
-            response.result = UNLOCK_INCORRECT;
-        } else {
-            response.result = UNLOCK_FAIL;
-        }
-        response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
-        TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGE("simStateHandle_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    TELEPHONY_LOGI("SimStateManager::UnlockPin2(), %{public}d", ret);
-    return true;
+    std::unique_lock<std::mutex> lck(ctx_);
+    TELEPHONY_LOGI("SimStateManager::UnlockPin2()");
+    responseReady_ = false;
+    simStateHandle_->UnlockPin2(slotId, pin2);
+    while (!responseReady_) {
+        TELEPHONY_LOGI("UnlockPin2::wait(), response = false");
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
+    if (!responseReady_) {
+        TELEPHONY_LOGE("sim update failed");
+        return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+    }
+    int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
+    if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+        response.result = UNLOCK_OK;
+    } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+        response.result = UNLOCK_INCORRECT;
+    } else {
+        response.result = UNLOCK_FAIL;
+    }
+    response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+    TELEPHONY_LOGI("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
+    return (response.result == UNLOCK_FAIL) ? TELEPHONY_ERR_RIL_CMD_FAIL : TELEPHONY_SUCCESS;
 }
 
-bool SimStateManager::UnlockPuk2(
+int32_t SimStateManager::UnlockPuk2(
     int32_t slotId, const std::string &newPin2, const std::string &puk2, LockStatusResponse &response)
 {
-    int32_t ret = UNLOCK_OK;
-    if (simStateHandle_ != nullptr) {
-        std::unique_lock<std::mutex> lck(ctx_);
-        TELEPHONY_LOGI("SimStateManager::UnlockPuk2()");
-        responseReady_ = false;
-        simStateHandle_->UnlockPuk2(slotId, newPin2, puk2);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("UnlockPuk2::wait(), response = false");
-            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
-                break;
-            }
-        }
-        int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
-        if (unlockResult == HRIL_UNLOCK_SUCCESS) {
-            response.result = UNLOCK_OK;
-        } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
-            response.result = UNLOCK_INCORRECT;
-        } else {
-            response.result = UNLOCK_FAIL;
-        }
-        response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
-        TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGE("simStateHandle_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    TELEPHONY_LOGI("SimStateManager::UnlockPuk2(), %{public}d", ret);
-    return true;
+    std::unique_lock<std::mutex> lck(ctx_);
+    TELEPHONY_LOGI("SimStateManager::UnlockPuk2()");
+    responseReady_ = false;
+    simStateHandle_->UnlockPuk2(slotId, newPin2, puk2);
+    while (!responseReady_) {
+        TELEPHONY_LOGI("UnlockPuk2::wait(), response = false");
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
+    if (!responseReady_) {
+        TELEPHONY_LOGE("sim update failed");
+        return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+    }
+    int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
+    if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+        response.result = UNLOCK_OK;
+    } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+        response.result = UNLOCK_INCORRECT;
+    } else {
+        response.result = UNLOCK_FAIL;
+    }
+    response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+    TELEPHONY_LOGI("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
+    return (response.result == UNLOCK_FAIL) ? TELEPHONY_ERR_RIL_CMD_FAIL : TELEPHONY_SUCCESS;
 }
 
-bool SimStateManager::AlterPin2(
+int32_t SimStateManager::AlterPin2(
     int32_t slotId, const std::string &newPin2, const std::string &oldPin2, LockStatusResponse &response)
 {
-    int32_t ret = UNLOCK_OK;
-    if (simStateHandle_ != nullptr) {
-        std::unique_lock<std::mutex> lck(ctx_);
-        TELEPHONY_LOGI("SimStateManager::AlterPin2()");
-        responseReady_ = false;
-        simStateHandle_->AlterPin2(slotId, newPin2, oldPin2);
-        while (!responseReady_) {
-            TELEPHONY_LOGI("AlterPin2::wait(), response = false");
-            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
-                break;
-            }
-        }
-        int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
-        if (unlockResult == HRIL_UNLOCK_SUCCESS) {
-            response.result = UNLOCK_OK;
-        } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
-            response.result = UNLOCK_INCORRECT;
-        } else {
-            response.result = UNLOCK_FAIL;
-        }
-        response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
-        TELEPHONY_LOGE("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGE("simStateHandle_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    TELEPHONY_LOGI("SimStateManager::AlterPin2(), %{public}d", ret);
-    return true;
+    std::unique_lock<std::mutex> lck(ctx_);
+    TELEPHONY_LOGI("SimStateManager::AlterPin2()");
+    responseReady_ = false;
+    simStateHandle_->AlterPin2(slotId, newPin2, oldPin2);
+    while (!responseReady_) {
+        TELEPHONY_LOGI("AlterPin2::wait(), response = false");
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
+    if (!responseReady_) {
+        TELEPHONY_LOGE("sim update failed");
+        return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+    }
+    int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
+    if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+        response.result = UNLOCK_OK;
+    } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+        response.result = UNLOCK_INCORRECT;
+    } else {
+        response.result = UNLOCK_FAIL;
+    }
+    response.remain = static_cast<int32_t>(simStateHandle_->GetUnlockData().remain);
+    TELEPHONY_LOGI("response.result :%{public}d, remain :%{public}d", response.result, response.remain);
+    return (response.result == UNLOCK_FAIL) ? TELEPHONY_ERR_RIL_CMD_FAIL : TELEPHONY_SUCCESS;
 }
 
 int32_t SimStateManager::RefreshSimState(int32_t slotId)
@@ -374,13 +419,12 @@ int32_t SimStateManager::RefreshSimState(int32_t slotId)
     return ret;
 }
 
-bool SimStateManager::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response)
+int32_t SimStateManager::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response)
 {
     if (simStateHandle_ == nullptr) {
         TELEPHONY_LOGE("UnlockSimLock(), simStateHandle_ is nullptr!!!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t ret = UNLOCK_OK;
     std::unique_lock<std::mutex> lck(ctx_);
     TELEPHONY_LOGI("SimStateManager::UnlockSimLock()");
     responseReady_ = false;
@@ -391,7 +435,11 @@ bool SimStateManager::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInf
             break;
         }
     }
-    ret = simStateHandle_->GetSimlockResponse().result;
+    if (!responseReady_) {
+        TELEPHONY_LOGE("sim update failed");
+        return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+    }
+    int32_t ret = simStateHandle_->GetSimlockResponse().result;
     TELEPHONY_LOGI("SimStateManager::UnlockSimLock(), remain: %{public}d", response.remain);
     response.remain = simStateHandle_->GetSimlockResponse().remain;
     if (ret == UNLOCK_PIN_PUK_INCORRECT) {
@@ -405,7 +453,7 @@ bool SimStateManager::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInf
             response.result = UNLOCK_OK;
         }
     }
-    return true;
+    return (response.result == UNLOCK_FAIL) ? TELEPHONY_ERR_RIL_CMD_FAIL : TELEPHONY_SUCCESS;
 }
 
 int32_t SimStateManager::SimAuthentication(
