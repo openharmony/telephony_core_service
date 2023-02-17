@@ -16,6 +16,7 @@
 #include "get_network_search_info_callback.h"
 
 #include "napi_radio.h"
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -36,7 +37,7 @@ void GetNetworkSearchInfoCallback::OnGetNetworkSearchInformation(
     if (asyncContext_->resolved) {
         asyncContext_->searchResult = networkSearchResult;
     } else {
-        asyncContext_->errorCode = errorCode;
+        asyncContext_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
     asyncContext_->callbackEnd = true;
     asyncContext_->cv.notify_all();

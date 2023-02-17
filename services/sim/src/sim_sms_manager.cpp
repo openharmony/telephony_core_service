@@ -15,6 +15,8 @@
 
 #include "sim_sms_manager.h"
 
+#include "telephony_errors.h"
+
 namespace OHOS {
 namespace Telephony {
 SimSmsManager::SimSmsManager(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
@@ -66,39 +68,39 @@ void SimSmsManager::Init(int slotId)
     TELEPHONY_LOGI("SimSmsManager::Init() end");
 }
 
-bool SimSmsManager::AddSmsToIcc(int status, std::string &pdu, std::string &smsc)
+int32_t SimSmsManager::AddSmsToIcc(int status, std::string &pdu, std::string &smsc)
 {
     if (smsController_ == nullptr) {
         TELEPHONY_LOGE("SimSmsManager::AddSmsToIcc smsController_ nullptr");
         return false;
     }
 
-    bool result = smsController_->AddSmsToIcc(status, pdu, smsc);
-    TELEPHONY_LOGI("SimSmsManager::AddSmsToIcc result:%{public}s ", (result ? "true" : "false"));
+    int32_t result = smsController_->AddSmsToIcc(status, pdu, smsc);
+    TELEPHONY_LOGI("SimSmsManager::AddSmsToIcc result:%{public}d", result);
     return result;
 }
 
-bool SimSmsManager::UpdateSmsIcc(int index, int status, std::string &pduData, std::string &smsc)
+int32_t SimSmsManager::UpdateSmsIcc(int index, int status, std::string &pduData, std::string &smsc)
 {
     if (smsController_ == nullptr) {
         TELEPHONY_LOGE("SimSmsManager::UpdateSmsIcc smsController_ nullptr");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    bool result = smsController_->UpdateSmsIcc(index, status, pduData, smsc);
-    TELEPHONY_LOGI("SimSmsManager::UpdateSmsIcc result:%{public}s ", (result ? "true" : "false"));
+    int32_t result = smsController_->UpdateSmsIcc(index, status, pduData, smsc);
+    TELEPHONY_LOGI("SimSmsManager::UpdateSmsIcc result:%{public}d", result);
     return result;
 }
 
-bool SimSmsManager::DelSmsIcc(int index)
+int32_t SimSmsManager::DelSmsIcc(int index)
 {
     if (smsController_ == nullptr) {
         TELEPHONY_LOGE("SimSmsManager::DelSmsIcc smsController_ nullptr");
         return false;
     }
 
-    bool result = smsController_->DelSmsIcc(index);
-    TELEPHONY_LOGI("SimSmsManager::DelSmsIcc result:%{public}s ", (result ? "true" : "false"));
+    int32_t result = smsController_->DelSmsIcc(index);
+    TELEPHONY_LOGI("SimSmsManager::DelSmsIcc result:%{public}d", result);
     return result;
 }
 

@@ -226,7 +226,7 @@ void OperatorName::UpdateSpn(
         if (spn.empty()) {
             std::u16string result = Str8ToStr16("");
             if (simManager_ != nullptr) {
-                result = simManager_->GetSimSpn(slotId_);
+                simManager_->GetSimSpn(slotId_, result);
             }
             spn = Str16ToStr8(result);
         }

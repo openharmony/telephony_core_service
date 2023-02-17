@@ -43,6 +43,9 @@ constexpr int16_t PARAMETER_COUNT_FOUR = 4;
 constexpr int32_t INVALID_VALUE = -1;
 
 static constexpr const char *GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHONY_STATE";
+static constexpr const char *SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
+static constexpr const char *LOCATION = "ohos.permission.LOCATION";
+static constexpr const char *GET_NETWORK_INFO = "ohos.permission.GET_NETWORK_INFO";
 
 static int32_t WrapRadioTech(int32_t radioTechType)
 {
@@ -107,36 +110,6 @@ static inline bool IsValidSlotId(int32_t slotId)
     return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT));
 }
 
-static napi_value ParseErrorValue(napi_env env, const int32_t rilErrorCode, const std::string &funcName)
-{
-    TELEPHONY_LOGI("rilErrorCode = %{public}d", rilErrorCode);
-    switch (rilErrorCode) {
-        case HRIL_ERR_NULL_POINT:
-            return NapiUtil::CreateErrorMessage(env, funcName + " error because hril err null point", rilErrorCode);
-        case HRIL_ERR_SUCCESS:
-            return NapiUtil::CreateUndefined(env);
-        case HRIL_ERR_GENERIC_FAILURE:
-            return NapiUtil::CreateErrorMessage(
-                env, funcName + " error because hril err generic failure", rilErrorCode);
-        case HRIL_ERR_INVALID_PARAMETER:
-            return NapiUtil::CreateErrorMessage(
-                env, funcName + " error because hril err invalid parameter", rilErrorCode);
-        case HRIL_ERR_CMD_SEND_FAILURE:
-            return NapiUtil::CreateErrorMessage(
-                env, funcName + " error because hril err cmd send failure", rilErrorCode);
-        case HRIL_ERR_CMD_NO_CARRIER:
-            return NapiUtil::CreateErrorMessage(
-                env, funcName + " error because hril err cmd no carrier", rilErrorCode);
-        case HRIL_ERR_INVALID_RESPONSE:
-            return NapiUtil::CreateErrorMessage(
-                env, funcName + " error because hril err invalid response", rilErrorCode);
-        case HRIL_ERR_REPEAT_STATUS:
-            return NapiUtil::CreateErrorMessage(env, funcName + " error because hril err repeat status", rilErrorCode);
-        default:
-            return NapiUtil::CreateErrorMessage(env, funcName + " ", rilErrorCode);
-    }
-}
-
 static void NativeGetRadioTech(napi_env env, void *data)
 {
     auto asyncContext = static_cast<RadioTechContext *>(data);
@@ -145,18 +118,18 @@ static void NativeGetRadioTech(napi_env env, void *data)
         asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    int32_t psRadioTech = DEFAULT_ERROR;
-    int32_t csRadioTech = DEFAULT_ERROR;
-    psRadioTech = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPsRadioTech(asyncContext->slotId);
-    csRadioTech = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCsRadioTech(asyncContext->slotId);
-    auto napiRadioTechUnknown = static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_UNKNOWN);
-    if ((psRadioTech >= napiRadioTechUnknown) && (csRadioTech >= napiRadioTechUnknown)) {
+    int32_t psRadioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    int32_t csRadioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    int32_t psResult =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPsRadioTech(asyncContext->slotId, psRadioTech);
+    int32_t csResult =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCsRadioTech(asyncContext->slotId, csRadioTech);
+    if (psResult == TELEPHONY_SUCCESS && csResult == TELEPHONY_SUCCESS) {
         asyncContext->resolved = true;
         asyncContext->csTech = WrapRadioTech(csRadioTech);
         asyncContext->psTech = WrapRadioTech(psRadioTech);
-    } else {
-        asyncContext->resolved = false;
     }
+    asyncContext->errorCode = csResult;
 }
 
 static void GetRadioTechCallback(napi_env env, napi_status status, void *data)
@@ -170,44 +143,23 @@ static void GetRadioTechCallback(napi_env env, napi_status status, void *data)
         napi_create_object(env, &callbackValue);
         NapiUtil::SetPropertyInt32(env, callbackValue, "psRadioTech", asyncContext->psTech);
         NapiUtil::SetPropertyInt32(env, callbackValue, "csRadioTech", asyncContext->csTech);
-        NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
-    } else if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
-        NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
     } else {
-        if (asyncContext->callbackRef != nullptr) {
-            napi_value recv = NapiUtil::CreateUndefined(env);
-            napi_value callbackFunc = nullptr;
-            napi_get_reference_value(env, asyncContext->callbackRef, &callbackFunc);
-            napi_value callbackValues[] = {nullptr, nullptr};
-            callbackValues[0] = NapiUtil::CreateErrorMessage(env, "get radio tech failed");
-            napi_create_object(env, &callbackValues[1]);
-            napi_value psTechValue = NapiUtil::CreateUndefined(env);
-            napi_value csTechValue = NapiUtil::CreateUndefined(env);
-            napi_set_named_property(env, callbackValues[1], "psRadioTech", psTechValue);
-            napi_set_named_property(env, callbackValues[1], "csRadioTech", csTechValue);
-            napi_value result = nullptr;
-            napi_call_function(env, recv, callbackFunc, std::size(callbackValues), callbackValues, &result);
-            napi_delete_reference(env, asyncContext->callbackRef);
-            napi_delete_async_work(env, asyncContext->work);
-            delete asyncContext;
-            asyncContext = nullptr;
-        } else {
-            callbackValue = NapiUtil::CreateErrorMessage(env, "get radio tech failed");
-            NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
-        }
+        JsError error =
+            NapiUtil::ConverErrorMessageWithPermissionForJs(asyncContext->errorCode, "getRadioTech", GET_NETWORK_INFO);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
+    NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGI("GetRadioTechCallback end");
 }
 
 static bool MatchGetRadioTechParameter(napi_env env, const napi_value parameters[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 1: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number});
+        case PARAMETER_COUNT_ONE: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number });
         }
-        case 2: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number, napi_function});
+        case PARAMETER_COUNT_TWO: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_function });
         }
         default: {
             return false;
@@ -218,12 +170,21 @@ static bool MatchGetRadioTechParameter(napi_env env, const napi_value parameters
 static napi_value GetRadioTech(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = PARAMETER_COUNT_TWO;
-    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
-    NAPI_ASSERT(env, MatchGetRadioTechParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchGetRadioTechParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("GetRadioTech parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<RadioTechContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("GetRadioTech asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
     if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
@@ -240,16 +201,18 @@ static void NativeGetSignalInfoList(napi_env env, void *data)
         asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    asyncContext->signalInfoList =
-        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSignalInfoList(asyncContext->slotId);
+    asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSignalInfoList(
+        asyncContext->slotId, asyncContext->signalInfoList);
     TELEPHONY_LOGI("NativeGetSignalInfoList size = %{public}zu", asyncContext->signalInfoList.size());
-    asyncContext->resolved = true;
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = true;
+    }
 }
 
 static void GetSignalInfoListCallback(napi_env env, napi_status status, void *data)
 {
     auto asyncContext = static_cast<SignalInfoListContext *>(data);
-    TELEPHONY_LOGI("GetSignalInfoListCallback size = %{public}zu,resolved = %{public}d",
+    TELEPHONY_LOGI("GetSignalInfoListCallback size = %{public}zu, resolved = %{public}d",
         asyncContext->signalInfoList.size(), asyncContext->resolved);
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
@@ -276,11 +239,8 @@ static void GetSignalInfoListCallback(napi_env env, napi_status status, void *da
                 signalType, signalIntensity, signalLevel);
         }
     } else {
-        if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
-            callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
-        } else {
-            callbackValue = NapiUtil::CreateErrorMessage(env, "get signal info list failed");
-        }
+        JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->errorCode);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGI("GetSignalInfoListCallback end");
@@ -289,11 +249,11 @@ static void GetSignalInfoListCallback(napi_env env, napi_status status, void *da
 static bool MatchGetSignalInfoListParameter(napi_env env, napi_value parameter[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 1: {
-            return NapiUtil::MatchParameters(env, parameter, {napi_number});
+        case PARAMETER_COUNT_ONE: {
+            return NapiUtil::MatchParameters(env, parameter, { napi_number });
         }
-        case 2: {
-            return NapiUtil::MatchParameters(env, parameter, {napi_number, napi_function});
+        case PARAMETER_COUNT_TWO: {
+            return NapiUtil::MatchParameters(env, parameter, { napi_number, napi_function });
         }
         default: {
             return false;
@@ -304,11 +264,15 @@ static bool MatchGetSignalInfoListParameter(napi_env env, napi_value parameter[]
 static napi_value GetSignalInfoList(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = PARAMETER_COUNT_TWO;
-    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
-    NAPI_ASSERT(env, MatchGetSignalInfoListParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchGetSignalInfoListParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("GetSignalInfoList parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<SignalInfoListContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &(asyncContext->slotId)));
     if (parameterCount == PARAMETER_COUNT_TWO) {
@@ -345,21 +309,28 @@ static void NativeGetNetworkState(napi_env env, void *data)
         return;
     }
     sptr<NetworkState> networkState = nullptr;
-    networkState = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkState(asyncContext->slotId);
-    if (networkState != nullptr) {
-        asyncContext->resolved = true;
-        asyncContext->regStatus = static_cast<int32_t>(networkState->GetRegStatus());
-        asyncContext->longOperatorName = networkState->GetLongOperatorName();
-        asyncContext->shortOperatorName = networkState->GetShortOperatorName();
-        asyncContext->plmnNumeric = networkState->GetPlmnNumeric();
-        asyncContext->isRoaming = networkState->IsRoaming();
-        asyncContext->isEmergency = networkState->IsEmergency();
-        asyncContext->csRoamingStatus = static_cast<int32_t>(networkState->GetCsRoamingStatus());
-        asyncContext->psRoamingStatus = static_cast<int32_t>(networkState->GetPsRoamingStatus());
-        asyncContext->cfgTech = static_cast<int32_t>(networkState->GetCfgTech());
-    } else {
-        asyncContext->resolved = false;
+    asyncContext->errorCode =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkState(asyncContext->slotId, networkState);
+    if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("NativeGetNetworkState errorCode = %{public}d", asyncContext->errorCode);
+        return;
     }
+    if (networkState == nullptr) {
+        TELEPHONY_LOGE("NativeGetNetworkState networkState is nullptr");
+        asyncContext->errorCode = ERROR_NATIVE_API_EXECUTE_FAIL;
+        return;
+    }
+    asyncContext->resolved = true;
+    asyncContext->regStatus = static_cast<int32_t>(networkState->GetRegStatus());
+    asyncContext->longOperatorName = networkState->GetLongOperatorName();
+    asyncContext->shortOperatorName = networkState->GetShortOperatorName();
+    asyncContext->plmnNumeric = networkState->GetPlmnNumeric();
+    asyncContext->isRoaming = networkState->IsRoaming();
+    asyncContext->isEmergency = networkState->IsEmergency();
+    asyncContext->csRoamingStatus = static_cast<int32_t>(networkState->GetCsRoamingStatus());
+    asyncContext->psRoamingStatus = static_cast<int32_t>(networkState->GetPsRoamingStatus());
+    asyncContext->cfgTech = static_cast<int32_t>(networkState->GetCfgTech());
+    TELEPHONY_LOGI("NativeGetNetworkState resolved is true.");
 }
 
 static void GetNetworkStateCallback(napi_env env, napi_status status, void *data)
@@ -377,10 +348,10 @@ static void GetNetworkStateCallback(napi_env env, napi_status status, void *data
         NapiUtil::SetPropertyInt32(env, callbackValue, "cfgTech", WrapRadioTech(asyncContext->cfgTech));
         NapiUtil::SetPropertyBoolean(env, callbackValue, "isCaActive", asyncContext->isCaActive);
         NapiUtil::SetPropertyBoolean(env, callbackValue, "isEmergency", asyncContext->isEmergency);
-    } else if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
     } else {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "get network state failed");
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            asyncContext->errorCode, "getNetworkState", GET_NETWORK_INFO);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
 }
@@ -388,15 +359,15 @@ static void GetNetworkStateCallback(napi_env env, napi_status status, void *data
 static bool MatchGetNetworkStateParameter(napi_env env, napi_value parameter[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 0: {
+        case PARAMETER_COUNT_ZERO: {
             return true;
         }
-        case 1: {
-            return NapiUtil::MatchParameters(env, parameter, {napi_number}) ||
-                NapiUtil::MatchParameters(env, parameter, {napi_function});
+        case PARAMETER_COUNT_ONE: {
+            return NapiUtil::MatchParameters(env, parameter, { napi_number }) ||
+                   NapiUtil::MatchParameters(env, parameter, { napi_function });
         }
-        case 2: {
-            return NapiUtil::MatchParameters(env, parameter, {napi_number, napi_function});
+        case PARAMETER_COUNT_TWO: {
+            return NapiUtil::MatchParameters(env, parameter, { napi_number, napi_function });
         }
         default: {
             return false;
@@ -407,15 +378,15 @@ static bool MatchGetNetworkStateParameter(napi_env env, napi_value parameter[], 
 static bool MatchGetIMEIParameter(napi_env env, napi_value parameter[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 0: {
+        case PARAMETER_COUNT_ZERO: {
             return true;
         }
-        case 1: {
-            return NapiUtil::MatchParameters(env, parameter, {napi_number}) ||
-                NapiUtil::MatchParameters(env, parameter, {napi_function});
+        case PARAMETER_COUNT_ONE: {
+            return NapiUtil::MatchParameters(env, parameter, { napi_number }) ||
+                   NapiUtil::MatchParameters(env, parameter, { napi_function });
         }
-        case 2: {
-            return NapiUtil::MatchParameters(env, parameter, {napi_number, napi_function});
+        case PARAMETER_COUNT_TWO: {
+            return NapiUtil::MatchParameters(env, parameter, { napi_number, napi_function });
         }
         default: {
             return false;
@@ -426,15 +397,15 @@ static bool MatchGetIMEIParameter(napi_env env, napi_value parameter[], size_t p
 static bool MatchGetNrOptionModeParameter(napi_env env, napi_value parameter[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 0: {
+        case PARAMETER_COUNT_ZERO: {
             return true;
         }
-        case 1: {
-            return NapiUtil::MatchParameters(env, parameter, {napi_number}) ||
-                NapiUtil::MatchParameters(env, parameter, {napi_function});
+        case PARAMETER_COUNT_ONE: {
+            return NapiUtil::MatchParameters(env, parameter, { napi_number }) ||
+                   NapiUtil::MatchParameters(env, parameter, { napi_function });
         }
-        case 2: {
-            return NapiUtil::MatchParameters(env, parameter, {napi_number, napi_function});
+        case PARAMETER_COUNT_TWO: {
+            return NapiUtil::MatchParameters(env, parameter, { napi_number, napi_function });
         }
         default: {
             return false;
@@ -445,11 +416,11 @@ static bool MatchGetNrOptionModeParameter(napi_env env, napi_value parameter[], 
 static bool MatchIsNrSupportedParameter(napi_env env, napi_value parameter[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 0: {
+        case PARAMETER_COUNT_ZERO: {
             return true;
         }
-        case 1: {
-            return NapiUtil::MatchParameters(env, parameter, {napi_number});
+        case PARAMETER_COUNT_ONE: {
+            return NapiUtil::MatchParameters(env, parameter, { napi_number });
         }
         default: {
             return false;
@@ -464,7 +435,11 @@ static napi_value GetNetworkState(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
-    NAPI_ASSERT(env, MatchGetNetworkStateParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchGetNetworkStateParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("GetNetworkState parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<GetStateContext>();
     if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
@@ -496,11 +471,11 @@ static void NativeGetNetworkSelectionMode(napi_env env, void *data)
     std::unique_ptr<GetNetworkSearchModeCallback> callback =
         std::make_unique<GetNetworkSearchModeCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkSelectionMode(
+    asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkSelectionMode(
         asyncContext->slotId, callback.release());
-    if (asyncContext->sendRequest) {
-        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [asyncContext] { return asyncContext->callbackEnd; });
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->cv.wait_for(
+            callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [asyncContext] { return asyncContext->callbackEnd; });
         TELEPHONY_LOGI("NativeGetNetworkSelectionMode after callback end");
     }
     TELEPHONY_LOGI("NativeGetNetworkSelectionMode end");
@@ -512,10 +487,13 @@ static void GetNetworkSelectionModeCallback(napi_env env, napi_status status, vo
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
         napi_create_int32(env, asyncContext->selectMode, &callbackValue);
-    } else if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
     } else {
-        callbackValue = ParseErrorValue(env, asyncContext->errorCode, "get network selection mode failed");
+        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("GetNetworkSelectionModeCallback time out, errorCode = %{public}d", asyncContext->errorCode);
+            asyncContext->errorCode = TELEPHONY_ERR_FAIL;
+        }
+        JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->errorCode);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGI("GetNetworkSelectionModeCallback end");
@@ -528,7 +506,11 @@ static napi_value GetNetworkSelectionMode(napi_env env, napi_callback_info info)
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    NAPI_ASSERT(env, MatchGetRadioTechParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchGetRadioTechParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("GetNetworkSelectionMode parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<GetSelectModeContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
     if (parameterCount == PARAMETER_COUNT_TWO) {
@@ -549,11 +531,11 @@ static void NativeGetNetworkSearchInformation(napi_env env, void *data)
     std::unique_ptr<GetNetworkSearchInfoCallback> callback =
         std::make_unique<GetNetworkSearchInfoCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkSearchInformation(
+    asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkSearchInformation(
         asyncContext->slotId, callback.release());
-    if (asyncContext->sendRequest) {
-        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [asyncContext] { return asyncContext->callbackEnd; });
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->cv.wait_for(
+            callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [asyncContext] { return asyncContext->callbackEnd; });
         TELEPHONY_LOGI("NativeGetNetworkSearchInformation after callback end");
     }
     TELEPHONY_LOGI("NativeGetNetworkSearchInformation end");
@@ -622,10 +604,15 @@ static void GetNetworkSearchInformationCallback(napi_env env, napi_status status
             napi_set_element(env, searchResultArray, i, info);
         }
         napi_set_named_property(env, callbackValue, "networkSearchResult", searchResultArray);
-    } else if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
     } else {
-        callbackValue = ParseErrorValue(env, asyncContext->errorCode, "get network search info failed");
+        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE(
+                "GetNetworkSearchInformationCallback time out, errorCode = %{public}d", asyncContext->errorCode);
+            asyncContext->errorCode = TELEPHONY_ERR_FAIL;
+        }
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            asyncContext->errorCode, "getNetworkSearchInformation", GET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGI("GetNetworkSearchInformationCallback end");
@@ -634,11 +621,11 @@ static void GetNetworkSearchInformationCallback(napi_env env, napi_status status
 static bool MatchGetNetworkSearchInformation(napi_env env, const napi_value parameters[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 1: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number});
+        case PARAMETER_COUNT_ONE: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number });
         }
-        case 2: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number, napi_function});
+        case PARAMETER_COUNT_TWO: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_function });
         }
         default: {
             return false;
@@ -649,11 +636,15 @@ static bool MatchGetNetworkSearchInformation(napi_env env, const napi_value para
 static napi_value GetNetworkSearchInformation(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = PARAMETER_COUNT_TWO;
-    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    NAPI_ASSERT(env, MatchGetNetworkSearchInformation(env, parameters, parameterCount), "type mismatch");
+    if (!MatchGetNetworkSearchInformation(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("GetNetworkSearchInformation parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<GetSearchInfoContext>().release();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
     if (parameterCount == PARAMETER_COUNT_TWO) {
@@ -680,7 +671,7 @@ static std::string GetStringProperty(napi_env env, napi_value object, const std:
     napi_value value = nullptr;
     napi_status getNameStatus = napi_get_named_property(env, object, propertyName.c_str(), &value);
     if (getNameStatus == napi_ok) {
-        char chars[BUF_SIZE] = {0};
+        char chars[BUF_SIZE] = { 0 };
         size_t charLength = 0;
         napi_status getStringStatus = napi_get_value_string_utf8(env, value, chars, BUF_SIZE, &charLength);
         if (getStringStatus == napi_ok && charLength > 0) {
@@ -702,14 +693,14 @@ static bool MatchSetNetworkSelectionModeParameters(napi_env env, napi_value para
     TELEPHONY_LOGI("start MatchSetNetworkSelectionModeParameters parameterCount = %{public}lu",
         static_cast<unsigned long>(parameterCount));
     switch (parameterCount) {
-        case 1: {
-            if (!NapiUtil::MatchParameters(env, parameters, {napi_object})) {
+        case PARAMETER_COUNT_ONE: {
+            if (!NapiUtil::MatchParameters(env, parameters, { napi_object })) {
                 return false;
             }
             break;
         }
-        case 2: {
-            if (!NapiUtil::MatchParameters(env, parameters, {napi_object, napi_function})) {
+        case PARAMETER_COUNT_TWO: {
+            if (!NapiUtil::MatchParameters(env, parameters, { napi_object, napi_function })) {
                 TELEPHONY_LOGI("start MatchSetNetworkSelectionModeParameters not match two parameter");
                 return false;
             }
@@ -795,13 +786,12 @@ static void NativeSetNetworkSelectionMode(napi_env env, void *data)
     std::unique_ptr<SetNetworkSearchModeCallback> callback =
         std::make_unique<SetNetworkSearchModeCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest =
-        DelayedRefSingleton<CoreServiceClient>::GetInstance().SetNetworkSelectionMode(asyncContext->slotId,
-            asyncContext->selectMode, networkInfo, asyncContext->resumeSelection, callback.release());
-    TELEPHONY_LOGI("NativeSetNetworkSelectionMode setResult = %{public}d", asyncContext->sendRequest);
-    if (asyncContext->sendRequest) {
-        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [asyncContext] { return asyncContext->callbackEnd; });
+    asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetNetworkSelectionMode(
+        asyncContext->slotId, asyncContext->selectMode, networkInfo, asyncContext->resumeSelection, callback.release());
+    TELEPHONY_LOGI("NativeSetNetworkSelectionMode errorCode = %{public}d", asyncContext->errorCode);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->cv.wait_for(
+            callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [asyncContext] { return asyncContext->callbackEnd; });
         TELEPHONY_LOGI("NativeSetNetworkSelectionMode after callback end");
     }
     TELEPHONY_LOGI("NativeSetNetworkSelectionMode end");
@@ -810,19 +800,21 @@ static void NativeSetNetworkSelectionMode(napi_env env, void *data)
 static void SetNetworkSelectionModeCallback(napi_env env, napi_status status, void *data)
 {
     auto asyncContext = static_cast<SetSelectModeContext *>(data);
-    if (asyncContext->sendRequest) {
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = asyncContext->setResult;
-        TELEPHONY_LOGI("SetNetworkSelectionModeCallback resolved = %{public}d", asyncContext->resolved);
-    } else {
-        asyncContext->resolved = false;
     }
+    TELEPHONY_LOGI("SetNetworkSelectionModeCallback resolved = %{public}d", asyncContext->resolved);
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
         napi_get_undefined(env, &callbackValue);
-    } else if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
     } else {
-        callbackValue = ParseErrorValue(env, asyncContext->errorCode, "set network selection mode failed");
+        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("SetNetworkSelectionModeCallback time out, errorCode = %{public}d", asyncContext->errorCode);
+            asyncContext->errorCode = TELEPHONY_ERR_FAIL;
+        }
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            asyncContext->errorCode, "setNetworkSelectionMode", SET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle1ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGI("SetNetworkSelectionModeCallback end");
@@ -861,11 +853,15 @@ static void ParseNetworkSelectionParameter(napi_env env, napi_value object, SetS
 static napi_value SetNetworkSelectionMode(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = PARAMETER_COUNT_TWO;
-    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    NAPI_ASSERT(env, MatchSetNetworkSelectionModeParameters(env, parameters, parameterCount), "type mismatch");
+    if (!MatchSetNetworkSelectionModeParameters(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("SetNetworkSelectionMode parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<SetSelectModeContext>();
     ParseNetworkSelectionParameter(env, parameters[0], *asyncContext);
     if (parameterCount == PARAMETER_COUNT_TWO) {
@@ -883,28 +879,25 @@ static void NativeGetCountryCode(napi_env env, void *data)
         context->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    context->countryCode = NapiUtil::ToUtf8(
-        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetIsoCountryCodeForNetwork(context->slotId));
+    std::u16string countryCode;
+    context->errorCode =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetIsoCountryCodeForNetwork(context->slotId, countryCode);
+    context->countryCode = NapiUtil::ToUtf8(countryCode);
     TELEPHONY_LOGI("NativeGetCountryCode countryCode = %{public}s", context->countryCode.c_str());
-    context->resolved = true;
+    if (context->errorCode == TELEPHONY_SUCCESS) {
+        context->resolved = true;
+    }
 }
 
 static void GetCountryCodeCallback(napi_env env, napi_status status, void *data)
 {
     auto context = static_cast<GetISOCountryCodeContext *>(data);
     napi_value callbackValue = nullptr;
-    if (status == napi_ok) {
-        if (context->resolved) {
-            napi_create_string_utf8(env, context->countryCode.c_str(), context->countryCode.size(), &callbackValue);
-        } else {
-            if (context->errorCode == ERROR_SLOT_ID_INVALID) {
-                callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
-            } else {
-                callbackValue = NapiUtil::CreateErrorMessage(env, "get iso country code failed");
-            }
-        }
+    if (context->resolved) {
+        napi_create_string_utf8(env, context->countryCode.c_str(), context->countryCode.size(), &callbackValue);
     } else {
-        NapiUtil::CreateErrorMessage(env, "get iso country code error,napi_status = " + std ::to_string(status));
+        JsError error = NapiUtil::ConverErrorMessageForJs(context->errorCode);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, context, callbackValue);
 }
@@ -912,11 +905,11 @@ static void GetCountryCodeCallback(napi_env env, napi_status status, void *data)
 static bool MatchGetISOCountryCodeForNetworkParameter(napi_env env, napi_value parameters[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 1: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number});
+        case PARAMETER_COUNT_ONE: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number });
         }
-        case 2: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number, napi_function});
+        case PARAMETER_COUNT_TWO: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_function });
         }
         default:
             return false;
@@ -930,7 +923,11 @@ static napi_value GetISOCountryCodeForNetwork(napi_env env, napi_callback_info i
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    NAPI_ASSERT(env, MatchGetISOCountryCodeForNetworkParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchGetISOCountryCodeForNetworkParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("GetISOCountryCodeForNetwork parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<GetISOCountryCodeContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
     if (parameterCount == PARAMETER_COUNT_TWO) {
@@ -943,15 +940,15 @@ static napi_value GetISOCountryCodeForNetwork(napi_env env, napi_callback_info i
 static bool MatchIsRadioOnParameter(napi_env env, napi_value parameters[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 0: {
+        case PARAMETER_COUNT_ZERO: {
             return true;
         }
-        case 1: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_function}) ||
-                   NapiUtil::MatchParameters(env, parameters, {napi_number});
+        case PARAMETER_COUNT_ONE: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_function }) ||
+                   NapiUtil::MatchParameters(env, parameters, { napi_number });
         }
-        case 2: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number, napi_function});
+        case PARAMETER_COUNT_TWO: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_function });
         }
         default:
             return false;
@@ -968,11 +965,11 @@ static void NativeIsRadioOn(napi_env env, void *data)
     }
     std::unique_ptr<GetRadioStateCallback> callback = std::make_unique<GetRadioStateCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest =
+    asyncContext->errorCode =
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetRadioState(asyncContext->slotId, callback.release());
-    if (asyncContext->sendRequest) {
-        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [asyncContext] { return asyncContext->callbackEnd; });
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->cv.wait_for(
+            callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [asyncContext] { return asyncContext->callbackEnd; });
         TELEPHONY_LOGI("NativeIsRadioOn after callback end");
     }
     TELEPHONY_LOGI("NativeIsRadioOn end");
@@ -984,10 +981,14 @@ static void IsRadioOnCallback(napi_env env, napi_status status, void *data)
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
         napi_get_boolean(env, asyncContext->isRadioOn, &callbackValue);
-    } else if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
     } else {
-        callbackValue = ParseErrorValue(env, asyncContext->errorCode, "get radio status failed");
+        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("IsRadioOnCallback time out, errorCode = %{public}d", asyncContext->errorCode);
+            asyncContext->errorCode = TELEPHONY_ERR_FAIL;
+        }
+        JsError error =
+            NapiUtil::ConverErrorMessageWithPermissionForJs(asyncContext->errorCode, "isRadioOn", GET_NETWORK_INFO);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGI("IsRadioOnCallback end");
@@ -1000,8 +1001,17 @@ static napi_value IsRadioOn(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
-    NAPI_ASSERT(env, MatchIsRadioOnParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchIsRadioOnParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("IsRadioOn parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<IsRadioOnContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("IsRadioOn asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
     } else if (parameterCount == PARAMETER_COUNT_ONE) {
@@ -1031,11 +1041,11 @@ static void NativeTurnOnRadio(napi_env env, void *data)
     }
     std::unique_ptr<SetRadioStateCallback> callback = std::make_unique<SetRadioStateCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetRadioState(
+    asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetRadioState(
         asyncContext->slotId, true, callback.release());
-    if (asyncContext->sendRequest) {
-        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [asyncContext] { return asyncContext->callbackEnd; });
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->cv.wait_for(
+            callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [asyncContext] { return asyncContext->callbackEnd; });
         TELEPHONY_LOGI("NativeTurnOnRadio after callback end");
     }
     TELEPHONY_LOGI("NativeTurnOnRadio end");
@@ -1047,10 +1057,14 @@ static void TurnOnRadioCallback(napi_env env, napi_status status, void *data)
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
         napi_get_undefined(env, &callbackValue);
-    } else if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
     } else {
-        callbackValue = ParseErrorValue(env, asyncContext->errorCode, "turn on radio failed");
+        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("TurnOnRadioCallback time out, errorCode = %{public}d", asyncContext->errorCode);
+            asyncContext->errorCode = TELEPHONY_ERR_FAIL;
+        }
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            asyncContext->errorCode, "turnOnRadio", SET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle1ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGI("TurnOnRadioCallback end");
@@ -1059,15 +1073,15 @@ static void TurnOnRadioCallback(napi_env env, napi_status status, void *data)
 static bool MatchSwitchRadioParameter(napi_env env, napi_value parameters[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 0: {
+        case PARAMETER_COUNT_ZERO: {
             return true;
         }
-        case 1: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number}) ||
-                NapiUtil::MatchParameters(env, parameters, {napi_function});
+        case PARAMETER_COUNT_ONE: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number }) ||
+                   NapiUtil::MatchParameters(env, parameters, { napi_function });
         }
-        case 2: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number, napi_function});
+        case PARAMETER_COUNT_TWO: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_function });
         }
         default:
             return false;
@@ -1077,11 +1091,15 @@ static bool MatchSwitchRadioParameter(napi_env env, napi_value parameters[], siz
 static napi_value TurnOnRadio(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = PARAMETER_COUNT_TWO;
-    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
-    NAPI_ASSERT(env, MatchIsRadioOnParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchIsRadioOnParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("TurnOnRadio parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<SwitchRadioContext>();
     if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
@@ -1090,12 +1108,12 @@ static napi_value TurnOnRadio(napi_env env, napi_callback_info info)
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
         if (valueType == napi_number) {
             NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-            TELEPHONY_LOGI("IsRadioOn context->slotId = %{public}d", asyncContext->slotId);
-        } else if (valueType == napi_function) {
+            TELEPHONY_LOGI("TurnOnRadio context->slotId = %{public}d", asyncContext->slotId);
+        } else {
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
         }
-    } else if (parameterCount == PARAMETER_COUNT_TWO) {
+    } else {
         NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
@@ -1113,11 +1131,11 @@ static void NativeTurnOffRadio(napi_env env, void *data)
     }
     std::unique_ptr<SetRadioStateCallback> callback = std::make_unique<SetRadioStateCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetRadioState(
+    asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetRadioState(
         asyncContext->slotId, false, callback.release());
-    if (asyncContext->sendRequest) {
-        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [asyncContext] { return asyncContext->callbackEnd; });
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->cv.wait_for(
+            callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [asyncContext] { return asyncContext->callbackEnd; });
         TELEPHONY_LOGI("NativeTurnOffRadio after callback end");
     }
     TELEPHONY_LOGI("NativeTurnOffRadio end");
@@ -1129,10 +1147,14 @@ static void TurnOffRadioCallback(napi_env env, napi_status status, void *data)
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
         napi_get_undefined(env, &callbackValue);
-    } else if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
     } else {
-        callbackValue = ParseErrorValue(env, asyncContext->errorCode, "turn off radio failed");
+        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("TurnOffRadioCallback time out, errorCode = %{public}d", asyncContext->errorCode);
+            asyncContext->errorCode = TELEPHONY_ERR_FAIL;
+        }
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            asyncContext->errorCode, "turnOffRadio", SET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle1ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGI("TurnOffRadioCallback end");
@@ -1141,11 +1163,15 @@ static void TurnOffRadioCallback(napi_env env, napi_status status, void *data)
 static napi_value TurnOffRadio(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = PARAMETER_COUNT_TWO;
-    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
-    NAPI_ASSERT(env, MatchIsRadioOnParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchIsRadioOnParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("TurnOffRadio parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<SwitchRadioContext>();
     if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
@@ -1175,12 +1201,13 @@ static void NativeGetOperatorName(napi_env env, void *data)
         context->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    std::u16string u16OperatorName =
-        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOperatorName(context->slotId);
+    std::u16string u16OperatorName = u"";
+    context->errorCode =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOperatorName(context->slotId, u16OperatorName);
     std::string operatorName = NapiUtil::ToUtf8(u16OperatorName);
     TELEPHONY_LOGI("NativeGetOperatorName operatorName = %{public}s", operatorName.c_str());
-    context->resolved = true;
-    if (context->resolved) {
+    if (context->errorCode == TELEPHONY_ERR_SUCCESS) {
+        context->resolved = true;
         context->operatorNameLength = (operatorName.size() < BUF_SIZE) ? operatorName.size() : BUF_SIZE;
         for (size_t i = 0; i < context->operatorNameLength; i++) {
             context->operatorName[i] = operatorName.at(i);
@@ -1195,11 +1222,8 @@ static void GetOperatorNameCallback(napi_env env, napi_status status, void *data
     if (context->resolved) {
         napi_create_string_utf8(env, context->operatorName, context->operatorNameLength, &callbackValue);
     } else {
-        if (context->errorCode == ERROR_SLOT_ID_INVALID) {
-            callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
-        } else {
-            callbackValue = NapiUtil::CreateErrorMessage(env, "get operator name failed");
-        }
+        JsError error = NapiUtil::ConverErrorMessageForJs(context->errorCode);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, context, callbackValue);
 }
@@ -1207,11 +1231,11 @@ static void GetOperatorNameCallback(napi_env env, napi_status status, void *data
 static bool MatchGetOperatorNameParameter(napi_env env, napi_value parameters[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 1: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number});
+        case PARAMETER_COUNT_ONE: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number });
         }
-        case 2: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number, napi_function});
+        case PARAMETER_COUNT_TWO: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_function });
         }
         default:
             return false;
@@ -1225,7 +1249,11 @@ static napi_value GetOperatorName(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    NAPI_ASSERT(env, MatchGetOperatorNameParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchGetOperatorNameParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("GetOperatorName parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<GetOperatorNameContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
     if (parameterCount == PARAMETER_COUNT_TWO) {
@@ -1246,20 +1274,12 @@ static void NativeSetPreferredNetwork(napi_env env, void *data)
     auto setPreferredNetworkCallback = std::make_unique<SetPreferredNetworkCallback>(asyncContext);
     OHOS::sptr<INetworkSearchCallback> callback(setPreferredNetworkCallback.release());
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetPreferredNetwork(
+    asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetPreferredNetwork(
         asyncContext->slotId, asyncContext->preferredNetworkMode, callback);
-    if ((asyncContext->slotId != 0) && (asyncContext->slotId != 1)) {
-        asyncContext->resolved = false;
-        asyncContext->errorCode = SLOTID_INPUT_ERROR;
-    } else {
-        if (asyncContext->sendRequest) {
-            asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-                [asyncContext] { return asyncContext->callbackEnd; });
-            TELEPHONY_LOGI("NativeTurnOffRadio after callback end");
-        } else {
-            asyncContext->resolved = false;
-            asyncContext->errorCode = HRIL_ERR_CMD_SEND_FAILURE;
-        }
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->cv.wait_for(
+            callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [asyncContext] { return asyncContext->callbackEnd; });
+        TELEPHONY_LOGI("NativeTurnOffRadio after callback end");
     }
 }
 
@@ -1268,21 +1288,16 @@ static void SetPreferredNetworkCallback(napi_env env, napi_status status, void *
     auto context = static_cast<PreferredNetworkModeContext *>(data);
     TELEPHONY_LOGI("SetPreferredNetworkCallback resolved = %{public}d", context->resolved);
     napi_value callbackValue = nullptr;
-    if (status == napi_ok) {
-        if (context->resolved) {
-            napi_get_undefined(env, &callbackValue);
-        } else {
-            if (context->errorCode == ERROR_SLOT_ID_INVALID) {
-                callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
-            } else if (context->errorCode == ENUMERATION_INPUT_ERROR) {
-                callbackValue = ParseErrorValue(env, context->errorCode, "enumeration input error");
-            } else {
-                callbackValue = ParseErrorValue(env, context->errorCode, "set preferred network mode error");
-            }
-        }
+    if (context->resolved) {
+        napi_get_undefined(env, &callbackValue);
     } else {
-        callbackValue = NapiUtil::CreateErrorMessage(
-            env, "set preferred network error because napi_status = " + std::to_string(status));
+        if (context->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("SetPreferredNetworkCallback time out, errorCode = %{public}d", context->errorCode);
+            context->errorCode = TELEPHONY_ERR_FAIL;
+        }
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            context->errorCode, "setPreferredNetwork", SET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     TELEPHONY_LOGI("SetPreferredNetworkCallback end");
     NapiUtil::Handle1ValueCallback(env, context, callbackValue);
@@ -1291,11 +1306,11 @@ static void SetPreferredNetworkCallback(napi_env env, napi_status status, void *
 static bool MatchSetPreferredNetworkParameter(napi_env env, napi_value parameters[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 2: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number, napi_number});
+        case PARAMETER_COUNT_TWO: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number });
         }
-        case 3: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number, napi_number, napi_function});
+        case PARAMETER_COUNT_THREE: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number, napi_function });
         }
         default:
             return false;
@@ -1304,20 +1319,24 @@ static bool MatchSetPreferredNetworkParameter(napi_env env, napi_value parameter
 
 static napi_value SetPreferredNetwork(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 3;
-    napi_value parameters[3] = {0};
+    size_t parameterCount = PARAMETER_COUNT_THREE;
+    napi_value parameters[PARAMETER_COUNT_THREE] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    NAPI_ASSERT(env, MatchSetPreferredNetworkParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchSetPreferredNetworkParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("SetPreferredNetwork parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<PreferredNetworkModeContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
     NAPI_CALL(env, napi_get_value_int32(env, parameters[1], &asyncContext->preferredNetworkMode));
-    if (parameterCount == 3) {
+    if (parameterCount == PARAMETER_COUNT_THREE) {
         NAPI_CALL(env, napi_create_reference(env, parameters[2], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
-    return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "SetPreferredNetworkMode",
-        NativeSetPreferredNetwork, SetPreferredNetworkCallback);
+    return NapiUtil::HandleAsyncWork(
+        env, asyncContext.release(), "SetPreferredNetworkMode", NativeSetPreferredNetwork, SetPreferredNetworkCallback);
 }
 
 static void NativeGetPreferredNetwork(napi_env env, void *data)
@@ -1331,20 +1350,12 @@ static void NativeGetPreferredNetwork(napi_env env, void *data)
     auto getPreferredNetworkCallback = std::make_unique<GetPreferredNetworkCallback>(asyncContext);
     OHOS::sptr<INetworkSearchCallback> callback(getPreferredNetworkCallback.release());
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-    asyncContext->sendRequest =
+    asyncContext->errorCode =
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPreferredNetwork(asyncContext->slotId, callback);
-    if ((asyncContext->slotId != 0) && (asyncContext->slotId != 1)) {
-        asyncContext->resolved = false;
-        asyncContext->errorCode = SLOTID_INPUT_ERROR;
-    } else {
-        if (asyncContext->sendRequest) {
-            asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-                [asyncContext] { return asyncContext->callbackEnd; });
-            TELEPHONY_LOGI("GetPreferredNetwork after callback end");
-        } else {
-            asyncContext->resolved = false;
-            asyncContext->errorCode = HRIL_ERR_CMD_SEND_FAILURE;
-        }
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->cv.wait_for(
+            callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [asyncContext] { return asyncContext->callbackEnd; });
+        TELEPHONY_LOGI("NativeGetPreferredNetwork after callback end");
     }
 }
 
@@ -1353,32 +1364,29 @@ static void GetPreferredNetworkCallback(napi_env env, napi_status status, void *
     auto context = static_cast<PreferredNetworkModeContext *>(data);
     TELEPHONY_LOGI("GetPreferredNetworkCallback resolved = %{public}d", context->resolved);
     napi_value callbackValue = nullptr;
-    if (status == napi_ok) {
-        if (context->resolved) {
-            napi_create_int32(env, context->preferredNetworkMode, &callbackValue);
-        } else {
-            if (context->errorCode == ERROR_SLOT_ID_INVALID) {
-                callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
-            } else {
-                callbackValue = ParseErrorValue(env, context->errorCode, "get preferred network mode");
-            }
-        }
+    if (context->resolved) {
+        napi_create_int32(env, context->preferredNetworkMode, &callbackValue);
     } else {
-        context->resolved = false;
-        callbackValue = NapiUtil::CreateErrorMessage(
-            env, "get preferred network error because napi_status = " + std::to_string(status));
+        if (context->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("GetPreferredNetworkCallback time out, errorCode = %{public}d", context->errorCode);
+            context->errorCode = TELEPHONY_ERR_FAIL;
+        }
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            context->errorCode, "getPreferredNetwork", GET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
+    TELEPHONY_LOGI("GetPreferredNetworkCallback end");
     NapiUtil::Handle2ValueCallback(env, context, callbackValue);
 }
 
 static bool MatchGetPreferredNetworkParameter(napi_env env, napi_value parameters[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case 1: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number});
+        case PARAMETER_COUNT_ONE: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number });
         }
-        case 2: {
-            return NapiUtil::MatchParameters(env, parameters, {napi_number, napi_function});
+        case PARAMETER_COUNT_TWO: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_function });
         }
         default:
             return false;
@@ -1388,18 +1396,22 @@ static bool MatchGetPreferredNetworkParameter(napi_env env, napi_value parameter
 static napi_value GetPreferredNetwork(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = PARAMETER_COUNT_TWO;
-    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    NAPI_ASSERT(env, MatchGetPreferredNetworkParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchGetPreferredNetworkParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("SendUpdateCellLocationRequest parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<PreferredNetworkModeContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
     if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
-    return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "GetPreferredNetworkMode",
-        NativeGetPreferredNetwork, GetPreferredNetworkCallback);
+    return NapiUtil::HandleAsyncWork(
+        env, asyncContext.release(), "GetPreferredNetworkMode", NativeGetPreferredNetwork, GetPreferredNetworkCallback);
 }
 
 void NativeGetIMEI(napi_env env, void *data)
@@ -1410,27 +1422,25 @@ void NativeGetIMEI(napi_env env, void *data)
         context->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    context->getIMEIResult =
-        NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImei(context->slotId));
-    TELEPHONY_LOGI("NativeGetIMEI len = %{public}lu", static_cast<unsigned long>(context->getIMEIResult.length()));
-    context->resolved = !(context->getIMEIResult.empty());
+    std::u16string imei = u"";
+    context->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImei(context->slotId, imei);
+    if (context->errorCode == TELEPHONY_SUCCESS) {
+        context->resolved = true;
+        context->getIMEIResult = NapiUtil::ToUtf8(imei);
+        TELEPHONY_LOGI("NativeGetIMEI len = %{public}lu", static_cast<unsigned long>(context->getIMEIResult.length()));
+    }
 }
 
 void GetIMEICallback(napi_env env, napi_status status, void *data)
 {
     auto context = static_cast<GetIMEIContext *>(data);
     napi_value callbackValue = nullptr;
-    if (status == napi_ok) {
-        if (context->resolved) {
-            napi_create_string_utf8(
-                env, context->getIMEIResult.c_str(), context->getIMEIResult.size(), &callbackValue);
-        } else {
-            callbackValue = NapiUtil::CreateErrorMessage(env, "getIMEI error");
-        }
-    } else if (context->errorCode == ERROR_SLOT_ID_INVALID) {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
+    if (context->resolved) {
+        napi_create_string_utf8(env, context->getIMEIResult.c_str(), context->getIMEIResult.size(), &callbackValue);
     } else {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "getIMEI error,napi_status = " + std ::to_string(status));
+        JsError error =
+            NapiUtil::ConverErrorMessageWithPermissionForJs(context->errorCode, "getIMEI", GET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, context, callbackValue);
 }
@@ -1438,12 +1448,21 @@ void GetIMEICallback(napi_env env, napi_status status, void *data)
 static napi_value GetIMEI(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = PARAMETER_COUNT_TWO;
-    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
-    NAPI_ASSERT(env, MatchGetIMEIParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchGetIMEIParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("GetIMEI parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<GetIMEIContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("GetIMEI asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
     } else if (parameterCount == PARAMETER_COUNT_ONE) {
@@ -1451,11 +1470,11 @@ static napi_value GetIMEI(napi_env env, napi_callback_info info)
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
         if (valueType == napi_number) {
             NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-        } else if (valueType == napi_function) {
+        } else {
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
         }
-    } else if (parameterCount == PARAMETER_COUNT_TWO) {
+    } else {
         NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
@@ -1470,27 +1489,25 @@ void NativeGetMEID(napi_env env, void *data)
         context->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    context->getMEIDResult =
-        NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetMeid(context->slotId));
-    TELEPHONY_LOGI("NativeGetMEID len = %{public}lu", static_cast<unsigned long>(context->getMEIDResult.length()));
-    context->resolved = !(context->getMEIDResult.empty());
+    std::u16string meid = u"";
+    context->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetMeid(context->slotId, meid);
+    if (context->errorCode == TELEPHONY_SUCCESS) {
+        context->resolved = true;
+        context->getMEIDResult = NapiUtil::ToUtf8(meid);
+        TELEPHONY_LOGI("NativeGetMEID len = %{public}lu", static_cast<unsigned long>(context->getMEIDResult.length()));
+    }
 }
 
 void GetMEIDCallback(napi_env env, napi_status status, void *data)
 {
     auto context = static_cast<GetMEIDContext *>(data);
     napi_value callbackValue = nullptr;
-    if (status == napi_ok) {
-        if (context->resolved) {
-            napi_create_string_utf8(
-                env, context->getMEIDResult.c_str(), context->getMEIDResult.size(), &callbackValue);
-        } else {
-            callbackValue = NapiUtil::CreateErrorMessage(env, "getMEID error");
-        }
-    } else if (context->errorCode == ERROR_SLOT_ID_INVALID) {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
+    if (context->resolved) {
+        napi_create_string_utf8(env, context->getMEIDResult.c_str(), context->getMEIDResult.size(), &callbackValue);
     } else {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "getMEID error,napi_status = " + std ::to_string(status));
+        JsError error =
+            NapiUtil::ConverErrorMessageWithPermissionForJs(context->errorCode, "getMEID", GET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, context, callbackValue);
 }
@@ -1498,11 +1515,15 @@ void GetMEIDCallback(napi_env env, napi_status status, void *data)
 static napi_value GetMEID(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = PARAMETER_COUNT_TWO;
-    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
-    NAPI_ASSERT(env, MatchGetIMEIParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchGetIMEIParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("GetMEID parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<GetMEIDContext>();
     if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
@@ -1531,10 +1552,11 @@ static void NativeSendUpdateCellLocationRequest(napi_env env, void *data)
         asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    asyncContext->sendRequest =
+    asyncContext->errorCode =
         DelayedRefSingleton<CoreServiceClient>::GetInstance().SendUpdateCellLocationRequest(asyncContext->slotId);
-    TELEPHONY_LOGI("asyncContext->sendRequest = %{public}d", asyncContext->sendRequest);
-    asyncContext->resolved = true;
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = true;
+    }
     TELEPHONY_LOGI("NativeSendUpdateCellLocationRequest end");
 }
 
@@ -1544,10 +1566,10 @@ static void SendUpdateCellLocationRequestCallback(napi_env env, napi_status stat
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
         napi_get_undefined(env, &callbackValue);
-    } else if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
     } else {
-        callbackValue = ParseErrorValue(env, asyncContext->errorCode, "SendUpdateCellLocationRequestCallback failed");
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            asyncContext->errorCode, "sendUpdateCellLocationRequest", LOCATION);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle1ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGI("SendUpdateCellLocationRequestCallback end");
@@ -1560,7 +1582,11 @@ static napi_value SendUpdateCellLocationRequest(napi_env env, napi_callback_info
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    NAPI_ASSERT(env, MatchSwitchRadioParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchSwitchRadioParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("SendUpdateCellLocationRequest parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<SwitchRadioContext>();
     if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
@@ -1727,12 +1753,21 @@ static void NativeGetCellInformation(napi_env env, void *data)
         asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    asyncContext->cellInformations =
-        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCellInfoList(asyncContext->slotId);
-    asyncContext->resolved = true;
+    asyncContext->cellInformations.clear();
+    asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCellInfoList(
+        asyncContext->slotId, asyncContext->cellInformations);
     TELEPHONY_LOGI("NativeGetCellInformation len = %{public}lu",
         static_cast<unsigned long>(asyncContext->cellInformations.size()));
-    asyncContext->resolved = (asyncContext->cellInformations.size() != 0);
+    if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("NativeGetCellInformation errorCode = %{public}d", asyncContext->errorCode);
+        return;
+    }
+    if (asyncContext->cellInformations.size() == 0) {
+        TELEPHONY_LOGE("NativeGetCellInformation cellInformations is empty.");
+        asyncContext->errorCode = ERROR_NATIVE_API_EXECUTE_FAIL;
+        return;
+    }
+    asyncContext->resolved = true;
 }
 
 void GetCellInformationCallback(napi_env env, napi_status status, void *data)
@@ -1771,10 +1806,10 @@ void GetCellInformationCallback(napi_env env, napi_status status, void *data)
             napi_set_element(env, asyncContext->callbackValue, i, info);
             ++i;
         }
-    } else if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
-        asyncContext->callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
     } else {
-        asyncContext->callbackValue = NapiUtil::CreateErrorMessage(env, "GetCellInformation failed");
+        JsError error =
+            NapiUtil::ConverErrorMessageWithPermissionForJs(asyncContext->errorCode, "getCellInformation", LOCATION);
+        asyncContext->callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, asyncContext->callbackValue);
     TELEPHONY_LOGI("GetCellInformationCallback end");
@@ -1787,7 +1822,11 @@ static napi_value GetCellInformation(napi_env env, napi_callback_info info)
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    NAPI_ASSERT(env, MatchGetNetworkStateParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchGetNetworkStateParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("GetCellInformation parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = new CellInformationContext();
     if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
@@ -1798,11 +1837,11 @@ static napi_value GetCellInformation(napi_env env, napi_callback_info info)
             NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         } else if (valueType == napi_function) {
             asyncContext->slotId = GetDefaultSlotId();
-            NAPI_CALL(env, napi_create_reference(env, parameters[0], 1, &asyncContext->callbackRef));
+            NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
         }
     } else if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-        NAPI_CALL(env, napi_create_reference(env, parameters[1], 1, &asyncContext->callbackRef));
+        NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     napi_value result = nullptr;
     if (asyncContext->callbackRef == nullptr) {
@@ -1811,8 +1850,7 @@ static napi_value GetCellInformation(napi_env env, napi_callback_info info)
         NAPI_CALL(env, napi_get_undefined(env, &result));
     }
     napi_value resourceName = nullptr;
-    NAPI_CALL(env, napi_create_string_utf8(env, "GetCellInformation",
-                                           NAPI_AUTO_LENGTH, &resourceName));
+    NAPI_CALL(env, napi_create_string_utf8(env, "GetCellInformation", NAPI_AUTO_LENGTH, &resourceName));
     NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, NativeGetCellInformation,
                        GetCellInformationCallback, static_cast<void *>(asyncContext), &(asyncContext->work)));
     NAPI_CALL(env, napi_queue_async_work(env, asyncContext->work));
@@ -1822,9 +1860,12 @@ static napi_value GetCellInformation(napi_env env, napi_callback_info info)
 static void NativeGetPrimarySlotId(napi_env env, void *data)
 {
     auto asyncContext = static_cast<GetPrimarySlotIdContext *>(data);
-    asyncContext->slotId = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPrimarySlotId();
+    asyncContext->errorCode =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPrimarySlotId(asyncContext->slotId);
     TELEPHONY_LOGI("GetPrimarySlotId = %{public}d", asyncContext->slotId);
-    asyncContext->resolved = (asyncContext->slotId >= 0);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = true;
+    }
 }
 
 void GetPrimarySlotIdCallback(napi_env env, napi_status status, void *data)
@@ -1834,7 +1875,8 @@ void GetPrimarySlotIdCallback(napi_env env, napi_status status, void *data)
     if (asyncContext->resolved) {
         napi_create_int32(env, asyncContext->slotId, &callbackValue);
     } else {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "GetPrimarySlotId failed");
+        JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->errorCode);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
 }
@@ -1846,7 +1888,11 @@ static napi_value GetPrimarySlotId(napi_env env, napi_callback_info info)
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    NAPI_ASSERT(env, MatchSwitchRadioParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchSwitchRadioParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("GetPrimarySlotId parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<SwitchRadioContext>();
     if (parameterCount == PARAMETER_COUNT_ONE) {
         NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
@@ -1863,29 +1909,28 @@ static void NativeGetUniqueDeviceId(napi_env env, void *data)
         context->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    context->getUniqueDeviceId =
-        NapiUtil::ToUtf8(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetUniqueDeviceId(context->slotId));
-    TELEPHONY_LOGI(
-        "NativeGetUniqueDeviceId len = %{public}lu", static_cast<unsigned long>(context->getUniqueDeviceId.length()));
-    context->resolved = !(context->getUniqueDeviceId.empty());
+    std::u16string deviceId = u"";
+    context->errorCode =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetUniqueDeviceId(context->slotId, deviceId);
+    if (context->errorCode == TELEPHONY_SUCCESS) {
+        context->resolved = true;
+        context->getUniqueDeviceId = NapiUtil::ToUtf8(deviceId);
+        TELEPHONY_LOGI("NativeGetUniqueDeviceId len = %{public}lu",
+            static_cast<unsigned long>(context->getUniqueDeviceId.length()));
+    }
 }
 
 void GetUniqueDeviceIdCallback(napi_env env, napi_status status, void *data)
 {
     auto context = static_cast<GetUniqueDeviceIdContext *>(data);
     napi_value callbackValue = nullptr;
-    if (status == napi_ok) {
-        if (context->resolved) {
-            napi_create_string_utf8(
-                env, context->getUniqueDeviceId.c_str(), context->getUniqueDeviceId.size(), &callbackValue);
-        } else {
-            callbackValue = NapiUtil::CreateErrorMessage(env, "GetUniqueDeviceId error");
-        }
-    } else if (context->errorCode == ERROR_SLOT_ID_INVALID) {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
+    if (context->resolved) {
+        napi_create_string_utf8(
+            env, context->getUniqueDeviceId.c_str(), context->getUniqueDeviceId.size(), &callbackValue);
     } else {
-        callbackValue =
-            NapiUtil::CreateErrorMessage(env, "GetUniqueDeviceId error,napi_status = " + std ::to_string(status));
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            context->errorCode, "getUniqueDeviceId", GET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, context, callbackValue);
 }
@@ -1893,11 +1938,15 @@ void GetUniqueDeviceIdCallback(napi_env env, napi_status status, void *data)
 static napi_value GetUniqueDeviceId(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = PARAMETER_COUNT_TWO;
-    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
-    NAPI_ASSERT(env, MatchGetIMEIParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchGetIMEIParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("GetUniqueDeviceId parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<GetIMEIContext>();
     if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
@@ -1942,23 +1991,25 @@ static void NativeGetNrOptionMode(napi_env env, void *data)
         context->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    context->nrOptionMode =
-        WrapNrOptionMode(DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNrOptionMode(context->slotId));
-    context->resolved = true;
-    TELEPHONY_LOGI("NativeGetNrOptionMode nrOptionMode = %{public}d", context->nrOptionMode);
+    NrMode type = NrMode::NR_MODE_UNKNOWN;
+    context->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNrOptionMode(context->slotId, type);
+    context->nrOptionMode = WrapNrOptionMode(type);
+    if (context->errorCode == TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGI("NativeGetNrOptionMode nrOptionMode = %{public}d", context->nrOptionMode);
+        context->resolved = true;
+    }
 }
 
 static void GetNrOptionModeCallback(napi_env env, napi_status status, void *data)
 {
     auto context = static_cast<GetNrOptionModeContext *>(data);
     TELEPHONY_LOGI("GetNrOptionModeCallback resolved = %{public}d", context->resolved);
-    napi_value callbackValue = ParseErrorValue(env, context->errorCode, "GetNrOptionMode");
-    if (status == napi_ok) {
-        if (context->resolved) {
-            napi_create_int32(env, context->nrOptionMode, &callbackValue);
-        } else if (context->errorCode == ERROR_SLOT_ID_INVALID) {
-            callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
-        }
+    napi_value callbackValue = nullptr;
+    if (context->resolved) {
+        napi_create_int32(env, context->nrOptionMode, &callbackValue);
+    } else {
+        JsError error = NapiUtil::ConverErrorMessageForJs(context->errorCode);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, context, callbackValue);
 }
@@ -1966,11 +2017,15 @@ static void GetNrOptionModeCallback(napi_env env, napi_status status, void *data
 static napi_value GetNrOptionMode(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = PARAMETER_COUNT_TWO;
-    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
-    NAPI_ASSERT(env, MatchGetNrOptionModeParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchGetNrOptionModeParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("GetNrOptionMode parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<GetNrOptionModeContext>();
     if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
@@ -2005,7 +2060,7 @@ static napi_value IsNrSupported(napi_env env, napi_callback_info info)
 
     switch (parameterCount) {
         case PARAMETER_COUNT_ZERO: {
-            slotId = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPrimarySlotId();
+            DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPrimarySlotId(slotId);
             if (slotId == INVALID_VALUE) {
                 TELEPHONY_LOGE("get primary slot id failed.");
                 napi_get_boolean(env, isNrSupported, &result);
@@ -2043,9 +2098,9 @@ static void NativeSetPrimarySlotId(napi_env env, void *data)
         context->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    context->setResult = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetPrimarySlotId(context->slotId);
-    TELEPHONY_LOGI("context->setResult = %{public}d", context->setResult);
-    if (context->setResult == 1) {
+    context->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetPrimarySlotId(context->slotId);
+    TELEPHONY_LOGI("context->errorCode = %{public}d", context->errorCode);
+    if (context->errorCode == TELEPHONY_ERR_SUCCESS) {
         context->resolved = true;
     }
 }
@@ -2056,10 +2111,10 @@ static void SetPrimarySlotIdCallback(napi_env env, napi_status status, void *dat
     napi_value callbackValue = nullptr;
     if (context->resolved) {
         napi_get_undefined(env, &callbackValue);
-    } else if (context->errorCode == ERROR_SLOT_ID_INVALID) {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
     } else {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "SetPrimarySlotId failed");
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            context->errorCode, "setPrimarySlotId", SET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle1ValueCallback(env, context, callbackValue);
 }
@@ -2067,11 +2122,15 @@ static void SetPrimarySlotIdCallback(napi_env env, napi_status status, void *dat
 static napi_value SetPrimarySlotId(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = PARAMETER_COUNT_TWO;
-    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    NAPI_ASSERT(env, MatchGetISOCountryCodeForNetworkParameter(env, parameters, parameterCount), "type mismatch");
+    if (!MatchGetISOCountryCodeForNetworkParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("SetPrimarySlotId parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<SetPrimarySlotIdContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
     if (parameterCount == PARAMETER_COUNT_TWO) {
@@ -2650,8 +2709,8 @@ static napi_value CreateRadioType(napi_env env, napi_value exports)
             "RADIO_TECHNOLOGY_NR", NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR))),
     };
     napi_value result = nullptr;
-    napi_define_class(env, "RadioType", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,
-        sizeof(desc) / sizeof(*desc), desc, &result);
+    napi_define_class(env, "RadioType", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr, sizeof(desc) / sizeof(*desc),
+        desc, &result);
     napi_set_named_property(env, exports, "RadioType", result);
 
     return exports;
@@ -2979,7 +3038,7 @@ static napi_module _radioModule = {
     .nm_register_func = InitNapiRadioNetwork,
     .nm_modname = "telephony.radio",
     .nm_priv = ((void *)0),
-    .reserved = {0},
+    .reserved = { 0 },
 };
 
 extern "C" __attribute__((constructor)) void RegisterRadioNetworkModule(void)
