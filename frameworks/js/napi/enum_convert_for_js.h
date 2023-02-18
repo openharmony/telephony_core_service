@@ -16,6 +16,7 @@
 #ifndef ENUM_CONVERT_FOR_JS_H
 #define ENUM_CONVERT_FOR_JS_H
 
+#include "core_service_errors.h"
 #include "telephony_errors.h"
 
 namespace OHOS {
@@ -63,8 +64,11 @@ enum CallManagerErrorCode {
     CALL_ERR_UNHOLD_FAILED,
     CALL_ERR_HANGUP_FAILED,
     CALL_ERR_CONFERENCE_SEPERATE_FAILED,
+    CALL_ERR_THE_CALL_IS_NOT_IN_THE_CONFERENCE,
     CALL_ERR_STARTRTT_FAILED,
     CALL_ERR_STOPRTT_FAILED,
+    CALL_ERR_VOLTE_NOT_SUPPORT,
+    CALL_ERR_VOLTE_PROVISIONING_DISABLED,
     // call audio error
     CALL_ERR_BLUETOOTH_CONNECTION_FAILED,
     CALL_ERR_SETTING_AUDIO_DEVICE_FAILED,
@@ -101,6 +105,10 @@ enum CallManagerErrorCode {
     CALL_ERR_VIDEO_NOT_SUPPORTED,
 };
 
+enum CellularDataErrorCode {
+    CELLULAR_DATA_INVALID_PARAM = CELLULAR_DATA_ERR_OFFSET,
+};
+
 // 3GPP TS 24.008 V3.9.0 (2001-09)  10.5.4.11 Cause
 enum PROTOCOL_ERROR_TYPE {
     CALL_ERR_PARAMETER_OUT_OF_RANGE = PROTOCOL_ERR_OFFSET, // (e.g. parameter out of range)
@@ -109,6 +117,12 @@ enum PROTOCOL_ERROR_TYPE {
     CALL_ERR_RESOURCE_UNAVAILABLE, // Resources unavailable, unspecified
     CALL_ERR_OPTION_NOT_AVAILABLE, // service or option not available
     CALL_ERR_OPTION_NOT_IMPLEMENTED, // service or option not implemented
+};
+
+enum SmsMmsErrorCode {
+    SMS_MMS_DECODE_DATA_EMPTY = SMS_MMS_ERR_OFFSET,
+    SMS_MMS_UNKNOWN_SIM_MESSAGE_STATUS,
+    SMS_MMS_MESSAGE_LENGTH_OUT_OF_RANGE,
 };
 } // namespace Telephony
 } // namespace OHOS

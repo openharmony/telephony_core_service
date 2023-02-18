@@ -21,6 +21,8 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t INVALID_VALUE = -1;
+
 CoreServiceStub::CoreServiceStub()
 {
     AddHandlerNetWorkToMap();
@@ -70,7 +72,6 @@ void CoreServiceStub::AddHandlerSimToMap()
     memberFuncMap_[uint32_t(InterfaceID::GET_SIM_GID1)] = &CoreServiceStub::OnGetSimGid1;
     memberFuncMap_[uint32_t(InterfaceID::GET_SIM_GID2)] = &CoreServiceStub::OnGetSimGid2;
     memberFuncMap_[uint32_t(InterfaceID::GET_SIM_EONS)] = &CoreServiceStub::OnGetSimEons;
-
     memberFuncMap_[uint32_t(InterfaceID::GET_SIM_SUB_INFO)] = &CoreServiceStub::OnGetSimSubscriptionInfo;
     memberFuncMap_[uint32_t(InterfaceID::SET_DEFAULT_VOICE_SLOTID)] = &CoreServiceStub::OnSetDefaultVoiceSlotId;
     memberFuncMap_[uint32_t(InterfaceID::GET_DEFAULT_VOICE_SLOTID)] = &CoreServiceStub::OnGetDefaultVoiceSlotId;
@@ -149,17 +150,25 @@ int32_t CoreServiceStub::OnRemoteRequest(
 int32_t CoreServiceStub::OnGetPsRadioTech(MessageParcel &data, MessageParcel &reply)
 {
     auto slotId = data.ReadInt32();
-    int32_t result = GetPsRadioTech(slotId);
+    int32_t radioTech = 0;
+    int32_t result = GetPsRadioTech(slotId, radioTech);
     reply.WriteInt32(result);
-    return NO_ERROR;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteInt32(radioTech);
+    }
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetCsRadioTech(MessageParcel &data, MessageParcel &reply)
 {
     auto slotId = data.ReadInt32();
-    int32_t result = GetCsRadioTech(slotId);
+    int32_t radioTech = 0;
+    int32_t result = GetCsRadioTech(slotId, radioTech);
     reply.WriteInt32(result);
-    return NO_ERROR;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteInt32(radioTech);
+    }
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetOperatorNumeric(MessageParcel &data, MessageParcel &reply)
@@ -173,30 +182,41 @@ int32_t CoreServiceStub::OnGetOperatorNumeric(MessageParcel &data, MessageParcel
 int32_t CoreServiceStub::OnGetOperatorName(MessageParcel &data, MessageParcel &reply)
 {
     auto slotId = data.ReadInt32();
-    std::u16string result = GetOperatorName(slotId);
-    reply.WriteString16(result);
-    return NO_ERROR;
+    std::u16string operatorName = u"";
+    int32_t result = GetOperatorName(slotId, operatorName);
+    reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteString16(operatorName);
+    }
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetSignalInfoList(MessageParcel &data, MessageParcel &reply)
 {
     auto slotId = data.ReadInt32();
-    auto result = GetSignalInfoList(slotId);
-    reply.WriteInt32(static_cast<int32_t>(result.size()));
-    for (const auto &v : result) {
+    std::vector<sptr<SignalInformation>> signals;
+    int32_t result = GetSignalInfoList(slotId, signals);
+    reply.WriteInt32(result);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    reply.WriteInt32(static_cast<int32_t>(signals.size()));
+    for (const auto &v : signals) {
         v->Marshalling(reply);
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetNetworkState(MessageParcel &data, MessageParcel &reply)
 {
     auto slotId = data.ReadInt32();
-    sptr<NetworkState> result = GetNetworkState(slotId);
-    if (result != nullptr) {
-        result->Marshalling(reply);
+    sptr<NetworkState> networkState = nullptr;
+    int32_t result = GetNetworkState(slotId, networkState);
+    reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        networkState->Marshalling(reply);
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnSetRadioState(MessageParcel &data, MessageParcel &reply)
@@ -204,21 +224,23 @@ int32_t CoreServiceStub::OnSetRadioState(MessageParcel &data, MessageParcel &rep
     int32_t slotId = data.ReadInt32();
     sptr<INetworkSearchCallback> callback = nullptr;
     sptr<IRemoteObject> remoteCallback = data.ReadRemoteObject();
-    if (remoteCallback != nullptr) {
-        callback = iface_cast<INetworkSearchCallback>(remoteCallback);
+    if (remoteCallback == nullptr) {
+        TELEPHONY_LOGE("CoreServiceStub::OnSetRadioState remoteCallback is nullptr.");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    callback = iface_cast<INetworkSearchCallback>(remoteCallback);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("CoreServiceStub::OnSetRadioState callback is nullptr.");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     bool isOn = data.ReadBool();
-    bool result = false;
-    if (callback != nullptr) {
-        TELEPHONY_LOGI("CoreServiceStub::OnSetRadioState isOn:%{public}d", isOn);
-        result = SetRadioState(slotId, isOn, callback);
-    }
-    bool ret = reply.WriteBool(result);
-    if (!ret) {
+    TELEPHONY_LOGI("CoreServiceStub::OnSetRadioState isOn:%{public}d", isOn);
+    int32_t result = SetRadioState(slotId, isOn, callback);
+    if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("CoreServiceStub::OnSetRadioState write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetRadioState(MessageParcel &data, MessageParcel &reply)
@@ -226,68 +248,94 @@ int32_t CoreServiceStub::OnGetRadioState(MessageParcel &data, MessageParcel &rep
     int32_t slotId = data.ReadInt32();
     sptr<INetworkSearchCallback> callback = nullptr;
     sptr<IRemoteObject> remoteCallback = data.ReadRemoteObject();
-    if (remoteCallback != nullptr) {
-        callback = iface_cast<INetworkSearchCallback>(remoteCallback);
+    if (remoteCallback == nullptr) {
+        TELEPHONY_LOGE("CoreServiceStub::OnGetRadioState remoteCallback is nullptr.");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool result = false;
-    if (callback != nullptr) {
-        result = GetRadioState(slotId, callback);
+    callback = iface_cast<INetworkSearchCallback>(remoteCallback);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("CoreServiceStub::OnGetRadioState callback is nullptr.");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool ret = reply.WriteBool(result);
-    if (!ret) {
+    int32_t result = GetRadioState(slotId, callback);
+    if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("CoreServiceStub::OnGetRadioState write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    TELEPHONY_LOGI("CoreServiceStub::OnGetRadioState  result:%{public}d", result);
-    return NO_ERROR;
+    TELEPHONY_LOGI("CoreServiceStub::OnGetRadioState result:%{public}d", result);
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetIsoCountryCodeForNetwork(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string result = GetIsoCountryCodeForNetwork(slotId);
-    bool ret = reply.WriteString16(result);
-    if (!ret) {
+    std::u16string countryCode;
+    int32_t result = GetIsoCountryCodeForNetwork(slotId, countryCode);
+    if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("OnRemoteRequest::GET_ISO_COUNTRY_CODE write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    return NO_ERROR;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteString16(countryCode);
+    }
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetImei(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string result = GetImei(slotId);
-    bool ret = reply.WriteString16(result);
-    if (!ret) {
-        TELEPHONY_LOGE("OnRemoteRequest::GET_IMEI write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+    std::u16string imei = u"";
+    int32_t result = GetImei(slotId, imei);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetImei write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteString16(imei)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetImei write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetMeid(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string result = GetMeid(slotId);
-    bool ret = reply.WriteString16(result);
-    if (!ret) {
-        TELEPHONY_LOGE("OnRemoteRequest::GET_MEID write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+    std::u16string meid = u"";
+    int32_t result = GetMeid(slotId, meid);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetMeid write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteString16(meid)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetMeid write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetUniqueDeviceId(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string result = GetUniqueDeviceId(slotId);
-    bool ret = reply.WriteString16(result);
-    if (!ret) {
-        TELEPHONY_LOGE("OnRemoteRequest::GET_UNIQUE_DEVICE_ID write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+    std::u16string deviceId = u"";
+    int32_t result = GetUniqueDeviceId(slotId, deviceId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetUniqueDeviceId write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteString16(deviceId)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetUniqueDeviceId write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
 }
 
 int32_t CoreServiceStub::OnIsNrSupported(MessageParcel &data, MessageParcel &reply)
@@ -305,110 +353,149 @@ int32_t CoreServiceStub::OnIsNrSupported(MessageParcel &data, MessageParcel &rep
 int32_t CoreServiceStub::OnGetNrOptionMode(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    NrMode nrMode = GetNrOptionMode(slotId);
-    bool ret = reply.WriteInt32(static_cast<int32_t>(nrMode));
-    if (!ret) {
-        TELEPHONY_LOGE("OnRemoteRequest::GET_NR_OPTION_MODE write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+    NrMode nrMode = NrMode::NR_MODE_UNKNOWN;
+    int32_t result = GetNrOptionMode(slotId, nrMode);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetNrOptionMode write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteInt32(static_cast<int32_t>(nrMode))) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetNrOptionMode write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
 }
 
 int32_t CoreServiceStub::OnHasSimCard(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    bool result = HasSimCard(slotId);
-    TELEPHONY_LOGI("OnRemoteRequest::OnHasSimCard result is %{public}s", result ? "true" : "false");
-    bool ret = reply.WriteBool(result);
+    bool hasSimCard = false;
+    int32_t result = HasSimCard(slotId, hasSimCard);
+    TELEPHONY_LOGI("OnRemoteRequest::OnHasSimCard result is %{public}s", hasSimCard ? "true" : "false");
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteBool(hasSimCard));
+    }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::OnHasSimCard write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetSimState(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    int32_t result = GetSimState(slotId);
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    int32_t result = GetSimState(slotId, simState);
     bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(simState)));
+    }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::GET_SIM_STATE write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetCardType(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    int32_t result = GetCardType(slotId);
+    CardType cardType = CardType::UNKNOWN_CARD;
+    int32_t result = GetCardType(slotId, cardType);
     bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(cardType)));
+    }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::GET_CARD_TYPE write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetISOCountryCodeForSim(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string result = GetISOCountryCodeForSim(slotId);
-    bool ret = reply.WriteString16(result);
+    std::u16string countryCode;
+    int32_t result = GetISOCountryCodeForSim(slotId, countryCode);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(countryCode));
+    }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::GET_ISO_COUNTRY_CODE write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetSimSpn(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string result = GetSimSpn(slotId);
-    bool ret = reply.WriteString16(result);
+    std::u16string spn;
+    int32_t result = GetSimSpn(slotId, spn);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(spn));
+    }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::GET_SPN write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetSimIccId(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string result = GetSimIccId(slotId);
-    bool ret = reply.WriteString16(result);
+    std::u16string iccId;
+    int32_t result = GetSimIccId(slotId, iccId);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(iccId));
+    }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::GET_ICCID write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetSimOperatorNumeric(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string result = GetSimOperatorNumeric(slotId);
-    bool ret = reply.WriteString16(result);
+    std::u16string operatorNumeric;
+    int32_t result = GetSimOperatorNumeric(slotId, operatorNumeric);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(operatorNumeric));
+    }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::GET_SIM_OPERATOR_NUMERIC write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetIMSI(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string result = GetIMSI(slotId);
-    bool ret = reply.WriteString16(result);
+    std::u16string imsi;
+    int32_t result = GetIMSI(slotId, imsi);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(imsi));
+    }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::GET_IMSI write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnIsSimActive(MessageParcel &data, MessageParcel &reply)
@@ -458,18 +545,16 @@ int32_t CoreServiceStub::OnGetNetworkSearchInformation(MessageParcel &data, Mess
     if (remoteCallback != nullptr) {
         callback = iface_cast<INetworkSearchCallback>(remoteCallback);
     }
-    bool result = false;
-    if (callback != nullptr) {
-        result = GetNetworkSearchInformation(slotId, callback);
-    } else {
+    if (callback == nullptr) {
         TELEPHONY_LOGE("CoreServiceStub::OnGetNetworkSearchInformation callback is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool ret = reply.WriteBool(result);
-    if (!ret) {
-        TELEPHONY_LOGE("CoreServiceStub::OnGetNetworkSearchInformation write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+    int32_t result = GetNetworkSearchInformation(slotId, callback);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetNetworkSearchInformation write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetNetworkSelectionMode(MessageParcel &data, MessageParcel &reply)
@@ -480,18 +565,16 @@ int32_t CoreServiceStub::OnGetNetworkSelectionMode(MessageParcel &data, MessageP
     if (remoteCallback != nullptr) {
         callback = iface_cast<INetworkSearchCallback>(remoteCallback);
     }
-    bool result = false;
-    if (callback != nullptr) {
-        result = GetNetworkSelectionMode(slotId, callback);
-    } else {
+    if (callback == nullptr) {
         TELEPHONY_LOGE("CoreServiceStub::OnGetNetworkSelectionMode callback is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool ret = reply.WriteBool(result);
-    if (!ret) {
+    int32_t result = GetNetworkSelectionMode(slotId, callback);
+    if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("CoreServiceStub::OnGetNetworkSelectionMode write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnSetNetworkSelectionMode(MessageParcel &data, MessageParcel &reply)
@@ -508,18 +591,16 @@ int32_t CoreServiceStub::OnSetNetworkSelectionMode(MessageParcel &data, MessageP
         TELEPHONY_LOGE("CoreServiceStub::OnSetNetworkSelectionMode remoteCallback is null");
     }
     sptr<NetworkInformation> networkState = NetworkInformation::Unmarshalling(data);
-    bool result = false;
-    if (callback != nullptr) {
-        result = SetNetworkSelectionMode(slotId, selectMode, networkState, resumeSelection, callback);
-    } else {
+    if (callback == nullptr) {
         TELEPHONY_LOGE("CoreServiceStub::OnSetNetworkSelectionMode callback is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool ret = reply.WriteBool(result);
-    if (!ret) {
-        TELEPHONY_LOGE("OnSetNetworkSelectionMode write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+    int32_t result = SetNetworkSelectionMode(slotId, selectMode, networkState, resumeSelection, callback);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnSetNetworkSelectionMode write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetLocaleFromDefaultSim(MessageParcel &data, MessageParcel &reply)
@@ -536,13 +617,17 @@ int32_t CoreServiceStub::OnGetLocaleFromDefaultSim(MessageParcel &data, MessageP
 int32_t CoreServiceStub::OnGetSimGid1(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string result = GetSimGid1(slotId);
-    bool ret = reply.WriteString16(result);
+    std::u16string gid1;
+    int32_t result = GetSimGid1(slotId, gid1);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(gid1));
+    }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::GetSimGid1 write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetSimGid2(MessageParcel &data, MessageParcel &reply)
@@ -576,29 +661,29 @@ int32_t CoreServiceStub::OnGetSimSubscriptionInfo(MessageParcel &data, MessagePa
 {
     int32_t slotId = data.ReadInt32();
     IccAccountInfo iccAccountInfo;
-    bool result = GetSimAccountInfo(slotId, iccAccountInfo);
-    bool ret = reply.WriteBool(result);
+    int32_t result = GetSimAccountInfo(slotId, iccAccountInfo);
+    bool ret = reply.WriteInt32(result);
     if (!iccAccountInfo.Marshalling(reply)) {
         TELEPHONY_LOGE("OnGetSimSubscriptionInfo IccAccountInfo reply Marshalling is false");
-        return TRANSACTION_ERR;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     if (!ret) {
         TELEPHONY_LOGE("OnGetSimSubscriptionInfo write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnSetDefaultVoiceSlotId(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    bool result = SetDefaultVoiceSlotId(slotId);
-    bool ret = reply.WriteBool(result);
+    int32_t result = SetDefaultVoiceSlotId(slotId);
+    bool ret = reply.WriteInt32(result);
     if (!ret) {
         TELEPHONY_LOGE("OnSetDefaultVoiceSlotId write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetDefaultVoiceSlotId(MessageParcel &data, MessageParcel &reply)
@@ -615,136 +700,150 @@ int32_t CoreServiceStub::OnGetDefaultVoiceSlotId(MessageParcel &data, MessagePar
 int32_t CoreServiceStub::OnSetPrimarySlotId(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    bool result = SetPrimarySlotId(slotId);
-    bool ret = reply.WriteBool(result);
-    if (!ret) {
-        TELEPHONY_LOGE("OnSetPrimarySlotId write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+    int32_t result = SetPrimarySlotId(slotId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnSetPrimarySlotId write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetPrimarySlotId(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t result = GetPrimarySlotId();
-    bool ret = reply.WriteInt32(result);
-    if (!ret) {
+    int32_t slotId = INVALID_VALUE;
+    int32_t result = GetPrimarySlotId(slotId);
+    if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("OnGetPrimarySlotId write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    return NO_ERROR;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteInt32(slotId);
+    }
+    return result;
 }
 
 int32_t CoreServiceStub::OnUnlockPin(MessageParcel &data, MessageParcel &reply)
 {
-    LockStatusResponse response = { 0 };
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
     int32_t slotId = data.ReadInt32();
     std::u16string pin = data.ReadString16();
-    bool result = UnlockPin(slotId, pin, response);
-    bool ret = reply.WriteBool(result);
+    int32_t result = UnlockPin(slotId, pin, response);
+    bool ret = reply.WriteInt32(result);
     TELEPHONY_LOGI(
         "OnUnlockPin, response.result :%{public}d, response.remain :%{public}d", response.result, response.remain);
-    ret = (ret && reply.WriteInt32(response.result));
-    ret = (ret && reply.WriteInt32(response.remain));
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(response.result));
+        ret = (ret && reply.WriteInt32(response.remain));
+    }
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnUnlockPin write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnUnlockPuk(MessageParcel &data, MessageParcel &reply)
 {
-    LockStatusResponse response = { 0 };
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
     int32_t slotId = data.ReadInt32();
     std::u16string newPin = data.ReadString16();
     std::u16string puk = data.ReadString16();
-    bool result = UnlockPuk(slotId, newPin, puk, response);
-    bool ret = reply.WriteBool(result);
+    int32_t result = UnlockPuk(slotId, newPin, puk, response);
+    bool ret = reply.WriteInt32(result);
     TELEPHONY_LOGI(
         "OnUnlockPuk, response.result :%{public}d, response.remain :%{public}d", response.result, response.remain);
-    ret = (ret && reply.WriteInt32(response.result));
-    ret = (ret && reply.WriteInt32(response.remain));
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(response.result));
+        ret = (ret && reply.WriteInt32(response.remain));
+    }
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnUnlockPuk write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnAlterPin(MessageParcel &data, MessageParcel &reply)
 {
-    LockStatusResponse response = { 0 };
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
     int32_t slotId = data.ReadInt32();
     std::u16string newPin = data.ReadString16();
     std::u16string oldPin = data.ReadString16();
-    bool result = AlterPin(slotId, newPin, oldPin, response);
-    bool ret = reply.WriteBool(result);
+    int32_t result = AlterPin(slotId, newPin, oldPin, response);
+    bool ret = reply.WriteInt32(result);
     TELEPHONY_LOGI(
         "OnAlterPin, response.result :%{public}d, response.remain :%{public}d", response.result, response.remain);
-    ret = (ret && reply.WriteInt32(response.result));
-    ret = (ret && reply.WriteInt32(response.remain));
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(response.result));
+        ret = (ret && reply.WriteInt32(response.remain));
+    }
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnAlterPin write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnUnlockPin2(MessageParcel &data, MessageParcel &reply)
 {
-    LockStatusResponse response = { 0 };
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
     int32_t slotId = data.ReadInt32();
     std::u16string pin2 = data.ReadString16();
-    bool result = UnlockPin2(slotId, pin2, response);
-    bool ret = reply.WriteBool(result);
+    int32_t result = UnlockPin2(slotId, pin2, response);
+    bool ret = reply.WriteInt32(result);
     TELEPHONY_LOGI(
         "OnUnlockPin2, response.result :%{public}d, response.remain :%{public}d", response.result, response.remain);
-    ret = (ret && reply.WriteInt32(response.result));
-    ret = (ret && reply.WriteInt32(response.remain));
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(response.result));
+        ret = (ret && reply.WriteInt32(response.remain));
+    }
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnUnlockPin2 write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnUnlockPuk2(MessageParcel &data, MessageParcel &reply)
 {
-    LockStatusResponse response = { 0 };
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
     int32_t slotId = data.ReadInt32();
     std::u16string newPin2 = data.ReadString16();
     std::u16string puk2 = data.ReadString16();
-    bool result = UnlockPuk2(slotId, newPin2, puk2, response);
-    bool ret = reply.WriteBool(result);
+    int32_t result = UnlockPuk2(slotId, newPin2, puk2, response);
+    bool ret = reply.WriteInt32(result);
     TELEPHONY_LOGI(
         "OnUnlockPuk2, response.result :%{public}d, response.remain :%{public}d", response.result, response.remain);
-    ret = (ret && reply.WriteInt32(response.result));
-    ret = (ret && reply.WriteInt32(response.remain));
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(response.result));
+        ret = (ret && reply.WriteInt32(response.remain));
+    }
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnUnlockPuk2 write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnAlterPin2(MessageParcel &data, MessageParcel &reply)
 {
-    LockStatusResponse response = { 0 };
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
     int32_t slotId = data.ReadInt32();
     std::u16string newPin2 = data.ReadString16();
     std::u16string oldPin2 = data.ReadString16();
-    bool result = AlterPin2(slotId, newPin2, oldPin2, response);
-    bool ret = reply.WriteBool(result);
+    int32_t result = AlterPin2(slotId, newPin2, oldPin2, response);
+    bool ret = reply.WriteInt32(result);
     TELEPHONY_LOGI(
         "OnAlterPin2, response.result :%{public}d, response.remain :%{public}d", response.result, response.remain);
-    ret = (ret && reply.WriteInt32(response.result));
-    ret = (ret && reply.WriteInt32(response.remain));
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(response.result));
+        ret = (ret && reply.WriteInt32(response.remain));
+    }
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnAlterPin2 write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnSetLockState(MessageParcel &data, MessageParcel &reply)
@@ -754,36 +853,42 @@ int32_t CoreServiceStub::OnSetLockState(MessageParcel &data, MessageParcel &repl
     options.lockType = static_cast<LockType>(data.ReadInt32());
     options.lockState = static_cast<LockState>(data.ReadInt32());
     options.password = data.ReadString16();
-    LockStatusResponse response = { 0 };
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
     TELEPHONY_LOGI("CoreServiceStub::OnSetLockState(), lockType = %{public}d, lockState = %{public}d, "
                    "slotId = %{public}d",
         options.lockType, options.lockState, slotId);
-    bool result = SetLockState(slotId, options, response);
-    bool ret = reply.WriteBool(result);
+    int32_t result = SetLockState(slotId, options, response);
+    bool ret = reply.WriteInt32(result);
     TELEPHONY_LOGI(
         "OnSetLockState, response.result :%{public}d, response.remain :%{public}d", response.result, response.remain);
-    ret = (ret && reply.WriteInt32(response.result));
-    ret = (ret && reply.WriteInt32(response.remain));
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(response.result));
+        ret = (ret && reply.WriteInt32(response.remain));
+    }
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnSetLockState write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetLockState(MessageParcel &data, MessageParcel &reply)
 {
+    LockState lockState = LockState::LOCK_ERROR;
     LockType lockType;
     int32_t slotId = data.ReadInt32();
     lockType = static_cast<LockType>(data.ReadInt32());
     TELEPHONY_LOGI("CoreServiceStub::OnGetLockState(),lockType = %{public}d, slotId = %{public}d", lockType, slotId);
-    int32_t result = GetLockState(slotId, lockType);
+    int32_t result = GetLockState(slotId, lockType, lockState);
     bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(lockState)));
+    }
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnGetLockState write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnRefreshSimState(MessageParcel &data, MessageParcel &reply)
@@ -804,13 +909,13 @@ int32_t CoreServiceStub::OnSetActiveSim(MessageParcel &data, MessageParcel &repl
     int32_t slotId = data.ReadInt32();
     int32_t enable = data.ReadInt32();
     TELEPHONY_LOGI("CoreServiceStub::OnSetActiveSim(), slotId = %{public}d", slotId);
-    bool result = SetActiveSim(slotId, enable);
+    int32_t result = SetActiveSim(slotId, enable);
     bool ret = reply.WriteInt32(result);
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnSetActiveSim write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetPreferredNetwork(MessageParcel &data, MessageParcel &reply)
@@ -822,56 +927,58 @@ int32_t CoreServiceStub::OnGetPreferredNetwork(MessageParcel &data, MessageParce
         TELEPHONY_LOGI("CoreServiceStub::OnGetPreferredNetwork remote callback is not null.");
         callback = iface_cast<INetworkSearchCallback>(remoteCallback);
     }
-    bool result = false;
-    if (callback != nullptr) {
-        result = GetPreferredNetwork(slotId, callback);
-    } else {
+    if (callback == nullptr) {
         TELEPHONY_LOGE("CoreServiceStub::OnGetPreferredNetwork callback is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool ret = reply.WriteBool(result);
-    if (!ret) {
-        TELEPHONY_LOGE("CoreServiceStub::OnGetPreferredNetwork write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+    int32_t result = GetPreferredNetwork(slotId, callback);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetPreferredNetwork write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnSetShowNumber(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
     std::u16string number = data.ReadString16();
-    bool result = SetShowNumber(slotId, number);
-    bool ret = reply.WriteBool(result);
+    int32_t result = SetShowNumber(slotId, number);
+    bool ret = reply.WriteInt32(result);
     if (!ret) {
         TELEPHONY_LOGE("OnSetShowNumber write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetShowNumber(OHOS::MessageParcel &data, OHOS::MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string result = GetShowNumber(slotId);
-    bool ret = reply.WriteString16(result);
+    std::u16string showNumber;
+    int32_t result = GetShowNumber(slotId, showNumber);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(showNumber));
+    }
     if (!ret) {
         TELEPHONY_LOGE("OnGetShowNumber write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnSetShowName(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
     std::u16string name = data.ReadString16();
-    bool result = SetShowName(slotId, name);
-    bool ret = reply.WriteBool(result);
+    int32_t result = SetShowName(slotId, name);
+    bool ret = reply.WriteInt32(result);
     if (!ret) {
         TELEPHONY_LOGE("OnSetShowName write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnSetPreferredNetwork(MessageParcel &data, MessageParcel &reply)
@@ -886,42 +993,44 @@ int32_t CoreServiceStub::OnSetPreferredNetwork(MessageParcel &data, MessageParce
     } else {
         TELEPHONY_LOGE("CoreServiceStub::OnSetPreferredNetwork remoteCallback is null");
     }
-    bool result = false;
-    if (callback != nullptr) {
-        result = SetPreferredNetwork(slotId, networkMode, callback);
-    } else {
+    if (callback == nullptr) {
         TELEPHONY_LOGE("CoreServiceStub::OnSetPreferredNetwork callback is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool ret = reply.WriteBool(result);
-    if (!ret) {
-        TELEPHONY_LOGE("CoreServiceStub::OnSetPreferredNetwork write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+    int32_t result = SetPreferredNetwork(slotId, networkMode, callback);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnSetPreferredNetwork write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetShowName(OHOS::MessageParcel &data, OHOS::MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string result = GetShowName(slotId);
-    bool ret = reply.WriteString16(result);
+    std::u16string showName;
+    int32_t result = GetShowName(slotId, showName);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(showName));
+    }
     if (!ret) {
         TELEPHONY_LOGE("OnGetShowName write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetActiveSimAccountInfoList(MessageParcel &data, MessageParcel &reply)
 {
     std::vector<IccAccountInfo> iccAccountInfoList;
-    bool result = GetActiveSimAccountInfoList(iccAccountInfoList);
+    int32_t result = GetActiveSimAccountInfoList(iccAccountInfoList);
     int32_t size = static_cast<int32_t>(iccAccountInfoList.size());
-    bool ret = reply.WriteBool(result);
+    bool ret = reply.WriteInt32(result);
     ret = (ret && reply.WriteInt32(size));
     if (!ret) {
         TELEPHONY_LOGE("OnGetActiveSimAccountInfoList write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     std::vector<IccAccountInfo>::iterator it = iccAccountInfoList.begin();
     while (it != iccAccountInfoList.end()) {
@@ -929,40 +1038,46 @@ int32_t CoreServiceStub::OnGetActiveSimAccountInfoList(MessageParcel &data, Mess
             Str16ToStr8((*it).showName).c_str());
         if (!(*it).Marshalling(reply)) {
             TELEPHONY_LOGE("OnGetActiveSimAccountInfoList IccAccountInfo reply Marshalling is false");
-            return ERR_FLATTEN_OBJECT;
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
         }
         ++it;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetOperatorConfig(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
     OperatorConfig operatorConfig;
-    bool result = GetOperatorConfigs(slotId, operatorConfig);
-    bool ret = reply.WriteBool(result);
+    int32_t result = GetOperatorConfigs(slotId, operatorConfig);
+    bool ret = reply.WriteInt32(result);
     if (!ret) {
         TELEPHONY_LOGE("OnGetOperatorConfig write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    if (!operatorConfig.Marshalling(reply)) {
-        TELEPHONY_LOGE("OnGetOperatorConfig operatorConfig reply Marshalling is false");
-        return ERR_FLATTEN_OBJECT;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        if (!operatorConfig.Marshalling(reply)) {
+            TELEPHONY_LOGE("OnGetOperatorConfig operatorConfig reply Marshalling is false");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetSimPhoneNumber(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string result = GetSimTelephoneNumber(slotId);
-    bool ret = reply.WriteString16(result);
+    std::u16string telephoneNumber;
+    int32_t result = GetSimTelephoneNumber(slotId, telephoneNumber);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(telephoneNumber));
+    }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::OnGetSimPhoneNumber write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetSimTeleNumberIdentifier(MessageParcel &data, MessageParcel &reply)
@@ -980,41 +1095,54 @@ int32_t CoreServiceStub::OnGetSimTeleNumberIdentifier(MessageParcel &data, Messa
 int32_t CoreServiceStub::OnGetVoiceMailInfor(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string result = GetVoiceMailIdentifier(slotId);
-    bool ret = reply.WriteString16(result);
+    std::u16string voiceMailIdentifier;
+    int32_t result = GetVoiceMailIdentifier(slotId, voiceMailIdentifier);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(voiceMailIdentifier));
+    }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::OnGetVoiceMailInfor write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetVoiceMailNumber(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string result = GetVoiceMailNumber(slotId);
-    bool ret = reply.WriteString16(result);
+    std::u16string voiceMailNumber;
+    int32_t result = GetVoiceMailNumber(slotId, voiceMailNumber);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(voiceMailNumber));
+    }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::OnGetVoiceMailNumber write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnDiallingNumbersGet(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
     int32_t type = data.ReadInt32();
-    auto result = QueryIccDiallingNumbers(slotId, type);
-    bool ret = reply.WriteInt32(static_cast<int32_t>(result.size()));
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers;
+    int32_t result = QueryIccDiallingNumbers(slotId, type, diallingNumbers);
+    bool ret = reply.WriteInt32(result);
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::OnDiallingNumbersGet write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    for (const auto &v : result) {
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    reply.WriteInt32(static_cast<int32_t>(diallingNumbers.size()));
+    for (const auto &v : diallingNumbers) {
         v->Marshalling(reply);
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnAddIccDiallingNumbers(MessageParcel &data, MessageParcel &reply)
@@ -1022,19 +1150,17 @@ int32_t CoreServiceStub::OnAddIccDiallingNumbers(MessageParcel &data, MessagePar
     int32_t slotId = data.ReadInt32();
     int32_t type = data.ReadInt32();
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = DiallingNumbersInfo::UnMarshalling(data);
-    bool result = false;
-    if (diallingNumber != nullptr) {
-        result = AddIccDiallingNumbers(slotId, type, diallingNumber);
-    } else {
-        TELEPHONY_LOGE("CoreServiceStub::OnAddIccDiallingNumbers callback is null");
+    if (diallingNumber == nullptr) {
+        TELEPHONY_LOGE("CoreServiceStub::OnAddIccDiallingNumbers diallingNumber is null");
+        return TELEPHONY_ERR_READ_DATA_FAIL;
     }
-
-    bool ret = reply.WriteBool(result);
+    int32_t result = AddIccDiallingNumbers(slotId, type, diallingNumber);
+    bool ret = reply.WriteInt32(result);
     if (!ret) {
         TELEPHONY_LOGE("OnAddIccDiallingNumbers write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnUpdateIccDiallingNumbers(MessageParcel &data, MessageParcel &reply)
@@ -1042,19 +1168,17 @@ int32_t CoreServiceStub::OnUpdateIccDiallingNumbers(MessageParcel &data, Message
     int32_t slotId = data.ReadInt32();
     int32_t type = data.ReadInt32();
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = DiallingNumbersInfo::UnMarshalling(data);
-    bool result = false;
-    if (diallingNumber != nullptr) {
-        result = UpdateIccDiallingNumbers(slotId, type, diallingNumber);
-    } else {
-        TELEPHONY_LOGE("CoreServiceStub::OnUpdateIccDiallingNumbers callback is null");
+    if (diallingNumber == nullptr) {
+        TELEPHONY_LOGE("CoreServiceStub::OnUpdateIccDiallingNumbers diallingNumber is null");
+        return TELEPHONY_ERR_READ_DATA_FAIL;
     }
-
-    bool ret = reply.WriteBool(result);
+    int32_t result = UpdateIccDiallingNumbers(slotId, type, diallingNumber);
+    bool ret = reply.WriteInt32(result);
     if (!ret) {
         TELEPHONY_LOGE("OnUpdateIccDiallingNumbers write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnDelIccDiallingNumbers(MessageParcel &data, MessageParcel &reply)
@@ -1062,18 +1186,17 @@ int32_t CoreServiceStub::OnDelIccDiallingNumbers(MessageParcel &data, MessagePar
     int32_t slotId = data.ReadInt32();
     int32_t type = data.ReadInt32();
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = DiallingNumbersInfo::UnMarshalling(data);
-    bool result = false;
-    if (diallingNumber != nullptr) {
-        result = DelIccDiallingNumbers(slotId, type, diallingNumber);
-    } else {
-        TELEPHONY_LOGE("CoreServiceStub::OnDelIccDiallingNumbers callback is null");
+    if (diallingNumber == nullptr) {
+        TELEPHONY_LOGE("CoreServiceStub::OnDelIccDiallingNumbers diallingNumber is null");
+        return TELEPHONY_ERR_READ_DATA_FAIL;
     }
-    bool ret = reply.WriteBool(result);
+    int32_t result = DelIccDiallingNumbers(slotId, type, diallingNumber);
+    bool ret = reply.WriteInt32(result);
     if (!ret) {
         TELEPHONY_LOGE("OnDelIccDiallingNumbers write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnSetVoiceMailInfo(MessageParcel &data, MessageParcel &reply)
@@ -1081,14 +1204,14 @@ int32_t CoreServiceStub::OnSetVoiceMailInfo(MessageParcel &data, MessageParcel &
     int32_t slotId = data.ReadInt32();
     std::u16string name = data.ReadString16();
     std::u16string number = data.ReadString16();
-    bool result = SetVoiceMailInfo(slotId, name, number);
+    int32_t result = SetVoiceMailInfo(slotId, name, number);
 
-    bool ret = reply.WriteBool(result);
+    bool ret = reply.WriteInt32(result);
     if (!ret) {
         TELEPHONY_LOGE("OnSetVoiceMailInfo write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetMaxSimCount(MessageParcel &data, MessageParcel &reply)
@@ -1166,28 +1289,28 @@ int32_t CoreServiceStub::OnSendEnvelopeCmd(MessageParcel &data, MessageParcel &r
 {
     int32_t slotId = data.ReadInt32();
     std::string cmd = data.ReadString();
-    bool result = SendEnvelopeCmd(slotId, cmd);
+    int32_t result = SendEnvelopeCmd(slotId, cmd);
     TELEPHONY_LOGI("OnRemoteRequest::OnSendEnvelopeCmd result is %{public}s", result ? "true" : "false");
-    bool ret = reply.WriteBool(result);
+    bool ret = reply.WriteInt32(result);
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::OnSendEnvelopeCmd write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnSendTerminalResponseCmd(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
     std::string cmd = data.ReadString();
-    bool result = SendTerminalResponseCmd(slotId, cmd);
+    int32_t result = SendTerminalResponseCmd(slotId, cmd);
     TELEPHONY_LOGI("OnRemoteRequest::OnSendTerminalResponseCmd result is %{public}s", result ? "true" : "false");
-    bool ret = reply.WriteBool(result);
+    bool ret = reply.WriteInt32(result);
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::OnSendTerminalResponseCmd write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnSendCallSetupRequestResult(MessageParcel &data, MessageParcel &reply)
@@ -1210,18 +1333,20 @@ int32_t CoreServiceStub::OnUnlockSimLock(MessageParcel &data, MessageParcel &rep
     int32_t slotId = data.ReadInt32();
     lockInfo.lockType = static_cast<PersoLockType>(data.ReadInt32());
     lockInfo.password = data.ReadString16();
-    LockStatusResponse response = { 0 };
+    LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
 
     TELEPHONY_LOGI("CoreServiceStub::OnUnlockSimLock(), lockType = %{public}d", lockInfo.lockType);
-    bool result = UnlockSimLock(slotId, lockInfo, response);
-    bool ret = reply.WriteBool(result);
-    ret = (ret && reply.WriteInt32(response.result));
-    ret = (ret && reply.WriteInt32(response.remain));
+    int32_t result = UnlockSimLock(slotId, lockInfo, response);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(response.result));
+        ret = (ret && reply.WriteInt32(response.remain));
+    }
     if (!ret) {
         TELEPHONY_LOGE("CoreServiceStub::OnUnlockSimLock write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnGetImsRegStatus(MessageParcel &data, MessageParcel &reply)
@@ -1243,10 +1368,18 @@ int32_t CoreServiceStub::OnGetImsRegStatus(MessageParcel &data, MessageParcel &r
 int32_t CoreServiceStub::OnGetCellInfoList(MessageParcel &data, MessageParcel &reply)
 {
     auto slotId = data.ReadInt32();
-    auto result = GetCellInfoList(slotId);
-    reply.WriteInt32(static_cast<int32_t>(result.size()));
-    TELEPHONY_LOGI("OnRemoteRequest OnGetCellInfoList cell size %{public}zu", result.size());
-    for (const auto &v : result) {
+    std::vector<sptr<CellInformation>> cellInfo;
+    int32_t result = GetCellInfoList(slotId, cellInfo);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetCellInfoList write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    reply.WriteInt32(static_cast<int32_t>(cellInfo.size()));
+    TELEPHONY_LOGI("OnRemoteRequest OnGetCellInfoList cell size %{public}zu", cellInfo.size());
+    for (const auto &v : cellInfo) {
         v->Marshalling(reply);
     }
     return NO_ERROR;
@@ -1255,25 +1388,28 @@ int32_t CoreServiceStub::OnGetCellInfoList(MessageParcel &data, MessageParcel &r
 int32_t CoreServiceStub::OnGetCellLocation(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    bool result = SendUpdateCellLocationRequest(slotId);
-    bool ret = reply.WriteBool(result);
-    if (!ret) {
-        TELEPHONY_LOGE("OnGetCellLocation write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+    int32_t result = SendUpdateCellLocationRequest(slotId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetCellLocation write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnHasOperatorPrivileges(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    bool result = HasOperatorPrivileges(slotId);
-    bool ret = reply.WriteBool(result);
+    bool hasOperatorPrivileges = false;
+    int32_t result = HasOperatorPrivileges(slotId, hasOperatorPrivileges);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteBool(hasOperatorPrivileges));
+    }
     if (!ret) {
         TELEPHONY_LOGE("OnHasOperatorPrivileges write reply failed.");
-        return ERR_FLATTEN_OBJECT;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return NO_ERROR;
+    return result;
 }
 
 int32_t CoreServiceStub::OnSimAuthentication(MessageParcel &data, MessageParcel &reply)
