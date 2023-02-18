@@ -162,36 +162,35 @@ std::optional<NapiError> MatchParameters(
         typeSize--;
     }
     std::vector<napi_valuetype> typeStd(typeSize, napi_undefined);
+
+    if (argc != typeStd.size()) {
+        return std::optional<NapiError>(ERROR_PARAMETER_COUNTS_INVALID);
+    }
+    bool typeMatched = true;
     std::apply(
-        [argc, &argv, &typeStd](Ts &...tupleArgs) {
-            size_t index {0};
+        [argc, &argv, &typeStd](Ts &... tupleArgs) {
+            size_t index { 0 };
             ((index < argc ? (typeStd[index++] = GetInputArgvType(tupleArgs)) : true), ...);
         },
         theTuple);
-
-    if (argc == typeStd.size()) {
-        bool typeMatched = true;
-        for (size_t i = 0; i < argc; i++) {
-            napi_valuetype valueType = napi_undefined;
-            napi_typeof(env, argv[i], &valueType);
-            if (valueType != typeStd[i]) {
-                typeMatched = false;
-                break;
-            }
+    for (size_t i = 0; i < argc; i++) {
+        napi_valuetype valueType = napi_undefined;
+        napi_typeof(env, argv[i], &valueType);
+        if (valueType != typeStd[i]) {
+            typeMatched = false;
+            break;
         }
-
-        if (typeMatched) {
-            std::apply(
-                [env, argc, &argv](Ts &...tupleArgs) {
-                    size_t index {0};
-                    ((index < argc ? NapiValueConverted(env, argv[index++], tupleArgs) : napi_ok), ...);
-                },
-                theTuple);
-            return std::nullopt;
-        }
-        return std::optional<NapiError>(ERROR_PARAMETER_TYPE_INVALID);
     }
-    return std::optional<NapiError>(ERROR_PARAMETER_COUNTS_INVALID);
+    if (typeMatched) {
+        std::apply(
+            [env, argc, &argv](Ts &... tupleArgs) {
+                size_t index { 0 };
+                ((index < argc ? NapiValueConverted(env, argv[index++], tupleArgs) : napi_ok), ...);
+            },
+            theTuple);
+        return std::nullopt;
+    }
+    return std::optional<NapiError>(ERROR_PARAMETER_TYPE_INVALID);
 }
 } // namespace Telephony
 } // namespace OHOS

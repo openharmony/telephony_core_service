@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "test.h"
+
 #include <list>
 #include <securec.h>
 #include <sys/time.h>
@@ -34,6 +36,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace OHOS::EventFwk;
 sptr<ICoreService> g_telephonyService = nullptr;
+const int32_t INVALID_VALUE = -1;
 const int32_t INPUT_GET_PS_RADIO_TECH = 0;
 const int32_t INPUT_GET_CS_RADIO_TECH = 1;
 const int32_t INPUT_GET_OPERATOR_NUMERIC = 2;
@@ -76,8 +79,7 @@ std::list<ImsRegStateCallback> imsRegStateCallbackList_;
 sptr<ICoreService> GetProxy()
 {
     TELEPHONY_LOGI("TelephonyTestService GetProxy ... ");
-    sptr<ISystemAbilityManager> systemAbilityMgr =
-        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityMgr == nullptr) {
         TELEPHONY_LOGE("TelephonyTestService Get ISystemAbilityManager failed ... ");
         return nullptr;
@@ -111,8 +113,10 @@ static int32_t InputSlotId()
 
 void TestGetNetworkState()
 {
+    AccessToken token;
     TELEPHONY_LOGI("TelephonyTestService Remote GetNetworkState");
-    sptr<NetworkState> result = g_telephonyService->GetNetworkState(InputSlotId());
+    sptr<NetworkState> result;
+    g_telephonyService->GetNetworkState(InputSlotId(), result);
     if (result == nullptr) {
         TELEPHONY_LOGE("result is null");
     } else {
@@ -131,14 +135,18 @@ void TestGetNetworkState()
 
 void TestGetPsRadioTech()
 {
-    int32_t result = g_telephonyService->GetPsRadioTech(InputSlotId());
-    TELEPHONY_LOGI("TelephonyTestService Remote GetPsRadioTech result:%{public}d", result);
+    AccessToken token;
+    int32_t radioTech = INVALID_VALUE;
+    g_telephonyService->GetPsRadioTech(InputSlotId(), radioTech);
+    TELEPHONY_LOGI("TelephonyTestService Remote GetPsRadioTech radioTech:%{public}d", radioTech);
 }
 
 void TestGetCsRadioTech()
 {
-    int32_t result = g_telephonyService->GetCsRadioTech(InputSlotId());
-    TELEPHONY_LOGI("TelephonyTestService Remote GetCsRadioTech result:%{public}d", result);
+    AccessToken token;
+    int32_t radioTech = INVALID_VALUE;
+    g_telephonyService->GetCsRadioTech(InputSlotId(), radioTech);
+    TELEPHONY_LOGI("TelephonyTestService Remote GetCsRadioTech radioTech:%{public}d", radioTech);
 }
 
 void TestGetOperatorNumeric()
@@ -150,8 +158,9 @@ void TestGetOperatorNumeric()
 
 void TestGetOperatorName()
 {
-    std::u16string result = g_telephonyService->GetOperatorName(InputSlotId());
-    std::string str = Str16ToStr8(result);
+    std::u16string operatorName = u"";
+    g_telephonyService->GetOperatorName(InputSlotId(), operatorName);
+    std::string str = Str16ToStr8(operatorName);
     TELEPHONY_LOGI("TelephonyTestService Remote GetOperatorName result:%{public}s", str.c_str());
 }
 
@@ -159,16 +168,14 @@ void TestGsmSignalInformation(const GsmSignalInformation &gsm)
 {
     TELEPHONY_LOGI("TelephonyTestService Remote GsmSignalInformation ToString:%{public}s", gsm.ToString().c_str());
     TELEPHONY_LOGI("TelephonyTestService Remote GsmSignalInformation GetRssi:%{public}d", gsm.GetRssi());
-    TELEPHONY_LOGI(
-        "TelephonyTestService Remote GsmSignalInformation GetSignalLevel:%{public}d", gsm.GetSignalLevel());
+    TELEPHONY_LOGI("TelephonyTestService Remote GsmSignalInformation GetSignalLevel:%{public}d", gsm.GetSignalLevel());
     TELEPHONY_LOGI("TelephonyTestService Remote GsmSignalInformation GetBitErrorRate:%{public}d", gsm.GetGsmBer());
     TELEPHONY_LOGI("TelephonyTestService Remote GsmSignalInformation GetNetworkType[GSM] \n");
 }
 
 void TestCdmaSignalInformation(const CdmaSignalInformation &cdma)
 {
-    TELEPHONY_LOGI(
-        "TelephonyTestService Remote CdmaSignalInformation ToString:%{public}s", cdma.ToString().c_str());
+    TELEPHONY_LOGI("TelephonyTestService Remote CdmaSignalInformation ToString:%{public}s", cdma.ToString().c_str());
     TELEPHONY_LOGI("TelephonyTestService Remote CdmaSignalInformation GetCdmaRssi:%{public}d", cdma.GetCdmaRssi());
     TELEPHONY_LOGI(
         "TelephonyTestService Remote CdmaSignalInformation GetSignalLevel:%{public}d", cdma.GetSignalLevel());
@@ -182,15 +189,13 @@ void TestLteSignalInformation(const LteSignalInformation &lte)
     TELEPHONY_LOGI("TelephonyTestService Remote LteSignalInformation GetLteRsrp:%{public}d", lte.GetRsrp());
     TELEPHONY_LOGI("TelephonyTestService Remote LteSignalInformation GetLteSnr:%{public}d", lte.GetSnr());
     TELEPHONY_LOGI("TelephonyTestService Remote LteSignalInformation GetLteRxlev:%{public}d", lte.GetRxlev());
-    TELEPHONY_LOGI(
-        "TelephonyTestService Remote LteSignalInformation GetSignalLevel:%{public}d", lte.GetSignalLevel());
+    TELEPHONY_LOGI("TelephonyTestService Remote LteSignalInformation GetSignalLevel:%{public}d", lte.GetSignalLevel());
     TELEPHONY_LOGI("TelephonyTestService Remote LteSignalInformation GetNetworkType[LTE] \n");
 }
 
 void TestWcdmaSignalInformation(const WcdmaSignalInformation &wcdma)
 {
-    TELEPHONY_LOGI(
-        "TelephonyTestService Remote WcdmaSignalInformation ToString:%{public}s", wcdma.ToString().c_str());
+    TELEPHONY_LOGI("TelephonyTestService Remote WcdmaSignalInformation ToString:%{public}s", wcdma.ToString().c_str());
     TELEPHONY_LOGI("TelephonyTestService Remote WcdmaSignalInformation GetwcdmaRscp:%{public}d", wcdma.GetRscp());
     TELEPHONY_LOGI("TelephonyTestService Remote WcdmaSignalInformation GetRxlev:%{public}d", wcdma.GetRxlev());
     TELEPHONY_LOGI("TelephonyTestService Remote WcdmaSignalInformation GetwcdmaEcio:%{public}d", wcdma.GetEcno());
@@ -205,8 +210,8 @@ void TestTdScdmaSignalInformation(const TdScdmaSignalInformation &tdScdma)
     TELEPHONY_LOGI(
         "TelephonyTestService Remote TdScdmaSignalInformation ToString:%{public}s", tdScdma.ToString().c_str());
     TELEPHONY_LOGI("TelephonyTestService Remote TdScdmaSignalInformation GetRssi:%{public}d", tdScdma.GetRscp());
-    TELEPHONY_LOGI("TelephonyTestService Remote TdScdmaSignalInformation GetSignalLevel:%{public}d",
-        tdScdma.GetSignalLevel());
+    TELEPHONY_LOGI(
+        "TelephonyTestService Remote TdScdmaSignalInformation GetSignalLevel:%{public}d", tdScdma.GetSignalLevel());
     TELEPHONY_LOGI("TelephonyTestService Remote TdScdmaSignalInformation GetNetworkType[TDSCDMA] \n");
 }
 
@@ -216,16 +221,16 @@ void TestNrSignalInformation(const NrSignalInformation &nr)
     TELEPHONY_LOGI("TelephonyTestService Remote NrSignalInformation NrRsrp:%{public}d", nr.GetRsrp());
     TELEPHONY_LOGI("TelephonyTestService Remote NrSignalInformation NrRsrq:%{public}d", nr.GetRsrq());
     TELEPHONY_LOGI("TelephonyTestService Remote NrSignalInformation NrSinr:%{public}d", nr.GetSinr());
-    TELEPHONY_LOGI(
-        "TelephonyTestService Remote NrSignalInformation GetSignalLevel:%{public}d", nr.GetSignalLevel());
+    TELEPHONY_LOGI("TelephonyTestService Remote NrSignalInformation GetSignalLevel:%{public}d", nr.GetSignalLevel());
     TELEPHONY_LOGI("TelephonyTestService Remote NrSignalInformation GetNetworkType[NR] \n");
 }
 
 void TestGetSignalInfoList()
 {
-    auto result = g_telephonyService->GetSignalInfoList(InputSlotId());
+    std::vector<sptr<SignalInformation>> signals;
+    g_telephonyService->GetSignalInfoList(InputSlotId(), signals);
     SignalInformation::NetworkType type;
-    for (const auto &v : result) {
+    for (const auto &v : signals) {
         type = v->GetNetworkType();
         TELEPHONY_LOGI("TelephonyTestService Remote SignalInformation result NetworkTypeId:%{public}d",
             static_cast<int32_t>(type));
@@ -249,11 +254,12 @@ void TestGetSignalInfoList()
             TestNrSignalInformation(*nr);
         }
     }
-    TELEPHONY_LOGI("TelephonyTestService Remote TestGetSignalInfoList size:%{public}zu", result.size());
+    TELEPHONY_LOGI("TelephonyTestService Remote TestGetSignalInfoList size:%{public}zu", signals.size());
 }
 
 void TestSetRadioState()
 {
+    AccessToken token;
     std::cout << "please input radio state off(0) or on(1)" << std::endl;
     int32_t inputState = 0;
     std::cin >> inputState;
@@ -270,6 +276,7 @@ void TestSetRadioState()
 
 void TestGetRadioState()
 {
+    AccessToken token;
     OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
     int32_t result = g_telephonyService->GetRadioState(InputSlotId(), callback);
     TELEPHONY_LOGI("TelephonyTestService Remote GetRadioState result:%{public}d", result);
@@ -285,6 +292,7 @@ void TestNotifySpnChanged()
 
 void TestNotifyNetworkStateChange()
 {
+    AccessToken token;
     TestGetCsRadioTech();
     sleep(SLEEP_TIME);
     TestGetOperatorNumeric();
@@ -295,15 +303,17 @@ void TestNotifyNetworkStateChange()
 
 void TestGetNetworkSearchInformation()
 {
+    AccessToken token;
     if (g_telephonyService != nullptr) {
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-        bool result = g_telephonyService->GetNetworkSearchInformation(InputSlotId(), callback);
+        int32_t result = g_telephonyService->GetNetworkSearchInformation(InputSlotId(), callback);
         TELEPHONY_LOGI("TelephonyTestService::TestGetNetworkSearchInformation result:%{public}d", result);
     }
 }
 
 void TestGetNetworkSelectionMode()
 {
+    AccessToken token;
     if (g_telephonyService != nullptr) {
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
         bool result = g_telephonyService->GetNetworkSelectionMode(InputSlotId(), callback);
@@ -313,11 +323,13 @@ void TestGetNetworkSelectionMode()
 
 void TestSetNetworkSelectionMode()
 {
+    AccessToken token;
     if (g_telephonyService == nullptr) {
         TELEPHONY_LOGE("g_telephonyService is nullptr");
         return;
     }
-    sptr<NetworkState> networkState = g_telephonyService->GetNetworkState(InputSlotId());
+    sptr<NetworkState> networkState;
+    g_telephonyService->GetNetworkState(InputSlotId(), networkState);
     if (networkState == nullptr) {
         TELEPHONY_LOGE("networkState is nullptr");
         return;
@@ -338,7 +350,8 @@ void TestSetNetworkSelectionMode()
 void TestGetIsoCountryCodeForNetwork()
 {
     if (g_telephonyService != nullptr) {
-        std::u16string result = g_telephonyService->GetIsoCountryCodeForNetwork(InputSlotId());
+        std::u16string result;
+        g_telephonyService->GetIsoCountryCodeForNetwork(InputSlotId(), result);
         std::string str = Str16ToStr8(result);
         TELEPHONY_LOGI("TestGetIsoCountryCodeForNetwork result:%{public}s", str.c_str());
     }
@@ -346,21 +359,23 @@ void TestGetIsoCountryCodeForNetwork()
 
 void TestGetPreferredNetwork()
 {
+    AccessToken token;
     if (g_telephonyService != nullptr) {
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-        bool result = g_telephonyService->GetPreferredNetwork(InputSlotId(), callback);
+        int32_t result = g_telephonyService->GetPreferredNetwork(InputSlotId(), callback);
         TELEPHONY_LOGI("TelephonyTestService::TestGetPreferredNetwork result:%{public}d", result);
     }
 }
 
 void TestSetPreferredNetwork()
 {
+    AccessToken token;
     int32_t networkMode = 0;
     std::cout << "please input networkmode:" << std::endl;
     std::cin >> networkMode;
     if (g_telephonyService != nullptr) {
         OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-        bool result = g_telephonyService->SetPreferredNetwork(InputSlotId(), networkMode, callback);
+        int32_t result = g_telephonyService->SetPreferredNetwork(InputSlotId(), networkMode, callback);
         TELEPHONY_LOGI("TelephonyTestService::TestSetPreferredNetwork result:%{public}d", result);
     }
 }
@@ -375,10 +390,16 @@ void TestIsNrSupported()
 
 void TestGetNrOptionMode()
 {
-    if (g_telephonyService != nullptr) {
-        NrMode result = g_telephonyService->GetNrOptionMode(InputSlotId());
-        TELEPHONY_LOGI("TelephonyTestService::TestGetNrOptionMode result:%{public}d", result);
+    if (g_telephonyService == nullptr) {
+        std::cout << "TestGetNrOptionMode g_telephonyService is nullptr." << std::endl;
+        return;
     }
+    NrMode mode = NrMode::NR_MODE_UNKNOWN;
+    int32_t result = g_telephonyService->GetNrOptionMode(InputSlotId(), mode);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        std::cout << "error:" << result << std::endl;
+    }
+    std::cout << "mode:" << static_cast<int32_t>(mode) << std::endl;
 }
 
 void TestRegisterImsRegStateCallback()
@@ -478,6 +499,7 @@ void TestInitTimeAndTimeZone()
 
 void TestGetImsRegStatus()
 {
+    AccessToken token;
     if (g_telephonyService != nullptr) {
         int32_t slotId = 0;
         int32_t imsSrvType = 0;
@@ -498,41 +520,67 @@ void TestGetImsRegStatus()
 
 void TestGetImei()
 {
-    if (g_telephonyService != nullptr) {
-        std::u16string result = g_telephonyService->GetImei(InputSlotId());
-        std::string str = Str16ToStr8(result);
-        std::cout << " result:" << str << std::endl;
+    AccessToken token;
+    if (g_telephonyService == nullptr) {
+        std::cout << "TestGetImei g_telephonyService is nullptr." << std::endl;
+        return;
     }
+    std::u16string imei = u"";
+    int32_t result = g_telephonyService->GetMeid(InputSlotId(), imei);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        std::cout << "error:" << result << std::endl;
+    }
+    std::string str = Str16ToStr8(imei);
+    std::cout << "imei:" << str << std::endl;
 }
 
 void TestGetMeid()
 {
-    if (g_telephonyService != nullptr) {
-        std::u16string result = g_telephonyService->GetMeid(InputSlotId());
-        std::string str = Str16ToStr8(result);
-        std::cout << " result:" << str << std::endl;
+    AccessToken token;
+    if (g_telephonyService == nullptr) {
+        std::cout << "TestGetMeid g_telephonyService is nullptr." << std::endl;
+        return;
     }
+    std::u16string meid = u"";
+    int32_t result = g_telephonyService->GetMeid(InputSlotId(), meid);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        std::cout << "error:" << result << std::endl;
+    }
+    std::string str = Str16ToStr8(meid);
+    std::cout << "meid:" << str << std::endl;
 }
 
 void TestGetUniqueDeviceId()
 {
-    if (g_telephonyService != nullptr) {
-        std::u16string result = g_telephonyService->GetUniqueDeviceId(InputSlotId());
-        std::string str = Str16ToStr8(result);
-        std::cout << " result:" << str << std::endl;
+    AccessToken token;
+    if (g_telephonyService == nullptr) {
+        std::cout << "TestGetUniqueDeviceId g_telephonyService is nullptr." << std::endl;
+        return;
     }
+    std::u16string deviceId = u"";
+    int32_t result = g_telephonyService->GetUniqueDeviceId(InputSlotId(), deviceId);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        std::cout << "error:" << result << std::endl;
+    }
+    std::string str = Str16ToStr8(deviceId);
+    std::cout << "deviceId:" << str << std::endl;
 }
 
 void TestGetCellInfoList()
 {
+    AccessToken token;
     if (g_telephonyService != nullptr) {
         sptr<NetworkState> networkState = new (std::nothrow) NetworkState();
-        std::vector<sptr<CellInformation>> cellList = g_telephonyService->GetCellInfoList(InputSlotId());
+        std::vector<sptr<CellInformation>> cellList;
+        if (g_telephonyService->GetCellInfoList(InputSlotId(), cellList) != TELEPHONY_ERR_SUCCESS) {
+            TELEPHONY_LOGE("TestGetCellInfoList GetCellInfoList failed.");
+            return;
+        }
         CellInformation::CellType type;
         for (const auto &v : cellList) {
             type = v->GetNetworkType();
-            TELEPHONY_LOGI("TelephonyTestService Remote CellInfoList result NetworkTypeId:%{public}d",
-                static_cast<int32_t>(type));
+            TELEPHONY_LOGI(
+                "TelephonyTestService Remote CellInfoList result NetworkTypeId:%{public}d", static_cast<int32_t>(type));
             if (type == CellInformation::CellType::CELL_TYPE_GSM) {
                 GsmCellInformation *gsm = reinterpret_cast<GsmCellInformation *>(v.GetRefPtr());
                 TELEPHONY_LOGI("result:%{public}s", gsm->ToString().c_str());
@@ -558,8 +606,9 @@ void TestGetCellInfoList()
 
 void TestSendUpdateCellLocationRequest()
 {
+    AccessToken token;
     if (g_telephonyService != nullptr) {
-        bool result = g_telephonyService->SendUpdateCellLocationRequest(InputSlotId());
+        int32_t result = g_telephonyService->SendUpdateCellLocationRequest(InputSlotId());
         TELEPHONY_LOGI("TelephonyTestService::SendUpdateCellLocationRequest result:%{public}d", result);
     }
 }

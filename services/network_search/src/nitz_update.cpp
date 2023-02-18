@@ -139,7 +139,7 @@ bool NitzUpdate::NitzTimeParse(std::string &strTimeSubs, NetworkTime &networkTim
         strSep = "-";
         flag = -1;
     } else {
-        TELEPHONY_LOGE("NitzUpdate::NitzParse timezone string error %{public}s slotId:%{public}d",
+        TELEPHONY_LOGE("NitzUpdate::NitzTimeParse time string error %{public}s slotId:%{public}d",
             strTimeSubs.c_str(), slotId_);
         return false;
     }
@@ -147,7 +147,7 @@ bool NitzUpdate::NitzTimeParse(std::string &strTimeSubs, NetworkTime &networkTim
     std::vector<std::string> strsRet;
     SplitStr(strTimeSubs, strSep, strsRet);
     if (strsRet.size() != TIMEZONE_SPLIT_NUM) {
-        TELEPHONY_LOGE("NitzUpdate::NitzParse timezone error slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("NitzUpdate::NitzTimeParse time error slotId:%{public}d", slotId_);
         return false;
     }
     strTimeSubs = strsRet[0];
@@ -158,7 +158,7 @@ bool NitzUpdate::NitzTimeParse(std::string &strTimeSubs, NetworkTime &networkTim
     strsRet.clear();
     SplitStr(strTimeSubs, strSep, strsRet);
     if (strsRet.size() != TIME_SPLIT_NUM) {
-        TELEPHONY_LOGE("NitzUpdate::NitzParse timezone vector error slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("NitzUpdate::NitzTimeParse time vector error slotId:%{public}d", slotId_);
         return false;
     }
     StrToInt(strsRet[0], networkTime.hour);
@@ -209,7 +209,7 @@ bool NitzUpdate::IsValidTime(int64_t networkTime)
 {
     int64_t currentSystemTime = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
     if (currentSystemTime <= 0) {
-        TELEPHONY_LOGE("NitzUpdate::IsInvalidTime current system time is invalid");
+        TELEPHONY_LOGE("NitzUpdate::IsValidTime current system time is invalid");
         return false;
     }
     currentSystemTime = currentSystemTime / MILLI_TO_BASE;
@@ -224,7 +224,7 @@ bool NitzUpdate::IsValidTime(int64_t networkTime)
     int64_t systemElapsedTime = currentSystemTime - lastSystemTime_;
     if (abs(networkTimeInterval - systemElapsedTime) > TIME_THRESHOLD) {
         TELEPHONY_LOGE(
-            "NitzUpdate::IsInvalidTime The gap between the network time interval and the system elapsed time interval "
+            "NitzUpdate::IsValidTime The gap between the network time interval and the system elapsed time interval "
             "is large and will not be processed, slotId:%{public}d",
             slotId_);
         return false;
@@ -247,15 +247,17 @@ void NitzUpdate::ProcessTimeZone()
         TELEPHONY_LOGE("failed to get NetworkSearchManager slotId:%{public}d", slotId_);
         return;
     }
-    int32_t primarySlotId = CoreManagerInner::GetInstance().GetPrimarySlotId();
+    int32_t primarySlotId = INVALID_VALUE;
+    CoreManagerInner::GetInstance().GetPrimarySlotId(primarySlotId);
     if (primarySlotId == INVALID_VALUE) {
         TELEPHONY_LOGI("primarySlotId %{public}d is invalid slotId:%{public}d", primarySlotId, slotId_);
         return;
     }
-    std::u16string iso = nsm->GetIsoCountryCodeForNetwork(primarySlotId);
+    std::u16string iso;
+    nsm->GetIsoCountryCodeForNetwork(primarySlotId, iso);
     std::string countryCode = Str16ToStr8(iso);
     if (countryCode.empty()) {
-        TELEPHONY_LOGE("NitzUpdate::ProcessCountryCode countryCode is null slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("NitzUpdate::ProcessTimeZone countryCode is null slotId:%{public}d", slotId_);
         return;
     }
 
@@ -284,7 +286,7 @@ void NitzUpdate::SaveTimeZone(std::string &timeZone)
 
     timeZone_ = timeZone;
     bool result = OHOS::MiscServices::TimeServiceClient::GetInstance()->SetTimeZone(timeZone);
-    TELEPHONY_LOGI("NitzUpdate::ProcessTimeZone result:%{public}d timezone:%{public}s slotId:%{public}d",
+    TELEPHONY_LOGI("NitzUpdate::SaveTimeZone result:%{public}d timezone:%{public}s slotId:%{public}d",
         result, timeZone.c_str(), slotId_);
 
     std::string param = "time-zone";
@@ -304,7 +306,7 @@ void NitzUpdate::SaveTime(int64_t networkTime)
     }
 
     bool result = OHOS::MiscServices::TimeServiceClient::GetInstance()->SetTime(networkTime * MILLI_TO_BASE);
-    TELEPHONY_LOGI("NitzUpdate::ProcessTime result:%{public}d slotId:%{public}d", result, slotId_);
+    TELEPHONY_LOGI("NitzUpdate::SaveTime result:%{public}d slotId:%{public}d", result, slotId_);
     if (runningLock != nullptr) {
         runningLock->UnLock();
     }

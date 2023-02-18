@@ -15,6 +15,7 @@
 
 #include "network_search_handler.h"
 
+#include "core_service_errors.h"
 #include "ims_core_service_client.h"
 #include "network_search_manager.h"
 #include "telephony_log_wrapper.h"
@@ -249,9 +250,11 @@ void NetworkSearchHandler::SimRecordsLoaded(const AppExecFwk::InnerEvent::Pointe
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager != nullptr) {
-        RadioTech csRadioTech = static_cast<RadioTech>(networkSearchManager->GetCsRadioTech(slotId_));
-        RadioTech psRadioTech = static_cast<RadioTech>(networkSearchManager->GetPsRadioTech(slotId_));
-        UpdatePhone(csRadioTech, psRadioTech);
+        int32_t csRadioTech = 0;
+        int32_t psRadioTech = 0;
+        networkSearchManager->GetCsRadioTech(slotId_, csRadioTech);
+        networkSearchManager->GetPsRadioTech(slotId_, psRadioTech);
+        UpdatePhone(static_cast<RadioTech>(csRadioTech), static_cast<RadioTech>(psRadioTech));
     }
 
     if (operatorName_ != nullptr) {
@@ -731,12 +734,14 @@ void NetworkSearchHandler::RadioGetNeighboringCellInfo(const AppExecFwk::InnerEv
     }
 }
 
-void NetworkSearchHandler::GetCellInfoList(std::vector<sptr<CellInformation>> &cells)
+int32_t NetworkSearchHandler::GetCellInfoList(std::vector<sptr<CellInformation>> &cells)
 {
     TELEPHONY_LOGI("NetworkSearchHandler::GetCellInfoList slotId:%{public}d", slotId_);
     if (cellInfo_ != nullptr) {
         cellInfo_->GetCellInfoList(cells);
+        return TELEPHONY_ERR_SUCCESS;
     }
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
 sptr<CellLocation> NetworkSearchHandler::GetCellLocation()
@@ -756,7 +761,7 @@ void NetworkSearchHandler::TimezoneRefresh()
     }
 }
 
-void NetworkSearchHandler::SendUpdateCellLocationRequest()
+int32_t NetworkSearchHandler::SendUpdateCellLocationRequest()
 {
     std::vector<sptr<CellInformation>> cells;
     if (cellInfo_ != nullptr) {
@@ -765,7 +770,7 @@ void NetworkSearchHandler::SendUpdateCellLocationRequest()
     uint32_t curTime = static_cast<uint32_t>(time(0));
     if ((curTime - lastCellRequestTime_) < cellRequestMinInterval_ && cells.size() != 0) {
         TELEPHONY_LOGE("NetworkSearchHandler::SendUpdateCellLocationRequest interval is too short");
-        return;
+        return TELEPHONY_ERR_SUCCESS;
     }
     TELEPHONY_LOGI("NetworkSearchHandler::SendUpdateCellLocationRequest slotId:%{public}d", slotId_);
     std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
@@ -775,6 +780,7 @@ void NetworkSearchHandler::SendUpdateCellLocationRequest()
         event->SetOwner(shared_from_this());
         telRilManager->GetCurrentCellInfo(slotId_, event);
     }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 void NetworkSearchHandler::UpdateCellLocation(int32_t techType, int32_t cellId, int32_t lac)

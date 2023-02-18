@@ -28,6 +28,7 @@ public:
 
 private:
     void ShowHelp(std::string &result) const;
+    void ShowCoreServiceTimeInfo(std::string &result) const;
     void ShowCoreServiceInfo(std::string &result) const;
 };
 } // namespace Telephony

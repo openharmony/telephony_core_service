@@ -15,8 +15,9 @@
 
 #include "set_radio_state_callback.h"
 
-#include "telephony_napi_hril_error_code.h"
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_napi_hril_error_code.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -33,7 +34,7 @@ void SetRadioStateCallback::OnSetRadioStateCallback(const bool setResult, const 
     asyncContext_->resolved = (errorCode == HRIL_ERR_REPEAT_STATUS) ||
         ((errorCode == HRIL_ERR_SUCCESS) && setResult);
     if (!asyncContext_->resolved) {
-        asyncContext_->errorCode = errorCode;
+        asyncContext_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
     asyncContext_->callbackEnd = true;
     asyncContext_->cv.notify_all();

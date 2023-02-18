@@ -35,46 +35,46 @@ public:
     using HANDLE = const std::shared_ptr<AppExecFwk::EventHandler>;
     using NSCALLBACK = const sptr<INetworkSearchCallback>;
     virtual bool OnInit() = 0;
-    virtual int32_t GetPsRadioTech(int32_t slotId) = 0;
-    virtual int32_t GetCsRadioTech(int32_t slotId) = 0;
+    virtual int32_t GetPsRadioTech(int32_t slotId, int32_t &psRadioTech) = 0;
+    virtual int32_t GetCsRadioTech(int32_t slotId, int32_t &csRadioTech) = 0;
     virtual std::u16string GetOperatorNumeric(int32_t slotId) = 0;
-    virtual std::u16string GetOperatorName(int32_t slotId) = 0;
-    virtual sptr<NetworkState> GetNetworkStatus(int32_t slotId) = 0;
+    virtual int32_t GetOperatorName(int32_t slotId, std::u16string &operatorName) = 0;
+    virtual int32_t GetNetworkStatus(int32_t slotId, sptr<NetworkState> &networkState) = 0;
     virtual int32_t GetRadioState(int32_t slotId) = 0;
-    virtual bool GetRadioState(int32_t slotId, NSCALLBACK &callback) = 0;
+    virtual int32_t GetRadioState(int32_t slotId, NSCALLBACK &callback) = 0;
     /**
      * Set radio state
      * 27007-410_2001 8.2 Set phone functionality +CFUN
      * 3GPP TS 27.007 V4.1.0 (2001-03)
      */
     virtual void SetRadioState(int32_t slotId, bool isOn, int32_t rst) = 0;
-    virtual bool SetRadioState(int32_t slotId, bool isOn, int32_t rst, NSCALLBACK &callback) = 0;
-    virtual std::vector<sptr<SignalInformation>> GetSignalInfoList(int32_t slotId) = 0;
+    virtual int32_t SetRadioState(int32_t slotId, bool isOn, int32_t rst, NSCALLBACK &callback) = 0;
+    virtual int32_t GetSignalInfoList(int32_t slotId, std::vector<sptr<SignalInformation>> &signals) = 0;
     virtual void RegisterCoreNotify(int32_t slotId, HANDLE &handler, int32_t what) = 0;
     virtual void UnRegisterCoreNotify(int32_t slotId, HANDLE &handler, int32_t what) = 0;
     virtual void RegisterCellularDataObject(const sptr<NetworkSearchCallBackBase> &callback) = 0;
     virtual void UnRegisterCellularDataObject(const sptr<NetworkSearchCallBackBase> &callback) = 0;
     virtual void RegisterCellularCallObject(const sptr<NetworkSearchCallBackBase> &callback) = 0;
     virtual void UnRegisterCellularCallObject(const sptr<NetworkSearchCallBackBase> &callback) = 0;
-    virtual bool GetNetworkSearchInformation(int32_t slotId, NSCALLBACK &callback) = 0;
-    virtual bool GetNetworkSelectionMode(int32_t slotId, NSCALLBACK &callback) = 0;
-    virtual bool SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
+    virtual int32_t GetNetworkSearchInformation(int32_t slotId, NSCALLBACK &callback) = 0;
+    virtual int32_t GetNetworkSelectionMode(int32_t slotId, NSCALLBACK &callback) = 0;
+    virtual int32_t SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
         const sptr<NetworkInformation> &networkInformation, bool resumeSelection, NSCALLBACK &callback) = 0;
-    virtual std::u16string GetIsoCountryCodeForNetwork(int32_t slotId) = 0;
-    virtual bool GetPreferredNetwork(int32_t slotId, NSCALLBACK &callback) = 0;
-    virtual bool SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback) = 0;
+    virtual int32_t GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode) = 0;
+    virtual int32_t GetPreferredNetwork(int32_t slotId, NSCALLBACK &callback) = 0;
+    virtual int32_t SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback) = 0;
     virtual int32_t GetPsRegState(int32_t slotId) = 0;
     virtual int32_t GetCsRegState(int32_t slotId) = 0;
     virtual int32_t GetPsRoamingState(int32_t slotId) = 0;
-    virtual std::u16string GetImei(int32_t slotId) = 0;
+    virtual int32_t GetImei(int32_t slotId, std::u16string &imei) = 0;
     virtual int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) = 0;
-    virtual std::vector<sptr<CellInformation>> GetCellInfoList(int32_t slotId) = 0;
-    virtual bool SendUpdateCellLocationRequest(int32_t slotId) = 0;
+    virtual int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) = 0;
+    virtual int32_t SendUpdateCellLocationRequest(int32_t slotId) = 0;
     virtual sptr<CellLocation> GetCellLocation(int32_t slotId) = 0;
-    virtual std::u16string GetMeid(int32_t slotId) = 0;
-    virtual std::u16string GetUniqueDeviceId(int32_t slotId) = 0;
+    virtual int32_t GetMeid(int32_t slotId, std::u16string &meid) = 0;
+    virtual int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) = 0;
     virtual PhoneType GetPhoneType(int32_t slotId) = 0;
-    virtual NrMode GetNrOptionMode(int32_t slotId) = 0;
+    virtual int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) = 0;
     virtual FrequencyType GetFrequencyType(int32_t slotId) = 0;
     virtual NrState GetNrState(int32_t slotId) = 0;
     virtual int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName,

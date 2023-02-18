@@ -76,6 +76,13 @@ sptr<ICoreService> NetworkSearchTest::GetProxy()
     }
 }
 
+bool NetworkSearchTest::HasSimCard(int32_t slotId)
+{
+    bool hasSimCard = false;
+    NetworkSearchTest::telephonyService_->HasSimCard(slotId, hasSimCard);
+    return hasSimCard;
+}
+
 void NetworkSearchTest::PrintCellInformation(std::vector<sptr<CellInformation>> cellList)
 {
     for (const auto &cell : cellList) {
@@ -126,7 +133,6 @@ void NetworkSearchTest::PrintGsmCellInformation(sptr<CellInformation> cell)
     TELEPHONY_LOGI("CellInformation type:%{private}d, lac:%{private}d, bsic:%{private}d, arfcn:%{private}d",
         static_cast<int32_t>(gsm->GetNetworkType()), gsm->GetLac(), gsm->GetBsic(), gsm->GetArfcn());
     TELEPHONY_LOGI("CellInformation result:%{public}s", gsm->ToString().c_str());
-
     MessageParcel data;
     gsm->Marshalling(data);
     gsm->Unmarshalling(data);
@@ -159,7 +165,6 @@ void NetworkSearchTest::PrintCdmaCellInformation(sptr<CellInformation> cell)
         static_cast<int32_t>(cdma->GetNetworkType()), cdma->GetBaseId(), cdma->GetLatitude(), cdma->GetLongitude(),
         cdma->GetNid(), cdma->GetSid());
     TELEPHONY_LOGI("CellInformation result:%{public}s", cdma->ToString().c_str());
-
     MessageParcel data;
     cdma->Marshalling(data);
     cdma->Unmarshalling(data);
@@ -400,12 +405,12 @@ void NetworkSearchTest::PrintNetworkStateInformation(sptr<NetworkState> result)
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetPsRadioTech_0100, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        int32_t result = CoreServiceClient::GetInstance().GetPsRadioTech(SLOT_ID);
+        int32_t result = -1;
+        CoreServiceClient::GetInstance().GetPsRadioTech(SLOT_ID, result);
         TELEPHONY_LOGI("TelephonyTestService GetPsRadioTech result: %{public}d", result);
         EXPECT_GT(result, -1);
     }
@@ -419,12 +424,12 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetPsRadioTech_0100, Functio
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetPsRadioTech_0200, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        int32_t result = CoreServiceClient::GetInstance().GetPsRadioTech(SLOT_ID1);
+        int32_t result = -1;
+        CoreServiceClient::GetInstance().GetPsRadioTech(SLOT_ID1, result);
         TELEPHONY_LOGI("TelephonyTestService GetPsRadioTech result: %{public}d", result);
         EXPECT_GT(result, -1);
     }
@@ -437,13 +442,13 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetPsRadioTech_0200, Functio
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetPsRadioTech_0300, Function | MediumTest | Level1)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
         return;
     }
-    int32_t result = CoreServiceClient::GetInstance().GetPsRadioTech(SLOT_ID);
+    int32_t radioTech = -1;
+    int32_t result = CoreServiceClient::GetInstance().GetPsRadioTech(SLOT_ID, radioTech);
     TELEPHONY_LOGI("TelephonyTestService GetPsRadioTech result: %{public}d", result);
     EXPECT_EQ(TELEPHONY_ERR_PERMISSION_ERR, result);
 }
@@ -456,12 +461,12 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetPsRadioTech_0300, Functio
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCsRadioTech_0100, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        int32_t result = CoreServiceClient::GetInstance().GetCsRadioTech(SLOT_ID);
+        int32_t result = -1;
+        CoreServiceClient::GetInstance().GetCsRadioTech(SLOT_ID, result);
         EXPECT_GT(result, -1);
     }
 }
@@ -474,12 +479,12 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCsRadioTech_0100, Functio
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCsRadioTech_0200, Function | MediumTest | Level1)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        int32_t result = CoreServiceClient::GetInstance().GetCsRadioTech(SLOT_ID1);
+        int32_t result = -1;
+        CoreServiceClient::GetInstance().GetCsRadioTech(SLOT_ID1, result);
         EXPECT_GT(result, -1);
     }
 }
@@ -491,13 +496,14 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCsRadioTech_0200, Functio
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCsRadioTech_0300, Function | MediumTest | Level1)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
         return;
     }
-    int32_t result = CoreServiceClient::GetInstance().GetCsRadioTech(SLOT_ID);
+    int32_t radioTech = -1;
+    int32_t result = CoreServiceClient::GetInstance().GetCsRadioTech(SLOT_ID, radioTech);
+    TELEPHONY_LOGI("TelephonyTestService GetCsRadioTech result: %{public}d", result);
     EXPECT_EQ(TELEPHONY_ERR_PERMISSION_ERR, result);
 }
 
@@ -509,12 +515,12 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCsRadioTech_0300, Functio
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0100, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        sptr<NetworkState> result = CoreServiceClient::GetInstance().GetNetworkState(SLOT_ID);
+        sptr<NetworkState> result = nullptr;
+        CoreServiceClient::GetInstance().GetNetworkState(SLOT_ID, result);
         if (result == nullptr) {
             TELEPHONY_LOGI("GetNetworkState result is null");
         } else {
@@ -538,12 +544,12 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0100, Functi
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0200, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        sptr<NetworkState> result = CoreServiceClient::GetInstance().GetNetworkState(SLOT_ID1);
+        sptr<NetworkState> result = nullptr;
+        CoreServiceClient::GetInstance().GetNetworkState(SLOT_ID1, result);
         if (result == nullptr) {
             TELEPHONY_LOGI("GetNetworkState result is null");
         } else {
@@ -562,13 +568,13 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0200, Functi
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0300, Function | MediumTest | Level2)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
         return;
     }
-    sptr<NetworkState> result = CoreServiceClient::GetInstance().GetNetworkState(SLOT_ID);
+    sptr<NetworkState> result = nullptr;
+    CoreServiceClient::GetInstance().GetNetworkState(SLOT_ID, result);
     ASSERT_TRUE(result == nullptr);
 }
 
@@ -579,8 +585,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0300, Functi
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorNumeric_0100, Function | MediumTest | Level1)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
@@ -597,8 +602,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorNumeric_0100, Fun
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorNumeric_0200, Function | MediumTest | Level1)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
@@ -615,13 +619,14 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorNumeric_0200, Fun
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorName_0100, Function | MediumTest | Level1)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        std::u16string result = CoreServiceClient::GetInstance().GetOperatorName(SLOT_ID);
-        std::string operatorName = Str16ToStr8(result);
+        std::u16string u16OperatorName = u"";
+        int32_t result = CoreServiceClient::GetInstance().GetOperatorName(SLOT_ID, u16OperatorName);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        std::string operatorName = Str16ToStr8(u16OperatorName);
         EXPECT_STRNE(operatorName.c_str(), "");
     }
 }
@@ -633,13 +638,14 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorName_0100, Functi
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorName_0200, Function | MediumTest | Level1)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        std::u16string result = CoreServiceClient::GetInstance().GetOperatorName(SLOT_ID1);
-        std::string operatorName = Str16ToStr8(result);
+        std::u16string u16OperatorName = u"";
+        int32_t result = CoreServiceClient::GetInstance().GetOperatorName(SLOT_ID1, u16OperatorName);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        std::string operatorName = Str16ToStr8(u16OperatorName);
         EXPECT_STRNE(operatorName.c_str(), "");
     }
 }
@@ -651,12 +657,12 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetOperatorName_0200, Functi
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetSignalInfoList_0100, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        auto result = CoreServiceClient::GetInstance().GetSignalInfoList(SLOT_ID);
+        std::vector<sptr<SignalInformation>> result;
+        CoreServiceClient::GetInstance().GetSignalInfoList(SLOT_ID, result);
         SignalInformation::NetworkType type;
         for (const auto &v : result) {
             type = v->GetNetworkType();
@@ -688,12 +694,12 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetSignalInfoList_0100, Func
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetSignalInfoList_0200, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        auto result = CoreServiceClient::GetInstance().GetSignalInfoList(SLOT_ID1);
+        std::vector<sptr<SignalInformation>> result;
+        CoreServiceClient::GetInstance().GetSignalInfoList(SLOT_ID1, result);
         SignalInformation::NetworkType type;
         for (const auto &v : result) {
             type = v->GetNetworkType();
@@ -759,13 +765,14 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_PrintSignalInfo_0100, Functi
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCellInfoList_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
         return;
     }
-    std::vector<sptr<CellInformation>> cellList = CoreServiceClient::GetInstance().GetCellInfoList(SLOT_ID);
+    std::vector<sptr<CellInformation>> cellList;
+    int32_t result = CoreServiceClient::GetInstance().GetCellInfoList(SLOT_ID, cellList);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     PrintCellInformation(cellList);
     ASSERT_TRUE(!cellList.empty());
 }
@@ -778,13 +785,14 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCellInfoList_0100, Functi
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCellInfoList_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
         return;
     }
-    std::vector<sptr<CellInformation>> cellList = CoreServiceClient::GetInstance().GetCellInfoList(SLOT_ID1);
+    std::vector<sptr<CellInformation>> cellList;
+    int32_t result = CoreServiceClient::GetInstance().GetCellInfoList(SLOT_ID1, cellList);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     PrintCellInformation(cellList);
     ASSERT_TRUE(!cellList.empty());
 }
@@ -796,13 +804,14 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCellInfoList_0200, Functi
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCellInfoList_0300, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
         return;
     }
-    std::vector<sptr<CellInformation>> cellList = CoreServiceClient::GetInstance().GetCellInfoList(SLOT_ID);
+    std::vector<sptr<CellInformation>> cellList;
+    int32_t result = CoreServiceClient::GetInstance().GetCellInfoList(SLOT_ID, cellList);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
     PrintCellInformation(cellList);
     ASSERT_TRUE(cellList.empty());
 }
@@ -846,12 +855,12 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_PrintCellInfoList_0100, Func
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetIsoCountryCodeForNetwork_0100, Function | MediumTest | Level1)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        std::u16string result = CoreServiceClient::GetInstance().GetIsoCountryCodeForNetwork(SLOT_ID);
+        std::u16string result = u"";
+        EXPECT_EQ(CoreServiceClient::GetInstance().GetIsoCountryCodeForNetwork(SLOT_ID, result), TELEPHONY_ERR_SUCCESS);
         std::string countryCode = Str16ToStr8(result);
         TELEPHONY_LOGI("TelephonyTestService GetIsoCountryCodeForNetwork countryCode: %{public}s", countryCode.c_str());
         EXPECT_STRNE(countryCode.c_str(), "");
@@ -865,12 +874,12 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetIsoCountryCodeForNetwork_
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetIsoCountryCodeForNetwork_0200, Function | MediumTest | Level1)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        std::u16string result = CoreServiceClient::GetInstance().GetIsoCountryCodeForNetwork(SLOT_ID1);
+        std::u16string result = u"";
+        CoreServiceClient::GetInstance().GetIsoCountryCodeForNetwork(SLOT_ID1, result);
         std::string countryCode = Str16ToStr8(result);
         TELEPHONY_LOGI("TelephonyTestService GetIsoCountryCodeForNetwork countryCode: %{public}s", countryCode.c_str());
         EXPECT_STRNE(countryCode.c_str(), "");
@@ -885,7 +894,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetIsoCountryCodeForNetwork_
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
@@ -900,10 +909,10 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0100
         "CHINA MOBILE", "CMCC", "46000", static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
         static_cast<int32_t>(NetworkRat::NETWORK_LTE));
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = telephonyService_->SetNetworkSelectionMode(
+    int32_t result = telephonyService_->SetNetworkSelectionMode(
         SLOT_ID, static_cast<int32_t>(SelectionMode::MODE_TYPE_MANUAL), networkInfo, true, callback);
     TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode result: %{public}d", result);
-    ASSERT_TRUE(result);
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetNetworkModeCallbackResult();
     TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode syncResult: %{public}d", syncResult);
@@ -918,7 +927,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0100
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
@@ -928,10 +937,10 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0200
         static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
         static_cast<int32_t>(NetworkRat::NETWORK_LTE));
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = telephonyService_->SetNetworkSelectionMode(
+    int32_t result = telephonyService_->SetNetworkSelectionMode(
         SLOT_ID, static_cast<int32_t>(SelectionMode::MODE_TYPE_AUTO), networkInfo, true, callback);
     TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode result: %{public}d", result);
-    ASSERT_TRUE(result);
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetNetworkModeCallbackResult();
     TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode syncResult: %{public}d", syncResult);
@@ -946,7 +955,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0200
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0300, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
@@ -974,7 +983,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0300
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0400, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
@@ -1001,7 +1010,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0400
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0500, Function | MediumTest | Level3)
 {
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
@@ -1029,7 +1038,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0500
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
@@ -1039,10 +1048,10 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0100
         static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
         static_cast<int32_t>(NetworkRat::NETWORK_LTE));
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().SetNetworkSelectionMode(
+    int32_t result = CoreServiceClient::GetInstance().SetNetworkSelectionMode(
         SLOT_ID, static_cast<int32_t>(SelectionMode::MODE_TYPE_MANUAL), networkInfo, true, callback);
     TELEPHONY_LOGI("GetNetworkSelectionMode_0100 SetNetworkSelectionMode result: %{public}d", result);
-    ASSERT_TRUE(result);
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetNetworkModeCallbackResult();
     TELEPHONY_LOGI("GetNetworkSelectionMode_0100 SetNetworkModeCallbackResult syncResult: %{public}d", syncResult);
@@ -1050,7 +1059,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0100
 
     result = CoreServiceClient::GetInstance().GetNetworkSelectionMode(SLOT_ID, callback);
     TELEPHONY_LOGI("GetNetworkSelectionMode_0100 GetNetworkSelectionMode result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
     callback->WaitForGetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     int32_t networkSelectionMode = callback->GetNetworkModeCallbackResult();
     TELEPHONY_LOGI("GetNetworkSelectionMode_0100 GetNetworkModeCallbackResult mode: %{public}d", networkSelectionMode);
@@ -1065,7 +1074,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0100
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
@@ -1075,10 +1084,10 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0200
         static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
         static_cast<int32_t>(NetworkRat::NETWORK_LTE));
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().SetNetworkSelectionMode(
+    int32_t result = CoreServiceClient::GetInstance().SetNetworkSelectionMode(
         SLOT_ID, static_cast<int32_t>(SelectionMode::MODE_TYPE_AUTO), networkInfo, true, callback);
     TELEPHONY_LOGI("GetNetworkSelectionMode_0200 SetNetworkSelectionMode result: %{public}d", result);
-    ASSERT_TRUE(result);
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetNetworkModeCallbackResult();
     TELEPHONY_LOGI("GetNetworkSelectionMode_0200 SetNetworkModeCallbackResult syncResult: %{public}d", syncResult);
@@ -1086,7 +1095,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0200
 
     result = CoreServiceClient::GetInstance().GetNetworkSelectionMode(SLOT_ID, callback);
     TELEPHONY_LOGI("GetNetworkSelectionMode_0200 GetNetworkSelectionMode result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
     callback->WaitForGetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     int32_t networkSelectionMode = callback->GetNetworkModeCallbackResult();
     TELEPHONY_LOGI("GetNetworkSelectionMode_0200 GetNetworkModeCallbackResult mode: %{public}d", networkSelectionMode);
@@ -1101,7 +1110,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0200
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0300, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
@@ -1111,10 +1120,10 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0300
         static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
         static_cast<int32_t>(NetworkRat::NETWORK_LTE));
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().SetNetworkSelectionMode(
+    int32_t result = CoreServiceClient::GetInstance().SetNetworkSelectionMode(
         SLOT_ID1, static_cast<int32_t>(SelectionMode::MODE_TYPE_MANUAL), networkInfo, true, callback);
     TELEPHONY_LOGI("GetNetworkSelectionMode_0300 SetNetworkSelectionMode result: %{public}d", result);
-    ASSERT_TRUE(result);
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetNetworkModeCallbackResult();
     TELEPHONY_LOGI("GetNetworkSelectionMode_0300 SetNetworkModeCallbackResult syncResult: %{public}d", syncResult);
@@ -1122,7 +1131,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0300
 
     result = CoreServiceClient::GetInstance().GetNetworkSelectionMode(SLOT_ID1, callback);
     TELEPHONY_LOGI("GetNetworkSelectionMode_0300 GetNetworkSelectionMode result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
     callback->WaitForGetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     int32_t networkSelectionMode = callback->GetNetworkModeCallbackResult();
     TELEPHONY_LOGI("GetNetworkSelectionMode_0300 GetNetworkModeCallbackResult mode: %{public}d", networkSelectionMode);
@@ -1137,7 +1146,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0300
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0400, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
@@ -1147,10 +1156,10 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0400
         static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
         static_cast<int32_t>(NetworkRat::NETWORK_LTE));
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().SetNetworkSelectionMode(
+    int32_t result = CoreServiceClient::GetInstance().SetNetworkSelectionMode(
         SLOT_ID1, static_cast<int32_t>(SelectionMode::MODE_TYPE_AUTO), networkInfo, true, callback);
     TELEPHONY_LOGI("GetNetworkSelectionMode_0400 SetNetworkSelectionMode result: %{public}d", result);
-    ASSERT_TRUE(result);
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetNetworkModeCallbackResult();
     TELEPHONY_LOGI("GetNetworkSelectionMode_0400 SetNetworkModeCallbackResult syncResult: %{public}d", syncResult);
@@ -1158,7 +1167,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0400
 
     result = CoreServiceClient::GetInstance().GetNetworkSelectionMode(SLOT_ID1, callback);
     TELEPHONY_LOGI("GetNetworkSelectionMode_0400 GetNetworkSelectionMode result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
     callback->WaitForGetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     int32_t networkSelectionMode = callback->GetNetworkModeCallbackResult();
     TELEPHONY_LOGI("GetNetworkSelectionMode_0400 GetNetworkModeCallbackResult mode: %{public}d", networkSelectionMode);
@@ -1173,15 +1182,15 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0400
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
     }
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID, false, callback);
+    int32_t result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID, false, callback);
     TELEPHONY_LOGI("SetRadioState_0100 SetRadioState result: %{public}d", result);
-    ASSERT_TRUE(result);
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     callback->WaitForSetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetRadioStateCallbackResult();
     TELEPHONY_LOGI("SetRadioState_0100 SetRadioStateCallbackResult syncResult: %{public}d", syncResult);
@@ -1196,15 +1205,15 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0100, Function
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
     }
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID, true, callback);
+    int32_t result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID, true, callback);
     TELEPHONY_LOGI("SetRadioState_0200 SetRadioState result: %{public}d", result);
-    ASSERT_TRUE(result);
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     callback->WaitForSetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetRadioStateCallbackResult();
     TELEPHONY_LOGI("SetRadioState_0200 SetRadioStateCallbackResult syncResult: %{public}d", syncResult);
@@ -1219,15 +1228,15 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0200, Function
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0300, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
     }
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = telephonyService_->SetRadioState(SLOT_ID1, false, callback);
+    int32_t result = telephonyService_->SetRadioState(SLOT_ID1, false, callback);
     TELEPHONY_LOGI("SetRadioState_0300 SetRadioState result: %{public}d", result);
-    ASSERT_TRUE(result);
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     callback->WaitForSetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetRadioStateCallbackResult();
     TELEPHONY_LOGI("SetRadioState_0300 SetRadioStateCallbackResult syncResult: %{public}d", syncResult);
@@ -1242,15 +1251,15 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0300, Function
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0400, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
     }
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID1, true, callback);
+    int32_t result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID1, true, callback);
     TELEPHONY_LOGI("SetRadioState_0400 SetRadioState result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     callback->WaitForSetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetRadioStateCallbackResult();
     TELEPHONY_LOGI("SetRadioState_0400 SetRadioStateCallbackResult syncResult: %{public}d", syncResult);
@@ -1264,15 +1273,15 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0400, Function
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0500, Function | MediumTest | Level3)
 {
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
     }
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID, false, callback);
+    int32_t result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID, false, callback);
     TELEPHONY_LOGI("SetRadioState_0100 SetRadioState result: %{public}d", result);
-    ASSERT_FALSE(result);
+    ASSERT_TRUE(result == TELEPHONY_ERR_PERMISSION_ERR);
 }
 
 /**
@@ -1283,15 +1292,15 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0500, Function
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
     }
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID, false, callback);
+    int32_t result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID, false, callback);
     TELEPHONY_LOGI("GetRadioState_0100 SetRadioState result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     callback->WaitForSetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetRadioStateCallbackResult();
     TELEPHONY_LOGI("GetRadioState_0100 SetRadioStateCallbackResult: %{public}d", syncResult);
@@ -1299,7 +1308,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0100, Function
 
     result = CoreServiceClient::GetInstance().GetRadioState(SLOT_ID, callback);
     TELEPHONY_LOGI("GetRadioState_0100 GetRadioState result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     callback->WaitForGetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool isRadioOn = callback->GetRadioStateCallbackResult();
     TELEPHONY_LOGI("GetRadioState_0100 GetRadioStateCallbackResult isRadioOn: %{public}d", isRadioOn);
@@ -1314,15 +1323,15 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0100, Function
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
     }
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID, true, callback);
+    int32_t result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID, true, callback);
     TELEPHONY_LOGI("GetRadioState_0200 SetRadioState result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     callback->WaitForSetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetRadioStateCallbackResult();
     TELEPHONY_LOGI("GetRadioState_0200 SetRadioStateCallbackResult: %{public}d", syncResult);
@@ -1330,7 +1339,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0200, Function
 
     result = CoreServiceClient::GetInstance().GetRadioState(SLOT_ID, callback);
     TELEPHONY_LOGI("GetRadioState_0200 GetRadioState result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     callback->WaitForGetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool isRadioOn = callback->GetRadioStateCallbackResult();
     TELEPHONY_LOGI("GetRadioState_0200 GetRadioStateCallbackResult isRadioOn: %{public}d", isRadioOn);
@@ -1345,15 +1354,15 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0200, Function
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0300, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
     }
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID1, false, callback);
+    int32_t result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID1, false, callback);
     TELEPHONY_LOGI("GetRadioState_0300 SetRadioState result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     callback->WaitForSetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetRadioStateCallbackResult();
     TELEPHONY_LOGI("GetRadioState_0300 SetRadioStateCallbackResult syncResult: %{public}d", syncResult);
@@ -1361,7 +1370,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0300, Function
 
     result = CoreServiceClient::GetInstance().GetRadioState(SLOT_ID1, callback);
     TELEPHONY_LOGI("GetRadioState_0300 GetRadioState result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     callback->WaitForGetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool isRadioOn = callback->GetRadioStateCallbackResult();
     TELEPHONY_LOGI("GetRadioState_0300 GetRadioStateCallbackResult isRadioOn: %{public}d", isRadioOn);
@@ -1376,15 +1385,15 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0300, Function
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0400, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
     }
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID1, true, callback);
+    int32_t result = CoreServiceClient::GetInstance().SetRadioState(SLOT_ID1, true, callback);
     TELEPHONY_LOGI("GetRadioState_0400 SetRadioState result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     callback->WaitForSetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetRadioStateCallbackResult();
     TELEPHONY_LOGI("GetRadioState_0400 SetRadioStateCallbackResult syncResult: %{public}d", syncResult);
@@ -1392,7 +1401,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0400, Function
 
     result = CoreServiceClient::GetInstance().GetRadioState(SLOT_ID1, callback);
     TELEPHONY_LOGI("GetRadioState_0400 GetRadioState result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     callback->WaitForGetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool isRadioOn = callback->GetRadioStateCallbackResult();
     TELEPHONY_LOGI("GetRadioState_0400 GetRadioStateCallbackResult isRadioOn: %{public}d", isRadioOn);
@@ -1406,15 +1415,15 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0400, Function
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0500, Function | MediumTest | Level3)
 {
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
     }
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().GetRadioState(SLOT_ID, callback);
+    int32_t result = CoreServiceClient::GetInstance().GetRadioState(SLOT_ID, callback);
     TELEPHONY_LOGI("GetRadioState_0100 GetRadioState result: %{public}d", result);
-    ASSERT_FALSE(result);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
 /**
@@ -1425,12 +1434,13 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0500, Function
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0100, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        std::u16string result = CoreServiceClient::GetInstance().GetImei(SLOT_ID);
+        std::u16string result = u"";
+        int32_t ret = CoreServiceClient::GetInstance().GetImei(SLOT_ID, result);
+        EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
         std::string imei = Str16ToStr8(result);
         TELEPHONY_LOGI("TelephonyTestService GetImei Imei: %{public}s", imei.c_str());
         EXPECT_STRNE(imei.c_str(), "");
@@ -1445,12 +1455,13 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0100, Function | Med
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0200, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        std::u16string result = CoreServiceClient::GetInstance().GetImei(SLOT_ID1);
+        std::u16string result = u"";
+        int32_t ret = CoreServiceClient::GetInstance().GetImei(SLOT_ID1, result);
+        EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
         std::string imei = Str16ToStr8(result);
         TELEPHONY_LOGI("TelephonyTestService GetImei Imei: %{public}s", imei.c_str());
         EXPECT_STRNE(imei.c_str(), "");
@@ -1464,16 +1475,14 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0200, Function | Med
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0300, Function | MediumTest | Level2)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
         return;
     }
-    std::u16string result = CoreServiceClient::GetInstance().GetImei(SLOT_ID);
-    std::string imei = Str16ToStr8(result);
-    TELEPHONY_LOGI("TelephonyTestService GetImei Imei: %{public}s", imei.c_str());
-    ASSERT_TRUE(imei.empty());
+    std::u16string result = u"";
+    int32_t ret = CoreServiceClient::GetInstance().GetImei(SLOT_ID, result);
+    EXPECT_EQ(ret, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
 /**
@@ -1484,12 +1493,14 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0300, Function | Med
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetMeid_0100, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        std::u16string result = CoreServiceClient::GetInstance().GetMeid(SLOT_ID);
+        std::u16string result = u"";
+        int32_t ret = CoreServiceClient::GetInstance().GetMeid(SLOT_ID, result);
+        TELEPHONY_LOGI("TelephonyTestService GetMeid ret: %{public}d", ret);
+        EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
         std::string meid = Str16ToStr8(result);
         TELEPHONY_LOGI("TelephonyTestService GetMeid Meid: %{public}s", meid.c_str());
         EXPECT_STRNE(meid.c_str(), "");
@@ -1504,12 +1515,13 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetMeid_0100, Function | Med
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetMeid_0200, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        std::u16string result = CoreServiceClient::GetInstance().GetMeid(SLOT_ID1);
+        std::u16string result = u"";
+        int32_t ret = CoreServiceClient::GetInstance().GetMeid(SLOT_ID1, result);
+        EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
         std::string meid = Str16ToStr8(result);
         TELEPHONY_LOGI("TelephonyTestService GetMeid Meid: %{public}s", meid.c_str());
         EXPECT_STRNE(meid.c_str(), "");
@@ -1523,16 +1535,14 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetMeid_0200, Function | Med
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetMeid_0300, Function | MediumTest | Level2)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
         return;
     }
-    std::u16string result = CoreServiceClient::GetInstance().GetMeid(SLOT_ID);
-    std::string meid = Str16ToStr8(result);
-    TELEPHONY_LOGI("TelephonyTestService GetMeid Meid: %{public}s", meid.c_str());
-    ASSERT_TRUE(meid.empty());
+    std::u16string result = u"";
+    int32_t ret = CoreServiceClient::GetInstance().GetMeid(SLOT_ID, result);
+    EXPECT_EQ(ret, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
 /**
@@ -1543,15 +1553,16 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetMeid_0300, Function | Med
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetUniqueDeviceId_0100, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        std::u16string result = CoreServiceClient::GetInstance().GetUniqueDeviceId(SLOT_ID);
-        std::string deviceid = Str16ToStr8(result);
-        TELEPHONY_LOGI("TelephonyTestService GetUniqueDeviceId DeviceId: %{public}s", deviceid.c_str());
-        EXPECT_STRNE(deviceid.c_str(), "");
+        std::u16string result = u"";
+        int32_t ret = CoreServiceClient::GetInstance().GetUniqueDeviceId(SLOT_ID, result);
+        EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+        std::string deviceId = Str16ToStr8(result);
+        TELEPHONY_LOGI("TelephonyTestService GetUniqueDeviceId DeviceId: %{public}s", deviceId.c_str());
+        EXPECT_STRNE(deviceId.c_str(), "");
     }
 }
 
@@ -1563,15 +1574,16 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetUniqueDeviceId_0100, Func
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetUniqueDeviceId_0200, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        std::u16string result = CoreServiceClient::GetInstance().GetUniqueDeviceId(SLOT_ID1);
-        std::string deviceid = Str16ToStr8(result);
-        TELEPHONY_LOGI("TelephonyTestService GetUniqueDeviceId DeviceId: %{public}s", deviceid.c_str());
-        EXPECT_STRNE(deviceid.c_str(), "");
+        std::u16string result = u"";
+        int32_t ret = CoreServiceClient::GetInstance().GetUniqueDeviceId(SLOT_ID1, result);
+        EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+        std::string deviceId = Str16ToStr8(result);
+        TELEPHONY_LOGI("TelephonyTestService GetUniqueDeviceId DeviceId: %{public}s", deviceId.c_str());
+        EXPECT_STRNE(deviceId.c_str(), "");
     }
 }
 
@@ -1582,17 +1594,14 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetUniqueDeviceId_0200, Func
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetUniqueDeviceId_0300, Function | MediumTest | Level2)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
         return;
-    } else {
-        std::u16string result = CoreServiceClient::GetInstance().GetUniqueDeviceId(SLOT_ID);
-        std::string deviceid = Str16ToStr8(result);
-        TELEPHONY_LOGI("TelephonyTestService GetUniqueDeviceId DeviceId: %{public}s", deviceid.c_str());
-        ASSERT_TRUE(deviceid.empty());
     }
+    std::u16string result = u"";
+    int32_t ret = CoreServiceClient::GetInstance().GetUniqueDeviceId(SLOT_ID, result);
+    EXPECT_EQ(ret, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
 /**
@@ -1603,14 +1612,13 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetUniqueDeviceId_0300, Func
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SendUpdateCellLocationRequest_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        bool result = CoreServiceClient::GetInstance().SendUpdateCellLocationRequest(SLOT_ID);
+        int32_t result = CoreServiceClient::GetInstance().SendUpdateCellLocationRequest(SLOT_ID);
         TELEPHONY_LOGI("TelephonyTestService SendUpdateCellLocationRequest result: %{public}d", result);
-        ASSERT_TRUE(result);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1622,14 +1630,13 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SendUpdateCellLocationReques
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SendUpdateCellLocationRequest_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
-        bool result = CoreServiceClient::GetInstance().SendUpdateCellLocationRequest(SLOT_ID1);
+        int32_t result = CoreServiceClient::GetInstance().SendUpdateCellLocationRequest(SLOT_ID1);
         TELEPHONY_LOGI("TelephonyTestService SendUpdateCellLocationRequest result: %{public}d", result);
-        ASSERT_TRUE(result);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1640,16 +1647,14 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SendUpdateCellLocationReques
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SendUpdateCellLocationRequest_0300, Function | MediumTest | Level3)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr ||
-        !(NetworkSearchTest::telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
         return;
-    } else {
-        bool result = CoreServiceClient::GetInstance().SendUpdateCellLocationRequest(SLOT_ID);
-        TELEPHONY_LOGI("TelephonyTestService SendUpdateCellLocationRequest result: %{public}d", result);
-        ASSERT_FALSE(result);
     }
+    int32_t result = CoreServiceClient::GetInstance().SendUpdateCellLocationRequest(SLOT_ID);
+    TELEPHONY_LOGI("TelephonyTestService SendUpdateCellLocationRequest result: %{public}d", result);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
 /**
@@ -1660,15 +1665,15 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SendUpdateCellLocationReques
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSearchInformation_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
     }
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().GetNetworkSearchInformation(SLOT_ID, callback);
+    int32_t result = CoreServiceClient::GetInstance().GetNetworkSearchInformation(SLOT_ID, callback);
     TELEPHONY_LOGI("TelephonyTestService GetNetworkSearchInformation result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
     callback->WaitForGetNetworkSearchInformationCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->GetNetworkSearchInformationCallbackResult();
     TELEPHONY_LOGI("TelephonyTestService GetNetworkSearchInformation syncResult: %{public}d", syncResult);
@@ -1683,15 +1688,15 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSearchInformation_
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSearchInformation_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
     }
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().GetNetworkSearchInformation(SLOT_ID1, callback);
+    int32_t result = CoreServiceClient::GetInstance().GetNetworkSearchInformation(SLOT_ID1, callback);
     TELEPHONY_LOGI("TelephonyTestService GetNetworkSearchInformation result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
     callback->WaitForGetNetworkSearchInformationCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->GetNetworkSearchInformationCallbackResult();
     TELEPHONY_LOGI("TelephonyTestService GetNetworkSearchInformation syncResult: %{public}d", syncResult);
@@ -1705,15 +1710,15 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSearchInformation_
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSearchInformation_0300, Function | MediumTest | Level3)
 {
-    if (telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         telephonyService_ = GetProxy();
         return;
     }
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = CoreServiceClient::GetInstance().GetNetworkSearchInformation(SLOT_ID, callback);
+    int32_t result = CoreServiceClient::GetInstance().GetNetworkSearchInformation(SLOT_ID, callback);
     TELEPHONY_LOGI("TelephonyTestService GetNetworkSearchInformation result: %{public}d", result);
-    ASSERT_FALSE(result);
+    EXPECT_EQ(TELEPHONY_ERR_PERMISSION_ERR, result);
 }
 
 /**
@@ -1724,7 +1729,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSearchInformation_
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0100, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -1760,7 +1765,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0200, Functi
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0300, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -1778,7 +1783,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0300, Functi
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0400, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -1795,7 +1800,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0400, Functi
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0500, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -1812,7 +1817,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0500, Functi
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0600, Function | MediumTest | Level2)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -1829,7 +1834,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0600, Functi
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0100, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -1880,7 +1885,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0200, 
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0300, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -1900,7 +1905,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0300, 
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0400, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -1916,7 +1921,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0400, 
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0500, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -1945,7 +1950,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0500, 
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0600, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -1965,7 +1970,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0600, 
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0700, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -1980,7 +1985,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0700, 
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0800, Function | MediumTest | Level2)
 {
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -2001,7 +2006,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0800, 
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0900, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -2022,7 +2027,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0900, 
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0100, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -2053,7 +2058,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0100
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0200, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -2087,7 +2092,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0300
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0400, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -2105,7 +2110,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0500
 {
     AccessToken token;
     int ret = TELEPHONY_SUCCESS;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -2133,7 +2138,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0500
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0600, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
@@ -2149,7 +2154,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0600
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0700, Function | MediumTest | Level2)
 {
     AccessToken token;
-    if (NetworkSearchTest::telephonyService_ == nullptr || !(telephonyService_->HasSimCard(SLOT_ID1))) {
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         return;
     }
