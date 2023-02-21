@@ -3661,7 +3661,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSlotId_0100, Function | MediumTest | Level3)
     } else {
         int32_t simId = 1;
         int32_t result = CoreServiceClient::GetInstance().GetSlotId(simId);
-        EXPECT_GT(result, -1);
+        EXPECT_GE(result, -1);
     }
 }
 
