@@ -20,6 +20,19 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t ZERO_VALUE = 0;
+constexpr int32_t SIGNAL_LEVEL_INVALID = 0;
+constexpr int32_t SIGNAL_RSSI_MAXIMUM = -1;
+constexpr int32_t SIGNAL_FOUR_BARS = 4;
+constexpr int32_t SIGNAL_FIVE_BARS = 5;
+const int32_t *GSM_SIGNAL_THRESHOLD = SignalInformation::GSM_SIGNAL_THRESHOLD_5BAR;
+const int32_t *CDMA_SIGNAL_THRESHOLD = SignalInformation::CDMA_SIGNAL_THRESHOLD_5BAR;
+const int32_t *LTE_SIGNAL_THRESHOLD = SignalInformation::LTE_SIGNAL_THRESHOLD_5BAR;
+const int32_t *WCDMA_SIGNAL_THRESHOLD = SignalInformation::WCDMA_SIGNAL_THRESHOLD_5BAR;
+const int32_t *TD_SCDMA_SIGNAL_THRESHOLD = SignalInformation::TD_SCDMA_SIGNAL_THRESHOLD_5BAR;
+const int32_t *NR_SIGNAL_THRESHOLD = SignalInformation::NR_SIGNAL_THRESHOLD_5BAR;
+int32_t CellInfo::signalBar_ = SIGNAL_FIVE_BARS;
+
 const std::map<RatType, CellInfo::CallInfoFunc> CellInfo::memberFuncMap_ = {
     {RatType::NETWORK_TYPE_GSM, &CellInfo::ProcessNeighboringCellGsm},
     {RatType::NETWORK_TYPE_CDMA, &CellInfo::ProcessNeighboringCellCdma},
@@ -27,9 +40,33 @@ const std::map<RatType, CellInfo::CallInfoFunc> CellInfo::memberFuncMap_ = {
     {RatType::NETWORK_TYPE_TDSCDMA, &CellInfo::ProcessNeighboringCellTdscdma},
     {RatType::NETWORK_TYPE_LTE, &CellInfo::ProcessNeighboringCellLte},
     {RatType::NETWORK_TYPE_NR, &CellInfo::ProcessNeighboringCellNr}};
+
 CellInfo::CellInfo(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
     : networkSearchManager_(networkSearchManager), slotId_(slotId)
-{}
+{
+    InitCellSignalBar();
+}
+
+void CellInfo::InitCellSignalBar(const int32_t bar)
+{
+    if (bar == SIGNAL_FOUR_BARS) {
+        GSM_SIGNAL_THRESHOLD = SignalInformation::GSM_SIGNAL_THRESHOLD_4BAR;
+        CDMA_SIGNAL_THRESHOLD = SignalInformation::CDMA_SIGNAL_THRESHOLD_4BAR;
+        LTE_SIGNAL_THRESHOLD = SignalInformation::LTE_SIGNAL_THRESHOLD_4BAR;
+        WCDMA_SIGNAL_THRESHOLD = SignalInformation::WCDMA_SIGNAL_THRESHOLD_4BAR;
+        TD_SCDMA_SIGNAL_THRESHOLD = SignalInformation::TD_SCDMA_SIGNAL_THRESHOLD_4BAR;
+        NR_SIGNAL_THRESHOLD = SignalInformation::NR_SIGNAL_THRESHOLD_4BAR;
+        signalBar_ = SIGNAL_FOUR_BARS;
+    } else {
+        GSM_SIGNAL_THRESHOLD = SignalInformation::GSM_SIGNAL_THRESHOLD_5BAR;
+        CDMA_SIGNAL_THRESHOLD = SignalInformation::CDMA_SIGNAL_THRESHOLD_5BAR;
+        LTE_SIGNAL_THRESHOLD = SignalInformation::LTE_SIGNAL_THRESHOLD_5BAR;
+        WCDMA_SIGNAL_THRESHOLD = SignalInformation::WCDMA_SIGNAL_THRESHOLD_5BAR;
+        TD_SCDMA_SIGNAL_THRESHOLD = SignalInformation::TD_SCDMA_SIGNAL_THRESHOLD_5BAR;
+        NR_SIGNAL_THRESHOLD = SignalInformation::NR_SIGNAL_THRESHOLD_5BAR;
+        signalBar_ = SIGNAL_FIVE_BARS;
+    }
+}
 
 void CellInfo::ProcessNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
@@ -201,15 +238,18 @@ void CellInfo::UpdateSignalLevel(sptr<CellInformation> &cell, CellInformation::C
     std::vector<sptr<SignalInformation>> signals;
     nsm->GetSignalInfoList(slotId_, signals);
     int32_t signalLevel = 0;
+    int32_t signalIntensity = 0;
     for (const auto &v : signals) {
         if (ConvertToCellType(v->GetNetworkType()) == cellType) {
             TELEPHONY_LOGI("CellInfo::UpdateSignalLevel signal level %{public}d slotId:%{public}d",
                 v->GetSignalLevel(), slotId_);
             signalLevel = v->GetSignalLevel();
+            signalIntensity = v->GetSignalIntensity();
             break;
         }
     }
     cell->SetSignalLevel(signalLevel);
+    cell->SetSignalIntensity(signalIntensity);
 }
 
 CellInformation::CellType CellInfo::ConvertToCellType(SignalInformation::NetworkType signalType) const
@@ -332,7 +372,7 @@ bool CellInfo::ProcessNeighboringCellGsm(CellNearbyInfo *cellInfo)
         cell->SetGsmParam(bsic, lac, arfcn);
         cellInfos_.emplace_back(cell);
         TELEPHONY_LOGI("CellInfo::ProcessNeighboringCellGsm arfcn:%{private}d cellId:%{private}d"
-                       "bsic:%{private}d lac:%{private}d slotId:%{public}d",
+            "bsic:%{private}d lac:%{private}d slotId:%{public}d",
             arfcn, cellId, bsic, lac, slotId_);
         return true;
     }
@@ -432,14 +472,20 @@ bool CellInfo::ProcessCurrentCellGsm(CurrentCellInfo *cellInfo)
         int32_t &cellId = cellInfo->ServiceCellParas.gsm.cellId;
         int32_t &bsic = cellInfo->ServiceCellParas.gsm.bsic;
         int32_t &lac = cellInfo->ServiceCellParas.gsm.lac;
+        int32_t &rxlev = cellInfo->ServiceCellParas.gsm.rxlev;
+        rxlev = ZERO_VALUE - rxlev;
         cell->Init(cellInfo->mcc, cellInfo->mnc, cellId);
         cell->SetGsmParam(bsic, lac, arfcn);
+        cell->SetSignalIntensity(rxlev);
         cell->SetIsCamped(true);
+        int32_t level = GetCurrentSignalLevelGsm(rxlev);
+        cell->SetSignalLevel(level);
         currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
-        TELEPHONY_LOGI("CellInfo::ProcessCurrentCellGsm arfcn:%{private}d cellId:%{private}d"
-                       "bsic:%{private}d lac:%{private}d slotId:%{public}d",
-            arfcn, cellId, bsic, lac, slotId_);
+        TELEPHONY_LOGI(
+            "CellInfo::ProcessCurrentCellGsm arfcn:%{private}d cellId:%{private}d"
+            "bsic:%{private}d lac:%{private}d rxlev:%{public}d slotId:%{public}d",
+            arfcn, cellId, bsic, lac, rxlev, slotId_);
         return true;
     }
     return false;
@@ -453,12 +499,19 @@ bool CellInfo::ProcessCurrentCellLte(CurrentCellInfo *cellInfo)
         int32_t &pci = cellInfo->ServiceCellParas.lte.pci;
         int32_t &cellId = cellInfo->ServiceCellParas.lte.cellId;
         int32_t &tac = cellInfo->ServiceCellParas.lte.tac;
+        int32_t &rsrp = cellInfo->ServiceCellParas.lte.rsrp;
+        rsrp = ZERO_VALUE - rsrp;
         cell->Init(cellInfo->mcc, cellInfo->mnc, cellId);
         cell->SetLteParam(pci, tac, arfcn);
+        cell->SetSignalIntensity(rsrp);
         cell->SetIsCamped(true);
+        int32_t level = GetCurrentSignalLevelLte(rsrp);
+        cell->SetSignalLevel(level);
         currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
-        TELEPHONY_LOGI("CellInfo::ProcessCurrentCellLte arfcn:%{private}d pci:%{private}d", arfcn, pci);
+        TELEPHONY_LOGI(
+            "CellInfo::ProcessCurrentCellLte arfcn:%{private}d pci:%{private}d rsrp:%{public}d slotId:%{public}d",
+            arfcn, pci, rsrp, slotId_);
         return true;
     }
     return false;
@@ -472,12 +525,18 @@ bool CellInfo::ProcessCurrentCellWcdma(CurrentCellInfo *cellInfo)
         int32_t &psc = cellInfo->ServiceCellParas.wcdma.psc;
         int32_t &cellId = cellInfo->ServiceCellParas.wcdma.cellId;
         int32_t &lac = cellInfo->ServiceCellParas.wcdma.lac;
+        int32_t &rscp = cellInfo->ServiceCellParas.wcdma.rscp;
+        rscp = ZERO_VALUE - rscp;
         cell->Init(cellInfo->mcc, cellInfo->mnc, cellId);
         cell->SetWcdmaParam(psc, lac, arfcn);
+        cell->SetSignalIntensity(rscp);
         cell->SetIsCamped(true);
+        int32_t level = GetCurrentSignalLevelWcdma(rscp);
+        cell->SetSignalLevel(level);
         currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
-        TELEPHONY_LOGI("CellInfo::ProcessCurrentCellWcdma arfcn:%{private}d psc:%{private}d", arfcn, psc);
+        TELEPHONY_LOGI(
+            "CellInfo::ProcessCurrentCellWcdma arfcn:%{private}d psc:%{private}d rscp:%{public}d", arfcn, psc, rscp);
         return true;
     }
     return false;
@@ -492,12 +551,19 @@ bool CellInfo::ProcessCurrentCellCdma(CurrentCellInfo *cellInfo)
         int32_t &latitude = cellInfo->ServiceCellParas.cdma.latitude;
         int32_t &networkId = cellInfo->ServiceCellParas.cdma.networkId;
         int32_t &systemId = cellInfo->ServiceCellParas.cdma.systemId;
+        int32_t &pilotStrength = cellInfo->ServiceCellParas.cdma.pilotStrength;
+        pilotStrength = ZERO_VALUE - pilotStrength;
         cell->Init(cellInfo->mcc, cellInfo->mnc, baseId);
         cell->SetCdmaParam(baseId, latitude, longitude, networkId, systemId);
+        cell->SetSignalIntensity(pilotStrength);
         cell->SetIsCamped(true);
+        int32_t level = GetCurrentSignalLevelCdma(pilotStrength);
+        cell->SetSignalLevel(level);
         currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
-        TELEPHONY_LOGI("CellInfo::ProcessCurrentCellCdma baseId:%{private}d networkId:%{private}d", baseId, networkId);
+        TELEPHONY_LOGI(
+            "CellInfo::ProcessCurrentCellCdma baseId:%{private}d networkId:%{private}d pilotStrength:%{public}d",
+            baseId, networkId, pilotStrength);
         return true;
     }
     return false;
@@ -511,9 +577,14 @@ bool CellInfo::ProcessCurrentCellTdscdma(CurrentCellInfo *cellInfo)
         int32_t &cpid = cellInfo->ServiceCellParas.tdscdma.cpid;
         int32_t &cellId = cellInfo->ServiceCellParas.tdscdma.cellId;
         int32_t &lac = cellInfo->ServiceCellParas.tdscdma.lac;
+        int32_t &rscp = cellInfo->ServiceCellParas.tdscdma.rscp;
+        rscp = ZERO_VALUE - rscp;
         cell->Init(cellInfo->mcc, cellInfo->mnc, cellId);
         cell->SetTdscdmaParam(cpid, lac, arfcn);
+        cell->SetSignalIntensity(rscp);
         cell->SetIsCamped(true);
+        int32_t level = GetCurrentSignalLevelTdscdma(rscp);
+        cell->SetSignalLevel(level);
         currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
         TELEPHONY_LOGI("CellInfo::ProcessCurrentCellTdscdma arfcn:%{private}d pci:%{private}d slotId:%{public}d", arfcn,
@@ -537,11 +608,91 @@ bool CellInfo::ProcessCurrentCellNr(CurrentCellInfo *cellInfo)
         currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
 
-        TELEPHONY_LOGI("CellInfo::ProcessCurrentCellNr arfcn:%{private}d pci:%{private}d slotId:%{public}d", nrArfcn,
-            pci, slotId_);
+        TELEPHONY_LOGI("CellInfo::ProcessCurrentCellNr arfcn:%{private}d pci:%{private}d slotId:%{public}d",
+            nrArfcn, pci, slotId_);
         return true;
     }
     return false;
+}
+
+int32_t CellInfo::GetCurrentSignalLevelGsm(int32_t rxlev)
+{
+    int32_t level = SIGNAL_LEVEL_INVALID;
+    if (rxlev >= SIGNAL_RSSI_MAXIMUM) {
+        TELEPHONY_LOGE("CellInfo::GetCurrentSignalLevelGsm Value is Invalid.");
+        return level;
+    }
+    for (int32_t i = signalBar_; i >= 0; --i) {
+        if (rxlev >= GSM_SIGNAL_THRESHOLD[i]) {
+            level = i;
+            break;
+        }
+    }
+    return level;
+}
+
+int32_t CellInfo::GetCurrentSignalLevelLte(int32_t rsrp)
+{
+    int32_t level = SIGNAL_LEVEL_INVALID;
+    if (rsrp >= SIGNAL_RSSI_MAXIMUM) {
+        TELEPHONY_LOGE("CellInfo::GetCurrentSignalLevelLte Value is Invalid.");
+        return level;
+    }
+    for (int32_t i = signalBar_; i >= 0; --i) {
+        if (rsrp >= LTE_SIGNAL_THRESHOLD[i]) {
+            level = i;
+            break;
+        }
+    }
+    return level;
+}
+
+int32_t CellInfo::GetCurrentSignalLevelWcdma(int32_t rscp)
+{
+    int32_t level = SIGNAL_LEVEL_INVALID;
+    if (rscp >= SIGNAL_RSSI_MAXIMUM) {
+        TELEPHONY_LOGE("CellInfo::GetCurrentSignalLevelWcdma Value is Invalid.");
+        return level;
+    }
+    for (int32_t i = signalBar_; i >= 0; --i) {
+        if (rscp >= WCDMA_SIGNAL_THRESHOLD[i]) {
+            level = i;
+            break;
+        }
+    }
+    return level;
+}
+
+int32_t CellInfo::GetCurrentSignalLevelCdma(int32_t pilotStrength)
+{
+    int32_t level = SIGNAL_LEVEL_INVALID;
+    if (pilotStrength >= SIGNAL_RSSI_MAXIMUM) {
+        TELEPHONY_LOGE("CellInfo::GetCurrentSignalLevelCdma Value is Invalid.");
+        return level;
+    }
+    for (int32_t i = signalBar_; i >= 0; --i) {
+        if (pilotStrength >= CDMA_SIGNAL_THRESHOLD[i]) {
+            level = i;
+            break;
+        }
+    }
+    return level;
+}
+
+int32_t CellInfo::GetCurrentSignalLevelTdscdma(int32_t rscp)
+{
+    int32_t level = SIGNAL_LEVEL_INVALID;
+    if (rscp >= SIGNAL_RSSI_MAXIMUM) {
+        TELEPHONY_LOGE("CellInfo::GetCurrentSignalLevelTdscdma Value is Invalid.");
+        return level;
+    }
+    for (int32_t i = signalBar_; i >= 0; --i) {
+        if (rscp >= TD_SCDMA_SIGNAL_THRESHOLD[i]) {
+            level = i;
+            break;
+        }
+    }
+    return level;
 }
 
 void CellInfo::GetCellInfoList(std::vector<sptr<CellInformation>> &cellInfo)
