@@ -127,6 +127,7 @@ GsmCellInformation::GsmCellInformation(const GsmCellInformation &gsmCell)
     lac_ = gsmCell.lac_;
     timeStamp_ = gsmCell.timeStamp_;
     signalLevel_ = gsmCell.signalLevel_;
+    signalIntensity_ = gsmCell.signalIntensity_;
     isCamped_ = gsmCell.isCamped_;
 }
 
@@ -140,6 +141,7 @@ GsmCellInformation &GsmCellInformation::operator=(const GsmCellInformation &gsmC
     lac_ = gsmCell.lac_;
     timeStamp_ = gsmCell.timeStamp_;
     signalLevel_ = gsmCell.signalLevel_;
+    signalIntensity_ = gsmCell.signalIntensity_;
     isCamped_ = gsmCell.isCamped_;
     return *this;
 }
@@ -150,6 +152,7 @@ bool GsmCellInformation::operator==(const GsmCellInformation &other) const
         arfcn_ == other.arfcn_ && cellId_ == other.cellId_ &&
         bsic_ == other.bsic_ && lac_ == other.lac_ &&
         signalLevel_ == other.signalLevel_ &&
+        signalIntensity_ == other.signalIntensity_ &&
         isCamped_ == other.isCamped_;
 }
 
@@ -169,7 +172,8 @@ std::string GsmCellInformation::ToString() const
     std::string content("netWorkType:" + std::to_string(netWorkType) + ",mcc:" + mcc_ +
         ",mnc:" + mnc_ + ",arfcn:" + std::to_string(arfcn_) + ",cellId:" + std::to_string(cellId_) +
         ",timeStamp:" + std::to_string(timeStamp_) + ",signalLevel:" + std::to_string(signalLevel_) +
-        ",bsic:" + std::to_string(bsic_) + ",lac:" + std::to_string(lac_));
+        ",signalIntensity_:" + std::to_string(signalIntensity_) + ",bsic:" + std::to_string(bsic_) +
+        ",lac:" + std::to_string(lac_));
     return content;
 }
 
@@ -202,6 +206,9 @@ bool GsmCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(signalLevel_)) {
         return false;
     }
+    if (!parcel.WriteInt32(signalIntensity_)) {
+        return false;
+    }
     if (!parcel.WriteBool(isCamped_)) {
         return false;
     }
@@ -231,6 +238,7 @@ bool GsmCellInformation::ReadFromParcel(Parcel &parcel)
     lac_ = parcel.ReadInt32();
     timeStamp_ = parcel.ReadUint64();
     signalLevel_ = parcel.ReadInt32();
+    signalIntensity_ = parcel.ReadInt32();
     isCamped_ = parcel.ReadBool();
 
     return true;
@@ -270,6 +278,7 @@ LteCellInformation::LteCellInformation(const LteCellInformation &lteCell)
     tac_ = lteCell.tac_;
     timeStamp_ = lteCell.timeStamp_;
     signalLevel_ = lteCell.signalLevel_;
+    signalIntensity_ = lteCell.signalIntensity_;
     isCamped_ = lteCell.isCamped_;
 }
 
@@ -283,6 +292,7 @@ LteCellInformation &LteCellInformation::operator=(const LteCellInformation &lteC
     tac_ = lteCell.tac_;
     timeStamp_ = lteCell.timeStamp_;
     signalLevel_ = lteCell.signalLevel_;
+    signalIntensity_ = lteCell.signalIntensity_;
     isCamped_ = lteCell.isCamped_;
     return *this;
 }
@@ -292,7 +302,7 @@ bool LteCellInformation::operator==(const LteCellInformation &other) const
     return mcc_ == other.mcc_ && mnc_ == other.mnc_ &&
         earfcn_ == other.earfcn_ && cellId_ == other.cellId_ &&
         pci_ == other.pci_ && tac_ == other.tac_ &&
-        signalLevel_ == other.signalLevel_ &&
+        signalLevel_ == other.signalLevel_ && signalIntensity_ == other.signalIntensity_ &&
         isCamped_ == other.isCamped_;
 }
 
@@ -335,6 +345,9 @@ bool LteCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(signalLevel_)) {
         return false;
     }
+    if (!parcel.WriteInt32(signalIntensity_)) {
+        return false;
+    }
     if (!parcel.WriteBool(isCamped_)) {
         return false;
     }
@@ -364,6 +377,7 @@ bool LteCellInformation::ReadFromParcel(Parcel &parcel)
     tac_ = parcel.ReadInt32();
     timeStamp_ = parcel.ReadInt64();
     signalLevel_ = parcel.ReadInt32();
+    signalIntensity_ = parcel.ReadInt32();
     isCamped_ = parcel.ReadBool();
     return true;
 }
@@ -391,6 +405,7 @@ std::string LteCellInformation::ToString() const
     std::string content("netWorkType:" + std::to_string(netWorkType) + ",mcc:" + mcc_ +
         ",mnc:" + mnc_ + ",earfcn:" + std::to_string(earfcn_) + ",cellId:" + std::to_string(cellId_) +
         ",timeStamp:" + std::to_string(timeStamp_) + ",signalLevel:" + std::to_string(signalLevel_) +
+        ",signalIntensity:" + std::to_string(signalIntensity_) + ",pci:" + std::to_string(pci_) +
         ",pci:" + std::to_string(pci_) + ",tac:" + std::to_string(tac_));
     return content;
 }
@@ -412,6 +427,7 @@ WcdmaCellInformation::WcdmaCellInformation(const WcdmaCellInformation &wcdmaCell
     lac_ = wcdmaCell.lac_;
     timeStamp_ = wcdmaCell.timeStamp_;
     signalLevel_ = wcdmaCell.signalLevel_;
+    signalIntensity_ = wcdmaCell.signalIntensity_;
     isCamped_ = wcdmaCell.isCamped_;
 }
 
@@ -425,6 +441,7 @@ WcdmaCellInformation &WcdmaCellInformation::operator=(const WcdmaCellInformation
     lac_ = wcdmaCell.lac_;
     timeStamp_ = wcdmaCell.timeStamp_;
     signalLevel_ = wcdmaCell.signalLevel_;
+    signalIntensity_ = wcdmaCell.signalIntensity_;
     isCamped_ = wcdmaCell.isCamped_;
     return *this;
 }
@@ -434,7 +451,7 @@ bool WcdmaCellInformation::operator==(const WcdmaCellInformation &other) const
     return mcc_ == other.mcc_ && mnc_ == other.mnc_ &&
         uarfcn_ == other.uarfcn_ && cellId_ == other.cellId_ &&
         psc_ == other.psc_ && lac_ == other.lac_ &&
-        signalLevel_ == other.signalLevel_ &&
+        signalLevel_ == other.signalLevel_ && signalIntensity_ == other.signalIntensity_ &&
         isCamped_ == other.isCamped_;
 }
 
@@ -477,6 +494,9 @@ bool WcdmaCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(signalLevel_)) {
         return false;
     }
+    if (!parcel.WriteInt32(signalIntensity_)) {
+        return false;
+    }
     if (!parcel.WriteBool(isCamped_)) {
         return false;
     }
@@ -506,6 +526,7 @@ bool WcdmaCellInformation::ReadFromParcel(Parcel &parcel)
     lac_ = parcel.ReadInt32();
     timeStamp_ = parcel.ReadInt64();
     signalLevel_ = parcel.ReadInt32();
+    signalIntensity_ = parcel.ReadInt32();
     isCamped_ = parcel.ReadBool();
     return true;
 }
@@ -533,7 +554,8 @@ std::string WcdmaCellInformation::ToString() const
     std::string content("netWorkType:" + std::to_string(netWorkType) + ",mcc:" + mcc_ +
         ",mnc:" + mnc_ + ",uarfcn:" + std::to_string(uarfcn_) + ",cellId:" + std::to_string(cellId_) +
         ",timeStamp:" + std::to_string(timeStamp_) + ",signalLevel:" + std::to_string(signalLevel_) +
-        ",psc:" + std::to_string(psc_) + ",lac:" + std::to_string(lac_));
+        ",signalIntensity:" + std::to_string(signalIntensity_) + ",psc:" + std::to_string(psc_) +
+        ",lac:" + std::to_string(lac_));
     return content;
 }
 
@@ -554,6 +576,7 @@ TdscdmaCellInformation::TdscdmaCellInformation(const TdscdmaCellInformation &tds
     lac_ = tdscdmaCell.lac_;
     timeStamp_ = tdscdmaCell.timeStamp_;
     signalLevel_ = tdscdmaCell.signalLevel_;
+    signalIntensity_ = tdscdmaCell.signalIntensity_;
     isCamped_ = tdscdmaCell.isCamped_;
 }
 
@@ -567,6 +590,7 @@ TdscdmaCellInformation &TdscdmaCellInformation::operator=(const TdscdmaCellInfor
     lac_ = tdscdmaCell.lac_;
     timeStamp_ = tdscdmaCell.timeStamp_;
     signalLevel_ = tdscdmaCell.signalLevel_;
+    signalIntensity_ = tdscdmaCell.signalIntensity_;
     isCamped_ = tdscdmaCell.isCamped_;
     return *this;
 }
@@ -576,7 +600,7 @@ bool TdscdmaCellInformation::operator==(const TdscdmaCellInformation &other) con
     return mcc_ == other.mcc_ && mnc_ == other.mnc_ &&
         uarfcn_ == other.uarfcn_ && cellId_ == other.cellId_ &&
         cpid_ == other.cpid_ && lac_ == other.lac_ &&
-        signalLevel_ == other.signalLevel_ &&
+        signalLevel_ == other.signalLevel_ && signalIntensity_ == other.signalIntensity_ &&
         isCamped_ == other.isCamped_;
 }
 
@@ -619,6 +643,9 @@ bool TdscdmaCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(signalLevel_)) {
         return false;
     }
+    if (!parcel.WriteInt32(signalIntensity_)) {
+        return false;
+    }
     if (!parcel.WriteBool(isCamped_)) {
         return false;
     }
@@ -648,6 +675,7 @@ bool TdscdmaCellInformation::ReadFromParcel(Parcel &parcel)
     lac_ = parcel.ReadInt32();
     timeStamp_ = parcel.ReadUint64();
     signalLevel_ = parcel.ReadInt32();
+    signalIntensity_ = parcel.ReadInt32();
     isCamped_ = parcel.ReadBool();
     return true;
 }
@@ -675,7 +703,8 @@ std::string TdscdmaCellInformation::ToString() const
     std::string content("netWorkType:" + std::to_string(netWorkType) + ",mcc:" + mcc_ +
         ",mnc:" + mnc_ + ",uarfcn:" + std::to_string(uarfcn_) + ",cellId:" + std::to_string(cellId_) +
         ",timeStamp:" + std::to_string(timeStamp_) + ",signalLevel:" + std::to_string(signalLevel_) +
-        ",cpid:" + std::to_string(cpid_) + ",lac:" + std::to_string(lac_));
+        ",signalIntensity:" + std::to_string(signalIntensity_) + ",cpid:" + std::to_string(cpid_) +
+        ",lac:" + std::to_string(lac_));
     return content;
 }
 
@@ -697,6 +726,7 @@ CdmaCellInformation::CdmaCellInformation(const CdmaCellInformation &cdmaCell)
     sid_ = cdmaCell.sid_;
     timeStamp_ = cdmaCell.timeStamp_;
     signalLevel_ = cdmaCell.signalLevel_;
+    signalIntensity_ = cdmaCell.signalIntensity_;
     isCamped_ = cdmaCell.isCamped_;
 }
 
@@ -709,6 +739,7 @@ CdmaCellInformation &CdmaCellInformation::operator=(const CdmaCellInformation &c
     sid_ = cdmaCell.sid_;
     timeStamp_ = cdmaCell.timeStamp_;
     signalLevel_ = cdmaCell.signalLevel_;
+    signalIntensity_ = cdmaCell.signalIntensity_;
     isCamped_ = cdmaCell.isCamped_;
     return *this;
 }
@@ -717,8 +748,8 @@ bool CdmaCellInformation::operator==(const CdmaCellInformation &other) const
 {
     return baseId_ == other.baseId_ && latitude_ == other.latitude_ &&
         longitude_ == other.longitude_ && nid_ == other.nid_ &&
-        sid_ == other.sid_ &&
-        signalLevel_ == other.signalLevel_ && isCamped_ == other.isCamped_;
+        sid_ == other.sid_ && signalLevel_ == other.signalLevel_ &&
+        signalIntensity_ == other.signalIntensity_ && isCamped_ == other.isCamped_;
 }
 
 CellInformation::CellType CdmaCellInformation::GetNetworkType() const
@@ -752,6 +783,9 @@ bool CdmaCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(signalLevel_)) {
         return false;
     }
+    if (!parcel.WriteInt32(signalIntensity_)) {
+        return false;
+    }
     if (!parcel.WriteBool(isCamped_)) {
         return false;
     }
@@ -780,6 +814,7 @@ bool CdmaCellInformation::ReadFromParcel(Parcel &parcel)
     sid_ = parcel.ReadInt32();
     timeStamp_ = parcel.ReadUint64();
     signalLevel_ = parcel.ReadInt32();
+    signalIntensity_ = parcel.ReadInt32();
     isCamped_ = parcel.ReadBool();
     return true;
 }
@@ -823,7 +858,8 @@ std::string CdmaCellInformation::ToString() const
     std::string content("netWorkType:" + std::to_string(netWorkType) + ",baseId:" + std::to_string(baseId_) +
         ",latitude:" + std::to_string(latitude_) + ",longitude:" + std::to_string(longitude_) +
         ",nid:" + std::to_string(nid_) + ",timeStamp:" + std::to_string(timeStamp_) +
-        ",signalLevel:" + std::to_string(signalLevel_) + ",sid:" + std::to_string(sid_));
+        ",signalLevel:" + std::to_string(signalLevel_) + ",signalIntensity:" + std::to_string(signalIntensity_) +
+        ",sid:" + std::to_string(sid_));
     return content;
 }
 
@@ -846,6 +882,7 @@ NrCellInformation::NrCellInformation(const NrCellInformation &nrCell)
     nci_ = nrCell.nci_;
     timeStamp_ = nrCell.timeStamp_;
     signalLevel_ = nrCell.signalLevel_;
+    signalIntensity_ = nrCell.signalIntensity_;
     isCamped_ = nrCell.isCamped_;
 }
 
@@ -860,6 +897,7 @@ NrCellInformation &NrCellInformation::operator=(const NrCellInformation &nrCell)
     nci_ = nrCell.nci_;
     timeStamp_ = nrCell.timeStamp_;
     signalLevel_ = nrCell.signalLevel_;
+    signalIntensity_ = nrCell.signalIntensity_;
     isCamped_ = nrCell.isCamped_;
     return *this;
 }
@@ -869,7 +907,7 @@ bool NrCellInformation::operator==(const NrCellInformation &other) const
     return mcc_ == other.mcc_ && mnc_ == other.mnc_ &&
         cellId_ == other.cellId_ && nrArfcn_ == other.nrArfcn_ &&
         pci_ == other.pci_ && tac_ == other.tac_ && nci_ == other.nci_ &&
-        signalLevel_ == other.signalLevel_ &&
+        signalLevel_ == other.signalLevel_ && signalIntensity_ == other.signalIntensity_ &&
         isCamped_ == other.isCamped_;
 }
 
@@ -910,6 +948,9 @@ bool NrCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(signalLevel_)) {
         return false;
     }
+    if (!parcel.WriteInt32(signalIntensity_)) {
+        return false;
+    }
     if (!parcel.WriteBool(isCamped_)) {
         return false;
     }
@@ -940,6 +981,7 @@ bool NrCellInformation::ReadFromParcel(Parcel &parcel)
     nci_ = parcel.ReadInt64();
     timeStamp_ = parcel.ReadInt64();
     signalLevel_ = parcel.ReadInt32();
+    signalIntensity_ = parcel.ReadInt32();
     isCamped_ = parcel.ReadBool();
     return true;
 }
@@ -977,7 +1019,8 @@ std::string NrCellInformation::ToString() const
     std::string content("netWorkType:" + std::to_string(netWorkType) + ",mcc:" + mcc_ +
         ",mnc:" + mnc_ + ",earfcn:" + std::to_string(nrArfcn_) + ",cellId:" + std::to_string(cellId_) +
         ",timeStamp:" + std::to_string(timeStamp_) + ",signalLevel:" + std::to_string(signalLevel_) +
-        ",pci:" + std::to_string(pci_) + ",tac:" + std::to_string(tac_) + ",nci:" + std::to_string(nci_));
+        ",signalIntensity:" + std::to_string(signalIntensity_) + ",pci:" + std::to_string(pci_) +
+        ",tac:" + std::to_string(tac_) + ",nci:" + std::to_string(nci_));
     return content;
 }
 } // namespace Telephony
