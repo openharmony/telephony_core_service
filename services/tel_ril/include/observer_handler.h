@@ -16,6 +16,7 @@
 #ifndef OBSERVER_HANDLER_H
 #define OBSERVER_HANDLER_H
 
+#include <mutex>
 #include <unordered_map>
 #include "event_handler.h"
 #include "telephony_log_wrapper.h"
@@ -66,6 +67,7 @@ public:
 
 private:
     std::unordered_map<int32_t, std::list<std::shared_ptr<AppExecFwk::EventHandler>>> observerHandlerMap_;
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
