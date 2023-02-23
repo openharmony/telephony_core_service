@@ -1502,7 +1502,6 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetMeid_0100, Function | Med
         TELEPHONY_LOGI("TelephonyTestService GetMeid ret: %{public}d", ret);
         EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
         std::string meid = Str16ToStr8(result);
-        TELEPHONY_LOGI("TelephonyTestService GetMeid Meid: %{public}s", meid.c_str());
         EXPECT_STRNE(meid.c_str(), "");
     }
 }
@@ -1523,7 +1522,6 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetMeid_0200, Function | Med
         int32_t ret = CoreServiceClient::GetInstance().GetMeid(SLOT_ID1, result);
         EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
         std::string meid = Str16ToStr8(result);
-        TELEPHONY_LOGI("TelephonyTestService GetMeid Meid: %{public}s", meid.c_str());
         EXPECT_STRNE(meid.c_str(), "");
     }
 }
