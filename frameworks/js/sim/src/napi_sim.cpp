@@ -1206,13 +1206,6 @@ void NativeGetIMSI(napi_env env, void *data)
     int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetIMSI(asyncContext->slotId, imsi);
     if (errorCode == ERROR_NONE) {
         asyncContext->callbackVal = NapiUtil::ToUtf8(imsi);
-        if (asyncContext->callbackVal.length() > IMSI_LOG_LENGTH) {
-            std::string imsiLog = asyncContext->callbackVal.substr(0, IMSI_LOG_LENGTH);
-            TELEPHONY_LOGI("NAPI NativeGetIMSI success");
-        } else {
-            TELEPHONY_LOGE("NAPI NativeGetIMSI IMSI length is invalid %{public}lu",
-                static_cast<unsigned long>(asyncContext->callbackVal.length()));
-        }
         asyncContext->context.resolved = true;
     } else {
         asyncContext->context.resolved = false;
