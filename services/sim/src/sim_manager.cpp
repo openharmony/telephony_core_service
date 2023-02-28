@@ -141,6 +141,7 @@ int32_t SimManager::HasSimCard(int32_t slotId, bool &hasSimCard)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (simStateManager_[slotId]->HasSimCard()) {
+        TELEPHONY_LOGE("HasSimCard is true!");
         hasSimCard = true;
         return TELEPHONY_ERR_SUCCESS;
     }
