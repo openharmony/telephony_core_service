@@ -18,9 +18,10 @@
 
 #include <vector>
 
-#include "abs_shared_result_set.h"
-#include "data_ability_helper.h"
-#include "data_ability_predicates.h"
+#include "datashare_helper.h"
+#include "datashare_predicates.h"
+#include "datashare_result_set.h"
+#include "datashare_values_bucket.h"
 #include "iservice_registry.h"
 #include "result_set.h"
 #include "sim_constant.h"
@@ -29,7 +30,6 @@
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
 #include "uri.h"
-#include "values_bucket.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -46,28 +46,28 @@ public:
     int32_t SetDefaultVoiceCard(int32_t slotId);
     int32_t SetDefaultMessageCard(int32_t slotId);
     int32_t SetDefaultCellularData(int32_t slotId);
-    int32_t InsertData(int64_t &id, const NativeRdb::ValuesBucket &values);
+    int32_t InsertData(int64_t &id, const DataShare::DataShareValuesBucket &values);
     int32_t QueryDataBySlotId(int32_t slotId, SimRdbInfo &simBean);
     int32_t QueryDataByIccId(std::string iccId, SimRdbInfo &simBean);
     int32_t QueryAllData(std::vector<SimRdbInfo> &vec);
     int32_t QueryAllValidData(std::vector<SimRdbInfo> &vec);
-    int32_t UpdateDataBySlotId(int32_t slotId, const NativeRdb::ValuesBucket &values);
-    int32_t UpdateDataByIccId(std::string iccId, const NativeRdb::ValuesBucket &values);
+    int32_t UpdateDataBySlotId(int32_t slotId, const DataShare::DataShareValuesBucket &values);
+    int32_t UpdateDataByIccId(std::string iccId, const DataShare::DataShareValuesBucket &values);
     int32_t ForgetAllData();
     int32_t ForgetAllData(int32_t slotId);
     int32_t ClearData();
 
 private:
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> CreateDataAHelper();
-    int Insert(const NativeRdb::ValuesBucket &values);
-    std::shared_ptr<NativeRdb::AbsSharedResultSet> Query(
-        std::vector<std::string> &columns, const NativeRdb::DataAbilityPredicates &predicates);
-    int Update(const NativeRdb::ValuesBucket &value, const NativeRdb::DataAbilityPredicates &predicates);
-    int Delete(const NativeRdb::DataAbilityPredicates &predicates);
-    void SaveDataToBean(std::shared_ptr<NativeRdb::AbsSharedResultSet> result, SimRdbInfo &simBean);
+    std::shared_ptr<DataShare::DataShareHelper> CreateDataAHelper();
+    int Insert(const DataShare::DataShareValuesBucket &values);
+    std::shared_ptr<DataShare::DataShareResultSet> Query(
+        std::vector<std::string> &columns, const DataShare::DataSharePredicates &predicates);
+    int Update(const DataShare::DataShareValuesBucket &value, const DataShare::DataSharePredicates &predicates);
+    int Delete(const DataShare::DataSharePredicates &predicates);
+    void SaveDataToBean(std::shared_ptr<DataShare::DataShareResultSet> result, SimRdbInfo &simBean);
 
 private:
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> helper_ = nullptr;
+    std::shared_ptr<DataShare::DataShareHelper> helper_ = nullptr;
 
 private:
     enum class DefaultCardType {
