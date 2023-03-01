@@ -940,7 +940,7 @@ int32_t MultiSimController::SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue
     }
     DataShare::DataShareValuesBucket values;
     DataShare::DataShareValueObject valueObj(imsSwitchValue);
-    values.Put(SimRdbInfo::IMS_SWITCH, iccidObj);
+    values.Put(SimRdbInfo::IMS_SWITCH, valueObj);
     return simDbHelper_->UpdateDataByIccId(localCacheInfo_[slotId].iccId, values);
 }
 
