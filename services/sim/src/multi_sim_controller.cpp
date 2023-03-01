@@ -196,15 +196,18 @@ int32_t MultiSimController::UpdateDataByIccId(int slotId, const std::string &new
     }
     SimRdbInfo simRdbInfo;
     simDbHelper_->QueryDataByIccId(newIccId, simRdbInfo);
-    NativeRdb::ValuesBucket values;
-    values.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
-    values.PutInt(SimRdbInfo::IS_ACTIVE, ACTIVE);
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataShareValueObject slotObj(slotId);
+    DataShare::DataShareValueObject valueObj(ACTIVE);
+    values.Put(SimRdbInfo::SLOT_INDEX, slotObj);
+    values.Put(SimRdbInfo::IS_ACTIVE, valueObj);
     const int32_t slotSingle = 1;
     if (SIM_SLOT_COUNT == slotSingle) {
-        values.PutInt(SimData::IS_MAIN_CARD, MAIN_CARD);
-        values.PutInt(SimData::IS_VOICE_CARD, MAIN_CARD);
-        values.PutInt(SimData::IS_MESSAGE_CARD, MAIN_CARD);
-        values.PutInt(SimData::IS_CELLULAR_DATA_CARD, MAIN_CARD);
+        DataShare::DataShareValueObject mainCardObj(MAIN_CARD);
+        values.Put(SimRdbInfo::IS_MAIN_CARD, mainCardObj);
+        values.Put(SimRdbInfo::IS_VOICE_CARD, mainCardObj);
+        values.Put(SimRdbInfo::IS_MESSAGE_CARD, mainCardObj);
+        values.Put(SimRdbInfo::IS_CELLULAR_DATA_CARD, mainCardObj);
     }
     return simDbHelper_->UpdateDataByIccId(newIccId, values); // finish re active
 }
@@ -217,22 +220,27 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
     }
     SimRdbInfo simRdbInfo;
     simDbHelper_->QueryDataByIccId(newIccId, simRdbInfo);
-    NativeRdb::ValuesBucket values;
-    values.PutInt(SimRdbInfo::SLOT_INDEX, slotId);
-    values.PutString(SimRdbInfo::ICC_ID, newIccId);
-    values.PutString(SimRdbInfo::CARD_ID, newIccId); // iccId == cardId by now
-    values.PutInt(SimRdbInfo::IS_ACTIVE, ACTIVE);
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataShareValueObject slotObj(slotId);
+    DataShare::DataShareValueObject iccidObj(newIccId);
+    DataShare::DataShareValueObject valueObj(ACTIVE);
+    values.Put(SimRdbInfo::SLOT_INDEX, slotObj);
+    values.Put(SimRdbInfo::ICC_ID, iccidObj);
+    values.Put(SimRdbInfo::CARD_ID, iccidObj); // iccId == cardId by now
+    values.Put(SimRdbInfo::IS_ACTIVE, valueObj);
     const int32_t slotSingle = 1;
     if (SIM_SLOT_COUNT == slotSingle) {
-        values.PutInt(SimData::IS_MAIN_CARD, MAIN_CARD);
-        values.PutInt(SimData::IS_VOICE_CARD, MAIN_CARD);
-        values.PutInt(SimData::IS_MESSAGE_CARD, MAIN_CARD);
-        values.PutInt(SimData::IS_CELLULAR_DATA_CARD, MAIN_CARD);
+        DataShare::DataShareValueObject mainCardObj(MAIN_CARD);
+        values.Put(SimRdbInfo::IS_MAIN_CARD, mainCardObj);
+        values.Put(SimRdbInfo::IS_VOICE_CARD, mainCardObj);
+        values.Put(SimRdbInfo::IS_MESSAGE_CARD, mainCardObj);
+        values.Put(SimRdbInfo::IS_CELLULAR_DATA_CARD, mainCardObj);
     } else {
-        values.PutInt(SimData::IS_MAIN_CARD, NOT_MAIN);
-        values.PutInt(SimData::IS_VOICE_CARD, NOT_MAIN);
-        values.PutInt(SimData::IS_MESSAGE_CARD, NOT_MAIN);
-        values.PutInt(SimData::IS_CELLULAR_DATA_CARD, NOT_MAIN);
+        DataShare::DataShareValueObject notMainCardObj(NOT_MAIN);
+        values.Put(SimRdbInfo::IS_MAIN_CARD, notMainCardObj);
+        values.Put(SimRdbInfo::IS_VOICE_CARD, notMainCardObj);
+        values.Put(SimRdbInfo::IS_MESSAGE_CARD, notMainCardObj);
+        values.Put(SimRdbInfo::IS_CELLULAR_DATA_CARD, notMainCardObj);
     }
     int64_t id;
     return simDbHelper_->InsertData(id, values);
@@ -425,8 +433,9 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    NativeRdb::ValuesBucket values;
-    values.PutInt(SimRdbInfo::IS_ACTIVE, enable);
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataShareValueObject valueObj(enable);
+    values.Put(SimRdbInfo::IS_ACTIVE, valueObj);
     int32_t result = simDbHelper_->UpdateDataBySlotId(slotId, values);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("MultiSimController::SetActiveSim failed by database");
@@ -779,8 +788,9 @@ int32_t MultiSimController::SetShowNumber(int32_t slotId, std::u16string number,
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    NativeRdb::ValuesBucket values;
-    values.PutString(SimRdbInfo::PHONE_NUMBER, Str16ToStr8(number));
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataShareValueObject valueObj(Str16ToStr8(number));
+    values.Put(SimRdbInfo::PHONE_NUMBER, valueObj);
     int32_t result = simDbHelper_->UpdateDataBySlotId(slotId, values);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("MultiSimController::SetShowNumber set Data Base failed");
@@ -820,8 +830,9 @@ int32_t MultiSimController::SetShowName(int32_t slotId, std::u16string name, boo
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    NativeRdb::ValuesBucket values;
-    values.PutString(SimRdbInfo::SHOW_NAME, Str16ToStr8(name));
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataShareValueObject valueObj(Str16ToStr8(name));
+    values.Put(SimRdbInfo::SHOW_NAME, valueObj);
     int32_t result = simDbHelper_->UpdateDataBySlotId(slotId, values);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("MultiSimController::SetShowName set Data Base failed");
@@ -852,9 +863,10 @@ bool MultiSimController::SetIccId(int32_t slotId, std::u16string iccId)
         TELEPHONY_LOGE("MultiSimController::SetIccId failed by nullptr");
         return false;
     }
-    NativeRdb::ValuesBucket values;
-    values.PutString(SimRdbInfo::ICC_ID, Str16ToStr8(iccId));
-    values.PutString(SimRdbInfo::CARD_ID, Str16ToStr8(iccId)); // iccId == cardId by now
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataShareValueObject iccidObj(Str16ToStr8(iccId));
+    values.Put(SimRdbInfo::ICC_ID, iccidObj);
+    values.Put(SimRdbInfo::CARD_ID, iccidObj); // iccId == cardId by now
     int32_t result = simDbHelper_->UpdateDataBySlotId(slotId, values);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("MultiSimController::SetIccId set Data Base failed");
@@ -926,8 +938,9 @@ int32_t MultiSimController::SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue
             slotId, localCacheInfo_.size());
         return TELEPHONY_ERROR;
     }
-    NativeRdb::ValuesBucket values;
-    values.PutInt(SimRdbInfo::IMS_SWITCH, imsSwitchValue);
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataShareValueObject valueObj(imsSwitchValue);
+    values.Put(SimRdbInfo::IMS_SWITCH, iccidObj);
     return simDbHelper_->UpdateDataByIccId(localCacheInfo_[slotId].iccId, values);
 }
 
