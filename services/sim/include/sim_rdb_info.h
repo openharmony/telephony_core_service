@@ -36,10 +36,10 @@ public:
     static constexpr const char *IS_VOICE_CARD = "is_voice_card";
     static constexpr const char *IS_MESSAGE_CARD = "is_message_card";
     static constexpr const char *IS_CELLULAR_DATA_CARD = "is_cellular_data_card";
-    inline static const std::string SIM_RDB_URI = "dataability:///com.ohos.simability";
-    inline static const std::string SIM_RDB_SELECTION = "dataability:///com.ohos.simability/sim/sim_info";
+    inline static const std::string SIM_RDB_URI = "datashare:///com.ohos.simability";
+    inline static const std::string SIM_RDB_SELECTION = "datashare:///com.ohos.simability/sim/sim_info";
     inline static const std::string SIM_RDB_DEFAULT_SET_URI =
-        "dataability:///com.ohos.simability/sim/sim_info/set_card";
+        "datashare:///com.ohos.simability/sim/sim_info/set_card";
     int simId;
     std::string iccId;
     std::string cardId;
