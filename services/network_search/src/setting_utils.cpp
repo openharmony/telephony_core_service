@@ -103,7 +103,7 @@ bool SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
         return false;
     }
 
-    if (result->GoToFirstRow() != NativeRdb::E_OK) {
+    if (result->GoToFirstRow() != DataShare::E_OK) {
         TELEPHONY_LOGE("SettingUtils: query error, go to first row error");
         return false;
     }
