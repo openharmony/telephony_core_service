@@ -414,6 +414,7 @@ int32_t SimRdbHelper::ForgetAllData(int32_t slotId)
 {
     TELEPHONY_LOGI("SimRdbHelper::ForgetAllData slotId = %{public}d", slotId);
     DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(SimRdbInfo::SLOT_INDEX, std::to_string(slotId));
     DataShare::DataShareValuesBucket value;
     DataShare::DataShareValueObject valueObj(DEACTIVE);
     value.Put(SimRdbInfo::IS_ACTIVE, valueObj);
