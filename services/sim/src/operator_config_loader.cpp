@@ -57,23 +57,23 @@ std::string OperatorConfigLoader::LoadOpKeyOnMccMnc(int32_t slotId)
     }
     Uri uri(OPKEY_INFO_URI);
     std::vector<std::string> colume;
-    NativeRdb::DataAbilityPredicates predicates;
-    std::shared_ptr<NativeRdb::AbsSharedResultSet> resultSet;
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> helper = CreateOpKeyHelper();
+    DataShare::DataSharePredicates predicates;
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet;
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateOpKeyHelper();
     if (helper == nullptr || simFileManager_ == nullptr) {
         TELEPHONY_LOGE("helper or simFileManager_ is nullptr");
         return DEFAULT_OPERATOR_KEY;
     }
     std::string mccmncFromSim = Str16ToStr8(simFileManager_->GetSimOperatorNumeric());
     predicates.EqualTo(MCCMNC, mccmncFromSim);
-    resultSet = helper->Query(uri, colume, predicates);
+    resultSet = helper->Query(uri, predicates, colume);
     if (resultSet != nullptr) {
         return GetOpKey(resultSet, slotId);
     }
     return DEFAULT_OPERATOR_KEY;
 }
 
-std::string OperatorConfigLoader::GetOpKey(std::shared_ptr<NativeRdb::AbsSharedResultSet> resultSet, int32_t slotId)
+std::string OperatorConfigLoader::GetOpKey(std::shared_ptr<DataShare::DataShareResultSet> resultSet, int32_t slotId)
 {
     if (resultSet == nullptr) {
         TELEPHONY_LOGE("GetOpKey resultSet is nullptr");
@@ -119,7 +119,7 @@ std::string OperatorConfigLoader::GetOpKey(std::shared_ptr<NativeRdb::AbsSharedR
     return opKeyVal;
 }
 
-bool OperatorConfigLoader::MatchOperatorRule(std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet, int row)
+bool OperatorConfigLoader::MatchOperatorRule(std::shared_ptr<DataShare::DataShareResultSet> &resultSet, int row)
 {
     if (resultSet == nullptr) {
         TELEPHONY_LOGE("resultSet is nullptr");
@@ -169,21 +169,15 @@ bool OperatorConfigLoader::MatchOperatorRule(std::shared_ptr<NativeRdb::AbsShare
     return isAllRuleMatch;
 }
 
-std::shared_ptr<AppExecFwk::DataAbilityHelper> OperatorConfigLoader::CreateOpKeyHelper()
+std::shared_ptr<DataShare::DataShareHelper> OperatorConfigLoader::CreateOpKeyHelper()
 {
     if (opKeyDataAbilityHelper_ == nullptr) {
-        std::shared_ptr<Uri> dataAbilityUri = std::make_shared<Uri>(OPKEY_URI);
-        if (dataAbilityUri == nullptr) {
-            TELEPHONY_LOGE("CreateOpKeyHelper dataAbilityUri is nullptr");
-            return nullptr;
-        }
-        opKeyDataAbilityHelper_ = CreateDataAHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, dataAbilityUri);
+        opKeyDataAbilityHelper_ = CreateDataAHelper();
     }
     return opKeyDataAbilityHelper_;
 }
 
-std::shared_ptr<AppExecFwk::DataAbilityHelper> OperatorConfigLoader::CreateDataAHelper(
-    int32_t systemAbilityId, std::shared_ptr<Uri> dataAbilityUri) const
+std::shared_ptr<DataShare::DataShareHelper> OperatorConfigLoader::CreateDataAHelper() const
 {
     TELEPHONY_LOGI("OperatorConfigLoader::CreateDataAHelper");
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -191,12 +185,12 @@ std::shared_ptr<AppExecFwk::DataAbilityHelper> OperatorConfigLoader::CreateDataA
         TELEPHONY_LOGE("OperatorConfigLoader Get system ability mgr failed");
         return nullptr;
     }
-    auto remoteObj = saManager->GetSystemAbility(systemAbilityId);
+    auto remoteObj = saManager->GetSystemAbility(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID);
     if (remoteObj == nullptr) {
         TELEPHONY_LOGE("OperatorConfigLoader GetSystemAbility Service Failed");
         return nullptr;
     }
-    return AppExecFwk::DataAbilityHelper::Creator(remoteObj, dataAbilityUri);
+    return DataShare::DataShareHelper::Creator(remoteObj, OPKEY_URI);
 }
 } // namespace Telephony
 } // namespace OHOS
