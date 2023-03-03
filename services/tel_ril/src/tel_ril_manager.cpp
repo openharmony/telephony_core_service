@@ -437,6 +437,11 @@ int32_t TelRilManager::GetCallFailReason(int32_t slotId, const AppExecFwk::Inner
     return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetCallFailReason);
 }
 
+int32_t TelRilManager::CloseUnFinishedUssd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::CloseUnFinishedUssd);
+}
+
 /*********************** TelRilCall end ****************************/
 /*********************** TelRilData start **************************/
 int32_t TelRilManager::SetInitApnInfo(

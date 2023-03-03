@@ -67,6 +67,7 @@ public:
     int32_t GetCallFailReason(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SetBarringPassword(std::string fac, std::string oldPassword,
         std::string newPassword, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t CloseUnFinishedUssd(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t AnswerResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo);
     int32_t GetCallListResponse(
         const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::CallInfoList &callList);
@@ -115,6 +116,7 @@ public:
     int32_t CallSrvccStatusNotice(const HDI::Ril::V1_0::SrvccStatus &srvccStatus);
     int32_t CallEmergencyNotice(const HDI::Ril::V1_0::EmergencyInfoList &emergencyInfoList);
     int32_t CallRsrvccStatusNotify();
+    int32_t CloseUnFinishedUssdResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo);
 
 private:
     void BuildEmergencyInfoList(std::shared_ptr<EmergencyInfoList> emergencyCallList,

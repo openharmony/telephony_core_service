@@ -240,6 +240,11 @@ int32_t TelRilCallback::SetBarringPasswordResponse(const HDI::Ril::V1_0::RilRadi
     return Response(responseInfo, &TelRilManager::GetTelRilCall, &TelRilCall::SetBarringPasswordResponse);
 }
 
+int32_t TelRilCallback::CloseUnFinishedUssdResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilCall, &TelRilCall::CloseUnFinishedUssdResponse);
+}
+
 // Data
 int32_t TelRilCallback::PdpContextListUpdated(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
     const HDI::Ril::V1_0::DataCallResultList &dataCallResultList)

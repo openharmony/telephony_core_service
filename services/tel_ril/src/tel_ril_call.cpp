@@ -296,6 +296,11 @@ int32_t TelRilCall::SetBarringPasswordResponse(const HDI::Ril::V1_0::RilRadioRes
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
+int32_t TelRilCall::CloseUnFinishedUssdResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
+{
+    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
+}
+
 int32_t TelRilCall::GetCallList(const AppExecFwk::InnerEvent::Pointer &result)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_GET_CALL_LIST, &HDI::Ril::V1_0::IRil::GetCallList);
@@ -506,6 +511,12 @@ int32_t TelRilCall::SetBarringPassword(
     setBarringInfo.newPassword = newPassword;
     return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SET_BARRING_PASSWORD,
         &HDI::Ril::V1_0::IRil::SetBarringPassword, setBarringInfo);
+}
+
+int32_t TelRilCall::CloseUnFinishedUssd(const AppExecFwk::InnerEvent::Pointer &result)
+{
+    return Request(
+        TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_CLOSE_UNFINISHED_USSD, &HDI::Ril::V1_0::IRil::CloseUnFinishedUssd);
 }
 
 int32_t TelRilCall::CallStateUpdated()
