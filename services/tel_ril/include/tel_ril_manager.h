@@ -261,6 +261,7 @@ public:
         int32_t slotId, const ApduSimIORequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SimAuthentication(int32_t slotId, const SimAuthenticationRequestInfo &reqInfo,
         const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t CloseUnFinishedUssd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     /**
      * Register hdf status listener
