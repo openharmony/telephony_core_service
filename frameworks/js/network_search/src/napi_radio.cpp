@@ -2708,10 +2708,9 @@ static napi_value CreateRadioType(napi_env env, napi_value exports)
             "RADIO_TECHNOLOGY_NR", NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR))),
     };
     napi_value result = nullptr;
-    napi_define_class(env, "RadioType", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr, sizeof(desc) / sizeof(*desc),
-        desc, &result);
-    napi_set_named_property(env, exports, "RadioType", result);
-
+    napi_define_class(env, "RadioTechnology", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result);
+    napi_set_named_property(env, exports, "RadioTechnology", result);
     return exports;
 }
 
