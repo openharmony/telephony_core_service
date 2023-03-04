@@ -20,10 +20,7 @@
 
 namespace OHOS {
 namespace Telephony {
-SimRdbHelper::SimRdbHelper()
-{
-    helper_ = CreateDataAHelper();
-}
+SimRdbHelper::SimRdbHelper() {}
 
 SimRdbHelper::~SimRdbHelper() {}
 
@@ -40,54 +37,61 @@ std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateDataAHelper()
         TELEPHONY_LOGE("SimRdbHelper GetSystemAbility Service Failed.");
         return nullptr;
     }
-    return DataShare::DataShareHelper::Creator(remoteObj, SimRdbInfo::SIM_RDB_URI);
+    if (helper_ == nullptr) {
+        helper_ = DataShare::DataShareHelper::Creator(remoteObj, SimRdbInfo::SIM_RDB_URI);
+    }
+    return helper_;
 }
 
 int SimRdbHelper::Insert(const DataShare::DataShareValuesBucket &values)
 {
-    if (helper_ == nullptr) {
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAHelper();
+    if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::Insert failed by nullptr");
         return INVALID_VALUE;
     }
     Uri simUri(SimRdbInfo::SIM_RDB_SELECTION);
     TELEPHONY_LOGI("SimRdbHelper::Insert");
-    return helper_->Insert(simUri, values);
+    return dataShareHelper->Insert(simUri, values);
 }
 
 std::shared_ptr<DataShare::DataShareResultSet> SimRdbHelper::Query(
     std::vector<std::string> &columns, const DataShare::DataSharePredicates &predicates)
 {
-    if (helper_ == nullptr) {
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAHelper();
+    if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::Query failed by nullptr");
         return nullptr;
     }
     Uri simUri(SimRdbInfo::SIM_RDB_SELECTION);
     TELEPHONY_LOGI("SimRdbHelper::Query");
-    std::shared_ptr<DataShare::DataShareResultSet> ret = helper_->Query(simUri, predicates, columns);
+    std::shared_ptr<DataShare::DataShareResultSet> ret = dataShareHelper->Query(simUri, predicates, columns);
     return ret;
 }
 
 int SimRdbHelper::Update(const DataShare::DataShareValuesBucket &value,
     const DataShare::DataSharePredicates &predicates)
 {
-    if (helper_ == nullptr) {
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAHelper();
+    if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::Update failed by nullptr");
         return INVALID_VALUE;
     }
     Uri simUri(SimRdbInfo::SIM_RDB_SELECTION);
     TELEPHONY_LOGI("SimRdbHelper::Update");
-    return helper_->Update(simUri, predicates, value);
+    return dataShareHelper->Update(simUri, predicates, value);
 }
 
 int SimRdbHelper::Delete(const DataShare::DataSharePredicates &predicates)
 {
-    if (helper_ == nullptr) {
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAHelper();
+    if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::Delete failed by nullptr");
         return INVALID_VALUE;
     }
     Uri simUri(SimRdbInfo::SIM_RDB_SELECTION);
     TELEPHONY_LOGI("SimRdbHelper::Delete");
-    return helper_->Delete(simUri, predicates);
+    return dataShareHelper->Delete(simUri, predicates);
 }
 
 int32_t SimRdbHelper::GetDefaultMainCardSlotId()
@@ -195,12 +199,13 @@ int32_t SimRdbHelper::SetDefaultMainCard(int32_t slotId)
     DataShare::DataShareValueObject valueObj(static_cast<int>(DefaultCardType::MAIN));
     value.Put(SimRdbInfo::SLOT_INDEX, slotObj);
     value.Put(SimRdbInfo::CARD_TYPE, valueObj);
-    if (helper_ == nullptr) {
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAHelper();
+    if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::SetDefaultMainCard failed by nullptr");
         return INVALID_VALUE;
     }
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
-    return helper_->Update(defaultUri, predicates, value);
+    return dataShareHelper->Update(defaultUri, predicates, value);
 }
 
 int32_t SimRdbHelper::SetDefaultVoiceCard(int32_t slotId)
@@ -212,12 +217,13 @@ int32_t SimRdbHelper::SetDefaultVoiceCard(int32_t slotId)
     DataShare::DataShareValueObject valueObj(static_cast<int>(DefaultCardType::VOICE));
     value.Put(SimRdbInfo::SLOT_INDEX, slotObj);
     value.Put(SimRdbInfo::CARD_TYPE, valueObj);
-    if (helper_ == nullptr) {
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAHelper();
+    if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::SetDefaultVoiceCard failed by nullptr");
         return INVALID_VALUE;
     }
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
-    return helper_->Update(defaultUri, predicates, value);
+    return dataShareHelper->Update(defaultUri, predicates, value);
 }
 
 int32_t SimRdbHelper::SetDefaultMessageCard(int32_t slotId)
@@ -229,12 +235,13 @@ int32_t SimRdbHelper::SetDefaultMessageCard(int32_t slotId)
     DataShare::DataShareValueObject valueObj(static_cast<int>(DefaultCardType::SMS));
     value.Put(SimRdbInfo::SLOT_INDEX, slotObj);
     value.Put(SimRdbInfo::CARD_TYPE, valueObj);
-    if (helper_ == nullptr) {
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAHelper();
+    if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::SetDefaultMessageCard failed by nullptr");
         return INVALID_VALUE;
     }
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
-    return helper_->Update(defaultUri, predicates, value);
+    return dataShareHelper->Update(defaultUri, predicates, value);
 }
 
 int32_t SimRdbHelper::SetDefaultCellularData(int32_t slotId)
@@ -246,12 +253,13 @@ int32_t SimRdbHelper::SetDefaultCellularData(int32_t slotId)
     DataShare::DataShareValueObject valueObj(static_cast<int>(DefaultCardType::DATA));
     value.Put(SimRdbInfo::SLOT_INDEX, slotObj);
     value.Put(SimRdbInfo::CARD_TYPE, valueObj);
-    if (helper_ == nullptr) {
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAHelper();
+    if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::SetDefaultCellularData failed by nullptr");
         return INVALID_VALUE;
     }
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
-    return helper_->Update(defaultUri, predicates, value);
+    return dataShareHelper->Update(defaultUri, predicates, value);
 }
 
 int32_t SimRdbHelper::InsertData(int64_t &id, const DataShare::DataShareValuesBucket &values)
