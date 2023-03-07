@@ -377,7 +377,7 @@ static bool TestGetPrimarySlotId()
     int32_t result = INVALID_VALUE;
     g_telephonyService->GetPrimarySlotId(slotId);
     string expect = (result >= INVALID_VALUE) ? "success" : "fail";
-    std::cout << "TelephonyTestService Remote GetPrimarySlotId result [" << result << "] " << expect
+    std::cout << "TelephonyTestService Remote GetPrimarySlotId result [" << slotId << "] " << expect
               << std::endl;
     return true;
 }
