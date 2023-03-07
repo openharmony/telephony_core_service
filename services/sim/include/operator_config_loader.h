@@ -20,12 +20,13 @@
 #include <libxml/xmlmemory.h>
 #include <vector>
 
-#include "abs_shared_result_set.h"
 #include "common_event.h"
 #include "common_event_manager.h"
 #include "config_policy_utils.h"
-#include "data_ability_helper.h"
-#include "data_ability_predicates.h"
+#include "datashare_helper.h"
+#include "datashare_predicates.h"
+#include "datashare_result_set.h"
+#include "datashare_values_bucket.h"
 #include "event_handler.h"
 #include "inner_event.h"
 #include "iremote_broker.h"
@@ -35,14 +36,12 @@
 #include "sim_file_manager.h"
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
-#include "uri.h"
-#include "values_bucket.h"
 #include "want.h"
 
 namespace OHOS {
 namespace Telephony {
-static const std::string OPKEY_URI = "dataability:///com.ohos.opkeyability";
-const std::string OPKEY_INFO_URI = "dataability:///com.ohos.opkeyability/opkey/opkey_info";
+static const std::string OPKEY_URI = "datashare:///com.ohos.opkeyability";
+const std::string OPKEY_INFO_URI = "datashare:///com.ohos.opkeyability/opkey/opkey_info";
 
 class OperatorConfigLoader {
 public:
@@ -53,16 +52,15 @@ public:
 
 private:
     std::string LoadOpKeyOnMccMnc(int32_t slotId);
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> CreateDataAHelper(
-        int32_t systemAbilityId, std::shared_ptr<Uri> dataAbilityUri) const;
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> CreateOpKeyHelper();
-    std::string GetOpKey(std::shared_ptr<NativeRdb::AbsSharedResultSet> resultSet, int32_t slotId);
-    bool MatchOperatorRule(std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet, int row);
+    std::shared_ptr<DataShare::DataShareHelper> CreateDataAHelper() const;
+    std::shared_ptr<DataShare::DataShareHelper> CreateOpKeyHelper();
+    std::string GetOpKey(std::shared_ptr<DataShare::DataShareResultSet> resultSet, int32_t slotId);
+    bool MatchOperatorRule(std::shared_ptr<DataShare::DataShareResultSet> &resultSet, int row);
 
 private:
     std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
     std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> opKeyDataAbilityHelper_ = nullptr;
+    std::shared_ptr<DataShare::DataShareHelper> opKeyDataAbilityHelper_ = nullptr;
     std::string iccidFromSim_;
     std::string imsiFromSim_;
     std::string spnFromSim_;
