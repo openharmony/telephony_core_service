@@ -34,6 +34,10 @@ int32_t ImsRegInfoCallbackProxy::OnImsRegInfoChanged(int32_t slotId, ImsServiceT
         TELEPHONY_LOGE("remote is nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
+    if (!data.WriteInterfaceToken(ImsRegInfoCallbackProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
     data.WriteInt32(slotId);
     data.WriteInt32(static_cast<int32_t>(info.imsRegState));
     data.WriteInt32(static_cast<int32_t>(info.imsRegTech));

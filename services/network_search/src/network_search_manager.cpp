@@ -1260,11 +1260,10 @@ void NetworkSearchManager::NotifyImsRegInfoChanged(int32_t slotId, ImsServiceTyp
         if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType)) {
             if (iter.imsCallback == nullptr) {
                 TELEPHONY_LOGE("imsCallback is nullptr from listImsRegInfoCallbackRecord_");
-                return;
+                continue;
             }
             iter.imsCallback->OnImsRegInfoChanged(slotId, imsSrvType, info);
             isExisted = true;
-            break;
         }
     }
     if (!isExisted) {
