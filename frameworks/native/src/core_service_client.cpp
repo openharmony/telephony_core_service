@@ -28,7 +28,10 @@ namespace Telephony {
 constexpr int32_t INVALID_VALUE = -1;
 
 CoreServiceClient::CoreServiceClient() = default;
-CoreServiceClient::~CoreServiceClient() = default;
+CoreServiceClient::~CoreServiceClient()
+{
+    RemoveDeathRecipient(nullptr, false);
+}
 
 sptr<ICoreService> CoreServiceClient::GetProxy()
 {
@@ -65,21 +68,32 @@ sptr<ICoreService> CoreServiceClient::GetProxy()
 
 void CoreServiceClient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("OnRemoteDied failed, remote is nullptr");
+    RemoveDeathRecipient(remote, true);
+}
+
+void CoreServiceClient::RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied)
+{
+    if (isRemoteDied && remote == nullptr) {
+        TELEPHONY_LOGE("Remote died, remote is nullptr");
         return;
     }
     std::lock_guard<std::mutex> lock(mutexProxy_);
     if (proxy_ == nullptr) {
-        TELEPHONY_LOGE("OnRemoteDied proxy_ is nullptr");
+        TELEPHONY_LOGE("proxy_ is nullptr");
         return;
     }
     auto serviceRemote = proxy_->AsObject();
-    if ((serviceRemote != nullptr) && (serviceRemote == remote.promote())) {
-        serviceRemote->RemoveDeathRecipient(deathRecipient_);
-        proxy_ = nullptr;
-        TELEPHONY_LOGE("on remote died");
+    if (serviceRemote == nullptr) {
+        TELEPHONY_LOGE("serviceRemote is nullptr");
+        return;
     }
+    if (isRemoteDied && serviceRemote != remote.promote()) {
+        TELEPHONY_LOGE("Remote died serviceRemote is not same");
+        return;
+    }
+    serviceRemote->RemoveDeathRecipient(deathRecipient_);
+    proxy_ = nullptr;
+    TELEPHONY_LOGI("RemoveDeathRecipient success");
 }
 
 int32_t CoreServiceClient::GetPsRadioTech(int32_t slotId, int32_t &psRadioTech)
