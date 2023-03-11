@@ -121,6 +121,7 @@ public:
     int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType);
 
 private:
+    void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         explicit CoreServiceDeathRecipient(CoreServiceClient &client) : client_(client) {}
