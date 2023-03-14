@@ -168,8 +168,7 @@ int32_t SimRdbHelper::GetDefaultCellularDataCardSlotId()
 
 int32_t SimRdbHelper::GetDefaultVoiceCardSlotId()
 {
-    TELEPHONY_LOGI("SimRdbHelper::GetDefaultVoiceCardSlotId");
-    int32_t voiceCardSlotId = 0;
+    int32_t voiceCardSlotId = INVALID_VALUE;
     std::vector<std::string> colume;
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SimRdbInfo::IS_VOICE_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
@@ -187,6 +186,7 @@ int32_t SimRdbHelper::GetDefaultVoiceCardSlotId()
     result->GetColumnIndex(SimRdbInfo::SLOT_INDEX, index);
     result->GetInt(index, voiceCardSlotId);
     result->Close();
+    TELEPHONY_LOGI("SimRdbHelper::GetDefaultVoiceCardSlotId = %{public}d", slotId);
     return voiceCardSlotId;
 }
 
