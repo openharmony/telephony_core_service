@@ -47,7 +47,6 @@ int32_t NapiImsRegInfoCallbackManager::RegisterImsRegStateCallback(ImsRegStateCa
             "[slot%{public}d] Register imsRegState callback successfully, type %{public}d", slotId, imsSrvType);
     } else {
         if (stateCallback.imsCallback != nullptr) {
-            delete stateCallback.imsCallback;
             stateCallback.imsCallback = nullptr;
         }
         TELEPHONY_LOGE("[slot%{public}d] Register imsRegState callback failed, type %{public}d, ret %{public}d", slotId,
@@ -66,7 +65,6 @@ int32_t NapiImsRegInfoCallbackManager::UnregisterImsRegStateCallback(
     for (; iter != listImsRegStateCallback_.end(); ++iter) {
         if ((iter->slotId == slotId) && (iter->imsSrvType == imsSrvType)) {
             if (iter->imsCallback != nullptr) {
-                delete iter->imsCallback;
                 iter->imsCallback = nullptr;
             }
             listImsRegStateCallback_.erase(iter);
