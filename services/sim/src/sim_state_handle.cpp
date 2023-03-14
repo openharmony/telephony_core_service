@@ -75,7 +75,7 @@ bool SimStateHandle::HasSimCard()
     if (iccState_.simStatus_ != ICC_CARD_ABSENT) {
         has = true;
     }
-    TELEPHONY_LOGI("SimStateHandle::HasSimCard(), has = %{public}d", has);
+    TELEPHONY_LOGD("SimStateHandle::HasSimCard(), has = %{public}d", has);
     return has;
 }
 

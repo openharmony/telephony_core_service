@@ -33,10 +33,10 @@ void ObserverHandler::RegObserver(int32_t what, const std::shared_ptr<AppExecFwk
         if (it == handlers.end()) {
             handlers.push_back(handler);
         }
-        TELEPHONY_LOGI("ObserverHandler RegObserver update callback what: %{public}d, list size: %{public}zu", what,
+        TELEPHONY_LOGD("ObserverHandler RegObserver update callback what: %{public}d, list size: %{public}zu", what,
             handlers.size());
     } else {
-        TELEPHONY_LOGI("ObserverHandler RegObserver callback what: %{public}d", what);
+        TELEPHONY_LOGD("ObserverHandler RegObserver callback what: %{public}d", what);
         std::list<std::shared_ptr<AppExecFwk::EventHandler>> handlers;
         handlers.push_back(handler);
         observerHandlerMap_.emplace(what, handlers);
@@ -64,7 +64,7 @@ void ObserverHandler::Remove(int32_t what, const std::shared_ptr<AppExecFwk::Eve
         if (it != handlers.end()) {
             handlers.erase(it);
         }
-        TELEPHONY_LOGI("ObserverHandler Remove handlers list: %{public}zu", handlers.size());
+        TELEPHONY_LOGD("ObserverHandler Remove handlers list: %{public}zu", handlers.size());
     }
 }
 
@@ -78,7 +78,7 @@ void ObserverHandler::NotifyObserver(int32_t what)
     }
 
     for (auto handler : iter->second) {
-        TELEPHONY_LOGI("handler->SendEvent:%{public}d", what);
+        TELEPHONY_LOGD("handler->SendEvent:%{public}d", what);
         handler->SendEvent(what);
     }
 }
