@@ -496,22 +496,11 @@ int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, IccAccountInfo &in
 int32_t MultiSimController::GetDefaultVoiceSlotId()
 {
     TELEPHONY_LOGI("MultiSimController::GetDefaultVoiceSlotId");
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (localCacheInfo_.empty()) {
-        TELEPHONY_LOGE("MultiSimController::GetDefaultVoiceSlotId failed by nullptr");
-        if (simDbHelper_ == nullptr) {
-            TELEPHONY_LOGE("MultiSimController::GetDefaultVoiceSlotId simDbHelper is nullptr");
-            return DEFAULT_SLOT_ID;
-        }
-        return simDbHelper_->GetDefaultVoiceCardSlotId();
+    if (simDbHelper_ == nullptr) {
+        TELEPHONY_LOGE("MultiSimController::GetDefaultVoiceSlotId simDbHelper is nullptr");
+        return INVALID_VALUE;
     }
-    int32_t i = DEFAULT_SIM_SLOT_ID;
-    for (; i < maxCount_; i++) {
-        if (localCacheInfo_[i].isVoiceCard == MAIN_CARD) {
-            return i;
-        }
-    }
-    return GetFirstActivedSlotId();
+    return simDbHelper_->GetDefaultVoiceCardSlotId();
 }
 
 int32_t MultiSimController::GetFirstActivedSlotId()
