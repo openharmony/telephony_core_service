@@ -59,6 +59,7 @@ ohos_fuzztest("SendSmsMoreModeFuzzTest") {
     "drivers_interface_ril:libril_proxy_1.0",
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",
+    "hdf_core:libpub_utils",
     "hisysevent_native:libhisysevent",
     "i18n:zone_util",
     "init:libbegetutil",
