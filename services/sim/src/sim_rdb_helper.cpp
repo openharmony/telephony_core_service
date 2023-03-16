@@ -186,7 +186,7 @@ int32_t SimRdbHelper::GetDefaultVoiceCardSlotId()
     result->GetColumnIndex(SimRdbInfo::SLOT_INDEX, index);
     result->GetInt(index, voiceCardSlotId);
     result->Close();
-    TELEPHONY_LOGI("SimRdbHelper::GetDefaultVoiceCardSlotId = %{public}d", slotId);
+    TELEPHONY_LOGI("SimRdbHelper::GetDefaultVoiceCardSlotId = %{public}d", voiceCardSlotId);
     return voiceCardSlotId;
 }
 
