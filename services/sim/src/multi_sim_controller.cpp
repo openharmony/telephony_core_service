@@ -496,6 +496,7 @@ int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, IccAccountInfo &in
 int32_t MultiSimController::GetDefaultVoiceSlotId()
 {
     TELEPHONY_LOGI("MultiSimController::GetDefaultVoiceSlotId");
+    std::lock_guard<std::mutex> lock(mutex_);
     if (simDbHelper_ == nullptr) {
         TELEPHONY_LOGE("MultiSimController::GetDefaultVoiceSlotId simDbHelper is nullptr");
         return INVALID_VALUE;
