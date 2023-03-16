@@ -116,7 +116,7 @@ public:
     int32_t CallSrvccStatusNotice(const HDI::Ril::V1_0::SrvccStatus &srvccStatus);
     int32_t CallEmergencyNotice(const HDI::Ril::V1_0::EmergencyInfoList &emergencyInfoList);
     int32_t CallRsrvccStatusNotify();
-    int32_t CloseUnFinishedUssdResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo);
+    int32_t CloseUnFinishedUssdResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
 
 private:
     void BuildEmergencyInfoList(std::shared_ptr<EmergencyInfoList> emergencyCallList,
