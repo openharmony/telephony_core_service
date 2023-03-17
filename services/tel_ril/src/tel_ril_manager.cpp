@@ -59,7 +59,7 @@ bool TelRilManager::DeInit()
 
 bool TelRilManager::ConnectRilInterface()
 {
-    rilInterface_ = HDI::Ril::V1_0::IRil::Get();
+    rilInterface_ = HDI::Ril::V1_1::IRil::Get();
     if (rilInterface_ == nullptr) {
         TELEPHONY_LOGE("TelRilManager not find RilInterfaceService");
         return false;

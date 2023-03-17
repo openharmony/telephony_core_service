@@ -26,7 +26,7 @@ using OHOS::IRemoteObject;
 using OHOS::sptr;
 namespace OHOS {
 namespace Telephony {
-TelRilNetwork::TelRilNetwork(int32_t slotId, sptr<HDI::Ril::V1_0::IRil> rilInterface,
+TelRilNetwork::TelRilNetwork(int32_t slotId, sptr<HDI::Ril::V1_1::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {}
@@ -34,114 +34,114 @@ TelRilNetwork::TelRilNetwork(int32_t slotId, sptr<HDI::Ril::V1_0::IRil> rilInter
 int32_t TelRilNetwork::GetSignalStrength(const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_SIGNAL_STRENGTH, &HDI::Ril::V1_0::IRil::GetSignalStrength);
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_SIGNAL_STRENGTH, &HDI::Ril::V1_1::IRil::GetSignalStrength);
 }
 
 int32_t TelRilNetwork::GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_CS_REG_STATUS, &HDI::Ril::V1_0::IRil::GetCsRegStatus);
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_CS_REG_STATUS, &HDI::Ril::V1_1::IRil::GetCsRegStatus);
 }
 
 int32_t TelRilNetwork::GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_PS_REG_STATUS, &HDI::Ril::V1_0::IRil::GetPsRegStatus);
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_PS_REG_STATUS, &HDI::Ril::V1_1::IRil::GetPsRegStatus);
 }
 
 int32_t TelRilNetwork::GetOperatorInfo(const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_OPERATOR_INFO, &HDI::Ril::V1_0::IRil::GetOperatorInfo);
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_OPERATOR_INFO, &HDI::Ril::V1_1::IRil::GetOperatorInfo);
 }
 
 int32_t TelRilNetwork::GetNetworkSearchInformation(const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION,
-        &HDI::Ril::V1_0::IRil::GetNetworkSearchInformation);
+        &HDI::Ril::V1_1::IRil::GetNetworkSearchInformation);
 }
 
 int32_t TelRilNetwork::GetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_NETWORK_SELECTION_MODE,
-        &HDI::Ril::V1_0::IRil::GetNetworkSelectionMode);
+        &HDI::Ril::V1_1::IRil::GetNetworkSelectionMode);
 }
 
 int32_t TelRilNetwork::SetNetworkSelectionMode(
     int32_t automaticFlag, std::string oper, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    HDI::Ril::V1_0::SetNetworkModeInfo setNetworkModeInfo;
+    HDI::Ril::V1_1::SetNetworkModeInfo setNetworkModeInfo;
     setNetworkModeInfo.selectMode = automaticFlag;
     setNetworkModeInfo.oper = oper;
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_SET_NETWORK_SELECTION_MODE,
-        &HDI::Ril::V1_0::IRil::SetNetworkSelectionMode, setNetworkModeInfo);
+        &HDI::Ril::V1_1::IRil::SetNetworkSelectionMode, setNetworkModeInfo);
 }
 
 int32_t TelRilNetwork::SetPreferredNetwork(
     int32_t preferredNetworkType, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_SET_PREFERRED_NETWORK,
-        &HDI::Ril::V1_0::IRil::SetPreferredNetwork, preferredNetworkType);
+        &HDI::Ril::V1_1::IRil::SetPreferredNetwork, preferredNetworkType);
 }
 
 int32_t TelRilNetwork::GetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_PREFERRED_NETWORK,
-        &HDI::Ril::V1_0::IRil::GetPreferredNetwork);
+        &HDI::Ril::V1_1::IRil::GetPreferredNetwork);
 }
 
 int32_t TelRilNetwork::GetCellInfoList(const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST,
-        &HDI::Ril::V1_0::IRil::GetNeighboringCellInfoList);
+        &HDI::Ril::V1_1::IRil::GetNeighboringCellInfoList);
 }
 
 int32_t TelRilNetwork::GetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_CURRENT_CELL_INFO,
-        &HDI::Ril::V1_0::IRil::GetCurrentCellInfo);
+        &HDI::Ril::V1_1::IRil::GetCurrentCellInfo);
 }
 
 int32_t TelRilNetwork::GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG,
-        &HDI::Ril::V1_0::IRil::GetPhysicalChannelConfig);
+        &HDI::Ril::V1_1::IRil::GetPhysicalChannelConfig);
 }
 
 int32_t TelRilNetwork::SetLocateUpdates(HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_SET_LOCATE_UPDATES,
-        &HDI::Ril::V1_0::IRil::SetLocateUpdates, static_cast<HDI::Ril::V1_0::RilRegNotifyMode>(mode));
+        &HDI::Ril::V1_1::IRil::SetLocateUpdates, static_cast<HDI::Ril::V1_1::RilRegNotifyMode>(mode));
 }
 
 int32_t TelRilNetwork::SetNotificationFilter(int32_t newFilter, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_SET_NOTIFICATION_FILTER,
-        &HDI::Ril::V1_0::IRil::SetNotificationFilter, newFilter);
+        &HDI::Ril::V1_1::IRil::SetNotificationFilter, newFilter);
 }
 
 int32_t TelRilNetwork::SetDeviceState(
     int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_SET_DEVICE_STATE,
-        &HDI::Ril::V1_0::IRil::SetDeviceState, deviceStateType, deviceStateOn);
+        &HDI::Ril::V1_1::IRil::SetDeviceState, deviceStateType, deviceStateOn);
 }
 
-int32_t TelRilNetwork::SignalStrengthUpdated(const HDI::Ril::V1_0::Rssi &rssi)
+int32_t TelRilNetwork::SignalStrengthUpdated(const HDI::Ril::V1_1::Rssi &rssi)
 {
     std::shared_ptr<Rssi> signalStrength = std::make_shared<Rssi>();
     BuildSignalStrength(signalStrength, rssi);
     return Notify<Rssi>(TELEPHONY_LOG_FUNC_NAME, signalStrength, RadioEvent::RADIO_SIGNAL_STRENGTH_UPDATE);
 }
 
-int32_t TelRilNetwork::NetworkCsRegStatusUpdated(const HDI::Ril::V1_0::CsRegStatusInfo &csRegStatusInfo)
+int32_t TelRilNetwork::NetworkCsRegStatusUpdated(const HDI::Ril::V1_1::CsRegStatusInfo &csRegStatusInfo)
 {
     std::shared_ptr<CsRegStatusInfo> regStatusInfo = std::make_shared<CsRegStatusInfo>();
     BuildCsRegStatusInfo(regStatusInfo, csRegStatusInfo);
     return Notify<CsRegStatusInfo>(TELEPHONY_LOG_FUNC_NAME, regStatusInfo, RadioEvent::RADIO_NETWORK_STATE);
 }
 
-int32_t TelRilNetwork::NetworkPsRegStatusUpdated(const HDI::Ril::V1_0::PsRegStatusInfo &psRegStatusInfo)
+int32_t TelRilNetwork::NetworkPsRegStatusUpdated(const HDI::Ril::V1_1::PsRegStatusInfo &psRegStatusInfo)
 {
     std::shared_ptr<PsRegStatusResultInfo> regStatusInfo = std::make_shared<PsRegStatusResultInfo>();
     BuildPsRegStatusInfo(regStatusInfo, psRegStatusInfo);
@@ -160,7 +160,7 @@ int32_t TelRilNetwork::NetworkTimeUpdated(const std::string &timeStr)
         TELEPHONY_LOG_FUNC_NAME, std::make_shared<std::string>(timeStr), RadioEvent::RADIO_NETWORK_TIME_UPDATE);
 }
 
-int32_t TelRilNetwork::NetworkPhyChnlCfgUpdated(const HDI::Ril::V1_0::ChannelConfigInfoList &channelConfigInfoList)
+int32_t TelRilNetwork::NetworkPhyChnlCfgUpdated(const HDI::Ril::V1_1::ChannelConfigInfoList &channelConfigInfoList)
 {
     std::shared_ptr<ChannelConfigInfoList> channelConfigList = std::make_shared<ChannelConfigInfoList>();
     BuildChannelConfigInfoList(channelConfigList, channelConfigInfoList);
@@ -168,7 +168,7 @@ int32_t TelRilNetwork::NetworkPhyChnlCfgUpdated(const HDI::Ril::V1_0::ChannelCon
         TELEPHONY_LOG_FUNC_NAME, channelConfigList, RadioEvent::RADIO_CHANNEL_CONFIG_UPDATE);
 }
 
-int32_t TelRilNetwork::NetworkCurrentCellUpdated(const HDI::Ril::V1_0::CellListCurrentInfo &cellListCurrentInfo)
+int32_t TelRilNetwork::NetworkCurrentCellUpdated(const HDI::Ril::V1_1::CellListCurrentInfo &cellListCurrentInfo)
 {
     std::shared_ptr<CellListCurrentInfo> currentCellList = std::make_shared<CellListCurrentInfo>();
     BuildCurrentCellInfoList(currentCellList, cellListCurrentInfo);
@@ -176,7 +176,7 @@ int32_t TelRilNetwork::NetworkCurrentCellUpdated(const HDI::Ril::V1_0::CellListC
 }
 
 int32_t TelRilNetwork::GetSignalStrengthResponse(
-    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::Rssi &rssi)
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::Rssi &rssi)
 {
     std::shared_ptr<Rssi> signalStrength = std::make_shared<Rssi>();
     BuildSignalStrength(signalStrength, rssi);
@@ -184,7 +184,7 @@ int32_t TelRilNetwork::GetSignalStrengthResponse(
 }
 
 int32_t TelRilNetwork::GetCsRegStatusResponse(
-    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::CsRegStatusInfo &csRegStatusInfo)
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::CsRegStatusInfo &csRegStatusInfo)
 {
     auto getDataFunc = [&csRegStatusInfo, this](std::shared_ptr<TelRilRequest> telRilRequest) {
         std::shared_ptr<CsRegStatusInfo> regStatusInfo = std::make_shared<CsRegStatusInfo>();
@@ -196,7 +196,7 @@ int32_t TelRilNetwork::GetCsRegStatusResponse(
 }
 
 int32_t TelRilNetwork::GetPsRegStatusResponse(
-    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::PsRegStatusInfo &psRegStatusInfo)
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::PsRegStatusInfo &psRegStatusInfo)
 {
     auto getDataFunc = [&psRegStatusInfo, this](std::shared_ptr<TelRilRequest> telRilRequest) {
         std::shared_ptr<PsRegStatusResultInfo> regStatusInfo = std::make_shared<PsRegStatusResultInfo>();
@@ -208,15 +208,15 @@ int32_t TelRilNetwork::GetPsRegStatusResponse(
 }
 
 int32_t TelRilNetwork::GetOperatorInfoResponse(
-    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::OperatorInfo &operatorInfo)
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::OperatorInfo &operatorInfo)
 {
     std::shared_ptr<OperatorInfoResult> operatorResult = std::make_shared<OperatorInfoResult>();
     BuildOperatorInfo(operatorResult, operatorInfo);
     return Response<OperatorInfoResult>(TELEPHONY_LOG_FUNC_NAME, responseInfo, operatorResult);
 }
 
-int32_t TelRilNetwork::GetNetworkSearchInformationResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
-    const HDI::Ril::V1_0::AvailableNetworkList &availableNetworkList)
+int32_t TelRilNetwork::GetNetworkSearchInformationResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_1::AvailableNetworkList &availableNetworkList)
 {
     auto getDataFunc = [&availableNetworkList, this](std::shared_ptr<TelRilRequest> telRilRequest) {
         std::shared_ptr<AvailableNetworkList> availableNetworkInfos = std::make_shared<AvailableNetworkList>();
@@ -227,8 +227,8 @@ int32_t TelRilNetwork::GetNetworkSearchInformationResponse(const HDI::Ril::V1_0:
     return Response<AvailableNetworkList>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
 }
 
-int32_t TelRilNetwork::GetNetworkSelectionModeResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
-    const HDI::Ril::V1_0::SetNetworkModeInfo &setNetworkModeInfo)
+int32_t TelRilNetwork::GetNetworkSelectionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_1::SetNetworkModeInfo &setNetworkModeInfo)
 {
     auto getDataFunc = [&setNetworkModeInfo, this](std::shared_ptr<TelRilRequest> telRilRequest) {
         std::shared_ptr<SetNetworkModeInfo> networkModeInfo = std::make_shared<SetNetworkModeInfo>();
@@ -239,13 +239,13 @@ int32_t TelRilNetwork::GetNetworkSelectionModeResponse(const HDI::Ril::V1_0::Ril
     return Response<SetNetworkModeInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
 }
 
-int32_t TelRilNetwork::SetNetworkSelectionModeResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
+int32_t TelRilNetwork::SetNetworkSelectionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
 int32_t TelRilNetwork::GetNeighboringCellInfoListResponse(
-    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::CellListNearbyInfo &cellInfoList)
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::CellListNearbyInfo &cellInfoList)
 {
     std::shared_ptr<CellListNearbyInfo> cellListNearbyInfo = std::make_shared<CellListNearbyInfo>();
     BuildNeighboringCellInfoList(cellListNearbyInfo, cellInfoList);
@@ -253,20 +253,20 @@ int32_t TelRilNetwork::GetNeighboringCellInfoListResponse(
 }
 
 int32_t TelRilNetwork::GetCurrentCellInfoResponse(
-    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::CellListCurrentInfo &cellInfoList)
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList)
 {
     std::shared_ptr<CellListCurrentInfo> currentCellList = std::make_shared<CellListCurrentInfo>();
     BuildCurrentCellInfoList(currentCellList, cellInfoList);
     return Response<CellListCurrentInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, currentCellList);
 }
 
-int32_t TelRilNetwork::SetPreferredNetworkResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
+int32_t TelRilNetwork::SetPreferredNetworkResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilNetwork::GetPreferredNetworkResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
-    const HDI::Ril::V1_0::PreferredNetworkTypeInfo &preferredNetworkTypeInfo)
+int32_t TelRilNetwork::GetPreferredNetworkResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_1::PreferredNetworkTypeInfo &preferredNetworkTypeInfo)
 {
     auto getDataFunc = [&preferredNetworkTypeInfo](std::shared_ptr<TelRilRequest> telRilRequest) {
         std::shared_ptr<PreferredNetworkTypeInfo> preferredTypeInfo = std::make_shared<PreferredNetworkTypeInfo>();
@@ -277,8 +277,8 @@ int32_t TelRilNetwork::GetPreferredNetworkResponse(const HDI::Ril::V1_0::RilRadi
     return Response<PreferredNetworkTypeInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
 }
 
-int32_t TelRilNetwork::GetPhysicalChannelConfigResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
-    const HDI::Ril::V1_0::ChannelConfigInfoList &channelConfigInfoList)
+int32_t TelRilNetwork::GetPhysicalChannelConfigResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_1::ChannelConfigInfoList &channelConfigInfoList)
 {
     auto getDataFunc = [&channelConfigInfoList, this](std::shared_ptr<TelRilRequest> telRilRequest) {
         std::shared_ptr<ChannelConfigInfoList> channelConfigList = std::make_shared<ChannelConfigInfoList>();
@@ -289,22 +289,22 @@ int32_t TelRilNetwork::GetPhysicalChannelConfigResponse(const HDI::Ril::V1_0::Ri
     return Response<ChannelConfigInfoList>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
 }
 
-int32_t TelRilNetwork::SetLocateUpdatesResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
+int32_t TelRilNetwork::SetLocateUpdatesResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilNetwork::SetNotificationFilterResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
+int32_t TelRilNetwork::SetNotificationFilterResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilNetwork::SetDeviceStateResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
+int32_t TelRilNetwork::SetDeviceStateResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-void TelRilNetwork::BuildSignalStrength(std::shared_ptr<Rssi> signalStrength, const HDI::Ril::V1_0::Rssi &rssi)
+void TelRilNetwork::BuildSignalStrength(std::shared_ptr<Rssi> signalStrength, const HDI::Ril::V1_1::Rssi &rssi)
 {
     signalStrength->gw.rxlev = rssi.gw.rxlev;
     signalStrength->gw.ber = rssi.gw.ber;
@@ -325,7 +325,7 @@ void TelRilNetwork::BuildSignalStrength(std::shared_ptr<Rssi> signalStrength, co
 }
 
 void TelRilNetwork::BuildCsRegStatusInfo(
-    std::shared_ptr<CsRegStatusInfo> regStatusInfo, const HDI::Ril::V1_0::CsRegStatusInfo &csRegStatusInfo)
+    std::shared_ptr<CsRegStatusInfo> regStatusInfo, const HDI::Ril::V1_1::CsRegStatusInfo &csRegStatusInfo)
 {
     regStatusInfo->notifyType = csRegStatusInfo.notifyType;
     regStatusInfo->regStatus = static_cast<HRilRegStatus>(csRegStatusInfo.regStatus);
@@ -335,7 +335,7 @@ void TelRilNetwork::BuildCsRegStatusInfo(
 }
 
 void TelRilNetwork::BuildPsRegStatusInfo(
-    std::shared_ptr<PsRegStatusResultInfo> regStatusInfo, const HDI::Ril::V1_0::PsRegStatusInfo &psRegStatusInfo)
+    std::shared_ptr<PsRegStatusResultInfo> regStatusInfo, const HDI::Ril::V1_1::PsRegStatusInfo &psRegStatusInfo)
 {
     regStatusInfo->notifyType = psRegStatusInfo.notifyType;
     regStatusInfo->regStatus = static_cast<HRilRegStatus>(psRegStatusInfo.regStatus);
@@ -348,7 +348,7 @@ void TelRilNetwork::BuildPsRegStatusInfo(
 }
 
 void TelRilNetwork::BuildOperatorInfo(
-    std::shared_ptr<OperatorInfoResult> operatorInfoResult, const HDI::Ril::V1_0::OperatorInfo &operatorInfo)
+    std::shared_ptr<OperatorInfoResult> operatorInfoResult, const HDI::Ril::V1_1::OperatorInfo &operatorInfo)
 {
     operatorInfoResult->longName = operatorInfo.longName;
     operatorInfoResult->shortName = operatorInfo.shortName;
@@ -356,7 +356,7 @@ void TelRilNetwork::BuildOperatorInfo(
 }
 
 void TelRilNetwork::BuildAvailableNetworkList(std::shared_ptr<AvailableNetworkList> availableNetworkInfos,
-    const HDI::Ril::V1_0::AvailableNetworkList &availableNetworkList)
+    const HDI::Ril::V1_1::AvailableNetworkList &availableNetworkList)
 {
     AvailableNetworkInfo operInfo = {};
     availableNetworkInfos->itemNum = availableNetworkList.itemNum;
@@ -372,14 +372,14 @@ void TelRilNetwork::BuildAvailableNetworkList(std::shared_ptr<AvailableNetworkLi
 }
 
 void TelRilNetwork::BuildNetworkModeInfo(
-    std::shared_ptr<SetNetworkModeInfo> networkModeInfo, const HDI::Ril::V1_0::SetNetworkModeInfo &setNetworkModeInfo)
+    std::shared_ptr<SetNetworkModeInfo> networkModeInfo, const HDI::Ril::V1_1::SetNetworkModeInfo &setNetworkModeInfo)
 {
     networkModeInfo->selectMode = setNetworkModeInfo.selectMode;
     networkModeInfo->oper = setNetworkModeInfo.oper;
 }
 
 void TelRilNetwork::BuildNeighboringCellInfoList(
-    std::shared_ptr<CellListNearbyInfo> cellListNearbyInfo, const HDI::Ril::V1_0::CellListNearbyInfo &cellInfoList)
+    std::shared_ptr<CellListNearbyInfo> cellListNearbyInfo, const HDI::Ril::V1_1::CellListNearbyInfo &cellInfoList)
 {
     cellListNearbyInfo->itemNum = cellInfoList.itemNum;
     for (auto info : cellInfoList.cellNearbyInfo) {
@@ -389,7 +389,7 @@ void TelRilNetwork::BuildNeighboringCellInfoList(
     }
 }
 
-void TelRilNetwork::FillGsmCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::CellNearbyInfo &info)
+void TelRilNetwork::FillGsmCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_1::CellNearbyInfo &info)
 {
     cellInfo.ServiceCellParas.gsm.band = info.serviceCells.gsm.band;
     cellInfo.ServiceCellParas.gsm.arfcn = info.serviceCells.gsm.arfcn;
@@ -399,7 +399,7 @@ void TelRilNetwork::FillGsmCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::R
     cellInfo.ServiceCellParas.gsm.rxlev = info.serviceCells.gsm.rxlev;
 }
 
-void TelRilNetwork::FillLteCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::CellNearbyInfo &info)
+void TelRilNetwork::FillLteCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_1::CellNearbyInfo &info)
 {
     cellInfo.ServiceCellParas.lte.arfcn = info.serviceCells.lte.arfcn;
     cellInfo.ServiceCellParas.lte.pci = info.serviceCells.lte.pci;
@@ -408,7 +408,7 @@ void TelRilNetwork::FillLteCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::R
     cellInfo.ServiceCellParas.lte.rxlev = info.serviceCells.lte.rxlev;
 }
 
-void TelRilNetwork::FillWcdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::CellNearbyInfo &info)
+void TelRilNetwork::FillWcdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_1::CellNearbyInfo &info)
 {
     cellInfo.ServiceCellParas.wcdma.arfcn = info.serviceCells.wcdma.arfcn;
     cellInfo.ServiceCellParas.wcdma.psc = info.serviceCells.wcdma.psc;
@@ -416,7 +416,7 @@ void TelRilNetwork::FillWcdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI:
     cellInfo.ServiceCellParas.wcdma.ecno = info.serviceCells.wcdma.ecno;
 }
 
-void TelRilNetwork::FillCdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::CellNearbyInfo &info)
+void TelRilNetwork::FillCdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_1::CellNearbyInfo &info)
 {
     cellInfo.ServiceCellParas.cdma.systemId = info.serviceCells.cdma.systemId;
     cellInfo.ServiceCellParas.cdma.networkId = info.serviceCells.cdma.networkId;
@@ -430,7 +430,7 @@ void TelRilNetwork::FillCdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::
 }
 
 void TelRilNetwork::FillTdscdmaCellNearbyInfo(
-    CellNearbyInfo &cellNearbyInfo, const HDI::Ril::V1_0::CellNearbyInfo &info)
+    CellNearbyInfo &cellNearbyInfo, const HDI::Ril::V1_1::CellNearbyInfo &info)
 {
     cellNearbyInfo.ServiceCellParas.tdscdma.arfcn = info.serviceCells.tdscdma.arfcn;
     cellNearbyInfo.ServiceCellParas.tdscdma.syncId = info.serviceCells.tdscdma.syncId;
@@ -443,7 +443,7 @@ void TelRilNetwork::FillTdscdmaCellNearbyInfo(
     cellNearbyInfo.ServiceCellParas.tdscdma.cpid = info.serviceCells.tdscdma.cpid;
 }
 
-void TelRilNetwork::FillNrCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::CellNearbyInfo &info)
+void TelRilNetwork::FillNrCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_1::CellNearbyInfo &info)
 {
     cellInfo.ServiceCellParas.nr.nrArfcn = info.serviceCells.nr.nrArfcn;
     cellInfo.ServiceCellParas.nr.pci = info.serviceCells.nr.pci;
@@ -451,7 +451,7 @@ void TelRilNetwork::FillNrCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ri
     cellInfo.ServiceCellParas.nr.nci = info.serviceCells.nr.nci;
 }
 
-void TelRilNetwork::FillCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::CellNearbyInfo &info)
+void TelRilNetwork::FillCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_1::CellNearbyInfo &info)
 {
     cellInfo.ratType = info.ratType;
     switch (info.ratType) {
@@ -480,7 +480,7 @@ void TelRilNetwork::FillCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril:
 }
 
 void TelRilNetwork::BuildCurrentCellInfoList(
-    std::shared_ptr<CellListCurrentInfo> currentCellList, const HDI::Ril::V1_0::CellListCurrentInfo &cellInfoList)
+    std::shared_ptr<CellListCurrentInfo> currentCellList, const HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList)
 {
     currentCellList->itemNum = cellInfoList.itemNum;
     for (auto &info : cellInfoList.cellCurrentInfo) {
@@ -490,7 +490,7 @@ void TelRilNetwork::BuildCurrentCellInfoList(
     }
 }
 
-void TelRilNetwork::FillCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info)
+void TelRilNetwork::FillCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_1::CurrentCellInfo &info)
 {
     cellInfo.ratType = info.ratType;
     cellInfo.mcc = info.mcc;
@@ -520,7 +520,7 @@ void TelRilNetwork::FillCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ri
     }
 }
 
-void TelRilNetwork::FillGsmCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info)
+void TelRilNetwork::FillGsmCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_1::CurrentCellInfo &info)
 {
     cellInfo.ServiceCellParas.gsm.band = info.serviceCells.gsm.band;
     cellInfo.ServiceCellParas.gsm.arfcn = info.serviceCells.gsm.arfcn;
@@ -532,7 +532,7 @@ void TelRilNetwork::FillGsmCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI:
     cellInfo.ServiceCellParas.gsm.ta = info.serviceCells.gsm.ta;
 }
 
-void TelRilNetwork::FillLteCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info)
+void TelRilNetwork::FillLteCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_1::CurrentCellInfo &info)
 {
     cellInfo.ServiceCellParas.lte.arfcn = info.serviceCells.lte.arfcn;
     cellInfo.ServiceCellParas.lte.cellId = info.serviceCells.lte.cellId;
@@ -543,7 +543,7 @@ void TelRilNetwork::FillLteCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI:
     cellInfo.ServiceCellParas.lte.rssi = info.serviceCells.lte.rssi;
 }
 
-void TelRilNetwork::FillWcdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info)
+void TelRilNetwork::FillWcdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_1::CurrentCellInfo &info)
 {
     cellInfo.ServiceCellParas.wcdma.arfcn = info.serviceCells.wcdma.arfcn;
     cellInfo.ServiceCellParas.wcdma.cellId = info.serviceCells.wcdma.cellId;
@@ -556,7 +556,7 @@ void TelRilNetwork::FillWcdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HD
     cellInfo.ServiceCellParas.wcdma.drx = info.serviceCells.wcdma.drx;
 }
 
-void TelRilNetwork::FillCdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info)
+void TelRilNetwork::FillCdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_1::CurrentCellInfo &info)
 {
     cellInfo.ServiceCellParas.cdma.systemId = info.serviceCells.cdma.systemId;
     cellInfo.ServiceCellParas.cdma.networkId = info.serviceCells.cdma.networkId;
@@ -570,7 +570,7 @@ void TelRilNetwork::FillCdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI
 }
 
 void TelRilNetwork::FillTdscdmaCurrentCellInfo(
-    CurrentCellInfo &currentCellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info)
+    CurrentCellInfo &currentCellInfo, const HDI::Ril::V1_1::CurrentCellInfo &info)
 {
     currentCellInfo.ServiceCellParas.tdscdma.arfcn = info.serviceCells.tdscdma.arfcn;
     currentCellInfo.ServiceCellParas.tdscdma.syncId = info.serviceCells.tdscdma.syncId;
@@ -583,7 +583,7 @@ void TelRilNetwork::FillTdscdmaCurrentCellInfo(
     currentCellInfo.ServiceCellParas.tdscdma.cpid = info.serviceCells.tdscdma.cpid;
 }
 
-void TelRilNetwork::FillNrCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info)
+void TelRilNetwork::FillNrCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_1::CurrentCellInfo &info)
 {
     cellInfo.ServiceCellParas.nr.nrArfcn = info.serviceCells.nr.nrArfcn;
     cellInfo.ServiceCellParas.nr.pci = info.serviceCells.nr.pci;
@@ -592,7 +592,7 @@ void TelRilNetwork::FillNrCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::
 }
 
 void TelRilNetwork::BuildChannelConfigInfoList(std::shared_ptr<ChannelConfigInfoList> channelConfigList,
-    const HDI::Ril::V1_0::ChannelConfigInfoList &channelConfigInfoList)
+    const HDI::Ril::V1_1::ChannelConfigInfoList &channelConfigInfoList)
 {
     channelConfigList->itemNum = channelConfigInfoList.itemNum;
     for (int32_t i = 0; i < channelConfigList->itemNum; i++) {
