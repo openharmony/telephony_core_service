@@ -134,7 +134,7 @@ bool OperatorFileParser::ParseOperatorConfigFromFile(OperatorConfig &opc, const 
 
 void OperatorFileParser::ParseOperatorConfigFromJson(const Json::Value &root, OperatorConfig &opc)
 {
-    TELEPHONY_LOGI("ParseOperatorConfigFromJson");
+    TELEPHONY_LOGD("ParseOperatorConfigFromJson");
     Json::Value::Members mems = root.getMemberNames();
     std::map<std::u16string, std::u16string> &configValue = opc.configValue;
     for (auto mem : mems) {
@@ -145,33 +145,33 @@ void OperatorFileParser::ParseOperatorConfigFromJson(const Json::Value &root, Op
             value.toStyledString().c_str());
         auto valueType = root[mem].type();
         if (valueType == Json::arrayValue) {
-            TELEPHONY_LOGI("parse type arrayValue");
+            TELEPHONY_LOGD("parse type arrayValue");
             if (value.size() > 0) {
                 ParseArray(keyStr8, value, opc);
             }
             continue;
         }
         if (valueType == Json::stringValue) {
-            TELEPHONY_LOGI("parse type stringValue");
+            TELEPHONY_LOGD("parse type stringValue");
             opc.stringValue[keyStr8] = value.asString();
             configValue[Str8ToStr16(keyStr8)] = Str8ToStr16(value.asString());
             continue;
         }
         if (valueType == Json::intValue) {
-            TELEPHONY_LOGI("parse type initValue");
+            TELEPHONY_LOGD("parse type initValue");
             int64_t lValue = static_cast<int64_t>(stoll(value.asString()));
             configValue[Str8ToStr16(keyStr8)] = Str8ToStr16(value.asString());
             if (value > INT_MAX) {
-                TELEPHONY_LOGI("value is long");
+                TELEPHONY_LOGD("value is long");
                 opc.longValue[keyStr8] = lValue;
             } else {
-                TELEPHONY_LOGI("value is int");
+                TELEPHONY_LOGD("value is int");
                 opc.intValue[keyStr8] = static_cast<int32_t>(lValue);
             }
             continue;
         }
         if (valueType == Json::booleanValue) {
-            TELEPHONY_LOGI("parse type booleanValue");
+            TELEPHONY_LOGD("parse type booleanValue");
             opc.boolValue[keyStr8] = value.asBool();
             configValue[Str8ToStr16(keyStr8)] = Str8ToStr16(value.asString());
             continue;

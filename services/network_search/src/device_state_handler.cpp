@@ -143,7 +143,7 @@ void DeviceStateHandler::SetCellRequestMinInterval(uint32_t minInterval) const
         return;
     }
     if (inner->networkSearchHandler_ != nullptr) {
-        TELEPHONY_LOGI("DeviceStateHandler::SetCellRequestMinInterval %{public}d", minInterval);
+        TELEPHONY_LOGD("DeviceStateHandler::SetCellRequestMinInterval %{public}d", minInterval);
         inner->networkSearchHandler_->SetCellRequestMinInterval(minInterval);
     }
 }
@@ -177,7 +177,7 @@ void DeviceStateHandler::SetDeviceState(int32_t deviceStateType, bool deviceStat
     }
     std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
     if (telRilManager != nullptr) {
-        TELEPHONY_LOGI("DeviceStateHandler::SetDeviceState type:%{public}d state:%{public}d, slotId_:%{public}d",
+        TELEPHONY_LOGD("DeviceStateHandler::SetDeviceState type:%{public}d state:%{public}d, slotId_:%{public}d",
             deviceStateType, deviceStateOn, slotId_);
         telRilManager->SetDeviceState(slotId_, deviceStateType, deviceStateOn, event);
     }

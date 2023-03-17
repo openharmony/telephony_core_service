@@ -276,7 +276,7 @@ int32_t TelRilSms::SmsStatusReportNotify(const HDI::Ril::V1_0::SmsMessageInfo &i
 
 int32_t TelRilSms::NewSmsStoredOnSimNotify(int32_t recordNumber, int32_t indicationType)
 {
-    TELEPHONY_LOGI("indicationType: %{public}d", indicationType);
+    TELEPHONY_LOGD("indicationType: %{public}d", indicationType);
     return Notify<int32_t>(
         TELEPHONY_LOG_FUNC_NAME, std::make_shared<int32_t>(recordNumber), RadioEvent::RADIO_SMS_ON_SIM);
 }

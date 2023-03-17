@@ -181,7 +181,7 @@ int32_t TelRilManager::RegisterCoreNotify(
                 }
                 break;
             default:
-                TELEPHONY_LOGI("RegisterCoreNotify default what:%{public}d, slotId:%{public}d", what, slotId);
+                TELEPHONY_LOGD("RegisterCoreNotify default what:%{public}d, slotId:%{public}d", what, slotId);
                 observerHandler->RegObserver(what, observerCallBack);
                 break;
         }
@@ -428,7 +428,7 @@ int32_t TelRilManager::GetEmergencyCallList(int32_t slotId, const AppExecFwk::In
 int32_t TelRilManager::SetEmergencyCallList(
     int32_t slotId, const std::vector<EmergencyCall> &eccVec, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    TELEPHONY_LOGI("SetEmergencyCallList start");
+    TELEPHONY_LOGD("SetEmergencyCallList start");
     return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetEmergencyCallList, eccVec);
 }
 
@@ -808,7 +808,7 @@ int32_t TelRilManager::SetRadioProtocol(
 
 void TelRilManager::HandleRilInterfaceStatusCallback(const OHOS::HDI::ServiceManager::V1_0::ServiceStatus &status)
 {
-    TELEPHONY_LOGI("TelRilManager::HandleRilInterfaceCallback, service name %{public}s %{public}d",
+    TELEPHONY_LOGD("TelRilManager::HandleRilInterfaceCallback, service name %{public}s %{public}d",
         status.serviceName.c_str(), status.status);
     if (status.serviceName != std::string(RIL_INTERFACE_SERVICE_NAME)) {
         return;
@@ -878,7 +878,7 @@ bool TelRilManager::UnRegisterHdfStatusListener()
         return false;
     }
 
-    TELEPHONY_LOGI("TelRilManager::UnRegisterHdfStatusListener, unregister successfully!");
+    TELEPHONY_LOGD("TelRilManager::UnRegisterHdfStatusListener, unregister successfully!");
     return true;
 }
 
@@ -898,14 +898,14 @@ bool TelRilManager::ReConnectRilInterface()
         TELEPHONY_LOGE("TelRilManager::ReConnectRilInterface, Reset remote object failed!");
         return false;
     }
-    TELEPHONY_LOGI("TelRilManager::ReConnectRilInterface, Connect riladapter service successfully!");
+    TELEPHONY_LOGD("TelRilManager::ReConnectRilInterface, Connect riladapter service successfully!");
     return true;
 }
 
 bool TelRilManager::DisConnectRilInterface()
 {
     if (rilInterface_ == nullptr) {
-        TELEPHONY_LOGI("TelRilManager::DisConnectRilInterface has been successfully disconnected!");
+        TELEPHONY_LOGD("TelRilManager::DisConnectRilInterface has been successfully disconnected!");
         return true;
     }
     rilInterface_ = nullptr;
@@ -913,7 +913,7 @@ bool TelRilManager::DisConnectRilInterface()
         TELEPHONY_LOGE("TelRilManager::DisConnectRilInterface, Reset remote object failed!");
         return false;
     }
-    TELEPHONY_LOGI("TelRilManager::DisConnectRilInterface, disconnect riladapter service successfully");
+    TELEPHONY_LOGD("TelRilManager::DisConnectRilInterface, disconnect riladapter service successfully");
     return true;
 }
 } // namespace Telephony
