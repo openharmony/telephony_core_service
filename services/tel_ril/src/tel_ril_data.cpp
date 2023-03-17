@@ -176,7 +176,7 @@ int32_t TelRilData::SetLinkBandwidthReportingRule(
     dLinkBandwidth.maximumDownlinkKbpsSize = static_cast<int32_t>(linkBandwidth.maximumDownlinkKbps.size());
     dLinkBandwidth.maximumUplinkKbps = linkBandwidth.maximumUplinkKbps;
     dLinkBandwidth.maximumDownlinkKbps = linkBandwidth.maximumDownlinkKbps;
-    TELEPHONY_LOGI("maximumUplinkKbpsSize:%{public}d, maximumDownlinkKbpsSize:%{public}d",
+    TELEPHONY_LOGD("maximumUplinkKbpsSize:%{public}d, maximumDownlinkKbpsSize:%{public}d",
         dLinkBandwidth.maximumUplinkKbpsSize, dLinkBandwidth.maximumDownlinkKbpsSize);
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE,
         &HDI::Ril::V1_0::IRil::SetLinkBandwidthReportingRule, dLinkBandwidth);

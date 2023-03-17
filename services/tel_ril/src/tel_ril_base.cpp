@@ -65,7 +65,7 @@ std::shared_ptr<TelRilRequest> TelRilBase::FindTelRilRequest(const HRilRadioResp
     std::lock_guard<std::mutex> lockRequest(TelRilBase::requestLock_);
     auto iter = TelRilBase::requestMap_.find(serial);
     if (iter == TelRilBase::requestMap_.end()) {
-        TELEPHONY_LOGI("FindTelRilRequest not found serial:%{public}d", serial);
+        TELEPHONY_LOGD("FindTelRilRequest not found serial:%{public}d", serial);
     } else {
         telRilRequest = iter->second;
         if (handler_ != nullptr) {
