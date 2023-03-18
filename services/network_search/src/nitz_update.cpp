@@ -36,10 +36,6 @@ namespace OHOS {
 namespace Telephony {
 const int32_t MILLI_TO_BASE = 1000;
 const int32_t MAX_UPDATE_TIME = 5;
-const std::string KEY_AUTO_TIME_ZONE = "auto_timezone";
-const std::string KEY_AUTO_TIME = "auto_time";
-const std::string KEY_SYSTEM_TIMEZONE = "system_timezone";
-const std::string KEY_SYSTEM_TIME = "system_time";
 const uint32_t TIME_SPLIT_NUM = 3;
 const uint32_t TIMEZONE_SPLIT_NUM = 2;
 const uint32_t YEAR_LENGTH_TWO = 2;
@@ -52,9 +48,9 @@ const uint32_t TIME_THRESHOLD = 3; // seconds
 int64_t NitzUpdate::lastSystemTime_ = 0;
 int32_t NitzUpdate::offset_ = 0;
 int64_t NitzUpdate::lastNetworkTime_ = 0;
-std::string NitzUpdate::timeZone_ = "";
+std::string NitzUpdate::timeZone_;
 
-NitzUpdate::NitzUpdate(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
+NitzUpdate::NitzUpdate(const std::weak_ptr<NetworkSearchManager> &networkSearchManager, int32_t slotId)
     : networkSearchManager_(networkSearchManager), slotId_(slotId)
 {}
 
@@ -78,8 +74,7 @@ void NitzUpdate::ProcessNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event)
 
     TELEPHONY_LOGI(
         "NitzUpdate::ProcessNitzUpdate get time:%{public}s slotId:%{public}d", strTime.get()->c_str(), slotId_);
-    NetworkTime networkTime;
-    (void)memset_s(&networkTime, sizeof(NetworkTime), 0, sizeof(NetworkTime));
+    NetworkTime networkTime = {0};
     if (NitzParse(*strTime, networkTime)) {
         ProcessTime(networkTime);
         offset_ = networkTime.offset;
@@ -90,17 +85,13 @@ void NitzUpdate::ProcessNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event)
 bool NitzUpdate::NitzParse(std::string &nitzStr, NetworkTime &networkTime)
 {
     std::string strSep = ",";
-    std::string strDateSubs = "";
-    std::string strTimeSubs = "";
     std::vector<std::string> strsRet;
     SplitStr(nitzStr, strSep, strsRet);
     if (static_cast<uint32_t>(strsRet.size()) < static_cast<uint32_t>(TIMEZONE_SPLIT_NUM)) {
         TELEPHONY_LOGE("NitzUpdate::NitzParse nitz string error slotId:%{public}d", slotId_);
         return false;
     }
-    strDateSubs = strsRet[0];
-    strTimeSubs = strsRet[1];
-
+    std::string strDateSubs = strsRet[0];
     strsRet.clear();
     strSep = "/";
     SplitStr(strDateSubs, strSep, strsRet);
@@ -119,7 +110,7 @@ bool NitzUpdate::NitzParse(std::string &nitzStr, NetworkTime &networkTime)
     StrToInt(strYear, networkTime.year);
     StrToInt(strsRet[1], networkTime.month);
     StrToInt(strsRet[LOCATION_DAY_OR_SEC], networkTime.day);
-
+    std::string strTimeSubs = strsRet[1];
     if (!NitzTimeParse(strTimeSubs, networkTime)) {
         return false;
     }
@@ -326,7 +317,7 @@ bool NitzUpdate::IsAutoTimeZone()
     }
     Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI);
     std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIMEZONE;
-    std::string value = "";
+    std::string value;
     if (!settingHelper->Query(uri, key, value)) {
         TELEPHONY_LOGI("Query %{public}s fail", key.c_str());
         return false;

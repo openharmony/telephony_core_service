@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
-NetworkType::NetworkType(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
+NetworkType::NetworkType(const std::weak_ptr<NetworkSearchManager> &networkSearchManager, int32_t slotId)
     : networkSearchManager_(networkSearchManager), slotId_(slotId)
 {}
 
