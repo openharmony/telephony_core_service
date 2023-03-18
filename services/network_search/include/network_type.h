@@ -27,7 +27,7 @@ namespace Telephony {
 class NetworkSearchManager;
 class NetworkType {
 public:
-    NetworkType(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId);
+    NetworkType(const std::weak_ptr<NetworkSearchManager> &networkSearchManager, int32_t slotId);
     virtual ~NetworkType() = default;
     void ProcessGetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessSetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &event) const;
