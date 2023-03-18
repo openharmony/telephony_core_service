@@ -74,10 +74,7 @@ void NitzUpdate::ProcessNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event)
 
     TELEPHONY_LOGI(
         "NitzUpdate::ProcessNitzUpdate get time:%{public}s slotId:%{public}d", strTime.get()->c_str(), slotId_);
-    NetworkTime networkTime;
-    if (memset_s(&networkTime, sizeof(NetworkTime), 0, sizeof(NetworkTime)) != EOK) {
-        return;
-    }
+    NetworkTime networkTime = {0};
     if (NitzParse(*strTime, networkTime)) {
         ProcessTime(networkTime);
         offset_ = networkTime.offset;
