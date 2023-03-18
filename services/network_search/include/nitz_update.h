@@ -25,7 +25,7 @@ namespace Telephony {
 class NetworkSearchManager;
 class NitzUpdate {
 public:
-    NitzUpdate(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId);
+    NitzUpdate(const std::weak_ptr<NetworkSearchManager> &networkSearchManager, int32_t slotId);
     virtual ~NitzUpdate() = default;
     void ProcessNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessTimeZone();
