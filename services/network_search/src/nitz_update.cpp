@@ -110,7 +110,7 @@ bool NitzUpdate::NitzParse(std::string &nitzStr, NetworkTime &networkTime)
     StrToInt(strYear, networkTime.year);
     StrToInt(strsRet[1], networkTime.month);
     StrToInt(strsRet[LOCATION_DAY_OR_SEC], networkTime.day);
-     std::string strTimeSubs = strsRet[1];
+    std::string strTimeSubs = strsRet[1];
     if (!NitzTimeParse(strTimeSubs, networkTime)) {
         return false;
     }
