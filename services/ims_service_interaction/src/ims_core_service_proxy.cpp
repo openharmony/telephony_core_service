@@ -24,10 +24,6 @@ namespace OHOS {
 namespace Telephony {
 int32_t ImsCoreServiceProxy::GetImsRegistrationStatus(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGE("[slot%{public}d]Permission denied!", slotId);
-        return TELEPHONY_ERR_PERMISSION_ERR;
-    }
     MessageParcel in;
     if (!in.WriteInterfaceToken(ImsCoreServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("[slot%{public}d]Write descriptor token fail!", slotId);
@@ -54,10 +50,6 @@ int32_t ImsCoreServiceProxy::GetImsRegistrationStatus(int32_t slotId)
 
 int32_t ImsCoreServiceProxy::RegisterImsCoreServiceCallback(const sptr<ImsCoreServiceCallbackInterface> &callback)
 {
-    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGE("Permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
-    }
     if (callback == nullptr) {
         TELEPHONY_LOGE("callback is nullptr!");
         return TELEPHONY_ERR_ARGUMENT_INVALID;

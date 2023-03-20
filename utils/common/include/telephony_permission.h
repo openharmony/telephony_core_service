@@ -37,6 +37,8 @@ static constexpr const char *CELL_LOCATION = "ohos.permission.LOCATION";
 static constexpr const char *READ_MESSAGES = "ohos.permission.READ_MESSAGES";
 static constexpr const char *SEND_MESSAGES = "ohos.permission.SEND_MESSAGES";
 static constexpr const char *RECEIVE_MESSAGES = "ohos.permission.RECEIVE_SMS";
+static constexpr const char *CONNECT_CELLULAR_CALL_SERVICE = "ohos.permission.CONNECT_CELLULAR_CALL_SERVICE";
+static constexpr const char *CONNECT_IMS_SERVICE = "ohos.permission.CONNECT_IMS_SERVICE";
 } // namespace Permission
 
 class TelephonyPermission {
