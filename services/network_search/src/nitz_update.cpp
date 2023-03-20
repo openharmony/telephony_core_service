@@ -178,7 +178,7 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
 
     struct tm t;
     (void)memset_s(&t, sizeof(t), 0, sizeof(t));
-    t.tm_year = networkTime.year - CST_YEAR;
+    t.tm_year = networkTime.year - static_cast<int32_t>(CST_YEAR);
     t.tm_mon = networkTime.month - 1;
     t.tm_mday = networkTime.day;
     t.tm_hour = networkTime.hour;
@@ -216,8 +216,7 @@ bool NitzUpdate::IsValidTime(int64_t networkTime)
     if (abs(networkTimeInterval - systemElapsedTime) > TIME_THRESHOLD) {
         TELEPHONY_LOGE(
             "NitzUpdate::IsInvalidTime The gap between the network time interval and the system elapsed time interval "
-            "is large and will not be processed, slotId:%{public}d",
-            slotId_);
+            "is large and will not be processed, slotId:%{public}d", slotId_);
         return false;
     }
 
