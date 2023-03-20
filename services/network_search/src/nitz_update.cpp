@@ -178,7 +178,7 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
 
     struct tm t;
     (void)memset_s(&t, sizeof(t), 0, sizeof(t));
-    t.tm_year = networkTime.year - CST_YEAR;
+    t.tm_year = networkTime.year - static_cast<int32_t>(CST_YEAR);
     t.tm_mon = networkTime.month - 1;
     t.tm_mday = networkTime.day;
     t.tm_hour = networkTime.hour;
