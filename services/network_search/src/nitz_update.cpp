@@ -216,8 +216,7 @@ bool NitzUpdate::IsValidTime(int64_t networkTime)
     if (abs(networkTimeInterval - systemElapsedTime) > TIME_THRESHOLD) {
         TELEPHONY_LOGE(
             "NitzUpdate::IsInvalidTime The gap between the network time interval and the system elapsed time interval "
-            "is large and will not be processed, slotId:%{public}d",
-            slotId_);
+            "is large and will not be processed, slotId:%{public}d", slotId_);
         return false;
     }
 
