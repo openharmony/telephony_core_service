@@ -2187,7 +2187,7 @@ HWTEST_F(BranchTest, Telephony_SimRdbHelper_001, Function | MediumTest | Level1)
     EXPECT_GE(simRdbHelper->GetDefaultMainCardSlotId(), TELEPHONY_ERROR);
     EXPECT_GE(simRdbHelper->GetDefaultMessageCardSlotId(), TELEPHONY_ERROR);
     EXPECT_EQ(simRdbHelper->GetDefaultCellularDataCardSlotId(), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(simRdbHelper->GetDefaultVoiceCardSlotId(), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(simRdbHelper->GetDefaultVoiceCardSlotId(), TELEPHONY_ERROR);
     EXPECT_EQ(simRdbHelper->SetDefaultMainCard(INVALID_SLOTID), TELEPHONY_ERROR);
     EXPECT_EQ(simRdbHelper->SetDefaultVoiceCard(INVALID_SLOTID), TELEPHONY_ERROR);
     EXPECT_EQ(simRdbHelper->SetDefaultMessageCard(INVALID_SLOTID), TELEPHONY_ERROR);
