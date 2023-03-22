@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace Telephony {
-TelRilSim::TelRilSim(int32_t slotId, sptr<HDI::Ril::V1_1::IRil> rilInterface,
+TelRilSim::TelRilSim(int32_t slotId, sptr<HDI::Ril::V1_0::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {}
@@ -67,7 +67,7 @@ int32_t TelRilSim::SimRefreshNotify()
     return Notify(TELEPHONY_LOG_FUNC_NAME, RadioEvent::RADIO_ICC_REFRESH);
 }
 
-int32_t TelRilSim::SimRadioProtocolUpdated(const HDI::Ril::V1_1::RadioProtocol &radioProtocol)
+int32_t TelRilSim::SimRadioProtocolUpdated(const HDI::Ril::V1_0::RadioProtocol &radioProtocol)
 {
     std::shared_ptr<RadioProtocol> protocol = std::make_shared<RadioProtocol>();
     BuildRadioProtocol(protocol, radioProtocol);
@@ -76,7 +76,7 @@ int32_t TelRilSim::SimRadioProtocolUpdated(const HDI::Ril::V1_1::RadioProtocol &
 
 // response
 int32_t TelRilSim::GetSimIOResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::IccIoResultInfo &result)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::IccIoResultInfo &result)
 {
     return ResponseIccIo(responseInfo, result);
 }
@@ -148,26 +148,26 @@ int32_t TelRilSim::ProcessIccIoInfo(
 }
 
 int32_t TelRilSim::GetSimStatusResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::CardStatusInfo &result)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::CardStatusInfo &result)
 {
     std::shared_ptr<CardStatusInfo> cardStatusInfo = std::make_shared<CardStatusInfo>();
     BuildCardStatusInfo(cardStatusInfo, result);
     return Response<CardStatusInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, cardStatusInfo);
 }
 
-int32_t TelRilSim::GetImsiResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &result)
+int32_t TelRilSim::GetImsiResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const std::string &result)
 {
     return Response<std::string>(TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<std::string>(result));
 }
 
 int32_t TelRilSim::GetSimLockStatusResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t simLockStatus)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, int32_t simLockStatus)
 {
     return Response<int32_t>(TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<int32_t>(simLockStatus));
 }
 
 int32_t TelRilSim::SetSimLockResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::LockStatusResp &lockStatus)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::LockStatusResp &lockStatus)
 {
     std::shared_ptr<LockStatusResp> lockStatusResp = std::make_shared<LockStatusResp>();
     BuildLockStatusResp(lockStatusResp, lockStatus);
@@ -175,7 +175,7 @@ int32_t TelRilSim::SetSimLockResponse(
 }
 
 int32_t TelRilSim::ChangeSimPasswordResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::LockStatusResp &lockStatus)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::LockStatusResp &lockStatus)
 {
     std::shared_ptr<LockStatusResp> lockStatusResp = std::make_shared<LockStatusResp>();
     BuildLockStatusResp(lockStatusResp, lockStatus);
@@ -183,7 +183,7 @@ int32_t TelRilSim::ChangeSimPasswordResponse(
 }
 
 int32_t TelRilSim::UnlockPinResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::LockStatusResp &lockStatus)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::LockStatusResp &lockStatus)
 {
     std::shared_ptr<LockStatusResp> lockStatusResp = std::make_shared<LockStatusResp>();
     BuildLockStatusResp(lockStatusResp, lockStatus);
@@ -191,7 +191,7 @@ int32_t TelRilSim::UnlockPinResponse(
 }
 
 int32_t TelRilSim::UnlockPukResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::LockStatusResp &lockStatus)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::LockStatusResp &lockStatus)
 {
     std::shared_ptr<LockStatusResp> lockStatusResp = std::make_shared<LockStatusResp>();
     BuildLockStatusResp(lockStatusResp, lockStatus);
@@ -199,7 +199,7 @@ int32_t TelRilSim::UnlockPukResponse(
 }
 
 int32_t TelRilSim::UnlockPin2Response(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::LockStatusResp &lockStatus)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::LockStatusResp &lockStatus)
 {
     std::shared_ptr<LockStatusResp> lockStatusResp = std::make_shared<LockStatusResp>();
     BuildLockStatusResp(lockStatusResp, lockStatus);
@@ -207,40 +207,40 @@ int32_t TelRilSim::UnlockPin2Response(
 }
 
 int32_t TelRilSim::UnlockPuk2Response(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::LockStatusResp &lockStatus)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::LockStatusResp &lockStatus)
 {
     std::shared_ptr<LockStatusResp> lockStatusResp = std::make_shared<LockStatusResp>();
     BuildLockStatusResp(lockStatusResp, lockStatus);
     return Response<LockStatusResp>(TELEPHONY_LOG_FUNC_NAME, responseInfo, lockStatusResp);
 }
 
-int32_t TelRilSim::SetActiveSimResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSim::SetActiveSimResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilSim::SimStkSendTerminalResponseResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSim::SimStkSendTerminalResponseResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilSim::SimStkSendEnvelopeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSim::SimStkSendEnvelopeResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilSim::SimStkSendCallSetupRequestResultResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSim::SimStkSendCallSetupRequestResultResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilSim::SimStkIsReadyResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSim::SimStkIsReadyResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
 int32_t TelRilSim::GetRadioProtocolResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::RadioProtocol &radioProtocol)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::RadioProtocol &radioProtocol)
 {
     std::shared_ptr<RadioProtocol> protocol = std::make_shared<RadioProtocol>();
     BuildRadioProtocol(protocol, radioProtocol);
@@ -248,46 +248,46 @@ int32_t TelRilSim::GetRadioProtocolResponse(
 }
 
 int32_t TelRilSim::SetRadioProtocolResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::RadioProtocol &radioProtocol)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::RadioProtocol &radioProtocol)
 {
     std::shared_ptr<RadioProtocol> protocol = std::make_shared<RadioProtocol>();
     BuildRadioProtocol(protocol, radioProtocol);
     return Response<RadioProtocol>(TELEPHONY_LOG_FUNC_NAME, responseInfo, protocol);
 }
 
-int32_t TelRilSim::SimOpenLogicalChannelResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
-    const HDI::Ril::V1_1::OpenLogicalChannelResponse &pOpenLogicalChannelResponse)
+int32_t TelRilSim::SimOpenLogicalChannelResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::OpenLogicalChannelResponse &pOpenLogicalChannelResponse)
 {
     std::shared_ptr<OpenLogicalChannelResponse> openLogicalChannelResp = std::make_shared<OpenLogicalChannelResponse>();
     BuildOpenLogicalChannelResp(openLogicalChannelResp, pOpenLogicalChannelResponse);
     return Response<OpenLogicalChannelResponse>(TELEPHONY_LOG_FUNC_NAME, responseInfo, openLogicalChannelResp);
 }
 
-int32_t TelRilSim::SimCloseLogicalChannelResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSim::SimCloseLogicalChannelResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
 int32_t TelRilSim::SimTransmitApduLogicalChannelResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::IccIoResultInfo &result)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::IccIoResultInfo &result)
 {
     return ResponseIccIo(responseInfo, result);
 }
 
 int32_t TelRilSim::SimTransmitApduBasicChannelResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::IccIoResultInfo &result)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::IccIoResultInfo &result)
 {
     return ResponseIccIo(responseInfo, result);
 }
 
 int32_t TelRilSim::SimAuthenticationResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::IccIoResultInfo &result)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::IccIoResultInfo &result)
 {
     return ResponseIccIo(responseInfo, result);
 }
 
 int32_t TelRilSim::UnlockSimLockResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::LockStatusResp &lockStatus)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::LockStatusResp &lockStatus)
 {
     std::shared_ptr<LockStatusResp> lockStatusResp = std::make_shared<LockStatusResp>();
     BuildLockStatusResp(lockStatusResp, lockStatus);
@@ -296,12 +296,12 @@ int32_t TelRilSim::UnlockSimLockResponse(
 
 int32_t TelRilSim::GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_SIM_GET_SIM_STATUS, &HDI::Ril::V1_1::IRil::GetSimStatus);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_SIM_GET_SIM_STATUS, &HDI::Ril::V1_0::IRil::GetSimStatus);
 }
 
 int32_t TelRilSim::GetSimIO(SimIoRequestInfo simIoInfo, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    OHOS::HDI::Ril::V1_1::SimIoRequestInfo iccIoRequestInfo;
+    OHOS::HDI::Ril::V1_0::SimIoRequestInfo iccIoRequestInfo;
     iccIoRequestInfo.command = simIoInfo.command;
     iccIoRequestInfo.fileId = simIoInfo.fileId;
     iccIoRequestInfo.p1 = simIoInfo.p1;
@@ -311,169 +311,169 @@ int32_t TelRilSim::GetSimIO(SimIoRequestInfo simIoInfo, const AppExecFwk::InnerE
     iccIoRequestInfo.path = simIoInfo.path;
     iccIoRequestInfo.pin2 = simIoInfo.pin2;
     return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_GET_SIM_IO, &HDI::Ril::V1_1::IRil::GetSimIO, iccIoRequestInfo);
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_GET_SIM_IO, &HDI::Ril::V1_0::IRil::GetSimIO, iccIoRequestInfo);
 }
 
 int32_t TelRilSim::GetImsi(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_SIM_GET_IMSI, &HDI::Ril::V1_1::IRil::GetImsi);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_SIM_GET_IMSI, &HDI::Ril::V1_0::IRil::GetImsi);
 }
 
 int32_t TelRilSim::GetSimLockStatus(std::string fac, const AppExecFwk::InnerEvent::Pointer &response)
 {
     const int32_t MODE = 2;
-    OHOS::HDI::Ril::V1_1::SimLockInfo simLockInfo;
+    OHOS::HDI::Ril::V1_0::SimLockInfo simLockInfo;
     simLockInfo.fac = fac;
     simLockInfo.mode = MODE;
     simLockInfo.classx = 0;
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_GET_SIM_LOCK_STATUS,
-        &HDI::Ril::V1_1::IRil::GetSimLockStatus, simLockInfo);
+        &HDI::Ril::V1_0::IRil::GetSimLockStatus, simLockInfo);
 }
 
 int32_t TelRilSim::SetSimLock(
     std::string fac, int32_t mode, std::string passwd, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    OHOS::HDI::Ril::V1_1::SimLockInfo simLockInfo;
+    OHOS::HDI::Ril::V1_0::SimLockInfo simLockInfo;
     simLockInfo.fac = fac;
     simLockInfo.mode = mode;
     simLockInfo.passwd = passwd;
     simLockInfo.classx = 0;
     return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_SET_SIM_LOCK, &HDI::Ril::V1_1::IRil::SetSimLock, simLockInfo);
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_SET_SIM_LOCK, &HDI::Ril::V1_0::IRil::SetSimLock, simLockInfo);
 }
 
 int32_t TelRilSim::ChangeSimPassword(std::string fac, std::string oldPassword, std::string newPassword,
     int32_t passwordLength, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    OHOS::HDI::Ril::V1_1::SimPasswordInfo simPwdInfo;
+    OHOS::HDI::Ril::V1_0::SimPasswordInfo simPwdInfo;
     simPwdInfo.fac = fac;
     simPwdInfo.oldPassword = oldPassword;
     simPwdInfo.newPassword = newPassword;
     simPwdInfo.passwordLength = passwordLength;
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_CHANGE_SIM_PASSWORD,
-        &HDI::Ril::V1_1::IRil::ChangeSimPassword, simPwdInfo);
+        &HDI::Ril::V1_0::IRil::ChangeSimPassword, simPwdInfo);
 }
 
 int32_t TelRilSim::UnlockPin(std::string pin, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_UNLOCK_PIN, &HDI::Ril::V1_1::IRil::UnlockPin, pin);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_UNLOCK_PIN, &HDI::Ril::V1_0::IRil::UnlockPin, pin);
 }
 
 int32_t TelRilSim::UnlockPuk(std::string puk, std::string pin, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_UNLOCK_PUK, &HDI::Ril::V1_1::IRil::UnlockPuk, puk, pin);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_UNLOCK_PUK, &HDI::Ril::V1_0::IRil::UnlockPuk, puk, pin);
 }
 
 int32_t TelRilSim::UnlockPin2(std::string pin2, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_UNLOCK_PIN2, &HDI::Ril::V1_1::IRil::UnlockPin2, pin2);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_UNLOCK_PIN2, &HDI::Ril::V1_0::IRil::UnlockPin2, pin2);
 }
 
 int32_t TelRilSim::UnlockPuk2(std::string puk2, std::string pin2, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_UNLOCK_PUK2, &HDI::Ril::V1_1::IRil::UnlockPuk2, puk2, pin2);
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_UNLOCK_PUK2, &HDI::Ril::V1_0::IRil::UnlockPuk2, puk2, pin2);
 }
 
 int32_t TelRilSim::SetActiveSim(int32_t index, int32_t enable, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_SET_ACTIVE_SIM, &HDI::Ril::V1_1::IRil::SetActiveSim, index, enable);
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_SET_ACTIVE_SIM, &HDI::Ril::V1_0::IRil::SetActiveSim, index, enable);
 }
 
 int32_t TelRilSim::SimStkSendTerminalResponse(
     const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_STK_SEND_TERMINAL_RESPONSE,
-        &HDI::Ril::V1_1::IRil::SimStkSendTerminalResponse, strCmd);
+        &HDI::Ril::V1_0::IRil::SimStkSendTerminalResponse, strCmd);
 }
 
 int32_t TelRilSim::SimStkSendEnvelope(const std::string &strCmd, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_STK_SEND_ENVELOPE,
-        &HDI::Ril::V1_1::IRil::SimStkSendEnvelope, strCmd);
+        &HDI::Ril::V1_0::IRil::SimStkSendEnvelope, strCmd);
 }
 
 int32_t TelRilSim::SimStkSendCallSetupRequestResult(bool accept, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT,
-        &HDI::Ril::V1_1::IRil::SimStkSendCallSetupRequestResult, (int32_t)accept);
+        &HDI::Ril::V1_0::IRil::SimStkSendCallSetupRequestResult, (int32_t)accept);
 }
 
 int32_t TelRilSim::SimStkIsReady(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_STK_IS_READY, &HDI::Ril::V1_1::IRil::SimStkIsReady);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_STK_IS_READY, &HDI::Ril::V1_0::IRil::SimStkIsReady);
 }
 
 
 int32_t TelRilSim::GetRadioProtocol(const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_GET_RADIO_PROTOCOL, &HDI::Ril::V1_1::IRil::GetRadioProtocol);
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_GET_RADIO_PROTOCOL, &HDI::Ril::V1_0::IRil::GetRadioProtocol);
 }
 
 int32_t TelRilSim::SetRadioProtocol(RadioProtocol radioProtocol, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    HDI::Ril::V1_1::RadioProtocol protocol;
+    HDI::Ril::V1_0::RadioProtocol protocol;
     protocol.slotId = radioProtocol.slotId;
     protocol.sessionId = radioProtocol.sessionId;
-    protocol.phase = static_cast<HDI::Ril::V1_1::RadioProtocolPhase>(radioProtocol.phase);
+    protocol.phase = static_cast<HDI::Ril::V1_0::RadioProtocolPhase>(radioProtocol.phase);
     protocol.technology = radioProtocol.technology;
     protocol.modemId = radioProtocol.modemId;
-    protocol.status = static_cast<HDI::Ril::V1_1::RadioProtocolStatus>(radioProtocol.status);
+    protocol.status = static_cast<HDI::Ril::V1_0::RadioProtocolStatus>(radioProtocol.status);
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_SET_RADIO_PROTOCOL,
-        &HDI::Ril::V1_1::IRil::SetRadioProtocol, protocol);
+        &HDI::Ril::V1_0::IRil::SetRadioProtocol, protocol);
 }
 
 int32_t TelRilSim::SimOpenLogicalChannel(std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_OPEN_LOGICAL_CHANNEL,
-        &HDI::Ril::V1_1::IRil::SimOpenLogicalChannel, appID, p2);
+        &HDI::Ril::V1_0::IRil::SimOpenLogicalChannel, appID, p2);
 }
 
 int32_t TelRilSim::SimCloseLogicalChannel(int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_CLOSE_LOGICAL_CHANNEL,
-        &HDI::Ril::V1_1::IRil::SimCloseLogicalChannel, channelId);
+        &HDI::Ril::V1_0::IRil::SimCloseLogicalChannel, channelId);
 }
 
 int32_t TelRilSim::SimTransmitApduLogicalChannel(
     const ApduSimIORequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    OHOS::HDI::Ril::V1_1::ApduSimIORequestInfo ApduRequestInfo;
+    OHOS::HDI::Ril::V1_0::ApduSimIORequestInfo ApduRequestInfo;
     BuildApduRequestInfo(ApduRequestInfo, reqInfo);
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL,
-        &HDI::Ril::V1_1::IRil::SimTransmitApduLogicalChannel, ApduRequestInfo);
+        &HDI::Ril::V1_0::IRil::SimTransmitApduLogicalChannel, ApduRequestInfo);
 }
 
 int32_t TelRilSim::SimTransmitApduBasicChannel(
     const ApduSimIORequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    OHOS::HDI::Ril::V1_1::ApduSimIORequestInfo ApduRequestInfo;
+    OHOS::HDI::Ril::V1_0::ApduSimIORequestInfo ApduRequestInfo;
     BuildApduRequestInfo(ApduRequestInfo, reqInfo);
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL,
-        &HDI::Ril::V1_1::IRil::SimTransmitApduBasicChannel, ApduRequestInfo);
+        &HDI::Ril::V1_0::IRil::SimTransmitApduBasicChannel, ApduRequestInfo);
 }
 
 int32_t TelRilSim::SimAuthentication(
     const SimAuthenticationRequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    OHOS::HDI::Ril::V1_1::SimAuthenticationRequestInfo simAuthInfo;
+    OHOS::HDI::Ril::V1_0::SimAuthenticationRequestInfo simAuthInfo;
     simAuthInfo.aid = reqInfo.aid;
     simAuthInfo.authData = reqInfo.authData;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_AUTHENTICATION, &HDI::Ril::V1_1::IRil::SimAuthentication,
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_AUTHENTICATION, &HDI::Ril::V1_0::IRil::SimAuthentication,
         simAuthInfo);
 }
 
 int32_t TelRilSim::UnlockSimLock(
     int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_UNLOCK_SIM_LOCK, &HDI::Ril::V1_1::IRil::UnlockSimLock,
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_UNLOCK_SIM_LOCK, &HDI::Ril::V1_0::IRil::UnlockSimLock,
         lockType, password);
 }
 
 void TelRilSim::BuildIccIoResult(
-    std::shared_ptr<IccIoResultInfo> iccIoResult, const HDI::Ril::V1_1::IccIoResultInfo &result)
+    std::shared_ptr<IccIoResultInfo> iccIoResult, const HDI::Ril::V1_0::IccIoResultInfo &result)
 {
     iccIoResult->response = result.response;
     iccIoResult->sw1 = result.sw1;
@@ -481,7 +481,7 @@ void TelRilSim::BuildIccIoResult(
 }
 
 void TelRilSim::BuildCardStatusInfo(
-    std::shared_ptr<CardStatusInfo> cardStatusInfo, const HDI::Ril::V1_1::CardStatusInfo &result)
+    std::shared_ptr<CardStatusInfo> cardStatusInfo, const HDI::Ril::V1_0::CardStatusInfo &result)
 {
     cardStatusInfo->index = result.index;
     cardStatusInfo->simType = result.simType;
@@ -489,14 +489,14 @@ void TelRilSim::BuildCardStatusInfo(
 }
 
 void TelRilSim::BuildLockStatusResp(
-    std::shared_ptr<LockStatusResp> lockStatusResp, const HDI::Ril::V1_1::LockStatusResp &lockStatus)
+    std::shared_ptr<LockStatusResp> lockStatusResp, const HDI::Ril::V1_0::LockStatusResp &lockStatus)
 {
     lockStatusResp->result = lockStatus.result;
     lockStatusResp->remain = lockStatus.remain;
 }
 
 void TelRilSim::BuildRadioProtocol(
-    std::shared_ptr<RadioProtocol> protocol, const HDI::Ril::V1_1::RadioProtocol &radioProtocol)
+    std::shared_ptr<RadioProtocol> protocol, const HDI::Ril::V1_0::RadioProtocol &radioProtocol)
 {
     protocol->slotId = radioProtocol.slotId;
     protocol->sessionId = radioProtocol.sessionId;
@@ -507,7 +507,7 @@ void TelRilSim::BuildRadioProtocol(
 }
 
 void TelRilSim::BuildOpenLogicalChannelResp(std::shared_ptr<OpenLogicalChannelResponse> openLogicalChannelResp,
-    const HDI::Ril::V1_1::OpenLogicalChannelResponse &pOpenLogicalChannelResponse)
+    const HDI::Ril::V1_0::OpenLogicalChannelResponse &pOpenLogicalChannelResponse)
 {
     openLogicalChannelResp->sw1 = pOpenLogicalChannelResponse.sw1;
     openLogicalChannelResp->sw2 = pOpenLogicalChannelResponse.sw2;
@@ -516,7 +516,7 @@ void TelRilSim::BuildOpenLogicalChannelResp(std::shared_ptr<OpenLogicalChannelRe
 }
 
 void TelRilSim::BuildApduRequestInfo(
-    OHOS::HDI::Ril::V1_1::ApduSimIORequestInfo &ApduRequestInfo, const ApduSimIORequestInfo &reqInfo)
+    OHOS::HDI::Ril::V1_0::ApduSimIORequestInfo &ApduRequestInfo, const ApduSimIORequestInfo &reqInfo)
 {
     ApduRequestInfo.channelId = reqInfo.channelId;
     ApduRequestInfo.type = reqInfo.type;
@@ -528,7 +528,7 @@ void TelRilSim::BuildApduRequestInfo(
 }
 
 int32_t TelRilSim::ResponseIccIo(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::IccIoResultInfo &result)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::IccIoResultInfo &result)
 {
     std::shared_ptr<IccIoResultInfo> iccIoResult = std::make_shared<IccIoResultInfo>();
     BuildIccIoResult(iccIoResult, result);

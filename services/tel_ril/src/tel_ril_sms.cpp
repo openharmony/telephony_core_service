@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
-TelRilSms::TelRilSms(int32_t slotId, sptr<HDI::Ril::V1_1::IRil> rilInterface,
+TelRilSms::TelRilSms(int32_t slotId, sptr<HDI::Ril::V1_0::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {}
@@ -42,18 +42,18 @@ bool TelRilSms::IsSmsRespOrNotify(uint32_t code)
     return IsSmsResponse(code) || IsSmsNotification(code);
 }
 
-HDI::Ril::V1_1::GsmSmsMessageInfo TelRilSms::ConstructGsmSendSmsRequestLinkList(std::string &smsPdu, std::string &pdu)
+HDI::Ril::V1_0::GsmSmsMessageInfo TelRilSms::ConstructGsmSendSmsRequestLinkList(std::string &smsPdu, std::string &pdu)
 {
-    HDI::Ril::V1_1::GsmSmsMessageInfo msg;
+    HDI::Ril::V1_0::GsmSmsMessageInfo msg;
     msg.smscPdu = smsPdu.empty() ? "" : smsPdu;
     msg.pdu = pdu.empty() ? "" : pdu;
     return msg;
 }
 
-OHOS::HDI::Ril::V1_1::SmsMessageIOInfo TelRilSms::ConstructSmsMessageIOInfoRequestLinkList(
+OHOS::HDI::Ril::V1_0::SmsMessageIOInfo TelRilSms::ConstructSmsMessageIOInfoRequestLinkList(
     std::string &smsPdu, std::string &pdu)
 {
-    OHOS::HDI::Ril::V1_1::SmsMessageIOInfo msg;
+    OHOS::HDI::Ril::V1_0::SmsMessageIOInfo msg;
     msg.smscPdu = smsPdu.empty() ? "" : smsPdu;
     msg.pdu = pdu.empty() ? "" : pdu;
     return msg;
@@ -61,137 +61,137 @@ OHOS::HDI::Ril::V1_1::SmsMessageIOInfo TelRilSms::ConstructSmsMessageIOInfoReque
 
 int32_t TelRilSms::SendGsmSms(std::string &smsPdu, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    HDI::Ril::V1_1::GsmSmsMessageInfo gsmSmsMessageInfo = ConstructGsmSendSmsRequestLinkList(smsPdu, pdu);
+    HDI::Ril::V1_0::GsmSmsMessageInfo gsmSmsMessageInfo = ConstructGsmSendSmsRequestLinkList(smsPdu, pdu);
     return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SEND_GSM_SMS, &HDI::Ril::V1_1::IRil::SendGsmSms, gsmSmsMessageInfo);
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SEND_GSM_SMS, &HDI::Ril::V1_0::IRil::SendGsmSms, gsmSmsMessageInfo);
 }
 
 int32_t TelRilSms::SendCdmaSms(std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    HDI::Ril::V1_1::SendCdmaSmsMessageInfo cdmaSmsMessageInfo = {};
+    HDI::Ril::V1_0::SendCdmaSmsMessageInfo cdmaSmsMessageInfo = {};
     cdmaSmsMessageInfo.smscPdu = pdu;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SEND_CDMA_SMS, &HDI::Ril::V1_1::IRil::SendCdmaSms,
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SEND_CDMA_SMS, &HDI::Ril::V1_0::IRil::SendCdmaSms,
         cdmaSmsMessageInfo);
 }
 
 int32_t TelRilSms::AddSimMessage(
     int32_t status, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    OHOS::HDI::Ril::V1_1::SmsMessageIOInfo mGsmSmsMessageInfo = ConstructSmsMessageIOInfoRequestLinkList(smscPdu, pdu);
+    OHOS::HDI::Ril::V1_0::SmsMessageIOInfo mGsmSmsMessageInfo = ConstructSmsMessageIOInfoRequestLinkList(smscPdu, pdu);
     mGsmSmsMessageInfo.state = status;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_ADD_SIM_MESSAGE, &HDI::Ril::V1_1::IRil::AddSimMessage,
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_ADD_SIM_MESSAGE, &HDI::Ril::V1_0::IRil::AddSimMessage,
         mGsmSmsMessageInfo);
 }
 
 int32_t TelRilSms::DelSimMessage(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_DEL_SIM_MESSAGE, &HDI::Ril::V1_1::IRil::DelSimMessage, gsmIndex);
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_DEL_SIM_MESSAGE, &HDI::Ril::V1_0::IRil::DelSimMessage, gsmIndex);
 }
 
 int32_t TelRilSms::UpdateSimMessage(int32_t gsmIndex, int32_t state, std::string smscPdu, std::string pdu,
     const AppExecFwk::InnerEvent::Pointer &response)
 {
-    OHOS::HDI::Ril::V1_1::SmsMessageIOInfo smsMessageIOInfo = ConstructSmsMessageIOInfoRequestLinkList(smscPdu, pdu);
+    OHOS::HDI::Ril::V1_0::SmsMessageIOInfo smsMessageIOInfo = ConstructSmsMessageIOInfoRequestLinkList(smscPdu, pdu);
     smsMessageIOInfo.index = gsmIndex;
     smsMessageIOInfo.state = state;
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_UPDATE_SIM_MESSAGE,
-        &HDI::Ril::V1_1::IRil::UpdateSimMessage, smsMessageIOInfo);
+        &HDI::Ril::V1_0::IRil::UpdateSimMessage, smsMessageIOInfo);
 }
 
 int32_t TelRilSms::SetSmscAddr(int32_t tosca, std::string address, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    OHOS::HDI::Ril::V1_1::ServiceCenterAddress serCenterAddress;
+    OHOS::HDI::Ril::V1_0::ServiceCenterAddress serCenterAddress;
     serCenterAddress.address = address;
     serCenterAddress.tosca = tosca;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SET_SMSC_ADDR, &HDI::Ril::V1_1::IRil::SetSmscAddr,
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SET_SMSC_ADDR, &HDI::Ril::V1_0::IRil::SetSmscAddr,
         serCenterAddress);
 }
 
 int32_t TelRilSms::GetSmscAddr(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_GET_SMSC_ADDR, &HDI::Ril::V1_1::IRil::GetSmscAddr);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_GET_SMSC_ADDR, &HDI::Ril::V1_0::IRil::GetSmscAddr);
 }
 
 int32_t TelRilSms::GetCdmaCBConfig(const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_GET_CDMA_CB_CONFIG, &HDI::Ril::V1_1::IRil::GetCdmaCBConfig);
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_GET_CDMA_CB_CONFIG, &HDI::Ril::V1_0::IRil::GetCdmaCBConfig);
 }
 
 int32_t TelRilSms::SendSmsMoreMode(
     std::string &smscPdu, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    HDI::Ril::V1_1::GsmSmsMessageInfo gsmSmsMessageInfo = ConstructGsmSendSmsRequestLinkList(smscPdu, pdu);
+    HDI::Ril::V1_0::GsmSmsMessageInfo gsmSmsMessageInfo = ConstructGsmSendSmsRequestLinkList(smscPdu, pdu);
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SEND_SMS_MORE_MODE,
-        &HDI::Ril::V1_1::IRil::SendSmsMoreMode, gsmSmsMessageInfo);
+        &HDI::Ril::V1_0::IRil::SendSmsMoreMode, gsmSmsMessageInfo);
 }
 
 int32_t TelRilSms::SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    HDI::Ril::V1_1::ModeData mModeData;
+    HDI::Ril::V1_0::ModeData mModeData;
     mModeData.result = success;
     mModeData.mode = cause;
     return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SEND_SMS_ACK, &HDI::Ril::V1_1::IRil::SendSmsAck, mModeData);
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SEND_SMS_ACK, &HDI::Ril::V1_0::IRil::SendSmsAck, mModeData);
 }
 
 int32_t TelRilSms::SetCBConfig(
     int32_t mode, std::string idList, std::string dcsList, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    HDI::Ril::V1_1::CBConfigInfo cellBroadcastInfo;
+    HDI::Ril::V1_0::CBConfigInfo cellBroadcastInfo;
     cellBroadcastInfo.mode = mode;
     cellBroadcastInfo.mids = idList.empty() ? "" : idList;
     cellBroadcastInfo.dcss = dcsList.empty() ? "" : dcsList;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SET_CB_CONFIG, &HDI::Ril::V1_1::IRil::SetCBConfig,
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SET_CB_CONFIG, &HDI::Ril::V1_0::IRil::SetCBConfig,
         cellBroadcastInfo);
 }
 
 int32_t TelRilSms::SetCdmaCBConfig(
     const CdmaCBConfigInfoList &cdmaCBConfigInfoList, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    HDI::Ril::V1_1::CdmaCBConfigInfoList iCdmaCBConfigInfoList;
+    HDI::Ril::V1_0::CdmaCBConfigInfoList iCdmaCBConfigInfoList;
     iCdmaCBConfigInfoList.size = cdmaCBConfigInfoList.size;
     for (auto &cdmaCBConfigInfo : cdmaCBConfigInfoList.list) {
-        HDI::Ril::V1_1::CdmaCBConfigInfo iCdmaCBConfigInfo = {};
+        HDI::Ril::V1_0::CdmaCBConfigInfo iCdmaCBConfigInfo = {};
         iCdmaCBConfigInfo.service = cdmaCBConfigInfo.service;
         iCdmaCBConfigInfo.language = cdmaCBConfigInfo.language;
         iCdmaCBConfigInfo.checked = cdmaCBConfigInfo.checked;
         iCdmaCBConfigInfoList.list.push_back(iCdmaCBConfigInfo);
     }
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SET_CDMA_CB_CONFIG,
-        &HDI::Ril::V1_1::IRil::SetCdmaCBConfig, iCdmaCBConfigInfoList);
+        &HDI::Ril::V1_0::IRil::SetCdmaCBConfig, iCdmaCBConfigInfoList);
 }
 
 int32_t TelRilSms::GetCBConfig(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_GET_CB_CONFIG, &HDI::Ril::V1_1::IRil::GetCBConfig);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_GET_CB_CONFIG, &HDI::Ril::V1_0::IRil::GetCBConfig);
 }
 
 int32_t TelRilSms::AddCdmaSimMessage(int32_t status, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    OHOS::HDI::Ril::V1_1::SmsMessageIOInfo mSmsMessageIOInfo = {};
+    OHOS::HDI::Ril::V1_0::SmsMessageIOInfo mSmsMessageIOInfo = {};
     mSmsMessageIOInfo.state = status;
     mSmsMessageIOInfo.pdu = pdu;
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_ADD_CDMA_SIM_MESSAGE,
-        &HDI::Ril::V1_1::IRil::AddCdmaSimMessage, mSmsMessageIOInfo);
+        &HDI::Ril::V1_0::IRil::AddCdmaSimMessage, mSmsMessageIOInfo);
 }
 
 int32_t TelRilSms::DelCdmaSimMessage(int32_t cdmaIndex, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_DEL_CDMA_SIM_MESSAGE,
-        &HDI::Ril::V1_1::IRil::DelCdmaSimMessage, cdmaIndex);
+        &HDI::Ril::V1_0::IRil::DelCdmaSimMessage, cdmaIndex);
 }
 
 int32_t TelRilSms::UpdateCdmaSimMessage(
     int32_t cdmaIndex, int32_t state, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    OHOS::HDI::Ril::V1_1::SmsMessageIOInfo smsMessageIOInfo = {};
+    OHOS::HDI::Ril::V1_0::SmsMessageIOInfo smsMessageIOInfo = {};
     smsMessageIOInfo.index = cdmaIndex;
     smsMessageIOInfo.state = state;
     smsMessageIOInfo.pdu = pdu;
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_UPDATE_CDMA_SIM_MESSAGE,
-        &HDI::Ril::V1_1::IRil::UpdateCdmaSimMessage, smsMessageIOInfo);
+        &HDI::Ril::V1_0::IRil::UpdateCdmaSimMessage, smsMessageIOInfo);
 }
 
 uint8_t TelRilSms::ConvertHexCharToInt(uint8_t ch)
@@ -238,7 +238,7 @@ uint8_t *TelRilSms::ConvertHexStringToBytes(const uint8_t *hexString, size_t len
     return bytes;
 }
 
-int32_t TelRilSms::NewSmsNotify(const HDI::Ril::V1_1::SmsMessageInfo &iSmsMessageInfo)
+int32_t TelRilSms::NewSmsNotify(const HDI::Ril::V1_0::SmsMessageInfo &iSmsMessageInfo)
 {
     std::shared_ptr<SmsMessageInfo> smsMessageInfo = std::make_shared<SmsMessageInfo>();
     if (smsMessageInfo == nullptr) {
@@ -249,7 +249,7 @@ int32_t TelRilSms::NewSmsNotify(const HDI::Ril::V1_1::SmsMessageInfo &iSmsMessag
     return Notify<SmsMessageInfo>(TELEPHONY_LOG_FUNC_NAME, smsMessageInfo, RadioEvent::RADIO_GSM_SMS);
 }
 
-int32_t TelRilSms::NewCdmaSmsNotify(const HDI::Ril::V1_1::SmsMessageInfo &iSmsMessageInfo)
+int32_t TelRilSms::NewCdmaSmsNotify(const HDI::Ril::V1_0::SmsMessageInfo &iSmsMessageInfo)
 {
     std::shared_ptr<SmsMessageInfo> smsMessageInfo = std::make_shared<SmsMessageInfo>();
     if (smsMessageInfo == nullptr) {
@@ -263,7 +263,7 @@ int32_t TelRilSms::NewCdmaSmsNotify(const HDI::Ril::V1_1::SmsMessageInfo &iSmsMe
     return Notify<SmsMessageInfo>(TELEPHONY_LOG_FUNC_NAME, smsMessageInfo, RadioEvent::RADIO_CDMA_SMS);
 }
 
-int32_t TelRilSms::SmsStatusReportNotify(const HDI::Ril::V1_1::SmsMessageInfo &iSmsMessageInfo)
+int32_t TelRilSms::SmsStatusReportNotify(const HDI::Ril::V1_0::SmsMessageInfo &iSmsMessageInfo)
 {
     std::shared_ptr<SmsMessageInfo> smsMessageInfo = std::make_shared<SmsMessageInfo>();
     if (smsMessageInfo == nullptr) {
@@ -281,7 +281,7 @@ int32_t TelRilSms::NewSmsStoredOnSimNotify(int32_t recordNumber, int32_t indicat
         TELEPHONY_LOG_FUNC_NAME, std::make_shared<int32_t>(recordNumber), RadioEvent::RADIO_SMS_ON_SIM);
 }
 
-int32_t TelRilSms::CBConfigNotify(const HDI::Ril::V1_1::CBConfigReportInfo &iCellBroadConfigReportInfo)
+int32_t TelRilSms::CBConfigNotify(const HDI::Ril::V1_0::CBConfigReportInfo &iCellBroadConfigReportInfo)
 {
     std::shared_ptr<CBConfigReportInfo> cellBroadConfigReportInfo = std::make_shared<CBConfigReportInfo>();
     if (cellBroadConfigReportInfo == nullptr) {
@@ -293,40 +293,40 @@ int32_t TelRilSms::CBConfigNotify(const HDI::Ril::V1_1::CBConfigReportInfo &iCel
         TELEPHONY_LOG_FUNC_NAME, cellBroadConfigReportInfo, RadioEvent::RADIO_CELL_BROADCAST);
 }
 
-int32_t TelRilSms::SendGsmSmsResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
-    const HDI::Ril::V1_1::SendSmsResultInfo &iSendSmsResultInfo)
+int32_t TelRilSms::SendGsmSmsResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::SendSmsResultInfo &iSendSmsResultInfo)
 {
     return ResponseSendSms(responseInfo, iSendSmsResultInfo);
 }
 
-int32_t TelRilSms::SendCdmaSmsResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
-    const HDI::Ril::V1_1::SendSmsResultInfo &iSendSmsResultInfo)
+int32_t TelRilSms::SendCdmaSmsResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::SendSmsResultInfo &iSendSmsResultInfo)
 {
     return ResponseSendSms(responseInfo, iSendSmsResultInfo);
 }
 
-int32_t TelRilSms::AddSimMessageResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSms::AddSimMessageResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilSms::DelSimMessageResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSms::DelSimMessageResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilSms::UpdateSimMessageResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSms::UpdateSimMessageResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilSms::SetSmscAddrResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSms::SetSmscAddrResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilSms::GetSmscAddrResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
-    const HDI::Ril::V1_1::ServiceCenterAddress &iServiceCenterAddress)
+int32_t TelRilSms::GetSmscAddrResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::ServiceCenterAddress &iServiceCenterAddress)
 {
     std::shared_ptr<ServiceCenterAddress> serCenterAddress = std::make_shared<ServiceCenterAddress>();
     if (serCenterAddress == nullptr) {
@@ -338,7 +338,7 @@ int32_t TelRilSms::GetSmscAddrResponse(const HDI::Ril::V1_1::RilRadioResponseInf
 }
 
 int32_t TelRilSms::GetCBConfigResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::CBConfigInfo &iCellBroadcastInfo)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::CBConfigInfo &iCellBroadcastInfo)
 {
     std::shared_ptr<CBConfigInfo> cellBroadcastInfo = std::make_shared<CBConfigInfo>();
     if (cellBroadcastInfo == nullptr) {
@@ -350,7 +350,7 @@ int32_t TelRilSms::GetCBConfigResponse(
 }
 
 int32_t TelRilSms::GetCdmaCBConfigResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::CdmaCBConfigInfo &iCdmaCBConfigInfo)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::CdmaCBConfigInfo &iCdmaCBConfigInfo)
 {
     std::shared_ptr<CdmaCBConfigInfo> cdmaCBConfigInfo = std::make_shared<CdmaCBConfigInfo>();
     if (cdmaCBConfigInfo == nullptr) {
@@ -361,44 +361,44 @@ int32_t TelRilSms::GetCdmaCBConfigResponse(
     return Response<CdmaCBConfigInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, cdmaCBConfigInfo);
 }
 
-int32_t TelRilSms::SendSmsMoreModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
-    const HDI::Ril::V1_1::SendSmsResultInfo &iSendSmsResultInfo)
+int32_t TelRilSms::SendSmsMoreModeResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_0::SendSmsResultInfo &iSendSmsResultInfo)
 {
     return ResponseSendSms(responseInfo, iSendSmsResultInfo);
 }
 
-int32_t TelRilSms::SendSmsAckResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSms::SendSmsAckResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilSms::SetCBConfigResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSms::SetCBConfigResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilSms::SetCdmaCBConfigResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSms::SetCdmaCBConfigResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilSms::AddCdmaSimMessageResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSms::AddCdmaSimMessageResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilSms::DelCdmaSimMessageResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSms::DelCdmaSimMessageResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
-int32_t TelRilSms::UpdateCdmaSimMessageResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t TelRilSms::UpdateCdmaSimMessageResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
 void TelRilSms::BuildSendSmsResultInfo(
-    std::shared_ptr<SendSmsResultInfo> sendSmsResultInfo, const HDI::Ril::V1_1::SendSmsResultInfo &iSendSmsResultInfo)
+    std::shared_ptr<SendSmsResultInfo> sendSmsResultInfo, const HDI::Ril::V1_0::SendSmsResultInfo &iSendSmsResultInfo)
 {
     sendSmsResultInfo->msgRef = iSendSmsResultInfo.msgRef;
     sendSmsResultInfo->pdu = iSendSmsResultInfo.pdu;
@@ -406,7 +406,7 @@ void TelRilSms::BuildSendSmsResultInfo(
 }
 
 void TelRilSms::BuildCBConfigInfo(
-    std::shared_ptr<CBConfigInfo> cellBroadcastInfo, const HDI::Ril::V1_1::CBConfigInfo &iCellBroadcastInfo)
+    std::shared_ptr<CBConfigInfo> cellBroadcastInfo, const HDI::Ril::V1_0::CBConfigInfo &iCellBroadcastInfo)
 {
     cellBroadcastInfo->serial = iCellBroadcastInfo.serial;
     cellBroadcastInfo->mode = iCellBroadcastInfo.mode;
@@ -416,7 +416,7 @@ void TelRilSms::BuildCBConfigInfo(
 }
 
 void TelRilSms::BuildServiceCenterAddress(std::shared_ptr<ServiceCenterAddress> serCenterAddress,
-    const HDI::Ril::V1_1::ServiceCenterAddress &iServiceCenterAddress)
+    const HDI::Ril::V1_0::ServiceCenterAddress &iServiceCenterAddress)
 {
     serCenterAddress->serial = iServiceCenterAddress.serial;
     serCenterAddress->tosca = iServiceCenterAddress.tosca;
@@ -424,7 +424,7 @@ void TelRilSms::BuildServiceCenterAddress(std::shared_ptr<ServiceCenterAddress> 
 }
 
 void TelRilSms::BuildCdmaCBConfigInfo(
-    std::shared_ptr<CdmaCBConfigInfo> cdmaCBConfigInfo, const HDI::Ril::V1_1::CdmaCBConfigInfo &iCdmaCBConfigInfo)
+    std::shared_ptr<CdmaCBConfigInfo> cdmaCBConfigInfo, const HDI::Ril::V1_0::CdmaCBConfigInfo &iCdmaCBConfigInfo)
 {
     cdmaCBConfigInfo->service = iCdmaCBConfigInfo.service;
     cdmaCBConfigInfo->language = iCdmaCBConfigInfo.language;
@@ -432,7 +432,7 @@ void TelRilSms::BuildCdmaCBConfigInfo(
 }
 
 void TelRilSms::BuildSmsMessageInfo(
-    std::shared_ptr<SmsMessageInfo> smsMessageInfo, const HDI::Ril::V1_1::SmsMessageInfo &iSmsMessageInfo)
+    std::shared_ptr<SmsMessageInfo> smsMessageInfo, const HDI::Ril::V1_0::SmsMessageInfo &iSmsMessageInfo)
 {
     smsMessageInfo->indicationType = iSmsMessageInfo.indicationType;
     smsMessageInfo->size = iSmsMessageInfo.size;
@@ -441,7 +441,7 @@ void TelRilSms::BuildSmsMessageInfo(
     }
 }
 void TelRilSms::BuildCBConfigReportInfo(std::shared_ptr<CBConfigReportInfo> cellBroadConfigReportInfo,
-    const HDI::Ril::V1_1::CBConfigReportInfo &iCellBroadConfigReportInfo)
+    const HDI::Ril::V1_0::CBConfigReportInfo &iCellBroadConfigReportInfo)
 {
     cellBroadConfigReportInfo->indicationType = iCellBroadConfigReportInfo.indicationType;
     cellBroadConfigReportInfo->sn = iCellBroadConfigReportInfo.sn;
@@ -455,7 +455,7 @@ void TelRilSms::BuildCBConfigReportInfo(std::shared_ptr<CBConfigReportInfo> cell
 }
 
 int32_t TelRilSms::ResponseSendSms(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::SendSmsResultInfo &result)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::SendSmsResultInfo &result)
 {
     auto getDataFunc = [&result, this](std::shared_ptr<TelRilRequest> telRilRequest) {
         std::shared_ptr<SendSmsResultInfo> sendSmsResultInfo = std::make_shared<SendSmsResultInfo>();

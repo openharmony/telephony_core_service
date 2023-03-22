@@ -32,7 +32,7 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_types.h"
-#include "v1_1/iril.h"
+#include "v1_0/iril.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -53,13 +53,13 @@ private:
 
 class TelRilBase {
 public:
-    TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_1::IRil> rilInterface,
+    TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_0::IRil> rilInterface,
         std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     virtual ~TelRilBase() = default;
 
     static std::shared_ptr<TelRilRequest> CreateTelRilRequest(
         int32_t request, const AppExecFwk::InnerEvent::Pointer &result);
-    void ResetRilInterface(sptr<HDI::Ril::V1_1::IRil> rilInterface);
+    void ResetRilInterface(sptr<HDI::Ril::V1_0::IRil> rilInterface);
     static std::shared_ptr<TelRilRequest> FindTelRilRequest(const HRilRadioResponseInfo &responseInfo);
     int32_t ErrorResponse(std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo);
 
@@ -67,18 +67,18 @@ protected:
     template<typename FuncType, typename... ParamTypes>
     inline int32_t Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response, int32_t requestId,
         FuncType &&_func, ParamTypes &&... _args);
-    inline HRilRadioResponseInfo BuildHRilRadioResponseInfo(const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo);
-    inline int32_t Response(const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo);
+    inline HRilRadioResponseInfo BuildHRilRadioResponseInfo(const HDI::Ril::V1_0::RilRadioResponseInfo &iResponseInfo);
+    inline int32_t Response(const char *funcName, const HDI::Ril::V1_0::RilRadioResponseInfo &iResponseInfo);
     template<typename T>
-    inline int32_t Response(const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo, T data);
+    inline int32_t Response(const char *funcName, const HDI::Ril::V1_0::RilRadioResponseInfo &iResponseInfo, T data);
     template<typename T>
     inline int32_t Response(
-        const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo, std::shared_ptr<T> data);
+        const char *funcName, const HDI::Ril::V1_0::RilRadioResponseInfo &iResponseInfo, std::shared_ptr<T> data);
     template<typename T>
-    inline int32_t Response(const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo,
+    inline int32_t Response(const char *funcName, const HDI::Ril::V1_0::RilRadioResponseInfo &iResponseInfo,
         std::function<std::shared_ptr<T>(std::shared_ptr<TelRilRequest>)> getDataFunc);
     template<typename T>
-    inline int32_t Response(const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo,
+    inline int32_t Response(const char *funcName, const HDI::Ril::V1_0::RilRadioResponseInfo &iResponseInfo,
         std::function<T(std::shared_ptr<TelRilRequest>)> getDataFunc);
     inline int32_t Notify(const char *funcName, RadioEvent notifyId);
     template<typename T>
@@ -88,7 +88,7 @@ protected:
 
 protected:
     std::shared_ptr<ObserverHandler> observerHandler_;
-    sptr<HDI::Ril::V1_1::IRil> rilInterface_;
+    sptr<HDI::Ril::V1_0::IRil> rilInterface_;
     int32_t slotId_;
 
 private:
@@ -125,7 +125,7 @@ inline int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::Inner
     return (rilInterface_->*(_func))(slotId_, telRilRequest->serialId_, std::forward<ParamTypes>(_args)...);
 }
 
-inline int32_t TelRilBase::Response(const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo)
+inline int32_t TelRilBase::Response(const char *funcName, const HDI::Ril::V1_0::RilRadioResponseInfo &iResponseInfo)
 {
     auto getDataFunc = [&iResponseInfo](std::shared_ptr<TelRilRequest> telRilRequest) {
         std::shared_ptr<HRilRadioResponseInfo> result = std::make_shared<HRilRadioResponseInfo>();
@@ -139,7 +139,7 @@ inline int32_t TelRilBase::Response(const char *funcName, const HDI::Ril::V1_1::
 
 template<typename T>
 inline int32_t TelRilBase::Response(
-    const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo, T data)
+    const char *funcName, const HDI::Ril::V1_0::RilRadioResponseInfo &iResponseInfo, T data)
 {
     auto getDataFunc = [data](std::shared_ptr<TelRilRequest> telRilRequest) { return data; };
     return Response<T>(funcName, iResponseInfo, getDataFunc);
@@ -147,7 +147,7 @@ inline int32_t TelRilBase::Response(
 
 template<typename T>
 inline int32_t TelRilBase::Response(
-    const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo, std::shared_ptr<T> data)
+    const char *funcName, const HDI::Ril::V1_0::RilRadioResponseInfo &iResponseInfo, std::shared_ptr<T> data)
 {
     if (data == nullptr) {
         TELEPHONY_LOGE("Response func %{public}s data  is null", funcName);
@@ -158,14 +158,14 @@ inline int32_t TelRilBase::Response(
 }
 
 template<typename T>
-inline int32_t TelRilBase::Response(const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo,
+inline int32_t TelRilBase::Response(const char *funcName, const HDI::Ril::V1_0::RilRadioResponseInfo &iResponseInfo,
     std::function<std::shared_ptr<T>(std::shared_ptr<TelRilRequest>)> getDataFunc)
 {
     return Response<std::shared_ptr<T>>(funcName, iResponseInfo, getDataFunc);
 }
 
 template<typename T>
-inline int32_t TelRilBase::Response(const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo,
+inline int32_t TelRilBase::Response(const char *funcName, const HDI::Ril::V1_0::RilRadioResponseInfo &iResponseInfo,
     std::function<T(std::shared_ptr<TelRilRequest>)> getDataFunc)
 {
     const auto &radioResponseInfo = BuildHRilRadioResponseInfo(iResponseInfo);
@@ -228,7 +228,7 @@ inline int32_t TelRilBase::Notify(const char *funcName, RadioEvent notifyId)
 }
 
 inline HRilRadioResponseInfo TelRilBase::BuildHRilRadioResponseInfo(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &iResponseInfo)
 {
     HRilRadioResponseInfo responseInfo = { 0 };
     responseInfo.flag = iResponseInfo.flag;

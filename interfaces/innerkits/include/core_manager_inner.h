@@ -125,8 +125,6 @@ public:
     int32_t SetUssd(int32_t slotId, int32_t eventId, const std::string str,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetUssd(int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t CloseUnFinishedUssd(
-        int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetMute(int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t SetMute(
         int32_t slotId, int32_t eventId, int32_t mute, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
