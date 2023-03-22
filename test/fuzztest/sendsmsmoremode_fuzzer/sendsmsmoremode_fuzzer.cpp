@@ -53,7 +53,7 @@ void SendSmsMoreMode(const uint8_t *data, size_t size)
     std::string dcsList(reinterpret_cast<const char *>(data), size);
     std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(*data);
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(responseId, object);
-    auto rilInterface_ = HDI::Ril::V1_0::IRil::Get();
+    auto rilInterface_ = HDI::Ril::V1_1::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
     if (eventLoop_ == nullptr) {
@@ -95,7 +95,7 @@ void GetCallList(const uint8_t *data, size_t size)
     std::string newPassword(reinterpret_cast<const char *>(data), size);
     std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(*data);
     AppExecFwk::InnerEvent::Pointer result = AppExecFwk::InnerEvent::Get(resultId, object);
-    auto rilInterface_ = HDI::Ril::V1_0::IRil::Get();
+    auto rilInterface_ = HDI::Ril::V1_1::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
     if (eventLoop_ == nullptr) {
@@ -134,9 +134,9 @@ void AnswerResponse(const uint8_t *data, size_t size)
     int32_t resultId = static_cast<int32_t>(size);
     std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(*data);
     AppExecFwk::InnerEvent::Pointer result = AppExecFwk::InnerEvent::Get(resultId, object);
-    HDI::Ril::V1_0::RilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     responseInfo.slotId = slotId;
-    auto rilInterface_ = HDI::Ril::V1_0::IRil::Get();
+    auto rilInterface_ = HDI::Ril::V1_1::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
     if (eventLoop_ == nullptr) {
@@ -171,7 +171,7 @@ void DeactivatePdpContext(const uint8_t *data, size_t size)
     std::string userName(reinterpret_cast<const char *>(data), size);
     std::string password(reinterpret_cast<const char *>(data), size);
     std::string roamingProtocol(reinterpret_cast<const char *>(data), size);
-    HDI::Ril::V1_0::RilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     responseInfo.slotId = slotId;
     std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(*data);
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(responseId, object);
@@ -183,7 +183,7 @@ void DeactivatePdpContext(const uint8_t *data, size_t size)
     dataProfile.userName = userName;
     dataProfile.password = password;
     dataProfile.roamingProtocol = roamingProtocol;
-    auto rilInterface_ = HDI::Ril::V1_0::IRil::Get();
+    auto rilInterface_ = HDI::Ril::V1_1::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
     if (eventLoop_ == nullptr) {
@@ -206,9 +206,9 @@ void SimStkProactiveNotify(const uint8_t *data, size_t size)
 {
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     std::string response(reinterpret_cast<const char *>(data), size);
-    HDI::Ril::V1_0::RilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     responseInfo.slotId = slotId;
-    auto rilInterface_ = HDI::Ril::V1_0::IRil::Get();
+    auto rilInterface_ = HDI::Ril::V1_1::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
     if (eventLoop_ == nullptr) {
@@ -255,7 +255,7 @@ void GetSimStatus(const uint8_t *data, size_t size)
     simIoInfo.aid = aid;
     std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(*data);
     AppExecFwk::InnerEvent::Pointer result = AppExecFwk::InnerEvent::Get(resultId, object);
-    auto rilInterface_ = HDI::Ril::V1_0::IRil::Get();
+    auto rilInterface_ = HDI::Ril::V1_1::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
     if (eventLoop_ == nullptr) {
