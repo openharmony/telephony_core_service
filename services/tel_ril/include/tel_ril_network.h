@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Telephony {
 class TelRilNetwork : public TelRilBase {
 public:
-    TelRilNetwork(int32_t slotId, sptr<HDI::Ril::V1_0::IRil> rilInterface,
+    TelRilNetwork(int32_t slotId, sptr<HDI::Ril::V1_1::IRil> rilInterface,
         std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     ~TelRilNetwork() = default;
 
@@ -47,72 +47,72 @@ public:
         int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &response);
 
     // ril unsol
-    int32_t SignalStrengthUpdated(const HDI::Ril::V1_0::Rssi &rssi);
-    int32_t NetworkCsRegStatusUpdated(const HDI::Ril::V1_0::CsRegStatusInfo &csRegStatusInfo);
-    int32_t NetworkPsRegStatusUpdated(const HDI::Ril::V1_0::PsRegStatusInfo &psRegStatusInfo);
+    int32_t SignalStrengthUpdated(const HDI::Ril::V1_1::Rssi &rssi);
+    int32_t NetworkCsRegStatusUpdated(const HDI::Ril::V1_1::CsRegStatusInfo &csRegStatusInfo);
+    int32_t NetworkPsRegStatusUpdated(const HDI::Ril::V1_1::PsRegStatusInfo &psRegStatusInfo);
     int32_t NetworkTimeZoneUpdated(const std::string &timeZoneStr);
     int32_t NetworkTimeUpdated(const std::string &timeStr);
-    int32_t NetworkPhyChnlCfgUpdated(const HDI::Ril::V1_0::ChannelConfigInfoList &channelConfigInfoList);
-    int32_t NetworkCurrentCellUpdated(const HDI::Ril::V1_0::CellListCurrentInfo &cellListCurrentInfo);
+    int32_t NetworkPhyChnlCfgUpdated(const HDI::Ril::V1_1::ChannelConfigInfoList &channelConfigInfoList);
+    int32_t NetworkCurrentCellUpdated(const HDI::Ril::V1_1::CellListCurrentInfo &cellListCurrentInfo);
 
     int32_t GetSignalStrengthResponse(
-        const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::Rssi &rssi);
-    int32_t GetCsRegStatusResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
-        const HDI::Ril::V1_0::CsRegStatusInfo &csRegStatusInfo);
-    int32_t GetPsRegStatusResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
-        const HDI::Ril::V1_0::PsRegStatusInfo &psRegStatusInfo);
+        const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::Rssi &rssi);
+    int32_t GetCsRegStatusResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_1::CsRegStatusInfo &csRegStatusInfo);
+    int32_t GetPsRegStatusResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_1::PsRegStatusInfo &psRegStatusInfo);
     int32_t GetOperatorInfoResponse(
-        const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::OperatorInfo &operatorInfo);
-    int32_t GetNetworkSearchInformationResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
-        const HDI::Ril::V1_0::AvailableNetworkList &availableNetworkList);
-    int32_t GetNetworkSelectionModeResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
-        const HDI::Ril::V1_0::SetNetworkModeInfo &setNetworkModeInfo);
-    int32_t SetNetworkSelectionModeResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo);
-    int32_t GetNeighboringCellInfoListResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
-        const HDI::Ril::V1_0::CellListNearbyInfo &cellInfoList);
-    int32_t GetCurrentCellInfoResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
-        const HDI::Ril::V1_0::CellListCurrentInfo &cellInfoList);
-    int32_t SetPreferredNetworkResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo);
-    int32_t GetPreferredNetworkResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
-        const HDI::Ril::V1_0::PreferredNetworkTypeInfo &preferredNetworkTypeInfo);
-    int32_t GetPhysicalChannelConfigResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,
-        const HDI::Ril::V1_0::ChannelConfigInfoList &channelConfigInfoList);
-    int32_t SetLocateUpdatesResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo);
-    int32_t SetNotificationFilterResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo);
-    int32_t SetDeviceStateResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo);
+        const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::OperatorInfo &operatorInfo);
+    int32_t GetNetworkSearchInformationResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_1::AvailableNetworkList &availableNetworkList);
+    int32_t GetNetworkSelectionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_1::SetNetworkModeInfo &setNetworkModeInfo);
+    int32_t SetNetworkSelectionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
+    int32_t GetNeighboringCellInfoListResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_1::CellListNearbyInfo &cellInfoList);
+    int32_t GetCurrentCellInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList);
+    int32_t SetPreferredNetworkResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
+    int32_t GetPreferredNetworkResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_1::PreferredNetworkTypeInfo &preferredNetworkTypeInfo);
+    int32_t GetPhysicalChannelConfigResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_1::ChannelConfigInfoList &channelConfigInfoList);
+    int32_t SetLocateUpdatesResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
+    int32_t SetNotificationFilterResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
+    int32_t SetDeviceStateResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
 
 private:
-    void BuildSignalStrength(std::shared_ptr<Rssi> signalStrength, const HDI::Ril::V1_0::Rssi &rssi);
+    void BuildSignalStrength(std::shared_ptr<Rssi> signalStrength, const HDI::Ril::V1_1::Rssi &rssi);
     void BuildCsRegStatusInfo(
-        std::shared_ptr<CsRegStatusInfo> regStatusInfo, const HDI::Ril::V1_0::CsRegStatusInfo &csRegStatusInfo);
+        std::shared_ptr<CsRegStatusInfo> regStatusInfo, const HDI::Ril::V1_1::CsRegStatusInfo &csRegStatusInfo);
     void BuildPsRegStatusInfo(
-        std::shared_ptr<PsRegStatusResultInfo> regStatusInfo, const HDI::Ril::V1_0::PsRegStatusInfo &psRegStatusInfo);
+        std::shared_ptr<PsRegStatusResultInfo> regStatusInfo, const HDI::Ril::V1_1::PsRegStatusInfo &psRegStatusInfo);
     void BuildOperatorInfo(
-        std::shared_ptr<OperatorInfoResult> operatorInfoResult, const HDI::Ril::V1_0::OperatorInfo &operatorInfo);
+        std::shared_ptr<OperatorInfoResult> operatorInfoResult, const HDI::Ril::V1_1::OperatorInfo &operatorInfo);
     void BuildAvailableNetworkList(std::shared_ptr<AvailableNetworkList> availableNetworkInfos,
-        const HDI::Ril::V1_0::AvailableNetworkList &availableNetworkList);
+        const HDI::Ril::V1_1::AvailableNetworkList &availableNetworkList);
     void BuildNetworkModeInfo(std::shared_ptr<SetNetworkModeInfo> networkModeInfo,
-        const HDI::Ril::V1_0::SetNetworkModeInfo &setNetworkModeInfo);
+        const HDI::Ril::V1_1::SetNetworkModeInfo &setNetworkModeInfo);
     void BuildNeighboringCellInfoList(std::shared_ptr<CellListNearbyInfo> cellListNearbyInfo,
-        const HDI::Ril::V1_0::CellListNearbyInfo &cellInfoList);
-    void FillGsmCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::CellNearbyInfo &info);
-    void FillLteCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::CellNearbyInfo &info);
-    void FillWcdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::CellNearbyInfo &info);
-    void FillCdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::CellNearbyInfo &info);
-    void FillTdscdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::CellNearbyInfo &info);
-    void FillNrCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::CellNearbyInfo &info);
-    void FillCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_0::CellNearbyInfo &info);
+        const HDI::Ril::V1_1::CellListNearbyInfo &cellInfoList);
+    void FillGsmCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_1::CellNearbyInfo &info);
+    void FillLteCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_1::CellNearbyInfo &info);
+    void FillWcdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_1::CellNearbyInfo &info);
+    void FillCdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_1::CellNearbyInfo &info);
+    void FillTdscdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_1::CellNearbyInfo &info);
+    void FillNrCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_1::CellNearbyInfo &info);
+    void FillCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_1::CellNearbyInfo &info);
     void BuildCurrentCellInfoList(std::shared_ptr<CellListCurrentInfo> currentCellList,
-        const HDI::Ril::V1_0::CellListCurrentInfo &cellInfoList);
-    void FillCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info);
-    void FillGsmCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info);
-    void FillLteCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info);
-    void FillWcdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info);
-    void FillCdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info);
-    void FillTdscdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info);
-    void FillNrCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_0::CurrentCellInfo &info);
+        const HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList);
+    void FillCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_1::CurrentCellInfo &info);
+    void FillGsmCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_1::CurrentCellInfo &info);
+    void FillLteCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_1::CurrentCellInfo &info);
+    void FillWcdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_1::CurrentCellInfo &info);
+    void FillCdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_1::CurrentCellInfo &info);
+    void FillTdscdmaCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_1::CurrentCellInfo &info);
+    void FillNrCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::Ril::V1_1::CurrentCellInfo &info);
     void BuildChannelConfigInfoList(std::shared_ptr<ChannelConfigInfoList> channelConfigList,
-        const HDI::Ril::V1_0::ChannelConfigInfoList &channelConfigInfoList);
+        const HDI::Ril::V1_1::ChannelConfigInfoList &channelConfigInfoList);
 };
 } // namespace Telephony
 } // namespace OHOS
