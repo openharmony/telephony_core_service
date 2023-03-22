@@ -198,22 +198,6 @@ int32_t CoreManagerInner::SetUssd(int32_t slotId, int32_t eventId, const std::st
     return telRilManager_->SetUssd(slotId, str, response);
 }
 
-int32_t CoreManagerInner::CloseUnFinishedUssd(
-    int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
-{
-    if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
-    if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    response->SetOwner(handler);
-    return telRilManager_->CloseUnFinishedUssd(slotId, response);
-}
-
 int32_t CoreManagerInner::GetUssd(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {

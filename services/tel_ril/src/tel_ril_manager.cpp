@@ -59,7 +59,7 @@ bool TelRilManager::DeInit()
 
 bool TelRilManager::ConnectRilInterface()
 {
-    rilInterface_ = HDI::Ril::V1_1::IRil::Get();
+    rilInterface_ = HDI::Ril::V1_0::IRil::Get();
     if (rilInterface_ == nullptr) {
         TELEPHONY_LOGE("TelRilManager not find RilInterfaceService");
         return false;
@@ -435,11 +435,6 @@ int32_t TelRilManager::SetEmergencyCallList(
 int32_t TelRilManager::GetCallFailReason(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::GetCallFailReason);
-}
-
-int32_t TelRilManager::CloseUnFinishedUssd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::CloseUnFinishedUssd);
 }
 
 /*********************** TelRilCall end ****************************/

@@ -227,7 +227,6 @@ public:
     virtual int32_t GetCallPreferenceMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t SetUssd(int32_t slotId, const std::string str, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t GetUssd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
-    virtual int32_t CloseUnFinishedUssd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t SetMute(int32_t slotId, const int32_t mute, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t GetMute(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t GetEmergencyCallList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
