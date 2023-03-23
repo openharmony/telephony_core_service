@@ -32,7 +32,9 @@ public:
         CALL_STATE_FOR_ID,
         SIM_STATE,
         ADD_OBSERVER,
-        REMOVE_OBSERVER
+        REMOVE_OBSERVER,
+        CFU_INDICATOR,
+        VOICE_MAIL_MSG_INDICATOR
     };
 
     /**
@@ -45,6 +47,7 @@ public:
      */
     virtual int32_t UpdateCellularDataConnectState(
         int32_t slotId, int32_t dataState, int32_t networkState) = 0;
+
     /**
      * UpdateCellularDataFlow
      *
@@ -66,6 +69,7 @@ public:
      */
     virtual int32_t UpdateSimState(
         int32_t slotId, CardType type, SimState state, LockReason reason) = 0;
+
     /**
      * UpdateCallState
      *
@@ -118,6 +122,24 @@ public:
      */
     virtual int32_t UpdateNetworkState(
         int32_t slotId, const sptr<NetworkState> &networkState) = 0;
+
+    /**
+     * Update call forward unconditionally indicator
+     *
+     * @param slotId sim slot id
+     * @param cfuResult set the result of call forwarding
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t UpdateCfuIndicator(int32_t slotId, bool cfuResult) = 0;
+
+    /**
+     * Update voice mail message indicator
+     *
+     * @param slotId sim slot id
+     * @param voiceMailMsgResult voice mail message indicator
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t UpdateVoiceMailMsgIndicator(int32_t slotId, bool voiceMailMsgResult) = 0;
 
     /**
      * RegisterStateChange

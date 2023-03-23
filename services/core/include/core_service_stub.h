@@ -99,6 +99,9 @@ private:
     int32_t OnGetSimTeleNumberIdentifier(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetVoiceMailInfor(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetVoiceMailNumber(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetVoiceMailCount(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetVoiceMailCount(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetVoiceCallForwarding(MessageParcel &data, MessageParcel &reply);
     int32_t OnDiallingNumbersGet(MessageParcel &data, MessageParcel &reply);
     int32_t OnAddIccDiallingNumbers(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateIccDiallingNumbers(MessageParcel &data, MessageParcel &reply);

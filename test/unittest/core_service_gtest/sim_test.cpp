@@ -943,6 +943,124 @@ HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailNumber_0300, Function | MediumTest |
 }
 
 /**
+ * @tc.number   Telephony_Sim_GetVoiceMailCount_0100
+ * @tc.name     Get sim voice mail count
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailCount_0100, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!SimTest::HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        int32_t voiceMailCount;
+        int32_t result = CoreServiceClient::GetInstance().GetVoiceMailCount(SimTest::slotId_, voiceMailCount);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_GetVoiceMailCount_0200
+ * @tc.name     Get sim voice mail count
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailCount_0200, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!SimTest::HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        int32_t voiceMailCount;
+        int32_t result = CoreServiceClient::GetInstance().GetVoiceMailCount(SimTest::slotId1_, voiceMailCount);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_GetVoiceMailCount_0300
+ * @tc.name     Get sim voice mail count
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailCount_0300, Function | MediumTest | Level1)
+{
+    if (!SimTest::HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        int32_t voiceMailCount;
+        int32_t result = CoreServiceClient::GetInstance().GetVoiceMailCount(SimTest::slotId_, voiceMailCount);
+        EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_SetVoiceMailCount_0100
+ * @tc.name     Set sim voice mail count
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailCount_0100, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!SimTest::HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        int32_t voiceMailCount = 0;
+        int32_t result = CoreServiceClient::GetInstance().SetVoiceMailCount(SimTest::slotId_, voiceMailCount);
+        EXPECT_GT(result, -1);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_SetVoiceMailCount_0200
+ * @tc.name     Get sim voice mail count
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailCount_0200, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!SimTest::HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        int32_t voiceMailCount = 0;
+        int32_t result = CoreServiceClient::GetInstance().SetVoiceMailCount(SimTest::slotId1_, voiceMailCount);
+        EXPECT_GT(result, -1);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_SetVoiceCallForwarding_0100
+ * @tc.name     Set sim voicecall forwarding
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SetVoiceCallForwarding_0100, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!SimTest::HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        std::string number = "01234567890123456789";
+        int32_t result = CoreServiceClient::GetInstance().SetVoiceCallForwarding(SimTest::slotId_, true, number);
+        EXPECT_GT(result, -1);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_SetVoiceCallForwarding_0200
+ * @tc.name     Set sim voicecall forwarding
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SetVoiceCallForwarding_0200, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!SimTest::HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        std::string number = "01234567890123456789";
+        int32_t result = CoreServiceClient::GetInstance().SetVoiceCallForwarding(SimTest::slotId_, true, number);
+        EXPECT_GT(result, -1);
+    }
+}
+
+/**
  * @tc.number   Telephony_Sim_GetDefaultVoiceSlotId_0100
  * @tc.name     Get default voice sim slotId
  * @tc.desc     Function test

@@ -35,7 +35,9 @@ public:
         ON_CELL_INFO_UPDATED,
         ON_SIM_STATE_UPDATED,
         ON_CELLULAR_DATA_CONNECT_STATE_UPDATED,
-        ON_CELLULAR_DATA_FLOW_UPDATED
+        ON_CELLULAR_DATA_FLOW_UPDATED,
+        ON_CFU_INDICATOR_UPDATED,
+        ON_VOICE_MAIL_MSG_INDICATOR_UPDATED,
     };
 
     virtual void OnCellularDataConnectStateUpdated(
@@ -52,6 +54,8 @@ public:
         int32_t slotId, CardType type, SimState state, LockReason reason) = 0;
     virtual void OnCellularDataFlowUpdated(
         int32_t slotId, int32_t dataFlowType) = 0;
+    virtual void OnCfuIndicatorUpdated(int32_t slotId, bool cfuResult) = 0;
+    virtual void OnVoiceMailMsgIndicatorUpdated(int32_t slotId, bool voiceMailMsgResult) = 0;
 
 public:
     static const uint32_t OBSERVER_MASK_NETWORK_STATE = 0x00000001;
@@ -61,6 +65,8 @@ public:
     static const uint32_t OBSERVER_MASK_SIM_STATE = 0x00000020;
     static const uint32_t OBSERVER_MASK_DATA_CONNECTION_STATE = 0x00000040;
     static const uint32_t OBSERVER_MASK_DATA_FLOW = 0x00000080;
+    static const uint32_t OBSERVER_MASK_CFU_INDICATOR = 0x00000100;
+    static const uint32_t OBSERVER_MASK_VOICE_MAIL_MSG_INDICATOR = 0x00000200;
 };
 } // namespace Telephony
 } // namespace OHOS

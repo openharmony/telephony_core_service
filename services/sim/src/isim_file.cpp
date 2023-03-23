@@ -245,6 +245,18 @@ bool IsimFile::UpdateVoiceMail(const std::string &mailName, const std::string &m
     return false;
 }
 
+bool IsimFile::SetVoiceMailCount(int32_t voiceMailCount)
+{
+    // cdma not support
+    return false;
+}
+
+bool IsimFile::SetVoiceCallForwarding(bool enable, const std::string &number)
+{
+    // cdma not support
+    return false;
+}
+
 int IsimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
 {
     return 0;

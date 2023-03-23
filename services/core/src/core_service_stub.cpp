@@ -104,6 +104,9 @@ void CoreServiceStub::AddHandlerSimToMapExt()
         &CoreServiceStub::OnGetSimTeleNumberIdentifier;
     memberFuncMap_[uint32_t(InterfaceID::GET_VOICE_MAIL_TAG)] = &CoreServiceStub::OnGetVoiceMailInfor;
     memberFuncMap_[uint32_t(InterfaceID::GET_VOICE_MAIL_NUMBER)] = &CoreServiceStub::OnGetVoiceMailNumber;
+    memberFuncMap_[uint32_t(InterfaceID::GET_VOICE_MAIL_COUNT)] = &CoreServiceStub::OnGetVoiceMailCount;
+    memberFuncMap_[uint32_t(InterfaceID::SET_VOICE_MAIL_COUNT)] = &CoreServiceStub::OnSetVoiceMailCount;
+    memberFuncMap_[uint32_t(InterfaceID::SET_VOICE_CALL_FORWARDING)] = &CoreServiceStub::OnSetVoiceCallForwarding;
     memberFuncMap_[uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_GET)] = &CoreServiceStub::OnDiallingNumbersGet;
     memberFuncMap_[uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_INSERT)] = &CoreServiceStub::OnAddIccDiallingNumbers;
     memberFuncMap_[uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_UPDATE)] = &CoreServiceStub::OnUpdateIccDiallingNumbers;
@@ -1119,6 +1122,47 @@ int32_t CoreServiceStub::OnGetVoiceMailNumber(MessageParcel &data, MessageParcel
     }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::OnGetVoiceMailNumber write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnGetVoiceMailCount(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t voiceMailCount;
+    int32_t result = GetVoiceMailCount(slotId, voiceMailCount);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(voiceMailCount));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetVoiceMailCount write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnSetVoiceMailCount(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t voiceMailCount = data.ReadInt32();
+    int32_t result = SetVoiceMailCount(slotId, voiceMailCount);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnSetVoiceMailCount write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnSetVoiceCallForwarding(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    bool enable = data.ReadBool();
+    std::string number = data.ReadString();
+    int32_t result = SetVoiceCallForwarding(slotId, enable, number);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnSetVoiceCallForwarding write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return result;
