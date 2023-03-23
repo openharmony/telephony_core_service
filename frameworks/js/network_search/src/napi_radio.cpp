@@ -1648,7 +1648,7 @@ void JudgmentDataLte(napi_env env, napi_value data, sptr<CellInformation> infoIt
 {
     auto lteCellInfo = static_cast<LteCellInformation *>(infoItem.GetRefPtr());
     if (lteCellInfo != nullptr) {
-        NapiUtil::SetPropertyInt32(env, data, "cgi", 0);
+        NapiUtil::SetPropertyInt32(env, data, "cgi", lteCellInfo->GetCellId());
         NapiUtil::SetPropertyInt32(env, data, "pci", lteCellInfo->GetPci());
         NapiUtil::SetPropertyInt32(env, data, "tac", lteCellInfo->GetTac());
         NapiUtil::SetPropertyInt32(env, data, "earfcn", lteCellInfo->GetArfcn());
