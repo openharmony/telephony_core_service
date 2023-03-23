@@ -1666,7 +1666,7 @@ void JudgmentDataWcdma(napi_env env, napi_value data, sptr<CellInformation> info
         NapiUtil::SetPropertyInt32(env, data, "lac", wcdmaCellInfo->GetLac());
         NapiUtil::SetPropertyInt32(env, data, "cellId", wcdmaCellInfo->GetCellId());
         NapiUtil::SetPropertyInt32(env, data, "psc", wcdmaCellInfo->GetPsc());
-        NapiUtil::SetPropertyInt32(env, data, "uarfcn", 0);
+        NapiUtil::SetPropertyInt32(env, data, "uarfcn", wcdmaCellInfo->GetArfcn());
         NapiUtil::SetPropertyStringUtf8(env, data, "mcc", wcdmaCellInfo->GetMcc());
         NapiUtil::SetPropertyStringUtf8(env, data, "mnc", wcdmaCellInfo->GetMnc());
     }
