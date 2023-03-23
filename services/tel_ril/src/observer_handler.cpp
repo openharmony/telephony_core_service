@@ -25,6 +25,7 @@ ObserverHandler::~ObserverHandler() {}
 
 void ObserverHandler::RegObserver(int32_t what, const std::shared_ptr<AppExecFwk::EventHandler> handler)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     auto iter = observerHandlerMap_.find(what);
     if (iter != observerHandlerMap_.end()) {
         std::list<std::shared_ptr<OHOS::AppExecFwk::EventHandler>> &handlers = iter->second;
@@ -44,6 +45,7 @@ void ObserverHandler::RegObserver(int32_t what, const std::shared_ptr<AppExecFwk
 
 void ObserverHandler::RemoveAll()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     observerHandlerMap_.clear();
 }
 
@@ -54,6 +56,7 @@ void ObserverHandler::Remove(int32_t what, const std::shared_ptr<AppExecFwk::Eve
         return;
     }
 
+    std::lock_guard<std::mutex> lock(mutex_);
     auto iter = observerHandlerMap_.find(what);
     if (iter != observerHandlerMap_.end()) {
         std::list<std::shared_ptr<OHOS::AppExecFwk::EventHandler>> &handlers = iter->second;
@@ -67,6 +70,7 @@ void ObserverHandler::Remove(int32_t what, const std::shared_ptr<AppExecFwk::Eve
 
 void ObserverHandler::NotifyObserver(int32_t what)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     auto iter = observerHandlerMap_.find(what);
     if (iter == observerHandlerMap_.end()) {
         TELEPHONY_LOGE("ObserverHandler NotifyObserver %{public}d not register", what);
