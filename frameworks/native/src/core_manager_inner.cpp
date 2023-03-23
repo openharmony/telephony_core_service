@@ -1946,6 +1946,33 @@ int32_t CoreManagerInner::GetVoiceMailNumber(int32_t slotId, std::u16string &voi
     return simManager_->GetVoiceMailNumber(slotId, voiceMailNumber);
 }
 
+int32_t CoreManagerInner::GetVoiceMailCount(int32_t slotId, int32_t &voiceMailCount)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetVoiceMailCount(slotId, voiceMailCount);
+}
+
+int32_t CoreManagerInner::SetVoiceMailCount(int32_t slotId, int32_t voiceMailCount)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SetVoiceMailCount(slotId, voiceMailCount);
+}
+
+int32_t CoreManagerInner::SetVoiceCallForwarding(int32_t slotId, bool enable, const std::string &number)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SetVoiceCallForwarding(slotId, enable, number);
+}
+
 int32_t CoreManagerInner::HasSimCard(int32_t slotId, bool &hasSimCard)
 {
     if (simManager_ == nullptr) {

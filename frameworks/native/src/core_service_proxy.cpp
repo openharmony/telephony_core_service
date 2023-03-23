@@ -1868,6 +1868,91 @@ int32_t CoreServiceProxy::GetVoiceMailNumber(int32_t slotId, std::u16string &voi
     return result;
 }
 
+int32_t CoreServiceProxy::GetVoiceMailCount(int32_t slotId, int32_t &voiceMailCount)
+{
+    if (!IsValidSlotId(slotId)) {
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetVoiceMailCount WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetVoiceMailCount Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_VOICE_MAIL_COUNT), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetVoiceMailCount failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        voiceMailCount = reply.ReadInt32();
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::SetVoiceMailCount(int32_t slotId, int32_t voiceMailCount)
+{
+    if (!IsValidSlotId(slotId)) {
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("SetVoiceMailCount WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    data.WriteInt32(voiceMailCount);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("SetVoiceMailCount Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::SET_VOICE_MAIL_COUNT), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("SetVoiceMailCount failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return reply.ReadInt32();
+}
+
+int32_t CoreServiceProxy::SetVoiceCallForwarding(int32_t slotId, bool enable, const std::string &number)
+{
+    if (!IsValidSlotId(slotId)) {
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("SetVoiceCallForwarding WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    data.WriteBool(enable);
+    data.WriteString(number);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("SetVoiceCallForwarding Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::SET_VOICE_CALL_FORWARDING), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("SetVoiceCallForwarding failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return reply.ReadInt32();
+}
+
 int32_t CoreServiceProxy::QueryIccDiallingNumbers(
     int slotId, int type, std::vector<std::shared_ptr<DiallingNumbersInfo>> &result)
 {

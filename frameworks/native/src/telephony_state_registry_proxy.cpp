@@ -349,5 +349,59 @@ int32_t TelephonyStateRegistryProxy::UnregisterStateChange(
     }
     return TELEPHONY_SUCCESS;
 }
+
+int32_t TelephonyStateRegistryProxy::UpdateCfuIndicator(int32_t slotId, bool cfuResult)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!in.WriteInt32(slotId)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteBool(cfuResult)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int result = remote->SendRequest(
+        static_cast<uint32_t>(StateNotifyCode::CFU_INDICATOR), in, out, option);
+    if (result == ERR_NONE) {
+        result = out.ReadInt32();
+        return result;
+    }
+    return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+}
+
+int32_t TelephonyStateRegistryProxy::UpdateVoiceMailMsgIndicator(int32_t slotId, bool voiceMailMsgResult)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!in.WriteInt32(slotId)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteBool(voiceMailMsgResult)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int result = remote->SendRequest(
+        static_cast<uint32_t>(StateNotifyCode::VOICE_MAIL_MSG_INDICATOR), in, out, option);
+    if (result == ERR_NONE) {
+        result = out.ReadInt32();
+        return result;
+    }
+    return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+}
 } // namespace Telephony
 } // namespace OHOS

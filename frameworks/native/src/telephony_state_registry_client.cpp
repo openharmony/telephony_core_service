@@ -165,6 +165,26 @@ int32_t TelephonyStateRegistryClient::UpdateSimState(
     }
     return proxy->UpdateSimState(slotId, type, state, reason);
 }
+
+int32_t TelephonyStateRegistryClient::UpdateCfuIndicator(int32_t slotId, bool cfuResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->UpdateCfuIndicator(slotId, cfuResult);
 }
+
+int32_t TelephonyStateRegistryClient::UpdateVoiceMailMsgIndicator(int32_t slotId, bool voiceMailMsgResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->UpdateVoiceMailMsgIndicator(slotId, voiceMailMsgResult);
+}
+} // namespace Telephony
 }
 

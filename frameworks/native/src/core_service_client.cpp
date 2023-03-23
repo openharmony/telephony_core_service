@@ -655,6 +655,36 @@ int32_t CoreServiceClient::GetVoiceMailNumber(int32_t slotId, std::u16string &vo
     return proxy->GetVoiceMailNumber(slotId, voiceMailNumber);
 }
 
+int32_t CoreServiceClient::GetVoiceMailCount(int32_t slotId, int32_t &voiceMailCount)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetVoiceMailCount(slotId, voiceMailCount);
+}
+
+int32_t CoreServiceClient::SetVoiceMailCount(int32_t slotId, int32_t voiceMailCount)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->SetVoiceMailCount(slotId, voiceMailCount);
+}
+
+int32_t CoreServiceClient::SetVoiceCallForwarding(int32_t slotId, bool enable, const std::string &number)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->SetVoiceCallForwarding(slotId, enable, number);
+}
+
 int32_t CoreServiceClient::QueryIccDiallingNumbers(
     int slotId, int type, std::vector<std::shared_ptr<DiallingNumbersInfo>> &result)
 {
