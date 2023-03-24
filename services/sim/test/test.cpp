@@ -235,6 +235,9 @@ enum class InputCmd {
     INPUT_GETSIMID = 71,
     INPUT_GETSLOTID = 72,
     INPUT_QUIT = 100,
+    INPUT_GET_VOICEMAIL_COUNT = 130,
+    INPUT_SET_VOICEMAIL_COUNT = 131,
+    INPUT_SET_VOICECALL_FORWARDING = 132,
 };
 
 enum class PinWordSize {
@@ -595,6 +598,44 @@ static bool TestGetVoiceMailNumber()
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
     std::cout << "TelephonyTestService Remote GetVoiceMailNumber result [" << str << "] " << expect << std::endl;
+    return true;
+}
+
+static bool TestGetVoiceMailCount()
+{
+    AccessToken token;
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    int32_t result;
+    g_telephonyService->GetVoiceMailCount(testSlot, result);
+    std::cout << "TelephonyTestService Remote GetVoiceMailCount result [" << result << "] " << std::endl;
+    return true;
+}
+
+static bool TestSetVoiceMailCount()
+{
+    static int32_t testSlot = SLOT_ID;
+    int32_t voiceMailCount;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    std::cout << "please input voiceMailCount" << std::endl;
+    std::cin >> voiceMailCount;
+    int32_t result = g_telephonyService->SetVoiceMailCount(testSlot, voiceMailCount);
+    std::cout << "TelephonyTestService Remote SetVoiceMailCount result [" << result << "] " << std::endl;
+    return true;
+}
+
+static bool TestSetVoiceCallForwarding()
+{
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    std::string number;
+    std::cout << "please input number" << endl;
+    std::cin >> number;
+    int32_t result = g_telephonyService->SetVoiceCallForwarding(testSlot, true, number);
+    std::cout << "TelephonyTestService Remote SetVoiceCallForwarding result [" << result << "] " << std::endl;
     return true;
 }
 
@@ -1364,6 +1405,7 @@ static void Prompt()
                  "61:GetSimTelephoneNumber\n62:GetSimTeleNumberIdentifier\n63:GetCardType\n"
                  "64:UnlockSimLock\n65:SetPrimarySlotId\n66:GetPrimarySlotId\n67:GetOpName\n"
                  "68:GetOpKeyExt\n70:HasOperatorPrivileges\n71:TestGetSimId\n72:TestGetSlotId\n"
+                 "130:GetVoiceMailCount\n131:SetVoiceMailCount\n132:SetVoiceCallForwarding\n"
                  "100:exit\n"
               << std::endl;
 }
@@ -1428,6 +1470,9 @@ static void InitFuncMapExt()
     g_funcMap[InputCmd::INPUT_GETSIMID] = TestGetSimId;
     g_funcMap[InputCmd::INPUT_GETSLOTID] = TestGetSlotId;
     g_funcMap[InputCmd::INPUT_QUIT] = TestQuit;
+    g_funcMap[InputCmd::INPUT_GET_VOICEMAIL_COUNT] = TestGetVoiceMailCount;
+    g_funcMap[InputCmd::INPUT_SET_VOICEMAIL_COUNT] = TestSetVoiceMailCount;
+    g_funcMap[InputCmd::INPUT_SET_VOICECALL_FORWARDING] = TestSetVoiceCallForwarding;
 }
 
 static bool ProcessInput()

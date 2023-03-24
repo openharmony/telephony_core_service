@@ -371,6 +371,18 @@ bool RuimFile::UpdateVoiceMail(const std::string &mailName, const std::string &m
     return false;
 }
 
+bool RuimFile::SetVoiceMailCount(int32_t voiceMailCount)
+{
+    // cdma not support
+    return false;
+}
+
+bool RuimFile::SetVoiceCallForwarding(bool enable, const std::string &number)
+{
+    // cdma not support
+    return false;
+}
+
 RuimFile::~RuimFile() {}
 } // namespace Telephony
 } // namespace OHOS

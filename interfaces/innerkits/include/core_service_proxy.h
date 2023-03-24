@@ -95,6 +95,9 @@ public:
     std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) override;
     int32_t GetVoiceMailIdentifier(int32_t slotId, std::u16string &voiceMailIdentifier) override;
     int32_t GetVoiceMailNumber(int32_t slotId, std::u16string &voiceMailNumber) override;
+    int32_t GetVoiceMailCount(int32_t slotId, int32_t &voiceMailCount) override;
+    int32_t SetVoiceMailCount(int32_t slotId, int32_t voiceMailCount) override;
+    int32_t SetVoiceCallForwarding(int32_t slotId, bool enable, const std::string &number) override;
     int32_t QueryIccDiallingNumbers(
         int slotId, int type, std::vector<std::shared_ptr<DiallingNumbersInfo>> &result) override;
     int32_t AddIccDiallingNumbers(

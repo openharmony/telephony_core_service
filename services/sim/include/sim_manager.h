@@ -102,6 +102,9 @@ public:
     std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) override;
     int32_t GetVoiceMailIdentifier(int32_t slotId, std::u16string &voiceMailIdentifier) override;
     int32_t GetVoiceMailNumber(int32_t slotId, std::u16string &voiceMailNumber) override;
+    int32_t GetVoiceMailCount(int32_t slotId, int32_t &voiceMailCount) override;
+    int32_t SetVoiceMailCount(int32_t slotId, int32_t voiceMailCount) override;
+    int32_t SetVoiceCallForwarding(int32_t slotId, bool enable, const std::string &number) override;
     std::u16string GetSimIst(int32_t slotId) override;
     int ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum) override;
     int32_t SetVoiceMailInfo(int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) override;

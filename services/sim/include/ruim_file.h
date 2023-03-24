@@ -40,6 +40,8 @@ public:
     bool ObtainCsimSpnDisplayCondition();
     int ObtainSpnCondition(bool roaming, const std::string &operatorNum);
     bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber);
+    bool SetVoiceMailCount(int32_t voiceMailCount);
+    bool SetVoiceCallForwarding(bool enable, const std::string &number);
 
 protected:
     void ProcessIccRefresh(int msgId);

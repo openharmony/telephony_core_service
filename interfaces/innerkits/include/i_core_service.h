@@ -100,6 +100,9 @@ public:
     virtual std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) = 0;
     virtual int32_t GetVoiceMailIdentifier(int32_t slotId, std::u16string &voiceMailIdentifier) = 0;
     virtual int32_t GetVoiceMailNumber(int32_t slotId, std::u16string &voiceMailNumber) = 0;
+    virtual int32_t GetVoiceMailCount(int32_t slotId, int32_t &voiceMailCount) = 0;
+    virtual int32_t SetVoiceMailCount(int32_t slotId, int32_t voiceMailCount) = 0;
+    virtual int32_t SetVoiceCallForwarding(int32_t slotId, bool enable, const std::string &number) = 0;
     virtual int32_t QueryIccDiallingNumbers(
         int slotId, int type, std::vector<std::shared_ptr<DiallingNumbersInfo>> &result) = 0;
     virtual int32_t AddIccDiallingNumbers(
@@ -210,6 +213,9 @@ public:
         GET_SIM_EONS,
         GET_SIM_SLOTID,
         GET_SIM_SIMID,
+        GET_VOICE_MAIL_COUNT,
+        SET_VOICE_MAIL_COUNT,
+        SET_VOICE_CALL_FORWARDING,
     };
 
 protected:

@@ -192,6 +192,11 @@ std::string IccFile::ObtainVoiceMailNumber()
     return voiceMailNum_;
 }
 
+int32_t IccFile::ObtainVoiceMailCount()
+{
+    return voiceMailCount_;
+}
+
 std::string IccFile::ObtainSPN()
 {
     return spn_;

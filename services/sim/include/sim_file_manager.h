@@ -55,6 +55,9 @@ public:
     std::u16string GetSimIst();
     std::u16string GetVoiceMailIdentifier();
     std::u16string GetVoiceMailNumber();
+    int32_t GetVoiceMailCount();
+    bool SetVoiceMailCount(int32_t voiceMailCount);
+    bool SetVoiceCallForwarding(bool enable, const std::string &number);
     std::u16string GetOpName();
     std::u16string GetOpKey();
     std::u16string GetOpKeyExt();

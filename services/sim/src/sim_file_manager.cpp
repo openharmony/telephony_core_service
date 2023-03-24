@@ -316,6 +316,36 @@ std::u16string SimFileManager::GetVoiceMailNumber()
     return Str8ToStr16(result);
 }
 
+int32_t SimFileManager::GetVoiceMailCount()
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::GetVoiceMailCount simFile nullptr");
+        return UNKNOWN_VOICE_MAIL_COUNT;
+    }
+
+    return simFile_->ObtainVoiceMailCount();
+}
+
+bool SimFileManager::SetVoiceMailCount(int32_t voiceMailCount)
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::SetVoiceMailCount simFile nullptr");
+        return false;
+    }
+
+    return simFile_->SetVoiceMailCount(voiceMailCount);
+}
+
+bool SimFileManager::SetVoiceCallForwarding(bool enable, const std::string &number)
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::SetVoiceCallForwarding simFile nullptr");
+        return false;
+    }
+
+    return simFile_->SetVoiceCallForwarding(enable, number);
+}
+
 std::u16string SimFileManager::GetOpName()
 {
     return Str8ToStr16(opName_);
