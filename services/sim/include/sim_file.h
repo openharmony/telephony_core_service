@@ -36,6 +36,8 @@ public:
     ~SimFile() = default;
     bool ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event);
     bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber);
+    bool SetVoiceMailCount(int32_t voiceMailCount);
+    bool SetVoiceCallForwarding(bool enable, const std::string &number);
 
 protected:
     enum SpnStatus {
@@ -59,6 +61,10 @@ protected:
     unsigned char *efCphsMwi_ = nullptr;
     unsigned char *efCff_ = nullptr;
     unsigned char *efCfis_ = nullptr;
+    std::string efMWISStr_;
+    std::string efCphsMwisStr_;
+    std::string efCffStr_;
+    std::string efCfisStr_;
     std::string efLi_ = IccFileController::NULLSTR;
     std::string efPl_ = IccFileController::NULLSTR;
     SpnStatus spnStatus_ = OBTAIN_SPN_NONE;
@@ -128,8 +134,13 @@ private:
     const int MAIL_DELAY_TIME = 50 * 1000;
     static const uint8_t CPHS_VOICE_MAIL_MASK = 0x30;
     static const uint8_t CPHS_VOICE_MAIL_EXSIT = 0x30;
+    static const int CFIS_BCD_NUMBER_LENGTH_OFFSET = 2;
+    static const int CFIS_TON_NPI_OFFSET = 3;
+    static const int CFIS_ADN_CAPABILITY_ID_OFFSET = 14;
+    static const int CFIS_ADN_EXTENSION_ID_OFFSET = 15;
     int ObtainExtensionElementaryFile(int ef);
     bool CphsVoiceMailAvailable();
+    bool EfCfisAvailable(int32_t size);
     void GetCphsMailBox();
     std::string ParseSpn(const std::string &rawData, int curState);
     void ParsePnn(const std::vector<std::string> &records);

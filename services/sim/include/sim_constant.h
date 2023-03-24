@@ -273,6 +273,17 @@ enum RadioProtocolEvent {
     MSG_SIM_SET_ACTIVE = 2001,
     MSG_SIM_FORGET_ALLDATA = 2002,
 };
+
+enum VoiceMailConstant {
+    DEFAULT_VOICE_MAIL_COUNT = -2,
+    UNKNOWN_VOICE_MAIL_COUNT = -1,
+};
+
+enum CallForwardingStatus {
+    CALL_FORWARDING_STATUS_DISABLED = 0,
+    CALL_FORWARDING_STATUS_ENABLED = 1,
+    CALL_FORWARDING_STATUS_UNKNOWN = -1,
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_SIM_CONSTANT_H

@@ -62,6 +62,7 @@ public:
     std::string ObtainHomeNameOfPnn();
     std::string ObtainMsisdnAlphaStatus();
     std::string ObtainVoiceMailNumber();
+    int32_t ObtainVoiceMailCount();
     std::string ObtainSPN();
     std::string ObtainEons(const std::string &plmn, int32_t lac, bool longNameRequired);
     std::string ObtainVoiceMailInfo();
@@ -79,6 +80,8 @@ public:
         virtual void ProcessParseFile(const AppExecFwk::InnerEvent::Pointer &event) = 0;
     };
     virtual bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber) = 0;
+    virtual bool SetVoiceMailCount(int32_t voiceMailCount) = 0;
+    virtual bool SetVoiceCallForwarding(bool enable, const std::string &number) = 0;
     bool HasSimCard();
     void UnInit();
     void ClearData();
@@ -107,6 +110,13 @@ protected:
     std::string lastMsisdn_ = "";
     std::string lastMsisdnTag_ = "";
     std::string voiceMailNum_ = "";
+    int32_t efMWISSize_ = 0;
+    int32_t efCphsMwiSize_ = 0;
+    int32_t efCfisSize_ = 0;
+    int32_t efCffSize_ = 0;
+    int32_t callForwardingStatus = CALL_FORWARDING_STATUS_UNKNOWN;
+    bool voiceMailWaiting_ = false;
+    int32_t voiceMailCount_ = DEFAULT_VOICE_MAIL_COUNT;
     std::string voiceMailTag_ = "";
     std::string lastVoiceMailNum_ = "";
     std::string lastVoiceMailTag_ = "";
@@ -130,7 +140,13 @@ protected:
     bool waitResult_ = false;
     static std::mutex mtx_;
     std::condition_variable processWait_;
-    const uint8_t BYTE_NUM = 0xff;
+    const uint8_t BYTE_NUM = 0xFF;
+    const uint8_t BYTE_NUM2 = 0x01;
+    const uint8_t BYTE_NUM3 = 0x0F;
+    const uint8_t BYTE_NUM4 = 0x0A;
+    const uint8_t BYTE_NUM5 = 0x05;
+    const uint8_t BYTE_NUM6 = 0xFE;
+    const uint8_t BYTE_NUM7 = 0xF0;
     const int DATA_STEP = 2;
     static std::unique_ptr<ObserverHandler> filesFetchedObser_;
     std::unique_ptr<ObserverHandler> lockedFilesFetchedObser_ = nullptr;

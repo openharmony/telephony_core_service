@@ -777,6 +777,52 @@ int32_t SimManager::GetVoiceMailNumber(int32_t slotId, std::u16string &voiceMail
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t SimManager::GetVoiceMailCount(int32_t slotId, int32_t &voiceMailCount)
+{
+    if (!HasSimCardInner(slotId)) {
+        TELEPHONY_LOGE("GetVoiceMailCount has no sim card!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    voiceMailCount = simFileManager_[slotId]->GetVoiceMailCount();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::SetVoiceMailCount(int32_t slotId, int32_t voiceMailCount)
+{
+    if (!HasSimCardInner(slotId)) {
+        TELEPHONY_LOGE("SetVoiceMailCount has no sim card!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (simFileManager_[slotId]->SetVoiceMailCount(voiceMailCount)) {
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+}
+
+int32_t SimManager::SetVoiceCallForwarding(int32_t slotId, bool enable, const std::string &number)
+{
+    if (!HasSimCardInner(slotId)) {
+        TELEPHONY_LOGE("SetVoiceCallForwarding has no sim card!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (simFileManager_[slotId]->SetVoiceCallForwarding(enable, number)) {
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+}
+
 int32_t SimManager::ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum)
 {
     if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {

@@ -725,6 +725,43 @@ napi_value GetVoiceMailNumber(napi_env env, napi_callback_info info)
         env, info, "GetVoiceMailNumber");
 }
 
+void NativeGetVoiceMailCount(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    AsyncContext<int32_t> *asyncContext = static_cast<AsyncContext<int32_t> *>(data);
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeGetVoiceMailCount slotId is invalid");
+        asyncContext->context.errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
+    int32_t voiceMailCount = ERROR_DEFAULT;
+    int32_t errorCode =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetVoiceMailCount(asyncContext->slotId, voiceMailCount);
+    if (errorCode == ERROR_NONE) {
+        asyncContext->callbackVal = voiceMailCount;
+        asyncContext->context.resolved = true;
+    } else {
+        asyncContext->context.resolved = false;
+    }
+    asyncContext->context.errorCode = errorCode;
+}
+
+void GetVoiceMailCountCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncContext<int32_t>> context(static_cast<AsyncContext<int32_t> *>(data));
+    NapiAsyncPermissionCompleteCallback(
+        env, status, *context, false, "GetVoiceMailCount", Permission::GET_TELEPHONY_STATE);
+}
+
+napi_value GetVoiceMailCount(napi_env env, napi_callback_info info)
+{
+    return NapiCreateAsyncWork<int32_t, NativeGetVoiceMailCount, GetVoiceMailCountCallback>(
+        env, info, "GetVoiceMailCount");
+}
+
 void NativeGetSimTelephoneNumber(napi_env env, void *data)
 {
     if (data == nullptr) {
@@ -2533,6 +2570,7 @@ napi_status InitSimInterfaceAboutVoice(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getDefaultVoiceSlotId", GetDefaultVoiceSlotId),
         DECLARE_NAPI_FUNCTION("getVoiceMailIdentifier", GetVoiceMailIdentifier),
         DECLARE_NAPI_FUNCTION("getVoiceMailNumber", GetVoiceMailNumber),
+        DECLARE_NAPI_FUNCTION("getVoiceMailCount", GetVoiceMailCount),
         DECLARE_NAPI_FUNCTION("setVoiceMailInfo", SetVoiceMailInfo),
     };
     return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);

@@ -223,6 +223,27 @@ declare namespace sim {
   function getVoiceMailNumber(slotId: number): Promise<string>;
 
   /**
+   * Obtains the number of messages in the voice mailbox of the SIM card in the specified slot.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from {@code 0} to the maximum card slot index number supported by the device.
+   * @param callback Returns the number of messages in the voice mailbox.
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @throws {BusinessError} 201 - Permission denied.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300004 - Do not have sim card.
+   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @throws {BusinessError} 8301002 - SIM card operation error.
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function getVoiceMailCount(slotId: number, callback: AsyncCallback<number>): void;
+  function getVoiceMailCount(slotId: number): Promise<number>;
+
+  /**
    * Sets the voice mail information.
    *
    * @param slotId Indicates the card slot index number,

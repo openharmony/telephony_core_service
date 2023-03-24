@@ -872,6 +872,48 @@ int32_t CoreService::GetVoiceMailNumber(int32_t slotId, std::u16string &voiceMai
     return simManager_->GetVoiceMailNumber(slotId, voiceMailNumber);
 }
 
+int32_t CoreService::GetVoiceMailCount(int32_t slotId, int32_t &voiceMailCount)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    TELEPHONY_LOGI("CoreService::GetVoiceMailCount(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetVoiceMailCount(slotId, voiceMailCount);
+}
+
+int32_t CoreService::SetVoiceMailCount(int32_t slotId, int32_t voiceMailCount)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    TELEPHONY_LOGI("CoreService::SetVoiceMailCount(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SetVoiceMailCount(slotId, voiceMailCount);
+}
+
+int32_t CoreService::SetVoiceCallForwarding(int32_t slotId, bool enable, const std::string &number)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    TELEPHONY_LOGI("CoreService::SetVoiceCallForwarding(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SetVoiceCallForwarding(slotId, enable, number);
+}
+
 int32_t CoreService::QueryIccDiallingNumbers(
     int slotId, int type, std::vector<std::shared_ptr<DiallingNumbersInfo>> &reslut)
 {

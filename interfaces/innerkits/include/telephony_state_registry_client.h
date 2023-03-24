@@ -37,6 +37,8 @@ public:
     int32_t UpdateNetworkState(int32_t slotId, const sptr<NetworkState> &networkState);
     int32_t UpdateSimState(int32_t slotId, CardType type, SimState state, LockReason reason);
     int32_t UpdateCellularDataFlow(int32_t slotId, int32_t flowType);
+    int32_t UpdateCfuIndicator(int32_t slotId, bool cfuResult);
+    int32_t UpdateVoiceMailMsgIndicator(int32_t slotId, bool voiceMailMsgResult);
     sptr<ITelephonyStateNotify> GetProxy();
 
 private:
