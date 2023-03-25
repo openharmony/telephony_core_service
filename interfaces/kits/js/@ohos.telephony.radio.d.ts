@@ -394,7 +394,7 @@ declare namespace radio {
    * @since 7
    */
   function isRadioOn(callback: AsyncCallback<boolean>): void;
-  function isRadioOn(slotId: number, callback: AsyncCallback<boolean>): void
+  function isRadioOn(slotId: number, callback: AsyncCallback<boolean>): void;
   function isRadioOn(slotId?: number): Promise<boolean>;
 
   /**
