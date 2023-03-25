@@ -2500,6 +2500,48 @@ napi_status InitEnumPersoLockType(napi_env env, napi_value exports)
     return napi_define_properties(env, exports, arrSize, desc);
 }
 
+napi_status InitEnumOperatorConfigKey(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_VOICE_MAIL_NUMBER_STRING", GetNapiValue(env, "voice_mail_number_string")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_IMS_SWITCH_ON_BY_DEFAULT_BOOL",
+            GetNapiValue(env, "ims_switch_on_by_default_bool")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_HIDE_IMS_SWITCH_BOOL", GetNapiValue(env, "hide_ims_switch_bool")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_VOLTE_SUPPORTED_BOOL", GetNapiValue(env, "volte_supported_bool")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_NR_MODE_SUPPORTED_LIST_INT_ARRAY",
+            GetNapiValue(env, "nr_mode_supported_list_int_array")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_VOLTE_PROVISIONING_SUPPORTED_BOOL",
+            GetNapiValue(env, "volte_provisioning_supported_bool")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_SS_OVER_UT_SUPPORTED_BOOL", GetNapiValue(env, "ss_over_ut_supported_bool")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_IMS_GBA_REQUIRED_BOOL", GetNapiValue(env, "ims_gba_required_bool")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_UT_PROVISIONING_SUPPORTED_BOOL",
+            GetNapiValue(env, "ut_provisioning_supported_bool")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_IMS_PREFER_FOR_EMERGENCY_BOOL",
+            GetNapiValue(env, "ims_prefer_for_emergency_bool")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_CALL_WAITING_SERVICE_CLASS_INT",
+            GetNapiValue(env, "call_waiting_service_class_int")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_CALL_TRANSFER_VISIBILITY_BOOL",
+            GetNapiValue(env, "call_transfer_visibility_bool")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_IMS_CALL_DISCONNECT_REASON_INFO_MAPPING_STRING_ARRAY",
+            GetNapiValue(env, "ims_call_disconnect_reason_info_mapping_string_array")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_FORCE_VOLTE_SWITCH_ON_BOOL", GetNapiValue(env, "force_volte_switch_on_bool")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_ENABLE_OPERATOR_NAME_CUST_BOOL",
+            GetNapiValue(env, "enable_operator_name_cust_bool")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_OPERATOR_NAME_CUST_STRING",
+            GetNapiValue(env, "operator_name_cust_string")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_SPN_DISPLAY_CONDITION_CUST_INT",
+            GetNapiValue(env, "spn_display_condition_cust_int")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_PNN_CUST_STRING_ARRAY", GetNapiValue(env, "pnn_cust_string_array")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_OPL_CUST_STRING_ARRAY", GetNapiValue(env, "opl_cust_string_array")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_EMERGENCY_CALL_STRING_ARRAY",
+            GetNapiValue(env, "emergency_call_string_array")),
+    };
+
+    constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
+    NapiUtil::DefineEnumClassByName(env, exports, "OperatorConfigKey", arrSize, desc);
+    return napi_define_properties(env, exports, arrSize, desc);
+}
+
 napi_status InitSimLockInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
@@ -2588,6 +2630,7 @@ napi_value InitNapiSim(napi_env env, napi_value exports)
     NAPI_CALL(env, InitEnumLockType(env, exports));
     NAPI_CALL(env, InitEnumCardType(env, exports));
     NAPI_CALL(env, InitEnumPersoLockType(env, exports));
+    NAPI_CALL(env, InitEnumOperatorConfigKey(env, exports));
     return exports;
 }
 EXTERN_C_END
