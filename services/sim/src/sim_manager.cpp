@@ -168,7 +168,8 @@ int32_t SimManager::GetSimState(int32_t slotId, SimState &simState)
 {
     if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("GetSimState has no sim card!");
-        return TELEPHONY_ERR_NO_SIM_CARD;
+        simState = SimState::SIM_STATE_NOT_PRESENT;
+        return TELEPHONY_ERR_SUCCESS;
     }
     simState = simStateManager_[slotId]->GetSimState();
     return TELEPHONY_ERR_SUCCESS;
