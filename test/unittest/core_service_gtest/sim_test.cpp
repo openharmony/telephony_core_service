@@ -4336,7 +4336,8 @@ HWTEST_F(SimTest, Telephony_Sim_TestDump_0100, Function | MediumTest | Level3)
 HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (!SimTest::HasSimCard(slotId_) || CoreServiceClient::GetInstance().GetMaxSimCount() == 1) {
+    if (CoreServiceClient::GetInstance().GetMaxSimCount() == 1 ||
+        !(SimTest::HasSimCard(slotId_) && SimTest::HasSimCard(slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card or one card version");
     } else {
         int32_t result = CoreServiceClient::GetInstance().SetPrimarySlotId(SimTest::slotId_);
@@ -4353,7 +4354,8 @@ HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0100, Function | MediumTest | L
 HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    if (!SimTest::HasSimCard(slotId1_)) {
+    if (CoreServiceClient::GetInstance().GetMaxSimCount() == 1 ||
+        !(SimTest::HasSimCard(slotId_) && SimTest::HasSimCard(slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         int32_t result = CoreServiceClient::GetInstance().SetPrimarySlotId(SimTest::slotId1_);
