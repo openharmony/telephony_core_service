@@ -197,7 +197,7 @@ inline int32_t TelRilBase::SendEventData(
         TELEPHONY_LOGE("func %{public}s Send eventId:%{public}d is failed!", funcName, eventId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    TELEPHONY_LOGI("func %{public}s Send eventId:%{public}d finish", funcName, eventId);
+    TELEPHONY_LOGD("func %{public}s Send eventId:%{public}d finish", funcName, eventId);
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -208,7 +208,7 @@ inline int32_t TelRilBase::Notify(const char *funcName, std::shared_ptr<T> data,
         TELEPHONY_LOGE("%{public}s() observerHandler_ or data is nullptr", funcName);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    TELEPHONY_LOGI("%{public}s() notify event %{public}d notifyId slotId:%{public}d", funcName, notifyId, slotId_);
+    TELEPHONY_LOGD("%{public}s() notify event %{public}d notifyId slotId:%{public}d", funcName, notifyId, slotId_);
     observerHandler_->NotifyObserver(notifyId, data);
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -219,7 +219,7 @@ inline int32_t TelRilBase::Notify(const char *funcName, RadioEvent notifyId)
         TELEPHONY_LOGE("%{public}s() observerHandler_  is nullptr", funcName);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    TELEPHONY_LOGI("%{public}s() notify event %{public}d notifyId slotId:%{public}d", funcName, notifyId, slotId_);
+    TELEPHONY_LOGD("%{public}s() notify event %{public}d notifyId slotId:%{public}d", funcName, notifyId, slotId_);
     observerHandler_->NotifyObserver(notifyId);
     return TELEPHONY_ERR_SUCCESS;
 }
