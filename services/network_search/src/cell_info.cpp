@@ -70,7 +70,7 @@ void CellInfo::InitCellSignalBar(const int32_t bar)
 
 void CellInfo::ProcessNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("CellInfo::ProcessNeighboringCellInfo cell info start...... slotId:%{public}d", slotId_);
+    TELEPHONY_LOGD("CellInfo::ProcessNeighboringCellInfo cell info start...... slotId:%{public}d", slotId_);
     std::lock_guard<std::mutex> lock(mutex_);
     if (event == nullptr) {
         TELEPHONY_LOGE("CellInfo::ProcessNeighboringCellInfo event is nullptr slotId:%{public}d", slotId_);
@@ -110,7 +110,7 @@ void CellInfo::ProcessNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer 
 
 void CellInfo::ProcessCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("CellInfo::ProcessCurrentCellInfo cell info start... slotId:%{public}d", slotId_);
+    TELEPHONY_LOGD("CellInfo::ProcessCurrentCellInfo cell info start... slotId:%{public}d", slotId_);
     std::lock_guard<std::mutex> lock(mutex_);
     if (event == nullptr) {
         TELEPHONY_LOGE("CellInfo::ProcessCurrentCellInfo event is nullptr slotId:%{public}d", slotId_);

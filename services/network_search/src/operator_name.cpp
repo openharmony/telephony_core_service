@@ -362,7 +362,7 @@ std::string OperatorName::GetPlmn(const sptr<NetworkState> &networkState, bool l
     if (plmn.empty()) {
         plmn = networkState->GetLongOperatorName();
     }
-    TELEPHONY_LOGI(
+    TELEPHONY_LOGD(
         "OperatorName::GetPlmn lac:%{public}d, numeric:%{public}s, longNameRequired:%{public}d, plmn:%{public}s", lac,
         numeric.c_str(), longNameRequired, plmn.c_str());
     return plmn;
@@ -412,8 +412,7 @@ std::string OperatorName::GetCustEons(const std::string &numeric, int32_t lac, b
         pnnIndex = -1;
         TELEPHONY_LOGI(
             "OperatorName::GetCustEons numeric:%{public}s, opl->plmnNumeric:%{public}s, lac:%{public}d, "
-            "opl->lacStart:%{public}d, opl->lacEnd:%{public}d, "
-            "opl->pnnRecordId:%{public}d",
+            "opl->lacStart:%{public}d, opl->lacEnd:%{public}d, opl->pnnRecordId:%{public}d",
             numeric.c_str(), opl->plmnNumeric.c_str(), lac, opl->lacStart, opl->lacEnd, opl->pnnRecordId);
         if (numeric.compare(opl->plmnNumeric) == 0 &&
             ((opl->lacStart == 0 && opl->lacEnd == 0xfffe) || (opl->lacStart <= lac && opl->lacEnd >= lac))) {
@@ -439,7 +438,7 @@ std::string OperatorName::GetCustEons(const std::string &numeric, int32_t lac, b
 
 std::string OperatorName::GetCustomName(const std::string &numeric)
 {
-    TELEPHONY_LOGI("OperatorName::GetCustomName numeric:%{public}s", numeric.c_str());
+    TELEPHONY_LOGD("OperatorName::GetCustomName numeric:%{public}s", numeric.c_str());
     std::string name = "";
     if (numeric.empty()) {
         return name;
@@ -447,19 +446,19 @@ std::string OperatorName::GetCustomName(const std::string &numeric)
     auto obj = std::find(cmMccMnc_.begin(), cmMccMnc_.end(), numeric);
     if (obj != cmMccMnc_.end()) {
         ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::CMCC, name);
-        TELEPHONY_LOGI("OperatorName::GetCustomName CMCC:%{public}s", name.c_str());
+        TELEPHONY_LOGD("OperatorName::GetCustomName CMCC:%{public}s", name.c_str());
         return name;
     }
     obj = std::find(cuMccMnc_.begin(), cuMccMnc_.end(), numeric);
     if (obj != cuMccMnc_.end()) {
         ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::CUCC, name);
-        TELEPHONY_LOGI("OperatorName::GetCustomName CUCC:%{public}s", name.c_str());
+        TELEPHONY_LOGD("OperatorName::GetCustomName CUCC:%{public}s", name.c_str());
         return name;
     }
     obj = std::find(ctMccMnc_.begin(), ctMccMnc_.end(), numeric);
     if (obj != ctMccMnc_.end()) {
         ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::CTCC, name);
-        TELEPHONY_LOGI("OperatorName::GetCustomName CTCC:%{public}s", name.c_str());
+        TELEPHONY_LOGD("OperatorName::GetCustomName CTCC:%{public}s", name.c_str());
         return name;
     }
     return name;

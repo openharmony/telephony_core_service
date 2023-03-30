@@ -128,7 +128,7 @@ int32_t TelRilModem::RadioStateUpdated(int32_t state)
     commonEventData.SetWant(want);
     EventFwk::CommonEventPublishInfo publishInfo;
     bool retsult = EventFwk::CommonEventManager::PublishCommonEvent(commonEventData, publishInfo, nullptr);
-    TELEPHONY_LOGI("publish modem subscribed event result : %{public}d", retsult);
+    TELEPHONY_LOGD("publish modem subscribed event result : %{public}d", retsult);
     return Notify<HRilInt32Parcel>(
         TELEPHONY_LOG_FUNC_NAME, std::make_shared<HRilInt32Parcel>(state), RadioEvent::RADIO_STATE_CHANGED);
 }
