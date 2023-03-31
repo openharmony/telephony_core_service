@@ -321,14 +321,14 @@ void NapiUtil::Handle1ValueCallback(napi_env env, BaseContext *baseContext, napi
 
 void NapiUtil::Handle2ValueCallback(napi_env env, BaseContext *baseContext, napi_value callbackValue)
 {
-    TELEPHONY_LOGI("Handle2ValueCallback start");
+    TELEPHONY_LOGD("Handle2ValueCallback start");
     if (baseContext == nullptr) {
         TELEPHONY_LOGI("Handle2ValueCallback serious error baseContext nullptr");
         ThrowParameterError(env);
         return;
     }
     if (baseContext->callbackRef != nullptr) {
-        TELEPHONY_LOGI("Handle2ValueCallback start normal callback");
+        TELEPHONY_LOGD("Handle2ValueCallback start normal callback");
         napi_value recv = CreateUndefined(env);
         napi_value callbackFunc = nullptr;
         NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, baseContext->callbackRef, &callbackFunc));
@@ -339,20 +339,20 @@ void NapiUtil::Handle2ValueCallback(napi_env env, BaseContext *baseContext, napi
         NAPI_CALL_RETURN_VOID(
             env, napi_call_function(env, recv, callbackFunc, std::size(callbackValues), callbackValues, &result));
         NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, baseContext->callbackRef));
-        TELEPHONY_LOGI("Handle2ValueCallback normal callback end");
+        TELEPHONY_LOGD("Handle2ValueCallback normal callback end");
     } else if (baseContext->deferred != nullptr) {
-        TELEPHONY_LOGI("Handle2ValueCallback start promise callback");
+        TELEPHONY_LOGD("Handle2ValueCallback start promise callback");
         if (baseContext->resolved) {
             NAPI_CALL_RETURN_VOID(env, napi_resolve_deferred(env, baseContext->deferred, callbackValue));
         } else {
             NAPI_CALL_RETURN_VOID(env, napi_reject_deferred(env, baseContext->deferred, callbackValue));
         }
-        TELEPHONY_LOGI("Handle2ValueCallback promise callback end");
+        TELEPHONY_LOGD("Handle2ValueCallback promise callback end");
     }
     napi_delete_async_work(env, baseContext->work);
     delete baseContext;
     baseContext = nullptr;
-    TELEPHONY_LOGI("Handle2ValueCallback end");
+    TELEPHONY_LOGD("Handle2ValueCallback end");
 }
 
 void NapiUtil::DefineEnumClassByName(

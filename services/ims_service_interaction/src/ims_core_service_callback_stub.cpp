@@ -76,7 +76,7 @@ int32_t ImsCoreServiceCallbackStub::OnImsServiceStatusReportInner(MessageParcel 
 int32_t ImsCoreServiceCallbackStub::UpdateImsServiceStatusChanged(
     int32_t slotId, const ImsServiceStatus &imsServiceStatus)
 {
-    TELEPHONY_LOGI("ImsCoreServiceCallbackStub::UpdateImsServiceStatusChanged entry");
+    TELEPHONY_LOGD("ImsCoreServiceCallbackStub::UpdateImsServiceStatusChanged entry");
     std::shared_ptr<ImsCoreServiceClient> imsCoreServiceClient = DelayedSingleton<ImsCoreServiceClient>::GetInstance();
     if (imsCoreServiceClient->GetHandler(slotId) == nullptr) {
         TELEPHONY_LOGE("get handler was null! slotId is %{public}d", slotId);
