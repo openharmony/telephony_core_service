@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -171,7 +171,7 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
     }
 
     auto &powerMgrClient = PowerMgrClient::GetInstance();
-    auto runningLock = powerMgrClient.CreateRunningLock("runninglock", RunningLockType::RUNNINGLOCK_BACKGROUND);
+    auto runningLock = powerMgrClient.CreateRunningLock("runninglock", RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
     if (runningLock != nullptr) {
         runningLock->Lock();
     }
@@ -290,7 +290,7 @@ void NitzUpdate::SaveTime(int64_t networkTime)
 {
     TELEPHONY_LOGI("NitzUpdate::SaveTime networkTime:(%{public}" PRId64 ") slotId:%{public}d", networkTime, slotId_);
     auto &powerMgrClient = PowerMgrClient::GetInstance();
-    auto runningLock = powerMgrClient.CreateRunningLock("runninglock", RunningLockType::RUNNINGLOCK_BACKGROUND);
+    auto runningLock = powerMgrClient.CreateRunningLock("runninglock", RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
     if (runningLock != nullptr) {
         runningLock->Lock();
     }
