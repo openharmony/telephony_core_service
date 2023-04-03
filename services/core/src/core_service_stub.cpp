@@ -133,7 +133,7 @@ void CoreServiceStub::AddHandlerSimToMapExt()
 int32_t CoreServiceStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    TELEPHONY_LOGI("CoreServiceStub OnRemoteRequest code %{public}u", code);
+    TELEPHONY_LOGD("CoreServiceStub OnRemoteRequest code %{public}u", code);
     std::u16string myDescripter = CoreServiceStub::GetDescriptor();
     std::u16string remoteDescripter = data.ReadInterfaceToken();
     if (myDescripter != remoteDescripter) {

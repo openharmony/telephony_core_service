@@ -42,7 +42,7 @@ bool SimManager::OnInit(int32_t slotCount)
     slotCount_ = slotCount;
     InitMultiSimObject();
     InitSingleSimObject();
-    TELEPHONY_LOGI("SimManager OnInit success");
+    TELEPHONY_LOGD("SimManager OnInit success");
     return true;
 }
 
@@ -978,7 +978,7 @@ bool SimManager::IsValidSlotId(int32_t slotId)
         TELEPHONY_LOGE("slotId is invalid, slotId = %{public}d", slotId);
         return false;
     }
-    TELEPHONY_LOGI("slotId is valid, slotId = %{public}d", slotId);
+    TELEPHONY_LOGD("slotId is valid, slotId = %{public}d", slotId);
     return true;
 }
 
