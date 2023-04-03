@@ -486,7 +486,7 @@ int32_t CoreServiceProxy::GetUniqueDeviceId(int32_t slotId, std::u16string &devi
 
 int32_t CoreServiceProxy::HasSimCard(int32_t slotId, bool &hasSimCard)
 {
-    TELEPHONY_LOGI("CoreServiceProxy HasSimCard ::%{public}d", slotId);
+    TELEPHONY_LOGD("CoreServiceProxy HasSimCard ::%{public}d", slotId);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -517,7 +517,7 @@ int32_t CoreServiceProxy::GetSimState(int32_t slotId, SimState &simState)
     if (!IsValidSlotId(slotId)) {
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
-    TELEPHONY_LOGI("CoreServiceProxy GetSimState ::%{public}d", slotId);
+    TELEPHONY_LOGD("CoreServiceProxy GetSimState ::%{public}d", slotId);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
