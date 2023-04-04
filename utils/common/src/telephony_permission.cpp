@@ -47,7 +47,6 @@ bool TelephonyPermission::GetBundleNameByUid(int32_t uid, std::string &bundleNam
         TELEPHONY_LOGE(" permission check failed, cannot get IBundleMgr.");
         return false;
     }
-    //return iBundleMgr->GetBundleNameForUid(uid, bundleName);
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     ErrCode errCode = iBundleMgr->GetNameForUid(uid, bundleName);
     if (errCode != ERR_OK) {
