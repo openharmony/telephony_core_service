@@ -1846,7 +1846,6 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0100, 
         NetworkSearchTest::imsRegStateCallbackList_.push_back(imsRegStateCallback);
     } else {
         if (imsRegStateCallback.imsCallback != nullptr) {
-            delete imsRegStateCallback.imsCallback;
             imsRegStateCallback.imsCallback = nullptr;
         }
     }
@@ -1870,7 +1869,6 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0200, 
     sptr<ImsRegInfoCallback> imsRegInfoCallback = new ImsRegInfoCallbackGtest();
     ret = NetworkSearchTest::telephonyService_->RegisterImsRegInfoCallback(
         INVALID_SLOT_ID, DEFAULT_TYPE, imsRegInfoCallback);
-    delete imsRegInfoCallback;
     imsRegInfoCallback = nullptr;
     EXPECT_EQ(TELEPHONY_ERR_SLOTID_INVALID, ret);
 }
@@ -1890,7 +1888,6 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0300, 
     sptr<ImsRegInfoCallback> imsRegInfoCallback = new ImsRegInfoCallbackGtest();
     int ret = NetworkSearchTest::telephonyService_->RegisterImsRegInfoCallback(
         SLOT_ID, static_cast<ImsServiceType>(INVALID_TYPE), imsRegInfoCallback);
-    delete imsRegInfoCallback;
     imsRegInfoCallback = nullptr;
     EXPECT_EQ(TELEPHONY_ERR_ARGUMENT_INVALID, ret);
 }
@@ -1933,7 +1930,6 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0500, 
         NetworkSearchTest::imsRegStateCallbackList_.push_back(imsRegStateCallback);
     } else {
         if (imsRegStateCallback.imsCallback != nullptr) {
-            delete imsRegStateCallback.imsCallback;
             imsRegStateCallback.imsCallback = nullptr;
         }
     }
@@ -1955,7 +1951,6 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_RegImsRegInfoCallback_0600, 
     sptr<ImsRegInfoCallback> imsRegInfoCallback = new ImsRegInfoCallbackGtest();
     int ret = NetworkSearchTest::telephonyService_->RegisterImsRegInfoCallback(
         SLOT_ID1, static_cast<ImsServiceType>(INVALID_TYPE), imsRegInfoCallback);
-    delete imsRegInfoCallback;
     imsRegInfoCallback = nullptr;
     EXPECT_EQ(TELEPHONY_ERR_ARGUMENT_INVALID, ret);
 }
@@ -2038,7 +2033,6 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0100
     for (; itor != NetworkSearchTest::imsRegStateCallbackList_.end(); ++itor) {
         if (itor->slotId == SLOT_ID && itor->imsSrvType == DEFAULT_TYPE) {
             if (itor->imsCallback != nullptr) {
-                delete itor->imsCallback;
                 itor->imsCallback = nullptr;
             }
             NetworkSearchTest::imsRegStateCallbackList_.erase(itor);
@@ -2118,7 +2112,6 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0500
     for (; itor != NetworkSearchTest::imsRegStateCallbackList_.end(); ++itor) {
         if (itor->slotId == SLOT_ID1 && itor->imsSrvType == DEFAULT_TYPE) {
             if (itor->imsCallback != nullptr) {
-                delete itor->imsCallback;
                 itor->imsCallback = nullptr;
             }
             NetworkSearchTest::imsRegStateCallbackList_.erase(itor);
