@@ -67,6 +67,8 @@ std::string OperatorConfigLoader::LoadOpKeyOnMccMnc(int32_t slotId)
     std::string mccmncFromSim = Str16ToStr8(simFileManager_->GetSimOperatorNumeric());
     predicates.EqualTo(MCCMNC, mccmncFromSim);
     resultSet = helper->Query(uri, predicates, colume);
+    helper->Release();
+    helper = nullptr;
     if (resultSet != nullptr) {
         return GetOpKey(resultSet, slotId);
     }
@@ -169,15 +171,7 @@ bool OperatorConfigLoader::MatchOperatorRule(std::shared_ptr<DataShare::DataShar
     return isAllRuleMatch;
 }
 
-std::shared_ptr<DataShare::DataShareHelper> OperatorConfigLoader::CreateOpKeyHelper()
-{
-    if (opKeyDataAbilityHelper_ == nullptr) {
-        opKeyDataAbilityHelper_ = CreateDataAHelper();
-    }
-    return opKeyDataAbilityHelper_;
-}
-
-std::shared_ptr<DataShare::DataShareHelper> OperatorConfigLoader::CreateDataAHelper() const
+std::shared_ptr<DataShare::DataShareHelper> OperatorConfigLoader::CreateOpKeyHelper() const
 {
     TELEPHONY_LOGI("OperatorConfigLoader::CreateDataAHelper");
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();

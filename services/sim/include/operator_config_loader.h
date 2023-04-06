@@ -52,15 +52,13 @@ public:
 
 private:
     std::string LoadOpKeyOnMccMnc(int32_t slotId);
-    std::shared_ptr<DataShare::DataShareHelper> CreateDataAHelper() const;
-    std::shared_ptr<DataShare::DataShareHelper> CreateOpKeyHelper();
+    std::shared_ptr<DataShare::DataShareHelper> CreateOpKeyHelper() const;
     std::string GetOpKey(std::shared_ptr<DataShare::DataShareResultSet> resultSet, int32_t slotId);
     bool MatchOperatorRule(std::shared_ptr<DataShare::DataShareResultSet> &resultSet, int row);
 
 private:
     std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
     std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
-    std::shared_ptr<DataShare::DataShareHelper> opKeyDataAbilityHelper_ = nullptr;
     std::string iccidFromSim_;
     std::string imsiFromSim_;
     std::string spnFromSim_;
