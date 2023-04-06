@@ -37,10 +37,7 @@ std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateDataAHelper()
         TELEPHONY_LOGE("SimRdbHelper GetSystemAbility Service Failed.");
         return nullptr;
     }
-    if (helper_ == nullptr) {
-        helper_ = DataShare::DataShareHelper::Creator(remoteObj, SimRdbInfo::SIM_RDB_URI);
-    }
-    return helper_;
+    return DataShare::DataShareHelper::Creator(remoteObj, SimRdbInfo::SIM_RDB_URI);
 }
 
 int SimRdbHelper::Insert(const DataShare::DataShareValuesBucket &values)
@@ -52,7 +49,10 @@ int SimRdbHelper::Insert(const DataShare::DataShareValuesBucket &values)
     }
     Uri simUri(SimRdbInfo::SIM_RDB_SELECTION);
     TELEPHONY_LOGI("SimRdbHelper::Insert");
-    return dataShareHelper->Insert(simUri, values);
+    int result = dataShareHelper->Insert(simUri, values);
+    dataShareHelper->Release();
+    dataShareHelper = nullptr;
+    return result;
 }
 
 std::shared_ptr<DataShare::DataShareResultSet> SimRdbHelper::Query(
@@ -66,6 +66,8 @@ std::shared_ptr<DataShare::DataShareResultSet> SimRdbHelper::Query(
     Uri simUri(SimRdbInfo::SIM_RDB_SELECTION);
     TELEPHONY_LOGI("SimRdbHelper::Query");
     std::shared_ptr<DataShare::DataShareResultSet> ret = dataShareHelper->Query(simUri, predicates, columns);
+    dataShareHelper->Release();
+    dataShareHelper = nullptr;
     return ret;
 }
 
@@ -79,7 +81,10 @@ int SimRdbHelper::Update(const DataShare::DataShareValuesBucket &value,
     }
     Uri simUri(SimRdbInfo::SIM_RDB_SELECTION);
     TELEPHONY_LOGI("SimRdbHelper::Update");
-    return dataShareHelper->Update(simUri, predicates, value);
+    int result = dataShareHelper->Update(simUri, predicates, value);
+    dataShareHelper->Release();
+    dataShareHelper = nullptr;
+    return result;
 }
 
 int SimRdbHelper::Delete(const DataShare::DataSharePredicates &predicates)
@@ -91,7 +96,10 @@ int SimRdbHelper::Delete(const DataShare::DataSharePredicates &predicates)
     }
     Uri simUri(SimRdbInfo::SIM_RDB_SELECTION);
     TELEPHONY_LOGI("SimRdbHelper::Delete");
-    return dataShareHelper->Delete(simUri, predicates);
+    int result = dataShareHelper->Delete(simUri, predicates);
+    dataShareHelper->Release();
+    dataShareHelper = nullptr;
+    return result;
 }
 
 int32_t SimRdbHelper::GetDefaultMainCardSlotId()
@@ -205,7 +213,10 @@ int32_t SimRdbHelper::SetDefaultMainCard(int32_t slotId)
         return INVALID_VALUE;
     }
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
-    return dataShareHelper->Update(defaultUri, predicates, value);
+    int result = dataShareHelper->Update(defaultUri, predicates, value);
+    dataShareHelper->Release();
+    dataShareHelper = nullptr;
+    return result;
 }
 
 int32_t SimRdbHelper::SetDefaultVoiceCard(int32_t slotId)
@@ -223,7 +234,10 @@ int32_t SimRdbHelper::SetDefaultVoiceCard(int32_t slotId)
         return INVALID_VALUE;
     }
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
-    return dataShareHelper->Update(defaultUri, predicates, value);
+    int result = dataShareHelper->Update(defaultUri, predicates, value);
+    dataShareHelper->Release();
+    dataShareHelper = nullptr;
+    return result;
 }
 
 int32_t SimRdbHelper::SetDefaultMessageCard(int32_t slotId)
@@ -241,7 +255,10 @@ int32_t SimRdbHelper::SetDefaultMessageCard(int32_t slotId)
         return INVALID_VALUE;
     }
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
-    return dataShareHelper->Update(defaultUri, predicates, value);
+    int result = dataShareHelper->Update(defaultUri, predicates, value);
+    dataShareHelper->Release();
+    dataShareHelper = nullptr;
+    return result;
 }
 
 int32_t SimRdbHelper::SetDefaultCellularData(int32_t slotId)
@@ -259,7 +276,10 @@ int32_t SimRdbHelper::SetDefaultCellularData(int32_t slotId)
         return INVALID_VALUE;
     }
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
-    return dataShareHelper->Update(defaultUri, predicates, value);
+    int result = dataShareHelper->Update(defaultUri, predicates, value);
+    dataShareHelper->Release();
+    dataShareHelper = nullptr;
+    return result;
 }
 
 int32_t SimRdbHelper::InsertData(int64_t &id, const DataShare::DataShareValuesBucket &values)
