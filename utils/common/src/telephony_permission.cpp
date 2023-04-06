@@ -15,6 +15,7 @@
 
 #include "telephony_permission.h"
 
+#include "accesstoken_kit.h"
 #include "bundle_mgr_interface.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
@@ -23,7 +24,9 @@
 #include "accesstoken_kit.h"
 #include "privacy_kit.h"
 
+#include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
+#include "tokenid_kit.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -65,7 +68,7 @@ bool TelephonyPermission::GetBundleNameByUid(int32_t uid, std::string &bundleNam
 bool TelephonyPermission::CheckPermission(const std::string &permissionName)
 {
     if (permissionName.empty()) {
-        TELEPHONY_LOGE("permission check failed，permission name is empty.");
+        TELEPHONY_LOGE("permission check failed, permission name is empty.");
         return false;
     }
 
@@ -102,6 +105,20 @@ bool TelephonyPermission::CheckPermission(const std::string &permissionName)
         return false;
     }
     return true;
+}
+
+bool TelephonyPermission::CheckCallerIsSystemApp()
+{
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = AccessTokenKit::GetTokenTypeFlag(callerToken);
+    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE ||
+        tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
+        TELEPHONY_LOGI("tokenType check passed.");
+        return true;
+    }
+
+    auto selfToken = IPCSkeleton::GetCallingFullTokenID();
+    return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken);
 }
 } // namespace Telephony
 } // namespace OHOS
