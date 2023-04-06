@@ -45,6 +45,7 @@ class TelephonyPermission {
 public:
     static bool CheckPermission(const std::string &permissionName);
     static bool GetBundleNameByUid(int32_t uid, std::string &bundleName);
+    static bool CheckCallerIsSystemApp();
 };
 } // namespace Telephony
 } // namespace OHOS
