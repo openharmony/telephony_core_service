@@ -67,9 +67,6 @@ private:
     void SaveDataToBean(std::shared_ptr<DataShare::DataShareResultSet> result, SimRdbInfo &simBean);
 
 private:
-    std::shared_ptr<DataShare::DataShareHelper> helper_ = nullptr;
-
-private:
     enum class DefaultCardType {
         MAIN,
         VOICE,
