@@ -79,6 +79,7 @@
                     "//base/telephony/core_service/sa_profile:core_service_sa_profile",
                     "//base/telephony/core_service/services/etc/init:telephony.cfg",
                     "//base/telephony/core_service/services/etc/carrier:operator_config",
+                    "//base/telephony/core_service/services/etc/ons:ons.bin",
                     "//base/telephony/core_service/services/etc/param:telephony.para",
                     "//base/telephony/core_service/services/etc/param:telephony.para.dac",
                     "//base/telephony/core_service/telephonyres:telephonyres_hap"
