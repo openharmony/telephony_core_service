@@ -136,8 +136,8 @@ enum JsErrorCode {
 };
 
 struct JsError {
-    JsErrorCode errorCode;
-    std::string errorMessage;
+    JsErrorCode errorCode = JsErrorCode::JS_ERROR_TELEPHONY_UNKNOW_ERROR;
+    std::string errorMessage = "";
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -138,14 +138,14 @@ enum class LockState {
 };
 
 struct LockInfo {
-    LockType lockType;
-    std::u16string password;
-    LockState lockState;
+    LockType lockType = LockType::PIN_LOCK;
+    std::u16string password = u"";
+    LockState lockState = LockState::LOCK_ERROR;
 };
 
 struct PersoLockInfo {
-    PersoLockType lockType;
-    std::u16string password;
+    PersoLockType lockType = PersoLockType::PN_PIN_LOCK;
+    std::u16string password = u"";
 };
 
 enum UnlockResult {
@@ -155,14 +155,14 @@ enum UnlockResult {
 };
 
 struct LockStatusResponse {
-    int32_t result;
-    int32_t remain;
+    int32_t result = 0;
+    int32_t remain = 0;
 };
 
 struct SimAuthenticationResponse {
-    int32_t sw1;
-    int32_t sw2;
-    std::string response;
+    int32_t sw1 = 0;
+    int32_t sw2 = 0;
+    std::string response = "";
 };
 
 enum SimAuthResult {
@@ -171,13 +171,13 @@ enum SimAuthResult {
 };
 
 struct IccAccountInfo : public Parcelable {
-    int32_t simId; // sim Id for card
-    int32_t slotIndex; // slot index for card
-    bool isEsim; // mark card is eSim or not
-    bool isActive; // active status for card
-    std::u16string iccId; // iccId for card
-    std::u16string showName; // show name for card
-    std::u16string showNumber; // show number for card
+    int32_t simId = 0; // sim Id for card
+    int32_t slotIndex = 0; // slot index for card
+    bool isEsim = false; // mark card is eSim or not
+    bool isActive = false; // active status for card
+    std::u16string iccId = u""; // iccId for card
+    std::u16string showName = u""; // show name for card
+    std::u16string showNumber = u""; // show number for card
     inline static const std::u16string DEFAULT_SHOW_NAME = u"Card";
     inline static const std::u16string DEFAULT_SHOW_NUMBER = u"";
     inline static const std::u16string DEFAULT_ICC_ID = u"";

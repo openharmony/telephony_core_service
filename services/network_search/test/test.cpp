@@ -71,8 +71,8 @@ using NsTestFunc = void (*)();
 std::map<int32_t, NsTestFunc> memberFuncMap_;
 std::shared_ptr<TestBroadCast> subscriber = nullptr;
 struct ImsRegStateCallback {
-    int32_t slotId;
-    int32_t imsSrvType;
+    int32_t slotId = 0;
+    int32_t imsSrvType = 0;
     sptr<ImsRegInfoCallback> imsCallback = nullptr;
 };
 std::list<ImsRegStateCallback> imsRegStateCallbackList_;
