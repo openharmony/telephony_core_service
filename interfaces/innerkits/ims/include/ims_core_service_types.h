@@ -33,8 +33,8 @@ enum RadioTechFamily {
 };
 
 struct ImsResponseInfo {
-    int32_t slotId;
-    ImsErrType error;
+    int32_t slotId = 0;
+    ImsErrType error = ImsErrType::IMS_FAILED;
 };
 
 struct ImsServiceStatus {
@@ -46,8 +46,8 @@ struct ImsServiceStatus {
 };
 
 struct ImsRegistrationStatus {
-    bool isRegisterd;
-    RadioTechFamily radioTechFamily;
+    bool isRegisterd = false;
+    RadioTechFamily radioTechFamily = RadioTechFamily::RADIO_TECH_FAMILY_3GPP;
 };
 } // namespace Telephony
 } // namespace OHOS

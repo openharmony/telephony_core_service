@@ -179,8 +179,8 @@ private:
 };
 
 struct ImsRegStateCallback {
-    int32_t slotId;
-    ImsServiceType imsSrvType;
+    int32_t slotId = 0;
+    ImsServiceType imsSrvType = ImsServiceType::TYPE_VOICE;
     sptr<ImsRegInfoCallback> imsCallback = nullptr;
 };
 

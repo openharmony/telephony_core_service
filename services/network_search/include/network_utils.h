@@ -31,8 +31,8 @@
 namespace OHOS {
 namespace Telephony {
 struct NetworkSearchCallbackInfo {
-    int32_t param_;
-    sptr<INetworkSearchCallback> networkSearchItem_;
+    int32_t param_ = 0;
+    sptr<INetworkSearchCallback> networkSearchItem_ = nullptr;
 
     NetworkSearchCallbackInfo(int32_t param, sptr<INetworkSearchCallback> callback)
     {

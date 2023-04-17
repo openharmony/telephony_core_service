@@ -32,13 +32,13 @@ public:
     void AutoTimeChange();
     void AutoTimeZoneChange();
     struct NetworkTime {
-        int32_t year;
-        int32_t month;
-        int32_t day;
-        int32_t hour;
-        int32_t minute;
-        int32_t second;
-        int32_t offset;
+        int32_t year = 0;
+        int32_t month = 0;
+        int32_t day = 0;
+        int32_t hour = 0;
+        int32_t minute = 0;
+        int32_t second = 0;
+        int32_t offset = 0;
     };
 
 private:

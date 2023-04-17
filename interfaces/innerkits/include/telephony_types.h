@@ -72,107 +72,107 @@ enum ModemPowerState { CORE_SERVICE_POWER_NOT_AVAILABLE = -1, CORE_SERVICE_POWER
 
 template<typename T>
 struct TelRilResponseInfo {
-    int32_t slotId;
-    int32_t flag;
-    int32_t errorNo;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    int32_t flag = 0;
+    int32_t errorNo = 0;
     T object;
 };
 
 struct LinkBandwidthRule {
-    int32_t rat;
-    int32_t delayMs;
-    int32_t delayUplinkKbps;
-    int32_t delayDownlinkKbps;
-    std::vector<int32_t> maximumUplinkKbps;
-    std::vector<int32_t> maximumDownlinkKbps;
+    int32_t rat = 0;
+    int32_t delayMs = 0;
+    int32_t delayUplinkKbps = 0;
+    int32_t delayDownlinkKbps = 0;
+    std::vector<int32_t> maximumUplinkKbps {};
+    std::vector<int32_t> maximumDownlinkKbps {};
 };
 
 struct DataProfile {
-    int profileId;
+    int profileId = 0;
     /** (Access Point Name) a string parameter which is a logical name that is used to select the
      * GGSN or the external packet data network. from 3GPP TS 27.007 10.1 V4.3.0 (2001-12)
      */
-    std::string apn;
+    std::string apn = "";
     /** (Packet Data Protocol type) a string parameter which specifies the type of packet
      * data protocol from 3GPP TS 27.007 10.1 V4.3.0 (2001-12)
      */
-    std::string protocol;
-    int32_t verType;
-    std::string userName;
-    std::string password;
-    std::string roamingProtocol;
+    std::string protocol = "";
+    int32_t verType = 0;
+    std::string userName = "";
+    std::string password = "";
+    std::string roamingProtocol = "";
 };
 
 struct ActivateDataParam {
-    int32_t param; // eg:AppExecFwk::InnerEvent::Get(eventId, activateData.param);
-    int32_t radioTechnology;
+    int32_t param = 0; // eg:AppExecFwk::InnerEvent::Get(eventId, activateData.param);
+    int32_t radioTechnology = 0;
     struct DataProfile dataProfile;
-    bool isRoaming;
-    bool allowRoaming;
+    bool isRoaming = false;
+    bool allowRoaming = false;
 };
 
 struct DeactivateDataParam {
-    int32_t param; // eg:AppExecFwk::InnerEvent::Get(eventId, deactivateData.param);
-    int32_t cid;
-    int32_t reason;
+    int32_t param = 0; // eg:AppExecFwk::InnerEvent::Get(eventId, deactivateData.param);
+    int32_t cid = 0;
+    int32_t reason = 0;
 };
 
 struct CallTransferParam {
-    int32_t mode;
-    int32_t reason;
-    int32_t classx;
-    std::string number;
+    int32_t mode = 0;
+    int32_t reason = 0;
+    int32_t classx = 0;
+    std::string number = "";
 };
 
 struct CallRestrictionParam {
-    int32_t mode;
-    char password[MAX_PARAMETER_LENGTH + 1];
-    std::string fac;
+    int32_t mode = 0;
+    char password[MAX_PARAMETER_LENGTH + 1] = { 0 };
+    std::string fac = "";
 };
 
 struct DtmfParam {
-    int32_t index;
-    int32_t switchOn;
-    int32_t switchOff;
-    std::string sDTMFCode;
+    int32_t index = 0;
+    int32_t switchOn = 0;
+    int32_t switchOff = 0;
+    std::string sDTMFCode = "";
 };
 
 struct CBConfigParam {
-    int32_t mode;
-    std::string idList;
-    std::string dcsList;
+    int32_t mode = 0;
+    std::string idList = "";
+    std::string dcsList = "";
 };
 
 struct CdmaSimMessageParam {
-    int32_t cdmaIndex;
-    int32_t status;
-    std::string pdu;
+    int32_t cdmaIndex = 0;
+    int32_t status = 0;
+    std::string pdu = "";
 };
 
 struct GsmSimMessageParam {
-    int64_t refId;
-    std::string smscPdu;
-    std::string pdu;
+    int64_t refId = 0;
+    std::string smscPdu = "";
+    std::string pdu = "";
 };
 
 struct SimMessageParam {
-    int32_t gsmIndex;
-    int32_t status;
-    std::string smscPdu;
-    std::string pdu;
+    int32_t gsmIndex = 0;
+    int32_t status = 0;
+    std::string smscPdu = "";
+    std::string pdu = "";
 };
 
 struct SimLockParam {
-    std::string fac;
-    int32_t mode;
-    std::string passwd;
+    std::string fac = "";
+    int32_t mode = 0;
+    std::string passwd = "";
 };
 
 struct SimPasswordParam {
-    int32_t passwordLength;
-    std::string fac;
-    std::string oldPassword;
-    std::string newPassword;
+    int32_t passwordLength = 0;
+    std::string fac = "";
+    std::string oldPassword = "";
+    std::string newPassword = "";
 };
 
 enum class EccType : int32_t {
@@ -195,11 +195,11 @@ enum class AbnormalServiceType : int32_t {
 };
 
 struct EmergencyCall {
-    std::string eccNum;
-    std::string mcc;
-    EccType eccType;
-    SimpresentType simpresent;
-    AbnormalServiceType abnormalService;
+    std::string eccNum = "";
+    std::string mcc = "";
+    EccType eccType = EccType::TYPE_CATEGORY;
+    SimpresentType simpresent = SimpresentType::TYPE_NO_CARD;
+    AbnormalServiceType abnormalService = AbnormalServiceType::TYPE_ALL;
     bool operator==(const EmergencyCall &call)
     {
         return (eccNum == call.eccNum && mcc == call.mcc);
@@ -207,8 +207,8 @@ struct EmergencyCall {
 };
 
 struct SetEccListResponse {
-    int32_t result;
-    int32_t value;
+    int32_t result = 0;
+    int32_t value = 0;
 };
 
 struct PlmnNetworkName {
@@ -238,77 +238,77 @@ enum class RadioProtocolStatus {
 };
 
 struct RadioProtocol {
-    int32_t slotId;
-    int32_t sessionId;
-    RadioProtocolPhase phase;
-    int32_t technology;
-    int32_t modemId;
-    RadioProtocolStatus status;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    int32_t sessionId = 0;
+    RadioProtocolPhase phase = RadioProtocolPhase::RADIO_PROTOCOL_PHASE_INITIAL;
+    int32_t technology = 0;
+    int32_t modemId = 0;
+    RadioProtocolStatus status = RadioProtocolStatus::RADIO_PROTOCOL_STATUS_NONE;
 };
 
 struct SsBaseResult {
-    int32_t index; /* command index, use for find the ss command to retry */
-    int32_t result; /* the result of execute command */
-    int32_t reason; /* This use for remaind message code */
+    int32_t index = 0; /* command index, use for find the ss command to retry */
+    int32_t result = 0; /* the result of execute command */
+    int32_t reason = 0; /* This use for remaind message code */
     std::string message = ""; /* This use for remaind message */
 };
 
 struct GetClipResult {
     SsBaseResult result; /* query results */
-    int32_t action; /* parameter sets/shows the result code presentation status in the TA */
-    int32_t clipStat; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
+    int32_t action = 0; /* parameter sets/shows the result code presentation status in the TA */
+    int32_t clipStat = 0; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
 };
 
 struct GetClirResult {
     SsBaseResult result; /* query results */
-    int32_t action; /* parameter sets/shows the result code presentation status in the TA */
-    int32_t clirStat; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
+    int32_t action = 0; /* parameter sets/shows the result code presentation status in the TA */
+    int32_t clirStat = 0; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
 };
 
 struct GetColrResult {
     SsBaseResult result; /* query results */
-    int32_t action; /* parameter sets/shows the result code presentation status in the TA */
-    int32_t colrStat; /* parameter shows the subscriber COLR service status in the network, <0-4> */
+    int32_t action = 0; /* parameter sets/shows the result code presentation status in the TA */
+    int32_t colrStat = 0; /* parameter shows the subscriber COLR service status in the network, <0-4> */
 };
 
 struct GetColpResult {
     SsBaseResult result; /* query results */
-    int32_t action; /* parameter sets/shows the result code presentation status in the TA */
-    int32_t colpStat; /* parameter shows the subscriber COLP service status in the network, <0-4> */
+    int32_t action = 0; /* parameter sets/shows the result code presentation status in the TA */
+    int32_t colpStat = 0; /* parameter shows the subscriber COLP service status in the network, <0-4> */
 };
 
 struct CallWaitResult {
     SsBaseResult result; /* query results */
-    int32_t status; /* parameter sets/shows the result code presentation status in the TA */
-    int32_t classCw; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
+    int32_t status = 0; /* parameter sets/shows the result code presentation status in the TA */
+    int32_t classCw = 0; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
 };
 
 struct CallRestrictionResult {
     SsBaseResult result; /* query results */
-    int32_t status; /* parameter sets/shows the result code presentation status in the TA */
-    int32_t classCw; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
+    int32_t status = 0; /* parameter sets/shows the result code presentation status in the TA */
+    int32_t classCw = 0; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
 };
 
 struct CallForwardQueryResult {
-    int32_t serial;
-    int32_t result; /* query results */
-    int32_t status;
-    int32_t classx;
-    std::string number;
-    int32_t type;
-    int32_t reason;
-    int32_t time;
-    int32_t startHour;
-    int32_t startMinute;
-    int32_t endHour;
-    int32_t endMinute;
+    int32_t serial = 0;
+    int32_t result = 0; /* query results */
+    int32_t status = 0;
+    int32_t classx = 0;
+    std::string number = "";
+    int32_t type = 0;
+    int32_t reason = 0;
+    int32_t time = 0;
+    int32_t startHour = 0;
+    int32_t startMinute = 0;
+    int32_t endHour = 0;
+    int32_t endMinute = 0;
 };
 
 struct CallForwardQueryInfoList {
     SsBaseResult result;
-    int32_t callSize;
-    int32_t flag;
-    std::vector<CallForwardQueryResult> calls;
+    int32_t callSize = 0;
+    int32_t flag = 0;
+    std::vector<CallForwardQueryResult> calls {};
 };
 } // namespace Telephony
 } // namespace OHOS
