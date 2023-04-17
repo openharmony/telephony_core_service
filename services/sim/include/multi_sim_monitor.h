@@ -53,8 +53,8 @@ private:
 
 private:
     struct SimAccountCallbackRecord {
-        std::string bundleName;
-        sptr<SimAccountCallback> simAccountCallback;
+        std::string bundleName = "";
+        sptr<SimAccountCallback> simAccountCallback = nullptr;
     };
 
     bool ready_ = false;

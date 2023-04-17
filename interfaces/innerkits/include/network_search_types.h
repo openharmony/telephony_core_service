@@ -226,9 +226,9 @@ enum class PreferredNetworkMode {
 };
 
 struct OperatorInformation {
-    std::string operatorNumeric;
-    std::string fullName;
-    std::string shortName;
+    std::string operatorNumeric = "";
+    std::string fullName = "";
+    std::string shortName = "";
 };
 
 enum class RadioProtocolTech {
