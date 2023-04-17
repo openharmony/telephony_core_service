@@ -34,7 +34,7 @@ struct IccControllerHolder {
     bool getAllFile = false;
     std::string filePath = "";
     AppExecFwk::InnerEvent::Pointer fileLoaded = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
-    std::vector<std::string> fileResults;
+    std::vector<std::string> fileResults {};
     IccControllerHolder(int efId, int recordNum) : fileId(efId), fileNum(recordNum), getAllFile(false) {}
     IccControllerHolder(int efId, int recordNum, std::string path)
         : fileId(efId), fileNum(recordNum), getAllFile(false), filePath(path)
@@ -75,7 +75,7 @@ struct ControllerToFileMsg : public FileToControllerMsg, IccFileData {
 
 struct IccToRilMsg {
     explicit  IccToRilMsg(std::shared_ptr<IccControllerHolder> holder) : controlHolder(holder) {}
-    std::shared_ptr<IccControllerHolder> controlHolder;
+    std::shared_ptr<IccControllerHolder> controlHolder = nullptr;
     int arg1 = INVALID_VALUE;
     int arg2 = INVALID_VALUE;
 };
@@ -108,7 +108,7 @@ struct MultiRecordResult : public FileToControllerMsg {
             iccLoader = cmd->iccLoader;
         }
     }
-    std::vector<std::string> fileResults;
+    std::vector<std::string> fileResults {};
     int resultLength = 0;
     std::shared_ptr<void> exception = nullptr;
 };

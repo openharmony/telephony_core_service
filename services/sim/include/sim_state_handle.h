@@ -90,9 +90,9 @@ constexpr const char *FDN_PIN_LOCK = "P2";
 constexpr const char *FDN_PIN2_LOCK = "FD";
 
 struct UnlockData {
-    int32_t result;
-    int32_t remain;
-    int32_t lockState;
+    int32_t result = 0;
+    int32_t remain = 0;
+    int32_t lockState = 0;
 };
 
 class SimStateHandle : public AppExecFwk::EventHandler {

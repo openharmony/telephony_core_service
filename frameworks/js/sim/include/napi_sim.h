@@ -52,7 +52,7 @@ struct AsyncContextPIN {
 
 struct AsyncIccAccountInfo {
     AsyncContext<napi_value> asyncContext;
-    std::vector<IccAccountInfo> vecInfo;
+    std::vector<IccAccountInfo> vecInfo {};
 };
 
 struct ConfigInfo {
@@ -76,7 +76,7 @@ template<typename T>
 struct AsyncDiallingNumbers {
     AsyncContext<T> asyncContext;
     int32_t type = ERROR_DEFAULT;
-    std::vector<TelNumbersInfo> infoVec;
+    std::vector<TelNumbersInfo> infoVec {};
 };
 
 struct AsyncVoiceMail {

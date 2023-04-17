@@ -81,14 +81,14 @@ constexpr const char *KEY_PNN_CUST_STRING_ARRAY = "pnn_cust_string_array";
 constexpr const char *KEY_OPL_CUST_STRING_ARRAY = "opl_cust_string_array";
 
 struct OperatorConfig : public Parcelable {
-    std::map<std::u16string, std::u16string> configValue;
-    std::map<std::string, std::string> stringValue;
-    std::map<std::string, std::vector<std::string>> stringArrayValue;
-    std::map<std::string, int32_t> intValue;
-    std::map<std::string, std::vector<int32_t>> intArrayValue;
-    std::map<std::string, int64_t> longValue;
-    std::map<std::string, std::vector<int64_t>> longArrayValue;
-    std::map<std::string, bool> boolValue;
+    std::map<std::u16string, std::u16string> configValue {};
+    std::map<std::string, std::string> stringValue {};
+    std::map<std::string, std::vector<std::string>> stringArrayValue {};
+    std::map<std::string, int32_t> intValue {};
+    std::map<std::string, std::vector<int32_t>> intArrayValue {};
+    std::map<std::string, int64_t> longValue {};
+    std::map<std::string, std::vector<int64_t>> longArrayValue {};
+    std::map<std::string, bool> boolValue {};
     const int32_t MAX_CONFIG_SIZE = 10000;
     bool Marshalling(Parcel &parcel) const;
     bool MarshallingU16StringMap(Parcel &parcel) const;

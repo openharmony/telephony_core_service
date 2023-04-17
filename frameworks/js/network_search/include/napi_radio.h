@@ -156,7 +156,7 @@ struct RadioTechContext : BaseContext {
 
 struct SignalInfoListContext : BaseContext {
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
-    std::vector<sptr<SignalInformation>> signalInfoList;
+    std::vector<sptr<SignalInformation>> signalInfoList {};
 };
 
 struct GetSelectModeContext : CallbackContext {
@@ -239,7 +239,7 @@ struct SendUpdateCellLocationRequest : CallbackContext {
 
 struct CellInformationContext : BaseContext {
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
-    std::vector<sptr<CellInformation>> cellInformations;
+    std::vector<sptr<CellInformation>> cellInformations {};
     napi_value callbackValue = nullptr;
 };
 
@@ -277,8 +277,8 @@ struct ImsRegStateCallback {
     napi_env env = nullptr;
     napi_ref thisVar = nullptr;
     napi_ref callbackRef = nullptr;
-    int32_t slotId;
-    ImsServiceType imsSrvType;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    ImsServiceType imsSrvType = ImsServiceType::TYPE_VOICE;
     sptr<ImsRegInfoCallback> imsCallback = nullptr;
 };
 

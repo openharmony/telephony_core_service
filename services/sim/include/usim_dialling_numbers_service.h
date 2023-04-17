@@ -31,7 +31,7 @@ enum UsimMessage {
 };
 
 struct UsimDiallingNumberFile {
-    std::map<int, std::shared_ptr<TagData>> fileIds_;
+    std::map<int, std::shared_ptr<TagData>> fileIds_ {};
     int fileNumber_ = 0;
 };
 
