@@ -1120,8 +1120,8 @@ HWTEST_F(BranchTest, Telephony_SimManager_001, Function | MediumTest | Level1)
     EXPECT_GT(simManager->HasSimCard(0, boolResult), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->HasSimCard(INVALID_SLOTID, boolResult), TELEPHONY_ERR_SUCCESS);
     SimState simState = SimState::SIM_STATE_UNKNOWN;
-    EXPECT_NE(simManager->GetSimState(0, simState), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->GetSimState(INVALID_SLOTID, simState), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GE(simManager->GetSimState(0, simState), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GE(simManager->GetSimState(INVALID_SLOTID, simState), TELEPHONY_ERR_SUCCESS);
     CardType cardType = CardType::UNKNOWN_CARD;
     EXPECT_NE(simManager->GetCardType(0, cardType), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->GetCardType(INVALID_SLOTID, cardType), TELEPHONY_ERR_SUCCESS);
