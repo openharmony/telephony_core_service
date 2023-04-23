@@ -197,7 +197,7 @@ int32_t CoreServiceProxy::GetNetworkState(int32_t slotId, sptr<NetworkState> &ne
 
 int32_t CoreServiceProxy::GetSignalInfoList(int32_t slotId, std::vector<sptr<SignalInformation>> &signals)
 {
-    TELEPHONY_LOGI("CoreServiceProxy::GetSignalInfoList slotId : %{public}d", slotId);
+    TELEPHONY_LOGD("CoreServiceProxy::GetSignalInfoList slotId : %{public}d", slotId);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;

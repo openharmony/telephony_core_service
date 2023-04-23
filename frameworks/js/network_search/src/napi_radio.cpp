@@ -212,7 +212,7 @@ static void NativeGetSignalInfoList(napi_env env, void *data)
 static void GetSignalInfoListCallback(napi_env env, napi_status status, void *data)
 {
     auto asyncContext = static_cast<SignalInfoListContext *>(data);
-    TELEPHONY_LOGI("GetSignalInfoListCallback size = %{public}zu, resolved = %{public}d",
+    TELEPHONY_LOGD("GetSignalInfoListCallback size = %{public}zu, resolved = %{public}d",
         asyncContext->signalInfoList.size(), asyncContext->resolved);
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
@@ -243,7 +243,7 @@ static void GetSignalInfoListCallback(napi_env env, napi_status status, void *da
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
-    TELEPHONY_LOGI("GetSignalInfoListCallback end");
+    TELEPHONY_LOGD("GetSignalInfoListCallback end");
 }
 
 static bool MatchGetSignalInfoListParameter(napi_env env, napi_value parameter[], size_t parameterCount)
@@ -330,7 +330,7 @@ static void NativeGetNetworkState(napi_env env, void *data)
     asyncContext->csRoamingStatus = static_cast<int32_t>(networkState->GetCsRoamingStatus());
     asyncContext->psRoamingStatus = static_cast<int32_t>(networkState->GetPsRoamingStatus());
     asyncContext->cfgTech = static_cast<int32_t>(networkState->GetCfgTech());
-    TELEPHONY_LOGI("NativeGetNetworkState resolved is true.");
+    TELEPHONY_LOGD("NativeGetNetworkState resolved is true.");
 }
 
 static void GetNetworkStateCallback(napi_env env, napi_status status, void *data)

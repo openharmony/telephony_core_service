@@ -86,7 +86,7 @@ std::string NapiUtil::GetErrorMessage(int32_t errorCode)
         TELEPHONY_LOGE("NapiUtil::GetErrorMessage return null.");
         return result;
     }
-    TELEPHONY_LOGI("NapiUtil::GetErrorMessage errorCode %{public}d, message = %{public}s", errorCode, iter->second);
+    TELEPHONY_LOGD("NapiUtil::GetErrorMessage errorCode %{public}d, message = %{public}s", errorCode, iter->second);
     result = iter->second;
     return result;
 }
@@ -279,7 +279,7 @@ napi_value NapiUtil::HandleAsyncWork(napi_env env, BaseContext *baseContext, con
         std::string errorMessage = "error at napi_queue_async_work";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
     }
-    TELEPHONY_LOGI("NapiUtil HandleAsyncWork end");
+    TELEPHONY_LOGD("NapiUtil HandleAsyncWork end");
     return result;
 }
 
