@@ -89,7 +89,7 @@ The telephony core service module needs to provide APIs for related modules, inc
 | function hasOperatorPrivileges(slotId: number, callback: AsyncCallback\<boolean>): void | Checks whether the application (caller) has been granted the operator permission.| –|
 | function getMaxSimCount(): number | Obtains the maximum number of SIM cards, that is, the maximum number of SIM card slots, available on the device.| –|
 
-For details about the complete description of JavaScript APIs and sample code, see [SIM Card Management](https://gitee.com/openharmony/docs/blob/master/en/application-dev/js-reference/apis/js-apis-sim.md).
+For details about the complete description of JavaScript APIs and sample code, see [SIM Card Management](https://gitee.com/openharmony/docs/blob/master/en/application-dev/reference/apis/js-apis-sim.md).
 
 ### NetworkSearchManager APIs<a name="section198mcpsimp"></a>
 
@@ -123,7 +123,7 @@ For details about the complete description of JavaScript APIs and sample code, s
 | function off(type: 'imsRegStateChange', slotId: number, imsType: ImsServiceType, callback?: Callback\<ImsRegInfo>): void; | Unregisters IMS network status callback  | ohos.permission.GET_TELEPHONY_STATE  |
 
 
-For details about the complete description of JavaScript APIs and sample code, see [Radio](https://gitee.com/openharmony/docs/blob/master/en/application-dev/js-reference/apis/js-apis-radio.md).
+For details about the complete description of JavaScript APIs and sample code, see [Radio](https://gitee.com/openharmony/docs/blob/master/en/application-dev/reference/apis/js-apis-radio.md).
 
 **NOTE**
 
@@ -207,7 +207,7 @@ The function of querying the status of a specified SIM card is used as an exampl
 
 ## Repositories Involved<a name="section409mcpsimp"></a>
 
-[Telephony Subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/%E7%94%B5%E8%AF%9D%E6%9C%8D%E5%8A%A1%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
+[Telephony Subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/telephony.md)
 
 **telephony\_core\_service**
 
