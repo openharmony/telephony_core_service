@@ -27,7 +27,7 @@ NetworkState::NetworkState()
 
 void NetworkState::Init()
 {
-    TELEPHONY_LOGI("NetworkState::Init");
+    TELEPHONY_LOGD("NetworkState::Init");
     isEmergency_ = false;
     csRoaming_ = RoamingType::ROAMING_STATE_UNKNOWN;
     psRoaming_ = RoamingType::ROAMING_STATE_UNKNOWN;
