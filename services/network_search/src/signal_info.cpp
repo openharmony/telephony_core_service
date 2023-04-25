@@ -89,18 +89,18 @@ bool SignalInfo::ProcessNr(const NrRssi &nrSignal)
 
 static void PrintfLog(const Rssi &signalIntensity)
 {
-    TELEPHONY_LOGI("SignalInfo::ProcessSignalIntensity gm.rssi:%{public}d, gm.ber:%{public}d\n",
+    TELEPHONY_LOGD("SignalInfo::ProcessSignalIntensity gm.rssi:%{public}d, gm.ber:%{public}d\n",
         signalIntensity.gw.rxlev, signalIntensity.gw.ber);
 
-    TELEPHONY_LOGI("SignalInfo::ProcessSignalIntensity cdma.absoluteRssi:%{public}d, cdma.ecno:%{public}d ",
+    TELEPHONY_LOGD("SignalInfo::ProcessSignalIntensity cdma.absoluteRssi:%{public}d, cdma.ecno:%{public}d ",
         signalIntensity.cdma.absoluteRssi, signalIntensity.cdma.ecno);
 
-    TELEPHONY_LOGI(
+    TELEPHONY_LOGD(
         "SignalInfo::ProcessSignalIntensity lte.rxlev:%{public}d, "
         "lte.rsrq:%{public}d, lte.rsrp:%{public}d, lte.snr:%{public}d ",
         signalIntensity.lte.rxlev, signalIntensity.lte.rsrq, signalIntensity.lte.rsrp, signalIntensity.lte.snr);
 
-    TELEPHONY_LOGI(
+    TELEPHONY_LOGD(
         "SignalInfo::ProcessSignalIntensity wcdma.rxlev:%{public}d, "
         "SignalInfo::ProcessSignalIntensity wcdma.ecio:%{public}d "
         "SignalInfo::ProcessSignalIntensity wcdma.rscp:%{public}d "
@@ -108,9 +108,9 @@ static void PrintfLog(const Rssi &signalIntensity)
         signalIntensity.wcdma.rxlev, signalIntensity.wcdma.ecio, signalIntensity.wcdma.rscp,
         signalIntensity.wcdma.ber);
 
-    TELEPHONY_LOGI("SignalInfo::ProcessSignalIntensity tdScdma.rscp:%{public}d\n", signalIntensity.tdScdma.rscp);
+    TELEPHONY_LOGD("SignalInfo::ProcessSignalIntensity tdScdma.rscp:%{public}d\n", signalIntensity.tdScdma.rscp);
 
-    TELEPHONY_LOGI(
+    TELEPHONY_LOGD(
         "SignalInfo::ProcessSignalIntensity nr.rsrp:%{public}d, "
         "nr.rsrq:%{public}d, nr.sinr:%{public}d ",
         signalIntensity.nr.rsrp, signalIntensity.nr.rsrq, signalIntensity.nr.sinr);
