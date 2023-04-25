@@ -33,6 +33,7 @@ HapInfoParams testNetInfoParams = {
     .userID = 1,
     .instIndex = 0,
     .appIDDesc = "test",
+    .isSystemApp = true,
 };
 
 PermissionDef testNetPermLocationDef = {
@@ -165,7 +166,7 @@ public:
         currentID_ = GetSelfTokenID();
         AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(testNetInfoParams, testNetPolicyParams);
         accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
-        SetSelfTokenID(accessID_);
+        SetSelfTokenID(tokenIdEx.tokenIDEx);
     }
     ~AccessToken()
     {
