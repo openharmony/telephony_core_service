@@ -32,6 +32,7 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_CORE_SERVICE_ROOT/services/core/src/core_service_dump_helper.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/core/src/core_service_hisysevent.cpp",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/core/src/core_service_stub.cpp",
+    "$TELEPHONY_CORE_SERVICE_ROOT/services/core/src/runner_pool.cpp",
     "$TELEPHONY_IMS_CORE_SERVICE_SRC_PATH/ims_core_service_callback_stub.cpp",
     "$TELEPHONY_IMS_CORE_SERVICE_SRC_PATH/ims_core_service_client.cpp",
     "$TELEPHONY_IMS_CORE_SERVICE_SRC_PATH/ims_core_service_proxy.cpp",

@@ -17,6 +17,7 @@
 
 #include "core_service_errors.h"
 #include "radio_event.h"
+#include "runner_pool.h"
 #include "telephony_errors.h"
 
 namespace OHOS {
@@ -92,7 +93,7 @@ void SimManager::InitMultiSimObject()
 
 void SimManager::InitSingleSimObject()
 {
-    controllerRunner_ = AppExecFwk::EventRunner::Create("MultiSimController");
+    controllerRunner_ = RunnerPool::GetInstance().GetCommonRunner();
     if (controllerRunner_.get() == nullptr) {
         TELEPHONY_LOGE("SimManager::InitSingleSimObject get controllerRunner_ failed");
         return;
@@ -105,11 +106,7 @@ void SimManager::InitSingleSimObject()
     }
     multiSimController_->Init();
 
-    monitorRunner_ = AppExecFwk::EventRunner::Create("MultiSimMonitor");
-    if (monitorRunner_.get() == nullptr) {
-        TELEPHONY_LOGE("get monitorRunner_ failed");
-        return;
-    }
+    monitorRunner_ = RunnerPool::GetInstance().GetSimDbAndFileRunner();
     multiSimMonitor_ = std::make_shared<MultiSimMonitor>(
         monitorRunner_, multiSimController_, simStateManager_, simFileManager_);
     if (multiSimMonitor_ == nullptr) {

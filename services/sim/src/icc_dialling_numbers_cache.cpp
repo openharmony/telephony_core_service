@@ -15,6 +15,8 @@
 
 #include "icc_dialling_numbers_cache.h"
 
+#include "runner_pool.h"
+
 namespace OHOS {
 namespace Telephony {
 IccDiallingNumbersCache::IccDiallingNumbersCache(
@@ -42,7 +44,7 @@ void IccDiallingNumbersCache::Init()
         return;
     }
 
-    std::shared_ptr<AppExecFwk::EventRunner> loaderLoop = AppExecFwk::EventRunner::Create("usimpdiallingnumbers");
+    std::shared_ptr<AppExecFwk::EventRunner> loaderLoop = RunnerPool::GetInstance().GetCommonRunner();
     if (loaderLoop.get() == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersCache failed to create usimpdiallingnumbers loop");
         return;
@@ -54,7 +56,6 @@ void IccDiallingNumbersCache::Init()
     }
     std::shared_ptr<IccFileController> fileController = simFileManager_->GetIccFileController();
     usimDiallingNumberSrv_->SetFileControllerAndDiallingNumberHandler(fileController, diallingNumbersHandler_);
-    loaderLoop->Run();
 }
 
 void IccDiallingNumbersCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)

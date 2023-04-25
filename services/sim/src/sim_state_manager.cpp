@@ -16,6 +16,7 @@
 #include "sim_state_manager.h"
 
 #include "core_service_errors.h"
+#include "runner_pool.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
@@ -43,7 +44,7 @@ void SimStateManager::Init(int32_t slotId)
         TELEPHONY_LOGE("SimStateManager::Init telRilManager_ is null.");
         return;
     }
-    eventLoop_ = AppExecFwk::EventRunner::Create("SimStateHandle");
+    eventLoop_ = RunnerPool::GetInstance().GetCommonRunner();
     if (eventLoop_.get() == nullptr) {
         TELEPHONY_LOGE("SimStateHandle failed to create EventRunner");
         return;
@@ -55,7 +56,7 @@ void SimStateManager::Init(int32_t slotId)
     }
     simStateHandle_->SetRilManager(telRilManager_);
     simStateHandle_->Init(slotId);
-    eventLoop_->Run();
+
     TELEPHONY_LOGI("SimStateManager::eventLoop_ is running");
     simStateRun_ = STATE_RUNNING;
 }

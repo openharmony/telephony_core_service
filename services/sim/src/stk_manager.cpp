@@ -15,6 +15,7 @@
 
 #include "stk_manager.h"
 
+#include "runner_pool.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
@@ -40,9 +41,7 @@ void StkManager::Init(int slotId)
         TELEPHONY_LOGE("StkManager[%{public}d]::Init() telRilManager or simStateManager_ is nullptr", slotId);
         return;
     }
-    std::string name = "StkController_";
-    name.append(std::to_string(slotId));
-    stkEventLoop_ = AppExecFwk::EventRunner::Create(name.c_str());
+    stkEventLoop_ = RunnerPool::GetInstance().GetCommonRunner();
     if (stkEventLoop_.get() == nullptr) {
         TELEPHONY_LOGE("StkManager[%{public}d]::Init() failed to create EventRunner", slotId);
         return;
@@ -53,7 +52,6 @@ void StkManager::Init(int slotId)
         return;
     }
     stkController_->Init();
-    stkEventLoop_->Run();
     TELEPHONY_LOGI("StkManager[%{public}d]::Init() success", slotId);
 }
 
