@@ -130,6 +130,7 @@ public:
      * @return Absolute RF Channel Number
      */
     int32_t GetArfcn() const;
+
 private:
     int32_t lac_ = 0;
     int32_t bsic_ = 0;
@@ -168,6 +169,7 @@ public:
      * @return Absolute RF Channel Number
      */
     int32_t GetArfcn() const;
+
 private:
     int32_t pci_ = 0;
     int32_t tac_ = 0;
@@ -206,6 +208,7 @@ public:
      * @return Absolute RF Channel Number
      */
     int32_t GetArfcn() const;
+
 private:
     int32_t lac_ = 0;
     int32_t psc_ = 0;
@@ -244,6 +247,7 @@ public:
      * @return Absolute RF Channel Number
      */
     int32_t GetArfcn() const;
+
 private:
     int32_t lac_ = 0;
     int32_t cpid_ = 0;
@@ -313,6 +317,7 @@ public:
     CellInformation::CellType GetNetworkType() const override;
     std::string ToString() const override;
     void SetNrParam(int32_t nrArfcn, int32_t pci, int32_t tac, int64_t nci);
+    void SetNrSignalParam(int32_t rsrp, int32_t rsrq);
     NrCellInformation(const NrCellInformation &nrCell);
     NrCellInformation &operator=(const NrCellInformation &nrCell);
     bool operator==(const NrCellInformation &other) const;
@@ -339,11 +344,14 @@ public:
      * @return NR(New Radio 5G) Cell Identity
      */
     int64_t GetNci() const;
+
 private:
     int32_t nrArfcn_ = 0;
     int32_t pci_ = 0;
     int32_t tac_ = 0;
     int64_t nci_ = 0;
+    int32_t rsrp_ = 0;
+    int32_t rsrq_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
