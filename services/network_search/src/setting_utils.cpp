@@ -16,7 +16,7 @@
 #include "setting_utils.h"
 
 #include "rdb_errno.h"
-
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -36,7 +36,7 @@ const std::string SettingUtils::NETWORK_SEARCH_SETTING_PREFERRED_NETWORK_MODE_UR
 
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIME = "settings.telephony.autotime";
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIMEZONE = "settings.telephony.autotimezone";
-const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE = "settings.telephony.airplanemode";
+const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE = "airplane_mode";
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE =
     "settings.telephony.preferrednetworkmode";
 
@@ -86,12 +86,12 @@ bool SettingUtils::RegisterSettingsObserver(
     return true;
 }
 
-bool SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
+int32_t SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
 {
     TELEPHONY_LOGI("SettingUtils:Query");
     if (settingHelper_ == nullptr) {
         TELEPHONY_LOGE("settingHelper_ is null");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     std::vector<std::string> columns;
@@ -100,12 +100,12 @@ bool SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
     auto result = settingHelper_->Query(uri, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("SettingUtils: query error, result is null");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     if (result->GoToFirstRow() != DataShare::E_OK) {
         TELEPHONY_LOGE("SettingUtils: query error, go to first row error");
-        return false;
+        return TELEPHONY_ERR_DATABASE_READ_FAIL;
     }
 
     int columnIndex = 0;
@@ -113,15 +113,15 @@ bool SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
     result->GetString(columnIndex, value);
     result->Close();
     TELEPHONY_LOGI("SettingUtils: query success");
-    return true;
+    return TELEPHONY_SUCCESS;
 }
 
-bool SettingUtils::Insert(Uri uri, const std::string &key, const std::string &value)
+int32_t SettingUtils::Insert(Uri uri, const std::string &key, const std::string &value)
 {
     TELEPHONY_LOGI("SettingUtils: insert start");
     if (settingHelper_ == nullptr) {
         TELEPHONY_LOGE("settingHelper_ is null");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     DataShare::DataShareValuesBucket valuesBucket;
     DataShare::DataShareValueObject keyObj(key);
@@ -130,14 +130,14 @@ bool SettingUtils::Insert(Uri uri, const std::string &key, const std::string &va
     valuesBucket.Put(SETTING_VALUE, valueObj);
     int32_t result = settingHelper_->Insert(uri, valuesBucket);
     if (result == RDB_INVALID_VALUE) {
-        return false;
+        return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     TELEPHONY_LOGI("SettingUtils: insert success");
     settingHelper_->NotifyChange(uri);
-    return true;
+    return TELEPHONY_SUCCESS;
 }
 
-bool SettingUtils::Update(Uri uri, const std::string &key, const std::string &value)
+int32_t SettingUtils::Update(Uri uri, const std::string &key, const std::string &value)
 {
     TELEPHONY_LOGI("SettingUtils:update");
     if (settingHelper_ == nullptr) {
@@ -145,8 +145,7 @@ bool SettingUtils::Update(Uri uri, const std::string &key, const std::string &va
         return false;
     }
     std::string queryValue = "";
-    bool ret = Query(uri, key, queryValue);
-    if (!ret) {
+    if (Query(uri, key, queryValue) != TELEPHONY_SUCCESS) {
         return Insert(uri, key, value);
     }
 
@@ -157,11 +156,11 @@ bool SettingUtils::Update(Uri uri, const std::string &key, const std::string &va
     predicates.EqualTo(SETTING_KEY, key);
     int32_t result = settingHelper_->Update(uri, predicates, valuesBucket);
     if (result == RDB_INVALID_VALUE) {
-        return false;
+        return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     TELEPHONY_LOGI("SettingUtils: update success");
     settingHelper_->NotifyChange(uri);
-    return true;
+    return TELEPHONY_SUCCESS;
 }
 
 AutoTimeObserver::AutoTimeObserver(std::shared_ptr<NetworkSearchHandler> &networkSearchHandler)

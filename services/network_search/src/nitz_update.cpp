@@ -317,7 +317,7 @@ bool NitzUpdate::IsAutoTimeZone()
     Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI);
     std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIMEZONE;
     std::string value;
-    if (!settingHelper->Query(uri, key, value)) {
+    if (settingHelper->Query(uri, key, value) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("Query %{public}s fail", key.c_str());
         return false;
     }
@@ -336,7 +336,7 @@ bool NitzUpdate::IsAutoTime()
     Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIME_URI);
     std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIME;
     std::string value = "";
-    if (!settingHelper->Query(uri, key, value)) {
+    if (settingHelper->Query(uri, key, value) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("Query %{public}s fail", key.c_str());
         return false;
     }

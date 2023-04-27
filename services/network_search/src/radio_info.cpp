@@ -72,7 +72,9 @@ void RadioInfo::ProcessGetRadioState(const AppExecFwk::InnerEvent::Pointer &even
         }
         NetworkUtils::RemoveCallbackFromMap(index);
     } else {
-        if (nsm->GetRadioState(slotId_) != ModemPowerState::CORE_SERVICE_POWER_ON && !nsm->GetAirplaneMode()) {
+        bool isAirplaneModeOn = false;
+        if (nsm->GetRadioState(slotId_) != ModemPowerState::CORE_SERVICE_POWER_ON &&
+            nsm->GetAirplaneMode(isAirplaneModeOn) == TELEPHONY_SUCCESS && !isAirplaneModeOn) {
             nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
         }
         if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_ON) {
@@ -310,13 +312,25 @@ void RadioInfo::AirplaneModeChange()
         TELEPHONY_LOGE("networkSearchManager_ is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    bool airplaneMode = nsm->GetAirplaneMode();
-    if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_OFF && airplaneMode == false) {
+    bool isAirplaneModeOn = false;
+    if (nsm->GetAirplaneMode(isAirplaneModeOn) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("AirplaneModeChange GetAirplaneMode fail slotId:%{public}d", slotId_);
+        return;
+    }
+    bool lastAirplaneMode = false;
+    nsm->GetLocalAirplaneMode(slotId_, lastAirplaneMode);
+    if (isAirplaneModeOn == lastAirplaneMode) {
+        TELEPHONY_LOGE("airplaneMode is not change, slotId:%{public}d", slotId_);
+        return;
+    }
+    if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_OFF && isAirplaneModeOn == false) {
         nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
     }
-    if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_ON && airplaneMode == true) {
+    if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_ON && isAirplaneModeOn == true) {
         nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_OFF), 0);
     }
+    nsm->SetLocalAirplaneMode(slotId_, isAirplaneModeOn);
+    TELEPHONY_LOGD("RadioInfo::AirplaneModeChange end. airplaneMode:%{public}d", isAirplaneModeOn);
 }
 } // namespace Telephony
 } // namespace OHOS

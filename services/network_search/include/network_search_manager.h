@@ -70,6 +70,7 @@ struct NetworkSearchManagerInner {
     FrequencyType freqType_ = FrequencyType::FREQ_TYPE_UNKNOWN;
     std::mutex mutex_;
     bool isRadioFirstPowerOn_ = true;
+    bool airplaneMode_ = false;
 
     bool RegisterSetting();
     bool UnRegisterSetting();
@@ -202,11 +203,14 @@ public:
     void GetVoiceTech(int32_t slotId);
     std::shared_ptr<NetworkSearchManagerInner> FindManagerInner(int32_t slotId);
     void SetLocateUpdate(int32_t slotId);
-    bool GetAirplaneMode();
+    int32_t GetAirplaneMode(bool &airplaneMode) override;
     bool IsRadioFirstPowerOn(int32_t slotId);
     void SetRadioFirstPowerOn(int32_t slotId, bool isFirstPowerOn);
     void NotifyImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info);
     void InitSimRadioProtocol(int32_t slotId);
+    int32_t SetLocalAirplaneMode(int32_t slotId, bool state);
+    int32_t GetLocalAirplaneMode(int32_t slotId, bool &state);
+    int32_t UpdateRadioOn(int32_t slotId) override;
 
     inline void InitMsgNum(int32_t slotId)
     {
@@ -257,7 +261,6 @@ private:
         sptr<ImsRegInfoCallback> imsCallback;
     };
 
-    bool AirplaneMode_ = false;
     sptr<NetworkSearchCallBackBase> cellularDataCallBack_ = nullptr;
     sptr<NetworkSearchCallBackBase> cellularCallCallBack_ = nullptr;
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
