@@ -605,6 +605,13 @@ int32_t TelRilCallback::GetRrcConnectionStateUpdated(
     return Notify(responseInfo, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::GetRrcConnectionStateUpdated, state);
 }
 
+int32_t TelRilCallback::NetworkCurrentCellUpdated_1_1(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellListCurrentInformation)
+{
+    return Notify(responseInfo, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::NetworkCurrentCellUpdated_1_1,
+        cellListCurrentInformation);
+}
+
 int32_t TelRilCallback::GetSignalStrengthResponse(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::Rssi &rssi)
 {
@@ -663,6 +670,13 @@ int32_t TelRilCallback::GetCurrentCellInfoResponse(
 {
     return Response(
         responseInfo, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::GetCurrentCellInfoResponse, cellInfoList);
+}
+
+int32_t TelRilCallback::GetCurrentCellInfoResponse_1_1(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellListCurrentInformation)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::GetCurrentCellInfoResponse_1_1,
+        cellListCurrentInformation);
 }
 
 int32_t TelRilCallback::SetPreferredNetworkResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)

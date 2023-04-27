@@ -168,7 +168,7 @@ HWTEST_F(BranchTest, Telephony_CellInfo_002, Function | MediumTest | Level1)
     cellNearbyInfo.ServiceCellParas.cdma.baseId = 1;
     cellNearbyInfo.ServiceCellParas.tdscdma.arfcn = 1;
     cellNearbyInfo.ServiceCellParas.nr.nci = 1;
-    CurrentCellInfo current;
+    CurrentCellInformation current;
     EXPECT_TRUE(cellInfo->ProcessNeighboringCellGsm(&cellNearbyInfo));
     EXPECT_TRUE(cellInfo->ProcessNeighboringCellLte(&cellNearbyInfo));
     EXPECT_TRUE(cellInfo->ProcessNeighboringCellWcdma(&cellNearbyInfo));
