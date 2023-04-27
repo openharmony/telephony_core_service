@@ -52,6 +52,7 @@ ohos_shared_library("radio") {
 
   external_deps = [
     "c_utils:utils",
+    "core_service:libtel_common",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",
