@@ -2189,6 +2189,45 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0900
     EXPECT_EQ(TELEPHONY_SUCCESS, ret);
 }
 
+/**
+ * @tc.number   Telephony_NetworkSearch_GetBasebandVersion_0100
+ * @tc.name     Get baseband version
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetBasebandVersion_0100, Function | MediumTest | Level2)
+{
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+    } else {
+        std::string version = "";
+        int32_t ret = CoreServiceClient::GetInstance().GetBasebandVersion(SLOT_ID, version);
+        EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+        TELEPHONY_LOGI("TelephonyTestService GetBasebandVersion version: %{public}s", version.c_str());
+        EXPECT_STRNE(version.c_str(), "");
+    }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetBasebandVersion_0200
+ * @tc.name     Get Get baseband version
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetBasebandVersion_0200, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+    } else {
+        std::string version = "";
+        int32_t ret = CoreServiceClient::GetInstance().GetBasebandVersion(SLOT_ID1, version);
+        EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+        TELEPHONY_LOGI("TelephonyTestService GetBasebandVersion version: %{public}s", version.c_str());
+        EXPECT_STRNE(version.c_str(), "");
+    }
+}
+
 #else // TEL_TEST_UNSUPPORT
 /**
  * @tc.number   Telephony_NetworkSearch_MockTest_0100

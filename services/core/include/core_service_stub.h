@@ -117,6 +117,7 @@ private:
     int32_t OnUnlockSimLock(MessageParcel &data, MessageParcel &reply);
     int32_t OnRegisterImsRegInfoCallback(MessageParcel &data, MessageParcel &reply);
     int32_t OnUnregisterImsRegInfoCallback(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetBasebandVersion(MessageParcel &data, MessageParcel &reply);
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;

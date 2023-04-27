@@ -122,6 +122,7 @@ public:
     int32_t RegisterImsRegInfoCallback(
         int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback);
     int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType);
+    int32_t GetBasebandVersion(int32_t slotId, std::string &version);
 
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);

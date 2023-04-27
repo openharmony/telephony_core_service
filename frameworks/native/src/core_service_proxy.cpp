@@ -142,6 +142,34 @@ int32_t CoreServiceProxy::GetOperatorName(int32_t slotId, std::u16string &operat
     return result;
 }
 
+
+int32_t CoreServiceProxy::GetBasebandVersion(int32_t slotId, std::string &version)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetBasebandVersion WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetBasebandVersion Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(InterfaceID::GET_BASEBAND_VERSION), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("GetBasebandVersion failed, error code is %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        version = reply.ReadString();
+    }
+    return result;
+}
+
 int32_t CoreServiceProxy::GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     MessageParcel data;

@@ -64,6 +64,7 @@ const int32_t INPUT_GET_NR_OPTION_MODE = 26;
 const int32_t REG_IMS_ST_CALLBACK = 27;
 const int32_t UN_REG_IMS_ST_CALLBACK = 28;
 const int32_t INPUT_NOTIFY_SPN_CHANGE = 29;
+const int32_t INPUT_GET_BASEBAND_VERSION = 30;
 const int32_t INPUT_INIT_TIME = 99;
 const int32_t INPUT_QUIT = 100;
 const int32_t SLEEP_TIME = 5;
@@ -288,6 +289,20 @@ void TestNotifySpnChanged()
     std::cout << "please wait for SPN_INFO_CHANGED, or input any key to exit" << std::endl;
     int32_t inputToExit = 0;
     std::cin >> inputToExit;
+}
+
+void TestGetBasebandVersion()
+{
+    if (g_telephonyService == nullptr) {
+        std::cout << "TestGetBasebandVersion g_telephonyService is nullptr." << std::endl;
+        return;
+    }
+    std::string version = "";
+    int32_t result = g_telephonyService->GetBasebandVersion(InputSlotId(), version);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        std::cout << "error:" << result << std::endl;
+    }
+    std::cout << "version:" << version << std::endl;
 }
 
 void TestNotifyNetworkStateChange()
@@ -644,6 +659,7 @@ void Prompt()
         "27:RegisterImsRegStateCallback\n"
         "28:UnregisterImsRegStateCallback\n"
         "29:NotifySpnChange\n"
+        "30:GetBasebandVersion\n"
         "99:InitTimeAndTimeZone\n"
         "100:exit \n");
 }
@@ -714,6 +730,7 @@ void Init()
     memberFuncMap_[REG_IMS_ST_CALLBACK] = TestRegisterImsRegStateCallback;
     memberFuncMap_[UN_REG_IMS_ST_CALLBACK] = TestUnregisterImsRegStateCallback;
     memberFuncMap_[INPUT_NOTIFY_SPN_CHANGE] = TestNotifySpnChanged;
+    memberFuncMap_[INPUT_GET_BASEBAND_VERSION] = TestGetBasebandVersion;
 }
 
 void InitBroadCast()

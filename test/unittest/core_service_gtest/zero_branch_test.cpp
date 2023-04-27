@@ -1594,6 +1594,9 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     EXPECT_EQ(result, testStr);
     EXPECT_NE(networkSearchManager->GetMeid(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, testStr);
+    std::string version = "";
+    EXPECT_NE(networkSearchManager->GetBasebandVersion(INVALID_SLOTID, version), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(version, "");
     EXPECT_FALSE(networkSearchManager->IsNrSupported(INVALID_SLOTID));
     sptr<NetworkState> networkState = nullptr;
     EXPECT_NE(networkSearchManager->GetNetworkStatus(INVALID_SLOTID, networkState), TELEPHONY_ERR_SUCCESS);
@@ -1770,6 +1773,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
     networkSearchHandler->AutoTimeChange(event);
     networkSearchHandler->AutoTimeZoneChange(event);
     networkSearchHandler->AirplaneModeChange(event);
+    networkSearchHandler->RadioGetBasebandVersion(event);
     event = nullptr;
     networkSearchHandler->RadioGetCurrentCellInfo(event);
     networkSearchHandler->RadioCurrentCellInfoUpdate(event);
@@ -1783,6 +1787,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
     networkSearchHandler->SetCellRequestMinInterval(1);
     networkSearchHandler->RadioOffOrUnavailableState(1);
     networkSearchHandler->RadioGetNeighboringCellInfo(event);
+    networkSearchHandler->RadioGetBasebandVersion(event);
     EXPECT_EQ(networkSearchHandler->GetPhoneType(), PhoneType::PHONE_TYPE_IS_NONE);
 }
 
