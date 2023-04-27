@@ -1176,6 +1176,19 @@ int32_t CoreService::UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType
     return networkSearchManager_->UnregisterImsRegInfoCallback(slotId, imsSrvType, GetBundleName());
 }
 
+int32_t CoreService::GetBasebandVersion(int32_t slotId, std::string &version)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->GetBasebandVersion(slotId, version);
+}
+
 int32_t CoreService::Dump(std::int32_t fd, const std::vector<std::u16string> &args)
 {
     if (fd < 0) {

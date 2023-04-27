@@ -208,7 +208,6 @@ public:
     int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) const;
     int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo);
     int32_t SendUpdateCellLocationRequest(int32_t slotId);
-
     int32_t GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     int32_t SetPreferredNetwork(int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback);
     int32_t GetAirplaneMode(bool &airplaneMode);

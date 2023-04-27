@@ -130,6 +130,8 @@ public:
     virtual int32_t RegisterImsRegInfoCallback(
         int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback) = 0;
     virtual int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType) = 0;
+    virtual int32_t GetBasebandVersion(int32_t slotId, std::string &version) = 0;
+
     enum class InterfaceID {
         GET_PS_RADIO_TECH = 0,
         GET_CS_RADIO_TECH,
@@ -216,6 +218,7 @@ public:
         GET_VOICE_MAIL_COUNT,
         SET_VOICE_MAIL_COUNT,
         SET_VOICE_CALL_FORWARDING,
+        GET_BASEBAND_VERSION,
     };
 
 protected:

@@ -926,5 +926,15 @@ int32_t CoreServiceClient::UnregisterImsRegInfoCallback(int32_t slotId, ImsServi
     }
     return proxy->UnregisterImsRegInfoCallback(slotId, imsSrvType);
 }
+
+int32_t CoreServiceClient::GetBasebandVersion(int32_t slotId, std::string &version)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetBasebandVersion(slotId, version);
+}
 } // namespace Telephony
 } // namespace OHOS
