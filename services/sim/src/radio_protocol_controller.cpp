@@ -27,11 +27,7 @@ std::condition_variable RadioProtocolController::cv_;
 RadioProtocolController::RadioProtocolController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
     const std::shared_ptr<AppExecFwk::EventRunner> &runner)
     : AppExecFwk::EventHandler(runner), telRilManager_(telRilManager)
-{
-    if (runner != nullptr) {
-        runner->Run();
-    }
-}
+{}
 
 void RadioProtocolController::Init()
 {
