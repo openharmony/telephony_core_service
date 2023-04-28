@@ -21,6 +21,7 @@
 #include "network_search_manager.h"
 #include "network_search_types.h"
 #include "parameter.h"
+#include "runner_pool.h"
 #include "sim_manager.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
@@ -56,7 +57,7 @@ void CoreService::OnStart()
         }
         registerToService_ = true;
     }
-
+    RunnerPool::GetInstance().Init();
     if (!Init()) {
         TELEPHONY_LOGE("failed to init CoreService");
         return;
