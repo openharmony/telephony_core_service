@@ -413,6 +413,7 @@ HWTEST_F(BranchTest, Telephony_SimFile_002, Function | MediumTest | Level1)
     EXPECT_TRUE(simFile->ProcessGetEhplmnDone(event));
     EXPECT_TRUE(simFile->ProcessGetPnnDone(event));
     EXPECT_TRUE(simFile->ProcessGetOplDone(event));
+    EXPECT_TRUE(simFile->ProcessGetOpl5gDone(event));
     EXPECT_FALSE(simFile->ProcessUpdateDone(event));
     EXPECT_TRUE(simFile->ProcessSetCphsMailbox(event));
     EXPECT_TRUE(simFile->ProcessGetFplmnDone(event));
@@ -504,6 +505,12 @@ HWTEST_F(BranchTest, Telephony_SimFile_004, Function | MediumTest | Level1)
     simFile->ParseOpl(emptyRecords);
     simFile->ParsePnn(records);
     simFile->ParseOpl(records);
+    std::vector<std::string> invalidRecords = { "64F0100000GGGG02", "64F0000000GGGG01" };
+    simFile->ParseOpl(invalidRecords);
+    std::vector<std::string> invalidPlmnRecords = { "F640100000FFFE02", "F640000000FFFE01" };
+    simFile->ParseOpl(invalidPlmnRecords);
+    std::vector<std::string> records5g = { "64F0100000FFFE02", "64F0000000FFFE01" };
+    simFile->ParseOpl(records5g);
     SimFile::SpnStatus newStatus;
     EXPECT_TRUE(simFile->IsContinueGetSpn(false, SimFile::SpnStatus::OBTAIN_SPN_NONE, newStatus));
     EXPECT_TRUE(simFile->IsContinueGetSpn(true, SimFile::SpnStatus::OBTAIN_SPN_NONE, newStatus));
@@ -520,6 +527,35 @@ HWTEST_F(BranchTest, Telephony_SimFile_004, Function | MediumTest | Level1)
     EXPECT_EQ(simFile->ParseSpn("CMCC", OBTAIN_OPERATOR_NAMESTRING), "\xC0\xCC");
     EXPECT_EQ(simFile->ParseSpn("CMCC", OBTAIN_OPERATOR_NAME_SHORTFORM), "\xC0\xCC");
     EXPECT_EQ(simFile->ParseSpn("", 0), "");
+}
+
+/**
+ * @tc.number   Telephony_SimFile_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SimFile_005, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->OnInit();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("SimFile");
+    std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(eventLoopRecord, simStateManager);
+    std::vector<std::string> emptyRecords = {};
+    simFile->ParseOpl5g(emptyRecords);
+    EXPECT_TRUE(simFile->opl5gFiles_.empty());
+    std::vector<std::string> records = { "46000", "46002", "46004", "46007", "46008" };
+    simFile->ParseOpl5g(records);
+    EXPECT_TRUE(simFile->opl5gFiles_.empty());
+    std::vector<std::string> invalidRecords = { "64F010000000GGGGGG02", "64F000000000GGGGGG01" };
+    simFile->ParseOpl5g(invalidRecords);
+    EXPECT_TRUE(simFile->opl5gFiles_.empty());
+    std::vector<std::string> invalidPlmnRecords = { "F64010000000FFFFFE02", "F64000000000FFFFFE01" };
+    simFile->ParseOpl5g(invalidPlmnRecords);
+    EXPECT_TRUE(simFile->opl5gFiles_.empty());
+    std::vector<std::string> records5g = { "64F010000000FFFFFE02", "64F000000000FFFFFE01" };
+    simFile->ParseOpl5g(records5g);
+    EXPECT_FALSE(simFile->opl5gFiles_.empty());
 }
 
 /**
@@ -1890,6 +1926,7 @@ HWTEST_F(BranchTest, Telephony_UsimFileController_001, Function | MediumTest | L
     EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_MBDN), "");
     EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_PNN), "");
     EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_OPL), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_OPL5G), "");
     EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_SPDI), "");
     EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_SST), "");
     EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CFIS), "");
