@@ -3336,9 +3336,9 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockSimLock_0300, Function | MediumTest | Leve
 void SimAuthenticationTestFunc(CoreServiceTestHelper &helper)
 {
     SimAuthenticationResponse response = { 0 };
-    std::string aid = "aa";
+    AuthType authType = AuthType::SIM_AUTH_EAP_SIM_TYPE;
     std::string authData = "1234";
-    int32_t result = CoreServiceClient::GetInstance().SimAuthentication(SimTest::slotId_, aid, authData, response);
+    int32_t result = CoreServiceClient::GetInstance().SimAuthentication(SimTest::slotId_, authType, authData, response);
     helper.SetBoolResult(result == 0);
     helper.NotifyAll();
 }
@@ -3369,9 +3369,10 @@ void SimAuthenticationTestFunc1(CoreServiceTestHelper &helper)
 {
     AccessToken token;
     SimAuthenticationResponse response = { 0 };
-    std::string aid = "aa";
+    AuthType authType = AuthType::SIM_AUTH_EAP_SIM_TYPE;
     std::string authData = "1234";
-    int32_t result = CoreServiceClient::GetInstance().SimAuthentication(SimTest::slotId1_, aid, authData, response);
+    int32_t result =
+        CoreServiceClient::GetInstance().SimAuthentication(SimTest::slotId1_, authType, authData, response);
     helper.SetBoolResult(result == 0);
     helper.NotifyAll();
 }
@@ -3409,6 +3410,70 @@ HWTEST_F(SimTest, Telephony_Sim_SimAuthentication_0300, Function | MediumTest | 
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(SimAuthenticationTestFunc, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            bool result = helper.GetBoolResult();
+            EXPECT_FALSE(result);
+        }
+    }
+}
+
+void SimAuthenticationTestFunc2(CoreServiceTestHelper &helper)
+{
+    SimAuthenticationResponse response = { 0 };
+    AuthType authType = AuthType::SIM_AUTH_EAP_AKA_TYPE;
+    std::string authData = "1234";
+    int32_t result = CoreServiceClient::GetInstance().SimAuthentication(SimTest::slotId_, authType, authData, response);
+    helper.SetBoolResult(result == 0);
+    helper.NotifyAll();
+}
+
+/**
+ * @tc.number   Telephony_Sim_SimAuthentication_0400
+ * @tc.name     Sim authentication
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SimAuthentication_0400, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!SimTest::HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(SimAuthenticationTestFunc2, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            bool result = helper.GetBoolResult();
+            EXPECT_TRUE(result);
+        }
+    }
+}
+
+void SimAuthenticationTestFunc3(CoreServiceTestHelper &helper)
+{
+    SimAuthenticationResponse response = { 0 };
+    AuthType authType = static_cast<AuthType>(0);
+    std::string authData = "1234";
+    int32_t result = CoreServiceClient::GetInstance().SimAuthentication(SimTest::slotId_, authType, authData, response);
+    helper.SetBoolResult(result == 0);
+    helper.NotifyAll();
+}
+
+/**
+ * @tc.number   Telephony_Sim_SimAuthentication_0500
+ * @tc.name     Sim authentication
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SimAuthentication_0500, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!SimTest::HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(SimAuthenticationTestFunc3, std::ref(helper))) {
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
@@ -4093,7 +4158,8 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0200, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->UnlockSimLock(0, mPersoLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
     mCoreService->SendUpdateCellLocationRequest(0);
     SimAuthenticationResponse mSimAuthenticationResponse;
-    EXPECT_NE(mCoreService->SimAuthentication(0, "", "", mSimAuthenticationResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mSimAuthenticationResponse),
+        TELEPHONY_ERR_SUCCESS);
     const sptr<ImsRegInfoCallback> mImsRegInfoCallback = nullptr;
     EXPECT_NE(mCoreService->RegisterImsRegInfoCallback(0, ImsServiceType::TYPE_VOICE, mImsRegInfoCallback),
         TELEPHONY_ERR_SUCCESS);
@@ -4238,7 +4304,8 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0500, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->UnlockSimLock(0, mPersoLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
     mCoreService->SendUpdateCellLocationRequest(0);
     SimAuthenticationResponse mSimAuthenticationResponse;
-    EXPECT_NE(mCoreService->SimAuthentication(0, "", "", mSimAuthenticationResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mSimAuthenticationResponse),
+        TELEPHONY_ERR_SUCCESS);
     const sptr<ImsRegInfoCallback> mImsRegInfoCallback = nullptr;
     EXPECT_NE(mCoreService->RegisterImsRegInfoCallback(0, ImsServiceType::TYPE_VOICE, mImsRegInfoCallback),
         TELEPHONY_ERR_SUCCESS);

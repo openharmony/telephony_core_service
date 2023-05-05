@@ -851,14 +851,14 @@ int32_t CoreServiceClient::HasOperatorPrivileges(const int32_t slotId, bool &has
 }
 
 int32_t CoreServiceClient::SimAuthentication(
-    int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response)
+    int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return false;
     }
-    return proxy->SimAuthentication(slotId, aid, authData, response);
+    return proxy->SimAuthentication(slotId, authType, authData, response);
 }
 
 int32_t CoreServiceClient::GetPrimarySlotId(int32_t &slotId)

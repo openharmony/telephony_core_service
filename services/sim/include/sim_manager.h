@@ -77,8 +77,8 @@ public:
     int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
     int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) override;
     int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) override;
-    int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
-        SimAuthenticationResponse &response) override;
+    int32_t SimAuthentication(
+        int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response) override;
     int32_t GetRadioProtocolTech(int32_t slotId) override;
     void GetRadioProtocol(int32_t slotId) override;
     // STK
@@ -135,6 +135,7 @@ public:
 
 private:
     bool IsValidSlotId(int32_t slotId);
+    bool IsValidAuthType(AuthType authType);
     bool IsValidSlotIdForDefault(int32_t slotId);
     void InitMultiSimObject();
     void InitSingleSimObject();
