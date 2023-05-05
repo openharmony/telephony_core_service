@@ -30,6 +30,7 @@ namespace Telephony {
 static const int DECIMAL_MAX = 10;
 static const int HALF_LEN = 2;
 static const int HALF_BYTE_LEN = 4;
+static const int LAC_RANGE_LEN = 6;
 static const int UCS_FLAG = 0x81;
 static const int UCS_WIDE_FLAG = 0x82;
 // Full Name IEI from TS 24.008
