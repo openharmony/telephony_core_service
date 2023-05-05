@@ -294,7 +294,7 @@ void SimStateHandle::ObtainRealtimeIccStatus(int32_t slotId)
     telRilManager_->GetSimStatus(slotId, event); // get sim card state
 }
 
-int32_t SimStateHandle::SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData)
+int32_t SimStateHandle::SimAuthentication(int32_t slotId, AuthType authType, const std::string &authData)
 {
     if (telRilManager_ == nullptr) {
         TELEPHONY_LOGE("SimStateHandle::SimAuthentication() telRilManager_ is nullptr!!");
@@ -307,9 +307,28 @@ int32_t SimStateHandle::SimAuthentication(int32_t slotId, const std::string &aid
     }
     event->SetOwner(shared_from_this());
     SimAuthenticationRequestInfo requireInfo;
-    requireInfo.aid = aid;
+    requireInfo.serial = static_cast<int32_t>(authType);
+    requireInfo.aid = GetAidByCardType(externalType_);
     requireInfo.authData = authData;
     return telRilManager_->SimAuthentication(slotId, requireInfo, event);
+}
+
+std::string SimStateHandle::GetAidByCardType(CardType type)
+{
+    switch (type) {
+        case CardType::SINGLE_MODE_RUIM_CARD:
+            return CDMA_FAKE_AID;
+        case CardType::SINGLE_MODE_SIM_CARD:
+        case CardType::DUAL_MODE_CG_CARD:
+        case CardType::CT_NATIONAL_ROAMING_CARD:
+        case CardType::CU_DUAL_MODE_CARD:
+        case CardType::DUAL_MODE_TELECOM_LTE_CARD:
+        case CardType::DUAL_MODE_UG_CARD:
+            return GSM_FAKE_AID;
+        default:
+            break;
+    }
+    return USIM_AID;
 }
 
 void SimStateHandle::GetSimCardData(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId)
