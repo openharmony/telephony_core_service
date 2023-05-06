@@ -689,6 +689,9 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_001, Function | MediumTest | Lev
     EXPECT_GT(mInner.GetLinkBandwidthInfo(0, 0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     LinkBandwidthRule mLinkBandwidthRule;
     EXPECT_GT(mInner.SetLinkBandwidthReportingRule(0, 0, mLinkBandwidthRule, nullptr), TELEPHONY_ERR_SUCCESS);
+    bool airplaneMode = false;
+    EXPECT_GT(mInner.GetAirplaneMode(airplaneMode), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.UpdateRadioOn(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1621,6 +1624,9 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     EXPECT_TRUE(cellInfo.empty());
     EXPECT_NE(networkSearchManager->SendUpdateCellLocationRequest(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
     EXPECT_TRUE(networkSearchManager->GetCellLocation(INVALID_SLOTID) == nullptr);
+    bool airplaneMode = false;
+    EXPECT_NE(networkSearchManager->GetAirplaneMode(airplaneMode), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->UpdateRadioOn(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1667,6 +1673,9 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_002, Function | MediumTest |
     networkSearchManager->SetNrOptionMode(INVALID_SLOTID, NrMode::NR_MODE_UNKNOWN);
     networkSearchManager->SetFrequencyType(INVALID_SLOTID, FrequencyType::FREQ_TYPE_MMWAVE);
     networkSearchManager->SetRadioFirstPowerOn(INVALID_SLOTID, true);
+    networkSearchManager->SetLocalAirplaneMode(INVALID_SLOTID, true);
+    bool state = false;
+    networkSearchManager->GetLocalAirplaneMode(INVALID_SLOTID, state);
     EXPECT_TRUE(networkSearchManager->GetNetworkSearchInformationValue(INVALID_SLOTID) == nullptr);
     EXPECT_TRUE(networkSearchManager->GetNetworkSearchState(INVALID_SLOTID) != nullptr);
     EXPECT_TRUE(networkSearchManager->IsRadioFirstPowerOn(INVALID_SLOTID));
