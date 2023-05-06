@@ -160,6 +160,11 @@ void ParseOpl5g(const uint8_t *data, size_t size)
         return;
     }
 
+    if (g_flag) {
+        return;
+    }
+    g_flag = true;
+
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("SimFile");
@@ -175,10 +180,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
-    if (g_flag) {
-        return;
-    }
-    g_flag = true;
 
     OnRemoteRequest(data, size);
     GetSimTelephoneNumber(data, size);
