@@ -49,9 +49,9 @@ public:
 
     bool RegisterSettingsObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     bool UnRegisterSettingsObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
-    bool Query(Uri uri, const std::string &key, std::string &value);
-    bool Insert(Uri uri, const std::string &key, const std::string &value);
-    bool Update(Uri uri, const std::string &key, const std::string &value);
+    int32_t Query(Uri uri, const std::string &key, std::string &value);
+    int32_t Insert(Uri uri, const std::string &key, const std::string &value);
+    int32_t Update(Uri uri, const std::string &key, const std::string &value);
 
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();

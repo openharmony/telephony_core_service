@@ -231,6 +231,10 @@ void SimFile::LoadSimFiles()
     fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_OPL, eventOpl);
     fileToGet_++;
 
+    AppExecFwk::InnerEvent::Pointer eventOpl5g = BuildCallerInfo(MSG_SIM_OBTAIN_OPL5G_DONE);
+    fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_OPL5G, eventOpl5g);
+    fileToGet_++;
+
     AppExecFwk::InnerEvent::Pointer phoneNumberEvent =
         CreateDiallingNumberPointer(MSG_SIM_OBTAIN_MSISDN_DONE, 0, 0, nullptr);
     diallingNumberHandler_->GetDiallingNumbers(
@@ -461,13 +465,47 @@ void SimFile::ParseOpl(const std::vector<std::string> &records)
         }
         std::shared_ptr<OperatorPlmnInfo> file = std::make_shared<OperatorPlmnInfo>();
         file->plmnNumeric = plmn;
-        int base = 16; // convert to hexadecimal
-        file->lacStart = stoi(dataOpl.substr(MCCMNC_LEN, HALF_BYTE_LEN), 0, base);
-        file->lacEnd = stoi(dataOpl.substr(MCCMNC_LEN + HALF_BYTE_LEN, HALF_BYTE_LEN), 0, base);
-        file->pnnRecordId = stoi(dataOpl.substr(MCCMNC_LEN + BYTE_LENGTH, HALF_LEN), 0, base);
+        if (!regex_match(dataOpl, std::regex("[0-9a-fA-F]+"))) {
+            TELEPHONY_LOGI("InputValue is not a hexadecimal number");
+            continue;
+        }
+        file->lacStart = stoi(dataOpl.substr(MCCMNC_LEN, HALF_BYTE_LEN), 0, HEXADECIMAL);
+        file->lacEnd = stoi(dataOpl.substr(MCCMNC_LEN + HALF_BYTE_LEN, HALF_BYTE_LEN), 0, HEXADECIMAL);
+        file->pnnRecordId = stoi(dataOpl.substr(MCCMNC_LEN + BYTE_LENGTH, HALF_LEN), 0, HEXADECIMAL);
         TELEPHONY_LOGI("plmnNumeric: %{public}s, lacStart: %{public}d, lacEnd: %{public}d, pnnRecordId: %{public}d",
             file->plmnNumeric.c_str(), file->lacStart, file->lacEnd, file->pnnRecordId);
         oplFiles_.push_back(file);
+    }
+}
+
+void SimFile::ParseOpl5g(const std::vector<std::string> &records)
+{
+    opl5gFiles_.clear();
+    if (records.empty()) {
+        TELEPHONY_LOGI("ParseOpl5g records is empty");
+        return;
+    }
+    for (const auto &dataOpl : records) {
+        TELEPHONY_LOGD("ParseOpl5g: %{public}s", dataOpl.c_str());
+        if (dataOpl.size() != (OPL_5G_LENGTH + OPL_5G_LENGTH)) {
+            continue;
+        }
+        std::string plmn = SIMUtils::BcdPlmnConvertToString(dataOpl, 0);
+        if (plmn.empty()) {
+            continue;
+        }
+        std::shared_ptr<OperatorPlmnInfo> file = std::make_shared<OperatorPlmnInfo>();
+        file->plmnNumeric = plmn;
+        if (!regex_match(dataOpl, std::regex("[0-9a-fA-F]+"))) {
+            TELEPHONY_LOGI("InputValue is not a hexadecimal number");
+            continue;
+        }
+        file->lacStart = stoi(dataOpl.substr(MCCMNC_LEN, LAC_RANGE_LEN), 0, HEXADECIMAL);
+        file->lacEnd = stoi(dataOpl.substr(MCCMNC_LEN + LAC_RANGE_LEN, LAC_RANGE_LEN), 0, HEXADECIMAL);
+        file->pnnRecordId = stoi(dataOpl.substr(MCCMNC_LEN + LAC_RANGE_LEN + LAC_RANGE_LEN, HALF_LEN), 0, HEXADECIMAL);
+        TELEPHONY_LOGD("plmnNumeric: %{public}s, lacStart: %{public}d, lacEnd: %{public}d, pnnRecordId: %{public}d",
+            file->plmnNumeric.c_str(), file->lacStart, file->lacEnd, file->pnnRecordId);
+        opl5gFiles_.push_back(file);
     }
 }
 
@@ -1274,12 +1312,35 @@ bool SimFile::ProcessGetOplDone(const AppExecFwk::InnerEvent::Pointer &event)
             if (object->exception == nullptr) {
                 ParseOpl(object->fileResults);
             }
-            for (std::string str : object->fileResults) {
-                TELEPHONY_LOGI("ProcessGetOplDone: %{public}s", str.c_str());
-            }
         } else {
             TELEPHONY_LOGE("ProcessGetOplDone: get null pointer!!!");
         }
+    }
+    return isFileProcessResponse;
+}
+
+bool SimFile::ProcessGetOpl5gDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGD("ProcessGetOpl5gDone: start");
+    bool isFileProcessResponse = true;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return isFileProcessResponse;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd != nullptr) {
+        if (fd->exception != nullptr) {
+            TELEPHONY_LOGE("ProcessGetOpl5gDone: get error result");
+        }
+        return isFileProcessResponse;
+    }
+    std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
+    if (object == nullptr) {
+        TELEPHONY_LOGE("ProcessGetOpl5gDone: get null pointer!!!");
+        return isFileProcessResponse;
+    }
+    if (object->exception == nullptr) {
+        ParseOpl5g(object->fileResults);
     }
     return isFileProcessResponse;
 }
@@ -1497,6 +1558,7 @@ void SimFile::InitMemberFunc()
     memberFuncMap_[MSG_SIM_UPDATE_DONE] = &SimFile::ProcessUpdateDone;
     memberFuncMap_[MSG_SIM_OBTAIN_PNN_DONE] = &SimFile::ProcessGetPnnDone;
     memberFuncMap_[MSG_SIM_OBTAIN_OPL_DONE] = &SimFile::ProcessGetOplDone;
+    memberFuncMap_[MSG_SIM_OBTAIN_OPL5G_DONE] = &SimFile::ProcessGetOpl5gDone;
     memberFuncMap_[MSG_SIM_OBTAIN_ALL_SMS_DONE] = &SimFile::ProcessGetAllSmsDone;
     memberFuncMap_[MSG_SIM_MARK_SMS_READ_DONE] = &SimFile::ProcessMarkSms;
     memberFuncMap_[MSG_SIM_SMS_ON_SIM] = &SimFile::ProcessSmsOnSim;
