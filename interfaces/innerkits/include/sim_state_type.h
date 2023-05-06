@@ -126,6 +126,11 @@ enum class LockType {
     FDN_LOCK = 2,
 };
 
+enum AuthType {
+    SIM_AUTH_EAP_SIM_TYPE = 128,
+    SIM_AUTH_EAP_AKA_TYPE = 129,
+};
+
 enum class LockState {
     /**Indicates that the lock state card is in the <b>off</b> state. */
     LOCK_OFF = 0,

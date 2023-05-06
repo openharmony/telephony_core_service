@@ -114,7 +114,7 @@ public:
     int32_t UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response);
     int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges);
     int32_t SimAuthentication(
-        int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response);
+        int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response);
     int32_t GetPrimarySlotId(int32_t &slotId);
     int32_t SetPrimarySlotId(int32_t slotId);
     int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo);
