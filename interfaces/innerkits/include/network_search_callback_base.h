@@ -32,7 +32,7 @@ public:
     }
     virtual void ClearCellularDataConnections(int32_t slotId) {}
     virtual void ClearCellularCallList(int32_t slotId) {}
-    virtual void SetReadyToCall(int32_t slotId, bool isReadyToCall) {}
+    virtual void SetReadyToCall(int32_t slotId, int32_t callType, bool isReadyToCall) {}
 };
 } // namespace Telephony
 } // namespace OHOS

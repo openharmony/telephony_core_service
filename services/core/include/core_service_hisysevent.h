@@ -47,6 +47,7 @@ public:
         int32_t slotId, SmsMmsMessageType type, SmsMmsErrorCode errorCode, const std::string &desc);
     static void WriteDataActivateFaultEvent(
         int32_t slotId, int32_t switchState, CellularDataErrorCode errorType, const std::string &errorMsg);
+    static void WriteAirplaneModeChangeEvent(const int32_t enable);
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -1546,8 +1546,7 @@ int32_t CoreManagerInner::UpdateRadioOn(int32_t slotId)
         TELEPHONY_LOGE("networkSearchManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    networkSearchManager_->UpdateRadioOn(slotId);
-    return TELEPHONY_SUCCESS;
+    return networkSearchManager_->UpdateRadioOn(slotId);
 }
 
 /******************** networkSearchManager end ************************/
