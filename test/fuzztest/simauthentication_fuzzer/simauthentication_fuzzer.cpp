@@ -34,6 +34,8 @@ constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t TYPE_NUM = 2;
 constexpr int32_t TWO_INT_NUM = 2;
 constexpr int32_t SLEEP_TIME_SECONDS = 10;
+constexpr int32_t SIM_AUTH_EAP_SIM_TYPE = 128;
+constexpr int32_t SIM_AUTH_EAP_AKA_TYPE = 129;
 bool g_flag = false;
 
 bool IsServiceInited()
@@ -143,11 +145,15 @@ void SimAuthentication(const uint8_t *data, size_t size)
     }
 
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    std::string aid(reinterpret_cast<const char *>(data), size);
     std::string authData(reinterpret_cast<const char *>(data), size);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteString(aid);
+    int32_t authType = static_cast<int32_t>(size % TYPE_NUM);
+    if (authType) {
+        dataMessageParcel.WriteInt32(SIM_AUTH_EAP_AKA_TYPE);
+    } else {
+        dataMessageParcel.WriteInt32(SIM_AUTH_EAP_SIM_TYPE);
+    }
     dataMessageParcel.WriteString(authData);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;

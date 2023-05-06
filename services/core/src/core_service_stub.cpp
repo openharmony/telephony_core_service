@@ -1459,10 +1459,10 @@ int32_t CoreServiceStub::OnHasOperatorPrivileges(MessageParcel &data, MessagePar
 int32_t CoreServiceStub::OnSimAuthentication(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::string aid = data.ReadString();
+    AuthType authType = static_cast<AuthType>(data.ReadInt32());
     std::string authData = data.ReadString();
     SimAuthenticationResponse response = { 0 };
-    int32_t result = SimAuthentication(slotId, aid, authData, response);
+    int32_t result = SimAuthentication(slotId, authType, authData, response);
     reply.WriteInt32(result);
     reply.WriteInt32(response.sw1);
     reply.WriteInt32(response.sw2);

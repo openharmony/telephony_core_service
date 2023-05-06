@@ -89,6 +89,10 @@ constexpr const char *FDN_PIN_LOCK = "P2";
 // FDN lock type
 constexpr const char *FDN_PIN2_LOCK = "FD";
 
+constexpr const char *USIM_AID = "USIM_AID";
+constexpr const char *CDMA_FAKE_AID = "CDMA_FAKE_AID";
+constexpr const char *GSM_FAKE_AID = "GSM_FAKE_AID";
+
 struct UnlockData {
     int32_t result = 0;
     int32_t remain = 0;
@@ -122,7 +126,7 @@ public:
     bool IsIccReady();
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
-    int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData);
+    int32_t SimAuthentication(int32_t slotId, AuthType authType, const std::string &authData);
     SimAuthenticationResponse GetSimAuthenticationResponse();
 
 private:
@@ -143,6 +147,7 @@ private:
     void NotifySimLock(int slotId);
     void GetUnlockSimLockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
     void GetSimAuthenticationResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
+    std::string GetAidByCardType(CardType type);
 
 private:
     int32_t oldSimType_ = ICC_UNKNOWN_TYPE;

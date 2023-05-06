@@ -1286,9 +1286,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_003, Function | MediumTest | Level1)
     bool boolResult = false;
     EXPECT_GT(simManager->HasOperatorPrivileges(0, boolResult), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->HasOperatorPrivileges(INVALID_SLOTID, boolResult), TELEPHONY_ERR_SUCCESS);
-    SimAuthenticationResponse mResponse;
-    EXPECT_NE(simManager->SimAuthentication(0, "", "", mResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->SimAuthentication(INVALID_SLOTID, "", "", mResponse), TELEPHONY_ERR_SUCCESS);
     int32_t testRadioProtocolTech = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN);
     EXPECT_EQ(simManager->GetRadioProtocolTech(0), testRadioProtocolTech);
     EXPECT_EQ(simManager->GetRadioProtocolTech(INVALID_SLOTID), testRadioProtocolTech);
@@ -1343,6 +1340,13 @@ HWTEST_F(BranchTest, Telephony_SimManager_004, Function | MediumTest | Level1)
     std::string testString = "";
     EXPECT_NE(simManager->ObtainSpnCondition(0, true, testString), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->ObtainSpnCondition(INVALID_SLOTID, true, testString), TELEPHONY_ERR_SUCCESS);
+    SimAuthenticationResponse mResponse;
+    EXPECT_NE(simManager->SimAuthentication(0, static_cast<AuthType>(0), "", mResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(
+        simManager->SimAuthentication(INVALID_SLOTID, static_cast<AuthType>(0), "", mResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(simManager->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(simManager->SimAuthentication(INVALID_SLOTID, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mResponse),
+        TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1382,12 +1386,33 @@ HWTEST_F(BranchTest, Telephony_SimStateManager_001, Function | MediumTest | Leve
     PersoLockInfo mPersoLockInfo;
     EXPECT_GT(simStateManager->UnlockSimLock(0, mPersoLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
     SimAuthenticationResponse mResponse;
-    EXPECT_NE(simStateManager->SimAuthentication(0, "", "", mResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(
+        simStateManager->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mResponse), TELEPHONY_ERR_SUCCESS);
     auto simStateManagerTwo = std::make_shared<SimStateManager>(telRilManager);
     simStateManager->simStateHandle_ = std::make_shared<SimStateHandle>(runner, simStateManagerTwo);
     EXPECT_GE(simStateManager->GetCardType(), CardType::UNKNOWN_CARD);
     EXPECT_GT(simStateManager->UnlockSimLock(0, mPersoLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simStateManager->SimAuthentication(0, "", "", mResponse), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_SimStateHandle_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SimStateHandle_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    auto simStateHandle = std::make_shared<SimStateHandle>(runner, simStateManager);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::SINGLE_MODE_RUIM_CARD), CDMA_FAKE_AID);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::SINGLE_MODE_SIM_CARD), GSM_FAKE_AID);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::DUAL_MODE_CG_CARD), GSM_FAKE_AID);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::CT_NATIONAL_ROAMING_CARD), GSM_FAKE_AID);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::CU_DUAL_MODE_CARD), GSM_FAKE_AID);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::DUAL_MODE_TELECOM_LTE_CARD), GSM_FAKE_AID);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::DUAL_MODE_UG_CARD), GSM_FAKE_AID);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::UNKNOWN_CARD), USIM_AID);
 }
 
 /**
