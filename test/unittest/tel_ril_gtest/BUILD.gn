@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
+SOURCE_DIR = "../../../"
 
 ohos_unittest("tel_ril_gtest") {
   install_enable = true
@@ -21,26 +22,20 @@ ohos_unittest("tel_ril_gtest") {
   module_out_path = part_name + "/" + test_module
 
   sources = [
-    "//base/telephony/core_service/frameworks/native/src/i_network_search_callback_stub.cpp",
+    "$SOURCE_DIR/frameworks/native/src/i_network_search_callback_stub.cpp",
     "tel_ril_test.cpp",
   ]
 
   include_dirs = [
-    "//base/telephony/core_service/utils/common/include",
-    "//base/telephony/core_service/utils/log/include",
-    "//base/telephony/core_service/common/sim",
-    "//base/telephony/core_service/common/network_search",
-    "//base/telephony/core_service/common/core",
-    "//base/telephony/core_service/services/tel_ril/include",
-    "//base/telephony/core_service/services/sim/include",
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
-    "//commonlibrary/c_utils/base/include",
+    "$SOURCE_DIR/utils/common/include",
+    "$SOURCE_DIR/utils/log/include",
+    "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/services/sim/include",
   ]
 
   deps = [
-    "//base/telephony/core_service:tel_core_service",
-    "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
-    "//drivers/hdf_core/adapter/uhdf2/hdi:libhdi",
+    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "//third_party/googletest:gtest_main",
   ]
 
@@ -52,6 +47,7 @@ ohos_unittest("tel_ril_gtest") {
     "drivers_interface_ril:hril_innerkits",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "hdf_core:libhdi",
     "init:libbegetutil",
     "ipc:ipc_core",
     "power_manager:powermgr_client",

@@ -11,9 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/telephony/core_service/core_service_aafwk.gni")
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+SOURCE_DIR = "../../../.."
 
 ohos_executable("tel_network_search_test") {
   install_enable = true
@@ -24,24 +23,21 @@ ohos_executable("tel_network_search_test") {
     "test_broadcast.cpp",
   ]
 
-  include_dirs = [
-    "${ability_runtime_inner_api_path}/ability_manager/include",
-    "${ability_runtime_services_path}/abilitymgr/include",
-  ]
+  configs = [ "$SOURCE_DIR/core_service/utils:telephony_log_config" ]
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
-
-  deps = [ "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native" ]
+  deps =
+      [ "$SOURCE_DIR/core_service/interfaces/innerkits:tel_core_service_api" ]
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
     "ability_runtime:wantagent_innerkits",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
-    "core_service:tel_core_service_api",
     "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",

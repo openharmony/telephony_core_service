@@ -24,10 +24,11 @@ constexpr static const int32_t WAIT_TIME_SECOND = 5;
 bool CoreServiceTestHelper::Run(void (*func)(CoreServiceTestHelper &), CoreServiceTestHelper &helper)
 {
     std::thread t(func, std::ref(helper));
+    pthread_setname_np(t.native_handle(), "core_service_test_helper");
     t.detach();
     return WaitForResult(WAIT_TIME_SECOND);
 }
- 
+
 void CoreServiceTestHelper::NotifyAll()
 {
     std::unique_lock<std::mutex> lock(mtx_);
