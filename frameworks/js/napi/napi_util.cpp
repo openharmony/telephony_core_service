@@ -614,6 +614,7 @@ bool NapiUtil::CreateCommonCallErrorMessageForJs(int32_t errorCode, JsErrorCode 
         case CALL_ERR_EMERGENCY_UNSUPPORT_CONFERENCEABLE:
         case CALL_ERR_VOLTE_NOT_SUPPORT:
         case CALL_ERR_VOLTE_PROVISIONING_DISABLED:
+        case CALL_ERR_DIAL_IS_BUSY:
             jsErrorCode = JS_ERROR_TELEPHONY_SYSTEM_ERROR;
             break;
         default:
