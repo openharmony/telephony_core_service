@@ -51,6 +51,7 @@ std::string UsimFileController::ObtainUsimElementFilePath(int efId)
         case ELEMENTARY_FILE_MBDN:
         case ELEMENTARY_FILE_PNN:
         case ELEMENTARY_FILE_OPL:
+        case ELEMENTARY_FILE_OPL5G:
         case ELEMENTARY_FILE_SPDI:
         case ELEMENTARY_FILE_SST:
         case ELEMENTARY_FILE_CFIS:

@@ -15,6 +15,7 @@
 
 #include "sim_account_manager.h"
 
+#include "runner_pool.h"
 #include "string_ex.h"
 
 namespace OHOS {
@@ -47,7 +48,7 @@ void SimAccountManager::Init(int32_t slotId)
         TELEPHONY_LOGE("SimAccountManager::init SimAccountManager invalid slotId = %{public}d", slotId);
         return;
     }
-    operatorConfigCacheRunner_ = AppExecFwk::EventRunner::Create("OperatorConfigCache");
+    operatorConfigCacheRunner_ = RunnerPool::GetInstance().GetSimDbAndFileRunner();
     if (operatorConfigCacheRunner_.get() == nullptr) {
         TELEPHONY_LOGE("SimAccountManager::Init operatorConfigCacheRunner_ failed");
         return;
@@ -58,7 +59,7 @@ void SimAccountManager::Init(int32_t slotId)
         return;
     }
     operatorConfigCache_->RegisterForIccChange();
-    simStateTrackerRunner_ = AppExecFwk::EventRunner::Create("SimStateTracker");
+    simStateTrackerRunner_ = RunnerPool::GetInstance().GetSimDbAndFileRunner();
     if (simStateTrackerRunner_.get() == nullptr) {
         TELEPHONY_LOGE("SimAccountManager::Init simStateTrackerRunner_ failed");
         return;
@@ -111,7 +112,7 @@ int32_t SimAccountManager::HasOperatorPrivileges(const int32_t slotId, bool &has
     }
     if (privilegesRunner_.get() == nullptr) {
         TELEPHONY_LOGE("make privilegesRunner_");
-        privilegesRunner_ = AppExecFwk::EventRunner::Create("PrivilegeController");
+        privilegesRunner_ = RunnerPool::GetInstance().GetCommonRunner();
     }
     if ((privilegesRunner_ == nullptr) || (telRilManager_ == nullptr) || (simStateManager_ == nullptr)) {
         TELEPHONY_LOGE("has nullptr at privilegesRunner_ or telRilManager_ or simStateManager_");

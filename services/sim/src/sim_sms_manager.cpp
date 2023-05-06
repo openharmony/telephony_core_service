@@ -16,6 +16,7 @@
 #include "sim_sms_manager.h"
 
 #include "telephony_errors.h"
+#include "runner_pool.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -42,7 +43,7 @@ void SimSmsManager::Init(int slotId)
         return;
     }
 
-    eventLoopSms_ = AppExecFwk::EventRunner::Create("simSmsController");
+    eventLoopSms_ = RunnerPool::GetInstance().GetCommonRunner();
     if (eventLoopSms_.get() == nullptr) {
         TELEPHONY_LOGE("simSmsController  failed to create EventRunner");
         return;
@@ -61,7 +62,6 @@ void SimSmsManager::Init(int slotId)
     }
     smsController_->SetRilAndFileManager(telRilManager_, fileManager);
 
-    eventLoopSms_->Run();
     stateSms_ = HandleRunningState::STATE_RUNNING;
 
     smsController_->Init(slotId_);

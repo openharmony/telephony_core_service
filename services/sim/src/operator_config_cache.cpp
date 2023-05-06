@@ -30,9 +30,6 @@ OperatorConfigCache::OperatorConfigCache(const std::shared_ptr<AppExecFwk::Event
     std::shared_ptr<SimFileManager> simFileManager, int32_t slotId)
     : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), slotId_(slotId)
 {
-    if (runner != nullptr) {
-        runner->Run();
-    }
     TELEPHONY_LOGI("OperatorConfigCache create");
 }
 

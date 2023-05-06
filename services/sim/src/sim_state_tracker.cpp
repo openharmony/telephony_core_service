@@ -17,6 +17,7 @@
 
 #include "core_manager_inner.h"
 #include "radio_event.h"
+#include "thread"
 
 namespace OHOS {
 namespace Telephony {
@@ -26,9 +27,6 @@ SimStateTracker::SimStateTracker(const std::shared_ptr<AppExecFwk::EventRunner> 
     : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), operatorConfigCache_(operatorConfigCache),
       slotId_(slotId)
 {
-    if (runner != nullptr) {
-        runner->Run();
-    }
     if (simFileManager == nullptr) {
         TELEPHONY_LOGE("can not make OperatorConfigLoader");
     }
@@ -71,7 +69,11 @@ void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             TELEPHONY_LOGE("sim is not exist");
             return;
         }
-        operatorConfigLoader_->LoadOperatorConfig(slotId_);
+        std::thread loadOperatorConfigTask([&]() {
+            pthread_setname_np(pthread_self(), "load_operator_config");
+            operatorConfigLoader_->LoadOperatorConfig(slotId_);
+        });
+        loadOperatorConfigTask.detach();
     }
 }
 

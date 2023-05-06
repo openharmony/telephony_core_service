@@ -30,9 +30,6 @@ MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<AppExecFwk::EventRunner> 
     : AppExecFwk::EventHandler(runner), controller_(controller),
       simStateManager_(simStateManager), simFileManager_(simFileManager)
 {
-    if (runner != nullptr) {
-        runner->Run();
-    }
     if (observerHandler_ == nullptr) {
         observerHandler_ = std::make_unique<ObserverHandler>();
     }

@@ -126,7 +126,7 @@ public:
     virtual int32_t SendUpdateCellLocationRequest(int32_t slotId) = 0;
     virtual int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) = 0;
     virtual int32_t SimAuthentication(
-        int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response) = 0;
+        int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response) = 0;
     virtual int32_t RegisterImsRegInfoCallback(
         int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback) = 0;
     virtual int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType) = 0;

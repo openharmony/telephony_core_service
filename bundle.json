@@ -1,6 +1,6 @@
 {
     "name": "@ohos/core_service",
-    "version": "3.1.0",
+    "version": "4.0",
     "description": "telephony core service",
     "publishAs": "code-segment",
     "homePage": "https://gitee.com/openharmony",
@@ -41,12 +41,13 @@
                 "c_utils",
                 "common_event_service",
                 "config_policy",
+                "data_share",
                 "drivers_interface_ril",
                 "eventhandler",
                 "hdf_core",
+                "hilog",
                 "hisysevent_native",
                 "hiviewdfx_hilog_native",
-                "huks",
                 "i18n",
                 "init",
                 "ipc",
@@ -59,10 +60,18 @@
                 "resource_management",
                 "safwk",
                 "samgr",
+                "telephony_data",
                 "time_service"
             ],
             "third_party": [
-                "libphonenumber"
+                "googletest",
+                "icu4c",
+                "jsoncpp",
+                "libphonenumber",
+                "libxml2",
+                "node",
+                "openssl",
+                "protobuf"
             ]
         },
         "build": {

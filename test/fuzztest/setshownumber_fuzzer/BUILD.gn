@@ -12,7 +12,7 @@
 # limitations under the License.
 
 #####################hydra-fuzz###################
-import("//base/telephony/core_service/telephony.gni")
+SUBSYSTEM_DIR = "../../../.."
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
@@ -22,23 +22,22 @@ ohos_fuzztest("SetShowNumberFuzzTest") {
   module_output_path = "core_service/SetShowNumberFuzzTest"
   module_out_path = module_output_path
   fuzz_config_file =
-      "//base/telephony/core_service/test/fuzztest/setshownumber_fuzzer"
+      "$SUBSYSTEM_DIR/core_service/test/fuzztest/setshownumber_fuzzer"
 
   include_dirs = [
-    "//base/telephony/core_service/frameworks/js/napi/include",
-    "//base/telephony/core_service/frameworks/js/napi",
-    "//base/telephony/core_service/services/sim/include",
-    "//base/telephony/core_service/services/core/include",
-    "//base/telephony/core_service/services/tel_ril/include",
-    "//base/telephony/core_service/test/fuzztest/common_fuzzer",
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/include",
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
+    "$SUBSYSTEM_DIR/core_service/services/sim/include",
+    "$SUBSYSTEM_DIR/core_service/services/core/include",
+    "$SUBSYSTEM_DIR/core_service/services/tel_ril/include",
+    "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer",
   ]
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+  configs = [ "$SUBSYSTEM_DIR/core_service/utils:telephony_log_config" ]
 
   deps = [
-    "//base/telephony/core_service:tel_core_service",
-    "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
-    "//foundation/arkui/napi:ace_napi",
+    "$SUBSYSTEM_DIR/core_service:tel_core_service",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
   ]
 
   external_deps = [
@@ -63,6 +62,7 @@ ohos_fuzztest("SetShowNumberFuzzTest") {
     "i18n:zone_util",
     "init:libbegetutil",
     "ipc:ipc_core",
+    "napi:ace_napi",
     "netmanager_base:net_conn_manager_if",
     "netmanager_ext:net_tether_manager_if",
     "power_manager:powermgr_client",
@@ -71,7 +71,7 @@ ohos_fuzztest("SetShowNumberFuzzTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
-  defines += [
+  defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
@@ -88,8 +88,8 @@ ohos_fuzztest("SetShowNumberFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "//base/telephony/core_service/frameworks/js/napi/napi_util.cpp",
-    "//base/telephony/core_service/test/fuzztest/common_fuzzer/addcoreservicetoken_fuzzer.cpp",
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
+    "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer/addcoreservicetoken_fuzzer.cpp",
     "setshownumber_fuzzer.cpp",
   ]
 }

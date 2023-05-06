@@ -21,9 +21,10 @@
 #include <mutex>
 
 #include "inner_event.h"
+#include "radio_event.h"
+#include "runner_pool.h"
 #include "sim_data_type.h"
 #include "telephony_log_wrapper.h"
-#include "radio_event.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -193,15 +194,12 @@ void IccOperatorPrivilegeController::Init(const int32_t slotId)
         return;
     }
     if (this->GetEventRunner() == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create("UsimOperatorPrivilegeManager");
+        auto runner = RunnerPool::GetInstance().GetCommonRunner();
         if (runner == nullptr) {
             TELEPHONY_LOGE("IccOperatorPrivilegeController::Init Create thread fail!");
             return;
         }
         this->SetEventRunner(runner);
-        if (runner->Run() != ERR_OK) {
-            TELEPHONY_LOGE("runner->Run() fail!!");
-        }
     }
     auto self = this->shared_from_this();
     simStateManager_->RegisterCoreNotify(self, RadioEvent::RADIO_SIM_STATE_CHANGE);

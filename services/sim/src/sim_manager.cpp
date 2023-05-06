@@ -17,6 +17,7 @@
 
 #include "core_service_errors.h"
 #include "radio_event.h"
+#include "runner_pool.h"
 #include "telephony_errors.h"
 
 namespace OHOS {
@@ -92,7 +93,7 @@ void SimManager::InitMultiSimObject()
 
 void SimManager::InitSingleSimObject()
 {
-    controllerRunner_ = AppExecFwk::EventRunner::Create("MultiSimController");
+    controllerRunner_ = RunnerPool::GetInstance().GetCommonRunner();
     if (controllerRunner_.get() == nullptr) {
         TELEPHONY_LOGE("SimManager::InitSingleSimObject get controllerRunner_ failed");
         return;
@@ -105,11 +106,7 @@ void SimManager::InitSingleSimObject()
     }
     multiSimController_->Init();
 
-    monitorRunner_ = AppExecFwk::EventRunner::Create("MultiSimMonitor");
-    if (monitorRunner_.get() == nullptr) {
-        TELEPHONY_LOGE("get monitorRunner_ failed");
-        return;
-    }
+    monitorRunner_ = RunnerPool::GetInstance().GetSimDbAndFileRunner();
     multiSimMonitor_ = std::make_shared<MultiSimMonitor>(
         monitorRunner_, multiSimController_, simStateManager_, simFileManager_);
     if (multiSimMonitor_ == nullptr) {
@@ -499,14 +496,21 @@ int32_t SimManager::HasOperatorPrivileges(const int32_t slotId, bool &hasOperato
 }
 
 int32_t SimManager::SimAuthentication(
-    int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response)
+    int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response)
 {
-    TELEPHONY_LOGI("SimManager::SimAuthentication slotId:%{public}d", slotId);
-    if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {
+    if (!HasSimCardInner(slotId)) {
+        TELEPHONY_LOGE("SimAuthentication has no sim card!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if (!IsValidAuthType(authType)) {
+        TELEPHONY_LOGE("SimAuthentication authType is invalid!");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if (simStateManager_[slotId] == nullptr) {
         TELEPHONY_LOGE("simStateManager_ can not be null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simStateManager_[slotId]->SimAuthentication(slotId, aid, authData, response);
+    return simStateManager_[slotId]->SimAuthentication(slotId, authType, authData, response);
 }
 
 int32_t SimManager::GetRadioProtocolTech(int32_t slotId)
@@ -980,6 +984,11 @@ bool SimManager::IsValidSlotId(int32_t slotId)
     }
     TELEPHONY_LOGD("slotId is valid, slotId = %{public}d", slotId);
     return true;
+}
+
+bool SimManager::IsValidAuthType(AuthType authType)
+{
+    return (authType == AuthType::SIM_AUTH_EAP_SIM_TYPE || authType == AuthType::SIM_AUTH_EAP_AKA_TYPE);
 }
 
 bool SimManager::IsValidSlotIdForDefault(int32_t slotId)

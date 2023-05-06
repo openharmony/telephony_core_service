@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//foundation/distributeddatamgr/preferences/preferences.gni")
 
 group("common_target") {
   deps = [ ":libtel_common" ]
@@ -20,6 +19,14 @@ group("common_target") {
 
 config("telephony_log_config") {
   include_dirs = [ "log/include" ]
+}
+
+config("tel_napi_config") {
+  include_dirs = [
+    "../frameworks/js/napi/",
+    "../frameworks/js/network_search/include/",
+    "../interfaces/innerkits/include/",
+  ]
 }
 
 config("tel_utils_config") {
@@ -31,9 +38,8 @@ config("tel_utils_config") {
 }
 
 ohos_shared_library("libtel_common") {
-  include_dirs = [ "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include" ]
-
   sources = [
+    "../frameworks/js/napi/napi_util.cpp",
     "common/src/enum_convert.cpp",
     "common/src/str_convert.cpp",
     "common/src/telephony_common_utils.cpp",
@@ -51,11 +57,12 @@ ohos_shared_library("libtel_common") {
     defines += [ "STANDARD_SYSTEM_ENABLE" ]
   }
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+  configs = [ "../utils:telephony_log_config" ]
 
-  public_configs = [ ":tel_utils_config" ]
-
-  public_deps = [ "//commonlibrary/c_utils/base:utils" ]
+  public_configs = [
+    ":tel_napi_config",
+    ":tel_utils_config",
+  ]
 
   if (is_double_framework) {
     cflags_cc = [ "-DCONFIG_DUAL_FRAMEWORK" ]
@@ -74,8 +81,10 @@ ohos_shared_library("libtel_common") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
+    "hisysevent_native:libhisysevent",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "napi:ace_napi",
     "preferences:native_preferences",
     "samgr:samgr_proxy",
   ]

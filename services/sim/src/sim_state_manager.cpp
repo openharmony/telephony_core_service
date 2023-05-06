@@ -16,6 +16,7 @@
 #include "sim_state_manager.h"
 
 #include "core_service_errors.h"
+#include "runner_pool.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
@@ -43,7 +44,7 @@ void SimStateManager::Init(int32_t slotId)
         TELEPHONY_LOGE("SimStateManager::Init telRilManager_ is null.");
         return;
     }
-    eventLoop_ = AppExecFwk::EventRunner::Create("SimStateHandle");
+    eventLoop_ = RunnerPool::GetInstance().GetCommonRunner();
     if (eventLoop_.get() == nullptr) {
         TELEPHONY_LOGE("SimStateHandle failed to create EventRunner");
         return;
@@ -55,7 +56,7 @@ void SimStateManager::Init(int32_t slotId)
     }
     simStateHandle_->SetRilManager(telRilManager_);
     simStateHandle_->Init(slotId);
-    eventLoop_->Run();
+
     TELEPHONY_LOGI("SimStateManager::eventLoop_ is running");
     simStateRun_ = STATE_RUNNING;
 }
@@ -457,7 +458,7 @@ int32_t SimStateManager::UnlockSimLock(int32_t slotId, const PersoLockInfo &lock
 }
 
 int32_t SimStateManager::SimAuthentication(
-    int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response)
+    int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response)
 {
     if (simStateHandle_ == nullptr) {
         TELEPHONY_LOGE("SimAuthentication(), simStateHandle_ is nullptr!!!");
@@ -466,7 +467,7 @@ int32_t SimStateManager::SimAuthentication(
     std::unique_lock<std::mutex> lck(ctx_);
     responseReady_ = false;
     int32_t ret = SIM_AUTH_FAIL;
-    ret = simStateHandle_->SimAuthentication(slotId, aid, authData);
+    ret = simStateHandle_->SimAuthentication(slotId, authType, authData);
     while (!responseReady_) {
         TELEPHONY_LOGI("SimAuthentication::wait(), response = false");
         if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {

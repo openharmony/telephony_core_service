@@ -10,15 +10,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//base/telephony/core_service/core_service_aafwk.gni")
-import("//base/telephony/core_service/telephony.gni")
+SUBSYSTEM_DIR = "../../../.."
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-TELEPHONY_CORE_SERVICE_ROOT = "//base/telephony/core_service"
-TELEPHONY_SIM_ROOT = "//base/telephony/core_service/services/sim"
-HDF_FRAMEWORKS = "//drivers/hdf/frameworks"
-TELEPHONY_FRAMEWORKS_ROOT = "//base/telephony/core_service/frameworks/native/"
+TELEPHONY_CORE_SERVICE_ROOT = "$SUBSYSTEM_DIR/core_service"
+TELEPHONY_SIM_ROOT = "$SUBSYSTEM_DIR/core_service/services/sim"
+TELEPHONY_FRAMEWORKS_ROOT = "$SUBSYSTEM_DIR/core_service/frameworks/native/"
 
 ohos_executable("tel_sim_test") {
   install_enable = true
@@ -31,40 +28,26 @@ ohos_executable("tel_sim_test") {
   ]
 
   include_dirs = [
-    "//base/telephony/telephony_data/sim/include",
-    "//base/telephony/telephony_data/common/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/base/include",
     "$TELEPHONY_CORE_SERVICE_ROOT/services/tel_ril/include",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/include",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/state_registry",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/telephony_data",
     "$TELEPHONY_SIM_ROOT/include",
-
-    "$HDF_FRAMEWORKS/ability/sbuf/include",
-    "$HDF_FRAMEWORKS/core/shared/include",
-    "$HDF_FRAMEWORKS/core/host/include",
-    "$HDF_FRAMEWORKS/core/master/include",
-    "$HDF_FRAMEWORKS/include/core",
-    "$HDF_FRAMEWORKS/include/utils",
-    "$HDF_FRAMEWORKS/utils/include",
-    "$HDF_FRAMEWORKS/include/osal",
   ]
 
-  defines += [
+  defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceSimTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+  configs = [ "$SUBSYSTEM_DIR/core_service/utils:telephony_log_config" ]
 
   deps = [
-    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-    "//base/telephony/core_service:tel_core_service",
-    "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
+    "$SUBSYSTEM_DIR/core_service:tel_core_service",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
   ]
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:abilitykit_native",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",

@@ -15,6 +15,7 @@
 
 #include "sim_rdb_helper.h"
 
+#include "sim_data.h"
 #include "telephony_errors.h"
 #include "telephony_types.h"
 
@@ -37,7 +38,7 @@ std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateDataAHelper()
         TELEPHONY_LOGE("SimRdbHelper GetSystemAbility Service Failed.");
         return nullptr;
     }
-    return DataShare::DataShareHelper::Creator(remoteObj, SimRdbInfo::SIM_RDB_URI);
+    return DataShare::DataShareHelper::Creator(remoteObj, SIM_URI);
 }
 
 int SimRdbHelper::Insert(const DataShare::DataShareValuesBucket &values)
@@ -108,7 +109,7 @@ int32_t SimRdbHelper::GetDefaultMainCardSlotId()
     int32_t mainCardSlotId = 0;
     std::vector<std::string> colume;
     DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(SimRdbInfo::IS_MAIN_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
+    predicates.EqualTo(SimData::IS_MAIN_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::get nothing");
@@ -120,7 +121,7 @@ int32_t SimRdbHelper::GetDefaultMainCardSlotId()
         return mainCardSlotId;
     }
     int index = 0;
-    result->GetColumnIndex(SimRdbInfo::SLOT_INDEX, index);
+    result->GetColumnIndex(SimData::SLOT_INDEX, index);
     result->GetInt(index, mainCardSlotId);
     result->Close();
     return mainCardSlotId;
@@ -132,7 +133,7 @@ int32_t SimRdbHelper::GetDefaultMessageCardSlotId()
     int32_t messageCardSlotId = 0;
     std::vector<std::string> colume;
     DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(SimRdbInfo::IS_MESSAGE_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
+    predicates.EqualTo(SimData::IS_MESSAGE_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::get nothing");
@@ -144,7 +145,7 @@ int32_t SimRdbHelper::GetDefaultMessageCardSlotId()
         return messageCardSlotId;
     }
     int index = 0;
-    result->GetColumnIndex(SimRdbInfo::SLOT_INDEX, index);
+    result->GetColumnIndex(SimData::SLOT_INDEX, index);
     result->GetInt(index, messageCardSlotId);
     result->Close();
     return messageCardSlotId;
@@ -156,7 +157,7 @@ int32_t SimRdbHelper::GetDefaultCellularDataCardSlotId()
     int32_t cellularDataCardSlotId = 0;
     std::vector<std::string> colume;
     DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(SimRdbInfo::IS_CELLULAR_DATA_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
+    predicates.EqualTo(SimData::IS_CELLULAR_DATA_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::get nothing");
@@ -168,7 +169,7 @@ int32_t SimRdbHelper::GetDefaultCellularDataCardSlotId()
         return cellularDataCardSlotId;
     }
     int index = 0;
-    result->GetColumnIndex(SimRdbInfo::SLOT_INDEX, index);
+    result->GetColumnIndex(SimData::SLOT_INDEX, index);
     result->GetInt(index, cellularDataCardSlotId);
     result->Close();
     return cellularDataCardSlotId;
@@ -179,7 +180,7 @@ int32_t SimRdbHelper::GetDefaultVoiceCardSlotId()
     int32_t voiceCardSlotId = INVALID_VALUE;
     std::vector<std::string> colume;
     DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(SimRdbInfo::IS_VOICE_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
+    predicates.EqualTo(SimData::IS_VOICE_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::get nothing");
@@ -191,7 +192,7 @@ int32_t SimRdbHelper::GetDefaultVoiceCardSlotId()
         return voiceCardSlotId;
     }
     int index = 0;
-    result->GetColumnIndex(SimRdbInfo::SLOT_INDEX, index);
+    result->GetColumnIndex(SimData::SLOT_INDEX, index);
     result->GetInt(index, voiceCardSlotId);
     result->Close();
     TELEPHONY_LOGI("SimRdbHelper::GetDefaultVoiceCardSlotId = %{public}d", voiceCardSlotId);
@@ -205,8 +206,8 @@ int32_t SimRdbHelper::SetDefaultMainCard(int32_t slotId)
     DataShare::DataShareValuesBucket value;
     DataShare::DataShareValueObject slotObj(slotId);
     DataShare::DataShareValueObject valueObj(static_cast<int>(DefaultCardType::MAIN));
-    value.Put(SimRdbInfo::SLOT_INDEX, slotObj);
-    value.Put(SimRdbInfo::CARD_TYPE, valueObj);
+    value.Put(SimData::SLOT_INDEX, slotObj);
+    value.Put(SimData::CARD_TYPE, valueObj);
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::SetDefaultMainCard failed by nullptr");
@@ -226,8 +227,8 @@ int32_t SimRdbHelper::SetDefaultVoiceCard(int32_t slotId)
     DataShare::DataShareValuesBucket value;
     DataShare::DataShareValueObject slotObj(slotId);
     DataShare::DataShareValueObject valueObj(static_cast<int>(DefaultCardType::VOICE));
-    value.Put(SimRdbInfo::SLOT_INDEX, slotObj);
-    value.Put(SimRdbInfo::CARD_TYPE, valueObj);
+    value.Put(SimData::SLOT_INDEX, slotObj);
+    value.Put(SimData::CARD_TYPE, valueObj);
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::SetDefaultVoiceCard failed by nullptr");
@@ -247,8 +248,8 @@ int32_t SimRdbHelper::SetDefaultMessageCard(int32_t slotId)
     DataShare::DataShareValuesBucket value;
     DataShare::DataShareValueObject slotObj(slotId);
     DataShare::DataShareValueObject valueObj(static_cast<int>(DefaultCardType::SMS));
-    value.Put(SimRdbInfo::SLOT_INDEX, slotObj);
-    value.Put(SimRdbInfo::CARD_TYPE, valueObj);
+    value.Put(SimData::SLOT_INDEX, slotObj);
+    value.Put(SimData::CARD_TYPE, valueObj);
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::SetDefaultMessageCard failed by nullptr");
@@ -268,8 +269,8 @@ int32_t SimRdbHelper::SetDefaultCellularData(int32_t slotId)
     DataShare::DataShareValuesBucket value;
     DataShare::DataShareValueObject slotObj(slotId);
     DataShare::DataShareValueObject valueObj(static_cast<int>(DefaultCardType::DATA));
-    value.Put(SimRdbInfo::SLOT_INDEX, slotObj);
-    value.Put(SimRdbInfo::CARD_TYPE, valueObj);
+    value.Put(SimData::SLOT_INDEX, slotObj);
+    value.Put(SimData::CARD_TYPE, valueObj);
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::SetDefaultCellularData failed by nullptr");
@@ -292,37 +293,37 @@ void SimRdbHelper::SaveDataToBean(std::shared_ptr<DataShare::DataShareResultSet>
 {
     TELEPHONY_LOGI("SimRdbHelper::SaveDataToBean");
     int index = 0;
-    result->GetColumnIndex(SimRdbInfo::SIM_ID, index);
+    result->GetColumnIndex(SimData::SIM_ID, index);
     result->GetInt(index, simBean.simId);
-    result->GetColumnIndex(SimRdbInfo::ICC_ID, index);
+    result->GetColumnIndex(SimData::ICC_ID, index);
     result->GetString(index, simBean.iccId);
-    result->GetColumnIndex(SimRdbInfo::CARD_ID, index);
+    result->GetColumnIndex(SimData::CARD_ID, index);
     result->GetString(index, simBean.cardId);
-    result->GetColumnIndex(SimRdbInfo::IMS_SWITCH, index);
+    result->GetColumnIndex(SimData::IMS_SWITCH, index);
     result->GetInt(index, simBean.imsSwitch);
-    result->GetColumnIndex(SimRdbInfo::SLOT_INDEX, index);
+    result->GetColumnIndex(SimData::SLOT_INDEX, index);
     result->GetInt(index, simBean.slotIndex);
-    result->GetColumnIndex(SimRdbInfo::CARD_TYPE, index);
+    result->GetColumnIndex(SimData::CARD_TYPE, index);
     result->GetInt(index, simBean.cardType);
-    result->GetColumnIndex(SimRdbInfo::SHOW_NAME, index);
+    result->GetColumnIndex(SimData::SHOW_NAME, index);
     result->GetString(index, simBean.showName);
-    result->GetColumnIndex(SimRdbInfo::PHONE_NUMBER, index);
+    result->GetColumnIndex(SimData::PHONE_NUMBER, index);
     result->GetString(index, simBean.phoneNumber);
-    result->GetColumnIndex(SimRdbInfo::COUNTRY_CODE, index);
+    result->GetColumnIndex(SimData::COUNTRY_CODE, index);
     result->GetString(index, simBean.countryCode);
-    result->GetColumnIndex(SimRdbInfo::LANGUAGE, index);
+    result->GetColumnIndex(SimData::LANGUAGE, index);
     result->GetString(index, simBean.language);
-    result->GetColumnIndex(SimRdbInfo::IMSI, index);
+    result->GetColumnIndex(SimData::IMSI, index);
     result->GetString(index, simBean.imsi);
-    result->GetColumnIndex(SimRdbInfo::IS_MAIN_CARD, index);
+    result->GetColumnIndex(SimData::IS_MAIN_CARD, index);
     result->GetInt(index, simBean.isMainCard);
-    result->GetColumnIndex(SimRdbInfo::IS_VOICE_CARD, index);
+    result->GetColumnIndex(SimData::IS_VOICE_CARD, index);
     result->GetInt(index, simBean.isVoiceCard);
-    result->GetColumnIndex(SimRdbInfo::IS_MESSAGE_CARD, index);
+    result->GetColumnIndex(SimData::IS_MESSAGE_CARD, index);
     result->GetInt(index, simBean.isMessageCard);
-    result->GetColumnIndex(SimRdbInfo::IS_CELLULAR_DATA_CARD, index);
+    result->GetColumnIndex(SimData::IS_CELLULAR_DATA_CARD, index);
     result->GetInt(index, simBean.isCellularDataCard);
-    result->GetColumnIndex(SimRdbInfo::IS_ACTIVE, index);
+    result->GetColumnIndex(SimData::IS_ACTIVE, index);
     result->GetInt(index, simBean.isActive);
 }
 
@@ -332,7 +333,7 @@ int32_t SimRdbHelper::QueryDataBySlotId(int32_t slotId, SimRdbInfo &simBean)
     std::string slot = std::to_string(slotId);
     std::vector<std::string> colume;
     DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(SimRdbInfo::SLOT_INDEX, slot);
+    predicates.EqualTo(SimData::SLOT_INDEX, slot);
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::QueryDataBySlotId get nothing");
@@ -352,7 +353,7 @@ int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)
     TELEPHONY_LOGI("SimRdbHelper::QueryDataByIccId");
     std::vector<std::string> colume;
     DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(SimRdbInfo::ICC_ID, iccId);
+    predicates.EqualTo(SimData::ICC_ID, iccId);
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::QueryDataByIccId get nothing");
@@ -394,7 +395,7 @@ int32_t SimRdbHelper::QueryAllValidData(std::vector<SimRdbInfo> &vec)
     std::vector<std::string> colume;
     std::string id = std::to_string(DEACTIVE);
     DataShare::DataSharePredicates predicates;
-    predicates.GreaterThan(SimRdbInfo::IS_ACTIVE, id);
+    predicates.GreaterThan(SimData::IS_ACTIVE, id);
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::QueryAllValidData get nothing");
@@ -416,7 +417,7 @@ int32_t SimRdbHelper::UpdateDataBySlotId(int32_t slotId, const DataShare::DataSh
     TELEPHONY_LOGI("SimRdbHelper::UpdateDataBySlotId = %{public}d", slotId);
     std::string slot = std::to_string(slotId);
     DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(SimRdbInfo::SLOT_INDEX, slot);
+    predicates.EqualTo(SimData::SLOT_INDEX, slot);
     return Update(values, predicates);
 }
 
@@ -424,7 +425,7 @@ int32_t SimRdbHelper::UpdateDataByIccId(std::string iccId, const DataShare::Data
 {
     TELEPHONY_LOGI("SimRdbHelper::UpdateDataByIccId");
     DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(SimRdbInfo::ICC_ID, iccId);
+    predicates.EqualTo(SimData::ICC_ID, iccId);
     return Update(values, predicates);
 }
 
@@ -434,7 +435,7 @@ int32_t SimRdbHelper::ForgetAllData()
     DataShare::DataSharePredicates predicates;
     DataShare::DataShareValuesBucket value;
     DataShare::DataShareValueObject valueObj(DEACTIVE);
-    value.Put(SimRdbInfo::IS_ACTIVE, valueObj);
+    value.Put(SimData::IS_ACTIVE, valueObj);
     return Update(value, predicates);
 }
 
@@ -442,10 +443,10 @@ int32_t SimRdbHelper::ForgetAllData(int32_t slotId)
 {
     TELEPHONY_LOGI("SimRdbHelper::ForgetAllData slotId = %{public}d", slotId);
     DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(SimRdbInfo::SLOT_INDEX, std::to_string(slotId));
+    predicates.EqualTo(SimData::SLOT_INDEX, std::to_string(slotId));
     DataShare::DataShareValuesBucket value;
     DataShare::DataShareValueObject valueObj(DEACTIVE);
-    value.Put(SimRdbInfo::IS_ACTIVE, valueObj);
+    value.Put(SimData::IS_ACTIVE, valueObj);
     return Update(value, predicates);
 }
 
@@ -453,7 +454,7 @@ int32_t SimRdbHelper::ClearData()
 {
     std::string id = std::to_string(INVALID_VALUE);
     DataShare::DataSharePredicates predicates;
-    predicates.GreaterThan(SimRdbInfo::SIM_ID, id);
+    predicates.GreaterThan(SimData::SIM_ID, id);
     return Delete(predicates);
 }
 } // namespace Telephony

@@ -131,6 +131,7 @@ bool NetworkSearchHandler::InitOperatorName()
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     operatorName_ = std::make_shared<OperatorName>(
         subscriberInfo, nsm->GetNetworkSearchState(slotId_), nsm->GetSimManager(), networkSearchManager_, slotId_);
     if (operatorName_ == nullptr) {
@@ -356,6 +357,11 @@ void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::P
     if (networkRegister_ != nullptr) {
         networkRegister_->ProcessCsRegister(event);
     }
+
+    sptr<NetworkSearchCallBackBase> cellularCall = networkSearchManager->GetCellularCallCallBack();
+    if (cellularCall) {
+        cellularCall->SetReadyToCall(slotId_, true);
+    }
     TELEPHONY_LOGD("NetworkSearchHandler::RadioRilVoiceRegState slotId:%{public}d", slotId_);
 }
 
@@ -457,16 +463,23 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
     }
     networkSearchState->NotifyStateChange();
     networkSearchManager->SetNrOptionMode(slotId_, NrMode::NR_MODE_UNKNOWN);
-    if (!networkSearchManager->GetAirplaneMode() && radioState == CORE_SERVICE_POWER_OFF) {
+    bool isAirplaneModeOn = false;
+    if (networkSearchManager->GetAirplaneMode(isAirplaneModeOn) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("RadioOffOrUnavailableState GetAirplaneMode fail slotId:%{public}d", slotId_);
+        return;
+    }
+    if (!isAirplaneModeOn && radioState == CORE_SERVICE_POWER_OFF) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
     }
     sptr<NetworkSearchCallBackBase> cellularData = networkSearchManager->GetCellularDataCallBack();
     if (cellularData) {
         cellularData->ClearCellularDataConnections(slotId_);
+        TELEPHONY_LOGD("RadioOffOrUnavailableState ClearCellularDataConnections");
     }
     sptr<NetworkSearchCallBackBase> cellularCall = networkSearchManager->GetCellularCallCallBack();
     if (cellularCall) {
         cellularCall->ClearCellularCallList(slotId_);
+        TELEPHONY_LOGD("RadioOffOrUnavailableState ClearCellularCallList");
     }
 }
 
