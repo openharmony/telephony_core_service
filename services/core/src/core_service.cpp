@@ -21,6 +21,7 @@
 #include "network_search_manager.h"
 #include "network_search_types.h"
 #include "parameter.h"
+#include "runner_pool.h"
 #include "sim_manager.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
@@ -56,7 +57,7 @@ void CoreService::OnStart()
         }
         registerToService_ = true;
     }
-
+    RunnerPool::GetInstance().Init();
     if (!Init()) {
         TELEPHONY_LOGE("failed to init CoreService");
         return;
@@ -1134,7 +1135,7 @@ int32_t CoreService::HasOperatorPrivileges(const int32_t slotId, bool &hasOperat
 }
 
 int32_t CoreService::SimAuthentication(
-    int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response)
+    int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_STATE");
@@ -1145,7 +1146,7 @@ int32_t CoreService::SimAuthentication(
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->SimAuthentication(slotId, aid, authData, response);
+    return simManager_->SimAuthentication(slotId, authType, authData, response);
 }
 
 int32_t CoreService::RegisterImsRegInfoCallback(

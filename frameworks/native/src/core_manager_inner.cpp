@@ -1530,6 +1530,26 @@ int32_t CoreManagerInner::GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvT
     }
     return networkSearchManager_->GetImsRegStatus(slotId, imsSrvType, info);
 }
+
+int32_t CoreManagerInner::GetAirplaneMode(bool &airplaneMode)
+{
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->GetAirplaneMode(airplaneMode);
+}
+
+int32_t CoreManagerInner::UpdateRadioOn(int32_t slotId)
+{
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    networkSearchManager_->UpdateRadioOn(slotId);
+    return TELEPHONY_SUCCESS;
+}
+
 /******************** networkSearchManager end ************************/
 /******************** simManager_ start *******************/
 

@@ -11,12 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/telephony/core_service/telephony.gni")
+TELEPHONY_CORE_SERVICE_ROOT = "../../.."
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-
-TELEPHONY_CORE_SERVICE_ROOT = "//base/telephony/core_service"
-TELEPHONY_SIM_ROOT = "//base/telephony/core_service/services/sim"
+TELEPHONY_SIM_ROOT = "$TELEPHONY_CORE_SERVICE_ROOT/services/sim"
 
 ohos_executable("tel_ril_test") {
   install_enable = true
@@ -30,17 +27,14 @@ ohos_executable("tel_ril_test") {
     "$TELEPHONY_SIM_ROOT/include",
   ]
 
-  defines += [
+  defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceRilTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+  configs = [ "$TELEPHONY_CORE_SERVICE_ROOT/utils:telephony_log_config" ]
 
-  deps = [
-    "$hdf_uhdf_path/hdi:libhdi",
-    "//base/telephony/core_service:tel_core_service",
-  ]
+  deps = [ "$TELEPHONY_CORE_SERVICE_ROOT:tel_core_service" ]
 
   external_deps = [
     "c_utils:utils",
@@ -48,6 +42,7 @@ ohos_executable("tel_ril_test") {
     "drivers_interface_ril:hril_innerkits",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "hdf_core:libhdi",
     "init:libbegetutil",
     "ipc:ipc_core",
     "power_manager:powermgr_client",

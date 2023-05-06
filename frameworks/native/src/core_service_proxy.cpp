@@ -2547,7 +2547,7 @@ int32_t CoreServiceProxy::HasOperatorPrivileges(const int32_t slotId, bool &hasO
 }
 
 int32_t CoreServiceProxy::SimAuthentication(
-    int32_t slotId, const std::string &aid, const std::string &authData, SimAuthenticationResponse &response)
+    int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -2557,7 +2557,7 @@ int32_t CoreServiceProxy::SimAuthentication(
         return ERROR;
     }
     data.WriteInt32(slotId);
-    data.WriteString(aid);
+    data.WriteInt32(static_cast<int32_t>(authType));
     data.WriteString(authData);
     auto remote = Remote();
     if (remote == nullptr) {

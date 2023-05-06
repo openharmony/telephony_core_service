@@ -17,6 +17,7 @@
 
 #include "core_service_errors.h"
 #include "radio_event.h"
+#include "runner_pool.h"
 #include "telephony_errors.h"
 
 namespace OHOS {
@@ -36,7 +37,7 @@ void IccDiallingNumbersManager::Init()
         return;
     }
 
-    eventLoopDiallingNumbers_ = AppExecFwk::EventRunner::Create("diallingNumbersCacheLoop");
+    eventLoopDiallingNumbers_ = RunnerPool::GetInstance().GetCommonRunner();
     if (eventLoopDiallingNumbers_.get() == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersManager failed to create EventRunner");
         return;
@@ -53,7 +54,6 @@ void IccDiallingNumbersManager::Init()
         return;
     }
 
-    eventLoopDiallingNumbers_->Run();
     stateDiallingNumbers_ = HandleRunningState::STATE_RUNNING;
 
     diallingNumbersCache_->Init();
@@ -94,6 +94,7 @@ void IccDiallingNumbersManager::InitFdnCache()
 {
     TELEPHONY_LOGI("IccDiallingNumbersManager::InitFdnCache start");
     std::thread initTask([&]() {
+        pthread_setname_np(pthread_self(), "init_fdn_cache");
         std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers;
         QueryIccDiallingNumbers(DiallingNumbersInfo::SIM_FDN, diallingNumbers);
     });
@@ -340,8 +341,7 @@ bool IccDiallingNumbersManager::IsValidType(int type)
 std::shared_ptr<IccDiallingNumbersManager> IccDiallingNumbersManager::CreateInstance(
     const std::shared_ptr<SimFileManager> &simFile, const std::shared_ptr<SimStateManager> &simState)
 {
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoop =
-        AppExecFwk::EventRunner::Create("diallingNumbersManagerLoop");
+    std::shared_ptr<AppExecFwk::EventRunner> eventLoop = RunnerPool::GetInstance().GetCommonRunner();
     if (eventLoop.get() == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersManager  failed to create EventRunner");
         return nullptr;
@@ -356,7 +356,6 @@ std::shared_ptr<IccDiallingNumbersManager> IccDiallingNumbersManager::CreateInst
         TELEPHONY_LOGE("IccDiallingNumbersManager::Init manager create nullptr.");
         return nullptr;
     }
-    eventLoop->Run();
     return manager;
 }
 

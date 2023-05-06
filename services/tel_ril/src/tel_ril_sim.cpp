@@ -283,7 +283,11 @@ int32_t TelRilSim::SimTransmitApduBasicChannelResponse(
 int32_t TelRilSim::SimAuthenticationResponse(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::IccIoResultInfo &result)
 {
-    return ResponseIccIo(responseInfo, result);
+    std::shared_ptr<IccIoResultInfo> simAuthResp = std::make_shared<IccIoResultInfo>();
+    simAuthResp->sw1 = result.sw1;
+    simAuthResp->sw2 = result.sw2;
+    simAuthResp->response = result.response;
+    return Response<IccIoResultInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, simAuthResp);
 }
 
 int32_t TelRilSim::UnlockSimLockResponse(
@@ -459,6 +463,7 @@ int32_t TelRilSim::SimAuthentication(
     const SimAuthenticationRequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
 {
     OHOS::HDI::Ril::V1_1::SimAuthenticationRequestInfo simAuthInfo;
+    simAuthInfo.serial = reqInfo.serial;
     simAuthInfo.aid = reqInfo.aid;
     simAuthInfo.authData = reqInfo.authData;
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_AUTHENTICATION, &HDI::Ril::V1_1::IRil::SimAuthentication,

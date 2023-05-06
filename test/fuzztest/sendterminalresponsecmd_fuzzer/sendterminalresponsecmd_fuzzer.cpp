@@ -37,6 +37,7 @@ bool IsServiceInited()
     if (!g_isInited) {
         auto onStart = [] { DelayedSingleton<CoreService>::GetInstance()->OnStart(); };
         std::thread startThread(onStart);
+        pthread_setname_np(startThread.native_handle(), "sendterminalresponsecmd_fuzzer");
         startThread.join();
 
         sleep(SLEEP_TIME_SECONDS);

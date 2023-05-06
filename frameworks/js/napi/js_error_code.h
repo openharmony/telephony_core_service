@@ -70,6 +70,11 @@ enum JsErrorCode {
     JS_ERROR_TELEPHONY_NO_SIM_CARD,
 
     /**
+     * Airplane mode is on.
+     */
+    JS_ERROR_TELEPHONY_AIRPLANE_MODE_ON,
+
+    /**
      * Unknown error code.
      */
     JS_ERROR_TELEPHONY_UNKNOW_ERROR = 8300999,

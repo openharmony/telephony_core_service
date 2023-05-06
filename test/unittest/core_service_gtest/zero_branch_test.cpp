@@ -413,6 +413,7 @@ HWTEST_F(BranchTest, Telephony_SimFile_002, Function | MediumTest | Level1)
     EXPECT_TRUE(simFile->ProcessGetEhplmnDone(event));
     EXPECT_TRUE(simFile->ProcessGetPnnDone(event));
     EXPECT_TRUE(simFile->ProcessGetOplDone(event));
+    EXPECT_TRUE(simFile->ProcessGetOpl5gDone(event));
     EXPECT_FALSE(simFile->ProcessUpdateDone(event));
     EXPECT_TRUE(simFile->ProcessSetCphsMailbox(event));
     EXPECT_TRUE(simFile->ProcessGetFplmnDone(event));
@@ -504,6 +505,12 @@ HWTEST_F(BranchTest, Telephony_SimFile_004, Function | MediumTest | Level1)
     simFile->ParseOpl(emptyRecords);
     simFile->ParsePnn(records);
     simFile->ParseOpl(records);
+    std::vector<std::string> invalidRecords = { "64F0100000GGGG02", "64F0000000GGGG01" };
+    simFile->ParseOpl(invalidRecords);
+    std::vector<std::string> invalidPlmnRecords = { "F640100000FFFE02", "F640000000FFFE01" };
+    simFile->ParseOpl(invalidPlmnRecords);
+    std::vector<std::string> records5g = { "64F0100000FFFE02", "64F0000000FFFE01" };
+    simFile->ParseOpl(records5g);
     SimFile::SpnStatus newStatus;
     EXPECT_TRUE(simFile->IsContinueGetSpn(false, SimFile::SpnStatus::OBTAIN_SPN_NONE, newStatus));
     EXPECT_TRUE(simFile->IsContinueGetSpn(true, SimFile::SpnStatus::OBTAIN_SPN_NONE, newStatus));
@@ -520,6 +527,35 @@ HWTEST_F(BranchTest, Telephony_SimFile_004, Function | MediumTest | Level1)
     EXPECT_EQ(simFile->ParseSpn("CMCC", OBTAIN_OPERATOR_NAMESTRING), "\xC0\xCC");
     EXPECT_EQ(simFile->ParseSpn("CMCC", OBTAIN_OPERATOR_NAME_SHORTFORM), "\xC0\xCC");
     EXPECT_EQ(simFile->ParseSpn("", 0), "");
+}
+
+/**
+ * @tc.number   Telephony_SimFile_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SimFile_005, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->OnInit();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("SimFile");
+    std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(eventLoopRecord, simStateManager);
+    std::vector<std::string> emptyRecords = {};
+    simFile->ParseOpl5g(emptyRecords);
+    EXPECT_TRUE(simFile->opl5gFiles_.empty());
+    std::vector<std::string> records = { "46000", "46002", "46004", "46007", "46008" };
+    simFile->ParseOpl5g(records);
+    EXPECT_TRUE(simFile->opl5gFiles_.empty());
+    std::vector<std::string> invalidRecords = { "64F010000000GGGGGG02", "64F000000000GGGGGG01" };
+    simFile->ParseOpl5g(invalidRecords);
+    EXPECT_TRUE(simFile->opl5gFiles_.empty());
+    std::vector<std::string> invalidPlmnRecords = { "F64010000000FFFFFE02", "F64000000000FFFFFE01" };
+    simFile->ParseOpl5g(invalidPlmnRecords);
+    EXPECT_TRUE(simFile->opl5gFiles_.empty());
+    std::vector<std::string> records5g = { "64F010000000FFFFFE02", "64F000000000FFFFFE01" };
+    simFile->ParseOpl5g(records5g);
+    EXPECT_FALSE(simFile->opl5gFiles_.empty());
 }
 
 /**
@@ -689,6 +725,9 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_001, Function | MediumTest | Lev
     EXPECT_GT(mInner.GetLinkBandwidthInfo(0, 0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     LinkBandwidthRule mLinkBandwidthRule;
     EXPECT_GT(mInner.SetLinkBandwidthReportingRule(0, 0, mLinkBandwidthRule, nullptr), TELEPHONY_ERR_SUCCESS);
+    bool airplaneMode = false;
+    EXPECT_GT(mInner.GetAirplaneMode(airplaneMode), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.UpdateRadioOn(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1247,9 +1286,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_003, Function | MediumTest | Level1)
     bool boolResult = false;
     EXPECT_GT(simManager->HasOperatorPrivileges(0, boolResult), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->HasOperatorPrivileges(INVALID_SLOTID, boolResult), TELEPHONY_ERR_SUCCESS);
-    SimAuthenticationResponse mResponse;
-    EXPECT_NE(simManager->SimAuthentication(0, "", "", mResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->SimAuthentication(INVALID_SLOTID, "", "", mResponse), TELEPHONY_ERR_SUCCESS);
     int32_t testRadioProtocolTech = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN);
     EXPECT_EQ(simManager->GetRadioProtocolTech(0), testRadioProtocolTech);
     EXPECT_EQ(simManager->GetRadioProtocolTech(INVALID_SLOTID), testRadioProtocolTech);
@@ -1304,6 +1340,13 @@ HWTEST_F(BranchTest, Telephony_SimManager_004, Function | MediumTest | Level1)
     std::string testString = "";
     EXPECT_NE(simManager->ObtainSpnCondition(0, true, testString), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->ObtainSpnCondition(INVALID_SLOTID, true, testString), TELEPHONY_ERR_SUCCESS);
+    SimAuthenticationResponse mResponse;
+    EXPECT_NE(simManager->SimAuthentication(0, static_cast<AuthType>(0), "", mResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(
+        simManager->SimAuthentication(INVALID_SLOTID, static_cast<AuthType>(0), "", mResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(simManager->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(simManager->SimAuthentication(INVALID_SLOTID, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mResponse),
+        TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1343,12 +1386,33 @@ HWTEST_F(BranchTest, Telephony_SimStateManager_001, Function | MediumTest | Leve
     PersoLockInfo mPersoLockInfo;
     EXPECT_GT(simStateManager->UnlockSimLock(0, mPersoLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
     SimAuthenticationResponse mResponse;
-    EXPECT_NE(simStateManager->SimAuthentication(0, "", "", mResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(
+        simStateManager->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mResponse), TELEPHONY_ERR_SUCCESS);
     auto simStateManagerTwo = std::make_shared<SimStateManager>(telRilManager);
     simStateManager->simStateHandle_ = std::make_shared<SimStateHandle>(runner, simStateManagerTwo);
     EXPECT_GE(simStateManager->GetCardType(), CardType::UNKNOWN_CARD);
     EXPECT_GT(simStateManager->UnlockSimLock(0, mPersoLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simStateManager->SimAuthentication(0, "", "", mResponse), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_SimStateHandle_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SimStateHandle_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    auto simStateHandle = std::make_shared<SimStateHandle>(runner, simStateManager);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::SINGLE_MODE_RUIM_CARD), CDMA_FAKE_AID);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::SINGLE_MODE_SIM_CARD), GSM_FAKE_AID);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::DUAL_MODE_CG_CARD), GSM_FAKE_AID);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::CT_NATIONAL_ROAMING_CARD), GSM_FAKE_AID);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::CU_DUAL_MODE_CARD), GSM_FAKE_AID);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::DUAL_MODE_TELECOM_LTE_CARD), GSM_FAKE_AID);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::DUAL_MODE_UG_CARD), GSM_FAKE_AID);
+    EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::UNKNOWN_CARD), USIM_AID);
 }
 
 /**
@@ -1621,6 +1685,9 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     EXPECT_TRUE(cellInfo.empty());
     EXPECT_NE(networkSearchManager->SendUpdateCellLocationRequest(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
     EXPECT_TRUE(networkSearchManager->GetCellLocation(INVALID_SLOTID) == nullptr);
+    bool airplaneMode = false;
+    EXPECT_NE(networkSearchManager->GetAirplaneMode(airplaneMode), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->UpdateRadioOn(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1667,6 +1734,9 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_002, Function | MediumTest |
     networkSearchManager->SetNrOptionMode(INVALID_SLOTID, NrMode::NR_MODE_UNKNOWN);
     networkSearchManager->SetFrequencyType(INVALID_SLOTID, FrequencyType::FREQ_TYPE_MMWAVE);
     networkSearchManager->SetRadioFirstPowerOn(INVALID_SLOTID, true);
+    networkSearchManager->SetLocalAirplaneMode(INVALID_SLOTID, true);
+    bool state = false;
+    networkSearchManager->GetLocalAirplaneMode(INVALID_SLOTID, state);
     EXPECT_TRUE(networkSearchManager->GetNetworkSearchInformationValue(INVALID_SLOTID) == nullptr);
     EXPECT_TRUE(networkSearchManager->GetNetworkSearchState(INVALID_SLOTID) != nullptr);
     EXPECT_TRUE(networkSearchManager->IsRadioFirstPowerOn(INVALID_SLOTID));
@@ -1890,6 +1960,7 @@ HWTEST_F(BranchTest, Telephony_UsimFileController_001, Function | MediumTest | L
     EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_MBDN), "");
     EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_PNN), "");
     EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_OPL), "");
+    EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_OPL5G), "");
     EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_SPDI), "");
     EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_SST), "");
     EXPECT_NE(uSimFileController->ObtainElementFilePath(ELEMENTARY_FILE_CFIS), "");

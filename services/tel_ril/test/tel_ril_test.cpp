@@ -714,8 +714,27 @@ void TelRilTest::OnRequestSimAuthenticationTest(int32_t slotId,
         std::cerr << "telRilManager is nullptr" << std::endl;
         return;
     }
+    int32_t authType;
+    std::string aid;
+    std::string authData;
+
+    std::cout << "please enter the authType:" << std::endl;
+    std::cout << "SIM_AUTH_EAP_SIM_TYPE is 128" << std::endl;
+    std::cout << "SIM_AUTH_EAP_AKA_TYPE is 129" << std::endl;
+    std::cin >> authType;
+    std::cout << "please enter the aid:" << std::endl;
+    std::cout << "USIM_AID" << std::endl;
+    std::cout << "CDMA_FAKE_AID" << std::endl;
+    std::cout << "GSM_FAKE_AID" << std::endl;
+    std::cin >> aid;
+    std::cout << "please enter the authData base64 encoded:" << std::endl;
+    std::cin >> authData;
     SimAuthenticationRequestInfo reqInfo;
-    telRilManager_->SimAuthentication(slotId, reqInfo, event);
+    reqInfo.serial = authType;
+    reqInfo.aid = aid;
+    reqInfo.authData = authData;
+    int ret = telRilManager_->SimAuthentication(slotId, reqInfo, event);
+    TELEPHONY_LOGI("OnRequestSimAuthenticationTest ret = %{public}d", ret);
     std::cout << "TelRilTest::OnRequestSimAuthenticationTest end" << std::endl;
 }
 

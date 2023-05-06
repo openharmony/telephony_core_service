@@ -120,8 +120,8 @@ public:
     int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) override;
     int32_t SendUpdateCellLocationRequest(int32_t slotId) override;
     int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) override;
-    int32_t SimAuthentication(int32_t slotId, const std::string &aid, const std::string &authData,
-        SimAuthenticationResponse &response) override;
+    int32_t SimAuthentication(
+        int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response) override;
     int32_t RegisterImsRegInfoCallback(
         int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback) override;
     int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType) override;
