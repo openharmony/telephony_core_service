@@ -131,6 +131,7 @@ bool NetworkSearchHandler::InitOperatorName()
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     operatorName_ = std::make_shared<OperatorName>(
         subscriberInfo, nsm->GetNetworkSearchState(slotId_), nsm->GetSimManager(), networkSearchManager_, slotId_);
     if (operatorName_ == nullptr) {
