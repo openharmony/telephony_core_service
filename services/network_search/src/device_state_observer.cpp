@@ -41,6 +41,7 @@ void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceState
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_CHARGING);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_DISCHARGING);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     subscriber_ = std::make_shared<DeviceStateEventSubscriber>(subscriberInfo);
     subscriber_->SetEventHandler(deviceStateHandler);
     subscriber_->InitEventMap();
