@@ -131,6 +131,7 @@ protected:
     std::string fplmns_ = "";
     std::vector<std::shared_ptr<PlmnNetworkName>> pnnFiles_;
     std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles_;
+    std::vector<std::shared_ptr<OperatorPlmnInfo>> opl5gFiles_;
     int lengthOfMnc_ = DEFAULT_MNC;
     int indexOfMailbox_ = 1;
     int fileToGet_ = 0;
@@ -140,6 +141,8 @@ protected:
     bool waitResult_ = false;
     static std::mutex mtx_;
     std::condition_variable processWait_;
+    const int HEXADECIMAL = 16;
+    const size_t OPL_5G_LENGTH = 10;
     const uint8_t BYTE_NUM = 0xFF;
     const uint8_t BYTE_NUM2 = 0x01;
     const uint8_t BYTE_NUM3 = 0x0F;

@@ -113,6 +113,7 @@ private:
     bool ProcessGetEhplmnDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetPnnDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetOplDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessGetOpl5gDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessSetCphsMailbox(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetFplmnDone(const AppExecFwk::InnerEvent::Pointer &event);
@@ -145,6 +146,7 @@ private:
     std::string ParseSpn(const std::string &rawData, int curState);
     void ParsePnn(const std::vector<std::string> &records);
     void ParseOpl(const std::vector<std::string> &records);
+    void ParseOpl5g(const std::vector<std::string> &records);
 };
 } // namespace Telephony
 } // namespace OHOS
