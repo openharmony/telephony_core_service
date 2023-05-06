@@ -94,6 +94,7 @@ void IccDiallingNumbersManager::InitFdnCache()
 {
     TELEPHONY_LOGI("IccDiallingNumbersManager::InitFdnCache start");
     std::thread initTask([&]() {
+        pthread_setname_np(pthread_self(), "init_fdn_cache");
         std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers;
         QueryIccDiallingNumbers(DiallingNumbersInfo::SIM_FDN, diallingNumbers);
     });

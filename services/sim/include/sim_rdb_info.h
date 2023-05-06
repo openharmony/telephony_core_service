@@ -20,23 +20,6 @@ namespace OHOS {
 namespace Telephony {
 class SimRdbInfo {
 public:
-    static constexpr const char *SIM_ID = "sim_id";
-    static constexpr const char *ICC_ID = "icc_id";
-    static constexpr const char *CARD_ID = "card_id";
-    static constexpr const char *SLOT_INDEX = "slot_index";
-    static constexpr const char *SHOW_NAME = "show_name";
-    static constexpr const char *PHONE_NUMBER = "phone_number";
-    static constexpr const char *COUNTRY_CODE = "country_code";
-    static constexpr const char *LANGUAGE = "language";
-    static constexpr const char *IMSI = "imsi";
-    static constexpr const char *CARD_TYPE = "card_type";
-    static constexpr const char *IMS_SWITCH = "ims_switch";
-    static constexpr const char *IS_ACTIVE = "is_active";
-    static constexpr const char *IS_MAIN_CARD = "is_main_card";
-    static constexpr const char *IS_VOICE_CARD = "is_voice_card";
-    static constexpr const char *IS_MESSAGE_CARD = "is_message_card";
-    static constexpr const char *IS_CELLULAR_DATA_CARD = "is_cellular_data_card";
-    inline static const std::string SIM_RDB_URI = "datashare:///com.ohos.simability";
     inline static const std::string SIM_RDB_SELECTION = "datashare:///com.ohos.simability/sim/sim_info";
     inline static const std::string SIM_RDB_DEFAULT_SET_URI =
         "datashare:///com.ohos.simability/sim/sim_info/set_card";
