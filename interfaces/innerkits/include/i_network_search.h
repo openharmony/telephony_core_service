@@ -81,6 +81,8 @@ public:
         const sptr<ImsRegInfoCallback> &callback) = 0;
     virtual int32_t UnregisterImsRegInfoCallback(
         int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName) = 0;
+    virtual int32_t GetAirplaneMode(bool &airplaneMode) = 0;
+    virtual int32_t UpdateRadioOn(int32_t slotId) = 0;
     /**
      * @brief support Nr network or not
      *

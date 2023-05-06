@@ -14,12 +14,14 @@
  */
 
 #include "icc_file.h"
+
+#include "core_manager_inner.h"
 #include "if_system_ability_manager.h"
 #include "inner_event.h"
 #include "iservice_registry.h"
+#include "radio_event.h"
 #include "system_ability_definition.h"
 #include "telephony_state_registry_client.h"
-#include "radio_event.h"
 
 using namespace std;
 using namespace OHOS::AppExecFwk;
@@ -204,21 +206,29 @@ std::string IccFile::ObtainSPN()
 
 std::string IccFile::ObtainEons(const std::string &plmn, int32_t lac, bool longNameRequired)
 {
+    std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles = oplFiles_;
+    sptr<NetworkState> networkState = nullptr;
+    CoreManagerInner::GetInstance().GetNetworkStatus(slotId_, networkState);
+    if (networkState != nullptr && !(opl5gFiles_.empty())) {
+        NrState nrState = networkState->GetNrState();
+        if (nrState == NrState::NR_NSA_STATE_SA_ATTACHED) {
+            oplFiles = opl5gFiles_;
+        }
+    }
     bool roaming = (plmn.compare(operatorNumeric_) == 0 ? false : true);
     TELEPHONY_LOGI("ObtainEons roaming:%{public}d", roaming);
-    if (plmn.empty() || pnnFiles_.empty() || (oplFiles_.empty() && roaming)) {
+    if (plmn.empty() || pnnFiles_.empty() || (oplFiles.empty() && roaming)) {
         TELEPHONY_LOGE("ObtainEons is empty");
         return "";
     }
     int pnnIndex = 1;
-    for (std::shared_ptr<OperatorPlmnInfo> opl : oplFiles_) {
+    for (std::shared_ptr<OperatorPlmnInfo> opl : oplFiles) {
         if (opl == nullptr) {
             continue;
         }
         pnnIndex = -1;
-        TELEPHONY_LOGI(
-            "ObtainEons plmn:%{public}s, opl->plmnNumeric:%{public}s, lac:%{public}d, "
-            "opl->lacStart:%{public}d, opl->lacEnd:%{public}d, opl->pnnRecordId:%{public}d",
+        TELEPHONY_LOGD("ObtainEons plmn:%{public}s, opl->plmnNumeric:%{public}s, lac:%{public}d, "
+                       "opl->lacStart:%{public}d, opl->lacEnd:%{public}d, opl->pnnRecordId:%{public}d",
             plmn.c_str(), opl->plmnNumeric.c_str(), lac, opl->lacStart, opl->lacEnd, opl->pnnRecordId);
         if (plmn.compare(opl->plmnNumeric) == 0 &&
             ((opl->lacStart == 0 && opl->lacEnd == 0xfffe) || (opl->lacStart <= lac && opl->lacEnd >= lac))) {
