@@ -23,6 +23,7 @@
 #include "addcoreservicetoken_fuzzer.h"
 #include "core_service.h"
 #include "napi_util.h"
+#include "sim_file.h"
 #include "system_ability_definition.h"
 #include "unistd.h"
 
@@ -33,6 +34,7 @@ constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t TYPE_NUM = 2;
 constexpr int32_t TWO_INT_NUM = 2;
 constexpr int32_t SLEEP_TIME_SECONDS = 10;
+bool g_flag = false;
 
 bool IsServiceInited()
 {
@@ -152,6 +154,27 @@ void SimAuthentication(const uint8_t *data, size_t size)
     DelayedSingleton<CoreService>::GetInstance()->OnSimAuthentication(dataMessageParcel, reply);
 }
 
+void ParseOpl5g(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    if (g_flag) {
+        return;
+    }
+    g_flag = true;
+
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("SimFile");
+    std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(eventLoopRecord, simStateManager);
+    std::string fileData(reinterpret_cast<const char *>(data), size);
+    std::vector<std::string> records;
+    records.push_back(fileData);
+    simFile->ParseOpl5g(records);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -164,6 +187,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetVoiceMailNumber(data, size);
     QueryIccDiallingNumbers(data, size);
     SimAuthentication(data, size);
+    ParseOpl5g(data, size);
     return;
 }
 } // namespace OHOS
