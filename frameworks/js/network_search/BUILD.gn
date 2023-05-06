@@ -10,23 +10,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//base/telephony/core_service/core_service_aafwk.gni")
-import("//base/telephony/core_service/telephony.gni")
+SUBSYSTEM_DIR = "../../../.."
 import("//build/ohos.gni")
-
-SUBSYSTEM_DIR = "//base/telephony"
 
 ohos_shared_library("radio") {
   include_dirs = [
-    "//third_party/node/src",
     "include",
     "$SUBSYSTEM_DIR/core_service/interfaces/kits/native",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/include",
-    "//commonlibrary/c_utils/base/include",
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
     "$SUBSYSTEM_DIR/core_service/common/sim",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "${ability_runtime_path}/interfaces/kits/native/ability/native",
   ]
 
   sources = [
@@ -43,20 +36,20 @@ ohos_shared_library("radio") {
     "src/set_radio_state_callback.cpp",
   ]
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+  configs = [ "$SUBSYSTEM_DIR/core_service/utils:telephony_log_config" ]
 
-  deps = [
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
-    "//foundation/arkui/napi:ace_napi",
-  ]
+  deps = [ "//third_party/node:node_header" ]
 
   external_deps = [
+    "ability_runtime:abilitykit_native",
     "c_utils:utils",
+    "core_service:tel_core_service_api",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",
+    "napi:ace_napi",
   ]
-  defines += [
+  defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceRadioJsApi\"",
     "LOG_DOMAIN = 0xD001F04",
   ]
