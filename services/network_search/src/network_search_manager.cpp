@@ -29,11 +29,6 @@
 namespace OHOS {
 namespace Telephony {
 namespace {
-const std::string KEY_DEFAULT_PREFERRED_NETWORK_MODE = "preferred_network_mode";
-const int32_t AIRPLANE_MODE_UNSUPPORT = 0;
-const int32_t AIRPLANE_MODE_SUPPORT = 1;
-const std::string SUPPORT_AIRPLANE_MODE_PARAM = "persist.sys.support_air_plane_mode";
-const int32_t IS_SUPPORT_AIRPLANE_MODE = system::GetIntParameter(SUPPORT_AIRPLANE_MODE_PARAM, AIRPLANE_MODE_UNSUPPORT);
 const size_t MCC_LEN = 3;
 } // namespace
 
@@ -112,7 +107,7 @@ bool NetworkSearchManagerInner::RegisterSetting()
 
     Uri autoTimeUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIME_URI);
     Uri autoTimezoneUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI);
-    Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
+    Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_URI);
     settingHelper->RegisterSettingsObserver(autoTimeUri, settingAutoTimeObserver_);
     settingHelper->RegisterSettingsObserver(autoTimezoneUri, settingAutoTimezoneObserver_);
     settingHelper->RegisterSettingsObserver(airplaneModeUri, airplaneModeObserver_);
@@ -129,7 +124,7 @@ bool NetworkSearchManagerInner::UnRegisterSetting()
 
     Uri autoTimeUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIME_URI);
     Uri autoTimezoneUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI);
-    Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
+    Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_URI);
     settingHelper->UnRegisterSettingsObserver(autoTimeUri, settingAutoTimeObserver_);
     settingHelper->UnRegisterSettingsObserver(autoTimezoneUri, settingAutoTimezoneObserver_);
     settingHelper->UnRegisterSettingsObserver(airplaneModeUri, airplaneModeObserver_);
@@ -170,6 +165,10 @@ bool NetworkSearchManager::OnInit()
         return false;
     }
     ClearManagerInner();
+    bool mode = false;
+    if (GetAirplaneMode(mode) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("NetworkSearchManager::Init GetAirplaneMode fail");
+    }
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
         std::shared_ptr<NetworkSearchManagerInner> inner = FindManagerInner(slotId);
         if (inner == nullptr) {
@@ -189,7 +188,8 @@ bool NetworkSearchManager::OnInit()
                 ClearManagerInner();
                 return false;
             }
-            TELEPHONY_LOGI("NetworkSearchManager::Init inner init slotId:%{public}d", slotId);
+            SetLocalAirplaneMode(slotId, mode);
+            TELEPHONY_LOGI("NetworkSearchManager::Init airplaneMode:%{public}d slotId:%{public}d", mode, slotId);
             // Prevent running crash and query the radio status at startup
             eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_STATUS);
         }
@@ -228,7 +228,6 @@ int32_t NetworkSearchManager::SetRadioState(int32_t slotId, bool isOn, int32_t r
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    AirplaneMode_ = isOn ? false : true;
     int32_t fun = static_cast<int32_t>(isOn);
     if (!eventSender_->SendCallback(slotId, RadioEvent::RADIO_SET_STATUS, &callback, fun, rst)) {
         TELEPHONY_LOGE("slotId:%{public}d SetRadioState SendCallback failed.", slotId);
@@ -799,9 +798,40 @@ void NetworkSearchManager::SavePreferredNetworkValue(int32_t slotId, int32_t net
     Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_PREFERRED_NETWORK_MODE_URI);
     std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE + "_" + std::to_string(slotId);
     std::string value = std::to_string(networkMode);
-    if (!settingHelper->Update(uri, key, value)) {
+    if (settingHelper->Update(uri, key, value) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Update %{public}s fail", key.c_str());
     }
+}
+
+int32_t NetworkSearchManager::UpdateRadioOn(int32_t slotId)
+{
+    std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("settingHelper is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_URI);
+    std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE;
+    int32_t airplaneModeOff = 0;
+    std::string value = std::to_string(airplaneModeOff);
+    int32_t ret = settingHelper->Update(uri, key, value);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("NetworkSearchManager::UpdateRadioOn Update fail");
+        return ret;
+    }
+    SetRadioState(slotId, CORE_SERVICE_POWER_ON, 0);
+    AAFwk::Want want;
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_AIRPLANE_MODE_CHANGED);
+    want.SetParam("state", false);
+    EventFwk::CommonEventData data;
+    data.SetWant(want);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    if (!EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr)) {
+        TELEPHONY_LOGE("PublishCommonEvent fail");
+        return TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t NetworkSearchManager::GetPreferredNetworkValue(int32_t slotId) const
@@ -816,7 +846,7 @@ int32_t NetworkSearchManager::GetPreferredNetworkValue(int32_t slotId) const
     Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_PREFERRED_NETWORK_MODE_URI);
     std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE + "_" + std::to_string(slotId);
     std::string value = "";
-    if (!settingHelper->Query(uri, key, value)) {
+    if (settingHelper->Query(uri, key, value) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("Query %{public}s fail", key.c_str());
         return networkMode;
     }
@@ -1173,28 +1203,24 @@ void NetworkSearchManager::TriggerTimezoneRefresh(int32_t slotId)
     TELEPHONY_LOGE("NetworkSearchManager::TriggerTimezoneRefresh slotId:%{public}d", slotId);
 }
 
-bool NetworkSearchManager::GetAirplaneMode()
+int32_t NetworkSearchManager::GetAirplaneMode(bool &airplaneMode)
 {
-    if (IS_SUPPORT_AIRPLANE_MODE == AIRPLANE_MODE_SUPPORT) {
-        TELEPHONY_LOGI("support airplane mode, return true");
-        return true;
-    }
     std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGI("settingHelper is null");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
+    Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_URI);
     std::string value = "";
     std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE;
-    if (!settingHelper->Query(uri, key, value)) {
+    if (settingHelper->Query(uri, key, value) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("Query airplane mode fail");
-        return false;
+        return TELEPHONY_ERR_DATABASE_READ_FAIL;
     }
-    bool airplaneMode = value == "1";
+    airplaneMode = value == "1";
     TELEPHONY_LOGI("Get airplane mode:%{public}d", airplaneMode);
-    return airplaneMode;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t NetworkSearchManager::RegisterImsRegInfoCallback(
@@ -1278,6 +1304,30 @@ void NetworkSearchManager::InitSimRadioProtocol(int32_t slotId)
         return;
     }
     simManager_->GetRadioProtocol(slotId);
+}
+
+int32_t NetworkSearchManager::SetLocalAirplaneMode(int32_t slotId, bool state)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("SetLocalAirplaneMode inner is nullptr, slotId:%{public}d", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    inner->airplaneMode_ = state;
+    TELEPHONY_LOGD("SetLocalAirplaneMode slotId:%{public}d state:%{public}d", slotId, state);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t NetworkSearchManager::GetLocalAirplaneMode(int32_t slotId, bool &state)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("GetLocalAirplaneMode inner is nullptr, slotId:%{public}d", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    state = inner->airplaneMode_;
+    TELEPHONY_LOGD("GetLocalAirplaneMode slotId:%{public}d state:%{public}d", slotId, state);
+    return TELEPHONY_ERR_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS
