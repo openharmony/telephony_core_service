@@ -22,8 +22,6 @@
 #include "sim_file_manager.h"
 #include "telephony_log_wrapper.h"
 #include "sim_constant.h"
-#include "sim_data.h"
-#include "rdb_sim_helper.h"
 
 namespace OHOS {
 namespace Telephony {

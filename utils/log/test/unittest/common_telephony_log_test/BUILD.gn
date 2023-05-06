@@ -13,18 +13,18 @@
 import("//build/ohos.gni")
 import("//build/test.gni")
 
-module_output_path = "//base/telephony/core_service/utils/telephonydfx"
+SOURCE_DIR = "../../../../../.."
+module_output_path = "$SOURCE_DIR/core_service/utils/telephonydfx"
 
 ohos_unittest("TelephonySALogTest") {
   module_out_path = module_output_path
 
-  sources = [
-    "//base/telephony/core_service/utils/log/src/telephony_log_wrapper.cpp",
-  ]
+  sources =
+      [ "$SOURCE_DIR/core_service/utils/log/src/telephony_log_wrapper.cpp" ]
 
   configs = [
-    "//base/telephony/core_service/utils:telephony_log_config",
-    "//base/telephony/core_service/utils/test:common_test_config",
+    "$SOURCE_DIR/core_service/utils:telephony_log_config",
+    "$SOURCE_DIR/core_service/utils/test:common_test_config",
   ]
 
   deps = [ "//third_party/googletest:gtest_main" ]
