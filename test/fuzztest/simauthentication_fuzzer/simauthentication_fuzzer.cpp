@@ -34,6 +34,7 @@ constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t TYPE_NUM = 2;
 constexpr int32_t TWO_INT_NUM = 2;
 constexpr int32_t SLEEP_TIME_SECONDS = 10;
+bool g_flag = false;
 
 bool IsServiceInited()
 {
@@ -174,6 +175,10 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
+    if (g_flag) {
+        return;
+    }
+    g_flag = true;
 
     OnRemoteRequest(data, size);
     GetSimTelephoneNumber(data, size);
