@@ -24,8 +24,10 @@
 #include "mcc_pool.h"
 #include "network_search_types.h"
 #include "telephony_config.h"
+#include "telephony_common_utils.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "parameter.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -36,6 +38,13 @@ const int32_t SERVICE_ABILITY_OFF = 0;
 const int32_t SERVICE_ABILITY_ON = 1;
 const int32_t NETWORK_MODE_LTE = 1;
 const int32_t NETWORK_MODE_NR = 2;
+const int32_t SYS_PARAMETER_SIZE = 256;
+constexpr const char *MIN_TIME_FROM_NR_TO_LTE = "30000";
+constexpr const char *CFG_TECH_UPDATE_TIME = "persist.radio.cfg.update.time";
+constexpr const char *TELEPHONY_NR_CONVERSION_CONFIG = "persist.telephony.nr.config";
+constexpr const char *TELEPHONY_NR_CONFIG_A = "ConfigA";
+constexpr const char *TELEPHONY_NR_CONFIG_D = "ConfigD";
+constexpr const char *TELEPHONY_NR_CONFIG_AD = "ConfigAD";
 
 NetworkSearchManager::NetworkSearchManager(
     std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<ISimManager> simManager)
@@ -1177,6 +1186,85 @@ void NetworkSearchManager::DcPhysicalLinkActiveUpdate(int32_t slotId, bool isAct
             inner->networkSearchHandler_->SendEvent(event);
         }
     }
+}
+
+int32_t NetworkSearchManager::NotifyStateChange(int32_t slotId)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    char param[SYS_PARAMETER_SIZE] = { 0 };
+    int32_t delayTime = 0;
+    int32_t code = GetParameter(CFG_TECH_UPDATE_TIME, MIN_TIME_FROM_NR_TO_LTE, param, SYS_PARAMETER_SIZE);
+    if (code <= 0 || !IsValidDecValue(param)) {
+        delayTime = std::stoi(MIN_TIME_FROM_NR_TO_LTE);
+    } else {
+        delayTime = std::stoi(param);
+    }
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NOTIFY_STATE_CHANGE);
+    if (IsNeedDelayNotify(slotId)) {
+        inner->networkSearchHandler_->SendEvent(event, delayTime);
+        TELEPHONY_LOGD("delayTime:%{public}d slotId:%{public}d", delayTime, slotId);
+    } else {
+        uint32_t innerEventId = static_cast<uint32_t>(RadioEvent::RADIO_NOTIFY_STATE_CHANGE);
+        if (inner->networkSearchHandler_->HasInnerEvent(innerEventId)) {
+            TELEPHONY_LOGD("RemoveEvent delayTime:%{public}d slotId:%{public}d", delayTime, slotId);
+            inner->networkSearchHandler_->RemoveEvent(innerEventId);
+        }
+        inner->networkSearchHandler_->SendEvent(event);
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+static int32_t GetNetworkCapability(
+    int32_t slotId, int32_t networkCapabilityType, int32_t &networkCapabilityState)
+{
+    return 0;
+}
+
+bool NetworkSearchManager::IsNeedDelayNotify(int32_t slotId)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if ((inner->networkSearchState_ == nullptr) || (inner->networkSearchState_->GetNetworkStatus() == nullptr)) {
+        TELEPHONY_LOGE("NetworkSearchManager::IsNeedDelayNotify failed due to nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    RadioTech psRadioTech = inner->networkSearchState_->GetNetworkStatus()->GetPsRadioTech();
+    RadioTech lastPsRadioTech = inner->networkSearchState_->GetNetworkStatus()->GetLastPsRadioTech();
+    int32_t networkCapabilityState = 0;
+    GetNetworkCapability(slotId, SERVICE_TYPE_NR, networkCapabilityState);
+    if (networkCapabilityState == SERVICE_ABILITY_OFF) {
+        return false;
+    }
+    RegServiceState lastRegState = RegServiceState::REG_STATE_UNKNOWN;
+    inner->networkSearchHandler_->GetLastRegServiceState(lastRegState);
+    if (lastRegState == RegServiceState::REG_STATE_NO_SERVICE) {
+        return false;
+    }
+    bool state = false;
+    inner->networkSearchHandler_->GetNrSecondaryCellState(state);
+    if (state) {
+        return false;
+    }
+    if ((psRadioTech != RadioTech::RADIO_TECHNOLOGY_LTE) && (psRadioTech != RadioTech::RADIO_TECHNOLOGY_LTE_CA)) {
+        return false;
+    }
+    sptr<NetworkSearchCallBackBase> cellularCall = GetCellularCallCallBack();
+    if (cellularCall) {
+        return false;
+    }
+    RadioTech lastCfgTech = inner->networkSearchState_->GetNetworkStatus()->GetLastCfgTech();
+    if ((lastCfgTech == RadioTech::RADIO_TECHNOLOGY_NR) && (lastPsRadioTech != RadioTech::RADIO_TECHNOLOGY_NR) &&
+        (psRadioTech == RadioTech::RADIO_TECHNOLOGY_LTE || (psRadioTech == RadioTech::RADIO_TECHNOLOGY_LTE_CA))) {
+        return true;
+    }
+    return false;
 }
 
 bool NetworkSearchManager::IsRadioFirstPowerOn(int32_t slotId)

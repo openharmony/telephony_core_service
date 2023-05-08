@@ -54,9 +54,9 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
     { RadioEvent::RADIO_VOICE_TECH_CHANGED, &NetworkSearchHandler::RadioVoiceTechChange },
     { RadioEvent::RADIO_GET_VOICE_TECH, &NetworkSearchHandler::RadioVoiceTechChange },
     { RadioEvent::RADIO_SET_DATA_CONNECT_ACTIVE, &NetworkSearchHandler::DcPhysicalLinkActiveUpdate },
+    { RadioEvent::RADIO_NOTIFY_STATE_CHANGE, &NetworkSearchHandler::NotifyStateChange },
     { RadioEvent::RADIO_GET_BASEBAND_VERSION, &NetworkSearchHandler::RadioGetBasebandVersion },
-    { RadioEvent::RADIO_SET_NR_OPTION_MODE, &NetworkSearchHandler::SetNrOptionModeResponse },
-    { RadioEvent::RADIO_GET_NR_OPTION_MODE, &NetworkSearchHandler::GetNrOptionModeResponse },
+    { RadioEvent::RADIO_GET_NR_OPTION_MODE, &NetworkSearchHandler::RadioGetNrOptionMode },
     { RadioEvent::RADIO_GET_RRC_CONNECTION_STATE, &NetworkSearchHandler::RadioGetRrcConnectionState },
     { RadioEvent::RADIO_RRC_CONNECTION_STATE_UPDATE, &NetworkSearchHandler::RadioGetRrcConnectionState },
     { SettingEventCode::MSG_AUTO_TIME, &NetworkSearchHandler::AutoTimeChange },
@@ -347,6 +347,7 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
     }
     if (networkRegister_ != nullptr) {
         networkRegister_->ProcessPsRegister(event);
+        networkSearchManager->NotifyStateChange(slotId_);
     }
     sptr<NetworkSearchCallBackBase> cellularCall = networkSearchManager->GetCellularCallCallBack();
     if (cellularCall) {
@@ -833,8 +834,14 @@ void NetworkSearchHandler::RadioChannelConfigInfo(const AppExecFwk::InnerEvent::
         TELEPHONY_LOGE("NetworkSearchHandler::RadioChannelConfigInfo event is nullptr!");
         return;
     }
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioChannelConfigInfo failed to get NetworkSearchManager");
+        return;
+    }
     if (networkRegister_ != nullptr) {
         networkRegister_->ProcessChannelConfigInfo(event);
+        networkSearchManager->NotifyStateChange(slotId_);
     }
     TELEPHONY_LOGD("NetworkSearchHandler::RadioChannelConfigInfo slotId:%{public}d", slotId_);
 }
@@ -852,6 +859,39 @@ void NetworkSearchHandler::DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEve
         isActive ? "true" : "false");
 }
 
+void NetworkSearchHandler::NotifyStateChange(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGD("NetworkSearchHandler::NotifyStateChange slotId:%{public}d", slotId_);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::NotifyStateChange event is nullptr!");
+        return;
+    }
+    if (networkRegister_ == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::NotifyStateChange networkRegister_ is nullptr!");
+        return;
+    }
+    networkRegister_->NotifyStateChange();
+}
+
+int32_t NetworkSearchHandler::GetLastRegServiceState(RegServiceState &regState)
+{
+    if (networkRegister_ == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::GetLastRegServiceState networkRegister_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    regState = networkRegister_->GetLastRegServiceState();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkSearchHandler::GetNrSecondaryCellState(bool &state)
+{
+    if (networkRegister_ == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::GetNrSecondaryCellState networkRegister_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    state = networkRegister_->GetNrSecondaryCellState();
+    return TELEPHONY_ERR_SUCCESS;
+}
 
 int32_t NetworkSearchHandler::UpdateNrConfig(int32_t status)
 {
@@ -862,6 +902,15 @@ int32_t NetworkSearchHandler::UpdateNrConfig(int32_t status)
     }
     networkRegister_->UpdateNrConfig(status);
     return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkSearchHandler::GetNrConfig(std::string &config)
+{
+    if (networkRegister_ == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::GetNrConfig networkRegister_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkRegister_->GetNrConfig(config);
 }
 
 void NetworkSearchHandler::UpdateImsServiceStatus(const AppExecFwk::InnerEvent::Pointer &event)

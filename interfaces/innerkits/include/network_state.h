@@ -48,6 +48,11 @@ public:
      */
     RadioTech GetPsRadioTech() const;
     /*
+     * Obtains RAT of the PS domain on the registered network.
+     * @return Returns last RAT of the PS domain on the registered network
+     */
+    RadioTech GetLastPsRadioTech() const;
+    /*
      * Obtains RAT of the CS domain on the registered network.
      * @return Returns RAT of the CS domain on the registered network
      */
@@ -89,10 +94,15 @@ public:
      */
     NrState GetNrState() const;
     /*
-     *  Obtains the radio Access technology after config conversion.
-     * @return Returns Access technology .
+     * Obtains the radio access technology after config conversion.
+     * @return Returns access technology.
      */
     RadioTech GetCfgTech() const;
+    /*
+     * Obtains the radio Access technology after config conversion.
+     * @return Returns last access technology.
+     */
+    RadioTech GetLastCfgTech() const;
 
 private:
     bool isEmergency_;
@@ -103,6 +113,8 @@ private:
     RegServiceState psRegStatus_;
     RegServiceState csRegStatus_;
     RadioTech psRadioTech_;
+    RadioTech lastPsRadioTech_;
+    RadioTech lastCfgTech_;
     RadioTech csRadioTech_;
     RadioTech cfgTech_;
     NrState nrState_;

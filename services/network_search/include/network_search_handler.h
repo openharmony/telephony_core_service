@@ -51,7 +51,9 @@ public:
     void UpdatePhone(RadioTech csRadioTech, const RadioTech &psRadioTech) const;
     int32_t GetCellInfoList(std::vector<sptr<CellInformation>> &cells);
     void DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEvent::Pointer &event);
+    void NotifyStateChange(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t UpdateNrConfig(int32_t status);
+    int32_t GetNrConfig(std::string &config);
     void UpdateImsServiceStatus(const AppExecFwk::InnerEvent::Pointer &event);
     void UpdateImsRegisterState(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t SendUpdateCellLocationRequest();
@@ -89,6 +91,8 @@ public:
     sptr<CellLocation> GetCellLocation();
     void TimezoneRefresh();
     void SetCellRequestMinInterval(uint32_t minInterval);
+    int32_t GetLastRegServiceState(RegServiceState &regState);
+    int32_t GetNrSecondaryCellState(bool &state);
 
 private:
     void RadioOnState();
@@ -125,8 +129,7 @@ private:
     void AutoTimeZoneChange(const AppExecFwk::InnerEvent::Pointer &);
     void AirplaneModeChange(const AppExecFwk::InnerEvent::Pointer &);
     void RadioGetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &event);
-    void SetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event);
-    void GetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event);
+    void RadioGetNrOptionMode(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event);
     bool InitOperatorName();
 

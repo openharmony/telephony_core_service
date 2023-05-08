@@ -32,12 +32,18 @@ public:
     virtual ~NetworkRegister() = default;
     void InitNrConversionConfig();
     void ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &event);
-    void ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &event) const;
+    void ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessRestrictedState(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event);
+    int32_t NotifyStateChange();
     void DcPhysicalLinkActiveUpdate(bool isActive);
     int32_t UpdateNrConfig(int32_t status);
+    void UpdateCfgTech();
+    int32_t UpdateNrConfig(int32_t status);
+    int32_t GetNrConfig(std::string &config);
+    RegServiceState GetLastRegServiceState() const;
+    bool GetNrSecondaryCellState() const;
 
     enum class RilRegister {
         REG_STATE_NOT_REG = 0,
@@ -60,11 +66,11 @@ public:
 private:
     RegServiceState ConvertRegFromRil(RilRegister code) const;
     RadioTech ConvertTechFromRil(HRilRadioTech code) const;
-    NrState ConvertStringToNrState(std::string &strState) const;
     void UpdateNrState();
-    void UpdateCfgTech();
     void NotifyNrFrequencyChanged();
-    void NrConfigParse(std::string &cfgStr);
+    int32_t GetRrcConnectionState(int32_t &rrcState);
+    bool IsValidConfig(const std::string &config);
+    RadioTech GetTechnologyByNrConfig(RadioTech tech);
 
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
@@ -97,6 +103,7 @@ private:
     int32_t slotId_ = 0;
     bool isCsCapable_ = true;
     std::string currentNrConfig_ = "";
+    RegServiceState lastRegStatus_ = RegServiceState::REG_STATE_UNKNOWN;
 };
 } // namespace Telephony
 } // namespace OHOS
