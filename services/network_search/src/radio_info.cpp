@@ -315,7 +315,7 @@ void RadioInfo::AirplaneModeChange()
 int32_t RadioInfo::ProcessGetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &event) const
 {
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    TELEPHONY_LOGI("RadioInfo::ProcessGetBasebandVersion slotId:%{public}d", slotId_);
+    TELEPHONY_LOGD("RadioInfo::ProcessGetBasebandVersion slotId:%{public}d", slotId_);
     if (event == nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetBasebandVersion event is nullptr slotId:%{public}d", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -338,7 +338,7 @@ int32_t RadioInfo::ProcessGetBasebandVersion(const AppExecFwk::InnerEvent::Point
 int32_t RadioInfo::ProcessGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event) const
 {
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    TELEPHONY_LOGI("RadioInfo::ProcessGetRrcConnectionState slotId:%{public}d", slotId_);
+    TELEPHONY_LOGD("RadioInfo::ProcessGetRrcConnectionState slotId:%{public}d", slotId_);
     if (event == nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetRrcConnectionState event is nullptr slotId:%{public}d", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -354,6 +354,8 @@ int32_t RadioInfo::ProcessGetRrcConnectionState(const AppExecFwk::InnerEvent::Po
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TELEPHONY_LOGD("RadioInfo::ProcessGetRrcConnectionState success");
+    nsm->UpdateNrConfig(slotId_, *state);
+    nsm->NotifyStateChange(slotId_);
     return TELEPHONY_ERR_SUCCESS;
 }
 

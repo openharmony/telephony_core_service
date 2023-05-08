@@ -166,6 +166,8 @@ public:
     FrequencyType GetFrequencyType(int32_t slotId) override;
     NrState GetNrState(int32_t slotId) override;
     void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive) override;
+    int32_t NotifyStateChange(int32_t slotId) override;
+    bool IsNeedDelayNotify(int32_t slotId);
     int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) override;
     int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName,
         const sptr<ImsRegInfoCallback> &callback) override;
@@ -222,8 +224,10 @@ public:
     int32_t UpdateNrOptionMode(int32_t slotId, NrMode mode);
     int32_t UpdateRadioOn(int32_t slotId) override;
     int32_t UpdateNrConfig(int32_t slotId, int32_t status);
+    int32_t UpdateRrcConnectionState(int32_t slotId, int32_t status);
     int32_t GetRrcConnectionState(int32_t slotId, int32_t &status) override;
     int32_t UpdateRrcConnectionState(int32_t slotId, int32_t &status);
+    int32_t GetRrcConnectionStateValue(int32_t slotId, int32_t &status);
 
     inline void InitMsgNum(int32_t slotId)
     {
