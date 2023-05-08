@@ -15,6 +15,7 @@
 
 #include "radio_info.h"
 
+#include "core_service_hisysevent.h"
 #include "hril_types.h"
 #include "hril_modem_parcel.h"
 #include "network_search_manager.h"
@@ -317,6 +318,7 @@ void RadioInfo::AirplaneModeChange()
         TELEPHONY_LOGE("AirplaneModeChange GetAirplaneMode fail slotId:%{public}d", slotId_);
         return;
     }
+    CoreServiceHiSysEvent::WriteAirplaneModeChangeEvent(isAirplaneModeOn);
     bool lastAirplaneMode = false;
     nsm->GetLocalAirplaneMode(slotId_, lastAirplaneMode);
     if (isAirplaneModeOn == lastAirplaneMode) {
