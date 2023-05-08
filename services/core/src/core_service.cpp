@@ -18,6 +18,7 @@
 #include "core_manager_inner.h"
 #include "core_service_dump_helper.h"
 #include "ims_core_service_client.h"
+#include "ipc_skeleton.h"
 #include "network_search_manager.h"
 #include "network_search_types.h"
 #include "parameter.h"
@@ -32,6 +33,9 @@
 
 namespace OHOS {
 namespace Telephony {
+namespace {
+const int32_t MAX_IPC_THREAD_NUM = 6;
+}
 const bool G_REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<CoreService>::GetInstance().get());
 
@@ -58,6 +62,7 @@ void CoreService::OnStart()
         registerToService_ = true;
     }
     RunnerPool::GetInstance().Init();
+    IPCSkeleton::SetMaxWorkThreadNum(MAX_IPC_THREAD_NUM);
     if (!Init()) {
         TELEPHONY_LOGE("failed to init CoreService");
         return;
