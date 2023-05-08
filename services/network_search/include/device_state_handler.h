@@ -44,6 +44,7 @@ private:
     void SetNotificationFilter(int32_t newFilter, bool force);
     void SetDeviceState(int32_t deviceStateType, bool deviceStateOn);
     void SyncSettings();
+    void GetRrcConnectionState() const;
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;

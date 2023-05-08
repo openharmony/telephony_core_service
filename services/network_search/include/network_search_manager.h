@@ -68,6 +68,7 @@ struct NetworkSearchManagerInner {
     std::u16string meid_ = u"";
     std::string basebandVersion_ = "";
     NrMode nrMode_ = NrMode::NR_MODE_UNKNOWN;
+    int32_t rrcConnectionStatus_ = 0;
     FrequencyType freqType_ = FrequencyType::FREQ_TYPE_UNKNOWN;
     std::mutex mutex_;
     bool isRadioFirstPowerOn_ = true;
@@ -203,7 +204,7 @@ public:
     void SetImei(int32_t slotId, std::u16string imei);
     void UpdateCellLocation(int32_t slotId, int32_t techType, int32_t cellId, int32_t lac);
     void SetMeid(int32_t slotId, std::u16string meid);
-    void SetNrOptionMode(int32_t slotId, NrMode mode);
+    int32_t SetNrOptionMode(int32_t slotId, NrMode mode);
     void SetFrequencyType(int32_t slotId, FrequencyType type);
     void GetVoiceTech(int32_t slotId);
     std::shared_ptr<NetworkSearchManagerInner> FindManagerInner(int32_t slotId);
@@ -215,10 +216,14 @@ public:
     void InitSimRadioProtocol(int32_t slotId);
     int32_t SetLocalAirplaneMode(int32_t slotId, bool state);
     int32_t GetLocalAirplaneMode(int32_t slotId, bool &state);
-    int32_t UpdateRadioOn(int32_t slotId) override;
     void SetBasebandVersion(int32_t slotId, std::string version);
     int32_t GetBasebandVersion(int32_t slotId, std::string &version) override;
     int32_t JudgeNetworkMode(int32_t preferredNetwork);
+    int32_t UpdateNrOptionMode(int32_t slotId, NrMode mode);
+    int32_t UpdateRadioOn(int32_t slotId) override;
+    int32_t UpdateNrConfig(int32_t slotId, int32_t status);
+    int32_t GetRrcConnectionState(int32_t slotId, int32_t &status) override;
+    int32_t UpdateRrcConnectionState(int32_t slotId, int32_t &status);
 
     inline void InitMsgNum(int32_t slotId)
     {

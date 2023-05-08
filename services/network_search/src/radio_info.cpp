@@ -143,7 +143,7 @@ void RadioInfo::ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) con
         return;
     }
     if (nsm == nullptr) {
-        TELEPHONY_LOGE("NetworkSelection::ProcessGetImei nsm is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("RadioInfo::ProcessGetImei nsm is nullptr slotId:%{public}d", slotId_);
         return;
     }
 
@@ -166,7 +166,7 @@ void RadioInfo::ProcessGetMeid(const AppExecFwk::InnerEvent::Pointer &event) con
         return;
     }
     if (nsm == nullptr) {
-        TELEPHONY_LOGE("NetworkSelection::ProcessGetMeid nsm is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("RadioInfo::ProcessGetMeid nsm is nullptr slotId:%{public}d", slotId_);
         return;
     }
 
@@ -321,18 +321,39 @@ int32_t RadioInfo::ProcessGetBasebandVersion(const AppExecFwk::InnerEvent::Point
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (nsm == nullptr) {
-        TELEPHONY_LOGE("NetworkSelection::ProcessGetBasebandVersion nsm is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("RadioInfo::ProcessGetBasebandVersion nsm is nullptr slotId:%{public}d", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     std::shared_ptr<HRilStringParcel> version = event->GetSharedObject<HRilStringParcel>();
     if (version == nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetBasebandVersion version is nullptr slotId:%{public}d", slotId_);
-        nsm->SetBasebandVersion(slotId_, "");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    TELEPHONY_LOGI("RadioInfo::ProcessGetBasebandVersion success");
+    TELEPHONY_LOGD("RadioInfo::ProcessGetBasebandVersion success");
     nsm->SetBasebandVersion(slotId_, version->data);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t RadioInfo::ProcessGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event) const
+{
+    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
+    TELEPHONY_LOGI("RadioInfo::ProcessGetRrcConnectionState slotId:%{public}d", slotId_);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetRrcConnectionState event is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (nsm == nullptr) {
+        TELEPHONY_LOGE("NetworkSelection::ProcessGetRrcConnectionState nsm is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    auto state = event->GetSharedObject<int32_t>();
+    if (state == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetRrcConnectionState state is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    TELEPHONY_LOGD("RadioInfo::ProcessGetRrcConnectionState success");
     return TELEPHONY_ERR_SUCCESS;
 }
 

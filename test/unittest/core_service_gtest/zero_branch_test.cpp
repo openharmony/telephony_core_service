@@ -1797,6 +1797,10 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_003, Function | MediumTest |
     bool airplaneMode = false;
     EXPECT_NE(networkSearchManager->GetAirplaneMode(airplaneMode), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->UpdateRadioOn(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->UpdateNrOptionMode(INVALID_SLOTID, NrMode::NR_MODE_UNKNOWN), TELEPHONY_SUCCESS);
+    int32_t status = 0;
+    EXPECT_NE(networkSearchManager->UpdateRrcConnectionState(INVALID_SLOTID, status), TELEPHONY_SUCCESS);
+    EXPECT_EQ(status, 0);
 }
 
 /**
@@ -1931,6 +1935,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
     networkSearchHandler->AutoTimeZoneChange(event);
     networkSearchHandler->AirplaneModeChange(event);
     networkSearchHandler->RadioGetBasebandVersion(event);
+    networkSearchHandler->RadioGetRrcConnectionState(event);
     event = nullptr;
     networkSearchHandler->RadioGetCurrentCellInfo(event);
     networkSearchHandler->RadioCurrentCellInfoUpdate(event);
@@ -1945,6 +1950,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
     networkSearchHandler->RadioOffOrUnavailableState(1);
     networkSearchHandler->RadioGetNeighboringCellInfo(event);
     networkSearchHandler->RadioGetBasebandVersion(event);
+    networkSearchHandler->RadioGetRrcConnectionState(event);
     EXPECT_EQ(networkSearchHandler->GetPhoneType(), PhoneType::PHONE_TYPE_IS_NONE);
 }
 

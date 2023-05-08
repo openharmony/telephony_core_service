@@ -104,6 +104,7 @@ public:
     virtual int32_t SetNetworkCapability(
         int32_t slotId, int32_t networkCapabilityType, int32_t networkCapabilityState) = 0;
     virtual int32_t UpdateRadioOn(int32_t slotId) = 0;
+    virtual int32_t GetRrcConnectionState(int32_t slotId, int32_t &status) = 0;
 
     /**
      * @brief support Nr network or not
