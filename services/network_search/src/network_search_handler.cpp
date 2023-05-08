@@ -339,6 +339,11 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
     if (networkRegister_ != nullptr) {
         networkRegister_->ProcessPsRegister(event);
     }
+    sptr<NetworkSearchCallBackBase> cellularCall = networkSearchManager->GetCellularCallCallBack();
+    if (cellularCall) {
+        int32_t imsType = 1;
+        cellularCall->SetReadyToCall(slotId_, imsType, true);
+    }
     TELEPHONY_LOGD("NetworkSearchHandler::RadioRilDataRegState slotId:%{public}d", slotId_);
 }
 
@@ -360,7 +365,8 @@ void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::P
 
     sptr<NetworkSearchCallBackBase> cellularCall = networkSearchManager->GetCellularCallCallBack();
     if (cellularCall) {
-        cellularCall->SetReadyToCall(slotId_, true);
+        int32_t csType = 0;
+        cellularCall->SetReadyToCall(slotId_, csType, true);
     }
     TELEPHONY_LOGD("NetworkSearchHandler::RadioRilVoiceRegState slotId:%{public}d", slotId_);
 }

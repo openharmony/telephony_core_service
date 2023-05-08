@@ -30,6 +30,7 @@ static constexpr const char *CALL_HANGUP_FAILED_EVENT = "CALL_HANGUP_FAILED";
 static constexpr const char *SMS_SEND_FAILED_EVENT = "SMS_SEND_FAILED";
 static constexpr const char *SMS_RECEIVE_FAILED_EVENT = "SMS_RECEIVE_FAILED";
 static constexpr const char *DATA_ACTIVATE_FAILED_EVENT = "DATA_ACTIVATE_FAILED";
+static constexpr const char *AIRPLANE_MODE_EVENT = "AIRPLANE_MODE_STATE";
 
 // KEY
 static constexpr const char *SLOT_ID_KEY = "SLOT_ID";
@@ -49,6 +50,7 @@ static constexpr const char *DATA_SWITCH_KEY = "DATA_SWITCH";
 static constexpr const char *UPLINK_DATA_KEY = "UPLINK_DATA";
 static constexpr const char *DOWNLINK_DATA_KEY = "DOWNLINK_DATA";
 static constexpr const char *DATASTATE_KEY = "DATASTATE";
+static constexpr const char *SWITCH_KEY = "SWITCH";
 
 // VALUE
 static constexpr const char *CORE_SERVICE_MODULE = "CORE_SERVICE";
@@ -113,5 +115,11 @@ void CoreServiceHiSysEvent::WriteDataActivateFaultEvent(
         DATA_SWITCH_KEY, switchState, UPLINK_DATA_KEY, INVALID_PARAMETER, DOWNLINK_DATA_KEY, INVALID_PARAMETER,
         DATASTATE_KEY, INVALID_PARAMETER, ERROR_TYPE_KEY, static_cast<int32_t>(errorType), ERROR_MSG_KEY, errorMsg);
 }
+
+void CoreServiceHiSysEvent::WriteAirplaneModeChangeEvent(const int32_t enable)
+{
+    HiWriteBehaviorEvent(AIRPLANE_MODE_EVENT, SWITCH_KEY, enable);
+}
+
 } // namespace Telephony
 } // namespace OHOS
