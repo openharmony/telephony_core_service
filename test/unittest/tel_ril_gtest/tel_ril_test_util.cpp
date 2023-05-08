@@ -259,6 +259,9 @@ void TelRilTest::InitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_SET_LOCATE_UPDATES] = &TelRilTest::SetLocateUpdatesTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_NOTIFICATION_FILTER] = &TelRilTest::SetNotificationFilterTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_DEVICE_STATE] = &TelRilTest::SetDeviceStateTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_RRC_CONNECTION_STATE] = &TelRilTest::GetRrcConnectionStateTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_NR_OPTION_MODE] = &TelRilTest::GetNrOptionModeTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_NR_OPTION_MODE] = &TelRilTest::SetNrOptionModeTest;
 }
 
 void TelRilTest::InitModem()
@@ -1746,6 +1749,64 @@ void TelRilTest::SetDeviceStateTest(int32_t slotId, const std::shared_ptr<AppExe
         TELEPHONY_LOGI("TelRilTest::SetDeviceStateTest -->");
         telRilManager_->SetDeviceState(slotId, deviceStateType, deviceStateOn, event);
         TELEPHONY_LOGI("TelRilTest::SetDeviceStateTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Get rrc conection state
+ *
+ * @param handler
+ */
+void TelRilTest::GetRrcConnectionStateTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_RRC_CONNECTION_STATE);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetRrcConnectionStateTest -->");
+        telRilManager_->GetRrcConnectionState(slotId, event);
+        TELEPHONY_LOGI("TelRilTest::GetRrcConnectionStateTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Get nr mode
+ *
+ * @param handler
+ */
+void TelRilTest::GetNrOptionModeTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_NR_OPTION_MODE);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetNrOptionModeTest -->");
+        telRilManager_->GetNrOptionMode(slotId, event);
+        TELEPHONY_LOGI("TelRilTest::GetNrOptionModeTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Get nr mode
+ *
+ * @param handler
+ */
+void TelRilTest::SetNrOptionModeTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_SET_NR_OPTION_MODE);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::SetNrOptionModeTest -->");
+        int32_t mode = 1;
+        telRilManager_->SetNrOptionMode(slotId, mode, event);
+        TELEPHONY_LOGI("TelRilTest::SetNrOptionModeTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }

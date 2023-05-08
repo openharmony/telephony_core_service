@@ -38,6 +38,8 @@ const char *TELEPHONY_NR_CONVERSION_CONFIG_A = "persist.telephony.nr.config.a";
 const char *TELEPHONY_NR_CONVERSION_CONFIG_B = "persist.telephony.nr.config.b";
 const char *TELEPHONY_NR_CONVERSION_CONFIG_C = "persist.telephony.nr.config.c";
 const char *TELEPHONY_NR_CONVERSION_CONFIG_D = "persist.telephony.nr.config.d";
+constexpr const char *TELEPHONY_NR_CONFIG_A = "ConfigA";
+constexpr const char *TELEPHONY_NR_CONFIG_D = "ConfigD";
 const int32_t SYS_PARAMETER_SIZE = 256;
 const int32_t NR_STATE_NUM = 6;
 const int32_t KEY_VALUE_NUM = 2;
@@ -419,6 +421,16 @@ void NetworkRegister::NrConfigParse(std::string &cfgStr)
         }
         nrConfigMap_.insert(std::make_pair(nrState, tech));
     }
+}
+
+int32_t NetworkRegister::UpdateNrConfig(int32_t status)
+{
+    if (status == RRC_CONNECTED_STATUS) {
+        currentNrConfig_ = TELEPHONY_NR_CONFIG_A;
+    } else {
+        currentNrConfig_ = TELEPHONY_NR_CONFIG_D;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 NrState NetworkRegister::ConvertStringToNrState(std::string &strState) const

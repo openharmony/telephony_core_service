@@ -55,6 +55,10 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
     { RadioEvent::RADIO_GET_VOICE_TECH, &NetworkSearchHandler::RadioVoiceTechChange },
     { RadioEvent::RADIO_SET_DATA_CONNECT_ACTIVE, &NetworkSearchHandler::DcPhysicalLinkActiveUpdate },
     { RadioEvent::RADIO_GET_BASEBAND_VERSION, &NetworkSearchHandler::RadioGetBasebandVersion },
+    { RadioEvent::RADIO_SET_NR_OPTION_MODE, &NetworkSearchHandler::SetNrOptionModeResponse },
+    { RadioEvent::RADIO_GET_NR_OPTION_MODE, &NetworkSearchHandler::GetNrOptionModeResponse },
+    { RadioEvent::RADIO_GET_RRC_CONNECTION_STATE, &NetworkSearchHandler::RadioGetRrcConnectionState },
+    { RadioEvent::RADIO_RRC_CONNECTION_STATE_UPDATE, &NetworkSearchHandler::RadioGetRrcConnectionState },
     { SettingEventCode::MSG_AUTO_TIME, &NetworkSearchHandler::AutoTimeChange },
     { SettingEventCode::MSG_AUTO_TIMEZONE, &NetworkSearchHandler::AutoTimeZoneChange },
     { SettingEventCode::MSG_AUTO_AIRPLANE_MODE, &NetworkSearchHandler::AirplaneModeChange }
@@ -178,6 +182,8 @@ void NetworkSearchHandler::RegisterEvents()
                 slotId_, shared_from_this(), RadioEvent::RADIO_VOICE_TECH_CHANGED, nullptr);
             telRilManager->RegisterCoreNotify(
                 slotId_, shared_from_this(), RadioEvent::RADIO_CURRENT_CELL_UPDATE, nullptr);
+            telRilManager->RegisterCoreNotify(
+                slotId_, shared_from_this(), RadioEvent::RADIO_RRC_CONNECTION_STATE_UPDATE, nullptr);
         }
     }
     // Register IMS
@@ -211,6 +217,8 @@ void NetworkSearchHandler::UnregisterEvents()
             telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_CHANNEL_CONFIG_UPDATE);
             telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_VOICE_TECH_CHANGED);
             telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_CURRENT_CELL_UPDATE);
+            telRilManager->UnRegisterCoreNotify(
+                slotId_, shared_from_this(), RadioEvent::RADIO_RRC_CONNECTION_STATE_UPDATE);
         }
     }
 }
@@ -828,7 +836,7 @@ void NetworkSearchHandler::RadioChannelConfigInfo(const AppExecFwk::InnerEvent::
     if (networkRegister_ != nullptr) {
         networkRegister_->ProcessChannelConfigInfo(event);
     }
-    TELEPHONY_LOGD("NetworkSearchHandler::ProcessChannelConfigInfo slotId:%{public}d", slotId_);
+    TELEPHONY_LOGD("NetworkSearchHandler::RadioChannelConfigInfo slotId:%{public}d", slotId_);
 }
 
 void NetworkSearchHandler::DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEvent::Pointer &event)
@@ -842,6 +850,18 @@ void NetworkSearchHandler::DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEve
     }
     TELEPHONY_LOGI("NetworkSearchHandler::DcPhysicalLinkActiveUpdate slotId:%{public}d active:%{public}s", slotId_,
         isActive ? "true" : "false");
+}
+
+
+int32_t NetworkSearchHandler::UpdateNrConfig(int32_t status)
+{
+    TELEPHONY_LOGD("NetworkSearchHandler::UpdateNrConfig slotId:%{public}d", slotId_);
+    if (networkRegister_ == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::UpdateNrConfig networkRegister_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    networkRegister_->UpdateNrConfig(status);
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 void NetworkSearchHandler::UpdateImsServiceStatus(const AppExecFwk::InnerEvent::Pointer &event)
@@ -882,12 +902,52 @@ void NetworkSearchHandler::RadioGetBasebandVersion(const AppExecFwk::InnerEvent:
         TELEPHONY_LOGE("NetworkSearchHandler::RadioGetBasebandVersion event is nullptr!");
         return;
     }
-    TELEPHONY_LOGI("NetworkSearchHandler::RadioGetBasebandVersion start slotId:%{public}d", slotId_);
+    TELEPHONY_LOGI("RadioGetBasebandVersion start slotId:%{public}d", slotId_);
     if (radioInfo_ == nullptr) {
         TELEPHONY_LOGE("RadioGetBasebandVersion RadioInfo is null slotId:%{public}d", slotId_);
         return;
     }
     radioInfo_->ProcessGetBasebandVersion(event);
+}
+
+void NetworkSearchHandler::SetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::SetNrOptionModeResponse event is nullptr!");
+        return;
+    }
+    TELEPHONY_LOGD("SetNrOptionModeResponse start slotId:%{public}d", slotId_);
+    if (radioInfo_ == nullptr) {
+        TELEPHONY_LOGE("SetNrOptionModeResponse RadioInfo is null slotId:%{public}d", slotId_);
+        return;
+    }
+}
+
+void NetworkSearchHandler::GetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::GetNrOptionModeResponse event is nullptr!");
+        return;
+    }
+    TELEPHONY_LOGD("GetNrOptionModeResponse start slotId:%{public}d", slotId_);
+    if (radioInfo_ == nullptr) {
+        TELEPHONY_LOGE("GetNrOptionModeResponse RadioInfo is null slotId:%{public}d", slotId_);
+        return;
+    }
+}
+
+void NetworkSearchHandler::RadioGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioGetRrcConnectionState event is nullptr!");
+        return;
+    }
+    TELEPHONY_LOGI("NetworkSearchHandler::RadioGetRrcConnectionState start slotId:%{public}d", slotId_);
+    if (radioInfo_ == nullptr) {
+        TELEPHONY_LOGE("RadioGetRrcConnectionState RadioInfo is null slotId:%{public}d", slotId_);
+        return;
+    }
+    radioInfo_->ProcessGetRrcConnectionState(event);
 }
 
 void NetworkSearchHandler::RadioVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event)

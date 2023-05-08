@@ -125,7 +125,10 @@ enum class DiffInterfaceId {
     TEST_GET_CMUT,
     TEST_GET_EMERGENCY_CALL_LIST,
     TEST_SET_VONR_STATUS,
-    TEST_EXIT
+    TEST_GET_RRC_CONNECTION_STATE,
+    TEST_GET_NR_OPTION_MODE,
+    TEST_SET_NR_OPTION_MODE,
+    TEST_EXIT,
 };
 
 class TelRilTest : public testing::Test {
@@ -269,6 +272,9 @@ private:
     void SetMuteTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetMuteTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void GetEmergencyCallListTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void GetRrcConnectionStateTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void GetNrOptionModeTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void SetNrOptionModeTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     uint32_t GetRandNum();
     std::string GetRandPhoneNum(const int len);

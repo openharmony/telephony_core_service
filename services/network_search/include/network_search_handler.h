@@ -51,6 +51,7 @@ public:
     void UpdatePhone(RadioTech csRadioTech, const RadioTech &psRadioTech) const;
     int32_t GetCellInfoList(std::vector<sptr<CellInformation>> &cells);
     void DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEvent::Pointer &event);
+    int32_t UpdateNrConfig(int32_t status);
     void UpdateImsServiceStatus(const AppExecFwk::InnerEvent::Pointer &event);
     void UpdateImsRegisterState(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t SendUpdateCellLocationRequest();
@@ -124,6 +125,9 @@ private:
     void AutoTimeZoneChange(const AppExecFwk::InnerEvent::Pointer &);
     void AirplaneModeChange(const AppExecFwk::InnerEvent::Pointer &);
     void RadioGetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &event);
+    void SetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event);
+    void GetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event);
+    void RadioGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event);
     bool InitOperatorName();
 
 private:
