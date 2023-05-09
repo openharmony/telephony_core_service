@@ -472,7 +472,6 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
     bool isAirplaneModeOn = false;
     if (networkSearchManager->GetAirplaneMode(isAirplaneModeOn) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RadioOffOrUnavailableState GetAirplaneMode fail slotId:%{public}d", slotId_);
-        return;
     }
     if (!isAirplaneModeOn && radioState == CORE_SERVICE_POWER_OFF) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);

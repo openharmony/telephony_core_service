@@ -74,8 +74,8 @@ void RadioInfo::ProcessGetRadioState(const AppExecFwk::InnerEvent::Pointer &even
         NetworkUtils::RemoveCallbackFromMap(index);
     } else {
         bool isAirplaneModeOn = false;
-        if (nsm->GetRadioState(slotId_) != ModemPowerState::CORE_SERVICE_POWER_ON &&
-            nsm->GetAirplaneMode(isAirplaneModeOn) == TELEPHONY_SUCCESS && !isAirplaneModeOn) {
+        nsm->GetAirplaneMode(isAirplaneModeOn);
+        if (nsm->GetRadioState(slotId_) != ModemPowerState::CORE_SERVICE_POWER_ON && !isAirplaneModeOn) {
             nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
         }
         if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_ON) {
@@ -316,7 +316,6 @@ void RadioInfo::AirplaneModeChange()
     bool isAirplaneModeOn = false;
     if (nsm->GetAirplaneMode(isAirplaneModeOn) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("AirplaneModeChange GetAirplaneMode fail slotId:%{public}d", slotId_);
-        return;
     }
     CoreServiceHiSysEvent::WriteAirplaneModeChangeEvent(isAirplaneModeOn);
     bool lastAirplaneMode = false;
