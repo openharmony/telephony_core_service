@@ -90,7 +90,6 @@ private:
 
 private:
     int32_t maxCount_ = 0;
-    bool ready_ = false;
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
     std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;
