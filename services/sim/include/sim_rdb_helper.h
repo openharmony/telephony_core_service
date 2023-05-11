@@ -58,12 +58,15 @@ public:
     int32_t ClearData();
 
 private:
-    std::shared_ptr<DataShare::DataShareHelper> CreateDataAHelper();
-    int Insert(const DataShare::DataShareValuesBucket &values);
-    std::shared_ptr<DataShare::DataShareResultSet> Query(
+    std::shared_ptr<DataShare::DataShareHelper> CreateDataHelper();
+    int Insert(
+        std::shared_ptr<DataShare::DataShareHelper> dataShareHelper, const DataShare::DataShareValuesBucket &values);
+    std::shared_ptr<DataShare::DataShareResultSet> Query(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
         std::vector<std::string> &columns, const DataShare::DataSharePredicates &predicates);
-    int Update(const DataShare::DataShareValuesBucket &value, const DataShare::DataSharePredicates &predicates);
-    int Delete(const DataShare::DataSharePredicates &predicates);
+    int Update(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
+        const DataShare::DataShareValuesBucket &value, const DataShare::DataSharePredicates &predicates);
+    int Delete(
+        std::shared_ptr<DataShare::DataShareHelper> dataShareHelper, const DataShare::DataSharePredicates &predicates);
     void SaveDataToBean(std::shared_ptr<DataShare::DataShareResultSet> result, SimRdbInfo &simBean);
 
 private:

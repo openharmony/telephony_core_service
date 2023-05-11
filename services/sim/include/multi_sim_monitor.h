@@ -19,9 +19,10 @@
 #include <list>
 
 #include "multi_sim_controller.h"
-#include "sim_file_manager.h"
-#include "telephony_log_wrapper.h"
 #include "sim_constant.h"
+#include "sim_file_manager.h"
+#include "system_ability_status_change_stub.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -34,20 +35,33 @@ public:
     virtual ~MultiSimMonitor() = default;
 
     void Init();
-    bool RegisterForIccLoaded(int32_t slotId);
-    bool UnRegisterForIccLoaded(int32_t slotId);
-    bool RegisterForSimStateChanged(int32_t slotId);
-    bool UnRegisterForSimStateChanged(int32_t slotId);
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     int32_t RegisterSimAccountCallback(const std::string &bundleName, const sptr<SimAccountCallback> &callback);
     int32_t UnregisterSimAccountCallback(const std::string &bundleName);
     void NotifySimAccountChanged();
 
 private:
+    class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
+    public:
+        SystemAbilityStatusChangeListener(std::shared_ptr<AppExecFwk::EventHandler> multiSimMonitorHandler,
+            std::shared_ptr<MultiSimController> controller,
+            std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_);
+        ~SystemAbilityStatusChangeListener() = default;
+        virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+        virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+
+    private:
+        std::weak_ptr<AppExecFwk::EventHandler> multiSimMonitorHandler_;
+        std::shared_ptr<MultiSimController> controller_ = nullptr;
+        std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
+    };
+
+private:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     void RefreshData(int32_t slotId);
     void InitData(int32_t slotId);
     bool IsValidSlotId(int32_t slotId);
+    void InitListener();
 
 private:
     struct SimAccountCallbackRecord {
@@ -55,13 +69,13 @@ private:
         sptr<SimAccountCallback> simAccountCallback = nullptr;
     };
 
-    bool ready_ = false;
     std::shared_ptr<MultiSimController> controller_ = nullptr;
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     std::list<SimAccountCallbackRecord> listSimAccountCallbackRecord_;
     std::mutex mutexInner_;
+    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -27,15 +27,7 @@ SimManager::SimManager(std::shared_ptr<ITelRilManager> telRilManager) : telRilMa
     TELEPHONY_LOGI("SimManager::SimManager()");
 }
 
-SimManager::~SimManager()
-{
-    if (multiSimMonitor_ != nullptr) {
-        for (int32_t slotId = 0; slotId < slotCount_; slotId++) {
-            multiSimMonitor_->UnRegisterForIccLoaded(slotId);
-            multiSimMonitor_->UnRegisterForSimStateChanged(slotId);
-        }
-    }
-}
+SimManager::~SimManager() {}
 
 bool SimManager::OnInit(int32_t slotCount)
 {
@@ -114,10 +106,6 @@ void SimManager::InitSingleSimObject()
         return;
     }
     multiSimMonitor_->Init();
-    for (int32_t slotId = 0; slotId < slotCount_; slotId++) {
-        multiSimMonitor_->RegisterForIccLoaded(slotId);
-        multiSimMonitor_->RegisterForSimStateChanged(slotId);
-    }
 }
 
 void SimManager::SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager)
