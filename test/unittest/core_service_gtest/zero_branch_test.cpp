@@ -2295,17 +2295,12 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
     event = nullptr;
     multiSimMonitor->ProcessEvent(event);
     multiSimMonitor->InitData(INVALID_SLOTID);
-    multiSimMonitor->ready_ = true;
     multiSimMonitor->InitData(0);
     multiSimMonitor->RefreshData(INVALID_SLOTID);
     multiSimMonitor->RefreshData(0);
     multiSimMonitor->NotifySimAccountChanged();
     std::string bundleName = "123";
     sptr<SimAccountCallback> callback = nullptr;
-    EXPECT_FALSE(multiSimMonitor->RegisterForIccLoaded(0));
-    EXPECT_FALSE(multiSimMonitor->UnRegisterForIccLoaded(0));
-    EXPECT_FALSE(multiSimMonitor->RegisterForSimStateChanged(0));
-    EXPECT_FALSE(multiSimMonitor->UnRegisterForSimStateChanged(0));
     EXPECT_GT(multiSimMonitor->RegisterSimAccountCallback(bundleName, callback), TELEPHONY_ERROR);
     EXPECT_EQ(multiSimMonitor->UnregisterSimAccountCallback(bundleName), TELEPHONY_ERROR);
 }

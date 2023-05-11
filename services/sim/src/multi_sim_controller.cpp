@@ -28,8 +28,6 @@ namespace Telephony {
 static const int32_t DEFAULT_SLOT_ID = 0;
 static const int32_t EVENT_CODE = 1;
 static const int32_t ACTIVATABLE = 2;
-static const int32_t RETRY_COUNT = 12;
-static const int32_t RETRY_TIME = 5000;
 static const int32_t IMS_SWITCH_VALUE_UNKNOWN = -1;
 static const std::string PARAM_SLOTID = "slotId";
 static const std::string DEFAULT_VOICE_SLOT_CHANGED = "defaultVoiceSlotChanged";
@@ -73,23 +71,7 @@ bool MultiSimController::ForgetAllData()
         TELEPHONY_LOGE("MultiSimController::Init simDbHelper_ is nullptr failed");
         return false;
     }
-    ready_ = false;
-    int32_t result = INVALID_VALUE;
-    for (uint32_t i = 0; i <= RETRY_COUNT; i++) { // if we can not do ForgetAllData right,then nothing will be right
-        if (ready_) {
-            TELEPHONY_LOGI("MultiSimController::already ForgetAllData");
-            return true;
-        }
-        result = simDbHelper_->ForgetAllData();
-        std::this_thread::sleep_for(std::chrono::milliseconds(RETRY_TIME));
-        if (result != INVALID_VALUE) {
-            TELEPHONY_LOGI("MultiSimController::ForgetAllData complete");
-            ready_ = true;
-            return true;
-        }
-    }
-    TELEPHONY_LOGE("MultiSimController::get dataAbility error, is over");
-    return false;
+    return simDbHelper_->ForgetAllData();
 }
 
 bool MultiSimController::ForgetAllData(int32_t slotId)

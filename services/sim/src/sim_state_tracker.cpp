@@ -42,8 +42,8 @@ void SimStateTracker::InitListener()
         TELEPHONY_LOGE("samgrProxy or statusChangeListener_ is nullptr");
         return;
     }
-    int32_t ret = samgrProxy->SubscribeSystemAbility(ACCESSIBILITY_MANAGER_SERVICE_ID, statusChangeListener_);
-    TELEPHONY_LOGI("SubscribeSystemAbility ACCESSIBILITY_MANAGER_SERVICE_ID result:%{public}d", ret);
+    int32_t ret = samgrProxy->SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, statusChangeListener_);
+    TELEPHONY_LOGI("SubscribeSystemAbility DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID result:%{public}d", ret);
 }
 
 void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -107,7 +107,7 @@ SimStateTracker::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeLis
 void SimStateTracker::SystemAbilityStatusChangeListener::OnAddSystemAbility(
     int32_t systemAbilityId, const std::string &deviceId)
 {
-    if (systemAbilityId == ACCESSIBILITY_MANAGER_SERVICE_ID && configLoader_ != nullptr) {
+    if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID && configLoader_ != nullptr) {
         TELEPHONY_LOGI("SystemAbilityStatusChangeListener::LoadOperatorConfig");
         configLoader_->LoadOperatorConfig(slotId_);
     }
@@ -116,8 +116,8 @@ void SimStateTracker::SystemAbilityStatusChangeListener::OnAddSystemAbility(
 void SimStateTracker::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
     int32_t systemAbilityId, const std::string &deviceId)
 {
-    if (systemAbilityId == ACCESSIBILITY_MANAGER_SERVICE_ID) {
-        TELEPHONY_LOGE("ACCESSIBILITY_MANAGER_SERVICE_ID stopped");
+    if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
+        TELEPHONY_LOGE("DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID stopped");
     }
 }
 } // namespace Telephony
