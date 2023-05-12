@@ -288,7 +288,13 @@ private:
             TELEPHONY_LOGE("telRilManager_ or _func or _moduleFunc is nullptr");
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
-        return ((telRilManager_.get()->*(_func))(slotId).*(_moduleFunc))(std::forward<ParamTypes>(_args)...);
+
+        auto modulePtr = (telRilManager_.get()->*(_func))(slotId);
+        if (modulePtr == nullptr) {
+            TELEPHONY_LOGE("modulePtr is nullptr");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        return (modulePtr.get()->*(_moduleFunc))(std::forward<ParamTypes>(_args)...);
     }
 
 private:

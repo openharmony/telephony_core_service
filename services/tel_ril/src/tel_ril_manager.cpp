@@ -105,42 +105,66 @@ void TelRilManager::InitTelModule(int32_t slotId)
 {
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     observerHandler_.push_back(observerHandler);
-    telRilSms_.push_back(std::make_unique<TelRilSms>(slotId, rilInterface_, observerHandler_[slotId], handler_));
-    telRilSim_.push_back(std::make_unique<TelRilSim>(slotId, rilInterface_, observerHandler_[slotId], handler_));
-    telRilCall_.push_back(std::make_unique<TelRilCall>(slotId, rilInterface_, observerHandler_[slotId], handler_));
-    telRilData_.push_back(std::make_unique<TelRilData>(slotId, rilInterface_, observerHandler_[slotId], handler_));
-    telRilModem_.push_back(std::make_unique<TelRilModem>(slotId, rilInterface_, observerHandler_[slotId], handler_));
+    telRilSms_.push_back(std::make_shared<TelRilSms>(slotId, rilInterface_, observerHandler_[slotId], handler_));
+    telRilSim_.push_back(std::make_shared<TelRilSim>(slotId, rilInterface_, observerHandler_[slotId], handler_));
+    telRilCall_.push_back(std::make_shared<TelRilCall>(slotId, rilInterface_, observerHandler_[slotId], handler_));
+    telRilData_.push_back(std::make_shared<TelRilData>(slotId, rilInterface_, observerHandler_[slotId], handler_));
+    telRilModem_.push_back(std::make_shared<TelRilModem>(slotId, rilInterface_, observerHandler_[slotId], handler_));
     telRilNetwork_.push_back(
-        std::make_unique<TelRilNetwork>(slotId, rilInterface_, observerHandler_[slotId], handler_));
+        std::make_shared<TelRilNetwork>(slotId, rilInterface_, observerHandler_[slotId], handler_));
 }
-TelRilSms &TelRilManager::GetTelRilSms(int32_t slotId)
+std::shared_ptr<TelRilSms> TelRilManager::GetTelRilSms(int32_t slotId)
 {
-    return *telRilSms_[slotId];
-}
-
-TelRilSim &TelRilManager::GetTelRilSim(int32_t slotId)
-{
-    return *telRilSim_[slotId];
-}
-
-TelRilCall &TelRilManager::GetTelRilCall(int32_t slotId)
-{
-    return *telRilCall_[slotId];
+    if (slotId < 0 || slotId >= telRilSms_.size()) {
+        TELEPHONY_LOGE("telRilSms_ slotId is valid");
+        return nullptr;
+    }
+    return telRilSms_[slotId];
 }
 
-TelRilData &TelRilManager::GetTelRilData(int32_t slotId)
+std::shared_ptr<TelRilSim> TelRilManager::GetTelRilSim(int32_t slotId)
 {
-    return *telRilData_[slotId];
+    if (slotId < 0 || slotId >= telRilSim_.size()) {
+        TELEPHONY_LOGE("telRilSim_ slotId is valid");
+        return nullptr;
+    }
+    return telRilSim_[slotId];
 }
 
-TelRilNetwork &TelRilManager::GetTelRilNetwork(int32_t slotId)
+std::shared_ptr<TelRilCall> TelRilManager::GetTelRilCall(int32_t slotId)
 {
-    return *telRilNetwork_[slotId];
+    if (slotId < 0 || slotId >= telRilCall_.size()) {
+        TELEPHONY_LOGE("telRilCall_ slotId is valid");
+        return nullptr;
+    }
+    return telRilCall_[slotId];
 }
 
-TelRilModem &TelRilManager::GetTelRilModem(int32_t slotId)
+std::shared_ptr<TelRilData> TelRilManager::GetTelRilData(int32_t slotId)
 {
-    return *telRilModem_[slotId];
+    if (slotId < 0 || slotId >= telRilData_.size()) {
+        TELEPHONY_LOGE("telRilData_ slotId is valid");
+        return nullptr;
+    }
+    return telRilData_[slotId];
+}
+
+std::shared_ptr<TelRilNetwork> TelRilManager::GetTelRilNetwork(int32_t slotId)
+{
+    if (slotId < 0 || slotId >= telRilNetwork_.size()) {
+        TELEPHONY_LOGE("telRilNetwork_ slotId is valid");
+        return nullptr;
+    }
+    return telRilNetwork_[slotId];
+}
+
+std::shared_ptr<TelRilModem> TelRilManager::GetTelRilModem(int32_t slotId)
+{
+    if (slotId < 0 || slotId >= telRilModem_.size()) {
+        TELEPHONY_LOGE("telRilModem_ slotId is valid");
+        return nullptr;
+    }
+    return telRilModem_[slotId];
 }
 
 std::shared_ptr<ObserverHandler> TelRilManager::GetObserverHandler(int32_t slotId)
@@ -152,12 +176,24 @@ bool TelRilManager::ResetRilInterface(void)
 {
     int32_t size = static_cast<int32_t>(telRilCall_.size());
     for (int32_t slotId = 0; slotId < size; slotId++) {
-        GetTelRilSms(slotId).ResetRilInterface(rilInterface_);
-        GetTelRilSim(slotId).ResetRilInterface(rilInterface_);
-        GetTelRilCall(slotId).ResetRilInterface(rilInterface_);
-        GetTelRilData(slotId).ResetRilInterface(rilInterface_);
-        GetTelRilModem(slotId).ResetRilInterface(rilInterface_);
-        GetTelRilNetwork(slotId).ResetRilInterface(rilInterface_);
+        if (GetTelRilSms(slotId) != nullptr) {
+            GetTelRilSms(slotId)->ResetRilInterface(rilInterface_);
+        }
+        if (GetTelRilSim(slotId) != nullptr) {
+            GetTelRilSim(slotId)->ResetRilInterface(rilInterface_);
+        }
+        if (GetTelRilCall(slotId) != nullptr) {
+            GetTelRilCall(slotId)->ResetRilInterface(rilInterface_);
+        }
+        if (GetTelRilData(slotId) != nullptr) {
+            GetTelRilData(slotId)->ResetRilInterface(rilInterface_);
+        }
+        if (GetTelRilModem(slotId) != nullptr) {
+            GetTelRilModem(slotId)->ResetRilInterface(rilInterface_);
+        }
+        if (GetTelRilNetwork(slotId) != nullptr) {
+            GetTelRilNetwork(slotId)->ResetRilInterface(rilInterface_);
+        }
     }
     return true;
 }
@@ -175,8 +211,12 @@ int32_t TelRilManager::RegisterCoreNotify(
                 break;
             case RadioEvent::RADIO_OFF:
                 observerHandler->RegObserver(what, observerCallBack);
-                if (GetTelRilModem(slotId).radioState_ == CORE_SERVICE_POWER_OFF ||
-                    CORE_SERVICE_POWER_NOT_AVAILABLE == GetTelRilModem(slotId).radioState_) {
+                if (GetTelRilModem(slotId) == nullptr) {
+                    TELEPHONY_LOGE("telRilModem_ slotId is valid");
+                    return TELEPHONY_ERR_LOCAL_PTR_NULL;
+                }
+                if (GetTelRilModem(slotId)->radioState_ == CORE_SERVICE_POWER_OFF ||
+                    CORE_SERVICE_POWER_NOT_AVAILABLE == GetTelRilModem(slotId)->radioState_) {
                     observerHandler->NotifyObserver(what);
                 }
                 break;
