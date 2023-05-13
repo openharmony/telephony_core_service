@@ -2297,6 +2297,74 @@ static bool IsValidImsSrvType(napi_env env, int32_t imsSrvType, const std::strin
     return flag;
 }
 
+static bool MatchGetBasebandVersion(napi_env env, napi_value parameters[], size_t parameterCount)
+{
+    switch (parameterCount) {
+        case PARAMETER_COUNT_ONE: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number });
+        }
+        case PARAMETER_COUNT_TWO: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_function });
+        }
+        default:
+            return false;
+    }
+}
+
+static void NativeGetBasebandVersion(napi_env env, void *data)
+{
+    auto asyncContext = static_cast<GetBasebandVersionContext *>(data);
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeGetBasebandVersion slotId is invalid");
+        asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
+    std::string version = "";
+    asyncContext->errorCode =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetBasebandVersion(asyncContext->slotId, version);
+    TELEPHONY_LOGI("errorCode = %{public}d", asyncContext->errorCode);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = true;
+        asyncContext->getBasebandVersion = version;
+    }
+}
+
+static void GetBasebandVersionCallback(napi_env env, napi_status status, void *data)
+{
+    auto asyncContext = static_cast<GetBasebandVersionContext *>(data);
+    napi_value callbackValue = nullptr;
+    if (asyncContext->resolved) {
+        napi_create_string_utf8(
+            env, asyncContext->getBasebandVersion.c_str(), asyncContext->getBasebandVersion.size(), &callbackValue);
+    } else {
+        JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->errorCode);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
+    }
+    NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
+}
+
+static napi_value GetBasebandVersion(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
+    if (!MatchGetBasebandVersion(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("GetBasebandVersion MatchGetBasebandVersion failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<GetBasebandVersionContext>();
+    NAPI_CALL(env, napi_get_value_int32(env, parameters[ARRAY_INDEX_FIRST], &asyncContext->slotId));
+    if (parameterCount == PARAMETER_COUNT_TWO) {
+        NAPI_CALL(env,
+            napi_create_reference(env, parameters[ARRAY_INDEX_SECOND], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+    }
+    return NapiUtil::HandleAsyncWork(
+        env, asyncContext.release(), "GetBasebandVersion", NativeGetBasebandVersion, GetBasebandVersionCallback);
+}
+
 static napi_value ObserverOn(napi_env env, napi_callback_info info)
 {
     size_t argc = PARAMETER_COUNT_FOUR;
@@ -2992,6 +3060,7 @@ static napi_value CreateFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("isNRSupported", IsNrSupported),
         DECLARE_NAPI_FUNCTION("setPrimarySlotId", SetPrimarySlotId),
         DECLARE_NAPI_FUNCTION("getImsRegInfo", GetImsRegInfo),
+        DECLARE_NAPI_FUNCTION("getBasebandVersion", GetBasebandVersion),
         DECLARE_NAPI_FUNCTION("on", ObserverOn),
         DECLARE_NAPI_FUNCTION("off", ObserverOff),
     };

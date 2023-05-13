@@ -66,6 +66,7 @@ struct NetworkSearchManagerInner {
     ModemPowerState radioState_ = ModemPowerState::CORE_SERVICE_POWER_OFF;
     std::u16string imei_ = u"";
     std::u16string meid_ = u"";
+    std::string basebandVersion_ = "";
     NrMode nrMode_ = NrMode::NR_MODE_UNKNOWN;
     FrequencyType freqType_ = FrequencyType::FREQ_TYPE_UNKNOWN;
     std::mutex mutex_;
@@ -211,6 +212,8 @@ public:
     int32_t SetLocalAirplaneMode(int32_t slotId, bool state);
     int32_t GetLocalAirplaneMode(int32_t slotId, bool &state);
     int32_t UpdateRadioOn(int32_t slotId) override;
+    void SetBasebandVersion(int32_t slotId, std::string version);
+    int32_t GetBasebandVersion(int32_t slotId, std::string &version) override;
 
     inline void InitMsgNum(int32_t slotId)
     {

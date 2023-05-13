@@ -56,6 +56,7 @@ void CoreServiceStub::AddHandlerNetWorkToMap()
     memberFuncMap_[uint32_t(InterfaceID::GET_NR_OPTION_MODE)] = &CoreServiceStub::OnGetNrOptionMode;
     memberFuncMap_[uint32_t(InterfaceID::REG_IMS_CALLBACK)] = &CoreServiceStub::OnRegisterImsRegInfoCallback;
     memberFuncMap_[uint32_t(InterfaceID::UN_REG_IMS_CALLBACK)] = &CoreServiceStub::OnUnregisterImsRegInfoCallback;
+    memberFuncMap_[uint32_t(InterfaceID::GET_BASEBAND_VERSION)] = &CoreServiceStub::OnGetBasebandVersion;
 }
 
 void CoreServiceStub::AddHandlerSimToMap()
@@ -1493,6 +1494,25 @@ int32_t CoreServiceStub::OnUnregisterImsRegInfoCallback(MessageParcel &data, Mes
     ImsServiceType imsSrvType = static_cast<ImsServiceType>(data.ReadInt32());
     int32_t result = UnregisterImsRegInfoCallback(slotId, imsSrvType);
     reply.WriteInt32(result);
+    return result;
+}
+
+int32_t CoreServiceStub::OnGetBasebandVersion(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::string version = "";
+    int32_t result = GetBasebandVersion(slotId, version);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetBasebandVersion write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteString(version)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetBasebandVersion write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
     return result;
 }
 } // namespace Telephony

@@ -216,6 +216,8 @@ public:
 
     int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType) override;
 
+    int32_t GetBasebandVersion(int32_t slotId, std::string &version) override;
+
     int32_t Dump(std::int32_t fd, const std::vector<std::u16string> &args) override;
 
     int64_t GetBindTime();

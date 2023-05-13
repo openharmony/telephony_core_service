@@ -54,6 +54,7 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
     { RadioEvent::RADIO_VOICE_TECH_CHANGED, &NetworkSearchHandler::RadioVoiceTechChange },
     { RadioEvent::RADIO_GET_VOICE_TECH, &NetworkSearchHandler::RadioVoiceTechChange },
     { RadioEvent::RADIO_SET_DATA_CONNECT_ACTIVE, &NetworkSearchHandler::DcPhysicalLinkActiveUpdate },
+    { RadioEvent::RADIO_GET_BASEBAND_VERSION, &NetworkSearchHandler::RadioGetBasebandVersion },
     { SettingEventCode::MSG_AUTO_TIME, &NetworkSearchHandler::AutoTimeChange },
     { SettingEventCode::MSG_AUTO_TIMEZONE, &NetworkSearchHandler::AutoTimeZoneChange },
     { SettingEventCode::MSG_AUTO_AIRPLANE_MODE, &NetworkSearchHandler::AirplaneModeChange }
@@ -873,6 +874,20 @@ void NetworkSearchHandler::UpdateImsRegisterState(const AppExecFwk::InnerEvent::
     }
     TELEPHONY_LOGI("NetworkSearchHandler::UpdateImsRegisterState slotId:%{public}d isRegister:%{public}s", slotId_,
         isRegister ? "true" : "false");
+}
+
+void NetworkSearchHandler::RadioGetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioGetBasebandVersion event is nullptr!");
+        return;
+    }
+    TELEPHONY_LOGI("NetworkSearchHandler::RadioGetBasebandVersion start slotId:%{public}d", slotId_);
+    if (radioInfo_ == nullptr) {
+        TELEPHONY_LOGE("RadioGetBasebandVersion RadioInfo is null slotId:%{public}d", slotId_);
+        return;
+    }
+    radioInfo_->ProcessGetBasebandVersion(event);
 }
 
 void NetworkSearchHandler::RadioVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event)

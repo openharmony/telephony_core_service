@@ -1329,5 +1329,31 @@ int32_t NetworkSearchManager::GetLocalAirplaneMode(int32_t slotId, bool &state)
     TELEPHONY_LOGD("GetLocalAirplaneMode slotId:%{public}d state:%{public}d", slotId, state);
     return TELEPHONY_ERR_SUCCESS;
 }
+
+void NetworkSearchManager::SetBasebandVersion(int32_t slotId, std::string version)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::SetBasebandVersion slotId:%{public}d", slotId);
+        return;
+    }
+    inner->basebandVersion_ = version;
+}
+
+int32_t NetworkSearchManager::GetBasebandVersion(int32_t slotId, std::string &version)
+{
+    TELEPHONY_LOGI("NetworkSearchManager::GetBasebandVersion start slotId:%{public}d", slotId);
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (inner->basebandVersion_.empty()) {
+        eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_BASEBAND_VERSION);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    version = inner->basebandVersion_;
+    return TELEPHONY_ERR_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS
