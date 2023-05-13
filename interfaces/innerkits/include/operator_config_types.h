@@ -79,6 +79,18 @@ constexpr const char *KEY_PNN_CUST_STRING_ARRAY = "pnn_cust_string_array";
  * See 3GPP TS 31.102 v15.2.0 Section 4.2.59 EF_OPL.
  */
 constexpr const char *KEY_OPL_CUST_STRING_ARRAY = "opl_cust_string_array";
+/**
+ * Indicates whether a modem is used as the bandwidth reporting source.
+ */
+constexpr const char *KEY_BANDWIDTH_SOURCE_USE_MODEM_BOOL = "bandwidth_source_use_modem_bool";
+/**
+ * Indicates whether to use uplink bandwidth value of LTE if it is NR NSA.
+ */
+constexpr const char *KEY_UPLINK_BANDWIDTH_NR_NSA_USE_LTE_VALUE_BOOL = "uplink_bandwidth_nr_nsa_use_lte_value_bool";
+/**
+ * Indicates the uplink and downlink bandwidth values for the network.
+ */
+constexpr const char *KEY_BANDWIDTH_STRING_ARRAY = "bandwidth_string_array";
 
 struct OperatorConfig : public Parcelable {
     std::map<std::u16string, std::u16string> configValue {};

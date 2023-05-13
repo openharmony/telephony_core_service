@@ -252,6 +252,13 @@ int32_t TelRilCallback::PdpContextListUpdated(const HDI::Ril::V1_1::RilRadioResp
     return Notify(responseInfo, &TelRilManager::GetTelRilData, &TelRilData::PdpContextListUpdated, dataCallResultList);
 }
 
+int32_t TelRilCallback::DataLinkCapabilityUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_1::DataLinkCapability &dataLinkCapability)
+{
+    return Notify(
+        responseInfo, &TelRilManager::GetTelRilData, &TelRilData::DataLinkCapabilityUpdated, dataLinkCapability);
+}
+
 int32_t TelRilCallback::ActivatePdpContextResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
     const HDI::Ril::V1_1::SetupDataCallResultInfo &setupDataCallResultInfo)
 {
@@ -288,6 +295,13 @@ int32_t TelRilCallback::GetLinkBandwidthInfoResponse(const HDI::Ril::V1_1::RilRa
         responseInfo, &TelRilManager::GetTelRilData, &TelRilData::GetLinkBandwidthInfoResponse, dataLinkBandwidthInfo);
 }
 
+int32_t TelRilCallback::GetLinkCapabilityResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_1::DataLinkCapability &dataLinkCapability)
+{
+    return Response(
+        responseInfo, &TelRilManager::GetTelRilData, &TelRilData::GetLinkCapabilityResponse, dataLinkCapability);
+}
+
 int32_t TelRilCallback::SetDataPermittedResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
     return Response(responseInfo, &TelRilManager::GetTelRilData, &TelRilData::SetDataPermittedResponse);
@@ -303,6 +317,11 @@ int32_t TelRilCallback::VoiceRadioTechUpdated(const HDI::Ril::V1_1::RilRadioResp
 {
     return Notify(
         responseInfo, &TelRilManager::GetTelRilModem, &TelRilModem::VoiceRadioTechUpdated, voiceRadioTechnology);
+}
+
+int32_t TelRilCallback::DsdsModeUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t mode)
+{
+    return Notify(responseInfo, &TelRilManager::GetTelRilModem, &TelRilModem::DsdsModeUpdated, mode);
 }
 
 int32_t TelRilCallback::ShutDownResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)

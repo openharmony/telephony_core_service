@@ -141,6 +141,12 @@ int32_t TelRilModem::VoiceRadioTechUpdated(const HDI::Ril::V1_1::VoiceRadioTechn
         TELEPHONY_LOG_FUNC_NAME, mVoiceRadioTechnology, RadioEvent::RADIO_VOICE_TECH_CHANGED);
 }
 
+int32_t TelRilModem::DsdsModeUpdated(int32_t mode)
+{
+    return Notify<HRilInt32Parcel>(
+        TELEPHONY_LOG_FUNC_NAME, std::make_shared<HRilInt32Parcel>(mode), RadioEvent::RADIO_DSDS_MODE_CHANGED);
+}
+
 void TelRilModem::BuildVoiceRadioTechnology(const HDI::Ril::V1_1::VoiceRadioTechnology &voiceRadioTechnology,
     std::shared_ptr<VoiceRadioTechnology> &mVoiceRadioTechnology)
 {

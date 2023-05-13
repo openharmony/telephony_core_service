@@ -54,6 +54,7 @@ enum class DiffInterfaceId {
     TEST_RILCM_GET_LINK_BANDWIDTH_INFO,
     TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE,
     TEST_RILCM_SET_DATA_PERMITTED_TEST,
+    TEST_RILCM_GET_LINK_CAPABILITY,
     /* =========== Cellular Data End ============= */
     TEST_GET_SIGNAL_STRENGTH,
     TEST_CALL_DIAL,
@@ -342,6 +343,7 @@ public:
     void OnRequestSetLinkBandwidthReportingRuleTest(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestSetDataPermittedTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestGetLinkCapabilityTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestGetNetworkSearchInformationTest(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -424,6 +426,7 @@ void TelRilTest::OnInitInterface()
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE] =
         &TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest;
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST] = &TelRilTest::OnRequestSetDataPermittedTest;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY] = &TelRilTest::OnRequestGetLinkCapabilityTest;
 
     OnInitCall();
 
@@ -553,6 +556,8 @@ void TelRilTest::OnInitForRegister(int32_t slotId, const std::shared_ptr<AppExec
     TELEPHONY_LOGI("TelRilTest::OnInitForRegister -->");
     // Register all APIs
     telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_STATE_CHANGED, nullptr);
+    telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_DSDS_MODE_CHANGED, nullptr);
+    telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_LINK_CAPABILITY_CHANGED, nullptr);
     telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_IMS_NETWORK_STATE_CHANGED, nullptr);
     telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_ON, nullptr);
     telRilManager_->RegisterCoreNotify(slotId, handler, RadioEvent::RADIO_NOT_AVAIL, nullptr);
@@ -1619,6 +1624,19 @@ void TelRilTest::OnRequestGetLinkBandwidthInfoTest(
     }
 }
 
+void TelRilTest::OnRequestGetLinkCapabilityTest(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestGetLinkCapabilityTest -->");
+        telRilManager_->GetLinkCapability(slotId, event);
+        TELEPHONY_LOGI("OnRequestGetLinkCapabilityTest finished");
+    }
+}
+
 void TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest(
     int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
@@ -2462,6 +2480,8 @@ void DataTest()
          << "--> OnRequestSetLinkBandwidthReportingRuleTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST)
          << "--> OnRequestSetDataPermittedTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY)
+         << "--> OnRequestGetLinkCapabilityTest" << endl;
     cout << "=========== Cellular Data End =============" << endl;
 }
 

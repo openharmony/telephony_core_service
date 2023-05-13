@@ -202,6 +202,7 @@ public:
         int32_t slotId, LinkBandwidthRule linkBandwidth, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SetDataPermitted(
         int32_t slotId, int32_t dataPermitted, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetLinkCapability(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t GetSimStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
     int32_t GetSimIO(int32_t slotId, SimIoRequestInfo data, const AppExecFwk::InnerEvent::Pointer &response) override;
