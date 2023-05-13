@@ -101,6 +101,22 @@ void GetMeid(const uint8_t *data, size_t size)
     DelayedSingleton<CoreService>::GetInstance()->OnGetMeid(dataMessageParcel, reply);
 }
 
+void GetBasebandVersion(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetBasebandVersion(dataMessageParcel, reply);
+}
+
 void GetOperatorNumeric(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -158,6 +174,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     OnRemoteRequest(data, size);
     GetUniqueDeviceId(data, size);
     GetMeid(data, size);
+    GetBasebandVersion(data, size);
     GetOperatorNumeric(data, size);
     GetOperatorName(data, size);
     SendEnvelopeCmd(data, size);

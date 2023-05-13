@@ -550,6 +550,46 @@ declare namespace radio {
   function off(type: 'imsRegStateChange', slotId: number, imsType: ImsServiceType, callback?: Callback<ImsRegInfo>): void;
 
   /**
+   * Obtains the baseband version of the specified SIM card slot.
+   *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot index number
+   * supported by the device.
+   * @param { AsyncCallback<string> } callback - Indicates the callback for getting the baseband version.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function getBasebandVersion(slotId: number, callback: AsyncCallback<string>): void;
+
+  /**
+   * Obtains the baseband version of the specified SIM card slot.
+   *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot index number
+   * supported by the device.
+   * @returns { Promise<string> } Returns the baseband version.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function getBasebandVersion(slotId: number): Promise<string>;
+
+  /**
    * @systemapi Hide this for inner system use.
    * @since 8
    */

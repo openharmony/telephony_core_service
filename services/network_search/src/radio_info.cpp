@@ -247,8 +247,10 @@ void RadioInfo::UpdatePhone(RadioTech csRadioTech, const RadioTech &psRadioTech)
         networkSearchManager->InitSimRadioProtocol(slotId_);
         std::u16string meid = u"";
         std::u16string imei = u"";
+        std::string basebandVersion = "";
         networkSearchManager->GetImei(slotId_, imei);
         networkSearchManager->GetMeid(slotId_, meid);
+        networkSearchManager->GetBasebandVersion(slotId_, basebandVersion);
         if (static_cast<ModemPowerState>(radioState) == CORE_SERVICE_POWER_ON) {
             networkSearchManager->GetVoiceTech(slotId_);
         }
@@ -332,6 +334,30 @@ void RadioInfo::AirplaneModeChange()
     }
     nsm->SetLocalAirplaneMode(slotId_, isAirplaneModeOn);
     TELEPHONY_LOGD("RadioInfo::AirplaneModeChange end. airplaneMode:%{public}d", isAirplaneModeOn);
+}
+
+int32_t RadioInfo::ProcessGetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &event) const
+{
+    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
+    TELEPHONY_LOGI("RadioInfo::ProcessGetBasebandVersion slotId:%{public}d", slotId_);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetBasebandVersion event is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (nsm == nullptr) {
+        TELEPHONY_LOGE("NetworkSelection::ProcessGetBasebandVersion nsm is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    std::shared_ptr<HRilStringParcel> version = event->GetSharedObject<HRilStringParcel>();
+    if (version == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetBasebandVersion version is nullptr slotId:%{public}d", slotId_);
+        nsm->SetBasebandVersion(slotId_, "");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    TELEPHONY_LOGI("RadioInfo::ProcessGetBasebandVersion success");
+    nsm->SetBasebandVersion(slotId_, version->data);
+    return TELEPHONY_ERR_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

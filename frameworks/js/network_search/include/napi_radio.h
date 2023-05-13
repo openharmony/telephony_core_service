@@ -286,6 +286,11 @@ struct ImsStateWorker {
     ImsRegInfo info;
     ImsRegStateCallback callback;
 };
+
+struct GetBasebandVersionContext : BaseContext {
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    std::string getBasebandVersion = "";
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // NAPI_RADIO_H

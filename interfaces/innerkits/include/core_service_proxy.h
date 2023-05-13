@@ -29,6 +29,7 @@ public:
     int32_t GetSignalInfoList(int32_t slotId, std::vector<sptr<SignalInformation>> &signals) override;
     std::u16string GetOperatorNumeric(int32_t slotId) override;
     int32_t GetOperatorName(int32_t slotId, std::u16string &operatorName) override;
+    int32_t GetBasebandVersion(int32_t slotId, std::string &version) override;
     int32_t GetNetworkState(int32_t slotId, sptr<NetworkState> &networkState) override;
     int32_t SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback) override;
     int32_t GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
