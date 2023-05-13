@@ -81,6 +81,8 @@ public:
         int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response) override;
     int32_t GetRadioProtocolTech(int32_t slotId) override;
     void GetRadioProtocol(int32_t slotId) override;
+    int32_t GetDsdsMode(int32_t &dsdsMode) override;
+    int32_t SetDsdsMode(int32_t dsdsMode) override;
     // STK
     int32_t SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
     int32_t SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
@@ -154,6 +156,7 @@ private:
     std::shared_ptr<AppExecFwk::EventRunner> controllerRunner_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> monitorRunner_;
     int32_t slotCount_ = SLOT_ID_ZERO;
+    int32_t dsdsMode_ = DSDS_MODE_V2;
 };
 } // namespace Telephony
 } // namespace OHOS
