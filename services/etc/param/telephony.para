@@ -14,3 +14,4 @@
 const.telephony.slotCount=1
 telephony.sim.opkey0=-1
 telephony.sim.opkey1=-1
+const.telephony.sms.expire.days=7
