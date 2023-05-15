@@ -146,6 +146,42 @@ int32_t TelRilData::PdpContextListUpdated(const HDI::Ril::V1_1::DataCallResultLi
         TELEPHONY_LOG_FUNC_NAME, dataCallResultList, RadioEvent::RADIO_DATA_CALL_LIST_CHANGED);
 }
 
+int32_t TelRilData::DataLinkCapabilityUpdated(const HDI::Ril::V1_1::DataLinkCapability &dataLinkCapability)
+{
+    std::shared_ptr<DataLinkCapability> linkCapability = std::make_shared<DataLinkCapability>();
+    if (linkCapability == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d linkCapability is nullptr", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    linkCapability->primaryDownlinkKbps = dataLinkCapability.primaryDownlinkKbps;
+    linkCapability->primaryUplinkKbps = dataLinkCapability.primaryUplinkKbps;
+    linkCapability->secondaryDownlinkKbps = dataLinkCapability.secondaryDownlinkKbps;
+    linkCapability->secondaryUplinkKbps = dataLinkCapability.secondaryUplinkKbps;
+    return Notify<DataLinkCapability>(
+        TELEPHONY_LOG_FUNC_NAME, linkCapability, RadioEvent::RADIO_LINK_CAPABILITY_CHANGED);
+}
+
+int32_t TelRilData::GetLinkCapability(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return Request(
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_DATA_GET_LINK_CAPABILITY, &HDI::Ril::V1_1::IRil::GetLinkCapability);
+}
+
+int32_t TelRilData::GetLinkCapabilityResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_1::DataLinkCapability &dataLinkCapability)
+{
+    std::shared_ptr<DataLinkCapability> linkCapability = std::make_shared<DataLinkCapability>();
+    if (linkCapability == nullptr) {
+        TELEPHONY_LOGE("ERROR : linkCapability == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    linkCapability->primaryDownlinkKbps = dataLinkCapability.primaryDownlinkKbps;
+    linkCapability->primaryUplinkKbps = dataLinkCapability.primaryUplinkKbps;
+    linkCapability->secondaryDownlinkKbps = dataLinkCapability.secondaryDownlinkKbps;
+    linkCapability->secondaryUplinkKbps = dataLinkCapability.secondaryUplinkKbps;
+    return Response<DataLinkCapability>(TELEPHONY_LOG_FUNC_NAME, responseInfo, linkCapability);
+}
+
 int32_t TelRilData::GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_DATA_GET_LINK_BANDWIDTH_INFO,

@@ -194,6 +194,7 @@ void TelRilTest::InitData()
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE] =
         &TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest;
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST] = &TelRilTest::SetDataPermittedTest;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY_TEST] = &TelRilTest::GetLinkCapabilityTest;
 }
 
 void TelRilTest::InitSim()
@@ -1503,6 +1504,26 @@ void TelRilTest::SetDataPermittedTest(int32_t slotId, const std::shared_ptr<AppE
 }
 
 /**
+ * @brief Get data link capability
+ *
+ * @param handler
+ */
+void TelRilTest::GetLinkCapabilityTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY_TEST);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetLinkCapabilityTest -->");
+        sleep(WAIT_TIME_SECOND);
+        telRilManager_->GetLinkCapability(slotId, event);
+        TELEPHONY_LOGI("TelRilTest::GetLinkCapabilityTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
  * @brief Search for carrier information
  *
  * @param handler
@@ -2409,6 +2430,26 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetLinkBandwidthInfoTest_0101, Function | 
 HWTEST_F(TelRilTest, Telephony_TelRil_GetLinkBandwidthInfoTest_0201, Function | MediumTest | Level3)
 {
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_BANDWIDTH_INFO), SLOT_ID_1, GetHandler());
+}
+
+/**
+ * @tc.number Telephony_TelRil_GetLinkCapabilityTest_0101 to do ...
+ * @tc.name Get link capability of the card 1
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_GetLinkCapabilityTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY_TEST), SLOT_ID_0, GetHandler());
+}
+
+/**
+ * @tc.number Telephony_TelRil_GetLinkCapabilityTest_0201 to do ...
+ * @tc.name Get data link capability of the card 2
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_GetLinkCapabilityTest_0201, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY_TEST), SLOT_ID_1, GetHandler());
 }
 
 /**

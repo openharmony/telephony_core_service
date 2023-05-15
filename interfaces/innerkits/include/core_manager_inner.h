@@ -100,6 +100,8 @@ public:
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t GetLinkBandwidthInfo(
         int32_t slotId, int32_t eventId, const int32_t cid, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    int32_t GetLinkCapability(
+        int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t SetLinkBandwidthReportingRule(int32_t slotId, int32_t eventId, LinkBandwidthRule linkBandwidth,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     /* PDP end */
@@ -291,6 +293,8 @@ public:
     int32_t GetPrimarySlotId(int32_t &slotId);
     int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue);
     int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue);
+    int32_t GetDsdsMode(int32_t &dsdsMode);
+    int32_t SetDsdsMode(int32_t dsdsMode);
     /******************** simManager end *****************************/
 private:
     CoreManagerInner();

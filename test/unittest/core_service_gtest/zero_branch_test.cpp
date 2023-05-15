@@ -728,6 +728,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_001, Function | MediumTest | Lev
     bool airplaneMode = false;
     EXPECT_GT(mInner.GetAirplaneMode(airplaneMode), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.UpdateRadioOn(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetLinkCapability(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -937,6 +938,9 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_005, Function | MediumTest | Lev
     mInner.GetDefaultCellularDataSlotId();
     int32_t slotId = INVALID_VALUE;
     mInner.GetPrimarySlotId(slotId);
+    int32_t dsdsMode = INVALID_VALUE;
+    mInner.GetDsdsMode(dsdsMode);
+    mInner.SetDsdsMode(0);
     EXPECT_NE(mInner.SaveImsSwitch(0, 0), TELEPHONY_ERR_SUCCESS);
     int32_t imsSwitchValue = 0;
     EXPECT_NE(mInner.SaveImsSwitch(0, imsSwitchValue), TELEPHONY_ERR_SUCCESS);
@@ -1337,6 +1341,9 @@ HWTEST_F(BranchTest, Telephony_SimManager_004, Function | MediumTest | Level1)
     EXPECT_NE(simManager->QueryImsSwitch(INVALID_SLOTID, imsSwitchValue), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->RegisterSimAccountCallback("", nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->UnregisterSimAccountCallback(""), TELEPHONY_ERR_SUCCESS);
+    int32_t dsdsMode = INVALID_VALUE;
+    simManager->GetDsdsMode(dsdsMode);
+    simManager->SetDsdsMode(0);
     std::string testString = "";
     EXPECT_NE(simManager->ObtainSpnCondition(0, true, testString), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->ObtainSpnCondition(INVALID_SLOTID, true, testString), TELEPHONY_ERR_SUCCESS);
