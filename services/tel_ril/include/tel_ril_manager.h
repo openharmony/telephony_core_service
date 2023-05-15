@@ -277,12 +277,12 @@ public:
      */
     bool UnRegisterHdfStatusListener();
 
-    TelRilSms &GetTelRilSms(int32_t slotId);
-    TelRilSim &GetTelRilSim(int32_t slotId);
-    TelRilCall &GetTelRilCall(int32_t slotId);
-    TelRilData &GetTelRilData(int32_t slotId);
-    TelRilNetwork &GetTelRilNetwork(int32_t slotId);
-    TelRilModem &GetTelRilModem(int32_t slotId);
+    std::shared_ptr<TelRilSms> GetTelRilSms(int32_t slotId);
+    std::shared_ptr<TelRilSim> GetTelRilSim(int32_t slotId);
+    std::shared_ptr<TelRilCall> GetTelRilCall(int32_t slotId);
+    std::shared_ptr<TelRilData> GetTelRilData(int32_t slotId);
+    std::shared_ptr<TelRilNetwork> GetTelRilNetwork(int32_t slotId);
+    std::shared_ptr<TelRilModem> GetTelRilModem(int32_t slotId);
     void SendAckAndLock(void);
     void ReduceRunningLock();
 
@@ -315,15 +315,15 @@ private:
      * @return true/false - success/fail
      */
     template<typename ResponsePtr, typename ClassTypePtr, typename FuncType, typename... ParamTypes>
-    inline int32_t TaskSchedule(ResponsePtr &_result, const std::string _module, ClassTypePtr &_obj, FuncType &&_func,
+    inline int32_t TaskSchedule(ResponsePtr &_result, const std::string _module, ClassTypePtr _obj, FuncType &&_func,
         ParamTypes &&... _args) const
     {
-        if (_func != nullptr) {
+        if (_func != nullptr && _obj != nullptr) {
             // The reason for using native member function access here is to
             //   remove std::unique_ptr to prevent copying.
             // The reason for not directly using pointers to access member functions is:
             //   _obj is a smart pointer, not a native pointer.
-            return (_obj.*(_func))(std::forward<ParamTypes>(_args)..., _result);
+            return (_obj.get()->*(_func))(std::forward<ParamTypes>(_args)..., _result);
         } else {
             TELEPHONY_LOGE("%{public}s - func: %{public}s", _module.c_str(), "null pointer");
             return HRIL_ERR_NULL_POINT;
@@ -332,12 +332,12 @@ private:
 
 private:
     std::mutex mutex_;
-    std::vector<std::unique_ptr<TelRilSim>> telRilSim_;
-    std::vector<std::unique_ptr<TelRilSms>> telRilSms_;
-    std::vector<std::unique_ptr<TelRilCall>> telRilCall_;
-    std::vector<std::unique_ptr<TelRilData>> telRilData_;
-    std::vector<std::unique_ptr<TelRilModem>> telRilModem_;
-    std::vector<std::unique_ptr<TelRilNetwork>> telRilNetwork_;
+    std::vector<std::shared_ptr<TelRilSim>> telRilSim_;
+    std::vector<std::shared_ptr<TelRilSms>> telRilSms_;
+    std::vector<std::shared_ptr<TelRilCall>> telRilCall_;
+    std::vector<std::shared_ptr<TelRilData>> telRilData_;
+    std::vector<std::shared_ptr<TelRilModem>> telRilModem_;
+    std::vector<std::shared_ptr<TelRilNetwork>> telRilNetwork_;
     std::vector<std::shared_ptr<ObserverHandler>> observerHandler_;
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
     std::shared_ptr<TelRilHandler> handler_ = nullptr;
