@@ -1206,6 +1206,22 @@ int32_t CoreManagerInner::GetLinkBandwidthInfo(
     return telRilManager_->GetLinkBandwidthInfo(slotId, cid, response);
 }
 
+int32_t CoreManagerInner::GetLinkCapability(
+    int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("telRilManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    response->SetOwner(handler);
+    return telRilManager_->GetLinkCapability(slotId, response);
+}
+
 int32_t CoreManagerInner::GetSignalStrength(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
@@ -1763,6 +1779,24 @@ int32_t CoreManagerInner::GetDefaultCellularDataSlotId()
         return TELEPHONY_ERROR;
     }
     return simManager_->GetDefaultCellularDataSlotId();
+}
+
+int32_t CoreManagerInner::GetDsdsMode(int32_t &dsdsMode)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetDsdsMode(dsdsMode);
+}
+
+int32_t CoreManagerInner::SetDsdsMode(int32_t dsdsMode)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SetDsdsMode(dsdsMode);
 }
 
 int32_t CoreManagerInner::GetPrimarySlotId(int32_t &slotId)

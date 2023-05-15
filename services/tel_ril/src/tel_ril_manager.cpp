@@ -527,6 +527,11 @@ int32_t TelRilManager::SetDataPermitted(
     return TaskSchedule(response, "TelRilData", GetTelRilData(slotId), &TelRilData::SetDataPermitted, dataPermitted);
 }
 
+int32_t TelRilManager::GetLinkCapability(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilData", GetTelRilData(slotId), &TelRilData::GetLinkCapability);
+}
+
 /*********************** TelRilData end ****************************/
 /*********************** TelRilNetwork start ***********************/
 int32_t TelRilManager::GetSignalStrength(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)

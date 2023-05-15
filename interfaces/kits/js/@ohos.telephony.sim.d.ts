@@ -1250,6 +1250,33 @@ declare namespace sim {
      * Indicates the emergency call list.
      */
     KEY_EMERGENCY_CALL_STRING_ARRAY = "emergency_call_string_array",
+
+    /**
+     * Indicates whether a modem is used as the bandwidth reporting source.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @systemapi Hide this for inner system use.
+     * @since 10
+     */
+    KEY_BANDWIDTH_SOURCE_USE_MODEM_BOOL = 'bandwidth_source_use_modem_bool',
+
+    /**
+     * Indicates whether to use uplink bandwidth value of LTE if it is NR NSA.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @systemapi Hide this for inner system use.
+     * @since 10
+     */
+    KEY_UPLINK_BANDWIDTH_NR_NSA_USE_LTE_VALUE_BOOL = 'uplink_bandwidth_nr_nsa_use_lte_value_bool',
+
+    /**
+     * Indicates the uplink and downlink bandwidth values for the network.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @systemapi Hide this for inner system use.
+     * @since 10
+     */
+    KEY_BANDWIDTH_STRING_ARRAY = 'bandwidth_string_array',
   }
 }
 

@@ -403,6 +403,23 @@ int32_t SimManager::GetDefaultCellularDataSlotId()
     return multiSimController_->GetDefaultCellularDataSlotId();
 }
 
+int32_t SimManager::GetDsdsMode(int32_t &dsdsMode)
+{
+    if (slotCount_ == std::atoi(DEFAULT_SLOT_COUNT)) {
+        TELEPHONY_LOGI(" default dsds mode is 0 for single card version");
+        dsdsMode = DSDS_MODE_V2;
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    dsdsMode = dsdsMode_;
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::SetDsdsMode(int32_t dsdsMode)
+{
+    dsdsMode_ = dsdsMode;
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 int32_t SimManager::GetPrimarySlotId(int32_t &slotId)
 {
     if (slotCount_ == std::atoi(DEFAULT_SLOT_COUNT)) {

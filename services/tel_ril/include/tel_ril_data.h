@@ -41,6 +41,7 @@ public:
     int32_t GetPdpContextListResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::DataCallResultList &iDataCallResultList);
     int32_t PdpContextListUpdated(const HDI::Ril::V1_1::DataCallResultList &iDataCallResultList);
+    int32_t DataLinkCapabilityUpdated(const HDI::Ril::V1_1::DataLinkCapability &dataLinkCapability);
     bool IsDataRespOrNotify(uint32_t code);
     int32_t GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetLinkBandwidthInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
@@ -50,6 +51,9 @@ public:
     int32_t SetLinkBandwidthReportingRuleResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
     int32_t SetDataPermitted(const int32_t dataPermitted, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetDataPermittedResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
+    int32_t GetLinkCapability(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetLinkCapabilityResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_1::DataLinkCapability &dataLinkCapability);
 
 private:
     bool IsDataResponse(uint32_t code);

@@ -199,6 +199,13 @@ void DeactivatePdpContext(const uint8_t *data, size_t size)
     telRilData->SetLinkBandwidthReportingRuleResponse(responseInfo);
     telRilData->SetDataPermitted(dataPermitted, response);
     telRilData->SetDataPermittedResponse(responseInfo);
+    telRilData->GetLinkCapability(response);
+    HDI::Ril::V1_1::DataLinkCapability dataLinkCapability;
+    dataLinkCapability.primaryDownlinkKbps = static_cast<int32_t>(size);
+    dataLinkCapability.primaryUplinkKbps = static_cast<int32_t>(size);
+    dataLinkCapability.secondaryDownlinkKbps = static_cast<int32_t>(size);
+    dataLinkCapability.secondaryUplinkKbps = static_cast<int32_t>(size);
+    telRilData->GetLinkCapabilityResponse(responseInfo, dataLinkCapability);
     telRilData->SetInitApnInfo(dataProfile, response);
 }
 
