@@ -90,6 +90,7 @@ ohos_shared_library("tel_core_service_api") {
   } else {
     external_deps += [ "hilog:libhilog" ]
   }
+  innerapi_tags = [ "platformsdk" ]
   part_name = "core_service"
   subsystem_name = "telephony"
 }
