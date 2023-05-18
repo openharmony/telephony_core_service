@@ -482,6 +482,12 @@ int32_t TelRilManager::CloseUnFinishedUssd(int32_t slotId, const AppExecFwk::Inn
     return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::CloseUnFinishedUssd);
 }
 
+int32_t TelRilManager::SetVoNRSwitch(
+    int32_t slotId, const int32_t state, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetVoNRSwitch, state);
+}
+
 /*********************** TelRilCall end ****************************/
 /*********************** TelRilData start **************************/
 int32_t TelRilManager::SetInitApnInfo(

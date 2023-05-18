@@ -98,6 +98,9 @@ public:
         int32_t slotId, char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &result) = 0;
     virtual int32_t StopDtmf(int32_t slotId, int32_t index, const AppExecFwk::InnerEvent::Pointer &result) = 0;
 
+    virtual int32_t SetVoNRSwitch(
+        int32_t slotId, int32_t state, const AppExecFwk::InnerEvent::Pointer &result) = 0;
+
     virtual int32_t GetSignalStrength(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
     virtual int32_t GetCsRegStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;

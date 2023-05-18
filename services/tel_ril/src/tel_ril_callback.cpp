@@ -245,6 +245,11 @@ int32_t TelRilCallback::CloseUnFinishedUssdResponse(const HDI::Ril::V1_1::RilRad
     return Response(responseInfo, &TelRilManager::GetTelRilCall, &TelRilCall::CloseUnFinishedUssdResponse);
 }
 
+int32_t TelRilCallback::SetVonrSwitchResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilCall, &TelRilCall::SetVoNRSwitchResponse);
+}
+
 // Data
 int32_t TelRilCallback::PdpContextListUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
     const HDI::Ril::V1_1::DataCallResultList &dataCallResultList)
