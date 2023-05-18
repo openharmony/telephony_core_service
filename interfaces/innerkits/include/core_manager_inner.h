@@ -87,6 +87,8 @@ public:
     int32_t GetCallRestriction(int32_t slotId, std::string fac, const AppExecFwk::InnerEvent::Pointer &response) const;
     int32_t SetCallRestriction(
         int32_t slotId, const CallRestrictionParam &callRestriction, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetVoNRSwitch(
+        int32_t slotId, int32_t state, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     /* PDP start */
     int32_t SetDataPermitted(int32_t slotId, int32_t eventId, int32_t dataPermitted,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
