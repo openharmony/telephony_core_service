@@ -127,6 +127,7 @@ enum class DiffInterfaceId {
     TEST_GET_MUTE,
     TEST_GET_XLEMA,
     TEST_GET_CALL_FAIL,
+    TEST_SET_VONR_SWITCH,
     TEST_EXIT,
 };
 
@@ -372,6 +373,7 @@ public:
     void OnRequestGetMuteTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetEmergencyCallListTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetCallFailReasonTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestSetVoNRSwitchTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     class DemoHandler : public AppExecFwk::EventHandler {
     public:
@@ -470,6 +472,7 @@ void TelRilTest::OnInitCall()
     memberFuncMap_[DiffInterfaceId::TEST_GET_MUTE] = &TelRilTest::OnRequestGetMuteTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_XLEMA] = &TelRilTest::OnRequestGetEmergencyCallListTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_FAIL] = &TelRilTest::OnRequestGetCallFailReasonTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_VONR_SWITCH] = &TelRilTest::OnRequestSetVoNRSwitchTest;
 }
 
 void TelRilTest::OnInitSms()
@@ -2399,6 +2402,22 @@ void TelRilTest::OnRequestGetEmergencyCallListTest(
     }
 }
 
+void TelRilTest::OnRequestSetVoNRSwitchTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SET_VONR_SWITCH_STATUS);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        int32_t state;
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestSetVoNRSwitchTest -->");
+        std::cout << "Please input set value[0:disable 1:enable]:  ";
+        std::cin >> state;
+        TELEPHONY_LOGI("TelRilTest::OnRequestSetVoNRSwitchTest --> state = [%{public}d]", state);
+        telRilManager_->SetVoNRSwitch(slotId, state, event);
+        TELEPHONY_LOGI("TelRilTest::OnRequestSetVoNRSwitchTest --> "
+                       "OnRequestSetVoNRSwitchTest finished");
+    }
+}
+
 void Promote()
 {
     cout << "########################### TEL RIL TEST ######################" << endl;
@@ -2521,6 +2540,7 @@ void CallTest()
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_MUTE) << " --> OnRequestGetMuteTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_XLEMA) << " --> OnRequestGetEmergencyCallListTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_CALL_FAIL) << " --> OnRequestGetCallFailReasonTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_VONR_SWITCH) << " --> OnRequestSetVoNRSwitchTest" << endl;
 }
 
 void SmsTest()

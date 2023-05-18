@@ -181,6 +181,7 @@ void TelRilTest::InitCall()
     memberFuncMap_[DiffInterfaceId::TEST_SET_CMUT] = &TelRilTest::SetMuteTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_CMUT] = &TelRilTest::GetMuteTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_EMERGENCY_CALL_LIST] = &TelRilTest::GetEmergencyCallListTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_VONR_STATUS] = &TelRilTest::SetVoNRSwitchTest;
 }
 
 void TelRilTest::InitData()
@@ -2075,6 +2076,25 @@ void TelRilTest::GetEmergencyCallListTest(int32_t slotId, const std::shared_ptr<
         telRilManager_->GetEmergencyCallList(slotId, event);
         TELEPHONY_LOGI("TelRilTest::GetEmergencyCallListTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND_LONG);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Set VoNR Switch
+ *
+ * @param handler
+ */
+void TelRilTest::SetVoNRSwitchTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SET_VONR_SWITCH_STATUS);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::SetVoNRSwitchTest -->");
+        telRilManager_->SetVoNRSwitch(slotId, 1, event);
+        TELEPHONY_LOGI("TelRilTest::SetVoNRSwitchTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }
 }
@@ -4421,6 +4441,28 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioStateTest_0101, Function | MediumT
 HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioStateTest_0201, Function | MediumTest | Level3)
 {
     ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE), SLOT_ID_1, GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_SetVoNRSwitchTest_0101 to do ...
+ * @tc.name Set vonr switch of the card 1
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SetVoNRSwitchTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_VONR_STATUS), SLOT_ID_0, GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_SetVoNRSwitchTest_0201 to do ...
+ * @tc.name Set vonr switch of the card 2
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SetVoNRSwitchTest_0201, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_VONR_STATUS), SLOT_ID_1, GetHandler());
     return;
 }
 #else // TEL_TEST_UNSUPPORT
