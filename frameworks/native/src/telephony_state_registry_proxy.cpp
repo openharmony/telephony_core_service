@@ -15,6 +15,8 @@
 
 #include "telephony_state_registry_proxy.h"
 
+#include <stdint.h>
+
 #include "cell_information.h"
 #include "i_telephony_state_notify.h"
 #include "ipc_types.h"
