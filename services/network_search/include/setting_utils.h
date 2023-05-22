@@ -57,7 +57,6 @@ private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
 
 private:
-    std::shared_ptr<DataShare::DataShareHelper> settingHelper_;
     const std::string SETTING_KEY = "KEYWORD";
     const std::string SETTING_VALUE = "VALUE";
     const int32_t RDB_INVALID_VALUE = -1;
