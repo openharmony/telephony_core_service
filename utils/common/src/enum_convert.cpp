@@ -15,6 +15,8 @@
 
 #include "enum_convert.h"
 
+#include "string"
+
 namespace OHOS {
 namespace Telephony {
 std::string GetBoolValue(int32_t value)
