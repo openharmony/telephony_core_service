@@ -42,7 +42,7 @@ const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE =
 
 SettingUtils::SettingUtils() = default;
 
-SettingUtils::~SettingUtils() {} = default;
+SettingUtils::~SettingUtils() = default;
 
 std::shared_ptr<DataShare::DataShareHelper> SettingUtils::CreateDataShareHelper()
 {
