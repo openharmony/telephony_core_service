@@ -22,34 +22,6 @@
 
 namespace OHOS {
 namespace Telephony {
-enum class TelephonyLogLevel {
-    DEBUG = 0,
-    INFO,
-    WARN,
-    ERROR,
-    FATAL,
-};
-
-class TelephonyLogWrapper {
-public:
-    static bool JudgeLevel(const TelephonyLogLevel &level);
-
-    static void SetLogLevel(const TelephonyLogLevel &level)
-    {
-        level_ = level;
-    }
-
-    static const TelephonyLogLevel &GetLogLevel()
-    {
-        return level_;
-    }
-
-    static std::string GetBriefFileName(const std::string &file);
-
-private:
-    static TelephonyLogLevel level_;
-};
-
 #define CONFIG_HILOG
 #ifdef CONFIG_HILOG
 
