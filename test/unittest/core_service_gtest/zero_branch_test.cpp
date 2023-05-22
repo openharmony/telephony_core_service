@@ -15,14 +15,18 @@
 #define private public
 #define protected public
 #include "cell_info.h"
+#include "cell_location.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_manager_inner.h"
+#include "core_service_client.h"
 #include "csim_file_controller.h"
 #include "gtest/gtest.h"
 #include "icc_file.h"
 #include "icc_file_controller.h"
 #include "icc_operator_rule.h"
+#include "ims_core_service_callback_proxy.h"
+#include "ims_core_service_callback_stub.h"
 #include "isim_file_controller.h"
 #include "multi_sim_controller.h"
 #include "multi_sim_monitor.h"
@@ -106,7 +110,11 @@ HWTEST_F(BranchTest, Telephony_CellInfo_001, Function | MediumTest | Level1)
     sptr<CellInformation> wcdmaCellInformation = new WcdmaCellInformation();
     sptr<CellInformation> tdscdmaCellInformation = new TdscdmaCellInformation();
     sptr<CellInformation> nrCellInformation = new NrCellInformation();
-    sptr<CellInformation> cdmaCellInformation = new NrCellInformation();
+    sptr<CellInformation> cdmaCellInformation = new CdmaCellInformation();
+    sptr<CellInformation> cdmaCellInformationTwo;
+    cdmaCellInformationTwo = cdmaCellInformation;
+    Parcel parcel;
+    gsmCellInformation->CellInformation::Unmarshalling(parcel);
     std::vector<sptr<CellInformation>> cellInfos;
     cellInfo->GetCellInfoList(cellInfoList);
     cellInfo->ProcessNeighboringCellInfo(event);
@@ -133,6 +141,7 @@ HWTEST_F(BranchTest, Telephony_CellInfo_001, Function | MediumTest | Level1)
     EXPECT_TRUE(
         cellInfo->ProcessCellLocation(tdscdmaCellInformation, CellInformation::CellType::CELL_TYPE_TDSCDMA, 1, 0));
     EXPECT_TRUE(cellInfo->ProcessCellLocation(nrCellInformation, CellInformation::CellType::CELL_TYPE_NR, 1, 0));
+    EXPECT_GE(cdmaCellInformation->GetSignalIntensity(), 0);
 }
 
 /**
@@ -2315,6 +2324,77 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
     sptr<SimAccountCallback> callback = nullptr;
     EXPECT_GT(multiSimMonitor->RegisterSimAccountCallback(bundleName, callback), TELEPHONY_ERROR);
     EXPECT_EQ(multiSimMonitor->UnregisterSimAccountCallback(bundleName), TELEPHONY_ERROR);
+}
+
+/**
+ * @tc.number   Telephony_ImsCoreServiceCallbackProxy_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_ImsCoreServiceCallbackProxy_001, Function | MediumTest | Level1)
+{
+    sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityMgr == nullptr) {
+        TELEPHONY_LOGE("Telephony_ImsCoreServiceCallbackProxy systemAbilityMgr is nullptr");
+        return;
+    }
+    sptr<IRemoteObject> remote = systemAbilityMgr->CheckSystemAbility(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID);
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Telephony_ImsCoreServiceCallbackProxy remote is nullptr");
+        return;
+    }
+    auto imsCoreServiceCallbackProxy = std::make_shared<ImsCoreServiceCallbackProxy>(remote);
+    ImsServiceStatus imsServiceStatus;
+    EXPECT_GE(imsCoreServiceCallbackProxy->UpdateImsServiceStatusChanged(INVALID_SLOTID, imsServiceStatus), 0);
+    ImsRegistrationStatus imsRegStatus;
+    EXPECT_GE(imsCoreServiceCallbackProxy->GetImsRegistrationStatusResponse(INVALID_SLOTID, imsRegStatus), 0);
+    auto imsCoreServiceCallbackStub = std::make_shared<ImsCoreServiceCallbackStub>();
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    EXPECT_GE(imsCoreServiceCallbackStub->OnRemoteRequest(0, data, reply, option), 0);
+}
+
+/**
+ * @tc.number   Telephony_CoreServiceClient_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CoreServiceClient_001, Function | MediumTest | Level1)
+{
+    auto coreServiceClient = std::make_shared<CoreServiceClient>();
+    coreServiceClient->OnRemoteDied(nullptr);
+    auto recipient = std::make_shared<CoreServiceClient::CoreServiceDeathRecipient>(CoreServiceClient::GetInstance());
+    recipient->OnRemoteDied(nullptr);
+    EXPECT_GE(coreServiceClient->GetNetworkSelectionMode(INVALID_SLOTID, nullptr), 0);
+    EXPECT_NE(coreServiceClient->RefreshSimState(INVALID_SLOTID), 0);
+    EXPECT_GE(coreServiceClient->GetPreferredNetwork(INVALID_SLOTID, nullptr), 0);
+    EXPECT_GE(coreServiceClient->SetPreferredNetwork(INVALID_SLOTID, 0, nullptr), 0);
+}
+
+/**
+ * @tc.number   Telephony_SignalInformation_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SignalInformation_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<SignalInformation> wCdmaSignalInformation = std::make_shared<WcdmaSignalInformation>();
+    std::shared_ptr<SignalInformation> nrSignalInformation = std::make_shared<NrSignalInformation>();
+    std::shared_ptr<SignalInformation> cdmaSignalInformation = std::make_shared<CdmaSignalInformation>();
+    std::shared_ptr<SignalInformation> tdScdmaSignalInformation = std::make_shared<TdScdmaSignalInformation>();
+    std::shared_ptr<SignalInformation> gsmSignalInformation = std::make_shared<GsmSignalInformation>();
+    Parcel parcel;
+    gsmSignalInformation->SignalInformation::Unmarshalling(parcel);
+    EXPECT_GE(wCdmaSignalInformation->GetSignalIntensity(), 0);
+    EXPECT_GE(nrSignalInformation->GetSignalIntensity(), 0);
+    EXPECT_GE(cdmaSignalInformation->GetSignalIntensity(), 0);
+    EXPECT_GE(tdScdmaSignalInformation->GetSignalIntensity(), 0);
+    EXPECT_GE(gsmSignalInformation->GetSignalIntensity(), 0);
+    std::shared_ptr<CellLocation> cellLocation = std::make_shared<GsmCellLocation>();
+    cellLocation->CellLocation::Unmarshalling(parcel);
+    std::shared_ptr<GsmCellLocation> gsmCellLocation = std::make_shared<GsmCellLocation>();
+    EXPECT_GE(gsmCellLocation->GetCellId(), 0);
 }
 } // namespace Telephony
 } // namespace OHOS
