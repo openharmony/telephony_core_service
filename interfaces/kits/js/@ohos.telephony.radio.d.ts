@@ -2029,7 +2029,7 @@ declare namespace radio {
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
      * @since 8
-     */ 
+     */
     data: CdmaCellInformation | GsmCellInformation | LteCellInformation | NrCellInformation | TdscdmaCellInformation
     | WcdmaCellInformation;
   }
