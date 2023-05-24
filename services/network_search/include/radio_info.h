@@ -42,6 +42,7 @@ public:
     void ProcessVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event);
     void AirplaneModeChange();
     int32_t ProcessGetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &event) const;
+    int32_t ProcessSetNrOptionMode(const AppExecFwk::InnerEvent::Pointer &event) const;
     int32_t ProcessGetNrOptionMode(const AppExecFwk::InnerEvent::Pointer &event) const;
     int32_t ProcessGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event) const;
 

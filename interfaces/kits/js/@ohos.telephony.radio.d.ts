@@ -456,6 +456,8 @@ declare namespace radio {
    * @syscap SystemCapability.Telephony.CoreService
    * @systemapi Hide this for inner system use.
    * @since 8
+   * @deprecated since 10
+   * @useinstead telephony.radio#getNROptionMode
    */
   function getNrOptionMode(slotId?: number): Promise<NrOptionMode>;
 
@@ -472,6 +474,8 @@ declare namespace radio {
    * @syscap SystemCapability.Telephony.CoreService
    * @systemapi Hide this for inner system use.
    * @since 8
+   * @deprecated since 10
+   * @useinstead telephony.radio#getNROptionMode
    */
   function getNrOptionMode(callback: AsyncCallback<NrOptionMode>): void;
 
@@ -1321,6 +1325,84 @@ declare namespace radio {
    * @since 10
    */
   function getBasebandVersion(slotId: number): Promise<string>;
+
+  /**
+   * Set the NR option mode.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot index
+   * number supported by the device.
+   * @param { NROptionMode } mode - Indicates the nr option mode to be set.
+   * @param { AsyncCallback<void> } callback - Indicates the callback for getting the option result.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function setNROptionMode(slotId: number, mode: NROptionMode, callback: AsyncCallback<void>): void;
+
+  /**
+   * Set the NR option mode.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot index
+   * number supported by the device.
+   * @param { NROptionMode } mode - Indicates the nr option mode to be set.
+   * @returns { Promise<void> } Returns option result.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function setNROptionMode(slotId: number, mode: NROptionMode): Promise<void>;
+
+  /**
+   * Get the option mode of NR.
+   *
+   * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot
+   * index number supported by the device.
+   * @param { AsyncCallback<NROptionMode> } callback - Indicates the callback for getting the selection mode of NR.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function getNROptionMode(slotId: number, callback: AsyncCallback<NROptionMode>): void;
+
+  /**
+   * Get the option mode of NR.
+   *
+   * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot
+   * index number supported by the device.
+   * @returns { AsyncCallback<NROptionMode> } Returns the selection mode of NR.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function getNROptionMode(slotId: number): Promise<NROptionMode>;
 
   /**
    * Indicates the preferred network.
@@ -2615,6 +2697,8 @@ declare namespace radio {
    * @syscap SystemCapability.Telephony.CoreService
    * @systemapi Hide this for inner system use.
    * @since 8
+   * @deprecated since 10
+   * @useinstead telephony.radio#NROptionMode
    */
   export enum NrOptionMode {
     /**
@@ -2650,6 +2734,52 @@ declare namespace radio {
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
      * @since 8
+     */
+    NR_OPTION_NSA_AND_SA,
+  }
+
+  /**
+   * Obtains the option mode of NR.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CoreService
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  export enum NROptionMode {
+    /**
+     * Indicates unknown NR networking mode.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @systemapi Hide this for inner system use.
+     * @since 10
+     */
+    NR_OPTION_UNKNOWN,
+
+    /**
+     * Indicates that the NR networking mode is NSA only.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @systemapi Hide this for inner system use.
+     * @since 10
+     */
+    NR_OPTION_NSA_ONLY,
+
+    /**
+     * Indicates that the NR networking mode is SA only.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @systemapi Hide this for inner system use.
+     * @since 10
+     */
+    NR_OPTION_SA_ONLY,
+
+    /**
+     * Indicates that the NR networking mode is NSA and SA.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @systemapi Hide this for inner system use.
+     * @since 10
      */
     NR_OPTION_NSA_AND_SA,
   }

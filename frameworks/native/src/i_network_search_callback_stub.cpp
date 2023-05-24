@@ -53,6 +53,14 @@ int32_t INetworkSearchCallbackStub::OnNetworkSearchCallback(NetworkSearchCallbac
             OnSetPreferredNetworkCallback(data);
             break;
         }
+        case INetworkSearchCallback::NetworkSearchCallback::SET_NR_MODE_RESULT: {
+            OnSetNrOptionModeCallback(data);
+            break;
+        }
+        case INetworkSearchCallback::NetworkSearchCallback::GET_NR_MODE_RESULT: {
+            OnGetNrOptionModeCallback(data);
+            break;
+        }
         default: {
             return DEFAULT_ERROR;
         }
@@ -109,6 +117,20 @@ void INetworkSearchCallbackStub::OnGetPreferredNetworkCallback(MessageParcel &da
     OnGetPreferredNetworkCallback(networkMode, error);
 }
 
+void INetworkSearchCallbackStub::OnSetNrOptionModeCallback(MessageParcel &data)
+{
+    bool result = data.ReadBool();
+    int32_t error = data.ReadInt32();
+    OnSetNrOptionModeCallback(result, error);
+}
+
+void INetworkSearchCallbackStub::OnGetNrOptionModeCallback(MessageParcel &data)
+{
+    int32_t mode = data.ReadInt32();
+    int32_t error = data.ReadInt32();
+    OnGetNrOptionModeCallback(mode, error);
+}
+
 void INetworkSearchCallbackStub::OnGetNetworkSearchInformation(
     const sptr<NetworkSearchResult> &networkSearchResult, const int32_t errorCode)
 {}
@@ -135,7 +157,10 @@ int INetworkSearchCallbackStub::OnRemoteRequest(
 
 void INetworkSearchCallbackStub::OnSetPreferredNetworkCallback(const bool result, const int32_t errorCode) {}
 
-void INetworkSearchCallbackStub::OnGetPreferredNetworkCallback(const int32_t networkMode, const int32_t errorCode)
-{}
+void INetworkSearchCallbackStub::OnGetPreferredNetworkCallback(const int32_t networkMode, const int32_t errorCode) {}
+
+void INetworkSearchCallbackStub::OnSetNrOptionModeCallback(const bool result, const int32_t errorCode) {}
+
+void INetworkSearchCallbackStub::OnGetNrOptionModeCallback(const int32_t mode, const int32_t errorCode) {}
 } // namespace Telephony
 } // namespace OHOS

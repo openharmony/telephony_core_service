@@ -1128,6 +1128,20 @@ int32_t NetworkSearchManager::GetNrOptionMode(int32_t slotId, NrMode &mode)
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t NetworkSearchManager::GetNrOptionMode(int32_t slotId, NSCALLBACK &callback)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (!eventSender_->SendCallback(slotId, RadioEvent::RADIO_GET_NR_OPTION_MODE, &callback)) {
+        TELEPHONY_LOGE("slotId:%{public}d GetNrOptionMode SendCallback failed.", slotId);
+        return CORE_SERVICE_SEND_CALLBACK_FAILED;
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 int32_t NetworkSearchManager::UpdateNrOptionMode(int32_t slotId, NrMode mode)
 {
     auto inner = FindManagerInner(slotId);
@@ -1139,17 +1153,37 @@ int32_t NetworkSearchManager::UpdateNrOptionMode(int32_t slotId, NrMode mode)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t NetworkSearchManager::SetNrOptionMode(int32_t slotId, NrMode mode)
+int32_t NetworkSearchManager::SetNrOptionMode(int32_t slotId, int32_t mode)
 {
     TELEPHONY_LOGD("NetworkSearchManager SetNrOptionMode mode:%{public}d slotId:%{public}d", mode, slotId);
+    if (mode < static_cast<int32_t>(NrMode::NR_MODE_UNKNOWN) ||
+        mode > static_cast<int32_t>(NrMode::NR_MODE_NSA_AND_SA)) {
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+    eventSender_->SendBase(slotId, RadioEvent::RADIO_SET_NR_OPTION_MODE);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkSearchManager::SetNrOptionMode(int32_t slotId, int32_t mode, NSCALLBACK &callback)
+{
+    TELEPHONY_LOGD("NetworkSearchManager SetNrOptionMode mode:%{public}d slotId:%{public}d", mode, slotId);
+    if (mode < static_cast<int32_t>(NrMode::NR_MODE_UNKNOWN) ||
+        mode > static_cast<int32_t>(NrMode::NR_MODE_NSA_AND_SA)) {
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (!eventSender_->SendCallbackEx(slotId, RadioEvent::RADIO_SET_NR_OPTION_MODE, &callback, mode)) {
+        TELEPHONY_LOGE("slotId:%{public}d SetNrOptionMode SendCallback failed.", slotId);
+        return CORE_SERVICE_SEND_CALLBACK_FAILED;
     }
     return TELEPHONY_ERR_SUCCESS;
 }

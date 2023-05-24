@@ -71,10 +71,19 @@ public:
      * @brief Obtain the selection mode of NR
      *
      * @param slotId[in], sim slot id
-     * @param mode[out], the selection mode of NR of the SIM card
+     * @param callback[out], the callback of NR mode
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t GetNrOptionMode(int32_t slotId, NrMode &mode);
+    int32_t SetNrOptionMode(int32_t slotId, int32_t mode, const sptr<INetworkSearchCallback> &callback);
+
+    /**
+     * @brief Obtain the selection mode of NR
+     *
+     * @param slotId[in], sim slot id
+     * @param callback[out], the callback of NR mode
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetNrOptionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
 
     /**
      * @brief Obtain the unique ID

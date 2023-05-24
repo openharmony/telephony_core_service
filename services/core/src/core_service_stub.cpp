@@ -55,6 +55,7 @@ void CoreServiceStub::AddHandlerNetWorkToMap()
     memberFuncMap_[uint32_t(InterfaceID::SET_PREFERRED_NETWORK_MODE)] = &CoreServiceStub::OnSetPreferredNetwork;
     memberFuncMap_[uint32_t(InterfaceID::GET_NETWORK_CAPABILITY)] = &CoreServiceStub::OnGetNetworkCapability;
     memberFuncMap_[uint32_t(InterfaceID::SET_NETWORK_CAPABILITY)] = &CoreServiceStub::OnSetNetworkCapability;
+    memberFuncMap_[uint32_t(InterfaceID::SET_NR_OPTION_MODE)] = &CoreServiceStub::OnSetNrOptionMode;
     memberFuncMap_[uint32_t(InterfaceID::GET_NR_OPTION_MODE)] = &CoreServiceStub::OnGetNrOptionMode;
     memberFuncMap_[uint32_t(InterfaceID::REG_IMS_CALLBACK)] = &CoreServiceStub::OnRegisterImsRegInfoCallback;
     memberFuncMap_[uint32_t(InterfaceID::UN_REG_IMS_CALLBACK)] = &CoreServiceStub::OnUnregisterImsRegInfoCallback;
@@ -357,19 +358,44 @@ int32_t CoreServiceStub::OnIsNrSupported(MessageParcel &data, MessageParcel &rep
     return NO_ERROR;
 }
 
+int32_t CoreServiceStub::OnSetNrOptionMode(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t nrMode = data.ReadInt32();
+    sptr<INetworkSearchCallback> callback = nullptr;
+    sptr<IRemoteObject> remoteCallback = data.ReadRemoteObject();
+    if (remoteCallback == nullptr) {
+        TELEPHONY_LOGE("CoreServiceStub::OnSetNrOptionMode remoteCallback is nullptr.");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    callback = iface_cast<INetworkSearchCallback>(remoteCallback);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("CoreServiceStub::OnSetNrOptionMode callback is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t result = SetNrOptionMode(slotId, nrMode, callback);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnSetNrOptionMode write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
 int32_t CoreServiceStub::OnGetNrOptionMode(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    NrMode nrMode = NrMode::NR_MODE_UNKNOWN;
-    int32_t result = GetNrOptionMode(slotId, nrMode);
+    sptr<INetworkSearchCallback> callback = nullptr;
+    sptr<IRemoteObject> remoteCallback = data.ReadRemoteObject();
+    if (remoteCallback != nullptr) {
+        TELEPHONY_LOGD("CoreServiceStub::OnGetNrOptionMode remote callback is not null.");
+        callback = iface_cast<INetworkSearchCallback>(remoteCallback);
+    }
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("CoreServiceStub::OnGetNrOptionMode callback is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t result = GetNrOptionMode(slotId, callback);
     if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnGetNrOptionMode write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        return result;
-    }
-    if (!reply.WriteInt32(static_cast<int32_t>(nrMode))) {
         TELEPHONY_LOGE("OnRemoteRequest::OnGetNrOptionMode write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }

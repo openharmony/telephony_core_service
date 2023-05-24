@@ -168,7 +168,10 @@ public:
     void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive) override;
     int32_t HandleNotifyStateChangeWithDelay(int32_t slotId, bool isNeedDelay) override;
     bool IsNeedDelayNotify(int32_t slotId);
+    int32_t SetNrOptionMode(int32_t slotId, int32_t mode);
+    int32_t SetNrOptionMode(int32_t slotId, int32_t mode, NSCALLBACK &callback) override;
     int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) override;
+    int32_t GetNrOptionMode(int32_t slotId, NSCALLBACK &callback) override;
     int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName,
         const sptr<ImsRegInfoCallback> &callback) override;
     int32_t UnregisterImsRegInfoCallback(
@@ -206,7 +209,6 @@ public:
     void SetImei(int32_t slotId, std::u16string imei);
     void UpdateCellLocation(int32_t slotId, int32_t techType, int32_t cellId, int32_t lac);
     void SetMeid(int32_t slotId, std::u16string meid);
-    int32_t SetNrOptionMode(int32_t slotId, NrMode mode);
     void SetFrequencyType(int32_t slotId, FrequencyType type);
     void GetVoiceTech(int32_t slotId);
     std::shared_ptr<NetworkSearchManagerInner> FindManagerInner(int32_t slotId);

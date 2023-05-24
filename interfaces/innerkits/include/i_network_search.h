@@ -111,6 +111,7 @@ public:
      * @return Returns the network status of the phone.
      */
     virtual PhoneType GetPhoneType(int32_t slotId) = 0;
+    virtual int32_t SetNrOptionMode(int32_t slotId, int32_t mode, NSCALLBACK &callback) = 0;
     virtual int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) = 0;
     /**
      * @brief Obtains the frequency type.

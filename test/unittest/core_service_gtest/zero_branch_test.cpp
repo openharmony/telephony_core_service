@@ -1698,6 +1698,19 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     EXPECT_EQ(result, testStr);
     EXPECT_NE(networkSearchManager->GetMeid(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, testStr);
+    std::string version = "";
+    EXPECT_NE(networkSearchManager->GetBasebandVersion(INVALID_SLOTID, version), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(version, "");
+    EXPECT_FALSE(networkSearchManager->IsNrSupported(INVALID_SLOTID));
+    sptr<NetworkState> networkState = nullptr;
+    EXPECT_NE(networkSearchManager->GetNetworkStatus(INVALID_SLOTID, networkState), TELEPHONY_ERR_SUCCESS);
+    EXPECT_TRUE(networkState == nullptr);
+    networkSearchManager->AddManagerInner(INVALID_SLOTID, inner);
+    EXPECT_EQ(networkSearchManager->GetFrequencyType(INVALID_SLOTID), FrequencyType::FREQ_TYPE_UNKNOWN);
+    EXPECT_EQ(networkSearchManager->GetNrState(INVALID_SLOTID), NrState::NR_STATE_NOT_SUPPORT);
+    EXPECT_EQ(networkSearchManager->GetPsRegState(INVALID_SLOTID), TELEPHONY_ERROR);
+    EXPECT_EQ(networkSearchManager->GetCsRegState(INVALID_SLOTID), TELEPHONY_ERROR);
+    EXPECT_EQ(networkSearchManager->GetPsRoamingState(INVALID_SLOTID), TELEPHONY_ERROR);
 }
 
 /**
@@ -1741,7 +1754,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_002, Function | MediumTest |
     networkSearchManager->SetImei(INVALID_SLOTID, imei);
     networkSearchManager->UpdateCellLocation(INVALID_SLOTID, 1, 1, 1);
     networkSearchManager->SetMeid(INVALID_SLOTID, imei);
-    networkSearchManager->SetNrOptionMode(INVALID_SLOTID, NrMode::NR_MODE_UNKNOWN);
     networkSearchManager->SetFrequencyType(INVALID_SLOTID, FrequencyType::FREQ_TYPE_MMWAVE);
     networkSearchManager->SetRadioFirstPowerOn(INVALID_SLOTID, true);
     networkSearchManager->SetLocalAirplaneMode(INVALID_SLOTID, true);
@@ -1934,6 +1946,8 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
     networkSearchHandler->AutoTimeZoneChange(event);
     networkSearchHandler->AirplaneModeChange(event);
     networkSearchHandler->RadioGetBasebandVersion(event);
+    networkSearchHandler->SetNrOptionModeResponse(event);
+    networkSearchHandler->GetNrOptionModeResponse(event);
     networkSearchHandler->RadioGetRrcConnectionState(event);
     event = nullptr;
     networkSearchHandler->RadioGetCurrentCellInfo(event);
@@ -1949,7 +1963,8 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
     networkSearchHandler->RadioOffOrUnavailableState(1);
     networkSearchHandler->RadioGetNeighboringCellInfo(event);
     networkSearchHandler->RadioGetBasebandVersion(event);
-    networkSearchHandler->HandleRrcStateChanged(1);
+    networkSearchHandler->SetNrOptionModeResponse(event);
+    networkSearchHandler->GetNrOptionModeResponse(event);
     networkSearchHandler->RadioGetRrcConnectionState(event);
     EXPECT_EQ(networkSearchHandler->GetPhoneType(), PhoneType::PHONE_TYPE_IS_NONE);
 }

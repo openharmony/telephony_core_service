@@ -23,10 +23,12 @@
 #include "core_service_client.h"
 #include "get_network_search_info_callback.h"
 #include "get_network_search_mode_callback.h"
+#include "get_nr_option_mode_callback.h"
 #include "get_preferred_network_callback.h"
 #include "get_radio_state_callback.h"
 #include "napi_ims_reg_info_callback_manager.h"
 #include "set_network_search_mode_callback.h"
+#include "set_nr_option_mode_callback.h"
 #include "set_preferred_network_callback.h"
 #include "set_radio_state_callback.h"
 #include "telephony_config.h"
@@ -413,17 +415,26 @@ static bool MatchGetIMEIParameter(napi_env env, napi_value parameter[], size_t p
 static bool MatchGetNrOptionModeParameter(napi_env env, napi_value parameter[], size_t parameterCount)
 {
     switch (parameterCount) {
-        case PARAMETER_COUNT_ZERO: {
-            return true;
-        }
         case PARAMETER_COUNT_ONE: {
-            return NapiUtil::MatchParameters(env, parameter, { napi_number }) ||
-                   NapiUtil::MatchParameters(env, parameter, { napi_function }) ||
-                   NapiUtil::MatchParameters(env, parameter, { napi_null }) ||
-                   NapiUtil::MatchParameters(env, parameter, { napi_undefined });
+            return NapiUtil::MatchParameters(env, parameter, { napi_number });
         }
         case PARAMETER_COUNT_TWO: {
             return NapiUtil::MatchParameters(env, parameter, { napi_number, napi_function });
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
+static bool MatchSetNrOptionModeParameter(napi_env env, napi_value parameter[], size_t parameterCount)
+{
+    switch (parameterCount) {
+        case PARAMETER_COUNT_TWO: {
+            return NapiUtil::MatchParameters(env, parameter, { napi_number, napi_number });
+        }
+        case PARAMETER_COUNT_THREE: {
+            return NapiUtil::MatchParameters(env, parameter, { napi_number, napi_number, napi_function });
         }
         default: {
             return false;
@@ -2162,47 +2173,38 @@ static napi_value GetUniqueDeviceId(napi_env env, napi_callback_info info)
         env, asyncContext.release(), "GetUniqueDeviceId", NativeGetUniqueDeviceId, GetUniqueDeviceIdCallback);
 }
 
-static int32_t WrapNrOptionMode(NrMode type)
-{
-    switch (type) {
-        case NrMode::NR_MODE_UNKNOWN:
-            return static_cast<int32_t>(NR_OPTION_UNKNOWN);
-        case NrMode::NR_MODE_NSA_ONLY:
-            return static_cast<int32_t>(NR_OPTION_NSA_ONLY);
-        case NrMode::NR_MODE_SA_ONLY:
-            return static_cast<int32_t>(NR_OPTION_SA_ONLY);
-        case NrMode::NR_MODE_NSA_AND_SA:
-            return static_cast<int32_t>(NR_OPTION_NSA_AND_SA);
-        default:
-            return static_cast<int32_t>(NR_OPTION_UNKNOWN);
-    }
-}
-
 static void NativeGetNrOptionMode(napi_env env, void *data)
 {
-    auto context = static_cast<GetNrOptionModeContext *>(data);
+    auto context = static_cast<NrOptionModeContext *>(data);
     if (!IsValidSlotId(context->slotId)) {
         TELEPHONY_LOGE("NativeGetNrOptionMode slotId is invalid");
         context->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    NrMode type = NrMode::NR_MODE_UNKNOWN;
-    context->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNrOptionMode(context->slotId, type);
-    context->nrOptionMode = WrapNrOptionMode(type);
+    auto getNrOptionModeCallback = std::make_unique<GetNrOptionModeCallback>(context);
+    OHOS::sptr<INetworkSearchCallback> callback(getNrOptionModeCallback.release());
+    std::unique_lock<std::mutex> callbackLock(context->callbackMutex);
+    context->errorCode =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNrOptionMode(context->slotId, callback);
     if (context->errorCode == TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGI("NativeGetNrOptionMode nrOptionMode = %{public}d", context->nrOptionMode);
-        context->resolved = true;
+        context->cv.wait_for(
+            callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [context] { return context->callbackEnd; });
+        TELEPHONY_LOGI("NativeGetNrOptionMode after callback end");
     }
 }
 
 static void GetNrOptionModeCallback(napi_env env, napi_status status, void *data)
 {
-    auto context = static_cast<GetNrOptionModeContext *>(data);
+    auto context = static_cast<NrOptionModeContext *>(data);
     TELEPHONY_LOGI("GetNrOptionModeCallback resolved = %{public}d", context->resolved);
     napi_value callbackValue = nullptr;
     if (context->resolved) {
         napi_create_int32(env, context->nrOptionMode, &callbackValue);
     } else {
+        if (context->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("GetNrOptionModeCallback time out, errorCode = %{public}d", context->errorCode);
+            context->errorCode = TELEPHONY_ERR_FAIL;
+        }
         JsError error = NapiUtil::ConverErrorMessageForJs(context->errorCode);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
@@ -2221,27 +2223,75 @@ static napi_value GetNrOptionMode(napi_env env, napi_callback_info info)
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
-    auto asyncContext = std::make_unique<GetNrOptionModeContext>();
-    if (parameterCount == PARAMETER_COUNT_ZERO) {
-        asyncContext->slotId = GetDefaultSlotId();
-    } else if (parameterCount == PARAMETER_COUNT_ONE) {
-        napi_valuetype valueType = napi_undefined;
-        NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
-        if (valueType == napi_undefined || valueType == napi_null) {
-            TELEPHONY_LOGI("undefined or null parameter detected, treating as no parameter input.");
-            asyncContext->slotId = GetDefaultSlotId();
-        } else if (valueType == napi_number) {
-            NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-        } else if (valueType == napi_function) {
-            asyncContext->slotId = GetDefaultSlotId();
-            NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
-        }
-    } else if (parameterCount == PARAMETER_COUNT_TWO) {
-        NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+    auto asyncContext = std::make_unique<NrOptionModeContext>();
+    NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+    if (parameterCount == PARAMETER_COUNT_TWO) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(
         env, asyncContext.release(), "GetNrOptionMode", NativeGetNrOptionMode, GetNrOptionModeCallback);
+}
+
+static void NativeSetNrOptionMode(napi_env env, void *data)
+{
+    auto asyncContext = static_cast<NrOptionModeContext *>(data);
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeSetNrOptionMode slotId is invalid");
+        asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
+    auto setNrOptionModeCallback = std::make_unique<SetNrOptionModeCallback>(asyncContext);
+    OHOS::sptr<INetworkSearchCallback> callback(setNrOptionModeCallback.release());
+    std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
+    int32_t mode = asyncContext->nrOptionMode;
+    asyncContext->errorCode =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().SetNrOptionMode(asyncContext->slotId, mode, callback);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->cv.wait_for(
+            callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [asyncContext] { return asyncContext->callbackEnd; });
+        TELEPHONY_LOGI("NativeSetNrOptionMode after callback end");
+    }
+}
+
+static void SetNrOptionModeCallback(napi_env env, napi_status status, void *data)
+{
+    auto context = static_cast<NrOptionModeContext *>(data);
+    TELEPHONY_LOGI("SetNrOptionModeCallback resolved = %{public}d", context->resolved);
+    napi_value callbackValue = nullptr;
+    if (context->resolved) {
+        napi_get_undefined(env, &callbackValue);
+    } else {
+        if (context->errorCode == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("SetNrOptionModeCallback time out, errorCode = %{public}d", context->errorCode);
+            context->errorCode = TELEPHONY_ERR_FAIL;
+        }
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            context->errorCode, "SetNrOptionMode", SET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
+    }
+    NapiUtil::Handle2ValueCallback(env, context, callbackValue);
+}
+
+static napi_value SetNrOptionMode(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = PARAMETER_COUNT_THREE;
+    napi_value parameters[PARAMETER_COUNT_THREE] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
+    if (!MatchSetNrOptionModeParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("SetNrOptionMode parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<NrOptionModeContext>();
+    NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+    NAPI_CALL(env, napi_get_value_int32(env, parameters[1], &asyncContext->nrOptionMode));
+    if (parameterCount == PARAMETER_COUNT_THREE) {
+        NAPI_CALL(env, napi_create_reference(env, parameters[2], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+    }
+    return NapiUtil::HandleAsyncWork(
+        env, asyncContext.release(), "SetNrOptionMode", NativeSetNrOptionMode, SetNrOptionModeCallback);
 }
 
 static napi_value IsNrSupported(napi_env env, napi_callback_info info)
@@ -3300,6 +3350,8 @@ static napi_value CreateFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setPrimarySlotId", SetPrimarySlotId),
         DECLARE_NAPI_FUNCTION("getImsRegInfo", GetImsRegInfo),
         DECLARE_NAPI_FUNCTION("getBasebandVersion", GetBasebandVersion),
+        DECLARE_NAPI_FUNCTION("setNROptionMode", SetNrOptionMode),
+        DECLARE_NAPI_FUNCTION("getNROptionMode", GetNrOptionMode),
         DECLARE_NAPI_FUNCTION("on", ObserverOn),
         DECLARE_NAPI_FUNCTION("off", ObserverOff),
     };
