@@ -15,8 +15,11 @@
 
 #include "cell_location.h"
 
+#include <stdint.h>
+
 #include "new"
 #include "parcel.h"
+#include "time.h"
 
 namespace OHOS {
 namespace Telephony {
