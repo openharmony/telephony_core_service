@@ -23,7 +23,7 @@
 #include "new"
 #include "parcel.h"
 #include "string"
-#include "ctime"
+#include "time.h"
 
 namespace OHOS {
 namespace Telephony {

@@ -16,7 +16,9 @@
 #ifndef ENUM_CONVERT_H
 #define ENUM_CONVERT_H
 
-#include <string>
+#include <stdint.h>
+
+#include "iosfwd"
 
 namespace OHOS {
 namespace Telephony {
