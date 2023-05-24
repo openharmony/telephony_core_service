@@ -1694,7 +1694,7 @@ bool SimFile::SetVoiceCallForwarding(bool enable, const std::string &number)
         if (enable && !number.empty()) {
             std::vector<uint8_t> bcdCodes;
             SimNumberDecode::NumberConvertToBCD(number, bcdCodes, false, SimNumberDecode::BCD_TYPE_ADN);
-            int dataLength = bcdCodes.size();
+            unsigned int dataLength = bcdCodes.size();
             unsigned char numberData[dataLength];
             for (int i = 0; i < dataLength; ++i) {
                 numberData[i] = bcdCodes.at(i);

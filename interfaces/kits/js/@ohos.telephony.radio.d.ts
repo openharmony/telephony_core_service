@@ -851,7 +851,7 @@ declare namespace radio {
    * @syscap SystemCapability.Telephony.CoreService
    * @since 7
    */
-  function isRadioOn(slotId: number, callback: AsyncCallback<boolean>): void
+  function isRadioOn(slotId: number, callback: AsyncCallback<boolean>): void;
 
   /**
    * Checks whether the radio service is enabled.
@@ -2029,9 +2029,9 @@ declare namespace radio {
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
      * @since 8
-     */
+     */ 
     data: CdmaCellInformation | GsmCellInformation | LteCellInformation | NrCellInformation | TdscdmaCellInformation
-      | WcdmaCellInformation;
+    | WcdmaCellInformation;
   }
 
   /**
