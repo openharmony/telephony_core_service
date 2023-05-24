@@ -83,7 +83,7 @@ void RuimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         return;
     }
     auto id = event->GetInnerEventId();
-    TELEPHONY_LOGI("RuimFile::ProcessEvent id %{public}d", id);
+    TELEPHONY_LOGD("RuimFile::ProcessEvent id %{public}d", id);
     auto itFunc = memberFuncMap_.find(id);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;

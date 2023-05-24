@@ -169,7 +169,7 @@ int32_t MultiSimMonitor::UnregisterSimAccountCallback(const std::string &bundleN
 
 void MultiSimMonitor::NotifySimAccountChanged()
 {
-    TELEPHONY_LOGI("NotifySimAccountChanged");
+    TELEPHONY_LOGD("NotifySimAccountChanged");
     bool isExisted = false;
     std::lock_guard<std::mutex> lock(mutexInner_);
     for (auto iter : listSimAccountCallbackRecord_) {
@@ -209,7 +209,7 @@ void MultiSimMonitor::SystemAbilityStatusChangeListener::OnAddSystemAbility(
         return;
     }
 
-    TELEPHONY_LOGI("SystemAbilityStatusChangeListener::OnAddSystemAbility DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID");
+    TELEPHONY_LOGD("SystemAbilityStatusChangeListener::OnAddSystemAbility DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID");
     if (controller_ == nullptr) {
         TELEPHONY_LOGE("MultiSimController is null");
         return;
@@ -236,7 +236,7 @@ void MultiSimMonitor::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
     if (systemAbilityId != DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
         return;
     }
-    TELEPHONY_LOGI("SystemAbilityStatusChangeListener::OnRemoveSystemAbility DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID");
+    TELEPHONY_LOGD("SystemAbilityStatusChangeListener::OnRemoveSystemAbility DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID");
     auto handler = multiSimMonitorHandler_.lock();
     if (handler == nullptr) {
         TELEPHONY_LOGE("multiSimMonitorHandler_ is null");

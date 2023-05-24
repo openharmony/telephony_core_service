@@ -32,7 +32,7 @@ void UsimDiallingNumbersService::ProcessEvent(const AppExecFwk::InnerEvent::Poin
         return;
     }
     uint32_t id = event->GetInnerEventId();
-    TELEPHONY_LOGI("UsimDiallingNumbersService::ProcessEvent Id is %{public}d", id);
+    TELEPHONY_LOGD("UsimDiallingNumbersService::ProcessEvent Id is %{public}d", id);
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     if (fd != nullptr) {
         if (fd->exception != nullptr) {

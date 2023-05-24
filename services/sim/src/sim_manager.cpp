@@ -110,7 +110,7 @@ void SimManager::InitSingleSimObject()
 
 void SimManager::SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager)
 {
-    TELEPHONY_LOGI("SimManager::SetNetworkSearchManager");
+    TELEPHONY_LOGD("SimManager::SetNetworkSearchManager");
     if (multiSimController_ == nullptr) {
         TELEPHONY_LOGE("SimManager::SetNetworkSearchManager multiSimController_ is nullptr");
         return;
@@ -151,7 +151,6 @@ bool SimManager::HasSimCardInner(int32_t slotId)
 int32_t SimManager::GetSimState(int32_t slotId, SimState &simState)
 {
     if (!HasSimCardInner(slotId)) {
-        TELEPHONY_LOGE("GetSimState has no sim card!");
         simState = SimState::SIM_STATE_NOT_PRESENT;
         return TELEPHONY_ERR_SUCCESS;
     }
@@ -1002,7 +1001,7 @@ bool SimManager::IsValidSlotIdForDefault(int32_t slotId)
         TELEPHONY_LOGE("slotId is invalid, slotId = %{public}d", slotId);
         return false;
     }
-    TELEPHONY_LOGI("slotId is valid, slotId = %{public}d", slotId);
+    TELEPHONY_LOGD("slotId is valid, slotId = %{public}d", slotId);
     return true;
 }
 

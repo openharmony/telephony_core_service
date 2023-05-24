@@ -65,7 +65,7 @@ void IccDiallingNumbersCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
         return;
     }
     uint32_t id = event->GetInnerEventId();
-    TELEPHONY_LOGI("IccDiallingNumbersCache ProcessEvent Id is %{public}d", id);
+    TELEPHONY_LOGD("IccDiallingNumbersCache ProcessEvent Id is %{public}d", id);
     switch (id) {
         case MSG_SIM_OBTAIN_ADN_DETAILS_DONE:
             ProcessObtainAdnDetailsDone(event);
@@ -321,7 +321,7 @@ void IccDiallingNumbersCache::SendBackResult(const AppExecFwk::InnerEvent::Point
     } else {
         TELEPHONY_LOGE("IccDiallingNumbersCache::SendBackResult null owner");
     }
-    TELEPHONY_LOGI("IccDiallingNumbersCache::SendBackResult send end");
+    TELEPHONY_LOGD("IccDiallingNumbersCache::SendBackResult send end");
 }
 
 void IccDiallingNumbersCache::SendUpdateResult(

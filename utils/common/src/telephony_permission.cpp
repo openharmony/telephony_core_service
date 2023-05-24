@@ -47,7 +47,6 @@ bool TelephonyPermission::GetBundleNameByUid(int32_t uid, std::string &bundleNam
 
     sptr<AppExecFwk::IBundleMgr> iBundleMgr = OHOS::iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
     if (iBundleMgr == nullptr) {
-        TELEPHONY_LOGE(" permission check failed, cannot get IBundleMgr.");
         return false;
     }
     std::string identity = IPCSkeleton::ResetCallingIdentity();
@@ -68,7 +67,7 @@ bool TelephonyPermission::GetBundleNameByUid(int32_t uid, std::string &bundleNam
 bool TelephonyPermission::CheckPermission(const std::string &permissionName)
 {
     if (permissionName.empty()) {
-        TELEPHONY_LOGE("permission check failed, permission name is empty.");
+        TELEPHONY_LOGD("permission check failed, permission name is empty.");
         return false;
     }
 
@@ -80,8 +79,7 @@ bool TelephonyPermission::CheckPermission(const std::string &permissionName)
     } else if (tokenType == ATokenTypeEnum::TOKEN_HAP) {
         result = AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
     } else {
-        TELEPHONY_LOGE("permission check failed, callerToken:%{public}u, tokenType:%{public}d",
-            callerToken, tokenType);
+        TELEPHONY_LOGD("permission check failed, callerToken:%{public}u, tokenType:%{public}d", callerToken, tokenType);
     }
 
     if (permissionName == Permission::ANSWER_CALL || permissionName == Permission::READ_CALL_LOG
@@ -93,14 +91,15 @@ bool TelephonyPermission::CheckPermission(const std::string &permissionName)
             int32_t failCount = status ? 0 : 1;
             int32_t ret = PrivacyKit::AddPermissionUsedRecord(callerToken, permissionName, successCount, failCount);
             if (ret != 0) {
-                TELEPHONY_LOGE("AddPermissionUsedRecord failed, permission:%{public}s, "
-                    "successCount:%{public}d, failCount:%{public}d", permissionName.c_str(), successCount, failCount);
+                TELEPHONY_LOGD("AddPermissionUsedRecord failed, permission:%{public}s, "
+                               "successCount:%{public}d, failCount:%{public}d",
+                    permissionName.c_str(), successCount, failCount);
             }
         }
     }
 
     if (result != PermissionState::PERMISSION_GRANTED) {
-        TELEPHONY_LOGE("permission check failed, permission:%{public}s, callerToken:%{public}u, tokenType:%{public}d",
+        TELEPHONY_LOGD("permission check failed, permission:%{public}s, callerToken:%{public}u, tokenType:%{public}d",
             permissionName.c_str(), callerToken, tokenType);
         return false;
     }
