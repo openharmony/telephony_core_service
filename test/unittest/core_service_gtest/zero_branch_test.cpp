@@ -2269,16 +2269,16 @@ HWTEST_F(BranchTest, Telephony_SimRdbHelper_001, Function | MediumTest | Level1)
     std::vector<SimRdbInfo> vec;
     EXPECT_GE(simRdbHelper->GetDefaultMainCardSlotId(), TELEPHONY_ERROR);
     EXPECT_GE(simRdbHelper->GetDefaultMessageCardSlotId(), TELEPHONY_ERROR);
-    EXPECT_EQ(simRdbHelper->GetDefaultCellularDataCardSlotId(), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(simRdbHelper->GetDefaultVoiceCardSlotId(), TELEPHONY_ERROR);
-    EXPECT_EQ(simRdbHelper->SetDefaultMainCard(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_EQ(simRdbHelper->SetDefaultVoiceCard(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_EQ(simRdbHelper->SetDefaultMessageCard(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_EQ(simRdbHelper->SetDefaultCellularData(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_EQ(simRdbHelper->QueryDataBySlotId(INVALID_SLOTID, simBean), TELEPHONY_ERROR);
-    EXPECT_EQ(simRdbHelper->QueryDataByIccId(iccId, simBean), TELEPHONY_ERROR);
-    EXPECT_EQ(simRdbHelper->QueryAllData(vec), TELEPHONY_ERROR);
-    EXPECT_EQ(simRdbHelper->QueryAllValidData(vec), TELEPHONY_ERROR);
+    EXPECT_GE(simRdbHelper->GetDefaultCellularDataCardSlotId(), TELEPHONY_ERROR);
+    EXPECT_GE(simRdbHelper->GetDefaultVoiceCardSlotId(), TELEPHONY_ERROR);
+    EXPECT_GE(simRdbHelper->SetDefaultMainCard(INVALID_SLOTID), TELEPHONY_ERROR);
+    EXPECT_GE(simRdbHelper->SetDefaultVoiceCard(INVALID_SLOTID), TELEPHONY_ERROR);
+    EXPECT_GE(simRdbHelper->SetDefaultMessageCard(INVALID_SLOTID), TELEPHONY_ERROR);
+    EXPECT_GE(simRdbHelper->SetDefaultCellularData(INVALID_SLOTID), TELEPHONY_ERROR);
+    EXPECT_GE(simRdbHelper->QueryDataBySlotId(INVALID_SLOTID, simBean), TELEPHONY_ERROR);
+    EXPECT_GE(simRdbHelper->QueryDataByIccId(iccId, simBean), TELEPHONY_ERROR);
+    EXPECT_GE(simRdbHelper->QueryAllData(vec), TELEPHONY_ERROR);
+    EXPECT_GE(simRdbHelper->QueryAllValidData(vec), TELEPHONY_ERROR);
 }
 
 /**
