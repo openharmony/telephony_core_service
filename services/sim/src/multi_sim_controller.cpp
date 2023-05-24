@@ -62,13 +62,13 @@ void MultiSimController::Init()
         radioProtocolController_->Init();
     }
     maxCount_ = SIM_SLOT_COUNT;
-    TELEPHONY_LOGI("MultiSimController::Init Create SimRdbHelper count = %{public}d", maxCount_);
+    TELEPHONY_LOGI("Create SimRdbHelper count = %{public}d", maxCount_);
 }
 
 bool MultiSimController::ForgetAllData()
 {
     if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::Init simDbHelper_ is nullptr failed");
+        TELEPHONY_LOGE("simDbHelper_ is nullptr failed");
         return false;
     }
     return simDbHelper_->ForgetAllData();
@@ -77,7 +77,7 @@ bool MultiSimController::ForgetAllData()
 bool MultiSimController::ForgetAllData(int32_t slotId)
 {
     if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::ForgetAllData simDbHelper_ is nullptr");
+        TELEPHONY_LOGE("simDbHelper_ is nullptr");
         return false;
     }
     return simDbHelper_->ForgetAllData(slotId) != INVALID_VALUE;
@@ -92,15 +92,15 @@ bool MultiSimController::InitData(int32_t slotId)
 {
     bool result = true;
     if (!IsValidData(slotId)) {
-        TELEPHONY_LOGI("MultiSimController::InitData has no sim card, abandon");
+        TELEPHONY_LOGE("has no sim card, abandon");
         return false;
     }
     if (!InitIccId(slotId)) { // check if we insert or reactive a data
-        TELEPHONY_LOGI("MultiSimController::InitData can not init IccId");
+        TELEPHONY_LOGE("can not init IccId");
         result = false;
     }
     if (!GetListFromDataBase()) { // init data base to local cache
-        TELEPHONY_LOGE("MultiSimController::InitData can not get dataBase");
+        TELEPHONY_LOGE("can not get dataBase");
         result = false;
     }
     if (localCacheInfo_.size() <= 0) {
@@ -108,15 +108,15 @@ bool MultiSimController::InitData(int32_t slotId)
         return false;
     }
     if (!InitActive(slotId)) {
-        TELEPHONY_LOGE("MultiSimController::InitData InitActive failed");
+        TELEPHONY_LOGE("InitActive failed");
         result = false;
     }
     if (!InitShowName(slotId)) {
-        TELEPHONY_LOGE("MultiSimController::InitData InitShowName failed");
+        TELEPHONY_LOGE("InitShowName failed");
         result = false;
     }
     if (!InitShowNumber(slotId)) {
-        TELEPHONY_LOGE("MultiSimController::InitData InitShowNumber failed");
+        TELEPHONY_LOGE("InitShowNumber failed");
         result = false;
     }
     return result;
@@ -143,16 +143,16 @@ bool MultiSimController::InitIccId(int slotId)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (simFileManager_[slotId] == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::InitIccId can not get simFileManager");
+        TELEPHONY_LOGE("can not get simFileManager");
         return false;
     }
     std::string newIccId = Str16ToStr8(simFileManager_[slotId]->GetSimIccId());
     if (newIccId.empty()) {
-        TELEPHONY_LOGE("MultiSimController::InitIccId can not get iccId");
+        TELEPHONY_LOGE("can not get iccId");
         return false;
     }
     if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::InitIccId failed by nullptr");
+        TELEPHONY_LOGE("failed by nullptr");
         return false;
     }
     int32_t result;
@@ -164,7 +164,7 @@ bool MultiSimController::InitIccId(int slotId)
         result = InsertData(slotId, newIccId);
     }
     if (result == INVALID_VALUE) {
-        TELEPHONY_LOGE("MultiSimController::InitIccId failed to init data");
+        TELEPHONY_LOGE("failed to init data");
         return false;
     } else {
         return true;
@@ -174,7 +174,7 @@ bool MultiSimController::InitIccId(int slotId)
 int32_t MultiSimController::UpdateDataByIccId(int slotId, const std::string &newIccId)
 {
     if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::UpdateDataByIccId failed by nullptr");
+        TELEPHONY_LOGE("failed by nullptr");
         return INVALID_VALUE;
     }
     SimRdbInfo simRdbInfo;
@@ -198,7 +198,7 @@ int32_t MultiSimController::UpdateDataByIccId(int slotId, const std::string &new
 int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
 {
     if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::InsertData failed by nullptr");
+        TELEPHONY_LOGE("failed by nullptr");
         return INVALID_VALUE;
     }
     SimRdbInfo simRdbInfo;
@@ -234,11 +234,11 @@ bool MultiSimController::InitShowName(int slotId)
     std::u16string showName;
     GetShowName(slotId, showName);
     if (!showName.empty() && showName != IccAccountInfo::DEFAULT_SHOW_NAME) {
-        TELEPHONY_LOGI("MultiSimController::InitShowName no need to Init again");
+        TELEPHONY_LOGE("no need to Init again");
         return true;
     }
     if (networkSearchManager_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::InitShowName failed by nullptr");
+        TELEPHONY_LOGE("failed by nullptr");
         return false;
     }
     networkSearchManager_->GetOperatorName(slotId, showName);
@@ -256,7 +256,7 @@ bool MultiSimController::InitShowNumber(int slotId)
     std::u16string showNumber;
     GetShowNumber(slotId, showNumber);
     if (!showNumber.empty() && showNumber != IccAccountInfo::DEFAULT_SHOW_NUMBER) {
-        TELEPHONY_LOGI("MultiSimController::InitShowNumber no need to Init again");
+        TELEPHONY_LOGD("no need to Init again");
         return true;
     }
     if (simFileManager_[slotId] == nullptr) {
@@ -275,13 +275,13 @@ bool MultiSimController::InitShowNumber(int slotId)
 
 bool MultiSimController::GetListFromDataBase()
 {
-    TELEPHONY_LOGI("MultiSimController::GetListFromDataBase");
+    TELEPHONY_LOGD("start");
     std::lock_guard<std::mutex> lock(mutex_);
     if (localCacheInfo_.size() > 0) {
         localCacheInfo_.clear();
     }
     if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::GetListFromDataBase failed by nullptr");
+        TELEPHONY_LOGE("failed by nullptr");
         return false;
     }
     int32_t result = simDbHelper_->QueryAllValidData(localCacheInfo_);
@@ -292,9 +292,9 @@ bool MultiSimController::GetListFromDataBase()
 void MultiSimController::SortCache()
 {
     size_t count = localCacheInfo_.size();
-    TELEPHONY_LOGI("MultiSimController::SortCache count = %{public}lu", static_cast<unsigned long>(count));
+    TELEPHONY_LOGI("count = %{public}lu", static_cast<unsigned long>(count));
     if (count <= 0) {
-        TELEPHONY_LOGE("MultiSimController::Sort empty");
+        TELEPHONY_LOGE("empty");
         return;
     }
     std::vector<SimRdbInfo> sortCache;
@@ -306,8 +306,8 @@ void MultiSimController::SortCache()
         sortCache.emplace_back(emptyUnit);
     }
     for (size_t j = 0; j < count; j++) {
-        TELEPHONY_LOGI("MultiSimController::index = %{public}d j = %{public}lu", localCacheInfo_[j].slotIndex,
-            static_cast<unsigned long>(j));
+        TELEPHONY_LOGD(
+            "index = %{public}d j = %{public}lu", localCacheInfo_[j].slotIndex, static_cast<unsigned long>(j));
         sortCache[localCacheInfo_[j].slotIndex] = localCacheInfo_[j];
     }
     localCacheInfo_ = sortCache;
@@ -319,7 +319,7 @@ void MultiSimController::SortCache()
 bool MultiSimController::IsValidData(int32_t slotId)
 {
     if (((slotId < DEFAULT_SIM_SLOT_ID) || (slotId >= SIM_SLOT_COUNT)) || simStateManager_[slotId] == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::IsValidData can not get simStateManager");
+        TELEPHONY_LOGE("can not get simStateManager");
         return false;
     }
     return simStateManager_[slotId]->HasSimCard();
@@ -329,7 +329,7 @@ bool MultiSimController::RefreshActiveIccAccountInfoList()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (localCacheInfo_.empty()) {
-        TELEPHONY_LOGE("MultiSimController::RefreshActiveIccAccountInfoList failed by invalid data");
+        TELEPHONY_LOGE("failed by invalid data");
         return false;
     }
     std::vector<SimRdbInfo>::iterator it = localCacheInfo_.begin();
@@ -353,7 +353,7 @@ bool MultiSimController::RefreshActiveIccAccountInfoList()
 int32_t MultiSimController::GetSlotId(int32_t simId)
 {
     if (localCacheInfo_.empty()) {
-        TELEPHONY_LOGE("MultiSimController::GetSlotId failed by nullptr");
+        TELEPHONY_LOGE("failed by nullptr");
         return INVALID_VALUE;
     }
     std::lock_guard<std::mutex> lock(mutex_);
@@ -372,11 +372,11 @@ bool MultiSimController::IsSimActive(int32_t slotId)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (!IsValidData(slotId)) {
-        TELEPHONY_LOGE("MultiSimController::IsSimActive InValidData");
+        TELEPHONY_LOGE("InValidData");
         return false;
     }
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
-        TELEPHONY_LOGE("MultiSimController::IsSimActive failed by out of range");
+        TELEPHONY_LOGE("failed by out of range");
         return false;
     }
     return localCacheInfo_[slotId].isActive == ACTIVE ? true : false;
@@ -386,7 +386,7 @@ bool MultiSimController::IsSimActivatable(int32_t slotId)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
-        TELEPHONY_LOGE("MultiSimController::IsSimActivatable failed by out of range");
+        TELEPHONY_LOGD("out of range");
         return false;
     }
     return localCacheInfo_[slotId].isActive == ACTIVATABLE ? true : false;
@@ -394,25 +394,25 @@ bool MultiSimController::IsSimActivatable(int32_t slotId)
 
 int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool force)
 {
-    TELEPHONY_LOGI("MultiSimController::SetActiveSim enable = %{public}d slotId = %{public}d", enable, slotId);
+    TELEPHONY_LOGI("enable = %{public}d slotId = %{public}d", enable, slotId);
     if (!IsValidData(slotId)) {
-        TELEPHONY_LOGE("MultiSimController::SetActiveSim invalid slotid or sim card absent.");
+        TELEPHONY_LOGE("invalid slotid or sim card absent.");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     if (!force && GetIccId(slotId).empty() && enable != ACTIVE) { // force is used for init data
-        TELEPHONY_LOGE("MultiSimController::SetActiveSim empty sim operation set failed");
+        TELEPHONY_LOGE("empty sim operation set failed");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size() && enable != ACTIVE) {
-        TELEPHONY_LOGE("MultiSimController::SetActiveSim failed by out of range");
+        TELEPHONY_LOGE("failed by out of range");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (!force && !SetActiveSimToRil(slotId, ENTITY_CARD, enable)) {
-        TELEPHONY_LOGE("MultiSimController::SetActiveSim SetActiveSimToRil failed");
+        TELEPHONY_LOGE("SetActiveSimToRil failed");
         return TELEPHONY_ERR_RIL_CMD_FAIL;
     }
     if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::SetActiveSim failed by nullptr");
+        TELEPHONY_LOGE("failed by nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
@@ -421,7 +421,7 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
     values.Put(SimData::IS_ACTIVE, valueObj);
     int32_t result = simDbHelper_->UpdateDataBySlotId(slotId, values);
     if (result == INVALID_VALUE) {
-        TELEPHONY_LOGE("MultiSimController::SetActiveSim failed by database");
+        TELEPHONY_LOGE("failed by database");
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     if (enable == ACTIVE) {
@@ -435,7 +435,7 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
 bool MultiSimController::SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable)
 {
     if (radioProtocolController_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::SetActiveSim radioProtocolController_ is nullptr");
+        TELEPHONY_LOGE("radioProtocolController_ is nullptr");
         return false;
     }
     std::unique_lock<std::mutex> lck(radioProtocolController_->ctx_);
@@ -478,7 +478,6 @@ int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, IccAccountInfo &in
 
 int32_t MultiSimController::GetDefaultVoiceSlotId()
 {
-    TELEPHONY_LOGI("MultiSimController::GetDefaultVoiceSlotId");
     std::lock_guard<std::mutex> lock(mutex_);
     if (simDbHelper_ == nullptr) {
         TELEPHONY_LOGE("MultiSimController::GetDefaultVoiceSlotId simDbHelper is nullptr");
@@ -500,28 +499,28 @@ int32_t MultiSimController::GetFirstActivedSlotId()
 
 int32_t MultiSimController::SetDefaultVoiceSlotId(int32_t slotId)
 {
-    TELEPHONY_LOGI("MultiSimController::SetDefaultVoiceSlotId slotId = %{public}d", slotId);
+    TELEPHONY_LOGD("slotId = %{public}d", slotId);
     if ((slotId == DEFAULT_SIM_SLOT_ID_REMOVE && localCacheInfo_.empty()) ||
         (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsValidData(slotId))) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultVoiceSlotId no sim card");
+        TELEPHONY_LOGE("no sim card");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     if (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsSimActive(slotId)) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultVoiceSlotId slotId is not active");
+        TELEPHONY_LOGE("slotId is not active");
         return CORE_SERVICE_SIM_CARD_IS_NOT_ACTIVE;
     }
     if (slotId >= (int32_t)localCacheInfo_.size() || slotId < DEFAULT_SIM_SLOT_ID_REMOVE) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultVoiceSlotId failed by out of range");
+        TELEPHONY_LOGE("failed by out of range");
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultVoiceSlotId failed by nullptr");
+        TELEPHONY_LOGE("failed by nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
     int32_t result = simDbHelper_->SetDefaultVoiceCard(slotId);
     if (result == INVALID_VALUE) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultVoiceSlotId get Data Base failed");
+        TELEPHONY_LOGE("get Data Base failed");
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
@@ -540,12 +539,11 @@ int32_t MultiSimController::SetDefaultVoiceSlotId(int32_t slotId)
 
 int32_t MultiSimController::GetDefaultSmsSlotId()
 {
-    TELEPHONY_LOGI("MultiSimController::GetDefaultSmsSlotId");
     std::lock_guard<std::mutex> lock(mutex_);
     if (localCacheInfo_.empty()) {
-        TELEPHONY_LOGE("MultiSimController::GetDefaultSmsSlotId failed by nullptr");
+        TELEPHONY_LOGE("failed by nullptr");
         if (simDbHelper_ == nullptr) {
-            TELEPHONY_LOGE("MultiSimController::GetDefaultSmsSlotId simDbHelper is nullptr");
+            TELEPHONY_LOGE("simDbHelper is nullptr");
             return DEFAULT_SLOT_ID;
         }
         return simDbHelper_->GetDefaultMessageCardSlotId();
@@ -562,25 +560,25 @@ int32_t MultiSimController::GetDefaultSmsSlotId()
 int32_t MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
 {
     if (slotId == DEFAULT_SIM_SLOT_ID_REMOVE && localCacheInfo_.empty()) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId no sim card");
+        TELEPHONY_LOGE("no sim card");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     if (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsSimActive(slotId)) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId slotId is not active!");
+        TELEPHONY_LOGE("slotId is not active!");
         return CORE_SERVICE_SIM_CARD_IS_NOT_ACTIVE;
     }
     if (slotId >= (int32_t)localCacheInfo_.size() || slotId < DEFAULT_SIM_SLOT_ID_REMOVE) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId failed by out of range");
+        TELEPHONY_LOGE("failed by out of range");
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId failed by nullptr");
+        TELEPHONY_LOGE("failed by nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
     int32_t result = simDbHelper_->SetDefaultMessageCard(slotId);
     if (result == INVALID_VALUE) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultSmsSlotId get Data Base failed");
+        TELEPHONY_LOGE("get Data Base failed");
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
@@ -604,28 +602,28 @@ int32_t MultiSimController::GetDefaultCellularDataSlotId()
 
 int32_t MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
 {
-    TELEPHONY_LOGI("MultiSimController::SetDefaultCellularDataSlotId slotId = %{public}d", slotId);
+    TELEPHONY_LOGD("slotId = %{public}d", slotId);
     if ((slotId == DEFAULT_SIM_SLOT_ID_REMOVE && localCacheInfo_.empty()) ||
         (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsValidData(slotId))) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId no sim card");
+        TELEPHONY_LOGE("no sim card");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     if (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsSimActive(slotId)) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId slotId is not active");
+        TELEPHONY_LOGE("slotId is not active");
         return CORE_SERVICE_SIM_CARD_IS_NOT_ACTIVE;
     }
     if (slotId >= (int32_t)localCacheInfo_.size() || slotId < DEFAULT_SIM_SLOT_ID_REMOVE) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId failed by out of range");
+        TELEPHONY_LOGE("failed by out of range");
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId failed by nullptr");
+        TELEPHONY_LOGE("failed by nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
     int32_t result = simDbHelper_->SetDefaultCellularData(slotId);
     if (result == INVALID_VALUE) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId get Data Base failed");
+        TELEPHONY_LOGE("get Data Base failed");
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
@@ -638,7 +636,7 @@ int32_t MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
     }
     CoreServiceHiSysEvent::WriteDefaultDataSlotIdBehaviorEvent(slotId);
     if (!AnnounceDefaultCellularDataSlotIdChanged(slotId)) {
-        TELEPHONY_LOGE("MultiSimController::SetDefaultCellularDataSlotId publish broadcast failed");
+        TELEPHONY_LOGE("publish broadcast failed");
         return TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL;
     }
     return TELEPHONY_ERR_SUCCESS;
@@ -647,9 +645,9 @@ int32_t MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
 int32_t MultiSimController::GetDefaultCellularDataSlotIdUnit()
 {
     if (localCacheInfo_.empty()) {
-        TELEPHONY_LOGE("MultiSimController::GetDefaultCellularDataSlotId failed by nullptr");
+        TELEPHONY_LOGE("failed by nullptr");
         if (simDbHelper_ == nullptr) {
-            TELEPHONY_LOGE("MultiSimController::GetDefaultCellularDataSlotIdUnit simDbHelper is nullptr");
+            TELEPHONY_LOGE("simDbHelper is nullptr");
             return DEFAULT_SLOT_ID;
         }
         return simDbHelper_->GetDefaultCellularDataCardSlotId();
@@ -665,11 +663,10 @@ int32_t MultiSimController::GetDefaultCellularDataSlotIdUnit()
 
 int32_t MultiSimController::GetPrimarySlotId()
 {
-    TELEPHONY_LOGI("MultiSimController::GetPrimarySlotId");
     std::lock_guard<std::mutex> lock(mutex_);
     if (localCacheInfo_.empty()) {
         if (simDbHelper_ == nullptr) {
-            TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId failed by nullptr");
+            TELEPHONY_LOGE("failed by nullptr");
             return DEFAULT_SLOT_ID;
         }
         return simDbHelper_->GetDefaultMainCardSlotId();
@@ -686,31 +683,31 @@ int32_t MultiSimController::GetPrimarySlotId()
 int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
 {
     if (localCacheInfo_.empty() || !IsValidData(slotId)) {
-        TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId no sim card");
+        TELEPHONY_LOGE("no sim card");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
-        TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId failed by out of range");
+        TELEPHONY_LOGE("failed by out of range");
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     if (!IsSimActive(slotId)) {
-        TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId slotId is not active");
+        TELEPHONY_LOGE("slotId is not active");
         return CORE_SERVICE_SIM_CARD_IS_NOT_ACTIVE;
     }
     // change protocol for default cellulardata slotId
     if (radioProtocolController_ == nullptr || !radioProtocolController_->SetRadioProtocol(slotId)) {
-        TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId SetRadioProtocol failed");
+        TELEPHONY_LOGE("SetRadioProtocol failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId failed by nullptr");
+        TELEPHONY_LOGE("failed by nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
     int32_t setMainResult = simDbHelper_->SetDefaultMainCard(slotId);
     int32_t setDataResult = simDbHelper_->SetDefaultCellularData(slotId);
     if (setMainResult == INVALID_VALUE || setDataResult == INVALID_VALUE) {
-        TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId failed by invalid result");
+        TELEPHONY_LOGE("failed by invalid result");
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
@@ -724,7 +721,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
         localCacheInfo_[i].isCellularDataCard = NOT_MAIN;
     }
     if (!AnnounceDefaultMainSlotIdChanged(slotId)) {
-        TELEPHONY_LOGE("MultiSimController::SetPrimarySlotId publish broadcast failed");
+        TELEPHONY_LOGE("publish broadcast failed");
         return TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL;
     }
     return TELEPHONY_ERR_SUCCESS;
@@ -734,11 +731,11 @@ int32_t MultiSimController::GetShowNumber(int32_t slotId, std::u16string &showNu
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (!IsValidData(slotId)) {
-        TELEPHONY_LOGE("MultiSimController::GetShowNumber InValidData");
+        TELEPHONY_LOGE("InValidData");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
-        TELEPHONY_LOGE("MultiSimController::GetShowNumber failed by nullptr");
+        TELEPHONY_LOGE("failed by nullptr");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     showNumber = Str8ToStr16(localCacheInfo_[slotId].phoneNumber);
@@ -777,11 +774,11 @@ int32_t MultiSimController::GetShowName(int32_t slotId, std::u16string &showName
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (!IsValidData(slotId)) {
-        TELEPHONY_LOGE("MultiSimController::GetShowNumber InValidData");
+        TELEPHONY_LOGE("InValidData");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
-        TELEPHONY_LOGE("MultiSimController::GetShowName failed by nullptr");
+        TELEPHONY_LOGE("failed by nullptr");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     showName = Str8ToStr16(localCacheInfo_[slotId].showName);
@@ -899,7 +896,7 @@ bool MultiSimController::PublishSimFileEvent(const AAFwk::Want &want, int eventC
     EventFwk::CommonEventPublishInfo publishInfo;
     publishInfo.SetOrdered(true);
     bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    TELEPHONY_LOGI("MultiSimController::PublishSimFileEvent end###publishResult = %{public}d\n", publishResult);
+    TELEPHONY_LOGD("MultiSimController::PublishSimFileEvent end###publishResult = %{public}d", publishResult);
     return publishResult;
 }
 
@@ -935,13 +932,13 @@ int32_t MultiSimController::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchVal
 int32_t MultiSimController::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList)
 {
     if (!RefreshActiveIccAccountInfoList()) {
-        TELEPHONY_LOGE("MultiSimController::GetActiveSimAccountInfoList refresh failed");
+        TELEPHONY_LOGE("refresh failed");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     iccAccountInfoList.clear();
     std::vector<IccAccountInfo>::iterator it = iccAccountInfoList_.begin();
     while (it != iccAccountInfoList_.end()) {
-        TELEPHONY_LOGI("MultiSimController::GetActiveSimAccountInfoList slotIndex=%{public}d", it->slotIndex);
+        TELEPHONY_LOGI("slotIndex=%{public}d", it->slotIndex);
         iccAccountInfoList.emplace_back(*it);
         ++it;
     }

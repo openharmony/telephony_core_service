@@ -98,7 +98,7 @@ void SimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         return;
     }
     auto id = event->GetInnerEventId();
-    TELEPHONY_LOGI("SimFile::ProcessEvent id %{public}d", id);
+    TELEPHONY_LOGD("SimFile::ProcessEvent id %{public}d, slotId_ = %{public}d", id, slotId_);
     auto itFunc = memberFuncMap_.find(id);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
@@ -143,7 +143,8 @@ void SimFile::ProcessFileLoaded(bool response)
         return;
     }
     fileToGet_ -= LOAD_STEP;
-    TELEPHONY_LOGI("SimFile ProcessFileLoaded Done: %{public}d requested: %{public}d", fileToGet_, fileQueried_);
+    TELEPHONY_LOGD("SimFile ProcessFileLoaded Done: %{public}d requested: %{public}d slotId = %{public}d", fileToGet_,
+        fileQueried_, slotId_);
     if (ObtainFilesFetched()) {
         OnAllFilesFetched();
     } else if (LockQueriedOrNot()) {
@@ -157,7 +158,7 @@ void SimFile::OnAllFilesFetched()
 {
     UpdateSimLanguage();
     UpdateLoaded(true);
-    TELEPHONY_LOGI("SimFile SimFile::OnAllFilesFetched: start notify");
+    TELEPHONY_LOGI("SimFile SimFile::OnAllFilesFetched: start notify slotId = %{public}d", slotId_);
     if (filesFetchedObser_ != nullptr) {
         filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
     }
@@ -166,7 +167,7 @@ void SimFile::OnAllFilesFetched()
 
 bool SimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("SimFile::SIM_STATE_READY received");
+    TELEPHONY_LOGI("SimFile::SIM_STATE_READY received slotId = %{public}d", slotId_);
     CardType cardType = stateManager_->GetCardType();
     if (cardType == CardType::SINGLE_MODE_USIM_CARD || cardType == CardType::SINGLE_MODE_SIM_CARD) {
         LoadSimFiles();
@@ -267,7 +268,7 @@ void SimFile::ObtainSpnPhase(bool start, const AppExecFwk::InnerEvent::Pointer &
         return;
     }
 
-    TELEPHONY_LOGI("SimFile::ObtainSpnPhase state is %{public}d", spnStatus_);
+    TELEPHONY_LOGI("SimFile::ObtainSpnPhase state is %{public}d slotId is %{public}d", spnStatus_, slotId_);
     if (spnStatus_ == OBTAIN_SPN_START) {
         StartObtainSpn();
     } else if (spnStatus_ == OBTAIN_SPN_GENERAL) {
@@ -386,7 +387,7 @@ std::string SimFile::ParseSpn(const std::string &rawData, int spnStatus)
     std::shared_ptr<unsigned char> bytesRaw = SIMUtils::HexStringConvertToBytes(rawData, length);
     std::shared_ptr<unsigned char> bytesNew = nullptr;
     if (bytesRaw == nullptr) {
-        TELEPHONY_LOGI("ParseSpn invalid data: %{public}s", rawData.c_str());
+        TELEPHONY_LOGE("ParseSpn invalid data: %{public}s", rawData.c_str());
         return "";
     }
     if (spnStatus == OBTAIN_SPN_GENERAL) {
@@ -417,7 +418,7 @@ void SimFile::ParsePnn(const std::vector<std::string> &records)
         int recordLen = 0;
         std::shared_ptr<unsigned char> data = SIMUtils::HexStringConvertToBytes(dataPnn, recordLen);
         if (data == nullptr) {
-            TELEPHONY_LOGI("ParsePnn data is nullptr");
+            TELEPHONY_LOGD("ParsePnn data is nullptr");
             continue;
         }
         unsigned char *tlv = data.get();
@@ -455,7 +456,7 @@ void SimFile::ParseOpl(const std::vector<std::string> &records)
         return;
     }
     for (const auto &dataOpl : records) {
-        TELEPHONY_LOGI("ParseOpl: %{public}s", dataOpl.c_str());
+        TELEPHONY_LOGD("ParseOpl: %{public}s", dataOpl.c_str());
         if (dataOpl.size() != (BYTE_LENGTH + BYTE_LENGTH)) {
             continue;
         }
@@ -482,7 +483,7 @@ void SimFile::ParseOpl5g(const std::vector<std::string> &records)
 {
     opl5gFiles_.clear();
     if (records.empty()) {
-        TELEPHONY_LOGI("ParseOpl5g records is empty");
+        TELEPHONY_LOGE("ParseOpl5g records is empty");
         return;
     }
     for (const auto &dataOpl : records) {

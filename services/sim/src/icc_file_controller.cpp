@@ -136,7 +136,7 @@ void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer 
 {
     std::string str = IccFileController::NULLSTR;
     std::string path = IccFileController::NULLSTR;
-    TELEPHONY_LOGI("IccFileController::ProcessBinarySize init");
+    TELEPHONY_LOGD("IccFileController::ProcessBinarySize init");
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
 
     if (rcvMsg->controlHolder == nullptr) {
@@ -165,7 +165,7 @@ void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer 
         msg.pin2 = "";
         telRilManager_->GetSimIO(slotId_, msg, process);
     }
-    TELEPHONY_LOGI("IccFileController::ProcessBinarySize finish %{public}d", fileId);
+    TELEPHONY_LOGD("IccFileController::ProcessBinarySize finish %{public}d", fileId);
 }
 
 void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer &event)
@@ -203,7 +203,7 @@ void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer 
 
 void IccFileController::ProcessReadBinary(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("IccFileController MSG_SIM_OBTAIN_TRANSPARENT_ELEMENTARY_FILE_DONE");
+    TELEPHONY_LOGD("IccFileController MSG_SIM_OBTAIN_TRANSPARENT_ELEMENTARY_FILE_DONE");
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     if (rcvMsg == nullptr || rcvMsg->controlHolder == nullptr) {
         TELEPHONY_LOGE("rcvMsg or rcvMsg->controlHolder is nullptr");

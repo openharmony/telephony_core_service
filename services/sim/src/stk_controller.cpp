@@ -346,8 +346,8 @@ int32_t StkController::SendCallSetupRequestResult(bool accept)
     responseFinished_ = false;
     telRilManager->SendCallSetupRequestResult(slotId_, accept, event);
     while (!responseFinished_) {
-        TELEPHONY_LOGI("StkController[%{public}d]::SendCallSetupRequestResult() wait for the response to finish",
-            slotId_);
+        TELEPHONY_LOGI(
+            "StkController[%{public}d]::SendCallSetupRequestResult() wait for the response to finish", slotId_);
         if (stkCv_.wait_for(callSetupRequestlock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
             TELEPHONY_LOGE("StkController[%{public}d]::SendCallSetupRequestResult() wait timeout", slotId_);
             responseFinished_ = true;

@@ -233,7 +233,7 @@ std::string NapiUtil::GetStringFromValue(napi_env env, napi_value value)
     char msgChars[MAX_TEXT_LENGTH] = {0};
     size_t msgLength = 0;
     NAPI_CALL_BASE(env, napi_get_value_string_utf8(env, value, msgChars, MAX_TEXT_LENGTH, &msgLength), "");
-    TELEPHONY_LOGI("NapiUtil GetStringFromValue msgLength = %{public}zu", msgLength);
+    TELEPHONY_LOGI("msgLength = %{public}zu", msgLength);
     if (msgLength > 0) {
         return std::string(msgChars, 0, msgLength);
     } else {
@@ -255,7 +255,7 @@ napi_value NapiUtil::GetNamedProperty(napi_env env, napi_value object, const std
 napi_value NapiUtil::HandleAsyncWork(napi_env env, BaseContext *baseContext, const std::string &workName,
     napi_async_execute_callback execute, napi_async_complete_callback complete)
 {
-    TELEPHONY_LOGI("NapiUtil HandleAsyncWork workName = %{public}s", workName.c_str());
+    TELEPHONY_LOGD("workName = %{public}s", workName.c_str());
     std::unique_ptr<BaseContext> context(baseContext);
     if (context == nullptr) {
         ThrowParameterError(env);
@@ -275,7 +275,6 @@ napi_value NapiUtil::HandleAsyncWork(napi_env env, BaseContext *baseContext, con
     napi_status queueWorkStatus = napi_queue_async_work(env, context->work);
     if (queueWorkStatus == napi_ok) {
         context.release();
-        TELEPHONY_LOGI("NapiUtil HandleAsyncWork napi_queue_async_work ok");
     } else {
         std::string errorCode = std::to_string(queueWorkStatus);
         std::string errorMessage = "error at napi_queue_async_work";
@@ -287,14 +286,14 @@ napi_value NapiUtil::HandleAsyncWork(napi_env env, BaseContext *baseContext, con
 
 void NapiUtil::Handle1ValueCallback(napi_env env, BaseContext *baseContext, napi_value callbackValue)
 {
-    TELEPHONY_LOGI("Handle1ValueCallback start");
+    TELEPHONY_LOGD("Handle1ValueCallback start");
     if (baseContext == nullptr) {
         TELEPHONY_LOGE("Handle1ValueCallback baseContext is nullptr");
         NapiUtil::ThrowParameterError(env);
         return;
     }
     if (baseContext->callbackRef != nullptr) {
-        TELEPHONY_LOGI("Handle1ValueCallback start normal callback");
+        TELEPHONY_LOGI("start normal callback");
         napi_value recv = CreateUndefined(env);
         napi_value callbackFunc = nullptr;
         NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, baseContext->callbackRef, &callbackFunc));
@@ -303,22 +302,22 @@ void NapiUtil::Handle1ValueCallback(napi_env env, BaseContext *baseContext, napi
         NAPI_CALL_RETURN_VOID(
             env, napi_call_function(env, recv, callbackFunc, std::size(callbackValues), callbackValues, &result));
         NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, baseContext->callbackRef));
-        TELEPHONY_LOGI("Handle1ValueCallback normal callback end");
+        TELEPHONY_LOGD("normal callback end");
     } else if (baseContext->deferred != nullptr) {
-        TELEPHONY_LOGI("Handle1ValueCallback start promise callback");
+        TELEPHONY_LOGI("start promise callback");
         if (baseContext->resolved) {
             NAPI_CALL_RETURN_VOID(env, napi_resolve_deferred(env, baseContext->deferred, callbackValue));
-            TELEPHONY_LOGI("Handle1ValueCallback napi_resolve_deferred end");
+            TELEPHONY_LOGI("napi_resolve_deferred end");
         } else {
             NAPI_CALL_RETURN_VOID(env, napi_reject_deferred(env, baseContext->deferred, callbackValue));
-            TELEPHONY_LOGI("Handle1ValueCallback napi_reject_deferred end");
+            TELEPHONY_LOGI("napi_reject_deferred end");
         }
-        TELEPHONY_LOGI("Handle1ValueCallback promise callback end");
+        TELEPHONY_LOGD("promise callback end");
     }
     napi_delete_async_work(env, baseContext->work);
     delete baseContext;
     baseContext = nullptr;
-    TELEPHONY_LOGI("Handle1ValueCallback end");
+    TELEPHONY_LOGD("end");
 }
 
 void NapiUtil::Handle2ValueCallback(napi_env env, BaseContext *baseContext, napi_value callbackValue)
@@ -398,8 +397,7 @@ JsError NapiUtil::ConverErrorMessageForJs(int32_t errorCode)
         TELEPHONY_LOGE("NapiUtil::ConverErrorMessageForJs errorCode is out of range");
     }
     error.errorMessage = GetErrorMessage(error.errorCode);
-    TELEPHONY_LOGI(
-        "NapiUtil::ConverErrorMessageForJs errorCode from %{public}d to %{public}d", errorCode, error.errorCode);
+    TELEPHONY_LOGI("errorCode from %{public}d to %{public}d", errorCode, error.errorCode);
     return error;
 }
 
