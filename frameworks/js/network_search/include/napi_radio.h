@@ -258,7 +258,7 @@ struct GetUniqueDeviceIdContext : BaseContext {
     std::string getUniqueDeviceId = "";
 };
 
-struct GetNrOptionModeContext : BaseContext {
+struct NrOptionModeContext : CallbackContext {
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
     int32_t nrOptionMode = DEFAULT_ERROR;
 };

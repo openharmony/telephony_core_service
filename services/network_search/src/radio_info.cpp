@@ -335,29 +335,6 @@ int32_t RadioInfo::ProcessGetBasebandVersion(const AppExecFwk::InnerEvent::Point
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t RadioInfo::ProcessGetNrOptionMode(const AppExecFwk::InnerEvent::Pointer &event) const
-{
-    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    TELEPHONY_LOGI("ProcessGetNrOptionMode start, slotId:%{public}d", slotId_);
-    if (event == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode event is nullptr slotId:%{public}d", slotId_);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (nsm == nullptr) {
-        TELEPHONY_LOGE("NetworkSelection::ProcessGetNrOptionMode nsm is nullptr slotId:%{public}d", slotId_);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    auto mode = event->GetSharedObject<int32_t>();
-    if (mode == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode mode is nullptr slotId:%{public}d", slotId_);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    TELEPHONY_LOGI("ProcessGetNrOptionMode success:%{public}d", *mode);
-    nsm->UpdateNrOptionMode(slotId_, static_cast<NrMode>(*mode));
-    return TELEPHONY_ERR_SUCCESS;
-}
-
 int32_t RadioInfo::ProcessGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event) const
 {
     TELEPHONY_LOGI("start slotId:%{public}d", slotId_);
@@ -383,6 +360,105 @@ int32_t RadioInfo::ProcessGetRrcConnectionState(const AppExecFwk::InnerEvent::Po
         return result;
     }
     nsm->ProcessNotifyStateChangeEvent(slotId_);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t RadioInfo::ProcessSetNrOptionMode(const AppExecFwk::InnerEvent::Pointer &event) const
+{
+    TELEPHONY_LOGI("start slotId:%{public}d", slotId_);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessSetNrOptionMode event is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    if (responseInfo == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessSetNrOptionMode responseInfo is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
+    if (nsm == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessSetNrOptionMode nsm is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int64_t index = responseInfo->flag;
+    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo = NetworkUtils::FindNetworkSearchCallback(index);
+    if (callbackInfo == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessSetNrOptionMode callbackInfo is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    bool success = responseInfo->error == HRilErrType::NONE;
+    if (success) {
+        nsm->UpdateNrOptionMode(slotId_, static_cast<NrMode>(callbackInfo->param_));
+    }
+    sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchItem_;
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessSetNrOptionMode callback is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    MessageParcel data;
+    data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
+    if (!data.WriteBool(success) ||
+        !data.WriteInt32(success ? TELEPHONY_SUCCESS : static_cast<int32_t>(responseInfo->error))) {
+        TELEPHONY_LOGE("RadioInfo::ProcessSetNrOptionMode write date fail slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    callback->OnNetworkSearchCallback(INetworkSearchCallback::NetworkSearchCallback::SET_NR_OPTION_MODE_RESULT, data);
+    NetworkUtils::RemoveCallbackFromMap(index);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t RadioInfo::ProcessGetNrOptionMode(const AppExecFwk::InnerEvent::Pointer &event) const
+{
+    TELEPHONY_LOGI("start slotId:%{public}d", slotId_);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode event is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
+    if (nsm == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode nsm is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    std::shared_ptr<NrModeInfo> nrModeInfo = event->GetSharedObject<NrModeInfo>();
+    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    if (responseInfo == nullptr && nrModeInfo == nullptr) {
+        TELEPHONY_LOGE("responseInfo and mode is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    MessageParcel data;
+    data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
+    int64_t index = -1;
+    int32_t nrMode = 0;
+    if (nrModeInfo != nullptr) {
+        nrMode = nrModeInfo->nrMode;
+        index = nrModeInfo->flag;
+        nsm->UpdateNrOptionMode(slotId_, static_cast<NrMode>(nrMode));
+        if (!data.WriteInt32(nrMode) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
+            TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode WriteInt32 nrMode is false");
+            return TELEPHONY_ERR_WRITE_DATA_FAIL;
+        }
+    } else if (responseInfo != nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode error code is %{public}d", responseInfo->error);
+        index = responseInfo->flag;
+        if (!data.WriteInt32(nrMode) || !data.WriteInt32(static_cast<int32_t>(responseInfo->error))) {
+            TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode WriteInt32 nrMode is false");
+            return TELEPHONY_ERR_WRITE_DATA_FAIL;
+        }
+    }
+    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo = NetworkUtils::FindNetworkSearchCallback(index);
+    if (callbackInfo == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode callbackInfo is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchItem_;
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode callback is nullptr slotId:%{public}d", slotId_);
+        NetworkUtils::RemoveCallbackFromMap(index);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    callback->OnNetworkSearchCallback(INetworkSearchCallback::NetworkSearchCallback::GET_NR_OPTION_MODE_RESULT, data);
+    NetworkUtils::RemoveCallbackFromMap(index);
     return TELEPHONY_ERR_SUCCESS;
 }
 

@@ -335,7 +335,13 @@ int32_t TelRilNetwork::SetNrOptionModeResponse(const HDI::Ril::V1_1::RilRadioRes
 
 int32_t TelRilNetwork::GetNrOptionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t mode)
 {
-    return Response<int32_t>(TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<int32_t>(mode));
+    auto getDataFunc = [mode](std::shared_ptr<TelRilRequest> telRilRequest) {
+        std::shared_ptr<NrModeInfo> nrModeInfo = std::make_shared<NrModeInfo>();
+        nrModeInfo->nrMode = mode;
+        nrModeInfo->flag = telRilRequest->pointer_->GetParam();
+        return nrModeInfo;
+    };
+    return Response<NrModeInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
 }
 
 int32_t TelRilNetwork::GetRrcConnectionStateResponse(

@@ -40,6 +40,8 @@ public:
         const sptr<NetworkSearchResult> &networkSearchResult, const int32_t errorCode);
     virtual void OnSetPreferredNetworkCallback(const bool result, const int32_t errorCode);
     virtual void OnGetPreferredNetworkCallback(const int32_t networkMode, const int32_t errorCode);
+    virtual void OnSetNrOptionModeCallback(const bool setResult, const int32_t errorCode);
+    virtual void OnGetNrOptionModeCallback(const int32_t mode, const int32_t errorCode);
 
 private:
     void OnSetNetworkModeCallback(MessageParcel &data);
@@ -49,6 +51,8 @@ private:
     void OnGetNetworkSearchInformation(MessageParcel &data);
     void OnSetPreferredNetworkCallback(MessageParcel &data);
     void OnGetPreferredNetworkCallback(MessageParcel &data);
+    void OnSetNrOptionModeCallback(MessageParcel &data);
+    void OnGetNrOptionModeCallback(MessageParcel &data);
 };
 } // namespace Telephony
 } // namespace OHOS
