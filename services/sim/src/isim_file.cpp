@@ -47,7 +47,7 @@ void IsimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
     auto id = event->GetInnerEventId();
     bool isFileHandleResponse = false;
-    TELEPHONY_LOGI("IsimFile::ProcessEvent id %{public}d", id);
+    TELEPHONY_LOGD("IsimFile::ProcessEvent id %{public}d", id);
     auto itFunc = memberFuncMap_.find(id);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;

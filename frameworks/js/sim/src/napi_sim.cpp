@@ -585,14 +585,14 @@ void NativeGetSimState(napi_env env, void *data)
     }
     AsyncContext<int32_t> *asyncContext = static_cast<AsyncContext<int32_t> *>(data);
     if (!IsValidSlotId(asyncContext->slotId)) {
-        TELEPHONY_LOGE("NativeGetSimState slotId is invalid");
+        TELEPHONY_LOGE("slotId is invalid");
         asyncContext->context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     int32_t errorCode =
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimState(asyncContext->slotId, simState);
-    TELEPHONY_LOGI("NAPI NativeGetSimState %{public}d", errorCode);
+    TELEPHONY_LOGD("NAPI NativeGetSimState %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext->context.resolved = true;
         asyncContext->callbackVal = static_cast<int32_t>(simState);
@@ -1199,7 +1199,7 @@ void NativeHasSimCard(napi_env env, void *data)
     }
     AsyncContext<bool> *reVal = static_cast<AsyncContext<bool> *>(data);
     if (!IsValidSlotId(reVal->slotId)) {
-        TELEPHONY_LOGE("NativeHasSimCard slotId is invalid");
+        TELEPHONY_LOGE("slotId is invalid");
         reVal->context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
@@ -1211,7 +1211,7 @@ void NativeHasSimCard(napi_env env, void *data)
     } else {
         reVal->context.resolved = false;
     }
-    TELEPHONY_LOGI("NAPI NativeHasSimCard %{public}d", errorCode);
+    TELEPHONY_LOGD("errorCode is %{public}d", errorCode);
     reVal->context.errorCode = errorCode;
 }
 

@@ -378,13 +378,13 @@ int32_t CoreServiceStub::OnHasSimCard(MessageParcel &data, MessageParcel &reply)
     int32_t slotId = data.ReadInt32();
     bool hasSimCard = false;
     int32_t result = HasSimCard(slotId, hasSimCard);
-    TELEPHONY_LOGI("OnRemoteRequest::OnHasSimCard result is %{public}s", hasSimCard ? "true" : "false");
+    TELEPHONY_LOGD("result is %{public}s", hasSimCard ? "true" : "false");
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         ret = (ret && reply.WriteBool(hasSimCard));
     }
     if (!ret) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnHasSimCard write reply failed.");
+        TELEPHONY_LOGE("write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return result;

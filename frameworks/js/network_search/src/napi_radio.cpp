@@ -2149,18 +2149,18 @@ static void NativeGetImsRegInfo(napi_env env, void *data)
     }
     context->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImsRegStatus(
         context->slotId, static_cast<ImsServiceType>(context->imsSrvType), context->imsRegInfo);
-    TELEPHONY_LOGI("result is %{public}d", context->errorCode);
+    TELEPHONY_LOGD("result is %{public}d", context->errorCode);
     context->resolved = (context->errorCode == TELEPHONY_SUCCESS);
 }
 
 static void GetImsRegInfoCallback(napi_env env, napi_status status, void *data)
 {
-    TELEPHONY_LOGI("status = %{public}d", status);
+    TELEPHONY_LOGD("status = %{public}d", status);
     auto context = static_cast<GetImsRegInfoContext *>(data);
     napi_value callbackValue = nullptr;
     JsError error = {};
     if (status == napi_ok) {
-        TELEPHONY_LOGI("context->resolved = %{public}d", context->resolved);
+        TELEPHONY_LOGD("context->resolved = %{public}d", context->resolved);
         if (context->resolved) {
             napi_create_object(env, &callbackValue);
             NapiUtil::SetPropertyInt32(

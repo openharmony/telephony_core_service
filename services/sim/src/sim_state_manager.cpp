@@ -86,7 +86,7 @@ bool SimStateManager::HasSimCard()
     bool ret = false;
     if (simStateHandle_ != nullptr) {
         std::lock_guard<std::mutex> lck(mtx_);
-        TELEPHONY_LOGI("SimStateManager::HasSimCard()");
+        TELEPHONY_LOGD("SimStateManager::HasSimCard");
         ret = simStateHandle_->HasSimCard();
     }
     return ret;
@@ -97,7 +97,7 @@ SimState SimStateManager::GetSimState()
     SimState ret = SimState::SIM_STATE_UNKNOWN;
     if (simStateHandle_ != nullptr) {
         std::lock_guard<std::mutex> lck(mtx_);
-        TELEPHONY_LOGI("SimStateManager::GetSimState()");
+        TELEPHONY_LOGD("SimStateManager::GetSimState()");
         ret = simStateHandle_->GetSimState();
     }
     return ret;
@@ -121,7 +121,7 @@ int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockS
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_lock<std::mutex> lck(ctx_);
-    TELEPHONY_LOGD("SimStateManager::UnlockPin()");
+    TELEPHONY_LOGD("SimStateManager::UnlockPin slotId = %{public}d", slotId);
     responseReady_ = false;
     simStateHandle_->UnlockPin(slotId, pin);
     while (!responseReady_) {
@@ -155,7 +155,7 @@ int32_t SimStateManager::UnlockPuk(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_lock<std::mutex> lck(ctx_);
-    TELEPHONY_LOGD("SimStateManager::UnlockPuk()");
+    TELEPHONY_LOGD("SimStateManager::UnlockPuk slotId = %{public}d", slotId);
     responseReady_ = false;
     simStateHandle_->UnlockPuk(slotId, newPin, puk);
     while (!responseReady_) {
@@ -189,7 +189,7 @@ int32_t SimStateManager::AlterPin(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_lock<std::mutex> lck(ctx_);
-    TELEPHONY_LOGD("SimStateManager::AlterPin()");
+    TELEPHONY_LOGD("SimStateManager::AlterPin slotId = %{public}d", slotId);
     responseReady_ = false;
     simStateHandle_->AlterPin(slotId, newPin, oldPin);
     while (!responseReady_) {
@@ -232,7 +232,7 @@ int32_t SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, L
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_lock<std::mutex> lck(ctx_);
-    TELEPHONY_LOGD("SimStateManager::SetLockState()");
+    TELEPHONY_LOGD("SimStateManager::SetLockState slotId = %{public}d", slotId);
     responseReady_ = false;
     simStateHandle_->SetLockState(slotId, options);
     while (!responseReady_) {
@@ -271,11 +271,11 @@ int32_t SimStateManager::GetLockState(int32_t slotId, LockType lockType, LockSta
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_lock<std::mutex> lck(ctx_);
-    TELEPHONY_LOGD("SimStateManager::GetLockState()");
+    TELEPHONY_LOGD("SimStateManager::GetLockState slotId = %{public}d", slotId);
     responseReady_ = false;
     simStateHandle_->GetLockState(slotId, lockType);
     while (!responseReady_) {
-        TELEPHONY_LOGI("GetLockState::wait(), response = false");
+        TELEPHONY_LOGI("GetLockState::wait, response = false");
         if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
             break;
         }
@@ -306,7 +306,7 @@ int32_t SimStateManager::UnlockPin2(int32_t slotId, const std::string &pin2, Loc
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_lock<std::mutex> lck(ctx_);
-    TELEPHONY_LOGD("SimStateManager::UnlockPin2()");
+    TELEPHONY_LOGD("SimStateManager::UnlockPin2 slotId = %{public}d", slotId);
     responseReady_ = false;
     simStateHandle_->UnlockPin2(slotId, pin2);
     while (!responseReady_) {
@@ -340,7 +340,7 @@ int32_t SimStateManager::UnlockPuk2(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_lock<std::mutex> lck(ctx_);
-    TELEPHONY_LOGD("SimStateManager::UnlockPuk2()");
+    TELEPHONY_LOGD("SimStateManager::UnlockPuk2 slotId = %{public}d", slotId);
     responseReady_ = false;
     simStateHandle_->UnlockPuk2(slotId, newPin2, puk2);
     while (!responseReady_) {
@@ -374,7 +374,7 @@ int32_t SimStateManager::AlterPin2(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_lock<std::mutex> lck(ctx_);
-    TELEPHONY_LOGD("SimStateManager::AlterPin2()");
+    TELEPHONY_LOGD("SimStateManager::AlterPin2 slotId = %{public}d", slotId);
     responseReady_ = false;
     simStateHandle_->AlterPin2(slotId, newPin2, oldPin2);
     while (!responseReady_) {
@@ -405,7 +405,7 @@ int32_t SimStateManager::RefreshSimState(int32_t slotId)
     int32_t ret = 0;
     if (simStateHandle_ != nullptr) {
         std::unique_lock<std::mutex> lck(ctx_);
-        TELEPHONY_LOGI("SimStateManager::RefreshSimState()");
+        TELEPHONY_LOGD("SimStateManager::RefreshSimState slotId = %{public}d", slotId);
         responseReady_ = false;
         simStateHandle_->ObtainRealtimeIccStatus(slotId);
         while (!responseReady_) {
@@ -427,7 +427,7 @@ int32_t SimStateManager::UnlockSimLock(int32_t slotId, const PersoLockInfo &lock
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_lock<std::mutex> lck(ctx_);
-    TELEPHONY_LOGD("SimStateManager::UnlockSimLock()");
+    TELEPHONY_LOGD("SimStateManager::UnlockSimLock slotId = %{public}d", slotId);
     responseReady_ = false;
     simStateHandle_->UnlockSimLock(slotId, lockInfo);
     while (!responseReady_) {
