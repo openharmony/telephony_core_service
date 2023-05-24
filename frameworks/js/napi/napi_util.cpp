@@ -526,7 +526,6 @@ bool NapiUtil::CreateCommonErrorMessageForJs(int32_t errorCode, JsErrorCode &jsE
         return false;
     }
     bool flag = true;
-
     switch (errorCode) {
         case TELEPHONY_ERR_ARGUMENT_MISMATCH:
         case TELEPHONY_ERR_ARGUMENT_INVALID:
