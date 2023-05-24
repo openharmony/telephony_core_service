@@ -27,9 +27,9 @@ GetNetworkSearchInfoCallback::GetNetworkSearchInfoCallback(GetSearchInfoContext 
 void GetNetworkSearchInfoCallback::OnGetNetworkSearchInformation(
     const sptr<NetworkSearchResult> &networkSearchResult, const int32_t errorCode)
 {
-    TELEPHONY_LOGI("OnGetNetworkSearchInfoCallback start errorCode = %{public}d", errorCode);
+    TELEPHONY_LOGI("start errorCode = %{public}d", errorCode);
     if (asyncContext_ == nullptr) {
-        TELEPHONY_LOGE("OnGetNetworkSearchInfoCallback asyncContext null");
+        TELEPHONY_LOGE("asyncContext null");
         return;
     }
     std::unique_lock<std::mutex> callbackLock(asyncContext_->callbackMutex);
@@ -41,7 +41,7 @@ void GetNetworkSearchInfoCallback::OnGetNetworkSearchInformation(
     }
     asyncContext_->callbackEnd = true;
     asyncContext_->cv.notify_all();
-    TELEPHONY_LOGI("OnGetNetworkSearchInfoCallback end");
+    TELEPHONY_LOGD("end");
 }
 } // namespace Telephony
 } // namespace OHOS

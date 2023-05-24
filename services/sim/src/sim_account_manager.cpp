@@ -75,7 +75,7 @@ void SimAccountManager::Init(int32_t slotId)
 
 int32_t SimAccountManager::GetOperatorConfigs(int32_t slotId, OHOS::Telephony::OperatorConfig &poc)
 {
-    TELEPHONY_LOGI("SimAccountManager::GetOperatorConfigs");
+    TELEPHONY_LOGD("SimAccountManager::GetOperatorConfigs");
     if (operatorConfigCache_ == nullptr) {
         TELEPHONY_LOGE("SimAccountManager::GetOperatorConfigs operatorConfigCache_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -106,7 +106,7 @@ bool SimAccountManager::IsValidSlotIdForDefault(int32_t slotId)
 
 int32_t SimAccountManager::HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges)
 {
-    TELEPHONY_LOGI("SimAccountManager::HasOperatorPrivileges begin");
+    TELEPHONY_LOGD("SimAccountManager::HasOperatorPrivileges begin");
     if (privilegeController_ != nullptr) {
         return privilegeController_->HasOperatorPrivileges(hasOperatorPrivileges);
     }

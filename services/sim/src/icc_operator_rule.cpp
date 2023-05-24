@@ -98,7 +98,7 @@ bool IccOperatorRule::CreateFromTLV(const std::string &hexStr, std::vector<IccOp
 bool IccOperatorRule::CreateFromTLV(const std::string::const_iterator &hexStrBeg,
     const std::string::const_iterator &hexStrEnd, std::vector<IccOperatorRule> &result)
 {
-    TELEPHONY_LOGI("IccOperatorRule::CreateFromTLV by iterator Begin!");
+    TELEPHONY_LOGD("IccOperatorRule::CreateFromTLV by iterator Begin!");
     result.clear();
     const auto &[hexStrIt, prefixIt] =
         std::mismatch(hexStrBeg, hexStrEnd, TAG_ALL_RULE.begin(), TAG_ALL_RULE.end());
@@ -214,8 +214,8 @@ bool IccOperatorRule::DecodeTLVTagLimits(
 bool IccOperatorRule::DecodeTLVTagRule(std::string::const_iterator &hexStrBeg,
     const std::string::const_iterator &hexStrEnd, IccOperatorRule &result, int32_t &len)
 {
-    TELEPHONY_LOGI("Start parse TAG_RULE(%{public}s) for [%{public}s]", TAG_RULE.data(),
-        std::string(hexStrBeg, hexStrEnd).data());
+    TELEPHONY_LOGI(
+        "Start parse TAG_RULE(%{public}s) for [%{public}s]", TAG_RULE.data(), std::string(hexStrBeg, hexStrEnd).data());
     len = INT32_INITVALUE;
     const auto [hexStrIt, prefixIt] =
         std::mismatch(hexStrBeg, hexStrEnd, TAG_RULE.begin(), TAG_RULE.end());

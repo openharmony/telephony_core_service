@@ -110,7 +110,7 @@ void RadioProtocolController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
         return;
     }
     auto id = event->GetInnerEventId();
-    TELEPHONY_LOGI("RadioProtocolController::ProcessEvent id = %{public}d", id);
+    TELEPHONY_LOGD("RadioProtocolController::ProcessEvent id = %{public}d", id);
     auto itFunc = memberFuncMap_.find(id);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;

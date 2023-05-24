@@ -94,13 +94,13 @@ void IccFile::Init()
 
 void IccFile::StartLoad()
 {
-    TELEPHONY_LOGI("simmgr IccFile::StarLoad() start");
+    TELEPHONY_LOGI("IccFile::StarLoad start");
 }
 
 std::string IccFile::ObtainIMSI()
 {
     if (imsi_.empty()) {
-        TELEPHONY_LOGI("IccFile::ObtainIMSI  is null:");
+        TELEPHONY_LOGI("IccFile::ObtainIMSI is null:");
     }
     return imsi_;
 }
@@ -283,7 +283,7 @@ void IccFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
     auto id = event->GetInnerEventId();
     bool result = false;
-    TELEPHONY_LOGI("IccFile::ProcessEvent id %{public}d", id);
+    TELEPHONY_LOGD("IccFile::ProcessEvent id %{public}d", id);
     switch (id) {
         case MSG_SIM_OBTAIN_ICC_FILE_DONE:
             result = ProcessIccFileObtained(event);
@@ -323,7 +323,7 @@ void IccFile::RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> e
     if (filesFetchedObser_ != nullptr) {
         filesFetchedObser_->RegObserver(eventCode, eventHandler);
     }
-    TELEPHONY_LOGI("IccFile::RegisterAllFilesLoaded: registerd");
+    TELEPHONY_LOGD("IccFile::RegisterAllFilesLoaded: registerd");
     if (ObtainFilesFetched()) {
         TELEPHONY_LOGI("IccFile::RegisterAllFilesLoaded: notify");
         if (eventHandler != nullptr) {

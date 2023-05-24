@@ -212,7 +212,7 @@ std::u16string SimFileManager::GetSimIccId()
     }
 
     std::string result = simFile_->ObtainIccId();
-    TELEPHONY_LOGI("SimFileManager::GetSimIccId result:%{public}s ", (result.empty() ? "false" : "true"));
+    TELEPHONY_LOGD("SimFileManager::GetSimIccId result:%{public}s ", (result.empty() ? "false" : "true"));
     return Str8ToStr16(result);
 }
 
@@ -459,7 +459,7 @@ bool SimFileManager::HasSimCard()
 bool SimFileManager::InitDiallingNumberHandler()
 {
     if (fileController_ == nullptr) {
-        TELEPHONY_LOGI("InitDiallingNumberHandler null fileController");
+        TELEPHONY_LOGE("InitDiallingNumberHandler null fileController");
         return false;
     }
     if (diallingNumberHandler_ != nullptr) {
@@ -492,14 +492,14 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         return;
     }
     uint32_t id = event->GetInnerEventId();
-    TELEPHONY_LOGI("SimFileManager::ProcessEvent id %{public}d", id);
+    TELEPHONY_LOGD("SimFileManager::ProcessEvent id %{public}d", id);
     if (simStateManager_ == nullptr) {
         TELEPHONY_LOGE("simStateManager_ is nullptr");
         return;
     }
     switch (id) {
         case RadioEvent::RADIO_VOICE_TECH_CHANGED: {
-            TELEPHONY_LOGI("SimFileManager receive RADIO_VOICE_TECH_CHANGED");
+            TELEPHONY_LOGD("SimFileManager receive RADIO_VOICE_TECH_CHANGED");
             std::shared_ptr<VoiceRadioTechnology> tech = event->GetSharedObject<VoiceRadioTechnology>();
             SimFileManager::IccType iccType = GetIccTypeByTech(tech);
             if (iccType == SimFileManager::IccType::ICC_TYPE_CDMA &&
@@ -589,7 +589,7 @@ SimFileManager::IccType SimFileManager::GetIccTypeByCardType(CardType type)
 SimFileManager::IccType SimFileManager::GetIccTypeByTech(const std::shared_ptr<VoiceRadioTechnology> &tech)
 {
     if (tech == nullptr) {
-        TELEPHONY_LOGI("GetCardTypeByTech param tech is nullptr then ICC_TYPE_UNKNOW");
+        TELEPHONY_LOGE("GetCardTypeByTech param tech is nullptr then ICC_TYPE_UNKNOW");
         return SimFileManager::IccType::ICC_TYPE_GSM;
     }
     switch (tech->actType) {

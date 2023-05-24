@@ -86,8 +86,7 @@ SimState SimStateHandle::GetSimState()
 
 CardType SimStateHandle::GetCardType()
 {
-    TELEPHONY_LOGI(
-        "SimStateHandle::GetCardType() externalType_=%{public}d", static_cast<int32_t>(externalType_));
+    TELEPHONY_LOGD("SimStateHandle::GetCardType() externalType_=%{public}d", static_cast<int32_t>(externalType_));
     return externalType_;
 }
 
@@ -243,8 +242,8 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
     const int32_t newSimType = ar.simType_;
     const int32_t newSimStatus = ar.simStatus_;
     iccState_ = ar;
-    TELEPHONY_LOGI("SimStateHandle::ProcessIccCardState SimType[%{public}d], SimStatus[%{public}d]", newSimType,
-        newSimStatus);
+    TELEPHONY_LOGI(
+        "SimStateHandle::ProcessIccCardState SimType[%{public}d], SimStatus[%{public}d]", newSimType, newSimStatus);
     if (oldSimType_ != newSimType) {
         CardTypeEscape(newSimType, slotId);
         oldSimType_ = newSimType;
@@ -345,8 +344,8 @@ void SimStateHandle::GetSimCardData(const AppExecFwk::InnerEvent::Pointer &event
     if (param != nullptr) {
         iccState.simType_ = param->simType;
         iccState.simStatus_ = param->simState;
-        TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), simType_ = %{public}d", iccState.simType_);
-        TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), simStatus_ = %{public}d", iccState.simStatus_);
+        TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), simType_ = %{public}d, simStatus_ = %{public}d",
+            iccState.simType_, iccState.simStatus_);
     } else {
         error = static_cast<int32_t>(response->error);
         TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), error = %{public}d", error);
@@ -467,8 +466,7 @@ void SimStateHandle::SyncCmdResponse()
 {
     std::unique_lock<std::mutex> lck(SimStateManager::ctx_);
     SimStateManager::responseReady_ = true;
-    TELEPHONY_LOGI(
-        "SimStateHandle::SyncCmdResponse(), responseReady_ = %{public}d", SimStateManager::responseReady_);
+    TELEPHONY_LOGI("SimStateHandle::SyncCmdResponse(), responseReady_ = %{public}d", SimStateManager::responseReady_);
     SimStateManager::cv_.notify_one();
 }
 
@@ -490,8 +488,7 @@ bool SimStateHandle::PublishSimStateEvent(std::string event, int32_t eventCode, 
 void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     uint32_t eventId = event->GetInnerEventId();
-    TELEPHONY_LOGI("SimStateHandle::ProcessEvent(), eventId = %{public}d", eventId);
-    TELEPHONY_LOGI("SimStateHandle::ProcessEvent(), slotId_ = %{public}d", slotId_);
+    TELEPHONY_LOGD("SimStateHandle::ProcessEvent(), eventId = %{public}d, slotId_ = %{public}d", eventId, slotId_);
     switch (eventId) {
         case RadioEvent::RADIO_STATE_CHANGED:
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
@@ -539,15 +536,15 @@ bool SimStateHandle::ConnectService()
 {
     auto systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemManager == nullptr) {
-        TELEPHONY_LOGE("SimStateHandle::ConnectService() GetSystemAbilityManager() null\n");
+        TELEPHONY_LOGE("SimStateHandle::ConnectService() GetSystemAbilityManager null");
         return false;
     }
     sptr<IRemoteObject> object = systemManager->GetSystemAbility(TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID);
     if (object == nullptr) {
-        TELEPHONY_LOGI("SimStateHandle::ConnectService() faild\n");
+        TELEPHONY_LOGE("SimStateHandle::ConnectService faild");
         return false;
     }
-    TELEPHONY_LOGI("SimStateHandle::ConnectService() success\n");
+    TELEPHONY_LOGI("SimStateHandle::ConnectService success");
     return true;
 }
 
