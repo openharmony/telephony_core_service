@@ -1,0 +1,12 @@
+{
+    "process": "telephony",
+    "systemability": [
+        {
+            "name": 4010,
+            "libpath": "libtel_core_service.z.so",
+            "run-on-create": true,
+            "distributed": false,
+            "dump_level": 1
+        }
+    ]
+}
