@@ -1513,8 +1513,8 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0300, Function | Medium
         diallingNumbers->number_ = Str8ToStr16("00000000000");
         SimTest::telephonyService_->AddIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumbers);
-        int32_t SLEEP_TIME = 1;
-        sleep(SLEEP_TIME);
+        int32_t sleepTime = 1;
+        sleep(sleepTime);
         int index = 0;
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
         diallingNumber->index_ = index;
