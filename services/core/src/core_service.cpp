@@ -1183,6 +1183,10 @@ int32_t CoreService::UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType
 
 int32_t CoreService::GetBasebandVersion(int32_t slotId, std::string &version)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_STATE");
         return TELEPHONY_ERR_PERMISSION_ERR;

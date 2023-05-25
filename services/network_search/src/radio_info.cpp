@@ -330,6 +330,14 @@ void RadioInfo::AirplaneModeChange()
         nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
     }
     if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_ON && isAirplaneModeOn == true) {
+        sptr<NetworkSearchCallBackBase> cellularData = nsm->GetCellularDataCallBack();
+        if (cellularData) {
+            cellularData->ClearCellularDataConnections(slotId_);
+        }
+        sptr<NetworkSearchCallBackBase> cellularCall = nsm->GetCellularCallCallBack();
+        if (cellularCall) {
+            cellularCall->ClearCellularCallList(slotId_);
+        }
         nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_OFF), 0);
     }
     nsm->SetLocalAirplaneMode(slotId_, isAirplaneModeOn);
