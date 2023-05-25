@@ -2338,7 +2338,8 @@ static void GetBasebandVersionCallback(napi_env env, napi_status status, void *d
         napi_create_string_utf8(
             env, asyncContext->getBasebandVersion.c_str(), asyncContext->getBasebandVersion.size(), &callbackValue);
     } else {
-        JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->errorCode);
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            asyncContext->errorCode, "getBasebandVersion", GET_TELEPHONY_STATE);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
