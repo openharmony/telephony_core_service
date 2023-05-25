@@ -852,9 +852,6 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_003, Function | MediumTest | Lev
     EXPECT_NE(mInner.GetNrOptionMode(0, mode), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(mode, NrMode::NR_MODE_UNKNOWN);
     EXPECT_EQ(mInner.GetFrequencyType(0), FrequencyType::FREQ_TYPE_UNKNOWN);
-    EXPECT_EQ(mInner.GetNrState(0), NrState::NR_STATE_NOT_SUPPORT);
-    EXPECT_NE(mInner.SendUpdateCellLocationRequest(0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_FALSE(mInner.IsNrSupported(0));
 }
 
 /**
@@ -907,6 +904,9 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_004, Function | MediumTest | Lev
     EXPECT_GT(mInner.AddIccDiallingNumbers(0, 0, diallingNumbers), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.DelIccDiallingNumbers(0, 0, diallingNumbers), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.UpdateIccDiallingNumbers(0, 0, diallingNumbers), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(mInner.GetNrState(0), NrState::NR_STATE_NOT_SUPPORT);
+    EXPECT_NE(mInner.SendUpdateCellLocationRequest(0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_FALSE(mInner.IsNrSupported(0));
 }
 
 /**
@@ -1205,8 +1205,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_001, Function | MediumTest | Level1)
     EXPECT_GT(simManager->UnlockSimLock(INVALID_SLOTID, mPersoLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(simManager->IsSimActive(0));
     EXPECT_FALSE(simManager->IsSimActive(INVALID_SLOTID));
-    EXPECT_GT(simManager->SetActiveSim(0, 1), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->SetActiveSim(INVALID_SLOTID, 1), TELEPHONY_ERR_SUCCESS);
     IccAccountInfo mIccAccountInfo;
     EXPECT_GT(simManager->GetSimAccountInfo(0, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->GetSimAccountInfo(INVALID_SLOTID, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
@@ -1264,6 +1262,8 @@ HWTEST_F(BranchTest, Telephony_SimManager_002, Function | MediumTest | Level1)
     EXPECT_NE(simManager->GetOpKeyExt(INVALID_SLOTID, testStr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->SetVoiceMailInfo(0, testStr, testStr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->SetVoiceMailInfo(INVALID_SLOTID, testStr, testStr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->SetActiveSim(0, 1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->SetActiveSim(INVALID_SLOTID, 1), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1687,26 +1687,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     EXPECT_EQ(networkSearchManager->GetPsRegState(INVALID_SLOTID), TELEPHONY_ERROR);
     EXPECT_EQ(networkSearchManager->GetCsRegState(INVALID_SLOTID), TELEPHONY_ERROR);
     EXPECT_EQ(networkSearchManager->GetPsRoamingState(INVALID_SLOTID), TELEPHONY_ERROR);
-    networkSearchManager->TriggerSimRefresh(INVALID_SLOTID);
-    networkSearchManager->RegisterCoreNotify(INVALID_SLOTID, networkSearchHandler, 1);
-    networkSearchManager->UnRegisterCoreNotify(INVALID_SLOTID, networkSearchHandler, 1);
-    int32_t radioTech;
-    EXPECT_NE(networkSearchManager->GetPsRadioTech(INVALID_SLOTID, radioTech), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(networkSearchManager->GetCsRadioTech(INVALID_SLOTID, radioTech), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(networkSearchManager->GetOperatorNumeric(INVALID_SLOTID), testStr);
-    EXPECT_NE(networkSearchManager->GetOperatorName(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(result, testStr);
-    std::vector<sptr<Telephony::SignalInformation>> signals;
-    networkSearchManager->GetSignalInfoList(INVALID_SLOTID, signals);
-    EXPECT_TRUE(signals.empty());
-    std::vector<sptr<CellInformation>> cellInfo;
-    networkSearchManager->GetCellInfoList(INVALID_SLOTID, cellInfo);
-    EXPECT_TRUE(cellInfo.empty());
-    EXPECT_NE(networkSearchManager->SendUpdateCellLocationRequest(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
-    EXPECT_TRUE(networkSearchManager->GetCellLocation(INVALID_SLOTID) == nullptr);
-    bool airplaneMode = false;
-    EXPECT_NE(networkSearchManager->GetAirplaneMode(airplaneMode), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(networkSearchManager->UpdateRadioOn(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1764,6 +1744,44 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_002, Function | MediumTest |
         TELEPHONY_ERR_ARGUMENT_NULL);
     EXPECT_EQ(networkSearchManager->UnregisterImsRegInfoCallback(INVALID_SLOTID, ImsServiceType::TYPE_SMS, bundleName),
         TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearchManager_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_NetworkSearchManager_003, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<SimManager> simManager = nullptr;
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto runner = AppExecFwk::EventRunner::Create("test");
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(runner, networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
+    networkSearchManager->TriggerSimRefresh(INVALID_SLOTID);
+    networkSearchManager->RegisterCoreNotify(INVALID_SLOTID, networkSearchHandler, 1);
+    networkSearchManager->UnRegisterCoreNotify(INVALID_SLOTID, networkSearchHandler, 1);
+    int32_t radioTech;
+    std::u16string testStr = u"";
+    std::u16string result = u"";
+    EXPECT_NE(networkSearchManager->GetPsRadioTech(INVALID_SLOTID, radioTech), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->GetCsRadioTech(INVALID_SLOTID, radioTech), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->GetOperatorNumeric(INVALID_SLOTID), testStr);
+    EXPECT_NE(networkSearchManager->GetOperatorName(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(result, testStr);
+    std::vector<sptr<Telephony::SignalInformation>> signals;
+    networkSearchManager->GetSignalInfoList(INVALID_SLOTID, signals);
+    EXPECT_TRUE(signals.empty());
+    std::vector<sptr<CellInformation>> cellInfo;
+    networkSearchManager->GetCellInfoList(INVALID_SLOTID, cellInfo);
+    EXPECT_TRUE(cellInfo.empty());
+    EXPECT_NE(networkSearchManager->SendUpdateCellLocationRequest(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
+    EXPECT_TRUE(networkSearchManager->GetCellLocation(INVALID_SLOTID) == nullptr);
+    bool airplaneMode = false;
+    EXPECT_NE(networkSearchManager->GetAirplaneMode(airplaneMode), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->UpdateRadioOn(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
 }
 
 /**

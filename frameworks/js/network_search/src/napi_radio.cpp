@@ -606,7 +606,8 @@ static void GetNetworkSearchInformationCallback(napi_env env, napi_status status
         napi_set_named_property(env, callbackValue, "networkSearchResult", searchResultArray);
     } else {
         if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("GetNetworkSearchInformationCallback time out, errorCode = %{public}d", asyncContext->errorCode);
+            TELEPHONY_LOGE(
+                "GetNetworkSearchInformationCallback time out, errorCode = %{public}d", asyncContext->errorCode);
             asyncContext->errorCode = TELEPHONY_ERR_FAIL;
         }
         JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
