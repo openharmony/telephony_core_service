@@ -538,6 +538,7 @@ bool NapiUtil::CreateCommonErrorMessageForJs(int32_t errorCode, JsErrorCode &jsE
         case TELEPHONY_ERR_READ_DATA_FAIL:
         case TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL:
         case TELEPHONY_ERR_REGISTER_CALLBACK_FAIL:
+        case TELEPHONY_ERR_CALLBACK_ALREADY_REGISTERED:
         case TELEPHONY_ERR_UNINIT:
         case TELEPHONY_ERR_UNREGISTER_CALLBACK_FAIL:
             jsErrorCode = JS_ERROR_TELEPHONY_SERVICE_ERROR;
