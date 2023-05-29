@@ -212,9 +212,9 @@ void MultiSimMonitor::RegisterSimNotify()
         return;
     }
     controller_->ForgetAllData();
-    for (unsigned slotId = 0; slotId < simFileManager_.size(); slotId++) {
+    for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
         if (simFileManager_[slotId] == nullptr) {
-            TELEPHONY_LOGE("simFileManager_ is null slotId :  %{public}d", slotId);
+            TELEPHONY_LOGE("simFileManager_ is null slotId : %{public}zu", slotId);
             continue;
         }
         simFileManager_[slotId]->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
@@ -224,9 +224,9 @@ void MultiSimMonitor::RegisterSimNotify()
 
 void MultiSimMonitor::UnRegisterSimNotify()
 {
-    for (unsigned slotId = 0; slotId < simFileManager_.size(); slotId++) {
+    for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
         if (simFileManager_[slotId] == nullptr) {
-            TELEPHONY_LOGE("simFileManager_ is null slotId :  %{public}d", slotId);
+            TELEPHONY_LOGE("simFileManager_ is null slotId : %{public}zu", slotId);
             continue;
         }
         simFileManager_[slotId]->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
