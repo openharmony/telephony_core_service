@@ -43,6 +43,7 @@ ohos_shared_library("radio") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
+    "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",

@@ -43,6 +43,7 @@ ohos_shared_library("libtel_common") {
     "common/src/enum_convert.cpp",
     "common/src/str_convert.cpp",
     "common/src/telephony_common_utils.cpp",
+    "common/src/telephony_config.cpp",
     "common/src/telephony_permission.cpp",
     "preferences/src/tel_profile_util.cpp",
   ]
@@ -81,6 +82,7 @@ ohos_shared_library("libtel_common") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "hisysevent_native:libhisysevent",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
     "preferences:native_preferences",

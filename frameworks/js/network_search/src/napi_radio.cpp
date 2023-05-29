@@ -29,6 +29,7 @@
 #include "set_network_search_mode_callback.h"
 #include "set_preferred_network_callback.h"
 #include "set_radio_state_callback.h"
+#include "telephony_config.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
@@ -40,7 +41,6 @@ constexpr int16_t PARAMETER_COUNT_ONE = 1;
 constexpr int16_t PARAMETER_COUNT_TWO = 2;
 constexpr int16_t PARAMETER_COUNT_THREE = 3;
 constexpr int16_t PARAMETER_COUNT_FOUR = 4;
-constexpr int32_t INVALID_VALUE = -1;
 
 static constexpr const char *GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHONY_STATE";
 static constexpr const char *SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
@@ -2093,37 +2093,15 @@ static napi_value IsNrSupported(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     bool isNrSupported = false;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
-    NAPI_ASSERT(env, MatchIsNrSupportedParameter(env, parameters, parameterCount), "type mismatch");
-    int32_t slotId = SIM_SLOT_0;
-
-    switch (parameterCount) {
-        case PARAMETER_COUNT_ZERO: {
-            DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPrimarySlotId(slotId);
-            if (slotId == INVALID_VALUE) {
-                TELEPHONY_LOGE("get primary slot id failed.");
-                napi_get_boolean(env, isNrSupported, &result);
-                return result;
-            }
-            isNrSupported = DelayedRefSingleton<CoreServiceClient>::GetInstance().IsNrSupported(slotId);
-            break;
-        }
-        case PARAMETER_COUNT_ONE: {
-            NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &slotId));
-            if (!IsValidSlotId(slotId)) {
-                TELEPHONY_LOGE("IsNrSupported slotId is invalid");
-                napi_get_boolean(env, isNrSupported, &result);
-                return result;
-            }
-            if (slotId == SIM_SLOT_0) {
-                isNrSupported = DelayedRefSingleton<CoreServiceClient>::GetInstance().IsNrSupported(SIM_SLOT_0);
-            } else if (slotId == SIM_SLOT_1) {
-                isNrSupported = DelayedRefSingleton<CoreServiceClient>::GetInstance().IsNrSupported(SIM_SLOT_1);
-            }
-            break;
-        }
-        default:
-            break;
+    if (!MatchIsNrSupportedParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("IsNrSupported parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
     }
+    TelephonyConfig telephonyConfig;
+    isNrSupported =
+        telephonyConfig.IsCapabilitySupport(static_cast<int32_t>(TelephonyConfig::ConfigType::MODEM_CAP_SUPPORT_NR));
+    TELEPHONY_LOGD("isNrSupported:%{public}d", isNrSupported);
     napi_get_boolean(env, isNrSupported, &result);
     return result;
 }
