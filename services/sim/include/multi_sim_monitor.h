@@ -18,42 +18,66 @@
 
 #include <list>
 
+#include "common_event_subscriber.h"
+#include "iservice_registry.h"
 #include "multi_sim_controller.h"
 #include "sim_constant.h"
 #include "sim_file_manager.h"
+#include "system_ability_definition.h"
 #include "system_ability_status_change_stub.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace OHOS::EventFwk;
+using CommonEventSubscribeInfo = OHOS::EventFwk::CommonEventSubscribeInfo;
+using CommonEventSubscriber = OHOS::EventFwk::CommonEventSubscriber;
 class MultiSimMonitor : public AppExecFwk::EventHandler {
 public:
     MultiSimMonitor(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
         const std::shared_ptr<MultiSimController> &controller,
         std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
         std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager);
-    virtual ~MultiSimMonitor() = default;
+    ~MultiSimMonitor();
 
     void Init();
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     int32_t RegisterSimAccountCallback(const std::string &bundleName, const sptr<SimAccountCallback> &callback);
     int32_t UnregisterSimAccountCallback(const std::string &bundleName);
     void NotifySimAccountChanged();
+    void RegisterSimNotify();
+    void UnRegisterSimNotify();
 
 private:
+    class UserSwitchEventSubscriber : public CommonEventSubscriber {
+    public:
+        explicit UserSwitchEventSubscriber(
+            const CommonEventSubscribeInfo &info, std::shared_ptr<AppExecFwk::EventHandler> multiSimMonitorHandler)
+            : CommonEventSubscriber(info), multiSimMonitorHandler_(multiSimMonitorHandler)
+        {}
+        ~UserSwitchEventSubscriber() = default;
+        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+
+    private:
+        std::shared_ptr<AppExecFwk::EventHandler> multiSimMonitorHandler_ = nullptr;
+    };
+
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
     public:
-        SystemAbilityStatusChangeListener(std::shared_ptr<AppExecFwk::EventHandler> multiSimMonitorHandler,
-            std::shared_ptr<MultiSimController> controller,
-            std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_);
+        SystemAbilityStatusChangeListener(std::shared_ptr<AppExecFwk::EventHandler> multiSimMonitorHandler);
         ~SystemAbilityStatusChangeListener() = default;
         virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
         virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
 
     private:
         std::weak_ptr<AppExecFwk::EventHandler> multiSimMonitorHandler_;
-        std::shared_ptr<MultiSimController> controller_ = nullptr;
-        std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
+        std::shared_ptr<UserSwitchEventSubscriber> userSwitchSubscriber_ = nullptr;
+    };
+
+public:
+    enum {
+        REGISTER_SIM_NOTIFY_EVENT = 0,
+        UNREGISTER_SIM_NOTIFY_EVENT,
     };
 
 private:
