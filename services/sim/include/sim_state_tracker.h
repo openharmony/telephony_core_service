@@ -18,19 +18,25 @@
 
 #include <string>
 
+#include "common_event_subscriber.h"
+#include "iservice_registry.h"
 #include "operator_config_cache.h"
 #include "operator_config_loader.h"
+#include "system_ability_definition.h"
 #include "system_ability_status_change_stub.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace OHOS::EventFwk;
+using CommonEventSubscribeInfo = OHOS::EventFwk::CommonEventSubscribeInfo;
+using CommonEventSubscriber = OHOS::EventFwk::CommonEventSubscriber;
 class SimStateTracker : public AppExecFwk::EventHandler {
 public:
     SimStateTracker(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
         std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache,
         int32_t slotId);
-    virtual ~SimStateTracker() = default;
+    ~SimStateTracker();
     void InitListener();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     bool RegisterForIccLoaded();
@@ -47,6 +53,19 @@ private:
     OperatorConfig config_;
 
 private:
+    class UserSwitchEventSubscriber : public CommonEventSubscriber {
+    public:
+        explicit UserSwitchEventSubscriber(
+            const CommonEventSubscribeInfo &info, int32_t slotId, std::shared_ptr<OperatorConfigLoader> configLoader)
+            : CommonEventSubscriber(info), slotId_(slotId), configLoader_(configLoader)
+        {}
+        ~UserSwitchEventSubscriber() = default;
+        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+
+    private:
+        const int32_t slotId_;
+        std::shared_ptr<OperatorConfigLoader> configLoader_ = nullptr;
+    };
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
     public:
         explicit SystemAbilityStatusChangeListener(int32_t slotId, std::shared_ptr<OperatorConfigLoader> configLoader);
@@ -57,6 +76,7 @@ private:
     private:
         const int32_t slotId_;
         std::shared_ptr<OperatorConfigLoader> configLoader_ = nullptr;
+        std::shared_ptr<UserSwitchEventSubscriber> userSwitchSubscriber_ = nullptr;
     };
 };
 } // namespace Telephony

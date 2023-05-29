@@ -15,12 +15,16 @@
 
 #include "sim_state_tracker.h"
 
+#include "common_event_manager.h"
+#include "common_event_support.h"
 #include "core_manager_inner.h"
+#include "os_account_manager_wrapper.h"
 #include "radio_event.h"
 #include "thread"
 
 namespace OHOS {
 namespace Telephony {
+const int32_t ACTIVE_USER_ID = 100;
 SimStateTracker::SimStateTracker(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache,
     int32_t slotId)
@@ -34,6 +38,17 @@ SimStateTracker::SimStateTracker(const std::shared_ptr<AppExecFwk::EventRunner> 
     InitListener();
 }
 
+SimStateTracker::~SimStateTracker()
+{
+    if (statusChangeListener_ != nullptr) {
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy != nullptr) {
+            samgrProxy->UnSubscribeSystemAbility(OHOS::SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN, statusChangeListener_);
+            statusChangeListener_ = nullptr;
+        }
+    }
+}
+
 void SimStateTracker::InitListener()
 {
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -42,8 +57,8 @@ void SimStateTracker::InitListener()
         TELEPHONY_LOGE("samgrProxy or statusChangeListener_ is nullptr");
         return;
     }
-    int32_t ret = samgrProxy->SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, statusChangeListener_);
-    TELEPHONY_LOGI("SubscribeSystemAbility DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID result:%{public}d", ret);
+    int32_t ret = samgrProxy->SubscribeSystemAbility(SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN, statusChangeListener_);
+    TELEPHONY_LOGI("SubscribeSystemAbility SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN result:%{public}d", ret);
 }
 
 void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -107,17 +122,57 @@ SimStateTracker::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeLis
 void SimStateTracker::SystemAbilityStatusChangeListener::OnAddSystemAbility(
     int32_t systemAbilityId, const std::string &deviceId)
 {
-    if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID && configLoader_ != nullptr) {
-        TELEPHONY_LOGI("SystemAbilityStatusChangeListener::LoadOperatorConfig");
+    if (systemAbilityId != SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN || configLoader_ == nullptr) {
+        TELEPHONY_LOGE("added SA is not accoubt manager service or configLoader_ is nullptr, ignored.");
+        return;
+    }
+    TELEPHONY_LOGI("SystemAbilityStatusChangeListener::LoadOperatorConfig");
+    std::vector<int32_t> activeList = { 0 };
+    DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
+    TELEPHONY_LOGI("current active user id is :%{public}d", activeList[0]);
+    if (activeList[0] == ACTIVE_USER_ID) {
         configLoader_->LoadOperatorConfig(slotId_);
+    } else {
+        MatchingSkills matchingSkills;
+        matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
+        CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+        subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
+        userSwitchSubscriber_ = std::make_shared<UserSwitchEventSubscriber>(subscriberInfo, slotId_, configLoader_);
+        bool subRet = CommonEventManager::SubscribeCommonEvent(userSwitchSubscriber_);
+        if (!subRet) {
+            TELEPHONY_LOGE("Subscribe user switched event failed!");
+        }
     }
 }
 
 void SimStateTracker::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
     int32_t systemAbilityId, const std::string &deviceId)
 {
-    if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
-        TELEPHONY_LOGE("DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID stopped");
+    if (systemAbilityId != SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
+        TELEPHONY_LOGE("removed SA is not account manager service, ignored.");
+        return;
+    }
+    TELEPHONY_LOGD("SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN stopped");
+    if (userSwitchSubscriber_ != nullptr) {
+        bool subRet = CommonEventManager::UnSubscribeCommonEvent(userSwitchSubscriber_);
+        if (!subRet) {
+            TELEPHONY_LOGE("UnSubscribe user switched event failed!");
+        }
+        userSwitchSubscriber_ = nullptr;
+    }
+}
+
+void SimStateTracker::UserSwitchEventSubscriber::OnReceiveEvent(const CommonEventData &data)
+{
+    OHOS::EventFwk::Want want = data.GetWant();
+    std::string action = data.GetWant().GetAction();
+    TELEPHONY_LOGI("action = %{public}s", action.c_str());
+    if (action == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        int32_t userId = data.GetCode();
+        TELEPHONY_LOGI("current user id is :%{public}d", userId);
+        if (userId == ACTIVE_USER_ID) {
+            configLoader_->LoadOperatorConfig(slotId_);
+        }
     }
 }
 } // namespace Telephony
