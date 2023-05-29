@@ -15,12 +15,15 @@
 
 #include "multi_sim_monitor.h"
 
+#include "common_event_manager.h"
+#include "common_event_support.h"
+#include "os_account_manager_wrapper.h"
 #include "radio_event.h"
 #include "string_ex.h"
 
 namespace OHOS {
 namespace Telephony {
-
+const int32_t ACTIVE_USER_ID = 100;
 MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     const std::shared_ptr<MultiSimController> &controller,
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
@@ -30,6 +33,17 @@ MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<AppExecFwk::EventRunner> 
 {
     if (observerHandler_ == nullptr) {
         observerHandler_ = std::make_unique<ObserverHandler>();
+    }
+}
+
+MultiSimMonitor::~MultiSimMonitor()
+{
+    if (statusChangeListener_ != nullptr) {
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy != nullptr) {
+            samgrProxy->UnSubscribeSystemAbility(OHOS::SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN, statusChangeListener_);
+            statusChangeListener_ = nullptr;
+        }
     }
 }
 
@@ -54,6 +68,14 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         case RadioEvent::RADIO_SIM_STATE_CHANGE: {
             auto slotId = event->GetParam();
             RefreshData(slotId);
+            break;
+        }
+        case MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT: {
+            RegisterSimNotify();
+            break;
+        }
+        case MultiSimMonitor::UNREGISTER_SIM_NOTIFY_EVENT: {
+            UnRegisterSimNotify();
             break;
         }
         default:
@@ -183,72 +205,120 @@ void MultiSimMonitor::NotifySimAccountChanged()
     }
 }
 
-void MultiSimMonitor::InitListener()
+void MultiSimMonitor::RegisterSimNotify()
 {
-    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    statusChangeListener_ =
-        new (std::nothrow) SystemAbilityStatusChangeListener(shared_from_this(), controller_, simFileManager_);
-    if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
-        TELEPHONY_LOGE("samgrProxy or statusChangeListener_ is nullptr");
-        return;
-    }
-    int32_t ret = samgrProxy->SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, statusChangeListener_);
-    TELEPHONY_LOGI("SubscribeSystemAbility DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID result:%{public}d", ret);
-}
-
-MultiSimMonitor::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(
-    std::shared_ptr<AppExecFwk::EventHandler> multiSimMonitorHandler, std::shared_ptr<MultiSimController> controller,
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager)
-    : multiSimMonitorHandler_(multiSimMonitorHandler), controller_(controller), simFileManager_(simFileManager)
-{}
-
-void MultiSimMonitor::SystemAbilityStatusChangeListener::OnAddSystemAbility(
-    int32_t systemAbilityId, const std::string &deviceId)
-{
-    if (systemAbilityId != DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
-        return;
-    }
-
-    TELEPHONY_LOGD("SystemAbilityStatusChangeListener::OnAddSystemAbility DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID");
     if (controller_ == nullptr) {
         TELEPHONY_LOGE("MultiSimController is null");
         return;
     }
     controller_->ForgetAllData();
-    auto handler = multiSimMonitorHandler_.lock();
-    if (handler == nullptr) {
-        TELEPHONY_LOGE("multiSimMonitorHandler_ is null");
-        return;
-    }
-    for (unsigned slotId = 0; slotId < simFileManager_.size(); slotId++) {
+    for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
         if (simFileManager_[slotId] == nullptr) {
-            TELEPHONY_LOGE("simFileManager_ is null slotId : %{public}d", slotId);
+            TELEPHONY_LOGE("simFileManager_ is null slotId : %{public}zu", slotId);
             continue;
         }
-        simFileManager_[slotId]->RegisterCoreNotify(handler, RadioEvent::RADIO_SIM_RECORDS_LOADED);
-        simFileManager_[slotId]->RegisterCoreNotify(handler, RadioEvent::RADIO_SIM_STATE_CHANGE);
+        simFileManager_[slotId]->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
+        simFileManager_[slotId]->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+    }
+}
+
+void MultiSimMonitor::UnRegisterSimNotify()
+{
+    for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
+        if (simFileManager_[slotId] == nullptr) {
+            TELEPHONY_LOGE("simFileManager_ is null slotId : %{public}zu", slotId);
+            continue;
+        }
+        simFileManager_[slotId]->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
+        simFileManager_[slotId]->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+    }
+}
+
+void MultiSimMonitor::InitListener()
+{
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(shared_from_this());
+    if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
+        TELEPHONY_LOGE("samgrProxy or statusChangeListener_ is nullptr");
+        return;
+    }
+    int32_t ret = samgrProxy->SubscribeSystemAbility(SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN, statusChangeListener_);
+    TELEPHONY_LOGI("SubscribeSystemAbility SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN result:%{public}d", ret);
+}
+
+MultiSimMonitor::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(
+    std::shared_ptr<AppExecFwk::EventHandler> multiSimMonitorHandler)
+    : multiSimMonitorHandler_(multiSimMonitorHandler)
+{}
+
+void MultiSimMonitor::SystemAbilityStatusChangeListener::OnAddSystemAbility(
+    int32_t systemAbilityId, const std::string &deviceId)
+{
+    if (systemAbilityId != SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
+        return;
+    }
+
+    TELEPHONY_LOGD("SystemAbilityStatusChangeListener::OnAddSystemAbility SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN");
+    std::vector<int32_t> activeList = { 0 };
+    DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
+    TELEPHONY_LOGI("current active user id is :%{public}d", activeList[0]);
+    auto multiSimMonitorHandler = multiSimMonitorHandler_.lock();
+    if (activeList[0] == ACTIVE_USER_ID) {
+        if (multiSimMonitorHandler == nullptr) {
+            TELEPHONY_LOGE("MultiSimMonitor is null");
+            return;
+        }
+        multiSimMonitorHandler->SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
+    } else {
+        MatchingSkills matchingSkills;
+        matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
+        CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+        subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
+        userSwitchSubscriber_ = std::make_shared<UserSwitchEventSubscriber>(subscriberInfo, multiSimMonitorHandler);
+        bool subRet = CommonEventManager::SubscribeCommonEvent(userSwitchSubscriber_);
+        if (!subRet) {
+            TELEPHONY_LOGE("Subscribe user switched event failed!");
+        }
     }
 }
 
 void MultiSimMonitor::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
     int32_t systemAbilityId, const std::string &deviceId)
 {
-    if (systemAbilityId != DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
+    if (systemAbilityId != SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
         return;
     }
-    TELEPHONY_LOGD("SystemAbilityStatusChangeListener::OnRemoveSystemAbility DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID");
-    auto handler = multiSimMonitorHandler_.lock();
-    if (handler == nullptr) {
-        TELEPHONY_LOGE("multiSimMonitorHandler_ is null");
+    TELEPHONY_LOGD("SystemAbilityStatusChangeListener::OnRemoveSystemAbility SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN");
+    auto multiSimMonitorHandler = multiSimMonitorHandler_.lock();
+    if (multiSimMonitorHandler == nullptr) {
+        TELEPHONY_LOGE("MultiSimMonitor is null");
         return;
     }
-    for (unsigned slotId = 0; slotId < simFileManager_.size(); slotId++) {
-        if (simFileManager_[slotId] == nullptr) {
-            TELEPHONY_LOGE("simFileManager_ is null slotId : %{public}d", slotId);
-            continue;
+    multiSimMonitorHandler->SendEvent(MultiSimMonitor::UNREGISTER_SIM_NOTIFY_EVENT);
+    if (userSwitchSubscriber_ != nullptr) {
+        bool subRet = CommonEventManager::UnSubscribeCommonEvent(userSwitchSubscriber_);
+        if (!subRet) {
+            TELEPHONY_LOGE("UnSubscribe user switched event failed!");
         }
-        simFileManager_[slotId]->UnRegisterCoreNotify(handler, RadioEvent::RADIO_SIM_RECORDS_LOADED);
-        simFileManager_[slotId]->UnRegisterCoreNotify(handler, RadioEvent::RADIO_SIM_STATE_CHANGE);
+        userSwitchSubscriber_ = nullptr;
+    }
+}
+
+void MultiSimMonitor::UserSwitchEventSubscriber::OnReceiveEvent(const CommonEventData &data)
+{
+    if (multiSimMonitorHandler_ == nullptr) {
+        TELEPHONY_LOGE("MultiSimMonitor is null");
+        return;
+    }
+    OHOS::EventFwk::Want want = data.GetWant();
+    std::string action = data.GetWant().GetAction();
+    TELEPHONY_LOGI("action = %{public}s", action.c_str());
+    if (action == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        int32_t userId = data.GetCode();
+        TELEPHONY_LOGI("current user id is :%{public}d", userId);
+        if (userId == ACTIVE_USER_ID) {
+            multiSimMonitorHandler_->SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
+        }
     }
 }
 } // namespace Telephony

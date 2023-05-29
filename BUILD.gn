@@ -132,6 +132,7 @@ ohos_shared_library("tel_core_service") {
   external_deps = [
     "ability_base:want",
     "ability_base:zuri",
+    "ability_runtime:ability_deps_wrapper",
     "ability_runtime:ability_manager",
     "ability_runtime:data_ability_helper",
     "ability_runtime:dataobs_manager",
