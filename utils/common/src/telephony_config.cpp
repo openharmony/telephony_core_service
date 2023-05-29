@@ -25,7 +25,7 @@ namespace Telephony {
 static const uint32_t BCD_MAX_VALUE = 15;
 static const uint32_t ASCII_BASE_OFFSET_VALUE = 10;
 static const uint32_t MODEM_CAP_MIN_VALUE = 0;
-static const uint32_t MODEM_CAP_MAX_VALUE = 360;
+static const uint32_t MODEM_CAP_MAX_VALUE = 32;
 static const uint32_t BCD_LEN = 4;
 static const uint32_t BASE_VALUE = 1;
 static const int32_t INVALID_VALUE = -1;
