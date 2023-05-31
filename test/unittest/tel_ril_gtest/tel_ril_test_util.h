@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_TEL_RIL_TEST_H
-#define OHOS_TEL_RIL_TEST_H
+#ifndef OHOS_TEL_RIL_TEST_UTIL_H
+#define OHOS_TEL_RIL_TEST_UTIL_H
 
 #include <condition_variable>
 #include <gtest/gtest.h>
@@ -281,6 +281,12 @@ private:
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     std::map<DiffInterfaceId, RilManagerAndResponseTestFun> memberFuncMap_;
 };
+
+#ifndef TEL_TEST_UNSUPPORT
+inline const int32_t SLOT_ID_0 = 0;
+inline const int32_t SLOT_ID_1 = 1;
+#endif // TEL_TEST_UNSUPPORT
+
 } // namespace Telephony
 } // namespace OHOS
-#endif // OHOS_TEL_RIL_TEST_H
+#endif // OHOS_TEL_RIL_TEST_UTIL_H

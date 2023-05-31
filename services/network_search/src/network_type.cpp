@@ -27,7 +27,6 @@ NetworkType::NetworkType(const std::weak_ptr<NetworkSearchManager> &networkSearc
 
 void NetworkType::ProcessGetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &event) const
 {
-    TELEPHONY_LOGI("NetworkType::ProcessGetPreferredNetwork");
     if (event == nullptr) {
         TELEPHONY_LOGE("NetworkType::ProcessGetPreferredNetwork event is nullptr");
         return;
@@ -64,8 +63,7 @@ void NetworkType::ProcessGetPreferredNetwork(const AppExecFwk::InnerEvent::Point
             return;
         }
     }
-    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
-        NetworkUtils::FindNetworkSearchCallback(index);
+    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo = NetworkUtils::FindNetworkSearchCallback(index);
     if (callbackInfo != nullptr) {
         sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchItem_;
         if (callback != nullptr) {

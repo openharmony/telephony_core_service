@@ -200,7 +200,6 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
     }
     switch (systemAbilityId) {
         case POWER_MANAGER_SERVICE_ID: {
-            TELEPHONY_LOGI("DeviceStateObserver systemAbilityId is POWER_MANAGER_SERVICE_ID");
             if (sub_->GetEventHandler() == nullptr) {
                 TELEPHONY_LOGE("DeviceStateObserver OnAddSystemAbility eventHandler is nullptr");
                 return;
@@ -208,21 +207,18 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
             auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
             sub_->GetEventHandler()->ProcessScreenDisplay(powerMgrClient.IsScreenOn());
             auto powerSaveMode = powerMgrClient.GetDeviceMode();
-            sub_->GetEventHandler()->ProcessPowerSaveMode(
-                powerSaveMode == PowerMgr::PowerMode::POWER_SAVE_MODE ||
-                powerSaveMode == PowerMgr::PowerMode::EXTREME_POWER_SAVE_MODE);
+            sub_->GetEventHandler()->ProcessPowerSaveMode(powerSaveMode == PowerMode::POWER_SAVE_MODE ||
+                                                          powerSaveMode == PowerMode::EXTREME_POWER_SAVE_MODE);
             break;
         }
         case POWER_MANAGER_BATT_SERVICE_ID: {
-            TELEPHONY_LOGI("DeviceStateObserver systemAbilityId is POWER_MANAGER_BATT_SERVICE_ID");
             if (sub_->GetEventHandler() == nullptr) {
                 TELEPHONY_LOGE("DeviceStateObserver OnAddSystemAbility eventHandler is nullptr");
                 return;
             }
             auto &batterySrvClient = PowerMgr::BatterySrvClient::GetInstance();
-            auto chargingStatus = batterySrvClient.GetChargingStatus();
             sub_->GetEventHandler()->ProcessChargingState(
-                chargingStatus == PowerMgr::BatteryChargeState::CHARGE_STATE_ENABLE);
+                batterySrvClient.GetChargingStatus() == PowerMgr::BatteryChargeState::CHARGE_STATE_ENABLE);
             break;
         }
         case COMMON_EVENT_SERVICE_ID: {
@@ -231,7 +227,6 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
             break;
         }
         case COMM_NET_TETHERING_MANAGER_SYS_ABILITY_ID: {
-            TELEPHONY_LOGI("DeviceStateObserver systemAbilityId is COMM_NET_TETHERING_MANAGER_SYS_ABILITY_ID");
             auto networkShareClient = DelayedSingleton<NetManagerStandard::NetworkShareClient>::GetInstance();
             if (networkShareClient == nullptr) {
                 TELEPHONY_LOGE("DeviceStateObserver OnAddSystemAbility networkShareClient is nullptr");
