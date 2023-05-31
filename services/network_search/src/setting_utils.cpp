@@ -62,14 +62,14 @@ std::shared_ptr<DataShare::DataShareHelper> SettingUtils::CreateDataShareHelper(
 bool SettingUtils::UnRegisterSettingsObserver(
     const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    std::shared_ptr<DataShare::DataShareHelper> settingHelper_ = CreateDataShareHelper();
-    if (settingHelper_ == nullptr) {
-        TELEPHONY_LOGE("settingHelper_ is null");
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("settingHelper is null");
         return false;
     }
-    settingHelper_->UnregisterObserver(uri, dataObserver);
-    settingHelper_->Release();
-    settingHelper_ = nullptr;
+    settingHelper->UnregisterObserver(uri, dataObserver);
+    settingHelper->Release();
+    settingHelper = nullptr;
     TELEPHONY_LOGI("SettingUtils: UnRegisterObserver Success");
     return true;
 }
@@ -77,14 +77,14 @@ bool SettingUtils::UnRegisterSettingsObserver(
 bool SettingUtils::RegisterSettingsObserver(
     const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    std::shared_ptr<DataShare::DataShareHelper> settingHelper_ = CreateDataShareHelper();
-    if (settingHelper_ == nullptr) {
-        TELEPHONY_LOGE("settingHelper_ is null");
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("settingHelper is null");
         return false;
     }
-    settingHelper_->RegisterObserver(uri, dataObserver);
-    settingHelper_->Release();
-    settingHelper_ = nullptr;
+    settingHelper->RegisterObserver(uri, dataObserver);
+    settingHelper->Release();
+    settingHelper = nullptr;
     TELEPHONY_LOGI("SettingUtils: RegisterObserver Success");
     return true;
 }
@@ -92,16 +92,16 @@ bool SettingUtils::RegisterSettingsObserver(
 int32_t SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
 {
     TELEPHONY_LOGI("SettingUtils:Query");
-    std::shared_ptr<DataShare::DataShareHelper> settingHelper_ = CreateDataShareHelper();
-    if (settingHelper_ == nullptr) {
-        TELEPHONY_LOGE("settingHelper_ is null");
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("settingHelper is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     std::vector<std::string> columns;
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTING_KEY, key);
-    auto result = settingHelper_->Query(uri, predicates, columns);
+    auto result = settingHelper->Query(uri, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("SettingUtils: query error, result is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -116,8 +116,8 @@ int32_t SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
     result->GetColumnIndex(SETTING_VALUE, columnIndex);
     result->GetString(columnIndex, value);
     result->Close();
-    settingHelper_->Release();
-    settingHelper_ = nullptr;
+    settingHelper->Release();
+    settingHelper = nullptr;
     TELEPHONY_LOGI("SettingUtils: query success");
     return TELEPHONY_SUCCESS;
 }
@@ -125,9 +125,9 @@ int32_t SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
 int32_t SettingUtils::Insert(Uri uri, const std::string &key, const std::string &value)
 {
     TELEPHONY_LOGI("SettingUtils: insert start");
-    std::shared_ptr<DataShare::DataShareHelper> settingHelper_ = CreateDataShareHelper();
-    if (settingHelper_ == nullptr) {
-        TELEPHONY_LOGE("settingHelper_ is null");
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("settingHelper is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     DataShare::DataShareValuesBucket valuesBucket;
@@ -135,23 +135,23 @@ int32_t SettingUtils::Insert(Uri uri, const std::string &key, const std::string 
     DataShare::DataShareValueObject valueObj(value);
     valuesBucket.Put(SETTING_KEY, keyObj);
     valuesBucket.Put(SETTING_VALUE, valueObj);
-    int32_t result = settingHelper_->Insert(uri, valuesBucket);
+    int32_t result = settingHelper->Insert(uri, valuesBucket);
     if (result == RDB_INVALID_VALUE) {
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     TELEPHONY_LOGI("SettingUtils: insert success");
-    settingHelper_->NotifyChange(uri);
-    settingHelper_->Release();
-    settingHelper_ = nullptr;
+    settingHelper->NotifyChange(uri);
+    settingHelper->Release();
+    settingHelper = nullptr;
     return TELEPHONY_SUCCESS;
 }
 
 int32_t SettingUtils::Update(Uri uri, const std::string &key, const std::string &value)
 {
     TELEPHONY_LOGI("SettingUtils:update");
-    std::shared_ptr<DataShare::DataShareHelper> settingHelper_ = CreateDataShareHelper();
-    if (settingHelper_ == nullptr) {
-        TELEPHONY_LOGE("settingHelper_ is null");
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("settingHelper is null");
         return false;
     }
     std::string queryValue = "";
@@ -164,14 +164,14 @@ int32_t SettingUtils::Update(Uri uri, const std::string &key, const std::string 
     valuesBucket.Put(SETTING_VALUE, valueObj);
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTING_KEY, key);
-    int32_t result = settingHelper_->Update(uri, predicates, valuesBucket);
+    int32_t result = settingHelper->Update(uri, predicates, valuesBucket);
     if (result == RDB_INVALID_VALUE) {
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     TELEPHONY_LOGI("SettingUtils: update success");
-    settingHelper_->NotifyChange(uri);
-    settingHelper_->Release();
-    settingHelper_ = nullptr;
+    settingHelper->NotifyChange(uri);
+    settingHelper->Release();
+    settingHelper = nullptr;
     return TELEPHONY_SUCCESS;
 }
 
