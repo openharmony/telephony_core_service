@@ -18,6 +18,9 @@
 
 #include <memory>
 #include "event_handler.h"
+#include "hril_types.h"
+#include "hril_modem_parcel.h"
+#include "message_parcel.h"
 #include "network_state.h"
 #include "telephony_types.h"
 namespace OHOS {
@@ -42,6 +45,12 @@ public:
 
 private:
     PhoneType RadioTechToPhoneType(RadioTech csRadioTech, const RadioTech &psRadioTech) const;
+    bool WriteRadioStateResponseInfo(
+        int64_t &index, MessageParcel &data, std::shared_ptr<HRilRadioResponseInfo> &responseInfo) const;
+    bool WriteRadioStateResponseInfo(
+        int64_t &index, MessageParcel &data, bool &result, std::shared_ptr<HRilRadioResponseInfo> &responseInfo) const;
+    bool WriteRadioStateObject(
+        int64_t &index, MessageParcel &data, bool &result, std::unique_ptr<HRilRadioStateInfo> &object) const;
     PhoneType phoneType_ = PhoneType::PHONE_TYPE_IS_NONE;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     int32_t slotId_ = 0;

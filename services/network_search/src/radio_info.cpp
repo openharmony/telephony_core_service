@@ -16,8 +16,6 @@
 #include "radio_info.h"
 
 #include "core_service_hisysevent.h"
-#include "hril_types.h"
-#include "hril_modem_parcel.h"
 #include "network_search_manager.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -42,25 +40,19 @@ void RadioInfo::ProcessGetRadioState(const AppExecFwk::InnerEvent::Pointer &even
         return;
     }
     int64_t index = 0;
-    bool state = false;
     MessageParcel data;
     data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
     if (responseInfo != nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetRadioState false slotId:%{public}d", slotId_);
-        index = responseInfo->flag;
-        if (!data.WriteBool(state) || !data.WriteInt32((int32_t)responseInfo->error)) {
-            NetworkUtils::RemoveCallbackFromMap(index);
+        if (!WriteRadioStateResponseInfo(index, data, responseInfo)) {
             return;
         }
     }
     if (object != nullptr) {
-        index = object->flag;
-        int32_t radioState = object->state;
-        TELEPHONY_LOGI("ProcessGetRadioState RadioState is:%{public}d slotId:%{public}d", radioState, slotId_);
-        state = (radioState == ModemPowerState::CORE_SERVICE_POWER_ON) ? true : false;
-        nsm->SetRadioStateValue(slotId_, (ModemPowerState)radioState);
-        if (!data.WriteBool(state) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
-            NetworkUtils::RemoveCallbackFromMap(index);
+        TELEPHONY_LOGI("ProcessGetRadioState RadioState is:%{public}d slotId:%{public}d", object->state, slotId_);
+        bool state = (object->state == ModemPowerState::CORE_SERVICE_POWER_ON) ? true : false;
+        nsm->SetRadioStateValue(slotId_, (ModemPowerState)object->state);
+        if (!WriteRadioStateObject(index, data, state, object)) {
             return;
         }
     }
@@ -99,33 +91,24 @@ void RadioInfo::ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &even
     }
     MessageParcel data;
     int64_t index = 0;
-    ModemPowerState radioState = ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;
     bool result = true;
+    ModemPowerState radioState = ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;
     data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
     if (responseInfo != nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessSetRadioState false slotId:%{public}d", slotId_);
-        index = responseInfo->flag;
-        int32_t error = static_cast<int32_t>(responseInfo->error);
-        int32_t status = static_cast<int32_t>(HRilErrNumber::HRIL_ERR_REPEAT_STATUS);
-        result = (error == status) ? true : false;
-        if (!data.WriteBool(result) || !data.WriteInt32((int32_t)responseInfo->error)) {
-            NetworkUtils::RemoveCallbackFromMap(index);
+        if (!WriteRadioStateResponseInfo(index, data, result, responseInfo)) {
             return;
         }
     }
     if (object != nullptr) {
         TELEPHONY_LOGI("RadioInfo::ProcessSetRadioState ok slotId:%{public}d", slotId_);
-        index = object->flag;
         radioState = (ModemPowerState)object->flag;
         result = true;
-        if (!data.WriteBool(result) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
-            NetworkUtils::RemoveCallbackFromMap(index);
+        if (!WriteRadioStateObject(index, data, result, object)) {
             return;
         }
     }
-
-    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo =
-        NetworkUtils::FindNetworkSearchCallback(index);
+    std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo = NetworkUtils::FindNetworkSearchCallback(index);
     if (callbackInfo != nullptr) {
         if (result) {
             nsm->SetRadioStateValue(slotId_, (ModemPowerState)(callbackInfo->param_));
@@ -366,6 +349,42 @@ int32_t RadioInfo::ProcessGetBasebandVersion(const AppExecFwk::InnerEvent::Point
     TELEPHONY_LOGI("RadioInfo::ProcessGetBasebandVersion success");
     nsm->SetBasebandVersion(slotId_, version->data);
     return TELEPHONY_ERR_SUCCESS;
+}
+
+bool RadioInfo::WriteRadioStateResponseInfo(
+    int64_t &index, MessageParcel &data, std::shared_ptr<HRilRadioResponseInfo> &responseInfo) const
+{
+    index = responseInfo->flag;
+    if (!data.WriteBool(false) || !data.WriteInt32((int32_t)responseInfo->error)) {
+        NetworkUtils::RemoveCallbackFromMap(index);
+        return false;
+    }
+    return true;
+}
+
+bool RadioInfo::WriteRadioStateResponseInfo(
+    int64_t &index, MessageParcel &data, bool &result, std::shared_ptr<HRilRadioResponseInfo> &responseInfo) const
+{
+    index = responseInfo->flag;
+    int32_t error = static_cast<int32_t>(responseInfo->error);
+    int32_t status = static_cast<int32_t>(HRilErrNumber::HRIL_ERR_REPEAT_STATUS);
+    result = (error == status) ? true : false;
+    if (!data.WriteBool(result) || !data.WriteInt32((int32_t)responseInfo->error)) {
+        NetworkUtils::RemoveCallbackFromMap(index);
+        return false;
+    }
+    return true;
+}
+
+bool RadioInfo::WriteRadioStateObject(
+    int64_t &index, MessageParcel &data, bool &state, std::unique_ptr<HRilRadioStateInfo> &object) const
+{
+    index = object->flag;
+    if (!data.WriteBool(state) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
+        NetworkUtils::RemoveCallbackFromMap(index);
+        return false;
+    }
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS
