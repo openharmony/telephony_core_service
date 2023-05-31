@@ -40,10 +40,7 @@ const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE = "airplan
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE =
     "settings.telephony.preferrednetworkmode";
 
-SettingUtils::SettingUtils()
-{
-    settingHelper_ = CreateDataShareHelper();
-}
+SettingUtils::SettingUtils() = default;
 
 SettingUtils::~SettingUtils() = default;
 
@@ -65,11 +62,14 @@ std::shared_ptr<DataShare::DataShareHelper> SettingUtils::CreateDataShareHelper(
 bool SettingUtils::UnRegisterSettingsObserver(
     const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper_ = CreateDataShareHelper();
     if (settingHelper_ == nullptr) {
         TELEPHONY_LOGE("settingHelper_ is null");
         return false;
     }
     settingHelper_->UnregisterObserver(uri, dataObserver);
+    settingHelper_->Release();
+    settingHelper_ = nullptr;
     TELEPHONY_LOGI("SettingUtils: UnRegisterObserver Success");
     return true;
 }
@@ -77,11 +77,14 @@ bool SettingUtils::UnRegisterSettingsObserver(
 bool SettingUtils::RegisterSettingsObserver(
     const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper_ = CreateDataShareHelper();
     if (settingHelper_ == nullptr) {
         TELEPHONY_LOGE("settingHelper_ is null");
         return false;
     }
     settingHelper_->RegisterObserver(uri, dataObserver);
+    settingHelper_->Release();
+    settingHelper_ = nullptr;
     TELEPHONY_LOGI("SettingUtils: RegisterObserver Success");
     return true;
 }
@@ -89,6 +92,7 @@ bool SettingUtils::RegisterSettingsObserver(
 int32_t SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
 {
     TELEPHONY_LOGI("SettingUtils:Query");
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper_ = CreateDataShareHelper();
     if (settingHelper_ == nullptr) {
         TELEPHONY_LOGE("settingHelper_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -112,6 +116,8 @@ int32_t SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
     result->GetColumnIndex(SETTING_VALUE, columnIndex);
     result->GetString(columnIndex, value);
     result->Close();
+    settingHelper_->Release();
+    settingHelper_ = nullptr;
     TELEPHONY_LOGI("SettingUtils: query success");
     return TELEPHONY_SUCCESS;
 }
@@ -119,6 +125,7 @@ int32_t SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
 int32_t SettingUtils::Insert(Uri uri, const std::string &key, const std::string &value)
 {
     TELEPHONY_LOGI("SettingUtils: insert start");
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper_ = CreateDataShareHelper();
     if (settingHelper_ == nullptr) {
         TELEPHONY_LOGE("settingHelper_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -134,12 +141,15 @@ int32_t SettingUtils::Insert(Uri uri, const std::string &key, const std::string 
     }
     TELEPHONY_LOGI("SettingUtils: insert success");
     settingHelper_->NotifyChange(uri);
+    settingHelper_->Release();
+    settingHelper_ = nullptr;
     return TELEPHONY_SUCCESS;
 }
 
 int32_t SettingUtils::Update(Uri uri, const std::string &key, const std::string &value)
 {
     TELEPHONY_LOGI("SettingUtils:update");
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper_ = CreateDataShareHelper();
     if (settingHelper_ == nullptr) {
         TELEPHONY_LOGE("settingHelper_ is null");
         return false;
@@ -160,6 +170,8 @@ int32_t SettingUtils::Update(Uri uri, const std::string &key, const std::string 
     }
     TELEPHONY_LOGI("SettingUtils: update success");
     settingHelper_->NotifyChange(uri);
+    settingHelper_->Release();
+    settingHelper_ = nullptr;
     return TELEPHONY_SUCCESS;
 }
 
@@ -169,12 +181,6 @@ AutoTimeObserver::AutoTimeObserver(std::shared_ptr<NetworkSearchHandler> &networ
 
 void AutoTimeObserver::OnChange()
 {
-    std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
-    if (settingHelper == nullptr) {
-        TELEPHONY_LOGI("settingHelper is null");
-        return;
-    }
-
     TELEPHONY_LOGI("AutoTimeObserver::OnChange");
     if (networkSearchHandler_ != nullptr) {
         InnerEvent::Pointer event = InnerEvent::Get(SettingEventCode::MSG_AUTO_TIME);
@@ -188,12 +194,6 @@ AutoTimezoneObserver::AutoTimezoneObserver(std::shared_ptr<NetworkSearchHandler>
 
 void AutoTimezoneObserver::OnChange()
 {
-    std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
-    if (settingHelper == nullptr) {
-        TELEPHONY_LOGI("settingHelper is null");
-        return;
-    }
-
     TELEPHONY_LOGI("AutoTimezoneObserver::OnChange");
     if (networkSearchHandler_ != nullptr) {
         InnerEvent::Pointer event = InnerEvent::Get(SettingEventCode::MSG_AUTO_TIMEZONE);
@@ -207,12 +207,6 @@ AirplaneModeObserver::AirplaneModeObserver(std::shared_ptr<NetworkSearchHandler>
 
 void AirplaneModeObserver::OnChange()
 {
-    std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
-    if (settingHelper == nullptr) {
-        TELEPHONY_LOGI("settingHelper is null");
-        return;
-    }
-
     TELEPHONY_LOGI("AirplaneModeObserver::OnChange");
     if (networkSearchHandler_ != nullptr) {
         InnerEvent::Pointer event = InnerEvent::Get(SettingEventCode::MSG_AUTO_AIRPLANE_MODE);
