@@ -27,6 +27,7 @@
 #include "icc_operator_rule.h"
 #include "ims_core_service_callback_proxy.h"
 #include "ims_core_service_callback_stub.h"
+#include "ims_core_service_proxy.h"
 #include "isim_file_controller.h"
 #include "multi_sim_controller.h"
 #include "multi_sim_monitor.h"
@@ -1859,6 +1860,11 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
     std::vector<sptr<SignalInformation>> signals;
     std::vector<sptr<CellInformation>> cells;
     EXPECT_TRUE(networkSearchHandler->Init());
+    NetworkSearchResult mResult;
+    MessageParcel parcel;
+    mResult.Marshalling(parcel);
+    mResult.ReadFromParcel(parcel);
+    mResult.Unmarshalling(parcel);
     networkSearchHandler->RadioGetCurrentCellInfo(event);
     networkSearchHandler->RadioCurrentCellInfoUpdate(event);
     networkSearchHandler->RadioChannelConfigInfo(event);
@@ -2371,6 +2377,28 @@ HWTEST_F(BranchTest, Telephony_ImsCoreServiceCallbackProxy_001, Function | Mediu
     MessageParcel reply;
     MessageOption option;
     EXPECT_GE(imsCoreServiceCallbackStub->OnRemoteRequest(0, data, reply, option), 0);
+}
+
+/**
+ * @tc.number   Telephony_ImsCoreServiceProxy_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_ImsCoreServiceProxy_001, Function | MediumTest | Level1)
+{
+    sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityMgr == nullptr) {
+        TELEPHONY_LOGE("Telephony_ImsCoreServiceProxy systemAbilityMgr is nullptr");
+        return;
+    }
+    sptr<IRemoteObject> remote = systemAbilityMgr->CheckSystemAbility(TELEPHONY_IMS_SYS_ABILITY_ID);
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Telephony_ImsCoreServiceProxy remote is nullptr");
+        return;
+    }
+    auto imsCoreServiceProxy = std::make_shared<ImsCoreServiceProxy>(remote);
+    EXPECT_GE(imsCoreServiceProxy->GetImsRegistrationStatus(0), 0);
+    EXPECT_GE(imsCoreServiceProxy->RegisterImsCoreServiceCallback(nullptr), 0);
 }
 
 /**
