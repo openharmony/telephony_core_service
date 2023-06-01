@@ -364,7 +364,9 @@ static bool MatchGetNetworkStateParameter(napi_env env, napi_value parameter[], 
         }
         case PARAMETER_COUNT_ONE: {
             return NapiUtil::MatchParameters(env, parameter, { napi_number }) ||
-                   NapiUtil::MatchParameters(env, parameter, { napi_function });
+                   NapiUtil::MatchParameters(env, parameter, { napi_function }) ||
+                   NapiUtil::MatchParameters(env, parameter, { napi_null }) ||
+                   NapiUtil::MatchParameters(env, parameter, { napi_undefined });
         }
         case PARAMETER_COUNT_TWO: {
             return NapiUtil::MatchParameters(env, parameter, { napi_number, napi_function });
@@ -383,7 +385,9 @@ static bool MatchGetIMEIParameter(napi_env env, napi_value parameter[], size_t p
         }
         case PARAMETER_COUNT_ONE: {
             return NapiUtil::MatchParameters(env, parameter, { napi_number }) ||
-                   NapiUtil::MatchParameters(env, parameter, { napi_function });
+                   NapiUtil::MatchParameters(env, parameter, { napi_function }) ||
+                   NapiUtil::MatchParameters(env, parameter, { napi_null }) ||
+                   NapiUtil::MatchParameters(env, parameter, { napi_undefined });
         }
         case PARAMETER_COUNT_TWO: {
             return NapiUtil::MatchParameters(env, parameter, { napi_number, napi_function });
@@ -402,7 +406,9 @@ static bool MatchGetNrOptionModeParameter(napi_env env, napi_value parameter[], 
         }
         case PARAMETER_COUNT_ONE: {
             return NapiUtil::MatchParameters(env, parameter, { napi_number }) ||
-                   NapiUtil::MatchParameters(env, parameter, { napi_function });
+                   NapiUtil::MatchParameters(env, parameter, { napi_function }) ||
+                   NapiUtil::MatchParameters(env, parameter, { napi_null }) ||
+                   NapiUtil::MatchParameters(env, parameter, { napi_undefined });
         }
         case PARAMETER_COUNT_TWO: {
             return NapiUtil::MatchParameters(env, parameter, { napi_number, napi_function });
@@ -436,7 +442,7 @@ static napi_value GetNetworkState(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     if (!MatchGetNetworkStateParameter(env, parameters, parameterCount)) {
-        TELEPHONY_LOGE("GetNetworkState parameter matching failed.");
+        TELEPHONY_LOGE("parameter matching failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -446,7 +452,10 @@ static napi_value GetNetworkState(napi_env env, napi_callback_info info)
     } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
-        if (valueType == napi_number) {
+        if (valueType == napi_undefined || valueType == napi_null) {
+            TELEPHONY_LOGI("undefined or null parameter detected, treating as no parameter input.");
+            asyncContext->slotId = GetDefaultSlotId();
+        } else if (valueType == napi_number) {
             NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         } else if (valueType == napi_function) {
             asyncContext->slotId = GetDefaultSlotId();
@@ -944,7 +953,9 @@ static bool MatchIsRadioOnParameter(napi_env env, napi_value parameters[], size_
         }
         case PARAMETER_COUNT_ONE: {
             return NapiUtil::MatchParameters(env, parameters, { napi_function }) ||
-                   NapiUtil::MatchParameters(env, parameters, { napi_number });
+                   NapiUtil::MatchParameters(env, parameters, { napi_number }) ||
+                   NapiUtil::MatchParameters(env, parameters, { napi_null }) ||
+                   NapiUtil::MatchParameters(env, parameters, { napi_undefined });
         }
         case PARAMETER_COUNT_TWO: {
             return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_function });
@@ -1001,13 +1012,13 @@ static napi_value IsRadioOn(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     if (!MatchIsRadioOnParameter(env, parameters, parameterCount)) {
-        TELEPHONY_LOGE("IsRadioOn parameter matching failed.");
+        TELEPHONY_LOGE("parameter matching failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
     auto asyncContext = std::make_unique<IsRadioOnContext>();
     if (asyncContext == nullptr) {
-        TELEPHONY_LOGE("IsRadioOn asyncContext is nullptr.");
+        TELEPHONY_LOGE("asyncContext is nullptr.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -1016,9 +1027,12 @@ static napi_value IsRadioOn(napi_env env, napi_callback_info info)
     } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
-        if (valueType == napi_number) {
+        if (valueType == napi_undefined || valueType == napi_null) {
+            TELEPHONY_LOGI("undefined or null parameter detected, treating as no parameter input.");
+            asyncContext->slotId = GetDefaultSlotId();
+        } else if (valueType == napi_number) {
             NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-            TELEPHONY_LOGI("IsRadioOn context->slotId = %{public}d", asyncContext->slotId);
+            TELEPHONY_LOGI("context->slotId = %{public}d", asyncContext->slotId);
         } else if (valueType == napi_function) {
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
@@ -1095,7 +1109,7 @@ static napi_value TurnOnRadio(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     if (!MatchIsRadioOnParameter(env, parameters, parameterCount)) {
-        TELEPHONY_LOGE("TurnOnRadio parameter matching failed.");
+        TELEPHONY_LOGE("parameter matching failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -1105,9 +1119,12 @@ static napi_value TurnOnRadio(napi_env env, napi_callback_info info)
     } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
-        if (valueType == napi_number) {
+        if (valueType == napi_undefined || valueType == napi_null) {
+            TELEPHONY_LOGI("undefined or null parameter detected, treating as no parameter input.");
+            asyncContext->slotId = GetDefaultSlotId();
+        } else if (valueType == napi_number) {
             NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-            TELEPHONY_LOGI("TurnOnRadio context->slotId = %{public}d", asyncContext->slotId);
+            TELEPHONY_LOGI("context->slotId = %{public}d", asyncContext->slotId);
         } else {
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
@@ -1167,7 +1184,7 @@ static napi_value TurnOffRadio(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     if (!MatchIsRadioOnParameter(env, parameters, parameterCount)) {
-        TELEPHONY_LOGE("TurnOffRadio parameter matching failed.");
+        TELEPHONY_LOGE("parameter matching failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -1177,9 +1194,12 @@ static napi_value TurnOffRadio(napi_env env, napi_callback_info info)
     } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
-        if (valueType == napi_number) {
+        if (valueType == napi_undefined || valueType == napi_null) {
+            TELEPHONY_LOGI("undefined or null parameter detected, treating as no parameter input.");
+            asyncContext->slotId = GetDefaultSlotId();
+        } else if (valueType == napi_number) {
             NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-            TELEPHONY_LOGI("IsRadioOn context->slotId = %{public}d", asyncContext->slotId);
+            TELEPHONY_LOGI("context->slotId = %{public}d", asyncContext->slotId);
         } else if (valueType == napi_function) {
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
@@ -1452,13 +1472,13 @@ static napi_value GetIMEI(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     if (!MatchGetIMEIParameter(env, parameters, parameterCount)) {
-        TELEPHONY_LOGE("GetIMEI parameter matching failed.");
+        TELEPHONY_LOGE("parameter matching failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
     auto asyncContext = std::make_unique<GetIMEIContext>();
     if (asyncContext == nullptr) {
-        TELEPHONY_LOGE("GetIMEI asyncContext is nullptr.");
+        TELEPHONY_LOGE("asyncContext is nullptr.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -1467,7 +1487,10 @@ static napi_value GetIMEI(napi_env env, napi_callback_info info)
     } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
-        if (valueType == napi_number) {
+        if (valueType == napi_undefined || valueType == napi_null) {
+            TELEPHONY_LOGI("undefined or null parameter detected, treating as no parameter input.");
+            asyncContext->slotId = GetDefaultSlotId();
+        } else if (valueType == napi_number) {
             NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         } else {
             asyncContext->slotId = GetDefaultSlotId();
@@ -1519,7 +1542,7 @@ static napi_value GetMEID(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     if (!MatchGetIMEIParameter(env, parameters, parameterCount)) {
-        TELEPHONY_LOGE("GetMEID parameter matching failed.");
+        TELEPHONY_LOGE("parameter matching failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -1529,9 +1552,12 @@ static napi_value GetMEID(napi_env env, napi_callback_info info)
     } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
-        if (valueType == napi_number) {
+        if (valueType == napi_undefined || valueType == napi_null) {
+            TELEPHONY_LOGI("undefined or null parameter detected, treating as no parameter input.");
+            asyncContext->slotId = GetDefaultSlotId();
+        } else if (valueType == napi_number) {
             NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-            TELEPHONY_LOGI("NativeGetMEID context->slotId = %{public}d", asyncContext->slotId);
+            TELEPHONY_LOGI("context->slotId = %{public}d", asyncContext->slotId);
         } else if (valueType == napi_function) {
             asyncContext->slotId = GetDefaultSlotId();
             NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
@@ -1581,8 +1607,8 @@ static napi_value SendUpdateCellLocationRequest(napi_env env, napi_callback_info
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    if (!MatchSwitchRadioParameter(env, parameters, parameterCount)) {
-        TELEPHONY_LOGE("SendUpdateCellLocationRequest parameter matching failed.");
+    if (!MatchIsRadioOnParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("parameter matching failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -1592,7 +1618,10 @@ static napi_value SendUpdateCellLocationRequest(napi_env env, napi_callback_info
     } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
-        if (valueType == napi_number) {
+        if (valueType == napi_undefined || valueType == napi_null) {
+            TELEPHONY_LOGI("undefined or null parameter detected, treating as no parameter input.");
+            asyncContext->slotId = GetDefaultSlotId();
+        } else if (valueType == napi_number) {
             NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         } else if (valueType == napi_function) {
             asyncContext->slotId = GetDefaultSlotId();
@@ -1822,7 +1851,7 @@ static napi_value GetCellInformation(napi_env env, napi_callback_info info)
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     if (!MatchGetNetworkStateParameter(env, parameters, parameterCount)) {
-        TELEPHONY_LOGE("GetCellInformation parameter matching failed.");
+        TELEPHONY_LOGE("parameter matching failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -1832,7 +1861,10 @@ static napi_value GetCellInformation(napi_env env, napi_callback_info info)
     } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
-        if (valueType == napi_number) {
+        if (valueType == napi_undefined || valueType == napi_null) {
+            TELEPHONY_LOGI("undefined or null parameter detected, treating as no parameter input.");
+            asyncContext->slotId = GetDefaultSlotId();
+        } else if (valueType == napi_number) {
             NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         } else if (valueType == napi_function) {
             asyncContext->slotId = GetDefaultSlotId();
@@ -1942,7 +1974,7 @@ static napi_value GetUniqueDeviceId(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     if (!MatchGetIMEIParameter(env, parameters, parameterCount)) {
-        TELEPHONY_LOGE("GetUniqueDeviceId parameter matching failed.");
+        TELEPHONY_LOGE("parameter matching failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -1952,7 +1984,10 @@ static napi_value GetUniqueDeviceId(napi_env env, napi_callback_info info)
     } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
-        if (valueType == napi_number) {
+        if (valueType == napi_undefined || valueType == napi_null) {
+            TELEPHONY_LOGI("undefined or null parameter detected, treating as no parameter input.");
+            asyncContext->slotId = GetDefaultSlotId();
+        } else if (valueType == napi_number) {
             NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         } else if (valueType == napi_function) {
             asyncContext->slotId = GetDefaultSlotId();
@@ -2021,7 +2056,7 @@ static napi_value GetNrOptionMode(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     if (!MatchGetNrOptionModeParameter(env, parameters, parameterCount)) {
-        TELEPHONY_LOGE("GetNrOptionMode parameter matching failed.");
+        TELEPHONY_LOGE("parameter matching failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -2031,7 +2066,10 @@ static napi_value GetNrOptionMode(napi_env env, napi_callback_info info)
     } else if (parameterCount == PARAMETER_COUNT_ONE) {
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
-        if (valueType == napi_number) {
+        if (valueType == napi_undefined || valueType == napi_null) {
+            TELEPHONY_LOGI("undefined or null parameter detected, treating as no parameter input.");
+            asyncContext->slotId = GetDefaultSlotId();
+        } else if (valueType == napi_number) {
             NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         } else if (valueType == napi_function) {
             asyncContext->slotId = GetDefaultSlotId();
@@ -2270,7 +2308,12 @@ static bool MatchObserverOffParameter(napi_env env, napi_value parameters[], siz
             return NapiUtil::MatchParameters(env, parameters, { napi_string, napi_number, napi_number });
         }
         case PARAMETER_COUNT_FOUR: {
-            return NapiUtil::MatchParameters(env, parameters, { napi_string, napi_number, napi_number, napi_function });
+            return NapiUtil::MatchParameters(
+                       env, parameters, { napi_string, napi_number, napi_number, napi_function }) ||
+                   NapiUtil::MatchParameters(
+                       env, parameters, { napi_string, napi_number, napi_number, napi_null }) ||
+                   NapiUtil::MatchParameters(
+                       env, parameters, { napi_string, napi_number, napi_number, napi_undefined });
         }
         default: {
             return false;
