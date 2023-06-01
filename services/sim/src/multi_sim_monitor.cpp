@@ -258,6 +258,10 @@ void MultiSimMonitor::SystemAbilityStatusChangeListener::OnAddSystemAbility(
     int32_t systemAbilityId, const std::string &deviceId)
 {
     auto multiSimMonitorHandler = multiSimMonitorHandler_.lock();
+    if (multiSimMonitorHandler == nullptr) {
+        TELEPHONY_LOGE("MultiSimMonitor is null");
+        return;
+    }
     switch (systemAbilityId) {
         case SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN: {
             TELEPHONY_LOGI("SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN running");
@@ -265,10 +269,6 @@ void MultiSimMonitor::SystemAbilityStatusChangeListener::OnAddSystemAbility(
             DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
             TELEPHONY_LOGI("current active user id is :%{public}d", activeList[0]);
             if (activeList[0] == ACTIVE_USER_ID) {
-                if (multiSimMonitorHandler == nullptr) {
-                    TELEPHONY_LOGE("MultiSimMonitor is null");
-                    return;
-                }
                 multiSimMonitorHandler->SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
             }
             break;
@@ -294,13 +294,13 @@ void MultiSimMonitor::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
     int32_t systemAbilityId, const std::string &deviceId)
 {
     auto multiSimMonitorHandler = multiSimMonitorHandler_.lock();
+    if (multiSimMonitorHandler == nullptr) {
+        TELEPHONY_LOGE("MultiSimMonitor is null");
+        return;
+    }
     switch (systemAbilityId) {
         case SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN: {
             TELEPHONY_LOGE("SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN stopped");
-            if (multiSimMonitorHandler == nullptr) {
-                TELEPHONY_LOGE("MultiSimMonitor is null");
-                return;
-            }
             multiSimMonitorHandler->SendEvent(MultiSimMonitor::UNREGISTER_SIM_NOTIFY_EVENT);
             break;
         }
