@@ -117,6 +117,47 @@ void GetBasebandVersion(const uint8_t *data, size_t size)
     DelayedSingleton<CoreService>::GetInstance()->OnGetBasebandVersion(dataMessageParcel, reply);
 }
 
+void SetNetworkCapability(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t networkCapabilityType = static_cast<int32_t>(size);
+    int32_t networkCapabilityState = static_cast<int32_t>(size);
+    MessageParcel dataMessageParcel;
+    MessageParcel reply;
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteInt32(networkCapabilityType);
+    dataMessageParcel.WriteInt32(networkCapabilityState);
+    int32_t error = DelayedSingleton<CoreService>::GetInstance()->OnSetNetworkCapability(dataMessageParcel, reply);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("SetNetworkCapability failed, error code is %{public}d \n", error);
+    }
+}
+
+void GetNetworkCapability(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t networkCapabilityType = static_cast<int32_t>(size);
+    int32_t networkCapabilityState = static_cast<int32_t>(size);
+    MessageParcel dataMessageParcel;
+    MessageParcel reply;
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteInt32(networkCapabilityType);
+    dataMessageParcel.WriteInt32(networkCapabilityState);
+    int32_t error = DelayedSingleton<CoreService>::GetInstance()->OnGetNetworkCapability(dataMessageParcel, reply);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE(
+            "GetNetworkAbilitySwitch failed, error code is %{public}d \n, networkCapabilityState is %{public}d", error,
+            networkCapabilityState);
+    }
+}
+
 void GetOperatorNumeric(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -178,6 +219,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetOperatorNumeric(data, size);
     GetOperatorName(data, size);
     SendEnvelopeCmd(data, size);
+    GetNetworkCapability(data, size);
+    SetNetworkCapability(data, size);
 }
 } // namespace OHOS
 

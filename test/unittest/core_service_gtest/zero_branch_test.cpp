@@ -1688,6 +1688,12 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     EXPECT_EQ(networkSearchManager->GetPsRegState(INVALID_SLOTID), TELEPHONY_ERROR);
     EXPECT_EQ(networkSearchManager->GetCsRegState(INVALID_SLOTID), TELEPHONY_ERROR);
     EXPECT_EQ(networkSearchManager->GetPsRoamingState(INVALID_SLOTID), TELEPHONY_ERROR);
+    std::int32_t networkAbilityType = 0;
+    std::int32_t networkAbilityState = 0;
+    EXPECT_EQ(networkSearchManager->GetNetworkCapability(INVALID_SLOTID, networkAbilityType, networkAbilityState),
+        TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->SetNetworkCapability(INVALID_SLOTID, networkAbilityType, networkAbilityState),
+        TELEPHONY_ERR_SUCCESS);
 }
 
 /**
