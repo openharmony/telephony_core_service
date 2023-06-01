@@ -125,6 +125,10 @@ SimStateTracker::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeLis
 void SimStateTracker::SystemAbilityStatusChangeListener::OnAddSystemAbility(
     int32_t systemAbilityId, const std::string &deviceId)
 {
+    if (configLoader_ == nullptr) {
+        TELEPHONY_LOGE("configLoader_ is nullptr.");
+        return;
+    }
     switch (systemAbilityId) {
         case SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN: {
             TELEPHONY_LOGI("SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN running");
