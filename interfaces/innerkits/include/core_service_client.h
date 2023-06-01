@@ -92,6 +92,8 @@ public:
     int32_t GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     int32_t SetPreferredNetwork(int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback);
     int32_t GetSimTelephoneNumber(int32_t slotId, std::u16string &telephoneNumber);
+    int32_t GetNetworkCapability(int32_t slotId, int32_t networkCapabilityType, int32_t &networkCapabilityState);
+    int32_t SetNetworkCapability(int32_t slotId, int32_t networkCapabilityType, int32_t networkCapabilityState);
     int32_t GetVoiceMailIdentifier(int32_t slotId, std::u16string &voiceMailIdentifier);
     int32_t GetVoiceMailNumber(int32_t slotId, std::u16string &voiceMailNumber);
     int32_t GetVoiceMailCount(int32_t slotId, int32_t &voiceMailCount);

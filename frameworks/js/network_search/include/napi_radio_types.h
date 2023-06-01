@@ -199,6 +199,42 @@ enum RegStatus {
      */
     REGISTRATION_STATE_POWER_OFF = 3
 };
+
+enum NetworkCapabilityType {
+    /**
+     * Indicates LTE network switch type.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @since 10
+     */
+    SERVICE_TYPE_LTE,
+
+    /**
+     * Indicates NR network switch type.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @since 10
+     */
+    SERVICE_TYPE_NR,
+};
+
+enum NetworkCapabilityState {
+    /**
+     * Indicates turn off network switch.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @since 10
+     */
+    SERVICE_CAPABILITY_OFF,
+
+    /**
+     * Indicates turn on network switch.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @since 10
+     */
+    SERVICE_CAPABILITY_ON,
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // NAPI_RADIO_TYPES_H

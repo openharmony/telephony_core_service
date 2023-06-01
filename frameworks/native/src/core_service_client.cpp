@@ -625,6 +625,28 @@ int32_t CoreServiceClient::SetPreferredNetwork(
     return proxy->SetPreferredNetwork(slotId, networkMode, callback);
 }
 
+int32_t CoreServiceClient::GetNetworkCapability(
+    int32_t slotId, int32_t networkCapabilityType, int32_t &networkCapabilityState)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetNetworkCapability(slotId, networkCapabilityType, networkCapabilityState);
+}
+
+int32_t CoreServiceClient::SetNetworkCapability(
+    int32_t slotId, int32_t networkCapabilityType, int32_t networkCapabilityState)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->SetNetworkCapability(slotId, networkCapabilityType, networkCapabilityState);
+}
+
 int32_t CoreServiceClient::GetSimTelephoneNumber(int32_t slotId, std::u16string &telephoneNumber)
 {
     auto proxy = GetProxy();

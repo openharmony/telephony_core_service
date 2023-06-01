@@ -110,6 +110,18 @@ static inline bool IsValidSlotId(int32_t slotId)
     return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT));
 }
 
+static inline bool IsValidNetworkCapabilityType(int32_t networkCapabilityType)
+{
+    return ((networkCapabilityType != static_cast<int32_t>(NetworkCapabilityType::SERVICE_TYPE_LTE)) ||
+            (networkCapabilityType != static_cast<int32_t>(NetworkCapabilityType::SERVICE_TYPE_NR)));
+}
+
+static inline bool IsValidNetworkCapabilityState(int32_t networkCapabilityState)
+{
+    return ((networkCapabilityState != static_cast<int32_t>(NetworkCapabilityState::SERVICE_CAPABILITY_OFF)) ||
+            (networkCapabilityState != static_cast<int32_t>(NetworkCapabilityState::SERVICE_CAPABILITY_ON)));
+}
+
 static void NativeGetRadioTech(napi_env env, void *data)
 {
     auto asyncContext = static_cast<RadioTechContext *>(data);
@@ -1432,6 +1444,156 @@ static napi_value GetPreferredNetwork(napi_env env, napi_callback_info info)
     }
     return NapiUtil::HandleAsyncWork(
         env, asyncContext.release(), "GetPreferredNetworkMode", NativeGetPreferredNetwork, GetPreferredNetworkCallback);
+}
+
+static void NativeSetNetworkCapability(napi_env env, void *data)
+{
+    auto asyncContext = static_cast<NetworkCapabilityContext *>(data);
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeSetNetworkCapability slotId is invalid");
+        asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
+    if (!IsValidNetworkCapabilityType(asyncContext->networkCapabilityType) ||
+        !IsValidNetworkCapabilityState(asyncContext->networkCapabilityState)) {
+        TELEPHONY_LOGE("NativeSetNetworkCapability networkCapabilityType or networkCapabilityState is invalid");
+        asyncContext->errorCode = ERROR_PARAMETER_TYPE_INVALID;
+        return;
+    }
+    std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
+    asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetNetworkCapability(
+        asyncContext->slotId, asyncContext->networkCapabilityType, asyncContext->networkCapabilityState);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = true;
+    }
+}
+
+static void SetNetworkCapabilityCallback(napi_env env, napi_status status, void *data)
+{
+    auto context = static_cast<NetworkCapabilityContext *>(data);
+    TELEPHONY_LOGD("SetNetworkCapabilityCallback resolved = %{public}d", context->resolved);
+    napi_value callbackValue = nullptr;
+    if (context->resolved) {
+        napi_get_undefined(env, &callbackValue);
+    } else {
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            context->errorCode, "SetNetworkCapabilityCallback", SET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
+    }
+    TELEPHONY_LOGD("SetNetworkCapabilityCallback end");
+    NapiUtil::Handle2ValueCallback(env, context, callbackValue);
+}
+
+static bool MatchSetNetworkCapabilityParameter(napi_env env, napi_value parameters[], size_t parameterCount)
+{
+    switch (parameterCount) {
+        case PARAMETER_COUNT_THREE: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number, napi_number });
+        }
+        case PARAMETER_COUNT_FOUR: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number, napi_number, napi_function });
+        }
+        default:
+            return false;
+    }
+}
+
+static napi_value SetNetworkCapability(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = PARAMETER_COUNT_FOUR;
+    napi_value parameters[PARAMETER_COUNT_FOUR] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
+    if (!MatchSetNetworkCapabilityParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("SetNetworkCapability parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<NetworkCapabilityContext>();
+    NAPI_CALL(env, napi_get_value_int32(env, parameters[ARRAY_INDEX_FIRST], &asyncContext->slotId));
+    NAPI_CALL(env, napi_get_value_int32(env, parameters[ARRAY_INDEX_SECOND], &asyncContext->networkCapabilityType));
+    NAPI_CALL(env, napi_get_value_int32(env, parameters[ARRAY_INDEX_THIRD], &asyncContext->networkCapabilityState));
+    if (parameterCount == ARRAY_INDEX_FOURTH) {
+        NAPI_CALL(env,
+            napi_create_reference(env, parameters[ARRAY_INDEX_FOURTH], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+    }
+    return NapiUtil::HandleAsyncWork(
+        env, asyncContext.release(), "SetNetworkCapability", NativeSetNetworkCapability, SetNetworkCapabilityCallback);
+}
+
+static void NativeGetNetworkCapability(napi_env env, void *data)
+{
+    auto asyncContext = static_cast<NetworkCapabilityContext *>(data);
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeGetNetworkCapability slotId is invalid");
+        asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
+    if (!IsValidNetworkCapabilityType(asyncContext->networkCapabilityType)) {
+        TELEPHONY_LOGE("NativeSetNetworkCapability networkCapabilityType is invalid");
+        asyncContext->errorCode = ERROR_PARAMETER_TYPE_INVALID;
+        return;
+    }
+    std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
+    asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkCapability(
+        asyncContext->slotId, asyncContext->networkCapabilityType, asyncContext->networkCapabilityState);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = true;
+    }
+}
+
+static void GetNetworkCapabilityCallback(napi_env env, napi_status status, void *data)
+{
+    auto asyncContext = static_cast<NetworkCapabilityContext *>(data);
+    TELEPHONY_LOGD("GetNetworkCapabilityCallback resolved = %{public}d", asyncContext->resolved);
+    napi_value callbackValue = nullptr;
+    if (asyncContext->resolved) {
+        napi_create_int32(env, asyncContext->networkCapabilityState, &callbackValue);
+    } else {
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            asyncContext->errorCode, "GetNetworkCapabilityCallback", GET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
+    }
+    TELEPHONY_LOGD("GetNetworkCapabilityCallback end");
+    NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
+}
+
+static bool MatchGetNetworkCapabilityParameter(napi_env env, napi_value parameters[], size_t parameterCount)
+{
+    switch (parameterCount) {
+        case PARAMETER_COUNT_TWO: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number });
+        }
+        case PARAMETER_COUNT_THREE: {
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number, napi_function });
+        }
+        default:
+            return false;
+    }
+}
+
+static napi_value GetNetworkCapability(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = PARAMETER_COUNT_THREE;
+    napi_value parameters[PARAMETER_COUNT_THREE] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
+    if (!MatchGetNetworkCapabilityParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("GetNetworkCapability parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<NetworkCapabilityContext>();
+    NAPI_CALL(env, napi_get_value_int32(env, parameters[ARRAY_INDEX_FIRST], &asyncContext->slotId));
+    NAPI_CALL(env, napi_get_value_int32(env, parameters[ARRAY_INDEX_SECOND], &asyncContext->networkCapabilityType));
+    if (parameterCount == PARAMETER_COUNT_THREE) {
+        NAPI_CALL(env,
+            napi_create_reference(env, parameters[ARRAY_INDEX_THIRD], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+    }
+    return NapiUtil::HandleAsyncWork(
+        env, asyncContext.release(), "GetNetworkCapability", NativeGetNetworkCapability, GetNetworkCapabilityCallback);
 }
 
 void NativeGetIMEI(napi_env env, void *data)
@@ -3072,6 +3234,8 @@ static napi_value CreateFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getOperatorName", GetOperatorName),
         DECLARE_NAPI_FUNCTION("setPreferredNetwork", SetPreferredNetwork),
         DECLARE_NAPI_FUNCTION("getPreferredNetwork", GetPreferredNetwork),
+        DECLARE_NAPI_FUNCTION("setNetworkCapability", SetNetworkCapability),
+        DECLARE_NAPI_FUNCTION("getNetworkCapability", GetNetworkCapability),
         DECLARE_NAPI_FUNCTION("getIMEI", GetIMEI),
         DECLARE_NAPI_FUNCTION("getMEID", GetMEID),
         DECLARE_NAPI_FUNCTION("sendUpdateCellLocationRequest", SendUpdateCellLocationRequest),

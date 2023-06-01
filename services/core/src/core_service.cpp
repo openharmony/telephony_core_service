@@ -822,6 +822,41 @@ int32_t CoreService::SetPreferredNetwork(
     return networkSearchManager_->SetPreferredNetwork(slotId, networkMode, callback);
 }
 
+int32_t CoreService::GetNetworkCapability(
+    int32_t slotId, int32_t networkCapabilityType, int32_t &networkCapabilityState)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->GetNetworkCapability(slotId, networkCapabilityType, networkCapabilityState);
+}
+
+int32_t CoreService::SetNetworkCapability(int32_t slotId, int32_t networkCapabilityType, int32_t networkCapabilityState)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->SetNetworkCapability(slotId, networkCapabilityType, networkCapabilityState);
+}
+
 int32_t CoreService::GetSimTelephoneNumber(int32_t slotId, std::u16string &telephoneNumber)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
