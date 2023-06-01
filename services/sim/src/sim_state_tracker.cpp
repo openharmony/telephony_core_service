@@ -44,6 +44,7 @@ SimStateTracker::~SimStateTracker()
         auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgrProxy != nullptr) {
             samgrProxy->UnSubscribeSystemAbility(OHOS::SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN, statusChangeListener_);
+            samgrProxy->UnSubscribeSystemAbility(OHOS::COMMON_EVENT_SERVICE_ID, statusChangeListener_);
             statusChangeListener_ = nullptr;
         }
     }
@@ -59,6 +60,8 @@ void SimStateTracker::InitListener()
     }
     int32_t ret = samgrProxy->SubscribeSystemAbility(SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN, statusChangeListener_);
     TELEPHONY_LOGI("SubscribeSystemAbility SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN result:%{public}d", ret);
+    ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+    TELEPHONY_LOGI("SubscribeSystemAbility COMMON_EVENT_SERVICE_ID result:%{public}d", ret);
 }
 
 void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -122,43 +125,58 @@ SimStateTracker::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeLis
 void SimStateTracker::SystemAbilityStatusChangeListener::OnAddSystemAbility(
     int32_t systemAbilityId, const std::string &deviceId)
 {
-    if (systemAbilityId != SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN || configLoader_ == nullptr) {
-        TELEPHONY_LOGE("added SA is not accoubt manager service or configLoader_ is nullptr, ignored.");
+    if (configLoader_ == nullptr) {
+        TELEPHONY_LOGE("configLoader_ is nullptr.");
         return;
     }
-    TELEPHONY_LOGI("SystemAbilityStatusChangeListener::LoadOperatorConfig");
-    std::vector<int32_t> activeList = { 0 };
-    DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
-    TELEPHONY_LOGI("current active user id is :%{public}d", activeList[0]);
-    if (activeList[0] == ACTIVE_USER_ID) {
-        configLoader_->LoadOperatorConfig(slotId_);
-    } else {
-        MatchingSkills matchingSkills;
-        matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
-        CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-        subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
-        userSwitchSubscriber_ = std::make_shared<UserSwitchEventSubscriber>(subscriberInfo, slotId_, configLoader_);
-        bool subRet = CommonEventManager::SubscribeCommonEvent(userSwitchSubscriber_);
-        if (!subRet) {
-            TELEPHONY_LOGE("Subscribe user switched event failed!");
+    switch (systemAbilityId) {
+        case SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN: {
+            TELEPHONY_LOGI("SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN running");
+            std::vector<int32_t> activeList = { 0 };
+            DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
+            TELEPHONY_LOGI("current active user id is :%{public}d", activeList[0]);
+            if (activeList[0] == ACTIVE_USER_ID) {
+                configLoader_->LoadOperatorConfig(slotId_);
+            }
+            break;
         }
+        case COMMON_EVENT_SERVICE_ID: {
+            TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID running");
+            MatchingSkills matchingSkills;
+            matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
+            CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+            subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
+            userSwitchSubscriber_ = std::make_shared<UserSwitchEventSubscriber>(subscriberInfo, slotId_, configLoader_);
+            bool subRet = CommonEventManager::SubscribeCommonEvent(userSwitchSubscriber_);
+            TELEPHONY_LOGI("Subscribe user switched subRet is :%{public}d", subRet);
+            break;
+        }
+        default:
+            TELEPHONY_LOGE("systemAbilityId is invalid");
+            break;
     }
 }
 
 void SimStateTracker::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
     int32_t systemAbilityId, const std::string &deviceId)
 {
-    if (systemAbilityId != SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
-        TELEPHONY_LOGE("removed SA is not account manager service, ignored.");
-        return;
-    }
-    TELEPHONY_LOGD("SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN stopped");
-    if (userSwitchSubscriber_ != nullptr) {
-        bool subRet = CommonEventManager::UnSubscribeCommonEvent(userSwitchSubscriber_);
-        if (!subRet) {
-            TELEPHONY_LOGE("UnSubscribe user switched event failed!");
+    switch (systemAbilityId) {
+        case SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN: {
+            TELEPHONY_LOGE("SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN stopped");
+            break;
         }
-        userSwitchSubscriber_ = nullptr;
+        case COMMON_EVENT_SERVICE_ID: {
+            TELEPHONY_LOGE("COMMON_EVENT_SERVICE_ID stopped");
+            if (userSwitchSubscriber_ != nullptr) {
+                bool subRet = CommonEventManager::UnSubscribeCommonEvent(userSwitchSubscriber_);
+                TELEPHONY_LOGI("Unsubscribe user switched subRet is :%{public}d", subRet);
+                userSwitchSubscriber_ = nullptr;
+            }
+            break;
+        }
+        default:
+            TELEPHONY_LOGE("systemAbilityId is invalid");
+            break;
     }
 }
 
