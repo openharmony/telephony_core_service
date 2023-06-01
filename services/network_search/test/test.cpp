@@ -65,6 +65,8 @@ const int32_t REG_IMS_ST_CALLBACK = 27;
 const int32_t UN_REG_IMS_ST_CALLBACK = 28;
 const int32_t INPUT_NOTIFY_SPN_CHANGE = 29;
 const int32_t INPUT_GET_BASEBAND_VERSION = 30;
+const int32_t INPUT_GET_NETWORK_CAPABILITY = 31;
+const int32_t INPUT_SET_NETWORK_CAPABILITY = 32;
 const int32_t INPUT_INIT_TIME = 99;
 const int32_t INPUT_QUIT = 100;
 const int32_t SLEEP_TIME = 5;
@@ -395,6 +397,38 @@ void TestSetPreferredNetwork()
     }
 }
 
+void TestSetNetworkCapability()
+{
+    AccessToken token;
+    int32_t networkCapabilityType = 0;
+    int32_t networkCapabilityState = 0;
+    std::cout << "please input device type:" << std::endl;
+    std::cin >> networkCapabilityType;
+    std::cout << "please input 5G suppot or not" << std::endl;
+    std::cin >> networkCapabilityState;
+    if (g_telephonyService != nullptr) {
+        int32_t result =
+            g_telephonyService->SetNetworkCapability(InputSlotId(), networkCapabilityType, networkCapabilityState);
+        TELEPHONY_LOGI("TelephonyTestService::TestSetNetworkCapability result:%{public}d", result);
+    }
+}
+
+void TestGetNetworkCapability()
+{
+    AccessToken token;
+    int32_t networkCapabilityType = 0;
+    int32_t networkCapabilityState = 0;
+    std::cout << "please input device type:" << std::endl;
+    std::cin >> networkCapabilityType;
+    if (g_telephonyService != nullptr) {
+        int32_t result =
+            g_telephonyService->GetNetworkCapability(InputSlotId(), networkCapabilityType, networkCapabilityState);
+        TELEPHONY_LOGI("TelephonyTestService::TestGetNetworkCapability "
+                       "result:%{public}d, and NR swtich:%{public}d",
+            result, networkCapabilityState);
+    }
+}
+
 void TestIsNrSupported()
 {
     if (g_telephonyService != nullptr) {
@@ -660,6 +694,8 @@ void Prompt()
         "28:UnregisterImsRegStateCallback\n"
         "29:NotifySpnChange\n"
         "30:GetBasebandVersion\n"
+        "31:GetNetworkCapability\n"
+        "32:SetNetworkCapability\n"
         "99:InitTimeAndTimeZone\n"
         "100:exit \n");
 }
@@ -731,6 +767,8 @@ void Init()
     memberFuncMap_[UN_REG_IMS_ST_CALLBACK] = TestUnregisterImsRegStateCallback;
     memberFuncMap_[INPUT_NOTIFY_SPN_CHANGE] = TestNotifySpnChanged;
     memberFuncMap_[INPUT_GET_BASEBAND_VERSION] = TestGetBasebandVersion;
+    memberFuncMap_[INPUT_SET_NETWORK_CAPABILITY] = TestSetNetworkCapability;
+    memberFuncMap_[INPUT_GET_NETWORK_CAPABILITY] = TestGetNetworkCapability;
 }
 
 void InitBroadCast()
