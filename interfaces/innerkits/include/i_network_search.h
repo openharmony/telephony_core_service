@@ -83,6 +83,26 @@ public:
         int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName) = 0;
     virtual int32_t GetBasebandVersion(int32_t slotId, std::string &version) = 0;
     virtual int32_t GetAirplaneMode(bool &airplaneMode) = 0;
+    /**
+     * @brief Get the network capability.
+     *
+     * @param slotId[in], sim slot id
+     * @param networkCapabilityType[in], the device capability type
+     * @param networkCapabilityState[in], the device capability state
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t GetNetworkCapability(
+        int32_t slotId, int32_t networkCapabilityType, int32_t &networkCapabilityState) = 0;
+    /**
+     * @brief Set the network capability.
+     *
+     * @param slotId[in], sim slot id
+     * @param networkCapabilityType[in], the device capability type
+     * @param networkCapabilityState[in], the device capability state
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t SetNetworkCapability(
+        int32_t slotId, int32_t networkCapabilityType, int32_t networkCapabilityState) = 0;
     virtual int32_t UpdateRadioOn(int32_t slotId) = 0;
 
     /**

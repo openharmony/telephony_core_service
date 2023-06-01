@@ -53,6 +53,8 @@ void CoreServiceStub::AddHandlerNetWorkToMap()
     memberFuncMap_[uint32_t(InterfaceID::GET_CELL_LOCATION)] = &CoreServiceStub::OnGetCellLocation;
     memberFuncMap_[uint32_t(InterfaceID::GET_PREFERRED_NETWORK_MODE)] = &CoreServiceStub::OnGetPreferredNetwork;
     memberFuncMap_[uint32_t(InterfaceID::SET_PREFERRED_NETWORK_MODE)] = &CoreServiceStub::OnSetPreferredNetwork;
+    memberFuncMap_[uint32_t(InterfaceID::GET_NETWORK_CAPABILITY)] = &CoreServiceStub::OnGetNetworkCapability;
+    memberFuncMap_[uint32_t(InterfaceID::SET_NETWORK_CAPABILITY)] = &CoreServiceStub::OnSetNetworkCapability;
     memberFuncMap_[uint32_t(InterfaceID::GET_NR_OPTION_MODE)] = &CoreServiceStub::OnGetNrOptionMode;
     memberFuncMap_[uint32_t(InterfaceID::REG_IMS_CALLBACK)] = &CoreServiceStub::OnRegisterImsRegInfoCallback;
     memberFuncMap_[uint32_t(InterfaceID::UN_REG_IMS_CALLBACK)] = &CoreServiceStub::OnUnregisterImsRegInfoCallback;
@@ -938,6 +940,33 @@ int32_t CoreServiceStub::OnGetPreferredNetwork(MessageParcel &data, MessageParce
     int32_t result = GetPreferredNetwork(slotId, callback);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("OnRemoteRequest::OnGetPreferredNetwork write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnGetNetworkCapability(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t networkCapabilityType = data.ReadInt32();
+    int32_t networkCapabilityState = 0;
+    int32_t result = GetNetworkCapability(slotId, networkCapabilityType, networkCapabilityState);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetNetworkCapability write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    reply.WriteInt32(networkCapabilityState);
+    return result;
+}
+
+int32_t CoreServiceStub::OnSetNetworkCapability(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t networkCapabilityType = data.ReadInt32();
+    int32_t networkCapabilityState = data.ReadInt32();
+    int32_t result = SetNetworkCapability(slotId, networkCapabilityType, networkCapabilityState);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnSetNetworkCapability write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return result;

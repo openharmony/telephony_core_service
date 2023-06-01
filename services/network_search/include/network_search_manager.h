@@ -170,6 +170,10 @@ public:
         const sptr<ImsRegInfoCallback> &callback) override;
     int32_t UnregisterImsRegInfoCallback(
         int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName) override;
+    int32_t GetNetworkCapability(
+        int32_t slotId, int32_t networkCapabilityType, int32_t &networkCapabilityState) override;
+    int32_t SetNetworkCapability(
+        int32_t slotId, int32_t networkCapabilityType, int32_t networkCapabilityState) override;
 
     void NotifyPsRoamingOpenChanged(int32_t slotId);
     void NotifyPsRoamingCloseChanged(int32_t slotId);
@@ -214,6 +218,7 @@ public:
     int32_t UpdateRadioOn(int32_t slotId) override;
     void SetBasebandVersion(int32_t slotId, std::string version);
     int32_t GetBasebandVersion(int32_t slotId, std::string &version) override;
+    int32_t JudgeNetworkMode(int32_t preferredNetwork);
 
     inline void InitMsgNum(int32_t slotId)
     {
