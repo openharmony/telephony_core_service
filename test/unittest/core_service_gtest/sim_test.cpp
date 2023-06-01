@@ -1471,6 +1471,52 @@ HWTEST_F(SimTest, Telephony_Sim_SetPrimarySlotId_0300, Function | MediumTest | L
     }
 }
 
+/**
+ * @tc.number   Telephony_Sim_HasOperatorPrivileges_0100
+ * @tc.name     Whether has operator privileges
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_HasOperatorPrivileges_0100, Function | MediumTest | Level3)
+{
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    CoreServiceClient::GetInstance().GetSimState(SimTest::slotId_, simState);
+    if (!(SimTest::HasSimCard(SimTest::slotId_)) || (simState != SimState::SIM_STATE_READY)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(HasOperatorPrivileges, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        }
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_HasOperatorPrivileges_0200
+ * @tc.name     Whether has operator privileges
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_HasOperatorPrivileges_0200, Function | MediumTest | Level3)
+{
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    CoreServiceClient::GetInstance().GetSimState(SimTest::slotId1_, simState);
+    if (!(SimTest::HasSimCard(SimTest::slotId1_)) || (simState != SimState::SIM_STATE_READY)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(HasOperatorPrivileges1, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        }
+    }
+}
+
 #else // TEL_TEST_UNSUPPORT
 /**
  * @tc.number   Telephony_Sim_MockTest_0100
