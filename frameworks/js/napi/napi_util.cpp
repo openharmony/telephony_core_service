@@ -523,7 +523,18 @@ bool NapiUtil::CreateCommonErrorMessageForJs(int32_t errorCode, JsErrorCode &jsE
     if ((errorCode < COMMON_ERR_OFFSET || errorCode >= CALL_ERR_OFFSET)) {
         return false;
     }
+    if (CreateCommonArgumentErrorMessageForJs(errorCode, jsErrorCode) ||
+        CreateCommonServiceErrorMessageForJs(errorCode, jsErrorCode) ||
+        CreateCommonSystemErrorMessageForJs(errorCode, jsErrorCode)) {
+        return true;
+    }
+    return false;
+}
+
+bool NapiUtil::CreateCommonArgumentErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode)
+{
     bool flag = true;
+
     switch (errorCode) {
         case TELEPHONY_ERR_ARGUMENT_MISMATCH:
         case TELEPHONY_ERR_ARGUMENT_INVALID:
@@ -531,6 +542,18 @@ bool NapiUtil::CreateCommonErrorMessageForJs(int32_t errorCode, JsErrorCode &jsE
         case TELEPHONY_ERR_SLOTID_INVALID:
             jsErrorCode = JS_ERROR_TELEPHONY_ARGUMENT_ERROR;
             break;
+        default:
+            flag = false;
+            break;
+    }
+    return flag;
+}
+
+bool NapiUtil::CreateCommonServiceErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode)
+{
+    bool flag = true;
+
+    switch (errorCode) {
         case TELEPHONY_ERR_DESCRIPTOR_MISMATCH:
         case TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL:
         case TELEPHONY_ERR_WRITE_DATA_FAIL:
@@ -543,6 +566,18 @@ bool NapiUtil::CreateCommonErrorMessageForJs(int32_t errorCode, JsErrorCode &jsE
         case TELEPHONY_ERR_UNREGISTER_CALLBACK_FAIL:
             jsErrorCode = JS_ERROR_TELEPHONY_SERVICE_ERROR;
             break;
+        default:
+            flag = false;
+            break;
+    }
+    return flag;
+}
+
+bool NapiUtil::CreateCommonSystemErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode)
+{
+    bool flag = true;
+
+    switch (errorCode) {
         case TELEPHONY_ERR_FAIL:
         case TELEPHONY_ERR_MEMCPY_FAIL:
         case TELEPHONY_ERR_MEMSET_FAIL:

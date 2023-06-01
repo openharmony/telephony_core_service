@@ -70,6 +70,9 @@ private:
     static bool CreateSmsErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
     static bool CreateObserverErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
     static bool CreateCommonErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateCommonArgumentErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateCommonServiceErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateCommonSystemErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
     static bool CreateCallErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
     static bool CreateCommonCallErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
     static bool CreateVideoCallErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
