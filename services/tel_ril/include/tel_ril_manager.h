@@ -97,6 +97,9 @@ public:
 
     int32_t SetCallRestriction(int32_t slotId, const CallRestrictionParam &callRestriction,
         const AppExecFwk::InnerEvent::Pointer &result) override;
+
+    int32_t SetVoNRSwitch(int32_t slotId, int32_t state, const AppExecFwk::InnerEvent::Pointer &result) override;
+
     int32_t SendDtmf(
         int32_t slotId, const DtmfParam &dtmfParam, const AppExecFwk::InnerEvent::Pointer &result) override;
     int32_t SendDtmf(

@@ -85,6 +85,7 @@ public:
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t callFail) override;
     int32_t SetBarringPasswordResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t CloseUnFinishedUssdResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
+    int32_t SetVonrSwitchResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
 
     // Data
     int32_t PdpContextListUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,

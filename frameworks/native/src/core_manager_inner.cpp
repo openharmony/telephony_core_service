@@ -1030,6 +1030,22 @@ int32_t CoreManagerInner::SetCallRestriction(
     return telRilManager_->SetCallRestriction(slotId, callRestriction, response);
 }
 
+int32_t CoreManagerInner::SetVoNRSwitch(
+    int32_t slotId, int32_t state, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("telRilManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    response->SetOwner(handler);
+    return telRilManager_->SetVoNRSwitch(slotId, state, response);
+}
+
 int32_t CoreManagerInner::SendDTMF(int32_t slotId, int32_t eventId, const DtmfParam &dtmfParam,
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {

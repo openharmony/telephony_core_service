@@ -301,6 +301,11 @@ int32_t TelRilCall::CloseUnFinishedUssdResponse(const HDI::Ril::V1_1::RilRadioRe
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
+int32_t TelRilCall::SetVoNRSwitchResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+{
+    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
+}
+
 int32_t TelRilCall::GetCallList(const AppExecFwk::InnerEvent::Pointer &result)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_GET_CALL_LIST, &HDI::Ril::V1_1::IRil::GetCallList);
@@ -517,6 +522,12 @@ int32_t TelRilCall::CloseUnFinishedUssd(const AppExecFwk::InnerEvent::Pointer &r
 {
     return Request(
         TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_CLOSE_UNFINISHED_USSD, &HDI::Ril::V1_1::IRil::CloseUnFinishedUssd);
+}
+
+int32_t TelRilCall::SetVoNRSwitch(int32_t state, const AppExecFwk::InnerEvent::Pointer &result)
+{
+    return Request(
+        TELEPHONY_LOG_FUNC_NAME, result, HREQ_SET_VONR_SWITCH, &HDI::Ril::V1_1::IRil::SetVonrSwitch, state);
 }
 
 int32_t TelRilCall::CallStateUpdated()
