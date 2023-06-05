@@ -222,6 +222,12 @@ struct PreferredNetworkModeContext : CallbackContext {
     int32_t preferredNetworkMode = DEFAULT_ERROR;
 };
 
+struct NetworkCapabilityContext : CallbackContext {
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    int32_t networkCapabilityType = DEFAULT_ERROR;
+    int32_t networkCapabilityState = DEFAULT_ERROR;
+};
+
 struct GetIMEIContext : BaseContext {
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::string getIMEIResult = "";

@@ -23,6 +23,7 @@
 #include "core_service_errors.h"
 #include "mcc_pool.h"
 #include "network_search_types.h"
+#include "telephony_config.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
@@ -31,6 +32,12 @@ namespace Telephony {
 namespace {
 const size_t MCC_LEN = 3;
 } // namespace
+const int32_t SERVICE_TYPE_LTE = 0;
+const int32_t SERVICE_TYPE_NR = 1;
+const int32_t SERVICE_ABILITY_OFF = 0;
+const int32_t SERVICE_ABILITY_ON = 1;
+const int32_t NETWORK_MODE_LTE = 1;
+const int32_t NETWORK_MODE_NR = 2;
 
 NetworkSearchManager::NetworkSearchManager(
     std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<ISimManager> simManager)
@@ -1354,6 +1361,103 @@ int32_t NetworkSearchManager::GetBasebandVersion(int32_t slotId, std::string &ve
     }
     version = inner->basebandVersion_;
     return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkSearchManager::GetNetworkCapability(
+    int32_t slotId, int32_t networkCapabilityType, int32_t &networkCapabilityState)
+{
+    TelephonyConfig telephonyConfig;
+    bool isNrSupported = false;
+    isNrSupported =
+        telephonyConfig.IsCapabilitySupport(static_cast<int32_t>(TelephonyConfig::ConfigType::MODEM_CAP_SUPPORT_NR));
+    if (networkCapabilityType == SERVICE_TYPE_NR && !isNrSupported) {
+        TELEPHONY_LOGE(
+            "switch type and nr capability no match, networkCapabilityType:%{public}d isNrSupported:%{public}d",
+            networkCapabilityType, isNrSupported);
+        return TELEPHONY_ERROR;
+    }
+    int32_t preferredNetwork = static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_AUTO);
+    int32_t networkMode = static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_AUTO);
+    preferredNetwork = GetPreferredNetworkValue(slotId);
+    networkMode = JudgeNetworkMode(preferredNetwork);
+    if (networkCapabilityType == SERVICE_TYPE_NR && networkMode == NETWORK_MODE_NR) {
+        networkCapabilityState = SERVICE_ABILITY_ON;
+    } else if (networkCapabilityType == SERVICE_TYPE_LTE &&
+               (networkMode == NETWORK_MODE_NR || networkMode == NETWORK_MODE_LTE)) {
+        networkCapabilityState = SERVICE_ABILITY_ON;
+    } else {
+        networkCapabilityState = SERVICE_ABILITY_OFF;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t NetworkSearchManager::SetNetworkCapability(
+    int32_t slotId, int32_t networkCapabilityType, int32_t networkCapabilityState)
+{
+    TelephonyConfig telephonyConfig;
+    bool isNrSupported = false;
+    isNrSupported =
+        telephonyConfig.IsCapabilitySupport(static_cast<int32_t>(TelephonyConfig::ConfigType::MODEM_CAP_SUPPORT_NR));
+    if (networkCapabilityType == SERVICE_TYPE_NR && !isNrSupported) {
+        TELEPHONY_LOGE(
+            "switch type and nr capability no match, networkCapabilityType:%{public}d isNrSupported:%{public}d",
+            networkCapabilityType, isNrSupported);
+        return TELEPHONY_ERROR;
+    }
+    bool ret = false;
+    if ((networkCapabilityType == SERVICE_TYPE_LTE && networkCapabilityState == SERVICE_ABILITY_ON) ||
+        (networkCapabilityType == SERVICE_TYPE_NR && networkCapabilityState == SERVICE_ABILITY_OFF)) {
+        ret = SetPreferredNetwork(
+            slotId, static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
+    } else if (networkCapabilityType == SERVICE_TYPE_NR && networkCapabilityState == SERVICE_ABILITY_ON) {
+        ret = SetPreferredNetwork(
+            slotId, static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
+    } else if (networkCapabilityType == SERVICE_TYPE_LTE && networkCapabilityState == SERVICE_ABILITY_OFF) {
+        ret = SetPreferredNetwork(
+            slotId, static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE(
+            "set preferred Network failed, networkCapabilityType:%{public}d networkCapabilityState:%{public}d",
+            networkCapabilityType, networkCapabilityState);
+        return TELEPHONY_ERROR;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t NetworkSearchManager::JudgeNetworkMode(int32_t preferredNetwork)
+{
+    int32_t networkMode = static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_AUTO);
+    switch (preferredNetwork) {
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA_GSM):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_EVDO_CDMA):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA_GSM_EVDO_CDMA):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_GSM):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA):
+            networkMode = NETWORK_MODE_LTE;
+            break;
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA_GSM):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_EVDO_CDMA):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA_GSM_EVDO_CDMA):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_GSM):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM):
+        case static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA):
+            networkMode = NETWORK_MODE_NR;
+            break;
+        default:
+            break;
+    }
+    return networkMode;
 }
 } // namespace Telephony
 } // namespace OHOS

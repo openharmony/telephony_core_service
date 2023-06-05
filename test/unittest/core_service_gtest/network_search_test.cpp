@@ -1544,6 +1544,132 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetMeid_0300, Function | Med
 }
 
 /**
+ * @tc.number   Telephony_NetworkSearch_GetNetworkCapability_0100
+ * @tc.name     Get network ability switch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkCapability_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+    } else {
+        int32_t networkCapabilityType = 0;
+        int32_t networkCapabilityState = 0;
+        int32_t ret = CoreServiceClient::GetInstance().GetNetworkCapability(
+            SLOT_ID, networkCapabilityType, networkCapabilityState);
+        TELEPHONY_LOGI(
+            "TelephonyTestService GetNetworkCapability: %{public}d, flag: %{public}d", ret, networkCapabilityState);
+        EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+    }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetNetworkCapability_0200
+ * @tc.name     Get network ability switch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkAbilitySwitch_0200, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+    } else {
+        int32_t networkCapabilityType = 0;
+        int32_t networkCapabilityState = 0;
+        int32_t ret = CoreServiceClient::GetInstance().GetNetworkCapability(
+            SLOT_ID1, networkCapabilityType, networkCapabilityState);
+        TELEPHONY_LOGI(
+            "TelephonyTestService GetNetworkCapability: %{public}d, flag: %{public}d", ret, networkCapabilityState);
+        EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+    }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetNetworkCapability_0300
+ * @tc.name     Get network ability switch without permisson
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkAbilitySwitch_0300, Function | MediumTest | Level2)
+{
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+    } else {
+        int32_t networkCapabilityType = 0;
+        int32_t networkCapabilityState = 0;
+        int32_t ret = CoreServiceClient::GetInstance().GetNetworkCapability(
+            SLOT_ID, networkCapabilityType, networkCapabilityState);
+        TELEPHONY_LOGI("TelephonyTestService GetNetworkCapability: %{public}d, networkCapabilityState: %{public}d", ret,
+            networkCapabilityState);
+        EXPECT_EQ(ret, TELEPHONY_ERR_PERMISSION_ERR);
+    }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_SetNetworkCapability_0100
+ * @tc.name     Set network ability switch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkCapability_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+        return;
+    }
+    int32_t networkCapabilityType = 0;
+    int32_t networkCapabilityState = 0;
+    int32_t ret =
+        CoreServiceClient::GetInstance().SetNetworkCapability(SLOT_ID, networkCapabilityType, networkCapabilityState);
+    TELEPHONY_LOGI("SetNetworkCapability_0100 result: %{public}d", ret);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_SetNetworkCapability_0200
+ * @tc.name     Set network ability switch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkCapability_0200, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+        return;
+    }
+    int32_t networkCapabilityType = 0;
+    int32_t networkCapabilityState = 0;
+    int32_t ret =
+        CoreServiceClient::GetInstance().SetNetworkCapability(SLOT_ID1, networkCapabilityType, networkCapabilityState);
+    TELEPHONY_LOGI("SetNetworkCapability_0200 result: %{public}d", ret);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_SetNetworkCapability_0300
+ * @tc.name     Set network ability switch without permisson
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkCapability_0300, Function | MediumTest | Level2)
+{
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+    }
+    int32_t networkCapabilityType = 0;
+    int32_t networkCapabilityState = 0;
+    int32_t ret =
+        CoreServiceClient::GetInstance().SetNetworkCapability(SLOT_ID, networkCapabilityType, networkCapabilityState);
+    TELEPHONY_LOGI("SetNetworkCapability_0300 result: %{public}d", ret);
+    EXPECT_EQ(ret, TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
  * @tc.number   Telephony_NetworkSearch_GetUniqueDeviceId_0100
  * @tc.name     Get unique device id
  * @tc.desc     Function test

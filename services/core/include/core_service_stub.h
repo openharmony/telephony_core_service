@@ -95,6 +95,8 @@ private:
     int32_t OnSetActiveSim(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetPreferredNetwork(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetPreferredNetwork(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetNetworkCapability(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetNetworkCapability(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimPhoneNumber(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimTeleNumberIdentifier(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetVoiceMailInfor(MessageParcel &data, MessageParcel &reply);
