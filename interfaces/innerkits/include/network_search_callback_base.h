@@ -26,12 +26,35 @@ class NetworkSearchCallBackBase : public virtual RefBase {
 public:
     virtual ~NetworkSearchCallBackBase() = default;
 
+    /**
+     * @brief Whether cellular data has internet capability.
+     *
+     * @param slotId[in], sim slot id
+     * @param cid[in], Context identification
+     * @return Return true if has, false if hasn't.
+     */
     virtual bool HasInternetCapability(int32_t slotId, int32_t cId)
     {
         return false;
     }
+    /**
+     * @brief Clear cellular data connections.
+     *
+     * @param slotId[in], sim slot id
+     */
     virtual void ClearCellularDataConnections(int32_t slotId) {}
+    /**
+     * @brief Clear the call corresponding to slotId
+     *
+     * @param slotId[in], sim slot id
+     */
     virtual void ClearCellularCallList(int32_t slotId) {}
+    /**
+     * @brief Set whether the device can make calls
+     * @param slotId[in], sim slot id
+     * @param callType[in], indicate the call type is cs or ims. 0 is cs, 1 is ims
+     * @param isReadyToCall[in], indicate whether the device can make calls
+     */
     virtual void SetReadyToCall(int32_t slotId, int32_t callType, bool isReadyToCall) {}
 };
 } // namespace Telephony

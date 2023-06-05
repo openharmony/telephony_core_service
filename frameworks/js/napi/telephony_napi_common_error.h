@@ -18,13 +18,43 @@
 
 namespace OHOS {
 namespace Telephony {
+/**
+ * @brief Indicates the error of NAPI.
+ */
 enum NapiError : int32_t {
+    /**
+     * Indicates there is no error.
+     */
     ERROR_NONE = 0,
+
+    /**
+     * Indicates the default value of NAPI error.
+     */
     ERROR_DEFAULT = -1,
+
+    /**
+     * Indicates the service is unavailable.
+     */
     ERROR_SERVICE_UNAVAILABLE = -2,
+
+    /**
+     * Indicates the count of parameter is error.
+     */
     ERROR_PARAMETER_COUNTS_INVALID = -4,
+
+    /**
+     * Indicates the type of parameter is error.
+     */
     ERROR_PARAMETER_TYPE_INVALID = -5,
+
+    /**
+     * Indicates the native API execute failed.
+     */
     ERROR_NATIVE_API_EXECUTE_FAIL = -6,
+
+    /**
+     * Indicates the slot id is invalid.
+     */
     ERROR_SLOT_ID_INVALID = 202,
 };
 } // namespace Telephony

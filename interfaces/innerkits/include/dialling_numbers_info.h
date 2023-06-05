@@ -26,7 +26,14 @@ namespace Telephony {
 class DiallingNumbersInfo : public Parcelable {
 public:
     enum : uint32_t {
+        /**
+         * Fixed dialing number
+         */
         SIM_ADN = 1,
+        /**
+         *
+         * Abbreviated dialing numbers
+         */
         SIM_FDN = 2,
     };
     static const int EMPTY_INDEX = 0;

@@ -50,17 +50,22 @@ public:
     CellLocation::CellType GetCellLocationType() const override;
     void SetGsmParam(int32_t cellId, int32_t lac, int32_t psc = 0);
     /**
-     * @return gsm cell id, 0 if unknown, 0xffff max legal value
+     * @brief Obtain gsm cell id
+     *
+     * @return GSM cell id, 0 if unknown, 0xffff max legal value
      */
     int32_t GetCellId() const;
     /**
-     * @return gsm location area code, 0 if unknown, 0xffff max legal value
+     * @brief Obtain gsm location area code
+     *
+     * @return GSM location area code, 0 if unknown, 0xffff max legal value
      */
     int32_t GetLac() const;
     /**
-     * On a UMTS network, return the primary scrambling code
+     * @brief On a UMTS network, return the primary scrambling code
      * cell.
-     * @return primary scrambling code for WCDMA, 0 if unknown or GSM
+     *
+     * @return Primary scrambling code for WCDMA, 0 if unknown or GSM
      */
     int32_t GetPsc() const;
 
@@ -80,10 +85,35 @@ public:
     CellLocation::CellType GetCellLocationType() const override;
     void SetCdmaParam(int32_t baseId, int32_t latitude, int32_t longitude, int32_t nid, int32_t sid);
 
+    /**
+     * @brief Obtain cdma base station identification number
+     *
+     * @return CDMA base station identification number
+     */
     int32_t GetBaseId() const;
+    /**
+     * @brief Obtain cdma base station latitude
+     *
+     * @return CDMA base station latitude
+     */
     int32_t GetLatitude() const;
+    /**
+     * @brief Obtain cdma base station longitude
+     *
+     * @return CDMA base station longitude
+     */
     int32_t GetLongitude() const;
+    /**
+     * @brief Obtain cdma network identification number
+     *
+     * @return CDMA network identification number
+     */
     int32_t GetNid() const;
+    /**
+     * @brief Obtain cdma system identification number
+     *
+     * @return CDMA system identification number
+     */
     int32_t GetSid() const;
 private:
     int32_t baseId_ = 0;
