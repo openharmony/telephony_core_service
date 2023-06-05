@@ -46,11 +46,10 @@ public:
 private:
     PhoneType RadioTechToPhoneType(RadioTech csRadioTech, const RadioTech &psRadioTech) const;
     bool WriteRadioStateResponseInfo(
-        int64_t &index, MessageParcel &data, std::shared_ptr<HRilRadioResponseInfo> &responseInfo) const;
-    bool WriteRadioStateResponseInfo(
-        int64_t &index, MessageParcel &data, bool &result, std::shared_ptr<HRilRadioResponseInfo> &responseInfo) const;
+        int64_t &index, MessageParcel &data, bool result, std::shared_ptr<HRilRadioResponseInfo> &responseInfo) const;
     bool WriteRadioStateObject(
-        int64_t &index, MessageParcel &data, bool &result, std::unique_ptr<HRilRadioStateInfo> &object) const;
+        int64_t &index, MessageParcel &data, bool result, std::unique_ptr<HRilRadioStateInfo> &object) const;
+    void UpdateInfoOfSetRadioState(ModemPowerState &radioState, bool result, MessageParcel &data, int64_t index) const;
     PhoneType phoneType_ = PhoneType::PHONE_TYPE_IS_NONE;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     int32_t slotId_ = 0;
