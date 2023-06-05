@@ -34,6 +34,8 @@ public:
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
+    bool WriteGetPreferredNetworkInfo(std::shared_ptr<PreferredNetworkTypeInfo> &preferredNetworkInfo,
+        std::shared_ptr<HRilRadioResponseInfo> &responseInfo, MessageParcel &data, int64_t &index) const;
     int32_t slotId_ = 0;
 };
 } // namespace Telephony
