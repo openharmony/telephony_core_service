@@ -96,6 +96,10 @@ public:
     virtual int32_t GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual int32_t SetPreferredNetwork(
         int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual int32_t GetNetworkCapability(
+        int32_t slotId, int32_t networkCapabilityType, int32_t &networkCapabilityState) = 0;
+    virtual int32_t SetNetworkCapability(
+        int32_t slotId, int32_t networkCapabilityType, int32_t networkCapabilityState) = 0;
     virtual int32_t GetSimTelephoneNumber(int32_t slotId, std::u16string &telephoneNumber) = 0;
     virtual std::u16string GetSimTeleNumberIdentifier(const int32_t slotId) = 0;
     virtual int32_t GetVoiceMailIdentifier(int32_t slotId, std::u16string &voiceMailIdentifier) = 0;
@@ -187,6 +191,8 @@ public:
         SET_SIM_ACTIVE,
         GET_PREFERRED_NETWORK_MODE,
         SET_PREFERRED_NETWORK_MODE,
+        GET_NETWORK_CAPABILITY,
+        SET_NETWORK_CAPABILITY,
         GET_SIM_PHONE_NUMBER,
         GET_SIM_TELENUMBER_IDENTIFIER,
         GET_VOICE_MAIL_TAG,

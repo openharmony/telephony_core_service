@@ -151,6 +151,11 @@ public:
     int32_t SetPreferredNetwork(
         int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback) override;
 
+    int32_t GetNetworkCapability(
+        int32_t slotId, int32_t networkCapabilityType, int32_t &networkCapabilitytate) override;
+
+    int32_t SetNetworkCapability(int32_t slotId, int32_t networkCapabilityType, int32_t networkCapabilitytate) override;
+
     int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
 
     int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) override;
