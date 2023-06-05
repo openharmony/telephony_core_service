@@ -124,6 +124,7 @@ enum class DiffInterfaceId {
     TEST_SET_CMUT,
     TEST_GET_CMUT,
     TEST_GET_EMERGENCY_CALL_LIST,
+    TEST_SET_VONR_STATUS,
     TEST_EXIT
 };
 
@@ -237,6 +238,7 @@ private:
     void AddRilCmCdmaSmsTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void DelRilCmCdmaSmsTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void UpdateRilCmCdmaSmsTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void SetVoNRSwitchTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     /* =========== Cellular Data Start ============= */
     void DataSetInitApnInfoTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);

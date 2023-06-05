@@ -117,6 +117,8 @@ public:
     int32_t CallEmergencyNotice(const HDI::Ril::V1_1::EmergencyInfoList &emergencyInfoList);
     int32_t CallRsrvccStatusNotify();
     int32_t CloseUnFinishedUssdResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
+    int32_t SetVoNRSwitch(int32_t state, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetVoNRSwitchResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
 
 private:
     void BuildEmergencyInfoList(std::shared_ptr<EmergencyInfoList> emergencyCallList,
