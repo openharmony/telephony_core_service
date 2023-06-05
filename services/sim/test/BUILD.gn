@@ -60,9 +60,7 @@ ohos_executable("tel_sim_test") {
     "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
     "init:libbegetutil",
-    "ipc:ipc_core",
-    "relational_store:native_dataability",
-    "relational_store:native_rdb",
+    "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

@@ -44,7 +44,7 @@ ohos_executable("tel_ril_test") {
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",
     "init:libbegetutil",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "power_manager:powermgr_client",
     "samgr:samgr_proxy",
   ]

@@ -39,6 +39,13 @@ public:
     virtual int32_t GetCsRadioTech(int32_t slotId, int32_t &csRadioTech) = 0;
     virtual std::u16string GetOperatorNumeric(int32_t slotId) = 0;
     virtual int32_t GetOperatorName(int32_t slotId, std::u16string &operatorName) = 0;
+    /**
+     * @brief Get network state
+     *
+     * @param slotId[in], sim slot id
+     * @param networkState[out], the network state of the SIM card
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
     virtual int32_t GetNetworkStatus(int32_t slotId, sptr<NetworkState> &networkState) = 0;
     virtual int32_t GetRadioState(int32_t slotId) = 0;
     virtual int32_t GetRadioState(int32_t slotId, NSCALLBACK &callback) = 0;
@@ -63,25 +70,73 @@ public:
     virtual int32_t GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode) = 0;
     virtual int32_t GetPreferredNetwork(int32_t slotId, NSCALLBACK &callback) = 0;
     virtual int32_t SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback) = 0;
+    /**
+     * @brief Obtains the registration status of the packet switched (PS) domain.
+     *
+     * @param slotId[in], sim slot id
+     * @return Returns the registration status.
+     */
     virtual int32_t GetPsRegState(int32_t slotId) = 0;
+    /**
+     * @brief Obtains the registration status of the circuit switched (CS) domain.
+     *
+     * @param slotId[in], sim slot id
+     * @return Returns the registration status.
+     */
     virtual int32_t GetCsRegState(int32_t slotId) = 0;
+    /**
+     * @brief Obtains the roaming status of the packet switched (PS) domain.
+     *
+     * @param slotId[in], sim slot id
+     * @return Returns the roaming status.
+     */
     virtual int32_t GetPsRoamingState(int32_t slotId) = 0;
     virtual int32_t GetImei(int32_t slotId, std::u16string &imei) = 0;
     virtual int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) = 0;
     virtual int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) = 0;
     virtual int32_t SendUpdateCellLocationRequest(int32_t slotId) = 0;
+    /**
+     * @brief Obtains the location of the device.
+     *
+     * @param slotId[in], sim slot id
+     * @return Returns the current location of the device.
+     */
     virtual sptr<CellLocation> GetCellLocation(int32_t slotId) = 0;
     virtual int32_t GetMeid(int32_t slotId, std::u16string &meid) = 0;
     virtual int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) = 0;
+    /**
+     * @brief Obtains the network status of the phone.
+     *
+     * @param slotId[in], sim slot id
+     * @return Returns the network status of the phone.
+     */
     virtual PhoneType GetPhoneType(int32_t slotId) = 0;
     virtual int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) = 0;
+    /**
+     * @brief Obtains the frequency type.
+     *
+     * @param slotId[in], sim slot id
+     * @return Returns the frequency type.
+     */
     virtual FrequencyType GetFrequencyType(int32_t slotId) = 0;
+    /**
+     * @brief Obtains the 5G New Radio (NR) status.
+     *
+     * @param slotId[in], sim slot id
+     * @return Returns the 5G New Radio (NR) status.
+     */
     virtual NrState GetNrState(int32_t slotId) = 0;
     virtual int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName,
         const sptr<ImsRegInfoCallback> &callback) = 0;
     virtual int32_t UnregisterImsRegInfoCallback(
         int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName) = 0;
     virtual int32_t GetBasebandVersion(int32_t slotId, std::string &version) = 0;
+    /**
+     * @brief Get the airplane mode.
+     *
+     * @param airplaneMode[out], true  if airplane is opening, false if airplane is closed
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
     virtual int32_t GetAirplaneMode(bool &airplaneMode) = 0;
     /**
      * @brief Get the network capability.
@@ -103,8 +158,13 @@ public:
      */
     virtual int32_t SetNetworkCapability(
         int32_t slotId, int32_t networkCapabilityType, int32_t networkCapabilityState) = 0;
+    /**
+     * @brief Update radio on, set airplane mode Off and radio state on
+     *
+     * @param slotId[in], sim slot id
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
     virtual int32_t UpdateRadioOn(int32_t slotId) = 0;
-
     /**
      * @brief support Nr network or not
      *
@@ -112,6 +172,12 @@ public:
      * @return false not support
      */
     virtual bool IsNrSupported(int32_t slotId) = 0;
+    /**
+     * @brief Update physical link active status
+     *
+     * @param slotId[in], sim slot id
+     * @param isActive[in], physical link active or not
+     */
     virtual void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive) = 0;
 };
 } // namespace Telephony
