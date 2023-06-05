@@ -89,6 +89,7 @@ ohos_shared_library("libtel_common") {
     "samgr:samgr_proxy",
   ]
 
+  innerapi_tags = [ "platformsdk" ]
   part_name = "core_service"
   subsystem_name = "telephony"
 }
