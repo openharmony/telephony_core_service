@@ -194,16 +194,17 @@ DeviceStateObserver::SystemAbilityStatusChangeListener::SystemAbilityStatusChang
 void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
     int32_t systemAbilityId, const std::string& deviceId)
 {
+    TELEPHONY_LOGI("systemAbilityId is %{public}d", systemAbilityId);
     if (sub_ == nullptr) {
         TELEPHONY_LOGE("OnAddSystemAbility sub_ is nullptr");
         return;
     }
+    if (sub_->GetEventHandler() == nullptr && systemAbilityId != COMMON_EVENT_SERVICE_ID) {
+        TELEPHONY_LOGE("DeviceStateObserver OnAddSystemAbility eventHandler is nullptr");
+        return;
+    }
     switch (systemAbilityId) {
         case POWER_MANAGER_SERVICE_ID: {
-            if (sub_->GetEventHandler() == nullptr) {
-                TELEPHONY_LOGE("DeviceStateObserver OnAddSystemAbility eventHandler is nullptr");
-                return;
-            }
             auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
             sub_->GetEventHandler()->ProcessScreenDisplay(powerMgrClient.IsScreenOn());
             auto powerSaveMode = powerMgrClient.GetDeviceMode();
@@ -212,10 +213,6 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
             break;
         }
         case POWER_MANAGER_BATT_SERVICE_ID: {
-            if (sub_->GetEventHandler() == nullptr) {
-                TELEPHONY_LOGE("DeviceStateObserver OnAddSystemAbility eventHandler is nullptr");
-                return;
-            }
             auto &batterySrvClient = PowerMgr::BatterySrvClient::GetInstance();
             sub_->GetEventHandler()->ProcessChargingState(
                 batterySrvClient.GetChargingStatus() == PowerMgr::BatteryChargeState::CHARGE_STATE_ENABLE);
