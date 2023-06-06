@@ -53,6 +53,7 @@
                 "ipc",
                 "napi",
                 "netmanager_base",
+                "netmanager_ext",
                 "power_manager",
                 "preferences",
                 "resource_management",
