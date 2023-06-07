@@ -15,7 +15,7 @@
 
 #include "network_information.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "iosfwd"
 #include "memory"
