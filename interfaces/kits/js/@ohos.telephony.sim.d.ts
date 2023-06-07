@@ -2153,7 +2153,7 @@ declare namespace sim {
     /**
      * Indicates the operations remaining.
      *
-     * @type { number }
+     * @type { ?number }
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
      * @since 7
@@ -2193,7 +2193,7 @@ declare namespace sim {
     /**
      * Indicates the record number.
      *
-     * @type { number }
+     * @type { ?number }
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
      * @since 8
@@ -2203,7 +2203,7 @@ declare namespace sim {
     /**
      * Indicates the PIN 2.
      *
-     * @type { string }
+     * @type { ?string }
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
      * @since 8
@@ -2742,7 +2742,7 @@ declare namespace sim {
      * @since 9
      */
     KEY_IMS_CALL_DISCONNECT_REASON_INFO_MAPPING_STRING_ARRAY =
-    "ims_call_disconnect_reason_info_mapping_string_array",
+        "ims_call_disconnect_reason_info_mapping_string_array",
 
     /**
      * Indicates the forced Volte switch on state.
