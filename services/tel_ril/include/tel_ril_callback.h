@@ -294,7 +294,12 @@ private:
             TELEPHONY_LOGE("telRilManager_ or _func or _moduleFunc is nullptr");
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
+        return Execute(slotId, _func, _moduleFunc, std::forward<ParamTypes>(_args)...);
+    }
 
+    template<typename FuncType, typename ModuleFuncType, typename... ParamTypes>
+    inline int32_t Execute(int32_t slotId, FuncType &&_func, ModuleFuncType _moduleFunc, ParamTypes &&... _args) const
+    {
         auto modulePtr = (telRilManager_.get()->*(_func))(slotId);
         if (modulePtr == nullptr) {
             TELEPHONY_LOGE("modulePtr is nullptr");
