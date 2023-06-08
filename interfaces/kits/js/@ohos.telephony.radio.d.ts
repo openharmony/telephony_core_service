@@ -436,6 +436,8 @@ declare namespace radio {
    * @syscap SystemCapability.Telephony.CoreService
    * @systemapi Hide this for inner system use.
    * @since 8
+   * @deprecated since 10
+   * @useinstead telephony.radio#getNROptionMode
    */
   function getNrOptionMode(slotId: number, callback: AsyncCallback<NrOptionMode>): void;
 
@@ -596,7 +598,7 @@ declare namespace radio {
   /**
    * Obtains the unique device ID of a specified card slot of the device.
    *
-   * <p>If the device is registered with a 3GPP-compliant network, the international mobile equipment identity
+   * If the device is registered with a 3GPP-compliant network, the international mobile equipment identity
    * (IMEI) is returned. If the device is registered with a 3GPP2-compliant network, the mobile equipment identifier
    * (MEID) is returned.
    *
@@ -621,7 +623,7 @@ declare namespace radio {
   /**
    * Obtains the unique device ID of a specified card slot of the device.
    *
-   * <p>If the device is registered with a 3GPP-compliant network, the international mobile equipment identity
+   * If the device is registered with a 3GPP-compliant network, the international mobile equipment identity
    * (IMEI) is returned. If the device is registered with a 3GPP2-compliant network, the mobile equipment identifier
    * (MEID) is returned.
    *
@@ -646,7 +648,7 @@ declare namespace radio {
   /**
    * Obtains the unique device ID of a specified card slot of the device.
    *
-   * <p>If the device is registered with a 3GPP-compliant network, the international mobile equipment identity
+   * If the device is registered with a 3GPP-compliant network, the international mobile equipment identity
    * (IMEI) is returned. If the device is registered with a 3GPP2-compliant network, the mobile equipment identifier
    * (MEID) is returned.
    *
@@ -669,7 +671,7 @@ declare namespace radio {
   /**
    * Obtains the index number of the card slot where the primary card is located if multiple SIM cards are inserted.
    *
-   * <p>The primary card is the SIM card inserted in the card slot that uses data services by default.
+   * The primary card is the SIM card inserted in the card slot that uses data services by default.
    *
    * @param { AsyncCallback<number> } callback - Indicates the callback for getting the index number of
    * the primary card slot.
@@ -686,7 +688,7 @@ declare namespace radio {
   /**
    * Obtains the index number of the card slot where the primary card is located if multiple SIM cards are inserted.
    *
-   * <p>The primary card is the SIM card inserted in the card slot that uses data services by default.
+   * The primary card is the SIM card inserted in the card slot that uses data services by default.
    *
    * @returns { Promise<number> } Returns the index number of the primary card slot.
    * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
@@ -1238,7 +1240,7 @@ declare namespace radio {
    * a monitored {@code slotId} updates.
    *
    * @permission ohos.permission.GET_TELEPHONY_STATE
-   * @param { string } type - imsRegStateChange.
+   * @param { 'imsRegStateChange' } type - Event type. Indicates the imsRegStateChange event to be subscribed to.
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @param { ImsServiceType } imsType - Indicates the ims service type of the {@link ImsServiceType}.
@@ -1261,7 +1263,7 @@ declare namespace radio {
    * Unsubscribe from imsRegStateChange event.
    *
    * @permission ohos.permission.GET_TELEPHONY_STATE
-   * @param { string } type - imsRegStateChange.
+   * @param { 'imsRegStateChange' } type - Event type. Indicates the imsRegStateChange event to unsubscribe from.
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @param { ImsServiceType } imsType - Indicates the ims service type of the {@link ImsServiceType}.
@@ -1281,7 +1283,7 @@ declare namespace radio {
   function off(type: 'imsRegStateChange', slotId: number, imsType: ImsServiceType, callback?: Callback<ImsRegInfo>): void;
 
   /**
-   * Obtains the baseband version of the specified SIM card slot.
+   * Get the version of Baseband.
    *
    * @permission ohos.permission.GET_TELEPHONY_STATE
    * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot index number
@@ -1301,7 +1303,7 @@ declare namespace radio {
   function getBasebandVersion(slotId: number, callback: AsyncCallback<string>): void;
 
   /**
-   * Obtains the baseband version of the specified SIM card slot.
+   * Get the version of Baseband.
    *
    * @permission ohos.permission.GET_TELEPHONY_STATE
    * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot index number
@@ -1756,6 +1758,7 @@ declare namespace radio {
   /**
    * Returns child class objects specific to the network type.
    *
+   * @interface SignalInformation
    * @syscap SystemCapability.Telephony.CoreService
    * @since 6
    */
@@ -1863,7 +1866,7 @@ declare namespace radio {
   export interface NetworkState {
     /**
      * Obtains the operator name in the long alphanumeric format of the registered network.
-     * <p>
+     *
      * Returns the operator name in the long alphanumeric format as a string;
      * returns an empty string if no operator name is obtained.
      *
@@ -1875,7 +1878,7 @@ declare namespace radio {
 
     /**
      * Obtains the operator name in the short alphanumeric format of the registered network.
-     * <p>
+     *
      * Returns the operator name in the short alphanumeric format as a string;
      * returns an empty string if no operator name is obtained.
      *
@@ -1887,7 +1890,7 @@ declare namespace radio {
 
     /**
      * Obtains the PLMN code of the registered network.
-     * <p>
+     *
      * Returns the PLMN code as a string; returns an empty string if no operator name is obtained.
      *
      * @type { string }
@@ -1926,8 +1929,9 @@ declare namespace radio {
     /**
      * Obtains the NSA network registration status of the device.
      *
-     * <p>Returns the NSA network registration status {@code NsaState}.
+     * Returns the NSA network registration status {@code NsaState}.
      *
+     * @type { NsaState }
      * @syscap SystemCapability.Telephony.CoreService
      * @since 6
      */
@@ -1936,8 +1940,9 @@ declare namespace radio {
     /**
      * Obtains the status of CA.
      *
-     * <p>Returns {@code true} if CA is actived; returns {@code false} otherwise.
+     * Returns {@code true} if CA is actived; returns {@code false} otherwise.
      *
+     * @type { boolean }
      * @syscap SystemCapability.Telephony.CoreService
      * @since 6
      */
@@ -1946,9 +1951,10 @@ declare namespace radio {
     /**
      * Checks whether this device is allowed to make emergency calls only.
      *
-     * <p>Returns {@code true} if this device is allowed to make emergency calls only;
+     * Returns {@code true} if this device is allowed to make emergency calls only;
      * returns {@code false} otherwise.
      *
+     * @type { boolean }
      * @syscap SystemCapability.Telephony.CoreService
      * @since 6
      */
@@ -2115,7 +2121,7 @@ declare namespace radio {
   export interface CellInformation {
     /**
      * Obtains the network type of the serving cell.
-     * <p>
+     *
      * An application can call this method to determine the network type that the child class uses.
      *
      * @type { NetworkType }
@@ -2126,7 +2132,7 @@ declare namespace radio {
 
     /**
      * Obtains the camp-on status of the serving cell.
-     * <p>
+     *
      * Returns {@code true} if the user equipment (UE) is camped on the cell; returns {@code false} otherwise.
      *
      * @type { boolean }
@@ -2138,7 +2144,7 @@ declare namespace radio {
 
     /**
      * Obtains the timestamp when the cell information is obtained.
-     * <p>
+     *
      * Returns a timestamp since boot, in nanoseconds.
      *
      * @type { number }
@@ -2151,7 +2157,6 @@ declare namespace radio {
     /**
      * An abstract method of the parent class whose implementation depends on the child classes.
      * Returned child class objects vary according to the network type.
-     * <p>
      * Returns child class objects specific to the network type.
      *
      * @type { SignalInformation }
@@ -2170,7 +2175,7 @@ declare namespace radio {
      * @since 8
      */
     data: CdmaCellInformation | GsmCellInformation | LteCellInformation | NrCellInformation | TdscdmaCellInformation
-    | WcdmaCellInformation;
+      | WcdmaCellInformation;
   }
 
   /**
@@ -2565,6 +2570,7 @@ declare namespace radio {
     /**
      * Indicates the primary scrambling code.
      *
+     * @type { number }
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
      * @since 8
