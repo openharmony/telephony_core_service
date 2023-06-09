@@ -54,7 +54,8 @@ enum class RegServiceState {
  */
 enum class RoamingType {
     /**
-     * Registered in a roaming network, but unknown the roaming type*/
+     * Registered in a roaming network, but unknown the roaming type
+     */
     ROAMING_STATE_UNKNOWN,
     /**
      * Not roaming
