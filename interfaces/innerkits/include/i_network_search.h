@@ -134,7 +134,7 @@ public:
     /**
      * @brief Get the airplane mode.
      *
-     * @param airplaneMode[out], true  if airplane is opening, false if airplane is closed
+     * @param airplaneMode[out], true if airplane is opening, false if airplane is closed
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     virtual int32_t GetAirplaneMode(bool &airplaneMode) = 0;

@@ -62,8 +62,7 @@ public:
      */
     int32_t GetLac() const;
     /**
-     * @brief On a UMTS network, return the primary scrambling code
-     * cell.
+     * @brief On a UMTS network, return the primary scrambling code cell
      *
      * @return Primary scrambling code for WCDMA, 0 if unknown or GSM
      */

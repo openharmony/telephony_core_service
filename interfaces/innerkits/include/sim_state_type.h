@@ -53,7 +53,7 @@ enum class CardType {
     DUAL_MODE_CG_CARD = 40,
 
     /**
-     * Icc card type:  Roaming Card (Dual Mode).
+     * Icc card type: Roaming Card (Dual Mode).
      */
     CT_NATIONAL_ROAMING_CARD = 41,
 
