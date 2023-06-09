@@ -146,7 +146,7 @@ public:
      *
      * @param telephonyObserver api callback
      * @param slotId sim slot id
-     * @param mask  listening type bitmask
+     * @param mask listening type bitmask
      * @param isUpdate Whether to update immediately
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */

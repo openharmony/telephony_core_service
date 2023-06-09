@@ -62,4 +62,4 @@ struct ImsRegInfo {
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif  // IMS_REG_TYPES_H
+#endif // IMS_REG_TYPES_H
