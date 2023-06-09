@@ -78,6 +78,7 @@ void CoreServiceStub::AddHandlerSimToMap()
     memberFuncMap_[uint32_t(InterfaceID::GET_SIM_SUB_INFO)] = &CoreServiceStub::OnGetSimSubscriptionInfo;
     memberFuncMap_[uint32_t(InterfaceID::SET_DEFAULT_VOICE_SLOTID)] = &CoreServiceStub::OnSetDefaultVoiceSlotId;
     memberFuncMap_[uint32_t(InterfaceID::GET_DEFAULT_VOICE_SLOTID)] = &CoreServiceStub::OnGetDefaultVoiceSlotId;
+    memberFuncMap_[uint32_t(InterfaceID::GET_DEFAULT_VOICE_SIMID)] = &CoreServiceStub::OnGetDefaultVoiceSimId;
     memberFuncMap_[uint32_t(InterfaceID::SET_PRIMARY_SLOTID)] = &CoreServiceStub::OnSetPrimarySlotId;
     memberFuncMap_[uint32_t(InterfaceID::GET_PRIMARY_SLOTID)] = &CoreServiceStub::OnGetPrimarySlotId;
 
@@ -701,6 +702,25 @@ int32_t CoreServiceStub::OnGetDefaultVoiceSlotId(MessageParcel &data, MessagePar
         return ERR_FLATTEN_OBJECT;
     }
     return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetDefaultVoiceSimId(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t simId = INVALID_VALUE;
+    int32_t result = GetDefaultVoiceSimId(simId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteInt32(simId)) {
+        TELEPHONY_LOGE("write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CoreServiceStub::OnSetPrimarySlotId(MessageParcel &data, MessageParcel &reply)

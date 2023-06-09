@@ -1713,7 +1713,7 @@ int32_t CoreManagerInner::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info
         TELEPHONY_LOGE("simManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetSimAccountInfo(slotId, info);
+    return simManager_->GetSimAccountInfo(slotId, false, info);
 }
 
 int32_t CoreManagerInner::SetDefaultVoiceSlotId(int32_t slotId)
@@ -1779,6 +1779,15 @@ int32_t CoreManagerInner::GetDefaultVoiceSlotId()
     return simManager_->GetDefaultVoiceSlotId();
 }
 
+int32_t CoreManagerInner::GetDefaultVoiceSimId(int32_t &simId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetDefaultVoiceSimId(simId);
+}
+
 int32_t CoreManagerInner::GetDefaultSmsSlotId()
 {
     if (simManager_ == nullptr) {
@@ -1788,6 +1797,15 @@ int32_t CoreManagerInner::GetDefaultSmsSlotId()
     return simManager_->GetDefaultSmsSlotId();
 }
 
+int32_t CoreManagerInner::GetDefaultSmsSimId(int32_t &simId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetDefaultSmsSimId(simId);
+}
+
 int32_t CoreManagerInner::GetDefaultCellularDataSlotId()
 {
     if (simManager_ == nullptr) {
@@ -1795,6 +1813,15 @@ int32_t CoreManagerInner::GetDefaultCellularDataSlotId()
         return TELEPHONY_ERROR;
     }
     return simManager_->GetDefaultCellularDataSlotId();
+}
+
+int32_t CoreManagerInner::GetDefaultCellularDataSimId(int32_t &simId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetDefaultCellularDataSimId(simId);
 }
 
 int32_t CoreManagerInner::GetDsdsMode(int32_t &dsdsMode)
@@ -1848,7 +1875,7 @@ int32_t CoreManagerInner::GetActiveSimAccountInfoList(std::vector<IccAccountInfo
         TELEPHONY_LOGE("simManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetActiveSimAccountInfoList(iccAccountInfoList);
+    return simManager_->GetActiveSimAccountInfoList(false, iccAccountInfoList);
 }
 
 int32_t CoreManagerInner::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)

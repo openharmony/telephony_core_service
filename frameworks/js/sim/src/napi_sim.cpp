@@ -476,6 +476,52 @@ napi_value GetDefaultVoiceSlotId(napi_env env, napi_callback_info info)
     return result;
 }
 
+void NativeGetDefaultVoiceSimId(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+
+    AsyncContext<int32_t> *asyncContext = &(static_cast<AsyncDefaultSimId *>(data)->asyncContext);
+    int32_t simId = 0;
+    int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDefaultVoiceSimId(simId);
+    TELEPHONY_LOGI("error: %{public}d", errorCode);
+    if (errorCode == ERROR_NONE) {
+        asyncContext->callbackVal = simId;
+        asyncContext->context.resolved = true;
+    } else {
+        asyncContext->context.resolved = false;
+    }
+    asyncContext->context.errorCode = errorCode;
+}
+
+void GetDefaultVoiceSimIdCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncDefaultSimId> context(static_cast<AsyncDefaultSimId *>(data));
+    NapiAsyncCompleteCallback(env, status, context->asyncContext, "get default voice sim id failed");
+}
+
+napi_value GetDefaultVoiceSimId(napi_env env, napi_callback_info info)
+{
+    auto asyncContext = new AsyncDefaultSimId();
+    BaseContext &context = asyncContext->asyncContext.context;
+
+    auto initPara = std::make_tuple(&context.callbackRef);
+    AsyncPara para {
+        .funcName = "GetDefaultVoiceSimId",
+        .env = env,
+        .info = info,
+        .execute = NativeGetDefaultVoiceSimId,
+        .complete = GetDefaultVoiceSimIdCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2<AsyncDefaultSimId>(para, asyncContext, initPara);
+    if (result) {
+        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+    }
+    return result;
+}
+
 void NativeGetIsoForSim(napi_env env, void *data)
 {
     if (data == nullptr) {
@@ -2621,6 +2667,7 @@ napi_status InitSimInterfaceAboutVoice(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("setDefaultVoiceSlotId", SetDefaultVoiceSlotId),
         DECLARE_NAPI_FUNCTION("getDefaultVoiceSlotId", GetDefaultVoiceSlotId),
+        DECLARE_NAPI_FUNCTION("getDefaultVoiceSimId", GetDefaultVoiceSimId),
         DECLARE_NAPI_FUNCTION("getVoiceMailIdentifier", GetVoiceMailIdentifier),
         DECLARE_NAPI_FUNCTION("getVoiceMailNumber", GetVoiceMailNumber),
         DECLARE_NAPI_FUNCTION("getVoiceMailCount", GetVoiceMailCount),
