@@ -624,7 +624,7 @@ struct RadioProtocol {
      */
     int32_t sessionId = 0;
     /**
-     * Radio protocol parameters. For details, see  RadioProtocolPhase.
+     * Radio protocol parameters. For details, see RadioProtocolPhase.
      */
     RadioProtocolPhase phase = RadioProtocolPhase::RADIO_PROTOCOL_PHASE_INITIAL;
     /**
@@ -648,7 +648,7 @@ struct RadioProtocol {
      */
     int32_t modemId = 0;
     /**
-     * Radio protocol status. For details, see  RadioProtocolStatus.
+     * Radio protocol status. For details, see RadioProtocolStatus.
      */
     RadioProtocolStatus status = RadioProtocolStatus::RADIO_PROTOCOL_STATUS_NONE;
 };

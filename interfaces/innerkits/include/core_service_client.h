@@ -125,7 +125,7 @@ public:
      *
      * @param slotId[in], sim slot id
      * @param isOn[in], turn on or turn off the radio service
-     * @param callback[out], the callback of r adio state
+     * @param callback[out], the callback of radio state
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback);
@@ -188,7 +188,7 @@ public:
      * @brief Obtain the service provider name
      *
      * @param slotId[in], sim slot id
-     * @param spn[out],  the service provider name of the SIM card
+     * @param spn[out], the service provider name of the SIM card
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetSimSpn(int32_t slotId, std::u16string &spn);
@@ -197,7 +197,7 @@ public:
      * @brief Obtain the integrated circuit card identity
      *
      * @param slotId[in], sim slot id
-     * @param iccId[out],  the integrated circuit card identity of the SIM card
+     * @param iccId[out], the integrated circuit card identity of the SIM card
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetSimIccId(int32_t slotId, std::u16string &iccId);
@@ -206,7 +206,7 @@ public:
      * @brief Obtain the international mobile subscriber identity
      *
      * @param slotId[in], sim slot id
-     * @param imsi[out],  the international mobile subscriber identity of the SIM card
+     * @param imsi[out], the international mobile subscriber identity of the SIM card
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetIMSI(int32_t slotId, std::u16string &imsi);
@@ -239,7 +239,7 @@ public:
      * @brief Obtain the callback of network search information
      *
      * @param slotId[in], sim slot id
-     * @param callback[out],  the callback of network search information
+     * @param callback[out], the callback of network search information
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
@@ -248,7 +248,7 @@ public:
      * @brief Obtain the callback of network selection mode
      *
      * @param slotId[in], sim slot id
-     * @param callback[out],  the callback of network selection mode
+     * @param callback[out], the callback of network selection mode
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetNetworkSelectionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
@@ -264,7 +264,7 @@ public:
      * @brief Obtain the group identifier level 1
      *
      * @param slotId[in], sim slot id
-     * @param gid1[out],  the group identifier level 1 of the SIM card
+     * @param gid1[out], the group identifier level 1 of the SIM card
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetSimGid1(int32_t slotId, std::u16string &gid1);
@@ -292,10 +292,10 @@ public:
      * @brief Set the network search mode
      *
      * @param slotId[in], sim slot id
-     * @param selectMode[in],  the network search mode of the SIM card
-     * @param networkInformation[in],  the network information
-     * @param resumeSelection[in],  whether to continue selecting the network selection mode
-     * @param callback[in],  the callback of set network selection mode
+     * @param selectMode[in], the network search mode of the SIM card
+     * @param networkInformation[in], the network information
+     * @param resumeSelection[in], whether to continue selecting the network selection mode
+     * @param callback[in], the callback of set network selection mode
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
@@ -306,7 +306,7 @@ public:
      * @brief Obtain the ISO-defined country code
      *
      * @param slotId[in], sim slot id
-     * @param countryCode[out],  the ISO-defined country code of the country where the registered network is deployed
+     * @param countryCode[out], the ISO-defined country code of the country where the registered network is deployed
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode);
@@ -315,7 +315,7 @@ public:
      * @brief Obtain the sim account information
      *
      * @param slotId[in], sim slot id
-     * @param info[out],  account information of SIM card
+     * @param info[out], account information of SIM card
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
@@ -742,7 +742,7 @@ public:
      * @param slotId[in], sim slot id
      * @param aid[in], app id
      * @param authData[in], authentication data
-     * @param response[out], the response of sim card  authentication
+     * @param response[out], the response of sim card authentication
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t SimAuthentication(
@@ -765,7 +765,7 @@ public:
     int32_t SetPrimarySlotId(int32_t slotId);
 
     /**
-     * @brief Obtain the cell  information list
+     * @brief Obtain the cell information list
      *
      * @param slotId[in], primary slot id
      * @param cellInfo[out], the current cell information of the SIM card
@@ -786,7 +786,7 @@ public:
      *
      * @param slotId[in], sim slot id
      * @param imsSrvType[in], ims service type
-     * @param callback[out], the callback of   ims register status info
+     * @param callback[out], the callback of ims register status info
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t RegisterImsRegInfoCallback(
@@ -805,7 +805,7 @@ public:
      * @brief Obtain the base band version
      *
      * @param slotId[in], sim slot id
-     * @param version[out], the  the baseband version of the SIM card
+     * @param version[out], the the baseband version of the SIM card
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetBasebandVersion(int32_t slotId, std::string &version);
