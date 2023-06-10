@@ -130,6 +130,8 @@ public:
 
     int32_t GetDefaultVoiceSlotId() override;
 
+    int32_t GetDefaultVoiceSimId(int32_t &simId) override;
+
     int32_t SetPrimarySlotId(int32_t slotId) override;
 
     int32_t GetPrimarySlotId(int32_t &slotId) override;

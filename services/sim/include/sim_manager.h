@@ -59,7 +59,7 @@ public:
     // SimAccount
     bool IsSimActive(int32_t slotId) override;
     int32_t SetActiveSim(int32_t slotId, int32_t enable) override;
-    int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) override;
+    int32_t GetSimAccountInfo(int32_t slotId, bool denied, IccAccountInfo &info) override;
     int32_t SetDefaultVoiceSlotId(int32_t slotId) override;
     int32_t SetDefaultSmsSlotId(int32_t slotId) override;
     int32_t SetDefaultCellularDataSlotId(int32_t slotId) override;
@@ -67,14 +67,17 @@ public:
     int32_t SetShowNumber(int32_t slotId, const std::u16string &number) override;
     int32_t SetShowName(int32_t slotId, const std::u16string &name) override;
     int32_t GetDefaultVoiceSlotId() override;
+    int32_t GetDefaultVoiceSimId(int32_t &simId) override;
     int32_t GetDefaultSmsSlotId() override;
+    int32_t GetDefaultSmsSimId(int32_t &simId) override;
     int32_t GetDefaultCellularDataSlotId() override;
+    int32_t GetDefaultCellularDataSimId(int32_t &simId) override;
     int32_t GetPrimarySlotId(int32_t &slotId) override;
     int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber) override;
     int32_t GetShowName(int32_t slotId, std::u16string &showName) override;
     int32_t GetSlotId(int32_t simId) override;
     int32_t GetSimId(int32_t slotId) override;
-    int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
+    int32_t GetActiveSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList) override;
     int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) override;
     int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) override;
     int32_t SimAuthentication(

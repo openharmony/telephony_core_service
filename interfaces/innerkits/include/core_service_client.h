@@ -68,6 +68,7 @@ public:
     int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
     int32_t SetDefaultVoiceSlotId(int32_t slotId);
     int32_t GetDefaultVoiceSlotId();
+    int32_t GetDefaultVoiceSimId(int32_t &simId);
     int32_t SetShowNumber(int32_t slotId, const std::u16string &number);
     int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber);
     int32_t SetShowName(int32_t slotId, const std::u16string &name);
