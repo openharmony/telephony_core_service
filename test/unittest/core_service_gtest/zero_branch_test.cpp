@@ -1107,10 +1107,10 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | L
     EXPECT_FALSE(multiSimController->ForgetAllData());
     EXPECT_FALSE(multiSimController->ForgetAllData(0));
     EXPECT_FALSE(multiSimController->IsValidData(0));
-    EXPECT_TRUE(multiSimController->AnnounceDefaultMainSlotIdChanged(0));
-    EXPECT_TRUE(multiSimController->AnnounceDefaultVoiceSlotIdChanged(0));
-    EXPECT_TRUE(multiSimController->AnnounceDefaultSmsSlotIdChanged(0));
-    EXPECT_TRUE(multiSimController->AnnounceDefaultCellularDataSlotIdChanged(0));
+    EXPECT_TRUE(multiSimController->AnnounceDefaultMainSimIdChanged(0));
+    EXPECT_TRUE(multiSimController->AnnounceDefaultVoiceSimIdChanged(0));
+    EXPECT_TRUE(multiSimController->AnnounceDefaultSmsSimIdChanged(0));
+    EXPECT_TRUE(multiSimController->AnnounceDefaultCellularDataSimIdChanged(0));
     AAFwk::Want want;
     EXPECT_FALSE(multiSimController->PublishSimFileEvent(want, 0, ""));
     EXPECT_FALSE(multiSimController->InitShowName(0));
@@ -1139,7 +1139,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
     EXPECT_NE(multiSimController->SetDefaultVoiceSlotId(0), TELEPHONY_ERR_SUCCESS);
     multiSimController->GetDefaultSmsSlotId();
     IccAccountInfo mIccAccountInfo;
-    EXPECT_NE(multiSimController->GetSimAccountInfo(0, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->GetSimAccountInfo(0, false, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
     multiSimController->GetDefaultCellularDataSlotId();
     EXPECT_NE(multiSimController->SetDefaultCellularDataSlotId(0), TELEPHONY_ERR_SUCCESS);
     multiSimController->GetPrimarySlotId();
@@ -1154,7 +1154,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
     int32_t imsSwitchValue;
     EXPECT_NE(multiSimController->QueryImsSwitch(0, imsSwitchValue), TELEPHONY_ERR_SUCCESS);
     std::vector<IccAccountInfo> iccAccountInfoList = {};
-    EXPECT_NE(multiSimController->GetActiveSimAccountInfoList(iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->GetActiveSimAccountInfoList(false, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
     multiSimController->radioProtocolController_ = nullptr;
     EXPECT_NE(multiSimController->GetRadioProtocolTech(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->GetFirstActivedSlotId(), TELEPHONY_ERR_SUCCESS);
@@ -1279,7 +1279,7 @@ HWTEST_F(BranchTest, Telephony_SimManager_003, Function | MediumTest | Level1)
     EXPECT_NE(simManager->GetSlotId(1), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->GetSimId(0), TELEPHONY_ERR_SUCCESS);
     std::vector<IccAccountInfo> iccAccountInfoList;
-    EXPECT_GT(simManager->GetActiveSimAccountInfoList(iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->GetActiveSimAccountInfoList(false, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
     OperatorConfig mOperatorConfig;
     EXPECT_GT(simManager->GetOperatorConfigs(0, mOperatorConfig), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->GetOperatorConfigs(INVALID_SLOTID, mOperatorConfig), TELEPHONY_ERR_SUCCESS);
@@ -1386,8 +1386,8 @@ HWTEST_F(BranchTest, Telephony_SimManager_005, Function | MediumTest | Level1)
     EXPECT_FALSE(simManager->IsSimActive(0));
     EXPECT_FALSE(simManager->IsSimActive(INVALID_SLOTID));
     IccAccountInfo mIccAccountInfo;
-    EXPECT_GT(simManager->GetSimAccountInfo(0, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->GetSimAccountInfo(INVALID_SLOTID, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->GetSimAccountInfo(0, false, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->GetSimAccountInfo(INVALID_SLOTID, false, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
 }
 
 /**

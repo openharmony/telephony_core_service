@@ -1099,6 +1099,33 @@ int32_t CoreServiceProxy::GetDefaultVoiceSlotId()
     return result;
 }
 
+int32_t CoreServiceProxy::GetDefaultVoiceSimId(int32_t &simId)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_DEFAULT_VOICE_SIMID), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    TELEPHONY_LOGI("end: result=%{public}d", result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        simId = reply.ReadInt32();
+    }
+    return result;
+}
+
 int32_t CoreServiceProxy::SetPrimarySlotId(int32_t slotId)
 {
     TELEPHONY_LOGI("CoreServiceProxy::SetPrimarySlotId slotId = %{public}d", slotId);
