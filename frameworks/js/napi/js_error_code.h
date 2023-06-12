@@ -22,6 +22,9 @@
 
 namespace OHOS {
 namespace Telephony {
+/**
+ * @brief Indicates the error code for JS.
+ */
 enum JsErrorCode {
     /**
      * Permission denied.

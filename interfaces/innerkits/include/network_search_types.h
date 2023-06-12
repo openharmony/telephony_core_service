@@ -26,8 +26,17 @@ constexpr const char *CUR_PLMN = "CUR_PLMN";
 constexpr const char *CUR_SPN_SHOW = "CUR_SPN_SHOW";
 constexpr const char *CUR_SPN = "CUR_SPN";
 
+/**
+ * @brief Domain type
+ */
 enum class DomainType {
+    /**
+     * Packet Switched (PS) domain
+     */
     DOMAIN_TYPE_PS,
+    /**
+     * Circuit Switched (CS) domain
+     */
     DOMAIN_TYPE_CS,
 };
 
@@ -40,15 +49,30 @@ enum class RegServiceState {
     REG_STATE_POWER_OFF
 };
 
+/**
+ * @brief Registered roaming type
+ */
 enum class RoamingType {
+    /**
+     * Registered in a roaming network, but unknown the roaming type
+     */
     ROAMING_STATE_UNKNOWN,
+    /**
+     * Not roaming
+     */
     ROAMING_STATE_UNSPEC,
+    /**
+     * Registered in a domestic roaming network
+     */
     ROAMING_STATE_DOMESTIC,
+    /**
+     * Registered in an international roaming network
+     */
     ROAMING_STATE_INTERNATIONAL
 };
 
 /**
- * Describes the radio access technology.
+ * @brief Describes the radio access technology.
  */
 enum class RadioTech {
     /**
@@ -132,7 +156,7 @@ enum class RadioTech {
 };
 
 /**
- * Describes the nsa sa state.
+ * @brief Describes the nsa sa state.
  */
 enum class NrState {
     /**
@@ -167,21 +191,41 @@ enum class NrState {
     NR_NSA_STATE_SA_ATTACHED = 6
 };
 
+/**
+ * @brief Describes the 5G New Radio (NR) mode.
+ */
 enum class NrMode {
-    /** Indicates unknown NR networking mode. */
+    /**
+     * Indicates unknown NR networking mode.
+     */
     NR_MODE_UNKNOWN,
 
-    /** Indicates that the NR networking mode is NSA only. */
+    /**
+     * Indicates that the NR networking mode is NSA only.
+     */
     NR_MODE_NSA_ONLY,
 
-    /** Indicates that the NR networking mode is SA only. */
+    /**
+     * Indicates that the NR networking mode is SA only.
+     */
     NR_MODE_SA_ONLY,
 
-    /** Indicates that the NR networking mode is NSA and SA. */
+    /**
+     * Indicates that the NR networking mode is NSA and SA.
+     */
     NR_MODE_NSA_AND_SA,
 };
 
-enum class FrequencyType { FREQ_TYPE_UNKNOWN = 0, FREQ_TYPE_MMWAVE };
+/**
+ * @brief Describes the frequency type.
+ */
+enum class FrequencyType {
+    FREQ_TYPE_UNKNOWN = 0,
+    /**
+     * Frequency range is millimeter wave frequency.
+     */
+    FREQ_TYPE_MMWAVE
+};
 
 enum class PhoneType { PHONE_TYPE_IS_NONE, PHONE_TYPE_IS_GSM, PHONE_TYPE_IS_CDMA };
 

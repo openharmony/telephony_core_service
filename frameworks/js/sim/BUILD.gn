@@ -36,7 +36,7 @@ ohos_shared_library("sim") {
     "core_service:tel_core_service_api",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "napi:ace_napi",
   ]
   defines = [

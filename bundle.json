@@ -51,12 +51,11 @@
                 "i18n",
                 "init",
                 "ipc",
-                "jsoncpp",
                 "napi",
                 "netmanager_base",
+                "netmanager_ext",
                 "power_manager",
                 "preferences",
-                "relational_store",
                 "resource_management",
                 "safwk",
                 "samgr",
@@ -64,14 +63,13 @@
                 "time_service"
             ],
             "third_party": [
-                "googletest",
-                "icu4c",
+                "icu",
                 "jsoncpp",
                 "libphonenumber",
                 "libxml2",
                 "node",
                 "openssl",
-                "protobuf"
+                "profiler"
             ]
         },
         "build": {
@@ -98,41 +96,14 @@
                 {
                     "header": {
                         "header_base" : "//base/telephony/core_service/interfaces/innerkits",
-                        "header_files": [
-                            "include/core_service_client.h",
-                            "include/i_core_service.h",
-                            "include/ims_reg_types.h",
-                            "include/telephony_errors.h",
-                            "include/cell_information.h",
-                            "include/cell_location.h",
-                            "include/network_information.h",
-                            "include/network_search_result.h",
-                            "include/network_state.h",
-                            "include/signal_information.h",
-                            "include/dialling_numbers_info.h",
-                            "include/sim_state_type.h",
-                            "ims/include/ims_core_service_callback_interface.h",
-                            "ims/include/ims_core_service_callback_proxy.h",
-                            "ims/include/ims_core_service_callback_stub.h",
-                            "ims/include/ims_core_service_client.h",
-                            "ims/include/ims_core_service_interface.h",
-                            "ims/include/ims_core_service_proxy.h",
-                            "ims/include/ims_core_service_types.h"
-                        ]
+                        "header_files": []
                     },
                     "name":"//base/telephony/core_service/interfaces/innerkits:tel_core_service_api"
                 },
                 {
                     "header": {
                         "header_base" : "//base/telephony/core_service/utils",
-                        "header_files": [
-                            "common/include/str_convert.h",
-                            "common/include/telephony_hisysevent.h",
-                            "common/include/telephony_permission.h",
-                            "log/include/telephony_log_c.h",
-                            "log/include/telephony_log_wrapper.h",
-                            "preferences/include/tel_profile_util.h"
-                        ]
+                        "header_files": []
                     },
                     "name":"//base/telephony/core_service/utils:libtel_common"
                 }
