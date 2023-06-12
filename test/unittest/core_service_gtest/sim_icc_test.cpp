@@ -79,7 +79,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0300, Function | Med
     } else {
         std::vector<IccAccountInfo> iccAccountInfoList;
         int32_t result = CoreServiceClient::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
-        EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 

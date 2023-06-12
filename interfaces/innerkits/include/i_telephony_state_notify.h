@@ -34,7 +34,8 @@ public:
         ADD_OBSERVER,
         REMOVE_OBSERVER,
         CFU_INDICATOR,
-        VOICE_MAIL_MSG_INDICATOR
+        VOICE_MAIL_MSG_INDICATOR,
+        ICC_ACCOUNT_CHANGE
     };
 
     /**
@@ -45,8 +46,7 @@ public:
      * @param networkState network state
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t UpdateCellularDataConnectState(
-        int32_t slotId, int32_t dataState, int32_t networkState) = 0;
+    virtual int32_t UpdateCellularDataConnectState(int32_t slotId, int32_t dataState, int32_t networkState) = 0;
 
     /**
      * UpdateCellularDataFlow
@@ -55,8 +55,7 @@ public:
      * @param dataFlowType cellular data flow state
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t UpdateCellularDataFlow(
-        int32_t slotId, int32_t dataFlowType) = 0;
+    virtual int32_t UpdateCellularDataFlow(int32_t slotId, int32_t dataFlowType) = 0;
 
     /**
      * UpdateSimState
@@ -67,8 +66,7 @@ public:
      * @param reason
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t UpdateSimState(
-        int32_t slotId, CardType type, SimState state, LockReason reason) = 0;
+    virtual int32_t UpdateSimState(int32_t slotId, CardType type, SimState state, LockReason reason) = 0;
 
     /**
      * UpdateCallState
@@ -78,8 +76,7 @@ public:
      * @param number call number
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t UpdateCallState(
-        int32_t slotId, int32_t callStatus, const std::u16string &number) = 0;
+    virtual int32_t UpdateCallState(int32_t slotId, int32_t callStatus, const std::u16string &number) = 0;
 
     /**
      * UpdateCallStateForSlotId
@@ -100,18 +97,16 @@ public:
      * @param vec networkType search signal information
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t UpdateSignalInfo(
-        int32_t slotId, const std::vector<sptr<SignalInformation>> &vec) = 0;
+    virtual int32_t UpdateSignalInfo(int32_t slotId, const std::vector<sptr<SignalInformation>> &vec) = 0;
 
     /**
-      * UpdateCellInfo
-      *
-      * @param slotId sim slot id
-      * @param vec cell info
-      * @return int32_t TELEPHONY_NO_ERROR on success, others on failure.
-      */
-    virtual int32_t UpdateCellInfo(
-        int32_t slotId, const std::vector<sptr<CellInformation>> &vec) = 0;
+     * UpdateCellInfo
+     *
+     * @param slotId sim slot id
+     * @param vec cell info
+     * @return int32_t TELEPHONY_NO_ERROR on success, others on failure.
+     */
+    virtual int32_t UpdateCellInfo(int32_t slotId, const std::vector<sptr<CellInformation>> &vec) = 0;
 
     /**
      * UpdateNetworkState
@@ -120,8 +115,7 @@ public:
      * @param networkStatus network status
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t UpdateNetworkState(
-        int32_t slotId, const sptr<NetworkState> &networkState) = 0;
+    virtual int32_t UpdateNetworkState(int32_t slotId, const sptr<NetworkState> &networkState) = 0;
 
     /**
      * Update call forward unconditionally indicator
@@ -131,6 +125,8 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     virtual int32_t UpdateCfuIndicator(int32_t slotId, bool cfuResult) = 0;
+
+    virtual int32_t UpdateIccAccount() = 0;
 
     /**
      * Update voice mail message indicator
@@ -146,12 +142,12 @@ public:
      *
      * @param telephonyObserver api callback
      * @param slotId sim slot id
-     * @param mask  listening type bitmask
+     * @param mask listening type bitmask
      * @param isUpdate Whether to update immediately
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t RegisterStateChange(const sptr<TelephonyObserverBroker> &telephonyObserver,
-        int32_t slotId, uint32_t mask, bool isUpdate) = 0;
+    virtual int32_t RegisterStateChange(
+        const sptr<TelephonyObserverBroker> &telephonyObserver, int32_t slotId, uint32_t mask, bool isUpdate) = 0;
 
     /**
      * UnregisterStateChange
