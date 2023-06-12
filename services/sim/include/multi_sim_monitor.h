@@ -26,6 +26,7 @@
 #include "system_ability_definition.h"
 #include "system_ability_status_change_stub.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_state_registry_client.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -104,4 +105,3 @@ private:
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_MULTI_SIM_MONITOR_H
-

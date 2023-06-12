@@ -115,7 +115,7 @@ void TelRilManager::InitTelModule(int32_t slotId)
 }
 std::shared_ptr<TelRilSms> TelRilManager::GetTelRilSms(int32_t slotId)
 {
-    if (slotId < 0 || slotId >= telRilSms_.size()) {
+    if (slotId < 0 || static_cast<size_t>(slotId) >= telRilSms_.size()) {
         TELEPHONY_LOGE("telRilSms_ slotId is valid");
         return nullptr;
     }
@@ -124,7 +124,7 @@ std::shared_ptr<TelRilSms> TelRilManager::GetTelRilSms(int32_t slotId)
 
 std::shared_ptr<TelRilSim> TelRilManager::GetTelRilSim(int32_t slotId)
 {
-    if (slotId < 0 || slotId >= telRilSim_.size()) {
+    if (slotId < 0 || static_cast<size_t>(slotId) >= telRilSim_.size()) {
         TELEPHONY_LOGE("telRilSim_ slotId is valid");
         return nullptr;
     }
@@ -133,7 +133,7 @@ std::shared_ptr<TelRilSim> TelRilManager::GetTelRilSim(int32_t slotId)
 
 std::shared_ptr<TelRilCall> TelRilManager::GetTelRilCall(int32_t slotId)
 {
-    if (slotId < 0 || slotId >= telRilCall_.size()) {
+    if (slotId < 0 || static_cast<size_t>(slotId) >= telRilCall_.size()) {
         TELEPHONY_LOGE("telRilCall_ slotId is valid");
         return nullptr;
     }
@@ -142,7 +142,7 @@ std::shared_ptr<TelRilCall> TelRilManager::GetTelRilCall(int32_t slotId)
 
 std::shared_ptr<TelRilData> TelRilManager::GetTelRilData(int32_t slotId)
 {
-    if (slotId < 0 || slotId >= telRilData_.size()) {
+    if (slotId < 0 || static_cast<size_t>(slotId) >= telRilData_.size()) {
         TELEPHONY_LOGE("telRilData_ slotId is valid");
         return nullptr;
     }
@@ -151,7 +151,7 @@ std::shared_ptr<TelRilData> TelRilManager::GetTelRilData(int32_t slotId)
 
 std::shared_ptr<TelRilNetwork> TelRilManager::GetTelRilNetwork(int32_t slotId)
 {
-    if (slotId < 0 || slotId >= telRilNetwork_.size()) {
+    if (slotId < 0 || static_cast<size_t>(slotId) >= telRilNetwork_.size()) {
         TELEPHONY_LOGE("telRilNetwork_ slotId is valid");
         return nullptr;
     }
@@ -160,7 +160,7 @@ std::shared_ptr<TelRilNetwork> TelRilManager::GetTelRilNetwork(int32_t slotId)
 
 std::shared_ptr<TelRilModem> TelRilManager::GetTelRilModem(int32_t slotId)
 {
-    if (slotId < 0 || slotId >= telRilModem_.size()) {
+    if (slotId < 0 || static_cast<size_t>(slotId) >= telRilModem_.size()) {
         TELEPHONY_LOGE("telRilModem_ slotId is valid");
         return nullptr;
     }

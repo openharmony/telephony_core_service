@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,14 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#ifndef SIM_TEST_H
-#define SIM_TEST_H
+#ifndef OHOS_SIM_TEST_UTIL_H
+#define OHOS_SIM_TEST_UTIL_H
 
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
 #include "core_service_client.h"
+#include "core_service_test_helper.h"
 #include "token_setproc.h"
 
 namespace OHOS {
@@ -28,7 +28,7 @@ using namespace testing::ext;
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 
-HapInfoParams testInfoParams = {
+inline HapInfoParams testInfoParams = {
     .bundleName = "tel_core_service_gtest",
     .userID = 1,
     .instIndex = 0,
@@ -36,7 +36,7 @@ HapInfoParams testInfoParams = {
     .isSystemApp = true,
 };
 
-PermissionDef testPermGetTelephonyStateDef = {
+inline PermissionDef testPermGetTelephonyStateDef = {
     .permissionName = "ohos.permission.GET_TELEPHONY_STATE",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -47,7 +47,7 @@ PermissionDef testPermGetTelephonyStateDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testGetTelephonyState = {
+inline PermissionStateFull testGetTelephonyState = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -55,7 +55,7 @@ PermissionStateFull testGetTelephonyState = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testPermSetTelephonyStateDef = {
+inline PermissionDef testPermSetTelephonyStateDef = {
     .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -66,7 +66,7 @@ PermissionDef testPermSetTelephonyStateDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testSetTelephonyState = {
+inline PermissionStateFull testSetTelephonyState = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -74,7 +74,7 @@ PermissionStateFull testSetTelephonyState = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testPermGetNetworkInfoDef = {
+inline PermissionDef testPermGetNetworkInfoDef = {
     .permissionName = "ohos.permission.GET_NETWORK_INFO",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -85,7 +85,7 @@ PermissionDef testPermGetNetworkInfoDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testPermGetNetworkInfo = {
+inline PermissionStateFull testPermGetNetworkInfo = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -93,7 +93,7 @@ PermissionStateFull testPermGetNetworkInfo = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testSimPermWriteContactsDef  = {
+inline PermissionDef testSimPermWriteContactsDef  = {
     .permissionName = "ohos.permission.WRITE_CONTACTS",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -104,7 +104,7 @@ PermissionDef testSimPermWriteContactsDef  = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testSimPermWriteContacts = {
+inline PermissionStateFull testSimPermWriteContacts = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -112,7 +112,7 @@ PermissionStateFull testSimPermWriteContacts = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testSimPermReadContactsDef = {
+inline PermissionDef testSimPermReadContactsDef = {
     .permissionName = "ohos.permission.READ_CONTACTS",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -123,7 +123,7 @@ PermissionDef testSimPermReadContactsDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testSimPermReadContacts = {
+inline PermissionStateFull testSimPermReadContacts = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -131,7 +131,7 @@ PermissionStateFull testSimPermReadContacts = {
     .resDeviceID = { "local" },
 };
 
-HapPolicyParams testPolicyParams = {
+inline HapPolicyParams testPolicyParams = {
     .apl = APL_SYSTEM_BASIC,
     .domain = "test.domain",
     .permList = { testPermGetTelephonyStateDef, testPermSetTelephonyStateDef, testPermGetNetworkInfoDef,
@@ -176,7 +176,54 @@ public:
     static const int32_t slotId1_ = 1;
     static const int32_t slotIdErr_ = -1;
     static const int32_t simId = 1;
+
+private:
+    static void CompareOperatorConfProcess(OperatorConfig poc);
+    static void QueryIccAdnDiallingNumbersTestFunc(CoreServiceTestHelper &helper);
+    static void QueryIccAdnDiallingNumbersTestFunc1(CoreServiceTestHelper &helper);
+    static void QueryIccFdnDiallingNumbersTestFunc(CoreServiceTestHelper &helper);
+    static void QueryIccFdnDiallingNumbersTestFunc1(CoreServiceTestHelper &helper);
+    static void SetLockStateTestFunc(CoreServiceTestHelper &helper);
+    static void SetLockStateTestFunc1(CoreServiceTestHelper &helper);
+    static void SetFDNStateTestFunc(CoreServiceTestHelper &helper);
+    static void SetFDNStateTestFunc1(CoreServiceTestHelper &helper);
+    static void GetLockStateTestFunc(CoreServiceTestHelper &helper);
+    static void GetLockStateTestFunc1(CoreServiceTestHelper &helper);
+    static void GetFDNStateTestFunc(CoreServiceTestHelper &helper);
+    static void GetFDNStateTestFunc1(CoreServiceTestHelper &helper);
+    static void UnlockPinTestFunc(CoreServiceTestHelper &helper);
+    static void UnlockPinTestFunc1(CoreServiceTestHelper &helper);
+    static void UnlockPukTestFunc(CoreServiceTestHelper &helper);
+    static void UnlockPukTestFunc1(CoreServiceTestHelper &helper);
+    static void AlterPinTestFunc(CoreServiceTestHelper &helper);
+    static void AlterPinTestFunc1(CoreServiceTestHelper &helper);
+    static void UnlockPin2TestFunc(CoreServiceTestHelper &helper);
+    static void UnlockPin2TestFunc1(CoreServiceTestHelper &helper);
+    static void UnlockPuk2TestFunc(CoreServiceTestHelper &helper);
+    static void UnlockPuk2TestFunc1(CoreServiceTestHelper &helper);
+    static void AlterPin2TestFunc(CoreServiceTestHelper &helper);
+    static void AlterPin2TestFunc1(CoreServiceTestHelper &helper);
+    static void SetActiveSimTestFunc(CoreServiceTestHelper &helper);
+    static void SetActiveSimTestFunc1(CoreServiceTestHelper &helper);
+    static void ReSetActiveSimTestFunc(CoreServiceTestHelper &helper);
+    static void ReSetActiveSimTestFunc1(CoreServiceTestHelper &helper);
+    static void HasOperatorPrivileges(CoreServiceTestHelper &helper);
+    static void HasOperatorPrivileges1(CoreServiceTestHelper &helper);
+    static void UnlockSimLockTestFunc(CoreServiceTestHelper &helper);
+    static void UnlockSimLockTestFunc1(CoreServiceTestHelper &helper);
+    static void SimAuthenticationTestFunc(CoreServiceTestHelper &helper);
+    static void SimAuthenticationTestFunc1(CoreServiceTestHelper &helper);
+    static void SimAuthenticationTestFunc2(CoreServiceTestHelper &helper);
+    static void SimAuthenticationTestFunc3(CoreServiceTestHelper &helper);
+    static void SendTerminalResponseCmdTestFunc(CoreServiceTestHelper &helper);
+    static void SendTerminalResponseCmdTestFunc1(CoreServiceTestHelper &helper);
+    static void SendEnvelopeCmdTestFunc(CoreServiceTestHelper &helper);
+    static void SendEnvelopeCmdTestFunc1(CoreServiceTestHelper &helper);
+    static void SendCallSetupRequestResultTestFunc(CoreServiceTestHelper &helper);
+    static void SendCallSetupRequestResultTestFunc1(CoreServiceTestHelper &helper);
+    static void SetVoiceMailInfoTestFunc(CoreServiceTestHelper &helper);
+    static void SetVoiceMailInfoTestFunc1(CoreServiceTestHelper &helper);
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // SIM_TEST_H
+#endif // OHOS_SIM_TEST_UTIL_H
