@@ -29,11 +29,11 @@ static const int32_t DEFAULT_SLOT_ID = 0;
 static const int32_t EVENT_CODE = 1;
 static const int32_t ACTIVATABLE = 2;
 static const int32_t IMS_SWITCH_VALUE_UNKNOWN = -1;
-static const std::string PARAM_SLOTID = "slotId";
-static const std::string DEFAULT_VOICE_SLOT_CHANGED = "defaultVoiceSlotChanged";
-static const std::string DEFAULT_SMS_SLOT_CHANGED = "defaultSmsSlotChanged";
-static const std::string DEFAULT_CELLULAR_DATA_SLOT_CHANGED = "defaultCellularDataChanged";
-static const std::string DEFAULT_MAIN_SLOT_CHANGED = "defaultMainSlotChanged";
+static const std::string PARAM_SIMID = "simId";
+static const std::string DEFAULT_VOICE_SIMID_CHANGED = "defaultVoiceSimIdChanged";
+static const std::string DEFAULT_SMS_SIMID_CHANGED = "defaultSmsSimIdChanged";
+static const std::string DEFAULT_CELLULAR_DATA_SIMID_CHANGED = "defaultCellularDataSimIdChanged";
+static const std::string DEFAULT_MAIN_SIMID_CHANGED = "defaultMainSimIdChanged";
 
 MultiSimController::MultiSimController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
@@ -451,7 +451,7 @@ bool MultiSimController::SetActiveSimToRil(int32_t slotId, int32_t type, int32_t
     return radioProtocolController_->GetActiveSimToRilResult() == static_cast<int32_t>(HRilErrType::NONE);
 }
 
-int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
+int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, bool denied, IccAccountInfo &info)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (!IsValidData(slotId)) {
@@ -470,9 +470,11 @@ int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, IccAccountInfo &in
     info.simId = localCacheInfo_[slotId].simId;
     info.isActive = localCacheInfo_[slotId].isActive;
     info.showName = Str8ToStr16(localCacheInfo_[slotId].showName);
-    info.showNumber = Str8ToStr16(localCacheInfo_[slotId].phoneNumber);
-    info.iccId = Str8ToStr16(localCacheInfo_[slotId].iccId);
     info.isEsim = false;
+    if (!denied) {
+        info.showNumber = Str8ToStr16(localCacheInfo_[slotId].phoneNumber);
+        info.iccId = Str8ToStr16(localCacheInfo_[slotId].iccId);
+    }
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -531,7 +533,12 @@ int32_t MultiSimController::SetDefaultVoiceSlotId(int32_t slotId)
         }
         localCacheInfo_[i].isVoiceCard = NOT_MAIN;
     }
-    if (!AnnounceDefaultVoiceSlotIdChanged(slotId)) {
+    if (localCacheInfo_[slotId].simId == defaultVoiceSimId_) {
+        TELEPHONY_LOGE("no need to AnnounceDefaultVoiceSimIdChanged");
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    defaultVoiceSimId_ = localCacheInfo_[slotId].simId;
+    if (!AnnounceDefaultVoiceSimIdChanged(slotId)) {
         return TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL;
     }
     return TELEPHONY_ERR_SUCCESS;
@@ -589,7 +596,12 @@ int32_t MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
         }
         localCacheInfo_[i].isMessageCard = NOT_MAIN;
     }
-    if (!AnnounceDefaultSmsSlotIdChanged(slotId)) {
+    if (localCacheInfo_[slotId].simId == defaultSmsSimId_) {
+        TELEPHONY_LOGE("no need to AnnounceDefaultSmsSimIdChanged");
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    defaultSmsSimId_ = localCacheInfo_[slotId].simId;
+    if (!AnnounceDefaultSmsSimIdChanged(slotId)) {
         return TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL;
     }
     return TELEPHONY_ERR_SUCCESS;
@@ -635,7 +647,12 @@ int32_t MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
         localCacheInfo_[i].isCellularDataCard = NOT_MAIN;
     }
     CoreServiceHiSysEvent::WriteDefaultDataSlotIdBehaviorEvent(slotId);
-    if (!AnnounceDefaultCellularDataSlotIdChanged(slotId)) {
+    if (localCacheInfo_[slotId].simId == defaultCellularSimId_) {
+        TELEPHONY_LOGE("no need to defaultCellularSimId_");
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    defaultCellularSimId_ = localCacheInfo_[slotId].simId;
+    if (!AnnounceDefaultCellularDataSimIdChanged(defaultCellularSimId_)) {
         TELEPHONY_LOGE("publish broadcast failed");
         return TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL;
     }
@@ -720,7 +737,12 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
         localCacheInfo_[i].isMainCard = NOT_MAIN;
         localCacheInfo_[i].isCellularDataCard = NOT_MAIN;
     }
-    if (!AnnounceDefaultMainSlotIdChanged(slotId)) {
+    if (localCacheInfo_[slotId].simId == primarySimId_) {
+        TELEPHONY_LOGE("no need to AnnounceDefaultMainSimIdChanged");
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    primarySimId_ = localCacheInfo_[slotId].simId;
+    if (!AnnounceDefaultMainSimIdChanged(slotId)) {
         TELEPHONY_LOGE("publish broadcast failed");
         return TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL;
     }
@@ -847,43 +869,43 @@ bool MultiSimController::SetIccId(int32_t slotId, std::u16string iccId)
     return true;
 }
 
-bool MultiSimController::AnnounceDefaultVoiceSlotIdChanged(int32_t slotId)
+bool MultiSimController::AnnounceDefaultVoiceSimIdChanged(int32_t simId)
 {
     AAFwk::Want want;
-    want.SetParam(PARAM_SLOTID, slotId);
+    want.SetParam(PARAM_SIMID, simId);
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_VOICE_SUBSCRIPTION_CHANGED);
     int32_t eventCode = EVENT_CODE;
-    std::string eventData(DEFAULT_VOICE_SLOT_CHANGED);
+    std::string eventData(DEFAULT_VOICE_SIMID_CHANGED);
     return PublishSimFileEvent(want, eventCode, eventData);
 }
 
-bool MultiSimController::AnnounceDefaultSmsSlotIdChanged(int32_t slotId)
+bool MultiSimController::AnnounceDefaultSmsSimIdChanged(int32_t simId)
 {
     AAFwk::Want want;
-    want.SetParam(PARAM_SLOTID, slotId);
+    want.SetParam(PARAM_SIMID, simId);
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_SMS_SUBSCRIPTION_CHANGED);
     int32_t eventCode = EVENT_CODE;
-    std::string eventData(DEFAULT_SMS_SLOT_CHANGED);
+    std::string eventData(DEFAULT_SMS_SIMID_CHANGED);
     return PublishSimFileEvent(want, eventCode, eventData);
 }
 
-bool MultiSimController::AnnounceDefaultCellularDataSlotIdChanged(int32_t slotId)
+bool MultiSimController::AnnounceDefaultCellularDataSimIdChanged(int32_t simId)
 {
     AAFwk::Want want;
-    want.SetParam(PARAM_SLOTID, slotId);
+    want.SetParam(PARAM_SIMID, simId);
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED);
     int32_t eventCode = EVENT_CODE;
-    std::string eventData(DEFAULT_CELLULAR_DATA_SLOT_CHANGED);
+    std::string eventData(DEFAULT_CELLULAR_DATA_SIMID_CHANGED);
     return PublishSimFileEvent(want, eventCode, eventData);
 }
 
-bool MultiSimController::AnnounceDefaultMainSlotIdChanged(int32_t slotId)
+bool MultiSimController::AnnounceDefaultMainSimIdChanged(int32_t simId)
 {
     AAFwk::Want want;
-    want.SetParam(PARAM_SLOTID, slotId);
+    want.SetParam(PARAM_SIMID, simId);
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_MAIN_SUBSCRIPTION_CHANGED);
     int32_t eventCode = EVENT_CODE;
-    std::string eventData(DEFAULT_MAIN_SLOT_CHANGED);
+    std::string eventData(DEFAULT_MAIN_SIMID_CHANGED);
     return PublishSimFileEvent(want, eventCode, eventData);
 }
 
@@ -929,7 +951,7 @@ int32_t MultiSimController::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchVal
     return TELEPHONY_SUCCESS;
 }
 
-int32_t MultiSimController::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList)
+int32_t MultiSimController::GetActiveSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList)
 {
     if (!RefreshActiveIccAccountInfoList()) {
         TELEPHONY_LOGE("refresh failed");
@@ -939,6 +961,10 @@ int32_t MultiSimController::GetActiveSimAccountInfoList(std::vector<IccAccountIn
     std::vector<IccAccountInfo>::iterator it = iccAccountInfoList_.begin();
     while (it != iccAccountInfoList_.end()) {
         TELEPHONY_LOGI("slotIndex=%{public}d", it->slotIndex);
+        if (denied) {
+            it->iccId = u"";
+            it->showNumber = u"";
+        }
         iccAccountInfoList.emplace_back(*it);
         ++it;
     }

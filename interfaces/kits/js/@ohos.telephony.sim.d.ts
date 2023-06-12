@@ -725,9 +725,8 @@ declare namespace sim {
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @param { AsyncCallback<IccAccountInfo> } callback - Indicates the callback for
-   * getting a {@code IccAccountInfo} object.
-   * @throws { BusinessError } 201 - Permission denied.
-   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * getting a {@code IccAccountInfo} object. The ICCID and phone number will be null
+   * if has no ohos.permission.GET_TELEPHONY_STATE.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 8300001 - Invalid parameter value.
    * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
@@ -736,8 +735,7 @@ declare namespace sim {
    * @throws { BusinessError } 8300999 - Unknown error code.
    * @throws { BusinessError } 8301002 - SIM card operation error.
    * @syscap SystemCapability.Telephony.CoreService
-   * @systemapi Hide this for inner system use.
-   * @since 7
+   * @since 10
    */
   function getSimAccountInfo(slotId: number, callback: AsyncCallback<IccAccountInfo>): void;
 
@@ -747,9 +745,8 @@ declare namespace sim {
    * @permission ohos.permission.GET_TELEPHONY_STATE
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns { Promise<IccAccountInfo> } Returns a {@code IccAccountInfo} object.
-   * @throws { BusinessError } 201 - Permission denied.
-   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @returns { Promise<IccAccountInfo> } Returns a {@code IccAccountInfo} object. The ICCID and phone number
+   * will be null if has no ohos.permission.GET_TELEPHONY_STATE.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 8300001 - Invalid parameter value.
    * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
@@ -758,8 +755,7 @@ declare namespace sim {
    * @throws { BusinessError } 8300999 - Unknown error code.
    * @throws { BusinessError } 8301002 - SIM card operation error.
    * @syscap SystemCapability.Telephony.CoreService
-   * @systemapi Hide this for inner system use.
-   * @since 7
+   * @since 10
    */
   function getSimAccountInfo(slotId: number): Promise<IccAccountInfo>;
 
@@ -768,9 +764,8 @@ declare namespace sim {
    *
    * @permission ohos.permission.GET_TELEPHONY_STATE
    * @param { AsyncCallback<Array<IccAccountInfo>> } callback - The callback is used to
-   * return the array of {@link IccAccountInfo}.
-   * @throws { BusinessError } 201 - Permission denied.
-   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * return the array of {@link IccAccountInfo}. The ICCID and phone number will be null
+   * if has no ohos.permission.GET_TELEPHONY_STATE.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 8300001 - Invalid parameter value.
    * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
@@ -778,8 +773,7 @@ declare namespace sim {
    * @throws { BusinessError } 8300004 - Do not have sim card.
    * @throws { BusinessError } 8300999 - Unknown error code.
    * @syscap SystemCapability.Telephony.CoreService
-   * @systemapi Hide this for inner system use.
-   * @since 8
+   * @since 10
    */
   function getActiveSimAccountInfoList(callback: AsyncCallback<Array<IccAccountInfo>>): void;
 
@@ -787,16 +781,14 @@ declare namespace sim {
    * Get the list of active SIM card account information.
    *
    * @permission ohos.permission.GET_TELEPHONY_STATE
-   * @returns { Promise<Array<IccAccountInfo>> } Returns the array of {@link IccAccountInfo}.
-   * @throws { BusinessError } 201 - Permission denied.
-   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @returns { Promise<Array<IccAccountInfo>> } Returns the array of {@link IccAccountInfo}. The ICCID
+   * and phone number will be null if has no ohos.permission.GET_TELEPHONY_STATE.
    * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
    * @throws { BusinessError } 8300003 - System internal error.
    * @throws { BusinessError } 8300004 - Do not have sim card.
    * @throws { BusinessError } 8300999 - Unknown error code.
    * @syscap SystemCapability.Telephony.CoreService
-   * @systemapi Hide this for inner system use.
-   * @since 8
+   * @since 10
    */
   function getActiveSimAccountInfoList(): Promise<Array<IccAccountInfo>>;
 
@@ -2021,6 +2013,38 @@ declare namespace sim {
   function getOpName(slotId: number): Promise<string>;
 
   /**
+   * Obtains the default SIM ID for the voice service.
+   *
+   * @param { AsyncCallback<number> } callback - Returns the SIM ID of the default voice sim
+   * and SIM ID will increase from 1.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300004 - Do not have sim card.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @throws { BusinessError } 8301001 - SIM card is not activated.
+   * @since 10
+   */
+  function getDefaultVoiceSimId(callback: AsyncCallback<number>): void;
+
+  /**
+   * Obtains the default SIM ID for the voice service.
+   *
+   * @returns { Promise<number> } Returns the SIM ID of the default voice sim
+   * and SIM ID will increase from 1.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300004 - Do not have sim card.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @throws { BusinessError } 8301001 - SIM card is not activated.
+   * @since 10
+   */
+  function getDefaultVoiceSimId(): Promise<number>;
+
+  /**
    * Defines the carrier configuration.
    *
    * @interface OperatorConfig
@@ -2153,7 +2177,7 @@ declare namespace sim {
     /**
      * Indicates the operations remaining.
      *
-     * @type { number }
+     * @type { ?number }
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
      * @since 7
@@ -2193,7 +2217,7 @@ declare namespace sim {
     /**
      * Indicates the record number.
      *
-     * @type { number }
+     * @type { ?number }
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
      * @since 8
@@ -2203,7 +2227,7 @@ declare namespace sim {
     /**
      * Indicates the PIN 2.
      *
-     * @type { string }
+     * @type { ?string }
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
      * @since 8
@@ -2742,7 +2766,7 @@ declare namespace sim {
      * @since 9
      */
     KEY_IMS_CALL_DISCONNECT_REASON_INFO_MAPPING_STRING_ARRAY =
-    "ims_call_disconnect_reason_info_mapping_string_array",
+        "ims_call_disconnect_reason_info_mapping_string_array",
 
     /**
      * Indicates the forced Volte switch on state.

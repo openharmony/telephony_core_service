@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_TEL_RIL_TEST_H
-#define OHOS_TEL_RIL_TEST_H
+#ifndef OHOS_TEL_RIL_TEST_UTIL_H
+#define OHOS_TEL_RIL_TEST_UTIL_H
 
 #include <condition_variable>
 #include <gtest/gtest.h>
@@ -281,6 +281,12 @@ private:
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     std::map<DiffInterfaceId, RilManagerAndResponseTestFun> memberFuncMap_;
 };
+
+#ifndef TEL_TEST_UNSUPPORT
+inline const int32_t SLOT_ID_0 = 0;
+inline const int32_t SLOT_ID_1 = 1;
+#endif // TEL_TEST_UNSUPPORT
+
 } // namespace Telephony
 } // namespace OHOS
-#endif // OHOS_TEL_RIL_TEST_H
+#endif // OHOS_TEL_RIL_TEST_UTIL_H

@@ -62,6 +62,7 @@ public:
     int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) override;
     int32_t SetDefaultVoiceSlotId(int32_t slotId) override;
     int32_t GetDefaultVoiceSlotId() override;
+    int32_t GetDefaultVoiceSimId(int32_t &simId) override;
     int32_t GetPrimarySlotId(int32_t &slotId) override;
     int32_t SetPrimarySlotId(int32_t slotId) override;
     int32_t SetShowNumber(int32_t slotId, const std::u16string &number) override;

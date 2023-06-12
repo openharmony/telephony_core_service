@@ -185,6 +185,16 @@ int32_t TelephonyStateRegistryClient::UpdateVoiceMailMsgIndicator(int32_t slotId
     }
     return proxy->UpdateVoiceMailMsgIndicator(slotId, voiceMailMsgResult);
 }
+
+int32_t TelephonyStateRegistryClient::UpdateIccAccount()
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->UpdateIccAccount();
+}
 } // namespace Telephony
 }
 

@@ -27,8 +27,13 @@ ohos_unittest("tel_core_service_gtest") {
     "ims_reg_info_callback_gtest.cpp",
     "network_search_test.cpp",
     "network_search_test_callback_stub.cpp",
+    "sim_core_service_test.cpp",
+    "sim_elementary_file_test.cpp",
+    "sim_icc_test.cpp",
     "sim_operator_brocast_test.cpp",
     "sim_test.cpp",
+    "sim_test_util.cpp",
+    "sim_type_convert_test.cpp",
     "zero_branch_test.cpp",
   ]
 

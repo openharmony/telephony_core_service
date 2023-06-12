@@ -15,7 +15,7 @@
 
 #include "telephony_state_registry_proxy.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "cell_information.h"
 #include "i_telephony_state_notify.h"
@@ -399,6 +399,25 @@ int32_t TelephonyStateRegistryProxy::UpdateVoiceMailMsgIndicator(int32_t slotId,
     }
     int result = remote->SendRequest(
         static_cast<uint32_t>(StateNotifyCode::VOICE_MAIL_MSG_INDICATOR), in, out, option);
+    if (result == ERR_NONE) {
+        result = out.ReadInt32();
+        return result;
+    }
+    return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+}
+
+int32_t TelephonyStateRegistryProxy::UpdateIccAccount()
+{
+    MessageOption option;
+    MessageParcel in, out;
+    if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int result = remote->SendRequest(static_cast<uint32_t>(StateNotifyCode::ICC_ACCOUNT_CHANGE), in, out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();
         return result;

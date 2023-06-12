@@ -115,6 +115,7 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t UpdateVoiceMailMsgIndicator(int32_t slotId, bool voiceMailMsgResult);
+    int32_t UpdateIccAccount();
     sptr<ITelephonyStateNotify> GetProxy();
 
 private:
