@@ -83,6 +83,7 @@ public:
     virtual int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) = 0;
     virtual int32_t SetDefaultVoiceSlotId(int32_t slotId) = 0;
     virtual int32_t GetDefaultVoiceSlotId() = 0;
+    virtual int32_t GetDefaultVoiceSimId(int32_t &simId) = 0;
     virtual int32_t SetPrimarySlotId(int32_t slotId) = 0;
     virtual int32_t GetPrimarySlotId(int32_t &slotId) = 0;
     virtual int32_t SetShowNumber(int32_t slotId, const std::u16string &number) = 0;
@@ -177,6 +178,7 @@ public:
         GET_SIM_SUB_INFO,
         SET_DEFAULT_VOICE_SLOTID,
         GET_DEFAULT_VOICE_SLOTID,
+        GET_DEFAULT_VOICE_SIMID,
         SET_PRIMARY_SLOTID,
         GET_PRIMARY_SLOTID,
         SET_DEFAULT_DATA_SLOTID,

@@ -204,6 +204,7 @@ void MultiSimMonitor::NotifySimAccountChanged()
     if (!isExisted) {
         TELEPHONY_LOGI("SimAccountCallback has not been registered");
     }
+    DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateIccAccount();
 }
 
 void MultiSimMonitor::RegisterSimNotify()

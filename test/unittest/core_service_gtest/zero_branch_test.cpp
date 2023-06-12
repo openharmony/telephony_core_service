@@ -770,31 +770,6 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_002, Function | MediumTest | Lev
     EXPECT_GT(mInner.GetOperatorInfo(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetCellInfoList(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetCurrentCellInfo(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
-    GsmSimMessageParam mGsmSimMessageParam;
-    EXPECT_GT(mInner.SendGsmSms(0, 0, mGsmSimMessageParam, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.SendSmsMoreMode(0, 0, mGsmSimMessageParam, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.SendCdmaSms(0, 0, "", 0L, nullptr), TELEPHONY_ERR_SUCCESS);
-    SimMessageParam mSimMessageParam;
-    EXPECT_GT(mInner.AddSimMessage(0, 0, mSimMessageParam, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.GetCdmaCBConfig(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.SetSmscAddr(0, 0, 0, "", nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.DelSimMessage(0, 0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.SendSmsAck(0, 0, true, 0, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.GetCBConfig(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
-    CBConfigParam mCBConfigParam;
-    EXPECT_GT(mInner.SetCBConfig(0, 0, mCBConfigParam, nullptr), TELEPHONY_ERR_SUCCESS);
-    CdmaCBConfigInfoList mCdmaCBConfigInfoList;
-    EXPECT_GT(mInner.SetCdmaCBConfig(0, 0, mCdmaCBConfigInfoList, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.GetNetworkSearchInformation(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.GetNetworkSelectionMode(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.AddCdmaSimMessage(0, 0, 0, "", nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.DelCdmaSimMessage(0, 0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
-    CdmaSimMessageParam mCdmaSimMessageParam;
-    EXPECT_GT(mInner.UpdateCdmaSimMessage(0, 0, mCdmaSimMessageParam, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.SetPreferredNetworkPara(0, 0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.GetPreferredNetworkPara(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
-    std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
-    EXPECT_GT(mInner.QueryIccDiallingNumbers(0, 0, result), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1013,6 +988,41 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_006, Function | MediumTest | Lev
 }
 
 /**
+ * @tc.number   Telephony_CoreManagerInner_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CoreManagerInner_007, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+    GsmSimMessageParam mGsmSimMessageParam;
+    EXPECT_GT(mInner.SendGsmSms(0, 0, mGsmSimMessageParam, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.SendSmsMoreMode(0, 0, mGsmSimMessageParam, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.SendCdmaSms(0, 0, "", 0L, nullptr), TELEPHONY_ERR_SUCCESS);
+    SimMessageParam mSimMessageParam;
+    EXPECT_GT(mInner.AddSimMessage(0, 0, mSimMessageParam, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetCdmaCBConfig(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.SetSmscAddr(0, 0, 0, "", nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.DelSimMessage(0, 0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.SendSmsAck(0, 0, true, 0, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetCBConfig(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
+    CBConfigParam mCBConfigParam;
+    EXPECT_GT(mInner.SetCBConfig(0, 0, mCBConfigParam, nullptr), TELEPHONY_ERR_SUCCESS);
+    CdmaCBConfigInfoList mCdmaCBConfigInfoList;
+    EXPECT_GT(mInner.SetCdmaCBConfig(0, 0, mCdmaCBConfigInfoList, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetNetworkSearchInformation(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetNetworkSelectionMode(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.AddCdmaSimMessage(0, 0, 0, "", nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.DelCdmaSimMessage(0, 0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
+    CdmaSimMessageParam mCdmaSimMessageParam;
+    EXPECT_GT(mInner.UpdateCdmaSimMessage(0, 0, mCdmaSimMessageParam, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.SetPreferredNetworkPara(0, 0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetPreferredNetworkPara(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
+    EXPECT_GT(mInner.QueryIccDiallingNumbers(0, 0, result), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
  * @tc.number   Telephony_TagService_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1097,10 +1107,10 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | L
     EXPECT_FALSE(multiSimController->ForgetAllData());
     EXPECT_FALSE(multiSimController->ForgetAllData(0));
     EXPECT_FALSE(multiSimController->IsValidData(0));
-    EXPECT_TRUE(multiSimController->AnnounceDefaultMainSlotIdChanged(0));
-    EXPECT_TRUE(multiSimController->AnnounceDefaultVoiceSlotIdChanged(0));
-    EXPECT_TRUE(multiSimController->AnnounceDefaultSmsSlotIdChanged(0));
-    EXPECT_TRUE(multiSimController->AnnounceDefaultCellularDataSlotIdChanged(0));
+    EXPECT_TRUE(multiSimController->AnnounceDefaultMainSimIdChanged(0));
+    EXPECT_TRUE(multiSimController->AnnounceDefaultVoiceSimIdChanged(0));
+    EXPECT_TRUE(multiSimController->AnnounceDefaultSmsSimIdChanged(0));
+    EXPECT_TRUE(multiSimController->AnnounceDefaultCellularDataSimIdChanged(0));
     AAFwk::Want want;
     EXPECT_FALSE(multiSimController->PublishSimFileEvent(want, 0, ""));
     EXPECT_FALSE(multiSimController->InitShowName(0));
@@ -1129,7 +1139,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
     EXPECT_NE(multiSimController->SetDefaultVoiceSlotId(0), TELEPHONY_ERR_SUCCESS);
     multiSimController->GetDefaultSmsSlotId();
     IccAccountInfo mIccAccountInfo;
-    EXPECT_NE(multiSimController->GetSimAccountInfo(0, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->GetSimAccountInfo(0, false, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
     multiSimController->GetDefaultCellularDataSlotId();
     EXPECT_NE(multiSimController->SetDefaultCellularDataSlotId(0), TELEPHONY_ERR_SUCCESS);
     multiSimController->GetPrimarySlotId();
@@ -1144,7 +1154,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
     int32_t imsSwitchValue;
     EXPECT_NE(multiSimController->QueryImsSwitch(0, imsSwitchValue), TELEPHONY_ERR_SUCCESS);
     std::vector<IccAccountInfo> iccAccountInfoList = {};
-    EXPECT_NE(multiSimController->GetActiveSimAccountInfoList(iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->GetActiveSimAccountInfoList(false, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
     multiSimController->radioProtocolController_ = nullptr;
     EXPECT_NE(multiSimController->GetRadioProtocolTech(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->GetFirstActivedSlotId(), TELEPHONY_ERR_SUCCESS);
@@ -1179,37 +1189,12 @@ HWTEST_F(BranchTest, Telephony_SimManager_001, Function | MediumTest | Level1)
     CardType cardType = CardType::UNKNOWN_CARD;
     EXPECT_NE(simManager->GetCardType(0, cardType), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->GetCardType(INVALID_SLOTID, cardType), TELEPHONY_ERR_SUCCESS);
-    std::string password = "1234";
-    LockStatusResponse mLockStatusResponse;
-    EXPECT_GT(simManager->UnlockPin(0, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->UnlockPin(INVALID_SLOTID, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->UnlockPuk(0, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->UnlockPuk(INVALID_SLOTID, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->AlterPin(0, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->AlterPin(INVALID_SLOTID, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    LockInfo mLockInfo;
-    EXPECT_GT(simManager->SetLockState(0, mLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->SetLockState(INVALID_SLOTID, mLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
     LockType mLockType = LockType::PIN_LOCK;
     LockState lockState;
     EXPECT_NE(simManager->GetLockState(0, mLockType, lockState), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->GetLockState(INVALID_SLOTID, mLockType, lockState), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->RefreshSimState(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->RefreshSimState(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->UnlockPin2(0, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->UnlockPin2(INVALID_SLOTID, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->UnlockPuk2(0, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->UnlockPuk2(INVALID_SLOTID, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->AlterPin2(0, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->AlterPin2(INVALID_SLOTID, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    PersoLockInfo mPersoLockInfo;
-    EXPECT_GT(simManager->UnlockSimLock(0, mPersoLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->UnlockSimLock(INVALID_SLOTID, mPersoLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_FALSE(simManager->IsSimActive(0));
-    EXPECT_FALSE(simManager->IsSimActive(INVALID_SLOTID));
-    IccAccountInfo mIccAccountInfo;
-    EXPECT_GT(simManager->GetSimAccountInfo(0, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->GetSimAccountInfo(INVALID_SLOTID, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1294,7 +1279,7 @@ HWTEST_F(BranchTest, Telephony_SimManager_003, Function | MediumTest | Level1)
     EXPECT_NE(simManager->GetSlotId(1), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->GetSimId(0), TELEPHONY_ERR_SUCCESS);
     std::vector<IccAccountInfo> iccAccountInfoList;
-    EXPECT_GT(simManager->GetActiveSimAccountInfoList(iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->GetActiveSimAccountInfoList(false, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
     OperatorConfig mOperatorConfig;
     EXPECT_GT(simManager->GetOperatorConfigs(0, mOperatorConfig), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->GetOperatorConfigs(INVALID_SLOTID, mOperatorConfig), TELEPHONY_ERR_SUCCESS);
@@ -1365,6 +1350,44 @@ HWTEST_F(BranchTest, Telephony_SimManager_004, Function | MediumTest | Level1)
     EXPECT_NE(simManager->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mResponse), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->SimAuthentication(INVALID_SLOTID, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mResponse),
         TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_SimManager_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SimManager_005, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->OnInit();
+    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
+    simManager->SetNetworkSearchManager(nullptr);
+    std::string password = "1234";
+    LockStatusResponse mLockStatusResponse;
+    EXPECT_GT(simManager->UnlockPin(0, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->UnlockPin(INVALID_SLOTID, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->UnlockPuk(0, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->UnlockPuk(INVALID_SLOTID, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->AlterPin(0, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->AlterPin(INVALID_SLOTID, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    LockInfo mLockInfo;
+    EXPECT_GT(simManager->SetLockState(0, mLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->SetLockState(INVALID_SLOTID, mLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->UnlockPin2(0, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->UnlockPin2(INVALID_SLOTID, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->UnlockPuk2(0, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->UnlockPuk2(INVALID_SLOTID, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->AlterPin2(0, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->AlterPin2(INVALID_SLOTID, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    PersoLockInfo mPersoLockInfo;
+    EXPECT_GT(simManager->UnlockSimLock(0, mPersoLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->UnlockSimLock(INVALID_SLOTID, mPersoLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_FALSE(simManager->IsSimActive(0));
+    EXPECT_FALSE(simManager->IsSimActive(INVALID_SLOTID));
+    IccAccountInfo mIccAccountInfo;
+    EXPECT_GT(simManager->GetSimAccountInfo(0, false, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->GetSimAccountInfo(INVALID_SLOTID, false, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1467,29 +1490,6 @@ HWTEST_F(BranchTest, Telephony_NetworkRegister_001, Function | MediumTest | Leve
         RegServiceState::REG_STATE_IN_SERVICE);
     EXPECT_EQ(networkRegister->ConvertRegFromRil(NetworkRegister::RilRegister::REG_STATE_EMERGENCY_ONLY),
         RegServiceState::REG_STATE_EMERGENCY_ONLY);
-    EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_GSM), RadioTech::RADIO_TECHNOLOGY_GSM);
-    EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_1XRTT), RadioTech::RADIO_TECHNOLOGY_1XRTT);
-    EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_HSPA), RadioTech::RADIO_TECHNOLOGY_HSPA);
-    EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_HSPAP), RadioTech::RADIO_TECHNOLOGY_HSPAP);
-    EXPECT_EQ(networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_NR), RadioTech::RADIO_TECHNOLOGY_NR);
-    EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_WCDMA), RadioTech::RADIO_TECHNOLOGY_WCDMA);
-    EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_LTE), RadioTech::RADIO_TECHNOLOGY_LTE);
-    EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_EVDO), RadioTech::RADIO_TECHNOLOGY_EVDO);
-    EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_EHRPD), RadioTech::RADIO_TECHNOLOGY_EHRPD);
-    EXPECT_EQ(networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_TD_SCDMA),
-        RadioTech::RADIO_TECHNOLOGY_TD_SCDMA);
-    EXPECT_EQ(networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_LTE_CA),
-        RadioTech::RADIO_TECHNOLOGY_LTE_CA);
-    EXPECT_EQ(networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_INVALID),
-        RadioTech::RADIO_TECHNOLOGY_UNKNOWN);
 }
 
 /**
@@ -1521,6 +1521,43 @@ HWTEST_F(BranchTest, Telephony_NetworkRegister_002, Function | MediumTest | Leve
     EXPECT_EQ(networkRegister->ConvertStringToNrState(strState), NrState::NR_NSA_STATE_SA_ATTACHED);
     strState = "123";
     EXPECT_EQ(networkRegister->ConvertStringToNrState(strState), NrState::NR_STATE_NOT_SUPPORT);
+}
+
+/**
+ * @tc.number   Telephony_NetworkRegister_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_NetworkRegister_003, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto networkRegister = std::make_shared<NetworkRegister>(networkSearchState, networkSearchManager, INVALID_SLOTID);
+    EXPECT_EQ(
+        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_GSM), RadioTech::RADIO_TECHNOLOGY_GSM);
+    EXPECT_EQ(
+        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_1XRTT), RadioTech::RADIO_TECHNOLOGY_1XRTT);
+    EXPECT_EQ(
+        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_HSPA), RadioTech::RADIO_TECHNOLOGY_HSPA);
+    EXPECT_EQ(
+        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_HSPAP), RadioTech::RADIO_TECHNOLOGY_HSPAP);
+    EXPECT_EQ(networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_NR), RadioTech::RADIO_TECHNOLOGY_NR);
+    EXPECT_EQ(
+        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_WCDMA), RadioTech::RADIO_TECHNOLOGY_WCDMA);
+    EXPECT_EQ(
+        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_LTE), RadioTech::RADIO_TECHNOLOGY_LTE);
+    EXPECT_EQ(
+        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_EVDO), RadioTech::RADIO_TECHNOLOGY_EVDO);
+    EXPECT_EQ(
+        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_EHRPD), RadioTech::RADIO_TECHNOLOGY_EHRPD);
+    EXPECT_EQ(networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_TD_SCDMA),
+        RadioTech::RADIO_TECHNOLOGY_TD_SCDMA);
+    EXPECT_EQ(networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_LTE_CA),
+        RadioTech::RADIO_TECHNOLOGY_LTE_CA);
+    EXPECT_EQ(networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_INVALID),
+        RadioTech::RADIO_TECHNOLOGY_UNKNOWN);
 }
 
 /**
@@ -1642,14 +1679,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     auto telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<SimManager> simManager = nullptr;
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
-    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
-    auto runner = AppExecFwk::EventRunner::Create("test");
-    auto networkSearchHandler =
-        std::make_shared<NetworkSearchHandler>(runner, networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
-    auto inner = std::make_shared<NetworkSearchManagerInner>();
-    inner->networkSearchState_ = networkSearchState;
-    inner->observerHandler_ = std::make_unique<ObserverHandler>();
-    inner->networkSearchHandler_ = networkSearchHandler;
     sptr<NetworkInformation> networkInfo = nullptr;
     ImsRegInfo info;
     std::u16string testStr = u"";
@@ -1673,28 +1702,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     EXPECT_EQ(result, testStr);
     EXPECT_NE(networkSearchManager->GetMeid(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, testStr);
-    std::string version = "";
-    EXPECT_NE(networkSearchManager->GetBasebandVersion(INVALID_SLOTID, version), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(version, "");
-    EXPECT_FALSE(networkSearchManager->IsNrSupported(INVALID_SLOTID));
-    sptr<NetworkState> networkState = nullptr;
-    EXPECT_NE(networkSearchManager->GetNetworkStatus(INVALID_SLOTID, networkState), TELEPHONY_ERR_SUCCESS);
-    EXPECT_TRUE(networkState == nullptr);
-    NrMode mode = NrMode::NR_MODE_UNKNOWN;
-    EXPECT_NE(networkSearchManager->GetNrOptionMode(INVALID_SLOTID, mode), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(mode, NrMode::NR_MODE_UNKNOWN);
-    networkSearchManager->AddManagerInner(INVALID_SLOTID, inner);
-    EXPECT_EQ(networkSearchManager->GetFrequencyType(INVALID_SLOTID), FrequencyType::FREQ_TYPE_UNKNOWN);
-    EXPECT_EQ(networkSearchManager->GetNrState(INVALID_SLOTID), NrState::NR_STATE_NOT_SUPPORT);
-    EXPECT_EQ(networkSearchManager->GetPsRegState(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_EQ(networkSearchManager->GetCsRegState(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_EQ(networkSearchManager->GetPsRoamingState(INVALID_SLOTID), TELEPHONY_ERROR);
-    std::int32_t networkAbilityType = 0;
-    std::int32_t networkAbilityState = 0;
-    EXPECT_EQ(networkSearchManager->GetNetworkCapability(INVALID_SLOTID, networkAbilityType, networkAbilityState),
-        TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(networkSearchManager->SetNetworkCapability(INVALID_SLOTID, networkAbilityType, networkAbilityState),
-        TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1790,6 +1797,48 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_003, Function | MediumTest |
     bool airplaneMode = false;
     EXPECT_NE(networkSearchManager->GetAirplaneMode(airplaneMode), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->UpdateRadioOn(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearchManager_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_NetworkSearchManager_004, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<SimManager> simManager = nullptr;
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto runner = AppExecFwk::EventRunner::Create("test");
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(runner, networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
+    auto inner = std::make_shared<NetworkSearchManagerInner>();
+    inner->networkSearchState_ = networkSearchState;
+    inner->observerHandler_ = std::make_unique<ObserverHandler>();
+    inner->networkSearchHandler_ = networkSearchHandler;
+    std::string version = "";
+    EXPECT_NE(networkSearchManager->GetBasebandVersion(INVALID_SLOTID, version), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(version, "");
+    EXPECT_FALSE(networkSearchManager->IsNrSupported(INVALID_SLOTID));
+    sptr<NetworkState> networkState = nullptr;
+    EXPECT_NE(networkSearchManager->GetNetworkStatus(INVALID_SLOTID, networkState), TELEPHONY_ERR_SUCCESS);
+    EXPECT_TRUE(networkState == nullptr);
+    NrMode mode = NrMode::NR_MODE_UNKNOWN;
+    EXPECT_NE(networkSearchManager->GetNrOptionMode(INVALID_SLOTID, mode), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(mode, NrMode::NR_MODE_UNKNOWN);
+    networkSearchManager->AddManagerInner(INVALID_SLOTID, inner);
+    EXPECT_EQ(networkSearchManager->GetFrequencyType(INVALID_SLOTID), FrequencyType::FREQ_TYPE_UNKNOWN);
+    EXPECT_EQ(networkSearchManager->GetNrState(INVALID_SLOTID), NrState::NR_STATE_NOT_SUPPORT);
+    EXPECT_EQ(networkSearchManager->GetPsRegState(INVALID_SLOTID), TELEPHONY_ERROR);
+    EXPECT_EQ(networkSearchManager->GetCsRegState(INVALID_SLOTID), TELEPHONY_ERROR);
+    EXPECT_EQ(networkSearchManager->GetPsRoamingState(INVALID_SLOTID), TELEPHONY_ERROR);
+    std::int32_t networkAbilityType = 0;
+    std::int32_t networkAbilityState = 0;
+    EXPECT_EQ(networkSearchManager->GetNetworkCapability(INVALID_SLOTID, networkAbilityType, networkAbilityState),
+        TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->SetNetworkCapability(INVALID_SLOTID, networkAbilityType, networkAbilityState),
+        TELEPHONY_ERR_SUCCESS);
 }
 
 /**

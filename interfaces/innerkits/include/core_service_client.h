@@ -336,6 +336,14 @@ public:
     int32_t GetDefaultVoiceSlotId();
 
     /**
+     * @brief Obtain default voice simId
+     *
+     * @param simId[out], default voice simId
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetDefaultVoiceSimId(int32_t &simId);
+
+    /**
      * @brief Set the SIM card show number
      *
      * @param slotId[in], sim slot id
