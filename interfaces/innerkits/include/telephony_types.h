@@ -544,11 +544,11 @@ struct PlmnNetworkName {
 };
 
 /**
- * @brief Defines the Operator PLMN information see 3GPP TS 31.102 Section 4.2.59..
+ * @brief Defines the Operator PLMN information see 3GPP TS 31.102 Section 4.2.59.
  */
 struct OperatorPlmnInfo {
     /**
-     * PLMN numeri
+     * PLMN numeric
      */
     std::string plmnNumeric = "";
     /**
@@ -572,23 +572,23 @@ struct OperatorPlmnInfo {
  */
 enum class RadioProtocolPhase {
     /**
-     * Initialization
+     * The value of Initial radio protocol phase
      */
     RADIO_PROTOCOL_PHASE_INITIAL,
     /**
-     * Check
+     * The value of execute check communication phase
      */
     RADIO_PROTOCOL_PHASE_CHECK,
     /**
-     * Update
+     * The value of execute update communication phase
      */
     RADIO_PROTOCOL_PHASE_UPDATE,
     /**
-     * Notification
+     * The value of unsol radio phase
      */
     RADIO_PROTOCOL_PHASE_NOTIFY,
     /**
-     * End
+     * The value of execute complete communication phase
      */
     RADIO_PROTOCOL_PHASE_COMPLETE,
 };
@@ -598,15 +598,15 @@ enum class RadioProtocolPhase {
  */
 enum class RadioProtocolStatus {
     /**
-     * No state
+     * Unknow radio protocol state
      */
     RADIO_PROTOCOL_STATUS_NONE,
     /**
-     * Success
+     * Set radio protocol successed
      */
     RADIO_PROTOCOL_STATUS_SUCCESS,
     /**
-     * Failed
+     * Set radio protocol failed
      */
     RADIO_PROTOCOL_STATUS_FAIL,
 };
