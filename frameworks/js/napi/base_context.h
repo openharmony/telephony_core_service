@@ -22,6 +22,9 @@
 
 namespace OHOS {
 namespace Telephony {
+/**
+ * @brief Used to save base parameters for NAPI.
+ */
 struct BaseContext {
     napi_async_work work = nullptr;
     napi_deferred deferred = nullptr;

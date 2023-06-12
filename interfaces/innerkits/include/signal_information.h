@@ -44,7 +44,17 @@ public:
     static void InitSignalBar(const int32_t bar = 5);
     static std::unique_ptr<SignalInformation> Unmarshalling(Parcel &parcel);
     virtual bool ReadFromParcel(Parcel &parcel) = 0;
+    /**
+     * @brief Get signal strength
+     *
+     * @return Received signal strength
+     */
     virtual int32_t GetSignalIntensity() const = 0;
+    /**
+     * @brief Get signal strength level
+     *
+     * @return Received signal strength level
+     */
     virtual int32_t GetSignalLevel() const = 0;
     virtual std::string ToString() const = 0;
     virtual sptr<SignalInformation> NewInstance() const = 0;
@@ -61,7 +71,17 @@ public:
     ~GsmSignalInformation() = default;
     void SetValue(const int32_t gsmRssi = 0, const int32_t gsmBer = 0);
     bool operator==(const GsmSignalInformation &gsm) const;
+    /**
+     * @brief Get signal strength Indicator
+     *
+     * @return Received Signal Strength Indicator
+     */
     int32_t GetRssi() const;
+    /**
+     * @brief Get Bit Error Rate
+     *
+     * @return Bit Error Rate
+     */
     int32_t GetGsmBer() const;
     int32_t GetSignalIntensity() const override;
     int32_t GetSignalLevel() const override;
@@ -84,6 +104,11 @@ public:
     ~CdmaSignalInformation() = default;
     void SetValue(const int32_t cdmaRssi = 0, const int32_t cdmaEcno = 0);
     bool operator==(const CdmaSignalInformation &cdma) const;
+    /**
+     * @brief Get CDMA Received Signal Strength Indicator
+     *
+     * @return CDMA Received Signal Strength Indicator
+     */
     int32_t GetCdmaRssi() const;
     int32_t GetSignalIntensity() const override;
     int32_t GetSignalLevel() const override;
@@ -107,9 +132,29 @@ public:
     void SetValue(
         const int32_t rxlev = 0, const int32_t lteRsrp = 0, const int32_t lteRsrq = 0, const int32_t lteSnr = 0);
     bool operator==(const LteSignalInformation &lte) const;
+    /**
+     * @brief Get signal level
+     *
+     * @return Received Signal Level
+     */
     int32_t GetRxlev() const;
+    /**
+     * @brief Get reference signal received power in dBm
+     *
+     * @return Reference signal received power in dBm
+     */
     int32_t GetRsrp() const;
+    /**
+     * @brief Get reference signal received quality
+     *
+     * @return Reference signal received quality
+     */
     int32_t GetRsrq() const;
+    /**
+     * @brief Get reference signal signal-to-noise ratio
+     *
+     * @return Reference signal signal-to-noise ratio
+     */
     int32_t GetSnr() const;
     int32_t GetSignalIntensity() const override;
     int32_t GetSignalLevel() const override;
@@ -135,9 +180,29 @@ public:
     void SetValue(const int32_t wcdmaRxlev = 0, const int32_t wcdmaRscp = 0, const int32_t wcdmaEcio = 0,
         const int32_t wcdmaBer = 0);
     bool operator==(const WcdmaSignalInformation &wcdma) const;
+    /**
+     * @brief Get signal level
+     *
+     * @return Received signal level
+     */
     int32_t GetRxlev() const;
+    /**
+     * @brief Get the Receive signal channel power as dBm
+     *
+     * @return Received receive signal channel power as dBm
+     */
     int32_t GetRscp() const;
+    /**
+     * @brief Get energy per chip over the noise spectral density
+     *
+     * @return Energy per chip over the noise spectral density
+     */
     int32_t GetEcno() const;
+    /**
+     * @brief Get Bit Error Rate
+     *
+     * @return Bit Error Rate
+     */
     int32_t GetBer() const;
     int32_t GetSignalIntensity() const override;
     int32_t GetSignalLevel() const override;
@@ -162,6 +227,11 @@ public:
     ~TdScdmaSignalInformation() = default;
     void SetValue(const int32_t tdScdmaRscp = 0);
     bool operator==(const TdScdmaSignalInformation &tdScdma) const;
+    /**
+     * @brief Get Receive signal channel power
+     *
+     * @return Received receive signal channel power
+     */
     int32_t GetRscp() const;
     int32_t GetSignalIntensity() const override;
     int32_t GetSignalLevel() const override;
@@ -183,8 +253,23 @@ public:
     ~NrSignalInformation() = default;
     void SetValue(const int32_t rsrp = 0, const int32_t rsrq = 0, const int32_t sinr = 0);
     bool operator==(const NrSignalInformation &nr) const;
+    /**
+     * @brief Get Reference signal received power in dBm
+     *
+     * @return Reference signal received power in dBm
+     */
     int32_t GetRsrp() const;
+    /**
+     * @brief Get Reference signal received quality
+     *
+     * @return Reference signal received quality
+     */
     int32_t GetRsrq() const;
+    /**
+     * @brief Get Signal-to-noise and interference ratio
+     *
+     * @return Signal-to-noise and interference ratio
+     */
     int32_t GetSinr() const;
     int32_t GetSignalIntensity() const override;
     int32_t GetSignalLevel() const override;

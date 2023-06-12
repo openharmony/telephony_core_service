@@ -46,7 +46,7 @@ public:
     int32_t SetDefaultVoiceSlotId(int32_t slotId);
     int32_t GetDefaultSmsSlotId();
     int32_t SetDefaultSmsSlotId(int32_t slotId);
-    int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
+    int32_t GetSimAccountInfo(int32_t slotId, bool denied, IccAccountInfo &info);
     int32_t GetDefaultCellularDataSlotId();
     int32_t SetDefaultCellularDataSlotId(int32_t slotId);
     int32_t GetPrimarySlotId();
@@ -65,7 +65,7 @@ public:
     int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue);
     int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue);
     bool GetListFromDataBase();
-    int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList);
+    int32_t GetActiveSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList);
     int32_t GetRadioProtocolTech(int32_t slotId);
     void GetRadioProtocol(int32_t slotId);
 
@@ -82,14 +82,18 @@ private:
     std::u16string GetIccId(int32_t slotId);
     bool SetIccId(int32_t slotId, std::u16string iccId);
     int32_t GetDefaultCellularDataSlotIdUnit();
-    bool AnnounceDefaultMainSlotIdChanged(int32_t slotId);
-    bool AnnounceDefaultVoiceSlotIdChanged(int32_t slotId);
-    bool AnnounceDefaultSmsSlotIdChanged(int32_t slotId);
-    bool AnnounceDefaultCellularDataSlotIdChanged(int32_t slotId);
+    bool AnnounceDefaultMainSimIdChanged(int32_t simId);
+    bool AnnounceDefaultVoiceSimIdChanged(int32_t simId);
+    bool AnnounceDefaultSmsSimIdChanged(int32_t simId);
+    bool AnnounceDefaultCellularDataSimIdChanged(int32_t simId);
     bool PublishSimFileEvent(const AAFwk::Want &want, int eventCode, const std::string &eventData);
 
 private:
     int32_t maxCount_ = 0;
+    int32_t primarySimId_ = 0;
+    int32_t defaultSmsSimId_ = 0;
+    int32_t defaultCellularSimId_ = 0;
+    int32_t defaultVoiceSimId_ = 0;
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
     std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;

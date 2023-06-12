@@ -21,11 +21,29 @@
 namespace OHOS {
 namespace Telephony {
 enum {
+    /**
+     * State registry data not exist
+     */
     TELEPHONY_STATE_REGISTRY_DATA_NOT_EXIST = STATE_REGISTRY_ERR_OFFSET,
+    /**
+     * State unregistry data not exist
+     */
     TELEPHONY_STATE_UNREGISTRY_DATA_NOT_EXIST,
+    /**
+     * State registry data exist
+     */
     TELEPHONY_STATE_REGISTRY_DATA_EXIST,
+    /**
+     * State registry not implemented
+     */
     TELEPHONY_STATE_REGISTRY_NOT_IMPLEMENTED,
+    /**
+     * State registry permission denied
+     */
     TELEPHONY_STATE_REGISTRY_PERMISSION_DENIED,
+    /**
+     * State registry slotId error
+     */
     TELEPHONY_STATE_REGISTRY_SLODID_ERROR
 };
 } // namespace Telephony

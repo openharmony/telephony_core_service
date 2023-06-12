@@ -38,6 +38,7 @@ config("tel_utils_config") {
 }
 
 ohos_shared_library("libtel_common") {
+  version_script = "libtel_common.versionscript"
   sources = [
     "../frameworks/js/napi/napi_util.cpp",
     "common/src/enum_convert.cpp",

@@ -335,6 +335,22 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0700, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->HasSimCard(0, hasValue), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->HasOperatorPrivileges(0, hasValue), TELEPHONY_ERR_SUCCESS);
 }
+
+/**
+ * @tc.number   Telephony_Sim_GetDefaultVoiceSimId_0100
+ * @tc.name     Get default voice sim simId
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetDefaultVoiceSimId_0100, Function | MediumTest | Level1)
+{
+    if (SimTest::HasSimCard(slotId_) || SimTest::HasSimCard(slotId1_)) {
+        int32_t simId;
+        CoreServiceClient::GetInstance().GetDefaultVoiceSimId(simId);
+        EXPECT_GT(simId, 0);
+    } else {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    }
+}
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS

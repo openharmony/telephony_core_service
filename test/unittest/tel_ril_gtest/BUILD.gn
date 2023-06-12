@@ -55,7 +55,7 @@ ohos_unittest("tel_ril_gtest") {
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",
     "init:libbegetutil",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

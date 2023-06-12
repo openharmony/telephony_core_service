@@ -79,6 +79,7 @@
 | function getSimOperatorNumeric(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽SIM卡的归属PLMN（Public Land Mobile Network）号 | 无                                  |
 | function getSimSpn(slotId: number, callback: AsyncCallback\<string>): void; | 获取指定卡槽SIM卡的运营商SPN（Service Provider Name）       | 无                                  |
 | function getDefaultVoiceSlotId(callback: AsyncCallback\<number>): void; | 获取语音业务的默认卡卡槽                                    | 无                                  |
+| function getDefaultVoiceSimId(callback: AsyncCallback\<number>): void; | 获取语音业务的默认卡ID                                    | 无                                  |
 | function isSimActive(slotId: number, callback: AsyncCallback\<boolean>): void | 检查指定卡槽的SIM卡是否激活                           | 无 |
 | function hasSimCard(slotId: number, callback: AsyncCallback\<boolean>): void  | 检查SIM卡是否插入指定卡槽                             | 无                                  |
 | function getSimTelephoneNumber(slotId: number, callback: AsyncCallback\<string>): void | 获取指定卡槽SIM卡的MSISDN（Mobile Station Integrated Services Digital Network）|ohos.permission.GET_TELEPHONY_STATE |

@@ -440,6 +440,16 @@ int32_t CoreServiceClient::GetDefaultVoiceSlotId()
     return proxy->GetDefaultVoiceSlotId();
 }
 
+int32_t CoreServiceClient::GetDefaultVoiceSimId(int32_t &simId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetDefaultVoiceSimId(simId);
+}
+
 int32_t CoreServiceClient::SetShowNumber(int32_t slotId, const std::u16string &number)
 {
     auto proxy = GetProxy();
