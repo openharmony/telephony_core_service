@@ -75,6 +75,7 @@ private:
     int32_t OnGetSimSubscriptionInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetDefaultVoiceSlotId(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetDefaultVoiceSlotId(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetDefaultVoiceSimId(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetPrimarySlotId(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetPrimarySlotId(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetShowNumber(MessageParcel &data, MessageParcel &reply);

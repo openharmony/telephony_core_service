@@ -94,6 +94,10 @@ struct AsyncDefaultSlotId {
     AsyncContext<int32_t> asyncContext;
 };
 
+struct AsyncDefaultSimId {
+    AsyncContext<int32_t> asyncContext;
+};
+
 struct AsyncStkCallSetupResult {
     AsyncContext<int32_t> asyncContext;
 };

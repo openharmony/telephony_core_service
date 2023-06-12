@@ -235,6 +235,7 @@ enum class InputCmd {
     INPUT_HAS_OPERATOR_PRIVILEGES = 70,
     INPUT_GETSIMID = 71,
     INPUT_GETSLOTID = 72,
+    INPUT_GETDEFAULTCALLSIMID = 73,
     INPUT_QUIT = 100,
     INPUT_GET_VOICEMAIL_COUNT = 130,
     INPUT_SET_VOICEMAIL_COUNT = 131,
@@ -274,8 +275,7 @@ static std::map<InputCmd, CmdProcessFunc> g_funcMap;
 static sptr<ICoreService> GetProxy()
 {
     std::cout << "TelephonyTestService GetProxy ... " << std::endl;
-    sptr<ISystemAbilityManager> systemAbilityMgr =
-        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityMgr == nullptr) {
         std::cout << "TelephonyTestService Get ISystemAbilityManager failed ... " << std::endl;
         return nullptr;
@@ -369,8 +369,7 @@ static bool TestSetPrimarySlotId()
     std::cin >> testDefaultPrimarySlot;
     bool result = g_telephonyService->SetPrimarySlotId(testDefaultPrimarySlot);
     string expect = result ? "success" : "fail";
-    std::cout << "TelephonyTestService Remote SetPrimarySlotId result [" << result << "] " << expect
-              << std::endl;
+    std::cout << "TelephonyTestService Remote SetPrimarySlotId result [" << result << "] " << expect << std::endl;
     return true;
 }
 
@@ -381,8 +380,7 @@ static bool TestGetPrimarySlotId()
     int32_t result = INVALID_VALUE;
     g_telephonyService->GetPrimarySlotId(slotId);
     string expect = (result >= INVALID_VALUE) ? "success" : "fail";
-    std::cout << "TelephonyTestService Remote GetPrimarySlotId result [" << slotId << "] " << expect
-              << std::endl;
+    std::cout << "TelephonyTestService Remote GetPrimarySlotId result [" << slotId << "] " << expect << std::endl;
     return true;
 }
 
@@ -396,8 +394,7 @@ static bool TestGetISOCountryCodeForSim()
     g_telephonyService->GetISOCountryCodeForSim(testSlot, result);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
-    std::cout << "TelephonyTestService Remote GetISOCountryCodeForSim result [" << str << "] " << expect
-              << std::endl;
+    std::cout << "TelephonyTestService Remote GetISOCountryCodeForSim result [" << str << "] " << expect << std::endl;
     return true;
 }
 
@@ -407,7 +404,7 @@ static bool TestGetSimSpn()
     static int32_t testSlot = SLOT_ID;
     std::cout << "please input Slot Id" << std::endl;
     std::cin >> testSlot;
-    std::u16string result  = u"test";
+    std::u16string result = u"test";
     g_telephonyService->GetSimSpn(testSlot, result);
     std::string str = Str16ToStr8(result);
     string expect = strcmp(str.c_str(), "test") ? "success" : "fail";
@@ -419,7 +416,7 @@ static bool TestGetSimIccId()
 {
     AccessToken token;
     int32_t slotId = 0;
-    std::cout << "please input soltid:"<< std::endl;
+    std::cout << "please input soltid:" << std::endl;
     std::cin >> slotId;
     std::u16string result;
     g_telephonyService->GetSimIccId(slotId, result);
@@ -459,16 +456,16 @@ static bool TestGetSimEons()
 {
     AccessToken token;
     int32_t slotId = 0;
-    std::cout << "please input soltId:"<< std::endl;
+    std::cout << "please input soltId:" << std::endl;
     std::cin >> slotId;
     std::string plmn = "46001";
-    std::cout << "please input plmn:"<< std::endl;
+    std::cout << "please input plmn:" << std::endl;
     std::cin >> plmn;
     int32_t lac = 1;
-    std::cout << "please input lac:"<< std::endl;
+    std::cout << "please input lac:" << std::endl;
     std::cin >> lac;
     bool longNameRequired = true;
-    std::cout << "please input longNameRequired:"<< std::endl;
+    std::cout << "please input longNameRequired:" << std::endl;
     std::cin >> longNameRequired;
     std::u16string result = g_telephonyService->GetSimEons(slotId, plmn, lac, longNameRequired);
     std::string str = Str16ToStr8(result);
@@ -583,8 +580,7 @@ static bool TestGetVoiceMailIdentifier()
     g_telephonyService->GetVoiceMailIdentifier(testSlot, result);
     std::string str = Str16ToStr8(result);
     string expect = str.empty() ? "fail" : "success";
-    std::cout << "TelephonyTestService Remote GetVoiceMailIdentifier result [" << str << "] " << expect
-              << std::endl;
+    std::cout << "TelephonyTestService Remote GetVoiceMailIdentifier result [" << str << "] " << expect << std::endl;
     return true;
 }
 
@@ -671,8 +667,7 @@ static bool TestQueryIccDiallingNumbers()
         std::string number = Str16ToStr8(item->GetNumber());
         int index = item->GetIndex();
         int diallingNumbertype = item->GetFileId();
-        std::cout << ++id << "  " << index << " " << name << "  " << number << "  " << diallingNumbertype
-                  << std::endl;
+        std::cout << ++id << "  " << index << " " << name << "  " << number << "  " << diallingNumbertype << std::endl;
     }
     return true;
 }
@@ -709,8 +704,8 @@ static bool TestAddIccDiallingNumbers()
     diallingNumber->name_ = Str8ToStr16(name);
     diallingNumber->number_ = Str8ToStr16(number);
     diallingNumber->pin2_ = Str8ToStr16(pin2);
-    std::cout << "start insert " << Str16ToStr8(diallingNumber->name_) << " "
-              << Str16ToStr8(diallingNumber->number_) << std::endl;
+    std::cout << "start insert " << Str16ToStr8(diallingNumber->name_) << " " << Str16ToStr8(diallingNumber->number_)
+              << std::endl;
     int32_t result = g_telephonyService->AddIccDiallingNumbers(testSlot, type, diallingNumber);
     std::cout << "TelephonyTestService Remote TestAddIccDiallingNumbers result [" << result << "] " << std::endl;
     return true;
@@ -842,8 +837,7 @@ static bool TestSetDefaultVoiceSlotId()
     std::cin >> testDefaultVoiceSlot;
     int32_t result = g_telephonyService->SetDefaultVoiceSlotId(testDefaultVoiceSlot);
     string expect = (result == TELEPHONY_ERR_SUCCESS) ? "success" : "fail";
-    std::cout << "TelephonyTestService Remote SetDefaultVoiceSlotId result [" << result << "] " << expect
-              << std::endl;
+    std::cout << "TelephonyTestService Remote SetDefaultVoiceSlotId result [" << result << "] " << expect << std::endl;
     return true;
 }
 
@@ -852,8 +846,7 @@ static bool TestGetDefaultVoiceSlotId()
     AccessToken token;
     int32_t result = g_telephonyService->GetDefaultVoiceSlotId();
     string expect = (result >= INVALID_VALUE) ? "success" : "fail";
-    std::cout << "TelephonyTestService Remote GetDefaultVoiceSlotId result [" << result << "] " << expect
-              << std::endl;
+    std::cout << "TelephonyTestService Remote GetDefaultVoiceSlotId result [" << result << "] " << expect << std::endl;
     return true;
 }
 
@@ -1239,8 +1232,7 @@ static int32_t GetSimLockType()
 {
     AccessToken token;
     int32_t testType = -1;
-    while (!AmongPersoLockType(testType, PersoLockTypeTest::SIM_PN_PIN_TYPE,
-        PersoLockTypeTest::SIM_SIM_PUK_TYPE)) {
+    while (!AmongPersoLockType(testType, PersoLockTypeTest::SIM_PN_PIN_TYPE, PersoLockTypeTest::SIM_SIM_PUK_TYPE)) {
         std::cout << "\n Set lock switch, Please input lock type number(\n"
                      " 0. Network Personalization PIN\n"
                      " 1. Network Personalization PUK\n"
@@ -1319,7 +1311,7 @@ static bool TestUnlockSimLock()
     int32_t testType = GetSimLockType();
     std::string password = GetSimLockPassword(testType);
     std::cout << "UnlockSimLock: password = " << password << endl;
-    lockInfo.password =  Str8ToStr16(password);
+    lockInfo.password = Str8ToStr16(password);
     lockInfo.lockType = static_cast<PersoLockType>(testType);
     g_telephonyService->UnlockSimLock(slotId, lockInfo, response);
     std::cout << "UnlockSimLock complete:" << response.result << " " << response.remain << std::endl;
@@ -1406,6 +1398,7 @@ static void Prompt()
                  "61:GetSimTelephoneNumber\n62:GetSimTeleNumberIdentifier\n63:GetCardType\n"
                  "64:UnlockSimLock\n65:SetPrimarySlotId\n66:GetPrimarySlotId\n67:GetOpName\n"
                  "68:GetOpKeyExt\n70:HasOperatorPrivileges\n71:TestGetSimId\n72:TestGetSlotId\n"
+                 "73:TestGetDefaultVoiceSimId\n"
                  "130:GetVoiceMailCount\n131:SetVoiceMailCount\n132:SetVoiceCallForwarding\n"
                  "100:exit\n"
               << std::endl;
@@ -1438,6 +1431,7 @@ static void InitFuncMapExt()
     g_funcMap[InputCmd::INPUT_GETIMSI] = TestGetIMSI;
     g_funcMap[InputCmd::INPUT_SETDEFAULTCALL] = TestSetDefaultVoiceSlotId;
     g_funcMap[InputCmd::INPUT_GETDEFAULTCALL] = TestGetDefaultVoiceSlotId;
+    g_funcMap[InputCmd::INPUT_GETDEFAULTCALLSIMID] = TestGetDefaultVoiceSimId;
     g_funcMap[InputCmd::INPUT_UNLOCK_PIN] = TestUnlockPin;
     g_funcMap[InputCmd::INPUT_UNLOCK_PUK] = TestUnlockPuk;
     g_funcMap[InputCmd::INPUT_ALTER_PIN] = TestAlterPin;

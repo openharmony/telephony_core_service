@@ -39,6 +39,7 @@ public:
     int32_t UpdateCellularDataFlow(int32_t slotId, int32_t flowType);
     int32_t UpdateCfuIndicator(int32_t slotId, bool cfuResult);
     int32_t UpdateVoiceMailMsgIndicator(int32_t slotId, bool voiceMailMsgResult);
+    int32_t UpdateIccAccount();
     sptr<ITelephonyStateNotify> GetProxy();
 
 private:

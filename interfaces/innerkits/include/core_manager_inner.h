@@ -290,8 +290,11 @@ public:
     int32_t SetShowNumber(int32_t slotId, const std::u16string &number);
     int32_t SetShowName(int32_t slotId, const std::u16string &name);
     int32_t GetDefaultVoiceSlotId();
+    int32_t GetDefaultVoiceSimId(int32_t &simId);
     int32_t GetDefaultSmsSlotId();
+    int32_t GetDefaultSmsSimId(int32_t &simId);
     int32_t GetDefaultCellularDataSlotId();
+    int32_t GetDefaultCellularDataSimId(int32_t &simId);
     int32_t GetPrimarySlotId(int32_t &slotId);
     int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue);
     int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue);

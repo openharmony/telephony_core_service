@@ -436,7 +436,7 @@ int32_t CoreService::GetSlotId(int32_t simId)
     TELEPHONY_LOGD("CoreService::GetSlotId(), simId = %{public}d", simId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("CoreService::GetSlotId(), simManager_ is nullptr!");
-        return TELEPHONY_ERROR;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simManager_->GetSlotId(simId);
 }
@@ -546,14 +546,14 @@ int32_t CoreService::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
     }
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
+        denied = true;
     }
     TELEPHONY_LOGD("CoreService::GetSimAccountInfo(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetSimAccountInfo(slotId, info);
+    return simManager_->GetSimAccountInfo(slotId, denied, info);
 }
 
 int32_t CoreService::SetDefaultVoiceSlotId(int32_t slotId)
@@ -582,6 +582,16 @@ int32_t CoreService::GetDefaultVoiceSlotId()
         return TELEPHONY_ERROR;
     }
     return simManager_->GetDefaultVoiceSlotId();
+}
+
+int32_t CoreService::GetDefaultVoiceSimId(int32_t &simId)
+{
+    TELEPHONY_LOGD("start");
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetDefaultVoiceSimId(simId);
 }
 
 int32_t CoreService::SetPrimarySlotId(int32_t slotId)
@@ -692,14 +702,14 @@ int32_t CoreService::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &ic
     }
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
+        denied = true;
     }
     TELEPHONY_LOGD("CoreService::GetActiveSimAccountInfoList");
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetActiveSimAccountInfoList(iccAccountInfoList);
+    return simManager_->GetActiveSimAccountInfoList(denied, iccAccountInfoList);
 }
 
 int32_t CoreService::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
