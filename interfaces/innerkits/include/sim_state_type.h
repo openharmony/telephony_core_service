@@ -23,38 +23,64 @@
 
 namespace OHOS {
 namespace Telephony {
+/**
+ * @brief Icc card type
+ */
 enum class CardType {
-    /** Icc card type: Unknow type Card. */
+    /**
+     * Icc card type: Unknow type Card.
+     */
     UNKNOWN_CARD = -1,
 
-    /** Icc card type: Single sim card type. */
+    /**
+     * Icc card type: Single sim card type.
+     */
     SINGLE_MODE_SIM_CARD = 10,
 
-    /** Icc card type: Single usim card type. */
+    /**
+     * Icc card type: Single usim card type.
+     */
     SINGLE_MODE_USIM_CARD = 20,
 
-    /** Icc card type: Single ruim card type. */
+    /**
+     * Icc card type: Single ruim card type.
+     */
     SINGLE_MODE_RUIM_CARD = 30,
 
-    /** Icc card type: Double card C+G. */
+    /**
+     * Icc card type: Double card C+G.
+     */
     DUAL_MODE_CG_CARD = 40,
 
-    /** Icc card type:  Roaming Card (Dual Mode). */
+    /**
+     * Icc card type: Roaming Card (Dual Mode).
+     */
     CT_NATIONAL_ROAMING_CARD = 41,
 
-    /** Icc card type: China Unicom Dual Mode Card. */
+    /**
+     * Icc card type: China Unicom Dual Mode Card.
+     */
     CU_DUAL_MODE_CARD = 42,
 
-    /** Icc card type: LTE Card (Dual Mode). */
+    /**
+     * Icc card type: LTE Card (Dual Mode).
+     */
     DUAL_MODE_TELECOM_LTE_CARD = 43,
 
-    /** Icc card type: Double card U+G. */
+    /**
+     * Icc card type: Double card U+G.
+     */
     DUAL_MODE_UG_CARD = 50,
 
-    /** Icc card type: Single isim card type. */
+    /**
+     * Icc card type: Single isim card type.
+     */
     SINGLE_MODE_ISIM_CARD = 60,
 };
 
+/**
+ * @brief SIM card state
+ */
 enum class SimState {
     /**
      * Indicates unknown SIM card state, that is, the accurate status cannot be obtained.
@@ -92,97 +118,217 @@ enum class SimState {
     SIM_STATE_LOADED
 };
 
+/**
+ * @brief Lock reason
+ */
 enum class LockReason {
     SIM_NONE,
     SIM_PIN,
     SIM_PUK,
-    SIM_PN_PIN, // Network Personalization (refer 3GPP TS 22.022 [33])
+    /**
+     * Network Personalization (refer 3GPP TS 22.022 [33])
+     */
+    SIM_PN_PIN,
     SIM_PN_PUK,
-    SIM_PU_PIN, // network sUbset Personalization (refer 3GPP TS 22.022 [33])
+    /**
+     * Network sUbset Personalization (refer 3GPP TS 22.022 [33])
+     */
+    SIM_PU_PIN,
     SIM_PU_PUK,
-    SIM_PP_PIN, // service supplier Personalization (refer 3GPP TS 22.022 [33])
+    /**
+     * Service supplier Personalization (refer 3GPP TS 22.022 [33])
+     */
+    SIM_PP_PIN,
     SIM_PP_PUK,
-    SIM_PC_PIN, // Corporate Personalization (refer 3GPP TS 22.022 [33])
+    /**
+     * Corporate Personalization (refer 3GPP TS 22.022 [33])
+     */
+    SIM_PC_PIN,
     SIM_PC_PUK,
-    SIM_SIM_PIN, // SIM/USIM personalisation (refer 3GPP TS 22.022 [33])
+    /**
+     * SIM/USIM Personalisation (refer 3GPP TS 22.022 [33])
+     */
+    SIM_SIM_PIN,
     SIM_SIM_PUK,
 };
 
+/**
+ * @brief Personalization lock type
+ */
 enum class PersoLockType {
-    PN_PIN_LOCK, // Network Personalization (refer 3GPP TS 22.022 [33])
+    /**
+     * Network Personalization (refer 3GPP TS 22.022 [33])
+     */
+    PN_PIN_LOCK,
     PN_PUK_LOCK,
-    PU_PIN_LOCK, // network sUbset Personalization (refer 3GPP TS 22.022 [33])
+    /**
+     * Network sUbset Personalization (refer 3GPP TS 22.022 [33])
+     */
+    PU_PIN_LOCK,
     PU_PUK_LOCK,
-    PP_PIN_LOCK, // service supplier Personalization (refer 3GPP TS 22.022 [33])
+    /**
+     * Service supplier Personalization (refer 3GPP TS 22.022 [33])
+     */
+    PP_PIN_LOCK,
     PP_PUK_LOCK,
-    PC_PIN_LOCK, // Corporate Personalization (refer 3GPP TS 22.022 [33])
+    /**
+     * Corporate Personalization (refer 3GPP TS 22.022 [33])
+     */
+    PC_PIN_LOCK,
     PC_PUK_LOCK,
-    SIM_PIN_LOCK, // SIM/USIM personalisation (refer 3GPP TS 22.022 [33])
+    /**
+     * SIM/USIM Personalisation (refer 3GPP TS 22.022 [33])
+     */
+    SIM_PIN_LOCK,
     SIM_PUK_LOCK,
 };
 
+/**
+ * @brief Lock type
+ */
 enum class LockType {
     PIN_LOCK = 1,
     FDN_LOCK = 2,
 };
 
+/**
+ * @brief Authentication type
+ */
 enum AuthType {
+    /**
+     * Authentication type is EAP-SIM. See RFC 4186
+     */
     SIM_AUTH_EAP_SIM_TYPE = 128,
+    /**
+     * Authentication type is EAP-AKA. See RFC 4187
+     */
     SIM_AUTH_EAP_AKA_TYPE = 129,
 };
 
+/**
+ * @brief Lock state
+ */
 enum class LockState {
-    /**Indicates that the lock state card is in the <b>off</b> state. */
+    /**
+     * Indicates that the lock state card is in the off state.
+     */
     LOCK_OFF = 0,
 
-    /**Indicates that the lock state card is in the <b>open</b> state. */
+    /**
+     * Indicates that the lock state card is in the open state.
+     */
     LOCK_ON,
 
-    /**Indicates that the lock state card is in the <b>error</b> state. */
+    /**
+     * Indicates that the lock state card is in the error state.
+     */
     LOCK_ERROR,
 };
 
+/**
+ * @brief Lock information
+ */
 struct LockInfo {
     LockType lockType = LockType::PIN_LOCK;
     std::u16string password = u"";
     LockState lockState = LockState::LOCK_ERROR;
 };
 
+/**
+ * @brief Personalization lock information
+ */
 struct PersoLockInfo {
     PersoLockType lockType = PersoLockType::PN_PIN_LOCK;
     std::u16string password = u"";
 };
 
+/**
+ * @brief Unlock result
+ */
 enum UnlockResult {
-    UNLOCK_FAIL = -2, // unlock fail
-    UNLOCK_INCORRECT = -1, // password error
-    UNLOCK_OK = 0, // unlock successful
+    /**
+     * Unlock fail
+     */
+    UNLOCK_FAIL = -2,
+    /**
+     * Password error
+     */
+    UNLOCK_INCORRECT = -1,
+    /**
+     * Unlock successful
+     */
+    UNLOCK_OK = 0,
 };
 
+/**
+ * @brief Lock status response
+ */
 struct LockStatusResponse {
     int32_t result = 0;
     int32_t remain = 0;
 };
 
+/**
+ * @brief SIM card Authentication response
+ */
 struct SimAuthenticationResponse {
+    /**
+     * Status word 1 of the SIM card, which is returned by the SIM card after command execution
+     */
     int32_t sw1 = 0;
+    /**
+     * Status word 2 of the SIM card, which is returned by the SIM card after command execution
+     */
     int32_t sw2 = 0;
     std::string response = "";
 };
 
+/**
+ * @brief SIM card Authentication result
+ */
 enum SimAuthResult {
+    /**
+     * Authentication fail
+     */
     SIM_AUTH_FAIL = -1,
+    /**
+     * Authentication success
+     */
     SIM_AUTH_SUCCESS = 0,
 };
 
+/**
+ * @brief Icc Account Information
+ */
 struct IccAccountInfo : public Parcelable {
-    int32_t simId = 0; // sim Id for card
-    int32_t slotIndex = 0; // slot index for card
-    bool isEsim = false; // mark card is eSim or not
-    bool isActive = false; // active status for card
-    std::u16string iccId = u""; // iccId for card
-    std::u16string showName = u""; // show name for card
-    std::u16string showNumber = u""; // show number for card
+    /**
+     * SIM Id for card
+     */
+    int32_t simId = 0;
+    /**
+     * Slot index for card
+     */
+    int32_t slotIndex = 0;
+    /**
+     * Mark card is eSim or not
+     */
+    bool isEsim = false;
+    /**
+     * Active status for card
+     */
+    bool isActive = false;
+    /**
+     * IccId for card
+     */
+    std::u16string iccId = u"";
+    /**
+     * Show name for card
+     */
+    std::u16string showName = u"";
+    /**
+     * Show number for card
+     */
+    std::u16string showNumber = u"";
     inline static const std::u16string DEFAULT_SHOW_NAME = u"Card";
     inline static const std::u16string DEFAULT_SHOW_NUMBER = u"";
     inline static const std::u16string DEFAULT_ICC_ID = u"";

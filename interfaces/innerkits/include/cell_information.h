@@ -23,13 +23,34 @@ namespace Telephony {
 class CellInformation : public Parcelable {
 public:
     static const int32_t MAX_CELL_NUM = 10;
+    /**
+     * @brief Cell type
+     */
     enum class CellType {
         CELL_TYPE_NONE = 0,
+        /**
+         * Global System for Mobile Communications (GSM) cell type
+         */
         CELL_TYPE_GSM,
+        /**
+         * Code Division Multiple Access (CDMA) cell type
+         */
         CELL_TYPE_CDMA,
+        /**
+         * Wideband Code Division Multiple Access (WCDMA) cell type
+         */
         CELL_TYPE_WCDMA,
+        /**
+         * Time Division-Synchronous Code Division Multiple Access (TD-SCDMA) cell type
+         */
         CELL_TYPE_TDSCDMA,
+        /**
+         * Long Term Evolution (LTE) cell type
+         */
         CELL_TYPE_LTE,
+        /**
+         * 5G New Radio (NR) cell type
+         */
         CELL_TYPE_NR
     };
     CellInformation() = default;
@@ -41,8 +62,23 @@ public:
     virtual std::string ToString() const = 0;
     void Init(int32_t mcc, int32_t mnc, int32_t cellId);
 
+    /**
+     * @brief Obtain the cell Id
+     *
+     * @return Cell Id
+     */
     virtual int32_t GetCellId() const;
+    /**
+     * @brief Obtain the Mobile Country Code
+     *
+     * @return Mobile Country Code
+     */
     virtual std::string GetMcc() const;
+    /**
+     * @brief Obtain the Mobile Network Code
+     *
+     * @return Mobile Network Code
+     */
     virtual std::string GetMnc() const;
     virtual uint64_t GetTimeStamp() const;
     virtual int32_t GetSignalLevel() const;
@@ -76,8 +112,23 @@ public:
     GsmCellInformation(const GsmCellInformation &gsmCell);
     GsmCellInformation &operator=(const GsmCellInformation &gsmCell);
     bool operator==(const GsmCellInformation &other) const;
+    /**
+     * @brief Obtain the Location Area Code
+     *
+     * @return Location Area Code
+     */
     int32_t GetLac() const;
+    /**
+     * @brief Obtain the Base Station Identity Code
+     *
+     * @return Base Station Identity Code
+     */
     int32_t GetBsic() const;
+    /**
+     * @brief Obtain the Absolute RF Channel Number
+     *
+     * @return Absolute RF Channel Number
+     */
     int32_t GetArfcn() const;
 private:
     int32_t lac_ = 0;
@@ -99,8 +150,23 @@ public:
     LteCellInformation &operator=(const LteCellInformation &lteCell);
     bool operator==(const LteCellInformation &other) const;
     void UpdateLocation(int32_t cellId, int32_t tac);
+    /**
+     * @brief Obtain the Physical Cell Id
+     *
+     * @return Physical Cell Id
+     */
     int32_t GetPci() const;
+    /**
+     * @brief Obtain the Tracking Area Code
+     *
+     * @return Tracking Area Code
+     */
     int32_t GetTac() const;
+    /**
+     * @brief Obtain the Absolute RF Channel Number
+     *
+     * @return Absolute RF Channel Number
+     */
     int32_t GetArfcn() const;
 private:
     int32_t pci_ = 0;
@@ -122,8 +188,23 @@ public:
     WcdmaCellInformation &operator=(const WcdmaCellInformation &wcdmaCell);
     bool operator==(const WcdmaCellInformation &other) const;
     void UpdateLocation(int32_t cellId, int32_t lac);
+    /**
+     * @brief Obtain the Primary Scrambling Code
+     *
+     * @return Primary Scrambling Code
+     */
     int32_t GetPsc() const;
+    /**
+     * @brief Obtain the Location Area Code
+     *
+     * @return Location Area Code
+     */
     int32_t GetLac() const;
+    /**
+     * @brief Obtain the Absolute RF Channel Number
+     *
+     * @return Absolute RF Channel Number
+     */
     int32_t GetArfcn() const;
 private:
     int32_t lac_ = 0;
@@ -145,8 +226,23 @@ public:
     TdscdmaCellInformation &operator=(const TdscdmaCellInformation &wcdmaCell);
     bool operator==(const TdscdmaCellInformation &other) const;
     void UpdateLocation(int32_t cellId, int32_t lac);
+    /**
+     * @brief Obtain the Cell Parameters ID
+     *
+     * @return Cell Parameters ID
+     */
     int32_t GetCpid() const;
+    /**
+     * @brief Obtain the Location Area Code
+     *
+     * @return Location Area Code
+     */
     int32_t GetLac() const;
+    /**
+     * @brief Obtain the Absolute RF Channel Number
+     *
+     * @return Absolute RF Channel Number
+     */
     int32_t GetArfcn() const;
 private:
     int32_t lac_ = 0;
@@ -168,10 +264,35 @@ public:
     CdmaCellInformation &operator=(const CdmaCellInformation &cdmaCell);
     bool operator==(const CdmaCellInformation &other) const;
     void UpdateLocation(int32_t baseId, int32_t latitude, int32_t longitude);
+    /**
+     * @brief Obtain cdma base station identification number
+     *
+     * @return CDMA base station identification number
+     */
     int32_t GetBaseId() const;
+    /**
+     * @brief Obtain cdma base station latitude
+     *
+     * @return CDMA base station latitude
+     */
     int32_t GetLatitude() const;
+    /**
+     * @brief Obtain cdma base station longitude
+     *
+     * @return CDMA base station longitude
+     */
     int32_t GetLongitude() const;
+    /**
+     * @brief Obtain cdma network identification number
+     *
+     * @return CDMA network identification number
+     */
     int32_t GetNid() const;
+    /**
+     * @brief Obtain cdma system identification number
+     *
+     * @return CDMA system identification number
+     */
     int32_t GetSid() const;
 
 private:
@@ -196,9 +317,27 @@ public:
     NrCellInformation &operator=(const NrCellInformation &nrCell);
     bool operator==(const NrCellInformation &other) const;
     void UpdateLocation(int32_t pci, int32_t tac);
+    /**
+     * @return Absolute RF Channel Number
+     */
     int32_t GetArfcn() const;
+    /**
+     * @brief Obtain the Physical Cell Id
+     *
+     * @return Physical Cell Id
+     */
     int32_t GetPci() const;
+    /**
+     * @brief Obtain the Tracking Area Code
+     *
+     * @return Tracking Area Code
+     */
     int32_t GetTac() const;
+    /**
+     * @brief Obtain the NR(New Radio 5G) Cell Identity
+     *
+     * @return NR(New Radio 5G) Cell Identity
+     */
     int64_t GetNci() const;
 private:
     int32_t nrArfcn_ = 0;

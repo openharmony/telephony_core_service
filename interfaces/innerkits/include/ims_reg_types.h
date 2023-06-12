@@ -25,11 +25,17 @@ const int16_t INFO_MAXIMUM_LIMIT = 31;
 const int16_t DATA_LENGTH_ONE = 1;
 const int16_t DATA_LENGTH_TWO = 2;
 
+/**
+ * @brief IMS register status
+ */
 enum ImsRegState {
     IMS_UNREGISTERED,
     IMS_REGISTERED,
 };
 
+/**
+ * @brief IMS register technology
+ */
 enum ImsRegTech {
     IMS_REG_TECH_NONE = 0,
     IMS_REG_TECH_LTE = 1,
@@ -37,6 +43,9 @@ enum ImsRegTech {
     IMS_REG_TECH_NR = 3,
 };
 
+/**
+ * @brief IMS service type
+ */
 enum ImsServiceType {
     TYPE_VOICE = 0,
     TYPE_VIDEO = 1,
@@ -44,10 +53,13 @@ enum ImsServiceType {
     TYPE_SMS = 3,
 };
 
+/**
+ * @brief IMS register information
+ */
 struct ImsRegInfo {
     ImsRegState imsRegState = IMS_UNREGISTERED;
     ImsRegTech imsRegTech = IMS_REG_TECH_NONE;
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif  // IMS_REG_TYPES_H
+#endif // IMS_REG_TYPES_H
