@@ -540,10 +540,7 @@ std::u16string CoreService::GetSimEons(int32_t slotId, const std::string &plmn, 
 
 int32_t CoreService::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
 {
-    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
-        TELEPHONY_LOGE("Non-system applications use system APIs!");
-        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
-    }
+    bool denied = false;
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("permission denied!");
         denied = true;
@@ -696,10 +693,7 @@ int32_t CoreService::GetShowName(int32_t slotId, std::u16string &showName)
 
 int32_t CoreService::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList)
 {
-    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
-        TELEPHONY_LOGE("Non-system applications use system APIs!");
-        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
-    }
+    bool denied = false;
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("permission denied!");
         denied = true;
