@@ -32,7 +32,7 @@ enum JsErrorCode {
     JS_ERROR_TELEPHONY_PERMISSION_DENIED = 201,
 
     /**
-     * Non system applications use system APIs.
+     * Non-system applications use system APIs.
      */
     JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API = 202,
 
