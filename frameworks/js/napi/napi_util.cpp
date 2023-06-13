@@ -53,7 +53,8 @@ static constexpr const char *JS_ERROR_CELLULAR_CALL_IMS_BASE_ERROR_STRING = "Cel
 static constexpr const char *JS_ERROR_CELLULAR_DATA_BASE_ERROR_STRING = "Cellular data module base error.";
 static constexpr const char *JS_ERROR_SMS_MMS_BASE_ERROR_STRING = "Sms mms module base error.";
 static constexpr const char *JS_ERROR_STATE_REGISTRY_BASE_ERROR_STRING = "State registry module base error.";
-static constexpr const char *JS_ERROR_AIRPLANE_MODE_ON_STRING = "Airplane mode is on, can not call.";
+static constexpr const char *JS_ERROR_AIRPLANE_MODE_ON_STRING = "Airplane mode is on.";
+static constexpr const char *JS_ERROR_NETWORK_NOT_IN_SERVICE = "Network not in service.";
 
 static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_PERMISSION_DENIED, JS_ERROR_TELEPHONY_PERMISSION_DENIED_STRING },
@@ -78,6 +79,7 @@ static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_SMS_MMS_BASE_ERROR, JS_ERROR_SMS_MMS_BASE_ERROR_STRING },
     { JsErrorCode::JS_ERROR_STATE_REGISTRY_BASE_ERROR, JS_ERROR_STATE_REGISTRY_BASE_ERROR_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_AIRPLANE_MODE_ON, JS_ERROR_AIRPLANE_MODE_ON_STRING },
+    { JsErrorCode::JS_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE, JS_ERROR_NETWORK_NOT_IN_SERVICE }
 };
 
 std::string NapiUtil::GetErrorMessage(int32_t errorCode)
@@ -601,6 +603,9 @@ bool NapiUtil::CreateCommonSystemErrorMessageForJs(int32_t errorCode, JsErrorCod
             break;
         case TELEPHONY_ERR_AIRPLANE_MODE_ON:
             jsErrorCode = JS_ERROR_TELEPHONY_AIRPLANE_MODE_ON;
+            break;
+        case TELEPHONY_ERR_NETWORK_NOT_IN_SERVICE:
+            jsErrorCode = JS_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE;
             break;
         default:
             flag = false;
