@@ -78,6 +78,11 @@ enum JsErrorCode {
     JS_ERROR_TELEPHONY_AIRPLANE_MODE_ON,
 
     /**
+     * Network not in service.
+     */
+    JS_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE,
+
+    /**
      * Unknown error code.
      */
     JS_ERROR_TELEPHONY_UNKNOW_ERROR = 8300999,
