@@ -32,7 +32,7 @@ namespace OHOS {
 namespace Telephony {
 static constexpr int32_t MAX_TEXT_LENGTH = 4096;
 static constexpr const char *JS_ERROR_TELEPHONY_PERMISSION_DENIED_STRING = "Permission denied.";
-static constexpr const char *JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API_STRING = "Non system applications use system APIs.";
+static constexpr const char *JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API_STRING = "Non-system applications use system APIs.";
 static constexpr const char *JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING =
     "Parameter error. The type of parameter should match or the number of parameters must match.";
 static constexpr const char *JS_ERROR_DEVICE_NOT_SUPPORT_THIS_API_STRING = "The device does not support this API.";
