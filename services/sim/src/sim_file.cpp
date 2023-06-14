@@ -1693,17 +1693,10 @@ bool SimFile::SetVoiceCallForwarding(bool enable, const std::string &number)
         }
         // Spec reference for EF_CFIS contents, TS 51.011 section 10.3.46.
         if (enable && !number.empty()) {
-            std::vector<uint8_t> bcdCodes;
-            SimNumberDecode::NumberConvertToBCD(number, bcdCodes, false, SimNumberDecode::BCD_TYPE_ADN);
-            unsigned int dataLength = bcdCodes.size();
-            unsigned char numberData[dataLength];
-            for (unsigned int i = 0; i < dataLength; ++i) {
-                numberData[i] = bcdCodes.at(i);
+            if (!FillNumber(efCfis_, efCfisSize_, number)) {
+                TELEPHONY_LOGE("fill number failed");
+                return false;
             }
-            SIMUtils::ArrayCopy(numberData, 0, efCfis_, CFIS_TON_NPI_OFFSET, dataLength);
-            efCfis_[CFIS_BCD_NUMBER_LENGTH_OFFSET] = static_cast<unsigned char>(dataLength);
-            efCfis_[CFIS_ADN_CAPABILITY_ID_OFFSET] = static_cast<unsigned char>(BYTE_NUM);
-            efCfis_[CFIS_ADN_EXTENSION_ID_OFFSET] = static_cast<unsigned char>(BYTE_NUM);
         }
         fileController_->UpdateLinearFixedFile(ELEMENTARY_FILE_CFIS, 1, efCfisStr_, efCfisSize_, "", eventUpdate);
         setDone = true;
@@ -1727,6 +1720,30 @@ bool SimFile::SetVoiceCallForwarding(bool enable, const std::string &number)
     }
     TELEPHONY_LOGE("SetVoiceCallForwarding efCfis_ and efCff_ is nullptr");
     return false;
+}
+
+bool SimFile::FillNumber(unsigned char *efCfis, int32_t efCfisSize, const std::string &number)
+{
+    std::vector<uint8_t> bcdCodes;
+    SimNumberDecode::NumberConvertToBCD(number, bcdCodes, false, SimNumberDecode::BCD_TYPE_ADN);
+    unsigned int dataLength = bcdCodes.size();
+    unsigned char numberData[dataLength];
+    for (unsigned int i = 0; i < dataLength; ++i) {
+        numberData[i] = bcdCodes.at(i);
+    }
+    if (CFIS_TON_NPI_OFFSET + dataLength >= efCfisSize) {
+        TELEPHONY_LOGE("data is invalid");
+        return false;
+    }
+    SIMUtils::ArrayCopy(numberData, 0, efCfis, CFIS_TON_NPI_OFFSET, dataLength);
+    if (CFIS_ADN_EXTENSION_ID_OFFSET >= efCfisSize) {
+        TELEPHONY_LOGE("data is invalid");
+        return false;
+    }
+    efCfis[CFIS_BCD_NUMBER_LENGTH_OFFSET] = static_cast<unsigned char>(dataLength);
+    efCfis[CFIS_ADN_CAPABILITY_ID_OFFSET] = static_cast<unsigned char>(BYTE_NUM);
+    efCfis[CFIS_ADN_EXTENSION_ID_OFFSET] = static_cast<unsigned char>(BYTE_NUM);
+    return true;
 }
 
 bool SimFile::CphsVoiceMailAvailable()
