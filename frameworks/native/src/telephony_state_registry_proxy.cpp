@@ -408,8 +408,7 @@ int32_t TelephonyStateRegistryProxy::UpdateVoiceMailMsgIndicator(int32_t slotId,
 
 int32_t TelephonyStateRegistryProxy::UpdateIccAccount()
 {
-    MessageOption option;
-    MessageParcel in, out;
+    MessageParcel in;
     if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
@@ -417,6 +416,8 @@ int32_t TelephonyStateRegistryProxy::UpdateIccAccount()
     if (remote == nullptr) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
+    MessageOption option;
+    MessageParcel out;
     int result = remote->SendRequest(static_cast<uint32_t>(StateNotifyCode::ICC_ACCOUNT_CHANGE), in, out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();

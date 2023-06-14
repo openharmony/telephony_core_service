@@ -850,6 +850,16 @@ static bool TestGetDefaultVoiceSlotId()
     return true;
 }
 
+static bool TestGetDefaultVoiceSimId()
+{
+    AccessToken token;
+    int32_t simId = 0;
+    int32_t result = g_telephonyService->GetDefaultVoiceSimId(simId);
+    string expect = (result >= INVALID_VALUE) ? "success" : "fail";
+    std::cout << "TelephonyTestService Remote GetDefaultVoiceSimId result [" << result << "] " << expect << std::endl;
+    return true;
+}
+
 static bool TestSetShowNumber()
 {
     AccessToken token;

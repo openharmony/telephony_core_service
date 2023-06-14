@@ -706,7 +706,7 @@ int32_t CoreServiceStub::OnGetDefaultVoiceSlotId(MessageParcel &data, MessagePar
 
 int32_t CoreServiceStub::OnGetDefaultVoiceSimId(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t simId = INVALID_VALUE;
+    int32_t simId = 0;
     int32_t result = GetDefaultVoiceSimId(simId);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("write int32 reply failed.");
