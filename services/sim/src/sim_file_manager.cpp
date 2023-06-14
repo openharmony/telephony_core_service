@@ -590,7 +590,7 @@ SimFileManager::IccType SimFileManager::GetIccTypeByTech(const std::shared_ptr<V
 {
     if (tech == nullptr) {
         TELEPHONY_LOGE("GetCardTypeByTech param tech is nullptr then ICC_TYPE_UNKNOW");
-        return SimFileManager::IccType::ICC_TYPE_GSM;
+        return SimFileManager::IccType::ICC_TYPE_USIM;
     }
     switch (tech->actType) {
         case int32_t(RadioTech::RADIO_TECHNOLOGY_EHRPD):
@@ -605,7 +605,7 @@ SimFileManager::IccType SimFileManager::GetIccTypeByTech(const std::shared_ptr<V
         default:
             break;
     }
-    return SimFileManager::IccType::ICC_TYPE_GSM;
+    return SimFileManager::IccType::ICC_TYPE_USIM;
 }
 
 bool SimFileManager::IsValidType(SimFileManager::IccType type)
