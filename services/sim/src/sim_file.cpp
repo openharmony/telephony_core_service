@@ -1693,7 +1693,7 @@ bool SimFile::SetVoiceCallForwarding(bool enable, const std::string &number)
         }
         // Spec reference for EF_CFIS contents, TS 51.011 section 10.3.46.
         if (enable && !number.empty()) {
-            if (!FillNumber(efCfis_, efCfisSize_, number)) {
+            if (!FillNumber(efCfisData, efCfisSize_, number)) {
                 TELEPHONY_LOGE("fill number failed");
                 return false;
             }
@@ -1722,7 +1722,7 @@ bool SimFile::SetVoiceCallForwarding(bool enable, const std::string &number)
     return false;
 }
 
-bool SimFile::FillNumber(unsigned char *efCfis, int32_t efCfisSize, const std::string &number)
+bool SimFile::FillNumber(std::shared_ptr<unsigned char> efCfisData, int32_t efCfisSize, const std::string &number)
 {
     std::vector<uint8_t> bcdCodes;
     SimNumberDecode::NumberConvertToBCD(number, bcdCodes, false, SimNumberDecode::BCD_TYPE_ADN);
@@ -1735,6 +1735,7 @@ bool SimFile::FillNumber(unsigned char *efCfis, int32_t efCfisSize, const std::s
         TELEPHONY_LOGE("data is invalid");
         return false;
     }
+    efCfis = efCfisData.get();
     SIMUtils::ArrayCopy(numberData, 0, efCfis, CFIS_TON_NPI_OFFSET, dataLength);
     if (CFIS_ADN_EXTENSION_ID_OFFSET >= efCfisSize) {
         TELEPHONY_LOGE("data is invalid");
