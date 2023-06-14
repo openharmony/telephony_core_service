@@ -1735,15 +1735,15 @@ bool SimFile::FillNumber(std::shared_ptr<unsigned char> efCfisData, int32_t efCf
         TELEPHONY_LOGE("data is invalid");
         return false;
     }
-    efCfis = efCfisData.get();
-    SIMUtils::ArrayCopy(numberData, 0, efCfis, CFIS_TON_NPI_OFFSET, dataLength);
+    efCfis_ = efCfisData.get();
+    SIMUtils::ArrayCopy(numberData, 0, efCfis_, CFIS_TON_NPI_OFFSET, dataLength);
     if (CFIS_ADN_EXTENSION_ID_OFFSET >= efCfisSize) {
         TELEPHONY_LOGE("data is invalid");
         return false;
     }
-    efCfis[CFIS_BCD_NUMBER_LENGTH_OFFSET] = static_cast<unsigned char>(dataLength);
-    efCfis[CFIS_ADN_CAPABILITY_ID_OFFSET] = static_cast<unsigned char>(BYTE_NUM);
-    efCfis[CFIS_ADN_EXTENSION_ID_OFFSET] = static_cast<unsigned char>(BYTE_NUM);
+    efCfis_[CFIS_BCD_NUMBER_LENGTH_OFFSET] = static_cast<unsigned char>(dataLength);
+    efCfis_[CFIS_ADN_CAPABILITY_ID_OFFSET] = static_cast<unsigned char>(BYTE_NUM);
+    efCfis_[CFIS_ADN_EXTENSION_ID_OFFSET] = static_cast<unsigned char>(BYTE_NUM);
     return true;
 }
 
