@@ -1130,13 +1130,6 @@ int32_t NetworkSearchManager::SetNrOptionMode(int32_t slotId, NrMode mode)
         TELEPHONY_LOGE("telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SET_NR_OPTION_MODE);
-    if (event == nullptr || inner->networkSearchHandler_ == nullptr) {
-        TELEPHONY_LOGE("event is null!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    event->SetOwner(inner->networkSearchHandler_);
-    telRilManager_->SetNrOptionMode(slotId, static_cast<int32_t>(mode), event);
     return TELEPHONY_ERR_SUCCESS;
 }
 
