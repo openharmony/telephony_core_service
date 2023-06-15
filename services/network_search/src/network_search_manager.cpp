@@ -1376,10 +1376,8 @@ int32_t NetworkSearchManager::GetNetworkCapability(
             networkCapabilityType, isNrSupported);
         return TELEPHONY_ERROR;
     }
-    int32_t preferredNetwork = static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_AUTO);
-    int32_t networkMode = static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_AUTO);
-    preferredNetwork = GetPreferredNetworkValue(slotId);
-    networkMode = JudgeNetworkMode(preferredNetwork);
+    int32_t preferredNetwork = GetPreferredNetworkValue(slotId);
+    int32_t networkMode = JudgeNetworkMode(preferredNetwork);
     if (networkCapabilityType == SERVICE_TYPE_NR && networkMode == NETWORK_MODE_NR) {
         networkCapabilityState = SERVICE_ABILITY_ON;
     } else if (networkCapabilityType == SERVICE_TYPE_LTE &&
