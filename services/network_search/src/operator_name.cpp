@@ -86,15 +86,8 @@ void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("OperatorName::HandleOperatorInfo phone type:%{public}d invalid", type);
     }
     networkSearchManager->decMsgNum(slotId_);
-    if (networkSearchState_ != nullptr) {
-        if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
-            bool isNeedDelay = networkSearchManager->IsNeedDelayNotify(slotId_);
-            if (isNeedDelay) {
-                TELEPHONY_LOGI("operator change, revert last tech. slotId:%{public}d", slotId_);
-                RevertLastTechnology();
-            }
-            networkSearchManager->HandleNotifyStateChangeWithDelay(slotId_, isNeedDelay);
-        }
+    if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
+        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
     }
 
     NotifySpnChanged();

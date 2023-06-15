@@ -212,6 +212,7 @@ public:
     std::shared_ptr<NetworkSearchManagerInner> FindManagerInner(int32_t slotId);
     void SetLocateUpdate(int32_t slotId);
     int32_t GetAirplaneMode(bool &airplaneMode) override;
+    int32_t ProcessNotifyStateChangeEvent(int32_t slotId);
     bool IsRadioFirstPowerOn(int32_t slotId);
     void SetRadioFirstPowerOn(int32_t slotId, bool isFirstPowerOn);
     void NotifyImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info);
@@ -267,7 +268,8 @@ private:
     void ClearManagerInner();
     void AddManagerInner(int32_t slotId, const std::shared_ptr<NetworkSearchManagerInner> &inner);
     bool RemoveManagerInner(int32_t slotId);
-    int32_t GetDelayNotifyTime(int32_t slotId);
+    int32_t GetDelayNotifyTime();
+    int32_t RevertLastTechnology(int32_t slotId);
 
 private:
     struct ImsRegInfoCallbackRecord {
@@ -285,6 +287,7 @@ private:
     std::map<int32_t, std::shared_ptr<NetworkSearchManagerInner>> mapManagerInner_;
     std::list<ImsRegInfoCallbackRecord> listImsRegInfoCallbackRecord_;
     std::mutex mutexInner_;
+    int32_t delayTime_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

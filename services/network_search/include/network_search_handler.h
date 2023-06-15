@@ -93,7 +93,6 @@ public:
     void TimezoneRefresh();
     void SetCellRequestMinInterval(uint32_t minInterval);
     int32_t GetRegServiceState(RegServiceState &regState);
-    int32_t GetNrSecondaryCellState(bool &state);
 
 private:
     void RadioOnState();
@@ -130,7 +129,8 @@ private:
     void AutoTimeZoneChange(const AppExecFwk::InnerEvent::Pointer &);
     void AirplaneModeChange(const AppExecFwk::InnerEvent::Pointer &);
     void RadioGetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &event);
-    void RadioGetNrOptionMode(const AppExecFwk::InnerEvent::Pointer &event);
+    void SetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event);
+    void GetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event);
     bool InitOperatorName();
 

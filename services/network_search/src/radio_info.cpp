@@ -335,6 +335,29 @@ int32_t RadioInfo::ProcessGetBasebandVersion(const AppExecFwk::InnerEvent::Point
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t RadioInfo::ProcessGetNrOptionMode(const AppExecFwk::InnerEvent::Pointer &event) const
+{
+    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
+    TELEPHONY_LOGI("ProcessGetNrOptionMode start, slotId:%{public}d", slotId_);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode event is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (nsm == nullptr) {
+        TELEPHONY_LOGE("NetworkSelection::ProcessGetNrOptionMode nsm is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    auto mode = event->GetSharedObject<int32_t>();
+    if (mode == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode mode is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    TELEPHONY_LOGI("ProcessGetNrOptionMode success:%{public}d", *mode);
+    nsm->UpdateNrOptionMode(slotId_, static_cast<NrMode>(*mode));
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 int32_t RadioInfo::ProcessGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event) const
 {
     TELEPHONY_LOGI("start slotId:%{public}d", slotId_);
@@ -348,21 +371,14 @@ int32_t RadioInfo::ProcessGetRrcConnectionState(const AppExecFwk::InnerEvent::Po
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    auto object = event->GetSharedObject<int32_t>();
+    auto object = event->GetSharedObject<HRilInt32Parcel>();
     if (object == nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetRrcConnectionState object is nullptr slotId:%{public}d", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TELEPHONY_LOGI("rrc state[%{public}d] notify success, slotId:%{public}d", object->data, slotId_);
     nsm->UpdateNrConfig(slotId_, object->data);
-    nsm->NotifyStateChange(slotId_);
-    ELEPHONY_LOGI("ps domain change, slotId:%{public}d", slotId_);
-    bool isNeedDelay = networkSearchManager->IsNeedDelayNotify(slotId_);
-    if (isNeedDelay) {
-        TELEPHONY_LOGI("rrc state change, revert last tech. slotId:%{public}d", slotId_);
-        RevertLastTechnology();
-    }
-    nsm->HandleNotifyStateChangeWithDelay(slotId_, isNeedDelay);
+    nsm->ProcessNotifyStateChangeEvent(slotId_);
     return TELEPHONY_ERR_SUCCESS;
 }
 

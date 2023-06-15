@@ -48,8 +48,8 @@ NetworkRegister::NetworkRegister(std::shared_ptr<NetworkSearchState> networkSear
 void NetworkRegister::InitNrConversionConfig()
 {
     std::string config = "";
-    GetSystemPropertiesConfig(config);
-    if (config == TELEPHONY_NR_CONFIG_AD) {
+    GetSystemPropertiesConfig(systemPropertiesConfig_);
+    if (systemPropertiesConfig_ == TELEPHONY_NR_CONFIG_AD) {
         int32_t rrcState = 0;
         GetRrcConnectionState(rrcState);
         if (rrcState == RRC_CONNECTED_STATUS) {
@@ -100,12 +100,7 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
         slotId_, static_cast<int32_t>(tech), csRegStateResult->cellId, csRegStateResult->lacCode);
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
         TELEPHONY_LOGI("cs domain change, slotId:%{public}d", slotId_);
-        bool isNeedDelay = networkSearchManager->IsNeedDelayNotify(slotId_);
-        if (isNeedDelay) {
-            TELEPHONY_LOGI("cs domain change, revert last tech. slotId:%{public}d", slotId_);
-            RevertLastTechnology();
-        }
-        networkSearchManager->HandleNotifyStateChangeWithDelay(slotId_, isNeedDelay);
+        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
     }
     CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_CS),
         static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
@@ -155,7 +150,10 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
     TELEPHONY_LOGI(
         "ProcessPsRegister: regStatus= %{public}d radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
         registrationStatus, psRegStatusResult->radioTechnology, roam, slotId_);
-    
+    if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
+        TELEPHONY_LOGI("ps domain change, slotId:%{public}d", slotId_);
+        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
+    }
     CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_PS),
         static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
 }
@@ -170,29 +168,6 @@ int32_t NetworkRegister::RevertLastTechnology()
     networkSearchState_->SetNetworkType(lastPsRadioTech, DomainType::DOMAIN_TYPE_PS);
     TELEPHONY_LOGI(
         "lastCfgTech:%{public}d lastPsRadioTech:%{public}d slotId:%{public}d", lastCfgTech, lastPsRadioTech, slotId_);
-    return TELEPHONY_ERR_SUCCESS;
-}
-
-int32_t NetworkRegister::ProcessPsRegisterNofityEvent()
-{
-    auto networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("networkSearchManager is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (networkSearchState_ == nullptr) {
-        TELEPHONY_LOGE("networkSearchState_ is nullptr slotId:%{public}d", slotId_);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
-        TELEPHONY_LOGI("ps domain change, slotId:%{public}d", slotId_);
-        bool isNeedDelay = networkSearchManager->IsNeedDelayNotify(slotId_);
-        if (isNeedDelay) {
-            TELEPHONY_LOGI("ps domain change, revert last tech. slotId:%{public}d", slotId_);
-            RevertLastTechnology();
-        }
-        networkSearchManager->HandleNotifyStateChangeWithDelay(slotId_, isNeedDelay);
-    }
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -245,25 +220,14 @@ void NetworkRegister::ProcessChannelConfigInfo(const AppExecFwk::InnerEvent::Poi
         isNrSecondaryCell_ = isNrSecondaryCell;
         UpdateNrState();
         UpdateCfgTech();
-        CheckIsNeedRevertPhysicalChannelConfig();
+        auto networkSearchManager = networkSearchManager_.lock();
+        if (networkSearchManager == nullptr) {
+            TELEPHONY_LOGE("NetworkRegister::ProcessChannelConfigInfo networkSearchManager is nullptr");
+            return;
+        }
+        TELEPHONY_LOGI("physical channel change, slotId:%{public}d", slotId_);
+        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
     }
-}
-
-int32_t NetworkRegister::CheckIsNeedRevertPhysicalChannelConfig()
-{
-    auto networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("NetworkRegister::NotifyNrFrequencyChanged networkSearchManager is nullptr");
-        return;
-    }
-    bool isNeedDelay = networkSearchManager->IsNeedDelayNotify(slotId_);
-    TELEPHONY_LOGI("physical channel change, isNeedDelay:%{public}d slotId:%{public}d", isNeedDelay, slotId_);
-    if (isNeedDelay) {
-        TELEPHONY_LOGI("physical channel change, revert last tech. slotId:%{public}d", slotId_);
-        RevertLastTechnology();
-    }
-    networkSearchManager->HandleNotifyStateChangeWithDelay(slotId_, isNeedDelay);
-    return TELEPHONY_ERR_SUCCESS;
 }
 
 void NetworkRegister::NotifyNrFrequencyChanged()
@@ -395,11 +359,6 @@ RegServiceState NetworkRegister::GetRegServiceState() const
     return regStatusResult_;
 }
 
-bool NetworkRegister::GetNrSecondaryCellState() const
-{
-    return isNrSecondaryCell_;
-}
-
 RadioTech NetworkRegister::ConvertTechFromRil(HRilRadioTech code) const
 {
     switch (code) {
@@ -452,9 +411,7 @@ int32_t NetworkRegister::GetRrcConnectionState(int32_t &rrcState)
 
 int32_t NetworkRegister::UpdateNrConfig(int32_t status)
 {
-    std::string config = "";
-    GetSystemPropertiesConfig(config);
-    if (config == TELEPHONY_NR_CONFIG_AD) {
+    if (systemPropertiesConfig_ == TELEPHONY_NR_CONFIG_AD) {
         if (status == RRC_CONNECTED_STATUS) {
             currentNrConfig_ = TELEPHONY_NR_CONFIG_A;
         } else {
@@ -485,9 +442,7 @@ RadioTech NetworkRegister::GetTechnologyByNrConfig(RadioTech tech)
     if (tech != RadioTech::RADIO_TECHNOLOGY_LTE_CA && tech != RadioTech::RADIO_TECHNOLOGY_LTE) {
         return tech;
     }
-    std::string config = "";
-    GetSystemPropertiesConfig(config);
-    if (config == TELEPHONY_NR_CONFIG_AD) {
+    if (systemPropertiesConfig_ == TELEPHONY_NR_CONFIG_AD) {
         int32_t rrcState = 0;
         GetRrcConnectionState(rrcState);
         if (rrcState == RRC_CONNECTED_STATUS) {
@@ -496,6 +451,7 @@ RadioTech NetworkRegister::GetTechnologyByNrConfig(RadioTech tech)
             currentNrConfig_ = TELEPHONY_NR_CONFIG_D;
         }
     }
+    TELEPHONY_LOGI("currentNrConfig_:%{public}s, slotId:%{public}d", currentNrConfig_.c_str(), slotId_);
     switch (nrState_) {
         case NrState::NR_NSA_STATE_NO_DETECT: {
             if (currentNrConfig_ == TELEPHONY_NR_CONFIG_D) {
