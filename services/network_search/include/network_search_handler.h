@@ -52,8 +52,9 @@ public:
     int32_t GetCellInfoList(std::vector<sptr<CellInformation>> &cells);
     void DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void NotifyStateChange(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleDelayNotifyEvent(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t UpdateNrConfig(int32_t status);
-    int32_t GetNrConfig(std::string &config);
+    int32_t RevertLastTechnology();
     void UpdateImsServiceStatus(const AppExecFwk::InnerEvent::Pointer &event);
     void UpdateImsRegisterState(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t SendUpdateCellLocationRequest();
@@ -91,7 +92,7 @@ public:
     sptr<CellLocation> GetCellLocation();
     void TimezoneRefresh();
     void SetCellRequestMinInterval(uint32_t minInterval);
-    int32_t GetLastRegServiceState(RegServiceState &regState);
+    int32_t GetRegServiceState(RegServiceState &regState);
     int32_t GetNrSecondaryCellState(bool &state);
 
 private:
