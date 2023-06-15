@@ -309,7 +309,7 @@ void RadioInfo::AirplaneModeChange()
         nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_OFF), 0);
     }
     nsm->SetLocalAirplaneMode(slotId_, isAirplaneModeOn);
-    TELEPHONY_LOGD("RadioInfo::AirplaneModeChange end. airplaneMode:%{public}d", isAirplaneModeOn);
+    TELEPHONY_LOGI("airplaneMode:%{public}d", isAirplaneModeOn);
 }
 
 int32_t RadioInfo::ProcessGetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &event) const
@@ -337,25 +337,32 @@ int32_t RadioInfo::ProcessGetBasebandVersion(const AppExecFwk::InnerEvent::Point
 
 int32_t RadioInfo::ProcessGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event) const
 {
-    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    TELEPHONY_LOGD("RadioInfo::ProcessGetRrcConnectionState slotId:%{public}d", slotId_);
+    TELEPHONY_LOGI("start slotId:%{public}d", slotId_);
     if (event == nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetRrcConnectionState event is nullptr slotId:%{public}d", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
     if (nsm == nullptr) {
-        TELEPHONY_LOGE("NetworkSelection::ProcessGetRrcConnectionState nsm is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("RadioInfo::ProcessGetRrcConnectionState nsm is nullptr slotId:%{public}d", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    auto state = event->GetSharedObject<int32_t>();
-    if (state == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetRrcConnectionState state is nullptr slotId:%{public}d", slotId_);
+    auto object = event->GetSharedObject<int32_t>();
+    if (object == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetRrcConnectionState object is nullptr slotId:%{public}d", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    TELEPHONY_LOGD("RadioInfo::ProcessGetRrcConnectionState success");
-    nsm->UpdateNrConfig(slotId_, *state);
+    TELEPHONY_LOGI("rrc state[%{public}d] notify success, slotId:%{public}d", object->data, slotId_);
+    nsm->UpdateNrConfig(slotId_, object->data);
     nsm->NotifyStateChange(slotId_);
+    ELEPHONY_LOGI("ps domain change, slotId:%{public}d", slotId_);
+    bool isNeedDelay = networkSearchManager->IsNeedDelayNotify(slotId_);
+    if (isNeedDelay) {
+        TELEPHONY_LOGI("rrc state change, revert last tech. slotId:%{public}d", slotId_);
+        RevertLastTechnology();
+    }
+    nsm->HandleNotifyStateChangeWithDelay(slotId_, isNeedDelay);
     return TELEPHONY_ERR_SUCCESS;
 }
 
