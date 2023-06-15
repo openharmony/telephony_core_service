@@ -1735,8 +1735,7 @@ bool SimFile::FillNumber(std::shared_ptr<unsigned char> efCfisData, int32_t efCf
         TELEPHONY_LOGE("data is invalid");
         return false;
     }
-    unsigned char *efCfis = nullptr;
-    efCfis = efCfisData.get();
+    auto efCfis = efCfisData.get();
     SIMUtils::ArrayCopy(numberData, 0, efCfis, CFIS_TON_NPI_OFFSET, dataLength);
     if (CFIS_ADN_EXTENSION_ID_OFFSET >= efCfisSize) {
         TELEPHONY_LOGE("data is invalid");
