@@ -2377,10 +2377,7 @@ int32_t CoreServiceProxy::GetOpName(int32_t slotId, std::u16string &opname)
 
 int32_t CoreServiceProxy::GetMaxSimCount()
 {
-    char simSlotCount[SYSPARA_SIZE] = { 0 };
-    GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
-    int32_t slotCount = std::atoi(simSlotCount);
-    return slotCount;
+    return SIM_SLOT_COUNT;
 }
 
 int32_t CoreServiceProxy::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)

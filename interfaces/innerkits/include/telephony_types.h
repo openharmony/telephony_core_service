@@ -35,6 +35,7 @@ inline const int32_t ERROR_SLOT_OPKEY = -2;
 inline const int32_t DSDS_MODE_V2 = 0;
 inline const int32_t DSDS_MODE_V3 = 1;
 inline const size_t MAX_PARAMETER_LENGTH = 100;
+inline int32_t maxSlotCount_ = 0;
 inline constexpr const char *DEFAULT_SLOT_COUNT = "1";
 inline constexpr const char *TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
 inline constexpr const char *DEFAULT_PREFERRED_NETWORK_TYPE = "5"; // CORE_NETWORK_MODE_LTE_WCDMA_GSM
@@ -48,10 +49,12 @@ inline constexpr const char *COUNTRY_CODE_KEY = "telephony.sim.countryCode";
 template<typename T>
 inline T GetMaxSlotCount()
 {
-    char simSlotCount[SYSPARA_SIZE] = { 0 };
-    GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
-    T slotCount = std::atoi(simSlotCount);
-    return slotCount;
+    if (maxSlotCount_ == 0) {
+        char simSlotCount[SYSPARA_SIZE] = { 0 };
+        GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
+        maxSlotCount_ = std::atoi(simSlotCount);
+    }
+    return maxSlotCount_;
 }
 
 template<typename T>
