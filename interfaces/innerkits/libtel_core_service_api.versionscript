@@ -21,6 +21,7 @@
       *CellLocation*;
       *CoreManagerInner*;
       *CoreServiceClient*;
+      *CoreServiceProxy*;
       *GsmCellInformation*;
       *GsmCellLocation*;
       *GsmSignalInformation*;

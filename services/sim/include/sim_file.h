@@ -147,6 +147,7 @@ private:
     void ParsePnn(const std::vector<std::string> &records);
     void ParseOpl(const std::vector<std::string> &records);
     void ParseOpl5g(const std::vector<std::string> &records);
+    bool FillNumber(std::shared_ptr<unsigned char> efCfisData, int32_t efCfisSize, const std::string &number);
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -1192,10 +1192,7 @@ int32_t CoreService::SetVoiceMailInfo(
 
 int32_t CoreService::GetMaxSimCount()
 {
-    char simSlotCount[SYSPARA_SIZE] = { 0 };
-    GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
-    int32_t slotCount = std::atoi(simSlotCount);
-    return slotCount;
+    return SIM_SLOT_COUNT;
 }
 
 int32_t CoreService::GetOpKey(int32_t slotId, std::u16string &opkey)

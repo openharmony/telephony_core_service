@@ -1102,8 +1102,6 @@ int32_t CoreServiceProxy::GetDefaultVoiceSlotId()
 int32_t CoreServiceProxy::GetDefaultVoiceSimId(int32_t &simId)
 {
     MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("WriteInterfaceToken is false");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
@@ -1113,6 +1111,8 @@ int32_t CoreServiceProxy::GetDefaultVoiceSimId(int32_t &simId)
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
+    MessageParcel reply;
+    MessageOption option;
     int32_t st = remote->SendRequest(uint32_t(InterfaceID::GET_DEFAULT_VOICE_SIMID), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("failed, error code is %{public}d", st);
@@ -2377,10 +2377,7 @@ int32_t CoreServiceProxy::GetOpName(int32_t slotId, std::u16string &opname)
 
 int32_t CoreServiceProxy::GetMaxSimCount()
 {
-    char simSlotCount[SYSPARA_SIZE] = { 0 };
-    GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
-    int32_t slotCount = std::atoi(simSlotCount);
-    return slotCount;
+    return SIM_SLOT_COUNT;
 }
 
 int32_t CoreServiceProxy::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
