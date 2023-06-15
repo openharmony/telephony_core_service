@@ -234,7 +234,7 @@ void NetworkSearchState::SetInitial()
     }
 }
 
-void NetworkSearchState::GetLastCfgTech(RadioTech &tech)
+int32_t NetworkSearchState::GetLastCfgTech(RadioTech &tech)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (networkState_ == nullptr) {
@@ -245,7 +245,7 @@ void NetworkSearchState::GetLastCfgTech(RadioTech &tech)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-void NetworkSearchState::GetLastPsRadioTech(RadioTech &tech)
+int32_t NetworkSearchState::GetLastPsRadioTech(RadioTech &tech)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (networkState_ == nullptr) {
@@ -268,7 +268,7 @@ void NetworkSearchState::SetNrState(NrState state)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
-        TELEPHONY_LOGE("nrState_:%{public}d slotId:%{public}d", nrState_, slotId_);
+        TELEPHONY_LOGE("nrState_:%{public}d slotId:%{public}d", state, slotId_);
         networkState_->SetNrState(state);
     }
 }

@@ -54,11 +54,12 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
     { RadioEvent::RADIO_VOICE_TECH_CHANGED, &NetworkSearchHandler::RadioVoiceTechChange },
     { RadioEvent::RADIO_GET_VOICE_TECH, &NetworkSearchHandler::RadioVoiceTechChange },
     { RadioEvent::RADIO_SET_DATA_CONNECT_ACTIVE, &NetworkSearchHandler::DcPhysicalLinkActiveUpdate },
-    { RadioEvent::NOTIFY_STATE_CHANGE, &NetworkSearchHandler::NotifyStateChange },
     { RadioEvent::RADIO_GET_BASEBAND_VERSION, &NetworkSearchHandler::RadioGetBasebandVersion },
-    { RadioEvent::RADIO_GET_NR_OPTION_MODE, &NetworkSearchHandler::RadioGetNrOptionMode },
+    { RadioEvent::RADIO_SET_NR_OPTION_MODE, &NetworkSearchHandler::SetNrOptionModeResponse },
+    { RadioEvent::RADIO_GET_NR_OPTION_MODE, &NetworkSearchHandler::GetNrOptionModeResponse },
     { RadioEvent::RADIO_GET_RRC_CONNECTION_STATE, &NetworkSearchHandler::RadioGetRrcConnectionState },
     { RadioEvent::RADIO_RRC_CONNECTION_STATE_UPDATE, &NetworkSearchHandler::RadioGetRrcConnectionState },
+    { RadioEvent::NOTIFY_STATE_CHANGE, &NetworkSearchHandler::NotifyStateChange },
     { RadioEvent::DELAY_NOTIFY_STATE_CHANGE, &NetworkSearchHandler::HandleDelayNotifyEvent },
     { SettingEventCode::MSG_AUTO_TIME, &NetworkSearchHandler::AutoTimeChange },
     { SettingEventCode::MSG_AUTO_TIMEZONE, &NetworkSearchHandler::AutoTimeZoneChange },
@@ -478,7 +479,7 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
         cellInfo_->ClearCellInfoList();
     }
     networkSearchState->NotifyStateChange();
-    networkSearchManager->SetNrOptionMode(slotId_, NrMode::NR_MODE_UNKNOWN);
+    networkSearchManager->UpdateNrOptionMode(slotId_, NrMode::NR_MODE_UNKNOWN);
     bool isAirplaneModeOn = false;
     if (networkSearchManager->GetAirplaneMode(isAirplaneModeOn) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RadioOffOrUnavailableState GetAirplaneMode fail slotId:%{public}d", slotId_);
@@ -834,11 +835,6 @@ void NetworkSearchHandler::RadioChannelConfigInfo(const AppExecFwk::InnerEvent::
         TELEPHONY_LOGE("NetworkSearchHandler::RadioChannelConfigInfo event is nullptr!");
         return;
     }
-    auto networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchHandler::RadioChannelConfigInfo failed to get NetworkSearchManager");
-        return;
-    }
     if (networkRegister_ != nullptr) {
         networkRegister_->ProcessChannelConfigInfo(event);
     }
@@ -883,14 +879,7 @@ void NetworkSearchHandler::HandleDelayNotifyEvent(const AppExecFwk::InnerEvent::
         TELEPHONY_LOGE("NetworkSearchHandler::NotifyStateChange networkRegister_ is nullptr!");
         return;
     }
-    GetRilOperatorInfo(false);
-    GetRilPsRegistration(false);
-    GetRilCsRegistration(false);
-    auto networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager != nullptr) {
-        networkSearchManager->InitMsgNum(slotId_);
-    }
-    GetRilSignalIntensity(false);
+    RadioOnState();
 }
 
 int32_t NetworkSearchHandler::GetRegServiceState(RegServiceState &regState)
@@ -900,16 +889,6 @@ int32_t NetworkSearchHandler::GetRegServiceState(RegServiceState &regState)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     regState = networkRegister_->GetRegServiceState();
-    return TELEPHONY_ERR_SUCCESS;
-}
-
-int32_t NetworkSearchHandler::GetNrSecondaryCellState(bool &state)
-{
-    if (networkRegister_ == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchHandler::GetNrSecondaryCellState networkRegister_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    state = networkRegister_->GetNrSecondaryCellState();
     return TELEPHONY_ERR_SUCCESS;
 }
 

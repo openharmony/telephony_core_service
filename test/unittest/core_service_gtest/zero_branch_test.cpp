@@ -1794,15 +1794,12 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_003, Function | MediumTest |
     EXPECT_NE(networkSearchManager->GetAirplaneMode(airplaneMode), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->UpdateRadioOn(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->UpdateNrOptionMode(INVALID_SLOTID, NrMode::NR_MODE_UNKNOWN), TELEPHONY_SUCCESS);
-    EXPECT_NE(networkSearchManager->SetNrOptionMode(INVALID_SLOTID, 1), TELEPHONY_SUCCESS);
-    EXPECT_NE(networkSearchManager->SetNrOptionMode(INVALID_SLOTID, 1, networkSearchCallback), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(networkSearchManager->UpdateNrOptionMode(INVALID_SLOTID, NrMode::NR_MODE_UNKNOWN), TELEPHONY_SUCCESS);
-    NrMode mode = NrMode::NR_MODE_UNKNOWN;
-    EXPECT_NE(networkSearchManager->GetNrOptionMode(INVALID_SLOTID, mode), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(mode, NrMode::NR_MODE_UNKNOWN);
     int32_t status = 0;
     EXPECT_NE(networkSearchManager->UpdateRrcConnectionState(INVALID_SLOTID, status), TELEPHONY_SUCCESS);
     EXPECT_EQ(status, 0);
+    NrMode mode = NrMode::NR_MODE_UNKNOWN;
+    EXPECT_NE(networkSearchManager->GetNrOptionMode(INVALID_SLOTID, mode), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(mode, NrMode::NR_MODE_UNKNOWN);
 }
 
 /**
@@ -1937,8 +1934,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
     networkSearchHandler->AutoTimeZoneChange(event);
     networkSearchHandler->AirplaneModeChange(event);
     networkSearchHandler->RadioGetBasebandVersion(event);
-    networkSearchHandler->UpdateCfgTech(event);
-    networkSearchHandler->RadioGetNrOptionMode(event);
     networkSearchHandler->RadioGetRrcConnectionState(event);
     event = nullptr;
     networkSearchHandler->RadioGetCurrentCellInfo(event);
@@ -1954,9 +1949,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
     networkSearchHandler->RadioOffOrUnavailableState(1);
     networkSearchHandler->RadioGetNeighboringCellInfo(event);
     networkSearchHandler->RadioGetBasebandVersion(event);
-    networkSearchHandler->UpdateCfgTech(event);
     networkSearchHandler->UpdateNrConfig(1);
-    networkSearchHandler->RadioGetNrOptionMode(event);
     networkSearchHandler->RadioGetRrcConnectionState(event);
     EXPECT_EQ(networkSearchHandler->GetPhoneType(), PhoneType::PHONE_TYPE_IS_NONE);
 }

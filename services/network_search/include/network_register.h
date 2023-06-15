@@ -37,13 +37,11 @@ public:
     void ProcessPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t RevertLastTechnology();
-    int32_t ProcessPsRegisterNofityEvent();
     int32_t NotifyStateChange();
     void DcPhysicalLinkActiveUpdate(bool isActive);
     void UpdateCfgTech();
     int32_t UpdateNrConfig(int32_t status);
     RegServiceState GetRegServiceState() const;
-    bool GetNrSecondaryCellState() const;
 
     enum class RilRegister {
         REG_STATE_NOT_REG = 0,
@@ -72,7 +70,6 @@ private:
     bool IsValidConfig(const std::string &config);
     RadioTech GetTechnologyByNrConfig(RadioTech tech);
     int32_t GetSystemPropertiesConfig(std::string &config);
-    int32_t CheckIsNeedRevertPhysicalChannelConfig();
 
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
@@ -105,6 +102,7 @@ private:
     int32_t slotId_ = 0;
     bool isCsCapable_ = true;
     std::string currentNrConfig_ = "";
+    std::string systemPropertiesConfig_ = "ConfigD";
     RegServiceState regStatusResult_ = RegServiceState::REG_STATE_UNKNOWN;
 };
 } // namespace Telephony
