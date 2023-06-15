@@ -45,6 +45,9 @@ public:
     int32_t SetNotificationFilter(int32_t newFilter, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetDeviceState(
         int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetNrOptionMode(int32_t mode, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetNrOptionMode(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &response);
 
     // ril unsol
     int32_t SignalStrengthUpdated(const HDI::Ril::V1_1::Rssi &rssi);
@@ -80,6 +83,11 @@ public:
     int32_t SetLocateUpdatesResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
     int32_t SetNotificationFilterResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
     int32_t SetDeviceStateResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
+    int32_t SetNrOptionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
+    int32_t GetNrOptionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t mode);
+    int32_t GetRrcConnectionStateResponse(
+        const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t rrcConnectionState);
+    int32_t GetRrcConnectionStateUpdated(int32_t state);
 
 private:
     void BuildSignalStrength(std::shared_ptr<Rssi> signalStrength, const HDI::Ril::V1_1::Rssi &rssi);

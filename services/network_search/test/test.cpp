@@ -295,6 +295,7 @@ void TestNotifySpnChanged()
 
 void TestGetBasebandVersion()
 {
+    AccessToken token;
     if (g_telephonyService == nullptr) {
         std::cout << "TestGetBasebandVersion g_telephonyService is nullptr." << std::endl;
         return;

@@ -152,6 +152,12 @@ public:
 
     int32_t GetBasebandVersion(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
+    int32_t SetNrOptionMode(int32_t slotId, int32_t mode, const AppExecFwk::InnerEvent::Pointer &response) override;
+
+    int32_t GetNrOptionMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+
+    int32_t GetRrcConnectionState(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+
     int32_t SendGsmSms(
         int32_t slotId, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) override;
 

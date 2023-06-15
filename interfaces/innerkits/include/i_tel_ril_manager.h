@@ -253,6 +253,9 @@ public:
         int32_t slotId, int32_t newFilter, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t SetDeviceState(int32_t slotId, int32_t deviceStateType, bool deviceStateOn,
         const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t SetNrOptionMode(int32_t slotId, int32_t mode, const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t GetNrOptionMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t GetRrcConnectionState(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -216,6 +216,12 @@ public:
     int32_t SetLocateUpdatesResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t SetNotificationFilterResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t SetDeviceStateResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
+    int32_t SetNrOptionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
+    int32_t GetNrOptionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t mode) override;
+    int32_t GetRrcConnectionStateResponse(
+        const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t rrcConnectionState) override;
+    int32_t GetRrcConnectionStateUpdated(
+        const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;
 
     // Sms
     int32_t NewSmsNotify(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,

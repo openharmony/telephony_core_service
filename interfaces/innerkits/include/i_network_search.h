@@ -165,6 +165,8 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     virtual int32_t UpdateRadioOn(int32_t slotId) = 0;
+    virtual int32_t GetRrcConnectionState(int32_t slotId, int32_t &status) = 0;
+
     /**
      * @brief support Nr network or not
      *
