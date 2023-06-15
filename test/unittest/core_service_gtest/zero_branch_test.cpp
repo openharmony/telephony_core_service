@@ -822,12 +822,6 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_003, Function | MediumTest | Lev
     sptr<NetworkState> networkState = nullptr;
     mInner.GetNetworkStatus(0, networkState);
     EXPECT_EQ(networkState, nullptr);
-    EXPECT_EQ(mInner.GetCellLocation(0), nullptr);
-    EXPECT_EQ(mInner.GetPhoneType(0), PhoneType::PHONE_TYPE_IS_NONE);
-    NrMode mode = NrMode::NR_MODE_UNKNOWN;
-    EXPECT_NE(mInner.GetNrOptionMode(0, mode), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(mode, NrMode::NR_MODE_UNKNOWN);
-    EXPECT_EQ(mInner.GetFrequencyType(0), FrequencyType::FREQ_TYPE_UNKNOWN);
 }
 
 /**
@@ -1020,6 +1014,12 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_007, Function | MediumTest | Lev
     EXPECT_GT(mInner.GetPreferredNetworkPara(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
     EXPECT_GT(mInner.QueryIccDiallingNumbers(0, 0, result), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(mInner.GetCellLocation(0), nullptr);
+    EXPECT_EQ(mInner.GetPhoneType(0), PhoneType::PHONE_TYPE_IS_NONE);
+    NrMode mode = NrMode::NR_MODE_UNKNOWN;
+    EXPECT_NE(mInner.GetNrOptionMode(0, mode), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(mode, NrMode::NR_MODE_UNKNOWN);
+    EXPECT_EQ(mInner.GetFrequencyType(0), FrequencyType::FREQ_TYPE_UNKNOWN);
 }
 
 /**
