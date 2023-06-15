@@ -965,10 +965,10 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0300
         static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
         static_cast<int32_t>(NetworkRat::NETWORK_LTE));
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = telephonyService_->SetNetworkSelectionMode(
+    int32_t result = telephonyService_->SetNetworkSelectionMode(
         SLOT_ID1, static_cast<int32_t>(SelectionMode::MODE_TYPE_MANUAL), networkInfo, true, callback);
     TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
     callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetNetworkModeCallbackResult();
     TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode syncResult: %{public}d", syncResult);
@@ -993,10 +993,10 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0400
         static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
         static_cast<int32_t>(NetworkRat::NETWORK_LTE));
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = telephonyService_->SetNetworkSelectionMode(
+    int32_t result = telephonyService_->SetNetworkSelectionMode(
         SLOT_ID1, static_cast<int32_t>(SelectionMode::MODE_TYPE_AUTO), networkInfo, true, callback);
     TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode result: %{public}d", result);
-    ASSERT_TRUE(result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
     callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetNetworkModeCallbackResult();
     TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode syncResult: %{public}d", syncResult);
@@ -1020,10 +1020,10 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0500
         static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
         static_cast<int32_t>(NetworkRat::NETWORK_LTE));
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    bool result = telephonyService_->SetNetworkSelectionMode(
+    int32_t result = telephonyService_->SetNetworkSelectionMode(
         SLOT_ID1, static_cast<int32_t>(SelectionMode::MODE_TYPE_AUTO), networkInfo, true, callback);
     TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode result: %{public}d", result);
-    ASSERT_FALSE(result);
+    EXPECT_NE(TELEPHONY_ERR_SUCCESS, result);
     callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetNetworkModeCallbackResult();
     TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode syncResult: %{public}d", syncResult);
@@ -2322,6 +2322,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0900
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetBasebandVersion_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
@@ -2336,7 +2337,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetBasebandVersion_0100, Fun
 
 /**
  * @tc.number   Telephony_NetworkSearch_GetBasebandVersion_0200
- * @tc.name     Get Get baseband version
+ * @tc.name     Get baseband version
  * @tc.desc     Function test
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetBasebandVersion_0200, Function | MediumTest | Level2)

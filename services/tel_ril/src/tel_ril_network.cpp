@@ -127,6 +127,24 @@ int32_t TelRilNetwork::SetDeviceState(
         &HDI::Ril::V1_1::IRil::SetDeviceState, deviceStateType, deviceStateOn);
 }
 
+int32_t TelRilNetwork::SetNrOptionMode(int32_t mode, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_SET_NR_OPTION_MODE,
+        &HDI::Ril::V1_1::IRil::SetNrOptionMode, mode);
+}
+
+int32_t TelRilNetwork::GetNrOptionMode(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return Request(
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_NR_OPTION_MODE, &HDI::Ril::V1_1::IRil::GetNrOptionMode);
+}
+
+int32_t TelRilNetwork::GetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_RRC_CONNECTION_STATE,
+        &HDI::Ril::V1_1::IRil::GetRrcConnectionState);
+}
+
 int32_t TelRilNetwork::SignalStrengthUpdated(const HDI::Ril::V1_1::Rssi &rssi)
 {
     std::shared_ptr<Rssi> signalStrength = std::make_shared<Rssi>();
@@ -173,6 +191,12 @@ int32_t TelRilNetwork::NetworkCurrentCellUpdated(const HDI::Ril::V1_1::CellListC
     std::shared_ptr<CellListCurrentInfo> currentCellList = std::make_shared<CellListCurrentInfo>();
     BuildCurrentCellInfoList(currentCellList, cellListCurrentInfo);
     return Notify<CellListCurrentInfo>(TELEPHONY_LOG_FUNC_NAME, currentCellList, RadioEvent::RADIO_CURRENT_CELL_UPDATE);
+}
+
+int32_t TelRilNetwork::GetRrcConnectionStateUpdated(int32_t state)
+{
+    return Notify<HRilInt32Parcel>(TELEPHONY_LOG_FUNC_NAME, std::make_shared<HRilInt32Parcel>(state),
+        RadioEvent::RADIO_RRC_CONNECTION_STATE_UPDATE);
 }
 
 int32_t TelRilNetwork::GetSignalStrengthResponse(
@@ -302,6 +326,22 @@ int32_t TelRilNetwork::SetNotificationFilterResponse(const HDI::Ril::V1_1::RilRa
 int32_t TelRilNetwork::SetDeviceStateResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
+}
+
+int32_t TelRilNetwork::SetNrOptionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+{
+    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
+}
+
+int32_t TelRilNetwork::GetNrOptionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t mode)
+{
+    return Response<int32_t>(TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<int32_t>(mode));
+}
+
+int32_t TelRilNetwork::GetRrcConnectionStateResponse(
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t rrcConnectionState)
+{
+    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo, rrcConnectionState);
 }
 
 void TelRilNetwork::BuildSignalStrength(std::shared_ptr<Rssi> signalStrength, const HDI::Ril::V1_1::Rssi &rssi)

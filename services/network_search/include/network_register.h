@@ -37,6 +37,8 @@ public:
     void ProcessPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void DcPhysicalLinkActiveUpdate(bool isActive);
+    int32_t UpdateNrConfig(int32_t status);
+
     enum class RilRegister {
         REG_STATE_NOT_REG = 0,
         REG_STATE_HOME_ONLY = 1,
@@ -94,6 +96,7 @@ private:
 
     int32_t slotId_ = 0;
     bool isCsCapable_ = true;
+    std::string currentNrConfig_ = "";
 };
 } // namespace Telephony
 } // namespace OHOS

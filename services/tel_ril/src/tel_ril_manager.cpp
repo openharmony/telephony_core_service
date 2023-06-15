@@ -624,6 +624,22 @@ int32_t TelRilManager::SetDeviceState(
     return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::SetDeviceState,
         deviceStateType, deviceStateOn);
 }
+
+int32_t TelRilManager::SetNrOptionMode(int32_t slotId, int32_t mode, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::SetNrOptionMode, mode);
+}
+
+int32_t TelRilManager::GetNrOptionMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetNrOptionMode);
+}
+
+int32_t TelRilManager::GetRrcConnectionState(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetRrcConnectionState);
+}
+
 /*********************** TelRilNetwork end ****************************/
 /*********************** TelRilSms start ******************************/
 int32_t TelRilManager::SendGsmSms(

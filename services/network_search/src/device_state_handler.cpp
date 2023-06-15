@@ -51,6 +51,9 @@ void DeviceStateHandler::ProcessWifiState(bool isWifiConnected)
 void DeviceStateHandler::ProcessScreenDisplay(bool isScreenOn)
 {
     isScreenOn_ = isScreenOn;
+    if (isScreenOn) {
+        GetRrcConnectionState();
+    }
     ProcessDeviceState();
 }
 
@@ -192,6 +195,17 @@ void DeviceStateHandler::SyncSettings()
     SetDeviceState(LOW_DATA_STATE, isLowData_);
     SetDeviceState(POWER_SAVE_MODE, isPowerSaveModeOn_);
     SetNotificationFilter(notificationFilter_, true);
+}
+
+void DeviceStateHandler::GetRrcConnectionState() const
+{
+    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
+    if (nsm == nullptr) {
+        TELEPHONY_LOGE("DeviceStateHandler::GetRrcConnectionState nsm is null");
+        return;
+    }
+    int32_t status = 0;
+    nsm->GetRrcConnectionState(slotId_, status);
 }
 } // namespace Telephony
 } // namespace OHOS

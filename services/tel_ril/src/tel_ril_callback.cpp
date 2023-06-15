@@ -599,6 +599,12 @@ int32_t TelRilCallback::NetworkCurrentCellUpdated(const HDI::Ril::V1_1::RilRadio
         cellListCurrentInfo);
 }
 
+int32_t TelRilCallback::GetRrcConnectionStateUpdated(
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state)
+{
+    return Notify(responseInfo, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::GetRrcConnectionStateUpdated, state);
+}
+
 int32_t TelRilCallback::GetSignalStrengthResponse(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::Rssi &rssi)
 {
@@ -691,6 +697,23 @@ int32_t TelRilCallback::SetNotificationFilterResponse(const HDI::Ril::V1_1::RilR
 int32_t TelRilCallback::SetDeviceStateResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
     return Response(responseInfo, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::SetDeviceStateResponse);
+}
+
+int32_t TelRilCallback::SetNrOptionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::SetNrOptionModeResponse);
+}
+
+int32_t TelRilCallback::GetNrOptionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t mode)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::GetNrOptionModeResponse, mode);
+}
+
+int32_t TelRilCallback::GetRrcConnectionStateResponse(
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t rrcConnectionState)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::GetRrcConnectionStateResponse,
+        rrcConnectionState);
 }
 
 int32_t TelRilCallback::NewSmsNotify(
