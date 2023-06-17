@@ -377,7 +377,11 @@ int32_t RadioInfo::ProcessGetRrcConnectionState(const AppExecFwk::InnerEvent::Po
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TELEPHONY_LOGI("rrc state[%{public}d] notify success, slotId:%{public}d", object->data, slotId_);
-    nsm->HandleRrcStateChanged(slotId_, object->data);
+    int32_t result = nsm->HandleRrcStateChanged(slotId_, object->data);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("Do not need notify, result:%{public}d, slotId:%{public}d", result, slotId_);
+        return result;
+    }
     nsm->ProcessNotifyStateChangeEvent(slotId_);
     return TELEPHONY_ERR_SUCCESS;
 }
