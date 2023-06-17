@@ -1511,8 +1511,8 @@ HWTEST_F(BranchTest, Telephony_NetworkRegister_002, Function | MediumTest | Leve
     EXPECT_TRUE(networkRegister->IsValidConfig(config));
     int32_t rrcState = 1;
     EXPECT_NE(networkRegister->GetRrcConnectionState(rrcState), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(networkRegister->UpdateNrConfig(0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(networkRegister->UpdateNrConfig(1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkRegister->HandleRrcStateChanged(0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkRegister->HandleRrcStateChanged(1), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(
         networkRegister->GetTechnologyByNrConfig(RadioTech::RADIO_TECHNOLOGY_NR), RadioTech::RADIO_TECHNOLOGY_INVALID);
     EXPECT_GT(
@@ -1949,7 +1949,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
     networkSearchHandler->RadioOffOrUnavailableState(1);
     networkSearchHandler->RadioGetNeighboringCellInfo(event);
     networkSearchHandler->RadioGetBasebandVersion(event);
-    networkSearchHandler->UpdateNrConfig(1);
+    networkSearchHandler->HandleRrcStateChanged(1);
     networkSearchHandler->RadioGetRrcConnectionState(event);
     EXPECT_EQ(networkSearchHandler->GetPhoneType(), PhoneType::PHONE_TYPE_IS_NONE);
 }

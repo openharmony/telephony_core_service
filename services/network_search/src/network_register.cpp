@@ -304,8 +304,6 @@ void NetworkRegister::UpdateNrState()
         return;
     }
     if (endcSupport_) {
-        int32_t rrcState = 0;
-        GetRrcConnectionState(rrcState);
         if (dcNrRestricted_) {
             nrState_ = NrState::NR_STATE_NOT_SUPPORT;
             networkSearchState_->SetNrState(nrState_);
@@ -409,7 +407,7 @@ int32_t NetworkRegister::GetRrcConnectionState(int32_t &rrcState)
     return networkSearchManager->UpdateRrcConnectionState(slotId_, rrcState);
 }
 
-int32_t NetworkRegister::UpdateNrConfig(int32_t status)
+int32_t NetworkRegister::HandleRrcStateChanged(int32_t status)
 {
     if (systemPropertiesConfig_ == TELEPHONY_NR_CONFIG_AD) {
         if (status == RRC_CONNECTED_STATUS) {

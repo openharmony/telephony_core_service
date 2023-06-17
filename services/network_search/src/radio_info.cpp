@@ -377,7 +377,7 @@ int32_t RadioInfo::ProcessGetRrcConnectionState(const AppExecFwk::InnerEvent::Po
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TELEPHONY_LOGI("rrc state[%{public}d] notify success, slotId:%{public}d", object->data, slotId_);
-    nsm->UpdateNrConfig(slotId_, object->data);
+    nsm->HandleRrcStateChanged(slotId_, object->data);
     nsm->ProcessNotifyStateChangeEvent(slotId_);
     return TELEPHONY_ERR_SUCCESS;
 }

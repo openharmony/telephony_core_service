@@ -892,14 +892,14 @@ int32_t NetworkSearchHandler::GetRegServiceState(RegServiceState &regState)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t NetworkSearchHandler::UpdateNrConfig(int32_t status)
+int32_t NetworkSearchHandler::HandleRrcStateChanged(int32_t status)
 {
-    TELEPHONY_LOGI("NetworkSearchHandler::UpdateNrConfig slotId:%{public}d", slotId_);
+    TELEPHONY_LOGI("NetworkSearchHandler::HandleRrcStateChanged slotId:%{public}d", slotId_);
     if (networkRegister_ == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchHandler::UpdateNrConfig networkRegister_ is nullptr!");
+        TELEPHONY_LOGE("NetworkSearchHandler::HandleRrcStateChanged networkRegister_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    networkRegister_->UpdateNrConfig(status);
+    networkRegister_->HandleRrcStateChanged(status);
     return TELEPHONY_ERR_SUCCESS;
 }
 

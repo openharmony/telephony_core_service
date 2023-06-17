@@ -1065,16 +1065,20 @@ bool NetworkSearchManager::IsNrSupported(int32_t slotId)
         static_cast<uint32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_NR);
 }
 
-int32_t NetworkSearchManager::UpdateNrConfig(int32_t slotId, int32_t status)
+int32_t NetworkSearchManager::HandleRrcStateChanged(int32_t slotId, int32_t status)
 {
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    if (inner->rrcConnectionStatus_ == status) {
+        TELEPHONY_LOGI("slotId:%{public}d rrc state is not change.", slotId);
+        return TELEPHONY_ERR_FAIL;
+    }
     inner->rrcConnectionStatus_ = status;
     if (status == RRC_CONNECTED_STATUS || status == RRC_IDLE_STATUS) {
-        inner->networkSearchHandler_->UpdateNrConfig(status);
+        inner->networkSearchHandler_->HandleRrcStateChanged(status);
     }
     return TELEPHONY_ERR_SUCCESS;
 }

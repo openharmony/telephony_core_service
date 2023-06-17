@@ -40,7 +40,7 @@ public:
     int32_t NotifyStateChange();
     void DcPhysicalLinkActiveUpdate(bool isActive);
     void UpdateCfgTech();
-    int32_t UpdateNrConfig(int32_t status);
+    int32_t HandleRrcStateChanged(int32_t status);
     RegServiceState GetRegServiceState() const;
 
     enum class RilRegister {

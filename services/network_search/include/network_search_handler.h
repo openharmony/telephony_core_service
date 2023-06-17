@@ -53,7 +53,7 @@ public:
     void DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void NotifyStateChange(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleDelayNotifyEvent(const AppExecFwk::InnerEvent::Pointer &event);
-    int32_t UpdateNrConfig(int32_t status);
+    int32_t HandleRrcStateChanged(int32_t status);
     int32_t RevertLastTechnology();
     void UpdateImsServiceStatus(const AppExecFwk::InnerEvent::Pointer &event);
     void UpdateImsRegisterState(const AppExecFwk::InnerEvent::Pointer &event);
