@@ -29,21 +29,14 @@
 
 namespace OHOS {
 namespace Telephony {
-const char *TELEPHONY_NR_CONVERSION_CONFIG_INDEX = "persist.telephony.nr.config.index"; // "A/B/C/D"
-/**
- * System configuration format
- * NOT_SUPPORT：4g,NO_DETECT:4g,CONNECTED_DETECT:4g,IDLE_DETECT:4g,DUAL_CONNECTED:5g,SA_ATTACHED:5g
- */
-const char *TELEPHONY_NR_CONVERSION_CONFIG_A = "persist.telephony.nr.config.a";
-const char *TELEPHONY_NR_CONVERSION_CONFIG_B = "persist.telephony.nr.config.b";
-const char *TELEPHONY_NR_CONVERSION_CONFIG_C = "persist.telephony.nr.config.c";
-const char *TELEPHONY_NR_CONVERSION_CONFIG_D = "persist.telephony.nr.config.d";
+constexpr const char *TELEPHONY_NR_CONVERSION_CONFIG = "persist.telephony.nr.config";
 constexpr const char *TELEPHONY_NR_CONFIG_A = "ConfigA";
+constexpr const char *TELEPHONY_NR_CONFIG_B = "ConfigB";
+constexpr const char *TELEPHONY_NR_CONFIG_C = "ConfigC";
 constexpr const char *TELEPHONY_NR_CONFIG_D = "ConfigD";
-const int32_t SYS_PARAMETER_SIZE = 256;
-const int32_t NR_STATE_NUM = 6;
-const int32_t KEY_VALUE_NUM = 2;
-const int32_t MAX_SIZE = 100;
+constexpr const char *TELEPHONY_NR_CONFIG_AD = "ConfigAD";
+constexpr int32_t SYS_PARAMETER_SIZE = 256;
+constexpr int32_t MAX_SIZE = 100;
 
 NetworkRegister::NetworkRegister(std::shared_ptr<NetworkSearchState> networkSearchState,
     std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
@@ -54,42 +47,21 @@ NetworkRegister::NetworkRegister(std::shared_ptr<NetworkSearchState> networkSear
 
 void NetworkRegister::InitNrConversionConfig()
 {
-    char prase[SYS_PARAMETER_SIZE] = { 0 };
-    int code = GetParameter(TELEPHONY_NR_CONVERSION_CONFIG_INDEX, "A", prase, SYS_PARAMETER_SIZE);
-    if (code <= 0 || prase[0] > 'D' || prase[0] < 'A') {
-        TELEPHONY_LOGE(
-            "Failed to get system properties %{public}s. err:%{public}d slotId:%{public}d", prase, code, slotId_);
-        return;
+    std::string config = "";
+    GetSystemPropertiesConfig(systemPropertiesConfig_);
+    if (systemPropertiesConfig_ == TELEPHONY_NR_CONFIG_AD) {
+        int32_t rrcState = 0;
+        GetRrcConnectionState(rrcState);
+        if (rrcState == RRC_CONNECTED_STATUS) {
+            config = TELEPHONY_NR_CONFIG_A;
+        } else {
+            config = TELEPHONY_NR_CONFIG_D;
+        }
     }
-
-    switch (prase[0]) {
-        case 'A':
-            code = GetParameter(TELEPHONY_NR_CONVERSION_CONFIG_A, "", prase, SYS_PARAMETER_SIZE);
-            break;
-        case 'B':
-            code = GetParameter(TELEPHONY_NR_CONVERSION_CONFIG_B, "", prase, SYS_PARAMETER_SIZE);
-            break;
-        case 'C':
-            code = GetParameter(TELEPHONY_NR_CONVERSION_CONFIG_C, "", prase, SYS_PARAMETER_SIZE);
-            break;
-        case 'D':
-            code = GetParameter(TELEPHONY_NR_CONVERSION_CONFIG_D, "", prase, SYS_PARAMETER_SIZE);
-            break;
-        default:
-            break;
-    }
-
-    std::string strNrConfig = "";
-    strNrConfig = prase;
-    if (code <= 0 || strNrConfig.empty()) {
-        TELEPHONY_LOGI("Failed to get system properties err:%{public}d use default config a", code);
-        strNrConfig = "NOT_SUPPORT:4g,NO_DETECT:4g,CONNECTED_DETECT:4g,"
-                      "IDLE_DETECT:4g,DUAL_CONNECTED:5g,SA_ATTACHED:5g";
-    }
-    NrConfigParse(strNrConfig);
+    currentNrConfig_ = config;
 }
 
-void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &event) const
+void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &event)
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
@@ -112,6 +84,7 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
         TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister networkSearchState_ is nullptr slotId:%{public}d", slotId_);
         return;
     }
+    regStatusResult_ = regStatus;
     networkSearchState_->SetNetworkState(regStatus, DomainType::DOMAIN_TYPE_CS);
     networkSearchState_->SetEmergency((regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) && isCsCapable_);
     RadioTech tech = ConvertTechFromRil(static_cast<HRilRadioTech>(csRegStateResult->radioTechnology));
@@ -121,13 +94,13 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
         roam = RoamingType::ROAMING_STATE_UNSPEC;
     }
     networkSearchState_->SetNetworkStateToRoaming(roam, DomainType::DOMAIN_TYPE_CS);
-    TELEPHONY_LOGI(
-        "ProcessCsRegister: regStatus= %{public}d radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
+    TELEPHONY_LOGI("regStatus= %{public}d radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
         registrationStatus, csRegStateResult->radioTechnology, roam, slotId_);
     networkSearchManager->UpdateCellLocation(
         slotId_, static_cast<int32_t>(tech), csRegStateResult->cellId, csRegStateResult->lacCode);
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
-        networkSearchState_->NotifyStateChange();
+        TELEPHONY_LOGI("cs domain change, slotId:%{public}d", slotId_);
+        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
     }
     CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_CS),
         static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
@@ -157,6 +130,7 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
         TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister networkSearchState_ is nullptr slotId:%{public}d", slotId_);
         return;
     }
+    regStatusResult_ = regStatus;
     networkSearchState_->SetNetworkState(regStatus, DomainType::DOMAIN_TYPE_PS);
     networkSearchState_->SetEmergency((regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) && isCsCapable_);
     RadioTech tech = ConvertTechFromRil(static_cast<HRilRadioTech>(psRegStatusResult->radioTechnology));
@@ -177,10 +151,34 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
         "ProcessPsRegister: regStatus= %{public}d radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
         registrationStatus, psRegStatusResult->radioTechnology, roam, slotId_);
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
-        networkSearchState_->NotifyStateChange();
+        TELEPHONY_LOGI("ps domain change, slotId:%{public}d", slotId_);
+        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
     }
     CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_PS),
         static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
+}
+
+int32_t NetworkRegister::RevertLastTechnology()
+{
+    RadioTech lastCfgTech = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    RadioTech lastPsRadioTech = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    networkSearchState_->GetLastCfgTech(lastCfgTech);
+    networkSearchState_->GetLastPsRadioTech(lastPsRadioTech);
+    networkSearchState_->SetCfgTech(lastCfgTech);
+    networkSearchState_->SetNetworkType(lastPsRadioTech, DomainType::DOMAIN_TYPE_PS);
+    TELEPHONY_LOGI(
+        "lastCfgTech:%{public}d lastPsRadioTech:%{public}d slotId:%{public}d", lastCfgTech, lastPsRadioTech, slotId_);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkRegister::NotifyStateChange()
+{
+    if (networkSearchState_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchState_ is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    networkSearchState_->NotifyStateChange();
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 void NetworkRegister::ProcessChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event)
@@ -208,7 +206,7 @@ void NetworkRegister::ProcessChannelConfigInfo(const AppExecFwk::InnerEvent::Poi
     }
 
     bool isNrSecondaryCell = false;
-    for (int i = 0; i < size; ++i) {
+    for (int32_t  i = 0; i < size; ++i) {
         if (static_cast<RadioTech>(channelConfigInfos_[i].ratType) == RadioTech::RADIO_TECHNOLOGY_NR &&
             static_cast<ConnectServiceCell>(channelConfigInfos_[i].cellConnStatus) ==
             ConnectServiceCell::CONNECTION_SECONDARY_CELL) {
@@ -216,11 +214,19 @@ void NetworkRegister::ProcessChannelConfigInfo(const AppExecFwk::InnerEvent::Poi
             break;
         }
     }
+    TELEPHONY_LOGI("isNrSecondaryCell:%{public}d slotId:%{public}d", isNrSecondaryCell, slotId_);
     NotifyNrFrequencyChanged();
     if (isNrSecondaryCell_ != isNrSecondaryCell) {
         isNrSecondaryCell_ = isNrSecondaryCell;
         UpdateNrState();
         UpdateCfgTech();
+        auto networkSearchManager = networkSearchManager_.lock();
+        if (networkSearchManager == nullptr) {
+            TELEPHONY_LOGE("NetworkRegister::ProcessChannelConfigInfo networkSearchManager is nullptr");
+            return;
+        }
+        TELEPHONY_LOGI("physical channel change, slotId:%{public}d", slotId_);
+        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
     }
 }
 
@@ -228,7 +234,7 @@ void NetworkRegister::NotifyNrFrequencyChanged()
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("NetworkRegister::ProcessChannelConfigInfo networkSearchManager is nullptr");
+        TELEPHONY_LOGE("NetworkRegister::NotifyNrFrequencyChanged networkSearchManager is nullptr");
         return;
     }
     bool isFreqChanged = false;
@@ -236,23 +242,23 @@ void NetworkRegister::NotifyNrFrequencyChanged()
 
     sptr<NetworkSearchCallBackBase> cellularData = networkSearchManager->GetCellularDataCallBack();
     if (cellularData == nullptr) {
-        TELEPHONY_LOGE("NetworkRegister::ProcessChannelConfigInfo cellularData callback is nullptr");
+        TELEPHONY_LOGE("NetworkRegister::NotifyNrFrequencyChanged cellularData callback is nullptr");
         return;
     }
     ssize_t size = channelConfigInfos_.size();
     if (size >= MAX_SIZE) {
-        TELEPHONY_LOGE("NetworkRegister::ProcessChannelConfigInfo channelConfigInfos_ over max size");
+        TELEPHONY_LOGE("NetworkRegister::NotifyNrFrequencyChanged channelConfigInfos_ over max size");
         return;
     }
-    for (int i = 0; i < size; ++i) {
+    for (int32_t  i = 0; i < size; ++i) {
         std::vector<int32_t> &cids = channelConfigInfos_[i].contextIds;
         if (isFreqChanged) {
-            TELEPHONY_LOGE("NetworkRegister::ProcessChannelConfigInfo channelConfigInfos:%{public}d isFreqChanged", i);
+            TELEPHONY_LOGE("NetworkRegister::NotifyNrFrequencyChanged channelConfigInfos:%{public}d isFreqChanged", i);
             continue;
         }
         for (auto &cid : cids) {
             if (!cellularData->HasInternetCapability(slotId_, cid)) {
-                TELEPHONY_LOGE("NetworkRegister::ProcessChannelConfigInfo cid:%{public}d hasNoInternetCapability", cid);
+                TELEPHONY_LOGE("NetworkRegister::NotifyNrFrequencyChanged cid:%{public}d hasNoInternetCapability", cid);
                 continue;
             }
             curFreqType = static_cast<FrequencyType>(channelConfigInfos_[i].freqRange);
@@ -276,67 +282,52 @@ void NetworkRegister::DcPhysicalLinkActiveUpdate(bool isActive)
         isActive ? "true" : "false", slotId_);
     isPhysicalLinkActive_ = isActive;
     UpdateNrState();
-    UpdateCfgTech();
 }
 
 void NetworkRegister::UpdateNrState()
 {
-    auto networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager == nullptr || networkSearchState_ == nullptr) {
-        TELEPHONY_LOGE("NetworkRegister::UpdateNrState error slotId:%{public}d", slotId_);
+    if (networkSearchState_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchState_ is nullptr, slotId:%{public}d", slotId_);
         return;
     }
 
-    // update NR mode and NR state
-    NrMode nrMode = NrMode::NR_MODE_UNKNOWN;
     nrState_ = NrState::NR_STATE_NOT_SUPPORT;
     RadioTech rat = networkSearchState_->GetNetworkStatus()->GetPsRadioTech();
     if (rat == RadioTech::RADIO_TECHNOLOGY_NR) {
-        nrMode = NrMode::NR_MODE_SA_ONLY;
         nrState_ = NrState::NR_NSA_STATE_SA_ATTACHED;
+        networkSearchState_->SetNrState(nrState_);
+        return;
     }
-
-    if (endcSupport_ && (rat == RadioTech::RADIO_TECHNOLOGY_LTE || rat == RadioTech::RADIO_TECHNOLOGY_LTE_CA)) {
-        nrMode = NrMode::NR_MODE_NSA_ONLY;
-
+    if (isNrSecondaryCell_) {
+        nrState_ = NrState::NR_NSA_STATE_DUAL_CONNECTED;
+        networkSearchState_->SetNrState(nrState_);
+        return;
+    }
+    if (endcSupport_) {
         if (dcNrRestricted_) {
             nrState_ = NrState::NR_STATE_NOT_SUPPORT;
+            networkSearchState_->SetNrState(nrState_);
+            return;
         }
-        if (!dcNrRestricted_ && !nrSupport_) {
+        if (!dcNrRestricted_) {
             nrState_ = NrState::NR_NSA_STATE_NO_DETECT;
-        }
-        if (!dcNrRestricted_ && nrSupport_ && !isPhysicalLinkActive_ && !isNrSecondaryCell_) {
-            nrState_ = NrState::NR_NSA_STATE_IDLE_DETECT;
-        }
-        if (isNrSecondaryCell_ || (!dcNrRestricted_ && nrSupport_ && isPhysicalLinkActive_)) {
-            if (rat == RadioTech::RADIO_TECHNOLOGY_LTE) {
-                nrState_ = NrState::NR_NSA_STATE_CONNECTED_DETECT;
-            }
-            if (rat == RadioTech::RADIO_TECHNOLOGY_LTE_CA) {
-                nrState_ = NrState::NR_NSA_STATE_DUAL_CONNECTED;
-            }
+            networkSearchState_->SetNrState(nrState_);
+            return;
         }
     }
-    networkSearchManager->SetNrOptionMode(slotId_, nrMode);
-    networkSearchState_->SetNrState(nrState_);
 }
 
 void NetworkRegister::UpdateCfgTech()
 {
-    if (nrConfigMap_.find(nrState_) == nrConfigMap_.end()) {
-        TELEPHONY_LOGE("NetworkRegister::UpdateCfgTech not find nr state slotId:%{public}d", slotId_);
-        return;
-    }
-
     if (networkSearchState_ == nullptr) {
         TELEPHONY_LOGE("NetworkRegister::UpdateCfgTech networkSearchState_ is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    RadioTech cfgTech = nrConfigMap_[nrState_];
-    if (cfgTech != RadioTech::RADIO_TECHNOLOGY_NR) {
-        cfgTech = networkSearchState_->GetNetworkStatus()->GetPsRadioTech();
-    }
+    RadioTech tech = networkSearchState_->GetNetworkStatus()->GetPsRadioTech();
+    TELEPHONY_LOGI("Before conversion, tech:%{public}d slotId:%{public}d", tech, slotId_);
+    RadioTech cfgTech = GetTechnologyByNrConfig(tech);
     networkSearchState_->SetCfgTech(cfgTech);
+    TELEPHONY_LOGI("After conversion, cfgTech:%{public}d slotId:%{public}d", cfgTech, slotId_);
 }
 
 void NetworkRegister::ProcessRestrictedState(const AppExecFwk::InnerEvent::Pointer &event) const {}
@@ -359,6 +350,11 @@ RegServiceState NetworkRegister::ConvertRegFromRil(RilRegister code) const
         default:
             return RegServiceState::REG_STATE_NO_SERVICE;
     }
+}
+
+RegServiceState NetworkRegister::GetRegServiceState() const
+{
+    return regStatusResult_;
 }
 
 RadioTech NetworkRegister::ConvertTechFromRil(HRilRadioTech code) const
@@ -391,65 +387,96 @@ RadioTech NetworkRegister::ConvertTechFromRil(HRilRadioTech code) const
     }
 }
 
-void NetworkRegister::NrConfigParse(std::string &cfgStr)
+bool NetworkRegister::IsValidConfig(const std::string &config)
 {
-    /**
-     * parse string
-     * NOT_SUPPORT：4g,NO_DETECT:4g,CONNECTED_DETECT:4g,IDLE_DETECT:4g,DUAL_CONNECTED:5g,SA_ATTACHED:5g
-     */
-    std::string strSep = ",";
-    std::vector<std::string> strsRet;
-    SplitStr(cfgStr, strSep, strsRet);
-    if (static_cast<int>(strsRet.size()) != NR_STATE_NUM) {
-        TELEPHONY_LOGE("NetworkRegister::NrConfigParse string error slotId:%{public}d", slotId_);
-        return;
-    }
-
-    std::string strNrFlag = "";
-    std::vector<std::string> nrStateKv;
-    for (auto &state : strsRet) {
-        strSep = ":";
-        SplitStr(state, strSep, nrStateKv);
-        if (static_cast<int>(nrStateKv.size()) != KEY_VALUE_NUM) {
-            TELEPHONY_LOGE("NetworkRegister::NrConfigParse key value string error slotId:%{public}d", slotId_);
-            return;
-        }
-        NrState nrState = ConvertStringToNrState(nrStateKv[0]);
-        RadioTech tech = RadioTech::RADIO_TECHNOLOGY_NR;
-        if (nrStateKv[1].compare("5g") != 0) {
-            tech = RadioTech::RADIO_TECHNOLOGY_LTE;
-        }
-        nrConfigMap_.insert(std::make_pair(nrState, tech));
+    if (config == TELEPHONY_NR_CONFIG_A || config == TELEPHONY_NR_CONFIG_B || config == TELEPHONY_NR_CONFIG_C ||
+        config == TELEPHONY_NR_CONFIG_D || config == TELEPHONY_NR_CONFIG_AD) {
+        return true;
+    } else {
+        return false;
     }
 }
 
-int32_t NetworkRegister::UpdateNrConfig(int32_t status)
+int32_t NetworkRegister::GetRrcConnectionState(int32_t &rrcState)
 {
-    if (status == RRC_CONNECTED_STATUS) {
-        currentNrConfig_ = TELEPHONY_NR_CONFIG_A;
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NetworkRegister::GetRrcConnectionState networkSearchManager is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager->UpdateRrcConnectionState(slotId_, rrcState);
+}
+
+int32_t NetworkRegister::HandleRrcStateChanged(int32_t status)
+{
+    if (systemPropertiesConfig_ == TELEPHONY_NR_CONFIG_AD) {
+        if (status == RRC_CONNECTED_STATUS) {
+            currentNrConfig_ = TELEPHONY_NR_CONFIG_A;
+        } else {
+            currentNrConfig_ = TELEPHONY_NR_CONFIG_D;
+        }
+    }
+    TELEPHONY_LOGE("currentNrConfig_:%{public}s, slotId:%{public}d", currentNrConfig_.c_str(), slotId_);
+    UpdateNrState();
+    UpdateCfgTech();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkRegister::GetSystemPropertiesConfig(std::string &config)
+{
+    char param[SYS_PARAMETER_SIZE] = { 0 };
+    int32_t code = GetParameter(TELEPHONY_NR_CONVERSION_CONFIG, TELEPHONY_NR_CONFIG_D, param, SYS_PARAMETER_SIZE);
+    if (code <= 0 || !IsValidConfig(param)) {
+        TELEPHONY_LOGE("get system properties:%{public}s, slotId:%{public}d", param, slotId_);
+        config = TELEPHONY_NR_CONFIG_D;
     } else {
-        currentNrConfig_ = TELEPHONY_NR_CONFIG_D;
+        config = param;
     }
     return TELEPHONY_ERR_SUCCESS;
 }
 
-NrState NetworkRegister::ConvertStringToNrState(std::string &strState) const
+RadioTech NetworkRegister::GetTechnologyByNrConfig(RadioTech tech)
 {
-    if (strState.compare("NOT_SUPPORT") == 0) {
-        return NrState::NR_STATE_NOT_SUPPORT;
-    } else if (strState.compare("NO_DETECT") == 0) {
-        return NrState::NR_NSA_STATE_NO_DETECT;
-    } else if (strState.compare("CONNECTED_DETECT") == 0) {
-        return NrState::NR_NSA_STATE_CONNECTED_DETECT;
-    } else if (strState.compare("IDLE_DETECT") == 0) {
-        return NrState::NR_NSA_STATE_IDLE_DETECT;
-    } else if (strState.compare("DUAL_CONNECTED") == 0) {
-        return NrState::NR_NSA_STATE_DUAL_CONNECTED;
-    } else if (strState.compare("SA_ATTACHED") == 0) {
-        return NrState::NR_NSA_STATE_SA_ATTACHED;
-    } else {
-        return NrState::NR_STATE_NOT_SUPPORT;
+    if (tech != RadioTech::RADIO_TECHNOLOGY_LTE_CA && tech != RadioTech::RADIO_TECHNOLOGY_LTE) {
+        return tech;
     }
+    if (systemPropertiesConfig_ == TELEPHONY_NR_CONFIG_AD) {
+        int32_t rrcState = 0;
+        GetRrcConnectionState(rrcState);
+        if (rrcState == RRC_CONNECTED_STATUS) {
+            currentNrConfig_ = TELEPHONY_NR_CONFIG_A;
+        } else {
+            currentNrConfig_ = TELEPHONY_NR_CONFIG_D;
+        }
+    }
+    TELEPHONY_LOGI("currentNrConfig_:%{public}s, slotId:%{public}d", currentNrConfig_.c_str(), slotId_);
+    switch (nrState_) {
+        case NrState::NR_NSA_STATE_NO_DETECT: {
+            if (currentNrConfig_ == TELEPHONY_NR_CONFIG_D) {
+                tech = RadioTech::RADIO_TECHNOLOGY_NR;
+            }
+            break;
+        }
+        case NrState::NR_NSA_STATE_CONNECTED_DETECT: {
+            if (currentNrConfig_ == TELEPHONY_NR_CONFIG_C || currentNrConfig_ == TELEPHONY_NR_CONFIG_D) {
+                tech = RadioTech::RADIO_TECHNOLOGY_NR;
+            }
+            break;
+        }
+        case NrState::NR_NSA_STATE_IDLE_DETECT: {
+            if (currentNrConfig_ == TELEPHONY_NR_CONFIG_B || currentNrConfig_ == TELEPHONY_NR_CONFIG_C ||
+                currentNrConfig_ == TELEPHONY_NR_CONFIG_D) {
+                tech = RadioTech::RADIO_TECHNOLOGY_NR;
+            }
+            break;
+        }
+        case NrState::NR_NSA_STATE_DUAL_CONNECTED:
+            tech = RadioTech::RADIO_TECHNOLOGY_NR;
+            break;
+        default:
+            break;
+    }
+    return tech;
 }
 } // namespace Telephony
 } // namespace OHOS

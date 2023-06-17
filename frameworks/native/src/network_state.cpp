@@ -213,6 +213,11 @@ RadioTech NetworkState::GetPsRadioTech() const
     return psRadioTech_;
 }
 
+RadioTech NetworkState::GetLastPsRadioTech() const
+{
+    return lastPsRadioTech_;
+}
+
 RadioTech NetworkState::GetCsRadioTech() const
 {
     return csRadioTech_;
@@ -252,6 +257,7 @@ void NetworkState::SetNetworkType(RadioTech tech, DomainType domainType)
     if (domainType == DomainType::DOMAIN_TYPE_CS) {
         csRadioTech_ = tech;
     } else {
+        lastPsRadioTech_ = psRadioTech_;
         psRadioTech_ = tech;
     }
 }
@@ -309,12 +315,18 @@ std::string NetworkState::ToString() const
 
 void NetworkState::SetCfgTech(RadioTech tech)
 {
+    lastCfgTech_ = cfgTech_;
     cfgTech_ = tech;
 }
 
 RadioTech NetworkState::GetCfgTech() const
 {
     return cfgTech_;
+}
+
+RadioTech NetworkState::GetLastCfgTech() const
+{
+    return lastCfgTech_;
 }
 
 void NetworkState::SetNrState(NrState state)

@@ -341,7 +341,8 @@ int32_t TelRilNetwork::GetNrOptionModeResponse(const HDI::Ril::V1_1::RilRadioRes
 int32_t TelRilNetwork::GetRrcConnectionStateResponse(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t rrcConnectionState)
 {
-    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo, rrcConnectionState);
+    return Response<HRilInt32Parcel>(
+        TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<HRilInt32Parcel>(rrcConnectionState));
 }
 
 void TelRilNetwork::BuildSignalStrength(std::shared_ptr<Rssi> signalStrength, const HDI::Ril::V1_1::Rssi &rssi)

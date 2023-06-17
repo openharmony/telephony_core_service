@@ -39,6 +39,8 @@ public:
     void SetNetworkState(RegServiceState state, DomainType domainType);
     void SetNetworkStateToRoaming(RoamingType roamingType, DomainType domainType);
     void SetInitial();
+    int32_t GetLastCfgTech(RadioTech &tech);
+    int32_t GetLastPsRadioTech(RadioTech &tech);
     void SetNrState(NrState state);
     void SetCfgTech(RadioTech tech);
     std::unique_ptr<NetworkState> GetNetworkStatus();
