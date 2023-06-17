@@ -224,7 +224,7 @@ public:
     int32_t JudgeNetworkMode(int32_t preferredNetwork);
     int32_t UpdateNrOptionMode(int32_t slotId, NrMode mode);
     int32_t UpdateRadioOn(int32_t slotId) override;
-    int32_t UpdateNrConfig(int32_t slotId, int32_t status);
+    int32_t HandleRrcStateChanged(int32_t slotId, int32_t status);
     int32_t GetRrcConnectionState(int32_t slotId, int32_t &status) override;
     int32_t UpdateRrcConnectionState(int32_t slotId, int32_t &status);
 
