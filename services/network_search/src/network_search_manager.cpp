@@ -23,6 +23,8 @@
 #include "core_service_errors.h"
 #include "mcc_pool.h"
 #include "network_search_types.h"
+#include "parameter.h"
+#include "telephony_common_utils.h"
 #include "telephony_config.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -36,6 +38,10 @@ const int32_t SERVICE_ABILITY_OFF = 0;
 const int32_t SERVICE_ABILITY_ON = 1;
 const int32_t NETWORK_MODE_LTE = 1;
 const int32_t NETWORK_MODE_NR = 2;
+const int32_t SYS_PARAMETER_SIZE = 256;
+const int32_t INVALID_DELAY_TIME = 0;
+constexpr const char *NO_DELAY_TIME__CONFIG = "0";
+constexpr const char *CFG_TECH_UPDATE_TIME = "persist.radio.cfg.update.time";
 
 NetworkSearchManager::NetworkSearchManager(
     std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<ISimManager> simManager)
@@ -199,6 +205,7 @@ bool NetworkSearchManager::OnInit()
             eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_STATUS);
         }
     }
+    delayTime_ = GetDelayNotifyTime();
     TELEPHONY_LOGI("NetworkSearchManager::Init success");
     return true;
 }
@@ -664,7 +671,7 @@ int32_t NetworkSearchManager::SetNetworkSelectionMode(int32_t slotId, int32_t se
     bool ret = eventSender_->SendCallback(
         slotId, RadioEvent::RADIO_SET_NETWORK_SELECTION_MODE, &callback, selectMode, plmnNumeric);
     if (!ret) {
-        TELEPHONY_LOGE("slotId:%{public}d SetPreferredNetwork SendCallback failed.", slotId);
+        TELEPHONY_LOGE("slotId:%{public}d SetNetworkSelectionMode SendCallback failed.", slotId);
         return CORE_SERVICE_SEND_CALLBACK_FAILED;
     }
     return TELEPHONY_ERR_SUCCESS;
@@ -1058,18 +1065,32 @@ bool NetworkSearchManager::IsNrSupported(int32_t slotId)
         static_cast<uint32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_NR);
 }
 
-int32_t NetworkSearchManager::UpdateNrConfig(int32_t slotId, int32_t status)
+int32_t NetworkSearchManager::HandleRrcStateChanged(int32_t slotId, int32_t status)
 {
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    if (inner->rrcConnectionStatus_ == status) {
+        TELEPHONY_LOGI("slotId:%{public}d rrc state is not change.", slotId);
+        return TELEPHONY_ERR_FAIL;
+    }
     inner->rrcConnectionStatus_ = status;
     if (status == RRC_CONNECTED_STATUS || status == RRC_IDLE_STATUS) {
-        inner->networkSearchHandler_->UpdateNrConfig(status);
+        inner->networkSearchHandler_->HandleRrcStateChanged(status);
     }
     return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkSearchManager::RevertLastTechnology(int32_t slotId)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return inner->networkSearchHandler_->RevertLastTechnology();
 }
 
 int32_t NetworkSearchManager::GetRrcConnectionState(int32_t slotId, int32_t &status)
@@ -1177,6 +1198,111 @@ void NetworkSearchManager::DcPhysicalLinkActiveUpdate(int32_t slotId, bool isAct
             inner->networkSearchHandler_->SendEvent(event);
         }
     }
+}
+
+int32_t NetworkSearchManager::GetDelayNotifyTime()
+{
+    char param[SYS_PARAMETER_SIZE] = { 0 };
+    int32_t delayTime = 0;
+    int32_t code = GetParameter(CFG_TECH_UPDATE_TIME, NO_DELAY_TIME__CONFIG, param, SYS_PARAMETER_SIZE);
+    if (code <= 0 || !IsValidDecValue(param)) {
+        delayTime = std::stoi(NO_DELAY_TIME__CONFIG);
+    } else {
+        delayTime = std::stoi(param);
+    }
+    return delayTime;
+}
+
+int32_t NetworkSearchManager::HandleNotifyStateChangeWithDelay(int32_t slotId, bool isNeedDelay)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    auto delayEvent = AppExecFwk::InnerEvent::Get(RadioEvent::DELAY_NOTIFY_STATE_CHANGE);
+    uint32_t delayEventId = static_cast<uint32_t>(RadioEvent::DELAY_NOTIFY_STATE_CHANGE);
+    if (isNeedDelay) {
+        if (inner->networkSearchHandler_->HasInnerEvent(delayEventId)) {
+            TELEPHONY_LOGI("Has delay event, return. slotId:%{public}d", slotId);
+        } else {
+            inner->networkSearchHandler_->SendEvent(delayEvent, delayTime_);
+            TELEPHONY_LOGI("Need delay, delayTime:%{public}d slotId:%{public}d", delayTime_, slotId);
+        }
+    } else {
+        TELEPHONY_LOGI("Do not need delay, slotId:%{public}d", slotId);
+        if (inner->networkSearchHandler_->HasInnerEvent(delayEventId)) {
+            TELEPHONY_LOGI("Remove delay event, slotId:%{public}d", slotId);
+            inner->networkSearchHandler_->RemoveEvent(delayEventId);
+        }
+        auto event = AppExecFwk::InnerEvent::Get(RadioEvent::NOTIFY_STATE_CHANGE);
+        inner->networkSearchHandler_->SendEvent(event);
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+bool NetworkSearchManager::IsNeedDelayNotify(int32_t slotId)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
+        return false;
+    }
+    if ((inner->networkSearchState_ == nullptr) || (inner->networkSearchState_->GetNetworkStatus() == nullptr)) {
+        TELEPHONY_LOGE("NetworkSearchManager::IsNeedDelayNotify failed due to nullptr!");
+        return false;
+    }
+    if (delayTime_ <= INVALID_DELAY_TIME) {
+        TELEPHONY_LOGI("The system properties are not configured with a valid delay time.");
+        return false;
+    }
+    int32_t networkCapabilityState = 0;
+    GetNetworkCapability(slotId, SERVICE_TYPE_NR, networkCapabilityState);
+    if (networkCapabilityState == SERVICE_ABILITY_OFF) {
+        TELEPHONY_LOGI("The NR switch is closed.");
+        return false;
+    }
+    RegServiceState regState = RegServiceState::REG_STATE_UNKNOWN;
+    inner->networkSearchHandler_->GetRegServiceState(regState);
+    if (regState == RegServiceState::REG_STATE_NO_SERVICE) {
+        TELEPHONY_LOGI("The reg state is no service.");
+        return false;
+    }
+    RadioTech cfgTech = inner->networkSearchState_->GetNetworkStatus()->GetCfgTech();
+    if ((cfgTech != RadioTech::RADIO_TECHNOLOGY_LTE) && (cfgTech != RadioTech::RADIO_TECHNOLOGY_LTE_CA)) {
+        TELEPHONY_LOGI("The cfgTech[%{public}d] is not LTE, slotId:%{public}d", cfgTech, slotId);
+        return false;
+    }
+    sptr<NetworkSearchCallBackBase> cellularCall = GetCellularCallCallBack();
+    if (cellularCall) {
+        TELEPHONY_LOGI("Has cellularCall, slotId:%{public}d", slotId);
+    }
+    RadioTech lastCfgTech = inner->networkSearchState_->GetNetworkStatus()->GetLastCfgTech();
+    RadioTech lastPsRadioTech = inner->networkSearchState_->GetNetworkStatus()->GetLastPsRadioTech();
+    if ((lastCfgTech == RadioTech::RADIO_TECHNOLOGY_NR) && (lastPsRadioTech != RadioTech::RADIO_TECHNOLOGY_NR) &&
+        (cfgTech == RadioTech::RADIO_TECHNOLOGY_LTE || (cfgTech == RadioTech::RADIO_TECHNOLOGY_LTE_CA))) {
+        TELEPHONY_LOGI(
+            "lastCfgTech:%{public}d lastPsTech:%{public}d slotId:%{public}d", lastCfgTech, lastPsRadioTech, slotId);
+        return true;
+    }
+    return false;
+}
+
+int32_t NetworkSearchManager::ProcessNotifyStateChangeEvent(int32_t slotId)
+{
+    TELEPHONY_LOGI("Start process network state notify event, slotId:%{public}d", slotId);
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    bool isNeedDelay = IsNeedDelayNotify(slotId);
+    if (isNeedDelay) {
+        TELEPHONY_LOGI("revert last tech. slotId:%{public}d", slotId);
+        inner->networkSearchHandler_->RevertLastTechnology();
+    }
+    return HandleNotifyStateChangeWithDelay(slotId, isNeedDelay);
 }
 
 bool NetworkSearchManager::IsRadioFirstPowerOn(int32_t slotId)

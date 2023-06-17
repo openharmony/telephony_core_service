@@ -59,6 +59,8 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
     { RadioEvent::RADIO_GET_NR_OPTION_MODE, &NetworkSearchHandler::GetNrOptionModeResponse },
     { RadioEvent::RADIO_GET_RRC_CONNECTION_STATE, &NetworkSearchHandler::RadioGetRrcConnectionState },
     { RadioEvent::RADIO_RRC_CONNECTION_STATE_UPDATE, &NetworkSearchHandler::RadioGetRrcConnectionState },
+    { RadioEvent::NOTIFY_STATE_CHANGE, &NetworkSearchHandler::NotifyStateChange },
+    { RadioEvent::DELAY_NOTIFY_STATE_CHANGE, &NetworkSearchHandler::HandleDelayNotifyEvent },
     { SettingEventCode::MSG_AUTO_TIME, &NetworkSearchHandler::AutoTimeChange },
     { SettingEventCode::MSG_AUTO_TIMEZONE, &NetworkSearchHandler::AutoTimeZoneChange },
     { SettingEventCode::MSG_AUTO_AIRPLANE_MODE, &NetworkSearchHandler::AirplaneModeChange }
@@ -477,7 +479,7 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
         cellInfo_->ClearCellInfoList();
     }
     networkSearchState->NotifyStateChange();
-    networkSearchManager->SetNrOptionMode(slotId_, NrMode::NR_MODE_UNKNOWN);
+    networkSearchManager->UpdateNrOptionMode(slotId_, NrMode::NR_MODE_UNKNOWN);
     bool isAirplaneModeOn = false;
     if (networkSearchManager->GetAirplaneMode(isAirplaneModeOn) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RadioOffOrUnavailableState GetAirplaneMode fail slotId:%{public}d", slotId_);
@@ -852,15 +854,63 @@ void NetworkSearchHandler::DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEve
         isActive ? "true" : "false");
 }
 
-
-int32_t NetworkSearchHandler::UpdateNrConfig(int32_t status)
+void NetworkSearchHandler::NotifyStateChange(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGD("NetworkSearchHandler::UpdateNrConfig slotId:%{public}d", slotId_);
+    TELEPHONY_LOGI("NetworkSearchHandler::NotifyStateChange slotId:%{public}d", slotId_);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::NotifyStateChange event is nullptr!");
+        return;
+    }
     if (networkRegister_ == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchHandler::UpdateNrConfig networkRegister_ is nullptr!");
+        TELEPHONY_LOGE("NetworkSearchHandler::NotifyStateChange networkRegister_ is nullptr!");
+        return;
+    }
+    networkRegister_->NotifyStateChange();
+}
+
+void NetworkSearchHandler::HandleDelayNotifyEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("NetworkSearchHandler::HandleDelayNotifyEvent slotId:%{public}d", slotId_);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::NotifyStateChange event is nullptr!");
+        return;
+    }
+    if (networkRegister_ == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::NotifyStateChange networkRegister_ is nullptr!");
+        return;
+    }
+    RadioOnState();
+}
+
+int32_t NetworkSearchHandler::GetRegServiceState(RegServiceState &regState)
+{
+    if (networkRegister_ == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::GetRegServiceState networkRegister_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    networkRegister_->UpdateNrConfig(status);
+    regState = networkRegister_->GetRegServiceState();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkSearchHandler::HandleRrcStateChanged(int32_t status)
+{
+    TELEPHONY_LOGI("NetworkSearchHandler::HandleRrcStateChanged slotId:%{public}d", slotId_);
+    if (networkRegister_ == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::HandleRrcStateChanged networkRegister_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    networkRegister_->HandleRrcStateChanged(status);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkSearchHandler::RevertLastTechnology()
+{
+    TELEPHONY_LOGI("NetworkSearchHandler::RevertLastTechnology slotId:%{public}d", slotId_);
+    if (networkRegister_ == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RevertLastTechnology networkRegister_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    networkRegister_->RevertLastTechnology();
     return TELEPHONY_ERR_SUCCESS;
 }
 

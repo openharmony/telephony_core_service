@@ -166,6 +166,8 @@ public:
     FrequencyType GetFrequencyType(int32_t slotId) override;
     NrState GetNrState(int32_t slotId) override;
     void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive) override;
+    int32_t HandleNotifyStateChangeWithDelay(int32_t slotId, bool isNeedDelay) override;
+    bool IsNeedDelayNotify(int32_t slotId);
     int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) override;
     int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName,
         const sptr<ImsRegInfoCallback> &callback) override;
@@ -210,6 +212,7 @@ public:
     std::shared_ptr<NetworkSearchManagerInner> FindManagerInner(int32_t slotId);
     void SetLocateUpdate(int32_t slotId);
     int32_t GetAirplaneMode(bool &airplaneMode) override;
+    int32_t ProcessNotifyStateChangeEvent(int32_t slotId);
     bool IsRadioFirstPowerOn(int32_t slotId);
     void SetRadioFirstPowerOn(int32_t slotId, bool isFirstPowerOn);
     void NotifyImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info);
@@ -221,7 +224,7 @@ public:
     int32_t JudgeNetworkMode(int32_t preferredNetwork);
     int32_t UpdateNrOptionMode(int32_t slotId, NrMode mode);
     int32_t UpdateRadioOn(int32_t slotId) override;
-    int32_t UpdateNrConfig(int32_t slotId, int32_t status);
+    int32_t HandleRrcStateChanged(int32_t slotId, int32_t status);
     int32_t GetRrcConnectionState(int32_t slotId, int32_t &status) override;
     int32_t UpdateRrcConnectionState(int32_t slotId, int32_t &status);
 
@@ -265,6 +268,8 @@ private:
     void ClearManagerInner();
     void AddManagerInner(int32_t slotId, const std::shared_ptr<NetworkSearchManagerInner> &inner);
     bool RemoveManagerInner(int32_t slotId);
+    int32_t GetDelayNotifyTime();
+    int32_t RevertLastTechnology(int32_t slotId);
 
 private:
     struct ImsRegInfoCallbackRecord {
@@ -282,6 +287,7 @@ private:
     std::map<int32_t, std::shared_ptr<NetworkSearchManagerInner>> mapManagerInner_;
     std::list<ImsRegInfoCallbackRecord> listImsRegInfoCallbackRecord_;
     std::mutex mutexInner_;
+    int32_t delayTime_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

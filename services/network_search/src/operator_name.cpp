@@ -86,10 +86,8 @@ void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("OperatorName::HandleOperatorInfo phone type:%{public}d invalid", type);
     }
     networkSearchManager->decMsgNum(slotId_);
-    if (networkSearchState_ != nullptr) {
-        if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
-            networkSearchState_->NotifyStateChange();
-        }
+    if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
+        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
     }
 
     NotifySpnChanged();

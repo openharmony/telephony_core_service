@@ -1504,23 +1504,19 @@ HWTEST_F(BranchTest, Telephony_NetworkRegister_002, Function | MediumTest | Leve
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
     auto networkRegister = std::make_shared<NetworkRegister>(networkSearchState, networkSearchManager, INVALID_SLOTID);
-    std::string cfgStr = "123,4";
-    networkRegister->NrConfigParse(cfgStr);
     networkRegister->InitNrConversionConfig();
-    std::string strState = "NOT_SUPPORT";
-    EXPECT_EQ(networkRegister->ConvertStringToNrState(strState), NrState::NR_STATE_NOT_SUPPORT);
-    strState = "NO_DETECT";
-    EXPECT_EQ(networkRegister->ConvertStringToNrState(strState), NrState::NR_NSA_STATE_NO_DETECT);
-    strState = "CONNECTED_DETECT";
-    EXPECT_EQ(networkRegister->ConvertStringToNrState(strState), NrState::NR_NSA_STATE_CONNECTED_DETECT);
-    strState = "IDLE_DETECT";
-    EXPECT_EQ(networkRegister->ConvertStringToNrState(strState), NrState::NR_NSA_STATE_IDLE_DETECT);
-    strState = "DUAL_CONNECTED";
-    EXPECT_EQ(networkRegister->ConvertStringToNrState(strState), NrState::NR_NSA_STATE_DUAL_CONNECTED);
-    strState = "SA_ATTACHED";
-    EXPECT_EQ(networkRegister->ConvertStringToNrState(strState), NrState::NR_NSA_STATE_SA_ATTACHED);
-    strState = "123";
-    EXPECT_EQ(networkRegister->ConvertStringToNrState(strState), NrState::NR_STATE_NOT_SUPPORT);
+    std::string config = "";
+    EXPECT_FALSE(networkRegister->IsValidConfig(config));
+    config = "ConfigD";
+    EXPECT_TRUE(networkRegister->IsValidConfig(config));
+    int32_t rrcState = 1;
+    EXPECT_NE(networkRegister->GetRrcConnectionState(rrcState), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkRegister->HandleRrcStateChanged(0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkRegister->HandleRrcStateChanged(1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(
+        networkRegister->GetTechnologyByNrConfig(RadioTech::RADIO_TECHNOLOGY_NR), RadioTech::RADIO_TECHNOLOGY_INVALID);
+    EXPECT_GT(
+        networkRegister->GetTechnologyByNrConfig(RadioTech::RADIO_TECHNOLOGY_LTE), RadioTech::RADIO_TECHNOLOGY_INVALID);
 }
 
 /**
@@ -1801,6 +1797,9 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_003, Function | MediumTest |
     int32_t status = 0;
     EXPECT_NE(networkSearchManager->UpdateRrcConnectionState(INVALID_SLOTID, status), TELEPHONY_SUCCESS);
     EXPECT_EQ(status, 0);
+    NrMode mode = NrMode::NR_MODE_UNKNOWN;
+    EXPECT_NE(networkSearchManager->GetNrOptionMode(INVALID_SLOTID, mode), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(mode, NrMode::NR_MODE_UNKNOWN);
 }
 
 /**
@@ -1950,6 +1949,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
     networkSearchHandler->RadioOffOrUnavailableState(1);
     networkSearchHandler->RadioGetNeighboringCellInfo(event);
     networkSearchHandler->RadioGetBasebandVersion(event);
+    networkSearchHandler->HandleRrcStateChanged(1);
     networkSearchHandler->RadioGetRrcConnectionState(event);
     EXPECT_EQ(networkSearchHandler->GetPhoneType(), PhoneType::PHONE_TYPE_IS_NONE);
 }
