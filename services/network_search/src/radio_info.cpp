@@ -409,7 +409,6 @@ int32_t RadioInfo::ProcessSetNrOptionMode(const AppExecFwk::InnerEvent::Pointer 
 
 int32_t RadioInfo::ProcessGetNrOptionMode(const AppExecFwk::InnerEvent::Pointer &event) const
 {
-    TELEPHONY_LOGI("start slotId:%{public}d", slotId_);
     if (event == nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode event is nullptr slotId:%{public}d", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -419,7 +418,6 @@ int32_t RadioInfo::ProcessGetNrOptionMode(const AppExecFwk::InnerEvent::Pointer 
         TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode nsm is nullptr slotId:%{public}d", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-
     std::shared_ptr<NrModeInfo> nrModeInfo = event->GetSharedObject<NrModeInfo>();
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (responseInfo == nullptr && nrModeInfo == nullptr) {
@@ -439,7 +437,6 @@ int32_t RadioInfo::ProcessGetNrOptionMode(const AppExecFwk::InnerEvent::Pointer 
             return TELEPHONY_ERR_WRITE_DATA_FAIL;
         }
     } else if (responseInfo != nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode error code is %{public}d", responseInfo->error);
         index = responseInfo->flag;
         if (!data.WriteInt32(nrMode) || !data.WriteInt32(static_cast<int32_t>(responseInfo->error))) {
             TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode WriteInt32 nrMode is false");

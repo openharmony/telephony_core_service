@@ -386,10 +386,11 @@ int32_t CoreServiceStub::OnGetNrOptionMode(MessageParcel &data, MessageParcel &r
     int32_t slotId = data.ReadInt32();
     sptr<INetworkSearchCallback> callback = nullptr;
     sptr<IRemoteObject> remoteCallback = data.ReadRemoteObject();
-    if (remoteCallback != nullptr) {
-        TELEPHONY_LOGD("CoreServiceStub::OnGetNrOptionMode remote callback is not null.");
-        callback = iface_cast<INetworkSearchCallback>(remoteCallback);
+    if (remoteCallback == nullptr) {
+        TELEPHONY_LOGE("CoreServiceStub::OnGetNrOptionMode remoteCallback is nullptr.");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
+    callback = iface_cast<INetworkSearchCallback>(remoteCallback);
     if (callback == nullptr) {
         TELEPHONY_LOGE("CoreServiceStub::OnGetNrOptionMode callback is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

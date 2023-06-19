@@ -53,11 +53,11 @@ int32_t INetworkSearchCallbackStub::OnNetworkSearchCallback(NetworkSearchCallbac
             OnSetPreferredNetworkCallback(data);
             break;
         }
-        case INetworkSearchCallback::NetworkSearchCallback::SET_NR_MODE_RESULT: {
+        case INetworkSearchCallback::NetworkSearchCallback::SET_NR_OPTION_MODE_RESULT: {
             OnSetNrOptionModeCallback(data);
             break;
         }
-        case INetworkSearchCallback::NetworkSearchCallback::GET_NR_MODE_RESULT: {
+        case INetworkSearchCallback::NetworkSearchCallback::GET_NR_OPTION_MODE_RESULT: {
             OnGetNrOptionModeCallback(data);
             break;
         }

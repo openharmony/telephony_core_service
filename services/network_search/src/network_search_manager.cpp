@@ -1165,7 +1165,7 @@ int32_t NetworkSearchManager::SetNrOptionMode(int32_t slotId, int32_t mode)
         TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    eventSender_->SendBase(slotId, RadioEvent::RADIO_SET_NR_OPTION_MODE);
+    eventSender_->SendBase(slotId, RadioEvent::RADIO_SET_NR_OPTION_MODE, mode);
     return TELEPHONY_ERR_SUCCESS;
 }
 

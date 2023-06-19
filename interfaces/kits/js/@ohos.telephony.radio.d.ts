@@ -840,7 +840,7 @@ declare namespace radio {
    * @syscap SystemCapability.Telephony.CoreService
    * @since 7
    */
-  function isRadioOn(slotId: number, callback: AsyncCallback<boolean>): void
+  function isRadioOn(slotId: number, callback: AsyncCallback<boolean>): void;
 
   /**
    * Checks whether the radio service is enabled.
@@ -1391,7 +1391,7 @@ declare namespace radio {
    *
    * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot
    * index number supported by the device.
-   * @returns { AsyncCallback<NROptionMode> } Returns the selection mode of NR.
+   * @returns { Promise<NROptionMode> } Returns the selection mode of NR.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 8300001 - Invalid parameter value.
