@@ -132,6 +132,13 @@ int32_t NapiImsRegInfoCallbackManager::ReportImsRegInfo(
     const ImsRegInfo &info, const ImsRegStateCallback &stateCallback)
 {
     napi_env env = stateCallback.env;
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env, &scope);
+    if (scope == nullptr) {
+        TELEPHONY_LOGE("scope is nullptr");
+        napi_close_handle_scope(env, scope);
+        return TELEPHONY_ERROR;
+    }
     napi_value callbackValues[CALLBACK_VALUES_SIZE] = { 0 };
     napi_create_object(env, &callbackValues[0]);
     NapiUtil::SetPropertyInt32(env, callbackValues[0], "imsRegState", static_cast<int32_t>(info.imsRegState));
@@ -142,6 +149,7 @@ int32_t NapiImsRegInfoCallbackManager::ReportImsRegInfo(
     napi_get_reference_value(env, stateCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is nullptr!");
+        napi_close_handle_scope(env, scope);
         return TELEPHONY_ERROR;
     }
     napi_value callbackResult = nullptr;
@@ -149,8 +157,10 @@ int32_t NapiImsRegInfoCallbackManager::ReportImsRegInfo(
         napi_call_function(env, thisVar, callbackFunc, std::size(callbackValues), callbackValues, &callbackResult);
     if (ret != napi_status::napi_ok) {
         TELEPHONY_LOGE("napi_call_function failed!");
+        napi_close_handle_scope(env, scope);
         return TELEPHONY_ERROR;
     }
+    napi_close_handle_scope(env, scope);
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
