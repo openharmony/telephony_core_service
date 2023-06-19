@@ -71,7 +71,8 @@ public:
      * @brief Obtain the selection mode of NR
      *
      * @param slotId[in], sim slot id
-     * @param callback[out], the callback of NR mode
+     * @param mode[out], the selection mode of NR
+     * @param callback[out], Indicates the result of setting NR mode
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t SetNrOptionMode(int32_t slotId, int32_t mode, const sptr<INetworkSearchCallback> &callback);

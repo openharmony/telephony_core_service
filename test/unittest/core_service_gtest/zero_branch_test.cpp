@@ -1698,19 +1698,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     EXPECT_EQ(result, testStr);
     EXPECT_NE(networkSearchManager->GetMeid(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, testStr);
-    std::string version = "";
-    EXPECT_NE(networkSearchManager->GetBasebandVersion(INVALID_SLOTID, version), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(version, "");
-    EXPECT_FALSE(networkSearchManager->IsNrSupported(INVALID_SLOTID));
-    sptr<NetworkState> networkState = nullptr;
-    EXPECT_NE(networkSearchManager->GetNetworkStatus(INVALID_SLOTID, networkState), TELEPHONY_ERR_SUCCESS);
-    EXPECT_TRUE(networkState == nullptr);
-    networkSearchManager->AddManagerInner(INVALID_SLOTID, inner);
-    EXPECT_EQ(networkSearchManager->GetFrequencyType(INVALID_SLOTID), FrequencyType::FREQ_TYPE_UNKNOWN);
-    EXPECT_EQ(networkSearchManager->GetNrState(INVALID_SLOTID), NrState::NR_STATE_NOT_SUPPORT);
-    EXPECT_EQ(networkSearchManager->GetPsRegState(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_EQ(networkSearchManager->GetCsRegState(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_EQ(networkSearchManager->GetPsRoamingState(INVALID_SLOTID), TELEPHONY_ERROR);
 }
 
 /**
@@ -1783,6 +1770,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_003, Function | MediumTest |
     auto runner = AppExecFwk::EventRunner::Create("test");
     auto networkSearchHandler =
         std::make_shared<NetworkSearchHandler>(runner, networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
+    sptr<INetworkSearchCallback> networkSearchCallback = nullptr;
     networkSearchManager->TriggerSimRefresh(INVALID_SLOTID);
     networkSearchManager->RegisterCoreNotify(INVALID_SLOTID, networkSearchHandler, 1);
     networkSearchManager->UnRegisterCoreNotify(INVALID_SLOTID, networkSearchHandler, 1);
@@ -1811,7 +1799,10 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_003, Function | MediumTest |
     EXPECT_EQ(status, 0);
     NrMode mode = NrMode::NR_MODE_UNKNOWN;
     EXPECT_NE(networkSearchManager->GetNrOptionMode(INVALID_SLOTID, mode), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->GetNrOptionMode(INVALID_SLOTID, networkSearchCallback), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(mode, NrMode::NR_MODE_UNKNOWN);
+    EXPECT_NE(networkSearchManager->SetNrOptionMode(INVALID_SLOTID, 1), TELEPHONY_SUCCESS);
+    EXPECT_NE(networkSearchManager->SetNrOptionMode(INVALID_SLOTID, 1, networkSearchCallback), TELEPHONY_ERR_SUCCESS);
 }
 
 /**

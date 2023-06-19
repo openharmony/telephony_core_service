@@ -2229,7 +2229,7 @@ static napi_value GetNrOptionMode(napi_env env, napi_callback_info info)
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(
-        env, asyncContext.release(), "GetNrOptionMode", NativeGetNrOptionMode, GetNrOptionModeCallback);
+        env, asyncContext.release(), "getNROptionMode", NativeGetNrOptionMode, GetNrOptionModeCallback);
 }
 
 static void NativeSetNrOptionMode(napi_env env, void *data)
@@ -2249,14 +2249,14 @@ static void NativeSetNrOptionMode(napi_env env, void *data)
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->cv.wait_for(
             callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [asyncContext] { return asyncContext->callbackEnd; });
-        TELEPHONY_LOGI("NativeSetNrOptionMode after callback end");
+        TELEPHONY_LOGD("NativeSetNrOptionMode after callback end");
     }
 }
 
 static void SetNrOptionModeCallback(napi_env env, napi_status status, void *data)
 {
     auto context = static_cast<NrOptionModeContext *>(data);
-    TELEPHONY_LOGI("SetNrOptionModeCallback resolved = %{public}d", context->resolved);
+    TELEPHONY_LOGD("SetNrOptionModeCallback resolved = %{public}d", context->resolved);
     napi_value callbackValue = nullptr;
     if (context->resolved) {
         napi_get_undefined(env, &callbackValue);
@@ -2266,7 +2266,7 @@ static void SetNrOptionModeCallback(napi_env env, napi_status status, void *data
             context->errorCode = TELEPHONY_ERR_FAIL;
         }
         JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
-            context->errorCode, "SetNrOptionMode", SET_TELEPHONY_STATE);
+            context->errorCode, "setNrOptionMode", SET_TELEPHONY_STATE);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, context, callbackValue);
@@ -2288,10 +2288,11 @@ static napi_value SetNrOptionMode(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
     NAPI_CALL(env, napi_get_value_int32(env, parameters[1], &asyncContext->nrOptionMode));
     if (parameterCount == PARAMETER_COUNT_THREE) {
-        NAPI_CALL(env, napi_create_reference(env, parameters[2], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+        NAPI_CALL(env,
+            napi_create_reference(env, parameters[ARRAY_INDEX_SECOND], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(
-        env, asyncContext.release(), "SetNrOptionMode", NativeSetNrOptionMode, SetNrOptionModeCallback);
+        env, asyncContext.release(), "setNrOptionMode", NativeSetNrOptionMode, SetNrOptionModeCallback);
 }
 
 static napi_value IsNrSupported(napi_env env, napi_callback_info info)

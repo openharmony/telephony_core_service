@@ -160,6 +160,10 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
 
 int32_t NetworkRegister::RevertLastTechnology()
 {
+    if (networkSearchState_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchState_ is nullptr slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     RadioTech lastCfgTech = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
     RadioTech lastPsRadioTech = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
     networkSearchState_->GetLastCfgTech(lastCfgTech);
@@ -416,7 +420,7 @@ int32_t NetworkRegister::HandleRrcStateChanged(int32_t status)
             currentNrConfig_ = TELEPHONY_NR_CONFIG_D;
         }
     }
-    TELEPHONY_LOGE("currentNrConfig_:%{public}s, slotId:%{public}d", currentNrConfig_.c_str(), slotId_);
+    TELEPHONY_LOGI("currentNrConfig_:%{public}s, slotId:%{public}d", currentNrConfig_.c_str(), slotId_);
     UpdateNrState();
     UpdateCfgTech();
     return TELEPHONY_ERR_SUCCESS;

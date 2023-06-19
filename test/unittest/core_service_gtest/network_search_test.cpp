@@ -35,6 +35,7 @@ constexpr ImsServiceType DEFAULT_TYPE = TYPE_VOICE;
 constexpr int32_t INVALID_SLOT_ID = -1;
 constexpr int32_t INVALID_TYPE = -1;
 constexpr int32_t WAIT_TIME_SECOND_LONG = 60;
+constexpr int32_t NR_NSA_OPTION_ONLY = 1;
 #endif // TEL_TEST_UNSUPPORT
 
 sptr<ICoreService> NetworkSearchTest::telephonyService_ = nullptr;
@@ -2353,6 +2354,135 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetBasebandVersion_0200, Fun
         TELEPHONY_LOGI("TelephonyTestService GetBasebandVersion version: %{public}s", version.c_str());
         EXPECT_STRNE(version.c_str(), "");
     }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetBasebandVersion_0300
+ * @tc.name     Get baseband version without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetBasebandVersion_0300, Function | MediumTest | Level2)
+{
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+    } else {
+        std::string version = "";
+        int32_t ret = CoreServiceClient::GetInstance().GetBasebandVersion(SLOT_ID, version);
+        EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
+        TELEPHONY_LOGI("TelephonyTestService GetBasebandVersion version: %{public}s", version.c_str());
+        EXPECT_STRNE(version.c_str(), "");
+    }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_SetNrOptionMode_0100
+ * @tc.name     Set nr mode
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNrOptionMode_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        telephonyService_ = GetProxy();
+        return;
+    }
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    int32_t result = CoreServiceClient::GetInstance().SetNrOptionMode(SLOT_ID, NR_NSA_OPTION_ONLY, callback);
+    TELEPHONY_LOGI("TelephonyTestService SetNrOptionMode result: %{public}d", result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
+    callback->WaitForSetNrOptionModeCallback(WAIT_TIME_SECOND_LONG);
+    bool syncResult = callback->SetNrOptionModeCallbackResult();
+    TELEPHONY_LOGI("TelephonyTestService SetNrOptionMode syncResult: %{public}d", syncResult);
+    ASSERT_TRUE(syncResult || TELEPHONY_ERR_SUCCESS == result);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_SetNrOptionMode_0200
+ * @tc.name     Set nr mode
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNrOptionMode_0200, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        telephonyService_ = GetProxy();
+        return;
+    }
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    int32_t result = CoreServiceClient::GetInstance().SetNrOptionMode(SLOT_ID1, NR_NSA_OPTION_ONLY, callback);
+    TELEPHONY_LOGI("TelephonyTestService SetNrOptionMode result: %{public}d", result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
+    callback->WaitForSetNrOptionModeCallback(WAIT_TIME_SECOND_LONG);
+    bool syncResult = callback->SetNrOptionModeCallbackResult();
+    TELEPHONY_LOGI("TelephonyTestService SetNrOptionMode syncResult: %{public}d", syncResult);
+    ASSERT_TRUE(syncResult || TELEPHONY_ERR_SUCCESS == result);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_SetNrOptionMode_0300
+ * @tc.name     Set nr mode without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNrOptionMode_0300, Function | MediumTest | Level3)
+{
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        telephonyService_ = GetProxy();
+        return;
+    }
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    int32_t result = CoreServiceClient::GetInstance().SetNrOptionMode(SLOT_ID1, NR_NSA_OPTION_ONLY, callback);
+    TELEPHONY_LOGI("TelephonyTestService SetNrOptionMode result: %{public}d", result);
+    EXPECT_NE(TELEPHONY_ERR_SUCCESS, result);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetNrOptionMode_0100
+ * @tc.name     Get nr mode
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNrOptionMode_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        telephonyService_ = GetProxy();
+        return;
+    }
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    int32_t result = CoreServiceClient::GetInstance().GetNrOptionMode(SLOT_ID, callback);
+    TELEPHONY_LOGI("TelephonyTestService GetNrOptionMode result: %{public}d", result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
+    callback->WaitForGetNrOptionModeCallback(WAIT_TIME_SECOND_LONG);
+    bool syncResult = callback->GetNrOptionModeCallbackResult();
+    TELEPHONY_LOGI("TelephonyTestService GetNrOptionMode syncResult: %{public}d", syncResult);
+    ASSERT_TRUE(syncResult || TELEPHONY_ERR_SUCCESS == result);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetNrOptionMode_0200
+ * @tc.name     Get Nr Mode
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNrOptionMode_0200, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        telephonyService_ = GetProxy();
+        return;
+    }
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    int32_t result = CoreServiceClient::GetInstance().GetNrOptionMode(SLOT_ID1, callback);
+    TELEPHONY_LOGI("TelephonyTestService GetNrOptionMode result: %{public}d", result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
+    callback->WaitForGetNrOptionModeCallback(WAIT_TIME_SECOND_LONG);
+    bool syncResult = callback->GetNrOptionModeCallbackResult();
+    TELEPHONY_LOGI("TelephonyTestService GetNrOptionMode syncResult: %{public}d", syncResult);
+    ASSERT_TRUE(syncResult || TELEPHONY_ERR_SUCCESS == result);
 }
 
 #else // TEL_TEST_UNSUPPORT
