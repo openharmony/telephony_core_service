@@ -80,7 +80,6 @@ private:
     int32_t InsertData(int slotId, const std::string &newIccId);
     void SortCache();
     std::u16string GetIccId(int32_t slotId);
-    bool SetIccId(int32_t slotId, std::u16string iccId);
     int32_t GetDefaultCellularDataSlotIdUnit();
     bool AnnounceDefaultMainSimIdChanged(int32_t simId);
     bool AnnounceDefaultVoiceSimIdChanged(int32_t simId);
