@@ -254,6 +254,9 @@ static void GetSignalInfoListCallback(napi_env env, napi_status status, void *da
         JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->errorCode);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
+    if (asyncContext->signalInfoList.capacity() != 0) {
+        std::vector<sptr<SignalInformation>>().swap(asyncContext->signalInfoList);
+    }
     NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
     TELEPHONY_LOGD("GetSignalInfoListCallback end");
 }
