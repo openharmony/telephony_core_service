@@ -71,7 +71,7 @@ public:
      * @brief Obtain the selection mode of NR
      *
      * @param slotId[in], sim slot id
-     * @param mode[out], the selection mode of NR
+     * @param mode[in], the selection mode of NR
      * @param callback[out], Indicates the result of setting NR mode
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */

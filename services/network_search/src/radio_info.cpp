@@ -427,7 +427,7 @@ int32_t RadioInfo::ProcessGetNrOptionMode(const AppExecFwk::InnerEvent::Pointer 
     MessageParcel data;
     data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
     int64_t index = -1;
-    int32_t nrMode = 0;
+    int32_t nrMode = static_cast<int32_t>(NrMode::NR_MODE_UNKNOWN);
     if (nrModeInfo != nullptr) {
         nrMode = nrModeInfo->nrMode;
         index = nrModeInfo->flag;
