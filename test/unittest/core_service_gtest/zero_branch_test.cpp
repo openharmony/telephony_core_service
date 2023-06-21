@@ -255,7 +255,6 @@ HWTEST_F(BranchTest, Telephony_SimFileManager_001, Function | MediumTest | Level
 {
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     SimFileManager simFileManager { runner, telRilManager, simStateManager };
     const std::u16string emptyStr = Str8ToStr16("");
@@ -302,7 +301,6 @@ HWTEST_F(BranchTest, Telephony_SimFileManager_002, Function | MediumTest | Level
 {
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     SimFileManager simFileManager { runner, telRilManager, simStateManager };
     auto tech = std::make_shared<VoiceRadioTechnology>();
@@ -342,7 +340,6 @@ HWTEST_F(BranchTest, Telephony_SimFileManager_002, Function | MediumTest | Level
 HWTEST_F(BranchTest, Telephony_SimFile_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("SimFile");
     std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(eventLoopRecord, simStateManager);
@@ -392,7 +389,6 @@ HWTEST_F(BranchTest, Telephony_SimFile_001, Function | MediumTest | Level1)
 HWTEST_F(BranchTest, Telephony_SimFile_002, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("SimFile");
     std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(eventLoopRecord, simStateManager);
@@ -442,7 +438,6 @@ HWTEST_F(BranchTest, Telephony_SimFile_002, Function | MediumTest | Level1)
 HWTEST_F(BranchTest, Telephony_SimFile_003, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("SimFile");
     std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(eventLoopRecord, simStateManager);
@@ -492,7 +487,6 @@ HWTEST_F(BranchTest, Telephony_SimFile_003, Function | MediumTest | Level1)
 HWTEST_F(BranchTest, Telephony_SimFile_004, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("SimFile");
     std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(eventLoopRecord, simStateManager);
@@ -547,7 +541,6 @@ HWTEST_F(BranchTest, Telephony_SimFile_004, Function | MediumTest | Level1)
 HWTEST_F(BranchTest, Telephony_SimFile_005, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("SimFile");
     std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(eventLoopRecord, simStateManager);
@@ -576,7 +569,6 @@ HWTEST_F(BranchTest, Telephony_SimFile_005, Function | MediumTest | Level1)
 HWTEST_F(BranchTest, Telephony_ISimFile_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("IsimFile");
     std::shared_ptr<IsimFile> iSimFile = std::make_shared<IsimFile>(eventLoopRecord, simStateManager);
@@ -617,7 +609,6 @@ HWTEST_F(BranchTest, Telephony_ISimFile_001, Function | MediumTest | Level1)
 HWTEST_F(BranchTest, Telephony_RuimFile_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("RuimFile");
     std::shared_ptr<RuimFile> rUimFile = std::make_shared<RuimFile>(eventLoopRecord, simStateManager);
@@ -1052,7 +1043,6 @@ HWTEST_F(BranchTest, Telephony_TagService_001, Function | MediumTest | Level1)
 HWTEST_F(BranchTest, Telephony_SimSmsController_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("SimSmsController");
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::SimSmsController> simSmsController =
@@ -1172,7 +1162,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
 HWTEST_F(BranchTest, Telephony_SimManager_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
     simManager->SetNetworkSearchManager(nullptr);
     std::u16string testStr = u"";
@@ -1205,7 +1194,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_001, Function | MediumTest | Level1)
 HWTEST_F(BranchTest, Telephony_SimManager_002, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
     std::u16string testStr = u"";
     EXPECT_GT(simManager->GetISOCountryCodeForSim(0, testStr), TELEPHONY_ERR_SUCCESS);
@@ -1261,7 +1249,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_002, Function | MediumTest | Level1)
 HWTEST_F(BranchTest, Telephony_SimManager_003, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
     simManager->SetDefaultVoiceSlotId(0);
     simManager->SetDefaultVoiceSlotId(INVALID_SLOTID);
@@ -1315,7 +1302,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_003, Function | MediumTest | Level1)
 HWTEST_F(BranchTest, Telephony_SimManager_004, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
     std::vector<std::shared_ptr<DiallingNumbersInfo>> list;
     EXPECT_GT(simManager->QueryIccDiallingNumbers(0, 1, list), TELEPHONY_ERR_SUCCESS);
@@ -1360,7 +1346,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_004, Function | MediumTest | Level1)
 HWTEST_F(BranchTest, Telephony_SimManager_005, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
     simManager->SetNetworkSearchManager(nullptr);
     std::string password = "1234";
@@ -1398,7 +1383,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_005, Function | MediumTest | Level1)
 HWTEST_F(BranchTest, Telephony_SimStateManager_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     simStateManager->RegisterCoreNotify(nullptr, 1);
