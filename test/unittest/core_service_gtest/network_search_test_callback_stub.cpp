@@ -55,6 +55,16 @@ bool NetworkSearchTestCallbackStub::GetPreferredNetworkCallbackResult() const
     return getPreferredNetworkResult_;
 }
 
+bool NetworkSearchTestCallbackStub::SetNrOptionModeCallbackResult() const
+{
+    return setNrOptionModeResult_;
+}
+
+bool NetworkSearchTestCallbackStub::GetNrOptionModeCallbackResult() const
+{
+    return getNrOptionModeResult_;
+}
+
 void NetworkSearchTestCallbackStub::WaitForGetNetworkModeCallback(int32_t timeoutSecond)
 {
     std::unique_lock<std::mutex> callbackLock(getNetworkModeMutex_);
@@ -95,6 +105,18 @@ void NetworkSearchTestCallbackStub::WaitForGetPreferredNetworkCallback(int32_t t
 {
     std::unique_lock<std::mutex> callbackLock(getPreferredNetworkMutex_);
     getPreferredNetworkCv_.wait_for(callbackLock, std::chrono::seconds(timeoutSecond));
+}
+
+void NetworkSearchTestCallbackStub::WaitForSetNrOptionModeCallback(int32_t timeoutSecond)
+{
+    std::unique_lock<std::mutex> callbackLock(setNrOptionModeMutex_);
+    setNrOptionModeCv_.wait_for(callbackLock, std::chrono::seconds(timeoutSecond));
+}
+
+void NetworkSearchTestCallbackStub::WaitForGetNrOptionModeCallback(int32_t timeoutSecond)
+{
+    std::unique_lock<std::mutex> callbackLock(getNrOptionModeMutex_);
+    getNrOptionModeCv_.wait_for(callbackLock, std::chrono::seconds(timeoutSecond));
 }
 
 void NetworkSearchTestCallbackStub::OnGetNetworkModeCallback(const int32_t searchModel, const int32_t errorCode)
@@ -182,6 +204,20 @@ void NetworkSearchTestCallbackStub::OnGetPreferredNetworkCallback(const int32_t 
         "result:%{public}d, error:%{public}d", networkMode, errorCode);
     getPreferredNetworkResult_ = (TELEPHONY_SUCCESS == errorCode);
     getPreferredNetworkCv_.notify_all();
+}
+
+void NetworkSearchTestCallbackStub::OnSetNrOptionModeCallback(const bool setResult, const int32_t errorCode)
+{
+    TELEPHONY_LOGI("setResult:%{public}d, errorCode:%{public}d", setResult, errorCode);
+    setNrOptionModeResult_ = (TELEPHONY_SUCCESS == errorCode);
+    setNrOptionModeCv_.notify_all();
+}
+
+void NetworkSearchTestCallbackStub::OnGetNrOptionModeCallback(const int32_t mode, const int32_t errorCode)
+{
+    TELEPHONY_LOGI("mode:%{public}d, errorCode:%{public}d", mode, errorCode);
+    getNrOptionModeResult_ = (TELEPHONY_SUCCESS == errorCode);
+    getNrOptionModeCv_.notify_all();
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -32,6 +32,8 @@ public:
     bool GetNetworkSearchInformationCallbackResult() const;
     bool SetPreferredNetworkCallbackResult() const;
     bool GetPreferredNetworkCallbackResult() const;
+    bool SetNrOptionModeCallbackResult() const;
+    bool GetNrOptionModeCallbackResult() const;
     void WaitForGetNetworkModeCallback(int32_t timeoutSecond);
     void WaitForSetNetworkModeCallback(int32_t timeoutSecond);
     void WaitForSetRadioStateCallback(int32_t timeoutSecond);
@@ -39,6 +41,8 @@ public:
     void WaitForGetNetworkSearchInformationCallback(int32_t timeoutSecond);
     void WaitForSetPreferredNetworkCallback(int32_t timeoutSecond);
     void WaitForGetPreferredNetworkCallback(int32_t timeoutSecond);
+    void WaitForSetNrOptionModeCallback(int32_t timeoutSecond);
+    void WaitForGetNrOptionModeCallback(int32_t timeoutSecond);
     void OnGetNetworkModeCallback(const int32_t searchModel, const int32_t errorCode) override;
     void OnSetNetworkModeCallback(const bool setResult, const int32_t errorCode) override;
     void OnSetRadioStateCallback(const bool setResult, const int32_t errorCode) override;
@@ -47,6 +51,8 @@ public:
         const sptr<NetworkSearchResult> &networkSearchResult, const int32_t errorCode) override;
     void OnSetPreferredNetworkCallback(const bool result, const int32_t errorCode) override;
     void OnGetPreferredNetworkCallback(const int32_t networkMode, const int32_t errorCode) override;
+    void OnSetNrOptionModeCallback(const bool setResult, const int32_t errorCode) override;
+    void OnGetNrOptionModeCallback(const int32_t mode, const int32_t errorCode) override;
 
 private:
     int32_t getNetworkModeResult_ = false;
@@ -56,6 +62,8 @@ private:
     bool getNetworkSearchInformationResult_ = false;
     bool setPreferredNetworkResult_ = false;
     bool getPreferredNetworkResult_ = false;
+    bool setNrOptionModeResult_ = false;
+    bool getNrOptionModeResult_ = false;
     std::mutex getNetworkModeMutex_;
     std::condition_variable getNetworkModeCv_;
     std::mutex setNetworkModeMutex_;
@@ -70,6 +78,10 @@ private:
     std::condition_variable setPreferredNetworkCv_;
     std::mutex getPreferredNetworkMutex_;
     std::condition_variable getPreferredNetworkCv_;
+    std::mutex setNrOptionModeMutex_;
+    std::condition_variable setNrOptionModeCv_;
+    std::mutex getNrOptionModeMutex_;
+    std::condition_variable getNrOptionModeCv_;
 };
 } // namespace Telephony
 } // namespace OHOS

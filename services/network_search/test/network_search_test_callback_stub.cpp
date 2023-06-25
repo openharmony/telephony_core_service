@@ -95,5 +95,15 @@ void NetworkSearchTestCallbackStub::OnGetPreferredNetworkCallback(
         "errorCode:%{public}d",
         networkMode, errorCode);
 }
+
+void NetworkSearchTestCallbackStub::OnSetNrOptionModeCallback(const bool setResult, const int32_t errorCode)
+{
+    TELEPHONY_LOGI("setResult:%{public}d, errorCode:%{public}d", setResult, errorCode);
+}
+
+void NetworkSearchTestCallbackStub::OnGetNrOptionModeCallback(const int32_t mode, const int32_t errorCode)
+{
+    TELEPHONY_LOGI("mode:%{public}d, errorCode:%{public}d", mode, errorCode);
+}
 } // namespace Telephony
 } // namespace OHOS

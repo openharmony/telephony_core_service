@@ -30,6 +30,8 @@ public:
         const sptr<NetworkSearchResult> &networkSearchResult, const int32_t errorCode) override;
     void OnSetPreferredNetworkCallback(const bool result, const int32_t errorCode) override;
     void OnGetPreferredNetworkCallback(const int32_t networkMode, const int32_t errorCode) override;
+    void OnSetNrOptionModeCallback(const bool setResult, const int32_t errorCode) override;
+    void OnGetNrOptionModeCallback(const int32_t mode, const int32_t errorCode) override;
 };
 } // namespace Telephony
 } // namespace OHOS

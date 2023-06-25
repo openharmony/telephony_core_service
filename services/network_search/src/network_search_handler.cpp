@@ -952,7 +952,7 @@ void NetworkSearchHandler::RadioGetBasebandVersion(const AppExecFwk::InnerEvent:
         TELEPHONY_LOGE("NetworkSearchHandler::RadioGetBasebandVersion event is nullptr!");
         return;
     }
-    TELEPHONY_LOGI("RadioGetBasebandVersion start slotId:%{public}d", slotId_);
+    TELEPHONY_LOGD("RadioGetBasebandVersion start slotId:%{public}d", slotId_);
     if (radioInfo_ == nullptr) {
         TELEPHONY_LOGE("RadioGetBasebandVersion RadioInfo is null slotId:%{public}d", slotId_);
         return;
@@ -971,6 +971,7 @@ void NetworkSearchHandler::SetNrOptionModeResponse(const AppExecFwk::InnerEvent:
         TELEPHONY_LOGE("SetNrOptionModeResponse RadioInfo is null slotId:%{public}d", slotId_);
         return;
     }
+    radioInfo_->ProcessSetNrOptionMode(event);
 }
 
 void NetworkSearchHandler::GetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event)
@@ -984,6 +985,7 @@ void NetworkSearchHandler::GetNrOptionModeResponse(const AppExecFwk::InnerEvent:
         TELEPHONY_LOGE("GetNrOptionModeResponse RadioInfo is null slotId:%{public}d", slotId_);
         return;
     }
+    radioInfo_->ProcessGetNrOptionMode(event);
 }
 
 void NetworkSearchHandler::RadioGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event)
@@ -992,7 +994,7 @@ void NetworkSearchHandler::RadioGetRrcConnectionState(const AppExecFwk::InnerEve
         TELEPHONY_LOGE("NetworkSearchHandler::RadioGetRrcConnectionState event is nullptr!");
         return;
     }
-    TELEPHONY_LOGI("NetworkSearchHandler::RadioGetRrcConnectionState start slotId:%{public}d", slotId_);
+    TELEPHONY_LOGD("RadioGetRrcConnectionState start slotId:%{public}d", slotId_);
     if (radioInfo_ == nullptr) {
         TELEPHONY_LOGE("RadioGetRrcConnectionState RadioInfo is null slotId:%{public}d", slotId_);
         return;
