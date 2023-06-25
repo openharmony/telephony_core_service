@@ -46,7 +46,8 @@ public:
     virtual int32_t GetMeid(int32_t slotId, std::u16string &meid) = 0;
     virtual int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) = 0;
     virtual bool IsNrSupported(int32_t slotId) = 0;
-    virtual int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) = 0;
+    virtual int32_t SetNrOptionMode(int32_t slotId, int32_t mode, const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual int32_t GetNrOptionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual int32_t HasSimCard(int32_t slotId, bool &hasSimCard) = 0;
     virtual int32_t GetSimState(int32_t slotId, SimState &simState) = 0;
     virtual int32_t GetCardType(int32_t slotId, CardType &cardType) = 0;
@@ -217,6 +218,7 @@ public:
         HAS_OPERATOR_PRIVILEGES,
         SIM_AUTHENTICATION,
         IS_NR_SUPPORTED,
+        SET_NR_OPTION_MODE,
         GET_NR_OPTION_MODE,
         REG_IMS_CALLBACK,
         UN_REG_IMS_CALLBACK,

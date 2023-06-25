@@ -309,7 +309,24 @@ bool CoreService::IsNrSupported(int32_t slotId)
     return networkSearchManager_->IsNrSupported(slotId);
 }
 
-int32_t CoreService::GetNrOptionMode(int32_t slotId, NrMode &mode)
+int32_t CoreService::SetNrOptionMode(int32_t slotId, int32_t mode, const sptr<INetworkSearchCallback> &callback)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->SetNrOptionMode(slotId, mode, callback);
+}
+
+int32_t CoreService::GetNrOptionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -319,7 +336,7 @@ int32_t CoreService::GetNrOptionMode(int32_t slotId, NrMode &mode)
         TELEPHONY_LOGE("networkSearchManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return networkSearchManager_->GetNrOptionMode(slotId, mode);
+    return networkSearchManager_->GetNrOptionMode(slotId, callback);
 }
 
 int32_t CoreService::HasSimCard(int32_t slotId, bool &hasSimCard)

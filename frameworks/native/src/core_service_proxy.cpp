@@ -2726,7 +2726,40 @@ bool CoreServiceProxy::IsNrSupported(int32_t slotId)
     return result;
 }
 
-int32_t CoreServiceProxy::GetNrOptionMode(int32_t slotId, NrMode &mode)
+int32_t CoreServiceProxy::SetNrOptionMode(int32_t slotId, int32_t mode, const sptr<INetworkSearchCallback> &callback)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("SetNrOptionMode WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("SetNrOptionMode WriteInt32 slotId is false");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!data.WriteInt32(mode)) {
+        TELEPHONY_LOGE("SetNrOptionMode WriteInt32 mode is false");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (callback != nullptr) {
+        data.WriteRemoteObject(callback->AsObject().GetRefPtr());
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("SetNrOptionMode Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(InterfaceID::SET_NR_OPTION_MODE), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("SetNrOptionMode failed, error code is %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return reply.ReadInt32();
+}
+
+int32_t CoreServiceProxy::GetNrOptionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -2736,6 +2769,9 @@ int32_t CoreServiceProxy::GetNrOptionMode(int32_t slotId, NrMode &mode)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     data.WriteInt32(slotId);
+    if (callback != nullptr) {
+        data.WriteRemoteObject(callback->AsObject().GetRefPtr());
+    }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("GetNrOptionMode Remote is null");
@@ -2746,11 +2782,7 @@ int32_t CoreServiceProxy::GetNrOptionMode(int32_t slotId, NrMode &mode)
         TELEPHONY_LOGE("GetNrOptionMode failed, error code is %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t result = reply.ReadInt32();
-    if (result == TELEPHONY_ERR_SUCCESS) {
-        mode = static_cast<NrMode>(reply.ReadInt32());
-    }
-    return result;
+    return reply.ReadInt32();
 }
 
 int32_t CoreServiceProxy::RegisterImsRegInfoCallback(

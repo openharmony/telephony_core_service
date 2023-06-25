@@ -62,7 +62,9 @@ public:
 
     bool IsNrSupported(int32_t slotId) override;
 
-    int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) override;
+    int32_t SetNrOptionMode(int32_t slotId, int32_t mode, const sptr<INetworkSearchCallback> &callback) override;
+
+    int32_t GetNrOptionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 
     int32_t HasSimCard(int32_t slotId, bool &hasSimCard) override;
 

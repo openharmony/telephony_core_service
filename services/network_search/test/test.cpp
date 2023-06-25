@@ -67,6 +67,7 @@ const int32_t INPUT_NOTIFY_SPN_CHANGE = 29;
 const int32_t INPUT_GET_BASEBAND_VERSION = 30;
 const int32_t INPUT_GET_NETWORK_CAPABILITY = 31;
 const int32_t INPUT_SET_NETWORK_CAPABILITY = 32;
+const int32_t INPUT_SET_NR_OPTION_MODE = 33;
 const int32_t INPUT_INIT_TIME = 99;
 const int32_t INPUT_QUIT = 100;
 const int32_t SLEEP_TIME = 5;
@@ -308,6 +309,22 @@ void TestGetBasebandVersion()
     std::cout << "version:" << version << std::endl;
 }
 
+void TestSetNrOptionMode()
+{
+    if (g_telephonyService == nullptr) {
+        std::cout << "TestSetNrOptionMode g_telephonyService is nullptr." << std::endl;
+        return;
+    }
+    int32_t mode = 0;
+    std::cout << "please input nr mode:" << std::endl;
+    std::cin >> mode;
+    if (g_telephonyService != nullptr) {
+        OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+        int32_t result = g_telephonyService->SetNrOptionMode(InputSlotId(), mode, callback);
+        TELEPHONY_LOGI("TelephonyTestService::TestSetNrOptionMode result:%{public}d", result);
+    }
+}
+
 void TestNotifyNetworkStateChange()
 {
     AccessToken token;
@@ -445,11 +462,14 @@ void TestGetNrOptionMode()
         return;
     }
     NrMode mode = NrMode::NR_MODE_UNKNOWN;
-    int32_t result = g_telephonyService->GetNrOptionMode(InputSlotId(), mode);
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        std::cout << "error:" << result << std::endl;
+    if (g_telephonyService != nullptr) {
+        OHOS::sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+        int32_t result = g_telephonyService->GetNrOptionMode(InputSlotId(), callback);
+        if (result != TELEPHONY_ERR_SUCCESS) {
+            std::cout << "error:" << result << std::endl;
+        }
+        std::cout << "mode:" << static_cast<int32_t>(mode) << std::endl;
     }
-    std::cout << "mode:" << static_cast<int32_t>(mode) << std::endl;
 }
 
 void TestRegisterImsRegStateCallback()
@@ -697,6 +717,7 @@ void Prompt()
         "30:GetBasebandVersion\n"
         "31:GetNetworkCapability\n"
         "32:SetNetworkCapability\n"
+        "33:SetNrOptionMode\n"
         "99:InitTimeAndTimeZone\n"
         "100:exit \n");
 }
@@ -770,6 +791,7 @@ void Init()
     memberFuncMap_[INPUT_GET_BASEBAND_VERSION] = TestGetBasebandVersion;
     memberFuncMap_[INPUT_SET_NETWORK_CAPABILITY] = TestSetNetworkCapability;
     memberFuncMap_[INPUT_GET_NETWORK_CAPABILITY] = TestGetNetworkCapability;
+    memberFuncMap_[INPUT_SET_NR_OPTION_MODE] = TestSetNrOptionMode;
 }
 
 void InitBroadCast()

@@ -146,14 +146,24 @@ bool CoreServiceClient::IsNrSupported(int32_t slotId)
     return proxy->IsNrSupported(slotId);
 }
 
-int32_t CoreServiceClient::GetNrOptionMode(int32_t slotId, NrMode &mode)
+int32_t CoreServiceClient::SetNrOptionMode(int32_t slotId, int32_t mode, const sptr<INetworkSearchCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetNrOptionMode(slotId, mode);
+    return proxy->SetNrOptionMode(slotId, mode, callback);
+}
+
+int32_t CoreServiceClient::GetNrOptionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetNrOptionMode(slotId, callback);
 }
 
 int32_t CoreServiceClient::GetSignalInfoList(int32_t slotId, std::vector<sptr<SignalInformation>> &signals)

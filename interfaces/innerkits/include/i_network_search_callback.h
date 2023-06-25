@@ -31,6 +31,8 @@ public:
         SET_RADIO_STATUS_RESULT,
         GET_PREFERRED_NETWORK_MODE_RESULT,
         SET_PREFERRED_NETWORK_MODE_RESULT,
+        SET_NR_OPTION_MODE_RESULT,
+        GET_NR_OPTION_MODE_RESULT,
     };
     virtual int32_t OnNetworkSearchCallback(NetworkSearchCallback requestId, MessageParcel &data) = 0;
 
