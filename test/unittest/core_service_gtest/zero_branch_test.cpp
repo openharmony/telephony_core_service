@@ -1107,7 +1107,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | L
     EXPECT_FALSE(multiSimController->InitShowNumber(0));
     EXPECT_FALSE(multiSimController->InitIccId(0));
     EXPECT_FALSE(multiSimController->GetListFromDataBase());
-    EXPECT_FALSE(multiSimController->SetIccId(0, u""));
 }
 
 /**
@@ -2354,7 +2353,6 @@ HWTEST_F(BranchTest, Telephony_SimRdbHelper_001, Function | MediumTest | Level1)
     EXPECT_GE(simRdbHelper->SetDefaultVoiceCard(INVALID_SLOTID), TELEPHONY_ERROR);
     EXPECT_GE(simRdbHelper->SetDefaultMessageCard(INVALID_SLOTID), TELEPHONY_ERROR);
     EXPECT_GE(simRdbHelper->SetDefaultCellularData(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->QueryDataBySlotId(INVALID_SLOTID, simBean), TELEPHONY_ERROR);
     EXPECT_GE(simRdbHelper->QueryDataByIccId(iccId, simBean), TELEPHONY_ERROR);
     EXPECT_GE(simRdbHelper->QueryAllData(vec), TELEPHONY_ERROR);
     EXPECT_GE(simRdbHelper->QueryAllValidData(vec), TELEPHONY_ERROR);

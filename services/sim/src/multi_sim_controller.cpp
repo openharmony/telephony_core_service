@@ -419,7 +419,7 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
     DataShare::DataShareValuesBucket values;
     DataShare::DataShareValueObject valueObj(enable);
     values.Put(SimData::IS_ACTIVE, valueObj);
-    int32_t result = simDbHelper_->UpdateDataBySlotId(slotId, values);
+    int32_t result = simDbHelper_->UpdateDataBySimId(localCacheInfo_[slotId].simId, values);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("failed by database");
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
@@ -481,11 +481,21 @@ int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, bool denied, IccAc
 int32_t MultiSimController::GetDefaultVoiceSlotId()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::GetDefaultVoiceSlotId simDbHelper is nullptr");
-        return INVALID_VALUE;
+    if (localCacheInfo_.empty()) {
+        TELEPHONY_LOGE("failed by nullptr");
+        if (simDbHelper_ == nullptr) {
+            TELEPHONY_LOGE("simDbHelper is nullptr");
+            return DEFAULT_SLOT_ID;
+        }
+        return simDbHelper_->GetDefaultVoiceCardSlotId();
     }
-    return simDbHelper_->GetDefaultVoiceCardSlotId();
+    int32_t i = DEFAULT_SIM_SLOT_ID;
+    for (; i < maxCount_; i++) {
+        if (localCacheInfo_[i].isVoiceCard == MAIN_CARD) {
+            return i;
+        }
+    }
+    return GetFirstActivedSlotId();
 }
 
 int32_t MultiSimController::GetFirstActivedSlotId()
@@ -520,7 +530,7 @@ int32_t MultiSimController::SetDefaultVoiceSlotId(int32_t slotId)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t result = simDbHelper_->SetDefaultVoiceCard(slotId);
+    int32_t result = simDbHelper_->SetDefaultVoiceCard(localCacheInfo_[slotId].simId);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("get Data Base failed");
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
@@ -583,7 +593,7 @@ int32_t MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t result = simDbHelper_->SetDefaultMessageCard(slotId);
+    int32_t result = simDbHelper_->SetDefaultMessageCard(localCacheInfo_[slotId].simId);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("get Data Base failed");
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
@@ -633,7 +643,7 @@ int32_t MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t result = simDbHelper_->SetDefaultCellularData(slotId);
+    int32_t result = simDbHelper_->SetDefaultCellularData(localCacheInfo_[slotId].simId);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("get Data Base failed");
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
@@ -721,8 +731,8 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t setMainResult = simDbHelper_->SetDefaultMainCard(slotId);
-    int32_t setDataResult = simDbHelper_->SetDefaultCellularData(slotId);
+    int32_t setMainResult = simDbHelper_->SetDefaultMainCard(localCacheInfo_[slotId].simId);
+    int32_t setDataResult = simDbHelper_->SetDefaultCellularData(localCacheInfo_[slotId].simId);
     if (setMainResult == INVALID_VALUE || setDataResult == INVALID_VALUE) {
         TELEPHONY_LOGE("failed by invalid result");
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
@@ -783,7 +793,7 @@ int32_t MultiSimController::SetShowNumber(int32_t slotId, std::u16string number,
     DataShare::DataShareValuesBucket values;
     DataShare::DataShareValueObject valueObj(Str16ToStr8(number));
     values.Put(SimData::PHONE_NUMBER, valueObj);
-    int32_t result = simDbHelper_->UpdateDataBySlotId(slotId, values);
+    int32_t result = simDbHelper_->UpdateDataBySimId(localCacheInfo_[slotId].simId, values);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("MultiSimController::SetShowNumber set Data Base failed");
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
@@ -825,7 +835,7 @@ int32_t MultiSimController::SetShowName(int32_t slotId, std::u16string name, boo
     DataShare::DataShareValuesBucket values;
     DataShare::DataShareValueObject valueObj(Str16ToStr8(name));
     values.Put(SimData::SHOW_NAME, valueObj);
-    int32_t result = simDbHelper_->UpdateDataBySlotId(slotId, values);
+    int32_t result = simDbHelper_->UpdateDataBySimId(localCacheInfo_[slotId].simId, values);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("MultiSimController::SetShowName set Data Base failed");
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
@@ -842,31 +852,6 @@ std::u16string MultiSimController::GetIccId(int32_t slotId)
         return u"";
     }
     return Str8ToStr16(localCacheInfo_[slotId].iccId);
-}
-
-bool MultiSimController::SetIccId(int32_t slotId, std::u16string iccId)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
-        TELEPHONY_LOGE("MultiSimController::SetIccId failed by out of range");
-        return false;
-    }
-    if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimController::SetIccId failed by nullptr");
-        return false;
-    }
-    DataShare::DataShareValuesBucket values;
-    DataShare::DataShareValueObject iccidObj(Str16ToStr8(iccId));
-    values.Put(SimData::ICC_ID, iccidObj);
-    values.Put(SimData::CARD_ID, iccidObj); // iccId == cardId by now
-    int32_t result = simDbHelper_->UpdateDataBySlotId(slotId, values);
-    if (result == INVALID_VALUE) {
-        TELEPHONY_LOGE("MultiSimController::SetIccId set Data Base failed");
-        return false;
-    }
-    localCacheInfo_[slotId].iccId = Str16ToStr8(iccId); // save to cache
-    localCacheInfo_[slotId].cardId = Str16ToStr8(iccId);
-    return true;
 }
 
 bool MultiSimController::AnnounceDefaultVoiceSimIdChanged(int32_t simId)
