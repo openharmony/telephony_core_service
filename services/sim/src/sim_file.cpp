@@ -1731,7 +1731,7 @@ bool SimFile::FillNumber(std::shared_ptr<unsigned char> efCfisData, int32_t efCf
     for (unsigned int i = 0; i < dataLength; ++i) {
         numberData[i] = bcdCodes.at(i);
     }
-    if (CFIS_TON_NPI_OFFSET + dataLength >= efCfisSize) {
+    if (CFIS_TON_NPI_OFFSET + static_cast<int32_t>(dataLength) >= efCfisSize) {
         TELEPHONY_LOGE("data is invalid");
         return false;
     }
