@@ -277,7 +277,11 @@ int32_t SimManager::SetActiveSim(int32_t slotId, int32_t enable)
         TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return multiSimController_->SetActiveSim(slotId, enable);
+    int32_t ret = multiSimController_->SetActiveSim(slotId, enable);
+    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
+        multiSimMonitor_->NotifySimAccountChanged();
+    }
+    return ret;
 }
 
 int32_t SimManager::GetSimAccountInfo(int32_t slotId, bool denied, IccAccountInfo &info)
@@ -299,7 +303,11 @@ int32_t SimManager::SetDefaultVoiceSlotId(int32_t slotId)
         TELEPHONY_LOGE("multiSimController_ is nullptr.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return multiSimController_->SetDefaultVoiceSlotId(slotId);
+    int32_t ret = multiSimController_->SetDefaultVoiceSlotId(slotId);
+    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
+        multiSimMonitor_->NotifySimAccountChanged();
+    }
+    return ret;
 }
 
 int32_t SimManager::SetDefaultSmsSlotId(int32_t slotId)
@@ -312,7 +320,11 @@ int32_t SimManager::SetDefaultSmsSlotId(int32_t slotId)
         TELEPHONY_LOGE("multiSimController_ is nullptr.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return multiSimController_->SetDefaultSmsSlotId(slotId);
+    int32_t ret = multiSimController_->SetDefaultSmsSlotId(slotId);
+    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
+        multiSimMonitor_->NotifySimAccountChanged();
+    }
+    return ret;
 }
 
 int32_t SimManager::SetDefaultCellularDataSlotId(int32_t slotId)
@@ -342,7 +354,11 @@ int32_t SimManager::SetPrimarySlotId(int32_t slotId)
         TELEPHONY_LOGE("multiSimController_ is nullptr.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return multiSimController_->SetPrimarySlotId(slotId);
+    int32_t ret = multiSimController_->SetPrimarySlotId(slotId);
+    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
+        multiSimMonitor_->NotifySimAccountChanged();
+    }
+    return ret;
 }
 
 int32_t SimManager::SetShowNumber(int32_t slotId, const std::u16string &number)
