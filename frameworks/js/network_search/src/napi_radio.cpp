@@ -1476,7 +1476,7 @@ static void NativeSetNetworkCapability(napi_env env, void *data)
     }
     asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetNetworkCapability(
         asyncContext->slotId, asyncContext->networkCapabilityType, asyncContext->networkCapabilityState);
-    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+    if (asyncContext->errorCode == TELEPHONY_ERR_SUCCESS) {
         asyncContext->resolved = true;
     }
 }
@@ -1494,7 +1494,7 @@ static void SetNetworkCapabilityCallback(napi_env env, napi_status status, void 
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     TELEPHONY_LOGD("SetNetworkCapabilityCallback end");
-    NapiUtil::Handle2ValueCallback(env, context, callbackValue);
+    NapiUtil::Handle1ValueCallback(env, context, callbackValue);
 }
 
 static bool MatchSetNetworkCapabilityParameter(napi_env env, napi_value parameters[], size_t parameterCount)
@@ -1550,7 +1550,7 @@ static void NativeGetNetworkCapability(napi_env env, void *data)
     }
     asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkCapability(
         asyncContext->slotId, asyncContext->networkCapabilityType, asyncContext->networkCapabilityState);
-    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+    if (asyncContext->errorCode == TELEPHONY_ERR_SUCCESS) {
         asyncContext->resolved = true;
     }
 }

@@ -1810,67 +1810,67 @@ int32_t CoreServiceProxy::GetNetworkCapability(
 {
     TELEPHONY_LOGD("CoreServiceProxy GetNetworkCapability");
     MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("GetNetworkCapability WriteInterfaceToken is false");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     if (!data.WriteInt32(slotId)) {
         TELEPHONY_LOGE("GetNetworkCapability WriteInt32 slotId is false");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!data.WriteInt32(networkCapabilityType)) {
         TELEPHONY_LOGE("GetNetworkCapability WriteInt32 deviceType is false");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("GetNetworkCapability Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
+    MessageParcel reply;
+    MessageOption option;
     int32_t error = remote->SendRequest(uint32_t(InterfaceID::GET_NETWORK_CAPABILITY), data, reply, option);
     if (error != ERR_NONE) {
-        TELEPHONY_LOGE("GetNetworkCapability failed, error code is %{public}d \n", error);
+        TELEPHONY_LOGE("GetNetworkCapability failed, error code is %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t ret = reply.ReadInt32();
-    if (ret != TELEPHONY_SUCCESS) {
+    if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("GetNetworkCapability failed!");
         return ret;
     }
     networkCapabilityState = reply.ReadInt32();
-    return TELEPHONY_SUCCESS;
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CoreServiceProxy::SetNetworkCapability(
     int32_t slotId, int32_t networkCapabilityType, int32_t networkCapabilityState)
 {
-    TELEPHONY_LOGI("CoreServiceProxy SetNetworkCapability");
+    TELEPHONY_LOGD("CoreServiceProxy SetNetworkCapability");
     MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("SetNetworkCapability WriteInterfaceToken is false");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     if (!data.WriteInt32(slotId)) {
         TELEPHONY_LOGE("SetNetworkCapability WriteInt32 slotId is false");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!data.WriteInt32(networkCapabilityType)) {
         TELEPHONY_LOGE("SetNetworkCapability WriteInt32 type is false");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!data.WriteInt32(networkCapabilityState)) {
         TELEPHONY_LOGE("SetNetworkCapability WriteInt32 enabled is false");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("SetNetworkCapability Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
+    MessageParcel reply;
+    MessageOption option;
     int32_t error = remote->SendRequest(uint32_t(InterfaceID::SET_NETWORK_CAPABILITY), data, reply, option);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("SetNetworkCapability failed, error code is %{public}d \n", error);
