@@ -498,8 +498,8 @@ void NativeGetDefaultVoiceSimId(napi_env env, void *data)
 void GetDefaultVoiceSimIdCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
-    std::unique_ptr<AsyncDefaultSimId> context(static_cast<AsyncDefaultSimId *>(data));
-    NapiAsyncCompleteCallback(env, status, context->asyncContext, "get default voice sim id failed");
+    std::unique_ptr<AsyncContext<int32_t>> context(static_cast<AsyncContext<int32_t> *>(data));
+    NapiAsyncCommomCompleteCallback(env, status, *context, false);
 }
 
 napi_value GetDefaultVoiceSimId(napi_env env, napi_callback_info info)
