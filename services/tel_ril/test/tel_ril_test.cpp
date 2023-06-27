@@ -244,10 +244,7 @@ void TelRilTest::OnRequestCallGetCurrentCallsStatusTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestCallGetCurrentCallsStatusTest -->");
         telRilManager_->GetCallList(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestCallGetCurrentCallsStatusTest --> "
-            "OnRequestCallGetCurrentCallsStatusTest "
-            "finished");
+        TELEPHONY_LOGI("OnRequestCallGetCurrentCallsStatusTest finished");
     }
 }
 /************************************** SIM test func *******************************************/
@@ -399,9 +396,7 @@ void TelRilTest::OnRequestSimGetImsiTest(int32_t slotId, const std::shared_ptr<A
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestSimGetImsiTest -->");
         telRilManager_->GetImsi(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSimGetImsiTest --> "
-            "OnRequestSimGetImsiTest finished");
+        TELEPHONY_LOGI("OnRequestSimGetImsiTest finished");
     }
 }
 
@@ -678,9 +673,7 @@ void TelRilTest::OnRequestNetworkGetRssiTest(int32_t slotId, const std::shared_p
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestNetworkGetRssiTest -->");
         telRilManager_->GetSignalStrength(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestNetworkGetRssiTest --> "
-            "OnRequestNetworkGetRssiTest finished");
+        TELEPHONY_LOGI("OnRequestNetworkGetRssiTest finished");
     }
 }
 
@@ -700,9 +693,7 @@ void TelRilTest::OnRequestCallDialTest(int32_t slotId, const std::shared_ptr<App
     clirMode = 0; // use subscription default value
     TELEPHONY_LOGI("TelRilTest::OnRequestCallDialTest -->");
     telRilManager_->Dial(slotId, phoneNum, clirMode, event);
-    TELEPHONY_LOGI(
-        "TelRilTest::OnRequestCallDialTest --> "
-        "OnRequestCallDialTest finished");
+    TELEPHONY_LOGI("OnRequestCallDialTest finished");
 }
 
 void TelRilTest::OnRequestRefusedCallTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
@@ -712,9 +703,7 @@ void TelRilTest::OnRequestRefusedCallTest(int32_t slotId, const std::shared_ptr<
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestRefusedCallTest -->");
         telRilManager_->Reject(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestRefusedCallTest --> "
-            "OnRequestRefusedCallTest finished");
+        TELEPHONY_LOGI("OnRequestRefusedCallTest finished");
     }
 }
 
@@ -725,9 +714,7 @@ void TelRilTest::OnRequestGetCallWaitTest(int32_t slotId, const std::shared_ptr<
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetCallWaitTest -->");
         telRilManager_->GetCallWaiting(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetCallWaitTest --> "
-            "OnRequestGetCallWaitTest finished");
+        TELEPHONY_LOGI("OnRequestGetCallWaitTest finished");
     }
 }
 
@@ -745,9 +732,7 @@ void TelRilTest::OnRequestSetCallWaitTest(int32_t slotId, const std::shared_ptr<
     std::cin >> operating;
 
     telRilManager_->SetCallWaiting(slotId, operating, event);
-    TELEPHONY_LOGI(
-        "TelRilTest::OnRequestSetCallWaitTest --> "
-        "OnRequestSetCallWaitTest finished");
+    TELEPHONY_LOGI("OnRequestSetCallWaitTest finished");
 }
 
 void TelRilTest::OnRequestCallHangupTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
@@ -757,9 +742,7 @@ void TelRilTest::OnRequestCallHangupTest(int32_t slotId, const std::shared_ptr<A
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestCallHangupTest -->");
         telRilManager_->Hangup(slotId, static_cast<int32_t>(event->GetInnerEventId()), event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestCallHangupTest --> OnRequestCallHangupTest "
-            "finished");
+        TELEPHONY_LOGI("OnRequestCallHangupTest finished");
     }
 }
 
@@ -770,9 +753,7 @@ void TelRilTest::OnRequestCallAnswerTest(int32_t slotId, const std::shared_ptr<A
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestCallAnswerTest -->");
         telRilManager_->Answer(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestCallAnswerTest --> "
-            "OnRequestCallAnswerTest finished");
+        TELEPHONY_LOGI("OnRequestCallAnswerTest finished");
     }
 }
 
@@ -783,9 +764,7 @@ void TelRilTest::OnRequestCallHoldTest(int32_t slotId, const std::shared_ptr<App
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestCallHoldTest -->");
         telRilManager_->HoldCall(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestCallHoldTest --> "
-            "OnRequestCallHoldTest finished");
+        TELEPHONY_LOGI("OnRequestCallHoldTest finished");
     }
 }
 
@@ -796,9 +775,7 @@ void TelRilTest::OnRequestCallActiveTest(int32_t slotId, const std::shared_ptr<A
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestCallActiveTest -->");
         telRilManager_->UnHoldCall(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestCallActiveTest --> "
-            "OnRequestCallActiveTest finished");
+        TELEPHONY_LOGI("OnRequestCallActiveTest finished");
     }
 }
 
@@ -809,9 +786,7 @@ void TelRilTest::OnRequestCallSwapTest(int32_t slotId, const std::shared_ptr<App
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestCallSwapTest -->");
         telRilManager_->SwitchCall(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestCallSwapTest --> "
-            "OnRequestCallSwapTest finished");
+        TELEPHONY_LOGI("OnRequestCallSwapTest finished");
     }
 }
 
@@ -823,9 +798,7 @@ void TelRilTest::OnRequestNetworkVoiceRegistrationStateTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestNetworkVoiceRegistrationStateTest -->");
         telRilManager_->GetCsRegStatus(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestNetworkVoiceRegistrationStateTest --> "
-            "OnRequestNetworkVoiceRegistrationStateTest finished");
+        TELEPHONY_LOGI("OnRequestNetworkVoiceRegistrationStateTest finished");
     }
 }
 
@@ -837,9 +810,7 @@ void TelRilTest::OnRequestNetworkDataRegistrationStateTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestNetworkDataRegistrationStateTest -->");
         telRilManager_->GetPsRegStatus(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestNetworkDataRegistrationStateTest --> "
-            "OnRequestNetworkDataRegistrationStateTest finished");
+        TELEPHONY_LOGI("OnRequestNetworkDataRegistrationStateTest finished");
     }
 }
 
@@ -956,9 +927,7 @@ void TelRilTest::OnRequestSetRilCmSmsCenterAddressTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestSetRilCmSmsCenterAddressTest -->");
         telRilManager_->SetSmscAddr(slotId, tosca, address, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSetRilCmSmsCenterAddressTest --> OnRequestSetRilCmSmsCenterAddressTest "
-            "finished");
+        TELEPHONY_LOGI("OnRequestSetRilCmSmsCenterAddressTest finished");
     }
 }
 
@@ -970,9 +939,7 @@ void TelRilTest::OnRequestGetRilCmSmsCenterAddressTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetRilCmSmsCenterAddressTest -->");
         telRilManager_->GetSmscAddr(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetRilCmSmsCenterAddressTest --> OnRequestGetRilCmSmsCenterAddressTest "
-            "finished");
+        TELEPHONY_LOGI("OnRequestGetRilCmSmsCenterAddressTest finished");
     }
 }
 
@@ -1041,8 +1008,7 @@ void TelRilTest::OnRequestSmsSendSmsExpectMoreTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestSmsSendSmsExpectMoreTest -->");
         telRilManager_->SendSmsMoreMode(slotId, "smscPdu", "pdu", event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSmsSendSmsExpectMoreTest --> OnRequestSmsSendSmsExpectMoreTest finished");
+        TELEPHONY_LOGI("OnRequestSmsSendSmsExpectMoreTest finished");
     }
 }
 
@@ -1173,9 +1139,7 @@ void TelRilTest::OnRequestSmsAcknowledgeTest(int32_t slotId, const std::shared_p
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestSmsAcknowledgeTest -->");
         telRilManager_->SendSmsAck(slotId, true, REASON, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSmsAcknowledgeTest -->"
-            " OnRequestSmsAcknowledgeTest finished");
+        TELEPHONY_LOGI("OnRequestSmsAcknowledgeTest finished");
     }
 }
 
@@ -1188,9 +1152,7 @@ void TelRilTest::OnRequestSetInitApnInfoTest(int32_t slotId, const std::shared_p
         TELEPHONY_LOGI("TelRilTest::OnRequestSetInitApnInfoTest -->");
         DataProfile dataProfile = {0, "cmnet", "IPV4V6", AUTHTYPE_1, "", "", "IPV4V6"};
         telRilManager_->SetInitApnInfo(slotId, dataProfile, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSetInitApnInfoTest -->"
-            "OnRequestSetInitApnInfoTest finished");
+        TELEPHONY_LOGI("OnRequestSetInitApnInfoTest finished");
     }
 }
 
@@ -1205,9 +1167,7 @@ void TelRilTest::OnRequestDataSetupDataCallTest(
         DataProfile dataProfile = {0, "cmnet", "IPV4V6", AUTHTYPE_1, "", "", "IPV4V6"};
         ActivateDataParam activateData = {0, REASON, dataProfile, false, true};
         telRilManager_->ActivatePdpContext(slotId, activateData, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestDataSetupDataCallTest -->"
-            "OnRequestDataSetupDataCallTest finished");
+        TELEPHONY_LOGI("OnRequestDataSetupDataCallTest finished");
     }
 }
 
@@ -1220,9 +1180,7 @@ void TelRilTest::OnRequestDataDisableDataCallTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestCallDeactivateDataCallTest -->");
         telRilManager_->DeactivatePdpContext(slotId, CID, REASON, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestDataDisableDataCallTest --> "
-            "OnRequestDataDisableDataCallTest finished");
+        TELEPHONY_LOGI("OnRequestDataDisableDataCallTest finished");
     }
 }
 
@@ -1250,9 +1208,7 @@ void TelRilTest::OnRequestGetLinkBandwidthInfoTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetLinkBandwidthInfoTest -->");
         telRilManager_->GetLinkBandwidthInfo(slotId, cid, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetLinkBandwidthInfoTest --> "
-            "OnRequestGetLinkBandwidthInfoTest finished");
+        TELEPHONY_LOGI("OnRequestGetLinkBandwidthInfoTest finished");
     }
 }
 
@@ -1289,9 +1245,7 @@ void TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest(
             rule.maximumDownlinkKbps.push_back(MAX_DOWNLINK_LINK_BANDWIDTH[i]);
         }
         telRilManager_->SetLinkBandwidthReportingRule(slotId, rule, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest --> "
-            "OnRequestSetLinkBandwidthReportingRuleTest finished");
+        TELEPHONY_LOGI("OnRequestSetLinkBandwidthReportingRuleTest finished");
     }
 }
 
@@ -1327,9 +1281,7 @@ void TelRilTest::OnRequestGetNetworkSelectionModeTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetNetworkSelectionModeTest -->");
         telRilManager_->GetNetworkSelectionMode(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetNetworkSelectionModeTest --> "
-            "OnRequestGetNetworkSelectionModeTest finished");
+        TELEPHONY_LOGI("OnRequestGetNetworkSelectionModeTest finished");
     }
 }
 
@@ -1341,9 +1293,7 @@ void TelRilTest::OnRequestSetNetworkSelectionModeTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestSetNetworkSelectionModeTest -->");
         telRilManager_->SetNetworkSelectionMode(slotId, 1, "46001", event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSetNetworkSelectionModeTest --> "
-            "OnRequestSetNetworkSelectionModeTest finished");
+        TELEPHONY_LOGI("OnRequestSetNetworkSelectionModeTest finished");
     }
 }
 
@@ -1358,9 +1308,7 @@ void TelRilTest::OnRequestSetPreferredNetworkTest(
         std::cin >> netType;
         TELEPHONY_LOGI("TelRilTest::OnRequestSetPreferredNetworkTest -->");
         telRilManager_->SetPreferredNetwork(slotId, netType, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSetPreferredNetworkTest --> "
-            "OnRequestSetPreferredNetworkTest finished");
+        TELEPHONY_LOGI("OnRequestSetPreferredNetworkTest finished");
     }
 }
 
@@ -1372,9 +1320,7 @@ void TelRilTest::OnRequestGetPreferredNetworkTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetPreferredNetworkTest -->");
         telRilManager_->GetPreferredNetwork(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetPreferredNetworkTest --> "
-            "OnRequestGetPreferredNetworkTest finished");
+        TELEPHONY_LOGI("OnRequestGetPreferredNetworkTest finished");
     }
 }
 
@@ -1385,9 +1331,7 @@ void TelRilTest::OnRequestGetImeiTest(int32_t slotId, const std::shared_ptr<AppE
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetImeiTest -->");
         telRilManager_->GetImei(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetImeiTest --> "
-            "OnRequestGetImeiTest finished");
+        TELEPHONY_LOGI("OnRequestGetImeiTest finished");
     }
 }
 
@@ -1400,9 +1344,7 @@ void TelRilTest::OnRequestGetBasebandVersionTest(int32_t slotId,
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetBasebandVersionTest -->");
         telRilManager_->GetBasebandVersion(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetBasebandVersionTest --> "
-            "OnRequestGetBasebandVersionTest finished");
+        TELEPHONY_LOGI("OnRequestGetBasebandVersionTest finished");
     }
 }
 
@@ -1413,9 +1355,7 @@ void TelRilTest::OnRequestGetMeidTest(int32_t slotId, const std::shared_ptr<AppE
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetMeidTest -->");
         telRilManager_->GetMeid(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetMeidTest --> "
-            "OnRequestGetMeidTest finished");
+        TELEPHONY_LOGI("OnRequestGetMeidTest finished");
     }
 }
 
@@ -1582,9 +1522,7 @@ void TelRilTest::OnRequestCallJoinTest(int32_t slotId, const std::shared_ptr<App
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestCallJoinTest -->");
         telRilManager_->CombineConference(slotId, callType, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestCallJoinTest --> "
-            "OnRequestCallJoinTest finished");
+        TELEPHONY_LOGI("OnRequestCallJoinTest finished");
     }
 }
 
@@ -1612,16 +1550,13 @@ void TelRilTest::OnRequestSeparateConferenceTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestSeparateConferenceTest -->");
         telRilManager_->SeparateConference(slotId, callIndex, callType, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSeparateConferenceTest --> "
-            "OnRequestSeparateConferenceTest finished");
+        TELEPHONY_LOGI("OnRequestSeparateConferenceTest finished");
     }
 }
 
 void TelRilTest::OnRequestGetCallForwardTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     int32_t reason = 0;
-    TELEPHONY_LOGI("RilUnitTest::OnRequestGetCallForwardTest -->");
     std::cout << "please enter Get Call Forward reason<0-5>:";
     std::cin >> reason;
 
@@ -1630,9 +1565,7 @@ void TelRilTest::OnRequestGetCallForwardTest(int32_t slotId, const std::shared_p
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetCallForwardTest -->");
         telRilManager_->GetCallTransferInfo(slotId, reason, event);
-        TELEPHONY_LOGI(
-            "OnRequestGetCallForwardTest --> "
-            "OnRequestGetCallForwardTest ");
+        TELEPHONY_LOGI("OnRequestGetCallForwardTest ");
     }
 }
 
@@ -1737,9 +1670,7 @@ void TelRilTest::OnRequestSetCallForwardTest(int32_t slotId, const std::shared_p
         callTransfer.number = phoneNum;
         callTransfer.classx = classx;
         telRilManager_->SetCallTransferInfo(slotId, callTransfer, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSetCallForwardTest --> "
-            "OnRequestSetCallForwardTest finished");
+        TELEPHONY_LOGI("OnRequestSetCallForwardTest finished");
     }
 }
 
@@ -1750,9 +1681,7 @@ void TelRilTest::OnRequestGetClipTest(int32_t slotId, const std::shared_ptr<AppE
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetClipTest -->");
         telRilManager_->GetClip(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetClipTest --> "
-            "OnRequestGetClipTest finished");
+        TELEPHONY_LOGI("OnRequestGetClipTest finished");
     }
 }
 
@@ -1766,9 +1695,7 @@ void TelRilTest::OnRequestSetClipTest(int32_t slotId, const std::shared_ptr<AppE
         std::cout << "please input call set clip action: ";
         std::cin >> action;
         telRilManager_->SetClip(slotId, action, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSetClipTest --> "
-            "OnRequestSetClipTest finished");
+        TELEPHONY_LOGI("OnRequestSetClipTest finished");
     }
 }
 
@@ -1805,9 +1732,7 @@ void TelRilTest::OnRequestGetCallRestrictionTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetCallRestrictionTest -->");
         telRilManager_->GetCallRestriction(slotId, "AI", event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetCallRestrictionTest --> "
-            "OnRequestGetCallRestrictionTest finished");
+        TELEPHONY_LOGI("OnRequestGetCallRestrictionTest finished");
     }
 }
 
@@ -1841,9 +1766,7 @@ void TelRilTest::OnRequestSetCallRestrictionTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestSetCallRestrictionTest -->");
         telRilManager_->SetCallRestriction(slotId, restriction, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSetCallRestrictionTest --> "
-            "OnRequestSetCallRestrictionTest finished");
+        TELEPHONY_LOGI("OnRequestSetCallRestrictionTest finished");
     }
 }
 
@@ -1852,10 +1775,7 @@ void TelRilTest::OnRequestSendDtmfTest(int32_t slotId, const std::shared_ptr<App
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SEND_DTMF);
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::OnRequestSendDtmfTest -->");
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSendDtmfTest --> "
-            "OnRequestSendDtmfTest finished");
+        TELEPHONY_LOGI("OnRequestSendDtmfTest finished");
     }
 }
 
@@ -1864,10 +1784,7 @@ void TelRilTest::OnRequestStartDtmfTest(int32_t slotId, const std::shared_ptr<Ap
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_START_DTMF);
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::OnRequestStartDtmfTest -->");
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestStartDtmfTest --> "
-            "OnRequestStartDtmfTest finished");
+        TELEPHONY_LOGI("OnRequestStartDtmfTest finished");
     }
 }
 
@@ -1877,9 +1794,7 @@ void TelRilTest::OnRequestStopDtmfTest(int32_t slotId, const std::shared_ptr<App
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestStopDtmfTest -->");
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestStopDtmfTest --> "
-            "OnRequestStopDtmfTest finished");
+        TELEPHONY_LOGI("OnRequestStopDtmfTest finished");
     }
 }
 
@@ -1890,8 +1805,7 @@ void TelRilTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
         return;
     }
     const uint32_t eventId = event->GetInnerEventId();
-    TELEPHONY_LOGI(
-        "TelRilTest::DemoHandler::ProcessEvent --> eventId:%{public}d, slotId:%{public}d", eventId, this->slotId_);
+    TELEPHONY_LOGI("eventId:%{public}d, slotId:%{public}d", eventId, this->slotId_);
     switch (eventId) {
         case uint32_t(CustomMessageID::MSG_OPEN_LOGICAL_CHANNEL_DONE): {
             auto result = event->GetUniqueObject<OpenLogicalChannelResponse>();
@@ -1958,14 +1872,11 @@ void TelRilTest::OnRequestSetCallPreferenceModeTest(
     if (event != nullptr && telRilManager_ != nullptr) {
         int32_t mode = 0;
         event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::OnRequestSetCallPreferenceModeTest -->");
         std::cout << "Please enter to set the voice call mode operation,[1-4]: ";
         std::cin >> mode;
         TELEPHONY_LOGI("TelRilTest::OnRequestSetCallPreferenceModeTest --> mode = [%{public}d]", mode);
         telRilManager_->SetCallPreferenceMode(slotId, mode, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSetCallPreferenceModeTest --> "
-            "OnRequestSetCallPreferenceModeTest finished");
+        TELEPHONY_LOGI("OnRequestSetCallPreferenceModeTest finished");
     }
 }
 
@@ -1977,9 +1888,7 @@ void TelRilTest::OnRequestGetCallPreferenceModeTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetCallPreferenceModeTest -->");
         telRilManager_->GetCallPreferenceMode(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetCallPreferenceModeTest --> "
-            "OnRequestGetCallPreferenceModeTest finished");
+        TELEPHONY_LOGI("OnRequestGetCallPreferenceModeTest finished");
     }
 }
 
@@ -1989,14 +1898,11 @@ void TelRilTest::OnRequestSetUssdTest(int32_t slotId, const std::shared_ptr<AppE
     if (event != nullptr && telRilManager_ != nullptr) {
         std::string str;
         event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::OnRequestSetUssdTest -->");
         std::cout << "USSD string, the maximum length is 160 characters: ";
         std::cin >> str;
         TELEPHONY_LOGI("TelRilTest::OnRequestSetUssdTest --> str = [%{public}s]", str.c_str());
         telRilManager_->SetUssd(slotId, str, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSetUssdTest --> "
-            "OnRequestSetUssdTest finished");
+        TELEPHONY_LOGI("OnRequestSetUssdTest finished");
     }
 }
 
@@ -2007,9 +1913,7 @@ void TelRilTest::OnRequestGetUssdTest(int32_t slotId, const std::shared_ptr<AppE
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetUssdTest -->");
         telRilManager_->GetUssd(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetUssdTest --> "
-            "OnRequestGetUssdTest finished");
+        TELEPHONY_LOGI("OnRequestGetUssdTest finished");
     }
 }
 
@@ -2021,9 +1925,7 @@ void TelRilTest::OnRequestGetCallFailReasonTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetCallFailReasonTest -->");
         telRilManager_->GetCallFailReason(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetCallFailReasonTest --> "
-            "OnRequestGetCallFailReasonTest finished");
+        TELEPHONY_LOGI("OnRequestGetCallFailReasonTest finished");
     }
 }
 
@@ -2038,9 +1940,7 @@ void TelRilTest::OnRequestSetMuteTest(int32_t slotId, const std::shared_ptr<AppE
         std::cin >> mute;
         TELEPHONY_LOGI("TelRilTest::OnRequestSetMuteTest --> mute = [%{public}d]", mute);
         telRilManager_->SetMute(slotId, mute, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestSetMuteTest --> "
-            "OnRequestSetMuteTest finished");
+        TELEPHONY_LOGI("OnRequestSetMuteTest finished");
     }
 }
 
@@ -2051,9 +1951,7 @@ void TelRilTest::OnRequestGetMuteTest(int32_t slotId, const std::shared_ptr<AppE
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetMuteTest -->");
         telRilManager_->GetMute(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetMuteTest --> "
-            "OnRequestGetMuteTest finished");
+        TELEPHONY_LOGI("OnRequestGetMuteTest finished");
     }
 }
 
@@ -2065,9 +1963,7 @@ void TelRilTest::OnRequestGetEmergencyCallListTest(
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::OnRequestGetEmergencyCallListTest -->");
         telRilManager_->GetEmergencyCallList(slotId, event);
-        TELEPHONY_LOGI(
-            "TelRilTest::OnRequestGetEmergencyCallListTest --> "
-            "OnRequestGetEmergencyCallListTest finished");
+        TELEPHONY_LOGI("OnRequestGetEmergencyCallListTest finished");
     }
 }
 
@@ -2082,8 +1978,7 @@ void TelRilTest::OnRequestSetVoNRSwitchTest(int32_t slotId, const std::shared_pt
         std::cin >> state;
         TELEPHONY_LOGI("TelRilTest::OnRequestSetVoNRSwitchTest --> state = [%{public}d]", state);
         telRilManager_->SetVoNRSwitch(slotId, state, event);
-        TELEPHONY_LOGI("TelRilTest::OnRequestSetVoNRSwitchTest --> "
-                       "OnRequestSetVoNRSwitchTest finished");
+        TELEPHONY_LOGI("OnRequestSetVoNRSwitchTest finished");
     }
 }
 
