@@ -2370,8 +2370,6 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetBasebandVersion_0300, Fun
         std::string version = "";
         int32_t ret = CoreServiceClient::GetInstance().GetBasebandVersion(SLOT_ID, version);
         EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
-        TELEPHONY_LOGI("TelephonyTestService GetBasebandVersion version: %{public}s", version.c_str());
-        EXPECT_STRNE(version.c_str(), "");
     }
 }
 
