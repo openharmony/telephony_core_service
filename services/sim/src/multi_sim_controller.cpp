@@ -491,7 +491,7 @@ int32_t MultiSimController::GetDefaultVoiceSlotId()
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
     for (; i < maxCount_; i++) {
-        if (localCacheInfo_[i].isVoiceCard == MAIN_CARD || localCacheInfo_[i].isActive == ACTIVE) {
+        if (localCacheInfo_[i].isVoiceCard == MAIN_CARD && localCacheInfo_[i].isActive == ACTIVE) {
             return i;
         }
     }
@@ -567,7 +567,7 @@ int32_t MultiSimController::GetDefaultSmsSlotId()
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
     for (; i < maxCount_; i++) {
-        if (localCacheInfo_[i].isMessageCard == MAIN_CARD || localCacheInfo_[i].isActive == ACTIVE) {
+        if (localCacheInfo_[i].isMessageCard == MAIN_CARD && localCacheInfo_[i].isActive == ACTIVE) {
             return i;
         }
     }
@@ -681,7 +681,7 @@ int32_t MultiSimController::GetDefaultCellularDataSlotIdUnit()
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
     for (; i < maxCount_; i++) {
-        if (localCacheInfo_[i].isCellularDataCard == MAIN_CARD || localCacheInfo_[i].isActive == ACTIVE) {
+        if (localCacheInfo_[i].isCellularDataCard == MAIN_CARD && localCacheInfo_[i].isActive == ACTIVE) {
             return i;
         }
     }
@@ -700,7 +700,7 @@ int32_t MultiSimController::GetPrimarySlotId()
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
     for (; i < maxCount_; i++) {
-        if (localCacheInfo_[i].isMainCard == MAIN_CARD || localCacheInfo_[i].isActive == ACTIVE) {
+        if (localCacheInfo_[i].isMainCard == MAIN_CARD && localCacheInfo_[i].isActive == ACTIVE) {
             return i;
         }
     }
