@@ -223,7 +223,6 @@ public:
     int32_t GetLocalAirplaneMode(int32_t slotId, bool &state);
     void SetBasebandVersion(int32_t slotId, std::string version);
     int32_t GetBasebandVersion(int32_t slotId, std::string &version) override;
-    int32_t JudgeNetworkMode(int32_t preferredNetwork);
     int32_t UpdateNrOptionMode(int32_t slotId, NrMode mode);
     int32_t UpdateRadioOn(int32_t slotId) override;
     int32_t HandleRrcStateChanged(int32_t slotId, int32_t status);
@@ -272,6 +271,7 @@ private:
     bool RemoveManagerInner(int32_t slotId);
     int32_t GetDelayNotifyTime();
     int32_t RevertLastTechnology(int32_t slotId);
+    int32_t ConvertNetworkModeToCapabilityType(int32_t preferredNetwork);
 
 private:
     struct ImsRegInfoCallbackRecord {
