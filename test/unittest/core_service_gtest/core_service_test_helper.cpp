@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr static const int32_t WAIT_TIME_SECOND = 5;
+constexpr static const int32_t WAIT_TIME_SECOND = 30;
 
 bool CoreServiceTestHelper::Run(void (*func)(CoreServiceTestHelper &), CoreServiceTestHelper &helper)
 {

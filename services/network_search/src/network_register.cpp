@@ -290,7 +290,7 @@ void NetworkRegister::DcPhysicalLinkActiveUpdate(bool isActive)
 
 void NetworkRegister::UpdateNrState()
 {
-    if (networkSearchState_ == nullptr) {
+    if (networkSearchState_ == nullptr || networkSearchState_->GetNetworkStatus() == nullptr) {
         TELEPHONY_LOGE("networkSearchState_ is nullptr, slotId:%{public}d", slotId_);
         return;
     }
@@ -323,7 +323,7 @@ void NetworkRegister::UpdateNrState()
 
 void NetworkRegister::UpdateCfgTech()
 {
-    if (networkSearchState_ == nullptr) {
+    if (networkSearchState_ == nullptr || networkSearchState_->GetNetworkStatus() == nullptr) {
         TELEPHONY_LOGE("NetworkRegister::UpdateCfgTech networkSearchState_ is nullptr slotId:%{public}d", slotId_);
         return;
     }
