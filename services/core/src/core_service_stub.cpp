@@ -998,11 +998,14 @@ int32_t CoreServiceStub::OnGetNetworkCapability(MessageParcel &data, MessageParc
     int32_t networkCapabilityType = data.ReadInt32();
     int32_t networkCapabilityState = 0;
     int32_t result = GetNetworkCapability(slotId, networkCapabilityType, networkCapabilityState);
-    if (!reply.WriteInt32(result)) {
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(networkCapabilityState));
+    }
+    if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::OnGetNetworkCapability write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    reply.WriteInt32(networkCapabilityState);
     return result;
 }
 

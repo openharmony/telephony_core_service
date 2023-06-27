@@ -1826,7 +1826,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_004, Function | MediumTest |
     std::int32_t networkAbilityState = 0;
     EXPECT_EQ(networkSearchManager->GetNetworkCapability(INVALID_SLOTID, networkAbilityType, networkAbilityState),
         TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(networkSearchManager->SetNetworkCapability(INVALID_SLOTID, networkAbilityType, networkAbilityState),
+    EXPECT_NE(networkSearchManager->SetNetworkCapability(INVALID_SLOTID, networkAbilityType, networkAbilityState),
         TELEPHONY_ERR_SUCCESS);
 }
 
