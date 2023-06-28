@@ -18,6 +18,7 @@
 
 #include "i_core_service.h"
 #include "iremote_stub.h"
+#include "telephony_ipc_interface_code.h"
 
 namespace OHOS {
 namespace Telephony {
