@@ -158,7 +158,8 @@ int32_t CoreServiceProxy::GetBasebandVersion(int32_t slotId, std::string &versio
         TELEPHONY_LOGE("GetBasebandVersion Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::GET_BASEBAND_VERSION), data, reply, option);
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::GET_BASEBAND_VERSION),
+        data, reply, option);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("GetBasebandVersion failed, error code is %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -188,7 +189,8 @@ int32_t CoreServiceProxy::GetNetworkSearchInformation(int32_t slotId, const sptr
     if (remote == nullptr) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_NETWORK_SEARCH_RESULT), data, reply, option);
+    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_NETWORK_SEARCH_RESULT), data,
+        reply, option);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("GetNetworkSearchInformation failed, error code is: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -416,7 +418,8 @@ int32_t CoreServiceProxy::GetIsoCountryCodeForNetwork(int32_t slotId, std::u16st
         TELEPHONY_LOGE("GetIsoCountryCodeForNetwork Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_ISO_COUNTRY_CODE_FOR_NETWORK), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_ISO_COUNTRY_CODE_FOR_NETWORK), data,
+        reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetIsoCountryCodeForNetwork failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -856,7 +859,8 @@ int32_t CoreServiceProxy::GetNetworkSelectionMode(int32_t slotId, const sptr<INe
         TELEPHONY_LOGE("GetNetworkSelectionMode Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_NETWORK_SELECTION_MODE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_NETWORK_SELECTION_MODE), data,
+        reply, option);
     if (st != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("GetNetworkSelectionMode failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -898,7 +902,8 @@ int32_t CoreServiceProxy::SetNetworkSelectionMode(int32_t slotId, int32_t select
         TELEPHONY_LOGE("SetNetworkSelectionMode Remote is null");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_NETWORK_SELECTION_MODE), data, reply, option);
+    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_NETWORK_SELECTION_MODE), data,
+        reply, option);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("SetNetworkSelectionMode failed, error code is %{public}d", error);
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
@@ -1322,7 +1327,8 @@ int32_t CoreServiceProxy::GetActiveSimAccountInfoList(std::vector<IccAccountInfo
         TELEPHONY_LOGE("GetActiveSimAccountInfoList Remote is null");
         return false;
     }
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_ACTIVE_ACCOUNT_INFO_LIST), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_ACTIVE_ACCOUNT_INFO_LIST), data,
+        reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetActiveSimAccountInfoList failed, error code is %{public}d", st);
         return false;
@@ -1763,7 +1769,8 @@ int32_t CoreServiceProxy::GetPreferredNetwork(int32_t slotId, const sptr<INetwor
         TELEPHONY_LOGE("GetPreferredNetwork Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_PREFERRED_NETWORK_MODE), data, reply, option);
+    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_PREFERRED_NETWORK_MODE), data,
+        reply, option);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("GetPreferredNetwork failed, error code is %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -1797,7 +1804,8 @@ int32_t CoreServiceProxy::SetPreferredNetwork(
         TELEPHONY_LOGE("SetPreferredNetwork Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_PREFERRED_NETWORK_MODE), data, reply, option);
+    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_PREFERRED_NETWORK_MODE), data,
+        reply, option);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("SetPreferredNetwork failed, error code is %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -1829,7 +1837,8 @@ int32_t CoreServiceProxy::GetNetworkCapability(
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_NETWORK_CAPABILITY), data, reply, option);
+    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_NETWORK_CAPABILITY), data,
+        reply, option);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("GetNetworkCapability failed, error code is %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -1871,7 +1880,8 @@ int32_t CoreServiceProxy::SetNetworkCapability(
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_NETWORK_CAPABILITY), data, reply, option);
+    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_NETWORK_CAPABILITY), data,
+        reply, option);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("SetNetworkCapability failed, error code is %{public}d \n", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -1927,7 +1937,8 @@ std::u16string CoreServiceProxy::GetSimTeleNumberIdentifier(const int32_t slotId
         TELEPHONY_LOGE("GetSimTeleNumberIdentifier Remote is null");
         return Str8ToStr16("");
     }
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_SIM_TELENUMBER_IDENTIFIER), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_SIM_TELENUMBER_IDENTIFIER), data,
+        reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetSimTeleNumberIdentifier failed, error code is %{public}d", st);
         return Str8ToStr16("");
@@ -2073,7 +2084,8 @@ int32_t CoreServiceProxy::SetVoiceCallForwarding(int32_t slotId, bool enable, co
         TELEPHONY_LOGE("SetVoiceCallForwarding Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_VOICE_CALL_FORWARDING), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_VOICE_CALL_FORWARDING), data,
+        reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SetVoiceCallForwarding failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -2159,7 +2171,8 @@ int32_t CoreServiceProxy::AddIccDiallingNumbers(
         TELEPHONY_LOGE("AddIccDiallingNumbers Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::ICC_DIALLING_NUMBERS_INSERT), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::ICC_DIALLING_NUMBERS_INSERT), data,
+        reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("AddIccDiallingNumbers failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -2197,7 +2210,8 @@ int32_t CoreServiceProxy::DelIccDiallingNumbers(
         TELEPHONY_LOGE("DelIccDiallingNumbers Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::ICC_DIALLING_NUMBERS_DELETE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::ICC_DIALLING_NUMBERS_DELETE), data,
+        reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("DelIccDiallingNumbers failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -2235,7 +2249,8 @@ int32_t CoreServiceProxy::UpdateIccDiallingNumbers(
         TELEPHONY_LOGE("UpdateIccDiallingNumbers Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::ICC_DIALLING_NUMBERS_UPDATE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::ICC_DIALLING_NUMBERS_UPDATE), data,
+        reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("UpdateIccDiallingNumbers failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -2403,7 +2418,8 @@ int32_t CoreServiceProxy::SendEnvelopeCmd(int32_t slotId, const std::string &cmd
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::STK_CMD_FROM_APP_ENVELOPE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::STK_CMD_FROM_APP_ENVELOPE), data,
+        reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -2436,7 +2452,8 @@ int32_t CoreServiceProxy::SendTerminalResponseCmd(int32_t slotId, const std::str
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::STK_CMD_FROM_APP_TERMINAL_RESPONSE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::STK_CMD_FROM_APP_TERMINAL_RESPONSE), data,
+        reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SendTerminalResponseCmd failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -2463,8 +2480,8 @@ int32_t CoreServiceProxy::SendCallSetupRequestResult(int32_t slotId, bool accept
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t st =
-        remote->SendRequest(uint32_t(CoreServiceInterfaceCode::STK_RESULT_FROM_APP_CALL_SETUP_REQUEST), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::STK_RESULT_FROM_APP_CALL_SETUP_REQUEST),
+        data,reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SendCallSetupRequestResult failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -2717,7 +2734,8 @@ bool CoreServiceProxy::IsNrSupported(int32_t slotId)
         TELEPHONY_LOGE("SimAuthentication Remote is null");
         return ERROR;
     }
-    int32_t st = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::IS_NR_SUPPORTED), data, reply, option);
+    int32_t st = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::IS_NR_SUPPORTED), data,
+        reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("IsNrSupported failed, error code is %{public}d", st);
         return false;
@@ -2751,7 +2769,8 @@ int32_t CoreServiceProxy::SetNrOptionMode(int32_t slotId, int32_t mode, const sp
         TELEPHONY_LOGE("SetNrOptionMode Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::SET_NR_OPTION_MODE), data, reply, option);
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::SET_NR_OPTION_MODE), data,
+        reply, option);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("SetNrOptionMode failed, error code is %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -2777,7 +2796,8 @@ int32_t CoreServiceProxy::GetNrOptionMode(int32_t slotId, const sptr<INetworkSea
         TELEPHONY_LOGE("GetNrOptionMode Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::GET_NR_OPTION_MODE), data, reply, option);
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::GET_NR_OPTION_MODE), data,
+        reply, option);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("GetNrOptionMode failed, error code is %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -2809,7 +2829,8 @@ int32_t CoreServiceProxy::RegisterImsRegInfoCallback(
         TELEPHONY_LOGE("remote is nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::REG_IMS_CALLBACK), data, reply, option);
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::REG_IMS_CALLBACK), data,
+        reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("error! errCode:%{public}d", error);
         return error;
@@ -2832,7 +2853,8 @@ int32_t CoreServiceProxy::UnregisterImsRegInfoCallback(int32_t slotId, ImsServic
         TELEPHONY_LOGE("remote is nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::UN_REG_IMS_CALLBACK), data, reply, option);
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::UN_REG_IMS_CALLBACK), data,
+        reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("error! errCode:%{public}d", error);
         return error;
