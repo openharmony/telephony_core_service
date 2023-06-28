@@ -19,6 +19,7 @@
 #include "iremote_proxy.h"
 
 #include "i_telephony_state_notify.h"
+#include "state_registry_ipc_interface_code.h"
 
 namespace OHOS {
 namespace Telephony {
