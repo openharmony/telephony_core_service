@@ -59,17 +59,13 @@ ohos_executable("tel_sim_test") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
+    "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
   part_name = "core_service"
   subsystem_name = "telephony"
 }

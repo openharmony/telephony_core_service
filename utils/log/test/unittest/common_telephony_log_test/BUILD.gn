@@ -28,15 +28,12 @@ ohos_unittest("TelephonySALogTest") {
   ]
 
   deps = [ "//third_party/googletest:gtest_main" ]
+
+  external_deps = [ "hilog:libhilog" ]
   defines += [
     "TELEPHONY_LOG_TAG = \"CoreServiceSALogTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
-  if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
-  }
 
   part_name = "core_service"
 }
