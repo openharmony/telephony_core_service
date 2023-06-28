@@ -16,6 +16,7 @@
 #ifndef I_CORE_SERVICE_INTERFACE_CODE_H
 #define I_CORE_SERVICE_INTERFACE_CODE_H
 
+/* SAID:4010 */
 namespace OHOS {
 namespace Telephony {
 class ITelephony : public IRemoteBroker {
