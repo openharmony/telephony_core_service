@@ -36,7 +36,7 @@ int32_t ImsCoreServiceCallbackProxy::UpdateImsServiceStatusChanged(
         TELEPHONY_LOGE("[slot%{public}d]Write imsServiceStatus fail!", slotId);
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    return SendRequest(in, slotId, IMS_SERVICE_STATUS_REPORT);
+    return SendRequest(in, slotId, ImsCoreServiceInterfaceCode::IMS_SERVICE_STATUS_REPORT);
 }
 
 int32_t ImsCoreServiceCallbackProxy::GetImsRegistrationStatusResponse(
@@ -52,7 +52,7 @@ int32_t ImsCoreServiceCallbackProxy::GetImsRegistrationStatusResponse(
         TELEPHONY_LOGE("[slot%{public}d]Write imsRegStatus fail!", slotId);
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    return SendRequest(in, slotId, IMS_GET_REGISTRATION_STATUS);
+    return SendRequest(in, slotId, ImsCoreServiceInterfaceCode::IMS_GET_REGISTRATION_STATUS);
 }
 
 int32_t ImsCoreServiceCallbackProxy::WriteCommonInfo(std::string funcName, MessageParcel &in, int32_t slotId)

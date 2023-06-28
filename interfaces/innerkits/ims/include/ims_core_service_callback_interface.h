@@ -27,12 +27,6 @@ class ImsCoreServiceCallbackInterface : public IRemoteBroker {
 public:
     virtual ~ImsCoreServiceCallbackInterface() = default;
 
-    enum {
-        /****************** ims core ability ******************/
-        IMS_SERVICE_STATUS_REPORT = 0,
-        IMS_GET_REGISTRATION_STATUS,
-    };
-
     /**
      * UpdateImsServiceStatusChanged
      *
