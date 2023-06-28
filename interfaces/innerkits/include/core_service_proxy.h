@@ -17,6 +17,7 @@
 #define BASE_PHONE_SERVICE_PROXY_H
 
 #include "i_core_service.h"
+#include "telephony_ipc_interface_code.h"
 
 namespace OHOS {
 namespace Telephony {
