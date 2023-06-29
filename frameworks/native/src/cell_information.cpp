@@ -871,6 +871,12 @@ void NrCellInformation::SetNrParam(int32_t nrArfcn, int32_t pci, int32_t tac, in
     nci_ = nci;
 }
 
+void NrCellInformation::SetNrSignalParam(int32_t rsrp, int32_t rsrq)
+{
+    rsrp_ = rsrp;
+    rsrq_ = rsrq;
+}
+
 NrCellInformation::NrCellInformation(const NrCellInformation &nrCell)
 {
     mcc_ = nrCell.mcc_;
@@ -880,6 +886,8 @@ NrCellInformation::NrCellInformation(const NrCellInformation &nrCell)
     pci_ = nrCell.pci_;
     tac_ = nrCell.tac_;
     nci_ = nrCell.nci_;
+    rsrp_ = nrCell.rsrp_;
+    rsrq_ = nrCell.rsrq_;
     timeStamp_ = nrCell.timeStamp_;
     signalLevel_ = nrCell.signalLevel_;
     signalIntensity_ = nrCell.signalIntensity_;
@@ -895,6 +903,8 @@ NrCellInformation &NrCellInformation::operator=(const NrCellInformation &nrCell)
     pci_ = nrCell.pci_;
     tac_ = nrCell.tac_;
     nci_ = nrCell.nci_;
+    rsrp_ = nrCell.rsrp_;
+    rsrq_ = nrCell.rsrq_;
     timeStamp_ = nrCell.timeStamp_;
     signalLevel_ = nrCell.signalLevel_;
     signalIntensity_ = nrCell.signalIntensity_;
@@ -904,11 +914,10 @@ NrCellInformation &NrCellInformation::operator=(const NrCellInformation &nrCell)
 
 bool NrCellInformation::operator==(const NrCellInformation &other) const
 {
-    return mcc_ == other.mcc_ && mnc_ == other.mnc_ &&
-        cellId_ == other.cellId_ && nrArfcn_ == other.nrArfcn_ &&
-        pci_ == other.pci_ && tac_ == other.tac_ && nci_ == other.nci_ &&
-        signalLevel_ == other.signalLevel_ && signalIntensity_ == other.signalIntensity_ &&
-        isCamped_ == other.isCamped_;
+    return mcc_ == other.mcc_ && mnc_ == other.mnc_ && cellId_ == other.cellId_ && nrArfcn_ == other.nrArfcn_ &&
+        pci_ == other.pci_ && tac_ == other.tac_ && nci_ == other.nci_ && rsrp_ == other.rsrp_ &&
+        rsrq_ == other.rsrq_ && timeStamp_ == other.timeStamp_ && signalLevel_ == other.signalLevel_ &&
+        signalIntensity_ == other.signalIntensity_ && isCamped_ == other.isCamped_;
 }
 
 CellInformation::CellType NrCellInformation::GetNetworkType() const
@@ -940,6 +949,12 @@ bool NrCellInformation::Marshalling(Parcel &parcel) const
         return false;
     }
     if (!parcel.WriteInt64(nci_)) {
+        return false;
+    }
+    if (!parcel.WriteInt32(rsrp_)) {
+        return false;
+    }
+    if (!parcel.WriteInt32(rsrq_)) {
         return false;
     }
     if (!parcel.WriteInt64(timeStamp_)) {
@@ -979,6 +994,8 @@ bool NrCellInformation::ReadFromParcel(Parcel &parcel)
     pci_ = parcel.ReadInt32();
     tac_ = parcel.ReadInt32();
     nci_ = parcel.ReadInt64();
+    rsrp_ = parcel.ReadInt32();
+    rsrq_ = parcel.ReadInt32();
     timeStamp_ = parcel.ReadInt64();
     signalLevel_ = parcel.ReadInt32();
     signalIntensity_ = parcel.ReadInt32();
@@ -1020,7 +1037,8 @@ std::string NrCellInformation::ToString() const
         ",mnc:" + mnc_ + ",earfcn:" + std::to_string(nrArfcn_) + ",cellId:" + std::to_string(cellId_) +
         ",timeStamp:" + std::to_string(timeStamp_) + ",signalLevel:" + std::to_string(signalLevel_) +
         ",signalIntensity:" + std::to_string(signalIntensity_) + ",pci:" + std::to_string(pci_) +
-        ",tac:" + std::to_string(tac_) + ",nci:" + std::to_string(nci_));
+        ",tac:" + std::to_string(tac_) + ",nci:" + std::to_string(nci_) + ",rsrp:" + std::to_string(rsrp_) +
+        ",rsrq:" + std::to_string(rsrq_));
     return content;
 }
 } // namespace Telephony
