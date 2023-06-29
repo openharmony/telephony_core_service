@@ -116,7 +116,7 @@ void CellInfo::ProcessCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("CellInfo::ProcessCurrentCellInfo event is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    CellListCurrentInfo *cellInfoList = event->GetSharedObject<CellListCurrentInfo>().get();
+    CellListCurrentInformation *cellInfoList = event->GetSharedObject<CellListCurrentInformation>().get();
     if (cellInfoList == nullptr) {
         TELEPHONY_LOGE("CellInfo::ProcessCurrentCellInfo rssi is nullptr");
         return;
@@ -133,9 +133,9 @@ void CellInfo::ProcessCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &eve
         cellInfoList->itemNum, cellInfos_.size());
     currentCellInfo_ = nullptr;
     cellInfos_.clear();
-    std::vector<CurrentCellInfo> cell = cellInfoList->cellCurrentInfo;
+    std::vector<CurrentCellInformation> cell = cellInfoList->cellCurrentInfo;
     for (int32_t i = 0; i < cellSize; ++i) {
-        CurrentCellInfo currentCell = cell[i];
+        CurrentCellInformation currentCell = cell[i];
         ProcessCurrentCell(&currentCell);
     }
     NotifyCellInfoUpdated();
@@ -317,7 +317,7 @@ CellInformation::CellType CellInfo::ConvertTechToCellType(RadioTech techType) co
     }
 }
 
-bool CellInfo::ProcessCurrentCell(CurrentCellInfo *cellInfo)
+bool CellInfo::ProcessCurrentCell(CurrentCellInformation *cellInfo)
 {
     bool ret = false;
     switch (cellInfo->ratType) {
@@ -464,7 +464,7 @@ bool CellInfo::ProcessNeighboringCellNr(CellNearbyInfo *cellInfo)
     return false;
 }
 
-bool CellInfo::ProcessCurrentCellGsm(CurrentCellInfo *cellInfo)
+bool CellInfo::ProcessCurrentCellGsm(CurrentCellInformation *cellInfo)
 {
     sptr<GsmCellInformation> cell = new GsmCellInformation;
     if (cell != nullptr) {
@@ -491,7 +491,7 @@ bool CellInfo::ProcessCurrentCellGsm(CurrentCellInfo *cellInfo)
     return false;
 }
 
-bool CellInfo::ProcessCurrentCellLte(CurrentCellInfo *cellInfo)
+bool CellInfo::ProcessCurrentCellLte(CurrentCellInformation *cellInfo)
 {
     sptr<LteCellInformation> cell = new LteCellInformation;
     if (cell != nullptr) {
@@ -517,7 +517,7 @@ bool CellInfo::ProcessCurrentCellLte(CurrentCellInfo *cellInfo)
     return false;
 }
 
-bool CellInfo::ProcessCurrentCellWcdma(CurrentCellInfo *cellInfo)
+bool CellInfo::ProcessCurrentCellWcdma(CurrentCellInformation *cellInfo)
 {
     sptr<WcdmaCellInformation> cell = new WcdmaCellInformation;
     if (cell != nullptr) {
@@ -542,7 +542,7 @@ bool CellInfo::ProcessCurrentCellWcdma(CurrentCellInfo *cellInfo)
     return false;
 }
 
-bool CellInfo::ProcessCurrentCellCdma(CurrentCellInfo *cellInfo)
+bool CellInfo::ProcessCurrentCellCdma(CurrentCellInformation *cellInfo)
 {
     sptr<CdmaCellInformation> cell = new CdmaCellInformation;
     if (cell != nullptr) {
@@ -569,7 +569,7 @@ bool CellInfo::ProcessCurrentCellCdma(CurrentCellInfo *cellInfo)
     return false;
 }
 
-bool CellInfo::ProcessCurrentCellTdscdma(CurrentCellInfo *cellInfo)
+bool CellInfo::ProcessCurrentCellTdscdma(CurrentCellInformation *cellInfo)
 {
     sptr<TdscdmaCellInformation> cell = new TdscdmaCellInformation;
     if (cell != nullptr) {
@@ -594,7 +594,7 @@ bool CellInfo::ProcessCurrentCellTdscdma(CurrentCellInfo *cellInfo)
     return false;
 }
 
-bool CellInfo::ProcessCurrentCellNr(CurrentCellInfo *cellInfo)
+bool CellInfo::ProcessCurrentCellNr(CurrentCellInformation *cellInfo)
 {
     sptr<NrCellInformation> cell = new NrCellInformation;
     if (cell != nullptr && cellInfo != nullptr) {
@@ -602,14 +602,22 @@ bool CellInfo::ProcessCurrentCellNr(CurrentCellInfo *cellInfo)
         int32_t &pci = cellInfo->ServiceCellParas.nr.pci;
         int32_t &tac = cellInfo->ServiceCellParas.nr.tac;
         int64_t &nci = cellInfo->ServiceCellParas.nr.nci;
+        int32_t &rsrp = cellInfo->ServiceCellParas.nr.rsrp;
+        int32_t &rsrq = cellInfo->ServiceCellParas.nr.rsrq;
+        rsrp = ZERO_VALUE - rsrp;
         cell->Init(cellInfo->mcc, cellInfo->mnc, 0);
         cell->SetNrParam(nrArfcn, pci, tac, nci);
+        cell->SetNrSignalParam(rsrp, rsrq);
+        cell->SetSignalIntensity(rsrp);
         cell->SetIsCamped(true);
+        int32_t level = GetCurrentSignalLevelNr(rsrp);
+        cell->SetSignalLevel(level);
         currentCellInfo_ = cell;
         cellInfos_.emplace_back(cell);
 
-        TELEPHONY_LOGI("CellInfo::ProcessCurrentCellNr arfcn:%{private}d pci:%{private}d slotId:%{public}d",
-            nrArfcn, pci, slotId_);
+        TELEPHONY_LOGI(
+            "CellInfo::ProcessCurrentCellNr arfcn:%{private}d pci:%{private}d slotId:%{public}d rsrp:%{public}d "
+            "rsrq:%{public}d", nrArfcn, pci, slotId_, rsrp, rsrq);
         return true;
     }
     return false;
@@ -688,6 +696,22 @@ int32_t CellInfo::GetCurrentSignalLevelTdscdma(int32_t rscp)
     }
     for (int32_t i = signalBar_; i >= 0; --i) {
         if (rscp >= TD_SCDMA_SIGNAL_THRESHOLD[i]) {
+            level = i;
+            break;
+        }
+    }
+    return level;
+}
+
+int32_t CellInfo::GetCurrentSignalLevelNr(int32_t rsrp)
+{
+    int32_t level = SIGNAL_LEVEL_INVALID;
+    if (rsrp >= SIGNAL_RSSI_MAXIMUM) {
+        TELEPHONY_LOGE("CellInfo::GetCurrentSignalLevelNr Value is Invalid.");
+        return level;
+    }
+    for (int32_t i = signalBar_; i >= 0; --i) {
+        if (rsrp >= NR_SIGNAL_THRESHOLD[i]) {
             level = i;
             break;
         }
@@ -786,12 +810,6 @@ sptr<CellLocation> CellInfo::GetCellLocation()
             cellLocation->SetGsmParam(cellinfo->GetCellId(), cellinfo->GetLac());
             return cellLocation;
         }
-        case CellInformation::CellType::CELL_TYPE_LTE: {
-            sptr<LteCellInformation> cellinfo = static_cast<LteCellInformation *>(currentCellInfo_.GetRefPtr());
-            sptr<GsmCellLocation> cellLocation = new GsmCellLocation;
-            cellLocation->SetGsmParam(cellinfo->GetCellId(), cellinfo->GetTac());
-            return cellLocation;
-        }
         case CellInformation::CellType::CELL_TYPE_WCDMA: {
             sptr<WcdmaCellInformation> cellinfo = static_cast<WcdmaCellInformation *>(currentCellInfo_.GetRefPtr());
             sptr<GsmCellLocation> cellLocation = new GsmCellLocation;
@@ -805,9 +823,32 @@ sptr<CellLocation> CellInfo::GetCellLocation()
                 cellinfo->GetNid(), cellinfo->GetSid());
             return cellLocation;
         }
+        case CellInformation::CellType::CELL_TYPE_LTE:
+        case CellInformation::CellType::CELL_TYPE_NR:
+            return GetCellLocationExt(type);
         default:
             TELEPHONY_LOGE("CellInfo::GetCellLocation cell type error slotId:%{public}d", slotId_);
             break;
+    }
+    return nullptr;
+}
+
+sptr<CellLocation> CellInfo::GetCellLocationExt(CellInformation::CellType type)
+{
+    if (currentCellInfo_ == nullptr) {
+        TELEPHONY_LOGE("CellInfo::GetCellLocationExt is null slotId:%{public}d", slotId_);
+        return nullptr;
+    }
+    if (type == CellInformation::CellType::CELL_TYPE_LTE) {
+        sptr<LteCellInformation> cellinfo = static_cast<LteCellInformation *>(currentCellInfo_.GetRefPtr());
+        sptr<GsmCellLocation> cellLocation = new GsmCellLocation;
+        cellLocation->SetGsmParam(cellinfo->GetCellId(), cellinfo->GetTac());
+        return cellLocation;
+    } else if (type == CellInformation::CellType::CELL_TYPE_NR) {
+        sptr<NrCellInformation> cellinfo = static_cast<NrCellInformation *>(currentCellInfo_.GetRefPtr());
+        sptr<GsmCellLocation> cellLocation = new GsmCellLocation;
+        cellLocation->SetGsmParam(cellinfo->GetCellId(), cellinfo->GetTac());
+        return cellLocation;
     }
     return nullptr;
 }

@@ -191,6 +191,8 @@ public:
         const HDI::Ril::V1_1::ChannelConfigInfoList &channelConfigInfoList) override;
     int32_t NetworkCurrentCellUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CellListCurrentInfo &cellListCurrentInfo) override;
+    int32_t NetworkCurrentCellUpdated_1_1(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellListCurrentInfo) override;
     int32_t GetSignalStrengthResponse(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::Rssi &rssi) override;
     int32_t GetCsRegStatusResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
@@ -208,6 +210,8 @@ public:
         const HDI::Ril::V1_1::CellListNearbyInfo &cellInfoList) override;
     int32_t GetCurrentCellInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList) override;
+    int32_t GetCurrentCellInfoResponse_1_1(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellListCurrentInfo) override;
     int32_t SetPreferredNetworkResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t GetPreferredNetworkResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::PreferredNetworkTypeInfo &preferredNetworkTypeInfo) override;

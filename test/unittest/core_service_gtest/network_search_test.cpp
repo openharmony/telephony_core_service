@@ -247,6 +247,7 @@ void NetworkSearchTest::PrintNrCellInformation(sptr<CellInformation> cell)
     sptr<NrCellInformation> nrCell = new NrCellInformation;
     nrCell->UpdateLocation(0, 0);
     nrCell->SetNrParam(0, 0, 0, 0);
+    nrCell->SetNrSignalParam(0, 0);
     NrCellInformation nrCellInformation = *nr;
     TELEPHONY_LOGI("CellInformation nr is same as nrCell:%{public}d", *nrCell == nrCellInformation);
 }
