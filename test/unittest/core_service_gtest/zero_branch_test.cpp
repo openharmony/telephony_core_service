@@ -315,21 +315,21 @@ HWTEST_F(BranchTest, Telephony_SimFileManager_002, Function | MediumTest | Level
     tech->actType = HRilRadioTech::RADIO_TECHNOLOGY_1XRTT;
     EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_CDMA);
     tech->actType = HRilRadioTech::RADIO_TECHNOLOGY_WCDMA;
-    EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_GSM);
+    EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_USIM);
     tech->actType = HRilRadioTech::RADIO_TECHNOLOGY_LTE_CA;
-    EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_GSM);
+    EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_USIM);
     tech->actType = HRilRadioTech::RADIO_TECHNOLOGY_LTE;
-    EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_GSM);
+    EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_USIM);
     tech->actType = HRilRadioTech::RADIO_TECHNOLOGY_GSM;
-    EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_GSM);
+    EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_USIM);
     tech->actType = HRilRadioTech::RADIO_TECHNOLOGY_TD_SCDMA;
-    EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_GSM);
+    EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_USIM);
     tech->actType = HRilRadioTech::RADIO_TECHNOLOGY_HSPA;
-    EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_GSM);
+    EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_USIM);
     EXPECT_TRUE(simFileManager.IsValidType(SimFileManager::IccType::ICC_TYPE_CDMA));
     tech = nullptr;
-    EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_GSM);
-    EXPECT_EQ(simFileManager.GetIccTypeByTech(nullptr), SimFileManager::IccType::ICC_TYPE_GSM);
+    EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_USIM);
+    EXPECT_EQ(simFileManager.GetIccTypeByTech(nullptr), SimFileManager::IccType::ICC_TYPE_USIM);
 }
 
 /**
