@@ -36,9 +36,9 @@ ImsCoreServiceCallbackStub::~ImsCoreServiceCallbackStub()
 void ImsCoreServiceCallbackStub::InitFuncMap()
 {
     /****************** ims basic ability ******************/
-    requestFuncMap_[ImsCoreServiceInterfaceCode::IMS_SERVICE_STATUS_REPORT] =
+    requestFuncMap_[static_cast<uint32_t>(ImsCoreServiceInterfaceCode::IMS_SERVICE_STATUS_REPORT)] =
         &ImsCoreServiceCallbackStub::OnImsServiceStatusReportInner;
-    requestFuncMap_[ImsCoreServiceInterfaceCode::IMS_GET_REGISTRATION_STATUS] =
+    requestFuncMap_[static_cast<uint32_t>(ImsCoreServiceInterfaceCode::IMS_GET_REGISTRATION_STATUS)] =
         &ImsCoreServiceCallbackStub::OnGetImsRegistrationStatusResponseInner;
 }
 
