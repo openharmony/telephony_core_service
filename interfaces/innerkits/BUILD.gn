@@ -82,17 +82,13 @@ ohos_shared_library("tel_core_service_api") {
     "c_utils:utils",
     "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
+    "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
     "resource_management:global_resmgr",
     "samgr:samgr_proxy",
   ]
 
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
   innerapi_tags = [ "platformsdk" ]
   part_name = "core_service"
   subsystem_name = "telephony"

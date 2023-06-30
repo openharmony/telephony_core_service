@@ -148,7 +148,8 @@ ohos_shared_library("tel_core_service") {
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",
     "hdf_core:libpub_utils",
-    "hisysevent_native:libhisysevent",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "i18n:zone_util",
     "init:libbegetutil",
     "ipc:ipc_single",
@@ -161,11 +162,6 @@ ohos_shared_library("tel_core_service") {
     "time_service:time_client",
   ]
 
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
   part_name = "core_service"
   subsystem_name = "telephony"
 }

@@ -54,6 +54,7 @@ ohos_unittest("tel_ril_gtest") {
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",
+    "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
     "power_manager:powermgr_client",
@@ -66,12 +67,6 @@ ohos_unittest("tel_ril_gtest") {
   ]
 
   # defines += [ "TEL_TEST_PIN_PUK" ]
-
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
 }
 
 group("unittest") {
