@@ -43,17 +43,12 @@ ohos_executable("tel_ril_test") {
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",
+    "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
     "power_manager:powermgr_client",
     "samgr:samgr_proxy",
   ]
-
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
 
   part_name = "core_service"
   subsystem_name = "telephony"

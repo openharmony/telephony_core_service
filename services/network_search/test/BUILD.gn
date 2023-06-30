@@ -40,6 +40,7 @@ ohos_executable("tel_network_search_test") {
     "common_event_service:cesfwk_innerkits",
     "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
+    "hilog:libhilog",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -50,12 +51,6 @@ ohos_executable("tel_network_search_test") {
     "TELEPHONY_LOG_TAG = \"NetworkSearchTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
-
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
 
   # install_enable = true
 

@@ -73,6 +73,7 @@ ohos_unittest("tel_core_service_gtest") {
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",
+    "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
@@ -85,12 +86,6 @@ ohos_unittest("tel_core_service_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
-
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
 }
 
 group("unittest") {

@@ -58,7 +58,8 @@ ohos_fuzztest("SendTerminalResponseCmdFuzzTest") {
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",
     "hdf_core:libpub_utils",
-    "hisysevent_native:libhisysevent",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "i18n:zone_util",
     "init:libbegetutil",
     "ipc:ipc_single",
@@ -73,11 +74,6 @@ ohos_fuzztest("SendTerminalResponseCmdFuzzTest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
 
   cflags = [
     "-g",

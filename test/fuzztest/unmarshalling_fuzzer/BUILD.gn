@@ -50,6 +50,7 @@ ohos_fuzztest("UnMarshallingFuzzTest") {
     "c_utils:utils",
     "drivers_interface_ril:hril_innerkits",
     "drivers_interface_ril:ril_idl_headers",
+    "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
@@ -62,11 +63,6 @@ ohos_fuzztest("UnMarshallingFuzzTest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
 
   cflags = [
     "-g",
