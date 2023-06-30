@@ -485,7 +485,7 @@ int32_t MultiSimController::GetDefaultVoiceSlotId()
         TELEPHONY_LOGE("failed by nullptr");
         if (simDbHelper_ == nullptr) {
             TELEPHONY_LOGE("simDbHelper is nullptr");
-            return DEFAULT_SLOT_ID;
+            return INVALID_VALUE;
         }
         return simDbHelper_->GetDefaultVoiceCardSlotId();
     }
@@ -561,7 +561,7 @@ int32_t MultiSimController::GetDefaultSmsSlotId()
         TELEPHONY_LOGE("failed by nullptr");
         if (simDbHelper_ == nullptr) {
             TELEPHONY_LOGE("simDbHelper is nullptr");
-            return DEFAULT_SLOT_ID;
+            return INVALID_VALUE;
         }
         return simDbHelper_->GetDefaultMessageCardSlotId();
     }
@@ -675,7 +675,7 @@ int32_t MultiSimController::GetDefaultCellularDataSlotIdUnit()
         TELEPHONY_LOGE("failed by nullptr");
         if (simDbHelper_ == nullptr) {
             TELEPHONY_LOGE("simDbHelper is nullptr");
-            return DEFAULT_SLOT_ID;
+            return INVALID_VALUE;
         }
         return simDbHelper_->GetDefaultCellularDataCardSlotId();
     }
@@ -694,7 +694,7 @@ int32_t MultiSimController::GetPrimarySlotId()
     if (localCacheInfo_.empty()) {
         if (simDbHelper_ == nullptr) {
             TELEPHONY_LOGE("failed by nullptr");
-            return DEFAULT_SLOT_ID;
+            return INVALID_VALUE;
         }
         return simDbHelper_->GetDefaultMainCardSlotId();
     }
