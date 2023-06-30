@@ -25,7 +25,6 @@
 
 namespace OHOS {
 namespace Telephony {
-static const int32_t DEFAULT_SLOT_ID = 0;
 static const int32_t EVENT_CODE = 1;
 static const int32_t ACTIVATABLE = 2;
 static const int32_t IMS_SWITCH_VALUE_UNKNOWN = -1;
