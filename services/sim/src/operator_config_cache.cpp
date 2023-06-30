@@ -35,9 +35,11 @@ OperatorConfigCache::OperatorConfigCache(const std::shared_ptr<AppExecFwk::Event
 
 void OperatorConfigCache::ClearAllCache(int32_t slotId)
 {
+    std::unique_lock<std::mutex> lock(mutex_);
     ClearOperatorValue(slotId);
     ClearMemoryCache(slotId);
     parser_.ClearFilesCache();
+    lock.unlock();
 }
 
 void OperatorConfigCache::ClearOperatorValue(int32_t slotId)
@@ -72,7 +74,6 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
         TELEPHONY_LOGE("simFileManager_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     std::string iccid = Str16ToStr8(simFileManager_->GetSimIccId());
     std::string filename = EncryptIccId(iccid) + ".json";
     std::string opkey = GetOpKey(slotId);
@@ -88,7 +89,9 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
     if (parser_.ParseOperatorConfigFromFile(poc, parser_.GetOperatorConfigFilePath(filename), opcJson)) {
         TELEPHONY_LOGI("load from file success opc size %{public}zu", poc.configValue.size());
         if (poc.configValue.size() > 0) {
+            std::unique_lock<std::mutex> lock(mutex_);
             CopyOperatorConfig(poc, opc_);
+            lock.unlock();
             if (canAnnounceChanged) {
                 AnnounceOperatorConfigChanged(slotId);
             }
@@ -100,7 +103,9 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
         parser_.WriteOperatorConfigJson(filename, opcJson);
 
         if (poc.configValue.size() > 0) {
+            std::unique_lock<std::mutex> lock(mutex_);
             CopyOperatorConfig(poc, opc_);
+            lock.unlock();
             if (canAnnounceChanged) {
                 AnnounceOperatorConfigChanged(slotId);
             }
@@ -114,7 +119,9 @@ int32_t OperatorConfigCache::GetOperatorConfigs(int32_t slotId, OperatorConfig &
 {
     if (opc_.configValue.size() > 0) {
         TELEPHONY_LOGI("get from memory");
+        std::unique_lock<std::mutex> lock(mutex_);
         CopyOperatorConfig(opc_, poc);
+        lock.unlock();
         return TELEPHONY_ERR_SUCCESS;
     }
     TELEPHONY_LOGI("reload operator config");
@@ -123,28 +130,28 @@ int32_t OperatorConfigCache::GetOperatorConfigs(int32_t slotId, OperatorConfig &
 
 void OperatorConfigCache::CopyOperatorConfig(const OperatorConfig &from, OperatorConfig &to)
 {
-    for (auto it : from.configValue) {
+    for (const auto &it : from.configValue) {
         to.configValue[it.first] = it.second;
     }
-    for (auto it : from.boolValue) {
+    for (const auto &it : from.boolValue) {
         to.boolValue[it.first] = it.second;
     }
-    for (auto it : from.intValue) {
+    for (const auto &it : from.intValue) {
         to.intValue[it.first] = it.second;
     }
-    for (auto it : from.longValue) {
+    for (const auto &it : from.longValue) {
         to.longValue[it.first] = it.second;
     }
-    for (auto it : from.stringValue) {
+    for (const auto &it : from.stringValue) {
         to.stringValue[it.first] = it.second;
     }
-    for (auto it : from.intArrayValue) {
+    for (const auto &it : from.intArrayValue) {
         to.intArrayValue[it.first] = std::vector<int32_t>(it.second);
     }
-    for (auto it : from.longArrayValue) {
+    for (const auto &it : from.longArrayValue) {
         to.longArrayValue[it.first] = std::vector<int64_t>(it.second);
     }
-    for (auto it : from.stringArrayValue) {
+    for (const auto &it : from.stringArrayValue) {
         to.stringArrayValue[it.first] = std::vector<std::string>(it.second);
     }
 }
@@ -192,8 +199,10 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
     if (event->GetInnerEventId() == RadioEvent::RADIO_SIM_STATE_CHANGE) {
         TELEPHONY_LOGI("OperatorConfigCache::Sim state change");
         if (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_LOCKED) {
+            std::unique_lock<std::mutex> lock(mutex_);
             ClearOperatorValue(slotId_);
             ClearMemoryCache(slotId_);
+            lock.unlock();
             OperatorConfig opc;
             LoadOperatorConfig(slotId_, opc);
         }
