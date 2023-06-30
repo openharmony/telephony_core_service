@@ -495,7 +495,7 @@ int32_t MultiSimController::GetDefaultVoiceSlotId()
             return i;
         }
     }
-    return GetFirstActivedSlotId();
+    return INVALID_VALUE;
 }
 
 int32_t MultiSimController::GetFirstActivedSlotId()
