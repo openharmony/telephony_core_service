@@ -1527,7 +1527,7 @@ static napi_value SetNetworkCapability(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_get_value_int32(env, parameters[ARRAY_INDEX_FIRST], &asyncContext->slotId));
     NAPI_CALL(env, napi_get_value_int32(env, parameters[ARRAY_INDEX_SECOND], &asyncContext->networkCapabilityType));
     NAPI_CALL(env, napi_get_value_int32(env, parameters[ARRAY_INDEX_THIRD], &asyncContext->networkCapabilityState));
-    if (parameterCount == ARRAY_INDEX_FOURTH) {
+    if (parameterCount == PARAMETER_COUNT_FOUR) {
         NAPI_CALL(env,
             napi_create_reference(env, parameters[ARRAY_INDEX_FOURTH], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
@@ -1907,7 +1907,7 @@ void JudgmentDataNr(napi_env env, napi_value data, sptr<CellInformation> infoIte
         NapiUtil::SetPropertyInt32(env, data, "nrArfcn", nrCellCellInfo->GetArfcn());
         NapiUtil::SetPropertyInt32(env, data, "pci", nrCellCellInfo->GetPci());
         NapiUtil::SetPropertyInt32(env, data, "tac", nrCellCellInfo->GetTac());
-        NapiUtil::SetPropertyInt32(env, data, "nci", nrCellCellInfo->GetNci());
+        NapiUtil::SetPropertyInt64(env, data, "nci", nrCellCellInfo->GetNci());
         NapiUtil::SetPropertyStringUtf8(env, data, "mcc", nrCellCellInfo->GetMcc());
         NapiUtil::SetPropertyStringUtf8(env, data, "mnc", nrCellCellInfo->GetMnc());
     }
@@ -2259,7 +2259,7 @@ static void NativeSetNrOptionMode(napi_env env, void *data)
 static void SetNrOptionModeCallback(napi_env env, napi_status status, void *data)
 {
     auto context = static_cast<NrOptionModeContext *>(data);
-    TELEPHONY_LOGD("SetNrOptionModeCallback resolved = %{public}d", context->resolved);
+    TELEPHONY_LOGI("SetNrOptionModeCallback resolved = %{public}d", context->resolved);
     napi_value callbackValue = nullptr;
     if (context->resolved) {
         napi_get_undefined(env, &callbackValue);
@@ -2269,7 +2269,7 @@ static void SetNrOptionModeCallback(napi_env env, napi_status status, void *data
             context->errorCode = TELEPHONY_ERR_FAIL;
         }
         JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
-            context->errorCode, "setNrOptionMode", SET_TELEPHONY_STATE);
+            context->errorCode, "setNROptionMode", SET_TELEPHONY_STATE);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, context, callbackValue);
@@ -2288,14 +2288,14 @@ static napi_value SetNrOptionMode(napi_env env, napi_callback_info info)
         return nullptr;
     }
     auto asyncContext = std::make_unique<NrOptionModeContext>();
-    NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-    NAPI_CALL(env, napi_get_value_int32(env, parameters[1], &asyncContext->nrOptionMode));
+    NAPI_CALL(env, napi_get_value_int32(env, parameters[ARRAY_INDEX_FIRST], &asyncContext->slotId));
+    NAPI_CALL(env, napi_get_value_int32(env, parameters[ARRAY_INDEX_SECOND], &asyncContext->nrOptionMode));
     if (parameterCount == PARAMETER_COUNT_THREE) {
         NAPI_CALL(env,
-            napi_create_reference(env, parameters[ARRAY_INDEX_SECOND], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+            napi_create_reference(env, parameters[ARRAY_INDEX_THIRD], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(
-        env, asyncContext.release(), "setNrOptionMode", NativeSetNrOptionMode, SetNrOptionModeCallback);
+        env, asyncContext.release(), "setNROptionMode", NativeSetNrOptionMode, SetNrOptionModeCallback);
 }
 
 static napi_value IsNrSupported(napi_env env, napi_callback_info info)
@@ -3269,9 +3269,9 @@ static napi_value CreateNrOptionMode(napi_env env, napi_value exports)
             "NR_OPTION_NSA_AND_SA", NapiUtil::ToInt32Value(env, static_cast<int32_t>(NR_OPTION_NSA_AND_SA))),
     };
     napi_value result = nullptr;
-    napi_define_class(env, "NrOptionMode", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,
+    napi_define_class(env, "NROptionMode", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,
         sizeof(desc) / sizeof(*desc), desc, &result);
-    napi_set_named_property(env, exports, "NrOptionMode", result);
+    napi_set_named_property(env, exports, "NROptionMode", result);
     return exports;
 }
 
