@@ -605,6 +605,7 @@ bool CellInfo::ProcessCurrentCellNr(CurrentCellInformation *cellInfo)
         int32_t &rsrp = cellInfo->ServiceCellParas.nr.rsrp;
         int32_t &rsrq = cellInfo->ServiceCellParas.nr.rsrq;
         rsrp = ZERO_VALUE - rsrp;
+        rsrq = ZERO_VALUE - rsrq;
         cell->Init(cellInfo->mcc, cellInfo->mnc, 0);
         cell->SetNrParam(nrArfcn, pci, tac, nci);
         cell->SetNrSignalParam(rsrp, rsrq);
