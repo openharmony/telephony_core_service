@@ -13,20 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef TELEPHONY_IMS_CORE_SERVICE_IPC_INTERFACE_CODE_H
-#define TELEPHONY_IMS_CORE_SERVICE_IPC_INTERFACE_CODE_H
+#ifndef TELEPHONY_IMS_CORE_SERVICE_CALLBACK_IPC_INTERFACE_CODE_H
+#define TELEPHONY_IMS_CORE_SERVICE_CALLBACK_IPC_INTERFACE_CODE_H
 
 #include "iremote_broker.h"
 
 #include "ims_core_service_types.h"
 #include "ims_reg_types.h"
 
+/* SAID:4010 */
 namespace OHOS {
 namespace Telephony {
-enum class ImsCoreServiceInterfaceCode {
+enum class ImsCoreServiceCallbackInterfaceCode {
     IMS_SERVICE_STATUS_REPORT = 0,
     IMS_GET_REGISTRATION_STATUS,
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // TELEPHONY_IMS_CORE_SERVICE_IPC_INTERFACE_CODE_H
+#endif // TELEPHONY_IMS_CORE_SERVICE_CALLBACK_IPC_INTERFACE_CODE_H
