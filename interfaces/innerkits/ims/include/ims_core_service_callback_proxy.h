@@ -18,7 +18,7 @@
 
 #include "iremote_proxy.h"
 #include "ims_core_service_callback_interface.h"
-#include "ims_core_service_ipc_interface_code.h"
+#include "ims_core_service_callback_ipc_interface_code.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
