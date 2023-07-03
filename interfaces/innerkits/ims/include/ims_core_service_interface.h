@@ -28,15 +28,6 @@ enum ImsServiceProxyType {
 };
 class ImsCoreServiceInterface : public IRemoteBroker {
 public:
-    enum {
-        /****************** core basic ******************/
-        IMS_GET_REGISTRATION_STATUS = 0,
-
-        /****************** callback ******************/
-        IMS_REGISTER_CALLBACK = 100,
-        IMS_GET_PROXY_OBJECT_PTR,
-    };
-
     /**
      * GetImsRegistrationStatus
      *
