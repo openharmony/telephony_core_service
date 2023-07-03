@@ -1642,10 +1642,10 @@ int32_t NetworkSearchManager::SetNetworkCapability(
     if ((networkCapabilityType == SERVICE_TYPE_LTE && networkCapabilityState == SERVICE_ABILITY_ON) ||
         (networkCapabilityType == SERVICE_TYPE_NR && networkCapabilityState == SERVICE_ABILITY_OFF)) {
         ret = SetPreferredNetwork(
-            slotId, static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
+            slotId, static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA_GSM));
     } else if (networkCapabilityType == SERVICE_TYPE_NR && networkCapabilityState == SERVICE_ABILITY_ON) {
         ret = SetPreferredNetwork(
-            slotId, static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
+            slotId, static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA_GSM));
     } else if (networkCapabilityType == SERVICE_TYPE_LTE && networkCapabilityState == SERVICE_ABILITY_OFF) {
         ret = SetPreferredNetwork(
             slotId, static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));

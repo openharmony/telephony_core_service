@@ -1471,7 +1471,7 @@ static void NativeSetNetworkCapability(napi_env env, void *data)
     if (!IsValidNetworkCapabilityType(asyncContext->networkCapabilityType) ||
         !IsValidNetworkCapabilityState(asyncContext->networkCapabilityState)) {
         TELEPHONY_LOGE("NativeSetNetworkCapability networkCapabilityType or networkCapabilityState is invalid");
-        asyncContext->errorCode = ERROR_PARAMETER_TYPE_INVALID;
+        asyncContext->errorCode = TELEPHONY_ERR_ARGUMENT_INVALID;
         return;
     }
     asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetNetworkCapability(
@@ -1545,7 +1545,7 @@ static void NativeGetNetworkCapability(napi_env env, void *data)
     }
     if (!IsValidNetworkCapabilityType(asyncContext->networkCapabilityType)) {
         TELEPHONY_LOGE("NativeSetNetworkCapability networkCapabilityType is invalid");
-        asyncContext->errorCode = ERROR_PARAMETER_TYPE_INVALID;
+        asyncContext->errorCode = TELEPHONY_ERR_ARGUMENT_INVALID;
         return;
     }
     asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkCapability(
