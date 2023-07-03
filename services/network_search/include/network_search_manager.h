@@ -73,6 +73,7 @@ struct NetworkSearchManagerInner {
     std::mutex mutex_;
     bool isRadioFirstPowerOn_ = true;
     bool airplaneMode_ = false;
+    int32_t preferredNetworkValue_ = 0;
 
     bool RegisterSetting();
     bool UnRegisterSetting();
@@ -201,7 +202,9 @@ public:
         int32_t slotId, int32_t selectMode, const sptr<NetworkInformation> &networkInformation, bool resumeSelection);
     void SetRadioStateValue(int32_t slotId, ModemPowerState radioState);
     void SetNetworkSelectionValue(int32_t slotId, SelectionMode selection);
-    bool GetPreferredNetwork(int32_t slotId);
+    int32_t GetPreferredNetwork(int32_t slotId);
+    int32_t SetCachePreferredNetworkValue(int32_t slotId, int32_t networkMode);
+    int32_t GetCachePreferredNetworkValue(int32_t slotId, int32_t &networkMode);
     bool SetPreferredNetwork(int32_t slotId, int32_t networkMode);
     void SavePreferredNetworkValue(int32_t slotId, int32_t networkMode);
     int32_t GetPreferredNetworkValue(int32_t slotId) const;

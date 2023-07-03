@@ -73,20 +73,21 @@ void NetworkType::ProcessSetPreferredNetwork(const AppExecFwk::InnerEvent::Point
         TELEPHONY_LOGE("NetworkType::ProcessSetPreferredNetwork responseInfo is nullptr");
         return;
     }
+
+    bool success = responseInfo->error == HRilErrType::NONE;
+    if (success) {
+        int32_t networkMode = 0;
+        networkSearchManager->GetCachePreferredNetworkValue(slotId_, networkMode);
+        if (networkMode >= static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_AUTO) &&
+            networkMode < static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_MAX_VALUE)) {
+            networkSearchManager->SavePreferredNetworkValue(slotId_, networkMode);
+        }
+    }
     int64_t index = responseInfo->flag;
     std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo = NetworkUtils::FindNetworkSearchCallback(index);
     if (callbackInfo == nullptr) {
         TELEPHONY_LOGE("NetworkType::ProcessSetPreferredNetwork callbackInfo is nullptr slotId:%{public}d", slotId_);
         return;
-    }
-
-    bool success = responseInfo->error == HRilErrType::NONE;
-    if (success) {
-        int64_t networkMode = callbackInfo->param_;
-        if (networkMode >= static_cast<int64_t>(PreferredNetworkMode::CORE_NETWORK_MODE_AUTO) &&
-            networkMode < static_cast<int64_t>(PreferredNetworkMode::CORE_NETWORK_MODE_MAX_VALUE)) {
-            networkSearchManager->SavePreferredNetworkValue(slotId_, networkMode);
-        }
     }
     sptr<INetworkSearchCallback> callback = callbackInfo->networkSearchItem_;
     if (callback == nullptr) {

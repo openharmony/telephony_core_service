@@ -114,14 +114,14 @@ static inline bool IsValidSlotId(int32_t slotId)
 
 static inline bool IsValidNetworkCapabilityType(int32_t networkCapabilityType)
 {
-    return ((networkCapabilityType != static_cast<int32_t>(NetworkCapabilityType::SERVICE_TYPE_LTE)) ||
-        (networkCapabilityType != static_cast<int32_t>(NetworkCapabilityType::SERVICE_TYPE_NR)));
+    return ((networkCapabilityType == static_cast<int32_t>(NetworkCapabilityType::SERVICE_TYPE_LTE)) ||
+        (networkCapabilityType == static_cast<int32_t>(NetworkCapabilityType::SERVICE_TYPE_NR)));
 }
 
 static inline bool IsValidNetworkCapabilityState(int32_t networkCapabilityState)
 {
-    return ((networkCapabilityState != static_cast<int32_t>(NetworkCapabilityState::SERVICE_CAPABILITY_OFF)) ||
-        (networkCapabilityState != static_cast<int32_t>(NetworkCapabilityState::SERVICE_CAPABILITY_ON)));
+    return ((networkCapabilityState == static_cast<int32_t>(NetworkCapabilityState::SERVICE_CAPABILITY_OFF)) ||
+        (networkCapabilityState == static_cast<int32_t>(NetworkCapabilityState::SERVICE_CAPABILITY_ON)));
 }
 
 static void NativeGetRadioTech(napi_env env, void *data)
@@ -2259,7 +2259,7 @@ static void NativeSetNrOptionMode(napi_env env, void *data)
 static void SetNrOptionModeCallback(napi_env env, napi_status status, void *data)
 {
     auto context = static_cast<NrOptionModeContext *>(data);
-    TELEPHONY_LOGI("SetNrOptionModeCallback resolved = %{public}d", context->resolved);
+    TELEPHONY_LOGD("SetNrOptionModeCallback resolved = %{public}d", context->resolved);
     napi_value callbackValue = nullptr;
     if (context->resolved) {
         napi_get_undefined(env, &callbackValue);
