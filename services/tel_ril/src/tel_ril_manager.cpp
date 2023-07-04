@@ -397,6 +397,13 @@ int32_t TelRilManager::SetCallRestriction(
         callRestriction.fac, callRestriction.mode, callRestriction.password);
 }
 
+int32_t TelRilManager::SetBarringPassword(int32_t slotId, const char *oldPassword,
+    const char *newPassword, const std::string &restrictionType, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SetBarringPassword,
+        restrictionType, oldPassword, newPassword);
+}
+
 int32_t TelRilManager::SendDtmf(
     int32_t slotId, const DtmfParam &dtmfParam, const AppExecFwk::InnerEvent::Pointer &response)
 {
