@@ -91,8 +91,8 @@ void GetCallList(const uint8_t *data, size_t size)
     std::string fac(reinterpret_cast<const char *>(data), size);
     std::string password(reinterpret_cast<const char *>(data), size);
     std::string sDTMFCode(reinterpret_cast<const char *>(data), size);
-    std::string oldPassword(reinterpret_cast<const char *>(data), size);
-    std::string newPassword(reinterpret_cast<const char *>(data), size);
+    const char *oldPassword(reinterpret_cast<const char *>(data));
+    const char *newPassword(reinterpret_cast<const char *>(data));
     std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(*data);
     AppExecFwk::InnerEvent::Pointer result = AppExecFwk::InnerEvent::Get(resultId, object);
     auto rilInterface_ = HDI::Ril::V1_1::IRil::Get();

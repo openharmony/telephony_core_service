@@ -48,8 +48,8 @@ public:
     int32_t GetClir(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SetClir(const int32_t action, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetCallRestriction(std::string fac, const AppExecFwk::InnerEvent::Pointer &result);
-    int32_t SetCallRestriction(
-        std::string fac, int32_t mode, std::string password, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetCallRestriction(std::string restrictionType,
+        int32_t mode, std::string password, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SendDtmf(const std::string &sDTMFCode, int32_t index, int32_t switchOn, int32_t switchOff,
         const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SendDtmf(char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &result);
@@ -65,8 +65,8 @@ public:
     int32_t SetEmergencyCallList(
         const std::vector<EmergencyCall> &eccVec, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetCallFailReason(const AppExecFwk::InnerEvent::Pointer &result);
-    int32_t SetBarringPassword(std::string fac, std::string oldPassword,
-        std::string newPassword, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetBarringPassword(std::string fac, const char *oldPassword,
+        const char *newPassword, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t CloseUnFinishedUssd(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t AnswerResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
     int32_t GetCallListResponse(

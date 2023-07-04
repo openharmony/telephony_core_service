@@ -423,6 +423,28 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetCallRestrictionTest_0201, Function | Me
 }
 
 /**
+ * @tc.number Telephony_TelRil_SetBarringPasswordTest_0101 to do ...
+ * @tc.name Set call barring password of the card 1
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SetBarringPasswordTest_0101, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_BARRING_PWD), SLOT_ID_0, GetHandler());
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_SetBarringPasswordTest_0201 to do ...
+ * @tc.name Set call barring password of the card 2
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_SetBarringPasswordTest_0201, Function | MediumTest | Level3)
+{
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_BARRING_PWD), SLOT_ID_1, GetHandler());
+    return;
+}
+
+/**
  * @tc.number Telephony_TelRil_SetUssdTest_0101 to do ...
  * @tc.name Set USSD information of the card 1
  * @tc.desc Function test

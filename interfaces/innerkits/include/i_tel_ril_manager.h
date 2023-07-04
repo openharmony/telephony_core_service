@@ -90,6 +90,10 @@ public:
 
     virtual int32_t SetCallRestriction(
         int32_t slotId, const CallRestrictionParam &callrestriction, const AppExecFwk::InnerEvent::Pointer &result) = 0;
+
+    virtual int32_t SetBarringPassword(int32_t slotId, const char *oldPassword, const char *newPassword,
+        const std::string &restrictionType, const AppExecFwk::InnerEvent::Pointer &response) = 0;
+
     virtual int32_t SendDtmf(
         int32_t slotId, const DtmfParam &dtmfParam, const AppExecFwk::InnerEvent::Pointer &result) = 0;
     virtual int32_t SendDtmf(

@@ -944,6 +944,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_006, Function | MediumTest | Lev
     EXPECT_GT(mInner.GetCallRestriction(0, "", event), TELEPHONY_ERR_SUCCESS);
     CallRestrictionParam mCallRestrictionParam;
     EXPECT_GT(mInner.SetCallRestriction(0, mCallRestrictionParam, event), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.SetBarringPassword(0, "", "", "", event), TELEPHONY_ERR_SUCCESS);
     std::shared_ptr<AppExecFwk::EventHandler> handler;
     sptr<NetworkSearchCallBackBase> callback = nullptr;
     mInner.RegisterCellularDataObject(callback);
