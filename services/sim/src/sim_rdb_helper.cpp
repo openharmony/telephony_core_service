@@ -92,7 +92,7 @@ int SimRdbHelper::Delete(
 int32_t SimRdbHelper::GetDefaultMainCardSlotId()
 {
     TELEPHONY_LOGD("start");
-    int32_t mainCardSlotId = INVALID_VALUE;
+    int32_t mainCardSlotId = 0;
     std::vector<std::string> colume;
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SimData::IS_MAIN_CARD, std::to_string(static_cast<int32_t>(MAIN_CARD)));
