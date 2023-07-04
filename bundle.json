@@ -68,7 +68,7 @@
                 "libxml2",
                 "node",
                 "openssl",
-                "profiler"
+                "protobuf"
             ]
         },
         "build": {
