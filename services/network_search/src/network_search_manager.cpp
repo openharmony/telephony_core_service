@@ -748,7 +748,8 @@ int32_t NetworkSearchManager::SetPreferredNetwork(int32_t slotId, int32_t networ
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     int32_t filterMode = static_cast<int32_t>(NetworkUtils::GetNetworkModeFromRaf(modemRaf & raf));
-    TELEPHONY_LOGD("SetPreferredNetwork filterMode:%{public}d slotId:%{public}d", filterMode, slotId);
+    TELEPHONY_LOGI("filterMode:%{public}d slotId:%{public}d", filterMode, slotId);
+    SetCachePreferredNetworkValue(slotId, filterMode);
     if (!eventSender_->SendCallbackEx(slotId, RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, &callback, filterMode)) {
         TELEPHONY_LOGE("slotId:%{public}d SetPreferredNetwork SendCallback failed.", slotId);
         return CORE_SERVICE_SEND_CALLBACK_FAILED;
@@ -756,7 +757,7 @@ int32_t NetworkSearchManager::SetPreferredNetwork(int32_t slotId, int32_t networ
     return TELEPHONY_ERR_SUCCESS;
 }
 
-bool NetworkSearchManager::GetPreferredNetwork(int32_t slotId)
+int32_t NetworkSearchManager::GetPreferredNetwork(int32_t slotId)
 {
     TELEPHONY_LOGD("NetworkSearchManager GetPreferredNetwork slotId:%{public}d", slotId);
     auto inner = FindManagerInner(slotId);
@@ -768,6 +769,30 @@ bool NetworkSearchManager::GetPreferredNetwork(int32_t slotId)
         TELEPHONY_LOGE("slotId:%{public}d GetPreferredNetwork SendCallback failed.", slotId);
         return CORE_SERVICE_SEND_CALLBACK_FAILED;
     }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkSearchManager::SetCachePreferredNetworkValue(int32_t slotId, int32_t networkMode)
+{
+    TELEPHONY_LOGD("SetCachePreferredNetworkValue slotId:%{public}d", slotId);
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    inner->preferredNetworkValue_ = networkMode;
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkSearchManager::GetCachePreferredNetworkValue(int32_t slotId, int32_t &networkMode)
+{
+    TELEPHONY_LOGD("GetCachePreferredNetworkValue slotId:%{public}d", slotId);
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    networkMode = inner->preferredNetworkValue_;
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -792,7 +817,8 @@ bool NetworkSearchManager::SetPreferredNetwork(int32_t slotId, int32_t networkMo
         return false;
     }
     int32_t filterMode = static_cast<int32_t>(NetworkUtils::GetNetworkModeFromRaf(modemRaf & raf));
-    TELEPHONY_LOGD("SetPreferredNetwork filterMode:%{public}d slotId:%{public}d", filterMode, slotId);
+    TELEPHONY_LOGI("filterMode:%{public}d slotId:%{public}d", filterMode, slotId);
+    SetCachePreferredNetworkValue(slotId, filterMode);
     return eventSender_->SendBase(slotId, RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, filterMode);
 }
 
@@ -1616,10 +1642,10 @@ int32_t NetworkSearchManager::SetNetworkCapability(
     if ((networkCapabilityType == SERVICE_TYPE_LTE && networkCapabilityState == SERVICE_ABILITY_ON) ||
         (networkCapabilityType == SERVICE_TYPE_NR && networkCapabilityState == SERVICE_ABILITY_OFF)) {
         ret = SetPreferredNetwork(
-            slotId, static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
+            slotId, static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_WCDMA_GSM));
     } else if (networkCapabilityType == SERVICE_TYPE_NR && networkCapabilityState == SERVICE_ABILITY_ON) {
         ret = SetPreferredNetwork(
-            slotId, static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
+            slotId, static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_WCDMA_GSM));
     } else if (networkCapabilityType == SERVICE_TYPE_LTE && networkCapabilityState == SERVICE_ABILITY_OFF) {
         ret = SetPreferredNetwork(
             slotId, static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));

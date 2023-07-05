@@ -114,14 +114,14 @@ static inline bool IsValidSlotId(int32_t slotId)
 
 static inline bool IsValidNetworkCapabilityType(int32_t networkCapabilityType)
 {
-    return ((networkCapabilityType != static_cast<int32_t>(NetworkCapabilityType::SERVICE_TYPE_LTE)) ||
-        (networkCapabilityType != static_cast<int32_t>(NetworkCapabilityType::SERVICE_TYPE_NR)));
+    return ((networkCapabilityType == static_cast<int32_t>(NetworkCapabilityType::SERVICE_TYPE_LTE)) ||
+        (networkCapabilityType == static_cast<int32_t>(NetworkCapabilityType::SERVICE_TYPE_NR)));
 }
 
 static inline bool IsValidNetworkCapabilityState(int32_t networkCapabilityState)
 {
-    return ((networkCapabilityState != static_cast<int32_t>(NetworkCapabilityState::SERVICE_CAPABILITY_OFF)) ||
-        (networkCapabilityState != static_cast<int32_t>(NetworkCapabilityState::SERVICE_CAPABILITY_ON)));
+    return ((networkCapabilityState == static_cast<int32_t>(NetworkCapabilityState::SERVICE_CAPABILITY_OFF)) ||
+        (networkCapabilityState == static_cast<int32_t>(NetworkCapabilityState::SERVICE_CAPABILITY_ON)));
 }
 
 static void NativeGetRadioTech(napi_env env, void *data)
@@ -1471,7 +1471,7 @@ static void NativeSetNetworkCapability(napi_env env, void *data)
     if (!IsValidNetworkCapabilityType(asyncContext->networkCapabilityType) ||
         !IsValidNetworkCapabilityState(asyncContext->networkCapabilityState)) {
         TELEPHONY_LOGE("NativeSetNetworkCapability networkCapabilityType or networkCapabilityState is invalid");
-        asyncContext->errorCode = ERROR_PARAMETER_TYPE_INVALID;
+        asyncContext->errorCode = TELEPHONY_ERR_ARGUMENT_INVALID;
         return;
     }
     asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetNetworkCapability(
@@ -1545,7 +1545,7 @@ static void NativeGetNetworkCapability(napi_env env, void *data)
     }
     if (!IsValidNetworkCapabilityType(asyncContext->networkCapabilityType)) {
         TELEPHONY_LOGE("NativeSetNetworkCapability networkCapabilityType is invalid");
-        asyncContext->errorCode = ERROR_PARAMETER_TYPE_INVALID;
+        asyncContext->errorCode = TELEPHONY_ERR_ARGUMENT_INVALID;
         return;
     }
     asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkCapability(
@@ -2259,7 +2259,7 @@ static void NativeSetNrOptionMode(napi_env env, void *data)
 static void SetNrOptionModeCallback(napi_env env, napi_status status, void *data)
 {
     auto context = static_cast<NrOptionModeContext *>(data);
-    TELEPHONY_LOGI("SetNrOptionModeCallback resolved = %{public}d", context->resolved);
+    TELEPHONY_LOGD("SetNrOptionModeCallback resolved = %{public}d", context->resolved);
     napi_value callbackValue = nullptr;
     if (context->resolved) {
         napi_get_undefined(env, &callbackValue);
