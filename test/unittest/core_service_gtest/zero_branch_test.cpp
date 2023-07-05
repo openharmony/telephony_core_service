@@ -1668,6 +1668,9 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
         TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(networkSearchManager->SetNetworkSelectionMode(INVALID_SLOTID, 1, networkInfo, true));
     EXPECT_NE(networkSearchManager->GetPreferredNetwork(INVALID_SLOTID, networkSearchCallback), TELEPHONY_ERR_SUCCESS);
+    int32_t networkMode = 0;
+    EXPECT_NE(networkSearchManager->SetCachePreferredNetworkValue(INVALID_SLOTID, networkMode), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->GetCachePreferredNetworkValue(INVALID_SLOTID, networkMode), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(
         networkSearchManager->SetPreferredNetwork(INVALID_SLOTID, 1, networkSearchCallback), TELEPHONY_ERR_SUCCESS);
     std::u16string result = u"";
