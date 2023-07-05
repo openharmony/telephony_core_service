@@ -38,6 +38,10 @@ AIRPLANE_MODE_STATE:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: airplane mode change event}
   SWITCH: {type: INT32, desc: 0_OFF 1_ON}
 
+VONR_SWITCH_STATE:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: vonr swtich state change event}
+  SWITCH: {type: INT32, desc: 0_OFF 1_ON}
+
 SMS_RECEIVE_FAILED:
   __BASE: {type: FAULT, level: CRITICAL, tag: PowerStats, desc: receive sms failed event}
   MODULE: {type: STRING, desc: module name}
