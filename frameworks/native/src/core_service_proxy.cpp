@@ -2481,7 +2481,7 @@ int32_t CoreServiceProxy::SendCallSetupRequestResult(int32_t slotId, bool accept
     }
     std::lock_guard<std::mutex> lock(mutex_);
     int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::STK_RESULT_FROM_APP_CALL_SETUP_REQUEST),
-        data,reply, option);
+        data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SendCallSetupRequestResult failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
