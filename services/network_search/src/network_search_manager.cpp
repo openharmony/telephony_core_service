@@ -1288,10 +1288,11 @@ int32_t NetworkSearchManager::GetDelayNotifyTime()
     char param[SYS_PARAMETER_SIZE] = { 0 };
     int32_t delayTime = 0;
     int32_t code = GetParameter(CFG_TECH_UPDATE_TIME, NO_DELAY_TIME__CONFIG, param, SYS_PARAMETER_SIZE);
-    if (code <= 0 || !IsValidDecValue(param)) {
+    std::string time = param;
+    if (code <= 0 || !IsValidDecValue(time)) {
         delayTime = std::stoi(NO_DELAY_TIME__CONFIG);
     } else {
-        delayTime = std::stoi(param);
+        delayTime = std::stoi(time);
     }
     return delayTime;
 }
