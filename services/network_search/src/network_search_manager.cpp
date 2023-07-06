@@ -21,6 +21,7 @@
 #include <string_ex.h>
 
 #include "core_service_errors.h"
+#include "enum_convert.h"
 #include "mcc_pool.h"
 #include "network_search_types.h"
 #include "parameter.h"
@@ -1259,6 +1260,29 @@ void NetworkSearchManager::DcPhysicalLinkActiveUpdate(int32_t slotId, bool isAct
     }
 }
 
+int32_t NetworkSearchManager::NotifyCallStatusToNetworkSearch(int32_t slotId, int32_t callStatus)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    switch (callStatus) {
+        case static_cast<int32_t>(TelephonyCallState::CALL_STATUS_ACTIVE):
+        case static_cast<int32_t>(TelephonyCallState::CALL_STATUS_HOLDING):
+        case static_cast<int32_t>(TelephonyCallState::CALL_STATUS_DIALING):
+        case static_cast<int32_t>(TelephonyCallState::CALL_STATUS_INCOMING):
+        case static_cast<int32_t>(TelephonyCallState::CALL_STATUS_WAITING):
+            inner->hasCall_ = true;
+            break;
+        default:
+            inner->hasCall_ = false;
+            break;
+    }
+    TELEPHONY_LOGI("slotId:%{public}d callStatus:%{public}d hasCall:%{public}d", slotId, callStatus, inner->hasCall_);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 int32_t NetworkSearchManager::GetDelayNotifyTime()
 {
     char param[SYS_PARAMETER_SIZE] = { 0 };
@@ -1333,9 +1357,9 @@ bool NetworkSearchManager::IsNeedDelayNotify(int32_t slotId)
         TELEPHONY_LOGI("The cfgTech[%{public}d] is not LTE, slotId:%{public}d", cfgTech, slotId);
         return false;
     }
-    sptr<NetworkSearchCallBackBase> cellularCall = GetCellularCallCallBack();
-    if (cellularCall) {
-        TELEPHONY_LOGI("Has cellularCall, slotId:%{public}d", slotId);
+    if (inner->hasCall_) {
+        TELEPHONY_LOGI("Has call, slotId:%{public}d", slotId);
+        return false;
     }
     RadioTech lastCfgTech = inner->networkSearchState_->GetNetworkStatus()->GetLastCfgTech();
     RadioTech lastPsRadioTech = inner->networkSearchState_->GetNetworkStatus()->GetLastPsRadioTech();

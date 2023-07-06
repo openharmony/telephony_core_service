@@ -222,6 +222,7 @@ public:
     FrequencyType GetFrequencyType(int32_t slotId) const;
     NrState GetNrState(int32_t slotId) const;
     void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive);
+    int32_t NotifyCallStatusToNetworkSearch(int32_t slotId, int32_t callStatus);
     /******************** networkSearchManager end *******************/
     /******************** simManager start ***************************/
     int32_t ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum);
