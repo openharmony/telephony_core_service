@@ -1007,6 +1007,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_007, Function | MediumTest | Lev
     EXPECT_GT(mInner.QueryIccDiallingNumbers(0, 0, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(mInner.GetCellLocation(0), nullptr);
     EXPECT_EQ(mInner.GetPhoneType(0), PhoneType::PHONE_TYPE_IS_NONE);
+    EXPECT_NE(mInner.NotifyCallStatusToNetworkSearch(0, 0), TELEPHONY_ERR_SUCCESS);
     NrMode mode = NrMode::NR_MODE_UNKNOWN;
     EXPECT_NE(mInner.GetNrOptionMode(0, mode), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(mode, NrMode::NR_MODE_UNKNOWN);
@@ -1819,6 +1820,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_004, Function | MediumTest |
     NrMode mode = NrMode::NR_MODE_UNKNOWN;
     EXPECT_NE(networkSearchManager->GetNrOptionMode(INVALID_SLOTID, mode), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(mode, NrMode::NR_MODE_UNKNOWN);
+    EXPECT_NE(networkSearchManager->NotifyCallStatusToNetworkSearch(INVALID_SLOTID, 0), TELEPHONY_ERR_SUCCESS);
     networkSearchManager->AddManagerInner(INVALID_SLOTID, inner);
     EXPECT_EQ(networkSearchManager->GetFrequencyType(INVALID_SLOTID), FrequencyType::FREQ_TYPE_UNKNOWN);
     EXPECT_EQ(networkSearchManager->GetNrState(INVALID_SLOTID), NrState::NR_STATE_NOT_SUPPORT);
