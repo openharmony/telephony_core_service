@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef I_CORE_SERVICE_INTERFACE_CODE_H
-#define I_CORE_SERVICE_INTERFACE_CODE_H
+#ifndef CORE_SERVICE_INTERFACE_CODE_H
+#define CORE_SERVICE_INTERFACE_CODE_H
 
 /* SAID:4010 */
 namespace OHOS {
@@ -113,4 +113,4 @@ enum class CoreServiceInterfaceCode {
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // I_CORE_SERVICE_INTERFACE_CODE_H
+#endif // CORE_SERVICE_INTERFACE_CODE_H
