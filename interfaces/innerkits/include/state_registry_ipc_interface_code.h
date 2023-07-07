@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #ifndef OHOS_TELEPHONY_STATE_IPC_INTERFACE_CODE_H
 #define OHOS_TELEPHONY_STATE_IPC_INTERFACE_CODE_H
 
+/* SAID:4010 */
 namespace OHOS {
 namespace Telephony {
 enum class StateNotifyInterfaceCode {
