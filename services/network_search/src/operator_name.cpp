@@ -43,7 +43,7 @@ OperatorName::OperatorName(const EventFwk::CommonEventSubscribeInfo &sp,
       networkSearchManager_(networkSearchManager), slotId_(slotId)
 {
     std::vector<std::string> vecSpnFormats;
-    ResourceUtils::Get().GetValueByName<std::vector<std::string>>(ResourceUtils::SPN_FORMATS, vecSpnFormats);
+    ResourceUtils::Get().GetStringArrayValueByName(ResourceUtils::SPN_FORMATS, vecSpnFormats);
     if (vecSpnFormats.size() > FORMAT_IDX_SPN_CS) {
         csSpnFormat_ = vecSpnFormats[FORMAT_IDX_SPN_CS];
     }
@@ -198,16 +198,16 @@ void OperatorName::UpdatePlmn(
             case RegServiceState::REG_STATE_EMERGENCY_ONLY:
             case RegServiceState::REG_STATE_SEARCH:
                 if (networkState->IsEmergency()) {
-                    ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::EMERGENCY_CALLS_ONLY, plmn);
+                    ResourceUtils::Get().GetStringValueByName(ResourceUtils::EMERGENCY_CALLS_ONLY, plmn);
                 } else {
-                    ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::OUT_OF_SERIVCE, plmn);
+                    ResourceUtils::Get().GetStringValueByName(ResourceUtils::OUT_OF_SERIVCE, plmn);
                 }
                 showPlmn = true;
                 break;
             case RegServiceState::REG_STATE_UNKNOWN:
             case RegServiceState::REG_STATE_POWER_OFF:
             default:
-                ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::OUT_OF_SERIVCE, plmn);
+                ResourceUtils::Get().GetStringValueByName(ResourceUtils::OUT_OF_SERIVCE, plmn);
                 showPlmn = true;
                 break;
         }
@@ -296,7 +296,7 @@ void OperatorName::NotifyCdmaSpnChanged(RegServiceState regStatus, sptr<NetworkS
             plmn = NetworkUtils::FormatString(csSpnFormat_, plmn.c_str());
         }
     } else if (regStatus != RegServiceState::REG_STATE_POWER_OFF) {
-        ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::OUT_OF_SERIVCE, plmn);
+        ResourceUtils::Get().GetStringValueByName(ResourceUtils::OUT_OF_SERIVCE, plmn);
     }
     showPlmn = !plmn.empty();
     TELEPHONY_LOGI(
@@ -443,19 +443,19 @@ std::string OperatorName::GetCustomName(const std::string &numeric)
     }
     auto obj = std::find(cmMccMnc_.begin(), cmMccMnc_.end(), numeric);
     if (obj != cmMccMnc_.end()) {
-        ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::CMCC, name);
+        ResourceUtils::Get().GetStringValueByName(ResourceUtils::CMCC, name);
         TELEPHONY_LOGD("OperatorName::GetCustomName CMCC:%{public}s", name.c_str());
         return name;
     }
     obj = std::find(cuMccMnc_.begin(), cuMccMnc_.end(), numeric);
     if (obj != cuMccMnc_.end()) {
-        ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::CUCC, name);
+        ResourceUtils::Get().GetStringValueByName(ResourceUtils::CUCC, name);
         TELEPHONY_LOGD("OperatorName::GetCustomName CUCC:%{public}s", name.c_str());
         return name;
     }
     obj = std::find(ctMccMnc_.begin(), ctMccMnc_.end(), numeric);
     if (obj != ctMccMnc_.end()) {
-        ResourceUtils::Get().GetValueByName<std::string>(ResourceUtils::CTCC, name);
+        ResourceUtils::Get().GetStringValueByName(ResourceUtils::CTCC, name);
         TELEPHONY_LOGD("OperatorName::GetCustomName CTCC:%{public}s", name.c_str());
         return name;
     }

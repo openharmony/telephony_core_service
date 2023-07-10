@@ -556,10 +556,10 @@ bool ResourceUtils::GetCallFailedMessageName(int32_t reason, std::string &name)
     return true;
 }
 
-bool ResourceUtils::GetStringValueByName(std::string name, std::string &value)
+bool ResourceUtils::GetStringValueByName(const std::string &name, std::string &value)
 {
     auto itor = mapResourceValues_.find(name);
-    if (itor == mapResourceValues_.end()) {
+    if (itor == mapResourceValues_.end() || !itor->second.has_value()) {
         return false;
     }
     value = std::any_cast<std::string>(itor->second);
@@ -570,6 +570,46 @@ bool ResourceUtils::IsFileExist(const std::string &filePath)
 {
     struct stat buffer;
     return (stat(filePath.c_str(), &buffer) == 0);
+}
+
+bool ResourceUtils::GetStringArrayValueByName(const std::string &name, std::vector<std::string> &value)
+{
+    auto itor = mapResourceValues_.find(name);
+    if (itor == mapResourceValues_.end() || !itor->second.has_value()) {
+        return false;
+    }
+    value = std::any_cast<std::vector<std::string>>(itor->second);
+    return true;
+}
+
+bool ResourceUtils::GetBooleanValueByName(const std::string &name, bool &value)
+{
+    auto itor = mapResourceValues_.find(name);
+    if (itor == mapResourceValues_.end() || !itor->second.has_value()) {
+        return false;
+    }
+    value = std::any_cast<bool>(itor->second);
+    return true;
+}
+
+bool ResourceUtils::GetIntegerValueByName(const std::string &name, int32_t &value)
+{
+    auto itor = mapResourceValues_.find(name);
+    if (itor == mapResourceValues_.end() || !itor->second.has_value()) {
+        return false;
+    }
+    value = std::any_cast<int32_t>(itor->second);
+    return true;
+}
+
+bool ResourceUtils::GetIntArrayValueByName(const std::string &name, std::vector<int32_t> &value)
+{
+    auto itor = mapResourceValues_.find(name);
+    if (itor == mapResourceValues_.end() || !itor->second.has_value()) {
+        return false;
+    }
+    value = std::any_cast<std::vector<int32_t>>(itor->second);
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS
