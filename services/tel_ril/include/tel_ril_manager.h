@@ -98,6 +98,9 @@ public:
     int32_t SetCallRestriction(int32_t slotId, const CallRestrictionParam &callRestriction,
         const AppExecFwk::InnerEvent::Pointer &result) override;
 
+    int32_t SetBarringPassword(int32_t slotId, const char *oldPassword, const char *newPassword,
+        const std::string &restrictionType, const AppExecFwk::InnerEvent::Pointer &response) override;
+
     int32_t SetVoNRSwitch(int32_t slotId, int32_t state, const AppExecFwk::InnerEvent::Pointer &result) override;
 
     int32_t SendDtmf(

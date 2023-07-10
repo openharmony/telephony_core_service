@@ -293,7 +293,7 @@ int32_t TelRilCall::GetCallFailReasonResponse(
 
 int32_t TelRilCall::SetBarringPasswordResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
-    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
+    return ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
 int32_t TelRilCall::CloseUnFinishedUssdResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
@@ -424,10 +424,10 @@ int32_t TelRilCall::GetCallRestriction(std::string fac, const AppExecFwk::InnerE
 }
 
 int32_t TelRilCall::SetCallRestriction(
-    std::string fac, int32_t mode, std::string password, const AppExecFwk::InnerEvent::Pointer &result)
+    std::string restrictionType, int32_t mode, std::string password, const AppExecFwk::InnerEvent::Pointer &result)
 {
     HDI::Ril::V1_1::CallRestrictionInfo callRestrictionInfo = {};
-    callRestrictionInfo.fac = fac;
+    callRestrictionInfo.fac = restrictionType;
     callRestrictionInfo.mode = mode;
     callRestrictionInfo.password = password;
     return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SET_CALL_RESTRICTION,
@@ -508,7 +508,7 @@ int32_t TelRilCall::GetUssd(const AppExecFwk::InnerEvent::Pointer &result)
 }
 
 int32_t TelRilCall::SetBarringPassword(
-    std::string fac, std::string oldPassword, std::string newPassword, const AppExecFwk::InnerEvent::Pointer &result)
+    std::string fac, const char *oldPassword, const char *newPassword, const AppExecFwk::InnerEvent::Pointer &result)
 {
     HDI::Ril::V1_1::SetBarringInfo setBarringInfo = {};
     setBarringInfo.fac = fac;

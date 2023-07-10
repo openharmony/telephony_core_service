@@ -182,6 +182,7 @@ void TelRilTest::InitCall()
     memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_CLIP] = &TelRilTest::SetClipTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_CALL_RESTRICTION] = &TelRilTest::GetCallRestrictionTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_CALL_RESTRICTION] = &TelRilTest::SetCallRestrictionTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SET_BARRING_PWD] = &TelRilTest::SetBarringPasswordTest;
     memberFuncMap_[DiffInterfaceId::TEST_SEND_DTMF] = &TelRilTest::SendDtmfTest;
     memberFuncMap_[DiffInterfaceId::TEST_START_DTMF] = &TelRilTest::StartDtmfTest;
     memberFuncMap_[DiffInterfaceId::TEST_STOP_DTMF] = &TelRilTest::StopDtmfTest;
@@ -2002,6 +2003,30 @@ void TelRilTest::SetCallRestrictionTest(int32_t slotId, std::shared_ptr<AppExecF
         TELEPHONY_LOGI("TelRilTest::SetCallRestrictionTest -->");
         telRilManager_->SetCallRestriction(slotId, callRestriction, event);
         TELEPHONY_LOGI("TelRilTest::SetCallRestrictionTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Set call barring password
+ *
+ * @param handler
+ */
+void TelRilTest::SetBarringPasswordTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+{
+    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SET_CALL_RESTRICTION_PWD);
+    auto event = AppExecFwk::InnerEvent::Get(eventId, slotId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        std::string fac = GTEST_STRING;
+        char oldPassword[MAX_BUF_SIZE + 1] = "oldPWD";
+        char newPassword[MAX_BUF_SIZE + 1] = "newPWD";
+        TELEPHONY_LOGI("TelRilTest::SetBarringPasswordTest -->");
+        telRilManager_->SetBarringPassword(slotId, newPassword, oldPassword, fac, event);
+        TELEPHONY_LOGI("TelRilTest::SetBarringPasswordTest --> finished");
+        (void)memset_s(oldPassword, sizeof(oldPassword), 0, sizeof(oldPassword));
+        (void)memset_s(newPassword, sizeof(newPassword), 0, sizeof(newPassword));
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }
