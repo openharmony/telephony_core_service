@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,7 +40,8 @@ int32_t ImsCoreServiceProxy::GetImsRegistrationStatus(int32_t slotId)
     }
     MessageParcel out;
     MessageOption option;
-    int32_t error = remote->SendRequest(IMS_GET_REGISTRATION_STATUS, in, out, option);
+    int32_t error = remote->SendRequest(static_cast<int32_t>(ImsCoreServiceInterfaceCode::IMS_GET_REGISTRATION_STATUS),
+        in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -70,7 +71,8 @@ int32_t ImsCoreServiceProxy::RegisterImsCoreServiceCallback(const sptr<ImsCoreSe
     }
     MessageParcel out;
     MessageOption option;
-    int32_t error = remote->SendRequest(IMS_REGISTER_CALLBACK, in, out, option);
+    int32_t error = remote->SendRequest(static_cast<int32_t>(ImsCoreServiceInterfaceCode::IMS_REGISTER_CALLBACK), in,
+        out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -93,7 +95,8 @@ sptr<IRemoteObject> ImsCoreServiceProxy::GetProxyObjectPtr(ImsServiceProxyType p
     }
     MessageParcel replyParcel;
     MessageOption option;
-    int32_t error = remote->SendRequest(IMS_GET_PROXY_OBJECT_PTR, dataParcel, replyParcel, option);
+    int32_t error = remote->SendRequest(static_cast<int32_t>(ImsCoreServiceInterfaceCode::IMS_GET_PROXY_OBJECT_PTR),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function GetProxyObjectPtr failed! errCode:%{public}d", error);
         return nullptr;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,7 +57,7 @@ int32_t TelephonyStateRegistryProxy::UpdateCellularDataConnectState(
         return TELEPHONY_ERR_FAIL;
     }
     int result = remote->SendRequest(
-        static_cast<uint32_t>(StateNotifyCode::CELLULAR_DATA_STATE), in, out, option);
+        static_cast<uint32_t>(StateNotifyInterfaceCode::CELLULAR_DATA_STATE), in, out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();
         return result;
@@ -85,7 +85,7 @@ int32_t TelephonyStateRegistryProxy::UpdateCellularDataFlow(
         return TELEPHONY_ERR_FAIL;
     }
     int result = remote->SendRequest(
-        static_cast<uint32_t>(StateNotifyCode::CELLULAR_DATA_FLOW), in, out, option);
+        static_cast<uint32_t>(StateNotifyInterfaceCode::CELLULAR_DATA_FLOW), in, out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();
         return result;
@@ -116,7 +116,7 @@ int32_t TelephonyStateRegistryProxy::UpdateCallState(
         return TELEPHONY_ERR_FAIL;
     }
     int result = remote->SendRequest(
-        static_cast<uint32_t>(StateNotifyCode::CALL_STATE), in, out, option);
+        static_cast<uint32_t>(StateNotifyInterfaceCode::CALL_STATE), in, out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();
         return result;
@@ -150,7 +150,7 @@ int32_t TelephonyStateRegistryProxy::UpdateCallStateForSlotId(
         return TELEPHONY_ERR_FAIL;
     }
     int result = remote->SendRequest(
-        static_cast<uint32_t>(StateNotifyCode::CALL_STATE_FOR_ID), in, out, option);
+        static_cast<uint32_t>(StateNotifyInterfaceCode::CALL_STATE_FOR_ID), in, out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();
         return result;
@@ -185,7 +185,7 @@ int32_t TelephonyStateRegistryProxy::UpdateSignalInfo(
         return TELEPHONY_ERR_FAIL;
     }
     int result = remote->SendRequest(
-        static_cast<uint32_t>(StateNotifyCode::SIGNAL_INFO), in, out, option);
+        static_cast<uint32_t>(StateNotifyInterfaceCode::SIGNAL_INFO), in, out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();
         return result;
@@ -220,7 +220,7 @@ int32_t TelephonyStateRegistryProxy::UpdateCellInfo(
         return TELEPHONY_ERR_FAIL;
     }
     int result = remote->SendRequest(
-        static_cast<uint32_t>(StateNotifyCode::CELL_INFO), in, out, option);
+        static_cast<uint32_t>(StateNotifyInterfaceCode::CELL_INFO), in, out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();
         return result;
@@ -248,7 +248,7 @@ int32_t TelephonyStateRegistryProxy::UpdateNetworkState(
         return TELEPHONY_ERR_FAIL;
     }
     int result = remote->SendRequest(
-        static_cast<uint32_t>(StateNotifyCode::NET_WORK_STATE), in, out, option);
+        static_cast<uint32_t>(StateNotifyInterfaceCode::NET_WORK_STATE), in, out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();
         return result;
@@ -282,7 +282,7 @@ int32_t TelephonyStateRegistryProxy::UpdateSimState(
         return TELEPHONY_ERR_FAIL;
     }
     int result = remote->SendRequest(
-        static_cast<uint32_t>(StateNotifyCode::SIM_STATE), in, out, option);
+        static_cast<uint32_t>(StateNotifyInterfaceCode::SIM_STATE), in, out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();
         return result;
@@ -316,7 +316,7 @@ int32_t TelephonyStateRegistryProxy::RegisterStateChange(
         return TELEPHONY_ERR_FAIL;
     }
     int result = remote->SendRequest(
-        static_cast<uint32_t>(StateNotifyCode::ADD_OBSERVER), in, out, option);
+        static_cast<uint32_t>(StateNotifyInterfaceCode::ADD_OBSERVER), in, out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();
         return result;
@@ -344,7 +344,7 @@ int32_t TelephonyStateRegistryProxy::UnregisterStateChange(
         return TELEPHONY_ERR_FAIL;
     }
     int result = remote->SendRequest(
-        static_cast<uint32_t>(StateNotifyCode::REMOVE_OBSERVER), in, out, option);
+        static_cast<uint32_t>(StateNotifyInterfaceCode::REMOVE_OBSERVER), in, out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();
         return result;
@@ -371,7 +371,7 @@ int32_t TelephonyStateRegistryProxy::UpdateCfuIndicator(int32_t slotId, bool cfu
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int result = remote->SendRequest(
-        static_cast<uint32_t>(StateNotifyCode::CFU_INDICATOR), in, out, option);
+        static_cast<uint32_t>(StateNotifyInterfaceCode::CFU_INDICATOR), in, out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();
         return result;
@@ -398,7 +398,7 @@ int32_t TelephonyStateRegistryProxy::UpdateVoiceMailMsgIndicator(int32_t slotId,
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int result = remote->SendRequest(
-        static_cast<uint32_t>(StateNotifyCode::VOICE_MAIL_MSG_INDICATOR), in, out, option);
+        static_cast<uint32_t>(StateNotifyInterfaceCode::VOICE_MAIL_MSG_INDICATOR), in, out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();
         return result;
@@ -418,7 +418,8 @@ int32_t TelephonyStateRegistryProxy::UpdateIccAccount()
     }
     MessageOption option;
     MessageParcel out;
-    int result = remote->SendRequest(static_cast<uint32_t>(StateNotifyCode::ICC_ACCOUNT_CHANGE), in, out, option);
+    int result = remote->SendRequest(static_cast<uint32_t>(StateNotifyInterfaceCode::ICC_ACCOUNT_CHANGE), in,
+        out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();
         return result;

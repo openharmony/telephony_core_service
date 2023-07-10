@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,7 +36,8 @@ int32_t ImsCoreServiceCallbackProxy::UpdateImsServiceStatusChanged(
         TELEPHONY_LOGE("[slot%{public}d]Write imsServiceStatus fail!", slotId);
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    return SendRequest(in, slotId, IMS_SERVICE_STATUS_REPORT);
+    return SendRequest(in, slotId,
+        static_cast<int32_t>(ImsCoreServiceCallbackInterfaceCode::IMS_SERVICE_STATUS_REPORT));
 }
 
 int32_t ImsCoreServiceCallbackProxy::GetImsRegistrationStatusResponse(
@@ -52,7 +53,8 @@ int32_t ImsCoreServiceCallbackProxy::GetImsRegistrationStatusResponse(
         TELEPHONY_LOGE("[slot%{public}d]Write imsRegStatus fail!", slotId);
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    return SendRequest(in, slotId, IMS_GET_REGISTRATION_STATUS);
+    return SendRequest(in, slotId,
+        static_cast<int32_t>(ImsCoreServiceCallbackInterfaceCode::IMS_GET_REGISTRATION_STATUS));
 }
 
 int32_t ImsCoreServiceCallbackProxy::WriteCommonInfo(std::string funcName, MessageParcel &in, int32_t slotId)

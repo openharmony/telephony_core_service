@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,22 +22,6 @@ namespace OHOS {
 namespace Telephony {
 class ITelephonyStateNotify : public IRemoteBroker {
 public:
-    enum class StateNotifyCode {
-        CELL_INFO = 0,
-        CELLULAR_DATA_STATE,
-        CELLULAR_DATA_FLOW,
-        SIGNAL_INFO,
-        NET_WORK_STATE,
-        CALL_STATE,
-        CALL_STATE_FOR_ID,
-        SIM_STATE,
-        ADD_OBSERVER,
-        REMOVE_OBSERVER,
-        CFU_INDICATOR,
-        VOICE_MAIL_MSG_INDICATOR,
-        ICC_ACCOUNT_CHANGE
-    };
-
     /**
      * UpdateCellularDataConnectState
      *
