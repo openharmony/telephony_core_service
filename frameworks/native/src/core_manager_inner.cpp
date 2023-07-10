@@ -1027,6 +1027,16 @@ int32_t CoreManagerInner::SetCallRestriction(
     return telRilManager_->SetCallRestriction(slotId, callRestriction, response);
 }
 
+int32_t CoreManagerInner::SetBarringPassword(int32_t slotId, const char *oldPassword,
+    const char *newPassword, const std::string &restrictionType, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("telRilManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return telRilManager_->SetBarringPassword(slotId, oldPassword, newPassword, restrictionType, response);
+}
+
 int32_t CoreManagerInner::SetVoNRSwitch(
     int32_t slotId, int32_t state, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {

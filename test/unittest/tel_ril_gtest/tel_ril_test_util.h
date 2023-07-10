@@ -77,6 +77,7 @@ enum class DiffInterfaceId {
     TEST_SET_CALL_CLIP,
     TEST_GET_CALL_RESTRICTION,
     TEST_SET_CALL_RESTRICTION,
+    TEST_SET_BARRING_PWD,
     TEST_SEND_DTMF,
     TEST_START_DTMF,
     TEST_STOP_DTMF,
@@ -218,6 +219,7 @@ private:
     void SetClipTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetCallRestrictionTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void SetCallRestrictionTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
+    void SetBarringPasswordTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void NetworkVoiceRegistrationStateTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void NetworkDataRegistrationStateTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetRadioProtocolTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
