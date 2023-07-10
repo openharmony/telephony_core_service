@@ -40,13 +40,15 @@ ohos_shared_library("radio") {
 
   configs = [ "$SUBSYSTEM_DIR/core_service/utils:telephony_log_config" ]
 
-  deps = [ "//third_party/node:node_header" ]
+  deps = [
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
+    "//third_party/node:node_header",
+  ]
 
   external_deps = [
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "core_service:libtel_common",
-    "core_service:tel_core_service_api",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
