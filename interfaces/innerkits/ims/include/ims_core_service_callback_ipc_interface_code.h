@@ -16,11 +16,6 @@
 #ifndef TELEPHONY_IMS_CORE_SERVICE_CALLBACK_IPC_INTERFACE_CODE_H
 #define TELEPHONY_IMS_CORE_SERVICE_CALLBACK_IPC_INTERFACE_CODE_H
 
-#include "iremote_broker.h"
-
-#include "ims_core_service_types.h"
-#include "ims_reg_types.h"
-
 /* SAID:4010 */
 namespace OHOS {
 namespace Telephony {
