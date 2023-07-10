@@ -210,10 +210,12 @@ public:
     void ShowAllValue();
     ~ResourceUtils() = default;
 
-    template<typename T>
-    bool GetValueByName(std::string name, T &value);
     bool GetCallFailedMessageName(int32_t reason, std::string &name);
-    bool GetStringValueByName(std::string name, std::string &value);
+    bool GetStringValueByName(const std::string &name, std::string &value);
+    bool GetStringArrayValueByName(const std::string &name, std::vector<std::string> &value);
+    bool GetBooleanValueByName(const std::string &name, bool &value);
+    bool GetIntegerValueByName(const std::string &name, int32_t &value);
+    bool GetIntArrayValueByName(const std::string &name, std::vector<int32_t> &value);
 
 private:
     ResourceUtils();
@@ -244,17 +246,6 @@ private:
     static const std::map<DisconnectedReasons, std::string> callFailedResourceName_;
     static const std::string RESOURCE_HAP_BUNDLE_NAME;
     static const std::string RESOURCE_INDEX_PATH;
-};
-
-template<typename T>
-bool ResourceUtils::GetValueByName(std::string name, T &value)
-{
-    auto itor = mapResourceValues_.find(name);
-    if (itor == mapResourceValues_.end()) {
-        return false;
-    }
-    value = std::any_cast<T>(itor->second);
-    return true;
 };
 } // namespace Telephony
 } // namespace OHOS
