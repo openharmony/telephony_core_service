@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,107 +32,127 @@ CoreServiceStub::CoreServiceStub()
 
 void CoreServiceStub::AddHandlerNetWorkToMap()
 {
-    memberFuncMap_[uint32_t(InterfaceID::GET_PS_RADIO_TECH)] = &CoreServiceStub::OnGetPsRadioTech;
-    memberFuncMap_[uint32_t(InterfaceID::GET_CS_RADIO_TECH)] = &CoreServiceStub::OnGetCsRadioTech;
-    memberFuncMap_[uint32_t(InterfaceID::GET_OPERATOR_NUMERIC)] = &CoreServiceStub::OnGetOperatorNumeric;
-    memberFuncMap_[uint32_t(InterfaceID::GET_OPERATOR_NAME)] = &CoreServiceStub::OnGetOperatorName;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SIGNAL_INFO_LIST)] = &CoreServiceStub::OnGetSignalInfoList;
-    memberFuncMap_[uint32_t(InterfaceID::GET_NETWORK_STATE)] = &CoreServiceStub::OnGetNetworkState;
-    memberFuncMap_[uint32_t(InterfaceID::SET_RADIO_STATE)] = &CoreServiceStub::OnSetRadioState;
-    memberFuncMap_[uint32_t(InterfaceID::GET_RADIO_STATE)] = &CoreServiceStub::OnGetRadioState;
-    memberFuncMap_[uint32_t(InterfaceID::GET_NETWORK_SEARCH_RESULT)] = &CoreServiceStub::OnGetNetworkSearchInformation;
-    memberFuncMap_[uint32_t(InterfaceID::GET_NETWORK_SELECTION_MODE)] = &CoreServiceStub::OnGetNetworkSelectionMode;
-    memberFuncMap_[uint32_t(InterfaceID::SET_NETWORK_SELECTION_MODE)] = &CoreServiceStub::OnSetNetworkSelectionMode;
-    memberFuncMap_[uint32_t(InterfaceID::GET_ISO_COUNTRY_CODE_FOR_NETWORK)] =
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_PS_RADIO_TECH)] = &CoreServiceStub::OnGetPsRadioTech;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CS_RADIO_TECH)] = &CoreServiceStub::OnGetCsRadioTech;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPERATOR_NUMERIC)] = &CoreServiceStub::OnGetOperatorNumeric;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPERATOR_NAME)] = &CoreServiceStub::OnGetOperatorName;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIGNAL_INFO_LIST)] = &CoreServiceStub::OnGetSignalInfoList;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NETWORK_STATE)] = &CoreServiceStub::OnGetNetworkState;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_RADIO_STATE)] = &CoreServiceStub::OnSetRadioState;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_RADIO_STATE)] = &CoreServiceStub::OnGetRadioState;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NETWORK_SEARCH_RESULT)] =
+        &CoreServiceStub::OnGetNetworkSearchInformation;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NETWORK_SELECTION_MODE)] =
+        &CoreServiceStub::OnGetNetworkSelectionMode;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_NETWORK_SELECTION_MODE)] =
+        &CoreServiceStub::OnSetNetworkSelectionMode;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ISO_COUNTRY_CODE_FOR_NETWORK)] =
         &CoreServiceStub::OnGetIsoCountryCodeForNetwork;
-    memberFuncMap_[uint32_t(InterfaceID::GET_IMEI)] = &CoreServiceStub::OnGetImei;
-    memberFuncMap_[uint32_t(InterfaceID::GET_MEID)] = &CoreServiceStub::OnGetMeid;
-    memberFuncMap_[uint32_t(InterfaceID::GET_UNIQUE_DEVICE_ID)] = &CoreServiceStub::OnGetUniqueDeviceId;
-    memberFuncMap_[uint32_t(InterfaceID::GET_IMS_REG_STATUS)] = &CoreServiceStub::OnGetImsRegStatus;
-    memberFuncMap_[uint32_t(InterfaceID::GET_CELL_INFO_LIST)] = &CoreServiceStub::OnGetCellInfoList;
-    memberFuncMap_[uint32_t(InterfaceID::GET_CELL_LOCATION)] = &CoreServiceStub::OnGetCellLocation;
-    memberFuncMap_[uint32_t(InterfaceID::GET_PREFERRED_NETWORK_MODE)] = &CoreServiceStub::OnGetPreferredNetwork;
-    memberFuncMap_[uint32_t(InterfaceID::SET_PREFERRED_NETWORK_MODE)] = &CoreServiceStub::OnSetPreferredNetwork;
-    memberFuncMap_[uint32_t(InterfaceID::GET_NETWORK_CAPABILITY)] = &CoreServiceStub::OnGetNetworkCapability;
-    memberFuncMap_[uint32_t(InterfaceID::SET_NETWORK_CAPABILITY)] = &CoreServiceStub::OnSetNetworkCapability;
-    memberFuncMap_[uint32_t(InterfaceID::SET_NR_OPTION_MODE)] = &CoreServiceStub::OnSetNrOptionMode;
-    memberFuncMap_[uint32_t(InterfaceID::GET_NR_OPTION_MODE)] = &CoreServiceStub::OnGetNrOptionMode;
-    memberFuncMap_[uint32_t(InterfaceID::REG_IMS_CALLBACK)] = &CoreServiceStub::OnRegisterImsRegInfoCallback;
-    memberFuncMap_[uint32_t(InterfaceID::UN_REG_IMS_CALLBACK)] = &CoreServiceStub::OnUnregisterImsRegInfoCallback;
-    memberFuncMap_[uint32_t(InterfaceID::GET_BASEBAND_VERSION)] = &CoreServiceStub::OnGetBasebandVersion;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMEI)] = &CoreServiceStub::OnGetImei;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_MEID)] = &CoreServiceStub::OnGetMeid;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_UNIQUE_DEVICE_ID)] = &CoreServiceStub::OnGetUniqueDeviceId;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMS_REG_STATUS)] = &CoreServiceStub::OnGetImsRegStatus;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CELL_INFO_LIST)] = &CoreServiceStub::OnGetCellInfoList;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CELL_LOCATION)] = &CoreServiceStub::OnGetCellLocation;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_PREFERRED_NETWORK_MODE)] =
+        &CoreServiceStub::OnGetPreferredNetwork;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_PREFERRED_NETWORK_MODE)] =
+        &CoreServiceStub::OnSetPreferredNetwork;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NETWORK_CAPABILITY)] =
+        &CoreServiceStub::OnGetNetworkCapability;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_NETWORK_CAPABILITY)] =
+        &CoreServiceStub::OnSetNetworkCapability;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_NR_OPTION_MODE)] = &CoreServiceStub::OnSetNrOptionMode;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NR_OPTION_MODE)] = &CoreServiceStub::OnGetNrOptionMode;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::REG_IMS_CALLBACK)] =
+        &CoreServiceStub::OnRegisterImsRegInfoCallback;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UN_REG_IMS_CALLBACK)] =
+        &CoreServiceStub::OnUnregisterImsRegInfoCallback;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_BASEBAND_VERSION)] = &CoreServiceStub::OnGetBasebandVersion;
 }
 
 void CoreServiceStub::AddHandlerSimToMap()
 {
-    memberFuncMap_[uint32_t(InterfaceID::HAS_SIM_CARD)] = &CoreServiceStub::OnHasSimCard;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_STATE)] = &CoreServiceStub::OnGetSimState;
-    memberFuncMap_[uint32_t(InterfaceID::GET_ISO_COUNTRY_CODE)] = &CoreServiceStub::OnGetISOCountryCodeForSim;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SPN)] = &CoreServiceStub::OnGetSimSpn;
-    memberFuncMap_[uint32_t(InterfaceID::GET_ICCID)] = &CoreServiceStub::OnGetSimIccId;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_OPERATOR_NUMERIC)] = &CoreServiceStub::OnGetSimOperatorNumeric;
-    memberFuncMap_[uint32_t(InterfaceID::GET_IMSI)] = &CoreServiceStub::OnGetIMSI;
-    memberFuncMap_[uint32_t(InterfaceID::IS_SIM_ACTIVE)] = &CoreServiceStub::OnIsSimActive;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_LANGUAGE)] = &CoreServiceStub::OnGetLocaleFromDefaultSim;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_GID1)] = &CoreServiceStub::OnGetSimGid1;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_GID2)] = &CoreServiceStub::OnGetSimGid2;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_EONS)] = &CoreServiceStub::OnGetSimEons;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_SUB_INFO)] = &CoreServiceStub::OnGetSimSubscriptionInfo;
-    memberFuncMap_[uint32_t(InterfaceID::SET_DEFAULT_VOICE_SLOTID)] = &CoreServiceStub::OnSetDefaultVoiceSlotId;
-    memberFuncMap_[uint32_t(InterfaceID::GET_DEFAULT_VOICE_SLOTID)] = &CoreServiceStub::OnGetDefaultVoiceSlotId;
-    memberFuncMap_[uint32_t(InterfaceID::GET_DEFAULT_VOICE_SIMID)] = &CoreServiceStub::OnGetDefaultVoiceSimId;
-    memberFuncMap_[uint32_t(InterfaceID::SET_PRIMARY_SLOTID)] = &CoreServiceStub::OnSetPrimarySlotId;
-    memberFuncMap_[uint32_t(InterfaceID::GET_PRIMARY_SLOTID)] = &CoreServiceStub::OnGetPrimarySlotId;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::HAS_SIM_CARD)] = &CoreServiceStub::OnHasSimCard;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_STATE)] = &CoreServiceStub::OnGetSimState;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ISO_COUNTRY_CODE)] =
+        &CoreServiceStub::OnGetISOCountryCodeForSim;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SPN)] = &CoreServiceStub::OnGetSimSpn;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ICCID)] = &CoreServiceStub::OnGetSimIccId;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_OPERATOR_NUMERIC)] =
+        &CoreServiceStub::OnGetSimOperatorNumeric;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMSI)] = &CoreServiceStub::OnGetIMSI;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_SIM_ACTIVE)] = &CoreServiceStub::OnIsSimActive;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_LANGUAGE)] = &CoreServiceStub::OnGetLocaleFromDefaultSim;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_GID1)] = &CoreServiceStub::OnGetSimGid1;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_GID2)] = &CoreServiceStub::OnGetSimGid2;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_EONS)] = &CoreServiceStub::OnGetSimEons;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SUB_INFO)] = &CoreServiceStub::OnGetSimSubscriptionInfo;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_DEFAULT_VOICE_SLOTID)] =
+        &CoreServiceStub::OnSetDefaultVoiceSlotId;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_DEFAULT_VOICE_SLOTID)] =
+        &CoreServiceStub::OnGetDefaultVoiceSlotId;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_DEFAULT_VOICE_SIMID)] =
+        &CoreServiceStub::OnGetDefaultVoiceSimId;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_PRIMARY_SLOTID)] = &CoreServiceStub::OnSetPrimarySlotId;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_PRIMARY_SLOTID)] = &CoreServiceStub::OnGetPrimarySlotId;
 
-    memberFuncMap_[uint32_t(InterfaceID::SET_SHOW_NUMBER)] = &CoreServiceStub::OnSetShowNumber;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SHOW_NUMBER)] = &CoreServiceStub::OnGetShowNumber;
-    memberFuncMap_[uint32_t(InterfaceID::SET_SHOW_NAME)] = &CoreServiceStub::OnSetShowName;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SHOW_NAME)] = &CoreServiceStub::OnGetShowName;
-    memberFuncMap_[uint32_t(InterfaceID::GET_ACTIVE_ACCOUNT_INFO_LIST)] =
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_SHOW_NUMBER)] = &CoreServiceStub::OnSetShowNumber;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SHOW_NUMBER)] = &CoreServiceStub::OnGetShowNumber;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_SHOW_NAME)] = &CoreServiceStub::OnSetShowName;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SHOW_NAME)] = &CoreServiceStub::OnGetShowName;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ACTIVE_ACCOUNT_INFO_LIST)] =
         &CoreServiceStub::OnGetActiveSimAccountInfoList;
-    memberFuncMap_[uint32_t(InterfaceID::GET_OPERATOR_CONFIG)] = &CoreServiceStub::OnGetOperatorConfig;
-    memberFuncMap_[uint32_t(InterfaceID::UNLOCK_PIN)] = &CoreServiceStub::OnUnlockPin;
-    memberFuncMap_[uint32_t(InterfaceID::UNLOCK_PUK)] = &CoreServiceStub::OnUnlockPuk;
-    memberFuncMap_[uint32_t(InterfaceID::ALTER_PIN)] = &CoreServiceStub::OnAlterPin;
-    memberFuncMap_[uint32_t(InterfaceID::CHECK_LOCK)] = &CoreServiceStub::OnGetLockState;
-    memberFuncMap_[uint32_t(InterfaceID::SWITCH_LOCK)] = &CoreServiceStub::OnSetLockState;
-    memberFuncMap_[uint32_t(InterfaceID::UNLOCK_PIN2)] = &CoreServiceStub::OnUnlockPin2;
-    memberFuncMap_[uint32_t(InterfaceID::UNLOCK_PUK2)] = &CoreServiceStub::OnUnlockPuk2;
-    memberFuncMap_[uint32_t(InterfaceID::ALTER_PIN2)] = &CoreServiceStub::OnAlterPin2;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPERATOR_CONFIG)] = &CoreServiceStub::OnGetOperatorConfig;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UNLOCK_PIN)] = &CoreServiceStub::OnUnlockPin;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UNLOCK_PUK)] = &CoreServiceStub::OnUnlockPuk;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::ALTER_PIN)] = &CoreServiceStub::OnAlterPin;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::CHECK_LOCK)] = &CoreServiceStub::OnGetLockState;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SWITCH_LOCK)] = &CoreServiceStub::OnSetLockState;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UNLOCK_PIN2)] = &CoreServiceStub::OnUnlockPin2;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UNLOCK_PUK2)] = &CoreServiceStub::OnUnlockPuk2;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::ALTER_PIN2)] = &CoreServiceStub::OnAlterPin2;
 }
 
 void CoreServiceStub::AddHandlerSimToMapExt()
 {
-    memberFuncMap_[uint32_t(InterfaceID::REFRESH_SIM_STATE)] = &CoreServiceStub::OnRefreshSimState;
-    memberFuncMap_[uint32_t(InterfaceID::SET_SIM_ACTIVE)] = &CoreServiceStub::OnSetActiveSim;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_PHONE_NUMBER)] = &CoreServiceStub::OnGetSimPhoneNumber;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_TELENUMBER_IDENTIFIER)] =
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::REFRESH_SIM_STATE)] = &CoreServiceStub::OnRefreshSimState;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_SIM_ACTIVE)] = &CoreServiceStub::OnSetActiveSim;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_PHONE_NUMBER)] = &CoreServiceStub::OnGetSimPhoneNumber;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_TELENUMBER_IDENTIFIER)] =
         &CoreServiceStub::OnGetSimTeleNumberIdentifier;
-    memberFuncMap_[uint32_t(InterfaceID::GET_VOICE_MAIL_TAG)] = &CoreServiceStub::OnGetVoiceMailInfor;
-    memberFuncMap_[uint32_t(InterfaceID::GET_VOICE_MAIL_NUMBER)] = &CoreServiceStub::OnGetVoiceMailNumber;
-    memberFuncMap_[uint32_t(InterfaceID::GET_VOICE_MAIL_COUNT)] = &CoreServiceStub::OnGetVoiceMailCount;
-    memberFuncMap_[uint32_t(InterfaceID::SET_VOICE_MAIL_COUNT)] = &CoreServiceStub::OnSetVoiceMailCount;
-    memberFuncMap_[uint32_t(InterfaceID::SET_VOICE_CALL_FORWARDING)] = &CoreServiceStub::OnSetVoiceCallForwarding;
-    memberFuncMap_[uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_GET)] = &CoreServiceStub::OnDiallingNumbersGet;
-    memberFuncMap_[uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_INSERT)] = &CoreServiceStub::OnAddIccDiallingNumbers;
-    memberFuncMap_[uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_UPDATE)] = &CoreServiceStub::OnUpdateIccDiallingNumbers;
-    memberFuncMap_[uint32_t(InterfaceID::ICC_DIALLING_NUMBERS_DELETE)] = &CoreServiceStub::OnDelIccDiallingNumbers;
-    memberFuncMap_[uint32_t(InterfaceID::SET_VOICE_MAIL)] = &CoreServiceStub::OnSetVoiceMailInfo;
-    memberFuncMap_[uint32_t(InterfaceID::GET_MAX_SIM_COUNT)] = &CoreServiceStub::OnGetMaxSimCount;
-    memberFuncMap_[uint32_t(InterfaceID::GET_OPKEY)] = &CoreServiceStub::OnGetOpKey;
-    memberFuncMap_[uint32_t(InterfaceID::GET_OPNAME)] = &CoreServiceStub::OnGetOpName;
-    memberFuncMap_[uint32_t(InterfaceID::GET_OPKEY_EXT)] = &CoreServiceStub::OnGetOpKeyExt;
-    memberFuncMap_[uint32_t(InterfaceID::STK_CMD_FROM_APP_ENVELOPE)] = &CoreServiceStub::OnSendEnvelopeCmd;
-    memberFuncMap_[uint32_t(InterfaceID::STK_CMD_FROM_APP_TERMINAL_RESPONSE)] =
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_VOICE_MAIL_TAG)] = &CoreServiceStub::OnGetVoiceMailInfor;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_VOICE_MAIL_NUMBER)] = &CoreServiceStub::OnGetVoiceMailNumber;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_VOICE_MAIL_COUNT)] = &CoreServiceStub::OnGetVoiceMailCount;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_VOICE_MAIL_COUNT)] = &CoreServiceStub::OnSetVoiceMailCount;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_VOICE_CALL_FORWARDING)] =
+        &CoreServiceStub::OnSetVoiceCallForwarding;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::ICC_DIALLING_NUMBERS_GET)] =
+        &CoreServiceStub::OnDiallingNumbersGet;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::ICC_DIALLING_NUMBERS_INSERT)] =
+        &CoreServiceStub::OnAddIccDiallingNumbers;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::ICC_DIALLING_NUMBERS_UPDATE)] =
+        &CoreServiceStub::OnUpdateIccDiallingNumbers;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::ICC_DIALLING_NUMBERS_DELETE)] =
+        &CoreServiceStub::OnDelIccDiallingNumbers;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_VOICE_MAIL)] = &CoreServiceStub::OnSetVoiceMailInfo;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_MAX_SIM_COUNT)] = &CoreServiceStub::OnGetMaxSimCount;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPKEY)] = &CoreServiceStub::OnGetOpKey;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPNAME)] = &CoreServiceStub::OnGetOpName;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPKEY_EXT)] = &CoreServiceStub::OnGetOpKeyExt;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::STK_CMD_FROM_APP_ENVELOPE)] = &CoreServiceStub::OnSendEnvelopeCmd;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::STK_CMD_FROM_APP_TERMINAL_RESPONSE)] =
         &CoreServiceStub::OnSendTerminalResponseCmd;
-    memberFuncMap_[uint32_t(InterfaceID::STK_RESULT_FROM_APP_CALL_SETUP_REQUEST)] =
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::STK_RESULT_FROM_APP_CALL_SETUP_REQUEST)] =
         &CoreServiceStub::OnSendCallSetupRequestResult;
-    memberFuncMap_[uint32_t(InterfaceID::GET_CARD_TYPE)] = &CoreServiceStub::OnGetCardType;
-    memberFuncMap_[uint32_t(InterfaceID::UNLOCK_SIMLOCK)] = &CoreServiceStub::OnUnlockSimLock;
-    memberFuncMap_[uint32_t(InterfaceID::HAS_OPERATOR_PRIVILEGES)] = &CoreServiceStub::OnHasOperatorPrivileges;
-    memberFuncMap_[uint32_t(InterfaceID::SIM_AUTHENTICATION)] = &CoreServiceStub::OnSimAuthentication;
-    memberFuncMap_[uint32_t(InterfaceID::IS_NR_SUPPORTED)] = &CoreServiceStub::OnIsNrSupported;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_SLOTID)] = &CoreServiceStub::OnGetSlotId;
-    memberFuncMap_[uint32_t(InterfaceID::GET_SIM_SIMID)] = &CoreServiceStub::OnGetSimId;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CARD_TYPE)] = &CoreServiceStub::OnGetCardType;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UNLOCK_SIMLOCK)] = &CoreServiceStub::OnUnlockSimLock;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::HAS_OPERATOR_PRIVILEGES)] =
+        &CoreServiceStub::OnHasOperatorPrivileges;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SIM_AUTHENTICATION)] = &CoreServiceStub::OnSimAuthentication;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_NR_SUPPORTED)] = &CoreServiceStub::OnIsNrSupported;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SLOTID)] = &CoreServiceStub::OnGetSlotId;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SIMID)] = &CoreServiceStub::OnGetSimId;
 }
 
 int32_t CoreServiceStub::OnRemoteRequest(
