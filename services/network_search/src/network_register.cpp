@@ -42,7 +42,7 @@ NetworkRegister::NetworkRegister(std::shared_ptr<NetworkSearchState> networkSear
     std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
     : networkSearchState_(networkSearchState), networkSearchManager_(networkSearchManager), slotId_(slotId)
 {
-    ResourceUtils::Get().GetValueByName<bool>(ResourceUtils::IS_CS_CAPABLE, isCsCapable_);
+    ResourceUtils::Get().GetBooleanValueByName(ResourceUtils::IS_CS_CAPABLE, isCsCapable_);
 }
 
 void NetworkRegister::InitNrConversionConfig()
