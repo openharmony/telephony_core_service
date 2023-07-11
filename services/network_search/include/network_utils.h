@@ -282,7 +282,7 @@ template<typename T>
 T EventSender::GetFunctionOfEvent(RadioEvent radioEvent)
 {
     auto itFunc = mapFunctions_.find(radioEvent);
-    if (itFunc != mapFunctions_.end()) {
+    if (itFunc != mapFunctions_.end() && itFunc->second.has_value()) {
         TELEPHONY_LOGI("GetFunctionOfEvent find");
         return std::any_cast<T>(itFunc->second);
     }
