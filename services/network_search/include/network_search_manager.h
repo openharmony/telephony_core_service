@@ -74,6 +74,7 @@ struct NetworkSearchManagerInner {
     bool isRadioFirstPowerOn_ = true;
     bool airplaneMode_ = false;
     int32_t preferredNetworkValue_ = 0;
+    bool hasCall_ = false;
 
     bool RegisterSetting();
     bool UnRegisterSetting();
@@ -167,6 +168,7 @@ public:
     FrequencyType GetFrequencyType(int32_t slotId) override;
     NrState GetNrState(int32_t slotId) override;
     void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive) override;
+    int32_t NotifyCallStatusToNetworkSearch(int32_t slotId, int32_t callStatus) override;
     int32_t HandleNotifyStateChangeWithDelay(int32_t slotId, bool isNeedDelay) override;
     bool IsNeedDelayNotify(int32_t slotId);
     int32_t SetNrOptionMode(int32_t slotId, int32_t mode);

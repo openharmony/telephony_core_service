@@ -184,6 +184,7 @@ public:
      * @param isActive[in], physical link active or not
      */
     virtual void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive) = 0;
+    virtual int32_t NotifyCallStatusToNetworkSearch(int32_t slotId, int32_t callStatus) = 0;
     virtual int32_t HandleNotifyStateChangeWithDelay(int32_t slotId, bool isNeedDelay) = 0;
 };
 } // namespace Telephony

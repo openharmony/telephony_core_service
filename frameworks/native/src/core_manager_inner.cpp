@@ -1537,6 +1537,15 @@ void CoreManagerInner::DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive)
     }
 }
 
+int32_t CoreManagerInner::NotifyCallStatusToNetworkSearch(int32_t slotId, int32_t callStatus)
+{
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->NotifyCallStatusToNetworkSearch(slotId, callStatus);
+}
+
 int32_t CoreManagerInner::GetNrOptionMode(int32_t slotId, NrMode &mode)
 {
     if (networkSearchManager_ != nullptr) {
