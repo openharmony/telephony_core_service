@@ -2136,7 +2136,9 @@ int32_t CoreServiceProxy::QueryIccDiallingNumbers(
     }
     for (int i = 0; i < size; i++) {
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = DiallingNumbersInfo::UnMarshalling(reply);
-        result.emplace_back(diallingNumber);
+        if (diallingNumber != nullptr) {
+            result.emplace_back(diallingNumber);
+        }
     }
     return TELEPHONY_ERR_SUCCESS;
 }

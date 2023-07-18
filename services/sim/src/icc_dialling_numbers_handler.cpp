@@ -61,6 +61,10 @@ void IccDiallingNumbersHandler::GetDiallingNumbers(
         return;
     }
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest = CreateLoadRequest(ef, exid, index, "", response);
+    if (loadRequest == nullptr) {
+        TELEPHONY_LOGE("loadRequest is null pointer");
+        return;
+    }
     AppExecFwk::InnerEvent::Pointer ptDiallingNumberRead =
         BuildCallerInfo(MSG_SIM_OBTAIN_ADN_DONE, loadRequest->GetLoadId());
     fileController_->ObtainLinearFixedFile(ef, GetFilePath(ef), index, ptDiallingNumberRead);
@@ -74,6 +78,10 @@ void IccDiallingNumbersHandler::GetAllDiallingNumbers(int ef, int exid, AppExecF
     }
     TELEPHONY_LOGI("IccDiallingNumbersHandler::GetAllDiallingNumbers start");
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest = CreateLoadRequest(ef, exid, 0, "", response);
+    if (loadRequest == nullptr) {
+        TELEPHONY_LOGE("loadRequest is null pointer");
+        return;
+    }
     AppExecFwk::InnerEvent::Pointer ptDiallingNumberReadAll =
         BuildCallerInfo(MSG_SIM_OBTAIN_ALL_ADN_DONE, loadRequest->GetLoadId());
     fileController_->ObtainAllLinearFixedFile(ef, GetFilePath(ef), ptDiallingNumberReadAll);
@@ -88,6 +96,10 @@ void IccDiallingNumbersHandler::UpdateDiallingNumbers(
     }
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest =
         CreateLoadRequest(infor.fileId, infor.extFile, infor.index, infor.pin2, response);
+    if (loadRequest == nullptr) {
+        TELEPHONY_LOGE("loadRequest is null pointer");
+        return;
+    }
     loadRequest->SetIsDelete(infor.isDel);
     TELEPHONY_LOGI("UpdateDiallingNumbers contents ready");
     std::shared_ptr<void> diallingNumberObj = static_cast<std::shared_ptr<void>>(infor.diallingNumber);
