@@ -428,6 +428,10 @@ void IccFileController::SendResponse(std::shared_ptr<IccControllerHolder> holder
     AppExecFwk::InnerEvent::Pointer &response = holder->fileLoaded;
     bool isNull = (response == nullptr);
     auto owner = response->GetOwner();
+    if (owner == nullptr) {
+        TELEPHONY_LOGE("owner is nullptr");
+        return;
+    }
     std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
     uint32_t id = response->GetInnerEventId();
     bool needShare = (id == MSG_SIM_OBTAIN_ICC_FILE_DONE);
@@ -458,6 +462,10 @@ void IccFileController::SendResponse(std::shared_ptr<IccControllerHolder> holder
 void IccFileController::SendEfLinearResult(const AppExecFwk::InnerEvent::Pointer &response, const int val[], int len)
 {
     std::shared_ptr<AppExecFwk::EventHandler> handler = response->GetOwner();
+    if (handler == nullptr) {
+        TELEPHONY_LOGE("handler is nullptr!");
+        return;
+    }
     std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
     std::shared_ptr<EfLinearResult> object = std::make_shared<EfLinearResult>(cmdData.get());
     object->valueData[0] = val[0];
@@ -477,6 +485,10 @@ void IccFileController::SendMultiRecordResult(
     const AppExecFwk::InnerEvent::Pointer &response, std::vector<std::string> &strValue)
 {
     std::shared_ptr<AppExecFwk::EventHandler> handler = response->GetOwner();
+    if (handler == nullptr) {
+        TELEPHONY_LOGE("handler is nullptr!");
+        return;
+    }
     std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
     std::shared_ptr<MultiRecordResult> object = std::make_shared<MultiRecordResult>(cmdData.get());
     object->fileResults.assign(strValue.begin(), strValue.end());
@@ -620,6 +632,10 @@ bool IccFileController::ProcessErrorResponse(const AppExecFwk::InnerEvent::Point
     }
     AppExecFwk::InnerEvent::Pointer &response = rcvMsg->controlHolder->fileLoaded;
     auto owner = response->GetOwner();
+    if (owner == nullptr) {
+        TELEPHONY_LOGE("owner is nullptr");
+        return false;
+    }
     uint32_t id = response->GetInnerEventId();
     std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
     bool needShare = (id == MSG_SIM_OBTAIN_ICC_FILE_DONE);
