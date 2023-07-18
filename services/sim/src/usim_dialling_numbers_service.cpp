@@ -306,6 +306,10 @@ void UsimDiallingNumbersService::SendBackResult(
     const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &diallingnumbers)
 {
     auto owner = callerPointer_->GetOwner();
+    if (owner == nullptr) {
+        TELEPHONY_LOGE("owner is nullptr");
+        return;
+    }
     uint32_t id = callerPointer_->GetInnerEventId();
     std::unique_ptr<UsimFetcher> fd = callerPointer_->GetUniqueObject<UsimFetcher>();
     std::unique_ptr<UsimResult> data = std::make_unique<UsimResult>(fd.get());
