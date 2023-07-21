@@ -89,6 +89,7 @@ void MultiSimController::SetNetworkSearchManager(std::shared_ptr<INetworkSearch>
 
 bool MultiSimController::InitData(int32_t slotId)
 {
+    TELEPHONY_LOGI("start to initData slotId is %{public}d", slotId);
     bool result = true;
     if (!IsValidData(slotId)) {
         TELEPHONY_LOGE("has no sim card, abandon");
@@ -158,16 +159,18 @@ bool MultiSimController::InitIccId(int slotId)
     SimRdbInfo simRdbInfo;
     simDbHelper_->QueryDataByIccId(newIccId, simRdbInfo);
     if (!simRdbInfo.iccId.empty()) { // already have this card, reactive it
+        TELEPHONY_LOGI("old sim insert");
         result = UpdateDataByIccId(slotId, newIccId);
     } else { // insert a new data for new IccId
+        TELEPHONY_LOGI("new sim insert");
         result = InsertData(slotId, newIccId);
     }
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("failed to init data");
         return false;
-    } else {
-        return true;
     }
+    TELEPHONY_LOGI("result is %{public}d", result);
+    return true;
 }
 
 int32_t MultiSimController::UpdateDataByIccId(int slotId, const std::string &newIccId)
@@ -284,6 +287,7 @@ bool MultiSimController::GetListFromDataBase()
         return false;
     }
     int32_t result = simDbHelper_->QueryAllValidData(localCacheInfo_);
+    TELEPHONY_LOGI("QueryAllValidData result is %{public}d", result);
     SortCache();
     return (result != INVALID_VALUE) ? true : false;
 }
