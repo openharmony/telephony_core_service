@@ -70,14 +70,7 @@ bool TelephonyPermission::CheckPermission(const std::string &permissionName)
 
     auto callerToken = IPCSkeleton::GetCallingTokenID();
     auto tokenType = AccessTokenKit::GetTokenTypeFlag(callerToken);
-    int result = PermissionState::PERMISSION_DENIED;
-    if (tokenType == ATokenTypeEnum::TOKEN_NATIVE) {
-        result = PermissionState::PERMISSION_GRANTED;
-    } else if (tokenType == ATokenTypeEnum::TOKEN_HAP) {
-        result = AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
-    } else {
-        TELEPHONY_LOGD("permission check failed, callerToken:%{public}u, tokenType:%{public}d", callerToken, tokenType);
-    }
+    int result = AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
 
     if (permissionName == Permission::ANSWER_CALL || permissionName == Permission::READ_CALL_LOG
         || permissionName == Permission::READ_CONTACTS || permissionName == Permission::WRITE_CONTACTS
