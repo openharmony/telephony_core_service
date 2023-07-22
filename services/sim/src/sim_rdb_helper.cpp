@@ -100,7 +100,7 @@ int32_t SimRdbHelper::GetDefaultMainCardSlotId()
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::GetDefaultMainCardSlotId failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return mainCardSlotId;
     }
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(dataShareHelper, colume, predicates);
     if (result == nullptr) {
@@ -132,7 +132,7 @@ int32_t SimRdbHelper::GetDefaultMessageCardSlotId()
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::GetDefaultMessageCardSlotId failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return messageCardSlotId;
     }
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(dataShareHelper, colume, predicates);
     if (result == nullptr) {
@@ -164,7 +164,7 @@ int32_t SimRdbHelper::GetDefaultCellularDataCardSlotId()
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::GetDefaultCellularDataCardSlotId failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return cellularDataCardSlotId;
     }
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(dataShareHelper, colume, predicates);
     if (result == nullptr) {
@@ -195,7 +195,7 @@ int32_t SimRdbHelper::GetDefaultVoiceCardSlotId()
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::GetDefaultVoiceCardSlotId failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return voiceCardSlotId;
     }
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(dataShareHelper, colume, predicates);
     if (result == nullptr) {
@@ -229,7 +229,7 @@ int32_t SimRdbHelper::SetDefaultMainCard(int32_t simId)
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return INVALID_VALUE;
     }
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
     int result = dataShareHelper->Update(defaultUri, predicates, value);
@@ -250,7 +250,7 @@ int32_t SimRdbHelper::SetDefaultVoiceCard(int32_t simId)
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return INVALID_VALUE;
     }
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
     int result = dataShareHelper->Update(defaultUri, predicates, value);
@@ -271,7 +271,7 @@ int32_t SimRdbHelper::SetDefaultMessageCard(int32_t simId)
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return INVALID_VALUE;
     }
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
     int result = dataShareHelper->Update(defaultUri, predicates, value);
@@ -292,7 +292,7 @@ int32_t SimRdbHelper::SetDefaultCellularData(int32_t slotId)
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return INVALID_VALUE;
     }
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
     int result = dataShareHelper->Update(defaultUri, predicates, value);
@@ -306,8 +306,12 @@ int32_t SimRdbHelper::InsertData(int64_t &id, const DataShare::DataShareValuesBu
     TELEPHONY_LOGD("start");
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("need to retry CreateDataHelper");
+        dataShareHelper = CreateDataHelper();
+    }
+    if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::InsertData failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return INVALID_VALUE;
     }
     int result = Insert(dataShareHelper, values);
     dataShareHelper->Release();
@@ -362,7 +366,7 @@ int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return INVALID_VALUE;
     }
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(dataShareHelper, colume, predicates);
     if (result == nullptr) {
@@ -388,7 +392,7 @@ int32_t SimRdbHelper::QueryAllData(std::vector<SimRdbInfo> &vec)
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return INVALID_VALUE;
     }
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(dataShareHelper, colume, predicates);
     if (result == nullptr) {
@@ -417,8 +421,12 @@ int32_t SimRdbHelper::QueryAllValidData(std::vector<SimRdbInfo> &vec)
     predicates.GreaterThan(SimData::IS_ACTIVE, id);
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGI("retry CreateDataHelper");
+        dataShareHelper = CreateDataHelper();
+    }
+    if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return INVALID_VALUE;
     }
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(dataShareHelper, colume, predicates);
     if (result == nullptr) {
@@ -447,7 +455,7 @@ int32_t SimRdbHelper::UpdateDataBySimId(int32_t simId, const DataShare::DataShar
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return INVALID_VALUE;
     }
     int result = Update(dataShareHelper, values, predicates);
     dataShareHelper->Release();
@@ -463,7 +471,7 @@ int32_t SimRdbHelper::UpdateDataByIccId(std::string iccId, const DataShare::Data
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return INVALID_VALUE;
     }
     int result = Update(dataShareHelper, values, predicates);
     dataShareHelper->Release();
@@ -481,7 +489,7 @@ int32_t SimRdbHelper::ForgetAllData()
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return INVALID_VALUE;
     }
     int result = Update(dataShareHelper, value, predicates);
     dataShareHelper->Release();
@@ -500,7 +508,7 @@ int32_t SimRdbHelper::ForgetAllData(int32_t slotId)
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return INVALID_VALUE;
     }
     int result = Update(dataShareHelper, value, predicates);
     dataShareHelper->Release();
@@ -516,7 +524,7 @@ int32_t SimRdbHelper::ClearData()
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return INVALID_VALUE;
     }
     int result = Delete(dataShareHelper, predicates);
     dataShareHelper->Release();
