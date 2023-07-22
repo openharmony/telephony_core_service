@@ -44,7 +44,11 @@ int32_t NetworkSearchResult::GetNetworkSearchInformationSize() const
 
 bool NetworkSearchResult::ReadFromParcel(Parcel &parcel)
 {
-    listSize_ = parcel.ReadInt32();
+    int32_t rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    listSize_ = rat;
     TELEPHONY_LOGI("ReadParcelable<NetworkState> %{public}d", listSize_);
     for (int32_t i = 0; i < listSize_; i++) {
         std::unique_ptr<NetworkInformation> networkInfo(parcel.ReadParcelable<NetworkInformation>());

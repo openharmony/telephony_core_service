@@ -230,16 +230,50 @@ GsmCellInformation *GsmCellInformation::Unmarshalling(Parcel &parcel)
 
 bool GsmCellInformation::ReadFromParcel(Parcel &parcel)
 {
-    mcc_ = parcel.ReadString();
-    mnc_ = parcel.ReadString();
-    arfcn_ = parcel.ReadInt32();
-    cellId_ = parcel.ReadInt32();
-    bsic_ = parcel.ReadInt32();
-    lac_ = parcel.ReadInt32();
-    timeStamp_ = parcel.ReadUint64();
-    signalLevel_ = parcel.ReadInt32();
-    signalIntensity_ = parcel.ReadInt32();
-    isCamped_ = parcel.ReadBool();
+    std::string readString;
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
+    mcc_ = readString;
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
+    mnc_ = readString;
+    int32_t rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    arfcn_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    cellId_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    bsic_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    lac_ = rat;
+    uint64_t time;
+    if (!parcel.ReadUint64(time)) {
+        return false;
+    }
+    timeStamp_ = time;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    signalLevel_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    signalIntensity_ = rat;
+    bool temCamped;
+    if (!parcel.ReadBool(temCamped)) {
+        return false;
+    }
+    isCamped_ = temCamped;
 
     return true;
 }
@@ -369,16 +403,50 @@ LteCellInformation *LteCellInformation::Unmarshalling(Parcel &parcel)
 
 bool LteCellInformation::ReadFromParcel(Parcel &parcel)
 {
-    mcc_ = parcel.ReadString();
-    mnc_ = parcel.ReadString();
-    earfcn_ = parcel.ReadInt32();
-    cellId_ = parcel.ReadInt32();
-    pci_ = parcel.ReadInt32();
-    tac_ = parcel.ReadInt32();
-    timeStamp_ = parcel.ReadInt64();
-    signalLevel_ = parcel.ReadInt32();
-    signalIntensity_ = parcel.ReadInt32();
-    isCamped_ = parcel.ReadBool();
+    std::string readString;
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
+    mcc_ = readString;
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
+    mnc_ = readString;
+    int32_t rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    earfcn_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    cellId_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    pci_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    tac_ = rat;
+    uint64_t time;
+    if (!parcel.ReadUint64(time)) {
+        return false;
+    }
+    timeStamp_ = time;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    signalLevel_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    signalIntensity_ = rat;
+    bool temCamped;
+    if (!parcel.ReadBool(temCamped)) {
+        return false;
+    }
+    isCamped_ = temCamped;
     return true;
 }
 
@@ -518,16 +586,50 @@ WcdmaCellInformation *WcdmaCellInformation::Unmarshalling(Parcel &parcel)
 
 bool WcdmaCellInformation::ReadFromParcel(Parcel &parcel)
 {
-    mcc_ = parcel.ReadString();
-    mnc_ = parcel.ReadString();
-    uarfcn_ = parcel.ReadInt32();
-    cellId_ = parcel.ReadInt32();
-    psc_ = parcel.ReadInt32();
-    lac_ = parcel.ReadInt32();
-    timeStamp_ = parcel.ReadInt64();
-    signalLevel_ = parcel.ReadInt32();
-    signalIntensity_ = parcel.ReadInt32();
-    isCamped_ = parcel.ReadBool();
+    std::string readString;
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
+    mcc_ = readString;
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
+    mnc_ = readString;
+    int32_t rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    uarfcn_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    cellId_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    psc_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    lac_ = rat;
+    uint64_t time;
+    if (!parcel.ReadUint64(time)) {
+        return false;
+    }
+    timeStamp_ = time;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    signalLevel_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    signalIntensity_ = rat;
+    bool temCamped;
+    if (!parcel.ReadBool(temCamped)) {
+        return false;
+    }
+    isCamped_ = temCamped;
     return true;
 }
 
@@ -667,16 +769,50 @@ TdscdmaCellInformation *TdscdmaCellInformation::Unmarshalling(Parcel &parcel)
 
 bool TdscdmaCellInformation::ReadFromParcel(Parcel &parcel)
 {
-    mcc_ = parcel.ReadString();
-    mnc_ = parcel.ReadString();
-    uarfcn_ = parcel.ReadInt32();
-    cellId_ = parcel.ReadInt32();
-    cpid_ = parcel.ReadInt32();
-    lac_ = parcel.ReadInt32();
-    timeStamp_ = parcel.ReadUint64();
-    signalLevel_ = parcel.ReadInt32();
-    signalIntensity_ = parcel.ReadInt32();
-    isCamped_ = parcel.ReadBool();
+    std::string readString;
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
+    mcc_ = readString;
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
+    mnc_ = readString;
+    int32_t rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    uarfcn_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    cellId_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    cpid_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    lac_ = rat;
+    uint64_t time;
+    if (!parcel.ReadUint64(time)) {
+        return false;
+    }
+    timeStamp_ = time;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    signalLevel_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    signalIntensity_ = rat;
+    bool temCamped;
+    if (!parcel.ReadBool(temCamped)) {
+        return false;
+    }
+    isCamped_ = temCamped;
     return true;
 }
 
@@ -807,15 +943,45 @@ CdmaCellInformation *CdmaCellInformation::Unmarshalling(Parcel &parcel)
 
 bool CdmaCellInformation::ReadFromParcel(Parcel &parcel)
 {
-    baseId_ = parcel.ReadInt32();
-    latitude_ = parcel.ReadInt32();
-    longitude_ = parcel.ReadInt32();
-    nid_ = parcel.ReadInt32();
-    sid_ = parcel.ReadInt32();
-    timeStamp_ = parcel.ReadUint64();
-    signalLevel_ = parcel.ReadInt32();
-    signalIntensity_ = parcel.ReadInt32();
-    isCamped_ = parcel.ReadBool();
+    int32_t rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    baseId_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    latitude_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    longitude_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    nid_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    sid_ = rat;
+    uint64_t time;
+    if (!parcel.ReadUint64(time)) {
+        return false;
+    }
+    timeStamp_ = time;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    signalLevel_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    signalIntensity_ = rat;
+    bool temCamped;
+    if (!parcel.ReadBool(temCamped)) {
+        return false;
+    }
+    isCamped_ = temCamped;
     return true;
 }
 
@@ -987,19 +1153,63 @@ NrCellInformation *NrCellInformation::Unmarshalling(Parcel &parcel)
 
 bool NrCellInformation::ReadFromParcel(Parcel &parcel)
 {
-    mcc_ = parcel.ReadString();
-    mnc_ = parcel.ReadString();
-    cellId_ = parcel.ReadInt32();
-    nrArfcn_ = parcel.ReadInt32();
-    pci_ = parcel.ReadInt32();
-    tac_ = parcel.ReadInt32();
-    nci_ = parcel.ReadInt64();
-    rsrp_ = parcel.ReadInt32();
-    rsrq_ = parcel.ReadInt32();
-    timeStamp_ = parcel.ReadInt64();
-    signalLevel_ = parcel.ReadInt32();
-    signalIntensity_ = parcel.ReadInt32();
-    isCamped_ = parcel.ReadBool();
+    std::string readString;
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
+    mcc_ = readString;
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
+    mnc_ = readString;
+    int32_t rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    cellId_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    nrArfcn_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    pci_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    tac_ = rat;
+    int64_t tempNci;
+    if (!parcel.ReadInt64(tempNci)) {
+        return false;
+    }
+    nci_ = tempNci;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    rsrp_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    rsrq_ = rat;
+    uint64_t time;
+    if (!parcel.ReadUint64(time)) {
+        return false;
+    }
+    timeStamp_ = time;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    signalLevel_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    signalIntensity_ = rat;
+    bool temCamped;
+    if (!parcel.ReadBool(temCamped)) {
+        return false;
+    }
+    isCamped_ = temCamped;
     return true;
 }
 
