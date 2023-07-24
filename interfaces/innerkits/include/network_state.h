@@ -118,6 +118,8 @@ private:
     RadioTech csRadioTech_;
     RadioTech cfgTech_;
     NrState nrState_;
+    bool ReadParcelString(Parcel &parcel);
+    bool ReadParcelInt(Parcel &parcel);
 };
 } // namespace Telephony
 } // namespace OHOS
