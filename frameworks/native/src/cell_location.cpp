@@ -63,10 +63,24 @@ GsmCellLocation *GsmCellLocation::Unmarshalling(Parcel &parcel)
 
 bool GsmCellLocation::ReadFromParcel(Parcel &parcel)
 {
-    cellId_ = parcel.ReadInt32();
-    lac_ = parcel.ReadInt32();
-    psc_ = parcel.ReadInt32();
-    timeStamp_ = parcel.ReadInt64();
+    int32_t rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    cellId_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    lac_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    psc_ = rat;
+    uint64_t time;
+    if (!parcel.ReadUint64(time)) {
+        return false;
+    }
+    timeStamp_ = time;
     return true;
 }
 
@@ -144,12 +158,32 @@ CdmaCellLocation *CdmaCellLocation::Unmarshalling(Parcel &parcel)
 
 bool CdmaCellLocation::ReadFromParcel(Parcel &parcel)
 {
-    baseId_ = parcel.ReadInt32();
-    latitude_ = parcel.ReadInt32();
-    longitude_ = parcel.ReadInt32();
-    nid_ = parcel.ReadInt32();
-    sid_ = parcel.ReadInt32();
-    timeStamp_ = parcel.ReadUint64();
+    int32_t rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    baseId_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    latitude_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    longitude_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    nid_ = rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    sid_ = rat;
+    uint64_t time;
+    if (!parcel.ReadUint64(time)) {
+        return false;
+    }
+    timeStamp_ = time;
     return true;
 }
 

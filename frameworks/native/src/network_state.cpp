@@ -51,31 +51,81 @@ bool NetworkState::ReadFromParcel(Parcel &parcel)
         return false;
     }
 
-    std::string readString = parcel.ReadString();
+    if (!ReadParcelString(parcel)) {
+        return false;
+    }
+
+    if (!ReadParcelInt(parcel)) {
+        return false;
+    }
+    return true;
+}
+
+bool NetworkState::ReadParcelString(Parcel &parcel)
+{
+    std::string readString;
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
     psOperatorInfo_.fullName = readString;
-
-    readString = parcel.ReadString();
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
     psOperatorInfo_.shortName = readString;
-
-    readString = parcel.ReadString();
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
     psOperatorInfo_.operatorNumeric = readString;
-
-    readString = parcel.ReadString();
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
     csOperatorInfo_.fullName = readString;
-
-    readString = parcel.ReadString();
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
     csOperatorInfo_.shortName = readString;
-
-    readString = parcel.ReadString();
+    if (!parcel.ReadString(readString)) {
+        return false;
+    }
     csOperatorInfo_.operatorNumeric = readString;
-    csRoaming_ = static_cast<RoamingType>(parcel.ReadInt32());
-    psRoaming_ = static_cast<RoamingType>(parcel.ReadInt32());
-    psRegStatus_ = static_cast<RegServiceState>(parcel.ReadInt32());
-    csRegStatus_ = static_cast<RegServiceState>(parcel.ReadInt32());
-    psRadioTech_ = static_cast<RadioTech>(parcel.ReadInt32());
-    csRadioTech_ = static_cast<RadioTech>(parcel.ReadInt32());
-    cfgTech_ = static_cast<RadioTech>(parcel.ReadInt32());
-    nrState_ = static_cast<NrState>(parcel.ReadInt32());
+    return true;
+}
+
+bool NetworkState::ReadParcelInt(Parcel &parcel)
+{
+    int32_t rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    csRoaming_ = static_cast<RoamingType>(rat);
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    psRoaming_ = static_cast<RoamingType>(rat);
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    psRegStatus_ = static_cast<RegServiceState>(rat);
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    csRegStatus_ = static_cast<RegServiceState>(rat);
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    psRadioTech_ = static_cast<RadioTech>(rat);
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    csRadioTech_ = static_cast<RadioTech>(rat);
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    cfgTech_ = static_cast<RadioTech>(rat);
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    nrState_ = static_cast<NrState>(rat);
     return true;
 }
 
