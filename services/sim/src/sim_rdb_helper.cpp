@@ -280,14 +280,14 @@ int32_t SimRdbHelper::SetDefaultMessageCard(int32_t simId)
     return result;
 }
 
-int32_t SimRdbHelper::SetDefaultCellularData(int32_t slotId)
+int32_t SimRdbHelper::SetDefaultCellularData(int32_t simId)
 {
-    TELEPHONY_LOGI("slotId = %{public}d", slotId);
+    TELEPHONY_LOGI("simId = %{public}d", simId);
     DataShare::DataSharePredicates predicates;
     DataShare::DataShareValuesBucket value;
-    DataShare::DataShareValueObject slotObj(slotId);
+    DataShare::DataShareValueObject slotObj(simId);
     DataShare::DataShareValueObject valueObj(static_cast<int>(DefaultCardType::DATA));
-    value.Put(SimData::SLOT_INDEX, slotObj);
+    value.Put(SimData::SIM_ID, slotObj);
     value.Put(SimData::CARD_TYPE, valueObj);
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
