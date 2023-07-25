@@ -1076,7 +1076,7 @@ int32_t CoreManagerInner::SendDTMF(int32_t slotId, int32_t eventId, char cDTMFCo
         TELEPHONY_LOGE("telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId, index);
     if (response == nullptr) {
         TELEPHONY_LOGE("response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

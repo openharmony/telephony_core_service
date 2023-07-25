@@ -23,6 +23,11 @@
 
 namespace OHOS {
 namespace Telephony {
+static const int32_t TYPE_CS = 0;
+static const int32_t DTMF_ON_LENGTH = 150;
+static const int32_t DTMF_OFF_LENGTH = 70;
+static const int32_t DTMF_STRING_LENGTH = 1;
+
 TelRilCall::TelRilCall(int32_t slotId, sptr<HDI::Ril::V1_1::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
@@ -233,7 +238,24 @@ int32_t TelRilCall::SetCallRestrictionResponse(const HDI::Ril::V1_1::RilRadioRes
 
 int32_t TelRilCall::SendDtmfResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
-    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
+    const auto &info = BuildHRilRadioResponseInfo(responseInfo);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(info);
+    if (telRilRequest == nullptr || telRilRequest->pointer_ == nullptr) {
+        TELEPHONY_LOGE("telRilRequest or pointer_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::shared_ptr<HRilRadioResponseInfo> radioResponseInfo = std::make_shared<HRilRadioResponseInfo>();
+    radioResponseInfo->serial = responseInfo.serial;
+    radioResponseInfo->flag = telRilRequest->pointer_->GetParam();
+    radioResponseInfo->error = static_cast<HRilErrType>(responseInfo.error);
+    AppExecFwk::InnerEvent::Pointer response =
+        AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SEND_DTMF, radioResponseInfo, TYPE_CS);
+    bool ret = telRilRequest->pointer_->GetOwner()->SendEvent(response);
+    if (!ret) {
+        TELEPHONY_LOGE("SendEvent fail!");
+        return TELEPHONY_ERR_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t TelRilCall::StartDtmfResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
@@ -455,9 +477,9 @@ int32_t TelRilCall::SendDtmf(char cDTMFCode, int32_t index, const AppExecFwk::In
     HDI::Ril::V1_1::DtmfInfo dtmfInfo = {};
     dtmfInfo.callId = index;
     dtmfInfo.dtmfKey = dtmfKey;
-    dtmfInfo.onLength = 1;
-    dtmfInfo.offLength = 0;
-    dtmfInfo.stringLength = 1;
+    dtmfInfo.onLength = DTMF_ON_LENGTH;
+    dtmfInfo.offLength = DTMF_OFF_LENGTH;
+    dtmfInfo.stringLength = DTMF_STRING_LENGTH;
     return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SEND_DTMF, &HDI::Ril::V1_1::IRil::SendDtmf, dtmfInfo);
 }
 
