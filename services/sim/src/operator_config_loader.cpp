@@ -51,7 +51,7 @@ std::string OperatorConfigLoader::LoadOpKeyOnMccMnc(int32_t slotId)
 {
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     CoreManagerInner::GetInstance().GetSimState(slotId, simState);
-    if (simState != SimState::SIM_STATE_READY) {
+    if (simFileManager_ == nullptr || simState != SimState::SIM_STATE_READY) {
         TELEPHONY_LOGE("LoadOpKeyOnMccMnc simState not ready");
         return DEFAULT_OPERATOR_KEY;
     }
@@ -60,8 +60,8 @@ std::string OperatorConfigLoader::LoadOpKeyOnMccMnc(int32_t slotId)
     DataShare::DataSharePredicates predicates;
     std::shared_ptr<DataShare::DataShareResultSet> resultSet;
     std::shared_ptr<DataShare::DataShareHelper> helper = CreateOpKeyHelper();
-    if (helper == nullptr || simFileManager_ == nullptr) {
-        TELEPHONY_LOGE("helper or simFileManager_ is nullptr");
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("helper is nullptr");
         return DEFAULT_OPERATOR_KEY;
     }
     std::string mccmncFromSim = Str16ToStr8(simFileManager_->GetSimOperatorNumeric());
