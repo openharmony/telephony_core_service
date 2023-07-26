@@ -1502,7 +1502,7 @@ HWTEST_F(BranchTest, Telephony_NetworkRegister_002, Function | MediumTest | Leve
         networkRegister->GetTechnologyByNrConfig(RadioTech::RADIO_TECHNOLOGY_NR), RadioTech::RADIO_TECHNOLOGY_INVALID);
     EXPECT_GT(
         networkRegister->GetTechnologyByNrConfig(RadioTech::RADIO_TECHNOLOGY_LTE), RadioTech::RADIO_TECHNOLOGY_INVALID);
-    EXPECT_NE(networkRegister->NotifyStateChange(), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkRegister->NotifyStateChange(), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkRegister->RevertLastTechnology(), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(networkRegister->GetSystemPropertiesConfig(config), TELEPHONY_ERR_SUCCESS);
 }
