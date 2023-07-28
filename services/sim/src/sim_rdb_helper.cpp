@@ -105,11 +105,14 @@ int32_t SimRdbHelper::GetDefaultMainCardSlotId()
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(dataShareHelper, colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("nothing");
+        dataShareHelper->Release();
         return mainCardSlotId;
     }
     int resultSetNum = result->GoToFirstRow();
     if (resultSetNum != 0) {
         TELEPHONY_LOGD("not found main card");
+        result->Close();
+        dataShareHelper->Release();
         return mainCardSlotId;
     }
     int index = 0;
@@ -137,11 +140,14 @@ int32_t SimRdbHelper::GetDefaultMessageCardSlotId()
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(dataShareHelper, colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::get nothing");
+        dataShareHelper->Release();
         return messageCardSlotId;
     }
     int resultSetNum = result->GoToFirstRow();
     if (resultSetNum != 0) {
         TELEPHONY_LOGD("not found default sms card");
+        result->Close();
+        dataShareHelper->Release();
         return messageCardSlotId;
     }
     int index = 0;
@@ -169,11 +175,14 @@ int32_t SimRdbHelper::GetDefaultCellularDataCardSlotId()
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(dataShareHelper, colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("SimRdbHelper::get nothing");
+        dataShareHelper->Release();
         return cellularDataCardSlotId;
     }
     int resultSetNum = result->GoToFirstRow();
     if (resultSetNum != 0) {
         TELEPHONY_LOGD("not found default data card");
+        result->Close();
+        dataShareHelper->Release();
         return cellularDataCardSlotId;
     }
     int index = 0;
@@ -200,11 +209,14 @@ int32_t SimRdbHelper::GetDefaultVoiceCardSlotId()
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(dataShareHelper, colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("get nothing");
+        dataShareHelper->Release();
         return voiceCardSlotId;
     }
     int resultSetNum = result->GoToFirstRow();
     if (resultSetNum != 0) {
         TELEPHONY_LOGD("not found default voice card");
+        result->Close();
+        dataShareHelper->Release();
         return voiceCardSlotId;
     }
     int index = 0;
@@ -371,6 +383,7 @@ int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(dataShareHelper, colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("get nothing");
+        dataShareHelper->Release();
         return INVALID_VALUE;
     }
     int resultSetNum = result->GoToFirstRow();
@@ -397,6 +410,7 @@ int32_t SimRdbHelper::QueryAllData(std::vector<SimRdbInfo> &vec)
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(dataShareHelper, colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("get nothing");
+        dataShareHelper->Release();
         return INVALID_VALUE;
     }
     int resultSetNum = result->GoToFirstRow();
@@ -431,6 +445,7 @@ int32_t SimRdbHelper::QueryAllValidData(std::vector<SimRdbInfo> &vec)
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(dataShareHelper, colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("get nothing");
+        dataShareHelper->Release();
         return INVALID_VALUE;
     }
     int resultSetNum = result->GoToFirstRow();
