@@ -104,11 +104,14 @@ int32_t SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
     auto result = settingHelper->Query(uri, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("SettingUtils: query error, result is null");
+        settingHelper->Release();
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     if (result->GoToFirstRow() != DataShare::E_OK) {
         TELEPHONY_LOGE("SettingUtils: query error, go to first row error");
+        result->Close();
+        settingHelper->Release();
         return TELEPHONY_ERR_DATABASE_READ_FAIL;
     }
 
@@ -137,6 +140,7 @@ int32_t SettingUtils::Insert(Uri uri, const std::string &key, const std::string 
     valuesBucket.Put(SETTING_VALUE, valueObj);
     int32_t result = settingHelper->Insert(uri, valuesBucket);
     if (result == RDB_INVALID_VALUE) {
+        settingHelper->Release();
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     TELEPHONY_LOGI("SettingUtils: insert success");
@@ -149,16 +153,15 @@ int32_t SettingUtils::Insert(Uri uri, const std::string &key, const std::string 
 int32_t SettingUtils::Update(Uri uri, const std::string &key, const std::string &value)
 {
     TELEPHONY_LOGI("SettingUtils:update");
-    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
-    if (settingHelper == nullptr) {
-        TELEPHONY_LOGE("settingHelper is null");
-        return false;
-    }
     std::string queryValue = "";
     if (Query(uri, key, queryValue) != TELEPHONY_SUCCESS) {
         return Insert(uri, key, value);
     }
-
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("settingHelper is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     DataShare::DataShareValuesBucket valuesBucket;
     DataShare::DataShareValueObject valueObj(value);
     valuesBucket.Put(SETTING_VALUE, valueObj);
@@ -166,6 +169,7 @@ int32_t SettingUtils::Update(Uri uri, const std::string &key, const std::string 
     predicates.EqualTo(SETTING_KEY, key);
     int32_t result = settingHelper->Update(uri, predicates, valuesBucket);
     if (result == RDB_INVALID_VALUE) {
+        settingHelper->Release();
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     TELEPHONY_LOGI("SettingUtils: update success");
