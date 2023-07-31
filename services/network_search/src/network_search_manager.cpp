@@ -118,7 +118,7 @@ bool NetworkSearchManagerInner::RegisterSetting()
 
     Uri autoTimeUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIME_URI);
     Uri autoTimezoneUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI);
-    Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_URI);
+    Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
     settingHelper->RegisterSettingsObserver(autoTimeUri, settingAutoTimeObserver_);
     settingHelper->RegisterSettingsObserver(autoTimezoneUri, settingAutoTimezoneObserver_);
     settingHelper->RegisterSettingsObserver(airplaneModeUri, airplaneModeObserver_);
@@ -135,7 +135,7 @@ bool NetworkSearchManagerInner::UnRegisterSetting()
 
     Uri autoTimeUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIME_URI);
     Uri autoTimezoneUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI);
-    Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_URI);
+    Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
     settingHelper->UnRegisterSettingsObserver(autoTimeUri, settingAutoTimeObserver_);
     settingHelper->UnRegisterSettingsObserver(autoTimezoneUri, settingAutoTimezoneObserver_);
     settingHelper->UnRegisterSettingsObserver(airplaneModeUri, airplaneModeObserver_);
@@ -849,7 +849,7 @@ int32_t NetworkSearchManager::UpdateRadioOn(int32_t slotId)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_URI);
+    Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
     std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE;
     int32_t airplaneModeOff = 0;
     std::string value = std::to_string(airplaneModeOff);
@@ -1481,7 +1481,7 @@ int32_t NetworkSearchManager::GetAirplaneMode(bool &airplaneMode)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_URI);
+    Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
     std::string value = "";
     std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE;
     if (settingHelper->Query(uri, key, value) != TELEPHONY_SUCCESS) {
