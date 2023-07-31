@@ -26,6 +26,7 @@
 #include "network_search_types.h"
 #include "radio_event.h"
 #include "securec.h"
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -338,7 +339,10 @@ bool EventSender::Send(
         TELEPHONY_LOGE("EventSender::Send telRilManager_.get() is null.");
         return false;
     }
-    (telRilManager_.get()->*rilFuncPointer)(slotId, args..., event);
+    if ((telRilManager_.get()->*rilFuncPointer)(slotId, args..., event) != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("EventSender::Send process ril function error.");
+        return false;
+    }
     return true;
 }
 } // namespace Telephony
