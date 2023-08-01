@@ -83,7 +83,7 @@ The telephony core service module needs to provide APIs for related modules, inc
 | function getDefaultVoiceSimId(callback: AsyncCallback\<number>): void; | Obtains the sim id of the default SIM card that provides the voice service.                                   | –                                 |
 | function isSimActive(slotId: number, callback: AsyncCallback\<boolean>): void | Checks whether the SIM card in the specified slot is activated.                          | –                                 |
 | function hasSimCard(slotId: number, callback: AsyncCallback\<boolean>): void  | Checks whether the specified slot is populated with a SIM card.                            | –                                 |
-| function getSimTelephoneNumber(slotId: number, callback: AsyncCallback\<string>): void | Obtains the mobile station integrated services digital network (MSISDN) of the SIM card in the specified slot.|ohos.permission.GET_TELEPHONY_STATE |
+| function getSimTelephoneNumber(slotId: number, callback: AsyncCallback\<string>): void | Obtains the mobile station integrated services digital network (MSISDN) of the SIM card in the specified slot.|ohos.permission.GET_PHONE_NUMBERS |
 | function getVoiceMailIdentifier(slotId: number, callback: AsyncCallback\<string>): void | Obtains the voice mailbox identifier of the SIM card in the specified slot.| ohos.permission.GET_TELEPHONY_STATE |
 | function getVoiceMailNumber(slotId: number, callback: AsyncCallback\<string>): void | Obtains the voice mailbox number of the SIM card in the specified slot.| ohos.permission.GET_TELEPHONY_STATE |
 | function getCardType(slotId: number, callback: AsyncCallback\<CardType>): void | Obtains the type of the SIM card in the specified slot. | –|

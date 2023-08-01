@@ -62,6 +62,10 @@ static constexpr const char *SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHON
  */
 static constexpr const char *GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHONY_STATE";
 /**
+ * This permission indicates being allowed to get MSISDN of SIM card.
+ */
+static constexpr const char *GET_PHONE_NUMBERS = "ohos.permission.GET_PHONE_NUMBERS";
+/**
  * This permission indicates being allowed to set information about network.
  */
 static constexpr const char *SET_NETWORK_INFO = "ohos.permission.SET_NETWORK_INFO";
