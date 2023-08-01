@@ -327,7 +327,7 @@ void IccFile::RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> e
     if (ObtainFilesFetched()) {
         TELEPHONY_LOGI("IccFile::RegisterAllFilesLoaded: notify");
         if (eventHandler != nullptr) {
-            eventHandler->SendEvent(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
+            eventHandler->SendEvent(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_, 0);
         }
         PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED,
             static_cast<int32_t>(SimState::SIM_STATE_LOADED), "");
