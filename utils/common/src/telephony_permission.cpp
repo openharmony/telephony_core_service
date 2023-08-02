@@ -48,11 +48,11 @@ bool TelephonyPermission::GetBundleNameByUid(int32_t uid, std::string &bundleNam
     }
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     ErrCode errCode = iBundleMgr->GetNameForUid(uid, bundleName);
+    IPCSkeleton::SetCallingIdentity(identity);
     if (errCode != ERR_OK) {
         TELEPHONY_LOGE("get name for uid failed, error code : %{public}d", errCode);
         return false;
     }
-    IPCSkeleton::SetCallingIdentity(identity);
     return true;
 }
 
