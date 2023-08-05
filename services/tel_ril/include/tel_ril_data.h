@@ -58,7 +58,6 @@ public:
 private:
     bool IsDataResponse(uint32_t code);
     bool IsDataNotification(uint32_t code);
-    void DataResponseError(HRilErrType errCode, const AppExecFwk::InnerEvent::Pointer &response);
     void BuildDataCallResultList(std::shared_ptr<DataCallResultList> dataCallResultList,
         const HDI::Ril::V1_1::DataCallResultList &iDataCallResultList);
     void BuildDataCallResultInfo(std::shared_ptr<SetupDataCallResultInfo> dataCallResult,
