@@ -28,19 +28,6 @@ TelRilData::TelRilData(int32_t slotId, sptr<HDI::Ril::V1_1::IRil> rilInterface,
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {}
 
-void TelRilData::DataResponseError(HRilErrType errCode, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    std::lock_guard<std::mutex> lockRequest(responseErrorLock_);
-    uint32_t eventId = response->GetInnerEventId();
-    const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = response->GetOwner();
-    std::shared_ptr<HRilRadioResponseInfo> respInfo = std::make_shared<HRilRadioResponseInfo>();
-    respInfo->flag = response->GetParam();
-    respInfo->error = errCode;
-    if (!handler->SendEvent(eventId, respInfo)) {
-        TELEPHONY_LOGE("Send eventId:%{public}d is failed!", eventId);
-    }
-}
-
 HDI::Ril::V1_1::DataProfileDataInfo TelRilData::ChangeDPToHalDataProfile(DataProfile dataProfile)
 {
     HDI::Ril::V1_1::DataProfileDataInfo dataProfileInfo;
