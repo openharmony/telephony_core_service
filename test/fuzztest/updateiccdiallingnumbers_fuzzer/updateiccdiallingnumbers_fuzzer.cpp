@@ -32,7 +32,6 @@ static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t ACCEPT_TYPE = 2;
 constexpr int32_t SIM_TYPE_NUM = 2;
-constexpr int32_t TWO_INT_NUM = 2;
 constexpr int32_t SLEEP_TIME_SECONDS = 10;
 
 bool IsServiceInited()
@@ -62,8 +61,7 @@ void OnRemoteRequest(const uint8_t *data, size_t size)
     if (!dataMessageParcel.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
         return;
     }
-    size_t dataSize = size - sizeof(uint32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(uint32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(size);
     MessageParcel reply;
@@ -80,8 +78,7 @@ void GetOpKey(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetOpKey(dataMessageParcel, reply);
@@ -96,8 +93,8 @@ void GetOpKeyExt(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetOpKeyExt(dataMessageParcel, reply);
@@ -112,8 +109,8 @@ void GetOpName(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetOpName(dataMessageParcel, reply);
@@ -130,8 +127,8 @@ void SendCallSetupRequestResult(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(accept);
-    size_t dataSize = size - sizeof(int32_t) * TWO_INT_NUM;
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t) * TWO_INT_NUM, dataSize);
+
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnSendCallSetupRequestResult(dataMessageParcel, reply);
@@ -146,8 +143,8 @@ void HasOperatorPrivileges(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnHasOperatorPrivileges(dataMessageParcel, reply);
@@ -162,8 +159,8 @@ void GetCellInfoList(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetCellInfoList(dataMessageParcel, reply);
@@ -180,8 +177,7 @@ void UpdateIccDiallingNumbers(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(type);
-    size_t dataSize = size - sizeof(int32_t) * TWO_INT_NUM;
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t) * TWO_INT_NUM, dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnUpdateIccDiallingNumbers(dataMessageParcel, reply);

@@ -79,8 +79,7 @@ void GetSimGid1(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetSimGid1(dataMessageParcel, reply);
@@ -95,8 +94,7 @@ void GetSimGid2(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetSimGid2(dataMessageParcel, reply);
@@ -111,8 +109,7 @@ void GetSimAccountInfo(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetSimSubscriptionInfo(dataMessageParcel, reply);
@@ -140,8 +137,7 @@ void GetCardType(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetCardType(dataMessageParcel, reply);
@@ -156,8 +152,7 @@ void GetSimState(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetSimState(dataMessageParcel, reply);
@@ -172,8 +167,7 @@ void HasSimCard(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnHasSimCard(dataMessageParcel, reply);
