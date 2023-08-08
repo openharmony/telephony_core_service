@@ -32,6 +32,7 @@ static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t SIM_TYPE_NUM = 2;
 constexpr int32_t TWO_INT_NUM = 2;
+constexpr int32_t SIZE_LIMIT = 4;
 constexpr int32_t SLEEP_TIME_SECONDS = 10;
 constexpr uint32_t FUCTION_SIZE = 100;
 
@@ -58,7 +59,7 @@ void OnRemoteRequest(const uint8_t *data, size_t size)
         return;
     }
 
-    if (size < 4) {
+    if (size < SIZE_LIMIT) {
         return;
     }
 
