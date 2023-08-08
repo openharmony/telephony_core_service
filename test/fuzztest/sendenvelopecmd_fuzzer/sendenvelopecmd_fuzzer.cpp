@@ -50,25 +50,6 @@ bool IsServiceInited()
     return g_isInited;
 }
 
-void OnRemoteRequest(const uint8_t *data, size_t size)
-{
-    if (!IsServiceInited()) {
-        return;
-    }
-
-    MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
-        return;
-    }
-    size_t dataSize = size - sizeof(uint32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(uint32_t), dataSize);
-    dataMessageParcel.RewindRead(0);
-    uint32_t code = static_cast<uint32_t>(size);
-    MessageParcel reply;
-    MessageOption option;
-    DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
-}
-
 void GetUniqueDeviceId(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -78,8 +59,7 @@ void GetUniqueDeviceId(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetUniqueDeviceId(dataMessageParcel, reply);
@@ -94,8 +74,7 @@ void GetMeid(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetMeid(dataMessageParcel, reply);
@@ -110,8 +89,7 @@ void GetBasebandVersion(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetBasebandVersion(dataMessageParcel, reply);
@@ -167,8 +145,7 @@ void GetOperatorNumeric(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetOperatorNumeric(dataMessageParcel, reply);
@@ -183,8 +160,7 @@ void GetOperatorName(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetOperatorName(dataMessageParcel, reply);
@@ -212,7 +188,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    OnRemoteRequest(data, size);
     GetUniqueDeviceId(data, size);
     GetMeid(data, size);
     GetBasebandVersion(data, size);

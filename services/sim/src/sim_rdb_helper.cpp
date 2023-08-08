@@ -120,7 +120,6 @@ int32_t SimRdbHelper::GetDefaultMainCardSlotId()
     result->GetInt(index, mainCardSlotId);
     result->Close();
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return mainCardSlotId;
 }
 
@@ -155,7 +154,6 @@ int32_t SimRdbHelper::GetDefaultMessageCardSlotId()
     result->GetInt(index, messageCardSlotId);
     result->Close();
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return messageCardSlotId;
 }
 
@@ -190,7 +188,6 @@ int32_t SimRdbHelper::GetDefaultCellularDataCardSlotId()
     result->GetInt(index, cellularDataCardSlotId);
     result->Close();
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return cellularDataCardSlotId;
 }
 
@@ -224,7 +221,6 @@ int32_t SimRdbHelper::GetDefaultVoiceCardSlotId()
     result->GetInt(index, voiceCardSlotId);
     result->Close();
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     TELEPHONY_LOGD("voiceCardSlotId = %{public}d", voiceCardSlotId);
     return voiceCardSlotId;
 }
@@ -246,7 +242,6 @@ int32_t SimRdbHelper::SetDefaultMainCard(int32_t simId)
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
     int result = dataShareHelper->Update(defaultUri, predicates, value);
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return result;
 }
 
@@ -267,7 +262,6 @@ int32_t SimRdbHelper::SetDefaultVoiceCard(int32_t simId)
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
     int result = dataShareHelper->Update(defaultUri, predicates, value);
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return result;
 }
 
@@ -288,7 +282,6 @@ int32_t SimRdbHelper::SetDefaultMessageCard(int32_t simId)
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
     int result = dataShareHelper->Update(defaultUri, predicates, value);
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return result;
 }
 
@@ -309,7 +302,6 @@ int32_t SimRdbHelper::SetDefaultCellularData(int32_t simId)
     Uri defaultUri(SimRdbInfo::SIM_RDB_DEFAULT_SET_URI);
     int result = dataShareHelper->Update(defaultUri, predicates, value);
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return result;
 }
 
@@ -327,7 +319,6 @@ int32_t SimRdbHelper::InsertData(int64_t &id, const DataShare::DataShareValuesBu
     }
     int result = Insert(dataShareHelper, values);
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return result;
 }
 
@@ -393,7 +384,6 @@ int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)
     }
     result->Close();
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return TELEPHONY_SUCCESS;
 }
 
@@ -422,7 +412,6 @@ int32_t SimRdbHelper::QueryAllData(std::vector<SimRdbInfo> &vec)
     }
     result->Close();
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return TELEPHONY_SUCCESS;
 }
 
@@ -457,7 +446,6 @@ int32_t SimRdbHelper::QueryAllValidData(std::vector<SimRdbInfo> &vec)
     }
     result->Close();
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return TELEPHONY_SUCCESS;
 }
 
@@ -474,7 +462,6 @@ int32_t SimRdbHelper::UpdateDataBySimId(int32_t simId, const DataShare::DataShar
     }
     int result = Update(dataShareHelper, values, predicates);
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return result;
 }
 
@@ -490,7 +477,6 @@ int32_t SimRdbHelper::UpdateDataByIccId(std::string iccId, const DataShare::Data
     }
     int result = Update(dataShareHelper, values, predicates);
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return result;
 }
 
@@ -508,7 +494,6 @@ int32_t SimRdbHelper::ForgetAllData()
     }
     int result = Update(dataShareHelper, value, predicates);
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return result;
 }
 
@@ -527,7 +512,6 @@ int32_t SimRdbHelper::ForgetAllData(int32_t slotId)
     }
     int result = Update(dataShareHelper, value, predicates);
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return result;
 }
 
@@ -543,7 +527,6 @@ int32_t SimRdbHelper::ClearData()
     }
     int result = Delete(dataShareHelper, predicates);
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return result;
 }
 } // namespace Telephony
