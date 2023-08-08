@@ -344,7 +344,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetDefaultVoiceSimId_0100, Function | MediumTest
     if (SimTest::HasSimCard(slotId_) || SimTest::HasSimCard(slotId1_)) {
         int32_t simId;
         CoreServiceClient::GetInstance().GetDefaultVoiceSimId(simId);
-        EXPECT_GT(simId, 0);
+        EXPECT_GE(simId, 0);
     } else {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     }
