@@ -29,13 +29,13 @@ ohos_shared_library("sim") {
 
   deps = [
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
+    "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
     "//third_party/node:node_header",
   ]
 
   external_deps = [
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
-    "core_service:libtel_common",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
