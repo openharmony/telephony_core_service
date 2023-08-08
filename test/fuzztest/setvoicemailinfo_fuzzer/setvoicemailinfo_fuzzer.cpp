@@ -32,7 +32,6 @@ namespace OHOS {
 static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t LOCK_TYPE = 2;
-constexpr int32_t TWO_INT_NUM = 2;
 constexpr int32_t SLEEP_TIME_SECONDS = 10;
 
 bool IsServiceInited()
@@ -103,8 +102,7 @@ void GetLockState(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(static_cast<int32_t>(size % LOCK_TYPE));
-    size_t dataSize = size - sizeof(int32_t) * TWO_INT_NUM;
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t) * TWO_INT_NUM, dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetLockState(dataMessageParcel, reply);
