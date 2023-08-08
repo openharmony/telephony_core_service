@@ -69,7 +69,6 @@ bool SettingUtils::UnRegisterSettingsObserver(
     }
     settingHelper->UnregisterObserver(uri, dataObserver);
     settingHelper->Release();
-    settingHelper = nullptr;
     TELEPHONY_LOGI("SettingUtils: UnRegisterObserver Success");
     return true;
 }
@@ -84,7 +83,6 @@ bool SettingUtils::RegisterSettingsObserver(
     }
     settingHelper->RegisterObserver(uri, dataObserver);
     settingHelper->Release();
-    settingHelper = nullptr;
     TELEPHONY_LOGI("SettingUtils: RegisterObserver Success");
     return true;
 }
@@ -120,7 +118,6 @@ int32_t SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
     result->GetString(columnIndex, value);
     result->Close();
     settingHelper->Release();
-    settingHelper = nullptr;
     TELEPHONY_LOGI("SettingUtils: query success");
     return TELEPHONY_SUCCESS;
 }
@@ -146,7 +143,6 @@ int32_t SettingUtils::Insert(Uri uri, const std::string &key, const std::string 
     TELEPHONY_LOGI("SettingUtils: insert success");
     settingHelper->NotifyChange(uri);
     settingHelper->Release();
-    settingHelper = nullptr;
     return TELEPHONY_SUCCESS;
 }
 
@@ -175,7 +171,6 @@ int32_t SettingUtils::Update(Uri uri, const std::string &key, const std::string 
     TELEPHONY_LOGI("SettingUtils: update success");
     settingHelper->NotifyChange(uri);
     settingHelper->Release();
-    settingHelper = nullptr;
     return TELEPHONY_SUCCESS;
 }
 
