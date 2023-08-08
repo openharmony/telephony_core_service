@@ -31,7 +31,6 @@ namespace OHOS {
 static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t SIM_TYPE_NUM = 2;
-constexpr int32_t TWO_INT_NUM = 2;
 constexpr int32_t SIZE_LIMIT = 4;
 constexpr int32_t SLEEP_TIME_SECONDS = 10;
 constexpr uint32_t FUCTION_SIZE = 100;
@@ -67,7 +66,7 @@ void OnRemoteRequest(const uint8_t *data, size_t size)
     if (!dataMessageParcel.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
         return;
     }
-    dataMessageParcel.WriteBuffer(data, dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
 
     uint32_t code = (static_cast<uint32_t>(data[0]) << 24) | (static_cast<uint32_t>(data[1]) << 16) |
@@ -192,8 +191,7 @@ void AddIccDiallingNumbers(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(type);
-    size_t dataSize = size - sizeof(int32_t) * TWO_INT_NUM;
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t) * TWO_INT_NUM, dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnAddIccDiallingNumbers(dataMessageParcel, reply);
