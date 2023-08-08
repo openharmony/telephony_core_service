@@ -52,25 +52,6 @@ bool IsServiceInited()
     return g_isInited;
 }
 
-void OnRemoteRequest(const uint8_t *data, size_t size)
-{
-    if (!IsServiceInited()) {
-        return;
-    }
-
-    MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
-        return;
-    }
-    size_t dataSize = size - sizeof(uint32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(uint32_t), dataSize);
-    dataMessageParcel.RewindRead(0);
-    uint32_t code = static_cast<uint32_t>(size);
-    MessageParcel reply;
-    MessageOption option;
-    DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
-}
-
 void GetDefaultVoiceSlotId(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -155,7 +136,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    OnRemoteRequest(data, size);
     GetDefaultVoiceSlotId(data, size);
     GetOperatorConfigs(data, size);
     GetActiveSimAccountInfoList(data, size);
