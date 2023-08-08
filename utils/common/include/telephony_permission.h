@@ -93,6 +93,10 @@ static constexpr const char *CONNECT_CELLULAR_CALL_SERVICE = "ohos.permission.CO
  * This permission indicates being allowed to connect IMS service.
  */
 static constexpr const char *CONNECT_IMS_SERVICE = "ohos.permission.CONNECT_IMS_SERVICE";
+/**
+ * This permission indicates being allowed to receive mms.
+ */
+static constexpr const char *RECEIVE_MMS = "ohos.permission.RECEIVE_MMS";
 } // namespace Permission
 
 class TelephonyPermission {
