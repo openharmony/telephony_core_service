@@ -32,7 +32,6 @@ namespace OHOS {
 static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t TYPE_NUM = 2;
-constexpr int32_t TWO_INT_NUM = 2;
 constexpr int32_t SLEEP_TIME_SECONDS = 10;
 constexpr int32_t SIM_AUTH_EAP_SIM_TYPE = 128;
 constexpr int32_t SIM_AUTH_EAP_AKA_TYPE = 129;
@@ -55,25 +54,6 @@ bool IsServiceInited()
     return g_isInited;
 }
 
-void OnRemoteRequest(const uint8_t *data, size_t size)
-{
-    if (!IsServiceInited()) {
-        return;
-    }
-
-    MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
-        return;
-    }
-    size_t dataSize = size - sizeof(uint32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(uint32_t), dataSize);
-    dataMessageParcel.RewindRead(0);
-    uint32_t code = static_cast<uint32_t>(size);
-    MessageParcel reply;
-    MessageOption option;
-    DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
-}
-
 void GetSimTelephoneNumber(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -83,8 +63,7 @@ void GetSimTelephoneNumber(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetSimPhoneNumber(dataMessageParcel, reply);
@@ -99,8 +78,7 @@ void GetVoiceMailIdentifier(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetVoiceMailInfor(dataMessageParcel, reply);
@@ -115,8 +93,7 @@ void GetVoiceMailNumber(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetVoiceMailNumber(dataMessageParcel, reply);
@@ -132,8 +109,7 @@ void QueryIccDiallingNumbers(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(static_cast<int32_t>(size % TYPE_NUM));
-    size_t dataSize = size - sizeof(int32_t) * TWO_INT_NUM;
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t) * TWO_INT_NUM, dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnDiallingNumbersGet(dataMessageParcel, reply);
@@ -188,7 +164,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    OnRemoteRequest(data, size);
     GetSimTelephoneNumber(data, size);
     GetVoiceMailIdentifier(data, size);
     GetVoiceMailNumber(data, size);
