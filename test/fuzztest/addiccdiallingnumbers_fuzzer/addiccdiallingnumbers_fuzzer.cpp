@@ -33,6 +33,7 @@ constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t SIM_TYPE_NUM = 2;
 constexpr int32_t TWO_INT_NUM = 2;
 constexpr int32_t SLEEP_TIME_SECONDS = 10;
+constexpr uint32_t FUCTION_SIZE = 100;
 
 bool IsServiceInited()
 {
@@ -57,14 +58,20 @@ void OnRemoteRequest(const uint8_t *data, size_t size)
         return;
     }
 
+    if (size < 4) {
+        return;
+    }
+
     MessageParcel dataMessageParcel;
     if (!dataMessageParcel.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
         return;
     }
-    size_t dataSize = size - sizeof(uint32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(uint32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, dataSize);
     dataMessageParcel.RewindRead(0);
-    uint32_t code = static_cast<uint32_t>(size);
+
+    uint32_t code = (static_cast<uint32_t>(data[0]) << 24) | (static_cast<uint32_t>(data[1]) << 16) |
+                    (static_cast<uint32_t>(data[2]) << 8) | (static_cast<uint32_t>(data[3])) % FUCTION_SIZE;
+
     MessageParcel reply;
     MessageOption option;
     DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
