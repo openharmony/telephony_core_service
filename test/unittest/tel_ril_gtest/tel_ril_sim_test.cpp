@@ -754,8 +754,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SendEnvelopeCmdTest_0201, Function | Mediu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SendCallSetupRequestResultTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(
-        static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT), SLOT_ID_0, GetHandler());
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT), SLOT_ID_0,
+                GetHandler());
     return;
 }
 
@@ -766,8 +766,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SendCallSetupRequestResultTest_0101, Funct
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SendCallSetupRequestResultTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(
-        static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT), SLOT_ID_1, GetHandler());
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_CALL_SETUP_REQUEST_RESULT), SLOT_ID_1,
+                GetHandler());
     return;
 }
 #endif // TEL_TEST_UNSUPPORT

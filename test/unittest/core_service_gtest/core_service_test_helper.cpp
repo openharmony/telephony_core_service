@@ -14,8 +14,8 @@
  */
 
 #include "core_service_test_helper.h"
-#include <thread>
 #include "telephony_log_wrapper.h"
+#include <thread>
 
 namespace OHOS {
 namespace Telephony {
@@ -73,5 +73,5 @@ std::string CoreServiceTestHelper::GetStringResult()
 {
     return strResult_;
 }
-} // Telephony
-} // OHOS
+} // namespace Telephony
+} // namespace OHOS

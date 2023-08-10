@@ -154,8 +154,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetLinkCapabilityTest_0201, Function | Med
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetLinkBandwidthReportingRuleTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(
-        static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE), SLOT_ID_0, GetHandler());
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE), SLOT_ID_0,
+                GetHandler());
 }
 
 /**
@@ -165,8 +165,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetLinkBandwidthReportingRuleTest_0101, Fu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetLinkBandwidthReportingRuleTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(
-        static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE), SLOT_ID_1, GetHandler());
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE), SLOT_ID_1,
+                GetHandler());
 }
 
 /**

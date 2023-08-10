@@ -45,17 +45,17 @@ constexpr int32_t MAX_BUF_SIZE = 255;
 constexpr int32_t WAIT_TELEPHONY_RETART_TIME = 60;
 const int BANDWIDTH_HYSTERESIS_MS = 3000;
 const int BANDWIDTH_HYSTERESIS_KBPS = 50;
-const int MAX_DOWNLINK_LINK_BANDWIDTH[] = { 100, // VoIP
-    500, // Web
-    1000, // SD
-    5000, // HD
-    10000, // file
-    20000, // 4K
-    50000, // LTE
-    100000,
-    200000, // 5G
-    500000, 1000000 };
-const int MAX_UPLINK_LINK_BANDWIDTH[] = { 100, 500, 1000, 5000, 10000, 20000, 50000, 100000, 200000 };
+const int MAX_DOWNLINK_LINK_BANDWIDTH[] = {100,   // VoIP
+                                           500,   // Web
+                                           1000,  // SD
+                                           5000,  // HD
+                                           10000, // file
+                                           20000, // 4K
+                                           50000, // LTE
+                                           100000,
+                                           200000, // 5G
+                                           500000, 1000000};
+const int MAX_UPLINK_LINK_BANDWIDTH[] = {100, 500, 1000, 5000, 10000, 20000, 50000, 100000, 200000};
 // send "test"
 const std::string TEST_PDU = "A10305810180F6000004F4F29C0E";
 // leave blank, smsc will be acquired automatically
@@ -519,16 +519,16 @@ void TelRilTest::EnterSimPinTest(int32_t slotId, std::shared_ptr<AppExecFwk::Eve
  */
 void TelRilTest::EnterErrorPinTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
 {
-        int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SIM_ENTER_PIN);
-        auto event = AppExecFwk::InnerEvent::Get(eventId);
-        if (event != nullptr && telRilManager_ != nullptr) {
-            event->SetOwner(handler);
-            std::string pin = "1111";
-            TELEPHONY_LOGI("TelRilTest::EnterErrorPinTest -->");
-            telRilManager_->UnlockPin(slotId, pin, event);
-            TELEPHONY_LOGI("TelRilTest::EnterErrorPinTest --> finished");
-            bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
-            ASSERT_TRUE(syncResult);
+    int32_t eventId = static_cast<int32_t>(RadioEvent::RADIO_SIM_ENTER_PIN);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        std::string pin = "1111";
+        TELEPHONY_LOGI("TelRilTest::EnterErrorPinTest -->");
+        telRilManager_->UnlockPin(slotId, pin, event);
+        TELEPHONY_LOGI("TelRilTest::EnterErrorPinTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
     }
 }
 
@@ -2199,8 +2199,8 @@ void TelRilTest::SetVoNRSwitchTest(int32_t slotId, std::shared_ptr<AppExecFwk::E
  *
  * @param handler
  */
-void TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest(
-    int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+void TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest(int32_t slotId,
+                                                            std::shared_ptr<AppExecFwk::EventHandler> handler)
 {
     int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE);
     auto event = AppExecFwk::InnerEvent::Get(eventId);
@@ -2284,8 +2284,10 @@ bool TelRilTest::DemoHandler::GetBoolResult(int32_t eventId)
 {
     bool ret = false;
     if (eventId_ == 0) {
-        TELEPHONY_LOGI("Ril interface response timeout, not implemented."
-            "eventId: %{public}d, current eventId: %{public}d", eventId, eventId_);
+        TELEPHONY_LOGI(
+            "Ril interface response timeout, not implemented."
+            "eventId: %{public}d, current eventId: %{public}d",
+            eventId, eventId_);
         ret = true;
         Clean();
         return ret;
@@ -2293,13 +2295,12 @@ bool TelRilTest::DemoHandler::GetBoolResult(int32_t eventId)
     if (eventId_ != eventId) {
         ret = false;
         TELEPHONY_LOGI("GetBoolResult eventId does not match. eventId: %{public}d, current eventId: %{public}d",
-            eventId, eventId_);
+                       eventId, eventId_);
         Clean();
         return ret;
     }
     if ((resultInfo_ != nullptr) &&
-        ((resultInfo_->error == HRilErrType::NONE) ||
-         (resultInfo_->error == HRilErrType::HRIL_ERR_GENERIC_FAILURE) ||
+        ((resultInfo_->error == HRilErrType::NONE) || (resultInfo_->error == HRilErrType::HRIL_ERR_GENERIC_FAILURE) ||
          (resultInfo_->error == HRilErrType::HRIL_ERR_INVALID_RESPONSE) ||
          (resultInfo_->error == HRilErrType::HRIL_ERR_INVALID_MODEM_PARAMETER))) {
         ret = true;
@@ -2338,8 +2339,9 @@ void TelRilTest::DemoHandler::ProcessResponseInfo(const AppExecFwk::InnerEvent::
                 if (addr != nullptr) {
                     g_smscAddr = addr->address;
                     g_tosca = addr->tosca;
-                    TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> g_smscAddr=%{public}s,"
-                                   "g_tosca=%{public}d",
+                    TELEPHONY_LOGI(
+                        "TelRilTest::DemoHandler::ProcessResponseInfo --> g_smscAddr=%{public}s,"
+                        "g_tosca=%{public}d",
                         g_smscAddr.c_str(), g_tosca);
                 } else {
                     TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> get resultInfo_");
