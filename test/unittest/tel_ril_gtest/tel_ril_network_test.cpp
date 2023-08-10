@@ -54,8 +54,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_NetworkOperatorTest_0201, Function | Mediu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_NetworkVoiceRegistrationStateTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(
-        static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE), SLOT_ID_0, GetHandler());
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE), SLOT_ID_0,
+                GetHandler());
     return;
 }
 
@@ -66,8 +66,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_NetworkVoiceRegistrationStateTest_0101, Fu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_NetworkVoiceRegistrationStateTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(
-        static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE), SLOT_ID_1, GetHandler());
+    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE), SLOT_ID_1,
+                GetHandler());
     return;
 }
 
