@@ -12,6 +12,13 @@
 # limitations under the License.
 import("//build/ohos.gni")
 
+ohos_prebuilt_etc("telephony_trust") {
+  source = "telephony_trust.json"
+  module_install_dir = "profile"
+  part_name = "core_service"
+  subsystem_name = "telephony"
+}
+
 ## Install telephony.cfg to /system/etc/init/telephony.cfg
 ohos_prebuilt_etc("telephony.cfg") {
   source = "telephony.cfg"
