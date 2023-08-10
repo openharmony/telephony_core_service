@@ -1004,7 +1004,8 @@ int32_t CoreService::GetSimTelephoneNumber(int32_t slotId, std::u16string &telep
         TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
-    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+    if ((!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) &&
+        (!TelephonyPermission::CheckPermission(Permission::GET_PHONE_NUMBERS))) {
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
