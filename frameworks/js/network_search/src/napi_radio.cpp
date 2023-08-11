@@ -2059,7 +2059,7 @@ static napi_value GetCellInformation(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_create_string_utf8(env, "GetCellInformation", NAPI_AUTO_LENGTH, &resourceName));
     NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, NativeGetCellInformation,
                        GetCellInformationCallback, static_cast<void *>(asyncContext), &(asyncContext->work)));
-    NAPI_CALL(env, napi_queue_async_work(env, asyncContext->work));
+    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncContext->work, napi_qos_default));
     return result;
 }
 
