@@ -274,12 +274,12 @@ napi_value NapiUtil::HandleAsyncWork(napi_env env, BaseContext *baseContext, con
     NAPI_CALL(env, napi_create_string_utf8(env, workName.data(), NAPI_AUTO_LENGTH, &resourceName));
     NAPI_CALL(env,
         napi_create_async_work(env, resource, resourceName, execute, complete, (void *)context.get(), &context->work));
-    napi_status queueWorkStatus = napi_queue_async_work(env, context->work);
+    napi_status queueWorkStatus = napi_queue_async_work_with_qos(env, context->work, napi_qos_default);
     if (queueWorkStatus == napi_ok) {
         context.release();
     } else {
         std::string errorCode = std::to_string(queueWorkStatus);
-        std::string errorMessage = "error at napi_queue_async_work";
+        std::string errorMessage = "error at napi_queue_async_work_with_qos";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
     }
     TELEPHONY_LOGD("NapiUtil HandleAsyncWork end");

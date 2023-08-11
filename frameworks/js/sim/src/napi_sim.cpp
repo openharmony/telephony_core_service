@@ -84,7 +84,7 @@ napi_value NapiCreateAsyncWork(napi_env env, napi_callback_info info, std::strin
     NAPI_CALL(env,
         napi_create_async_work(
             env, nullptr, resourceName, exec, complete, static_cast<void *>(pContext), &context.work));
-    if (napi_queue_async_work(env, context.work) != napi_ok) {
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
         delete pContext;
         result = nullptr;
     }
@@ -471,7 +471,7 @@ napi_value GetDefaultVoiceSlotId(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncDefaultSlotId>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -517,7 +517,7 @@ napi_value GetDefaultVoiceSimId(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncDefaultSimId>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -974,7 +974,7 @@ napi_value GetSimAccountInfo(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncIccAccountInfo>(para, iccAccountInfo, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -1062,7 +1062,7 @@ napi_value UnlockPin(napi_env env, napi_callback_info info)
     napi_value result = NapiCreateAsyncWork2<AsyncContextPIN>(para, pinContext, initPara);
     if (result) {
         pinContext->inStr1 = std::string(tmpStr);
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -1121,7 +1121,7 @@ napi_value UnlockPuk(napi_env env, napi_callback_info info)
     if (result) {
         pukContext->inStr1 = std::string(tmpStr1);
         pukContext->inStr2 = std::string(tmpStr2);
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -1182,7 +1182,7 @@ napi_value AlterPin(napi_env env, napi_callback_info info)
     if (result) {
         alterPinContext->inStr1 = std::string(tmpStr1);
         alterPinContext->inStr2 = std::string(tmpStr2);
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -1242,7 +1242,7 @@ napi_value SetLockState(napi_env env, napi_callback_info info)
     napi_value result = NapiCreateAsyncWork2<AsyncContextPIN>(para, asyncContextPIN, initPara);
     if (result) {
         PinInfoParaAnalyze(env, object, *asyncContextPIN);
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -1360,7 +1360,7 @@ napi_value SetShowName(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncContext2>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -1443,7 +1443,7 @@ napi_value SetShowNumber(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncContext2>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -1536,7 +1536,7 @@ napi_value UnlockPin2(napi_env env, napi_callback_info info)
     napi_value result = NapiCreateAsyncWork2(para, pinContext, initPara);
     if (result) {
         pinContext->inStr1 = std::string(tmpStr);
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -1597,7 +1597,7 @@ napi_value UnlockPuk2(napi_env env, napi_callback_info info)
     if (result) {
         pinContext->inStr1 = std::string(tmpStr1);
         pinContext->inStr2 = std::string(tmpStr2);
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -1656,7 +1656,7 @@ napi_value AlterPin2(napi_env env, napi_callback_info info)
     if (result) {
         pinContext->inStr1 = std::string(tmpStr1);
         pinContext->inStr2 = std::string(tmpStr2);
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -1720,7 +1720,7 @@ napi_value GetOperatorConfigs(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncOperatorConfig>(para, crrierConfig, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -1774,7 +1774,7 @@ napi_value GetActiveSimAccountInfoList(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncIccAccountInfo>(para, accountInfo, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -1840,7 +1840,7 @@ napi_value QueryIccDiallingNumbers(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncDiallingNumbers<napi_value>>(para, diallingNumbers, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -1897,7 +1897,7 @@ napi_value AddIccDiallingNumbers(napi_env env, napi_callback_info info)
         TelNumbersInfo inputInfo;
         DiallingNumberParaAnalyze(env, object, inputInfo);
         diallingNumbers->infoVec.push_back(std::move(inputInfo));
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -1952,7 +1952,7 @@ napi_value DelIccDiallingNumbers(napi_env env, napi_callback_info info)
         TelNumbersInfo inputInfo;
         DiallingNumberParaAnalyze(env, object, inputInfo);
         diallingNumbers->infoVec.push_back(std::move(inputInfo));
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -2009,7 +2009,7 @@ napi_value UpdateIccDiallingNumbers(napi_env env, napi_callback_info info)
         TelNumbersInfo inputInfo;
         DiallingNumberParaAnalyze(env, object, inputInfo);
         diallingNumbers->infoVec.push_back(std::move(inputInfo));
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -2060,7 +2060,7 @@ napi_value SetVoiceMailInfo(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncVoiceMail>(para, mailContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -2107,7 +2107,7 @@ napi_value SendEnvelopeCmd(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncContext2>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -2154,7 +2154,7 @@ napi_value SendTerminalResponseCmd(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncContext2>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -2200,7 +2200,7 @@ napi_value AcceptCallSetupRequest(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncStkCallSetupResult>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -2246,7 +2246,7 @@ napi_value RejectCallSetupRequest(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncStkCallSetupResult>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -2374,7 +2374,7 @@ napi_value GetLockState(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncGetLockState>(para, lockStateContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
@@ -2470,7 +2470,7 @@ napi_value UnlockSimLock(napi_env env, napi_callback_info info)
     napi_value result = NapiCreateAsyncWork2<AsyncContextPIN>(para, asyncContextPIN, initPara);
     if (result) {
         PersoLockInfoAnalyze(env, object, *asyncContextPIN);
-        NAPI_CALL(env, napi_queue_async_work(env, context.work));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
