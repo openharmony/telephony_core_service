@@ -108,8 +108,7 @@ int32_t NapiImsRegInfoCallbackManager::ReportImsRegInfoInner(
     dataWorker->callback = stateCallback;
     uv_work_t *work = new uv_work_t();
     work->data = (void *)(dataWorker);
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportImsRegInfoWork);
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportImsRegInfoWork, uv_qos_default);
     return TELEPHONY_SUCCESS;
 }
 
