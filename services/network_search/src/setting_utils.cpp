@@ -25,6 +25,7 @@ using namespace AppExecFwk;
 
 const std::string SettingUtils::NETWORK_SEARCH_SETTING_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+static const std::string NETWORK_SEARCH_SETTING_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 const std::string SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIME_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=auto_time";
 const std::string SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI =
@@ -56,7 +57,7 @@ std::shared_ptr<DataShare::DataShareHelper> SettingUtils::CreateDataShareHelper(
         TELEPHONY_LOGE("SettingUtils: GetSystemAbility Service Failed.");
         return nullptr;
     }
-    return DataShare::DataShareHelper::Creator(remoteObj, NETWORK_SEARCH_SETTING_URI);
+    return DataShare::DataShareHelper::Creator(remoteObj, NETWORK_SEARCH_SETTING_URI, NETWORK_SEARCH_SETTING_EXT_URI);
 }
 
 bool SettingUtils::UnRegisterSettingsObserver(
