@@ -27,6 +27,7 @@ ohos_unittest("tel_core_service_gtest") {
     "ims_reg_info_callback_gtest.cpp",
     "network_search_test.cpp",
     "network_search_test_callback_stub.cpp",
+    "security_token.cpp",
     "sim_core_service_test.cpp",
     "sim_elementary_file_test.cpp",
     "sim_icc_test.cpp",
@@ -35,6 +36,8 @@ ohos_unittest("tel_core_service_gtest") {
     "sim_test_util.cpp",
     "sim_type_convert_test.cpp",
     "zero_branch_test.cpp",
+    "zero_branch_test_core_service.cpp",
+    "zero_branch_test_sim_ril.cpp",
   ]
 
   include_dirs = [
