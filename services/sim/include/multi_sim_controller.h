@@ -41,7 +41,6 @@ public:
     void Init();
     bool InitData(int32_t slotId);
     void SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager);
-    bool RefreshActiveIccAccountInfoList();
     int32_t GetDefaultVoiceSlotId();
     int32_t SetDefaultVoiceSlotId(int32_t slotId);
     int32_t GetDefaultSmsSlotId();
@@ -86,6 +85,7 @@ private:
     bool AnnounceDefaultSmsSimIdChanged(int32_t simId);
     bool AnnounceDefaultCellularDataSimIdChanged(int32_t simId);
     bool PublishSimFileEvent(const AAFwk::Want &want, int eventCode, const std::string &eventData);
+    bool RefreshActiveIccAccountInfoList();
 
 private:
     int32_t maxCount_ = 0;
