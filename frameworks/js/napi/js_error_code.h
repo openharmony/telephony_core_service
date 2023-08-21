@@ -83,6 +83,16 @@ enum JsErrorCode {
     JS_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE,
 
     /**
+     * Conference call is exceed limit.
+     */
+    JS_ERROR_TELEPHONY_CONFERENCE_EXCEED_LIMIT,
+
+    /**
+     * Conference call is not active.
+     */
+    JS_ERROR_TELEPHONY_CONFERENCE_CALL_NOT_ACTIVE,
+
+    /**
      * Unknown error code.
      */
     JS_ERROR_TELEPHONY_UNKNOW_ERROR = 8300999,
