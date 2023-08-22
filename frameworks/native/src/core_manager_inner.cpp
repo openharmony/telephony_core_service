@@ -183,12 +183,12 @@ int32_t CoreManagerInner::SetUssd(int32_t slotId, int32_t eventId, const std::st
     const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("set ussd telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("set ussd response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -199,12 +199,12 @@ int32_t CoreManagerInner::CloseUnFinishedUssd(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("close unfinished ussd telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("close unfinished ussd response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -215,12 +215,12 @@ int32_t CoreManagerInner::GetUssd(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get ussd telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get ussd response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -231,12 +231,12 @@ int32_t CoreManagerInner::GetMute(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get mute telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get mute response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -247,12 +247,12 @@ int32_t CoreManagerInner::SetMute(
     int32_t slotId, int32_t eventId, int32_t mute, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("set mute telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("set mute response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -263,12 +263,12 @@ int32_t CoreManagerInner::GetEmergencyCallList(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get emergency call list telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get emergency call list response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -280,12 +280,12 @@ int32_t CoreManagerInner::SetEmergencyCallList(int32_t slotId, int32_t eventId, 
 {
     TELEPHONY_LOGI("SetEmergencyCallList start");
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("set emergency call list telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("set emergency call list response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -296,12 +296,12 @@ int32_t CoreManagerInner::GetCallFailReason(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get call fail reason telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get call fail reason response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -312,12 +312,12 @@ int32_t CoreManagerInner::SetCallPreferenceMode(
     int32_t slotId, int32_t eventId, int32_t mode, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("set call preference mode telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("set call preference mode response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -328,12 +328,12 @@ int32_t CoreManagerInner::GetCallPreferenceMode(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get call preference mode telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get call preference mode response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -344,12 +344,12 @@ int32_t CoreManagerInner::SetPreferredNetworkPara(int32_t slotId, int32_t eventI
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("set preferred network telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("set preferred network response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -360,12 +360,12 @@ int32_t CoreManagerInner::GetPreferredNetworkPara(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get preferred network telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get preferred network response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -376,12 +376,12 @@ int32_t CoreManagerInner::GetOperatorInfo(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get operator info telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get operator info response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -392,12 +392,12 @@ int32_t CoreManagerInner::GetCellInfoList(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get cell info list telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get cell info list response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -408,12 +408,12 @@ int32_t CoreManagerInner::GetCurrentCellInfo(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get current cell info telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get current cell info response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -424,12 +424,12 @@ int32_t CoreManagerInner::SendGsmSms(int32_t slotId, int32_t eventId, GsmSimMess
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("send gsm sms telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId, gsmMessage.refId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("send gsm sms response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -440,12 +440,12 @@ int32_t CoreManagerInner::SendCdmaSms(int32_t slotId, int32_t eventId, std::stri
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("send cdma sms telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId, refId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("send cdma sms response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -456,12 +456,12 @@ int32_t CoreManagerInner::AddSimMessage(int32_t slotId, int32_t eventId, const S
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("add sim message telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("add sim message response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -472,12 +472,12 @@ int32_t CoreManagerInner::DelSimMessage(
     int32_t slotId, int32_t eventId, int32_t gsmIndex, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("delete sim message telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("delete sim message response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -488,12 +488,12 @@ int32_t CoreManagerInner::GetSmscAddr(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get smsc address telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get smsc address response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -504,12 +504,12 @@ int32_t CoreManagerInner::SetSmscAddr(int32_t slotId, int32_t eventId, int32_t t
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("set smsc address telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("set smsc address response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -520,12 +520,12 @@ int32_t CoreManagerInner::SetCBConfig(int32_t slotId, int32_t eventId, const CBC
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("set CB config telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("set CB config response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -536,12 +536,12 @@ int32_t CoreManagerInner::SetCdmaCBConfig(int32_t slotId, int32_t eventId, CdmaC
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("set cdma CB config telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("set cdma CB config response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -552,12 +552,12 @@ int32_t CoreManagerInner::GetCBConfig(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get CB config telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get CB config response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -568,12 +568,12 @@ int32_t CoreManagerInner::GetCdmaCBConfig(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get cdma CB config telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get cdma CB config response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -584,12 +584,12 @@ int32_t CoreManagerInner::SendSmsMoreMode(int32_t slotId, int32_t eventId, GsmSi
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("send sms more mode telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId, gsmMessage.refId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("send sms more mode response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -600,12 +600,12 @@ int32_t CoreManagerInner::SendSmsAck(int32_t slotId, int32_t eventId, bool succe
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("send sms ack telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("send sms ack response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -616,12 +616,12 @@ int32_t CoreManagerInner::AddCdmaSimMessage(int32_t slotId, int32_t eventId, int
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("add cdma sim message telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("add cdma sim message response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -632,12 +632,12 @@ int32_t CoreManagerInner::DelCdmaSimMessage(
     int32_t slotId, int32_t eventId, int32_t cdmaIndex, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("delete cdma sim message telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("delete cdma sim message response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -648,12 +648,12 @@ int32_t CoreManagerInner::UpdateCdmaSimMessage(int32_t slotId, int32_t eventId, 
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("update cdma sim message telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("update cdma sim message response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -664,12 +664,12 @@ int32_t CoreManagerInner::GetNetworkSearchInformation(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get network search information telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get network search information response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -680,12 +680,12 @@ int32_t CoreManagerInner::GetNetworkSelectionMode(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get network selection mode telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get network selection mode response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -696,12 +696,12 @@ int32_t CoreManagerInner::SetNetworkSelectionMode(int32_t slotId, int32_t eventI
     std::string oper, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("set network selection mode telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("set network selection mode response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -712,12 +712,12 @@ int32_t CoreManagerInner::SetRadioState(
     int32_t slotId, int32_t eventId, int fun, int rst, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("set radio state telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("set radio state response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -728,12 +728,12 @@ int32_t CoreManagerInner::GetRadioState(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get radio state telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get radio state response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -744,12 +744,12 @@ int32_t CoreManagerInner::ShutDown(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("shut down telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("shut down response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -760,12 +760,12 @@ int32_t CoreManagerInner::Dial(int32_t slotId, int32_t eventId, std::string addr
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("dial telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("dial response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -776,12 +776,12 @@ int32_t CoreManagerInner::Reject(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("reject call telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("reject call response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -792,12 +792,12 @@ int32_t CoreManagerInner::Hangup(
     int32_t slotId, int32_t eventId, int32_t gsmIndex, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("hung up call telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("hung up call response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -808,12 +808,12 @@ int32_t CoreManagerInner::Answer(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("answer call telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("answer call response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -824,12 +824,12 @@ int32_t CoreManagerInner::GetCallList(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get call list telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get call list response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -840,12 +840,12 @@ int32_t CoreManagerInner::HoldCall(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("hold call telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("hold call response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -856,12 +856,12 @@ int32_t CoreManagerInner::UnHoldCall(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("unhold call telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("unhold call response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -872,12 +872,12 @@ int32_t CoreManagerInner::SwitchCall(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("switch call telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("switch call response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -888,12 +888,12 @@ int32_t CoreManagerInner::CombineConference(
     int32_t slotId, int32_t eventId, int32_t callType, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("combine conference telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("combine conference response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -904,12 +904,12 @@ int32_t CoreManagerInner::SeparateConference(int32_t slotId, int32_t eventId, in
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("separate conference telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("separate conference response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -920,12 +920,12 @@ int32_t CoreManagerInner::CallSupplement(
     int32_t slotId, int32_t eventId, int32_t type, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("call supplement telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("call supplement response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1041,12 +1041,12 @@ int32_t CoreManagerInner::SetVoNRSwitch(
     int32_t slotId, int32_t state, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("set NR voice switch telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("set NR voice switch response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1057,12 +1057,12 @@ int32_t CoreManagerInner::SendDTMF(int32_t slotId, int32_t eventId, const DtmfPa
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("send DTMF telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("send DTMF response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1073,12 +1073,12 @@ int32_t CoreManagerInner::SendDTMF(int32_t slotId, int32_t eventId, char cDTMFCo
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("send DTMF telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId, index);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("send DTMF response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1089,12 +1089,12 @@ int32_t CoreManagerInner::StartDTMF(int32_t slotId, int32_t eventId, char cDTMFC
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("start DTMF telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("start DTMF response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1105,12 +1105,12 @@ int32_t CoreManagerInner::StopDTMF(
     int32_t slotId, int32_t eventId, int32_t index, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("stop DTMF telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("stop DTMF response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1121,12 +1121,12 @@ int32_t CoreManagerInner::SetDataPermitted(
     int32_t slotId, int32_t eventId, int32_t dataPermitted, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("set data permitted telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("set data permitted response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1137,12 +1137,12 @@ int32_t CoreManagerInner::SetInitApnInfo(int32_t slotId, int32_t eventId, const 
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("set init apn info telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("set init apn info response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1153,12 +1153,12 @@ int32_t CoreManagerInner::ActivatePdpContext(int32_t slotId, int32_t eventId, co
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("activate pdp context telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId, activateData.param);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("activate pdp context response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1169,12 +1169,12 @@ int32_t CoreManagerInner::DeactivatePdpContext(int32_t slotId, int32_t eventId,
     const DeactivateDataParam &deactivateData, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("deactivate pdp context telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId, deactivateData.param);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("deactivate pdp context response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1185,12 +1185,12 @@ int32_t CoreManagerInner::GetPdpContextList(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get pdp context list telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get pdp context list response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1201,12 +1201,12 @@ int32_t CoreManagerInner::SetLinkBandwidthReportingRule(int32_t slotId, int32_t 
     LinkBandwidthRule linkBandwidth, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("set link bandwidth reporting rule telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("set link bandwidth reporting rule response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1217,12 +1217,12 @@ int32_t CoreManagerInner::GetLinkBandwidthInfo(
     int32_t slotId, int32_t eventId, const int32_t cid, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get link bandwidth info telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get link bandwidth info response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1233,12 +1233,12 @@ int32_t CoreManagerInner::GetLinkCapability(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get link capability telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get link capability response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1249,12 +1249,12 @@ int32_t CoreManagerInner::GetSignalStrength(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get signal strength telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get signal strength response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1265,12 +1265,12 @@ int32_t CoreManagerInner::GetCsRegStatus(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get cs register status telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get cs register status response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
@@ -1281,12 +1281,12 @@ int32_t CoreManagerInner::GetPsRegStatus(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager is null!");
+        TELEPHONY_LOGE("get ps register status telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
+        TELEPHONY_LOGE("get ps register status response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
