@@ -625,5 +625,90 @@ HWTEST_F(SimRilBranchTest, Telephony_SimManager_001, Function | MediumTest | Lev
     EXPECT_GT(simManager->GetDefaultSmsSlotId(), TELEPHONY_PERMISSION_ERROR);
     RunnerPool::GetInstance().commonRunner_ = RunnerPool::GetInstance().CreateRunner("CoreServiceCommonRunner");
 }
+
+AppExecFwk::InnerEvent::Pointer GetControllerToFileMsgEvent(int32_t code, bool withException)
+{
+    auto objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
+    objectUnique->resultData = "123456";
+    if (withException) {
+        objectUnique->exception = std::make_shared<int32_t>(0);
+    }
+    return AppExecFwk::InnerEvent::Get(code, objectUnique);
+}
+
+AppExecFwk::InnerEvent::Pointer GetDiallingNumbersHandlerResultEvent(int32_t code, bool withException)
+{
+    auto objectUnique = std::make_unique<DiallingNumbersHandlerResult>(nullptr);
+    objectUnique->result = std::make_shared<DiallingNumbersInfo>();
+    if (withException) {
+        objectUnique->exception = std::make_shared<int32_t>(0);
+    }
+    return AppExecFwk::InnerEvent::Get(code, objectUnique);
+}
+
+/**
+ * @tc.number   Telephony_SimFile_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_SimFile_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<AppExecFwk::EventRunner> runner = nullptr;
+    std::shared_ptr<SimStateManager> simStateManager = nullptr;
+    auto simFile = std::make_shared<SimFile>(runner, simStateManager);
+    std::vector<int> testCase1 = { MSG_SIM_OBTAIN_GID1_DONE, MSG_SIM_OBTAIN_GID2_DONE, MSG_SIM_SET_MSISDN_DONE,
+        MSG_SIM_OBTAIN_SPDI_DONE, MSG_SIM_OBTAIN_CFIS_DONE, MSG_SIM_OBTAIN_MWIS_DONE,
+        MSG_SIM_OBTAIN_VOICE_MAIL_INDICATOR_CPHS_DONE, MSG_SIM_OBTAIN_ICCID_DONE, MSG_SIM_OBTAIN_CFF_DONE,
+        MSG_SIM_OBTAIN_CFF_DONE, MSG_SIM_OBTAIN_AD_DONE, MSG_SIM_SMS_ON_SIM, MSG_SIM_OBTAIN_ALL_SMS_DONE,
+        MSG_SIM_OBTAIN_SMS_DONE, MSG_SIM_OBTAIN_PLMN_W_ACT_DONE, MSG_SIM_OBTAIN_OPLMN_W_ACT_DONE,
+        MSG_SIM_OBTAIN_CSP_CPHS_DONE, MSG_SIM_OBTAIN_INFO_CPHS_DONE, MSG_SIM_OBTAIN_SST_DONE, MSG_SIM_OBTAIN_PNN_DONE,
+        MSG_SIM_OBTAIN_OPL_DONE, MSG_SIM_OBTAIN_OPL5G_DONE, MSG_SIM_UPDATE_DONE, MSG_SIM_OBTAIN_HPLMN_W_ACT_DONE,
+        MSG_SIM_OBTAIN_EHPLMN_DONE, MSG_SIM_OBTAIN_FPLMN_DONE };
+    for (int32_t code : testCase1) {
+        auto event1 = GetControllerToFileMsgEvent(code, true);
+        simFile->ProcessEvent(event1);
+        if (code == MSG_SIM_SMS_ON_SIM) {
+            continue;
+        }
+        auto event2 = GetControllerToFileMsgEvent(code, false);
+        simFile->ProcessEvent(event2);
+    }
+    std::vector<int> testCase2 = { MSG_SIM_OBTAIN_MSISDN_DONE, MSG_SIM_OBTAIN_CPHS_MAILBOX_DONE,
+        MSG_SIM_SET_CPHS_MAILBOX_DONE, MSG_SIM_SET_MBDN_DONE };
+    simFile->cphsInfo_ = "";
+    for (int32_t code : testCase2) {
+        auto event1 = GetDiallingNumbersHandlerResultEvent(code, false);
+        simFile->ProcessEvent(event1);
+        auto event2 = GetDiallingNumbersHandlerResultEvent(code, true);
+        simFile->ProcessEvent(event2);
+    }
+    int32_t efCfisSize = 0;
+    std::string efCfisStr = "1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF";
+    std::string number = "123456789111111";
+    std::shared_ptr<unsigned char> efCfisData = SIMUtils::HexStringConvertToBytes(efCfisStr, efCfisSize);
+    ASSERT_TRUE(simFile->FillNumber(efCfisData, efCfisSize, number));
+    efCfisStr = "1234";
+    efCfisData = SIMUtils::HexStringConvertToBytes(efCfisStr, efCfisSize);
+    ASSERT_FALSE(simFile->FillNumber(efCfisData, efCfisSize, number));
+}
+
+/**
+ * @tc.number   Telephony_SimFile_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_SimFile_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<AppExecFwk::EventRunner> runner = nullptr;
+    std::shared_ptr<SimStateManager> simStateManager = nullptr;
+    auto simFile = std::make_shared<SimFile>(runner, simStateManager);
+    int32_t voiceMailCount = 2;
+    simFile->SetVoiceMailCount(voiceMailCount);
+    bool enable = true;
+    std::string number = "00000000000";
+    simFile->SetVoiceCallForwarding(enable, number);
+    ASSERT_FALSE(simFile->EfCfisAvailable(0));
+}
+
 } // namespace Telephony
 } // namespace OHOS
