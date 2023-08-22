@@ -131,7 +131,7 @@ int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockS
         }
     }
     if (!responseReady_) {
-        TELEPHONY_LOGE("sim update failed");
+        TELEPHONY_LOGE("unlock pin sim update failed");
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
@@ -165,7 +165,7 @@ int32_t SimStateManager::UnlockPuk(
         }
     }
     if (!responseReady_) {
-        TELEPHONY_LOGE("sim update failed");
+        TELEPHONY_LOGE("unlock puk sim update failed");
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
@@ -199,7 +199,7 @@ int32_t SimStateManager::AlterPin(
         }
     }
     if (!responseReady_) {
-        TELEPHONY_LOGE("sim update failed");
+        TELEPHONY_LOGE("alter pin sim update failed");
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
@@ -242,7 +242,7 @@ int32_t SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, L
         }
     }
     if (!responseReady_) {
-        TELEPHONY_LOGE("sim update failed");
+        TELEPHONY_LOGE("set lock state sim update failed");
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
@@ -281,7 +281,7 @@ int32_t SimStateManager::GetLockState(int32_t slotId, LockType lockType, LockSta
         }
     }
     if (!responseReady_) {
-        TELEPHONY_LOGE("sim load failed");
+        TELEPHONY_LOGE("get lock state sim load failed");
         return CORE_ERR_SIM_CARD_LOAD_FAILED;
     }
     switch (simStateHandle_->GetUnlockData().lockState) {
@@ -316,7 +316,7 @@ int32_t SimStateManager::UnlockPin2(int32_t slotId, const std::string &pin2, Loc
         }
     }
     if (!responseReady_) {
-        TELEPHONY_LOGE("sim update failed");
+        TELEPHONY_LOGE("unlock pin2 sim update failed");
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
@@ -350,7 +350,7 @@ int32_t SimStateManager::UnlockPuk2(
         }
     }
     if (!responseReady_) {
-        TELEPHONY_LOGE("sim update failed");
+        TELEPHONY_LOGE("unlock puk2 sim update failed");
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
@@ -384,7 +384,7 @@ int32_t SimStateManager::AlterPin2(
         }
     }
     if (!responseReady_) {
-        TELEPHONY_LOGE("sim update failed");
+        TELEPHONY_LOGE("alter pin2 sim update failed");
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);

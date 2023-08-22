@@ -256,24 +256,25 @@ bool GsmCellInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     lac_ = rat;
-    uint64_t time;
-    if (!parcel.ReadUint64(time)) {
+    uint64_t gsmTime = 0;
+    if (!parcel.ReadUint64(gsmTime)) {
         return false;
     }
-    timeStamp_ = time;
+    timeStamp_ = gsmTime;
     if (!parcel.ReadInt32(rat)) {
         return false;
     }
     signalLevel_ = rat;
-    if (!parcel.ReadInt32(rat)) {
+    int32_t gsmSignalIntensity = 0;
+    if (!parcel.ReadInt32(gsmSignalIntensity)) {
         return false;
     }
-    signalIntensity_ = rat;
-    bool temCamped;
-    if (!parcel.ReadBool(temCamped)) {
+    signalIntensity_ = gsmSignalIntensity;
+    bool gsmTemCamped = false;
+    if (!parcel.ReadBool(gsmTemCamped)) {
         return false;
     }
-    isCamped_ = temCamped;
+    isCamped_ = gsmTemCamped;
 
     return true;
 }
@@ -429,24 +430,25 @@ bool LteCellInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     tac_ = rat;
-    uint64_t time;
-    if (!parcel.ReadUint64(time)) {
+    uint64_t lteTime = 0;
+    if (!parcel.ReadUint64(lteTime)) {
         return false;
     }
-    timeStamp_ = time;
+    timeStamp_ = lteTime;
     if (!parcel.ReadInt32(rat)) {
         return false;
     }
     signalLevel_ = rat;
-    if (!parcel.ReadInt32(rat)) {
+    int32_t lteSignalIntensity = 0;
+    if (!parcel.ReadInt32(lteSignalIntensity)) {
         return false;
     }
-    signalIntensity_ = rat;
-    bool temCamped;
-    if (!parcel.ReadBool(temCamped)) {
+    signalIntensity_ = lteSignalIntensity;
+    bool lteTemCamped = false;
+    if (!parcel.ReadBool(lteTemCamped)) {
         return false;
     }
-    isCamped_ = temCamped;
+    isCamped_ = lteTemCamped;
     return true;
 }
 
@@ -612,24 +614,25 @@ bool WcdmaCellInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     lac_ = rat;
-    uint64_t time;
-    if (!parcel.ReadUint64(time)) {
+    uint64_t wcdmaTime = 0;
+    if (!parcel.ReadUint64(wcdmaTime)) {
         return false;
     }
-    timeStamp_ = time;
+    timeStamp_ = wcdmaTime;
     if (!parcel.ReadInt32(rat)) {
         return false;
     }
     signalLevel_ = rat;
-    if (!parcel.ReadInt32(rat)) {
+    int32_t wcdmaSignalIntensity = 0;
+    if (!parcel.ReadInt32(wcdmaSignalIntensity)) {
         return false;
     }
-    signalIntensity_ = rat;
-    bool temCamped;
-    if (!parcel.ReadBool(temCamped)) {
+    signalIntensity_ = wcdmaSignalIntensity;
+    bool wcdmaTemCamped = false;
+    if (!parcel.ReadBool(wcdmaTemCamped)) {
         return false;
     }
-    isCamped_ = temCamped;
+    isCamped_ = wcdmaTemCamped;
     return true;
 }
 
@@ -795,24 +798,25 @@ bool TdscdmaCellInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     lac_ = rat;
-    uint64_t time;
-    if (!parcel.ReadUint64(time)) {
+    uint64_t tdscdmaTime = 0;
+    if (!parcel.ReadUint64(tdscdmaTime)) {
         return false;
     }
-    timeStamp_ = time;
+    timeStamp_ = tdscdmaTime;
     if (!parcel.ReadInt32(rat)) {
         return false;
     }
     signalLevel_ = rat;
-    if (!parcel.ReadInt32(rat)) {
+    int32_t tdscdmaSignalIntensity = 0;
+    if (!parcel.ReadInt32(tdscdmaSignalIntensity)) {
         return false;
     }
-    signalIntensity_ = rat;
-    bool temCamped;
-    if (!parcel.ReadBool(temCamped)) {
+    signalIntensity_ = tdscdmaSignalIntensity;
+    bool tdscdmaTemCamped = false;
+    if (!parcel.ReadBool(tdscdmaTemCamped)) {
         return false;
     }
-    isCamped_ = temCamped;
+    isCamped_ = tdscdmaTemCamped;
     return true;
 }
 
@@ -964,24 +968,25 @@ bool CdmaCellInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     sid_ = rat;
-    uint64_t time;
-    if (!parcel.ReadUint64(time)) {
+    uint64_t cdmaTime = 0;
+    if (!parcel.ReadUint64(cdmaTime)) {
         return false;
     }
-    timeStamp_ = time;
+    timeStamp_ = cdmaTime;
     if (!parcel.ReadInt32(rat)) {
         return false;
     }
     signalLevel_ = rat;
-    if (!parcel.ReadInt32(rat)) {
+    int32_t cdmaSignalIntensity = 0;
+    if (!parcel.ReadInt32(cdmaSignalIntensity)) {
         return false;
     }
-    signalIntensity_ = rat;
-    bool temCamped;
-    if (!parcel.ReadBool(temCamped)) {
+    signalIntensity_ = cdmaSignalIntensity;
+    bool cdmaTemCamped;
+    if (!parcel.ReadBool(cdmaTemCamped)) {
         return false;
     }
-    isCamped_ = temCamped;
+    isCamped_ = cdmaTemCamped;
     return true;
 }
 
@@ -1192,24 +1197,25 @@ bool NrCellInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     rsrq_ = rat;
-    uint64_t time;
-    if (!parcel.ReadUint64(time)) {
+    uint64_t nrTime = 0;
+    if (!parcel.ReadUint64(nrTime)) {
         return false;
     }
-    timeStamp_ = time;
+    timeStamp_ = nrTime;
     if (!parcel.ReadInt32(rat)) {
         return false;
     }
     signalLevel_ = rat;
-    if (!parcel.ReadInt32(rat)) {
+    int32_t nrSignalIntensity = 0;
+    if (!parcel.ReadInt32(nrSignalIntensity)) {
         return false;
     }
-    signalIntensity_ = rat;
-    bool temCamped;
-    if (!parcel.ReadBool(temCamped)) {
+    signalIntensity_ = nrSignalIntensity;
+    bool nrTemCamped = false;
+    if (!parcel.ReadBool(nrTemCamped)) {
         return false;
     }
-    isCamped_ = temCamped;
+    isCamped_ = nrTemCamped;
     return true;
 }
 
