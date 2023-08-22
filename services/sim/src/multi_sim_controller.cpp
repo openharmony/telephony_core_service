@@ -330,7 +330,6 @@ bool MultiSimController::IsValidData(int32_t slotId)
 
 bool MultiSimController::RefreshActiveIccAccountInfoList()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     if (localCacheInfo_.empty()) {
         TELEPHONY_LOGE("failed by invalid data");
         return false;
@@ -941,6 +940,7 @@ int32_t MultiSimController::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchVal
 
 int32_t MultiSimController::GetActiveSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (!RefreshActiveIccAccountInfoList()) {
         TELEPHONY_LOGE("refresh failed");
         return TELEPHONY_ERR_NO_SIM_CARD;
