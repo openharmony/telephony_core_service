@@ -1668,11 +1668,18 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     std::u16string testStr = u"";
     sptr<INetworkSearchCallback> networkSearchCallback = nullptr;
     networkSearchManager->SetRadioState(INVALID_SLOTID, true, 1);
+    networkSearchManager->SetRadioState(INVALID_SLOTID, true, 1, networkSearchCallback);
     EXPECT_EQ(networkSearchManager->GetRadioState(INVALID_SLOTID), ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
     EXPECT_NE(networkSearchManager->GetNetworkSearchInformation(INVALID_SLOTID, networkSearchCallback),
         TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(networkSearchManager->SetNetworkSelectionMode(INVALID_SLOTID, 1, networkInfo, true));
+    int32_t slotId = 0;
+    EXPECT_FALSE(networkSearchManager->SetNetworkSelectionMode(slotId, 1, networkInfo, true));
+    EXPECT_NE(
+        networkSearchManager->SetNetworkSelectionMode(INVALID_SLOTID, 1, networkInfo, true, networkSearchCallback),
+        TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->GetPreferredNetwork(INVALID_SLOTID, networkSearchCallback), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->GetPreferredNetwork(slotId, networkSearchCallback), TELEPHONY_ERR_SUCCESS);
     int32_t networkMode = 0;
     EXPECT_NE(networkSearchManager->SetCachePreferredNetworkValue(INVALID_SLOTID, networkMode), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->GetCachePreferredNetworkValue(INVALID_SLOTID, networkMode), TELEPHONY_ERR_SUCCESS);
@@ -1837,6 +1844,56 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_004, Function | MediumTest |
         TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->SetNetworkCapability(INVALID_SLOTID, networkAbilityType, networkAbilityState),
         TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearchManager_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_NetworkSearchManager_005, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<SimManager> simManager = nullptr;
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto runner = AppExecFwk::EventRunner::Create("test");
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(runner, networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
+    networkSearchManager->OnInit();
+    sptr<INetworkSearchCallback> networkSearchCallback = nullptr;
+    sptr<NetworkSearchCallBackBase> callback = nullptr;
+    int32_t status = 0;
+    std::string version = "";
+    std::u16string result = u"";
+    std::vector<NetworkInformation> operatorInfo;
+    networkSearchManager->GetRadioState(INVALID_SLOTID, networkSearchCallback);
+    networkSearchManager->SetNetworkSearchResultValue(INVALID_SLOTID, 0, operatorInfo);
+    EXPECT_NE(
+        networkSearchManager->GetNetworkSelectionMode(INVALID_SLOTID, networkSearchCallback), TELEPHONY_ERR_SUCCESS);
+    int32_t slotId = 0;
+    EXPECT_NE(networkSearchManager->SetPreferredNetwork(slotId, 1, networkSearchCallback), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->GetPreferredNetwork(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->GetPreferredNetwork(slotId), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->GetUniqueDeviceId(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->HandleRrcStateChanged(INVALID_SLOTID, status), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->HandleRrcStateChanged(slotId, status), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->RevertLastTechnology(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->RevertLastTechnology(slotId), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->GetRrcConnectionState(INVALID_SLOTID, status), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->UpdateRrcConnectionState(slotId, status), TELEPHONY_ERR_SUCCESS);
+    NrMode mode = NrMode::NR_MODE_UNKNOWN;
+    EXPECT_NE(networkSearchManager->GetNrOptionMode(slotId, mode), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->SetNrOptionMode(slotId, 1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->SetNrOptionMode(slotId, 1, networkSearchCallback), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->GetNrState(slotId), NrState::NR_STATE_NOT_SUPPORT);
+    EXPECT_NE(networkSearchManager->NotifyCallStatusToNetworkSearch(slotId, 0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->HandleNotifyStateChangeWithDelay(INVALID_SLOTID, false), TELEPHONY_ERR_SUCCESS);
+    EXPECT_FALSE(networkSearchManager->IsNeedDelayNotify(INVALID_SLOTID));
+    EXPECT_NE(networkSearchManager->ProcessNotifyStateChangeEvent(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
+    EXPECT_FALSE(networkSearchManager->RemoveManagerInner(INVALID_SLOTID));
+    networkSearchManager->UnRegisterCoreNotify(slotId, networkSearchHandler, 1);
+    networkSearchManager->UnRegisterCellularDataObject(callback);
 }
 
 /**
