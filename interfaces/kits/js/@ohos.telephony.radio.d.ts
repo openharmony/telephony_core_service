@@ -422,6 +422,18 @@ declare namespace radio {
   function getISOCountryCodeForNetwork(slotId: number): Promise<string>;
 
   /**
+   * Obtains the ISO-defined country code of the country where the registered network is deployed.
+   *
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns Returns the country code defined in ISO 3166-2.
+   * Returns an empty string if the device is not registered with any network.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 10
+   */
+  function getISOCountryCodeForNetworkSync(slotId: number): string;
+
+  /**
    * Get the option mode of NR.
    *
    * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot
@@ -779,6 +791,18 @@ declare namespace radio {
    */
   function getSignalInformation(slotId: number): Promise<Array<SignalInformation>>;
 
+   /**
+    * Obtains the list of signal strength information of the registered network corresponding to a specified SIM card.
+    *
+    * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot
+    * index number supported by the device.
+    * @returns Returns the callback for getting the instance list of
+    * the child classes derived from {@link SignalInformation}.
+    * @syscap SystemCapability.Telephony.CoreService
+    * @since 10
+    */
+  function getSignalInformationSync(slotId: number): SignalInformation;
+
   /**
    * Checks whether the device supports 5G New Radio (NR).
    *
@@ -1024,6 +1048,17 @@ declare namespace radio {
    * @since 7
    */
   function getOperatorName(slotId: number): Promise<string>;
+
+   /**
+    * Get the operator name of the specified SIM card slot.
+    *
+    * @param { number } slotId - Indicates the card slot index number,
+    * ranging from 0 to the maximum card slot index number supported by the device.
+    * @returns Returns the operator name.
+    * @syscap SystemCapability.Telephony.CoreService
+    * @since 10
+    */
+  function getOperatorNameSync(slotId: number): string;
 
   /**
    * Set the preferred network for the specified SIM card slot.

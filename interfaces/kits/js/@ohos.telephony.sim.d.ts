@@ -49,6 +49,17 @@ declare namespace sim {
   function isSimActive(slotId: number): Promise<boolean>;
 
   /**
+   * Checks whether the SIM card in a specified slot is activated.
+   *
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from {@code 0} to the maximum card slot index number supported by the device.
+   * @returns Returns {@code true} if the SIM card is activated; returns {@code false} otherwise.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 10
+   */
+  function isSimActiveSync(slotId: number): boolean;
+
+  /**
    * Obtains the default card slot for the voice service.
    *
    * @param { AsyncCallback<number> } callback - Indicates the callback for getting
@@ -145,6 +156,17 @@ declare namespace sim {
   function getISOCountryCodeForSim(slotId: number): Promise<string>;
 
   /**
+   * Obtains the ISO country code of the SIM card in a specified slot.
+   *
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns Returns the country code defined in ISO 3166-2; returns an empty string if no SIM card is inserted.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 10
+   */
+  function getISOCountryCodeForSimSync(slotId: number): string;
+
+  /**
    * Obtains the home PLMN number of the SIM card in a specified slot.
    *
    * <p>The value is recorded in the SIM card and is irrelevant to the network
@@ -184,6 +206,20 @@ declare namespace sim {
    * @since 6
    */
   function getSimOperatorNumeric(slotId: number): Promise<string>;
+
+  /**
+   * Obtains the home PLMN number of the SIM card in a specified slot.
+   *
+   * <p>The value is recorded in the SIM card and is irrelevant to the network
+   * with which the SIM card is currently registered.
+   *
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns Returns the PLMN number; returns an empty string if no SIM card is inserted.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 10
+   */
+  function getSimOperatorNumericSync(slotId: number): string;
 
   /**
    * Obtains the service provider name (SPN) of the SIM card in a specified slot.
@@ -226,6 +262,20 @@ declare namespace sim {
    * @since 6
    */
   function getSimSpn(slotId: number): Promise<string>;
+
+  /**
+   * Obtains the service provider name (SPN) of the SIM card in a specified slot.
+   *
+   * <p>The value is recorded in the EFSPN file of the SIM card and is irrelevant to the network
+   * with which the SIM card is currently registered.
+   *
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns Returns the SPN; returns an empty string if no SIM card is inserted or no EFSPN file in the SIM card.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 10
+   */
+  function getSimSpnSync(slotId: number): string;
 
   /**
    * Obtains the state of the SIM card in a specified slot.
@@ -276,6 +326,25 @@ declare namespace sim {
   function getSimState(slotId: number): Promise<SimState>;
 
   /**
+   * Obtains the state of the SIM card in a specified slot.
+   *
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from {@code 0} to the maximum card slot index number supported by the device.
+   * @returns Returns one of the following SIM card states:
+   * <ul>
+   * <li>{@code SimState#SIM_STATE_UNKNOWN}
+   * <li>{@code SimState#SIM_STATE_NOT_PRESENT}
+   * <li>{@code SimState#SIM_STATE_LOCKED}
+   * <li>{@code SimState#SIM_STATE_NOT_READY}
+   * <li>{@code SimState#SIM_STATE_READY}
+   * <li>{@code SimState#SIM_STATE_LOADED}
+   * </ul>
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 10
+   */
+  function getSimStateSync(slotId: number): SimState;
+
+  /**
    * Obtains the type of the SIM card installed in a specified slot.
    *
    * @param { number } slotId - Indicates the card slot index number,
@@ -308,6 +377,17 @@ declare namespace sim {
    * @since 7
    */
   function getCardType(slotId: number): Promise<CardType>;
+
+  /**
+   * Obtains the type of the SIM card installed in a specified slot.
+   *
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from {@code 0} to the maximum card slot index number supported by the device.
+   * @returns Returns the SIM card type.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 10
+   */
+  function getCardTypeSync(slotId: number): CardType;
 
   /**
    * Obtains the ICCID of the SIM card in a specified slot.
@@ -717,6 +797,17 @@ declare namespace sim {
    * @since 7
    */
   function hasSimCard(slotId: number): Promise<boolean>;
+
+  /**
+   * Checks whether a SIM card is inserted in a specified slot.
+   *
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns Returns {@code true} if a SIM card is inserted; return {@code false} otherwise.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 10
+   */
+  function hasSimCardSync(slotId: number): boolean;
 
   /**
    * Get account information of SIM card.
@@ -1977,6 +2068,17 @@ declare namespace sim {
   function getOpKey(slotId: number): Promise<string>;
 
   /**
+   * Obtains the operator key of the SIM card in a specified slot.
+   *
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns Returns the operator key; Returns an empty string if no SIM card is inserted or no operator key matched.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 10
+   */
+  function getOpKeySync(slotId: number): string;
+
+  /**
    * Obtains the operator name of the SIM card in a specified slot.
    *
    * @param { number } slotId - Indicates the card slot index number,
@@ -2011,6 +2113,17 @@ declare namespace sim {
    * @since 9
    */
   function getOpName(slotId: number): Promise<string>;
+
+  /**
+   * Obtains the operator name of the SIM card in a specified slot.
+   *
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns Returns the operator name; returns an empty string if no SIM card is inserted or no operator name matched.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 9
+   */
+  function getOpNameSync(slotId: number): string;
 
   /**
    * Obtains the default SIM ID for the voice service.
