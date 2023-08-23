@@ -791,16 +791,16 @@ declare namespace radio {
    */
   function getSignalInformation(slotId: number): Promise<Array<SignalInformation>>;
 
-   /**
-    * Obtains the list of signal strength information of the registered network corresponding to a specified SIM card.
-    *
-    * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot
-    * index number supported by the device.
-    * @returns Returns the callback for getting the instance list of
-    * the child classes derived from {@link SignalInformation}.
-    * @syscap SystemCapability.Telephony.CoreService
-    * @since 10
-    */
+  /**
+   * Obtains the list of signal strength information of the registered network corresponding to a specified SIM card.
+   *
+   * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot
+   * index number supported by the device.
+   * @returns Returns the callback for getting the instance list of
+   * the child classes derived from {@link SignalInformation}.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 10
+   */
   function getSignalInformationSync(slotId: number): SignalInformation;
 
   /**
@@ -1049,15 +1049,15 @@ declare namespace radio {
    */
   function getOperatorName(slotId: number): Promise<string>;
 
-   /**
-    * Get the operator name of the specified SIM card slot.
-    *
-    * @param { number } slotId - Indicates the card slot index number,
-    * ranging from 0 to the maximum card slot index number supported by the device.
-    * @returns Returns the operator name.
-    * @syscap SystemCapability.Telephony.CoreService
-    * @since 10
-    */
+  /**
+   * Get the operator name of the specified SIM card slot.
+   *
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns Returns the operator name.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 10
+   */
   function getOperatorNameSync(slotId: number): string;
 
   /**

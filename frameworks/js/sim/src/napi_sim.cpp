@@ -1460,7 +1460,7 @@ napi_value HasSimCardSync(napi_env env, napi_callback_info info)
         return value;
     }
     if (IsValidSlotId(slotId)) {
-         DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
     }
     NAPI_CALL(env, napi_create_int32(env, hasSimCard, &value));
     return value;
@@ -2495,7 +2495,7 @@ napi_value GetOpKeySync(napi_env env, napi_callback_info info)
         return value;
     }
     if (IsValidSlotId(slotId)) {
-         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpKey(slotId, opKey);
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpKey(slotId, opKey);
     }
     std::string operatorKey = NapiUtil::ToUtf8(opKey);
     NAPI_CALL(env, napi_create_string_utf8(env, operatorKey.c_str(), operatorKey.length(), &value));
@@ -2557,7 +2557,7 @@ napi_value GetOpNameSync(napi_env env, napi_callback_info info)
         return value;
     }
     if (IsValidSlotId(slotId)) {
-         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpName(slotId, opName);
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpName(slotId, opName);
     }
     std::string operatorName = NapiUtil::ToUtf8(opName);
     NAPI_CALL(env, napi_create_string_utf8(env, operatorName.c_str(), operatorName.length(), &value));
