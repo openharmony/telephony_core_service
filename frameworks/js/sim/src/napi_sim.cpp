@@ -395,7 +395,7 @@ napi_value IsSimActiveSync(napi_env env, napi_callback_info info)
     if (IsValidSlotId(slotId)) {
         isSimActive = DelayedRefSingleton<CoreServiceClient>::GetInstance().IsSimActive(slotId);
     }
-    NAPI_CALL(env, napi_create_int32(env, isSimActive, &value));
+    NAPI_CALL(env, napi_get_boolean(env, isSimActive, &value));
     return value;
 }
 
@@ -1462,7 +1462,7 @@ napi_value HasSimCardSync(napi_env env, napi_callback_info info)
     if (IsValidSlotId(slotId)) {
         DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
     }
-    NAPI_CALL(env, napi_create_int32(env, hasSimCard, &value));
+    NAPI_CALL(env, napi_get_boolean(env, hasSimCard, &value));
     return value;
 }
 
