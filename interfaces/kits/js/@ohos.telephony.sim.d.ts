@@ -53,7 +53,7 @@ declare namespace sim {
    *
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from {@code 0} to the maximum card slot index number supported by the device.
-   * @returns Returns {@code true} if the SIM card is activated; returns {@code false} otherwise.
+   * @returns { boolean } Returns {@code true} if the SIM card is activated; returns {@code false} otherwise.
    * @syscap SystemCapability.Telephony.CoreService
    * @since 10
    */
@@ -160,7 +160,8 @@ declare namespace sim {
    *
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns Returns the country code defined in ISO 3166-2; returns an empty string if no SIM card is inserted.
+   * @returns { string } Returns the country code defined in ISO 3166-2; returns an empty string if no SIM card
+   * is inserted.
    * @syscap SystemCapability.Telephony.CoreService
    * @since 10
    */
@@ -215,7 +216,7 @@ declare namespace sim {
    *
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns Returns the PLMN number; returns an empty string if no SIM card is inserted.
+   * @returns { string } Returns the PLMN number; returns an empty string if no SIM card is inserted.
    * @syscap SystemCapability.Telephony.CoreService
    * @since 10
    */
@@ -271,7 +272,8 @@ declare namespace sim {
    *
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns Returns the SPN; returns an empty string if no SIM card is inserted or no EFSPN file in the SIM card.
+   * @returns { string } Returns the SPN; returns an empty string if no SIM card is inserted or no EFSPN file
+   * in the SIM card.
    * @syscap SystemCapability.Telephony.CoreService
    * @since 10
    */
@@ -330,7 +332,7 @@ declare namespace sim {
    *
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from {@code 0} to the maximum card slot index number supported by the device.
-   * @returns Returns one of the following SIM card states:
+   * @returns { SimState } Returns one of the following SIM card states:
    * <ul>
    * <li>{@code SimState#SIM_STATE_UNKNOWN}
    * <li>{@code SimState#SIM_STATE_NOT_PRESENT}
@@ -383,7 +385,7 @@ declare namespace sim {
    *
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from {@code 0} to the maximum card slot index number supported by the device.
-   * @returns Returns the SIM card type.
+   * @returns { CardType } Returns the SIM card type.
    * @syscap SystemCapability.Telephony.CoreService
    * @since 10
    */
@@ -803,7 +805,7 @@ declare namespace sim {
    *
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns Returns {@code true} if a SIM card is inserted; return {@code false} otherwise.
+   * @returns { boolean } Returns {@code true} if a SIM card is inserted; return {@code false} otherwise.
    * @syscap SystemCapability.Telephony.CoreService
    * @since 10
    */
@@ -2072,7 +2074,8 @@ declare namespace sim {
    *
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns Returns the operator key; Returns an empty string if no SIM card is inserted or no operator key matched.
+   * @returns { string } Returns the operator key; Returns an empty string if no SIM card is inserted or
+   * no operator key matched.
    * @syscap SystemCapability.Telephony.CoreService
    * @since 10
    */
@@ -2119,9 +2122,10 @@ declare namespace sim {
    *
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns Returns the operator name; returns an empty string if no SIM card is inserted or no operator name matched.
+   * @returns { string } Returns the operator name; returns an empty string if no SIM card is inserted or
+   * no operator name matched.
    * @syscap SystemCapability.Telephony.CoreService
-   * @since 9
+   * @since 10
    */
   function getOpNameSync(slotId: number): string;
 

@@ -426,7 +426,7 @@ declare namespace radio {
    *
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns Returns the country code defined in ISO 3166-2.
+   * @returns { string } Returns the country code defined in ISO 3166-2.
    * Returns an empty string if the device is not registered with any network.
    * @syscap SystemCapability.Telephony.CoreService
    * @since 10
@@ -796,7 +796,7 @@ declare namespace radio {
    *
    * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot
    * index number supported by the device.
-   * @returns Returns the callback for getting the instance list of
+   * @returns { Array<SignalInformation> } Returns the callback for getting the instance list of
    * the child classes derived from {@link SignalInformation}.
    * @syscap SystemCapability.Telephony.CoreService
    * @since 10
@@ -1054,7 +1054,7 @@ declare namespace radio {
    *
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns Returns the operator name.
+   * @returns { string } Returns the operator name.
    * @syscap SystemCapability.Telephony.CoreService
    * @since 10
    */
