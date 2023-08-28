@@ -374,6 +374,31 @@ napi_value IsSimActive(napi_env env, napi_callback_info info)
     return NapiCreateAsyncWork<bool, NativeIsSimActive, IsSimActiveCallback>(env, info, "IsSimActive");
 }
 
+napi_value IsSimActiveSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    bool isSimActive = false;
+    napi_value value = nullptr;
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        NAPI_CALL(env, napi_create_int32(env, isSimActive, &value));
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        NAPI_CALL(env, napi_create_int32(env, isSimActive, &value));
+        return value;
+    }
+    if (IsValidSlotId(slotId)) {
+        isSimActive = DelayedRefSingleton<CoreServiceClient>::GetInstance().IsSimActive(slotId);
+    }
+    NAPI_CALL(env, napi_get_boolean(env, isSimActive, &value));
+    return value;
+}
+
 void NativeActivateSim(napi_env env, void *data)
 {
     if (data == nullptr) {
@@ -559,6 +584,34 @@ napi_value GetISOCountryCodeForSim(napi_env env, napi_callback_info info)
         env, info, "GetISOCountryCodeForSim");
 }
 
+napi_value GetISOCountryCodeForSimSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    std::u16string countryCode;
+    napi_value value = nullptr;
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        std::string code = NapiUtil::ToUtf8(countryCode);
+        NAPI_CALL(env, napi_create_string_utf8(env, code.c_str(), code.length(), &value));
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        std::string code = NapiUtil::ToUtf8(countryCode);
+        NAPI_CALL(env, napi_create_string_utf8(env, code.c_str(), code.length(), &value));
+        return value;
+    }
+    if (IsValidSlotId(slotId)) {
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(slotId, countryCode);
+    }
+    std::string code = NapiUtil::ToUtf8(countryCode);
+    NAPI_CALL(env, napi_create_string_utf8(env, code.c_str(), code.length(), &value));
+    return value;
+}
+
 void NativeGetSimOperatorNumeric(napi_env env, void *data)
 {
     if (data == nullptr) {
@@ -596,6 +649,34 @@ napi_value GetSimOperatorNumeric(napi_env env, napi_callback_info info)
         env, info, "GetSimOperatorNumeric");
 }
 
+napi_value GetSimOperatorNumericSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    std::u16string operatorNumeric;
+    napi_value value = nullptr;
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        std::string numeric = NapiUtil::ToUtf8(operatorNumeric);
+        NAPI_CALL(env, napi_create_string_utf8(env, numeric.c_str(), numeric.length(), &value));
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        std::string numeric = NapiUtil::ToUtf8(operatorNumeric);
+        NAPI_CALL(env, napi_create_string_utf8(env, numeric.c_str(), numeric.length(), &value));
+        return value;
+    }
+    if (IsValidSlotId(slotId)) {
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimOperatorNumeric(slotId, operatorNumeric);
+    }
+    std::string numeric = NapiUtil::ToUtf8(operatorNumeric);
+    NAPI_CALL(env, napi_create_string_utf8(env, numeric.c_str(), numeric.length(), &value));
+    return value;
+}
+
 void NativeGetSimSpn(napi_env env, void *data)
 {
     if (data == nullptr) {
@@ -629,6 +710,34 @@ void GetSimSpnCallback(napi_env env, napi_status status, void *data)
 napi_value GetSimSpn(napi_env env, napi_callback_info info)
 {
     return NapiCreateAsyncWork<std::string, NativeGetSimSpn, GetSimSpnCallback>(env, info, "GetSimSpn");
+}
+
+napi_value GetSimSpnSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    std::u16string spn;
+    napi_value value = nullptr;
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        std::string simSpn = NapiUtil::ToUtf8(spn);
+        NAPI_CALL(env, napi_create_string_utf8(env, simSpn.c_str(), simSpn.length(), &value));
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        std::string simSpn = NapiUtil::ToUtf8(spn);
+        NAPI_CALL(env, napi_create_string_utf8(env, simSpn.c_str(), simSpn.length(), &value));
+        return value;
+    }
+    if (IsValidSlotId(slotId)) {
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimSpn(slotId, spn);
+    }
+    std::string simSpn = NapiUtil::ToUtf8(spn);
+    NAPI_CALL(env, napi_create_string_utf8(env, simSpn.c_str(), simSpn.length(), &value));
+    return value;
 }
 
 void NativeGetSimState(napi_env env, void *data)
@@ -667,6 +776,31 @@ napi_value GetSimState(napi_env env, napi_callback_info info)
     return NapiCreateAsyncWork<int32_t, NativeGetSimState, GetSimStateCallback>(env, info, "GetSimState");
 }
 
+napi_value GetSimStateSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    napi_value value = nullptr;
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        NAPI_CALL(env, napi_create_int32(env, static_cast<int32_t>(simState), &value));
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        NAPI_CALL(env, napi_create_int32(env, static_cast<int32_t>(simState), &value));
+        return value;
+    }
+    if (IsValidSlotId(slotId)) {
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimState(slotId, simState);
+    }
+    NAPI_CALL(env, napi_create_int32(env, static_cast<int32_t>(simState), &value));
+    return value;
+}
+
 void NativeGetCardType(napi_env env, void *data)
 {
     if (data == nullptr) {
@@ -701,6 +835,31 @@ void GetCardTypeCallback(napi_env env, napi_status status, void *data)
 napi_value GetCardType(napi_env env, napi_callback_info info)
 {
     return NapiCreateAsyncWork<int32_t, NativeGetCardType, GetCardTypeCallback>(env, info, "GetCardType");
+}
+
+napi_value GetCardTypeSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    CardType cardType = CardType::UNKNOWN_CARD;
+    napi_value value = nullptr;
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        NAPI_CALL(env, napi_create_int32(env, static_cast<int32_t>(cardType), &value));
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        NAPI_CALL(env, napi_create_int32(env, static_cast<int32_t>(cardType), &value));
+        return value;
+    }
+    if (IsValidSlotId(slotId)) {
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCardType(slotId, cardType);
+    }
+    NAPI_CALL(env, napi_create_int32(env, static_cast<int32_t>(cardType), &value));
+    return value;
 }
 
 void NativeGetVoiceMailIdentifier(napi_env env, void *data)
@@ -1280,6 +1439,31 @@ void HasSimCardCallback(napi_env env, napi_status status, void *data)
 napi_value HasSimCard(napi_env env, napi_callback_info info)
 {
     return NapiCreateAsyncWork<bool, NativeHasSimCard, HasSimCardCallback>(env, info, "HasSimCard");
+}
+
+napi_value HasSimCardSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    bool hasSimCard = false;
+    napi_value value = nullptr;
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        NAPI_CALL(env, napi_create_int32(env, hasSimCard, &value));
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        NAPI_CALL(env, napi_create_int32(env, hasSimCard, &value));
+        return value;
+    }
+    if (IsValidSlotId(slotId)) {
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
+    }
+    NAPI_CALL(env, napi_get_boolean(env, hasSimCard, &value));
+    return value;
 }
 
 void NativeGetIMSI(napi_env env, void *data)
@@ -2290,6 +2474,34 @@ napi_value GetOpKey(napi_env env, napi_callback_info info)
     return NapiCreateAsyncWork<std::string, NativeGetOpKey, GetOpKeyCallback>(env, info, "GetOpKey");
 }
 
+napi_value GetOpKeySync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    std::u16string opKey;
+    napi_value value = nullptr;
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        std::string operatorKey = NapiUtil::ToUtf8(opKey);
+        NAPI_CALL(env, napi_create_string_utf8(env, operatorKey.c_str(), operatorKey.length(), &value));
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        std::string operatorKey = NapiUtil::ToUtf8(opKey);
+        NAPI_CALL(env, napi_create_string_utf8(env, operatorKey.c_str(), operatorKey.length(), &value));
+        return value;
+    }
+    if (IsValidSlotId(slotId)) {
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpKey(slotId, opKey);
+    }
+    std::string operatorKey = NapiUtil::ToUtf8(opKey);
+    NAPI_CALL(env, napi_create_string_utf8(env, operatorKey.c_str(), operatorKey.length(), &value));
+    return value;
+}
+
 void NativeGetOpName(napi_env env, void *data)
 {
     if (data == nullptr) {
@@ -2322,6 +2534,34 @@ void GetOpNameCallback(napi_env env, napi_status status, void *data)
 napi_value GetOpName(napi_env env, napi_callback_info info)
 {
     return NapiCreateAsyncWork<std::string, NativeGetOpName, GetOpNameCallback>(env, info, "GetOpName");
+}
+
+napi_value GetOpNameSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    std::u16string opName;
+    napi_value value = nullptr;
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        std::string operatorName = NapiUtil::ToUtf8(opName);
+        NAPI_CALL(env, napi_create_string_utf8(env, operatorName.c_str(), operatorName.length(), &value));
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        std::string operatorName = NapiUtil::ToUtf8(opName);
+        NAPI_CALL(env, napi_create_string_utf8(env, operatorName.c_str(), operatorName.length(), &value));
+        return value;
+    }
+    if (IsValidSlotId(slotId)) {
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpName(slotId, opName);
+    }
+    std::string operatorName = NapiUtil::ToUtf8(opName);
+    NAPI_CALL(env, napi_create_string_utf8(env, operatorName.c_str(), operatorName.length(), &value));
+    return value;
 }
 
 void NativeGetLockState(napi_env env, void *data)
@@ -2680,16 +2920,23 @@ napi_status InitSimInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("getISOCountryCodeForSim", GetISOCountryCodeForSim),
+        DECLARE_NAPI_FUNCTION("getISOCountryCodeForSimSync", GetISOCountryCodeForSimSync),
         DECLARE_NAPI_FUNCTION("getSimOperatorNumeric", GetSimOperatorNumeric),
+        DECLARE_NAPI_FUNCTION("getSimOperatorNumericSync", GetSimOperatorNumericSync),
         DECLARE_NAPI_FUNCTION("getSimSpn", GetSimSpn),
+        DECLARE_NAPI_FUNCTION("getSimSpnSync", GetSimSpnSync),
         DECLARE_NAPI_FUNCTION("getSimState", GetSimState),
+        DECLARE_NAPI_FUNCTION("getSimStateSync", GetSimStateSync),
         DECLARE_NAPI_FUNCTION("getCardType", GetCardType),
+        DECLARE_NAPI_FUNCTION("getCardTypeSync", GetCardTypeSync),
         DECLARE_NAPI_FUNCTION("getSimIccId", GetSimIccId),
         DECLARE_NAPI_FUNCTION("getIMSI", GetIMSI),
         DECLARE_NAPI_FUNCTION("hasSimCard", HasSimCard),
+        DECLARE_NAPI_FUNCTION("hasSimCardSync", HasSimCardSync),
         DECLARE_NAPI_FUNCTION("getSimGid1", GetSimGid1),
         DECLARE_NAPI_FUNCTION("getSimAccountInfo", GetSimAccountInfo),
         DECLARE_NAPI_FUNCTION("isSimActive", IsSimActive),
+        DECLARE_NAPI_FUNCTION("isSimActiveSync", IsSimActiveSync),
         DECLARE_NAPI_FUNCTION("activateSim", ActivateSim),
         DECLARE_NAPI_FUNCTION("deactivateSim", DeactivateSim),
         DECLARE_NAPI_FUNCTION("setShowName", SetShowName),
@@ -2706,7 +2953,9 @@ napi_status InitSimInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getMaxSimCount", GetMaxSimCount),
         DECLARE_NAPI_FUNCTION("hasOperatorPrivileges", HasOperatorPrivileges),
         DECLARE_NAPI_FUNCTION("getOpKey", GetOpKey),
+        DECLARE_NAPI_FUNCTION("getOpKeySync", GetOpKeySync),
         DECLARE_NAPI_FUNCTION("getOpName", GetOpName),
+        DECLARE_NAPI_FUNCTION("getOpNameSync", GetOpNameSync),
     };
     return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }
