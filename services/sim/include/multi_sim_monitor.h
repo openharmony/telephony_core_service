@@ -38,7 +38,7 @@ public:
     MultiSimMonitor(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
         const std::shared_ptr<MultiSimController> &controller,
         std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
-        std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager);
+        std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager);
     ~MultiSimMonitor();
 
     void Init();
@@ -96,7 +96,7 @@ private:
 
     std::shared_ptr<MultiSimController> controller_ = nullptr;
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager_;
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     std::list<SimAccountCallbackRecord> listSimAccountCallbackRecord_;
     std::mutex mutexInner_;

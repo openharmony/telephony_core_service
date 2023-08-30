@@ -28,8 +28,8 @@ namespace OHOS {
 namespace Telephony {
 class RadioProtocolController : public AppExecFwk::EventHandler {
 public:
-    RadioProtocolController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
-        const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    RadioProtocolController(
+        std::weak_ptr<Telephony::ITelRilManager> telRilManager, const std::shared_ptr<AppExecFwk::EventRunner> &runner);
     virtual ~RadioProtocolController() = default;
 
     void Init();
@@ -71,7 +71,7 @@ private:
 
 private:
     using ProcessFunc = void (RadioProtocolController::*)(const AppExecFwk::InnerEvent::Pointer &event);
-    std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
+    std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
     std::map<int32_t, ProcessFunc> memberFuncMap_;
     std::vector<RadioProtocol> radioProtocol_;
     std::vector<RadioProtocol> oldRadioProtocol_;

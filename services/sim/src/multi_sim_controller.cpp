@@ -41,7 +41,8 @@ MultiSimController::MultiSimController(std::shared_ptr<Telephony::ITelRilManager
     : simStateManager_(simStateManager), simFileManager_(simFileManager)
 {
     TELEPHONY_LOGI("MultiSimController::MultiSimController");
-    radioProtocolController_ = std::make_shared<RadioProtocolController>(telRilManager, runner);
+    radioProtocolController_ =
+        std::make_shared<RadioProtocolController>(std::weak_ptr<ITelRilManager>(telRilManager), runner);
 }
 
 MultiSimController::~MultiSimController()

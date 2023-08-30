@@ -46,7 +46,7 @@ const std::string OPKEY_INFO_URI = "datashare:///com.ohos.opkeyability/opkey/opk
 class OperatorConfigLoader {
 public:
     explicit OperatorConfigLoader(
-        std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache);
+        std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache);
     virtual ~OperatorConfigLoader();
     OperatorConfig LoadOperatorConfig(int32_t slotId);
 
@@ -57,7 +57,7 @@ private:
     bool MatchOperatorRule(std::shared_ptr<DataShare::DataShareResultSet> &resultSet, int row);
 
 private:
-    std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
+    std::weak_ptr<SimFileManager> simFileManager_;
     std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
     std::string iccidFromSim_;
     std::string imsiFromSim_;
