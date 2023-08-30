@@ -81,8 +81,8 @@ public:
     ~IccState() {}
 
 public:
-    int32_t simType_;
-    int32_t simStatus_;
+    int32_t simType_ = 0;
+    int32_t simStatus_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

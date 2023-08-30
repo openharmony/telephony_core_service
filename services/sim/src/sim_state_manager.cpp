@@ -54,7 +54,7 @@ void SimStateManager::Init(int32_t slotId)
         TELEPHONY_LOGE("SimStateManager::failed to create new SimStateHandle");
         return;
     }
-    simStateHandle_->SetRilManager(telRilManager_);
+    simStateHandle_->SetRilManager(std::weak_ptr<Telephony::ITelRilManager>(telRilManager_));
     simStateHandle_->Init(slotId);
 
     TELEPHONY_LOGI("SimStateManager::eventLoop_ is running");

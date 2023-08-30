@@ -122,7 +122,7 @@ public:
     void UnlockPuk2(int32_t slotId, const std::string &newPin2, const std::string &puk2);
     void AlterPin2(int32_t slotId, const std::string &newPin2, const std::string &oldPin2);
     void UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo);
-    void SetRilManager(std::shared_ptr<Telephony::ITelRilManager> telRilManager);
+    void SetRilManager(std::weak_ptr<Telephony::ITelRilManager> telRilManager);
     bool IsIccReady();
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
@@ -160,7 +160,7 @@ private:
     SimState externalState_; // need to broadcast sim state;
     CardType externalType_ = CardType::UNKNOWN_CARD; // need to broadcast card type;
     std::weak_ptr<SimStateManager> simStateManager_;
-    std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr; // ril manager
+    std::weak_ptr<Telephony::ITelRilManager> telRilManager_; // ril manager
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
 };
 } // namespace Telephony

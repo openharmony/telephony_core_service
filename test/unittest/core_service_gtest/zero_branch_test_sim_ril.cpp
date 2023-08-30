@@ -169,7 +169,7 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_001, Function | Medium
     operatorConfigLoader->operatorConfigCache_ = nullptr;
     operatorConfigLoader->LoadOperatorConfig(0);
     operatorConfigLoader->LoadOpKeyOnMccMnc(0);
-    operatorConfigLoader->simFileManager_ = nullptr;
+    simFileManager = nullptr;
     EXPECT_EQ(operatorConfigLoader->LoadOpKeyOnMccMnc(0), DEFAULT_OPERATOR_KEY);
     EXPECT_EQ(operatorConfigLoader->GetOpKey(nullptr, 0), DEFAULT_OPERATOR_KEY);
     std::shared_ptr<DataShare::DataShareResultSet> resultSet = nullptr;
@@ -213,7 +213,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateTracker_001, Function | MediumTest 
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
     event = nullptr;
     simStateTracker->ProcessEvent(event);
-    simStateTracker->simFileManager_ = nullptr;
+    simFileManager = nullptr;
     std::shared_ptr<OperatorConfigLoader> operatorConfigLoader_ = nullptr;
     auto statusChangeListener_ =
         new (std::nothrow) SimStateTracker::SystemAbilityStatusChangeListener(0, operatorConfigLoader_);
@@ -319,16 +319,18 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_001, Function | M
 {
     RunnerPool::GetInstance().Init();
     auto telRilManager = std::make_shared<TelRilManager>();
-    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     auto runner = AppExecFwk::EventRunner::Create("SimAccountManager");
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto simFileManager1 = std::make_shared<SimFileManager>(runner, telRilManager, simStateManager);
+    simFileManager1 = nullptr;
+    IccDiallingNumbersManager::CreateInstance(simFileManager1, simStateManager);
     auto simFileManager = std::make_shared<SimFileManager>(runner, telRilManager, simStateManager);
-    auto iccDiallingNumbersManager1 = IccDiallingNumbersManager::CreateInstance(nullptr, simStateManager);
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     iccDiallingNumbersManager->stateDiallingNumbers_ = IccDiallingNumbersManager::HandleRunningState::STATE_RUNNING;
     iccDiallingNumbersManager->Init();
     iccDiallingNumbersManager->stateDiallingNumbers_ = IccDiallingNumbersManager::HandleRunningState::STATE_NOT_START;
     iccDiallingNumbersManager->Init();
-    iccDiallingNumbersManager->simFileManager_ = nullptr;
+    simFileManager = nullptr;
     iccDiallingNumbersManager->Init();
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
     event = nullptr;
@@ -433,7 +435,9 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_002, Function | MediumTest |
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     auto simStateHandle = std::make_shared<SimStateHandle>(runner, simStateManager);
     simStateHandle->Init(0);
-    simStateHandle->telRilManager_ = nullptr;
+    std::shared_ptr<TelRilManager> telRilManager1 = std::make_shared<TelRilManager>();
+    telRilManager1 = nullptr;
+    simStateHandle->SetRilManager(telRilManager1);
     simStateHandle->Init(0);
     simStateHandle->iccState_.simStatus_ = ICC_CARD_ABSENT;
     EXPECT_FALSE(simStateHandle->HasSimCard());
@@ -441,12 +445,9 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_002, Function | MediumTest |
     EXPECT_TRUE(simStateHandle->HasSimCard());
     simStateHandle->GetSimState();
     simStateHandle->GetCardType();
-    simStateHandle->SetRilManager(nullptr);
-    simStateHandle->telRilManager_ = nullptr;
     PersoLockInfo lockInfo;
     std::string authData = "test";
     simStateHandle->UnlockSimLock(0, lockInfo);
-    simStateHandle->SetRilManager(nullptr);
     EXPECT_EQ(simStateHandle->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, authData), SIM_AUTH_FAIL);
 }
 

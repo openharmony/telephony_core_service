@@ -36,8 +36,7 @@ class SimFileManager : public AppExecFwk::EventHandler {
 public:
     using HANDLE = std::shared_ptr<AppExecFwk::EventHandler>;
     SimFileManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        std::shared_ptr<Telephony::ITelRilManager> telRilManager,
-        std::shared_ptr<Telephony::SimStateManager> state);
+        std::weak_ptr<Telephony::ITelRilManager> telRilManager, std::weak_ptr<Telephony::SimStateManager> state);
     virtual ~SimFileManager();
     void Init(int slotId);
     void ClearData();
@@ -75,13 +74,12 @@ public:
     bool HasSimCard();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     static std::shared_ptr<SimFileManager> CreateInstance(
-        const std::shared_ptr<Telephony::ITelRilManager> &ril,
-        const std::shared_ptr<SimStateManager> &simState);
+        std::weak_ptr<Telephony::ITelRilManager> ril, std::weak_ptr<SimStateManager> simState);
     enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
     enum class IccType { ICC_TYPE_CDMA, ICC_TYPE_GSM, ICC_TYPE_IMS, ICC_TYPE_USIM };
 
 protected:
-    std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
+    std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
     std::shared_ptr<IccFileController> fileController_ = nullptr;
     std::shared_ptr<IccFile> simFile_ = nullptr;
     std::shared_ptr<IccDiallingNumbersHandler> diallingNumberHandler_ = nullptr;
@@ -89,7 +87,7 @@ protected:
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopFileController_ = nullptr;
     HandleRunningState stateRecord_ = HandleRunningState::STATE_NOT_START;
     HandleRunningState stateHandler_ = HandleRunningState::STATE_NOT_START;
-    std::shared_ptr<Telephony::SimStateManager> simStateManager_ = nullptr;
+    std::weak_ptr<Telephony::SimStateManager> simStateManager_;
     int slotId_ = 0;
     IccType iccType_ = IccType::ICC_TYPE_USIM;
     std::map<IccType, std::shared_ptr<IccFile>> iccFileCache_;

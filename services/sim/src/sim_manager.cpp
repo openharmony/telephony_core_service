@@ -54,7 +54,8 @@ void SimManager::InitMultiSimObject()
         if (simStateManager_[slotId] != nullptr) {
             simStateManager_[slotId]->Init(slotId);
         }
-        simFileManager_[slotId] = SimFileManager::CreateInstance(telRilManager_, simStateManager_[slotId]);
+        simFileManager_[slotId] = SimFileManager::CreateInstance(std::weak_ptr<ITelRilManager>(telRilManager_),
+            std::weak_ptr<Telephony::SimStateManager>(simStateManager_[slotId]));
         if (simFileManager_[slotId] != nullptr) {
             simFileManager_[slotId]->Init(slotId);
         }
@@ -68,8 +69,8 @@ void SimManager::InitMultiSimObject()
         if (simAccountManager_[slotId] != nullptr) {
             simAccountManager_[slotId]->Init(slotId);
         }
-        iccDiallingNumbersManager_[slotId] =
-            IccDiallingNumbersManager::CreateInstance(simFileManager_[slotId], simStateManager_[slotId]);
+        iccDiallingNumbersManager_[slotId] = IccDiallingNumbersManager::CreateInstance(
+            std::weak_ptr<SimFileManager>(simFileManager_[slotId]), simStateManager_[slotId]);
         if (iccDiallingNumbersManager_[slotId] != nullptr) {
             iccDiallingNumbersManager_[slotId]->Init();
         }
@@ -99,8 +100,12 @@ void SimManager::InitSingleSimObject()
     multiSimController_->Init();
 
     monitorRunner_ = RunnerPool::GetInstance().GetSimDbAndFileRunner();
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager;
+    for (auto simFile : simFileManager_) {
+        simFileManager.push_back(std::weak_ptr<Telephony::SimFileManager>(simFile));
+    }
     multiSimMonitor_ =
-        std::make_shared<MultiSimMonitor>(monitorRunner_, multiSimController_, simStateManager_, simFileManager_);
+        std::make_shared<MultiSimMonitor>(monitorRunner_, multiSimController_, simStateManager_, simFileManager);
     if (multiSimMonitor_ == nullptr) {
         TELEPHONY_LOGE("SimAccountManager:: multiSimMonitor is null");
         return;

@@ -22,10 +22,10 @@
 namespace OHOS {
 namespace Telephony {
 SimFileManager::SimFileManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<Telephony::SimStateManager> state)
+    std::weak_ptr<ITelRilManager> telRilManager, std::weak_ptr<Telephony::SimStateManager> state)
     : AppExecFwk::EventHandler(runner), telRilManager_(telRilManager), simStateManager_(state)
 {
-    if (simStateManager_ == nullptr) {
+    if (simStateManager_.lock() == nullptr) {
         TELEPHONY_LOGE("SimFileManager set NULL simStateManager.");
         return;
     }
@@ -51,11 +51,17 @@ void SimFileManager::Init(int slotId)
         TELEPHONY_LOGI("SimFileManager::Init stateHandler_ started.");
         return;
     }
-    if (telRilManager_ == nullptr) {
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
         TELEPHONY_LOGE("SimFileManager get NULL ITelRilManager.");
         return;
     }
-    CardType cardType = simStateManager_->GetCardType();
+    auto simStateManager = simStateManager_.lock();
+    if (simStateManager == nullptr) {
+        TELEPHONY_LOGE("SimFileManager get NULL simStateManager.");
+        return;
+    }
+    CardType cardType = simStateManager->GetCardType();
     TELEPHONY_LOGI("SimFileManager current card type is %{public}d", cardType);
     if ((cardType == static_cast<CardType>(0)) || (cardType == CardType::UNKNOWN_CARD)) {
         cardType = CardType::SINGLE_MODE_USIM_CARD; // default card
@@ -77,9 +83,8 @@ void SimFileManager::Init(int slotId)
     stateRecord_ = HandleRunningState::STATE_RUNNING;
     stateHandler_ = HandleRunningState::STATE_RUNNING;
 
-    simStateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_CARD_TYPE_CHANGE);
-    telRilManager_->RegisterCoreNotify(
-        slotId, shared_from_this(), RadioEvent::RADIO_VOICE_TECH_CHANGED, nullptr);
+    simStateManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_CARD_TYPE_CHANGE);
+    telRilManager->RegisterCoreNotify(slotId, shared_from_this(), RadioEvent::RADIO_VOICE_TECH_CHANGED, nullptr);
     TELEPHONY_LOGI("SimFileManager::Init() end");
 }
 
@@ -101,11 +106,11 @@ bool SimFileManager::InitSimFile(SimFileManager::IccType type)
     auto iccFileIt = iccFileCache_.find(type);
     if (iccFileIt == iccFileCache_.end()) {
         if (type == SimFileManager::IccType::ICC_TYPE_CDMA) {
-            simFile_ = std::make_shared<RuimFile>(eventLoopRecord_, simStateManager_);
+            simFile_ = std::make_shared<RuimFile>(eventLoopRecord_, simStateManager_.lock());
         } else if (type == SimFileManager::IccType::ICC_TYPE_IMS) {
-            simFile_ = std::make_shared<IsimFile>(eventLoopRecord_, simStateManager_);
+            simFile_ = std::make_shared<IsimFile>(eventLoopRecord_, simStateManager_.lock());
         } else {
-            simFile_ = std::make_shared<SimFile>(eventLoopRecord_, simStateManager_);
+            simFile_ = std::make_shared<SimFile>(eventLoopRecord_, simStateManager_.lock());
         }
         iccFileCache_.insert(std::make_pair(type, simFile_));
     } else {
@@ -116,7 +121,7 @@ bool SimFileManager::InitSimFile(SimFileManager::IccType type)
         TELEPHONY_LOGE("SimFileManager::Init simFile create nullptr.");
         return false;
     }
-    simFile_->SetRilAndFileController(telRilManager_, fileController_, diallingNumberHandler_);
+    simFile_->SetRilAndFileController(telRilManager_.lock(), fileController_, diallingNumberHandler_);
     simFile_->SetId(slotId_);
     simFile_->Init();
     return true;
@@ -152,7 +157,7 @@ bool SimFileManager::InitIccFileController(SimFileManager::IccType type)
         TELEPHONY_LOGE("SimFileManager::Init fileController create nullptr.");
         return false;
     }
-    fileController_->SetRilManager(telRilManager_);
+    fileController_->SetRilManager(telRilManager_.lock());
     return true;
 }
 
@@ -399,8 +404,9 @@ std::shared_ptr<IccFileController> SimFileManager::GetIccFileController()
 
 void SimFileManager::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {
-    if (what == RadioEvent::RADIO_SIM_STATE_CHANGE && simStateManager_ != nullptr) {
-        simStateManager_->RegisterCoreNotify(handler, what);
+    auto simStateManager = simStateManager_.lock();
+    if (what == RadioEvent::RADIO_SIM_STATE_CHANGE && simStateManager != nullptr) {
+        simStateManager->RegisterCoreNotify(handler, what);
         return;
     }
     if (simFile_ == nullptr) {
@@ -412,8 +418,9 @@ void SimFileManager::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventH
 
 void SimFileManager::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {
-    if (what == RadioEvent::RADIO_SIM_STATE_CHANGE && simStateManager_ != nullptr) {
-        simStateManager_->UnRegisterCoreNotify(handler, what);
+    auto simStateManager = simStateManager_.lock();
+    if (what == RadioEvent::RADIO_SIM_STATE_CHANGE && simStateManager != nullptr) {
+        simStateManager->UnRegisterCoreNotify(handler, what);
         return;
     }
     if (simFile_ == nullptr) {
@@ -447,12 +454,13 @@ bool SimFileManager::SetVoiceMailInfo(const std::u16string &mailName, const std:
 
 bool SimFileManager::HasSimCard()
 {
-    if (simStateManager_ == nullptr) {
-        TELEPHONY_LOGE("SimFileManager::HasSimCard simStateManager_ nullptr");
+    auto simStateManager = simStateManager_.lock();
+    if (simStateManager == nullptr) {
+        TELEPHONY_LOGE("simStateManager nullptr");
         return false;
     }
-    bool result = simStateManager_->HasSimCard();
-    TELEPHONY_LOGI("SimFileManager::HasSimCard result:%{public}s ", (result ? "true" : "false"));
+    bool result = simStateManager->HasSimCard();
+    TELEPHONY_LOGI("result:%{public}s ", (result ? "true" : "false"));
     return result;
 }
 
@@ -493,8 +501,9 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
     uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGD("SimFileManager::ProcessEvent id %{public}d", id);
-    if (simStateManager_ == nullptr) {
-        TELEPHONY_LOGE("simStateManager_ is nullptr");
+    auto simStateManager = simStateManager_.lock();
+    if (simStateManager == nullptr) {
+        TELEPHONY_LOGE("simStateManager is nullptr");
         return;
     }
     switch (id) {
@@ -503,7 +512,7 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             std::shared_ptr<VoiceRadioTechnology> tech = event->GetSharedObject<VoiceRadioTechnology>();
             SimFileManager::IccType iccType = GetIccTypeByTech(tech);
             if (iccType == SimFileManager::IccType::ICC_TYPE_CDMA &&
-                simStateManager_->GetCardType() == CardType::SINGLE_MODE_USIM_CARD) {
+                simStateManager->GetCardType() == CardType::SINGLE_MODE_USIM_CARD) {
                 iccType = SimFileManager::IccType::ICC_TYPE_USIM;
                 TELEPHONY_LOGI("SimFileManager change iccType to USIM");
             }
@@ -511,7 +520,7 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             break;
         }
         case RadioEvent::RADIO_CARD_TYPE_CHANGE: {
-            CardType cardType = simStateManager_->GetCardType();
+            CardType cardType = simStateManager->GetCardType();
             TELEPHONY_LOGI("SimFileManager GetCardType is %{public}d", cardType);
             SimFileManager::IccType iccType = GetIccTypeByCardType(cardType);
             ChangeSimFileByCardType(iccType);
@@ -523,20 +532,24 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 }
 
 std::shared_ptr<SimFileManager> SimFileManager::CreateInstance(
-    const std::shared_ptr<ITelRilManager> &ril, const std::shared_ptr<SimStateManager> &simState)
+    std::weak_ptr<ITelRilManager> ril, std::weak_ptr<SimStateManager> simState)
 {
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop = RunnerPool::GetInstance().GetCommonRunner();
     if (eventLoop.get() == nullptr) {
-        TELEPHONY_LOGE("SimFileManager failed to create EventRunner");
+        TELEPHONY_LOGE("failed to create EventRunner");
         return nullptr;
     }
-    if (ril == nullptr) {
-        TELEPHONY_LOGE("SimFileManager::Init rilmanager null pointer");
+    if (ril.lock() == nullptr) {
+        TELEPHONY_LOGE("rilmanager null pointer");
+        return nullptr;
+    }
+    if (simState.lock() == nullptr) {
+        TELEPHONY_LOGE("simState null pointer");
         return nullptr;
     }
     std::shared_ptr<SimFileManager> manager = std::make_shared<SimFileManager>(eventLoop, ril, simState);
     if (manager == nullptr) {
-        TELEPHONY_LOGE("SimFileManager::Init manager create nullptr.");
+        TELEPHONY_LOGE("manager create nullptr.");
         return nullptr;
     }
 
@@ -635,6 +648,9 @@ std::u16string SimFileManager::GetSimIst()
 
 void SimFileManager::ClearData()
 {
+    opName_ = "";
+    opKey_ = "";
+    opKeyExt_ = "";
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::ClearData simFile nullptr");
         return;

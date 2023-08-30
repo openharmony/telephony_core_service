@@ -36,7 +36,7 @@ enum DiallingNumbersMessageType {
 class IccDiallingNumbersManager : public AppExecFwk::EventHandler {
 public:
     IccDiallingNumbersManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simState);
+        std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simState);
     ~IccDiallingNumbersManager();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t QueryIccDiallingNumbers(int type, std::vector<std::shared_ptr<DiallingNumbersInfo>> &result);
@@ -45,7 +45,7 @@ public:
     int32_t UpdateIccDiallingNumbers(int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
     void Init();
     static std::shared_ptr<IccDiallingNumbersManager> CreateInstance(
-        const std::shared_ptr<SimFileManager> &simFile, const std::shared_ptr<SimStateManager> &simState);
+        std::weak_ptr<SimFileManager> simFile, std::shared_ptr<SimStateManager> simState);
     enum class HandleRunningState {
         STATE_NOT_START,
         STATE_RUNNING
@@ -57,7 +57,7 @@ protected:
     HandleRunningState stateDiallingNumbers_ = HandleRunningState::STATE_NOT_START;
 
 private:
-    std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
+    std::weak_ptr<SimFileManager> simFileManager_;
     std::shared_ptr<Telephony::SimStateManager> simStateManager_ = nullptr;
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbersList_;
     std::mutex mtx_;

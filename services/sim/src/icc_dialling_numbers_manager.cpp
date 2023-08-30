@@ -25,7 +25,7 @@ namespace Telephony {
 constexpr static const int32_t WAIT_TIME_SECOND = 1;
 
 IccDiallingNumbersManager::IccDiallingNumbersManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simState)
+    std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simState)
     : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), simStateManager_(simState)
 {}
 
@@ -43,22 +43,23 @@ void IccDiallingNumbersManager::Init()
         return;
     }
 
-    if (simFileManager_ == nullptr) {
-        TELEPHONY_LOGE("IccDiallingNumbersManager::Init SimFileManager null pointer");
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
+        TELEPHONY_LOGE("SimFileManager null pointer");
         return;
     }
 
-    diallingNumbersCache_ = std::make_shared<IccDiallingNumbersCache>(eventLoopDiallingNumbers_, simFileManager_);
+    diallingNumbersCache_ = std::make_shared<IccDiallingNumbersCache>(eventLoopDiallingNumbers_, simFileManager);
     if (diallingNumbersCache_ == nullptr) {
-        TELEPHONY_LOGE("IccDiallingNumbersManager::Init simFile create nullptr.");
+        TELEPHONY_LOGE("simFile create nullptr.");
         return;
     }
 
     stateDiallingNumbers_ = HandleRunningState::STATE_RUNNING;
 
     diallingNumbersCache_->Init();
-    simFileManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
-    TELEPHONY_LOGI("IccDiallingNumbersManager::Init() end");
+    simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    TELEPHONY_LOGI("Init() end");
 }
 
 void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -339,14 +340,14 @@ bool IccDiallingNumbersManager::IsValidType(int type)
 }
 
 std::shared_ptr<IccDiallingNumbersManager> IccDiallingNumbersManager::CreateInstance(
-    const std::shared_ptr<SimFileManager> &simFile, const std::shared_ptr<SimStateManager> &simState)
+    std::weak_ptr<SimFileManager> simFile, std::shared_ptr<SimStateManager> simState)
 {
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop = RunnerPool::GetInstance().GetCommonRunner();
     if (eventLoop.get() == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersManager  failed to create EventRunner");
         return nullptr;
     }
-    if (simFile == nullptr) {
+    if (simFile.lock() == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersManager::Init SimFileManager null pointer");
         return nullptr;
     }
