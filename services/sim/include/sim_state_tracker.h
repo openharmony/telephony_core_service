@@ -34,7 +34,7 @@ using CommonEventSubscriber = OHOS::EventFwk::CommonEventSubscriber;
 class SimStateTracker : public AppExecFwk::EventHandler {
 public:
     SimStateTracker(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache,
+        std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache,
         int32_t slotId);
     ~SimStateTracker();
     void InitListener();
@@ -46,7 +46,7 @@ public:
 
 private:
     inline static const std::string OPERATOR_CONFIG_CHANGED = "operatorConfigChanged";
-    std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
+    std::weak_ptr<SimFileManager> simFileManager_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
     int32_t slotId_;

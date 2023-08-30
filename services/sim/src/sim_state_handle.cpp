@@ -51,10 +51,11 @@ void SimStateHandle::Init(int32_t slotId)
     slotId_ = slotId;
     TELEPHONY_LOGI("SimStateHandle::HasSimCard(), slotId_ = %{public}d", slotId_);
     ConnectService();
-    if (telRilManager_ != nullptr) {
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager != nullptr) {
         TELEPHONY_LOGI("SimStateHandle::SimStateHandle RegisterEvent start");
-        telRilManager_->RegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE, nullptr);
-        telRilManager_->RegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STATE_CHANGED, nullptr);
+        telRilManager->RegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE, nullptr);
+        telRilManager->RegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STATE_CHANGED, nullptr);
     } else {
         TELEPHONY_LOGE("SimStateHandle::SimStateHandle get ril_Manager fail");
         return;
@@ -99,7 +100,12 @@ void SimStateHandle::UnlockPin(int32_t slotId, const std::string &pin)
         return;
     }
     event->SetOwner(shared_from_this());
-    telRilManager_->UnlockPin(slotId, pin, event);
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("telRilManager is nullptr!");
+        return;
+    }
+    telRilManager->UnlockPin(slotId, pin, event);
 }
 
 void SimStateHandle::UnlockPuk(int32_t slotId, const std::string &newPin, const std::string &puk)
@@ -111,7 +117,12 @@ void SimStateHandle::UnlockPuk(int32_t slotId, const std::string &newPin, const 
         return;
     }
     event->SetOwner(shared_from_this());
-    telRilManager_->UnlockPuk(slotId, puk, newPin, event);
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("telRilManager is nullptr!");
+        return;
+    }
+    telRilManager->UnlockPuk(slotId, puk, newPin, event);
 }
 
 void SimStateHandle::AlterPin(int32_t slotId, const std::string &newPin, const std::string &oldPin)
@@ -129,7 +140,12 @@ void SimStateHandle::AlterPin(int32_t slotId, const std::string &newPin, const s
         return;
     }
     event->SetOwner(shared_from_this());
-    telRilManager_->ChangeSimPassword(slotId, simPinPassword, event);
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("telRilManager is nullptr!");
+        return;
+    }
+    telRilManager->ChangeSimPassword(slotId, simPinPassword, event);
 }
 
 void SimStateHandle::UnlockPin2(int32_t slotId, const std::string &pin2)
@@ -141,7 +157,12 @@ void SimStateHandle::UnlockPin2(int32_t slotId, const std::string &pin2)
         return;
     }
     event->SetOwner(shared_from_this());
-    telRilManager_->UnlockPin2(slotId, pin2, event);
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("telRilManager is nullptr!");
+        return;
+    }
+    telRilManager->UnlockPin2(slotId, pin2, event);
 }
 
 void SimStateHandle::UnlockPuk2(int32_t slotId, const std::string &newPin2, const std::string &puk2)
@@ -153,7 +174,12 @@ void SimStateHandle::UnlockPuk2(int32_t slotId, const std::string &newPin2, cons
         return;
     }
     event->SetOwner(shared_from_this());
-    telRilManager_->UnlockPuk2(slotId, puk2, newPin2, event);
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("telRilManager is nullptr!");
+        return;
+    }
+    telRilManager->UnlockPuk2(slotId, puk2, newPin2, event);
 }
 
 void SimStateHandle::AlterPin2(int32_t slotId, const std::string &newPin2, const std::string &oldPin2)
@@ -171,7 +197,12 @@ void SimStateHandle::AlterPin2(int32_t slotId, const std::string &newPin2, const
         return;
     }
     event->SetOwner(shared_from_this());
-    telRilManager_->ChangeSimPassword(slotId, simPin2Password, event);
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("telRilManager is nullptr!");
+        return;
+    }
+    telRilManager->ChangeSimPassword(slotId, simPin2Password, event);
 }
 
 void SimStateHandle::SetLockState(int32_t slotId, const LockInfo &options)
@@ -191,7 +222,12 @@ void SimStateHandle::SetLockState(int32_t slotId, const LockInfo &options)
     } else {
         simLock.fac = FDN_PIN2_LOCK;
     }
-    telRilManager_->SetSimLock(slotId, simLock, event);
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("telRilManager is nullptr!");
+        return;
+    }
+    telRilManager->SetSimLock(slotId, simLock, event);
 }
 
 void SimStateHandle::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo)
@@ -203,18 +239,20 @@ void SimStateHandle::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo
         return;
     }
     event->SetOwner(shared_from_this());
-    if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("SimStateHandle telRilManager_ is nullptr!!");
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("SimStateHandle telRilManager is nullptr!!");
         return;
     }
     int32_t lockType = static_cast<int32_t>(lockInfo.lockType);
-    telRilManager_->UnlockSimLock(slotId, lockType, Str16ToStr8(lockInfo.password), event);
+    telRilManager->UnlockSimLock(slotId, lockType, Str16ToStr8(lockInfo.password), event);
 }
 
-void SimStateHandle::SetRilManager(std::shared_ptr<Telephony::ITelRilManager> telRilManager)
+void SimStateHandle::SetRilManager(std::weak_ptr<Telephony::ITelRilManager> telRilManager)
 {
     telRilManager_ = telRilManager;
-    if (telRilManager_ == nullptr) {
+    auto telRilManagerNew = telRilManager_.lock();
+    if (telRilManagerNew == nullptr) {
         TELEPHONY_LOGE("SimStateHandle set NULL TelRilManager!!");
     }
 }
@@ -228,10 +266,15 @@ void SimStateHandle::GetLockState(int32_t slotId, LockType lockType)
         return;
     }
     event->SetOwner(shared_from_this());
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("telRilManager is nullptr!");
+        return;
+    }
     if (LockType::PIN_LOCK == lockType) {
-        telRilManager_->GetSimLockStatus(slotId, FAC_PIN_LOCK, event);
+        telRilManager->GetSimLockStatus(slotId, FAC_PIN_LOCK, event);
     } else {
-        telRilManager_->GetSimLockStatus(slotId, FDN_PIN2_LOCK, event);
+        telRilManager->GetSimLockStatus(slotId, FDN_PIN2_LOCK, event);
     }
 }
 
@@ -264,9 +307,10 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
 
 void SimStateHandle::UnInit()
 {
-    if (telRilManager_ != nullptr) {
-        telRilManager_->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
-        telRilManager_->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STATE_CHANGED);
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager != nullptr) {
+        telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+        telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STATE_CHANGED);
     }
 }
 
@@ -279,7 +323,12 @@ void SimStateHandle::ObtainIccStatus(int32_t slotId)
         return;
     }
     event->SetOwner(shared_from_this());
-    telRilManager_->GetSimStatus(slotId, event); // get sim card state
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("telRilManager is nullptr!");
+        return;
+    }
+    telRilManager->GetSimStatus(slotId, event); // get sim card state
 }
 
 void SimStateHandle::ObtainRealtimeIccStatus(int32_t slotId)
@@ -290,15 +339,16 @@ void SimStateHandle::ObtainRealtimeIccStatus(int32_t slotId)
         return;
     }
     event->SetOwner(shared_from_this());
-    telRilManager_->GetSimStatus(slotId, event); // get sim card state
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("telRilManager is nullptr!");
+        return;
+    }
+    telRilManager->GetSimStatus(slotId, event); // get sim card state
 }
 
 int32_t SimStateHandle::SimAuthentication(int32_t slotId, AuthType authType, const std::string &authData)
 {
-    if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("SimStateHandle::SimAuthentication() telRilManager_ is nullptr!!");
-        return SIM_AUTH_FAIL;
-    }
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_AUTHENTICATION_DONE);
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
@@ -309,7 +359,12 @@ int32_t SimStateHandle::SimAuthentication(int32_t slotId, AuthType authType, con
     requireInfo.serial = static_cast<int32_t>(authType);
     requireInfo.aid = GetAidByCardType(externalType_);
     requireInfo.authData = authData;
-    return telRilManager_->SimAuthentication(slotId, requireInfo, event);
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("SimStateHandle::SimAuthentication() telRilManager is nullptr!!");
+        return SIM_AUTH_FAIL;
+    }
+    return telRilManager->SimAuthentication(slotId, requireInfo, event);
 }
 
 std::string SimStateHandle::GetAidByCardType(CardType type)

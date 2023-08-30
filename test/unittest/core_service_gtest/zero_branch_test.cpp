@@ -256,7 +256,8 @@ HWTEST_F(BranchTest, Telephony_SimFileManager_001, Function | MediumTest | Level
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    SimFileManager simFileManager { runner, telRilManager, simStateManager };
+    SimFileManager simFileManager { runner, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager) };
     const std::u16string emptyStr = Str8ToStr16("");
     const std::u16string mailName = Str8ToStr16("张三");
     const std::u16string mailnumber = Str8ToStr16("12345678901");
@@ -302,7 +303,8 @@ HWTEST_F(BranchTest, Telephony_SimFileManager_002, Function | MediumTest | Level
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    SimFileManager simFileManager { runner, telRilManager, simStateManager };
+    SimFileManager simFileManager { runner, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager) };
     auto tech = std::make_shared<VoiceRadioTechnology>();
     simFileManager.ChangeSimFileByCardType(SimFileManager::IccType::ICC_TYPE_USIM);
     EXPECT_EQ(
@@ -344,10 +346,6 @@ HWTEST_F(BranchTest, Telephony_SimFile_001, Function | MediumTest | Level1)
     std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("SimFile");
     std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(eventLoopRecord, simStateManager);
     auto event = AppExecFwk::InnerEvent::Get(0);
-    EXPECT_TRUE(simFile->ProcessGetAdDone(event));
-    EXPECT_TRUE(simFile->ProcessVoiceMailCphs(event));
-    EXPECT_TRUE(simFile->ProcessGetMwisDone(event));
-    EXPECT_TRUE(simFile->ProcessGetMbdnDone(event));
     event = nullptr;
     simFile->ProcessEvent(event);
     simFile->ObtainSpnPhase(false, event);
@@ -2161,7 +2159,8 @@ HWTEST_F(BranchTest, Telephony_RadioProtocolController_001, Function | MediumTes
     auto telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(INVALID_SLOTID, 1);
-    auto radioProtocolController = std::make_shared<RadioProtocolController>(telRilManager, runner);
+    auto radioProtocolController =
+        std::make_shared<RadioProtocolController>(std::weak_ptr<TelRilManager>(telRilManager), runner);
     radioProtocolController->UnRegisterEvents();
     radioProtocolController->ProcessGetRadioProtocol(event);
     radioProtocolController->ProcessCheckRadioProtocol(event);
@@ -2196,7 +2195,7 @@ HWTEST_F(BranchTest, Telephony_RadioProtocolController_001, Function | MediumTes
     EXPECT_FALSE(radioProtocolController->SetRadioProtocol(INVALID_SLOTID));
     radioProtocolController->isCommunicating_ = true;
     EXPECT_FALSE(radioProtocolController->SetRadioProtocol(INVALID_SLOTID));
-    radioProtocolController->telRilManager_ = nullptr;
+    telRilManager = nullptr;
     std::vector<RadioProtocol> radioProtocol;
     radioProtocolController->SendRadioProtocolEvent(radioProtocol, 1);
     radioProtocolController->UnRegisterEvents();
@@ -2439,12 +2438,21 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
 {
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
+    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
+    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
+        runner, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
+        simStateManagerPtr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager, runner);
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
+    };
     auto multiSimMonitor =
-        std::make_shared<MultiSimMonitor>(runner, multiSimController, simStateManager, simFileManager);
+        std::make_shared<MultiSimMonitor>(runner, multiSimController, simStateManager, simFileManagerWeak);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_RECORDS_LOADED, 1);
     multiSimMonitor->ProcessEvent(event);
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE, 1);

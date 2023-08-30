@@ -53,7 +53,8 @@ void SimAccountManager::Init(int32_t slotId)
         TELEPHONY_LOGE("SimAccountManager::Init operatorConfigCacheRunner_ failed");
         return;
     }
-    operatorConfigCache_ = std::make_shared<OperatorConfigCache>(operatorConfigCacheRunner_, simFileManager_, slotId);
+    operatorConfigCache_ = std::make_shared<OperatorConfigCache>(
+        operatorConfigCacheRunner_, std::weak_ptr<SimFileManager>(simFileManager_), slotId);
     if (operatorConfigCache_ == nullptr) {
         TELEPHONY_LOGE("SimAccountManager::operatorConfigCache_ is null");
         return;
@@ -64,8 +65,8 @@ void SimAccountManager::Init(int32_t slotId)
         TELEPHONY_LOGE("SimAccountManager::Init simStateTrackerRunner_ failed");
         return;
     }
-    simStateTracker_ =
-        std::make_shared<SimStateTracker>(simStateTrackerRunner_, simFileManager_, operatorConfigCache_, slotId);
+    simStateTracker_ = std::make_shared<SimStateTracker>(
+        simStateTrackerRunner_, std::weak_ptr<SimFileManager>(simFileManager_), operatorConfigCache_, slotId);
     if (simStateTracker_ == nullptr) {
         TELEPHONY_LOGE("SimAccountManager::simStateTracker_ is null");
         return;

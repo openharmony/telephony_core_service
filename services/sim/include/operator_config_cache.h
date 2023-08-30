@@ -25,7 +25,7 @@ namespace Telephony {
 class OperatorConfigCache : public AppExecFwk::EventHandler {
 public:
     explicit OperatorConfigCache(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        std::shared_ptr<SimFileManager> simFileManager, int32_t slotId);
+        std::weak_ptr<SimFileManager> simFileManager, int32_t slotId);
     virtual ~OperatorConfigCache() = default;
     void ClearAllCache(int32_t slotId);
     void ClearMemoryCache(int32_t slotId);
@@ -39,7 +39,7 @@ public:
 
 private:
     OperatorFileParser parser_;
-    std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
+    std::weak_ptr<SimFileManager> simFileManager_;
     std::string GetOpKey(int32_t slotId);
     void CopyOperatorConfig(const OperatorConfig &from, OperatorConfig &to);
     bool AnnounceOperatorConfigChanged(int32_t slotId);

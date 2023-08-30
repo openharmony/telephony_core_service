@@ -27,7 +27,7 @@ const int32_t ACTIVE_USER_ID = 100;
 MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     const std::shared_ptr<MultiSimController> &controller,
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager)
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager)
     : AppExecFwk::EventHandler(runner), controller_(controller), simStateManager_(simStateManager),
       simFileManager_(simFileManager)
 {
@@ -113,7 +113,8 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         TELEPHONY_LOGE("MultiSimMonitor::RefreshData slotId is invalid");
         return;
     }
-    if (controller_ == nullptr || simStateManager_[slotId] == nullptr || simFileManager_[slotId] == nullptr) {
+    auto simFileManager = simFileManager_[slotId].lock();
+    if (controller_ == nullptr || simStateManager_[slotId] == nullptr || simFileManager == nullptr) {
         TELEPHONY_LOGE("MultiSimMonitor::RefreshData controller_ or simStateManager_ is nullptr");
         return;
     }
@@ -121,7 +122,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when sim is absent");
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
-        simFileManager_[slotId]->ClearData();
+        simFileManager->ClearData();
     }
     NotifySimAccountChanged();
 }
@@ -215,24 +216,26 @@ void MultiSimMonitor::RegisterSimNotify()
     }
     controller_->ForgetAllData();
     for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
-        if (simFileManager_[slotId] == nullptr) {
-            TELEPHONY_LOGE("simFileManager_ is null slotId : %{public}zu", slotId);
+        auto simFileManager = simFileManager_[slotId].lock();
+        if (simFileManager == nullptr) {
+            TELEPHONY_LOGE("simFileManager is null slotId : %{public}zu", slotId);
             continue;
         }
-        simFileManager_[slotId]->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
-        simFileManager_[slotId]->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+        simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
+        simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     }
 }
 
 void MultiSimMonitor::UnRegisterSimNotify()
 {
     for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
-        if (simFileManager_[slotId] == nullptr) {
-            TELEPHONY_LOGE("simFileManager_ is null slotId : %{public}zu", slotId);
+        auto simFileManager = simFileManager_[slotId].lock();
+        if (simFileManager == nullptr) {
+            TELEPHONY_LOGE("simFileManager is null slotId : %{public}zu", slotId);
             continue;
         }
-        simFileManager_[slotId]->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
-        simFileManager_[slotId]->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+        simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
+        simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     }
 }
 

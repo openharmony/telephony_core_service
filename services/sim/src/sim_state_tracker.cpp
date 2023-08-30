@@ -26,12 +26,12 @@ namespace OHOS {
 namespace Telephony {
 const int32_t ACTIVE_USER_ID = 100;
 SimStateTracker::SimStateTracker(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache,
+    std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache,
     int32_t slotId)
     : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), operatorConfigCache_(operatorConfigCache),
       slotId_(slotId)
 {
-    if (simFileManager == nullptr) {
+    if (simFileManager.lock() == nullptr) {
         TELEPHONY_LOGE("can not make OperatorConfigLoader");
     }
     operatorConfigLoader_ = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
@@ -98,22 +98,24 @@ void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 bool SimStateTracker::RegisterForIccLoaded()
 {
     TELEPHONY_LOGI("SimStateTracker::RegisterForIccLoaded");
-    if (simFileManager_ == nullptr) {
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
         TELEPHONY_LOGE("SimStateTracker::can not get SimFileManager");
         return false;
     }
-    simFileManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
     return true;
 }
 
 bool SimStateTracker::UnRegisterForIccLoaded()
 {
     TELEPHONY_LOGI("SimStateTracker::UnRegisterForIccLoaded");
-    if (simFileManager_ == nullptr) {
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
         TELEPHONY_LOGE("SimStateTracker::can not get SimFileManager");
         return false;
     }
-    simFileManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
     return true;
 }
 
