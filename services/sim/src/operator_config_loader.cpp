@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace Telephony {
 OperatorConfigLoader::OperatorConfigLoader(
-    std::shared_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache)
+    std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache)
     : simFileManager_(simFileManager), operatorConfigCache_(operatorConfigCache)
 {
     TELEPHONY_LOGI("OperatorConfigLoader construct");
@@ -51,7 +51,8 @@ std::string OperatorConfigLoader::LoadOpKeyOnMccMnc(int32_t slotId)
 {
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     CoreManagerInner::GetInstance().GetSimState(slotId, simState);
-    if (simFileManager_ == nullptr || simState != SimState::SIM_STATE_READY) {
+    std::shared_ptr<SimFileManager> simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr || simState != SimState::SIM_STATE_READY) {
         TELEPHONY_LOGE("LoadOpKeyOnMccMnc simState not ready");
         return DEFAULT_OPERATOR_KEY;
     }
@@ -64,7 +65,7 @@ std::string OperatorConfigLoader::LoadOpKeyOnMccMnc(int32_t slotId)
         TELEPHONY_LOGE("helper is nullptr");
         return DEFAULT_OPERATOR_KEY;
     }
-    std::string mccmncFromSim = Str16ToStr8(simFileManager_->GetSimOperatorNumeric());
+    std::string mccmncFromSim = Str16ToStr8(simFileManager->GetSimOperatorNumeric());
     predicates.EqualTo(MCCMNC, mccmncFromSim);
     resultSet = helper->Query(uri, predicates, colume);
     if (resultSet != nullptr) {
@@ -84,15 +85,16 @@ std::string OperatorConfigLoader::GetOpKey(std::shared_ptr<DataShare::DataShareR
         TELEPHONY_LOGE("GetOpKey resultSet is nullptr");
         return DEFAULT_OPERATOR_KEY;
     }
-    if (simFileManager_ == nullptr) {
-        TELEPHONY_LOGE("GetOpKey simFileManager_ is nullptr");
+    std::shared_ptr<SimFileManager> simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
+        TELEPHONY_LOGE("GetOpKey simFileManager is nullptr");
         return DEFAULT_OPERATOR_KEY;
     }
-    iccidFromSim_ = Str16ToStr8(simFileManager_->GetSimIccId());
-    imsiFromSim_ = Str16ToStr8(simFileManager_->GetIMSI());
-    spnFromSim_ = Str16ToStr8(simFileManager_->GetSimSpn());
-    gid1FromSim_ = Str16ToStr8(simFileManager_->GetSimGid1());
-    gid2FromSim_ = Str16ToStr8(simFileManager_->GetSimGid2());
+    iccidFromSim_ = Str16ToStr8(simFileManager->GetSimIccId());
+    imsiFromSim_ = Str16ToStr8(simFileManager->GetIMSI());
+    spnFromSim_ = Str16ToStr8(simFileManager->GetSimSpn());
+    gid1FromSim_ = Str16ToStr8(simFileManager->GetSimGid1());
+    gid2FromSim_ = Str16ToStr8(simFileManager->GetSimGid2());
     int count;
     resultSet->GetRowCount(count);
     TELEPHONY_LOGI("GetOpKey count: %{public}d", count);
@@ -118,9 +120,9 @@ std::string OperatorConfigLoader::GetOpKey(std::shared_ptr<DataShare::DataShareR
     std::string key;
     SetParameter(key.append(OPKEY_PROP_PREFIX).append(std::to_string(slotId)).c_str(), opKeyVal.c_str());
     key.shrink_to_fit();
-    simFileManager_->SetOpKey(opKeyVal);
-    simFileManager_->SetOpName(opNameVal);
-    simFileManager_->SetOpKeyExt(opKeyExtVal);
+    simFileManager->SetOpKey(opKeyVal);
+    simFileManager->SetOpName(opNameVal);
+    simFileManager->SetOpKeyExt(opKeyExtVal);
     return opKeyVal;
 }
 

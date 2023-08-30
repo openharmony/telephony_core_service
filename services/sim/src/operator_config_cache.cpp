@@ -27,7 +27,7 @@
 namespace OHOS {
 namespace Telephony {
 OperatorConfigCache::OperatorConfigCache(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    std::shared_ptr<SimFileManager> simFileManager, int32_t slotId)
+    std::weak_ptr<SimFileManager> simFileManager, int32_t slotId)
     : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), slotId_(slotId)
 {
     TELEPHONY_LOGI("OperatorConfigCache create");
@@ -44,16 +44,17 @@ void OperatorConfigCache::ClearAllCache(int32_t slotId)
 
 void OperatorConfigCache::ClearOperatorValue(int32_t slotId)
 {
-    if (simFileManager_ == nullptr) {
-        TELEPHONY_LOGE("simFileManager_ is nullptr");
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
+        TELEPHONY_LOGE("simFileManager is nullptr");
         return;
     }
     std::string key;
     std::string initialOpkey = INITIAL_OPKEY;
     SetParameter(key.append(OPKEY_PROP_PREFIX).append(std::to_string(slotId)).c_str(), initialOpkey.c_str());
-    simFileManager_->SetOpKey("");
-    simFileManager_->SetOpName("");
-    simFileManager_->SetOpKeyExt("");
+    simFileManager->SetOpKey("");
+    simFileManager->SetOpName("");
+    simFileManager->SetOpKeyExt("");
 }
 
 void OperatorConfigCache::ClearMemoryCache(int32_t slotId)
@@ -70,11 +71,12 @@ void OperatorConfigCache::ClearMemoryCache(int32_t slotId)
 
 int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &poc)
 {
-    if (simFileManager_ == nullptr) {
-        TELEPHONY_LOGE("simFileManager_ is nullptr");
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
+        TELEPHONY_LOGE("simFileManager is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::string iccid = Str16ToStr8(simFileManager_->GetSimIccId());
+    std::string iccid = Str16ToStr8(simFileManager->GetSimIccId());
     std::string filename = EncryptIccId(iccid) + ".json";
     std::string opkey = GetOpKey(slotId);
     if (opkey == std::string(INITIAL_OPKEY)) {
@@ -180,11 +182,12 @@ std::string OperatorConfigCache::EncryptIccId(const std::string iccid)
 bool OperatorConfigCache::RegisterForIccChange()
 {
     TELEPHONY_LOGI("OperatorConfigCache::RegisterForIccLoaded");
-    if (simFileManager_ == nullptr) {
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
         TELEPHONY_LOGE("OperatorConfigCache::can not get SimFileManager");
         return false;
     }
-    simFileManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+    simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     return true;
 }
 
@@ -212,11 +215,12 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
 bool OperatorConfigCache::UnRegisterForIccChange()
 {
     TELEPHONY_LOGI("OperatorConfigCache::UnRegisterForIccLoaded");
-    if (simFileManager_ == nullptr) {
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
         TELEPHONY_LOGE("OperatorConfigCache::can not get SimFileManager");
         return false;
     }
-    simFileManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+    simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     return true;
 }
 

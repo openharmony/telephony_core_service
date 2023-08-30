@@ -17,6 +17,7 @@
 #include "iservice_registry.h"
 #include "sim_operator_brocast_test.h"
 #include "system_ability_definition.h"
+#include "tel_ril_manager.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -97,7 +98,12 @@ void SimTest::ParseOperatorConf(int32_t slotId)
         return;
     }
     delete reader;
-    OperatorConfigCache ofpc(nullptr, nullptr, slotId);
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto simFileManager = std::make_shared<SimFileManager>(
+        runner, std::weak_ptr<ITelRilManager>(telRilManager), std::weak_ptr<SimStateManager>(simStateManager));
+    OperatorConfigCache ofpc(nullptr, std::weak_ptr<SimFileManager>(simFileManager), slotId);
     OperatorFileParser ofp;
     OperatorConfig poc;
     std::u16string result;
