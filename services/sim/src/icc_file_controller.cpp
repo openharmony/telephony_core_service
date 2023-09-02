@@ -90,6 +90,10 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
     std::string str = IccFileController::NULLSTR;
     std::string path = IccFileController::NULLSTR;
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return;
+    }
     IccFileData *result = &(rcvMsg->fileData);
     std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
     if (result == nullptr || hd == nullptr) {
@@ -138,7 +142,10 @@ void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer 
     std::string path = IccFileController::NULLSTR;
     TELEPHONY_LOGD("IccFileController::ProcessBinarySize init");
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return;
+    }
     if (rcvMsg->controlHolder == nullptr) {
         TELEPHONY_LOGE("IccFileController::ProcessBinarySize controlHolder is nullptr");
         return;
@@ -173,6 +180,10 @@ void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer 
     std::string str = IccFileController::NULLSTR;
     std::string path = IccFileController::NULLSTR;
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return;
+    }
     const AppExecFwk::InnerEvent::Pointer &process = rcvMsg->controlHolder->fileLoaded;
     IccFileData *result = &(rcvMsg->fileData);
     std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
