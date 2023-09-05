@@ -170,6 +170,7 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_001, Function | Medium
     operatorConfigLoader->LoadOperatorConfig(0);
     operatorConfigLoader->LoadOpKeyOnMccMnc(0);
     simFileManager = nullptr;
+    operatorConfigLoader->simFileManager_ = simFileManager;
     EXPECT_EQ(operatorConfigLoader->LoadOpKeyOnMccMnc(0), DEFAULT_OPERATOR_KEY);
     EXPECT_EQ(operatorConfigLoader->GetOpKey(nullptr, 0), DEFAULT_OPERATOR_KEY);
     std::shared_ptr<DataShare::DataShareResultSet> resultSet = nullptr;
@@ -214,6 +215,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateTracker_001, Function | MediumTest 
     event = nullptr;
     simStateTracker->ProcessEvent(event);
     simFileManager = nullptr;
+    simStateTracker->simFileManager_ = simFileManager;
     std::shared_ptr<OperatorConfigLoader> operatorConfigLoader_ = nullptr;
     auto statusChangeListener_ =
         new (std::nothrow) SimStateTracker::SystemAbilityStatusChangeListener(0, operatorConfigLoader_);
@@ -331,13 +333,17 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_001, Function | M
     iccDiallingNumbersManager->stateDiallingNumbers_ = IccDiallingNumbersManager::HandleRunningState::STATE_NOT_START;
     iccDiallingNumbersManager->Init();
     simFileManager = nullptr;
+    iccDiallingNumbersManager->simFileManager_ = simFileManager;
+    iccDiallingNumbersManager->stateDiallingNumbers_ = IccDiallingNumbersManager::HandleRunningState::STATE_NOT_START;
     iccDiallingNumbersManager->Init();
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
     event = nullptr;
     iccDiallingNumbersManager->ProcessEvent(event);
-    iccDiallingNumbersManager->ProcessEvent(AppExecFwk::InnerEvent::Get(-1, 1));
+    iccDiallingNumbersManager->ProcessEvent(AppExecFwk::InnerEvent::Get(0, 1));
     iccDiallingNumbersManager->ProcessEvent(AppExecFwk::InnerEvent::Get(MSG_SIM_DIALLING_NUMBERS_GET_DONE, 1));
-    iccDiallingNumbersManager->ProcessEvent(AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_RECORDS_LOADED, 1));
+    iccDiallingNumbersManager->ProcessEvent(AppExecFwk::InnerEvent::Get(MSG_SIM_DIALLING_NUMBERS_UPDATE_DONE, 1));
+    iccDiallingNumbersManager->ProcessEvent(AppExecFwk::InnerEvent::Get(MSG_SIM_DIALLING_NUMBERS_WRITE_DONE, 1));
+    iccDiallingNumbersManager->ProcessEvent(AppExecFwk::InnerEvent::Get(MSG_SIM_DIALLING_NUMBERS_DELETE_DONE, 1));
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = nullptr;
     std::vector<std::shared_ptr<DiallingNumbersInfo>> result = {};
     EXPECT_GE(iccDiallingNumbersManager->UpdateIccDiallingNumbers(0, diallingNumber), TELEPHONY_ERR_SUCCESS);
@@ -365,23 +371,25 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_001, Function | 
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
     event = nullptr;
     usimDiallingNumbersService->ProcessEvent(event);
-    usimDiallingNumbersService->ProcessEvent(AppExecFwk::InnerEvent::Get(-1));
     usimDiallingNumbersService->FillDiallingNumbersRecords(nullptr);
-    usimDiallingNumbersService->LoadPbrFiles();
+    std::string record = "record";
     std::vector<std::string> records;
+    records.push_back(record);
     usimDiallingNumbersService->GeneratePbrFile(records);
     usimDiallingNumbersService->BuildCallerInfo(-1);
     usimDiallingNumbersService->CreateHandlerPointer(-1, 1, 0, nullptr);
-    std::shared_ptr<IccFileController> iccFileController = nullptr;
-    std::shared_ptr<IccDiallingNumbersHandler> iccDiallingNumbersHandler = nullptr;
-    usimDiallingNumbersService->SetFileControllerAndDiallingNumberHandler(iccFileController, iccDiallingNumbersHandler);
-    std::string record = "record";
     usimDiallingNumbersService->BuildNumberFileByRecord(record);
     std::shared_ptr<UsimDiallingNumberFile> file = std::make_shared<UsimDiallingNumberFile>();
     std::vector<uint8_t> datav;
+    uint8_t data = 0;
+    datav.push_back(data);
     auto tlvEfSfi = std::make_shared<TagService>(datav);
     usimDiallingNumbersService->StorePbrDetailInfo(file, tlvEfSfi, 0);
-    usimDiallingNumbersService->NextStep(0);
+    std::shared_ptr<IccFileController> iccFileController = nullptr;
+    std::shared_ptr<IccDiallingNumbersHandler> iccDiallingNumbersHandler = nullptr;
+    usimDiallingNumbersService->SetFileControllerAndDiallingNumberHandler(iccFileController, iccDiallingNumbersHandler);
+    usimDiallingNumbersService->LoadPbrFiles();
+    EXPECT_TRUE(usimDiallingNumbersService->fileController_ == nullptr);
 }
 
 /**

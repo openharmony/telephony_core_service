@@ -129,7 +129,7 @@ void IccDiallingNumbersManager::ProcessLoadDone(const AppExecFwk::InnerEvent::Po
 void IccDiallingNumbersManager::ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
-    if (object->exception != nullptr) {
+    if (object != nullptr && object->exception != nullptr) {
         std::shared_ptr<HRilRadioResponseInfo> responseInfo =
             std::static_pointer_cast<HRilRadioResponseInfo>(object->exception);
         TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessUpdateDone error %{public}d", responseInfo->error);
@@ -144,7 +144,7 @@ void IccDiallingNumbersManager::ProcessUpdateDone(const AppExecFwk::InnerEvent::
 void IccDiallingNumbersManager::ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
-    if (object->exception != nullptr) {
+    if (object != nullptr && object->exception != nullptr) {
         std::shared_ptr<HRilRadioResponseInfo> responseInfo =
             std::static_pointer_cast<HRilRadioResponseInfo>(object->exception);
         TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessWriteDone error %{public}d", responseInfo->error);
@@ -159,7 +159,7 @@ void IccDiallingNumbersManager::ProcessWriteDone(const AppExecFwk::InnerEvent::P
 void IccDiallingNumbersManager::ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
-    if (object->exception != nullptr) {
+    if (object != nullptr && object->exception != nullptr) {
         std::shared_ptr<HRilRadioResponseInfo> responseInfo =
             std::static_pointer_cast<HRilRadioResponseInfo>(object->exception);
         TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessDeleteDone error %{public}d", responseInfo->error);
