@@ -23,6 +23,7 @@
 namespace OHOS {
 namespace Telephony {
 sptr<ICoreService> SimTest::telephonyService_ = nullptr;
+std::shared_ptr<SimOperatorBrocastTest> subscriber_;
 
 void SimTest::SetUpTestCase()
 {
@@ -39,14 +40,15 @@ void SimTest::InitBroadCast()
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
     subscribeInfo.SetPriority(1);
-    std::shared_ptr<SimOperatorBrocastTest> subscriber = std::make_shared<SimOperatorBrocastTest>(subscribeInfo);
-    EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber);
+    subscriber_ = std::make_shared<SimOperatorBrocastTest>(subscribeInfo);
+    EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber_);
     SimOperatorBrocastTest::telephonyService_ = telephonyService_;
 }
 
 void SimTest::TearDownTestCase()
 {
     TELEPHONY_LOGI("----------Sim gtest end ------------");
+    EventFwk::CommonEventManager::UnSubscribeCommonEvent(subscriber_);
 }
 
 void SimTest::SetUp() {}
