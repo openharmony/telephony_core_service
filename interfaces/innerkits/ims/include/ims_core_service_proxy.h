@@ -30,6 +30,7 @@ public:
     int32_t GetImsRegistrationStatus(int32_t slotId) override;
     int32_t RegisterImsCoreServiceCallback(const sptr<ImsCoreServiceCallbackInterface> &callback) override;
     sptr<IRemoteObject> GetProxyObjectPtr(ImsServiceProxyType proxyType) override;
+    int32_t GetPhoneNumberFromIMPU(int32_t slotId, std::string &phoneNumber) override;
 
 private:
     static inline BrokerDelegator<ImsCoreServiceProxy> delegator_;

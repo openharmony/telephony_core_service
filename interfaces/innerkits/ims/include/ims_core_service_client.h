@@ -37,6 +37,7 @@ public:
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     std::shared_ptr<AppExecFwk::EventHandler> GetHandler(int32_t slotId);
     int32_t GetImsRegistrationStatus(int32_t slotId);
+    int32_t GetPhoneNumberFromIMPU(int32_t slotId, std::string &phoneNumber);
 
 public:
     sptr<ImsCoreServiceInterface> GetImsCoreServiceProxy();
