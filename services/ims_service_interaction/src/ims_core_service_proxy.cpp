@@ -49,6 +49,34 @@ int32_t ImsCoreServiceProxy::GetImsRegistrationStatus(int32_t slotId)
     return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
 }
 
+int32_t ImsCoreServiceProxy::GetPhoneNumberFromIMPU(int32_t slotId, std::string &phoneNumber)
+{
+    MessageParcel in;
+    if (!in.WriteInterfaceToken(ImsCoreServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("[slot%{public}d]Write descriptor token fail!", slotId);
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!in.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("[slot%{public}d]Write slotId fail!", slotId);
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("[slot%{public}d]Remote is null", slotId);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    MessageParcel out;
+    MessageOption option;
+    int32_t error = remote->SendRequest(
+        static_cast<int32_t>(ImsCoreServiceInterfaceCode::IMS_GET_PHONE_NUMBER_FROM_IMPU), in, out, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("[slot%{public}d]SendRequest fail, error:%{public}d", slotId, error);
+    }
+    int32_t result = out.ReadInt32();
+    phoneNumber = out.ReadString();
+    return result;
+}
+
 int32_t ImsCoreServiceProxy::RegisterImsCoreServiceCallback(const sptr<ImsCoreServiceCallbackInterface> &callback)
 {
     if (callback == nullptr) {

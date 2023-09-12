@@ -84,6 +84,16 @@ int32_t ImsCoreServiceClient::GetImsRegistrationStatus(int32_t slotId)
     return imsCoreServiceProxy_->GetImsRegistrationStatus(slotId);
 }
 
+int32_t ImsCoreServiceClient::GetPhoneNumberFromIMPU(int32_t slotId, std::string &phoneNumber)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+
+    return imsCoreServiceProxy_->GetPhoneNumberFromIMPU(slotId, phoneNumber);
+}
+
 sptr<ImsCoreServiceInterface> ImsCoreServiceClient::GetImsCoreServiceProxy()
 {
     Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);

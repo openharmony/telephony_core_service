@@ -22,6 +22,7 @@ namespace Telephony {
 enum class ImsCoreServiceInterfaceCode {
     /****************** core basic ******************/
     IMS_GET_REGISTRATION_STATUS = 0,
+    IMS_GET_PHONE_NUMBER_FROM_IMPU,
 
     /****************** callback ******************/
     IMS_REGISTER_CALLBACK = 100,
