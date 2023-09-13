@@ -47,18 +47,18 @@ NetworkRegister::NetworkRegister(std::shared_ptr<NetworkSearchState> networkSear
 
 void NetworkRegister::InitNrConversionConfig()
 {
-    std::string config = "";
     GetSystemPropertiesConfig(systemPropertiesConfig_);
     if (systemPropertiesConfig_ == TELEPHONY_NR_CONFIG_AD) {
         int32_t rrcState = 0;
         GetRrcConnectionState(rrcState);
         if (rrcState == RRC_CONNECTED_STATUS) {
-            config = TELEPHONY_NR_CONFIG_A;
+            currentNrConfig_ = TELEPHONY_NR_CONFIG_A;
         } else {
-            config = TELEPHONY_NR_CONFIG_D;
+            currentNrConfig_ = TELEPHONY_NR_CONFIG_D;
         }
+    } else {
+        currentNrConfig_ = systemPropertiesConfig_;
     }
-    currentNrConfig_ = config;
 }
 
 void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &event)
