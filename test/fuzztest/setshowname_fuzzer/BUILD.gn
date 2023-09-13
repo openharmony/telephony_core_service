@@ -19,7 +19,7 @@ import("//build/test.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SetShowNameFuzzTest") {
-  module_output_path = "core_service/SetShowNameFuzzTest"
+  module_output_path = "core_service/core_service"
   module_out_path = module_output_path
   fuzz_config_file =
       "$SUBSYSTEM_DIR/core_service/test/fuzztest/setshowname_fuzzer"
