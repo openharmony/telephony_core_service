@@ -53,6 +53,16 @@ public:
      */
     virtual sptr<IRemoteObject> GetProxyObjectPtr(ImsServiceProxyType proxyType) = 0;
 
+    /**
+     * GetPhoneNumberFromIMPU
+     *
+     * @brief get the telephone number form Network IMPU
+     * @param slotId[in], the slot id
+     * @param phoneNumber[out], the telephone number
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t GetPhoneNumberFromIMPU(int32_t slotId, std::string &phoneNumber) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ImsCoreServiceInterface");
 };
