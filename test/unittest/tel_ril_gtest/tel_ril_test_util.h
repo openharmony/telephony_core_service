@@ -142,7 +142,7 @@ public:
     static void SetUpTestCase();
     static void TearDownTestCase();
     static sptr<ICoreService> GetProxy();
-    void ProcessTest(int32_t index, int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
+    bool ProcessTest(int32_t index, int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
 
 public:
     class DemoHandler : public AppExecFwk::EventHandler {
