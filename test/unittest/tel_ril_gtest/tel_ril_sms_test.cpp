@@ -32,7 +32,7 @@ namespace Telephony {
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SendRilCmSmsTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -43,7 +43,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SendRilCmSmsTest_0101, Function | MediumTe
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SendRilCmSmsTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -54,7 +54,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SendRilCmSmsTest_0201, Function | MediumTe
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_StorageRilCmSmsTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_STORAGE_SMS), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_STORAGE_SMS), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -65,7 +65,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_StorageRilCmSmsTest_0101, Function | Mediu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_StorageRilCmSmsTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_STORAGE_SMS), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_STORAGE_SMS), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -76,7 +76,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_StorageRilCmSmsTest_0201, Function | Mediu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_DeleteRilCmSmsTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_DELETE_SMS), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_DELETE_SMS), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -87,7 +87,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_DeleteRilCmSmsTest_0101, Function | Medium
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_DeleteRilCmSmsTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_DELETE_SMS), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_DELETE_SMS), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -98,7 +98,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_DeleteRilCmSmsTest_0201, Function | Medium
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_UpdateRilCmSmsTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UPDATE_SMS), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UPDATE_SMS), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -109,7 +109,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_UpdateRilCmSmsTest_0101, Function | Medium
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_UpdateRilCmSmsTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UPDATE_SMS), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UPDATE_SMS), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -120,7 +120,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_UpdateRilCmSmsTest_0201, Function | Medium
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetRilCmSmsCenterAddressTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_SMS_CENTER_ADDRESS), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_SMS_CENTER_ADDRESS), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -131,7 +132,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetRilCmSmsCenterAddressTest_0101, Functio
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetRilCmSmsCenterAddressTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_SMS_CENTER_ADDRESS), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_SMS_CENTER_ADDRESS), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -142,7 +144,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetRilCmSmsCenterAddressTest_0201, Functio
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetRilCmSmsCenterAddressTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SMS_CENTER_ADDRESS), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SMS_CENTER_ADDRESS), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -153,7 +156,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetRilCmSmsCenterAddressTest_0101, Functio
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetRilCmSmsCenterAddressTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SMS_CENTER_ADDRESS), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SMS_CENTER_ADDRESS), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -164,7 +168,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetRilCmSmsCenterAddressTest_0201, Functio
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetRilCmCBConfigTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_CB_CONFIG), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_CB_CONFIG), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -175,7 +179,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetRilCmCBConfigTest_0101, Function | Medi
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetRilCmCBConfigTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_CB_CONFIG), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_CB_CONFIG), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -186,7 +190,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetRilCmCBConfigTest_0201, Function | Medi
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetRilCmCBConfigTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CB_CONFIG), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CB_CONFIG), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -197,7 +201,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetRilCmCBConfigTest_0101, Function | Medi
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetRilCmCBConfigTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CB_CONFIG), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CB_CONFIG), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -208,7 +212,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetRilCmCBConfigTest_0201, Function | Medi
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetRilCmCdmaCBConfigTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CDMA_CB_CONFIG), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CDMA_CB_CONFIG), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -219,7 +223,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetRilCmCdmaCBConfigTest_0101, Function | 
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetRilCmCdmaCBConfigTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CDMA_CB_CONFIG), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CDMA_CB_CONFIG), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -230,7 +234,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetRilCmCdmaCBConfigTest_0201, Function | 
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SmsSendSmsExpectMoreTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS_EXPECT_MORE), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS_EXPECT_MORE), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -241,7 +245,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SmsSendSmsExpectMoreTest_0101, Function | 
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SmsSendSmsExpectMoreTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS_EXPECT_MORE), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS_EXPECT_MORE), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -252,7 +256,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SmsSendSmsExpectMoreTest_0201, Function | 
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SmsAcknowledgeTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS_ACK), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS_ACK), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -263,7 +267,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SmsAcknowledgeTest_0101, Function | Medium
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SmsAcknowledgeTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS_ACK), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS_ACK), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -274,7 +278,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SmsAcknowledgeTest_0201, Function | Medium
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_AddRilCmCdmaSmsTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ADD_CDMA_SMS), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ADD_CDMA_SMS), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -285,7 +289,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_AddRilCmCdmaSmsTest_0101, Function | Mediu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_AddRilCmCdmaSmsTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ADD_CDMA_SMS), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ADD_CDMA_SMS), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -296,7 +300,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_AddRilCmCdmaSmsTest_0201, Function | Mediu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_DelRilCmCdmaSmsTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_DEL_CDMA_SMS), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_DEL_CDMA_SMS), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -307,7 +311,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_DelRilCmCdmaSmsTest_0101, Function | Mediu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_DelRilCmCdmaSmsTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_DEL_CDMA_SMS), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_DEL_CDMA_SMS), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -318,7 +322,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_DelRilCmCdmaSmsTest_0201, Function | Mediu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_UpdateRilCmCdmaSmsTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UPDATE_CDMA_SMS), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UPDATE_CDMA_SMS), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -329,7 +333,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_UpdateRilCmCdmaSmsTest_0101, Function | Me
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_UpdateRilCmCdmaSmsTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UPDATE_CDMA_SMS), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_UPDATE_CDMA_SMS), SLOT_ID_1, GetHandler()));
     return;
 }
 #endif // TEL_TEST_UNSUPPORT

@@ -32,7 +32,7 @@ namespace Telephony {
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_NetworkOperatorTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_OPERATOR), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_OPERATOR), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -43,7 +43,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_NetworkOperatorTest_0101, Function | Mediu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_NetworkOperatorTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_OPERATOR), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_OPERATOR), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -54,8 +54,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_NetworkOperatorTest_0201, Function | Mediu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_NetworkVoiceRegistrationStateTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE), SLOT_ID_0,
-                GetHandler());
+    ASSERT_TRUE(ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -66,8 +66,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_NetworkVoiceRegistrationStateTest_0101, Fu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_NetworkVoiceRegistrationStateTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE), SLOT_ID_1,
-                GetHandler());
+    ASSERT_TRUE(ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -78,7 +78,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_NetworkVoiceRegistrationStateTest_0201, Fu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_NetworkDataRegistrationStateTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_DATA_REGISTRATION_STATE), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_DATA_REGISTRATION_STATE), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -89,7 +90,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_NetworkDataRegistrationStateTest_0101, Fun
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_NetworkDataRegistrationStateTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_DATA_REGISTRATION_STATE), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_DATA_REGISTRATION_STATE), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -100,7 +102,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_NetworkDataRegistrationStateTest_0201, Fun
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSearchInformationTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_NETWORKS_TO_USE), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_NETWORKS_TO_USE), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -111,7 +113,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSearchInformationTest_0101, Func
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSearchInformationTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_NETWORKS_TO_USE), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_NETWORKS_TO_USE), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -122,7 +124,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSearchInformationTest_0201, Func
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSelectionModeTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SELECTION_MOD_FOR_NETWORKS), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_GET_SELECTION_MOD_FOR_NETWORKS), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -133,7 +136,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSelectionModeTest_0101, Function
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSelectionModeTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SELECTION_MOD_FOR_NETWORKS), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_GET_SELECTION_MOD_FOR_NETWORKS), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -144,7 +148,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSelectionModeTest_0201, Function
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetNetworkSelectionModeTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_MODE_AUTOMATIC_NETWORKS), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_MODE_AUTOMATIC_NETWORKS), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -155,7 +160,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetNetworkSelectionModeTest_0101, Function
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetNetworkSelectionModeTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_MODE_AUTOMATIC_NETWORKS), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_MODE_AUTOMATIC_NETWORKS), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -166,7 +172,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetNetworkSelectionModeTest_0201, Function
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetPreferredNetworkParaTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -177,7 +184,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetPreferredNetworkParaTest_0101, Function
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetPreferredNetworkParaTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -188,7 +196,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetPreferredNetworkParaTest_0201, Function
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetPreferredNetworkParaTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -199,7 +208,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetPreferredNetworkParaTest_0101, Function
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetPreferredNetworkParaTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -210,7 +220,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetPreferredNetworkParaTest_0201, Function
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetImeiTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMEI), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMEI), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -221,7 +231,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetImeiTest_0101, Function | MediumTest | 
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetImeiTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMEI), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMEI), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -232,7 +242,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetImeiTest_0201, Function | MediumTest | 
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetMeidTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_MEID), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_MEID), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -243,7 +253,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetMeidTest_0101, Function | MediumTest | 
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetMeidTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_MEID), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_MEID), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -254,7 +264,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetMeidTest_0201, Function | MediumTest | 
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetVoiceRadioTechnologyTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -265,7 +275,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetVoiceRadioTechnologyTest_0101, Function
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetVoiceRadioTechnologyTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -276,7 +286,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetVoiceRadioTechnologyTest_0201, Function
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetPhysicalChannelConfigTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -287,7 +298,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetPhysicalChannelConfigTest_0101, Functio
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetPhysicalChannelConfigTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -298,7 +310,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetPhysicalChannelConfigTest_0201, Functio
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetLocateUpdatesTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_LOCATE_UPDATES), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_LOCATE_UPDATES), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -309,7 +321,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetLocateUpdatesTest_0101, Function | Medi
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetLocateUpdatesTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_LOCATE_UPDATES), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_LOCATE_UPDATES), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -321,7 +333,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetLocateUpdatesTest_0201, Function | Medi
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetNotificationFilterTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_NOTIFICATION_FILTER), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_NOTIFICATION_FILTER), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -333,7 +346,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetNotificationFilterTest_0101, Function |
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetNotificationFilterTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_NOTIFICATION_FILTER), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_NOTIFICATION_FILTER), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -345,7 +359,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetNotificationFilterTest_0201, Function |
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetDeviceStateTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_DEVICE_STATE), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_DEVICE_STATE), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -357,7 +371,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetDeviceStateTest_0101, Function | Medium
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetDeviceStateTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_DEVICE_STATE), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_DEVICE_STATE), SLOT_ID_1, GetHandler()));
     return;
 }
 #endif // TEL_TEST_UNSUPPORT

@@ -32,7 +32,7 @@ namespace Telephony {
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_NetworkGetRssiTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -43,7 +43,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_NetworkGetRssiTest_0101, Function | Medium
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_NetworkGetRssiTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -54,7 +54,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_NetworkGetRssiTest_0201, Function | Medium
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioStateTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_POWER_STATE), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_POWER_STATE), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -65,7 +65,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioStateTest_0101, Function | MediumT
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioStateTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_POWER_STATE), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_POWER_STATE), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -76,7 +76,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioStateTest_0201, Function | MediumT
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioStateTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -87,7 +87,7 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioStateTest_0101, Function | MediumT
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioStateTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE), SLOT_ID_1, GetHandler()));
     return;
 }
 #endif // TEL_TEST_UNSUPPORT

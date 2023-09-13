@@ -41,7 +41,7 @@ namespace Telephony {
  */
 HWTEST_F(SimTest, Telephony_Sim_ParseOperatorConf_0100, Function | MediumTest | Level1)
 {
-    ParseOperatorConf(SimTest::slotId_);
+    EXPECT_TRUE(ParseOperatorConf(SimTest::slotId_));
 }
 
 /**
@@ -51,7 +51,7 @@ HWTEST_F(SimTest, Telephony_Sim_ParseOperatorConf_0100, Function | MediumTest | 
  */
 HWTEST_F(SimTest, Telephony_Sim_ParseOperatorConf_0200, Function | MediumTest | Level1)
 {
-    ParseOperatorConf(SimTest::slotId1_);
+    EXPECT_TRUE(ParseOperatorConf(SimTest::slotId1_));
 }
 
 /**
@@ -61,7 +61,7 @@ HWTEST_F(SimTest, Telephony_Sim_ParseOperatorConf_0200, Function | MediumTest | 
  */
 HWTEST_F(SimTest, Telephony_Sim_ParseOperatorConf_0300, Function | MediumTest | Level1)
 {
-    ParseOperatorConf(SimTest::slotIdErr_);
+    EXPECT_FALSE(ParseOperatorConf(SimTest::slotIdErr_));
 }
 
 /**

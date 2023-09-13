@@ -166,7 +166,7 @@ public:
     static void SetUpTestCase();
     void SetUp();
     void TearDown();
-    void ParseOperatorConf(int32_t slotId);
+    bool ParseOperatorConf(int32_t slotId);
     static void InitBroadCast();
     static void TearDownTestCase();
     static sptr<ICoreService> GetProxy();
