@@ -81,12 +81,12 @@ bool SimTest::HasSimCard(int32_t slotId)
     return hasSimCard;
 }
 
-void SimTest::ParseOperatorConf(int32_t slotId)
+bool SimTest::ParseOperatorConf(int32_t slotId)
 {
     AccessToken token;
     if (SimTest::telephonyService_ == nullptr) {
         TELEPHONY_LOGE("ParseOperatorConf TelephonyTestService Remote service is null");
-        return;
+        return false;
     }
     const std::string rawJson = R"({ "string": "JSON中国", "long": 2147483699, "int": 88, "bool": true,
         "strA": ["street", "city", "country"], "longA": [ 2147483699, 2147483900, 2147499999],
@@ -97,7 +97,7 @@ void SimTest::ParseOperatorConf(int32_t slotId)
     Json::CharReader *reader(builder.newCharReader());
     if (!reader->parse(rawJson.c_str(), rawJson.c_str() + rawJson.length(), &root, &err)) {
         TELEPHONY_LOGE("ParserUtil::ParserPdpProfileJson reader is error!\n");
-        return;
+        return false;
     }
     delete reader;
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
@@ -115,12 +115,13 @@ void SimTest::ParseOperatorConf(int32_t slotId)
     if (slotId == SimTest::slotIdErr_) {
         filename = "";
         EXPECT_TRUE(true);
-        return;
+        return false;
     }
     ofp.WriteOperatorConfigJson(filename, root);
     Json::Value ret;
     ofp.ParseOperatorConfigFromFile(poc, filename, ret);
     CompareOperatorConfProcess(poc);
+    return true;
 }
 
 void SimTest::CompareOperatorConfProcess(OperatorConfig poc)

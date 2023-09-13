@@ -128,18 +128,18 @@ sptr<ICoreService> TelRilTest::GetProxy()
     }
 }
 
-void TelRilTest::ProcessTest(int32_t index, int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+bool TelRilTest::ProcessTest(int32_t index, int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
 {
     auto telephonyService = GetProxy();
     if (telephonyService == nullptr) {
         TELEPHONY_LOGE("TelRilTest::ProcessTest telephonyService is nullptr");
-        return;
+        return true;
     }
     bool hasSimCard = false;
     telephonyService->HasSimCard(slotId, hasSimCard);
     if (!hasSimCard) {
         TELEPHONY_LOGE("TelRilTest::ProcessTest no sim card %{public}d", slotId);
-        return;
+        return true;
     }
 
     for (auto itFunc : memberFuncMap_) {
@@ -147,8 +147,10 @@ void TelRilTest::ProcessTest(int32_t index, int32_t slotId, std::shared_ptr<AppE
         if (val == index) {
             auto memberFunc = itFunc.second;
             (this->*memberFunc)(slotId, handler);
+            return true;
         }
     }
+    return false;
 }
 
 void TelRilTest::AddRequestToMap()

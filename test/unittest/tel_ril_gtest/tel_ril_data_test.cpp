@@ -32,7 +32,8 @@ namespace Telephony {
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_DataSetInitApnInfoTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_INIT_APN_INFO), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_INIT_APN_INFO), SLOT_ID_0, GetHandler()));
     return;
 }
 
@@ -43,7 +44,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_DataSetInitApnInfoTest_0101, Function | Me
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_DataSetInitApnInfoTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_INIT_APN_INFO), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_INIT_APN_INFO), SLOT_ID_1, GetHandler()));
     return;
 }
 
@@ -54,7 +56,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_DataSetInitApnInfoTest_0201, Function | Me
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_DataSetupDataCallTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SETUP_DATA_CALL), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SETUP_DATA_CALL), SLOT_ID_0, GetHandler()));
 }
 
 /**
@@ -64,7 +67,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_DataSetupDataCallTest_0101, Function | Med
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_DataSetupDataCallTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SETUP_DATA_CALL), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SETUP_DATA_CALL), SLOT_ID_1, GetHandler()));
 }
 
 /**
@@ -74,7 +78,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_DataSetupDataCallTest_0201, Function | Med
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_DataDisableDataCallTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_DEACTIVATE_DATA_CALL), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_DEACTIVATE_DATA_CALL), SLOT_ID_0, GetHandler()));
 }
 
 /**
@@ -84,7 +89,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_DataDisableDataCallTest_0101, Function | M
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_DataDisableDataCallTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_DEACTIVATE_DATA_CALL), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_DEACTIVATE_DATA_CALL), SLOT_ID_1, GetHandler()));
 }
 
 /**
@@ -94,7 +100,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_DataDisableDataCallTest_0201, Function | M
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetDataCallListTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_DATA_CALL_LIST), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_DATA_CALL_LIST), SLOT_ID_0, GetHandler()));
 }
 
 /**
@@ -104,7 +111,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetDataCallListTest_0101, Function | Mediu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetDataCallListTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_DATA_CALL_LIST), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(
+        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_DATA_CALL_LIST), SLOT_ID_1, GetHandler()));
 }
 
 /**
@@ -114,7 +122,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetDataCallListTest_0201, Function | Mediu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetLinkBandwidthInfoTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_BANDWIDTH_INFO), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_BANDWIDTH_INFO), SLOT_ID_0, GetHandler()));
 }
 
 /**
@@ -124,7 +133,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetLinkBandwidthInfoTest_0101, Function | 
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetLinkBandwidthInfoTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_BANDWIDTH_INFO), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_BANDWIDTH_INFO), SLOT_ID_1, GetHandler()));
 }
 
 /**
@@ -134,7 +144,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetLinkBandwidthInfoTest_0201, Function | 
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetLinkCapabilityTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY_TEST), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY_TEST), SLOT_ID_0, GetHandler()));
 }
 
 /**
@@ -144,7 +155,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetLinkCapabilityTest_0101, Function | Med
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_GetLinkCapabilityTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY_TEST), SLOT_ID_1, GetHandler());
+    ASSERT_TRUE(ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY_TEST), SLOT_ID_1, GetHandler()));
 }
 
 /**
@@ -154,8 +166,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetLinkCapabilityTest_0201, Function | Med
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetLinkBandwidthReportingRuleTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE), SLOT_ID_0,
-                GetHandler());
+    ASSERT_TRUE(ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE), SLOT_ID_0, GetHandler()));
 }
 
 /**
@@ -165,8 +177,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetLinkBandwidthReportingRuleTest_0101, Fu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetLinkBandwidthReportingRuleTest_0201, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE), SLOT_ID_1,
-                GetHandler());
+    ASSERT_TRUE(ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE), SLOT_ID_1, GetHandler()));
 }
 
 /**
@@ -176,7 +188,8 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetLinkBandwidthReportingRuleTest_0201, Fu
  */
 HWTEST_F(TelRilTest, Telephony_TelRil_SetDataPermittedTest_0101, Function | MediumTest | Level3)
 {
-    ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST), SLOT_ID_0, GetHandler());
+    ASSERT_TRUE(ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST), SLOT_ID_0, GetHandler()));
 }
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
