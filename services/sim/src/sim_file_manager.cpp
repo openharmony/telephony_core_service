@@ -15,6 +15,7 @@
 
 #include "sim_file_manager.h"
 
+#include "ims_core_service_client.h"
 #include "network_state.h"
 #include "radio_event.h"
 #include "runner_pool.h"
@@ -272,13 +273,19 @@ std::u16string SimFileManager::GetSimGid2()
 
 std::u16string SimFileManager::GetSimTelephoneNumber()
 {
-    if (simFile_ == nullptr) {
-        TELEPHONY_LOGE("SimFileManager::GetSimTelephoneNumber simFile nullptr");
-        return Str8ToStr16("");
+    std::string result = "";
+    if (simFile_ != nullptr) {
+        result = simFile_->ObtainMsisdnNumber();
     }
-
-    std::string result = simFile_->ObtainMsisdnNumber();
-    TELEPHONY_LOGI("SimFileManager::GetSimTelephoneNumber result:%{public}s ", (result.empty() ? "false" : "true"));
+    TELEPHONY_LOGI("result is empty:%{public}s", (result.empty() ? "true" : "false"));
+    if (!result.empty()) {
+        return Str8ToStr16(result);
+    }
+    std::shared_ptr<ImsCoreServiceClient> imsCoreServiceClient = DelayedSingleton<ImsCoreServiceClient>::GetInstance();
+    if (imsCoreServiceClient != nullptr) {
+        imsCoreServiceClient->GetPhoneNumberFromIMPU(slotId_, result);
+        TELEPHONY_LOGI("impu result is empty:%{public}s", (result.empty() ? "true" : "false"));
+    }
     return Str8ToStr16(result);
 }
 
