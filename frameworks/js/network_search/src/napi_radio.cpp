@@ -299,6 +299,52 @@ static napi_value GetSignalInfoList(napi_env env, napi_callback_info info)
         env, asyncContext.release(), "GetSignalInfoList", NativeGetSignalInfoList, GetSignalInfoListCallback);
 }
 
+static napi_value GetSignalInfoListSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    std::vector<sptr<SignalInformation>> signalInfoList;
+    napi_value value = nullptr;
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        NAPI_CALL(env, napi_create_array(env, &value));
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        NAPI_CALL(env, napi_create_array(env, &value));
+        return value;
+    }
+    if (IsValidSlotId(slotId)) {
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSignalInfoList(slotId, signalInfoList);
+    }
+    napi_create_array(env, &value);
+    int i = 0;
+    for (sptr<SignalInformation> infoItem : signalInfoList) {
+        napi_value info = nullptr;
+        napi_create_object(env, &info);
+        int32_t signalType = static_cast<int32_t>(NetworkType::NETWORK_TYPE_UNKNOWN);
+        int32_t signalLevel = 0;
+        int32_t signalIntensity = 0;
+        if (infoItem != nullptr) {
+            signalType = WrapSignalInformationType(infoItem->GetNetworkType());
+            signalLevel = infoItem->GetSignalLevel();
+            signalIntensity = infoItem->GetSignalIntensity();
+        }
+        NapiUtil::SetPropertyInt32(env, info, "signalType", signalType);
+        NapiUtil::SetPropertyInt32(env, info, "signalLevel", signalLevel);
+        NapiUtil::SetPropertyInt32(env, info, "dBm", signalIntensity);
+        napi_set_element(env, value, i, info);
+        i++;
+        TELEPHONY_LOGI(
+            "GetSignalInfoListCallback signalType:%{public}d, signalIntensity:%{public}d, signalLevel:%{public}d",
+            signalType, signalIntensity, signalLevel);
+    }
+    return value;
+}
+
 static int32_t WrapRegState(int32_t nativeState)
 {
     RegServiceState state = static_cast<RegServiceState>(nativeState);
@@ -954,7 +1000,7 @@ static bool MatchGetISOCountryCodeForNetworkParameter(napi_env env, napi_value p
 static napi_value GetISOCountryCodeForNetwork(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = PARAMETER_COUNT_TWO;
-    napi_value parameters[PARAMETER_COUNT_TWO] = {0};
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar;
     void *data;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
@@ -970,6 +1016,34 @@ static napi_value GetISOCountryCodeForNetwork(napi_env env, napi_callback_info i
     }
     return NapiUtil::HandleAsyncWork(
         env, asyncContext.release(), "GetISOCountryCodeForNetwork", NativeGetCountryCode, GetCountryCodeCallback);
+}
+
+static napi_value GetISOCountryCodeForNetworkSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = PARAMETER_COUNT_ONE;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    std::u16string countryCode;
+    napi_value value = nullptr;
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        std::string code = NapiUtil::ToUtf8(countryCode);
+        NAPI_CALL(env, napi_create_string_utf8(env, code.c_str(), code.length(), &value));
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        std::string code = NapiUtil::ToUtf8(countryCode);
+        NAPI_CALL(env, napi_create_string_utf8(env, code.c_str(), code.length(), &value));
+        return value;
+    }
+    if (IsValidSlotId(slotId)) {
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetIsoCountryCodeForNetwork(slotId, countryCode);
+    }
+    std::string code = NapiUtil::ToUtf8(countryCode);
+    NAPI_CALL(env, napi_create_string_utf8(env, code.c_str(), code.length(), &value));
+    return value;
 }
 
 static bool MatchIsRadioOnParameter(napi_env env, napi_value parameters[], size_t parameterCount)
@@ -1307,6 +1381,34 @@ static napi_value GetOperatorName(napi_env env, napi_callback_info info)
     }
     return NapiUtil::HandleAsyncWork(
         env, asyncContext.release(), "GetOperatorName", NativeGetOperatorName, GetOperatorNameCallback);
+}
+
+static napi_value GetOperatorNameSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    std::u16string operatorName;
+    napi_value value = nullptr;
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        std::string name = NapiUtil::ToUtf8(operatorName);
+        NAPI_CALL(env, napi_create_string_utf8(env, name.c_str(), name.length(), &value));
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        std::string name = NapiUtil::ToUtf8(operatorName);
+        NAPI_CALL(env, napi_create_string_utf8(env, name.c_str(), name.length(), &value));
+        return value;
+    }
+    if (IsValidSlotId(slotId)) {
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOperatorName(slotId, operatorName);
+    }
+    std::string name = NapiUtil::ToUtf8(operatorName);
+    NAPI_CALL(env, napi_create_string_utf8(env, name.c_str(), name.length(), &value));
+    return value;
 }
 
 static void NativeSetPreferredNetwork(napi_env env, void *data)
@@ -3329,15 +3431,18 @@ static napi_value CreateFunctions(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("getRadioTech", GetRadioTech),
         DECLARE_NAPI_FUNCTION("getSignalInformation", GetSignalInfoList),
+        DECLARE_NAPI_FUNCTION("getSignalInformationSync", GetSignalInfoListSync),
         DECLARE_NAPI_FUNCTION("getNetworkState", GetNetworkState),
         DECLARE_NAPI_FUNCTION("setNetworkSelectionMode", SetNetworkSelectionMode),
         DECLARE_NAPI_FUNCTION("getNetworkSelectionMode", GetNetworkSelectionMode),
         DECLARE_NAPI_FUNCTION("getNetworkSearchInformation", GetNetworkSearchInformation),
         DECLARE_NAPI_FUNCTION("getISOCountryCodeForNetwork", GetISOCountryCodeForNetwork),
+        DECLARE_NAPI_FUNCTION("getISOCountryCodeForNetworkSync", GetISOCountryCodeForNetworkSync),
         DECLARE_NAPI_FUNCTION("isRadioOn", IsRadioOn),
         DECLARE_NAPI_FUNCTION("turnOnRadio", TurnOnRadio),
         DECLARE_NAPI_FUNCTION("turnOffRadio", TurnOffRadio),
         DECLARE_NAPI_FUNCTION("getOperatorName", GetOperatorName),
+        DECLARE_NAPI_FUNCTION("getOperatorNameSync", GetOperatorNameSync),
         DECLARE_NAPI_FUNCTION("setPreferredNetwork", SetPreferredNetwork),
         DECLARE_NAPI_FUNCTION("getPreferredNetwork", GetPreferredNetwork),
         DECLARE_NAPI_FUNCTION("setNetworkCapability", SetNetworkCapability),
