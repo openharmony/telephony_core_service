@@ -122,19 +122,6 @@ void GetSimAccountInfo(const uint8_t *data, size_t size)
     DelayedSingleton<CoreService>::GetInstance()->OnGetSimSubscriptionInfo(dataMessageParcel, reply);
 }
 
-void GetPrimarySlotId(const uint8_t *data, size_t size)
-{
-    if (!IsServiceInited()) {
-        return;
-    }
-
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
-    MessageParcel reply;
-    DelayedSingleton<CoreService>::GetInstance()->OnGetPrimarySlotId(dataMessageParcel, reply);
-}
-
 void GetCardType(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -207,7 +194,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetSimGid1(data, size);
     GetSimGid2(data, size);
     GetSimAccountInfo(data, size);
-    GetPrimarySlotId(data, size);
     GetCardType(data, size);
     GetSimState(data, size);
     HasSimCard(data, size);
