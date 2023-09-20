@@ -314,6 +314,11 @@ enum class SmsMmsErrorCode {
      * Indicates the time of sms broadcast out of range.
      */
     SMS_ERROR_BROADCAST_TIME_OUT,
+
+    /**
+     * Indicates the SMS address is blocked.
+     */
+    SMS_ERROR_ADDRESS_BLOCKED,
 };
 
 /**
