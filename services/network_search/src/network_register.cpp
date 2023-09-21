@@ -84,6 +84,13 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
         TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister networkSearchState_ is nullptr slotId:%{public}d", slotId_);
         return;
     }
+    if (regStatus == RegServiceState::REG_STATE_IN_SERVICE || regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) {
+        sptr<NetworkSearchCallBackBase> cellularCall = networkSearchManager->GetCellularCallCallBack();
+        if (cellularCall) {
+            int32_t csType = 0;
+            cellularCall->SetReadyToCall(slotId_, csType, true);
+        }
+    }
     regStatusResult_ = regStatus;
     networkSearchState_->SetNetworkState(regStatus, DomainType::DOMAIN_TYPE_CS);
     networkSearchState_->SetEmergency((regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) && isCsCapable_);
@@ -129,6 +136,13 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
     if (networkSearchState_ == nullptr) {
         TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister networkSearchState_ is nullptr slotId:%{public}d", slotId_);
         return;
+    }
+    if (regStatus == RegServiceState::REG_STATE_IN_SERVICE || regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) {
+        sptr<NetworkSearchCallBackBase> cellularCall = networkSearchManager->GetCellularCallCallBack();
+        if (cellularCall) {
+            int32_t imsType = 1;
+            cellularCall->SetReadyToCall(slotId_, imsType, true);
+        }
     }
     regStatusResult_ = regStatus;
     networkSearchState_->SetNetworkState(regStatus, DomainType::DOMAIN_TYPE_PS);
