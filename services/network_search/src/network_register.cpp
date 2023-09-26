@@ -37,6 +37,7 @@ constexpr const char *TELEPHONY_NR_CONFIG_D = "ConfigD";
 constexpr const char *TELEPHONY_NR_CONFIG_AD = "ConfigAD";
 constexpr int32_t SYS_PARAMETER_SIZE = 256;
 constexpr int32_t MAX_SIZE = 100;
+constexpr int32_t IMS_TYPE = 1;
 
 NetworkRegister::NetworkRegister(std::shared_ptr<NetworkSearchState> networkSearchState,
     std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
@@ -139,7 +140,7 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
     if (regStatus == RegServiceState::REG_STATE_IN_SERVICE || regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) {
         sptr<NetworkSearchCallBackBase> cellularCall = networkSearchManager->GetCellularCallCallBack();
         if (cellularCall) {
-            cellularCall->SetReadyToCall(slotId_, 1, true);
+            cellularCall->SetReadyToCall(slotId_, IMS_TYPE, true);
         }
     }
     regStatusResult_ = regStatus;
