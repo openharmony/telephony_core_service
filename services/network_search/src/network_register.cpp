@@ -37,6 +37,7 @@ constexpr const char *TELEPHONY_NR_CONFIG_D = "ConfigD";
 constexpr const char *TELEPHONY_NR_CONFIG_AD = "ConfigAD";
 constexpr int32_t SYS_PARAMETER_SIZE = 256;
 constexpr int32_t MAX_SIZE = 100;
+constexpr int32_t IMS_TYPE = 1;
 
 NetworkRegister::NetworkRegister(std::shared_ptr<NetworkSearchState> networkSearchState,
     std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
@@ -125,7 +126,6 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
         TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister event is nullptr slotId:%{public}d", slotId_);
         return;
     }
-
     std::shared_ptr<PsRegStatusResultInfo> psRegStatusResult = event->GetSharedObject<PsRegStatusResultInfo>();
     if (psRegStatusResult == nullptr) {
         TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister psRegStatusResult is nullptr slotId:%{public}d", slotId_);
@@ -140,8 +140,7 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
     if (regStatus == RegServiceState::REG_STATE_IN_SERVICE || regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) {
         sptr<NetworkSearchCallBackBase> cellularCall = networkSearchManager->GetCellularCallCallBack();
         if (cellularCall) {
-            int32_t imsType = 1;
-            cellularCall->SetReadyToCall(slotId_, imsType, true);
+            cellularCall->SetReadyToCall(slotId_, IMS_TYPE, true);
         }
     }
     regStatusResult_ = regStatus;
@@ -154,15 +153,12 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
         roam = RoamingType::ROAMING_STATE_UNSPEC;
     }
     networkSearchState_->SetNetworkStateToRoaming(roam, DomainType::DOMAIN_TYPE_PS);
-
     endcSupport_ = psRegStatusResult->isEnDcAvailable;
     dcNrRestricted_ = psRegStatusResult->isDcNrRestricted;
     nrSupport_ = psRegStatusResult->isNrAvailable;
     UpdateNrState();
     UpdateCfgTech();
-
-    TELEPHONY_LOGI(
-        "ProcessPsRegister: regStatus= %{public}d radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
+    TELEPHONY_LOGI("regStatus= %{public}d radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
         registrationStatus, psRegStatusResult->radioTechnology, roam, slotId_);
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
         TELEPHONY_LOGI("ps domain change, slotId:%{public}d", slotId_);
