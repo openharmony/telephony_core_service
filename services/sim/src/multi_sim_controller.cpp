@@ -711,7 +711,7 @@ int32_t MultiSimController::GetPrimarySlotId()
             return i;
         }
     }
-    return GetDefaultCellularDataSlotIdUnit();
+    return GetFirstActivedSlotId();
 }
 
 int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
