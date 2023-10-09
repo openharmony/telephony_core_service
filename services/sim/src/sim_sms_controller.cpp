@@ -41,9 +41,11 @@ void SimSmsController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event
             ProcessLoadDone(event);
             break;
         case SIM_SMS_UPDATE_COMPLETED:
+            TELEPHONY_LOGI("ProcessEvent update");
             ProcessUpdateDone(event);
             break;
         case SIM_SMS_WRITE_COMPLETED:
+            TELEPHONY_LOGI("ProcessEvent write");
             ProcessWriteDone(event);
             break;
         case SIM_SMS_DELETE_COMPLETED:
