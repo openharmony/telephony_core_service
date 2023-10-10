@@ -21,6 +21,9 @@
 
 namespace OHOS {
 namespace Telephony {
+
+const int32_t AVAILABLE_NETWORK_LIST_LENGTH = 50;
+
 NetworkSearchResult::NetworkSearchResult() {}
 
 void NetworkSearchResult::SetNetworkSearchResultValue(
@@ -50,6 +53,9 @@ bool NetworkSearchResult::ReadFromParcel(Parcel &parcel)
     }
     listSize_ = rat;
     TELEPHONY_LOGI("ReadParcelable<NetworkState> %{public}d", listSize_);
+    if (listSize_ > AVAILABLE_NETWORK_LIST_LENGTH) {
+        return false;
+    }
     for (int32_t i = 0; i < listSize_; i++) {
         std::unique_ptr<NetworkInformation> networkInfo(parcel.ReadParcelable<NetworkInformation>());
         if (networkInfo == nullptr) {
