@@ -41,6 +41,7 @@
       *TdscdmaCellInformation*;
       *TdScdmaSignalInformation*;
       *TelephonyStateRegistryClient*;
+      *TelephonyStateRegistryProxy*;
       *WcdmaCellInformation*;
       *WcdmaSignalInformation*;
     };
