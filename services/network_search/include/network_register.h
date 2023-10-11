@@ -70,6 +70,7 @@ private:
     bool IsValidConfig(const std::string &config);
     RadioTech GetTechnologyByNrConfig(RadioTech tech);
     int32_t GetSystemPropertiesConfig(std::string &config);
+    void UpdateNetworkSearchState(RegServiceState regStatus, RadioTech tech, RoamingType roam, DomainType type);
 
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;

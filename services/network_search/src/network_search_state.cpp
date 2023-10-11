@@ -403,9 +403,9 @@ void NetworkSearchState::NotifyStateChange()
     // otherwise observers may get the wrong phone type
     CsRadioTechChange();
 
+    NotifyPsRadioTechChange();
     NotifyPsRegStatusChange();
     NotifyPsRoamingStatusChange();
-    NotifyPsRadioTechChange();
     NotifyEmergencyChange();
     NotifyNrStateChange();
 

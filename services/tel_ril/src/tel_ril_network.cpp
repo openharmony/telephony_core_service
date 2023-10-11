@@ -243,9 +243,13 @@ int32_t TelRilNetwork::GetPsRegStatusResponse(
 int32_t TelRilNetwork::GetOperatorInfoResponse(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::OperatorInfo &operatorInfo)
 {
-    std::shared_ptr<OperatorInfoResult> operatorResult = std::make_shared<OperatorInfoResult>();
-    BuildOperatorInfo(operatorResult, operatorInfo);
-    return Response<OperatorInfoResult>(TELEPHONY_LOG_FUNC_NAME, responseInfo, operatorResult);
+    auto getDataFunc = [&operatorInfo, this](std::shared_ptr<TelRilRequest> telRilRequest) {
+        std::shared_ptr<OperatorInfoResult> operatorResult = std::make_shared<OperatorInfoResult>();
+        this->BuildOperatorInfo(operatorResult, operatorInfo);
+        operatorResult->flag = telRilRequest->pointer_->GetParam();
+        return operatorResult;
+    };
+    return Response<OperatorInfoResult>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
 }
 
 int32_t TelRilNetwork::GetNetworkSearchInformationResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,

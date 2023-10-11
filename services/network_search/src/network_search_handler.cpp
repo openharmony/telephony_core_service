@@ -490,13 +490,19 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
 
 void NetworkSearchHandler::RadioOnState()
 {
-    GetRilOperatorInfo(false);
-    GetRilPsRegistration(false);
-    GetRilCsRegistration(false);
     auto networkSearchManager = networkSearchManager_.lock();
+    int64_t serialNum = NetworkSearchManagerInner::SERIAL_NUMBER_DEFAULT;
     if (networkSearchManager != nullptr) {
         networkSearchManager->InitMsgNum(slotId_);
+        serialNum = networkSearchManager->IncreaseSerialNum(slotId_);
+        if (serialNum == NetworkSearchManagerInner::SERIAL_NUMBER_DEFAULT) {
+            TELEPHONY_LOGE("Invalid serial number slotId:%{public}d", slotId_);
+            return;
+        }
     }
+    GetRilOperatorInfo(serialNum, false);
+    GetRilPsRegistration(serialNum, false);
+    GetRilCsRegistration(serialNum, false);
     GetRilSignalIntensity(false);
 }
 
@@ -526,14 +532,14 @@ void NetworkSearchHandler::SetRadioStateResponse(const AppExecFwk::InnerEvent::P
     radioInfo_->ProcessSetRadioState(event);
 }
 
-void NetworkSearchHandler::GetRilOperatorInfo(bool checkTime)
+void NetworkSearchHandler::GetRilOperatorInfo(int64_t serialNum, bool checkTime)
 {
     TELEPHONY_LOGD("NetworkSearchHandler::GetOperatorInfo start slotId:%{public}d", slotId_);
     if (!TimeOutCheck(lastTimeOperatorReq_, checkTime)) {
         return;
     }
 
-    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR);
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR, serialNum);
     if (event != nullptr) {
         event->SetOwner(shared_from_this());
         std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
@@ -543,14 +549,14 @@ void NetworkSearchHandler::GetRilOperatorInfo(bool checkTime)
     }
 }
 
-void NetworkSearchHandler::GetRilPsRegistration(bool checkTime)
+void NetworkSearchHandler::GetRilPsRegistration(int64_t serialNum, bool checkTime)
 {
     TELEPHONY_LOGD("NetworkSearchHandler::GetPsRegStatus start slotId:%{public}d", slotId_);
     if (!TimeOutCheck(lastTimePsRegistrationReq_, checkTime)) {
         return;
     }
 
-    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_DATA_REG_STATE);
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_DATA_REG_STATE, serialNum);
     if (event != nullptr) {
         event->SetOwner(shared_from_this());
         std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
@@ -570,14 +576,14 @@ void NetworkSearchHandler::InitGetNetworkSelectionMode()
     networkSearchManager->GetNetworkSelectionMode(slotId_);
 }
 
-void NetworkSearchHandler::GetRilCsRegistration(bool checkTime)
+void NetworkSearchHandler::GetRilCsRegistration(int64_t serialNum, bool checkTime)
 {
     TELEPHONY_LOGD("NetworkSearchHandler::GetCsRegStatus start slotId:%{public}d", slotId_);
     if (!TimeOutCheck(lastTimeCsRegistrationReq_, checkTime)) {
         return;
     }
 
-    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_VOICE_REG_STATE);
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_VOICE_REG_STATE, serialNum);
     if (event != nullptr) {
         event->SetOwner(shared_from_this());
         std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
