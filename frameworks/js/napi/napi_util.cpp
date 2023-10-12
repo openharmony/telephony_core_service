@@ -55,6 +55,8 @@ static constexpr const char *JS_ERROR_SMS_MMS_BASE_ERROR_STRING = "Sms mms modul
 static constexpr const char *JS_ERROR_STATE_REGISTRY_BASE_ERROR_STRING = "State registry module base error.";
 static constexpr const char *JS_ERROR_AIRPLANE_MODE_ON_STRING = "Airplane mode is on.";
 static constexpr const char *JS_ERROR_NETWORK_NOT_IN_SERVICE = "Network not in service.";
+static constexpr const char *JS_ERROR_CONFERENCE_EXCEED_LIMIT_STRING = "Conference call is exceed limit.";
+static constexpr const char *JS_ERROR_CONFERENCE_CALL_IS_NOT_ACTIVE_STRING = "Conference call is not active.";
 
 static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_PERMISSION_DENIED, JS_ERROR_TELEPHONY_PERMISSION_DENIED_STRING },
@@ -79,7 +81,9 @@ static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_SMS_MMS_BASE_ERROR, JS_ERROR_SMS_MMS_BASE_ERROR_STRING },
     { JsErrorCode::JS_ERROR_STATE_REGISTRY_BASE_ERROR, JS_ERROR_STATE_REGISTRY_BASE_ERROR_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_AIRPLANE_MODE_ON, JS_ERROR_AIRPLANE_MODE_ON_STRING },
-    { JsErrorCode::JS_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE, JS_ERROR_NETWORK_NOT_IN_SERVICE }
+    { JsErrorCode::JS_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE, JS_ERROR_NETWORK_NOT_IN_SERVICE },
+    { JsErrorCode::JS_ERROR_TELEPHONY_CONFERENCE_EXCEED_LIMIT, JS_ERROR_CONFERENCE_EXCEED_LIMIT_STRING },
+    { JsErrorCode::JS_ERROR_TELEPHONY_CONFERENCE_CALL_NOT_ACTIVE, JS_ERROR_CONFERENCE_CALL_IS_NOT_ACTIVE_STRING }
 };
 
 std::string NapiUtil::GetErrorMessage(int32_t errorCode)
@@ -641,6 +645,12 @@ bool NapiUtil::CreateCommonCallErrorMessageForJs(int32_t errorCode, JsErrorCode 
         case TELEPHONY_CALL_ERR_INVALID_SLOT_ID:
             jsErrorCode = JS_ERROR_TELEPHONY_ARGUMENT_ERROR;
             break;
+        case TELEPHONY_CALL_ERR_CONFERENCE_CALL_EXCEED_LIMIT:
+            jsErrorCode = JS_ERROR_TELEPHONY_CONFERENCE_EXCEED_LIMIT;
+            break;
+        case TELEPHONY_CALL_ERR_CONFERENCE_CALL_IS_NOT_ACTIVE:
+            jsErrorCode = JS_ERROR_TELEPHONY_CONFERENCE_CALL_NOT_ACTIVE;
+            break;
         case TELEPHONY_CALL_ERR_CALL_IS_NOT_ACTIVATED:
         case TELEPHONY_CALL_ERR_ILLEGAL_CALL_OPERATION:
         case TELEPHONY_CALL_ERR_AUDIO_SETTING_MUTE_FAILED:
@@ -648,7 +658,7 @@ bool NapiUtil::CreateCommonCallErrorMessageForJs(int32_t errorCode, JsErrorCode 
         case TELEPHONY_CALL_ERR_PHONE_CALLS_TOO_FEW:
         case TELEPHONY_CALL_ERR_VIDEO_ILLEGAL_CALL_TYPE:
         case TELEPHONY_CALL_ERR_CONFERENCE_NOT_EXISTS:
-        case TELEPHONY_CALL_ERR_CONFERENCE_CALL_EXCEED_LIMIT:
+        case TELEPHONY_CALL_ERR_CONFERENCE_SEPERATE_FAILED:
         case TELEPHONY_CALL_ERR_EMERGENCY_UNSUPPORT_CONFERENCEABLE:
         case TELEPHONY_CALL_ERR_VOLTE_NOT_SUPPORT:
         case TELEPHONY_CALL_ERR_VOLTE_PROVISIONING_DISABLED:
