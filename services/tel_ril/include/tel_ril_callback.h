@@ -193,6 +193,8 @@ public:
         const HDI::Ril::V1_1::CellListCurrentInfo &cellListCurrentInfo) override;
     int32_t NetworkCurrentCellUpdated_1_1(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellListCurrentInfo) override;
+    int32_t ResidentNetworkUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const std::string &plmn) override;
     int32_t GetSignalStrengthResponse(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::Rssi &rssi) override;
     int32_t GetCsRegStatusResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,

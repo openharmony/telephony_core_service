@@ -612,6 +612,12 @@ int32_t TelRilCallback::NetworkCurrentCellUpdated_1_1(const HDI::Ril::V1_1::RilR
         cellListCurrentInformation);
 }
 
+int32_t TelRilCallback::ResidentNetworkUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const std::string &plmn)
+{
+    return Notify(responseInfo, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::ResidentNetworkUpdated, plmn);
+}
+
 int32_t TelRilCallback::GetSignalStrengthResponse(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::Rssi &rssi)
 {
