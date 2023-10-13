@@ -51,6 +51,8 @@ struct NetworkSearchManagerInner {
     static const int32_t MSG_NUM = 3;
     int32_t msgNum_ = MSG_NUM;
     static const int32_t DEFAULT_RAF = 0xffff;
+    static const int64_t SERIAL_NUMBER_DEFAULT = -1;
+    static const int64_t SERIAL_NUMBER_THRESHOLD = 1000;
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
     std::shared_ptr<NetworkSearchHandler> networkSearchHandler_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
@@ -74,6 +76,9 @@ struct NetworkSearchManagerInner {
     bool isRadioFirstPowerOn_ = true;
     bool airplaneMode_ = false;
     int32_t preferredNetworkValue_ = 0;
+    int64_t serialNum_ = SERIAL_NUMBER_DEFAULT;
+    std::mutex msgNumMutex_;
+    std::mutex serialNumMutex_;
     bool hasCall_ = false;
 
     bool RegisterSetting();
@@ -108,15 +113,32 @@ struct NetworkSearchManagerInner {
     }
     inline void InitMsgNum()
     {
+        std::lock_guard<std::mutex> lock(msgNumMutex_);
         msgNum_ = MSG_NUM;
     }
     inline bool CheckIsNeedNotify()
     {
+        std::lock_guard<std::mutex> lock(msgNumMutex_);
         return msgNum_ == 0 ? true : false;
     }
     inline void decMsgNum()
     {
+        std::lock_guard<std::mutex> lock(msgNumMutex_);
         msgNum_--;
+    }
+    inline int64_t IncreaseSerialNum()
+    {
+        std::lock_guard<std::mutex> lock(serialNumMutex_);
+        if (serialNum_ >= SERIAL_NUMBER_THRESHOLD) {
+            // recycle the serial number.
+            serialNum_ = SERIAL_NUMBER_DEFAULT;
+        }
+        return ++serialNum_;
+    }
+    inline int64_t GetSerialNum()
+    {
+        std::lock_guard<std::mutex> lock(serialNumMutex_);
+        return serialNum_;
     }
 };
 
@@ -255,6 +277,22 @@ public:
         if (inner != nullptr) {
             inner->decMsgNum();
         }
+    }
+    inline int64_t IncreaseSerialNum(int32_t slotId)
+    {
+        auto inner = FindManagerInner(slotId);
+        if (inner != nullptr) {
+            return inner->IncreaseSerialNum();
+        }
+        return NetworkSearchManagerInner::SERIAL_NUMBER_DEFAULT;
+    }
+    inline int64_t GetSerialNum(int32_t slotId)
+    {
+        auto inner = FindManagerInner(slotId);
+        if (inner != nullptr) {
+            return inner->GetSerialNum();
+        }
+        return NetworkSearchManagerInner::SERIAL_NUMBER_DEFAULT;
     }
     inline sptr<NetworkSearchCallBackBase> GetCellularDataCallBack()
     {
