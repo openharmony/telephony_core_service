@@ -18,6 +18,9 @@
 
 #include "radio_event.h"
 #include "securec.h"
+#include "sim_constant.h"
+#include "sim_data_type.h"
+#include "sim_utils.h"
 #include "tel_ril_manager.h"
 #include "telephony_log_wrapper.h"
 
@@ -128,6 +131,7 @@ void TelRilTest::OnInitSim()
     /*-----------------------------------SIM----------------------------------*/
     memberFuncMap_[DiffInterfaceId::TEST_GET_SIM_CARD_STATUS] = &TelRilTest::OnRequestSimGetSimStatusTest;
     memberFuncMap_[DiffInterfaceId::TEST_SIM_IO] = &TelRilTest::OnRequestSimIccIoTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_SIM_SMS] = &TelRilTest::OnRequestSimSmsTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_IMSI] = &TelRilTest::OnRequestSimGetImsiTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_SIM_LOCK_STATUS] = &TelRilTest::OnRequestGetSimLockStatusTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_SIM_LOCK] = &TelRilTest::OnRequestSetSimLockTest;
@@ -276,6 +280,51 @@ void TelRilTest::OnRequestSimIccIoTest(int32_t slotId, const std::shared_ptr<App
         simIoRequestInfo.pin2 = "";
         telRilManager_->GetSimIO(slotId, simIoRequestInfo, event);
         TELEPHONY_LOGI("TelRilTest::OnRequestSimIccIoTest --> OnRequestSimIccIoTest finished");
+    }
+}
+
+void TelRilTest::OnRequestSimSmsTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t cardType = 0;
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_IO);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr");
+        return;
+    }
+    event->SetOwner(handler);
+    std::cout << "input 0 : GSM or 1 : CDMA" << std::endl;
+    std::cin >> cardType;
+    TELEPHONY_LOGI("TelRilTest::cardType is %{public}d", cardType);
+    std::string path = cardType == 0 ? "3F007F10" : "3F007F25";
+    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(FILEID_SMS, path);
+    ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(event));
+
+    std::unique_ptr<IccToRilMsg> msg = std::make_unique<IccToRilMsg>(ctrlHolder);
+    if (msg == nullptr) {
+        TELEPHONY_LOGE("msg is nullptr");
+        return;
+    }
+    int64_t param = 0;
+    AppExecFwk::InnerEvent::Pointer process = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_IO, msg, param);
+    if (process == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
+    process->SetOwner(handler);
+
+    if (telRilManager_ != nullptr) {
+        TELEPHONY_LOGI("TelRilTest::OnRequestSimSmsTest -->");
+        SimIoRequestInfo simIoRequestInfo;
+        simIoRequestInfo.command = COMMAND;
+        simIoRequestInfo.fileId = FILEID_SMS;
+        simIoRequestInfo.p1 = 0;
+        simIoRequestInfo.p2 = 0;
+        simIoRequestInfo.p3 = P3;
+        simIoRequestInfo.data = "";
+        simIoRequestInfo.path = path;
+        simIoRequestInfo.pin2 = "";
+        telRilManager_->GetSimIO(slotId, simIoRequestInfo, process);
+        TELEPHONY_LOGI("TelRilTest::OnRequestSimSmsTest --> OnRequestSimSmsTest finished");
     }
 }
 
@@ -1843,8 +1892,50 @@ void TelRilTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
             break;
         }
         default:
+            ProcessRecordSize(event);
             break;
     }
+}
+
+void TelRilTest::DemoHandler::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    int size = 0;
+    std::unique_ptr<IccFromRilMsg> receiveMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (receiveMsg == nullptr) {
+        TELEPHONY_LOGE("receiveMsg is nullptr");
+        return;
+    }
+    IccFileData *result = &(receiveMsg->fileData);
+    std::shared_ptr<IccControllerHolder> &holder = receiveMsg->controlHolder;
+    if (result == nullptr || holder == nullptr) {
+        return;
+    }
+    TELEPHONY_LOGI(" resultData: %{public}s", result->resultData.c_str());
+    int recordLen = 0;
+    std::shared_ptr<unsigned char> rawData = SIMUtils::HexStringConvertToBytes(result->resultData, recordLen);
+    if (rawData == nullptr) {
+        return;
+    }
+    unsigned char *fileData = rawData.get();
+    if (recordLen > LENGTH_OF_RECORD) {
+        GetFileAndDataSize(fileData, holder->fileSize, size);
+        if (holder->fileSize != 0) {
+            holder->countFiles = size / holder->fileSize;
+        }
+    }
+    TELEPHONY_LOGI("ProcessRecordSize %{public}d %{public}d %{public}d", size, holder->fileSize, holder->countFiles);
+}
+
+void TelRilTest::DemoHandler::GetFileAndDataSize(const unsigned char *data, int &fileSize, int &dataSize)
+{
+    uint8_t byteNum = 0xFF;
+    uint32_t offset = 8;
+    if (data == nullptr) {
+        TELEPHONY_LOGE("GetFileAndDataSize null data");
+        return;
+    }
+    fileSize = data[LENGTH_OF_RECORD] & byteNum;
+    dataSize = ((data[SIZE_ONE_OF_FILE] & byteNum) << offset) + (data[SIZE_TWO_OF_FILE] & byteNum);
 }
 
 void TelRilTest::DemoHandler::OnRequestShutDownTestResponse(const AppExecFwk::InnerEvent::Pointer &event)
@@ -2006,7 +2097,7 @@ void SimTest()
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIM_CARD_STATUS) << "--> OnRequestSimGetSimStatusTest"
          << endl; // pass
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_SIM_IO) << "--> OnRequestSimIccIoTest" << endl;
-
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIM_SMS) << "--> OnRequestSimSmsTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_OPEN_LG_SIMIO) << "--> OnRequestOpenLGSimIOTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_TRANSMIT_APDU_LOGICAL_CHANNEL)
          << "--> OnRequestTransmitApduLogicalChannelTest" << endl;

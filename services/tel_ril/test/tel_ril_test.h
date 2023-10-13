@@ -27,6 +27,7 @@ namespace Telephony {
 enum class DiffInterfaceId {
     TEST_GET_SIM_CARD_STATUS = 1,
     TEST_SIM_IO,
+    TEST_GET_SIM_SMS,
     TEST_OPEN_LG_SIMIO,
     TEST_TRANSMIT_APDU_LOGICAL_CHANNEL,
     TEST_TRANSMIT_APDU_BASIC_CHANNEL,
@@ -130,6 +131,9 @@ enum class DiffInterfaceId {
     TEST_GET_XLEMA,
     TEST_GET_CALL_FAIL,
     TEST_SET_VONR_SWITCH,
+    TEST_GET_RRC_CONNECTION_STATE,
+    TEST_GET_NR_OPTION_MODE,
+    TEST_SET_NR_OPTION_MODE,
     TEST_EXIT,
 };
 
@@ -150,6 +154,7 @@ const int32_t TYPESBITMAP = 12;
 const int32_t P3 = 15;
 const int32_t COMMAND = 192;
 const int32_t FILEID = 20272;
+const int32_t FILEID_SMS = 28476;
 const int32_t AUTHTYPE_1 = 0;
 const int32_t BANDWIDTH_HYSTERESIS_MS = 3000;
 const int32_t BANDWIDTH_HYSTERESIS_KBPS = 50;
@@ -199,6 +204,8 @@ public:
     void OnRequestSimIccIoTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestOpenLGSimIOTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+
+    void OnRequestSimSmsTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestTransmitApduLogicalChannelTest(int32_t slotId,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -375,6 +382,9 @@ public:
     void OnRequestGetEmergencyCallListTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetCallFailReasonTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestSetVoNRSwitchTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestGetRrcConnectionStateTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestGetNrOptionModeTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestSetNrOptionModeTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     class DemoHandler : public AppExecFwk::EventHandler {
     public:
@@ -390,6 +400,8 @@ public:
         int32_t slotId_;
         void OnRequestGetBasebandVersionTestResponse(const AppExecFwk::InnerEvent::Pointer &event);
         void OnRequestShutDownTestResponse(const AppExecFwk::InnerEvent::Pointer &event);
+        void ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer &event);
+        void GetFileAndDataSize(const unsigned char *data, int &fileSize, int &dataSize);
     };
 
 private:
