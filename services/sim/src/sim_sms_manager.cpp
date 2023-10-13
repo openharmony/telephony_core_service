@@ -72,7 +72,7 @@ int32_t SimSmsManager::AddSmsToIcc(int status, std::string &pdu, std::string &sm
 {
     if (smsController_ == nullptr) {
         TELEPHONY_LOGE("SimSmsManager::AddSmsToIcc smsController_ nullptr");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     int32_t result = smsController_->AddSmsToIcc(status, pdu, smsc);
@@ -96,7 +96,7 @@ int32_t SimSmsManager::DelSmsIcc(int index)
 {
     if (smsController_ == nullptr) {
         TELEPHONY_LOGE("SimSmsManager::DelSmsIcc smsController_ nullptr");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     int32_t result = smsController_->DelSmsIcc(index);
