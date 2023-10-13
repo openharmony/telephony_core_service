@@ -208,6 +208,12 @@ int32_t TelRilNetwork::NetworkCurrentCellUpdated_1_1(
         TELEPHONY_LOG_FUNC_NAME, currentCellList, RadioEvent::RADIO_CURRENT_CELL_UPDATE);
 }
 
+int32_t TelRilNetwork::ResidentNetworkUpdated(const std::string &plmn)
+{
+    return Notify<std::string>(
+        TELEPHONY_LOG_FUNC_NAME, std::make_shared<std::string>(plmn), RadioEvent::RADIO_RESIDENT_NETWORK_CHANGE);
+}
+
 int32_t TelRilNetwork::GetSignalStrengthResponse(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::Rssi &rssi)
 {
