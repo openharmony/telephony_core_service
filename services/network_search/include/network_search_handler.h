@@ -72,21 +72,21 @@ public:
      * 27007-410_2001 7.3 PLMN selection +COPS
      * 3GPP TS 27.007 V4.1.0 (2001-03)
      */
-    void GetRilOperatorInfo(bool checkTime = true);
+    void GetRilOperatorInfo(int64_t serialNum, bool checkTime = true);
 
     /**
      * Get PS network registration status
      * 27007-410_2001 10.1.19	GPRS network registration status +CGREG
      * 3GPP TS 27.007 V4.1.0 (2001-03)
      */
-    void GetRilPsRegistration(bool checkTime = true);
+    void GetRilPsRegistration(int64_t serialNum, bool checkTime = true);
 
     /**
      * Get CS network registration status
      * 27007-410_2001 7.2 Network registration +CREG
      * 3GPP TS 27.007 V4.1.0 (2001-03)
      */
-    void GetRilCsRegistration(bool checkTime = true);
+    void GetRilCsRegistration(int64_t serialNum, bool checkTime = true);
 
     void UpdateCellLocation(int32_t techType, int32_t cellId, int32_t lac);
     sptr<CellLocation> GetCellLocation();

@@ -77,6 +77,19 @@ void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("OperatorName::HandleOperatorInfo networkSearchManager is nullptr slotId:%{public}d", slotId_);
         return;
     }
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
+    std::shared_ptr<OperatorInfoResult> operatorInfoResult = event->GetSharedObject<OperatorInfoResult>();
+    if (operatorInfoResult == nullptr) {
+        TELEPHONY_LOGE("operatorInfoResult is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
+    if (operatorInfoResult->flag != networkSearchManager->GetSerialNum(slotId_)) {
+        TELEPHONY_LOGI("Aborting outdated operator info event slotId:%{public}d", slotId_);
+        return;
+    }
     PhoneType type = networkSearchManager->GetPhoneType(slotId_);
     if (type == PhoneType::PHONE_TYPE_IS_GSM) {
         GsmOperatorInfo(event);

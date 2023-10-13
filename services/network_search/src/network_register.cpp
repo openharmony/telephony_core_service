@@ -62,6 +62,19 @@ void NetworkRegister::InitNrConversionConfig()
     }
 }
 
+void NetworkRegister::UpdateNetworkSearchState(RegServiceState regStatus,
+                                               RadioTech tech,
+                                               RoamingType roam,
+                                               DomainType type)
+{
+    regStatusResult_ = regStatus;
+    networkSearchState_->SetNetworkState(regStatus, type);
+    networkSearchState_->SetEmergency(
+        (regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) && isCsCapable_);
+    networkSearchState_->SetNetworkType(tech, type);
+    networkSearchState_->SetNetworkStateToRoaming(roam, type);
+}
+
 void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &event)
 {
     auto networkSearchManager = networkSearchManager_.lock();
@@ -69,7 +82,6 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
         TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister networkSearchManager is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    networkSearchManager->decMsgNum(slotId_);
     if (event == nullptr) {
         TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister event is nullptr slotId:%{public}d", slotId_);
         return;
@@ -79,6 +91,11 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
         TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister csRegStateResult is nullptr slotId:%{public}d", slotId_);
         return;
     }
+    if (csRegStateResult->flag != networkSearchManager->GetSerialNum(slotId_)) {
+        TELEPHONY_LOGI("Aborting outdated cs registration event slotId:%{public}d", slotId_);
+        return;
+    }
+    networkSearchManager->decMsgNum(slotId_);
     RilRegister registrationStatus = static_cast<RilRegister>(csRegStateResult->regStatus);
     RegServiceState regStatus = ConvertRegFromRil(registrationStatus);
     if (networkSearchState_ == nullptr) {
@@ -92,16 +109,12 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
             cellularCall->SetReadyToCall(slotId_, csType, true);
         }
     }
-    regStatusResult_ = regStatus;
-    networkSearchState_->SetNetworkState(regStatus, DomainType::DOMAIN_TYPE_CS);
-    networkSearchState_->SetEmergency((regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) && isCsCapable_);
     RadioTech tech = ConvertTechFromRil(static_cast<HRilRadioTech>(csRegStateResult->radioTechnology));
-    networkSearchState_->SetNetworkType(tech, DomainType::DOMAIN_TYPE_CS);
     RoamingType roam = RoamingType::ROAMING_STATE_UNKNOWN;
     if (registrationStatus == RilRegister::REG_STATE_ROAMING) {
         roam = RoamingType::ROAMING_STATE_UNSPEC;
     }
-    networkSearchState_->SetNetworkStateToRoaming(roam, DomainType::DOMAIN_TYPE_CS);
+    UpdateNetworkSearchState(regStatus, tech, roam, DomainType::DOMAIN_TYPE_CS);
     TELEPHONY_LOGI("regStatus= %{public}d radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
         registrationStatus, csRegStateResult->radioTechnology, roam, slotId_);
     networkSearchManager->UpdateCellLocation(
@@ -121,7 +134,6 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
         TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister networkSearchManager is nullptr");
         return;
     }
-    networkSearchManager->decMsgNum(slotId_);
     if (event == nullptr) {
         TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister event is nullptr slotId:%{public}d", slotId_);
         return;
@@ -131,6 +143,11 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
         TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister psRegStatusResult is nullptr slotId:%{public}d", slotId_);
         return;
     }
+    if (psRegStatusResult->flag != networkSearchManager->GetSerialNum(slotId_)) {
+        TELEPHONY_LOGI("Aborting outdated ps registration event slotId:%{public}d", slotId_);
+        return;
+    }
+    networkSearchManager->decMsgNum(slotId_);
     RilRegister registrationStatus = static_cast<RilRegister>(psRegStatusResult->regStatus);
     RegServiceState regStatus = ConvertRegFromRil(registrationStatus);
     if (networkSearchState_ == nullptr) {
@@ -143,16 +160,12 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
             cellularCall->SetReadyToCall(slotId_, IMS_TYPE, true);
         }
     }
-    regStatusResult_ = regStatus;
-    networkSearchState_->SetNetworkState(regStatus, DomainType::DOMAIN_TYPE_PS);
-    networkSearchState_->SetEmergency((regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) && isCsCapable_);
     RadioTech tech = ConvertTechFromRil(static_cast<HRilRadioTech>(psRegStatusResult->radioTechnology));
-    networkSearchState_->SetNetworkType(tech, DomainType::DOMAIN_TYPE_PS);
     RoamingType roam = RoamingType::ROAMING_STATE_UNKNOWN;
     if (registrationStatus == RilRegister::REG_STATE_ROAMING) {
         roam = RoamingType::ROAMING_STATE_UNSPEC;
     }
-    networkSearchState_->SetNetworkStateToRoaming(roam, DomainType::DOMAIN_TYPE_PS);
+    UpdateNetworkSearchState(regStatus, tech, roam, DomainType::DOMAIN_TYPE_PS);
     endcSupport_ = psRegStatusResult->isEnDcAvailable;
     dcNrRestricted_ = psRegStatusResult->isDcNrRestricted;
     nrSupport_ = psRegStatusResult->isNrAvailable;
