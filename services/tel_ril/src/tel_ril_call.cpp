@@ -28,7 +28,7 @@ static const int32_t DTMF_ON_LENGTH = 150;
 static const int32_t DTMF_OFF_LENGTH = 70;
 static const int32_t DTMF_STRING_LENGTH = 1;
 
-TelRilCall::TelRilCall(int32_t slotId, sptr<HDI::Ril::V1_1::IRil> rilInterface,
+TelRilCall::TelRilCall(int32_t slotId, sptr<HDI::Ril::V1_2::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {}

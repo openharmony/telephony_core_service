@@ -26,7 +26,7 @@ using OHOS::IRemoteObject;
 using OHOS::sptr;
 namespace OHOS {
 namespace Telephony {
-TelRilNetwork::TelRilNetwork(int32_t slotId, sptr<HDI::Ril::V1_1::IRil> rilInterface,
+TelRilNetwork::TelRilNetwork(int32_t slotId, sptr<HDI::Ril::V1_2::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {}

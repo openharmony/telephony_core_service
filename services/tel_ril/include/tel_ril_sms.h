@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Telephony {
 class TelRilSms : public TelRilBase {
 public:
-    TelRilSms(int32_t slotId, sptr<HDI::Ril::V1_1::IRil> rilInterface, std::shared_ptr<ObserverHandler> observerHandler,
+    TelRilSms(int32_t slotId, sptr<HDI::Ril::V1_2::IRil> rilInterface, std::shared_ptr<ObserverHandler> observerHandler,
         std::shared_ptr<TelRilHandler> handler);
     ~TelRilSms() = default;
 
