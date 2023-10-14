@@ -16,13 +16,13 @@
 #ifndef TEL_RIL_CALLBACK_H
 #define TEL_RIL_CALLBACK_H
 
-#include <v1_1/iril.h>
+#include <v1_2/iril.h>
 
 #include "tel_ril_manager.h"
 
 namespace OHOS {
 namespace Telephony {
-class TelRilCallback : public HDI::Ril::V1_1::IRilCallback {
+class TelRilCallback : public HDI::Ril::V1_2::IRilCallback {
 public:
     explicit TelRilCallback(std::shared_ptr<TelRilManager> telRilManager);
     ~TelRilCallback() = default;
