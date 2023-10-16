@@ -103,7 +103,7 @@ private:
     void DfxWriteCallFaultEvent(std::shared_ptr<TelRilRequest> telRilRequest, const int32_t error);
 
 private:
-    static std::atomic_uint nextSerialId_;
+    static std::atomic_int nextSerialId_;
     static std::unordered_map<int32_t, std::shared_ptr<TelRilRequest>> requestMap_;
     static std::mutex requestLock_;
     static std::shared_ptr<TelRilHandler> handler_;
