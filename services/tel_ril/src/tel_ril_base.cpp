@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-std::atomic_uint TelRilBase::nextSerialId_(1);
+std::atomic_int TelRilBase::nextSerialId_(1);
 std::unordered_map<int32_t, std::shared_ptr<TelRilRequest>> TelRilBase::requestMap_;
 std::mutex TelRilBase::requestLock_;
 std::shared_ptr<TelRilHandler> TelRilBase::handler_;
@@ -52,7 +52,7 @@ std::shared_ptr<TelRilRequest> TelRilBase::CreateTelRilRequest(
 
 int32_t TelRilBase::GetNextSerialId(void)
 {
-    if (nextSerialId_ >= UINT32_MAX) {
+    if (nextSerialId_ >= INT32_MAX) {
         nextSerialId_ = 1;
     }
     return nextSerialId_++;
