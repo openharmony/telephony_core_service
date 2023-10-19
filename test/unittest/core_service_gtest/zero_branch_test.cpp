@@ -2276,6 +2276,7 @@ HWTEST_F(BranchTest, Telephony_IccOperatorRule_001, Function | MediumTest | Leve
     EXPECT_FALSE(operatorMatchingRule->IccidRegexMatch(iccidFromSim, iccidRegex));
     EXPECT_FALSE(operatorMatchingRule->ImsiRegexMatch(iccidFromSim, iccidRegex));
     EXPECT_FALSE(operatorMatchingRule->SpnRegexMatch(iccidFromSim, iccidRegex));
+    EXPECT_TRUE(operatorMatchingRule->SpnRegexMatch(iccidFromSim, "null"));
     EXPECT_FALSE(operatorMatchingRule->PrefixMatch(iccidFromSim, iccidRegex));
 }
 
