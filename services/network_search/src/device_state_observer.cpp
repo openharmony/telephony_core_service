@@ -15,18 +15,24 @@
 
 #include "device_state_observer.h"
 
+#ifdef ABILITY_BATTERY_SUPPORT
 #include "battery_srv_client.h"
+#endif
 #include "iservice_registry.h"
 #include "networkshare_client.h"
 #include "networkshare_constants.h"
+#ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
 #include "power_mode_info.h"
+#endif
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
+#ifdef ABILITY_POWER_SUPPORT
 using PowerMode = OHOS::PowerMgr::PowerMode;
+#endif
 namespace {
 const std::string NET_TYPE = "NetType";
 }
@@ -134,6 +140,7 @@ void DeviceStateEventSubscriber::ProcessWifiState(const CommonEventData &data)
 
 void DeviceStateEventSubscriber::ProcessPowerSaveMode(const CommonEventData &data)
 {
+#ifdef ABILITY_POWER_SUPPORT
     if (deviceStateHandler_ == nullptr) {
         TELEPHONY_LOGE("DeviceStateEventSubscriber::ProcessPowerSaveMode networkSearchHandler_ is nullptr");
         return;
@@ -153,6 +160,7 @@ void DeviceStateEventSubscriber::ProcessPowerSaveMode(const CommonEventData &dat
             break;
     }
     TELEPHONY_LOGI("ProcessPowerSaveMode powerModeCode %{public}d", static_cast<int32_t>(powerModeCode));
+#endif
 }
 
 void DeviceStateEventSubscriber::SetEventHandler(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler)
@@ -205,17 +213,21 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
     }
     switch (systemAbilityId) {
         case POWER_MANAGER_SERVICE_ID: {
+#ifdef ABILITY_POWER_SUPPORT
             auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
             sub_->GetEventHandler()->ProcessScreenDisplay(powerMgrClient.IsScreenOn());
             auto powerSaveMode = powerMgrClient.GetDeviceMode();
             sub_->GetEventHandler()->ProcessPowerSaveMode(
                 powerSaveMode == PowerMode::POWER_SAVE_MODE || powerSaveMode == PowerMode::EXTREME_POWER_SAVE_MODE);
+#endif
             break;
         }
         case POWER_MANAGER_BATT_SERVICE_ID: {
+#ifdef ABILITY_BATTERY_SUPPORT
             auto &batterySrvClient = PowerMgr::BatterySrvClient::GetInstance();
             sub_->GetEventHandler()->ProcessChargingState(
                 batterySrvClient.GetChargingStatus() == PowerMgr::BatteryChargeState::CHARGE_STATE_ENABLE);
+#endif
             break;
         }
         case COMMON_EVENT_SERVICE_ID: {

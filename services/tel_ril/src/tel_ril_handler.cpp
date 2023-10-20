@@ -51,11 +51,13 @@ void TelRilHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 
 void TelRilHandler::OnInit(void)
 {
+#ifdef ABILITY_POWER_SUPPORT
     auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
     ackRunningLock_ = powerMgrClient.CreateRunningLock(
         "telRilAckRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
     reqRunningLock_ = powerMgrClient.CreateRunningLock(
         "telRilRequestRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
+#endif
     reqRunningLockCount_ = 0;
     reqLockSerialNum_ = 0;
     ackLockSerialNum_ = 0;
@@ -63,6 +65,7 @@ void TelRilHandler::OnInit(void)
 
 void TelRilHandler::ApplyRunningLock(int32_t lockType)
 {
+#ifdef ABILITY_POWER_SUPPORT
     if (ackRunningLock_ == nullptr) {
         auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
         ackRunningLock_ = powerMgrClient.CreateRunningLock(
@@ -91,10 +94,12 @@ void TelRilHandler::ApplyRunningLock(int32_t lockType)
     } else {
         TELEPHONY_LOGE("ApplyRunningLock, lockType:%{public}d is invalid", lockType);
     }
+#endif
 }
 
 void TelRilHandler::ReduceRunningLock(int32_t lockType)
 {
+#ifdef ABILITY_POWER_SUPPORT
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
     TELEPHONY_LOGD("ReduceRunningLock, reqRunningLockCount_:%{public}d", static_cast<int>(reqRunningLockCount_));
     if ((reqRunningLock_ != nullptr) && (lockType == NORMAL_RUNNING_LOCK)) {
@@ -108,10 +113,12 @@ void TelRilHandler::ReduceRunningLock(int32_t lockType)
     } else {
         TELEPHONY_LOGW("ReduceRunningLock type %{public}d don't processe.", lockType);
     }
+#endif
 }
 
 void TelRilHandler::ReleaseRunningLock(int32_t lockType)
 {
+#ifdef ABILITY_POWER_SUPPORT
     if (reqRunningLock_ == nullptr || ackRunningLock_ == nullptr) {
         TELEPHONY_LOGE("reqRunningLock_ or ackRunningLock_ is nullptr");
         return;
@@ -126,6 +133,7 @@ void TelRilHandler::ReleaseRunningLock(int32_t lockType)
     } else {
         TELEPHONY_LOGE("ReleaseRunningLock, lockType:%{public}d is invalid", lockType);
     }
+#endif
 }
 } // namespace Telephony
 } // namespace OHOS

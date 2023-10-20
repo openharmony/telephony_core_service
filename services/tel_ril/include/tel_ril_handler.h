@@ -18,7 +18,9 @@
 
 #include "event_handler.h"
 #include "event_runner.h"
+#ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -44,8 +46,10 @@ public:
     static const int32_t ACK_RUNNING_LOCK = 101;
 
 private:
+#ifdef ABILITY_POWER_SUPPORT
     std::shared_ptr<PowerMgr::RunningLock> reqRunningLock_;
     std::shared_ptr<PowerMgr::RunningLock> ackRunningLock_;
+#endif
     std::atomic_uint reqRunningLockCount_;
     std::atomic_int reqLockSerialNum_;
     std::atomic_int ackLockSerialNum_;
