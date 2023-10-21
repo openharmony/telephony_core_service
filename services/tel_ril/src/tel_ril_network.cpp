@@ -26,7 +26,7 @@ using OHOS::IRemoteObject;
 using OHOS::sptr;
 namespace OHOS {
 namespace Telephony {
-TelRilNetwork::TelRilNetwork(int32_t slotId, sptr<HDI::Ril::V1_1::IRil> rilInterface,
+TelRilNetwork::TelRilNetwork(int32_t slotId, sptr<HDI::Ril::V1_2::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {}
@@ -206,6 +206,12 @@ int32_t TelRilNetwork::NetworkCurrentCellUpdated_1_1(
     BuildCurrentCellInformationList(currentCellList, cellListCurrentInformation);
     return Notify<CellListCurrentInformation>(
         TELEPHONY_LOG_FUNC_NAME, currentCellList, RadioEvent::RADIO_CURRENT_CELL_UPDATE);
+}
+
+int32_t TelRilNetwork::ResidentNetworkUpdated(const std::string &plmn)
+{
+    return Notify<std::string>(
+        TELEPHONY_LOG_FUNC_NAME, std::make_shared<std::string>(plmn), RadioEvent::RADIO_RESIDENT_NETWORK_CHANGE);
 }
 
 int32_t TelRilNetwork::GetSignalStrengthResponse(

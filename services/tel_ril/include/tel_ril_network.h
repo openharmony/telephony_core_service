@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Telephony {
 class TelRilNetwork : public TelRilBase {
 public:
-    TelRilNetwork(int32_t slotId, sptr<HDI::Ril::V1_1::IRil> rilInterface,
+    TelRilNetwork(int32_t slotId, sptr<HDI::Ril::V1_2::IRil> rilInterface,
         std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     ~TelRilNetwork() = default;
 
@@ -58,6 +58,7 @@ public:
     int32_t NetworkPhyChnlCfgUpdated(const HDI::Ril::V1_1::ChannelConfigInfoList &channelConfigInfoList);
     int32_t NetworkCurrentCellUpdated(const HDI::Ril::V1_1::CellListCurrentInfo &cellListCurrentInfo);
     int32_t NetworkCurrentCellUpdated_1_1(const HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellListCurrentInformation);
+    int32_t ResidentNetworkUpdated(const std::string &plmn);
 
     int32_t GetSignalStrengthResponse(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::Rssi &rssi);
