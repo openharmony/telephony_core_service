@@ -16,8 +16,8 @@
 #ifndef NETWORK_SEARCH_SETTINGS_RDB_HELPER_H
 #define NETWORK_SEARCH_SETTINGS_RDB_HELPER_H
 
-#include <memory>
 #include <singleton.h>
+#include <memory>
 #include <utility>
 
 #include "datashare_helper.h"
@@ -36,6 +36,7 @@ namespace OHOS {
 namespace Telephony {
 class SettingUtils : public DelayedSingleton<SettingUtils> {
     DECLARE_DELAYED_SINGLETON(SettingUtils);
+
 public:
     static const std::string NETWORK_SEARCH_SETTING_URI;
     static const std::string NETWORK_SEARCH_SETTING_AUTO_TIME_URI;
@@ -73,18 +74,8 @@ public:
 
 class AutoTimeObserver : public AAFwk::DataAbilityObserverStub {
 public:
-    AutoTimeObserver(std::shared_ptr<NetworkSearchHandler> &networkSearchHandler);
+    explicit AutoTimeObserver(std::shared_ptr<NetworkSearchHandler> &networkSearchHandler);
     ~AutoTimeObserver() = default;
-    void OnChange() override;
-
-private:
-    std::shared_ptr<NetworkSearchHandler> networkSearchHandler_;
-};
-
-class AutoTimezoneObserver : public AAFwk::DataAbilityObserverStub {
-public:
-    AutoTimezoneObserver(std::shared_ptr<NetworkSearchHandler> &networkSearchHandler);
-    ~AutoTimezoneObserver() = default;
     void OnChange() override;
 
 private:
@@ -93,7 +84,7 @@ private:
 
 class AirplaneModeObserver : public AAFwk::DataAbilityObserverStub {
 public:
-    AirplaneModeObserver(std::shared_ptr<NetworkSearchHandler> &networkSearchHandler);
+    explicit AirplaneModeObserver(std::shared_ptr<NetworkSearchHandler> &networkSearchHandler);
     ~AirplaneModeObserver() = default;
     void OnChange() override;
 
