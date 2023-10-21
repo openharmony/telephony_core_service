@@ -214,6 +214,10 @@ bool SimNumberDecode::BCDSectionConvertToString(const std::vector<uint8_t>::cons
 bool SimNumberDecode::BCDConvertToString(const std::vector<uint8_t>::const_iterator &codeBeg,
     const std::vector<uint8_t>::const_iterator &codeEnd, std::string &number, const int bcdExtType)
 {
+    if (codeBeg == codeEnd) {
+        TELEPHONY_LOGE("occur error by iterator");
+        return false;
+    }
     TELEPHONY_LOGI("SimNumberDecode::BCDConvertToString begin with codes:'%{public}s' and bcdExtType:'%{public}d'",
         HexToStr(std::vector<uint8_t>(codeBeg, codeEnd)).c_str(), bcdExtType);
     std::vector<uint8_t>::const_iterator it = codeBeg;
