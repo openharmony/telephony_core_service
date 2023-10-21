@@ -126,7 +126,6 @@ private:
     void RadioChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event);
     void AutoTimeChange(const AppExecFwk::InnerEvent::Pointer &);
-    void AutoTimeZoneChange(const AppExecFwk::InnerEvent::Pointer &);
     void AirplaneModeChange(const AppExecFwk::InnerEvent::Pointer &);
     void RadioGetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &event);
     void SetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event);

@@ -60,7 +60,6 @@ struct NetworkSearchManagerInner {
     std::shared_ptr<DeviceStateHandler> deviceStateHandler_ = nullptr;
     std::shared_ptr<DeviceStateObserver> deviceStateObserver_ = nullptr;
     sptr<AutoTimeObserver> settingAutoTimeObserver_ = nullptr;
-    sptr<AutoTimezoneObserver> settingAutoTimezoneObserver_ = nullptr;
     sptr<AirplaneModeObserver> airplaneModeObserver_ = nullptr;
     HandleRunningState state_ = HandleRunningState::STATE_NOT_START;
     std::unique_ptr<NetworkSearchResult> networkSearchResult_ = nullptr;
