@@ -27,6 +27,7 @@ ohos_unittest("tel_core_service_gtest") {
     "ims_reg_info_callback_gtest.cpp",
     "network_search_test.cpp",
     "network_search_test_callback_stub.cpp",
+    "network_search_test_time_zone.cpp",
     "security_token.cpp",
     "sim_core_service_test.cpp",
     "sim_elementary_file_test.cpp",
@@ -61,6 +62,7 @@ ohos_unittest("tel_core_service_gtest") {
 
   external_deps = [
     "ability_base:want",
+    "ability_base:zuri",
     "ability_runtime:ability_manager",
     "ability_runtime:data_ability_helper",
     "ability_runtime:wantagent_innerkits",
@@ -79,6 +81,8 @@ ohos_unittest("tel_core_service_gtest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "location:lbsservice_common",
+    "location:locator_sdk",
     "netmanager_base:net_conn_manager_if",
     "netmanager_ext:net_tether_manager_if",
     "power_manager:powermgr_client",

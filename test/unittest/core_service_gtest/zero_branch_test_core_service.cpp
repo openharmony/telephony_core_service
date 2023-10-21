@@ -18,10 +18,13 @@
 #include <string_ex.h>
 
 #include "core_service.h"
+#include "network_search_manager.h"
 #include "network_search_test_callback_stub.h"
 #include "runner_pool.h"
 #include "security_token.h"
+#include "sim_manager.h"
 #include "telephony_log_wrapper.h"
+#include "time_zone_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -221,6 +224,182 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_001, Function | Mediu
     std::string version;
     EXPECT_GE(
         DelayedSingleton<CoreService>::GetInstance()->GetBasebandVersion(SLOT_ID, version), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_TimeZoneManager_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneManager_001, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    DelayedSingleton<TimeZoneManager>::GetInstance()->Init(networkSearchManager);
+    std::string countryCode = "cn";
+    DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
+    int32_t offset = 0;
+    DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateTimeZoneOffset(offset, DEFAULT_SIM_SLOT_ID);
+    std::string timeZone = "Asia/Singapore";
+    EXPECT_FALSE(DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateLocationTimeZone(timeZone));
+    DelayedSingleton<TimeZoneManager>::GetInstance()->SendUpdateLocationRequest();
+    DelayedSingleton<TimeZoneManager>::GetInstance()->SendUpdateLocationCountryCodeRequest();
+    DelayedSingleton<TimeZoneManager>::GetInstance()->IsRoaming();
+    DelayedSingleton<TimeZoneManager>::GetInstance()->HasSimCard();
+    DelayedSingleton<TimeZoneManager>::GetInstance()->GetCurrentLac();
+
+    auto inner = std::make_shared<NetworkSearchManagerInner>();
+    networkSearchManager->AddManagerInner(DEFAULT_SIM_SLOT_ID, inner);
+    DelayedSingleton<TimeZoneManager>::GetInstance()->Init(networkSearchManager);
+    inner->eventLoop_ = AppExecFwk::EventRunner::Create("test");
+    DelayedSingleton<TimeZoneManager>::GetInstance()->Init(networkSearchManager);
+    DelayedSingleton<TimeZoneManager>::GetInstance()->Init(networkSearchManager);
+    DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
+    DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateTimeZoneOffset(offset, DEFAULT_SIM_SLOT_ID);
+    DelayedSingleton<TimeZoneManager>::GetInstance()->SendUpdateLocationRequest();
+    DelayedSingleton<TimeZoneManager>::GetInstance()->SendUpdateLocationCountryCodeRequest();
+    DelayedSingleton<TimeZoneManager>::GetInstance()->IsRoaming();
+    DelayedSingleton<TimeZoneManager>::GetInstance()->HasSimCard();
+    DelayedSingleton<TimeZoneManager>::GetInstance()->GetCurrentLac();
+    EXPECT_FALSE(DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateLocationTimeZone(timeZone));
+}
+
+/**
+ * @tc.number   Telephony_TimeZoneUpdater_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneUpdater_001, Function | MediumTest | Level1)
+{
+    auto eventLoop = AppExecFwk::EventRunner::Create("test");
+    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>(eventLoop);
+    timeZoneUpdater->Init();
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    timeZoneUpdater->ProcessEvent(event);
+    std::string countryCode = "cn";
+    timeZoneUpdater->UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
+    int32_t offset = 0;
+    timeZoneUpdater->UpdateTimeZoneOffset(offset, DEFAULT_SIM_SLOT_ID);
+    std::string timeZone = "Asia/Shanghai";
+    timeZoneUpdater->UpdateLocationTimeZone(timeZone);
+    timeZoneUpdater->SendUpdateLocationRequest();
+    timeZoneUpdater->SendUpdateLocationCountryCodeRequest();
+    timeZoneUpdater->RegisterSetting();
+    Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=auto_timezone_test");
+    std::string key = "settings.telephony.autotimezonetest";
+    std::string value;
+    timeZoneUpdater->QuerySetting(uri, key, value);
+    timeZoneUpdater->StartEventSubscriber();
+    timeZoneUpdater->RequestLocationUpdate();
+    timeZoneUpdater->IsAutoTimeZone();
+    timeZoneUpdater->IsAirplaneMode();
+    timeZoneUpdater->IsScreenOn();
+    timeZoneUpdater->IsLocationTimeZoneEnabled();
+    timeZoneUpdater->UpdateTelephonyTimeZone();
+    timeZoneUpdater->UpdateTelephonyTimeZone(countryCode);
+    timeZoneUpdater->UpdateTelephonyTimeZone(offset);
+    timeZoneUpdater->NeedUpdateLocationTimeZone(timeZone);
+    timeZoneUpdater->SaveTimeZone(timeZone);
+    timeZoneUpdater->HandleAutoTimeZoneChange(event);
+    timeZoneUpdater->HandleAirplaneModeChange(event);
+    timeZoneUpdater->HandleLocationTimeOut(event);
+    timeZoneUpdater->HandleScreenOnEvent(event);
+    timeZoneUpdater->HandleCountryCodeChange(event);
+    timeZoneUpdater->HandleNetworkConnected(event);
+    timeZoneUpdater->HandleRequestLocationUpdate(event);
+    timeZoneUpdater->HandleRequestLocationCountryCode(event);
+    timeZoneUpdater->StopEventSubscriber();
+    timeZoneUpdater->UnRegisterSetting();
+    timeZoneUpdater->UnInit();
+    countryCode = "CN";
+    EXPECT_EQ(timeZoneUpdater->StringToLower(countryCode), "cn");
+    EXPECT_TRUE(timeZoneUpdater->IsTimeZoneMatchCountryCode(timeZone));
+    EXPECT_FALSE(timeZoneUpdater->IsMultiTimeZoneCountry(countryCode));
+}
+
+/**
+ * @tc.number   Telephony_TimeZoneUpdater_002
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneUpdater_002, Function | MediumTest | Level1)
+{
+    auto eventLoop = AppExecFwk::EventRunner::Create("test");
+    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>(eventLoop);
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    timeZoneUpdater->ProcessEvent(event);
+    std::string countryCode = "cn";
+    timeZoneUpdater->UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
+    int32_t offset = 0;
+    timeZoneUpdater->UpdateTimeZoneOffset(offset, DEFAULT_SIM_SLOT_ID);
+    std::string timeZone = "Asia/Shanghai";
+    timeZoneUpdater->UpdateLocationTimeZone(timeZone);
+    timeZoneUpdater->SendUpdateLocationRequest();
+    timeZoneUpdater->SendUpdateLocationCountryCodeRequest();
+    timeZoneUpdater->StartEventSubscriber();
+    timeZoneUpdater->StartEventSubscriber();
+    timeZoneUpdater->RequestLocationUpdate();
+    timeZoneUpdater->IsLocationTimeZoneEnabled();
+    timeZoneUpdater->HandleCountryCodeChange(event);
+    timeZoneUpdater->HandleNetworkConnected(event);
+    timeZoneUpdater->HandleRequestLocationUpdate(event);
+    timeZoneUpdater->HandleRequestLocationCountryCode(event);
+    timeZoneUpdater->HandleAutoTimeZoneChange(event);
+    timeZoneUpdater->HandleAirplaneModeChange(event);
+    timeZoneUpdater->HandleLocationTimeOut(event);
+    timeZoneUpdater->HandleScreenOnEvent(event);
+    timeZoneUpdater->StopEventSubscriber();
+    timeZoneUpdater->StopEventSubscriber();
+    timeZoneUpdater->UnRegisterSetting();
+    EXPECT_FALSE(timeZoneUpdater->IsMultiTimeZoneCountry(countryCode));
+}
+
+/**
+ * @tc.number   Telephony_TimeZoneLocationSuggester_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationSuggester_001, Function | MediumTest | Level1)
+{
+    auto eventLoop = AppExecFwk::EventRunner::Create("test");
+    auto suggester = std::make_shared<TimeZoneLocationSuggester>(eventLoop);
+    suggester->Init();
+    suggester->NitzUpdate();
+    Parcel parcel;
+    std::unique_ptr<Location::Location> location = Location::Location::Unmarshalling(parcel);
+    suggester->LocationUpdate(location);
+    suggester->GetLocationExpirationTime();
+    suggester->IsLocationExpired();
+    suggester->ClearLocation();
+    EXPECT_FALSE(suggester->HasLocation());
+}
+
+/**
+ * @tc.number   Telephony_TimeZoneLocationUpdate_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationUpdate_001, Function | MediumTest | Level1)
+{
+    auto eventLoop = AppExecFwk::EventRunner::Create("test");
+    auto suggester = std::make_shared<TimeZoneLocationSuggester>(eventLoop);
+    auto update = std::make_shared<TimeZoneLocationUpdate>(suggester);
+    update->StartPassiveUpdate();
+    update->StopPassiveUpdate();
+    update->RequestUpdate();
+    update->CancelUpdate();
+    update->LocationSwitchChange();
+    Parcel parcel;
+    std::unique_ptr<Location::Location> location = Location::Location::Unmarshalling(parcel);
+    update->LocationReport(location);
+    update->RegisterLocationChange();
+    update->UnregisterLocationChange();
+    update->RegisterSwitchCallback();
+    update->UnregisterSwitchCallback();
+    update->IsLocationEnabled();
+    update->GetIsoCountryCode();
+    EXPECT_NE(update->GetIsoCountryCode(), "test");
 }
 } // namespace Telephony
 } // namespace OHOS
