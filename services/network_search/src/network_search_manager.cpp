@@ -15,10 +15,10 @@
 
 #include "network_search_manager.h"
 
-#include <cinttypes>
 #include <parameters.h>
-#include <securec.h>
 #include <string_ex.h>
+#include <securec.h>
+#include <cinttypes>
 
 #include "core_service_errors.h"
 #include "enum_convert.h"
@@ -107,20 +107,16 @@ bool NetworkSearchManager::InitPointer(std::shared_ptr<NetworkSearchManagerInner
 bool NetworkSearchManagerInner::RegisterSetting()
 {
     settingAutoTimeObserver_ = new AutoTimeObserver(networkSearchHandler_);
-    settingAutoTimezoneObserver_ = new AutoTimezoneObserver(networkSearchHandler_);
     airplaneModeObserver_ = new AirplaneModeObserver(networkSearchHandler_);
     std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
-    if (settingAutoTimeObserver_ == nullptr || settingAutoTimezoneObserver_ == nullptr ||
-        airplaneModeObserver_ == nullptr || settingHelper == nullptr) {
+    if (settingAutoTimeObserver_ == nullptr || airplaneModeObserver_ == nullptr || settingHelper == nullptr) {
         TELEPHONY_LOGE("NetworkSearchManager::RegisterSetting is null.");
         return false;
     }
 
     Uri autoTimeUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIME_URI);
-    Uri autoTimezoneUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI);
     Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
     settingHelper->RegisterSettingsObserver(autoTimeUri, settingAutoTimeObserver_);
-    settingHelper->RegisterSettingsObserver(autoTimezoneUri, settingAutoTimezoneObserver_);
     settingHelper->RegisterSettingsObserver(airplaneModeUri, airplaneModeObserver_);
     return true;
 }
@@ -134,10 +130,8 @@ bool NetworkSearchManagerInner::UnRegisterSetting()
     }
 
     Uri autoTimeUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIME_URI);
-    Uri autoTimezoneUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI);
     Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
     settingHelper->UnRegisterSettingsObserver(autoTimeUri, settingAutoTimeObserver_);
-    settingHelper->UnRegisterSettingsObserver(autoTimezoneUri, settingAutoTimezoneObserver_);
     settingHelper->UnRegisterSettingsObserver(airplaneModeUri, airplaneModeObserver_);
     return true;
 }
