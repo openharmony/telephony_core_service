@@ -1981,7 +1981,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
     networkSearchHandler->SimStateChange(event);
     networkSearchHandler->SimRecordsLoaded(event);
     networkSearchHandler->AutoTimeChange(event);
-    networkSearchHandler->AutoTimeZoneChange(event);
     networkSearchHandler->AirplaneModeChange(event);
     networkSearchHandler->RadioGetBasebandVersion(event);
     networkSearchHandler->SetNrOptionModeResponse(event);

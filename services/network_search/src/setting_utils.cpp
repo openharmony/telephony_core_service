@@ -188,19 +188,6 @@ void AutoTimeObserver::OnChange()
     }
 }
 
-AutoTimezoneObserver::AutoTimezoneObserver(std::shared_ptr<NetworkSearchHandler> &networkSearchHandler)
-    : networkSearchHandler_(networkSearchHandler)
-{}
-
-void AutoTimezoneObserver::OnChange()
-{
-    TELEPHONY_LOGI("AutoTimezoneObserver::OnChange");
-    if (networkSearchHandler_ != nullptr) {
-        InnerEvent::Pointer event = InnerEvent::Get(SettingEventCode::MSG_AUTO_TIMEZONE);
-        networkSearchHandler_->SendEvent(event);
-    }
-}
-
 AirplaneModeObserver::AirplaneModeObserver(std::shared_ptr<NetworkSearchHandler> &networkSearchHandler)
     : networkSearchHandler_(networkSearchHandler)
 {}

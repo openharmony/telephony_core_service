@@ -62,7 +62,6 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
     { RadioEvent::NOTIFY_STATE_CHANGE, &NetworkSearchHandler::NotifyStateChange },
     { RadioEvent::DELAY_NOTIFY_STATE_CHANGE, &NetworkSearchHandler::HandleDelayNotifyEvent },
     { SettingEventCode::MSG_AUTO_TIME, &NetworkSearchHandler::AutoTimeChange },
-    { SettingEventCode::MSG_AUTO_TIMEZONE, &NetworkSearchHandler::AutoTimeZoneChange },
     { SettingEventCode::MSG_AUTO_AIRPLANE_MODE, &NetworkSearchHandler::AirplaneModeChange }
 };
 
@@ -1014,14 +1013,6 @@ void NetworkSearchHandler::AutoTimeChange(const AppExecFwk::InnerEvent::Pointer 
     TELEPHONY_LOGD("NetworkSearchHandler::AutoTimeChange");
     if (nitzUpdate_ != nullptr) {
         nitzUpdate_->AutoTimeChange();
-    }
-}
-
-void NetworkSearchHandler::AutoTimeZoneChange(const AppExecFwk::InnerEvent::Pointer &)
-{
-    TELEPHONY_LOGD("NetworkSearchHandler::AutoTimeZoneChange");
-    if (nitzUpdate_ != nullptr) {
-        nitzUpdate_->AutoTimeZoneChange();
     }
 }
 
