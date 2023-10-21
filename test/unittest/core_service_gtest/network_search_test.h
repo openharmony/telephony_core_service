@@ -28,7 +28,7 @@ namespace Telephony {
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 
-HapInfoParams testNetInfoParams = {
+inline HapInfoParams testNetInfoParams = {
     .bundleName = "tel_core_service_gtest",
     .userID = 1,
     .instIndex = 0,
@@ -36,7 +36,7 @@ HapInfoParams testNetInfoParams = {
     .isSystemApp = true,
 };
 
-PermissionDef testNetPermLocationDef = {
+inline PermissionDef testNetPermLocationDef = {
     .permissionName = "ohos.permission.LOCATION",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -47,7 +47,7 @@ PermissionDef testNetPermLocationDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testNetPermLocation = {
+inline PermissionStateFull testNetPermLocation = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -55,7 +55,7 @@ PermissionStateFull testNetPermLocation = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testNetPermGetTelephonyStateDef = {
+inline PermissionDef testNetPermGetTelephonyStateDef = {
     .permissionName = "ohos.permission.GET_TELEPHONY_STATE",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -66,7 +66,7 @@ PermissionDef testNetPermGetTelephonyStateDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testNetGetTelephonyState = {
+inline PermissionStateFull testNetGetTelephonyState = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -74,7 +74,7 @@ PermissionStateFull testNetGetTelephonyState = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testNetPermSetTelephonyStateDef = {
+inline PermissionDef testNetPermSetTelephonyStateDef = {
     .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -85,7 +85,7 @@ PermissionDef testNetPermSetTelephonyStateDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testNetSetTelephonyState = {
+inline PermissionStateFull testNetSetTelephonyState = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -93,7 +93,7 @@ PermissionStateFull testNetSetTelephonyState = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testNetPermGetNetworkInfoDef = {
+inline PermissionDef testNetPermGetNetworkInfoDef = {
     .permissionName = "ohos.permission.GET_NETWORK_INFO",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -104,7 +104,7 @@ PermissionDef testNetPermGetNetworkInfoDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testNetPermGetNetworkInfo = {
+inline PermissionStateFull testNetPermGetNetworkInfo = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -112,7 +112,7 @@ PermissionStateFull testNetPermGetNetworkInfo = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testPermReadContactsDef = {
+inline PermissionDef testPermReadContactsDef = {
     .permissionName = "ohos.permission.READ_CONTACTS",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -123,7 +123,7 @@ PermissionDef testPermReadContactsDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testPermReadContacts = {
+inline PermissionStateFull testPermReadContacts = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -131,7 +131,7 @@ PermissionStateFull testPermReadContacts = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testPermWriteContactsDef = {
+inline PermissionDef testPermWriteContactsDef = {
     .permissionName = "ohos.permission.WRITE_CONTACTS",
     .bundleName = "tel_core_service_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -142,7 +142,7 @@ PermissionDef testPermWriteContactsDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testPermWriteContacts = {
+inline PermissionStateFull testPermWriteContacts = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -150,7 +150,7 @@ PermissionStateFull testPermWriteContacts = {
     .resDeviceID = { "local" },
 };
 
-HapPolicyParams testNetPolicyParams = {
+inline HapPolicyParams testNetPolicyParams = {
     .apl = APL_SYSTEM_BASIC,
     .domain = "test.domain",
     .permList = { testNetPermLocationDef, testNetPermGetTelephonyStateDef, testNetPermSetTelephonyStateDef,
