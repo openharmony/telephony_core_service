@@ -59,12 +59,12 @@ bool TelRilManager::DeInit()
 
 bool TelRilManager::ConnectRilInterface()
 {
-    rilInterface_ = HDI::Ril::V1_1::IRil::Get();
+    rilInterface_ = HDI::Ril::V1_2::IRil::Get();
     if (rilInterface_ == nullptr) {
         TELEPHONY_LOGE("TelRilManager not find RilInterfaceService");
         return false;
     }
-    rilInterface_->SetCallback(new TelRilCallback(shared_from_this()));
+    rilInterface_->SetCallback1_2(new TelRilCallback(shared_from_this()));
     return true;
 }
 
