@@ -492,7 +492,7 @@ void SimStateHandle::GetUnlockSimLockResult(const AppExecFwk::InnerEvent::Pointe
 void SimStateHandle::GetSimAuthenticationResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("SimStateHandle::GetSimAuthenticationResult slotId = %{public}d", slotId);
-    auto response = event->GetUniqueObject<IccIoResultInfo>();
+    auto response = event->GetSharedObject<IccIoResultInfo>();
     if (response == nullptr) {
         TELEPHONY_LOGE("SimStateHandle::GetSimAuthenticationResult() fail");
         return;
