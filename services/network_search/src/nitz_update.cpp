@@ -22,14 +22,18 @@
 #include "common_event_support.h"
 #include "core_manager_inner.h"
 #include "network_search_manager.h"
+#ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
+#endif
 #include "setting_utils.h"
 #include "string_ex.h"
 #include "telephony_log_wrapper.h"
 #include "time_service_client.h"
 #include "time_zone_manager.h"
 
+#ifdef ABILITY_POWER_SUPPORT
 using namespace OHOS::PowerMgr;
+#endif
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;
 namespace OHOS {
@@ -168,13 +172,13 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
         TELEPHONY_LOGE("NitzUpdate::ProcessTime time error slotId:%{public}d", slotId_);
         return;
     }
-
+#ifdef ABILITY_POWER_SUPPORT
     auto &powerMgrClient = PowerMgrClient::GetInstance();
     auto runningLock = powerMgrClient.CreateRunningLock("runninglock", RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
     if (runningLock != nullptr) {
         runningLock->Lock();
     }
-
+#endif
     struct tm t;
     (void)memset_s(&t, sizeof(t), 0, sizeof(t));
     t.tm_year = networkTime.year - static_cast<int32_t>(CST_YEAR);
@@ -190,9 +194,11 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
     }
 
     SaveTime(static_cast<int64_t>(timegm(&t)));
+#ifdef ABILITY_POWER_SUPPORT
     if (runningLock != nullptr) {
         runningLock->UnLock();
     }
+#endif
 }
 
 bool NitzUpdate::IsValidTime(int64_t networkTime)
@@ -258,17 +264,20 @@ void NitzUpdate::ProcessTimeZone()
 void NitzUpdate::SaveTime(int64_t networkTime)
 {
     TELEPHONY_LOGI("NitzUpdate::SaveTime networkTime:(%{public}" PRId64 ") slotId:%{public}d", networkTime, slotId_);
+#ifdef ABILITY_POWER_SUPPORT
     auto &powerMgrClient = PowerMgrClient::GetInstance();
     auto runningLock = powerMgrClient.CreateRunningLock("runninglock", RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
     if (runningLock != nullptr) {
         runningLock->Lock();
     }
-
+#endif
     bool result = OHOS::MiscServices::TimeServiceClient::GetInstance()->SetTime(networkTime * MILLI_TO_BASE);
     TELEPHONY_LOGI("NitzUpdate::ProcessTime result:%{public}d slotId:%{public}d", result, slotId_);
+#ifdef ABILITY_POWER_SUPPORT
     if (runningLock != nullptr) {
         runningLock->UnLock();
     }
+#endif
     std::string param = "time";
     AAFwk::Want want;
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_NITZ_TIME_CHANGED);
