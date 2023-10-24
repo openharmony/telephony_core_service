@@ -551,11 +551,12 @@ void TimeZoneUpdater::RequestLocationUpdate()
         TELEPHONY_LOGE("location is disabled");
         return;
     }
-    if (HasInnerEvent(TimeZoneEventCode::EVENT_LOCATION_TIMEOUT)) {
-        RemoveEvent(TimeZoneEventCode::EVENT_LOCATION_TIMEOUT);
+    uint32_t eventId = static_cast<uint32_t>(TimeZoneEventCode::EVENT_LOCATION_TIMEOUT);
+    if (HasInnerEvent(eventId)) {
+        RemoveEvent(eventId);
         locationUpdate_->CancelUpdate();
     }
-    InnerEvent::Pointer event = InnerEvent::Get(TimeZoneEventCode::EVENT_LOCATION_TIMEOUT);
+    InnerEvent::Pointer event = InnerEvent::Get(eventId);
     SendEvent(event, LOCATION_TIME_OUT_MS);
     locationUpdate_->RequestUpdate();
 }
