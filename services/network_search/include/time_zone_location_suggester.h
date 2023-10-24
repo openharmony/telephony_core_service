@@ -31,17 +31,17 @@ namespace OHOS {
 namespace Telephony {
 class TimeZoneEventCode {
 public:
-    static const uint32_t BASE = 0x00060000;
-    static const uint32_t STATE_MACHINE_INIT = BASE + 0;
-    static const uint32_t STATE_MACHINE_QUIT = BASE + 1;
-    static const uint32_t EVENT_NITZ_UPDATE = BASE + 2;
-    static const uint32_t EVENT_LOCATION_UPDATE = BASE + 3;
-    static const uint32_t EVENT_LOCATION_TIMEOUT = BASE + 4;
-    static const uint32_t EVENT_SCREEN_ON = BASE + 5;
-    static const uint32_t EVENT_COUNTRY_CODE_CHANGE = BASE + 6;
-    static const uint32_t EVENT_NETWORK_CONNECTED = BASE + 7;
-    static const uint32_t EVENT_REQUEST_LOCATION_UPDATE = BASE + 8;
-    static const uint32_t EVENT_REQUEST_LOCATION_COUNTRY_CODE = BASE + 9;
+    static const int32_t BASE = 0x00060000;
+    static const int32_t STATE_MACHINE_INIT = BASE + 0;
+    static const int32_t STATE_MACHINE_QUIT = BASE + 1;
+    static const int32_t EVENT_NITZ_UPDATE = BASE + 2;
+    static const int32_t EVENT_LOCATION_UPDATE = BASE + 3;
+    static const int32_t EVENT_LOCATION_TIMEOUT = BASE + 4;
+    static const int32_t EVENT_SCREEN_ON = BASE + 5;
+    static const int32_t EVENT_COUNTRY_CODE_CHANGE = BASE + 6;
+    static const int32_t EVENT_NETWORK_CONNECTED = BASE + 7;
+    static const int32_t EVENT_REQUEST_LOCATION_UPDATE = BASE + 8;
+    static const int32_t EVENT_REQUEST_LOCATION_COUNTRY_CODE = BASE + 9;
 };
 
 class TimeZoneLocationSuggester;
