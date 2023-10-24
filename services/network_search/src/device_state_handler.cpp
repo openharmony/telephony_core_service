@@ -15,9 +15,10 @@
 
 #include "device_state_handler.h"
 
-#include "battery_srv_client.h"
 #include "network_search_manager.h"
+#ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
+#endif
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -32,12 +33,12 @@ DeviceStateHandler::DeviceStateHandler(
     const std::weak_ptr<ITelRilManager> &telRilManager, int32_t slotId)
     : networkSearchManager_(networkSearchManager), telRilManager_(telRilManager), slotId_(slotId)
 {
-    isCharging_ = true;
+#ifdef ABILITY_POWER_SUPPORT
     auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
-    isScreenOn_ = true;
     auto powerSaveMode = powerMgrClient.GetDeviceMode();
     isPowerSaveModeOn_ = powerSaveMode == PowerMgr::PowerMode::POWER_SAVE_MODE ||
         powerSaveMode == PowerMgr::PowerMode::EXTREME_POWER_SAVE_MODE;
+#endif
     TELEPHONY_LOGI("DeviceStateHandler isCharging_=%{public}d, isScreenOn_=%{public}d, isPowerSaveModeOn_=%{public}d",
         isCharging_, isScreenOn_, isPowerSaveModeOn_);
 }

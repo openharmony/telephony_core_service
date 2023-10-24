@@ -142,7 +142,6 @@ ohos_shared_library("tel_core_service") {
     "ability_runtime:data_ability_helper",
     "ability_runtime:dataobs_manager",
     "ability_runtime:wantagent_innerkits",
-    "battery_manager:batterysrv_client",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
@@ -164,12 +163,25 @@ ohos_shared_library("tel_core_service") {
     "location:locator_sdk",
     "netmanager_base:net_conn_manager_if",
     "netmanager_ext:net_tether_manager_if",
-    "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "telephony_data:tel_telephony_data",
     "time_service:time_client",
   ]
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.powermgr_power_manager) &&
+      global_parts_info.powermgr_power_manager) {
+    external_deps += [ "power_manager:powermgr_client" ]
+    defines += [ "ABILITY_POWER_SUPPORT" ]
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.powermgr_battery_manager) &&
+      global_parts_info.powermgr_battery_manager) {
+    external_deps += [ "battery_manager:batterysrv_client" ]
+    defines += [ "ABILITY_BATTERY_SUPPORT" ]
+  }
 
   part_name = "core_service"
   subsystem_name = "telephony"
