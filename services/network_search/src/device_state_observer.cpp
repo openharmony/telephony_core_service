@@ -203,12 +203,8 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
     int32_t systemAbilityId, const std::string& deviceId)
 {
     TELEPHONY_LOGI("systemAbilityId is %{public}d", systemAbilityId);
-    if (sub_ == nullptr) {
-        TELEPHONY_LOGE("OnAddSystemAbility sub_ is nullptr");
-        return;
-    }
-    if (sub_->GetEventHandler() == nullptr && systemAbilityId != COMMON_EVENT_SERVICE_ID) {
-        TELEPHONY_LOGE("DeviceStateObserver OnAddSystemAbility eventHandler is nullptr");
+    if (sub_ == nullptr || sub_->GetEventHandler() == nullptr) {
+        TELEPHONY_LOGE("sub_ is nullptr or eventHandler is nullptr");
         return;
     }
     switch (systemAbilityId) {
