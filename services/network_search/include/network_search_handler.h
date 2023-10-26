@@ -131,6 +131,7 @@ private:
     void SetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void GetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event);
+    void RadioResidentNetworkChange(const AppExecFwk::InnerEvent::Pointer &event);
     bool InitOperatorName();
 
 private:
