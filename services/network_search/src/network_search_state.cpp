@@ -183,28 +183,45 @@ void NetworkSearchState::SetImsServiceStatus(const ImsServiceStatus &imsServiceS
         return;
     }
     ImsRegInfo imsRegInfo;
-    bool isRegister = false;
     imsRegInfo.imsRegTech = imsServiceStatus.imsRegTech;
     if (voiceChanged || (radioTechChanged && imsServiceStatus_->supportImsVoice)) {
-        isRegister = imsRegStatus_ && imsServiceStatus_->supportImsVoice;
-        imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
+        imsRegInfo.imsRegState = GetImsRegState(ImsServiceType::TYPE_VOICE);
         NotifyImsStateChange(ImsServiceType::TYPE_VOICE, imsRegInfo);
     }
     if (videoChanged || (radioTechChanged && imsServiceStatus_->supportImsVideo)) {
-        isRegister = imsRegStatus_ && imsServiceStatus_->supportImsVideo;
-        imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
+        imsRegInfo.imsRegState = GetImsRegState(ImsServiceType::TYPE_VIDEO);
         NotifyImsStateChange(ImsServiceType::TYPE_VIDEO, imsRegInfo);
     }
     if (utChanged || (radioTechChanged && imsServiceStatus_->supportImsUt)) {
-        isRegister = imsRegStatus_ && imsServiceStatus_->supportImsUt;
-        imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
+        imsRegInfo.imsRegState = GetImsRegState(ImsServiceType::TYPE_UT);
         NotifyImsStateChange(ImsServiceType::TYPE_UT, imsRegInfo);
     }
     if (smsChanged || (radioTechChanged && imsServiceStatus_->supportImsSms)) {
-        isRegister = imsRegStatus_ && imsServiceStatus_->supportImsSms;
-        imsRegInfo.imsRegState = isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
+        imsRegInfo.imsRegState = GetImsRegState(ImsServiceType::TYPE_SMS);
         NotifyImsStateChange(ImsServiceType::TYPE_SMS, imsRegInfo);
     }
+}
+
+ImsRegState NetworkSearchState::GetImsRegState(const ImsServiceType type)
+{
+    bool isRegister = false;
+    switch (type) {
+        case ImsServiceType::TYPE_VOICE:
+            isRegister = imsRegStatus_ && imsServiceStatus_->supportImsVoice;
+            break;
+        case ImsServiceType::TYPE_VIDEO:
+            isRegister = imsRegStatus_ && imsServiceStatus_->supportImsVideo;
+            break;
+        case ImsServiceType::TYPE_UT:
+            isRegister = imsRegStatus_ && imsServiceStatus_->supportImsUt;
+            break;
+        case ImsServiceType::TYPE_SMS:
+            isRegister = imsRegStatus_ && imsServiceStatus_->supportImsSms;
+            break;
+        default:
+            break;
+    }
+    return isRegister ? ImsRegState::IMS_REGISTERED : ImsRegState::IMS_UNREGISTERED;
 }
 
 std::unique_ptr<NetworkState> NetworkSearchState::GetNetworkStatus()

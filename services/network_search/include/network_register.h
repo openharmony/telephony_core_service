@@ -40,6 +40,7 @@ public:
     int32_t NotifyStateChange();
     void DcPhysicalLinkActiveUpdate(bool isActive);
     void UpdateCfgTech();
+    void UpdateCellularCall(const RegServiceState &regStatus, const int32_t callType);
     int32_t HandleRrcStateChanged(int32_t status);
     RegServiceState GetRegServiceState() const;
 
