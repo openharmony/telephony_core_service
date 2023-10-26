@@ -12,16 +12,19 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("telephony_core_service.gni")
 
 TELEPHONY_NETWORK_SEARCH_ROOT = "services/network_search"
 TELEPHONY_SIM_ROOT = "services/sim"
 TELEPHONY_TEL_RIL_ROOT = "services/tel_ril"
 TELEPHONY_IMS_CORE_SERVICE_SRC_PATH = "services/ims_service_interaction/src"
+TELEPHONY_EXT_WRAPPER_ROOT = "services/telephony_ext_wrapper"
 
 ohos_shared_library("tel_core_service") {
   install_enable = true
 
   sources = [
+    "$TELEPHONY_EXT_WRAPPER_ROOT/src/telephony_ext_wrapper.cpp",
     "$TELEPHONY_IMS_CORE_SERVICE_SRC_PATH/ims_core_service_callback_stub.cpp",
     "$TELEPHONY_IMS_CORE_SERVICE_SRC_PATH/ims_core_service_client.cpp",
     "$TELEPHONY_IMS_CORE_SERVICE_SRC_PATH/ims_core_service_proxy.cpp",
@@ -110,6 +113,7 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_SIM_ROOT/include",
     "$TELEPHONY_TEL_RIL_ROOT/include",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/include",
+    "$TELEPHONY_EXT_WRAPPER_ROOT/include",
     "services/core/include",
     "utils/log/include",
   ]
@@ -121,6 +125,8 @@ ohos_shared_library("tel_core_service") {
     "LOG_DOMAIN = 0xD001F04",
     "OPENSSL_SUPPRESS_DEPRECATED",
   ]
+
+  defines += telephony_extra_defines
 
   deps = [
     "interfaces/innerkits:tel_core_service_api",
