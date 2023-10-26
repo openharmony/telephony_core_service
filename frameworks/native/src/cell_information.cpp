@@ -1167,6 +1167,34 @@ bool NrCellInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     mnc_ = readString;
+    if (!ReadIntFromParcel(parcel)) {
+        return false;
+    }
+    uint64_t nrTime = 0;
+    if (!parcel.ReadUint64(nrTime)) {
+        return false;
+    }
+    int32_t rat;
+    timeStamp_ = nrTime;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    signalLevel_ = rat;
+    int32_t nrSignalIntensity = 0;
+    if (!parcel.ReadInt32(nrSignalIntensity)) {
+        return false;
+    }
+    signalIntensity_ = nrSignalIntensity;
+    bool nrTemCamped = false;
+    if (!parcel.ReadBool(nrTemCamped)) {
+        return false;
+    }
+    isCamped_ = nrTemCamped;
+    return true;
+}
+
+bool NrCellInformation::ReadIntFromParcel(Parcel &parcel)
+{
     int32_t rat;
     if (!parcel.ReadInt32(rat)) {
         return false;
@@ -1197,25 +1225,6 @@ bool NrCellInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     rsrq_ = rat;
-    uint64_t nrTime = 0;
-    if (!parcel.ReadUint64(nrTime)) {
-        return false;
-    }
-    timeStamp_ = nrTime;
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
-    signalLevel_ = rat;
-    int32_t nrSignalIntensity = 0;
-    if (!parcel.ReadInt32(nrSignalIntensity)) {
-        return false;
-    }
-    signalIntensity_ = nrSignalIntensity;
-    bool nrTemCamped = false;
-    if (!parcel.ReadBool(nrTemCamped)) {
-        return false;
-    }
-    isCamped_ = nrTemCamped;
     return true;
 }
 
