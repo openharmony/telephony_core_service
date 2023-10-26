@@ -1986,6 +1986,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
     networkSearchHandler->SetNrOptionModeResponse(event);
     networkSearchHandler->GetNrOptionModeResponse(event);
     networkSearchHandler->RadioGetRrcConnectionState(event);
+    networkSearchHandler->RadioResidentNetworkChange(event);
     event = nullptr;
     networkSearchHandler->RadioGetCurrentCellInfo(event);
     networkSearchHandler->RadioCurrentCellInfoUpdate(event);
@@ -2003,6 +2004,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
     networkSearchHandler->SetNrOptionModeResponse(event);
     networkSearchHandler->GetNrOptionModeResponse(event);
     networkSearchHandler->RadioGetRrcConnectionState(event);
+    networkSearchHandler->RadioResidentNetworkChange(event);
     EXPECT_EQ(networkSearchHandler->GetPhoneType(), PhoneType::PHONE_TYPE_IS_NONE);
 }
 
