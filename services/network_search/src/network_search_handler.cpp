@@ -17,12 +17,15 @@
 
 #include "core_service_errors.h"
 #include "ims_core_service_client.h"
+#include "mcc_pool.h"
 #include "network_search_manager.h"
 #include "telephony_log_wrapper.h"
+#include "time_zone_manager.h"
 
 namespace OHOS {
 namespace Telephony {
 static const int32_t REQ_INTERVAL = 30;
+const size_t MCC_LEN = 3;
 const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandler::memberFuncMap_ = {
     { RadioEvent::RADIO_SIM_STATE_CHANGE, &NetworkSearchHandler::SimStateChange },
     { RadioEvent::RADIO_IMSI_LOADED_READY, &NetworkSearchHandler::ImsiLoadedReady },
@@ -61,6 +64,7 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
     { RadioEvent::RADIO_RRC_CONNECTION_STATE_UPDATE, &NetworkSearchHandler::RadioGetRrcConnectionState },
     { RadioEvent::NOTIFY_STATE_CHANGE, &NetworkSearchHandler::NotifyStateChange },
     { RadioEvent::DELAY_NOTIFY_STATE_CHANGE, &NetworkSearchHandler::HandleDelayNotifyEvent },
+    { RadioEvent::RADIO_RESIDENT_NETWORK_CHANGE, &NetworkSearchHandler::RadioResidentNetworkChange },
     { SettingEventCode::MSG_AUTO_TIME, &NetworkSearchHandler::AutoTimeChange },
     { SettingEventCode::MSG_AUTO_AIRPLANE_MODE, &NetworkSearchHandler::AirplaneModeChange }
 };
@@ -185,6 +189,8 @@ void NetworkSearchHandler::RegisterEvents()
                 slotId_, shared_from_this(), RadioEvent::RADIO_CURRENT_CELL_UPDATE, nullptr);
             telRilManager->RegisterCoreNotify(
                 slotId_, shared_from_this(), RadioEvent::RADIO_RRC_CONNECTION_STATE_UPDATE, nullptr);
+            telRilManager->RegisterCoreNotify(
+                slotId_, shared_from_this(), RadioEvent::RADIO_RESIDENT_NETWORK_CHANGE, nullptr);
         }
     }
     // Register IMS
@@ -220,6 +226,7 @@ void NetworkSearchHandler::UnregisterEvents()
             telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_CURRENT_CELL_UPDATE);
             telRilManager->UnRegisterCoreNotify(
                 slotId_, shared_from_this(), RadioEvent::RADIO_RRC_CONNECTION_STATE_UPDATE);
+            telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_RESIDENT_NETWORK_CHANGE);
         }
     }
 }
@@ -1021,6 +1028,48 @@ void NetworkSearchHandler::AirplaneModeChange(const AppExecFwk::InnerEvent::Poin
     TELEPHONY_LOGD("NetworkSearchHandler::AirplaneModeChange");
     if (radioInfo_ != nullptr) {
         radioInfo_->AirplaneModeChange();
+    }
+}
+
+void NetworkSearchHandler::RadioResidentNetworkChange(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioResidentNetworkChange event is nullptr!");
+        return;
+    }
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("RadioResidentNetworkChange networkSearchManager is nullptr");
+        return;
+    }
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+        if (networkSearchManager->GetCsRegState(slotId) ==
+                static_cast<int32_t>(RegServiceState::REG_STATE_IN_SERVICE) ||
+            networkSearchManager->GetPsRegState(slotId) ==
+                static_cast<int32_t>(RegServiceState::REG_STATE_IN_SERVICE)) {
+            TELEPHONY_LOGE("RadioResidentNetworkChange RegState is in service");
+            return;
+        }
+    }
+    auto object = event->GetSharedObject<std::string>();
+    if (object == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioResidentNetworkChange object is nullptr!");
+        return;
+    }
+    std::string plmn = *object;
+    std::string countryCode = "";
+    if (plmn.length() >= MCC_LEN) {
+        std::string mcc = plmn.substr(0, MCC_LEN);
+        int32_t value = 0;
+        if (StrToInt(mcc, value)) {
+            countryCode = MccPool::MccCountryCode(value);
+        } else {
+            TELEPHONY_LOGE("RadioResidentNetworkChange parse Failed!! slotId:%{public}d", slotId_);
+        }
+    }
+    if (!countryCode.empty()) {
+        TELEPHONY_LOGI("RadioResidentNetworkChange: update countryCode[%{public}s]", countryCode.c_str());
+        DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateCountryCode(countryCode, slotId_);
     }
 }
 
