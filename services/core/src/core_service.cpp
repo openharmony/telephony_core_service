@@ -30,6 +30,7 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -104,6 +105,13 @@ bool CoreService::Init()
     }
     simManager_->SetNetworkSearchManager(networkSearchManager_);
     CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    if (TELEPHONY_EXT_WRAPPER.function_example_) {
+        // only example, when other functions are added, please delete it.
+        TELEPHONY_LOGD("CoreService::Init is not empty.");
+    }
+#endif
     TELEPHONY_LOGI("CoreService::Init success");
     return true;
 }
