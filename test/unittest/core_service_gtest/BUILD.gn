@@ -48,6 +48,7 @@ ohos_unittest("tel_core_service_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
