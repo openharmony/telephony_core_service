@@ -29,6 +29,7 @@
 #include "str_convert.h"
 #include "string_ex.h"
 #include "tel_profile_util.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -347,6 +348,23 @@ HWTEST_F(SimTest, Telephony_Sim_GetDefaultVoiceSimId_0100, Function | MediumTest
         EXPECT_GE(simId, 0);
     } else {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_InitTelephonyExtService_0100
+ * @tc.name     Init Telephony Ext Service.
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_InitTelephonyExtService_0100, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    if (TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_ == nullptr) {
+        TELEPHONY_LOGI("telephonyExtWrapperHandle_ null");
+    } else {
+        TELEPHONY_LOGI("telephonyExtWrapperHandle_ not null");
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.function_example_ != nullptr, true);
     }
 }
 #endif // TEL_TEST_UNSUPPORT
