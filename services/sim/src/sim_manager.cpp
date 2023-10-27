@@ -405,15 +405,17 @@ int32_t SimManager::GetDefaultVoiceSimId(int32_t &simId)
     }
     int32_t result = multiSimController_->GetDefaultVoiceSlotId();
     if (result < DEFAULT_SIM_SLOT_ID) {
-        TELEPHONY_LOGE("DefaultVoiceSlotId is invalid");
-        return TELEPHONY_ERR_NO_SIM_CARD;
+        TELEPHONY_LOGI("DefaultVoiceSlotId is invalid");
+        simId = INVALID_VALUE;
+        return TELEPHONY_ERR_SUCCESS;
     }
     int32_t defaultSimId = GetSimId(result);
     if (defaultSimId <= DEFAULT_SIM_SLOT_ID) {
-        TELEPHONY_LOGE("simId  is invalid");
-        return TELEPHONY_ERR_FAIL;
+        TELEPHONY_LOGI("simId  is invalid");
+        simId = INVALID_VALUE;
+    } else {
+        simId = defaultSimId;
     }
-    simId = defaultSimId;
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -438,15 +440,17 @@ int32_t SimManager::GetDefaultSmsSimId(int32_t &simId)
     }
     int32_t result = multiSimController_->GetDefaultSmsSlotId();
     if (result < DEFAULT_SIM_SLOT_ID) {
-        TELEPHONY_LOGE("DefaultSmsSlotId is invalid");
-        return TELEPHONY_ERR_NO_SIM_CARD;
+        TELEPHONY_LOGI("DefaultSmsSlotId is invalid");
+        simId = INVALID_VALUE;
+        return TELEPHONY_ERR_SUCCESS;
     }
     int32_t defaultSimId = GetSimId(result);
     if (defaultSimId <= DEFAULT_SIM_SLOT_ID) {
-        TELEPHONY_LOGE("simId  is invalid");
-        return TELEPHONY_ERR_FAIL;
+        TELEPHONY_LOGI("simId  is invalid");
+        simId = INVALID_VALUE;
+    } else {
+        simId = defaultSimId;
     }
-    simId = defaultSimId;
     return TELEPHONY_ERR_SUCCESS;
 }
 
