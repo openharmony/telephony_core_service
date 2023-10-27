@@ -91,6 +91,18 @@ constexpr const char *KEY_UPLINK_BANDWIDTH_NR_NSA_USE_LTE_VALUE_BOOL = "uplink_b
  * Indicates the uplink and downlink bandwidth values for the network.
  */
 constexpr const char *KEY_BANDWIDTH_STRING_ARRAY = "bandwidth_string_array";
+/**
+ * Indicates the MTU size.
+ */
+constexpr const char *KEY_MTU_SIZE_STRING = "mtu_size_string";
+/**
+ * Indicates the whether support single pdp mode.
+ */
+constexpr const char *KEY_SINGLE_PDP_ENABLED_BOOL = "single_pdp_enabled_bool";
+/**
+ * Indicates the whether carry ESM information to network.
+ */
+constexpr const char *KEY_PLMN_ESM_FLAG_INT = "plmn_esm_flag_int";
 
 struct OperatorConfig : public Parcelable {
     std::map<std::u16string, std::u16string> configValue {};
