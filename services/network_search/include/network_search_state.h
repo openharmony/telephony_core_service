@@ -57,6 +57,7 @@ private:
     void NotifyEmergencyChange();
     void NotifyNrStateChange();
     void NotifyImsStateChange(ImsServiceType imsSrvType, const ImsRegInfo &info);
+    ImsRegState GetImsRegState(const ImsServiceType type);
 
 private:
     std::mutex mutex_;

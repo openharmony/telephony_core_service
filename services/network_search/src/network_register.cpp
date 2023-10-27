@@ -37,6 +37,7 @@ constexpr const char *TELEPHONY_NR_CONFIG_D = "ConfigD";
 constexpr const char *TELEPHONY_NR_CONFIG_AD = "ConfigAD";
 constexpr int32_t SYS_PARAMETER_SIZE = 256;
 constexpr int32_t MAX_SIZE = 100;
+constexpr int32_t CS_TYPE = 0;
 constexpr int32_t IMS_TYPE = 1;
 
 NetworkRegister::NetworkRegister(std::shared_ptr<NetworkSearchState> networkSearchState,
@@ -102,13 +103,7 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
         TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister networkSearchState_ is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    if (regStatus == RegServiceState::REG_STATE_IN_SERVICE || regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) {
-        sptr<NetworkSearchCallBackBase> cellularCall = networkSearchManager->GetCellularCallCallBack();
-        if (cellularCall) {
-            int32_t csType = 0;
-            cellularCall->SetReadyToCall(slotId_, csType, true);
-        }
-    }
+    UpdateCellularCall(regStatus, CS_TYPE);
     RadioTech tech = ConvertTechFromRil(static_cast<HRilRadioTech>(csRegStateResult->radioTechnology));
     RoamingType roam = RoamingType::ROAMING_STATE_UNKNOWN;
     if (registrationStatus == RilRegister::REG_STATE_ROAMING) {
@@ -125,6 +120,21 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
     }
     CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_CS),
         static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
+}
+
+void NetworkRegister::UpdateCellularCall(const RegServiceState &regStatus, const int32_t callType)
+{
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager is nullptr");
+        return;
+    }
+    if (regStatus == RegServiceState::REG_STATE_IN_SERVICE || regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) {
+        sptr<NetworkSearchCallBackBase> cellularCall = networkSearchManager->GetCellularCallCallBack();
+        if (cellularCall) {
+            cellularCall->SetReadyToCall(slotId_, callType, true);
+        }
+    }
 }
 
 void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &event)
@@ -154,12 +164,7 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
         TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister networkSearchState_ is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    if (regStatus == RegServiceState::REG_STATE_IN_SERVICE || regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) {
-        sptr<NetworkSearchCallBackBase> cellularCall = networkSearchManager->GetCellularCallCallBack();
-        if (cellularCall) {
-            cellularCall->SetReadyToCall(slotId_, IMS_TYPE, true);
-        }
-    }
+    UpdateCellularCall(regStatus, IMS_TYPE);
     RadioTech tech = ConvertTechFromRil(static_cast<HRilRadioTech>(psRegStatusResult->radioTechnology));
     RoamingType roam = RoamingType::ROAMING_STATE_UNKNOWN;
     if (registrationStatus == RilRegister::REG_STATE_ROAMING) {

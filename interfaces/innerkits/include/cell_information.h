@@ -314,6 +314,7 @@ public:
     bool Marshalling(Parcel &parcel) const override;
     static NrCellInformation *Unmarshalling(Parcel &parcel);
     bool ReadFromParcel(Parcel &parcel) override;
+    bool ReadIntFromParcel(Parcel &parcel);
     CellInformation::CellType GetNetworkType() const override;
     std::string ToString() const override;
     void SetNrParam(int32_t nrArfcn, int32_t pci, int32_t tac, int64_t nci);
