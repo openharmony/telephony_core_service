@@ -103,6 +103,10 @@ constexpr const char *KEY_SINGLE_PDP_ENABLED_BOOL = "single_pdp_enabled_bool";
  * Indicates the whether carry ESM information to network.
  */
 constexpr const char *KEY_PLMN_ESM_FLAG_INT = "plmn_esm_flag_int";
+/**
+ * Indicates the whether only support single pdp radio type array.
+ */
+constexpr const char *KEY_SINGLE_PDP_RADIO_TYPE_ARRAY = "single_pdp_radio_type_array";
 
 struct OperatorConfig : public Parcelable {
     std::map<std::u16string, std::u16string> configValue {};
