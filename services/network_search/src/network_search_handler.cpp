@@ -305,7 +305,6 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
             break;
         }
         case CORE_SERVICE_POWER_ON: {
-            SendUpdateCellLocationRequest();
             InitGetNetworkSelectionMode();
             RadioOnState();
             break;
@@ -509,6 +508,7 @@ void NetworkSearchHandler::RadioOnState()
     GetRilOperatorInfo(serialNum, false);
     GetRilPsRegistration(serialNum, false);
     GetRilCsRegistration(serialNum, false);
+    SendUpdateCellLocationRequest();
     GetRilSignalIntensity(false);
 }
 
