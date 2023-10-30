@@ -112,8 +112,6 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
     UpdateNetworkSearchState(regStatus, tech, roam, DomainType::DOMAIN_TYPE_CS);
     TELEPHONY_LOGI("regStatus= %{public}d radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
         registrationStatus, csRegStateResult->radioTechnology, roam, slotId_);
-    networkSearchManager->UpdateCellLocation(
-        slotId_, static_cast<int32_t>(tech), csRegStateResult->cellId, csRegStateResult->lacCode);
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
         TELEPHONY_LOGI("cs domain change, slotId:%{public}d", slotId_);
         networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
