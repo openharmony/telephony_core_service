@@ -127,13 +127,21 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
     NotifySimAccountChanged();
 }
 
-void MultiSimMonitor::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
+void MultiSimMonitor::RegisterCoreNotify(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {
-    if (observerHandler_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimMonitor::RegisterCoreNotify observerHandler_ is nullptr");
+    if (observerHandler_ == nullptr || handler == nullptr) {
+        TELEPHONY_LOGE("observerHandler_ or handler is nullptr");
         return;
     }
     observerHandler_->RegObserver(what, handler);
+    if (controller_ == nullptr) {
+        TELEPHONY_LOGE("controller_ is nullptr");
+        return;
+    }
+    if (controller_->IsSimActive(slotId)) {
+        handler->SendEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, slotId, 0);
+    }
 }
 
 bool MultiSimMonitor::IsValidSlotId(int32_t slotId)
