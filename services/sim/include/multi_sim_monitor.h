@@ -42,7 +42,7 @@ public:
     ~MultiSimMonitor();
 
     void Init();
-    void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    void RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     int32_t RegisterSimAccountCallback(const std::string &bundleName, const sptr<SimAccountCallback> &callback);
     int32_t UnregisterSimAccountCallback(const std::string &bundleName);
     void NotifySimAccountChanged();

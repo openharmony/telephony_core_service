@@ -1037,7 +1037,7 @@ void SimManager::RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExe
             TELEPHONY_LOGE("slotId is invalid or multiSimMonitor_ is nullptr");
             return;
         }
-        multiSimMonitor_->RegisterCoreNotify(handler, what);
+        multiSimMonitor_->RegisterCoreNotify(slotId, handler, what);
     } else {
         TELEPHONY_LOGE("SimManager::RegisterCoreNotify faild");
     }
