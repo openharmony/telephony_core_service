@@ -140,6 +140,7 @@ bool NetworkSearchHandler::InitOperatorName()
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     operatorName_ = std::make_shared<OperatorName>(

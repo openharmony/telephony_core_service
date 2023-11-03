@@ -21,6 +21,7 @@
 #include "ipc_skeleton.h"
 #include "network_search_manager.h"
 #include "network_search_types.h"
+#include "operator_name_utils.h"
 #include "parameter.h"
 #include "runner_pool.h"
 #include "sim_manager.h"
@@ -63,6 +64,7 @@ void CoreService::OnStart()
         registerToService_ = true;
     }
     RunnerPool::GetInstance().Init();
+    OperatorNameUtils::GetInstance().Init();
     IPCSkeleton::SetMaxWorkThreadNum(MAX_IPC_THREAD_NUM);
     if (!Init()) {
         TELEPHONY_LOGE("failed to init CoreService");

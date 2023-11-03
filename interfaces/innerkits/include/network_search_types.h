@@ -25,6 +25,7 @@ constexpr const char *CUR_PLMN_SHOW = "CUR_PLMN_SHOW";
 constexpr const char *CUR_PLMN = "CUR_PLMN";
 constexpr const char *CUR_SPN_SHOW = "CUR_SPN_SHOW";
 constexpr const char *CUR_SPN = "CUR_SPN";
+constexpr const char *DOMESTIC_SPN = "DOMESTIC_SPN";
 constexpr int32_t RRC_CONNECTED_STATUS = 1;
 constexpr int32_t RRC_IDLE_STATUS = 0;
 
