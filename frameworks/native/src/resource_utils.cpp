@@ -17,7 +17,7 @@
 
 #include <sys/stat.h>
 
-#include "bundle_mgr_interface.h"
+#include "bundle_mgr_proxy.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "singleton.h"

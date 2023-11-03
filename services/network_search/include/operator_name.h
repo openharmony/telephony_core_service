@@ -42,10 +42,12 @@ private:
     void GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const;
     void CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const;
     void PublishEvent(int32_t rule, RegServiceState state, bool showPlmn, const std::string &plmn, bool showSpn,
-        const std::string &spn);
+        const std::string &spn, const std::string &domesticSpn);
     sptr<NetworkState> GetNetworkStatus();
-    void NotifyGsmSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState);
-    void NotifyCdmaSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState);
+    void NotifyGsmSpnChanged(
+        RegServiceState regStatus, sptr<NetworkState> &networkState, const std::string &domesticSpn);
+    void NotifyCdmaSpnChanged(
+        RegServiceState regStatus, sptr<NetworkState> &networkState, const std::string &domesticSpn);
 
     void UpdatePlmn(RegServiceState regStatus, sptr<NetworkState> &networkState, int32_t spnRule, std::string &plmn,
         bool &showPlmn);
@@ -60,6 +62,15 @@ private:
     void UpdatePnnCust(const std::vector<std::string> &pnnCust);
     void UpdateOplCust(const std::vector<std::string> &oplCust);
     void UpdateOperatorConfig();
+    bool isDomesticRoaming(const std::string &simPlmn, const std::string &netPlmn);
+    bool isCMCard(const std::string &numeric);
+    bool isCUCard(const std::string &numeric);
+    bool isCTCard(const std::string &numeric);
+    bool isCBCard(const std::string &numeric);
+    bool isCMDomestic(const std::string &numeric);
+    bool isCUDomestic(const std::string &numeric);
+    bool isCTDomestic(const std::string &numeric);
+    bool isCBDomestic(const std::string &numeric);
 
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
@@ -74,9 +85,14 @@ private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     int32_t slotId_ = 0;
     std::string csSpnFormat_;
-    const std::vector<std::string> cmMccMnc_ { "46000", "46002", "46004", "46007", "46008" };
-    const std::vector<std::string> cuMccMnc_ { "46001", "46009" };
+    const std::vector<std::string> cmMccMnc_ { "46000", "46002", "46004", "46007", "46008", "46013" };
+    const std::vector<std::string> cuMccMnc_ { "46001", "46006", "46009" };
     const std::vector<std::string> ctMccMnc_ { "46003", "46011" };
+    const std::vector<std::string> cbnMccMnc_ { "46015" };
+    const std::vector<std::string> cmDomesticMccMnc_ { "46031", "46050" };
+    const std::vector<std::string> cuDomesticMccMnc_ { "46022", "46061" };
+    const std::vector<std::string> ctDomesticMccMnc_ { "46021", "46060" };
+    const std::vector<std::string> cbDomesticnMccMnc_ { "46032", "46051" };
     bool enableCust_ = false;
     std::string spnCust_ = "";
     int32_t displayConditionCust_ = SPN_INVALID;

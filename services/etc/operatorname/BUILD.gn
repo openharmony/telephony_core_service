@@ -12,17 +12,14 @@
 # limitations under the License.
 import("//build/ohos.gni")
 
-## Install ons.bin to /vendor/etc/ons/ons.bin
-
-group("ons_bin") {
-  deps = [ ":ons.bin" ]
-}
-
-ohos_prebuilt_etc("ons.bin") {
-  source = "ons.bin"
+## Install operator_name.json to /system/etc/operator_name.json
+ohos_prebuilt_etc("operator_name_default") {
+  source = "operator_name.json"
+  relative_install_dir = "./telephony"
   part_name = "core_service"
   subsystem_name = "telephony"
-  relative_install_dir = "ons"
-  install_enable = true
-   install_images = [ chipset_base_dir ]
+}
+
+group("operator_name") {
+  deps = [ ":operator_name_default" ]
 }
