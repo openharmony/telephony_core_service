@@ -17,9 +17,13 @@
 #include <gtest/gtest.h>
 #include <string_ex.h>
 
+#include "common_event_manager.h"
+#include "common_event_support.h"
 #include "core_service.h"
 #include "network_search_manager.h"
 #include "network_search_test_callback_stub.h"
+#include "operator_name.h"
+#include "operator_name_utils.h"
 #include "runner_pool.h"
 #include "security_token.h"
 #include "sim_manager.h"
@@ -32,6 +36,7 @@ using namespace testing::ext;
 
 namespace {
 constexpr int32_t SLOT_ID = 0;
+const int32_t INVALID_SLOTID = 2;
 constexpr int32_t NR_NSA_OPTION_ONLY = 1;
 } // namespace
 
@@ -400,6 +405,240 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationUpdate_001, Function |
     update->IsLocationEnabled();
     update->GetIsoCountryCode();
     EXPECT_NE(update->GetIsoCountryCode(), "test");
+}
+
+/**
+ * @tc.number   Telephony_OperatorName_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto operatorName = std::make_shared<OperatorName>(
+        subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+    std::string numeric = "";
+    EXPECT_FALSE(operatorName->isCMCard(numeric));
+    EXPECT_FALSE(operatorName->isCUCard(numeric));
+    EXPECT_FALSE(operatorName->isCTCard(numeric));
+    EXPECT_FALSE(operatorName->isCBCard(numeric));
+    EXPECT_FALSE(operatorName->isCMDomestic(numeric));
+    EXPECT_FALSE(operatorName->isCUDomestic(numeric));
+    EXPECT_FALSE(operatorName->isCTDomestic(numeric));
+    EXPECT_FALSE(operatorName->isCBDomestic(numeric));
+}
+
+/**
+ * @tc.number   Telephony_OperatorNameCMCC_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_OperatorNameCMCC_001, Function | MediumTest | Level1)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto operatorName = std::make_shared<OperatorName>(
+        subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+    std::string simPlmn = "46000";
+    std::string netPlmn = "46031";
+    EXPECT_TRUE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46001";
+    netPlmn = "46031";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46003";
+    netPlmn = "46031";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46015";
+    netPlmn = "46031";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46018";
+    netPlmn = "46031";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46000";
+    netPlmn = "46050";
+    EXPECT_TRUE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46001";
+    netPlmn = "46050";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46003";
+    netPlmn = "46050";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46015";
+    netPlmn = "46050";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46018";
+    netPlmn = "46050";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+}
+
+/**
+ * @tc.number   Telephony_OperatorNameCUCC_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_OperatorCUCC_001, Function | MediumTest | Level1)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto operatorName = std::make_shared<OperatorName>(
+        subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+    std::string simPlmn = "46001";
+    std::string netPlmn = "46022";
+    EXPECT_TRUE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46000";
+    netPlmn = "46022";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46003";
+    netPlmn = "46022";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46015";
+    netPlmn = "46022";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46018";
+    netPlmn = "46022";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46001";
+    netPlmn = "46061";
+    EXPECT_TRUE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46000";
+    netPlmn = "46061";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46003";
+    netPlmn = "46061";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46015";
+    netPlmn = "46061";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46018";
+    netPlmn = "46061";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+}
+
+/**
+ * @tc.number   Telephony_OperatorNameCTCC_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_OperatorNameCTCC_001, Function | MediumTest | Level1)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto operatorName = std::make_shared<OperatorName>(
+        subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+    std::string simPlmn = "46003";
+    std::string netPlmn = "46021";
+    EXPECT_TRUE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46000";
+    netPlmn = "46021";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46001";
+    netPlmn = "46021";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46015";
+    netPlmn = "46021";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46018";
+    netPlmn = "46021";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46003";
+    netPlmn = "46060";
+    EXPECT_TRUE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46000";
+    netPlmn = "46060";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46001";
+    netPlmn = "46060";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46015";
+    netPlmn = "46060";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46018";
+    netPlmn = "46060";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+}
+
+/**
+ * @tc.number   Telephony_OperatorNameCBCC_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_OperatorNameCBCC_001, Function | MediumTest | Level1)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto operatorName = std::make_shared<OperatorName>(
+        subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+    std::string simPlmn = "46015";
+    std::string netPlmn = "46032";
+    EXPECT_TRUE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46000";
+    netPlmn = "46032";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46001";
+    netPlmn = "46032";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46003";
+    netPlmn = "46032";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46018";
+    netPlmn = "46032";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46015";
+    netPlmn = "46051";
+    EXPECT_TRUE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46000";
+    netPlmn = "46051";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46001";
+    netPlmn = "46051";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46003";
+    netPlmn = "46051";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46018";
+    netPlmn = "46051";
+    EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+}
+
+/**
+ * @tc.number   Telephony_OperatorNameUtils_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_OperatorNameUtils_001, Function | MediumTest | Level1)
+{
+    OperatorNameUtils::GetInstance().Init();
+    char *content = nullptr;
+    const char *path = "etc/telephony/a.json";
+    EXPECT_GT(OperatorNameUtils::GetInstance().LoaderJsonFile(content, path), TELEPHONY_ERR_SUCCESS);
+    std::string numeric = "46000";
+    EXPECT_NE(OperatorNameUtils::GetInstance().GetCustomName(numeric), "");
 }
 } // namespace Telephony
 } // namespace OHOS
