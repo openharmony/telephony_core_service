@@ -24,5 +24,5 @@ ohos_prebuilt_etc("ons.bin") {
   subsystem_name = "telephony"
   relative_install_dir = "ons"
   install_enable = true
-   install_images = [ chipset_base_dir ]
+  install_images = [ chipset_base_dir ]
 }
