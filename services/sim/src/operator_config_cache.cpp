@@ -23,6 +23,7 @@
 #include "common_event_support.h"
 #include "core_manager_inner.h"
 #include "radio_event.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -31,6 +32,14 @@ OperatorConfigCache::OperatorConfigCache(const std::shared_ptr<AppExecFwk::Event
     : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), slotId_(slotId)
 {
     TELEPHONY_LOGI("OperatorConfigCache create");
+    if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_ != nullptr &&
+        TELEPHONY_EXT_WRAPPER.updateOpcVersion_ != nullptr) {
+        if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_()) {
+            ClearAllCache(slotId);
+            TELEPHONY_LOGI("clear all cache done");
+            TELEPHONY_EXT_WRAPPER.updateOpcVersion_();
+        }
+    }
 }
 
 void OperatorConfigCache::ClearAllCache(int32_t slotId)

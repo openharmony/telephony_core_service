@@ -39,6 +39,7 @@ private:
     int32_t LoaderJsonFile(char *&content, const std::string &path);
     void ParseArray(const std::string key, const Json::Value &arrayValue_, OperatorConfig &poc);
     bool CloseFile(FILE *f);
+    void DeleteFiles();
     inline static const char *DEFAULT_OPERATE_CONFIG_PATH = "etc/operator_config.json";
     inline static const char *DEFAULT_OPERATE_CONFIG_DIR = "/data/service/el1/public/telephony/operatorconfig";
     inline static const int MODE_SLOT_0 = 11;
