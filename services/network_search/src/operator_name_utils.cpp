@@ -211,6 +211,9 @@ std::string OperatorNameUtils::GetNameByLocale(OperatorNameCust &value)
 
 std::string OperatorNameUtils::GetCustomName(const std::string &numeric)
 {
+    if (!IsInit()) {
+        Init();
+    }
     TELEPHONY_LOGD("Start");
     for (OperatorNameCust value : nameArray_) {
         auto obj = std::find(value.mccMnc.begin(), value.mccMnc.end(), numeric);
