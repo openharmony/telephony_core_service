@@ -59,7 +59,19 @@ void OperatorFileParser::ClearFilesCache()
 {
     if (isCachePathExit()) {
         TELEPHONY_LOGI("removeAllCache");
-        rmdir(DEFAULT_OPERATE_CONFIG_DIR);
+        DeleteFiles();
+    }
+}
+
+void OperatorFileParser::DeleteFiles()
+{
+    std::filesystem::path dirPath = std::string(DEFAULT_OPERATE_CONFIG_DIR);
+    std::error_code errorCode;
+    std::filesystem::remove_all(dirPath, errorCode);
+    if (errorCode.operator bool()) {
+        TELEPHONY_LOGE("delete fail, error code : %{public}d", errorCode.value());
+    } else {
+        TELEPHONY_LOGI("delete success");
     }
 }
 

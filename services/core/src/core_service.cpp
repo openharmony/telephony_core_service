@@ -80,6 +80,9 @@ void CoreService::OnStart()
 bool CoreService::Init()
 {
     TELEPHONY_LOGI("CoreService::Init");
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+#endif
     telRilManager_ = std::make_shared<TelRilManager>();
     if (telRilManager_ != nullptr) {
         if (!telRilManager_->OnInit()) {
@@ -107,13 +110,6 @@ bool CoreService::Init()
     }
     simManager_->SetNetworkSearchManager(networkSearchManager_);
     CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
-    if (TELEPHONY_EXT_WRAPPER.function_example_) {
-        // only example, when other functions are added, please delete it.
-        TELEPHONY_LOGD("CoreService::Init is not empty.");
-    }
-#endif
     TELEPHONY_LOGI("CoreService::Init success");
     return true;
 }

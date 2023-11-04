@@ -28,11 +28,11 @@ public:
     DISALLOW_COPY_AND_MOVE(TelephonyExtWrapper);
     void InitTelephonyExtWrapper();
 
-    // only example, when other functions are added, please delete it.
-    typedef void (*FUNCTION_EXAMPLE)(int32_t&);
+    typedef bool (*CHECK_OPC_VERSION_IS_UPDATE)(void);
+    typedef void (*UPDATE_OPC_VERSION)(void);
 
-    // only example, when other functions are added, please delete it.
-    FUNCTION_EXAMPLE function_example_ = nullptr;
+    CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
+    UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
