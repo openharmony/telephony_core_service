@@ -57,6 +57,7 @@ void OperatorNameUtils::Init()
     }
     ParserOperatorNameCustJson(nameArray_);
     TELEPHONY_LOGI("init success");
+    isInit_ = true;
 }
 
 bool OperatorNameUtils::IsInit()
