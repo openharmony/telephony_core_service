@@ -80,10 +80,6 @@ bool CoreService::Init()
     TELEPHONY_LOGI("CoreService::Init");
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
-    if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_ != nullptr &&
-        TELEPHONY_EXT_WRAPPER.updateOpcVersion_ != nullptr) {
-        TELEPHONY_LOGD("CoreService::Init is not empty.");
-    }
 #endif
     telRilManager_ = std::make_shared<TelRilManager>();
     if (telRilManager_ != nullptr) {
