@@ -21,7 +21,6 @@
 #include "ipc_skeleton.h"
 #include "network_search_manager.h"
 #include "network_search_types.h"
-#include "operator_name_utils.h"
 #include "parameter.h"
 #include "runner_pool.h"
 #include "sim_manager.h"
@@ -29,9 +28,9 @@
 #include "system_ability_definition.h"
 #include "telephony_common_utils.h"
 #include "telephony_errors.h"
+#include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
-#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -64,7 +63,6 @@ void CoreService::OnStart()
         registerToService_ = true;
     }
     RunnerPool::GetInstance().Init();
-    OperatorNameUtils::GetInstance().Init();
     IPCSkeleton::SetMaxWorkThreadNum(MAX_IPC_THREAD_NUM);
     if (!Init()) {
         TELEPHONY_LOGE("failed to init CoreService");
