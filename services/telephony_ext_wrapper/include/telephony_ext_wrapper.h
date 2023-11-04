@@ -28,7 +28,7 @@ public:
     DISALLOW_COPY_AND_MOVE(TelephonyExtWrapper);
     void InitTelephonyExtWrapper();
 
-    typedef void (*CHECK_OPC_VERSION_IS_UPDATE)(void);
+    typedef bool (*CHECK_OPC_VERSION_IS_UPDATE)(void);
     typedef void (*UPDATE_OPC_VERSION)(void);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
