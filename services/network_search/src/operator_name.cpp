@@ -23,6 +23,7 @@
 #include "hril_network_parcel.h"
 #include "network_search_manager.h"
 #include "operator_config_types.h"
+#include "operator_name_utils.h"
 #include "resource_utils.h"
 #include "telephony_log_wrapper.h"
 using namespace OHOS::AppExecFwk;
@@ -63,6 +64,18 @@ void OperatorName::OnReceiveEvent(const EventFwk::CommonEventData &data)
         sptr<NetworkState> networkState = GetNetworkStatus();
         if (networkState != nullptr && networkState->GetRegStatus() == RegServiceState::REG_STATE_IN_SERVICE) {
             NotifySpnChanged();
+        }
+    } else if (action == CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED) {
+        TELEPHONY_LOGI("locale changed Slot%{public}d", slotId_);
+        NotifySpnChanged();
+        auto networkSearchManager = networkSearchManager_.lock();
+        if (networkSearchManager == nullptr) {
+            TELEPHONY_LOGE("networkSearchManager is nullptr slotId:%{public}d", slotId_);
+            return;
+        }
+        networkSearchManager->decMsgNum(slotId_);
+        if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
+            networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
         }
     } else {
         TELEPHONY_LOGI("OperatorName::OnReceiveEvent Slot%{public}d: action=%{public}s code=%{public}d", slotId_,
@@ -182,17 +195,28 @@ void OperatorName::NotifySpnChanged()
         return;
     }
     TELEPHONY_LOGI("OperatorName::NotifySpnChanged slotId:%{public}d", slotId_);
+    std::string netPlmn = "";
+    std::string simPlmn = "";
+    std::string domesticSpn = "";
     RegServiceState regStatus = RegServiceState::REG_STATE_UNKNOWN;
     sptr<NetworkState> networkState = GetNetworkStatus();
     if (networkState != nullptr) {
         regStatus = networkState->GetRegStatus();
-    } else {
-        TELEPHONY_LOGE("OperatorName::NotifySpnChanged networkState is nullptr slotId:%{public}d", slotId_);
+        std::string netPlmn = networkState->GetPlmnNumeric();
     }
+    if (simManager_ != nullptr) {
+        std::u16string operatorNumeric = u"";
+        simManager_->GetSimOperatorNumeric(slotId_, operatorNumeric);
+        simPlmn = Str16ToStr8(operatorNumeric);
+    }
+    if (isDomesticRoaming(simPlmn, netPlmn)) {
+        domesticSpn = GetCustomName(simPlmn);
+    }
+
     if (networkSearchManager->GetPhoneType(slotId_) == PhoneType::PHONE_TYPE_IS_GSM) {
-        NotifyGsmSpnChanged(regStatus, networkState);
+        NotifyGsmSpnChanged(regStatus, networkState, domesticSpn);
     } else if (networkSearchManager->GetPhoneType(slotId_) == PhoneType::PHONE_TYPE_IS_CDMA) {
-        NotifyCdmaSpnChanged(regStatus, networkState);
+        NotifyCdmaSpnChanged(regStatus, networkState, domesticSpn);
     }
 }
 
@@ -252,7 +276,8 @@ void OperatorName::UpdateSpn(
     }
 }
 
-void OperatorName::NotifyGsmSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState)
+void OperatorName::NotifyGsmSpnChanged(
+    RegServiceState regStatus, sptr<NetworkState> &networkState, const std::string &domesticSpn)
 {
     if (networkState == nullptr) {
         TELEPHONY_LOGE("OperatorName::NotifyGsmSpnChanged networkState is nullptr slotId:%{public}d", slotId_);
@@ -281,14 +306,15 @@ void OperatorName::NotifyGsmSpnChanged(RegServiceState regStatus, sptr<NetworkSt
     if (curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn || curPlmnShow_ != showPlmn ||
         curSpn_.compare(spn) || curPlmn_.compare(plmn)) {
         TELEPHONY_LOGI("OperatorName::NotifyGsmSpnChanged start send broadcast slotId:%{public}d...", slotId_);
-        PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn);
+        PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn, domesticSpn);
     } else {
         TELEPHONY_LOGI(
             "OperatorName::NotifyGsmSpnChanged spn no changed, not need to update slotId:%{public}d", slotId_);
     }
 }
 
-void OperatorName::NotifyCdmaSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState)
+void OperatorName::NotifyCdmaSpnChanged(
+    RegServiceState regStatus, sptr<NetworkState> &networkState, const std::string &domesticSpn)
 {
     if (networkState == nullptr) {
         TELEPHONY_LOGE("OperatorName::NotifyCdmaSpnChanged networkState is nullptr slotId:%{public}d", slotId_);
@@ -319,7 +345,7 @@ void OperatorName::NotifyCdmaSpnChanged(RegServiceState regStatus, sptr<NetworkS
     if (curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn || curPlmnShow_ != showPlmn ||
         curSpn_.compare(spn) || curPlmn_.compare(plmn)) {
         TELEPHONY_LOGI("OperatorName::NotifyCdmaSpnChanged start send broadcast slotId:%{public}d...", slotId_);
-        PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn);
+        PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn, domesticSpn);
     } else {
         TELEPHONY_LOGI(
             "OperatorName::NotifyCdmaSpnChanged spn no changed, not need to update slotId:%{public}d", slotId_);
@@ -327,7 +353,7 @@ void OperatorName::NotifyCdmaSpnChanged(RegServiceState regStatus, sptr<NetworkS
 }
 
 void OperatorName::PublishEvent(const int32_t rule, const RegServiceState state, const bool showPlmn,
-    const std::string &plmn, const bool showSpn, const std::string &spn)
+    const std::string &plmn, const bool showSpn, const std::string &spn, const std::string &domesticSpn)
 {
     Want want;
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SPN_INFO_CHANGED);
@@ -336,6 +362,7 @@ void OperatorName::PublishEvent(const int32_t rule, const RegServiceState state,
     want.SetParam(CUR_PLMN, plmn);
     want.SetParam(CUR_SPN_SHOW, showSpn);
     want.SetParam(CUR_SPN, spn);
+    want.SetParam(DOMESTIC_SPN, domesticSpn);
     CommonEventData data;
     data.SetWant(want);
 
@@ -449,30 +476,129 @@ std::string OperatorName::GetCustEons(const std::string &numeric, int32_t lac, b
 
 std::string OperatorName::GetCustomName(const std::string &numeric)
 {
-    TELEPHONY_LOGD("OperatorName::GetCustomName numeric:%{public}s", numeric.c_str());
-    std::string name = "";
+    return OperatorNameUtils::GetInstance().GetCustomName(numeric);
+}
+
+bool OperatorName::isDomesticRoaming(const std::string &simPlmn, const std::string &netPlmn)
+{
+    if (isCMCard(simPlmn) && isCMDomestic(netPlmn)) {
+        return true;
+    }
+    if (isCUCard(simPlmn) && isCUDomestic(netPlmn)) {
+        return true;
+    }
+    if (isCTCard(simPlmn) && isCTDomestic(netPlmn)) {
+        return true;
+    }
+    if (isCBCard(simPlmn) && isCBDomestic(netPlmn)) {
+        return true;
+    }
+    TELEPHONY_LOGD("simPlmn not match netPlmn");
+    return false;
+}
+
+bool OperatorName::isCMCard(const std::string &numeric)
+{
     if (numeric.empty()) {
-        return name;
+        return false;
     }
     auto obj = std::find(cmMccMnc_.begin(), cmMccMnc_.end(), numeric);
     if (obj != cmMccMnc_.end()) {
-        ResourceUtils::Get().GetStringValueByName(ResourceUtils::CMCC, name);
-        TELEPHONY_LOGD("OperatorName::GetCustomName CMCC:%{public}s", name.c_str());
-        return name;
+        TELEPHONY_LOGD("is CM card");
+        return true;
     }
-    obj = std::find(cuMccMnc_.begin(), cuMccMnc_.end(), numeric);
+    return false;
+}
+
+bool OperatorName::isCUCard(const std::string &numeric)
+{
+    if (numeric.empty()) {
+        return false;
+    }
+    auto obj = std::find(cuMccMnc_.begin(), cuMccMnc_.end(), numeric);
     if (obj != cuMccMnc_.end()) {
-        ResourceUtils::Get().GetStringValueByName(ResourceUtils::CUCC, name);
-        TELEPHONY_LOGD("OperatorName::GetCustomName CUCC:%{public}s", name.c_str());
-        return name;
+        TELEPHONY_LOGD("is CU card");
+        return true;
     }
-    obj = std::find(ctMccMnc_.begin(), ctMccMnc_.end(), numeric);
+    return false;
+}
+
+bool OperatorName::isCTCard(const std::string &numeric)
+{
+    if (numeric.empty()) {
+        return false;
+    }
+    auto obj = std::find(ctMccMnc_.begin(), ctMccMnc_.end(), numeric);
     if (obj != ctMccMnc_.end()) {
-        ResourceUtils::Get().GetStringValueByName(ResourceUtils::CTCC, name);
-        TELEPHONY_LOGD("OperatorName::GetCustomName CTCC:%{public}s", name.c_str());
-        return name;
+        TELEPHONY_LOGD("is CT card");
+        return true;
     }
-    return name;
+    return false;
+}
+
+bool OperatorName::isCBCard(const std::string &numeric)
+{
+    if (numeric.empty()) {
+        return false;
+    }
+    auto obj = std::find(cbnMccMnc_.begin(), cbnMccMnc_.end(), numeric);
+    if (obj != cbnMccMnc_.end()) {
+        TELEPHONY_LOGD("is CB card");
+        return true;
+    }
+    return false;
+}
+
+bool OperatorName::isCMDomestic(const std::string &numeric)
+{
+    if (numeric.empty()) {
+        return false;
+    }
+    auto obj = std::find(cmDomesticMccMnc_.begin(), cmDomesticMccMnc_.end(), numeric);
+    if (obj != cmDomesticMccMnc_.end()) {
+        TELEPHONY_LOGD("is CM domestic");
+        return true;
+    }
+    return false;
+}
+
+bool OperatorName::isCUDomestic(const std::string &numeric)
+{
+    if (numeric.empty()) {
+        return false;
+    }
+    auto obj = std::find(cuDomesticMccMnc_.begin(), cuDomesticMccMnc_.end(), numeric);
+    if (obj != cuDomesticMccMnc_.end()) {
+        TELEPHONY_LOGD("is CU domestic");
+        return true;
+    }
+    return false;
+}
+
+bool OperatorName::isCTDomestic(const std::string &numeric)
+{
+    if (numeric.empty()) {
+        return false;
+    }
+    auto obj = std::find(ctDomesticMccMnc_.begin(), ctDomesticMccMnc_.end(), numeric);
+    if (obj != ctDomesticMccMnc_.end()) {
+        TELEPHONY_LOGD("is CT domestic");
+        return true;
+    }
+    return false;
+}
+
+bool OperatorName::isCBDomestic(const std::string &numeric)
+{
+    if (numeric.empty()) {
+        return false;
+    }
+    auto obj = std::find(cbDomesticnMccMnc_.begin(), cbDomesticnMccMnc_.end(), numeric);
+    if (obj != cbDomesticnMccMnc_.end()) {
+        TELEPHONY_LOGD("is CB domestic");
+        return true;
+    }
+    return false;
 }
 
 int32_t OperatorName::GetCurrentLac()

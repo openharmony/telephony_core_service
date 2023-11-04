@@ -1564,8 +1564,8 @@ HWTEST_F(BranchTest, Telephony_OperatorName_001, Function | MediumTest | Level1)
     std::string numeric = "qwe";
     std::vector<std::string> pnnCust;
     sptr<NetworkState> networkState;
-    operatorName->NotifyGsmSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState);
-    operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState);
+    operatorName->NotifyGsmSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
+    operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
     operatorName->UpdateOperatorConfig();
     operatorName->UpdatePnnCust(pnnCust);
     operatorName->UpdateOplCust(pnnCust);
@@ -1578,8 +1578,8 @@ HWTEST_F(BranchTest, Telephony_OperatorName_001, Function | MediumTest | Level1)
     operatorName->UpdatePlmn(RegServiceState::REG_STATE_UNKNOWN, networkState, 1, plmn, showPlmn);
     operatorName->UpdatePlmn(RegServiceState::REG_STATE_POWER_OFF, networkState, 1, plmn, showPlmn);
     operatorName->UpdateSpn(RegServiceState::REG_STATE_IN_SERVICE, networkState, 1, plmn, showPlmn);
-    operatorName->NotifyGsmSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState);
-    operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState);
+    operatorName->NotifyGsmSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
+    operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
     operatorName->GsmOperatorInfo(event);
     operatorName->HandleOperatorInfo(event);
     operatorName->NotifySpnChanged();
