@@ -88,6 +88,7 @@
                     "//base/telephony/core_service/services/etc/init:telephony_trust",
                     "//base/telephony/core_service/services/etc/init:telephony.cfg",
                     "//base/telephony/core_service/services/etc/carrier:operator_config",
+                    "//base/telephony/core_service/services/etc/operatorname:operator_name",
                     "//base/telephony/core_service/services/etc/ons:ons.bin",
                     "//base/telephony/core_service/services/etc/param:telephony.para",
                     "//base/telephony/core_service/services/etc/param:telephony.para.dac",
