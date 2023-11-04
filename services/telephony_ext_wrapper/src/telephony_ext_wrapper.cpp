@@ -40,10 +40,14 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
         return;
     }
 
-    // only example, when other functions are added, please delete it.
-    function_example_ = (FUNCTION_EXAMPLE)dlsym(telephonyExtWrapperHandle_, "FunctionExample");
-    // Check whether all function pointers are empty.
-    if (function_example_ == nullptr) {
+    checkOpcVersionIsUpdate_ = (CHECK_OPC_VERSION_IS_UPDATE)dlsym(telephonyExtWrapperHandle_, "CheckOpcVersionIsUpdate");
+    if (checkOpcVersionIsUpdate_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+        return;
+    }
+
+    updateOpcVersion_ = (UPDATE_OPC_VERSION)dlsym(telephonyExtWrapperHandle_, "UpdateOpcVersion");
+    if (updateOpcVersion_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
     }
