@@ -364,7 +364,8 @@ HWTEST_F(SimTest, Telephony_Sim_InitTelephonyExtService_0100, Function | MediumT
         TELEPHONY_LOGI("telephonyExtWrapperHandle_ null");
     } else {
         TELEPHONY_LOGI("telephonyExtWrapperHandle_ not null");
-        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.function_example_ != nullptr, true);
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_ != nullptr, true);
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.updateOpcVersion_ != nullptr, true);
     }
 }
 #endif // TEL_TEST_UNSUPPORT
