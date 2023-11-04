@@ -40,7 +40,8 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
         return;
     }
 
-    checkOpcVersionIsUpdate_ = (CHECK_OPC_VERSION_IS_UPDATE)dlsym(telephonyExtWrapperHandle_, "CheckOpcVersionIsUpdate");
+    checkOpcVersionIsUpdate_ = (CHECK_OPC_VERSION_IS_UPDATE)dlsym(telephonyExtWrapperHandle_,
+        "CheckOpcVersionIsUpdate");
     if (checkOpcVersionIsUpdate_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
