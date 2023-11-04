@@ -555,7 +555,7 @@ bool OperatorName::isCMDomestic(const std::string &numeric)
         return false;
     }
     auto obj = std::find(cmDomesticMccMnc_.begin(), cmDomesticMccMnc_.end(), numeric);
-    if (obj != cmMccMnc_.end()) {
+    if (obj != cmDomesticMccMnc_.end()) {
         TELEPHONY_LOGD("is CM domestic");
         return true;
     }
@@ -568,7 +568,7 @@ bool OperatorName::isCUDomestic(const std::string &numeric)
         return false;
     }
     auto obj = std::find(cuDomesticMccMnc_.begin(), cuDomesticMccMnc_.end(), numeric);
-    if (obj != cuMccMnc_.end()) {
+    if (obj != cuDomesticMccMnc_.end()) {
         TELEPHONY_LOGD("is CU domestic");
         return true;
     }
@@ -581,7 +581,7 @@ bool OperatorName::isCTDomestic(const std::string &numeric)
         return false;
     }
     auto obj = std::find(ctDomesticMccMnc_.begin(), ctDomesticMccMnc_.end(), numeric);
-    if (obj != ctMccMnc_.end()) {
+    if (obj != ctDomesticMccMnc_.end()) {
         TELEPHONY_LOGD("is CT domestic");
         return true;
     }
@@ -594,7 +594,7 @@ bool OperatorName::isCBDomestic(const std::string &numeric)
         return false;
     }
     auto obj = std::find(cbDomesticnMccMnc_.begin(), cbDomesticnMccMnc_.end(), numeric);
-    if (obj != cbnMccMnc_.end()) {
+    if (obj != cbDomesticnMccMnc_.end()) {
         TELEPHONY_LOGD("is CB domestic");
         return true;
     }
