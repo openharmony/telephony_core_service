@@ -298,6 +298,11 @@ int32_t TelRilSim::UnlockSimLockResponse(
     return Response<LockStatusResp>(TELEPHONY_LOG_FUNC_NAME, responseInfo, lockStatusResp);
 }
 
+int32_t TelRilSim::SendSimMatchedOperatorInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+{
+    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
+}
+
 int32_t TelRilSim::GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_SIM_GET_SIM_STATUS, &HDI::Ril::V1_1::IRil::GetSimStatus);
@@ -475,6 +480,18 @@ int32_t TelRilSim::UnlockSimLock(
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_UNLOCK_SIM_LOCK, &HDI::Ril::V1_1::IRil::UnlockSimLock,
         lockType, password);
+}
+
+int32_t TelRilSim::SendSimMatchedOperatorInfo(
+    const NcfgOperatorInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    OHOS::HDI::Ril::V1_2::NcfgOperatorInfo ncfgOperatorInfo;
+    ncfgOperatorInfo.operName = reqInfo.operName;
+    ncfgOperatorInfo.operKey = reqInfo.operKey;
+    ncfgOperatorInfo.state = reqInfo.state;
+    ncfgOperatorInfo.reserve = reqInfo.reserve;
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SIM_SEND_NCFG_OPER_INFO,
+        &HDI::Ril::V1_2::IRil::SendSimMatchedOperatorInfo, ncfgOperatorInfo);
 }
 
 void TelRilSim::BuildIccIoResult(

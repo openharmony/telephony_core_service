@@ -147,6 +147,8 @@ void TelRilTest::OnInitSim()
     memberFuncMap_[DiffInterfaceId::TEST_TRANSMIT_APDU_BASIC_CHANNEL] =
         &TelRilTest::OnRequestTransmitApduBasicChannelTest;
     memberFuncMap_[DiffInterfaceId::TEST_SIM_AUTH] = &TelRilTest::OnRequestSimAuthenticationTest;
+    memberFuncMap_[DiffInterfaceId::TEST_SIM_SEND_NCFG_OPER_INFO] =
+        &TelRilTest::OnRequestSendSimMatchedOperatorInfoTest;
     memberFuncMap_[DiffInterfaceId::TEST_CLOSE_LG_SIMIO] = &TelRilTest::OnRequestCloseLGSimIOTest;
     memberFuncMap_[DiffInterfaceId::TEST_STK_SEND_TERMINAL_RESPONSE] =
         &TelRilTest::OnRequestSendTerminalResponseCmdTest;
@@ -419,6 +421,35 @@ void TelRilTest::OnRequestSimAuthenticationTest(int32_t slotId,
     int ret = telRilManager_->SimAuthentication(slotId, reqInfo, event);
     TELEPHONY_LOGI("OnRequestSimAuthenticationTest ret = %{public}d", ret);
     std::cout << "TelRilTest::OnRequestSimAuthenticationTest end" << std::endl;
+}
+
+void TelRilTest::OnRequestSendSimMatchedOperatorInfoTest(int32_t slotId,
+    const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    std::cout << "TelRilTest::OnRequestSendSimMatchedOperatorInfoTest begin:" << std::endl;
+    auto event = AppExecFwk::InnerEvent::Get(uint32_t(CustomMessageID::MSG_SIM_SEND_NCFG_OPER_INFO_DONE));
+    if (event == nullptr) {
+        std::cerr << "event is nullptr" << std::endl;
+        return;
+    }
+    event->SetOwner(handler);
+    if (telRilManager_ == nullptr) {
+        std::cerr << "telRilManager is nullptr" << std::endl;
+        return;
+    }
+
+    NcfgOperatorInfo reqInfo = NcfgOperatorInfo();
+    cout << "input operName:" << std::endl;
+    cin >> reqInfo.operName;
+    cout << "input operKey:" << std::endl;
+    cin >> reqInfo.operKey;
+    cout << "input state:" << std::endl;
+    cin >> reqInfo.state;
+    cout << "input reserve:" << std::endl;
+    cin >> reqInfo.reserve;
+    int32_t ret = g_rilInterface->SendSimMatchedOperatorInfo(slotId, GetSerialId(), reqInfo);
+    TELEPHONY_LOGI("OnRequestSendSimMatchedOperatorInfoTest ret = %{public}d", ret);
+    std::cout << "TelRilTest::OnRequestSendSimMatchedOperatorInfoTest end" << std::endl;
 }
 
 void TelRilTest::OnRequestCloseLGSimIOTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
@@ -1883,6 +1914,10 @@ void TelRilTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
             TELEPHONY_LOGI("sim authentication done");
             break;
         }
+        case uint32_t(CustomMessageID::MSG_SIM_SEND_NCFG_OPER_INFO_DONE): {
+            TELEPHONY_LOGI("sim SendSimMatchedOperatorInfo done");
+            break;
+        }
         case uint32_t(DiffInterfaceId::TEST_GET_BASEBAND_VERSION): {
             OnRequestGetBasebandVersionTestResponse(event);
             break;
@@ -2105,6 +2140,8 @@ void SimTest()
          << "--> OnRequestTransmitApduBasicChannelTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_CLOSE_LG_SIMIO) << "--> OnRequestCloseLGSimIOTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_SIM_AUTH) << "--> OnRequestSimAuthenticationTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::MSG_SIM_SEND_NCFG_OPER_INFO_DONE)
+         << "--> OnRequestSendSimMatchedOperatorInfoTest" << endl;
 
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMSI) << "--> OnRequestSimGetImsiTest" << endl; // pass
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_ICCID) << "--> OnRequestSimGetIccIDTest" << endl; // pass
