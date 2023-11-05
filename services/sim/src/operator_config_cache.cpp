@@ -233,8 +233,26 @@ bool OperatorConfigCache::UnRegisterForIccChange()
     return true;
 }
 
+void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId)
+{
+    TELEPHONY_LOGI("OperatorConfigCache::SendSimMatchedOperatorInfo");
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
+        TELEPHONY_LOGE("OperatorConfigCache::can not get SimFileManager");
+        return false;
+    }
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
+    std::string operName = Str16ToStr8(simFileManager->GetOpName());
+    std::string operKey = Str16ToStr8(simFileManager->GetOpKey());
+    int32_t response = CoreManagerInner::GetInstance().SendSimMatchedOperatorInfo(slotId,
+        static_cast<int32_t>(simState), operName, operKey);
+    TELEPHONY_LOGI("OperatorConfigCache::SendSimMatchedOperatorInfo response = %{public}d", response);
+}
+
 bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId)
 {
+    SendSimMatchedOperatorInfo(slotId);
     AAFwk::Want want;
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     want.SetParam(KEY_SLOTID, slotId);

@@ -79,6 +79,8 @@ public:
     virtual void GetRadioProtocol(int32_t slotId) = 0;
     virtual int32_t GetDsdsMode(int32_t &dsdsMode) = 0;
     virtual int32_t SetDsdsMode(int32_t dsdsMode) = 0;
+    virtual int32_t SendSimMatchedOperatorInfo(
+        int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey) = 0;
     // STK
     virtual int32_t SendEnvelopeCmd(int32_t slotId, const std::string &cmd) = 0;
     virtual int32_t SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) = 0;

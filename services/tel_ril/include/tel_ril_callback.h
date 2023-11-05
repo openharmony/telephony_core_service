@@ -175,6 +175,7 @@ public:
         const HDI::Ril::V1_1::IccIoResultInfo &result) override;
     int32_t UnlockSimLockResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::LockStatusResp &lockStatus) override;
+    int32_t SendSimMatchedOperatorInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
 
     // Network
     int32_t NetworkCsRegStatusUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,

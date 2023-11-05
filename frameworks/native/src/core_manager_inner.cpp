@@ -1858,6 +1858,16 @@ int32_t CoreManagerInner::SetDsdsMode(int32_t dsdsMode)
     return simManager_->SetDsdsMode(dsdsMode);
 }
 
+int32_t CoreManagerInner::SendSimMatchedOperatorInfo(
+    int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SendSimMatchedOperatorInfo(slotId, state, operName, operKey);
+}
+
 int32_t CoreManagerInner::GetPrimarySlotId(int32_t &slotId)
 {
     if (simManager_ == nullptr) {
