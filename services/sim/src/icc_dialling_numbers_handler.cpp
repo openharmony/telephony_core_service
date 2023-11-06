@@ -545,10 +545,6 @@ bool IccDiallingNumbersHandler::FormatNameAndNumber(
     std::string &&name = SIMUtils::Trim(nameTemp);
     std::string &&number = SIMUtils::Trim(numberTemp);
 
-    if (name.empty() || number.empty()) {
-        TELEPHONY_LOGE("name or number shuld not be empty");
-        return false;
-    }
     std::u16string &&nameWide = Str8ToStr16(name);
     std::u16string &&numberWide = Str8ToStr16(number);
 
