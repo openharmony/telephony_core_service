@@ -239,7 +239,7 @@ void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId)
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
         TELEPHONY_LOGE("OperatorConfigCache::can not get SimFileManager");
-        return false;
+        return;
     }
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
