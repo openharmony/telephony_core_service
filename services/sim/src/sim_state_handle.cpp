@@ -523,7 +523,7 @@ void SimStateHandle::GetSimAuthenticationResult(int32_t slotId, const AppExecFwk
     simAuthRespon_.response = response->response;
 }
 
-void SimStateHandle::void GetSendSimMatchedOperatorInfoResult(
+void SimStateHandle::GetSendSimMatchedOperatorInfoResult(
     int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("SimStateHandle::GetSendSimMatchedOperatorInfoResult slotId = %{public}d", slotId);
