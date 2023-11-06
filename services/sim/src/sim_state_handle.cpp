@@ -540,7 +540,7 @@ SimAuthenticationResponse SimStateHandle::GetSimAuthenticationResponse()
     return simAuthRespon_;
 }
 
-int32_t SimStateHandle::GetSimMatchedOperatorInfoResponse()
+int32_t SimStateHandle::GetSendSimMatchedOperatorInfoResponse()
 {
     return sendSimMatchedOperatorInfoResult_;
 }
