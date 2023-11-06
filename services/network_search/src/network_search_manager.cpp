@@ -642,10 +642,14 @@ bool NetworkSearchManager::SetNetworkSelectionMode(
         return false;
     }
     std::string plmnNumeric = "";
+    std::string operatorCurrentRadio = "";
+    std::string operatorInfo = "";
     if (networkInformation != nullptr) {
         plmnNumeric = networkInformation->GetOperatorNumeric();
+        operatorCurrentRadio = std::to_string(networkInformation->GetRadioTech());
+        operatorInfo = plmnNumeric + "," + operatorCurrentRadio;
     }
-    return eventSender_->SendBase(slotId, RadioEvent::RADIO_SET_NETWORK_SELECTION_MODE, selectMode, plmnNumeric);
+    return eventSender_->SendBase(slotId, RadioEvent::RADIO_SET_NETWORK_SELECTION_MODE, selectMode, operatorInfo);
 }
 
 int32_t NetworkSearchManager::SetNetworkSelectionMode(int32_t slotId, int32_t selectMode,
@@ -659,11 +663,15 @@ int32_t NetworkSearchManager::SetNetworkSelectionMode(int32_t slotId, int32_t se
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::string plmnNumeric = "";
+    std::string operatorCurrentRadio = "";
+    std::string operatorInfo = "";
     if (networkInformation != nullptr) {
         plmnNumeric = networkInformation->GetOperatorNumeric();
+        operatorCurrentRadio = std::to_string(networkInformation->GetRadioTech());
+        operatorInfo = plmnNumeric + "," + operatorCurrentRadio;
     }
     bool ret = eventSender_->SendCallback(
-        slotId, RadioEvent::RADIO_SET_NETWORK_SELECTION_MODE, &callback, selectMode, plmnNumeric);
+        slotId, RadioEvent::RADIO_SET_NETWORK_SELECTION_MODE, &callback, selectMode, operatorInfo);
     if (!ret) {
         TELEPHONY_LOGE("slotId:%{public}d SetNetworkSelectionMode SendCallback failed.", slotId);
         return CORE_SERVICE_SEND_CALLBACK_FAILED;
