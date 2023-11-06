@@ -81,6 +81,11 @@ void IccDiallingNumbersCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
     }
 }
 
+void IccDiallingNumbersCache::ClearDiallingNumberCache()
+{
+    diallingNumberFileList_.clear();
+}
+
 void IccDiallingNumbersCache::ProcessObtainPbrDetailsDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     std::unique_ptr<UsimResult> fd = event->GetUniqueObject<UsimResult>();
