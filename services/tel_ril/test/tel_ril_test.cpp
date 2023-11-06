@@ -447,7 +447,7 @@ void TelRilTest::OnRequestSendSimMatchedOperatorInfoTest(int32_t slotId,
     cin >> reqInfo.state;
     cout << "input reserve:" << std::endl;
     cin >> reqInfo.reserve;
-    int32_t ret = g_rilInterface->SendSimMatchedOperatorInfo(slotId, GetSerialId(), reqInfo);
+    int32_t ret = telRilManager_->SendSimMatchedOperatorInfo(slotId, reqInfo, event);
     TELEPHONY_LOGI("OnRequestSendSimMatchedOperatorInfoTest ret = %{public}d", ret);
     std::cout << "TelRilTest::OnRequestSendSimMatchedOperatorInfoTest end" << std::endl;
 }
@@ -2140,7 +2140,7 @@ void SimTest()
          << "--> OnRequestTransmitApduBasicChannelTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_CLOSE_LG_SIMIO) << "--> OnRequestCloseLGSimIOTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_SIM_AUTH) << "--> OnRequestSimAuthenticationTest" << endl;
-    cout << static_cast<int32_t>(DiffInterfaceId::MSG_SIM_SEND_NCFG_OPER_INFO_DONE)
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_SIM_SEND_NCFG_OPER_INFO)
          << "--> OnRequestSendSimMatchedOperatorInfoTest" << endl;
 
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMSI) << "--> OnRequestSimGetImsiTest" << endl; // pass
