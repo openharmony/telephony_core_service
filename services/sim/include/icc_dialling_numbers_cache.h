@@ -47,6 +47,7 @@ public:
         int recordIndex, bool isDel, const AppExecFwk::InnerEvent::Pointer &caller);
     void ObtainAllDiallingNumberFiles(int fileId, int extensionEf, const AppExecFwk::InnerEvent::Pointer &caller);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    void ClearDiallingNumberCache();
 
 protected:
     std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
