@@ -65,6 +65,8 @@ public:
     int32_t SimAuthentication(
         const SimAuthenticationRequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t UnlockSimLock(int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SendSimMatchedOperatorInfo(
+        const NcfgOperatorInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response);
 
     int32_t GetSimStatusResponse(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::CardStatusInfo &result);
@@ -104,6 +106,7 @@ public:
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::IccIoResultInfo &result);
     int32_t UnlockSimLockResponse(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::LockStatusResp &lockStatus);
+    int32_t SendSimMatchedOperatorInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
 
 private:
     int32_t ProcessIccIoInfo(

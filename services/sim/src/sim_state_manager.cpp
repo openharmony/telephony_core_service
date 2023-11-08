@@ -482,6 +482,27 @@ int32_t SimStateManager::SimAuthentication(
     return ret;
 }
 
+int32_t SimStateManager::SendSimMatchedOperatorInfo(
+    int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey)
+{
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGE("SendSimMatchedOperatorInfo(), simStateHandle_ is nullptr!!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::unique_lock<std::mutex> lck(ctx_);
+    responseReady_ = false;
+    simStateHandle_->SendSimMatchedOperatorInfo(slotId, state, operName, operKey);
+    while (!responseReady_) {
+        TELEPHONY_LOGI("SendSimMatchedOperatorInfo::wait(), response = false");
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
+    int32_t response = simStateHandle_->GetSendSimMatchedOperatorInfoResponse();
+    TELEPHONY_LOGI("SimStateManager::SendSimMatchedOperatorInfo(), response: %{public}d", response);
+    return response;
+}
+
 SimStateManager::~SimStateManager()
 {
     if (simStateHandle_ != nullptr) {
