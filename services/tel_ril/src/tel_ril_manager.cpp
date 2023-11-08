@@ -873,6 +873,12 @@ int32_t TelRilManager::UnlockSimLock(
     return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::UnlockSimLock, lockType, password);
 }
 
+int32_t TelRilManager::SendSimMatchedOperatorInfo(
+    int32_t slotId, const NcfgOperatorInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SendSimMatchedOperatorInfo, reqInfo);
+}
+
 int32_t TelRilManager::GetRadioProtocol(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::GetRadioProtocol);

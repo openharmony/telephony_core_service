@@ -82,6 +82,8 @@ const int MSG_SIM_UNLOCK_SIMLOCK_DONE = 51;
 
 const int MSG_SIM_AUTHENTICATION_DONE = 61;
 
+const int MSG_SIM_SEND_NCFG_OPER_INFO_DONE = 62;
+
 // pin lock type
 constexpr const char *FAC_PIN_LOCK = "SC";
 // change pin2 type
@@ -128,6 +130,9 @@ public:
     void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
     int32_t SimAuthentication(int32_t slotId, AuthType authType, const std::string &authData);
     SimAuthenticationResponse GetSimAuthenticationResponse();
+    void SendSimMatchedOperatorInfo(
+        int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey);
+    int32_t GetSendSimMatchedOperatorInfoResponse();
 
 private:
     void SyncCmdResponse();
@@ -147,6 +152,7 @@ private:
     void NotifySimLock(int slotId);
     void GetUnlockSimLockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
     void GetSimAuthenticationResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
+    void GetSendSimMatchedOperatorInfoResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     std::string GetAidByCardType(CardType type);
 
 private:
@@ -155,6 +161,7 @@ private:
     int32_t slotId_ = DEFAULT_SIM_SLOT_ID;
     UnlockData unlockRespon_ = { UNLOCK_FAIL, TELEPHONY_ERROR, static_cast<int32_t>(LockState::LOCK_ERROR) };
     SimAuthenticationResponse simAuthRespon_ = { 0 };
+    int32_t sendSimMatchedOperatorInfoResult_ = static_cast<int32_t>(HRilErrType::NONE);
     LockStatusResponse simlockRespon_ = { UNLOCK_FAIL, TELEPHONY_ERROR };
     IccState iccState_; // icc card states
     SimState externalState_; // need to broadcast sim state;

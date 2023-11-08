@@ -367,6 +367,27 @@ int32_t SimStateHandle::SimAuthentication(int32_t slotId, AuthType authType, con
     return telRilManager->SimAuthentication(slotId, requireInfo, event);
 }
 
+void SimStateHandle::SendSimMatchedOperatorInfo(
+    int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey)
+{
+    auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_SEND_NCFG_OPER_INFO_DONE);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
+    event->SetOwner(shared_from_this());
+    NcfgOperatorInfo requireInfo;
+    requireInfo.state = state;
+    requireInfo.operName = operName;
+    requireInfo.operKey = operKey;
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("SimStateHandle::SendSimMatchedOperatorInfo() telRilManager is nullptr!!");
+        return;
+    }
+    telRilManager->SendSimMatchedOperatorInfo(slotId, requireInfo, event);
+}
+
 std::string SimStateHandle::GetAidByCardType(CardType type)
 {
     switch (type) {
@@ -502,9 +523,26 @@ void SimStateHandle::GetSimAuthenticationResult(int32_t slotId, const AppExecFwk
     simAuthRespon_.response = response->response;
 }
 
+void SimStateHandle::GetSendSimMatchedOperatorInfoResult(
+    int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("SimStateHandle::GetSendSimMatchedOperatorInfoResult slotId = %{public}d", slotId);
+    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    if (response == nullptr) {
+        TELEPHONY_LOGE("SimStateHandle::GetSendSimMatchedOperatorInfoResult() fail");
+        return;
+    }
+    sendSimMatchedOperatorInfoResult_ = static_cast<int32_t>(response->error);
+}
+
 SimAuthenticationResponse SimStateHandle::GetSimAuthenticationResponse()
 {
     return simAuthRespon_;
+}
+
+int32_t SimStateHandle::GetSendSimMatchedOperatorInfoResponse()
+{
+    return sendSimMatchedOperatorInfoResult_;
 }
 
 UnlockData SimStateHandle::GetUnlockData()
@@ -579,6 +617,10 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             break;
         case MSG_SIM_AUTHENTICATION_DONE:
             GetSimAuthenticationResult(slotId_, event);
+            SyncCmdResponse();
+            break;
+        case MSG_SIM_SEND_NCFG_OPER_INFO_DONE:
+            GetSendSimMatchedOperatorInfoResult(slotId_, event);
             SyncCmdResponse();
             break;
         default:

@@ -602,6 +602,16 @@ int32_t SimManager::SimAuthentication(
     return simStateManager_[slotId]->SimAuthentication(slotId, authType, authData, response);
 }
 
+int32_t SimManager::SendSimMatchedOperatorInfo(
+    int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey)
+{
+    if (simStateManager_[slotId] == nullptr) {
+        TELEPHONY_LOGE("simStateManager_ can not be null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simStateManager_[slotId]->SendSimMatchedOperatorInfo(slotId, state, operName, operKey);
+}
+
 int32_t SimManager::GetRadioProtocolTech(int32_t slotId)
 {
     TELEPHONY_LOGI("SimManager::GetRadioProtocolTech slotId:%{public}d", slotId);

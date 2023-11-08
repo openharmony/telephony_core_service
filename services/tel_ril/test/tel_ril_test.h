@@ -33,6 +33,7 @@ enum class DiffInterfaceId {
     TEST_TRANSMIT_APDU_BASIC_CHANNEL,
     TEST_CLOSE_LG_SIMIO,
     TEST_SIM_AUTH,
+    TEST_SIM_SEND_NCFG_OPER_INFO,
     TEST_GET_IMSI,
     TEST_GET_ICCID,
     TEST_GET_SIM_LOCK_STATUS,
@@ -142,7 +143,8 @@ enum class CustomMessageID : uint32_t {
     MSG_TRANSMIT_LOGICAL_CHANNEL_DONE = 0x7f000001,
     MSG_CLOSE_LOGICAL_CHANNEL_DONE = 0x7f000002,
     MSG_TRANSMIT_BASIC_CHANNEL_DONE = 0x7f000003,
-    MSG_SIM_AUTHENTICATION_DONE = 0x7f000004
+    MSG_SIM_AUTHENTICATION_DONE = 0x7f000004,
+    MSG_SIM_SEND_NCFG_OPER_INFO_DONE = 0x7f000005
 };
 
 const int32_t CID = 1;
@@ -214,6 +216,9 @@ public:
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestSimAuthenticationTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+
+    void OnRequestSendSimMatchedOperatorInfoTest(
+        int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestCloseLGSimIOTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 

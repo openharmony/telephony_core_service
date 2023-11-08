@@ -552,6 +552,11 @@ int32_t TelRilCallback::UnlockSimLockResponse(
     return Response(responseInfo, &TelRilManager::GetTelRilSim, &TelRilSim::UnlockSimLockResponse, lockStatus);
 }
 
+int32_t TelRilCallback::SendSimMatchedOperatorInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilSim, &TelRilSim::SendSimMatchedOperatorInfoResponse);
+}
+
 // Network
 int32_t TelRilCallback::NetworkCsRegStatusUpdated(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::CsRegStatusInfo &csRegStatusInfo)

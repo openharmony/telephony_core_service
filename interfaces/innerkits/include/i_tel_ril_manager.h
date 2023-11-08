@@ -252,6 +252,8 @@ public:
         int32_t slotId, const ApduSimIORequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t SimAuthentication(int32_t slotId, const SimAuthenticationRequestInfo &reqInfo,
         const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t SendSimMatchedOperatorInfo(int32_t slotId, const NcfgOperatorInfo &reqInfo,
+        const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
     virtual int32_t SetNotificationFilter(
         int32_t slotId, int32_t newFilter, const AppExecFwk::InnerEvent::Pointer &response) = 0;

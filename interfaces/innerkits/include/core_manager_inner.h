@@ -303,6 +303,8 @@ public:
     int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue);
     int32_t GetDsdsMode(int32_t &dsdsMode);
     int32_t SetDsdsMode(int32_t dsdsMode);
+    int32_t SendSimMatchedOperatorInfo(
+        int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey);
     /******************** simManager end *****************************/
 private:
     CoreManagerInner();
