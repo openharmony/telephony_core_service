@@ -240,6 +240,10 @@ int32_t CoreServiceStub::OnGetNetworkState(MessageParcel &data, MessageParcel &r
     auto slotId = data.ReadInt32();
     sptr<NetworkState> networkState = nullptr;
     int32_t result = GetNetworkState(slotId, networkState);
+    if (networkState == nullptr) {
+        TELEPHONY_LOGE("networkState is nullptr.");
+        result = TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         networkState->Marshalling(reply);
