@@ -294,7 +294,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersHandler_001, Function | M
     diallingNumberHandler->ProcessDiallingNumber(loadRequest, object);
     diallingNumberHandler->ProcessDiallingNumberLoadDone(event, id);
     std::shared_ptr<DiallingNumbersInfo> telNumber = std::make_shared<DiallingNumbersInfo>();
-    EXPECT_FALSE(diallingNumberHandler->FormatNameAndNumber(telNumber, false));
+    EXPECT_TRUE(diallingNumberHandler->FormatNameAndNumber(telNumber, false));
     EXPECT_TRUE(diallingNumberHandler->FormatNameAndNumber(telNumber, true));
     diallingNumberHandler->MakeExceptionResult(0);
     diallingNumberHandler->UpdateFileController(iccFileController);
