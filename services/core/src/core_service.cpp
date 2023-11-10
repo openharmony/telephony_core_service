@@ -364,6 +364,25 @@ int32_t CoreService::GetSimState(int32_t slotId, SimState &simState)
     return simManager_->GetSimState(slotId, simState);
 }
 
+int32_t CoreService::GetDsdsMode(int32_t &dsdsMode)
+{
+    TELEPHONY_LOGI("CoreService::GetDsdsMode()");
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    return simManager_->GetDsdsMode(dsdsMode);
+}
+
 int32_t CoreService::GetCardType(int32_t slotId, CardType &cardType)
 {
     TELEPHONY_LOGD("CoreService::GetCardType(), slotId = %{public}d", slotId);

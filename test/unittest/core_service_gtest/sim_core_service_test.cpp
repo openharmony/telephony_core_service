@@ -81,6 +81,8 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0100, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->GetShowName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->RefreshSimState(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->SetActiveSim(0, 1), TELEPHONY_ERR_SUCCESS);
+    int32_t dsdsMode = INVALID_VALUE;
+    EXPECT_NE(mCoreService->GetDsdsMode(dsdsMode), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -295,6 +297,8 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0600, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->GetCardType(0, cardType), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetSlotId(1), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetSimId(0), TELEPHONY_ERR_SUCCESS);
+    int32_t dsdsMode = INVALID_VALUE;
+    EXPECT_NE(mCoreService->GetDsdsMode(dsdsMode), TELEPHONY_ERR_SUCCESS);
 }
 
 /**

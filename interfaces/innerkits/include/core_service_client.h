@@ -177,6 +177,14 @@ public:
     int32_t GetSimState(int32_t slotId, SimState &simState);
 
     /**
+     * @brief Obtain the value of dsds mode
+     *
+     * @param dsdsMode[out], the value of dsds mode
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetDsdsMode(int32_t &dsdsMode);
+
+    /**
      * @brief Obtain the operator numeric of PLMN
      *
      * @param slotId[in], sim slot id
