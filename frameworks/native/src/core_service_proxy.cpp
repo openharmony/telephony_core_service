@@ -574,6 +574,33 @@ int32_t CoreServiceProxy::GetSimState(int32_t slotId, SimState &simState)
     return result;
 }
 
+int32_t CoreServiceProxy::GetDsdsMode(int32_t &dsdsMode)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_DSDS_MODE), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        dsdsMode = static_cast<int32_t>(reply.ReadInt32());
+    }
+    TELEPHONY_LOGD("call end: result=%{public}d", result);
+    return result;
+}
+
 int32_t CoreServiceProxy::GetCardType(int32_t slotId, CardType &cardType)
 {
     TELEPHONY_LOGI("CoreServiceProxy GetCardType ::%{public}d", slotId);

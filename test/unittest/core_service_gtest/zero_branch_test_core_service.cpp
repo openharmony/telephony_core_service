@@ -169,6 +169,8 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_001, Function | Medium
     DelayedSingleton<CoreService>::GetInstance()->SetDefaultVoiceSlotId(SLOT_ID);
     DelayedSingleton<CoreService>::GetInstance()->GetDefaultVoiceSlotId();
     DelayedSingleton<CoreService>::GetInstance()->GetDefaultVoiceSimId(simId);
+    int32_t dsdsMode = 0;
+    DelayedSingleton<CoreService>::GetInstance()->GetDsdsMode(dsdsMode);
     DelayedSingleton<CoreService>::GetInstance()->SetPrimarySlotId(SLOT_ID);
     DelayedSingleton<CoreService>::GetInstance()->GetPrimarySlotId(result);
     const std::u16string cardNumber = Str8ToStr16("SimNumber12345678901");

@@ -740,6 +740,51 @@ napi_value GetSimSpnSync(napi_env env, napi_callback_info info)
     return value;
 }
 
+void NativeGetDsdsMode(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    AsyncContext<int32_t> *asyncContext = &(static_cast<AsyncDsdsInfo *>(data)->asyncContext);
+    int32_t dsdsMode = DSDS_MODE_V2;
+    int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
+    TELEPHONY_LOGD("NAPI NativeGetDsdsMode %{public}d", errorCode);
+    if (errorCode == ERROR_NONE) {
+        asyncContext->callbackVal = dsdsMode;
+        asyncContext->context.resolved = true;
+    } else {
+        asyncContext->context.resolved = false;
+    }
+    asyncContext->context.errorCode = errorCode;
+}
+
+void GetDsdsModeCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncDsdsInfo> context(static_cast<AsyncDsdsInfo *>(data));
+    NapiAsyncCommomCompleteCallback(env, status, context->asyncContext, false);
+}
+
+napi_value GetDsdsMode(napi_env env, napi_callback_info info)
+{
+    auto asyncContext = new AsyncDsdsInfo();
+    BaseContext &context = asyncContext->asyncContext.context;
+
+    auto initPara = std::make_tuple(&context.callbackRef);
+    AsyncPara para {
+        .funcName = "GetDsdsMode",
+        .env = env,
+        .info = info,
+        .execute = NativeGetDsdsMode,
+        .complete = GetDsdsModeCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2<AsyncDsdsInfo>(para, asyncContext, initPara);
+    if (result) {
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    }
+    return result;
+}
+
 void NativeGetSimState(napi_env env, void *data)
 {
     if (data == nullptr) {
@@ -2956,6 +3001,7 @@ napi_status InitSimInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getOpKeySync", GetOpKeySync),
         DECLARE_NAPI_FUNCTION("getOpName", GetOpName),
         DECLARE_NAPI_FUNCTION("getOpNameSync", GetOpNameSync),
+        DECLARE_NAPI_FUNCTION("getDsdsMode", GetDsdsMode),
     };
     return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }

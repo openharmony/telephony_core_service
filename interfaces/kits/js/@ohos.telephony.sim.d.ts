@@ -2163,6 +2163,52 @@ declare namespace sim {
   function getDefaultVoiceSimId(): Promise<number>;
 
   /**
+   * Obtains the value of dsds mode.
+   *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @param { AsyncCallback<DsdsMode> } callback - Indicates the callback for getting one of the following dsds mode states:
+   * <ul>
+   * <li>{@code DsdsMode#DSDS_MODE_V2}
+   * <li>{@code DsdsMode#DSDS_MODE_V3}
+   * <li>{@code DsdsMode#DSDS_MODE_TDM}
+   * <li>{@code DsdsMode#DSDS_MODE_V5}
+   * </ul>
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @systemapi Hide this for inner system use.
+   * @since 11
+   */
+  function getDsdsMode(callback: AsyncCallback<DsdsMode>): void;
+
+  /**
+   * Obtains the value of dsds mode.
+   *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @returns { Promise<DsdsMode> } Returns one of the following dsds mode states:
+   * <ul>
+   * <li>{@code DsdsMode#DSDS_MODE_V2}
+   * <li>{@code DsdsMode#DSDS_MODE_V3}
+   * <li>{@code DsdsMode#DSDS_MODE_TDM}
+   * <li>{@code DsdsMode#DSDS_MODE_V5}
+   * </ul>
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @systemapi Hide this for inner system use.
+   * @since 11
+   */
+  function getDsdsMode(): Promise<DsdsMode>;
+
+  /**
    * Defines the carrier configuration.
    *
    * @interface OperatorConfig
@@ -2975,6 +3021,52 @@ declare namespace sim {
      * @since 10
      */
     KEY_BANDWIDTH_STRING_ARRAY = 'bandwidth_string_array',
+  }
+
+  /**
+   * Indicates the Dsds Mode.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CoreService
+   * @systemapi Hide this for inner system use.
+   * @since 11
+   */
+  export enum DsdsMode {
+    /**
+     * Indicates the Dsds Mode.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @systemapi Hide this for inner system use.
+     * @since 11
+     */
+    DSDS_MODE_V2 = 0,
+
+    /**
+     * Indicates the Dsds Mode.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @systemapi Hide this for inner system use.
+     * @since 11
+     */
+    DSDS_MODE_V3 = 1,
+
+    /**
+     * Indicates the Dsds Mode.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @systemapi Hide this for inner system use.
+     * @since 11
+     */
+    DSDS_MODE_TDM = 2,
+
+    /**
+     * Indicates the Dsds Mode.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @systemapi Hide this for inner system use.
+     * @since 11
+     */
+    DSDS_MODE_V5 = 3,
   }
 }
 

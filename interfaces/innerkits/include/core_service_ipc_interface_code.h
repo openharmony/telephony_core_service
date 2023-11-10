@@ -110,6 +110,7 @@ enum class CoreServiceInterfaceCode {
     SET_VOICE_MAIL_COUNT,
     SET_VOICE_CALL_FORWARDING,
     GET_BASEBAND_VERSION,
+    GET_DSDS_MODE,
 };
 } // namespace Telephony
 } // namespace OHOS
