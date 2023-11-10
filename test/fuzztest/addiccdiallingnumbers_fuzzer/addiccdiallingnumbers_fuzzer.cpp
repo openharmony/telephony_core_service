@@ -152,6 +152,21 @@ void GetSimState(const uint8_t *data, size_t size)
     DelayedSingleton<CoreService>::GetInstance()->OnGetSimState(dataMessageParcel, reply);
 }
 
+void GetDsdsMode(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t dsdsMode = static_cast<int32_t>(size);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(dsdsMode);
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetDsdsMode(dataMessageParcel, reply);
+}
+
 void HasSimCard(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -196,6 +211,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetSimAccountInfo(data, size);
     GetCardType(data, size);
     GetSimState(data, size);
+    GetDsdsMode(data, size);
     HasSimCard(data, size);
     AddIccDiallingNumbers(data, size);
     return;

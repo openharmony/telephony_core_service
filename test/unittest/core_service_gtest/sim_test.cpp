@@ -1516,6 +1516,24 @@ HWTEST_F(SimTest, Telephony_Sim_HasOperatorPrivileges_0200, Function | MediumTes
     }
 }
 
+/**
+ * @tc.number   Telephony_Sim_GetDsdsMode_0100
+ * @tc.name     Get Dsds Mode 3.0
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetDsdsMode_0100, Function | MediumTest | Level3)
+{
+    if (!SimTest::HasSimCard(slotId_) || CoreServiceClient::GetInstance().GetMaxSimCount() == 1) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card or one card version");
+    } else {
+        int32_t dsdsMode = INVALID_VALUE;
+        int32_t result = CoreServiceClient::GetInstance().GetDsdsMode(dsdsMode);
+        TELEPHONY_LOGI("TelephonyTestService Telephony_Sim_GetDsdsMode_0100 result: %{public}d ,DsdsMode: %{public}d",
+            result, dsdsMode);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    }
+}
+
 #else // TEL_TEST_UNSUPPORT
 /**
  * @tc.number   Telephony_Sim_MockTest_0100

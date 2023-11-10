@@ -58,6 +58,7 @@ private:
     int32_t OnGetNrOptionMode(MessageParcel &data, MessageParcel &reply);
     int32_t OnHasSimCard(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimState(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetDsdsMode(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCardType(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetISOCountryCodeForSim(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimSpn(MessageParcel &data, MessageParcel &reply);

@@ -257,6 +257,17 @@ int32_t CoreServiceClient::GetSimState(int32_t slotId, SimState &simState)
     return proxy->GetSimState(slotId, simState);
 }
 
+int32_t CoreServiceClient::GetDsdsMode(int32_t &dsdsMode)
+{
+    TELEPHONY_LOGI("Enter CoreServiceClient::GetDsdsMode");
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetDsdsMode(dsdsMode);
+}
+
 int32_t CoreServiceClient::GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric)
 {
     auto proxy = GetProxy();

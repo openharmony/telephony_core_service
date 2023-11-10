@@ -101,6 +101,10 @@ struct AsyncDefaultSimId {
 struct AsyncStkCallSetupResult {
     AsyncContext<int32_t> asyncContext;
 };
+
+struct AsyncDsdsInfo {
+    AsyncContext<int32_t> asyncContext;
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_NAPI_SIM_H
