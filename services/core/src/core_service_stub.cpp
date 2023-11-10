@@ -75,6 +75,7 @@ void CoreServiceStub::AddHandlerSimToMap()
 {
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::HAS_SIM_CARD)] = &CoreServiceStub::OnHasSimCard;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_STATE)] = &CoreServiceStub::OnGetSimState;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_DSDS_MODE)] = &CoreServiceStub::OnGetDsdsMode;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ISO_COUNTRY_CODE)] =
         &CoreServiceStub::OnGetISOCountryCodeForSim;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SPN)] = &CoreServiceStub::OnGetSimSpn;
@@ -455,6 +456,21 @@ int32_t CoreServiceStub::OnGetSimState(MessageParcel &data, MessageParcel &reply
     }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::GET_SIM_STATE write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnGetDsdsMode(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t dsdsMode = 0; /*0 means DSDS_MODE_V2*/
+    int32_t result = GetDsdsMode(dsdsMode);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(dsdsMode)));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::GET_DSDS_MODE write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return result;

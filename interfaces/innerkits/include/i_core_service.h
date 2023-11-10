@@ -50,6 +50,7 @@ public:
     virtual int32_t GetNrOptionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual int32_t HasSimCard(int32_t slotId, bool &hasSimCard) = 0;
     virtual int32_t GetSimState(int32_t slotId, SimState &simState) = 0;
+    virtual int32_t GetDsdsMode(int32_t &dsdsMode) = 0;
     virtual int32_t GetCardType(int32_t slotId, CardType &cardType) = 0;
     virtual int32_t UnlockPin(int32_t slotId, const std::u16string &pin, LockStatusResponse &response) = 0;
     virtual int32_t UnlockPuk(

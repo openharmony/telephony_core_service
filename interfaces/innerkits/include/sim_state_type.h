@@ -298,6 +298,16 @@ enum SimAuthResult {
 };
 
 /**
+ * @brief Dsds Mode
+ */
+enum class DsdsMode {
+    DSDS_MODE_V2 = 0,
+    DSDS_MODE_V3 = 1,
+    DSDS_MODE_TDM = 2,
+    DSDS_MODE_V5 = 3,
+};
+
+/**
  * @brief Icc Account Information
  */
 struct IccAccountInfo : public Parcelable {

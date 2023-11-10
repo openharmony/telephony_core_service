@@ -53,6 +53,7 @@ public:
     int32_t GetSimId(int32_t slotId) override;
     int32_t GetSimIccId(int32_t slotId, std::u16string &iccId) override;
     int32_t GetSimState(int32_t slotId, SimState &simState) override;
+    int32_t GetDsdsMode(int32_t &dsdsMode) override;
     int32_t GetCardType(int32_t slotId, CardType &cardType) override;
     int32_t GetSimSpn(int32_t slotId, std::u16string &spn) override;
     int32_t GetIMSI(int32_t slotId, std::u16string &imsi) override;
