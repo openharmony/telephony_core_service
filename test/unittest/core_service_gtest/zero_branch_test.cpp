@@ -60,6 +60,7 @@ namespace Telephony {
 using namespace testing::ext;
 
 namespace {
+const int32_t SLOT_ID_0 = 0;
 const int32_t INVALID_SLOTID = 2;
 const int32_t OBTAIN_SPN_NONE = 0;
 const int32_t OBTAIN_SPN_START = 1;
@@ -1892,6 +1893,26 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_005, Function | MediumTest |
     EXPECT_FALSE(networkSearchManager->RemoveManagerInner(INVALID_SLOTID));
     networkSearchManager->UnRegisterCoreNotify(slotId, networkSearchHandler, 1);
     networkSearchManager->UnRegisterCellularDataObject(callback);
+}
+
+/**
+ * @tc.number   Telephony_TelRilModem_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_TelRilModem_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    std::shared_ptr<TelRilHandler> handler = std::make_shared<TelRilHandler>(runner);
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+
+    std::vector<std::shared_ptr<ObserverHandler>> observerHandlers;
+    observerHandlers.push_back(observerHandler);
+    std::shared_ptr<TelRilModem> telRilModem = std::make_shared<TelRilModem>(
+        SLOT_ID_0, nullptr, observerHandlers[SLOT_ID_0], handler);
+    if (telRilModem != nullptr) {
+        EXPECT_EQ(telRilModem->OnRilAdapterHostDied(), TELEPHONY_ERR_SUCCESS);
+    }
 }
 
 /**
