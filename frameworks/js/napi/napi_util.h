@@ -80,6 +80,7 @@ private:
     static bool CreateDataErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
     static napi_value CreateError(napi_env env, int32_t err, const std::string &msg);
     static std::string GetErrorMessage(int32_t errorCode);
+    static bool CreateVcardErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
 };
 } // namespace Telephony
 } // namespace OHOS
