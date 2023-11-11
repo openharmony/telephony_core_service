@@ -3021,6 +3021,15 @@ declare namespace sim {
      * @since 10
      */
     KEY_BANDWIDTH_STRING_ARRAY = 'bandwidth_string_array',
+
+    /**
+     * Indicates the whether only support single pdp radio type array.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @systemapi Hide this for inner system use.
+     * @since 11
+     */
+    KEY_SINGLE_PDP_RADIO_TYPE_INT_ARRAY = 'single_pdp_radio_type_int_array',
   }
 
   /**
