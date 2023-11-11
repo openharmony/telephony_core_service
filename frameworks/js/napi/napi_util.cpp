@@ -57,6 +57,7 @@ static constexpr const char *JS_ERROR_AIRPLANE_MODE_ON_STRING = "Airplane mode i
 static constexpr const char *JS_ERROR_NETWORK_NOT_IN_SERVICE = "Network not in service.";
 static constexpr const char *JS_ERROR_CONFERENCE_EXCEED_LIMIT_STRING = "Conference call is exceed limit.";
 static constexpr const char *JS_ERROR_CONFERENCE_CALL_IS_NOT_ACTIVE_STRING = "Conference call is not active.";
+static constexpr const char *JS_ERROR_VCARD_FILE_INVALID_STRING = "VCard file invalid.";
 
 static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_PERMISSION_DENIED, JS_ERROR_TELEPHONY_PERMISSION_DENIED_STRING },
@@ -83,7 +84,8 @@ static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_AIRPLANE_MODE_ON, JS_ERROR_AIRPLANE_MODE_ON_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE, JS_ERROR_NETWORK_NOT_IN_SERVICE },
     { JsErrorCode::JS_ERROR_TELEPHONY_CONFERENCE_EXCEED_LIMIT, JS_ERROR_CONFERENCE_EXCEED_LIMIT_STRING },
-    { JsErrorCode::JS_ERROR_TELEPHONY_CONFERENCE_CALL_NOT_ACTIVE, JS_ERROR_CONFERENCE_CALL_IS_NOT_ACTIVE_STRING }
+    { JsErrorCode::JS_ERROR_TELEPHONY_CONFERENCE_CALL_NOT_ACTIVE, JS_ERROR_CONFERENCE_CALL_IS_NOT_ACTIVE_STRING },
+    { JsErrorCode::JS_ERROR_VCARD_FILE_INVALID, JS_ERROR_VCARD_FILE_INVALID_STRING }
 };
 
 std::string NapiUtil::GetErrorMessage(int32_t errorCode)
@@ -396,6 +398,7 @@ JsError NapiUtil::ConverErrorMessageForJs(int32_t errorCode)
         !CreateCallErrorMessageForJs(errorCode, error.errorCode) &&
         !CreateDataErrorMessageForJs(errorCode, error.errorCode) &&
         !CreateNetworkSearchErrorMessageForJs(errorCode, error.errorCode) &&
+        !CreateVcardErrorMessageForJs(errorCode, error.errorCode) &&
         !CreateSimErrorMessageForJs(errorCode, error.errorCode) &&
         !CreateSmsErrorMessageForJs(errorCode, error.errorCode) &&
         !CreateObserverErrorMessageForJs(errorCode, error.errorCode)) {
@@ -441,6 +444,21 @@ bool NapiUtil::CreateNetworkSearchErrorMessageForJs(int32_t errorCode, JsErrorCo
     switch (errorCode) {
         case CORE_SERVICE_SEND_CALLBACK_FAILED:
         case CORE_SERVICE_RADIO_PROTOCOL_TECH_UNKNOWN:
+            jsErrorCode = JS_ERROR_TELEPHONY_SYSTEM_ERROR;
+            break;
+        default:
+            flag = false;
+            break;
+    }
+
+    return flag;
+}
+
+bool NapiUtil::CreateVcardErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode)
+{
+    bool flag = true;
+    switch (errorCode) {
+        case TELEPHONY_ERR_VCARD_FILE_INVALID:
             jsErrorCode = JS_ERROR_TELEPHONY_SYSTEM_ERROR;
             break;
         default:
