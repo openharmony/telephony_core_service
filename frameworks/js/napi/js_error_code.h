@@ -161,6 +161,16 @@ enum JsErrorCode {
      * State registry module base error code.
      */
     JS_ERROR_STATE_REGISTRY_BASE_ERROR = 8801000,
+
+    /**
+     * VCard module base error code.
+     */
+    JS_ERROR_VCARD_BASE_ERROR = 8901000,
+
+    /**
+     * VCard file invalid.
+     */
+    JS_ERROR_VCARD_FILE_INVALID,
 };
 
 struct JsError {
