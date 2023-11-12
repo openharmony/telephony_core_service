@@ -78,8 +78,8 @@ void SimManager::InitMultiSimObject()
         if (stkManager_[slotId] != nullptr) {
             stkManager_[slotId]->Init(slotId);
         }
-        if (simStateManager_[DEFAULT_SIM_SLOT_ID] != nullptr && slotId == DEFAULT_SIM_SLOT_ID) {
-            simStateManager_[DEFAULT_SIM_SLOT_ID]->RefreshSimState(DEFAULT_SIM_SLOT_ID);
+        if (simStateManager_[slotId] != nullptr) {
+            simStateManager_[slotId]->RefreshSimState(slotId);
         }
     }
 }
