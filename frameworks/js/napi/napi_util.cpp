@@ -57,7 +57,7 @@ static constexpr const char *JS_ERROR_AIRPLANE_MODE_ON_STRING = "Airplane mode i
 static constexpr const char *JS_ERROR_NETWORK_NOT_IN_SERVICE = "Network not in service.";
 static constexpr const char *JS_ERROR_CONFERENCE_EXCEED_LIMIT_STRING = "Conference call is exceed limit.";
 static constexpr const char *JS_ERROR_CONFERENCE_CALL_IS_NOT_ACTIVE_STRING = "Conference call is not active.";
-static constexpr const char *JS_ERROR_VCARD_FILE_INVALID_STRING = "VCard file invalid.";
+static constexpr const char *JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT_STRING = "call count exceeds limit";
 
 static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_PERMISSION_DENIED, JS_ERROR_TELEPHONY_PERMISSION_DENIED_STRING },
@@ -85,7 +85,8 @@ static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE, JS_ERROR_NETWORK_NOT_IN_SERVICE },
     { JsErrorCode::JS_ERROR_TELEPHONY_CONFERENCE_EXCEED_LIMIT, JS_ERROR_CONFERENCE_EXCEED_LIMIT_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_CONFERENCE_CALL_NOT_ACTIVE, JS_ERROR_CONFERENCE_CALL_IS_NOT_ACTIVE_STRING },
-    { JsErrorCode::JS_ERROR_VCARD_FILE_INVALID, JS_ERROR_VCARD_FILE_INVALID_STRING }
+    { JsErrorCode::JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT, JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT_STRING }
+    
 };
 
 std::string NapiUtil::GetErrorMessage(int32_t errorCode)
@@ -668,6 +669,9 @@ bool NapiUtil::CreateCommonCallErrorMessageForJs(int32_t errorCode, JsErrorCode 
             break;
         case TELEPHONY_CALL_ERR_CONFERENCE_CALL_IS_NOT_ACTIVE:
             jsErrorCode = JS_ERROR_TELEPHONY_CONFERENCE_CALL_NOT_ACTIVE;
+            break;
+        case TELEPHONY_CALL_ERR_CALL_COUNTS_EXCEED_LIMIT:
+            jsErrorCode = JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT;
             break;
         case TELEPHONY_CALL_ERR_CALL_IS_NOT_ACTIVATED:
         case TELEPHONY_CALL_ERR_ILLEGAL_CALL_OPERATION:

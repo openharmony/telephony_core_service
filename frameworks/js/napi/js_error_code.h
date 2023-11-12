@@ -88,6 +88,11 @@ enum JsErrorCode {
     JS_ERROR_TELEPHONY_CONFERENCE_EXCEED_LIMIT,
 
     /**
+     * call count exceeds limit.
+     */
+    JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT,
+
+    /**
      * Conference call is not active.
      */
     JS_ERROR_TELEPHONY_CONFERENCE_CALL_NOT_ACTIVE,
