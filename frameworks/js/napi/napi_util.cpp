@@ -399,6 +399,7 @@ JsError NapiUtil::ConverErrorMessageForJs(int32_t errorCode)
         !CreateCallErrorMessageForJs(errorCode, error.errorCode) &&
         !CreateDataErrorMessageForJs(errorCode, error.errorCode) &&
         !CreateNetworkSearchErrorMessageForJs(errorCode, error.errorCode) &&
+        !CreateVcardErrorMessageForJs(errorCode, error.errorCode) &&
         !CreateSimErrorMessageForJs(errorCode, error.errorCode) &&
         !CreateSmsErrorMessageForJs(errorCode, error.errorCode) &&
         !CreateObserverErrorMessageForJs(errorCode, error.errorCode)) {
@@ -444,6 +445,21 @@ bool NapiUtil::CreateNetworkSearchErrorMessageForJs(int32_t errorCode, JsErrorCo
     switch (errorCode) {
         case CORE_SERVICE_SEND_CALLBACK_FAILED:
         case CORE_SERVICE_RADIO_PROTOCOL_TECH_UNKNOWN:
+            jsErrorCode = JS_ERROR_TELEPHONY_SYSTEM_ERROR;
+            break;
+        default:
+            flag = false;
+            break;
+    }
+
+    return flag;
+}
+
+bool NapiUtil::CreateVcardErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode)
+{
+    bool flag = true;
+    switch (errorCode) {
+        case TELEPHONY_ERR_VCARD_FILE_INVALID:
             jsErrorCode = JS_ERROR_TELEPHONY_SYSTEM_ERROR;
             break;
         default:
