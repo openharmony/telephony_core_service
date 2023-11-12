@@ -120,6 +120,16 @@ int32_t TelRilModem::GetBasebandVersionResponse(
         TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<HRilStringParcel>(basebandVersion));
 }
 
+int32_t TelRilModem::OnRilAdapterHostDied()
+{
+    int32_t result = Notify(TELEPHONY_LOG_FUNC_NAME, RadioEvent::RADIO_RIL_ADAPTER_HOST_DIED);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGI("Notify RIL died successfully.");
+        result = RadioStateUpdated(ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
+    }
+    return result;
+}
+
 int32_t TelRilModem::RadioStateUpdated(int32_t state)
 {
     AAFwk::Want want;
@@ -127,8 +137,8 @@ int32_t TelRilModem::RadioStateUpdated(int32_t state)
     EventFwk::CommonEventData commonEventData;
     commonEventData.SetWant(want);
     EventFwk::CommonEventPublishInfo publishInfo;
-    bool retsult = EventFwk::CommonEventManager::PublishCommonEvent(commonEventData, publishInfo, nullptr);
-    TELEPHONY_LOGD("publish modem subscribed event result : %{public}d", retsult);
+    bool result = EventFwk::CommonEventManager::PublishCommonEvent(commonEventData, publishInfo, nullptr);
+    TELEPHONY_LOGD("publish modem subscribed event result : %{public}d", result);
     return Notify<HRilInt32Parcel>(
         TELEPHONY_LOG_FUNC_NAME, std::make_shared<HRilInt32Parcel>(state), RadioEvent::RADIO_STATE_CHANGED);
 }
