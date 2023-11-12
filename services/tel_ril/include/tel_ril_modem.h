@@ -47,6 +47,7 @@ public:
         const HDI::Ril::V1_1::VoiceRadioTechnology &voiceRadioTechnology);
     int32_t GetBasebandVersionResponse(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &basebandVersion);
+    int32_t OnRilAdapterHostDied();
 
 public:
     ModemPowerState radioState_ = ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;
