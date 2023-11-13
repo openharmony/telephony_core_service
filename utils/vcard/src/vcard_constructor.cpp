@@ -247,6 +247,8 @@ int32_t VCardConstructor::ConstructName(std::shared_ptr<VCardContact> contact)
     } else if (VCardConfiguration::IsVer30(cardType_)) {
         AddLine(VCARD_TYPE_N, "");
         AddLine(VCARD_TYPE_FN, "");
+    } else {
+        TELEPHONY_LOGI("No need to do anything");
     }
     ConstructPhoneticNameFields(nameData);
     return TELEPHONY_SUCCESS;
@@ -455,8 +457,9 @@ int32_t VCardConstructor::ConstructEmails(std::shared_ptr<VCardContact> contact)
             continue;
         }
         int32_t labelId = static_cast<int32_t>(EmailType::EMAIL_OTHER);
-        if (VCardUtils::IsNum(data->GetLabelId())) {
-            labelId = std::stoi(data->GetLabelId());
+        std::string labelIdStr = data->GetLabelId();
+        if (!labelIdStr.empty() && VCardUtils::IsNum(labelIdStr)) {
+            labelId = std::stoi(labelIdStr);
         }
         auto it = emailSet.find(email);
         if (it != emailSet.end()) {
@@ -717,37 +720,37 @@ void VCardConstructor::AddTelLine(const std::string &labelId, const std::string 
 
 void VCardConstructor::AddPhotoLine(const std::string &encodedValue, const std::string &photoType)
 {
-    std::stringstream temp;
-    temp << VCARD_TYPE_PHOTO << PARAM_SEPARATOR;
+    std::stringstream photoLine;
+    photoLine << VCARD_TYPE_PHOTO << PARAM_SEPARATOR;
     if (isV30OrV40_) {
-        temp << PARAM_ENCODING_BASE64_AS_B;
+        photoLine << PARAM_ENCODING_BASE64_AS_B;
     } else {
-        temp << PARAM_ENCODING_BASE64_V21;
+        photoLine << PARAM_ENCODING_BASE64_V21;
     }
-    temp << PARAM_SEPARATOR;
-    AddParamType(temp, photoType);
-    temp << DATA_SEPARATOR;
-    temp << encodedValue;
+    photoLine << PARAM_SEPARATOR;
+    AddParamType(photoLine, photoType);
+    photoLine << DATA_SEPARATOR;
+    photoLine << encodedValue;
 
-    std::string tmpStr = temp.str();
-    temp.str("");
-    temp.clear();
+    std::string tmpStr = photoLine.str();
+    photoLine.str("");
+    photoLine.clear();
     int32_t count = 0;
     int32_t length = static_cast<int32_t>(tmpStr.length());
     int32_t firstLineNum = MAX_LINE_NUMS_BASE64_V30 - static_cast<int32_t>(std::string(END_OF_LINE).length());
     int32_t generalLineNum = firstLineNum - static_cast<int32_t>(std::string(WS).length());
-    int maxNum = firstLineNum;
-    for (int i = 0; i < length; i++) {
-        temp << tmpStr[i];
+    int32_t maxNum = firstLineNum;
+    for (int32_t i = 0; i < length; i++) {
+        photoLine << tmpStr[i];
         count++;
         if (count <= maxNum) {
             continue;
         }
-        temp << END_OF_LINE << WS;
+        photoLine << END_OF_LINE << WS;
         maxNum = generalLineNum;
         count = 0;
     }
-    result_ << temp.str() << END_OF_LINE << END_OF_LINE;
+    result_ << photoLine.str() << END_OF_LINE << END_OF_LINE;
 }
 
 void VCardConstructor::AddEmailLine(
@@ -901,7 +904,7 @@ std::string VCardConstructor::DealCharacters(std::string value)
 
     std::string temp;
     int32_t length = value.length();
-    for (int i = 0; i < length; i++) {
+    for (int32_t i = 0; i < length; i++) {
         HandleCharacter(i, length, value, temp);
     }
     return temp;
@@ -912,9 +915,9 @@ std::string VCardConstructor::EncodeQuotedPrintable(const std::string &input)
     std::ostringstream encodedStream;
     int32_t lineCount = 0;
     int32_t maxLen = ENCODEN_QUOTED_PRIN_MAX_LEN;
-    for (auto c : input) {
+    for (auto ch : input) {
         encodedStream << "=" << std::uppercase << std::setw(VALUE_INDEX_TWO) << std::setfill('0') << std::hex
-                      << static_cast<int32_t>(c);
+                      << static_cast<int32_t>(ch);
         lineCount += VALUE_LEN_THREE;
         if (lineCount >= maxLen) {
             encodedStream << "=\r\n";

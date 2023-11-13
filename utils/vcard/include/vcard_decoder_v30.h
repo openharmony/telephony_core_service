@@ -41,7 +41,7 @@ protected:
     virtual std::vector<std::string> GetSupportType();
 
 private:
-    void DealParmV30(const std::string &param, const std::string &paramValue, std::shared_ptr<VCardRawData> rawData,
+    void DealParamV30(const std::string &param, const std::string &paramValue, std::shared_ptr<VCardRawData> rawData,
         int32_t &errorCode);
     std::string EncodeParamValue(const std::string &paramValue);
 

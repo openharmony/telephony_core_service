@@ -22,12 +22,7 @@ namespace OHOS {
 namespace Telephony {
 class VCardEmailData : public VCardContactData {
 public:
-    VCardEmailData()
-    {
-        address_ = "";
-        type_ = 0;
-        label_ = "";
-    };
+    VCardEmailData() {};
     ~VCardEmailData() {}
     virtual int32_t BuildValuesBucket(OHOS::DataShare::DataShareValuesBucket &valuesBucket);
     virtual int32_t BuildData(std::shared_ptr<DataShare::DataShareResultSet> resultSet);
@@ -43,12 +38,10 @@ public:
     void SetDisplayName(const std::string &displayName);
 
 private:
-    std::string address_;
-    int32_t type_;
-    std::string label_;
-    std::string labelId_;
-    std::string labelName_;
-    std::string displayName_;
+    std::string address_ = "";
+    std::string labelId_ = "";
+    std::string labelName_ = "";
+    std::string displayName_ = "";
 };
 } // namespace Telephony
 } // namespace OHOS

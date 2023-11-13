@@ -92,11 +92,11 @@ bool MatchImportParameters(
         return NapiUtil::MatchParameters(env, parameters, { napi_object, napi_string });
     } else if (parameterCount == THREE_PARAMETERS) {
         bool typeMatch = NapiUtil::MatchParameters(env, parameters, { napi_object, napi_string, napi_function });
-        bool typeMatch2 = NapiUtil::MatchParameters(env, parameters, { napi_object, napi_string, napi_number });
         if (typeMatch) {
             hasCallback = true;
             return typeMatch;
         }
+        bool typeMatch2 = NapiUtil::MatchParameters(env, parameters, { napi_object, napi_string, napi_number });
         if (typeMatch2) {
             hasAccountId = true;
             return true;
@@ -109,6 +109,8 @@ bool MatchImportParameters(
             hasCallback = true;
             return true;
         }
+    } else {
+        TELEPHONY_LOGE("Invalid parameter count");
     }
     return false;
 }
@@ -254,11 +256,11 @@ bool MatchExportParameters(
         return NapiUtil::MatchParameters(env, parameters, { napi_object, napi_object });
     } else if (parameterCount == THREE_PARAMETERS) {
         bool typeMatch = NapiUtil::MatchParameters(env, parameters, { napi_object, napi_object, napi_function });
-        bool typeMatch2 = NapiUtil::MatchParameters(env, parameters, { napi_object, napi_object, napi_object });
         if (typeMatch) {
             hasCallback = true;
             return typeMatch;
         }
+        bool typeMatch2 = NapiUtil::MatchParameters(env, parameters, { napi_object, napi_object, napi_object });
         if (typeMatch2) {
             hasOption = true;
             return true;
@@ -271,6 +273,8 @@ bool MatchExportParameters(
             hasCallback = true;
             return true;
         }
+    } else {
+        TELEPHONY_LOGE("Invalid parameter count");
     }
     return false;
 }

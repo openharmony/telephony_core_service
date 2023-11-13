@@ -101,6 +101,8 @@ void VCardContact::AddOtherDatas(std::string name, std::string rawValue, std::st
     } else if (name == VCARD_TYPE_X_AIM || name == VCARD_TYPE_X_MSN || name == VCARD_TYPE_X_YAHOO ||
                name == VCARD_TYPE_X_ICQ || name == VCARD_TYPE_X_JABBER || name == VCARD_TYPE_X_QQ) {
         AddIms(name, rawValue, propValue, values, parasMap);
+    } else {
+        TELEPHONY_LOGI("No need to do anything");
     }
 }
 
@@ -172,62 +174,70 @@ int32_t VCardContact::BuildOneData(std::shared_ptr<DataShare::DataShareResultSet
     int columnIndexType = 0;
     resultSet->GetColumnIndex(ContactData::TYPE_ID, columnIndexType);
     resultSet->GetInt(columnIndexType, typeId);
-    if (typeId == TypeId::NAME) {
-        BuildData(resultSet, names_);
-        return TELEPHONY_SUCCESS;
-    }
-    if (typeId == TypeId::PHONE) {
-        BuildData(resultSet, phones_);
-        return TELEPHONY_SUCCESS;
-    }
-    if (typeId == TypeId::RELATION) {
-        BuildData(resultSet, relations_);
-        return TELEPHONY_SUCCESS;
-    }
-    if (typeId == TypeId::IM) {
-        BuildData(resultSet, ims_);
-        return TELEPHONY_SUCCESS;
-    }
-    if (typeId == TypeId::SIP_ADDRESS) {
-        BuildData(resultSet, sips_);
-        return TELEPHONY_SUCCESS;
+    switch (typeId) {
+        case TypeId::NAME: {
+            BuildData(resultSet, names_);
+            return TELEPHONY_SUCCESS;
+        }
+        case TypeId::PHONE: {
+            BuildData(resultSet, phones_);
+            return TELEPHONY_SUCCESS;
+        }
+        case TypeId::RELATION: {
+            BuildData(resultSet, relations_);
+            return TELEPHONY_SUCCESS;
+        }
+        case TypeId::IM: {
+            BuildData(resultSet, ims_);
+            return TELEPHONY_SUCCESS;
+        }
+        case TypeId::SIP_ADDRESS: {
+            BuildData(resultSet, sips_);
+            return TELEPHONY_SUCCESS;
+        }
+        default:
+            break;
     }
     return BuildOtherData(typeId, resultSet);
 }
 
 int32_t VCardContact::BuildOtherData(int32_t typeId, std::shared_ptr<DataShare::DataShareResultSet> resultSet)
 {
-    if (typeId == TypeId::NICKNAME) {
-        BuildData(resultSet, nicknames_);
-        return TELEPHONY_SUCCESS;
-    }
-    if (typeId == TypeId::EMAIL) {
-        BuildData(resultSet, emails_);
-        return TELEPHONY_SUCCESS;
-    }
-    if (typeId == TypeId::POSTAL_ADDRESS) {
-        BuildData(resultSet, postals_);
-        return TELEPHONY_SUCCESS;
-    }
-    if (typeId == TypeId::ORGANIZATION) {
-        BuildData(resultSet, organizations_);
-        return TELEPHONY_SUCCESS;
-    }
-    if (typeId == TypeId::WEBSITE) {
-        BuildData(resultSet, websites_);
-        return TELEPHONY_SUCCESS;
-    }
-    if (typeId == TypeId::PHOTO) {
-        BuildData(resultSet, photos_);
-        return TELEPHONY_SUCCESS;
-    }
-    if (typeId == TypeId::NOTE) {
-        BuildData(resultSet, notes_);
-        return TELEPHONY_SUCCESS;
-    }
-    if (typeId == TypeId::CONTACT_EVENT) {
-        BuildData(resultSet, events_);
-        return TELEPHONY_SUCCESS;
+    switch (typeId) {
+        case TypeId::NICKNAME: {
+            BuildData(resultSet, nicknames_);
+            return TELEPHONY_SUCCESS;
+        }
+        case TypeId::EMAIL: {
+            BuildData(resultSet, emails_);
+            return TELEPHONY_SUCCESS;
+        }
+        case TypeId::POSTAL_ADDRESS: {
+            BuildData(resultSet, postals_);
+            return TELEPHONY_SUCCESS;
+        }
+        case TypeId::ORGANIZATION: {
+            BuildData(resultSet, organizations_);
+            return TELEPHONY_SUCCESS;
+        }
+        case TypeId::WEBSITE: {
+            BuildData(resultSet, websites_);
+            return TELEPHONY_SUCCESS;
+        }
+        case TypeId::PHOTO: {
+            BuildData(resultSet, photos_);
+            return TELEPHONY_SUCCESS;
+        }
+        case TypeId::NOTE: {
+            BuildData(resultSet, notes_);
+            return TELEPHONY_SUCCESS;
+        }
+        case TypeId::CONTACT_EVENT: {
+            BuildData(resultSet, events_);
+            return TELEPHONY_SUCCESS;
+        }
+        default:
+            break;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -318,16 +328,15 @@ std::shared_ptr<VCardBirthdayData> VCardContact::GetBirthdays()
 
 void VCardContact::HandleName(std::vector<std::string> values, std::map<std::string, std::vector<std::string>> parasMap)
 {
-    HandleSortAsName(parasMap);
+    if (nameData_ == nullptr) {
+        return;
+    }
     int32_t size = 0;
-    if (values.empty() || (size = values.size()) < 1) {
+    if (values.empty() || (size = values.size()) == 0) {
         return;
     }
     if (size > N_MAX_VALUE_SIZE) {
         size = N_MAX_VALUE_SIZE;
-    }
-    if (nameData_ == nullptr) {
-        return;
     }
     switch (size) {
         case SIZE_FIVE:
@@ -397,7 +406,7 @@ void VCardContact::HandlePhoneticNameFromSound(std::vector<std::string> elems)
         return;
     }
     int32_t size = elems.size();
-    if (elems.empty() || (size = elems.size()) < 1) {
+    if (elems.empty() || (size = elems.size()) == 0) {
         return;
     }
     if (size > PHONE_NAME_SOUND_MAX_VALUE_SIZE) {
@@ -514,7 +523,7 @@ std::string VCardContact::BuildSinglePhoneticNameFromSortAsParam(
     } else {
         sortAsList = it->second;
     }
-    if (!sortAsList.empty() && sortAsList.size() != 0) {
+    if (!sortAsList.empty()) {
         std::vector<std::string> sortNames = VCardUtils::ConstructListFromValue(sortAsList.at(0), vCardType_);
         std::string builder;
         for (std::string elem : sortNames) {
@@ -537,7 +546,7 @@ void VCardContact::AddNewOrganization(std::string organizationName, std::string 
 void VCardContact::HandleTitleValue(std::string title)
 {
     if (organizations_.empty()) {
-        AddNewOrganization("", "", "", title, "", 1, false);
+        AddNewOrganization("", "", "", title, "", VALUE_INDEX_ONE, false);
         return;
     }
     for (std::shared_ptr<VCardOrganizationData> organizationData : organizations_) {
@@ -549,7 +558,7 @@ void VCardContact::HandleTitleValue(std::string title)
             return;
         }
     }
-    AddNewOrganization("", "", "", title, "", 1, false);
+    AddNewOrganization("", "", "", title, "", VALUE_INDEX_ONE, false);
 }
 
 void VCardContact::AddPhotoBytes(std::string formatName, std::string photoBytes, bool isPrimary)
@@ -570,7 +579,6 @@ void VCardContact::HandleSipCase(std::string propValue, std::vector<std::string>
             return;
         }
     }
-
     int32_t type = -1;
     std::string label;
     bool isPrimary = false;
@@ -587,6 +595,8 @@ void VCardContact::HandleSipCase(std::string propValue, std::vector<std::string>
                 label = (VCardUtils::StartWith(typeStringUpperCase, "X-")) ? typeStringOrg.substr(VALUE_INDEX_TWO)
                                                                            : typeStringOrg;
                 type = static_cast<int32_t>(SipType::CUSTOM_LABEL);
+            } else {
+                TELEPHONY_LOGI("No need to do anything");
             }
         }
     }
@@ -601,7 +611,6 @@ void VCardContact::AddPhone(int32_t type, std::string data, std::string label, b
     std::string builder;
     std::string trimmed = data;
     std::string formattedNumber;
-
     if (type == static_cast<int32_t>(PhoneVcType::NUM_PAGER) ||
         VCardConfiguration::RefrainPhoneNumberFormatting(VCardUtils::VcardtypeToInt(vCardType_))) {
         formattedNumber = trimmed;
@@ -618,6 +627,8 @@ void VCardContact::AddPhone(int32_t type, std::string data, std::string label, b
                 hasPauseOrWait = true;
             } else if (((ch >= '0' && ch <= '9') || ch == '*' || ch == '#') || (i == 0 && ch == '+')) {
                 builder += ch;
+            } else {
+                TELEPHONY_LOGI("No need to do anything");
             }
         }
         if (!hasPauseOrWait) {
@@ -626,7 +637,6 @@ void VCardContact::AddPhone(int32_t type, std::string data, std::string label, b
             formattedNumber = builder;
         }
     }
-
     std::shared_ptr<VCardPhoneData> object = std::make_shared<VCardPhoneData>();
     object->InitPhoneData(formattedNumber, type, label, isPrimary);
     phones_.push_back(object);
@@ -668,6 +678,7 @@ void VCardContact::AddNameData(std::string name, std::string rawValue, std::vect
     if (name == VCARD_TYPE_FN) {
         nameData_->setDispalyName((values.size() != 0) ? values[0] : "");
     } else if (name == VCARD_TYPE_N) {
+        HandleSortAsName(parasMap);
         HandleName(values, parasMap);
     } else if (name == VCARD_TYPE_NAME) {
         if (nameData_->GetFormatted().empty()) {
@@ -684,6 +695,8 @@ void VCardContact::AddNameData(std::string name, std::string rawValue, std::vect
     } else if (name == VCARD_TYPE_X_PHONETIC_LAST_NAME) {
         std::vector<std::string> valueList = VCardUtils::Split(((parasMap.size() == 0) ? rawValue : propValue), ";");
         nameData_->SetPhoneticFamily((valueList.size() != 0) ? valueList[0] : "");
+    } else {
+        TELEPHONY_LOGI("No need to do anything");
     }
 }
 
@@ -698,6 +711,7 @@ void VCardContact::AddCustom(
         for (std::string value : values) {
             if (i == SIZE_ONE) {
                 object->SetNickName(value);
+                break;
             }
             i++;
         }
@@ -712,6 +726,7 @@ void VCardContact::AddCustom(
                 object->SetLabelId(value);
             } else if (i == SIZE_THREE) {
                 object->SetLabelName(value);
+                break;
             }
             i++;
         }
@@ -726,6 +741,7 @@ void VCardContact::AddCustom(
                 object->SetLabelId(value);
             } else if (i == SIZE_THREE) {
                 object->SetLabelName(value);
+                break;
             }
             i++;
         }
@@ -750,6 +766,7 @@ void VCardContact::SetSip(
                 object->SetLabelId(values[i]);
             } else if (i == SIZE_TWO) {
                 object->SetLabelName(values[i]);
+                break;
             }
         }
         sips_.push_back(object);
@@ -838,15 +855,13 @@ void VCardContact::HandlePhoneCase(std::string phoneNumber, std::string rawValue
         type = static_cast<int32_t>(PhoneVcType::CUSTOM_LABEL);
         label = std::get<1>(result);
     }
-    bool isPrimary;
+    bool isPrimary = false;
     bool contains = false;
     if (std::find(typeCollection.begin(), typeCollection.end(), VCARD_PARAM_TYPE_PREF) != typeCollection.end()) {
         contains = true;
     }
     if (!typeCollection.empty() && contains) {
         isPrimary = true;
-    } else {
-        isPrimary = false;
     }
     AddPhone(type, phoneNumber, label, isPrimary);
 }
@@ -899,6 +914,8 @@ void VCardContact::AddEmailsData(std::string rawValue, std::string propValue, st
                 label = (VCardUtils::StartWith(typeStringUpperCase, "X-")) ? typeStringOrg.substr(VALUE_INDEX_TWO)
                                                                            : typeStringOrg;
                 type = static_cast<int32_t>(EmailType::CUSTOM_LABEL);
+            } else {
+                TELEPHONY_LOGI("No need to do anything");
             }
         }
     }
@@ -961,6 +978,8 @@ void VCardContact::AddPostalDatas(std::string rawValue, std::string propValue, s
                 type = static_cast<int32_t>(PostalType::ADDR_OTHER);
                 label = "";
             }
+        } else {
+            TELEPHONY_LOGI("No need to do anything");
         }
     }
     AddPostal(type < 0 ? static_cast<int32_t>(PostalType::ADDR_HOME) : type, values, label, isPrimary);
@@ -1006,6 +1025,8 @@ void VCardContact::AddPhotoDatas(std::string byte, std::string rawValue, std::st
                 isPrimary = true;
             } else if (formatName.empty()) {
                 formatName = typeValue;
+            } else {
+                TELEPHONY_LOGI("No need to do anything");
             }
         }
     }
@@ -1026,8 +1047,6 @@ void VCardContact::AddSkypePstnNumDatas(std::string propValue, std::map<std::str
     bool isPrimary = false;
     if (std::find(typeCollection.begin(), typeCollection.end(), VCARD_PARAM_TYPE_PREF) != typeCollection.end()) {
         isPrimary = true;
-    } else {
-        isPrimary = false;
     }
     AddPhone(type, propValue, "", isPrimary);
 }

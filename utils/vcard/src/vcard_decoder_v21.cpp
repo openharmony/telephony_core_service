@@ -65,7 +65,9 @@ void VCardDecoderV21::NotifyEnded()
         }
         it->OnEnded();
     }
+    fileUtils_.Close();
 }
+
 void VCardDecoderV21::NotifyOneContactStarted()
 {
     for (auto it : listeners_) {
@@ -228,7 +230,7 @@ void VCardDecoderV21::DealRawDataValue(
     }
     std::string temp = VCardUtils::ConvertCharset(rawValue, "", targetCharset, errorCode);
     if (errorCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("GetQuotedPritableValue failed");
+        TELEPHONY_LOGE("GetQuotedPrintableValue failed");
         return;
     }
     std::vector<std::string> valueList;
@@ -271,14 +273,14 @@ void VCardDecoderV21::DealBase64OrB(
 void VCardDecoderV21::DealEncodingQPOrNoEncodingFN(const std::string &rawValue, std::shared_ptr<VCardRawData> rawData,
     const std::string &fromCharSet, const std::string &toCharSet, int32_t &errorCode)
 {
-    std::string quotedPrintableValue = GetQuotedPritableValue(rawValue, errorCode);
+    std::string quotedPrintableValue = GetQuotedPrintableValue(rawValue, errorCode);
     if (errorCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("GetQuotedPritableValue failed");
+        TELEPHONY_LOGE("GetQuotedPrintableValue failed");
         return;
     }
     std::string encodedValue = ParseQuotedPrintableValue(quotedPrintableValue, fromCharSet, toCharSet, errorCode);
     if (errorCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("GetQuotedPritableValue failed");
+        TELEPHONY_LOGE("GetQuotedPrintableValue failed");
         return;
     }
     rawData->SetRawValue(quotedPrintableValue);
@@ -552,9 +554,9 @@ void VCardDecoderV21::DealAdrOrgN(const std::string &rawValue, std::shared_ptr<V
 {
     std::vector<std::string> encodedValues;
     if (currentEncoding_ == VCARD_PARAM_ENCODING_QP) {
-        std::string quotedPrintableValue = GetQuotedPritableValue(rawValue, errorCode);
+        std::string quotedPrintableValue = GetQuotedPrintableValue(rawValue, errorCode);
         if (errorCode != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("GetQuotedPritableValue failed");
+            TELEPHONY_LOGE("GetQuotedPrintableValue failed");
             return;
         }
         ParseQuotedPrintableValues(quotedPrintableValue, encodedValues, fromCharSet, toCharSet, errorCode);
@@ -583,14 +585,14 @@ void VCardDecoderV21::ParseQuotedPrintableValues(const std::string &rawValue, st
     for (auto temp : quotedPrintableList) {
         auto value = ParseQuotedPrintableValue(temp, fromCharSet, toCharSet, errorCode);
         if (errorCode != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("GetQuotedPritableValue failed");
+            TELEPHONY_LOGE("GetQuotedPrintableValue failed");
             return;
         }
         encodedValues.push_back(value);
     }
 }
 
-std::string VCardDecoderV21::GetQuotedPritableValue(const std::string &str, int32_t &errorCode)
+std::string VCardDecoderV21::GetQuotedPrintableValue(const std::string &str, int32_t &errorCode)
 {
     std::string target;
     std::string firstStr = str;
