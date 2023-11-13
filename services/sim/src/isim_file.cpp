@@ -87,6 +87,7 @@ void IsimFile::OnAllFilesFetched()
 {
     filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
     NotifyRegistrySimState(CardType::SINGLE_MODE_ISIM_CARD, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
+    LoadVoiceMail();
 }
 
 bool IsimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
@@ -265,6 +266,18 @@ int IsimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
 std::string IsimFile::ObtainIsoCountryCode()
 {
     return "";
+}
+
+std::string IsimFile::GetVoiceMailNumber()
+{
+    std::shared_lock<std::shared_mutex> lock(voiceMailMutex_);
+    return voiceMailNum_;
+}
+
+void IsimFile::SetVoiceMailNumber(const std::string mailNumber)
+{
+    std::unique_lock<std::shared_mutex> lock(voiceMailMutex_);
+    voiceMailNum_ = mailNumber;
 }
 
 IsimFile::~IsimFile() {}

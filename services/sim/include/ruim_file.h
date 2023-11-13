@@ -42,6 +42,8 @@ public:
     bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber);
     bool SetVoiceMailCount(int32_t voiceMailCount);
     bool SetVoiceCallForwarding(bool enable, const std::string &number);
+    std::string GetVoiceMailNumber();
+    void SetVoiceMailNumber(const std::string mailNumber);
 
 protected:
     void ProcessIccRefresh(int msgId);

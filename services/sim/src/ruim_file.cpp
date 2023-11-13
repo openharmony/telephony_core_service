@@ -126,6 +126,7 @@ void RuimFile::OnAllFilesFetched()
     UpdateLoaded(true);
     filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
     PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_LOADED, "");
+    LoadVoiceMail();
 }
 
 bool RuimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
@@ -381,6 +382,18 @@ bool RuimFile::SetVoiceCallForwarding(bool enable, const std::string &number)
 {
     // cdma not support
     return false;
+}
+
+std::string RuimFile::GetVoiceMailNumber()
+{
+    std::shared_lock<std::shared_mutex> lock(voiceMailMutex_);
+    return voiceMailNum_;
+}
+
+void RuimFile::SetVoiceMailNumber(const std::string mailNumber)
+{
+    std::unique_lock<std::shared_mutex> lock(voiceMailMutex_);
+    voiceMailNum_ = mailNumber;
 }
 
 RuimFile::~RuimFile() {}

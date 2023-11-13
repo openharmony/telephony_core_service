@@ -37,6 +37,8 @@ public:
     bool SetVoiceCallForwarding(bool enable, const std::string &number);
     int ObtainSpnCondition(bool roaming, const std::string &operatorNum);
     std::string ObtainIsoCountryCode();
+    std::string GetVoiceMailNumber();
+    void SetVoiceMailNumber(const std::string mailNumber);
 
 protected:
     void ProcessIccRefresh(int msgId);
