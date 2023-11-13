@@ -104,7 +104,7 @@ std::string VCardDecoderV30::EncodeParamValue(const std::string &value)
 void VCardDecoderV30::DealAnyParam(
     const std::string &param, const std::string &paramValue, std::shared_ptr<VCardRawData> rawData, int32_t &errorCode)
 {
-    DealParmV30(param, paramValue, rawData, errorCode);
+    DealParamV30(param, paramValue, rawData, errorCode);
 }
 
 void VCardDecoderV30::DealNoNameParam(
@@ -116,7 +116,7 @@ void VCardDecoderV30::DealNoNameParam(
 void VCardDecoderV30::DealTypeParam(
     const std::string &paramValue, std::shared_ptr<VCardRawData> rawData, int32_t &errorCode)
 {
-    DealParmV30(VCARD_PARAM_TYPE, paramValue, rawData, errorCode);
+    DealParamV30(VCARD_PARAM_TYPE, paramValue, rawData, errorCode);
 }
 
 void VCardDecoderV30::DealAgent(std::shared_ptr<VCardRawData> rawData, int32_t &errorCode) {}
@@ -148,7 +148,7 @@ std::string VCardDecoderV30::UnescapeChar(char ch)
     return std::string(1, ch);
 }
 
-void VCardDecoderV30::DealParmV30(
+void VCardDecoderV30::DealParamV30(
     const std::string &param, const std::string &paramValue, std::shared_ptr<VCardRawData> rawData, int32_t &errorCode)
 {
     auto quoted = false;

@@ -22,20 +22,7 @@ namespace OHOS {
 namespace Telephony {
 class VCardNameData : public VCardContactData {
 public:
-    VCardNameData()
-    {
-        family_ = "";
-        given_ = "";
-        middle_ = "";
-        prefix_ = "";
-        suffix_ = "";
-        formatted_ = "";
-        phoneticFamily_ = "";
-        phoneticGiven_ = "";
-        phoneticMiddle_ = "";
-        sort_ = "";
-        displayName_ = "";
-    };
+    VCardNameData() {};
     ~VCardNameData() {}
     virtual int32_t BuildValuesBucket(OHOS::DataShare::DataShareValuesBucket &valuesBucket);
     virtual int32_t BuildData(std::shared_ptr<DataShare::DataShareResultSet> resultSet);
@@ -63,17 +50,17 @@ public:
     std::string GetDisplayName();
 
 private:
-    std::string family_;
-    std::string given_;
-    std::string middle_;
-    std::string prefix_;
-    std::string suffix_;
-    std::string formatted_;
-    std::string phoneticFamily_;
-    std::string phoneticGiven_;
-    std::string phoneticMiddle_;
-    std::string sort_;
-    std::string displayName_;
+    std::string family_ = "";
+    std::string given_ = "";
+    std::string middle_ = "";
+    std::string prefix_ = "";
+    std::string suffix_ = "";
+    std::string formatted_ = "";
+    std::string phoneticFamily_ = "";
+    std::string phoneticGiven_ = "";
+    std::string phoneticMiddle_ = "";
+    std::string sort_ = "";
+    std::string displayName_ = "";
 };
 } // namespace Telephony
 } // namespace OHOS
