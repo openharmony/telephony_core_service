@@ -251,6 +251,10 @@ public:
 
 enum class EmailType {
     /**
+     * Indicates an invalid label ID.
+     */
+    INVALID_LABEL_ID = -1,
+    /**
      * Indicates a custom label.
      */
     CUSTOM_LABEL = 0,
@@ -269,14 +273,13 @@ enum class EmailType {
      * Indicates an email of the OTHER type.
      */
     EMAIL_OTHER = 3,
+};
 
+enum class EventType {
     /**
      * Indicates an invalid label ID.
      */
     INVALID_LABEL_ID = -1,
-};
-
-enum class EventType {
     /**
      * Indicates a custom label.
      */
@@ -296,14 +299,14 @@ enum class EventType {
      * Indicates an birthday event.
      */
     EVENT_BIRTHDAY = 3,
-
-    /**
-     * Indicates an invalid label ID.
-     */
-    INVALID_LABEL_ID = -1,
 };
 
 enum class ImType {
+    /**
+     * Indicates an invalid label ID.
+     */
+    INVALID_LABEL_ID = -2,
+
     /**
      * Indicates a custom label.
      */
@@ -343,14 +346,14 @@ enum class ImType {
      * Indicates a Jabber instant message.
      */
     IM_JABBER = 7,
-
-    /**
-     * Indicates an invalid label ID.
-     */
-    INVALID_LABEL_ID = -2,
 };
 
 enum class PhoneVcType {
+    /**
+     * Indicates an invalid label ID.
+     */
+    INVALID_LABEL_ID = -1,
+
     /**
      * Indicates a custom label.
      */
@@ -455,14 +458,14 @@ enum class PhoneVcType {
      * Indicates an MMS number.
      */
     NUM_MMS = 20,
+};
 
+enum class PostalType {
     /**
      * Indicates an invalid label ID.
      */
     INVALID_LABEL_ID = -1,
-};
 
-enum class PostalType {
     /**
      * Indicates a custom label.
      */
@@ -482,14 +485,14 @@ enum class PostalType {
      * Indicates an address of the OTHER type.
      */
     ADDR_OTHER = 3,
+};
 
+enum class SipType {
     /**
      * Indicates an invalid label ID.
      */
     INVALID_LABEL_ID = -1,
-};
 
-enum class SipType {
     /**
      * Indicates a custom label.
      */
@@ -509,14 +512,14 @@ enum class SipType {
      * Indicates an SIP address of the OTHER type.
      */
     SIP_OTHER = 3,
+};
 
+enum class RelationType {
     /**
      * Indicates an invalid label ID.
      */
     INVALID_LABEL_ID = -1,
-};
 
-enum class RelationType {
     /**
      * Indicates a custom label.
      */
@@ -591,11 +594,6 @@ enum class RelationType {
      * Indicates a spouse.
      */
     RELATION_SPOUSE = 14,
-
-    /**
-     * Indicates an invalid label ID.
-     */
-    INVALID_LABEL_ID = -1,
 };
 
 constexpr const char *DATA_VCARD = "VCARD";

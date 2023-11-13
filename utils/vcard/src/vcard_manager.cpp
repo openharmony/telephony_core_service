@@ -119,9 +119,7 @@ void VCardManager::InsertContactDbAbility(int32_t accountId, int32_t &errorCode)
 int32_t VCardManager::InsertRawContact(int32_t accountId)
 {
     OHOS::DataShare::DataShareValuesBucket ValuesBucket;
-
     ValuesBucket.Put(RawContact::ACCOUNT_ID, GetAccountId());
-
     if (IsContactsIdExit(accountId)) {
         ValuesBucket.Put(RawContact::CONTACT_ID, accountId);
     }
@@ -137,7 +135,7 @@ bool VCardManager::IsContactsIdExit(int32_t accountId)
     if (resultSet == nullptr) {
         return false;
     }
-    bool result = (resultSet != nullptr) && (resultSet->GoToFirstRow() == DataShare::E_OK);
+    bool result = (resultSet->GoToFirstRow() == DataShare::E_OK);
     resultSet->Close();
     return result;
 }
@@ -169,7 +167,7 @@ bool VCardManager::IsAccountIdExit(int32_t accountId)
     if (resultSet == nullptr) {
         return false;
     }
-    bool result = (resultSet != nullptr) && (resultSet->GoToFirstRow() == DataShare::E_OK);
+    bool result = (resultSet->GoToFirstRow() == DataShare::E_OK);
     resultSet->Close();
     return result;
 }
