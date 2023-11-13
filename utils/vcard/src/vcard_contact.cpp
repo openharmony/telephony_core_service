@@ -409,9 +409,7 @@ void VCardContact::HandlePhoneticNameFromSound(std::vector<std::string> elems)
     if (elems.empty() || (size = elems.size()) == 0) {
         return;
     }
-    if (size > PHONE_NAME_SOUND_MAX_VALUE_SIZE) {
-        size = PHONE_NAME_SOUND_MAX_VALUE_SIZE;
-    }
+    size = (size > PHONE_NAME_SOUND_MAX_VALUE_SIZE) ? PHONE_NAME_SOUND_MAX_VALUE_SIZE : size;
     if (elems[0].length() > 0) {
         bool onlyFirstElemIsNonEmpty = true;
         for (int32_t i = 1; i < size; i++) {
