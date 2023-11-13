@@ -257,7 +257,10 @@ HWTEST_F(BranchTest, Telephony_SimFileManager_001, Function | MediumTest | Level
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    SimFileManager simFileManager { runner, std::weak_ptr<ITelRilManager>(telRilManager),
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    SimFileManager simFileManager { runner, subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
         std::weak_ptr<SimStateManager>(simStateManager) };
     const std::u16string emptyStr = Str8ToStr16("");
     const std::u16string mailName = Str8ToStr16("张三");
@@ -304,8 +307,11 @@ HWTEST_F(BranchTest, Telephony_SimFileManager_002, Function | MediumTest | Level
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    SimFileManager simFileManager { runner, std::weak_ptr<ITelRilManager>(telRilManager),
-        std::weak_ptr<SimStateManager>(simStateManager) };
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    SimFileManager simFileManager { runner, subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
+    std::weak_ptr<SimStateManager>(simStateManager) };
     auto tech = std::make_shared<VoiceRadioTechnology>();
     simFileManager.ChangeSimFileByCardType(SimFileManager::IccType::ICC_TYPE_USIM);
     EXPECT_EQ(
@@ -1063,8 +1069,11 @@ HWTEST_F(BranchTest, Telephony_SimSmsController_001, Function | MediumTest | Lev
     simSmsController->ProcessEvent(eventUpdate);
     simSmsController->ProcessEvent(eventWrite);
     simSmsController->ProcessEvent(eventDelete);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     std::shared_ptr<Telephony::SimFileManager> simFileManager =
-        std::make_shared<SimFileManager>(runner, telRilManager, simStateManager);
+    std::make_shared<SimFileManager>(runner, subcribeInfo, telRilManager, simStateManager);
     simSmsController->SetRilAndFileManager(telRilManager, simFileManager);
     simFileManager = nullptr;
     simSmsController->SetRilAndFileManager(telRilManager, simFileManager);
@@ -2464,8 +2473,11 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
     auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
-        runner, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+        runner, subcribeInfo, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
         simStateManagerPtr };
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };

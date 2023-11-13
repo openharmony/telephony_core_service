@@ -15,16 +15,25 @@
 
 #include "sim_file_manager.h"
 
+#include "core_manager_inner.h"
 #include "ims_core_service_client.h"
 #include "network_state.h"
+#include "parameters.h"
 #include "radio_event.h"
 #include "runner_pool.h"
+#include "system_ability_definition.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
+static constexpr int32_t VM_NUMBER_LEN = 256;
+constexpr const char *VM_NUMBER_SIM_IMSI_KEY = "persist.telephony.sim.vmsimimsi";
+
 SimFileManager::SimFileManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    std::weak_ptr<ITelRilManager> telRilManager, std::weak_ptr<Telephony::SimStateManager> state)
-    : AppExecFwk::EventHandler(runner), telRilManager_(telRilManager), simStateManager_(state)
+    const EventFwk::CommonEventSubscribeInfo &sp, std::weak_ptr<ITelRilManager> telRilManager,
+    std::weak_ptr<Telephony::SimStateManager> state)
+    : AppExecFwk::EventHandler(runner), CommonEventSubscriber(sp), telRilManager_(telRilManager),
+    simStateManager_(state)
 {
     if (simStateManager_.lock() == nullptr) {
         TELEPHONY_LOGE("SimFileManager set NULL simStateManager.");
@@ -37,6 +46,21 @@ SimFileManager::~SimFileManager()
 {
     if (simFile_ != nullptr) {
         simFile_->UnInit();
+    }
+}
+
+void SimFileManager::OnReceiveEvent(const EventFwk::CommonEventData &data)
+{
+    const AAFwk::Want &want = data.GetWant();
+    std::string action = want.GetAction();
+    int32_t slotId = want.GetIntParam("slotId", 0);
+    TELEPHONY_LOGI("[slot%{public}d] action=%{public}s code=%{public}d", slotId, action.c_str(), data.GetCode());
+    if (EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED == action) {
+        if (slotId_ != slotId || simFile_ == nullptr) {
+            return;
+        }
+        TELEPHONY_LOGI("SimFileManager::OnReceiveEvent");
+        simFile_->LoadVoiceMail();
     }
 }
 
@@ -112,6 +136,9 @@ bool SimFileManager::InitSimFile(SimFileManager::IccType type)
             simFile_ = std::make_shared<IsimFile>(eventLoopRecord_, simStateManager_.lock());
         } else {
             simFile_ = std::make_shared<SimFile>(eventLoopRecord_, simStateManager_.lock());
+        }
+        if (simFile_ != nullptr) {
+            simFile_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
         }
         iccFileCache_.insert(std::make_pair(type, simFile_));
     } else {
@@ -315,6 +342,52 @@ std::u16string SimFileManager::GetVoiceMailIdentifier()
     return Str8ToStr16(result);
 }
 
+bool SimFileManager::IsPhoneTypeGsm(int32_t slotId)
+{
+    PhoneType phoneType = CoreManagerInner::GetInstance().GetPhoneType(slotId);
+    return phoneType == PhoneType::PHONE_TYPE_IS_GSM;
+}
+
+std::string SimFileManager::GetVoiceMailNumberCdmaKey()
+{
+    std::string key = "";
+    char spNumber[VM_NUMBER_LEN] = {0};
+    std::string spName = VM_NUMBER_CDMA_KEY;
+    GetParameter(key.append(spName).append(std::to_string(slotId_)).c_str(), "", spNumber, VM_NUMBER_LEN);
+    return spNumber;
+}
+
+std::string SimFileManager::GetVoiceMailNumberKey()
+{
+    std::string number = simFile_->GetVoiceMailNumber();
+    if (!number.empty()) {
+        return number;
+    }
+    if (TELEPHONY_EXT_WRAPPER.getVoiceMailIccidParameter_ != nullptr) {
+        std::string iccid = simFile_->ObtainIccId();
+        number = TELEPHONY_EXT_WRAPPER.getVoiceMailIccidParameter_(slotId_, iccid.c_str());
+        if (!number.empty()) {
+            return number;
+        }
+    }
+    std::string key = "";
+    char spNumber[VM_NUMBER_LEN] = {0};
+    std::string spName = VM_NUMBER_KEY;
+    GetParameter(key.append(spName).append(std::to_string(slotId_)).c_str(), "", spNumber, VM_NUMBER_LEN);
+    return spNumber;
+}
+
+std::string SimFileManager::GetVoiceMailNumberFromParam()
+{
+    std::string number = "";
+    if (IsPhoneTypeGsm(slotId_)) {
+        number = GetVoiceMailNumberKey();
+    } else {
+        number = GetVoiceMailNumberCdmaKey();
+    }
+    return number;
+}
+
 std::u16string SimFileManager::GetVoiceMailNumber()
 {
     if (simFile_ == nullptr) {
@@ -322,7 +395,7 @@ std::u16string SimFileManager::GetVoiceMailNumber()
         return Str8ToStr16("");
     }
 
-    std::string result = simFile_->ObtainVoiceMailNumber();
+    std::string result = GetVoiceMailNumberFromParam();
     TELEPHONY_LOGI("SimFileManager::GetVoiceMailNumber result:%{public}s ", (result.empty() ? "false" : "true"));
     return Str8ToStr16(result);
 }
@@ -446,12 +519,67 @@ void SimFileManager::SetImsi(std::string imsi)
     simFile_->UpdateImsi(imsi);
 }
 
+void SimFileManager::SetVoiceMailParamGsm(const std::u16string mailNumber, bool isSavedIccRecords)
+{
+    TELEPHONY_LOGI("SimFileManager::SetVoiceMailParamGsm, set gsm voice mail number");
+    std::string vmNumKey = "";
+    SetParameter(vmNumKey.append(VM_NUMBER_KEY).append(std::to_string(slotId_)).c_str(),
+        Str16ToStr8(mailNumber).c_str());
+    if (isSavedIccRecords) {
+        simFile_->SetVoiceMailNumber(Str16ToStr8(mailNumber));
+    }
+    if (TELEPHONY_EXT_WRAPPER.setVoiceMailIccidParameter_ != nullptr) {
+        std::string iccid = simFile_->ObtainIccId();
+        TELEPHONY_EXT_WRAPPER.setVoiceMailIccidParameter_(slotId_, iccid.c_str(), Str16ToStr8(mailNumber).c_str());
+    }
+}
+
+void SimFileManager::SetVoiceMailParamCdma(const std::u16string mailNumber)
+{
+    TELEPHONY_LOGI("SimFileManager::SetVoiceMailParamGsm, set cdma voice mail number");
+    std::string vmNumKey = "";
+    SetParameter(vmNumKey.append(VM_NUMBER_CDMA_KEY).append(std::to_string(slotId_)).c_str(),
+        Str16ToStr8(mailNumber).c_str());
+}
+
+std::string SimFileManager::GetVoiceMailSimImsiFromParam()
+{
+    std::string key = "";
+    char spNumber[VM_NUMBER_LEN] = {0};
+    GetParameter(key.append(VM_NUMBER_SIM_IMSI_KEY).append(std::to_string(slotId_)).c_str(), "",
+        spNumber, VM_NUMBER_LEN);
+    return spNumber;
+}
+
+void SimFileManager::SetVoiceMailSimImsiParam(std::string imsi)
+{
+    std::string key = "";
+    SetParameter(key.append(VM_NUMBER_SIM_IMSI_KEY).append(std::to_string(slotId_)).c_str(), imsi.c_str());
+}
+
+void SimFileManager::StoreVoiceMailNumber(const std::u16string mailNumber, bool isSavedIccRecords)
+{
+    std::string imsi = simFile_->ObtainIMSI();
+    SetVoiceMailSimImsiParam(imsi);
+    if (IsPhoneTypeGsm(slotId_)) {
+        SetVoiceMailParamGsm(mailNumber, isSavedIccRecords);
+    } else {
+        SetVoiceMailParamCdma(mailNumber);
+    }
+}
+
 bool SimFileManager::SetVoiceMailInfo(const std::u16string &mailName, const std::u16string &mailNumber)
 {
     if (simFile_ == nullptr || !HasSimCard()) {
         TELEPHONY_LOGE("SimFileManager::SetVoiceMail simFile nullptr");
         return false;
     }
+    bool isVoiceMailFixed = simFile_->GetIsVoiceMailFixed();
+    if (isVoiceMailFixed) {
+        TELEPHONY_LOGE("SimFileManager::SetVoiceMailInfo, voice mail is fixed by cust, set fail");
+        return false;
+    }
+    StoreVoiceMailNumber(mailNumber, true);
     std::string name = Str16ToStr8(mailName);
     std::string number = Str16ToStr8(mailNumber);
     bool result = simFile_->UpdateVoiceMail(name, number);
@@ -500,6 +628,23 @@ std::shared_ptr<IccDiallingNumbersHandler> SimFileManager::ObtainDiallingNumberH
     return diallingNumberHandler_;
 }
 
+void SimFileManager::HandleSimRecordsLoaded()
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("simFile_ is null");
+        return;
+    }
+
+    std::string imsiFromParam = GetVoiceMailSimImsiFromParam();
+    std::string imsiFromSim = simFile_->ObtainIMSI();
+    if ((!IsPhoneTypeGsm(slotId_) || !imsiFromParam.empty()) &&
+        !imsiFromSim.empty() && imsiFromParam != imsiFromSim) {
+        std::string nullStr = "";
+        StoreVoiceMailNumber(Str8ToStr16(nullStr), false);
+        SetVoiceMailSimImsiParam(nullStr);
+    }
+}
+
 void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -533,6 +678,11 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             ChangeSimFileByCardType(iccType);
             break;
         }
+        case RadioEvent::RADIO_SIM_RECORDS_LOADED: {
+            TELEPHONY_LOGI("SimFileManager::ProcessEvent, handle sim records loaded event");
+            HandleSimRecordsLoaded();
+            break;
+        }
         default:
             break;
     }
@@ -554,12 +704,19 @@ std::shared_ptr<SimFileManager> SimFileManager::CreateInstance(
         TELEPHONY_LOGE("simState null pointer");
         return nullptr;
     }
-    std::shared_ptr<SimFileManager> manager = std::make_shared<SimFileManager>(eventLoop, ril, simState);
+
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
+    subscribeInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+	
+    std::shared_ptr<SimFileManager> manager = std::make_shared<SimFileManager>(eventLoop, subscribeInfo, ril, simState);
     if (manager == nullptr) {
         TELEPHONY_LOGE("manager create nullptr.");
         return nullptr;
     }
-
+    bool subRet = EventFwk::CommonEventManager::SubscribeCommonEvent(manager);
+    TELEPHONY_LOGI("SimFileManager::CreateInstance, subscribe user switched subRet is %{public}d", subRet);
     return manager;
 }
 

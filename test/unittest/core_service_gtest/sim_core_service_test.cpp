@@ -370,6 +370,15 @@ HWTEST_F(SimTest, Telephony_Sim_InitTelephonyExtService_0100, Function | MediumT
         TELEPHONY_LOGI("telephonyExtWrapperHandle_ not null");
         EXPECT_EQ(TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_ != nullptr, true);
         EXPECT_EQ(TELEPHONY_EXT_WRAPPER.updateOpcVersion_ != nullptr, true);
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.getVoiceMailIccidParameter_ != nullptr, true);
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.setVoiceMailIccidParameter_ != nullptr, true);
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.initVoiceMailManagerExt_ != nullptr, true);
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.deinitVoiceMailManagerExt_ != nullptr, true);
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.resetVoiceMailLoadedFlagExt_ != nullptr, true);
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.setVoiceMailOnSimExt_ != nullptr, true);
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.getVoiceMailFixedExt_ != nullptr, true);
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.getVoiceMailNumberExt_ != nullptr, true);
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.getVoiceMailTagExt_ != nullptr, true);
     }
 }
 #endif // TEL_TEST_UNSUPPORT
