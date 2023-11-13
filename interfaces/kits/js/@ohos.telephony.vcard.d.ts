@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Technologies Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -116,6 +116,7 @@ declare namespace vcard {
    */
   function exportVCard(context: Context, predicates: dataSharePredicates.DataSharePredicates,
     callback: AsyncCallback<string>): void;
+
   /**
    * Export contact data to a vcf file.
    *
@@ -144,7 +145,7 @@ declare namespace vcard {
    * @param { Context } context - Indicates the context of application or capability.
    * @param { dataSharePredicates.DataSharePredicates } predicates - Execute statement.
    * @param { VCardBuilderOptions } options - Encoding and version.
-   * @returns { Promise<string> } the promise represents the address of the generated vcf file..
+   * @returns { Promise<string> } the promise represents the address of the generated vcf file.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
@@ -161,7 +162,7 @@ declare namespace vcard {
   /**
    * Indicates the VCard types.
    *
-   * @enum { string }
+   * @enum { number }
    * @syscap SystemCapability.Telephony.CoreService
    * @systemapi Hide this for inner system use.
    * @since 11

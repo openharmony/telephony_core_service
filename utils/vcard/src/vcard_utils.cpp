@@ -204,8 +204,8 @@ void VCardUtils::SaveFile(const std::string &fileStr, const std::string &path)
 bool VCardUtils::IsWrapPrintableAscii(std::vector<std::string> strs)
 {
     for (auto str : strs) {
-        for (char c : str) {
-            if (!(IsPrintableAscii(c) || c == '\r' || c == '\n')) {
+        for (char ch : str) {
+            if (!(IsPrintableAscii(ch) || ch == '\r' || ch == '\n')) {
                 return false;
             }
         }
@@ -225,17 +225,17 @@ bool VCardUtils::IsPrintableAscii(std::vector<std::string> strs)
 
 bool VCardUtils::IsPrintableAscii(const std::string &str)
 {
-    for (char c : str) {
-        if (!IsPrintableAscii(c)) {
+    for (char ch : str) {
+        if (!IsPrintableAscii(ch)) {
             return false;
         }
     }
     return true;
 }
 
-bool VCardUtils::IsPrintableAscii(char c)
+bool VCardUtils::IsPrintableAscii(char ch)
 {
-    return std::isprint(static_cast<unsigned char>(c));
+    return std::isprint(static_cast<unsigned char>(ch));
 }
 
 bool VCardUtils::IsNum(const std::string &str)
@@ -243,8 +243,8 @@ bool VCardUtils::IsNum(const std::string &str)
     if (str.empty()) {
         return false;
     }
-    for (char c : str) {
-        if (!std::isdigit(c)) {
+    for (char ch : str) {
+        if (!std::isdigit(ch)) {
             return false;
         }
     }

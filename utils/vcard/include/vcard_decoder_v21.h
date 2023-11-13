@@ -82,7 +82,7 @@ private:
         const std::string &fromCharSet, const std::string &toCharSet, int32_t &errorCode);
     std::string ParseQuotedPrintableValue(
         const std::string &from, const std::string &fromCharSet, const std::string &toCharSet, int32_t &errorCode);
-    std::string GetQuotedPritableValue(const std::string &str, int32_t &errorCode);
+    std::string GetQuotedPrintableValue(const std::string &str, int32_t &errorCode);
     std::string DecodeQuotedPrintable(const std::string &encodedString);
     std::vector<std::string> BuildListFromValue(const std::string &value);
     std::string GetPoMultiLine(const std::string &from);
