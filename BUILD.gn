@@ -92,6 +92,7 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_SIM_ROOT/src/tag_service.cpp",
     "$TELEPHONY_SIM_ROOT/src/usim_dialling_numbers_service.cpp",
     "$TELEPHONY_SIM_ROOT/src/usim_file_controller.cpp",
+    "$TELEPHONY_SIM_ROOT/src/voice_mail_constants.cpp",
     "$TELEPHONY_TEL_RIL_ROOT/src/observer_handler.cpp",
     "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_base.cpp",
     "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_call.cpp",

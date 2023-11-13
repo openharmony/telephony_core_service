@@ -107,6 +107,22 @@ constexpr const char *KEY_PLMN_ESM_FLAG_INT = "plmn_esm_flag_int";
  * Indicates the whether only support single pdp radio type array.
  */
 constexpr const char *KEY_SINGLE_PDP_RADIO_TYPE_INT_ARRAY = "single_pdp_radio_type_int_array";
+/**
+ * Indicates the voice mail number from cust.
+ */
+constexpr const char *KEY_VOICE_MAIL_NUMBER_STRING = "voice_mail_number_string";
+/**
+ * Indicates the voice mail carrier from cust.
+ */
+constexpr const char *KEY_VOICE_MAIL_CARRIER_STRING = "voice_mail_carrier_string";
+/**
+ * Indicates the voice mail tag from cust.
+ */
+constexpr const char *KEY_VOICE_MAIL_TAG_STRING = "voice_mail_tag_string";
+/**
+ * Indicates whether to edit voice mail information to sim card.
+ */
+constexpr const char *KEY_VOICE_MAIL_EDIT_NOT_TO_SIM_BOOL = "voice_mail_edit_not_to_sim_bool";
 
 struct OperatorConfig : public Parcelable {
     std::map<std::u16string, std::u16string> configValue {};
