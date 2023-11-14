@@ -39,6 +39,7 @@ public:
     typedef bool (*GET_VOICE_MAIL_FIXED_EXT)(int32_t, const char*);
     typedef char* (*GET_VOICE_MAIL_NUMBER_EXT)(int32_t, const char*);
     typedef char* (*GET_VOICE_MAIL_TAG_EXT)(int32_t, const char*);
+    typedef void (*RESET_VOICE_MAIL_MANAGER_EXT)(int32_t);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -51,6 +52,7 @@ public:
     GET_VOICE_MAIL_FIXED_EXT getVoiceMailFixedExt_ = nullptr;
     GET_VOICE_MAIL_NUMBER_EXT getVoiceMailNumberExt_ = nullptr;
     GET_VOICE_MAIL_TAG_EXT getVoiceMailTagExt_ = nullptr;
+    RESET_VOICE_MAIL_MANAGER_EXT resetVoiceMailManagerExt_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
