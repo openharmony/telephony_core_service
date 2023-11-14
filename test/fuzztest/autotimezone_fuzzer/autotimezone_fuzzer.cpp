@@ -82,7 +82,7 @@ void TestTimeZoneUpdater(const uint8_t *data, size_t size)
     timeZoneUpdater->NeedUpdateLocationTimeZone(timeZone);
     timeZoneUpdater->IsTimeZoneMatchCountryCode(timeZone);
     timeZoneUpdater->SaveTimeZone(timeZone);
-
+#ifdef ABILITY_LOCATION_SUPPORT
     Parcel parcel;
     parcel.WriteBuffer(data, size);
     if (timeZoneUpdater->locationSuggester_ != nullptr) {
@@ -93,6 +93,7 @@ void TestTimeZoneUpdater(const uint8_t *data, size_t size)
         std::unique_ptr<Location::Location> location = Location::Location::Unmarshalling(parcel);
         timeZoneUpdater->locationUpdate_->LocationReport(location);
     }
+#endif
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)

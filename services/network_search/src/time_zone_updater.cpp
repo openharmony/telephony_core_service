@@ -19,7 +19,9 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "net_all_capabilities.h"
+#ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
+#endif
 #include "setting_utils.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -226,7 +228,11 @@ bool TimeZoneUpdater::IsLocationTimeZoneEnabled()
 
 bool TimeZoneUpdater::IsScreenOn()
 {
-    return PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
+    bool isScreenOn = false;
+#ifdef ABILITY_POWER_SUPPORT
+    isScreenOn = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
+#endif
+    return isScreenOn;
 }
 
 std::string TimeZoneUpdater::StringToLower(const std::string &str)
