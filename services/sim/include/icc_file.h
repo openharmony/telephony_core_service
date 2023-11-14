@@ -178,6 +178,7 @@ protected:
 
 private:
     bool isVoiceMailFixed_ = false;
+    void ResetVoiceMailVariable();
     bool ProcessIccFileObtained(const AppExecFwk::InnerEvent::Pointer &event);
     void RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void UnregisterImsiLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
