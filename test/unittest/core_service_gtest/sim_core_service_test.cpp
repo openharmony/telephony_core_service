@@ -379,6 +379,7 @@ HWTEST_F(SimTest, Telephony_Sim_InitTelephonyExtService_0100, Function | MediumT
         EXPECT_EQ(TELEPHONY_EXT_WRAPPER.getVoiceMailFixedExt_ != nullptr, true);
         EXPECT_EQ(TELEPHONY_EXT_WRAPPER.getVoiceMailNumberExt_ != nullptr, true);
         EXPECT_EQ(TELEPHONY_EXT_WRAPPER.getVoiceMailTagExt_ != nullptr, true);
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.resetVoiceMailManagerExt_ != nullptr, true);
     }
 }
 #endif // TEL_TEST_UNSUPPORT

@@ -65,11 +65,13 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
         "GetVoiceMailNumberExt");
     getVoiceMailTagExt_ = (GET_VOICE_MAIL_TAG_EXT)dlsym(telephonyExtWrapperHandle_,
         "GetVoiceMailTagExt");
+    resetVoiceMailManagerExt_ = (RESET_VOICE_MAIL_MANAGER_EXT)dlsym(telephonyExtWrapperHandle_,
+        "ResetVoiceMailManagerExt");
     if (getVoiceMailIccidParameter_ == nullptr || setVoiceMailIccidParameter_ == nullptr ||
         initVoiceMailManagerExt_ == nullptr || deinitVoiceMailManagerExt_ == nullptr ||
         resetVoiceMailLoadedFlagExt_ == nullptr || setVoiceMailOnSimExt_ == nullptr ||
         getVoiceMailFixedExt_ == nullptr || getVoiceMailNumberExt_ == nullptr ||
-        getVoiceMailTagExt_ == nullptr) {
+        getVoiceMailTagExt_ == nullptr || resetVoiceMailManagerExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
     }
