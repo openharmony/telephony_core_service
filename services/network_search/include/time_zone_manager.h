@@ -16,15 +16,16 @@
 #ifndef NETWORK_SEARCH_INCLUDE_TIME_ZONE_MANAGER_H
 #define NETWORK_SEARCH_INCLUDE_TIME_ZONE_MANAGER_H
 
-#include "singleton.h"
 #include "time_zone_updater.h"
 
 namespace OHOS {
 namespace Telephony {
 
 class TimeZoneManager {
-    DECLARE_DELAYED_SINGLETON(TimeZoneManager)
 public:
+    ~TimeZoneManager() = default;
+    DISALLOW_COPY_AND_MOVE(TimeZoneManager);
+    static TimeZoneManager &GetInstance();
     void Init(std::weak_ptr<NetworkSearchManager> networkSearchManager);
     bool UpdateLocationTimeZone(std::string &timeZone);
     void UpdateCountryCode(std::string &countryCode, int32_t slotId);
@@ -35,6 +36,9 @@ public:
     bool IsRoaming();
     bool HasSimCard();
     int32_t GetCurrentLac();
+
+private:
+    TimeZoneManager();
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;

@@ -22,7 +22,11 @@ namespace OHOS {
 namespace Telephony {
 TimeZoneManager::TimeZoneManager() {}
 
-TimeZoneManager::~TimeZoneManager() {}
+TimeZoneManager &TimeZoneManager::GetInstance()
+{
+    static TimeZoneManager instance;
+    return instance;
+}
 
 void TimeZoneManager::Init(std::weak_ptr<NetworkSearchManager> networkSearchManager)
 {

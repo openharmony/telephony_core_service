@@ -30,8 +30,9 @@ TimeZoneLocationUpdate::TimeZoneLocationUpdate(std::shared_ptr<TimeZoneLocationS
     locatorImpl_ = Location::Locator::GetInstance();
     if (locatorImpl_ == nullptr) {
         TELEPHONY_LOGE("locatorImpl is null");
+    } else {
+        locationEnabled_ = locatorImpl_->IsLocationEnabled();
     }
-    locationEnabled_ = locatorImpl_->IsLocationEnabled();
 }
 
 TimeZoneLocationUpdate::~TimeZoneLocationUpdate()
@@ -199,7 +200,7 @@ void TimeZoneLocationUpdate::LocationSwitchChange()
     if (!locationEnabled && locationEnabled_) {
         TELEPHONY_LOGI("Enable location");
         RegisterLocationChange();
-        DelayedSingleton<TimeZoneManager>::GetInstance()->SendUpdateLocationRequest();
+        TimeZoneManager::GetInstance().SendUpdateLocationRequest();
     } else if (locationEnabled && !locationEnabled_) {
         TELEPHONY_LOGI("Disable location");
         UnregisterLocationChange();

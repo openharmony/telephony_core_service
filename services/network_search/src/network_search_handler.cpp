@@ -1070,7 +1070,7 @@ void NetworkSearchHandler::RadioResidentNetworkChange(const AppExecFwk::InnerEve
     }
     if (!countryCode.empty()) {
         TELEPHONY_LOGI("RadioResidentNetworkChange: update countryCode[%{public}s]", countryCode.c_str());
-        DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateCountryCode(countryCode, slotId_);
+        TimeZoneManager::GetInstance().UpdateCountryCode(countryCode, slotId_);
     }
 }
 
