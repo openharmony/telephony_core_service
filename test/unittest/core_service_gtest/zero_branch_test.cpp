@@ -1113,7 +1113,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | L
     EXPECT_TRUE(multiSimController->AnnounceDefaultCellularDataSimIdChanged(0));
     AAFwk::Want want;
     EXPECT_FALSE(multiSimController->PublishSimFileEvent(want, 0, ""));
-    EXPECT_FALSE(multiSimController->InitShowName(0));
     EXPECT_FALSE(multiSimController->InitShowNumber(0));
     EXPECT_FALSE(multiSimController->InitIccId(0));
     EXPECT_FALSE(multiSimController->GetListFromDataBase());

@@ -71,7 +71,6 @@ public:
 private:
     bool IsValidData(int32_t slotId);
     int32_t GetFirstActivedSlotId();
-    bool InitShowName(int slotId);
     bool InitShowNumber(int slotId);
     bool InitActive(int slotId);
     bool InitIccId(int slotId);

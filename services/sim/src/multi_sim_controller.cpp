@@ -112,10 +112,6 @@ bool MultiSimController::InitData(int32_t slotId)
         TELEPHONY_LOGE("InitActive failed");
         result = false;
     }
-    if (!InitShowName(slotId)) {
-        TELEPHONY_LOGE("InitShowName failed");
-        result = false;
-    }
     if (!InitShowNumber(slotId)) {
         TELEPHONY_LOGE("InitShowNumber failed");
         result = false;
@@ -230,28 +226,6 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
     }
     int64_t id;
     return simDbHelper_->InsertData(id, values);
-}
-
-bool MultiSimController::InitShowName(int slotId)
-{
-    std::u16string showName;
-    GetShowName(slotId, showName);
-    if (!showName.empty() && showName != IccAccountInfo::DEFAULT_SHOW_NAME) {
-        TELEPHONY_LOGE("no need to Init again");
-        return true;
-    }
-    if (networkSearchManager_ == nullptr) {
-        TELEPHONY_LOGE("failed by nullptr");
-        return false;
-    }
-    networkSearchManager_->GetOperatorName(slotId, showName);
-    int32_t result = TELEPHONY_ERROR;
-    if (!showName.empty()) {
-        result = SetShowName(slotId, showName, true);
-    } else {
-        result = SetShowName(slotId, IccAccountInfo::DEFAULT_SHOW_NAME, true);
-    }
-    return result == TELEPHONY_ERR_SUCCESS;
 }
 
 bool MultiSimController::InitShowNumber(int slotId)
@@ -821,6 +795,12 @@ int32_t MultiSimController::GetShowName(int32_t slotId, std::u16string &showName
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     showName = Str8ToStr16(localCacheInfo_[slotId].showName);
+    if (showName.empty() && networkSearchManager_ != nullptr) {
+        TELEPHONY_LOGI("GetOperatorName");
+        networkSearchManager_->GetOperatorName(slotId, showName);
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    TELEPHONY_LOGI("name is empty");
     return TELEPHONY_ERR_SUCCESS;
 }
 
