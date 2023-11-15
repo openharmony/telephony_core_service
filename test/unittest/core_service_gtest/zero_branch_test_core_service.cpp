@@ -373,11 +373,13 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationSuggester_001, Functio
     auto suggester = std::make_shared<TimeZoneLocationSuggester>(eventLoop);
     suggester->Init();
     suggester->NitzUpdate();
+#ifdef ABILITY_LOCATION_SUPPORT
     Parcel parcel;
     std::unique_ptr<Location::Location> location = Location::Location::Unmarshalling(parcel);
     suggester->LocationUpdate(location);
     suggester->GetLocationExpirationTime();
     suggester->IsLocationExpired();
+#endif
     suggester->ClearLocation();
     EXPECT_FALSE(suggester->HasLocation());
 }
@@ -396,6 +398,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationUpdate_001, Function |
     update->StopPassiveUpdate();
     update->RequestUpdate();
     update->CancelUpdate();
+#ifdef ABILITY_LOCATION_SUPPORT
     update->LocationSwitchChange();
     Parcel parcel;
     std::unique_ptr<Location::Location> location = Location::Location::Unmarshalling(parcel);
@@ -404,6 +407,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationUpdate_001, Function |
     update->UnregisterLocationChange();
     update->RegisterSwitchCallback();
     update->UnregisterSwitchCallback();
+#endif
     update->IsLocationEnabled();
     update->GetIsoCountryCode();
     EXPECT_NE(update->GetIsoCountryCode(), "test");

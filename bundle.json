@@ -63,14 +63,12 @@
                 "time_service"
             ],
             "third_party": [
-                "icu",
                 "jsoncpp",
                 "libphonenumber",
                 "libpng",
                 "libxml2",
                 "node",
-                "openssl",
-                "protobuf"
+                "openssl"
             ]
         },
         "build": {
