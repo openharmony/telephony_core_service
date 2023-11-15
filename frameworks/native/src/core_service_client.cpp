@@ -60,7 +60,7 @@ sptr<ICoreService> CoreServiceClient::GetProxy()
         TELEPHONY_LOGE("Failed to add death recipient");
         return nullptr;
     }
-    proxy_ = iface_cast<CoreServiceProxy>(obj);
+    proxy_ = iface_cast<ICoreService>(obj);
     deathRecipient_ = dr;
     TELEPHONY_LOGD("Succeed to connect core service %{public}d", proxy_ == nullptr);
     return proxy_;

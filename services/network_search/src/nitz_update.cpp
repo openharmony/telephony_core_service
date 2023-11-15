@@ -55,7 +55,7 @@ int64_t NitzUpdate::lastNetworkTime_ = 0;
 NitzUpdate::NitzUpdate(const std::weak_ptr<NetworkSearchManager> &networkSearchManager, int32_t slotId)
     : networkSearchManager_(networkSearchManager), slotId_(slotId)
 {
-    DelayedSingleton<TimeZoneManager>::GetInstance()->Init(networkSearchManager);
+    TimeZoneManager::GetInstance().Init(networkSearchManager);
 }
 
 void NitzUpdate::ProcessNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event)
@@ -81,7 +81,7 @@ void NitzUpdate::ProcessNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event)
     NetworkTime networkTime = {0};
     if (NitzParse(*strTime, networkTime)) {
         ProcessTime(networkTime);
-        DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateTimeZoneOffset(networkTime.offset, slotId_);
+        TimeZoneManager::GetInstance().UpdateTimeZoneOffset(networkTime.offset, slotId_);
     }
 }
 
@@ -258,7 +258,7 @@ void NitzUpdate::ProcessTimeZone()
         }
     }
     std::string countryCode = Str16ToStr8(iso);
-    DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateCountryCode(countryCode, primarySlotId);
+    TimeZoneManager::GetInstance().UpdateCountryCode(countryCode, primarySlotId);
 }
 
 void NitzUpdate::SaveTime(int64_t networkTime)
