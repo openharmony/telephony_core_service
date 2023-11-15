@@ -19,7 +19,9 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "net_all_capabilities.h"
+#ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
+#endif
 #include "setting_utils.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -32,6 +34,7 @@ namespace Telephony {
 using namespace AppExecFwk;
 const std::string NET_TYPE = "NetType";
 const std::string STRING_TRUE = "1";
+const std::string STRING_FALSE = "0";
 const std::string PARAM_TIME_ZONE = "time-zone";
 const std::string SHIELD_COUNTRY_CODE_RU = "ru";
 const std::string SHIELD_TIME_ZONE_RU = "asia/omsk";
@@ -202,7 +205,11 @@ bool TimeZoneUpdater::IsAutoTimeZone()
     std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIMEZONE;
     std::string value = "";
     QuerySetting(uri, key, value);
-    return value == STRING_TRUE;
+    bool isAutoTimeZone = true;
+    if (value == STRING_FALSE) {
+        isAutoTimeZone = false;
+    }
+    return isAutoTimeZone;
 }
 
 bool TimeZoneUpdater::IsAirplaneMode()
@@ -221,7 +228,11 @@ bool TimeZoneUpdater::IsLocationTimeZoneEnabled()
 
 bool TimeZoneUpdater::IsScreenOn()
 {
-    return PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
+    bool isScreenOn = false;
+#ifdef ABILITY_POWER_SUPPORT
+    isScreenOn = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
+#endif
+    return isScreenOn;
 }
 
 std::string TimeZoneUpdater::StringToLower(const std::string &str)

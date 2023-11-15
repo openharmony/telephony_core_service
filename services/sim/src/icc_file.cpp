@@ -21,6 +21,7 @@
 #include "iservice_registry.h"
 #include "radio_event.h"
 #include "system_ability_definition.h"
+#include "telephony_ext_wrapper.h"
 #include "telephony_state_registry_client.h"
 
 using namespace std;
@@ -95,6 +96,36 @@ void IccFile::Init()
 void IccFile::StartLoad()
 {
     TELEPHONY_LOGI("IccFile::StarLoad start");
+}
+
+void IccFile::SetId(int id)
+{
+    slotId_ = id;
+    TELEPHONY_LOGI("IccFile::SetId, slotId %{public}d.", id);
+    voiceMailConfig_ = std::make_shared<VoiceMailConstants>(id);
+}
+
+bool IccFile::GetIsVoiceMailFixed()
+{
+    return isVoiceMailFixed_;
+}
+
+void IccFile::SetVoiceMailByOperator(std::string spn)
+{
+    if (voiceMailConfig_ == nullptr) {
+        TELEPHONY_LOGE("IccFile::SetVoiceMailByOperator, voiceMailConfig_ is null.");
+        return;
+    }
+    if (voiceMailConfig_->ContainsCarrier(spn)) {
+        std::unique_lock<std::shared_mutex> lock(voiceMailMutex_);
+        isVoiceMailFixed_ = voiceMailConfig_->GetVoiceMailFixed(spn);
+        voiceMailNum_ = voiceMailConfig_->GetVoiceMailNumber(spn);
+        voiceMailTag_ = voiceMailConfig_->GetVoiceMailTag(spn);
+    } else {
+        TELEPHONY_LOGI("IccFile::SetVoiceMailByOperator, ContainsCarrier fail.");
+        std::unique_lock<std::shared_mutex> lock(voiceMailMutex_);
+        isVoiceMailFixed_ = false;
+    }
 }
 
 std::string IccFile::ObtainIMSI()
@@ -187,11 +218,6 @@ std::string IccFile::ObtainHomeNameOfPnn()
 std::string IccFile::ObtainMsisdnAlphaStatus()
 {
     return msisdnTag_;
-}
-
-std::string IccFile::ObtainVoiceMailNumber()
-{
-    return voiceMailNum_;
 }
 
 int32_t IccFile::ObtainVoiceMailCount()
@@ -295,6 +321,17 @@ void IccFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         default:
             break;
     }
+}
+
+void IccFile::LoadVoiceMail()
+{
+    if (voiceMailConfig_ == nullptr) {
+        TELEPHONY_LOGE("IccFile::LoadVoiceMail, voiceMailConfig_ is null.");
+        return;
+    }
+    voiceMailConfig_->ResetVoiceMailLoadedFlag();
+    std::string operatorNumeric = ObtainSimOperator();
+    SetVoiceMailByOperator(operatorNumeric);
 }
 
 void IccFile::RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
@@ -533,6 +570,17 @@ bool IccFile::HasSimCard()
     return (stateManager_ != nullptr) ? stateManager_->HasSimCard() : false;
 }
 
+void IccFile::ResetVoiceMailVariable()
+{
+    std::unique_lock<std::shared_mutex> lock(voiceMailMutex_);
+    isVoiceMailFixed_ = false;
+    voiceMailNum_ = "";
+    voiceMailTag_ = "";
+    if (TELEPHONY_EXT_WRAPPER.resetVoiceMailManagerExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.resetVoiceMailManagerExt_(slotId_);
+    }
+}
+
 void IccFile::ClearData()
 {
     imsi_ = "";
@@ -540,14 +588,13 @@ void IccFile::ClearData()
     UpdateSPN("");
     UpdateLoaded(false);
     operatorNumeric_ = "";
-    voiceMailNum_ = "";
-    voiceMailTag_ = "";
     indexOfMailbox_ = 1;
     msisdn_ = "";
     gid1_ = "";
     gid2_ = "";
     msisdnTag_ = "";
     fileQueried_ = false;
+    ResetVoiceMailVariable();
 }
 void IccFile::UnInit()
 {

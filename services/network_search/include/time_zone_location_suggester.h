@@ -23,7 +23,9 @@
 
 #include "event_handler.h"
 #include "inner_event.h"
+#ifdef ABILITY_LOCATION_SUPPORT
 #include "location.h"
+#endif
 #include "refbase.h"
 #include "telephony_log_wrapper.h"
 
@@ -111,7 +113,9 @@ public:
     ~TimeZoneLocationSuggester() = default;
     void Init();
     void NitzUpdate();
+#ifdef ABILITY_LOCATION_SUPPORT
     void LocationUpdate(const std::unique_ptr<Location::Location> &location);
+#endif
     bool HasLocation();
     void ClearLocation();
     bool IsLocationExpired();
@@ -126,9 +130,11 @@ private:
     sptr<State> idleState_;
     sptr<State> nitzState_;
     sptr<State> locationState_;
+#ifdef ABILITY_LOCATION_SUPPORT
     std::unique_ptr<Location::Location> currentLocation_ = nullptr;
     std::unique_ptr<Location::Location> lastLocation_ = nullptr;
     std::unique_ptr<Location::Location> timeZoneLocation_ = nullptr;
+#endif
     int64_t locationUpdateTime_ = 0;
     int64_t nitzUpdateTime_ = 0;
     int32_t nitzLac_ = 0;

@@ -47,6 +47,34 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
     }
+    getVoiceMailIccidParameter_ = (GET_VOICE_MAIL_ICCID_PARAMETER)dlsym(telephonyExtWrapperHandle_,
+        "GetVoiceMailIccidParameter");
+    setVoiceMailIccidParameter_ = (SET_VOICE_MAIL_ICCID_PARAMETER)dlsym(telephonyExtWrapperHandle_,
+        "SetVoiceMailIccidParameter");
+    initVoiceMailManagerExt_ = (INIT_VOICE_MAIL_MANAGER_EXT)dlsym(telephonyExtWrapperHandle_,
+        "InitVoiceMailManagerExt");
+    deinitVoiceMailManagerExt_ = (DEINIT_VOICE_MAIL_MANAGER_EXT)dlsym(telephonyExtWrapperHandle_,
+        "DeinitVoiceMailManagerExt");
+    resetVoiceMailLoadedFlagExt_ = (RESET_VOICE_MAIL_LOADED_FLAG_EXT)dlsym(telephonyExtWrapperHandle_,
+        "ResetVoiceMailLoadedFlagExt");
+    setVoiceMailOnSimExt_ = (SET_VOICE_MAIL_ON_SIM_EXT)dlsym(telephonyExtWrapperHandle_,
+        "SetVoiceMailOnSimExt");
+    getVoiceMailFixedExt_ = (GET_VOICE_MAIL_FIXED_EXT)dlsym(telephonyExtWrapperHandle_,
+        "GetVoiceMailFixedExt");
+    getVoiceMailNumberExt_ = (GET_VOICE_MAIL_NUMBER_EXT)dlsym(telephonyExtWrapperHandle_,
+        "GetVoiceMailNumberExt");
+    getVoiceMailTagExt_ = (GET_VOICE_MAIL_TAG_EXT)dlsym(telephonyExtWrapperHandle_,
+        "GetVoiceMailTagExt");
+    resetVoiceMailManagerExt_ = (RESET_VOICE_MAIL_MANAGER_EXT)dlsym(telephonyExtWrapperHandle_,
+        "ResetVoiceMailManagerExt");
+    if (getVoiceMailIccidParameter_ == nullptr || setVoiceMailIccidParameter_ == nullptr ||
+        initVoiceMailManagerExt_ == nullptr || deinitVoiceMailManagerExt_ == nullptr ||
+        resetVoiceMailLoadedFlagExt_ == nullptr || setVoiceMailOnSimExt_ == nullptr ||
+        getVoiceMailFixedExt_ == nullptr || getVoiceMailNumberExt_ == nullptr ||
+        getVoiceMailTagExt_ == nullptr || resetVoiceMailManagerExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+        return;
+    }
     TELEPHONY_LOGI("telephony ext wrapper init success");
 }
 } // namespace Telephony
