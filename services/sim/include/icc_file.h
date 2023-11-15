@@ -15,6 +15,7 @@
 
 #ifndef OHOS_ICC_FILE_H
 #define OHOS_ICC_FILE_H
+#include <shared_mutex>
 
 #include "common_event.h"
 #include "common_event_manager.h"
@@ -31,6 +32,7 @@
 #include "sim_state_manager.h"
 #include "telephony_log_wrapper.h"
 #include "usim_function_handle.h"
+#include "voice_mail_constants.h"
 #include "want.h"
 
 namespace OHOS {
@@ -61,7 +63,6 @@ public:
     std::string ObtainNAI();
     std::string ObtainHomeNameOfPnn();
     std::string ObtainMsisdnAlphaStatus();
-    std::string ObtainVoiceMailNumber();
     int32_t ObtainVoiceMailCount();
     std::string ObtainSPN();
     std::string ObtainEons(const std::string &plmn, int32_t lac, bool longNameRequired);
@@ -82,13 +83,14 @@ public:
     virtual bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber) = 0;
     virtual bool SetVoiceMailCount(int32_t voiceMailCount) = 0;
     virtual bool SetVoiceCallForwarding(bool enable, const std::string &number) = 0;
+    virtual std::string GetVoiceMailNumber() = 0;
+    virtual void SetVoiceMailNumber(const std::string mailNumber) = 0;
     bool HasSimCard();
     void UnInit();
     void ClearData();
-    void SetId(int id)
-    {
-        slotId_ = id;
-    }
+    void SetId(int id);
+    bool GetIsVoiceMailFixed();
+    void LoadVoiceMail();
 
 protected:
     virtual void ProcessIccRefresh(int msgId) = 0;
@@ -170,8 +172,13 @@ protected:
         int eventid, int efId, int index, std::shared_ptr<void> pobj);
     void NotifyRegistrySimState(CardType type, SimState state, LockReason reason);
     int slotId_ = 0;
+    void SetVoiceMailByOperator(std::string spn);
+    std::shared_ptr<VoiceMailConstants> voiceMailConfig_ = nullptr;
+    std::shared_mutex voiceMailMutex_;
 
 private:
+    bool isVoiceMailFixed_ = false;
+    void ResetVoiceMailVariable();
     bool ProcessIccFileObtained(const AppExecFwk::InnerEvent::Pointer &event);
     void RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void UnregisterImsiLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);

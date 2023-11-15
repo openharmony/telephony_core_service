@@ -16,6 +16,7 @@
 #ifndef OHOS_SIM_FILE_MANAGER_H
 #define OHOS_SIM_FILE_MANAGER_H
 
+#include "common_event_subscriber.h"
 #include "event_handler.h"
 #include "event_runner.h"
 #include "hril_modem_parcel.h"
@@ -25,6 +26,7 @@
 #include "ruim_file.h"
 #include "ruim_file_controller.h"
 #include "sim_file.h"
+#include "system_ability_status_change_stub.h"
 #include "isim_file.h"
 #include "isim_file_controller.h"
 #include "csim_file_controller.h"
@@ -32,11 +34,12 @@
 
 namespace OHOS {
 namespace Telephony {
-class SimFileManager : public AppExecFwk::EventHandler {
+class SimFileManager : public AppExecFwk::EventHandler, public EventFwk::CommonEventSubscriber {
 public:
     using HANDLE = std::shared_ptr<AppExecFwk::EventHandler>;
     SimFileManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        std::weak_ptr<Telephony::ITelRilManager> telRilManager, std::weak_ptr<Telephony::SimStateManager> state);
+        const EventFwk::CommonEventSubscribeInfo &sp, std::weak_ptr<Telephony::ITelRilManager> telRilManager,
+        std::weak_ptr<Telephony::SimStateManager> state);
     virtual ~SimFileManager();
     void Init(int slotId);
     void ClearData();
@@ -72,7 +75,8 @@ public:
     std::shared_ptr<IccDiallingNumbersHandler> ObtainDiallingNumberHandler();
     bool SetVoiceMailInfo(const std::u16string &mailName, const std::u16string &mailNumber);
     bool HasSimCard();
-    void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
+    void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     static std::shared_ptr<SimFileManager> CreateInstance(
         std::weak_ptr<Telephony::ITelRilManager> ril, std::weak_ptr<SimStateManager> simState);
     enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
@@ -104,6 +108,20 @@ private:
     std::string opName_;
     std::string opKey_;
     std::string opKeyExt_;
+
+    const std::string VM_NUMBER_KEY = "persist.telephony.sim.vmnum";
+    const std::string VM_NUMBER_CDMA_KEY = "persist.telephony.sim.vmnumcdma";
+    void SetVoiceMailParamGsm(const std::u16string mailNumber, bool isSavedIccRecords);
+    void SetVoiceMailParamCdma(const std::u16string mailNumber);
+    std::string GetVoiceMailNumberKey();
+    std::string GetVoiceMailNumberCdmaKey();
+    std::string GetVoiceMailNumberFromParam();
+    void SetVoiceMailSimImsiParam(std::string imsi);
+    void StoreVoiceMailNumber(const std::u16string mailNumber, bool isSavedIccRecoeds);
+    std::string GetVoiceMailSimImsiFromParam();
+    void HandleSimRecordsLoaded();
+    bool IsPhoneTypeGsm(int32_t slotId);
+    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

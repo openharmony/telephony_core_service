@@ -38,6 +38,8 @@ public:
     bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber);
     bool SetVoiceMailCount(int32_t voiceMailCount);
     bool SetVoiceCallForwarding(bool enable, const std::string &number);
+    std::string GetVoiceMailNumber();
+    void SetVoiceMailNumber(const std::string mailNumber);
 
 protected:
     enum SpnStatus {
@@ -148,6 +150,7 @@ private:
     void ParseOpl(const std::vector<std::string> &records);
     void ParseOpl5g(const std::vector<std::string> &records);
     bool FillNumber(std::shared_ptr<unsigned char> efCfisData, int32_t efCfisSize, const std::string &number);
+    bool VoiceMailNotEditToSim();
 };
 } // namespace Telephony
 } // namespace OHOS

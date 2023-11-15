@@ -30,9 +30,29 @@ public:
 
     typedef bool (*CHECK_OPC_VERSION_IS_UPDATE)(void);
     typedef void (*UPDATE_OPC_VERSION)(void);
+    typedef char* (*GET_VOICE_MAIL_ICCID_PARAMETER)(int32_t, const char*);
+    typedef void (*SET_VOICE_MAIL_ICCID_PARAMETER)(int32_t, const char*, const char*);
+    typedef void (*INIT_VOICE_MAIL_MANAGER_EXT)(int32_t);
+    typedef void (*DEINIT_VOICE_MAIL_MANAGER_EXT)(int32_t);
+    typedef void (*RESET_VOICE_MAIL_LOADED_FLAG_EXT)(int32_t);
+    typedef void (*SET_VOICE_MAIL_ON_SIM_EXT)(int32_t, const char*, const char*);
+    typedef bool (*GET_VOICE_MAIL_FIXED_EXT)(int32_t, const char*);
+    typedef char* (*GET_VOICE_MAIL_NUMBER_EXT)(int32_t, const char*);
+    typedef char* (*GET_VOICE_MAIL_TAG_EXT)(int32_t, const char*);
+    typedef void (*RESET_VOICE_MAIL_MANAGER_EXT)(int32_t);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
+    GET_VOICE_MAIL_ICCID_PARAMETER getVoiceMailIccidParameter_ = nullptr;
+    SET_VOICE_MAIL_ICCID_PARAMETER setVoiceMailIccidParameter_ = nullptr;
+    INIT_VOICE_MAIL_MANAGER_EXT initVoiceMailManagerExt_ = nullptr;
+    DEINIT_VOICE_MAIL_MANAGER_EXT deinitVoiceMailManagerExt_ = nullptr;
+    RESET_VOICE_MAIL_LOADED_FLAG_EXT resetVoiceMailLoadedFlagExt_ = nullptr;
+    SET_VOICE_MAIL_ON_SIM_EXT setVoiceMailOnSimExt_ = nullptr;
+    GET_VOICE_MAIL_FIXED_EXT getVoiceMailFixedExt_ = nullptr;
+    GET_VOICE_MAIL_NUMBER_EXT getVoiceMailNumberExt_ = nullptr;
+    GET_VOICE_MAIL_TAG_EXT getVoiceMailTagExt_ = nullptr;
+    RESET_VOICE_MAIL_MANAGER_EXT resetVoiceMailManagerExt_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
