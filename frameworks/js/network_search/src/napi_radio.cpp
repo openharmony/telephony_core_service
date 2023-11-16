@@ -615,8 +615,8 @@ static void NativeGetNetworkSearchInformation(napi_env env, void *data)
     asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkSearchInformation(
         asyncContext->slotId, callback.release());
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
-        asyncContext->cv.wait_for(
-            callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [asyncContext] { return asyncContext->callbackEnd; });
+        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_NETWORK_MANUAL_SEARCH_TIME_SECOND),
+            [asyncContext] { return asyncContext->callbackEnd; });
         TELEPHONY_LOGI("NativeGetNetworkSearchInformation after callback end");
     }
     TELEPHONY_LOGI("NativeGetNetworkSearchInformation end");
