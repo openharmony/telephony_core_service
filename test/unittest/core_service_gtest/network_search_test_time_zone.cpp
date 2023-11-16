@@ -181,7 +181,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_Location_0100, Function | Me
     suggester->locationState_->SetParentState(suggester->idleState_);
     suggester->SetOriginalState(suggester->idleState_);
     suggester->Start();
-    bool isRoaming = DelayedSingleton<TimeZoneManager>::GetInstance()->IsRoaming();
+    bool isRoaming = TimeZoneManager::GetInstance().IsRoaming();
     if (isRoaming) {
         EXPECT_EQ(suggester->GetLocationExpirationTime(), LOCATION_EXPIRATION_TIME_MS_ROAMING);
     } else {
