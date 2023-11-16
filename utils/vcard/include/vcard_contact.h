@@ -135,6 +135,8 @@ private:
     void AddOtherDatas(std::string name, std::string rawValue, std::string byte, std::vector<std::string> values,
         std::string propValue, std::vector<std::string> groups,
         std::map<std::string, std::vector<std::string>> parasMap);
+    std::vector<std::string> GetValueListFromParasMap(
+        std::string rawValue, std::string propValue, std::map<std::string, std::vector<std::string>> parasMap);
 
 private:
     const int32_t SORT_NAME_MAX_VALUE_SIZE = 3;

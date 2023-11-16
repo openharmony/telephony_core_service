@@ -16,6 +16,7 @@
 #ifndef OHOS_VCARD_MANAGER_H
 #define OHOS_VCARD_MANAGER_H
 
+#include "mutex"
 #include "vcard_configuration.h"
 #include "vcard_contact.h"
 #include "vcard_decoder.h"
@@ -25,8 +26,13 @@ namespace Telephony {
 class VCardManager {
 public:
     int32_t Import(const std::string &path, int32_t accountId);
+    int32_t ImportLock(
+        const std::string &path, std::shared_ptr<DataShare::DataShareHelper> dataShareHelper, int32_t accountId);
     int32_t Export(std::string &path, const DataShare::DataSharePredicates &predicates,
         int32_t cardType = VCardConfiguration::VER_21, const std::string &charset = "UTF-8");
+    int32_t ExportLock(std::string &path, std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
+        const DataShare::DataSharePredicates &predicates, int32_t cardType = VCardConfiguration::VER_21,
+        const std::string &charset = "UTF-8");
     int32_t ExportToStr(std::string &str, const DataShare::DataSharePredicates &predicates,
         int32_t cardType = VCardConfiguration::VER_21, const std::string &charset = "UTF-8");
     void SetDataHelper(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper);
@@ -36,6 +42,7 @@ public:
     void OnOneContactEnded();
     void OnRawDataCreated(std::shared_ptr<VCardRawData> rawData);
     static VCardManager &GetInstance();
+    void Release();
 
 private:
     class DecodeListener : public VCardDecodeListener {
@@ -45,7 +52,7 @@ private:
         virtual void OnOneContactStarted();
         virtual void OnOneContactEnded();
         virtual void OnRawDataCreated(std::shared_ptr<VCardRawData> rawData);
-        std::vector<std::shared_ptr<VCardContact>> GetContacts();
+        std::vector<std::shared_ptr<VCardContact>> &GetContacts();
 
     private:
         std::vector<std::shared_ptr<VCardContact>> contacts_;
@@ -61,9 +68,11 @@ private:
     int32_t InsertContactData(int32_t rawId, std::shared_ptr<VCardContact> contact);
     bool IsContactsIdExit(int32_t accountId);
     int32_t GetAccountId();
+    bool ParameterTypeAndCharsetCheck(int32_t cardType, std::string charset, int32_t &errorCode);
 
 private:
     std::shared_ptr<VCardManager::DecodeListener> listener_;
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
