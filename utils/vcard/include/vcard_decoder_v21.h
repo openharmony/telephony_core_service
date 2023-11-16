@@ -27,6 +27,7 @@ namespace OHOS {
 namespace Telephony {
 class VCardDecoderV21 : public VCardDecoder {
 public:
+    ~VCardDecoderV21();
     virtual void AddVCardDecodeListener(std::shared_ptr<VCardDecodeListener> listener);
     virtual void Decode(int32_t &errorCode);
     virtual bool DecodeOne(int32_t &errorCode);
@@ -37,7 +38,7 @@ protected:
     bool ParseItem(int32_t &errorCode);
     void DealRawDataValue(const std::string &name, std::shared_ptr<VCardRawData> rawData, int32_t &errorCode);
     virtual std::string GetVersion();
-    bool IsValidName(const std::string &name);
+    void RecordUnknowParamType(const std::string &name);
     virtual std::string GetLine();
     virtual std::string PeekLine();
     virtual std::string GetNonEmptyLine();

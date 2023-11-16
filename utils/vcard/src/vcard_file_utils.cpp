@@ -30,8 +30,7 @@ int32_t VCardFileUtils::Open(const std::string &filePath)
         return TELEPHONY_ERR_VCARD_FILE_INVALID;
     }
     std::string realPath = path;
-    std::shared_ptr<std::ifstream> input = std::make_shared<std::ifstream>(realPath);
-    file_ = std::shared_ptr<std::ifstream>(input);
+    file_ = std::make_shared<std::ifstream>(realPath);
     if (!file_->is_open()) {
         return TELEPHONY_ERR_VCARD_FILE_INVALID;
     }
@@ -51,6 +50,7 @@ int32_t VCardFileUtils::Close()
     }
     if (file_->is_open()) {
         file_->close();
+        file_ = nullptr;
     }
     return TELEPHONY_SUCCESS;
 }

@@ -35,6 +35,12 @@ static const int32_t DEFAULT_REF_COUNT = 1;
 const std::string CONTACT_URI = "datashare:///com.ohos.contactsdataability";
 const std::string PERMISSION_READ_CONTACTS = "ohos.permission.READ_CONTACTS";
 const std::string PERMISSION_WRITE_CONTACTS = "ohos.permission.WRITE_CONTACTS";
+const std::string DEFAULT_CHARSET = "UTF-8";
+constexpr int32_t TWO_PARAMETERS = 2;
+constexpr int32_t THREE_PARAMETERS = 3;
+constexpr int32_t FOUR_PARAMETERS = 4;
+constexpr int32_t PARAMETERS_INDEX_TWO = 2;
+constexpr int32_t PARAMETERS_INDEX_THREE = 3;
 
 static napi_value CreateEnumConstructor(napi_env env, napi_callback_info info)
 {
@@ -101,11 +107,24 @@ bool MatchImportParameters(
             hasAccountId = true;
             return true;
         }
+        bool isAccountIdUndefined =
+            NapiUtil::MatchParameters(env, parameters, { napi_object, napi_string, napi_undefined });
+        if (isAccountIdUndefined) {
+            hasAccountId = false;
+            return true;
+        }
     } else if (parameterCount == FOUR_PARAMETERS) {
         bool typeMatch3 =
             NapiUtil::MatchParameters(env, parameters, { napi_object, napi_string, napi_number, napi_function });
         if (typeMatch3) {
             hasAccountId = true;
+            hasCallback = true;
+            return true;
+        }
+        bool isAccountIdUndefined =
+            NapiUtil::MatchParameters(env, parameters, { napi_object, napi_string, napi_undefined, napi_function });
+        if (isAccountIdUndefined) {
+            hasAccountId = false;
             hasCallback = true;
             return true;
         }
@@ -124,15 +143,17 @@ void NativeImportVCard(napi_env env, void *data)
     }
     int32_t errorCode = TELEPHONY_SUCCESS;
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("App is not systemapp");
         errorCode = TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     } else {
         std::shared_ptr<DataShare::DataShareHelper> datashareHelper = asyncContext->datashareHelper;
         std::string filePath = asyncContext->filePath;
         if (datashareHelper == nullptr) {
+            TELEPHONY_LOGE("DatashareHelper is nullptr");
             errorCode = TELEPHONY_ERR_PERMISSION_ERR;
         } else {
-            VCardManager::GetInstance().SetDataHelper(datashareHelper);
-            errorCode = VCardManager::GetInstance().Import(filePath, asyncContext->accountId);
+            errorCode = VCardManager::GetInstance().ImportLock(filePath, datashareHelper, asyncContext->accountId);
+            TELEPHONY_LOGI("Import finish errorCode : %{public}d", errorCode);
         }
     }
     asyncContext->errorCode = errorCode;
@@ -216,9 +237,9 @@ void NativeExportVCard(napi_env env, void *data)
             std::shared_ptr<DataShare::DataSharePredicates> datasharePredicates = asyncContext->predicates;
             std::string charset = asyncContext->charset;
             std::string filePath = "";
-            VCardManager::GetInstance().SetDataHelper(datashareHelper);
-            errorCode =
-                VCardManager::GetInstance().Export(filePath, *datasharePredicates, asyncContext->cardType, charset);
+            errorCode = VCardManager::GetInstance().ExportLock(
+                filePath, datashareHelper, *datasharePredicates, asyncContext->cardType, charset);
+            TELEPHONY_LOGI("Export finish errorCode : %{public}d", errorCode);
             asyncContext->result = filePath;
         }
     }
@@ -265,11 +286,24 @@ bool MatchExportParameters(
             hasOption = true;
             return true;
         }
+        bool isOptionUndefined =
+            NapiUtil::MatchParameters(env, parameters, { napi_object, napi_object, napi_undefined });
+        if (isOptionUndefined) {
+            hasOption = false;
+            return true;
+        }
     } else if (parameterCount == FOUR_PARAMETERS) {
         bool typeMatch3 =
             NapiUtil::MatchParameters(env, parameters, { napi_object, napi_object, napi_object, napi_function });
         if (typeMatch3) {
             hasOption = true;
+            hasCallback = true;
+            return true;
+        }
+        bool isOptionUndefined =
+            NapiUtil::MatchParameters(env, parameters, { napi_object, napi_object, napi_undefined, napi_function });
+        if (isOptionUndefined) {
+            hasOption = false;
             hasCallback = true;
             return true;
         }
@@ -301,6 +335,32 @@ std::shared_ptr<DataShare::DataSharePredicates> GetDataSharePredicates(napi_env 
     return dataSharePredicates;
 }
 
+void HandleOptionParameters(napi_env env, napi_value parameters[], ExportContext *context)
+{
+    napi_value charset = NapiUtil::GetNamedProperty(env, parameters[TWO_PARAMETERS], "charset");
+    napi_valuetype charsetTemp = napi_undefined;
+    napi_typeof(env, charset, &charsetTemp);
+    bool isCharsetUndefined = (charsetTemp == napi_undefined);
+    if (charset != nullptr && !isCharsetUndefined) {
+        char strChars[NORMAL_STRING_SIZE] = { 0 };
+        size_t strLength = 0;
+        napi_get_value_string_utf8(env, charset, strChars, NORMAL_STRING_SIZE, &strLength);
+        std::string str8(strChars, strLength);
+        context->charset = str8;
+    } else {
+        context->charset = DEFAULT_CHARSET;
+    }
+    napi_value cardType = NapiUtil::GetNamedProperty(env, parameters[TWO_PARAMETERS], "cardType");
+    napi_valuetype cardTypeTemp = napi_undefined;
+    napi_typeof(env, cardType, &cardTypeTemp);
+    bool isCardTypeUndefined = (cardTypeTemp == napi_undefined);
+    if (cardType != nullptr && !isCardTypeUndefined) {
+        napi_get_value_int32(env, cardType, &context->cardType);
+    } else {
+        context->cardType = DEFAULT_CARD_TYPE;
+    }
+}
+
 napi_value ExportVCard(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = FOUR_PARAMETERS;
@@ -328,18 +388,7 @@ napi_value ExportVCard(napi_env env, napi_callback_info info)
         context->predicates = datasharePredicates;
     }
     if (hasOption) {
-        napi_value charset = NapiUtil::GetNamedProperty(env, parameters[2], "charset");
-        if (charset != nullptr) {
-            char strChars[NORMAL_STRING_SIZE] = { 0 };
-            size_t strLength = 0;
-            napi_get_value_string_utf8(env, charset, strChars, BUFF_LENGTH, &strLength);
-            std::string str8(strChars, strLength);
-            context->charset = str8;
-        }
-        napi_value cardType = NapiUtil::GetNamedProperty(env, parameters[2], "cardType");
-        if (cardType != nullptr) {
-            napi_get_value_int32(env, cardType, &context->cardType);
-        }
+        HandleOptionParameters(env, parameters, context);
     }
     if (hasCallback) {
         if (parameterCount == FOUR_PARAMETERS) {

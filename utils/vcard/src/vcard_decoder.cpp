@@ -19,6 +19,7 @@
 #include "vcard_decoder_v21.h"
 #include "vcard_decoder_v30.h"
 #include "vcard_decoder_v40.h"
+#include "vcard_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -30,6 +31,11 @@ VCardDecoder::~VCardDecoder() {}
 
 std::shared_ptr<VCardDecoder> VCardDecoder::Create(const std::string &path, int32_t &errorCode)
 {
+    if (!VCardUtils::EndWith(path, VCARD_FILE_EXTENSION)) {
+        errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
+        return nullptr;
+    }
+    fileUtils_.Close();
     errorCode = fileUtils_.Open(path);
     if (errorCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Failed to read path %{public}s", path.c_str());
@@ -43,6 +49,7 @@ std::shared_ptr<VCardDecoder> VCardDecoder::Create(const std::string &path, int3
 
 std::shared_ptr<VCardDecoder> VCardDecoder::Create(std::shared_ptr<std::ifstream> file, int32_t &errorCode)
 {
+    fileUtils_.Close();
     if (file == nullptr) {
         TELEPHONY_LOGE("file is nullptr");
         errorCode = TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -50,6 +57,11 @@ std::shared_ptr<VCardDecoder> VCardDecoder::Create(std::shared_ptr<std::ifstream
     fileUtils_.SetInputStream(file);
     errorCode = TELEPHONY_SUCCESS;
     return GetDecoder(GetVersion());
+}
+
+void VCardDecoder::Close()
+{
+    fileUtils_.Close();
 }
 
 std::string VCardDecoder::GetVersion()

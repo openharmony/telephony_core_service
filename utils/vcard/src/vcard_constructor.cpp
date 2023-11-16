@@ -67,10 +67,16 @@ void VCardConstructor::ContactBegin()
     } else {
         AddLine(VCARD_TYPE_VERSION, VERSION_21);
     }
+    headLength_ = result_.str().length();
 }
 
 void VCardConstructor::ContactEnd()
 {
+    if (headLength_ == result_.str().length()) {
+        TELEPHONY_LOGW("empty content");
+        result_.str("");
+        return;
+    }
     AddLine(VCARD_TYPE_END, DATA_VCARD);
 }
 
@@ -870,6 +876,7 @@ void VCardConstructor::HandleCharacter(int i, int32_t length, std::string value,
                     break;
                 }
             }
+            // fall_through
         }
         case '\n': {
             temp += "\\n";
@@ -880,6 +887,7 @@ void VCardConstructor::HandleCharacter(int i, int32_t length, std::string value,
                 temp += "\\\\";
                 break;
             }
+            // fall_through
         }
         case ',': {
             if (isV30OrV40_) {
@@ -968,6 +976,11 @@ void VCardConstructor::AddParamType(std::stringstream &result, const std::string
         result << PARAM_EQUAL;
     }
     result << paramType;
+}
+
+std::string VCardConstructor::ToString()
+{
+    return result_.str();
 }
 
 } // namespace Telephony
