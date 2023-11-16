@@ -1516,9 +1516,9 @@ int32_t CoreServiceStub::OnUnlockSimLock(MessageParcel &data, MessageParcel &rep
 int32_t CoreServiceStub::OnGetImsRegStatus(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    int32_t imsSrvType = data.ReadInt32();
+    ImsServiceType imsSrvType = static_cast<ImsServiceType>(data.ReadInt32());
     ImsRegInfo info;
-    int32_t result = GetImsRegStatus(slotId, static_cast<ImsServiceType>(imsSrvType), info);
+    int32_t result = GetImsRegStatus(slotId, imsSrvType, info);
     bool ret = reply.WriteInt32(result);
     ret = (ret && reply.WriteInt32(info.imsRegState));
     ret = (ret && reply.WriteInt32(info.imsRegTech));

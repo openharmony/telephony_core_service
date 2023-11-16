@@ -47,6 +47,7 @@ enum ImsRegTech {
  * @brief IMS service type
  */
 enum ImsServiceType {
+    TYPE_INVALID = -1,
     TYPE_VOICE = 0,
     TYPE_VIDEO = 1,
     TYPE_UT = 2,
