@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Telephony {
 class VCardEmailData : public VCardContactData {
 public:
-    VCardEmailData() {};
+    VCardEmailData() {}
     ~VCardEmailData() {}
     virtual int32_t BuildValuesBucket(OHOS::DataShare::DataShareValuesBucket &valuesBucket);
     virtual int32_t BuildData(std::shared_ptr<DataShare::DataShareResultSet> resultSet);

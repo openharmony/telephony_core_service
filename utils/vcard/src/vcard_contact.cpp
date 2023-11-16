@@ -341,14 +341,19 @@ void VCardContact::HandleName(std::vector<std::string> values, std::map<std::str
     switch (size) {
         case SIZE_FIVE:
             nameData_->SetSuffix(values[N_SUFFIX_VALUE_INDEX]);
+            // fall_through
         case SIZE_FOUR:
             nameData_->SetPrefix(values[N_PREFIX_VALUE_INDEX]);
+            // fall_through
         case SIZE_THREE:
             nameData_->SetMiddle(values[N_MIDDLE_VALUE_INDEX]);
+            // fall_through
         case SIZE_TWO:
             nameData_->SetGiven(values[N_GIVEN_VALUE_INDEX]);
+            // fall_through
         default:
             nameData_->SetFamily(values[N_FAMILY_VALUE_INDEX]);
+            break;
     }
 }
 
@@ -380,8 +385,10 @@ void VCardContact::HandleSortAsName(std::map<std::string, std::vector<std::strin
         switch (size) {
             case SIZE_THREE:
                 nameData_->SetPhoneticMiddle(sortNames[PHONETIC_MIDDLE_VALUE_INDEX]);
+                // fall_through
             case SIZE_TWO:
                 nameData_->SetPhoneticGiven(sortNames[PHONETIC_GIVEN_VALUE_INDEX]);
+                // fall_through
             default:
                 nameData_->SetPhoneticFamily(sortNames[PHONETIC_FAMILY_VALUE_INDEX]);
                 break;
@@ -659,7 +666,7 @@ void VCardContact::AddIms(std::string name, std::string rawValue, std::string pr
 {
     int32_t labeId = VCardUtils::GetLabelIdFromImType(name);
     std::shared_ptr<VCardImData> object = std::make_shared<VCardImData>();
-    std::vector<std::string> valueList = VCardUtils::Split(((parasMap.size() == 0) ? rawValue : propValue), ";");
+    std::vector<std::string> valueList = GetValueListFromParasMap(rawValue, propValue, parasMap);
     for (std::string value : valueList) {
         object->SetAddress(value);
     }
@@ -685,13 +692,13 @@ void VCardContact::AddNameData(std::string name, std::string rawValue, std::vect
     } else if (name == VCARD_TYPE_SORT_STRING) {
         nameData_->setSort(propValue);
     } else if (name == VCARD_TYPE_X_PHONETIC_FIRST_NAME) {
-        std::vector<std::string> valueList = VCardUtils::Split(((parasMap.size() == 0) ? rawValue : propValue), ";");
+        std::vector<std::string> valueList = GetValueListFromParasMap(rawValue, propValue, parasMap);
         nameData_->SetPhoneticGiven((valueList.size() != 0) ? valueList[0] : "");
     } else if (name == VCARD_TYPE_X_PHONETIC_MIDDLE_NAME) {
-        std::vector<std::string> valueList = VCardUtils::Split(((parasMap.size() == 0) ? rawValue : propValue), ";");
+        std::vector<std::string> valueList = GetValueListFromParasMap(rawValue, propValue, parasMap);
         nameData_->SetPhoneticMiddle((valueList.size() != 0) ? valueList[0] : "");
     } else if (name == VCARD_TYPE_X_PHONETIC_LAST_NAME) {
-        std::vector<std::string> valueList = VCardUtils::Split(((parasMap.size() == 0) ? rawValue : propValue), ";");
+        std::vector<std::string> valueList = GetValueListFromParasMap(rawValue, propValue, parasMap);
         nameData_->SetPhoneticFamily((valueList.size() != 0) ? valueList[0] : "");
     } else {
         TELEPHONY_LOGI("No need to do anything");
@@ -701,7 +708,7 @@ void VCardContact::AddNameData(std::string name, std::string rawValue, std::vect
 void VCardContact::AddCustom(
     std::string rawValue, std::map<std::string, std::vector<std::string>> parasMap, std::string propValue)
 {
-    std::vector<std::string> values = VCardUtils::Split(((parasMap.size() == 0) ? rawValue : propValue), ";");
+    std::vector<std::string> values = GetValueListFromParasMap(rawValue, propValue, parasMap);
     std::string type = (values.size() != 0) ? values[0] : "";
     if (type == TypeData::NICKNAME) {
         std::shared_ptr<VCardNicknameData> object = std::make_shared<VCardNicknameData>();
@@ -777,27 +784,25 @@ void VCardContact::SetSip(
 void VCardContact::AddSipData(
     std::string rawValue, std::map<std::string, std::vector<std::string>> parasMap, std::string propValue)
 {
-    if (parasMap.size() == 0) {
-        std::shared_ptr<VCardSipData> object = std::make_shared<VCardSipData>();
-        std::vector<std::string> values = VCardUtils::Split(rawValue, ";");
-        for (size_t i = 0; i < values.size(); i++) {
-            if (i == SIZE_ZERO) {
-                std::vector<std::string> address = VCardUtils::Split(values[i], ":");
-                object->SetAddress((address.size() >= SIZE_TWO) ? address[1] : "");
-            }
-            if (i == SIZE_ONE) {
-                object->SetLabelId(values[i]);
-            }
-            if (i == SIZE_TWO) {
-                object->SetLabelName(values[i]);
-            }
+    if (parasMap.size() != 0 && !propValue.empty()) {
+        SetSip(rawValue, parasMap, propValue);
+        return;
+    }
+    std::shared_ptr<VCardSipData> object = std::make_shared<VCardSipData>();
+    std::vector<std::string> values = VCardUtils::Split(rawValue, ";");
+    for (size_t i = 0; i < values.size(); i++) {
+        if (i == SIZE_ZERO) {
+            std::vector<std::string> address = VCardUtils::Split(values[i], ":");
+            object->SetAddress((address.size() >= SIZE_TWO) ? address[1] : "");
         }
-        sips_.push_back(object);
-    } else {
-        if (!propValue.empty()) {
-            SetSip(rawValue, parasMap, propValue);
+        if (i == SIZE_ONE) {
+            object->SetLabelId(values[i]);
+        }
+        if (i == SIZE_TWO) {
+            object->SetLabelName(values[i]);
         }
     }
+    sips_.push_back(object);
 }
 
 void VCardContact::AddPhonesData(std::string rawValue, std::string propValue, std::vector<std::string> values,
@@ -1087,6 +1092,12 @@ void VCardContact::AddImppDatas(std::string propValue, std::map<std::string, std
         }
         HandleSipCase(propValue, typeCollection);
     }
+}
+
+std::vector<std::string> VCardContact::GetValueListFromParasMap(
+    std::string rawValue, std::string propValue, std::map<std::string, std::vector<std::string>> parasMap)
+{
+    return VCardUtils::Split(((parasMap.size() == 0) ? rawValue : propValue), ";");
 }
 
 } // namespace Telephony
