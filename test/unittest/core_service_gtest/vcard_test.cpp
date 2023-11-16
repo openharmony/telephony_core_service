@@ -38,7 +38,7 @@ using namespace testing::ext;
 namespace {
 std::string CONTACT_URI = "datashare:///com.ohos.contactsdataability";
 constexpr const char *TEL_FILE_NAME = "example.vcf";
-std::string importTestInputString = R"(
+std::string IMPORT_TEST_STR = R"(
 BEGIN:VCARD
 VERSION:2.1
 N:Zhang;San;Jun;Mr.;Jr.
@@ -59,7 +59,7 @@ N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=4E;;;;
 END:VCARD
 
 )";
-std::string inputString2 = R"(
+std::string INPUT_STR_TWO = R"(
 BEGIN:VCARD
 VERSION:2.1
 N:Zhang;San;Jun;Mr.;Jr.
@@ -81,14 +81,14 @@ END:VCARD
 
 )";
 
-std::string inputString3 =
+std::string INPUT_STR_THREE =
     "BEGIN:VCARD\r\nVERSION:2.1\r\nX_OHOS_CUSTOM;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:relation;="
     "E6=B5=8B=E8=AF=95;=E6=B5=8B=E8=AF=95=69=64;=E6=B5=8B=E8=AF=95=6E=61=6D=65\r\nX_OHOS_CUSTOM:"
     "relation;realationName;labelId;labelName\r\nEND:VCARD\r\n";
-std::string inputString4 =
+std::string INPUT_STR_FOUR =
     "BEGIN:VCARD\r\nVERSION:2.1\r\nX_OHOS_CUSTOM:contact_event;20230102;1;test\r\nBDAY:20230103\r\nEND:VCARD\r\n";
 
-std::string inputString5 = R"(
+std::string INPUT_STR_FIVE = R"(
 BEGIN:VCARD
 VERSION:2.0
 N;CHARSET=UTF-8:刘;小;;;
@@ -208,7 +208,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_000, Function | MediumTest | Level2)
     if (dataShareHelper != nullptr) {
         TELEPHONY_LOGI("CreateDataShareHelper start test!!");
         VCardManager::GetInstance().SetDataHelper(dataShareHelper);
-        WriteTestData(importTestInputString);
+        WriteTestData(IMPORT_TEST_STR);
         std::vector<std::string> columns;
         OHOS::DataShare::DataSharePredicates predicates;
         predicates.Between(Contact::ID, "0", "100");
@@ -326,7 +326,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_001, Function | MediumTest | Level1)
  */
 HWTEST_F(VcardTest, Telephony_VCardTest_002, Function | MediumTest | Level1)
 {
-    WriteTestData(inputString2);
+    WriteTestData(INPUT_STR_TWO);
     int32_t errorCode;
     VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
@@ -340,7 +340,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_002, Function | MediumTest | Level1)
  */
 HWTEST_F(VcardTest, Telephony_VCardTest_003, Function | MediumTest | Level1)
 {
-    WriteTestData(inputString5);
+    WriteTestData(INPUT_STR_FIVE);
     int32_t errorCode;
     VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
@@ -1220,7 +1220,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_Multi_Thread_Import, Function | MediumTe
     std::vector<std::string> fileNames;
     std::string copiedString;
     for (int i = 0; i < testStringNum; ++i) {
-        copiedString += inputString5;
+        copiedString += INPUT_STR_FIVE;
     }
     for (int i = 0; i < testNum; i++) {
         std::string fileName = "TestFile_" + std::to_string(i) + ".vcf";
