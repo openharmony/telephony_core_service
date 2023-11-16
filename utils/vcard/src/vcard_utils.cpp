@@ -182,7 +182,7 @@ std::string VCardUtils::CreateFileName()
     std::time_t now = std::time(nullptr);
     std::tm *timeinfo = std::localtime(&now);
     std::ostringstream oss;
-    oss << std::put_time(timeinfo, "%Y%m%d_%H%M%S");
+    oss << std::put_time(timeinfo, VCARD_TIME_FORMAT);
     std::string fileName = oss.str() + ".vcf";
     return fileName;
 }
@@ -197,8 +197,8 @@ void VCardUtils::SaveFile(const std::string &fileStr, const std::string &path)
         while (std::getline(ss, line)) {
             file << line << std::endl;
         }
+        file.close();
     }
-    file.close();
 }
 
 bool VCardUtils::IsWrapPrintableAscii(std::vector<std::string> strs)
@@ -299,25 +299,29 @@ std::vector<std::string> VCardUtils::GetTypeFromPhoneLabelId(std::string labelId
         paramTypes.push_back(it->second);
         return paramTypes;
     }
-    if (phoneType == PhoneVcType::NUM_FAX_HOME) {
-        paramTypes.push_back(VCARD_PARAM_TYPE_HOME);
-        paramTypes.push_back(VCARD_PARAM_TYPE_FAX);
-        return paramTypes;
-    }
-    if (phoneType == PhoneVcType::NUM_FAX_WORK) {
-        paramTypes.push_back(VCARD_PARAM_TYPE_WORK);
-        paramTypes.push_back(VCARD_PARAM_TYPE_FAX);
-        return paramTypes;
-    }
-    if (phoneType == PhoneVcType::NUM_WORK_MOBILE) {
-        paramTypes.push_back(VCARD_PARAM_TYPE_WORK);
-        paramTypes.push_back(VCARD_PARAM_TYPE_CELL);
-        return paramTypes;
-    }
-    if (phoneType == PhoneVcType::NUM_WORK_PAGER) {
-        paramTypes.push_back(VCARD_PARAM_TYPE_WORK);
-        paramTypes.push_back(VCARD_PARAM_TYPE_PAGER);
-        return paramTypes;
+    switch (phoneType) {
+        case PhoneVcType::NUM_FAX_HOME: {
+            paramTypes.push_back(VCARD_PARAM_TYPE_HOME);
+            paramTypes.push_back(VCARD_PARAM_TYPE_FAX);
+            return paramTypes;
+        }
+        case PhoneVcType::NUM_FAX_WORK: {
+            paramTypes.push_back(VCARD_PARAM_TYPE_WORK);
+            paramTypes.push_back(VCARD_PARAM_TYPE_FAX);
+            return paramTypes;
+        }
+        case PhoneVcType::NUM_WORK_MOBILE: {
+            paramTypes.push_back(VCARD_PARAM_TYPE_WORK);
+            paramTypes.push_back(VCARD_PARAM_TYPE_CELL);
+            return paramTypes;
+        }
+        case PhoneVcType::NUM_WORK_PAGER: {
+            paramTypes.push_back(VCARD_PARAM_TYPE_WORK);
+            paramTypes.push_back(VCARD_PARAM_TYPE_PAGER);
+            return paramTypes;
+        }
+        default:
+            break;
     }
     return paramTypes;
 }
@@ -334,7 +338,6 @@ std::string VCardUtils::TrimListToString(const std::vector<std::string> &strs)
                 result += ";";
             }
         }
-        return result;
     } else if (size == 1) {
         return strs[0];
     } else {
@@ -399,8 +402,8 @@ void VCardUtils::HandleTypeAndLabel(int32_t &type, std::string &label, std::stri
     std::map<std::string, PhoneVcType>::iterator iter = typeToPhoneTypeMap.begin();
     iter = typeToPhoneTypeMap.find(labelCandidate);
     if (iter != typeToPhoneTypeMap.end()) {
-        PhoneVcType tmp = iter->second;
-        int32_t typeCandidate = static_cast<int32_t>(tmp);
+        PhoneVcType phoneType = iter->second;
+        int32_t typeCandidate = static_cast<int32_t>(phoneType);
 
         std::size_t indexOfAt = -1;
         std::size_t found = number.find("@");

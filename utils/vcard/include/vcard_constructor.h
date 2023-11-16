@@ -73,6 +73,7 @@ public:
     void ConstructPostalLine(std::shared_ptr<VCardPostalData> postalData, std::stringstream &postalLine,
         bool &needCharset, bool &needAddQuotedPrintable);
     void AddPostalLine(std::shared_ptr<VCardPostalData> postalData, int32_t postalType, const std::string &labelName);
+    std::string ToString();
 
 private:
     int32_t ConstructName(std::shared_ptr<VCardContact> contact);
@@ -91,6 +92,7 @@ private:
     int32_t ConstructNameV40(std::shared_ptr<VCardContact> contact);
 
 private:
+    size_t headLength_;
     int32_t cardType_;
     std::string charset_;
     std::stringstream result_;

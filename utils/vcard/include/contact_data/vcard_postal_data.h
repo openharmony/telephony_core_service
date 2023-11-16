@@ -22,24 +22,7 @@ namespace OHOS {
 namespace Telephony {
 class VCardPostalData : public VCardContactData {
 public:
-    VCardPostalData()
-    {
-        pobox_ = "";
-        extendedAddress_ = "";
-        street_ = "";
-        region_ = "";
-        postCode_ = "";
-        country_ = "";
-        city_ = "";
-        type_ = 0;
-        postalAddress_ = "";
-        localty_ = "";
-        postalCode_ = "";
-        label_ = "";
-        neighborhood_ = "";
-        labelId_ = "";
-        labelName_ = "";
-    };
+    VCardPostalData() {}
     ~VCardPostalData() {}
     virtual int32_t BuildValuesBucket(OHOS::DataShare::DataShareValuesBucket &valuesBucket);
     virtual int32_t BuildData(std::shared_ptr<DataShare::DataShareResultSet> resultSet);
@@ -73,21 +56,20 @@ private:
     const int32_t REGION_VALUE_INDEX = 4;
     const int32_t POSTCODE_VALUE_INDEX = 5;
     const int32_t COUNTRY_VALUE_INDEX = 6;
-    std::string pobox_;
-    std::string extendedAddress_;
-    std::string street_;
-    std::string localty_;
-    std::string region_;
-    std::string postalCode_;
-    std::string country_;
-    std::string city_;
-    int32_t type_;
-    std::string label_;
-    std::string postCode_;
-    std::string neighborhood_;
-    std::string postalAddress_;
-    std::string labelId_;
-    std::string labelName_;
+    std::string pobox_ = "";
+    std::string extendedAddress_ = "";
+    std::string street_ = "";
+    std::string localty_ = "";
+    std::string region_ = "";
+    std::string postalCode_ = "";
+    std::string country_ = "";
+    std::string city_ = "";
+    std::string label_ = "";
+    std::string postCode_ = "";
+    std::string neighborhood_ = "";
+    std::string postalAddress_ = "";
+    std::string labelId_ = "";
+    std::string labelName_ = "";
 };
 } // namespace Telephony
 } // namespace OHOS

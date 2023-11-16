@@ -30,24 +30,14 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr size_t ARRAY_SIZE = 64;
-constexpr size_t kMaxNumberLen = 100;
-
 const int32_t DEFAULT_ERROR = -1;
-constexpr size_t BUFF_LENGTH = 101;
-constexpr int32_t NONE_PARAMETER = 0;
-constexpr int32_t ONE_PARAMETER = 1;
-constexpr int32_t TWO_PARAMETERS = 2;
-constexpr int32_t THREE_PARAMETERS = 3;
-constexpr int32_t FOUR_PARAMETERS = 4;
-constexpr int32_t PARAMETERS_INDEX_TWO = 2;
-constexpr int32_t PARAMETERS_INDEX_THREE = 3;
+const int32_t DEFAULT_CARD_TYPE = 0;
 
 struct ExportContext : BaseContext {
     std::shared_ptr<DataShare::DataShareHelper> datashareHelper;
     std::shared_ptr<DataShare::DataSharePredicates> predicates;
-    int32_t cardType = DEFAULT_ERROR;
-    std::string charset = "";
+    int32_t cardType = DEFAULT_CARD_TYPE;
+    std::string charset = "UTF-8";
     std::string result = "";
 };
 

@@ -38,6 +38,7 @@ public:
     VCardDecoder();
     static std::shared_ptr<VCardDecoder> Create(const std::string &path, int32_t &errorCode);
     static std::shared_ptr<VCardDecoder> Create(std::shared_ptr<std::ifstream> file_, int32_t &errorCode);
+    static void Close();
     virtual void AddVCardDecodeListener(std::shared_ptr<VCardDecodeListener> listener);
     virtual void Decode(int32_t &errorCode);
     virtual bool DecodeOne(int32_t &errorCode);
