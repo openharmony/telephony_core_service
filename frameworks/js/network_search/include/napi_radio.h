@@ -42,6 +42,7 @@ constexpr int DEFAULT_ERROR = ERROR_SERVICE_UNAVAILABLE;
 constexpr int BUF_SIZE = 32;
 constexpr int CALLBACK_VALUES_SIZE = 1;
 constexpr int WAIT_TIME_SECOND = 60 * 3;
+constexpr int WAIT_NETWORK_MANUAL_SEARCH_TIME_SECOND = 60 * 5;
 const static std::string GSM = "GSM";
 const static std::string GPRS = "GPRS";
 const static std::string WCDMA = "WCDMA";
