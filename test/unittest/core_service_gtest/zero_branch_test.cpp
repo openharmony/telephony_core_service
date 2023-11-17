@@ -1920,6 +1920,7 @@ HWTEST_F(BranchTest, Telephony_TelRilModem_001, Function | MediumTest | Level1)
     std::shared_ptr<TelRilModem> telRilModem = std::make_shared<TelRilModem>(
         SLOT_ID_0, nullptr, observerHandlers[SLOT_ID_0], handler);
     if (telRilModem != nullptr) {
+        telRilModem->RadioStateUpdated(ModemPowerState::CORE_SERVICE_POWER_ON);
         EXPECT_EQ(telRilModem->OnRilAdapterHostDied(), TELEPHONY_ERR_SUCCESS);
     }
 }
