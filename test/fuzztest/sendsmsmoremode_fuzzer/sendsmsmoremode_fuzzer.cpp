@@ -190,7 +190,6 @@ void DeactivatePdpContext(const uint8_t *data, size_t size)
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
     if (eventLoop_ == nullptr) {
-        TELEPHONY_LOGE("Failed to create EventRunner");
         return;
     }
     auto handler_ = std::make_shared<TelRilHandler>(eventLoop_);
