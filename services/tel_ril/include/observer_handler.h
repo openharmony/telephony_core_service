@@ -41,6 +41,7 @@ public:
 
     void NotifyObserver(int32_t what, int64_t param)
     {
+        std::lock_guard<std::mutex> lock(mutex_);
         auto iter = observerHandlerMap_.find(what);
         if (iter == observerHandlerMap_.end()) {
             TELEPHONY_LOGE("ObserverHandler NotifyObserver %{public}d not register", what);
@@ -55,6 +56,7 @@ public:
     template<typename T>
     void NotifyObserver(int32_t what, std::shared_ptr<T> object)
     {
+        std::lock_guard<std::mutex> lock(mutex_);
         auto iter = observerHandlerMap_.find(what);
         if (iter == observerHandlerMap_.end()) {
             TELEPHONY_LOGE("ObserverHandler NotifyObserver %{public}d not register", what);
