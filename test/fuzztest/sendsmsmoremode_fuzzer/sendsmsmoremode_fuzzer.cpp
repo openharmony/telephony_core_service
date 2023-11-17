@@ -61,6 +61,7 @@ void SendSmsMoreMode(const uint8_t *data, size_t size)
         return;
     }
     auto handler_ = std::make_shared<TelRilHandler>(eventLoop_);
+    handler_ = nullptr;
     auto telRilSms = std::make_shared<TelRilSms>(slotId, rilInterface_, observerHandler, handler_);
     telRilSms->SendSmsMoreMode(smscPdu, pdu, response);
     telRilSms->IsSmsRespOrNotify(code);
@@ -103,6 +104,7 @@ void GetCallList(const uint8_t *data, size_t size)
         return;
     }
     auto handler_ = std::make_shared<TelRilHandler>(eventLoop_);
+    handler_ = nullptr;
     auto telRilCall = std::make_shared<TelRilCall>(slotId, rilInterface_, observerHandler, handler_);
     telRilCall->GetCallList(result);
     telRilCall->Dial(address, index, result);
@@ -144,6 +146,7 @@ void AnswerResponse(const uint8_t *data, size_t size)
         return;
     }
     auto handler_ = std::make_shared<TelRilHandler>(eventLoop_);
+    handler_ = nullptr;
     auto telRilCall = std::make_shared<TelRilCall>(slotId, rilInterface_, observerHandler, handler_);
     telRilCall->HoldCall(result);
     telRilCall->UnHoldCall(result);
@@ -191,6 +194,7 @@ void DeactivatePdpContext(const uint8_t *data, size_t size)
         return;
     }
     auto handler_ = std::make_shared<TelRilHandler>(eventLoop_);
+    handler_ = nullptr;
     auto telRilData = std::make_shared<TelRilData>(slotId, rilInterface_, observerHandler, handler_);
     telRilData->DeactivatePdpContext(cid, reason, response);
     telRilData->DeactivatePdpContextResponse(responseInfo);
@@ -223,6 +227,7 @@ void SimStkProactiveNotify(const uint8_t *data, size_t size)
         return;
     }
     auto handler_ = std::make_shared<TelRilHandler>(eventLoop_);
+    handler_ = nullptr;
     auto telRilSim = std::make_shared<TelRilSim>(slotId, rilInterface_, observerHandler, handler_);
     telRilSim->SimStkProactiveNotify(response);
     telRilSim->SimStkAlphaNotify(response);
@@ -270,6 +275,7 @@ void GetSimStatus(const uint8_t *data, size_t size)
         return;
     }
     auto handler_ = std::make_shared<TelRilHandler>(eventLoop_);
+    handler_ = nullptr;
     auto telRilSim = std::make_shared<TelRilSim>(slotId, rilInterface_, observerHandler, handler_);
     telRilSim->GetSimStatus(result);
     telRilSim->GetSimIO(simIoInfo, result);
