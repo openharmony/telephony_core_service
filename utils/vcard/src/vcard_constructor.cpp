@@ -867,7 +867,7 @@ void VCardConstructor::HandleCharacter(int i, int32_t length, std::string value,
     auto ch = value[i];
     switch (ch) {
         case ';': {
-            temp += '\\' + ';';
+            temp += "\\;";
             break;
         }
         case '\r': {
