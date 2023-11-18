@@ -39,6 +39,7 @@ VCardConstructor::VCardConstructor(int32_t cardType, const std::string &charset)
 
 std::string VCardConstructor::ContactVCard(std::shared_ptr<VCardContact> contact)
 {
+    result_.str("");
     ContactBegin();
     ConstructName(contact);
     ConstructPhones(contact);
