@@ -256,7 +256,7 @@ int32_t VCardManager::Export(
     std::string result = "";
     VCardEncoder encoder { cardType, charset };
     while (resultSetNum == 0 && errorCode == TELEPHONY_SUCCESS) {
-        result += encoder.ContructVCard(resultSet, errorCode);
+        result = encoder.ContructVCard(resultSet, errorCode);
         resultSetNum = resultSet->GoToNextRow();
     }
     if (errorCode != TELEPHONY_SUCCESS) {
