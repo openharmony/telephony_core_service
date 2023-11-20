@@ -108,7 +108,7 @@ void TelRilHandler::ReduceRunningLock(int32_t lockType)
         } else {
             reqRunningLockCount_ = 0;
             TELEPHONY_LOGD("ReduceRunningLock, UnLock");
-            reqRunningLock_->UnLock();
+            ReleaseRunningLockDelay(lockType);
         }
     } else {
         TELEPHONY_LOGW("ReduceRunningLock type %{public}d don't processe.", lockType);
@@ -127,13 +127,41 @@ void TelRilHandler::ReleaseRunningLock(int32_t lockType)
     TELEPHONY_LOGD("ReleaseRunningLock, lockType:%{public}d", lockType);
     if (lockType == NORMAL_RUNNING_LOCK) {
         reqRunningLockCount_ = 0;
-        reqRunningLock_->UnLock();
+        ReleaseRunningLockDelay(lockType);
     } else if (lockType == ACK_RUNNING_LOCK) {
-        ackRunningLock_->UnLock();
+        ReleaseRunningLockDelay(lockType);
     } else {
         TELEPHONY_LOGE("ReleaseRunningLock, lockType:%{public}d is invalid", lockType);
     }
 #endif
 }
+
+void TelRilHandler::ReleaseRunningLockDelay(int32_t lockType)
+{
+#ifdef ABILITY_POWER_SUPPORT
+    int ret = ERR_OK;
+    if (lockType == NORMAL_RUNNING_LOCK) {
+        ret = reqRunningLock_->UnLock();
+    } else if (lockType == ACK_RUNNING_LOCK) {
+        ret = ackRunningLock_->UnLock();
+    } else {
+        TELEPHONY_LOGE("ReleaseRunningLockDelay, lockType:%{public}d is invalid", lockType);
+    }
+    if (ret != PowerMgr::E_GET_POWER_SERVICE_FAILED) {
+        return;
+    }
+
+    TELEPHONY_LOGI("ReleaseRunningLockDelay, lockType:%{public}d, no found power service", lockType);
+    if (lockType == NORMAL_RUNNING_LOCK) {
+        this->SendEvent(RUNNING_LOCK_TIMEOUT_EVENT_ID, reqLockSerialNum_, DELAR_RELEASE_RUNNING_LOCK_TIMEOUT_MS);
+    } else if (lockType == ACK_RUNNING_LOCK) {
+        this->SendEvent(ACK_RUNNING_LOCK_TIMEOUT_EVENT_ID, ackLockSerialNum_, DELAR_RELEASE_RUNNING_LOCK_TIMEOUT_MS);
+    } else {
+        // do nothing, never come in
+        TELEPHONY_LOGE("lockType is invalid");
+    }
+#endif
+}
+
 } // namespace Telephony
 } // namespace OHOS
