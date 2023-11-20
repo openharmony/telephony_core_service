@@ -55,7 +55,6 @@ public:
     int32_t GetShowName(int32_t slotId, std::u16string &showName);
     int32_t SetShowName(int32_t slotId, std::u16string name, bool force = false);
     bool IsSimActive(int32_t slotId);
-    bool IsSimActivatable(int32_t slotId);
     int32_t SetActiveSim(int32_t slotId, int32_t enable, bool force = false);
     bool SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable);
     bool ForgetAllData();
@@ -67,11 +66,11 @@ public:
     int32_t GetActiveSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList);
     int32_t GetRadioProtocolTech(int32_t slotId);
     void GetRadioProtocol(int32_t slotId);
+    bool InitShowName(int slotId);
 
 private:
     bool IsValidData(int32_t slotId);
     int32_t GetFirstActivedSlotId();
-    bool InitShowName(int slotId);
     bool InitShowNumber(int slotId);
     bool InitActive(int slotId);
     bool InitIccId(int slotId);
