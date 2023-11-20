@@ -20,6 +20,7 @@
 #include "event_runner.h"
 #ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
+#include "power_mgr_errors.h"
 #endif
 
 namespace OHOS {
@@ -37,13 +38,16 @@ public:
     void ReleaseRunningLock(int32_t lockType);
 
 public:
+    static const int32_t NORMAL_RUNNING_LOCK = 100;
+    static const int32_t ACK_RUNNING_LOCK = 101;
+
+private:
     static const uint32_t RUNNING_LOCK_TIMEOUT_EVENT_ID = 0;
     static const uint32_t ACK_RUNNING_LOCK_TIMEOUT_EVENT_ID = 1;
 
     static const int64_t RUNNING_LOCK_DEFAULT_TIMEOUT_MS = 60 * 1000; // 60s
     static const int64_t ACK_RUNNING_LOCK_DEFAULT_TIMEOUT_MS = 200; // 200ms
-    static const int32_t NORMAL_RUNNING_LOCK = 100;
-    static const int32_t ACK_RUNNING_LOCK = 101;
+    static const int64_t DELAR_RELEASE_RUNNING_LOCK_TIMEOUT_MS = 5 * 1000; // 5s
 
 private:
 #ifdef ABILITY_POWER_SUPPORT
@@ -54,6 +58,9 @@ private:
     std::atomic_int reqLockSerialNum_;
     std::atomic_int ackLockSerialNum_;
     std::mutex mutexRunningLock_;
+
+private:
+    void ReleaseRunningLockDelay(int32_t lockType);
 };
 } // namespace Telephony
 } // namespace OHOS
