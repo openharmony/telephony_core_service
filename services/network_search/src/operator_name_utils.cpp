@@ -76,7 +76,7 @@ int32_t OperatorNameUtils::ParserOperatorNameCustJson(std::vector<OperatorNameCu
         ret = LoaderJsonFile(content, path);
     }
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE(" load fail!");
+        TELEPHONY_LOGE("load fail!");
         return ret;
     }
     if (content == nullptr) {
@@ -93,13 +93,14 @@ int32_t OperatorNameUtils::ParserOperatorNameCustJson(std::vector<OperatorNameCu
     Json::CharReader *reader(builder.newCharReader());
     if (!reader->parse(rawJson.c_str(), rawJson.c_str() + contentLength, &root, &err)) {
         TELEPHONY_LOGE("reader is error!");
+        delete reader;
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
     delete reader;
     reader = nullptr;
     Json::Value itemRoots = root[ITEM_OPERATOR_NAMES];
     if (itemRoots.size() == 0) {
-        TELEPHONY_LOGE(" itemRoots size == 0!");
+        TELEPHONY_LOGE("itemRoots size == 0!");
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
     ParserOperatorNames(vec, itemRoots);
