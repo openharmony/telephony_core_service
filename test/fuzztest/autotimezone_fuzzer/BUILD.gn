@@ -65,8 +65,6 @@ ohos_fuzztest("AutoTimeZoneFuzzTest") {
     "i18n:zone_util",
     "init:libbegetutil",
     "ipc:ipc_single",
-    "location:lbsservice_common",
-    "location:locator_sdk",
     "napi:ace_napi",
     "netmanager_base:net_conn_manager_if",
     "netmanager_ext:net_tether_manager_if",
@@ -78,6 +76,16 @@ ohos_fuzztest("AutoTimeZoneFuzzTest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.location_location) &&
+      global_parts_info.location_location) {
+    external_deps += [
+      "location:lbsservice_common",
+      "location:locator_sdk",
+    ]
+    defines += [ "ABILITY_LOCATION_SUPPORT" ]
+  }
 
   cflags = [
     "-g",

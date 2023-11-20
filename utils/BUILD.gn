@@ -37,6 +37,13 @@ config("tel_utils_config") {
   ]
 }
 
+config("tel_contact_config") {
+  include_dirs = [
+    "vcard/include",
+    "vcard/include/contact_data",
+  ]
+}
+
 ohos_shared_library("libtel_common") {
   version_script = "libtel_common.versionscript"
   sources = [
@@ -83,6 +90,82 @@ ohos_shared_library("libtel_common") {
     "napi:ace_napi",
     "preferences:native_preferences",
     "samgr:samgr_proxy",
+  ]
+
+  innerapi_tags = [ "platformsdk" ]
+  part_name = "core_service"
+  subsystem_name = "telephony"
+}
+
+ohos_shared_library("libtel_vcard") {
+  version_script = "libtel_vcard.versionscript"
+  sources = [
+    "vcard/src/contact_data/vcard_anniversary_data.cpp",
+    "vcard/src/contact_data/vcard_birthday_data.cpp",
+    "vcard/src/contact_data/vcard_email_data.cpp",
+    "vcard/src/contact_data/vcard_event_data.cpp",
+    "vcard/src/contact_data/vcard_im_data.cpp",
+    "vcard/src/contact_data/vcard_name_data.cpp",
+    "vcard/src/contact_data/vcard_nickname_data.cpp",
+    "vcard/src/contact_data/vcard_note_data.cpp",
+    "vcard/src/contact_data/vcard_organization_data.cpp",
+    "vcard/src/contact_data/vcard_phone_data.cpp",
+    "vcard/src/contact_data/vcard_photo_data.cpp",
+    "vcard/src/contact_data/vcard_postal_data.cpp",
+    "vcard/src/contact_data/vcard_relation_data.cpp",
+    "vcard/src/contact_data/vcard_sip_data.cpp",
+    "vcard/src/contact_data/vcard_website_data.cpp",
+    "vcard/src/vcard_configuration.cpp",
+    "vcard/src/vcard_constructor.cpp",
+    "vcard/src/vcard_contact.cpp",
+    "vcard/src/vcard_decoder.cpp",
+    "vcard/src/vcard_decoder_v21.cpp",
+    "vcard/src/vcard_decoder_v30.cpp",
+    "vcard/src/vcard_decoder_v40.cpp",
+    "vcard/src/vcard_encoder.cpp",
+    "vcard/src/vcard_file_utils.cpp",
+    "vcard/src/vcard_manager.cpp",
+    "vcard/src/vcard_raw_data.cpp",
+    "vcard/src/vcard_rdb_helper.cpp",
+    "vcard/src/vcard_utils.cpp",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"TelephonyVCard\"",
+    "LOG_DOMAIN = 0xD001F04",
+  ]
+
+  if (is_standard_system) {
+    defines += [ "STANDARD_SYSTEM_ENABLE" ]
+  }
+
+  configs = [ "../utils:telephony_log_config" ]
+
+  public_configs = [ ":tel_contact_config" ]
+
+  if (is_double_framework) {
+    cflags_cc = [ "-DCONFIG_DUAL_FRAMEWORK" ]
+  }
+
+  include_dirs = [
+    ":tel_contact_config",
+    "../interfaces/innerkits/include/",
+    "//third_party/glib/glib",
+    "//third_party/glib",
+  ]
+
+  deps = [ "//third_party/glib:glib_packages" ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:data_ability_helper",
+    "c_utils:utils",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "hilog:libhilog",
+    "init:libbegetutil",
   ]
 
   innerapi_tags = [ "platformsdk" ]

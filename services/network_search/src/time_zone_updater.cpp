@@ -19,7 +19,9 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "net_all_capabilities.h"
+#ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
+#endif
 #include "setting_utils.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -38,7 +40,9 @@ const std::string SHIELD_COUNTRY_CODE_RU = "ru";
 const std::string SHIELD_TIME_ZONE_RU = "asia/omsk";
 const std::string MULTI_TIMEZONE_COUNTRY_CODE[] = { "au", "br", "ca", "cd", "cl", "cy", "ec", "es", "fm", "gl", "id",
     "ki", "kz", "mn", "mx", "nz", "pf", "pg", "pt", "ru", "um", "us" };
-constexpr int32_t TIMEZONE_OFFSET_INVALID = 0xFFFFFFFF;
+constexpr int32_t TIMEZONE_OFFSET_MAX = 24 * 4;
+constexpr int32_t TIMEZONE_OFFSET_MIN = -24 * 4;
+constexpr int32_t TIMEZONE_OFFSET_INVALID = TIMEZONE_OFFSET_MAX + 1;
 constexpr uint32_t QUARTER_TO_MILLISECOND = 15 * 60 * 1000;
 constexpr int LOCATION_TIME_OUT_MS = 30 * 1000;
 
@@ -226,7 +230,11 @@ bool TimeZoneUpdater::IsLocationTimeZoneEnabled()
 
 bool TimeZoneUpdater::IsScreenOn()
 {
-    return PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
+    bool isScreenOn = false;
+#ifdef ABILITY_POWER_SUPPORT
+    isScreenOn = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
+#endif
+    return isScreenOn;
 }
 
 std::string TimeZoneUpdater::StringToLower(const std::string &str)
@@ -377,7 +385,11 @@ void TimeZoneUpdater::UpdateCountryCode(std::string &countryCode, int32_t slotId
 
 void TimeZoneUpdater::UpdateTimeZoneOffset(int32_t offset, int32_t slotId)
 {
-    if (offset_ == offset || offset == TIMEZONE_OFFSET_INVALID) {
+    if (offset > TIMEZONE_OFFSET_MAX || offset < TIMEZONE_OFFSET_MIN) {
+        TELEPHONY_LOGE("offset is invalid");
+        return;
+    }
+    if (offset_ == offset) {
         return;
     }
     OHOS::Global::I18n::ZoneUtil util;
@@ -439,7 +451,7 @@ void TimeZoneUpdater::UpdateTelephonyTimeZone()
 
 bool TimeZoneUpdater::UpdateTelephonyTimeZone(int32_t offset)
 {
-    if (offset == TIMEZONE_OFFSET_INVALID) {
+    if (offset > TIMEZONE_OFFSET_MAX || offset < TIMEZONE_OFFSET_MIN) {
         TELEPHONY_LOGE("offset is invalid");
         return false;
     }

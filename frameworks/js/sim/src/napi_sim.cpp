@@ -32,6 +32,9 @@ namespace OHOS {
 namespace Telephony {
 namespace {
 constexpr const char *JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING = "Invalid parameter value.";
+const int32_t PARAMETER_COUNT_ZERO = 0;
+const int32_t PARAMETER_COUNT_ONE = 1;
+const int32_t PARAMETER_COUNT_TWO = 2;
 struct AsyncPara {
     std::string funcName = "";
     napi_env env = nullptr;
@@ -119,6 +122,54 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncCo
     NAPI_CALL(env, napi_create_string_utf8(env, para.funcName.c_str(), para.funcName.length(), &resourceName));
     NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, para.execute, para.complete,
             static_cast<void *>(asyncContext), &context.work));
+    return result;
+}
+
+template<typename AsyncContextType, typename... Ts>
+napi_value NapiCreateAsyncWork3(const AsyncPara &para, AsyncContextType *asyncContext, std::tuple<Ts...> &theTuple)
+{
+    napi_env env = para.env;
+    BaseContext &context = asyncContext->asyncContext.context;
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    NAPI_CALL(env, napi_get_cb_info(env, para.info, &parameterCount, parameters, nullptr, nullptr));
+
+    napi_value result = nullptr;
+    std::optional<NapiError> errCode = MatchParameters(env, parameters, parameterCount, theTuple);
+    if (parameterCount == PARAMETER_COUNT_ZERO) {
+        TELEPHONY_LOGI("parameterCount is zero");
+    } else if (parameterCount == PARAMETER_COUNT_ONE) {
+        napi_valuetype valueType = napi_undefined;
+        NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
+        if (valueType == napi_undefined || valueType == napi_null) {
+            TELEPHONY_LOGI("undefined or null parameter detected, treating as no parameter input");
+        } else if (valueType == napi_function) {
+            TELEPHONY_LOGI("napi_function parameter detected");
+        } else {
+            if (errCode.has_value()) {
+                JsError error = NapiUtil::ConverErrorMessageForJs(errCode.value());
+                NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
+                return nullptr;
+            }
+        }
+    } else if (parameterCount >= PARAMETER_COUNT_TWO) {
+        if (errCode.has_value()) {
+            JsError error = NapiUtil::ConverErrorMessageForJs(errCode.value());
+            NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
+            return nullptr;
+        }
+    }
+
+    if (context.callbackRef == nullptr) {
+        NAPI_CALL(env, napi_create_promise(env, &context.deferred, &result));
+    } else {
+        NAPI_CALL(env, napi_get_undefined(env, &result));
+    }
+
+    napi_value resourceName = nullptr;
+    NAPI_CALL(env, napi_create_string_utf8(env, para.funcName.c_str(), para.funcName.length(), &resourceName));
+    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, para.execute, para.complete,
+                       static_cast<void *>(asyncContext), &context.work));
     return result;
 }
 
@@ -762,7 +813,8 @@ void GetDsdsModeCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncDsdsInfo> context(static_cast<AsyncDsdsInfo *>(data));
-    NapiAsyncCommomCompleteCallback(env, status, context->asyncContext, false);
+    NapiAsyncPermissionCompleteCallback(
+        env, status, context->asyncContext, false, { "GetDsdsMode", Permission::GET_TELEPHONY_STATE });
 }
 
 napi_value GetDsdsMode(napi_env env, napi_callback_info info)
@@ -778,7 +830,7 @@ napi_value GetDsdsMode(napi_env env, napi_callback_info info)
         .execute = NativeGetDsdsMode,
         .complete = GetDsdsModeCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncDsdsInfo>(para, asyncContext, initPara);
+    napi_value result = NapiCreateAsyncWork3<AsyncDsdsInfo>(para, asyncContext, initPara);
     if (result) {
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }

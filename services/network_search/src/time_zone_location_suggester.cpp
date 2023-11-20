@@ -23,9 +23,11 @@ namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;
 
+#ifdef ABILITY_LOCATION_SUPPORT
 constexpr int32_t INVALID_LAC = 0;
 constexpr int64_t TIME_MS_TO_NS = 1000000;
 constexpr double LOCATION_UPDATE_DISTANCE = 100 * 10000; // 100km
+#endif
 constexpr int64_t LOCATION_EXPIRATION_TIME_MS = 60 * 60 * 1000;
 constexpr int64_t LOCATION_EXPIRATION_TIME_MS_ROAMING = 30 * 60 * 1000;
 
@@ -251,6 +253,7 @@ void TimeZoneLocationSuggester::NitzUpdate()
     SendEvent(event);
 }
 
+#ifdef ABILITY_LOCATION_SUPPORT
 void TimeZoneLocationSuggester::LocationUpdate(const std::unique_ptr<Location::Location> &location)
 {
     if (location == nullptr) {
@@ -258,24 +261,31 @@ void TimeZoneLocationSuggester::LocationUpdate(const std::unique_ptr<Location::L
         return;
     }
     locationUpdateTime_ = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
-    currentLocation_ = std::make_unique<OHOS::Location::Location>(*location);
-    InnerEvent::Pointer event = InnerEvent::Get(TimeZoneEventCode::EVENT_LOCATION_UPDATE);
+    auto currentLocation = std::make_unique<OHOS::Location::Location>(*location);
+    InnerEvent::Pointer event = InnerEvent::Get(TimeZoneEventCode::EVENT_LOCATION_UPDATE, currentLocation);
     SendEvent(event);
 }
+#endif
 
 bool TimeZoneLocationSuggester::HasLocation()
 {
+#ifdef ABILITY_LOCATION_SUPPORT
     return lastLocation_ != nullptr;
+#else
+    return false;
+#endif
 }
 
 void TimeZoneLocationSuggester::ClearLocation()
 {
+#ifdef ABILITY_LOCATION_SUPPORT
     lastLocation_ = nullptr;
+#endif
 }
 
 int64_t TimeZoneLocationSuggester::GetLocationExpirationTime()
 {
-    bool isRoaming = DelayedSingleton<TimeZoneManager>::GetInstance()->IsRoaming();
+    bool isRoaming = TimeZoneManager::GetInstance().IsRoaming();
     return isRoaming ? LOCATION_EXPIRATION_TIME_MS_ROAMING : LOCATION_EXPIRATION_TIME_MS;
 }
 
@@ -320,10 +330,11 @@ bool IdleState::StateProcess(const InnerEvent::Pointer &event)
     switch (eventCode) {
         case TimeZoneEventCode::EVENT_NITZ_UPDATE:
             locationSuggester->nitzUpdateTime_ = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
-            locationSuggester->nitzLac_ = DelayedSingleton<TimeZoneManager>::GetInstance()->GetCurrentLac();
+            locationSuggester->nitzLac_ = TimeZoneManager::GetInstance().GetCurrentLac();
             locationSuggester->TransitionTo(locationSuggester->nitzState_);
             return true;
         case TimeZoneEventCode::EVENT_LOCATION_UPDATE:
+            locationSuggester->currentLocation_ = event->GetUniqueObject<OHOS::Location::Location>();
             if (ShouldUpdateTimeZone()) {
                 locationSuggester->TransitionTo(locationSuggester->locationState_);
             }
@@ -336,6 +347,7 @@ bool IdleState::StateProcess(const InnerEvent::Pointer &event)
 
 bool IdleState::ShouldUpdateTimeZone()
 {
+#ifdef ABILITY_LOCATION_SUPPORT
     std::shared_ptr<TimeZoneLocationSuggester> locationSuggester = locationSuggester_.lock();
     if (locationSuggester == nullptr) {
         TELEPHONY_LOGE("IdleState StateMachine is null");
@@ -364,6 +376,7 @@ bool IdleState::ShouldUpdateTimeZone()
     if (distance > LOCATION_UPDATE_DISTANCE) {
         return true;
     }
+#endif
     return false;
 }
 
@@ -396,6 +409,7 @@ bool NitzState::StateProcess(const InnerEvent::Pointer &event)
     }
     uint32_t eventCode = event->GetInnerEventId();
     if (eventCode == TimeZoneEventCode::EVENT_LOCATION_UPDATE) {
+        locationSuggester->currentLocation_ = event->GetUniqueObject<OHOS::Location::Location>();
         if (ShouldUpdateTimeZone()) {
             locationSuggester->TransitionTo(locationSuggester->locationState_);
         }
@@ -406,6 +420,7 @@ bool NitzState::StateProcess(const InnerEvent::Pointer &event)
 
 bool NitzState::ShouldUpdateTimeZone()
 {
+#ifdef ABILITY_LOCATION_SUPPORT
     std::shared_ptr<TimeZoneLocationSuggester> locationSuggester = locationSuggester_.lock();
     if (locationSuggester == nullptr) {
         TELEPHONY_LOGE("NitzState StateMachine is null");
@@ -415,7 +430,7 @@ bool NitzState::ShouldUpdateTimeZone()
         TELEPHONY_LOGE("NitzState location is null");
         return false;
     }
-    bool isRoaming = DelayedSingleton<TimeZoneManager>::GetInstance()->IsRoaming();
+    bool isRoaming = TimeZoneManager::GetInstance().IsRoaming();
     if (isRoaming && locationSuggester->lastLocation_ == nullptr) {
         locationSuggester->lastLocation_ =
             std::make_unique<OHOS::Location::Location>(*(locationSuggester->currentLocation_));
@@ -424,8 +439,8 @@ bool NitzState::ShouldUpdateTimeZone()
     }
     locationSuggester->lastLocation_ =
         std::make_unique<OHOS::Location::Location>(*(locationSuggester->currentLocation_));
-    int32_t lac = DelayedSingleton<TimeZoneManager>::GetInstance()->GetCurrentLac();
-    bool hasSim = DelayedSingleton<TimeZoneManager>::GetInstance()->HasSimCard();
+    int32_t lac = TimeZoneManager::GetInstance().GetCurrentLac();
+    bool hasSim = TimeZoneManager::GetInstance().HasSimCard();
     bool isTimeDiff =
         OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs() - locationSuggester->nitzUpdateTime_ >
         locationSuggester->GetLocationExpirationTime();
@@ -434,6 +449,7 @@ bool NitzState::ShouldUpdateTimeZone()
     if (isTimeDiff && (isHasSim || isNewLac)) {
         return true;
     }
+#endif
     return false;
 }
 
@@ -465,8 +481,13 @@ bool LocationState::StateProcess(const InnerEvent::Pointer &event)
 
 void LocationState::UpdateTimeZone()
 {
+#ifdef ABILITY_LOCATION_SUPPORT
     TELEPHONY_LOGI("LocationState::UpdateTimeZone");
     std::shared_ptr<TimeZoneLocationSuggester> locationSuggester = locationSuggester_.lock();
+    if (locationSuggester == nullptr) {
+        TELEPHONY_LOGE("LocationState StateMachine is null");
+        return;
+    }
     if (locationSuggester->lastLocation_ == nullptr) {
         TELEPHONY_LOGE("location is null");
         return;
@@ -481,14 +502,15 @@ void LocationState::UpdateTimeZone()
     }
     if (isValidZone) {
         TELEPHONY_LOGI("update location time zone[%{public}s]", zoneList[0].c_str());
-        if (DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateLocationTimeZone(zoneList[0])) {
+        if (TimeZoneManager::GetInstance().UpdateLocationTimeZone(zoneList[0])) {
             locationSuggester->timeZoneLocation_ =
                 std::make_unique<OHOS::Location::Location>(*(locationSuggester->lastLocation_));
         }
     } else {
         TELEPHONY_LOGI("time zone is invalid, get country code from location");
-        DelayedSingleton<TimeZoneManager>::GetInstance()->SendUpdateLocationCountryCodeRequest();
+        TimeZoneManager::GetInstance().SendUpdateLocationCountryCodeRequest();
     }
+#endif
 }
 } // namespace Telephony
 } // namespace OHOS

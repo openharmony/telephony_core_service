@@ -20,6 +20,7 @@
 
 namespace OHOS {
 namespace Telephony {
+#ifdef ABILITY_LOCATION_SUPPORT
 constexpr float TIME_ZONE_MAX_ACCURACY = 500.0;
 constexpr int TIME_ZONE_FIX_NUMBER_ONCE = 1;
 
@@ -29,8 +30,9 @@ TimeZoneLocationUpdate::TimeZoneLocationUpdate(std::shared_ptr<TimeZoneLocationS
     locatorImpl_ = Location::Locator::GetInstance();
     if (locatorImpl_ == nullptr) {
         TELEPHONY_LOGE("locatorImpl is null");
+    } else {
+        locationEnabled_ = locatorImpl_->IsLocationEnabled();
     }
-    locationEnabled_ = locatorImpl_->IsLocationEnabled();
 }
 
 TimeZoneLocationUpdate::~TimeZoneLocationUpdate()
@@ -198,7 +200,7 @@ void TimeZoneLocationUpdate::LocationSwitchChange()
     if (!locationEnabled && locationEnabled_) {
         TELEPHONY_LOGI("Enable location");
         RegisterLocationChange();
-        DelayedSingleton<TimeZoneManager>::GetInstance()->SendUpdateLocationRequest();
+        TimeZoneManager::GetInstance().SendUpdateLocationRequest();
     } else if (locationEnabled && !locationEnabled_) {
         TELEPHONY_LOGI("Disable location");
         UnregisterLocationChange();
@@ -303,5 +305,28 @@ int TimeZoneLocationUpdate::SwitchCallback::OnRemoteRequest(
     }
     return 0;
 }
+#else
+TimeZoneLocationUpdate::TimeZoneLocationUpdate(std::shared_ptr<TimeZoneLocationSuggester> locationSuggester) {}
+
+TimeZoneLocationUpdate::~TimeZoneLocationUpdate() {}
+
+bool TimeZoneLocationUpdate::IsLocationEnabled()
+{
+    return false;
+}
+
+void TimeZoneLocationUpdate::StartPassiveUpdate() {}
+
+void TimeZoneLocationUpdate::StopPassiveUpdate() {}
+
+void TimeZoneLocationUpdate::RequestUpdate() {}
+
+void TimeZoneLocationUpdate::CancelUpdate() {}
+
+std::string TimeZoneLocationUpdate::GetIsoCountryCode()
+{
+    return "";
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

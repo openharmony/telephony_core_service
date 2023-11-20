@@ -243,33 +243,33 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneManager_001, Function | Medium
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
-    DelayedSingleton<TimeZoneManager>::GetInstance()->Init(networkSearchManager);
+    TimeZoneManager::GetInstance().Init(networkSearchManager);
     std::string countryCode = "cn";
-    DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
+    TimeZoneManager::GetInstance().UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
     int32_t offset = 0;
-    DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateTimeZoneOffset(offset, DEFAULT_SIM_SLOT_ID);
+    TimeZoneManager::GetInstance().UpdateTimeZoneOffset(offset, DEFAULT_SIM_SLOT_ID);
     std::string timeZone = "Asia/Singapore";
-    EXPECT_FALSE(DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateLocationTimeZone(timeZone));
-    DelayedSingleton<TimeZoneManager>::GetInstance()->SendUpdateLocationRequest();
-    DelayedSingleton<TimeZoneManager>::GetInstance()->SendUpdateLocationCountryCodeRequest();
-    DelayedSingleton<TimeZoneManager>::GetInstance()->IsRoaming();
-    DelayedSingleton<TimeZoneManager>::GetInstance()->HasSimCard();
-    DelayedSingleton<TimeZoneManager>::GetInstance()->GetCurrentLac();
+    EXPECT_FALSE(TimeZoneManager::GetInstance().UpdateLocationTimeZone(timeZone));
+    TimeZoneManager::GetInstance().SendUpdateLocationRequest();
+    TimeZoneManager::GetInstance().SendUpdateLocationCountryCodeRequest();
+    TimeZoneManager::GetInstance().IsRoaming();
+    TimeZoneManager::GetInstance().HasSimCard();
+    TimeZoneManager::GetInstance().GetCurrentLac();
 
     auto inner = std::make_shared<NetworkSearchManagerInner>();
     networkSearchManager->AddManagerInner(DEFAULT_SIM_SLOT_ID, inner);
-    DelayedSingleton<TimeZoneManager>::GetInstance()->Init(networkSearchManager);
+    TimeZoneManager::GetInstance().Init(networkSearchManager);
     inner->eventLoop_ = AppExecFwk::EventRunner::Create("test");
-    DelayedSingleton<TimeZoneManager>::GetInstance()->Init(networkSearchManager);
-    DelayedSingleton<TimeZoneManager>::GetInstance()->Init(networkSearchManager);
-    DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
-    DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateTimeZoneOffset(offset, DEFAULT_SIM_SLOT_ID);
-    DelayedSingleton<TimeZoneManager>::GetInstance()->SendUpdateLocationRequest();
-    DelayedSingleton<TimeZoneManager>::GetInstance()->SendUpdateLocationCountryCodeRequest();
-    DelayedSingleton<TimeZoneManager>::GetInstance()->IsRoaming();
-    DelayedSingleton<TimeZoneManager>::GetInstance()->HasSimCard();
-    DelayedSingleton<TimeZoneManager>::GetInstance()->GetCurrentLac();
-    EXPECT_FALSE(DelayedSingleton<TimeZoneManager>::GetInstance()->UpdateLocationTimeZone(timeZone));
+    TimeZoneManager::GetInstance().Init(networkSearchManager);
+    TimeZoneManager::GetInstance().Init(networkSearchManager);
+    TimeZoneManager::GetInstance().UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
+    TimeZoneManager::GetInstance().UpdateTimeZoneOffset(offset, DEFAULT_SIM_SLOT_ID);
+    TimeZoneManager::GetInstance().SendUpdateLocationRequest();
+    TimeZoneManager::GetInstance().SendUpdateLocationCountryCodeRequest();
+    TimeZoneManager::GetInstance().IsRoaming();
+    TimeZoneManager::GetInstance().HasSimCard();
+    TimeZoneManager::GetInstance().GetCurrentLac();
+    EXPECT_FALSE(TimeZoneManager::GetInstance().UpdateLocationTimeZone(timeZone));
 }
 
 /**
@@ -373,11 +373,13 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationSuggester_001, Functio
     auto suggester = std::make_shared<TimeZoneLocationSuggester>(eventLoop);
     suggester->Init();
     suggester->NitzUpdate();
+#ifdef ABILITY_LOCATION_SUPPORT
     Parcel parcel;
     std::unique_ptr<Location::Location> location = Location::Location::Unmarshalling(parcel);
     suggester->LocationUpdate(location);
     suggester->GetLocationExpirationTime();
     suggester->IsLocationExpired();
+#endif
     suggester->ClearLocation();
     EXPECT_FALSE(suggester->HasLocation());
 }
@@ -396,6 +398,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationUpdate_001, Function |
     update->StopPassiveUpdate();
     update->RequestUpdate();
     update->CancelUpdate();
+#ifdef ABILITY_LOCATION_SUPPORT
     update->LocationSwitchChange();
     Parcel parcel;
     std::unique_ptr<Location::Location> location = Location::Location::Unmarshalling(parcel);
@@ -404,8 +407,8 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationUpdate_001, Function |
     update->UnregisterLocationChange();
     update->RegisterSwitchCallback();
     update->UnregisterSwitchCallback();
+#endif
     update->IsLocationEnabled();
-    update->GetIsoCountryCode();
     EXPECT_NE(update->GetIsoCountryCode(), "test");
 }
 
