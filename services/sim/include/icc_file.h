@@ -167,6 +167,7 @@ protected:
     bool PublishSimFileEvent(const std::string &event, int eventCode, const std::string &eventData);
     void UpdateIccLanguage(const std::string &langLi, const std::string &langPl);
     std::string ObtainValidLanguage(const std::string &langData);
+    void SwapPairsForIccId(std::string &iccId);
     std::shared_ptr<IccDiallingNumbersHandler> diallingNumberHandler_ = nullptr;
     AppExecFwk::InnerEvent::Pointer CreateDiallingNumberPointer(
         int eventid, int efId, int index, std::shared_ptr<void> pobj);
