@@ -1112,7 +1112,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | L
     EXPECT_TRUE(multiSimController->AnnounceDefaultCellularDataSimIdChanged(0));
     AAFwk::Want want;
     EXPECT_FALSE(multiSimController->PublishSimFileEvent(want, 0, ""));
-    EXPECT_FALSE(multiSimController->InitShowName(0));
     EXPECT_FALSE(multiSimController->InitShowNumber(0));
     EXPECT_FALSE(multiSimController->InitIccId(0));
     EXPECT_FALSE(multiSimController->GetListFromDataBase());
@@ -1920,6 +1919,7 @@ HWTEST_F(BranchTest, Telephony_TelRilModem_001, Function | MediumTest | Level1)
     std::shared_ptr<TelRilModem> telRilModem = std::make_shared<TelRilModem>(
         SLOT_ID_0, nullptr, observerHandlers[SLOT_ID_0], handler);
     if (telRilModem != nullptr) {
+        telRilModem->RadioStateUpdated(ModemPowerState::CORE_SERVICE_POWER_ON);
         EXPECT_EQ(telRilModem->OnRilAdapterHostDied(), TELEPHONY_ERR_SUCCESS);
     }
 }

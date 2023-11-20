@@ -30,7 +30,7 @@ VCardManager::VCardManager()
     listener_ = std::make_shared<VCardManager::DecodeListener>();
 }
 
-std::vector<std::shared_ptr<VCardContact>> VCardManager::DecodeListener::GetContacts()
+std::vector<std::shared_ptr<VCardContact>> &VCardManager::DecodeListener::GetContacts()
 {
     return contacts_;
 }
@@ -40,7 +40,10 @@ void VCardManager::DecodeListener::OnStarted()
     contacts_.clear();
 }
 
-void VCardManager::DecodeListener::OnEnded() {}
+void VCardManager::DecodeListener::OnEnded()
+{
+    VCardDecoder::Close();
+}
 
 void VCardManager::DecodeListener::OnOneContactStarted()
 {
@@ -62,6 +65,21 @@ void VCardManager::DecodeListener::OnRawDataCreated(std::shared_ptr<VCardRawData
     currentContact_->AddRawData(rawData, errorCode);
 }
 
+int32_t VCardManager::ImportLock(
+    const std::string &path, std::shared_ptr<DataShare::DataShareHelper> dataShareHelper, int32_t accountId)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("DataShareHelper is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    SetDataHelper(dataShareHelper);
+    int32_t errorCode = Import(path, accountId);
+    Release();
+    TELEPHONY_LOGI("ImportLock errorCode : %{public}d finish", errorCode);
+    return errorCode;
+}
+
 int32_t VCardManager::Import(const std::string &path, int32_t accountId)
 {
     int32_t errorCode = TELEPHONY_SUCCESS;
@@ -75,6 +93,7 @@ int32_t VCardManager::Import(const std::string &path, int32_t accountId)
         TELEPHONY_LOGE("Failed to insert ability");
         return errorCode;
     }
+    TELEPHONY_LOGI("Import size %{public}d success", static_cast<int32_t>(listener_->GetContacts().size()));
     return errorCode;
 }
 
@@ -191,9 +210,42 @@ int32_t VCardManager::InsertContactData(int32_t rawId, std::shared_ptr<VCardCont
     return TELEPHONY_SUCCESS;
 }
 
+bool VCardManager::ParameterTypeAndCharsetCheck(int32_t cardType, std::string charset, int32_t &errorCode)
+{
+    if (cardType < VERSION_21_NUM || cardType > VERSION_40_NUM) {
+        errorCode = TELEPHONY_ERR_ARGUMENT_INVALID;
+        return false;
+    }
+    if (!charset.empty() && !VCardUtils::EqualsIgnoreCase(DEFAULT_CHARSET, charset)) {
+        errorCode = TELEPHONY_ERR_ARGUMENT_INVALID;
+        return false;
+    }
+    errorCode = TELEPHONY_SUCCESS;
+    return true;
+}
+
+int32_t VCardManager::ExportLock(std::string &path, std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
+    const DataShare::DataSharePredicates &predicates, int32_t cardType, const std::string &charset)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("DataShareHelper is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    SetDataHelper(dataShareHelper);
+    int32_t errorCode = Export(path, predicates, cardType, charset);
+    Release();
+    TELEPHONY_LOGI("ExportLock errorCode : %{public}d finish", errorCode);
+    return errorCode;
+}
+
 int32_t VCardManager::Export(
     std::string &path, const DataShare::DataSharePredicates &predicates, int32_t cardType, const std::string &charset)
 {
+    int32_t errorCode = TELEPHONY_SUCCESS;
+    if (!ParameterTypeAndCharsetCheck(cardType, charset, errorCode)) {
+        return errorCode;
+    }
     std::vector<std::string> columns;
     auto resultSet = VCardRdbHelper::GetInstance().QueryContact(columns, predicates);
     if (resultSet == nullptr) {
@@ -203,9 +255,8 @@ int32_t VCardManager::Export(
     int32_t resultSetNum = resultSet->GoToFirstRow();
     std::string result = "";
     VCardEncoder encoder { cardType, charset };
-    int32_t errorCode = TELEPHONY_SUCCESS;
     while (resultSetNum == 0 && errorCode == TELEPHONY_SUCCESS) {
-        result = encoder.ContructVCard(resultSet, errorCode);
+        result += encoder.ContructVCard(resultSet, errorCode);
         resultSetNum = resultSet->GoToNextRow();
     }
     if (errorCode != TELEPHONY_SUCCESS) {
@@ -217,7 +268,7 @@ int32_t VCardManager::Export(
         std::string fileName = VCardUtils::CreateFileName();
         path = VCARD_EXPORT_FILE_PATH + fileName;
     } else {
-        path = VCardUtils::CreateFileName();
+        path = path + VCardUtils::CreateFileName();
     }
     if (!result.empty()) {
         VCardUtils::SaveFile(result, path);
@@ -243,7 +294,7 @@ int32_t VCardManager::ExportToStr(
     int32_t errorCode = TELEPHONY_SUCCESS;
     str = "";
     while (resultSetNum == 0 && errorCode == TELEPHONY_SUCCESS) {
-        str = encoder.ContructVCard(resultSet, errorCode);
+        str += encoder.ContructVCard(resultSet, errorCode);
         resultSetNum = resultSet->GoToNextRow();
     }
     if (errorCode != TELEPHONY_SUCCESS) {
@@ -264,6 +315,14 @@ VCardManager &VCardManager::GetInstance()
 {
     static VCardManager instance;
     return instance;
+}
+
+void VCardManager::Release()
+{
+    VCardRdbHelper::GetInstance().Release();
+    if (listener_ != nullptr) {
+        listener_->GetContacts().clear();
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

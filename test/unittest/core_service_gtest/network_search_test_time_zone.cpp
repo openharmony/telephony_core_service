@@ -181,7 +181,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_Location_0100, Function | Me
     suggester->locationState_->SetParentState(suggester->idleState_);
     suggester->SetOriginalState(suggester->idleState_);
     suggester->Start();
-    bool isRoaming = DelayedSingleton<TimeZoneManager>::GetInstance()->IsRoaming();
+    bool isRoaming = TimeZoneManager::GetInstance().IsRoaming();
     if (isRoaming) {
         EXPECT_EQ(suggester->GetLocationExpirationTime(), LOCATION_EXPIRATION_TIME_MS_ROAMING);
     } else {
@@ -195,12 +195,14 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_Location_0100, Function | Me
     idleState->ShouldUpdateTimeZone();
     nitzState->ShouldUpdateTimeZone();
     locationState->UpdateTimeZone();
+#ifdef ABILITY_LOCATION_SUPPORT
     Parcel parcel;
     std::unique_ptr<Location::Location> location = Location::Location::Unmarshalling(parcel);
     suggester->LocationUpdate(location);
     sleep(1);
     EXPECT_TRUE(suggester->HasLocation());
     EXPECT_FALSE(suggester->IsLocationExpired());
+#endif
     suggester->ClearLocation();
     EXPECT_FALSE(suggester->HasLocation());
 }

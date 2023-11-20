@@ -65,7 +65,6 @@ void VCardDecoderV21::NotifyEnded()
         }
         it->OnEnded();
     }
-    fileUtils_.Close();
 }
 
 void VCardDecoderV21::NotifyOneContactStarted()
@@ -118,7 +117,6 @@ bool VCardDecoderV21::DecodeOne(int32_t &errorCode)
     if (!ReadBegin()) {
         TELEPHONY_LOGE("Failed to decode");
         errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
-        fileUtils_.Close();
         return false;
     }
     ParseItems(errorCode);
@@ -189,10 +187,7 @@ bool VCardDecoderV21::ParseItem(int32_t &errorCode)
         DealAgent(rawData, errorCode);
         return true;
     }
-    if (!IsValidName(name)) {
-        TELEPHONY_LOGE("Name is invalid");
-        return false;
-    }
+    RecordUnknowParamType(name);
     DealRawDataValue(name, rawData, errorCode);
     return !fileUtils_.IsEnd();
 }
@@ -288,12 +283,11 @@ void VCardDecoderV21::DealEncodingQPOrNoEncodingFN(const std::string &rawValue, 
     NotifyRawDataCreated(rawData);
 }
 
-bool VCardDecoderV21::IsValidName(const std::string &name)
+void VCardDecoderV21::RecordUnknowParamType(const std::string &name)
 {
     if (!(ContainValue(VCardUtils::ToUpper(name), GetSupportType()) || VCardUtils::StartWith(name, "X-"))) {
         unknowParamType_.insert(name);
     }
-    return true;
 }
 
 std::string VCardDecoderV21::GetLine()
@@ -333,7 +327,7 @@ void VCardDecoderV21::BuildRawData(const std::string &line, std::shared_ptr<VCar
     int32_t status = STATUS_GROUP_OR_TYPE_NAME;
     int32_t namePos = 0;
     errorCode = TELEPHONY_SUCCESS;
-    for (int i = 0; i < length && errorCode == TELEPHONY_SUCCESS; i++) {
+    for (int32_t i = 0; i < length && errorCode == TELEPHONY_SUCCESS; i++) {
         if (status == STATUS_GROUP_OR_TYPE_NAME) {
             DealGroupOrTypeNameStatus(line, rawData, errorCode, status, namePos, i);
             continue;
@@ -487,13 +481,7 @@ void VCardDecoderV21::DealLanguageParam(
         errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
         return;
     }
-    if (!IsAllAscLetter(strs[0])) {
-        TELEPHONY_LOGE("Language error");
-        errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
-        return;
-    }
-
-    if (!IsAllAscLetter(strs[1])) {
+    if (!IsAllAscLetter(strs[0]) || !IsAllAscLetter(strs[1])) {
         TELEPHONY_LOGE("Language error");
         errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
         return;
@@ -764,6 +752,11 @@ bool VCardDecoderV21::IsAscChar(char ch)
         return true;
     }
     return false;
+}
+
+VCardDecoderV21::~VCardDecoderV21()
+{
+    fileUtils_.Close();
 }
 
 } // namespace Telephony

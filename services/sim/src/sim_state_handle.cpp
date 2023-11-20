@@ -425,6 +425,7 @@ void SimStateHandle::GetSimCardData(const AppExecFwk::InnerEvent::Pointer &event
     } else {
         error = static_cast<int32_t>(response->error);
         TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), error = %{public}d", error);
+        return;
     }
     ProcessIccCardState(iccState, slotId);
 }

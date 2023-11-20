@@ -35,13 +35,13 @@ public:
     void SetHexBytes(std::string &hexBytes);
     std::string GetFormat();
     std::string GetHexBytes();
-std::string GetBytes();
+    std::string GetBytes();
     void SetBytes(const std::string &bytes);
 
 private:
     std::string format_;
     std::string hexBytes_;
-std::string bytes_;
+    std::string bytes_;
 };
 } // namespace Telephony
 } // namespace OHOS

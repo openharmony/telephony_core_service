@@ -134,6 +134,8 @@ constexpr const char *VCARD_PARAM_SORT_AS = "SORT-AS";
 
 constexpr const char *VCARD_PARAM_EXTRA_TYPE_COMPANY = "COMPANY";
 constexpr const char *VCARD_EXPORT_FILE_PATH = "/data/storage/el2/base/files/";
+constexpr const char *VCARD_TIME_FORMAT = "%Y%m%d_%H%M%S";
+constexpr const char *VCARD_FILE_EXTENSION = ".vcf";
 
 constexpr const int32_t VCARD_PHONE_NUM_FORMAT_JAPAN = 2;
 constexpr const int32_t VCARD_PHONE_NUM_FORMAT_NANP = 1;

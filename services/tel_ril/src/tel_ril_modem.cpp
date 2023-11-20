@@ -133,6 +133,8 @@ int32_t TelRilModem::OnRilAdapterHostDied()
 int32_t TelRilModem::RadioStateUpdated(int32_t state)
 {
     AAFwk::Want want;
+    want.SetParam("slotId", slotId_);
+    want.SetParam("radioState", state);
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_RADIO_STATE_CHANGE);
     EventFwk::CommonEventData commonEventData;
     commonEventData.SetWant(want);

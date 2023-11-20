@@ -16,9 +16,11 @@
 #ifndef NETWORK_SEARCH_INCLUDE_TIME_ZONE_LOCATION_UPDATE_H
 #define NETWORK_SEARCH_INCLUDE_TIME_ZONE_LOCATION_UPDATE_H
 
+#ifdef ABILITY_LOCATION_SUPPORT
 #include "i_locator_callback.h"
 #include "iremote_stub.h"
 #include "locator.h"
+#endif
 #include "time_zone_location_suggester.h"
 
 namespace OHOS {
@@ -33,6 +35,7 @@ public:
     void RequestUpdate();
     void CancelUpdate();
     std::string GetIsoCountryCode();
+#ifdef ABILITY_LOCATION_SUPPORT
     void LocationSwitchChange();
     void LocationReport(const std::unique_ptr<Location::Location> &location);
 
@@ -75,6 +78,7 @@ private:
     sptr<LocationCallback> registerCallback_ = nullptr;
     bool locationEnabled_ = false;
     bool needUpdate_ = false;
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

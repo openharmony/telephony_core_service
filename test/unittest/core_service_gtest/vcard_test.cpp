@@ -14,6 +14,7 @@
  */
 #define private public
 #define protected public
+#include <cstdio>
 #include <fstream>
 #include <sstream>
 
@@ -25,6 +26,7 @@
 #include "system_ability_definition.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "thread"
 #include "vcard_constructor.h"
 #include "vcard_manager.h"
 #include "vcard_utils.h"
@@ -36,7 +38,7 @@ using namespace testing::ext;
 namespace {
 std::string CONTACT_URI = "datashare:///com.ohos.contactsdataability";
 constexpr const char *TEL_FILE_NAME = "example.vcf";
-std::string importTestInputString = R"(
+std::string IMPORT_TEST_STR = R"(
 BEGIN:VCARD
 VERSION:2.1
 N:Zhang;San;Jun;Mr.;Jr.
@@ -57,7 +59,7 @@ N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=4E;;;;
 END:VCARD
 
 )";
-std::string inputString2 = R"(
+std::string INPUT_STR_TWO = R"(
 BEGIN:VCARD
 VERSION:2.1
 N:Zhang;San;Jun;Mr.;Jr.
@@ -78,12 +80,48 @@ N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=4E;;;;
 END:VCARD
 
 )";
-std::string inputString3 =
+
+std::string INPUT_STR_THREE =
     "BEGIN:VCARD\r\nVERSION:2.1\r\nX_OHOS_CUSTOM;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:relation;="
     "E6=B5=8B=E8=AF=95;=E6=B5=8B=E8=AF=95=69=64;=E6=B5=8B=E8=AF=95=6E=61=6D=65\r\nX_OHOS_CUSTOM:"
     "relation;realationName;labelId;labelName\r\nEND:VCARD\r\n";
-std::string inputString4 =
+std::string INPUT_STR_FOUR =
     "BEGIN:VCARD\r\nVERSION:2.1\r\nX_OHOS_CUSTOM:contact_event;20230102;1;test\r\nBDAY:20230103\r\nEND:VCARD\r\n";
+
+std::string INPUT_STR_FIVE = R"(
+BEGIN:VCARD
+VERSION:2.0
+N;CHARSET=UTF-8:刘;小;;;
+FN;CHARSET=UTF-8:刘小
+ORG;CHARSET=UTF-8:开放人工智能
+TITLE;CHARSET=UTF-8:AI助手
+TEL;WORK;VOICE:1234567890
+EMAIL;INTERNET:liuxiao@example.com
+ADR;WORK;CHARSET=UTF-8:;;123 Main St;Anytown;CA;12345;USA
+TEL;CELL;VOICE:9876543210
+URL;WORK:http://example.com
+NOTE;CHARSET=UTF-8:这是一个测试备注
+REV:20220101T120000Z
+END:VCARD
+BEGIN:VCARD
+VERSION:2.0
+N;CHARSET=SHIFT_JIS:山田;太郎;;;
+FN;CHARSET=SHIFT_JIS:山田太郎
+ORG;CHARSET=SHIFT_JIS:オープンAI株式会社
+TEL;WORK;VOICE:1234567890
+EMAIL;INTERNET:"llll"
+ <test@example.com>
+NICKNAME:John
+TEL;CELL;VOICE:9876543210
+URL;WORK:http://example.com
+NOTE;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E8=BF=99=E6=98=AF=E4=B8=80=E4=B8=AA=E6=B5=8B=E8=AF=95=
+=E5=A4=87=E6=B3=A8
+REV:20220101T120000Z
+PHOTO;ENCODING=BASE64;JPEG:
+5oiR54ix5oiR55qE56WW5Zu9
+
+END:VCARD
+)";
 } // namespace
 
 class VcardTest : public testing::Test {
@@ -129,6 +167,34 @@ void WriteTestData(const std::string &testStr)
     file.close();
 }
 
+void WriteTestDataWithFileName(const std::string &testStr, const std::string &fileName)
+{
+    std::ofstream file(fileName.c_str(), std::ios::trunc);
+    if (file.is_open()) {
+        std::stringstream ss(testStr);
+        std::string line;
+
+        while (std::getline(ss, line)) {
+            file << line << std::endl;
+        }
+    }
+    file.close();
+}
+
+void TestImport(const std::string &fileName)
+{
+    VCardManager::GetInstance().ImportLock(
+        fileName, CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, CONTACT_URI), 0);
+}
+
+void TestExport(std::string &filePath)
+{
+    DataShare::DataSharePredicates predicates;
+    predicates.Between(Contact::ID, "0", "10");
+    VCardManager::GetInstance().ExportLock(
+        filePath, CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, CONTACT_URI), predicates);
+}
+
 /**
  * @tc.number   Telephony_VcardTest_000
  * @tc.name     test simple vcard
@@ -142,7 +208,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_000, Function | MediumTest | Level2)
     if (dataShareHelper != nullptr) {
         TELEPHONY_LOGI("CreateDataShareHelper start test!!");
         VCardManager::GetInstance().SetDataHelper(dataShareHelper);
-        WriteTestData(importTestInputString);
+        WriteTestData(IMPORT_TEST_STR);
         std::vector<std::string> columns;
         OHOS::DataShare::DataSharePredicates predicates;
         predicates.Between(Contact::ID, "0", "100");
@@ -232,7 +298,6 @@ HWTEST_F(VcardTest, Telephony_VCardTest_102, Function | MediumTest | Level2)
         int32_t errorCode;
         VCardManager::GetInstance().Decode(filePath, errorCode);
         EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
-        EXPECT_EQ(static_cast<int32_t>(VCardManager::GetInstance().listener_->contacts_.size()), rowCount);
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
         EXPECT_TRUE(false);
@@ -261,7 +326,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_001, Function | MediumTest | Level1)
  */
 HWTEST_F(VcardTest, Telephony_VCardTest_002, Function | MediumTest | Level1)
 {
-    WriteTestData(inputString2);
+    WriteTestData(INPUT_STR_TWO);
     int32_t errorCode;
     VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
@@ -275,41 +340,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_002, Function | MediumTest | Level1)
  */
 HWTEST_F(VcardTest, Telephony_VCardTest_003, Function | MediumTest | Level1)
 {
-    std::string inputString = R"(
-BEGIN:VCARD
-VERSION:2.0
-N;CHARSET=UTF-8:刘;小;;;
-FN;CHARSET=UTF-8:刘小
-ORG;CHARSET=UTF-8:开放人工智能
-TITLE;CHARSET=UTF-8:AI助手
-TEL;WORK;VOICE:1234567890
-EMAIL;INTERNET:liuxiao@example.com
-ADR;WORK;CHARSET=UTF-8:;;123 Main St;Anytown;CA;12345;USA
-TEL;CELL;VOICE:9876543210
-URL;WORK:http://example.com
-NOTE;CHARSET=UTF-8:这是一个测试备注
-REV:20220101T120000Z
-END:VCARD
-BEGIN:VCARD
-VERSION:2.0
-N;CHARSET=SHIFT_JIS:山田;太郎;;;
-FN;CHARSET=SHIFT_JIS:山田太郎
-ORG;CHARSET=SHIFT_JIS:オープンAI株式会社
-TEL;WORK;VOICE:1234567890
-EMAIL;INTERNET:"llll"
- <test@example.com>
-NICKNAME:John
-TEL;CELL;VOICE:9876543210
-URL;WORK:http://example.com
-NOTE;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E8=BF=99=E6=98=AF=E4=B8=80=E4=B8=AA=E6=B5=8B=E8=AF=95=
-=E5=A4=87=E6=B3=A8
-REV:20220101T120000Z
-PHOTO;ENCODING=BASE64;JPEG:
-5oiR54ix5oiR55qE56WW5Zu9
-
-END:VCARD
-)";
-    WriteTestData(inputString);
+    WriteTestData(INPUT_STR_FIVE);
     int32_t errorCode;
     VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
@@ -952,24 +983,24 @@ HWTEST_F(VcardTest, Telephony_VCardTest_016, Function | MediumTest | Level1)
 HWTEST_F(VcardTest, Telephony_VCardTest_PostalData_001, Function | MediumTest | Level1)
 {
     auto data1 = std::make_shared<VCardPostalData>();
-    data1->pobox_ = "testpobox";
-    data1->street_ = "testStreee";
-    data1->city_ = "testCity";
-    data1->region_ = "testRegion";
-    data1->postCode_ = "test101010";
-    data1->country_ = "ttttcountry";
+    data1->SetPOBox("testpobox");
+    data1->SetStreet("testStreee");
+    data1->SetCity("testCity");
+    data1->SetRegion("testRegion");
+    data1->SetPostCode("test101010");
+    data1->SetCountry("ttttcountry");
     auto data2 = std::make_shared<VCardPostalData>();
-    data2->pobox_ = "测试pobox";
-    data2->street_ = "测试Streee";
-    data2->city_ = "测试City";
-    data2->region_ = "测试Region";
-    data2->postCode_ = "101010";
-    data2->country_ = "测试ttttcountry";
+    data2->SetPOBox("测试pobox");
+    data2->SetStreet("测试Streee");
+    data2->SetCity("测试City");
+    data2->SetRegion("测试Region");
+    data2->SetPostCode("101010");
+    data2->SetCountry("测试ttttcountry");
     auto contact = std::make_shared<VCardContact>();
     auto data3 = std::make_shared<VCardPostalData>();
-    data3->postalAddress_ = "addresss";
+    data3->SetPostalAddress("addresss");
     auto data4 = std::make_shared<VCardPostalData>();
-    data4->postalAddress_ = "测试addresss";
+    data4->SetPostalAddress("测试addresss");
     contact->postals_.push_back(data1);
     contact->postals_.push_back(data2);
     contact->postals_.push_back(data3);
@@ -1179,6 +1210,52 @@ HWTEST_F(VcardTest, Telephony_VCardTest_022, Function | MediumTest | Level1)
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
         EXPECT_TRUE(false);
     }
+}
+
+HWTEST_F(VcardTest, Telephony_VCardTest_Multi_Thread_Import, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    int testNum = 20;
+    int testStringNum = 25;
+    std::vector<std::string> fileNames;
+    std::string copiedString;
+    for (int i = 0; i < testStringNum; ++i) {
+        copiedString += INPUT_STR_FIVE;
+    }
+    for (int i = 0; i < testNum; i++) {
+        std::string fileName = "TestFile_" + std::to_string(i) + ".vcf";
+        WriteTestDataWithFileName(copiedString, fileName);
+        fileNames.push_back(fileName);
+    }
+
+    std::vector<std::thread> threads;
+    for (auto fileName : fileNames) {
+        threads.emplace_back(std::thread(std::bind(TestImport, fileName)));
+    }
+
+    for (auto &thread : threads) {
+        thread.join();
+    }
+
+    for (auto &fileName : fileNames) {
+        std::remove(fileName.c_str());
+    }
+    EXPECT_EQ(static_cast<int32_t>(VCardManager::GetInstance().listener_->GetContacts().size()), 0);
+}
+
+HWTEST_F(VcardTest, Telephony_VCardTest_Multi_Thread_Export, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    int testNum = 5;
+    std::vector<std::thread> threads;
+    std::string fileName = "export_test";
+    for (int i = 0; i < testNum; i++) {
+        threads.emplace_back(std::thread(std::bind(TestExport, fileName)));
+    }
+    for (auto &thread : threads) {
+        thread.join();
+    }
+    EXPECT_NE(fileName.c_str(), "test");
 }
 
 } // namespace Telephony

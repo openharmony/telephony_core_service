@@ -615,8 +615,8 @@ static void NativeGetNetworkSearchInformation(napi_env env, void *data)
     asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkSearchInformation(
         asyncContext->slotId, callback.release());
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
-        asyncContext->cv.wait_for(
-            callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [asyncContext] { return asyncContext->callbackEnd; });
+        asyncContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_NETWORK_MANUAL_SEARCH_TIME_SECOND),
+            [asyncContext] { return asyncContext->callbackEnd; });
         TELEPHONY_LOGI("NativeGetNetworkSearchInformation after callback end");
     }
     TELEPHONY_LOGI("NativeGetNetworkSearchInformation end");
@@ -821,7 +821,7 @@ static int32_t WrapJsSelectMode(int32_t jsSelectMode)
 
 static int32_t GetRatTechValue(std::string ratTechStr)
 {
-    if (!GSM.compare(ratTechStr) || GPRS.compare(ratTechStr)) {
+    if (!GSM.compare(ratTechStr) || !GPRS.compare(ratTechStr)) {
         return static_cast<int32_t>(NetworkRat::NETWORK_GSM_OR_GPRS);
     }
     if (!WCDMA.compare(ratTechStr)) {
