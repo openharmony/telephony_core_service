@@ -199,6 +199,21 @@ void AddIccDiallingNumbers(const uint8_t *data, size_t size)
     DelayedSingleton<CoreService>::GetInstance()->OnAddIccDiallingNumbers(dataMessageParcel, reply);
 }
 
+void IsCTSimCard(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnIsCTSimCard(dataMessageParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -214,6 +229,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetDsdsMode(data, size);
     HasSimCard(data, size);
     AddIccDiallingNumbers(data, size);
+    IsCTSimCard(data, size);
     return;
 }
 } // namespace OHOS

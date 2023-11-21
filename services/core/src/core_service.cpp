@@ -461,6 +461,16 @@ int32_t CoreService::GetIMSI(int32_t slotId, std::u16string &imsi)
     return simManager_->GetIMSI(slotId, imsi);
 }
 
+int32_t CoreService::IsCTSimCard(int32_t slotId, bool &isCTSimCard)
+{
+    TELEPHONY_LOGD("CoreService::IsCTSimCard(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->IsCTSimCard(slotId, isCTSimCard);
+}
+
 bool CoreService::IsSimActive(int32_t slotId)
 {
     TELEPHONY_LOGD("CoreService::IsSimActive(), slotId = %{public}d", slotId);

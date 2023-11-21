@@ -1597,6 +1597,41 @@ napi_value GetIMSI(napi_env env, napi_callback_info info)
     return NapiCreateAsyncWork<std::string, NativeGetIMSI, GetIMSICallback>(env, info, "GetIMSI");
 }
 
+void NativeIsCTSimCard(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    AsyncContext<bool> *reVal = static_cast<AsyncContext<bool> *>(data);
+    if (!IsValidSlotId(reVal->slotId)) {
+        TELEPHONY_LOGE("slotId is invalid");
+        reVal->context.errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
+    bool isCTSimCard = false;
+    int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().IsCTSimCard(reVal->slotId, isCTSimCard);
+    if (errorCode == ERROR_NONE) {
+        reVal->callbackVal = isCTSimCard;
+        reVal->context.resolved = true;
+    } else {
+        reVal->context.resolved = false;
+    }
+    TELEPHONY_LOGD("errorCode is %{public}d", errorCode);
+    reVal->context.errorCode = errorCode;
+}
+
+void IsCTSimCardCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncContext<bool>> context(static_cast<AsyncContext<bool> *>(data));
+    NapiAsyncCommomCompleteCallback(env, status, *context, false);
+}
+
+napi_value IsCTSimCard(napi_env env, napi_callback_info info)
+{
+    return NapiCreateAsyncWork<bool, NativeIsCTSimCard, IsCTSimCardCallback>(env, info, "IsCTSimCard");
+}
+
 void NativeSetShowName(napi_env env, void *data)
 {
     if (data == nullptr) {
@@ -3028,6 +3063,7 @@ napi_status InitSimInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getCardTypeSync", GetCardTypeSync),
         DECLARE_NAPI_FUNCTION("getSimIccId", GetSimIccId),
         DECLARE_NAPI_FUNCTION("getIMSI", GetIMSI),
+        DECLARE_NAPI_FUNCTION("isCTSimCard", IsCTSimCard),
         DECLARE_NAPI_FUNCTION("hasSimCard", HasSimCard),
         DECLARE_NAPI_FUNCTION("hasSimCardSync", HasSimCardSync),
         DECLARE_NAPI_FUNCTION("getSimGid1", GetSimGid1),
