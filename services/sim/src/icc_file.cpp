@@ -520,6 +520,25 @@ std::string IccFile::ObtainValidLanguage(const std::string &langData)
     return result;
 }
 
+void IccFile::SwapPairsForIccId(std::string &iccId)
+{
+    std::string result = "";
+    for (size_t i = 0; i < iccId.length() - 1; i += DATA_STEP) {
+        if (iccId[i + 1] > '9') {
+            break;
+        }
+        result += iccId[i + 1];
+        if (iccId[i] == 'F') {
+            continue;
+        }
+        if (iccId[i] > '9') {
+            break;
+        }
+        result += iccId[i];
+    }
+    iccId = result;
+}
+
 IccFile::~IccFile() {}
 
 void IccFile::SetRilAndFileController(const std::shared_ptr<Telephony::ITelRilManager> &ril,
