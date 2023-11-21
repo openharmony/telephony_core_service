@@ -305,6 +305,7 @@ public:
     int32_t SetDsdsMode(int32_t dsdsMode);
     int32_t SendSimMatchedOperatorInfo(
         int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey);
+    int32_t IsCTSimCard(int32_t slotId, bool &isCTSimCard);
     /******************** simManager end *****************************/
 private:
     CoreManagerInner();

@@ -77,6 +77,7 @@ public:
     bool HasSimCard();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
+    bool IsCTSimCard();
     static std::shared_ptr<SimFileManager> CreateInstance(
         std::weak_ptr<Telephony::ITelRilManager> ril, std::weak_ptr<SimStateManager> simState);
     enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
@@ -105,6 +106,8 @@ private:
     bool InitIccFileController(IccType type);
     void ChangeSimFileByCardType(IccType type);
     bool IsValidType(IccType type);
+    bool IsCTCardType(CardType type);
+    bool IsCTIccId(std::string iccId);
     std::string opName_;
     std::string opKey_;
     std::string opKeyExt_;

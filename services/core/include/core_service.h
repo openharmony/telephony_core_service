@@ -84,6 +84,8 @@ public:
 
     int32_t GetIMSI(int32_t slotId, std::u16string &imsi) override;
 
+    int32_t IsCTSimCard(int32_t slotId, bool &isCTSimCard) override;
+
     bool IsSimActive(int32_t slotId) override;
 
     int32_t GetSlotId(int32_t simId) override;

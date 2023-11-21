@@ -207,6 +207,8 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_002, Function | Medium
     AuthType authType = AuthType::SIM_AUTH_EAP_SIM_TYPE;
     std::string authData = "1234";
     DelayedSingleton<CoreService>::GetInstance()->SimAuthentication(SLOT_ID, authType, authData, response);
+    bool isCTSimCard = false;
+    DelayedSingleton<CoreService>::GetInstance()->IsCTSimCard(SLOT_ID, isCTSimCard);
     EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
 }
 

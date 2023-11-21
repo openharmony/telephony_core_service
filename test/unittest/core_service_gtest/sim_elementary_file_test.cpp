@@ -1458,6 +1458,38 @@ HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailInfo_0300, Function | MediumTest | L
         }
     }
 }
+
+/**
+ * @tc.number   Telephony_Sim_IsCTSimCard_0100
+ * @tc.name     Check whther the SIM card is CT SIM.
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_IsCTSimCard_0100, Function | MediumTest | Level3)
+{
+    if (!SimTest::HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        bool isCTSimCard = false;
+        int32_t result = CoreServiceClient::GetInstance().IsCTSimCard(SimTest::slotId_, isCTSimCard);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_IsCTSimCard_0200
+ * @tc.name     Check whther the SIM card is CT SIM.
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_IsCTSimCard_0200, Function | MediumTest | Level3)
+{
+    if (!SimTest::HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        bool isCTSimCard = false;
+        int32_t result = CoreServiceClient::GetInstance().IsCTSimCard(SimTest::slotId1_, isCTSimCard);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    }
+}
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS

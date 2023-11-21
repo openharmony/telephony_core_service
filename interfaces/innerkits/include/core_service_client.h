@@ -230,6 +230,15 @@ public:
     int32_t GetIMSI(int32_t slotId, std::u16string &imsi);
 
     /**
+     * @brief Check whther the SIM card in a specified slot is China Telecom SIM.
+     *
+     * @param slotId[in], sim slot id
+     * @param isCTSimCard[out], returns true if a SIM card is inserted; return false otherwise
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t IsCTSimCard(int32_t slotId, bool &isCTSimCard);
+
+    /**
      * @brief Checks whether the SIM card in a specified slot is activated
      *
      * @param slotId[in], sim slot id

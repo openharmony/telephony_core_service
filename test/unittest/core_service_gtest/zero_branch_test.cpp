@@ -342,6 +342,54 @@ HWTEST_F(BranchTest, Telephony_SimFileManager_002, Function | MediumTest | Level
 }
 
 /**
+ * @tc.number   Telephony_SimFileManager_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SimFileManager_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    SimFileManager simFileManager { runner, subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager) };
+    EXPECT_TRUE(simFileManager.IsCTCardType(CardType::SINGLE_MODE_RUIM_CARD));
+    EXPECT_TRUE(simFileManager.IsCTCardType(CardType::CT_NATIONAL_ROAMING_CARD));
+    EXPECT_TRUE(simFileManager.IsCTCardType(CardType::DUAL_MODE_TELECOM_LTE_CARD));
+    EXPECT_FALSE(simFileManager.IsCTCardType(CardType::UNKNOWN_CARD));
+    std::string iccId = "";
+    EXPECT_FALSE(simFileManager.IsCTIccId(iccId));
+    iccId = "8986030";
+    EXPECT_TRUE(simFileManager.IsCTIccId(iccId));
+    iccId = "8985302";
+    EXPECT_TRUE(simFileManager.IsCTIccId(iccId));
+    EXPECT_FALSE(simFileManager.IsCTSimCard());
+    std::shared_ptr<AppExecFwk::EventRunner> runnerSimFile = AppExecFwk::EventRunner::Create("SimFile");
+    std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(runnerSimFile, simStateManager);
+    simFileManager.simFile_ = simFile;
+    std::shared_ptr<AppExecFwk::EventRunner> runnerSimStateHandle = AppExecFwk::EventRunner::Create("SimStateHandle");
+    auto simStateManagerTwo = std::make_shared<SimStateManager>(telRilManager);
+    auto simStateHandle = std::make_shared<SimStateHandle>(runnerSimStateHandle, simStateManagerTwo);
+    simStateManager->simStateHandle_ = simStateHandle;
+    simStateHandle->externalType_ = CardType::SINGLE_MODE_RUIM_CARD;
+    simFile->iccId_ = "8986030";
+    EXPECT_TRUE(simFileManager.IsCTSimCard());
+    simStateHandle->externalType_ = CardType::UNKNOWN_CARD;
+    simFile->operatorNumeric_ = "20404";
+    EXPECT_TRUE(simFileManager.IsCTSimCard());
+    simFile->operatorNumeric_ = "45431";
+    EXPECT_FALSE(simFileManager.IsCTSimCard());
+    simFile->operatorNumeric_ = "46003";
+    EXPECT_TRUE(simFileManager.IsCTSimCard());
+    simFile->iccId_ = "8985231";
+    EXPECT_FALSE(simFileManager.IsCTSimCard());
+    simStateManager->simStateHandle_ = nullptr;
+}
+
+/**
  * @tc.number   Telephony_SimFile_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -855,6 +903,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_004, Function | MediumTest | Lev
     EXPECT_GT(mInner.DelSmsIcc(0, 0), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(mInner.IsSimActive(0));
     EXPECT_GT(mInner.SetShowName(0, u""), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.IsCTSimCard(0, boolResult), TELEPHONY_ERR_SUCCESS);
     LockStatusResponse response;
     PersoLockInfo lockInfo;
     EXPECT_GT(mInner.UnlockSimLock(0, lockInfo, response), TELEPHONY_ERR_SUCCESS);
@@ -1382,6 +1431,9 @@ HWTEST_F(BranchTest, Telephony_SimManager_005, Function | MediumTest | Level1)
     IccAccountInfo mIccAccountInfo;
     EXPECT_GT(simManager->GetSimAccountInfo(0, false, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->GetSimAccountInfo(INVALID_SLOTID, false, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
+    bool isCTSimCard = false;
+    EXPECT_GT(simManager->IsCTSimCard(0, isCTSimCard), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->IsCTSimCard(INVALID_SLOTID, isCTSimCard), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
