@@ -771,36 +771,12 @@ declare namespace sim {
    * Check whether the SIM card in a specified slot is China Telecom SIM.
    *
    * @param { number } slotId - Indicates the card slot index number,
-   * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param { AsyncCallback<boolean> } callback - Indicates the callback for isCTSimCard.
-   * Returns {@code true} if the SIM card is CT SIM; return {@code false} otherwise.
-   * @throws { BusinessError } 401 - Parameter error.
-   * @throws { BusinessError } 8300001 - Invalid parameter value.
-   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
-   * @throws { BusinessError } 8300003 - System internal error.
-   * @throws { BusinessError } 8300004 - Do not have sim card.
-   * @throws { BusinessError } 8300999 - Unknown error code.
+   * ranging from 0 to the maximum card slots supported by the device.
+   * @returns { boolean } Returns {@code true} if the SIM card is CT SIM; return {@code false} otherwise.
    * @syscap SystemCapability.Telephony.CoreService
    * @since 11
    */
-  function isCTSimCard(slotId: number, callback: AsyncCallback<boolean>): void;
-
-  /**
-   * Check whether the SIM card in a specified slot is China Telecom SIM.
-   *
-   * @param { number } slotId - Indicates the card slot index number,
-   * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns { Promise<boolean> } Returns {@code true} if the SIM card is CT SIM; return {@code false} otherwise.
-   * @throws { BusinessError } 401 - Parameter error.
-   * @throws { BusinessError } 8300001 - Invalid parameter value.
-   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
-   * @throws { BusinessError } 8300003 - System internal error.
-   * @throws { BusinessError } 8300004 - Do not have sim card.
-   * @throws { BusinessError } 8300999 - Unknown error code.
-   * @syscap SystemCapability.Telephony.CoreService
-   * @since 11
-   */
-  function isCTSimCard(slotId: number): Promise<boolean>;
+  function isCTSimCard(slotId: number): boolean;
 
   /**
    * Checks whether a SIM card is inserted in a specified slot.
