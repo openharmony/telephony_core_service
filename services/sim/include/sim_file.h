@@ -128,6 +128,7 @@ private:
 
     void CheckMncLength();
     bool IsContinueGetSpn(bool start, SpnStatus curStatus, SpnStatus &newStatus);
+    const int MNC_INDEX = 7;
     const int MCC_LEN = 3;
     const int MNC_LEN = 2;
     const int MCCMNC_LEN = 6;
