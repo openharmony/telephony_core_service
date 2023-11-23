@@ -69,6 +69,7 @@ public:
     virtual int32_t GetSimSpn(int32_t slotId, std::u16string &spn) = 0;
     virtual int32_t GetSimIccId(int32_t slotId, std::u16string &iccId) = 0;
     virtual int32_t GetIMSI(int32_t slotId, std::u16string &imsi) = 0;
+    virtual int32_t IsCTSimCard(int32_t slotId, bool &isCTSimCard) = 0;
     virtual bool IsSimActive(int32_t slotId) = 0;
     virtual int32_t GetSlotId(int32_t simId) = 0;
     virtual int32_t GetSimId(int32_t slotId) = 0;

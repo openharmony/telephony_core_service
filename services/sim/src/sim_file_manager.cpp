@@ -29,6 +29,15 @@ namespace OHOS {
 namespace Telephony {
 static constexpr int32_t VM_NUMBER_LEN = 256;
 constexpr const char *VM_NUMBER_SIM_IMSI_KEY = "persist.telephony.voicemail.simimsi";
+const std::vector<std::string> CT_CPLMNS = { "46003", "46005", "46011", "46012", "47008", "45502", "45507", "46050",
+    "46051", "46059" };
+const std::vector<std::string> CT_ICCID_ARRAY = { "898603", "898606", "898611", "8985302", "8985307" };
+constexpr int32_t ICCID_LEN_MINIMUM = 7;
+constexpr int32_t ICCID_LEN_SIX = 6;
+constexpr int32_t PREFIX_LOCAL_ICCID_LEN = 4;
+constexpr const char *GC_ICCID = "8985231";
+constexpr const char *PREFIX_LOCAL_ICCID = "8986";
+constexpr const char *ROAMING_CPLMN = "20404";
 
 SimFileManager::SimFileManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     const EventFwk::CommonEventSubscribeInfo &sp, std::weak_ptr<ITelRilManager> telRilManager,
@@ -637,6 +646,79 @@ bool SimFileManager::InitDiallingNumberHandler()
         return false;
     }
     return true;
+}
+
+bool SimFileManager::IsCTSimCard()
+{
+    auto simStateManager = simStateManager_.lock();
+    if (simStateManager == nullptr) {
+        TELEPHONY_LOGE("simStateManager nullptr");
+        return false;
+    }
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("simFile nullptr");
+        return false;
+    }
+    CardType cardType = simStateManager->GetCardType();
+    bool isCTCardType = IsCTCardType(cardType);
+    std::string iccId = simFile_->ObtainIccId();
+    if (!iccId.empty() && iccId.length() >= ICCID_LEN_MINIMUM) {
+        iccId = iccId.substr(0, ICCID_LEN_MINIMUM);
+    }
+    if (isCTCardType && IsCTIccId(iccId)) {
+        TELEPHONY_LOGI("[slot%{public}d] result = 1", slotId_);
+        return true;
+    }
+    TELEPHONY_LOGI("[slot%{public}d] goto check plmn", slotId_);
+    bool result = false;
+    std::string plmn = simFile_->ObtainSimOperator();
+    if (!plmn.empty()) {
+        auto plmnRet = find(CT_CPLMNS.begin(), CT_CPLMNS.end(), plmn);
+        result = plmnRet != CT_CPLMNS.end();
+        TELEPHONY_LOGI("[slot%{public}d] plmn check result = %{public}d", slotId_, result);
+    }
+    if (!iccId.empty()) {
+        if (result) {
+            if (!iccId.compare(GC_ICCID)) {
+                result = false;
+            }
+        } else {
+            if (!plmn.compare(ROAMING_CPLMN) && IsCTIccId(iccId)) {
+                result = true;
+            }
+        }
+    }
+    TELEPHONY_LOGI("[slot%{public}d] result = %{public}d", slotId_, result);
+    return result;
+}
+
+bool SimFileManager::IsCTCardType(CardType type)
+{
+    bool isCTCardType = false;
+    switch (type) {
+        case CardType::SINGLE_MODE_RUIM_CARD:
+        case CardType::CT_NATIONAL_ROAMING_CARD:
+        case CardType::DUAL_MODE_TELECOM_LTE_CARD:
+            isCTCardType = true;
+            break;
+        default:
+            isCTCardType = false;
+            break;
+    }
+    return isCTCardType;
+}
+
+bool SimFileManager::IsCTIccId(std::string iccId)
+{
+    bool isCTIccId = false;
+    if (!iccId.empty() && iccId.length() >= ICCID_LEN_MINIMUM) {
+        if (iccId.compare(0, PREFIX_LOCAL_ICCID_LEN, PREFIX_LOCAL_ICCID) == 0) {
+            iccId = iccId.substr(0, ICCID_LEN_SIX);
+        }
+        auto iccIdRet = find(CT_ICCID_ARRAY.begin(), CT_ICCID_ARRAY.end(), iccId);
+        isCTIccId = iccIdRet != CT_ICCID_ARRAY.end();
+    }
+    return isCTIccId;
 }
 
 std::shared_ptr<IccDiallingNumbersHandler> SimFileManager::ObtainDiallingNumberHandler()

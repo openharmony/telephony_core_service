@@ -65,6 +65,7 @@ private:
     int32_t OnGetSimIccId(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimOperatorNumeric(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetIMSI(MessageParcel &data, MessageParcel &reply);
+    int32_t OnIsCTSimCard(MessageParcel &data, MessageParcel &reply);
     int32_t OnIsSimActive(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSlotId(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimId(MessageParcel &data, MessageParcel &reply);

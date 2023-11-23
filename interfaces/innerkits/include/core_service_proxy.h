@@ -57,6 +57,7 @@ public:
     int32_t GetCardType(int32_t slotId, CardType &cardType) override;
     int32_t GetSimSpn(int32_t slotId, std::u16string &spn) override;
     int32_t GetIMSI(int32_t slotId, std::u16string &imsi) override;
+    int32_t IsCTSimCard(int32_t slotId, bool &isCTSimCard) override;
     int32_t GetSimGid1(int32_t slotId, std::u16string &gid1) override;
     int32_t GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric) override;
     int32_t GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode) override;

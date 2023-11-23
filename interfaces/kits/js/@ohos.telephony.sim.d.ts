@@ -768,6 +768,17 @@ declare namespace sim {
   function getIMSI(slotId: number): Promise<string>;
 
   /**
+   * Check whether the SIM card in a specified slot is China Telecom SIM.
+   *
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slots supported by the device.
+   * @returns { boolean } Returns {@code true} if the SIM card is CT SIM; return {@code false} otherwise.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 11
+   */
+  function isCTSimCard(slotId: number): boolean;
+
+  /**
    * Checks whether a SIM card is inserted in a specified slot.
    *
    * @param { number } slotId - Indicates the card slot index number,

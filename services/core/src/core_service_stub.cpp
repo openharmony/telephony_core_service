@@ -83,6 +83,7 @@ void CoreServiceStub::AddHandlerSimToMap()
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_OPERATOR_NUMERIC)] =
         &CoreServiceStub::OnGetSimOperatorNumeric;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMSI)] = &CoreServiceStub::OnGetIMSI;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_CT_SIM_CARD)] = &CoreServiceStub::OnIsCTSimCard;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_SIM_ACTIVE)] = &CoreServiceStub::OnIsSimActive;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_LANGUAGE)] = &CoreServiceStub::OnGetLocaleFromDefaultSim;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_GID1)] = &CoreServiceStub::OnGetSimGid1;
@@ -567,6 +568,22 @@ int32_t CoreServiceStub::OnGetIMSI(MessageParcel &data, MessageParcel &reply)
     }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::GET_IMSI write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnIsCTSimCard(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    bool isCTSimCard = false;
+    int32_t result = IsCTSimCard(slotId, isCTSimCard);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteBool(isCTSimCard));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::IS_CT_SIM_CARD write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return result;

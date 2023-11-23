@@ -240,6 +240,7 @@ enum class InputCmd {
     INPUT_GET_VOICEMAIL_COUNT = 130,
     INPUT_SET_VOICEMAIL_COUNT = 131,
     INPUT_SET_VOICECALL_FORWARDING = 132,
+    INPUT_IS_CT_SIM_CARD = 133,
 };
 
 enum class PinWordSize {
@@ -633,6 +634,18 @@ static bool TestSetVoiceCallForwarding()
     std::cin >> number;
     int32_t result = g_telephonyService->SetVoiceCallForwarding(testSlot, true, number);
     std::cout << "TelephonyTestService Remote SetVoiceCallForwarding result [" << result << "] " << std::endl;
+    return true;
+}
+
+static bool TestIsCTSimCard()
+{
+    static int32_t testSlot = SLOT_ID;
+    std::cout << "please input Slot Id" << std::endl;
+    std::cin >> testSlot;
+    bool result = false;
+    g_telephonyService->IsCTSimCard(testSlot, result);
+    string expect = result ? "success" : "fail";
+    std::cout << "TelephonyTestService Remote IsCTSimCard result [" << result << "] " << expect << std::endl;
     return true;
 }
 
@@ -1410,6 +1423,7 @@ static void Prompt()
                  "68:GetOpKeyExt\n70:HasOperatorPrivileges\n71:TestGetSimId\n72:TestGetSlotId\n"
                  "73:TestGetDefaultVoiceSimId\n"
                  "130:GetVoiceMailCount\n131:SetVoiceMailCount\n132:SetVoiceCallForwarding\n"
+                 "133:TestIsCTSimCard\n"
                  "100:exit\n"
               << std::endl;
 }
@@ -1478,6 +1492,7 @@ static void InitFuncMapExt()
     g_funcMap[InputCmd::INPUT_GET_VOICEMAIL_COUNT] = TestGetVoiceMailCount;
     g_funcMap[InputCmd::INPUT_SET_VOICEMAIL_COUNT] = TestSetVoiceMailCount;
     g_funcMap[InputCmd::INPUT_SET_VOICECALL_FORWARDING] = TestSetVoiceCallForwarding;
+    g_funcMap[InputCmd::INPUT_IS_CT_SIM_CARD] = TestIsCTSimCard;
 }
 
 static bool ProcessInput()

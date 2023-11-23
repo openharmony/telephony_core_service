@@ -1597,6 +1597,31 @@ napi_value GetIMSI(napi_env env, napi_callback_info info)
     return NapiCreateAsyncWork<std::string, NativeGetIMSI, GetIMSICallback>(env, info, "GetIMSI");
 }
 
+napi_value IsCTSimCard(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    bool isCTSimCard = false;
+    napi_value value = nullptr;
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        NAPI_CALL(env, napi_create_int32(env, isCTSimCard, &value));
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        NAPI_CALL(env, napi_create_int32(env, isCTSimCard, &value));
+        return value;
+    }
+    if (IsValidSlotId(slotId)) {
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().IsCTSimCard(slotId, isCTSimCard);
+    }
+    NAPI_CALL(env, napi_get_boolean(env, isCTSimCard, &value));
+    return value;
+}
+
 void NativeSetShowName(napi_env env, void *data)
 {
     if (data == nullptr) {
@@ -3028,6 +3053,7 @@ napi_status InitSimInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getCardTypeSync", GetCardTypeSync),
         DECLARE_NAPI_FUNCTION("getSimIccId", GetSimIccId),
         DECLARE_NAPI_FUNCTION("getIMSI", GetIMSI),
+        DECLARE_NAPI_FUNCTION("isCTSimCard", IsCTSimCard),
         DECLARE_NAPI_FUNCTION("hasSimCard", HasSimCard),
         DECLARE_NAPI_FUNCTION("hasSimCardSync", HasSimCardSync),
         DECLARE_NAPI_FUNCTION("getSimGid1", GetSimGid1),

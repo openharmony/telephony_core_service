@@ -40,6 +40,7 @@ enum class CoreServiceInterfaceCode {
     GET_SPN,
     GET_ICCID,
     GET_IMSI,
+    IS_CT_SIM_CARD,
     IS_SIM_ACTIVE,
     UNLOCK_PIN,
     UNLOCK_PUK,

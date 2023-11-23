@@ -783,6 +783,36 @@ int32_t CoreServiceProxy::GetIMSI(int32_t slotId, std::u16string &imsi)
     return result;
 }
 
+int32_t CoreServiceProxy::IsCTSimCard(int32_t slotId, bool &isCTSimCard)
+{
+    if (!IsValidSlotId(slotId)) {
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("IsCTSimCard WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("IsCTSimCard Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::IS_CT_SIM_CARD), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("IsCTSimCard failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        isCTSimCard = reply.ReadBool();
+    }
+    return result;
+}
+
 bool CoreServiceProxy::IsSimActive(int32_t slotId)
 {
     TELEPHONY_LOGI("CoreServiceProxy IsSimActive ::%{public}d", slotId);

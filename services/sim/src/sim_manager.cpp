@@ -955,6 +955,20 @@ int32_t SimManager::SetVoiceMailInfo(int32_t slotId, const std::u16string &mailN
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t SimManager::IsCTSimCard(int32_t slotId, bool &isCTSimCard)
+{
+    if (!HasSimCardInner(slotId)) {
+        TELEPHONY_LOGE("IsCTSimCard has no sim card!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    isCTSimCard = simFileManager_[slotId]->IsCTSimCard();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 int32_t SimManager::AddSmsToIcc(int32_t slotId, int status, std::string &pdu, std::string &smsc)
 {
     if ((!IsValidSlotId(slotId)) || (simSmsManager_[slotId] == nullptr)) {
