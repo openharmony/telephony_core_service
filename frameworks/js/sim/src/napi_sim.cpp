@@ -1597,39 +1597,29 @@ napi_value GetIMSI(napi_env env, napi_callback_info info)
     return NapiCreateAsyncWork<std::string, NativeGetIMSI, GetIMSICallback>(env, info, "GetIMSI");
 }
 
-void NativeIsCTSimCard(napi_env env, void *data)
-{
-    if (data == nullptr) {
-        return;
-    }
-    AsyncContext<bool> *reVal = static_cast<AsyncContext<bool> *>(data);
-    if (!IsValidSlotId(reVal->slotId)) {
-        TELEPHONY_LOGE("slotId is invalid");
-        reVal->context.errorCode = ERROR_SLOT_ID_INVALID;
-        return;
-    }
-    bool isCTSimCard = false;
-    int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().IsCTSimCard(reVal->slotId, isCTSimCard);
-    if (errorCode == ERROR_NONE) {
-        reVal->callbackVal = isCTSimCard;
-        reVal->context.resolved = true;
-    } else {
-        reVal->context.resolved = false;
-    }
-    TELEPHONY_LOGD("errorCode is %{public}d", errorCode);
-    reVal->context.errorCode = errorCode;
-}
-
-void IsCTSimCardCallback(napi_env env, napi_status status, void *data)
-{
-    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
-    std::unique_ptr<AsyncContext<bool>> context(static_cast<AsyncContext<bool> *>(data));
-    NapiAsyncCommomCompleteCallback(env, status, *context, false);
-}
-
 napi_value IsCTSimCard(napi_env env, napi_callback_info info)
 {
-    return NapiCreateAsyncWork<bool, NativeIsCTSimCard, IsCTSimCardCallback>(env, info, "IsCTSimCard");
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    bool isCTSimCard = false;
+    napi_value value = nullptr;
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        NAPI_CALL(env, napi_create_int32(env, isCTSimCard, &value));
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        NAPI_CALL(env, napi_create_int32(env, isCTSimCard, &value));
+        return value;
+    }
+    if (IsValidSlotId(slotId)) {
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().IsCTSimCard(slotId, isCTSimCard);
+    }
+    NAPI_CALL(env, napi_get_boolean(env, isCTSimCard, &value));
+    return value;
 }
 
 void NativeSetShowName(napi_env env, void *data)
