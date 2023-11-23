@@ -109,8 +109,8 @@ private:
     std::string opKey_;
     std::string opKeyExt_;
 
-    const std::string VM_NUMBER_KEY = "persist.telephony.sim.vmnum";
-    const std::string VM_NUMBER_CDMA_KEY = "persist.telephony.sim.vmnumcdma";
+    const std::string VM_NUMBER_KEY = "persist.telephony.voicemail.gsm";
+    const std::string VM_NUMBER_CDMA_KEY = "persist.telephony.voicemail.cdma";
     void SetVoiceMailParamGsm(const std::u16string mailNumber, bool isSavedIccRecords);
     void SetVoiceMailParamCdma(const std::u16string mailNumber);
     std::string GetVoiceMailNumberKey();
@@ -121,6 +121,8 @@ private:
     std::string GetVoiceMailSimImsiFromParam();
     void HandleSimRecordsLoaded();
     bool IsPhoneTypeGsm(int32_t slotId);
+    std::string EncryptImsi(const std::string imsi);
+    bool IsEncryptImsiEmpty(const std::string encryptImsi);
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
 };
 } // namespace Telephony
