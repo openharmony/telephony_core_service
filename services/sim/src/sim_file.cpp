@@ -1032,12 +1032,12 @@ bool SimFile::ProcessGetAdDone(const AppExecFwk::InnerEvent::Pointer &event)
     }
     TELEPHONY_LOGI("SimFile ELEMENTARY_FILE_AD: %{public}s", rawData);
     int dataSize = static_cast<int>(iccData.size());
-    if (dataSize <= MCC_LEN) {
+    if (dataSize <= MNC_INDEX) {
         TELEPHONY_LOGI("SimFile MNC length dataSize = %{public}d", dataSize);
         doneData = false;
     }
     if (doneData) {
-        lengthOfMnc_ = fileData[MCC_LEN] & 0xf;
+        lengthOfMnc_ = fileData[MNC_INDEX] & 0xf;
         TELEPHONY_LOGI("setting4 lengthOfMnc_= %{public}d", lengthOfMnc_);
     }
     if (doneData && (lengthOfMnc_ == 0xf)) {
