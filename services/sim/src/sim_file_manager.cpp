@@ -15,6 +15,7 @@
 
 #include "sim_file_manager.h"
 
+#include <openssl/sha.h>
 #include "core_manager_inner.h"
 #include "ims_core_service_client.h"
 #include "network_state.h"
@@ -27,7 +28,7 @@
 namespace OHOS {
 namespace Telephony {
 static constexpr int32_t VM_NUMBER_LEN = 256;
-constexpr const char *VM_NUMBER_SIM_IMSI_KEY = "persist.telephony.sim.vmsimimsi";
+constexpr const char *VM_NUMBER_SIM_IMSI_KEY = "persist.telephony.voicemail.simimsi";
 
 SimFileManager::SimFileManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     const EventFwk::CommonEventSubscribeInfo &sp, std::weak_ptr<ITelRilManager> telRilManager,
@@ -542,6 +543,20 @@ void SimFileManager::SetVoiceMailParamCdma(const std::u16string mailNumber)
         Str16ToStr8(mailNumber).c_str());
 }
 
+std::string SimFileManager::EncryptImsi(const std::string imsi)
+{
+    if (imsi.empty()) {
+        return "";
+    }
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, imsi.c_str(), imsi.size());
+    SHA256_Final(hash, &sha256);
+    std::string encryptImsi = SIMUtils::BytesConvertToHexString(hash, SHA256_DIGEST_LENGTH);
+    return encryptImsi;
+}
+
 std::string SimFileManager::GetVoiceMailSimImsiFromParam()
 {
     std::string key = "";
@@ -553,8 +568,9 @@ std::string SimFileManager::GetVoiceMailSimImsiFromParam()
 
 void SimFileManager::SetVoiceMailSimImsiParam(std::string imsi)
 {
+    std::string encryptImsi = EncryptImsi(imsi);
     std::string key = "";
-    SetParameter(key.append(VM_NUMBER_SIM_IMSI_KEY).append(std::to_string(slotId_)).c_str(), imsi.c_str());
+    SetParameter(key.append(VM_NUMBER_SIM_IMSI_KEY).append(std::to_string(slotId_)).c_str(), encryptImsi.c_str());
 }
 
 void SimFileManager::StoreVoiceMailNumber(const std::u16string mailNumber, bool isSavedIccRecords)
@@ -635,10 +651,11 @@ void SimFileManager::HandleSimRecordsLoaded()
         return;
     }
 
-    std::string imsiFromParam = GetVoiceMailSimImsiFromParam();
     std::string imsiFromSim = simFile_->ObtainIMSI();
+    std::string encryptImsiFromSim = EncryptImsi(imsiFromSim);
+    std::string imsiFromParam = GetVoiceMailSimImsiFromParam();
     if ((!IsPhoneTypeGsm(slotId_) || !imsiFromParam.empty()) &&
-        !imsiFromSim.empty() && imsiFromParam != imsiFromSim) {
+        !encryptImsiFromSim.empty() && imsiFromParam != encryptImsiFromSim) {
         std::string nullStr = "";
         StoreVoiceMailNumber(Str8ToStr16(nullStr), false);
         SetVoiceMailSimImsiParam(nullStr);
