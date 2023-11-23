@@ -318,6 +318,16 @@ int32_t CoreServiceClient::GetIMSI(int32_t slotId, std::u16string &imsi)
     return proxy->GetIMSI(slotId, imsi);
 }
 
+int32_t CoreServiceClient::IsCTSimCard(int32_t slotId, bool &isCTSimCard)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->IsCTSimCard(slotId, isCTSimCard);
+}
+
 bool CoreServiceClient::IsSimActive(int32_t slotId)
 {
     auto proxy = GetProxy();

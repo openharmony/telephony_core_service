@@ -115,6 +115,7 @@ public:
     std::u16string GetSimIst(int32_t slotId) override;
     int ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum) override;
     int32_t SetVoiceMailInfo(int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber) override;
+    int32_t IsCTSimCard(int32_t slotId, bool &isCTSimCard) override;
     // SimSms
     int32_t AddSmsToIcc(int32_t slotId, int status, std::string &pdu, std::string &smsc) override;
     int32_t UpdateSmsIcc(

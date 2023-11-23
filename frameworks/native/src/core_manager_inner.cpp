@@ -2279,6 +2279,15 @@ int32_t CoreManagerInner::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue
     }
     return simManager_->QueryImsSwitch(slotId, imsSwitchValue);
 }
+
+int32_t CoreManagerInner::IsCTSimCard(int32_t slotId, bool &isCTSimCard)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->IsCTSimCard(slotId, isCTSimCard);
+}
 /******************** simManager_ end ************************/
 } // namespace Telephony
 } // namespace OHOS
