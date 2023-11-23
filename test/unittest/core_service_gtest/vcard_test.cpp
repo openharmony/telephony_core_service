@@ -81,7 +81,7 @@ END:VCARD
 
 )";
 
-std::string INPUT_STR_THREE =
+std::string g_inputStrThree =
     "BEGIN:VCARD\r\nVERSION:2.1\r\nX_OHOS_CUSTOM;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:relation;="
     "E6=B5=8B=E8=AF=95;=E6=B5=8B=E8=AF=95=69=64;=E6=B5=8B=E8=AF=95=6E=61=6D=65\r\nX_OHOS_CUSTOM:"
     "relation;realationName;labelId;labelName\r\nEND:VCARD\r\n";

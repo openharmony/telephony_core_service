@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+persist.telephony.voicemail.="radio:radio:750"
 persist.telephony.="radio:radio:775"
 telephony.="radio:radio:775"
 const.telephony.="radio:radio:444"

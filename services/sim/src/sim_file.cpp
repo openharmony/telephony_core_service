@@ -945,6 +945,7 @@ bool SimFile::ProcessGetIccIdDone(const AppExecFwk::InnerEvent::Pointer &event)
     }
     if (fd->exception == nullptr) {
         std::string iccData = fd->resultData;
+        SwapPairsForIccId(iccData);
         TELEPHONY_LOGI("SimFile::ProcessEvent ICCID result success");
         iccId_ = iccData;
     }
@@ -1024,29 +1025,21 @@ bool SimFile::ProcessGetAdDone(const AppExecFwk::InnerEvent::Pointer &event)
     }
     std::string iccData = fd->resultData;
     bool doneData = true;
-    if (!ObtainIMSI().empty()) {
-        std::string imsi = ObtainIMSI();
-        int mcc = atoi(imsi.substr(0, MCC_LEN).c_str());
-        lengthOfMnc_ = MccPool::ShortestMncLengthFromMcc(mcc);
-        TELEPHONY_LOGI("SimFile [TestMode] lengthOfMnc_= %{public}d", lengthOfMnc_);
-    } else {
-        char *rawData = const_cast<char *>(iccData.c_str());
-        unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
-        if (fd->exception != nullptr) {
-            doneData = false;
-        }
-        TELEPHONY_LOGI("SimFile ELEMENTARY_FILE_AD: %{public}s", rawData);
-        int dataSize = static_cast<int>(iccData.size());
-        if (dataSize <= MCC_LEN) {
-            TELEPHONY_LOGI("SimFile MNC length dataSize = %{public}d", dataSize);
-            doneData = false;
-        }
-        if (doneData) {
-            lengthOfMnc_ = fileData[MCC_LEN] & 0xf;
-            TELEPHONY_LOGI("setting4 lengthOfMnc_= %{public}d", lengthOfMnc_);
-        }
+    char *rawData = const_cast<char *>(iccData.c_str());
+    unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
+    if (fd->exception != nullptr) {
+        doneData = false;
     }
-
+    TELEPHONY_LOGI("SimFile ELEMENTARY_FILE_AD: %{public}s", rawData);
+    int dataSize = static_cast<int>(iccData.size());
+    if (dataSize <= MNC_INDEX) {
+        TELEPHONY_LOGI("SimFile MNC length dataSize = %{public}d", dataSize);
+        doneData = false;
+    }
+    if (doneData) {
+        lengthOfMnc_ = fileData[MNC_INDEX] & 0xf;
+        TELEPHONY_LOGI("setting4 lengthOfMnc_= %{public}d", lengthOfMnc_);
+    }
     if (doneData && (lengthOfMnc_ == 0xf)) {
         lengthOfMnc_ = UNKNOWN_MNC;
     } else if (doneData && (lengthOfMnc_ != MNC_LEN) && (lengthOfMnc_ != MCC_LEN)) {
