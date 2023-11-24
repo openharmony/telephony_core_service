@@ -375,7 +375,7 @@ int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)
     if (result == nullptr) {
         TELEPHONY_LOGE("get nothing");
         dataShareHelper->Release();
-        return INVALID_VALUE;
+        return TELEPHONY_SUCCESS;
     }
     int resultSetNum = result->GoToFirstRow();
     while (resultSetNum == 0) {
@@ -419,9 +419,9 @@ int32_t SimRdbHelper::QueryAllValidData(std::vector<SimRdbInfo> &vec)
 {
     TELEPHONY_LOGD("start");
     std::vector<std::string> colume;
-    std::string id = std::to_string(DEACTIVE);
+    std::string id = std::to_string(INVALID_VALUE);
     DataShare::DataSharePredicates predicates;
-    predicates.GreaterThan(SimData::IS_ACTIVE, id);
+    predicates.GreaterThan(SimData::SLOT_INDEX, id);
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGI("retry CreateDataHelper");
@@ -485,8 +485,8 @@ int32_t SimRdbHelper::ForgetAllData()
     TELEPHONY_LOGD("start");
     DataShare::DataSharePredicates predicates;
     DataShare::DataShareValuesBucket value;
-    DataShare::DataShareValueObject valueObj(DEACTIVE);
-    value.Put(SimData::IS_ACTIVE, valueObj);
+    DataShare::DataShareValueObject valueObj(INVALID_VALUE);
+    value.Put(SimData::SLOT_INDEX, valueObj);
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
@@ -494,6 +494,7 @@ int32_t SimRdbHelper::ForgetAllData()
     }
     int result = Update(dataShareHelper, value, predicates);
     dataShareHelper->Release();
+    TELEPHONY_LOGD("result = %{public}d", result);
     return result;
 }
 
@@ -503,8 +504,10 @@ int32_t SimRdbHelper::ForgetAllData(int32_t slotId)
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SimData::SLOT_INDEX, std::to_string(slotId));
     DataShare::DataShareValuesBucket value;
-    DataShare::DataShareValueObject valueObj(DEACTIVE);
+    DataShare::DataShareValueObject valueObj(ACTIVE);
     value.Put(SimData::IS_ACTIVE, valueObj);
+    DataShare::DataShareValueObject valueIndex(INVALID_VALUE);
+    value.Put(SimData::SLOT_INDEX, valueIndex);
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
@@ -512,6 +515,7 @@ int32_t SimRdbHelper::ForgetAllData(int32_t slotId)
     }
     int result = Update(dataShareHelper, value, predicates);
     dataShareHelper->Release();
+    TELEPHONY_LOGD("result = %{public}d", result);
     return result;
 }
 

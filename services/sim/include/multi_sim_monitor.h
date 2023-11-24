@@ -49,36 +49,9 @@ public:
     void RegisterSimNotify();
     void UnRegisterSimNotify();
 
-private:
-    class UserSwitchEventSubscriber : public CommonEventSubscriber {
-    public:
-        explicit UserSwitchEventSubscriber(
-            const CommonEventSubscribeInfo &info, std::shared_ptr<AppExecFwk::EventHandler> multiSimMonitorHandler)
-            : CommonEventSubscriber(info), multiSimMonitorHandler_(multiSimMonitorHandler)
-        {}
-        ~UserSwitchEventSubscriber() = default;
-        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
-
-    private:
-        std::shared_ptr<AppExecFwk::EventHandler> multiSimMonitorHandler_ = nullptr;
-    };
-
-    class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
-    public:
-        SystemAbilityStatusChangeListener(std::shared_ptr<AppExecFwk::EventHandler> multiSimMonitorHandler);
-        ~SystemAbilityStatusChangeListener() = default;
-        virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
-        virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
-
-    private:
-        std::weak_ptr<AppExecFwk::EventHandler> multiSimMonitorHandler_;
-        std::shared_ptr<UserSwitchEventSubscriber> userSwitchSubscriber_ = nullptr;
-    };
-
 public:
     enum {
         REGISTER_SIM_NOTIFY_EVENT = 0,
-        UNREGISTER_SIM_NOTIFY_EVENT,
     };
 
 private:
@@ -86,7 +59,6 @@ private:
     void RefreshData(int32_t slotId);
     void InitData(int32_t slotId);
     bool IsValidSlotId(int32_t slotId);
-    void InitListener();
 
 private:
     struct SimAccountCallbackRecord {
@@ -100,7 +72,7 @@ private:
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     std::list<SimAccountCallbackRecord> listSimAccountCallbackRecord_;
     std::mutex mutexInner_;
-    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
+    std::atomic<int32_t> remainCount_ = 30;
 };
 } // namespace Telephony
 } // namespace OHOS

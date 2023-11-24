@@ -134,15 +134,6 @@ int32_t SimManager::HasSimCard(int32_t slotId, bool &hasSimCard)
         hasSimCard = true;
         return TELEPHONY_ERR_SUCCESS;
     }
-    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (multiSimController_->IsSimActivatable(slotId)) {
-        hasSimCard = true;
-    } else {
-        hasSimCard = false;
-    }
     return TELEPHONY_ERR_SUCCESS;
 }
 
