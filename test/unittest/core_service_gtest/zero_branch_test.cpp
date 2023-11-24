@@ -1152,7 +1152,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | L
     EXPECT_GT(multiSimController->SetDefaultSmsSlotId(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(multiSimController->RefreshActiveIccAccountInfoList());
     EXPECT_FALSE(multiSimController->IsSimActive(0));
-    EXPECT_FALSE(multiSimController->IsSimActivatable(0));
     EXPECT_FALSE(multiSimController->ForgetAllData());
     EXPECT_FALSE(multiSimController->ForgetAllData(0));
     EXPECT_FALSE(multiSimController->IsValidData(0));

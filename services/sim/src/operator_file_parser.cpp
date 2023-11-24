@@ -136,6 +136,7 @@ bool OperatorFileParser::ParseOperatorConfigFromFile(OperatorConfig &opc, const 
     Json::CharReader *reader(builder.newCharReader());
     if (!reader->parse(rawJson.c_str(), rawJson.c_str() + contentLength, &opcJson, &err)) {
         TELEPHONY_LOGE("ParseOperatorConfigFromFile reader is error!");
+        delete reader;
         return false;
     }
     delete reader;
