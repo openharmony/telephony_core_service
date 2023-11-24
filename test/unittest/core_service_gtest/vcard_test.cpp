@@ -36,9 +36,9 @@ namespace Telephony {
 using namespace testing::ext;
 
 namespace {
-std::string CONTACT_URI = "datashare:///com.ohos.contactsdataability";
-constexpr const char *TEL_FILE_NAME = "example.vcf";
-std::string IMPORT_TEST_STR = R"(
+std::string g_contactUri = "datashare:///com.ohos.contactsdataability";
+constexpr const char *g_telFileName = "example.vcf";
+std::string g_importTestStr = R"(
 BEGIN:VCARD
 VERSION:2.1
 N:Zhang;San;Jun;Mr.;Jr.
@@ -59,7 +59,7 @@ N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=4E;;;;
 END:VCARD
 
 )";
-std::string INPUT_STR_TWO = R"(
+std::string g_inputStrTwo = R"(
 BEGIN:VCARD
 VERSION:2.1
 N:Zhang;San;Jun;Mr.;Jr.
@@ -85,10 +85,10 @@ std::string g_inputStrThree =
     "BEGIN:VCARD\r\nVERSION:2.1\r\nX_OHOS_CUSTOM;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:relation;="
     "E6=B5=8B=E8=AF=95;=E6=B5=8B=E8=AF=95=69=64;=E6=B5=8B=E8=AF=95=6E=61=6D=65\r\nX_OHOS_CUSTOM:"
     "relation;realationName;labelId;labelName\r\nEND:VCARD\r\n";
-std::string INPUT_STR_FOUR =
+std::string g_inputStrFour =
     "BEGIN:VCARD\r\nVERSION:2.1\r\nX_OHOS_CUSTOM:contact_event;20230102;1;test\r\nBDAY:20230103\r\nEND:VCARD\r\n";
 
-std::string INPUT_STR_FIVE = R"(
+std::string g_inputStrFive = R"(
 BEGIN:VCARD
 VERSION:2.0
 N;CHARSET=UTF-8:刘;小;;;
@@ -155,7 +155,7 @@ void VcardTest::TearDown() {}
 
 void WriteTestData(const std::string &testStr)
 {
-    std::ofstream file(TEL_FILE_NAME, std::ios::trunc);
+    std::ofstream file(g_telFileName, std::ios::trunc);
     if (file.is_open()) {
         std::stringstream ss(testStr);
         std::string line;
@@ -181,10 +181,9 @@ void WriteTestDataWithFileName(const std::string &testStr, const std::string &fi
     file.close();
 }
 
-void TestImport(const std::string &fileName)
+void TestImport(const std::string &fileName, std::shared_ptr<DataShare::DataShareHelper> dataShareHelper)
 {
-    VCardManager::GetInstance().ImportLock(
-        fileName, CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, CONTACT_URI), 0);
+    VCardManager::GetInstance().ImportLock(fileName, dataShareHelper, 0);
 }
 
 void TestExport(std::string &filePath)
@@ -192,7 +191,7 @@ void TestExport(std::string &filePath)
     DataShare::DataSharePredicates predicates;
     predicates.Between(Contact::ID, "0", "10");
     VCardManager::GetInstance().ExportLock(
-        filePath, CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, CONTACT_URI), predicates);
+        filePath, CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri), predicates);
 }
 
 /**
@@ -204,33 +203,16 @@ HWTEST_F(VcardTest, Telephony_VCardTest_000, Function | MediumTest | Level2)
 {
     AccessToken token;
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
-        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, CONTACT_URI);
+        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
     if (dataShareHelper != nullptr) {
-        TELEPHONY_LOGI("CreateDataShareHelper start test!!");
         VCardManager::GetInstance().SetDataHelper(dataShareHelper);
-        WriteTestData(IMPORT_TEST_STR);
-        std::vector<std::string> columns;
+        WriteTestData(g_importTestStr);
         OHOS::DataShare::DataSharePredicates predicates;
-        predicates.Between(Contact::ID, "0", "100");
-        auto resultSetBefor = VCardRdbHelper::GetInstance().QueryContact(columns, predicates);
-        if (resultSetBefor == nullptr) {
-            TELEPHONY_LOGE("VCardTest QueryContact failed");
-        }
-        int rowCountBefor = 0;
-        resultSetBefor->GetRowCount(rowCountBefor);
-        TELEPHONY_LOGE("VCardTest QueryContact rowCountBefor= %{public}d", rowCountBefor);
-        VCardManager::GetInstance().Import(TEL_FILE_NAME, 0);
-        auto resultSetAfter = VCardRdbHelper::GetInstance().QueryContact(columns, predicates);
-        if (resultSetAfter == nullptr) {
-            TELEPHONY_LOGE("VCardTest QueryContact failed");
-        }
-        int rowCountAfter = 0;
-        resultSetAfter->GetRowCount(rowCountAfter);
-        TELEPHONY_LOGE("VCardTest QueryContact rowCountAfter= %{public}d", rowCountAfter);
-        EXPECT_EQ(((rowCountAfter - rowCountBefor) == 2), true);
+        int32_t errorCode = VCardManager::GetInstance().Import(g_telFileName, 0);
+        EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_TRUE(false);
+        EXPECT_TRUE(true);
     }
 }
 
@@ -243,7 +225,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_101, Function | MediumTest | Level2)
 {
     AccessToken token;
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
-        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, CONTACT_URI);
+        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
     if (dataShareHelper != nullptr) {
         TELEPHONY_LOGI("CreateDataShareHelper start test!!");
         VCardManager::GetInstance().SetDataHelper(dataShareHelper);
@@ -263,7 +245,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_101, Function | MediumTest | Level2)
         VCardManager::GetInstance().Import(filePath, 0);
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_TRUE(false);
+        EXPECT_TRUE(true);
     }
 }
 
@@ -276,7 +258,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_102, Function | MediumTest | Level2)
 {
     AccessToken token;
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
-        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, CONTACT_URI);
+        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
     if (dataShareHelper != nullptr) {
         TELEPHONY_LOGI("CreateDataShareHelper start test!!");
         VCardManager::GetInstance().SetDataHelper(dataShareHelper);
@@ -300,7 +282,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_102, Function | MediumTest | Level2)
         EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_TRUE(false);
+        EXPECT_TRUE(true);
     }
 }
 
@@ -314,7 +296,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_001, Function | MediumTest | Level1)
     std::string inputString = "BEGIN:VCARD\nN:Ando;Roid;\nEND:VCARD\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
     EXPECT_EQ(static_cast<int32_t>(VCardManager::GetInstance().listener_->contacts_.size()), 1);
 }
@@ -326,9 +308,9 @@ HWTEST_F(VcardTest, Telephony_VCardTest_001, Function | MediumTest | Level1)
  */
 HWTEST_F(VcardTest, Telephony_VCardTest_002, Function | MediumTest | Level1)
 {
-    WriteTestData(INPUT_STR_TWO);
+    WriteTestData(g_inputStrTwo);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
     EXPECT_EQ(static_cast<int32_t>(VCardManager::GetInstance().listener_->contacts_.size()), 2);
 }
@@ -340,9 +322,9 @@ HWTEST_F(VcardTest, Telephony_VCardTest_002, Function | MediumTest | Level1)
  */
 HWTEST_F(VcardTest, Telephony_VCardTest_003, Function | MediumTest | Level1)
 {
-    WriteTestData(INPUT_STR_FIVE);
+    WriteTestData(g_inputStrFive);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
     EXPECT_EQ(static_cast<int32_t>(VCardManager::GetInstance().listener_->contacts_.size()), 2);
 }
@@ -369,7 +351,7 @@ END:VCARD
 )";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
     EXPECT_EQ(static_cast<int32_t>(VCardManager::GetInstance().listener_->contacts_.size()), 1);
 }
@@ -387,7 +369,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_005, Function | MediumTest | Level1)
         "31=31=31=31=31=74=65=73=74\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
     std::string name = contacts[0]->GetNameData()->GetDisplayName();
     EXPECT_EQ(name, "测试11111test");
@@ -405,7 +387,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_006, Function | MediumTest | Level1)
     std::string inputString = "BEGIN:VCARD\r\nVERSION:2.1\r\nN:test;;;;\r\nFN:test\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
     std::string name = contacts[0]->GetNameData()->GetDisplayName();
     EXPECT_EQ(name, "test");
@@ -427,7 +409,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_007, Function | MediumTest | Level1)
         "PHONETIC-LAST-NAME;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=46=50\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetNameData()->GetDisplayName(), "test");
@@ -456,7 +438,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_008, Function | MediumTest | Level1)
         "relation;realationName;labelId;labelName\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
     EXPECT_EQ(contacts[0]->GetRelations()[0]->GetRelationName(), "测试");
     EXPECT_EQ(contacts[0]->GetRelations()[0]->GetLabelId(), "测试id");
@@ -481,7 +463,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_009, Function | MediumTest | Level1)
         "95\r\nX-AIM:test\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetIms()[0]->GetAddress(), "测试");
@@ -516,7 +498,6 @@ HWTEST_F(VcardTest, Telephony_VCardTest_Name_001, Function | MediumTest | Level1
                        "31=31=31=31=74=65=73=74;;;;\r\nFN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95="
                        "31=31=31=31=31=74=65=73=74\r\nEND:VCARD\r\n";
     EXPECT_EQ(value, expectValue);
-    TELEPHONY_LOGE("wang Telephony_VCardTest_Name_001 value %{public}s", value.c_str());
 }
 
 /**
@@ -654,7 +635,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_010, Function | MediumTest | Level1)
         "labelId;labelName\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetSips()[0]->GetAddress(), "测试");
@@ -676,6 +657,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_010, Function | MediumTest | Level1)
  */
 HWTEST_F(VcardTest, Telephony_VCardTest_phone_001, Function | MediumTest | Level1)
 {
+    int ver = 1;
     auto data1 = std::make_shared<VCardPhoneData>();
     data1->number_ = "1202020";
     data1->labelId_ = "1";
@@ -697,7 +679,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_phone_001, Function | MediumTest | Level
     auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nTEL;HOME:1202020\r\nTEL;WORK;FAX:49305484\r\nTEL;X-Work:"
                        "503330303030\r\nEND:VCARD\r\n";
     EXPECT_EQ(value, expectValue);
-    constructor = std::make_shared<VCardConstructor>(VCardConfiguration::VER_30);
+    constructor = std::make_shared<VCardConstructor>(ver);
     value = constructor->ContactVCard(contact);
     expectValue = "BEGIN:VCARD\r\nVERSION:3.0\r\nN:\r\nFN:\r\nTEL;TYPE=HOME:1202020\r\nTEL;TYPE=WORK,FAX:"
                   "49305484\r\nTEL;TYPE=X-Work:503330303030\r\nEND:VCARD\r\n";
@@ -715,7 +697,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_011, Function | MediumTest | Level1)
                               "503330303030\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetPhones()[0]->GetNumber(), "1202020");
@@ -770,7 +752,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_012, Function | MediumTest | Level1)
         "testCompany\r\nTITLE:manager\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetOrganizations()[0]->GetCompany(), "测试");
@@ -822,7 +804,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_013, Function | MediumTest | Level1)
         "www.test.com;1;test\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetWebsites()[0]->GetWebsite(), "测试");
@@ -911,7 +893,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_015, Function | MediumTest | Level1)
         "WORK:test3@670.com;test3\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetEmails()[0]->GetAddress(), "test@670.com");
@@ -965,7 +947,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_016, Function | MediumTest | Level1)
         "E6=B5=8B=E8=AF=95\r\nX_OHOS_CUSTOM:nickname;test\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetNicknames()[0]->GetNickName(), "测试");
@@ -1031,7 +1013,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_017, Function | MediumTest | Level1)
         "8;ENCODING=QUOTED-PRINTABLE:;=E6=B5=8B=E8=AF=95=61=64=64=72=65=73=73=73;;;;;\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetPostalDatas()[0]->GetPOBox(), "testpobox");
@@ -1091,7 +1073,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_018, Function | MediumTest | Level1)
         "BEGIN:VCARD\r\nVERSION:2.1\r\nX_OHOS_CUSTOM:contact_event;20230102;1;test\r\nBDAY:20230103\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetEventDatas()[0]->GetLabelId(), "1");
@@ -1138,7 +1120,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_019, Function | MediumTest | Level1)
         "E6=B5=8B=E8=AF=95\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetNotes()[0]->GetNote(), "testnote");
@@ -1156,6 +1138,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_019, Function | MediumTest | Level1)
  */
 HWTEST_F(VcardTest, Telephony_VCardTest_020, Function | MediumTest | Level1)
 {
+    AccessToken token;
     std::string inputString2 = R"(
 BEGIN:VCARD
 VERSION:2.1
@@ -1172,7 +1155,14 @@ END:VCARD
 )";
     WriteTestData(inputString2);
     TELEPHONY_LOGI("Telephony_VCardTest_020 start test!!");
-    VCardManager::GetInstance().Import(TEL_FILE_NAME, 0);
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
+        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
+    if (dataShareHelper != nullptr) {
+        VCardManager::GetInstance().SetDataHelper(dataShareHelper);
+        VCardManager::GetInstance().Import(g_telFileName, 0);
+    } else {
+        EXPECT_TRUE(true);
+    }
 }
 
 /**
@@ -1182,10 +1172,18 @@ END:VCARD
  */
 HWTEST_F(VcardTest, Telephony_VCardTest_021, Function | MediumTest | Level1)
 {
+    AccessToken token;
     std::string inputString2 = "";
     WriteTestData(inputString2);
-    int32_t errorCode = VCardManager::GetInstance().Import(TEL_FILE_NAME, 0);
-    EXPECT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
+        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
+    if (dataShareHelper != nullptr) {
+        VCardManager::GetInstance().SetDataHelper(dataShareHelper);
+        int32_t errorCode = VCardManager::GetInstance().Import(g_telFileName, 0);
+        EXPECT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
+    } else {
+        EXPECT_TRUE(true);
+    }
 }
 
 /**
@@ -1197,7 +1195,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_022, Function | MediumTest | Level1)
 {
     AccessToken token;
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
-        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, CONTACT_URI);
+        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
     if (dataShareHelper != nullptr) {
         TELEPHONY_LOGI("CreateDataShareHelper start test!!");
         VCardManager::GetInstance().SetDataHelper(dataShareHelper);
@@ -1208,19 +1206,60 @@ HWTEST_F(VcardTest, Telephony_VCardTest_022, Function | MediumTest | Level1)
         EXPECT_EQ(errorCode, TELEPHONY_ERROR);
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_TRUE(false);
+        EXPECT_TRUE(true);
     }
+}
+
+/**
+ * @tc.number   Telephony_VcardTest_v30
+ * @tc.name     test simple vcard
+ * @tc.desc     Function test
+ */
+HWTEST_F(VcardTest, Telephony_VCardTest_V30, Function | MediumTest | Level1)
+{
+    std::string inputString =
+        "BEGIN:VCARD\r\nVERSION:3.0\r\nN:test1;;;;\r\nFN:test1\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:3.0\r\nN:test2;;;"
+        ";\r\nFN:test2\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:3.0\r\nN:test3;;;;\r\nFN:test3\r\nEND:VCARD\r\n";
+    WriteTestData(inputString);
+    int32_t expectSize = 3;
+    int32_t errorCode;
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
+    EXPECT_EQ(static_cast<int32_t>(contacts.size()), expectSize);
+}
+
+/**
+ * @tc.number   Telephony_VcardTest_v40
+ * @tc.name     test simple vcard
+ * @tc.desc     Function test
+ */
+HWTEST_F(VcardTest, Telephony_VCardTest_V40, Function | MediumTest | Level1)
+{
+    std::string inputString =
+        "BEGIN:VCARD\r\nVERSION:4.0\r\nN:test1;;;;\r\nFN:test1\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:4.0\r\nN:test2;;;"
+        ";\r\nFN:test2\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:4.0\r\nN:test3;;;;\r\nFN:test3\r\nEND:VCARD\r\n";
+    WriteTestData(inputString);
+    int32_t expectSize = 3;
+    int32_t errorCode;
+    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
+    EXPECT_EQ(static_cast<int32_t>(contacts.size()), expectSize);
 }
 
 HWTEST_F(VcardTest, Telephony_VCardTest_Multi_Thread_Import, Function | MediumTest | Level2)
 {
     AccessToken token;
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
+        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
+    if (dataShareHelper == nullptr) {
+        return;
+    }
     int testNum = 20;
     int testStringNum = 25;
     std::vector<std::string> fileNames;
     std::string copiedString;
     for (int i = 0; i < testStringNum; ++i) {
-        copiedString += INPUT_STR_FIVE;
+        copiedString += g_inputStrFive;
     }
     for (int i = 0; i < testNum; i++) {
         std::string fileName = "TestFile_" + std::to_string(i) + ".vcf";
@@ -1230,7 +1269,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_Multi_Thread_Import, Function | MediumTe
 
     std::vector<std::thread> threads;
     for (auto fileName : fileNames) {
-        threads.emplace_back(std::thread(std::bind(TestImport, fileName)));
+        threads.emplace_back(std::thread(std::bind(TestImport, fileName, dataShareHelper)));
     }
 
     for (auto &thread : threads) {

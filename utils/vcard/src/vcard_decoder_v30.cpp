@@ -75,7 +75,7 @@ std::string VCardDecoderV30::GetNonEmptyLine()
         ret = preLine_;
     }
     preLine_ = line;
-    return ret;
+    return VCardUtils::Trim(ret);
 }
 
 void VCardDecoderV30::DealParams(const std::string &params, std::shared_ptr<VCardRawData> rawData, int32_t &errorCode)
