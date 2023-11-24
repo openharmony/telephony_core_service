@@ -131,8 +131,7 @@ bool VCardDecoderV21::DecodeOne(int32_t &errorCode)
 
 bool VCardDecoderV21::ReadBegin()
 {
-    std::string line;
-    line = GetNonEmptyLine();
+    std::string line = GetNonEmptyLine();
     if (line == "") {
         TELEPHONY_LOGE("empty file");
         return false;

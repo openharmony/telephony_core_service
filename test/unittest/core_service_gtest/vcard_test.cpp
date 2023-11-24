@@ -37,7 +37,7 @@ using namespace testing::ext;
 
 namespace {
 std::string g_contactUri = "datashare:///com.ohos.contactsdataability";
-constexpr const char *g_telFileName = "example.vcf";
+constexpr const char *TEL_FILE_NAME = "example.vcf";
 std::string g_importTestStr = R"(
 BEGIN:VCARD
 VERSION:2.1
@@ -155,7 +155,7 @@ void VcardTest::TearDown() {}
 
 void WriteTestData(const std::string &testStr)
 {
-    std::ofstream file(g_telFileName, std::ios::trunc);
+    std::ofstream file(TEL_FILE_NAME, std::ios::trunc);
     if (file.is_open()) {
         std::stringstream ss(testStr);
         std::string line;
@@ -208,7 +208,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_000, Function | MediumTest | Level2)
         VCardManager::GetInstance().SetDataHelper(dataShareHelper);
         WriteTestData(g_importTestStr);
         OHOS::DataShare::DataSharePredicates predicates;
-        int32_t errorCode = VCardManager::GetInstance().Import(g_telFileName, 0);
+        int32_t errorCode = VCardManager::GetInstance().Import(TEL_FILE_NAME, 0);
         EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
@@ -296,7 +296,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_001, Function | MediumTest | Level1)
     std::string inputString = "BEGIN:VCARD\nN:Ando;Roid;\nEND:VCARD\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
     EXPECT_EQ(static_cast<int32_t>(VCardManager::GetInstance().listener_->contacts_.size()), 1);
 }
@@ -310,7 +310,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_002, Function | MediumTest | Level1)
 {
     WriteTestData(g_inputStrTwo);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
     EXPECT_EQ(static_cast<int32_t>(VCardManager::GetInstance().listener_->contacts_.size()), 2);
 }
@@ -324,7 +324,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_003, Function | MediumTest | Level1)
 {
     WriteTestData(g_inputStrFive);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
     EXPECT_EQ(static_cast<int32_t>(VCardManager::GetInstance().listener_->contacts_.size()), 2);
 }
@@ -351,7 +351,7 @@ END:VCARD
 )";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
     EXPECT_EQ(static_cast<int32_t>(VCardManager::GetInstance().listener_->contacts_.size()), 1);
 }
@@ -369,7 +369,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_005, Function | MediumTest | Level1)
         "31=31=31=31=31=74=65=73=74\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
     std::string name = contacts[0]->GetNameData()->GetDisplayName();
     EXPECT_EQ(name, "测试11111test");
@@ -387,7 +387,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_006, Function | MediumTest | Level1)
     std::string inputString = "BEGIN:VCARD\r\nVERSION:2.1\r\nN:test;;;;\r\nFN:test\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
     std::string name = contacts[0]->GetNameData()->GetDisplayName();
     EXPECT_EQ(name, "test");
@@ -409,7 +409,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_007, Function | MediumTest | Level1)
         "PHONETIC-LAST-NAME;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=46=50\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetNameData()->GetDisplayName(), "test");
@@ -438,7 +438,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_008, Function | MediumTest | Level1)
         "relation;realationName;labelId;labelName\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
     EXPECT_EQ(contacts[0]->GetRelations()[0]->GetRelationName(), "测试");
     EXPECT_EQ(contacts[0]->GetRelations()[0]->GetLabelId(), "测试id");
@@ -463,7 +463,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_009, Function | MediumTest | Level1)
         "95\r\nX-AIM:test\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetIms()[0]->GetAddress(), "测试");
@@ -635,7 +635,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_010, Function | MediumTest | Level1)
         "labelId;labelName\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetSips()[0]->GetAddress(), "测试");
@@ -697,7 +697,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_011, Function | MediumTest | Level1)
                               "503330303030\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetPhones()[0]->GetNumber(), "1202020");
@@ -752,7 +752,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_012, Function | MediumTest | Level1)
         "testCompany\r\nTITLE:manager\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetOrganizations()[0]->GetCompany(), "测试");
@@ -804,7 +804,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_013, Function | MediumTest | Level1)
         "www.test.com;1;test\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetWebsites()[0]->GetWebsite(), "测试");
@@ -893,7 +893,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_015, Function | MediumTest | Level1)
         "WORK:test3@670.com;test3\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetEmails()[0]->GetAddress(), "test@670.com");
@@ -947,7 +947,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_016, Function | MediumTest | Level1)
         "E6=B5=8B=E8=AF=95\r\nX_OHOS_CUSTOM:nickname;test\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetNicknames()[0]->GetNickName(), "测试");
@@ -1013,7 +1013,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_017, Function | MediumTest | Level1)
         "8;ENCODING=QUOTED-PRINTABLE:;=E6=B5=8B=E8=AF=95=61=64=64=72=65=73=73=73;;;;;\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetPostalDatas()[0]->GetPOBox(), "testpobox");
@@ -1073,7 +1073,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_018, Function | MediumTest | Level1)
         "BEGIN:VCARD\r\nVERSION:2.1\r\nX_OHOS_CUSTOM:contact_event;20230102;1;test\r\nBDAY:20230103\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetEventDatas()[0]->GetLabelId(), "1");
@@ -1120,7 +1120,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_019, Function | MediumTest | Level1)
         "E6=B5=8B=E8=AF=95\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
 
     EXPECT_EQ(contacts[0]->GetNotes()[0]->GetNote(), "testnote");
@@ -1159,7 +1159,7 @@ END:VCARD
         CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
     if (dataShareHelper != nullptr) {
         VCardManager::GetInstance().SetDataHelper(dataShareHelper);
-        VCardManager::GetInstance().Import(g_telFileName, 0);
+        VCardManager::GetInstance().Import(TEL_FILE_NAME, 0);
     } else {
         EXPECT_TRUE(true);
     }
@@ -1179,7 +1179,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_021, Function | MediumTest | Level1)
         CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
     if (dataShareHelper != nullptr) {
         VCardManager::GetInstance().SetDataHelper(dataShareHelper);
-        int32_t errorCode = VCardManager::GetInstance().Import(g_telFileName, 0);
+        int32_t errorCode = VCardManager::GetInstance().Import(TEL_FILE_NAME, 0);
         EXPECT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
     } else {
         EXPECT_TRUE(true);
@@ -1223,7 +1223,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_V30, Function | MediumTest | Level1)
     WriteTestData(inputString);
     int32_t expectSize = 3;
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
     EXPECT_EQ(static_cast<int32_t>(contacts.size()), expectSize);
 }
@@ -1241,7 +1241,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_V40, Function | MediumTest | Level1)
     WriteTestData(inputString);
     int32_t expectSize = 3;
     int32_t errorCode;
-    VCardManager::GetInstance().Decode(g_telFileName, errorCode);
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
     std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
     EXPECT_EQ(static_cast<int32_t>(contacts.size()), expectSize);
 }
