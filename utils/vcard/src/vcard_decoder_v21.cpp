@@ -132,12 +132,7 @@ bool VCardDecoderV21::DecodeOne(int32_t &errorCode)
 bool VCardDecoderV21::ReadBegin()
 {
     std::string line;
-    while (fileUtils_.ReadLine(line)) {
-        line = VCardUtils::Trim(line);
-        if (line.length() > 0) {
-            break;
-        }
-    }
+    line = GetNonEmptyLine();
     if (line == "") {
         TELEPHONY_LOGE("empty file");
         return false;
@@ -540,13 +535,13 @@ bool VCardDecoderV21::ContainValue(const std::string &value, const std::vector<s
 void VCardDecoderV21::DealAdrOrgN(const std::string &rawValue, std::shared_ptr<VCardRawData> rawData,
     const std::string &fromCharSet, const std::string &toCharSet, int32_t &errorCode)
 {
-    std::vector<std::string> encodedValues;
     if (currentEncoding_ == VCARD_PARAM_ENCODING_QP) {
         std::string quotedPrintableValue = GetQuotedPrintableValue(rawValue, errorCode);
         if (errorCode != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("GetQuotedPrintableValue failed");
             return;
         }
+        std::vector<std::string> encodedValues;
         ParseQuotedPrintableValues(quotedPrintableValue, encodedValues, fromCharSet, toCharSet, errorCode);
         if (errorCode != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("ParseQuotedPrintableValues failed");
@@ -589,9 +584,8 @@ std::string VCardDecoderV21::GetQuotedPrintableValue(const std::string &str, int
         return target;
     }
     target += VCardUtils::Trim(firstStr) + "\r\n";
-    std::string line;
     while (true) {
-        line = GetLine();
+        std::string line = GetLine();
         if (line.empty()) {
             TELEPHONY_LOGE("QuotedPritableValue error");
             errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
