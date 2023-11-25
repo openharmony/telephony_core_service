@@ -331,12 +331,8 @@ std::string VCardUtils::TrimListToString(const std::vector<std::string> &strs)
     int32_t size = strs.size();
     std::string result;
     if (size > 1) {
-        int i = 0;
         for (const auto &str : strs) {
-            result += str;
-            if (i < size - 1) {
-                result += ";";
-            }
+            result += str + ";";
         }
     } else if (size == 1) {
         return strs[0];
@@ -399,8 +395,7 @@ std::vector<std::string> VCardUtils::ConstructListFromValue(const std::string &v
 
 void VCardUtils::HandleTypeAndLabel(int32_t &type, std::string &label, std::string number, std::string labelCandidate)
 {
-    std::map<std::string, PhoneVcType>::iterator iter = typeToPhoneTypeMap.begin();
-    iter = typeToPhoneTypeMap.find(labelCandidate);
+    std::map<std::string, PhoneVcType>::iterator iter = typeToPhoneTypeMap.find(labelCandidate);
     if (iter != typeToPhoneTypeMap.end()) {
         PhoneVcType phoneType = iter->second;
         int32_t typeCandidate = static_cast<int32_t>(phoneType);
