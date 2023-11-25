@@ -1490,6 +1490,38 @@ HWTEST_F(BranchTest, Telephony_SimStateHandle_001, Function | MediumTest | Level
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     auto simStateHandle = std::make_shared<SimStateHandle>(runner, simStateManager);
+    simStateHandle->iccState_.simStatus_ = 1;
+    simStateHandle->slotId_ = INVALID_SLOTID;
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STATE_CHANGED);
+    simStateHandle->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE);
+    simStateHandle->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(MSG_SIM_GET_ICC_STATUS_DONE);
+    simStateHandle->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_PIN_DONE);
+    simStateHandle->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_PUK_DONE);
+    simStateHandle->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(MSG_SIM_CHANGE_PIN_DONE);
+    simStateHandle->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_PIN2_DONE);
+    simStateHandle->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_PUK2_DONE);
+    simStateHandle->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(MSG_SIM_CHANGE_PIN2_DONE);
+    simStateHandle->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(MSG_SIM_UNLOCK_SIMLOCK_DONE);
+    simStateHandle->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(MSG_SIM_ENABLE_PIN_DONE);
+    simStateHandle->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(MSG_SIM_CHECK_PIN_DONE);
+    simStateHandle->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(MSG_SIM_GET_REALTIME_ICC_STATUS_DONE);
+    simStateHandle->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(MSG_SIM_AUTHENTICATION_DONE);
+    simStateHandle->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(MSG_SIM_SEND_NCFG_OPER_INFO_DONE);
+    simStateHandle->ProcessEvent(event);
     EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::SINGLE_MODE_RUIM_CARD), CDMA_FAKE_AID);
     EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::SINGLE_MODE_SIM_CARD), GSM_FAKE_AID);
     EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::DUAL_MODE_CG_CARD), GSM_FAKE_AID);
@@ -1500,6 +1532,25 @@ HWTEST_F(BranchTest, Telephony_SimStateHandle_001, Function | MediumTest | Level
     EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::UNKNOWN_CARD), USIM_AID);
 }
 
+/**
+ * @tc.number   Telephony_SimStateHandle_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SimStateHandle_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    auto simStateHandle = std::make_shared<SimStateHandle>(runner, simStateManager);
+    simStateHandle->iccState_.simStatus_ = 1;
+    simStateHandle->slotId_ = INVALID_SLOTID;
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STATE_CHANGED);
+    simStateHandle->OnRadioStateUnavailable(event);
+    auto radioState = std::make_shared<HRilInt32Parcel>(ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STATE_CHANGED, radioState);
+    simStateHandle->OnRadioStateUnavailable(event);
+}
 /**
  * @tc.number   Telephony_NetworkRegister_001
  * @tc.name     test error branch

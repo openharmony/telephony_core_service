@@ -103,6 +103,7 @@ struct UnlockData {
 
 class SimStateHandle : public AppExecFwk::EventHandler {
 public:
+    using Func = void (SimStateHandle::*)(int32_t, const AppExecFwk::InnerEvent::Pointer &);
     SimStateHandle(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
         const std::weak_ptr<SimStateManager> &simStateManager);
     ~SimStateHandle() = default;
@@ -137,11 +138,10 @@ public:
 private:
     void SyncCmdResponse();
     void ObtainIccStatus(int32_t slotId);
-    void GetSimCardData(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
-    void GetSimLockState(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
-    void GetSetLockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
-    void GetUnlockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
-    void GetUnlockRemain(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
+    void GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
+    void GetSimLockState(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
+    void GetSetLockResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
+    void GetUnlockResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessIccCardState(IccState &ar, int32_t slotId);
     void UpdateAppInfo(IccState &ar, int32_t slotId);
@@ -150,12 +150,14 @@ private:
     void CardTypeEscape(int32_t simType, int32_t slotId);
     void SimLockStateEscape(int32_t simState, int32_t slotId, LockReason &reason);
     void NotifySimLock(int slotId);
-    void GetUnlockSimLockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId);
+    void GetUnlockSimLockResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     void GetSimAuthenticationResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     void GetSendSimMatchedOperatorInfoResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     std::string GetAidByCardType(CardType type);
+    void OnRadioStateUnavailable(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
+    static const std::map<uint32_t, Func> memberFuncMap_;
     int32_t oldSimType_ = ICC_UNKNOWN_TYPE;
     int32_t oldSimStatus_ = ICC_CONTENT_UNKNOWN;
     int32_t slotId_ = DEFAULT_SIM_SLOT_ID;
