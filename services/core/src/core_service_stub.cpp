@@ -242,8 +242,8 @@ int32_t CoreServiceStub::OnGetNetworkState(MessageParcel &data, MessageParcel &r
     auto slotId = data.ReadInt32();
     sptr<NetworkState> networkState = nullptr;
     int32_t result = GetNetworkState(slotId, networkState);
-    if ((networkState == nullptr) && (result != TELEPHONY_ERR_PERMISSION_ERR)) {
-        TELEPHONY_LOGE("networkState is nullptr and permission is not denied.");
+    if (networkState == nullptr) {
+        TELEPHONY_LOGE("networkState is nullptr.");
         result = TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     reply.WriteInt32(result);
