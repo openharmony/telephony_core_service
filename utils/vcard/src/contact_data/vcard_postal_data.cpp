@@ -26,13 +26,6 @@ constexpr int32_t ADDR_MAX_DATA_SIZE = 7;
 int32_t VCardPostalData::BuildValuesBucket(OHOS::DataShare::DataShareValuesBucket &valuesBucket)
 {
     valuesBucket.Put(ContactData::TYPE_ID, TypeId::POSTAL_ADDRESS);
-    std::string street = street_;
-    if (street_.empty() && !neighborhood_.empty()) {
-        street = neighborhood_;
-    }
-    if (!street_.empty() && !neighborhood_.empty()) {
-        street = street + " " + neighborhood_;
-    }
     valuesBucket.Put(ContactData::POBOX, pobox_);
     valuesBucket.Put(ContactData::POSTCODE, postCode_);
     valuesBucket.Put(ContactData::REGION, region_);

@@ -14,6 +14,8 @@
  */
 #include "vcard_contact.h"
 
+#include <numeric>
+
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "vcard_configuration.h"
@@ -413,7 +415,7 @@ void VCardContact::HandlePhoneticNameFromSound(std::vector<std::string> elems)
         return;
     }
     int32_t size = elems.size();
-    if (elems.empty() || (size = elems.size()) == 0) {
+    if (elems.empty() || size == 0) {
         return;
     }
     size = (size > PHONE_NAME_SOUND_MAX_VALUE_SIZE) ? PHONE_NAME_SOUND_MAX_VALUE_SIZE : size;
@@ -530,10 +532,8 @@ std::string VCardContact::BuildSinglePhoneticNameFromSortAsParam(
     }
     if (!sortAsList.empty()) {
         std::vector<std::string> sortNames = VCardUtils::ConstructListFromValue(sortAsList.at(0), vCardType_);
-        std::string builder;
-        for (std::string elem : sortNames) {
-            builder += elem;
-        }
+        std::string init = "";
+        std::string builder = std::accumulate(sortNames.begin(), sortNames.end(), init);
         return builder;
     } else {
         return "";
@@ -757,7 +757,6 @@ void VCardContact::AddCustom(
 void VCardContact::SetSip(
     std::string rawValue, std::map<std::string, std::vector<std::string>> parasMap, std::string propValue)
 {
-    std::vector<std::string> typeCollection;
     std::map<std::string, std::vector<std::string>>::iterator it = parasMap.find(VCARD_PARAM_TYPE);
     if (it == parasMap.end()) {
         TELEPHONY_LOGE("Map does not contain this key, %{public}s", VCARD_PARAM_TYPE);
@@ -776,6 +775,7 @@ void VCardContact::SetSip(
         }
         sips_.push_back(object);
     } else {
+        std::vector<std::string> typeCollection;
         typeCollection = it->second;
         HandleSipCase(propValue, typeCollection);
     }
@@ -875,7 +875,6 @@ void VCardContact::AddOrganizationsData(std::string rawValue, std::string propVa
     int32_t type = SIZE_ONE;
     bool isPrimary = false;
     if (parasMap.size() != 0) {
-        std::vector<std::string> typeCollection;
         std::map<std::string, std::vector<std::string>>::iterator it = parasMap.find(VCARD_PARAM_TYPE);
         if (it == parasMap.end()) {
             TELEPHONY_LOGE("Map does not contain this key, %{public}s", VCARD_PARAM_TYPE);

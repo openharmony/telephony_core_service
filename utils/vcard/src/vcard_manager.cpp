@@ -42,16 +42,19 @@ void VCardManager::DecodeListener::OnStarted()
 
 void VCardManager::DecodeListener::OnEnded()
 {
+    TELEPHONY_LOGI("OnEnded contact size %{public}d", static_cast<int32_t>(contacts_.size()));
     VCardDecoder::Close();
 }
 
 void VCardManager::DecodeListener::OnOneContactStarted()
 {
+    TELEPHONY_LOGI("OnOneContactStarted index %{public}d", static_cast<int32_t>(contacts_.size()));
     currentContact_ = std::make_shared<VCardContact>();
 }
 
 void VCardManager::DecodeListener::OnOneContactEnded()
 {
+    TELEPHONY_LOGI("OnOneContactEnded index %{public}d", static_cast<int32_t>(contacts_.size()));
     contacts_.push_back(currentContact_);
     currentContact_ = nullptr;
 }
@@ -198,7 +201,7 @@ int32_t VCardManager::InsertContactData(int32_t rawId, std::shared_ptr<VCardCont
     }
     std::vector<DataShare::DataShareValuesBucket> contactDataValues;
     contact->BuildContactData(rawId, contactDataValues);
-    if (contactDataValues.size() <= 0) {
+    if (contactDataValues.empty()) {
         TELEPHONY_LOGI("no data insert");
         return TELEPHONY_ERROR;
     }
