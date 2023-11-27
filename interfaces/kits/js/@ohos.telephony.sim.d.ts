@@ -2181,8 +2181,8 @@ declare namespace sim {
    * <ul>
    * <li>{@code DsdsMode#DSDS_MODE_V2}
    * <li>{@code DsdsMode#DSDS_MODE_V3}
-   * <li>{@code DsdsMode#DSDS_MODE_TDM}
-   * <li>{@code DsdsMode#DSDS_MODE_V5}
+   * <li>{@code DsdsMode#DSDS_MODE_V5_TDM}
+   * <li>{@code DsdsMode#DSDS_MODE_V5_DSDA}
    * </ul>
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
@@ -2204,8 +2204,8 @@ declare namespace sim {
    * <ul>
    * <li>{@code DsdsMode#DSDS_MODE_V2}
    * <li>{@code DsdsMode#DSDS_MODE_V3}
-   * <li>{@code DsdsMode#DSDS_MODE_TDM}
-   * <li>{@code DsdsMode#DSDS_MODE_V5}
+   * <li>{@code DsdsMode#DSDS_MODE_V5_TDM}
+   * <li>{@code DsdsMode#DSDS_MODE_V5_DSDA}
    * </ul>
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
@@ -3044,7 +3044,7 @@ declare namespace sim {
    */
   export enum DsdsMode {
     /**
-     * Indicates the Dsds Mode.
+     * Indicates the DSDS 2.0 Mode.
      *
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
@@ -3053,7 +3053,7 @@ declare namespace sim {
     DSDS_MODE_V2 = 0,
 
     /**
-     * Indicates the Dsds Mode.
+     * Indicates the DSDS 3.0 Mode.
      *
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
@@ -3062,22 +3062,22 @@ declare namespace sim {
     DSDS_MODE_V3 = 1,
 
     /**
-     * Indicates the Dsds Mode.
+     * Indicates the DSDS 5.0 TDM Mode.
      *
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
      * @since 11
      */
-    DSDS_MODE_TDM = 2,
+    DSDS_MODE_V5_TDM = 2,
 
     /**
-     * Indicates the Dsds Mode.
+     * Indicates the DSDS 5.0 DSDA Mode.
      *
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
      * @since 11
      */
-    DSDS_MODE_V5 = 3,
+    DSDS_MODE_V5_DSDA = 3,
   }
 }
 

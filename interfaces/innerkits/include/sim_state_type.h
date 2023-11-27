@@ -303,8 +303,8 @@ enum SimAuthResult {
 enum class DsdsMode {
     DSDS_MODE_V2 = 0,
     DSDS_MODE_V3 = 1,
-    DSDS_MODE_TDM = 2,
-    DSDS_MODE_V5 = 3,
+    DSDS_MODE_V5_TDM = 2,
+    DSDS_MODE_V5_DSDA = 3,
 };
 
 /**
