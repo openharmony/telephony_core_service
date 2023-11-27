@@ -54,6 +54,8 @@ public:
     int32_t GetLinkCapability(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetLinkCapabilityResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::DataLinkCapability &dataLinkCapability);
+    int32_t CleanAllConnections(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t CleanAllConnectionsResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
 
 private:
     bool IsDataResponse(uint32_t code);
