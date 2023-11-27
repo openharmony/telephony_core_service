@@ -55,14 +55,7 @@ void SendSmsMoreMode(const uint8_t *data, size_t size)
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(responseId, object);
     auto rilInterface_ = HDI::Ril::V1_2::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
-    auto eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
-    if (eventLoop_ == nullptr) {
-        TELEPHONY_LOGE("Failed to create EventRunner");
-        return;
-    }
-    auto handler_ = std::make_shared<TelRilHandler>(eventLoop_);
-    handler_ = nullptr;
-    auto telRilSms = std::make_shared<TelRilSms>(slotId, rilInterface_, observerHandler, handler_);
+    auto telRilSms = std::make_shared<TelRilSms>(slotId, rilInterface_, observerHandler, nullptr);
     telRilSms->SendSmsMoreMode(smscPdu, pdu, response);
     telRilSms->IsSmsRespOrNotify(code);
     telRilSms->AddSimMessage(status, smscPdu, pdu, response);
@@ -98,14 +91,7 @@ void GetCallList(const uint8_t *data, size_t size)
     AppExecFwk::InnerEvent::Pointer result = AppExecFwk::InnerEvent::Get(resultId, object);
     auto rilInterface_ = HDI::Ril::V1_2::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
-    auto eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
-    if (eventLoop_ == nullptr) {
-        TELEPHONY_LOGE("Failed to create EventRunner");
-        return;
-    }
-    auto handler_ = std::make_shared<TelRilHandler>(eventLoop_);
-    handler_ = nullptr;
-    auto telRilCall = std::make_shared<TelRilCall>(slotId, rilInterface_, observerHandler, handler_);
+    auto telRilCall = std::make_shared<TelRilCall>(slotId, rilInterface_, observerHandler, nullptr);
     telRilCall->GetCallList(result);
     telRilCall->Dial(address, index, result);
     telRilCall->Reject(result);
@@ -140,14 +126,7 @@ void AnswerResponse(const uint8_t *data, size_t size)
     responseInfo.slotId = slotId;
     auto rilInterface_ = HDI::Ril::V1_2::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
-    auto eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
-    if (eventLoop_ == nullptr) {
-        TELEPHONY_LOGE("Failed to create EventRunner");
-        return;
-    }
-    auto handler_ = std::make_shared<TelRilHandler>(eventLoop_);
-    handler_ = nullptr;
-    auto telRilCall = std::make_shared<TelRilCall>(slotId, rilInterface_, observerHandler, handler_);
+    auto telRilCall = std::make_shared<TelRilCall>(slotId, rilInterface_, observerHandler, nullptr);
     telRilCall->HoldCall(result);
     telRilCall->UnHoldCall(result);
     telRilCall->SwitchCall(result);
@@ -188,13 +167,7 @@ void DeactivatePdpContext(const uint8_t *data, size_t size)
     dataProfile.roamingProtocol = roamingProtocol;
     auto rilInterface_ = HDI::Ril::V1_2::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
-    auto eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
-    if (eventLoop_ == nullptr) {
-        return;
-    }
-    auto handler_ = std::make_shared<TelRilHandler>(eventLoop_);
-    handler_ = nullptr;
-    auto telRilData = std::make_shared<TelRilData>(slotId, rilInterface_, observerHandler, handler_);
+    auto telRilData = std::make_shared<TelRilData>(slotId, rilInterface_, observerHandler, nullptr);
     telRilData->DeactivatePdpContext(cid, reason, response);
     telRilData->DeactivatePdpContextResponse(responseInfo);
     telRilData->SetInitApnInfoResponse(responseInfo);
@@ -220,14 +193,7 @@ void SimStkProactiveNotify(const uint8_t *data, size_t size)
     responseInfo.slotId = slotId;
     auto rilInterface_ = HDI::Ril::V1_2::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
-    auto eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
-    if (eventLoop_ == nullptr) {
-        TELEPHONY_LOGE("Failed to create EventRunner");
-        return;
-    }
-    auto handler_ = std::make_shared<TelRilHandler>(eventLoop_);
-    handler_ = nullptr;
-    auto telRilSim = std::make_shared<TelRilSim>(slotId, rilInterface_, observerHandler, handler_);
+    auto telRilSim = std::make_shared<TelRilSim>(slotId, rilInterface_, observerHandler, nullptr);
     telRilSim->SimStkProactiveNotify(response);
     telRilSim->SimStkAlphaNotify(response);
     telRilSim->SimStkEventNotify(response);
