@@ -58,6 +58,8 @@ void TelRilTest::OnInitInterface()
         &TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest;
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST] = &TelRilTest::OnRequestSetDataPermittedTest;
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY] = &TelRilTest::OnRequestGetLinkCapabilityTest;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_CLEAN_ALL_DATA_CONNECTIONS_TEST] =
+        &TelRilTest::OnRequestCleanAllConnectionsTest;
 
     OnInitCall();
 
@@ -1305,6 +1307,19 @@ void TelRilTest::OnRequestGetLinkCapabilityTest(
     }
 }
 
+void TelRilTest::OnRequestCleanAllConnectionsTest(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_CLEAN_ALL_DATA_CONNECTIONS_TEST);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestCleanAllConnectionsTest -->");
+        telRilManager_->CleanAllConnections(slotId, event);
+        TELEPHONY_LOGI("OnRequestCleanAllConnectionsTest finished");
+    }
+}
+
 void TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest(
     int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
@@ -2193,6 +2208,8 @@ void DataTest()
          << "--> OnRequestSetDataPermittedTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY)
          << "--> OnRequestGetLinkCapabilityTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_CLEAN_ALL_DATA_CONNECTIONS_TEST)
+         << "--> OnRequestCleanAllConnectionsTest" << endl;
     cout << "=========== Cellular Data End =============" << endl;
 }
 

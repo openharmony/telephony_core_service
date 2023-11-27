@@ -59,6 +59,7 @@ enum class DiffInterfaceId {
     TEST_RILCM_SET_LINK_BANDWIDTH_REPORTING_RULE,
     TEST_RILCM_SET_DATA_PERMITTED_TEST,
     TEST_RILCM_GET_LINK_CAPABILITY,
+    TEST_RILCM_CLEAN_ALL_DATA_CONNECTIONS_TEST,
     /* =========== Cellular Data End ============= */
     TEST_GET_SIGNAL_STRENGTH,
     TEST_CALL_DIAL,
@@ -358,6 +359,7 @@ public:
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestSetDataPermittedTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetLinkCapabilityTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestCleanAllConnectionsTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestGetNetworkSearchInformationTest(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
