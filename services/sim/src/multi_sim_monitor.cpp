@@ -41,7 +41,6 @@ MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<AppExecFwk::EventRunner> 
 MultiSimMonitor::~MultiSimMonitor()
 {
     TELEPHONY_LOGD("destory");
-    UnRegisterSimNotify();
 }
 
 void MultiSimMonitor::Init()
