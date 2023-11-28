@@ -175,8 +175,6 @@ int32_t MultiSimController::UpdateDataByIccId(int slotId, const std::string &new
         TELEPHONY_LOGE("failed by nullptr");
         return INVALID_VALUE;
     }
-    SimRdbInfo simRdbInfo;
-    simDbHelper_->QueryDataByIccId(newIccId, simRdbInfo);
     DataShare::DataShareValuesBucket values;
     DataShare::DataShareValueObject slotObj(slotId);
     values.Put(SimData::SLOT_INDEX, slotObj);
@@ -188,7 +186,7 @@ int32_t MultiSimController::UpdateDataByIccId(int slotId, const std::string &new
         values.Put(SimData::IS_MESSAGE_CARD, mainCardObj);
         values.Put(SimData::IS_CELLULAR_DATA_CARD, mainCardObj);
     }
-    return simDbHelper_->UpdateDataByIccId(newIccId, values); // finish re active
+    return simDbHelper_->UpdateDataByIccId(newIccId, values);
 }
 
 int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
@@ -197,8 +195,6 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
         TELEPHONY_LOGE("failed by nullptr");
         return INVALID_VALUE;
     }
-    SimRdbInfo simRdbInfo;
-    simDbHelper_->QueryDataByIccId(newIccId, simRdbInfo);
     DataShare::DataShareValuesBucket values;
     DataShare::DataShareValueObject slotObj(slotId);
     DataShare::DataShareValueObject iccidObj(newIccId);
