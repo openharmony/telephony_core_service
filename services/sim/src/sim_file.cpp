@@ -1636,8 +1636,7 @@ bool SimFile::VoiceMailNotEditToSim()
     OperatorConfig operatorConfig;
     CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, operatorConfig);
     bool custVmNotToSim = false;
-    std::map<std::string, bool>::iterator it = operatorConfig.boolValue.begin();
-    it = operatorConfig.boolValue.find(KEY_VOICE_MAIL_EDIT_NOT_TO_SIM_BOOL);
+    std::map<std::string, bool>::iterator it = operatorConfig.boolValue.find(KEY_VOICE_MAIL_EDIT_NOT_TO_SIM_BOOL);
     if (it != operatorConfig.boolValue.end()) {
         custVmNotToSim = it->second;
     }
