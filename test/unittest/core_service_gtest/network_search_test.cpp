@@ -581,6 +581,28 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0300, Functi
 }
 
 /**
+ * @tc.number   Telephony_NetworkSearch_GetNetworkState_0400
+ * @tc.name     Get Network State type 2 3 4
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0400, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+    } else {
+        sptr<NetworkState> result = nullptr;
+        CoreServiceClient::GetInstance().GetNetworkState(SLOT_ID1, result);
+        if (result == nullptr) {
+            TELEPHONY_LOGI("GetNetworkState result is null");
+        } else {
+            EXPECT_GT(static_cast<int32_t>(result->GetNrState()), 1);
+        }
+    }
+}
+
+/**
  * @tc.number   Telephony_NetworkSearch_GetOperatorNumeric_0100
  * @tc.name     Get Operator Numeric of PLMN
  * @tc.desc     Function test
