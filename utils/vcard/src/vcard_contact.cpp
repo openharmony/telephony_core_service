@@ -333,8 +333,8 @@ void VCardContact::HandleName(std::vector<std::string> values, std::map<std::str
     if (nameData_ == nullptr) {
         return;
     }
-    int32_t size = 0;
-    if (values.empty() || (size = values.size()) == 0) {
+    int32_t size = static_cast<int32_t>(values.size());
+    if (values.empty() || size == 0) {
         return;
     }
     if (size > N_MAX_VALUE_SIZE) {
@@ -380,7 +380,7 @@ void VCardContact::HandleSortAsName(std::map<std::string, std::vector<std::strin
 
     if (sortAsList.size() > 0) {
         std::vector<std::string> sortNames = VCardUtils::ConstructListFromValue(sortAsList[0], vCardType_);
-        int32_t size = sortNames.size();
+        int32_t size = static_cast<int32_t>(sortNames.size());
         if (size > SORT_NAME_MAX_VALUE_SIZE) {
             size = SORT_NAME_MAX_VALUE_SIZE;
         }
@@ -414,7 +414,7 @@ void VCardContact::HandlePhoneticNameFromSound(std::vector<std::string> elems)
         nameData_->GetPhoneticGiven().empty()) {
         return;
     }
-    int32_t size = elems.size();
+    int32_t size = static_cast<int32_t>(elems.size());
     if (elems.empty() || size == 0) {
         return;
     }
@@ -429,7 +429,7 @@ void VCardContact::HandlePhoneticNameFromSound(std::vector<std::string> elems)
         }
         if (onlyFirstElemIsNonEmpty) {
             std::vector<std::string> namesArray = VCardUtils::Split(elems[VALUE_INDEX_ZERO], " ");
-            int32_t nameArrayLength = namesArray.size();
+            int32_t nameArrayLength = static_cast<int32_t>(namesArray.size());
             if (nameArrayLength == VALUE_LEN_THREE) {
                 nameData_->SetPhoneticFamily(namesArray[VALUE_INDEX_ZERO]);
                 nameData_->SetPhoneticMiddle(namesArray[VALUE_INDEX_ONE]);
@@ -477,7 +477,7 @@ void VCardContact::HandleOrgValue(int32_t type, std::vector<std::string> orgList
 
     std::string organizationName;
     std::string departmentName;
-    int32_t size = orgList.size();
+    int32_t size = static_cast<int32_t>(orgList.size());
     switch (size) {
         case SIZE_ZERO:
             organizationName = "";

@@ -335,7 +335,7 @@ std::shared_ptr<DataShare::DataSharePredicates> GetDataSharePredicates(napi_env 
     return dataSharePredicates;
 }
 
-void HandleOptionParameters(napi_env env, napi_value parameters[], ExportContext *context)
+void HandleOptionParameters(napi_env env, napi_value parameters[], size_t parameterCount, ExportContext *context)
 {
     napi_value charset = NapiUtil::GetNamedProperty(env, parameters[TWO_PARAMETERS], "charset");
     napi_valuetype charsetTemp = napi_undefined;
@@ -388,7 +388,7 @@ napi_value ExportVCard(napi_env env, napi_callback_info info)
         context->predicates = datasharePredicates;
     }
     if (hasOption) {
-        HandleOptionParameters(env, parameters, context);
+        HandleOptionParameters(env, parameters, parameterCount, context);
     }
     if (hasCallback) {
         if (parameterCount == FOUR_PARAMETERS) {
