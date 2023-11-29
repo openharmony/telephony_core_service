@@ -108,6 +108,8 @@ public:
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t SetLinkBandwidthReportingRule(int32_t slotId, int32_t eventId, LinkBandwidthRule linkBandwidth,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    int32_t CleanAllConnections(
+        int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     /* PDP end */
     int32_t StopDTMF(
         int32_t slotId, int32_t eventId, int32_t index, const std::shared_ptr<AppExecFwk::EventHandler> &handler);

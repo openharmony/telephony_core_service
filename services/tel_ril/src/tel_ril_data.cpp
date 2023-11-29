@@ -221,6 +221,17 @@ int32_t TelRilData::SetDataPermittedResponse(const HDI::Ril::V1_1::RilRadioRespo
     return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 
+int32_t TelRilData::CleanAllConnections(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return Request(
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_DATA_CLEAN_ALL_CONNECTIONS, &HDI::Ril::V1_2::IRil::CleanAllConnections);
+}
+
+int32_t TelRilData::CleanAllConnectionsResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+{
+    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
+}
+
 void TelRilData::BuildDataCallResultList(std::shared_ptr<DataCallResultList> dataCallResultList,
     const HDI::Ril::V1_1::DataCallResultList &iDataCallResultList)
 {

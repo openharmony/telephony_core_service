@@ -307,6 +307,11 @@ int32_t TelRilCallback::GetLinkCapabilityResponse(const HDI::Ril::V1_1::RilRadio
         responseInfo, &TelRilManager::GetTelRilData, &TelRilData::GetLinkCapabilityResponse, dataLinkCapability);
 }
 
+int32_t TelRilCallback::CleanAllConnectionsResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilData, &TelRilData::CleanAllConnectionsResponse);
+}
+
 int32_t TelRilCallback::SetDataPermittedResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
     return Response(responseInfo, &TelRilManager::GetTelRilData, &TelRilData::SetDataPermittedResponse);

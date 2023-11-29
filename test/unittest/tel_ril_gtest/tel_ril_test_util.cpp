@@ -208,6 +208,7 @@ void TelRilTest::InitData()
         &TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest;
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST] = &TelRilTest::SetDataPermittedTest;
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY_TEST] = &TelRilTest::GetLinkCapabilityTest;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_CLEAN_ALL_DATA_CONNECTIONS_TEST] = &TelRilTest::CleanAllConnectionsTest;
 }
 
 void TelRilTest::InitSim()
@@ -1531,6 +1532,27 @@ void TelRilTest::GetLinkCapabilityTest(int32_t slotId, std::shared_ptr<AppExecFw
         sleep(WAIT_TIME_SECOND);
         telRilManager_->GetLinkCapability(slotId, event);
         TELEPHONY_LOGI("TelRilTest::GetLinkCapabilityTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Clean all data connections
+ *
+ * @param slotId Indicates the card slot index number
+ * @param handler Indicates the event handler ptr
+ */
+void TelRilTest::CleanAllConnectionsTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_CLEAN_ALL_DATA_CONNECTIONS_TEST);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::CleanAllConnectionsTest -->");
+        sleep(WAIT_TIME_SECOND);
+        telRilManager_->CleanAllConnections(slotId, event);
+        TELEPHONY_LOGI("TelRilTest::CleanAllConnectionsTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }

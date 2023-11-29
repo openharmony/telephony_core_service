@@ -186,6 +186,7 @@ public:
     virtual int32_t SetDataPermitted(
         int32_t slotId, int32_t dataPermitted, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t GetLinkCapability(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t CleanAllConnections(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
     /* PDP end */
 
