@@ -68,7 +68,7 @@ int32_t VCardPostalData::BuildData(std::shared_ptr<DataShare::DataShareResultSet
 void VCardPostalData::InitPostalData(std::vector<std::string> propValueList, int32_t type, std::string label)
 {
     std::vector<std::string> dataArray(ADDR_MAX_DATA_SIZE, "");
-    int32_t size = propValueList.size();
+    int32_t size = static_cast<int32_t>(propValueList.size());
     if (size > ADDR_MAX_DATA_SIZE) {
         size = ADDR_MAX_DATA_SIZE;
     }

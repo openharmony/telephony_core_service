@@ -35,6 +35,7 @@ VCardConstructor::VCardConstructor(int32_t cardType, const std::string &charset)
     isV30OrV40_ = VCardConfiguration::IsVer30(cardType_) || VCardConfiguration::IsVer40(cardType_);
     needCharsetParam_ = !(VCardConfiguration::IsVer30(cardType) && VCardUtils::EqualsIgnoreCase("UTF-8", charset));
     needQP_ = !VCardConfiguration::IsVer30(cardType_);
+    headLength_ = 0;
 }
 
 std::string VCardConstructor::ContactVCard(std::shared_ptr<VCardContact> contact)
@@ -912,7 +913,7 @@ std::string VCardConstructor::DealCharacters(std::string value)
     }
 
     std::string temp;
-    int32_t length = value.length();
+    int32_t length = static_cast<int32_t>(value.length());
     for (int32_t i = 0; i < length; i++) {
         HandleCharacter(i, length, value, temp);
     }

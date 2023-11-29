@@ -328,7 +328,7 @@ std::vector<std::string> VCardUtils::GetTypeFromPhoneLabelId(std::string labelId
 
 std::string VCardUtils::TrimListToString(const std::vector<std::string> &strs)
 {
-    int32_t size = strs.size();
+    int32_t size = static_cast<int32_t>(strs.size());
     std::string result;
     if (size > 1) {
         for (const auto &str : strs) {
@@ -371,7 +371,7 @@ std::vector<std::string> VCardUtils::ConstructListFromValue(const std::string &v
 {
     std::vector<std::string> result;
     std::string builder;
-    int32_t length = value.length();
+    int32_t length = static_cast<int32_t>(value.length());
     for (int32_t i = 0; i < length; i++) {
         char ch = value[i];
         if (ch == '\\' && i < length - 1) {
