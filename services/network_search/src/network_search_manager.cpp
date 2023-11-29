@@ -29,6 +29,7 @@
 #include "telephony_config.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -499,6 +500,9 @@ int32_t NetworkSearchManager::GetNetworkStatus(int32_t slotId, sptr<NetworkState
     if (inner != nullptr) {
         if (inner->networkSearchState_ != nullptr) {
             networkState = inner->networkSearchState_->GetNetworkStatus().release();
+            if (TELEPHONY_EXT_WRAPPER.getNetworkStatusExt_ != nullptr) {
+                TELEPHONY_EXT_WRAPPER.getNetworkStatusExt_(slotId, networkState);
+            }
             return TELEPHONY_ERR_SUCCESS;
         }
     }
