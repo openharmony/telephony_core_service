@@ -18,6 +18,7 @@
 
 #include "nocopyable.h"
 #include "singleton.h"
+#include "network_state.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -40,6 +41,7 @@ public:
     typedef char* (*GET_VOICE_MAIL_NUMBER_EXT)(int32_t, const char*);
     typedef char* (*GET_VOICE_MAIL_TAG_EXT)(int32_t, const char*);
     typedef void (*RESET_VOICE_MAIL_MANAGER_EXT)(int32_t);
+    typedef void (*GET_NETWORK_STATUS_EXT)(int32_t slotId, sptr<OHOS::Telephony::NetworkState> &networkState);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -53,6 +55,7 @@ public:
     GET_VOICE_MAIL_NUMBER_EXT getVoiceMailNumberExt_ = nullptr;
     GET_VOICE_MAIL_TAG_EXT getVoiceMailTagExt_ = nullptr;
     RESET_VOICE_MAIL_MANAGER_EXT resetVoiceMailManagerExt_ = nullptr;
+    GET_NETWORK_STATUS_EXT getNetworkStatusExt_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
