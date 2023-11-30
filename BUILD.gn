@@ -21,6 +21,12 @@ TELEPHONY_IMS_CORE_SERVICE_SRC_PATH = "services/ims_service_interaction/src"
 TELEPHONY_EXT_WRAPPER_ROOT = "services/telephony_ext_wrapper"
 
 ohos_shared_library("tel_core_service") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
   install_enable = true
 
   sources = [
