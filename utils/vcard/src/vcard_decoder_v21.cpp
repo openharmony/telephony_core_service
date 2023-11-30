@@ -623,7 +623,8 @@ std::string VCardDecoderV21::DecodeQuotedPrintable(const std::string &encodedStr
         if (ch == '=') {
             char hex[VALUE_INDEX_THREE] = { 0 };
             iss.get(hex, VALUE_INDEX_THREE);
-            int decodedChar = std::stoi(hex, nullptr, DECODE_CHAR_MAX_SIZE);
+            std::string hexStr(hex);
+            int decodedChar = std::stoi(hexStr, nullptr, DECODE_CHAR_MAX_SIZE);
             oss << static_cast<char>(decodedChar);
         } else {
             oss << ch;
