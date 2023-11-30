@@ -799,8 +799,8 @@ sptr<CellLocation> CellInfo::GetCellLocation()
     CellInformation::CellType type = currentCellInfo_->GetNetworkType();
     switch (type) {
         case CellInformation::CellType::CELL_TYPE_GSM: {
-            sptr<TdscdmaCellInformation> cellinfo =
-                static_cast<TdscdmaCellInformation *>(currentCellInfo_.GetRefPtr());
+            sptr<GsmCellInformation> cellinfo =
+                static_cast<GsmCellInformation *>(currentCellInfo_.GetRefPtr());
             sptr<GsmCellLocation> cellLocation = new GsmCellLocation;
             cellLocation->SetGsmParam(cellinfo->GetCellId(), cellinfo->GetLac());
             return cellLocation;

@@ -1523,6 +1523,7 @@ HWTEST_F(SimTest, Telephony_Sim_HasOperatorPrivileges_0200, Function | MediumTes
  */
 HWTEST_F(SimTest, Telephony_Sim_GetDsdsMode_0100, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!SimTest::HasSimCard(slotId_) || CoreServiceClient::GetInstance().GetMaxSimCount() == 1) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card or one card version");
     } else {

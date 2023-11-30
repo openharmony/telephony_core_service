@@ -43,7 +43,7 @@ const std::string MULTI_TIMEZONE_COUNTRY_CODE[] = { "au", "br", "ca", "cd", "cl"
 constexpr int32_t TIMEZONE_OFFSET_MAX = 24 * 4;
 constexpr int32_t TIMEZONE_OFFSET_MIN = -24 * 4;
 constexpr int32_t TIMEZONE_OFFSET_INVALID = TIMEZONE_OFFSET_MAX + 1;
-constexpr uint32_t QUARTER_TO_MILLISECOND = 15 * 60 * 1000;
+constexpr int32_t QUARTER_TO_MILLISECOND = 15 * 60 * 1000;
 constexpr int LOCATION_TIME_OUT_MS = 30 * 1000;
 
 TimeZoneUpdater::TimeZoneUpdater(const std::shared_ptr<EventRunner> &runner) : EventHandler(runner)

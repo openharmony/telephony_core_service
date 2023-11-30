@@ -799,7 +799,7 @@ int32_t NetworkSearchHandler::SendUpdateCellLocationRequest()
         cellInfo_->GetCellInfoList(cells);
     }
     uint32_t curTime = static_cast<uint32_t>(time(0));
-    if ((curTime - lastCellRequestTime_) < cellRequestMinInterval_ && cells.size() != 0) {
+    if ((curTime < cellRequestMinInterval_ + lastCellRequestTime_) && cells.size() != 0) {
         TELEPHONY_LOGE("NetworkSearchHandler::SendUpdateCellLocationRequest interval is too short");
         return TELEPHONY_ERR_SUCCESS;
     }
