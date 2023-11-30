@@ -151,7 +151,7 @@ int32_t MultiSimMonitor::RegisterSimAccountCallback(
     }
     bool isExisted = false;
     std::lock_guard<std::mutex> lock(mutexInner_);
-    for (auto iter : listSimAccountCallbackRecord_) {
+    for (auto &iter : listSimAccountCallbackRecord_) {
         if ((iter.bundleName == bundleName)) {
             iter.simAccountCallback = callback;
             isExisted = true;
