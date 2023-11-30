@@ -38,6 +38,20 @@ namespace Telephony {
 std::mutex SimStateManager::ctx_;
 bool SimStateManager::responseReady_ = false;
 std::condition_variable SimStateManager::cv_;
+const std::map<uint32_t, SimStateHandle::Func> SimStateHandle::memberFuncMap_ = {
+    { MSG_SIM_UNLOCK_PIN_DONE, &SimStateHandle::GetUnlockResult },
+    { MSG_SIM_UNLOCK_PUK_DONE, &SimStateHandle::GetUnlockResult },
+    { MSG_SIM_CHANGE_PIN_DONE, &SimStateHandle::GetUnlockResult },
+    { MSG_SIM_UNLOCK_PIN2_DONE, &SimStateHandle::GetUnlockResult },
+    { MSG_SIM_UNLOCK_PUK2_DONE, &SimStateHandle::GetUnlockResult },
+    { MSG_SIM_CHANGE_PIN2_DONE, &SimStateHandle::GetUnlockResult },
+    { MSG_SIM_UNLOCK_SIMLOCK_DONE, &SimStateHandle::GetUnlockSimLockResult },
+    { MSG_SIM_ENABLE_PIN_DONE, &SimStateHandle::GetSetLockResult },
+    { MSG_SIM_CHECK_PIN_DONE, &SimStateHandle::GetSimLockState },
+    { MSG_SIM_GET_REALTIME_ICC_STATUS_DONE, &SimStateHandle::GetSimCardData },
+    { MSG_SIM_AUTHENTICATION_DONE, &SimStateHandle::GetSimAuthenticationResult },
+    { MSG_SIM_SEND_NCFG_OPER_INFO_DONE, &SimStateHandle::GetSendSimMatchedOperatorInfoResult },
+};
 
 SimStateHandle::SimStateHandle(
     const std::shared_ptr<AppExecFwk::EventRunner> &runner, const std::weak_ptr<SimStateManager> &simStateManager)
@@ -406,7 +420,7 @@ std::string SimStateHandle::GetAidByCardType(CardType type)
     return USIM_AID;
 }
 
-void SimStateHandle::GetSimCardData(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId)
+void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("SimStateHandle::GetSimCardData slotId = %{public}d", slotId);
     int32_t error = 0;
@@ -430,7 +444,7 @@ void SimStateHandle::GetSimCardData(const AppExecFwk::InnerEvent::Pointer &event
     ProcessIccCardState(iccState, slotId);
 }
 
-void SimStateHandle::GetSimLockState(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId)
+void SimStateHandle::GetSimLockState(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("SimStateHandle::GetSimLockState slotId = %{public}d", slotId);
     int32_t error = 0;
@@ -451,7 +465,7 @@ void SimStateHandle::GetSimLockState(const AppExecFwk::InnerEvent::Pointer &even
     TELEPHONY_LOGI("SimStateHandle::GetSimLockState(), lockState = %{public}d", unlockRespon_.lockState);
 }
 
-void SimStateHandle::GetSetLockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId)
+void SimStateHandle::GetSetLockResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("SimStateHandle::GetSetLockResult slotId = %{public}d", slotId);
     std::shared_ptr<LockStatusResp> param = event->GetSharedObject<LockStatusResp>();
@@ -471,7 +485,7 @@ void SimStateHandle::GetSetLockResult(const AppExecFwk::InnerEvent::Pointer &eve
     TELEPHONY_LOGI("SimStateHandle::GetSetLockResult(), iccUnlockResponse = %{public}d", unlockRespon_.result);
 }
 
-void SimStateHandle::GetUnlockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId)
+void SimStateHandle::GetUnlockResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("SimStateHandle::GetUnlockResult slotId = %{public}d", slotId);
     std::shared_ptr<LockStatusResp> param = event->GetSharedObject<LockStatusResp>();
@@ -492,7 +506,7 @@ void SimStateHandle::GetUnlockResult(const AppExecFwk::InnerEvent::Pointer &even
     TELEPHONY_LOGI("SimStateHandle::GetSimUnlockResponse(), iccUnlockResponse = %{public}d", unlockRespon_.result);
 }
 
-void SimStateHandle::GetUnlockSimLockResult(const AppExecFwk::InnerEvent::Pointer &event, int32_t slotId)
+void SimStateHandle::GetUnlockSimLockResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("SimStateHandle::GetUnlockSimLockResult slotId = %{public}d", slotId);
     std::shared_ptr<LockStatusResp> param = event->GetSharedObject<LockStatusResp>();
@@ -581,48 +595,30 @@ bool SimStateHandle::PublishSimStateEvent(std::string event, int32_t eventCode, 
 
 void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     uint32_t eventId = event->GetInnerEventId();
     TELEPHONY_LOGD("SimStateHandle::ProcessEvent(), eventId = %{public}d, slotId_ = %{public}d", eventId, slotId_);
+    auto itFunc = memberFuncMap_.find(eventId);
+    if (itFunc != memberFuncMap_.end()) {
+        auto memberFunc = itFunc->second;
+        if (memberFunc != nullptr) {
+            (this->*memberFunc)(slotId_, event);
+        }
+        SyncCmdResponse();
+        return;
+    }
+
     switch (eventId) {
         case RadioEvent::RADIO_STATE_CHANGED:
+            OnRadioStateUnavailable(event);
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
             ObtainIccStatus(slotId_);
             break;
         case MSG_SIM_GET_ICC_STATUS_DONE:
-            GetSimCardData(event, slotId_);
-            break;
-        case MSG_SIM_UNLOCK_PIN_DONE:
-        case MSG_SIM_UNLOCK_PUK_DONE:
-        case MSG_SIM_CHANGE_PIN_DONE:
-        case MSG_SIM_UNLOCK_PIN2_DONE:
-        case MSG_SIM_UNLOCK_PUK2_DONE:
-        case MSG_SIM_CHANGE_PIN2_DONE:
-            GetUnlockResult(event, slotId_);
-            SyncCmdResponse();
-            break;
-        case MSG_SIM_UNLOCK_SIMLOCK_DONE:
-            GetUnlockSimLockResult(event, slotId_);
-            SyncCmdResponse();
-            break;
-        case MSG_SIM_ENABLE_PIN_DONE:
-            GetSetLockResult(event, slotId_);
-            SyncCmdResponse();
-            break;
-        case MSG_SIM_CHECK_PIN_DONE:
-            GetSimLockState(event, slotId_);
-            SyncCmdResponse();
-            break;
-        case MSG_SIM_GET_REALTIME_ICC_STATUS_DONE:
-            GetSimCardData(event, slotId_);
-            SyncCmdResponse();
-            break;
-        case MSG_SIM_AUTHENTICATION_DONE:
-            GetSimAuthenticationResult(slotId_, event);
-            SyncCmdResponse();
-            break;
-        case MSG_SIM_SEND_NCFG_OPER_INFO_DONE:
-            GetSendSimMatchedOperatorInfoResult(slotId_, event);
-            SyncCmdResponse();
+            GetSimCardData(slotId_, event);
             break;
         default:
             TELEPHONY_LOGI("SimStateHandle::ProcessEvent(), unknown event");
@@ -836,6 +832,22 @@ void SimStateHandle::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::Even
         default:
             TELEPHONY_LOGI("SimStateHandle UnRegisterCoreNotify do default");
             break;
+    }
+}
+
+void SimStateHandle::OnRadioStateUnavailable(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<HRilInt32Parcel> object = event->GetSharedObject<HRilInt32Parcel>();
+    if (object == nullptr) {
+        TELEPHONY_LOGE("object is nullptr!");
+        return;
+    }
+    int32_t radioState = object->data;
+    if (radioState == ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE && HasSimCard()) {
+        IccState iccState;
+        iccState.simType_ = ICC_UNKNOWN_TYPE;
+        iccState.simStatus_ = ICC_CONTENT_UNKNOWN;
+        ProcessIccCardState(iccState, slotId_);
     }
 }
 } // namespace Telephony
