@@ -25,22 +25,22 @@ std::vector<int32_t> sJapaneseMobileTypeList = { VCardConfiguration::VCARD_TYPE_
 
 bool VCardConfiguration::IsVer21(const int32_t vcardType)
 {
-    return (vcardType & VER_FLAG) == VER_21;
+    return (static_cast<uint32_t>(vcardType) & VER_FLAG) == VER_21;
 }
 
 bool VCardConfiguration::IsVer30(const int32_t vcardType)
 {
-    return (vcardType & VER_FLAG) == VER_30;
+    return (static_cast<uint32_t>(vcardType) & VER_FLAG) == VER_30;
 }
 
 bool VCardConfiguration::IsVer40(const int32_t vcardType)
 {
-    return (vcardType & VER_FLAG) == VER_40;
+    return (static_cast<uint32_t>(vcardType) & VER_FLAG) == VER_40;
 }
 
 bool VCardConfiguration::RefrainPhoneNumberFormatting(const int32_t vcardType)
 {
-    return ((vcardType & FLAG_REFRAIN_PHONE_NUMBER_FORMATTING) != 0);
+    return ((static_cast<uint32_t>(vcardType) & FLAG_REFRAIN_PHONE_NUMBER_FORMATTING) != 0);
 }
 
 bool VCardConfiguration::IsJapaneseDevice(const int32_t vcardType)
