@@ -31,6 +31,7 @@
 namespace OHOS {
 namespace Telephony {
 namespace {
+constexpr const char *CHINA_TELECOM_CARD = "china_telecom_card";
 constexpr const char *JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING = "Invalid parameter value.";
 const int32_t PARAMETER_COUNT_ZERO = 0;
 const int32_t PARAMETER_COUNT_ONE = 1;
@@ -1597,28 +1598,38 @@ napi_value GetIMSI(napi_env env, napi_callback_info info)
     return NapiCreateAsyncWork<std::string, NativeGetIMSI, GetIMSICallback>(env, info, "GetIMSI");
 }
 
-napi_value IsCTSimCard(napi_env env, napi_callback_info info)
+napi_value IsOperatorSimCard(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = 1;
-    napi_value parameters[] = { nullptr };
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
-    bool isCTSimCard = false;
-    napi_value value = nullptr;
-    if (parameterCount != 1) {
-        TELEPHONY_LOGE("parameter count is incorrect");
-        NAPI_CALL(env, napi_create_int32(env, isCTSimCard, &value));
-        return value;
+    if (parameterCount != PARAMETER_COUNT_TWO ||
+        !NapiUtil::MatchParameters(env, parameters, { napi_number, napi_string })) {
+        TELEPHONY_LOGE("parameter type is incorrect");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
     }
     int32_t slotId = -1;
-    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
-        TELEPHONY_LOGE("convert parameter fail");
-        NAPI_CALL(env, napi_create_int32(env, isCTSimCard, &value));
-        return value;
+    napi_get_value_int32(env, parameters[0], &slotId);
+    if (!IsValidSlotId(slotId)) {
+        NapiUtil::ThrowError(env, JS_ERROR_TELEPHONY_ARGUMENT_ERROR, JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING);
+        return nullptr;
     }
-    if (IsValidSlotId(slotId)) {
-        DelayedRefSingleton<CoreServiceClient>::GetInstance().IsCTSimCard(slotId, isCTSimCard);
+    std::string operatorSimCard = NapiUtil::GetStringFromValue(env, parameters[1]);
+    int32_t errorCode = TELEPHONY_SUCCESS;
+    bool isOperatorSimCard = false;
+    if (!operatorSimCard.compare(CHINA_TELECOM_CARD)) {
+        errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().IsCTSimCard(slotId, isOperatorSimCard);
+    } else {
+        errorCode = TELEPHONY_ERR_ARGUMENT_MISMATCH;
     }
-    NAPI_CALL(env, napi_get_boolean(env, isCTSimCard, &value));
+    if (errorCode != TELEPHONY_SUCCESS) {
+        JsError error = NapiUtil::ConverErrorMessageForJs(errorCode);
+        NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
+        return nullptr;
+    }
+    napi_value value = nullptr;
+    NAPI_CALL(env, napi_get_boolean(env, isOperatorSimCard, &value));
     return value;
 }
 
@@ -2997,6 +3008,17 @@ napi_status InitEnumOperatorConfigKey(napi_env env, napi_value exports)
     return napi_define_properties(env, exports, arrSize, desc);
 }
 
+napi_status InitEnumOperatorSimCard(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("CHINA_TELECOM_CARD", GetNapiValue(env, CHINA_TELECOM_CARD)),
+    };
+
+    constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
+    NapiUtil::DefineEnumClassByName(env, exports, "OperatorSimCard", arrSize, desc);
+    return napi_define_properties(env, exports, arrSize, desc);
+}
+
 napi_status InitSimLockInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
@@ -3053,7 +3075,7 @@ napi_status InitSimInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getCardTypeSync", GetCardTypeSync),
         DECLARE_NAPI_FUNCTION("getSimIccId", GetSimIccId),
         DECLARE_NAPI_FUNCTION("getIMSI", GetIMSI),
-        DECLARE_NAPI_FUNCTION("isCTSimCard", IsCTSimCard),
+        DECLARE_NAPI_FUNCTION("isOperatorSimCard", IsOperatorSimCard),
         DECLARE_NAPI_FUNCTION("hasSimCard", HasSimCard),
         DECLARE_NAPI_FUNCTION("hasSimCardSync", HasSimCardSync),
         DECLARE_NAPI_FUNCTION("getSimGid1", GetSimGid1),
@@ -3099,6 +3121,7 @@ napi_value InitNapiSim(napi_env env, napi_value exports)
     NAPI_CALL(env, InitEnumCardType(env, exports));
     NAPI_CALL(env, InitEnumPersoLockType(env, exports));
     NAPI_CALL(env, InitEnumOperatorConfigKey(env, exports));
+    NAPI_CALL(env, InitEnumOperatorSimCard(env, exports));
     return exports;
 }
 EXTERN_C_END
