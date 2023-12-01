@@ -44,6 +44,12 @@ config("tel_core_service_api_config") {
 }
 
 ohos_shared_library("tel_core_service_api") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
   sources = [
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/cell_information.cpp",
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/cell_location.cpp",

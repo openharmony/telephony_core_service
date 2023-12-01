@@ -2169,14 +2169,12 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_006, Function | MediumTest |
  */
 HWTEST_F(BranchTest, Telephony_TelRilModem_001, Function | MediumTest | Level1)
 {
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
-    std::shared_ptr<TelRilHandler> handler = std::make_shared<TelRilHandler>(runner);
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
 
     std::vector<std::shared_ptr<ObserverHandler>> observerHandlers;
     observerHandlers.push_back(observerHandler);
     std::shared_ptr<TelRilModem> telRilModem = std::make_shared<TelRilModem>(
-        SLOT_ID_0, nullptr, observerHandlers[SLOT_ID_0], handler);
+        SLOT_ID_0, nullptr, observerHandlers[SLOT_ID_0], nullptr);
     if (telRilModem != nullptr) {
         telRilModem->RadioStateUpdated(ModemPowerState::CORE_SERVICE_POWER_ON);
         EXPECT_EQ(telRilModem->OnRilAdapterHostDied(), TELEPHONY_ERR_SUCCESS);

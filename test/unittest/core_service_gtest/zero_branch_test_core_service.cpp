@@ -60,7 +60,10 @@ void CoreServiceBranchTest::SetUpTestCase()
     DelayedSingleton<CoreService>::GetInstance()->Init();
 }
 
-void CoreServiceBranchTest::TearDownTestCase() {}
+void CoreServiceBranchTest::TearDownTestCase()
+{
+    DelayedSingleton<CoreService>::DestroyInstance();
+}
 
 void CoreServiceBranchTest::SetUp() {}
 

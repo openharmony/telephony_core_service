@@ -30,6 +30,7 @@ namespace OHOS {
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t BOOL_NUM = 2;
 constexpr int32_t TECH_NUM = 4;
+constexpr int32_t IMS_SERVICE_TYPE_NUM = 4;
 void OnRemoteRequest(const uint8_t *data, size_t size)
 {
     MessageParcel dataMessageParcel;
@@ -43,7 +44,7 @@ void OnRemoteRequest(const uint8_t *data, size_t size)
     dataMessageParcel.WriteInt32(reg);
     dataMessageParcel.WriteInt32(tech);
 
-    uint32_t code = static_cast<uint32_t>(size);
+    uint32_t code = static_cast<uint32_t>(size % IMS_SERVICE_TYPE_NUM);
     MessageParcel reply;
     MessageOption option;
     sptr<NapiImsRegInfoCallback> imsCallback = new NapiImsRegInfoCallback();
