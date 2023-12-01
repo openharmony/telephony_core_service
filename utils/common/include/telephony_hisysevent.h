@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 using EventType = OHOS::HiviewDFX::HiSysEvent::EventType;
 static constexpr const char *DOMAIN_NAME = OHOS::HiviewDFX::HiSysEvent::Domain::TELEPHONY;
-static const int32_t INVALID_PARAMETER = -1;
+static const int32_t INVALID_PARAMETER = 0xFF;
 
 /**
  * @brief Indicates the error code of call.

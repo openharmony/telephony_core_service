@@ -239,7 +239,7 @@ const std::map<std::string, ResourceUtils::ResourceType> ResourceUtils::mapResou
     { ResourceUtils::CALL_FAILED_UNKNOWN, ResourceUtils::ResourceType::ResourceTypeString },
 };
 
-const std::map<DisconnectedReasons, std::string> ResourceUtils::callFailedResourceName_ = {
+const std::map<int32_t, std::string> ResourceUtils::callFailedResourceName_ = {
     { DisconnectedReasons::UNASSIGNED_NUMBER, ResourceUtils::CALL_FAILED_UNASSIGNED_NUMBER },
     { DisconnectedReasons::NO_ROUTE_TO_DESTINATION, ResourceUtils::CALL_FAILED_NO_ROUTE_TO_DESTINATION },
     { DisconnectedReasons::CHANNEL_UNACCEPTABLE, ResourceUtils::CALL_FAILED_CHANNEL_UNACCEPTABLE },
@@ -547,7 +547,7 @@ void ResourceUtils::ShowAllValue()
 
 bool ResourceUtils::GetCallFailedMessageName(int32_t reason, std::string &name)
 {
-    auto itor = callFailedResourceName_.find(static_cast<DisconnectedReasons>(reason));
+    auto itor = callFailedResourceName_.find(reason);
     if (itor == callFailedResourceName_.end()) {
         name = (callFailedResourceName_.find(DisconnectedReasons::FAILED_UNKNOWN))->second;
         return true;

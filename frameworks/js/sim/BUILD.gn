@@ -13,6 +13,12 @@
 import("//build/ohos.gni")
 SUBSYSTEM_DIR = "../../../../"
 ohos_shared_library("sim") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
     "include",

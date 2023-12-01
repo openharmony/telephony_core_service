@@ -28,11 +28,12 @@ int32_t ImsRegInfoCallbackStub::OnRemoteRequest(
         return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
     }
     TELEPHONY_LOGI("Type is %{public}d", code);
+    ImsServiceType imsSrvType = static_cast<ImsServiceType>(code);
     int32_t slotId = data.ReadInt32();
     int32_t imsRegState = data.ReadInt32();
     int32_t imsRegTech = data.ReadInt32();
     const ImsRegInfo info = { static_cast<ImsRegState>(imsRegState), static_cast<ImsRegTech>(imsRegTech) };
-    return OnImsRegInfoChanged(slotId, static_cast<ImsServiceType>(code), info);
+    return OnImsRegInfoChanged(slotId, imsSrvType, info);
 }
 } // namespace Telephony
 } // namespace OHOS

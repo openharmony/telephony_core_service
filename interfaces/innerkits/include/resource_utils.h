@@ -243,7 +243,7 @@ private:
     };
 
     static const std::map<std::string, ResourceType> mapResourceNameType_;
-    static const std::map<DisconnectedReasons, std::string> callFailedResourceName_;
+    static const std::map<int32_t, std::string> callFailedResourceName_;
     static const std::string RESOURCE_HAP_BUNDLE_NAME;
     static const std::string RESOURCE_INDEX_PATH;
 };

@@ -475,7 +475,7 @@ int32_t MultiSimController::SetDefaultVoiceSlotId(int32_t slotId)
         TELEPHONY_LOGE("slotId is not active");
         return CORE_SERVICE_SIM_CARD_IS_NOT_ACTIVE;
     }
-    if (slotId >= (int32_t)localCacheInfo_.size() || slotId < DEFAULT_SIM_SLOT_ID_REMOVE) {
+    if (slotId >= (int32_t)localCacheInfo_.size() || slotId <= DEFAULT_SIM_SLOT_ID_REMOVE) {
         TELEPHONY_LOGE("failed by out of range");
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
@@ -538,7 +538,7 @@ int32_t MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
         TELEPHONY_LOGE("slotId is not active!");
         return CORE_SERVICE_SIM_CARD_IS_NOT_ACTIVE;
     }
-    if (slotId >= (int32_t)localCacheInfo_.size() || slotId < DEFAULT_SIM_SLOT_ID_REMOVE) {
+    if (slotId >= (int32_t)localCacheInfo_.size() || slotId <= DEFAULT_SIM_SLOT_ID_REMOVE) {
         TELEPHONY_LOGE("failed by out of range");
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
@@ -588,7 +588,7 @@ int32_t MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
         TELEPHONY_LOGE("slotId is not active");
         return CORE_SERVICE_SIM_CARD_IS_NOT_ACTIVE;
     }
-    if (slotId >= (int32_t)localCacheInfo_.size() || slotId < DEFAULT_SIM_SLOT_ID_REMOVE) {
+    if (slotId >= (int32_t)localCacheInfo_.size() || slotId <= DEFAULT_SIM_SLOT_ID_REMOVE) {
         TELEPHONY_LOGE("failed by out of range");
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
