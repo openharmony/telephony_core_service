@@ -55,7 +55,6 @@ static const int32_t RAF_5G = NR;
 static const int32_t RAF_AUTO = RAF_2G | RAF_3G | RAF_4G | RAF_5G;
 
 static const std::map<int32_t, PreferredNetworkMode> mapNetworkModeFromRaf = {
-    { RAF_AUTO, PreferredNetworkMode::CORE_NETWORK_MODE_AUTO },
     { GSM, PreferredNetworkMode::CORE_NETWORK_MODE_GSM },
     { WCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_WCDMA },
     { LTE, PreferredNetworkMode::CORE_NETWORK_MODE_LTE },
@@ -89,7 +88,7 @@ static const std::map<int32_t, PreferredNetworkMode> mapNetworkModeFromRaf = {
     { NR | LTE | TDSCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_GSM },
     { NR | LTE | TDSCDMA | WCDMA, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA },
     { NR | LTE | TDSCDMA | WCDMA | GSM, PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM },
-    { NR | LTE | TDSCDMA | GSM | EVDO | CDMA,
+    { NR | LTE | TDSCDMA | WCDMA | GSM | EVDO | CDMA,
         PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA },
 };
 
@@ -146,7 +145,7 @@ static const std::map<PreferredNetworkMode, int32_t> mapRafFromNetworkMode = {
     { PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA, NR | LTE | TDSCDMA | WCDMA },
     { PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM, NR | LTE | TDSCDMA | WCDMA | GSM },
     { PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA,
-        NR | LTE | TDSCDMA | GSM | EVDO | CDMA },
+        NR | LTE | TDSCDMA | WCDMA | GSM | EVDO | CDMA },
 };
 
 std::unordered_map<int64_t, std::shared_ptr<NetworkSearchCallbackInfo>> NetworkUtils::networkSearchCacheMap_;
