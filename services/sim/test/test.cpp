@@ -639,6 +639,7 @@ static bool TestSetVoiceCallForwarding()
 
 static bool TestIsCTSimCard()
 {
+    AccessToken token;
     static int32_t testSlot = SLOT_ID;
     std::cout << "please input Slot Id" << std::endl;
     std::cin >> testSlot;

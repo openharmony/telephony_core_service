@@ -1466,6 +1466,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailInfo_0300, Function | MediumTest | L
  */
 HWTEST_F(SimTest, Telephony_Sim_IsCTSimCard_0100, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!SimTest::HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
@@ -1482,6 +1483,7 @@ HWTEST_F(SimTest, Telephony_Sim_IsCTSimCard_0100, Function | MediumTest | Level3
  */
 HWTEST_F(SimTest, Telephony_Sim_IsCTSimCard_0200, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!SimTest::HasSimCard(slotId1_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
