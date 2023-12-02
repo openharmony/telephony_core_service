@@ -824,7 +824,8 @@ bool NetworkSearchManager::SetPreferredNetwork(int32_t slotId, int32_t networkMo
         return false;
     }
     int32_t filterMode = static_cast<int32_t>(NetworkUtils::GetNetworkModeFromRaf(modemRaf & raf));
-    TELEPHONY_LOGI("filterMode:%{public}d slotId:%{public}d", filterMode, slotId);
+    TELEPHONY_LOGI("modemRaf:%{public}d, raf:%{public}d, filterMode:%{public}d slotId:%{public}d", modemRaf, raf,
+        filterMode, slotId);
     SetCachePreferredNetworkValue(slotId, filterMode);
     return eventSender_->SendBase(slotId, RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, filterMode);
 }
