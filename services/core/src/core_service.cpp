@@ -463,6 +463,10 @@ int32_t CoreService::GetIMSI(int32_t slotId, std::u16string &imsi)
 
 int32_t CoreService::IsCTSimCard(int32_t slotId, bool &isCTSimCard)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     TELEPHONY_LOGD("CoreService::IsCTSimCard(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");

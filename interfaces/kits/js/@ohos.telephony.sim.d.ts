@@ -774,6 +774,7 @@ declare namespace sim {
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @param { OperatorSimCard } operator - Indicates the operator of sim.
    * @returns { boolean } Returns {@code true} if the SIM card is specified operator; return {@code false} otherwise.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 8300001 - Invalid parameter value.
    * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
@@ -781,6 +782,7 @@ declare namespace sim {
    * @throws { BusinessError } 8300004 - Do not have sim card.
    * @throws { BusinessError } 8300999 - Unknown error code.
    * @syscap SystemCapability.Telephony.CoreService
+   * @systemapi Hide this for inner system use.
    * @since 11
    */
   function isOperatorSimCard(slotId: number, operator: OperatorSimCard): boolean;
