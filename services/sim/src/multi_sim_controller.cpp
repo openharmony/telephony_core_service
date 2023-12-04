@@ -222,11 +222,6 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
 bool MultiSimController::InitShowNumber(int slotId)
 {
     std::u16string showNumber;
-    GetShowNumber(slotId, showNumber);
-    if (!showNumber.empty() && showNumber != IccAccountInfo::DEFAULT_SHOW_NUMBER) {
-        TELEPHONY_LOGD("no need to Init again");
-        return true;
-    }
     if (simFileManager_[slotId] == nullptr) {
         TELEPHONY_LOGE("can not get simFileManager");
         return false;
@@ -725,6 +720,17 @@ int32_t MultiSimController::GetShowNumber(int32_t slotId, std::u16string &showNu
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     showNumber = Str8ToStr16(localCacheInfo_[slotId].phoneNumber);
+    if (!showNumber.empty()) {
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    std::shared_ptr <ImsCoreServiceClient> imsCoreServiceClient = DelayedSingleton<ImsCoreServiceClient>::GetInstance();
+    if (imsCoreServiceClient == nullptr) {
+        TELEPHONY_LOGE("imsCoreServiceClient == nullptr");
+    }
+    std::string result = "";
+    imsCoreServiceClient->GetPhoneNumberFromIMPU(slotId_, result);
+    showNumber = Str8ToStr16(result);
+    TELEPHONY_LOGI("showNumber is empty:%{public}s", (showNumber.empty() ? "true" : "false"));
     return TELEPHONY_ERR_SUCCESS;
 }
 
