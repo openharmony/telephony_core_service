@@ -15,7 +15,7 @@ declare_args() {
   telephony_ext_feature = false
   telephony_vsim_feature = false
   telephony_fullnetwork_feature = false
-  booster_net_feature = false
+  data_service_ext_feature = false
 }
 
 print("telephony_ext_feature = ${telephony_ext_feature}")
@@ -33,6 +33,6 @@ if (telephony_fullnetwork_feature) {
   telephony_extra_defines += [ "OHOS_BUILD_ENABLE_TELEPHONY_FULLNETWORK" ]
 }
 
-if (booster_net_feature) {
-  telephony_extra_defines += [ "OHOS_BUILD_ENABLE_BOOSTER_NET" ]
+if (data_service_ext_feature) {
+  telephony_extra_defines += [ "OHOS_BUILD_ENABLE_DATA_SERVICE_EXT" ]
 }
