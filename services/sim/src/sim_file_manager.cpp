@@ -315,14 +315,6 @@ std::u16string SimFileManager::GetSimTelephoneNumber()
         result = simFile_->ObtainMsisdnNumber();
     }
     TELEPHONY_LOGI("result is empty:%{public}s", (result.empty() ? "true" : "false"));
-    if (!result.empty()) {
-        return Str8ToStr16(result);
-    }
-    std::shared_ptr<ImsCoreServiceClient> imsCoreServiceClient = DelayedSingleton<ImsCoreServiceClient>::GetInstance();
-    if (imsCoreServiceClient != nullptr) {
-        imsCoreServiceClient->GetPhoneNumberFromIMPU(slotId_, result);
-        TELEPHONY_LOGI("impu result is empty:%{public}s", (result.empty() ? "true" : "false"));
-    }
     return Str8ToStr16(result);
 }
 
