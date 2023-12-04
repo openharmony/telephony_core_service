@@ -18,4 +18,12 @@
 
 #define FUZZ_PROJECT_NAME "autotimezone_fuzzer"
 
+namespace OHOS {
+class AutoTimeZoneFuzzer {
+public:
+    AutoTimeZoneFuzzer();
+    ~AutoTimeZoneFuzzer();
+};
+} // namespace OHOS
+
 #endif // AUTOTIMEZONE_FUZZER_H
