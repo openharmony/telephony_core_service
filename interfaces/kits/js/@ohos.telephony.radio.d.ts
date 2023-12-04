@@ -58,8 +58,41 @@ declare namespace radio {
    * @syscap SystemCapability.Telephony.CoreService
    * @since 6
    */
-  function getRadioTech(slotId: number,
-    callback: AsyncCallback<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}>): void;
+  /**
+   * Obtains radio access technology (RAT) of the registered network. The system
+   * returns RAT of the packet service (PS) and circuit service (CS) domain.
+   *
+   * @permission ohos.permission.GET_NETWORK_INFO
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param { AsyncCallback<NetworkRadioTech> } callback - Returns
+   * the RAT of PS domain and CS domain of registered network.
+   * The values of RAT are as follows:
+   * <ul>
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_UNKNOWN}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_GSM}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_1XRTT}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_WCDMA}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_HSPA}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_HSPAP}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_TD_SCDMA}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_EVDO}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_EHRPD}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_LTE}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_LTE_CA}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_IWLAN}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_NR}
+   * </ul>
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 11
+   */
+  function getRadioTech(slotId: number, callback: AsyncCallback<NetworkRadioTech>): void;
 
   /**
    * Obtains radio access technology (RAT) of the registered network. The system
@@ -68,7 +101,7 @@ declare namespace radio {
    * @permission ohos.permission.GET_NETWORK_INFO
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns { Promise<psRadioTech: RadioTechnology, csRadioTech: RadioTechnology> } Returns
+   * @returns { Promise<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}> } Returns
    * the enumeration of RadioTechnology. The values are as follows:
    * <ul>
    * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_UNKNOWN}
@@ -94,7 +127,40 @@ declare namespace radio {
    * @syscap SystemCapability.Telephony.CoreService
    * @since 6
    */
-  function getRadioTech(slotId: number): Promise<{psRadioTech: RadioTechnology, csRadioTech: RadioTechnology}>;
+  /**
+   * Obtains radio access technology (RAT) of the registered network. The system
+   * returns RAT of the packet service (PS) and circuit service (CS) domain.
+   *
+   * @permission ohos.permission.GET_NETWORK_INFO
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns { Promise<NetworkRadioTech> } Returns the RAT of PS domain and CS domain of registered network.
+   * The values of RAT are as follows:
+   * <ul>
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_UNKNOWN}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_GSM}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_1XRTT}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_WCDMA}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_HSPA}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_HSPAP}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_TD_SCDMA}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_EVDO}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_EHRPD}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_LTE}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_LTE_CA}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_IWLAN}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_NR}
+   * </ul>
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 11
+   */
+  function getRadioTech(slotId: number): Promise<NetworkRadioTech>;
 
   /**
    * Obtains the network state of the registered network.
@@ -1753,6 +1819,31 @@ declare namespace radio {
      * @since 8
      */
     PREFERRED_NETWORK_MODE_MAX_VALUE = 99,
+  }
+
+  /**
+   * Describes the radio access technology (RAT) of registered network.
+   *
+   * @interface NetworkRadioTech
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 11
+   */
+  export interface NetworkRadioTech {
+    /**
+     * Indicates radio access technology (RAT) of packet service (PS) domain.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @since 11
+     */
+    psRadioTech: RadioTechnology;
+
+    /**
+     * Indicates radio access technology (RAT) of circuit service (CS) domain.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @since 11
+     */
+    csRadioTech: RadioTechnology;
   }
 
   /**
