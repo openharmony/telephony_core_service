@@ -920,7 +920,8 @@ void TelRilManager::HandleRilInterfaceStatusCallback(const OHOS::HDI::ServiceMan
             TELEPHONY_LOGE("TelRilManager::HandleRilInterfaceCallback, DisConnectRilAdapterService fail");
             return;
         }
-        for (int32_t slotId = SIM_SLOT_0; slotId < telRilModem_.size(); slotId++) {
+        int32_t size = static_cast<int32_t>(telRilModem_.size());
+        for (int32_t slotId = SIM_SLOT_0; slotId < size; slotId++) {
             if (GetTelRilModem(slotId) != nullptr) {
                 GetTelRilModem(slotId)->OnRilAdapterHostDied();
             }
