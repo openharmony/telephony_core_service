@@ -27,6 +27,7 @@
 #include "runner_pool.h"
 #include "security_token.h"
 #include "sim_manager.h"
+#include "tel_ril_manager.h"
 #include "telephony_log_wrapper.h"
 #include "time_zone_manager.h"
 
@@ -649,6 +650,24 @@ HWTEST_F(CoreServiceBranchTest, Telephony_OperatorNameUtils_001, Function | Medi
     EXPECT_GT(OperatorNameUtils::GetInstance().LoaderJsonFile(content, path), TELEPHONY_ERR_SUCCESS);
     std::string numeric = "46000";
     EXPECT_NE(OperatorNameUtils::GetInstance().GetCustomName(numeric), "");
+}
+
+/**
+ * @tc.number   Telephony_TelRilManager_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_TelRilManager_001, Function | MediumTest | Level1)
+{
+    OHOS::HDI::ServiceManager::V1_0::ServiceStatus status = { "test", 0, SERVIE_STATUS_STOP, "test" };
+    auto telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->HandleRilInterfaceStatusCallback(status);
+    status.serviceName = "ril_service";
+    telRilManager->HandleRilInterfaceStatusCallback(status);
+    status.deviceClass = DEVICE_CLASS_DEFAULT;
+    telRilManager->rilInterface_ = nullptr;
+    telRilManager->HandleRilInterfaceStatusCallback(status);
+    EXPECT_TRUE(status.status == SERVIE_STATUS_STOP);
 }
 } // namespace Telephony
 } // namespace OHOS
