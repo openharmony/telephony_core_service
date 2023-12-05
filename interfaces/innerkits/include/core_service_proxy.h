@@ -136,6 +136,7 @@ public:
     int32_t RegisterImsRegInfoCallback(
         int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback) override;
     int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType) override;
+    int32_t FactoryReset(int32_t slotId) override;
 
 private:
     template<class T>

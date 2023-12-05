@@ -76,7 +76,7 @@ int32_t CoreManagerInner::GetMaxSimCount(void)
 int32_t CoreManagerInner::RegisterCoreNotify(
     int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what, int32_t *obj)
 {
-    if (what >= RadioEvent::RADIO_PS_CONNECTION_ATTACHED && what <= RadioEvent::RADIO_EMERGENCY_STATE_CLOSE) {
+    if (what >= RadioEvent::RADIO_PS_CONNECTION_ATTACHED && what <= RadioEvent::RADIO_FACTORY_RESET) {
         if (networkSearchManager_ == nullptr) {
             TELEPHONY_LOGE("networkSearchManager is null!");
             return TELEPHONY_ERR_LOCAL_PTR_NULL;

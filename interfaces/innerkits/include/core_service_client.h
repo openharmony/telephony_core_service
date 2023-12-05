@@ -845,6 +845,14 @@ public:
      */
     int32_t GetBasebandVersion(int32_t slotId, std::string &version);
 
+    /**
+     * @brief Reset all network settings of telephony
+     *
+     * @param slotId[in], sim slot id
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t FactoryReset(int32_t slotId);
+
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {

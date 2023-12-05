@@ -2506,7 +2506,6 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNrOptionMode_0200, Functi
     TELEPHONY_LOGI("TelephonyTestService GetNrOptionMode syncResult: %{public}d", syncResult);
     ASSERT_TRUE(syncResult || TELEPHONY_ERR_SUCCESS == result);
 }
-
 #else // TEL_TEST_UNSUPPORT
 /**
  * @tc.number   Telephony_NetworkSearch_MockTest_0100

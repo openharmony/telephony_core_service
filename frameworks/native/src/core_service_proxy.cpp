@@ -2945,5 +2945,29 @@ int32_t CoreServiceProxy::SerializeImsRegInfoData(int32_t slotId, ImsServiceType
     }
     return TELEPHONY_SUCCESS;
 }
+
+int32_t CoreServiceProxy::FactoryReset(int32_t slotId)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    data.WriteInt32(slotId);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t error =
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("Error code is %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return reply.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS
