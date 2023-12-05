@@ -198,9 +198,11 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
     DataShare::DataShareValuesBucket values;
     DataShare::DataShareValueObject slotObj(slotId);
     DataShare::DataShareValueObject iccidObj(newIccId);
+    DataShare::DataShareValueObject valueObj(ACTIVE);
     values.Put(SimData::SLOT_INDEX, slotObj);
     values.Put(SimData::ICC_ID, iccidObj);
     values.Put(SimData::CARD_ID, iccidObj); // iccId == cardId by now
+    values.Put(SimData::IS_ACTIVE, valueObj);
     const int32_t slotSingle = 1;
     if (SIM_SLOT_COUNT == slotSingle) {
         DataShare::DataShareValueObject mainCardObj(MAIN_CARD);
