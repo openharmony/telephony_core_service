@@ -34,6 +34,7 @@
 #include "telephony_config.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_utils_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -2483,6 +2484,12 @@ static napi_value IsNrSupported(napi_env env, napi_callback_info info)
     TelephonyConfig telephonyConfig;
     isNrSupported =
         telephonyConfig.IsCapabilitySupport(static_cast<int32_t>(TelephonyConfig::ConfigType::MODEM_CAP_SUPPORT_NR));
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    TELEPHONY_EXT_UTILS_WRAPPER.InitTelephonyExtUtilsWrapper();
+#endif
+    if (TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_ != nullptr) {
+        isNrSupported = TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_();
+    }
     TELEPHONY_LOGD("isNrSupported:%{public}d", isNrSupported);
     napi_get_boolean(env, isNrSupported, &result);
     return result;

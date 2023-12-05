@@ -841,6 +841,26 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCellInfoList_0300, Functi
 }
 
 /**
+ * @tc.number   Telephony_NetworkSearch_GetCellInfoList_0400
+ * @tc.name     Get Cell Info List
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCellInfoList_0400, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+        return;
+    }
+    std::vector<sptr<CellInformation>> cellList;
+    int32_t result = CoreServiceClient::GetInstance().GetCellInfoList(SLOT_ID1, cellList);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    PrintCellInformation(cellList);
+    ASSERT_TRUE(!cellList.empty());
+}
+
+/**
  * @tc.number   Telephony_NetworkSearch_PrintCellInfoList_0100
  * @tc.name     Get Cell Info List
  * @tc.desc     Function test
