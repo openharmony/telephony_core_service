@@ -19,6 +19,11 @@
 #include "nocopyable.h"
 #include "singleton.h"
 #include "network_state.h"
+#include "network_search_types.h"
+#include "network_search_result.h"
+#include "signal_information.h"
+#include "network_state.h"
+#include "cell_information.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -42,6 +47,23 @@ public:
     typedef char* (*GET_VOICE_MAIL_TAG_EXT)(int32_t, const char*);
     typedef void (*RESET_VOICE_MAIL_MANAGER_EXT)(int32_t);
     typedef void (*GET_NETWORK_STATUS_EXT)(int32_t slotId, sptr<OHOS::Telephony::NetworkState> &networkState);
+	
+    typedef int32_t (*GET_CELL_INFO_LIST)(int32_t slotId, std::vector<sptr<OHOS::Telephony::CellInformation>> &cells);
+    typedef void (*GET_RADIO_TECH_EXT)(int32_t slotId, int32_t &domainRadioTech);
+    typedef void (*GET_NR_OPTION_MODE_EXT)(int32_t slotId, int32_t &mode);
+    typedef void (*GET_NR_OPTION_MODE_EXTEND)(int32_t slotId, OHOS::Telephony::NrMode &mode);
+    typedef void (*GET_PREFERRED_NETWORK_EXT)(int32_t &preferredNetworkType);
+    typedef bool (*IS_NR_SUPPORTED_NATIVE)(int32_t modemRaf);
+    typedef void (*GET_SIGNAL_INFO_LIST_EXT)(int32_t slotId,
+	    std::vector<sptr<OHOS::Telephony::SignalInformation>> &signals);
+    typedef bool (*IS_CAPABILITY_SUPPORT_EXT)(uint32_t capablity);
+    typedef void (*GET_NETWORK_CAPABILITY_EXT)(int32_t slotId, int32_t networkCapabilityType,
+	    int32_t &networkCapabilityState);
+    typedef int32_t (*WRAP_NATIVE_NETWORK_MODE_EXT)(int32_t nativeMode);
+    typedef void (*ON_GET_NETWORK_SEARCH_INFORMATION_EXT)(int32_t &availableSize,
+        std::vector<OHOS::Telephony::NetworkInformation> &networkInformations);
+    typedef void (*FILTER_SEND_SIGNAL_INFORMAION_EXT)(int32_t slotId,
+	    std::vector<sptr<OHOS::Telephony::SignalInformation>> &vec);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -56,6 +78,19 @@ public:
     GET_VOICE_MAIL_TAG_EXT getVoiceMailTagExt_ = nullptr;
     RESET_VOICE_MAIL_MANAGER_EXT resetVoiceMailManagerExt_ = nullptr;
     GET_NETWORK_STATUS_EXT getNetworkStatusExt_ = nullptr;
+
+    GET_CELL_INFO_LIST getCellInfoList_ = nullptr;
+    GET_RADIO_TECH_EXT getRadioTechExt_ = nullptr;
+    GET_NR_OPTION_MODE_EXT getNrOptionModeExt_ = nullptr;
+    GET_NR_OPTION_MODE_EXTEND getNrOptionModeExtend_ = nullptr;
+    GET_PREFERRED_NETWORK_EXT getPreferredNetworkExt_ = nullptr;
+    IS_NR_SUPPORTED_NATIVE isNrSupportedNative_ = nullptr;
+    GET_SIGNAL_INFO_LIST_EXT getSignalInfoListExt_ = nullptr;
+    IS_CAPABILITY_SUPPORT_EXT isCapabilitySupportExt_ = nullptr;
+    GET_NETWORK_CAPABILITY_EXT getNetworkCapabilityExt_ = nullptr;
+    WRAP_NATIVE_NETWORK_MODE_EXT wrapNativeNetworkModeExt_ = nullptr;
+    ON_GET_NETWORK_SEARCH_INFORMATION_EXT onGetNetworkSearchInformationExt_ = nullptr;
+    FILTER_SEND_SIGNAL_INFORMAION_EXT filterSendSignalInformationExt_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;

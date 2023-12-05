@@ -18,6 +18,7 @@
 #include "network_search_manager.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -195,6 +196,10 @@ bool NetworkSelection::AvailNetworkResult(
                 networkInformation.push_back(networkStateItem);
             }
         }
+        if (TELEPHONY_EXT_WRAPPER.onGetNetworkSearchInformationExt_ != nullptr) {
+            TELEPHONY_EXT_WRAPPER.onGetNetworkSearchInformationExt_(availableSize, networkInformation);
+        }
+
         nsm->SetNetworkSearchResultValue(slotId_, availableSize, networkInformation);
         sptr<NetworkSearchResult> networkSearchResult = nsm->GetNetworkSearchInformationValue(slotId_);
         if (networkSearchResult != nullptr) {
