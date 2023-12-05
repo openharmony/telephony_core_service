@@ -69,6 +69,7 @@ void CoreServiceStub::AddHandlerNetWorkToMap()
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UN_REG_IMS_CALLBACK)] =
         &CoreServiceStub::OnUnregisterImsRegInfoCallback;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_BASEBAND_VERSION)] = &CoreServiceStub::OnGetBasebandVersion;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::FACTORY_RESET)] = &CoreServiceStub::OnFactoryReset;
 }
 
 void CoreServiceStub::AddHandlerSimToMap()
@@ -1647,6 +1648,17 @@ int32_t CoreServiceStub::OnGetBasebandVersion(MessageParcel &data, MessageParcel
     }
     if (!reply.WriteString(version)) {
         TELEPHONY_LOGE("OnRemoteRequest::OnGetBasebandVersion write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnFactoryReset(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t result = FactoryReset(slotId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("Write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return result;

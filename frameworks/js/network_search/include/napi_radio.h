@@ -264,6 +264,10 @@ struct NrOptionModeContext : CallbackContext {
     int32_t nrOptionMode = DEFAULT_ERROR;
 };
 
+struct FactoryResetContext : BaseContext {
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+};
+
 struct SetPrimarySlotIdContext : BaseContext {
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
     bool setResult = false;

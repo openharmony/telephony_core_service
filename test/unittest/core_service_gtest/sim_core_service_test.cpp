@@ -262,6 +262,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0500, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->UpdateIccDiallingNumbers(0, 1, diallingNumber), TELEPHONY_ERR_SUCCESS);
     std::vector<IccAccountInfo> iccAccountInfoList = {};
     EXPECT_NE(mCoreService->GetActiveSimAccountInfoList(iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->FactoryReset(0), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
