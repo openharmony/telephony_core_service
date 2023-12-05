@@ -239,9 +239,8 @@ HWTEST_F(VcardTest, Telephony_VCardTest_101, Function | MediumTest | Level2)
         } else {
             int rowCount = 0;
             resultSet->GetRowCount(rowCount);
-            TELEPHONY_LOGE("VCardTest QueryContact rowCount= %{public}d", rowCount);
+            TELEPHONY_LOGI("VCardTest QueryContact rowCount= %{public}d", rowCount);
             VCardManager::GetInstance().Export(filePath, predicates);
-            TELEPHONY_LOGI("VCardTest export filePath = %{public}s", filePath.c_str());
             VCardManager::GetInstance().Import(filePath, 0);
         }
     } else {
@@ -273,11 +272,10 @@ HWTEST_F(VcardTest, Telephony_VCardTest_102, Function | MediumTest | Level2)
         } else {
             int rowCount = 0;
             resultSet->GetRowCount(rowCount);
-            TELEPHONY_LOGE("VCardTest QueryContact rowCount= %{public}d", rowCount);
+            TELEPHONY_LOGI("VCardTest QueryContact rowCount= %{public}d", rowCount);
             DataShare::DataSharePredicates predicates;
             predicates.Between(Contact::ID, "0", "100");
             VCardManager::GetInstance().Export(filePath, predicates);
-            TELEPHONY_LOGI("VCardTest export filePath = %{public}s", filePath.c_str());
             int32_t errorCode;
             VCardManager::GetInstance().Decode(filePath, errorCode);
             EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
