@@ -99,7 +99,8 @@ void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("operatorInfoResult is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    if (operatorInfoResult->flag != networkSearchManager->GetSerialNum(slotId_)) {
+    if (operatorInfoResult->flag != networkSearchManager->GetSerialNum(slotId_) &&
+        operatorInfoResult->flag != NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT) {
         TELEPHONY_LOGI("Aborting outdated operator info event slotId:%{public}d", slotId_);
         return;
     }
