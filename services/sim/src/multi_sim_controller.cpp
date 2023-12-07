@@ -819,14 +819,15 @@ int32_t MultiSimController::GetSimTelephoneNumber(int32_t slotId, std::u16string
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     std::shared_ptr<ImsCoreServiceClient> imsCoreServiceClient = DelayedSingleton<ImsCoreServiceClient>::GetInstance();
-    if(imsCoreServiceClient == nullptr) {
+    if (imsCoreServiceClient == nullptr) {
         TELEPHONY_LOGE("can not get imsCoreServiceClient");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::string result = "";
     imsCoreServiceClient->GetPhoneNumberFromIMPU(slotId, result);
     telephoneNumber = Str8ToStr16(result);
-    TELEPHONY_LOGI("impu result is empty:%{public}s, slotId:%{public}d", (telephoneNumber.empty() ? "true" : "false"), slotId);
+    TELEPHONY_LOGI("impu result is empty:%{public}s, slotId:%{public}d", (telephoneNumber.empty() ? "true" : "false"),
+        slotId);
     return TELEPHONY_ERR_SUCCESS;
 }
 

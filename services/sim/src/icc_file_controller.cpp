@@ -121,7 +121,8 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
             hd->countFiles = size / hd->fileSize;
         }
     }
-    TELEPHONY_LOGI("ProcessRecordSize fileId:%{public}d %{public}d %{public}d %{public}d", hd->fileId, size, hd->fileSize, hd->countFiles);
+    TELEPHONY_LOGI("ProcessRecordSize fileId:%{public}d %{public}d %{public}d %{public}d", hd->fileId, size,
+        hd->fileSize, hd->countFiles);
     if (telRilManager_ != nullptr) {
         SimIoRequestInfo msg;
         msg.command = CONTROLLER_REQ_READ_RECORD;
@@ -610,7 +611,8 @@ void IccFileController::ParseFileSize(int val[], int len, const unsigned char *d
     }
     TELEPHONY_LOGD("ParseFileSize result %{public}d, %{public}d %{public}d", val[0], val[1], val[MAX_FILE_INDEX]);
 }
-bool IccFileController::IsValidRecordSizeData(const unsigned char *data) {
+bool IccFileController::IsValidRecordSizeData(const unsigned char *data)
+{
     if (data == nullptr) {
         TELEPHONY_LOGE("IccFileTypeMismatch ERROR nullptr");
         return false;
