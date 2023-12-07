@@ -162,7 +162,7 @@ void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer 
     }
     unsigned char *fileData = rawData.get();
     int size = 0;
-    if (recordLen > STRUCTURE_OF_DATA) {
+    if (binaryLen > STRUCTURE_OF_DATA) {
         if (!IsValidBinarySizeData(fileData)) {
             TELEPHONY_LOGE("ProcessBinarySize get error filetype");
             SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
@@ -171,7 +171,7 @@ void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer 
         GetDataSize(fileData, size);
     }
     int fileId = rcvMsg->arg1;
-    TELEPHONY_LOGI("ProcessBinarySize fileId:%{public}d size:%{public}d %{public}d", fileId, size);
+    TELEPHONY_LOGI("ProcessBinarySize fileId:%{public}d size:%{public}d", fileId, size);
     const AppExecFwk::InnerEvent::Pointer &evt = hd->fileLoaded;
     if (evt->GetOwner() == nullptr) {
         TELEPHONY_LOGE("ProcessBinarySize isNull is null pointer");
