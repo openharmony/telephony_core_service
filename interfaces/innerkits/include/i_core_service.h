@@ -139,6 +139,7 @@ public:
         int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback) = 0;
     virtual int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType) = 0;
     virtual int32_t GetBasebandVersion(int32_t slotId, std::string &version) = 0;
+    virtual int32_t FactoryReset(int32_t slotId) = 0;
 
 protected:
     const int32_t ERROR = -1;

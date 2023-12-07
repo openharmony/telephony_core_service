@@ -2068,6 +2068,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_004, Function | MediumTest |
         TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->SetNetworkCapability(INVALID_SLOTID, networkAbilityType, networkAbilityState),
         TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->FactoryReset(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
 }
 
 /**

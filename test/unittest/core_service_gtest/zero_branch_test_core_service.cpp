@@ -123,6 +123,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_002, Function | Me
     std::vector<sptr<CellInformation>> cellList;
     int32_t result = DelayedSingleton<CoreService>::GetInstance()->GetCellInfoList(SLOT_ID, cellList);
     DelayedSingleton<CoreService>::GetInstance()->SendUpdateCellLocationRequest(SLOT_ID);
+    DelayedSingleton<CoreService>::GetInstance()->FactoryReset(SLOT_ID);
     std::u16string u16Ret = u"";
     DelayedSingleton<CoreService>::GetInstance()->GetIsoCountryCodeForNetwork(SLOT_ID, u16Ret);
     DelayedSingleton<CoreService>::GetInstance()->GetImei(SLOT_ID, u16Ret);

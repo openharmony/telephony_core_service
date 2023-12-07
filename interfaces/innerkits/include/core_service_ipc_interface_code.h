@@ -112,6 +112,7 @@ enum class CoreServiceInterfaceCode {
     SET_VOICE_CALL_FORWARDING,
     GET_BASEBAND_VERSION,
     GET_DSDS_MODE,
+    FACTORY_RESET,
 };
 } // namespace Telephony
 } // namespace OHOS

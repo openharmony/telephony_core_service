@@ -231,6 +231,8 @@ public:
 
     int32_t GetBasebandVersion(int32_t slotId, std::string &version) override;
 
+    int32_t FactoryReset(int32_t slotId) override;
+
     int32_t Dump(std::int32_t fd, const std::vector<std::u16string> &args) override;
 
     int64_t GetBindTime();
