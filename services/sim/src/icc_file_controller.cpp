@@ -610,22 +610,21 @@ void IccFileController::ParseFileSize(int val[], int len, const unsigned char *d
     }
     TELEPHONY_LOGD("ParseFileSize result %{public}d, %{public}d %{public}d", val[0], val[1], val[MAX_FILE_INDEX]);
 }
-bool IccFileController::IsValidRecordSizeData(const unsigned char *data)
-{
+bool IccFileController::IsValidRecordSizeData(const unsigned char *data) {
     if (data == nullptr) {
         TELEPHONY_LOGE("IccFileTypeMismatch ERROR nullptr");
-    return false;
+        return false;
+    }
+    if (ICC_ELEMENTARY_FILE != data[TYPE_OF_FILE]) {
+        TELEPHONY_LOGE("IccFileTypeMismatch ERROR TYPE_OF_FILE");
+        return false;
+    }
+    if (ELEMENTARY_FILE_TYPE_LINEAR_FIXED != data[STRUCTURE_OF_DATA]) {
+        TELEPHONY_LOGE("IccFileTypeMismatch ERROR STRUCTURE_OF_DATA");
+        return false;
+    }
+    return true;
 }
-if (ICC_ELEMENTARY_FILE != data[TYPE_OF_FILE]) {
-    TELEPHONY_LOGE("IccFileTypeMismatch ERROR TYPE_OF_FILE");
-    return false;
-}
-if (ELEMENTARY_FILE_TYPE_LINEAR_FIXED != data[STRUCTURE_OF_DATA]) {
-    TELEPHONY_LOGE("IccFileTypeMismatch ERROR STRUCTURE_OF_DATA");
-    return false;
-}
-return true;
-
 bool IccFileController::IsValidBinarySizeData(const unsigned char *data)
 {
     if (data == nullptr) {
