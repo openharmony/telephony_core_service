@@ -152,10 +152,6 @@ void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer 
         TELEPHONY_LOGE("ProcessBinarySize result or hd is nullptr");
         return;
     }
-    if (rcvMsg->controlHolder == nullptr) {
-        TELEPHONY_LOGE("ProcessBinarySize controlHolder is nullptr");
-        return;
-    }
     TELEPHONY_LOGI("ProcessBinarySize --- resultData: --- %{public}s", result->resultData.c_str());
     int binaryLen = 0;
     std::shared_ptr<unsigned char> rawData = SIMUtils::HexStringConvertToBytes(result->resultData, binaryLen);
