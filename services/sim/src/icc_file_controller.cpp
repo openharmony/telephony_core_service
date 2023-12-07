@@ -172,7 +172,7 @@ void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer 
     }
     int fileId = rcvMsg->arg1;
     TELEPHONY_LOGI("ProcessBinarySize fileId:%{public}d size:%{public}d %{public}d", fileId, size);
-    const AppExecFwk::InnerEvent::Pointer &evt = rcvMsg->controlHolder->fileLoaded;
+    const AppExecFwk::InnerEvent::Pointer &evt = hd->fileLoaded;
     if (evt->GetOwner() == nullptr) {
         TELEPHONY_LOGE("ProcessBinarySize isNull is null pointer");
         return;
