@@ -482,9 +482,6 @@ static bool MatchFactoryResetParameter(napi_env env, napi_value parameter[], siz
         case PARAMETER_COUNT_ONE: {
             return NapiUtil::MatchParameters(env, parameter, { napi_number });
         }
-        case PARAMETER_COUNT_TWO: {
-            return NapiUtil::MatchParameters(env, parameter, { napi_number, napi_function });
-        }
         default: {
             return false;
         }
@@ -2364,7 +2361,7 @@ static void NativeFactoryReset(napi_env env, void *data)
     if (context->errorCode == TELEPHONY_SUCCESS) {
         context->resolved = true;
     }
-    TELEPHONY_LOGI("NativeFactoryReset end");
+    TELEPHONY_LOGD("NativeFactoryReset end");
 }
 
 static void FactoryResetCallback(napi_env env, napi_status status, void *data)
@@ -2379,13 +2376,13 @@ static void FactoryResetCallback(napi_env env, napi_status status, void *data)
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle1ValueCallback(env, context, callbackValue);
-    TELEPHONY_LOGI("FactoryResetCallback end");
+    TELEPHONY_LOGD("FactoryResetCallback end");
 }
 
 static napi_value FactoryReset(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = PARAMETER_COUNT_TWO;
-    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
+    size_t parameterCount = PARAMETER_COUNT_ONE;
+    napi_value parameters[PARAMETER_COUNT_ONE] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
@@ -2396,10 +2393,6 @@ static napi_value FactoryReset(napi_env env, napi_callback_info info)
     }
     auto asyncContext = std::make_unique<FactoryResetContext>();
     NAPI_CALL(env, napi_get_value_int32(env, parameters[ARRAY_INDEX_FIRST], &asyncContext->slotId));
-    if (parameterCount == PARAMETER_COUNT_TWO) {
-        NAPI_CALL(env,
-            napi_create_reference(env, parameters[ARRAY_INDEX_SECOND], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
-    }
     return NapiUtil::HandleAsyncWork(
         env, asyncContext.release(), "factoryReset", NativeFactoryReset, FactoryResetCallback);
 }
