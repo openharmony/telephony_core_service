@@ -343,16 +343,16 @@ void VCardContact::HandleName(std::vector<std::string> values, std::map<std::str
     switch (size) {
         case SIZE_FIVE:
             nameData_->SetSuffix(values[N_SUFFIX_VALUE_INDEX]);
-            // fall_through
+            [[fallthrough]]; // fall_through
         case SIZE_FOUR:
             nameData_->SetPrefix(values[N_PREFIX_VALUE_INDEX]);
-            // fall_through
+            [[fallthrough]]; // fall_through
         case SIZE_THREE:
             nameData_->SetMiddle(values[N_MIDDLE_VALUE_INDEX]);
-            // fall_through
+            [[fallthrough]]; // fall_through
         case SIZE_TWO:
             nameData_->SetGiven(values[N_GIVEN_VALUE_INDEX]);
-            // fall_through
+            [[fallthrough]]; // fall_through
         default:
             nameData_->SetFamily(values[N_FAMILY_VALUE_INDEX]);
             break;
@@ -387,10 +387,10 @@ void VCardContact::HandleSortAsName(std::map<std::string, std::vector<std::strin
         switch (size) {
             case SIZE_THREE:
                 nameData_->SetPhoneticMiddle(sortNames[PHONETIC_MIDDLE_VALUE_INDEX]);
-                // fall_through
+                [[fallthrough]]; // fall_through
             case SIZE_TWO:
                 nameData_->SetPhoneticGiven(sortNames[PHONETIC_GIVEN_VALUE_INDEX]);
-                // fall_through
+                [[fallthrough]]; // fall_through
             default:
                 nameData_->SetPhoneticFamily(sortNames[PHONETIC_FAMILY_VALUE_INDEX]);
                 break;
