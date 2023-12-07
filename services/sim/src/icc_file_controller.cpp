@@ -111,7 +111,7 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
     unsigned char *fileData = rawData.get();
     path = CheckRightPath(hd->filePath, hd->fileId);
     if (recordLen > LENGTH_OF_RECORD) {
-        if (!IsValidSizeData(fileData)) {
+        if (!IsValidRecordSizeData(fileData)) {
             TELEPHONY_LOGE("ProcessRecordSize get error filetype");
             SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
             return;
@@ -121,7 +121,7 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
             hd->countFiles = size / hd->fileSize;
         }
     }
-    TELEPHONY_LOGI("ProcessRecordSize %{public}d %{public}d %{public}d", size, hd->fileSize, hd->countFiles);
+    TELEPHONY_LOGI("ProcessRecordSize fileId:%{public}d %{public}d %{public}d %{public}d", hd->fileId, size, hd->fileSize, hd->countFiles);
     if (telRilManager_ != nullptr) {
         SimIoRequestInfo msg;
         msg.command = CONTROLLER_REQ_READ_RECORD;
@@ -140,24 +140,47 @@ void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer 
 {
     std::string str = IccFileController::NULLSTR;
     std::string path = IccFileController::NULLSTR;
-    TELEPHONY_LOGD("IccFileController::ProcessBinarySize init");
+    TELEPHONY_LOGD("ProcessBinarySize init");
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     if (rcvMsg == nullptr) {
         TELEPHONY_LOGE("rcvMsg is nullptr");
         return;
     }
-    if (rcvMsg->controlHolder == nullptr) {
-        TELEPHONY_LOGE("IccFileController::ProcessBinarySize controlHolder is nullptr");
+    IccFileData *result = &(rcvMsg->fileData);
+    std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
+    if (result == nullptr || hd == nullptr) {
+        TELEPHONY_LOGE("ProcessBinarySize result or hd is nullptr");
         return;
     }
-    const AppExecFwk::InnerEvent::Pointer &evt = rcvMsg->controlHolder->fileLoaded;
-
-    if (evt->GetOwner() == nullptr) {
-        TELEPHONY_LOGE("IccFileController::ProcessBinarySize isNull is null pointer");
+    if (rcvMsg->controlHolder == nullptr) {
+        TELEPHONY_LOGE("ProcessBinarySize controlHolder is nullptr");
         return;
+    }
+    TELEPHONY_LOGI("ProcessBinarySize --- resultData: --- %{public}s", result->resultData.c_str());
+    int binaryLen = 0;
+    std::shared_ptr<unsigned char> rawData = SIMUtils::HexStringConvertToBytes(result->resultData, binaryLen);
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("ProcessBinarySize rawData is nullptr");
+        SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
+        return;
+    }
+    unsigned char *fileData = rawData.get();
+    int size = 0;
+    if (recordLen > STRUCTURE_OF_DATA) {
+        if (!IsValidBinarySizeData(fileData)) {
+            TELEPHONY_LOGE("ProcessBinarySize get error filetype");
+            SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
+            return;
+        }
+        GetDataSize(fileData, size);
     }
     int fileId = rcvMsg->arg1;
-    int size = 0;
+    TELEPHONY_LOGI("ProcessBinarySize fileId:%{public}d size:%{public}d %{public}d", fileId, size);
+    const AppExecFwk::InnerEvent::Pointer &evt = rcvMsg->controlHolder->fileLoaded;
+    if (evt->GetOwner() == nullptr) {
+        TELEPHONY_LOGE("ProcessBinarySize isNull is null pointer");
+        return;
+    }
     AppExecFwk::InnerEvent::Pointer process =
         BuildCallerInfo(MSG_SIM_OBTAIN_TRANSPARENT_ELEMENTARY_FILE_DONE, fileId, 0, evt);
     if (telRilManager_ != nullptr) {
@@ -166,13 +189,12 @@ void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer 
         msg.fileId = fileId;
         msg.p1 = 0;
         msg.p2 = 0;
-        msg.p3 = size;
+        msg.p3 = static_cast<int32_t>(size);
         msg.data = IccFileController::NULLSTR;
         msg.path = ObtainElementFilePath(fileId);
         msg.pin2 = "";
         telRilManager_->GetSimIO(slotId_, msg, process);
     }
-    TELEPHONY_LOGD("IccFileController::ProcessBinarySize finish %{public}d", fileId);
 }
 
 void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer &event)
@@ -592,7 +614,23 @@ void IccFileController::ParseFileSize(int val[], int len, const unsigned char *d
     }
     TELEPHONY_LOGD("ParseFileSize result %{public}d, %{public}d %{public}d", val[0], val[1], val[MAX_FILE_INDEX]);
 }
-bool IccFileController::IsValidSizeData(const unsigned char *data)
+bool IccFileController::IsValidRecordSizeData(const unsigned char *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("IccFileTypeMismatch ERROR nullptr");
+    return false;
+}
+if (ICC_ELEMENTARY_FILE != data[TYPE_OF_FILE]) {
+    TELEPHONY_LOGE("IccFileTypeMismatch ERROR TYPE_OF_FILE");
+    return false;
+}
+if (ELEMENTARY_FILE_TYPE_LINEAR_FIXED != data[STRUCTURE_OF_DATA]) {
+    TELEPHONY_LOGE("IccFileTypeMismatch ERROR STRUCTURE_OF_DATA");
+    return false;
+}
+return true;
+
+bool IccFileController::IsValidBinarySizeData(const unsigned char *data)
 {
     if (data == nullptr) {
         TELEPHONY_LOGE("IccFileTypeMismatch ERROR nullptr");
@@ -602,7 +640,7 @@ bool IccFileController::IsValidSizeData(const unsigned char *data)
         TELEPHONY_LOGE("IccFileTypeMismatch ERROR TYPE_OF_FILE");
         return false;
     }
-    if (ELEMENTARY_FILE_TYPE_LINEAR_FIXED != data[STRUCTURE_OF_DATA]) {
+    if (ELEMENTARY_FILE_TYPE_TRANSPARENT != data[STRUCTURE_OF_DATA]) {
         TELEPHONY_LOGE("IccFileTypeMismatch ERROR STRUCTURE_OF_DATA");
         return false;
     }
@@ -615,6 +653,14 @@ void IccFileController::GetFileAndDataSize(const unsigned char *data, int &fileS
         return;
     }
     fileSize = data[LENGTH_OF_RECORD] & BYTE_NUM;
+    dataSize = ((data[SIZE_ONE_OF_FILE] & BYTE_NUM) << OFFSET) + (data[SIZE_TWO_OF_FILE] & BYTE_NUM);
+}
+void IccFileController::GetDataSize(const unsigned char *data, int &dataSize)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("GetDataSize null data");
+        return;
+    }
     dataSize = ((data[SIZE_ONE_OF_FILE] & BYTE_NUM) << OFFSET) + (data[SIZE_TWO_OF_FILE] & BYTE_NUM);
 }
 
