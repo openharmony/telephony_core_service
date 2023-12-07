@@ -1084,7 +1084,8 @@ void NetworkSearchManager::GetVoiceTech(int32_t slotId)
         return;
     }
     eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_VOICE_TECH);
-    eventSender_->SendBase(slotId, RadioEvent::RADIO_OPERATOR);
+    eventSender_->SendCallback(
+        slotId, RadioEvent::RADIO_OPERATOR, nullptr, NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT);
 }
 
 bool NetworkSearchManager::IsNrSupported(int32_t slotId)

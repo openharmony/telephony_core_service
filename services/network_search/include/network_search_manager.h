@@ -53,6 +53,7 @@ struct NetworkSearchManagerInner {
     static const int32_t DEFAULT_RAF = 0xffff;
     static const int64_t SERIAL_NUMBER_DEFAULT = -1;
     static const int64_t SERIAL_NUMBER_THRESHOLD = 1000;
+    static const int64_t SERIAL_NUMBER_EXEMPT = 1100;
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
     std::shared_ptr<NetworkSearchHandler> networkSearchHandler_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;

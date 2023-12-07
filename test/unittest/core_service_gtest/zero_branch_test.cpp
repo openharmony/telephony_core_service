@@ -22,6 +22,7 @@
 #include "core_service_client.h"
 #include "csim_file_controller.h"
 #include "gtest/gtest.h"
+#include "hril_base_parcel.h"
 #include "icc_file.h"
 #include "icc_file_controller.h"
 #include "icc_operator_rule.h"
@@ -1817,6 +1818,10 @@ HWTEST_F(BranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
     bool showSpn = true;
     operatorName->UpdateSpn(RegServiceState::REG_STATE_IN_SERVICE, networkState, 1, plmn, showSpn);
     operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "ChinaMobile");
+    std::shared_ptr<OperatorInfoResult> operatorResult = std::make_shared<OperatorInfoResult>();
+    operatorResult->flag = NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT;
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR, operatorResult);
+    operatorName->HandleOperatorInfo(event);
 }
 
 /**
