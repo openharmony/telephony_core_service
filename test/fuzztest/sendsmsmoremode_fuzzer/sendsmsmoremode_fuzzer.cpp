@@ -43,14 +43,11 @@ void SendSmsMoreMode(const uint8_t *data, size_t size)
     int32_t gsmIndex = static_cast<int32_t>(size);
     int32_t cdmaIndex = static_cast<int32_t>(size);
     int32_t tosca = static_cast<int32_t>(size);
-    int32_t mode = static_cast<int32_t>(size);
     uint32_t code = static_cast<uint32_t>(size);
     uint8_t hexChar = static_cast<uint8_t>(size);
     std::string smscPdu(reinterpret_cast<const char *>(data), size);
     std::string pdu(reinterpret_cast<const char *>(data), size);
     std::string address(reinterpret_cast<const char *>(data), size);
-    std::string idList(reinterpret_cast<const char *>(data), size);
-    std::string dcsList(reinterpret_cast<const char *>(data), size);
     std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(*data);
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(responseId, object);
     auto rilInterface_ = HDI::Ril::V1_2::IRil::Get();
@@ -71,7 +68,6 @@ void SendSmsMoreMode(const uint8_t *data, size_t size)
     telRilSms->ConvertHexCharToInt(hexChar);
     telRilSms->SendSmsAck(success, state, response);
     telRilSms->AddCdmaSimMessage(status, pdu, response);
-    telRilSms->SetCBConfig(mode, idList, dcsList, response);
 }
 
 void GetCallList(const uint8_t *data, size_t size)
@@ -234,14 +230,7 @@ void GetSimStatus(const uint8_t *data, size_t size)
     AppExecFwk::InnerEvent::Pointer result = AppExecFwk::InnerEvent::Get(resultId, object);
     auto rilInterface_ = HDI::Ril::V1_2::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
-    auto eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
-    if (eventLoop_ == nullptr) {
-        TELEPHONY_LOGE("Failed to create EventRunner");
-        return;
-    }
-    auto handler_ = std::make_shared<TelRilHandler>(eventLoop_);
-    handler_ = nullptr;
-    auto telRilSim = std::make_shared<TelRilSim>(slotId, rilInterface_, observerHandler, handler_);
+    auto telRilSim = std::make_shared<TelRilSim>(slotId, rilInterface_, observerHandler, nullptr);
     telRilSim->GetSimStatus(result);
     telRilSim->GetSimIO(simIoInfo, result);
     telRilSim->GetSimLockStatus(fac, result);
