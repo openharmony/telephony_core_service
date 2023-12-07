@@ -25,6 +25,8 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
+constexpr int32_t SLOT_ID_0 = 0;
+constexpr int32_t SLOT_ID_1 = 1;
 constexpr int64_t LOCATION_EXPIRATION_TIME_MS = 60 * 60 * 1000;
 constexpr int64_t LOCATION_EXPIRATION_TIME_MS_ROAMING = 30 * 60 * 1000;
 constexpr int32_t TIMEZONE_OFFSET_0 = 0;
@@ -205,6 +207,59 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_Location_0100, Function | Me
 #endif
     suggester->ClearLocation();
     EXPECT_FALSE(suggester->HasLocation());
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_FactoryReset_0100
+ * @tc.name     Send Cell Location Update
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_FactoryReset_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID_0))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+    } else {
+        int32_t result = CoreServiceClient::GetInstance().FactoryReset(SLOT_ID_0);
+        TELEPHONY_LOGI("TelephonyTestService FactoryReset result: %{public}d", result);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_FactoryReset_0200
+ * @tc.name     Send Cell Location Update
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_FactoryReset_0200, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID_1))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+    } else {
+        int32_t result = CoreServiceClient::GetInstance().FactoryReset(SLOT_ID_1);
+        TELEPHONY_LOGI("TelephonyTestService FactoryReset result: %{public}d", result);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_FactoryReset_0300
+ * @tc.name     Send Cell Location Update without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_FactoryReset_0300, Function | MediumTest | Level3)
+{
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID_0))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+        return;
+    }
+    int32_t result = CoreServiceClient::GetInstance().FactoryReset(SLOT_ID_0);
+    TELEPHONY_LOGI("TelephonyTestService FactoryReset result: %{public}d", result);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
 }
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony

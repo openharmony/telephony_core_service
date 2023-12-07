@@ -999,5 +999,15 @@ int32_t CoreServiceClient::GetBasebandVersion(int32_t slotId, std::string &versi
     }
     return proxy->GetBasebandVersion(slotId, version);
 }
+
+int32_t CoreServiceClient::FactoryReset(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->FactoryReset(slotId);
+}
 } // namespace Telephony
 } // namespace OHOS
