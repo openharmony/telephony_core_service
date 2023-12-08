@@ -826,16 +826,11 @@ int32_t SimManager::GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt)
 
 int32_t SimManager::GetSimTelephoneNumber(int32_t slotId, std::u16string &telephoneNumber)
 {
-    if (!HasSimCardInner(slotId)) {
-        TELEPHONY_LOGE("GetSimTelephoneNumber has no sim card!");
-        return TELEPHONY_ERR_NO_SIM_CARD;
-    }
-    if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simFileManager is null!");
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    telephoneNumber = simFileManager_[slotId]->GetSimTelephoneNumber();
-    return TELEPHONY_ERR_SUCCESS;
+    return multiSimController_->GetSimTelephoneNumber(slotId, telephoneNumber);
 }
 
 std::u16string SimManager::GetSimTeleNumberIdentifier(const int32_t slotId)
