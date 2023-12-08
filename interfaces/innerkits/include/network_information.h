@@ -27,7 +27,7 @@ enum class NetworkPlmnState {
     NETWORK_PLMN_STATE_FORBIDDEN = 3
 };
 
-enum class NetworkRat { NETWORK_GSM_OR_GPRS = 0, NETWORK_WCDMA = 2, NETWORK_LTE = 7 };
+enum class NetworkRat { NETWORK_GSM_OR_GPRS = 0, NETWORK_WCDMA = 2, NETWORK_LTE = 7, NETWORK_NR = 12 };
 
 class NetworkInformation : public Parcelable {
 public:
