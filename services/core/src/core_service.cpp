@@ -656,6 +656,16 @@ int32_t CoreService::SetPrimarySlotId(int32_t slotId)
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    bool hasSim = false;
+    simManager_->HasSimCard(slotId, hasSim);
+    if (!hasSim) {
+        TELEPHONY_LOGE("has no sim");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if (!simManager_->IsSimActive(slotId)) {
+        TELEPHONY_LOGE("sim is not active");
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
     return simManager_->SetPrimarySlotId(slotId);
 }
 

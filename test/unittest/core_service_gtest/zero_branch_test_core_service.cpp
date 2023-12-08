@@ -418,6 +418,31 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationUpdate_001, Function |
 }
 
 /**
+ * @tc.number   Telephony_MultiSimController_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("MultiSimController");
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager, runner);
+    std::shared_ptr<RadioProtocolController> radioProtocolController = nullptr;
+    multiSimController->EncryptIccId("");
+    multiSimController->CheckIfNeedSwitchMainSlotId();
+    EXPECT_FALSE(multiSimController->IsValidSlotId(INVALID_SLOTID));
+    multiSimController->maxCount_ = 1;
+    EXPECT_FALSE(multiSimController->InitPrimary());
+    multiSimController->maxCount_ = 2;
+    EXPECT_FALSE(multiSimController->InitPrimary());
+    EXPECT_TRUE(multiSimController->IsAllCardsReady());
+    EXPECT_FALSE(multiSimController->IsAllCardsLoaded());
+}
+
+/**
  * @tc.number   Telephony_OperatorName_002
  * @tc.name     test error branch
  * @tc.desc     Function test
