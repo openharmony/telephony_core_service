@@ -54,6 +54,7 @@ public:
     int32_t SetShowNumber(int32_t slotId, std::u16string Number, bool force = false);
     int32_t GetShowName(int32_t slotId, std::u16string &showName);
     int32_t SetShowName(int32_t slotId, std::u16string name, bool force = false);
+    int32_t GetSimTelephoneNumber(int32_t slotId, std::u16string &telephoneNumber);
     bool IsSimActive(int32_t slotId);
     int32_t SetActiveSim(int32_t slotId, int32_t enable, bool force = false);
     bool SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable);

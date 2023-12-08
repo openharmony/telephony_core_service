@@ -90,8 +90,10 @@ private:
     const int MAX_FILE_INDEX = 2;
     const int ICC_FILE_CURRENT_MODE = 4;
     void ParseFileSize(int val[], int len, const unsigned char *data);
-    bool IsValidSizeData(const unsigned char *data);
+    bool IsValidRecordSizeData(const unsigned char *data);
+    bool IsValidBinarySizeData(const unsigned char *data);
     void GetFileAndDataSize(const unsigned char *data, int &dataSize, int &fileSize);
+    void GetDataSize(const unsigned char *data, int &dataSize);
     std::string CheckRightPath(const std::string &path, int fileId);
     bool ProcessErrorResponse(const AppExecFwk::InnerEvent::Pointer &event);
     bool IsFixedNumberType(int);
