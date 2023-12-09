@@ -22,6 +22,7 @@
 #include "icc_dialling_numbers_manager.h"
 #include "icc_file_controller.h"
 #include "icc_operator_privilege_controller.h"
+#include "mcc_pool.h"
 #include "operator_config_cache.h"
 #include "operator_config_loader.h"
 #include "parcel.h"
@@ -41,6 +42,7 @@ using namespace testing::ext;
 
 namespace {
 constexpr int32_t SLOT_ID = 0;
+constexpr int INVALID_MCC = 100;
 } // namespace
 
 class DemoHandler : public AppExecFwk::EventHandler {
@@ -608,7 +610,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccFileController_001, Function | MediumTes
     iccFileController->SendMultiRecordResult(event6, strValue);
     unsigned char *data1;
     iccFileController->ParseFileSize(val, size, data1);
-    iccFileController->IsValidSizeData(data1);
+    iccFileController->IsValidRecordSizeData(data1);
     iccFileController->GetFileAndDataSize(data1, size, size);
     ASSERT_TRUE(iccFileController->BuildCallerInfo(0, 0, 0, holder) != nullptr);
 }
@@ -736,5 +738,29 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_002, Function | MediumTest | Level1
     ASSERT_FALSE(simFile->EfCfisAvailable(0));
 }
 
+/**
+ * @tc.number   Telephony_MccPool_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_MccPool_001, Function | MediumTest | Level1)
+{
+    EXPECT_EQ(MccPool::MccCountryCode(MCC_CN_A), "cn");
+    EXPECT_EQ(MccPool::MccCountryCode(INVALID_MCC), "");
+    EXPECT_EQ(MccPool::ShortestMncLengthFromMcc(MCC_CN_A), MCC_SHORT);
+    EXPECT_EQ(MccPool::ShortestMncLengthFromMcc(MCC_US_A), MCC_LONG);
+    ASSERT_TRUE(MccPool::LengthIsThreeMnc("302370"));
+    ASSERT_FALSE(MccPool::LengthIsThreeMnc("46000"));
+
+    auto mccAccess = MccPool::AccessToMcc(MCC_BJ);
+    EXPECT_EQ(mccAccess->iso_, "bj");
+    std::shared_ptr<MccAccess> mccAccessA = std::make_shared<MccAccess>(MCC_MK, "", 0);
+    std::shared_ptr<MccAccess> mccAccessB = std::make_shared<MccAccess>(MCC_CN_A, "", 0);
+    std::shared_ptr<MccAccess> mccAccessC = std::make_shared<MccAccess>(MCC_CD, "", 0);
+    std::shared_ptr<MccAccess> mccAccessD = nullptr;
+    ASSERT_TRUE(MccPool::MccCompare(mccAccessA, mccAccessB));
+    ASSERT_FALSE(MccPool::MccCompare(mccAccessC, mccAccessB));
+    ASSERT_FALSE(MccPool::MccCompare(mccAccessA, mccAccessD));
+}
 } // namespace Telephony
 } // namespace OHOS
