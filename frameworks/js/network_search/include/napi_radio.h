@@ -47,6 +47,7 @@ const static std::string GSM = "GSM";
 const static std::string GPRS = "GPRS";
 const static std::string WCDMA = "WCDMA";
 const static std::string LTE = "LTE";
+const static std::string NR = "NR";
 const int32_t ARRAY_INDEX_FIRST = 0;
 const int32_t ARRAY_INDEX_SECOND = 1;
 const int32_t ARRAY_INDEX_THIRD = 2;

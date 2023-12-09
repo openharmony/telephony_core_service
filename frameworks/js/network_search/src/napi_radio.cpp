@@ -666,6 +666,9 @@ static std::string GetRadioTechName(int32_t radioTech)
         case NetworkRat::NETWORK_LTE: {
             return "LTE";
         }
+        case NetworkRat::NETWORK_NR: {
+            return "NR";
+        }
         default: {
             return "";
         }
@@ -841,6 +844,9 @@ static int32_t GetRatTechValue(std::string ratTechStr)
     }
     if (!LTE.compare(ratTechStr)) {
         return static_cast<int32_t>(NetworkRat::NETWORK_LTE);
+    }
+    if (!NR.compare(ratTechStr)) {
+        return static_cast<int32_t>(NetworkRat::NETWORK_NR);
     }
     return static_cast<int32_t>(NetworkRat::NETWORK_LTE);
 }
