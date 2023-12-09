@@ -273,16 +273,11 @@ public:
     int mcc_ = 0;
     std::string iso_ = "";
     int mncShortestLength_ = 0;
-    MccAccess(int mnc, std::string iso, int shortestMnc)
+    MccAccess(int mcc, std::string iso, int shortestMnc)
     {
-        mcc_ = mnc;
+        mcc_ = mcc;
         iso_ = iso;
         mncShortestLength_ = shortestMnc;
-    }
-
-    bool operator==(MccAccess m)
-    {
-        return (mcc_ == m.mcc_);
     }
 };
 
@@ -293,13 +288,13 @@ public:
     static std::string MccCountryCode(int mcc);
     static int ShortestMncLengthFromMcc(int mcc);
     static bool LengthIsThreeMnc(const std::string &mccMncCode);
-    static std::vector<MccAccess> mccAccessTable_;
+    static std::vector<std::shared_ptr<MccAccess>> mccAccessTable_;
     static std::vector<std::string> specialMccMnc_;
 
 private:
-    static MccAccess AccessToMcc(int mcc);
+    static std::shared_ptr<MccAccess> AccessToMcc(int mcc);
     static void InitMccTables();
-    static bool MccCompare(const MccAccess &a, const MccAccess &b);
+    static bool MccCompare(const std::shared_ptr<MccAccess> &mccAccessA, const std::shared_ptr<MccAccess> &mccAccessB);
     static void AddMccForAsia();
     static void AddMccForEurope();
     static void AddMccForAfrica();
