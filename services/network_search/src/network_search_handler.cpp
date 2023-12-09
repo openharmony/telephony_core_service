@@ -306,6 +306,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
             break;
         }
         case CORE_SERVICE_POWER_ON: {
+            firstInit_ = false;
             InitGetNetworkSelectionMode();
             RadioOnState();
             break;
@@ -438,9 +439,11 @@ void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Poi
         case CORE_SERVICE_POWER_OFF:
             RadioOffOrUnavailableState(radioState);
             break;
-        case CORE_SERVICE_POWER_ON:
+        case CORE_SERVICE_POWER_ON: {
+            firstInit_ = false;
             RadioOnState();
             break;
+        }
         default:
             TELEPHONY_LOGI("Unhandled message with number: %{public}d slotId:%{public}d", radioState, slotId_);
             break;
@@ -479,7 +482,7 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
     if (networkSearchManager->GetAirplaneMode(isAirplaneModeOn) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RadioOffOrUnavailableState GetAirplaneMode fail slotId:%{public}d", slotId_);
     }
-    if (!isAirplaneModeOn && radioState == CORE_SERVICE_POWER_OFF) {
+    if (firstInit_ && !isAirplaneModeOn && radioState == CORE_SERVICE_POWER_OFF) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
     }
     sptr<NetworkSearchCallBackBase> cellularData = networkSearchManager->GetCellularDataCallBack();
