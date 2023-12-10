@@ -78,14 +78,24 @@ private:
     int32_t UpdateDataByIccId(int slotId, const std::string &newIccId);
     int32_t InsertData(int slotId, const std::string &newIccId);
     void SortCache();
+    void SavePrimarySlotIdInfo(int32_t slotId);
+    void SaveDefaultCellularDataSlotIdInfo(int32_t slotId);
     std::u16string GetIccId(int32_t slotId);
-    int32_t GetDefaultCellularDataSlotIdUnit();
-    bool AnnounceDefaultMainSimIdChanged(int32_t simId);
+    bool AnnouncePrimarySimIdChanged(int32_t simId);
     bool AnnounceDefaultVoiceSimIdChanged(int32_t simId);
     bool AnnounceDefaultSmsSimIdChanged(int32_t simId);
     bool AnnounceDefaultCellularDataSimIdChanged(int32_t simId);
     bool PublishSimFileEvent(const AAFwk::Want &want, int eventCode, const std::string &eventData);
     bool RefreshActiveIccAccountInfoList();
+    std::string EncryptIccId(const std::string iccid);
+    void CheckIfNeedSwitchMainSlotId();
+    bool IsValidSlotId(int32_t slotId);
+    bool InitPrimary();
+    bool IsAllCardsReady();
+    bool IsAllCardsLoaded();
+    void SendMainCardBroadCast(int32_t slotId);
+    void SendDefaultCellularDataBroadCast(int32_t slotId);
+    void InitMainCardSlotId();
 
 private:
     int32_t maxCount_ = 0;
@@ -93,6 +103,8 @@ private:
     int32_t defaultSmsSimId_ = 0;
     int32_t defaultCellularSimId_ = 0;
     int32_t defaultVoiceSimId_ = 0;
+    int32_t lastPrimarySlotId_ = 0;
+    int32_t lastCellularDataSlotId_ = 0;
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
     std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;
