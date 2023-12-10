@@ -325,7 +325,7 @@ int32_t SimManager::SetDefaultSmsSlotId(int32_t slotId)
 
 int32_t SimManager::SetDefaultCellularDataSlotId(int32_t slotId)
 {
-    if (!IsValidSlotIdForDefault(slotId)) {
+    if (!IsValidSlotId(slotId)) {
         TELEPHONY_LOGE("slotId is invalid for default.");
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
