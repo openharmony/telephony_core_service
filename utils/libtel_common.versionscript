@@ -19,6 +19,7 @@
       OHOS::Telephony::NapiUtil*;
       OHOS::Telephony::TelephonyConfig*;
       OHOS::Telephony::TelephonyPermission*;
+      OHOS::Telephony::TelephonyExtUtilsWrapper*;
       OHOS::Telephony::TelProfileUtil*;
       OHOS::Telephony::ToUtf*;
       "OHOS::Telephony::GetBoolValue(int)";

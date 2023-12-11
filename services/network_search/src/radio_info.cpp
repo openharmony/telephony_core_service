@@ -412,6 +412,9 @@ int32_t RadioInfo::ProcessGetNrOptionMode(const AppExecFwk::InnerEvent::Pointer 
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::shared_ptr<NrModeInfo> nrModeInfo = event->GetSharedObject<NrModeInfo>();
+    if (TELEPHONY_EXT_WRAPPER.getNrOptionModeExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.getNrOptionModeExt_(slotId_, nrModeInfo->nrMode);
+    }
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (responseInfo == nullptr && nrModeInfo == nullptr) {
         TELEPHONY_LOGE("responseInfo and mode is nullptr slotId:%{public}d", slotId_);
