@@ -23,6 +23,8 @@
 #include "message_parcel.h"
 #include "network_state.h"
 #include "telephony_types.h"
+#include "telephony_ext_wrapper.h"
+
 namespace OHOS {
 namespace Telephony {
 class NetworkSearchManager;

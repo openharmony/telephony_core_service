@@ -405,6 +405,9 @@ int32_t NetworkSearchManager::GetPsRadioTech(int32_t slotId, int32_t &psRadioTec
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     psRadioTech = static_cast<int32_t>(inner->networkSearchState_->GetNetworkStatus()->GetPsRadioTech());
+    if (TELEPHONY_EXT_WRAPPER.getRadioTechExt_ != nullptr) { 
+        TELEPHONY_EXT_WRAPPER.getRadioTechExt_(slotId, psRadioTech); 
+    }
     TELEPHONY_LOGD("NetworkSearchManager::GetPsRadioTech result=%{public}d slotId:%{public}d", psRadioTech, slotId);
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -421,6 +424,9 @@ int32_t NetworkSearchManager::GetCsRadioTech(int32_t slotId, int32_t &csRadioTec
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     csRadioTech = static_cast<int32_t>(inner->networkSearchState_->GetNetworkStatus()->GetCsRadioTech());
+    if (TELEPHONY_EXT_WRAPPER.getRadioTechExt_ != nullptr) { 
+        TELEPHONY_EXT_WRAPPER.getRadioTechExt_(slotId, csRadioTech); 
+    }
     TELEPHONY_LOGD("NetworkSearchManager::GetCsRadioTech result=%{public}d slotId:%{public}d", csRadioTech, slotId);
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -565,6 +571,9 @@ int32_t NetworkSearchManager::GetSignalInfoList(int32_t slotId, std::vector<sptr
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     inner->networkSearchHandler_->GetSignalInfo(signals);
+    if (TELEPHONY_EXT_WRAPPER.getSignalInfoListExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.getSignalInfoListExt_(slotId, signals);
+    }
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -955,6 +964,9 @@ int32_t NetworkSearchManager::GetCellInfoList(int32_t slotId, std::vector<sptr<C
     if (inner != nullptr) {
         if (inner->networkSearchHandler_ != nullptr) {
             inner->networkSearchHandler_->GetCellInfoList(cellInfo);
+            if (TELEPHONY_EXT_WRAPPER.getCellInfoList_ != nullptr) {
+                TELEPHONY_EXT_WRAPPER.getCellInfoList_(slotId, cellInfo);
+            }
             return TELEPHONY_ERR_SUCCESS;
         }
     }
@@ -1105,6 +1117,9 @@ bool NetworkSearchManager::IsNrSupported(int32_t slotId)
         return false;
     }
     int32_t modemRaf = simManager_->GetRadioProtocolTech(slotId);
+    if (TELEPHONY_EXT_WRAPPER.isNrSupportedNative_ != nullptr) {
+        return TELEPHONY_EXT_WRAPPER.isNrSupportedNative_(modemRaf);
+    }
     return (static_cast<uint32_t>(modemRaf) & static_cast<uint32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_NR)) ==
         static_cast<uint32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_NR);
 }
@@ -1169,6 +1184,9 @@ int32_t NetworkSearchManager::GetNrOptionMode(int32_t slotId, NrMode &mode)
     }
     eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_NR_OPTION_MODE);
     mode = inner->nrMode_;
+    if (TELEPHONY_EXT_WRAPPER.getNrOptionModeExtend_ != nullptr) { 
+        TELEPHONY_EXT_WRAPPER.getNrOptionModeExtend_(slotId, mode);
+    }
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -1644,6 +1662,11 @@ int32_t NetworkSearchManager::GetBasebandVersion(int32_t slotId, std::string &ve
 int32_t NetworkSearchManager::GetNetworkCapability(
     int32_t slotId, int32_t networkCapabilityType, int32_t &networkCapabilityState)
 {
+    if (TELEPHONY_EXT_WRAPPER.getNetworkCapabilityExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.getNetworkCapabilityExt_(slotId, networkCapabilityType, networkCapabilityState);
+        return TELEPHONY_ERR_SUCCESS;
+    }
+
     TelephonyConfig telephonyConfig;
     bool isNrSupported =
         telephonyConfig.IsCapabilitySupport(static_cast<int32_t>(TelephonyConfig::ConfigType::MODEM_CAP_SUPPORT_NR));
@@ -1662,6 +1685,10 @@ int32_t NetworkSearchManager::GetNetworkCapability(
         networkCapabilityState = SERVICE_ABILITY_ON;
     } else {
         networkCapabilityState = SERVICE_ABILITY_OFF;
+    }
+    if (TELEPHONY_EXT_WRAPPER.getNetworkCapabilityExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.getNetworkCapabilityExt_(slotId, networkCapabilityType, networkCapabilityState);
+        return TELEPHONY_ERR_SUCCESS;
     }
     return TELEPHONY_ERR_SUCCESS;
 }
