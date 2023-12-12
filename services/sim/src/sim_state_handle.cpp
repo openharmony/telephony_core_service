@@ -408,10 +408,15 @@ std::string SimStateHandle::GetAidByCardType(CardType type)
         case CardType::SINGLE_MODE_RUIM_CARD:
             return CDMA_FAKE_AID;
         case CardType::SINGLE_MODE_SIM_CARD:
+            [[fallthrough]]; // fall_through
         case CardType::DUAL_MODE_CG_CARD:
+            [[fallthrough]]; // fall_through
         case CardType::CT_NATIONAL_ROAMING_CARD:
+            [[fallthrough]]; // fall_through
         case CardType::CU_DUAL_MODE_CARD:
+            [[fallthrough]]; // fall_through
         case CardType::DUAL_MODE_TELECOM_LTE_CARD:
+            [[fallthrough]]; // fall_through
         case CardType::DUAL_MODE_UG_CARD:
             return GSM_FAKE_AID;
         default:
@@ -614,6 +619,7 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     switch (eventId) {
         case RadioEvent::RADIO_STATE_CHANGED:
             OnRadioStateUnavailable(event);
+            [[fallthrough]]; // fall_through
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
             ObtainIccStatus(slotId_);
             break;
@@ -703,6 +709,7 @@ void SimStateHandle::SimLockStateEscape(
             reason = LockReason::SIM_PP_PUK;
             break;
         case ICC_CONTENT_UNKNOWN:
+            [[fallthrough]]; // fall_through
         default:
             isSimLockState = false;
             externalState_ = SimState::SIM_STATE_UNKNOWN;

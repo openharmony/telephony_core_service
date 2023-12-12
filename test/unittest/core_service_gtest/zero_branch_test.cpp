@@ -22,6 +22,7 @@
 #include "core_service_client.h"
 #include "csim_file_controller.h"
 #include "gtest/gtest.h"
+#include "hril_base_parcel.h"
 #include "icc_file.h"
 #include "icc_file_controller.h"
 #include "icc_operator_rule.h"
@@ -1232,7 +1233,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | L
     EXPECT_FALSE(multiSimController->ForgetAllData());
     EXPECT_FALSE(multiSimController->ForgetAllData(0));
     EXPECT_FALSE(multiSimController->IsValidData(0));
-    EXPECT_TRUE(multiSimController->AnnounceDefaultMainSimIdChanged(0));
+    EXPECT_TRUE(multiSimController->AnnouncePrimarySimIdChanged(0));
     EXPECT_TRUE(multiSimController->AnnounceDefaultVoiceSimIdChanged(0));
     EXPECT_TRUE(multiSimController->AnnounceDefaultSmsSimIdChanged(0));
     EXPECT_TRUE(multiSimController->AnnounceDefaultCellularDataSimIdChanged(0));
@@ -1264,7 +1265,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
     IccAccountInfo mIccAccountInfo;
     EXPECT_NE(multiSimController->GetSimAccountInfo(0, false, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
     multiSimController->GetDefaultCellularDataSlotId();
-    EXPECT_NE(multiSimController->SetDefaultCellularDataSlotId(0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(multiSimController->SetDefaultCellularDataSlotId(0), TELEPHONY_ERR_SUCCESS);
     multiSimController->GetPrimarySlotId();
     multiSimController->SetPrimarySlotId(0);
     EXPECT_NE(multiSimController->GetShowNumber(0, testU16Str), TELEPHONY_ERR_SUCCESS);
@@ -1283,7 +1284,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
     EXPECT_NE(multiSimController->GetFirstActivedSlotId(), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->UpdateDataByIccId(0, testStr), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->InsertData(0, testStr), TELEPHONY_ERR_SUCCESS);
-    multiSimController->GetDefaultCellularDataSlotIdUnit();
     EXPECT_EQ(multiSimController->GetIccId(0), u"");
 }
 
@@ -1817,6 +1817,10 @@ HWTEST_F(BranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
     bool showSpn = true;
     operatorName->UpdateSpn(RegServiceState::REG_STATE_IN_SERVICE, networkState, 1, plmn, showSpn);
     operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "ChinaMobile");
+    std::shared_ptr<OperatorInfoResult> operatorResult = std::make_shared<OperatorInfoResult>();
+    operatorResult->flag = NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT;
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR, operatorResult);
+    operatorName->HandleOperatorInfo(event);
 }
 
 /**
@@ -2063,6 +2067,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_004, Function | MediumTest |
         TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->SetNetworkCapability(INVALID_SLOTID, networkAbilityType, networkAbilityState),
         TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->FactoryReset(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
 }
 
 /**

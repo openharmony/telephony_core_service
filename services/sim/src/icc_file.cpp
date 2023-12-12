@@ -504,20 +504,25 @@ std::string IccFile::ObtainValidLanguage(const std::string &langData)
     }
     int langDataLen = 0;
     std::shared_ptr<unsigned char> ucc = SIMUtils::HexStringConvertToBytes(langData, langDataLen);
+    if (ucc == nullptr) {
+        TELEPHONY_LOGE("ucc is nullptr!!");
+        return "";
+    }
     unsigned char *data = ucc.get();
 
-    std::string spnName((char *)data);
-    TELEPHONY_LOGI("ObtainValidLanguage all is %{public}s---%{public}d", spnName.c_str(), langDataLen);
-    std::string result = "";
+    if (data == nullptr) {
+        TELEPHONY_LOGE("data is nullptr!!");
+        return "";
+    }
+    TELEPHONY_LOGI("ObtainValidLanguage all is %{public}s---%{public}d", data, langDataLen);
     for (int i = 0; (i + 1) < langDataLen; i += DATA_STEP) {
         std::string langName((char *)data, i, DATA_STEP);
         TELEPHONY_LOGI("ObtainValidLanguage item is %{public}d--%{public}s", i, langName.c_str());
         if (!langName.empty()) {
-            result = langName;
+            return langName;
         }
     }
-
-    return result;
+    return "";
 }
 
 void IccFile::SwapPairsForIccId(std::string &iccId)

@@ -58,6 +58,7 @@ ohos_shared_library("libtel_common") {
     "common/src/str_convert.cpp",
     "common/src/telephony_common_utils.cpp",
     "common/src/telephony_config.cpp",
+    "common/src/telephony_ext_utils_wrapper.cpp",
     "common/src/telephony_permission.cpp",
     "preferences/src/tel_profile_util.cpp",
   ]

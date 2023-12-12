@@ -841,6 +841,26 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCellInfoList_0300, Functi
 }
 
 /**
+ * @tc.number   Telephony_NetworkSearch_GetCellInfoList_0400
+ * @tc.name     Get Cell Info List
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetCellInfoList_0400, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+        return;
+    }
+    std::vector<sptr<CellInformation>> cellList;
+    int32_t result = CoreServiceClient::GetInstance().GetCellInfoList(SLOT_ID1, cellList);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    PrintCellInformation(cellList);
+    ASSERT_TRUE(!cellList.empty());
+}
+
+/**
  * @tc.number   Telephony_NetworkSearch_PrintCellInfoList_0100
  * @tc.name     Get Cell Info List
  * @tc.desc     Function test
@@ -1048,6 +1068,66 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0500
         SLOT_ID1, static_cast<int32_t>(SelectionMode::MODE_TYPE_AUTO), networkInfo, true, callback);
     TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode result: %{public}d", result);
     EXPECT_NE(TELEPHONY_ERR_SUCCESS, result);
+    callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
+    bool syncResult = callback->SetNetworkModeCallbackResult();
+    TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode syncResult: %{public}d", syncResult);
+    ASSERT_TRUE(syncResult);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_SetNetworkSelectionMode_0600
+ * @tc.name     Set Auto Network Selection Mode without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0600, Function | MediumTest | Level3)
+{
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        telephonyService_ = GetProxy();
+        return;
+    }
+    sptr<NetworkInformation> networkInfo = new (std::nothrow) NetworkInformation();
+    networkInfo->SetOperateInformation("CHINA MOBILE", "CMCC", "46000",
+        static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
+        static_cast<int32_t>(NetworkRat::NETWORK_NR));
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    int32_t result = telephonyService_->SetNetworkSelectionMode(
+        SLOT_ID1, static_cast<int32_t>(SelectionMode::MODE_TYPE_AUTO), networkInfo, true, callback);
+    TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode result: %{public}d", result);
+    EXPECT_NE(TELEPHONY_ERR_SUCCESS, result);
+    callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
+    bool syncResult = callback->SetNetworkModeCallbackResult();
+    TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode syncResult: %{public}d", syncResult);
+    ASSERT_TRUE(syncResult);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_SetNetworkSelectionMode_0700
+ * @tc.name     Set Manual Network Selection Mode
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0700, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        telephonyService_ = GetProxy();
+        return;
+    }
+
+    sptr<NetworkInformation> newNetworkInfo = new (std::nothrow) NetworkInformation();
+    newNetworkInfo->SetOperateInformation(newNetworkInfo->GetOperatorLongName(), newNetworkInfo->GetOperatorShortName(),
+        "46000", newNetworkInfo->GetNetworkState(), newNetworkInfo->GetRadioTech());
+
+    sptr<NetworkInformation> networkInfo = new (std::nothrow) NetworkInformation();
+    networkInfo->SetOperateInformation("CHINA MOBILE", "CMCC", "46000",
+        static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
+        static_cast<int32_t>(NetworkRat::NETWORK_NR));
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    int32_t result = telephonyService_->SetNetworkSelectionMode(
+        SLOT_ID, static_cast<int32_t>(SelectionMode::MODE_TYPE_MANUAL), networkInfo, true, callback);
+    TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode result: %{public}d", result);
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetNetworkModeCallbackResult();
     TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode syncResult: %{public}d", syncResult);
@@ -2506,7 +2586,6 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNrOptionMode_0200, Functi
     TELEPHONY_LOGI("TelephonyTestService GetNrOptionMode syncResult: %{public}d", syncResult);
     ASSERT_TRUE(syncResult || TELEPHONY_ERR_SUCCESS == result);
 }
-
 #else // TEL_TEST_UNSUPPORT
 /**
  * @tc.number   Telephony_NetworkSearch_MockTest_0100

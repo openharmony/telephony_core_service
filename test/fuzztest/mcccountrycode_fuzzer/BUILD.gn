@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Copyright (C) 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -18,19 +18,20 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("AutoTimeZoneFuzzTest") {
+ohos_fuzztest("MccCountryCodeFuzzTest") {
   module_output_path = "core_service/core_service"
   module_out_path = module_output_path
   fuzz_config_file =
-      "$SUBSYSTEM_DIR/core_service/test/fuzztest/autotimezone_fuzzer"
+      "$SUBSYSTEM_DIR/core_service/test/fuzztest/mcccountrycode_fuzzer"
 
   include_dirs = [
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/include",
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
     "$SUBSYSTEM_DIR/core_service/services/core/include",
-    "$SUBSYSTEM_DIR/core_service/services/telephony_ext_wrapper/include",
     "$SUBSYSTEM_DIR/core_service/services/network_search/include",
     "$SUBSYSTEM_DIR/core_service/services/sim/include",
-    "$SUBSYSTEM_DIR/core_service/services/tel_ril/include",
     "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer",
+    "$SUBSYSTEM_DIR/core_service/services/tel_ril/include",
   ]
 
   configs = [ "$SUBSYSTEM_DIR/core_service/utils:telephony_log_config" ]
@@ -41,52 +42,27 @@ ohos_fuzztest("AutoTimeZoneFuzzTest") {
   ]
 
   external_deps = [
-    "ability_base:want",
-    "ability_base:zuri",
     "ability_runtime:ability_manager",
     "ability_runtime:data_ability_helper",
-    "ability_runtime:wantagent_innerkits",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
-    "battery_manager:batterysrv_client",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
-    "config_policy:configpolicy_util",
-    "data_share:datashare_common",
-    "data_share:datashare_consumer",
     "drivers_interface_ril:hril_innerkits",
-    "drivers_interface_ril:libril_proxy_1.1",
-    "eventhandler:libeventhandler",
-    "hdf_core:libhdi",
-    "hdf_core:libpub_utils",
+    "drivers_interface_ril:ril_idl_headers",
     "hilog:libhilog",
-    "hisysevent:libhisysevent",
-    "i18n:intl_util",
-    "i18n:zone_util",
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
     "netmanager_base:net_conn_manager_if",
     "netmanager_ext:net_tether_manager_if",
     "power_manager:powermgr_client",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
-
-  if (defined(global_parts_info) &&
-      defined(global_parts_info.location_location) &&
-      global_parts_info.location_location) {
-    external_deps += [
-      "location:lbsservice_common",
-      "location:locator_sdk",
-    ]
-    defines += [ "ABILITY_LOCATION_SUPPORT" ]
-  }
 
   cflags = [
     "-g",
@@ -95,8 +71,9 @@ ohos_fuzztest("AutoTimeZoneFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
     "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer/addcoreservicetoken_fuzzer.cpp",
-    "autotimezone_fuzzer.cpp",
+    "mcccountrycode_fuzzer.cpp",
   ]
 }
 
@@ -106,7 +83,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":AutoTimeZoneFuzzTest",
+    ":MccCountryCodeFuzzTest",
   ]
 }
 ###############################################################################

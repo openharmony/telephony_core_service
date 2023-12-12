@@ -25,6 +25,11 @@ ObserverHandler::~ObserverHandler() {}
 
 void ObserverHandler::RegObserver(int32_t what, const std::shared_ptr<AppExecFwk::EventHandler> handler)
 {
+    if (handler == nullptr) {
+        TELEPHONY_LOGE("RegObserver failed, handler is nullptr!");
+        return;
+    }
+
     std::lock_guard<std::mutex> lock(mutex_);
     auto iter = observerHandlerMap_.find(what);
     if (iter != observerHandlerMap_.end()) {

@@ -53,6 +53,7 @@ struct NetworkSearchManagerInner {
     static const int32_t DEFAULT_RAF = 0xffff;
     static const int64_t SERIAL_NUMBER_DEFAULT = -1;
     static const int64_t SERIAL_NUMBER_THRESHOLD = 1000;
+    static const int64_t SERIAL_NUMBER_EXEMPT = 1100;
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
     std::shared_ptr<NetworkSearchHandler> networkSearchHandler_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
@@ -204,6 +205,7 @@ public:
         int32_t slotId, int32_t networkCapabilityType, int32_t &networkCapabilityState) override;
     int32_t SetNetworkCapability(
         int32_t slotId, int32_t networkCapabilityType, int32_t networkCapabilityState) override;
+    int32_t FactoryReset(int32_t slotId) override;
 
     void NotifyPsRoamingOpenChanged(int32_t slotId);
     void NotifyPsRoamingCloseChanged(int32_t slotId);
@@ -214,6 +216,7 @@ public:
     void NotifyEmergencyCloseChanged(int32_t slotId);
     void NotifyNrStateChanged(int32_t slotId);
     void NotifyNrFrequencyChanged(int32_t slotId);
+    void NotifyFactoryReset(int32_t slotId);
     std::shared_ptr<NetworkSearchState> GetNetworkSearchState(int32_t slotId);
     void TriggerSimRefresh(int32_t slotId);
     void TriggerTimezoneRefresh(int32_t slotId);

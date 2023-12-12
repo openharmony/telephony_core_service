@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,17 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef AUTOTIMEZONE_FUZZER_H
-#define AUTOTIMEZONE_FUZZER_H
+#ifndef MCCCOUNTRYCODE_FUZZER_H
+#define MCCCOUNTRYCODE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "autotimezone_fuzzer"
+#define FUZZ_PROJECT_NAME "mcccountrycode_fuzzer"
 
-namespace OHOS {
-class AutoTimeZoneFuzzer {
-public:
-    AutoTimeZoneFuzzer();
-    ~AutoTimeZoneFuzzer();
-};
-} // namespace OHOS
-
-#endif // AUTOTIMEZONE_FUZZER_H
+#endif // MCCCOUNTRYCODE_FUZZER_H

@@ -878,7 +878,7 @@ void VCardConstructor::HandleCharacter(int i, int32_t length, std::string value,
                     break;
                 }
             }
-            // fall_through
+            [[fallthrough]]; // fall_through
         }
         case '\n': {
             temp += "\\n";
@@ -889,7 +889,7 @@ void VCardConstructor::HandleCharacter(int i, int32_t length, std::string value,
                 temp += "\\\\";
                 break;
             }
-            // fall_through
+            [[fallthrough]]; // fall_through
         }
         case ',': {
             if (isV30OrV40_) {

@@ -27,6 +27,7 @@
 #include "runner_pool.h"
 #include "security_token.h"
 #include "sim_manager.h"
+#include "tel_ril_manager.h"
 #include "telephony_log_wrapper.h"
 #include "time_zone_manager.h"
 
@@ -122,6 +123,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_002, Function | Me
     std::vector<sptr<CellInformation>> cellList;
     int32_t result = DelayedSingleton<CoreService>::GetInstance()->GetCellInfoList(SLOT_ID, cellList);
     DelayedSingleton<CoreService>::GetInstance()->SendUpdateCellLocationRequest(SLOT_ID);
+    DelayedSingleton<CoreService>::GetInstance()->FactoryReset(SLOT_ID);
     std::u16string u16Ret = u"";
     DelayedSingleton<CoreService>::GetInstance()->GetIsoCountryCodeForNetwork(SLOT_ID, u16Ret);
     DelayedSingleton<CoreService>::GetInstance()->GetImei(SLOT_ID, u16Ret);
@@ -418,6 +420,31 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationUpdate_001, Function |
 }
 
 /**
+ * @tc.number   Telephony_MultiSimController_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("MultiSimController");
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager, runner);
+    std::shared_ptr<RadioProtocolController> radioProtocolController = nullptr;
+    multiSimController->EncryptIccId("");
+    multiSimController->CheckIfNeedSwitchMainSlotId();
+    EXPECT_FALSE(multiSimController->IsValidSlotId(INVALID_SLOTID));
+    multiSimController->maxCount_ = 1;
+    EXPECT_FALSE(multiSimController->InitPrimary());
+    multiSimController->maxCount_ = 2;
+    EXPECT_FALSE(multiSimController->InitPrimary());
+    EXPECT_TRUE(multiSimController->IsAllCardsReady());
+    EXPECT_FALSE(multiSimController->IsAllCardsLoaded());
+}
+
+/**
  * @tc.number   Telephony_OperatorName_002
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -649,6 +676,24 @@ HWTEST_F(CoreServiceBranchTest, Telephony_OperatorNameUtils_001, Function | Medi
     EXPECT_GT(OperatorNameUtils::GetInstance().LoaderJsonFile(content, path), TELEPHONY_ERR_SUCCESS);
     std::string numeric = "46000";
     EXPECT_NE(OperatorNameUtils::GetInstance().GetCustomName(numeric), "");
+}
+
+/**
+ * @tc.number   Telephony_TelRilManager_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_TelRilManager_001, Function | MediumTest | Level1)
+{
+    OHOS::HDI::ServiceManager::V1_0::ServiceStatus status = { "test", 0, SERVIE_STATUS_STOP, "test" };
+    auto telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->HandleRilInterfaceStatusCallback(status);
+    status.serviceName = "ril_service";
+    telRilManager->HandleRilInterfaceStatusCallback(status);
+    status.deviceClass = DEVICE_CLASS_DEFAULT;
+    telRilManager->rilInterface_ = nullptr;
+    telRilManager->HandleRilInterfaceStatusCallback(status);
+    EXPECT_TRUE(status.status == SERVIE_STATUS_STOP);
 }
 } // namespace Telephony
 } // namespace OHOS
