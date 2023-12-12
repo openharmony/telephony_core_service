@@ -362,6 +362,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_001, Function | M
     iccDiallingNumbersManager->ProcessEvent(AppExecFwk::InnerEvent::Get(MSG_SIM_DIALLING_NUMBERS_UPDATE_DONE, 1));
     iccDiallingNumbersManager->ProcessEvent(AppExecFwk::InnerEvent::Get(MSG_SIM_DIALLING_NUMBERS_WRITE_DONE, 1));
     iccDiallingNumbersManager->ProcessEvent(AppExecFwk::InnerEvent::Get(MSG_SIM_DIALLING_NUMBERS_DELETE_DONE, 1));
+    iccDiallingNumbersManager->BuildCallerInfo(-1);
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = nullptr;
     std::vector<std::shared_ptr<DiallingNumbersInfo>> result = {};
     EXPECT_GE(iccDiallingNumbersManager->UpdateIccDiallingNumbers(0, diallingNumber), TELEPHONY_ERR_SUCCESS);
