@@ -18,6 +18,7 @@
 #include "network_search_manager.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -33,6 +34,9 @@ void NetworkType::ProcessGetPreferredNetwork(const AppExecFwk::InnerEvent::Point
     }
     std::shared_ptr<PreferredNetworkTypeInfo> preferredNetworkInfo =
         event->GetSharedObject<PreferredNetworkTypeInfo>();
+    if (TELEPHONY_EXT_WRAPPER.getPreferredNetworkExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.getPreferredNetworkExt_(preferredNetworkInfo->preferredNetworkType);
+    }
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (preferredNetworkInfo == nullptr && responseInfo == nullptr) {
         TELEPHONY_LOGE("NetworkType::ProcessGetPreferredNetwork object is nullptr\n");

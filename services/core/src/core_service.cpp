@@ -660,6 +660,16 @@ int32_t CoreService::SetPrimarySlotId(int32_t slotId)
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    bool hasSim = false;
+    simManager_->HasSimCard(slotId, hasSim);
+    if (!hasSim) {
+        TELEPHONY_LOGE("has no sim");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if (!simManager_->IsSimActive(slotId)) {
+        TELEPHONY_LOGE("sim is not active");
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
     return simManager_->SetPrimarySlotId(slotId);
 }
 
@@ -1479,6 +1489,23 @@ int32_t CoreService::GetBasebandVersion(int32_t slotId, std::string &version)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return networkSearchManager_->GetBasebandVersion(slotId, version);
+}
+
+int32_t CoreService::FactoryReset(int32_t slotId)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->FactoryReset(slotId);
 }
 
 int32_t CoreService::Dump(std::int32_t fd, const std::vector<std::u16string> &args)

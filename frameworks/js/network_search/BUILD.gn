@@ -12,6 +12,7 @@
 # limitations under the License.
 SUBSYSTEM_DIR = "../../../.."
 import("//build/ohos.gni")
+import("$SUBSYSTEM_DIR/core_service/telephony_core_service.gni")
 
 ohos_shared_library("radio") {
   sanitize = {
@@ -64,6 +65,9 @@ ohos_shared_library("radio") {
     "TELEPHONY_LOG_TAG = \"CoreServiceRadioJsApi\"",
     "LOG_DOMAIN = 0xD001F04",
   ]
+
+  defines += telephony_extra_defines
+
   subsystem_name = "telephony"
   part_name = "core_service"
   relative_install_dir = "module/telephony"

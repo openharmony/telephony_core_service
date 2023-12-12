@@ -236,13 +236,13 @@ HWTEST_F(VcardTest, Telephony_VCardTest_101, Function | MediumTest | Level2)
         auto resultSet = VCardRdbHelper::GetInstance().QueryContact(columns, predicates);
         if (resultSet == nullptr) {
             TELEPHONY_LOGE("VCardTest QueryContact failed");
+        } else {
+            int rowCount = 0;
+            resultSet->GetRowCount(rowCount);
+            TELEPHONY_LOGI("VCardTest QueryContact rowCount= %{public}d", rowCount);
+            VCardManager::GetInstance().Export(filePath, predicates);
+            VCardManager::GetInstance().Import(filePath, 0);
         }
-        int rowCount = 0;
-        resultSet->GetRowCount(rowCount);
-        TELEPHONY_LOGE("VCardTest QueryContact rowCount= %{public}d", rowCount);
-        VCardManager::GetInstance().Export(filePath, predicates);
-        TELEPHONY_LOGI("VCardTest export filePath = %{public}s", filePath.c_str());
-        VCardManager::GetInstance().Import(filePath, 0);
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
         EXPECT_TRUE(true);
@@ -269,17 +269,17 @@ HWTEST_F(VcardTest, Telephony_VCardTest_102, Function | MediumTest | Level2)
         auto resultSet = VCardRdbHelper::GetInstance().QueryRawContact(columns, predicates2);
         if (resultSet == nullptr) {
             TELEPHONY_LOGE("VCardTest QueryContact failed");
+        } else {
+            int rowCount = 0;
+            resultSet->GetRowCount(rowCount);
+            TELEPHONY_LOGI("VCardTest QueryContact rowCount= %{public}d", rowCount);
+            DataShare::DataSharePredicates predicates;
+            predicates.Between(Contact::ID, "0", "100");
+            VCardManager::GetInstance().Export(filePath, predicates);
+            int32_t errorCode;
+            VCardManager::GetInstance().Decode(filePath, errorCode);
+            EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
         }
-        int rowCount = 0;
-        resultSet->GetRowCount(rowCount);
-        TELEPHONY_LOGE("VCardTest QueryContact rowCount= %{public}d", rowCount);
-        DataShare::DataSharePredicates predicates;
-        predicates.Between(Contact::ID, "0", "100");
-        VCardManager::GetInstance().Export(filePath, predicates);
-        TELEPHONY_LOGI("VCardTest export filePath = %{public}s", filePath.c_str());
-        int32_t errorCode;
-        VCardManager::GetInstance().Decode(filePath, errorCode);
-        EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
         EXPECT_TRUE(true);

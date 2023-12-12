@@ -34,6 +34,7 @@
 #include "telephony_config.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_utils_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -476,6 +477,18 @@ static bool MatchGetNrOptionModeParameter(napi_env env, napi_value parameter[], 
     }
 }
 
+static bool MatchFactoryResetParameter(napi_env env, napi_value parameter[], size_t parameterCount)
+{
+    switch (parameterCount) {
+        case PARAMETER_COUNT_ONE: {
+            return NapiUtil::MatchParameters(env, parameter, { napi_number });
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
 static bool MatchSetNrOptionModeParameter(napi_env env, napi_value parameter[], size_t parameterCount)
 {
     switch (parameterCount) {
@@ -654,6 +667,9 @@ static std::string GetRadioTechName(int32_t radioTech)
         case NetworkRat::NETWORK_LTE: {
             return "LTE";
         }
+        case NetworkRat::NETWORK_NR: {
+            return "NR";
+        }
         default: {
             return "";
         }
@@ -829,6 +845,9 @@ static int32_t GetRatTechValue(std::string ratTechStr)
     }
     if (!LTE.compare(ratTechStr)) {
         return static_cast<int32_t>(NetworkRat::NETWORK_LTE);
+    }
+    if (!NR.compare(ratTechStr)) {
+        return static_cast<int32_t>(NetworkRat::NETWORK_NR);
     }
     return static_cast<int32_t>(NetworkRat::NETWORK_LTE);
 }
@@ -2337,6 +2356,54 @@ static napi_value GetNrOptionMode(napi_env env, napi_callback_info info)
         env, asyncContext.release(), "getNROptionMode", NativeGetNrOptionMode, GetNrOptionModeCallback);
 }
 
+static void NativeFactoryReset(napi_env env, void *data)
+{
+    auto context = static_cast<FactoryResetContext *>(data);
+    if (!IsValidSlotId(context->slotId)) {
+        TELEPHONY_LOGE("NativeFactoryReset slotId is invalid");
+        context->errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
+    context->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().FactoryReset(context->slotId);
+    if (context->errorCode == TELEPHONY_SUCCESS) {
+        context->resolved = true;
+    }
+    TELEPHONY_LOGD("NativeFactoryReset end");
+}
+
+static void FactoryResetCallback(napi_env env, napi_status status, void *data)
+{
+    auto context = static_cast<FactoryResetContext *>(data);
+    napi_value callbackValue = nullptr;
+    if (context->resolved) {
+        napi_get_undefined(env, &callbackValue);
+    } else {
+        JsError error =
+            NapiUtil::ConverErrorMessageWithPermissionForJs(context->errorCode, "FactoryReset", SET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
+    }
+    NapiUtil::Handle1ValueCallback(env, context, callbackValue);
+    TELEPHONY_LOGD("FactoryResetCallback end");
+}
+
+static napi_value FactoryReset(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = PARAMETER_COUNT_ONE;
+    napi_value parameters[PARAMETER_COUNT_ONE] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
+    if (!MatchFactoryResetParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<FactoryResetContext>();
+    NAPI_CALL(env, napi_get_value_int32(env, parameters[ARRAY_INDEX_FIRST], &asyncContext->slotId));
+    return NapiUtil::HandleAsyncWork(
+        env, asyncContext.release(), "factoryReset", NativeFactoryReset, FactoryResetCallback);
+}
+
 static void NativeSetNrOptionMode(napi_env env, void *data)
 {
     auto asyncContext = static_cast<NrOptionModeContext *>(data);
@@ -2417,6 +2484,12 @@ static napi_value IsNrSupported(napi_env env, napi_callback_info info)
     TelephonyConfig telephonyConfig;
     isNrSupported =
         telephonyConfig.IsCapabilitySupport(static_cast<int32_t>(TelephonyConfig::ConfigType::MODEM_CAP_SUPPORT_NR));
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    TELEPHONY_EXT_UTILS_WRAPPER.InitTelephonyExtUtilsWrapper();
+#endif
+    if (TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_ != nullptr) {
+        isNrSupported = TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_();
+    }
     TELEPHONY_LOGD("isNrSupported:%{public}d", isNrSupported);
     napi_get_boolean(env, isNrSupported, &result);
     return result;
@@ -3463,6 +3536,7 @@ static napi_value CreateFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getNROptionMode", GetNrOptionMode),
         DECLARE_NAPI_FUNCTION("on", ObserverOn),
         DECLARE_NAPI_FUNCTION("off", ObserverOff),
+        DECLARE_NAPI_FUNCTION("factoryReset", FactoryReset),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;

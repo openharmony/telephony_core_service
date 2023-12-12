@@ -68,6 +68,7 @@ const int32_t INPUT_GET_BASEBAND_VERSION = 30;
 const int32_t INPUT_GET_NETWORK_CAPABILITY = 31;
 const int32_t INPUT_SET_NETWORK_CAPABILITY = 32;
 const int32_t INPUT_SET_NR_OPTION_MODE = 33;
+const int32_t INPUT_FACTORY_RESET = 34;
 const int32_t INPUT_INIT_TIME = 99;
 const int32_t INPUT_QUIT = 100;
 const int32_t SLEEP_TIME = 5;
@@ -682,44 +683,54 @@ void TestSendUpdateCellLocationRequest()
         TELEPHONY_LOGI("TelephonyTestService::SendUpdateCellLocationRequest result:%{public}d", result);
     }
 }
+
+void TestFactoryReset()
+{
+    AccessToken token;
+    if (g_telephonyService != nullptr) {
+        int32_t result = g_telephonyService->FactoryReset(InputSlotId());
+        TELEPHONY_LOGI("TelephonyTestService::FactoryReset result:%{public}d", result);
+    }
+}
+
 void Prompt()
 {
-    printf(
-        "\n-----------start test remote api--------------\n"
-        "usage:please input a cmd num:\n"
-        "0:GetPsRadioTech\n"
-        "1:GetCsRadioTech\n"
-        "2:GetOperatorNumeric\n"
-        "3:GetNetworkState\n"
-        "4:GetOperatorName\n"
-        "5:GetSignalInfoList\n"
-        "6:SetRadioState\n"
-        "7:GetRadioState\n"
-        "8:NotifyNetworkStateChange\n"
-        "9:GetNetworkSearchInformation\n"
-        "10:GetNetworkSelectionMode\n"
-        "11:SetNetworkSelectionMode\n"
-        "14:GetIsoCountryCodeForNetwork\n"
-        "15:GetPreferredNetwork\n"
-        "16:SetPreferredNetwork\n"
-        "17:GetTimeZone\n"
-        "18:GetImei\n"
-        "19:GetMeid\n"
-        "20:GetUniqueDeviceId\n"
-        "22:GetImsRegStatus\n"
-        "23:GetCellInfoList\n"
-        "24:SendUpdateCellLocationRequest\n"
-        "25:IsNrSupported\n"
-        "26:GetNrOptionMode\n"
-        "27:RegisterImsRegStateCallback\n"
-        "28:UnregisterImsRegStateCallback\n"
-        "29:NotifySpnChange\n"
-        "30:GetBasebandVersion\n"
-        "31:GetNetworkCapability\n"
-        "32:SetNetworkCapability\n"
-        "33:SetNrOptionMode\n"
-        "99:InitTimeAndTimeZone\n"
-        "100:exit \n");
+    printf("\n-----------start test remote api--------------\n"
+           "usage:please input a cmd num:\n"
+           "0:GetPsRadioTech\n"
+           "1:GetCsRadioTech\n"
+           "2:GetOperatorNumeric\n"
+           "3:GetNetworkState\n"
+           "4:GetOperatorName\n"
+           "5:GetSignalInfoList\n"
+           "6:SetRadioState\n"
+           "7:GetRadioState\n"
+           "8:NotifyNetworkStateChange\n"
+           "9:GetNetworkSearchInformation\n"
+           "10:GetNetworkSelectionMode\n"
+           "11:SetNetworkSelectionMode\n"
+           "14:GetIsoCountryCodeForNetwork\n"
+           "15:GetPreferredNetwork\n"
+           "16:SetPreferredNetwork\n"
+           "17:GetTimeZone\n"
+           "18:GetImei\n"
+           "19:GetMeid\n"
+           "20:GetUniqueDeviceId\n"
+           "22:GetImsRegStatus\n"
+           "23:GetCellInfoList\n"
+           "24:SendUpdateCellLocationRequest\n"
+           "25:IsNrSupported\n"
+           "26:GetNrOptionMode\n"
+           "27:RegisterImsRegStateCallback\n"
+           "28:UnregisterImsRegStateCallback\n"
+           "29:NotifySpnChange\n"
+           "30:GetBasebandVersion\n"
+           "31:GetNetworkCapability\n"
+           "32:SetNetworkCapability\n"
+           "33:SetNrOptionMode\n"
+           "34:FactoryReset\n"
+           "99:InitTimeAndTimeZone\n"
+           "100:exit \n");
 }
 
 void ProcessInput(bool &loopFlag)
@@ -792,6 +803,7 @@ void Init()
     memberFuncMap_[INPUT_SET_NETWORK_CAPABILITY] = TestSetNetworkCapability;
     memberFuncMap_[INPUT_GET_NETWORK_CAPABILITY] = TestGetNetworkCapability;
     memberFuncMap_[INPUT_SET_NR_OPTION_MODE] = TestSetNrOptionMode;
+    memberFuncMap_[INPUT_FACTORY_RESET] = TestFactoryReset;
 }
 
 void InitBroadCast()

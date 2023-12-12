@@ -28,12 +28,22 @@
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
+constexpr int32_t SLEEP_TIME = 1;
+static bool g_isInited = false;
+static std::shared_ptr<AutoTimeZoneFuzzer> g_serviceTest = nullptr;
+
+AutoTimeZoneFuzzer::AutoTimeZoneFuzzer() {}
+
+AutoTimeZoneFuzzer::~AutoTimeZoneFuzzer()
+{
+    sleep(SLEEP_TIME);
+}
 
 bool IsServiceInited()
 {
     if (!g_isInited) {
+        g_serviceTest = std::make_shared<AutoTimeZoneFuzzer>();
         auto telRilManager = std::make_shared<TelRilManager>();
         auto simManager = std::make_shared<SimManager>(telRilManager);
         auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);

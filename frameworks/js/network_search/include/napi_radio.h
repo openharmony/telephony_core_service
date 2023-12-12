@@ -47,6 +47,7 @@ const static std::string GSM = "GSM";
 const static std::string GPRS = "GPRS";
 const static std::string WCDMA = "WCDMA";
 const static std::string LTE = "LTE";
+const static std::string NR = "NR";
 const int32_t ARRAY_INDEX_FIRST = 0;
 const int32_t ARRAY_INDEX_SECOND = 1;
 const int32_t ARRAY_INDEX_THIRD = 2;
@@ -262,6 +263,10 @@ struct GetUniqueDeviceIdContext : BaseContext {
 struct NrOptionModeContext : CallbackContext {
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
     int32_t nrOptionMode = DEFAULT_ERROR;
+};
+
+struct FactoryResetContext : BaseContext {
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
 };
 
 struct SetPrimarySlotIdContext : BaseContext {
