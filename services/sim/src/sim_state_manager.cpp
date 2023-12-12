@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Telephony {
 std::mutex SimStateManager::mtx_;
-constexpr static const int32_t WAIT_TIME_SECOND = 1;
+constexpr static const int32_t WAIT_TIME_SECOND = 3;
 constexpr static const int32_t WAIT_TIME_LONG_SECOND = 20;
 
 SimStateManager::SimStateManager(std::shared_ptr<ITelRilManager> telRilManager)
