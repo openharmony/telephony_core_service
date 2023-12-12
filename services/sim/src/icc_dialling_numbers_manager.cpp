@@ -23,6 +23,7 @@
 namespace OHOS {
 namespace Telephony {
 constexpr static const int32_t WAIT_TIME_SECOND = 1;
+constexpr static const int32_t WAIT_QUERY_TIME_SECOND = 30;
 
 IccDiallingNumbersManager::IccDiallingNumbersManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simState)
@@ -125,7 +126,7 @@ void IccDiallingNumbersManager::ProcessLoadDone(const AppExecFwk::InnerEvent::Po
         TELEPHONY_LOGE("ProcessDiallingNumberLoadDone: get null pointer!!!");
     }
     TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessLoadDone: end");
-    hasEventDone_ = true;
+    hasQueryEventDone_ = true;
     processWait_.notify_all();
 }
 
@@ -264,7 +265,6 @@ int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
     int type, std::vector<std::shared_ptr<DiallingNumbersInfo>> &result)
 {
     std::unique_lock<std::mutex> lock(mtx_);
-    ClearRecords();
     if (diallingNumbersCache_ == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -275,17 +275,21 @@ int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     TELEPHONY_LOGI("QueryIccDiallingNumbers start:%{public}d", type);
-    int fileId = GetFileIdForType(type);
-    int extensionEf = diallingNumbersCache_->ExtendedElementFile(fileId);
-    AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_GET_DONE);
-    hasEventDone_ = false;
-    diallingNumbersCache_->ObtainAllDiallingNumberFiles(fileId, extensionEf, event);
-    processWait_.wait(lock, [this] { return hasEventDone_ == true; });
-    TELEPHONY_LOGI("IccDiallingNumbersManager::QueryIccDiallingNumbers: end");
+    if (hasQueryEventDone_) {
+        ClearRecords();
+        int fileId = GetFileIdForType(type);
+        int extensionEf = diallingNumbersCache_->ExtendedElementFile(fileId);
+        AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_GET_DONE);
+        hasQueryEventDone_ = false;
+        diallingNumbersCache_->ObtainAllDiallingNumberFiles(fileId, extensionEf, event);
+    }
+    processWait_.wait_for(
+        lock, std::chrono::seconds(WAIT_QUERY_TIME_SECOND), [this] { return hasQueryEventDone_ == true; });
+    TELEPHONY_LOGI("QueryIccDiallingNumbers: end");
     if (!diallingNumbersList_.empty()) {
         result = diallingNumbersList_;
     }
-    return hasEventDone_ ? TELEPHONY_SUCCESS : CORE_ERR_SIM_CARD_LOAD_FAILED;
+    return hasQueryEventDone_ ? TELEPHONY_SUCCESS : CORE_ERR_SIM_CARD_LOAD_FAILED;
 }
 
 AppExecFwk::InnerEvent::Pointer IccDiallingNumbersManager::BuildCallerInfo(int eventId)
