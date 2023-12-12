@@ -203,7 +203,7 @@ void OperatorName::NotifySpnChanged()
     sptr<NetworkState> networkState = GetNetworkStatus();
     if (networkState != nullptr) {
         regStatus = networkState->GetRegStatus();
-        std::string netPlmn = networkState->GetPlmnNumeric();
+        netPlmn = networkState->GetPlmnNumeric();
     }
     if (simManager_ != nullptr) {
         std::u16string operatorNumeric = u"";
