@@ -398,7 +398,6 @@ int32_t MultiSimController::GetSlotId(int32_t simId)
 
 bool MultiSimController::IsSimActive(int32_t slotId)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     if (!IsValidData(slotId)) {
         TELEPHONY_LOGE("InValidData");
         return false;
