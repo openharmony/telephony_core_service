@@ -1440,6 +1440,26 @@ declare namespace radio {
   function getNROptionMode(slotId: number): Promise<NROptionMode>;
 
   /**
+   * Reset all network settings of telephony.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot
+   * index number supported by the device.
+   * @returns { Promise<void> } The promise returned by the factoryReset.
+   * @throws { BusinessError } 201 - Permission denied
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @systemapi Hide this for inner system use.
+   * @since 11
+   */
+  function factoryReset(slotId: number): Promise<void>;
+
+  /**
    * Indicates the preferred network.
    *
    * @enum { number }
