@@ -49,6 +49,7 @@ const uint32_t LOCATION_DAY_OR_SEC = 2;
 const uint32_t TIME_THRESHOLD = 3; // seconds
 const int32_t SIM_SLOT_ID_0 = 0;
 const int32_t SIM_SLOT_ID_1 = 1;
+const std::string AUTO_TIME_OFF = "0";
 int64_t NitzUpdate::lastSystemTime_ = 0;
 int64_t NitzUpdate::lastNetworkTime_ = 0;
 
@@ -65,7 +66,7 @@ void NitzUpdate::ProcessNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event)
         return;
     }
     std::shared_ptr<std::string> strTime = event->GetSharedObject<std::string>();
-    if (strTime->empty()) {
+    if (strTime == nullptr || strTime->empty()) {
         TELEPHONY_LOGE("NitzUpdate::ProcessNitzUpdate is nullptr slotId:%{public}d", slotId_);
         return;
     }
@@ -164,10 +165,6 @@ bool NitzUpdate::NitzTimeParse(std::string &strTimeSubs, NetworkTime &networkTim
 
 void NitzUpdate::ProcessTime(NetworkTime &networkTime)
 {
-    bool autoTime = IsAutoTime();
-    if (!autoTime) {
-        TELEPHONY_LOGI("NitzUpdate::ProcessTime not auto udpate time slotId:%{public}d", slotId_);
-    }
     if (networkTime.year < static_cast<int32_t>(CST_YEAR) || networkTime.month < 1) {
         TELEPHONY_LOGE("NitzUpdate::ProcessTime time error slotId:%{public}d", slotId_);
         return;
@@ -192,7 +189,11 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
         TELEPHONY_LOGE("NitzUpdate::ProcessTime invalid time, slotId:%{public}d", slotId_);
         return;
     }
-
+    bool autoTime = IsAutoTime();
+    if (!autoTime) {
+        TELEPHONY_LOGI("NitzUpdate::ProcessTime not auto udpate time slotId:%{public}d", slotId_);
+        return;
+    }
     SaveTime(static_cast<int64_t>(timegm(&t)));
 #ifdef ABILITY_POWER_SUPPORT
     if (runningLock != nullptr) {
@@ -299,7 +300,10 @@ bool NitzUpdate::IsAutoTime()
         TELEPHONY_LOGI("Query %{public}s fail", key.c_str());
         return false;
     }
-    bool autoTime = value == "1";
+    bool autoTime = true;
+    if (value == AUTO_TIME_OFF) {
+        autoTime = false;
+    }
     TELEPHONY_LOGI("NitzUpdate::IsAutoTime autoTime:%{public}d slotId:%{public}d", autoTime, slotId_);
     return autoTime;
 }
@@ -326,6 +330,7 @@ void NitzUpdate::AutoTimeChange()
     }
     TELEPHONY_LOGI("now update autoTime:%{public}d slotId:%{public}d", autoTime, slotId_);
     int64_t time = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
+    time = time / MILLI_TO_BASE;
     if (lastNetworkTime_ == 0 || lastSystemTime_ == 0 || time < lastSystemTime_) {
         return;
     }

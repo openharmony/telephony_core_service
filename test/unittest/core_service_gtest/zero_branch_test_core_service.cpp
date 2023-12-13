@@ -39,6 +39,8 @@ namespace {
 constexpr int32_t SLOT_ID = 0;
 const int32_t INVALID_SLOTID = 2;
 constexpr int32_t NR_NSA_OPTION_ONLY = 1;
+const std::string NITZ_STR = "23/10/16,09:10:33+32,00";
+const std::string NITZ_STR_INVALID = "202312102359";
 } // namespace
 
 class DemoHandler : public AppExecFwk::EventHandler {
@@ -694,6 +696,33 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TelRilManager_001, Function | MediumTe
     telRilManager->rilInterface_ = nullptr;
     telRilManager->HandleRilInterfaceStatusCallback(status);
     EXPECT_TRUE(status.status == SERVIE_STATUS_STOP);
+}
+
+/**
+ * @tc.number   Telephony_NitzUpdate_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_NitzUpdate_001, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto nitzUpdate = std::make_shared<NitzUpdate>(networkSearchManager, SLOT_ID);
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    nitzUpdate->ProcessNitzUpdate(event);
+    nitzUpdate->ProcessTimeZone();
+    nitzUpdate->AutoTimeChange();
+    NitzUpdate::NetworkTime networkTime;
+    std::string nitzStr = NITZ_STR;
+    EXPECT_TRUE(nitzUpdate->NitzParse(nitzStr, networkTime));
+    nitzUpdate->ProcessTime(networkTime);
+    int64_t networkTimeSec = nitzUpdate->lastNetworkTime_;
+    nitzUpdate->IsValidTime(networkTimeSec);
+    nitzUpdate->SaveTime(networkTimeSec);
+    nitzUpdate->IsAutoTime();
+    nitzStr = NITZ_STR_INVALID;
+    EXPECT_FALSE(nitzUpdate->NitzParse(nitzStr, networkTime));
 }
 } // namespace Telephony
 } // namespace OHOS
