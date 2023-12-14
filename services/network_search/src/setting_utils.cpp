@@ -35,7 +35,7 @@ const std::string SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI =
 const std::string SettingUtils::NETWORK_SEARCH_SETTING_PREFERRED_NETWORK_MODE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=preferred_network_mode";
 
-const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIME = "settings.telephony.autotime";
+const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIME = "auto_time";
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIMEZONE = "auto_timezone";
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE = "settings.telephony.airplanemode";
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE =
