@@ -941,7 +941,7 @@ bool MultiSimController::PublishSimFileEvent(const AAFwk::Want &want, int eventC
     data.SetCode(eventCode);
     data.SetData(eventData);
     EventFwk::CommonEventPublishInfo publishInfo;
-    publishInfo.SetOrdered(true);
+    publishInfo.SetOrdered(false);
     bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
     TELEPHONY_LOGD("MultiSimController::PublishSimFileEvent end###publishResult = %{public}d", publishResult);
     return publishResult;
