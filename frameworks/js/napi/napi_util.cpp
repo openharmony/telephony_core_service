@@ -85,9 +85,10 @@ static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE, JS_ERROR_NETWORK_NOT_IN_SERVICE },
     { JsErrorCode::JS_ERROR_TELEPHONY_CONFERENCE_EXCEED_LIMIT, JS_ERROR_CONFERENCE_EXCEED_LIMIT_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_CONFERENCE_CALL_NOT_ACTIVE, JS_ERROR_CONFERENCE_CALL_IS_NOT_ACTIVE_STRING },
-    { JsErrorCode::JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT, JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT_STRING }
-    
+    { JsErrorCode::JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT, JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT_STRING },
 };
+const std::string ERROR_STRING = "error";
+const std::u16string ERROR_USTRING = u"error";
 
 std::string NapiUtil::GetErrorMessage(int32_t errorCode)
 {
@@ -104,12 +105,22 @@ std::string NapiUtil::GetErrorMessage(int32_t errorCode)
 
 std::string NapiUtil::ToUtf8(std::u16string str16)
 {
-    return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.to_bytes(str16);
+    if (str16 == ERROR_USTRING) {
+        return ERROR_STRING;
+    }
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert(ERROR_STRING);
+    std::string result = convert.to_bytes(str16);
+    return result == ERROR_STRING ? "" : result;
 }
 
 std::u16string NapiUtil::ToUtf16(std::string str)
 {
-    return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.from_bytes(str);
+    if (str == ERROR_STRING) {
+        return ERROR_USTRING;
+    }
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert(ERROR_STRING, ERROR_USTRING);
+    std::u16string result = convert.from_bytes(str);
+    return result == ERROR_USTRING ? u"" : result;
 }
 
 napi_value NapiUtil::CreateErrorMessage(napi_env env, const std::string &msg, int32_t errorCode)
