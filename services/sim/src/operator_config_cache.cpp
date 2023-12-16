@@ -261,7 +261,7 @@ bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId)
     data.SetWant(want);
     data.SetData(eventData);
     EventFwk::CommonEventPublishInfo publishInfo;
-    publishInfo.SetOrdered(true);
+    publishInfo.SetOrdered(false);
     bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
     TELEPHONY_LOGI("OperatorConfigCache:AnnounceOperatorConfigChanged end###result = %{public}d", publishResult);
     return publishResult;

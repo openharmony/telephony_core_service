@@ -465,7 +465,7 @@ bool IccFile::PublishSimFileEvent(const std::string &event, int eventCode, const
     data.SetCode(eventCode);
     data.SetData(eventData);
     CommonEventPublishInfo publishInfo;
-    publishInfo.SetOrdered(true);
+    publishInfo.SetOrdered(false);
     bool publishResult = CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
     TELEPHONY_LOGI("IccFile::PublishSimEvent result : %{public}d", publishResult);
     return publishResult;
