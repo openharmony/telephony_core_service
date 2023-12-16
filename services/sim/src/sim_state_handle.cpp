@@ -592,7 +592,7 @@ bool SimStateHandle::PublishSimStateEvent(std::string event, int32_t eventCode, 
     data.SetCode(eventCode);
     data.SetData(eventData);
     EventFwk::CommonEventPublishInfo publishInfo;
-    publishInfo.SetOrdered(true);
+    publishInfo.SetOrdered(false);
     bool publishResult = CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
     TELEPHONY_LOGI("SimStateHandle::PublishSimStateEvent result : %{public}d", publishResult);
     return publishResult;
