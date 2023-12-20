@@ -43,6 +43,7 @@ const int32_t SYS_PARAMETER_SIZE = 256;
 const int32_t INVALID_DELAY_TIME = 0;
 constexpr const char *NO_DELAY_TIME__CONFIG = "0";
 constexpr const char *CFG_TECH_UPDATE_TIME = "persist.radio.cfg.update.time";
+constexpr static const int32_t GET_SSB_WAIT_TIME_SECOND = 5;
 
 NetworkSearchManager::NetworkSearchManager(
     std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<ISimManager> simManager)
@@ -1759,6 +1760,35 @@ int32_t NetworkSearchManager::ConvertNetworkModeToCapabilityType(int32_t preferr
             break;
     }
     return capabilityType;
+}
+
+int32_t NetworkSearchManager::GetNrSsbId(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation)
+{
+    TELEPHONY_LOGD("Start slotId:%{public}d", slotId);
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::unique_lock<std::mutex> lck(ctx_);
+    ssbResponseReady_ = false;
+    eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_NR_SSBID_INFO);
+    while (!ssbResponseReady_) {
+        TELEPHONY_LOGI("Wait(), response = false");
+        if (cv_.wait_for(lck, std::chrono::seconds(GET_SSB_WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
+    if (!ssbResponseReady_) {
+        TELEPHONY_LOGE("Wait() is timeout");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (inner->networkSearchHandler_ != nullptr) {
+        TELEPHONY_LOGE("Start to get ssbid's response");
+        inner->networkSearchHandler_->GetNrSsbId(nrSsbInformation);
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 } // namespace Telephony
 } // namespace OHOS
