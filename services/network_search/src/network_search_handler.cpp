@@ -24,6 +24,9 @@
 
 namespace OHOS {
 namespace Telephony {
+std::mutex NetworkSearchManager::ctx_;
+bool NetworkSearchManager::ssbResponseReady_ = false;
+std::condition_variable NetworkSearchManager::cv_;
 static const int32_t REQ_INTERVAL = 30;
 const size_t MCC_LEN = 3;
 const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandler::memberFuncMap_ = {
@@ -65,6 +68,7 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
     { RadioEvent::NOTIFY_STATE_CHANGE, &NetworkSearchHandler::NotifyStateChange },
     { RadioEvent::DELAY_NOTIFY_STATE_CHANGE, &NetworkSearchHandler::HandleDelayNotifyEvent },
     { RadioEvent::RADIO_RESIDENT_NETWORK_CHANGE, &NetworkSearchHandler::RadioResidentNetworkChange },
+    { RadioEvent::RADIO_GET_NR_SSBID_INFO, &NetworkSearchHandler::GetNrSsbIdResponse },
     { SettingEventCode::MSG_AUTO_TIME, &NetworkSearchHandler::AutoTimeChange },
     { SettingEventCode::MSG_AUTO_AIRPLANE_MODE, &NetworkSearchHandler::AirplaneModeChange }
 };
@@ -125,13 +129,26 @@ bool NetworkSearchHandler::Init()
         TELEPHONY_LOGE("failed to create new nitzUpdate slotId:%{public}d", slotId_);
         return false;
     }
+    if (!SubModuleInit()) {
+        return false;
+    }
+    signalInfo_->InitSignalBar();
+    RegisterEvents();
+    return true;
+}
+
+bool NetworkSearchHandler::SubModuleInit()
+{
     cellInfo_ = std::make_unique<CellInfo>(networkSearchManager_, slotId_);
     if (cellInfo_ == nullptr) {
         TELEPHONY_LOGE("failed to create new CellInfo slotId:%{public}d", slotId_);
         return false;
     }
-    signalInfo_->InitSignalBar();
-    RegisterEvents();
+    nrSsbInfo_ = std::make_unique<NrSsbInfo>(networkSearchManager_, slotId_);
+    if (nrSsbInfo_ == nullptr) {
+        TELEPHONY_LOGE("failed to create new NrSsbInfo slotId:%{public}d", slotId_);
+        return false;
+    }
     return true;
 }
 
@@ -1017,6 +1034,41 @@ void NetworkSearchHandler::RadioVoiceTechChange(const AppExecFwk::InnerEvent::Po
         radioInfo_->ProcessVoiceTechChange(event);
     }
     TELEPHONY_LOGD("NetworkSearchHandler::RadioVoiceTechChange");
+}
+
+void NetworkSearchHandler::GetNrSsbIdResponse(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("Event is nullptr!");
+        return;
+    }
+    TELEPHONY_LOGD("Start slotId:%{public}d", slotId_);
+    if (nrSsbInfo_ == nullptr) {
+        TELEPHONY_LOGE("NrSsbInfo is null slotId:%{public}d", slotId_);
+        return;
+    }
+    if (nrSsbInfo_->ProcessGetNrSsbId(event)) {
+        SyncGetSsbInfoResponse();
+    }
+}
+
+void NetworkSearchHandler::SyncGetSsbInfoResponse()
+{
+    std::unique_lock<std::mutex> lck(NetworkSearchManager::ctx_);
+    NetworkSearchManager::ssbResponseReady_ = true;
+    TELEPHONY_LOGI("ssbResponseReady_ = %{public}d", NetworkSearchManager::ssbResponseReady_);
+    NetworkSearchManager::cv_.notify_one();
+}
+
+int32_t NetworkSearchHandler::GetNrSsbId(const std::shared_ptr<NrSsbInformation> &nrCellSsbIdsInfo)
+{
+    TELEPHONY_LOGI("SlotId:%{public}d", slotId_);
+    if (nrSsbInfo_ != nullptr) {
+        if (nrSsbInfo_->FillNrSsbIdInformation(nrCellSsbIdsInfo)) {
+            return TELEPHONY_ERR_SUCCESS;
+        }
+    }
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
 void NetworkSearchHandler::AutoTimeChange(const AppExecFwk::InnerEvent::Pointer &)

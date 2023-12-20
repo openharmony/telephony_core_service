@@ -48,6 +48,7 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_type.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_utils.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/nitz_update.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/nr_ssb_info.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/operator_name.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/operator_name_utils.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/radio_info.cpp",

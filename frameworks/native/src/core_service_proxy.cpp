@@ -2946,6 +2946,36 @@ int32_t CoreServiceProxy::SerializeImsRegInfoData(int32_t slotId, ImsServiceType
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CoreServiceProxy::GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("WriteInt32 slotId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_NR_SSB_ID_INFO), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("Failed, error code is %{public}d\n", error);
+        return error;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        nrSsbInformation->ReadFromParcel(reply);
+    }
+    return result;
+}
+
 int32_t CoreServiceProxy::FactoryReset(int32_t slotId)
 {
     MessageParcel data;

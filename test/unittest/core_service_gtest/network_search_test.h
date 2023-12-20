@@ -209,6 +209,7 @@ public:
     void PrintTdScdmaSignalInformation(sptr<SignalInformation> signal);
     void PrintLteSignalInformation(sptr<SignalInformation> signal);
     void PrintNrSignalInformation(sptr<SignalInformation> signal);
+    void PrintNrSsbIdInfo(std::shared_ptr<NrSsbInformation> nr);
 
 public:
     static sptr<ICoreService> telephonyService_;

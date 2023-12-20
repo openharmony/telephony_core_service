@@ -35,6 +35,7 @@
       *NetworkState*;
       *NrCellInformation*;
       *NrSignalInformation*;
+      *NrSsbInformation*;
       *OperatorConfig*;
       *ResourceUtils*;
       *SignalInformation*;

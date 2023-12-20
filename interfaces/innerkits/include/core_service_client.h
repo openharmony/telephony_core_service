@@ -846,6 +846,15 @@ public:
     int32_t GetBasebandVersion(int32_t slotId, std::string &version);
 
     /**
+     * @brief Obtain the NR ssb id information
+     *
+     * @param slotId[in], sim slot id
+     * @param nrSsbInfomation[out], the nr ssb information of the SIM card
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation);
+
+    /**
      * @brief Reset all network settings of telephony
      *
      * @param slotId[in], sim slot id

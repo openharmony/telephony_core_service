@@ -136,6 +136,7 @@ enum class DiffInterfaceId {
     TEST_GET_RRC_CONNECTION_STATE,
     TEST_GET_NR_OPTION_MODE,
     TEST_SET_NR_OPTION_MODE,
+    TEST_GET_NR_SSBID_INFO,
     TEST_EXIT,
 };
 
@@ -392,6 +393,7 @@ public:
     void OnRequestGetRrcConnectionStateTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetNrOptionModeTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestSetNrOptionModeTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestGetNrSsbIdTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     class DemoHandler : public AppExecFwk::EventHandler {
     public:

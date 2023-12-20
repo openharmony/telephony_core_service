@@ -48,6 +48,7 @@ public:
     int32_t SetNrOptionMode(int32_t mode, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetNrOptionMode(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetNrSsbId(const AppExecFwk::InnerEvent::Pointer &response);
 
     // ril unsol
     int32_t SignalStrengthUpdated(const HDI::Ril::V1_1::Rssi &rssi);
@@ -92,6 +93,8 @@ public:
     int32_t GetRrcConnectionStateResponse(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t rrcConnectionState);
     int32_t GetRrcConnectionStateUpdated(int32_t state);
+    int32_t GetNrSsbIdResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_2::NrCellSsbIds &nrCellSsbIds);
 
 private:
     void BuildSignalStrength(std::shared_ptr<Rssi> signalStrength, const HDI::Ril::V1_1::Rssi &rssi);
@@ -140,6 +143,9 @@ private:
         CurrentCellInformation &cellInfo, const HDI::Ril::V1_1::CurrentCellInfo_1_1 &info);
     void BuildChannelConfigInfoList(std::shared_ptr<ChannelConfigInfoList> channelConfigList,
         const HDI::Ril::V1_1::ChannelConfigInfoList &channelConfigInfoList);
+
+private:
+    const int32_t MAX_NBCELL_COUNT = 4;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -145,6 +145,12 @@ int32_t TelRilNetwork::GetRrcConnectionState(const AppExecFwk::InnerEvent::Point
         &HDI::Ril::V1_1::IRil::GetRrcConnectionState);
 }
 
+int32_t TelRilNetwork::GetNrSsbId(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return Request(
+        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_NR_SSBID_INFO, &HDI::Ril::V1_2::IRil::GetNrSsbId);
+}
+
 int32_t TelRilNetwork::SignalStrengthUpdated(const HDI::Ril::V1_1::Rssi &rssi)
 {
     std::shared_ptr<Rssi> signalStrength = std::make_shared<Rssi>();
@@ -376,6 +382,43 @@ int32_t TelRilNetwork::GetRrcConnectionStateResponse(
 {
     return Response<HRilInt32Parcel>(
         TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<HRilInt32Parcel>(rrcConnectionState));
+}
+
+int32_t TelRilNetwork::GetNrSsbIdResponse(
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_2::NrCellSsbIds &nrCellSsbIds)
+{
+    std::shared_ptr<NrCellSsbIds> nrCellSsbIdsInfo = std::make_shared<NrCellSsbIds>();
+    TELEPHONY_LOGI("Fill ssbid info");
+    nrCellSsbIdsInfo->arfcn = nrCellSsbIds.arfcn;
+    nrCellSsbIdsInfo->cid = nrCellSsbIds.cid;
+    nrCellSsbIdsInfo->pic = nrCellSsbIds.pic;
+    nrCellSsbIdsInfo->rsrp = nrCellSsbIds.rsrp;
+    nrCellSsbIdsInfo->sinr = nrCellSsbIds.sinr;
+    nrCellSsbIdsInfo->timeAdvance = nrCellSsbIds.timeAdvance;
+    nrCellSsbIdsInfo->nbCellCount = nrCellSsbIds.nbCellCount;
+    for (auto &info : nrCellSsbIds.sCellSsbList) {
+        SsbIdInfo ssbIdInfo;
+        ssbIdInfo.ssbId = info.ssbId;
+        ssbIdInfo.rsrp = info.rsrp;
+        nrCellSsbIdsInfo->sCellSsbList.push_back(ssbIdInfo);
+    }
+    int32_t nbCellCount =
+        (nrCellSsbIdsInfo->nbCellCount > MAX_NBCELL_COUNT) ? MAX_NBCELL_COUNT : nrCellSsbIdsInfo->nbCellCount;
+    for (int32_t i = 0; i < nbCellCount; i++) {
+        NeighboringCellSsbInfo neighboringCellSsbInfo;
+        neighboringCellSsbInfo.pci = nrCellSsbIds.nbCellSsbList[i].pci;
+        neighboringCellSsbInfo.arfcn = nrCellSsbIds.nbCellSsbList[i].arfcn;
+        neighboringCellSsbInfo.rsrp = nrCellSsbIds.nbCellSsbList[i].rsrp;
+        neighboringCellSsbInfo.sinr = nrCellSsbIds.nbCellSsbList[i].sinr;
+        for (auto &info : nrCellSsbIds.nbCellSsbList[i].ssbIdList) {
+            SsbIdInfo nbCellSsbIdInfo;
+            nbCellSsbIdInfo.ssbId = info.ssbId;
+            nbCellSsbIdInfo.rsrp = info.rsrp;
+            neighboringCellSsbInfo.ssbIdList.push_back(nbCellSsbIdInfo);
+        }
+        nrCellSsbIdsInfo->nbCellSsbList.push_back(neighboringCellSsbInfo);
+    }
+    return Response<NrCellSsbIds>(TELEPHONY_LOG_FUNC_NAME, responseInfo, nrCellSsbIdsInfo);
 }
 
 void TelRilNetwork::BuildSignalStrength(std::shared_ptr<Rssi> signalStrength, const HDI::Ril::V1_1::Rssi &rssi)
