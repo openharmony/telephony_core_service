@@ -31,9 +31,8 @@ using namespace OHOS::EventFwk;
 namespace OHOS {
 namespace Telephony {
 std::unique_ptr<ObserverHandler> IccFile::filesFetchedObser_ = nullptr;
-IccFile::IccFile(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager)
-    : AppExecFwk::EventHandler(runner), stateManager_(simStateManager)
+IccFile::IccFile(const std::string &name, std::shared_ptr<SimStateManager> simStateManager)
+    : TelEventHandler(name), stateManager_(simStateManager)
 {
     if (stateManager_ == nullptr) {
         TELEPHONY_LOGE("IccFile::IccFile set NULL SIMStateManager!!");

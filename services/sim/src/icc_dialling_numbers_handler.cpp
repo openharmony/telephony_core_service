@@ -343,7 +343,7 @@ bool IccDiallingNumbersHandler::SendBackResult(int loadId)
         TELEPHONY_LOGE("IccDiallingNumbersHandler::SendBackResult owner null pointer");
         return false;
     }
-    owner->SendEvent(id, data);
+    TelEventHandler::SendTelEvent(owner, id, data);
     ClearLoadRequest(loadId);
     TELEPHONY_LOGI("IccDiallingNumbersHandler::SendBackResult send end");
     return true;
