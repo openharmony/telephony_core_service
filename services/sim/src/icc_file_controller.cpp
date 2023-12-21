@@ -20,9 +20,7 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 namespace Telephony {
-IccFileController::IccFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int slotId)
-    : AppExecFwk::EventHandler(runner), slotId_(slotId)
-{}
+IccFileController::IccFileController(const std::string &name, int slotId) : TelEventHandler(name), slotId_(slotId) {}
 
 void IccFileController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
@@ -481,11 +479,7 @@ void IccFileController::SendResponse(std::shared_ptr<IccControllerHolder> holder
 
     isNull = (owner == nullptr);
     TELEPHONY_LOGD("IccFileController::SendResponse owner: %{public}d evtId: %{public}d", isNull, id);
-    if (needShare) {
-        owner->SendEvent(id, objectShare);
-    } else {
-        owner->SendEvent(id, objectUnique);
-    }
+    SendEvent(owner, id, needShare, objectShare, objectUnique);
     TELEPHONY_LOGD("IccFileController::SendResponse send end");
 }
 
@@ -508,7 +502,7 @@ void IccFileController::SendEfLinearResult(const AppExecFwk::InnerEvent::Pointer
         TELEPHONY_LOGE("event is nullptr!");
         return;
     }
-    handler->SendEvent(event);
+    TelEventHandler::SendTelEvent(handler, event);
 }
 
 void IccFileController::SendMultiRecordResult(
@@ -531,7 +525,7 @@ void IccFileController::SendMultiRecordResult(
         TELEPHONY_LOGE("event is nullptr!");
         return;
     }
-    handler->SendEvent(event);
+    TelEventHandler::SendTelEvent(handler, event);
 }
 
 AppExecFwk::InnerEvent::Pointer IccFileController::BuildCallerInfo(
@@ -710,13 +704,19 @@ bool IccFileController::ProcessErrorResponse(const AppExecFwk::InnerEvent::Point
     }
 
     TELEPHONY_LOGI("ProcessErrorResponse owner: evtId: %{public}d", id);
-    if (needShare) {
-        owner->SendEvent(id, objectShare);
-    } else {
-        owner->SendEvent(id, objectUnique);
-    }
+    SendEvent(owner, id, needShare, objectShare, objectUnique);
     TELEPHONY_LOGD("ProcessErrorResponse send end");
     return true;
+}
+
+void IccFileController::SendEvent(std::shared_ptr<AppExecFwk::EventHandler> handler, uint32_t id, bool needShare,
+    std::shared_ptr<ControllerToFileMsg> objectShare, std::unique_ptr<ControllerToFileMsg> &objectUnique)
+{
+    if (needShare) {
+        TelEventHandler::SendTelEvent(handler, id, objectShare);
+        return;
+    }
+    TelEventHandler::SendTelEvent(handler, id, objectUnique);
 }
 
 bool IccFileController::IsFixedNumberType(int efId)

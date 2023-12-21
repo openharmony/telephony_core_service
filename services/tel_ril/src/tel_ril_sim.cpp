@@ -106,7 +106,7 @@ int32_t TelRilSim::ErrorIccIoResponse(
             std::make_shared<Telephony::IccFromRilMsg>(toMsg->controlHolder);
         object->controlHolder = toMsg->controlHolder;
         object->fileData.exception = static_cast<std::shared_ptr<void>>(respInfo);
-        handler->SendEvent(eventId, object);
+        SendEventData(TELEPHONY_LOG_FUNC_NAME, eventId, handler, object);
     } else {
         TELEPHONY_LOGE("ERROR: telRilRequest or telRilRequest->pointer_ == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -143,7 +143,7 @@ int32_t TelRilSim::ProcessIccIoInfo(
     object->controlHolder = toMsg->controlHolder;
     object->arg1 = toMsg->arg1;
     object->arg2 = toMsg->arg2;
-    handler->SendEvent(eventId, object);
+    SendEventData(TELEPHONY_LOG_FUNC_NAME, eventId, handler, std::move(object));
     return TELEPHONY_ERR_SUCCESS;
 }
 

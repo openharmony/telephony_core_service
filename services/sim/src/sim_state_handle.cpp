@@ -53,9 +53,8 @@ const std::map<uint32_t, SimStateHandle::Func> SimStateHandle::memberFuncMap_ = 
     { MSG_SIM_SEND_NCFG_OPER_INFO_DONE, &SimStateHandle::GetSendSimMatchedOperatorInfoResult },
 };
 
-SimStateHandle::SimStateHandle(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, const std::weak_ptr<SimStateManager> &simStateManager)
-    : AppExecFwk::EventHandler(runner), simStateManager_(simStateManager)
+SimStateHandle::SimStateHandle(const std::weak_ptr<SimStateManager> &simStateManager)
+    : TelEventHandler("SimStateHandle"), simStateManager_(simStateManager)
 {
     TELEPHONY_LOGI("SimStateHandle::SimStateHandle()");
 }

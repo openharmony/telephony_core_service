@@ -27,6 +27,7 @@ ohos_fuzztest("SetShowNameFuzzTest") {
   include_dirs = [
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/include",
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
+    "$SUBSYSTEM_DIR/core_service/utils/common/include",
     "$SUBSYSTEM_DIR/core_service/services/core/include",
     "$SUBSYSTEM_DIR/core_service/services/network_search/include",
     "$SUBSYSTEM_DIR/core_service/services/sim/include",

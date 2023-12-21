@@ -26,9 +26,7 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
-RuimFile::RuimFile(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager)
-    : IccFile(runner, simStateManager)
+RuimFile::RuimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("RuimFile", simStateManager)
 {
     fileQueried_ = false;
     InitMemberFunc();

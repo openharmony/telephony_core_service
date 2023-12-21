@@ -42,6 +42,7 @@ std::shared_ptr<TelRilRequest> TelRilBase::CreateTelRilRequest(
     std::shared_ptr<TelRilRequest> telRilRequest = std::make_shared<TelRilRequest>(GetNextSerialId(), request, result);
     std::lock_guard<std::mutex> lockRequest(TelRilBase::requestLock_);
     TelRilBase::requestMap_.insert(std::make_pair(telRilRequest->serialId_, telRilRequest));
+    TELEPHONY_LOGD("CreateTelRilRequest serialId : %{public}d", static_cast<int32_t>(telRilRequest->serialId_));
     if (handler_ != nullptr) {
         handler_->ApplyRunningLock(TelRilHandler::NORMAL_RUNNING_LOCK);
     } else {
@@ -139,7 +140,8 @@ int32_t TelRilBase::ErrorResponse(
         respInfo->error = responseInfo.error;
         respInfo->flag = telRilRequest->pointer_->GetParam();
         DfxWriteCallFaultEvent(telRilRequest, static_cast<int32_t>(responseInfo.error));
-        return handler->SendEvent(eventId, respInfo);
+        TelEventHandler::SendTelEvent(handler, eventId, respInfo);
+        return static_cast<int32_t>(responseInfo.error);
     } else {
         TELEPHONY_LOGE("ERROR : telRilRequest  or telRilRequest->pointer_ is null !!!");
     }

@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Telephony {
 class RuimFile : public IccFile {
 public:
-    RuimFile(const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager);
+    explicit RuimFile(std::shared_ptr<SimStateManager> simStateManager);
     void StartLoad();
     std::string ObtainSimOperator();
     std::string ObtainIsoCountryCode();
