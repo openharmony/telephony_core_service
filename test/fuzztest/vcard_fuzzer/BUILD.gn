@@ -46,7 +46,7 @@ ohos_fuzztest("VcardFuzzTest") {
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",
-    "LOG_DOMAIN = 0xD000F00",
+    "LOG_DOMAIN = 0xD001F00",
   ]
 
   cflags = [
