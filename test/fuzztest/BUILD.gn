@@ -37,4 +37,5 @@ group("fuzztest") {
   deps += [ "imsregcallback_fuzzer:fuzztest" ]
   deps += [ "autotimezone_fuzzer:fuzztest" ]
   deps += [ "mcccountrycode_fuzzer:fuzztest" ]
+  deps += [ "vcard_fuzzer:fuzztest" ]
 }
