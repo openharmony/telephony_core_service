@@ -131,6 +131,7 @@ enum class DiffInterfaceId {
     TEST_GET_NR_OPTION_MODE,
     TEST_SET_NR_OPTION_MODE,
     TEST_GET_NR_SSBID_INFO,
+    TEST_GET_CELL_INFO_LIST_TYPE,
     TEST_EXIT,
 };
 
@@ -281,6 +282,7 @@ private:
     void GetNrOptionModeTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void SetNrOptionModeTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetNrSsbIdTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
+    void GetCellInfoListTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
 
     uint32_t GetRandNum();
     std::string GetRandPhoneNum(const int len);
