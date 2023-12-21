@@ -34,7 +34,7 @@ void NetworkType::ProcessGetPreferredNetwork(const AppExecFwk::InnerEvent::Point
     }
     std::shared_ptr<PreferredNetworkTypeInfo> preferredNetworkInfo =
         event->GetSharedObject<PreferredNetworkTypeInfo>();
-    if (TELEPHONY_EXT_WRAPPER.getPreferredNetworkExt_ != nullptr) {
+    if (TELEPHONY_EXT_WRAPPER.getPreferredNetworkExt_ != nullptr && preferredNetworkInfo != nullptr) {
         TELEPHONY_EXT_WRAPPER.getPreferredNetworkExt_(preferredNetworkInfo->preferredNetworkType);
     }
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
