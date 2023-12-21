@@ -161,6 +161,8 @@ public:
 
     int32_t GetRrcConnectionState(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
+    int32_t GetNrSsbId(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+
     int32_t SendGsmSms(
         int32_t slotId, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) override;
 

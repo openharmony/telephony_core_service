@@ -165,6 +165,22 @@ void UpdateIccDiallingNumbers(const uint8_t *data, size_t size)
     DelayedSingleton<CoreService>::GetInstance()->OnUpdateIccDiallingNumbers(dataMessageParcel, reply);
 }
 
+void GetNrSsbIdInfoTesting(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetNrSsbIdInfo(dataMessageParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -178,6 +194,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     HasOperatorPrivileges(data, size);
     GetCellInfoList(data, size);
     UpdateIccDiallingNumbers(data, size);
+    GetNrSsbIdInfoTesting(data, size);
     return;
 }
 } // namespace OHOS

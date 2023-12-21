@@ -137,6 +137,7 @@ public:
         int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback) override;
     int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType) override;
     int32_t FactoryReset(int32_t slotId) override;
+    int32_t GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation) override;
 
 private:
     template<class T>

@@ -26,6 +26,7 @@
 #include "network_selection.h"
 #include "network_type.h"
 #include "nitz_update.h"
+#include "nr_ssb_info.h"
 #include "operator_name.h"
 #include "radio_event.h"
 #include "radio_info.h"
@@ -59,6 +60,7 @@ public:
     void UpdateImsRegisterState(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t SendUpdateCellLocationRequest();
     PhoneType GetPhoneType();
+    int32_t GetNrSsbId(const std::shared_ptr<NrSsbInformation> &nrCellSsbIdsInfo);
 
     /**
      * Get signal quality
@@ -133,6 +135,9 @@ private:
     void RadioGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioResidentNetworkChange(const AppExecFwk::InnerEvent::Pointer &event);
     bool InitOperatorName();
+    void GetNrSsbIdResponse(const AppExecFwk::InnerEvent::Pointer &event);
+    void SyncGetSsbInfoResponse();
+    bool SubModuleInit();
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
@@ -146,6 +151,7 @@ private:
     std::unique_ptr<NetworkType> networkType_ = nullptr;
     std::unique_ptr<NitzUpdate> nitzUpdate_ = nullptr;
     std::unique_ptr<CellInfo> cellInfo_ = nullptr;
+    std::unique_ptr<NrSsbInfo> nrSsbInfo_ = nullptr;
     static const std::map<uint32_t, NsHandlerFunc> memberFuncMap_;
     int64_t lastTimeSignalReq_ = 0;
     int64_t lastTimeOperatorReq_ = 0;
