@@ -257,6 +257,7 @@ public:
     int32_t HandleRrcStateChanged(int32_t slotId, int32_t status);
     int32_t GetRrcConnectionState(int32_t slotId, int32_t &status) override;
     int32_t UpdateRrcConnectionState(int32_t slotId, int32_t &status);
+    int32_t GetNrSsbId(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation) override;
 
     inline void InitMsgNum(int32_t slotId)
     {
@@ -308,6 +309,11 @@ public:
     {
         return simManager_;
     }
+
+public:
+    static std::mutex ctx_;
+    static bool ssbResponseReady_;
+    static std::condition_variable cv_;
 
 private:
     bool InitPointer(std::shared_ptr<NetworkSearchManagerInner> &inner, int32_t slotId);

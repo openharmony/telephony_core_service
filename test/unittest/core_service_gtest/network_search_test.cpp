@@ -252,6 +252,35 @@ void NetworkSearchTest::PrintNrCellInformation(sptr<CellInformation> cell)
     TELEPHONY_LOGI("CellInformation nr is same as nrCell:%{public}d", *nrCell == nrCellInformation);
 }
 
+void NetworkSearchTest::PrintNrSsbIdInfo(std::shared_ptr<NrSsbInformation> nr)
+{
+    int32_t ssbListNum = 0;
+    int32_t nbCellNum = 0;
+    TELEPHONY_LOGI("NrCellSsbIdsInfo arfcn:%{private}d, cid:%{private}lld, pci:%{private}d, rsrp:%{public}d,"
+        "sinr:%{public}d, timeAdvance:%{private}d",
+        nr->GetArfcn(), nr->GetCid(), nr->GetPci(), nr->GetRsrp(), nr->GetSinr(), nr->GetTimeAdvance());
+    std::vector<SsbInfo> sCellSsbIdList;
+    nr->GetSCellSsbIdList(sCellSsbIdList);
+    for (auto info : sCellSsbIdList) {
+        ssbListNum = ssbListNum + 1;
+        TELEPHONY_LOGI("NrCellSsbIdsInfo sCellSsbNum:%{public}d, ssbId:%{private}d, rsrp:%{public}d",
+            ssbListNum, info.ssbId, info.rsrp);
+    }
+    TELEPHONY_LOGI("NrCellSsbIdsInfo nbCellCount:%{public}d", nr->GetNbCellCount());
+    std::vector<NeighboringCellSsbInformation> nbCellSsbIdList;
+    nr->GetNbCellSsbIdList(nbCellSsbIdList);
+    for (auto info : nbCellSsbIdList) {
+        nbCellNum = nbCellNum + 1;
+        TELEPHONY_LOGI("NrCellSsbIdsInfo nbCellNum:%{public}d, pci:%{private}d, arfcn:%{private}d",
+            nbCellNum, info.pci, info.arfcn);
+        ssbListNum = 0;
+        for (auto infoNbCell : info.ssbList) {
+            ssbListNum = ssbListNum + 1;
+            TELEPHONY_LOGI("NrCellSsbIdsInfo ssbId:%{private}d", infoNbCell.ssbId);
+        }
+    }
+}
+
 void NetworkSearchTest::PrintSignalInformation(std::vector<sptr<SignalInformation>> signalList)
 {
     for (const auto &signal : signalList) {

@@ -652,6 +652,11 @@ int32_t TelRilManager::GetRrcConnectionState(int32_t slotId, const AppExecFwk::I
     return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetRrcConnectionState);
 }
 
+int32_t TelRilManager::GetNrSsbId(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetNrSsbId);
+}
+
 /*********************** TelRilNetwork end ****************************/
 /*********************** TelRilSms start ******************************/
 int32_t TelRilManager::SendGsmSms(

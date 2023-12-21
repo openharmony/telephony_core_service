@@ -1000,6 +1000,16 @@ int32_t CoreServiceClient::GetBasebandVersion(int32_t slotId, std::string &versi
     return proxy->GetBasebandVersion(slotId, version);
 }
 
+int32_t CoreServiceClient::GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetNrSsbIdInfo(slotId, nrSsbInformation);
+}
+
 int32_t CoreServiceClient::FactoryReset(int32_t slotId)
 {
     auto proxy = GetProxy();

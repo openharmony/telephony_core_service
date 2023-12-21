@@ -189,6 +189,7 @@ void TelRilTest::OnInitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_GET_RRC_CONNECTION_STATE] = &TelRilTest::OnRequestGetRrcConnectionStateTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_NR_OPTION_MODE] = &TelRilTest::OnRequestGetNrOptionModeTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_NR_OPTION_MODE] = &TelRilTest::OnRequestSetNrOptionModeTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_NR_SSBID_INFO] = &TelRilTest::OnRequestGetNrSsbIdTest;
 }
 
 void TelRilTest::OnInitForRegister(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
@@ -1599,6 +1600,19 @@ void TelRilTest::OnRequestSetNrOptionModeTest(int32_t slotId, const std::shared_
     }
 }
 
+void TelRilTest::OnRequestGetNrSsbIdTest(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_NR_SSBID_INFO);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestGetNrSsbIdTest -->");
+        telRilManager_->GetNrSsbId(slotId, event);
+        TELEPHONY_LOGI("TelRilTest::OnRequestGetNrSsbIdTest --> finished");
+    }
+}
+
 void TelRilTest::OnRequestCallJoinTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     int32_t callType = 0; /* call type
@@ -2320,6 +2334,7 @@ void NetworkTest()
          << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_NR_OPTION_MODE) << "--> OnRequestSetNrOptionModeTest"
          << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_NR_SSBID_INFO) << "--> OnRequestGetNrSsbIdTest" << endl;
 }
 } // namespace Telephony
 } // namespace OHOS
