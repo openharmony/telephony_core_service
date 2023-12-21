@@ -30,6 +30,7 @@ ohos_unittest("tel_ril_gtest") {
     "tel_ril_sim_test.cpp",
     "tel_ril_sms_test.cpp",
     "tel_ril_test_util.cpp",
+    "zero_branch_test_tel_ril.cpp",
   ]
 
   include_dirs = [
@@ -51,6 +52,8 @@ ohos_unittest("tel_ril_gtest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "drivers_interface_ril:hril_innerkits",
+    "drivers_interface_ril:libril_proxy_1.1",
+    "drivers_interface_ril:libril_proxy_1.2",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",
