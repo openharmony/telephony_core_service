@@ -31,11 +31,10 @@ namespace Telephony {
 using namespace OHOS::EventFwk;
 using CommonEventSubscribeInfo = OHOS::EventFwk::CommonEventSubscribeInfo;
 using CommonEventSubscriber = OHOS::EventFwk::CommonEventSubscriber;
-class SimStateTracker : public AppExecFwk::EventHandler {
+class SimStateTracker : public TelEventHandler {
 public:
-    SimStateTracker(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache,
-        int32_t slotId);
+    SimStateTracker(std::weak_ptr<SimFileManager> simFileManager,
+        std::shared_ptr<OperatorConfigCache> operatorConfigCache, int32_t slotId);
     ~SimStateTracker();
     void InitListener();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);

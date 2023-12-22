@@ -37,11 +37,10 @@ const std::string PARAM_ALPHA_STRING = "alphaString";
 const std::string PARAM_REFRESH_RESULT = "refreshResult";
 } // namespace
 
-StkController::StkController(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    const std::weak_ptr<Telephony::ITelRilManager> &telRilManager,
+StkController::StkController(const std::weak_ptr<Telephony::ITelRilManager> &telRilManager,
     const std::weak_ptr<Telephony::SimStateManager> &simStateManager, int32_t slotId)
-    : AppExecFwk::EventHandler(runner), telRilManager_(telRilManager),
-    simStateManager_(simStateManager), slotId_(slotId)
+    : TelEventHandler("StkController"), telRilManager_(telRilManager), simStateManager_(simStateManager),
+      slotId_(slotId)
 {}
 
 void StkController::Init()

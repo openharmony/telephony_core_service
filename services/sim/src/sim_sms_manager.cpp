@@ -16,7 +16,7 @@
 #include "sim_sms_manager.h"
 
 #include "telephony_errors.h"
-#include "runner_pool.h"
+
 
 namespace OHOS {
 namespace Telephony {
@@ -43,19 +43,13 @@ void SimSmsManager::Init(int slotId)
         return;
     }
 
-    eventLoopSms_ = RunnerPool::GetInstance().GetCommonRunner();
-    if (eventLoopSms_.get() == nullptr) {
-        TELEPHONY_LOGE("simSmsController  failed to create EventRunner");
-        return;
-    }
-
     if (simFileManager_ == nullptr) {
         TELEPHONY_LOGE("SimSmsManager::Init SimFileManager null pointer");
         return;
     }
     std::shared_ptr<SimFileManager> fileManager = std::static_pointer_cast<SimFileManager>(simFileManager_);
 
-    smsController_ = std::make_shared<SimSmsController>(eventLoopSms_, stateManager_);
+    smsController_ = std::make_shared<SimSmsController>(stateManager_);
     if (smsController_ == nullptr) {
         TELEPHONY_LOGE("SimSmsManager::Init simFile create nullptr.");
         return;

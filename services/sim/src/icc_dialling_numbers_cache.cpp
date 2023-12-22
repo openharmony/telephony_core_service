@@ -15,13 +15,10 @@
 
 #include "icc_dialling_numbers_cache.h"
 
-#include "runner_pool.h"
-
 namespace OHOS {
 namespace Telephony {
-IccDiallingNumbersCache::IccDiallingNumbersCache(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimFileManager> simFileManager)
-    : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager)
+IccDiallingNumbersCache::IccDiallingNumbersCache(std::shared_ptr<SimFileManager> simFileManager)
+    : TelEventHandler("IccDiallingNumbersCache"), simFileManager_(simFileManager)
 {
     InitFileTypeMap();
 }
@@ -44,12 +41,7 @@ void IccDiallingNumbersCache::Init()
         return;
     }
 
-    std::shared_ptr<AppExecFwk::EventRunner> loaderLoop = RunnerPool::GetInstance().GetCommonRunner();
-    if (loaderLoop.get() == nullptr) {
-        TELEPHONY_LOGE("IccDiallingNumbersCache failed to create usimpdiallingnumbers loop");
-        return;
-    }
-    usimDiallingNumberSrv_ = std::make_shared<UsimDiallingNumbersService>(loaderLoop);
+    usimDiallingNumberSrv_ = std::make_shared<UsimDiallingNumbersService>();
     if (usimDiallingNumberSrv_ == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersCache failed to create usimpdiallingnumbers.");
         return;
@@ -322,7 +314,7 @@ void IccDiallingNumbersCache::SendBackResult(const AppExecFwk::InnerEvent::Point
     data->result = static_cast<std::shared_ptr<void>>(ar);
     data->exception = object;
     if (owner != nullptr) {
-        owner->SendEvent(id, data);
+        TelEventHandler::SendTelEvent(owner, id, data);
     } else {
         TELEPHONY_LOGE("IccDiallingNumbersCache::SendBackResult null owner");
     }

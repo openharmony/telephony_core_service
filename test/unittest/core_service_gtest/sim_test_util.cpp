@@ -107,7 +107,7 @@ bool SimTest::ParseOperatorConf(int32_t slotId)
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo,
         std::weak_ptr<ITelRilManager>(telRilManager), std::weak_ptr<SimStateManager>(simStateManager));
-    OperatorConfigCache ofpc(nullptr, std::weak_ptr<SimFileManager>(simFileManager), slotId);
+    OperatorConfigCache ofpc(std::weak_ptr<SimFileManager>(simFileManager), slotId);
     OperatorFileParser ofp;
     OperatorConfig poc;
     std::u16string result;

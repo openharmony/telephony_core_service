@@ -24,9 +24,8 @@ static const int64_t SET_ACTIVE_OUT_TIME = 10 * 1000;
 std::mutex RadioProtocolController::ctx_;
 std::condition_variable RadioProtocolController::cv_;
 
-RadioProtocolController::RadioProtocolController(
-    std::weak_ptr<Telephony::ITelRilManager> telRilManager, const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-    : AppExecFwk::EventHandler(runner), telRilManager_(telRilManager)
+RadioProtocolController::RadioProtocolController(std::weak_ptr<Telephony::ITelRilManager> telRilManager)
+    : TelEventHandler("RadioProtocolController"), telRilManager_(telRilManager)
 {}
 
 void RadioProtocolController::Init()

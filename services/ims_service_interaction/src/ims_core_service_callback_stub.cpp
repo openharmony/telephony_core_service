@@ -17,6 +17,7 @@
 
 #include "ims_core_service_client.h"
 #include "radio_event.h"
+#include "tel_event_handler.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
@@ -91,7 +92,8 @@ int32_t ImsCoreServiceCallbackStub::UpdateImsServiceStatusChanged(
     }
 
     *imsServiceState = imsServiceStatus;
-    imsCoreServiceClient->GetHandler(slotId)->SendEvent(RadioEvent::RADIO_IMS_SERVICE_STATUS_UPDATE, imsServiceState);
+    TelEventHandler::SendTelEvent(
+        imsCoreServiceClient->GetHandler(slotId), RadioEvent::RADIO_IMS_SERVICE_STATUS_UPDATE, imsServiceState);
     return TELEPHONY_SUCCESS;
 }
 
@@ -119,7 +121,8 @@ int32_t ImsCoreServiceCallbackStub::GetImsRegistrationStatusResponse(
     }
     std::shared_ptr<int32_t> isRegisterd = std::make_shared<int32_t>();
     *isRegisterd = imsRegStatus.isRegisterd ? 1 : 0;
-    imsCoreServiceClient->GetHandler(slotId)->SendEvent(RadioEvent::RADIO_IMS_REGISTER_STATE_UPDATE, isRegisterd);
+    TelEventHandler::SendTelEvent(
+        imsCoreServiceClient->GetHandler(slotId), RadioEvent::RADIO_IMS_REGISTER_STATE_UPDATE, isRegisterd);
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony

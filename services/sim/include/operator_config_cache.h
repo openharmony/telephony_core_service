@@ -22,10 +22,9 @@
 
 namespace OHOS {
 namespace Telephony {
-class OperatorConfigCache : public AppExecFwk::EventHandler {
+class OperatorConfigCache : public TelEventHandler {
 public:
-    explicit OperatorConfigCache(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        std::weak_ptr<SimFileManager> simFileManager, int32_t slotId);
+    explicit OperatorConfigCache(std::weak_ptr<SimFileManager> simFileManager, int32_t slotId);
     virtual ~OperatorConfigCache() = default;
     void ClearAllCache(int32_t slotId);
     void ClearMemoryCache(int32_t slotId);

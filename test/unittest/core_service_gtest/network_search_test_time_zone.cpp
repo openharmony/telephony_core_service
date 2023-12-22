@@ -43,8 +43,7 @@ constexpr int32_t TIMEZONE_OFFSET_NEGATIVE_1 = -1;
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UpdateCountryCode_0100, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>(eventLoop);
+    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>();
     timeZoneUpdater->Init();
     std::string countryCode = "cn";
     timeZoneUpdater->UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
@@ -78,8 +77,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UpdateCountryCode_0100, Func
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UpdateTimeZoneOffset_0100, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>(eventLoop);
+    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>();
     timeZoneUpdater->Init();
     std::string countryCode = "cn";
     timeZoneUpdater->UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
@@ -123,8 +121,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UpdateTimeZoneOffset_0100, F
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_TimeZoneID_0100, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>(eventLoop);
+    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>();
     timeZoneUpdater->Init();
     std::string countryCode = "cn";
     timeZoneUpdater->UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
@@ -166,8 +163,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_TimeZoneID_0100, Function | 
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_Location_0100, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto suggester = std::make_shared<TimeZoneLocationSuggester>(eventLoop);
+    auto suggester = std::make_shared<TimeZoneLocationSuggester>();
     auto idleState = new (std::nothrow) IdleState(std::weak_ptr<TimeZoneLocationSuggester>(suggester), "IdleState");
     auto nitzState = new (std::nothrow) NitzState(std::weak_ptr<TimeZoneLocationSuggester>(suggester), "NitzState");
     auto locationState =
