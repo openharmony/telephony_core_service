@@ -2714,18 +2714,6 @@ HWTEST_F(BranchTest, Telephony_IccFile_001, Function | MediumTest | Level1)
     iccFile->imsi_ = "123";
     iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_IMSI_LOADED_READY);
     iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_IMSI_LOADED_READY);
-    std::string iccId = "123456";
-    iccFile->SwapPairsForIccId(iccId);
-    EXPECT_EQ(iccId, "214365");
-    iccId = "12341A56";
-    iccFile->SwapPairsForIccId(iccId);
-    EXPECT_EQ(iccId, "2143");
-    iccId = "1234F156";
-    iccFile->SwapPairsForIccId(iccId);
-    EXPECT_EQ(iccId, "2143165");
-    iccId = "1234A156";
-    iccFile->SwapPairsForIccId(iccId);
-    EXPECT_EQ(iccId, "21431");
     std::string plmn = "";
     EXPECT_EQ(iccFile->ObtainEons(plmn, 1, true), "");
     plmn = "123";
@@ -2743,6 +2731,32 @@ HWTEST_F(BranchTest, Telephony_IccFile_001, Function | MediumTest | Level1)
     iccFile->oplFiles_.push_back(nullptr);
     EXPECT_EQ(iccFile->ObtainEons(plmn, 0, true), "");
     EXPECT_EQ(iccFile->ObtainEons(plmn, 0, false), "");
+}
+
+/**
+ * @tc.number   Telephony_IccFile_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_IccFile_002, Function | MediumTest | Level1) {
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    std::string iccId = "123456";
+    iccFile->SwapPairsForIccId(iccId);
+    EXPECT_EQ(iccId, "214365");
+    iccId = "12341A56";
+    iccFile->SwapPairsForIccId(iccId);
+    EXPECT_EQ(iccId, "2143");
+    iccId = "1234F156";
+    iccFile->SwapPairsForIccId(iccId);
+    EXPECT_EQ(iccId, "2143165");
+    iccId = "1234A156";
+    iccFile->SwapPairsForIccId(iccId);
+    EXPECT_EQ(iccId, "21431");
+    iccId = "1234AB56TF";
+    iccFile->GetFullIccid(iccId);
+    EXPECT_EQ(iccId, "2143BA65FT");
     std::string langData = "";
     EXPECT_EQ(iccFile->ObtainValidLanguage(langData), "");
 }

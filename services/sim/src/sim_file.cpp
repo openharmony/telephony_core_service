@@ -945,9 +945,13 @@ bool SimFile::ProcessGetIccIdDone(const AppExecFwk::InnerEvent::Pointer &event)
     }
     if (fd->exception == nullptr) {
         std::string iccData = fd->resultData;
+        TELEPHONY_LOGI("ICCID length is %{public}zu", iccData.length());
+        std::string fullIccData = iccData;
+        GetFullIccid(fullIccData);
         SwapPairsForIccId(iccData);
-        TELEPHONY_LOGI("SimFile::ProcessEvent ICCID result success");
-        iccId_ = iccData;
+        TELEPHONY_LOGI("SwapPairsForIccId ICCID length is %{public}zu", fullIccData.length());
+        decIccId_ = iccData;
+        iccId_ = fullIccData;
     }
     return isFileProcessResponse;
 }

@@ -146,6 +146,11 @@ std::string IccFile::ObtainIccId()
     return iccId_;
 }
 
+std::string IccFile::ObtainDecIccId()
+{
+    return decIccId_;
+}
+
 std::string IccFile::ObtainGid1()
 {
     return gid1_;
@@ -544,6 +549,16 @@ void IccFile::SwapPairsForIccId(std::string &iccId)
     iccId = result;
 }
 
+void IccFile::GetFullIccid(std::string &iccId)
+{
+    std::string result = "";
+    for (size_t i = 0; i < iccId.length() - 1; i += DATA_STEP) {
+        result += iccId[i + 1];
+        result += iccId[i];
+    }
+    iccId = result;
+}
+
 IccFile::~IccFile() {}
 
 void IccFile::SetRilAndFileController(const std::shared_ptr<Telephony::ITelRilManager> &ril,
@@ -609,6 +624,7 @@ void IccFile::ClearData()
 {
     imsi_ = "";
     iccId_ = "";
+    decIccId_ = "";
     UpdateSPN("");
     UpdateLoaded(false);
     operatorNumeric_ = "";
