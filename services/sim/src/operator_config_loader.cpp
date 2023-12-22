@@ -90,7 +90,7 @@ std::string OperatorConfigLoader::GetOpKey(std::shared_ptr<DataShare::DataShareR
         TELEPHONY_LOGE("GetOpKey simFileManager is nullptr");
         return DEFAULT_OPERATOR_KEY;
     }
-    iccidFromSim_ = Str16ToStr8(simFileManager->GetSimIccId());
+    iccidFromSim_ = Str16ToStr8(simFileManager->GetSimDecIccId());
     imsiFromSim_ = Str16ToStr8(simFileManager->GetIMSI());
     spnFromSim_ = Str16ToStr8(simFileManager->GetSimSpn());
     gid1FromSim_ = Str16ToStr8(simFileManager->GetSimGid1());

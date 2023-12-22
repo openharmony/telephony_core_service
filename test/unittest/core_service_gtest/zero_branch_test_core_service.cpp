@@ -435,6 +435,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | Med
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager, runner);
     std::shared_ptr<RadioProtocolController> radioProtocolController = nullptr;
+    multiSimController->PublishSetPrimaryEvent(true);
     multiSimController->EncryptIccId("");
     multiSimController->CheckIfNeedSwitchMainSlotId();
     EXPECT_FALSE(multiSimController->IsValidSlotId(INVALID_SLOTID));

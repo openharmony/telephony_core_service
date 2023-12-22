@@ -258,6 +258,18 @@ std::u16string SimFileManager::GetSimIccId()
     return Str8ToStr16(result);
 }
 
+std::u16string SimFileManager::GetSimDecIccId()
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("simFile is nullptr!");
+        return Str8ToStr16("");
+    }
+
+    std::string result = simFile_->ObtainDecIccId();
+    TELEPHONY_LOGD("obtain dec iccId result:%{public}s ", (result.empty() ? "false" : "true"));
+    return Str8ToStr16(result);
+}
+
 std::u16string SimFileManager::GetIMSI()
 {
     if (simFile_ == nullptr) {

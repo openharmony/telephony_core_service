@@ -48,6 +48,7 @@ public:
     std::u16string GetSimSpn();
     std::u16string GetSimEons(const std::string &plmn, int32_t lac, bool longNameRequired);
     std::u16string GetSimIccId();
+    std::u16string GetSimDecIccId();
     std::u16string GetIMSI();
     std::u16string GetLocaleFromDefaultSim();
     std::u16string GetSimGid1();
