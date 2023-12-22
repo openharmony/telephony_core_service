@@ -16,14 +16,15 @@
 #ifndef OHOS_ICC_DIALLING_NUMBERS_MANAGER_H
 #define OHOS_ICC_DIALLING_NUMBERS_MANAGER_H
 
-#include <iostream>
 #include <cstring>
+#include <iostream>
 #include <string>
 
+#include "dialling_numbers_info.h"
 #include "i_tel_ril_manager.h"
 #include "icc_dialling_numbers_cache.h"
 #include "sim_file_manager.h"
-#include "dialling_numbers_info.h"
+#include "tel_event_handler.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -33,9 +34,9 @@ enum DiallingNumbersMessageType {
     MSG_SIM_DIALLING_NUMBERS_WRITE_DONE,
     MSG_SIM_DIALLING_NUMBERS_DELETE_DONE,
 };
-class IccDiallingNumbersManager : public AppExecFwk::EventHandler {
+class IccDiallingNumbersManager : public TelEventHandler {
 public:
-    IccDiallingNumbersManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+    explicit IccDiallingNumbersManager(
         std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simState);
     ~IccDiallingNumbersManager();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);

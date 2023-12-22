@@ -26,7 +26,6 @@
 
 #include "device_state_handler.h"
 #include "device_state_observer.h"
-#include "event_handler.h"
 #include "i_network_search.h"
 #include "i_sim_manager.h"
 #include "i_tel_ril_manager.h"
@@ -56,7 +55,6 @@ struct NetworkSearchManagerInner {
     static const int64_t SERIAL_NUMBER_EXEMPT = 1100;
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
     std::shared_ptr<NetworkSearchHandler> networkSearchHandler_ = nullptr;
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     std::shared_ptr<DeviceStateHandler> deviceStateHandler_ = nullptr;
     std::shared_ptr<DeviceStateObserver> deviceStateObserver_ = nullptr;
@@ -104,9 +102,6 @@ struct NetworkSearchManagerInner {
             if (!RegisterDeviceStateObserver()) {
                 return false;
             }
-        }
-        if (eventLoop_ != nullptr) {
-            eventLoop_->Run();
         }
         state_ = HandleRunningState::STATE_RUNNING;
         return true;

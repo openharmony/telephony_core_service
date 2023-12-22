@@ -20,7 +20,6 @@
 #include "network_state.h"
 #include "parameters.h"
 #include "radio_event.h"
-#include "runner_pool.h"
 #include "system_ability_definition.h"
 #include "telephony_ext_wrapper.h"
 
@@ -608,12 +607,7 @@ bool SimFileManager::InitDiallingNumberHandler()
         diallingNumberHandler_->UpdateFileController(fileController_);
         return true;
     }
-    std::shared_ptr<AppExecFwk::EventRunner> loaderLoop = RunnerPool::GetInstance().GetCommonRunner();
-    if (loaderLoop.get() == nullptr) {
-        TELEPHONY_LOGE("SimFileManager failed to create diallingNumberloader loop");
-        return false;
-    }
-    diallingNumberHandler_ = std::make_shared<IccDiallingNumbersHandler>(loaderLoop, fileController_);
+    diallingNumberHandler_ = std::make_shared<IccDiallingNumbersHandler>(fileController_);
     if (diallingNumberHandler_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager failed to create IccDiallingNumbersHandler.");
         return false;

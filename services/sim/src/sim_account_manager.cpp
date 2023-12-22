@@ -15,7 +15,6 @@
 
 #include "sim_account_manager.h"
 
-#include "runner_pool.h"
 #include "string_ex.h"
 
 namespace OHOS {
@@ -48,25 +47,15 @@ void SimAccountManager::Init(int32_t slotId)
         TELEPHONY_LOGE("SimAccountManager::init SimAccountManager invalid slotId = %{public}d", slotId);
         return;
     }
-    operatorConfigCacheRunner_ = RunnerPool::GetInstance().GetSimDbAndFileRunner();
-    if (operatorConfigCacheRunner_.get() == nullptr) {
-        TELEPHONY_LOGE("SimAccountManager::Init operatorConfigCacheRunner_ failed");
-        return;
-    }
-    operatorConfigCache_ = std::make_shared<OperatorConfigCache>(
-        operatorConfigCacheRunner_, std::weak_ptr<SimFileManager>(simFileManager_), slotId);
+    operatorConfigCache_ =
+        std::make_shared<OperatorConfigCache>(std::weak_ptr<SimFileManager>(simFileManager_), slotId);
     if (operatorConfigCache_ == nullptr) {
         TELEPHONY_LOGE("SimAccountManager::operatorConfigCache_ is null");
         return;
     }
     operatorConfigCache_->RegisterForIccChange();
-    simStateTrackerRunner_ = RunnerPool::GetInstance().GetSimDbAndFileRunner();
-    if (simStateTrackerRunner_.get() == nullptr) {
-        TELEPHONY_LOGE("SimAccountManager::Init simStateTrackerRunner_ failed");
-        return;
-    }
-    simStateTracker_ = std::make_shared<SimStateTracker>(
-        simStateTrackerRunner_, std::weak_ptr<SimFileManager>(simFileManager_), operatorConfigCache_, slotId);
+    simStateTracker_ =
+        std::make_shared<SimStateTracker>(std::weak_ptr<SimFileManager>(simFileManager_), operatorConfigCache_, slotId);
     if (simStateTracker_ == nullptr) {
         TELEPHONY_LOGE("SimAccountManager::simStateTracker_ is null");
         return;
@@ -111,16 +100,11 @@ int32_t SimAccountManager::HasOperatorPrivileges(const int32_t slotId, bool &has
     if (privilegeController_ != nullptr) {
         return privilegeController_->HasOperatorPrivileges(hasOperatorPrivileges);
     }
-    if (privilegesRunner_.get() == nullptr) {
-        TELEPHONY_LOGE("make privilegesRunner_");
-        privilegesRunner_ = RunnerPool::GetInstance().GetCommonRunner();
-    }
-    if ((privilegesRunner_ == nullptr) || (telRilManager_ == nullptr) || (simStateManager_ == nullptr)) {
-        TELEPHONY_LOGE("has nullptr at privilegesRunner_ or telRilManager_ or simStateManager_");
+    if ((telRilManager_ == nullptr) || (simStateManager_ == nullptr)) {
+        TELEPHONY_LOGE("has nullptr at telRilManager_ or simStateManager_");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    auto controller =
-        std::make_shared<IccOperatorPrivilegeController>(privilegesRunner_, telRilManager_, simStateManager_);
+    auto controller = std::make_shared<IccOperatorPrivilegeController>(telRilManager_, simStateManager_);
     if (controller == nullptr) {
         TELEPHONY_LOGE("Make IccOperatorPrivilegeController fail!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

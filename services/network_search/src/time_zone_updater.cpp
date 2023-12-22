@@ -46,7 +46,7 @@ constexpr int32_t TIMEZONE_OFFSET_INVALID = TIMEZONE_OFFSET_MAX + 1;
 constexpr int32_t QUARTER_TO_MILLISECOND = 15 * 60 * 1000;
 constexpr int LOCATION_TIME_OUT_MS = 30 * 1000;
 
-TimeZoneUpdater::TimeZoneUpdater(const std::shared_ptr<EventRunner> &runner) : EventHandler(runner)
+TimeZoneUpdater::TimeZoneUpdater() : TelEventHandler("TimeZoneUpdater")
 {
     offset_ = TIMEZONE_OFFSET_INVALID;
     memberFuncMap_[SettingEventCode::MSG_AUTO_TIMEZONE] = &TimeZoneUpdater::HandleAutoTimeZoneChange;
@@ -87,7 +87,7 @@ void TimeZoneUpdater::Init()
         return;
     }
 
-    locationSuggester_ = std::make_shared<TimeZoneLocationSuggester>(GetEventRunner());
+    locationSuggester_ = std::make_shared<TimeZoneLocationSuggester>();
     if (locationSuggester_ == nullptr) {
         TELEPHONY_LOGE("failed to create new TimeZoneLocationSuggester");
         return;
@@ -593,7 +593,7 @@ void TimeZoneUpdater::AutoTimezoneObserver::OnChange()
 {
     if (eventHandler_ != nullptr) {
         InnerEvent::Pointer event = InnerEvent::Get(SettingEventCode::MSG_AUTO_TIMEZONE);
-        eventHandler_->SendEvent(event);
+        TelEventHandler::SendTelEvent(eventHandler_, event);
     }
 }
 
@@ -605,7 +605,7 @@ void TimeZoneUpdater::AirplaneModeObserver::OnChange()
 {
     if (eventHandler_ != nullptr) {
         InnerEvent::Pointer event = InnerEvent::Get(SettingEventCode::MSG_AUTO_AIRPLANE_MODE);
-        eventHandler_->SendEvent(event);
+        TelEventHandler::SendTelEvent(eventHandler_, event);
     }
 }
 
@@ -624,7 +624,7 @@ void TimeZoneUpdater::DeviceStateEventSubscriber::OnReceiveEvent(const EventFwk:
     std::string action = want.GetAction();
     if (action == CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
         InnerEvent::Pointer event = InnerEvent::Get(TimeZoneEventCode::EVENT_SCREEN_ON);
-        eventHandler_->SendEvent(event);
+        TelEventHandler::SendTelEvent(eventHandler_, event);
     } else if (action == CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE) {
         int32_t bearType = data.GetWant().GetIntParam(NET_TYPE, NetManagerStandard::NetBearType::BEARER_DEFAULT);
         if (bearType != NetManagerStandard::NetBearType::BEARER_WIFI &&
@@ -634,7 +634,7 @@ void TimeZoneUpdater::DeviceStateEventSubscriber::OnReceiveEvent(const EventFwk:
         bool isConnected = data.GetCode() == NetManagerStandard::NetConnState::NET_CONN_STATE_CONNECTED;
         if (isConnected) {
             InnerEvent::Pointer event = InnerEvent::Get(TimeZoneEventCode::EVENT_NETWORK_CONNECTED);
-            eventHandler_->SendEvent(event);
+            TelEventHandler::SendTelEvent(eventHandler_, event);
         }
     }
 }

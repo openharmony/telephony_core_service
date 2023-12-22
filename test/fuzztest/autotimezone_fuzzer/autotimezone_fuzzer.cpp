@@ -49,7 +49,6 @@ bool IsServiceInited()
         auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
         auto inner = std::make_shared<NetworkSearchManagerInner>();
         networkSearchManager->AddManagerInner(DEFAULT_SIM_SLOT_ID, inner);
-        inner->eventLoop_ = AppExecFwk::EventRunner::Create("test");
         TimeZoneManager::GetInstance().Init(networkSearchManager);
         g_isInited = true;
     }

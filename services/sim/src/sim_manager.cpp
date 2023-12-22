@@ -17,7 +17,6 @@
 
 #include "core_service_errors.h"
 #include "radio_event.h"
-#include "runner_pool.h"
 #include "telephony_errors.h"
 
 namespace OHOS {
@@ -86,26 +85,17 @@ void SimManager::InitMultiSimObject()
 
 void SimManager::InitSingleSimObject()
 {
-    controllerRunner_ = RunnerPool::GetInstance().GetCommonRunner();
-    if (controllerRunner_.get() == nullptr) {
-        TELEPHONY_LOGE("SimManager::InitSingleSimObject get controllerRunner_ failed");
-        return;
-    }
-    multiSimController_ =
-        std::make_shared<MultiSimController>(telRilManager_, simStateManager_, simFileManager_, controllerRunner_);
+    multiSimController_ = std::make_shared<MultiSimController>(telRilManager_, simStateManager_, simFileManager_);
     if (multiSimController_ == nullptr) {
         TELEPHONY_LOGE("SimManager::InitSingleSimObject multiSimController init failed");
         return;
     }
     multiSimController_->Init();
-
-    monitorRunner_ = RunnerPool::GetInstance().GetSimDbAndFileRunner();
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager;
     for (auto simFile : simFileManager_) {
         simFileManager.push_back(std::weak_ptr<Telephony::SimFileManager>(simFile));
     }
-    multiSimMonitor_ =
-        std::make_shared<MultiSimMonitor>(monitorRunner_, multiSimController_, simStateManager_, simFileManager);
+    multiSimMonitor_ = std::make_shared<MultiSimMonitor>(multiSimController_, simStateManager_, simFileManager);
     if (multiSimMonitor_ == nullptr) {
         TELEPHONY_LOGE("SimAccountManager:: multiSimMonitor is null");
         return;

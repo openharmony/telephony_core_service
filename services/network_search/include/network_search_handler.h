@@ -19,7 +19,6 @@
 #include <memory>
 
 #include "cell_info.h"
-#include "event_handler.h"
 #include "i_sim_manager.h"
 #include "i_tel_ril_manager.h"
 #include "network_register.h"
@@ -32,15 +31,15 @@
 #include "radio_info.h"
 #include "signal_info.h"
 #include "system_ability_status_change_stub.h"
+#include "tel_event_handler.h"
 
 namespace OHOS {
 namespace Telephony {
 class NetworkSearchManager;
-class NetworkSearchHandler : public AppExecFwk::EventHandler {
+class NetworkSearchHandler : public TelEventHandler {
 public:
     using NsHandlerFunc = void (NetworkSearchHandler::*)(const AppExecFwk::InnerEvent::Pointer &);
-    NetworkSearchHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        const std::weak_ptr<NetworkSearchManager> &networkSearchManager,
+    explicit NetworkSearchHandler(const std::weak_ptr<NetworkSearchManager> &networkSearchManager,
         const std::weak_ptr<ITelRilManager> &telRilManager, const std::weak_ptr<ISimManager> &simManager,
         int32_t slotId);
     virtual ~NetworkSearchHandler();
