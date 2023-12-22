@@ -62,8 +62,6 @@ public:
     typedef int32_t (*WRAP_NATIVE_NETWORK_MODE_EXT)(int32_t nativeMode);
     typedef void (*ON_GET_NETWORK_SEARCH_INFORMATION_EXT)(int32_t &availableSize,
         std::vector<OHOS::Telephony::NetworkInformation> &networkInformations);
-    typedef void (*FILTER_SEND_SIGNAL_INFORMAION_EXT)(int32_t slotId,
-	    std::vector<sptr<OHOS::Telephony::SignalInformation>> &vec);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -90,7 +88,6 @@ public:
     GET_NETWORK_CAPABILITY_EXT getNetworkCapabilityExt_ = nullptr;
     WRAP_NATIVE_NETWORK_MODE_EXT wrapNativeNetworkModeExt_ = nullptr;
     ON_GET_NETWORK_SEARCH_INFORMATION_EXT onGetNetworkSearchInformationExt_ = nullptr;
-    FILTER_SEND_SIGNAL_INFORMAION_EXT filterSendSignalInformationExt_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;

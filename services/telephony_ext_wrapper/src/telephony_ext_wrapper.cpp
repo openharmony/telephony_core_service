@@ -56,14 +56,12 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
         (WRAP_NATIVE_NETWORK_MODE_EXT)dlsym(telephonyExtWrapperHandle_, "WrapNativeNetworkModeExt");
     onGetNetworkSearchInformationExt_ = (ON_GET_NETWORK_SEARCH_INFORMATION_EXT)dlsym(telephonyExtWrapperHandle_,
         "OnGetNetworkSearchInformationExt");
-    filterSendSignalInformationExt_ =
-        (FILTER_SEND_SIGNAL_INFORMAION_EXT)dlsym(telephonyExtWrapperHandle_, "FilterSendSignalInformationExt");
     getNetworkStatusExt_ = (GET_NETWORK_STATUS_EXT)dlsym(telephonyExtWrapperHandle_, "GetNetworkStatusExt");
     if (checkOpcVersionIsUpdate_ == nullptr || updateOpcVersion_ == nullptr || getCellInfoList_ == nullptr ||
         getRadioTechExt_ == nullptr || getNrOptionModeExt_ == nullptr || getSignalInfoListExt_ == nullptr ||
         isCapabilitySupportExt_ == nullptr || getNetworkCapabilityExt_ == nullptr ||
-        wrapNativeNetworkModeExt_ == nullptr || onGetNetworkSearchInformationExt_ == nullptr ||
-        filterSendSignalInformationExt_ == nullptr || getNetworkStatusExt_ == nullptr || isNrSupportedNative_ == nullptr
+        wrapNativeNetworkModeExt_ == nullptr || onGetNetworkSearchInformationExt_ == nullptr
+        || getNetworkStatusExt_ == nullptr || isNrSupportedNative_ == nullptr
         || getNrOptionModeExtend_ == nullptr || getPreferredNetworkExt_ == nullptr
     ) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
