@@ -21,12 +21,9 @@ import("//build/test.gni")
 ohos_fuzztest("VcardFuzzTest") {
   module_output_path = "core_service/core_service"
   module_out_path = module_output_path
-  fuzz_config_file =
-      "$SUBSYSTEM_DIR/core_service/test/fuzztest/vcard_fuzzer"
+  fuzz_config_file = "$SUBSYSTEM_DIR/core_service/test/fuzztest/vcard_fuzzer"
 
-  include_dirs = [
-    "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer"
-  ]
+  include_dirs = [ "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer" ]
 
   configs = [ "$SUBSYSTEM_DIR/core_service/utils:telephony_log_config" ]
 
@@ -39,10 +36,10 @@ ohos_fuzztest("VcardFuzzTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
-    "hilog:libhilog",
     "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
+    "hilog:libhilog",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",
@@ -55,9 +52,7 @@ ohos_fuzztest("VcardFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [
-    "vcard_fuzzer.cpp"
-  ]
+  sources = [ "vcard_fuzzer.cpp" ]
 }
 
 ###############################################################################
