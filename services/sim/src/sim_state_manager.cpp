@@ -44,12 +44,7 @@ void SimStateManager::Init(int32_t slotId)
         TELEPHONY_LOGE("SimStateManager::Init telRilManager_ is null.");
         return;
     }
-    eventLoop_ = RunnerPool::GetInstance().GetCommonRunner();
-    if (eventLoop_.get() == nullptr) {
-        TELEPHONY_LOGE("SimStateHandle failed to create EventRunner");
-        return;
-    }
-    simStateHandle_ = std::make_shared<SimStateHandle>(eventLoop_, shared_from_this());
+    simStateHandle_ = std::make_shared<SimStateHandle>(shared_from_this());
     if (simStateHandle_ == nullptr) {
         TELEPHONY_LOGE("SimStateManager::failed to create new SimStateHandle");
         return;

@@ -130,11 +130,10 @@ HWTEST_F(SimRilBranchTest, Telephony_SimAccountManager_001, Function | MediumTes
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    auto runner = AppExecFwk::EventRunner::Create("SimAccountManager");
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(runner, subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
     auto simAccountManager = std::make_shared<SimAccountManager>(telRilManager, simStateManager, simFileManager);
     simAccountManager->Init(0);
     simAccountManager->Init(-1);
@@ -170,7 +169,7 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_001, Function | Medium
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(runner, subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(runner, simFileManager, 0);
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
     operatorConfigLoader->LoadOperatorConfig(0);
@@ -214,11 +213,10 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateTracker_001, Function | MediumTest 
     auto operatorConfigCacheRunner = AppExecFwk::EventRunner::Create("test");
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    auto runner = AppExecFwk::EventRunner::Create("SimAccountManager");
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(runner, subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(operatorConfigCacheRunner, simFileManager, 0);
     auto simStateTracker =
         std::make_shared<SimStateTracker>(simStateTrackerRunner, simFileManager, operatorConfigCache, 0);
@@ -260,12 +258,11 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_001, Function | Med
     auto eventLoopDiallingNumbers = AppExecFwk::EventRunner::Create("test");
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    auto runner = AppExecFwk::EventRunner::Create("SimAccountManager");
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(runner, subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
     auto diallingNumbersCache = std::make_shared<IccDiallingNumbersCache>(eventLoopDiallingNumbers, simFileManager);
     diallingNumbersCache->simFileManager_ = nullptr;
     diallingNumbersCache->Init();
@@ -290,7 +287,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersHandler_001, Function | M
 {
     std::shared_ptr<AppExecFwk::EventRunner> loaderLoop = AppExecFwk::EventRunner::Create("test");
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
-    std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(runner, 1);
+    std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(1);
     auto diallingNumberHandler = std::make_shared<IccDiallingNumbersHandler>(loaderLoop, iccFileController);
     diallingNumberHandler->fileController_ = nullptr;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
@@ -336,15 +333,14 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_001, Function | M
 {
     RunnerPool::GetInstance().Init();
     auto telRilManager = std::make_shared<TelRilManager>();
-    auto runner = AppExecFwk::EventRunner::Create("SimAccountManager");
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager1 = std::make_shared<SimFileManager>(runner, subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager1 = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
     simFileManager1 = nullptr;
     IccDiallingNumbersManager::CreateInstance(simFileManager1, simStateManager);
-    auto simFileManager = std::make_shared<SimFileManager>(runner, subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     iccDiallingNumbersManager->stateDiallingNumbers_ = IccDiallingNumbersManager::HandleRunningState::STATE_RUNNING;
     iccDiallingNumbersManager->Init();
@@ -460,8 +456,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_002, Function | MediumTest |
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
-    auto simStateHandle = std::make_shared<SimStateHandle>(runner, simStateManager);
+    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManager);
     simStateHandle->Init(0);
     std::shared_ptr<TelRilManager> telRilManager1 = std::make_shared<TelRilManager>();
     telRilManager1 = nullptr;
@@ -567,7 +562,7 @@ HWTEST_F(SimRilBranchTest, Telephony_tel_ril_manager_001, Function | MediumTest 
 HWTEST_F(SimRilBranchTest, Telephony_IccFileController_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
-    std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(runner, 1);
+    std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(1);
     auto event = AppExecFwk::InnerEvent::Get(0);
     iccFileController->ProcessReadBinary(event);
     std::shared_ptr<IccControllerHolder> holder = nullptr;
@@ -684,7 +679,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_001, Function | MediumTest | Level1
 {
     std::shared_ptr<AppExecFwk::EventRunner> runner = nullptr;
     std::shared_ptr<SimStateManager> simStateManager = nullptr;
-    auto simFile = std::make_shared<SimFile>(runner, simStateManager);
+    auto simFile = std::make_shared<SimFile>(simStateManager);
     std::vector<int> testCase1 = { MSG_SIM_OBTAIN_GID1_DONE, MSG_SIM_OBTAIN_GID2_DONE, MSG_SIM_SET_MSISDN_DONE,
         MSG_SIM_OBTAIN_SPDI_DONE, MSG_SIM_OBTAIN_CFIS_DONE, MSG_SIM_OBTAIN_MWIS_DONE,
         MSG_SIM_OBTAIN_VOICE_MAIL_INDICATOR_CPHS_DONE, MSG_SIM_OBTAIN_ICCID_DONE, MSG_SIM_OBTAIN_CFF_DONE,
@@ -730,7 +725,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_002, Function | MediumTest | Level1
 {
     std::shared_ptr<AppExecFwk::EventRunner> runner = nullptr;
     std::shared_ptr<SimStateManager> simStateManager = nullptr;
-    auto simFile = std::make_shared<SimFile>(runner, simStateManager);
+    auto simFile = std::make_shared<SimFile>(simStateManager);
     int32_t voiceMailCount = 2;
     simFile->SetVoiceMailCount(voiceMailCount);
     bool enable = true;

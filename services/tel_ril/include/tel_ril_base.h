@@ -85,6 +85,9 @@ protected:
     inline int32_t Notify(const char *funcName, std::shared_ptr<T> data, RadioEvent notifyId);
     inline int32_t ConfirmSupplementOfTelRilRequestInfo(
         const char *funcName, std::shared_ptr<TelRilRequest> telRilRequest);
+    template<typename T>
+    inline int32_t SendEventData(
+        const char *funcName, uint32_t eventId, std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler, T data);
 
 protected:
     std::shared_ptr<ObserverHandler> observerHandler_;
@@ -97,9 +100,6 @@ private:
     template<typename T>
     inline int32_t SendHandlerEvent(const char *funcName, std::shared_ptr<TelRilRequest> telRilRequest,
         std::function<T(std::shared_ptr<TelRilRequest>)> getDataFunc);
-    template<typename T>
-    inline int32_t SendEventData(
-        const char *funcName, uint32_t eventId, std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler, T data);
     void DfxWriteCallFaultEvent(std::shared_ptr<TelRilRequest> telRilRequest, const int32_t error);
 
 private:
@@ -196,7 +196,7 @@ template<typename T>
 inline int32_t TelRilBase::SendEventData(
     const char *funcName, uint32_t eventId, std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler, T data)
 {
-    if (!handler->SendEvent(eventId, data)) {
+    if (!TelEventHandler::SendTelEvent(handler, eventId, data)) {
         TELEPHONY_LOGE("func %{public}s Send eventId:%{public}d is failed!", funcName, eventId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }

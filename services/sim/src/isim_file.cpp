@@ -25,9 +25,7 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
-IsimFile::IsimFile(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager)
-    : IccFile(runner, simStateManager)
+IsimFile::IsimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("IsimFile", simStateManager)
 {
     fileQueried_ = false;
     InitMemberFunc();

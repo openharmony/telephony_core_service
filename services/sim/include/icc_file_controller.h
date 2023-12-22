@@ -19,19 +19,18 @@
 #include <cstring>
 #include <string>
 
-#include "event_handler.h"
-#include "event_runner.h"
 #include "i_tel_ril_manager.h"
 #include "sim_constant.h"
 #include "sim_data_type.h"
 #include "sim_utils.h"
+#include "tel_event_handler.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-class IccFileController : public AppExecFwk::EventHandler {
+class IccFileController : public TelEventHandler {
 public:
-    IccFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int slotId);
+    explicit IccFileController(const std::string &name, int slotId);
     virtual void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     virtual ~IccFileController();
     void ObtainBinaryFile(int fileId, const AppExecFwk::InnerEvent::Pointer &event);
@@ -82,6 +81,8 @@ protected:
     void ProcessLinearRecordSize(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessReadBinary(const AppExecFwk::InnerEvent::Pointer &event);
+    void SendEvent(std::shared_ptr<AppExecFwk::EventHandler> handler, uint32_t id, bool needShare,
+        std::shared_ptr<ControllerToFileMsg> objectShare, std::unique_ptr<ControllerToFileMsg> &objectUnique);
 
 private:
     const int RECORD_NUM = 3;

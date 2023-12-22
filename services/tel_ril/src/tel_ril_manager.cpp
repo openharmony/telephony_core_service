@@ -70,14 +70,8 @@ bool TelRilManager::ConnectRilInterface()
 
 void TelRilManager::CreatTelRilHandler(void)
 {
-    eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
-    if (eventLoop_ == nullptr) {
-        TELEPHONY_LOGE("Failed to create EventRunner");
-        return;
-    }
-    handler_ = std::make_shared<TelRilHandler>(eventLoop_);
+    handler_ = std::make_shared<TelRilHandler>();
     handler_->OnInit();
-    eventLoop_->Run();
 }
 
 void TelRilManager::ReduceRunningLock()
