@@ -52,8 +52,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, refId);
     auto telRilManager_ = std::make_shared<TelRilManager>();
     auto stateManager_ = std::make_shared<SimStateManager>(telRilManager_);
-    auto eventLoopRecord_ = AppExecFwk::EventRunner::Create("IccFile");
-    auto ruimFile = std::make_shared<RuimFile>(eventLoopRecord_, stateManager_);
+    auto ruimFile = std::make_shared<RuimFile>(stateManager_);
     ruimFile->ObtainSpnCondition(roaming, operatorNum);
     ruimFile->UpdateVoiceMail(mailName, mailNumber);
     ruimFile->ObtainIsoCountryCode();

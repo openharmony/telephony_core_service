@@ -87,11 +87,7 @@ void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             TELEPHONY_LOGE("sim is not exist");
             return;
         }
-        std::thread loadOperatorConfigTask([&]() {
-            pthread_setname_np(pthread_self(), "load_operator_config");
-            operatorConfigLoader_->LoadOperatorConfig(slotId_);
-        });
-        loadOperatorConfigTask.detach();
+        TelFFRTUtils::Submit([&]() { operatorConfigLoader_->LoadOperatorConfig(slotId_); });
     }
 }
 

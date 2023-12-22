@@ -44,6 +44,7 @@
                 "data_share",
                 "drivers_interface_ril",
                 "eventhandler",
+                "ffrt",
                 "hdf_core",
                 "hilog",
                 "hisysevent",

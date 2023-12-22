@@ -65,7 +65,6 @@ private:
 private:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<SimStateHandle> simStateHandle_ = nullptr;
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
     SimHandleRun simStateRun_ = STATE_NOT_START;
     static std::mutex mtx_;
 };

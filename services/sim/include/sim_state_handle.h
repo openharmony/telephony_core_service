@@ -16,23 +16,22 @@
 #ifndef OHOS_SIM_STATE_HANDLE_H
 #define OHOS_SIM_STATE_HANDLE_H
 
+#include <chrono>
+#include <condition_variable>
 #include <list>
 #include <memory>
 #include <mutex>
-#include <condition_variable>
-#include <chrono>
 #include <string>
 #include <vector>
 
-#include "event_handler.h"
-#include "event_runner.h"
-#include "want.h"
-#include "i_tel_ril_manager.h"
 #include "i_sim_manager.h"
+#include "i_tel_ril_manager.h"
 #include "icc_state.h"
 #include "observer_handler.h"
 #include "sim_state_type.h"
+#include "tel_event_handler.h"
 #include "telephony_errors.h"
+#include "want.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -101,11 +100,10 @@ struct UnlockData {
     int32_t lockState = 0;
 };
 
-class SimStateHandle : public AppExecFwk::EventHandler {
+class SimStateHandle : public TelEventHandler {
 public:
     using Func = void (SimStateHandle::*)(int32_t, const AppExecFwk::InnerEvent::Pointer &);
-    SimStateHandle(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        const std::weak_ptr<SimStateManager> &simStateManager);
+    explicit SimStateHandle(const std::weak_ptr<SimStateManager> &simStateManager);
     ~SimStateHandle() = default;
     void Init(int32_t slotId);
     void UnInit();

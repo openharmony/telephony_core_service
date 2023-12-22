@@ -29,6 +29,7 @@ ohos_fuzztest("SendEnvelopeCmdFuzzTest") {
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
     "$SUBSYSTEM_DIR/core_service/services/core/include",
     "$SUBSYSTEM_DIR/core_service/services/network_search/include",
+    "$SUBSYSTEM_DIR/core_service/utils/common/include",
     "$SUBSYSTEM_DIR/core_service/services/sim/include",
     "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer",
     "$SUBSYSTEM_DIR/core_service/services/tel_ril/include",
