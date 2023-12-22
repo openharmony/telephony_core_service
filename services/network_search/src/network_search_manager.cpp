@@ -69,13 +69,6 @@ bool NetworkSearchManager::InitPointer(std::shared_ptr<NetworkSearchManagerInner
         TELEPHONY_LOGE("NetworkSearchManager::InitPointer failed . inner is null");
         return false;
     }
-    std::string name = "NetworkSearchManager_";
-    name.append(std::to_string(slotId));
-    inner->eventLoop_ = AppExecFwk::EventRunner::Create(name.c_str());
-    if (inner->eventLoop_.get() == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchManager failed to create EventRunner slotId:%{public}d", slotId);
-        return false;
-    }
     inner->observerHandler_ = std::make_unique<ObserverHandler>();
     if (inner->observerHandler_ == nullptr) {
         TELEPHONY_LOGE("failed to create new ObserverHandler slotId:%{public}d", slotId);
@@ -86,8 +79,8 @@ bool NetworkSearchManager::InitPointer(std::shared_ptr<NetworkSearchManagerInner
         TELEPHONY_LOGE("failed to create new NetworkSearchState slotId:%{public}d", slotId);
         return false;
     }
-    inner->networkSearchHandler_ = std::make_shared<NetworkSearchHandler>(
-        inner->eventLoop_, shared_from_this(), telRilManager_, simManager_, slotId);
+    inner->networkSearchHandler_ =
+        std::make_shared<NetworkSearchHandler>(shared_from_this(), telRilManager_, simManager_, slotId);
     if (inner->networkSearchHandler_ == nullptr) {
         TELEPHONY_LOGE("failed to create new NetworkSearchHandler slotId:%{public}d", slotId);
         return false;

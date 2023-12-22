@@ -18,12 +18,13 @@
 
 #include <algorithm>
 #include <iostream>
-#include <vector>
 #include <map>
+#include <vector>
 
+#include "icc_dialling_numbers_handler.h"
 #include "icc_file_controller.h"
 #include "sim_file_manager.h"
-#include "icc_dialling_numbers_handler.h"
+#include "tel_event_handler.h"
 #include "usim_dialling_numbers_service.h"
 
 namespace OHOS {
@@ -35,10 +36,9 @@ enum {
 };
 
 const int ADD_FLAG = -1;
-class IccDiallingNumbersCache : public AppExecFwk::EventHandler {
+class IccDiallingNumbersCache : public TelEventHandler {
 public:
-    IccDiallingNumbersCache(
-        const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimFileManager> simFileManager);
+    explicit IccDiallingNumbersCache(std::shared_ptr<SimFileManager> simFileManager);
     ~IccDiallingNumbersCache();
     void Init();
     std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> LoadReadyDiallingNumbers(int fileId);

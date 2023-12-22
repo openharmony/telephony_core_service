@@ -40,12 +40,7 @@ void TimeZoneManager::Init(std::weak_ptr<NetworkSearchManager> networkSearchMana
         TELEPHONY_LOGE("NetworkSearchManager is null");
         return;
     }
-    auto inner = nsm->FindManagerInner(DEFAULT_SIM_SLOT_ID);
-    if (inner == nullptr || inner->eventLoop_ == nullptr) {
-        TELEPHONY_LOGE("Eventloop is null");
-        return;
-    }
-    timeZoneUpdater_ = std::make_shared<TimeZoneUpdater>(inner->eventLoop_);
+    timeZoneUpdater_ = std::make_shared<TimeZoneUpdater>();
     if (timeZoneUpdater_ == nullptr) {
         TELEPHONY_LOGE("failed to create new TimeZoneUpdater");
         return;

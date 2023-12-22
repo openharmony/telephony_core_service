@@ -26,11 +26,10 @@
 namespace OHOS {
 namespace Telephony {
 const int64_t DELAY_TIME = 1000;
-MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    const std::shared_ptr<MultiSimController> &controller,
+MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<MultiSimController> &controller,
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager)
-    : AppExecFwk::EventHandler(runner), controller_(controller), simStateManager_(simStateManager),
+    : TelEventHandler("MultiSimMonitor"), controller_(controller), simStateManager_(simStateManager),
       simFileManager_(simFileManager)
 {
     if (observerHandler_ == nullptr) {
@@ -133,7 +132,7 @@ void MultiSimMonitor::RegisterCoreNotify(
         return;
     }
     if (controller_->IsSimActive(slotId)) {
-        handler->SendEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, slotId, 0);
+        TelEventHandler::SendTelEvent(handler, RadioEvent::RADIO_SIM_ACCOUNT_LOADED, slotId, 0);
     }
 }
 

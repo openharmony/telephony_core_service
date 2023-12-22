@@ -16,20 +16,18 @@
 #ifndef OHOS_RADIO_PROTOCOL_CONTROLLER_H
 #define OHOS_RADIO_PROTOCOL_CONTROLLER_H
 
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
 
-#include "event_handler.h"
-#include "event_runner.h"
 #include "i_tel_ril_manager.h"
 #include "sim_constant.h"
+#include "tel_event_handler.h"
 
 namespace OHOS {
 namespace Telephony {
-class RadioProtocolController : public AppExecFwk::EventHandler {
+class RadioProtocolController : public TelEventHandler {
 public:
-    RadioProtocolController(
-        std::weak_ptr<Telephony::ITelRilManager> telRilManager, const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    explicit RadioProtocolController(std::weak_ptr<Telephony::ITelRilManager> telRilManager);
     virtual ~RadioProtocolController() = default;
 
     void Init();

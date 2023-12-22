@@ -16,7 +16,6 @@
 #include "sim_state_manager.h"
 
 #include "core_service_errors.h"
-#include "runner_pool.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 

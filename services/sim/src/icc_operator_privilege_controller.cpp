@@ -22,7 +22,6 @@
 
 #include "inner_event.h"
 #include "radio_event.h"
-#include "runner_pool.h"
 #include "sim_data_type.h"
 #include "telephony_log_wrapper.h"
 
@@ -169,10 +168,9 @@ public:
     }
 };
 
-IccOperatorPrivilegeController::IccOperatorPrivilegeController(std::shared_ptr<AppExecFwk::EventRunner> runner,
-    std::shared_ptr<Telephony::ITelRilManager> telRilManager,
-    std::shared_ptr<SimStateManager> simStateManager)
-    : AppExecFwk::EventHandler(runner), slotId_(0), telRilManager_(telRilManager),
+IccOperatorPrivilegeController::IccOperatorPrivilegeController(
+    std::shared_ptr<Telephony::ITelRilManager> telRilManager, std::shared_ptr<SimStateManager> simStateManager)
+    : TelEventHandler("IccOperatorPrivilegeController"), slotId_(0), telRilManager_(telRilManager),
       simStateManager_(simStateManager), state_(new IccOperatorPrivilegeController::LogicalStateMachine())
 {}
 
@@ -192,14 +190,6 @@ void IccOperatorPrivilegeController::Init(const int32_t slotId)
     if (simStateManager_ == nullptr) {
         TELEPHONY_LOGE("simStateManager_ can not be nullptr!!");
         return;
-    }
-    if (this->GetEventRunner() == nullptr) {
-        auto runner = RunnerPool::GetInstance().GetCommonRunner();
-        if (runner == nullptr) {
-            TELEPHONY_LOGE("IccOperatorPrivilegeController::Init Create thread fail!");
-            return;
-        }
-        this->SetEventRunner(runner);
     }
     auto self = this->shared_from_this();
     simStateManager_->RegisterCoreNotify(self, RadioEvent::RADIO_SIM_STATE_CHANGE);
@@ -327,7 +317,7 @@ void IccOperatorPrivilegeController::ProcessOpenLogicalChannelDone(const AppExec
         return;
     }
     TELEPHONY_LOGI("Will to SimTransmitApduLogicalChannel");
-    auto resultPtr = event->GetUniqueObject<OpenLogicalChannelResponse>();
+    auto resultPtr = event->GetSharedObject<OpenLogicalChannelResponse>();
     if (resultPtr == nullptr) {
         TELEPHONY_LOGE("the data of result is nullptr! then will Close Logical Channel");
         return;
@@ -352,7 +342,7 @@ void IccOperatorPrivilegeController::ProcessOpenLogicalChannelDone(const AppExec
 void IccOperatorPrivilegeController::ProcessTransmitLogicalChannelDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("Transmit Logical Channel Done!!");
-    auto resultPtr = event->GetUniqueObject<IccIoResultInfo>();
+    auto resultPtr = event->GetSharedObject<IccIoResultInfo>();
     do {
         if (resultPtr == nullptr) {
             TELEPHONY_LOGE("the data of result is nullptr! then will Close Logical Channel");

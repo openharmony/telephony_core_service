@@ -21,12 +21,12 @@
 #include <utility>
 #include <vector>
 
-#include "event_handler.h"
 #include "inner_event.h"
 #ifdef ABILITY_LOCATION_SUPPORT
 #include "location.h"
 #endif
 #include "refbase.h"
+#include "tel_event_handler.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -67,9 +67,9 @@ protected:
     bool isActive_ = false;
 };
 
-class StateMachineEventHandler : public AppExecFwk::EventHandler {
+class StateMachineEventHandler : public TelEventHandler {
 public:
-    explicit StateMachineEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    StateMachineEventHandler();
     ~StateMachineEventHandler() = default;
     virtual void SetOriginalState(sptr<State> &originalState);
     virtual void TransitionTo(sptr<State> &destState);
@@ -94,7 +94,7 @@ private:
 
 class StateMachine {
 public:
-    explicit StateMachine(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    StateMachine();
     virtual ~StateMachine() {}
     void Quit();
     void Start();
@@ -109,7 +109,7 @@ protected:
 
 class TimeZoneLocationSuggester : public StateMachine, public std::enable_shared_from_this<TimeZoneLocationSuggester> {
 public:
-    explicit TimeZoneLocationSuggester(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    TimeZoneLocationSuggester();
     ~TimeZoneLocationSuggester() = default;
     void Init();
     void NitzUpdate();

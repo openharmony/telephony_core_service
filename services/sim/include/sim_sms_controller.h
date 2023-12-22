@@ -37,10 +37,9 @@ enum {
     SIM_SMS_DELETE_COMPLETED = 4
 };
 
-class SimSmsController : public AppExecFwk::EventHandler {
+class SimSmsController : public TelEventHandler {
 public:
-    SimSmsController(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        std::shared_ptr<SimStateManager> simStateManager);
+    explicit SimSmsController(std::shared_ptr<SimStateManager> simStateManager);
     ~SimSmsController();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t AddSmsToIcc(int status, std::string &pdu, std::string &smsc);

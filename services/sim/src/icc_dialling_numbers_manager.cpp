@@ -17,7 +17,6 @@
 
 #include "core_service_errors.h"
 #include "radio_event.h"
-#include "runner_pool.h"
 #include "telephony_errors.h"
 
 namespace OHOS {
@@ -25,9 +24,9 @@ namespace Telephony {
 constexpr static const int32_t WAIT_TIME_SECOND = 1;
 constexpr static const int32_t WAIT_QUERY_TIME_SECOND = 30;
 
-IccDiallingNumbersManager::IccDiallingNumbersManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+IccDiallingNumbersManager::IccDiallingNumbersManager(
     std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simState)
-    : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), simStateManager_(simState)
+    : TelEventHandler("IccDiallingNumbersManager"), simFileManager_(simFileManager), simStateManager_(simState)
 {}
 
 void IccDiallingNumbersManager::Init()
@@ -38,19 +37,13 @@ void IccDiallingNumbersManager::Init()
         return;
     }
 
-    eventLoopDiallingNumbers_ = RunnerPool::GetInstance().GetCommonRunner();
-    if (eventLoopDiallingNumbers_.get() == nullptr) {
-        TELEPHONY_LOGE("IccDiallingNumbersManager failed to create EventRunner");
-        return;
-    }
-
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
         TELEPHONY_LOGE("SimFileManager null pointer");
         return;
     }
 
-    diallingNumbersCache_ = std::make_shared<IccDiallingNumbersCache>(eventLoopDiallingNumbers_, simFileManager);
+    diallingNumbersCache_ = std::make_shared<IccDiallingNumbersCache>(simFileManager);
     if (diallingNumbersCache_ == nullptr) {
         TELEPHONY_LOGE("simFile create nullptr.");
         return;
@@ -98,12 +91,10 @@ void IccDiallingNumbersManager::InitFdnCache()
     if (diallingNumbersCache_ != nullptr) {
         diallingNumbersCache_->ClearDiallingNumberCache();
     }
-    std::thread initTask([&]() {
-        pthread_setname_np(pthread_self(), "init_fdn_cache");
+    TelFFRTUtils::Submit([&]() {
         std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers;
         QueryIccDiallingNumbers(DiallingNumbersInfo::SIM_FDN, diallingNumbers);
     });
-    initTask.detach();
 }
 
 void IccDiallingNumbersManager::ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -349,17 +340,11 @@ bool IccDiallingNumbersManager::IsValidType(int type)
 std::shared_ptr<IccDiallingNumbersManager> IccDiallingNumbersManager::CreateInstance(
     std::weak_ptr<SimFileManager> simFile, std::shared_ptr<SimStateManager> simState)
 {
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoop = RunnerPool::GetInstance().GetCommonRunner();
-    if (eventLoop.get() == nullptr) {
-        TELEPHONY_LOGE("IccDiallingNumbersManager  failed to create EventRunner");
-        return nullptr;
-    }
     if (simFile.lock() == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersManager::Init SimFileManager null pointer");
         return nullptr;
     }
-    std::shared_ptr<IccDiallingNumbersManager> manager =
-        std::make_shared<IccDiallingNumbersManager>(eventLoop, simFile, simState);
+    std::shared_ptr<IccDiallingNumbersManager> manager = std::make_shared<IccDiallingNumbersManager>(simFile, simState);
     if (manager == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersManager::Init manager create nullptr.");
         return nullptr;

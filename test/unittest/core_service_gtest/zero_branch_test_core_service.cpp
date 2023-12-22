@@ -26,7 +26,6 @@
 #include "network_search_test_callback_stub.h"
 #include "operator_name.h"
 #include "operator_name_utils.h"
-#include "runner_pool.h"
 #include "security_token.h"
 #include "sim_manager.h"
 #include "tel_ril_manager.h"
@@ -45,13 +44,6 @@ const std::string NITZ_STR = "23/10/16,09:10:33+32,00";
 const std::string NITZ_STR_INVALID = "202312102359";
 } // namespace
 
-class DemoHandler : public AppExecFwk::EventHandler {
-public:
-    explicit DemoHandler(std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner) {}
-    virtual ~DemoHandler() {}
-    void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) {}
-};
-
 class CoreServiceBranchTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -61,7 +53,6 @@ public:
 };
 void CoreServiceBranchTest::SetUpTestCase()
 {
-    RunnerPool::GetInstance().Init();
     DelayedSingleton<CoreService>::GetInstance()->Init();
 }
 
@@ -411,21 +402,6 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_HiSysEvent_001, Function |
 }
 
 /**
- * @tc.number   Telephony_CoreService_RunnerPool_001
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_RunnerPool_001, Function | MediumTest | Level1)
-{
-    RunnerPool::GetInstance().Init();
-    RunnerPool::GetInstance().Init();
-    std::string name = "";
-    EXPECT_TRUE(RunnerPool::GetInstance().CreateRunner(name) != nullptr);
-    EXPECT_TRUE(RunnerPool::GetInstance().GetCommonRunner() != nullptr);
-    EXPECT_TRUE(RunnerPool::GetInstance().GetSimDbAndFileRunner() != nullptr);
-}
-
-/**
  * @tc.number   Telephony_TimeZoneManager_001
  * @tc.name     test normal branch
  * @tc.desc     Function test
@@ -451,7 +427,6 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneManager_001, Function | Medium
     auto inner = std::make_shared<NetworkSearchManagerInner>();
     networkSearchManager->AddManagerInner(DEFAULT_SIM_SLOT_ID, inner);
     TimeZoneManager::GetInstance().Init(networkSearchManager);
-    inner->eventLoop_ = AppExecFwk::EventRunner::Create("test");
     TimeZoneManager::GetInstance().Init(networkSearchManager);
     TimeZoneManager::GetInstance().Init(networkSearchManager);
     TimeZoneManager::GetInstance().UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
@@ -471,8 +446,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneManager_001, Function | Medium
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneUpdater_001, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>(eventLoop);
+    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>();
     timeZoneUpdater->Init();
     auto event = AppExecFwk::InnerEvent::Get(0);
     timeZoneUpdater->ProcessEvent(event);
@@ -524,8 +498,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneUpdater_001, Function | Medium
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneUpdater_002, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>(eventLoop);
+    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>();
     auto event = AppExecFwk::InnerEvent::Get(0);
     timeZoneUpdater->ProcessEvent(event);
     std::string countryCode = "cn";
@@ -561,8 +534,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneUpdater_002, Function | Medium
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationSuggester_001, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto suggester = std::make_shared<TimeZoneLocationSuggester>(eventLoop);
+    auto suggester = std::make_shared<TimeZoneLocationSuggester>();
     suggester->Init();
     suggester->NitzUpdate();
 #ifdef ABILITY_LOCATION_SUPPORT
@@ -583,8 +555,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationSuggester_001, Functio
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationUpdate_001, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto suggester = std::make_shared<TimeZoneLocationSuggester>(eventLoop);
+    auto suggester = std::make_shared<TimeZoneLocationSuggester>();
     auto update = std::make_shared<TimeZoneLocationUpdate>(suggester);
     update->StartPassiveUpdate();
     update->StopPassiveUpdate();
@@ -612,11 +583,10 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationUpdate_001, Function |
 HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("MultiSimController");
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
-        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager, runner);
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     std::shared_ptr<RadioProtocolController> radioProtocolController = nullptr;
     multiSimController->EncryptIccId("");
     multiSimController->CheckIfNeedSwitchMainSlotId();

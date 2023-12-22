@@ -28,6 +28,7 @@
 #include "sim_constant.h"
 #include "sim_state_manager.h"
 #include "system_ability_definition.h"
+#include "tel_event_handler.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_state_registry_client.h"
 #include "telephony_types.h"
@@ -791,7 +792,7 @@ void SimStateHandle::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventH
             observerHandler_->RegObserver(RadioEvent::RADIO_SIM_STATE_READY, handler);
             if (IsIccReady() && handler != nullptr) {
                 TELEPHONY_LOGI("SimStateHandle::RegisterIccReady() OK send");
-                handler->SendEvent(RadioEvent::RADIO_SIM_STATE_READY);
+                TelEventHandler::SendTelEvent(handler, RadioEvent::RADIO_SIM_STATE_READY);
             }
             break;
         case RadioEvent::RADIO_SIM_STATE_LOCKED:
