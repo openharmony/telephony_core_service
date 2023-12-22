@@ -21,6 +21,7 @@
 #include <ctime>
 #include <fstream>
 #include <iomanip>
+#include <numeric>
 #include <sstream>
 
 #include "glib.h"
@@ -331,9 +332,9 @@ std::string VCardUtils::TrimListToString(const std::vector<std::string> &strs)
     int32_t size = static_cast<int32_t>(strs.size());
     std::string result;
     if (size > 1) {
-        for (const auto &str : strs) {
-            result += str + ";";
-        }
+        std::string init = strs[VALUE_INDEX_ZERO];
+        result = std::accumulate(strs.begin(), strs.end(), init,
+            [](std::string &str, const std::string &element) { return str + ";" + element; });
     } else if (size == 1) {
         return strs[0];
     } else {
