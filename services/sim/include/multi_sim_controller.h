@@ -34,8 +34,7 @@ class MultiSimController {
 public:
     MultiSimController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
         std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
-        std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager,
-        const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+        std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager);
     virtual ~MultiSimController();
 
     void Init();

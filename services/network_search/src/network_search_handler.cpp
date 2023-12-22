@@ -73,11 +73,10 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
     { SettingEventCode::MSG_AUTO_AIRPLANE_MODE, &NetworkSearchHandler::AirplaneModeChange }
 };
 
-NetworkSearchHandler::NetworkSearchHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    const std::weak_ptr<NetworkSearchManager> &networkSearchManager, const std::weak_ptr<ITelRilManager> &telRilManager,
-    const std::weak_ptr<ISimManager> &simManager, int32_t slotId)
-    : AppExecFwk::EventHandler(runner), networkSearchManager_(networkSearchManager), telRilManager_(telRilManager),
-      simManager_(simManager), slotId_(slotId)
+NetworkSearchHandler::NetworkSearchHandler(const std::weak_ptr<NetworkSearchManager> &networkSearchManager,
+    const std::weak_ptr<ITelRilManager> &telRilManager, const std::weak_ptr<ISimManager> &simManager, int32_t slotId)
+    : TelEventHandler("NetworkSearchManager_" + std::to_string(slotId)), networkSearchManager_(networkSearchManager),
+      telRilManager_(telRilManager), simManager_(simManager), slotId_(slotId)
 {}
 
 NetworkSearchHandler::~NetworkSearchHandler()

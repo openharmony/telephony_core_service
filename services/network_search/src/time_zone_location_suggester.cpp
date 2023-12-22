@@ -45,7 +45,7 @@ std::string State::GetStateMachineName() const
     return name_;
 }
 
-StateMachineEventHandler::StateMachineEventHandler(const std::shared_ptr<EventRunner> &runner) : EventHandler(runner) {}
+StateMachineEventHandler::StateMachineEventHandler() : TelEventHandler("StateMachineEventHandler") {}
 
 void StateMachineEventHandler::SetOriginalState(sptr<State> &originalState)
 {
@@ -153,9 +153,9 @@ void StateMachineEventHandler::SendDeferredEvent()
     deferEvents_.clear();
 }
 
-StateMachine::StateMachine(const std::shared_ptr<EventRunner> &runner)
+StateMachine::StateMachine()
 {
-    stateMachineEventHandler_ = std::make_shared<StateMachineEventHandler>(runner);
+    stateMachineEventHandler_ = std::make_shared<StateMachineEventHandler>();
     if (stateMachineEventHandler_ == nullptr) {
         TELEPHONY_LOGE("stateMachineEventHandler_ is null");
         return;
@@ -226,7 +226,7 @@ void StateMachine::SendEvent(InnerEvent::Pointer &event)
     stateMachineEventHandler_->SendEvent(event);
 }
 
-TimeZoneLocationSuggester::TimeZoneLocationSuggester(const std::shared_ptr<EventRunner> &runner) : StateMachine(runner)
+TimeZoneLocationSuggester::TimeZoneLocationSuggester() : StateMachine()
 {}
 
 void TimeZoneLocationSuggester::Init()

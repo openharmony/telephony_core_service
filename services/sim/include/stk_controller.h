@@ -16,18 +16,17 @@
 #ifndef OHOS_STK_CONTROLLER_H
 #define OHOS_STK_CONTROLLER_H
 
-#include "event_handler.h"
-#include "inner_event.h"
 #include "i_tel_ril_manager.h"
+#include "inner_event.h"
 #include "sim_state_manager.h"
+#include "tel_event_handler.h"
 #include "want.h"
 
 namespace OHOS {
 namespace Telephony {
-class StkController : public AppExecFwk::EventHandler {
+class StkController : public TelEventHandler {
 public:
-    StkController(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        const std::weak_ptr<Telephony::ITelRilManager> &telRilManager,
+    explicit StkController(const std::weak_ptr<Telephony::ITelRilManager> &telRilManager,
         const std::weak_ptr<Telephony::SimStateManager> &simStateManager, int32_t slotId);
     virtual ~StkController() = default;
     void Init();
