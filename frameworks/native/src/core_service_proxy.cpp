@@ -310,7 +310,7 @@ static void ProcessSignalInfoNr(MessageParcel &reply, std::vector<sptr<SignalInf
 void CoreServiceProxy::ProcessSignalInfo(MessageParcel &reply, std::vector<sptr<SignalInformation>> &result)
 {
     int32_t size = reply.ReadInt32();
-    TELEPHONY_LOGI("CoreServiceProxy::GetSignalInfoList size:%{public}d\n", size);
+    TELEPHONY_LOGD("CoreServiceProxy::GetSignalInfoList size:%{public}d\n", size);
     if (size >= MAX_SIZE) {
         TELEPHONY_LOGE("CoreServiceProxy::GetSignalInfoList over max size");
         return;
