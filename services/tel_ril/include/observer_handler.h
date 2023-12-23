@@ -18,7 +18,9 @@
 
 #include <mutex>
 #include <unordered_map>
+
 #include "event_handler.h"
+#include "tel_event_handler.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -49,7 +51,7 @@ public:
         }
 
         for (auto handlers : iter->second) {
-            handlers->SendEvent(what, param, 0);
+            TelEventHandler::SendTelEvent(handlers, what, param, 0);
         }
     }
 
@@ -63,7 +65,7 @@ public:
             return;
         }
         for (auto handlers : iter->second) {
-            handlers->SendEvent(what, object);
+            TelEventHandler::SendTelEvent(handlers, what, object);
         }
     }
 

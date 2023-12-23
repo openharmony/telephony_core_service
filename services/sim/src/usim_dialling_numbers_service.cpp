@@ -19,8 +19,7 @@ namespace OHOS {
 namespace Telephony {
 std::mutex UsimDiallingNumbersService::mtx_;
 
-UsimDiallingNumbersService::UsimDiallingNumbersService(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-    : AppExecFwk::EventHandler(runner)
+UsimDiallingNumbersService::UsimDiallingNumbersService() : TelEventHandler("UsimDiallingNumbersService")
 {
     InitFuncMap();
 }
@@ -314,7 +313,7 @@ void UsimDiallingNumbersService::SendBackResult(
     std::unique_ptr<UsimFetcher> fd = callerPointer_->GetUniqueObject<UsimFetcher>();
     std::unique_ptr<UsimResult> data = std::make_unique<UsimResult>(fd.get());
     data->result = static_cast<std::shared_ptr<void>>(diallingnumbers);
-    owner->SendEvent(id, data);
+    TelEventHandler::SendTelEvent(owner, id, data);
     TELEPHONY_LOGI("UsimDiallingNumbersService::SendBackResult send end");
 }
 

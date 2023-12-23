@@ -22,6 +22,7 @@
 #include "radio_event.h"
 #include "system_ability_definition.h"
 #include "telephony_ext_wrapper.h"
+#include "tel_event_handler.h"
 #include "telephony_state_registry_client.h"
 
 using namespace std;
@@ -31,9 +32,8 @@ using namespace OHOS::EventFwk;
 namespace OHOS {
 namespace Telephony {
 std::unique_ptr<ObserverHandler> IccFile::filesFetchedObser_ = nullptr;
-IccFile::IccFile(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager)
-    : AppExecFwk::EventHandler(runner), stateManager_(simStateManager)
+IccFile::IccFile(const std::string &name, std::shared_ptr<SimStateManager> simStateManager)
+    : TelEventHandler(name), stateManager_(simStateManager)
 {
     if (stateManager_ == nullptr) {
         TELEPHONY_LOGE("IccFile::IccFile set NULL SIMStateManager!!");
@@ -347,7 +347,7 @@ void IccFile::RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> event
     }
     if (!ObtainIMSI().empty()) {
         if (eventHandler != nullptr) {
-            eventHandler->SendEvent(RadioEvent::RADIO_IMSI_LOADED_READY);
+            TelEventHandler::SendTelEvent(eventHandler, RadioEvent::RADIO_IMSI_LOADED_READY);
         }
     }
 }
@@ -369,7 +369,7 @@ void IccFile::RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> e
     if (ObtainFilesFetched()) {
         TELEPHONY_LOGI("IccFile::RegisterAllFilesLoaded: notify");
         if (eventHandler != nullptr) {
-            eventHandler->SendEvent(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_, 0);
+            TelEventHandler::SendTelEvent(eventHandler, RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_, 0);
         }
         PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED,
             static_cast<int32_t>(SimState::SIM_STATE_LOADED), "");

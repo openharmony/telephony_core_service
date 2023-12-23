@@ -161,6 +161,8 @@ public:
 
     int32_t GetRrcConnectionState(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
+    int32_t GetNrSsbId(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+
     int32_t SendGsmSms(
         int32_t slotId, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) override;
 
@@ -355,7 +357,6 @@ private:
     std::vector<std::shared_ptr<TelRilModem>> telRilModem_;
     std::vector<std::shared_ptr<TelRilNetwork>> telRilNetwork_;
     std::vector<std::shared_ptr<ObserverHandler>> observerHandler_;
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
     std::shared_ptr<TelRilHandler> handler_ = nullptr;
     sptr<OHOS::HDI::ServiceManager::V1_0::IServiceManager> servMgr_ = nullptr;
     sptr<HdfServiceStatusListener::IServStatListener> hdfListener_ = nullptr;

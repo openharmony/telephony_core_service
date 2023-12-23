@@ -17,9 +17,7 @@
 
 namespace OHOS {
 namespace Telephony {
-RuimFileController::RuimFileController(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int slotId)
-    : IccFileController(runner, slotId)
-{}
+RuimFileController::RuimFileController(int slotId) : IccFileController("RuimFileController", slotId) {}
 
 std::string RuimFileController::ObtainElementFilePath(int efId)
 {

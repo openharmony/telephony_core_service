@@ -70,14 +70,8 @@ bool TelRilManager::ConnectRilInterface()
 
 void TelRilManager::CreatTelRilHandler(void)
 {
-    eventLoop_ = AppExecFwk::EventRunner::Create("TelRilEventLoop");
-    if (eventLoop_ == nullptr) {
-        TELEPHONY_LOGE("Failed to create EventRunner");
-        return;
-    }
-    handler_ = std::make_shared<TelRilHandler>(eventLoop_);
+    handler_ = std::make_shared<TelRilHandler>();
     handler_->OnInit();
-    eventLoop_->Run();
 }
 
 void TelRilManager::ReduceRunningLock()
@@ -650,6 +644,11 @@ int32_t TelRilManager::GetNrOptionMode(int32_t slotId, const AppExecFwk::InnerEv
 int32_t TelRilManager::GetRrcConnectionState(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetRrcConnectionState);
+}
+
+int32_t TelRilManager::GetNrSsbId(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetNrSsbId);
 }
 
 /*********************** TelRilNetwork end ****************************/

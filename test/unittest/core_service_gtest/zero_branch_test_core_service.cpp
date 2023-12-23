@@ -20,11 +20,12 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_service.h"
+#include "core_service_dump_helper.h"
+#include "core_service_hisysevent.h"
 #include "network_search_manager.h"
 #include "network_search_test_callback_stub.h"
 #include "operator_name.h"
 #include "operator_name_utils.h"
-#include "runner_pool.h"
 #include "security_token.h"
 #include "sim_manager.h"
 #include "tel_ril_manager.h"
@@ -43,13 +44,6 @@ const std::string NITZ_STR = "23/10/16,09:10:33+32,00";
 const std::string NITZ_STR_INVALID = "202312102359";
 } // namespace
 
-class DemoHandler : public AppExecFwk::EventHandler {
-public:
-    explicit DemoHandler(std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner) {}
-    virtual ~DemoHandler() {}
-    void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) {}
-};
-
 class CoreServiceBranchTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -59,7 +53,6 @@ public:
 };
 void CoreServiceBranchTest::SetUpTestCase()
 {
-    RunnerPool::GetInstance().Init();
     DelayedSingleton<CoreService>::GetInstance()->Init();
 }
 
@@ -226,8 +219,8 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_002, Function | Medium
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_001, Function | MediumTest | Level1)
 {
-    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::GET_BASEBAND_VERSION);
-    for (uint32_t code = 0; code < maxCode; code++) {
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    for (uint32_t code = 0; code <= maxCode; code++) {
         if (code == static_cast<uint32_t>(CoreServiceInterfaceCode::HAS_OPERATOR_PRIVILEGES)) {
             continue;
         }
@@ -240,6 +233,172 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_001, Function | Mediu
     std::string version;
     EXPECT_GE(
         DelayedSingleton<CoreService>::GetInstance()->GetBasebandVersion(SLOT_ID, version), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CoreService_Stub_002
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_002, Function | MediumTest | Level1)
+{
+    SecurityToken token;
+    int32_t slotId = SLOT_ID;
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    for (uint32_t code = 0; code <= maxCode; code++) {
+        MessageParcel data;
+        MessageParcel reply;
+        MessageOption option;
+        data.WriteInterfaceToken(CoreServiceStub::GetDescriptor());
+        data.WriteInt32(slotId);
+        DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, data, reply, option);
+    }
+    std::string version;
+    EXPECT_GE(
+        DelayedSingleton<CoreService>::GetInstance()->GetBasebandVersion(SLOT_ID, version), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CoreService_Stub_003
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_003, Function | MediumTest | Level1)
+{
+    SecurityToken token;
+    int32_t slotId = SLOT_ID;
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    for (uint32_t code = 0; code <= maxCode; code++) {
+        if (code == static_cast<uint32_t>(CoreServiceInterfaceCode::HAS_OPERATOR_PRIVILEGES)) {
+            continue;
+        }
+        MessageParcel data;
+        MessageParcel reply;
+        MessageOption option;
+        data.WriteInterfaceToken(CoreServiceStub::GetDescriptor());
+        data.WriteInt32(slotId);
+        data.WriteRemoteObject(callback->AsObject().GetRefPtr());
+        DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, data, reply, option);
+    }
+    std::string version;
+    EXPECT_GE(
+        DelayedSingleton<CoreService>::GetInstance()->GetBasebandVersion(SLOT_ID, version), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CoreService_Stub_004
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_004, Function | MediumTest | Level1)
+{
+    SecurityToken token;
+    int32_t slotId = SLOT_ID;
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    DelayedSingleton<CoreService>::GetInstance()->GetRadioState(slotId, callback);
+    auto simManager = DelayedSingleton<CoreService>::GetInstance()->simManager_;
+    auto networkSearchManager_ = DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_;
+    auto telRilManager_ = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
+    DelayedSingleton<CoreService>::GetInstance()->simManager_ = nullptr;
+    DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_ = nullptr;
+    DelayedSingleton<CoreService>::GetInstance()->telRilManager_ = nullptr;
+    DelayedSingleton<CoreService>::GetInstance()->GetRadioState(slotId, callback);
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    for (uint32_t code = 0; code <= maxCode; code++) {
+        MessageParcel data;
+        MessageParcel reply;
+        MessageOption option;
+        data.WriteInterfaceToken(CoreServiceStub::GetDescriptor());
+        data.WriteInt32(slotId);
+        data.WriteRemoteObject(callback->AsObject().GetRefPtr());
+        DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, data, reply, option);
+    }
+    DelayedSingleton<CoreService>::GetInstance()->simManager_ = simManager;
+    DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_ = networkSearchManager_;
+    DelayedSingleton<CoreService>::GetInstance()->telRilManager_ = telRilManager_;
+    std::vector<std::u16string> args = { u"test", u"test1" };
+    DelayedSingleton<CoreService>::GetInstance()->Dump(slotId, args);
+    slotId--;
+    DelayedSingleton<CoreService>::GetInstance()->Dump(slotId, args);
+    DelayedSingleton<CoreService>::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
+    DelayedSingleton<CoreService>::GetInstance()->OnStart();
+    DelayedSingleton<CoreService>::GetInstance()->OnStop();
+    EXPECT_EQ(DelayedSingleton<CoreService>::GetInstance()->GetServiceRunningState(),
+        static_cast<int32_t>(ServiceRunningState::STATE_NOT_START));
+}
+
+/**
+ * @tc.number   Telephony_CoreService_DumpHelper_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_DumpHelper_001, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    if (telRilManager == nullptr) {
+        return;
+    }
+    telRilManager->OnInit();
+    DelayedSingleton<CoreService>::GetInstance()->telRilManager_ = telRilManager;
+    int32_t slotCount = DelayedSingleton<CoreService>::GetInstance()->GetMaxSimCount();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    if (simManager == nullptr) {
+        return;
+    }
+    simManager->OnInit(slotCount);
+    DelayedSingleton<CoreService>::GetInstance()->simManager_ = simManager;
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    if (networkSearchManager == nullptr) {
+        return;
+    }
+    networkSearchManager->OnInit();
+    DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_ = networkSearchManager;
+
+    auto coreServiceDumpHelper = std::make_shared<CoreServiceDumpHelper>();
+    std::vector<std::string> argsInStr;
+    std::string result;
+    coreServiceDumpHelper->ShowHelp(result);
+    coreServiceDumpHelper->ShowCoreServiceTimeInfo(result);
+    int32_t slotId = SLOT_ID;
+    bool hasSimCard = false;
+    simManager->simStateManager_[slotId]->simStateHandle_->iccState_.simStatus_ = ICC_CARD_ABSENT;
+    DelayedSingleton<CoreService>::GetInstance()->HasSimCard(slotId, hasSimCard);
+    EXPECT_FALSE(hasSimCard);
+    coreServiceDumpHelper->ShowCoreServiceInfo(result);
+    simManager->simStateManager_[slotId]->simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
+    DelayedSingleton<CoreService>::GetInstance()->HasSimCard(slotId, hasSimCard);
+    EXPECT_TRUE(hasSimCard);
+    coreServiceDumpHelper->ShowCoreServiceInfo(result);
+    coreServiceDumpHelper->Dump(argsInStr, result);
+    EXPECT_FALSE(result.empty());
+}
+
+/**
+ * @tc.number   Telephony_CoreService_HiSysEvent_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_HiSysEvent_001, Function | MediumTest | Level1)
+{
+    auto coreServiceHiSysEvent = std::make_shared<CoreServiceHiSysEvent>();
+    int32_t slotId = SLOT_ID;
+    int32_t argInt = SLOT_ID;
+    std::string argStr = "";
+    coreServiceHiSysEvent->WriteSignalLevelBehaviorEvent(slotId, argInt);
+    coreServiceHiSysEvent->WriteNetworkStateBehaviorEvent(slotId, argInt, argInt, argInt);
+    coreServiceHiSysEvent->WriteDefaultDataSlotIdBehaviorEvent(slotId);
+    coreServiceHiSysEvent->WriteSimStateBehaviorEvent(slotId, argInt);
+    coreServiceHiSysEvent->WriteDialCallFaultEvent(slotId, argInt, argStr);
+    coreServiceHiSysEvent->WriteAnswerCallFaultEvent(slotId, argInt, argStr);
+    coreServiceHiSysEvent->WriteHangUpFaultEvent(slotId, argInt, argStr);
+    coreServiceHiSysEvent->WriteSmsSendFaultEvent(
+        slotId, SmsMmsMessageType::SMS_SHORT_MESSAGE, SmsMmsErrorCode::SMS_ERROR_NULL_POINTER, argStr);
+    coreServiceHiSysEvent->WriteSmsReceiveFaultEvent(
+        slotId, SmsMmsMessageType::SMS_SHORT_MESSAGE, SmsMmsErrorCode::SMS_ERROR_NULL_POINTER, argStr);
+    coreServiceHiSysEvent->WriteDataActivateFaultEvent(
+        slotId, argInt, CellularDataErrorCode::DATA_ERROR_PS_NOT_ATTACH, argStr);
+    coreServiceHiSysEvent->WriteAirplaneModeChangeEvent(argInt);
 }
 
 /**
@@ -268,7 +427,6 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneManager_001, Function | Medium
     auto inner = std::make_shared<NetworkSearchManagerInner>();
     networkSearchManager->AddManagerInner(DEFAULT_SIM_SLOT_ID, inner);
     TimeZoneManager::GetInstance().Init(networkSearchManager);
-    inner->eventLoop_ = AppExecFwk::EventRunner::Create("test");
     TimeZoneManager::GetInstance().Init(networkSearchManager);
     TimeZoneManager::GetInstance().Init(networkSearchManager);
     TimeZoneManager::GetInstance().UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
@@ -288,8 +446,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneManager_001, Function | Medium
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneUpdater_001, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>(eventLoop);
+    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>();
     timeZoneUpdater->Init();
     auto event = AppExecFwk::InnerEvent::Get(0);
     timeZoneUpdater->ProcessEvent(event);
@@ -341,8 +498,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneUpdater_001, Function | Medium
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneUpdater_002, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>(eventLoop);
+    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>();
     auto event = AppExecFwk::InnerEvent::Get(0);
     timeZoneUpdater->ProcessEvent(event);
     std::string countryCode = "cn";
@@ -378,8 +534,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneUpdater_002, Function | Medium
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationSuggester_001, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto suggester = std::make_shared<TimeZoneLocationSuggester>(eventLoop);
+    auto suggester = std::make_shared<TimeZoneLocationSuggester>();
     suggester->Init();
     suggester->NitzUpdate();
 #ifdef ABILITY_LOCATION_SUPPORT
@@ -400,8 +555,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationSuggester_001, Functio
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationUpdate_001, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto suggester = std::make_shared<TimeZoneLocationSuggester>(eventLoop);
+    auto suggester = std::make_shared<TimeZoneLocationSuggester>();
     auto update = std::make_shared<TimeZoneLocationUpdate>(suggester);
     update->StartPassiveUpdate();
     update->StopPassiveUpdate();
@@ -429,11 +583,10 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationUpdate_001, Function |
 HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("MultiSimController");
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
-        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager, runner);
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     std::shared_ptr<RadioProtocolController> radioProtocolController = nullptr;
     multiSimController->PublishSetPrimaryEvent(true);
     multiSimController->EncryptIccId("");

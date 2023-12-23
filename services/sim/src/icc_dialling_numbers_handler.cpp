@@ -24,9 +24,8 @@ std::atomic_int IccDiallingNumbersHandler::nextSerialId_(1);
 std::unordered_map<int, std::shared_ptr<DiallingNumberLoadRequest>> IccDiallingNumbersHandler::requestMap_;
 static std::mutex requestLock_;
 
-IccDiallingNumbersHandler::IccDiallingNumbersHandler(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<IccFileController> fh)
-    : AppExecFwk::EventHandler(runner), fileController_(fh)
+IccDiallingNumbersHandler::IccDiallingNumbersHandler(std::shared_ptr<IccFileController> fh)
+    : TelEventHandler("IccDiallingNumbersHandler"), fileController_(fh)
 {
     InitFuncMap();
 }
@@ -343,7 +342,7 @@ bool IccDiallingNumbersHandler::SendBackResult(int loadId)
         TELEPHONY_LOGE("IccDiallingNumbersHandler::SendBackResult owner null pointer");
         return false;
     }
-    owner->SendEvent(id, data);
+    TelEventHandler::SendTelEvent(owner, id, data);
     ClearLoadRequest(loadId);
     TELEPHONY_LOGI("IccDiallingNumbersHandler::SendBackResult send end");
     return true;

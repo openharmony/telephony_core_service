@@ -100,15 +100,14 @@ bool SimTest::ParseOperatorConf(int32_t slotId)
         return false;
     }
     delete reader;
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(runner, subcribeInfo,
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo,
         std::weak_ptr<ITelRilManager>(telRilManager), std::weak_ptr<SimStateManager>(simStateManager));
-    OperatorConfigCache ofpc(nullptr, std::weak_ptr<SimFileManager>(simFileManager), slotId);
+    OperatorConfigCache ofpc(std::weak_ptr<SimFileManager>(simFileManager), slotId);
     OperatorFileParser ofp;
     OperatorConfig poc;
     std::u16string result;

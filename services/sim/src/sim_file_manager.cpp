@@ -20,7 +20,6 @@
 #include "network_state.h"
 #include "parameters.h"
 #include "radio_event.h"
-#include "runner_pool.h"
 #include "system_ability_definition.h"
 #include "telephony_ext_wrapper.h"
 
@@ -38,10 +37,10 @@ constexpr const char *GC_ICCID = "8985231";
 constexpr const char *PREFIX_LOCAL_ICCID = "8986";
 constexpr const char *ROAMING_CPLMN = "20404";
 
-SimFileManager::SimFileManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+SimFileManager::SimFileManager(
     const EventFwk::CommonEventSubscribeInfo &sp, std::weak_ptr<ITelRilManager> telRilManager,
     std::weak_ptr<Telephony::SimStateManager> state)
-    : AppExecFwk::EventHandler(runner), CommonEventSubscriber(sp), telRilManager_(telRilManager),
+    : TelEventHandler("SimFileManager"), CommonEventSubscriber(sp), telRilManager_(telRilManager),
     simStateManager_(state)
 {
     if (simStateManager_.lock() == nullptr) {
@@ -128,23 +127,14 @@ bool SimFileManager::InitSimFile(SimFileManager::IccType type)
         TELEPHONY_LOGE("InitSimFile need more helper");
         return false;
     }
-    if (eventLoopRecord_ == nullptr) {
-        eventLoopRecord_ = RunnerPool::GetInstance().GetCommonRunner();
-        if (eventLoopRecord_.get() == nullptr) {
-            TELEPHONY_LOGE("IccFile  failed to create EventRunner");
-            return false;
-        }
-    } else {
-        eventLoopRecord_->Stop();
-    }
     auto iccFileIt = iccFileCache_.find(type);
     if (iccFileIt == iccFileCache_.end()) {
         if (type == SimFileManager::IccType::ICC_TYPE_CDMA) {
-            simFile_ = std::make_shared<RuimFile>(eventLoopRecord_, simStateManager_.lock());
+            simFile_ = std::make_shared<RuimFile>(simStateManager_.lock());
         } else if (type == SimFileManager::IccType::ICC_TYPE_IMS) {
-            simFile_ = std::make_shared<IsimFile>(eventLoopRecord_, simStateManager_.lock());
+            simFile_ = std::make_shared<IsimFile>(simStateManager_.lock());
         } else {
-            simFile_ = std::make_shared<SimFile>(eventLoopRecord_, simStateManager_.lock());
+            simFile_ = std::make_shared<SimFile>(simStateManager_.lock());
         }
         if (simFile_ != nullptr) {
             simFile_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
@@ -166,25 +156,16 @@ bool SimFileManager::InitSimFile(SimFileManager::IccType type)
 
 bool SimFileManager::InitIccFileController(SimFileManager::IccType type)
 {
-    if (eventLoopFileController_ == nullptr) {
-        eventLoopFileController_ = RunnerPool::GetInstance().GetCommonRunner();
-        if (eventLoopFileController_.get() == nullptr) {
-            TELEPHONY_LOGE("SIMHandler failed to create EventRunner");
-            return false;
-        }
-    } else {
-        eventLoopFileController_->Stop();
-    }
     auto iccFileConIt = iccFileControllerCache_.find(type);
     if (iccFileConIt == iccFileControllerCache_.end()) {
         if (type == SimFileManager::IccType::ICC_TYPE_CDMA) { // ruim 30 usim 20 isim 60
-            fileController_ = std::make_shared<RuimFileController>(eventLoopFileController_, slotId_);
+            fileController_ = std::make_shared<RuimFileController>(slotId_);
         } else if (type == SimFileManager::IccType::ICC_TYPE_IMS) {
-            fileController_ = std::make_shared<IsimFileController>(eventLoopFileController_, slotId_);
+            fileController_ = std::make_shared<IsimFileController>(slotId_);
         } else if (type == SimFileManager::IccType::ICC_TYPE_GSM) {
-            fileController_ = std::make_shared<SimFileController>(eventLoopFileController_, slotId_);
+            fileController_ = std::make_shared<SimFileController>(slotId_);
         } else {
-            fileController_ = std::make_shared<UsimFileController>(eventLoopFileController_, slotId_);
+            fileController_ = std::make_shared<UsimFileController>(slotId_);
         }
         iccFileControllerCache_.insert(std::make_pair(type, fileController_));
     } else {
@@ -638,12 +619,7 @@ bool SimFileManager::InitDiallingNumberHandler()
         diallingNumberHandler_->UpdateFileController(fileController_);
         return true;
     }
-    std::shared_ptr<AppExecFwk::EventRunner> loaderLoop = RunnerPool::GetInstance().GetCommonRunner();
-    if (loaderLoop.get() == nullptr) {
-        TELEPHONY_LOGE("SimFileManager failed to create diallingNumberloader loop");
-        return false;
-    }
-    diallingNumberHandler_ = std::make_shared<IccDiallingNumbersHandler>(loaderLoop, fileController_);
+    diallingNumberHandler_ = std::make_shared<IccDiallingNumbersHandler>(fileController_);
     if (diallingNumberHandler_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager failed to create IccDiallingNumbersHandler.");
         return false;
@@ -793,11 +769,6 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 std::shared_ptr<SimFileManager> SimFileManager::CreateInstance(
     std::weak_ptr<ITelRilManager> ril, std::weak_ptr<SimStateManager> simState)
 {
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoop = RunnerPool::GetInstance().GetCommonRunner();
-    if (eventLoop.get() == nullptr) {
-        TELEPHONY_LOGE("failed to create EventRunner");
-        return nullptr;
-    }
     if (ril.lock() == nullptr) {
         TELEPHONY_LOGE("rilmanager null pointer");
         return nullptr;
@@ -811,8 +782,8 @@ std::shared_ptr<SimFileManager> SimFileManager::CreateInstance(
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
     subscribeInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-	
-    std::shared_ptr<SimFileManager> manager = std::make_shared<SimFileManager>(eventLoop, subscribeInfo, ril, simState);
+
+    std::shared_ptr<SimFileManager> manager = std::make_shared<SimFileManager>(subscribeInfo, ril, simState);
     if (manager == nullptr) {
         TELEPHONY_LOGE("manager create nullptr.");
         return nullptr;

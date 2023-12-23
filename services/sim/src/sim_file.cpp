@@ -33,9 +33,7 @@ using namespace OHOS::EventFwk;
 namespace OHOS {
 namespace Telephony {
 std::mutex IccFile::mtx_;
-SimFile::SimFile(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager)
-    : IccFile(runner, simStateManager)
+SimFile::SimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("SimFile", simStateManager)
 {
     fileQueried_ = false;
     displayConditionOfSpn_ = SPN_INVALID;

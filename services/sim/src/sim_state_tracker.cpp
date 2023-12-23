@@ -25,10 +25,9 @@
 namespace OHOS {
 namespace Telephony {
 const int32_t ACTIVE_USER_ID = 100;
-SimStateTracker::SimStateTracker(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache,
-    int32_t slotId)
-    : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), operatorConfigCache_(operatorConfigCache),
+SimStateTracker::SimStateTracker(std::weak_ptr<SimFileManager> simFileManager,
+    std::shared_ptr<OperatorConfigCache> operatorConfigCache, int32_t slotId)
+    : TelEventHandler("SimStateTracker"), simFileManager_(simFileManager), operatorConfigCache_(operatorConfigCache),
       slotId_(slotId)
 {
     if (simFileManager.lock() == nullptr) {
@@ -87,11 +86,7 @@ void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             TELEPHONY_LOGE("sim is not exist");
             return;
         }
-        std::thread loadOperatorConfigTask([&]() {
-            pthread_setname_np(pthread_self(), "load_operator_config");
-            operatorConfigLoader_->LoadOperatorConfig(slotId_);
-        });
-        loadOperatorConfigTask.detach();
+        TelFFRTUtils::Submit([&]() { operatorConfigLoader_->LoadOperatorConfig(slotId_); });
     }
 }
 

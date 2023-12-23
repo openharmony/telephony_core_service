@@ -22,7 +22,6 @@
 #include "network_search_manager.h"
 #include "network_search_types.h"
 #include "parameter.h"
-#include "runner_pool.h"
 #include "sim_manager.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
@@ -62,7 +61,6 @@ void CoreService::OnStart()
         }
         registerToService_ = true;
     }
-    RunnerPool::GetInstance().Init();
     IPCSkeleton::SetMaxWorkThreadNum(MAX_IPC_THREAD_NUM);
     if (!Init()) {
         TELEPHONY_LOGE("failed to init CoreService");
@@ -1547,6 +1545,23 @@ int64_t CoreService::GetEndTime()
 int64_t CoreService::GetSpendTime()
 {
     return endTime_ - bindTime_;
+}
+
+int32_t CoreService::GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::CELL_LOCATION)) {
+        TELEPHONY_LOGE("Do not support Permission::CELL_LOCATION");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->GetNrSsbId(slotId, nrSsbInformation);
 }
 } // namespace Telephony
 } // namespace OHOS

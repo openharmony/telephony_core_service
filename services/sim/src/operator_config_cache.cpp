@@ -27,9 +27,8 @@
 
 namespace OHOS {
 namespace Telephony {
-OperatorConfigCache::OperatorConfigCache(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    std::weak_ptr<SimFileManager> simFileManager, int32_t slotId)
-    : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), slotId_(slotId)
+OperatorConfigCache::OperatorConfigCache(std::weak_ptr<SimFileManager> simFileManager, int32_t slotId)
+    : TelEventHandler("OperatorConfigCache"), simFileManager_(simFileManager), slotId_(slotId)
 {
     TELEPHONY_LOGI("OperatorConfigCache create");
     if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_ != nullptr &&

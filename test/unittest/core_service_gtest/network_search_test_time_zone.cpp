@@ -43,8 +43,7 @@ constexpr int32_t TIMEZONE_OFFSET_NEGATIVE_1 = -1;
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UpdateCountryCode_0100, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>(eventLoop);
+    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>();
     timeZoneUpdater->Init();
     std::string countryCode = "cn";
     timeZoneUpdater->UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
@@ -78,8 +77,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UpdateCountryCode_0100, Func
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UpdateTimeZoneOffset_0100, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>(eventLoop);
+    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>();
     timeZoneUpdater->Init();
     std::string countryCode = "cn";
     timeZoneUpdater->UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
@@ -123,8 +121,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UpdateTimeZoneOffset_0100, F
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_TimeZoneID_0100, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>(eventLoop);
+    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>();
     timeZoneUpdater->Init();
     std::string countryCode = "cn";
     timeZoneUpdater->UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
@@ -166,8 +163,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_TimeZoneID_0100, Function | 
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_Location_0100, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto suggester = std::make_shared<TimeZoneLocationSuggester>(eventLoop);
+    auto suggester = std::make_shared<TimeZoneLocationSuggester>();
     auto idleState = new (std::nothrow) IdleState(std::weak_ptr<TimeZoneLocationSuggester>(suggester), "IdleState");
     auto nitzState = new (std::nothrow) NitzState(std::weak_ptr<TimeZoneLocationSuggester>(suggester), "NitzState");
     auto locationState =
@@ -260,6 +256,62 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_FactoryReset_0300, Function 
     int32_t result = CoreServiceClient::GetInstance().FactoryReset(SLOT_ID_0);
     TELEPHONY_LOGI("TelephonyTestService FactoryReset result: %{public}d", result);
     EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetNrSsbIdInfo_0100
+ * @tc.name     Get NR Cell's Ssb Id related info
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNrSsbIdInfo_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID_0))) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+        return;
+    }
+    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo;
+    int32_t result = CoreServiceClient::GetInstance().GetNrSsbIdInfo(SLOT_ID_0, nrCellSsbIdsInfo);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    NetworkSearchTest::PrintNrSsbIdInfo(nrCellSsbIdsInfo);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetNrSsbIdInfo_0200
+ * @tc.name     Get NR Cell's Ssb Id related info
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNrSsbIdInfo_0200, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID_1))) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+        return;
+    }
+    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo;
+    int32_t result = CoreServiceClient::GetInstance().GetNrSsbIdInfo(SLOT_ID_1, nrCellSsbIdsInfo);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    NetworkSearchTest::PrintNrSsbIdInfo(nrCellSsbIdsInfo);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetNrSsbIdInfo_0300
+ * @tc.name     Get NR Cell's Ssb Id related info without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNrSsbIdInfo_0300, Function | MediumTest | Level3)
+{
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID_0))) {
+        TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+        return;
+    }
+    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo;
+    int32_t result = CoreServiceClient::GetInstance().GetNrSsbIdInfo(SLOT_ID_0, nrCellSsbIdsInfo);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    NetworkSearchTest::PrintNrSsbIdInfo(nrCellSsbIdsInfo);
 }
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony

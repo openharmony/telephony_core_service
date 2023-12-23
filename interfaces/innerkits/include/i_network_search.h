@@ -26,6 +26,7 @@
 #include "network_search_callback_base.h"
 #include "network_search_result.h"
 #include "network_state.h"
+#include "nr_ssb_information.h"
 #include "signal_information.h"
 
 namespace OHOS {
@@ -170,6 +171,7 @@ public:
     virtual int32_t UpdateRadioOn(int32_t slotId) = 0;
     virtual int32_t GetRrcConnectionState(int32_t slotId, int32_t &status) = 0;
     virtual int32_t FactoryReset(int32_t slotId) = 0;
+    virtual int32_t GetNrSsbId(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation) = 0;
 
     /**
      * @brief support Nr network or not

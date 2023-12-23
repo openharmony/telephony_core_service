@@ -18,6 +18,7 @@
 
 #include "event_handler.h"
 #include "event_runner.h"
+#include "tel_event_handler.h"
 #ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
 #include "power_mgr_errors.h"
@@ -25,10 +26,9 @@
 
 namespace OHOS {
 namespace Telephony {
-class TelRilHandler : public AppExecFwk::EventHandler {
+class TelRilHandler : public TelEventHandler {
 public:
-    explicit TelRilHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner)
-    {}
+    TelRilHandler() : TelEventHandler("TelRilHandler") {}
     ~TelRilHandler() = default;
 
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;

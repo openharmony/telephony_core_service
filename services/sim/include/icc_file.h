@@ -20,8 +20,6 @@
 #include "common_event.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
-#include "event_handler.h"
-#include "event_runner.h"
 #include "i_tel_ril_manager.h"
 #include "icc_dialling_numbers_handler.h"
 #include "icc_file_controller.h"
@@ -30,6 +28,7 @@
 #include "plmn_file.h"
 #include "sim_constant.h"
 #include "sim_state_manager.h"
+#include "tel_event_handler.h"
 #include "telephony_log_wrapper.h"
 #include "usim_function_handle.h"
 #include "voice_mail_constants.h"
@@ -37,9 +36,9 @@
 
 namespace OHOS {
 namespace Telephony {
-class IccFile : public AppExecFwk::EventHandler {
+class IccFile : public TelEventHandler {
 public:
-    IccFile(const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager);
+    explicit IccFile(const std::string &name, std::shared_ptr<SimStateManager> simStateManager);
     void Init();
     virtual void StartLoad();
     std::string ObtainIMSI();

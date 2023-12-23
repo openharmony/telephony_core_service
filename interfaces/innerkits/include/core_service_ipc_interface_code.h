@@ -113,6 +113,7 @@ enum class CoreServiceInterfaceCode {
     GET_BASEBAND_VERSION,
     GET_DSDS_MODE,
     FACTORY_RESET,
+    GET_NR_SSB_ID_INFO,
 };
 } // namespace Telephony
 } // namespace OHOS
