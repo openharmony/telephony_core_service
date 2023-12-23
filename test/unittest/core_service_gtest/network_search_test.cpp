@@ -256,9 +256,7 @@ void NetworkSearchTest::PrintNrSsbIdInfo(std::shared_ptr<NrSsbInformation> nr)
 {
     int32_t ssbListNum = 0;
     int32_t nbCellNum = 0;
-    TELEPHONY_LOGI("NrCellSsbIdsInfo arfcn:%{private}d, cid:%{private}lld, pci:%{private}d, rsrp:%{public}d,"
-        "sinr:%{public}d, timeAdvance:%{private}d",
-        nr->GetArfcn(), nr->GetCid(), nr->GetPci(), nr->GetRsrp(), nr->GetSinr(), nr->GetTimeAdvance());
+    TELEPHONY_LOGI("NrCellSsbIdsInfo rsrp:%{public}d, sinr:%{public}d", nr->GetRsrp(), nr->GetSinr());
     std::vector<SsbInfo> sCellSsbIdList;
     nr->GetSCellSsbIdList(sCellSsbIdList);
     for (auto info : sCellSsbIdList) {
