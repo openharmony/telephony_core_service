@@ -70,6 +70,7 @@ void CoreServiceStub::AddHandlerNetWorkToMap()
         &CoreServiceStub::OnUnregisterImsRegInfoCallback;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_BASEBAND_VERSION)] = &CoreServiceStub::OnGetBasebandVersion;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::FACTORY_RESET)] = &CoreServiceStub::OnFactoryReset;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NR_SSB_ID_INFO)] = &CoreServiceStub::OnGetNrSsbIdInfo;
 }
 
 void CoreServiceStub::AddHandlerSimToMap()
@@ -1650,6 +1651,22 @@ int32_t CoreServiceStub::OnGetBasebandVersion(MessageParcel &data, MessageParcel
         TELEPHONY_LOGE("OnRemoteRequest::OnGetBasebandVersion write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
+    return result;
+}
+
+int32_t CoreServiceStub::OnGetNrSsbIdInfo(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::shared_ptr<NrSsbInformation> nrSsbInformation;
+    int32_t result = GetNrSsbIdInfo(slotId, nrSsbInformation);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("Write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    nrSsbInformation->Marshalling(reply);
     return result;
 }
 

@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Telephony {
 class SimFile : public IccFile {
 public:
-    SimFile(const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager);
+    explicit SimFile(std::shared_ptr<SimStateManager> simStateManager);
     void StartLoad();
     std::string ObtainMsisdnNumber();
     std::string ObtainSimOperator();

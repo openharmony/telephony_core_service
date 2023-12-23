@@ -46,13 +46,11 @@ static const std::string PRIMARY_SLOTID = "0";
 
 MultiSimController::MultiSimController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager,
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner)
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager)
     : simStateManager_(simStateManager), simFileManager_(simFileManager)
 {
     TELEPHONY_LOGI("MultiSimController::MultiSimController");
-    radioProtocolController_ =
-        std::make_shared<RadioProtocolController>(std::weak_ptr<ITelRilManager>(telRilManager), runner);
+    radioProtocolController_ = std::make_shared<RadioProtocolController>(std::weak_ptr<ITelRilManager>(telRilManager));
     InitMainCardSlotId();
 }
 

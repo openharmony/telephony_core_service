@@ -18,7 +18,6 @@
 
 #include "common_event_subscriber.h"
 #include "data_ability_observer_stub.h"
-#include "event_handler.h"
 #include "network_search_manager.h"
 #include "system_ability_status_change_stub.h"
 #include "time_zone_location_suggester.h"
@@ -26,9 +25,9 @@
 
 namespace OHOS {
 namespace Telephony {
-class TimeZoneUpdater : public AppExecFwk::EventHandler {
+class TimeZoneUpdater : public TelEventHandler {
 public:
-    explicit TimeZoneUpdater(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    TimeZoneUpdater();
     virtual ~TimeZoneUpdater();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void Init();

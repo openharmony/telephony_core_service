@@ -25,6 +25,7 @@
 #include "sim_file_manager.h"
 #include "system_ability_definition.h"
 #include "system_ability_status_change_stub.h"
+#include "tel_event_handler.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_state_registry_client.h"
 
@@ -33,10 +34,9 @@ namespace Telephony {
 using namespace OHOS::EventFwk;
 using CommonEventSubscribeInfo = OHOS::EventFwk::CommonEventSubscribeInfo;
 using CommonEventSubscriber = OHOS::EventFwk::CommonEventSubscriber;
-class MultiSimMonitor : public AppExecFwk::EventHandler {
+class MultiSimMonitor : public TelEventHandler {
 public:
-    MultiSimMonitor(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        const std::shared_ptr<MultiSimController> &controller,
+    explicit MultiSimMonitor(const std::shared_ptr<MultiSimController> &controller,
         std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
         std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager);
     ~MultiSimMonitor();

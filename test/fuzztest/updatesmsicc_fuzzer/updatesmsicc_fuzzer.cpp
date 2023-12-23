@@ -44,8 +44,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 
     auto telRilManager_ = std::make_shared<TelRilManager>();
     auto stateManager_ = std::make_shared<SimStateManager>(telRilManager_);
-    auto eventLoopSms_ = AppExecFwk::EventRunner::Create("simSmsController");
-    auto simSmsController = std::make_shared<SimSmsController>(eventLoopSms_, stateManager_);
+    auto simSmsController = std::make_shared<SimSmsController>(stateManager_);
     std::int32_t eventId = static_cast<int32_t>(size);
     std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(*data);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object);

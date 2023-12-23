@@ -746,6 +746,13 @@ int32_t TelRilCallback::GetRrcConnectionStateResponse(
         rrcConnectionState);
 }
 
+int32_t TelRilCallback::GetNrSsbIdResponse(
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_2::NrCellSsbIds &nrCellSsbIds)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::GetNrSsbIdResponse,
+        nrCellSsbIds);
+}
+
 int32_t TelRilCallback::NewSmsNotify(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::SmsMessageInfo &smsMessageInfo)
 {

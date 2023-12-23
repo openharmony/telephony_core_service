@@ -243,6 +243,8 @@ public:
 
     int32_t GetServiceRunningState();
 
+    int32_t GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation) override;
+
 private:
     bool Init();
 

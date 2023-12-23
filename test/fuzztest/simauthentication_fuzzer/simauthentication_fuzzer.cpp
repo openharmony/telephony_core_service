@@ -150,8 +150,7 @@ void ParseOpl5g(const uint8_t *data, size_t size)
 
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("SimFile");
-    std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(eventLoopRecord, simStateManager);
+    std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(simStateManager);
     std::string fileData(reinterpret_cast<const char *>(data), size);
     std::vector<std::string> records;
     records.push_back(fileData);
