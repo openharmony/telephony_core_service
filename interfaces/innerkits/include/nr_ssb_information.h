@@ -82,8 +82,8 @@ public:
     int32_t GetSinr() const;
     int32_t GetTimeAdvance() const;
     int32_t GetNbCellCount() const;
-    void GetSCellSsbIdList(std::vector<SsbInfo> sCellSsbList) const;
-    void GetNbCellSsbIdList(std::vector<NeighboringCellSsbInformation> nbCellSsbList) const;
+    void GetSCellSsbIdList(std::vector<SsbInfo> &sCellSsbList) const;
+    void GetNbCellSsbIdList(std::vector<NeighboringCellSsbInformation> &nbCellSsbList) const;
 
 public:
     static const int32_t SCELL_SSB_LIST = 8;

@@ -1037,13 +1037,13 @@ void NetworkSearchHandler::RadioVoiceTechChange(const AppExecFwk::InnerEvent::Po
 
 void NetworkSearchHandler::GetNrSsbIdResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    TELEPHONY_LOGD("Start slotId:%{public}d", slotId_);
     if (event == nullptr) {
         TELEPHONY_LOGE("Event is nullptr!");
         return;
     }
-    TELEPHONY_LOGD("Start slotId:%{public}d", slotId_);
     if (nrSsbInfo_ == nullptr) {
-        TELEPHONY_LOGE("NrSsbInfo is null slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("NrSsbInfo is null");
         return;
     }
     if (nrSsbInfo_->ProcessGetNrSsbId(event)) {
@@ -1055,7 +1055,7 @@ void NetworkSearchHandler::SyncGetSsbInfoResponse()
 {
     std::unique_lock<std::mutex> lck(NetworkSearchManager::ctx_);
     NetworkSearchManager::ssbResponseReady_ = true;
-    TELEPHONY_LOGI("ssbResponseReady_ = %{public}d", NetworkSearchManager::ssbResponseReady_);
+    TELEPHONY_LOGD("ssbResponseReady_ = %{public}d", NetworkSearchManager::ssbResponseReady_);
     NetworkSearchManager::cv_.notify_one();
 }
 

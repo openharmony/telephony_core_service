@@ -22,12 +22,17 @@ namespace OHOS {
 namespace Telephony {
 NrSsbInfo::NrSsbInfo(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
     : networkSearchManager_(networkSearchManager), slotId_(slotId)
-{}
+{
+    nrCellSsbIdsInfo_ = std::make_shared<NrCellSsbInfo>();
+}
 
 bool NrSsbInfo::FillNrSsbIdInformation(const std::shared_ptr<NrSsbInformation> &nrCellSsbIdsInfo)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-
+    if (nrCellSsbIdsInfo == nullptr) {
+        TELEPHONY_LOGE("nrCellSsbIdsInfo is null");
+        return false;
+    }
     nrCellSsbIdsInfo->SetSsbBaseParam(nrCellSsbIdsInfo_->arfcn, nrCellSsbIdsInfo_->cid, nrCellSsbIdsInfo_->pci,
         nrCellSsbIdsInfo_->rsrp, nrCellSsbIdsInfo_->sinr, nrCellSsbIdsInfo_->timeAdvance);
     nrCellSsbIdsInfo->SetSCellSsbList(nrCellSsbIdsInfo_->sCellSsbList);
@@ -37,10 +42,9 @@ bool NrSsbInfo::FillNrSsbIdInformation(const std::shared_ptr<NrSsbInformation> &
 
 bool NrSsbInfo::ProcessGetNrSsbId(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGD("Start... slotId:%{public}d", slotId_);
     std::lock_guard<std::mutex> lock(mutex_);
     if (event == nullptr) {
-        TELEPHONY_LOGE("Event is nullptr slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("Event is nullptr");
         return false;
     }
     std::shared_ptr<NrCellSsbIds> nrCellSsbIds = event->GetSharedObject<NrCellSsbIds>();
@@ -50,7 +54,7 @@ bool NrSsbInfo::ProcessGetNrSsbId(const AppExecFwk::InnerEvent::Pointer &event)
     }
 
     if (!UpdateNrSsbIdInfo(slotId_, nrCellSsbIds)) {
-        TELEPHONY_LOGI("Get ssb info is failed");
+        TELEPHONY_LOGE("Get ssb info is failed");
         return false;
     }
     return true;
@@ -58,11 +62,10 @@ bool NrSsbInfo::ProcessGetNrSsbId(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool NrSsbInfo::UpdateNrSsbIdInfo(int32_t slotId, std::shared_ptr<NrCellSsbIds> nrCellSsbIds)
 {
-    if (nrCellSsbIds == nullptr) {
-        TELEPHONY_LOGE("nrCellSsbIds is nullptr");
+    if (nrCellSsbIds == nullptr || nrCellSsbIdsInfo_ == nullptr) {
+        TELEPHONY_LOGE("nrCellSsbIds or nrCellSsbIdsInfo_ is nullptr");
         return false;
     }
-    TELEPHONY_LOGI("Start... slotId:%{public}d", slotId_);
     if (nrCellSsbIds->nbCellCount > NrSsbInformation::MAX_NBCELL_COUNT) {
         TELEPHONY_LOGE("nbCellCount:%{public}d > MAX_NBCELL_COUNT", nrCellSsbIds->nbCellCount);
         return false;
