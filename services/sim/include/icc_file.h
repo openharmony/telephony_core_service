@@ -44,6 +44,7 @@ public:
     std::string ObtainIMSI();
     void UpdateImsi(std::string imsi);
     std::string ObtainIccId();
+    std::string ObtainDecIccId();
     std::string ObtainGid1();
     std::string ObtainGid2();
     std::string ObtainMsisdnNumber();
@@ -102,7 +103,8 @@ protected:
     std::shared_ptr<IccFileController> fileController_ = nullptr;
     std::shared_ptr<SimStateManager> stateManager_ = nullptr;
     std::string imsi_ = "";
-    std::string iccId_ = ""; // decimals
+    std::string iccId_ = "";
+    std::string decIccId_ = "";
     std::string spn_ = "";
     std::string gid1_ = "";
     std::string gid2_ = "";
@@ -167,6 +169,7 @@ protected:
     void UpdateIccLanguage(const std::string &langLi, const std::string &langPl);
     std::string ObtainValidLanguage(const std::string &langData);
     void SwapPairsForIccId(std::string &iccId);
+    void GetFullIccid(std::string &iccId);
     std::shared_ptr<IccDiallingNumbersHandler> diallingNumberHandler_ = nullptr;
     AppExecFwk::InnerEvent::Pointer CreateDiallingNumberPointer(
         int eventid, int efId, int index, std::shared_ptr<void> pobj);

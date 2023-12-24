@@ -95,6 +95,7 @@ private:
     void SendMainCardBroadCast(int32_t slotId);
     void SendDefaultCellularDataBroadCast(int32_t slotId);
     void InitMainCardSlotId();
+    void PublishSetPrimaryEvent(bool setDone);
 
 private:
     int32_t maxCount_ = 0;
