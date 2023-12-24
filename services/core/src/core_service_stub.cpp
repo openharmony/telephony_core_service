@@ -1657,7 +1657,11 @@ int32_t CoreServiceStub::OnGetBasebandVersion(MessageParcel &data, MessageParcel
 int32_t CoreServiceStub::OnGetNrSsbIdInfo(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::shared_ptr<NrSsbInformation> nrSsbInformation;
+    std::shared_ptr<NrSsbInformation> nrSsbInformation = std::make_shared<NrSsbInformation>();
+    if (nrSsbInformation == nullptr) {
+        TELEPHONY_LOGE("nrSsbInformation is null.");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     int32_t result = GetNrSsbIdInfo(slotId, nrSsbInformation);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("Write reply failed.");
@@ -1666,7 +1670,10 @@ int32_t CoreServiceStub::OnGetNrSsbIdInfo(MessageParcel &data, MessageParcel &re
     if (result != TELEPHONY_ERR_SUCCESS) {
         return result;
     }
-    nrSsbInformation->Marshalling(reply);
+    if (!nrSsbInformation->Marshalling(reply)) {
+        TELEPHONY_LOGE("Marshalling is failed.");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
     return result;
 }
 

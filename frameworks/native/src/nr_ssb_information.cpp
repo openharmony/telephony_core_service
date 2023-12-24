@@ -122,14 +122,16 @@ bool NrSsbInformation::ReadFromParcel(Parcel &parcel)
     }
     timeAdvance_ = item_32;
     for (int32_t i = 0; i < SCELL_SSB_LIST; ++i) {
+        SsbInfo ssbInfo;
         if (!parcel.ReadInt32(item_32)) {
             return false;
         }
-        sCellSsbList_[i].ssbId = item_32;
+        ssbInfo.ssbId = item_32;
         if (!parcel.ReadInt32(item_32)) {
             return false;
         }
-        sCellSsbList_[i].rsrp = item_32;
+        ssbInfo.rsrp = item_32;
+        sCellSsbList_.push_back(ssbInfo);
     }
     if (!ReadFromParcelForNbCell(parcel)) {
         return false;
@@ -145,32 +147,36 @@ bool NrSsbInformation::ReadFromParcelForNbCell(Parcel &parcel)
     }
     nbCellCount_ = (item_32 > MAX_NBCELL_COUNT) ? MAX_NBCELL_COUNT : item_32;
     for (int32_t i = 0; i < nbCellCount_; ++i) {
+        NeighboringCellSsbInformation nbCellSsbInfo;
         if (!parcel.ReadInt32(item_32)) {
             return false;
         }
-        nbCellSsbList_[i].pci = item_32;
+        nbCellSsbInfo.pci = item_32;
         if (!parcel.ReadInt32(item_32)) {
             return false;
         }
-        nbCellSsbList_[i].arfcn = item_32;
+        nbCellSsbInfo.arfcn = item_32;
         if (!parcel.ReadInt32(item_32)) {
             return false;
         }
-        nbCellSsbList_[i].rsrp = item_32;
+        nbCellSsbInfo.rsrp = item_32;
         if (!parcel.ReadInt32(item_32)) {
             return false;
         }
-        nbCellSsbList_[i].sinr = item_32;
+        nbCellSsbInfo.sinr = item_32;
         for (int32_t j = 0; j < NBCELL_SSB_LIST; ++j) {
+            SsbInfo ssbInfo;
             if (!parcel.ReadInt32(item_32)) {
                 return false;
             }
-            nbCellSsbList_[i].ssbList[j].ssbId = item_32;
+            ssbInfo.ssbId = item_32;
             if (!parcel.ReadInt32(item_32)) {
                 return false;
             }
-            nbCellSsbList_[i].ssbList[j].rsrp = item_32;
+            ssbInfo.rsrp = item_32;
+            nbCellSsbInfo.ssbList.push_back(ssbInfo);
         }
+        nbCellSsbList_.push_back(nbCellSsbInfo);
     }
     return true;
 }
@@ -188,9 +194,11 @@ void NrSsbInformation::SetSsbBaseParam(
 
 void NrSsbInformation::SetSCellSsbList(std::vector<SsbInfo> sCellSsbList)
 {
-    for (int32_t i = 0; i < SCELL_SSB_LIST; ++i) {
-        sCellSsbList_[i].ssbId = sCellSsbList[i].ssbId;
-        sCellSsbList_[i].rsrp = sCellSsbList[i].rsrp;
+    for (auto &info : sCellSsbList) {
+        SsbInfo ssbInfo;
+        ssbInfo.ssbId = info.ssbId;
+        ssbInfo.rsrp = info.rsrp;
+        sCellSsbList_.push_back(ssbInfo);
     }
 }
 
@@ -198,14 +206,18 @@ void NrSsbInformation::SetNbCellSsbList(int32_t nbCellCount, std::vector<Neighbo
 {
     nbCellCount_ = (nbCellCount > MAX_NBCELL_COUNT) ? MAX_NBCELL_COUNT : nbCellCount;
     for (int32_t i = 0; i < nbCellCount_; ++i) {
-        nbCellSsbList_[i].pci = nbCellSsbList[i].pci;
-        nbCellSsbList_[i].arfcn = nbCellSsbList[i].arfcn;
-        nbCellSsbList_[i].rsrp = nbCellSsbList[i].rsrp;
-        nbCellSsbList_[i].sinr = nbCellSsbList[i].sinr;
-        for (int32_t j = 0; j < NBCELL_SSB_LIST; ++j) {
-            nbCellSsbList_[i].ssbList[j].ssbId = nbCellSsbList[i].ssbList[j].ssbId;
-            nbCellSsbList_[i].ssbList[j].rsrp = nbCellSsbList[i].ssbList[j].rsrp;
+        NeighboringCellSsbInformation nbCellSsbInfo;
+        nbCellSsbInfo.pci = nbCellSsbList[i].pci;
+        nbCellSsbInfo.arfcn = nbCellSsbList[i].arfcn;
+        nbCellSsbInfo.rsrp = nbCellSsbList[i].rsrp;
+        nbCellSsbInfo.sinr = nbCellSsbList[i].sinr;
+        for (auto &info : nbCellSsbList[i].ssbList) {
+            SsbInfo ssbInfo;
+            ssbInfo.ssbId = info.ssbId;
+            ssbInfo.rsrp = info.rsrp;
+            nbCellSsbInfo.ssbList.push_back(ssbInfo);
         }
+        nbCellSsbList_.push_back(nbCellSsbInfo);
     }
 }
 
@@ -244,7 +256,7 @@ int32_t NrSsbInformation::GetNbCellCount() const
     return nbCellCount_;
 }
 
-void NrSsbInformation::GetSCellSsbIdList(std::vector<SsbInfo> sCellSsbList) const
+void NrSsbInformation::GetSCellSsbIdList(std::vector<SsbInfo> &sCellSsbList) const
 {
     for (auto &info : sCellSsbList_) {
         SsbInfo ssbInfo;
@@ -254,7 +266,7 @@ void NrSsbInformation::GetSCellSsbIdList(std::vector<SsbInfo> sCellSsbList) cons
     }
 }
 
-void NrSsbInformation::GetNbCellSsbIdList(std::vector<NeighboringCellSsbInformation> nbCellSsbList) const
+void NrSsbInformation::GetNbCellSsbIdList(std::vector<NeighboringCellSsbInformation> &nbCellSsbList) const
 {
     for (int32_t i = 0; i < nbCellCount_; i++) {
         NeighboringCellSsbInformation neighboringCellSsbInfo;
