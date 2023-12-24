@@ -1546,6 +1546,14 @@ bool CoreManagerInner::IsNrSupported(int32_t slotId)
     return false;
 }
 
+bool CoreManagerInner::IsSatelliteEnabled()
+{
+    if (networkSearchManager_ != nullptr) {
+        return networkSearchManager_->IsSatelliteEnabled();
+    }
+    return false;
+}
+
 void CoreManagerInner::DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive)
 {
     if (networkSearchManager_ != nullptr) {

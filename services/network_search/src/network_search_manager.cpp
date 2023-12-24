@@ -15,16 +15,17 @@
 
 #include "network_search_manager.h"
 
-#include <parameters.h>
-#include <string_ex.h>
-#include <securec.h>
 #include <cinttypes>
+#include <parameters.h>
+#include <securec.h>
+#include <string_ex.h>
 
 #include "core_service_errors.h"
 #include "enum_convert.h"
 #include "mcc_pool.h"
 #include "network_search_types.h"
 #include "parameter.h"
+#include "satellite_service_client.h"
 #include "telephony_common_utils.h"
 #include "telephony_config.h"
 #include "telephony_errors.h"
@@ -945,7 +946,14 @@ int32_t NetworkSearchManager::GetImei(int32_t slotId, std::u16string &imei)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (inner->imei_.empty()) {
-        eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_IMEI);
+        std::shared_ptr<SatelliteServiceClient> satelliteClient =
+            DelayedSingleton<SatelliteServiceClient>::GetInstance();
+        bool isSatelliteEnable = IsSatelliteEnabled();
+        if (isSatelliteEnable) {
+            satelliteClient->GetImei(slotId);
+        } else {
+            eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_IMEI);
+        }
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     imei = inner->imei_;
@@ -1116,6 +1124,16 @@ bool NetworkSearchManager::IsNrSupported(int32_t slotId)
     }
     return (static_cast<uint32_t>(modemRaf) & static_cast<uint32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_NR)) ==
         static_cast<uint32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_NR);
+}
+
+bool NetworkSearchManager::IsSatelliteEnabled()
+{
+    std::shared_ptr<SatelliteServiceClient> satelliteClient = DelayedSingleton<SatelliteServiceClient>::GetInstance();
+    if (satelliteClient == nullptr) {
+        TELEPHONY_LOGE("satelliteClient is nullptr");
+        return false;
+    }
+    return satelliteClient->IsSatelliteEnabled();
 }
 
 int32_t NetworkSearchManager::HandleRrcStateChanged(int32_t slotId, int32_t status)
