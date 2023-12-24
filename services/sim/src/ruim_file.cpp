@@ -188,9 +188,12 @@ bool RuimFile::ProcessGetIccidDone(const AppExecFwk::InnerEvent::Pointer &event)
     }
     if (fd->exception == nullptr) {
         std::string iccData = fd->resultData;
+        std::string fullIccData = iccData;
+        GetFullIccid(fullIccData);
         SwapPairsForIccId(iccData);
         TELEPHONY_LOGI("RuimFile::ProcessEvent MSG_SIM_OBTAIN_ICCID_DONE result success");
-        iccId_ = iccData;
+        decIccId_ = iccData;
+        iccId_ = fullIccData;
     }
     return isFileProcessResponse;
 }

@@ -221,7 +221,8 @@ void RadioProtocolController::ProcessSetRadioProtocolTimeout(const AppExecFwk::I
         TELEPHONY_LOGE("RadioProtocolController::ProcessSetRadioProtocolTimeout failed due to invalid sessionId");
         return;
     }
-
+    ProcessCommunicationResponse(false);
+    CleanUpCommunication();
     sessionId_++;
     communicatingSlotCount_ = 0;
     communicationFailed_ = true;
