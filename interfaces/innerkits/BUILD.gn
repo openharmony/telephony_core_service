@@ -26,6 +26,7 @@ config("tel_core_service_api_config") {
   include_dirs = [
     "$TELEPHONY_INTERFACES_INNERKITS/include",
     "$TELEPHONY_INTERFACES_INNERKITS/ims/include",
+    "$TELEPHONY_INTERFACES_INNERKITS/satellite",
   ]
 
   cflags = []

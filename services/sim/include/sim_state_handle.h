@@ -28,6 +28,7 @@
 #include "i_tel_ril_manager.h"
 #include "icc_state.h"
 #include "observer_handler.h"
+#include "satellite_core_callback.h"
 #include "sim_state_type.h"
 #include "tel_event_handler.h"
 #include "telephony_errors.h"
@@ -127,6 +128,8 @@ public:
     bool IsIccReady();
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
+    void RegisterSatelliteCallback();
+    void UnregisterSatelliteCallback();
     int32_t SimAuthentication(int32_t slotId, AuthType authType, const std::string &authData);
     SimAuthenticationResponse GetSimAuthenticationResponse();
     void SendSimMatchedOperatorInfo(
@@ -153,6 +156,7 @@ private:
     void GetSendSimMatchedOperatorInfoResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     std::string GetAidByCardType(CardType type);
     void OnRadioStateUnavailable(const AppExecFwk::InnerEvent::Pointer &event);
+    int32_t IsSatelliteSupported();
 
 private:
     static const std::map<uint32_t, Func> memberFuncMap_;
@@ -169,6 +173,7 @@ private:
     std::weak_ptr<SimStateManager> simStateManager_;
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_; // ril manager
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
+    sptr<ISatelliteCoreCallback> satelliteCallback_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
