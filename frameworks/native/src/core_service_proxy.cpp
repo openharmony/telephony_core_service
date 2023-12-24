@@ -2964,6 +2964,10 @@ int32_t CoreServiceProxy::GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<N
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
+    if (nrSsbInformation == nullptr) {
+        TELEPHONY_LOGE("nrSsbInformation is null");
+        return TELEPHONY_ERR_ARGUMENT_NULL;
+    }
     int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_NR_SSB_ID_INFO), data, reply, option);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("Failed, error code is %{public}d\n", error);
@@ -2971,7 +2975,10 @@ int32_t CoreServiceProxy::GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<N
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        nrSsbInformation->ReadFromParcel(reply);
+        if (!nrSsbInformation->ReadFromParcel(reply)) {
+            TELEPHONY_LOGE("ReadFromParcel is failed");
+            return TELEPHONY_ERR_READ_DATA_FAIL;
+        }
     }
     return result;
 }

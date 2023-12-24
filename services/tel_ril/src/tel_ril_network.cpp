@@ -388,7 +388,10 @@ int32_t TelRilNetwork::GetNrSsbIdResponse(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_2::NrCellSsbIds &nrCellSsbIds)
 {
     std::shared_ptr<NrCellSsbIds> nrCellSsbIdsInfo = std::make_shared<NrCellSsbIds>();
-    TELEPHONY_LOGI("Fill ssbid info");
+    if (nrCellSsbIdsInfo == nullptr) {
+        return Response<NrCellSsbIds>(TELEPHONY_LOG_FUNC_NAME, responseInfo, nrCellSsbIdsInfo);
+    }
+    TELEPHONY_LOGI("Get ssbid response from hril");
     nrCellSsbIdsInfo->arfcn = nrCellSsbIds.arfcn;
     nrCellSsbIdsInfo->cid = nrCellSsbIds.cid;
     nrCellSsbIdsInfo->pic = nrCellSsbIds.pic;

@@ -1760,14 +1760,14 @@ int32_t NetworkSearchManager::GetNrSsbId(int32_t slotId, const std::shared_ptr<N
     TELEPHONY_LOGD("Start slotId:%{public}d", slotId);
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr) {
-        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
+        TELEPHONY_LOGE("inner is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_lock<std::mutex> lck(ctx_);
     ssbResponseReady_ = false;
     eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_NR_SSBID_INFO);
     while (!ssbResponseReady_) {
-        TELEPHONY_LOGI("Wait(), response = false");
+        TELEPHONY_LOGD("Wait(), response = false");
         if (cv_.wait_for(lck, std::chrono::seconds(GET_SSB_WAIT_TIME_SECOND)) == std::cv_status::timeout) {
             break;
         }
