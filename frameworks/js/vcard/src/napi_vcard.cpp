@@ -169,6 +169,7 @@ void ImportVCardCallback(napi_env env, napi_status status, void *data)
     auto context = static_cast<ImportContext *>(data);
     if (context == nullptr) {
         TELEPHONY_LOGE("ImportVCardCallback context nullptr");
+        return;
     }
     napi_value callbackValue = nullptr;
     if (context->resolved) {
