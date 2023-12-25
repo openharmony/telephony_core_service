@@ -218,7 +218,7 @@ static void NativeGetSignalInfoList(napi_env env, void *data)
     }
     asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSignalInfoList(
         asyncContext->slotId, asyncContext->signalInfoList);
-    TELEPHONY_LOGI("NativeGetSignalInfoList size = %{public}zu", asyncContext->signalInfoList.size());
+    TELEPHONY_LOGD("NativeGetSignalInfoList size = %{public}zu", asyncContext->signalInfoList.size());
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = true;
     }
