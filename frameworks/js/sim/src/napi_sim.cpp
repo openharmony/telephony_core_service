@@ -3001,6 +3001,10 @@ napi_status InitEnumOperatorConfigKey(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("KEY_OPL_CUST_STRING_ARRAY", GetNapiValue(env, "opl_cust_string_array")),
         DECLARE_NAPI_STATIC_PROPERTY("KEY_EMERGENCY_CALL_STRING_ARRAY",
             GetNapiValue(env, "emergency_call_string_array")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_EMERGENCY_CALL_WITH_CARD_STRING_ARRAY",
+            GetNapiValue(env, "emergency_call_with_card_string_array")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_EMERGENCY_CALL_NO_CARD_STRING_ARRAY",
+            GetNapiValue(env, "emergency_call_no_card_string_array")),
     };
 
     constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
