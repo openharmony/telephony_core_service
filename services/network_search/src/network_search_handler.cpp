@@ -471,7 +471,6 @@ void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Poi
 void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
 {
     TELEPHONY_LOGD("RadioOffOrUnavailableState enter... slotId:%{public}d", slotId_);
-
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("RadioOffOrUnavailableState NetworkSearchHandler is null slotId:%{public}d", slotId_);
@@ -482,7 +481,6 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
         TELEPHONY_LOGE("networkSearchState is null slotId:%{public}d", slotId_);
         return;
     }
-
     networkSearchState->SetInitial();
     RegServiceState regState = radioState == CORE_SERVICE_POWER_OFF ?
         RegServiceState::REG_STATE_POWER_OFF : RegServiceState::REG_STATE_NO_SERVICE;
@@ -500,7 +498,13 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
     if (networkSearchManager->GetAirplaneMode(isAirplaneModeOn) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RadioOffOrUnavailableState GetAirplaneMode fail slotId:%{public}d", slotId_);
     }
-    if (firstInit_ && !isAirplaneModeOn && radioState == CORE_SERVICE_POWER_OFF) {
+    auto simManager = networkSearchManager->GetSimManager();
+    if (simManager == nullptr) {
+        return;
+    }
+    bool hasSim = false;
+    simManager->HasSimCard(slotId_, hasSim);
+    if (hasSim && !isAirplaneModeOn && radioState == CORE_SERVICE_POWER_OFF) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
     }
     sptr<NetworkSearchCallBackBase> cellularData = networkSearchManager->GetCellularDataCallBack();
