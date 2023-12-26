@@ -232,5 +232,9 @@ enum RadioEvent {
     RADIO_IMS_GET_COLR,
     RADIO_IMS_SET_COLP,
     RADIO_IMS_GET_COLP,
+
+    // Satellite status
+    SATELLITE_STATUS_CHANGED,
+    GET_SATELLITE_CAPABILITY
 };
 #endif // RADIO_EVENT_H

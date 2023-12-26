@@ -29,6 +29,7 @@
 #include "operator_name.h"
 #include "radio_event.h"
 #include "radio_info.h"
+#include "satellite_core_callback.h"
 #include "signal_info.h"
 #include "system_ability_status_change_stub.h"
 #include "tel_event_handler.h"
@@ -57,6 +58,8 @@ public:
     int32_t RevertLastTechnology();
     void UpdateImsServiceStatus(const AppExecFwk::InnerEvent::Pointer &event);
     void UpdateImsRegisterState(const AppExecFwk::InnerEvent::Pointer &event);
+    void RegisterSatelliteCallback();
+    void UnregisterSatelliteCallback();
     int32_t SendUpdateCellLocationRequest();
     PhoneType GetPhoneType();
     int32_t GetNrSsbId(const std::shared_ptr<NrSsbInformation> &nrCellSsbIdsInfo);
@@ -134,7 +137,9 @@ private:
     void GetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioResidentNetworkChange(const AppExecFwk::InnerEvent::Pointer &event);
+    void SatelliteStatusChanged(const AppExecFwk::InnerEvent::Pointer &event);
     bool InitOperatorName();
+    int32_t IsSatelliteSupported();
     void GetNrSsbIdResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void SyncGetSsbInfoResponse();
     bool SubModuleInit();
@@ -162,6 +167,7 @@ private:
     uint32_t cellRequestMinInterval_ = 2; // This is the minimum interval in seconds for cell requests
     uint32_t lastCellRequestTime_ = 0;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
+    sptr<ISatelliteCoreCallback> satelliteCallback_ = nullptr;
 
 private:
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {

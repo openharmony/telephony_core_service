@@ -19,6 +19,7 @@
 #include "ims_core_service_client.h"
 #include "mcc_pool.h"
 #include "network_search_manager.h"
+#include "satellite_service_client.h"
 #include "telephony_log_wrapper.h"
 #include "time_zone_manager.h"
 
@@ -28,6 +29,7 @@ std::mutex NetworkSearchManager::ctx_;
 bool NetworkSearchManager::ssbResponseReady_ = false;
 std::condition_variable NetworkSearchManager::cv_;
 static const int32_t REQ_INTERVAL = 30;
+const int32_t SATELLITE_STATUS_ON = 1;
 const size_t MCC_LEN = 3;
 const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandler::memberFuncMap_ = {
     { RadioEvent::RADIO_SIM_STATE_CHANGE, &NetworkSearchHandler::SimStateChange },
@@ -70,7 +72,8 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
     { RadioEvent::RADIO_RESIDENT_NETWORK_CHANGE, &NetworkSearchHandler::RadioResidentNetworkChange },
     { RadioEvent::RADIO_GET_NR_SSBID_INFO, &NetworkSearchHandler::GetNrSsbIdResponse },
     { SettingEventCode::MSG_AUTO_TIME, &NetworkSearchHandler::AutoTimeChange },
-    { SettingEventCode::MSG_AUTO_AIRPLANE_MODE, &NetworkSearchHandler::AirplaneModeChange }
+    { SettingEventCode::MSG_AUTO_AIRPLANE_MODE, &NetworkSearchHandler::AirplaneModeChange },
+    { RadioEvent::SATELLITE_STATUS_CHANGED, &NetworkSearchHandler::SatelliteStatusChanged }
 };
 
 NetworkSearchHandler::NetworkSearchHandler(const std::weak_ptr<NetworkSearchManager> &networkSearchManager,
@@ -210,6 +213,13 @@ void NetworkSearchHandler::RegisterEvents()
                 slotId_, shared_from_this(), RadioEvent::RADIO_RESIDENT_NETWORK_CHANGE, nullptr);
         }
     }
+    {
+        if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED)) {
+            std::shared_ptr<SatelliteServiceClient> satelliteClient =
+                DelayedSingleton<SatelliteServiceClient>::GetInstance();
+            satelliteClient->AddNetworkHandler(slotId_, shared_from_this());
+        }
+    }
     // Register IMS
     {
         std::shared_ptr<ImsCoreServiceClient> imsCoreServiceClient =
@@ -217,6 +227,25 @@ void NetworkSearchHandler::RegisterEvents()
         if (imsCoreServiceClient != nullptr) {
             imsCoreServiceClient->RegisterImsCoreServiceCallbackHandler(slotId_, shared_from_this());
         }
+    }
+}
+
+void NetworkSearchHandler::RegisterSatelliteCallback()
+{
+    if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED)) {
+        satelliteCallback_ = std::make_unique<SatelliteCoreCallback>(shared_from_this()).release();
+        std::shared_ptr<SatelliteServiceClient> satelliteClient =
+            DelayedSingleton<SatelliteServiceClient>::GetInstance();
+        satelliteClient->RegisterCoreNotify(slotId_, RadioEvent::RADIO_SET_STATUS, satelliteCallback_);
+        satelliteClient->RegisterCoreNotify(slotId_, RadioEvent::RADIO_STATE_CHANGED, satelliteCallback_);
+        satelliteClient->RegisterCoreNotify(slotId_, RadioEvent::SATELLITE_STATUS_CHANGED, satelliteCallback_);
+    }
+}
+
+void NetworkSearchHandler::UnregisterSatelliteCallback()
+{
+    if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED)) {
+        satelliteCallback_ = nullptr;
     }
 }
 
@@ -245,6 +274,14 @@ void NetworkSearchHandler::UnregisterEvents()
                 slotId_, shared_from_this(), RadioEvent::RADIO_RRC_CONNECTION_STATE_UPDATE);
             telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_RESIDENT_NETWORK_CHANGE);
         }
+    }
+    if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED) &&
+        satelliteCallback_ != nullptr) {
+        std::shared_ptr<SatelliteServiceClient> satelliteClient =
+            DelayedSingleton<SatelliteServiceClient>::GetInstance();
+        satelliteClient->UnRegisterCoreNotify(slotId_, RadioEvent::RADIO_STATE_CHANGED);
+        satelliteClient->UnRegisterCoreNotify(slotId_, RadioEvent::RADIO_SET_STATUS);
+        satelliteClient->UnRegisterCoreNotify(slotId_, RadioEvent::SATELLITE_STATUS_CHANGED);
     }
 }
 
@@ -1130,9 +1167,32 @@ void NetworkSearchHandler::RadioResidentNetworkChange(const AppExecFwk::InnerEve
     }
 }
 
+void NetworkSearchHandler::SatelliteStatusChanged(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioResidentNetworkChange event is nullptr!");
+        return;
+    }
+    auto satelliteStatus = event->GetSharedObject<SatelliteStatus>();
+    if (satelliteStatus->mode == SATELLITE_STATUS_ON) {
+        std::shared_ptr<SatelliteServiceClient> satelliteClient =
+            DelayedSingleton<SatelliteServiceClient>::GetInstance();
+        satelliteClient->SetRadioState(
+            satelliteStatus->slotId, static_cast<int32_t>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
+    }
+}
+
 void NetworkSearchHandler::SetCellRequestMinInterval(uint32_t minInterval)
 {
     cellRequestMinInterval_ = minInterval;
+}
+
+int32_t NetworkSearchHandler::IsSatelliteSupported()
+{
+    char satelliteSupported[SYSPARA_SIZE] = { 0 };
+    GetParameter(TEL_SATELLITE_SUPPORTED, SATELLITE_DEFAULT_VALUE, satelliteSupported, SYSPARA_SIZE);
+    TELEPHONY_LOGI("satelliteSupported is %{public}s", satelliteSupported);
+    return std::atoi(satelliteSupported);
 }
 
 NetworkSearchHandler::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(

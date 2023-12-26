@@ -222,6 +222,7 @@ public:
     int32_t UpdateRadioOn(int32_t slotId);
 
     bool IsNrSupported(int32_t slotId);
+    bool IsSatelliteEnabled();
     int32_t GetNrOptionMode(int32_t slotId, NrMode &mode);
     FrequencyType GetFrequencyType(int32_t slotId) const;
     NrState GetNrState(int32_t slotId) const;
