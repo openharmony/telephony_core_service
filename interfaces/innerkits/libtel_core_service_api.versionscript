@@ -45,6 +45,7 @@
       *TelephonyStateRegistryProxy*;
       *WcdmaCellInformation*;
       *WcdmaSignalInformation*;
+      *SatelliteServiceClient*;
     };
   local:
     *;

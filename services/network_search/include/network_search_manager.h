@@ -182,6 +182,7 @@ public:
     int32_t GetMeid(int32_t slotId, std::u16string &meid) override;
     int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) override;
     bool IsNrSupported(int32_t slotId) override;
+    bool IsSatelliteEnabled() override;
     FrequencyType GetFrequencyType(int32_t slotId) override;
     NrState GetNrState(int32_t slotId) override;
     void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive) override;

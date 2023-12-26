@@ -36,6 +36,7 @@ inline const int32_t DSDS_MODE_V2 = 0;
 inline const int32_t DSDS_MODE_V3 = 1;
 inline const size_t MAX_PARAMETER_LENGTH = 100;
 inline int32_t maxSlotCount_ = 0;
+inline constexpr const char *SATELLITE_DEFAULT_VALUE = "0";
 inline constexpr const char *DEFAULT_SLOT_COUNT = "1";
 inline constexpr const char *TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
 inline constexpr const char *DEFAULT_PREFERRED_NETWORK_TYPE = "5"; // CORE_NETWORK_MODE_LTE_WCDMA_GSM
@@ -45,6 +46,7 @@ inline constexpr const char *INITIAL_OPKEY = "-1";
 inline constexpr const char *DEFAULT_OPERATOR_CONFIG = "default_operator_config.json";
 inline constexpr const char *OPKEY_PROP_PREFIX = "telephony.sim.opkey";
 inline constexpr const char *COUNTRY_CODE_KEY = "telephony.sim.countryCode";
+inline constexpr const char *TEL_SATELLITE_SUPPORTED = "const.telephony.satellite.supported";
 
 template<typename T>
 inline T GetMaxSlotCount()
@@ -65,6 +67,11 @@ inline T GetPreferredNetworkType()
     T networkType = std::atoi(preferredNetworkType);
     return networkType;
 }
+
+enum SatelliteValue {
+    SATELLITE_NOT_SUPPORTED = 0,
+    SATELLITE_SUPPORTED = 1,
+};
 
 enum SimSlotId {
     SIM_SLOT_0 = 0,

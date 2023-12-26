@@ -18,6 +18,8 @@ TELEPHONY_NETWORK_SEARCH_ROOT = "services/network_search"
 TELEPHONY_SIM_ROOT = "services/sim"
 TELEPHONY_TEL_RIL_ROOT = "services/tel_ril"
 TELEPHONY_IMS_CORE_SERVICE_SRC_PATH = "services/ims_service_interaction/src"
+TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH =
+    "services/satellite_service_interaction/src"
 TELEPHONY_EXT_WRAPPER_ROOT = "services/telephony_ext_wrapper"
 
 ohos_shared_library("tel_core_service") {
@@ -58,6 +60,10 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/time_zone_location_update.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/time_zone_manager.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/time_zone_updater.cpp",
+    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback.cpp",
+    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback_stub.cpp",
+    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_service_client.cpp",
+    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_service_proxy.cpp",
     "$TELEPHONY_SIM_ROOT/src/csim_file_controller.cpp",
     "$TELEPHONY_SIM_ROOT/src/icc_dialling_numbers_cache.cpp",
     "$TELEPHONY_SIM_ROOT/src/icc_dialling_numbers_handler.cpp",
@@ -123,6 +129,7 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_NETWORK_SEARCH_ROOT/include",
     "$TELEPHONY_EXT_WRAPPER_ROOT/include",
     "services/core/include",
+    "services/satellite_service_interaction/include",
     "utils/log/include",
   ]
 

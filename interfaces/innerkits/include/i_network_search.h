@@ -180,6 +180,15 @@ public:
      * @return false not support
      */
     virtual bool IsNrSupported(int32_t slotId) = 0;
+
+    /**
+     * @brief support Satellite network or not
+     *
+     * @return true support
+     * @return false not support
+     */
+    virtual bool IsSatelliteEnabled() = 0;
+
     /**
      * @brief Update physical link active status
      *
