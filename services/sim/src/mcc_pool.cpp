@@ -25,8 +25,8 @@ constexpr size_t MCC_ACCESS_TABLE_LEN = 240;
 std::shared_ptr<MccAccess> MccPool::AccessToMcc(int mcc)
 {
     InitMccTables();
-    auto it = std::find_if(
-        mccAccessTable_.begin(), mccAccessTable_.end(), [mcc](auto &p) { return p != nullptr && p->mcc_ == mcc; });
+    auto it = std::find_if(mccAccessTable_.begin(), mccAccessTable_.end(),
+        [mcc](const auto &p) { return p != nullptr && p->mcc_ == mcc; });
     if (it != mccAccessTable_.end()) {
         return *it;
     } else {
