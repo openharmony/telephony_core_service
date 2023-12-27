@@ -430,7 +430,7 @@ HWTEST_F(BranchTest, Telephony_SimFileManager_003, Function | MediumTest | Level
     EXPECT_FALSE(simFileManager.IsCTCardType(CardType::UNKNOWN_CARD));
     std::string iccId = "";
     EXPECT_FALSE(simFileManager.IsCTIccId(iccId));
-    iccId = "8986030";
+    iccId = "8986060";
     EXPECT_TRUE(simFileManager.IsCTIccId(iccId));
     iccId = "8985302";
     EXPECT_TRUE(simFileManager.IsCTIccId(iccId));
