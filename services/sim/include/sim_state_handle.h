@@ -155,7 +155,7 @@ private:
     void GetSimAuthenticationResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     void GetSendSimMatchedOperatorInfoResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     std::string GetAidByCardType(CardType type);
-    void OnRadioStateUnavailable(const AppExecFwk::InnerEvent::Pointer &event);
+    bool IsRadioStateUnavailable(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t IsSatelliteSupported();
 
 private:

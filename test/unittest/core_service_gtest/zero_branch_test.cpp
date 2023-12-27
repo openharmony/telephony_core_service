@@ -1009,7 +1009,6 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_005, Function | MediumTest | Lev
     mInner.SetDefaultCellularDataSlotId(0);
     mInner.SetDefaultSmsSlotId(0);
     mInner.SetDefaultVoiceSlotId(0);
-    mInner.SetPrimarySlotId(0);
     std::u16string test = u"";
     EXPECT_NE(mInner.GetOpName(0, test), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mInner.GetOpKeyExt(0, test), TELEPHONY_ERR_SUCCESS);
@@ -1244,7 +1243,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
     multiSimController->GetDefaultCellularDataSlotId();
     EXPECT_EQ(multiSimController->SetDefaultCellularDataSlotId(0), TELEPHONY_ERR_SUCCESS);
     multiSimController->GetPrimarySlotId();
-    multiSimController->SetPrimarySlotId(0);
     EXPECT_NE(multiSimController->GetShowNumber(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SetShowNumber(0, testU16Str, false), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->GetShowName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
@@ -1366,7 +1364,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_003, Function | MediumTest | Level1)
     simManager->SetDefaultSmsSlotId(INVALID_SLOTID);
     simManager->SetDefaultCellularDataSlotId(0);
     simManager->SetDefaultCellularDataSlotId(INVALID_SLOTID);
-    simManager->SetPrimarySlotId(0);
     simManager->SetPrimarySlotId(INVALID_SLOTID);
     simManager->GetDefaultVoiceSlotId();
     simManager->GetDefaultSmsSlotId();
@@ -1597,10 +1594,10 @@ HWTEST_F(BranchTest, Telephony_SimStateHandle_002, Function | MediumTest | Level
     simStateHandle->iccState_.simStatus_ = 1;
     simStateHandle->slotId_ = INVALID_SLOTID;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STATE_CHANGED);
-    simStateHandle->OnRadioStateUnavailable(event);
+    simStateHandle->IsRadioStateUnavailable(event);
     auto radioState = std::make_shared<HRilInt32Parcel>(ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STATE_CHANGED, radioState);
-    simStateHandle->OnRadioStateUnavailable(event);
+    EXPECT_TRUE(simStateHandle->IsRadioStateUnavailable(event));
 }
 /**
  * @tc.number   Telephony_NetworkRegister_001
