@@ -56,10 +56,8 @@ public:
     typedef bool (*IS_NR_SUPPORTED_NATIVE)(int32_t modemRaf);
     typedef void (*GET_SIGNAL_INFO_LIST_EXT)(int32_t slotId,
 	    std::vector<sptr<OHOS::Telephony::SignalInformation>> &signals);
-    typedef bool (*IS_CAPABILITY_SUPPORT_EXT)(uint32_t capablity);
     typedef void (*GET_NETWORK_CAPABILITY_EXT)(int32_t slotId, int32_t networkCapabilityType,
 	    int32_t &networkCapabilityState);
-    typedef int32_t (*WRAP_NATIVE_NETWORK_MODE_EXT)(int32_t nativeMode);
     typedef void (*ON_GET_NETWORK_SEARCH_INFORMATION_EXT)(int32_t &availableSize,
         std::vector<OHOS::Telephony::NetworkInformation> &networkInformations);
 
@@ -84,13 +82,13 @@ public:
     GET_PREFERRED_NETWORK_EXT getPreferredNetworkExt_ = nullptr;
     IS_NR_SUPPORTED_NATIVE isNrSupportedNative_ = nullptr;
     GET_SIGNAL_INFO_LIST_EXT getSignalInfoListExt_ = nullptr;
-    IS_CAPABILITY_SUPPORT_EXT isCapabilitySupportExt_ = nullptr;
     GET_NETWORK_CAPABILITY_EXT getNetworkCapabilityExt_ = nullptr;
-    WRAP_NATIVE_NETWORK_MODE_EXT wrapNativeNetworkModeExt_ = nullptr;
     ON_GET_NETWORK_SEARCH_INFORMATION_EXT onGetNetworkSearchInformationExt_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
+    void InitTelephonyExtWrapperForNetWork();
+    void InitTelephonyExtWrapperForVoiceMail();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

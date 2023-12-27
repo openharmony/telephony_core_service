@@ -39,7 +39,13 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
         TELEPHONY_LOGE("libtelephony_ext_service.z.so was not loaded, error: %{public}s", dlerror());
         return;
     }
+    InitTelephonyExtWrapperForNetWork();
+    InitTelephonyExtWrapperForVoiceMail();
+    TELEPHONY_LOGI("telephony ext wrapper init success");
+}
 
+void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
+{
     checkOpcVersionIsUpdate_ = (CHECK_OPC_VERSION_IS_UPDATE)dlsym(telephonyExtWrapperHandle_,
         "CheckOpcVersionIsUpdate");
     updateOpcVersion_ = (UPDATE_OPC_VERSION)dlsym(telephonyExtWrapperHandle_, "UpdateOpcVersion");
@@ -50,23 +56,22 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
     getPreferredNetworkExt_ = (GET_PREFERRED_NETWORK_EXT)dlsym(telephonyExtWrapperHandle_, "GetPreferredNetworkExt");
     isNrSupportedNative_ = (IS_NR_SUPPORTED_NATIVE)dlsym(telephonyExtWrapperHandle_, "IsNrSupportedNativeExt");
     getSignalInfoListExt_ = (GET_SIGNAL_INFO_LIST_EXT)dlsym(telephonyExtWrapperHandle_, "GetSignalInfoListExt");
-    isCapabilitySupportExt_ = (IS_CAPABILITY_SUPPORT_EXT)dlsym(telephonyExtWrapperHandle_, "IsCapabilitySupportExt");
     getNetworkCapabilityExt_ = (GET_NETWORK_CAPABILITY_EXT)dlsym(telephonyExtWrapperHandle_, "GetNetworkCapabilityExt");
-    wrapNativeNetworkModeExt_ =
-        (WRAP_NATIVE_NETWORK_MODE_EXT)dlsym(telephonyExtWrapperHandle_, "WrapNativeNetworkModeExt");
     onGetNetworkSearchInformationExt_ = (ON_GET_NETWORK_SEARCH_INFORMATION_EXT)dlsym(telephonyExtWrapperHandle_,
         "OnGetNetworkSearchInformationExt");
     getNetworkStatusExt_ = (GET_NETWORK_STATUS_EXT)dlsym(telephonyExtWrapperHandle_, "GetNetworkStatusExt");
     if (checkOpcVersionIsUpdate_ == nullptr || updateOpcVersion_ == nullptr || getCellInfoList_ == nullptr ||
         getRadioTechExt_ == nullptr || getNrOptionModeExt_ == nullptr || getSignalInfoListExt_ == nullptr ||
-        isCapabilitySupportExt_ == nullptr || getNetworkCapabilityExt_ == nullptr ||
-        wrapNativeNetworkModeExt_ == nullptr || onGetNetworkSearchInformationExt_ == nullptr
-        || getNetworkStatusExt_ == nullptr || isNrSupportedNative_ == nullptr
-        || getNrOptionModeExtend_ == nullptr || getPreferredNetworkExt_ == nullptr
-    ) {
+        getNetworkCapabilityExt_ == nullptr || onGetNetworkSearchInformationExt_ == nullptr ||
+        getNetworkStatusExt_ == nullptr || isNrSupportedNative_ == nullptr ||
+        getNrOptionModeExtend_ == nullptr || getPreferredNetworkExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
     }
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
+{
     getVoiceMailIccidParameter_ = (GET_VOICE_MAIL_ICCID_PARAMETER)dlsym(telephonyExtWrapperHandle_,
         "GetVoiceMailIccidParameter");
     setVoiceMailIccidParameter_ = (SET_VOICE_MAIL_ICCID_PARAMETER)dlsym(telephonyExtWrapperHandle_,
@@ -87,17 +92,18 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
         "GetVoiceMailTagExt");
     resetVoiceMailManagerExt_ = (RESET_VOICE_MAIL_MANAGER_EXT)dlsym(telephonyExtWrapperHandle_,
         "ResetVoiceMailManagerExt");
-    getNetworkStatusExt_ = (GET_NETWORK_STATUS_EXT)dlsym(telephonyExtWrapperHandle_, "GetNetworkStatusExt");	
+    getNetworkStatusExt_ = (GET_NETWORK_STATUS_EXT)dlsym(telephonyExtWrapperHandle_, "GetNetworkStatusExt");
     if (getVoiceMailIccidParameter_ == nullptr || setVoiceMailIccidParameter_ == nullptr ||
         initVoiceMailManagerExt_ == nullptr || deinitVoiceMailManagerExt_ == nullptr ||
         resetVoiceMailLoadedFlagExt_ == nullptr || setVoiceMailOnSimExt_ == nullptr ||
         getVoiceMailFixedExt_ == nullptr || getVoiceMailNumberExt_ == nullptr ||
         getVoiceMailTagExt_ == nullptr || resetVoiceMailManagerExt_ == nullptr ||
-		getNetworkStatusExt_ == nullptr) {
+        getNetworkStatusExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
     }
-    TELEPHONY_LOGI("telephony ext wrapper init success");
 }
+
+
 } // namespace Telephony
 } // namespace OHOS
