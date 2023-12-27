@@ -642,7 +642,7 @@ bool SimFileManager::IsCTSimCard()
     bool isCTCardType = IsCTCardType(cardType);
     std::string iccId = simFile_->ObtainIccId();
     if (!iccId.empty() && iccId.length() >= ICCID_LEN_MINIMUM) {
-        iccId = iccId.substr(0, ICCID_LEN_MINIMUM);
+        iccId.resize(ICCID_LEN_MINIMUM);
     }
     if (isCTCardType && IsCTIccId(iccId)) {
         TELEPHONY_LOGI("[slot%{public}d] result = 1", slotId_);
@@ -692,7 +692,7 @@ bool SimFileManager::IsCTIccId(std::string iccId)
     bool isCTIccId = false;
     if (!iccId.empty() && iccId.length() >= ICCID_LEN_MINIMUM) {
         if (iccId.compare(0, PREFIX_LOCAL_ICCID_LEN, PREFIX_LOCAL_ICCID) == 0) {
-            iccId = iccId.substr(0, ICCID_LEN_SIX);
+            iccId.resize(ICCID_LEN_SIX);
         }
         auto iccIdRet = find(CT_ICCID_ARRAY.begin(), CT_ICCID_ARRAY.end(), iccId);
         isCTIccId = iccIdRet != CT_ICCID_ARRAY.end();
