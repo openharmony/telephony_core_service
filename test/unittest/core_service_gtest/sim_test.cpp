@@ -1351,6 +1351,21 @@ HWTEST_F(SimTest, Telephony_Sim_IsNrSupported_0100, Function | MediumTest | Leve
 }
 
 /**
+ * @tc.number   Telephony_Sim_IsNrSupported_0200
+ * @tc.name     Is nr supported
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_IsNrSupported_0200, Function | MediumTest | Level3)
+{
+    if (!SimTest::HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceClient::GetInstance().IsNrSupported(slotId_);
+        ASSERT_TRUE(true);
+    }
+}
+
+/**
  * @tc.number   Telephony_Sim_GetNrOptionMode_0100
  * @tc.name     get nr option mode
  * @tc.desc     Function test
