@@ -70,6 +70,7 @@ public:
     GsmSignalInformation() = default;
     ~GsmSignalInformation() = default;
     void SetValue(const int32_t gsmRssi = 0, const int32_t gsmBer = 0);
+    GsmSignalInformation &operator=(const GsmSignalInformation &gsm);
     bool operator==(const GsmSignalInformation &gsm) const;
     /**
      * @brief Get signal strength Indicator
@@ -103,6 +104,7 @@ public:
     CdmaSignalInformation() = default;
     ~CdmaSignalInformation() = default;
     void SetValue(const int32_t cdmaRssi = 0, const int32_t cdmaEcno = 0);
+    CdmaSignalInformation &operator=(const CdmaSignalInformation &cdma);
     bool operator==(const CdmaSignalInformation &cdma) const;
     /**
      * @brief Get CDMA Received Signal Strength Indicator
@@ -131,6 +133,7 @@ public:
     ~LteSignalInformation() = default;
     void SetValue(
         const int32_t rxlev = 0, const int32_t lteRsrp = 0, const int32_t lteRsrq = 0, const int32_t lteSnr = 0);
+    LteSignalInformation &operator=(const LteSignalInformation &lte);
     bool operator==(const LteSignalInformation &lte) const;
     /**
      * @brief Get signal level
@@ -179,6 +182,7 @@ public:
     ~WcdmaSignalInformation() = default;
     void SetValue(const int32_t wcdmaRxlev = 0, const int32_t wcdmaRscp = 0, const int32_t wcdmaEcio = 0,
         const int32_t wcdmaBer = 0);
+    WcdmaSignalInformation &operator=(const WcdmaSignalInformation &wcdma);
     bool operator==(const WcdmaSignalInformation &wcdma) const;
     /**
      * @brief Get signal level
@@ -226,6 +230,7 @@ public:
     TdScdmaSignalInformation() = default;
     ~TdScdmaSignalInformation() = default;
     void SetValue(const int32_t tdScdmaRscp = 0);
+    TdScdmaSignalInformation &operator=(const TdScdmaSignalInformation &tdScdma);
     bool operator==(const TdScdmaSignalInformation &tdScdma) const;
     /**
      * @brief Get Receive signal channel power
@@ -252,6 +257,7 @@ public:
     NrSignalInformation() = default;
     ~NrSignalInformation() = default;
     void SetValue(const int32_t rsrp = 0, const int32_t rsrq = 0, const int32_t sinr = 0);
+    NrSignalInformation &operator=(const NrSignalInformation &nr);
     bool operator==(const NrSignalInformation &nr) const;
     /**
      * @brief Get Reference signal received power in dBm

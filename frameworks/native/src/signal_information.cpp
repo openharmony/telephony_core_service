@@ -64,6 +64,14 @@ std::unique_ptr<SignalInformation> SignalInformation::Unmarshalling(Parcel &parc
     return nullptr;
 }
 
+GsmSignalInformation &GsmSignalInformation::operator=(const GsmSignalInformation &gsm)
+{
+    signalBar_ = gsm.signalBar_;
+    gsmRxlev_ = gsm.gsmRxlev_;
+    gsmBer_ = gsm.gsmBer_;
+    return *this;
+}
+
 bool GsmSignalInformation::operator==(const GsmSignalInformation &gsm) const
 {
     return gsmRxlev_ == gsm.gsmRxlev_ && gsmBer_ == gsm.gsmBer_;
@@ -185,6 +193,14 @@ void CdmaSignalInformation::SetValue(const int32_t cdmaRssi, const int32_t cdmaE
     cdmaEcno_ = cdmaEcno;
 }
 
+CdmaSignalInformation &CdmaSignalInformation::operator=(const CdmaSignalInformation &cdma)
+{
+    signalBar_ = cdma.signalBar_;
+    cdmaRssi_ = cdma.cdmaRssi_;
+    cdmaEcno_ = cdma.cdmaEcno_;
+    return *this;
+}
+
 bool CdmaSignalInformation::operator==(const CdmaSignalInformation &cdma) const
 {
     return (cdmaRssi_ == cdma.cdmaRssi_ && cdmaEcno_ == cdma.cdmaEcno_);
@@ -285,6 +301,16 @@ bool CdmaSignalInformation::ReadFromParcel(Parcel &parcel)
 bool CdmaSignalInformation::ValidateCdmaValue() const
 {
     return cdmaRssi_ < SIGNAL_RSSI_MAXIMUM;
+}
+
+LteSignalInformation &LteSignalInformation::operator=(const LteSignalInformation &lte)
+{
+    signalBar_ = lte.signalBar_;
+    rxlev_ = lte.rxlev_;
+    lteRsrp_ = lte.lteRsrp_;
+    lteRsrq_ = lte.lteRsrq_;
+    lteSnr_ = lte.lteSnr_;
+    return *this;
 }
 
 bool LteSignalInformation::operator==(const LteSignalInformation &lte) const
@@ -425,6 +451,16 @@ bool LteSignalInformation::ReadFromParcel(Parcel &parcel)
 bool LteSignalInformation::ValidateLteValue() const
 {
     return lteRsrp_ < SIGNAL_RSSI_MAXIMUM;
+}
+
+WcdmaSignalInformation &WcdmaSignalInformation::operator=(const WcdmaSignalInformation &wcdma)
+{
+    signalBar_ = wcdma.signalBar_;
+    wcdmaRxlev_ = wcdma.wcdmaRxlev_;
+    wcdmaRscp_ = wcdma.wcdmaRscp_;
+    wcdmaEcio_ = wcdma.wcdmaEcio_;
+    wcdmaBer_ = wcdma.wcdmaBer_;
+    return *this;
 }
 
 bool WcdmaSignalInformation::operator==(const WcdmaSignalInformation &wcdma) const
@@ -568,6 +604,13 @@ bool WcdmaSignalInformation::ValidateWcdmaValue() const
     return wcdmaRscp_ < SIGNAL_RSSI_MAXIMUM;
 }
 
+TdScdmaSignalInformation &TdScdmaSignalInformation::operator=(const TdScdmaSignalInformation &tdScdma)
+{
+    signalBar_ = tdScdma.signalBar_;
+    tdScdmaRscp_ = tdScdma.tdScdmaRscp_;
+    return *this;
+}
+
 bool TdScdmaSignalInformation::operator==(const TdScdmaSignalInformation &tdScdma) const
 {
     return tdScdmaRscp_ == tdScdma.tdScdmaRscp_;
@@ -666,6 +709,15 @@ bool TdScdmaSignalInformation::ReadFromParcel(Parcel &parcel)
 bool TdScdmaSignalInformation::ValidateTdScdmaValue() const
 {
     return tdScdmaRscp_ < SIGNAL_RSSI_MAXIMUM;
+}
+
+NrSignalInformation &NrSignalInformation::operator=(const NrSignalInformation &nr)
+{
+    signalBar_ = nr.signalBar_;
+    nrRsrp_ = nr.nrRsrp_;
+    nrRsrq_ = nr.nrRsrq_;
+    nrSinr_ = nr.nrSinr_;
+    return *this;
 }
 
 bool NrSignalInformation::operator==(const NrSignalInformation &nr) const
