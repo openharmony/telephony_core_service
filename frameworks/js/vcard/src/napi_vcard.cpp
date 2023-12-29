@@ -20,6 +20,7 @@
 #include "ability.h"
 #include "core_service_client.h"
 #include "iostream"
+#include "js_proxy.h"
 #include "napi_parameter_util.h"
 #include "napi_util.h"
 #include "telephony_log_wrapper.h"
@@ -316,7 +317,13 @@ bool MatchExportParameters(
 
 static DataShare::DataSharePredicates UnwrapDataSharePredicates(napi_env env, napi_value value)
 {
-    auto predicates = DataShare::DataSharePredicatesProxy::GetNativePredicates(env, value);
+    if (value == nullptr) {
+        TELEPHONY_LOGE("value is null.");
+        return {};
+    }
+    JSProxy::JSProxy<DataShare::DataShareAbsPredicates> *jsProxy = nullptr;
+    napi_unwrap(env, value, reinterpret_cast<void **>(&jsProxy));
+    std::shared_ptr<DataShare::DataShareAbsPredicates> predicates = jsProxy->GetInstance();
     if (predicates == nullptr) {
         TELEPHONY_LOGE("GetNativePredicates is nullptr.");
         return {};
