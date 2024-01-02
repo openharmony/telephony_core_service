@@ -609,7 +609,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimManager_001, Function | MediumTest | Lev
     simManager->InitSingleSimObject();
     simManager->slotCount_ = 1;
     int32_t slotId;
-    simManager->SetPrimarySlotId(SLOT_ID);
     std::u16string testU = u"";
     simManager->SetShowNumber(SLOT_ID, testU);
     simManager->GetShowNumber(SLOT_ID, testU);
