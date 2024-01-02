@@ -652,7 +652,9 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 
     switch (eventId) {
         case RadioEvent::RADIO_STATE_CHANGED:
-            OnRadioStateUnavailable(event);
+            if (IsRadioStateUnavailable(event)) {
+                break;
+            }
             [[fallthrough]]; // fall_through
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
             ObtainIccStatus(slotId_);
@@ -876,20 +878,23 @@ void SimStateHandle::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::Even
     }
 }
 
-void SimStateHandle::OnRadioStateUnavailable(const AppExecFwk::InnerEvent::Pointer &event)
+bool SimStateHandle::IsRadioStateUnavailable(const AppExecFwk::InnerEvent::Pointer &event)
 {
     std::shared_ptr<HRilInt32Parcel> object = event->GetSharedObject<HRilInt32Parcel>();
     if (object == nullptr) {
         TELEPHONY_LOGE("object is nullptr!");
-        return;
+        return false;
     }
     int32_t radioState = object->data;
     if (radioState == ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE && HasSimCard()) {
+        TELEPHONY_LOGI("received radio unavailable");
         IccState iccState;
         iccState.simType_ = ICC_UNKNOWN_TYPE;
         iccState.simStatus_ = ICC_CONTENT_UNKNOWN;
         ProcessIccCardState(iccState, slotId_);
+        return true;
     }
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS
