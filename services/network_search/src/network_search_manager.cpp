@@ -1674,11 +1674,6 @@ int32_t NetworkSearchManager::GetBasebandVersion(int32_t slotId, std::string &ve
 int32_t NetworkSearchManager::GetNetworkCapability(
     int32_t slotId, int32_t networkCapabilityType, int32_t &networkCapabilityState)
 {
-    if (TELEPHONY_EXT_WRAPPER.getNetworkCapabilityExt_ != nullptr) {
-        TELEPHONY_EXT_WRAPPER.getNetworkCapabilityExt_(slotId, networkCapabilityType, networkCapabilityState);
-        return TELEPHONY_ERR_SUCCESS;
-    }
-
     TelephonyConfig telephonyConfig;
     bool isNrSupported =
         telephonyConfig.IsCapabilitySupport(static_cast<int32_t>(TelephonyConfig::ConfigType::MODEM_CAP_SUPPORT_NR));
