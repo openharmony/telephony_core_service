@@ -345,7 +345,12 @@ void MultiSimController::SortCache()
  */
 bool MultiSimController::IsValidData(int32_t slotId)
 {
-    if (((slotId < DEFAULT_SIM_SLOT_ID) || (slotId >= SIM_SLOT_COUNT)) || simStateManager_[slotId] == nullptr) {
+    if ((slotId < DEFAULT_SIM_SLOT_ID) || (slotId >= SIM_SLOT_COUNT)) {
+        TELEPHONY_LOGE("can not get simStateManager");
+        return false;
+    }
+    if (simStateManager_.empty() || static_cast<uint32_t>(slotId) >= simStateManager_.size() ||
+        simStateManager_[slotId] == nullptr) {
         TELEPHONY_LOGE("can not get simStateManager");
         return false;
     }
