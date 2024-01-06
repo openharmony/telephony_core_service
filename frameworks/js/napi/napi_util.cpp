@@ -58,6 +58,8 @@ static constexpr const char *JS_ERROR_NETWORK_NOT_IN_SERVICE = "Network not in s
 static constexpr const char *JS_ERROR_CONFERENCE_EXCEED_LIMIT_STRING = "Conference call is exceed limit.";
 static constexpr const char *JS_ERROR_CONFERENCE_CALL_IS_NOT_ACTIVE_STRING = "Conference call is not active.";
 static constexpr const char *JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT_STRING = "call count exceeds limit";
+static constexpr const char *JS_ERROR_TELEPHONY_DIAL_IS_BUSY_STRING =
+    "Current on a call, unable to initiate a new call";
 
 static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_PERMISSION_DENIED, JS_ERROR_TELEPHONY_PERMISSION_DENIED_STRING },
@@ -86,6 +88,7 @@ static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_CONFERENCE_EXCEED_LIMIT, JS_ERROR_CONFERENCE_EXCEED_LIMIT_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_CONFERENCE_CALL_NOT_ACTIVE, JS_ERROR_CONFERENCE_CALL_IS_NOT_ACTIVE_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT, JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT_STRING },
+    { JsErrorCode::JS_ERROR_TELEPHONY_DIAL_IS_BUSY, JS_ERROR_TELEPHONY_DIAL_IS_BUSY_STRING },
 };
 const std::string ERROR_STRING = "error";
 const std::u16string ERROR_USTRING = u"error";
@@ -695,8 +698,10 @@ bool NapiUtil::CreateCommonCallErrorMessageForJs(int32_t errorCode, JsErrorCode 
         case TELEPHONY_CALL_ERR_EMERGENCY_UNSUPPORT_CONFERENCEABLE:
         case TELEPHONY_CALL_ERR_VOLTE_NOT_SUPPORT:
         case TELEPHONY_CALL_ERR_VOLTE_PROVISIONING_DISABLED:
-        case TELEPHONY_CALL_ERR_DIAL_IS_BUSY:
             jsErrorCode = JS_ERROR_TELEPHONY_SYSTEM_ERROR;
+            break;
+        case TELEPHONY_CALL_ERR_DIAL_IS_BUSY:
+            jsErrorCode = JS_ERROR_TELEPHONY_DIAL_IS_BUSY;
             break;
         default:
             flag = false;
