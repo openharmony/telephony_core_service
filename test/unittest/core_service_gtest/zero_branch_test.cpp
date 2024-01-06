@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -73,6 +73,13 @@ const int32_t BYTES_LENGTH = 3;
 const int32_t LO_FOUR_LENGTH = 15;
 const int32_t CORE_NETWORK_MODE_NR = 31;
 const int32_t VALUE_LENGTH = 128;
+const CellInformation::CellType NONE = CellInformation::CellType::CELL_TYPE_NONE;
+const CellInformation::CellType GSM = CellInformation::CellType::CELL_TYPE_GSM;
+const CellInformation::CellType CDMA = CellInformation::CellType::CELL_TYPE_CDMA;
+const CellInformation::CellType WCDMA = CellInformation::CellType::CELL_TYPE_WCDMA;
+const CellInformation::CellType TDSCDMA = CellInformation::CellType::CELL_TYPE_TDSCDMA;
+const CellInformation::CellType LTE = CellInformation::CellType::CELL_TYPE_LTE;
+const CellInformation::CellType NR = CellInformation::CellType::CELL_TYPE_NR;
 } // namespace
 
 class BranchTest : public testing::Test {
@@ -199,48 +206,32 @@ HWTEST_F(BranchTest, Telephony_CellInfo_003, Function | MediumTest | Level1)
     auto simManager = std::make_shared<SimManager>(telRilManager);
     auto networkSearchManager_ = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     auto cellInfo = std::make_shared<CellInfo>(networkSearchManager_, INVALID_SLOTID);
-    EXPECT_EQ(
-        cellInfo->ConvertToCellType(SignalInformation::NetworkType::GSM), CellInformation::CellType::CELL_TYPE_GSM);
-    EXPECT_EQ(
-        cellInfo->ConvertToCellType(SignalInformation::NetworkType::WCDMA), CellInformation::CellType::CELL_TYPE_WCDMA);
-    EXPECT_EQ(
-        cellInfo->ConvertToCellType(SignalInformation::NetworkType::LTE), CellInformation::CellType::CELL_TYPE_LTE);
-    EXPECT_EQ(
-        cellInfo->ConvertToCellType(SignalInformation::NetworkType::CDMA), CellInformation::CellType::CELL_TYPE_CDMA);
-    EXPECT_EQ(cellInfo->ConvertToCellType(SignalInformation::NetworkType::TDSCDMA),
-        CellInformation::CellType::CELL_TYPE_TDSCDMA);
-    EXPECT_EQ(cellInfo->ConvertToCellType(SignalInformation::NetworkType::NR), CellInformation::CellType::CELL_TYPE_NR);
-    EXPECT_EQ(
-        cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_GSM), CellInformation::CellType::CELL_TYPE_GSM);
-    EXPECT_EQ(
-        cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_WCDMA), CellInformation::CellType::CELL_TYPE_WCDMA);
-    EXPECT_EQ(
-        cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_HSPAP), CellInformation::CellType::CELL_TYPE_WCDMA);
-    EXPECT_EQ(
-        cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_HSPA), CellInformation::CellType::CELL_TYPE_WCDMA);
-    EXPECT_EQ(
-        cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_LTE), CellInformation::CellType::CELL_TYPE_LTE);
-    EXPECT_EQ(
-        cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_LTE_CA), CellInformation::CellType::CELL_TYPE_LTE);
-    EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_TD_SCDMA),
-        CellInformation::CellType::CELL_TYPE_TDSCDMA);
-    EXPECT_EQ(
-        cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_1XRTT), CellInformation::CellType::CELL_TYPE_CDMA);
-    EXPECT_EQ(
-        cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_EVDO), CellInformation::CellType::CELL_TYPE_CDMA);
-    EXPECT_EQ(
-        cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_EHRPD), CellInformation::CellType::CELL_TYPE_CDMA);
-    EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_NR), CellInformation::CellType::CELL_TYPE_NR);
-    EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_UNKNOWN),
-        CellInformation::CellType::CELL_TYPE_NONE);
-    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_GSM), CellInformation::CellType::CELL_TYPE_GSM);
-    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_WCDMA), CellInformation::CellType::CELL_TYPE_WCDMA);
-    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_LTE), CellInformation::CellType::CELL_TYPE_LTE);
-    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_CDMA), CellInformation::CellType::CELL_TYPE_CDMA);
-    EXPECT_EQ(
-        cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_TDSCDMA), CellInformation::CellType::CELL_TYPE_TDSCDMA);
-    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_NR), CellInformation::CellType::CELL_TYPE_NR);
-    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_UNKNOWN), CellInformation::CellType::CELL_TYPE_NONE);
+    EXPECT_EQ(cellInfo->ConvertToCellType(SignalInformation::NetworkType::UNKNOWN), NONE);
+    EXPECT_EQ(cellInfo->ConvertToCellType(SignalInformation::NetworkType::GSM), GSM);
+    EXPECT_EQ(cellInfo->ConvertToCellType(SignalInformation::NetworkType::WCDMA), WCDMA);
+    EXPECT_EQ(cellInfo->ConvertToCellType(SignalInformation::NetworkType::LTE), LTE);
+    EXPECT_EQ(cellInfo->ConvertToCellType(SignalInformation::NetworkType::CDMA), CDMA);
+    EXPECT_EQ(cellInfo->ConvertToCellType(SignalInformation::NetworkType::TDSCDMA), TDSCDMA);
+    EXPECT_EQ(cellInfo->ConvertToCellType(SignalInformation::NetworkType::NR), NR);
+    EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_GSM), GSM);
+    EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_WCDMA), WCDMA);
+    EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_HSPAP), WCDMA);
+    EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_HSPA), WCDMA);
+    EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_LTE), LTE);
+    EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_LTE_CA), LTE);
+    EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_TD_SCDMA), TDSCDMA);
+    EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_1XRTT), CDMA);
+    EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_EVDO), CDMA);
+    EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_EHRPD), CDMA);
+    EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_NR), NR);
+    EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_UNKNOWN), NONE);
+    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_GSM), GSM);
+    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_WCDMA), WCDMA);
+    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_LTE), LTE);
+    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_CDMA), CDMA);
+    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_TDSCDMA), TDSCDMA);
+    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_NR), NR);
+    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_UNKNOWN), NONE);
 }
 
 /**
@@ -277,6 +268,69 @@ HWTEST_F(BranchTest, Telephony_CellInfo_004, Function | MediumTest | Level1)
     EXPECT_EQ(cellInfo->GetCurrentSignalLevelGsm(-40), SIGNAL_FOUR_BARS);
     EXPECT_EQ(cellInfo->GetCurrentSignalLevelTdscdma(-40), SIGNAL_FOUR_BARS);
     EXPECT_EQ(cellInfo->GetCurrentSignalLevelNr(-40), SIGNAL_FOUR_BARS);
+}
+
+/**
+ * @tc.number   Telephony_CellInfo_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellInfo_005, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto cellInfo = std::make_shared<CellInfo>(networkSearchManager, INVALID_SLOTID);
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    cellInfo->ProcessNeighboringCellInfo(event);
+    cellInfo->ProcessCurrentCellInfo(event);
+    event = nullptr;
+    cellInfo->ProcessNeighboringCellInfo(event);
+    cellInfo->ProcessCurrentCellInfo(event);
+    auto cellListNearbyInfo = std::make_shared<CellListNearbyInfo>();
+    auto cellListCurrentInfo = std::make_shared<CellListCurrentInformation>();
+    auto eventNearby = AppExecFwk::InnerEvent::Get(0, cellListNearbyInfo);
+    auto eventCurrent = AppExecFwk::InnerEvent::Get(0, cellListCurrentInfo);
+    cellInfo->ProcessNeighboringCellInfo(eventNearby);
+    cellInfo->ProcessCurrentCellInfo(eventCurrent);
+    CellNearbyInfo cellInfoNearby;
+    cellInfoNearby.ratType = 1;
+    cellListNearbyInfo->itemNum = 1;
+    cellListNearbyInfo->cellNearbyInfo.push_back(cellInfoNearby);
+    CurrentCellInformation cellInfoCurrent;
+    cellInfoCurrent.ratType = 1;
+    cellListCurrentInfo->itemNum = 1;
+    cellListCurrentInfo->cellCurrentInfo.push_back(cellInfoCurrent);
+    cellInfo->ProcessNeighboringCellInfo(eventNearby);
+    cellInfo->ProcessCurrentCellInfo(eventCurrent);
+
+    cellInfo = std::make_shared<CellInfo>(networkSearchManager, SLOT_ID_0);
+    cellInfo->UpdateCellLocation(1, 1, 1);
+    sptr<CellInformation> gsmCellInfo = new GsmCellInformation;
+    EXPECT_TRUE(cellInfo->ProcessCellLocation(gsmCellInfo, GSM, 1, 1));
+}
+
+/**
+ * @tc.number   Telephony_CellInfo_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellInfo_006, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto cellInfo = std::make_shared<CellInfo>(networkSearchManager, INVALID_SLOTID);
+    sptr<CellInformation> nwCellInfo = new GsmCellInformation;
+    EXPECT_FALSE(cellInfo->ProcessCellLocation(nwCellInfo, GSM, 0, 0));
+    nwCellInfo = new LteCellInformation;
+    EXPECT_FALSE(cellInfo->ProcessCellLocation(nwCellInfo, LTE, 0, 0));
+    nwCellInfo = new WcdmaCellInformation;
+    EXPECT_FALSE(cellInfo->ProcessCellLocation(nwCellInfo, WCDMA, 0, 0));
+    nwCellInfo = new TdscdmaCellInformation;
+    EXPECT_FALSE(cellInfo->ProcessCellLocation(nwCellInfo, TDSCDMA, 0, 0));
+    nwCellInfo = new NrCellInformation;
+    EXPECT_FALSE(cellInfo->ProcessCellLocation(nwCellInfo, NR, 0, 0));
 }
 
 /**

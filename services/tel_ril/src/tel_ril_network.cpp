@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -214,6 +214,15 @@ int32_t TelRilNetwork::NetworkCurrentCellUpdated_1_1(
         TELEPHONY_LOG_FUNC_NAME, currentCellList, RadioEvent::RADIO_CURRENT_CELL_UPDATE);
 }
 
+int32_t TelRilNetwork::NetworkCurrentCellUpdated_1_2(
+    const HDI::Ril::V1_2::CellListCurrentInfo_1_2 &cellListCurrentInformation)
+{
+    std::shared_ptr<CellListCurrentInformation> currentCellList = std::make_shared<CellListCurrentInformation>();
+    BuildCurrentCellInformationList(currentCellList, cellListCurrentInformation);
+    return Notify<CellListCurrentInformation>(
+        TELEPHONY_LOG_FUNC_NAME, currentCellList, RadioEvent::RADIO_CURRENT_CELL_UPDATE);
+}
+
 int32_t TelRilNetwork::ResidentNetworkUpdated(const std::string &plmn)
 {
     return Notify<std::string>(
@@ -301,6 +310,14 @@ int32_t TelRilNetwork::GetNeighboringCellInfoListResponse(
     return Response<CellListNearbyInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, cellListNearbyInfo);
 }
 
+int32_t TelRilNetwork::GetNeighboringCellInfoListResponse_1_2(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_2::CellListNearbyInfo_1_2 &cellInfoList)
+{
+    std::shared_ptr<CellListNearbyInfo> cellListNearbyInfo = std::make_shared<CellListNearbyInfo>();
+    BuildNeighboringCellInfoList(cellListNearbyInfo, cellInfoList);
+    return Response<CellListNearbyInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, cellListNearbyInfo);
+}
+
 int32_t TelRilNetwork::GetCurrentCellInfoResponse(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList)
 {
@@ -311,6 +328,14 @@ int32_t TelRilNetwork::GetCurrentCellInfoResponse(
 
 int32_t TelRilNetwork::GetCurrentCellInfoResponse_1_1(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
     const HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellListCurrentInformation)
+{
+    std::shared_ptr<CellListCurrentInformation> currentCellList = std::make_shared<CellListCurrentInformation>();
+    BuildCurrentCellInformationList(currentCellList, cellListCurrentInformation);
+    return Response<CellListCurrentInformation>(TELEPHONY_LOG_FUNC_NAME, responseInfo, currentCellList);
+}
+
+int32_t TelRilNetwork::GetCurrentCellInfoResponse_1_2(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_2::CellListCurrentInfo_1_2 &cellListCurrentInformation)
 {
     std::shared_ptr<CellListCurrentInformation> currentCellList = std::make_shared<CellListCurrentInformation>();
     BuildCurrentCellInformationList(currentCellList, cellListCurrentInformation);
@@ -599,6 +624,107 @@ void TelRilNetwork::FillCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril:
     }
 }
 
+void TelRilNetwork::BuildNeighboringCellInfoList(
+    std::shared_ptr<CellListNearbyInfo> cellListNearbyInfo, const HDI::Ril::V1_2::CellListNearbyInfo_1_2 &cellInfoList)
+{
+    cellListNearbyInfo->itemNum = cellInfoList.itemNum;
+    for (auto info : cellInfoList.cellNearbyInfo) {
+        CellNearbyInfo cellInfo;
+        FillCellNearbyInfo(cellInfo, info);
+        cellListNearbyInfo->cellNearbyInfo.push_back(cellInfo);
+    }
+}
+
+void TelRilNetwork::FillCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_2::CellNearbyInfo_1_2 &info)
+{
+    cellInfo.ratType = info.ratType;
+    switch (info.ratType) {
+        case NETWORK_TYPE_GSM:
+            FillGsmCellNearbyInfo(cellInfo, info);
+            break;
+        case NETWORK_TYPE_LTE:
+            FillLteCellNearbyInfo(cellInfo, info);
+            break;
+        case NETWORK_TYPE_WCDMA:
+            FillWcdmaCellNearbyInfo(cellInfo, info);
+            break;
+        case NETWORK_TYPE_CDMA:
+            FillCdmaCellNearbyInfo(cellInfo, info);
+            break;
+        case NETWORK_TYPE_TDSCDMA:
+            FillTdscdmaCellNearbyInfo(cellInfo, info);
+            break;
+        case NETWORK_TYPE_NR:
+            FillNrCellNearbyInfo(cellInfo, info);
+            break;
+        default:
+            TELEPHONY_LOGE("invalid ratType");
+            break;
+    }
+}
+
+void TelRilNetwork::FillGsmCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_2::CellNearbyInfo_1_2 &info)
+{
+    cellInfo.ServiceCellParas.gsm.band = info.serviceCells.gsm.band;
+    cellInfo.ServiceCellParas.gsm.arfcn = info.serviceCells.gsm.arfcn;
+    cellInfo.ServiceCellParas.gsm.bsic = info.serviceCells.gsm.bsic;
+    cellInfo.ServiceCellParas.gsm.cellId = info.serviceCells.gsm.cellId;
+    cellInfo.ServiceCellParas.gsm.lac = info.serviceCells.gsm.lac;
+    cellInfo.ServiceCellParas.gsm.rxlev = info.serviceCells.gsm.rxlev;
+}
+
+void TelRilNetwork::FillLteCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_2::CellNearbyInfo_1_2 &info)
+{
+    cellInfo.ServiceCellParas.lte.arfcn = info.serviceCells.lte.arfcn;
+    cellInfo.ServiceCellParas.lte.pci = info.serviceCells.lte.pci;
+    cellInfo.ServiceCellParas.lte.rsrp = info.serviceCells.lte.rsrp;
+    cellInfo.ServiceCellParas.lte.rsrq = info.serviceCells.lte.rsrq;
+    cellInfo.ServiceCellParas.lte.rxlev = info.serviceCells.lte.rxlev;
+}
+
+void TelRilNetwork::FillWcdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_2::CellNearbyInfo_1_2 &info)
+{
+    cellInfo.ServiceCellParas.wcdma.arfcn = info.serviceCells.wcdma.arfcn;
+    cellInfo.ServiceCellParas.wcdma.psc = info.serviceCells.wcdma.psc;
+    cellInfo.ServiceCellParas.wcdma.rscp = info.serviceCells.wcdma.rscp;
+    cellInfo.ServiceCellParas.wcdma.ecno = info.serviceCells.wcdma.ecno;
+}
+
+void TelRilNetwork::FillCdmaCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_2::CellNearbyInfo_1_2 &info)
+{
+    cellInfo.ServiceCellParas.cdma.systemId = info.serviceCells.cdma.systemId;
+    cellInfo.ServiceCellParas.cdma.networkId = info.serviceCells.cdma.networkId;
+    cellInfo.ServiceCellParas.cdma.baseId = info.serviceCells.cdma.baseId;
+    cellInfo.ServiceCellParas.cdma.zoneId = info.serviceCells.cdma.zoneId;
+    cellInfo.ServiceCellParas.cdma.pilotPn = info.serviceCells.cdma.pilotPn;
+    cellInfo.ServiceCellParas.cdma.pilotStrength = info.serviceCells.cdma.pilotStrength;
+    cellInfo.ServiceCellParas.cdma.channel = info.serviceCells.cdma.channel;
+    cellInfo.ServiceCellParas.cdma.longitude = info.serviceCells.cdma.longitude;
+    cellInfo.ServiceCellParas.cdma.latitude = info.serviceCells.cdma.latitude;
+}
+
+void TelRilNetwork::FillTdscdmaCellNearbyInfo(
+    CellNearbyInfo &cellNearbyInfo, const HDI::Ril::V1_2::CellNearbyInfo_1_2 &info)
+{
+    cellNearbyInfo.ServiceCellParas.tdscdma.arfcn = info.serviceCells.tdscdma.arfcn;
+    cellNearbyInfo.ServiceCellParas.tdscdma.syncId = info.serviceCells.tdscdma.syncId;
+    cellNearbyInfo.ServiceCellParas.tdscdma.sc = info.serviceCells.tdscdma.sc;
+    cellNearbyInfo.ServiceCellParas.tdscdma.cellId = info.serviceCells.tdscdma.cellId;
+    cellNearbyInfo.ServiceCellParas.tdscdma.lac = info.serviceCells.tdscdma.lac;
+    cellNearbyInfo.ServiceCellParas.tdscdma.rscp = info.serviceCells.tdscdma.rscp;
+    cellNearbyInfo.ServiceCellParas.tdscdma.drx = info.serviceCells.tdscdma.drx;
+    cellNearbyInfo.ServiceCellParas.tdscdma.rac = info.serviceCells.tdscdma.rac;
+    cellNearbyInfo.ServiceCellParas.tdscdma.cpid = info.serviceCells.tdscdma.cpid;
+}
+
+void TelRilNetwork::FillNrCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril::V1_2::CellNearbyInfo_1_2 &info)
+{
+    cellInfo.ServiceCellParas.nr.nrArfcn = info.serviceCells.nr.nrArfcn;
+    cellInfo.ServiceCellParas.nr.pci = info.serviceCells.nr.pci;
+    cellInfo.ServiceCellParas.nr.tac = info.serviceCells.nr.tac;
+    cellInfo.ServiceCellParas.nr.nci = info.serviceCells.nr.nci;
+}
+
 void TelRilNetwork::BuildCurrentCellInfoList(
     std::shared_ptr<CellListCurrentInfo> currentCellList, const HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList)
 {
@@ -822,6 +948,126 @@ void TelRilNetwork::FillTdscdmaCurrentCellInformation(
 
 void TelRilNetwork::FillNrCurrentCellInformation(
     CurrentCellInformation &cellInfo, const HDI::Ril::V1_1::CurrentCellInfo_1_1 &info)
+{
+    cellInfo.ServiceCellParas.nr.nrArfcn = info.serviceCells.nr.nrArfcn;
+    cellInfo.ServiceCellParas.nr.pci = info.serviceCells.nr.pci;
+    cellInfo.ServiceCellParas.nr.tac = info.serviceCells.nr.tac;
+    cellInfo.ServiceCellParas.nr.nci = info.serviceCells.nr.nci;
+    cellInfo.ServiceCellParas.nr.rsrp = info.serviceCells.nr.rsrp;
+    cellInfo.ServiceCellParas.nr.rsrq = info.serviceCells.nr.rsrq;
+}
+
+void TelRilNetwork::BuildCurrentCellInformationList(std::shared_ptr<CellListCurrentInformation> currentCellList,
+    const HDI::Ril::V1_2::CellListCurrentInfo_1_2 &cellInfoList)
+{
+    currentCellList->itemNum = cellInfoList.itemNum;
+    for (auto &info : cellInfoList.cellCurrentInfo) {
+        CurrentCellInformation cellInfo;
+        FillCurrentCellInformation(cellInfo, info);
+        currentCellList->cellCurrentInfo.push_back(cellInfo);
+    }
+}
+
+void TelRilNetwork::FillCurrentCellInformation(
+    CurrentCellInformation &cellInfo, const HDI::Ril::V1_2::CurrentCellInfo_1_2 &info)
+{
+    cellInfo.ratType = info.ratType;
+    cellInfo.mcc = info.mcc;
+    cellInfo.mnc = info.mnc;
+    switch (info.ratType) {
+        case NETWORK_TYPE_GSM:
+            FillGsmCurrentCellInformation(cellInfo, info);
+            break;
+        case NETWORK_TYPE_LTE:
+            FillLteCurrentCellInformation(cellInfo, info);
+            break;
+        case NETWORK_TYPE_WCDMA:
+            FillWcdmaCurrentCellInformation(cellInfo, info);
+            break;
+        case NETWORK_TYPE_CDMA:
+            FillCdmaCurrentCellInformation(cellInfo, info);
+            break;
+        case NETWORK_TYPE_TDSCDMA:
+            FillTdscdmaCurrentCellInformation(cellInfo, info);
+            break;
+        case NETWORK_TYPE_NR:
+            FillNrCurrentCellInformation(cellInfo, info);
+            break;
+        default:
+            TELEPHONY_LOGE("invalid ratType");
+            break;
+    }
+}
+
+void TelRilNetwork::FillGsmCurrentCellInformation(
+    CurrentCellInformation &cellInfo, const HDI::Ril::V1_2::CurrentCellInfo_1_2 &info)
+{
+    cellInfo.ServiceCellParas.gsm.band = info.serviceCells.gsm.band;
+    cellInfo.ServiceCellParas.gsm.arfcn = info.serviceCells.gsm.arfcn;
+    cellInfo.ServiceCellParas.gsm.bsic = info.serviceCells.gsm.bsic;
+    cellInfo.ServiceCellParas.gsm.cellId = info.serviceCells.gsm.cellId;
+    cellInfo.ServiceCellParas.gsm.lac = info.serviceCells.gsm.lac;
+    cellInfo.ServiceCellParas.gsm.rxlev = info.serviceCells.gsm.rxlev;
+    cellInfo.ServiceCellParas.gsm.rxQuality = info.serviceCells.gsm.rxQuality;
+    cellInfo.ServiceCellParas.gsm.ta = info.serviceCells.gsm.ta;
+}
+
+void TelRilNetwork::FillLteCurrentCellInformation(
+    CurrentCellInformation &cellInfo, const HDI::Ril::V1_2::CurrentCellInfo_1_2 &info)
+{
+    cellInfo.ServiceCellParas.lte.arfcn = info.serviceCells.lte.arfcn;
+    cellInfo.ServiceCellParas.lte.cellId = info.serviceCells.lte.cellId;
+    cellInfo.ServiceCellParas.lte.pci = info.serviceCells.lte.pci;
+    cellInfo.ServiceCellParas.lte.tac = info.serviceCells.lte.tac;
+    cellInfo.ServiceCellParas.lte.rsrp = info.serviceCells.lte.rsrp;
+    cellInfo.ServiceCellParas.lte.rsrq = info.serviceCells.lte.rsrq;
+    cellInfo.ServiceCellParas.lte.rssi = info.serviceCells.lte.rssi;
+}
+
+void TelRilNetwork::FillWcdmaCurrentCellInformation(
+    CurrentCellInformation &cellInfo, const HDI::Ril::V1_2::CurrentCellInfo_1_2 &info)
+{
+    cellInfo.ServiceCellParas.wcdma.arfcn = info.serviceCells.wcdma.arfcn;
+    cellInfo.ServiceCellParas.wcdma.cellId = info.serviceCells.wcdma.cellId;
+    cellInfo.ServiceCellParas.wcdma.psc = info.serviceCells.wcdma.psc;
+    cellInfo.ServiceCellParas.wcdma.lac = info.serviceCells.wcdma.lac;
+    cellInfo.ServiceCellParas.wcdma.rxlev = info.serviceCells.wcdma.rxlev;
+    cellInfo.ServiceCellParas.wcdma.rscp = info.serviceCells.wcdma.rscp;
+    cellInfo.ServiceCellParas.wcdma.ecno = info.serviceCells.wcdma.ecno;
+    cellInfo.ServiceCellParas.wcdma.ura = info.serviceCells.wcdma.ura;
+    cellInfo.ServiceCellParas.wcdma.drx = info.serviceCells.wcdma.drx;
+}
+
+void TelRilNetwork::FillCdmaCurrentCellInformation(
+    CurrentCellInformation &cellInfo, const HDI::Ril::V1_2::CurrentCellInfo_1_2 &info)
+{
+    cellInfo.ServiceCellParas.cdma.systemId = info.serviceCells.cdma.systemId;
+    cellInfo.ServiceCellParas.cdma.networkId = info.serviceCells.cdma.networkId;
+    cellInfo.ServiceCellParas.cdma.baseId = info.serviceCells.cdma.baseId;
+    cellInfo.ServiceCellParas.cdma.zoneId = info.serviceCells.cdma.zoneId;
+    cellInfo.ServiceCellParas.cdma.pilotPn = info.serviceCells.cdma.pilotPn;
+    cellInfo.ServiceCellParas.cdma.pilotStrength = info.serviceCells.cdma.pilotStrength;
+    cellInfo.ServiceCellParas.cdma.channel = info.serviceCells.cdma.channel;
+    cellInfo.ServiceCellParas.cdma.longitude = info.serviceCells.cdma.longitude;
+    cellInfo.ServiceCellParas.cdma.latitude = info.serviceCells.cdma.latitude;
+}
+
+void TelRilNetwork::FillTdscdmaCurrentCellInformation(
+    CurrentCellInformation &cellInfo, const HDI::Ril::V1_2::CurrentCellInfo_1_2 &info)
+{
+    cellInfo.ServiceCellParas.tdscdma.arfcn = info.serviceCells.tdscdma.arfcn;
+    cellInfo.ServiceCellParas.tdscdma.syncId = info.serviceCells.tdscdma.syncId;
+    cellInfo.ServiceCellParas.tdscdma.sc = info.serviceCells.tdscdma.sc;
+    cellInfo.ServiceCellParas.tdscdma.cellId = info.serviceCells.tdscdma.cellId;
+    cellInfo.ServiceCellParas.tdscdma.lac = info.serviceCells.tdscdma.lac;
+    cellInfo.ServiceCellParas.tdscdma.rscp = info.serviceCells.tdscdma.rscp;
+    cellInfo.ServiceCellParas.tdscdma.drx = info.serviceCells.tdscdma.drx;
+    cellInfo.ServiceCellParas.tdscdma.rac = info.serviceCells.tdscdma.rac;
+    cellInfo.ServiceCellParas.tdscdma.cpid = info.serviceCells.tdscdma.cpid;
+}
+
+void TelRilNetwork::FillNrCurrentCellInformation(
+    CurrentCellInformation &cellInfo, const HDI::Ril::V1_2::CurrentCellInfo_1_2 &info)
 {
     cellInfo.ServiceCellParas.nr.nrArfcn = info.serviceCells.nr.nrArfcn;
     cellInfo.ServiceCellParas.nr.pci = info.serviceCells.nr.pci;
