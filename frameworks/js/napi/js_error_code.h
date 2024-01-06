@@ -98,6 +98,11 @@ enum JsErrorCode {
     JS_ERROR_TELEPHONY_CONFERENCE_CALL_NOT_ACTIVE,
 
     /**
+     * Dial is busy.
+     */
+    JS_ERROR_TELEPHONY_DIAL_IS_BUSY,
+
+    /**
      * Unknown error code.
      */
     JS_ERROR_TELEPHONY_UNKNOW_ERROR = 8300999,
