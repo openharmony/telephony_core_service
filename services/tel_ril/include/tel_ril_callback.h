@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -195,6 +195,8 @@ public:
         const HDI::Ril::V1_1::CellListCurrentInfo &cellListCurrentInfo) override;
     int32_t NetworkCurrentCellUpdated_1_1(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellListCurrentInfo) override;
+    int32_t NetworkCurrentCellUpdated_1_2(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_2::CellListCurrentInfo_1_2 &cellListCurrentInfo) override;
     int32_t ResidentNetworkUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const std::string &plmn) override;
     int32_t GetSignalStrengthResponse(
@@ -212,10 +214,14 @@ public:
     int32_t SetNetworkSelectionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t GetNeighboringCellInfoListResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CellListNearbyInfo &cellInfoList) override;
+    int32_t GetNeighboringCellInfoListResponse_1_2(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_2::CellListNearbyInfo_1_2 &cellInfoList) override;
     int32_t GetCurrentCellInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList) override;
     int32_t GetCurrentCellInfoResponse_1_1(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellListCurrentInfo) override;
+    int32_t GetCurrentCellInfoResponse_1_2(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_2::CellListCurrentInfo_1_2 &cellListCurrentInfo) override;
     int32_t SetPreferredNetworkResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t GetPreferredNetworkResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::PreferredNetworkTypeInfo &preferredNetworkTypeInfo) override;

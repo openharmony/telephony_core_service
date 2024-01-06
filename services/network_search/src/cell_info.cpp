@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -362,6 +362,11 @@ bool CellInfo::ProcessCurrentCell(CurrentCellInformation *cellInfo)
 
 bool CellInfo::ProcessNeighboringCellGsm(CellNearbyInfo *cellInfo)
 {
+    bool ret = false;
+    if (cellInfo == nullptr) {
+        TELEPHONY_LOGE("cellInfo is nullptr");
+        return ret;
+    }
     sptr<GsmCellInformation> cell = new GsmCellInformation;
     if (cell != nullptr) {
         int32_t &arfcn = cellInfo->ServiceCellParas.gsm.arfcn;
@@ -374,13 +379,18 @@ bool CellInfo::ProcessNeighboringCellGsm(CellNearbyInfo *cellInfo)
         TELEPHONY_LOGI("CellInfo::ProcessNeighboringCellGsm arfcn:%{private}d cellId:%{private}d"
             "bsic:%{private}d lac:%{private}d slotId:%{public}d",
             arfcn, cellId, bsic, lac, slotId_);
-        return true;
+        ret = true;
     }
-    return false;
+    return ret;
 }
 
 bool CellInfo::ProcessNeighboringCellLte(CellNearbyInfo *cellInfo)
 {
+    bool ret = false;
+    if (cellInfo == nullptr) {
+        TELEPHONY_LOGE("cellInfo is nullptr");
+        return ret;
+    }
     sptr<LteCellInformation> cell = new LteCellInformation;
     if (cell != nullptr) {
         int32_t &arfcn = cellInfo->ServiceCellParas.lte.arfcn;
@@ -389,13 +399,18 @@ bool CellInfo::ProcessNeighboringCellLte(CellNearbyInfo *cellInfo)
         cell->SetLteParam(pci, 0, arfcn);
         cellInfos_.emplace_back(cell);
         TELEPHONY_LOGI("CellInfo::ProcessLte arfcn:%{private}d pci:%{private}d slotId:%{public}d", arfcn, pci, slotId_);
-        return true;
+        ret = true;
     }
-    return false;
+    return ret;
 }
 
 bool CellInfo::ProcessNeighboringCellWcdma(CellNearbyInfo *cellInfo)
 {
+    bool ret = false;
+    if (cellInfo == nullptr) {
+        TELEPHONY_LOGE("cellInfo is nullptr");
+        return ret;
+    }
     sptr<WcdmaCellInformation> cell = new WcdmaCellInformation;
     if (cell != nullptr) {
         int32_t &arfcn = cellInfo->ServiceCellParas.wcdma.arfcn;
@@ -405,13 +420,18 @@ bool CellInfo::ProcessNeighboringCellWcdma(CellNearbyInfo *cellInfo)
         cellInfos_.emplace_back(cell);
         TELEPHONY_LOGI(
             "CellInfo::ProcessWcdma arfcn:%{private}d psc:%{private}d slotId:%{public}d", arfcn, psc, slotId_);
-        return true;
+        ret = true;
     }
-    return false;
+    return ret;
 }
 
 bool CellInfo::ProcessNeighboringCellCdma(CellNearbyInfo *cellInfo)
 {
+    bool ret = false;
+    if (cellInfo == nullptr) {
+        TELEPHONY_LOGE("cellInfo is nullptr");
+        return ret;
+    }
     sptr<CdmaCellInformation> cell = new CdmaCellInformation;
     if (cell != nullptr) {
         int32_t &baseId = cellInfo->ServiceCellParas.cdma.baseId;
@@ -424,13 +444,18 @@ bool CellInfo::ProcessNeighboringCellCdma(CellNearbyInfo *cellInfo)
         cellInfos_.emplace_back(cell);
         TELEPHONY_LOGI(
             "CellInfo::ProcessCdma baseId:%{private}d psc:%{private}d slotId:%{public}d", baseId, systemId, slotId_);
-        return true;
+        ret = true;
     }
-    return false;
+    return ret;
 }
 
 bool CellInfo::ProcessNeighboringCellTdscdma(CellNearbyInfo *cellInfo)
 {
+    bool ret = false;
+    if (cellInfo == nullptr) {
+        TELEPHONY_LOGE("cellInfo is nullptr");
+        return ret;
+    }
     sptr<TdscdmaCellInformation> cell = new TdscdmaCellInformation;
     if (cell != nullptr) {
         int32_t &arfcn = cellInfo->ServiceCellParas.tdscdma.arfcn;
@@ -441,13 +466,18 @@ bool CellInfo::ProcessNeighboringCellTdscdma(CellNearbyInfo *cellInfo)
         cellInfos_.emplace_back(cell);
         TELEPHONY_LOGI(
             "CellInfo::ProcessTdscdma arfcn:%{private}d psc:%{private}d slotId:%{public}d", arfcn, cpid, slotId_);
-        return true;
+        ret = true;
     }
-    return false;
+    return ret;
 }
 
 bool CellInfo::ProcessNeighboringCellNr(CellNearbyInfo *cellInfo)
 {
+    bool ret = false;
+    if (cellInfo == nullptr) {
+        TELEPHONY_LOGE("cellInfo is nullptr");
+        return ret;
+    }
     sptr<NrCellInformation> cell = new NrCellInformation;
     if (cell != nullptr && cellInfo != nullptr) {
         int32_t &nrArfcn = cellInfo->ServiceCellParas.nr.nrArfcn;
@@ -459,13 +489,18 @@ bool CellInfo::ProcessNeighboringCellNr(CellNearbyInfo *cellInfo)
         cellInfos_.emplace_back(cell);
         TELEPHONY_LOGI("CellInfo::ProcessNeighboringCellNr arfcn:%{private}d pci:%{private}d slotId:%{public}d",
             nrArfcn, pci, slotId_);
-        return true;
+        ret = true;
     }
-    return false;
+    return ret;
 }
 
 bool CellInfo::ProcessCurrentCellGsm(CurrentCellInformation *cellInfo)
 {
+    bool ret = false;
+    if (cellInfo == nullptr) {
+        TELEPHONY_LOGE("cellInfo is nullptr");
+        return ret;
+    }
     sptr<GsmCellInformation> cell = new GsmCellInformation;
     if (cell != nullptr) {
         int32_t &arfcn = cellInfo->ServiceCellParas.gsm.arfcn;
@@ -486,13 +521,18 @@ bool CellInfo::ProcessCurrentCellGsm(CurrentCellInformation *cellInfo)
             "CellInfo::ProcessCurrentCellGsm arfcn:%{private}d cellId:%{private}d"
             "bsic:%{private}d lac:%{private}d rxlev:%{public}d slotId:%{public}d",
             arfcn, cellId, bsic, lac, rxlev, slotId_);
-        return true;
+        ret = true;
     }
-    return false;
+    return ret;
 }
 
 bool CellInfo::ProcessCurrentCellLte(CurrentCellInformation *cellInfo)
 {
+    bool ret = false;
+    if (cellInfo == nullptr) {
+        TELEPHONY_LOGE("cellInfo is nullptr");
+        return ret;
+    }
     sptr<LteCellInformation> cell = new LteCellInformation;
     if (cell != nullptr) {
         int32_t &arfcn = cellInfo->ServiceCellParas.lte.arfcn;
@@ -512,13 +552,18 @@ bool CellInfo::ProcessCurrentCellLte(CurrentCellInformation *cellInfo)
         TELEPHONY_LOGI(
             "CellInfo::ProcessCurrentCellLte arfcn:%{private}d pci:%{private}d rsrp:%{public}d slotId:%{public}d",
             arfcn, pci, rsrp, slotId_);
-        return true;
+        ret = true;
     }
-    return false;
+    return ret;
 }
 
 bool CellInfo::ProcessCurrentCellWcdma(CurrentCellInformation *cellInfo)
 {
+    bool ret = false;
+    if (cellInfo == nullptr) {
+        TELEPHONY_LOGE("cellInfo is nullptr");
+        return ret;
+    }
     sptr<WcdmaCellInformation> cell = new WcdmaCellInformation;
     if (cell != nullptr) {
         int32_t &arfcn = cellInfo->ServiceCellParas.wcdma.arfcn;
@@ -537,13 +582,18 @@ bool CellInfo::ProcessCurrentCellWcdma(CurrentCellInformation *cellInfo)
         cellInfos_.emplace_back(cell);
         TELEPHONY_LOGI(
             "CellInfo::ProcessCurrentCellWcdma arfcn:%{private}d psc:%{private}d rscp:%{public}d", arfcn, psc, rscp);
-        return true;
+        ret = true;
     }
-    return false;
+    return ret;
 }
 
 bool CellInfo::ProcessCurrentCellCdma(CurrentCellInformation *cellInfo)
 {
+    bool ret = false;
+    if (cellInfo == nullptr) {
+        TELEPHONY_LOGE("cellInfo is nullptr");
+        return ret;
+    }
     sptr<CdmaCellInformation> cell = new CdmaCellInformation;
     if (cell != nullptr) {
         int32_t &baseId = cellInfo->ServiceCellParas.cdma.baseId;
@@ -564,13 +614,18 @@ bool CellInfo::ProcessCurrentCellCdma(CurrentCellInformation *cellInfo)
         TELEPHONY_LOGI(
             "CellInfo::ProcessCurrentCellCdma baseId:%{private}d networkId:%{private}d pilotStrength:%{public}d",
             baseId, networkId, pilotStrength);
-        return true;
+        ret = true;
     }
-    return false;
+    return ret;
 }
 
 bool CellInfo::ProcessCurrentCellTdscdma(CurrentCellInformation *cellInfo)
 {
+    bool ret = false;
+    if (cellInfo == nullptr) {
+        TELEPHONY_LOGE("cellInfo is nullptr");
+        return ret;
+    }
     sptr<TdscdmaCellInformation> cell = new TdscdmaCellInformation;
     if (cell != nullptr) {
         int32_t &arfcn = cellInfo->ServiceCellParas.tdscdma.arfcn;
@@ -589,13 +644,18 @@ bool CellInfo::ProcessCurrentCellTdscdma(CurrentCellInformation *cellInfo)
         cellInfos_.emplace_back(cell);
         TELEPHONY_LOGI("CellInfo::ProcessCurrentCellTdscdma arfcn:%{private}d pci:%{private}d slotId:%{public}d", arfcn,
             cpid, slotId_);
-        return true;
+        ret = true;
     }
-    return false;
+    return ret;
 }
 
 bool CellInfo::ProcessCurrentCellNr(CurrentCellInformation *cellInfo)
 {
+    bool ret = false;
+    if (cellInfo == nullptr) {
+        TELEPHONY_LOGE("cellInfo is nullptr");
+        return ret;
+    }
     sptr<NrCellInformation> cell = new NrCellInformation;
     if (cell != nullptr && cellInfo != nullptr) {
         int32_t &nrArfcn = cellInfo->ServiceCellParas.nr.nrArfcn;
@@ -619,9 +679,9 @@ bool CellInfo::ProcessCurrentCellNr(CurrentCellInformation *cellInfo)
         TELEPHONY_LOGI(
             "CellInfo::ProcessCurrentCellNr arfcn:%{private}d pci:%{private}d slotId:%{public}d rsrp:%{public}d "
             "rsrq:%{public}d", nrArfcn, pci, slotId_, rsrp, rsrq);
-        return true;
+        ret = true;
     }
-    return false;
+    return ret;
 }
 
 int32_t CellInfo::GetCurrentSignalLevelGsm(int32_t rxlev)
