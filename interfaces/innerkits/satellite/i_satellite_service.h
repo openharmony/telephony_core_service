@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,9 @@
 #ifndef I_SATELLITE_SERVICE_H
 #define I_SATELLITE_SERVICE_H
 
-#include "event_handler.h"
 #include "i_satellite_core_callback.h"
 #include "iremote_proxy.h"
+#include "tel_event_handler.h"
 #include "telephony_types.h"
 
 namespace OHOS {
@@ -33,6 +33,14 @@ enum SatelliteServiceProxyType {
     PROXY_SATELLITE_CALL = 0,
     PROXY_SATELLITE_SMS = 1,
 };
+
+enum class SatelliteCapability : uint32_t {
+    NONE    = 0x0,
+    CALL    = 0x1,
+    SMS     = 0x1 << 1,
+    DATA    = 0x1 << 2,
+};
+
 class ISatelliteService : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.telephony.ISatelliteService");
@@ -79,19 +87,16 @@ public:
     /**
      * @brief Get satellite imei
      *
-     * @param slotId sim slot id
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t GetImei(int32_t slotId) = 0;
+    virtual std::string GetImei() = 0;
 
     /**
      * @brief Get satellite capability
      *
-     * @param slotId sim slot id
-     *
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t GetSatelliteCapability(int32_t slotId) = 0;
+    virtual int32_t GetSatelliteCapability() = 0;
 
     /**
      * @brief Get the pointer of service.

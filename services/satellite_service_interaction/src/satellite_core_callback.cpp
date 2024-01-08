@@ -19,12 +19,9 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
-
 namespace OHOS {
 namespace Telephony {
-SatelliteCoreCallback::SatelliteCoreCallback(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-    : handler_(handler)
-{}
+SatelliteCoreCallback::SatelliteCoreCallback(const std::shared_ptr<TelEventHandler> &handler) : handler_(handler) {}
 
 SatelliteCoreCallback::~SatelliteCoreCallback() {}
 
@@ -62,26 +59,6 @@ int32_t SatelliteCoreCallback::SimStateChanged(InnerEvent::Pointer &event)
 {
     if (handler_ == nullptr) {
         TELEPHONY_LOGE("SimStateChanged handler is null!");
-        return TELEPHONY_ERROR;
-    }
-    handler_->SendEvent(event, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t SatelliteCoreCallback::GetImeiResponse(InnerEvent::Pointer &event)
-{
-    if (handler_ == nullptr) {
-        TELEPHONY_LOGE("GetImeiResponse handler is null!");
-        return TELEPHONY_ERROR;
-    }
-    handler_->SendEvent(event, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t SatelliteCoreCallback::GetSatelliteCapabilityResponse(InnerEvent::Pointer &event)
-{
-    if (handler_ == nullptr) {
-        TELEPHONY_LOGE("GetSatelliteCapabilityResponse handler is null!");
         return TELEPHONY_ERROR;
     }
     handler_->SendEvent(event, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
