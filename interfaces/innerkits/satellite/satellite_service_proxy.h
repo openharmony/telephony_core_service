@@ -29,8 +29,8 @@ public:
     int32_t RegisterCoreNotify(int32_t slotId, int32_t what, const sptr<ISatelliteCoreCallback> &callback) override;
     int32_t UnRegisterCoreNotify(int32_t slotId, int32_t what) override;
     int32_t SetRadioState(int32_t slotId, int32_t isRadioOn, int32_t rst) override;
-    int32_t GetImei(int32_t slotId) override;
-    int32_t GetSatelliteCapability(int32_t slotId) override;
+    std::string GetImei() override;
+    int32_t GetSatelliteCapability() override;
     sptr<IRemoteObject> GetProxyObjectPtr(SatelliteServiceProxyType proxyType) override;
 
 private:

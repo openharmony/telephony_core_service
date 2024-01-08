@@ -132,7 +132,7 @@ void SatelliteServiceClient::SystemAbilityListener::OnRemoveSystemAbility(
     satelliteClient->ServiceOff();
 }
 
-int32_t SatelliteServiceClient::AddSimHandler(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+int32_t SatelliteServiceClient::AddSimHandler(int32_t slotId, const std::shared_ptr<TelEventHandler> &handler)
 {
     if (handler == nullptr) {
         TELEPHONY_LOGE("AddSimHandler return, handler is null.");
@@ -144,8 +144,7 @@ int32_t SatelliteServiceClient::AddSimHandler(int32_t slotId, const std::shared_
     return TELEPHONY_SUCCESS;
 }
 
-int32_t SatelliteServiceClient::AddNetworkHandler(
-    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+int32_t SatelliteServiceClient::AddNetworkHandler(int32_t slotId, const std::shared_ptr<TelEventHandler> &handler)
 {
     if (handler == nullptr) {
         TELEPHONY_LOGE("AddNetworkHandler return, handler is null.");
@@ -161,10 +160,18 @@ void SatelliteServiceClient::ServiceOn()
 {
     for (auto pair : simHandlerMap_) {
         auto handler = static_cast<SimStateHandle *>(pair.second.get());
+        if (handler == nullptr) {
+            TELEPHONY_LOGE("SimStateHandle is null: %{public}d", pair.first);
+            continue;
+        }
         handler->RegisterSatelliteCallback();
     }
     for (auto pair : networkHandlerMap_) {
         auto handler = static_cast<NetworkSearchHandler *>(pair.second.get());
+        if (handler == nullptr) {
+            TELEPHONY_LOGE("NetworkSearchHandler is null: %{public}d", pair.first);
+            continue;
+        }
         handler->RegisterSatelliteCallback();
     }
 }
@@ -176,10 +183,18 @@ void SatelliteServiceClient::ServiceOff()
 
     for (auto pair : simHandlerMap_) {
         auto handler = static_cast<SimStateHandle *>(pair.second.get());
+        if (handler == nullptr) {
+            TELEPHONY_LOGE("SimStateHandle is null: %{public}d", pair.first);
+            continue;
+        }
         handler->UnregisterSatelliteCallback();
     }
     for (auto pair : networkHandlerMap_) {
         auto handler = static_cast<NetworkSearchHandler *>(pair.second.get());
+        if (handler == nullptr) {
+            TELEPHONY_LOGE("NetworkSearchHandler is null: %{public}d", pair.first);
+            continue;
+        }
         handler->UnregisterSatelliteCallback();
     }
 }
@@ -215,14 +230,14 @@ bool SatelliteServiceClient::IsSatelliteEnabled()
     return proxy->IsSatelliteEnabled();
 }
 
-int32_t SatelliteServiceClient::GetSatelliteCapability(int32_t slotId)
+int32_t SatelliteServiceClient::GetSatelliteCapability()
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return 0;
+        return static_cast<int32_t>(SatelliteCapability::NONE);
     }
-    return proxy->GetSatelliteCapability(slotId);
+    return proxy->GetSatelliteCapability();
 }
 
 sptr<IRemoteObject> SatelliteServiceClient::GetProxyObjectPtr(SatelliteServiceProxyType type)
@@ -245,14 +260,14 @@ int32_t SatelliteServiceClient::SetRadioState(int32_t slotId, int32_t isRadioOn,
     return proxy->SetRadioState(slotId, isRadioOn, rst);
 }
 
-int32_t SatelliteServiceClient::GetImei(int32_t slotId)
+std::string SatelliteServiceClient::GetImei()
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        return "";
     }
-    return proxy->GetImei(slotId);
+    return proxy->GetImei();
 }
 } // namespace Telephony
 } // namespace OHOS

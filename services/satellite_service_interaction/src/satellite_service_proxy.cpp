@@ -61,7 +61,7 @@ bool SatelliteServiceProxy::IsSatelliteEnabled()
     return result;
 }
 
-int32_t SatelliteServiceProxy::GetSatelliteCapability(int32_t slotId)
+int32_t SatelliteServiceProxy::GetSatelliteCapability()
 {
     MessageParcel data;
     MessageParcel reply;
@@ -70,9 +70,6 @@ int32_t SatelliteServiceProxy::GetSatelliteCapability(int32_t slotId)
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("GetSatelliteCapability WriteInterfaceToken is false");
         return result;
-    }
-    if (!data.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
 
     auto remote = Remote();
@@ -101,6 +98,10 @@ int32_t SatelliteServiceProxy::RegisterCoreNotify(
     MessageParcel reply;
     MessageOption option;
     int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("RegisterCoreNotify callback is null");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("RegisterCoreNotify WriteInterfaceToken is false");
         return ret;
@@ -209,35 +210,31 @@ int32_t SatelliteServiceProxy::SetRadioState(int32_t slotId, int32_t isRadioOn, 
     return ret;
 }
 
-int32_t SatelliteServiceProxy::GetImei(int32_t slotId)
+std::string SatelliteServiceProxy::GetImei()
 {
     MessageParcel data;
-    int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    std::string imei = "";
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("GetImei WriteInterfaceToken is false");
-        return ret;
-    }
-    if (!data.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+        return imei;
     }
 
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("GetImei Remote is null");
-        return ret;
+        return imei;
     }
-    TELEPHONY_LOGD("Satellite GetImei slotId: %{public}d", slotId);
     MessageParcel reply;
     MessageOption option;
-    ret = remote->SendRequest(uint32_t(SatelliteServiceInterfaceCode::GET_IMEI), data, reply, option);
+    int32_t ret = remote->SendRequest(uint32_t(SatelliteServiceInterfaceCode::GET_IMEI), data, reply, option);
     if (ret != ERR_NONE) {
         TELEPHONY_LOGE("GetImei failed, error code is %{public}d ", ret);
-        return ret;
+        return imei;
     }
-    if (!reply.ReadInt32(ret)) {
+    if (!reply.ReadString(imei)) {
         TELEPHONY_LOGE("GetImei read reply failed");
     }
-    return ret;
+    return imei;
 }
 
 sptr<IRemoteObject> SatelliteServiceProxy::GetProxyObjectPtr(SatelliteServiceProxyType proxyType)
