@@ -92,11 +92,6 @@ bool MultiSimController::ForgetAllData(int32_t slotId)
     return simDbHelper_->ForgetAllData(slotId) != INVALID_VALUE;
 }
 
-void MultiSimController::SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager)
-{
-    networkSearchManager_ = networkSearchManager;
-}
-
 bool MultiSimController::InitData(int32_t slotId)
 {
     TELEPHONY_LOGI("start to initData slotId is %{public}d", slotId);
@@ -864,12 +859,7 @@ int32_t MultiSimController::GetShowName(int32_t slotId, std::u16string &showName
     }
     showName = Str8ToStr16(localCacheInfo_[slotId].showName);
     lock.unlock();
-    if (showName.empty() && networkSearchManager_ != nullptr) {
-        TELEPHONY_LOGI("GetOperatorName");
-        networkSearchManager_->GetOperatorName(slotId, showName);
-        return TELEPHONY_ERR_SUCCESS;
-    }
-    TELEPHONY_LOGI("name is empty");
+    TELEPHONY_LOGI("Get the SIM name set by the user");
     return TELEPHONY_ERR_SUCCESS;
 }
 

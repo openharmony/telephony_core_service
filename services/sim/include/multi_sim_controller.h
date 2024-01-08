@@ -18,7 +18,6 @@
 
 #include <list>
 
-#include "i_network_search.h"
 #include "if_system_ability_manager.h"
 #include "radio_protocol_controller.h"
 #include "sim_constant.h"
@@ -39,7 +38,6 @@ public:
 
     void Init();
     bool InitData(int32_t slotId);
-    void SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager);
     int32_t GetDefaultVoiceSlotId();
     int32_t SetDefaultVoiceSlotId(int32_t slotId);
     int32_t GetDefaultSmsSlotId();
@@ -108,7 +106,6 @@ private:
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
     std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;
-    std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
     IccAccountInfo iccAccountInfo_;
     std::vector<IccAccountInfo> iccAccountInfoList_;
     std::vector<SimRdbInfo> localCacheInfo_;

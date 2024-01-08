@@ -103,17 +103,6 @@ void SimManager::InitSingleSimObject()
     multiSimMonitor_->Init();
 }
 
-void SimManager::SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager)
-{
-    TELEPHONY_LOGD("SimManager::SetNetworkSearchManager");
-    if (multiSimController_ == nullptr) {
-        TELEPHONY_LOGE("SimManager::SetNetworkSearchManager multiSimController_ is nullptr");
-        return;
-    }
-    multiSimController_->SetNetworkSearchManager(networkSearchManager);
-    return;
-}
-
 int32_t SimManager::HasSimCard(int32_t slotId, bool &hasSimCard)
 {
     if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {

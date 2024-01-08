@@ -37,7 +37,6 @@ public:
     virtual ~SimManager();
     // Init
     bool OnInit(int32_t slotCount) override;
-    void SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager) override;
     // SimState
     int32_t HasSimCard(int32_t slotId, bool &hasSimCard) override;
     int32_t GetSimState(int32_t slotId, SimState &simState) override;
