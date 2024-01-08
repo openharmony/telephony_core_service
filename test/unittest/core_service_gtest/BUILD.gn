@@ -23,6 +23,7 @@ ohos_unittest("tel_core_service_gtest") {
 
   sources = [
     "network_search_test_callback_stub.cpp",
+    "satellite_service_test.cpp",
     "security_token.cpp",
     "zero_branch_test_core_service.cpp",
   ]

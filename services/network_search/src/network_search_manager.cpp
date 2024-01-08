@@ -945,15 +945,13 @@ int32_t NetworkSearchManager::GetImei(int32_t slotId, std::u16string &imei)
         TELEPHONY_LOGE("slotId:%{public}d inner or eventSender_ is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_ptr<SatelliteServiceClient> satelliteClient = DelayedSingleton<SatelliteServiceClient>::GetInstance();
+    if (IsSatelliteEnabled()) {
+        imei = Str8ToStr16(satelliteClient->GetImei());
+        return TELEPHONY_ERR_SUCCESS;
+    }
     if (inner->imei_.empty()) {
-        std::shared_ptr<SatelliteServiceClient> satelliteClient =
-            DelayedSingleton<SatelliteServiceClient>::GetInstance();
-        bool isSatelliteEnable = IsSatelliteEnabled();
-        if (isSatelliteEnable) {
-            satelliteClient->GetImei(slotId);
-        } else {
-            eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_IMEI);
-        }
+        eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_IMEI);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     imei = inner->imei_;

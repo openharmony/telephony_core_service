@@ -18,8 +18,6 @@
 
 #include <map>
 
-#include "event_handler.h"
-#include "event_runner.h"
 #include "i_satellite_core_callback.h"
 #include "iremote_stub.h"
 #include "satellite_core_callback_ipc_interface_code.h"
@@ -36,8 +34,6 @@ private:
     void InitFuncMap();
 
     int32_t OnSetRadioStateResponse(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetImeiResponse(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetSatelliteCapabilityResponse(MessageParcel &data, MessageParcel &reply);
     int32_t OnRadioStateChanged(MessageParcel &data, MessageParcel &reply);
     int32_t OnSatelliteStatusChanged(MessageParcel &data, MessageParcel &reply);
     int32_t OnSimStateChanged(MessageParcel &data, MessageParcel &reply);

@@ -33,10 +33,6 @@ void SatelliteCoreCallbackStub::InitFuncMap()
 {
     requestFuncMap_[static_cast<uint32_t>(SatelliteCoreCallbackInterfaceCode::SET_RADIO_STATE_RESPONSE)] =
         &SatelliteCoreCallbackStub::OnSetRadioStateResponse;
-    requestFuncMap_[static_cast<uint32_t>(SatelliteCoreCallbackInterfaceCode::GET_IMEI_RESPONSE)] =
-        &SatelliteCoreCallbackStub::OnGetImeiResponse;
-    requestFuncMap_[static_cast<uint32_t>(SatelliteCoreCallbackInterfaceCode::GET_SATELLITE_CAPABILITY_RESPONSE)] =
-        &SatelliteCoreCallbackStub::OnGetSatelliteCapabilityResponse;
     requestFuncMap_[static_cast<uint32_t>(SatelliteCoreCallbackInterfaceCode::RADIO_STATE_CHANGED)] =
         &SatelliteCoreCallbackStub::OnRadioStateChanged;
     requestFuncMap_[static_cast<uint32_t>(SatelliteCoreCallbackInterfaceCode::SATELLITE_STATUS_CHANGED)] =
@@ -110,40 +106,6 @@ int32_t SatelliteCoreCallbackStub::OnSetRadioStateResponse(MessageParcel &data, 
 
     TELEPHONY_LOGE("SatelliteCoreCallbackStub: radio response is null!");
     return TELEPHONY_ERR_READ_DATA_FAIL;
-}
-
-int32_t SatelliteCoreCallbackStub::OnGetImeiResponse(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t eventCode = data.ReadInt32();
-    auto info = std::make_shared<HRilStringParcel>();
-    if (!data.ReadString(info->data)) {
-        TELEPHONY_LOGE("HRilStringParcel is null!");
-        return TELEPHONY_ERR_READ_DATA_FAIL;
-    }
-    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventCode, info);
-    if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    reply.WriteInt32(GetImeiResponse(response));
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t SatelliteCoreCallbackStub::OnGetSatelliteCapabilityResponse(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t eventCode = data.ReadInt32();
-    auto info = std::make_shared<HRilStringParcel>();
-    if (!data.ReadString(info->data)) {
-        TELEPHONY_LOGE("HRilStringParcel is null!");
-        return TELEPHONY_ERR_READ_DATA_FAIL;
-    }
-    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventCode, info);
-    if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    reply.WriteInt32(GetSatelliteCapabilityResponse(response));
-    return TELEPHONY_SUCCESS;
 }
 
 int32_t SatelliteCoreCallbackStub::OnRadioStateChanged(MessageParcel &data, MessageParcel &reply)

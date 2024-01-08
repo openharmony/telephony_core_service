@@ -69,7 +69,7 @@ void SimStateHandle::Init(int32_t slotId)
     if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED)) {
         std::shared_ptr<SatelliteServiceClient> satelliteClient =
             DelayedSingleton<SatelliteServiceClient>::GetInstance();
-        satelliteClient->AddSimHandler(slotId_, shared_from_this());
+        satelliteClient->AddSimHandler(slotId_, std::static_pointer_cast<TelEventHandler>(shared_from_this()));
     }
     auto telRilManager = telRilManager_.lock();
     if (telRilManager != nullptr) {
@@ -350,7 +350,9 @@ void SimStateHandle::UnInit()
 
 void SimStateHandle::RegisterSatelliteCallback()
 {
-    satelliteCallback_ = std::make_unique<SatelliteCoreCallback>(shared_from_this()).release();
+    satelliteCallback_ =
+        std::make_unique<SatelliteCoreCallback>(std::static_pointer_cast<TelEventHandler>(shared_from_this()))
+            .release();
     std::shared_ptr<SatelliteServiceClient> satelliteClient = DelayedSingleton<SatelliteServiceClient>::GetInstance();
     satelliteClient->RegisterCoreNotify(slotId_, RadioEvent::RADIO_SIM_STATE_CHANGE, satelliteCallback_);
 }

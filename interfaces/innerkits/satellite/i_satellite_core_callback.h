@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,9 @@
 #ifndef I_SATELLITE_CORE_CALLBACK_H
 #define I_SATELLITE_CORE_CALLBACK_H
 
-#include "event_handler.h"
 #include "iremote_proxy.h"
 #include "satellite_core_callback_ipc_interface_code.h"
+#include "tel_event_handler.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -36,22 +36,6 @@ public:
      * @return Returns {@code TELEPHONY_SUCCESS} on success, others on failure.
      */
     virtual int32_t SetRadioStateResponse(InnerEvent::Pointer &event) = 0;
-
-    /**
-     * @brief GetImeiResponse.
-     *
-     * @param event event which contains the response data.
-     * @return Returns {@code TELEPHONY_SUCCESS} on success, others on failure.
-     */
-    virtual int32_t GetImeiResponse(InnerEvent::Pointer &event) = 0;
-
-    /**
-     * @brief GetSatelliteCapabilityResponse.
-     *
-     * @param event event which contains the response data.
-     * @return Returns {@code TELEPHONY_SUCCESS} on success, others on failure.
-     */
-    virtual int32_t GetSatelliteCapabilityResponse(InnerEvent::Pointer &event) = 0;
 
     /**
      * @brief RadioStateChanged.

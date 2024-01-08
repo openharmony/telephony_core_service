@@ -217,7 +217,7 @@ void NetworkSearchHandler::RegisterEvents()
         if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED)) {
             std::shared_ptr<SatelliteServiceClient> satelliteClient =
                 DelayedSingleton<SatelliteServiceClient>::GetInstance();
-            satelliteClient->AddNetworkHandler(slotId_, shared_from_this());
+            satelliteClient->AddNetworkHandler(slotId_, std::static_pointer_cast<TelEventHandler>(shared_from_this()));
         }
     }
     // Register IMS
@@ -233,7 +233,9 @@ void NetworkSearchHandler::RegisterEvents()
 void NetworkSearchHandler::RegisterSatelliteCallback()
 {
     if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED)) {
-        satelliteCallback_ = std::make_unique<SatelliteCoreCallback>(shared_from_this()).release();
+        satelliteCallback_ =
+            std::make_unique<SatelliteCoreCallback>(std::static_pointer_cast<TelEventHandler>(shared_from_this()))
+                .release();
         std::shared_ptr<SatelliteServiceClient> satelliteClient =
             DelayedSingleton<SatelliteServiceClient>::GetInstance();
         satelliteClient->RegisterCoreNotify(slotId_, RadioEvent::RADIO_SET_STATUS, satelliteCallback_);
@@ -1178,6 +1180,10 @@ void NetworkSearchHandler::SatelliteStatusChanged(const AppExecFwk::InnerEvent::
         return;
     }
     auto satelliteStatus = event->GetSharedObject<SatelliteStatus>();
+    if (satelliteStatus == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::satelliteStatus is nullptr!");
+        return;
+    }
     if (satelliteStatus->mode == SATELLITE_STATUS_ON) {
         std::shared_ptr<SatelliteServiceClient> satelliteClient =
             DelayedSingleton<SatelliteServiceClient>::GetInstance();
