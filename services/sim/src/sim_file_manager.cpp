@@ -187,7 +187,7 @@ std::u16string SimFileManager::GetSimOperatorNumeric()
     }
 
     std::string result = simFile_->ObtainSimOperator();
-    TELEPHONY_LOGI("SimFileManager::GetOperator result:%{public}s ", (result.empty() ? "false" : "true"));
+    TELEPHONY_LOGD("SimFileManager::GetOperator result:%{public}s ", (result.empty() ? "false" : "true"));
     return Str8ToStr16(result);
 }
 
@@ -199,7 +199,7 @@ std::u16string SimFileManager::GetISOCountryCodeForSim()
     }
 
     std::string result = simFile_->ObtainIsoCountryCode();
-    TELEPHONY_LOGI("SimFileManager::ObtainIsoCountryCode result:%{public}s ", (result.empty() ? "false" : "true"));
+    TELEPHONY_LOGD("SimFileManager::ObtainIsoCountryCode result:%{public}s ", (result.empty() ? "false" : "true"));
     return Str8ToStr16(result);
 }
 
@@ -211,7 +211,7 @@ std::u16string SimFileManager::GetSimSpn()
     }
 
     std::string result = simFile_->ObtainSPN();
-    TELEPHONY_LOGI("SimFileManager::GetSimSpn result:%{public}s ", (result.empty() ? "false" : "true"));
+    TELEPHONY_LOGD("SimFileManager::GetSimSpn result:%{public}s ", (result.empty() ? "false" : "true"));
     return Str8ToStr16(result);
 }
 
@@ -223,7 +223,7 @@ std::u16string SimFileManager::GetSimEons(const std::string &plmn, int32_t lac, 
     }
 
     std::string result = simFile_->ObtainEons(plmn, lac, longNameRequired);
-    TELEPHONY_LOGI("SimFileManager::GetEons result:%{public}s ", (result.empty() ? "false" : "true"));
+    TELEPHONY_LOGD("SimFileManager::GetEons result:%{public}s ", (result.empty() ? "false" : "true"));
     return Str8ToStr16(result);
 }
 
@@ -259,7 +259,7 @@ std::u16string SimFileManager::GetIMSI()
     }
 
     std::string result = simFile_->ObtainIMSI();
-    TELEPHONY_LOGI("SimFileManager::ObtainIMSI result:%{public}s ", (result.empty() ? "false" : "true"));
+    TELEPHONY_LOGD("SimFileManager::ObtainIMSI result:%{public}s ", (result.empty() ? "false" : "true"));
     return Str8ToStr16(result);
 }
 
@@ -271,8 +271,7 @@ std::u16string SimFileManager::GetLocaleFromDefaultSim()
     }
 
     std::string result = simFile_->ObtainIccLanguage();
-    TELEPHONY_LOGI(
-        "SimFileManager::GetLocaleFromDefaultSim result:%{public}s ", (result.empty() ? "false" : "true"));
+    TELEPHONY_LOGD("SimFileManager::GetLocaleFromDefaultSim result:%{public}s ", (result.empty() ? "false" : "true"));
     return Str8ToStr16(result);
 }
 
@@ -306,7 +305,7 @@ std::u16string SimFileManager::GetSimTelephoneNumber()
     if (simFile_ != nullptr) {
         result = simFile_->ObtainMsisdnNumber();
     }
-    TELEPHONY_LOGI("result is empty:%{public}s", (result.empty() ? "true" : "false"));
+    TELEPHONY_LOGD("result is empty:%{public}s", (result.empty() ? "true" : "false"));
     return Str8ToStr16(result);
 }
 

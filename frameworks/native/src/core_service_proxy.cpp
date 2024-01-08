@@ -815,7 +815,7 @@ int32_t CoreServiceProxy::IsCTSimCard(int32_t slotId, bool &isCTSimCard)
 
 bool CoreServiceProxy::IsSimActive(int32_t slotId)
 {
-    TELEPHONY_LOGI("CoreServiceProxy IsSimActive ::%{public}d", slotId);
+    TELEPHONY_LOGD("CoreServiceProxy IsSimActive ::%{public}d", slotId);
     if (!IsValidSlotId(slotId)) {
         TELEPHONY_LOGE("CoreServiceProxy::IsSimActive invalid simId");
         return false;
@@ -1081,7 +1081,7 @@ std::u16string CoreServiceProxy::GetSimEons(int32_t slotId, const std::string &p
 
 int32_t CoreServiceProxy::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
 {
-    TELEPHONY_LOGI("GetSimAccountInfo slotId = %{public}d", slotId);
+    TELEPHONY_LOGD("GetSimAccountInfo slotId = %{public}d", slotId);
     if (!IsValidSlotId(slotId)) {
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
@@ -1341,7 +1341,7 @@ int32_t CoreServiceProxy::SetShowName(int32_t slotId, const std::u16string &name
 
 int32_t CoreServiceProxy::GetShowName(int32_t slotId, std::u16string &showName)
 {
-    TELEPHONY_LOGI("GetShowName slotId = %{public}d", slotId);
+    TELEPHONY_LOGD("GetShowName slotId = %{public}d", slotId);
     if (!IsValidSlotId(slotId)) {
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
