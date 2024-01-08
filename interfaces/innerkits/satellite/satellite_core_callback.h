@@ -18,8 +18,6 @@
 
 #include <map>
 
-#include "event_handler.h"
-#include "event_runner.h"
 #include "iremote_stub.h"
 #include "satellite_core_callback_ipc_interface_code.h"
 #include "satellite_core_callback_stub.h"
@@ -28,18 +26,16 @@ namespace OHOS {
 namespace Telephony {
 class SatelliteCoreCallback : public SatelliteCoreCallbackStub {
 public:
-    explicit SatelliteCoreCallback(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    explicit SatelliteCoreCallback(const std::shared_ptr<TelEventHandler> &handler);
     virtual ~SatelliteCoreCallback();
 
     int32_t SetRadioStateResponse(InnerEvent::Pointer &event) override;
     int32_t RadioStateChanged(InnerEvent::Pointer &event) override;
     int32_t SimStateChanged(InnerEvent::Pointer &event) override;
     int32_t SatelliteStatusChanged(InnerEvent::Pointer &event) override;
-    int32_t GetImeiResponse(InnerEvent::Pointer &event) override;
-    int32_t GetSatelliteCapabilityResponse(InnerEvent::Pointer &event) override;
 
 private:
-    std::shared_ptr<AppExecFwk::EventHandler> handler_;
+    std::shared_ptr<TelEventHandler> handler_;
 };
 } // namespace Telephony
 } // namespace OHOS

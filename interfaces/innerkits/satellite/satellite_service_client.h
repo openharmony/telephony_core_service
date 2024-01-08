@@ -33,13 +33,13 @@ public:
     sptr<ISatelliteService> GetProxy();
     void OnRemoteDied(const wptr<IRemoteObject> &remote);
     bool IsSatelliteEnabled();
-    int32_t AddSimHandler(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    int32_t AddNetworkHandler(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    int32_t AddSimHandler(int32_t slotId, const std::shared_ptr<TelEventHandler> &handler);
+    int32_t AddNetworkHandler(int32_t slotId, const std::shared_ptr<TelEventHandler> &handler);
     int32_t RegisterCoreNotify(int32_t slotId, int32_t what, const sptr<ISatelliteCoreCallback> &callback);
     int32_t UnRegisterCoreNotify(int32_t slotId, int32_t what);
     int32_t SetRadioState(int32_t slotId, int32_t isRadioOn, int32_t rst);
-    int32_t GetImei(int32_t slotId);
-    int32_t GetSatelliteCapability(int32_t slotId);
+    std::string GetImei();
+    int32_t GetSatelliteCapability();
     sptr<IRemoteObject> GetProxyObjectPtr(SatelliteServiceProxyType type);
 
 private:
@@ -75,8 +75,8 @@ private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     sptr<ISatelliteService> proxy_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
-    std::map<int32_t, std::shared_ptr<AppExecFwk::EventHandler>> simHandlerMap_;
-    std::map<int32_t, std::shared_ptr<AppExecFwk::EventHandler>> networkHandlerMap_;
+    std::map<int32_t, std::shared_ptr<TelEventHandler>> simHandlerMap_;
+    std::map<int32_t, std::shared_ptr<TelEventHandler>> networkHandlerMap_;
 };
 } // namespace Telephony
 } // namespace OHOS
