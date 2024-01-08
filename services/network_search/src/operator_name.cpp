@@ -121,7 +121,7 @@ void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &eve
     networkSearchManager->TriggerTimezoneRefresh(slotId_);
 }
 
-void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const
+void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("OperatorName::GsmOperatorInfo event is nullptr slotId:%{public}d", slotId_);
@@ -135,6 +135,7 @@ void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
         longName = operatorInfoResult->longName;
         shortName = operatorInfoResult->shortName;
         numeric = operatorInfoResult->numeric;
+        updateOperatorLongName(longName, numeric);
     }
     TELEPHONY_LOGI(
         "OperatorName::GsmOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : %{public}s "
@@ -146,7 +147,7 @@ void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
     }
 }
 
-void OperatorName::CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const
+void OperatorName::CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("OperatorName::CdmaOperatorInfo event is nullptr slotId:%{public}d", slotId_);
@@ -160,6 +161,7 @@ void OperatorName::CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event
         longName = operatorInfoResult->longName;
         shortName = operatorInfoResult->shortName;
         numeric = operatorInfoResult->numeric;
+        updateOperatorLongName(longName, numeric);
     }
     TELEPHONY_LOGI(
         "OperatorName::CdmaOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : %{public}s "
@@ -701,6 +703,25 @@ void OperatorName::UpdateOplCust(const std::vector<std::string> &oplCust)
         if (!opl->plmnNumeric.empty()) {
             oplCust_.push_back(opl);
         }
+    }
+}
+
+void OperatorName::updateOperatorLongName(std::string &operatorLongName, const std::string &numeric)
+{
+    RegServiceState regStatus = RegServiceState::REG_STATE_UNKNOWN;
+    sptr<NetworkState> networkState = GetNetworkStatus();
+    if (networkState == nullptr) {
+        return;
+    }
+
+    regStatus = networkState->GetRegStatus();
+    if (regStatus != RegServiceState::REG_STATE_IN_SERVICE) {
+        return;
+    }
+
+    std::string customizedOperatorLongName = GetCustomName(numeric);
+    if (!customizedOperatorLongName.empty()) {
+        operatorLongName = customizedOperatorLongName;
     }
 }
 } // namespace Telephony
