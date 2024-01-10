@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -622,6 +622,13 @@ int32_t TelRilCallback::NetworkCurrentCellUpdated_1_1(const HDI::Ril::V1_1::RilR
         cellListCurrentInformation);
 }
 
+int32_t TelRilCallback::NetworkCurrentCellUpdated_1_2(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_2::CellListCurrentInfo_1_2 &cellListCurrentInformation)
+{
+    return Notify(responseInfo, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::NetworkCurrentCellUpdated_1_2,
+        cellListCurrentInformation);
+}
+
 int32_t TelRilCallback::ResidentNetworkUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
     const std::string &plmn)
 {
@@ -681,6 +688,14 @@ int32_t TelRilCallback::GetNeighboringCellInfoListResponse(
         cellInfoList);
 }
 
+int32_t TelRilCallback::GetNeighboringCellInfoListResponse_1_2(
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_2::CellListNearbyInfo_1_2 &cellInfoList)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilNetwork,
+        &TelRilNetwork::GetNeighboringCellInfoListResponse_1_2, cellInfoList);
+}
+
 int32_t TelRilCallback::GetCurrentCellInfoResponse(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList)
 {
@@ -692,6 +707,13 @@ int32_t TelRilCallback::GetCurrentCellInfoResponse_1_1(const HDI::Ril::V1_1::Ril
     const HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellListCurrentInformation)
 {
     return Response(responseInfo, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::GetCurrentCellInfoResponse_1_1,
+        cellListCurrentInformation);
+}
+
+int32_t TelRilCallback::GetCurrentCellInfoResponse_1_2(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_2::CellListCurrentInfo_1_2 &cellListCurrentInformation)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilNetwork, &TelRilNetwork::GetCurrentCellInfoResponse_1_2,
         cellListCurrentInformation);
 }
 
