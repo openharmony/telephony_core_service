@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -399,7 +399,7 @@ int32_t TelRilNetwork::GetNrSsbIdResponse(
     nrCellSsbIdsInfo->sinr = nrCellSsbIds.sinr;
     nrCellSsbIdsInfo->timeAdvance = nrCellSsbIds.timeAdvance;
     nrCellSsbIdsInfo->nbCellCount = nrCellSsbIds.nbCellCount;
-    for (auto &info : nrCellSsbIds.sCellSsbList) {
+    for (const auto &info : nrCellSsbIds.sCellSsbList) {
         SsbIdInfo ssbIdInfo;
         ssbIdInfo.ssbId = info.ssbId;
         ssbIdInfo.rsrp = info.rsrp;
@@ -413,7 +413,7 @@ int32_t TelRilNetwork::GetNrSsbIdResponse(
         neighboringCellSsbInfo.arfcn = nrCellSsbIds.nbCellSsbList[i].arfcn;
         neighboringCellSsbInfo.rsrp = nrCellSsbIds.nbCellSsbList[i].rsrp;
         neighboringCellSsbInfo.sinr = nrCellSsbIds.nbCellSsbList[i].sinr;
-        for (auto &info : nrCellSsbIds.nbCellSsbList[i].ssbIdList) {
+        for (const auto &info : nrCellSsbIds.nbCellSsbList[i].ssbIdList) {
             SsbIdInfo nbCellSsbIdInfo;
             nbCellSsbIdInfo.ssbId = info.ssbId;
             nbCellSsbIdInfo.rsrp = info.rsrp;
