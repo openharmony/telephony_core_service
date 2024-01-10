@@ -32,6 +32,7 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
+constexpr static const int32_t WAIT_TIME_SECOND = 1;
 std::mutex IccFile::mtx_;
 SimFile::SimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("SimFile", simStateManager)
 {
@@ -1666,7 +1667,12 @@ bool SimFile::UpdateVoiceMail(const std::string &mailName, const std::string &ma
         infor.extFile = ELEMENTARY_FILE_EXT6;
         infor.index = indexOfMailbox_;
         diallingNumberHandler_->UpdateDiallingNumbers(infor, event);
-        processWait_.wait(lock);
+        while (!waitResult_) {
+            TELEPHONY_LOGI("update voicemail wait, response = false");
+            if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+                break;
+            }
+        }
     } else if (CphsVoiceMailAvailable()) {
         std::unique_lock<std::mutex> lock(IccFile::mtx_);
         AppExecFwk::InnerEvent::Pointer event =
@@ -1677,7 +1683,12 @@ bool SimFile::UpdateVoiceMail(const std::string &mailName, const std::string &ma
         infor.extFile = ELEMENTARY_FILE_EXT1;
         infor.index = 1;
         diallingNumberHandler_->UpdateDiallingNumbers(infor, event);
-        processWait_.wait(lock);
+        while (!waitResult_) {
+            TELEPHONY_LOGI("update voicemail wait, response = false");
+            if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+                break;
+            }
+        }
     } else {
         TELEPHONY_LOGE("UpdateVoiceMail indexOfMailbox_ %{public}d is invalid!!", indexOfMailbox_);
     }

@@ -561,6 +561,7 @@ HWTEST_F(BranchTest, Telephony_SimFile_003, Function | MediumTest | Level1)
     std::string mailName = "";
     std::string mailNumber = "1234";
     simFile->indexOfMailbox_ = 0;
+    simFile->UpdateVoiceMail("", "");
     EXPECT_FALSE(simFile->UpdateVoiceMail(mailName, mailNumber));
     simFile->efCfis_ = (unsigned char *)mailNumber.c_str();
     simFile->imsi_ = "123";
