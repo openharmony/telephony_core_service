@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Telephony {
 class SignalInformation : public Parcelable {
 public:
-    enum class NetworkType { GSM = 1, CDMA, WCDMA, TDSCDMA, LTE, NR };
+    enum class NetworkType { UNKNOWN = 0, GSM = 1, CDMA, WCDMA, TDSCDMA, LTE, NR };
     static constexpr int32_t NO_VALUE = 0x1AAAAAAA;
     static constexpr int32_t MAX_SIGNAL_NUM = 2;
     static constexpr int32_t GSM_SIGNAL_THRESHOLD_5BAR[] = {-110, -109, -103, -97, -91, -85};
