@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -77,7 +77,7 @@ bool NrSsbInfo::UpdateNrSsbIdInfo(int32_t slotId, std::shared_ptr<NrCellSsbIds> 
     nrCellSsbIdsInfo_->sinr = nrCellSsbIds->sinr;
     nrCellSsbIdsInfo_->timeAdvance = nrCellSsbIds->timeAdvance;
     nrCellSsbIdsInfo_->nbCellCount = nrCellSsbIds->nbCellCount;
-    for (auto &info : nrCellSsbIds->sCellSsbList) {
+    for (const auto &info : nrCellSsbIds->sCellSsbList) {
         SsbInfo ssbInfo;
         ssbInfo.ssbId = info.ssbId;
         ssbInfo.rsrp = info.rsrp;
@@ -89,7 +89,7 @@ bool NrSsbInfo::UpdateNrSsbIdInfo(int32_t slotId, std::shared_ptr<NrCellSsbIds> 
         neighboringCellSsbInfo.arfcn = nrCellSsbIds->nbCellSsbList[i].arfcn;
         neighboringCellSsbInfo.rsrp = nrCellSsbIds->nbCellSsbList[i].rsrp;
         neighboringCellSsbInfo.sinr = nrCellSsbIds->nbCellSsbList[i].sinr;
-        for (auto &info : nrCellSsbIds->nbCellSsbList[i].ssbIdList) {
+        for (const auto &info : nrCellSsbIds->nbCellSsbList[i].ssbIdList) {
             SsbInfo ssbInfo;
             ssbInfo.ssbId = info.ssbId;
             ssbInfo.rsrp = info.rsrp;

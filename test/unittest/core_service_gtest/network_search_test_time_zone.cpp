@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -271,7 +271,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNrSsbIdInfo_0100, Functio
         NetworkSearchTest::telephonyService_ = GetProxy();
         return;
     }
-    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo;
+    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo = std::make_shared<NrSsbInformation>();
     int32_t result = CoreServiceClient::GetInstance().GetNrSsbIdInfo(SLOT_ID_0, nrCellSsbIdsInfo);
     // Force to set the expected result as failure since incomplete implement in modem.
     EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
@@ -291,7 +291,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNrSsbIdInfo_0200, Functio
         NetworkSearchTest::telephonyService_ = GetProxy();
         return;
     }
-    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo;
+    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo = std::make_shared<NrSsbInformation>();
     int32_t result = CoreServiceClient::GetInstance().GetNrSsbIdInfo(SLOT_ID_1, nrCellSsbIdsInfo);
     // Force to set the expected result as failure since incomplete implement in modem.
     EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
@@ -310,7 +310,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNrSsbIdInfo_0300, Functio
         NetworkSearchTest::telephonyService_ = GetProxy();
         return;
     }
-    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo;
+    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo = std::make_shared<NrSsbInformation>();
     int32_t result = CoreServiceClient::GetInstance().GetNrSsbIdInfo(SLOT_ID_0, nrCellSsbIdsInfo);
     EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
     NetworkSearchTest::PrintNrSsbIdInfo(nrCellSsbIdsInfo);
