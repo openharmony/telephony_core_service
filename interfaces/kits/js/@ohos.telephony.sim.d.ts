@@ -3041,24 +3041,6 @@ declare namespace sim {
      * @since 10
      */
     KEY_BANDWIDTH_STRING_ARRAY = 'bandwidth_string_array',
-
-    /**
-     * Indicates the emergency call list for with card.
-     *
-     * @syscap SystemCapability.Telephony.CoreService
-     * @systemapi Hide this for inner system use.
-     * @since 12
-     */
-    KEY_EMERGENCY_CALL_WITH_CARD_STRING_ARRAY = 'emergency_call_with_card_string_array',
-
-    /**
-     * Indicates the emergency call list for no card.
-     *
-     * @syscap SystemCapability.Telephony.CoreService
-     * @systemapi Hide this for inner system use.
-     * @since 12
-     */
-    KEY_EMERGENCY_CALL_NO_CARD_STRING_ARRAY = 'emergency_call_no_card_string_array',
   }
 
   /**
