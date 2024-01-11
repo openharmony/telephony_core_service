@@ -426,22 +426,21 @@ void SimFile::ParsePnn(const std::vector<std::string> &records)
         unsigned char *tlv = data.get();
         std::shared_ptr<PlmnNetworkName> file = std::make_shared<PlmnNetworkName>();
         int tagAndLength = NETWORK_NAME_LENGTH + 1;
-        if (recordLen > tagAndLength) {
-            if (recordLen >= (tagAndLength + static_cast<int>(tlv[NETWORK_NAME_LENGTH])) &&
-                tlv[NETWORK_NAME_IEI] == (unsigned char)LONG_NAME_FLAG) {
-                file->longName =
-                    SIMUtils::Gsm7bitConvertToString(tlv + NETWORK_NAME_TEXT_STRING, tlv[NETWORK_NAME_LENGTH] - 1);
-            }
-            int shortNameOffset = tagAndLength + tlv[NETWORK_NAME_LENGTH];
-            if (recordLen > (shortNameOffset + tagAndLength)) {
-                if (recordLen >= (shortNameOffset + tagAndLength +
-                                     static_cast<int>(tlv[shortNameOffset + NETWORK_NAME_LENGTH])) &&
-                    tlv[shortNameOffset + NETWORK_NAME_IEI] == (unsigned char)SHORT_NAME_FLAG) {
-                    file->shortName =
-                        SIMUtils::Gsm7bitConvertToString(tlv + (shortNameOffset + NETWORK_NAME_TEXT_STRING),
-                            tlv[shortNameOffset + NETWORK_NAME_LENGTH] - 1);
-                }
-            }
+        if (recordLen <= tagAndLength) {
+            TELEPHONY_LOGD("recordLen <= tagAndLength");
+            continue;
+        }
+        if (recordLen >= (tagAndLength + static_cast<int>(tlv[NETWORK_NAME_LENGTH])) &&
+            tlv[NETWORK_NAME_IEI] == (unsigned char)LONG_NAME_FLAG) {
+            file->longName =
+                SIMUtils::Gsm7bitConvertToString(tlv + NETWORK_NAME_TEXT_STRING, tlv[NETWORK_NAME_LENGTH] - 1);
+        }
+        int shortNameOffset = tagAndLength + tlv[NETWORK_NAME_LENGTH];
+        if (recordLen >=
+                (shortNameOffset + tagAndLength + static_cast<int>(tlv[shortNameOffset + NETWORK_NAME_LENGTH])) &&
+            tlv[shortNameOffset + NETWORK_NAME_IEI] == (unsigned char)SHORT_NAME_FLAG) {
+            file->shortName = SIMUtils::Gsm7bitConvertToString(
+                tlv + (shortNameOffset + NETWORK_NAME_TEXT_STRING), tlv[shortNameOffset + NETWORK_NAME_LENGTH] - 1);
         }
         TELEPHONY_LOGI("longName: %{public}s, shortName: %{public}s", file->longName.c_str(), file->shortName.c_str());
         if (!file->longName.empty() || !file->shortName.empty()) {
