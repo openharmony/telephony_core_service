@@ -400,8 +400,8 @@ int32_t NetworkSearchManager::GetPsRadioTech(int32_t slotId, int32_t &psRadioTec
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     psRadioTech = static_cast<int32_t>(inner->networkSearchState_->GetNetworkStatus()->GetPsRadioTech());
-    if (TELEPHONY_EXT_WRAPPER.getRadioTechExt_ != nullptr) { 
-        TELEPHONY_EXT_WRAPPER.getRadioTechExt_(slotId, psRadioTech); 
+    if (TELEPHONY_EXT_WRAPPER.getRadioTechExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.getRadioTechExt_(slotId, psRadioTech);
     }
     TELEPHONY_LOGD("NetworkSearchManager::GetPsRadioTech result=%{public}d slotId:%{public}d", psRadioTech, slotId);
     return TELEPHONY_ERR_SUCCESS;
@@ -419,8 +419,8 @@ int32_t NetworkSearchManager::GetCsRadioTech(int32_t slotId, int32_t &csRadioTec
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     csRadioTech = static_cast<int32_t>(inner->networkSearchState_->GetNetworkStatus()->GetCsRadioTech());
-    if (TELEPHONY_EXT_WRAPPER.getRadioTechExt_ != nullptr) { 
-        TELEPHONY_EXT_WRAPPER.getRadioTechExt_(slotId, csRadioTech); 
+    if (TELEPHONY_EXT_WRAPPER.getRadioTechExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.getRadioTechExt_(slotId, csRadioTech);
     }
     TELEPHONY_LOGD("NetworkSearchManager::GetCsRadioTech result=%{public}d slotId:%{public}d", csRadioTech, slotId);
     return TELEPHONY_ERR_SUCCESS;
@@ -1194,7 +1194,7 @@ int32_t NetworkSearchManager::GetNrOptionMode(int32_t slotId, NrMode &mode)
     }
     eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_NR_OPTION_MODE);
     mode = inner->nrMode_;
-    if (TELEPHONY_EXT_WRAPPER.getNrOptionModeExtend_ != nullptr) { 
+    if (TELEPHONY_EXT_WRAPPER.getNrOptionModeExtend_ != nullptr) {
         TELEPHONY_EXT_WRAPPER.getNrOptionModeExtend_(slotId, mode);
     }
     return TELEPHONY_ERR_SUCCESS;
