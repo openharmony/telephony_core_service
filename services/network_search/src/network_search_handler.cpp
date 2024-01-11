@@ -1144,9 +1144,9 @@ void NetworkSearchHandler::RadioResidentNetworkChange(const AppExecFwk::InnerEve
     }
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
         if (networkSearchManager->GetCsRegState(slotId) ==
-                static_cast<int32_t>(RegServiceState::REG_STATE_IN_SERVICE) ||
+            static_cast<int32_t>(RegServiceState::REG_STATE_IN_SERVICE) ||
             networkSearchManager->GetPsRegState(slotId) ==
-                static_cast<int32_t>(RegServiceState::REG_STATE_IN_SERVICE)) {
+            static_cast<int32_t>(RegServiceState::REG_STATE_IN_SERVICE)) {
             TELEPHONY_LOGE("RadioResidentNetworkChange RegState is in service");
             return;
         }
