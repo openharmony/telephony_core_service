@@ -38,7 +38,7 @@ bool OperatorMatchingRule::SpnRegexMatch(const std::string &spnFromSim, const st
     if (spnRegex == "null") {
         if (spnFromSim.empty()) {
             return true;
-	}
+        }
     }
     if (spnFromSim.empty()) {
         return false;

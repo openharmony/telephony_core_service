@@ -2677,7 +2677,7 @@ static bool MatchObserverOffParameter(napi_env env, napi_value parameters[], siz
         }
         case PARAMETER_COUNT_FOUR: {
             return NapiUtil::MatchParameters(
-                       env, parameters, { napi_string, napi_number, napi_number, napi_function }) ||
+                env, parameters, { napi_string, napi_number, napi_number, napi_function }) ||
                    NapiUtil::MatchParameters(
                        env, parameters, { napi_string, napi_number, napi_number, napi_null }) ||
                    NapiUtil::MatchParameters(
