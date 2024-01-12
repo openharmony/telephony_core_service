@@ -24,8 +24,7 @@
 namespace OHOS {
 namespace Telephony {
 const std::string BROADCAST_ARG_SLOT_ID = "slotId";
-const std::string KEY_EMERGENCY_CALL_WITH_CARD_STRING_ARRAY = "emergency_call_with_card_string_array";
-const std::string KEY_EMERGENCY_CALL_NO_CARD_STRING_ARRAY = "emergency_call_no_card_string_array";
+const std::string KEY_EMERGENCY_CALL_STRING_ARRAY = "emergency_call_string_array";
 const int32_t DEFAULT_CALL_WAITING_SERVICE_CLASS_CONFIG = 1;
 const std::vector<std::string> IMS_CALL_DISCONNECT_REASONINFO_MAPPING_CONFIG = std::vector<std::string> {};
 const int32_t CARRIER_NR_AVAILABILITY_NSA = 1;
