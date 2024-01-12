@@ -319,6 +319,11 @@ enum class SmsMmsErrorCode {
      * Indicates the SMS address is blocked.
      */
     SMS_ERROR_ADDRESS_BLOCKED,
+
+    /**
+     * Indicates the SMS send fail from ril.
+     */
+    SMS_ERROR_SEND_RESULT_FAIL,
 };
 
 /**
