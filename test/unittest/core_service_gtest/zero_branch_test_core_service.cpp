@@ -590,6 +590,12 @@ HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | Med
     multiSimController->PublishSetPrimaryEvent(true);
     multiSimController->EncryptIccId("");
     multiSimController->CheckIfNeedSwitchMainSlotId();
+    int simId = 0;
+    multiSimController->GetTargetDefaultSimId(INVALID_SLOTID, simId);
+    multiSimController->GetTargetSimId(INVALID_SLOTID, simId);
+    std::string iccId = "";
+    multiSimController->GetTargetIccId(INVALID_SLOTID, iccId);
+
     EXPECT_FALSE(multiSimController->IsValidSlotId(INVALID_SLOTID));
     multiSimController->maxCount_ = 1;
     EXPECT_FALSE(multiSimController->InitPrimary());

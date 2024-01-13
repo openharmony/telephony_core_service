@@ -79,7 +79,6 @@ private:
     void SortCache();
     void SavePrimarySlotIdInfo(int32_t slotId);
     void SaveDefaultCellularDataSlotIdInfo(int32_t slotId);
-    std::u16string GetIccId(int32_t slotId);
     bool AnnouncePrimarySimIdChanged(int32_t simId);
     bool AnnounceDefaultVoiceSimIdChanged(int32_t simId);
     bool AnnounceDefaultSmsSimIdChanged(int32_t simId);
@@ -96,6 +95,10 @@ private:
     void SendDefaultCellularDataBroadCast(int32_t slotId);
     void InitMainCardSlotId();
     void PublishSetPrimaryEvent(bool setDone);
+    int32_t GetTargetDefaultSimId(int32_t slotId, int &simId);
+    size_t GetLocalCacheSize();
+    int32_t GetTargetSimId(int32_t slotId, int &simId);
+    int32_t GetTargetIccId(int32_t slotId, std::string &iccId);
 
 private:
     int32_t maxCount_ = 0;
