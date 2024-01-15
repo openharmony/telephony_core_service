@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,8 @@ public:
     void ProcessNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessTimeZone();
     void AutoTimeChange();
+    void AutoTimeZoneChange();
+    void UpdateCountryCode(std::string &countryCode);
     struct NetworkTime {
         int32_t year = 0;
         int32_t month = 0;
@@ -44,7 +46,9 @@ public:
 private:
     void ProcessTime(NetworkTime &networkTime);
     bool IsValidTime(int64_t networkTime);
+    void SaveTimeZone(std::string &timeZone);
     void SaveTime(int64_t networkTime);
+    bool IsAutoTimeZone();
     bool IsAutoTime();
     bool NitzParse(std::string &nitzStr, NetworkTime &networkTime);
     bool NitzTimeParse(std::string &strTimeSubs, NetworkTime &networkTime);
@@ -56,6 +60,7 @@ private:
     int32_t slotId_ = 0;
     static int32_t offset_;
     static int64_t lastNetworkTime_;
+    static std::string timeZone_;
 };
 } // namespace Telephony
 } // namespace OHOS
