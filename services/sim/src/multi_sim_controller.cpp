@@ -697,6 +697,7 @@ int32_t MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
 int32_t MultiSimController::GetTargetDefaultSimId(int32_t slotId, int &simId)
 {
     std::unique_lock<std::mutex> lock(mutex_);
+    simId = 0;
     if ((slotId == DEFAULT_SIM_SLOT_ID_REMOVE && localCacheInfo_.empty()) ||
         (slotId != DEFAULT_SIM_SLOT_ID_REMOVE && !IsValidData(slotId))) {
         TELEPHONY_LOGE("no sim card");
