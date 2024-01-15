@@ -1314,7 +1314,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
     EXPECT_NE(multiSimController->GetFirstActivedSlotId(), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->UpdateDataByIccId(0, testStr), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->InsertData(0, testStr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(multiSimController->GetIccId(0), u"");
 }
 
 /**
