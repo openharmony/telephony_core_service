@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,7 @@
 #include "telephony_common_utils.h"
 #include "telephony_config.h"
 #include "telephony_errors.h"
+#include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_ext_wrapper.h"
 
@@ -114,6 +115,15 @@ bool NetworkSearchManagerInner::RegisterSetting()
     Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
     settingHelper->RegisterSettingsObserver(autoTimeUri, settingAutoTimeObserver_);
     settingHelper->RegisterSettingsObserver(airplaneModeUri, airplaneModeObserver_);
+    if (TELEPHONY_EXT_WRAPPER.updateCountryCodeExt_ == nullptr) {
+        settingAutoTimezoneObserver_ = new AutoTimezoneObserver(networkSearchHandler_);
+        if (settingAutoTimezoneObserver_ == nullptr) {
+            TELEPHONY_LOGE("NetworkSearchManager::RegisterSetting is null.");
+            return false;
+        }
+        Uri autoTimezoneUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI);
+        settingHelper->RegisterSettingsObserver(autoTimezoneUri, settingAutoTimezoneObserver_);
+    }
     return true;
 }
 
@@ -129,6 +139,10 @@ bool NetworkSearchManagerInner::UnRegisterSetting()
     Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
     settingHelper->UnRegisterSettingsObserver(autoTimeUri, settingAutoTimeObserver_);
     settingHelper->UnRegisterSettingsObserver(airplaneModeUri, airplaneModeObserver_);
+    if (settingAutoTimezoneObserver_ != nullptr) {
+        Uri autoTimezoneUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI);
+        settingHelper->UnRegisterSettingsObserver(autoTimezoneUri, settingAutoTimezoneObserver_);
+    }
     return true;
 }
 
