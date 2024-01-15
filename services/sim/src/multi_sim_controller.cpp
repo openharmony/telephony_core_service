@@ -563,6 +563,7 @@ size_t MultiSimController::GetLocalCacheSize()
 int32_t MultiSimController::GetTargetSimId(int32_t slotId, int &simId)
 {
     std::unique_lock<std::mutex> lock(mutex_);
+    simId = 0;
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -975,6 +976,7 @@ int32_t MultiSimController::GetSimTelephoneNumber(int32_t slotId, std::u16string
 int32_t MultiSimController::GetTargetIccId(int32_t slotId, std::string &iccId)
 {
     std::unique_lock<std::mutex> lock(mutex_);
+    iccId = "";
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("failed by out of range");
         return TELEPHONY_ERROR;
