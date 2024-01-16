@@ -17,7 +17,7 @@
 #define OHOS_I_SIM_MANAGER_H
 
 #include "dialling_numbers_info.h"
-#include "i_network_search.h"
+#include "event_handler.h"
 #include "operator_config_types.h"
 #include "sim_account_callback.h"
 #include "sim_state_type.h"
@@ -29,7 +29,6 @@ public:
     using HANDLE = const std::shared_ptr<AppExecFwk::EventHandler>;
     // Init
     virtual bool OnInit(int32_t slotCount) = 0;
-    virtual void SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager) = 0;
     // SimState
     virtual int32_t HasSimCard(int32_t slotId, bool &hasSimCard) = 0;
     virtual int32_t GetSimState(int32_t slotId, SimState &simState) = 0;
