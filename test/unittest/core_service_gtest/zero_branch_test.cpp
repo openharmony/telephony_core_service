@@ -1325,7 +1325,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    simManager->SetNetworkSearchManager(nullptr);
     std::u16string testStr = u"";
     EXPECT_GT(simManager->SetShowNumber(0, testStr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->SetShowNumber(INVALID_SLOTID, testStr), TELEPHONY_ERR_SUCCESS);
@@ -1509,7 +1508,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_005, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    simManager->SetNetworkSearchManager(nullptr);
     std::string password = "1234";
     LockStatusResponse mLockStatusResponse;
     EXPECT_GT(simManager->UnlockPin(0, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
