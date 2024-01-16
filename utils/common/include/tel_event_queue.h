@@ -24,6 +24,7 @@ namespace Telephony {
 class TelEventQueue {
 public:
     explicit TelEventQueue(const std::string &name);
+    ~TelEventQueue();
     void Submit(AppExecFwk::InnerEvent::Pointer &event, AppExecFwk::EventQueue::Priority priority);
     void RemoveEvent(uint32_t innerEventId);
     bool HasInnerEvent(uint32_t innerEventId);
@@ -37,20 +38,22 @@ private:
 private:
     void InsertEventsInner(AppExecFwk::InnerEvent::Pointer &event, AppExecFwk::EventQueue::Priority priority);
     bool HasEvent();
-    AppExecFwk::InnerEvent::Pointer PopEvent();
-    AppExecFwk::InnerEvent::Pointer &GetEvent();
+    AppExecFwk::InnerEvent::Pointer PopEvent(int32_t queueId, bool &isNeedSubmit);
     void SubmitInner(int32_t queueId);
     bool IsEmpty();
     uint32_t ToTelPriority(AppExecFwk::EventQueue::Priority priority);
     uint32_t GetPriorityIndex();
     AppExecFwk::InnerEvent::TimePoint GetHandleTime();
-    void ClearCurrentTask();
+    void ClearCurrentTask(bool isNeedEnd);
+    int32_t GetNextQueueId();
+    void SubmitToFFRT(int32_t queueId, AppExecFwk::InnerEvent::TimePoint handleTime, int64_t delayTime);
 
 private:
     static const uint32_t EVENT_QUEUE_NUM = 3;
     std::array<EventList, EVENT_QUEUE_NUM> eventLists_;
     AppExecFwk::InnerEvent::TimePoint curHandleTime_ { AppExecFwk::InnerEvent::TimePoint::max() };
     std::mutex eventCtx_;
+    std::mutex taskCtx_;
     ffrt::task_handle curTask_;
     std::string name_;
     std::atomic_int queueId_ { 0 };
