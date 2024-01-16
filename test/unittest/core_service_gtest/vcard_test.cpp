@@ -167,6 +167,22 @@ void WriteTestData(const std::string &testStr)
     file.close();
 }
 
+void WriteBigTestData(std::string &testStr, int32_t size)
+{
+    std::ofstream file(TEL_FILE_NAME, std::ios::trunc);
+    if (file.is_open()) {
+        for (int32_t i = 0; i < size; i++) {
+            std::stringstream ss(testStr);
+            std::string line;
+
+            while (std::getline(ss, line)) {
+                file << line << std::endl;
+            }
+        }
+    }
+    file.close();
+}
+
 void WriteTestDataWithFileName(const std::string &testStr, const std::string &fileName)
 {
     std::ofstream file(fileName.c_str(), std::ios::trunc);
@@ -1295,6 +1311,24 @@ HWTEST_F(VcardTest, Telephony_VCardTest_Multi_Thread_Export, Function | MediumTe
         thread.join();
     }
     EXPECT_NE(fileName.c_str(), "test");
+}
+
+HWTEST_F(VcardTest, Telephony_VCardTest_BigData_Import, Function | MediumTest | Level2)
+{
+    TELEPHONY_LOGI("VcardTest Telephony_VCardTest_BigData_Import");
+    std::string inputString = "BEGIN:VCARD\r\nVERSION:4.0\r\nN:test3;;;;\r\nFN:test3\r\nEND:VCARD\r\n";
+    int testNum = 10000;
+    WriteBigTestData(inputString, testNum);
+    AccessToken token;
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
+        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
+    if (dataShareHelper != nullptr) {
+        int32_t errorCode = VCardManager::GetInstance().ImportLock(TEL_FILE_NAME, dataShareHelper, 0);
+        EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
+    } else {
+        TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
+        EXPECT_TRUE(true);
+    }
 }
 
 } // namespace Telephony
