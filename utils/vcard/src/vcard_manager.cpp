@@ -222,7 +222,9 @@ std::vector<std::vector<std::shared_ptr<VCardContact>>> VCardManager::SplitConta
     if (step >= list.size()) {
         result.push_back(list);
     } else {
-        std::vector<std::shared_ptr<VCardContact>>::iterator curPtr = list.begin(), endPtr = list.end(), end;
+        std::vector<std::shared_ptr<VCardContact>>::iterator curPtr = list.begin();
+        std::vector<std::shared_ptr<VCardContact>>::iterator endPtr = list.end();
+        std::vector<std::shared_ptr<VCardContact>>::iterator end;
         while (curPtr < endPtr) {
             end = (endPtr - curPtr) > step ? (step + curPtr) : endPtr;
             step = (endPtr - curPtr) > step ? step : (endPtr - curPtr);
