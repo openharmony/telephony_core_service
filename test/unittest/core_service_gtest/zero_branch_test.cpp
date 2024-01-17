@@ -1211,7 +1211,6 @@ HWTEST_F(BranchTest, Telephony_TagService_001, Function | MediumTest | Level1)
 HWTEST_F(BranchTest, Telephony_SimSmsController_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("SimSmsController");
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::SimSmsController> simSmsController = std::make_shared<SimSmsController>(simStateManager);
     auto event = AppExecFwk::InnerEvent::Get(0);
