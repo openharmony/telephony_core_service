@@ -2348,7 +2348,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_003, Function | MediumTest |
     EXPECT_EQ(networkSearchHandler->GetRegServiceState(regState), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(networkSearchHandler->HandleRrcStateChanged(status), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(networkSearchHandler->RevertLastTechnology(), TELEPHONY_ERR_SUCCESS);
-    networkSearchHandler->SetPreferredNetworkOnFirstInit(true);
     networkSearchHandler->PowerOnPrimaryRadioDuringNoCard();
 }
 

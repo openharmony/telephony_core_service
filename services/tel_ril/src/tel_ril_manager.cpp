@@ -84,6 +84,15 @@ void TelRilManager::ReduceRunningLock()
     handler_->ReduceRunningLock(TelRilHandler::NORMAL_RUNNING_LOCK);
 }
 
+void TelRilManager::ReleaseRunningLock()
+{
+    if (handler_ == nullptr) {
+        TELEPHONY_LOGE("handler_ is null");
+        return;
+    }
+    handler_->ReleaseRunningLock(TelRilHandler::NORMAL_RUNNING_LOCK);
+}
+
 void TelRilManager::SendAckAndLock(void)
 {
     if (handler_ != nullptr) {
@@ -926,6 +935,7 @@ void TelRilManager::HandleRilInterfaceStatusCallback(const OHOS::HDI::ServiceMan
                 GetTelRilModem(slotId)->OnRilAdapterHostDied();
             }
         }
+        ReleaseRunningLock();
         TELEPHONY_LOGI("TelRilManager::HandleRilInterfaceCallback, disconnect riladapter service successfully!");
         return;
     }
