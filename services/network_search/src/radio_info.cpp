@@ -124,7 +124,6 @@ void RadioInfo::RadioFirstPowerOn(std::shared_ptr<NetworkSearchManager> &nsm, Mo
         return;
     }
     nsm->SetRadioFirstPowerOn(slotId_, false);
-    nsm->SetPreferredNetwork(slotId_, PREFERRED_NETWORK_TYPE);
 }
 
 void RadioInfo::ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) const
