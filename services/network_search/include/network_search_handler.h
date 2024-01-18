@@ -98,6 +98,7 @@ public:
     void SetCellRequestMinInterval(uint32_t minInterval);
     int32_t GetRegServiceState(RegServiceState &regState);
     void SetPreferredNetworkOnFirstInit(bool firstInit);
+    bool PowerOnPrimaryRadioDuringNoCard() const;
 
 private:
     void RadioOnState();
@@ -168,6 +169,7 @@ private:
     uint32_t lastCellRequestTime_ = 0;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     sptr<ISatelliteCoreCallback> satelliteCallback_ = nullptr;
+    const int32_t INVALID_SLOT_ID = -1;
 
 private:
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
