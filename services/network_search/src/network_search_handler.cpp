@@ -361,7 +361,6 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
             break;
         }
         case CORE_SERVICE_POWER_ON: {
-            SetPreferredNetworkOnFirstInit(firstInit_);
             firstInit_ = false;
             InitGetNetworkSelectionMode();
             RadioOnState();
@@ -496,7 +495,6 @@ void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Poi
             RadioOffOrUnavailableState(radioState);
             break;
         case CORE_SERVICE_POWER_ON: {
-            SetPreferredNetworkOnFirstInit(firstInit_);
             firstInit_ = false;
             RadioOnState();
             break;
@@ -1237,20 +1235,6 @@ void NetworkSearchHandler::SystemAbilityStatusChangeListener::OnRemoveSystemAbil
     }
     bool subscribeResult = CommonEventManager::UnSubscribeCommonEvent(opName_);
     TELEPHONY_LOGI("NetworkSearchHandler::OnRemoveSystemAbility subscribeResult = %{public}d", subscribeResult);
-}
-
-
-void NetworkSearchHandler::SetPreferredNetworkOnFirstInit(bool firstInit)
-{
-    if (firstInit) {
-        std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-        if (nsm == nullptr) {
-            TELEPHONY_LOGE("failed to get NetworkSearchManager");
-            return;
-        }
-        TELEPHONY_LOGI("SetPreferredNetwork on firstInit");
-        nsm->SetPreferredNetwork(slotId_, PREFERRED_NETWORK_TYPE);
-    }
 }
 } // namespace Telephony
 } // namespace OHOS
