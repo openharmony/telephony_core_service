@@ -59,6 +59,7 @@ bool TelRilManager::DeInit()
 
 bool TelRilManager::ConnectRilInterface()
 {
+    std::lock_guard<std::mutex> lock_l(mutex_);
     rilInterface_ = HDI::Ril::V1_2::IRil::Get();
     if (rilInterface_ == nullptr) {
         TELEPHONY_LOGE("TelRilManager not find RilInterfaceService");
@@ -999,6 +1000,7 @@ bool TelRilManager::ReConnectRilInterface()
 
 bool TelRilManager::DisConnectRilInterface()
 {
+    std::lock_guard<std::mutex> lock_l(mutex_);
     if (rilInterface_ == nullptr) {
         TELEPHONY_LOGD("TelRilManager::DisConnectRilInterface has been successfully disconnected!");
         return true;
