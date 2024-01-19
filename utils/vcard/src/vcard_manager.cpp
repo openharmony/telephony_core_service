@@ -194,7 +194,7 @@ void VCardManager::BatchInsertContactData(
     std::vector<int32_t> &rawIds, const std::vector<std::shared_ptr<VCardContact>> &contactList, int32_t &errorCode)
 {
     std::vector<DataShare::DataShareValuesBucket> contactDataValues;
-    for (int32_t i = 0; i < rawIds.size(); i++) {
+    for (size_t i = 0; i < rawIds.size(); i++) {
         int32_t rawId = rawIds[i];
         TELEPHONY_LOGI("rawId %{public}d", rawId);
         std::shared_ptr<VCardContact> contact = contactList[i];
@@ -217,7 +217,7 @@ void VCardManager::BatchInsertContactData(
 }
 
 std::vector<std::vector<std::shared_ptr<VCardContact>>> VCardManager::SplitContactsVector(
-    const std::vector<std::shared_ptr<VCardContact>> &list, size_t step)
+    std::vector<std::shared_ptr<VCardContact>> list, size_t step)
 {
     std::vector<std::vector<std::shared_ptr<VCardContact>>> result;
     if (step >= list.size()) {
@@ -227,8 +227,8 @@ std::vector<std::vector<std::shared_ptr<VCardContact>>> VCardManager::SplitConta
         std::vector<std::shared_ptr<VCardContact>>::iterator endPtr = list.end();
         std::vector<std::shared_ptr<VCardContact>>::iterator end;
         while (curPtr < endPtr) {
-            end = (endPtr - curPtr) > step ? (step + curPtr) : endPtr;
-            step = (endPtr - curPtr) > step ? step : (endPtr - curPtr);
+            end = static_cast<size_t>(endPtr - curPtr) > step ? (step + curPtr) : endPtr;
+            step = static_cast<size_t>(endPtr - curPtr) > step ? step : (endPtr - curPtr);
             result.push_back(std::vector<std::shared_ptr<VCardContact>>(curPtr, end));
             curPtr += step;
         }

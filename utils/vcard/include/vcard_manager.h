@@ -70,7 +70,7 @@ private:
     int32_t GetAccountId();
     bool ParameterTypeAndCharsetCheck(int32_t cardType, std::string charset, int32_t &errorCode);
     std::vector<std::vector<std::shared_ptr<VCardContact>>> SplitContactsVector(
-        const std::vector<std::shared_ptr<VCardContact>> &list, size_t step);
+        std::vector<std::shared_ptr<VCardContact>> list, size_t step);
     void BatchInsertContactDbAbility(int32_t accountId, int32_t &errorCode);
     void BatchInsertRawContact(int32_t accountId, uint32_t size, std::vector<int32_t> &rawIds, int32_t &errorCode);
     void BatchInsertContactData(std::vector<int32_t> &rawIds,
