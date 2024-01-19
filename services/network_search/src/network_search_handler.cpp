@@ -541,7 +541,7 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
     }
     bool hasSim = false;
     simManager->HasSimCard(slotId_, hasSim);
-    if ((hasSim && !isAirplaneModeOn && radioState == CORE_SERVICE_POWER_OFF) || PowerOnPrimaryRadioDuringNoCard()) {
+    if (!isAirplaneModeOn && ((hasSim && radioState == CORE_SERVICE_POWER_OFF) || IsPowerOnPrimaryRadioWhenNoSim())) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
     }
     sptr<NetworkSearchCallBackBase> cellularData = networkSearchManager->GetCellularDataCallBack();
@@ -1237,7 +1237,7 @@ void NetworkSearchHandler::SystemAbilityStatusChangeListener::OnRemoveSystemAbil
     TELEPHONY_LOGI("NetworkSearchHandler::OnRemoveSystemAbility subscribeResult = %{public}d", subscribeResult);
 }
 
-bool NetworkSearchHandler::PowerOnPrimaryRadioDuringNoCard() const
+bool NetworkSearchHandler::IsPowerOnPrimaryRadioWhenNoSim() const
 {
     TELEPHONY_LOGD("Start to check if power on primary modem's radio when sim slots are empty");
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
@@ -1250,7 +1250,7 @@ bool NetworkSearchHandler::PowerOnPrimaryRadioDuringNoCard() const
         TELEPHONY_LOGE("get simManager is failed");
         return false;
     }
-    int32_t primarySlotId = 0;
+    int32_t primarySlotId = INVALID_SLOT_ID;
     simManager->GetPrimarySlotId(primarySlotId);
     if (primarySlotId != INVALID_SLOT_ID && primarySlotId == slotId_) {
         for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; ++slotId) {
