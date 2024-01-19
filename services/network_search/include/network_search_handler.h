@@ -97,7 +97,7 @@ public:
     void TimezoneRefresh();
     void SetCellRequestMinInterval(uint32_t minInterval);
     int32_t GetRegServiceState(RegServiceState &regState);
-    bool PowerOnPrimaryRadioDuringNoCard() const;
+    bool IsPowerOnPrimaryRadioWhenNoSim() const;
 
 private:
     void RadioOnState();
