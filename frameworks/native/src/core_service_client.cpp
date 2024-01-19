@@ -818,7 +818,7 @@ int32_t CoreServiceClient::GetMaxSimCount()
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        return 0;
     }
     return proxy->GetMaxSimCount();
 }

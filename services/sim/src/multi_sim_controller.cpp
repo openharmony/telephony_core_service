@@ -468,7 +468,7 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId()
         TELEPHONY_LOGI("need to set slot%{public}d primary", firstActivedSlotId);
         std::thread initDataTask([&, firstActivedSlotId = firstActivedSlotId]() {
             pthread_setname_np(pthread_self(), "SetPrimarySlotId");
-            SetPrimarySlotId(firstActivedSlotId);
+            CoreManagerInner::GetInstance().SetPrimarySlotId(firstActivedSlotId);
         });
         initDataTask.detach();
     }
