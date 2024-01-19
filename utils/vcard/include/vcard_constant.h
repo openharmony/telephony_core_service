@@ -161,6 +161,7 @@ constexpr const int32_t CONTACTS_NOT_DELETED = 0;
 constexpr const int32_t ENCODEN_QUOTED_PRIN_MAX_LEN = 67;
 constexpr const int32_t NUM_MINUS_ONE = -1;
 constexpr const int32_t DECODE_CHAR_MAX_SIZE = 16;
+constexpr const int32_t BATCH_INSERT_MAX_SIZE = 300;
 
 class TypeId {
 public:
