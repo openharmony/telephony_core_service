@@ -24,6 +24,7 @@
 #include "enum_convert.h"
 #include "mcc_pool.h"
 #include "network_search_types.h"
+#include "operator_name_utils.h"
 #include "parameter.h"
 #include "satellite_service_client.h"
 #include "telephony_common_utils.h"
@@ -492,16 +493,28 @@ int32_t NetworkSearchManager::GetOperatorName(int32_t slotId, std::u16string &op
 {
     operatorName = u"";
     auto inner = FindManagerInner(slotId);
-    if (inner != nullptr) {
-        if (inner->networkSearchState_ != nullptr && inner->networkSearchState_->GetNetworkStatus() != nullptr) {
-            auto longOperatorName = inner->networkSearchState_->GetNetworkStatus()->GetLongOperatorName();
-            operatorName = Str8ToStr16(longOperatorName);
-            TELEPHONY_LOGD("NetworkSearchManager::GetOperatorName result:%{public}s slotId:%{public}d",
-                longOperatorName.c_str(), slotId);
-            return TELEPHONY_ERR_SUCCESS;
-        }
+    if (inner == nullptr) {
+        return TELEPHONY_ERR_SLOTID_INVALID;
     }
-    return TELEPHONY_ERR_SLOTID_INVALID;
+
+    if (inner->networkSearchState_ == nullptr) {
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+
+    if (inner->networkSearchState_->GetNetworkStatus() == nullptr) {
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+
+    auto longOperatorName = inner->networkSearchState_->GetNetworkStatus()->GetLongOperatorName();
+    operatorName = Str8ToStr16(longOperatorName);
+    if (inner->networkSearchState_->GetNetworkStatus()->GetRegStatus() == RegServiceState::REG_STATE_IN_SERVICE) {
+        std::string numeric = inner->networkSearchState_->GetNetworkStatus()->GetPlmnNumeric();
+        std::string customizedLongOperatorName = OperatorNameUtils::GetInstance().GetCustomName(numeric);
+        operatorName = Str8ToStr16(customizedLongOperatorName);
+    }
+    TELEPHONY_LOGD("NetworkSearchManager::GetOperatorName result:%{public}s slotId:%{public}d",
+        Str16ToStr8(operatorName).c_str(), slotId);
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t NetworkSearchManager::GetNetworkStatus(int32_t slotId, sptr<NetworkState> &networkState)
