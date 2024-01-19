@@ -140,13 +140,13 @@ void VCardManager::InsertContactDbAbility(int32_t accountId, int32_t &errorCode)
 
 void VCardManager::BatchInsertContactDbAbility(int32_t accountId, int32_t &errorCode)
 {
-    if (listener_->GetContacts().size() < BATCH_INSERT_MAX_SIZE) {
-        TELEPHONY_LOGI("contactData < 300");
-        InsertContactDbAbility(accountId, errorCode);
-        return;
-    }
     if (listener_ == nullptr) {
         errorCode = TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return;
+    }
+    if (listener_->GetContacts().size() < BATCH_INSERT_MAX_SIZE) {
+        TELEPHONY_LOGI("contactData < BATCH_INSERT_MAX_SIZE");
+        InsertContactDbAbility(accountId, errorCode);
         return;
     }
     if (listener_->GetContacts().size() == 0) {
@@ -155,7 +155,8 @@ void VCardManager::BatchInsertContactDbAbility(int32_t accountId, int32_t &error
     }
     std::vector<std::vector<std::shared_ptr<VCardContact>>> splitList =
         SplitContactsVector(listener_->GetContacts(), BATCH_INSERT_MAX_SIZE);
-    TELEPHONY_LOGI("contactData > 300, split List size %{public}d", static_cast<int32_t>(splitList.size()));
+    TELEPHONY_LOGI(
+        "contactData > BATCH_INSERT_MAX_SIZE, split List size %{public}d", static_cast<int32_t>(splitList.size()));
     for (std::vector<std::shared_ptr<VCardContact>> list : splitList) {
         TELEPHONY_LOGI("List size %{public}d", static_cast<int32_t>(list.size()));
         std::vector<int32_t> rawIds;
@@ -190,7 +191,7 @@ void VCardManager::BatchInsertRawContact(
 }
 
 void VCardManager::BatchInsertContactData(
-    std::vector<int32_t> &rawIds, std::vector<std::shared_ptr<VCardContact>> contactList, int32_t &errorCode)
+    std::vector<int32_t> &rawIds, const std::vector<std::shared_ptr<VCardContact>> &contactList, int32_t &errorCode)
 {
     std::vector<DataShare::DataShareValuesBucket> contactDataValues;
     for (int32_t i = 0; i < rawIds.size(); i++) {
@@ -216,7 +217,7 @@ void VCardManager::BatchInsertContactData(
 }
 
 std::vector<std::vector<std::shared_ptr<VCardContact>>> VCardManager::SplitContactsVector(
-    std::vector<std::shared_ptr<VCardContact>> list, size_t step)
+    const std::vector<std::shared_ptr<VCardContact>> &list, size_t step)
 {
     std::vector<std::vector<std::shared_ptr<VCardContact>>> result;
     if (step >= list.size()) {
