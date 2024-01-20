@@ -426,6 +426,7 @@ void NetworkSearchTest::PrintNetworkStateInformation(sptr<NetworkState> result)
     result->SetNetworkState(RegServiceState::REG_STATE_POWER_OFF, DomainType::DOMAIN_TYPE_CS);
     result->SetNrState(NrState::NR_STATE_NOT_SUPPORT);
     result->SetCfgTech(RadioTech::RADIO_TECHNOLOGY_LTE);
+    result->SetLongOperatorName("", DomainType::DOMAIN_TYPE_CS);
     TELEPHONY_LOGI("NetworkState result is same as networkState:%{public}d", *result == *networkState);
 }
 
