@@ -496,24 +496,16 @@ int32_t NetworkSearchManager::GetOperatorName(int32_t slotId, std::u16string &op
     if (inner == nullptr) {
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
-
     if (inner->networkSearchState_ == nullptr) {
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
-
     if (inner->networkSearchState_->GetNetworkStatus() == nullptr) {
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
-
     auto longOperatorName = inner->networkSearchState_->GetNetworkStatus()->GetLongOperatorName();
     operatorName = Str8ToStr16(longOperatorName);
-    if (inner->networkSearchState_->GetNetworkStatus()->GetRegStatus() == RegServiceState::REG_STATE_IN_SERVICE) {
-        std::string numeric = inner->networkSearchState_->GetNetworkStatus()->GetPlmnNumeric();
-        std::string customizedLongOperatorName = OperatorNameUtils::GetInstance().GetCustomName(numeric);
-        operatorName = Str8ToStr16(customizedLongOperatorName);
-    }
     TELEPHONY_LOGD("NetworkSearchManager::GetOperatorName result:%{public}s slotId:%{public}d",
-        Str16ToStr8(operatorName).c_str(), slotId);
+        longOperatorName.c_str(), slotId);
     return TELEPHONY_ERR_SUCCESS;
 }
 

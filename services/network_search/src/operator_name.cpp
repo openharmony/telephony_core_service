@@ -67,7 +67,7 @@ void OperatorName::OnReceiveEvent(const EventFwk::CommonEventData &data)
         }
     } else if (action == CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED) {
         TELEPHONY_LOGI("locale changed Slot%{public}d", slotId_);
-        NotifySpnChanged();
+        TrySetLongOperatorNameWithTranslation();
         auto networkSearchManager = networkSearchManager_.lock();
         if (networkSearchManager == nullptr) {
             TELEPHONY_LOGE("networkSearchManager is nullptr slotId:%{public}d", slotId_);
@@ -135,7 +135,7 @@ void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
         longName = operatorInfoResult->longName;
         shortName = operatorInfoResult->shortName;
         numeric = operatorInfoResult->numeric;
-        updateOperatorLongName(longName, numeric);
+        UpdateOperatorLongName(longName, numeric);
     }
     TELEPHONY_LOGI(
         "OperatorName::GsmOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : %{public}s "
@@ -161,7 +161,7 @@ void OperatorName::CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event
         longName = operatorInfoResult->longName;
         shortName = operatorInfoResult->shortName;
         numeric = operatorInfoResult->numeric;
-        updateOperatorLongName(longName, numeric);
+        UpdateOperatorLongName(longName, numeric);
     }
     TELEPHONY_LOGI(
         "OperatorName::CdmaOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : %{public}s "
@@ -706,7 +706,7 @@ void OperatorName::UpdateOplCust(const std::vector<std::string> &oplCust)
     }
 }
 
-void OperatorName::updateOperatorLongName(std::string &operatorLongName, const std::string &numeric)
+void OperatorName::UpdateOperatorLongName(std::string &operatorLongName, const std::string &numeric)
 {
     RegServiceState regStatus = RegServiceState::REG_STATE_UNKNOWN;
     sptr<NetworkState> networkState = GetNetworkStatus();
@@ -723,6 +723,19 @@ void OperatorName::updateOperatorLongName(std::string &operatorLongName, const s
     if (!customizedOperatorLongName.empty()) {
         operatorLongName = customizedOperatorLongName;
     }
+}
+
+void OperatorName::TrySetLongOperatorNameWithTranslation()
+{
+    sptr<NetworkState> networkState = GetNetworkStatus();
+    if (networkState != nullptr && networkSearchState_ != nullptr) {
+        std::string longOperatorName = networkState->GetLongOperatorName();
+        std::string numeric = networkState->GetPlmnNumeric();
+        UpdateOperatorLongName(longOperatorName, numeric);
+        networkSearchState_->SetLongOperatorName(longOperatorName, DomainType::DOMAIN_TYPE_CS);
+        networkSearchState_->SetLongOperatorName(longOperatorName, DomainType::DOMAIN_TYPE_PS);
+    }
+    NotifySpnChanged();
 }
 } // namespace Telephony
 } // namespace OHOS
