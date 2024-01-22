@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -59,6 +59,7 @@ struct NetworkSearchManagerInner {
     std::shared_ptr<DeviceStateHandler> deviceStateHandler_ = nullptr;
     std::shared_ptr<DeviceStateObserver> deviceStateObserver_ = nullptr;
     sptr<AutoTimeObserver> settingAutoTimeObserver_ = nullptr;
+    sptr<AutoTimezoneObserver> settingAutoTimezoneObserver_ = nullptr;
     sptr<AirplaneModeObserver> airplaneModeObserver_ = nullptr;
     HandleRunningState state_ = HandleRunningState::STATE_NOT_START;
     std::unique_ptr<NetworkSearchResult> networkSearchResult_ = nullptr;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -61,6 +61,9 @@ public:
     typedef void (*ON_GET_NETWORK_SEARCH_INFORMATION_EXT)(int32_t &availableSize,
         std::vector<OHOS::Telephony::NetworkInformation> &networkInformations);
 
+    typedef void (*UPDATE_COUNTRY_CODE_EXT)(int32_t, const char *);
+    typedef void (*UPDATE_TIME_ZONE_OFFSET_EXT)(int32_t, int32_t);
+
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
     GET_VOICE_MAIL_ICCID_PARAMETER getVoiceMailIccidParameter_ = nullptr;
@@ -84,6 +87,9 @@ public:
     GET_SIGNAL_INFO_LIST_EXT getSignalInfoListExt_ = nullptr;
     GET_NETWORK_CAPABILITY_EXT getNetworkCapabilityExt_ = nullptr;
     ON_GET_NETWORK_SEARCH_INFORMATION_EXT onGetNetworkSearchInformationExt_ = nullptr;
+
+    UPDATE_COUNTRY_CODE_EXT updateCountryCodeExt_ = nullptr;
+    UPDATE_TIME_ZONE_OFFSET_EXT updateTimeZoneOffsetExt_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
