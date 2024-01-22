@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,8 +20,8 @@
 #include "mcc_pool.h"
 #include "network_search_manager.h"
 #include "satellite_service_client.h"
+#include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
-#include "time_zone_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -72,6 +72,7 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
     { RadioEvent::RADIO_RESIDENT_NETWORK_CHANGE, &NetworkSearchHandler::RadioResidentNetworkChange },
     { RadioEvent::RADIO_GET_NR_SSBID_INFO, &NetworkSearchHandler::GetNrSsbIdResponse },
     { SettingEventCode::MSG_AUTO_TIME, &NetworkSearchHandler::AutoTimeChange },
+    { SettingEventCode::MSG_AUTO_TIMEZONE, &NetworkSearchHandler::AutoTimeZoneChange },
     { SettingEventCode::MSG_AUTO_AIRPLANE_MODE, &NetworkSearchHandler::AirplaneModeChange },
     { RadioEvent::SATELLITE_STATUS_CHANGED, &NetworkSearchHandler::SatelliteStatusChanged }
 };
@@ -1121,6 +1122,14 @@ void NetworkSearchHandler::AutoTimeChange(const AppExecFwk::InnerEvent::Pointer 
     }
 }
 
+void NetworkSearchHandler::AutoTimeZoneChange(const AppExecFwk::InnerEvent::Pointer &)
+{
+    TELEPHONY_LOGD("NetworkSearchHandler::AutoTimeZoneChange");
+    if (nitzUpdate_ != nullptr) {
+        nitzUpdate_->AutoTimeZoneChange();
+    }
+}
+
 void NetworkSearchHandler::AirplaneModeChange(const AppExecFwk::InnerEvent::Pointer &)
 {
     TELEPHONY_LOGD("NetworkSearchHandler::AirplaneModeChange");
@@ -1165,9 +1174,17 @@ void NetworkSearchHandler::RadioResidentNetworkChange(const AppExecFwk::InnerEve
             TELEPHONY_LOGE("RadioResidentNetworkChange parse Failed!! slotId:%{public}d", slotId_);
         }
     }
-    if (!countryCode.empty()) {
-        TELEPHONY_LOGI("RadioResidentNetworkChange: update countryCode[%{public}s]", countryCode.c_str());
-        TimeZoneManager::GetInstance().UpdateCountryCode(countryCode, slotId_);
+    if (countryCode.empty()) {
+        TELEPHONY_LOGE("RadioResidentNetworkChange countryCode is empty");
+        return;
+    }
+    TELEPHONY_LOGI("RadioResidentNetworkChange: update countryCode[%{public}s]", countryCode.c_str());
+    if (TELEPHONY_EXT_WRAPPER.updateCountryCodeExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.updateCountryCodeExt_(slotId_, countryCode.c_str());
+    } else {
+        if (nitzUpdate_ != nullptr) {
+            nitzUpdate_->UpdateCountryCode(countryCode);
+        }
     }
 }
 
