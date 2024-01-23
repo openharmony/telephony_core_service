@@ -280,6 +280,7 @@ public:
     int32_t SendSimMatchedOperatorInfo(int32_t slotId, const NcfgOperatorInfo &reqInfo,
         const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t CloseUnFinishedUssd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t InitTelExtraModule(int32_t slotId) override;
 
     /**
      * Register hdf status listener
@@ -319,6 +320,7 @@ private:
     void HandleRilInterfaceStatusCallback(const OHOS::HDI::ServiceManager::V1_0::ServiceStatus &status);
     bool ReConnectRilInterface();
     bool DisConnectRilInterface();
+    void ResetRilInterfaceBySlotId(int32_t slotId);
 
     std::shared_ptr<ObserverHandler> GetObserverHandler(int32_t slotId);
 

@@ -35,6 +35,8 @@ public:
     virtual int32_t UnRegisterCoreNotify(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int32_t what) = 0;
 
+    virtual int32_t InitTelExtraModule(int32_t slotId) = 0;
+
     virtual int32_t SetRadioState(
         int32_t slotId, int32_t fun, int32_t rst, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t GetRadioState(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;

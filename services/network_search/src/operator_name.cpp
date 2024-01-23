@@ -26,6 +26,8 @@
 #include "operator_name_utils.h"
 #include "resource_utils.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
+
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;
 
@@ -302,6 +304,9 @@ void OperatorName::NotifyGsmSpnChanged(
     }
     UpdatePlmn(regStatus, networkState, spnRule, plmn, showPlmn);
     UpdateSpn(regStatus, networkState, spnRule, spn, showSpn);
+    if (TELEPHONY_EXT_WRAPPER.changeSpnAndRuleExt_) {
+        TELEPHONY_EXT_WRAPPER.changeSpnAndRuleExt_(spn, spnRule, showSpn);
+    }
     TELEPHONY_LOGI(
         "OperatorName::NotifyGsmSpnChanged showSpn:%{public}d curSpn_:%{public}s spn:%{public}s showPlmn:%{public}d "
         "curPlmn_:%{public}s plmn:%{public}s slotId:%{public}d",

@@ -304,11 +304,23 @@ private:
         return TaskSchedule(responseInfo.slotId, _func, _moduleFunc, std::forward<ParamTypes>(_args)...);
     }
 
+    inline int32_t GetMaxSimSlot() const
+    {
+        auto maxSimCount = SIM_SLOT_COUNT;
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_VSIM
+        if (SIM_SLOT_COUNT == DUAL_SLOT_COUNT) {
+            maxSimCount = MAX_SLOT_COUNT;
+        }
+#endif
+        return maxSimCount;
+    }
+
     template<typename FuncType, typename ModuleFuncType, typename... ParamTypes>
     inline int32_t TaskSchedule(
         int32_t slotId, FuncType &&_func, ModuleFuncType _moduleFunc, ParamTypes &&... _args) const
     {
-        if (slotId < SIM_SLOT_0 || slotId >= SIM_SLOT_COUNT) {
+        auto maxSimCount = GetMaxSimSlot();
+        if (slotId < SIM_SLOT_0 || slotId >= maxSimCount) {
             TELEPHONY_LOGE("slotId:%{public}d is inValid ", slotId);
             return TELEPHONY_ERR_ARGUMENT_INVALID;
         }

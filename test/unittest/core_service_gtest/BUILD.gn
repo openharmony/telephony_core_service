@@ -128,6 +128,7 @@ ohos_unittest("tel_network_search_gtest") {
     "sim_test_util.cpp",
     "sim_type_convert_test.cpp",
     "vcard_test.cpp",
+    "vsim_test.cpp",
     "zero_branch_test.cpp",
     "zero_branch_test_sim_ril.cpp",
   ]
