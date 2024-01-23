@@ -181,38 +181,55 @@ bool NetworkSearchManager::OnInit()
         return false;
     }
     ClearManagerInner();
-    bool mode = false;
-    if (GetAirplaneMode(mode) != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("NetworkSearchManager::Init GetAirplaneMode fail");
-    }
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
-        std::shared_ptr<NetworkSearchManagerInner> inner = FindManagerInner(slotId);
-        if (inner == nullptr) {
-            inner = std::make_shared<NetworkSearchManagerInner>();
-            AddManagerInner(slotId, inner);
-        }
-        if (inner != nullptr && eventSender_ != nullptr) {
-            if (inner->state_ == HandleRunningState::STATE_RUNNING) {
-                TELEPHONY_LOGE("NetworkSearchManager::Init HandleRunningState is running. slotId:%{public}d", slotId);
-                continue;
-            }
-            if (!InitPointer(inner, slotId)) {
-                ClearManagerInner();
-                return false;
-            }
-            if (!inner->Init()) {
-                ClearManagerInner();
-                return false;
-            }
-            SetLocalAirplaneMode(slotId, mode);
-            TELEPHONY_LOGI("NetworkSearchManager::Init airplaneMode:%{public}d slotId:%{public}d", mode, slotId);
-            // Prevent running crash and query the radio status at startup
-            eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_STATUS);
-        }
+        InitModuleBySlotId(slotId);
     }
     delayTime_ = GetDelayNotifyTime();
     TELEPHONY_LOGI("NetworkSearchManager::Init success");
     return true;
+}
+
+int32_t NetworkSearchManager::InitTelExtraModule(int32_t slotId)
+{
+    return InitModuleBySlotId(slotId);
+}
+
+int32_t NetworkSearchManager::InitModuleBySlotId(int32_t slotId)
+{
+    if (slotId < 0 || slotId > SIM_SLOT_COUNT) {
+        return TELEPHONY_ERROR;
+    }
+    std::shared_ptr<NetworkSearchManagerInner> inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        inner = std::make_shared<NetworkSearchManagerInner>();
+        AddManagerInner(slotId, inner);
+    } else {
+        return TELEPHONY_SUCCESS; // has been added
+    }
+    bool mode = false;
+    if (GetAirplaneMode(mode) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("NetworkSearchManager::Init GetAirplaneMode fail");
+    }
+    if (inner != nullptr && eventSender_ != nullptr) {
+        if (inner->state_ == HandleRunningState::STATE_RUNNING) {
+            TELEPHONY_LOGE("NetworkSearchManager::Init HandleRunningState is running. slotId:%{public}d", slotId);
+            return TELEPHONY_ERROR;
+        }
+        if (!InitPointer(inner, slotId)) {
+            ClearManagerInner();
+            return TELEPHONY_ERROR;
+        }
+        if (!inner->Init()) {
+            ClearManagerInner();
+            return TELEPHONY_ERROR;
+        }
+        SetLocalAirplaneMode(slotId, mode);
+        TELEPHONY_LOGI("NetworkSearchManager::Init airplaneMode:%{public}d slotId:%{public}d", mode, slotId);
+        // Prevent running crash and query the radio status at startup
+        eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_STATUS);
+        return TELEPHONY_SUCCESS;
+    }
+    return TELEPHONY_ERROR;
 }
 
 std::shared_ptr<NetworkSearchState> NetworkSearchManager::GetNetworkSearchState(int32_t slotId)
@@ -1493,7 +1510,7 @@ std::shared_ptr<NetworkSearchManagerInner> NetworkSearchManager::FindManagerInne
 
 void NetworkSearchManager::ClearManagerInner()
 {
-    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+    for (int32_t slotId = 0; slotId < mapManagerInner_.size(); slotId++) {
         auto inner = FindManagerInner(slotId);
         if (inner != nullptr) {
             std::lock_guard<std::mutex> lock(inner->mutex_);

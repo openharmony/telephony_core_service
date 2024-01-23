@@ -37,6 +37,7 @@ public:
     virtual ~SimManager();
     // Init
     bool OnInit(int32_t slotCount) override;
+    int32_t InitTelExtraModule(int32_t slotId) override;
     // SimState
     int32_t HasSimCard(int32_t slotId, bool &hasSimCard) override;
     int32_t GetSimState(int32_t slotId, SimState &simState) override;
@@ -142,10 +143,13 @@ public:
 
 private:
     bool IsValidSlotId(int32_t slotId);
+    template<class N>
+    bool IsValidSlotId(int32_t slotId, std::vector<N> vec);
     bool IsValidAuthType(AuthType authType);
     bool IsValidSlotIdForDefault(int32_t slotId);
     void InitMultiSimObject();
     void InitSingleSimObject();
+    void InitBaseManager(int32_t slotId);
     bool HasSimCardInner(int32_t slotId);
 
 private:

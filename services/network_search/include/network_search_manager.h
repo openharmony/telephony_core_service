@@ -148,6 +148,7 @@ public:
     virtual ~NetworkSearchManager();
 
     bool OnInit() override;
+    int32_t InitTelExtraModule(int32_t slotId) override;
     void SetRadioState(int32_t slotId, bool isOn, int32_t rst) override;
     int32_t SetRadioState(int32_t slotId, bool isOn, int32_t rst, NSCALLBACK &callback) override;
     int32_t GetRadioState(int32_t slotId) override;
@@ -317,6 +318,7 @@ private:
     void ClearManagerInner();
     void AddManagerInner(int32_t slotId, const std::shared_ptr<NetworkSearchManagerInner> &inner);
     bool RemoveManagerInner(int32_t slotId);
+    int32_t InitModuleBySlotId(int32_t slotId);
     int32_t GetDelayNotifyTime();
     int32_t RevertLastTechnology(int32_t slotId);
     int32_t ConvertNetworkModeToCapabilityType(int32_t preferredNetwork);

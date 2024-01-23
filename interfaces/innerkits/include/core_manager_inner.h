@@ -46,6 +46,7 @@ public:
     void UnRegisterCellularCallObject(const sptr<NetworkSearchCallBackBase> &callback);
     bool IsInitFinished(void);
     bool IsInitFinishedForTelRil(void);
+    int32_t InitExtraModule(int32_t slotId);
     int32_t GetDefaultSlotId(void);
     int32_t GetMaxSimCount(void);
     int32_t RegisterSimAccountCallback(const std::string &bundleName, const sptr<SimAccountCallback> &callback);
@@ -315,6 +316,7 @@ private:
 
 private:
     bool isInitAllObj_ = false;
+    bool isInitExtraObj_ = false;
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
     std::shared_ptr<ISimManager> simManager_ = nullptr;
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
