@@ -81,9 +81,9 @@ int32_t SimManager::InitTelExtraModule(int32_t slotId)
         return TELEPHONY_SUCCESS;
     }
     // Program memory
-    simStateManager_.resize(slotCount_);
-    simFileManager_.resize(slotCount_);
-    simAccountManager_.resize(slotCount_);
+    simStateManager_.resize(MAX_SLOT_COUNT);
+    simFileManager_.resize(MAX_SLOT_COUNT);
+    simAccountManager_.resize(MAX_SLOT_COUNT);
     InitBaseManager(slotId);
     return TELEPHONY_SUCCESS;
 }
@@ -1054,13 +1054,13 @@ int32_t SimManager::UpdateIccDiallingNumbers(
 void SimManager::RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {
     if ((what >= RadioEvent::RADIO_IMSI_LOADED_READY) && (what <= RadioEvent::RADIO_SIM_RECORDS_LOADED)) {
-        if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
+        if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
             TELEPHONY_LOGE("slotId is invalid or simFileManager_ is nullptr");
             return;
         }
         simFileManager_[slotId]->RegisterCoreNotify(handler, what);
     } else if ((what >= RadioEvent::RADIO_SIM_STATE_CHANGE) && (what <= RadioEvent::RADIO_SIM_STATE_SIMLOCK)) {
-        if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {
+        if ((!IsValidSlotId(slotId, simStateManager_)) || (simStateManager_[slotId] == nullptr)) {
             TELEPHONY_LOGE("slotId is invalid or simStateManager_ is nullptr");
             return;
         }
@@ -1080,13 +1080,13 @@ void SimManager::UnRegisterCoreNotify(
     int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what)
 {
     if (what >= RadioEvent::RADIO_IMSI_LOADED_READY && what <= RadioEvent::RADIO_SIM_RECORDS_LOADED) {
-        if ((!IsValidSlotId(slotId)) || (simFileManager_[slotId] == nullptr)) {
+        if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
             TELEPHONY_LOGE("simFileManager is null");
             return;
         }
         simFileManager_[slotId]->UnRegisterCoreNotify(observerCallBack, what);
     } else if (what >= RadioEvent::RADIO_SIM_STATE_CHANGE && what <= RadioEvent::RADIO_SIM_STATE_SIMLOCK) {
-        if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {
+        if ((!IsValidSlotId(slotId, simStateManager_)) || (simStateManager_[slotId] == nullptr)) {
             TELEPHONY_LOGE("simStateManager_ is null");
             return;
         }
@@ -1102,7 +1102,6 @@ bool SimManager::IsValidSlotId(int32_t slotId)
         TELEPHONY_LOGE("slotId is invalid, slotId = %{public}d", slotId);
         return false;
     }
-    TELEPHONY_LOGD("slotId is valid, slotId = %{public}d", slotId);
     return true;
 }
 
@@ -1110,10 +1109,9 @@ template<class N>
 bool SimManager::IsValidSlotId(int32_t slotId, std::vector<N> vec)
 {
     if ((slotId < SLOT_ID_ZERO) || (slotId >= vec.size())) {
-        TELEPHONY_LOGE("slotId is invalid, slotId = %{public}d", slotId);
+        TELEPHONY_LOGE("slotId is invalid by vec.size(), slotId = %{public}d", slotId);
         return false;
     }
-    TELEPHONY_LOGD("slotId is valid, slotId = %{public}d", slotId);
     return true;
 }
 
