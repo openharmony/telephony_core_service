@@ -81,12 +81,10 @@ int32_t SimManager::InitTelExtraModule(int32_t slotId)
         return TELEPHONY_SUCCESS;
     }
     // Program memory
-    TELEPHONY_LOGI("InitTelExtraModule, size 1:%{public}lu", simStateManager_.size()); // del
     simStateManager_.resize(slotCount_);
     simFileManager_.resize(slotCount_);
     simAccountManager_.resize(slotCount_);
     InitBaseManager(slotId);
-    TELEPHONY_LOGI("InitTelExtraModule, size 2:%{public}lu", simStateManager_.size()); // del
     return TELEPHONY_SUCCESS;
 }
 
