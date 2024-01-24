@@ -2658,7 +2658,30 @@ HWTEST_F(BranchTest, Telephony_SIMUtils_001, Function | MediumTest | Level1)
     EXPECT_NE(simUtils->Gsm7bitConvertToString(bytes, 1), "");
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(bytesTwo, 0, 0, 1), "");
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(nullptr, 0, 1, 1), "");
-    EXPECT_EQ(simUtils->UcsCodeConvertToString(bytesTwo, 0, BYTES_LENGTH, 1), "");
+}
+
+/**
+ * @tc.number   Telephony_SIMUtils_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SIMUtils_002, Function | MediumTest | Level1)
+{
+    auto simUtils = std::make_shared<SIMUtils>();
+    unsigned char *data(new unsigned char[5] { 0x81, 0x02, 0xA9, 0xC8, 0xC8 });
+    EXPECT_EQ(
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data), 0, 5, 0), "哈哈");
+    unsigned char *data2(new unsigned char[4] { 0x81, 0x01, 0xAA, 0xCA });
+    EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data2), 0, 4, 0), "啊");
+    unsigned char *data3(new unsigned char[6] { 0x81, 0x03, 0xCE, 0xDC, 0xDC, 0xDC });
+    EXPECT_EQ(
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data3), 0, 6, 0), "杜杜杜");
+    unsigned char *data4(new unsigned char[6] { 0x82, 0x02, 0x4E, 0x2A, 0xE2, 0x80 });
+    EXPECT_EQ(
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data4), 0, 6, 0), "二个");
+    unsigned char *data5(new unsigned char[11] { 0x82, 0x07, 0x82, 0x80, 0x38, 0x30, 0x32, 0x35, 0x45, 0x46, 0xB3 });
+    EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data5), 0, 11, 0),
+        "8025EF芳");
 }
 
 /**
