@@ -708,13 +708,12 @@ void OperatorName::UpdateOplCust(const std::vector<std::string> &oplCust)
 
 void OperatorName::updateOperatorLongName(std::string &operatorLongName, const std::string &numeric)
 {
-    RegServiceState regStatus = RegServiceState::REG_STATE_UNKNOWN;
     sptr<NetworkState> networkState = GetNetworkStatus();
     if (networkState == nullptr) {
         return;
     }
 
-    regStatus = networkState->GetRegStatus();
+    RegServiceState regStatus = networkState->GetRegStatus();
     if (regStatus != RegServiceState::REG_STATE_IN_SERVICE) {
         return;
     }
