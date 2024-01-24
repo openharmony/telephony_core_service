@@ -44,6 +44,10 @@ int32_t VCardRdbHelper::QueryRawContactMaxId()
     DataShare::DataSharePredicates predicates;
     predicates.GreaterThanOrEqualTo(RawContact::ID, "1");
     auto resultSet = QueryRawContact(columns, predicates);
+    if (resultSet == nullptr) {
+        TELEPHONY_LOGE("resultSet is nullptr");
+        return DB_FAILD;
+    }
     int rowCount = 0;
     resultSet->GetRowCount(rowCount);
     TELEPHONY_LOGI("rowCount= %{public}d", rowCount);
