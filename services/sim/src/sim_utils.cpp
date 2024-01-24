@@ -198,8 +198,9 @@ std::string SIMUtils::DiallingNumberStringFieldConvertToString(
     std::u16string hs = u"";
     TELEPHONY_LOGI("DiallingNumberStringFieldToString: start 16be decode");
     if (data[offset] == static_cast<unsigned char>(CHINESE_FLAG)) {
+        int ucslen = (length - 1) / HALF_LEN;
         int outlen = 0;
-        std::shared_ptr<char16_t> cs = CharsConvertToChar16(data + 1, length - HALF_LEN, outlen, true);
+        std::shared_ptr<char16_t> cs = CharsConvertToChar16(data + 1, ucslen * HALF_LEN, outlen, true);
         hs = std::u16string(cs.get(), 0, outlen);
     }
     if (length >= START_POS && data[offset] == static_cast<unsigned char>(UCS_FLAG)) {
