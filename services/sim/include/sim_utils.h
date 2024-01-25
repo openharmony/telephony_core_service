@@ -31,13 +31,21 @@ static const int DECIMAL_MAX = 10;
 static const int HALF_LEN = 2;
 static const int HALF_BYTE_LEN = 4;
 static const int LAC_RANGE_LEN = 6;
+static const int ZERO_DATA = 0x00;
+static const int SEVENF_DATA = 0x7F;
+static const int F0_DATA = 0x80;
+static const int FF_DATA = 0xFF;
 static const int UCS_FLAG = 0x81;
 static const int UCS_WIDE_FLAG = 0x82;
+static const int HEX_HUNDRE = 0x100;
+static const int UCS_OFFSET = 3;
+static const int UCS_WIDE_OFFSET = 4;
 // Full Name IEI from TS 24.008
 static const int LONG_NAME_FLAG = 0x43;
 // Short Name IEI from TS 24.008
 static const int SHORT_NAME_FLAG = 0x45;
 static const int CHAR_GSM_7BIT = 7;
+static const int UCS_BASE_POS = 2;
 static const int START_POS = 3;
 static const int END_POS = 4;
 static const int POS_NOT_BLANK = 1;
@@ -77,8 +85,9 @@ public:
     static std::string Gsm7bitConvertToString(const unsigned char *bytes, int byteLen);
 
 private:
-    static std::string UcsCodeConvertToString(
-        std::shared_ptr<unsigned char> array, int offset, int length, int offPos);
+    static std::u16string UcsConvertToString(unsigned char *data, int length, int offset);
+    static std::u16string UcsWideConvertToString(unsigned char *data, int length, int offset);
+    static std::string Decode8BitConvertToString(unsigned char *data, int length, int offset);
 };
 } // namespace Telephony
 } // namespace OHOS
