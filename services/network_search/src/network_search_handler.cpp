@@ -413,6 +413,9 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
     if (networkRegister_ != nullptr) {
         networkRegister_->ProcessPsRegister(event);
     }
+    if (operatorName_ != nullptr) {
+        operatorName_->TrySetLongOperatorNameWithTranslation();
+    }
     TELEPHONY_LOGD("NetworkSearchHandler::RadioRilDataRegState slotId:%{public}d", slotId_);
 }
 
@@ -430,6 +433,9 @@ void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::P
     }
     if (networkRegister_ != nullptr) {
         networkRegister_->ProcessCsRegister(event);
+    }
+    if (operatorName_ != nullptr) {
+        operatorName_->TrySetLongOperatorNameWithTranslation();
     }
     TELEPHONY_LOGD("NetworkSearchHandler::RadioRilVoiceRegState slotId:%{public}d", slotId_);
 }

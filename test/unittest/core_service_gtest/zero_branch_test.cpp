@@ -1793,6 +1793,7 @@ HWTEST_F(BranchTest, Telephony_OperatorName_001, Function | MediumTest | Level1)
     operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
     operatorName->GsmOperatorInfo(event);
     operatorName->HandleOperatorInfo(event);
+    operatorName->TrySetLongOperatorNameWithTranslation();
     operatorName->NotifySpnChanged();
     operatorName->CdmaOperatorInfo(event);
     event = nullptr;
@@ -1843,6 +1844,7 @@ HWTEST_F(BranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
     operatorResult->flag = NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR, operatorResult);
     operatorName->HandleOperatorInfo(event);
+    operatorName->TrySetLongOperatorNameWithTranslation();
 }
 
 /**
@@ -1887,6 +1889,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchState_001, Function | MediumTest | L
     networkSearchState->SetCfgTech(RadioTech::RADIO_TECHNOLOGY_EVDO);
     networkSearchState->SetImsStatus(true);
     networkSearchState->SetImsStatus(false);
+    networkSearchState->SetLongOperatorName(longName, DomainType::DOMAIN_TYPE_PS);
     networkSearchState->NotifyPsRegStatusChange();
     networkSearchState->NotifyPsRoamingStatusChange();
     networkSearchState->NotifyPsRadioTechChange();
