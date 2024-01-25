@@ -250,7 +250,7 @@ std::u16string SIMUtils::UcsConvertToString(unsigned char *data, int length, int
         index = index + HALF_LEN;
     }
     int outlen = 0;
-    std::shared_ptr<char16_t> cs = CharsConvertToChar16(dataUsc, MAX_ENGLISH_NAME * 2, outlen, true);
+    std::shared_ptr<char16_t> cs = CharsConvertToChar16(dataUsc, MAX_ENGLISH_NAME * HALF_LEN, outlen, true);
     return std::u16string(cs.get(), 0, outlen);
 }
 
@@ -280,7 +280,7 @@ std::u16string SIMUtils::UcsWideConvertToString(unsigned char *data, int length,
         dataOffset++;
     }
     int outlen = 0;
-    std::shared_ptr<char16_t> cs = CharsConvertToChar16(dataUsc, MAX_ENGLISH_NAME * 2, outlen, true);
+    std::shared_ptr<char16_t> cs = CharsConvertToChar16(dataUsc, MAX_ENGLISH_NAME * HALF_LEN, outlen, true);
     return std::u16string(cs.get(), 0, outlen);
 }
 
