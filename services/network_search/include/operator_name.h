@@ -37,6 +37,7 @@ public:
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     void HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void NotifySpnChanged();
+    void TrySetLongOperatorNameWithTranslation();
 
 private:
     void GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event);
@@ -71,7 +72,7 @@ private:
     bool isCUDomestic(const std::string &numeric);
     bool isCTDomestic(const std::string &numeric);
     bool isCBDomestic(const std::string &numeric);
-    void updateOperatorLongName(std::string &operatorLongName, const std::string &numeric);
+    void UpdateOperatorLongName(std::string &operatorLongName, const std::string &numeric);
 
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
