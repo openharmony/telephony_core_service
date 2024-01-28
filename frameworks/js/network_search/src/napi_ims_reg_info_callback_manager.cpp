@@ -26,29 +26,26 @@ int32_t NapiImsRegInfoCallbackManager::RegisterImsRegStateCallback(ImsRegStateCa
 {
     int32_t slotId = stateCallback.slotId;
     ImsServiceType imsSrvType = stateCallback.imsSrvType;
-    std::lock_guard<std::mutex> lock(mutex_);
-    for (auto iter : listImsRegStateCallback_) {
-        if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType)) {
-            TELEPHONY_LOGI("[slot%{public}d] Ignore register action, since callback is existent, type %{public}d",
-                slotId, imsSrvType);
-            return TELEPHONY_SUCCESS;
-        }
-    }
     stateCallback.imsCallback = new NapiImsRegInfoCallback();
     if (stateCallback.imsCallback == nullptr) {
         TELEPHONY_LOGE("[slot%{public}d] Creat ImsRegInfoCallback failed, type %{public}d,", slotId, imsSrvType);
         return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
     }
+    if (InsertImsRegCallback(slotId, imsSrvType, stateCallback) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGI("[slot%{public}d] Ignore register action, since callback is existent, type %{public}d", slotId,
+            imsSrvType);
+        return TELEPHONY_SUCCESS;
+    }
     int32_t ret = DelayedRefSingleton<CoreServiceClient>::GetInstance().RegisterImsRegInfoCallback(
         slotId, imsSrvType, stateCallback.imsCallback);
     if (ret == TELEPHONY_SUCCESS) {
-        listImsRegStateCallback_.push_back(stateCallback);
         TELEPHONY_LOGI(
             "[slot%{public}d] Register imsRegState callback successfully, type %{public}d", slotId, imsSrvType);
     } else {
         if (stateCallback.imsCallback != nullptr) {
             stateCallback.imsCallback = nullptr;
         }
+        RemoveImsRegCallback(slotId, imsSrvType);
         TELEPHONY_LOGE("[slot%{public}d] Register imsRegState callback failed, type %{public}d, ret %{public}d", slotId,
             imsSrvType, ret);
     }
@@ -59,8 +56,36 @@ int32_t NapiImsRegInfoCallbackManager::UnregisterImsRegStateCallback(
     napi_env env, int32_t slotId, ImsServiceType imsSrvType)
 {
     int32_t ret = TELEPHONY_SUCCESS;
-    std::lock_guard<std::mutex> lock(mutex_);
+    RemoveImsRegCallback(slotId, imsSrvType);
     ret = DelayedRefSingleton<CoreServiceClient>::GetInstance().UnregisterImsRegInfoCallback(slotId, imsSrvType);
+    TELEPHONY_LOGI(
+        "[slot%{public}d] Unregister imsRegState callback successfully, type %{public}d", slotId, imsSrvType);
+    return ret;
+}
+
+std::list<ImsRegStateCallback> NapiImsRegInfoCallbackManager::GetImsRegCallbackList()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return listImsRegStateCallback_;
+}
+
+int32_t NapiImsRegInfoCallbackManager::InsertImsRegCallback(
+    int32_t slotId, ImsServiceType imsSrvType, ImsRegStateCallback &stateCallback)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (auto iter : listImsRegStateCallback_) {
+        if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType)) {
+            TELEPHONY_LOGD("[slot%{public}d] callback is existent", slotId);
+            return TELEPHONY_ERROR;
+        }
+    }
+    listImsRegStateCallback_.push_back(stateCallback);
+    return TELEPHONY_SUCCESS;
+}
+
+void NapiImsRegInfoCallbackManager::RemoveImsRegCallback(int32_t slotId, ImsServiceType imsSrvType)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
     auto iter = listImsRegStateCallback_.begin();
     for (; iter != listImsRegStateCallback_.end(); ++iter) {
         if ((iter->slotId == slotId) && (iter->imsSrvType == imsSrvType)) {
@@ -71,17 +96,14 @@ int32_t NapiImsRegInfoCallbackManager::UnregisterImsRegStateCallback(
             break;
         }
     }
-    TELEPHONY_LOGI(
-        "[slot%{public}d] Unregister imsRegState callback successfully, type %{public}d", slotId, imsSrvType);
-    return ret;
 }
 
 int32_t NapiImsRegInfoCallbackManager::ReportImsRegInfo(
     int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info)
 {
     int32_t ret = TELEPHONY_ERROR;
-    std::lock_guard<std::mutex> lock(mutex_);
-    for (auto iter : listImsRegStateCallback_) {
+    auto imsRegCallbackList = GetImsRegCallbackList();
+    for (auto iter : imsRegCallbackList) {
         if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType)) {
             ret = ReportImsRegInfoInner(iter, info);
             break;
