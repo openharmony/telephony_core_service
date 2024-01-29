@@ -548,7 +548,7 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
     }
     bool hasSim = false;
     simManager->HasSimCard(slotId_, hasSim);
-    if (!isAirplaneModeOn && ((hasSim && radioState == CORE_SERVICE_POWER_OFF) || IsPowerOnPrimaryRadioWhenNoSim())) {
+    if (!isAirplaneModeOn && (hasSim || IsPowerOnPrimaryRadioWhenNoSim()) && radioState == CORE_SERVICE_POWER_OFF) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
     }
     sptr<NetworkSearchCallBackBase> cellularData = networkSearchManager->GetCellularDataCallBack();
@@ -1276,12 +1276,6 @@ bool NetworkSearchHandler::IsPowerOnPrimaryRadioWhenNoSim() const
     int32_t primarySlotId = INVALID_SLOT_ID;
     simManager->GetPrimarySlotId(primarySlotId);
     if (primarySlotId != INVALID_SLOT_ID && primarySlotId == slotId_) {
-        for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; ++slotId) {
-            if (nsm->GetRadioState(slotId) == CORE_SERVICE_POWER_ON) {
-                TELEPHONY_LOGE("slotId[%{public}d], radio is on", slotId);
-                return false;
-            }
-        }
         TELEPHONY_LOGD("primarySlotId = %{public}d, send radio on request", primarySlotId);
         return true;
     }
