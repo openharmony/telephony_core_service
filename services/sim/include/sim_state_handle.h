@@ -136,6 +136,9 @@ public:
         int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey);
     int32_t GetSendSimMatchedOperatorInfoResponse();
 
+public:
+    bool modemInitDone_ = false;
+
 private:
     void SyncCmdResponse();
     void ObtainIccStatus(int32_t slotId);
