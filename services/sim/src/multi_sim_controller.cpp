@@ -777,7 +777,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
     SavePrimarySlotIdInfo(slotId);
     PublishSetPrimaryEvent(true);
     for (int32_t i = 0; i < maxCount_; i++) {
-        if (localCacheInfo_[i].iccId.empty()) {
+        if (!(localCacheInfo_[i].iccId.empty()) {
             InitActive(i);
         }
     }
