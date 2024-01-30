@@ -53,6 +53,7 @@ public:
         int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response);
     int32_t SendSimMatchedOperatorInfo(
         int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey);
+    bool IfModemInitDone();
 
 public:
     static bool responseReady_;
