@@ -97,6 +97,14 @@ SimState SimStateManager::GetSimState()
     return ret;
 }
 
+bool SimStateManager::IfModemInitDone()
+{
+    if (simStateHandle_ != nullptr) {
+        return simStateHandle_->modemInitDone_;
+    }
+    return false;
+}
+
 CardType SimStateManager::GetCardType()
 {
     CardType ret = CardType::UNKNOWN_CARD;

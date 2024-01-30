@@ -116,6 +116,10 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         controller_->GetListFromDataBase();
         simFileManager->ClearData();
     }
+    if (controller_->unInitModemSlotId_ == slotId) {
+        TELEPHONY_LOGI("need to recheck primary");
+        controller_->ReCheckPrimary();
+    }
     NotifySimAccountChanged();
 }
 
