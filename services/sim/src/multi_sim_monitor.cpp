@@ -148,8 +148,8 @@ int32_t MultiSimMonitor::RegisterSimAccountCallback(
         TELEPHONY_LOGE(" callback is nullptr");
         return TELEPHONY_ERR_ARGUMENT_NULL;
     }
-    bool isExisted = false;
     std::lock_guard<std::mutex> lock(mutexInner_);
+    bool isExisted = false;
     for (auto &iter : listSimAccountCallbackRecord_) {
         if ((iter.bundleName == bundleName)) {
             iter.simAccountCallback = callback;
@@ -172,8 +172,8 @@ int32_t MultiSimMonitor::RegisterSimAccountCallback(
 
 int32_t MultiSimMonitor::UnregisterSimAccountCallback(const std::string &bundleName)
 {
-    bool isSuccess = false;
     std::lock_guard<std::mutex> lock(mutexInner_);
+    bool isSuccess = false;
     auto iter = listSimAccountCallbackRecord_.begin();
     for (; iter != listSimAccountCallbackRecord_.end();) {
         if ((iter->bundleName == bundleName)) {
@@ -191,19 +191,20 @@ int32_t MultiSimMonitor::UnregisterSimAccountCallback(const std::string &bundleN
     return TELEPHONY_SUCCESS;
 }
 
+std::list<MultiSimMonitor::SimAccountCallbackRecord> MultiSimMonitor::GetSimAccountCallbackRecords()
+{
+    std::lock_guard<std::mutex> lock(mutexInner_);
+    return listSimAccountCallbackRecord_;
+}
+
 void MultiSimMonitor::NotifySimAccountChanged()
 {
-    TELEPHONY_LOGD("NotifySimAccountChanged");
-    bool isExisted = false;
-    std::lock_guard<std::mutex> lock(mutexInner_);
-    for (auto iter : listSimAccountCallbackRecord_) {
+    std::list<SimAccountCallbackRecord> CallbackRecord = GetSimAccountCallbackRecords();
+    TELEPHONY_LOGD("CallbackRecord size is %{public}zu", CallbackRecord.size());
+    for (auto iter : CallbackRecord) {
         if (iter.simAccountCallback != nullptr) {
-            isExisted = true;
             iter.simAccountCallback->OnSimAccountChanged();
         }
-    }
-    if (!isExisted) {
-        TELEPHONY_LOGI("SimAccountCallback has not been registered");
     }
     DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateIccAccount();
 }
