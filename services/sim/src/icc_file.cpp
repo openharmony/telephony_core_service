@@ -90,6 +90,7 @@ void IccFile::Init()
         stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
         stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
         stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
+        stateManager_->RegisterCoreNotify(shared_from_this(), MSG_ICC_REFRESH);
     }
 }
 
@@ -642,6 +643,7 @@ void IccFile::UnInit()
         stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
         stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
         stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), MSG_ICC_REFRESH);
     }
     ClearData();
 }
