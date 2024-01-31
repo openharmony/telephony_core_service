@@ -36,6 +36,11 @@ public:
     int32_t SendCallSetupRequestResult(bool accept);
     void UnRegisterEvents();
 
+public:
+    enum {
+        RETRY_SEND_RIL_PROACTIVE_COMMAND = 0,
+    };
+
 private:
     void RegisterEvents();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
@@ -51,6 +56,7 @@ private:
     void OnSendCallSetupRequestResult(const AppExecFwk::InnerEvent::Pointer &event);
     bool CheckIsSystemApp(const std::string &bundleName);
     sptr<OHOS::IRemoteObject> GetBundleMgr();
+    void RetrySendRilProactiveCommand();
 
 private:
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
@@ -64,6 +70,8 @@ private:
     std::string stkBundleName_ = "";
     std::mutex stkMutex_;
     std::condition_variable stkCv_;
+    AAFwk::Want retryWant_;
+    int32_t remainTryCount_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -38,6 +38,8 @@ const int32_t ICC_CARD_STATE_ABSENT = 0;
 const int32_t ICC_CARD_STATE_PRESENT = 1;
 const int32_t WAIT_TIME_SECOND = 2; // Set the timeout for sending the stk command
 const int32_t PARAMETER_LENGTH = 128;
+const int64_t DELAY_TIME = 3000;
+const int32_t MAX_RETRY_COUNT = 10;
 const std::string PARAM_SLOTID = "slotId";
 const std::string PARAM_MSG_CMD = "msgCmd";
 const std::string PARAM_CARD_STATUS = "cardStatus";
@@ -162,6 +164,9 @@ void StkController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         case RadioEvent::RADIO_STK_SEND_CALL_SETUP_REQUEST_RESULT:
             OnSendCallSetupRequestResult(event);
             break;
+        case StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND:
+            RetrySendRilProactiveCommand();
+            break;
         default:
             TELEPHONY_LOGE("StkController[%{public}d]::ProcessEvent() unknown event", slotId_);
             break;
@@ -230,6 +235,29 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
     bool publishResult = PublishStkEvent(want);
     TELEPHONY_LOGI("StkController[%{public}d]::OnSendRilProactiveCommand() stkData = %{public}s "
         "publishResult = %{public}d", slotId_, cmdData.c_str(), publishResult);
+    if (!publishResult) {
+        retryWant_ = want;
+        remainTryCount_ = MAX_RETRY_COUNT;
+        SendEvent(StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND, 0, DELAY_TIME);
+        return;
+    }
+    remainTryCount_ = 0;
+}
+
+void StkController::RetrySendRilProactiveCommand()
+{
+    remainTryCount_--;
+    TELEPHONY_LOGI("StkController[%{public}d], remainTryCount_ is %{public}d", slotId_, remainTryCount_);
+    if (remainTryCount_ > 0) {
+        if (!PublishStkEvent(retryWant_)) {
+            SendEvent(StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND, 0, DELAY_TIME);
+            return;
+        }
+        TELEPHONY_LOGI("StkController[%{public}d] retry sucess", slotId_);
+        remainTryCount_ = 0;
+        return;
+    }
+    TELEPHONY_LOGI("StkController[%{public}d] stop retry", slotId_);
 }
 
 void StkController::OnSendRilAlphaNotify(const AppExecFwk::InnerEvent::Pointer &event)
@@ -297,8 +325,9 @@ bool StkController::PublishStkEvent(AAFwk::Want &want)
     AppExecFwk::ElementName element("", stkBundleName_, ABILITY_NAME);
     want.SetElement(element);
     int32_t accountId = -1;
-    return AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(
+    auto ret = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(
         want, nullptr, accountId, AppExecFwk::ExtensionAbilityType::SERVICE);
+    return ret == 0;
 }
 
 bool StkController::CheckIsSystemApp(const std::string &bundleName)
