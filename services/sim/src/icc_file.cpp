@@ -90,7 +90,7 @@ void IccFile::Init()
         stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
         stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
         stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
-        stateManager_->RegisterCoreNotify(shared_from_this(), MSG_ICC_REFRESH);
+        stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_ICC_REFRESH);
     }
 }
 
@@ -321,7 +321,7 @@ void IccFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             result = ProcessIccFileObtained(event);
             ProcessFileLoaded(result);
             break;
-        case MSG_ICC_REFRESH:
+        case RadioEvent::RADIO_ICC_REFRESH:
             ProcessIccRefresh(MSG_ID_DEFAULT);
             break;
         default:
@@ -643,7 +643,7 @@ void IccFile::UnInit()
         stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
         stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
         stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
-        stateManager_->UnRegisterCoreNotify(shared_from_this(), MSG_ICC_REFRESH);
+        stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_ICC_REFRESH);
     }
     ClearData();
 }
