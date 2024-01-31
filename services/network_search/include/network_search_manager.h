@@ -313,15 +313,6 @@ public:
     static std::condition_variable cv_;
 
 private:
-    bool InitPointer(std::shared_ptr<NetworkSearchManagerInner> &inner, int32_t slotId);
-    void ClearManagerInner();
-    void AddManagerInner(int32_t slotId, const std::shared_ptr<NetworkSearchManagerInner> &inner);
-    bool RemoveManagerInner(int32_t slotId);
-    int32_t GetDelayNotifyTime();
-    int32_t RevertLastTechnology(int32_t slotId);
-    int32_t ConvertNetworkModeToCapabilityType(int32_t preferredNetwork);
-
-private:
     struct ImsRegInfoCallbackRecord {
         int32_t slotId;
         ImsServiceType imsSrvType;
@@ -329,6 +320,17 @@ private:
         sptr<ImsRegInfoCallback> imsCallback;
     };
 
+private:
+    bool InitPointer(std::shared_ptr<NetworkSearchManagerInner> &inner, int32_t slotId);
+    void ClearManagerInner();
+    void AddManagerInner(int32_t slotId, const std::shared_ptr<NetworkSearchManagerInner> &inner);
+    bool RemoveManagerInner(int32_t slotId);
+    int32_t GetDelayNotifyTime();
+    int32_t RevertLastTechnology(int32_t slotId);
+    int32_t ConvertNetworkModeToCapabilityType(int32_t preferredNetwork);
+    std::list<ImsRegInfoCallbackRecord> GetImsRegInfoCallbackRecords();
+
+private:
     sptr<NetworkSearchCallBackBase> cellularDataCallBack_ = nullptr;
     sptr<NetworkSearchCallBackBase> cellularCallCallBack_ = nullptr;
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
@@ -337,6 +339,7 @@ private:
     std::map<int32_t, std::shared_ptr<NetworkSearchManagerInner>> mapManagerInner_;
     std::list<ImsRegInfoCallbackRecord> listImsRegInfoCallbackRecord_;
     std::mutex mutexInner_;
+    std::mutex mutexIms_;
     int32_t delayTime_ = 0;
 };
 } // namespace Telephony
