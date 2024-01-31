@@ -34,6 +34,7 @@
 #include "sim_rdb_helper.h"
 #include "telephony_log_wrapper.h"
 #include "usim_dialling_numbers_service.h"
+#include "want.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -42,6 +43,7 @@ using namespace testing::ext;
 namespace {
 constexpr int32_t SLOT_ID = 0;
 constexpr int INVALID_MCC = 100;
+const int32_t INVALID_SLOTID = 2;
 } // namespace
 
 class DemoHandler : public AppExecFwk::EventHandler {
@@ -192,6 +194,26 @@ HWTEST_F(SimRilBranchTest, Telephony_StkManager_001, Function | MediumTest | Lev
     EXPECT_EQ(stkManager->SendEnvelopeCmd(0, cmd), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(stkManager->SendTerminalResponseCmd(0, cmd), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(stkManager->SendCallSetupRequestResult(0, false), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
+ * @tc.number   Telephony_StkController_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_StkController_002, Function | MediumTest | Level1)
+{
+    std::string name = "StkController_";
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_CALL_SETUP, 1);
+    std::shared_ptr<TelRilManager> telRilManager = nullptr;
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto stkController = std::make_shared<StkController>(telRilManager, simStateManager, INVALID_SLOTID);
+    std::string bundleNameEmpty = "";
+    std::string bundleName = "123";
+    EXPECT_FALSE(stkController->CheckIsSystemApp(bundleNameEmpty));
+    EXPECT_FALSE(stkController->CheckIsSystemApp(bundleName));
+    AAFwk::Want want;
+    EXPECT_FALSE(stkController->PublishStkEvent(want));
 }
 
 /**
@@ -610,8 +632,8 @@ HWTEST_F(SimRilBranchTest, Telephony_SimManager_001, Function | MediumTest | Lev
     simManager->slotCount_ = 1;
     int32_t slotId;
     std::u16string testU = u"";
-    simManager->SetShowNumber(SLOT_ID, testU);
-    simManager->GetShowNumber(SLOT_ID, testU);
+    simManager->SetShowNumber(INVALID_SLOTID, testU);
+    simManager->GetShowNumber(INVALID_SLOTID, testU);
     simManager->GetDefaultVoiceSimId(slotId);
     simManager->GetDefaultSmsSlotId();
     simManager->slotCount_ = 1;
@@ -621,13 +643,13 @@ HWTEST_F(SimRilBranchTest, Telephony_SimManager_001, Function | MediumTest | Lev
     simManager->GetDsdsMode(dsdsMode);
     simManager->stkManager_.resize(slotCount);
     simManager->simFileManager_.resize(slotCount);
-    simManager->SendCallSetupRequestResult(SLOT_ID, true);
-    simManager->GetSimGid2(SLOT_ID);
-    simManager->GetOpName(SLOT_ID, testU);
-    simManager->GetOpKey(SLOT_ID, testU);
-    simManager->GetOpKeyExt(SLOT_ID, testU);
-    simManager->GetSimTeleNumberIdentifier(SLOT_ID);
-    simManager->ObtainSpnCondition(SLOT_ID, false, testS);
+    simManager->SendCallSetupRequestResult(INVALID_SLOTID, true);
+    simManager->GetSimGid2(INVALID_SLOTID);
+    simManager->GetOpName(INVALID_SLOTID, testU);
+    simManager->GetOpKey(INVALID_SLOTID, testU);
+    simManager->GetOpKeyExt(INVALID_SLOTID, testU);
+    simManager->GetSimTeleNumberIdentifier(INVALID_SLOTID);
+    simManager->ObtainSpnCondition(INVALID_SLOTID, false, testS);
     simManager->slotCount_ = 0;
     simManager->GetPrimarySlotId(slotId);
     EXPECT_GT(simManager->GetDefaultSmsSlotId(), TELEPHONY_PERMISSION_ERROR);

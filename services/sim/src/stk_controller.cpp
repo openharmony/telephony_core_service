@@ -15,12 +15,19 @@
 
 #include "stk_controller.h"
 
+#include "ability_manager_client.h"
+#include "bundle_mgr_proxy.h"
 #include "common_event_data.h"
 #include "common_event_manager.h"
 #include "common_event_publish_info.h"
 #include "common_event_support.h"
+#include "extension_ability_info.h"
 #include "hril_types.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+#include "parameters.h"
 #include "radio_event.h"
+#include "system_ability_definition.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
@@ -30,11 +37,15 @@ namespace {
 const int32_t ICC_CARD_STATE_ABSENT = 0;
 const int32_t ICC_CARD_STATE_PRESENT = 1;
 const int32_t WAIT_TIME_SECOND = 2; // Set the timeout for sending the stk command
+const int32_t PARAMETER_LENGTH = 128;
 const std::string PARAM_SLOTID = "slotId";
 const std::string PARAM_MSG_CMD = "msgCmd";
 const std::string PARAM_CARD_STATUS = "cardStatus";
 const std::string PARAM_ALPHA_STRING = "alphaString";
 const std::string PARAM_REFRESH_RESULT = "refreshResult";
+const std::string STK_BUNDLE = "const.telephony.stk_bundle_name";
+const std::string ABILITY_NAME = "ServiceExtAbility";
+const std::string DEFAULT_BUNDLE = "";
 } // namespace
 
 StkController::StkController(const std::weak_ptr<Telephony::ITelRilManager> &telRilManager,
@@ -45,7 +56,26 @@ StkController::StkController(const std::weak_ptr<Telephony::ITelRilManager> &tel
 
 void StkController::Init()
 {
+    stkBundleName_ = initStkBudleName();
     RegisterEvents();
+}
+
+std::string StkController::initStkBudleName()
+{
+    char bundleName[PARAMETER_LENGTH] = { 0 };
+    GetParameter(STK_BUNDLE.c_str(), DEFAULT_BUNDLE.c_str(), bundleName, PARAMETER_LENGTH);
+    return bundleName;
+}
+
+sptr<OHOS::IRemoteObject> StkController::GetBundleMgr()
+{
+    OHOS::sptr<OHOS::ISystemAbilityManager> systemAbilityManager =
+        OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityManager == nullptr) {
+        TELEPHONY_LOGE("Failed to get ability mgr.");
+        return nullptr;
+    }
+    return systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
 }
 
 void StkController::RegisterEvents()
@@ -175,7 +205,7 @@ void StkController::OnIccStateChanged(const AppExecFwk::InnerEvent::Pointer &eve
     }
 }
 
-void StkController::OnSendRilSessionEnd(const AppExecFwk::InnerEvent::Pointer &event) const
+void StkController::OnSendRilSessionEnd(const AppExecFwk::InnerEvent::Pointer &event)
 {
     AAFwk::Want want;
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_STK_SESSION_END);
@@ -185,7 +215,7 @@ void StkController::OnSendRilSessionEnd(const AppExecFwk::InnerEvent::Pointer &e
         slotId_, publishResult);
 }
 
-void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Pointer &event) const
+void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Pointer &event)
 {
     auto stkData = event->GetSharedObject<std::string>();
     if (stkData == nullptr) {
@@ -202,7 +232,7 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
         "publishResult = %{public}d", slotId_, cmdData.c_str(), publishResult);
 }
 
-void StkController::OnSendRilAlphaNotify(const AppExecFwk::InnerEvent::Pointer &event) const
+void StkController::OnSendRilAlphaNotify(const AppExecFwk::InnerEvent::Pointer &event)
 {
     auto alphaData = event->GetSharedObject<std::string>();
     if (alphaData == nullptr) {
@@ -219,7 +249,7 @@ void StkController::OnSendRilAlphaNotify(const AppExecFwk::InnerEvent::Pointer &
         "publishResult = %{public}d", slotId_, cmdData.c_str(), publishResult);
 }
 
-void StkController::OnSendRilEventNotify(const AppExecFwk::InnerEvent::Pointer &event) const
+void StkController::OnSendRilEventNotify(const AppExecFwk::InnerEvent::Pointer &event)
 {
     auto eventData = event->GetSharedObject<std::string>();
     if (eventData == nullptr) {
@@ -236,7 +266,7 @@ void StkController::OnSendRilEventNotify(const AppExecFwk::InnerEvent::Pointer &
         "publishResult = %{public}d", slotId_, cmdData.c_str(), publishResult);
 }
 
-void StkController::OnIccRefresh(const AppExecFwk::InnerEvent::Pointer &event) const
+void StkController::OnIccRefresh(const AppExecFwk::InnerEvent::Pointer &event)
 {
     auto refreshResult = event->GetSharedObject<int32_t>();
     if (refreshResult == nullptr) {
@@ -254,12 +284,48 @@ void StkController::OnIccRefresh(const AppExecFwk::InnerEvent::Pointer &event) c
         slotId_, result, publishResult);
 }
 
-bool StkController::PublishStkEvent(const AAFwk::Want &want) const
+bool StkController::PublishStkEvent(AAFwk::Want &want)
 {
-    EventFwk::CommonEventData data(want);
-    EventFwk::CommonEventPublishInfo publishInfo;
-    publishInfo.SetOrdered(true);
-    return EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
+    if (stkBundleName_.empty()) {
+        TELEPHONY_LOGE("stkBundleName_ is empty");
+        return false;
+    }
+    if (!CheckIsSystemApp(stkBundleName_)) {
+        TELEPHONY_LOGE("is not system app");
+        return false;
+    }
+    AppExecFwk::ElementName element("", stkBundleName_, ABILITY_NAME);
+    want.SetElement(element);
+    int32_t accountId = -1;
+    return AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(
+        want, nullptr, accountId, AppExecFwk::ExtensionAbilityType::SERVICE);
+}
+
+bool StkController::CheckIsSystemApp(const std::string &bundleName)
+{
+    if (bundleName.empty()) {
+        TELEPHONY_LOGE("bundleName is empty");
+        return false;
+    }
+    sptr<OHOS::IRemoteObject> remoteObject = GetBundleMgr();
+    if (remoteObject == nullptr) {
+        TELEPHONY_LOGE("error to get bundleMgr");
+        return false;
+    }
+    sptr<AppExecFwk::IBundleMgr> iBundleMgr = OHOS::iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
+    if (iBundleMgr == nullptr) {
+        TELEPHONY_LOGE("iBundleMgr is null");
+        return false;
+    }
+    OHOS::AppExecFwk::BundleInfo info;
+    info.applicationInfo.isSystemApp = false;
+    if (!iBundleMgr->GetBundleInfo(
+        bundleName, OHOS::AppExecFwk::GET_BUNDLE_DEFAULT, info, AppExecFwk::Constants::ALL_USERID)) {
+        TELEPHONY_LOGE("Failed to get bundleInfo from bundleMgr");
+    } else {
+        TELEPHONY_LOGI("isSystemApp =%{public}d", info.applicationInfo.isSystemApp);
+    }
+    return info.applicationInfo.isSystemApp;
 }
 
 int32_t StkController::SendTerminalResponseCmd(const std::string &strCmd)
