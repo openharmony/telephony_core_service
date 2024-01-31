@@ -769,7 +769,7 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             }
             simFile_->ProcessIccRefresh(MSG_ID_DEFAULT);
             break;
-        };
+        }
         default:
             break;
     }
