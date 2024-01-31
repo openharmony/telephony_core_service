@@ -30,6 +30,7 @@ public:
         const std::weak_ptr<Telephony::SimStateManager> &simStateManager, int32_t slotId);
     virtual ~StkController() = default;
     void Init();
+    std::string initStkBudleName();
     int32_t SendTerminalResponseCmd(const std::string &strCmd);
     int32_t SendEnvelopeCmd(const std::string &strCmd);
     int32_t SendCallSetupRequestResult(bool accept);
@@ -39,15 +40,17 @@ private:
     void RegisterEvents();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void OnIccStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
-    void OnSendRilSessionEnd(const AppExecFwk::InnerEvent::Pointer &event) const;
-    void OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Pointer &event) const;
-    void OnSendRilAlphaNotify(const AppExecFwk::InnerEvent::Pointer &event) const;
-    void OnSendRilEventNotify(const AppExecFwk::InnerEvent::Pointer &event) const;
-    void OnIccRefresh(const AppExecFwk::InnerEvent::Pointer &event) const;
-    bool PublishStkEvent(const AAFwk::Want &want) const;
+    void OnSendRilSessionEnd(const AppExecFwk::InnerEvent::Pointer &event);
+    void OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Pointer &event);
+    void OnSendRilAlphaNotify(const AppExecFwk::InnerEvent::Pointer &event);
+    void OnSendRilEventNotify(const AppExecFwk::InnerEvent::Pointer &event);
+    void OnIccRefresh(const AppExecFwk::InnerEvent::Pointer &event);
+    bool PublishStkEvent(AAFwk::Want &want);
     void OnSendTerminalResponseResult(const AppExecFwk::InnerEvent::Pointer &event);
     void OnSendEnvelopeCmdResult(const AppExecFwk::InnerEvent::Pointer &event);
     void OnSendCallSetupRequestResult(const AppExecFwk::InnerEvent::Pointer &event);
+    bool CheckIsSystemApp(const std::string &bundleName);
+    sptr<OHOS::IRemoteObject> GetBundleMgr();
 
 private:
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
@@ -58,6 +61,7 @@ private:
     int32_t terminalResponseResult_ = 0;
     int32_t callSetupResponseResult_ = 0;
     bool responseFinished_ = false;
+    std::string stkBundleName_ = "";
     std::mutex stkMutex_;
     std::condition_variable stkCv_;
 };
