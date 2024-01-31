@@ -2184,6 +2184,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_006, Function | MediumTest |
     nsm->SetBasebandVersion(INVALID_SLOTID, "");
     nsm->ConvertNetworkModeToCapabilityType(CORE_NETWORK_MODE_NR);
     nsm->ConvertNetworkModeToCapabilityType(-1);
+    nsm->GetImsRegInfoCallbackRecords();
     EXPECT_EQ(nsm->GetFrequencyType(INVALID_SLOTID), FrequencyType::FREQ_TYPE_UNKNOWN);
 }
 

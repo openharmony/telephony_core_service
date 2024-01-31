@@ -1563,7 +1563,7 @@ int32_t NetworkSearchManager::RegisterImsRegInfoCallback(
         return TELEPHONY_ERR_ARGUMENT_NULL;
     }
     bool isExisted = false;
-    std::lock_guard<std::mutex> lock(mutexInner_);
+    std::lock_guard<std::mutex> lock(mutexIms_);
     for (auto iter : listImsRegInfoCallbackRecord_) {
         if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType) && (iter.bundleName == bundleName)) {
             isExisted = true;
@@ -1590,7 +1590,7 @@ int32_t NetworkSearchManager::UnregisterImsRegInfoCallback(
     int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName)
 {
     bool isSuccess = false;
-    std::lock_guard<std::mutex> lock(mutexInner_);
+    std::lock_guard<std::mutex> lock(mutexIms_);
     auto iter = listImsRegInfoCallbackRecord_.begin();
     for (; iter != listImsRegInfoCallbackRecord_.end(); ++iter) {
         if ((iter->slotId == slotId) && (iter->imsSrvType == imsSrvType) && (iter->bundleName == bundleName)) {
@@ -1608,16 +1608,22 @@ int32_t NetworkSearchManager::UnregisterImsRegInfoCallback(
     return TELEPHONY_SUCCESS;
 }
 
+std::list<NetworkSearchManager::ImsRegInfoCallbackRecord> NetworkSearchManager::GetImsRegInfoCallbackRecords()
+{
+    std::lock_guard<std::mutex> lock(mutexIms_);
+    return listImsRegInfoCallbackRecord_;
+}
+
 void NetworkSearchManager::NotifyImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info)
 {
     TELEPHONY_LOGD(
         "slotId:%{public}d, ImsRegState:%{public}d,  ImsRegTech:%{public}d", slotId, info.imsRegState, info.imsRegTech);
     bool isExisted = false;
-    std::lock_guard<std::mutex> lock(mutexInner_);
-    for (auto iter : listImsRegInfoCallbackRecord_) {
+    auto imsRegInfoCallbackRecords = GetImsRegInfoCallbackRecords();
+    for (auto iter : imsRegInfoCallbackRecords) {
         if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType)) {
             if (iter.imsCallback == nullptr) {
-                TELEPHONY_LOGE("imsCallback is nullptr from listImsRegInfoCallbackRecord_");
+                TELEPHONY_LOGE("imsCallback is nullptr from imsRegInfoCallbackRecords");
                 continue;
             }
             iter.imsCallback->OnImsRegInfoChanged(slotId, imsSrvType, info);
