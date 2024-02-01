@@ -114,6 +114,7 @@ void SimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 
 void SimFile::ProcessIccRefresh(int msgId)
 {
+    TELEPHONY_LOGI("SimFile::ProcessIccRefresh msgId %{public}d, slotId_ = %{public}d", msgId, slotId_);
     switch (msgId) {
         case ELEMENTARY_FILE_MBDN:
             fileToGet_++;
