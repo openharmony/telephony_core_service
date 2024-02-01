@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace Telephony {
 static const int64_t COMMUNICATION_TIMEOUT = 45 * 1000; // Set the timeout millisecond for radio protocol communication
-static const int64_t SET_ACTIVE_OUT_TIME = 10 * 1000;
+static const int64_t SET_ACTIVE_OUT_TIME = 5 * 1000;
 std::mutex RadioProtocolController::ctx_;
 std::condition_variable RadioProtocolController::cv_;
 
@@ -402,7 +402,6 @@ bool RadioProtocolController::RadioProtocolControllerPoll()
 void RadioProtocolController::ProcessActiveSimTimeOutDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("RadioProtocolController::ProcessActiveSimTimeOutDone");
-    activeResponse_ = 1;
     RadioProtocolControllerContinue();
     cv_.notify_all();
 }
@@ -420,6 +419,7 @@ bool RadioProtocolController::SetActiveSimToRil(int32_t slotId, int32_t type, in
         TELEPHONY_LOGE("event is nullptr!");
         return false;
     }
+    activeResponse_ = 1;
     event->SetOwner(shared_from_this());
     SendEvent(MSG_SIM_TIME_OUT_ACTIVE, SET_ACTIVE_OUT_TIME, Priority::LOW);
     telRilManager->SetActiveSim(slotId, type, enable, event);

@@ -31,12 +31,29 @@ TelEventQueue::TelEventQueue(const std::string &name) : name_(name)
     queue_ = std::make_shared<ffrt::queue>(name_.c_str());
 }
 
+TelEventQueue::~TelEventQueue()
+{
+    TELEPHONY_LOGI("%{public}s destroy", name_.c_str());
+    RemoveAllEvents();
+    ClearCurrentTask(true);
+    if (!queue_) {
+        return;
+    }
+    if (!curTask_) {
+        return;
+    }
+    TELEPHONY_LOGD("%{public}s need to wait", name_.c_str());
+    queue_->wait(curTask_);
+    curTask_ = ffrt::task_handle();
+    queue_ = nullptr;
+}
+
 void TelEventQueue::Submit(AppExecFwk::InnerEvent::Pointer &event, AppExecFwk::EventQueue::Priority priority)
 {
     InsertEventsInner(event, priority);
-    if (GetHandleTime() != curHandleTime_) {
-        queueId_++;
-        ClearCurrentTask();
+    if (GetHandleTime() < curHandleTime_) {
+        GetNextQueueId();
+        ClearCurrentTask(false);
         SubmitInner(queueId_.load());
     }
 }
@@ -69,14 +86,19 @@ void TelEventQueue::InsertEventsInner(AppExecFwk::InnerEvent::Pointer &event, Ap
         "%{public}s InsertEventsInner eventId %{public}d finish", name_.c_str(), static_cast<int32_t>(innerEventId));
 }
 
-void TelEventQueue::ClearCurrentTask()
+void TelEventQueue::ClearCurrentTask(bool isNeedEnd)
 {
+    std::lock_guard<std::mutex> lock(taskCtx_);
     if (!curTask_ || !queue_) {
         return;
     }
-    TELEPHONY_LOGI("%{public}s cancel current task", name_.c_str());
     queue_->cancel(curTask_);
+    if (isNeedEnd) {
+        GetNextQueueId();
+        return;
+    }
     curTask_ = ffrt::task_handle();
+    TELEPHONY_LOGD("%{public}s cancel current task", name_.c_str());
 }
 
 void TelEventQueue::SubmitInner(int32_t queueId)
@@ -95,32 +117,46 @@ void TelEventQueue::SubmitInner(int32_t queueId)
     if (handleTime > now) {
         delayTime = std::chrono::duration_cast<std::chrono::microseconds>(handleTime - now).count();
     }
-    auto innerEventId = static_cast<uint32_t>(GetEvent()->GetInnerEventId());
+    SubmitToFFRT(queueId, handleTime, delayTime);
+}
+
+int32_t TelEventQueue::GetNextQueueId()
+{
+    if (queueId_ >= INT32_MAX) {
+        queueId_ = 1;
+    }
+    return queueId_++;
+}
+
+void TelEventQueue::SubmitToFFRT(int32_t queueId, AppExecFwk::InnerEvent::TimePoint handleTime, int64_t delayTime)
+{
+    std::lock_guard<std::mutex> lock(taskCtx_);
     if (queueId != queueId_.load()) {
         TELEPHONY_LOGD("%{public}s task no need to submit", name_.c_str());
+        curHandleTime_ = AppExecFwk::InnerEvent::TimePoint::max();
         return;
     }
     curHandleTime_ = handleTime;
     curTask_ = queue_->submit_h(
-        [this, queueId = queueId, innerEventId = innerEventId]() {
-            if (queueId != queueId_.load()) {
-                TELEPHONY_LOGD("%{public}s task no need to process", name_.c_str());
+        [this, queueId = queueId]() {
+            bool isNeedSubmit = true;
+            auto event = PopEvent(queueId, isNeedSubmit);
+            std::shared_ptr<TelEventHandler> handler = nullptr;
+            if (event) {
+                handler = std::static_pointer_cast<TelEventHandler>(event->GetOwner());
+            }
+            if (event && handler) {
+                TELEPHONY_LOGD("%{public}s ProcessEvent eventId %{public}d", name_.c_str(),
+                    static_cast<uint32_t>(event->GetInnerEventId()));
+                handler->ProcessEvent(event);
+            }
+            if (!isNeedSubmit) {
+                TELEPHONY_LOGD("%{public}s task no need to submit", name_.c_str());
                 return;
             }
-            auto event = PopEvent();
-            if (!event || event->GetOwner() == nullptr) {
-                TELEPHONY_LOGE("%{public}s handler not exit", name_.c_str());
-                SubmitInner(queueId);
-                return;
-            }
-            TELEPHONY_LOGD(
-                "%{public}s ProcessEvent eventId %{public}d", name_.c_str(), static_cast<uint32_t>(innerEventId));
-            static_cast<TelEventHandler *>(event->GetOwner().get())->ProcessEvent(event);
             SubmitInner(queueId);
         },
         ffrt::task_attr().delay(delayTime));
-    TELEPHONY_LOGD("%{public}s SubmitInner eventId %{public}u delayTime %{public}d finish", name_.c_str(), innerEventId,
-        static_cast<int32_t>(delayTime));
 }
 
 void TelEventQueue::RemoveEvent(uint32_t innerEventId)
@@ -172,34 +208,31 @@ bool TelEventQueue::IsEmpty()
     return true;
 }
 
-AppExecFwk::InnerEvent::Pointer TelEventQueue::PopEvent()
+AppExecFwk::InnerEvent::Pointer TelEventQueue::PopEvent(int32_t queueId, bool &isNeedSubmit)
 {
     std::lock_guard<std::mutex> lock(eventCtx_);
-    if (IsEmpty()) {
+    if (IsEmpty() || queueId != queueId_.load()) {
+        isNeedSubmit = false;
+        curHandleTime_ = AppExecFwk::InnerEvent::TimePoint::max();
         return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
     }
     uint32_t priorityIndex = GetPriorityIndex();
     AppExecFwk::InnerEvent::Pointer event = std::move(eventLists_[priorityIndex].events.front());
     eventLists_[priorityIndex].events.pop_front();
-    return event;
-}
-
-AppExecFwk::InnerEvent::Pointer &TelEventQueue::GetEvent()
-{
-    std::lock_guard<std::mutex> lock(eventCtx_);
     if (IsEmpty()) {
-        return nullPointer_;
+        isNeedSubmit = false;
+        curHandleTime_ = AppExecFwk::InnerEvent::TimePoint::max();
     }
-    return eventLists_[GetPriorityIndex()].events.front();
+    return event;
 }
 
 AppExecFwk::InnerEvent::TimePoint TelEventQueue::GetHandleTime()
 {
-    auto &event = GetEvent();
-    if (!event) {
+    std::lock_guard<std::mutex> lock(eventCtx_);
+    if (IsEmpty()) {
         return AppExecFwk::InnerEvent::TimePoint::max();
     }
-    return event->GetHandleTime();
+    return eventLists_[GetPriorityIndex()].events.front()->GetHandleTime();
 }
 
 uint32_t TelEventQueue::GetPriorityIndex()

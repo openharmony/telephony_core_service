@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -66,7 +66,12 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
         getNetworkStatusExt_ == nullptr || isNrSupportedNative_ == nullptr ||
         getNrOptionModeExtend_ == nullptr || getPreferredNetworkExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
-        return;
+    }
+    updateCountryCodeExt_ = (UPDATE_COUNTRY_CODE_EXT)dlsym(telephonyExtWrapperHandle_, "UpdateCountryCodeExt");
+    updateTimeZoneOffsetExt_ =
+        (UPDATE_TIME_ZONE_OFFSET_EXT)dlsym(telephonyExtWrapperHandle_, "UpdateTimeZoneOffsetExt");
+    if (updateCountryCodeExt_ == nullptr || updateTimeZoneOffsetExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
 }
 

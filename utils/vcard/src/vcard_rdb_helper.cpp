@@ -38,6 +38,46 @@ VCardRdbHelper &VCardRdbHelper::GetInstance()
     return instance;
 }
 
+int32_t VCardRdbHelper::QueryRawContactMaxId()
+{
+    std::vector<std::string> columns;
+    DataShare::DataSharePredicates predicates;
+    predicates.GreaterThanOrEqualTo(RawContact::ID, "1");
+    auto resultSet = QueryRawContact(columns, predicates);
+    if (resultSet == nullptr) {
+        TELEPHONY_LOGE("resultSet is nullptr");
+        return DB_FAILD;
+    }
+    int rowCount = 0;
+    resultSet->GetRowCount(rowCount);
+    TELEPHONY_LOGI("rowCount= %{public}d", rowCount);
+    return static_cast<int32_t>(rowCount);
+}
+
+int32_t VCardRdbHelper::BatchInsertRawContact(const std::vector<DataShare::DataShareValuesBucket> &rawContactValues)
+{
+    if (dataShareHelper_ == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper_ is nullptr");
+        return DB_FAILD;
+    }
+    Uri uriRawContactBatch(uriRawContact.ToString() + "?isFromBatch=true");
+    int code = dataShareHelper_->BatchInsert(uriRawContactBatch, rawContactValues);
+    TELEPHONY_LOGI("insert code %{public}d", code);
+    return code;
+}
+
+int32_t VCardRdbHelper::BatchInsertContactData(const std::vector<DataShare::DataShareValuesBucket> &contactsDataValues)
+{
+    if (dataShareHelper_ == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper_ is nullptr");
+        return DB_FAILD;
+    }
+    Uri uriContactDataBatch(uriContactData.ToString() + "?isFromBatch=true");
+    int code = dataShareHelper_->BatchInsert(uriContactDataBatch, contactsDataValues);
+    TELEPHONY_LOGI("insert code %{public}d", code);
+    return code;
+}
+
 int32_t VCardRdbHelper::InsertRawContact(const DataShare::DataShareValuesBucket &rawContactValues)
 {
     if (dataShareHelper_ == nullptr) {

@@ -303,6 +303,7 @@ public:
     std::shared_ptr<TelRilModem> GetTelRilModem(int32_t slotId);
     void SendAckAndLock(void);
     void ReduceRunningLock();
+    void ReleaseRunningLock();
 
 public:
     static const int32_t INVALID_WAKELOCK = -1;

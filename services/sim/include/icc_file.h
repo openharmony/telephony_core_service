@@ -85,6 +85,7 @@ public:
     virtual bool SetVoiceCallForwarding(bool enable, const std::string &number) = 0;
     virtual std::string GetVoiceMailNumber() = 0;
     virtual void SetVoiceMailNumber(const std::string mailNumber) = 0;
+    virtual void ProcessIccRefresh(int msgId) = 0;
     bool HasSimCard();
     void UnInit();
     void ClearData();
@@ -93,7 +94,6 @@ public:
     void LoadVoiceMail();
 
 protected:
-    virtual void ProcessIccRefresh(int msgId) = 0;
     virtual void ProcessFileLoaded(bool response) = 0;
     virtual void OnAllFilesFetched() = 0;
     bool LockQueriedOrNot();

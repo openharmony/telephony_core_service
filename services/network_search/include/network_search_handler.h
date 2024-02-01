@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -97,7 +97,7 @@ public:
     void TimezoneRefresh();
     void SetCellRequestMinInterval(uint32_t minInterval);
     int32_t GetRegServiceState(RegServiceState &regState);
-    void SetPreferredNetworkOnFirstInit(bool firstInit);
+    bool IsPowerOnPrimaryRadioWhenNoSim() const;
 
 private:
     void RadioOnState();
@@ -131,6 +131,7 @@ private:
     void RadioChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioVoiceTechChange(const AppExecFwk::InnerEvent::Pointer &event);
     void AutoTimeChange(const AppExecFwk::InnerEvent::Pointer &);
+    void AutoTimeZoneChange(const AppExecFwk::InnerEvent::Pointer &);
     void AirplaneModeChange(const AppExecFwk::InnerEvent::Pointer &);
     void RadioGetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &event);
     void SetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event);
@@ -168,6 +169,7 @@ private:
     uint32_t lastCellRequestTime_ = 0;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     sptr<ISatelliteCoreCallback> satelliteCallback_ = nullptr;
+    const int32_t INVALID_SLOT_ID = -1;
 
 private:
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {

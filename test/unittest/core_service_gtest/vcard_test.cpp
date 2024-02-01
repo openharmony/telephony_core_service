@@ -167,6 +167,22 @@ void WriteTestData(const std::string &testStr)
     file.close();
 }
 
+void WriteBigTestData(std::string &testStr, int32_t size)
+{
+    std::ofstream file(TEL_FILE_NAME, std::ios::trunc);
+    if (file.is_open()) {
+        for (int32_t i = 0; i < size; i++) {
+            std::stringstream ss(testStr);
+            std::string line;
+
+            while (std::getline(ss, line)) {
+                file << line << std::endl;
+            }
+        }
+    }
+    file.close();
+}
+
 void WriteTestDataWithFileName(const std::string &testStr, const std::string &fileName)
 {
     std::ofstream file(fileName.c_str(), std::ios::trunc);
@@ -494,9 +510,9 @@ std::string TestSimpleName(const std::string &name)
 HWTEST_F(VcardTest, Telephony_VCardTest_Name_001, Function | MediumTest | Level1)
 {
     auto value = TestSimpleName("测试11111test");
-    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=31="
-                       "31=31=31=31=74=65=73=74;;;;\r\nFN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95="
-                       "31=31=31=31=31=74=65=73=74\r\nEND:VCARD\r\n";
+    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:;=E6=B5=8B=E8=AF=95=31="
+                       "31=31=31=31=74=65=73=74;;;\r\nFN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=31="
+                       "31=31=31=31=74=65=73=74\r\nEND:VCARD\r\n";
     EXPECT_EQ(value, expectValue);
 }
 
@@ -510,7 +526,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_Name_002, Function | MediumTest | Level1
     auto value = TestSimpleName("test");
     EXPECT_EQ(value.empty(), false);
     WriteTestData(value);
-    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nN:test;;;;\r\nFN:test\r\nEND:VCARD\r\n";
+    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nN:;test;;;\r\nFN:test\r\nEND:VCARD\r\n";
     EXPECT_EQ(value, expectValue);
 }
 
@@ -676,8 +692,8 @@ HWTEST_F(VcardTest, Telephony_VCardTest_phone_001, Function | MediumTest | Level
     contact->phones_.push_back(data3);
     auto constructor = std::make_shared<VCardConstructor>();
     auto value = constructor->ContactVCard(contact);
-    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nTEL;HOME:1202020\r\nTEL;WORK;FAX:49305484\r\nTEL;X-Work:"
-                       "503330303030\r\nEND:VCARD\r\n";
+    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nTEL;TYPE=HOME:1202020\r\nTEL;TYPE=WORK;TYPE=FAX:49305484\r\nTEL;"
+                       "TYPE=X-Work:503330303030\r\nEND:VCARD\r\n";
     EXPECT_EQ(value, expectValue);
     constructor = std::make_shared<VCardConstructor>(ver);
     value = constructor->ContactVCard(contact);
@@ -839,10 +855,10 @@ HWTEST_F(VcardTest, Telephony_VCardTest_Photo_001, Function | MediumTest | Level
     auto constructor = std::make_shared<VCardConstructor>();
     auto value = constructor->ContactVCard(contact);
     auto expectValue =
-        "BEGIN:VCARD\r\nVERSION:2.1\r\nPHOTO;ENCODING=BASE64;JPEG:/9j/4QoPRXhpZgAATU0AKgAAAAgADQEOAAIAAAAPAAAAqgE\r\n "
-        "PAAIAAAAHAAAAugEQAAIAAAAGAAAAwgESAAMAAAABAAEAAAEaAAUAAAABAAAAyAEbAAUAAAAB\r\n "
-        "AAAA0AEoAAMAAAABAAIAAAExAAIAAAAOAAAA2AEyAAIAAAAUAAAA5gITAAMAAAABAAEAAIKYA\r\n "
-        "AIAAAAOAAAA+odpAAQAAAAB\r\n\r\nEND:VCARD\r\n";
+        "BEGIN:VCARD\r\nVERSION:2.1\r\nPHOTO;ENCODING=BASE64;TYPE=JPEG:/9j/4QoPRXhpZgAATU0AKgAAAAgADQEOAAIAAAAPAA\r\n "
+        "AAqgEPAAIAAAAHAAAAugEQAAIAAAAGAAAAwgESAAMAAAABAAEAAAEaAAUAAAABAAAAyAEbAAU\r\n "
+        "AAAABAAAA0AEoAAMAAAABAAIAAAExAAIAAAAOAAAA2AEyAAIAAAAUAAAA5gITAAMAAAABAAEA\r\n "
+        "AIKYAAIAAAAOAAAA+odpAAQAAAAB\r\n\r\nEND:VCARD\r\n";
     EXPECT_EQ(value, expectValue);
 }
 
@@ -874,9 +890,9 @@ HWTEST_F(VcardTest, Telephony_VCardTest_Email_001, Function | MediumTest | Level
     contact->emails_.push_back(data3);
     auto constructor = std::make_shared<VCardConstructor>();
     auto value = constructor->ContactVCard(contact);
-    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nEMAIL;X-custom:test@670.com;test\r\nEMAIL;HOME;CHARSET=UTF-8;"
-                       "ENCODING=QUOTED-PRINTABLE:=74=65=73=74=32=40=36=37=30=2E=63=6F=6D;=E6=B5=8B=E8=AF=95\r\nEMAIL;"
-                       "WORK:test3@670.com;test3\r\nEND:VCARD\r\n";
+    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nEMAIL;TYPE=X-custom:test@670.com;test\r\nEMAIL;TYPE=HOME;CHARSET="
+                       "UTF-8;ENCODING=QUOTED-PRINTABLE:=74=65=73=74=32=40=36=37=30=2E=63=6F=6D;=E6=B5=8B=E8=AF="
+                       "95\r\nEMAIL;TYPE=WORK:test3@670.com;test3\r\nEND:VCARD\r\n";
     EXPECT_EQ(value, expectValue);
 }
 
@@ -989,12 +1005,12 @@ HWTEST_F(VcardTest, Telephony_VCardTest_PostalData_001, Function | MediumTest | 
     contact->postals_.push_back(data4);
     auto constructor = std::make_shared<VCardConstructor>();
     auto value = constructor->ContactVCard(contact);
-    auto expectValue =
-        "BEGIN:VCARD\r\nVERSION:2.1\r\nADR;HOME:testpobox;;testStreee;testCity;testRegion;test101010;"
-        "ttttcountry\r\nADR;HOME;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=70=6F=62=6F=78;;=E6=B5=8B="
-        "E8=AF=95=53=74=72=65=65=65;=E6=B5=8B=E8=AF=95=43=69=74=79;=E6=B5=8B=E8=AF=95=52=65=67=69=6F=6E;=31=30=31=30="
-        "31=30;=E6=B5=8B=E8=AF=95=74=74=74=74=63=6F=75=6E=74=72=79\r\nADR;HOME:;addresss;;;;;\r\nADR;HOME;CHARSET=UTF-"
-        "8;ENCODING=QUOTED-PRINTABLE:;=E6=B5=8B=E8=AF=95=61=64=64=72=65=73=73=73;;;;;\r\nEND:VCARD\r\n";
+    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nADR;TYPE=HOME:testpobox;;testStreee;testCity;testRegion;"
+                       "test101010;ttttcountry\r\nADR;TYPE=HOME;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8="
+                       "AF=95=70=6F=62=6F=78;;=E6=B5=8B=E8=AF=95=53=74=72=65=65=65;=E6=B5=8B=E8=AF=95=43=69=74=79;=E6="
+                       "B5=8B=E8=AF=95=52=65=67=69=6F=6E;=31=30=31=30=31=30;=E6=B5=8B=E8=AF=95=74=74=74=74=63=6F=75=6E="
+                       "74=72=79\r\nADR;TYPE=HOME:;addresss;;;;;\r\nADR;TYPE=HOME;CHARSET=UTF-8;ENCODING=QUOTED-"
+                       "PRINTABLE:;=E6=B5=8B=E8=AF=95=61=64=64=72=65=73=73=73;;;;;\r\nEND:VCARD\r\n";
     EXPECT_EQ(value, expectValue);
 }
 
@@ -1144,13 +1160,13 @@ BEGIN:VCARD
 VERSION:2.1
 N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=31;;;;
 FN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=31
-TEL;:18770000001
+TEL;TYPE=CELL;:18770000001
 END:VCARD
 BEGIN:VCARD
 VERSION:2.1
 N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=32;;;;
 FN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=32
-TEL;:18770000002
+TEL;TYPE=CELL;:18770000002
 END:VCARD
 )";
     WriteTestData(inputString2);
@@ -1295,6 +1311,24 @@ HWTEST_F(VcardTest, Telephony_VCardTest_Multi_Thread_Export, Function | MediumTe
         thread.join();
     }
     EXPECT_NE(fileName.c_str(), "test");
+}
+
+HWTEST_F(VcardTest, Telephony_VCardTest_BigData_Import, Function | MediumTest | Level2)
+{
+    TELEPHONY_LOGI("VcardTest Telephony_VCardTest_BigData_Import");
+    std::string inputString = "BEGIN:VCARD\r\nVERSION:4.0\r\nN:test3;;;;\r\nFN:test3\r\nEND:VCARD\r\n";
+    int testNum = 10000;
+    WriteBigTestData(inputString, testNum);
+    AccessToken token;
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
+        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
+    if (dataShareHelper != nullptr) {
+        int32_t errorCode = VCardManager::GetInstance().ImportLock(TEL_FILE_NAME, dataShareHelper, 0);
+        EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
+    } else {
+        TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
+        EXPECT_TRUE(true);
+    }
 }
 
 } // namespace Telephony

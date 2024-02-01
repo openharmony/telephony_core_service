@@ -91,7 +91,7 @@ int32_t VCardManager::Import(const std::string &path, int32_t accountId)
         TELEPHONY_LOGE("Failed to decode");
         return errorCode;
     }
-    InsertContactDbAbility(accountId, errorCode);
+    BatchInsertContactDbAbility(accountId, errorCode);
     if (errorCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Failed to insert ability");
         return errorCode;
@@ -136,6 +136,104 @@ void VCardManager::InsertContactDbAbility(int32_t accountId, int32_t &errorCode)
             errorCode = TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
     }
+}
+
+void VCardManager::BatchInsertContactDbAbility(int32_t accountId, int32_t &errorCode)
+{
+    if (listener_ == nullptr) {
+        errorCode = TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return;
+    }
+    if (listener_->GetContacts().size() < BATCH_INSERT_MAX_SIZE) {
+        TELEPHONY_LOGI("contactData < BATCH_INSERT_MAX_SIZE");
+        InsertContactDbAbility(accountId, errorCode);
+        return;
+    }
+    if (listener_->GetContacts().size() == 0) {
+        errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
+        return;
+    }
+    std::vector<std::vector<std::shared_ptr<VCardContact>>> splitList =
+        SplitContactsVector(listener_->GetContacts(), BATCH_INSERT_MAX_SIZE);
+    TELEPHONY_LOGI(
+        "contactData > BATCH_INSERT_MAX_SIZE, split List size %{public}d", static_cast<int32_t>(splitList.size()));
+    for (std::vector<std::shared_ptr<VCardContact>> list : splitList) {
+        TELEPHONY_LOGI("List size %{public}d", static_cast<int32_t>(list.size()));
+        std::vector<int32_t> rawIds;
+        BatchInsertRawContact(accountId, list.size(), rawIds, errorCode);
+        if (errorCode == TELEPHONY_ERROR) {
+            TELEPHONY_LOGE("Failed to batch insert raw contact");
+            continue;
+        }
+        BatchInsertContactData(rawIds, list, errorCode);
+        if (errorCode == TELEPHONY_ERROR) {
+            TELEPHONY_LOGE("Failed to batch insert contactData");
+            continue;
+        }
+    }
+}
+
+void VCardManager::BatchInsertRawContact(
+    int32_t accountId, uint32_t size, std::vector<int32_t> &rawIds, int32_t &errorCode)
+{
+    int32_t rawContactMaxId = VCardRdbHelper::GetInstance().QueryRawContactMaxId();
+    std::vector<DataShare::DataShareValuesBucket> rawContactValues;
+    for (uint32_t i = 0; i < size; i++) {
+        OHOS::DataShare::DataShareValuesBucket valuesBucket;
+        valuesBucket.Put(RawContact::ACCOUNT_ID, GetAccountId());
+        if (IsContactsIdExit(accountId)) {
+            valuesBucket.Put(RawContact::CONTACT_ID, accountId);
+        }
+        rawContactValues.push_back(valuesBucket);
+        rawIds.push_back(rawContactMaxId + i + 1);
+    }
+    VCardRdbHelper::GetInstance().BatchInsertRawContact(rawContactValues);
+}
+
+void VCardManager::BatchInsertContactData(
+    std::vector<int32_t> &rawIds, const std::vector<std::shared_ptr<VCardContact>> &contactList, int32_t &errorCode)
+{
+    std::vector<DataShare::DataShareValuesBucket> contactDataValues;
+    for (size_t i = 0; i < rawIds.size(); i++) {
+        int32_t rawId = rawIds[i];
+        TELEPHONY_LOGI("rawId %{public}d", rawId);
+        std::shared_ptr<VCardContact> contact = contactList[i];
+        if (contact == nullptr) {
+            errorCode = TELEPHONY_ERROR;
+            TELEPHONY_LOGE("contact is nullptr");
+            continue;
+        }
+        contact->BuildContactData(rawId, contactDataValues);
+        if (contactDataValues.empty()) {
+            TELEPHONY_LOGE("no contactData insert");
+            errorCode = TELEPHONY_ERROR;
+        }
+    }
+    int ret = VCardRdbHelper::GetInstance().BatchInsertContactData(contactDataValues);
+    if (ret == TELEPHONY_ERROR) {
+        TELEPHONY_LOGE("batch insert contactDatat failed");
+        errorCode = TELEPHONY_ERROR;
+    }
+}
+
+std::vector<std::vector<std::shared_ptr<VCardContact>>> VCardManager::SplitContactsVector(
+    std::vector<std::shared_ptr<VCardContact>> list, size_t step)
+{
+    std::vector<std::vector<std::shared_ptr<VCardContact>>> result;
+    if (step >= list.size()) {
+        result.push_back(list);
+    } else {
+        std::vector<std::shared_ptr<VCardContact>>::iterator curPtr = list.begin();
+        std::vector<std::shared_ptr<VCardContact>>::iterator endPtr = list.end();
+        std::vector<std::shared_ptr<VCardContact>>::iterator end;
+        while (curPtr < endPtr) {
+            end = static_cast<size_t>(endPtr - curPtr) > step ? (step + curPtr) : endPtr;
+            step = static_cast<size_t>(endPtr - curPtr) > step ? step : (endPtr - curPtr);
+            result.push_back(std::vector<std::shared_ptr<VCardContact>>(curPtr, end));
+            curPtr += step;
+        }
+    }
+    return result;
 }
 
 int32_t VCardManager::InsertRawContact(int32_t accountId)

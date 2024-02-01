@@ -55,17 +55,19 @@ public:
     };
 
 private:
-    void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
-    void RefreshData(int32_t slotId);
-    void InitData(int32_t slotId);
-    bool IsValidSlotId(int32_t slotId);
-
-private:
     struct SimAccountCallbackRecord {
         std::string bundleName = "";
         sptr<SimAccountCallback> simAccountCallback = nullptr;
     };
 
+private:
+    void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    void RefreshData(int32_t slotId);
+    void InitData(int32_t slotId);
+    bool IsValidSlotId(int32_t slotId);
+    std::list<SimAccountCallbackRecord> GetSimAccountCallbackRecords();
+
+private:
     std::shared_ptr<MultiSimController> controller_ = nullptr;
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager_;

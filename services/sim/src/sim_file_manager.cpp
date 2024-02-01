@@ -118,6 +118,7 @@ void SimFileManager::Init(int slotId)
 
     simStateManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_CARD_TYPE_CHANGE);
     telRilManager->RegisterCoreNotify(slotId, shared_from_this(), RadioEvent::RADIO_VOICE_TECH_CHANGED, nullptr);
+    telRilManager->RegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_ICC_REFRESH, nullptr);
     TELEPHONY_LOGI("SimFileManager::Init() end");
 }
 
@@ -758,6 +759,15 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         case RadioEvent::RADIO_SIM_RECORDS_LOADED: {
             TELEPHONY_LOGI("SimFileManager::ProcessEvent, handle sim records loaded event");
             HandleSimRecordsLoaded();
+            break;
+        }
+        case RadioEvent::RADIO_ICC_REFRESH: {
+            TELEPHONY_LOGI("SimFileManager::ProcessEvent, handle sim refresh event");
+            if (simFile_ == nullptr) {
+                TELEPHONY_LOGE("simFile_ is null");
+                return;
+            }
+            simFile_->ProcessIccRefresh(MSG_ID_DEFAULT);
             break;
         }
         default:

@@ -736,7 +736,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_002, Function | MediumTest | Level1
     bool enable = true;
     std::string number = "00000000000";
     simFile->SetVoiceCallForwarding(enable, number);
-    std::vector<std::string> records = { "46000" };
+    std::vector<std::string> records = { "460000", "01AABBCCDD" };
     simFile->ParsePnn(records);
     ASSERT_FALSE(simFile->EfCfisAvailable(0));
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,8 +20,8 @@
 #include "mcc_pool.h"
 #include "network_search_manager.h"
 #include "satellite_service_client.h"
+#include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
-#include "time_zone_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -72,6 +72,7 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
     { RadioEvent::RADIO_RESIDENT_NETWORK_CHANGE, &NetworkSearchHandler::RadioResidentNetworkChange },
     { RadioEvent::RADIO_GET_NR_SSBID_INFO, &NetworkSearchHandler::GetNrSsbIdResponse },
     { SettingEventCode::MSG_AUTO_TIME, &NetworkSearchHandler::AutoTimeChange },
+    { SettingEventCode::MSG_AUTO_TIMEZONE, &NetworkSearchHandler::AutoTimeZoneChange },
     { SettingEventCode::MSG_AUTO_AIRPLANE_MODE, &NetworkSearchHandler::AirplaneModeChange },
     { RadioEvent::SATELLITE_STATUS_CHANGED, &NetworkSearchHandler::SatelliteStatusChanged }
 };
@@ -361,7 +362,6 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
             break;
         }
         case CORE_SERVICE_POWER_ON: {
-            SetPreferredNetworkOnFirstInit(firstInit_);
             firstInit_ = false;
             InitGetNetworkSelectionMode();
             RadioOnState();
@@ -413,6 +413,9 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
     if (networkRegister_ != nullptr) {
         networkRegister_->ProcessPsRegister(event);
     }
+    if (operatorName_ != nullptr) {
+        operatorName_->TrySetLongOperatorNameWithTranslation();
+    }
     TELEPHONY_LOGD("NetworkSearchHandler::RadioRilDataRegState slotId:%{public}d", slotId_);
 }
 
@@ -430,6 +433,9 @@ void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::P
     }
     if (networkRegister_ != nullptr) {
         networkRegister_->ProcessCsRegister(event);
+    }
+    if (operatorName_ != nullptr) {
+        operatorName_->TrySetLongOperatorNameWithTranslation();
     }
     TELEPHONY_LOGD("NetworkSearchHandler::RadioRilVoiceRegState slotId:%{public}d", slotId_);
 }
@@ -496,7 +502,6 @@ void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Poi
             RadioOffOrUnavailableState(radioState);
             break;
         case CORE_SERVICE_POWER_ON: {
-            SetPreferredNetworkOnFirstInit(firstInit_);
             firstInit_ = false;
             RadioOnState();
             break;
@@ -543,7 +548,7 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
     }
     bool hasSim = false;
     simManager->HasSimCard(slotId_, hasSim);
-    if (hasSim && !isAirplaneModeOn && radioState == CORE_SERVICE_POWER_OFF) {
+    if (!isAirplaneModeOn && (hasSim || IsPowerOnPrimaryRadioWhenNoSim()) && radioState == CORE_SERVICE_POWER_OFF) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
     }
     sptr<NetworkSearchCallBackBase> cellularData = networkSearchManager->GetCellularDataCallBack();
@@ -1123,6 +1128,14 @@ void NetworkSearchHandler::AutoTimeChange(const AppExecFwk::InnerEvent::Pointer 
     }
 }
 
+void NetworkSearchHandler::AutoTimeZoneChange(const AppExecFwk::InnerEvent::Pointer &)
+{
+    TELEPHONY_LOGD("NetworkSearchHandler::AutoTimeZoneChange");
+    if (nitzUpdate_ != nullptr) {
+        nitzUpdate_->AutoTimeZoneChange();
+    }
+}
+
 void NetworkSearchHandler::AirplaneModeChange(const AppExecFwk::InnerEvent::Pointer &)
 {
     TELEPHONY_LOGD("NetworkSearchHandler::AirplaneModeChange");
@@ -1167,9 +1180,17 @@ void NetworkSearchHandler::RadioResidentNetworkChange(const AppExecFwk::InnerEve
             TELEPHONY_LOGE("RadioResidentNetworkChange parse Failed!! slotId:%{public}d", slotId_);
         }
     }
-    if (!countryCode.empty()) {
-        TELEPHONY_LOGI("RadioResidentNetworkChange: update countryCode[%{public}s]", countryCode.c_str());
-        TimeZoneManager::GetInstance().UpdateCountryCode(countryCode, slotId_);
+    if (countryCode.empty()) {
+        TELEPHONY_LOGE("RadioResidentNetworkChange countryCode is empty");
+        return;
+    }
+    TELEPHONY_LOGI("RadioResidentNetworkChange: update countryCode[%{public}s]", countryCode.c_str());
+    if (TELEPHONY_EXT_WRAPPER.updateCountryCodeExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.updateCountryCodeExt_(slotId_, countryCode.c_str());
+    } else {
+        if (nitzUpdate_ != nullptr) {
+            nitzUpdate_->UpdateCountryCode(countryCode);
+        }
     }
 }
 
@@ -1239,18 +1260,26 @@ void NetworkSearchHandler::SystemAbilityStatusChangeListener::OnRemoveSystemAbil
     TELEPHONY_LOGI("NetworkSearchHandler::OnRemoveSystemAbility subscribeResult = %{public}d", subscribeResult);
 }
 
-
-void NetworkSearchHandler::SetPreferredNetworkOnFirstInit(bool firstInit)
+bool NetworkSearchHandler::IsPowerOnPrimaryRadioWhenNoSim() const
 {
-    if (firstInit) {
-        std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-        if (nsm == nullptr) {
-            TELEPHONY_LOGE("failed to get NetworkSearchManager");
-            return;
-        }
-        TELEPHONY_LOGI("SetPreferredNetwork on firstInit");
-        nsm->SetPreferredNetwork(slotId_, PREFERRED_NETWORK_TYPE);
+    TELEPHONY_LOGD("Start to check if power on primary modem's radio when sim slots are empty");
+    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
+    if (nsm == nullptr) {
+        TELEPHONY_LOGE("get networkSearchManager is failed");
+        return false;
     }
+    auto simManager = nsm->GetSimManager();
+    if (simManager == nullptr) {
+        TELEPHONY_LOGE("get simManager is failed");
+        return false;
+    }
+    int32_t primarySlotId = INVALID_SLOT_ID;
+    simManager->GetPrimarySlotId(primarySlotId);
+    if (primarySlotId != INVALID_SLOT_ID && primarySlotId == slotId_) {
+        TELEPHONY_LOGD("primarySlotId = %{public}d, send radio on request", primarySlotId);
+        return true;
+    }
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS
