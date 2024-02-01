@@ -30,6 +30,7 @@ namespace {
 const int32_t ICC_CARD_STATE_ABSENT = 0;
 const int32_t ICC_CARD_STATE_PRESENT = 1;
 const int32_t WAIT_TIME_SECOND = 2; // Set the timeout for sending the stk command
+const int32_t REFRESH_RESULT_FILE_UPDATE = 0;
 const std::string PARAM_SLOTID = "slotId";
 const std::string PARAM_MSG_CMD = "msgCmd";
 const std::string PARAM_CARD_STATUS = "cardStatus";
@@ -239,11 +240,12 @@ void StkController::OnSendRilEventNotify(const AppExecFwk::InnerEvent::Pointer &
 void StkController::OnIccRefresh(const AppExecFwk::InnerEvent::Pointer &event) const
 {
     auto refreshResult = event->GetSharedObject<int32_t>();
+    int32_t result = REFRESH_RESULT_FILE_UPDATE;
     if (refreshResult == nullptr) {
         TELEPHONY_LOGE("StkController[%{public}d]::OnIccRefresh() refreshResult is nullptr", slotId_);
-        return;
+    } else {
+        result = (int32_t)*refreshResult;
     }
-    int32_t result = (int32_t)*refreshResult;
     AAFwk::Want want;
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_STK_CARD_STATE_CHANGED);
     want.SetParam(PARAM_SLOTID, slotId_);
