@@ -148,7 +148,7 @@ bool MultiSimController::InitPrimary()
         return false;
     }
     if (!IsAllModemInitDone()) {
-        TELEPHONY_LOGI("wait for the other modem int");
+        TELEPHONY_LOGI("wait for the other modem init");
         return false;
     }
     unInitModemSlotId_ = INVALID_VALUE;
