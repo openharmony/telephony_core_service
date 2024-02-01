@@ -2801,6 +2801,8 @@ HWTEST_F(BranchTest, Telephony_IccFile_002, Function | MediumTest | Level1) {
     EXPECT_EQ(iccId, "2143BA65FT");
     std::string langData = "";
     EXPECT_EQ(iccFile->ObtainValidLanguage(langData), "");
+    langData = "000011286F050400000000010203FF";
+    EXPECT_EQ(iccFile->ObtainValidLanguage(langData), "");
 }
 
 /**
