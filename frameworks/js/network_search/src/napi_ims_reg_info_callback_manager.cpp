@@ -63,12 +63,6 @@ int32_t NapiImsRegInfoCallbackManager::UnregisterImsRegStateCallback(
     return ret;
 }
 
-std::list<ImsRegStateCallback> NapiImsRegInfoCallbackManager::GetImsRegCallbackList()
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    return listImsRegStateCallback_;
-}
-
 int32_t NapiImsRegInfoCallbackManager::InsertImsRegCallback(
     int32_t slotId, ImsServiceType imsSrvType, ImsRegStateCallback &stateCallback)
 {
@@ -102,8 +96,8 @@ int32_t NapiImsRegInfoCallbackManager::ReportImsRegInfo(
     int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info)
 {
     int32_t ret = TELEPHONY_ERROR;
-    auto imsRegCallbackList = GetImsRegCallbackList();
-    for (auto iter : imsRegCallbackList) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (auto iter : listImsRegStateCallback_) {
         if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType)) {
             ret = ReportImsRegInfoInner(iter, info);
             break;
