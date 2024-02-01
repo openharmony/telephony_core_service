@@ -294,7 +294,7 @@ std::string SIMUtils::Decode8BitConvertToString(unsigned char *data, int length,
         }
     }
     i -= offset;
-    std::string str((char *)data, offset, i);
+    std::string str(reinterpret_cast<char *>(data), offset, i);
     TELEPHONY_LOGI("8bit decode result");
     return str;
 }
