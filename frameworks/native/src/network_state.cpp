@@ -388,5 +388,14 @@ NrState NetworkState::GetNrState() const
 {
     return nrState_;
 }
+
+void NetworkState::SetLongOperatorName(const std::string &longName, DomainType domainType)
+{
+    if (domainType == DomainType::DOMAIN_TYPE_PS) {
+        psOperatorInfo_.fullName = longName;
+    } else {
+        csOperatorInfo_.fullName = longName;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

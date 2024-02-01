@@ -466,5 +466,14 @@ void NetworkSearchState::CsRadioTechChange()
         networkSearchManager->UpdatePhone(slotId_, networkState_->GetCsRadioTech(), networkState_->GetPsRadioTech());
     }
 }
+
+void NetworkSearchState::SetLongOperatorName(const std::string &longName, DomainType domainType)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (networkState_ != nullptr) {
+        networkState_->SetLongOperatorName(longName, domainType);
+        TELEPHONY_LOGD("NetworkSearchState::SetLongOperatorName longName : %{public}s", longName.c_str());
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

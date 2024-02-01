@@ -196,6 +196,16 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     SendEnvelopeCmd(data, size);
     GetNetworkCapability(data, size);
     SetNetworkCapability(data, size);
+    auto telRilManager = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
+    if (telRilManager == nullptr) {
+        return;
+    }
+    auto handler = telRilManager->handler_;
+    if (handler != nullptr) {
+        handler->RemoveAllEvents();
+        handler->SendEvent(0, 0, AppExecFwk::EventQueue::Priority::HIGH);
+        sleep(SLEEP_TIME_SECONDS);
+    }
 }
 } // namespace OHOS
 

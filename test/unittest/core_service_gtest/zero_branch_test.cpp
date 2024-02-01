@@ -529,6 +529,7 @@ HWTEST_F(BranchTest, Telephony_SimFile_001, Function | MediumTest | Level1)
     simFile->InitMemberFunc();
     simFile->ProcessFileLoaded(false);
     simFile->ProcessFileLoaded(true);
+    simFile->ProcessIccRefresh(MSG_ID_DEFAULT);
     simFile->ProcessIccRefresh(ELEMENTARY_FILE_MBDN);
     simFile->ProcessIccRefresh(ELEMENTARY_FILE_MAILBOX_CPHS);
     simFile->ProcessIccRefresh(ELEMENTARY_FILE_CSP_CPHS);
@@ -1211,7 +1212,6 @@ HWTEST_F(BranchTest, Telephony_TagService_001, Function | MediumTest | Level1)
 HWTEST_F(BranchTest, Telephony_SimSmsController_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("SimSmsController");
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::SimSmsController> simSmsController = std::make_shared<SimSmsController>(simStateManager);
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -1314,7 +1314,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
     EXPECT_NE(multiSimController->GetFirstActivedSlotId(), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->UpdateDataByIccId(0, testStr), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->InsertData(0, testStr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(multiSimController->GetIccId(0), u"");
 }
 
 /**
@@ -1326,7 +1325,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    simManager->SetNetworkSearchManager(nullptr);
     std::u16string testStr = u"";
     EXPECT_GT(simManager->SetShowNumber(0, testStr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->SetShowNumber(INVALID_SLOTID, testStr), TELEPHONY_ERR_SUCCESS);
@@ -1510,7 +1508,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_005, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    simManager->SetNetworkSearchManager(nullptr);
     std::string password = "1234";
     LockStatusResponse mLockStatusResponse;
     EXPECT_GT(simManager->UnlockPin(0, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
@@ -1797,6 +1794,7 @@ HWTEST_F(BranchTest, Telephony_OperatorName_001, Function | MediumTest | Level1)
     operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
     operatorName->GsmOperatorInfo(event);
     operatorName->HandleOperatorInfo(event);
+    operatorName->TrySetLongOperatorNameWithTranslation();
     operatorName->NotifySpnChanged();
     operatorName->CdmaOperatorInfo(event);
     event = nullptr;
@@ -1847,6 +1845,7 @@ HWTEST_F(BranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
     operatorResult->flag = NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR, operatorResult);
     operatorName->HandleOperatorInfo(event);
+    operatorName->TrySetLongOperatorNameWithTranslation();
 }
 
 /**
@@ -1891,6 +1890,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchState_001, Function | MediumTest | L
     networkSearchState->SetCfgTech(RadioTech::RADIO_TECHNOLOGY_EVDO);
     networkSearchState->SetImsStatus(true);
     networkSearchState->SetImsStatus(false);
+    networkSearchState->SetLongOperatorName(longName, DomainType::DOMAIN_TYPE_PS);
     networkSearchState->NotifyPsRegStatusChange();
     networkSearchState->NotifyPsRoamingStatusChange();
     networkSearchState->NotifyPsRadioTechChange();
@@ -2185,6 +2185,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_006, Function | MediumTest |
     nsm->SetBasebandVersion(INVALID_SLOTID, "");
     nsm->ConvertNetworkModeToCapabilityType(CORE_NETWORK_MODE_NR);
     nsm->ConvertNetworkModeToCapabilityType(-1);
+    nsm->GetImsRegInfoCallbackRecords();
     EXPECT_EQ(nsm->GetFrequencyType(INVALID_SLOTID), FrequencyType::FREQ_TYPE_UNKNOWN);
 }
 
@@ -2292,6 +2293,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_002, Function | MediumTest |
     networkSearchHandler->SimStateChange(event);
     networkSearchHandler->SimRecordsLoaded(event);
     networkSearchHandler->AutoTimeChange(event);
+    networkSearchHandler->AutoTimeZoneChange(event);
     networkSearchHandler->AirplaneModeChange(event);
     networkSearchHandler->RadioGetBasebandVersion(event);
     networkSearchHandler->SetNrOptionModeResponse(event);
@@ -2352,7 +2354,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_003, Function | MediumTest |
     EXPECT_EQ(networkSearchHandler->GetRegServiceState(regState), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(networkSearchHandler->HandleRrcStateChanged(status), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(networkSearchHandler->RevertLastTechnology(), TELEPHONY_ERR_SUCCESS);
-    networkSearchHandler->SetPreferredNetworkOnFirstInit(true);
+    networkSearchHandler->IsPowerOnPrimaryRadioWhenNoSim();
 }
 
 /**
@@ -2661,7 +2663,36 @@ HWTEST_F(BranchTest, Telephony_SIMUtils_001, Function | MediumTest | Level1)
     EXPECT_NE(simUtils->Gsm7bitConvertToString(bytes, 1), "");
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(bytesTwo, 0, 0, 1), "");
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(nullptr, 0, 1, 1), "");
-    EXPECT_EQ(simUtils->UcsCodeConvertToString(bytesTwo, 0, BYTES_LENGTH, 1), "");
+}
+
+/**
+ * @tc.number   Telephony_SIMUtils_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SIMUtils_002, Function | MediumTest | Level1)
+{
+    auto simUtils = std::make_shared<SIMUtils>();
+    unsigned char *data(new unsigned char[5] { 0x81, 0x02, 0xA9, 0xC8, 0xC8 });
+    EXPECT_EQ(
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data), 0, 5, 0), "哈哈");
+    unsigned char *data2(new unsigned char[4] { 0x81, 0x01, 0xAA, 0xCA });
+    EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data2), 0, 4, 0), "啊");
+    unsigned char *data3(new unsigned char[6] { 0x81, 0x03, 0xCE, 0xDC, 0xDC, 0xDC });
+    EXPECT_EQ(
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data3), 0, 6, 0), "杜杜杜");
+    unsigned char *data4(new unsigned char[6] { 0x82, 0x02, 0x4E, 0x2A, 0xE2, 0x80 });
+    EXPECT_EQ(
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data4), 0, 6, 0), "二个");
+    unsigned char *data5(new unsigned char[11] { 0x82, 0x07, 0x82, 0x80, 0x38, 0x30, 0x32, 0x35, 0x45, 0x46, 0xB3 });
+    EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data5), 0, 11, 0),
+        "8025EF芳");
+    unsigned char *data6(new unsigned char[5] { 0x80, 0x4E, 0x2D, 0x56, 0xFD });
+    EXPECT_EQ(
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data6), 0, 5, 0), "中国");
+    unsigned char *data7(new unsigned char[9] { 0x80, 0x67, 0x5C, 0x00, 0x31, 0x00, 0x30, 0x5A, 0x18 });
+    EXPECT_EQ(
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data7), 0, 9, 0), "杜10娘");
 }
 
 /**
@@ -2769,6 +2800,8 @@ HWTEST_F(BranchTest, Telephony_IccFile_002, Function | MediumTest | Level1) {
     iccFile->GetFullIccid(iccId);
     EXPECT_EQ(iccId, "2143BA65FT");
     std::string langData = "";
+    EXPECT_EQ(iccFile->ObtainValidLanguage(langData), "");
+    langData = "000011286F050400000000010203FF";
     EXPECT_EQ(iccFile->ObtainValidLanguage(langData), "");
 }
 

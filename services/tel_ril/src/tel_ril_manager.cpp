@@ -59,6 +59,7 @@ bool TelRilManager::DeInit()
 
 bool TelRilManager::ConnectRilInterface()
 {
+    std::lock_guard<std::mutex> lock_l(mutex_);
     rilInterface_ = HDI::Ril::V1_2::IRil::Get();
     if (rilInterface_ == nullptr) {
         TELEPHONY_LOGE("TelRilManager not find RilInterfaceService");
@@ -81,6 +82,15 @@ void TelRilManager::ReduceRunningLock()
         return;
     }
     handler_->ReduceRunningLock(TelRilHandler::NORMAL_RUNNING_LOCK);
+}
+
+void TelRilManager::ReleaseRunningLock()
+{
+    if (handler_ == nullptr) {
+        TELEPHONY_LOGE("handler_ is null");
+        return;
+    }
+    handler_->ReleaseRunningLock(TelRilHandler::NORMAL_RUNNING_LOCK);
 }
 
 void TelRilManager::SendAckAndLock(void)
@@ -925,6 +935,7 @@ void TelRilManager::HandleRilInterfaceStatusCallback(const OHOS::HDI::ServiceMan
                 GetTelRilModem(slotId)->OnRilAdapterHostDied();
             }
         }
+        ReleaseRunningLock();
         TELEPHONY_LOGI("TelRilManager::HandleRilInterfaceCallback, disconnect riladapter service successfully!");
         return;
     }
@@ -999,6 +1010,7 @@ bool TelRilManager::ReConnectRilInterface()
 
 bool TelRilManager::DisConnectRilInterface()
 {
+    std::lock_guard<std::mutex> lock_l(mutex_);
     if (rilInterface_ == nullptr) {
         TELEPHONY_LOGD("TelRilManager::DisConnectRilInterface has been successfully disconnected!");
         return true;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,11 +24,13 @@
 #include "enum_convert.h"
 #include "mcc_pool.h"
 #include "network_search_types.h"
+#include "operator_name_utils.h"
 #include "parameter.h"
 #include "satellite_service_client.h"
 #include "telephony_common_utils.h"
 #include "telephony_config.h"
 #include "telephony_errors.h"
+#include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_ext_wrapper.h"
 
@@ -114,6 +116,15 @@ bool NetworkSearchManagerInner::RegisterSetting()
     Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
     settingHelper->RegisterSettingsObserver(autoTimeUri, settingAutoTimeObserver_);
     settingHelper->RegisterSettingsObserver(airplaneModeUri, airplaneModeObserver_);
+    if (TELEPHONY_EXT_WRAPPER.updateCountryCodeExt_ == nullptr) {
+        settingAutoTimezoneObserver_ = new AutoTimezoneObserver(networkSearchHandler_);
+        if (settingAutoTimezoneObserver_ == nullptr) {
+            TELEPHONY_LOGE("NetworkSearchManager::RegisterSetting is null.");
+            return false;
+        }
+        Uri autoTimezoneUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI);
+        settingHelper->RegisterSettingsObserver(autoTimezoneUri, settingAutoTimezoneObserver_);
+    }
     return true;
 }
 
@@ -129,6 +140,10 @@ bool NetworkSearchManagerInner::UnRegisterSetting()
     Uri airplaneModeUri(SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI);
     settingHelper->UnRegisterSettingsObserver(autoTimeUri, settingAutoTimeObserver_);
     settingHelper->UnRegisterSettingsObserver(airplaneModeUri, airplaneModeObserver_);
+    if (settingAutoTimezoneObserver_ != nullptr) {
+        Uri autoTimezoneUri(SettingUtils::NETWORK_SEARCH_SETTING_AUTO_TIMEZONE_URI);
+        settingHelper->UnRegisterSettingsObserver(autoTimezoneUri, settingAutoTimezoneObserver_);
+    }
     return true;
 }
 
@@ -492,16 +507,20 @@ int32_t NetworkSearchManager::GetOperatorName(int32_t slotId, std::u16string &op
 {
     operatorName = u"";
     auto inner = FindManagerInner(slotId);
-    if (inner != nullptr) {
-        if (inner->networkSearchState_ != nullptr && inner->networkSearchState_->GetNetworkStatus() != nullptr) {
-            auto longOperatorName = inner->networkSearchState_->GetNetworkStatus()->GetLongOperatorName();
-            operatorName = Str8ToStr16(longOperatorName);
-            TELEPHONY_LOGD("NetworkSearchManager::GetOperatorName result:%{public}s slotId:%{public}d",
-                longOperatorName.c_str(), slotId);
-            return TELEPHONY_ERR_SUCCESS;
-        }
+    if (inner == nullptr) {
+        return TELEPHONY_ERR_SLOTID_INVALID;
     }
-    return TELEPHONY_ERR_SLOTID_INVALID;
+    if (inner->networkSearchState_ == nullptr) {
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+    if (inner->networkSearchState_->GetNetworkStatus() == nullptr) {
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+    auto longOperatorName = inner->networkSearchState_->GetNetworkStatus()->GetLongOperatorName();
+    operatorName = Str8ToStr16(longOperatorName);
+    TELEPHONY_LOGD("NetworkSearchManager::GetOperatorName result:%{public}s slotId:%{public}d",
+        longOperatorName.c_str(), slotId);
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t NetworkSearchManager::GetNetworkStatus(int32_t slotId, sptr<NetworkState> &networkState)
@@ -1544,7 +1563,7 @@ int32_t NetworkSearchManager::RegisterImsRegInfoCallback(
         return TELEPHONY_ERR_ARGUMENT_NULL;
     }
     bool isExisted = false;
-    std::lock_guard<std::mutex> lock(mutexInner_);
+    std::lock_guard<std::mutex> lock(mutexIms_);
     for (auto iter : listImsRegInfoCallbackRecord_) {
         if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType) && (iter.bundleName == bundleName)) {
             isExisted = true;
@@ -1571,7 +1590,7 @@ int32_t NetworkSearchManager::UnregisterImsRegInfoCallback(
     int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName)
 {
     bool isSuccess = false;
-    std::lock_guard<std::mutex> lock(mutexInner_);
+    std::lock_guard<std::mutex> lock(mutexIms_);
     auto iter = listImsRegInfoCallbackRecord_.begin();
     for (; iter != listImsRegInfoCallbackRecord_.end(); ++iter) {
         if ((iter->slotId == slotId) && (iter->imsSrvType == imsSrvType) && (iter->bundleName == bundleName)) {
@@ -1589,16 +1608,22 @@ int32_t NetworkSearchManager::UnregisterImsRegInfoCallback(
     return TELEPHONY_SUCCESS;
 }
 
+std::list<NetworkSearchManager::ImsRegInfoCallbackRecord> NetworkSearchManager::GetImsRegInfoCallbackRecords()
+{
+    std::lock_guard<std::mutex> lock(mutexIms_);
+    return listImsRegInfoCallbackRecord_;
+}
+
 void NetworkSearchManager::NotifyImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info)
 {
     TELEPHONY_LOGD(
         "slotId:%{public}d, ImsRegState:%{public}d,  ImsRegTech:%{public}d", slotId, info.imsRegState, info.imsRegTech);
     bool isExisted = false;
-    std::lock_guard<std::mutex> lock(mutexInner_);
-    for (auto iter : listImsRegInfoCallbackRecord_) {
+    auto imsRegInfoCallbackRecords = GetImsRegInfoCallbackRecords();
+    for (auto iter : imsRegInfoCallbackRecords) {
         if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType)) {
             if (iter.imsCallback == nullptr) {
-                TELEPHONY_LOGE("imsCallback is nullptr from listImsRegInfoCallbackRecord_");
+                TELEPHONY_LOGE("imsCallback is nullptr from imsRegInfoCallbackRecords");
                 continue;
             }
             iter.imsCallback->OnImsRegInfoChanged(slotId, imsSrvType, info);
