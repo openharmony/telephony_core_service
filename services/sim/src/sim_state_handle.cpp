@@ -475,6 +475,7 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
     if (param != nullptr) {
         iccState.simType_ = param->simType;
         iccState.simStatus_ = param->simState;
+        modemInitDone_ = true;
         TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), simType_ = %{public}d, simStatus_ = %{public}d",
             iccState.simType_, iccState.simStatus_);
     } else {
@@ -888,7 +889,7 @@ bool SimStateHandle::IsRadioStateUnavailable(const AppExecFwk::InnerEvent::Point
         return false;
     }
     int32_t radioState = object->data;
-    if (radioState == ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE && HasSimCard()) {
+    if (radioState == ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE) {
         TELEPHONY_LOGI("received radio unavailable");
         IccState iccState;
         iccState.simType_ = ICC_UNKNOWN_TYPE;
