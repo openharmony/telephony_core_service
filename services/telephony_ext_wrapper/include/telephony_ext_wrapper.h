@@ -63,7 +63,7 @@ public:
 
     typedef void (*UPDATE_COUNTRY_CODE_EXT)(int32_t, const char *);
     typedef void (*UPDATE_TIME_ZONE_OFFSET_EXT)(int32_t, int32_t);
-    typedef void (*UPDATE_NETWORK_STATE_EXT)(int32_t slotId, std::unique_ptr<NetworkState> networkState);
+    typedef void (*UPDATE_NETWORK_STATE_EXT)(int32_t slotId, std::unique_ptr<NetworkState> &networkState);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
