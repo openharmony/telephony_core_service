@@ -1608,22 +1608,16 @@ int32_t NetworkSearchManager::UnregisterImsRegInfoCallback(
     return TELEPHONY_SUCCESS;
 }
 
-std::list<NetworkSearchManager::ImsRegInfoCallbackRecord> NetworkSearchManager::GetImsRegInfoCallbackRecords()
-{
-    std::lock_guard<std::mutex> lock(mutexIms_);
-    return listImsRegInfoCallbackRecord_;
-}
-
 void NetworkSearchManager::NotifyImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info)
 {
     TELEPHONY_LOGD(
         "slotId:%{public}d, ImsRegState:%{public}d,  ImsRegTech:%{public}d", slotId, info.imsRegState, info.imsRegTech);
     bool isExisted = false;
-    auto imsRegInfoCallbackRecords = GetImsRegInfoCallbackRecords();
-    for (auto iter : imsRegInfoCallbackRecords) {
+    std::lock_guard<std::mutex> lock(mutexIms_);
+    for (auto iter : listImsRegInfoCallbackRecord_) {
         if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType)) {
             if (iter.imsCallback == nullptr) {
-                TELEPHONY_LOGE("imsCallback is nullptr from imsRegInfoCallbackRecords");
+                TELEPHONY_LOGE("imsCallback is nullptr from listImsRegInfoCallbackRecord_");
                 continue;
             }
             iter.imsCallback->OnImsRegInfoChanged(slotId, imsSrvType, info);
