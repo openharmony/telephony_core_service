@@ -332,10 +332,6 @@ bool StkController::PublishStkEvent(AAFwk::Want &want)
 
 bool StkController::CheckIsSystemApp(const std::string &bundleName)
 {
-    if (bundleName.empty()) {
-        TELEPHONY_LOGE("bundleName is empty");
-        return false;
-    }
     sptr<OHOS::IRemoteObject> remoteObject = GetBundleMgr();
     if (remoteObject == nullptr) {
         TELEPHONY_LOGE("error to get bundleMgr");
