@@ -147,11 +147,24 @@ bool MultiSimController::InitPrimary()
         TELEPHONY_LOGI("no need to init");
         return false;
     }
+    if (!IsAllModemInitDone()) {
+        TELEPHONY_LOGI("wait for the other modem init");
+        return false;
+    }
+    unInitModemSlotId_ = INVALID_VALUE;
     if (IsAllCardsReady() && !IsAllCardsLoaded()) {
-        TELEPHONY_LOGI("wait for ohter card");
+        TELEPHONY_LOGI("wait for the other card ready");
         return false;
     }
     return true;
+}
+
+void MultiSimController::ReCheckPrimary()
+{
+    if (InitPrimary()) {
+        TELEPHONY_LOGI("ReCheckPrimary start");
+        CheckIfNeedSwitchMainSlotId();
+    }
 }
 
 bool MultiSimController::IsAllCardsReady()
@@ -159,6 +172,18 @@ bool MultiSimController::IsAllCardsReady()
     for (int32_t i = 0; i < maxCount_; i++) {
         if (simStateManager_[i] != nullptr && simStateManager_[i]->GetSimState() != SimState::SIM_STATE_READY) {
             TELEPHONY_LOGI("single card ready");
+            return false;
+        }
+    }
+    return true;
+}
+
+bool MultiSimController::IsAllModemInitDone()
+{
+    for (int32_t i = 0; i < maxCount_; i++) {
+        if (simStateManager_[i] != nullptr && !(simStateManager_[i]->IfModemInitDone())) {
+            TELEPHONY_LOGI("single modem init done");
+            unInitModemSlotId_ = i;
             return false;
         }
     }
@@ -457,8 +482,10 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId()
 {
     TELEPHONY_LOGD("start");
     if (IsSimActive(lastPrimarySlotId_)) {
-        SavePrimarySlotIdInfo(lastPrimarySlotId_);
         TELEPHONY_LOGI("main slotId active, no need to switch main card");
+        if (!IsAllCardsReady()) {
+            SavePrimarySlotIdInfo(lastPrimarySlotId_);
+        }
     } else {
         int32_t firstActivedSlotId = GetFirstActivedSlotId();
         if (!IsValidSlotId(firstActivedSlotId)) {
@@ -747,8 +774,13 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
         PublishSetPrimaryEvent(true);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    PublishSetPrimaryEvent(true);
     SavePrimarySlotIdInfo(slotId);
+    PublishSetPrimaryEvent(true);
+    for (int32_t i = 0; i < maxCount_; i++) {
+        if (!(localCacheInfo_[i].iccId.empty())) {
+            InitActive(i);
+        }
+    }
     return TELEPHONY_ERR_SUCCESS;
 }
 
