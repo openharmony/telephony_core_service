@@ -148,12 +148,12 @@ bool MultiSimController::InitPrimary()
         return false;
     }
     if (!IsAllModemInitDone()) {
-        TELEPHONY_LOGI("wait for the ohter modem init");
+        TELEPHONY_LOGI("wait for the other modem init");
         return false;
     }
     unInitModemSlotId_ = INVALID_VALUE;
     if (IsAllCardsReady() && !IsAllCardsLoaded()) {
-        TELEPHONY_LOGI("wait for the ohter card ready");
+        TELEPHONY_LOGI("wait for the other card ready");
         return false;
     }
     return true;
