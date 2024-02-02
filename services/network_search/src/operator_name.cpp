@@ -64,6 +64,7 @@ void OperatorName::OnReceiveEvent(const EventFwk::CommonEventData &data)
         sptr<NetworkState> networkState = GetNetworkStatus();
         if (networkState != nullptr && networkState->GetRegStatus() == RegServiceState::REG_STATE_IN_SERVICE) {
             NotifySpnChanged();
+            networkSearchState_->NotifyStateChange();
         }
     } else if (action == CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED) {
         TELEPHONY_LOGI("locale changed Slot%{public}d", slotId_);
