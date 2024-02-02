@@ -21,6 +21,7 @@
 #include "network_search_notify.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -416,6 +417,9 @@ void NetworkSearchState::NotifyStateChange()
         return;
     }
 
+    if (TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_(slotId_, std::move(networkState_));
+    }
     // We must Update RadioTech(PhoneType) bebore notifying observers,
     // otherwise observers may get the wrong phone type
     CsRadioTechChange();
