@@ -418,7 +418,7 @@ void NetworkSearchState::NotifyStateChange()
     }
 
     if (TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_ != nullptr) {
-        TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_(slotId_, std::move(networkState_));
+        TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_(slotId_, networkState_);
     }
     // We must Update RadioTech(PhoneType) bebore notifying observers,
     // otherwise observers may get the wrong phone type
