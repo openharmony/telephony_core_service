@@ -2162,6 +2162,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_006, Function | MediumTest |
     inner->networkSearchHandler_ = networkSearchHandler;
     nsm->delayTime_ = 1;
     int32_t status = 0;
+    std::string bundleName = "qwe";
     ImsRegInfo info;
     sptr<INetworkSearchCallback> networkSearchCallback = nullptr;
     nsm->AddManagerInner(INVALID_SLOTID, inner);
@@ -2169,6 +2170,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_006, Function | MediumTest |
     nsm->IsNeedDelayNotify(INVALID_SLOTID);
     nsm->HandleNotifyStateChangeWithDelay(INVALID_SLOTID, true);
     nsm->InitSimRadioProtocol(INVALID_SLOTID);
+    nsm->UnregisterImsRegInfoCallback(INVALID_SLOTID, ImsServiceType::TYPE_SMS, bundleName);
     EXPECT_EQ(nsm->HandleRrcStateChanged(INVALID_SLOTID, 0), TELEPHONY_ERR_FAIL);
     EXPECT_EQ(nsm->HandleRrcStateChanged(INVALID_SLOTID, 1), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(nsm->UpdateRrcConnectionState(INVALID_SLOTID, status), TELEPHONY_ERR_SUCCESS);
@@ -2185,7 +2187,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_006, Function | MediumTest |
     nsm->SetBasebandVersion(INVALID_SLOTID, "");
     nsm->ConvertNetworkModeToCapabilityType(CORE_NETWORK_MODE_NR);
     nsm->ConvertNetworkModeToCapabilityType(-1);
-    nsm->GetImsRegInfoCallbackRecords();
     EXPECT_EQ(nsm->GetFrequencyType(INVALID_SLOTID), FrequencyType::FREQ_TYPE_UNKNOWN);
 }
 
