@@ -519,7 +519,13 @@ std::string IccFile::ObtainValidLanguage(const std::string &langData)
         TELEPHONY_LOGE("data is nullptr!!");
         return "";
     }
-    TELEPHONY_LOGI("ObtainValidLanguage all is %{public}s---%{public}d", data, langDataLen);
+
+    int dataLen = static_cast<int>(strlen(reinterpret_cast<char *>(data)));
+    TELEPHONY_LOGI("ObtainValidLanguage all is %{public}s---%{public}d, dataLen:%{public}d",
+        data, langDataLen, dataLen);
+    if (langDataLen > dataLen) {
+        langDataLen = dataLen;
+    }
     for (int i = 0; (i + 1) < langDataLen; i += DATA_STEP) {
         std::string langName((char *)data, i, DATA_STEP);
         TELEPHONY_LOGI("ObtainValidLanguage item is %{public}d--%{public}s", i, langName.c_str());
