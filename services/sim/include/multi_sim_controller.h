@@ -65,6 +65,10 @@ public:
     int32_t GetRadioProtocolTech(int32_t slotId);
     void GetRadioProtocol(int32_t slotId);
     bool InitShowName(int slotId);
+    void ReCheckPrimary();
+
+public:
+    int32_t unInitModemSlotId_ = INVALID_VALUE;
 
 private:
     bool IsValidData(int32_t slotId);
@@ -97,6 +101,7 @@ private:
     size_t GetLocalCacheSize();
     int32_t GetTargetSimId(int32_t slotId, int &simId);
     int32_t GetTargetIccId(int32_t slotId, std::string &iccId);
+    bool IsAllModemInitDone();
 
 private:
     int32_t maxCount_ = 0;

@@ -415,6 +415,8 @@ HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | Med
     multiSimController->PublishSetPrimaryEvent(true);
     multiSimController->EncryptIccId("");
     multiSimController->CheckIfNeedSwitchMainSlotId();
+    multiSimController->IsAllModemInitDone();
+    multiSimController->ReCheckPrimary();
     int simId = 0;
     multiSimController->GetTargetDefaultSimId(INVALID_SLOTID, simId);
     multiSimController->GetTargetSimId(INVALID_SLOTID, simId);
