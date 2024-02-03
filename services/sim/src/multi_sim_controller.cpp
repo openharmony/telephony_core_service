@@ -880,8 +880,6 @@ int32_t MultiSimController::GetShowNumber(int32_t slotId, std::u16string &showNu
     }
     showNumber = simFileManager_[slotId]->GetSimTelephoneNumber();
     if (!showNumber.empty()) {
-        std::string number = Str16ToStr8(showNumber);
-        TELEPHONY_LOGI("showNumber: %{public}s", number.c_str());
         return TELEPHONY_ERR_SUCCESS;
     }
     std::unique_lock<std::mutex> lock(mutex_);
@@ -891,8 +889,6 @@ int32_t MultiSimController::GetShowNumber(int32_t slotId, std::u16string &showNu
     }
     showNumber = Str8ToStr16(localCacheInfo_[slotId].phoneNumber);
     if (!showNumber.empty()) {
-        std::string number = Str16ToStr8(showNumber);
-        TELEPHONY_LOGI("showNumber: %{public}s", number.c_str());
         return TELEPHONY_ERR_SUCCESS;
     }
     return GetSimTelephoneNumber(slotId, showNumber);
