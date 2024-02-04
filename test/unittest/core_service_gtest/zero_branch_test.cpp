@@ -404,6 +404,8 @@ HWTEST_F(BranchTest, Telephony_SimFileManager_001, Function | MediumTest | Level
     const std::u16string emptyStr = Str8ToStr16("");
     const std::u16string mailName = Str8ToStr16("张三");
     const std::u16string mailnumber = Str8ToStr16("12345678901");
+    const std::u16string alphaTag = Str8ToStr16("");
+    const std::u16string phoneNumber = Str8ToStr16("123456789");
     simFileManager.ClearData();
     EXPECT_EQ(simFileManager.GetSimOperatorNumeric(), u"");
     simFileManager.GetISOCountryCodeForSim();
@@ -429,6 +431,7 @@ HWTEST_F(BranchTest, Telephony_SimFileManager_001, Function | MediumTest | Level
     simFileManager.SetOpKeyExt("opkeyext");
     EXPECT_EQ(simFileManager.ObtainSpnCondition(true, "46001"), 0);
     EXPECT_FALSE(simFileManager.SetVoiceMailInfo(mailName, mailnumber));
+    EXPECT_FALSE(simFileManager.SetSimTelephoneNumber(alphaTag, phoneNumber));
     EXPECT_FALSE(simFileManager.HasSimCard());
     EXPECT_NE(simFileManager.GetIMSI(), u"46001");
     EXPECT_EQ(simFileManager.GetOpKey(), u"CMCC");
@@ -581,7 +584,7 @@ HWTEST_F(BranchTest, Telephony_SimFile_002, Function | MediumTest | Level1)
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     std::string testStr = "";
-    simFile->UpdateMsisdnNumber(testStr, testStr, event);
+    simFile->UpdateMsisdnNumber(testStr, testStr);
     EXPECT_TRUE(simFile->ProcessGetCphsMailBoxDone(event));
     EXPECT_TRUE(simFile->ProcessGetMbiDone(event));
     EXPECT_TRUE(simFile->ProcessGetCfisDone(event));
@@ -1314,6 +1317,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
     multiSimController->GetPrimarySlotId();
     EXPECT_NE(multiSimController->GetShowNumber(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SetShowNumber(0, testU16Str, false), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->SetShowNumberToDB(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->GetShowName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SetShowName(0, testU16Str, false), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SetActiveSim(0, 1, false), TELEPHONY_ERR_SUCCESS);

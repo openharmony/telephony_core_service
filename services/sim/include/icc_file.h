@@ -54,8 +54,8 @@ public:
     virtual int ObtainSpnCondition(bool roaming, const std::string &operatorNum) = 0;
     bool LoadedOrNot();
     void UpdateLoaded(bool loaded);
-    virtual void UpdateMsisdnNumber(
-        const std::string &alphaTag, const std::string &number, const AppExecFwk::InnerEvent::Pointer &onComplete);
+    virtual bool UpdateMsisdnNumber(
+        const std::string &alphaTag, const std::string &number);
     virtual void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     virtual ~IccFile();
     virtual bool ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event) = 0;

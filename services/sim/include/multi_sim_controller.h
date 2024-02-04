@@ -49,6 +49,7 @@ public:
     int32_t SetPrimarySlotId(int32_t slotId);
     int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber);
     int32_t SetShowNumber(int32_t slotId, std::u16string Number, bool force = false);
+    int32_t SetShowNumberToDB(int32_t slotId, std::u16string Number);
     int32_t GetShowName(int32_t slotId, std::u16string &showName);
     int32_t SetShowName(int32_t slotId, std::u16string name, bool force = false);
     int32_t GetSimTelephoneNumber(int32_t slotId, std::u16string &telephoneNumber);
