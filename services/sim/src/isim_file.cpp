@@ -18,6 +18,7 @@
 #include "radio_event.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "telephony_ext_wrapper.h"
 
 using namespace std;
 using namespace OHOS::AppExecFwk;
@@ -86,6 +87,9 @@ void IsimFile::OnAllFilesFetched()
     filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
     NotifyRegistrySimState(CardType::SINGLE_MODE_ISIM_CARD, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
     LoadVoiceMail();
+    if (TELEPHONY_EXT_WRAPPER.onAllFilesFetchedExt_) {
+        TELEPHONY_EXT_WRAPPER.onAllFilesFetchedExt_(slotId_);
+    }
 }
 
 bool IsimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)

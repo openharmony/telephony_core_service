@@ -29,6 +29,7 @@ public:
     using HANDLE = const std::shared_ptr<AppExecFwk::EventHandler>;
     // Init
     virtual bool OnInit(int32_t slotCount) = 0;
+    virtual int32_t InitTelExtraModule(int32_t slotId) = 0;
     // SimState
     virtual int32_t HasSimCard(int32_t slotId, bool &hasSimCard) = 0;
     virtual int32_t GetSimState(int32_t slotId, SimState &simState) = 0;

@@ -157,6 +157,7 @@ void CoreServiceStub::AddHandlerSimToMapExt()
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_NR_SUPPORTED)] = &CoreServiceStub::OnIsNrSupported;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SLOTID)] = &CoreServiceStub::OnGetSlotId;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SIMID)] = &CoreServiceStub::OnGetSimId;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::INIT_EXTRA_MODULE)] = &CoreServiceStub::OnInitExtraModule;
 }
 
 int32_t CoreServiceStub::OnRemoteRequest(
@@ -1681,6 +1682,17 @@ int32_t CoreServiceStub::OnFactoryReset(MessageParcel &data, MessageParcel &repl
 {
     int32_t slotId = data.ReadInt32();
     int32_t result = FactoryReset(slotId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("Write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnInitExtraModule(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t result = InitExtraModule(slotId);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("Write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

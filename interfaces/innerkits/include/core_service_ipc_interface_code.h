@@ -114,6 +114,7 @@ enum class CoreServiceInterfaceCode {
     GET_DSDS_MODE,
     FACTORY_RESET,
     GET_NR_SSB_ID_INFO,
+    INIT_EXTRA_MODULE,
 };
 } // namespace Telephony
 } // namespace OHOS
