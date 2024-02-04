@@ -146,7 +146,7 @@ public:
 protected:
     const int32_t ERROR = -1;
     const int32_t MIN_STRING_LE = 0;
-    const int32_t MAX_STRING_LE = 32;
+    const int32_t MAX_STRING_LE = 36;
     const int32_t MAX_VECTOR = 100;
 };
 } // namespace Telephony
