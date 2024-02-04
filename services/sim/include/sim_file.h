@@ -30,8 +30,8 @@ public:
     int ObtainSpnCondition(bool roaming, const std::string &operatorNum);
     int ObtainCallForwardStatus();
     std::shared_ptr<UsimFunctionHandle> ObtainUsimFunctionHandle();
-    void UpdateMsisdnNumber(
-        const std::string &alphaTag, const std::string &number, const AppExecFwk::InnerEvent::Pointer &onComplete);
+    bool UpdateMsisdnNumber(
+        const std::string &alphaTag, const std::string &number);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     ~SimFile() = default;
     bool ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event);

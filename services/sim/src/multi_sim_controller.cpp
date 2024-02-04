@@ -300,22 +300,13 @@ bool MultiSimController::InitShowNumber(int slotId)
         TELEPHONY_LOGE("InValidData");
         return false;
     }
-    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
-        TELEPHONY_LOGE("failed by nullptr");
-        return false;
-    }
-    showNumber = Str8ToStr16(localCacheInfo_[slotId].phoneNumber);
-    if (!showNumber.empty()) {
-        TELEPHONY_LOGD("no need to init showNumber");
-        return true;
-    }
     if (simFileManager_[slotId] == nullptr) {
         TELEPHONY_LOGE("can not get simFileManager");
         return false;
     }
     showNumber = simFileManager_[slotId]->GetSimTelephoneNumber();
     int32_t result = TELEPHONY_ERROR;
-    result = SetShowNumber(slotId, showNumber, true);
+    result = SetShowNumberToDB(slotId, showNumber);
     return result == TELEPHONY_ERR_SUCCESS;
 }
 
@@ -883,6 +874,14 @@ int32_t MultiSimController::GetShowNumber(int32_t slotId, std::u16string &showNu
         TELEPHONY_LOGE("InValidData");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
+    if (simFileManager_[slotId] == nullptr) {
+        TELEPHONY_LOGE("can not get simFileManager");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    showNumber = simFileManager_[slotId]->GetSimTelephoneNumber();
+    if (!showNumber.empty()) {
+        return TELEPHONY_ERR_SUCCESS;
+    }
     std::unique_lock<std::mutex> lock(mutex_);
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("failed by nullptr");
@@ -901,6 +900,23 @@ int32_t MultiSimController::SetShowNumber(int32_t slotId, std::u16string number,
     if (!force && !IsValidData(slotId)) {
         TELEPHONY_LOGE("MultiSimController::SetShowNumber InValidData");
         return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if (simFileManager_[slotId] == nullptr) {
+        TELEPHONY_LOGE("can not get simFileManager");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::u16string alphaTag = simFileManager_[slotId]->GetSimTeleNumberIdentifier();
+    if (!simFileManager_[slotId]->SetSimTelephoneNumber(alphaTag, number)) {
+        return TELEPHONY_ERR_FAIL;
+    }
+    return SetShowNumberToDB(slotId, number);
+}
+
+int32_t MultiSimController::SetShowNumberToDB(int32_t slotId, std::u16string number)
+{
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
+        TELEPHONY_LOGE("failed by nullptr");
+        return false;
     }
     int curSimId;
     if (GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) {
