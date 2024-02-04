@@ -64,6 +64,7 @@ public:
 
     typedef void (*UPDATE_COUNTRY_CODE_EXT)(int32_t, const char *);
     typedef void (*UPDATE_TIME_ZONE_OFFSET_EXT)(int32_t, int32_t);
+    typedef void (*UPDATE_NETWORK_STATE_EXT)(int32_t slotId, std::unique_ptr<NetworkState> &networkState);
     /* add for vsim begin */
     typedef void (*IS_VSIM_IN_STATUS)(int32_t slotId, int32_t type, bool &status);
     typedef void (*GET_VSIM_SLOT_ID)(int32_t &slotId);
@@ -98,6 +99,7 @@ public:
     GET_SIGNAL_INFO_LIST_EXT getSignalInfoListExt_ = nullptr;
     GET_NETWORK_CAPABILITY_EXT getNetworkCapabilityExt_ = nullptr;
     ON_GET_NETWORK_SEARCH_INFORMATION_EXT onGetNetworkSearchInformationExt_ = nullptr;
+    UPDATE_NETWORK_STATE_EXT updateNetworkStateExt_ = nullptr;
 
     UPDATE_COUNTRY_CODE_EXT updateCountryCodeExt_ = nullptr;
     UPDATE_TIME_ZONE_OFFSET_EXT updateTimeZoneOffsetExt_ = nullptr;
@@ -118,6 +120,7 @@ private:
     void* telephonyVSimWrapperHandle_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForVoiceMail();
+    void InitTelephonyExtWrapperForCust();
     void InitTelephonyExtWrapperForVSim();
 };
 

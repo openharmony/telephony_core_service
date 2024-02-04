@@ -48,6 +48,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
     }
     InitTelephonyExtWrapperForNetWork();
     InitTelephonyExtWrapperForVoiceMail();
+    InitTelephonyExtWrapperForCust();
     InitTelephonyExtWrapperForVSim();
     TELEPHONY_LOGI("telephony ext wrapper init success");
 }
@@ -114,6 +115,14 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
         getNetworkStatusExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
+    }
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForCust()
+{
+    updateNetworkStateExt_ = (UPDATE_NETWORK_STATE_EXT)dlsym(telephonyExtWrapperHandle_, "UpdateNetworkStateExt");
+    if (updateNetworkStateExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
 }
 
