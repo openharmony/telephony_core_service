@@ -166,6 +166,9 @@ void SimFile::OnAllFilesFetched()
     }
     PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_LOADED, "");
     LoadVoiceMail();
+    if (TELEPHONY_EXT_WRAPPER.onAllFilesFetchedExt_) {
+        TELEPHONY_EXT_WRAPPER.onAllFilesFetchedExt_(slotId_);
+    }
 }
 
 bool SimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)

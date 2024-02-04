@@ -63,6 +63,51 @@ bool CoreManagerInner::IsInitFinishedForTelRil(void)
     return telRilManager_ != nullptr;
 }
 
+int32_t CoreManagerInner::InitExtraModule(int32_t slotId)
+{
+    TELEPHONY_LOGI("InitExtraModule, slotId: %{public}d", slotId);
+    if (isInitExtraObj_) {
+        TELEPHONY_LOGE("InitExtraModule, has been inited, return!");
+        return TELEPHONY_SUCCESS;
+    }
+    if (SIM_SLOT_COUNT != DUAL_SLOT_COUNT) {
+        TELEPHONY_LOGE("InitExtraModule, can not been inited because of slot number, return!");
+        return TELEPHONY_ERROR;
+    }
+    if (telRilManager_ == nullptr || simManager_ == nullptr || networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("InitExtraModule, can not been inited because of nullptr, return!");
+        return TELEPHONY_ERROR;
+    }
+    int resultCode = TELEPHONY_SUCCESS;
+    // Step1. Init ril object.
+    if (telRilManager_ != nullptr) {
+        resultCode = telRilManager_->InitTelExtraModule(slotId);
+    }
+    TELEPHONY_LOGI("InitExtraModule, resultCode of ril: %{public}d", resultCode);
+    if (resultCode != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERROR;
+    }
+    // Step2. Init sim object.
+    if (simManager_ != nullptr) {
+        resultCode = simManager_->InitTelExtraModule(slotId);
+    }
+    TELEPHONY_LOGI("InitExtraModule, resultCode of sim: %{public}d", resultCode);
+    if (resultCode != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERROR;
+    }
+    // Step3. Init network search object.
+    if (networkSearchManager_ != nullptr) {
+        resultCode = networkSearchManager_->InitTelExtraModule(slotId);
+    }
+    TELEPHONY_LOGI("InitExtraModule, resultCode of network: %{public}d", resultCode);
+    if (resultCode != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERROR;
+    }
+    // only success set mark true.
+    isInitExtraObj_ = true;
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CoreManagerInner::GetDefaultSlotId(void)
 {
     return DEFAULT_SIM_SLOT_ID;

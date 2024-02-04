@@ -1019,5 +1019,15 @@ int32_t CoreServiceClient::FactoryReset(int32_t slotId)
     }
     return proxy->FactoryReset(slotId);
 }
+
+int32_t CoreServiceClient::InitExtraModule(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->InitExtraModule(slotId);
+}
 } // namespace Telephony
 } // namespace OHOS
