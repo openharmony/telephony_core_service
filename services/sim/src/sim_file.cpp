@@ -92,8 +92,6 @@ bool SimFile::UpdateMsisdnNumber(const std::string &alphaTag, const std::string 
 {
     lastMsisdn_ = number;
     lastMsisdnTag_ = alphaTag;
-    TELEPHONY_LOGI("SimFile::UpdateMsisdnNumber lastMsisdn_:%{public}s, lastMsisdnTag_:%{public}s", lastMsisdn_.c_str(),
-        lastMsisdnTag_.c_str());
     waitResult_ = false;
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
     diallingNumber->name_ = Str8ToStr16(alphaTag);
@@ -108,7 +106,7 @@ bool SimFile::UpdateMsisdnNumber(const std::string &alphaTag, const std::string 
     infor.index = 1;
     diallingNumberHandler_->UpdateDiallingNumbers(infor, phoneNumberEvent);
     while (!waitResult_) {
-        TELEPHONY_LOGI("update voicemail wait, response = false");
+        TELEPHONY_LOGI("update msisdn number wait, response = false");
         if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
             break;
         }
@@ -675,8 +673,6 @@ bool SimFile::ProcessGetMsisdnDone(const AppExecFwk::InnerEvent::Pointer &event)
     }
     msisdn_ = Str16ToStr8(diallingNumber->GetNumber());
     msisdnTag_ = Str16ToStr8(diallingNumber->GetName());
-    TELEPHONY_LOGI("ProcessGetMsisdnDone msisdn_:%{public}s, msisdnTag_:%{public}s", msisdn_.c_str(),
-        msisdnTag_.c_str());
     return isFileProcessResponse;
 }
 
