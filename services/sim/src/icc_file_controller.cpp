@@ -65,7 +65,11 @@ void IccFileController::ProcessLinearRecordSize(const AppExecFwk::InnerEvent::Po
         return;
     }
     IccFileData *result = &(rcvMsg->fileData);
-    std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
+    if (rcvMsg->controlHolder == nullptr) {
+        TELEPHONY_LOGE("controlHolder is nullptr");
+        return;
+    }
+    std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
     if (result == nullptr || hd == nullptr) {
         TELEPHONY_LOGE("result or hd is nullptr");
         return;
@@ -93,7 +97,11 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
         return;
     }
     IccFileData *result = &(rcvMsg->fileData);
-    std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
+    if (rcvMsg->controlHolder == nullptr) {
+        TELEPHONY_LOGE("controlHolder is nullptr");
+        return;
+    }
+    std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
     if (result == nullptr || hd == nullptr) {
         TELEPHONY_LOGE("result or hd is nullptr");
         return;
@@ -203,7 +211,11 @@ void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer 
     }
     const AppExecFwk::InnerEvent::Pointer &process = rcvMsg->controlHolder->fileLoaded;
     IccFileData *result = &(rcvMsg->fileData);
-    std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
+    if (rcvMsg->controlHolder == nullptr) {
+        TELEPHONY_LOGE("controlHolder is nullptr");
+        return;
+    }
+    std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
     TELEPHONY_LOGI("ProcessReadRecord %{public}d %{public}d %{public}d %{public}s", hd->getAllFile, hd->fileNum,
         hd->countFiles, result->resultData.c_str());
     path = CheckRightPath(hd->filePath, hd->fileId);
