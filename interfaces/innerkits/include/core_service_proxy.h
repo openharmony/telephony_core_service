@@ -138,6 +138,7 @@ public:
     int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType) override;
     int32_t FactoryReset(int32_t slotId) override;
     int32_t GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation) override;
+    int32_t InitExtraModule(int32_t slotId) override;
 
 private:
     template<class T>
