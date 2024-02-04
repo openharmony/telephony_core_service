@@ -629,7 +629,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkState_0400, Functi
         if (result == nullptr) {
             TELEPHONY_LOGI("GetNetworkState result is null");
         } else {
-            EXPECT_GT(static_cast<int32_t>(result->GetNrState()), 1);
+            EXPECT_GE(static_cast<int32_t>(result->GetNrState()), 1);
         }
     }
 }

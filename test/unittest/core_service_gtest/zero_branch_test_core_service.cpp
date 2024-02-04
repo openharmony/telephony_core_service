@@ -34,8 +34,10 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
+std::shared_ptr<SimManager> g_simManagerPtr = nullptr;
 
 namespace {
+constexpr int32_t SLEEP_TIME_SECONDS = 3;
 constexpr int32_t SLOT_ID = 0;
 const int32_t INVALID_SLOTID = 2;
 constexpr int32_t NR_NSA_OPTION_ONLY = 1;
@@ -53,10 +55,32 @@ public:
 void CoreServiceBranchTest::SetUpTestCase()
 {
     DelayedSingleton<CoreService>::GetInstance()->Init();
+    auto iSimManager = DelayedSingleton<CoreService>::GetInstance()->simManager_;
+    if (iSimManager == nullptr) {
+        return;
+    }
+    g_simManagerPtr = std::static_pointer_cast<SimManager>(iSimManager);
 }
 
 void CoreServiceBranchTest::TearDownTestCase()
 {
+    if (g_simManagerPtr != nullptr && g_simManagerPtr->multiSimMonitor_ != nullptr) {
+        g_simManagerPtr->multiSimMonitor_->remainCount_ = 0;
+        sleep(SLEEP_TIME_SECONDS);
+    }
+    auto telRilManager = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
+    if (telRilManager == nullptr) {
+        return;
+    }
+    auto handler = telRilManager->handler_;
+    if (handler != nullptr) {
+        handler->RemoveAllEvents();
+        handler->SendEvent(0, 0, AppExecFwk::EventQueue::Priority::HIGH);
+        sleep(SLEEP_TIME_SECONDS);
+    }
+    telRilManager->DisConnectRilInterface();
+    telRilManager->DeInit();
+    DelayedSingleton<CoreService>::GetInstance()->Stop();
     DelayedSingleton<CoreService>::DestroyInstance();
 }
 
@@ -370,6 +394,10 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_DumpHelper_001, Function |
     coreServiceDumpHelper->ShowCoreServiceInfo(result);
     coreServiceDumpHelper->Dump(argsInStr, result);
     EXPECT_FALSE(result.empty());
+    if (simManager->multiSimMonitor_ != nullptr) {
+        simManager->multiSimMonitor_->remainCount_ = 0;
+        sleep(SLEEP_TIME_SECONDS);
+    }
 }
 
 /**
