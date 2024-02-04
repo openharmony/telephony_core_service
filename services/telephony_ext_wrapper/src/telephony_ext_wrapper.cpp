@@ -21,14 +21,21 @@ namespace OHOS {
 namespace Telephony {
 namespace {
 const std::string TELEPHONY_EXT_WRAPPER_PATH = "libtelephony_ext_service.z.so";
+const std::string TELEPHONY_VSIM_WRAPPER_PATH = "libtel_vsim_symbol.z.so";
 } // namespace
 
 TelephonyExtWrapper::TelephonyExtWrapper() {}
 TelephonyExtWrapper::~TelephonyExtWrapper()
 {
     TELEPHONY_LOGD("TelephonyExtWrapper::~TelephonyExtWrapper() start");
-    dlclose(telephonyExtWrapperHandle_);
-    telephonyExtWrapperHandle_ = nullptr;
+    if (telephonyExtWrapperHandle_ != nullptr) {
+        dlclose(telephonyExtWrapperHandle_);
+        telephonyExtWrapperHandle_ = nullptr;
+    }
+    if (telephonyVSimWrapperHandle_ != nullptr) {
+        dlclose(telephonyVSimWrapperHandle_);
+        telephonyVSimWrapperHandle_ = nullptr;
+    }
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapper()
@@ -42,6 +49,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
     InitTelephonyExtWrapperForNetWork();
     InitTelephonyExtWrapperForVoiceMail();
     InitTelephonyExtWrapperForCust();
+    InitTelephonyExtWrapperForVSim();
     TELEPHONY_LOGI("telephony ext wrapper init success");
 }
 
@@ -116,6 +124,32 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCust()
     if (updateNetworkStateExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+void TelephonyExtWrapper::InitTelephonyExtWrapperForVSim()
+{
+    TELEPHONY_LOGI("[VSIM] telephony ext wrapper init begin");
+    telephonyVSimWrapperHandle_ = dlopen(TELEPHONY_EXT_WRAPPER_PATH.c_str(), RTLD_NOW);
+    if (telephonyVSimWrapperHandle_ == nullptr) {
+        TELEPHONY_LOGE("libtel_vsim_symbol.z.so was not loaded, error: %{public}s", dlerror());
+        return;
+    }
+    isVSimInStatus_ = (IS_VSIM_IN_STATUS) dlsym(telephonyVSimWrapperHandle_, "IsVSimInStatus");
+    getVSimSlotId_ = (GET_VSIM_SLOT_ID) dlsym(telephonyVSimWrapperHandle_, "GetVSimSlotId");
+    onAllFilesFetchedExt_ = (ON_ALL_FILES_FETCHED_EXT) dlsym(telephonyVSimWrapperHandle_,
+        "OnAllFilesFetchedExt");
+    putVSimExtraInfo_ = (PUT_VSIM_EXTRA_INFO) dlsym(telephonyVSimWrapperHandle_,
+        "PutVSimExtraInfo");
+    changeSpnAndRuleExt_ = (CHANGE_SPN_AND_RULE_EXT) dlsym(telephonyVSimWrapperHandle_,
+        "ChangeSpnAndRuleExt");
+    getVSimCardState_ = (GET_VSIM_CARD_STATE) dlsym(telephonyVSimWrapperHandle_, "GetVSimCardState");
+    getSimIdExt_ = (GET_SIM_ID_EXT) dlsym(telephonyVSimWrapperHandle_, "GetSimIdExt");
+    getSlotIdExt_ = (GET_SLOT_ID_EXT) dlsym(telephonyVSimWrapperHandle_, "GetSlotIdExt");
+    if (isVSimInStatus_ == nullptr || getVSimSlotId_ == nullptr || onAllFilesFetchedExt_ == nullptr ||
+        putVSimExtraInfo_ == nullptr || changeSpnAndRuleExt_ == nullptr || getVSimCardState_ == nullptr ||
+        getSimIdExt_ == nullptr || getSlotIdExt_ == nullptr) {
+        TELEPHONY_LOGE("[VSIM] telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGI("[VSIM] telephony ext wrapper init success");
 }
 
 } // namespace Telephony

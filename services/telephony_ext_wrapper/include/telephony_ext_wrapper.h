@@ -24,6 +24,7 @@
 #include "signal_information.h"
 #include "network_state.h"
 #include "cell_information.h"
+#include "want.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -64,6 +65,16 @@ public:
     typedef void (*UPDATE_COUNTRY_CODE_EXT)(int32_t, const char *);
     typedef void (*UPDATE_TIME_ZONE_OFFSET_EXT)(int32_t, int32_t);
     typedef void (*UPDATE_NETWORK_STATE_EXT)(int32_t slotId, std::unique_ptr<NetworkState> &networkState);
+    /* add for vsim begin */
+    typedef void (*IS_VSIM_IN_STATUS)(int32_t slotId, int32_t type, bool &status);
+    typedef void (*GET_VSIM_SLOT_ID)(int32_t &slotId);
+    typedef void (*ON_ALL_FILES_FETCHED_EXT)(int32_t slotId);
+    typedef void (*PUT_VSIM_EXTRA_INFO)(OHOS::AAFwk::Want &want, int32_t slotId, std::string value);
+    typedef void (*CHANGE_SPN_AND_RULE_EXT)(std::string &spn, int32_t &rule, bool &showSpn);
+    typedef void (*GET_VSIM_CARD_STATE)(int32_t &cardType);
+    typedef bool (*GET_SIM_ID_EXT)(int32_t slotId, int32_t &simId);
+    typedef bool (*GET_SLOT_ID_EXT)(int32_t simId, int32_t &slotId);
+    /* add for vsim end */
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -93,11 +104,24 @@ public:
     UPDATE_COUNTRY_CODE_EXT updateCountryCodeExt_ = nullptr;
     UPDATE_TIME_ZONE_OFFSET_EXT updateTimeZoneOffsetExt_ = nullptr;
 
+    /* add for vsim begin */
+    IS_VSIM_IN_STATUS isVSimInStatus_ = nullptr;
+    GET_VSIM_SLOT_ID getVSimSlotId_ = nullptr;
+    ON_ALL_FILES_FETCHED_EXT onAllFilesFetchedExt_ = nullptr;
+    PUT_VSIM_EXTRA_INFO putVSimExtraInfo_ = nullptr;
+    CHANGE_SPN_AND_RULE_EXT changeSpnAndRuleExt_ = nullptr;
+    GET_VSIM_CARD_STATE getVSimCardState_ = nullptr;
+    GET_SIM_ID_EXT getSimIdExt_ = nullptr;
+    GET_SLOT_ID_EXT getSlotIdExt_ = nullptr;
+    /* add for vsim end */
+
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
+    void* telephonyVSimWrapperHandle_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForVoiceMail();
     void InitTelephonyExtWrapperForCust();
+    void InitTelephonyExtWrapperForVSim();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
