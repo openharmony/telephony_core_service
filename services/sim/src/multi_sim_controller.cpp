@@ -906,7 +906,7 @@ int32_t MultiSimController::SetShowNumber(int32_t slotId, std::u16string number,
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::u16string alphaTag = simFileManager_[slotId]->GetSimTeleNumberIdentifier();
-    if(!simFileManager_[slotId]->SetSimTelephoneNumber(alphaTag, number)){
+    if (!simFileManager_[slotId]->SetSimTelephoneNumber(alphaTag, number)) {
         return TELEPHONY_ERR_FAIL;
     }
     return SetShowNumberToDB(slotId, number);
