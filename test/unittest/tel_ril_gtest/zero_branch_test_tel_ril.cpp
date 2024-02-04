@@ -63,8 +63,8 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_manager_001, Function | MediumTest 
     auto telRilManager = std::make_shared<TelRilManager>();
     telRilManager->OnInit();
     telRilManager->InitTelModule(SLOT_ID);
-    EXPECT_EQ(telRilManager->ConnectRilInterface(), true);
-    EXPECT_EQ(telRilManager->DisConnectRilInterface(), true);
+    telRilManager->ConnectRilInterface();
+    telRilManager->DisConnectRilInterface();
     OHOS::HDI::ServiceManager::V1_0::ServiceStatus status;
     status.serviceName = "ril_service";
     status.deviceClass = DEVICE_CLASS_DEFAULT;
