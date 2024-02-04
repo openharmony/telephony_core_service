@@ -124,6 +124,8 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCust()
     if (updateNetworkStateExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+}
+
 void TelephonyExtWrapper::InitTelephonyExtWrapperForVSim()
 {
     TELEPHONY_LOGI("[VSIM] telephony ext wrapper init begin");
