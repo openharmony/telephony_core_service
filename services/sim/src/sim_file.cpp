@@ -88,9 +88,32 @@ int SimFile::ObtainCallForwardStatus()
     return callForwardStatus_;
 }
 
-void SimFile::UpdateMsisdnNumber(
-    const std::string &alphaTag, const std::string &number, const AppExecFwk::InnerEvent::Pointer &onComplete)
-{}
+bool SimFile::UpdateMsisdnNumber(const std::string &alphaTag, const std::string &number)
+{
+    lastMsisdn_ = number;
+    lastMsisdnTag_ = alphaTag;
+    waitResult_ = false;
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
+    diallingNumber->name_ = Str8ToStr16(alphaTag);
+    diallingNumber->number_ = Str8ToStr16(number);
+    std::unique_lock<std::mutex> lock(IccFile::mtx_);
+    AppExecFwk::InnerEvent::Pointer phoneNumberEvent =
+            CreateDiallingNumberPointer(MSG_SIM_SET_MSISDN_DONE, 0, 0, nullptr);
+    DiallingNumberUpdateInfor infor;
+    infor.diallingNumber = diallingNumber;
+    infor.fileId = ELEMENTARY_FILE_MSISDN;
+    infor.extFile = ObtainExtensionElementaryFile(ELEMENTARY_FILE_MSISDN);
+    infor.index = 1;
+    diallingNumberHandler_->UpdateDiallingNumbers(infor, phoneNumberEvent);
+    while (!waitResult_) {
+        TELEPHONY_LOGI("update msisdn number wait, response = false");
+        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
+    TELEPHONY_LOGI("UpdateMsisdnNumber finished %{public}d", waitResult_);
+    return waitResult_;
+}
 
 void SimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
@@ -658,7 +681,7 @@ bool SimFile::ProcessGetMsisdnDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessSetMsisdnDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileProcessResponse = false;
+    bool isFileProcessResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("update Msisdn event is nullptr!");
         return isFileProcessResponse;
@@ -672,7 +695,12 @@ bool SimFile::ProcessSetMsisdnDone(const AppExecFwk::InnerEvent::Pointer &event)
     if (fd->exception == nullptr) {
         msisdn_ = lastMsisdn_;
         msisdnTag_ = lastMsisdnTag_;
+        waitResult_ = true;
+        processWait_.notify_all();
         TELEPHONY_LOGI("SimFile Success to update EF[MSISDN]");
+    } else {
+        processWait_.notify_all();
+        TELEPHONY_LOGE("SimFile Fail to update EF[MSISDN]");
     }
     return isFileProcessResponse;
 }
