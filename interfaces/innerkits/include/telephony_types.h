@@ -39,9 +39,9 @@ inline const int32_t DSDS_MODE_V3 = 1;
 inline const size_t MAX_PARAMETER_LENGTH = 100;
 inline const int32_t DUAL_SLOT_COUNT = 2;
 inline const int32_t MAX_SLOT_COUNT = 3;
-inline const int32_t DEFAULT_VALUE = -1;
+inline const int32_t VSIM_DEFAULT_VALUE = -1;
 inline int32_t maxSlotCount_ = 0;
-inline int32_t vSimModemCount_ = DEFAULT_VALUE;
+inline int32_t vSimModemCount_ = VSIM_DEFAULT_VALUE;
 inline constexpr const char *SATELLITE_DEFAULT_VALUE = "0";
 inline constexpr const char *DEFAULT_SLOT_COUNT = "1";
 inline constexpr const char *TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
@@ -71,14 +71,14 @@ template<typename T>
 inline T GetVSimModemCount()
 {
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_VSIM
-    if (vSimModemCount_ == DEFAULT_VALUE) {
+    if (vSimModemCount_ == VSIM_DEFAULT_VALUE) {
         char vSimModemCount[SYSPARA_SIZE] = { 0 };
         GetParameter(VSIM_MODEM_COUNT_STR, DEFAULT_VSIM_MODEM_COUNT, vSimModemCount, SYSPARA_SIZE);
         vSimModemCount_ = std::atoi(vSimModemCount);
     }
     return vSimModemCount_;
 #else
-    return DEFAULT_VALUE;
+    return VSIM_DEFAULT_VALUE;
 #endif
 }
 
