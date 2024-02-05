@@ -309,6 +309,17 @@ std::u16string SimFileManager::GetSimTelephoneNumber()
     return Str8ToStr16(result);
 }
 
+bool SimFileManager::SetSimTelephoneNumber(const std::u16string &alphaTag, const std::u16string &phoneNumber)
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::SetSimTelephoneNumber simFile nullptr");
+        return false;
+    }
+    std::string tag = Str16ToStr8(alphaTag);
+    std::string number = Str16ToStr8(phoneNumber);
+    return simFile_->UpdateMsisdnNumber(tag, number);
+}
+
 std::u16string SimFileManager::GetSimTeleNumberIdentifier()
 {
     if (simFile_ == nullptr) {
