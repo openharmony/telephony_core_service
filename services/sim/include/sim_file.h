@@ -38,6 +38,7 @@ public:
     bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber);
     bool SetVoiceMailCount(int32_t voiceMailCount);
     bool SetVoiceCallForwarding(bool enable, const std::string &number);
+    void ProcessIccRefresh(int msgId);
     std::string GetVoiceMailNumber();
     void SetVoiceMailNumber(const std::string mailNumber);
 
@@ -49,7 +50,6 @@ protected:
         OBTAIN_OPERATOR_NAMESTRING,
         OBTAIN_OPERATOR_NAME_SHORTFORM
     };
-    void ProcessIccRefresh(int msgId);
     void ProcessFileLoaded(bool response);
     void OnAllFilesFetched();
     void LoadSimFiles();
