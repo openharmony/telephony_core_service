@@ -77,6 +77,7 @@ public:
     std::shared_ptr<IccFileController> GetIccFileController();
     std::shared_ptr<IccDiallingNumbersHandler> ObtainDiallingNumberHandler();
     bool SetVoiceMailInfo(const std::u16string &mailName, const std::u16string &mailNumber);
+    bool SetSimTelephoneNumber(const std::u16string &alphaTag, const std::u16string &phoneNumber);
     bool HasSimCard();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;

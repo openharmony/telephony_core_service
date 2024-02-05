@@ -191,9 +191,10 @@ int IccFile::ObtainCallForwardStatus()
     return ICC_CALL_FORWARD_TYPE_UNKNOWN;
 }
 
-void IccFile::UpdateMsisdnNumber(
-    const std::string &alphaTag, const std::string &number, const AppExecFwk::InnerEvent::Pointer &onComplete)
-{}
+bool IccFile::UpdateMsisdnNumber(const std::string &alphaTag, const std::string &number)
+{
+    return false;
+}
 
 bool IccFile::ObtainFilesFetched()
 {
