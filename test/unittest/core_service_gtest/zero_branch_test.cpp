@@ -584,7 +584,6 @@ HWTEST_F(BranchTest, Telephony_SimFile_002, Function | MediumTest | Level1)
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     std::string testStr = "";
-    simFile->UpdateMsisdnNumber(testStr, testStr);
     EXPECT_TRUE(simFile->ProcessGetCphsMailBoxDone(event));
     EXPECT_TRUE(simFile->ProcessGetMbiDone(event));
     EXPECT_TRUE(simFile->ProcessGetCfisDone(event));
