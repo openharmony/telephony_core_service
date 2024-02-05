@@ -547,7 +547,6 @@ HWTEST_F(BranchTest, Telephony_SimFile_001, Function | MediumTest | Level1)
     simFile->InitMemberFunc();
     simFile->ProcessFileLoaded(false);
     simFile->ProcessFileLoaded(true);
-    simFile->ProcessIccRefresh(MSG_ID_DEFAULT);
     simFile->ProcessIccRefresh(ELEMENTARY_FILE_MBDN);
     simFile->ProcessIccRefresh(ELEMENTARY_FILE_MAILBOX_CPHS);
     simFile->ProcessIccRefresh(ELEMENTARY_FILE_CSP_CPHS);
