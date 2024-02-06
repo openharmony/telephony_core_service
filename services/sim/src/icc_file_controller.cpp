@@ -204,6 +204,10 @@ void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer 
     const AppExecFwk::InnerEvent::Pointer &process = rcvMsg->controlHolder->fileLoaded;
     IccFileData *result = &(rcvMsg->fileData);
     std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
+    if (hd == nullptr) {
+        TELEPHONY_LOGE("hd is nullptr");
+        return;
+    }
     TELEPHONY_LOGI("ProcessReadRecord %{public}d %{public}d %{public}d %{public}s", hd->getAllFile, hd->fileNum,
         hd->countFiles, result->resultData.c_str());
     path = CheckRightPath(hd->filePath, hd->fileId);
