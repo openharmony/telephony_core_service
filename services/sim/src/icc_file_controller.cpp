@@ -89,7 +89,7 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
     std::string path = IccFileController::NULLSTR;
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     if (rcvMsg == nullptr) {
-        TELEPHONY_LOGE("rcvMsg or controlHolder is nullptr");
+        TELEPHONY_LOGE("rcvMsg is nullptr");
         return;
     }
     IccFileData *result = &(rcvMsg->fileData);
