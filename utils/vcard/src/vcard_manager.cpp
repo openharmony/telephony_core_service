@@ -228,7 +228,7 @@ std::vector<std::vector<std::shared_ptr<VCardContact>>> VCardManager::SplitConta
         std::vector<std::shared_ptr<VCardContact>>::iterator end;
         while (curPtr < endPtr) {
             end = static_cast<size_t>(endPtr - curPtr) > step ? (step + curPtr) : endPtr;
-            step = static_cast<size_t>(endPtr - curPtr) > step ? step : (endPtr - curPtr);
+            step = static_cast<size_t>(endPtr - curPtr) > step ? step : static_cast<size_t>(endPtr - curPtr);
             result.push_back(std::vector<std::shared_ptr<VCardContact>>(curPtr, end));
             curPtr += step;
         }
