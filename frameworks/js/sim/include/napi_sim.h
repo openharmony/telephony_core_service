@@ -26,9 +26,8 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr size_t ARRAY_SIZE = 64;
-constexpr size_t MAX_APDU_STK_SIZE = 255;
-constexpr size_t kMaxNumberLen = 100;
+constexpr size_t ARRAY_SIZE = 255;
+constexpr size_t kMaxNumberLen = 254;
 
 template<typename T>
 struct AsyncContext {
@@ -39,7 +38,7 @@ struct AsyncContext {
 
 struct AsyncContext2 {
     AsyncContext<bool> asyncContext;
-    std::array<char, MAX_APDU_STK_SIZE> inputStr {};
+    std::array<char, ARRAY_SIZE> inputStr {};
 };
 
 struct AsyncContextPIN {
