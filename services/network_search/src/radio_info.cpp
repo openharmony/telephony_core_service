@@ -401,13 +401,9 @@ int32_t RadioInfo::ProcessSetNrOptionMode(const AppExecFwk::InnerEvent::Pointer 
 
 int32_t RadioInfo::ProcessGetNrOptionMode(const AppExecFwk::InnerEvent::Pointer &event) const
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode event is nullptr slotId:%{public}d", slotId_);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    if (nsm == nullptr) {
-        TELEPHONY_LOGE("RadioInfo::ProcessGetNrOptionMode nsm is nullptr slotId:%{public}d", slotId_);
+    if (event == nullptr || nsm == nullptr) {
+        TELEPHONY_LOGE("event or nsm is nullptr slotId:%{public}d", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::shared_ptr<NrModeInfo> nrModeInfo = event->GetSharedObject<NrModeInfo>();
