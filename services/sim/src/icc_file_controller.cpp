@@ -84,20 +84,13 @@ void IccFileController::ProcessLinearRecordSize(const AppExecFwk::InnerEvent::Po
 
 void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    int size = 0;
-    std::string str = IccFileController::NULLSTR;
-    std::string path = IccFileController::NULLSTR;
-    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
-        TELEPHONY_LOGE("rcvMsg is nullptr");
+    if (!CheckEvent(event)) {
+        TELEPHONY_LOGE("rcvMsg or result or hd is nullptr");
         return;
     }
+    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     IccFileData *result = &(rcvMsg->fileData);
     std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
-    if (result == nullptr || hd == nullptr) {
-        TELEPHONY_LOGE("result or hd is nullptr");
-        return;
-    }
     TELEPHONY_LOGI("ProcessRecordSize --- resultData: --- %{public}s", result->resultData.c_str());
     int recordLen = 0;
     std::shared_ptr<unsigned char> rawData = SIMUtils::HexStringConvertToBytes(result->resultData, recordLen);
@@ -107,7 +100,8 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
         return;
     }
     unsigned char *fileData = rawData.get();
-    path = CheckRightPath(hd->filePath, hd->fileId);
+    std::string path = CheckRightPath(hd->filePath, hd->fileId);
+    int size = 0;
     if (recordLen > LENGTH_OF_RECORD) {
         if (!IsValidRecordSizeData(fileData)) {
             TELEPHONY_LOGE("ProcessRecordSize get error filetype");
@@ -137,20 +131,14 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
 
 void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::string str = IccFileController::NULLSTR;
-    std::string path = IccFileController::NULLSTR;
     TELEPHONY_LOGD("ProcessBinarySize init");
+    if (!CheckEvent(event)) {
+        TELEPHONY_LOGE("rcvMsg or result or hd is nullptr");
+        return;
+    }
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
-        TELEPHONY_LOGE("rcvMsg is nullptr");
-        return;
-    }
     IccFileData *result = &(rcvMsg->fileData);
-    std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
-    if (result == nullptr || hd == nullptr) {
-        TELEPHONY_LOGE("ProcessBinarySize result or hd is nullptr");
-        return;
-    }
+    std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
     TELEPHONY_LOGI("ProcessBinarySize --- resultData: --- %{public}s", result->resultData.c_str());
     int binaryLen = 0;
     std::shared_ptr<unsigned char> rawData = SIMUtils::HexStringConvertToBytes(result->resultData, binaryLen);
@@ -190,6 +178,22 @@ void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer 
         msg.pin2 = "";
         telRilManager_->GetSimIO(slotId_, msg, process);
     }
+}
+
+bool CheckEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return false;
+    }
+    IccFileData *result = &(rcvMsg->fileData);
+    std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
+    if (result == nullptr || hd == nullptr) {
+        TELEPHONY_LOGE("ProcessBinarySize result or hd is nullptr");
+        return false;
+    }
+    return true;
 }
 
 void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer &event)
