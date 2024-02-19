@@ -180,7 +180,7 @@ void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer 
     }
 }
 
-bool CheckEvent(const AppExecFwk::InnerEvent::Pointer &event)
+bool IccFileController::CheckEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     if (rcvMsg == nullptr) {
