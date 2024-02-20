@@ -137,16 +137,13 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
 
 void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::string str = IccFileController::NULLSTR;
-    std::string path = IccFileController::NULLSTR;
-    TELEPHONY_LOGD("ProcessBinarySize init");
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     if (rcvMsg == nullptr) {
         TELEPHONY_LOGE("rcvMsg is nullptr");
         return;
     }
     IccFileData *result = &(rcvMsg->fileData);
-    std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
+    std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
     if (result == nullptr || hd == nullptr) {
         TELEPHONY_LOGE("ProcessBinarySize result or hd is nullptr");
         return;
