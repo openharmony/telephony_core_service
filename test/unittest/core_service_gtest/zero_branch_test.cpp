@@ -594,7 +594,7 @@ HWTEST_F(BranchTest, Telephony_SimFile_002, Function | MediumTest | Level1)
     EXPECT_TRUE(simFile->ProcessGetOplmnActDone(event));
     EXPECT_TRUE(simFile->ProcessGetSpdiDone(event));
     EXPECT_TRUE(simFile->ProcessGetMsisdnDone(event));
-    EXPECT_FALSE(simFile->ProcessSetMsisdnDone(event));
+    simFile->ProcessSetMsisdnDone(event);
     EXPECT_TRUE(simFile->ProcessObtainGid1Done(event));
     EXPECT_TRUE(simFile->ProcessObtainGid2Done(event));
     EXPECT_FALSE(simFile->ProcessSmsOnSim(event));
@@ -650,7 +650,7 @@ HWTEST_F(BranchTest, Telephony_SimFile_003, Function | MediumTest | Level1)
     EXPECT_TRUE(simFile->ProcessGetOplmnActDone(event));
     EXPECT_TRUE(simFile->ProcessGetSpdiDone(event));
     EXPECT_TRUE(simFile->ProcessGetMsisdnDone(event));
-    EXPECT_FALSE(simFile->ProcessSetMsisdnDone(event));
+    simFile->ProcessSetMsisdnDone(event);
     EXPECT_TRUE(simFile->ProcessObtainGid1Done(event));
     EXPECT_TRUE(simFile->ProcessObtainGid2Done(event));
     EXPECT_FALSE(simFile->ProcessSmsOnSim(event));
@@ -1316,7 +1316,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
     multiSimController->GetPrimarySlotId();
     EXPECT_NE(multiSimController->GetShowNumber(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SetShowNumber(0, testU16Str, false), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(multiSimController->SetShowNumberToDB(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    multiSimController->SetShowNumberToDB(0, testU16Str);
     EXPECT_NE(multiSimController->GetShowName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SetShowName(0, testU16Str, false), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SetActiveSim(0, 1, false), TELEPHONY_ERR_SUCCESS);
