@@ -98,7 +98,6 @@ private:
     std::string CheckRightPath(const std::string &path, int fileId);
     bool ProcessErrorResponse(const AppExecFwk::InnerEvent::Pointer &event);
     bool IsFixedNumberType(int);
-    bool CheckEvent(const AppExecFwk::InnerEvent::Pointer &event);
 };
 } // namespace Telephony
 } // namespace OHOS
