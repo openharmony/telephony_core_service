@@ -55,6 +55,7 @@ void OperatorNameUtils::Init()
         TELEPHONY_LOGI("has init");
         return;
     }
+    nameArray_.clear();
     ParserOperatorNameCustJson(nameArray_);
     TELEPHONY_LOGI("init success");
     isInit_ = true;
@@ -216,6 +217,10 @@ std::string OperatorNameUtils::GetCustomName(const std::string &numeric)
         Init();
     }
     TELEPHONY_LOGD("Start");
+    if (nameArray_.empty()) {
+        TELEPHONY_LOGE("nameArray_ is empty");
+        return "";
+    }
     for (OperatorNameCust value : nameArray_) {
         auto obj = std::find(value.mccMnc.begin(), value.mccMnc.end(), numeric);
         if (obj != value.mccMnc.end()) {
