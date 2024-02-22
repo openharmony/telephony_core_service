@@ -992,7 +992,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0100
     callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetNetworkModeCallbackResult();
     TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode syncResult: %{public}d", syncResult);
-    ASSERT_TRUE(syncResult);
+    ASSERT_GE(syncResult, TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1163,7 +1163,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0700
     callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetNetworkModeCallbackResult();
     TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode syncResult: %{public}d", syncResult);
-    ASSERT_TRUE(syncResult);
+    ASSERT_GE(syncResult, TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1191,7 +1191,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0100
     callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetNetworkModeCallbackResult();
     TELEPHONY_LOGI("GetNetworkSelectionMode_0100 SetNetworkModeCallbackResult syncResult: %{public}d", syncResult);
-    ASSERT_TRUE(syncResult);
+    ASSERT_GE(syncResult, TELEPHONY_ERR_SUCCESS);
 
     result = CoreServiceClient::GetInstance().GetNetworkSelectionMode(SLOT_ID, callback);
     TELEPHONY_LOGI("GetNetworkSelectionMode_0100 GetNetworkSelectionMode result: %{public}d", result);
@@ -1227,7 +1227,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0200
     callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetNetworkModeCallbackResult();
     TELEPHONY_LOGI("GetNetworkSelectionMode_0200 SetNetworkModeCallbackResult syncResult: %{public}d", syncResult);
-    ASSERT_TRUE(syncResult);
+    ASSERT_GE(syncResult, TELEPHONY_ERR_SUCCESS);
 
     result = CoreServiceClient::GetInstance().GetNetworkSelectionMode(SLOT_ID, callback);
     TELEPHONY_LOGI("GetNetworkSelectionMode_0200 GetNetworkSelectionMode result: %{public}d", result);
