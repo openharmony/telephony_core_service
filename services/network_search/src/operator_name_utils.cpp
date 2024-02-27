@@ -51,6 +51,7 @@ OperatorNameUtils &OperatorNameUtils::GetInstance()
 
 void OperatorNameUtils::Init()
 {
+    std::unique_lock<std::mutex> lock(mutex_);
     if (isInit_) {
         TELEPHONY_LOGI("has init");
         return;
@@ -63,7 +64,7 @@ void OperatorNameUtils::Init()
 
 bool OperatorNameUtils::IsInit()
 {
-    TELEPHONY_LOGI("is init %{public}d", isInit_);
+    TELEPHONY_LOGI("is init %{public}d nameArray_ size %{public}zu", isInit_, nameArray_.size());
     return isInit_;
 }
 
@@ -217,6 +218,7 @@ std::string OperatorNameUtils::GetCustomName(const std::string &numeric)
         Init();
     }
     TELEPHONY_LOGD("Start");
+    std::unique_lock<std::mutex> lock(mutex_);
     if (nameArray_.empty()) {
         TELEPHONY_LOGE("nameArray_ is empty");
         return "";
