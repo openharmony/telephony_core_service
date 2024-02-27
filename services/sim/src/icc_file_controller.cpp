@@ -85,8 +85,6 @@ void IccFileController::ProcessLinearRecordSize(const AppExecFwk::InnerEvent::Po
 void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer &event)
 {
     int size = 0;
-    std::string str = IccFileController::NULLSTR;
-    std::string path = IccFileController::NULLSTR;
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     if (rcvMsg == nullptr) {
         TELEPHONY_LOGE("rcvMsg is nullptr");
@@ -107,7 +105,7 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
         return;
     }
     unsigned char *fileData = rawData.get();
-    path = CheckRightPath(hd->filePath, hd->fileId);
+    std::string path = CheckRightPath(hd->filePath, hd->fileId);
     if (recordLen > LENGTH_OF_RECORD) {
         if (!IsValidRecordSizeData(fileData)) {
             TELEPHONY_LOGE("ProcessRecordSize get error filetype");
