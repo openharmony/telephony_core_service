@@ -463,7 +463,7 @@ std::string SimStateHandle::GetAidByCardType(CardType type)
 
 void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("SimStateHandle::GetSimCardData slotId = %{public}d", slotId);
+    TELEPHONY_LOGD("SimStateHandle::GetSimCardData slotId = %{public}d", slotId);
     int32_t error = 0;
     IccState iccState;
     std::shared_ptr<CardStatusInfo> param = event->GetSharedObject<CardStatusInfo>();
@@ -475,12 +475,11 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
     if (param != nullptr) {
         iccState.simType_ = param->simType;
         iccState.simStatus_ = param->simState;
-        modemInitDone_ = true;
-        TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), simType_ = %{public}d, simStatus_ = %{public}d",
-            iccState.simType_, iccState.simStatus_);
+        TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), slot%{public}d, type = %{public}d, status = %{public}d",
+            slotId, iccState.simType_, iccState.simStatus_);
     } else {
         error = static_cast<int32_t>(response->error);
-        TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), error = %{public}d", error);
+        TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), slot%{public}d, error = %{public}d", slotId, error);
         return;
     }
     ProcessIccCardState(iccState, slotId);

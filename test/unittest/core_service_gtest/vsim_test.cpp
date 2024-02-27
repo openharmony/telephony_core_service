@@ -22,6 +22,7 @@
 #include "operator_config_cache.h"
 #include "sim_test_util.h"
 #include "tel_ril_callback.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -141,6 +142,46 @@ HWTEST_F(SimTest, Telephony_VSim_GetMaxSimSlot_0100, Function | MediumTest | Lev
 #else
     EXPECT_EQ(SIM_SLOT_COUNT, maxSimSlot);
 #endif
+}
+
+/**
+ * @tc.number Telephony_VSim_Wrapper_0100
+ * @tc.name InitExtraModule
+ * @tc.desc Function test
+ */
+HWTEST_F(SimTest, Telephony_VSim_Wrapper_0100, Function | MediumTest | Level1)
+{
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForVSim();
+    if (TELEPHONY_EXT_WRAPPER.telephonyVSimWrapperHandle_ != nullptr) {
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isVSimInStatus_ != nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getVSimSlotId_ != nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.onAllFilesFetchedExt_ != nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.putVSimExtraInfo_ != nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.changeSpnAndRuleExt_ != nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getVSimCardState_ != nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getSimIdExt_ != nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getSlotIdExt_ != nullptr);
+    }
+}
+
+/**
+ * @tc.number Telephony_VSim_Wrapper_0200
+ * @tc.name InitExtraModule
+ * @tc.desc Function test
+ */
+HWTEST_F(SimTest, Telephony_VSim_Wrapper_0200, Function | MediumTest | Level1)
+{
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForVSim();
+    if (TELEPHONY_EXT_WRAPPER.telephonyVSimWrapperHandle_ == nullptr) {
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isVSimInStatus_ == nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getVSimSlotId_ == nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.onAllFilesFetchedExt_ == nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.putVSimExtraInfo_ == nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.changeSpnAndRuleExt_ == nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getVSimCardState_ == nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getSimIdExt_ == nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getSlotIdExt_ == nullptr);
+    }
 }
 
 #else // TEL_TEST_UNSUPPORT
