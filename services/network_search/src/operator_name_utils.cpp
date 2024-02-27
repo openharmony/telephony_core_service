@@ -223,7 +223,7 @@ std::string OperatorNameUtils::GetCustomName(const std::string &numeric)
         TELEPHONY_LOGE("nameArray_ is empty");
         return "";
     }
-    for (OperatorNameCust value : nameArray_) {
+    for (OperatorNameCust &value : nameArray_) {
         auto obj = std::find(value.mccMnc.begin(), value.mccMnc.end(), numeric);
         if (obj != value.mccMnc.end()) {
             std::string name = GetNameByLocale(value);
