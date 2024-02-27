@@ -54,6 +54,7 @@ private:
     static OperatorNameUtils operatorNameUtils_;
     bool isInit_ = false;
     std::vector<OperatorNameCust> nameArray_ = {};
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
