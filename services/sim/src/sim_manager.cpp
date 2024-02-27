@@ -1066,8 +1066,9 @@ void SimManager::RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExe
         }
         simStateManager_[slotId]->RegisterCoreNotify(handler, what);
     } else if (what == RadioEvent::RADIO_SIM_ACCOUNT_LOADED) {
-        if ((!IsValidSlotId(slotId)) || (multiSimMonitor_ == nullptr)) {
-            TELEPHONY_LOGE("slotId is invalid or multiSimMonitor_ is nullptr");
+        // IsVSimSlotId is used for the callback function can be registered in the VSIM card.
+        if ((!IsValidSlotId(slotId) && !multiSimMonitor_->IsVSimSlotId(slotId)) || (multiSimMonitor_ == nullptr)) {
+            TELEPHONY_LOGE("slotId is invalid or multiSimMonitor_ is nullptr !");
             return;
         }
         multiSimMonitor_->RegisterCoreNotify(slotId, handler, what);
