@@ -51,10 +51,12 @@ OperatorNameUtils &OperatorNameUtils::GetInstance()
 
 void OperatorNameUtils::Init()
 {
+    std::unique_lock<std::mutex> lock(mutex_);
     if (isInit_) {
         TELEPHONY_LOGI("has init");
         return;
     }
+    nameArray_.clear();
     ParserOperatorNameCustJson(nameArray_);
     TELEPHONY_LOGI("init success");
     isInit_ = true;
@@ -62,7 +64,7 @@ void OperatorNameUtils::Init()
 
 bool OperatorNameUtils::IsInit()
 {
-    TELEPHONY_LOGI("is init %{public}d", isInit_);
+    TELEPHONY_LOGI("is init %{public}d nameArray_ size %{public}zu", isInit_, nameArray_.size());
     return isInit_;
 }
 
@@ -216,7 +218,12 @@ std::string OperatorNameUtils::GetCustomName(const std::string &numeric)
         Init();
     }
     TELEPHONY_LOGD("Start");
-    for (OperatorNameCust value : nameArray_) {
+    std::unique_lock<std::mutex> lock(mutex_);
+    if (nameArray_.empty()) {
+        TELEPHONY_LOGE("nameArray_ is empty");
+        return "";
+    }
+    for (OperatorNameCust &value : nameArray_) {
         auto obj = std::find(value.mccMnc.begin(), value.mccMnc.end(), numeric);
         if (obj != value.mccMnc.end()) {
             std::string name = GetNameByLocale(value);
