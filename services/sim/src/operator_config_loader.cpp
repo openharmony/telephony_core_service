@@ -71,11 +71,9 @@ std::string OperatorConfigLoader::LoadOpKeyOnMccMnc(int32_t slotId)
     if (resultSet != nullptr) {
         std::string opkey = GetOpKey(resultSet, slotId);
         helper->Release();
-        helper = nullptr;
         return opkey;
     }
     helper->Release();
-    helper = nullptr;
     return DEFAULT_OPERATOR_KEY;
 }
 
