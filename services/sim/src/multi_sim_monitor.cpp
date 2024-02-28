@@ -149,7 +149,7 @@ bool MultiSimMonitor::IsValidSlotId(int32_t slotId)
 bool MultiSimMonitor::IsVSimSlotId(int32_t slotId)
 {
     if (TELEPHONY_EXT_WRAPPER.getVSimSlotId_) {
-        int vSimSlotId;
+        int vSimSlotId = DEFAULT_SIM_SLOT_ID_REMOVE;
         TELEPHONY_EXT_WRAPPER.getVSimSlotId_(vSimSlotId);
         return vSimSlotId == slotId;
     }

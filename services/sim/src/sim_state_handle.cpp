@@ -475,6 +475,7 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
     if (param != nullptr) {
         iccState.simType_ = param->simType;
         iccState.simStatus_ = param->simState;
+        modemInitDone_ = true;
         TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), slot%{public}d, type = %{public}d, status = %{public}d",
             slotId, iccState.simType_, iccState.simStatus_);
     } else {
