@@ -22,6 +22,7 @@
 #include "os_account_manager_wrapper.h"
 #include "radio_event.h"
 #include "string_ex.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -135,7 +136,7 @@ void MultiSimMonitor::RegisterCoreNotify(
         TELEPHONY_LOGE("controller_ is nullptr");
         return;
     }
-    if (controller_->IsSimActive(slotId)) {
+    if (controller_->IsSimActive(slotId) || IsVSimSlotId(slotId)) {
         TelEventHandler::SendTelEvent(handler, RadioEvent::RADIO_SIM_ACCOUNT_LOADED, slotId, 0);
     }
 }
@@ -143,6 +144,16 @@ void MultiSimMonitor::RegisterCoreNotify(
 bool MultiSimMonitor::IsValidSlotId(int32_t slotId)
 {
     return (slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT);
+}
+
+bool MultiSimMonitor::IsVSimSlotId(int32_t slotId)
+{
+    if (TELEPHONY_EXT_WRAPPER.getVSimSlotId_) {
+        int vSimSlotId = DEFAULT_SIM_SLOT_ID_REMOVE;
+        TELEPHONY_EXT_WRAPPER.getVSimSlotId_(vSimSlotId);
+        return vSimSlotId == slotId;
+    }
+    return false;
 }
 
 int32_t MultiSimMonitor::RegisterSimAccountCallback(

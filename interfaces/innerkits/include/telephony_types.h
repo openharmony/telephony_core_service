@@ -70,16 +70,12 @@ inline T GetMaxSlotCount()
 template<typename T>
 inline T GetVSimModemCount()
 {
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_VSIM
     if (vSimModemCount_ == VSIM_DEFAULT_VALUE) {
         char vSimModemCount[SYSPARA_SIZE] = { 0 };
         GetParameter(VSIM_MODEM_COUNT_STR, DEFAULT_VSIM_MODEM_COUNT, vSimModemCount, SYSPARA_SIZE);
         vSimModemCount_ = std::atoi(vSimModemCount);
     }
     return vSimModemCount_;
-#else
-    return VSIM_DEFAULT_VALUE;
-#endif
 }
 
 template<typename T>
