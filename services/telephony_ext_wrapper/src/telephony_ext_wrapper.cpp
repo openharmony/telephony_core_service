@@ -129,7 +129,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCust()
 void TelephonyExtWrapper::InitTelephonyExtWrapperForVSim()
 {
     TELEPHONY_LOGI("[VSIM] telephony ext wrapper init begin");
-    telephonyVSimWrapperHandle_ = dlopen(TELEPHONY_EXT_WRAPPER_PATH.c_str(), RTLD_NOW);
+    telephonyVSimWrapperHandle_ = dlopen(TELEPHONY_VSIM_WRAPPER_PATH.c_str(), RTLD_NOW);
     if (telephonyVSimWrapperHandle_ == nullptr) {
         TELEPHONY_LOGE("libtel_vsim_symbol.z.so was not loaded, error: %{public}s", dlerror());
         return;

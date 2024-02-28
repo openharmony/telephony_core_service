@@ -48,6 +48,7 @@ public:
     void NotifySimAccountChanged();
     void RegisterSimNotify();
     void UnRegisterSimNotify();
+    bool IsVSimSlotId(int32_t slotId);
 
 public:
     enum {

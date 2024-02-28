@@ -69,7 +69,7 @@ public:
     typedef void (*IS_VSIM_IN_STATUS)(int32_t slotId, int32_t type, bool &status);
     typedef void (*GET_VSIM_SLOT_ID)(int32_t &slotId);
     typedef void (*ON_ALL_FILES_FETCHED_EXT)(int32_t slotId);
-    typedef void (*PUT_VSIM_EXTRA_INFO)(OHOS::AAFwk::Want &want, int32_t slotId, std::string value);
+    typedef void (*PUT_VSIM_EXTRA_INFO)(OHOS::AAFwk::Want &want, int32_t slotId, int32_t value);
     typedef void (*CHANGE_SPN_AND_RULE_EXT)(std::string &spn, int32_t &rule, bool &showSpn);
     typedef void (*GET_VSIM_CARD_STATE)(int32_t &cardType);
     typedef bool (*GET_SIM_ID_EXT)(int32_t slotId, int32_t &simId);
