@@ -67,7 +67,11 @@ void IccFileController::ProcessLinearRecordSize(const AppExecFwk::InnerEvent::Po
         return;
     }
     IccFileData *result = &(rcvMsg->fileData);
-    std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
+    if (rcvMsg->controlHolder == nullptr) {
+        TELEPHONY_LOGE("controlHolder is nullptr");
+        return;
+    }
+    std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
     if (result == nullptr || hd == nullptr) {
         TELEPHONY_LOGE("result or hd is nullptr");
         return;
@@ -90,8 +94,12 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
     std::string str = IccFileController::NULLSTR;
     std::string path = IccFileController::NULLSTR;
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return;
+    }
     IccFileData *result = &(rcvMsg->fileData);
-    std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
+    std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
     if (result == nullptr || hd == nullptr) {
         TELEPHONY_LOGE("result or hd is nullptr");
         return;
@@ -173,9 +181,17 @@ void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer 
     std::string str = IccFileController::NULLSTR;
     std::string path = IccFileController::NULLSTR;
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return;
+    }
     const AppExecFwk::InnerEvent::Pointer &process = rcvMsg->controlHolder->fileLoaded;
     IccFileData *result = &(rcvMsg->fileData);
-    std::shared_ptr<IccControllerHolder> &hd = rcvMsg->controlHolder;
+    std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
+    if (hd == nullptr) {
+        TELEPHONY_LOGE("hd is nullptr");
+        return;
+    }
     TELEPHONY_LOGI("ProcessReadRecord %{public}d %{public}d %{public}d %{public}s", hd->getAllFile, hd->fileNum,
         hd->countFiles, result->resultData.c_str());
     path = CheckRightPath(hd->filePath, hd->fileId);
