@@ -350,6 +350,9 @@ void NetworkSearchState::NotifyPsRadioTechChange()
     }
 
     if (networkState_->GetPsRadioTech() != networkStateOld_->GetPsRadioTech()) {
+        TELEPHONY_LOGI("NotifyPsRadioTechChange NetworkSearchManager csRadioTech is %{public}d psRadioTech is  %{public}d", networkState_->GetCsRadioTech(),
+                    networkState_->GetPsRadioTech());
+        networkSearchManager->UpdatePhone(slotId_, networkState_->GetCsRadioTech(), networkState_->GetPsRadioTech());
         networkSearchManager->SendUpdateCellLocationRequest(slotId_);
         networkSearchManager->NotifyPsRatChanged(slotId_);
     }
