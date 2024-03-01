@@ -42,6 +42,7 @@ inline const int32_t MAX_SLOT_COUNT = 3;
 inline const int32_t VSIM_DEFAULT_VALUE = -1;
 inline int32_t maxSlotCount_ = 0;
 inline int32_t vSimModemCount_ = VSIM_DEFAULT_VALUE;
+inline constexpr size_t ARRAY_SIZE = 1024;
 inline constexpr const char *SATELLITE_DEFAULT_VALUE = "0";
 inline constexpr const char *DEFAULT_SLOT_COUNT = "1";
 inline constexpr const char *TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
