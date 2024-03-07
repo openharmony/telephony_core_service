@@ -247,6 +247,10 @@ public:
 
     int32_t InitExtraModule(int32_t slotId) override;
 
+    bool IsAllowedInsertApn(std::string &value) override;
+
+    int32_t GetTargetOpkey(int32_t slotId, std::u16string &opkey) override;
+
 private:
     bool Init();
 
