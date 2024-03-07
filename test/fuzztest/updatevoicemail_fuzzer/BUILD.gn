@@ -32,6 +32,7 @@ ohos_fuzztest("UpdateVoiceMailFuzzTest") {
     "$SUBSYSTEM_DIR/core_service/services/sim/include",
     "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer",
     "$SUBSYSTEM_DIR/core_service/services/tel_ril/include",
+    "$SUBSYSTEM_DIR/core_service/utils/common/include",
   ]
 
   configs = [ "$SUBSYSTEM_DIR/core_service/utils:telephony_log_config" ]
