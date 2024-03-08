@@ -38,6 +38,7 @@
 using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr const char *FILE_NAME = "example.vcf";
+constexpr int32_t TYPE_NUM = 3;
 
 void WriteTestData(const std::string &testStr)
 {
@@ -207,6 +208,129 @@ void ContructRelationData(const uint8_t *data, size_t size)
     auto value = constructor->ContactVCard(contact);
 }
 
+void DecodeVcardRelationV30(const uint8_t *data, size_t size)
+{
+    std::string inputString = "BEGIN:VCARD\r\nVERSION:3.0\r\nN:\r\nFN:\r\nTEL;TYPE=HOME:1202020\r\nTEL;TYPE=WORK,FAX:"
+                              "49305484\r\nTEL;TYPE=X-Work:503330303030\r\nEND:VCARD\r\n";
+    WriteTestData(inputString);
+    int32_t errorCode;
+    VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
+}
+
+void DecodeVcardRelationDataV30(const uint8_t *data, size_t size)
+{
+    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
+    std::string inputString = "BEGIN:VCARD\r\nVERSION:3.0\r\nN:\r\nFN:\r\nTEL;TYPE=HOME:1202020\r\nTEL;TYPE=WORK,FAX:"
+                              "49305484\r\nTEL;TYPE=X-Work:503330303030\r\nEND:VCARD\r\n" +
+                              fuzzdata;
+    WriteTestData(inputString);
+    int32_t errorCode;
+    VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
+}
+
+void DecodeVcardRelationV40(const uint8_t *data, size_t size)
+{
+    std::string inputString =
+        "BEGIN:VCARD\r\nVERSION:4.0\r\nN:test1;;;;\r\nFN:test1\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:4.0\r\nN:test2;;;"
+        ";\r\nFN:test2\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:4.0\r\nN:test3;;;;\r\nFN:test3\r\nEND:VCARD\r\n";
+    WriteTestData(inputString);
+    int32_t errorCode;
+    VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
+}
+
+void DecodeVcardRelationDataV40(const uint8_t *data, size_t size)
+{
+    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
+    std::string inputString =
+        "BEGIN:VCARD\r\nVERSION:4.0\r\nN:test1;;;;\r\nFN:test1\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:4.0\r\nN:test2;;;"
+        ";\r\nFN:test2\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:4.0\r\nN:test3;;;;\r\nFN:test3\r\nEND:VCARD\r\n" +
+        fuzzdata;
+    WriteTestData(inputString);
+    int32_t errorCode;
+    VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
+}
+
+void Import(const uint8_t *data, size_t size)
+{
+    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
+    int32_t accountId = static_cast<int32_t>(size);
+    VCardManager::GetInstance().Import(fuzzdata, accountId);
+}
+
+void ImportLock(const uint8_t *data, size_t size)
+{
+    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
+    int32_t accountId = static_cast<int32_t>(size);
+    VCardManager::GetInstance().ImportLock(fuzzdata, nullptr, accountId);
+}
+
+void Export(const uint8_t *data, size_t size)
+{
+    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
+    DataShare::DataSharePredicates predicates;
+    predicates.Between(Contact::ID, "0", "10");
+    int32_t cardType = static_cast<int32_t>(size % TYPE_NUM);
+    VCardManager::GetInstance().Export(fuzzdata, predicates, cardType);
+}
+
+void ExportLock(const uint8_t *data, size_t size)
+{
+    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
+    DataShare::DataSharePredicates predicates;
+    predicates.Between(Contact::ID, "0", "10");
+    int32_t cardType = static_cast<int32_t>(size % TYPE_NUM);
+    VCardManager::GetInstance().ExportLock(fuzzdata, nullptr, predicates, cardType);
+}
+
+void ExportToStr(const uint8_t *data, size_t size)
+{
+    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
+    DataShare::DataSharePredicates predicates;
+    predicates.Between(Contact::ID, "0", "10");
+    int32_t cardType = static_cast<int32_t>(size % TYPE_NUM);
+    VCardManager::GetInstance().ExportToStr(fuzzdata, predicates, cardType);
+    VCardManager::GetInstance().SetDataHelper(nullptr);
+}
+
+void VCardUtilsTest(const uint8_t *data, size_t size)
+{
+    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
+    int32_t intPara = static_cast<int32_t>(size);
+    char argument = static_cast<char>(size);
+    std::string fileData(reinterpret_cast<const char *>(data), size);
+    std::string numberStr = std::to_string(intPara);
+    std::vector<std::string> records;
+    records.push_back(fileData);
+    VCardUtils::EqualsIgnoreCase(fuzzdata, fuzzdata);
+    VCardUtils::Trim(fuzzdata);
+    VCardUtils::ToUpper(fuzzdata);
+    VCardUtils::StartWith(fuzzdata, fuzzdata);
+    VCardUtils::EndWith(fuzzdata, fuzzdata);
+    VCardUtils::EncodeBase64(fuzzdata);
+    VCardUtils::DecodeBase64(fuzzdata);
+    VCardUtils::ConvertCharset(fuzzdata, fuzzdata, fuzzdata, intPara);
+    VCardUtils::CreateFileName();
+    VCardUtils::SaveFile(fuzzdata, fuzzdata);
+    VCardUtils::IsPrintableAscii(fuzzdata);
+    VCardUtils::GetTypeFromImLabelId(numberStr);
+    VCardUtils::GetTypeFromPhoneLabelId(numberStr);
+    VCardUtils::GetImageType(fuzzdata);
+    VCardUtils::IsNum(fuzzdata);
+    VCardUtils::ConstructListFromValue(fuzzdata, fuzzdata);
+    VCardUtils::VcardtypeToInt(fuzzdata);
+    VCardUtils::FormatNumber(fuzzdata);
+    VCardUtils::GetPhoneNumberFormat(intPara);
+    VCardUtils::GetLabelIdFromImType(fuzzdata);
+    VCardUtils::HandleTypeAndLabel(intPara, fuzzdata, fuzzdata, fuzzdata);
+    VCardUtils::IsPrintableAscii(fuzzdata);
+    VCardUtils::IsPrintableAscii(argument);
+    VCardUtils::IsPrintableAscii(records);
+    VCardUtils::IsWrapPrintableAscii(records);
+    VCardUtils::TrimListToString(records);
+    VCardUtils::IsAllEmpty(records);
+    VCardUtils::HandleCh(argument, fuzzdata);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     DecodeVcard(data, size);
@@ -217,6 +341,16 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     ContructNameData(data, size);
     ContructRelation(data, size);
     ContructRelationData(data, size);
+    DecodeVcardRelationV30(data, size);
+    DecodeVcardRelationDataV30(data, size);
+    DecodeVcardRelationV40(data, size);
+    DecodeVcardRelationDataV40(data, size);
+    Import(data, size);
+    ImportLock(data, size);
+    Export(data, size);
+    ExportLock(data, size);
+    ExportToStr(data, size);
+    VCardUtilsTest(data, size);
     return;
 }
 } // namespace OHOS
