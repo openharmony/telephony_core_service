@@ -1940,11 +1940,9 @@ void TelRilTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
             break;
         }
         case uint32_t(CustomMessageID::MSG_SIM_AUTHENTICATION_DONE): {
-            TELEPHONY_LOGI("sim authentication done");
             break;
         }
         case uint32_t(CustomMessageID::MSG_SIM_SEND_NCFG_OPER_INFO_DONE): {
-            TELEPHONY_LOGI("sim SendSimMatchedOperatorInfo done");
             break;
         }
         case uint32_t(DiffInterfaceId::TEST_GET_BASEBAND_VERSION): {
