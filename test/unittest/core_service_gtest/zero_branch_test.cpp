@@ -2186,6 +2186,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_006, Function | MediumTest |
     nsm->RevertLastTechnology(INVALID_SLOTID);
     nsm->IsNeedDelayNotify(INVALID_SLOTID);
     nsm->HandleNotifyStateChangeWithDelay(INVALID_SLOTID, true);
+    nsm->HandleNotifyStateChangeWithDelay(INVALID_SLOTID, false);
     nsm->InitSimRadioProtocol(INVALID_SLOTID);
     nsm->UnregisterImsRegInfoCallback(INVALID_SLOTID, ImsServiceType::TYPE_SMS, bundleName);
     EXPECT_EQ(nsm->HandleRrcStateChanged(INVALID_SLOTID, 0), TELEPHONY_ERR_FAIL);
