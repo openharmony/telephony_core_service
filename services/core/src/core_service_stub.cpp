@@ -28,6 +28,7 @@ CoreServiceStub::CoreServiceStub()
     AddHandlerNetWorkToMap();
     AddHandlerSimToMap();
     AddHandlerSimToMapExt();
+    AddHandlerPdpProfileToMap();
 }
 
 void CoreServiceStub::AddHandlerNetWorkToMap()
@@ -158,6 +159,12 @@ void CoreServiceStub::AddHandlerSimToMapExt()
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SLOTID)] = &CoreServiceStub::OnGetSlotId;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SIMID)] = &CoreServiceStub::OnGetSimId;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::INIT_EXTRA_MODULE)] = &CoreServiceStub::OnInitExtraModule;
+}
+
+void CoreServiceStub::AddHandlerPdpProfileToMap()
+{
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_ALLOWED_INSERT_APN)] = &CoreServiceStub::OnIsAllowedInsertApn;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_TARGET_OPKEY)] = &CoreServiceStub::OnGetTargetOpkey;
 }
 
 int32_t CoreServiceStub::OnRemoteRequest(
@@ -1695,6 +1702,33 @@ int32_t CoreServiceStub::OnInitExtraModule(MessageParcel &data, MessageParcel &r
     int32_t result = InitExtraModule(slotId);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("Write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnIsAllowedInsertApn(MessageParcel &data, MessageParcel &reply)
+{
+    std::string value = data.ReadString();
+    bool result = IsAllowedInsertApn(value);
+    if (!reply.WriteBool(result)) {
+        TELEPHONY_LOGE("Write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t CoreServiceStub::OnGetTargetOpkey(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string opkey;
+    int32_t result = GetTargetOpkey(slotId, opkey);
+    if (!reply.WriteString16(opkey)) {
+        TELEPHONY_LOGE("Write reply opkey failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("Write reply result failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return result;

@@ -75,6 +75,8 @@ public:
     typedef bool (*GET_SIM_ID_EXT)(int32_t slotId, int32_t &simId);
     typedef bool (*GET_SLOT_ID_EXT)(int32_t simId, int32_t &slotId);
     /* add for vsim end */
+    typedef bool (*IS_ALLOWED_INSERT_APN)(std::string &value);
+    typedef void (*GET_TARGET_OPKEY)(int32_t slotId, std::u16string &opkey);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -114,6 +116,8 @@ public:
     GET_SIM_ID_EXT getSimIdExt_ = nullptr;
     GET_SLOT_ID_EXT getSlotIdExt_ = nullptr;
     /* add for vsim end */
+    IS_ALLOWED_INSERT_APN isAllowedInsertApn_ = nullptr;
+    GET_TARGET_OPKEY getTargetOpkey_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -122,6 +126,7 @@ private:
     void InitTelephonyExtWrapperForVoiceMail();
     void InitTelephonyExtWrapperForCust();
     void InitTelephonyExtWrapperForVSim();
+    void InitTelephonyExtWrapperForApnCust();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

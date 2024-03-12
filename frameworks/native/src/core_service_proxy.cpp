@@ -3030,5 +3030,64 @@ int32_t CoreServiceProxy::InitExtraModule(int32_t slotId)
     }
     return reply.ReadInt32();
 }
+
+bool CoreServiceProxy::IsAllowedInsertApn(std::string &value)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return true;
+    }
+
+    if (!data.WriteString(value)) {
+        TELEPHONY_LOGE("WriteString is false");
+        return true;
+    }
+
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return true;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int32_t error = remote->SendRequest(
+        static_cast<uint32_t>(CoreServiceInterfaceCode::IS_ALLOWED_INSERT_APN), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("Error code is %{public}d", error);
+        return true;
+    }
+    return reply.ReadBool();
+}
+
+int32_t CoreServiceProxy::GetTargetOpkey(int32_t slotId, std::u16string &opkey)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("WriteInt32 slotId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int32_t error =
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::GET_TARGET_OPKEY), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("Error code is %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    opkey = reply.ReadString16();
+    return reply.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS

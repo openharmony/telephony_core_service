@@ -1571,5 +1571,21 @@ int32_t CoreService::GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbI
     }
     return networkSearchManager_->GetNrSsbId(slotId, nrSsbInformation);
 }
+
+bool CoreService::IsAllowedInsertApn(std::string &value)
+{
+    if (TELEPHONY_EXT_WRAPPER.isAllowedInsertApn_ != nullptr) {
+        return TELEPHONY_EXT_WRAPPER.isAllowedInsertApn_(value);
+    }
+    return true;
+}
+
+int32_t CoreService::GetTargetOpkey(int32_t slotId, std::u16string &opkey)
+{
+    if (TELEPHONY_EXT_WRAPPER.getTargetOpkey_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.getTargetOpkey_(slotId, opkey);
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

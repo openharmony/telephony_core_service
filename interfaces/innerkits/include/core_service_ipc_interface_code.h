@@ -115,6 +115,8 @@ enum class CoreServiceInterfaceCode {
     FACTORY_RESET,
     GET_NR_SSB_ID_INFO,
     INIT_EXTRA_MODULE,
+    IS_ALLOWED_INSERT_APN,
+    GET_TARGET_OPKEY,
 };
 } // namespace Telephony
 } // namespace OHOS
