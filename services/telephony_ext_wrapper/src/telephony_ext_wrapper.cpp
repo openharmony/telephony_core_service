@@ -124,6 +124,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCust()
     if (updateNetworkStateExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+    InitTelephonyExtWrapperForApnCust();
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapperForVSim()
@@ -152,6 +153,15 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForVSim()
         return;
     }
     TELEPHONY_LOGI("[VSIM] telephony ext wrapper init success");
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForApnCust()
+{
+    isAllowedInsertApn_ = (IS_ALLOWED_INSERT_APN)dlsym(telephonyExtWrapperHandle_, "IsAllowedInsertApn");
+    getTargetOpkey_ = (GET_TARGET_OPKEY)dlsym(telephonyExtWrapperHandle_, "GetTargetOpkey");
+    if (isAllowedInsertApn_ == nullptr || getTargetOpkey_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
 }
 
 } // namespace Telephony

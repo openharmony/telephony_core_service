@@ -143,6 +143,8 @@ public:
     virtual int32_t FactoryReset(int32_t slotId) = 0;
     virtual int32_t GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation) = 0;
     virtual int32_t InitExtraModule(int32_t slotId) = 0;
+    virtual bool IsAllowedInsertApn(std::string &value) = 0;
+    virtual int32_t GetTargetOpkey(int32_t slotId, std::u16string &opkey) = 0;
 
 protected:
     const int32_t ERROR = -1;

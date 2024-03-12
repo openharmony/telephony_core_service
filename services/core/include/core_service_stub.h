@@ -32,6 +32,7 @@ private:
     void AddHandlerNetWorkToMap();
     void AddHandlerSimToMap();
     void AddHandlerSimToMapExt();
+    void AddHandlerPdpProfileToMap();
 
 private:
     using CoreServiceFunc = int32_t (CoreServiceStub::*)(MessageParcel &data, MessageParcel &reply);
@@ -128,6 +129,8 @@ private:
     int32_t OnFactoryReset(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetNrSsbIdInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnInitExtraModule(MessageParcel &data, MessageParcel &reply);
+    int32_t OnIsAllowedInsertApn(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetTargetOpkey(MessageParcel &data, MessageParcel &reply);
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;

@@ -1029,5 +1029,25 @@ int32_t CoreServiceClient::InitExtraModule(int32_t slotId)
     }
     return proxy->InitExtraModule(slotId);
 }
+
+bool CoreServiceClient::IsAllowedInsertApn(std::string &value)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return true;
+    }
+    return proxy->IsAllowedInsertApn(value);
+}
+
+int32_t CoreServiceClient::GetTargetOpkey(int32_t slotId, std::u16string &opkey)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetTargetOpkey(slotId, opkey);
+}
 } // namespace Telephony
 } // namespace OHOS
