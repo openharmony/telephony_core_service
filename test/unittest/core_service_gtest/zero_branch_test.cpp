@@ -19,7 +19,6 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_manager_inner.h"
-#include "core_service.h"
 #include "core_service_client.h"
 #include "csim_file_controller.h"
 #include "gtest/gtest.h"
@@ -61,7 +60,6 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
-std::shared_ptr<CoreService> g_coreServicePtr = nullptr;
 
 namespace {
 const int32_t SLOT_ID_0 = 0;
@@ -91,22 +89,9 @@ public:
     void SetUp();
     void TearDown();
 };
-void BranchTest::SetUpTestCase()
-{
-    g_coreServicePtr = std::make_shared<CoreService>();
-    if (g_coreServicePtr == nullptr) {
-        return;
-    }
-    g_coreServicePtr->Init();
-}
+void BranchTest::SetUpTestCase() {}
 
-void BranchTest::TearDownTestCase()
-{
-    if (g_coreServicePtr == nullptr) {
-        return;
-    }
-    g_coreServicePtr->OnStop();
-}
+void BranchTest::TearDownTestCase() {}
 
 void BranchTest::SetUp() {}
 
