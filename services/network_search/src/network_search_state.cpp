@@ -350,6 +350,7 @@ void NetworkSearchState::NotifyPsRadioTechChange()
     }
 
     if (networkState_->GetPsRadioTech() != networkStateOld_->GetPsRadioTech()) {
+        networkSearchManager->UpdatePhone(slotId_, networkState_->GetCsRadioTech(), networkState_->GetPsRadioTech());
         networkSearchManager->SendUpdateCellLocationRequest(slotId_);
         networkSearchManager->NotifyPsRatChanged(slotId_);
     }
