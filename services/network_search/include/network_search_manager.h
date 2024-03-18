@@ -256,6 +256,8 @@ public:
     int32_t GetRrcConnectionState(int32_t slotId, int32_t &status) override;
     int32_t UpdateRrcConnectionState(int32_t slotId, int32_t &status);
     int32_t GetNrSsbId(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation) override;
+    int32_t IsGsm(int32_t slotId, bool &isGsm) override;
+    int32_t IsCdma(int32_t slotId, bool &isCdma) override;
 
     inline void InitMsgNum(int32_t slotId)
     {
