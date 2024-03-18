@@ -398,7 +398,7 @@ void NetworkState::SetLongOperatorName(const std::string &longName, DomainType d
     }
 }
 
-bool NetworkState::IsCdma() const
+bool NetworkState::IsGsm() const
 {
     switch (psRadioTech_) {
         case RadioTech::RADIO_TECHNOLOGY_GSM:
@@ -408,7 +408,7 @@ bool NetworkState::IsCdma() const
     }
 }
 
-bool NetworkState::IsGsm() const
+bool NetworkState::IsCdma() const
 {
     switch (psRadioTech_) {
         case RadioTech::RADIO_TECHNOLOGY_1XRTT:
