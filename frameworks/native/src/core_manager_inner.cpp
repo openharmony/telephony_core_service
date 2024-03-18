@@ -2361,8 +2361,8 @@ int32_t CoreManagerInner::IsCTSimCard(int32_t slotId, bool &isCTSimCard)
 int32_t CoreManagerInner::IsGsm(int32_t slotId, bool &isGsm)
 {
     if (networkSearchManager_ == nullptr) {
-         TELEPHONY_LOGE("networkSearchManager is null!");
-         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        TELEPHONY_LOGE("networkSearchManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return networkSearchManager_->IsGsm(slotId, isGsm);
 }
@@ -2370,8 +2370,8 @@ int32_t CoreManagerInner::IsGsm(int32_t slotId, bool &isGsm)
 int32_t CoreManagerInner::IsCdma(int32_t slotId, bool &isCdma)
 {
     if (networkSearchManager_ == nullptr) {
-         TELEPHONY_LOGE("networkSearchManager is null!");
-         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        TELEPHONY_LOGE("networkSearchManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return networkSearchManager_->IsCdma(slotId, isCdma);
 }
