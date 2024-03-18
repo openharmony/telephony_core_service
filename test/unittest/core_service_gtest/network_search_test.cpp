@@ -2626,7 +2626,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_IsGsm__0100, Function | Medi
 {
     AccessToken token;
     bool isGsm = false;
-    CoreManagerInner::GetInstance().IsGsm(SLOT_ID, false);
+    CoreManagerInner::GetInstance().IsGsm(SLOT_ID, isGsm);
     TELEPHONY_LOGI("TelephonyTestService Telephony_NetworkSearch_IsGsm Result: %{public}d", isGsm);
 }
 
@@ -2639,7 +2639,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_IsCdma__0100, Function | Med
 {
     AccessToken token;
     bool isCdma = false;
-    CoreManagerInner::GetInstance().IsCdma(SLOT_ID, false);
+    CoreManagerInner::GetInstance().IsCdma(SLOT_ID, isCdma);
     TELEPHONY_LOGI("TelephonyTestService Telephony_NetworkSearch_IsCdma Result: %{public}d", isCdma);
 }
 
