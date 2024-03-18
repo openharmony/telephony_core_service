@@ -199,6 +199,8 @@ public:
     virtual void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive) = 0;
     virtual int32_t NotifyCallStatusToNetworkSearch(int32_t slotId, int32_t callStatus) = 0;
     virtual int32_t HandleNotifyStateChangeWithDelay(int32_t slotId, bool isNeedDelay) = 0;
+    virtual int32_t IsGsm(int32_t slotId, bool &isGsm) = 0;
+    virtual int32_t IsCdma(int32_t slotId, bool &isCdma) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

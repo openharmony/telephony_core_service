@@ -1830,5 +1830,38 @@ int32_t NetworkSearchManager::GetNrSsbId(int32_t slotId, const std::shared_ptr<N
     }
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
+
+int32_t NetworkSearchManager::IsGsm(int32_t slotId, bool &isGsm)
+{
+    auto inner = FindManagerInner(slotId);
+     if (inner == nullptr) {
+         TELEPHONY_LOGE("NetworkSearchManager::IsGsm Failed slotId:%{public}d", slotId);
+         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+     }
+     if ((inner->networkSearchState_ == nullptr) || (inner->networkSearchState_->GetNetworkStatus() == nullptr)) {
+         TELEPHONY_LOGE("NetworkSearchManager::IsGsm failed due to nullptr!");
+         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+     }
+     isGsm = inner->networkSearchState_->GetNetworkStatus()->IsGsm();
+     TELEPHONY_LOGD("NetworkSearchManager::IsGsm result=%{public}d slotId:%{public}d", isGsm, slotId);
+     return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkSearchManager::IsCdma(int32_t slotId, bool &isCdma)
+{
+    auto inner = FindManagerInner(slotId);
+     if (inner == nullptr) {
+         TELEPHONY_LOGE("NetworkSearchManager::IsCdma Failed slotId:%{public}d", slotId);
+         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+     }
+     if ((inner->networkSearchState_ == nullptr) || (inner->networkSearchState_->GetNetworkStatus() == nullptr)) {
+         TELEPHONY_LOGE("NetworkSearchManager::IsCdma failed due to nullptr!");
+         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+     }
+     isCdma = inner->networkSearchState_->GetNetworkStatus()->IsCdma();
+     TELEPHONY_LOGD("NetworkSearchManager::IsCdma result=%{public}d slotId:%{public}d", isCdma, slotId);
+     return TELEPHONY_ERR_SUCCESS;
+}
+
 } // namespace Telephony
 } // namespace OHOS
