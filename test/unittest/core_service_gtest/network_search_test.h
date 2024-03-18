@@ -21,6 +21,7 @@
 
 #include "accesstoken_kit.h"
 #include "core_service_client.h"
+#include "core_manager_inner.h"
 #include "token_setproc.h"
 
 namespace OHOS {

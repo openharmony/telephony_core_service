@@ -397,5 +397,29 @@ void NetworkState::SetLongOperatorName(const std::string &longName, DomainType d
         csOperatorInfo_.fullName = longName;
     }
 }
+
+bool NetworkState::IsCdma() const
+{
+    switch (psRadioTech_) {
+        case RadioTech::RADIO_TECHNOLOGY_GSM:
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool NetworkState::IsGsm() const
+{
+    switch (psRadioTech_) {
+        case RadioTech::RADIO_TECHNOLOGY_1XRTT:
+        case RadioTech::RADIO_TECHNOLOGY_WCDMA:
+        case RadioTech::RADIO_TECHNOLOGY_TD_SCDMA:
+        case RadioTech::RADIO_TECHNOLOGY_EVDO:
+        case RadioTech::RADIO_TECHNOLOGY_EHRPD:
+            return true;
+        default:
+            return false;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
