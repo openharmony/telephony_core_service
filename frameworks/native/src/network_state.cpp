@@ -402,6 +402,13 @@ bool NetworkState::IsGsm() const
 {
     switch (psRadioTech_) {
         case RadioTech::RADIO_TECHNOLOGY_GSM:
+        case RadioTech::RADIO_TECHNOLOGY_WCDMA:
+        case RadioTech::RADIO_TECHNOLOGY_HSPA:
+        case RadioTech::RADIO_TECHNOLOGY_HSPAP:
+        case RadioTech::RADIO_TECHNOLOGY_TD_SCDMA:
+        case RadioTech::RADIO_TECHNOLOGY_LTE:
+        case RadioTech::RADIO_TECHNOLOGY_LTE_CA:
+        case RadioTech::RADIO_TECHNOLOGY_IWLAN:
             return true;
         default:
             return false;
@@ -412,8 +419,6 @@ bool NetworkState::IsCdma() const
 {
     switch (psRadioTech_) {
         case RadioTech::RADIO_TECHNOLOGY_1XRTT:
-        case RadioTech::RADIO_TECHNOLOGY_WCDMA:
-        case RadioTech::RADIO_TECHNOLOGY_TD_SCDMA:
         case RadioTech::RADIO_TECHNOLOGY_EVDO:
         case RadioTech::RADIO_TECHNOLOGY_EHRPD:
             return true;
