@@ -2616,6 +2616,33 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNrOptionMode_0200, Functi
     TELEPHONY_LOGI("TelephonyTestService GetNrOptionMode syncResult: %{public}d", syncResult);
     ASSERT_TRUE(syncResult || TELEPHONY_ERR_SUCCESS == result);
 }
+
+/**
+ * @tc.number   Telephony_NetworkSearch_IsGsm__0100
+ * @tc.name     IsGsm
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_IsGsm__0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    bool isGsm = false;
+    CoreManagerInner::GetInstance().IsGsm(SLOT_ID, isGsm);
+    TELEPHONY_LOGI("TelephonyTestService Telephony_NetworkSearch_IsGsm Result: %{public}d", isGsm);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_IsCdma__0100
+ * @tc.name     IsCdma
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_IsCdma__0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    bool isCdma = false;
+    CoreManagerInner::GetInstance().IsCdma(SLOT_ID, isCdma);
+    TELEPHONY_LOGI("TelephonyTestService Telephony_NetworkSearch_IsCdma Result: %{public}d", isCdma);
+}
+
 #else // TEL_TEST_UNSUPPORT
 /**
  * @tc.number   Telephony_NetworkSearch_MockTest_0100
