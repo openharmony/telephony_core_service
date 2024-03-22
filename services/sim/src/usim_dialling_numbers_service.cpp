@@ -57,6 +57,10 @@ void UsimDiallingNumbersService::InitFuncMap()
 
 void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
     if (object != nullptr) {
         TELEPHONY_LOGI("UsimDiallingNumbersService::ProcessPbrLoadDone: %{public}d", object->resultLength);
@@ -81,6 +85,9 @@ void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent
 
 void UsimDiallingNumbersService::ProcessDiallingNumberLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        return;
+    }
     std::unique_ptr<DiallingNumbersHandlerResult> object = event->GetUniqueObject<DiallingNumbersHandlerResult>();
 
     if (object != nullptr) {
@@ -188,19 +195,18 @@ void UsimDiallingNumbersService::GeneratePbrFile(std::vector<std::string> &recor
             continue;
         }
         auto pbrFile = BuildNumberFileByRecord(dataPac);
-        pbrFiles_.push_back(pbrFile);
-        auto fileIt = pbrFile->fileIds_.find(TAG_SIM_USIM_ADN);
-        if (fileIt == pbrFile->fileIds_.end()) {
-            continue;
+        if (pbrFile != nullptr) {
+            pbrFiles_.push_back(pbrFile);
+            auto fileIt = pbrFile->fileIds_.find(TAG_SIM_USIM_ADN);
+            if (fileIt == pbrFile->fileIds_.end()) {
+                continue;
+            }
+            std::shared_ptr<TagData> file = fileIt->second;
+            if (file == nullptr || file->shortFileId == INVALID_SFI) {
+                continue;
+            }
+            efIdOfSfi_.insert(std::pair<int, int>(file->shortFileId, file->fileId));
         }
-        std::shared_ptr<TagData> file = fileIt->second;
-        if (file == nullptr) {
-            continue;
-        }
-        if (file->shortFileId == INVALID_SFI) {
-            continue;
-        }
-        efIdOfSfi_.insert(std::pair<int, int>(file->shortFileId, file->fileId));
     }
 }
 
@@ -221,6 +227,10 @@ AppExecFwk::InnerEvent::Pointer UsimDiallingNumbersService::CreateHandlerPointer
     int eventid, int efId, int index, std::shared_ptr<void> pobj)
 {
     std::unique_ptr<DiallingNumbersHandleHolder> holder = std::make_unique<DiallingNumbersHandleHolder>();
+    if (holder == nullptr) {
+        TELEPHONY_LOGE("holder is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     holder->fileID = efId;
     holder->index = index;
     holder->diallingNumber = pobj;
@@ -245,6 +255,10 @@ std::shared_ptr<UsimDiallingNumberFile> UsimDiallingNumbersService::BuildNumberF
     const std::string &record)
 {
     std::shared_ptr<TagService> recTlv = std::make_shared<TagService>(record);
+    if (recTlv == nullptr) {
+        TELEPHONY_LOGI("BuildNumberFileByRecord: recTlv is nullptr!");
+        return nullptr;
+    }
     std::shared_ptr<UsimDiallingNumberFile> file = std::make_shared<UsimDiallingNumberFile>();
     int tag = 0;
     TELEPHONY_LOGI("BuildNumberFileByRecord: start get tag");
@@ -267,6 +281,10 @@ std::shared_ptr<UsimDiallingNumberFile> UsimDiallingNumbersService::BuildNumberF
 void UsimDiallingNumbersService::StorePbrDetailInfo(
     std::shared_ptr<UsimDiallingNumberFile> file, std::shared_ptr<TagService> tlv, int parentTag)
 {
+    if (tlv == nullptr) {
+        TELEPHONY_LOGI("StorePbrDetailInfo: tlv is nullptr!");
+        return;
+    }
     for (int count = 0; tlv->Next(); ++count) {
         const int tag = tlv->GetTagCode();
         TELEPHONY_LOGI("make file tag type: %{public}d", tag);
@@ -312,6 +330,10 @@ void UsimDiallingNumbersService::SendBackResult(
     uint32_t id = callerPointer_->GetInnerEventId();
     std::unique_ptr<UsimFetcher> fd = callerPointer_->GetUniqueObject<UsimFetcher>();
     std::unique_ptr<UsimResult> data = std::make_unique<UsimResult>(fd.get());
+    if (data == nullptr) {
+        TELEPHONY_LOGE("data is nullptr");
+        return;
+    }
     data->result = static_cast<std::shared_ptr<void>>(diallingnumbers);
     TelEventHandler::SendTelEvent(owner, id, data);
     TELEPHONY_LOGI("UsimDiallingNumbersService::SendBackResult send end");

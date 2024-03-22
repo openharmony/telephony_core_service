@@ -76,6 +76,9 @@ int32_t SatelliteCoreCallbackStub::OnSetRadioStateResponse(MessageParcel &data, 
         int32_t error = data.ReadInt32();
         int32_t type = data.ReadInt32();
         auto info = std::make_shared<HRilRadioResponseInfo>();
+        if (info == nullptr) {
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
         info->flag = flag;
         info->serial = serial;
         info->error = static_cast<HRilErrType>(error);
@@ -93,6 +96,9 @@ int32_t SatelliteCoreCallbackStub::OnSetRadioStateResponse(MessageParcel &data, 
         int64_t flag = data.ReadInt64();
         int32_t state = data.ReadInt32();
         auto info = std::make_unique<HRilRadioStateInfo>();
+        if (info == nullptr) {
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
         info->flag = flag;
         info->state = state;
         AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventCode, info);

@@ -136,6 +136,10 @@ void SignalInfo::ProcessSignalIntensity(int32_t slotId, const AppExecFwk::InnerE
         DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifySignalInfoUpdated(slotId, signals);
         int level = 0;
         if (signals.size() != 0) {
+            if (signals[0] == nullptr) {
+                TELEPHONY_LOGE("signals is nullptr!");
+                return;
+            }
             level = signals[0]->GetSignalLevel();
         }
         CoreServiceHiSysEvent::WriteSignalLevelBehaviorEvent(slotId, level);
