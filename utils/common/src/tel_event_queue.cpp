@@ -71,6 +71,9 @@ uint32_t TelEventQueue::ToTelPriority(AppExecFwk::EventQueue::Priority priority)
 
 void TelEventQueue::InsertEventsInner(AppExecFwk::InnerEvent::Pointer &event, AppExecFwk::EventQueue::Priority priority)
 {
+    if (event == nullptr) {
+        return;
+    }
     std::unique_lock<std::mutex> lock(eventCtx_);
     auto &events = eventLists_[ToTelPriority(priority)].events;
     auto f = [](const AppExecFwk::InnerEvent::Pointer &first, const AppExecFwk::InnerEvent::Pointer &second) {
@@ -162,8 +165,12 @@ void TelEventQueue::SubmitToFFRT(int32_t queueId, AppExecFwk::InnerEvent::TimePo
 void TelEventQueue::RemoveEvent(uint32_t innerEventId)
 {
     std::lock_guard<std::mutex> lock(eventCtx_);
-    auto filter = [innerEventId](
-                      const AppExecFwk::InnerEvent::Pointer &p) { return p->GetInnerEventId() == innerEventId; };
+    auto filter = [innerEventId](const AppExecFwk::InnerEvent::Pointer &p) {
+        if (p == nullptr) {
+            return false;
+        }
+        return p->GetInnerEventId() == innerEventId;
+    };
     for (uint32_t i = 0; i < EVENT_QUEUE_NUM; ++i) {
         eventLists_[i].events.remove_if(filter);
     }
