@@ -188,6 +188,15 @@ std::u16string CoreService::GetOperatorNumeric(int32_t slotId)
     return networkSearchManager_->GetOperatorNumeric(slotId);
 }
 
+std::string CoreService::GetResidentNetworkNumeric(int32_t slotId)
+{
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return "";
+    }
+    return networkSearchManager_->GetResidentNetworkNumeric(slotId);
+}
+
 int32_t CoreService::GetOperatorName(int32_t slotId, std::u16string &operatorName)
 {
     if (networkSearchManager_ == nullptr) {

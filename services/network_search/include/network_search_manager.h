@@ -67,6 +67,7 @@ struct NetworkSearchManagerInner {
     ModemPowerState radioState_ = ModemPowerState::CORE_SERVICE_POWER_OFF;
     std::u16string imei_ = u"";
     std::u16string meid_ = u"";
+    std::string residentNetworkNumeric_ = "";
     std::string basebandVersion_ = "";
     NrMode nrMode_ = NrMode::NR_MODE_UNKNOWN;
     int32_t rrcConnectionStatus_ = 0;
@@ -258,6 +259,8 @@ public:
     int32_t GetNrSsbId(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation) override;
     int32_t IsGsm(int32_t slotId, bool &isGsm) override;
     int32_t IsCdma(int32_t slotId, bool &isCdma) override;
+    std::string GetResidentNetworkNumeric(int32_t slotId) override;
+    void SetResidentNetworkNumeric(int32_t slotId, std::string operatorNumeric);
 
     inline void InitMsgNum(int32_t slotId)
     {

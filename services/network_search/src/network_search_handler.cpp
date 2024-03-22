@@ -520,6 +520,7 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
         TELEPHONY_LOGE("RadioOffOrUnavailableState NetworkSearchHandler is null slotId:%{public}d", slotId_);
         return;
     }
+    networkSearchManager->SetResidentNetworkNumeric(slotId_, "");
     std::shared_ptr<NetworkSearchState> networkSearchState = networkSearchManager->GetNetworkSearchState(slotId_);
     if (networkSearchState == nullptr) {
         TELEPHONY_LOGE("networkSearchState is null slotId:%{public}d", slotId_);
@@ -1155,6 +1156,14 @@ void NetworkSearchHandler::RadioResidentNetworkChange(const AppExecFwk::InnerEve
         TELEPHONY_LOGE("RadioResidentNetworkChange networkSearchManager is nullptr");
         return;
     }
+    auto object = event->GetSharedObject<std::string>();
+    if (object == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioResidentNetworkChange object is nullptr!");
+        networkSearchManager->SetResidentNetworkNumeric(slotId_, "");
+        return;
+    }
+    std::string plmn = *object;
+    networkSearchManager->SetResidentNetworkNumeric(slotId_, plmn);
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
         if (networkSearchManager->GetCsRegState(slotId) ==
             static_cast<int32_t>(RegServiceState::REG_STATE_IN_SERVICE) ||
@@ -1164,12 +1173,6 @@ void NetworkSearchHandler::RadioResidentNetworkChange(const AppExecFwk::InnerEve
             return;
         }
     }
-    auto object = event->GetSharedObject<std::string>();
-    if (object == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchHandler::RadioResidentNetworkChange object is nullptr!");
-        return;
-    }
-    std::string plmn = *object;
     std::string countryCode = "";
     if (plmn.length() >= MCC_LEN) {
         std::string mcc = plmn.substr(0, MCC_LEN);

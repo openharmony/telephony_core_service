@@ -70,6 +70,7 @@ const int32_t INPUT_SET_NETWORK_CAPABILITY = 32;
 const int32_t INPUT_SET_NR_OPTION_MODE = 33;
 const int32_t INPUT_FACTORY_RESET = 34;
 const int32_t INPUT_GET_NR_SSBID = 35;
+const int32_t INPUT_GET_RESIDENT_NETWORK_NUMERIC = 36;
 const int32_t INPUT_INIT_TIME = 99;
 const int32_t INPUT_QUIT = 100;
 const int32_t SLEEP_TIME = 5;
@@ -160,6 +161,12 @@ void TestGetOperatorNumeric()
     std::u16string result = g_telephonyService->GetOperatorNumeric(InputSlotId());
     std::string str = Str16ToStr8(result);
     TELEPHONY_LOGI("TelephonyTestService Remote GetOperatorNumeric result:%{public}s", str.c_str());
+}
+
+void TestGetResidentNetworkNumeric()
+{
+    std::string result = g_telephonyService->GetResidentNetworkNumeric(InputSlotId());
+    TELEPHONY_LOGI("TelephonyTestService Remote GetResidentNetworkNumeric result:%{public}s", result.c_str());
 }
 
 void TestGetOperatorName()
@@ -765,6 +772,7 @@ void Prompt()
            "33:SetNrOptionMode\n"
            "34:FactoryReset\n"
            "35:GetNrSsbId\n"
+           "36:GetResidentNetworkNumeric\n"
            "99:InitTimeAndTimeZone\n"
            "100:exit \n");
 }
@@ -840,6 +848,7 @@ void Init()
     memberFuncMap_[INPUT_GET_NETWORK_CAPABILITY] = TestGetNetworkCapability;
     memberFuncMap_[INPUT_SET_NR_OPTION_MODE] = TestSetNrOptionMode;
     memberFuncMap_[INPUT_GET_NR_SSBID] = TestGetNrSsbId;
+    memberFuncMap_[INPUT_GET_RESIDENT_NETWORK_NUMERIC] = TestGetResidentNetworkNumeric;
     memberFuncMap_[INPUT_FACTORY_RESET] = TestFactoryReset;
 }
 
