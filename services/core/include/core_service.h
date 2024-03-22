@@ -46,6 +46,8 @@ public:
 
     std::u16string GetOperatorNumeric(int32_t slotId) override;
 
+    std::string GetResidentNetworkNumeric(int32_t slotId) override;
+
     int32_t GetOperatorName(int32_t slotId, std::u16string &operatorName) override;
 
     int32_t GetNetworkState(int32_t slotId, sptr<NetworkState> &networkState) override;

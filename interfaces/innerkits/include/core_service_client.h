@@ -113,6 +113,14 @@ public:
     std::u16string GetOperatorNumeric(int32_t slotId);
 
     /**
+     * @brief Obtain the resident network numeric
+     *
+     * @param slotId[in], sim slot id
+     * @return std::string resident network numeric of PLMN of the SIM card.
+     */
+    std::string GetResidentNetworkNumeric(int32_t slotId);
+
+    /**
      * @brief Obtain the operator name
      *
      * @param slotId[in], sim slot id

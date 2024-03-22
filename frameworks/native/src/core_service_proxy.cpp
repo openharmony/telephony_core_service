@@ -116,6 +116,31 @@ std::u16string CoreServiceProxy::GetOperatorNumeric(int32_t slotId)
     return result;
 }
 
+std::string CoreServiceProxy::GetResidentNetworkNumeric(int32_t slotId)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetResidentNetworkNumeric WriteInterfaceToken is false");
+        return "";
+    }
+    data.WriteInt32(slotId);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetResidentNetworkNumeric Remote is null");
+        return "";
+    }
+    int32_t st = remote->SendRequest(
+        uint32_t(CoreServiceInterfaceCode::GET_RESIDENT_NETWORK_NUMERIC), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetResidentNetworkNumeric failed, error code is %{public}d", st);
+        return "";
+    }
+    std::string result = reply.ReadString();
+    return result;
+}
+
 int32_t CoreServiceProxy::GetOperatorName(int32_t slotId, std::u16string &operatorName)
 {
     MessageParcel data;
