@@ -20,6 +20,7 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_service.h"
+#include "core_service_client.h"
 #include "core_service_dump_helper.h"
 #include "core_service_hisysevent.h"
 #include "network_search_manager.h"
@@ -741,6 +742,41 @@ HWTEST_F(CoreServiceBranchTest, Telephony_NitzUpdate_001, Function | MediumTest 
     nitzUpdate->IsAutoTime();
     nitzStr = NITZ_STR_INVALID;
     EXPECT_FALSE(nitzUpdate->NitzParse(nitzStr, networkTime));
+}
+
+/**
+ * @tc.number   Telephony_IsAllowedInsertApn_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_IsAllowedInsertApn_001, Function | MediumTest | Level1)
+{
+    std::string jsonValue = "";
+    auto coreServiceClient = std::make_shared<CoreServiceClient>();
+    coreServiceClient->OnRemoteDied(nullptr);
+    auto recipient = std::make_shared<CoreServiceClient::CoreServiceDeathRecipient>(CoreServiceClient::GetInstance());
+    recipient->OnRemoteDied(nullptr);
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    if (TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_ != nullptr) {
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.isAllowedInsertApn_ != nullptr, true);
+    }
+    EXPECT_TRUE(coreServiceClient->IsAllowedInsertApn(jsonValue));
+}
+
+/**
+ * @tc.number   Telephony_GetTargetOpkey_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_GetTargetOpkey_001, Function | MediumTest | Level1)
+{
+    std::u16string opkey;
+    auto coreServiceClient = std::make_shared<CoreServiceClient>();
+    coreServiceClient->OnRemoteDied(nullptr);
+    auto recipient = std::make_shared<CoreServiceClient::CoreServiceDeathRecipient>(CoreServiceClient::GetInstance());
+    recipient->OnRemoteDied(nullptr);
+    int32_t result = coreServiceClient->GetTargetOpkey(SLOT_ID, opkey);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
 }
 } // namespace Telephony
 } // namespace OHOS
