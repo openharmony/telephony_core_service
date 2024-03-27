@@ -40,6 +40,7 @@ private:
     int32_t OnGetPsRadioTech(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCsRadioTech(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetOperatorNumeric(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetResidentNetworkNumeric(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetOperatorName(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSignalInfoList(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetNetworkState(MessageParcel &data, MessageParcel &reply);

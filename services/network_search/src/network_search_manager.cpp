@@ -1863,5 +1863,22 @@ int32_t NetworkSearchManager::IsCdma(int32_t slotId, bool &isCdma)
     return TELEPHONY_ERR_SUCCESS;
 }
 
+void NetworkSearchManager::SetResidentNetworkNumeric(int32_t slotId, std::string residentNetworkNumeric)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner != nullptr) {
+        inner->residentNetworkNumeric_ = residentNetworkNumeric;
+    }
+}
+
+std::string NetworkSearchManager::GetResidentNetworkNumeric(int32_t slotId)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        TELEPHONY_LOGE("inner is null");
+        return "";
+    }
+    return inner->residentNetworkNumeric_;
+}
 } // namespace Telephony
 } // namespace OHOS

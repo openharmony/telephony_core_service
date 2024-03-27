@@ -36,6 +36,8 @@ void CoreServiceStub::AddHandlerNetWorkToMap()
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_PS_RADIO_TECH)] = &CoreServiceStub::OnGetPsRadioTech;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CS_RADIO_TECH)] = &CoreServiceStub::OnGetCsRadioTech;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPERATOR_NUMERIC)] = &CoreServiceStub::OnGetOperatorNumeric;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_RESIDENT_NETWORK_NUMERIC)] =
+        &CoreServiceStub::OnGetResidentNetworkNumeric;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPERATOR_NAME)] = &CoreServiceStub::OnGetOperatorName;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIGNAL_INFO_LIST)] = &CoreServiceStub::OnGetSignalInfoList;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NETWORK_STATE)] = &CoreServiceStub::OnGetNetworkState;
@@ -216,6 +218,14 @@ int32_t CoreServiceStub::OnGetOperatorNumeric(MessageParcel &data, MessageParcel
     auto slotId = data.ReadInt32();
     std::u16string result = GetOperatorNumeric(slotId);
     reply.WriteString16(result);
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetResidentNetworkNumeric(MessageParcel &data, MessageParcel &reply)
+{
+    auto slotId = data.ReadInt32();
+    std::string result = GetResidentNetworkNumeric(slotId);
+    reply.WriteString(result);
     return NO_ERROR;
 }
 
