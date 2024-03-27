@@ -54,5 +54,5 @@ void PdpProfileRdbHelper::notifyInitApnConfigs(int32_t slotId)
     dataShareHelper->Release();
     dataShareHelper = nullptr;
 }
-} // namespace Telephony
-} // namespace OHOS
+}  // namespace Telephony
+}  // namespace OHOS
