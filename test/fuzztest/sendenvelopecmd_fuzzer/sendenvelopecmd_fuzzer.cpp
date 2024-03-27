@@ -151,6 +151,21 @@ void GetOperatorNumeric(const uint8_t *data, size_t size)
     DelayedSingleton<CoreService>::GetInstance()->OnGetOperatorNumeric(dataMessageParcel, reply);
 }
 
+void GetResidentNetworkNumeric(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetResidentNetworkNumeric(dataMessageParcel, reply);
+}
+
 void GetOperatorName(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -196,6 +211,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     SendEnvelopeCmd(data, size);
     GetNetworkCapability(data, size);
     SetNetworkCapability(data, size);
+    GetResidentNetworkNumeric(data, size);
     auto telRilManager = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
     if (telRilManager == nullptr) {
         return;

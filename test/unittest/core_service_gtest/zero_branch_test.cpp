@@ -1947,6 +1947,8 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     EXPECT_EQ(result, testStr);
     EXPECT_NE(networkSearchManager->GetMeid(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, testStr);
+    EXPECT_EQ(networkSearchManager->GetResidentNetworkNumeric(INVALID_SLOTID), std::string());
+    networkSearchManager->SetResidentNetworkNumeric(0, "");
 }
 
 /**

@@ -187,6 +187,16 @@ std::u16string CoreServiceClient::GetOperatorNumeric(int32_t slotId)
     return proxy->GetOperatorNumeric(slotId);
 }
 
+std::string CoreServiceClient::GetResidentNetworkNumeric(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return "";
+    }
+    return proxy->GetResidentNetworkNumeric(slotId);
+}
+
 int32_t CoreServiceClient::GetOperatorName(int32_t slotId, std::u16string &operatorName)
 {
     auto proxy = GetProxy();
