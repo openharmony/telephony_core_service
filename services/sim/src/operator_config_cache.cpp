@@ -22,6 +22,7 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_manager_inner.h"
+#include "pdp_profile_rdb_helper.h"
 #include "radio_event.h"
 #include "telephony_ext_wrapper.h"
 
@@ -249,8 +250,24 @@ void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId)
     TELEPHONY_LOGI("OperatorConfigCache::SendSimMatchedOperatorInfo response = %{public}d", response);
 }
 
+void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
+{
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    CoreManagerInner::GetInstance().GetSimState(slotId, simState);
+    if (simState != SimState::SIM_STATE_READY) {
+        return;
+    }
+    auto helper = PdpProfileRdbHelper::GetInstance();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("get PdpProfileRdbHelper Failed.");
+    }
+    TELEPHONY_LOGI("OperatorConfigCache:notifyInitApnConfigs end");
+    helper->notifyInitApnConfigs(slotId);
+}
+
 bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId)
 {
+    notifyInitApnConfig(slotId);
     SendSimMatchedOperatorInfo(slotId);
     AAFwk::Want want;
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
