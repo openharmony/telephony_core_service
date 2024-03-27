@@ -18,6 +18,7 @@
 #include <openssl/sha.h>
 #include <string_ex.h>
 #include <telephony_types.h>
+
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_manager_inner.h"
