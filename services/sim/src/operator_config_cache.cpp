@@ -18,7 +18,6 @@
 #include <openssl/sha.h>
 #include <string_ex.h>
 #include <telephony_types.h>
-
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_manager_inner.h"
@@ -267,7 +266,7 @@ void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
 
 bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId)
 {
-    notifyInitApnConfig(slotId);
+    notifyInitApnConfigs(slotId);
     SendSimMatchedOperatorInfo(slotId);
     AAFwk::Want want;
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);

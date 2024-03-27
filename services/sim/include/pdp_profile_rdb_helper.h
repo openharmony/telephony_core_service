@@ -31,10 +31,10 @@ class PdpProfileRdbHelper : public DelayedSingleton<PdpProfileRdbHelper> {
     DECLARE_DELAYED_SINGLETON(PdpProfileRdbHelper);
 
 public:
-    void notifyInitApnConfig(int32_t slotId);
+    void notifyInitApnConfigs(int32_t slotId);
 private:
-     std::shared_ptr<DataShare::DataShareHelper> CreatePdpProfileDataHelper();
+    std::shared_ptr<DataShare::DataShareHelper> CreatePdpProfileDataHelper();
 };
-} // namespace Telephony
-} // namespace OHOS
-#endif // OHOS_PDP_PROFILE_RDB_HELPER_H
+}  // namespace Telephony
+}  // namespace OHOS
+#endif  // OHOS_PDP_PROFILE_RDB_HELPER_H
