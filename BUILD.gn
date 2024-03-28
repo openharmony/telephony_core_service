@@ -78,6 +78,7 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_SIM_ROOT/src/operator_config_loader.cpp",
     "$TELEPHONY_SIM_ROOT/src/operator_file_parser.cpp",
     "$TELEPHONY_SIM_ROOT/src/operator_matching_rule.cpp",
+    "$TELEPHONY_SIM_ROOT/src/pdp_profile_rdb_helper.cpp",
     "$TELEPHONY_SIM_ROOT/src/plmn_file.cpp",
     "$TELEPHONY_SIM_ROOT/src/radio_protocol_controller.cpp",
     "$TELEPHONY_SIM_ROOT/src/ruim_file.cpp",
