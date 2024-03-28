@@ -14,6 +14,7 @@
  */
 #include "operator_config_cache.h"
 
+#include <fstream>
 #include <json/json.h>
 #include <openssl/sha.h>
 #include <string_ex.h>
@@ -91,6 +92,7 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
         TELEPHONY_LOGI("load default operator config");
         filename = DEFAULT_OPERATOR_CONFIG;
     }
+    isLoadingConfig = true;
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     CoreManagerInner::GetInstance().GetSimState(slotId, simState);
     TELEPHONY_LOGI("LoadOperatorConfig simState = %{public}d", simState);
@@ -119,9 +121,11 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
             if (canAnnounceChanged) {
                 AnnounceOperatorConfigChanged(slotId);
             }
+            isLoadingConfig = false;
             return TELEPHONY_ERR_SUCCESS;
         }
     }
+    isLoadingConfig = false;
     return CORE_ERR_OPERATOR_CONF_NOT_EXIT;
 }
 
@@ -264,6 +268,29 @@ bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId)
     bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
     TELEPHONY_LOGI("OperatorConfigCache:AnnounceOperatorConfigChanged end###result = %{public}d", publishResult);
     return publishResult;
+}
+
+bool OperatorConfigCache::IsNeedOperatorLoad(int32_t slotId)
+{
+    std::string opkey = GetOpKey(slotId);
+    TELEPHONY_LOGI("IsNeedOperatorLoad slotId %{public}d opkey %{public}s isLoadingConfig: %{public}d",
+        slotId, opkey.data(), isLoadingConfig);
+    if (opkey.empty() || opkey == std::string(INITIAL_OPKEY)) {
+        return true;
+    }
+    if (isLoadingConfig) {
+        return false;
+    }
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
+        TELEPHONY_LOGI("simFileManager is nullptr");
+        return true;
+    }
+    std::string iccid = Str16ToStr8(simFileManager->GetSimIccId());
+    std::string filename = EncryptIccId(iccid) + ".json";
+    std::string path = parser_.GetOperatorConfigFilePath(filename);
+    std::ifstream f(path.c_str());
+    return !f.good();
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -31,6 +31,10 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t OPKEY_VMSG_LENTH = 3;
+constexpr int32_t VMSG_SLOTID_INDEX = 0;
+constexpr int32_t VMSG_OPKEY_INDEX = 1;
+constexpr int32_t VMSG_OPNAME_INDEX = 2;
 std::unique_ptr<ObserverHandler> IccFile::filesFetchedObser_ = nullptr;
 IccFile::IccFile(const std::string &name, std::shared_ptr<SimStateManager> simStateManager)
     : TelEventHandler(name), stateManager_(simStateManager)
@@ -45,7 +49,6 @@ IccFile::IccFile(const std::string &name, std::shared_ptr<SimStateManager> simSt
         TELEPHONY_LOGE("IccFile::IccFile filesFetchedObser_ create nullptr.");
         return;
     }
-
     lockedFilesFetchedObser_ = std::make_unique<ObserverHandler>();
     if (lockedFilesFetchedObser_ == nullptr) {
         TELEPHONY_LOGE("IccFile::IccFile lockedFilesFetchedObser_ create nullptr.");
@@ -81,6 +84,7 @@ IccFile::IccFile(const std::string &name, std::shared_ptr<SimStateManager> simSt
         TELEPHONY_LOGE("IccFile::IccFile recordsOverrideObser_ create nullptr.");
         return;
     }
+    AddOpkeyLoadObser();
     TELEPHONY_LOGI("simmgr IccFile::IccFile finish");
 }
 
@@ -134,6 +138,22 @@ std::string IccFile::ObtainIMSI()
         TELEPHONY_LOGI("IccFile::ObtainIMSI is null:");
     }
     return imsi_;
+}
+
+std::string IccFile::ObtainMCC()
+{
+    if (imsi_.empty()) {
+        TELEPHONY_LOGI("IccFile::ObtainMCC is null:");
+    }
+    return mcc_;
+}
+
+std::string IccFile::ObtainMNC()
+{
+    if (imsi_.empty()) {
+        TELEPHONY_LOGI("IccFile::ObtainMNC is null:");
+    }
+    return mnc_;
 }
 
 void IccFile::UpdateImsi(std::string imsi)
@@ -384,6 +404,22 @@ void IccFile::UnregisterAllFilesLoaded(const std::shared_ptr<AppExecFwk::EventHa
     }
 }
 
+void IccFile::RegisterOpkeyLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+{
+    int eventCode = RadioEvent::RADIO_SIM_OPKEY_LOADED;
+    if (opkeyLoadObser_ != nullptr) {
+        opkeyLoadObser_->RegObserver(eventCode, eventHandler);
+    }
+    TELEPHONY_LOGD("IccFile::RegisterOpkeyLoaded: registered");
+}
+
+void IccFile::UnregisterOpkeyLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    if (opkeyLoadObser_ != nullptr) {
+        opkeyLoadObser_->Remove(RadioEvent::RADIO_SIM_OPKEY_LOADED, handler);
+    }
+}
+
 void IccFile::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {
     switch (what) {
@@ -392,6 +428,9 @@ void IccFile::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler>
             break;
         case RadioEvent::RADIO_IMSI_LOADED_READY:
             RegisterImsiLoaded(handler);
+            break;
+        case RadioEvent::RADIO_SIM_OPKEY_LOADED:
+            RegisterOpkeyLoaded(handler);
             break;
         default:
             TELEPHONY_LOGI("RegisterCoreNotify default");
@@ -406,6 +445,9 @@ void IccFile::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandle
             break;
         case RadioEvent::RADIO_IMSI_LOADED_READY:
             UnregisterImsiLoaded(handler);
+            break;
+        case RadioEvent::RADIO_SIM_OPKEY_LOADED:
+            UnregisterOpkeyLoaded(handler);
             break;
         default:
             TELEPHONY_LOGI("RegisterCoreNotify default");
@@ -629,12 +671,15 @@ void IccFile::ResetVoiceMailVariable()
 
 void IccFile::ClearData()
 {
+    TELEPHONY_LOGI("IccFile CleaerData");
     imsi_ = "";
     iccId_ = "";
     decIccId_ = "";
     UpdateSPN("");
     UpdateLoaded(false);
     operatorNumeric_ = "";
+    mcc_ = "";
+    mnc_ = "";
     indexOfMailbox_ = 1;
     msisdn_ = "";
     gid1_ = "";
@@ -642,6 +687,10 @@ void IccFile::ClearData()
     msisdnTag_ = "";
     fileQueried_ = false;
     ResetVoiceMailVariable();
+    auto iccFileExt = iccFile_.lock();
+    if (TELEPHONY_EXT_WRAPPER.createIccFileExt_ != nullptr && iccFileExt) {
+        iccFileExt->ClearData();
+    }
 }
 void IccFile::UnInit()
 {
@@ -658,6 +707,64 @@ void IccFile::SaveCountryCode()
     std::string countryCode = ObtainIsoCountryCode();
     std::string key = COUNTRY_CODE_KEY + std::to_string(slotId_);
     SetParameter(key.c_str(), countryCode.c_str());
+}
+
+void IccFile::ProcessExtGetFileDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    ProcessEvent(event);
+}
+
+void IccFile::SetIccFile(std::shared_ptr<OHOS::Telephony::IIccFileExt>& iccFileExt)
+{
+    iccFile_ = iccFileExt;
+}
+
+void IccFile::OnOpkeyLoad(const std::string opkey, const std::string opName)
+{
+    TELEPHONY_LOGI("OnOpkeyLoad slotId: %{public}d opkey: %{public}s opName: %{public}s",
+        slotId_, opkey.data(), opName.data());
+    if (opkeyLoadObser_ != nullptr) {
+        std::vector<std::string> vMsg(OPKEY_VMSG_LENTH, "");
+        vMsg[VMSG_SLOTID_INDEX] = std::to_string(slotId_);
+        vMsg[VMSG_OPKEY_INDEX] = opkey;
+        vMsg[VMSG_OPNAME_INDEX] = opName;
+        auto obj = std::make_shared<std::vector<std::string>>(vMsg);
+        opkeyLoadObser_->NotifyObserver(RadioEvent::RADIO_SIM_OPKEY_LOADED, obj);
+    }
+}
+
+bool IccFile::ExecutOriginalSimIoRequest(int32_t fileId, int fileIdDone)
+{
+    TELEPHONY_LOGD("ExecutOriginalSimIoRequest simfile: %{public}x doneId: %{public}x", fileId, fileIdDone);
+    AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(fileIdDone);
+    if (fileId == ELEMENTARY_FILE_AD) {
+        fileController_->ObtainAllLinearFixedFile(fileId, event);
+    } else {
+        fileController_->ObtainBinaryFile(fileId, event);
+    }
+    return true;
+}
+
+void IccFile::AddOpkeyLoadObser()
+{
+    opkeyLoadObser_ = std::make_unique<ObserverHandler>();
+    if (opkeyLoadObser_ == nullptr) {
+        TELEPHONY_LOGE("IccFile::IccFile opkeyLoadObser_ create nullptr.");
+        return;
+    }
+}
+
+void IccFile::FileChangeToExt(const std::string fileName, const FileChangeType fileLoad)
+{
+    auto iccFileExt = iccFile_.lock();
+    if (TELEPHONY_EXT_WRAPPER.createIccFileExt_ != nullptr && iccFileExt) {
+        iccFileExt->FileChange(fileName, fileLoad);
+    }
+}
+
+void IccFile::AddRecordsToLoadNum()
+{
+    fileToGet_++;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -152,6 +152,9 @@ bool SimFileManager::InitSimFile(SimFileManager::IccType type)
     simFile_->SetRilAndFileController(telRilManager_.lock(), fileController_, diallingNumberHandler_);
     simFile_->SetId(slotId_);
     simFile_->Init();
+    if (TELEPHONY_EXT_WRAPPER.createIccFileExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.createIccFileExt_(slotId_, simFile_);
+    }
     return true;
 }
 
@@ -189,6 +192,30 @@ std::u16string SimFileManager::GetSimOperatorNumeric()
 
     std::string result = simFile_->ObtainSimOperator();
     TELEPHONY_LOGD("SimFileManager::GetOperator result:%{public}s ", (result.empty() ? "false" : "true"));
+    return Str8ToStr16(result);
+}
+
+std::u16string SimFileManager::GetMCC()
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::GetMCC simFile nullptr");
+        return Str8ToStr16("");
+    }
+
+    std::string result = simFile_->ObtainMCC();
+    TELEPHONY_LOGD("SimFileManager::GetMCC result:%{public}s ", (result.empty() ? "false" : "true"));
+    return Str8ToStr16(result);
+}
+
+std::u16string SimFileManager::GetMNC()
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::GetMNC simFile nullptr");
+        return Str8ToStr16("");
+    }
+
+    std::string result = simFile_->ObtainMNC();
+    TELEPHONY_LOGD("SimFileManager::GetMNC result:%{public}s ", (result.empty() ? "false" : "true"));
     return Str8ToStr16(result);
 }
 

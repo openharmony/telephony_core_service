@@ -39,7 +39,9 @@ public:
     void InitListener();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     bool RegisterForIccLoaded();
+    bool RegisterOpkeyLoaded();
     bool UnRegisterForIccLoaded();
+    bool UnRegisterOpkeyLoaded();
 
     std::shared_ptr<OperatorConfigLoader> operatorConfigLoader_ = nullptr;
 
@@ -50,6 +52,8 @@ private:
     std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
     int32_t slotId_;
     OperatorConfig config_;
+    void ProcessSimRecordLoad(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessSimOpkeyLoad(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     class UserSwitchEventSubscriber : public CommonEventSubscriber {
