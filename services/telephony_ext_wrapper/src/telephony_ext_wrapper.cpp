@@ -46,6 +46,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
         TELEPHONY_LOGE("libtelephony_ext_service.z.so was not loaded, error: %{public}s", dlerror());
         return;
     }
+    InitTelephonyExtWrapperForSim();
     InitTelephonyExtWrapperForNetWork();
     InitTelephonyExtWrapperForVoiceMail();
     InitTelephonyExtWrapperForCust();
@@ -164,5 +165,13 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForApnCust()
     }
 }
 
+void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
+{
+    createIccFileExt_ = (CREATE_ICC_FILE_EXT)dlsym(telephonyExtWrapperHandle_, "CreateIccFileExt");
+    if (createIccFileExt_ == nullptr) {
+        TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+        return;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

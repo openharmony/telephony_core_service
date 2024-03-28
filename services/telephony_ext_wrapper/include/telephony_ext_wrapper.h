@@ -25,6 +25,7 @@
 #include "network_state.h"
 #include "cell_information.h"
 #include "want.h"
+#include "i_icc_file.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -61,6 +62,7 @@ public:
 	    int32_t &networkCapabilityState);
     typedef void (*ON_GET_NETWORK_SEARCH_INFORMATION_EXT)(int32_t &availableSize,
         std::vector<OHOS::Telephony::NetworkInformation> &networkInformations);
+    typedef void (*CREATE_ICC_FILE_EXT)(int32_t slotId, std::shared_ptr<OHOS::Telephony::IIccFileExt> iccFileExt);
 
     typedef void (*UPDATE_COUNTRY_CODE_EXT)(int32_t, const char *);
     typedef void (*UPDATE_TIME_ZONE_OFFSET_EXT)(int32_t, int32_t);
@@ -101,6 +103,7 @@ public:
     GET_SIGNAL_INFO_LIST_EXT getSignalInfoListExt_ = nullptr;
     GET_NETWORK_CAPABILITY_EXT getNetworkCapabilityExt_ = nullptr;
     ON_GET_NETWORK_SEARCH_INFORMATION_EXT onGetNetworkSearchInformationExt_ = nullptr;
+    CREATE_ICC_FILE_EXT createIccFileExt_ = nullptr;
     UPDATE_NETWORK_STATE_EXT updateNetworkStateExt_ = nullptr;
 
     UPDATE_COUNTRY_CODE_EXT updateCountryCodeExt_ = nullptr;
@@ -127,6 +130,7 @@ private:
     void InitTelephonyExtWrapperForCust();
     void InitTelephonyExtWrapperForVSim();
     void InitTelephonyExtWrapperForApnCust();
+    void InitTelephonyExtWrapperForSim();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

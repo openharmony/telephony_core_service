@@ -26,6 +26,8 @@ public:
     void StartLoad();
     std::string ObtainMsisdnNumber();
     std::string ObtainSimOperator();
+    std::string ObtainMCC();
+    std::string ObtainMNC();
     std::string ObtainIsoCountryCode();
     int ObtainSpnCondition(bool roaming, const std::string &operatorNum);
     int ObtainCallForwardStatus();
@@ -41,6 +43,7 @@ public:
     void ProcessIccRefresh(int msgId);
     std::string GetVoiceMailNumber();
     void SetVoiceMailNumber(const std::string mailNumber);
+    void ClearData();
 
 protected:
     enum SpnStatus {
@@ -125,6 +128,7 @@ private:
     bool ProcessObtainLiLanguage(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessObtainPlLanguage(const AppExecFwk::InnerEvent::Pointer &event);
     void StartObtainSpn();
+    void LoadSimOtherFile();
 
     void CheckMncLength();
     bool IsContinueGetSpn(bool start, SpnStatus curStatus, SpnStatus &newStatus);

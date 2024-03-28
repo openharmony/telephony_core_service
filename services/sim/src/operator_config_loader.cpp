@@ -16,11 +16,12 @@
 #include "operator_config_loader.h"
 
 #include <string_ex.h>
-
+#include "sim_data.h"
 #include "core_manager_inner.h"
 #include "operator_matching_rule.h"
 #include "sim_state_type.h"
 #include "telephony_types.h"
+#include "telephony_errors.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -38,6 +39,11 @@ OperatorConfig OperatorConfigLoader::LoadOperatorConfig(int32_t slotId)
     OperatorConfig opc;
     if (operatorConfigCache_ == nullptr) {
         TELEPHONY_LOGE("operatorConfigCache_ is nullptr");
+        return opc;
+    }
+    bool isNeedLoad = operatorConfigCache_->IsNeedOperatorLoad(slotId);
+    TELEPHONY_LOGI("LoadOperatorConfig slotId: %{public}d isNeedLoad: %{public}d", slotId, isNeedLoad);
+    if (!isNeedLoad) {
         return opc;
     }
     TELEPHONY_LOGI("LoadOperatorConfig slotId %{public}d", slotId);
@@ -75,6 +81,28 @@ std::string OperatorConfigLoader::LoadOpKeyOnMccMnc(int32_t slotId)
     }
     helper->Release();
     return DEFAULT_OPERATOR_KEY;
+}
+
+int OperatorConfigLoader::InsertOpkeyToSimDb(std::string opKeyValue)
+{
+    if (opKeyValue.empty() || iccidFromSim_.empty()) {
+        TELEPHONY_LOGE("opKeyValue or imsi is null");
+        return Telephony::TELEPHONY_ERR_ARGUMENT_NULL;
+    }
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateSimHelper();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("helper is nullptr");
+        return Telephony::TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataShareValueObject valueObj(opKeyValue);
+    values.Put(SimData::OPKEY, valueObj);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(SimData::ICC_ID, iccidFromSim_);
+    Uri simUri(SIM_INFO_URI);
+    int result = helper->Update(simUri, predicates, values);
+    helper->Release();
+    return result;
 }
 
 std::string OperatorConfigLoader::GetOpKey(std::shared_ptr<DataShare::DataShareResultSet> resultSet, int32_t slotId)
@@ -121,6 +149,7 @@ std::string OperatorConfigLoader::GetOpKey(std::shared_ptr<DataShare::DataShareR
     simFileManager->SetOpKey(opKeyVal);
     simFileManager->SetOpName(opNameVal);
     simFileManager->SetOpKeyExt(opKeyExtVal);
+    InsertOpkeyToSimDb(opKeyVal);
     return opKeyVal;
 }
 
@@ -188,6 +217,22 @@ std::shared_ptr<DataShare::DataShareHelper> OperatorConfigLoader::CreateOpKeyHel
         return nullptr;
     }
     return DataShare::DataShareHelper::Creator(remoteObj, OPKEY_URI);
+}
+
+std::shared_ptr<DataShare::DataShareHelper> OperatorConfigLoader::CreateSimHelper() const
+{
+    TELEPHONY_LOGI("OperatorConfigLoader::CreateSimHelper");
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        TELEPHONY_LOGE("OperatorConfigLoader Get system ability mgr failed");
+        return nullptr;
+    }
+    auto remoteObj = saManager->GetSystemAbility(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID);
+    if (remoteObj == nullptr) {
+        TELEPHONY_LOGE("OperatorConfigLoader GetSystemAbility Service Failed");
+        return nullptr;
+    }
+    return DataShare::DataShareHelper::Creator(remoteObj, SIM_URI);
 }
 } // namespace Telephony
 } // namespace OHOS
