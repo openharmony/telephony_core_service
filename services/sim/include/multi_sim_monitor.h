@@ -76,6 +76,7 @@ private:
     std::list<SimAccountCallbackRecord> listSimAccountCallbackRecord_;
     std::mutex mutexInner_;
     std::atomic<int32_t> remainCount_ = 30;
+    int32_t maxSlotCount_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

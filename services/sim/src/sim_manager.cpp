@@ -85,6 +85,8 @@ int32_t SimManager::InitTelExtraModule(int32_t slotId)
     simFileManager_.resize(MAX_SLOT_COUNT);
     simAccountManager_.resize(MAX_SLOT_COUNT);
     InitBaseManager(slotId);
+    multiSimController_->AddExtraManagers(simStateManager_[slotId], simFileManager_[slotId]);
+    slotCount_ = MAX_SLOT_COUNT;
     return TELEPHONY_SUCCESS;
 }
 
@@ -162,7 +164,7 @@ int32_t SimManager::GetSimState(int32_t slotId, SimState &simState)
 int32_t SimManager::GetCardType(int32_t slotId, CardType &cardType)
 {
     if (!HasSimCardInner(slotId)) {
-        TELEPHONY_LOGE("GetCardType has no sim card!");
+        TELEPHONY_LOGE("slot%{public}d GetCardType has no sim card!", slotId);
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     cardType = simStateManager_[slotId]->GetCardType();

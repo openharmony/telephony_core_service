@@ -143,7 +143,11 @@ void MultiSimMonitor::RegisterCoreNotify(
 
 bool MultiSimMonitor::IsValidSlotId(int32_t slotId)
 {
-    return (slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT);
+    if (maxSlotCount_ == 0) {
+        maxSlotCount_ = (SIM_SLOT_COUNT == DUAL_SLOT_COUNT && VSIM_MODEM_COUNT == MAX_SLOT_COUNT) ?
+            MAX_SLOT_COUNT : SIM_SLOT_COUNT;
+    }
+    return (slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < maxSlotCount_);
 }
 
 bool MultiSimMonitor::IsVSimSlotId(int32_t slotId)
