@@ -33,15 +33,18 @@
 #include "usim_function_handle.h"
 #include "voice_mail_constants.h"
 #include "want.h"
+#include "i_icc_file.h"
 
 namespace OHOS {
 namespace Telephony {
-class IccFile : public TelEventHandler {
+class IccFile : public IIccFileExt, public TelEventHandler {
 public:
     explicit IccFile(const std::string &name, std::shared_ptr<SimStateManager> simStateManager);
     void Init();
     virtual void StartLoad();
     std::string ObtainIMSI();
+    virtual std::string ObtainMCC();
+    virtual std::string ObtainMNC();
     void UpdateImsi(std::string imsi);
     std::string ObtainIccId();
     std::string ObtainDecIccId();
@@ -88,10 +91,16 @@ public:
     virtual void ProcessIccRefresh(int msgId) = 0;
     bool HasSimCard();
     void UnInit();
-    void ClearData();
+    virtual void ClearData();
     void SetId(int id);
     bool GetIsVoiceMailFixed();
     void LoadVoiceMail();
+    bool ExecutOriginalSimIoRequest(int32_t filedId, int fileIdDone);
+    void OnOpkeyLoad(const std::string opKey, const std::string opName);
+    void FileChangeToExt(const std::string fileName, const FileChangeType fileLoad);
+    void ProcessExtGetFileDone(const AppExecFwk::InnerEvent::Pointer &event);
+    void SetIccFile(std::shared_ptr<OHOS::Telephony::IIccFileExt> &iccFile);
+    void AddRecordsToLoadNum();
 
 protected:
     virtual void ProcessFileLoaded(bool response) = 0;
@@ -124,6 +133,8 @@ protected:
     std::string lastVoiceMailNum_ = "";
     std::string lastVoiceMailTag_ = "";
     std::string operatorNumeric_ = "";
+    std::string mcc_ = "";
+    std::string mnc_ = "";
     bool voiceMailFixedOrNot_ = false;
     std::string pnnHomeName_ = "";
     std::string iccLanguage_ = "";
@@ -162,6 +173,7 @@ protected:
     std::unique_ptr<ObserverHandler> networkSelectionModeAutomaticObser_ = nullptr;
     std::unique_ptr<ObserverHandler> spnUpdatedObser_ = nullptr;
     std::unique_ptr<ObserverHandler> recordsOverrideObser_ = nullptr;
+    std::unique_ptr<ObserverHandler> opkeyLoadObser_ = nullptr;
     virtual AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId);
     virtual AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId, int arg1, int arg2);
     virtual AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId, std::shared_ptr<void> loader);
@@ -187,6 +199,9 @@ private:
     void UnregisterImsiLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void UnregisterAllFilesLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void RegisterOpkeyLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
+    void UnregisterOpkeyLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void AddOpkeyLoadObser();
 };
 } // namespace Telephony
 } // namespace OHOS
