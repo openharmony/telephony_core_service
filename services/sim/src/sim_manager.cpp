@@ -692,7 +692,6 @@ int32_t SimManager::SendCallSetupRequestResult(int32_t slotId, bool accept)
 int32_t SimManager::GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric)
 {
     if (!HasSimCardInner(slotId)) {
-        TELEPHONY_LOGE("GetSimOperatorNumeric has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {

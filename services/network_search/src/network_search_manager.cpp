@@ -1131,7 +1131,7 @@ PhoneType NetworkSearchManager::GetPhoneType(int32_t slotId)
             phoneType = inner->networkSearchHandler_->GetPhoneType();
         }
     }
-    TELEPHONY_LOGI("NetworkSearchManager::GetPhoneType type:%{public}d start slotId:%{public}d", phoneType, slotId);
+    TELEPHONY_LOGD("NetworkSearchManager::GetPhoneType type:%{public}d start slotId:%{public}d", phoneType, slotId);
     return phoneType;
 }
 
