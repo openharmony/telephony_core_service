@@ -200,7 +200,7 @@ void OperatorName::NotifySpnChanged()
         TELEPHONY_LOGE("OperatorName::NotifySpnChanged networkSearchManager is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    TELEPHONY_LOGI("OperatorName::NotifySpnChanged slotId:%{public}d", slotId_);
+    TELEPHONY_LOGD("OperatorName::NotifySpnChanged slotId:%{public}d", slotId_);
     std::string netPlmn = "";
     std::string simPlmn = "";
     std::string domesticSpn = "";
@@ -317,7 +317,7 @@ void OperatorName::NotifyGsmSpnChanged(
         TELEPHONY_LOGI("OperatorName::NotifyGsmSpnChanged start send broadcast slotId:%{public}d...", slotId_);
         PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn, domesticSpn);
     } else {
-        TELEPHONY_LOGI(
+        TELEPHONY_LOGD(
             "OperatorName::NotifyGsmSpnChanged spn no changed, not need to update slotId:%{public}d", slotId_);
     }
 }
