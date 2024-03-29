@@ -19,6 +19,7 @@
 #include "common_event_support.h"
 #include "radio_event.h"
 #include "telephony_common_utils.h"
+#include "telephony_ext_wrapper.h"
 
 using namespace std;
 using namespace OHOS::AppExecFwk;
@@ -194,6 +195,7 @@ bool RuimFile::ProcessGetIccidDone(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGI("RuimFile::ProcessEvent MSG_SIM_OBTAIN_ICCID_DONE result success");
         decIccId_ = iccData;
         iccId_ = fullIccData;
+        FileChangeToExt(iccId_, FileChangeType::ICCID_FILE_LOAD);
     }
     return isFileProcessResponse;
 }
@@ -217,6 +219,7 @@ bool RuimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
         if (!imsi_.empty()) {
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
         }
+        FileChangeToExt(imsi_, FileChangeType::C_IMSI_FILE_LOAD);
     }
     return isFileHandleResponse;
 }

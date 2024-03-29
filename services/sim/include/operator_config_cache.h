@@ -35,6 +35,7 @@ public:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     bool RegisterForIccChange();
     bool UnRegisterForIccChange();
+    bool IsNeedOperatorLoad(int32_t slotId);
 
 private:
     OperatorFileParser parser_;
@@ -48,6 +49,7 @@ private:
     inline static const std::string OPERATOR_CONFIG_CHANGED = "operatorConfigChanged";
     OperatorConfig opc_;
     int32_t slotId_;
+    bool isLoadingConfig = false;
     std::mutex mutex_;
 };
 } // namespace Telephony
