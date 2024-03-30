@@ -36,6 +36,9 @@ public:
         std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager);
     virtual ~MultiSimController();
 
+    void AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
+        std::shared_ptr<Telephony::SimFileManager> simFileManager);
+
     void Init();
     bool InitData(int32_t slotId);
     int32_t GetDefaultVoiceSlotId();
