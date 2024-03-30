@@ -18,16 +18,15 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("SetRadioStateFuzzTest") {
+ohos_fuzztest("UnlockPinFuzzTest") {
   module_output_path = "core_service/core_service"
   module_out_path = module_output_path
   fuzz_config_file =
-      "$SUBSYSTEM_DIR/core_service/test/fuzztest/setradiostate_fuzzer"
+      "$SUBSYSTEM_DIR/core_service/test/fuzztest/unlockpin_fuzzer"
 
   include_dirs = [
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/include",
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
-    "$SUBSYSTEM_DIR/core_service/frameworks/js/network_search/include",
     "$SUBSYSTEM_DIR/core_service/services/core/include",
     "$SUBSYSTEM_DIR/core_service/services/sim/include",
     "$SUBSYSTEM_DIR/core_service/services/tel_ril/include",
@@ -54,6 +53,7 @@ ohos_fuzztest("SetRadioStateFuzzTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
+    "core_service:libtel_common",
     "drivers_interface_ril:hril_innerkits",
     "drivers_interface_ril:libril_proxy_1.1",
     "eventhandler:libeventhandler",
@@ -63,14 +63,12 @@ ohos_fuzztest("SetRadioStateFuzzTest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
-    "netmanager_base:net_conn_manager_if",
-    "netmanager_ext:net_tether_manager_if",
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
   defines = [
-    "TELEPHONY_LOG_TAG = \"SetRadioStateFuzzTest\"",
+    "TELEPHONY_LOG_TAG = \"UnlockPinFuzzTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
 
@@ -89,12 +87,8 @@ ohos_fuzztest("SetRadioStateFuzzTest") {
 
   sources = [
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
-    "$SUBSYSTEM_DIR/core_service/frameworks/js/network_search/src/get_network_search_info_callback.cpp",
-    "$SUBSYSTEM_DIR/core_service/frameworks/js/network_search/src/set_nr_option_mode_callback.cpp",
-    "$SUBSYSTEM_DIR/core_service/frameworks/js/network_search/src/set_preferred_network_callback.cpp",
-    "$SUBSYSTEM_DIR/core_service/frameworks/js/network_search/src/set_radio_state_callback.cpp",
     "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer/addcoreservicetoken_fuzzer.cpp",
-    "setradiostate_fuzzer.cpp",
+    "unlockpin_fuzzer.cpp",
   ]
 }
 
@@ -104,7 +98,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":SetRadioStateFuzzTest",
+    ":UnlockPinFuzzTest",
   ]
 }
 ###############################################################################
