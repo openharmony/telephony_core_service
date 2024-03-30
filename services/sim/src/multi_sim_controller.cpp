@@ -92,6 +92,16 @@ bool MultiSimController::ForgetAllData(int32_t slotId)
     return simDbHelper_->ForgetAllData(slotId) != INVALID_VALUE;
 }
 
+void MultiSimController::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
+    std::shared_ptr<Telephony::SimFileManager> simFileManager)
+{
+    if (simStateManager_.size() == SIM_SLOT_COUNT) {
+        simStateManager_.push_back(simStateManager);
+        simFileManager_.push_back(simFileManager);
+        maxCount_ = MAX_SLOT_COUNT;
+    }
+}
+
 bool MultiSimController::InitData(int32_t slotId)
 {
     TELEPHONY_LOGI("start to initData slotId is %{public}d", slotId);
@@ -396,7 +406,7 @@ void MultiSimController::SortCache()
  */
 bool MultiSimController::IsValidData(int32_t slotId)
 {
-    if ((slotId < DEFAULT_SIM_SLOT_ID) || (slotId >= SIM_SLOT_COUNT)) {
+    if ((slotId < DEFAULT_SIM_SLOT_ID) || (static_cast<uint32_t>(slotId) >= simStateManager_.size())) {
         TELEPHONY_LOGE("can not get simStateManager");
         return false;
     }
