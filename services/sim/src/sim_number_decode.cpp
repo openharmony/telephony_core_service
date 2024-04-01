@@ -177,7 +177,6 @@ std::string SimNumberDecode::BCDConvertToString(
     if (!BCDConvertToString(bcdCode.begin(), bcdCode.end(), res, bcdExtType)) {
         TELEPHONY_LOGE("occur error in BCDConvertToString for '%{public}s by bcdExtType:%{public}d",
             HexToStr(bcdCode).c_str(), bcdExtType);
-        return "";
     }
     return res;
 }
@@ -227,7 +226,6 @@ bool SimNumberDecode::BCDConvertToString(const std::vector<uint8_t>::const_itera
         TELEPHONY_LOGE(
             "occur error to BCDSectionConvertToString by codes:'%{public}s' and bcdExtType:'%{public}d'",
             HexToStr(std::vector<uint8_t>(it, codeEnd)).c_str(), bcdExtType);
-        return false;
     }
     if (!prependPlus) {
         return true;
