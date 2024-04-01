@@ -464,7 +464,6 @@ int32_t MultiSimController::GetSlotId(int32_t simId)
 bool MultiSimController::IsSimActive(int32_t slotId)
 {
     if (!IsValidData(slotId)) {
-        TELEPHONY_LOGE("InValidData");
         return false;
     }
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {

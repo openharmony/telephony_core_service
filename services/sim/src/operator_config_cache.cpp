@@ -133,7 +133,7 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
 int32_t OperatorConfigCache::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
 {
     if (opc_.configValue.size() > 0) {
-        TELEPHONY_LOGI("get from memory");
+        TELEPHONY_LOGD("get from memory");
         std::unique_lock<std::mutex> lock(mutex_);
         CopyOperatorConfig(opc_, poc);
         lock.unlock();

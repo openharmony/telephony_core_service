@@ -64,7 +64,7 @@ void OperatorNameUtils::Init()
 
 bool OperatorNameUtils::IsInit()
 {
-    TELEPHONY_LOGI("is init %{public}d nameArray_ size %{public}zu", isInit_, nameArray_.size());
+    TELEPHONY_LOGD("is init %{public}d nameArray_ size %{public}zu", isInit_, nameArray_.size());
     return isInit_;
 }
 
