@@ -713,7 +713,7 @@ int32_t CoreServiceProxy::GetSimOperatorNumeric(int32_t slotId, std::u16string &
     if (result == TELEPHONY_ERR_SUCCESS) {
         operatorNumeric = reply.ReadString16();
     }
-    TELEPHONY_LOGI("GetSimOperatorNumeric call end");
+    TELEPHONY_LOGD("GetSimOperatorNumeric call end");
     return result;
 }
 
@@ -1260,7 +1260,7 @@ int32_t CoreServiceProxy::GetPrimarySlotId(int32_t &slotId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
-    TELEPHONY_LOGI("GetPrimarySlotId end: result=%{public}d", result);
+    TELEPHONY_LOGD("GetPrimarySlotId end: result=%{public}d", result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         slotId = reply.ReadInt32();
     }
