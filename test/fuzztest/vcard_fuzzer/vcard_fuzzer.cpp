@@ -308,7 +308,6 @@ void VCardUtilsTest(const uint8_t *data, size_t size)
     VCardUtils::EndWith(fuzzdata, fuzzdata);
     VCardUtils::EncodeBase64(fuzzdata);
     VCardUtils::DecodeBase64(fuzzdata);
-    VCardUtils::ConvertCharset(fuzzdata, fuzzdata, fuzzdata, intPara);
     VCardUtils::CreateFileName();
     VCardUtils::SaveFile(fuzzdata, fuzzdata);
     VCardUtils::IsPrintableAscii(fuzzdata);

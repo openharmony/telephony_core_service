@@ -22,7 +22,11 @@
 #define private public
 #include "addcoreservicetoken_fuzzer.h"
 #include "core_service.h"
+#include "get_network_search_info_callback.h"
 #include "napi_util.h"
+#include "set_nr_option_mode_callback.h"
+#include "set_preferred_network_callback.h"
+#include "set_radio_state_callback.h"
 #include "system_ability_definition.h"
 #include "unistd.h"
 
@@ -32,6 +36,7 @@ static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t IMS_TYPE = 3;
 constexpr int32_t NR_MODE = 4;
+constexpr int32_t NETWORK_MODE = 7;
 constexpr int32_t SLEEP_TIME_SECONDS = 10;
 
 bool IsServiceInited()
@@ -57,8 +62,16 @@ void SetRadioState(const uint8_t *data, size_t size)
         return;
     }
 
+    MessageParcel dataMessageParcel;
+    std::unique_ptr<SetRadioStateCallback> callbackWrap = std::make_unique<SetRadioStateCallback>(nullptr);
+    if (callbackWrap == nullptr) {
+        return;
+    }
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    DelayedSingleton<CoreService>::GetInstance()->SetRadioState(slotId, true, nullptr);
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnSetRadioState(dataMessageParcel, reply);
 }
 
 void GetRadioState(const uint8_t *data, size_t size)
@@ -67,8 +80,16 @@ void GetRadioState(const uint8_t *data, size_t size)
         return;
     }
 
+    MessageParcel dataMessageParcel;
+    std::unique_ptr<SetRadioStateCallback> callbackWrap = std::make_unique<SetRadioStateCallback>(nullptr);
+    if (callbackWrap == nullptr) {
+        return;
+    }
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    DelayedSingleton<CoreService>::GetInstance()->GetRadioState(slotId, nullptr);
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetRadioState(dataMessageParcel, reply);
 }
 
 void SetNrOptionMode(const uint8_t *data, size_t size)
@@ -77,9 +98,18 @@ void SetNrOptionMode(const uint8_t *data, size_t size)
         return;
     }
 
+    MessageParcel dataMessageParcel;
+    std::unique_ptr<SetRadioStateCallback> callbackWrap = std::make_unique<SetRadioStateCallback>(nullptr);
+    if (callbackWrap == nullptr) {
+        return;
+    }
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     int32_t nrMode = static_cast<int32_t>(size % NR_MODE);
-    DelayedSingleton<CoreService>::GetInstance()->SetNrOptionMode(slotId, nrMode, nullptr);
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteInt32(nrMode);
+    dataMessageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnSetNrOptionMode(dataMessageParcel, reply);
 }
 
 void GetNrOptionMode(const uint8_t *data, size_t size)
@@ -98,8 +128,59 @@ void GetNetworkSearchInformation(const uint8_t *data, size_t size)
         return;
     }
 
+    MessageParcel dataMessageParcel;
+    std::unique_ptr<GetNetworkSearchInfoCallback> callbackWrap =
+        std::make_unique<GetNetworkSearchInfoCallback>(nullptr);
+    if (callbackWrap == nullptr) {
+        return;
+    }
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    DelayedSingleton<CoreService>::GetInstance()->GetNetworkSearchInformation(slotId, nullptr);
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetNetworkSearchInformation(dataMessageParcel, reply);
+}
+
+void SetNetworkSelectionMode(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel dataMessageParcel;
+    std::unique_ptr<GetNetworkSearchInfoCallback> callbackWrap =
+        std::make_unique<GetNetworkSearchInfoCallback>(nullptr);
+    if (callbackWrap == nullptr) {
+        return;
+    }
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t selectionMode = static_cast<int32_t>(size % SLOT_NUM);
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteInt32(selectionMode);
+    dataMessageParcel.WriteBool(false);
+    dataMessageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnSetNetworkSelectionMode(dataMessageParcel, reply);
+}
+
+void SetPreferredNetwork(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel dataMessageParcel;
+    std::unique_ptr<SetPreferredNetworkCallback> callbackWrap = std::make_unique<SetPreferredNetworkCallback>(nullptr);
+    if (callbackWrap == nullptr) {
+        return;
+    }
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t networkMode = static_cast<int32_t>(size % NETWORK_MODE);
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteInt32(networkMode);
+    dataMessageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnSetPreferredNetwork(dataMessageParcel, reply);
 }
 
 void SetVoiceCallForwarding(const uint8_t *data, size_t size)
@@ -225,6 +306,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     SetNrOptionMode(data, size);
     GetNrOptionMode(data, size);
     GetNetworkSearchInformation(data, size);
+    SetNetworkSelectionMode(data, size);
+    SetPreferredNetwork(data, size);
     SetVoiceCallForwarding(data, size);
     GetMaxSimCount(data, size);
     GetImsRegStatus(data, size);
