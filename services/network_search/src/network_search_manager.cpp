@@ -206,10 +206,6 @@ int32_t NetworkSearchManager::InitModuleBySlotId(int32_t slotId)
     } else {
         return TELEPHONY_SUCCESS; // has been added
     }
-    bool mode = false;
-    if (GetAirplaneMode(mode) != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("NetworkSearchManager::Init GetAirplaneMode fail");
-    }
     if (inner != nullptr && eventSender_ != nullptr) {
         if (inner->state_ == HandleRunningState::STATE_RUNNING) {
             TELEPHONY_LOGE("NetworkSearchManager::Init HandleRunningState is running. slotId:%{public}d", slotId);
@@ -223,8 +219,6 @@ int32_t NetworkSearchManager::InitModuleBySlotId(int32_t slotId)
             ClearManagerInner();
             return TELEPHONY_ERROR;
         }
-        SetLocalAirplaneMode(slotId, mode);
-        TELEPHONY_LOGI("NetworkSearchManager::Init airplaneMode:%{public}d slotId:%{public}d", mode, slotId);
         // Prevent running crash and query the radio status at startup
         eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_STATUS);
         return TELEPHONY_SUCCESS;
@@ -1550,6 +1544,20 @@ void NetworkSearchManager::TriggerTimezoneRefresh(int32_t slotId)
         }
     }
     TELEPHONY_LOGE("NetworkSearchManager::TriggerTimezoneRefresh slotId:%{public}d", slotId);
+}
+
+void NetworkSearchManager::InitAirplaneMode(int32_t slotId)
+{
+    if (slotId < 0 || slotId > SIM_SLOT_COUNT) {
+        return;
+    }
+    bool mode = false;
+    if (GetAirplaneMode(mode) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("NetworkSearchManager::Init GetAirplaneMode fail");
+        return;
+    }
+    SetLocalAirplaneMode(slotId, mode);
+    TELEPHONY_LOGI("NetworkSearchManager::Init airplaneMode:%{public}d slotId:%{public}d", mode, slotId);
 }
 
 int32_t NetworkSearchManager::GetAirplaneMode(bool &airplaneMode)
