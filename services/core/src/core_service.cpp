@@ -106,7 +106,7 @@ bool CoreService::Init()
     }
     CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
-        networkSearchManager_->InitAirPlaneMode(slotId);
+        networkSearchManager_->InitAirplaneMode(slotId);
     }
     TELEPHONY_LOGI("CoreService::Init success");
     return true;
