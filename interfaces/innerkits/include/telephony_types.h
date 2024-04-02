@@ -30,6 +30,7 @@ namespace Telephony {
 #define VSIM_MODEM_COUNT GetVSimModemCount<int32_t>()
 #define IS_SUPPORT_VSIM (VSIM_MODEM_COUNT > 0)
 inline const int32_t SYSPARA_SIZE = 128;
+inline constexpr size_t ARRAY_SIZE = 1024;
 inline const int32_t DEFAULT_SIM_SLOT_ID = 0;
 inline const int32_t DEFAULT_SIM_SLOT_ID_REMOVE = -1;
 inline const int32_t INVALID_MAIN_CARD_SLOTID = -2;

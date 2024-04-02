@@ -76,7 +76,7 @@ template<typename T, std::enable_if_t<std::is_same_v<T, char>, int32_t> = 0>
 napi_status NapiValueConverted(napi_env env, napi_value arg, T *buf)
 {
     size_t result {0};
-    constexpr size_t bufSize { 255 };
+    constexpr size_t bufSize { 1024 };
     return napi_get_value_string_utf8(env, arg, buf, bufSize, &result);
 }
 
