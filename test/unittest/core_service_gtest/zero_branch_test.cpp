@@ -2037,6 +2037,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_003, Function | MediumTest |
     std::vector<sptr<CellInformation>> cellInfo;
     networkSearchManager->GetCellInfoList(INVALID_SLOTID, cellInfo);
     EXPECT_TRUE(cellInfo.empty());
+
     EXPECT_NE(networkSearchManager->SendUpdateCellLocationRequest(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
     EXPECT_TRUE(networkSearchManager->GetCellLocation(INVALID_SLOTID) == nullptr);
     bool airplaneMode = false;

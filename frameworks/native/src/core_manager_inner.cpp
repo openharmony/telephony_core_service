@@ -98,6 +98,7 @@ int32_t CoreManagerInner::InitExtraModule(int32_t slotId)
     // Step3. Init network search object.
     if (networkSearchManager_ != nullptr) {
         resultCode = networkSearchManager_->InitTelExtraModule(slotId);
+        networkSearchManager_->InitAirplaneMode(slotId);
     }
     TELEPHONY_LOGI("InitExtraModule, resultCode of network: %{public}d", resultCode);
     if (resultCode != TELEPHONY_SUCCESS) {
