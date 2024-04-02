@@ -593,7 +593,7 @@ int32_t TelRilCall::CallRingbackVoiceNotice(const HDI::Ril::V1_1::RingbackVoice 
         TELEPHONY_LOGE("ERROR : ringbackVoiceInfo == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ringbackVoiceInfo->status = ringbackVoice.status;
+    ringbackVoiceInfo->status = !ringbackVoice.status;
     return Notify<RingbackVoice>(TELEPHONY_LOG_FUNC_NAME, ringbackVoiceInfo, RadioEvent::RADIO_CALL_RINGBACK_VOICE);
 }
 
