@@ -138,6 +138,12 @@ public:
         int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName) = 0;
     virtual int32_t GetBasebandVersion(int32_t slotId, std::string &version) = 0;
     /**
+     * @brief Init airplane mode.
+     *
+     * @param slotId[in], sim slot id
+     */
+    virtual void InitAirplaneMode(int32_t slotId) = 0;
+    /**
      * @brief Get the airplane mode.
      *
      * @param airplaneMode[out], true if airplane is on, false if airplane is off

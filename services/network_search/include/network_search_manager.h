@@ -242,6 +242,7 @@ public:
     std::shared_ptr<NetworkSearchManagerInner> FindManagerInner(int32_t slotId);
     void SetLocateUpdate(int32_t slotId);
     int32_t GetAirplaneMode(bool &airplaneMode) override;
+    void InitAirplaneMode(int32_t slotId) override;
     int32_t ProcessNotifyStateChangeEvent(int32_t slotId);
     bool IsRadioFirstPowerOn(int32_t slotId);
     void SetRadioFirstPowerOn(int32_t slotId, bool isFirstPowerOn);
