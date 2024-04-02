@@ -367,14 +367,18 @@ static int32_t WrapRegState(int32_t nativeState)
 static void NativeGetNetworkState(napi_env env, void *data)
 {
     auto asyncContext = static_cast<GetStateContext *>(data);
+    if (asyncContext == nullptr) {
+        return;
+    }
     if (!IsValidSlotId(asyncContext->slotId)) {
         TELEPHONY_LOGE("NativeGetNetworkState slotId is invalid");
         asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
     sptr<NetworkState> networkState = nullptr;
-    asyncContext->errorCode =
-        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkState(asyncContext->slotId, networkState);
+    int32_t slotId = asyncContext->slotId;
+    int32_t result = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkState(slotId, networkState);
+    asyncContext->errorCode = result;
     if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("NativeGetNetworkState errorCode = %{public}d", asyncContext->errorCode);
         return;
