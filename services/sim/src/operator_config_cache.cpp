@@ -249,8 +249,9 @@ void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId)
     CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
     std::string operName = Str16ToStr8(simFileManager->GetOpName());
     std::string operKey = Str16ToStr8(simFileManager->GetOpKey());
+    std::string operNameNew = (operKey == "") ? "NULL" : operName;
     int32_t response = CoreManagerInner::GetInstance().SendSimMatchedOperatorInfo(slotId,
-        static_cast<int32_t>(simState), operName, operKey);
+        static_cast<int32_t>(simState), operNameNew, operKey);
     TELEPHONY_LOGI("OperatorConfigCache::SendSimMatchedOperatorInfo response = %{public}d", response);
 }
 
