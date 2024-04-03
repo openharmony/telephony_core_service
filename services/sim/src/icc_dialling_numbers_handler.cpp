@@ -418,9 +418,8 @@ void IccDiallingNumbersHandler::FetchDiallingNumberContent(
     offset += length;
     length = static_cast<int>(record[offset]);
     if (length > MAX_NUMBER_SIZE_BYTES) {
-        diallingNumber->number_ = u"";
+        length = MAX_NUMBER_SIZE_BYTES;
         TELEPHONY_LOGE("FetchDiallingNumberContent number error");
-        return;
     }
     /* parse number */
     ++offset;
