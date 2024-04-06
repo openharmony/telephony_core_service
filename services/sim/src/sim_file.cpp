@@ -1068,6 +1068,7 @@ bool SimFile::ProcessObtainIMSIDone(const AppExecFwk::InnerEvent::Pointer &event
         SaveCountryCode();
         TELEPHONY_LOGI("SimFile::ObtainIsoCountryCode result success");
         if (!imsi_.empty()) {
+            CheckMncLength();
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
             FileChangeToExt(imsi_, FileChangeType::G_IMSI_FILE_LOAD);
         }
