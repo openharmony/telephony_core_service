@@ -110,7 +110,7 @@ void CellInfo::ProcessNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer 
 
 void CellInfo::ProcessCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGD("CellInfo::ProcessCurrentCellInfo cell info start... slotId:%{public}d", slotId_);
+    ClearCellInfoList();
     std::lock_guard<std::mutex> lock(mutex_);
     if (event == nullptr) {
         TELEPHONY_LOGE("CellInfo::ProcessCurrentCellInfo event is nullptr slotId:%{public}d", slotId_);
@@ -118,21 +118,20 @@ void CellInfo::ProcessCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &eve
     }
     CellListCurrentInformation *cellInfoList = event->GetSharedObject<CellListCurrentInformation>().get();
     if (cellInfoList == nullptr) {
-        TELEPHONY_LOGE("CellInfo::ProcessCurrentCellInfo rssi is nullptr");
+        TELEPHONY_LOGE("CellInfo::ProcessCurrentCellInfo cellInfoList is nullptr slotId:%{public}d", slotId_);
         return;
     }
 
     int32_t cellSize = cellInfoList->itemNum >= CellInformation::MAX_CELL_NUM ? CellInformation::MAX_CELL_NUM :
                                                                                 cellInfoList->itemNum;
     if (cellSize <= 0) {
-        TELEPHONY_LOGE("CellInfo::ProcessCurrentCellInfo rssi is nullptr");
+        TELEPHONY_LOGE("CellInfo::ProcessCurrentCellInfo cellSize:%{public}d error, slotId:%{public}d",
+            cellSize, slotId_);
         return;
     }
 
-    TELEPHONY_LOGI("CellInfo::ProcessCurrentCellInfo cell size:%{public}d, cur size:%{public}zu",
-        cellInfoList->itemNum, cellInfos_.size());
-    currentCellInfo_ = nullptr;
-    cellInfos_.clear();
+    TELEPHONY_LOGI("CellInfo::ProcessCurrentCellInfo cell size:%{public}d, slotId:%{public}d",
+        cellInfoList->itemNum, slotId_);
     std::vector<CurrentCellInformation> cell = cellInfoList->cellCurrentInfo;
     for (int32_t i = 0; i < cellSize; ++i) {
         CurrentCellInformation currentCell = cell[i];
