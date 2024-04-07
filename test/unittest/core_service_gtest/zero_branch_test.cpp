@@ -974,6 +974,8 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_003, Function | MediumTest | Lev
     std::u16string result = u"";
     EXPECT_NE(mInner.GetImei(0, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, std::u16string());
+    EXPECT_NE(mInner.GetImeiSv(0, result), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(result, std::u16string());
     EXPECT_NE(mInner.GetMeid(0, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, std::u16string());
     EXPECT_NE(mInner.GetUniqueDeviceId(0, result), TELEPHONY_ERR_SUCCESS);
@@ -1941,6 +1943,8 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     EXPECT_EQ(result, testStr);
     EXPECT_NE(networkSearchManager->GetImei(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, testStr);
+    EXPECT_NE(networkSearchManager->GetImeiSv(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(result, testStr);
     EXPECT_EQ(networkSearchManager->GetImsRegStatus(INVALID_SLOTID, ImsServiceType::TYPE_SMS, info),
         TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(networkSearchManager->GetUniqueDeviceId(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
@@ -1970,6 +1974,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_002, Function | MediumTest |
     inner->networkSearchHandler_ = networkSearchHandler;
     std::string bundleName = "qwe";
     std::u16string imei = u"";
+    std::u16string imeiSv = u"";
     sptr<ImsRegInfoCallback> callback = nullptr;
     networkSearchManager->SetLocateUpdate(INVALID_SLOTID);
     networkSearchManager->GetVoiceTech(INVALID_SLOTID);
@@ -1989,6 +1994,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_002, Function | MediumTest |
     networkSearchManager->SetRadioStateValue(INVALID_SLOTID, ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
     networkSearchManager->SetNetworkSelectionValue(INVALID_SLOTID, SelectionMode::MODE_TYPE_UNKNOWN);
     networkSearchManager->SetImei(INVALID_SLOTID, imei);
+    networkSearchManager->SetImeiSv(INVALID_SLOTID, imeiSv);
     networkSearchManager->UpdateCellLocation(INVALID_SLOTID, 1, 1, 1);
     networkSearchManager->SetMeid(INVALID_SLOTID, imei);
     networkSearchManager->SetFrequencyType(INVALID_SLOTID, FrequencyType::FREQ_TYPE_MMWAVE);
@@ -2246,6 +2252,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_001, Function | MediumTest |
     networkSearchHandler->GetPreferredNetworkResponse(event);
     networkSearchHandler->SetPreferredNetworkResponse(event);
     networkSearchHandler->RadioGetImei(event);
+    networkSearchHandler->RadioGetImeiSv(event);
     networkSearchHandler->RadioGetMeid(event);
     event = nullptr;
     networkSearchHandler->ProcessEvent(event);
@@ -2347,6 +2354,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_003, Function | MediumTest |
     networkSearchHandler->HandleDelayNotifyEvent(event);
     networkSearchHandler->NetworkSearchResult(event);
     networkSearchHandler->RadioGetNeighboringCellInfo(event);
+    networkSearchHandler->RadioGetImeiSv(event);
     EXPECT_EQ(networkSearchHandler->GetRegServiceState(regState), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(networkSearchHandler->HandleRrcStateChanged(status), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(networkSearchHandler->RevertLastTechnology(), TELEPHONY_ERR_LOCAL_PTR_NULL);

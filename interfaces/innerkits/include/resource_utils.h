@@ -107,6 +107,7 @@ enum DisconnectedReasons {
     RADIO_RELEASE_ABNORMAL = 259, // RRC connection release, abnormal
     ACCESS_CLASS_BLOCKED = 260, // Access class barring
     NETWORK_DETACH = 261, // Explicit network detach
+    IMEISV_NOT_ACCEPTED = 262, // ImeiSv not accepted
     FAILED_INVALID_PARAMETER = 1025,
     SIM_NOT_EXIT = 1026,
     SIM_PIN_NEED = 1027,
@@ -180,6 +181,7 @@ public:
     static const std::string CALL_FAILED_FDN_BLOCKED;
     static const std::string CALL_FAILED_IMSI_UNKNOWN_IN_VLR;
     static const std::string CALL_FAILED_IMEI_NOT_ACCEPTED;
+    static const std::string CALL_FAILED_IMEISV_NOT_ACCEPTED;
     static const std::string CALL_FAILED_DIAL_MODIFIED_TO_USSD;
     static const std::string CALL_FAILED_DIAL_MODIFIED_TO_SS;
     static const std::string CALL_FAILED_DIAL_MODIFIED_TO_DIAL;

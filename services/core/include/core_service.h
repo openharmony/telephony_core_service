@@ -58,6 +58,8 @@ public:
 
     int32_t GetImei(int32_t slotId, std::u16string &imei) override;
 
+    int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) override;
+
     int32_t GetMeid(int32_t slotId, std::u16string &meid) override;
 
     int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) override;

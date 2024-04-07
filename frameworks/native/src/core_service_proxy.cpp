@@ -485,6 +485,33 @@ int32_t CoreServiceProxy::GetImei(int32_t slotId, std::u16string &imei)
     return result;
 }
 
+int32_t CoreServiceProxy::GetImeiSv(int32_t slotId, std::u16string &imeiSv)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetImeiSv WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetImeiSv Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_IMEISV), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("GetImeiSv failed, error code is %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        imeiSv = reply.ReadString16();
+    }
+    return result;
+}
+
 int32_t CoreServiceProxy::GetMeid(int32_t slotId, std::u16string &meid)
 {
     MessageParcel data;

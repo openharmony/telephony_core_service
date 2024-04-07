@@ -235,6 +235,11 @@ struct GetIMEIContext : BaseContext {
     std::string getIMEIResult = "";
 };
 
+struct GetIMEISVContext : BaseContext {
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    std::string getIMEISVResult = "";
+};
+
 struct GetMEIDContext : BaseContext {
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::string getMEIDResult = "";

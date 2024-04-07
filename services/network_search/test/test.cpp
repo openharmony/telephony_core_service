@@ -71,6 +71,7 @@ const int32_t INPUT_SET_NR_OPTION_MODE = 33;
 const int32_t INPUT_FACTORY_RESET = 34;
 const int32_t INPUT_GET_NR_SSBID = 35;
 const int32_t INPUT_GET_RESIDENT_NETWORK_NUMERIC = 36;
+const int32_t INPUT_GET_IMEISV = 37;
 const int32_t INPUT_INIT_TIME = 99;
 const int32_t INPUT_QUIT = 100;
 const int32_t SLEEP_TIME = 5;
@@ -613,6 +614,22 @@ void TestGetImei()
     std::cout << "imei:" << str << std::endl;
 }
 
+void TestGetImeiSv()
+{
+    AccessToken token;
+    if (g_telephonyService == nullptr) {
+        std::cout << "TestGetImeiSv g_telephonyService is nullptr." << std::endl;
+        return;
+    }
+    std::u16string imeiSv = u"";
+    int32_t result = g_telephonyService->GetImeiSv(InputSlotId(), imeiSv);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        std::cout << "error:" << result << std::endl;
+    }
+    std::string str = Str16ToStr8(imeiSv);
+    std::cout << "imeiSv:" << str << std::endl;
+}
+
 void TestGetMeid()
 {
     AccessToken token;
@@ -773,6 +790,7 @@ void Prompt()
            "34:FactoryReset\n"
            "35:GetNrSsbId\n"
            "36:GetResidentNetworkNumeric\n"
+           "37:GetImeiSv\n"
            "99:InitTimeAndTimeZone\n"
            "100:exit \n");
 }
@@ -849,6 +867,7 @@ void Init()
     memberFuncMap_[INPUT_SET_NR_OPTION_MODE] = TestSetNrOptionMode;
     memberFuncMap_[INPUT_GET_NR_SSBID] = TestGetNrSsbId;
     memberFuncMap_[INPUT_GET_RESIDENT_NETWORK_NUMERIC] = TestGetResidentNetworkNumeric;
+    memberFuncMap_[INPUT_GET_IMEISV] = TestGetImeiSv;
     memberFuncMap_[INPUT_FACTORY_RESET] = TestFactoryReset;
 }
 
