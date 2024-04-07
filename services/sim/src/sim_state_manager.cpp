@@ -128,7 +128,7 @@ int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockS
     simStateHandle_->UnlockPin(slotId, pin);
     while (!responseReady_) {
         TELEPHONY_LOGI("UnlockPin::wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == std::cv_status::timeout) {
             break;
         }
     }
@@ -162,7 +162,7 @@ int32_t SimStateManager::UnlockPuk(
     simStateHandle_->UnlockPuk(slotId, newPin, puk);
     while (!responseReady_) {
         TELEPHONY_LOGI("UnlockPuk::wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == std::cv_status::timeout) {
             break;
         }
     }
