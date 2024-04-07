@@ -79,6 +79,21 @@ void GetImei(const uint8_t *data, size_t size)
     DelayedSingleton<CoreService>::GetInstance()->OnGetImei(dataMessageParcel, reply);
 }
 
+void GetImeiSv(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CoreService>::GetInstance()->OnGetImeiSv(dataMessageParcel, reply);
+}
+
 void GetSimOperatorNumeric(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -133,6 +148,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 
     GetNetworkState(data, size);
     GetImei(data, size);
+    GetImeiSv(data, size);
     GetNetworkState(data, size);
     GetISOCountryCodeForSim(data, size);
     SendTerminalResponseCmd(data, size);

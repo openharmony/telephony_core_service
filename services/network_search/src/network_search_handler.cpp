@@ -54,6 +54,7 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
     { RadioEvent::RADIO_IMS_SERVICE_STATUS_UPDATE, &NetworkSearchHandler::UpdateImsServiceStatus },
     { RadioEvent::RADIO_IMS_REGISTER_STATE_UPDATE, &NetworkSearchHandler::UpdateImsRegisterState },
     { RadioEvent::RADIO_GET_IMEI, &NetworkSearchHandler::RadioGetImei },
+    { RadioEvent::RADIO_GET_IMEISV, &NetworkSearchHandler::RadioGetImeiSv },
     { RadioEvent::RADIO_GET_MEID, &NetworkSearchHandler::RadioGetMeid },
     { RadioEvent::RADIO_GET_NEIGHBORING_CELL_INFO, &NetworkSearchHandler::RadioGetNeighboringCellInfo },
     { RadioEvent::RADIO_GET_CURRENT_CELL_INFO, &NetworkSearchHandler::RadioGetCurrentCellInfo },
@@ -776,6 +777,20 @@ void NetworkSearchHandler::RadioGetImei(const AppExecFwk::InnerEvent::Pointer &e
         radioInfo_->ProcessGetImei(event);
     } else {
         TELEPHONY_LOGE("RadioGetImei radioInfo_ is null slotId:%{public}d", slotId_);
+    }
+}
+
+void NetworkSearchHandler::RadioGetImeiSv(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::RadioGetImeiSv event is nullptr!");
+        return;
+    }
+    TELEPHONY_LOGD("NetworkSearchHandler::RadioGetImeiSv start slotId:%{public}d", slotId_);
+    if (radioInfo_ != nullptr) {
+        radioInfo_->ProcessGetImeiSv(event);
+    } else {
+        TELEPHONY_LOGE("RadioGetImeiSv radioInfo_ is null slotId:%{public}d", slotId_);
     }
 }
 

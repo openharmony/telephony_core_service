@@ -107,7 +107,7 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Callback_001, Function | MediumTest
 HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Base_001, Function | MediumTest | Level1)
 {
     TELEPHONY_LOGI("Telephony_tel_ril_Base_001 entry");
-    auto rilInterface = HDI::Ril::V1_2::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilBase = std::make_shared<TelRilBase>(SLOT_ID, rilInterface, observerHandler, nullptr);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
@@ -151,7 +151,7 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Base_001, Function | MediumTest | L
 HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Network_001, Function | MediumTest | Level1)
 {
     TELEPHONY_LOGI("Telephony_tel_ril_Network_001 entry");
-    auto rilInterface = HDI::Ril::V1_2::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilNetwork = std::make_shared<TelRilNetwork>(SLOT_ID, rilInterface, observerHandler, nullptr);
 
@@ -182,7 +182,7 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Network_001, Function | MediumTest 
 HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Sms_001, Function | MediumTest | Level1)
 {
     TELEPHONY_LOGI("Telephony_tel_ril_Sms_001 entry");
-    auto rilInterface = HDI::Ril::V1_2::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilSms = std::make_shared<TelRilSms>(SLOT_ID, rilInterface, observerHandler, nullptr);
 
@@ -251,7 +251,7 @@ HWTEST_F(TelRilBranchTest, Telephony_observerhandler_001, Function | MediumTest 
 HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Modem_001, Function | MediumTest | Level1)
 {
     TELEPHONY_LOGI("Telephony_tel_ril_Modem_001 entry");
-    auto rilInterface = HDI::Ril::V1_2::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilModem = std::make_shared<TelRilModem>(SLOT_ID, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::VoiceRadioTechnology voiceRadioTechnology;
@@ -268,7 +268,7 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Modem_001, Function | MediumTest | 
 HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Data_001, Function | MediumTest | Level1)
 {
     TELEPHONY_LOGI("Telephony_tel_ril_Data_001 entry");
-    auto rilInterface = HDI::Ril::V1_2::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilData = std::make_shared<TelRilData>(SLOT_ID, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::DataCallResultList iDataCallResultList;
@@ -289,7 +289,7 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Data_001, Function | MediumTest | L
 HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Sim_001, Function | MediumTest | Level1)
 {
     TELEPHONY_LOGI("Telephony_tel_ril_Sim_001 entry");
-    auto rilInterface = HDI::Ril::V1_2::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilSim = std::make_shared<TelRilSim>(SLOT_ID, rilInterface, observerHandler, nullptr);
 
@@ -326,7 +326,7 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Sim_001, Function | MediumTest | Le
 HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Call_001, Function | MediumTest | Level1)
 {
     TELEPHONY_LOGI("Telephony_tel_ril_Call_001 entry");
-    auto rilInterface = HDI::Ril::V1_2::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilCall = std::make_shared<TelRilCall>(SLOT_ID, rilInterface, observerHandler, nullptr);
 

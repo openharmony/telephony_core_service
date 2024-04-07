@@ -273,6 +273,7 @@ void TelRilTest::InitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE] = &TelRilTest::GetPreferredNetworkParaTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE] = &TelRilTest::SetPreferredNetworkParaTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_IMEI] = &TelRilTest::GetImeiTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_IMEISV] = &TelRilTest::GetImeiSvTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_MEID] = &TelRilTest::GetMeidTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO] = &TelRilTest::GetVoiceRadioTechnologyTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG] = &TelRilTest::GetPhysicalChannelConfigTest;
@@ -1670,6 +1671,25 @@ void TelRilTest::GetImeiTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHa
         TELEPHONY_LOGI("TelRilTest::GetImeiTest -->");
         telRilManager_->GetImei(slotId, event);
         TELEPHONY_LOGI("TelRilTest::GetImeiTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Get IMEISV
+ *
+ * @param handler
+ */
+void TelRilTest::GetImeiSvTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMEISV);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetImeisVTest -->");
+        telRilManager_->GetImeiSv(slotId, event);
+        TELEPHONY_LOGI("TelRilTest::GetImeiSvTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }
