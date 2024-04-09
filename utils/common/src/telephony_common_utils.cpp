@@ -72,5 +72,10 @@ bool IsValidHexValue(const std::string &inputValue)
     TELEPHONY_LOGI("InputValue is not a hexadecimal number");
     return false;
 }
+
+int32_t GetTokenID()
+{
+    return static_cast<int32_t>(IPCSkeleton::GetCallingTokenID());
+}
 } // namespace Telephony
 } // namespace OHOS

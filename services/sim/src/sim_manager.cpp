@@ -1155,22 +1155,22 @@ int32_t SimManager::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue)
     return multiSimController_->QueryImsSwitch(slotId, imsSwitchValue);
 }
 
-int32_t SimManager::RegisterSimAccountCallback(const std::string &bundleName, const sptr<SimAccountCallback> &callback)
+int32_t SimManager::RegisterSimAccountCallback(const int32_t tokenId, const sptr<SimAccountCallback> &callback)
 {
     if (multiSimMonitor_ == nullptr) {
         TELEPHONY_LOGE("multiSimMonitor is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return multiSimMonitor_->RegisterSimAccountCallback(bundleName, callback);
+    return multiSimMonitor_->RegisterSimAccountCallback(tokenId, callback);
 }
 
-int32_t SimManager::UnregisterSimAccountCallback(const std::string &bundleName)
+int32_t SimManager::UnregisterSimAccountCallback(const int32_t tokenId)
 {
     if (multiSimMonitor_ == nullptr) {
         TELEPHONY_LOGE("multiSimMonitor is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return multiSimMonitor_->UnregisterSimAccountCallback(bundleName);
+    return multiSimMonitor_->UnregisterSimAccountCallback(tokenId);
 }
 } // namespace Telephony
 } // namespace OHOS

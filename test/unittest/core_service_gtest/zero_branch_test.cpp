@@ -1131,11 +1131,11 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_006, Function | MediumTest | Lev
         TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.UnRegisterCoreNotify(INVALID_SLOTID, handler, RadioEvent::RADIO_SIM_GET_RADIO_PROTOCOL),
         TELEPHONY_ERR_LOCAL_PTR_NULL);
-    std::string bundleName = "";
+    int32_t tokenId = 123456789;
     sptr<SimAccountCallback> simAccountCallback;
     int32_t imsSwitchValue = 1;
-    EXPECT_EQ(mInner.RegisterSimAccountCallback(bundleName, simAccountCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.UnregisterSimAccountCallback(bundleName), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.RegisterSimAccountCallback(tokenId, simAccountCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.UnregisterSimAccountCallback(tokenId), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetSmscAddr(INVALID_SLOTID, 1, handler), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.QueryImsSwitch(INVALID_SLOTID, imsSwitchValue), TELEPHONY_ERROR);
     EXPECT_GT(mInner.SetVoNRSwitch(0, 0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
@@ -1481,10 +1481,11 @@ HWTEST_F(BranchTest, Telephony_SimManager_004, Function | MediumTest | Level1)
     EXPECT_NE(simManager->SaveImsSwitch(0, 1), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->SaveImsSwitch(INVALID_SLOTID, 1), TELEPHONY_ERR_SUCCESS);
     int32_t imsSwitchValue;
+    int32_t tokenId = -1;
     EXPECT_NE(simManager->QueryImsSwitch(0, imsSwitchValue), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->QueryImsSwitch(INVALID_SLOTID, imsSwitchValue), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->RegisterSimAccountCallback("", nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->UnregisterSimAccountCallback(""), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(simManager->RegisterSimAccountCallback(tokenId, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(simManager->UnregisterSimAccountCallback(tokenId), TELEPHONY_ERR_SUCCESS);
     int32_t dsdsMode = INVALID_VALUE;
     simManager->GetDsdsMode(dsdsMode);
     simManager->SetDsdsMode(0);
@@ -1968,7 +1969,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_002, Function | MediumTest |
     inner->networkSearchState_ = networkSearchState;
     inner->observerHandler_ = std::make_unique<ObserverHandler>();
     inner->networkSearchHandler_ = networkSearchHandler;
-    std::string bundleName = "qwe";
+    int32_t tokenId = 123456789;
     std::u16string imei = u"";
     sptr<ImsRegInfoCallback> callback = nullptr;
     networkSearchManager->SetLocateUpdate(INVALID_SLOTID);
@@ -2000,9 +2001,9 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_002, Function | MediumTest |
     EXPECT_TRUE(networkSearchManager->GetNetworkSearchState(INVALID_SLOTID) != nullptr);
     EXPECT_TRUE(networkSearchManager->IsRadioFirstPowerOn(INVALID_SLOTID));
     EXPECT_EQ(networkSearchManager->RegisterImsRegInfoCallback(
-                  INVALID_SLOTID, ImsServiceType::TYPE_SMS, bundleName, callback),
+                  INVALID_SLOTID, ImsServiceType::TYPE_SMS, tokenId, callback),
         TELEPHONY_ERR_ARGUMENT_NULL);
-    EXPECT_EQ(networkSearchManager->UnregisterImsRegInfoCallback(INVALID_SLOTID, ImsServiceType::TYPE_SMS, bundleName),
+    EXPECT_EQ(networkSearchManager->UnregisterImsRegInfoCallback(INVALID_SLOTID, ImsServiceType::TYPE_SMS, tokenId),
         TELEPHONY_SUCCESS);
 }
 
@@ -2167,7 +2168,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_006, Function | MediumTest |
     inner->networkSearchHandler_ = networkSearchHandler;
     nsm->delayTime_ = 1;
     int32_t status = 0;
-    std::string bundleName = "qwe";
+    int32_t tokenId = 123456789;
     ImsRegInfo info;
     sptr<INetworkSearchCallback> networkSearchCallback = nullptr;
     nsm->AddManagerInner(INVALID_SLOTID, inner);
@@ -2176,7 +2177,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_006, Function | MediumTest |
     nsm->HandleNotifyStateChangeWithDelay(INVALID_SLOTID, true);
     nsm->HandleNotifyStateChangeWithDelay(INVALID_SLOTID, false);
     nsm->InitSimRadioProtocol(INVALID_SLOTID);
-    nsm->UnregisterImsRegInfoCallback(INVALID_SLOTID, ImsServiceType::TYPE_SMS, bundleName);
+    nsm->UnregisterImsRegInfoCallback(INVALID_SLOTID, ImsServiceType::TYPE_SMS, tokenId);
     EXPECT_EQ(nsm->HandleRrcStateChanged(INVALID_SLOTID, 0), TELEPHONY_ERR_FAIL);
     EXPECT_EQ(nsm->HandleRrcStateChanged(INVALID_SLOTID, 1), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(nsm->UpdateRrcConnectionState(INVALID_SLOTID, status), TELEPHONY_ERR_SUCCESS);
@@ -2876,10 +2877,10 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
     multiSimMonitor->RefreshData(INVALID_SLOTID);
     multiSimMonitor->RefreshData(0);
     multiSimMonitor->NotifySimAccountChanged();
-    std::string bundleName = "123";
+    int32_t tokenId = 123456789;
     sptr<SimAccountCallback> callback = nullptr;
-    EXPECT_GT(multiSimMonitor->RegisterSimAccountCallback(bundleName, callback), TELEPHONY_ERROR);
-    EXPECT_EQ(multiSimMonitor->UnregisterSimAccountCallback(bundleName), TELEPHONY_ERROR);
+    EXPECT_GT(multiSimMonitor->RegisterSimAccountCallback(tokenId, callback), TELEPHONY_ERROR);
+    EXPECT_EQ(multiSimMonitor->UnregisterSimAccountCallback(tokenId), TELEPHONY_ERROR);
 }
 
 /**

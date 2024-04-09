@@ -1581,7 +1581,7 @@ int32_t NetworkSearchManager::GetAirplaneMode(bool &airplaneMode)
 }
 
 int32_t NetworkSearchManager::RegisterImsRegInfoCallback(
-    int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName, const sptr<ImsRegInfoCallback> &callback)
+    int32_t slotId, ImsServiceType imsSrvType, const int32_t tokenId, const sptr<ImsRegInfoCallback> &callback)
 {
     if (callback == nullptr) {
         TELEPHONY_LOGE("[slot%{public}d] callback is nullptr", slotId);
@@ -1590,7 +1590,7 @@ int32_t NetworkSearchManager::RegisterImsRegInfoCallback(
     bool isExisted = false;
     std::lock_guard<std::mutex> lock(mutexIms_);
     for (auto iter : listImsRegInfoCallbackRecord_) {
-        if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType) && (iter.bundleName == bundleName)) {
+        if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType) && (iter.tokenId == tokenId)) {
             isExisted = true;
             break;
         }
@@ -1603,7 +1603,7 @@ int32_t NetworkSearchManager::RegisterImsRegInfoCallback(
     ImsRegInfoCallbackRecord imsRecord;
     imsRecord.slotId = slotId;
     imsRecord.imsSrvType = imsSrvType;
-    imsRecord.bundleName = bundleName;
+    imsRecord.tokenId = tokenId;
     imsRecord.imsCallback = callback;
     listImsRegInfoCallbackRecord_.push_back(imsRecord);
     TELEPHONY_LOGD("[slot%{public}d] Register successfully, callback list size is %{public}zu", slotId,
@@ -1612,13 +1612,13 @@ int32_t NetworkSearchManager::RegisterImsRegInfoCallback(
 }
 
 int32_t NetworkSearchManager::UnregisterImsRegInfoCallback(
-    int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName)
+    int32_t slotId, ImsServiceType imsSrvType, const int32_t tokenId)
 {
     bool isSuccess = false;
     std::lock_guard<std::mutex> lock(mutexIms_);
     auto iter = listImsRegInfoCallbackRecord_.begin();
     for (; iter != listImsRegInfoCallbackRecord_.end(); ++iter) {
-        if ((iter->slotId == slotId) && (iter->imsSrvType == imsSrvType) && (iter->bundleName == bundleName)) {
+        if ((iter->slotId == slotId) && (iter->imsSrvType == imsSrvType) && (iter->tokenId == tokenId)) {
             listImsRegInfoCallbackRecord_.erase(iter);
             isSuccess = true;
             break;

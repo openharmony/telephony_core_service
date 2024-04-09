@@ -65,8 +65,8 @@ public:
     virtual int32_t GetDefaultCellularDataSlotId() = 0;
     virtual int32_t GetDefaultCellularDataSimId(int32_t &simId) = 0;
     virtual int32_t RegisterSimAccountCallback(
-        const std::string &bundleName, const sptr<SimAccountCallback> &callback) = 0;
-    virtual int32_t UnregisterSimAccountCallback(const std::string &bundleName) = 0;
+        const int32_t tokenId, const sptr<SimAccountCallback> &callback) = 0;
+    virtual int32_t UnregisterSimAccountCallback(const int32_t tokenId) = 0;
     virtual int32_t GetPrimarySlotId(int32_t &slotId) = 0;
     virtual int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber) = 0;
     virtual int32_t GetShowName(int32_t slotId, std::u16string &showName) = 0;
