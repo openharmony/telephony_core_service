@@ -113,13 +113,13 @@ template<typename FuncType, typename... ParamTypes>
 inline int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response,
     int32_t requestId, FuncType &&_func, ParamTypes &&... _args)
 {
+    if (rilInterface_ == nullptr) {
+        TELEPHONY_LOGE("%{public}s() rilInterface_ is null: eventid=%{public}d", funcName, requestId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(requestId, response);
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("%{public}s() telRilRequest is null: eventid=%{public}d", funcName, requestId);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (rilInterface_ == nullptr) {
-        TELEPHONY_LOGE("%{public}s() rilInterface_ is null: eventid=%{public}d", funcName, requestId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return (rilInterface_->*(_func))(slotId_, telRilRequest->serialId_, std::forward<ParamTypes>(_args)...);
