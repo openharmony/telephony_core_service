@@ -26,6 +26,7 @@
       OHOS::Telephony::ToUtf*;
       "OHOS::Telephony::GetBoolValue(int)";
       "OHOS::Telephony::GetBundleName()";
+      "OHOS::Telephony::GetTokenID()";
       "OHOS::Telephony::GetCallState(int)";
       "OHOS::Telephony::GetCardType(int)";
       "OHOS::Telephony::GetCellularDataConnectionNetworkType(int)";

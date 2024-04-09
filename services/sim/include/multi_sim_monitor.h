@@ -43,8 +43,8 @@ public:
 
     void Init();
     void RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
-    int32_t RegisterSimAccountCallback(const std::string &bundleName, const sptr<SimAccountCallback> &callback);
-    int32_t UnregisterSimAccountCallback(const std::string &bundleName);
+    int32_t RegisterSimAccountCallback(const int32_t tokenId, const sptr<SimAccountCallback> &callback);
+    int32_t UnregisterSimAccountCallback(const int32_t tokenId);
     void NotifySimAccountChanged();
     void RegisterSimNotify();
     void UnRegisterSimNotify();
@@ -57,7 +57,7 @@ public:
 
 private:
     struct SimAccountCallbackRecord {
-        std::string bundleName = "";
+        int32_t tokenId = 0;
         sptr<SimAccountCallback> simAccountCallback = nullptr;
     };
 
