@@ -50,7 +50,6 @@ ohos_shared_library("radio") {
   deps = [
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
     "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
-    "//third_party/node:node_header",
   ]
 
   external_deps = [
