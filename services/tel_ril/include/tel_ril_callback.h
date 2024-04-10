@@ -16,13 +16,13 @@
 #ifndef TEL_RIL_CALLBACK_H
 #define TEL_RIL_CALLBACK_H
 
-#include <v1_2/iril.h>
+#include <v1_3/iril.h>
 
 #include "tel_ril_manager.h"
 
 namespace OHOS {
 namespace Telephony {
-class TelRilCallback : public HDI::Ril::V1_2::IRilCallback {
+class TelRilCallback : public HDI::Ril::V1_3::IRilCallback {
 public:
     explicit TelRilCallback(std::shared_ptr<TelRilManager> telRilManager);
     ~TelRilCallback() = default;
@@ -115,6 +115,8 @@ public:
     int32_t SetRadioStateResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t GetRadioStateResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;
     int32_t GetImeiResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &imei) override;
+    int32_t GetImeiSvResponse(
+        const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &imeiSv) override;
     int32_t GetMeidResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &meid) override;
     int32_t GetVoiceRadioTechnologyResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::VoiceRadioTechnology &voiceRadioTechnology) override;

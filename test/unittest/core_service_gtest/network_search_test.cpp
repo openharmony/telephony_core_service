@@ -1622,6 +1622,63 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImei_0300, Function | Med
 }
 
 /**
+ * @tc.number   Telephony_NetworkSearch_GetImeiSv_0100
+ * @tc.name     Get ImeiSv
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImeiSv_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+    } else {
+        std::u16string result = u"";
+        int32_t ret = CoreServiceClient::GetInstance().GetImeiSv(SLOT_ID, result);
+        EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+        std::string imei = Str16ToStr8(result);
+        EXPECT_STRNE(imei.c_str(), "");
+    }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetImeiSv_0200
+ * @tc.name     Get ImeiSv
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImeiSv_0200, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+    } else {
+        std::u16string result = u"";
+        int32_t ret = CoreServiceClient::GetInstance().GetImeiSv(SLOT_ID1, result);
+        EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+        std::string imei = Str16ToStr8(result);
+        EXPECT_STRNE(imei.c_str(), "");
+    }
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearch_GetImeiSv_0300
+ * @tc.name     Get ImeiSv without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImeiSv_0300, Function | MediumTest | Level2)
+{
+    if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
+        TELEPHONY_LOGI("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
+        return;
+    }
+    std::u16string result = u"";
+    int32_t ret = CoreServiceClient::GetInstance().GetImeiSv(SLOT_ID, result);
+    EXPECT_EQ(ret, TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
  * @tc.number   Telephony_NetworkSearch_GetMeid_0100
  * @tc.name     Get Meid
  * @tc.desc     Function test

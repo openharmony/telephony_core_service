@@ -121,6 +121,8 @@ public:
 
     virtual int32_t GetImei(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
+    virtual int32_t GetImeiSv(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
+
     virtual int32_t GetMeid(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
     virtual int32_t GetVoiceRadioTechnology(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;

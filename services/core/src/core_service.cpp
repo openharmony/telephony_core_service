@@ -279,6 +279,23 @@ int32_t CoreService::GetImei(int32_t slotId, std::u16string &imei)
     return networkSearchManager_->GetImei(slotId, imei);
 }
 
+int32_t CoreService::GetImeiSv(int32_t slotId, std::u16string &imeiSv)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->GetImeiSv(slotId, imeiSv);
+}
+
 int32_t CoreService::GetMeid(int32_t slotId, std::u16string &meid)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {

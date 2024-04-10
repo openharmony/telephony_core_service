@@ -113,6 +113,7 @@ enum class DiffInterfaceId {
     TEST_GET_PREFERRED_NETWORK_TYPE,
     TEST_SET_PREFERRED_NETWORK_TYPE,
     TEST_GET_IMEI,
+    TEST_GET_IMEISV,
     TEST_GET_MEID,
     TEST_GET_RADIO_PROTOCOL,
     TEST_SET_RADIO_PROTOCOL,
@@ -267,6 +268,7 @@ private:
     void SetPreferredNetworkParaTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetPreferredNetworkParaTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetImeiTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
+    void GetImeiSvTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetMeidTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetVoiceRadioTechnologyTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetPhysicalChannelConfigTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);

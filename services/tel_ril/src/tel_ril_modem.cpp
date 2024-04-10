@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace Telephony {
-TelRilModem::TelRilModem(int32_t slotId, sptr<HDI::Ril::V1_2::IRil> rilInterface,
+TelRilModem::TelRilModem(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {}
@@ -73,6 +73,11 @@ int32_t TelRilModem::GetImei(const AppExecFwk::InnerEvent::Pointer &response)
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_MODEM_GET_IMEI, &HDI::Ril::V1_1::IRil::GetImei);
 }
 
+int32_t TelRilModem::GetImeiSv(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_MODEM_GET_IMEISV, &HDI::Ril::V1_3::IRil::GetImeiSv);
+}
+
 int32_t TelRilModem::GetMeid(const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_MODEM_GET_MEID, &HDI::Ril::V1_1::IRil::GetMeid);
@@ -98,6 +103,13 @@ int32_t TelRilModem::ShutDownResponse(const HDI::Ril::V1_1::RilRadioResponseInfo
 int32_t TelRilModem::GetImeiResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &imei)
 {
     return Response<HRilStringParcel>(TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<HRilStringParcel>(imei));
+}
+
+int32_t TelRilModem::GetImeiSvResponse(
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &imeiSv)
+{
+    return Response<HRilStringParcel>(
+        TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<HRilStringParcel>(imeiSv));
 }
 
 int32_t TelRilModem::GetMeidResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &meid)

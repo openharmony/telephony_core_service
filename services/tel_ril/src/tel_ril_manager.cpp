@@ -60,12 +60,12 @@ bool TelRilManager::DeInit()
 bool TelRilManager::ConnectRilInterface()
 {
     std::lock_guard<std::mutex> lock_l(mutex_);
-    rilInterface_ = HDI::Ril::V1_2::IRil::Get();
+    rilInterface_ = HDI::Ril::V1_3::IRil::Get();
     if (rilInterface_ == nullptr) {
         TELEPHONY_LOGE("TelRilManager not find RilInterfaceService");
         return false;
     }
-    rilInterface_->SetCallback1_2(new TelRilCallback(shared_from_this()));
+    rilInterface_->SetCallback1_3(new TelRilCallback(shared_from_this()));
     return true;
 }
 
@@ -293,6 +293,11 @@ int32_t TelRilManager::GetVoiceRadioTechnology(int32_t slotId, const AppExecFwk:
 int32_t TelRilManager::GetImei(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilModem", GetTelRilModem(slotId), &TelRilModem::GetImei);
+}
+
+int32_t TelRilManager::GetImeiSv(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilModem", GetTelRilModem(slotId), &TelRilModem::GetImeiSv);
 }
 
 int32_t TelRilManager::GetMeid(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)

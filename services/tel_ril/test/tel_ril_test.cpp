@@ -177,6 +177,7 @@ void TelRilTest::OnInitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE] = &TelRilTest::OnRequestGetPreferredNetworkTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE] = &TelRilTest::OnRequestSetPreferredNetworkTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_IMEI] = &TelRilTest::OnRequestGetImeiTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_IMEISV] = &TelRilTest::OnRequestGetImeiSvTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_BASEBAND_VERSION] = &TelRilTest::OnRequestGetBasebandVersionTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_MEID] = &TelRilTest::OnRequestGetMeidTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_CS_REG_STATUS] = &TelRilTest::OnRequestGetCsRegStatusTest;
@@ -1431,6 +1432,17 @@ void TelRilTest::OnRequestGetImeiTest(int32_t slotId, const std::shared_ptr<AppE
     }
 }
 
+void TelRilTest::OnRequestGetImeiSvTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestGetImeiSvTest -->");
+        telRilManager_->GetImeiSv(slotId, event);
+        TELEPHONY_LOGI("OnRequestGetImeiSvTest finished");
+    }
+}
+
 void TelRilTest::OnRequestGetBasebandVersionTest(int32_t slotId,
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
@@ -2144,6 +2156,7 @@ void Promote()
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_POWER_STATE) << " --> OnRequestSetRadioStateTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE) << " --> OnRequestGetRadioStateTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMEI) << "--> OnRequestGetImeiTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMEISV) << "--> OnRequestGetImeiSvTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_BASEBAND_VERSION) << "--> OnRequestGetBasebandVersionTest"
          << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_MEID) << "--> OnRequestGetMeidTest" << endl;

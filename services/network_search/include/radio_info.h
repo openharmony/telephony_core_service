@@ -36,6 +36,7 @@ public:
     void ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &event) const;
     void RadioFirstPowerOn(std::shared_ptr<NetworkSearchManager> &nsm, ModemPowerState radioState) const;
     void ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) const;
+    void ProcessGetImeiSv(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessGetMeid(const AppExecFwk::InnerEvent::Pointer &event) const;
     void UpdatePhone(RadioTech csRadioTech, const RadioTech &psRadioTech);
     void SetPhoneType(PhoneType phoneType);

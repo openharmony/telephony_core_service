@@ -966,6 +966,14 @@ void NetworkSearchManager::SetImei(int32_t slotId, std::u16string imei)
     }
 }
 
+void NetworkSearchManager::SetImeiSv(int32_t slotId, std::u16string imeiSv)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner != nullptr) {
+        inner->imeiSv_ = imeiSv;
+    }
+}
+
 int32_t NetworkSearchManager::GetImei(int32_t slotId, std::u16string &imei)
 {
     TELEPHONY_LOGD("NetworkSearchManager::GetImei start slotId:%{public}d", slotId);
@@ -985,6 +993,23 @@ int32_t NetworkSearchManager::GetImei(int32_t slotId, std::u16string &imei)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     imei = inner->imei_;
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkSearchManager::GetImeiSv(int32_t slotId, std::u16string &imeiSv)
+{
+    TELEPHONY_LOGD("NetworkSearchManager::GetImeiSv start slotId:%{public}d", slotId);
+    imeiSv = u"";
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr || eventSender_ == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner or eventSender_ is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (inner->imeiSv_.empty()) {
+        eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_IMEISV);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    imeiSv = inner->imeiSv_;
     return TELEPHONY_ERR_SUCCESS;
 }
 

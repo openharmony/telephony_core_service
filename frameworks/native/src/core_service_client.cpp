@@ -247,6 +247,16 @@ int32_t CoreServiceClient::GetImei(int32_t slotId, std::u16string &imei)
     return proxy->GetImei(slotId, imei);
 }
 
+int32_t CoreServiceClient::GetImeiSv(int32_t slotId, std::u16string &imeiSv)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetImeiSv(slotId, imeiSv);
+}
+
 int32_t CoreServiceClient::HasSimCard(int32_t slotId, bool &hasSimCard)
 {
     auto proxy = GetProxy();

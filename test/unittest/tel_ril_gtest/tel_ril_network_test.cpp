@@ -260,6 +260,28 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetImeiTest_0201, Function | MediumTest | 
 }
 
 /**
+ * @tc.number Telephony_TelRil_GetImeiSvTest_0101 to do ...
+ * @tc.name Get ImeiSv information of the card 1
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_GetImeiSvTest_0101, Function | MediumTest | Level3)
+{
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMEISV), SLOT_ID_0, GetHandler()));
+    return;
+}
+
+/**
+ * @tc.number Telephony_TelRil_GetImeiSvTest_0201 to do ...
+ * @tc.name Get ImeiSv information of the card 2
+ * @tc.desc Function test
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_GetImeiSvTest_0201, Function | MediumTest | Level3)
+{
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMEISV), SLOT_ID_1, GetHandler()));
+    return;
+}
+
+/**
  * @tc.number Telephony_TelRil_GetMeidTest_0101 to do ...
  * @tc.name Get Meid information of the card 1
  * @tc.desc Function test

@@ -208,6 +208,7 @@ public:
     int32_t GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     int32_t GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode);
     int32_t GetImei(int32_t slotId, std::u16string &imei);
+    int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv);
     int32_t GetMeid(int32_t slotId, std::u16string &meid);
     int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId);
     PhoneType GetPhoneType(int32_t slotId);

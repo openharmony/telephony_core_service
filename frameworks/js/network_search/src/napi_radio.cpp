@@ -1803,6 +1803,77 @@ static napi_value GetIMEI(napi_env env, napi_callback_info info)
     return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "GetIMEI", NativeGetIMEI, GetIMEICallback);
 }
 
+void NativeGetIMEISV(napi_env env, void *data)
+{
+    auto context = static_cast<GetIMEISVContext *>(data);
+    if (!IsValidSlotId(context->slotId)) {
+        TELEPHONY_LOGE("NativeGetIMEISV slotId is invalid");
+        context->errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
+    std::u16string imeiSv = u"";
+    context->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImeiSv(context->slotId, imeiSv);
+    if (context->errorCode == TELEPHONY_SUCCESS) {
+        context->resolved = true;
+        context->getIMEISVResult = NapiUtil::ToUtf8(imeiSv);
+        TELEPHONY_LOGI(
+            "NativeGetIMEISV len = %{public}lu", static_cast<unsigned long>(context->getIMEISVResult.length()));
+    }
+}
+
+void GetIMEISVCallback(napi_env env, napi_status status, void *data)
+{
+    auto context = static_cast<GetIMEISVContext *>(data);
+    napi_value callbackValue = nullptr;
+    if (context->resolved) {
+        napi_create_string_utf8(env, context->getIMEISVResult.c_str(), context->getIMEISVResult.size(), &callbackValue);
+    } else {
+        JsError error =
+            NapiUtil::ConverErrorMessageWithPermissionForJs(context->errorCode, "getIMEISV", GET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
+    }
+    NapiUtil::Handle2ValueCallback(env, context, callbackValue);
+}
+
+static napi_value GetIMEISV(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = PARAMETER_COUNT_TWO;
+    napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
+    if (!MatchGetIMEIParameter(env, parameters, parameterCount)) {
+        TELEPHONY_LOGE("parameter matching failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<GetIMEISVContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    if (parameterCount == PARAMETER_COUNT_ZERO) {
+        asyncContext->slotId = GetDefaultSlotId();
+    } else if (parameterCount == PARAMETER_COUNT_ONE) {
+        napi_valuetype valueType = napi_undefined;
+        NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
+        if (valueType == napi_undefined || valueType == napi_null) {
+            TELEPHONY_LOGI("undefined or null parameter detected, treating as no parameter input.");
+            asyncContext->slotId = GetDefaultSlotId();
+        } else if (valueType == napi_number) {
+            NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+        } else {
+            asyncContext->slotId = GetDefaultSlotId();
+            NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+        }
+    } else {
+        NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+        NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+    }
+    return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "GetIMEISV", NativeGetIMEISV, GetIMEISVCallback);
+}
+
 void NativeGetMEID(napi_env env, void *data)
 {
     auto context = static_cast<GetMEIDContext *>(data);
@@ -3525,6 +3596,7 @@ static napi_value CreateFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setNetworkCapability", SetNetworkCapability),
         DECLARE_NAPI_FUNCTION("getNetworkCapability", GetNetworkCapability),
         DECLARE_NAPI_FUNCTION("getIMEI", GetIMEI),
+        DECLARE_NAPI_FUNCTION("getIMEISV", GetIMEISV),
         DECLARE_NAPI_FUNCTION("getMEID", GetMEID),
         DECLARE_NAPI_FUNCTION("sendUpdateCellLocationRequest", SendUpdateCellLocationRequest),
         DECLARE_NAPI_FUNCTION("getCellInformation", GetCellInformation),

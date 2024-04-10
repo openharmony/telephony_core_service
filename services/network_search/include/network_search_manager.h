@@ -66,6 +66,7 @@ struct NetworkSearchManagerInner {
     SelectionMode selection_ = SelectionMode::MODE_TYPE_UNKNOWN;
     ModemPowerState radioState_ = ModemPowerState::CORE_SERVICE_POWER_OFF;
     std::u16string imei_ = u"";
+    std::u16string imeiSv_ = u"";
     std::u16string meid_ = u"";
     std::string residentNetworkNumeric_ = "";
     std::string basebandVersion_ = "";
@@ -174,6 +175,7 @@ public:
     int32_t SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback) override;
     int32_t GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode) override;
     int32_t GetImei(int32_t slotId, std::u16string &imei) override;
+    int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) override;
     int32_t GetPsRegState(int32_t slotId) override;
     int32_t GetCsRegState(int32_t slotId) override;
     int32_t GetPsRoamingState(int32_t slotId) override;
@@ -235,6 +237,7 @@ public:
     int32_t GetPreferredNetworkValue(int32_t slotId) const;
     void UpdatePhone(int32_t slotId, RadioTech csRadioTech, const RadioTech &psRadioTech);
     void SetImei(int32_t slotId, std::u16string imei);
+    void SetImeiSv(int32_t slotId, std::u16string imeiSv);
     void UpdateCellLocation(int32_t slotId, int32_t techType, int32_t cellId, int32_t lac);
     void SetMeid(int32_t slotId, std::u16string meid);
     void SetFrequencyType(int32_t slotId, FrequencyType type);

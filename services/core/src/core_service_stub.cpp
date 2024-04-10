@@ -52,6 +52,7 @@ void CoreServiceStub::AddHandlerNetWorkToMap()
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ISO_COUNTRY_CODE_FOR_NETWORK)] =
         &CoreServiceStub::OnGetIsoCountryCodeForNetwork;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMEI)] = &CoreServiceStub::OnGetImei;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMEISV)] = &CoreServiceStub::OnGetImeiSv;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_MEID)] = &CoreServiceStub::OnGetMeid;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_UNIQUE_DEVICE_ID)] = &CoreServiceStub::OnGetUniqueDeviceId;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMS_REG_STATUS)] = &CoreServiceStub::OnGetImsRegStatus;
@@ -349,6 +350,25 @@ int32_t CoreServiceStub::OnGetImei(MessageParcel &data, MessageParcel &reply)
     }
     if (!reply.WriteString16(imei)) {
         TELEPHONY_LOGE("OnRemoteRequest::OnGetImei write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnGetImeiSv(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string imeiSv = u"";
+    int32_t result = GetImeiSv(slotId, imeiSv);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetImeiSv write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteString16(imeiSv)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetImeiSv write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return result;

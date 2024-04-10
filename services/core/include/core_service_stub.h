@@ -51,6 +51,7 @@ private:
     int32_t OnGetNetworkSelectionMode(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetIsoCountryCodeForNetwork(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetImei(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetImeiSv(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetMeid(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetUniqueDeviceId(MessageParcel &data, MessageParcel &reply);
     int32_t OnIsNrSupported(MessageParcel &data, MessageParcel &reply);
