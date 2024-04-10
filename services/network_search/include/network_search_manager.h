@@ -198,10 +198,10 @@ public:
     int32_t SetNrOptionMode(int32_t slotId, int32_t mode, NSCALLBACK &callback) override;
     int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) override;
     int32_t GetNrOptionMode(int32_t slotId, NSCALLBACK &callback) override;
-    int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName,
+    int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const int32_t tokenId,
         const sptr<ImsRegInfoCallback> &callback) override;
     int32_t UnregisterImsRegInfoCallback(
-        int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName) override;
+        int32_t slotId, ImsServiceType imsSrvType, const int32_t tokenId) override;
     int32_t GetNetworkCapability(
         int32_t slotId, int32_t networkCapabilityType, int32_t &networkCapabilityState) override;
     int32_t SetNetworkCapability(
@@ -336,7 +336,7 @@ private:
     struct ImsRegInfoCallbackRecord {
         int32_t slotId;
         ImsServiceType imsSrvType;
-        std::string bundleName;
+        int32_t tokenId = 0;
         sptr<ImsRegInfoCallback> imsCallback;
     };
 

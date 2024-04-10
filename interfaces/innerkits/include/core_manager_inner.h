@@ -49,8 +49,8 @@ public:
     int32_t InitExtraModule(int32_t slotId);
     int32_t GetDefaultSlotId(void);
     int32_t GetMaxSimCount(void);
-    int32_t RegisterSimAccountCallback(const std::string &bundleName, const sptr<SimAccountCallback> &callback);
-    int32_t UnregisterSimAccountCallback(const std::string &bundleName);
+    int32_t RegisterSimAccountCallback(const int32_t tokenId, const sptr<SimAccountCallback> &callback);
+    int32_t UnregisterSimAccountCallback(const int32_t tokenId);
 
     /******************** telRilManager start *******************/
     int32_t SetRadioState(

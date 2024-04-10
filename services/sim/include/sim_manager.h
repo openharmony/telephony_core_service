@@ -138,8 +138,8 @@ public:
     int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue) override;
     int32_t QueryImsSwitch(int32_t, int32_t &imsSwitchValue) override;
     int32_t RegisterSimAccountCallback(
-        const std::string &bundleName, const sptr<SimAccountCallback> &callback) override;
-    int32_t UnregisterSimAccountCallback(const std::string &bundleName) override;
+        const int32_t tokenId, const sptr<SimAccountCallback> &callback) override;
+    int32_t UnregisterSimAccountCallback(const int32_t tokenId) override;
 
 private:
     bool IsValidSlotId(int32_t slotId);

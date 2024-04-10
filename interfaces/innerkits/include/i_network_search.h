@@ -133,10 +133,10 @@ public:
      * @return Returns the 5G New Radio (NR) status.
      */
     virtual NrState GetNrState(int32_t slotId) = 0;
-    virtual int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName,
+    virtual int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const int32_t tokenId,
         const sptr<ImsRegInfoCallback> &callback) = 0;
     virtual int32_t UnregisterImsRegInfoCallback(
-        int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName) = 0;
+        int32_t slotId, ImsServiceType imsSrvType, const int32_t tokenId) = 0;
     virtual int32_t GetBasebandVersion(int32_t slotId, std::string &version) = 0;
     /**
      * @brief Init airplane mode.
