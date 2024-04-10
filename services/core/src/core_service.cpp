@@ -1480,7 +1480,7 @@ int32_t CoreService::RegisterImsRegInfoCallback(
         TELEPHONY_LOGE("failed! network search manager is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return networkSearchManager_->RegisterImsRegInfoCallback(slotId, imsSrvType, GetBundleName(), callback);
+    return networkSearchManager_->RegisterImsRegInfoCallback(slotId, imsSrvType, GetTokenID(), callback);
 }
 
 int32_t CoreService::UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType)
@@ -1497,7 +1497,7 @@ int32_t CoreService::UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType
         TELEPHONY_LOGE("failed! network search manager is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return networkSearchManager_->UnregisterImsRegInfoCallback(slotId, imsSrvType, GetBundleName());
+    return networkSearchManager_->UnregisterImsRegInfoCallback(slotId, imsSrvType, GetTokenID());
 }
 
 int32_t CoreService::GetBasebandVersion(int32_t slotId, std::string &version)

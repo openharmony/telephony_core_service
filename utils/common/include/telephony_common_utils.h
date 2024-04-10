@@ -42,6 +42,13 @@ bool IsValidDecValue(const std::string &inputValue);
  * @return Return {@code true} if the input value is a hexadecimal number, return {@code false} otherwise.
  */
 bool IsValidHexValue(const std::string &inputValue);
+
+/**
+ * @brief Get calling token id.
+ *
+ * @return Return token id of the caller.
+ */
+int32_t GetTokenID();
 } // namespace Telephony
 } // namespace OHOS
 #endif // TELEPHONY_COMMON_UTILS_H
