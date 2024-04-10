@@ -355,6 +355,12 @@ int32_t TelRilCallback::GetImeiResponse(
     return Response(responseInfo, &TelRilManager::GetTelRilModem, &TelRilModem::GetImeiResponse, imei);
 }
 
+int32_t TelRilCallback::GetImeiSvResponse(
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &imeiSv)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilModem, &TelRilModem::GetImeiSvResponse, imeiSv);
+}
+
 int32_t TelRilCallback::GetMeidResponse(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &meid)
 {

@@ -167,6 +167,15 @@ public:
     int32_t GetImei(int32_t slotId, std::u16string &imei);
 
     /**
+     * @brief Obtains the software version number of a specified card slot of the device
+     *
+     * @param slotId[in], sim slot id
+     * @param imeiSv[out], the International Mobile Equipment Identification Number of the SIM card
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv);
+
+    /**
      * @brief Checks whether a SIM card is inserted in a specified slot.
      *
      * @param slotId[in], sim slot id

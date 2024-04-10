@@ -30,6 +30,7 @@ enum class CoreServiceInterfaceCode {
     SET_RADIO_STATE,
     GET_RADIO_STATE,
     GET_IMEI,
+    GET_IMEISV,
     GET_MEID,
     GET_UNIQUE_DEVICE_ID,
     HAS_SIM_CARD,

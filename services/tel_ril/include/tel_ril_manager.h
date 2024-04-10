@@ -17,7 +17,7 @@
 #define TEL_RIL_MANAGER_H
 
 #include <singleton.h>
-#include <v1_2/iril.h>
+#include <v1_3/iril.h>
 
 #include "hdf_service_status_listener.h"
 #include "i_tel_ril_manager.h"
@@ -124,6 +124,8 @@ public:
     int32_t GetCurrentCellInfo(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t GetImei(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+
+    int32_t GetImeiSv(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t GetMeid(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
@@ -363,7 +365,7 @@ private:
     std::shared_ptr<TelRilHandler> handler_ = nullptr;
     sptr<OHOS::HDI::ServiceManager::V1_0::IServiceManager> servMgr_ = nullptr;
     sptr<HdfServiceStatusListener::IServStatListener> hdfListener_ = nullptr;
-    sptr<HDI::Ril::V1_2::IRil> rilInterface_ = nullptr;
+    sptr<HDI::Ril::V1_3::IRil> rilInterface_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

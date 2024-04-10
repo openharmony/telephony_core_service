@@ -32,7 +32,7 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_types.h"
-#include "v1_2/iril.h"
+#include "v1_3/iril.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -53,13 +53,13 @@ private:
 
 class TelRilBase {
 public:
-    TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_2::IRil> rilInterface,
+    TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
         std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     virtual ~TelRilBase() = default;
 
     static std::shared_ptr<TelRilRequest> CreateTelRilRequest(
         int32_t request, const AppExecFwk::InnerEvent::Pointer &result);
-    void ResetRilInterface(sptr<HDI::Ril::V1_2::IRil> rilInterface);
+    void ResetRilInterface(sptr<HDI::Ril::V1_3::IRil> rilInterface);
     static std::shared_ptr<TelRilRequest> FindTelRilRequest(const HRilRadioResponseInfo &responseInfo);
     int32_t ErrorResponse(std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo);
 
@@ -91,7 +91,7 @@ protected:
 
 protected:
     std::shared_ptr<ObserverHandler> observerHandler_;
-    sptr<HDI::Ril::V1_2::IRil> rilInterface_;
+    sptr<HDI::Ril::V1_3::IRil> rilInterface_;
     int32_t slotId_;
 
 private:

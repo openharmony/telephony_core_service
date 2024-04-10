@@ -124,6 +124,7 @@ private:
     void SetPreferredNetworkResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetImei(const AppExecFwk::InnerEvent::Pointer &event);
+    void RadioGetImeiSv(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetMeid(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &event);

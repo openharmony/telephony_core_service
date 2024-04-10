@@ -1495,6 +1495,15 @@ int32_t CoreManagerInner::GetImei(int32_t slotId, std::u16string &imei)
     return networkSearchManager_->GetImei(slotId, imei);
 }
 
+int32_t CoreManagerInner::GetImeiSv(int32_t slotId, std::u16string &imeiSv)
+{
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->GetImeiSv(slotId, imeiSv);
+}
+
 int32_t CoreManagerInner::GetMeid(int32_t slotId, std::u16string &meid)
 {
     if (networkSearchManager_ == nullptr) {

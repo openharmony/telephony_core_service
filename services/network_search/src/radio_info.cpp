@@ -149,6 +149,29 @@ void RadioInfo::ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) con
     nsm->SetImei(slotId_, Str8ToStr16(imeiID->data));
 }
 
+void RadioInfo::ProcessGetImeiSv(const AppExecFwk::InnerEvent::Pointer &event) const
+{
+    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
+    TELEPHONY_LOGI("RadioInfo::ProcessGetImeiSv slotId:%{public}d", slotId_);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetImeiSv event is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
+    if (nsm == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetImeiSv nsm is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
+
+    std::shared_ptr<HRilStringParcel> imeiSvID = event->GetSharedObject<HRilStringParcel>();
+    if (imeiSvID == nullptr) {
+        TELEPHONY_LOGE("RadioInfo::ProcessGetImeiSv imeiSv is nullptr slotId:%{public}d", slotId_);
+        nsm->SetImeiSv(slotId_, u"");
+        return;
+    }
+    TELEPHONY_LOGI("RadioInfo::ProcessGetImeiSv get imeiSv success");
+    nsm->SetImeiSv(slotId_, Str8ToStr16(imeiSvID->data));
+}
+
 void RadioInfo::ProcessGetMeid(const AppExecFwk::InnerEvent::Pointer &event) const
 {
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
@@ -207,8 +230,10 @@ void RadioInfo::UpdatePhone(RadioTech csRadioTech, const RadioTech &psRadioTech)
         networkSearchManager->InitSimRadioProtocol(slotId_);
         std::u16string meid = u"";
         std::u16string imei = u"";
+        std::u16string imeiSv = u"";
         std::string basebandVersion = "";
         networkSearchManager->GetImei(slotId_, imei);
+        networkSearchManager->GetImeiSv(slotId_, imeiSv);
         networkSearchManager->GetMeid(slotId_, meid);
         networkSearchManager->GetBasebandVersion(slotId_, basebandVersion);
         if (static_cast<ModemPowerState>(radioState) == CORE_SERVICE_POWER_ON) {
