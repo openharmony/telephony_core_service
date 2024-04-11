@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,7 @@
 #include "resource_utils.h"
 #include "string_ex.h"
 #include "telephony_errors.h"
+#include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -325,26 +326,56 @@ void NetworkRegister::UpdateNrState()
     RadioTech rat = networkSearchState_->GetNetworkStatus()->GetPsRadioTech();
     if (rat == RadioTech::RADIO_TECHNOLOGY_NR) {
         nrState_ = NrState::NR_NSA_STATE_SA_ATTACHED;
-        networkSearchState_->SetNrState(nrState_);
-        return;
-    }
-    if (isNrSecondaryCell_) {
-        nrState_ = NrState::NR_NSA_STATE_DUAL_CONNECTED;
-        networkSearchState_->SetNrState(nrState_);
-        return;
-    }
-    if (endcSupport_) {
-        if (dcNrRestricted_) {
-            nrState_ = NrState::NR_STATE_NOT_SUPPORT;
-            networkSearchState_->SetNrState(nrState_);
-            return;
-        }
-        if (!dcNrRestricted_) {
-            nrState_ = NrState::NR_NSA_STATE_NO_DETECT;
-            networkSearchState_->SetNrState(nrState_);
-            return;
+    } else {
+        if (isNrSecondaryCell_) {
+            nrState_ = NrState::NR_NSA_STATE_DUAL_CONNECTED;
+        } else if (endcSupport_) {
+            if (dcNrRestricted_) {
+                nrState_ = NrState::NR_STATE_NOT_SUPPORT;
+            } else {
+                nrState_ = NrState::NR_NSA_STATE_NO_DETECT;
+            }
         }
     }
+    nrState_ = static_cast<NrState>(UpdateNsaState(static_cast<int32_t>(nrState_)));
+    networkSearchState_->SetNrState(nrState_);
+}
+
+int32_t NetworkRegister::UpdateNsaState(int32_t nsaState)
+{
+    int32_t newNsaState = nsaState;
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr || networkSearchState_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchState_ is nullptr, slotId:%{public}d", slotId_);
+        return newNsaState;
+    }
+    std::vector<sptr<CellInformation>> cellInfo;
+    networkSearchManager->GetCellInfoList(slotId_, cellInfo);
+    int32_t cellId = 0;
+    auto iter = cellInfo.begin();
+    while (iter != cellInfo.end()) {
+        if ((*iter)->GetNetworkType() == CellInformation::CellType::CELL_TYPE_LTE) {
+            cellId = (*iter)->GetCellId();
+            break;
+        }
+        iter++;
+    }
+    auto networkState = networkSearchState_->GetNetworkStatus();
+    if (networkState == nullptr) {
+        TELEPHONY_LOGE("networkState is nullptr, slotId:%{public}d", slotId_);
+        return newNsaState;
+    }
+    RegServiceState regState = networkState->GetRegStatus();
+    RadioTech psRegTech = networkState->GetPsRadioTech();
+    if (regState != RegServiceState::REG_STATE_IN_SERVICE ||
+        (psRegTech != RadioTech::RADIO_TECHNOLOGY_LTE && psRegTech != RadioTech::RADIO_TECHNOLOGY_LTE_CA)) {
+        return newNsaState;
+    }
+    if (TELEPHONY_EXT_WRAPPER.updateNsaStateExt_ != nullptr) {
+        newNsaState = TELEPHONY_EXT_WRAPPER.updateNsaStateExt_(
+            slotId_, cellId, nrSupport_, dcNrRestricted_, newNsaState);
+    }
+    return newNsaState;
 }
 
 void NetworkRegister::UpdateCfgTech()
