@@ -308,6 +308,9 @@ int32_t TelephonyStateRegistryProxy::RegisterStateChange(
     if (!in.WriteBool(isUpdate)) {
         return TELEPHONY_ERR_FAIL;
     }
+    if (callback == nullptr) {
+        return TELEPHONY_ERR_FAIL;
+    }
     if (!in.WriteRemoteObject(callback->AsObject().GetRefPtr())) {
         return TELEPHONY_ERR_FAIL;
     }

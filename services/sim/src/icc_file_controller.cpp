@@ -167,7 +167,7 @@ void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer 
     int fileId = rcvMsg->arg1;
     TELEPHONY_LOGI("ProcessBinarySize fileId:%{public}d size:%{public}d", fileId, size);
     const AppExecFwk::InnerEvent::Pointer &evt = hd->fileLoaded;
-    if (evt->GetOwner() == nullptr) {
+    if (evt == nullptr) {
         TELEPHONY_LOGE("ProcessBinarySize isNull is null pointer");
         return;
     }
@@ -192,7 +192,7 @@ void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer 
     std::string str = IccFileController::NULLSTR;
     std::string path = IccFileController::NULLSTR;
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
+    if (rcvMsg == nullptr || rcvMsg->controlHolder == nullptr) {
         TELEPHONY_LOGE("rcvMsg is nullptr");
         return;
     }
@@ -484,6 +484,10 @@ void IccFileController::SendResponse(std::shared_ptr<IccControllerHolder> holder
 
 void IccFileController::SendEfLinearResult(const AppExecFwk::InnerEvent::Pointer &response, const int val[], int len)
 {
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is nullptr!");
+        return;
+    }
     std::shared_ptr<AppExecFwk::EventHandler> handler = response->GetOwner();
     if (handler == nullptr) {
         TELEPHONY_LOGE("handler is nullptr!");
@@ -507,6 +511,10 @@ void IccFileController::SendEfLinearResult(const AppExecFwk::InnerEvent::Pointer
 void IccFileController::SendMultiRecordResult(
     const AppExecFwk::InnerEvent::Pointer &response, std::vector<std::string> &strValue)
 {
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is nullptr!");
+        return;
+    }
     std::shared_ptr<AppExecFwk::EventHandler> handler = response->GetOwner();
     if (handler == nullptr) {
         TELEPHONY_LOGE("handler is nullptr!");
@@ -569,7 +577,15 @@ AppExecFwk::InnerEvent::Pointer IccFileController::BuildCallerInfo(
     int eventId, int arg1, int arg2, const AppExecFwk::InnerEvent::Pointer &msg)
 {
     std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(arg1);
+    if (ctrlHolder == nullptr) {
+        TELEPHONY_LOGE("ctrlHolder is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(msg));
+    if (ctrlHolder->fileLoaded == nullptr) {
+        TELEPHONY_LOGE("ctrlHolder->fileLoaded is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     bool isNull = ctrlHolder->fileLoaded->GetOwner() == nullptr;
     TELEPHONY_LOGD("IccFileController::BuildCallerInfo stage init owner: %{public}d", isNull);
     std::unique_ptr<IccToRilMsg> msgTo = std::make_unique<IccToRilMsg>(ctrlHolder);
@@ -674,10 +690,13 @@ std::string IccFileController::CheckRightPath(const std::string &path, int fileI
 bool IccFileController::ProcessErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
     std::shared_ptr<IccFromRilMsg> rcvMsg = event->GetSharedObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
+    if (rcvMsg == nullptr || rcvMsg->controlHolder == nullptr) {
         return false;
     }
     AppExecFwk::InnerEvent::Pointer &response = rcvMsg->controlHolder->fileLoaded;
+    if (response == nullptr) {
+        return false;
+    }
     auto owner = response->GetOwner();
     if (owner == nullptr) {
         TELEPHONY_LOGE("owner is nullptr");
@@ -691,6 +710,9 @@ bool IccFileController::ProcessErrorResponse(const AppExecFwk::InnerEvent::Point
     TELEPHONY_LOGD("ProcessErrorResponse start response %{public}d", needShare);
     if (needShare) {
         objectShare = std::make_shared<ControllerToFileMsg>(cmdData.get(), nullptr);
+        if (objectShare == nullptr) {
+            return false;
+        }
         objectShare->exception = rcvMsg->fileData.exception;
     } else {
         objectUnique = std::make_unique<ControllerToFileMsg>(cmdData.get(), nullptr);
