@@ -42,6 +42,7 @@ constexpr int32_t SLEEP_TIME_SECONDS = 3;
 constexpr int32_t SLOT_ID = 0;
 const int32_t INVALID_SLOTID = 2;
 constexpr int32_t NR_NSA_OPTION_ONLY = 1;
+constexpr int32_t SIGNAL_STRENGTH_GOOD = 3;
 const std::string NITZ_STR = "23/10/16,09:10:33+32,00";
 const std::string NITZ_STR_INVALID = "202312102359";
 } // namespace
@@ -778,6 +779,43 @@ HWTEST_F(CoreServiceBranchTest, Telephony_GetTargetOpkey_001, Function | MediumT
     recipient->OnRemoteDied(nullptr);
     int32_t result = coreServiceClient->GetTargetOpkey(SLOT_ID, opkey);
     EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_SignalInformationExt_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_SignalInformation_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<SignalInformation> gsm = std::make_shared<GsmSignalInformation>();
+    std::shared_ptr<SignalInformation> cdma = std::make_shared<CdmaSignalInformation>();
+    std::shared_ptr<SignalInformation> wcdma = std::make_shared<WcdmaSignalInformation>();
+    std::shared_ptr<SignalInformation> lte = std::make_shared<LteSignalInformation>();
+    std::shared_ptr<SignalInformation> nr = std::make_shared<NrSignalInformation>();
+    std::shared_ptr<SignalInformation> tdScdma = std::make_shared<TdScdmaSignalInformation>();
+    if (gsm == nullptr || cdma == nullptr || wcdma == nullptr || lte == nullptr || nr == nullptr ||
+        tdScdma == nullptr) {
+        return;
+    }
+    gsm->GetSignalLevel();
+    gsm->SetSignalLevel(SIGNAL_STRENGTH_GOOD);
+    EXPECT_EQ(gsm->GetSignalLevel(), SIGNAL_STRENGTH_GOOD);
+    cdma->GetSignalLevel();
+    cdma->SetSignalLevel(SIGNAL_STRENGTH_GOOD);
+    EXPECT_EQ(cdma->GetSignalLevel(), SIGNAL_STRENGTH_GOOD);
+    wcdma->GetSignalLevel();
+    wcdma->SetSignalLevel(SIGNAL_STRENGTH_GOOD);
+    EXPECT_EQ(wcdma->GetSignalLevel(), SIGNAL_STRENGTH_GOOD);
+    lte->GetSignalLevel();
+    lte->SetSignalLevel(SIGNAL_STRENGTH_GOOD);
+    EXPECT_EQ(lte->GetSignalLevel(), SIGNAL_STRENGTH_GOOD);
+    nr->GetSignalLevel();
+    nr->SetSignalLevel(SIGNAL_STRENGTH_GOOD);
+    EXPECT_EQ(nr->GetSignalLevel(), SIGNAL_STRENGTH_GOOD);
+    tdScdma->GetSignalLevel();
+    tdScdma->SetSignalLevel(SIGNAL_STRENGTH_GOOD);
+    EXPECT_EQ(tdScdma->GetSignalLevel(), SIGNAL_STRENGTH_GOOD);
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -599,6 +599,9 @@ int32_t NetworkSearchManager::GetSignalInfoList(int32_t slotId, std::vector<sptr
     if (TELEPHONY_EXT_WRAPPER.getSignalInfoListExt_ != nullptr) {
         TELEPHONY_EXT_WRAPPER.getSignalInfoListExt_(slotId, signals);
     }
+    if (TELEPHONY_EXT_WRAPPER.sortSignalInfoListExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.sortSignalInfoListExt_(slotId, signals);
+    }
     return TELEPHONY_ERR_SUCCESS;
 }
 

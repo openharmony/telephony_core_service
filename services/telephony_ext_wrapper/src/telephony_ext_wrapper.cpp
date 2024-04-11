@@ -83,6 +83,11 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
     if (updateCountryCodeExt_ == nullptr || updateTimeZoneOffsetExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+
+    sortSignalInfoListExt_ = (SORT_SIGNAL_INFO_LIST_EXT)dlsym(telephonyExtWrapperHandle_, "SortSignalInfoListExt");
+    if (sortSignalInfoListExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
