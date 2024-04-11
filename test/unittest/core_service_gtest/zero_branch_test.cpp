@@ -1501,7 +1501,7 @@ HWTEST_F(BranchTest, Telephony_SimManager_004, Function | MediumTest | Level1)
     EXPECT_NE(simManager->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mResponse), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->SimAuthentication(INVALID_SLOTID, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mResponse),
         TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->SendSimMatchedOperatorInfo(0, 0, "", ""), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(simManager->SendSimMatchedOperatorInfo(0, 0, "NULL", ""), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
