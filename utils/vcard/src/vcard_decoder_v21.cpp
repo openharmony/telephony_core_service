@@ -166,6 +166,10 @@ bool VCardDecoderV21::ParseItem(int32_t &errorCode)
     }
     std::lock_guard<std::mutex> lock(rawDataMutex_);
     auto rawData = std::make_shared<VCardRawData>();
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr!");
+        return false;
+    }
     BuildRawData(line, rawData, errorCode);
     if (errorCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Build raw data failed");
@@ -189,6 +193,10 @@ bool VCardDecoderV21::ParseItem(int32_t &errorCode)
 void VCardDecoderV21::DealRawDataValue(
     const std::string &name, std::shared_ptr<VCardRawData> rawData, int32_t &errorCode)
 {
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr!");
+        return;
+    }
     std::string nameUp = VCardUtils::ToUpper(rawData->GetName());
     std::string rawValue = rawData->GetRawValue();
     std::string sourceCharset = DEFAULT_INTERMEDIATE_CHARSET;
@@ -254,6 +262,10 @@ std::string VCardDecoderV21::GetVersion()
 void VCardDecoderV21::DealBase64OrB(
     const std::string &rawValue, std::shared_ptr<VCardRawData> rawData, int32_t &errorCode)
 {
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr!");
+        return;
+    }
     std::string base64 = GetBase64(rawValue, errorCode);
     rawData->SetByte(VCardUtils::DecodeBase64(base64));
     NotifyRawDataCreated(rawData);
@@ -262,6 +274,10 @@ void VCardDecoderV21::DealBase64OrB(
 void VCardDecoderV21::DealEncodingQPOrNoEncodingFN(const std::string &rawValue, std::shared_ptr<VCardRawData> rawData,
     const std::string &fromCharSet, const std::string &toCharSet, int32_t &errorCode)
 {
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr!");
+        return;
+    }
     std::string quotedPrintableValue = GetQuotedPrintableValue(rawValue, errorCode);
     if (errorCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetQuotedPrintableValue failed");
@@ -340,6 +356,10 @@ void VCardDecoderV21::BuildRawData(const std::string &line, std::shared_ptr<VCar
 void VCardDecoderV21::DealGroupOrTypeNameStatus(const std::string &line, std::shared_ptr<VCardRawData> rawData,
     int32_t &errorCode, int32_t &status, int32_t &namePos, int32_t &index)
 {
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr!");
+        return;
+    }
     if (line[index] == ':') {
         rawData->SetName(line.substr(namePos, index - namePos));
         rawData->SetRawValue(index < static_cast<int32_t>(line.length()) - 1 ? line.substr(index + 1) : "");
@@ -368,6 +388,10 @@ void VCardDecoderV21::DealGroupOrTypeNameStatus(const std::string &line, std::sh
 void VCardDecoderV21::DealParamsStatus(const std::string &line, std::shared_ptr<VCardRawData> rawData,
     int32_t &errorCode, int32_t &status, int32_t &namePos, int32_t &index)
 {
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr!");
+        return;
+    }
     if (line[index] == '"') {
         status = STATUS_PARAMS_IN_DQUOTE;
         return;
@@ -432,6 +456,10 @@ void VCardDecoderV21::DealNoNameParam(
 
 void VCardDecoderV21::DealTypeParam(const std::string &type, std::shared_ptr<VCardRawData> rawData, int32_t &errorCode)
 {
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr!");
+        return;
+    }
     if (!(ContainValue(VCardUtils::ToUpper(type), GetSupportParamType()) || VCardUtils::StartWith(type, "X-"))) {
         unknowParamType_.insert(type);
     }
@@ -441,6 +469,10 @@ void VCardDecoderV21::DealTypeParam(const std::string &type, std::shared_ptr<VCa
 void VCardDecoderV21::DealValueParam(
     const std::string &value, std::shared_ptr<VCardRawData> rawData, int32_t &errorCode)
 {
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr!");
+        return;
+    }
     if (!(ContainValue(VCardUtils::ToUpper(value), GetSupportParamValue()) || VCardUtils::StartWith(value, "X-"))) {
         unknowParamValue_.insert(value);
     }
@@ -450,6 +482,10 @@ void VCardDecoderV21::DealValueParam(
 void VCardDecoderV21::DealEncodingParam(
     const std::string &encoding, std::shared_ptr<VCardRawData> rawData, int32_t &errorCode)
 {
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr!");
+        return;
+    }
     if (ContainValue(encoding, GetSupportParamEncoding()) || VCardUtils::StartWith(encoding, "X-")) {
         rawData->AppendParameter(VCARD_PARAM_ENCODING, encoding);
         currentEncoding_ = encoding;
@@ -462,6 +498,10 @@ void VCardDecoderV21::DealEncodingParam(
 void VCardDecoderV21::DealCharsetParam(
     const std::string &charset, std::shared_ptr<VCardRawData> rawData, int32_t &errorCode)
 {
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr!");
+        return;
+    }
     currentCharset_ = charset;
     rawData->AppendParameter(VCARD_PARAM_CHARSET, charset);
 }
@@ -469,6 +509,10 @@ void VCardDecoderV21::DealCharsetParam(
 void VCardDecoderV21::DealLanguageParam(
     const std::string &language, std::shared_ptr<VCardRawData> rawData, int32_t &errorCode)
 {
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr!");
+        return;
+    }
     auto strs = VCardUtils::Split(language, "-");
     if (static_cast<int32_t>(strs.size()) != SIZE_TWO) {
         TELEPHONY_LOGE("Language error");
@@ -486,6 +530,10 @@ void VCardDecoderV21::DealLanguageParam(
 void VCardDecoderV21::DealAnyParam(
     const std::string &param, const std::string &paramValue, std::shared_ptr<VCardRawData> rawData, int32_t &errorCode)
 {
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr!");
+        return;
+    }
     rawData->AppendParameter(param, paramValue);
 }
 
@@ -534,6 +582,10 @@ bool VCardDecoderV21::ContainValue(const std::string &value, const std::vector<s
 void VCardDecoderV21::DealAdrOrgN(const std::string &rawValue, std::shared_ptr<VCardRawData> rawData,
     const std::string &fromCharSet, const std::string &toCharSet, int32_t &errorCode)
 {
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr!");
+        return;
+    }
     if (currentEncoding_ == VCARD_PARAM_ENCODING_QP) {
         std::string quotedPrintableValue = GetQuotedPrintableValue(rawValue, errorCode);
         if (errorCode != TELEPHONY_SUCCESS) {
@@ -664,6 +716,10 @@ std::vector<std::string> VCardDecoderV21::BuildListFromValue(const std::string &
 
 void VCardDecoderV21::DealAgent(std::shared_ptr<VCardRawData> rawData, int32_t &errorCode)
 {
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr!");
+        return;
+    }
     if (VCardUtils::ToUpper(rawData->GetRawValue()).find("BEGIN : VCARD") != std::string::npos) {
         TELEPHONY_LOGE("Agent data error");
         errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;

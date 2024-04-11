@@ -542,6 +542,10 @@ void VCardConstructor::AddPostalLine(
 void VCardConstructor::ConstructPostalLine(std::shared_ptr<VCardPostalData> postalData, std::stringstream &postalLine,
     bool &needCharset, bool &needAddQuotedPrintable)
 {
+    if (postalData == nullptr) {
+        TELEPHONY_LOGI("postalData is nullptr!");
+        return;
+    }
     std::string poBox = postalData->GetPOBox();
     std::string street = postalData->GetStreet();
     std::string city = postalData->GetCity();

@@ -255,7 +255,7 @@ public:
             TELEPHONY_LOGE("handler is nullptr");
             return false;
         }
-        if (handler->GetEventRunner() == nullptr) {
+        if (handler->GetEventRunner() == nullptr && handler.get() != nullptr) {
             return static_cast<TelEventHandler *>(handler.get())->SendEvent(std::forward<ParamTypes>(_args)...);
         }
         return handler->SendEvent(std::forward<ParamTypes>(_args)...);
