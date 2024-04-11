@@ -60,9 +60,11 @@ public:
     virtual sptr<SignalInformation> NewInstance() const = 0;
     SignalInformation();
     virtual ~SignalInformation() = default;
+    virtual void SetSignalLevel(const int32_t level);
 
 protected:
     static int32_t signalBar_;
+    int32_t signalLevel_ = -1;
 };
 
 class GsmSignalInformation : public SignalInformation {

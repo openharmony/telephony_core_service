@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@ namespace Telephony {
 constexpr int32_t SIGNAL_RSSI_MAXIMUM = -1;
 constexpr int32_t SIGNAL_INTENSITY_INVALID = 0;
 constexpr int32_t SIGNAL_LEVEL_INVALID = 0;
+constexpr int32_t SIGNAL_LEVEL_UNSET = -1;
 constexpr int32_t SIGNAL_FIVE_BARS = 5;
 constexpr int32_t SIGNAL_FOUR_BARS = 4;
 const int32_t *GSM_SIGNAL_THRESHOLD = SignalInformation::GSM_SIGNAL_THRESHOLD_5BAR;
@@ -64,11 +65,17 @@ std::unique_ptr<SignalInformation> SignalInformation::Unmarshalling(Parcel &parc
     return nullptr;
 }
 
+void SignalInformation::SetSignalLevel(const int32_t level)
+{
+    signalLevel_ = level;
+}
+
 GsmSignalInformation &GsmSignalInformation::operator=(const GsmSignalInformation &gsm)
 {
     signalBar_ = gsm.signalBar_;
     gsmRxlev_ = gsm.gsmRxlev_;
     gsmBer_ = gsm.gsmBer_;
+    signalLevel_ = gsm.signalLevel_;
     return *this;
 }
 
@@ -108,6 +115,9 @@ int32_t GsmSignalInformation::GetSignalIntensity() const
 
 int32_t GsmSignalInformation::GetSignalLevel() const
 {
+    if (signalLevel_ != SIGNAL_LEVEL_UNSET) {
+        return signalLevel_;
+    }
     int32_t level = SIGNAL_LEVEL_INVALID;
     int32_t gsmRxlev = GetRssi();
     if (ValidateGsmValue()) {
@@ -159,6 +169,9 @@ bool GsmSignalInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(gsmBer_)) {
         return false;
     }
+    if (!parcel.WriteInt32(signalLevel_)) {
+        return false;
+    }
     return true;
 }
 
@@ -177,6 +190,9 @@ bool GsmSignalInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     if (!parcel.ReadInt32(gsmBer_)) {
+        return false;
+    }
+    if (!parcel.ReadInt32(signalLevel_)) {
         return false;
     }
     return true;
@@ -198,6 +214,7 @@ CdmaSignalInformation &CdmaSignalInformation::operator=(const CdmaSignalInformat
     signalBar_ = cdma.signalBar_;
     cdmaRssi_ = cdma.cdmaRssi_;
     cdmaEcno_ = cdma.cdmaEcno_;
+    signalLevel_ = cdma.signalLevel_;
     return *this;
 }
 
@@ -226,6 +243,9 @@ int32_t CdmaSignalInformation::GetSignalIntensity() const
 
 int32_t CdmaSignalInformation::GetSignalLevel() const
 {
+    if (signalLevel_ != SIGNAL_LEVEL_UNSET) {
+        return signalLevel_;
+    }
     int32_t cdmaRssi = GetCdmaRssi();
     int32_t level = SIGNAL_LEVEL_INVALID;
     if (ValidateCdmaValue()) {
@@ -275,6 +295,9 @@ bool CdmaSignalInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(cdmaEcno_)) {
         return false;
     }
+    if (!parcel.WriteInt32(signalLevel_)) {
+        return false;
+    }
     return true;
 }
 
@@ -295,6 +318,9 @@ bool CdmaSignalInformation::ReadFromParcel(Parcel &parcel)
     if (!parcel.ReadInt32(cdmaEcno_)) {
         return false;
     }
+    if (!parcel.ReadInt32(signalLevel_)) {
+        return false;
+    }
     return true;
 }
 
@@ -310,6 +336,7 @@ LteSignalInformation &LteSignalInformation::operator=(const LteSignalInformation
     lteRsrp_ = lte.lteRsrp_;
     lteRsrq_ = lte.lteRsrq_;
     lteSnr_ = lte.lteSnr_;
+    signalLevel_ = lte.signalLevel_;
     return *this;
 }
 
@@ -362,6 +389,9 @@ int32_t LteSignalInformation::GetSignalIntensity() const
 
 int32_t LteSignalInformation::GetSignalLevel() const
 {
+    if (signalLevel_ != SIGNAL_LEVEL_UNSET) {
+        return signalLevel_;
+    }
     int32_t level = SIGNAL_LEVEL_INVALID;
     int32_t lteRsrp = GetRsrp();
     if (ValidateLteValue()) {
@@ -419,6 +449,9 @@ bool LteSignalInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(lteSnr_)) {
         return false;
     }
+    if (!parcel.WriteInt32(signalLevel_)) {
+        return false;
+    }
     return true;
 }
 
@@ -445,6 +478,9 @@ bool LteSignalInformation::ReadFromParcel(Parcel &parcel)
     if (!parcel.ReadInt32(lteSnr_)) {
         return false;
     }
+    if (!parcel.ReadInt32(signalLevel_)) {
+        return false;
+    }
     return true;
 }
 
@@ -460,6 +496,7 @@ WcdmaSignalInformation &WcdmaSignalInformation::operator=(const WcdmaSignalInfor
     wcdmaRscp_ = wcdma.wcdmaRscp_;
     wcdmaEcio_ = wcdma.wcdmaEcio_;
     wcdmaBer_ = wcdma.wcdmaBer_;
+    signalLevel_ = wcdma.signalLevel_;
     return *this;
 }
 
@@ -513,6 +550,9 @@ int32_t WcdmaSignalInformation::GetSignalIntensity() const
 
 int32_t WcdmaSignalInformation::GetSignalLevel() const
 {
+    if (signalLevel_ != SIGNAL_LEVEL_UNSET) {
+        return signalLevel_;
+    }
     int32_t level = SIGNAL_LEVEL_INVALID;
     int32_t wcdmaRscp = GetRscp();
     if (ValidateWcdmaValue()) {
@@ -570,6 +610,9 @@ bool WcdmaSignalInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(wcdmaBer_)) {
         return false;
     }
+    if (!parcel.WriteInt32(signalLevel_)) {
+        return false;
+    }
     return true;
 }
 
@@ -596,6 +639,9 @@ bool WcdmaSignalInformation::ReadFromParcel(Parcel &parcel)
     if (!parcel.ReadInt32(wcdmaBer_)) {
         return false;
     }
+    if (!parcel.ReadInt32(signalLevel_)) {
+        return false;
+    }
     return true;
 }
 
@@ -608,6 +654,7 @@ TdScdmaSignalInformation &TdScdmaSignalInformation::operator=(const TdScdmaSigna
 {
     signalBar_ = tdScdma.signalBar_;
     tdScdmaRscp_ = tdScdma.tdScdmaRscp_;
+    signalLevel_ = tdScdma.signalLevel_;
     return *this;
 }
 
@@ -641,6 +688,9 @@ int32_t TdScdmaSignalInformation::GetSignalIntensity() const
 
 int32_t TdScdmaSignalInformation::GetSignalLevel() const
 {
+    if (signalLevel_ != SIGNAL_LEVEL_UNSET) {
+        return signalLevel_;
+    }
     int32_t tdScdmaRscp = GetRscp();
     int32_t level = SIGNAL_LEVEL_INVALID;
     if (ValidateTdScdmaValue()) {
@@ -686,6 +736,9 @@ bool TdScdmaSignalInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(tdScdmaRscp_)) {
         return false;
     }
+    if (!parcel.WriteInt32(signalLevel_)) {
+        return false;
+    }
     return true;
 }
 
@@ -703,6 +756,9 @@ bool TdScdmaSignalInformation::ReadFromParcel(Parcel &parcel)
     if (!parcel.ReadInt32(tdScdmaRscp_)) {
         return false;
     }
+    if (!parcel.ReadInt32(signalLevel_)) {
+        return false;
+    }
     return true;
 }
 
@@ -717,6 +773,7 @@ NrSignalInformation &NrSignalInformation::operator=(const NrSignalInformation &n
     nrRsrp_ = nr.nrRsrp_;
     nrRsrq_ = nr.nrRsrq_;
     nrSinr_ = nr.nrSinr_;
+    signalLevel_ = nr.signalLevel_;
     return *this;
 }
 
@@ -762,6 +819,9 @@ int32_t NrSignalInformation::GetSignalIntensity() const
 
 int32_t NrSignalInformation::GetSignalLevel() const
 {
+    if (signalLevel_ != SIGNAL_LEVEL_UNSET) {
+        return signalLevel_;
+    }
     int32_t nrRsrp = GetRsrp();
     int32_t level = SIGNAL_LEVEL_INVALID;
     if (ValidateNrValue()) {
@@ -814,6 +874,9 @@ bool NrSignalInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(nrSinr_)) {
         return false;
     }
+    if (!parcel.WriteInt32(signalLevel_)) {
+        return false;
+    }
     return true;
 }
 
@@ -835,6 +898,9 @@ bool NrSignalInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     if (!parcel.ReadInt32(nrSinr_)) {
+        return false;
+    }
+    if (!parcel.ReadInt32(signalLevel_)) {
         return false;
     }
     return true;
