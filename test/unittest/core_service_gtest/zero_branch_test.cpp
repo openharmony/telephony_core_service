@@ -1720,6 +1720,8 @@ HWTEST_F(BranchTest, Telephony_NetworkRegister_002, Function | MediumTest | Leve
     EXPECT_EQ(networkRegister->NotifyStateChange(), TELEPHONY_ERR_SUCCESS);
     EXPECT_GE(networkRegister->RevertLastTechnology(), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(networkRegister->GetSystemPropertiesConfig(config), TELEPHONY_ERR_SUCCESS);
+    int32_t nsaState = 1;
+    EXPECT_EQ(networkRegister->UpdateNsaState(nsaState), nsaState);
 }
 
 /**

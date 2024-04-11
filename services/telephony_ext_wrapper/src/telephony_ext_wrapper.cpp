@@ -88,6 +88,10 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
     if (sortSignalInfoListExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+    updateNsaStateExt_ = (UPDATE_NSA_STATE_EXT)dlsym(telephonyExtWrapperHandle_, "UpdateNsaStateExt");
+    if (updateNsaStateExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
