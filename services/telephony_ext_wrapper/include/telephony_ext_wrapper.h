@@ -67,6 +67,8 @@ public:
     typedef void (*UPDATE_COUNTRY_CODE_EXT)(int32_t, const char *);
     typedef void (*UPDATE_TIME_ZONE_OFFSET_EXT)(int32_t, int32_t);
     typedef void (*UPDATE_NETWORK_STATE_EXT)(int32_t slotId, std::unique_ptr<NetworkState> &networkState);
+    typedef int32_t (*UPDATE_NSA_STATE_EXT)(
+        int32_t slotId, int32_t cellId, bool endcAvailable, bool dcNrRestricted, int32_t nsaState);
     /* add for vsim begin */
     typedef void (*IS_VSIM_IN_STATUS)(int32_t slotId, int32_t type, bool &status);
     typedef void (*GET_VSIM_SLOT_ID)(int32_t &slotId);
@@ -107,6 +109,7 @@ public:
     ON_GET_NETWORK_SEARCH_INFORMATION_EXT onGetNetworkSearchInformationExt_ = nullptr;
     CREATE_ICC_FILE_EXT createIccFileExt_ = nullptr;
     UPDATE_NETWORK_STATE_EXT updateNetworkStateExt_ = nullptr;
+    UPDATE_NSA_STATE_EXT updateNsaStateExt_ = nullptr;
 
     UPDATE_COUNTRY_CODE_EXT updateCountryCodeExt_ = nullptr;
     UPDATE_TIME_ZONE_OFFSET_EXT updateTimeZoneOffsetExt_ = nullptr;
