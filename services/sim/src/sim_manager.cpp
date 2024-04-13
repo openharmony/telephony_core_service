@@ -617,7 +617,7 @@ int32_t SimManager::SimAuthentication(
 int32_t SimManager::SendSimMatchedOperatorInfo(
     int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey)
 {
-    if (simStateManager_[slotId] == nullptr) {
+    if (simStateManager_.empty() || simStateManager_[slotId] == nullptr) {
         TELEPHONY_LOGE("simStateManager_ can not be null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
