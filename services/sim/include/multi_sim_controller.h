@@ -93,6 +93,7 @@ private:
     bool RefreshActiveIccAccountInfoList();
     std::string EncryptIccId(const std::string iccid);
     void CheckIfNeedSwitchMainSlotId();
+    int32_t getDefaultMainSlotByIccId();
     bool IsValidSlotId(int32_t slotId);
     bool InitPrimary();
     bool IsAllCardsReady();
