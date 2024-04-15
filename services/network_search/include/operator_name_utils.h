@@ -16,13 +16,11 @@
 #ifndef OPERATOR_NAME_UTILS_H
 #define OPERATOR_NAME_UTILS_H
 
-#include <json/json.h>
+#include <mutex>
 
+#include "cJSON.h"
 #include "iosfwd"
 #include "string"
-namespace Json {
-class Value;
-}
 
 namespace OHOS {
 namespace Telephony {
@@ -44,11 +42,12 @@ public:
 private:
     OperatorNameUtils() = default;
     ~OperatorNameUtils() = default;
-    void ParserOperatorNames(std::vector<OperatorNameCust> &vec, Json::Value &root);
+    void ParserOperatorNames(std::vector<OperatorNameCust> &vec, cJSON *itemRoots);
     int32_t LoaderJsonFile(char *&content, const char *path) const;
     int32_t ParserOperatorNameCustJson(std::vector<OperatorNameCust> &vec);
     int32_t CloseFile(FILE *f) const;
     std::string GetNameByLocale(OperatorNameCust &value);
+    std::string ParseString(cJSON *value);
 
 private:
     static OperatorNameUtils operatorNameUtils_;

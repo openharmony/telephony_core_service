@@ -23,9 +23,6 @@
 #include "cstdlib"
 #include "cstring"
 #include "iosfwd"
-#include "json/config.h"
-#include "json/reader.h"
-#include "json/value.h"
 #include "locale_config.h"
 #include "memory"
 #include "parameter.h"
@@ -85,27 +82,26 @@ int32_t OperatorNameUtils::ParserOperatorNameCustJson(std::vector<OperatorNameCu
         TELEPHONY_LOGE("content is nullptr!");
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
-    const int contentLength = strlen(content);
-    const std::string rawJson(content);
+    cJSON *root = cJSON_Parse(content);
     free(content);
     content = nullptr;
-    JSONCPP_STRING err;
-    Json::Value root;
-    Json::CharReaderBuilder builder;
-    Json::CharReader *reader(builder.newCharReader());
-    if (!reader->parse(rawJson.c_str(), rawJson.c_str() + contentLength, &root, &err)) {
-        TELEPHONY_LOGE("reader is error!");
-        delete reader;
+    if (root == nullptr) {
+        TELEPHONY_LOGE("json root is error!");
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
-    delete reader;
-    reader = nullptr;
-    Json::Value itemRoots = root[ITEM_OPERATOR_NAMES];
-    if (itemRoots.size() == 0) {
-        TELEPHONY_LOGE("itemRoots size == 0!");
+
+    cJSON *itemRoots = cJSON_GetObjectItem(root, ITEM_OPERATOR_NAMES);
+    if (itemRoots == nullptr || !cJSON_IsArray(itemRoots) || cJSON_GetArraySize(itemRoots) == 0) {
+        TELEPHONY_LOGE("operator name itemRoots is invalid");
+        cJSON_Delete(root);
+        itemRoots = nullptr;
+        root = nullptr;
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
     ParserOperatorNames(vec, itemRoots);
+    cJSON_Delete(root);
+    itemRoots = nullptr;
+    root = nullptr;
     return TELEPHONY_SUCCESS;
 }
 
@@ -160,30 +156,45 @@ int32_t OperatorNameUtils::LoaderJsonFile(char *&content, const char *path) cons
     return CloseFile(f);
 }
 
-void OperatorNameUtils::ParserOperatorNames(std::vector<OperatorNameCust> &vec, Json::Value &root)
+void OperatorNameUtils::ParserOperatorNames(std::vector<OperatorNameCust> &vec, cJSON *itemRoots)
 {
-    for (int32_t i = 0; i < static_cast<int32_t>(root.size()); i++) {
-        Json::Value itemRoot = root[i];
+    cJSON *itemRoot = nullptr;
+    cJSON *plmnArray = nullptr;
+    cJSON *arrValue = nullptr;
+    for (int32_t i = 0; i < cJSON_GetArraySize(itemRoots); i++) {
+        itemRoot = cJSON_GetArrayItem(itemRoots, i);
+        if (itemRoot == nullptr) {
+            continue;
+        }
         OperatorNameCust nameCust;
-        if (itemRoot[ITEM_PLMN].isArray()) {
-            for (auto value : itemRoot[ITEM_PLMN]) {
-                nameCust.mccMnc.push_back(value.asString());
+        plmnArray = cJSON_GetObjectItem(itemRoot, ITEM_PLMN);
+        if (plmnArray == nullptr || !cJSON_IsArray(plmnArray)) {
+            continue;
+        }
+        for (int32_t j = 0; j < cJSON_GetArraySize(plmnArray); j++) {
+            arrValue = cJSON_GetArrayItem(plmnArray, j);
+            if (arrValue != nullptr && cJSON_IsNumber(arrValue)) {
+                nameCust.mccMnc.push_back(std::to_string(static_cast<int32_t>(cJSON_GetNumberValue(arrValue))));
             }
         }
-        if (itemRoot[ITEM_ZH_HANS_CN].isString()) {
-            nameCust.zhHansCN = itemRoot[ITEM_ZH_HANS_CN].asString();
-        }
-        if (itemRoot[ITEM_EN_LATN_US].isString()) {
-            nameCust.enLatnUS = itemRoot[ITEM_EN_LATN_US].asString();
-        }
-        if (itemRoot[ITEM_ZH_HANT_TW].isString()) {
-            nameCust.zhHantTW = itemRoot[ITEM_ZH_HANT_TW].asString();
-        }
-        if (itemRoot[ITEM_ZH_HANT_HK].isString()) {
-            nameCust.zhHantHK = itemRoot[ITEM_ZH_HANT_HK].asString();
-        }
+
+        nameCust.zhHansCN = ParseString(cJSON_GetObjectItem(itemRoot, ITEM_ZH_HANS_CN));
+        nameCust.enLatnUS = ParseString(cJSON_GetObjectItem(itemRoot, ITEM_EN_LATN_US));
+        nameCust.zhHantTW = ParseString(cJSON_GetObjectItem(itemRoot, ITEM_ZH_HANT_TW));
+        nameCust.zhHantHK = ParseString(cJSON_GetObjectItem(itemRoot, ITEM_ZH_HANT_HK));
         vec.push_back(nameCust);
     }
+    itemRoot = nullptr;
+    plmnArray = nullptr;
+    arrValue = nullptr;
+}
+
+std::string OperatorNameUtils::ParseString(cJSON *value)
+{
+    if (value != nullptr && value->type == cJSON_String && value->valuestring != nullptr) {
+        return value->valuestring;
+    }
+    return "";
 }
 
 int32_t OperatorNameUtils::CloseFile(FILE *f) const

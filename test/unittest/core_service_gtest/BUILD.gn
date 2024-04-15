@@ -44,8 +44,8 @@ ohos_unittest("tel_core_service_gtest") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
+    "//third_party/cJSON:cjson",
     "//third_party/googletest:gtest_main",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   external_deps = [
@@ -149,8 +149,8 @@ ohos_unittest("tel_network_search_gtest") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
+    "//third_party/cJSON:cjson",
     "//third_party/googletest:gtest_main",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   external_deps = [
