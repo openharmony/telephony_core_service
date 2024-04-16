@@ -1214,5 +1214,20 @@ bool SimManager::IsSetPrimarySlotIdInProgress()
     }
     return multiSimController_->IsSetPrimarySlotIdInProgress();
 }
+
+int32_t SimManager::GetSimIO(int32_t slotId, int32_t command,
+    int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response)
+{
+    if (!HasSimCardInner(slotId)) {
+        TELEPHONY_LOGE("SimAuthentication has no sim card!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    SimIoRequestInfo requestInfo;
+    requestInfo.command = command;
+    requestInfo.fileId = fileId;
+    requestInfo.data = data;
+    requestInfo.path = path;
+    return simStateManager_[slotId]->GetSimIO(slotId, requestInfo, response);
+}
 } // namespace Telephony
 } // namespace OHOS

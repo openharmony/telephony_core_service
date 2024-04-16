@@ -1080,5 +1080,16 @@ int32_t CoreServiceClient::GetOpkeyVersion(std::string &versionInfo)
     }
     return proxy->GetOpkeyVersion(versionInfo);
 }
+
+int32_t CoreServiceClient::GetSimIO(int32_t slotId, int32_t command,
+    int32_t fileId, const std::string &dataStr, const std::string &path, SimAuthenticationResponse &response)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return false;
+    }
+    return proxy->GetSimIO(slotId, command, fileId, dataStr, path, response);
+}
 } // namespace Telephony
 } // namespace OHOS
