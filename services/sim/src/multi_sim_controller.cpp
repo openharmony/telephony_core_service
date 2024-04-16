@@ -181,7 +181,7 @@ bool MultiSimController::IsAllCardsReady()
 {
     for (int32_t i = 0; i < maxCount_; i++) {
         if (simStateManager_[i] != nullptr && (simStateManager_[i]->GetSimState() != SimState::SIM_STATE_READY
-            || simStateManager_[i]->GetSimState() != SimState::SIM_STATE_LOCKED)) {
+            && simStateManager_[i]->GetSimState() != SimState::SIM_STATE_LOCKED)) {
             TELEPHONY_LOGI("single card ready");
             return false;
         }
