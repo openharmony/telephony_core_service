@@ -90,6 +90,10 @@ const std::map<uint32_t, SimStateHandle::Func> SimStateHandle::memberFuncMap_ = 
         [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
             handle->GetSendSimMatchedOperatorInfoResult(slotId, event);
         } },
+    { MSG_SIM_GET_SIM_IO_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetSimIOResult(slotId, event);
+        } },
 };
 
 SimStateHandle::SimStateHandle(const std::weak_ptr<SimStateManager> &simStateManager)
@@ -963,6 +967,40 @@ bool SimStateHandle::IsRadioStateUnavailable(const AppExecFwk::InnerEvent::Point
         return true;
     }
     return false;
+}
+
+int32_t SimStateHandle::GetSimIO(int32_t slotId, SimIoRequestInfo requestInfo)
+{
+    auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_GET_SIM_IO_DONE);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return SIM_AUTH_FAIL;
+    }
+    event->SetOwner(shared_from_this());
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("SimStateHandle::GetSimIO() telRilManager is nullptr!!");
+        return SIM_AUTH_FAIL;
+    }
+    return telRilManager->GetSimIO(slotId, requestInfo, event);
+}
+
+void SimStateHandle::GetSimIOResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("SimStateHandle::GetSimIOResult slotId = %{public}d", slotId);
+    auto response = event->GetSharedObject<IccIoResultInfo>();
+    if (response == nullptr) {
+        TELEPHONY_LOGE("SimStateHandle::GetSimIOResult() fail");
+        return;
+    }
+    simIORespon_.sw1 = response->sw1;
+    simIORespon_.sw2 = response->sw2;
+    simIORespon_.response = response->response;
+}
+
+SimAuthenticationResponse SimStateHandle::GetSimIOResponse()
+{
+    return simIORespon_;
 }
 } // namespace Telephony
 } // namespace OHOS

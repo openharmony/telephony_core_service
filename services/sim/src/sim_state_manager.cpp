@@ -524,6 +524,32 @@ int32_t SimStateManager::SendSimMatchedOperatorInfo(
     return response;
 }
 
+int32_t SimStateManager::GetSimIO(
+    int32_t slotId, SimIoRequestInfo requestInfo, SimAuthenticationResponse &response)
+{
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGE("GetSimIO(), simStateHandle_ is nullptr!!!");
+        return SIM_AUTH_FAIL;
+    }
+    std::unique_lock<std::mutex> lck(ctx_);
+    responseReady_ = false;
+    int32_t ret = SIM_AUTH_FAIL;
+    ret = simStateHandle_->GetSimIO(slotId, requestInfo);
+    while (!responseReady_) {
+        TELEPHONY_LOGI("GetSimIO::wait(), response = false");
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
+    SimAuthenticationResponse retResponse = simStateHandle_->GetSimIOResponse();
+    response.sw1 = retResponse.sw1;
+    response.sw2 = retResponse.sw2;
+    response.response = retResponse.response;
+    TELEPHONY_LOGI("SimStateManager::GetSimIO(), sw1: %{public}d, sw2: %{public}d",
+        response.sw1, response.sw2);
+    return ret;
+}
+
 SimStateManager::~SimStateManager()
 {
     if (simStateHandle_ != nullptr) {

@@ -145,6 +145,8 @@ public:
 
     bool IsSetActiveSimInProgress(int32_t slotId) override;
     bool IsSetPrimarySlotIdInProgress() override;
+    int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
+        const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
 
 private:
     bool IsValidSlotId(int32_t slotId);
