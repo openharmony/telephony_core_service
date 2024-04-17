@@ -445,6 +445,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | Med
     std::shared_ptr<RadioProtocolController> radioProtocolController = nullptr;
     multiSimController->PublishSetPrimaryEvent(true);
     multiSimController->EncryptIccId("");
+    multiSimController->getDefaultMainSlotByIccId();
     multiSimController->CheckIfNeedSwitchMainSlotId();
     multiSimController->IsAllModemInitDone();
     multiSimController->ReCheckPrimary();

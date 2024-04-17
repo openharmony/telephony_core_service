@@ -181,7 +181,7 @@ bool MultiSimController::IsAllCardsReady()
 {
     for (int32_t i = 0; i < maxCount_; i++) {
         if (simStateManager_[i] != nullptr && (simStateManager_[i]->GetSimState() != SimState::SIM_STATE_READY
-            || simStateManager_[i]->GetSimState() != SimState::SIM_STATE_LOCKED)) {
+            && simStateManager_[i]->GetSimState() != SimState::SIM_STATE_LOCKED)) {
             TELEPHONY_LOGI("single card ready");
             return false;
         }
@@ -520,10 +520,18 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
 void MultiSimController::CheckIfNeedSwitchMainSlotId()
 {
     TELEPHONY_LOGD("start");
-    if (IsSimActive(lastPrimarySlotId_)) {
-        TELEPHONY_LOGI("main slotId active, no need to switch main card");
-        if (!IsAllCardsReady()) {
-            SavePrimarySlotIdInfo(lastPrimarySlotId_);
+    int32_t defaultSlotId = getDefaultMainSlotByIccId();
+    if (IsSimActive(defaultSlotId)) {
+        if (IsAllCardsReady() && defaultSlotId != lastPrimarySlotId_) {
+            TELEPHONY_LOGI("defaultSlotId changed, need to set slot%{public}d primary", defaultSlotId);
+            std::thread initDataTask([&, defaultSlotId = defaultSlotId]() {
+                pthread_setname_np(pthread_self(), "SetPrimarySlotId");
+                CoreManagerInner::GetInstance().SetPrimarySlotId(defaultSlotId);
+            });
+            initDataTask.detach();
+        } else {
+            TELEPHONY_LOGI("no need set main slot, defaultslot same main slot");
+            SavePrimarySlotIdInfo(defaultSlotId);
         }
     } else {
         int32_t firstActivedSlotId = GetFirstActivedSlotId();
@@ -531,13 +539,39 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId()
             TELEPHONY_LOGE("active slotId is invalid");
             return;
         }
-        TELEPHONY_LOGI("need to set slot%{public}d primary", firstActivedSlotId);
+        TELEPHONY_LOGI("single card active, need to set slot%{public}d primary", firstActivedSlotId);
         std::thread initDataTask([&, firstActivedSlotId = firstActivedSlotId]() {
             pthread_setname_np(pthread_self(), "SetPrimarySlotId");
             CoreManagerInner::GetInstance().SetPrimarySlotId(firstActivedSlotId);
         });
         initDataTask.detach();
     }
+}
+
+int32_t MultiSimController::getDefaultMainSlotByIccId()
+{
+    int mainSlot = lastPrimarySlotId_;
+    if (simFileManager_[SIM_SLOT_0] == nullptr || simFileManager_[SIM_SLOT_1] == nullptr) {
+        TELEPHONY_LOGE("simFileManager_ is null");
+        return mainSlot;
+    }
+    std::string iccIdSub1 = Str16ToStr8(simFileManager_[SIM_SLOT_0]->GetSimIccId());
+    std::string iccIdSub2 = Str16ToStr8(simFileManager_[SIM_SLOT_1]->GetSimIccId());
+    if (iccIdSub1.empty() || iccIdSub2.empty()) {
+        TELEPHONY_LOGD("iccid is null");
+        return mainSlot;
+    }
+    std::string encryptIccIdSub1 = EncryptIccId(iccIdSub1);
+    std::string encryptIccIdSub2 = EncryptIccId(iccIdSub2);
+    char lastMainCardIccId[SYSTEM_PARAMETER_LENGTH] = { 0 };
+    GetParameter(MAIN_CARD_ICCID_KEY.c_str(), "", lastMainCardIccId, SYSTEM_PARAMETER_LENGTH);
+    if (lastMainCardIccId == encryptIccIdSub1) {
+        mainSlot = SIM_SLOT_0;
+    } else if (lastMainCardIccId == encryptIccIdSub2) {
+        mainSlot = SIM_SLOT_1;
+    }
+    TELEPHONY_LOGI("getDefaultMainSlotByIccId is %{public}d", mainSlot);
+    return mainSlot;
 }
 
 bool MultiSimController::IsValidSlotId(int32_t slotId)
