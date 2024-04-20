@@ -30,6 +30,7 @@ OperatorConfigLoader::OperatorConfigLoader(
     : simFileManager_(simFileManager), operatorConfigCache_(operatorConfigCache)
 {
     TELEPHONY_LOGI("OperatorConfigLoader construct");
+    InitOpKeyData();
 }
 
 OperatorConfigLoader::~OperatorConfigLoader() {}
@@ -51,6 +52,40 @@ OperatorConfig OperatorConfigLoader::LoadOperatorConfig(int32_t slotId)
     operatorConfigCache_->LoadOperatorConfig(slotId, opc);
     TELEPHONY_LOGI("LoadOperatorConfig %{public}zu", opc.configValue.size());
     return opc;
+}
+
+void OperatorConfigLoader::InitOpKeyData()
+{
+    TELEPHONY_LOGI("InitOpKeyData start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateOpKeyHelper();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("OpKey helper is nullptr");
+        return;
+    }
+    Uri uri(OPKEY_INIT_URI);
+    std::vector<DataShare::DataShareValuesBucket> values;
+    int result = helper->BatchInsert(uri, values);
+    helper->Release();
+    helper = nullptr;
+    if (result <= 0) {
+        TELEPHONY_LOGI("InitOpKeyData opkey not change.");
+        return;
+    }
+    helper = CreateSimHelper();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("Sim helper is nullptr");
+        return;
+    }
+    TELEPHONY_LOGI("InitOpKeyData opkey changed, clear opkey temp.");
+    DataShare::DataShareValuesBucket valuesBucket;
+    DataShare::DataShareValueObject valueObj("");
+    valuesBucket.Put(SimData::OPKEY, valueObj);
+    DataShare::DataSharePredicates predicates;
+    Uri simUri(SIM_INFO_URI);
+    result = helper->Update(simUri, predicates, valuesBucket);
+    helper->Release();
+    helper = nullptr;
+    TELEPHONY_LOGI("InitOpKeyData end");
 }
 
 std::string OperatorConfigLoader::LoadOpKeyOnMccMnc(int32_t slotId)
