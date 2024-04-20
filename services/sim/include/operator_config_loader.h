@@ -59,6 +59,7 @@ private:
     std::string GetOpKey(std::shared_ptr<DataShare::DataShareResultSet> resultSet, int32_t slotId);
     bool MatchOperatorRule(std::shared_ptr<DataShare::DataShareResultSet> &resultSet, int row);
     int InsertOpkeyToSimDb(std::string opKeyVal);
+    void InitOpKeyData();
 
 private:
     std::weak_ptr<SimFileManager> simFileManager_;
