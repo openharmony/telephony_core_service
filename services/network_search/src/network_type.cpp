@@ -34,13 +34,17 @@ void NetworkType::ProcessGetPreferredNetwork(const AppExecFwk::InnerEvent::Point
     }
     std::shared_ptr<PreferredNetworkTypeInfo> preferredNetworkInfo =
         event->GetSharedObject<PreferredNetworkTypeInfo>();
-    if (TELEPHONY_EXT_WRAPPER.getPreferredNetworkExt_ != nullptr && preferredNetworkInfo != nullptr) {
-        TELEPHONY_EXT_WRAPPER.getPreferredNetworkExt_(preferredNetworkInfo->preferredNetworkType);
-    }
     std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (preferredNetworkInfo == nullptr && responseInfo == nullptr) {
         TELEPHONY_LOGE("NetworkType::ProcessGetPreferredNetwork object is nullptr\n");
         return;
+    }
+    std::shared_ptr<NetworkSearchManager> networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager != nullptr && preferredNetworkInfo != nullptr) {
+        networkSearchManager->SetCachePreferredNetworkValue(slotId_, preferredNetworkInfo->preferredNetworkType);
+    }
+    if (TELEPHONY_EXT_WRAPPER.getPreferredNetworkExt_ != nullptr && preferredNetworkInfo != nullptr) {
+        TELEPHONY_EXT_WRAPPER.getPreferredNetworkExt_(preferredNetworkInfo->preferredNetworkType);
     }
     MessageParcel data;
     int64_t index = -1;
@@ -79,13 +83,16 @@ void NetworkType::ProcessSetPreferredNetwork(const AppExecFwk::InnerEvent::Point
     }
 
     bool success = responseInfo->error == HRilErrType::NONE;
+    int32_t networkMode = 0;
     if (success) {
-        int32_t networkMode = 0;
         networkSearchManager->GetCachePreferredNetworkValue(slotId_, networkMode);
         if (networkMode >= static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_AUTO) &&
             networkMode < static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_MAX_VALUE)) {
             networkSearchManager->SavePreferredNetworkValue(slotId_, networkMode);
         }
+    } else {
+        networkMode = networkSearchManager->GetPreferredNetworkValue(slotId_);
+        networkSearchManager->SetCachePreferredNetworkValue(slotId_, networkMode);
     }
     int64_t index = responseInfo->flag;
     std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo = NetworkUtils::FindNetworkSearchCallback(index);
