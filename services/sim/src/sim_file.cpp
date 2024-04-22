@@ -304,6 +304,7 @@ void SimFile::LoadSimFiles()
 {
     TELEPHONY_LOGI("SimFile LoadSimFiles started");
     fileQueried_ = true;
+    fileToGet_ = 0;
 
     AppExecFwk::InnerEvent::Pointer eventIMSI = BuildCallerInfo(MSG_SIM_OBTAIN_IMSI_DONE);
     telRilManager_->GetImsi(slotId_, eventIMSI);
