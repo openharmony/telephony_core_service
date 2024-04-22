@@ -1753,7 +1753,8 @@ int32_t NetworkSearchManager::GetNetworkCapability(
             networkCapabilityType, isNrSupported);
         return TELEPHONY_ERR_FAIL;
     }
-    int32_t preferredNetwork = GetPreferredNetworkValue(slotId);
+    int32_t preferredNetwork = PREFERRED_NETWORK_TYPE;
+    GetCachePreferredNetworkValue(slotId, preferredNetwork);
     int32_t convertedType = ConvertNetworkModeToCapabilityType(preferredNetwork);
     if (networkCapabilityType == SERVICE_TYPE_NR && convertedType == SERVICE_TYPE_NR) {
         networkCapabilityState = SERVICE_ABILITY_ON;
