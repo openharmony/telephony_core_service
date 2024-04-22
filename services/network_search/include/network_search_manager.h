@@ -76,7 +76,7 @@ struct NetworkSearchManagerInner {
     std::mutex mutex_;
     bool isRadioFirstPowerOn_ = true;
     bool airplaneMode_ = false;
-    int32_t preferredNetworkValue_ = 0;
+    int32_t preferredNetworkValue_ = PREFERRED_NETWORK_TYPE;
     int64_t serialNum_ = SERIAL_NUMBER_DEFAULT;
     std::mutex msgNumMutex_;
     std::mutex serialNumMutex_;
