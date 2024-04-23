@@ -321,7 +321,7 @@ void PrintfUsage()
     std::cout << "1000:exit\n";
 }
 
-int32_t mainExit()
+int32_t MainExit()
 {
     std::vector<AccessTokenIDEx>::iterator it = simAccountCallbackTokenIDVec_.begin();
     while (it != simAccountCallbackTokenIDVec_.end()) {
