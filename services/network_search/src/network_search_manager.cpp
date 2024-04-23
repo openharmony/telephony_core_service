@@ -1101,7 +1101,7 @@ void NetworkSearchManager::SetLocateUpdate(int32_t slotId)
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SET_LOCATION_UPDATE);
     if (event != nullptr && inner->networkSearchHandler_ != nullptr) {
         event->SetOwner(inner->networkSearchHandler_);
-        telRilManager_->SetLocateUpdates(slotId, HRilRegNotifyMode::REG_NOTIFY_STAT_LAC_CELLID, event);
+        telRilManager_->SetLocateUpdates(slotId, RegNotifyMode::REG_NOTIFY_STAT_LAC_CELLID, event);
     }
 }
 

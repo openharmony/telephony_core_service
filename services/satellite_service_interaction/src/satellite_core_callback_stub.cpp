@@ -15,7 +15,7 @@
 
 #include "satellite_core_callback_stub.h"
 
-#include "hril_base_parcel.h"
+#include "tel_ril_base_parcel.h"
 #include "radio_event.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -75,14 +75,14 @@ int32_t SatelliteCoreCallbackStub::OnSetRadioStateResponse(MessageParcel &data, 
         int32_t serial = data.ReadInt32();
         int32_t error = data.ReadInt32();
         int32_t type = data.ReadInt32();
-        auto info = std::make_shared<HRilRadioResponseInfo>();
+        auto info = std::make_shared<RadioResponseInfo>();
         if (info == nullptr) {
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         info->flag = flag;
         info->serial = serial;
-        info->error = static_cast<HRilErrType>(error);
-        info->type = static_cast<HRilResponseTypes>(type);
+        info->error = static_cast<ErrType>(error);
+        info->type = static_cast<ResponseTypes>(type);
         AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventCode, info);
         if (response == nullptr) {
             TELEPHONY_LOGE("hril response is null!");
@@ -95,7 +95,7 @@ int32_t SatelliteCoreCallbackStub::OnSetRadioStateResponse(MessageParcel &data, 
     if (dataType == SatelliteRadioResponseType::RADIO_STATE_INFO) {
         int64_t flag = data.ReadInt64();
         int32_t state = data.ReadInt32();
-        auto info = std::make_unique<HRilRadioStateInfo>();
+        auto info = std::make_unique<RadioStateInfo>();
         if (info == nullptr) {
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
@@ -118,9 +118,9 @@ int32_t SatelliteCoreCallbackStub::OnRadioStateChanged(MessageParcel &data, Mess
 {
     int32_t eventCode = data.ReadInt32();
 
-    auto info = std::make_shared<HRilInt32Parcel>();
+    auto info = std::make_shared<Int32Parcel>();
     if (!data.ReadInt32(info->data)) {
-        TELEPHONY_LOGE("HRilInt32Parcel is null!");
+        TELEPHONY_LOGE("Int32Parcel is null!");
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
 

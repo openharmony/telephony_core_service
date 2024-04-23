@@ -1764,7 +1764,7 @@ void TelRilTest::SetLocateUpdatesTest(int32_t slotId, std::shared_ptr<AppExecFwk
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::SetLocateUpdatesTest -->");
-        HRilRegNotifyMode mode = REG_NOTIFY_STAT_LAC_CELLID;
+        RegNotifyMode mode = REG_NOTIFY_STAT_LAC_CELLID;
         telRilManager_->SetLocateUpdates(slotId, mode, event);
         TELEPHONY_LOGI("TelRilTest::SetLocateUpdatesTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
@@ -2384,9 +2384,9 @@ bool TelRilTest::DemoHandler::GetBoolResult(int32_t eventId)
         return ret;
     }
     if ((resultInfo_ != nullptr) &&
-        ((resultInfo_->error == HRilErrType::NONE) || (resultInfo_->error == HRilErrType::HRIL_ERR_GENERIC_FAILURE) ||
-         (resultInfo_->error == HRilErrType::HRIL_ERR_INVALID_RESPONSE) ||
-         (resultInfo_->error == HRilErrType::HRIL_ERR_INVALID_MODEM_PARAMETER))) {
+        ((resultInfo_->error == ErrType::NONE) || (resultInfo_->error == ErrType::ERR_GENERIC_FAILURE) ||
+         (resultInfo_->error == ErrType::ERR_INVALID_RESPONSE) ||
+         (resultInfo_->error == ErrType::ERR_INVALID_MODEM_PARAMETER))) {
         ret = true;
     }
     if (resultInfo_ == nullptr) {
@@ -2404,7 +2404,7 @@ void TelRilTest::DemoHandler::ProcessResponseInfo(const AppExecFwk::InnerEvent::
     if (event != nullptr) {
         eventId_ = event->GetInnerEventId();
         TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> eventId:%{public}d", eventId_);
-        // for some SIM interfaces, response data need to be get before HRilRadioResponseInfo
+        // for some SIM interfaces, response data need to be get before RadioResponseInfo
         switch (eventId_) {
             case static_cast<int32_t>(RadioEvent::RADIO_SIM_GET_IMSI): {
                 TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> RADIO_SIM_GET_IMSI");
@@ -2413,7 +2413,7 @@ void TelRilTest::DemoHandler::ProcessResponseInfo(const AppExecFwk::InnerEvent::
                     TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> imsi=%{public}s", imsi->c_str());
                 } else {
                     TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> get resultInfo_");
-                    resultInfo_ = event->GetSharedObject<HRilRadioResponseInfo>();
+                    resultInfo_ = event->GetSharedObject<RadioResponseInfo>();
                 }
                 break;
             }
@@ -2429,13 +2429,13 @@ void TelRilTest::DemoHandler::ProcessResponseInfo(const AppExecFwk::InnerEvent::
                         g_smscAddr.c_str(), g_tosca);
                 } else {
                     TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> get resultInfo_");
-                    resultInfo_ = event->GetSharedObject<HRilRadioResponseInfo>();
+                    resultInfo_ = event->GetSharedObject<RadioResponseInfo>();
                 }
                 break;
             }
             default: {
                 TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> case default");
-                resultInfo_ = event->GetSharedObject<HRilRadioResponseInfo>();
+                resultInfo_ = event->GetSharedObject<RadioResponseInfo>();
             }
         }
     }

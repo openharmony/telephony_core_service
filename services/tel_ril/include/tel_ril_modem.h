@@ -16,7 +16,7 @@
 #ifndef TEL_RIL_MODEM_H
 #define TEL_RIL_MODEM_H
 
-#include "hril_modem_parcel.h"
+#include "tel_ril_modem_parcel.h"
 #include "tel_ril_base.h"
 #include "telephony_types.h"
 

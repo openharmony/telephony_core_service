@@ -16,7 +16,7 @@
 #ifndef TEL_RIL_NETWORK_H
 #define TEL_RIL_NETWORK_H
 
-#include "hril_network_parcel.h"
+#include "tel_ril_network_parcel.h"
 #include "tel_ril_base.h"
 
 namespace OHOS {
@@ -41,7 +41,7 @@ public:
     int32_t GetCellInfoList(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t SetLocateUpdates(HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetLocateUpdates(RegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetNotificationFilter(int32_t newFilter, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetDeviceState(
         int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &response);

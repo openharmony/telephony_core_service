@@ -54,7 +54,6 @@ ohos_fuzztest("UpdateIccDiallingNumbersFuzzTest") {
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "core_service:libtel_common",
-    "drivers_interface_ril:hril_innerkits",
     "drivers_interface_ril:libril_proxy_1.1",
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",

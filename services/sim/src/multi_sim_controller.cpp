@@ -595,7 +595,7 @@ bool MultiSimController::SetActiveSimToRil(int32_t slotId, int32_t type, int32_t
         TELEPHONY_LOGI("MultiSimController SetActiveSimToRil wait");
         radioProtocolController_->cv_.wait(lck);
     }
-    return radioProtocolController_->GetActiveSimToRilResult() == static_cast<int32_t>(HRilErrType::NONE);
+    return radioProtocolController_->GetActiveSimToRilResult() == static_cast<int32_t>(ErrType::NONE);
 }
 
 int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, bool denied, IccAccountInfo &info)

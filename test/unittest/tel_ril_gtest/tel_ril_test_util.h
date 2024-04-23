@@ -167,7 +167,7 @@ public:
         std::mutex callbackMutex_;
         std::condition_variable cv_;
         int32_t eventId_;
-        std::shared_ptr<HRilRadioResponseInfo> resultInfo_;
+        std::shared_ptr<RadioResponseInfo> resultInfo_;
     };
 
 public:

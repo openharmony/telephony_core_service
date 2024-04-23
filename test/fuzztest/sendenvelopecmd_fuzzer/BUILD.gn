@@ -50,7 +50,6 @@ ohos_fuzztest("SendEnvelopeCmdFuzzTest") {
     "access_token:libtoken_setproc",
     "c_utils:utils",
     "core_service:libtel_common",
-    "drivers_interface_ril:hril_innerkits",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",

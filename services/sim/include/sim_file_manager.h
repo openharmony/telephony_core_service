@@ -19,7 +19,7 @@
 #include "common_event_subscriber.h"
 #include "event_handler.h"
 #include "event_runner.h"
-#include "hril_modem_parcel.h"
+#include "tel_ril_modem_parcel.h"
 #include "i_tel_ril_manager.h"
 #include "isim_file.h"
 #include "isim_file_controller.h"

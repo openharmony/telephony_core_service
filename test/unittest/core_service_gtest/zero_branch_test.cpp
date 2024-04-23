@@ -22,7 +22,7 @@
 #include "core_service_client.h"
 #include "csim_file_controller.h"
 #include "gtest/gtest.h"
-#include "hril_base_parcel.h"
+#include "tel_ril_base_parcel.h"
 #include "icc_file.h"
 #include "icc_file_controller.h"
 #include "icc_operator_rule.h"
@@ -179,19 +179,19 @@ HWTEST_F(BranchTest, Telephony_CellInfo_002, Function | MediumTest | Level1)
     EXPECT_TRUE(cellInfo->ProcessNeighboringCellCdma(&cellNearbyInfo));
     EXPECT_TRUE(cellInfo->ProcessNeighboringCellTdscdma(&cellNearbyInfo));
     EXPECT_TRUE(cellInfo->ProcessNeighboringCellNr(&cellNearbyInfo));
-    current.ratType = RatType::NETWORK_TYPE_GSM;
+    current.ratType = TelRilRatType::NETWORK_TYPE_GSM;
     EXPECT_TRUE(cellInfo->ProcessCurrentCell(&current));
-    current.ratType = RatType::NETWORK_TYPE_LTE;
+    current.ratType = TelRilRatType::NETWORK_TYPE_LTE;
     EXPECT_TRUE(cellInfo->ProcessCurrentCell(&current));
-    current.ratType = RatType::NETWORK_TYPE_WCDMA;
+    current.ratType = TelRilRatType::NETWORK_TYPE_WCDMA;
     EXPECT_TRUE(cellInfo->ProcessCurrentCell(&current));
-    current.ratType = RatType::NETWORK_TYPE_TDSCDMA;
+    current.ratType = TelRilRatType::NETWORK_TYPE_TDSCDMA;
     EXPECT_TRUE(cellInfo->ProcessCurrentCell(&current));
-    current.ratType = RatType::NETWORK_TYPE_CDMA;
+    current.ratType = TelRilRatType::NETWORK_TYPE_CDMA;
     EXPECT_TRUE(cellInfo->ProcessCurrentCell(&current));
-    current.ratType = RatType::NETWORK_TYPE_NR;
+    current.ratType = TelRilRatType::NETWORK_TYPE_NR;
     EXPECT_TRUE(cellInfo->ProcessCurrentCell(&current));
-    current.ratType = RatType::NETWORK_TYPE_UNKNOWN;
+    current.ratType = TelRilRatType::NETWORK_TYPE_UNKNOWN;
     EXPECT_FALSE(cellInfo->ProcessCurrentCell(&current));
 }
 
@@ -225,13 +225,13 @@ HWTEST_F(BranchTest, Telephony_CellInfo_003, Function | MediumTest | Level1)
     EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_EHRPD), CDMA);
     EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_NR), NR);
     EXPECT_EQ(cellInfo->ConvertTechToCellType(RadioTech::RADIO_TECHNOLOGY_UNKNOWN), NONE);
-    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_GSM), GSM);
-    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_WCDMA), WCDMA);
-    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_LTE), LTE);
-    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_CDMA), CDMA);
-    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_TDSCDMA), TDSCDMA);
-    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_NR), NR);
-    EXPECT_EQ(cellInfo->ConvertRatToCellType(RatType::NETWORK_TYPE_UNKNOWN), NONE);
+    EXPECT_EQ(cellInfo->ConvertRatToCellType(TelRilRatType::NETWORK_TYPE_GSM), GSM);
+    EXPECT_EQ(cellInfo->ConvertRatToCellType(TelRilRatType::NETWORK_TYPE_WCDMA), WCDMA);
+    EXPECT_EQ(cellInfo->ConvertRatToCellType(TelRilRatType::NETWORK_TYPE_LTE), LTE);
+    EXPECT_EQ(cellInfo->ConvertRatToCellType(TelRilRatType::NETWORK_TYPE_CDMA), CDMA);
+    EXPECT_EQ(cellInfo->ConvertRatToCellType(TelRilRatType::NETWORK_TYPE_TDSCDMA), TDSCDMA);
+    EXPECT_EQ(cellInfo->ConvertRatToCellType(TelRilRatType::NETWORK_TYPE_NR), NR);
+    EXPECT_EQ(cellInfo->ConvertRatToCellType(TelRilRatType::NETWORK_TYPE_UNKNOWN), NONE);
 }
 
 /**
@@ -445,21 +445,21 @@ HWTEST_F(BranchTest, Telephony_SimFileManager_002, Function | MediumTest | Level
     EXPECT_EQ(simFileManager.GetIccTypeByCardType(CardType::DUAL_MODE_UG_CARD), SimFileManager::IccType::ICC_TYPE_GSM);
     EXPECT_EQ(
         simFileManager.GetIccTypeByCardType(CardType::SINGLE_MODE_USIM_CARD), SimFileManager::IccType::ICC_TYPE_USIM);
-    tech->actType = HRilRadioTech::RADIO_TECHNOLOGY_EHRPD;
+    tech->actType = TelRilRadioTech::RADIO_TECHNOLOGY_EHRPD;
     EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_CDMA);
-    tech->actType = HRilRadioTech::RADIO_TECHNOLOGY_1XRTT;
+    tech->actType = TelRilRadioTech::RADIO_TECHNOLOGY_1XRTT;
     EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_CDMA);
-    tech->actType = HRilRadioTech::RADIO_TECHNOLOGY_WCDMA;
+    tech->actType = TelRilRadioTech::RADIO_TECHNOLOGY_WCDMA;
     EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_USIM);
-    tech->actType = HRilRadioTech::RADIO_TECHNOLOGY_LTE_CA;
+    tech->actType = TelRilRadioTech::RADIO_TECHNOLOGY_LTE_CA;
     EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_USIM);
-    tech->actType = HRilRadioTech::RADIO_TECHNOLOGY_LTE;
+    tech->actType = TelRilRadioTech::RADIO_TECHNOLOGY_LTE;
     EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_USIM);
-    tech->actType = HRilRadioTech::RADIO_TECHNOLOGY_GSM;
+    tech->actType = TelRilRadioTech::RADIO_TECHNOLOGY_GSM;
     EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_USIM);
-    tech->actType = HRilRadioTech::RADIO_TECHNOLOGY_TD_SCDMA;
+    tech->actType = TelRilRadioTech::RADIO_TECHNOLOGY_TD_SCDMA;
     EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_USIM);
-    tech->actType = HRilRadioTech::RADIO_TECHNOLOGY_HSPA;
+    tech->actType = TelRilRadioTech::RADIO_TECHNOLOGY_HSPA;
     EXPECT_EQ(simFileManager.GetIccTypeByTech(tech), SimFileManager::IccType::ICC_TYPE_USIM);
     EXPECT_TRUE(simFileManager.IsValidType(SimFileManager::IccType::ICC_TYPE_CDMA));
     tech = nullptr;
@@ -1652,7 +1652,7 @@ HWTEST_F(BranchTest, Telephony_SimStateHandle_002, Function | MediumTest | Level
     simStateHandle->slotId_ = INVALID_SLOTID;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STATE_CHANGED);
     simStateHandle->IsRadioStateUnavailable(event);
-    auto radioState = std::make_shared<HRilInt32Parcel>(ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
+    auto radioState = std::make_shared<Int32Parcel>(ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STATE_CHANGED, radioState);
     EXPECT_TRUE(simStateHandle->IsRadioStateUnavailable(event));
 }
@@ -1737,27 +1737,28 @@ HWTEST_F(BranchTest, Telephony_NetworkRegister_003, Function | MediumTest | Leve
     auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
     auto networkRegister = std::make_shared<NetworkRegister>(networkSearchState, networkSearchManager, INVALID_SLOTID);
     EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_GSM), RadioTech::RADIO_TECHNOLOGY_GSM);
+        networkRegister->ConvertTechFromRil(TelRilRadioTech::RADIO_TECHNOLOGY_GSM), RadioTech::RADIO_TECHNOLOGY_GSM);
+    EXPECT_EQ(networkRegister->ConvertTechFromRil(TelRilRadioTech::RADIO_TECHNOLOGY_1XRTT),
+        RadioTech::RADIO_TECHNOLOGY_1XRTT);
     EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_1XRTT), RadioTech::RADIO_TECHNOLOGY_1XRTT);
+        networkRegister->ConvertTechFromRil(TelRilRadioTech::RADIO_TECHNOLOGY_HSPA), RadioTech::RADIO_TECHNOLOGY_HSPA);
+    EXPECT_EQ(networkRegister->ConvertTechFromRil(TelRilRadioTech::RADIO_TECHNOLOGY_HSPAP),
+        RadioTech::RADIO_TECHNOLOGY_HSPAP);
+    EXPECT_EQ(networkRegister->ConvertTechFromRil(TelRilRadioTech::RADIO_TECHNOLOGY_NR),
+        RadioTech::RADIO_TECHNOLOGY_NR);
+    EXPECT_EQ(networkRegister->ConvertTechFromRil(TelRilRadioTech::RADIO_TECHNOLOGY_WCDMA),
+        RadioTech::RADIO_TECHNOLOGY_WCDMA);
     EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_HSPA), RadioTech::RADIO_TECHNOLOGY_HSPA);
+        networkRegister->ConvertTechFromRil(TelRilRadioTech::RADIO_TECHNOLOGY_LTE), RadioTech::RADIO_TECHNOLOGY_LTE);
     EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_HSPAP), RadioTech::RADIO_TECHNOLOGY_HSPAP);
-    EXPECT_EQ(networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_NR), RadioTech::RADIO_TECHNOLOGY_NR);
-    EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_WCDMA), RadioTech::RADIO_TECHNOLOGY_WCDMA);
-    EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_LTE), RadioTech::RADIO_TECHNOLOGY_LTE);
-    EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_EVDO), RadioTech::RADIO_TECHNOLOGY_EVDO);
-    EXPECT_EQ(
-        networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_EHRPD), RadioTech::RADIO_TECHNOLOGY_EHRPD);
-    EXPECT_EQ(networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_TD_SCDMA),
+        networkRegister->ConvertTechFromRil(TelRilRadioTech::RADIO_TECHNOLOGY_EVDO), RadioTech::RADIO_TECHNOLOGY_EVDO);
+    EXPECT_EQ(networkRegister->ConvertTechFromRil(TelRilRadioTech::RADIO_TECHNOLOGY_EHRPD),
+        RadioTech::RADIO_TECHNOLOGY_EHRPD);
+    EXPECT_EQ(networkRegister->ConvertTechFromRil(TelRilRadioTech::RADIO_TECHNOLOGY_TD_SCDMA),
         RadioTech::RADIO_TECHNOLOGY_TD_SCDMA);
-    EXPECT_EQ(networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_LTE_CA),
+    EXPECT_EQ(networkRegister->ConvertTechFromRil(TelRilRadioTech::RADIO_TECHNOLOGY_LTE_CA),
         RadioTech::RADIO_TECHNOLOGY_LTE_CA);
-    EXPECT_EQ(networkRegister->ConvertTechFromRil(HRilRadioTech::RADIO_TECHNOLOGY_INVALID),
+    EXPECT_EQ(networkRegister->ConvertTechFromRil(TelRilRadioTech::RADIO_TECHNOLOGY_INVALID),
         RadioTech::RADIO_TECHNOLOGY_UNKNOWN);
 }
 

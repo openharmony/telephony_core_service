@@ -649,7 +649,7 @@ int32_t TelRilManager::GetPhysicalChannelConfig(int32_t slotId, const AppExecFwk
 }
 
 int32_t TelRilManager::SetLocateUpdates(
-    int32_t slotId, HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response)
+    int32_t slotId, RegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::SetLocateUpdates, mode);
 }
