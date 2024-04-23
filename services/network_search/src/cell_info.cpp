@@ -33,13 +33,13 @@ const int32_t *TD_SCDMA_SIGNAL_THRESHOLD = SignalInformation::TD_SCDMA_SIGNAL_TH
 const int32_t *NR_SIGNAL_THRESHOLD = SignalInformation::NR_SIGNAL_THRESHOLD_5BAR;
 int32_t CellInfo::signalBar_ = SIGNAL_FIVE_BARS;
 
-const std::map<RatType, CellInfo::CallInfoFunc> CellInfo::memberFuncMap_ = {
-    {RatType::NETWORK_TYPE_GSM, &CellInfo::ProcessNeighboringCellGsm},
-    {RatType::NETWORK_TYPE_CDMA, &CellInfo::ProcessNeighboringCellCdma},
-    {RatType::NETWORK_TYPE_WCDMA, &CellInfo::ProcessNeighboringCellWcdma},
-    {RatType::NETWORK_TYPE_TDSCDMA, &CellInfo::ProcessNeighboringCellTdscdma},
-    {RatType::NETWORK_TYPE_LTE, &CellInfo::ProcessNeighboringCellLte},
-    {RatType::NETWORK_TYPE_NR, &CellInfo::ProcessNeighboringCellNr}};
+const std::map<TelRilRatType, CellInfo::CallInfoFunc> CellInfo::memberFuncMap_ = {
+    {TelRilRatType::NETWORK_TYPE_GSM, &CellInfo::ProcessNeighboringCellGsm},
+    {TelRilRatType::NETWORK_TYPE_CDMA, &CellInfo::ProcessNeighboringCellCdma},
+    {TelRilRatType::NETWORK_TYPE_WCDMA, &CellInfo::ProcessNeighboringCellWcdma},
+    {TelRilRatType::NETWORK_TYPE_TDSCDMA, &CellInfo::ProcessNeighboringCellTdscdma},
+    {TelRilRatType::NETWORK_TYPE_LTE, &CellInfo::ProcessNeighboringCellLte},
+    {TelRilRatType::NETWORK_TYPE_NR, &CellInfo::ProcessNeighboringCellNr}};
 
 CellInfo::CellInfo(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
     : networkSearchManager_(networkSearchManager), slotId_(slotId)
@@ -98,7 +98,7 @@ void CellInfo::ProcessNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer 
     std::vector<CellNearbyInfo> cell = cellInfo->cellNearbyInfo;
     for (int32_t i = 0; i < cellSize; ++i) {
         int32_t type = cell[i].ratType;
-        auto itFunc = memberFuncMap_.find(static_cast<RatType>(type));
+        auto itFunc = memberFuncMap_.find(static_cast<TelRilRatType>(type));
         if (itFunc != memberFuncMap_.end()) {
             auto memberFunc = itFunc->second;
             if (memberFunc != nullptr) {
@@ -274,17 +274,17 @@ CellInformation::CellType CellInfo::ConvertToCellType(SignalInformation::Network
 CellInformation::CellType CellInfo::ConvertRatToCellType(int ratType) const
 {
     switch (ratType) {
-        case RatType::NETWORK_TYPE_GSM:
+        case TelRilRatType::NETWORK_TYPE_GSM:
             return CellInformation::CellType::CELL_TYPE_GSM;
-        case RatType::NETWORK_TYPE_WCDMA:
+        case TelRilRatType::NETWORK_TYPE_WCDMA:
             return CellInformation::CellType::CELL_TYPE_WCDMA;
-        case RatType::NETWORK_TYPE_LTE:
+        case TelRilRatType::NETWORK_TYPE_LTE:
             return CellInformation::CellType::CELL_TYPE_LTE;
-        case RatType::NETWORK_TYPE_CDMA:
+        case TelRilRatType::NETWORK_TYPE_CDMA:
             return CellInformation::CellType::CELL_TYPE_CDMA;
-        case RatType::NETWORK_TYPE_TDSCDMA:
+        case TelRilRatType::NETWORK_TYPE_TDSCDMA:
             return CellInformation::CellType::CELL_TYPE_TDSCDMA;
-        case RatType::NETWORK_TYPE_NR:
+        case TelRilRatType::NETWORK_TYPE_NR:
             return CellInformation::CellType::CELL_TYPE_NR;
         default:
             return CellInformation::CellType::CELL_TYPE_NONE;
@@ -320,27 +320,27 @@ bool CellInfo::ProcessCurrentCell(CurrentCellInformation *cellInfo)
 {
     bool ret = false;
     switch (cellInfo->ratType) {
-        case RatType::NETWORK_TYPE_GSM: {
+        case TelRilRatType::NETWORK_TYPE_GSM: {
             ret = ProcessCurrentCellGsm(cellInfo);
             break;
         }
-        case RatType::NETWORK_TYPE_LTE: {
+        case TelRilRatType::NETWORK_TYPE_LTE: {
             ret = ProcessCurrentCellLte(cellInfo);
             break;
         }
-        case RatType::NETWORK_TYPE_WCDMA: {
+        case TelRilRatType::NETWORK_TYPE_WCDMA: {
             ret = ProcessCurrentCellWcdma(cellInfo);
             break;
         }
-        case RatType::NETWORK_TYPE_TDSCDMA: {
+        case TelRilRatType::NETWORK_TYPE_TDSCDMA: {
             ret = ProcessCurrentCellTdscdma(cellInfo);
             break;
         }
-        case RatType::NETWORK_TYPE_CDMA: {
+        case TelRilRatType::NETWORK_TYPE_CDMA: {
             ret = ProcessCurrentCellCdma(cellInfo);
             break;
         }
-        case RatType::NETWORK_TYPE_NR: {
+        case TelRilRatType::NETWORK_TYPE_NR: {
             ret = ProcessCurrentCellNr(cellInfo);
             break;
         }

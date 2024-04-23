@@ -63,7 +63,6 @@ ohos_executable("tel_sim_test") {
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
-    "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "init:libbegetutil",

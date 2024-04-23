@@ -16,10 +16,8 @@
 #include "tel_ril_call.h"
 
 #include "core_service_hisysevent.h"
-#include "hril_call_parcel.h"
-#include "hril_notification.h"
-#include "hril_request.h"
 #include "radio_event.h"
+#include "tel_ril_call_parcel.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -111,7 +109,7 @@ int32_t TelRilCall::GetCallWaitingResponse(
     int32_t ret = ConfirmSupplementOfTelRilRequestInfo(TELEPHONY_LOG_FUNC_NAME, telRilRequest);
     if (ret != TELEPHONY_SUCCESS) {
         return ret;
-    } else if (radioResponseInfo.error != HRilErrType::NONE) {
+    } else if (radioResponseInfo.error != ErrType::NONE) {
         callWaitInfoResult->result.result = TELEPHONY_ERR_FAIL;
     }
     callWaitInfoResult->result.index = telRilRequest->pointer_->GetParam();
@@ -144,7 +142,7 @@ int32_t TelRilCall::GetCallTransferInfoResponse(const HDI::Ril::V1_1::RilRadioRe
     int32_t ret = ConfirmSupplementOfTelRilRequestInfo(TELEPHONY_LOG_FUNC_NAME, telRilRequest);
     if (ret != TELEPHONY_SUCCESS) {
         return ret;
-    } else if (radioResponseInfo.error != HRilErrType::NONE) {
+    } else if (radioResponseInfo.error != ErrType::NONE) {
         cFQueryInfoList->result.result = TELEPHONY_ERR_FAIL;
     }
     cFQueryInfoList->result.index = telRilRequest->pointer_->GetParam();
@@ -168,7 +166,7 @@ int32_t TelRilCall::GetClipResponse(
     int32_t ret = ConfirmSupplementOfTelRilRequestInfo(TELEPHONY_LOG_FUNC_NAME, telRilRequest);
     if (ret != TELEPHONY_SUCCESS) {
         return ret;
-    } else if (radioResponseInfo.error != HRilErrType::NONE) {
+    } else if (radioResponseInfo.error != ErrType::NONE) {
         clipResult->result.result = TELEPHONY_ERR_FAIL;
     }
     clipResult->result.index = telRilRequest->pointer_->GetParam();
@@ -197,7 +195,7 @@ int32_t TelRilCall::GetClirResponse(
     int32_t ret = ConfirmSupplementOfTelRilRequestInfo(TELEPHONY_LOG_FUNC_NAME, telRilRequest);
     if (ret != TELEPHONY_SUCCESS) {
         return ret;
-    } else if (radioResponseInfo.error != HRilErrType::NONE) {
+    } else if (radioResponseInfo.error != ErrType::NONE) {
         result->result.result = TELEPHONY_ERR_FAIL;
     }
     result->result.index = telRilRequest->pointer_->GetParam();
@@ -226,7 +224,7 @@ int32_t TelRilCall::GetCallRestrictionResponse(
     int32_t ret = ConfirmSupplementOfTelRilRequestInfo(TELEPHONY_LOG_FUNC_NAME, telRilRequest);
     if (ret != TELEPHONY_SUCCESS) {
         return ret;
-    } else if (radioResponseInfo.error != HRilErrType::NONE) {
+    } else if (radioResponseInfo.error != ErrType::NONE) {
         callRestrictionResult->result.result = TELEPHONY_ERR_FAIL;
     }
     callRestrictionResult->result.index = telRilRequest->pointer_->GetParam();
@@ -247,10 +245,10 @@ int32_t TelRilCall::SendDtmfResponse(const HDI::Ril::V1_1::RilRadioResponseInfo 
         TELEPHONY_LOGE("telRilRequest or pointer_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::shared_ptr<HRilRadioResponseInfo> radioResponseInfo = std::make_shared<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> radioResponseInfo = std::make_shared<RadioResponseInfo>();
     radioResponseInfo->serial = responseInfo.serial;
     radioResponseInfo->flag = telRilRequest->pointer_->GetParam();
-    radioResponseInfo->error = static_cast<HRilErrType>(responseInfo.error);
+    radioResponseInfo->error = static_cast<ErrType>(responseInfo.error);
     AppExecFwk::InnerEvent::Pointer response =
         AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SEND_DTMF, radioResponseInfo, TYPE_CS);
     const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
@@ -333,7 +331,7 @@ int32_t TelRilCall::SetVoNRSwitchResponse(const HDI::Ril::V1_1::RilRadioResponse
 
 int32_t TelRilCall::GetCallList(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_GET_CALL_LIST, &HDI::Ril::V1_1::IRil::GetCallList);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::GetCallList);
 }
 
 int32_t TelRilCall::Dial(const std::string address, int32_t clirMode, const AppExecFwk::InnerEvent::Pointer &result)
@@ -341,73 +339,68 @@ int32_t TelRilCall::Dial(const std::string address, int32_t clirMode, const AppE
     HDI::Ril::V1_1::DialInfo dialInfo = {};
     dialInfo.address = address;
     dialInfo.clir = clirMode;
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_DIAL, &HDI::Ril::V1_1::IRil::Dial, dialInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::Dial, dialInfo);
 }
 
 int32_t TelRilCall::Reject(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_REJECT, &HDI::Ril::V1_1::IRil::Reject);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::Reject);
 }
 
 int32_t TelRilCall::Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_HANGUP, &HDI::Ril::V1_1::IRil::Hangup, gsmIndex);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::Hangup, gsmIndex);
 }
 
 int32_t TelRilCall::Answer(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_ANSWER, &HDI::Ril::V1_1::IRil::Answer);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::Answer);
 }
 
 int32_t TelRilCall::HoldCall(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_HOLD_CALL, &HDI::Ril::V1_1::IRil::HoldCall);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::HoldCall);
 }
 
 int32_t TelRilCall::UnHoldCall(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_UNHOLD_CALL, &HDI::Ril::V1_1::IRil::UnHoldCall);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::UnHoldCall);
 }
 
 int32_t TelRilCall::SwitchCall(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SWITCH_CALL, &HDI::Ril::V1_1::IRil::SwitchCall);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SwitchCall);
 }
 
 int32_t TelRilCall::CombineConference(int32_t callType, const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_COMBINE_CONFERENCE,
-        &HDI::Ril::V1_1::IRil::CombineConference, callType);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::CombineConference, callType);
 }
 
 int32_t TelRilCall::GetCallWaiting(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_GET_CALL_WAITING, &HDI::Ril::V1_1::IRil::GetCallWaiting);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::GetCallWaiting);
 }
 
 int32_t TelRilCall::SetCallWaiting(int32_t activate, const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SET_CALL_WAITING, &HDI::Ril::V1_1::IRil::SetCallWaiting, activate);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SetCallWaiting, activate);
 }
 
 int32_t TelRilCall::SeparateConference(
     int32_t callIndex, int32_t callType, const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SEPARATE_CONFERENCE,
-        &HDI::Ril::V1_1::IRil::SeparateConference, callIndex, callType);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SeparateConference, callIndex, callType);
 }
 
 int32_t TelRilCall::CallSupplement(int32_t type, const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_CALL_SUPPLEMENT, &HDI::Ril::V1_1::IRil::CallSupplement, type);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::CallSupplement, type);
 }
 
 int32_t TelRilCall::GetCallTransferInfo(int32_t reason, const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_GET_CALL_TRANSFER_INFO,
-        &HDI::Ril::V1_1::IRil::GetCallTransferInfo, reason);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::GetCallTransferInfo, reason);
 }
 
 int32_t TelRilCall::SetCallTransferInfo(
@@ -418,34 +411,32 @@ int32_t TelRilCall::SetCallTransferInfo(
     callForwardSetInfo.mode = mode;
     callForwardSetInfo.classx = classx;
     callForwardSetInfo.number = number;
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SET_CALL_TRANSFER_INFO,
-        &HDI::Ril::V1_1::IRil::SetCallTransferInfo, callForwardSetInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SetCallTransferInfo, callForwardSetInfo);
 }
 
 int32_t TelRilCall::GetClip(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_GET_CLIP, &HDI::Ril::V1_1::IRil::GetClip);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::GetClip);
 }
 
 int32_t TelRilCall::SetClip(const int32_t action, const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SET_CLIP, &HDI::Ril::V1_1::IRil::SetClip, action);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SetClip, action);
 }
 
 int32_t TelRilCall::GetClir(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_GET_CLIR, &HDI::Ril::V1_1::IRil::GetClir);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::GetClir);
 }
 
 int32_t TelRilCall::SetClir(const int32_t action, const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SET_CLIR, &HDI::Ril::V1_1::IRil::SetClir, action);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SetClir, action);
 }
 
 int32_t TelRilCall::GetCallRestriction(std::string fac, const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_GET_CALL_RESTRICTION,
-        &HDI::Ril::V1_1::IRil::GetCallRestriction, fac);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::GetCallRestriction, fac);
 }
 
 int32_t TelRilCall::SetCallRestriction(
@@ -455,8 +446,7 @@ int32_t TelRilCall::SetCallRestriction(
     callRestrictionInfo.fac = restrictionType;
     callRestrictionInfo.mode = mode;
     callRestrictionInfo.password = password;
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SET_CALL_RESTRICTION,
-        &HDI::Ril::V1_1::IRil::SetCallRestriction, callRestrictionInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SetCallRestriction, callRestrictionInfo);
 }
 
 int32_t TelRilCall::SendDtmf(const std::string &sDTMFCode, int32_t index, int32_t switchOn, int32_t switchOff,
@@ -468,7 +458,7 @@ int32_t TelRilCall::SendDtmf(const std::string &sDTMFCode, int32_t index, int32_
     dtmfInfo.onLength = switchOn;
     dtmfInfo.offLength = switchOff;
     dtmfInfo.stringLength = sDTMFCode.length();
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SEND_DTMF, &HDI::Ril::V1_1::IRil::SendDtmf, dtmfInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SendDtmf, dtmfInfo);
 }
 
 int32_t TelRilCall::SendDtmf(char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &result)
@@ -483,7 +473,7 @@ int32_t TelRilCall::SendDtmf(char cDTMFCode, int32_t index, const AppExecFwk::In
     dtmfInfo.onLength = DTMF_ON_LENGTH;
     dtmfInfo.offLength = DTMF_OFF_LENGTH;
     dtmfInfo.stringLength = DTMF_STRING_LENGTH;
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SEND_DTMF, &HDI::Ril::V1_1::IRil::SendDtmf, dtmfInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SendDtmf, dtmfInfo);
 }
 
 int32_t TelRilCall::StartDtmf(char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &result)
@@ -495,7 +485,7 @@ int32_t TelRilCall::StartDtmf(char cDTMFCode, int32_t index, const AppExecFwk::I
     HDI::Ril::V1_1::DtmfInfo dtmfInfo = {};
     dtmfInfo.callId = index;
     dtmfInfo.dtmfKey = dtmfKey;
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_START_DTMF, &HDI::Ril::V1_1::IRil::StartDtmf, dtmfInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::StartDtmf, dtmfInfo);
 }
 
 int32_t TelRilCall::StopDtmf(int32_t index, const AppExecFwk::InnerEvent::Pointer &result)
@@ -507,29 +497,27 @@ int32_t TelRilCall::StopDtmf(int32_t index, const AppExecFwk::InnerEvent::Pointe
     HDI::Ril::V1_1::DtmfInfo dtmfInfo = {};
     dtmfInfo.callId = index;
     dtmfInfo.dtmfKey = dtmfKey;
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_STOP_DTMF, &HDI::Ril::V1_1::IRil::StopDtmf, dtmfInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::StopDtmf, dtmfInfo);
 }
 
 int32_t TelRilCall::SetCallPreferenceMode(const int32_t mode, const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SET_CALL_PREFERENCE,
-        &HDI::Ril::V1_1::IRil::SetCallPreferenceMode, mode);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SetCallPreferenceMode, mode);
 }
 
 int32_t TelRilCall::GetCallPreferenceMode(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_GET_CALL_PREFERENCE, &HDI::Ril::V1_1::IRil::GetCallPreferenceMode);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::GetCallPreferenceMode);
 }
 
 int32_t TelRilCall::SetUssd(const std::string str, const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SET_USSD, &HDI::Ril::V1_1::IRil::SetUssd, str);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SetUssd, str);
 }
 
 int32_t TelRilCall::GetUssd(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_GET_USSD, &HDI::Ril::V1_1::IRil::GetUssd);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::GetUssd);
 }
 
 int32_t TelRilCall::SetBarringPassword(
@@ -539,20 +527,17 @@ int32_t TelRilCall::SetBarringPassword(
     setBarringInfo.fac = fac;
     setBarringInfo.oldPassword = oldPassword;
     setBarringInfo.newPassword = newPassword;
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SET_BARRING_PASSWORD,
-        &HDI::Ril::V1_1::IRil::SetBarringPassword, setBarringInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SetBarringPassword, setBarringInfo);
 }
 
 int32_t TelRilCall::CloseUnFinishedUssd(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_CLOSE_UNFINISHED_USSD, &HDI::Ril::V1_1::IRil::CloseUnFinishedUssd);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::CloseUnFinishedUssd);
 }
 
 int32_t TelRilCall::SetVoNRSwitch(int32_t state, const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, result, HREQ_SET_VONR_SWITCH, &HDI::Ril::V1_1::IRil::SetVonrSwitch, state);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SetVonrSwitch, state);
 }
 
 int32_t TelRilCall::CallStateUpdated()
@@ -593,7 +578,7 @@ int32_t TelRilCall::CallRingbackVoiceNotice(const HDI::Ril::V1_1::RingbackVoice 
         TELEPHONY_LOGE("ERROR : ringbackVoiceInfo == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ringbackVoiceInfo->status = !ringbackVoice.status;
+    ringbackVoiceInfo->status = ringbackVoice.status;
     return Notify<RingbackVoice>(TELEPHONY_LOG_FUNC_NAME, ringbackVoiceInfo, RadioEvent::RADIO_CALL_RINGBACK_VOICE);
 }
 
@@ -615,18 +600,17 @@ int32_t TelRilCall::CallRsrvccStatusNotify()
 
 int32_t TelRilCall::SetMute(const int32_t mute, const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SET_MUTE, &HDI::Ril::V1_1::IRil::SetMute, mute);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SetMute, mute);
 }
 
 int32_t TelRilCall::GetMute(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_GET_MUTE, &HDI::Ril::V1_1::IRil::GetMute);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::GetMute);
 }
 
 int32_t TelRilCall::GetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_GET_EMERGENCY_LIST, &HDI::Ril::V1_1::IRil::GetEmergencyCallList);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::GetEmergencyCallList);
 }
 
 int32_t TelRilCall::SetEmergencyCallList(
@@ -647,8 +631,7 @@ int32_t TelRilCall::SetEmergencyCallList(
         index++;
         emergencyInfoList.calls.push_back(emergencyCall);
     }
-    return Request(TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_SET_EMERGENCY_LIST,
-        &HDI::Ril::V1_1::IRil::SetEmergencyCallList, emergencyInfoList);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SetEmergencyCallList, emergencyInfoList);
 }
 
 int32_t TelRilCall::SetEmergencyCallListResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
@@ -670,8 +653,7 @@ int32_t TelRilCall::GetEmergencyCallListResponse(const HDI::Ril::V1_1::RilRadioR
 
 int32_t TelRilCall::GetCallFailReason(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, result, HREQ_CALL_GET_FAIL_REASON, &HDI::Ril::V1_1::IRil::GetCallFailReason);
+    return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::GetCallFailReason);
 }
 
 int32_t TelRilCall::CallEmergencyNotice(const HDI::Ril::V1_1::EmergencyInfoList &emergencyInfoList)
@@ -747,7 +729,7 @@ int32_t TelRilCall::ResponseSupplement(const char *funcName, const HDI::Ril::V1_
     auto resultInfo = std::make_shared<SsBaseResult>();
     resultInfo->index = telRilRequest->pointer_->GetParam();
     resultInfo->result = TELEPHONY_SUCCESS;
-    if (radioResponseInfo.error != HRilErrType::NONE) {
+    if (radioResponseInfo.error != ErrType::NONE) {
         resultInfo->result = TELEPHONY_ERR_FAIL;
     }
     return TelEventHandler::SendTelEvent(

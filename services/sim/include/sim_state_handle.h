@@ -168,7 +168,7 @@ private:
     int32_t slotId_ = DEFAULT_SIM_SLOT_ID;
     UnlockData unlockRespon_ = { UNLOCK_FAIL, TELEPHONY_ERROR, static_cast<int32_t>(LockState::LOCK_ERROR) };
     SimAuthenticationResponse simAuthRespon_ = { 0 };
-    int32_t sendSimMatchedOperatorInfoResult_ = static_cast<int32_t>(HRilErrType::NONE);
+    int32_t sendSimMatchedOperatorInfoResult_ = static_cast<int32_t>(ErrType::NONE);
     LockStatusResponse simlockRespon_ = { UNLOCK_FAIL, TELEPHONY_ERROR };
     IccState iccState_; // icc card states
     SimState externalState_; // need to broadcast sim state;

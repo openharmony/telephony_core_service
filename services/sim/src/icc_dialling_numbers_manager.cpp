@@ -125,10 +125,10 @@ void IccDiallingNumbersManager::ProcessUpdateDone(const AppExecFwk::InnerEvent::
 {
     std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
     if (object != nullptr && object->exception != nullptr) {
-        std::shared_ptr<HRilRadioResponseInfo> responseInfo =
-            std::static_pointer_cast<HRilRadioResponseInfo>(object->exception);
+        std::shared_ptr<RadioResponseInfo> responseInfo =
+            std::static_pointer_cast<RadioResponseInfo>(object->exception);
         TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessUpdateDone error %{public}d", responseInfo->error);
-        hasEventDone_ = (responseInfo->error == HRilErrType::NONE);
+        hasEventDone_ = (responseInfo->error == ErrType::NONE);
     } else {
         hasEventDone_ = true;
     }
@@ -140,10 +140,10 @@ void IccDiallingNumbersManager::ProcessWriteDone(const AppExecFwk::InnerEvent::P
 {
     std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
     if (object != nullptr && object->exception != nullptr) {
-        std::shared_ptr<HRilRadioResponseInfo> responseInfo =
-            std::static_pointer_cast<HRilRadioResponseInfo>(object->exception);
+        std::shared_ptr<RadioResponseInfo> responseInfo =
+            std::static_pointer_cast<RadioResponseInfo>(object->exception);
         TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessWriteDone error %{public}d", responseInfo->error);
-        hasEventDone_ = (responseInfo->error == HRilErrType::NONE);
+        hasEventDone_ = (responseInfo->error == ErrType::NONE);
     } else {
         hasEventDone_ = true;
     }
@@ -155,10 +155,10 @@ void IccDiallingNumbersManager::ProcessDeleteDone(const AppExecFwk::InnerEvent::
 {
     std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
     if (object != nullptr && object->exception != nullptr) {
-        std::shared_ptr<HRilRadioResponseInfo> responseInfo =
-            std::static_pointer_cast<HRilRadioResponseInfo>(object->exception);
+        std::shared_ptr<RadioResponseInfo> responseInfo =
+            std::static_pointer_cast<RadioResponseInfo>(object->exception);
         TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessDeleteDone error %{public}d", responseInfo->error);
-        hasEventDone_ = (responseInfo->error == HRilErrType::NONE);
+        hasEventDone_ = (responseInfo->error == ErrType::NONE);
     } else {
         hasEventDone_ = true;
     }

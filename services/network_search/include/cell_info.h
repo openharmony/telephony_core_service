@@ -17,7 +17,7 @@
 #define NETWORK_SEARCH_INCLUDE_CELL_INFO_H
 
 #include "event_handler.h"
-#include "hril_network_parcel.h"
+#include "tel_ril_network_parcel.h"
 #include "cell_information.h"
 #include "signal_information.h"
 #include "network_state.h"
@@ -73,7 +73,7 @@ private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
 
     using CallInfoFunc = bool (CellInfo::*)(CellNearbyInfo *);
-    static const std::map<RatType, CallInfoFunc> memberFuncMap_;
+    static const std::map<TelRilRatType, CallInfoFunc> memberFuncMap_;
     int32_t slotId_ = 0;
     static int32_t signalBar_;
 };

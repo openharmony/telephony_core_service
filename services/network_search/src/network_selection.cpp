@@ -39,7 +39,7 @@ void NetworkSelection::ProcessNetworkSearchResult(const AppExecFwk::InnerEvent::
         return;
     }
     std::shared_ptr<AvailableNetworkList> availNetworkResult = event->GetSharedObject<AvailableNetworkList>();
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
     if (availNetworkResult == nullptr && responseInfo == nullptr) {
         TELEPHONY_LOGE("NetworkSelection::ProcessNetworkSearchResult object is nullptr slotId:%{public}d", slotId_);
         return;
@@ -85,11 +85,11 @@ void NetworkSelection::ProcessGetNetworkSelectionMode(const AppExecFwk::InnerEve
         return;
     }
     std::shared_ptr<SetNetworkModeInfo> selectModeResult = event->GetSharedObject<SetNetworkModeInfo>();
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
     if (selectModeResult == nullptr && responseInfo == nullptr) {
         TELEPHONY_LOGE(
             "NetworkSelection::ProcessGetNetworkSelectionMode SelectModeResultInfo, NetworkSearchManager"
-            "or HRilRadioResponseInfo is nullptr slotId:%{public}d",
+            "or RadioResponseInfo is nullptr slotId:%{public}d",
             slotId_);
         return;
     }
@@ -138,7 +138,7 @@ void NetworkSelection::ProcessSetNetworkSelectionMode(const AppExecFwk::InnerEve
         TELEPHONY_LOGE("NetworkSelection::ProcessSetNetworkSelectionMode nsm is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
     if (responseInfo == nullptr) {
         TELEPHONY_LOGE("NetworkSelection::ProcessSetNetworkSelectionMode responseInfo is nullptr");
         return;
@@ -216,7 +216,7 @@ bool NetworkSelection::AvailNetworkResult(
 }
 
 bool NetworkSelection::ResponseInfoOfResult(
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const
+    std::shared_ptr<RadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const
 {
     if (responseInfo != nullptr) {
         TELEPHONY_LOGE("NetworkSelection::RilRadioResponseInfoOfResult error code is %{public}d slotId:%{public}d",
@@ -235,11 +235,11 @@ bool NetworkSelection::ResponseInfoOfResult(
 }
 
 bool NetworkSelection::ResponseInfoOfGet(
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const
+    std::shared_ptr<RadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const
 {
     if (responseInfo != nullptr) {
         TELEPHONY_LOGE(
-            "NetworkSelection::RilRadioResponseInfoOfGet HRilRadioResponseInfo error is %{public}d "
+            "NetworkSelection::RilRadioResponseInfoOfGet RadioResponseInfo error is %{public}d "
             "slotId:%{public}d",
             responseInfo->error, slotId_);
         index = responseInfo->flag;
@@ -258,9 +258,9 @@ bool NetworkSelection::ResponseInfoOfGet(
 }
 
 bool NetworkSelection::ResponseInfoOfSet(
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const
+    std::shared_ptr<RadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const
 {
-    if (responseInfo->error == HRilErrType::NONE) {
+    if (responseInfo->error == ErrType::NONE) {
         if (!data.WriteBool(true) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
             TELEPHONY_LOGE("NetworkSelection::ResponseInfoOfSet write data fail slotId:%{public}d", slotId_);
             return false;

@@ -54,7 +54,6 @@ ohos_fuzztest("UpdateSmsIccFuzzTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
-    "drivers_interface_ril:hril_innerkits",
     "drivers_interface_ril:libril_proxy_1.1",
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",

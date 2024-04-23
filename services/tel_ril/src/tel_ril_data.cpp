@@ -16,10 +16,8 @@
 #include "tel_ril_data.h"
 
 #include "core_service_hisysevent.h"
-#include "hril_modem_parcel.h"
-#include "hril_notification.h"
-#include "hril_request.h"
 #include "radio_event.h"
+#include "tel_ril_modem_parcel.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -46,8 +44,7 @@ int32_t TelRilData::DeactivatePdpContext(int32_t cid, int32_t reason, const AppE
     HDI::Ril::V1_1::UniInfo uniInfo;
     uniInfo.gsmIndex = cid;
     uniInfo.arg1 = reason;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_DATA_DEACTIVATE_PDP_CONTEXT,
-        &HDI::Ril::V1_1::IRil::DeactivatePdpContext, uniInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::DeactivatePdpContext, uniInfo);
 }
 
 int32_t TelRilData::DeactivatePdpContextResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
@@ -63,8 +60,7 @@ int32_t TelRilData::ActivatePdpContext(int32_t radioTechnology, DataProfile data
     dataCallInfo.dataProfileInfo = ChangeDPToHalDataProfile(dataProfile);
     dataCallInfo.roamingAllowed = allowRoaming;
     dataCallInfo.isRoaming = isRoaming;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_DATA_ACTIVATE_PDP_CONTEXT,
-        &HDI::Ril::V1_1::IRil::ActivatePdpContext, dataCallInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::ActivatePdpContext, dataCallInfo);
 }
 
 int32_t TelRilData::ActivatePdpContextResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
@@ -82,8 +78,7 @@ int32_t TelRilData::ActivatePdpContextResponse(const HDI::Ril::V1_1::RilRadioRes
 int32_t TelRilData::GetPdpContextList(const AppExecFwk::InnerEvent::Pointer &response)
 {
     HDI::Ril::V1_1::UniInfo uniInfo;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_DATA_GET_PDP_CONTEXT_LIST,
-        &HDI::Ril::V1_1::IRil::GetPdpContextList, uniInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetPdpContextList, uniInfo);
 }
 
 int32_t TelRilData::GetPdpContextListResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
@@ -108,8 +103,7 @@ int32_t TelRilData::GetPdpContextListResponse(const HDI::Ril::V1_1::RilRadioResp
 int32_t TelRilData::SetInitApnInfo(const DataProfile &dataProfile, const AppExecFwk::InnerEvent::Pointer &response)
 {
     HDI::Ril::V1_1::DataProfileDataInfo dataProfileInfo = ChangeDPToHalDataProfile(dataProfile);
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_DATA_SET_INIT_APN_INFO,
-        &HDI::Ril::V1_1::IRil::SetInitApnInfo, dataProfileInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SetInitApnInfo, dataProfileInfo);
 }
 
 int32_t TelRilData::SetInitApnInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
@@ -150,8 +144,7 @@ int32_t TelRilData::DataLinkCapabilityUpdated(const HDI::Ril::V1_1::DataLinkCapa
 
 int32_t TelRilData::GetLinkCapability(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_DATA_GET_LINK_CAPABILITY, &HDI::Ril::V1_1::IRil::GetLinkCapability);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetLinkCapability);
 }
 
 int32_t TelRilData::GetLinkCapabilityResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
@@ -171,8 +164,7 @@ int32_t TelRilData::GetLinkCapabilityResponse(const HDI::Ril::V1_1::RilRadioResp
 
 int32_t TelRilData::GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_DATA_GET_LINK_BANDWIDTH_INFO,
-        &HDI::Ril::V1_1::IRil::GetLinkBandwidthInfo, cid);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetLinkBandwidthInfo, cid);
 }
 
 int32_t TelRilData::GetLinkBandwidthInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
@@ -201,8 +193,8 @@ int32_t TelRilData::SetLinkBandwidthReportingRule(
     dLinkBandwidth.maximumDownlinkKbps = linkBandwidth.maximumDownlinkKbps;
     TELEPHONY_LOGD("maximumUplinkKbpsSize:%{public}d, maximumDownlinkKbpsSize:%{public}d",
         dLinkBandwidth.maximumUplinkKbpsSize, dLinkBandwidth.maximumDownlinkKbpsSize);
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE,
-        &HDI::Ril::V1_1::IRil::SetLinkBandwidthReportingRule, dLinkBandwidth);
+    return Request(
+        TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SetLinkBandwidthReportingRule, dLinkBandwidth);
 }
 
 int32_t TelRilData::SetLinkBandwidthReportingRuleResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
@@ -212,8 +204,7 @@ int32_t TelRilData::SetLinkBandwidthReportingRuleResponse(const HDI::Ril::V1_1::
 
 int32_t TelRilData::SetDataPermitted(const int32_t dataPermitted, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_DATA_SET_DATA_PERMITTED,
-        &HDI::Ril::V1_1::IRil::SetDataPermitted, dataPermitted);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SetDataPermitted, dataPermitted);
 }
 
 int32_t TelRilData::SetDataPermittedResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
@@ -223,8 +214,7 @@ int32_t TelRilData::SetDataPermittedResponse(const HDI::Ril::V1_1::RilRadioRespo
 
 int32_t TelRilData::CleanAllConnections(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_DATA_CLEAN_ALL_CONNECTIONS, &HDI::Ril::V1_2::IRil::CleanAllConnections);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_2::IRil::CleanAllConnections);
 }
 
 int32_t TelRilData::CleanAllConnectionsResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)

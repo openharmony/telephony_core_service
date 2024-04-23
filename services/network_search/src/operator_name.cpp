@@ -20,7 +20,7 @@
 
 #include "common_event_support.h"
 #include "core_manager_inner.h"
-#include "hril_network_parcel.h"
+#include "tel_ril_network_parcel.h"
 #include "network_search_manager.h"
 #include "operator_config_types.h"
 #include "operator_name_utils.h"

@@ -228,7 +228,7 @@ private:
     std::shared_ptr<unsigned char> CreateSavingSequence(
         const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int dataLength);
     std::shared_ptr<unsigned char> CreateNameSequence(const std::u16string &name, int &seqLength);
-    std::shared_ptr<HRilRadioResponseInfo> MakeExceptionResult(int code);
+    std::shared_ptr<RadioResponseInfo> MakeExceptionResult(int code);
     void FillNumberFiledForDiallingNumber(
         std::shared_ptr<unsigned char> diallingNumber, const std::string &number, int dataLength);
     bool FormatNameAndNumber(std::shared_ptr<DiallingNumbersInfo> &diallingNumber, bool isDel);

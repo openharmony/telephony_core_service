@@ -140,13 +140,13 @@ void IccDiallingNumbersCache::ProcessChangeDiallingNumbersDone(const AppExecFwk:
         if (fd->exception == nullptr) {
             diallingNumberFileList_.at(fileId)->at(index - 1) = diallingNumber;
         } else {
-            std::shared_ptr<HRilRadioResponseInfo> responseInfo =
-                std::static_pointer_cast<HRilRadioResponseInfo>(fd->exception);
+            std::shared_ptr<RadioResponseInfo> responseInfo =
+                std::static_pointer_cast<RadioResponseInfo>(fd->exception);
             if (responseInfo == nullptr) {
                 TELEPHONY_LOGE("responseInfo is nullptr");
                 return;
             }
-            if (responseInfo->error == HRilErrType::NONE) {
+            if (responseInfo->error == ErrType::NONE) {
                 diallingNumberFileList_.at(fileId)->at(index - 1) = diallingNumber;
             }
         }
@@ -293,8 +293,8 @@ void IccDiallingNumbersCache::ObtainAllDiallingNumberFiles(
 void IccDiallingNumbersCache::SendExceptionResult(const AppExecFwk::InnerEvent::Pointer &caller, int errCode)
 {
     std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList = nullptr;
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = std::make_shared<HRilRadioResponseInfo>();
-    responseInfo->error = static_cast<Telephony::HRilErrType>(errCode);
+    std::shared_ptr<RadioResponseInfo> responseInfo = std::make_shared<RadioResponseInfo>();
+    responseInfo->error = static_cast<Telephony::ErrType>(errCode);
     std::shared_ptr<void> exception = static_cast<std::shared_ptr<void>>(responseInfo);
     SendBackResult(caller, diallingNumberList, exception);
 }

@@ -344,7 +344,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
         TELEPHONY_LOGE("NetworkSearchHandler::RadioStateChange event is nullptr!");
         return;
     }
-    std::shared_ptr<HRilInt32Parcel> object = event->GetSharedObject<HRilInt32Parcel>();
+    std::shared_ptr<Int32Parcel> object = event->GetSharedObject<Int32Parcel>();
     if (object == nullptr) {
         TELEPHONY_LOGE("NetworkSearchHandler::RadioStateChange object is nullptr!");
         return;

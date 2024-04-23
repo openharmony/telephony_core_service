@@ -22,7 +22,7 @@
 #include "common_event_publish_info.h"
 #include "common_event_support.h"
 #include "extension_ability_info.h"
-#include "hril_types.h"
+#include "tel_ril_types.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "parameters.h"
@@ -454,12 +454,12 @@ void StkController::OnSendTerminalResponseResult(const AppExecFwk::InnerEvent::P
         TELEPHONY_LOGE("StkController[%{public}d]::OnSendTerminalResponseResult() event is nullptr", slotId_);
         return;
     }
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if (response == nullptr) {
         TELEPHONY_LOGE("StkController[%{public}d]::OnSendTerminalResponseResult() response is nullptr", slotId_);
         return;
     }
-    terminalResponseResult_ = response->error == HRilErrType::NONE;
+    terminalResponseResult_ = response->error == ErrType::NONE;
     TELEPHONY_LOGI("StkController[%{public}d]::OnSendTerminalResponseResult(), result = %{public}d",
         slotId_, terminalResponseResult_);
     responseFinished_ = true;
@@ -472,12 +472,12 @@ void StkController::OnSendEnvelopeCmdResult(const AppExecFwk::InnerEvent::Pointe
         TELEPHONY_LOGE("StkController[%{public}d]::OnSendEnvelopeCmdResult() event is nullptr", slotId_);
         return;
     }
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if (response == nullptr) {
         TELEPHONY_LOGE("StkController[%{public}d]::OnSendEnvelopeCmdResult() response is nullptr", slotId_);
         return;
     }
-    envelopeResponseResult_ = response->error == HRilErrType::NONE;
+    envelopeResponseResult_ = response->error == ErrType::NONE;
     TELEPHONY_LOGI("StkController[%{public}d]::OnSendEnvelopeCmdResult(), result = %{public}d",
         slotId_, envelopeResponseResult_);
     responseFinished_ = true;
@@ -490,12 +490,12 @@ void StkController::OnSendCallSetupRequestResult(const AppExecFwk::InnerEvent::P
         TELEPHONY_LOGE("StkController[%{public}d]::OnSendCallSetupRequestResult() event is nullptr", slotId_);
         return;
     }
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if (response == nullptr) {
         TELEPHONY_LOGE("StkController[%{public}d]::OnSendCallSetupRequestResult() response is nullptr", slotId_);
         return;
     }
-    callSetupResponseResult_ = response->error == HRilErrType::NONE ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_FAIL;
+    callSetupResponseResult_ = response->error == ErrType::NONE ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_FAIL;
     TELEPHONY_LOGI("StkController[%{public}d]::OnSendCallSetupRequestResult(), result = %{public}d",
         slotId_, callSetupResponseResult_);
     responseFinished_ = true;

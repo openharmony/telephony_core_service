@@ -20,7 +20,7 @@
 #include "common_event_support.h"
 #include "core_service_hisysevent.h"
 #include "hilog/log.h"
-#include "hril_sim_parcel.h"
+#include "tel_ril_sim_parcel.h"
 #include "if_system_ability_manager.h"
 #include "inner_event.h"
 #include "iservice_registry.h"
@@ -467,7 +467,7 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
     int32_t error = 0;
     IccState iccState;
     std::shared_ptr<CardStatusInfo> param = event->GetSharedObject<CardStatusInfo>();
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
         TELEPHONY_LOGE("SimStateHandle::GetSimCardData() fail");
         return;
@@ -491,7 +491,7 @@ void SimStateHandle::GetSimLockState(int32_t slotId, const AppExecFwk::InnerEven
     TELEPHONY_LOGI("SimStateHandle::GetSimLockState slotId = %{public}d", slotId);
     int32_t error = 0;
     std::shared_ptr<int32_t> param = event->GetSharedObject<int32_t>();
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
         TELEPHONY_LOGE("SimStateHandle::GetSimLockState() fail");
         return;
@@ -511,7 +511,7 @@ void SimStateHandle::GetSetLockResult(int32_t slotId, const AppExecFwk::InnerEve
 {
     TELEPHONY_LOGI("SimStateHandle::GetSetLockResult slotId = %{public}d", slotId);
     std::shared_ptr<LockStatusResp> param = event->GetSharedObject<LockStatusResp>();
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
         TELEPHONY_LOGE("SimStateHandle::GetSetLockResult() fail");
         return;
@@ -531,7 +531,7 @@ void SimStateHandle::GetUnlockResult(int32_t slotId, const AppExecFwk::InnerEven
 {
     TELEPHONY_LOGI("SimStateHandle::GetUnlockResult slotId = %{public}d", slotId);
     std::shared_ptr<LockStatusResp> param = event->GetSharedObject<LockStatusResp>();
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
         TELEPHONY_LOGE("SimStateHandle::GetSimUnlockResult() fail");
         return;
@@ -552,7 +552,7 @@ void SimStateHandle::GetUnlockSimLockResult(int32_t slotId, const AppExecFwk::In
 {
     TELEPHONY_LOGI("SimStateHandle::GetUnlockSimLockResult slotId = %{public}d", slotId);
     std::shared_ptr<LockStatusResp> param = event->GetSharedObject<LockStatusResp>();
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
         TELEPHONY_LOGE("SimStateHandle::GetUnlockSimLockResult() fail");
         return;
@@ -584,7 +584,7 @@ void SimStateHandle::GetSendSimMatchedOperatorInfoResult(
     int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("SimStateHandle::GetSendSimMatchedOperatorInfoResult slotId = %{public}d", slotId);
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if (response == nullptr) {
         TELEPHONY_LOGE("SimStateHandle::GetSendSimMatchedOperatorInfoResult() fail");
         return;
@@ -883,7 +883,7 @@ void SimStateHandle::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::Even
 
 bool SimStateHandle::IsRadioStateUnavailable(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::shared_ptr<HRilInt32Parcel> object = event->GetSharedObject<HRilInt32Parcel>();
+    std::shared_ptr<Int32Parcel> object = event->GetSharedObject<Int32Parcel>();
     if (object == nullptr) {
         TELEPHONY_LOGE("object is nullptr!");
         return false;
