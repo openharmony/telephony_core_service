@@ -54,6 +54,14 @@ const std::map<uint32_t, SimStateHandle::Func> SimStateHandle::memberFuncMap_ = 
     { MSG_SIM_AUTHENTICATION_DONE, &SimStateHandle::GetSimAuthenticationResult },
     { MSG_SIM_SEND_NCFG_OPER_INFO_DONE, &SimStateHandle::GetSendSimMatchedOperatorInfoResult },
 };
+const std::map<int32_t, std::string> simStatusMap_ = {
+    { static_cast<int32_t>(SimState::SIM_STATE_UNKNOWN), "SIM_STATE_UNKNOWN" },
+    { static_cast<int32_t>(SimState::SIM_STATE_NOT_PRESENT), "SIM_STATE_NOT_PRESENT" },
+    { static_cast<int32_t>(SimState::SIM_STATE_LOCKED), "SIM_STATE_LOCKED" },
+    { static_cast<int32_t>(SimState::SIM_STATE_NOT_READY), "SIM_STATE_NOT_READY" },
+    { static_cast<int32_t>(SimState::SIM_STATE_READY), "SIM_STATE_READY" },
+    { static_cast<int32_t>(SimState::SIM_STATE_LOADED), "SIM_STATE_LOADED" },
+};
 
 SimStateHandle::SimStateHandle(const std::weak_ptr<SimStateManager> &simStateManager)
     : TelEventHandler("SimStateHandle"), simStateManager_(simStateManager)
@@ -313,8 +321,9 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
     const int32_t newSimType = ar.simType_;
     const int32_t newSimStatus = ar.simStatus_;
     iccState_ = ar;
-    TELEPHONY_LOGI(
-        "SimStateHandle::ProcessIccCardState SimType[%{public}d], SimStatus[%{public}d]", newSimType, newSimStatus);
+    auto iter = simStatusMap_.find(newSimStatus);
+    TELEPHONY_LOGI("SimStateHandle::ProcessIccCardState SimType[%{public}d], SimStatus[%{public}s](%{public}d)",
+        newSimType, iter->second.c_str(), newSimStatus);
     if (oldSimType_ != newSimType) {
         CardTypeEscape(newSimType, slotId);
         oldSimType_ = newSimType;
@@ -322,9 +331,10 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
     if (oldSimStatus_ != newSimStatus) {
         SimStateEscape(newSimStatus, slotId, reason);
         oldSimStatus_ = newSimStatus;
-        TELEPHONY_LOGI(
-            "will to NotifyIccStateChanged at newSimStatus[%{public}d] observerHandler_ is nullptr[%{public}d] ",
-            newSimStatus, (observerHandler_ == nullptr));
+        iter = simStatusMap_.find(newSimStatus);
+        TELEPHONY_LOGI("will to NotifyIccStateChanged at newSimStatus[%{public}s]"
+                       "(%{public}d) observerHandler_ is nullptr[%{public}d] ",
+            iter->second.c_str(), newSimStatus, (observerHandler_ == nullptr));
         if (observerHandler_ != nullptr) {
             observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_CHANGE, slotId);
         }
