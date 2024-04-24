@@ -28,6 +28,7 @@
 #include "set_preferred_network_callback.h"
 #include "set_radio_state_callback.h"
 #include "system_ability_definition.h"
+#include "tel_event_handler.h"
 #include "unistd.h"
 
 using namespace OHOS::Telephony;
@@ -315,6 +316,11 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     RegisterImsRegInfoCallback(data, size);
     UnRegisterImsRegInfoCallback(data, size);
     GetSimOperatorNumeric(data, size);
+    auto telRilManager = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
+    if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
+        return;
+    }
+    telRilManager->handler_->ClearFfrt(true);
     return;
 }
 } // namespace OHOS
