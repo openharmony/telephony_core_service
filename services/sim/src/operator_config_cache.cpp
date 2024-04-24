@@ -15,11 +15,11 @@
 #include "operator_config_cache.h"
 
 #include <fstream>
-#include <json/json.h>
 #include <openssl/sha.h>
 #include <string_ex.h>
 #include <telephony_types.h>
 
+#include "cJSON.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_manager_inner.h"
@@ -79,6 +79,20 @@ void OperatorConfigCache::ClearMemoryCache(int32_t slotId)
     opc_.configValue.clear();
 }
 
+void OperatorConfigCache::UpdateCurrentOpc(
+    int32_t slotId, OperatorConfig &poc, bool canAnnounceChanged, bool needUpdateLoading)
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    CopyOperatorConfig(poc, opc_);
+    lock.unlock();
+    if (canAnnounceChanged) {
+        AnnounceOperatorConfigChanged(slotId);
+    }
+    if (needUpdateLoading) {
+        isLoadingConfig = false;
+    }
+}
+
 int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &poc)
 {
     auto simFileManager = simFileManager_.lock();
@@ -98,35 +112,34 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
     CoreManagerInner::GetInstance().GetSimState(slotId, simState);
     TELEPHONY_LOGI("LoadOperatorConfig simState = %{public}d", simState);
     bool canAnnounceChanged = (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_READY);
-    Json::Value opcJson;
-    if (parser_.ParseOperatorConfigFromFile(poc, parser_.GetOperatorConfigFilePath(filename), opcJson)) {
+    cJSON *root = nullptr;
+    if (parser_.ParseOperatorConfigFromFile(poc, parser_.GetOperatorConfigFilePath(filename), root)) {
         TELEPHONY_LOGI("load from file success opc size %{public}zu", poc.configValue.size());
         if (poc.configValue.size() > 0) {
-            std::unique_lock<std::mutex> lock(mutex_);
-            CopyOperatorConfig(poc, opc_);
-            lock.unlock();
-            if (canAnnounceChanged) {
-                AnnounceOperatorConfigChanged(slotId);
-            }
+            UpdateCurrentOpc(slotId, poc, canAnnounceChanged, false);
+            root = nullptr;
             return TELEPHONY_ERR_SUCCESS;
         }
     }
-    if (parser_.ParseFromCustomSystem(slotId, poc, opcJson)) {
+    root = cJSON_CreateObject();
+    if (parser_.ParseFromCustomSystem(slotId, poc, root)) {
         TELEPHONY_LOGI("load from custom system success");
-        parser_.WriteOperatorConfigJson(filename, opcJson);
+        parser_.WriteOperatorConfigJson(filename, root);
 
         if (poc.configValue.size() > 0) {
-            std::unique_lock<std::mutex> lock(mutex_);
-            CopyOperatorConfig(poc, opc_);
-            lock.unlock();
-            if (canAnnounceChanged) {
-                AnnounceOperatorConfigChanged(slotId);
+            UpdateCurrentOpc(slotId, poc, canAnnounceChanged, true);
+            if (root != nullptr) {
+                cJSON_Delete(root);
+                root = nullptr;
             }
-            isLoadingConfig = false;
             return TELEPHONY_ERR_SUCCESS;
         }
     }
     isLoadingConfig = false;
+    if (root != nullptr) {
+        cJSON_Delete(root);
+        root = nullptr;
+    }
     return CORE_ERR_OPERATOR_CONF_NOT_EXIT;
 }
 

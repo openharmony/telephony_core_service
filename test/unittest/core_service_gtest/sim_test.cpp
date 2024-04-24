@@ -88,10 +88,14 @@ HWTEST_F(SimTest, Telephony_Sim_ParseFromCustomSystem_0100, Function | MediumTes
         }
         OperatorConfig opc;
         OperatorFileParser parser;
-        Json::Value opcJsonValue;
+        cJSON *opcJsonValue = nullptr;
         if (isCanGetFromDefaultCustomSystemNormal) {
             EXPECT_EQ(parser.ParseFromCustomSystem(SimTest::slotId_, opc, opcJsonValue),
                 isCanGetFromDefaultCustomSystemNormal);
+        }
+        if (opcJsonValue != nullptr) {
+            cJSON_Delete(opcJsonValue);
+            opcJsonValue = nullptr;
         }
     }
 }
@@ -139,10 +143,14 @@ HWTEST_F(SimTest, Telephony_Sim_ParseFromCustomSystem_0300, Function | MediumTes
         }
         OperatorConfig opc;
         OperatorFileParser parser;
-        Json::Value opcJsonValue;
+        cJSON *opcJsonValue = nullptr;
         if (isCanGetFromDefaultCustomSystemNormal) {
             EXPECT_EQ(parser.ParseFromCustomSystem(SimTest::slotId1_, opc, opcJsonValue),
                 isCanGetFromDefaultCustomSystemNormal);
+        }
+        if (opcJsonValue != nullptr) {
+            cJSON_Delete(opcJsonValue);
+            opcJsonValue = nullptr;
         }
     }
 }

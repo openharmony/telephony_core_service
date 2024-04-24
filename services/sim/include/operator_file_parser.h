@@ -15,8 +15,8 @@
 
 #ifndef OHOS_OPERATOR_FILE_PARSER_H
 #define OHOS_OPERATOR_FILE_PARSER_H
-#include <json/json.h>
 
+#include "cJSON.h"
 #include "core_service_errors.h"
 #include "operator_config_types.h"
 #include "sim_state_type.h"
@@ -26,20 +26,23 @@ namespace OHOS {
 namespace Telephony {
 class OperatorFileParser {
 public:
-    bool ParseFromCustomSystem(int32_t slotId, OperatorConfig &opc, Json::Value &opcJson);
-    bool ParseOperatorConfigFromFile(OperatorConfig &poc, const std::string &path, Json::Value &opcJson);
-    bool WriteOperatorConfigJson(std::string filename, const Json::Value &root);
+    bool ParseFromCustomSystem(int32_t slotId, OperatorConfig &opc, cJSON *root);
+    bool ParseOperatorConfigFromFile(
+        OperatorConfig &poc, const std::string &path, cJSON *root, bool needSaveTempOpc = false);
+    bool WriteOperatorConfigJson(std::string filename, const cJSON *root);
     std::string GetOperatorConfigFilePath(std::string filename);
     void ClearFilesCache();
     bool isCachePathExit();
     virtual ~OperatorFileParser();
 
 private:
-    void ParseOperatorConfigFromJson(const Json::Value &root, OperatorConfig &poc);
+    void ParseOperatorConfigFromJson(const cJSON *root, OperatorConfig &poc, bool needSaveTempOpc);
     int32_t LoaderJsonFile(char *&content, const std::string &path);
-    void ParseArray(const std::string key, const Json::Value &arrayValue_, OperatorConfig &poc);
+    void CreateJsonFromOperatorConfig(cJSON *root);
+    void ParseArray(const std::string key, const cJSON *value, OperatorConfig &poc);
     bool CloseFile(FILE *f);
     void DeleteFiles();
+    std::map<std::string, std::string> tempConfig_;
     inline static const char *DEFAULT_OPERATE_CONFIG_PATH = "etc/telephony/operator_config.json";
     inline static const char *DEFAULT_OPERATE_CONFIG_DIR = "/data/service/el1/public/telephony/operatorconfig";
     inline static const int MODE_SLOT_0 = 11;
