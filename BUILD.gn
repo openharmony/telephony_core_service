@@ -165,7 +165,6 @@ ohos_shared_library("tel_core_service") {
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
-    "drivers_interface_ril:hril_innerkits",
     "drivers_interface_ril:libril_proxy_1.1",
     "drivers_interface_ril:libril_proxy_1.2",
     "drivers_interface_ril:libril_proxy_1.3",

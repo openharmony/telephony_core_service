@@ -16,7 +16,7 @@
 #ifndef TEL_RIL_SIM_H
 #define TEL_RIL_SIM_H
 
-#include "hril_sim_parcel.h"
+#include "tel_ril_sim_parcel.h"
 #include "tel_ril_base.h"
 #include "telephony_types.h"
 
@@ -112,7 +112,7 @@ private:
     int32_t ProcessIccIoInfo(
         std::shared_ptr<TelRilRequest> telRilRequest, std::shared_ptr<IccIoResultInfo> iccIoResult);
     int32_t ErrorIccIoResponse(
-        std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo);
+        std::shared_ptr<TelRilRequest> telRilRequest, const RadioResponseInfo &responseInfo);
     void BuildIccIoResult(std::shared_ptr<IccIoResultInfo> iccIoResult, const HDI::Ril::V1_1::IccIoResultInfo &result);
     void BuildCardStatusInfo(
         std::shared_ptr<CardStatusInfo> cardStatusInfo, const HDI::Ril::V1_1::CardStatusInfo &result);

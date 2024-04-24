@@ -20,7 +20,7 @@
 #include <map>
 #include "event_handler.h"
 
-#include "hril_network_parcel.h"
+#include "tel_ril_network_parcel.h"
 #include "network_search_state.h"
 
 namespace OHOS {
@@ -64,7 +64,7 @@ public:
 
 private:
     RegServiceState ConvertRegFromRil(RilRegister code) const;
-    RadioTech ConvertTechFromRil(HRilRadioTech code) const;
+    RadioTech ConvertTechFromRil(TelRilRadioTech code) const;
     void UpdateNrState();
     int32_t UpdateNsaState(int32_t nsaState);
     void NotifyNrFrequencyChanged();

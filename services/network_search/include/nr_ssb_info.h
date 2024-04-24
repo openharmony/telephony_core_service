@@ -17,7 +17,7 @@
 #define NETWORK_SEARCH_INCLUDE_NR_SSB_INFO_H
 
 #include "event_handler.h"
-#include "hril_network_parcel.h"
+#include "tel_ril_network_parcel.h"
 #include "nr_ssb_information.h"
 
 namespace OHOS {

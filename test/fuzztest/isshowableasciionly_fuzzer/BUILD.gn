@@ -48,7 +48,6 @@ ohos_fuzztest("IsShowableAsciiOnlyFuzzTest") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "c_utils:utils",
-    "drivers_interface_ril:hril_innerkits",
     "drivers_interface_ril:ril_idl_headers",
     "hilog:libhilog",
     "init:libbegetutil",

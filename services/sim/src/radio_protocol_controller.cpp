@@ -352,8 +352,8 @@ bool RadioProtocolController::ProcessResponseInfoOfEvent(const AppExecFwk::Inner
         TELEPHONY_LOGE("RadioProtocolController::ProcessResponseInfoOfEvent event is nullptr");
         return false;
     }
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
-    if (responseInfo != nullptr && responseInfo->error != HRilErrType::NONE) {
+    std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
+    if (responseInfo != nullptr && responseInfo->error != ErrType::NONE) {
         TELEPHONY_LOGE("RadioProtocolController::ProcessResponseInfoOfEvent error:%{public}d", responseInfo->error);
         communicationFailed_ = true;
         return true;
@@ -440,8 +440,8 @@ void RadioProtocolController::ProcessActiveSimToRilResponse(const AppExecFwk::In
     }
     TELEPHONY_LOGI("RadioProtocolController::GetSetActiveSimResult");
     int32_t result = 0;
-    std::shared_ptr<HRilErrType> param = event->GetSharedObject<HRilErrType>();
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<ErrType> param = event->GetSharedObject<ErrType>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
         TELEPHONY_LOGE("RadioProtocolController::GetSetActiveSimResult() fail");
         RadioProtocolControllerContinue();

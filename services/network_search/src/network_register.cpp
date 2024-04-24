@@ -18,7 +18,7 @@
 #include <cinttypes>
 
 #include "core_service_hisysevent.h"
-#include "hril_modem_parcel.h"
+#include "tel_ril_modem_parcel.h"
 #include "i_network_search_callback.h"
 #include "network_search_manager.h"
 #include "parameter.h"
@@ -105,7 +105,7 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
         return;
     }
     UpdateCellularCall(regStatus, CS_TYPE);
-    RadioTech tech = ConvertTechFromRil(static_cast<HRilRadioTech>(csRegStateResult->radioTechnology));
+    RadioTech tech = ConvertTechFromRil(static_cast<TelRilRadioTech>(csRegStateResult->radioTechnology));
     RoamingType roam = RoamingType::ROAMING_STATE_UNKNOWN;
     if (registrationStatus == RilRegister::REG_STATE_ROAMING) {
         roam = RoamingType::ROAMING_STATE_UNSPEC;
@@ -164,7 +164,7 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
         return;
     }
     UpdateCellularCall(regStatus, IMS_TYPE);
-    RadioTech tech = ConvertTechFromRil(static_cast<HRilRadioTech>(psRegStatusResult->radioTechnology));
+    RadioTech tech = ConvertTechFromRil(static_cast<TelRilRadioTech>(psRegStatusResult->radioTechnology));
     RoamingType roam = RoamingType::ROAMING_STATE_UNKNOWN;
     if (registrationStatus == RilRegister::REG_STATE_ROAMING) {
         roam = RoamingType::ROAMING_STATE_UNSPEC;
@@ -417,30 +417,30 @@ RegServiceState NetworkRegister::GetRegServiceState() const
     return regStatusResult_;
 }
 
-RadioTech NetworkRegister::ConvertTechFromRil(HRilRadioTech code) const
+RadioTech NetworkRegister::ConvertTechFromRil(TelRilRadioTech code) const
 {
     switch (code) {
-        case HRilRadioTech::RADIO_TECHNOLOGY_GSM:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_GSM:
             return RadioTech::RADIO_TECHNOLOGY_GSM;
-        case HRilRadioTech::RADIO_TECHNOLOGY_1XRTT:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_1XRTT:
             return RadioTech::RADIO_TECHNOLOGY_1XRTT;
-        case HRilRadioTech::RADIO_TECHNOLOGY_HSPA:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_HSPA:
             return RadioTech::RADIO_TECHNOLOGY_HSPA;
-        case HRilRadioTech::RADIO_TECHNOLOGY_HSPAP:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_HSPAP:
             return RadioTech::RADIO_TECHNOLOGY_HSPAP;
-        case HRilRadioTech::RADIO_TECHNOLOGY_WCDMA:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_WCDMA:
             return RadioTech::RADIO_TECHNOLOGY_WCDMA;
-        case HRilRadioTech::RADIO_TECHNOLOGY_LTE:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_LTE:
             return RadioTech::RADIO_TECHNOLOGY_LTE;
-        case HRilRadioTech::RADIO_TECHNOLOGY_EVDO:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_EVDO:
             return RadioTech::RADIO_TECHNOLOGY_EVDO;
-        case HRilRadioTech::RADIO_TECHNOLOGY_EHRPD:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_EHRPD:
             return RadioTech::RADIO_TECHNOLOGY_EHRPD;
-        case HRilRadioTech::RADIO_TECHNOLOGY_TD_SCDMA:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_TD_SCDMA:
             return RadioTech::RADIO_TECHNOLOGY_TD_SCDMA;
-        case HRilRadioTech::RADIO_TECHNOLOGY_LTE_CA:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_LTE_CA:
             return RadioTech::RADIO_TECHNOLOGY_LTE_CA;
-        case HRilRadioTech::RADIO_TECHNOLOGY_NR:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_NR:
             return RadioTech::RADIO_TECHNOLOGY_NR;
         default:
             return RadioTech::RADIO_TECHNOLOGY_UNKNOWN;

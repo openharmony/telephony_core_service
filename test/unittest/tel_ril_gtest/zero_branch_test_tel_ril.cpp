@@ -112,34 +112,34 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Base_001, Function | MediumTest | L
     auto telRilBase = std::make_shared<TelRilBase>(SLOT_ID, rilInterface, observerHandler, nullptr);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
     event = nullptr;
-    telRilBase->GetSerialId(event, 0);
+    telRilBase->GetSerialId(event);
     rilInterface = nullptr;
     telRilBase = std::make_shared<TelRilBase>(SLOT_ID, rilInterface, observerHandler, nullptr);
-    telRilBase->GetSerialId(event, 0);
+    telRilBase->GetSerialId(event);
 
-    HRilRadioResponseInfo responseInfo;
+    RadioResponseInfo responseInfo;
     std::shared_ptr<TelRilRequest> telRilRequest = nullptr;
     telRilBase->DfxWriteCallFaultEvent(telRilRequest, 1);
     EXPECT_NE(telRilBase->ErrorResponse(telRilRequest, responseInfo), TELEPHONY_ERR_SUCCESS);
 
-    telRilRequest = std::make_shared<TelRilRequest>(0, 0, event);
+    telRilRequest = std::make_shared<TelRilRequest>(0, event);
     telRilBase->DfxWriteCallFaultEvent(telRilRequest, 1);
     EXPECT_NE(telRilBase->ErrorResponse(telRilRequest, responseInfo), TELEPHONY_ERR_SUCCESS);
 
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_DIAL);
-    telRilRequest = std::make_shared<TelRilRequest>(0, 0, event);
+    telRilRequest = std::make_shared<TelRilRequest>(0, event);
     telRilBase->DfxWriteCallFaultEvent(telRilRequest, 1);
 
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_ACCEPT_CALL);
-    telRilRequest = std::make_shared<TelRilRequest>(0, 0, event);
+    telRilRequest = std::make_shared<TelRilRequest>(0, event);
     telRilBase->DfxWriteCallFaultEvent(telRilRequest, 1);
 
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_REJECT_CALL);
-    telRilRequest = std::make_shared<TelRilRequest>(0, 0, event);
+    telRilRequest = std::make_shared<TelRilRequest>(0, event);
     telRilBase->DfxWriteCallFaultEvent(telRilRequest, 1);
 
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_HANGUP_CONNECT);
-    telRilRequest = std::make_shared<TelRilRequest>(0, 0, event);
+    telRilRequest = std::make_shared<TelRilRequest>(0, event);
     telRilBase->DfxWriteCallFaultEvent(telRilRequest, 1);
 }
 
@@ -294,17 +294,17 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Sim_001, Function | MediumTest | Le
     auto telRilSim = std::make_shared<TelRilSim>(SLOT_ID, rilInterface, observerHandler, nullptr);
 
     std::shared_ptr<TelRilRequest> telRilRequest = nullptr;
-    HRilRadioResponseInfo responseInfo;
+    RadioResponseInfo responseInfo;
     std::shared_ptr<IccIoResultInfo> result = nullptr;
     EXPECT_NE(telRilSim->ErrorIccIoResponse(telRilRequest, responseInfo), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(telRilSim->ProcessIccIoInfo(telRilRequest, result), TELEPHONY_ERR_SUCCESS);
 
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
-    telRilRequest = std::make_shared<TelRilRequest>(0, 0, event);
+    telRilRequest = std::make_shared<TelRilRequest>(0, event);
     EXPECT_NE(telRilSim->ProcessIccIoInfo(telRilRequest, result), TELEPHONY_ERR_SUCCESS);
 
     event = nullptr;
-    telRilRequest = std::make_shared<TelRilRequest>(0, 0, event);
+    telRilRequest = std::make_shared<TelRilRequest>(0, event);
     EXPECT_NE(telRilSim->ErrorIccIoResponse(telRilRequest, responseInfo), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(telRilSim->ProcessIccIoInfo(telRilRequest, result), TELEPHONY_ERR_SUCCESS);
 
@@ -314,7 +314,7 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Sim_001, Function | MediumTest | Le
     EXPECT_NE(telRilSim->ResponseIccIo(info, resultInfo), TELEPHONY_ERR_SUCCESS);
 
     responseInfo.serial = 1;
-    telRilSim->CreateTelRilRequest(0, event);
+    telRilSim->CreateTelRilRequest(event);
     EXPECT_NE(telRilSim->ResponseIccIo(info, resultInfo), TELEPHONY_ERR_SUCCESS);
 }
 
@@ -350,12 +350,12 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Call_001, Function | MediumTest | L
     telRilCall->SendDtmfResponse(responseInfo);
 
     responseInfo.serial = 1;
-    telRilCall->CreateTelRilRequest(0, event);
+    telRilCall->CreateTelRilRequest(event);
     telRilCall->SendDtmfResponse(responseInfo);
 
     event = nullptr;
     responseInfo.serial = 2;
-    telRilCall->CreateTelRilRequest(0, event);
+    telRilCall->CreateTelRilRequest(event);
     telRilCall->SendDtmfResponse(responseInfo);
 }
 } // namespace Telephony

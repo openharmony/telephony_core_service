@@ -19,7 +19,7 @@
 #include <memory>
 
 #include "event_handler.h"
-#include "hril_network_parcel.h"
+#include "tel_ril_network_parcel.h"
 #include "iremote_stub.h"
 
 namespace OHOS {
@@ -39,11 +39,11 @@ private:
     bool SelectModeResult(
         std::shared_ptr<SetNetworkModeInfo> selectModeResult, MessageParcel &data, int64_t &index) const;
     bool ResponseInfoOfResult(
-        std::shared_ptr<HRilRadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const;
+        std::shared_ptr<RadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const;
     bool ResponseInfoOfGet(
-        std::shared_ptr<HRilRadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const;
+        std::shared_ptr<RadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const;
     bool ResponseInfoOfSet(
-        std::shared_ptr<HRilRadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const;
+        std::shared_ptr<RadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const;
 
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     int32_t slotId_ = 0;

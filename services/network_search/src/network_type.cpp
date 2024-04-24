@@ -34,7 +34,7 @@ void NetworkType::ProcessGetPreferredNetwork(const AppExecFwk::InnerEvent::Point
     }
     std::shared_ptr<PreferredNetworkTypeInfo> preferredNetworkInfo =
         event->GetSharedObject<PreferredNetworkTypeInfo>();
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
     if (preferredNetworkInfo == nullptr && responseInfo == nullptr) {
         TELEPHONY_LOGE("NetworkType::ProcessGetPreferredNetwork object is nullptr\n");
         return;
@@ -76,13 +76,13 @@ void NetworkType::ProcessSetPreferredNetwork(const AppExecFwk::InnerEvent::Point
         TELEPHONY_LOGE("NetworkType::ProcessSetPreferredNetwork networkSearchManager is nullptr");
         return;
     }
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
     if (responseInfo == nullptr) {
         TELEPHONY_LOGE("NetworkType::ProcessSetPreferredNetwork responseInfo is nullptr");
         return;
     }
 
-    bool success = responseInfo->error == HRilErrType::NONE;
+    bool success = responseInfo->error == ErrType::NONE;
     int32_t networkMode = 0;
     if (success) {
         networkSearchManager->GetCachePreferredNetworkValue(slotId_, networkMode);
@@ -118,7 +118,7 @@ void NetworkType::ProcessSetPreferredNetwork(const AppExecFwk::InnerEvent::Point
 }
 
 bool NetworkType::WriteGetPreferredNetworkInfo(std::shared_ptr<PreferredNetworkTypeInfo> &preferredNetworkInfo,
-    std::shared_ptr<HRilRadioResponseInfo> &responseInfo, MessageParcel &data, int64_t &index) const
+    std::shared_ptr<RadioResponseInfo> &responseInfo, MessageParcel &data, int64_t &index) const
 {
     std::shared_ptr<NetworkSearchManager> networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
