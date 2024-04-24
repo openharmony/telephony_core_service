@@ -118,5 +118,9 @@ void TelEventHandler::RemoveAllEvents()
     queue_->RemoveAllEvents();
 }
 
+void TelEventHandler::ClearFfrt(bool isNeedEnd)
+{
+    queue_->ClearCurrentTask(isNeedEnd);
+}
 } // namespace Telephony
 } // namespace OHOS
