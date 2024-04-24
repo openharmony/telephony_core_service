@@ -17,7 +17,7 @@
 #define NETWORK_SEARCH_INCLUDE_SIGNAL_INFO_H
 
 #include "event_handler.h"
-#include "hril_types.h"
+#include "tel_ril_types.h"
 #include "signal_information.h"
 
 namespace OHOS {

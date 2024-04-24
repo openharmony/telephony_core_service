@@ -43,7 +43,6 @@ void SendSmsMoreMode(const uint8_t *data, size_t size)
     int32_t gsmIndex = static_cast<int32_t>(size);
     int32_t cdmaIndex = static_cast<int32_t>(size);
     int32_t tosca = static_cast<int32_t>(size);
-    uint32_t code = static_cast<uint32_t>(size);
     uint8_t hexChar = static_cast<uint8_t>(size);
     std::string smscPdu(reinterpret_cast<const char *>(data), size);
     std::string pdu(reinterpret_cast<const char *>(data), size);
@@ -54,7 +53,6 @@ void SendSmsMoreMode(const uint8_t *data, size_t size)
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilSms = std::make_shared<TelRilSms>(slotId, rilInterface_, observerHandler, nullptr);
     telRilSms->SendSmsMoreMode(smscPdu, pdu, response);
-    telRilSms->IsSmsRespOrNotify(code);
     telRilSms->AddSimMessage(status, smscPdu, pdu, response);
     telRilSms->SendCdmaSms(pdu, response);
     telRilSms->DelSimMessage(gsmIndex, response);

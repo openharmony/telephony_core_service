@@ -66,6 +66,7 @@ ohos_shared_library("tel_core_service_api") {
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/operator_config_types.cpp",
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/resource_utils.cpp",
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/signal_information.cpp",
+    "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/tel_ril_base_parcel.cpp",
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/telephony_state_registry_client.cpp",
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/telephony_state_registry_proxy.cpp",
     "$TELEPHONY_IMS_CORE_SERVICE_ROOT/src/ims_core_service_callback_proxy.cpp",
@@ -79,16 +80,15 @@ ohos_shared_library("tel_core_service_api") {
     "LOG_DOMAIN = 0xD001F04",
   ]
 
-  configs = [ "$TELEPHONY_CORE_SERVICE_ROOT/utils:telephony_log_config" ]
+  public_configs = [ "$TELEPHONY_CORE_SERVICE_ROOT/utils:telephony_log_config" ]
 
-  public_configs = [ ":tel_core_service_api_config" ]
+  public_configs += [ ":tel_core_service_api_config" ]
 
   external_deps = [
     "ability_base:want",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
-    "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "init:libbegetutil",

@@ -16,7 +16,7 @@
 #ifndef TEL_RIL_SMS_H
 #define TEL_RIL_SMS_H
 
-#include "hril_sms_parcel.h"
+#include "tel_ril_sms_parcel.h"
 #include "tel_ril_base.h"
 
 namespace OHOS {
@@ -29,7 +29,6 @@ public:
 
     uint8_t *ConvertHexStringToBytes(const uint8_t *hexString, size_t length);
     uint8_t ConvertHexCharToInt(uint8_t ch);
-    bool IsSmsRespOrNotify(uint32_t code);
 
     int32_t SendGsmSms(std::string &smsPdu, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SendCdmaSms(std::string pdu, const AppExecFwk::InnerEvent::Pointer &response);
@@ -83,8 +82,6 @@ public:
     int32_t CBConfigNotify(const HDI::Ril::V1_1::CBConfigReportInfo &cellBroadConfigReportInfo);
 
 private:
-    bool IsSmsResponse(uint32_t code);
-    bool IsSmsNotification(uint32_t code);
     HDI::Ril::V1_1::GsmSmsMessageInfo ConstructGsmSendSmsRequestLinkList(std::string &smsPdu, std::string &pdu);
     OHOS::HDI::Ril::V1_1::SmsMessageIOInfo ConstructSmsMessageIOInfoRequestLinkList(
         std::string &smsPdu, std::string &pdu);

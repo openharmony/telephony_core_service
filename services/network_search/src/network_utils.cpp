@@ -17,7 +17,7 @@
 
 #include <cinttypes>
 
-#include "hril_network_parcel.h"
+#include "tel_ril_network_parcel.h"
 #include "network_search_manager.h"
 
 namespace OHOS {

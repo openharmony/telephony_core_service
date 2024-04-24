@@ -17,8 +17,6 @@
 
 #include <securec.h>
 
-#include "hril_notification.h"
-#include "hril_request.h"
 #include "radio_event.h"
 
 using namespace std;
@@ -33,38 +31,32 @@ TelRilNetwork::TelRilNetwork(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInter
 
 int32_t TelRilNetwork::GetSignalStrength(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_SIGNAL_STRENGTH, &HDI::Ril::V1_1::IRil::GetSignalStrength);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetSignalStrength);
 }
 
 int32_t TelRilNetwork::GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_CS_REG_STATUS, &HDI::Ril::V1_1::IRil::GetCsRegStatus);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetCsRegStatus);
 }
 
 int32_t TelRilNetwork::GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_PS_REG_STATUS, &HDI::Ril::V1_1::IRil::GetPsRegStatus);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetPsRegStatus);
 }
 
 int32_t TelRilNetwork::GetOperatorInfo(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_OPERATOR_INFO, &HDI::Ril::V1_1::IRil::GetOperatorInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetOperatorInfo);
 }
 
 int32_t TelRilNetwork::GetNetworkSearchInformation(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION,
-        &HDI::Ril::V1_1::IRil::GetNetworkSearchInformation);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetNetworkSearchInformation);
 }
 
 int32_t TelRilNetwork::GetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_NETWORK_SELECTION_MODE,
-        &HDI::Ril::V1_1::IRil::GetNetworkSelectionMode);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetNetworkSelectionMode);
 }
 
 int32_t TelRilNetwork::SetNetworkSelectionMode(
@@ -73,82 +65,72 @@ int32_t TelRilNetwork::SetNetworkSelectionMode(
     HDI::Ril::V1_1::SetNetworkModeInfo setNetworkModeInfo;
     setNetworkModeInfo.selectMode = automaticFlag;
     setNetworkModeInfo.oper = oper;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_SET_NETWORK_SELECTION_MODE,
-        &HDI::Ril::V1_1::IRil::SetNetworkSelectionMode, setNetworkModeInfo);
+    return Request(
+        TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SetNetworkSelectionMode, setNetworkModeInfo);
 }
 
 int32_t TelRilNetwork::SetPreferredNetwork(
     int32_t preferredNetworkType, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_SET_PREFERRED_NETWORK,
-        &HDI::Ril::V1_1::IRil::SetPreferredNetwork, preferredNetworkType);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SetPreferredNetwork, preferredNetworkType);
 }
 
 int32_t TelRilNetwork::GetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_PREFERRED_NETWORK,
-        &HDI::Ril::V1_1::IRil::GetPreferredNetwork);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetPreferredNetwork);
 }
 
 int32_t TelRilNetwork::GetCellInfoList(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST,
-        &HDI::Ril::V1_1::IRil::GetNeighboringCellInfoList);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetNeighboringCellInfoList);
 }
 
 int32_t TelRilNetwork::GetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_CURRENT_CELL_INFO,
-        &HDI::Ril::V1_1::IRil::GetCurrentCellInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetCurrentCellInfo);
 }
 
 int32_t TelRilNetwork::GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG,
-        &HDI::Ril::V1_1::IRil::GetPhysicalChannelConfig);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetPhysicalChannelConfig);
 }
 
-int32_t TelRilNetwork::SetLocateUpdates(HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilNetwork::SetLocateUpdates(RegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_SET_LOCATE_UPDATES,
-        &HDI::Ril::V1_1::IRil::SetLocateUpdates, static_cast<HDI::Ril::V1_1::RilRegNotifyMode>(mode));
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SetLocateUpdates,
+        static_cast<HDI::Ril::V1_1::RilRegNotifyMode>(mode));
 }
 
 int32_t TelRilNetwork::SetNotificationFilter(int32_t newFilter, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_SET_NOTIFICATION_FILTER,
-        &HDI::Ril::V1_1::IRil::SetNotificationFilter, newFilter);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SetNotificationFilter, newFilter);
 }
 
 int32_t TelRilNetwork::SetDeviceState(
     int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_SET_DEVICE_STATE,
-        &HDI::Ril::V1_1::IRil::SetDeviceState, deviceStateType, deviceStateOn);
+    return Request(
+        TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SetDeviceState, deviceStateType, deviceStateOn);
 }
 
 int32_t TelRilNetwork::SetNrOptionMode(int32_t mode, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_SET_NR_OPTION_MODE,
-        &HDI::Ril::V1_1::IRil::SetNrOptionMode, mode);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SetNrOptionMode, mode);
 }
 
 int32_t TelRilNetwork::GetNrOptionMode(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_NR_OPTION_MODE, &HDI::Ril::V1_1::IRil::GetNrOptionMode);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetNrOptionMode);
 }
 
 int32_t TelRilNetwork::GetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_RRC_CONNECTION_STATE,
-        &HDI::Ril::V1_1::IRil::GetRrcConnectionState);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetRrcConnectionState);
 }
 
 int32_t TelRilNetwork::GetNrSsbId(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_NETWORK_GET_NR_SSBID_INFO, &HDI::Ril::V1_2::IRil::GetNrSsbId);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_2::IRil::GetNrSsbId);
 }
 
 int32_t TelRilNetwork::SignalStrengthUpdated(const HDI::Ril::V1_1::Rssi &rssi)
@@ -201,7 +183,7 @@ int32_t TelRilNetwork::NetworkCurrentCellUpdated(const HDI::Ril::V1_1::CellListC
 
 int32_t TelRilNetwork::GetRrcConnectionStateUpdated(int32_t state)
 {
-    return Notify<HRilInt32Parcel>(TELEPHONY_LOG_FUNC_NAME, std::make_shared<HRilInt32Parcel>(state),
+    return Notify<Int32Parcel>(TELEPHONY_LOG_FUNC_NAME, std::make_shared<Int32Parcel>(state),
         RadioEvent::RADIO_RRC_CONNECTION_STATE_UPDATE);
 }
 
@@ -405,8 +387,8 @@ int32_t TelRilNetwork::GetNrOptionModeResponse(const HDI::Ril::V1_1::RilRadioRes
 int32_t TelRilNetwork::GetRrcConnectionStateResponse(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t rrcConnectionState)
 {
-    return Response<HRilInt32Parcel>(
-        TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<HRilInt32Parcel>(rrcConnectionState));
+    return Response<Int32Parcel>(
+        TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<Int32Parcel>(rrcConnectionState));
 }
 
 int32_t TelRilNetwork::GetNrSsbIdResponse(
@@ -473,20 +455,20 @@ void TelRilNetwork::BuildCsRegStatusInfo(
     std::shared_ptr<CsRegStatusInfo> regStatusInfo, const HDI::Ril::V1_1::CsRegStatusInfo &csRegStatusInfo)
 {
     regStatusInfo->notifyType = csRegStatusInfo.notifyType;
-    regStatusInfo->regStatus = static_cast<HRilRegStatus>(csRegStatusInfo.regStatus);
+    regStatusInfo->regStatus = static_cast<TelRilRegStatus>(csRegStatusInfo.regStatus);
     regStatusInfo->lacCode = csRegStatusInfo.lacCode;
     regStatusInfo->cellId = csRegStatusInfo.cellId;
-    regStatusInfo->radioTechnology = static_cast<HRilRadioTech>(csRegStatusInfo.radioTechnology);
+    regStatusInfo->radioTechnology = static_cast<TelRilRadioTech>(csRegStatusInfo.radioTechnology);
 }
 
 void TelRilNetwork::BuildPsRegStatusInfo(
     std::shared_ptr<PsRegStatusResultInfo> regStatusInfo, const HDI::Ril::V1_1::PsRegStatusInfo &psRegStatusInfo)
 {
     regStatusInfo->notifyType = psRegStatusInfo.notifyType;
-    regStatusInfo->regStatus = static_cast<HRilRegStatus>(psRegStatusInfo.regStatus);
+    regStatusInfo->regStatus = static_cast<TelRilRegStatus>(psRegStatusInfo.regStatus);
     regStatusInfo->lacCode = psRegStatusInfo.lacCode;
     regStatusInfo->cellId = psRegStatusInfo.cellId;
-    regStatusInfo->radioTechnology = static_cast<HRilRadioTech>(psRegStatusInfo.radioTechnology);
+    regStatusInfo->radioTechnology = static_cast<TelRilRadioTech>(psRegStatusInfo.radioTechnology);
     regStatusInfo->isNrAvailable = psRegStatusInfo.isNrAvailable;
     regStatusInfo->isEnDcAvailable = psRegStatusInfo.isEnDcAvailable;
     regStatusInfo->isDcNrRestricted = psRegStatusInfo.isDcNrRestricted;
@@ -1084,10 +1066,10 @@ void TelRilNetwork::BuildChannelConfigInfoList(std::shared_ptr<ChannelConfigInfo
     for (int32_t i = 0; i < channelConfigList->itemNum; i++) {
         PhysicalChannelConfig phyChnlCfg;
         phyChnlCfg.cellConnStatus =
-            static_cast<HRilCellConnectionStatus>(channelConfigInfoList.channelConfigInfos[i].cellConnStatus);
+            static_cast<CellConnectionStatus>(channelConfigInfoList.channelConfigInfos[i].cellConnStatus);
         phyChnlCfg.cellBandwidthDownlinkKhz = channelConfigInfoList.channelConfigInfos[i].cellBandwidthDownlinkKhz;
         phyChnlCfg.cellBandwidthUplinkKhz = channelConfigInfoList.channelConfigInfos[i].cellBandwidthUplinkKhz;
-        phyChnlCfg.ratType = static_cast<HRilRadioTech>(channelConfigInfoList.channelConfigInfos[i].ratType);
+        phyChnlCfg.ratType = static_cast<TelRilRadioTech>(channelConfigInfoList.channelConfigInfos[i].ratType);
         phyChnlCfg.freqRange = channelConfigInfoList.channelConfigInfos[i].freqRange;
         phyChnlCfg.downlinkChannelNum = channelConfigInfoList.channelConfigInfos[i].downlinkChannelNum;
         phyChnlCfg.uplinkChannelNum = channelConfigInfoList.channelConfigInfos[i].uplinkChannelNum;

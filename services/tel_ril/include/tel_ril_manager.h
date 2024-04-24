@@ -134,11 +134,11 @@ public:
     int32_t GetPhysicalChannelConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t SetLocateUpdates(
-        int32_t slotId, HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response) override;
+        int32_t slotId, RegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     /**
      * @param slotId is the card slot index number
-     * @param newFilter is the notification filter with bits in HRilNotificationFilter
+     * @param newFilter is the notification filter with bits in NotificationFilter
      * @param response is the feedback info after setting notification filter
      * @return int32_t Indicates if notification filter is set successfully
      */
@@ -147,7 +147,7 @@ public:
 
     /**
      * @param slotId is the card slot index number
-     * @param deviceStateType is the device state type in HRilDeviceStateType
+     * @param deviceStateType is the device state type in DeviceStateType
      * @param deviceStateOn Indicates the specific device state is on
      * @param response is the feedback info after setting device state
      * @return int32_t Indicates if device state is set successfully
@@ -349,7 +349,7 @@ private:
             return (_obj.get()->*(_func))(std::forward<ParamTypes>(_args)..., _result);
         } else {
             TELEPHONY_LOGE("%{public}s - func: %{public}s", _module.c_str(), "null pointer");
-            return HRIL_ERR_NULL_POINT;
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
     }
 

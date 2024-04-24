@@ -585,10 +585,10 @@ bool IccDiallingNumbersHandler::FormatNameAndNumber(
     return true;
 }
 
-std::shared_ptr<HRilRadioResponseInfo> IccDiallingNumbersHandler::MakeExceptionResult(int code)
+std::shared_ptr<RadioResponseInfo> IccDiallingNumbersHandler::MakeExceptionResult(int code)
 {
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = std::make_shared<HRilRadioResponseInfo>();
-    responseInfo->error = static_cast<Telephony::HRilErrType>(code);
+    std::shared_ptr<RadioResponseInfo> responseInfo = std::make_shared<RadioResponseInfo>();
+    responseInfo->error = static_cast<Telephony::ErrType>(code);
     return responseInfo;
 }
 

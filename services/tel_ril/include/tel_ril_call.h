@@ -16,7 +16,7 @@
 #ifndef TEL_RIL_CALL_H
 #define TEL_RIL_CALL_H
 
-#include "hril_call_parcel.h"
+#include "tel_ril_call_parcel.h"
 #include "tel_ril_base.h"
 
 namespace OHOS {

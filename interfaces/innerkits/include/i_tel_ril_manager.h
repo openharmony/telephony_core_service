@@ -17,10 +17,10 @@
 #define I_TEL_RIL_MANAGER_H
 
 #include "event_runner.h"
-#include "hril_network_parcel.h"
-#include "hril_sim_parcel.h"
-#include "hril_sms_parcel.h"
-#include "hril_types.h"
+#include "tel_ril_network_parcel.h"
+#include "tel_ril_sim_parcel.h"
+#include "tel_ril_sms_parcel.h"
+#include "tel_ril_types.h"
 #include "telephony_types.h"
 
 namespace OHOS {
@@ -132,7 +132,7 @@ public:
     virtual int32_t GetBasebandVersion(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
     virtual int32_t SetLocateUpdates(
-        int32_t slotId, HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response) = 0;
+        int32_t slotId, RegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
     virtual int32_t SendGsmSms(
         int32_t slotId, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) = 0;

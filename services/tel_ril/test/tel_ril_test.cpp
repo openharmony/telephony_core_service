@@ -1522,7 +1522,7 @@ void TelRilTest::OnRequestSetLocateUpdatesTest(
         const int32_t NOTIFY_STAT_ONLY = 1;
         const int32_t NOTIFY_STAT_LAC_CELLID = 2;
         int32_t notifyModeValue = REG_NOTIFY_STAT_LAC_CELLID;
-        HRilRegNotifyMode mode;
+        RegNotifyMode mode;
         std::cout << "Please input notifyMode(NOTIFY_STAT_ONLY: 1 / NOTIFY_STAT_LAC_CELLID: 2): " << endl;
         std::cin >> notifyModeValue;
         if (notifyModeValue == NOTIFY_STAT_ONLY) {
@@ -2014,7 +2014,7 @@ void TelRilTest::DemoHandler::GetFileAndDataSize(const unsigned char *data, int 
 
 void TelRilTest::DemoHandler::OnRequestShutDownTestResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
     if (responseInfo == nullptr) {
         TELEPHONY_LOGI("OnRequestShutDownTestResponse success");
     }
@@ -2023,7 +2023,7 @@ void TelRilTest::DemoHandler::OnRequestShutDownTestResponse(const AppExecFwk::In
 
 void TelRilTest::DemoHandler::OnRequestGetBasebandVersionTestResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::shared_ptr<HRilStringParcel> basebandVersion = event->GetSharedObject<HRilStringParcel>();
+    std::shared_ptr<StringParcel> basebandVersion = event->GetSharedObject<StringParcel>();
     if (basebandVersion != nullptr) {
         TELEPHONY_LOGI("test get baseband version:%{public}s", basebandVersion->data.c_str());
     }
