@@ -262,6 +262,7 @@ public:
     }
 
 private:
+    void ClearFfrt(bool isNeedEnd);
     std::shared_ptr<TelEventQueue> queue_ = nullptr;
 };
 } // namespace Telephony

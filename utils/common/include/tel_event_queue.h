@@ -29,6 +29,7 @@ public:
     void RemoveEvent(uint32_t innerEventId);
     bool HasInnerEvent(uint32_t innerEventId);
     void RemoveAllEvents();
+    void ClearCurrentTask(bool isNeedEnd);
 
 private:
     struct EventList {
@@ -44,7 +45,6 @@ private:
     uint32_t ToTelPriority(AppExecFwk::EventQueue::Priority priority);
     uint32_t GetPriorityIndex();
     AppExecFwk::InnerEvent::TimePoint GetHandleTime();
-    void ClearCurrentTask(bool isNeedEnd);
     int32_t GetNextQueueId();
     void SubmitToFFRT(int32_t queueId, AppExecFwk::InnerEvent::TimePoint handleTime, int64_t delayTime);
 
