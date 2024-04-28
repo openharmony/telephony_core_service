@@ -202,14 +202,20 @@ void SimStateTracker::SystemAbilityStatusChangeListener::OnAddSystemAbility(
             break;
         }
         case COMMON_EVENT_SERVICE_ID: {
-            TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID running");
+            TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID running, isUserSwitchSubscribered is :%{public}d",
+                isUserSwitchSubscribered);
+            if (isUserSwitchSubscribered) {
+                return;
+            }
             MatchingSkills matchingSkills;
             matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
             CommonEventSubscribeInfo subscriberInfo(matchingSkills);
             subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
             userSwitchSubscriber_ = std::make_shared<UserSwitchEventSubscriber>(subscriberInfo, slotId_, configLoader_);
-            bool subRet = CommonEventManager::SubscribeCommonEvent(userSwitchSubscriber_);
-            TELEPHONY_LOGI("Subscribe user switched subRet is :%{public}d", subRet);
+            if (CommonEventManager::SubscribeCommonEvent(userSwitchSubscriber_)) {
+                isUserSwitchSubscribered = true;
+                TELEPHONY_LOGI("Subscribe user switched success");
+            }
             break;
         }
         default:
@@ -227,11 +233,15 @@ void SimStateTracker::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
             break;
         }
         case COMMON_EVENT_SERVICE_ID: {
-            TELEPHONY_LOGE("COMMON_EVENT_SERVICE_ID stopped");
-            if (userSwitchSubscriber_ != nullptr) {
-                bool subRet = CommonEventManager::UnSubscribeCommonEvent(userSwitchSubscriber_);
-                TELEPHONY_LOGI("Unsubscribe user switched subRet is :%{public}d", subRet);
+            TELEPHONY_LOGE("COMMON_EVENT_SERVICE_ID stopped, isUserSwitchSubscribered is :%{public}d",
+                isUserSwitchSubscribered);
+            if (!isUserSwitchSubscribered) {
+                return;
+            }
+            if (userSwitchSubscriber_ != nullptr && CommonEventManager::UnSubscribeCommonEvent(userSwitchSubscriber_)) {
                 userSwitchSubscriber_ = nullptr;
+                isUserSwitchSubscribered = false;
+                TELEPHONY_LOGI("Unsubscribe user switched success");
             }
             break;
         }
