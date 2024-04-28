@@ -293,6 +293,7 @@ void OperatorName::NotifyGsmSpnChanged(
     std::string plmn = "";
     std::string spn = "";
     bool showPlmn = false;
+    bool showPlmnOld = false;
     bool showSpn = false;
     bool roaming = networkState->IsRoaming();
     if (enableCust_ && displayConditionCust_ != SPN_INVALID) {
@@ -308,10 +309,16 @@ void OperatorName::NotifyGsmSpnChanged(
     if (TELEPHONY_EXT_WRAPPER.changeSpnAndRuleExt_) {
         TELEPHONY_EXT_WRAPPER.changeSpnAndRuleExt_(spn, spnRule, showSpn);
     }
+    showPlmnOld = showPlmn;
+    if (spn.empty()) {
+        showPlmn = true;
+    }
     TELEPHONY_LOGI(
         "OperatorName::NotifyGsmSpnChanged showSpn:%{public}d curSpn_:%{public}s spn:%{public}s showPlmn:%{public}d "
-        "curPlmn_:%{public}s plmn:%{public}s slotId:%{public}d",
-        showSpn, curSpn_.c_str(), spn.c_str(), showPlmn, curPlmn_.c_str(), plmn.c_str(), slotId_);
+        "curPlmn_:%{public}s plmn:%{public}s showPlmnOld:%{public}d enableCust_:%{public}d "
+        "displayConditionCust_:%{public}d domesticSpn:%{public}s slotId:%{public}d",
+        showSpn, curSpn_.c_str(), spn.c_str(), showPlmn, curPlmn_.c_str(), plmn.c_str(), showPlmnOld, enableCust_,
+        displayConditionCust_, domesticSpn.c_str(), slotId_);
     if (curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn || curPlmnShow_ != showPlmn ||
         curSpn_.compare(spn) || curPlmn_.compare(plmn)) {
         TELEPHONY_LOGI("OperatorName::NotifyGsmSpnChanged start send broadcast slotId:%{public}d...", slotId_);
