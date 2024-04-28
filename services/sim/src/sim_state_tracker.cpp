@@ -233,7 +233,7 @@ void SimStateTracker::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
             break;
         }
         case COMMON_EVENT_SERVICE_ID: {
-            TELEPHONY_LOGE("COMMON_EVENT_SERVICE_ID stopped, isUserSwitchSubscribered is :%{public}d",
+            TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID stopped, isUserSwitchSubscribered is :%{public}d",
                 isUserSwitchSubscribered);
             if (!isUserSwitchSubscribered) {
                 return;
