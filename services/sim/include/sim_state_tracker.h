@@ -80,6 +80,7 @@ private:
         const int32_t slotId_;
         std::shared_ptr<OperatorConfigLoader> configLoader_ = nullptr;
         std::shared_ptr<UserSwitchEventSubscriber> userSwitchSubscriber_ = nullptr;
+        bool isUserSwitchSubscribered = false;
     };
 };
 } // namespace Telephony
