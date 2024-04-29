@@ -51,6 +51,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
     InitTelephonyExtWrapperForVoiceMail();
     InitTelephonyExtWrapperForCust();
     InitTelephonyExtWrapperForVSim();
+    InitTelephonyExtWrapperForOpkeyVersion();
     TELEPHONY_LOGI("telephony ext wrapper init success");
 }
 
@@ -179,6 +180,16 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     createIccFileExt_ = (CREATE_ICC_FILE_EXT)dlsym(telephonyExtWrapperHandle_, "CreateIccFileExt");
     if (createIccFileExt_ == nullptr) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+        return;
+    }
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForOpkeyVersion()
+{
+    TELEPHONY_LOGI("start");
+    getOpkeyVersion_ = (GET_OPKEY_VERSION)dlsym(telephonyExtWrapperHandle_, "GetOpkeyVersion");
+    if (getOpkeyVersion_ == nullptr) {
+        TELEPHONY_LOGE("[OpkeyVersion]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
     }
 }

@@ -1616,5 +1616,16 @@ int32_t CoreService::GetTargetOpkey(int32_t slotId, std::u16string &opkey)
     }
     return TELEPHONY_ERR_SUCCESS;
 }
+
+int32_t CoreService::GetOpkeyVersion(std::string &versionInfo)
+{
+    TELEPHONY_LOGI("start");
+    if (TELEPHONY_EXT_WRAPPER.getOpkeyVersion_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.getOpkeyVersion_(versionInfo);
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    TELEPHONY_LOGI("end");
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
+}
 } // namespace Telephony
 } // namespace OHOS
