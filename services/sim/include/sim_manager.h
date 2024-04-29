@@ -79,6 +79,7 @@ public:
     int32_t GetSimId(int32_t slotId) override;
     int32_t GetActiveSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList) override;
     int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) override;
+    int32_t UpdateOperatorConfigs(int32_t slotId) override;
     int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) override;
     int32_t SimAuthentication(
         int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response) override;

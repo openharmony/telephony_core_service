@@ -29,6 +29,7 @@ CoreServiceStub::CoreServiceStub()
     AddHandlerSimToMap();
     AddHandlerSimToMapExt();
     AddHandlerPdpProfileToMap();
+    AddHandlerOpkeyVersionToMap();
 }
 
 void CoreServiceStub::AddHandlerNetWorkToMap()
@@ -168,6 +169,11 @@ void CoreServiceStub::AddHandlerPdpProfileToMap()
 {
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_ALLOWED_INSERT_APN)] = &CoreServiceStub::OnIsAllowedInsertApn;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_TARGET_OPKEY)] = &CoreServiceStub::OnGetTargetOpkey;
+}
+
+void CoreServiceStub::AddHandlerOpkeyVersionToMap()
+{
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPKEY_VERSION)] = &CoreServiceStub::OnGetOpkeyVersion;
 }
 
 int32_t CoreServiceStub::OnRemoteRequest(
@@ -1761,6 +1767,23 @@ int32_t CoreServiceStub::OnGetTargetOpkey(MessageParcel &data, MessageParcel &re
         TELEPHONY_LOGE("Write reply result failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
+    return result;
+}
+
+int32_t CoreServiceStub::OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply)
+{
+    TELEPHONY_LOGI("start");
+    std::string versionInfo;
+    int32_t result = GetOpkeyVersion(versionInfo);
+    if (!reply.WriteString(versionInfo)) {
+        TELEPHONY_LOGE("Write versionInfo result failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("Write reply result failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    TELEPHONY_LOGI("end");
     return result;
 }
 } // namespace Telephony

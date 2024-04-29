@@ -83,6 +83,7 @@ public:
     typedef void (*GET_TARGET_OPKEY)(int32_t slotId, std::u16string &opkey);
     typedef void (*SORT_SIGNAL_INFO_LIST_EXT)(
         int32_t slotId, std::vector<sptr<OHOS::Telephony::SignalInformation>> &signals);
+    typedef void (*GET_OPKEY_VERSION)(std::string &versionInfo);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -127,6 +128,7 @@ public:
     IS_ALLOWED_INSERT_APN isAllowedInsertApn_ = nullptr;
     GET_TARGET_OPKEY getTargetOpkey_ = nullptr;
     SORT_SIGNAL_INFO_LIST_EXT sortSignalInfoListExt_ = nullptr;
+    GET_OPKEY_VERSION getOpkeyVersion_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -137,6 +139,7 @@ private:
     void InitTelephonyExtWrapperForVSim();
     void InitTelephonyExtWrapperForApnCust();
     void InitTelephonyExtWrapperForSim();
+    void InitTelephonyExtWrapperForOpkeyVersion();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
