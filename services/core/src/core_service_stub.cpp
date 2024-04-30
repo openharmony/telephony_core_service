@@ -1772,7 +1772,6 @@ int32_t CoreServiceStub::OnGetTargetOpkey(MessageParcel &data, MessageParcel &re
 
 int32_t CoreServiceStub::OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply)
 {
-    TELEPHONY_LOGI("start");
     std::string versionInfo;
     int32_t result = GetOpkeyVersion(versionInfo);
     if (!reply.WriteString(versionInfo)) {
@@ -1783,7 +1782,6 @@ int32_t CoreServiceStub::OnGetOpkeyVersion(MessageParcel &data, MessageParcel &r
         TELEPHONY_LOGE("Write reply result failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    TELEPHONY_LOGI("end");
     return result;
 }
 } // namespace Telephony

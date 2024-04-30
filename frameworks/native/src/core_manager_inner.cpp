@@ -1994,7 +1994,6 @@ int32_t CoreManagerInner::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc
 
 int32_t CoreManagerInner::UpdateOperatorConfigs()
 {
-    TELEPHONY_LOGI("start");
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -2002,7 +2001,7 @@ int32_t CoreManagerInner::UpdateOperatorConfigs()
     int32_t slotCount = SIM_SLOT_COUNT;
     int32_t failSlotCount = slotCount;
     for (int32_t slotId = 0; slotId < slotCount; slotId++) {
-        TELEPHONY_LOGI("select slotId %{public}d in slotCount %{public}d", slotId, slotCount);
+        TELEPHONY_LOGD("select slotId %{public}d in slotCount %{public}d", slotId, slotCount);
         int32_t err = simManager_->UpdateOperatorConfigs(slotId);
         if (err == TELEPHONY_ERR_SUCCESS) {
             failSlotCount--;

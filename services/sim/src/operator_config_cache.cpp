@@ -160,17 +160,17 @@ int32_t OperatorConfigCache::GetOperatorConfigs(int32_t slotId, OperatorConfig &
 
 int32_t OperatorConfigCache::UpdateOperatorConfigs(int32_t slotId)
 {
-    TELEPHONY_LOGI("start");
+    TELEPHONY_LOGD("start");
     std::unique_lock<std::mutex> lock(mutex_);
     ClearMemoryCache(slotId);
     lock.unlock();
     if (slotId == 0) {
-        TELEPHONY_LOGI("OperatorConfigCache:UpdateOperatorConfigs ClearFilesCache");
+        TELEPHONY_LOGD("OperatorConfigCache:UpdateOperatorConfigs ClearFilesCache");
         parser_.ClearFilesCache();
     }
     OperatorConfig opc;
     int32_t ret = LoadOperatorConfig(slotId_, opc, STATE_PARA_UPDATE);
-    TELEPHONY_LOGI("end");
+    TELEPHONY_LOGD("end");
     return ret;
 }
 

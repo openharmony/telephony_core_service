@@ -77,7 +77,6 @@ int32_t SimAccountManager::GetOperatorConfigs(int32_t slotId, OHOS::Telephony::O
 
 int32_t SimAccountManager::UpdateOperatorConfigs(int32_t slotId)
 {
-    TELEPHONY_LOGI("start");
     if (operatorConfigCache_ == nullptr) {
         TELEPHONY_LOGE("operatorConfigCache_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
