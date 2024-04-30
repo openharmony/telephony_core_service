@@ -589,7 +589,6 @@ int32_t SimManager::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
 
 int32_t SimManager::UpdateOperatorConfigs(int32_t slotId)
 {
-    TELEPHONY_LOGI("start");
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;

@@ -1072,7 +1072,6 @@ int32_t CoreServiceClient::GetTargetOpkey(int32_t slotId, std::u16string &opkey)
 
 int32_t CoreServiceClient::GetOpkeyVersion(std::string &versionInfo)
 {
-    TELEPHONY_LOGI("start");
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");

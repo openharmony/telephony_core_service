@@ -186,7 +186,6 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
 
 void TelephonyExtWrapper::InitTelephonyExtWrapperForOpkeyVersion()
 {
-    TELEPHONY_LOGI("start");
     getOpkeyVersion_ = (GET_OPKEY_VERSION)dlsym(telephonyExtWrapperHandle_, "GetOpkeyVersion");
     if (getOpkeyVersion_ == nullptr) {
         TELEPHONY_LOGE("[OpkeyVersion]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
