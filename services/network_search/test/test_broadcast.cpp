@@ -39,8 +39,7 @@ void TestBroadCast::OnReceiveEvent(const CommonEventData &data)
         std::cout << "CUR_SPN: " << spn.c_str() << std::endl;
         TELEPHONY_LOGI(
             "TestBroadCast::OnReceiveEvent slotId:%{public}d, showPlmn:%{public}d, plmn:%{public}s, "
-            "showSpn:%{public}d, spn:%{public}s,",
-            slotId, showPlmn, plmn.c_str(), showSpn, spn.c_str());
+            "showSpn:%{public}d, spn:%{public}s,", slotId, showPlmn, plmn.c_str(), showSpn, spn.c_str());
     }
 }
 } // namespace Telephony
