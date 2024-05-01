@@ -261,6 +261,7 @@ public:
     int32_t GetShowName(int32_t slotId, std::u16string &showName);
     int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList);
     int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc);
+    int32_t UpdateOperatorConfigs();
     int32_t GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric);
     int32_t GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode);
     int32_t GetSimIccId(int32_t slotId, std::u16string &iccId);

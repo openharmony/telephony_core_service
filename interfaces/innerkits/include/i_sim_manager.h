@@ -72,6 +72,7 @@ public:
     virtual int32_t GetShowName(int32_t slotId, std::u16string &showName) = 0;
     virtual int32_t GetActiveSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList) = 0;
     virtual int32_t GetOperatorConfigs(int slotId, OperatorConfig &poc) = 0;
+    virtual int32_t UpdateOperatorConfigs(int32_t slotId) = 0;
     virtual int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) = 0;
     virtual int32_t SimAuthentication(
         int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response) = 0;

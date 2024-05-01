@@ -3141,5 +3141,29 @@ int32_t CoreServiceProxy::GetTargetOpkey(int32_t slotId, std::u16string &opkey)
     opkey = reply.ReadString16();
     return reply.ReadInt32();
 }
+
+int32_t CoreServiceProxy::GetOpkeyVersion(std::string &versionInfo)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int32_t error =
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::GET_OPKEY_VERSION), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("Error code is %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    versionInfo = reply.ReadString();
+    return reply.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS
