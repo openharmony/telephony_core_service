@@ -143,6 +143,7 @@ public:
     int32_t InitExtraModule(int32_t slotId) override;
     bool IsAllowedInsertApn(std::string &value) override;
     int32_t GetTargetOpkey(int32_t slotId, std::u16string &opkey) override;
+    int32_t GetOpkeyVersion(std::string &versionInfo) override;
 
 private:
     template<class T>
