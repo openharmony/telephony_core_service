@@ -51,6 +51,7 @@ public:
         std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache);
     virtual ~OperatorConfigLoader();
     OperatorConfig LoadOperatorConfig(int32_t slotId);
+    int InitOpKeyData();
 
 private:
     std::string LoadOpKeyOnMccMnc(int32_t slotId);
@@ -59,7 +60,6 @@ private:
     std::string GetOpKey(std::shared_ptr<DataShare::DataShareResultSet> resultSet, int32_t slotId);
     bool MatchOperatorRule(std::shared_ptr<DataShare::DataShareResultSet> &resultSet, int row);
     int InsertOpkeyToSimDb(std::string opKeyVal);
-    void InitOpKeyData();
 
 private:
     std::weak_ptr<SimFileManager> simFileManager_;
