@@ -17,6 +17,7 @@
 
 #include <string_ex.h>
 #include "sim_data.h"
+#include "base_data_helper.h"
 #include "core_manager_inner.h"
 #include "operator_matching_rule.h"
 #include "sim_state_type.h"
@@ -30,7 +31,6 @@ OperatorConfigLoader::OperatorConfigLoader(
     : simFileManager_(simFileManager), operatorConfigCache_(operatorConfigCache)
 {
     TELEPHONY_LOGI("OperatorConfigLoader construct");
-    InitOpKeyData();
 }
 
 OperatorConfigLoader::~OperatorConfigLoader() {}
@@ -54,13 +54,13 @@ OperatorConfig OperatorConfigLoader::LoadOperatorConfig(int32_t slotId)
     return opc;
 }
 
-void OperatorConfigLoader::InitOpKeyData()
+int OperatorConfigLoader::InitOpKeyData()
 {
     TELEPHONY_LOGI("InitOpKeyData start");
     std::shared_ptr<DataShare::DataShareHelper> helper = CreateOpKeyHelper();
     if (helper == nullptr) {
         TELEPHONY_LOGE("OpKey helper is nullptr");
-        return;
+        return TELEPHONY_ERROR;
     }
     Uri uri(OPKEY_INIT_URI);
     std::vector<DataShare::DataShareValuesBucket> values;
@@ -69,12 +69,12 @@ void OperatorConfigLoader::InitOpKeyData()
     helper = nullptr;
     if (result <= 0) {
         TELEPHONY_LOGI("InitOpKeyData opkey not change.");
-        return;
+        return result;
     }
     helper = CreateSimHelper();
     if (helper == nullptr) {
         TELEPHONY_LOGE("Sim helper is nullptr");
-        return;
+        return TELEPHONY_ERROR;
     }
     TELEPHONY_LOGI("InitOpKeyData opkey changed, clear opkey temp.");
     DataShare::DataShareValuesBucket valuesBucket;
@@ -86,6 +86,7 @@ void OperatorConfigLoader::InitOpKeyData()
     helper->Release();
     helper = nullptr;
     TELEPHONY_LOGI("InitOpKeyData end");
+    return TELEPHONY_SUCCESS;
 }
 
 std::string OperatorConfigLoader::LoadOpKeyOnMccMnc(int32_t slotId)
@@ -241,33 +242,21 @@ bool OperatorConfigLoader::MatchOperatorRule(std::shared_ptr<DataShare::DataShar
 std::shared_ptr<DataShare::DataShareHelper> OperatorConfigLoader::CreateOpKeyHelper() const
 {
     TELEPHONY_LOGI("OperatorConfigLoader::CreateOpKeyHelper");
-    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (saManager == nullptr) {
-        TELEPHONY_LOGE("OperatorConfigLoader Get system ability mgr failed");
-        return nullptr;
+    auto helper = BaseDataHelper::GetInstance();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("get CreateOpKeyHelper Failed.");
     }
-    auto remoteObj = saManager->GetSystemAbility(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID);
-    if (remoteObj == nullptr) {
-        TELEPHONY_LOGE("OperatorConfigLoader GetSystemAbility Service Failed");
-        return nullptr;
-    }
-    return DataShare::DataShareHelper::Creator(remoteObj, OPKEY_URI);
+    return helper->CreateDataHelper(OPKEY_URI.c_str());
 }
 
 std::shared_ptr<DataShare::DataShareHelper> OperatorConfigLoader::CreateSimHelper() const
 {
     TELEPHONY_LOGI("OperatorConfigLoader::CreateSimHelper");
-    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (saManager == nullptr) {
-        TELEPHONY_LOGE("OperatorConfigLoader Get system ability mgr failed");
-        return nullptr;
+    auto helper = BaseDataHelper::GetInstance();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("get CreateOpKeyHelper Failed.");
     }
-    auto remoteObj = saManager->GetSystemAbility(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID);
-    if (remoteObj == nullptr) {
-        TELEPHONY_LOGE("OperatorConfigLoader GetSystemAbility Service Failed");
-        return nullptr;
-    }
-    return DataShare::DataShareHelper::Creator(remoteObj, SIM_URI);
+    return helper->CreateDataHelper(SIM_URI);
 }
 } // namespace Telephony
 } // namespace OHOS
