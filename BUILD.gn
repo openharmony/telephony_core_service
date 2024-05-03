@@ -60,6 +60,7 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback_stub.cpp",
     "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_service_client.cpp",
     "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_service_proxy.cpp",
+    "$TELEPHONY_SIM_ROOT/src/base_data_helper.cpp",
     "$TELEPHONY_SIM_ROOT/src/csim_file_controller.cpp",
     "$TELEPHONY_SIM_ROOT/src/icc_dialling_numbers_cache.cpp",
     "$TELEPHONY_SIM_ROOT/src/icc_dialling_numbers_handler.cpp",
