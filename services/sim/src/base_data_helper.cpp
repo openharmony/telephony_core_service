@@ -23,7 +23,8 @@ BaseDataHelper::BaseDataHelper() {}
 
 BaseDataHelper::~BaseDataHelper() = default;
 
-std::shared_ptr<DataShare::DataShareHelper> BaseDataHelper::CreateDataHelper(const char *uri) {
+std::shared_ptr<DataShare::DataShareHelper> BaseDataHelper::CreateDataHelper(const char *uri)
+{
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
         TELEPHONY_LOGE("Get system ability mgr failed.");
