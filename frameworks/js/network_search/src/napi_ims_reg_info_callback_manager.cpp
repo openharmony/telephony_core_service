@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -124,7 +124,16 @@ int32_t NapiImsRegInfoCallbackManager::ReportImsRegInfoInner(
     dataWorker->callback = stateCallback;
     uv_work_t *work = new uv_work_t();
     work->data = (void *)(dataWorker);
-    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportImsRegInfoWork, uv_qos_default);
+    int32_t resultCode =
+        uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportImsRegInfoWork, uv_qos_default);
+    if (resultCode != TELEPHONY_SUCCESS) {
+        delete dataWorker;
+        dataWorker = nullptr;
+        TELEPHONY_LOGE("ReportImsRegInfo failed, result: %{public}d", resultCode);
+        delete work;
+        work = nullptr;
+        return TELEPHONY_ERROR;
+    }
     return TELEPHONY_SUCCESS;
 }
 
