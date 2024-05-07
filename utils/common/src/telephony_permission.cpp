@@ -82,7 +82,7 @@ bool TelephonyPermission::CheckPermission(const std::string &permissionName)
             int32_t ret = PrivacyKit::AddPermissionUsedRecord(callerToken, permissionName, successCount, failCount);
             if (ret != 0) {
                 TELEPHONY_LOGD("AddPermissionUsedRecord failed, permission:%{public}s, "
-                               "successCount:%{public}d, failCount:%{public}d",
+                    "successCount:%{public}d, failCount:%{public}d",
                     permissionName.c_str(), successCount, failCount);
             }
         }
@@ -102,7 +102,7 @@ bool TelephonyPermission::CheckCallerIsSystemApp()
     auto tokenType = AccessTokenKit::GetTokenTypeFlag(callerToken);
     if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE ||
         tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
-        TELEPHONY_LOGI("tokenType check passed.");
+        TELEPHONY_LOGD("tokenType check passed.");
         return true;
     }
 

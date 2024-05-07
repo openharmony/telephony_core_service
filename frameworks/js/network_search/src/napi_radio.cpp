@@ -2211,7 +2211,7 @@ void GetCellInformationCallback(napi_env env, napi_status status, void *data)
         asyncContext->callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, asyncContext->callbackValue);
-    TELEPHONY_LOGI("GetCellInformationCallback end");
+    TELEPHONY_LOGD("GetCellInformationCallback end");
 }
 
 static napi_value GetCellInformation(napi_env env, napi_callback_info info)

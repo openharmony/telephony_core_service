@@ -19,8 +19,8 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_service_hisysevent.h"
+#include "enum_convert.h"
 #include "hilog/log.h"
-#include "tel_ril_sim_parcel.h"
 #include "if_system_ability_manager.h"
 #include "inner_event.h"
 #include "iservice_registry.h"
@@ -30,6 +30,7 @@
 #include "sim_state_manager.h"
 #include "system_ability_definition.h"
 #include "tel_event_handler.h"
+#include "tel_ril_sim_parcel.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_state_registry_client.h"
 #include "telephony_types.h"
@@ -53,14 +54,6 @@ const std::map<uint32_t, SimStateHandle::Func> SimStateHandle::memberFuncMap_ = 
     { MSG_SIM_GET_REALTIME_ICC_STATUS_DONE, &SimStateHandle::GetSimCardData },
     { MSG_SIM_AUTHENTICATION_DONE, &SimStateHandle::GetSimAuthenticationResult },
     { MSG_SIM_SEND_NCFG_OPER_INFO_DONE, &SimStateHandle::GetSendSimMatchedOperatorInfoResult },
-};
-const std::map<int32_t, std::string> simStatusMap_ = {
-    { static_cast<int32_t>(SimState::SIM_STATE_UNKNOWN), "SIM_STATE_UNKNOWN" },
-    { static_cast<int32_t>(SimState::SIM_STATE_NOT_PRESENT), "SIM_STATE_NOT_PRESENT" },
-    { static_cast<int32_t>(SimState::SIM_STATE_LOCKED), "SIM_STATE_LOCKED" },
-    { static_cast<int32_t>(SimState::SIM_STATE_NOT_READY), "SIM_STATE_NOT_READY" },
-    { static_cast<int32_t>(SimState::SIM_STATE_READY), "SIM_STATE_READY" },
-    { static_cast<int32_t>(SimState::SIM_STATE_LOADED), "SIM_STATE_LOADED" },
 };
 
 SimStateHandle::SimStateHandle(const std::weak_ptr<SimStateManager> &simStateManager)
@@ -333,7 +326,7 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
         oldSimStatus_ = newSimStatus;
         iter = simStatusMap_.find(newSimStatus);
         TELEPHONY_LOGI("will to NotifyIccStateChanged at newSimStatus[%{public}s]"
-                       "(%{public}d) observerHandler_ is nullptr[%{public}d] ",
+            "(%{public}d) observerHandler_ is nullptr[%{public}d] ",
             iter->second.c_str(), newSimStatus, (observerHandler_ == nullptr));
         if (observerHandler_ != nullptr) {
             observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_CHANGE, slotId);

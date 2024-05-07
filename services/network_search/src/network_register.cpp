@@ -18,12 +18,13 @@
 #include <cinttypes>
 
 #include "core_service_hisysevent.h"
-#include "tel_ril_modem_parcel.h"
+#include "enum_convert.h"
 #include "i_network_search_callback.h"
 #include "network_search_manager.h"
 #include "parameter.h"
 #include "resource_utils.h"
 #include "string_ex.h"
+#include "tel_ril_modem_parcel.h"
 #include "telephony_errors.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
@@ -111,8 +112,9 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
         roam = RoamingType::ROAMING_STATE_UNSPEC;
     }
     UpdateNetworkSearchState(regStatus, tech, roam, DomainType::DOMAIN_TYPE_CS);
-    TELEPHONY_LOGI("regStatus= %{public}d radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
-        registrationStatus, csRegStateResult->radioTechnology, roam, slotId_);
+    auto iter = rilRegisterStateMap_.find(static_cast<int32_t>(registrationStatus));
+    TELEPHONY_LOGI("regStatus= %{public}s(%{public}d) radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
+        iter->second.c_str(), registrationStatus, csRegStateResult->radioTechnology, roam, slotId_);
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
         TELEPHONY_LOGI("cs domain change, slotId:%{public}d", slotId_);
         networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
@@ -175,8 +177,9 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
     nrSupport_ = psRegStatusResult->isNrAvailable;
     UpdateNrState();
     UpdateCfgTech();
-    TELEPHONY_LOGI("regStatus= %{public}d radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
-        registrationStatus, psRegStatusResult->radioTechnology, roam, slotId_);
+    auto iter = rilRegisterStateMap_.find(static_cast<int32_t>(registrationStatus));
+    TELEPHONY_LOGI("regStatus= %{public}s(%{public}d) radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
+        iter->second.c_str(), registrationStatus, psRegStatusResult->radioTechnology, roam, slotId_);
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
         TELEPHONY_LOGI("ps domain change, slotId:%{public}d", slotId_);
         networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
