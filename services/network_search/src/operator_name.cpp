@@ -310,7 +310,7 @@ void OperatorName::NotifyGsmSpnChanged(
         TELEPHONY_EXT_WRAPPER.changeSpnAndRuleExt_(spn, spnRule, showSpn);
     }
     showPlmnOld = showPlmn;
-    if (spn.empty()) {
+    if (spn.empty() || !plmn.empty()) {
         showPlmn = true;
     }
     TELEPHONY_LOGI(
