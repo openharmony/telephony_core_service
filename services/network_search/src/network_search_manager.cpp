@@ -47,14 +47,6 @@ const int32_t INVALID_DELAY_TIME = 0;
 constexpr const char *NO_DELAY_TIME__CONFIG = "0";
 constexpr const char *CFG_TECH_UPDATE_TIME = "persist.radio.cfg.update.time";
 constexpr static const int32_t GET_SSB_WAIT_TIME_SECOND = 5;
-const std::map<int32_t, std::string> regServiceStateMap_ = {
-    { static_cast<int32_t>(RegServiceState::REG_STATE_UNKNOWN), "REG_STATE_UNKNOWN" },
-    { static_cast<int32_t>(RegServiceState::REG_STATE_IN_SERVICE), "REG_STATE_IN_SERVICE" },
-    { static_cast<int32_t>(RegServiceState::REG_STATE_NO_SERVICE), "REG_STATE_NO_SERVICE" },
-    { static_cast<int32_t>(RegServiceState::REG_STATE_EMERGENCY_ONLY), "REG_STATE_EMERGENCY_ONLY" },
-    { static_cast<int32_t>(RegServiceState::REG_STATE_SEARCH), "REG_STATE_SEARCH" },
-    { static_cast<int32_t>(RegServiceState::REG_STATE_POWER_OFF), "REG_STATE_POWER_OFF" },
-};
 
 NetworkSearchManager::NetworkSearchManager(
     std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<ISimManager> simManager)

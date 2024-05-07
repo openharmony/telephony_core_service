@@ -16,7 +16,9 @@
 #ifndef ENUM_CONVERT_H
 #define ENUM_CONVERT_H
 
+#include <map>
 #include <stdint.h>
+#include <string>
 
 #include "iosfwd"
 
@@ -307,6 +309,59 @@ enum class TelephonyLockReason {
      * Indicates SIM/USIM personalization of PUK lock(refer 3GPP TS 22.022 [33]).
      */
     SIM_SIM_PUK,
+};
+
+/**
+ * @brief Indicates the reg service states.
+ */
+enum class TelephonyRegServiceState {
+    REG_STATE_UNKNOWN,
+    REG_STATE_IN_SERVICE,
+    REG_STATE_NO_SERVICE,
+    REG_STATE_EMERGENCY_ONLY,
+    REG_STATE_SEARCH,
+    REG_STATE_POWER_OFF
+};
+
+/**
+ * @brief Indicates the ril register states.
+ */
+enum class TelephonyRilRegisterState {
+    REG_STATE_NOT_REG = 0,
+    REG_STATE_HOME_ONLY = 1,
+    REG_STATE_SEARCH = 2,
+    REG_STATE_NO_SERVICE = 3,
+    REG_STATE_INVALID = 4,
+    REG_STATE_ROAMING = 5,
+    REG_STATE_EMERGENCY_ONLY = 6
+};
+
+const std::map<int32_t, std::string> simStatusMap_ = {
+    { static_cast<int32_t>(TelephonySimState::SIM_STATE_UNKNOWN), "SIM_STATE_UNKNOWN" },
+    { static_cast<int32_t>(TelephonySimState::SIM_STATE_NOT_PRESENT), "SIM_STATE_NOT_PRESENT" },
+    { static_cast<int32_t>(TelephonySimState::SIM_STATE_LOCKED), "SIM_STATE_LOCKED" },
+    { static_cast<int32_t>(TelephonySimState::SIM_STATE_NOT_READY), "SIM_STATE_NOT_READY" },
+    { static_cast<int32_t>(TelephonySimState::SIM_STATE_READY), "SIM_STATE_READY" },
+    { static_cast<int32_t>(TelephonySimState::SIM_STATE_LOADED), "SIM_STATE_LOADED" },
+};
+
+const std::map<int32_t, std::string> regServiceStateMap_ = {
+    { static_cast<int32_t>(TelephonyRegServiceState::REG_STATE_UNKNOWN), "REG_STATE_UNKNOWN" },
+    { static_cast<int32_t>(TelephonyRegServiceState::REG_STATE_IN_SERVICE), "REG_STATE_IN_SERVICE" },
+    { static_cast<int32_t>(TelephonyRegServiceState::REG_STATE_NO_SERVICE), "REG_STATE_NO_SERVICE" },
+    { static_cast<int32_t>(TelephonyRegServiceState::REG_STATE_EMERGENCY_ONLY), "REG_STATE_EMERGENCY_ONLY" },
+    { static_cast<int32_t>(TelephonyRegServiceState::REG_STATE_SEARCH), "REG_STATE_SEARCH" },
+    { static_cast<int32_t>(TelephonyRegServiceState::REG_STATE_POWER_OFF), "REG_STATE_POWER_OFF" },
+};
+
+const std::map<int32_t, std::string> rilRegisterStateMap_ = {
+    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_NOT_REG), "REG_STATE_NOT_REG" },
+    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_HOME_ONLY), "REG_STATE_HOME_ONLY" },
+    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_SEARCH), "REG_STATE_SEARCH" },
+    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_NO_SERVICE), "REG_STATE_NO_SERVICE" },
+    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_INVALID), "REG_STATE_INVALID" },
+    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_ROAMING), "REG_STATE_ROAMING" },
+    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_EMERGENCY_ONLY), "REG_STATE_EMERGENCY_ONLY" },
 };
 
 /**
