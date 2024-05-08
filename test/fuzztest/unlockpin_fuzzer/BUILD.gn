@@ -76,6 +76,10 @@ ohos_fuzztest("UnlockPinFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+    "-fvisibility=hidden",
   ]
 
   ldflags = [
