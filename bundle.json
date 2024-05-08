@@ -65,7 +65,6 @@
                 "time_service"
             ],
             "third_party": [
-                "cJSON",
                 "libphonenumber",
                 "libpng",
                 "libxml2",
