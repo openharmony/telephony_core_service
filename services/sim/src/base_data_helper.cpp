@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,7 +36,7 @@ std::shared_ptr<DataShare::DataShareHelper> BaseDataHelper::CreateDataHelper(con
         return nullptr;
     }
     std::lock_guard<std::mutex> lock(lock_);
-    TELEPHONY_LOGE("CreateDataHelper start.");
+    TELEPHONY_LOGI("CreateDataHelper start.");
     return DataShare::DataShareHelper::Creator(remoteObj, uri);
 }
 } // namespace Telephony
