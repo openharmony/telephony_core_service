@@ -77,6 +77,10 @@ ohos_fuzztest("SatelliteCoreFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+    "-fvisibility=hidden",
   ]
 
   ldflags = [
