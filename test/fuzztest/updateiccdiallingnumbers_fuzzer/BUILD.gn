@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -80,7 +80,18 @@ ohos_fuzztest("UpdateIccDiallingNumbersFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+    "-fvisibility=hidden",
   ]
+
+  ldflags = [
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+  ]
+
   sources = [
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
     "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer/addcoreservicetoken_fuzzer.cpp",
