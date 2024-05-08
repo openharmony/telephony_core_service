@@ -18,7 +18,7 @@
 
 #include "iremote_proxy.h"
 #include "satellite_core_callback_ipc_interface_code.h"
-#include "tel_event_handler.h"
+#include "event_handler.h"
 
 namespace OHOS {
 namespace Telephony {
