@@ -18,7 +18,8 @@
 
 static constexpr const char *PDP_PROFILE_RDB_URI = "datashare:///com.ohos.pdpprofileability/net";
 static constexpr const char *PDP_PROFILE_RDB_INIT_URI =
-    "datashare:///com.ohos.pdpprofileability/net/pdp_profile/init?slotId=";
+    "datashare:///com.ohos.pdpprofileability/net/pdp_profile/init";
+static constexpr const char *SLOT_ID = "slotId";
 
 namespace OHOS {
 namespace Telephony {
@@ -49,7 +50,10 @@ void PdpProfileRdbHelper::notifyInitApnConfigs(int32_t slotId)
         return;
     }
     std::vector<DataShare::DataShareValuesBucket> values;
-    Uri pdpProfileUri(static_cast<std::string>(PDP_PROFILE_RDB_INIT_URI) + std::to_string(slotId));
+    DataShare::DataShareValuesBucket value;
+    value.Put(SLOT_ID, slotId);
+    values.push_back(value);
+    Uri pdpProfileUri(PDP_PROFILE_RDB_INIT_URI);
     dataShareHelper->BatchInsert(pdpProfileUri, values);
     dataShareHelper->Release();
     dataShareHelper = nullptr;
