@@ -417,7 +417,7 @@ void IccDiallingNumbersHandler::ClearLoadRequest(int serial)
 void IccDiallingNumbersHandler::FetchDiallingNumberContent(
     const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, const std::string &recordData)
 {
-    TELEPHONY_LOGI("FetchDiallingNumberContent start");
+    TELEPHONY_LOGD("FetchDiallingNumberContent start");
     int recordLen = 0;
     std::shared_ptr<unsigned char> data = SIMUtils::HexStringConvertToBytes(recordData, recordLen);
     if (diallingNumber == nullptr || data == nullptr) {

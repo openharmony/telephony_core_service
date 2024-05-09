@@ -1039,7 +1039,7 @@ int32_t MultiSimController::GetShowName(int32_t slotId, std::u16string &showName
     }
     showName = Str8ToStr16(localCacheInfo_[slotId].showName);
     lock.unlock();
-    TELEPHONY_LOGI("Get the SIM name set by the user");
+    TELEPHONY_LOGD("Get the SIM name set by the user");
     return TELEPHONY_ERR_SUCCESS;
 }
 

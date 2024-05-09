@@ -1602,10 +1602,11 @@ int32_t CoreServiceStub::OnGetCellInfoList(MessageParcel &data, MessageParcel &r
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     if (result != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetCellInfoList failed, result:%{public}d, cell size:%{public}zu", result,
+            cellInfo.size());
         return result;
     }
     reply.WriteInt32(static_cast<int32_t>(cellInfo.size()));
-    TELEPHONY_LOGI("OnRemoteRequest OnGetCellInfoList cell size %{public}zu", cellInfo.size());
     for (const auto &v : cellInfo) {
         v->Marshalling(reply);
     }

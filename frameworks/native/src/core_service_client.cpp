@@ -957,6 +957,7 @@ int32_t CoreServiceClient::GetPrimarySlotId(int32_t &slotId)
 
 int32_t CoreServiceClient::SetPrimarySlotId(int32_t slotId)
 {
+    TELEPHONY_LOGI("[slot%{public}d] entry", slotId);
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
