@@ -83,9 +83,10 @@ int32_t CoreServiceProxy::GetCsRadioTech(int32_t slotId, int32_t &csRadioTech)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
-    TELEPHONY_LOGI("GetCsRadioTech call end: result=%{public}d", result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         csRadioTech = reply.ReadInt32();
+    } else {
+        TELEPHONY_LOGE("GetCsRadioTech call failed: result=%{public}d", result);
     }
     return result;
 }
@@ -1287,9 +1288,10 @@ int32_t CoreServiceProxy::GetPrimarySlotId(int32_t &slotId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
-    TELEPHONY_LOGD("GetPrimarySlotId end: result=%{public}d", result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         slotId = reply.ReadInt32();
+    } else {
+        TELEPHONY_LOGE("GetPrimarySlotId failed: result=%{public}d", result);
     }
     return result;
 }
@@ -2707,7 +2709,7 @@ int32_t CoreServiceProxy::GetCellInfoList(int32_t slotId, std::vector<sptr<CellI
 void CoreServiceProxy::ProcessCellInfo(MessageParcel &reply, std::vector<sptr<CellInformation>> &cells)
 {
     int32_t size = reply.ReadInt32();
-    TELEPHONY_LOGI("CoreServiceProxy::ProcessCellInfo size:%{public}d\n", size);
+    TELEPHONY_LOGD("CoreServiceProxy::ProcessCellInfo size:%{public}d\n", size);
     if (size >= MAX_SIZE) {
         TELEPHONY_LOGE("CoreServiceProxy::ProcessCellInfo over max size");
         return;

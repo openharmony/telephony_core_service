@@ -686,7 +686,7 @@ bool SimFileManager::IsCTSimCard()
         TELEPHONY_LOGI("[slot%{public}d] result = 1", slotId_);
         return true;
     }
-    TELEPHONY_LOGI("[slot%{public}d] goto check plmn", slotId_);
+    TELEPHONY_LOGD("[slot%{public}d] goto check plmn", slotId_);
     bool result = false;
     std::string plmn = simFile_->ObtainSimOperator();
     if (!plmn.empty()) {
