@@ -336,13 +336,23 @@ enum class TelephonyRilRegisterState {
     REG_STATE_EMERGENCY_ONLY = 6
 };
 
-const std::map<int32_t, std::string> simStatusMap_ = {
-    { static_cast<int32_t>(TelephonySimState::SIM_STATE_UNKNOWN), "SIM_STATE_UNKNOWN" },
-    { static_cast<int32_t>(TelephonySimState::SIM_STATE_NOT_PRESENT), "SIM_STATE_NOT_PRESENT" },
-    { static_cast<int32_t>(TelephonySimState::SIM_STATE_LOCKED), "SIM_STATE_LOCKED" },
-    { static_cast<int32_t>(TelephonySimState::SIM_STATE_NOT_READY), "SIM_STATE_NOT_READY" },
-    { static_cast<int32_t>(TelephonySimState::SIM_STATE_READY), "SIM_STATE_READY" },
-    { static_cast<int32_t>(TelephonySimState::SIM_STATE_LOADED), "SIM_STATE_LOADED" },
+/**
+ * @brief Indicates the sim Icc state.
+ */
+enum class TelephonySimIccState {
+    ICC_CONTENT_UNKNOWN = -1,
+    ICC_CARD_ABSENT,
+    ICC_CONTENT_READY,
+    ICC_CONTENT_PIN,
+    ICC_CONTENT_PUK
+};
+
+const std::map<int32_t, std::string> simIccStatusMap_ = {
+    { static_cast<int32_t>(TelephonySimIccState::ICC_CONTENT_UNKNOWN), "ICC_CONTENT_UNKNOWN" },
+    { static_cast<int32_t>(TelephonySimIccState::ICC_CARD_ABSENT), "ICC_CARD_ABSENT" },
+    { static_cast<int32_t>(TelephonySimIccState::ICC_CONTENT_READY), "ICC_CONTENT_READY" },
+    { static_cast<int32_t>(TelephonySimIccState::ICC_CONTENT_PIN), "ICC_CONTENT_PIN" },
+    { static_cast<int32_t>(TelephonySimIccState::ICC_CONTENT_PUK), "ICC_CONTENT_PUK" },
 };
 
 const std::map<int32_t, std::string> regServiceStateMap_ = {
