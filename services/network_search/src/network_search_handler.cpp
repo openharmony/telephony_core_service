@@ -1288,7 +1288,7 @@ bool NetworkSearchHandler::IsPowerOnPrimaryRadioWhenNoSim() const
     }
     auto simManager = nsm->GetSimManager();
     if (simManager == nullptr) {
-        TELEPHONY_LOGE("get simManager is failed");
+        TELEPHONY_LOGE("get simManager failed");
         return false;
     }
     int32_t primarySlotId = INVALID_SLOT_ID;
