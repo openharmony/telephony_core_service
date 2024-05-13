@@ -359,7 +359,7 @@ HWTEST_F(BranchTest, Telephony_ImsRegInfoCallbackProxy_001, Function | MediumTes
 {
     sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityMgr == nullptr) {
-        TELEPHONY_LOGE("Telephony_ImsRegInfoCallbackProxy systemAbilityMgr is nullptr");
+        TELEPHONY_LOGE("Telephony_ImsRegInfoCallbackProxy systemAbilityMgr is nullptr ");
         return;
     }
     sptr<IRemoteObject> remote = systemAbilityMgr->CheckSystemAbility(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID);
