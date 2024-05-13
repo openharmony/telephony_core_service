@@ -312,7 +312,14 @@ void RadioInfo::AirplaneModeChange()
         return;
     }
     if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_OFF && isAirplaneModeOn == false) {
-        nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
+        auto simManager = nsm->GetSimManager();
+        if (simManager == nullptr) {
+            TELEPHONY_LOGE("get simManager failed");
+            return;
+        }
+        if (simManager->IsSimActive(slotId_)) {
+            nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
+        }
     }
     if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_ON && isAirplaneModeOn == true) {
         sptr<NetworkSearchCallBackBase> cellularData = nsm->GetCellularDataCallBack();
@@ -326,7 +333,7 @@ void RadioInfo::AirplaneModeChange()
         nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_OFF), 0);
     }
     nsm->SetLocalAirplaneMode(slotId_, isAirplaneModeOn);
-    TELEPHONY_LOGI("airplaneMode:%{public}d", isAirplaneModeOn);
+    TELEPHONY_LOGI("airplaneMode:%{public}d, slotId:%{public}d", isAirplaneModeOn, slotId_);
 }
 
 int32_t RadioInfo::ProcessGetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &event) const
