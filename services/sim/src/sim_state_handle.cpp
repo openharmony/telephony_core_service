@@ -897,6 +897,7 @@ bool SimStateHandle::IsRadioStateUnavailable(const AppExecFwk::InnerEvent::Point
         IccState iccState;
         iccState.simType_ = ICC_UNKNOWN_TYPE;
         iccState.simStatus_ = ICC_CONTENT_UNKNOWN;
+        modemInitDone_ = false;
         ProcessIccCardState(iccState, slotId_);
         return true;
     }

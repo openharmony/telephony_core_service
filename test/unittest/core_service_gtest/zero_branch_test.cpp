@@ -1183,6 +1183,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_007, Function | MediumTest | Lev
     EXPECT_NE(mInner.GetNrOptionMode(0, mode), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(mode, NrMode::NR_MODE_UNKNOWN);
     EXPECT_EQ(mInner.GetFrequencyType(0), FrequencyType::FREQ_TYPE_UNKNOWN);
+    EXPECT_NE(mInner.SetModemInit(-1, 0), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1343,6 +1344,8 @@ HWTEST_F(BranchTest, Telephony_SimManager_001, Function | MediumTest | Level1)
     CardType cardType = CardType::UNKNOWN_CARD;
     EXPECT_NE(simManager->GetCardType(0, cardType), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->GetCardType(INVALID_SLOTID, cardType), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(simManager->SetModemInit(0, 0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(simManager->SetModemInit(INVALID_SLOTID, 0), TELEPHONY_ERR_SUCCESS);
     LockType mLockType = LockType::PIN_LOCK;
     LockState lockState;
     EXPECT_NE(simManager->GetLockState(0, mLockType, lockState), TELEPHONY_ERR_SUCCESS);

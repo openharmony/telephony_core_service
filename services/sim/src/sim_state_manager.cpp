@@ -116,6 +116,16 @@ CardType SimStateManager::GetCardType()
     return ret;
 }
 
+int32_t SimStateManager::SetModemInit(bool state)
+{
+    if (simStateHandle_ != nullptr) {
+        TELEPHONY_LOGI("state: %{public}d", state);
+        simStateHandle_->modemInitDone_ = state;
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
+}
+
 int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
 {
     if (simStateHandle_ == nullptr) {
