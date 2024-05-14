@@ -245,6 +245,7 @@ public:
     int32_t HasSimCard(int32_t slotId, bool &hasSimCard);
     int32_t GetSimState(int32_t slotId, SimState &simState);
     int32_t GetCardType(int32_t slotId, CardType &cardType);
+    int32_t SetModemInit(int32_t slotId, bool state);
     int32_t UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response);
     int32_t UnlockPuk(int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response);
     int32_t AlterPin(
