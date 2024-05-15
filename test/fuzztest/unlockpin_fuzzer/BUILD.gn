@@ -39,6 +39,7 @@ ohos_fuzztest("UnlockPinFuzzTest") {
   deps = [
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
+    "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
   ]
 
   external_deps = [
