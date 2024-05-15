@@ -62,7 +62,8 @@
                 "safwk",
                 "samgr",
                 "telephony_data",
-                "time_service"
+                "time_service",
+                "huks"
             ],
             "third_party": [
                 "libphonenumber",

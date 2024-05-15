@@ -23,6 +23,7 @@
 #include "core_service_errors.h"
 #include "core_service_hisysevent.h"
 #include "ims_core_service_client.h"
+#include "tel_aes_crypto_util.h"
 #include "parameters.h"
 #include "sim_data.h"
 #include "sim_utils.h"
@@ -458,6 +459,15 @@ int32_t MultiSimController::GetSlotId(int32_t simId)
             return it->slotIndex;
         }
         ++it;
+    }
+    return INVALID_VALUE;
+}
+
+int32_t MultiSimController::GetSimId(int32_t slotId)
+{
+    IccAccountInfo iccAccountInfo;
+    if (GetSimAccountInfo(slotId, true, iccAccountInfo) == TELEPHONY_ERR_SUCCESS) {
+        return iccAccountInfo.simId;
     }
     return INVALID_VALUE;
 }
@@ -962,14 +972,19 @@ int32_t MultiSimController::GetShowNumber(int32_t slotId, std::u16string &showNu
     }
     showNumber = simFileManager_[slotId]->GetSimTelephoneNumber();
     if (!showNumber.empty()) {
+        TELEPHONY_LOGI("get phone number from sim");
         return TELEPHONY_ERR_SUCCESS;
     }
-    std::unique_lock<std::mutex> lock(mutex_);
-    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
-        TELEPHONY_LOGE("failed by nullptr");
+    int curSimId;
+    if (GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("failed by out of range");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     showNumber = Str8ToStr16(localCacheInfo_[slotId].phoneNumber);
+    if (!showNumber.empty()) {
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    showNumber = Str8ToStr16(TelAesCryptoUtils::ObtainDecryptString(PHONE_NUMBER_PREF, curSimId, ""));
     if (!showNumber.empty()) {
         return TELEPHONY_ERR_SUCCESS;
     }
@@ -1091,6 +1106,13 @@ int32_t MultiSimController::GetSimTelephoneNumber(int32_t slotId, std::u16string
     telephoneNumber = Str8ToStr16(result);
     TELEPHONY_LOGI("impu result is empty:%{public}s, slotId:%{public}d", (telephoneNumber.empty() ? "true" : "false"),
         slotId);
+    if (!telephoneNumber.empty()) {
+        int curSimId = GetSimId(slotId);
+        if (curSimId != INVALID_VALUE) {
+            TelAesCryptoUtils::SaveEncryptString(PHONE_NUMBER_PREF, curSimId, result);
+            TELEPHONY_LOGI("SaveEncryptString, slotId:%{public}d, curSimId:%{public}d", slotId, curSimId);
+        }
+    }
     return TELEPHONY_ERR_SUCCESS;
 }
 
