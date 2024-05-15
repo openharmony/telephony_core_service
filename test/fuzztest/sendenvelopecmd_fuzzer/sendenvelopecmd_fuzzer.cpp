@@ -25,6 +25,7 @@
 #include "core_service_stub.h"
 #include "napi_util.h"
 #include "system_ability_definition.h"
+#include "tel_event_handler.h"
 #include "unistd.h"
 
 using namespace OHOS::Telephony;
@@ -213,7 +214,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     SetNetworkCapability(data, size);
     GetResidentNetworkNumeric(data, size);
     auto telRilManager = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
-    if (telRilManager == nullptr) {
+    if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
         return;
     }
     auto handler = telRilManager->handler_;
@@ -222,6 +223,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         handler->SendEvent(0, 0, AppExecFwk::EventQueue::Priority::HIGH);
         sleep(SLEEP_TIME_SECONDS);
     }
+    telRilManager->handler_->ClearFfrt(true);
+    return;
 }
 } // namespace OHOS
 
