@@ -184,6 +184,7 @@ ohos_shared_library("tel_core_service") {
     "samgr:samgr_proxy",
     "telephony_data:tel_telephony_data",
     "time_service:time_client",
+    "huks:libhukssdk",
   ]
 
   if (defined(global_parts_info) &&

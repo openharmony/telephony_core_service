@@ -23,6 +23,7 @@
       OHOS::Telephony::TelephonyExtUtilsWrapper*;
       OHOS::Telephony::TelEventHandler*;
       OHOS::Telephony::TelProfileUtil*;
+      OHOS::Telephony::TelAesCryptoUtils*;
       OHOS::Telephony::ToUtf*;
       "OHOS::Telephony::GetBoolValue(int)";
       "OHOS::Telephony::GetBundleName()";
