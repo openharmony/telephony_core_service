@@ -17,6 +17,7 @@
 
 #include "core_manager_inner.h"
 #include "core_service_dump_helper.h"
+#include "ffrt_inner.h"
 #include "ims_core_service_client.h"
 #include "ipc_skeleton.h"
 #include "network_search_manager.h"
@@ -35,6 +36,7 @@ namespace OHOS {
 namespace Telephony {
 namespace {
 const int32_t MAX_IPC_THREAD_NUM = 6;
+const int32_t MAX_FFRT_THREAD_NUM = 16;
 }
 const bool G_REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<CoreService>::GetInstance().get());
@@ -62,6 +64,10 @@ void CoreService::OnStart()
         registerToService_ = true;
     }
     IPCSkeleton::SetMaxWorkThreadNum(MAX_IPC_THREAD_NUM);
+    int ffrtRet = ffrt_set_cpu_worker_max_num(ffrt::qos_default, MAX_FFRT_THREAD_NUM);
+    if (ffrtRet == -1) {
+        TELEPHONY_LOGE("ffrt_set_cpu_worker_max_num fail");
+    }
     if (!Init()) {
         TELEPHONY_LOGE("failed to init CoreService");
         return;
