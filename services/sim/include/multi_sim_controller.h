@@ -62,6 +62,7 @@ public:
     bool ForgetAllData();
     bool ForgetAllData(int32_t slotId);
     int32_t GetSlotId(int32_t simId);
+    int32_t GetSimId(int32_t slotId);
     int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue);
     int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue);
     bool GetListFromDataBase();
@@ -73,6 +74,7 @@ public:
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
+    static constexpr const char *PHONE_NUMBER_PREF = "sim_number_";
 
 private:
     bool IsValidData(int32_t slotId);
