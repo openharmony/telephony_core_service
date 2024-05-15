@@ -22,7 +22,7 @@ ohos_fuzztest("SatelliteCoreFuzzTest") {
   module_output_path = "core_service/core_service"
   module_out_path = module_output_path
   fuzz_config_file =
-      "$SUBSYSTEM_DIR/core_service/test/fuzztest/setshowname_fuzzer"
+      "$SUBSYSTEM_DIR/core_service/test/fuzztest/satellitecore_fuzzer"
 
   include_dirs = [
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/include",
@@ -39,6 +39,7 @@ ohos_fuzztest("SatelliteCoreFuzzTest") {
   deps = [
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
+    "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
   ]
 
   external_deps = [
