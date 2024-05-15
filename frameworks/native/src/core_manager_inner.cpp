@@ -2221,6 +2221,15 @@ int32_t CoreManagerInner::GetCardType(int32_t slotId, CardType &cardType)
     return simManager_->GetCardType(slotId, cardType);
 }
 
+int32_t CoreManagerInner::SetModemInit(int32_t slotId, bool state)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SetModemInit(slotId, state);
+}
+
 int32_t CoreManagerInner::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
 {
     if (simManager_ == nullptr) {

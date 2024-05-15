@@ -172,6 +172,15 @@ int32_t SimManager::GetCardType(int32_t slotId, CardType &cardType)
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t SimManager::SetModemInit(int32_t slotId, bool state)
+{
+    if ((!IsValidSlotId(slotId, simStateManager_)) || (simStateManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("slot%{public}d simStateManager_ is nullptr!", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simStateManager_[slotId]->SetModemInit(state);
+}
+
 int32_t SimManager::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
 {
     if (!HasSimCardInner(slotId)) {
