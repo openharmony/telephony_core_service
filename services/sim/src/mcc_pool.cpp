@@ -16,7 +16,6 @@
 #include "mcc_pool.h"
 
 using namespace std;
-//TODO
 namespace OHOS {
 namespace Telephony {
 constexpr size_t MCC_ACCESS_TABLE_LEN = 240;
