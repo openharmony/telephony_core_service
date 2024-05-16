@@ -1070,15 +1070,5 @@ int32_t CoreServiceClient::GetTargetOpkey(int32_t slotId, std::u16string &opkey)
     }
     return proxy->GetTargetOpkey(slotId, opkey);
 }
-
-int32_t CoreServiceClient::GetOpkeyVersion(std::string &versionInfo)
-{
-    auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return proxy->GetOpkeyVersion(versionInfo);
-}
 } // namespace Telephony
 } // namespace OHOS

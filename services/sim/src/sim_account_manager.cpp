@@ -75,15 +75,6 @@ int32_t SimAccountManager::GetOperatorConfigs(int32_t slotId, OHOS::Telephony::O
     return operatorConfigCache_->GetOperatorConfigs(static_cast<int32_t>(slotId), poc);
 }
 
-int32_t SimAccountManager::UpdateOperatorConfigs(int32_t slotId)
-{
-    if (operatorConfigCache_ == nullptr) {
-        TELEPHONY_LOGE("operatorConfigCache_ is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    return operatorConfigCache_->UpdateOperatorConfigs(slotId);
-}
-
 bool SimAccountManager::IsValidSlotId(int32_t slotId)
 {
     int32_t count = SIM_SLOT_COUNT;

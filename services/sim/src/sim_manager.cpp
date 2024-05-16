@@ -19,7 +19,6 @@
 #include "radio_event.h"
 #include "telephony_errors.h"
 #include "telephony_ext_wrapper.h"
-#include "telephony_permission.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -594,19 +593,6 @@ int32_t SimManager::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simAccountManager_[slotId]->GetOperatorConfigs(slotId, poc);
-}
-
-int32_t SimManager::UpdateOperatorConfigs(int32_t slotId)
-{
-    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGE("permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
-    }
-    if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId %{public}d is invalid or simAccountManager is null!", slotId);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    return simAccountManager_[slotId]->UpdateOperatorConfigs(slotId);
 }
 
 int32_t SimManager::HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges)

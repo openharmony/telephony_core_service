@@ -71,20 +71,20 @@ void OperatorConfigCache::ClearMemoryCache(int32_t slotId)
 }
 
 void OperatorConfigCache::UpdateCurrentOpc(
-    int32_t slotId, OperatorConfig &poc, int32_t state, bool canAnnounceChanged, bool needUpdateLoading)
+    int32_t slotId, OperatorConfig &poc, bool canAnnounceChanged, bool needUpdateLoading)
 {
     std::unique_lock<std::mutex> lock(mutex_);
     CopyOperatorConfig(poc, opc_);
     lock.unlock();
     if (canAnnounceChanged) {
-        AnnounceOperatorConfigChanged(slotId, state);
+        AnnounceOperatorConfigChanged(slotId);
     }
     if (needUpdateLoading) {
         isLoadingConfig = false;
     }
 }
 
-int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &poc, int32_t state)
+int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &poc)
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
@@ -101,14 +101,13 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
     isLoadingConfig = true;
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     CoreManagerInner::GetInstance().GetSimState(slotId, simState);
-    TELEPHONY_LOGI("LoadOperatorConfig slotId = %{public}d simState = %{public}d", slotId, simState);
+    TELEPHONY_LOGI("LoadOperatorConfig simState = %{public}d", simState);
     bool canAnnounceChanged = (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_READY);
     cJSON *root = nullptr;
     if (parser_.ParseOperatorConfigFromFile(poc, parser_.GetOperatorConfigFilePath(filename), root)) {
         TELEPHONY_LOGI("load from file success opc size %{public}zu", poc.configValue.size());
         if (poc.configValue.size() > 0) {
-            // state indicate the case of load operator config
-            UpdateCurrentOpc(slotId, poc, state, canAnnounceChanged, false);
+            UpdateCurrentOpc(slotId, poc, canAnnounceChanged, false);
             root = nullptr;
             return TELEPHONY_ERR_SUCCESS;
         }
@@ -119,8 +118,7 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
         parser_.WriteOperatorConfigJson(filename, root);
 
         if (poc.configValue.size() > 0) {
-            // state indicate the case of load operator config
-            UpdateCurrentOpc(slotId, poc, state, canAnnounceChanged, true);
+            UpdateCurrentOpc(slotId, poc, canAnnounceChanged, true);
             if (root != nullptr) {
                 cJSON_Delete(root);
                 root = nullptr;
@@ -147,20 +145,6 @@ int32_t OperatorConfigCache::GetOperatorConfigs(int32_t slotId, OperatorConfig &
     }
     TELEPHONY_LOGI("reload operator config");
     return LoadOperatorConfig(slotId, poc);
-}
-
-int32_t OperatorConfigCache::UpdateOperatorConfigs(int32_t slotId)
-{
-    std::unique_lock<std::mutex> lock(mutex_);
-    ClearMemoryCache(slotId);
-    lock.unlock();
-    if (slotId == 0) {
-        TELEPHONY_LOGD("OperatorConfigCache:UpdateOperatorConfigs ClearFilesCache");
-        parser_.ClearFilesCache();
-    }
-    OperatorConfig opc;
-    int32_t ret = LoadOperatorConfig(slotId_, opc, STATE_PARA_UPDATE);
-    return ret;
 }
 
 void OperatorConfigCache::CopyOperatorConfig(const OperatorConfig &from, OperatorConfig &to)
@@ -290,14 +274,13 @@ void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
     helper->notifyInitApnConfigs(slotId);
 }
 
-bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t state)
+bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId)
 {
     notifyInitApnConfigs(slotId);
     SendSimMatchedOperatorInfo(slotId);
     AAFwk::Want want;
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     want.SetParam(KEY_SLOTID, slotId);
-    want.SetParam(CHANGE_STATE, state);
     std::string eventData(OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventData data;
     data.SetWant(want);
