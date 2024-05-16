@@ -1165,7 +1165,15 @@ void SimFile::CheckMncLength()
             TELEPHONY_LOGI("SimFile update6 lengthOfMnc_= %{public}d", lengthOfMnc_);
         }
     }
-
+    if (((lengthOfMnc_ == UNINITIALIZED_MNC) || (lengthOfMnc_ == UNKNOWN_MNC) || (lengthOfMnc_ == MCC_LEN)) &&
+        ((!imsi.empty()) && (imsiSize >= MCCMNC_LEN - 1))) {
+        std::string mccMncCode = imsi.substr(0, MCCMNC_LEN - 1);
+        TELEPHONY_LOGI("SimFile mccMncCode= %{public}s", mccMncCode.c_str());
+        if (mccPool->LengthIsTwoMnc(mccMncCode)) {
+            lengthOfMnc_ = MNC_LEN;
+            TELEPHONY_LOGI("SimFile update6 lengthOfMnc_= %{public}d", lengthOfMnc_);
+        }
+    }
     if (lengthOfMnc_ == UNKNOWN_MNC || lengthOfMnc_ == UNINITIALIZED_MNC) {
         if (!imsi.empty()) {
             int mcc = atoi(imsi.substr(0, MCC_LEN).c_str());
