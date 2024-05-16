@@ -33,7 +33,6 @@ public:
 
     void Init(int32_t slotId);
     int32_t GetOperatorConfigs(int slotId, OperatorConfig &poc);
-    int32_t UpdateOperatorConfigs(int32_t slotId);
     int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges);
 
 private:

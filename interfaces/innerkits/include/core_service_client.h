@@ -904,14 +904,6 @@ public:
      */
     int32_t GetTargetOpkey(int32_t slotId, std::u16string &opkey);
 
-    /**
-     * @brief get opkey param version
-     *
-     * @param versionInfo[out], opkey param version info
-     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
-     */
-    int32_t GetOpkeyVersion(std::string &versionInfo);
-
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {

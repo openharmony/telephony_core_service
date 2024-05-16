@@ -255,8 +255,6 @@ public:
 
     int32_t GetTargetOpkey(int32_t slotId, std::u16string &opkey) override;
 
-    int32_t GetOpkeyVersion(std::string &versionInfo) override;
-
 private:
     bool Init();
 

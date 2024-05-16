@@ -33,7 +33,6 @@ private:
     void AddHandlerSimToMap();
     void AddHandlerSimToMapExt();
     void AddHandlerPdpProfileToMap();
-    void AddHandlerOpkeyVersionToMap();
 
 private:
     using CoreServiceFunc = int32_t (CoreServiceStub::*)(MessageParcel &data, MessageParcel &reply);
@@ -134,7 +133,6 @@ private:
     int32_t OnInitExtraModule(MessageParcel &data, MessageParcel &reply);
     int32_t OnIsAllowedInsertApn(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetTargetOpkey(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply);
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;

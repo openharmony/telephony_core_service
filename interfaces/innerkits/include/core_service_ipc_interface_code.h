@@ -118,7 +118,6 @@ enum class CoreServiceInterfaceCode {
     INIT_EXTRA_MODULE,
     IS_ALLOWED_INSERT_APN,
     GET_TARGET_OPKEY,
-    GET_OPKEY_VERSION,
     GET_RESIDENT_NETWORK_NUMERIC,
 };
 } // namespace Telephony
