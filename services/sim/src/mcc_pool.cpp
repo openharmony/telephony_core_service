@@ -19,8 +19,6 @@ using namespace std;
 //TODO
 namespace OHOS {
 namespace Telephony {
-std::vector<std::shared_ptr<MccAccess>> MccPool::mccAccessTable_;
-std::vector<std::string> MccPool::specialMccMnc_;
 constexpr size_t MCC_ACCESS_TABLE_LEN = 240;
 std::shared_ptr<MccAccess> MccPool::AccessToMcc(int mcc)
 {
@@ -340,191 +338,33 @@ bool MccPool::MccCompare(const std::shared_ptr<MccAccess> &mccAccessA, const std
 
 bool MccPool::LengthIsThreeMnc(const std::string &mccMncCode)
 {
-    InitSpecialMccMncTables();
-    std::vector<std::string>::iterator obj = std::find(specialMccMnc_.begin(), specialMccMnc_.end(), mccMncCode);
-    return (obj == specialMccMnc_.end()) ? false : true;
-}
-
-void MccPool::InitSpecialMccMncTables()
-{
-    if (specialMccMnc_.size() == 0) {
-        AddMccMncForCa();
-        AddMccMncForInAirtel();
-        AddMccMncForInHutch();
-        AddMccMncForMy();
+    for (const std::string &item : MCCMNC_CODES_HAVING_3DIGITS_MNC) {
+        if (mccMncCode == item) {
+            return true;
+        }
     }
+    return false;
 }
 
-void MccPool::AddMccMncForCa()
+bool MccPool::LengthIsTwoMnc(const std::string &mccMncCode)
 {
-    specialMccMnc_.push_back("302370");
-    specialMccMnc_.push_back("302720");
-    specialMccMnc_.push_back("310260");
-    specialMccMnc_.push_back("405025");
-    specialMccMnc_.push_back("405026");
-    specialMccMnc_.push_back("405027");
-    specialMccMnc_.push_back("405028");
-    specialMccMnc_.push_back("405029");
-    specialMccMnc_.push_back("405030");
-    specialMccMnc_.push_back("405031");
-    specialMccMnc_.push_back("405032");
-    specialMccMnc_.push_back("405033");
-    specialMccMnc_.push_back("405034");
-    specialMccMnc_.push_back("405035");
-    specialMccMnc_.push_back("405036");
-    specialMccMnc_.push_back("405037");
-    specialMccMnc_.push_back("405038");
-    specialMccMnc_.push_back("405039");
-    specialMccMnc_.push_back("405040");
-    specialMccMnc_.push_back("405041");
-    specialMccMnc_.push_back("405042");
-    specialMccMnc_.push_back("405043");
-    specialMccMnc_.push_back("405044");
-    specialMccMnc_.push_back("405045");
-    specialMccMnc_.push_back("405046");
-    specialMccMnc_.push_back("405047");
-    specialMccMnc_.push_back("405750");
-    specialMccMnc_.push_back("405751");
-    specialMccMnc_.push_back("405752");
-    specialMccMnc_.push_back("405753");
-    specialMccMnc_.push_back("405754");
-    specialMccMnc_.push_back("405755");
-    specialMccMnc_.push_back("405756");
-    specialMccMnc_.push_back("405799");
-    specialMccMnc_.push_back("405800");
-    specialMccMnc_.push_back("405801");
+    for (const std::string &item : MCCMNC_CODES_HAVING_2DIGITS_MNC) {
+        if (mccMncCode == item) {
+            return true;
+        }
+    }
+    return false;
 }
 
-void MccPool::AddMccMncForInAirtel()
+MccPool::MccPool()
 {
-    specialMccMnc_.push_back("405802");
-    specialMccMnc_.push_back("405803");
-    specialMccMnc_.push_back("405804");
-    specialMccMnc_.push_back("405805");
-    specialMccMnc_.push_back("405806");
-    specialMccMnc_.push_back("405807");
-    specialMccMnc_.push_back("405808");
-    specialMccMnc_.push_back("405809");
-    specialMccMnc_.push_back("405810");
-    specialMccMnc_.push_back("405811");
-    specialMccMnc_.push_back("405812");
-    specialMccMnc_.push_back("405813");
-    specialMccMnc_.push_back("405814");
-    specialMccMnc_.push_back("405815");
-    specialMccMnc_.push_back("405816");
-    specialMccMnc_.push_back("405817");
-    specialMccMnc_.push_back("405818");
-    specialMccMnc_.push_back("405819");
-    specialMccMnc_.push_back("405820");
-    specialMccMnc_.push_back("405821");
-    specialMccMnc_.push_back("405822");
-    specialMccMnc_.push_back("405823");
-    specialMccMnc_.push_back("405824");
-    specialMccMnc_.push_back("405825");
-    specialMccMnc_.push_back("405826");
-    specialMccMnc_.push_back("405827");
-    specialMccMnc_.push_back("405828");
-    specialMccMnc_.push_back("405829");
-    specialMccMnc_.push_back("405830");
-    specialMccMnc_.push_back("405831");
-    specialMccMnc_.push_back("405832");
-    specialMccMnc_.push_back("405833");
-    specialMccMnc_.push_back("405834");
-    specialMccMnc_.push_back("405835");
-    specialMccMnc_.push_back("405836");
+    InitMccTables();
 }
 
-void MccPool::AddMccMncForInHutch()
+MccPool::~MccPool()
 {
-    specialMccMnc_.push_back("405837");
-    specialMccMnc_.push_back("405838");
-    specialMccMnc_.push_back("405839");
-    specialMccMnc_.push_back("405840");
-    specialMccMnc_.push_back("405841");
-    specialMccMnc_.push_back("405842");
-    specialMccMnc_.push_back("405843");
-    specialMccMnc_.push_back("405844");
-    specialMccMnc_.push_back("405845");
-    specialMccMnc_.push_back("405846");
-    specialMccMnc_.push_back("405847");
-    specialMccMnc_.push_back("405848");
-    specialMccMnc_.push_back("405849");
-    specialMccMnc_.push_back("405850");
-    specialMccMnc_.push_back("405851");
-    specialMccMnc_.push_back("405852");
-    specialMccMnc_.push_back("405853");
-    specialMccMnc_.push_back("405854");
-    specialMccMnc_.push_back("405855");
-    specialMccMnc_.push_back("405856");
-    specialMccMnc_.push_back("405857");
-    specialMccMnc_.push_back("405858");
-    specialMccMnc_.push_back("405859");
-    specialMccMnc_.push_back("405860");
-    specialMccMnc_.push_back("405861");
-    specialMccMnc_.push_back("405862");
-    specialMccMnc_.push_back("405863");
-    specialMccMnc_.push_back("405864");
-    specialMccMnc_.push_back("405865");
-    specialMccMnc_.push_back("405866");
-    specialMccMnc_.push_back("405867");
-    specialMccMnc_.push_back("405868");
-    specialMccMnc_.push_back("405869");
-    specialMccMnc_.push_back("405870");
-    specialMccMnc_.push_back("405871");
-    specialMccMnc_.push_back("405872");
-    specialMccMnc_.push_back("405873");
-    specialMccMnc_.push_back("405874");
-    specialMccMnc_.push_back("405875");
+    mccAccessTable_.clear();
 }
 
-void MccPool::AddMccMncForMy()
-{
-    specialMccMnc_.push_back("405876");
-    specialMccMnc_.push_back("405877");
-    specialMccMnc_.push_back("405878");
-    specialMccMnc_.push_back("405879");
-    specialMccMnc_.push_back("405880");
-    specialMccMnc_.push_back("405881");
-    specialMccMnc_.push_back("405882");
-    specialMccMnc_.push_back("405883");
-    specialMccMnc_.push_back("405884");
-    specialMccMnc_.push_back("405885");
-    specialMccMnc_.push_back("405886");
-    specialMccMnc_.push_back("405908");
-    specialMccMnc_.push_back("405909");
-    specialMccMnc_.push_back("405910");
-    specialMccMnc_.push_back("405911");
-    specialMccMnc_.push_back("405912");
-    specialMccMnc_.push_back("405913");
-    specialMccMnc_.push_back("405914");
-    specialMccMnc_.push_back("405915");
-    specialMccMnc_.push_back("405916");
-    specialMccMnc_.push_back("405917");
-    specialMccMnc_.push_back("405918");
-    specialMccMnc_.push_back("405919");
-    specialMccMnc_.push_back("405920");
-    specialMccMnc_.push_back("405921");
-    specialMccMnc_.push_back("405922");
-    specialMccMnc_.push_back("405923");
-    specialMccMnc_.push_back("405924");
-    specialMccMnc_.push_back("405925");
-    specialMccMnc_.push_back("405926");
-    specialMccMnc_.push_back("405927");
-    specialMccMnc_.push_back("405928");
-    specialMccMnc_.push_back("405929");
-    specialMccMnc_.push_back("405930");
-    specialMccMnc_.push_back("405931");
-    specialMccMnc_.push_back("405932");
-    specialMccMnc_.push_back("502142");
-    specialMccMnc_.push_back("502143");
-    specialMccMnc_.push_back("502145");
-    specialMccMnc_.push_back("502146");
-    specialMccMnc_.push_back("502147");
-    specialMccMnc_.push_back("502148");
-}
-
-MccPool::MccPool() {}
-
-MccPool::~MccPool() {}
 } // namespace Telephony
 } // namespace OHOS
