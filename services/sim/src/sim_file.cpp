@@ -114,7 +114,7 @@ std::string SimFile::ObtainIsoCountryCode()
     int len = static_cast<int>(numeric.length());
     std::string mcc = numeric.substr(0, MCC_LEN);
     if (len >= MCC_LEN && IsValidDecValue(mcc)) {
-        std::string iso = MccPool::MccCountryCode(std::stoi(mcc));
+        std::string iso = MccPool::GetInstance()->MccCountryCode(std::stoi(mcc));
         return iso;
     } else {
         return "";
@@ -1154,12 +1154,13 @@ bool SimFile::ProcessGetAdDone(const AppExecFwk::InnerEvent::Pointer &event)
 void SimFile::CheckMncLength()
 {
     std::string imsi = ObtainIMSI();
+    auto mccPool = MccPool::GetInstance();
     int imsiSize = static_cast<int>(imsi.size());
     if (((lengthOfMnc_ == UNINITIALIZED_MNC) || (lengthOfMnc_ == UNKNOWN_MNC) || (lengthOfMnc_ == MNC_LEN)) &&
         ((!imsi.empty()) && (imsiSize >= MCCMNC_LEN))) {
         std::string mccMncCode = imsi.substr(0, MCCMNC_LEN);
         TELEPHONY_LOGI("SimFile mccMncCode= %{public}s", mccMncCode.c_str());
-        if (MccPool::LengthIsThreeMnc(mccMncCode)) {
+        if (mccPool->LengthIsThreeMnc(mccMncCode)) {
             lengthOfMnc_ = MCC_LEN;
             TELEPHONY_LOGI("SimFile update6 lengthOfMnc_= %{public}d", lengthOfMnc_);
         }
@@ -1168,7 +1169,7 @@ void SimFile::CheckMncLength()
     if (lengthOfMnc_ == UNKNOWN_MNC || lengthOfMnc_ == UNINITIALIZED_MNC) {
         if (!imsi.empty()) {
             int mcc = atoi(imsi.substr(0, MCC_LEN).c_str());
-            lengthOfMnc_ = MccPool::ShortestMncLengthFromMcc(mcc);
+            lengthOfMnc_ = mccPool->ShortestMncLengthFromMcc(mcc);
             TELEPHONY_LOGI("SimFile update7 lengthOfMnc_= %{public}d", lengthOfMnc_);
         } else {
             lengthOfMnc_ = UNKNOWN_MNC;

@@ -750,7 +750,7 @@ int32_t NetworkSearchManager::GetIsoCountryCodeForNetwork(int32_t slotId, std::u
         int32_t value = 0;
         bool succ = StrToInt(mcc, value);
         if (succ) {
-            iso = MccPool::MccCountryCode(value);
+            iso = MccPool::GetInstance()->MccCountryCode(value);
         } else {
             TELEPHONY_LOGE("GetIsoCountryCodeForNetwork parse Failed!! slotId:%{public}d", slotId);
         }
