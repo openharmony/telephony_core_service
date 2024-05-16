@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <functional>
 #include <iostream>
+#include <singleton.h>
 #include <vector>
 
 enum MccCountry {
