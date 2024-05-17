@@ -364,7 +364,7 @@ HWTEST_F(BranchTest, Telephony_ImsRegInfoCallbackProxy_001, Function | MediumTes
     }
     sptr<IRemoteObject> remote = systemAbilityMgr->CheckSystemAbility(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID);
     if (remote == nullptr) {
-        TELEPHONY_LOGE("Telephony_ImsRegInfoCallbackProxy remote is nullptr ");
+        TELEPHONY_LOGE("Telephony_ImsRegInfoCallbackProxy remote is nullptr");
         return;
     }
     auto imsRegInfoCallbackProxy = std::make_shared<ImsRegInfoCallbackProxy>(remote);
