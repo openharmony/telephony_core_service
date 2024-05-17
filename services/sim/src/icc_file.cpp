@@ -389,7 +389,7 @@ void IccFile::RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> e
     }
     TELEPHONY_LOGD("IccFile::RegisterAllFilesLoaded: registerd");
     if (ObtainFilesFetched()) {
-        TELEPHONY_LOGI("IccFile::RegisterAllFilesLoaded: notify");
+        TELEPHONY_LOGI("IccFile::RegisterAllFilesLoaded: notify, slotId:%{public}d", slotId);
         if (eventHandler != nullptr) {
             TelEventHandler::SendTelEvent(eventHandler, RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_, 0);
         }
@@ -429,7 +429,7 @@ void IccFile::RegisterIccidLoaded(std::shared_ptr<AppExecFwk::EventHandler> even
     }
     TELEPHONY_LOGD("IccFile::RegisterIccidLoaded: registered");
     if (!iccId_.empty()) {
-        TELEPHONY_LOGI("IccFile::RegisterIccidLoaded: notify");
+        TELEPHONY_LOGI("IccFile::RegisterIccidLoaded: notify, slotId:%{public}d", slotId);
         if (eventHandler != nullptr) {
             TelEventHandler::SendTelEvent(eventHandler, RadioEvent::RADIO_SIM_ICCID_LOADED, slotId_, 0);
         }
@@ -480,7 +480,7 @@ void IccFile::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandle
             UnregisterIccidLoaded(handler);
             break;
         default:
-            TELEPHONY_LOGI("RegisterCoreNotify default");
+            TELEPHONY_LOGI("UnregisterCoreNotify default");
     }
 }
 
