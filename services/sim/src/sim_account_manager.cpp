@@ -31,6 +31,7 @@ SimAccountManager::~SimAccountManager()
     if (simStateTracker_ != nullptr) {
         simStateTracker_->UnRegisterForIccLoaded();
         simStateTracker_->UnRegisterOpkeyLoaded();
+        simStateTracker_->UnregisterOperatorCacheDel();
     }
     if (operatorConfigCache_ != nullptr) {
         operatorConfigCache_->UnRegisterForIccChange();
@@ -63,6 +64,7 @@ void SimAccountManager::Init(int32_t slotId)
     }
     simStateTracker_->RegisterForIccLoaded();
     simStateTracker_->RegisterOpkeyLoaded();
+    simStateTracker_->RegisterOperatorCacheDel();
 }
 
 int32_t SimAccountManager::GetOperatorConfigs(int32_t slotId, OHOS::Telephony::OperatorConfig &poc)
