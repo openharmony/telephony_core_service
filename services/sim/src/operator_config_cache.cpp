@@ -285,6 +285,7 @@ void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
     auto helper = PdpProfileRdbHelper::GetInstance();
     if (helper == nullptr) {
         TELEPHONY_LOGE("get PdpProfileRdbHelper Failed.");
+        return;
     }
     TELEPHONY_LOGI("OperatorConfigCache:notifyInitApnConfigs end");
     helper->notifyInitApnConfigs(slotId);
