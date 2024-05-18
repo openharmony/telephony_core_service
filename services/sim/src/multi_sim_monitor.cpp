@@ -58,7 +58,7 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     auto eventCode = event->GetInnerEventId();
     TELEPHONY_LOGI("eventCode is %{public}d", eventCode);
     switch (eventCode) {
-        case RadioEvent::RADIO_SIM_RECORDS_LOADED: {
+        case RadioEvent::RADIO_SIM_ICCID_LOADED: {
             auto slotId = event->GetParam();
             InitData(slotId);
             break;
@@ -246,10 +246,10 @@ void MultiSimMonitor::RegisterSimNotify()
     for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
         auto simFileManager = simFileManager_[slotId].lock();
         if (simFileManager == nullptr) {
-            TELEPHONY_LOGE("simFileManager is null slotId : %{public}zu", slotId);
+            TELEPHONY_LOGE("simFileManager is null, slotId: %{public}zu", slotId);
             continue;
         }
-        simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
+        simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_ICCID_LOADED);
         simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     }
 }
@@ -259,10 +259,10 @@ void MultiSimMonitor::UnRegisterSimNotify()
     for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
         auto simFileManager = simFileManager_[slotId].lock();
         if (simFileManager == nullptr) {
-            TELEPHONY_LOGE("simFileManager is null slotId : %{public}zu", slotId);
+            TELEPHONY_LOGE("simFileManager is null, slotId: %{public}zu", slotId);
             continue;
         }
-        simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
+        simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_ICCID_LOADED);
         simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     }
 }

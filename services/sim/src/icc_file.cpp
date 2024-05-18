@@ -85,6 +85,7 @@ IccFile::IccFile(const std::string &name, std::shared_ptr<SimStateManager> simSt
         return;
     }
     AddOpkeyLoadObser();
+    AddIccidLoadObser();
     TELEPHONY_LOGI("simmgr IccFile::IccFile finish");
 }
 
@@ -388,7 +389,7 @@ void IccFile::RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> e
     }
     TELEPHONY_LOGD("IccFile::RegisterAllFilesLoaded: registerd");
     if (ObtainFilesFetched()) {
-        TELEPHONY_LOGI("IccFile::RegisterAllFilesLoaded: notify");
+        TELEPHONY_LOGI("IccFile::RegisterAllFilesLoaded: notify, slotId:%{public}d", slotId_);
         if (eventHandler != nullptr) {
             TelEventHandler::SendTelEvent(eventHandler, RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_, 0);
         }
@@ -420,6 +421,29 @@ void IccFile::UnregisterOpkeyLoaded(const std::shared_ptr<AppExecFwk::EventHandl
     }
 }
 
+void IccFile::RegisterIccidLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+{
+    int eventCode = RadioEvent::RADIO_SIM_ICCID_LOADED;
+    if (iccidLoadObser_ != nullptr) {
+        iccidLoadObser_->RegObserver(eventCode, eventHandler);
+    }
+    TELEPHONY_LOGD("IccFile::RegisterIccidLoaded: registered");
+    if (!iccId_.empty()) {
+        TELEPHONY_LOGI("IccFile::RegisterIccidLoaded: notify, slotId:%{public}d", slotId_);
+        if (eventHandler != nullptr) {
+            TelEventHandler::SendTelEvent(eventHandler, RadioEvent::RADIO_SIM_ICCID_LOADED, slotId_, 0);
+        }
+    }
+}
+
+void IccFile::UnregisterIccidLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    if (iccidLoadObser_ != nullptr) {
+        iccidLoadObser_->Remove(RadioEvent::RADIO_SIM_ICCID_LOADED, handler);
+    }
+}
+
+
 void IccFile::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {
     switch (what) {
@@ -431,6 +455,9 @@ void IccFile::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler>
             break;
         case RadioEvent::RADIO_SIM_OPKEY_LOADED:
             RegisterOpkeyLoaded(handler);
+            break;
+        case RadioEvent::RADIO_SIM_ICCID_LOADED:
+            RegisterIccidLoaded(handler);
             break;
         default:
             TELEPHONY_LOGI("RegisterCoreNotify default");
@@ -449,8 +476,11 @@ void IccFile::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandle
         case RadioEvent::RADIO_SIM_OPKEY_LOADED:
             UnregisterOpkeyLoaded(handler);
             break;
+        case RadioEvent::RADIO_SIM_ICCID_LOADED:
+            UnregisterIccidLoaded(handler);
+            break;
         default:
-            TELEPHONY_LOGI("RegisterCoreNotify default");
+            TELEPHONY_LOGI("UnregisterCoreNotify default");
     }
 }
 
@@ -750,6 +780,15 @@ void IccFile::AddOpkeyLoadObser()
     opkeyLoadObser_ = std::make_unique<ObserverHandler>();
     if (opkeyLoadObser_ == nullptr) {
         TELEPHONY_LOGE("IccFile::IccFile opkeyLoadObser_ create nullptr.");
+        return;
+    }
+}
+
+void IccFile::AddIccidLoadObser()
+{
+    iccidLoadObser_ = std::make_unique<ObserverHandler>();
+    if (iccidLoadObser_ == nullptr) {
+        TELEPHONY_LOGE("IccFile::IccFile iccidLoadObser_ create nullptr.");
         return;
     }
 }
