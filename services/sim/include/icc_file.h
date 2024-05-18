@@ -209,7 +209,6 @@ private:
     void UnregisterOperatorCacheDel(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void AddOpkeyLoadObser();
     void AddIccidLoadObser();
-    void AddIccidLoadObser();
     void AddOperatorCacheDelObser();
 };
 } // namespace Telephony
