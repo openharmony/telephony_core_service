@@ -175,6 +175,7 @@ protected:
     std::unique_ptr<ObserverHandler> recordsOverrideObser_ = nullptr;
     std::unique_ptr<ObserverHandler> opkeyLoadObser_ = nullptr;
     std::unique_ptr<ObserverHandler> iccidLoadObser_ = nullptr;
+    std::unique_ptr<ObserverHandler> operatorCacheDelObser_ = nullptr;
     virtual AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId);
     virtual AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId, int arg1, int arg2);
     virtual AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId, std::shared_ptr<void> loader);
@@ -204,8 +205,12 @@ private:
     void UnregisterOpkeyLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void RegisterIccidLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void UnregisterIccidLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void RegisterOperatorCacheDel(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
+    void UnregisterOperatorCacheDel(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void AddOpkeyLoadObser();
     void AddIccidLoadObser();
+    void AddIccidLoadObser();
+    void AddOperatorCacheDelObser();
 };
 } // namespace Telephony
 } // namespace OHOS
