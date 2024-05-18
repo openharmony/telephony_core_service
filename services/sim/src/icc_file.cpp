@@ -79,7 +79,7 @@ IccFile::IccFile(const std::string &name, std::shared_ptr<SimStateManager> simSt
         TELEPHONY_LOGE("IccFile::IccFile spnUpdatedObser_ create nullptr.");
         return;
     }
-	AddRecordsOverrideObser();
+    AddRecordsOverrideObser();
     AddOpkeyLoadObser();
     AddIccidLoadObser();
     AddOperatorCacheDelObser();
