@@ -79,13 +79,10 @@ IccFile::IccFile(const std::string &name, std::shared_ptr<SimStateManager> simSt
         TELEPHONY_LOGE("IccFile::IccFile spnUpdatedObser_ create nullptr.");
         return;
     }
-    recordsOverrideObser_ = std::make_unique<ObserverHandler>();
-    if (recordsOverrideObser_ == nullptr) {
-        TELEPHONY_LOGE("IccFile::IccFile recordsOverrideObser_ create nullptr.");
-        return;
-    }
+    AddRecordsOverrideObser();
     AddOpkeyLoadObser();
     AddIccidLoadObser();
+    AddOperatorCacheDelObser();
     TELEPHONY_LOGI("simmgr IccFile::IccFile finish");
 }
 
@@ -414,6 +411,15 @@ void IccFile::RegisterOpkeyLoaded(std::shared_ptr<AppExecFwk::EventHandler> even
     TELEPHONY_LOGD("IccFile::RegisterOpkeyLoaded: registered");
 }
 
+void IccFile::RegisterOperatorCacheDel(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+{
+    int eventCode = RadioEvent::RADIO_OPERATOR_CACHE_DELETE;
+    if (operatorCacheDelObser_ != nullptr) {
+        operatorCacheDelObser_->RegObserver(eventCode, eventHandler);
+    }
+    TELEPHONY_LOGD("IccFile::RegisterOperatorCacheDel: registered");
+}
+
 void IccFile::UnregisterOpkeyLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (opkeyLoadObser_ != nullptr) {
@@ -443,6 +449,12 @@ void IccFile::UnregisterIccidLoaded(const std::shared_ptr<AppExecFwk::EventHandl
     }
 }
 
+void IccFile::UnregisterOperatorCacheDel(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    if (operatorCacheDelObser_ != nullptr) {
+        operatorCacheDelObser_->Remove(RadioEvent::RADIO_OPERATOR_CACHE_DELETE, handler);
+    }
+}
 
 void IccFile::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {
@@ -458,6 +470,9 @@ void IccFile::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler>
             break;
         case RadioEvent::RADIO_SIM_ICCID_LOADED:
             RegisterIccidLoaded(handler);
+            break;
+        case RadioEvent::RADIO_OPERATOR_CACHE_DELETE:
+            RegisterOperatorCacheDel(handler);
             break;
         default:
             TELEPHONY_LOGI("RegisterCoreNotify default");
@@ -478,6 +493,9 @@ void IccFile::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandle
             break;
         case RadioEvent::RADIO_SIM_ICCID_LOADED:
             UnregisterIccidLoaded(handler);
+            break;
+        case RadioEvent::RADIO_OPERATOR_CACHE_DELETE:
+            UnregisterOperatorCacheDel(handler);
             break;
         default:
             TELEPHONY_LOGI("UnregisterCoreNotify default");
@@ -784,11 +802,29 @@ void IccFile::AddOpkeyLoadObser()
     }
 }
 
+void IccFile::AddOperatorCacheDelObser()
+{
+    operatorCacheDelObser_ = std::make_unique<ObserverHandler>();
+    if (operatorCacheDelObser_ == nullptr) {
+        TELEPHONY_LOGE("IccFile::IccFile opkeyLoadObser_ create nullptr.");
+        return;
+    }
+}
+
 void IccFile::AddIccidLoadObser()
 {
     iccidLoadObser_ = std::make_unique<ObserverHandler>();
     if (iccidLoadObser_ == nullptr) {
         TELEPHONY_LOGE("IccFile::IccFile iccidLoadObser_ create nullptr.");
+        return;
+    }
+}
+
+void IccFile::AddRecordsOverrideObser()
+{
+    recordsOverrideObser_ = std::make_unique<ObserverHandler>();
+    if (recordsOverrideObser_ == nullptr) {
+        TELEPHONY_LOGE("IccFile::IccFile recordsOverrideObser_ create nullptr.");
         return;
     }
 }
