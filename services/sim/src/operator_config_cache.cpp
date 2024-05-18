@@ -92,8 +92,8 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::string iccid = Str16ToStr8(simFileManager->GetSimIccId());
-    std::string filename = EncryptIccId(iccid) + ".json";
     std::string opkey = GetOpKey(slotId);
+    std::string filename = EncryptIccId(iccid + opkey) + ".json";
     if (opkey == std::string(INITIAL_OPKEY)) {
         TELEPHONY_LOGI("load default operator config");
         filename = DEFAULT_OPERATOR_CONFIG;

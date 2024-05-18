@@ -113,15 +113,41 @@ void SimStateTracker::ProcessSimOpkeyLoad(const AppExecFwk::InnerEvent::Pointer 
     std::string opName = (*msgObj)[2];
     TELEPHONY_LOGI("OnOpkeyLoad slotId, %{public}d opkey: %{public}s opName: %{public}s",
         slotId, opkey.data(), opName.data());
-    auto simFileManager = simFileManager_.lock();
-    if (simFileManager != nullptr) {
-        simFileManager->SetOpKey(opkey);
-        simFileManager->SetOpName(opName);
+    if (!opkey.empty()) {
+        auto simFileManager = simFileManager_.lock();
+        if (simFileManager != nullptr) {
+            simFileManager->SetOpKey(opkey);
+            simFileManager->SetOpName(opName);
+        }
+        TelFFRTUtils::Submit([&]() {
+            OperatorConfig opc;
+            operatorConfigCache_->LoadOperatorConfig(slotId_, opc);
+        });
+    } else {
+        bool hasSimCard = false;
+        CoreManagerInner::GetInstance().HasSimCard(slotId_, hasSimCard);
+        if (!hasSimCard) {
+            TELEPHONY_LOGE("sim is not exist");
+            return;
+        }
+        TelFFRTUtils::Submit([&]() { operatorConfigLoader_->LoadOperatorConfig(slotId_); });
     }
-    TelFFRTUtils::Submit([&]() {
-        OperatorConfig opc;
-        operatorConfigCache_->LoadOperatorConfig(slotId_, opc);
-    });
+}
+
+void SimStateTracker::ProcessOperatorCacheDel(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("SimStateTracker::ProcessOperatorCacheDel");
+    auto slotId = event->GetParam();
+    if (slotId != slotId_) {
+        TELEPHONY_LOGE("is not current slotId");
+        return;
+    }
+    if (operatorConfigCache_ == nullptr) {
+        TELEPHONY_LOGE("operatorConfigCache is nullptr");
+        return;
+    }
+    operatorConfigCache_->ClearOperatorValue(slotId);
+    operatorConfigCache_->ClearMemoryCache(slotId);
 }
 
 void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -140,6 +166,10 @@ void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 
     if (event->GetInnerEventId() == RadioEvent::RADIO_SIM_OPKEY_LOADED) {
         ProcessSimOpkeyLoad(event);
+    }
+
+    if (event->GetInnerEventId() == RadioEvent::RADIO_OPERATOR_CACHE_DELETE) {
+        ProcessOperatorCacheDel(event);
     }
 }
 
@@ -167,6 +197,18 @@ bool SimStateTracker::RegisterOpkeyLoaded()
     return true;
 }
 
+bool SimStateTracker::RegisterOperatorCacheDel()
+{
+    TELEPHONY_LOGI("SimStateTracker::RegisterOperatorCacheDel");
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
+        TELEPHONY_LOGE("simFileManager::can not get simFileManager");
+        return false;
+    }
+    simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_OPERATOR_CACHE_DELETE);
+    return true;
+}
+
 bool SimStateTracker::UnRegisterForIccLoaded()
 {
     TELEPHONY_LOGI("SimStateTracker::UnRegisterForIccLoaded");
@@ -188,6 +230,18 @@ bool SimStateTracker::UnRegisterOpkeyLoaded()
         return false;
     }
     simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_OPKEY_LOADED);
+    return true;
+}
+
+bool SimStateTracker::UnregisterOperatorCacheDel()
+{
+    TELEPHONY_LOGI("SimStateTracker::UnregisterOperatorCacheDel");
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
+        TELEPHONY_LOGE("simFileManager::can not get simFileManager");
+        return false;
+    }
+    simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_OPERATOR_CACHE_DELETE);
     return true;
 }
 
