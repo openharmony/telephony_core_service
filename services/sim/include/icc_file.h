@@ -206,7 +206,7 @@ private:
     void RegisterIccidLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void UnregisterIccidLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void RegisterOperatorCacheDel(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
-    void UnregisterOperatorCacheDel(std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void UnregisterOperatorCacheDel(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void AddRecordsOverrideObser();
     void AddOpkeyLoadObser();
     void AddIccidLoadObser();
