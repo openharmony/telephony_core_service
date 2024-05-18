@@ -449,7 +449,7 @@ void IccFile::UnregisterIccidLoaded(const std::shared_ptr<AppExecFwk::EventHandl
     }
 }
 
-void IccFile::unregisterOperatorCacheDel(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void IccFile::UnregisterOperatorCacheDel(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (operatorCacheDelObser_ != nullptr) {
         operatorCacheDelObser_->Remove(RadioEvent::RADIO_OPERATOR_CACHE_DELETE, handler);
@@ -495,7 +495,7 @@ void IccFile::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandle
             UnregisterIccidLoaded(handler);
             break;
         case RadioEvent::RADIO_OPERATOR_CACHE_DELETE:
-            unregisterOperatorCacheDel(handler);
+            UnregisterOperatorCacheDel(handler);
             break;
         default:
             TELEPHONY_LOGI("UnregisterCoreNotify default");
