@@ -28,7 +28,6 @@ enum ControllerType {
 enum MncType {
     UNINITIALIZED_MNC = -1,
     UNKNOWN_MNC = 0,
-    DEFAULT_MNC = 2
 };
 
 enum MWIType {
