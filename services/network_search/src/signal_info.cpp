@@ -18,6 +18,7 @@
 #include "core_service_hisysevent.h"
 #include "network_search_notify.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -124,6 +125,20 @@ void SignalInfo::ProcessSignalIntensity(int32_t slotId, const AppExecFwk::InnerE
         TELEPHONY_LOGE("rssi is nullptr\n");
         return;
     }
+    bool isUpdate = true;
+    if (TELEPHONY_EXT_WRAPPER.processSignalInfos_ != nullptr) {
+        isUpdate = TELEPHONY_EXT_WRAPPER.processSignalInfos_(slotId, *signalIntensity);
+        TELEPHONY_LOGD("TELEPHONY_EXT_WRAPPER.isUpdateSignal : %{public}d", isUpdate);
+    }
+    if (!isUpdate) {
+        return;
+    }
+
+    ProcessSignalIntensity(slotId, signalIntensity);
+}
+
+void SignalInfo::ProcessSignalIntensity(int32_t slotId, const Rssi *signalIntensity)
+{
     bool gsmUpdate = ProcessGsm(signalIntensity->gw);
     bool cdmaUpdate = ProcessCdma(signalIntensity->cdma);
     bool lteUpdate = ProcessLte(signalIntensity->lte);

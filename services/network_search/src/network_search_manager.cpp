@@ -1921,5 +1921,38 @@ std::string NetworkSearchManager::GetResidentNetworkNumeric(int32_t slotId)
     }
     return inner->residentNetworkNumeric_;
 }
+
+int32_t NetworkSearchManager::ProcessSignalIntensity(int32_t slotId, const Rssi &signalIntensity)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
+        TELEPHONY_LOGE("slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    inner->networkSearchHandler_->ProcessSignalIntensity(slotId, signalIntensity);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkSearchManager::StartRadioOnState(int32_t slotId)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::StartRadioOnState slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    inner->networkSearchHandler_->RadioOnState();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkSearchManager::StartGetRilSignalIntensity(int32_t slotId)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::StartGetRilSignalIntensity slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    inner->networkSearchHandler_->GetRilSignalIntensity(false);
+    return TELEPHONY_ERR_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

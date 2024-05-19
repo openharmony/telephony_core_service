@@ -1299,5 +1299,13 @@ bool NetworkSearchHandler::IsPowerOnPrimaryRadioWhenNoSim() const
     }
     return false;
 }
+
+void NetworkSearchHandler::ProcessSignalIntensity(int32_t slotId, const Rssi &signalIntensity)
+{
+    Rssi *s = const_cast<Rssi*>(&signalIntensity);
+    if (signalInfo_ != nullptr) {
+        signalInfo_->ProcessSignalIntensity(slotId, s);
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -28,6 +28,7 @@
 #include "network_state.h"
 #include "nr_ssb_information.h"
 #include "signal_information.h"
+#include "tel_ril_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -209,6 +210,9 @@ public:
     virtual int32_t HandleNotifyStateChangeWithDelay(int32_t slotId, bool isNeedDelay) = 0;
     virtual int32_t IsGsm(int32_t slotId, bool &isGsm) = 0;
     virtual int32_t IsCdma(int32_t slotId, bool &isCdma) = 0;
+    virtual int32_t StartRadioOnState(int32_t slotId) = 0;
+    virtual int32_t StartGetRilSignalIntensity(int32_t slotId) = 0;
+    virtual int32_t ProcessSignalIntensity(int32_t slotId, const struct Rssi &signalIntensity) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
