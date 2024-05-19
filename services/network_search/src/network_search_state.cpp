@@ -421,15 +421,7 @@ void NetworkSearchState::NotifyStateChange()
     if (TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_ != nullptr) {
         TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_(slotId_, networkState_);
     }
-    // We must Update RadioTech(PhoneType) bebore notifying observers,
-    // otherwise observers may get the wrong phone type
-    CsRadioTechChange();
 
-    NotifyPsRadioTechChange();
-    NotifyPsRegStatusChange();
-    NotifyPsRoamingStatusChange();
-    NotifyEmergencyChange();
-    NotifyNrStateChange();
 
     if (!(*networkState_ == *networkStateOld_)) {
         TELEPHONY_LOGI(
@@ -443,6 +435,22 @@ void NetworkSearchState::NotifyStateChange()
         MessageParcel data;
         networkState_->Marshalling(data);
         ns->ReadFromParcel(data);
+        if (TELEPHONY_EXT_WRAPPER.processStateChangeExt_ != nullptr) {
+            bool needDelay = TELEPHONY_EXT_WRAPPER.processStateChangeExt_(slotId_, ns);
+            if (needDelay) {
+                return;
+            }
+        }
+        // We must Update RadioTech(PhoneType) bebore notifying observers,
+        // otherwise observers may get the wrong phone type
+        CsRadioTechChange();
+
+        NotifyPsRadioTechChange();
+        NotifyPsRegStatusChange();
+        NotifyPsRoamingStatusChange();
+        NotifyEmergencyChange();
+        NotifyNrStateChange();
+
         DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifyNetworkStateUpdated(slotId_, ns);
         networkState_->Marshalling(data);
         networkStateOld_->ReadFromParcel(data);

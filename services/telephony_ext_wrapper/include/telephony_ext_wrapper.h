@@ -26,6 +26,7 @@
 #include "cell_information.h"
 #include "want.h"
 #include "i_icc_file.h"
+#include "tel_ril_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -85,6 +86,9 @@ public:
         int32_t slotId, std::vector<sptr<OHOS::Telephony::SignalInformation>> &signals);
     typedef void (*GET_OPKEY_VERSION)(std::string &versionInfo);
 
+    typedef bool (*PROCESS_SIGNAL_INFOS)(int32_t slotId, Rssi &signalIntensity);
+    typedef bool (*PROCESS_STATE_CHANGE_EXT)(int32_t slotId, sptr<NetworkState> &ns);
+
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
     GET_VOICE_MAIL_ICCID_PARAMETER getVoiceMailIccidParameter_ = nullptr;
@@ -129,6 +133,8 @@ public:
     GET_TARGET_OPKEY getTargetOpkey_ = nullptr;
     SORT_SIGNAL_INFO_LIST_EXT sortSignalInfoListExt_ = nullptr;
     GET_OPKEY_VERSION getOpkeyVersion_ = nullptr;
+    PROCESS_SIGNAL_INFOS processSignalInfos_ = nullptr;
+    PROCESS_STATE_CHANGE_EXT processStateChangeExt_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
