@@ -232,6 +232,9 @@ public:
     int32_t NotifyCallStatusToNetworkSearch(int32_t slotId, int32_t callStatus);
     int32_t IsGsm(int32_t slotId, bool &isGsm);
     int32_t IsCdma(int32_t slotId, bool &isCdma);
+    int32_t StartRadioOnState(int32_t slotId);
+    int32_t StartGetRilSignalIntensity(int32_t slotId);
+    int32_t ProcessSignalIntensity(int32_t slotId, const Rssi &signalIntensity);
     /******************** networkSearchManager end *******************/
     /******************** simManager start ***************************/
     int32_t ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum);

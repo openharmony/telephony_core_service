@@ -93,6 +93,14 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
     if (updateNsaStateExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+    processSignalInfos_ = (PROCESS_SIGNAL_INFOS)dlsym(telephonyExtWrapperHandle_, "ProcessSignalInfosExt");
+    if (processSignalInfos_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+    processStateChangeExt_ = (PROCESS_STATE_CHANGE_EXT)dlsym(telephonyExtWrapperHandle_, "ProcessStateChangeExt");
+    if (processStateChangeExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()

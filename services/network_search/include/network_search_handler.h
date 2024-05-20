@@ -33,6 +33,7 @@
 #include "signal_info.h"
 #include "system_ability_status_change_stub.h"
 #include "tel_event_handler.h"
+#include "tel_ril_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -98,9 +99,10 @@ public:
     void SetCellRequestMinInterval(uint32_t minInterval);
     int32_t GetRegServiceState(RegServiceState &regState);
     bool IsPowerOnPrimaryRadioWhenNoSim() const;
+    void ProcessSignalIntensity(int32_t slotId, const Rssi &signalIntensity);
+    void RadioOnState();
 
 private:
-    void RadioOnState();
     void RadioOffOrUnavailableState(int32_t radioState) const;
     void GetRadioStateResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void SetRadioStateResponse(const AppExecFwk::InnerEvent::Pointer &event);

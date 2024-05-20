@@ -265,6 +265,9 @@ public:
     int32_t IsCdma(int32_t slotId, bool &isCdma) override;
     std::string GetResidentNetworkNumeric(int32_t slotId) override;
     void SetResidentNetworkNumeric(int32_t slotId, std::string operatorNumeric);
+    int32_t ProcessSignalIntensity(int32_t slotId, const Rssi &signalIntensity) override;
+    int32_t StartRadioOnState(int32_t slotId) override;
+    int32_t StartGetRilSignalIntensity(int32_t slotId) override;
 
     inline void InitMsgNum(int32_t slotId)
     {

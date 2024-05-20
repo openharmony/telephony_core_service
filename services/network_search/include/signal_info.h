@@ -30,6 +30,7 @@ public:
     void InitSignalBar(const int32_t bar = 5) const;
     void GetSignalInfoList(std::vector<sptr<SignalInformation>> &signals);
     void ProcessSignalIntensity(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessSignalIntensity(int32_t slotId, const Rssi *signalIntensity);
 
 private:
     bool ProcessGsm(const GsmRssi &gsmSignal);
