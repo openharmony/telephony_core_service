@@ -422,7 +422,6 @@ void NetworkSearchState::NotifyStateChange()
         TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_(slotId_, networkState_);
     }
 
-
     if (!(*networkState_ == *networkStateOld_)) {
         TELEPHONY_LOGI(
             "NetworkSearchState::StateCheck isNetworkStateChange notify to app... slotId:%{public}d", slotId_);
