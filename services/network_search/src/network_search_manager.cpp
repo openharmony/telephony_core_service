@@ -887,6 +887,9 @@ void NetworkSearchManager::SavePreferredNetworkValue(int32_t slotId, int32_t net
 
 int32_t NetworkSearchManager::UpdateRadioOn(int32_t slotId)
 {
+    if (slotId < 0 || slotId > SIM_SLOT_COUNT) {
+        return TELEPHONY_ERROR;
+    }
     std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("settingHelper is null");
