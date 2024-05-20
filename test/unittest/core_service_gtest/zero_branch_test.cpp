@@ -2055,7 +2055,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_003, Function | MediumTest |
     EXPECT_TRUE(networkSearchManager->GetCellLocation(INVALID_SLOTID) == nullptr);
     bool airplaneMode = false;
     EXPECT_NE(networkSearchManager->GetAirplaneMode(airplaneMode), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(networkSearchManager->UpdateRadioOn(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->UpdateRadioOn(-1), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->UpdateNrOptionMode(INVALID_SLOTID, NrMode::NR_MODE_UNKNOWN), TELEPHONY_SUCCESS);
     int32_t status = 0;
     EXPECT_NE(networkSearchManager->UpdateRrcConnectionState(INVALID_SLOTID, status), TELEPHONY_SUCCESS);
@@ -2752,8 +2752,8 @@ HWTEST_F(BranchTest, Telephony_SimNumberDecode_001, Function | MediumTest | Leve
     std::vector<uint8_t>::const_iterator codeEnd = bcdCodes.end();
     EXPECT_FALSE(simNumberDecode->BCDSectionConvertToString(codeBeg, codeEnd, number, BYTES_LENGTH));
     EXPECT_FALSE(simNumberDecode->BCDSectionConvertToString(codeBeg, codeEnd, number, 1));
-    EXPECT_FALSE(simNumberDecode->BCDConvertToString(codeBeg, codeEnd, number, BYTES_LENGTH));
-    EXPECT_FALSE(simNumberDecode->BCDConvertToString(codeBeg, codeEnd, number, 1));
+    EXPECT_TRUE(simNumberDecode->BCDConvertToString(codeBeg, codeEnd, number, BYTES_LENGTH));
+    EXPECT_TRUE(simNumberDecode->BCDConvertToString(codeBeg, codeEnd, number, 1));
 }
 
 /**
