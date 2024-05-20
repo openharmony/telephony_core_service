@@ -18,6 +18,7 @@
 #include <string>
 
 #include "core_manager_inner.h"
+#include "core_service.h"
 #include "core_service_client.h"
 #include "operator_config_cache.h"
 #include "sim_test_util.h"
@@ -120,6 +121,7 @@ HWTEST_F(SimTest, Telephony_VSim_InitExtraModule_0700, Function | MediumTest | L
  */
 HWTEST_F(SimTest, Telephony_VSim_InitExtraModule_0800, Function | MediumTest | Level1)
 {
+    DelayedSingleton<CoreService>::GetInstance()->Init();
     EXPECT_EQ(TELEPHONY_SUCCESS, CoreServiceClient::GetInstance().InitExtraModule(2));
 }
 
