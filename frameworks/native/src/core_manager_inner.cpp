@@ -2414,6 +2414,34 @@ int32_t CoreManagerInner::IsCdma(int32_t slotId, bool &isCdma)
     }
     return networkSearchManager_->IsCdma(slotId, isCdma);
 }
+
+int32_t CoreManagerInner::ProcessSignalIntensity(int32_t slotId, const Rssi &signalIntensity)
+{
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->ProcessSignalIntensity(slotId, signalIntensity);
+}
+
+int32_t CoreManagerInner::StartRadioOnState(int32_t slotId)
+{
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->StartRadioOnState(slotId);
+}
+
+int32_t CoreManagerInner::StartGetRilSignalIntensity(int32_t slotId)
+{
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->StartGetRilSignalIntensity(slotId);
+}
+
 /******************** simManager_ end ************************/
 } // namespace Telephony
 } // namespace OHOS
