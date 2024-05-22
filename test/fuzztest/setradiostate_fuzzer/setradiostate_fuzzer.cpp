@@ -38,17 +38,11 @@ constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t IMS_TYPE = 3;
 constexpr int32_t NR_MODE = 4;
 constexpr int32_t NETWORK_MODE = 7;
-constexpr int32_t SLEEP_TIME_SECONDS = 10;
 
 bool IsServiceInited()
 {
     if (!g_isInited) {
-        auto onStart = [] { DelayedSingleton<CoreService>::GetInstance()->OnStart(); };
-        std::thread startThread(onStart);
-        pthread_setname_np(startThread.native_handle(), "setradiostate_fuzzer");
-        startThread.join();
-
-        sleep(SLEEP_TIME_SECONDS);
+        DelayedSingleton<CoreService>::GetInstance()->OnStart();
         if (DelayedSingleton<CoreService>::GetInstance()->GetServiceRunningState() ==
             static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
             g_isInited = true;
@@ -331,5 +325,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::AddCoreServiceTokenFuzzer token;
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::DelayedSingleton<CoreService>::DestroyInstance();
     return 0;
 }
