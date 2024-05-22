@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/**
+ * @file
+ * @kit TelephonyKit
+ */
+
 import type { AsyncCallback } from './@ohos.base';
 import type dataSharePredicates from './@ohos.data.dataSharePredicates';
 
@@ -34,28 +39,7 @@ declare namespace vcard {
    * @param { Context } context - Indicates the context of application or
    *     capability.
    * @param { string } filePath - Vcf file path.
-   * @param { AsyncCallback<void> } callback - The callback of the function.
-   * @throws { BusinessError } 201 - Permission denied.
-   * @throws { BusinessError } 202 - Non-system applications use system APIs.
-   * @throws { BusinessError } 401 - Parameter error.
-   * @throws { BusinessError } 8300001 - Invalid parameter value.
-   * @throws { BusinessError } 8300003 - System internal error.
-   * @throws { BusinessError } 8300999 - Unknown error code.
-   * @syscap SystemCapability.Telephony.CoreService
-   * @systemapi Hide this for inner system use.
-   * @since 11
-   */
-  function importVCard(context: Context, filePath: string, callback: AsyncCallback<void>): void;
-
-  /**
-   * Import contacts from the specified vcf file.
-   *
-   * @permission ohos.permission.WRITE_CONTACTS and
-   * ohos.permission.READ_CONTACTS
-   * @param { Context } context - Indicates the context of application or
-   *     capability.
-   * @param { string } filePath - Vcf file path.
-   * @param { number } accountId - Contact account ID.When the app chooses to
+   * @param { number } accountId - Contact account ID. When the app chooses to
    *     import the vcf file into a contact account,
    * it needs to pass in the accountId. If the accountId is not passed, a new
    * contact account will be added by default.
@@ -98,12 +82,14 @@ declare namespace vcard {
   function importVCard(context: Context, filePath: string, accountId?: number): Promise<void>;
 
   /**
-   * Export contact data to a vcf file.
+   * Import contacts from the specified vcf file.
    *
-   * @permission ohos.permission.WRITE_CONTACTS and ohos.permission.READ_CONTACTS
-   * @param { Context } context - Indicates the context of application or capability.
-   * @param { dataSharePredicates.DataSharePredicates } predicates - Execute statement.
-   * @param { AsyncCallback<string> } callback - Represents the address of the generated vcf file.
+   * @permission ohos.permission.WRITE_CONTACTS and
+   * ohos.permission.READ_CONTACTS
+   * @param { Context } context - Indicates the context of application or
+   *     capability.
+   * @param { string } filePath - Vcf file path.
+   * @param { AsyncCallback<void> } callback - The callback of the function.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
@@ -114,8 +100,7 @@ declare namespace vcard {
    * @systemapi Hide this for inner system use.
    * @since 11
    */
-  function exportVCard(context: Context, predicates: dataSharePredicates.DataSharePredicates,
-    callback: AsyncCallback<string>): void;
+  function importVCard(context: Context, filePath: string, callback: AsyncCallback<void>): void;
 
   /**
    * Export contact data to a vcf file.
@@ -145,7 +130,7 @@ declare namespace vcard {
    * @param { Context } context - Indicates the context of application or capability.
    * @param { dataSharePredicates.DataSharePredicates } predicates - Execute statement.
    * @param { VCardBuilderOptions } options - Encoding and version.
-   * @returns { Promise<string> } the promise represents the address of the generated vcf file.
+   * @returns { Promise<string> } the promise represents the address of the generated vcf file..
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
@@ -160,9 +145,29 @@ declare namespace vcard {
     options?: VCardBuilderOptions): Promise<string>;
 
   /**
+   * Export contact data to a vcf file.
+   *
+   * @permission ohos.permission.WRITE_CONTACTS and ohos.permission.READ_CONTACTS
+   * @param { Context } context - Indicates the context of application or capability.
+   * @param { dataSharePredicates.DataSharePredicates } predicates - Execute statement.
+   * @param { AsyncCallback<string> } callback - Represents the address of the generated vcf file.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @systemapi Hide this for inner system use.
+   * @since 11
+   */
+  function exportVCard(context: Context, predicates: dataSharePredicates.DataSharePredicates,
+    callback: AsyncCallback<string>): void;
+
+  /**
    * Indicates the VCard types.
    *
-   * @enum { number }
+   * @enum { string }
    * @syscap SystemCapability.Telephony.CoreService
    * @systemapi Hide this for inner system use.
    * @since 11
