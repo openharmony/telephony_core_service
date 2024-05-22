@@ -748,15 +748,16 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_002, Function | MediumTest | Level1
  */
 HWTEST_F(SimRilBranchTest, Telephony_MccPool_001, Function | MediumTest | Level1)
 {
-    auto mccPool = MccPool::GetInstance();
-    EXPECT_EQ(mccPool->MccCountryCode(MCC_CN_A), "cn");
-    EXPECT_EQ(mccPool->MccCountryCode(INVALID_MCC), "");
-    EXPECT_EQ(mccPool->ShortestMncLengthFromMcc(MCC_CN_A), MCC_SHORT);
-    EXPECT_EQ(mccPool->ShortestMncLengthFromMcc(MCC_US_A), MCC_LONG);
-    ASSERT_TRUE(mccPool->LengthIsThreeMnc("302370"));
-    ASSERT_FALSE(mccPool->LengthIsThreeMnc("46000"));
+    EXPECT_EQ(MccPool::MccCountryCode(MCC_CN_A), "cn");
+    EXPECT_EQ(MccPool::MccCountryCode(INVALID_MCC), "");
+    EXPECT_EQ(MccPool::ShortestMncLengthFromMcc(MCC_CN_A), MCC_SHORT);
+    EXPECT_EQ(MccPool::ShortestMncLengthFromMcc(MCC_US_A), MCC_LONG);
+    ASSERT_TRUE(MccPool::LengthIsThreeMnc("302370"));
+    ASSERT_FALSE(MccPool::LengthIsThreeMnc("46000"));
+    ASSERT_TRUE(MccPool::LengthIsTwoMnc("40402"));
+    ASSERT_FALSE(MccPool::LengthIsTwoMnc("46000"));
 
-    auto mccAccess = mccPool->AccessToMcc(MCC_BJ);
+    auto mccAccess = MccPool::AccessToMcc(MCC_BJ);
     EXPECT_EQ(mccAccess->iso_, "bj");
     std::shared_ptr<MccAccess> mccAccessA = std::make_shared<MccAccess>(MCC_MK, "", 0);
     std::shared_ptr<MccAccess> mccAccessB = std::make_shared<MccAccess>(MCC_CN_A, "", 0);
