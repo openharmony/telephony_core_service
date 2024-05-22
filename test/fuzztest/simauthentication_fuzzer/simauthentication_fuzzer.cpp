@@ -33,7 +33,6 @@ namespace OHOS {
 static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t TYPE_NUM = 2;
-constexpr int32_t SLEEP_TIME_SECONDS = 10;
 constexpr int32_t SIM_AUTH_EAP_SIM_TYPE = 128;
 constexpr int32_t SIM_AUTH_EAP_AKA_TYPE = 129;
 bool g_flag = false;
@@ -41,12 +40,7 @@ bool g_flag = false;
 bool IsServiceInited()
 {
     if (!g_isInited) {
-        auto onStart = [] { DelayedSingleton<CoreService>::GetInstance()->OnStart(); };
-        std::thread startThread(onStart);
-        pthread_setname_np(startThread.native_handle(), "simauthentication_fuzzer");
-        startThread.join();
-
-        sleep(SLEEP_TIME_SECONDS);
+        DelayedSingleton<CoreService>::GetInstance()->OnStart();
         if (DelayedSingleton<CoreService>::GetInstance()->GetServiceRunningState() ==
             static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
             g_isInited = true;
@@ -185,5 +179,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::AddCoreServiceTokenFuzzer token;
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::DelayedSingleton<CoreService>::DestroyInstance();
     return 0;
 }
