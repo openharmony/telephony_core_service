@@ -53,7 +53,7 @@ std::string RuimFile::ObtainSimOperator()
         std::string mcc = imsi.substr(0, MCC_LEN);
         if (operatorNumeric_.empty() && IsValidDecValue(mcc)) {
             operatorNumeric_ = imsi.substr(0, MCC_LEN +
-                                   MccPool::GetInstance()->ShortestMncLengthFromMcc(std::stoi(mcc)));
+                                   MccPool::ShortestMncLengthFromMcc(std::stoi(mcc)));
         }
     }
     return operatorNumeric_;
@@ -69,7 +69,7 @@ std::string RuimFile::ObtainIsoCountryCode()
     size_t len = numeric.length();
     std::string mcc = numeric.substr(0, MCC_LEN);
     if (len >= MCC_LEN && IsValidDecValue(mcc)) {
-        std::string iso = MccPool::GetInstance()->MccCountryCode(std::stoi(mcc));
+        std::string iso = MccPool::MccCountryCode(std::stoi(mcc));
         return iso;
     } else {
         return "";

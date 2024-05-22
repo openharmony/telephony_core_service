@@ -32,7 +32,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
 
     int mcc = static_cast<int>(size % THOUSAND) + MCC_GR;
-    MccPool::GetInstance()->MccCountryCode(mcc);
+    MccPool::MccCountryCode(mcc);
 }
 } // namespace OHOS
 

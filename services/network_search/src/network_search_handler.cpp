@@ -1193,7 +1193,7 @@ void NetworkSearchHandler::RadioResidentNetworkChange(const AppExecFwk::InnerEve
         std::string mcc = plmn.substr(0, MCC_LEN);
         int32_t value = 0;
         if (StrToInt(mcc, value)) {
-            countryCode = MccPool::GetInstance()->MccCountryCode(value);
+            countryCode = MccPool::MccCountryCode(value);
         } else {
             TELEPHONY_LOGE("RadioResidentNetworkChange parse Failed!! slotId:%{public}d", slotId_);
         }
