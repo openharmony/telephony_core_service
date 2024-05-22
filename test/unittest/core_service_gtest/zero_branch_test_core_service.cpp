@@ -40,7 +40,7 @@ std::shared_ptr<SimManager> g_simManagerPtr = nullptr;
 namespace {
 constexpr int32_t SLEEP_TIME_SECONDS = 3;
 constexpr int32_t SLOT_ID = 0;
-const int32_t INVALID_SLOTID = 2;
+const int32_t INVALID_SLOTID = -1;
 constexpr int32_t NR_NSA_OPTION_ONLY = 1;
 constexpr int32_t SIGNAL_STRENGTH_GOOD = 3;
 const std::string NITZ_STR = "23/10/16,09:10:33+32,00";
