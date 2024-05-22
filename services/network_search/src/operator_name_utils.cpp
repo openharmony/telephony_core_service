@@ -24,6 +24,7 @@
 #include "cstring"
 #include "iosfwd"
 #include "locale_config.h"
+#include "locale_info.h"
 #include "memory"
 #include "parameter.h"
 #include "telephony_errors.h"
@@ -39,6 +40,7 @@ const char *ITEM_ZH_HANS_CN = "zh-Hans-CN";
 const char *ITEM_EN_LATN_US = "en-Latn-US";
 const char *ITEM_ZH_HANT_TW = "zh-Hant-TW";
 const char *ITEM_ZH_HANT_HK = "zh-Hant-HK";
+const char *LANGUAGE_SCRIPT = "Hant";
 const int MAX_BYTE_LEN = 10 * 1024 * 1024;
 
 OperatorNameUtils &OperatorNameUtils::GetInstance()
@@ -210,7 +212,14 @@ int32_t OperatorNameUtils::CloseFile(FILE *f) const
 std::string OperatorNameUtils::GetNameByLocale(OperatorNameCust &value)
 {
     std::string locale = OHOS::Global::I18n::LocaleConfig::GetSystemLocale();
-    TELEPHONY_LOGD("locale is %{public}s", locale.c_str());
+    OHOS::Global::I18n::LocaleInfo localeInfo(locale);
+    TELEPHONY_LOGD("locale is %{public}s, language is %{public}s, script is %{public}s, region is %{public}s",
+        locale.c_str(), localeInfo.GetLanguage().c_str(), localeInfo.GetScript().c_str(),
+        localeInfo.GetRegion().c_str());
+    if (localeInfo.GetScript() == std::string(LANGUAGE_SCRIPT)) {
+        locale = std::string(ITEM_ZH_HANT_HK);
+    }
+
     if (locale == std::string(ITEM_ZH_HANS_CN)) {
         return value.zhHansCN;
     }
