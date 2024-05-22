@@ -52,8 +52,7 @@ std::string RuimFile::ObtainSimOperator()
         }
         std::string mcc = imsi.substr(0, MCC_LEN);
         if (operatorNumeric_.empty() && IsValidDecValue(mcc)) {
-            operatorNumeric_ = imsi.substr(0, MCC_LEN +
-                                   MccPool::ShortestMncLengthFromMcc(std::stoi(mcc)));
+            operatorNumeric_ = imsi.substr(0, MCC_LEN + MccPool::ShortestMncLengthFromMcc(std::stoi(mcc)));
         }
     }
     return operatorNumeric_;
