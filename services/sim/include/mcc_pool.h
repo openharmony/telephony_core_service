@@ -20,7 +20,6 @@
 #include <cstdio>
 #include <functional>
 #include <iostream>
-#include <singleton.h>
 #include <vector>
 
 enum MccCountry {
@@ -282,73 +281,36 @@ public:
     }
 };
 
-class MccPool : public OHOS::DelayedSingleton<MccPool> {
-    DECLARE_DELAYED_SINGLETON(MccPool);
-
+class MccPool {
 public:
-    const std::string MCCMNC_CODES_HAVING_3DIGITS_MNC[152] = {
-        "302370", "302720", "310260",
-        "405025", "405026", "405027", "405028", "405029", "405030", "405031", "405032",
-        "405033", "405034", "405035", "405036", "405037", "405038", "405039", "405040",
-        "405041", "405042", "405043", "405044", "405045", "405046", "405047", "405750",
-        "405751", "405752", "405753", "405754", "405755", "405756", "405799", "405800",
-        "405801", "405802", "405803", "405804", "405805", "405806", "405807", "405808",
-        "405809", "405810", "405811", "405812", "405813", "405814", "405815", "405816",
-        "405817", "405818", "405819", "405820", "405821", "405822", "405823", "405824",
-        "405825", "405826", "405827", "405828", "405829", "405830", "405831", "405832",
-        "405833", "405834", "405835", "405836", "405837", "405838", "405839", "405840",
-        "405841", "405842", "405843", "405844", "405845", "405846", "405847", "405848",
-        "405849", "405850", "405851", "405852", "405853", "405854", "405855", "405856",
-        "405857", "405858", "405859", "405860", "405861", "405862", "405863", "405864",
-        "405865", "405866", "405867", "405868", "405869", "405870", "405871", "405872",
-        "405873", "405874", "405875", "405876", "405877", "405878", "405879", "405880",
-        "405881", "405882", "405883", "405884", "405885", "405886", "405908", "405909",
-        "405910", "405911", "405912", "405913", "405914", "405915", "405916", "405917",
-        "405918", "405919", "405920", "405921", "405922", "405923", "405924", "405925",
-        "405926", "405927", "405928", "405929", "405930", "405931", "405932", "502142",
-        "502143", "502145", "502146", "502147", "502148"
-    };
-    const std::string MCCMNC_CODES_HAVING_2DIGITS_MNC[119] = {
-        "40400", "40401", "40402", "40403", "40404", "40405", "40407", "40409", "40410", "40411", "40412", "40413",
-        "40414", "40415", "40416", "40417", "40418", "40419", "40420", "40421", "40422", "40424", "40425", "40427",
-        "40428", "40429", "40430", "40431", "40433", "40434", "40435", "40436", "40437", "40438", "40440", "40441",
-        "40442", "40443", "40444", "40445", "40446", "40449", "40450", "40451", "40452", "40453", "40454", "40455",
-        "40456", "40457", "40458", "40459", "40460", "40462", "40464", "40466", "40467", "40468", "40469", "40470",
-        "40471", "40472", "40473", "40474", "40475", "40476", "40477", "40478", "40479", "40480", "40481", "40482",
-        "40483", "40484", "40485", "40486", "40487", "40488", "40489", "40490", "40491", "40492", "40493", "40494",
-        "40495", "40496", "40497", "40498", "40501", "40505", "40506", "40507", "40508", "40509", "40510", "40511",
-        "40512", "40513", "40514", "40515", "40517", "40518", "40519", "40520", "40521", "40522", "40523", "40524",
-        "40548", "40551", "40552", "40553", "40554", "40555", "40556", "40566", "40567", "40570", "23210"
-    };
-
-    std::vector<std::shared_ptr<MccAccess>> mccAccessTable_;
-
-    std::string MccCountryCode(int mcc);
-
-    int ShortestMncLengthFromMcc(int mcc);
-
-    bool LengthIsThreeMnc(const std::string &mccMncCode);
-
-    bool LengthIsTwoMnc(const std::string &mccMncCode);
+    MccPool();
+    ~MccPool();
+    static std::string MccCountryCode(int mcc);
+    static int ShortestMncLengthFromMcc(int mcc);
+    static bool LengthIsThreeMnc(const std::string &mccMncCode);
+    static bool LengthIsTwoMnc(const std::string &mccMncCode);
+    static std::vector<std::shared_ptr<MccAccess>> mccAccessTable_;
+    static std::vector<std::string> specialMccMnc_;
+    static std::vector<std::string> specialMccMnc2Digits_;
 
 private:
+    static std::shared_ptr<MccAccess> AccessToMcc(int mcc);
+    static void InitMccTables();
     static bool MccCompare(const std::shared_ptr<MccAccess> &mccAccessA, const std::shared_ptr<MccAccess> &mccAccessB);
+    static void AddMccForAsia();
+    static void AddMccForEurope();
+    static void AddMccForAfrica();
+    static void AddMccForNorthAmerica();
+    static void AddMccForSouthAmerica();
+    static void AddMccForAustralia();
 
-    std::shared_ptr<MccAccess> AccessToMcc(int mcc);
+    static void InitSpecialMccMncTables();
+    static void AddMccMncForCa();
+    static void AddMccMncForInAirtel();
+    static void AddMccMncForInHutch();
+    static void AddMccMncForMy();
 
-    void InitMccTables();
-
-    void AddMccForAsia();
-
-    void AddMccForEurope();
-
-    void AddMccForAfrica();
-
-    void AddMccForNorthAmerica();
-
-    void AddMccForSouthAmerica();
-
-    void AddMccForAustralia();
+    static void InitSpecialMccMnc2DigitsTables();
 };
 } // namespace Telephony
 } // namespace OHOS
