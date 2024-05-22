@@ -16,8 +16,12 @@
 #include "mcc_pool.h"
 
 using namespace std;
+
 namespace OHOS {
 namespace Telephony {
+std::vector<std::shared_ptr<MccAccess>> MccPool::mccAccessTable_;
+std::vector<std::string> MccPool::specialMccMnc_;
+std::vector<std::string> MccPool::specialMccMnc2Digits_;
 constexpr size_t MCC_ACCESS_TABLE_LEN = 240;
 std::shared_ptr<MccAccess> MccPool::AccessToMcc(int mcc)
 {
@@ -337,33 +341,324 @@ bool MccPool::MccCompare(const std::shared_ptr<MccAccess> &mccAccessA, const std
 
 bool MccPool::LengthIsThreeMnc(const std::string &mccMncCode)
 {
-    for (const std::string &item : MCCMNC_CODES_HAVING_3DIGITS_MNC) {
-        if (mccMncCode == item) {
-            return true;
-        }
+    InitSpecialMccMncTables();
+    std::vector<std::string>::iterator obj = std::find(specialMccMnc_.begin(), specialMccMnc_.end(), mccMncCode);
+    return (obj == specialMccMnc_.end()) ? false : true;
+}
+
+bool MccPool::LengthIsTwoMnc(const string &mccMncCode)
+{
+    InitSpecialMccMnc2DigitsTables();
+    std::vector<std::string>::iterator obj =
+        std::find(specialMccMnc2Digits_.begin(), specialMccMnc2Digits_.end(), mccMncCode);
+    return (obj == specialMccMnc2Digits_.end()) ? false : true;
+}
+
+void MccPool::InitSpecialMccMncTables()
+{
+    if (specialMccMnc_.size() == 0) {
+        AddMccMncForCa();
+        AddMccMncForInAirtel();
+        AddMccMncForInHutch();
+        AddMccMncForMy();
     }
-    return false;
 }
 
-bool MccPool::LengthIsTwoMnc(const std::string &mccMncCode)
+void MccPool::InitSpecialMccMnc2DigitsTables()
 {
-    for (const std::string &item : MCCMNC_CODES_HAVING_2DIGITS_MNC) {
-        if (mccMncCode == item) {
-            return true;
-        }
+    if (specialMccMnc2Digits_.size() == 0) {
+        specialMccMnc2Digits_.push_back("40400");
+        specialMccMnc2Digits_.push_back("40401");
+        specialMccMnc2Digits_.push_back("40402");
+        specialMccMnc2Digits_.push_back("40403");
+        specialMccMnc2Digits_.push_back("40404");
+        specialMccMnc2Digits_.push_back("40405");
+        specialMccMnc2Digits_.push_back("40407");
+        specialMccMnc2Digits_.push_back("40409");
+        specialMccMnc2Digits_.push_back("40410");
+        specialMccMnc2Digits_.push_back("40411");
+        specialMccMnc2Digits_.push_back("40412");
+        specialMccMnc2Digits_.push_back("40413");
+        specialMccMnc2Digits_.push_back("40414");
+        specialMccMnc2Digits_.push_back("40415");
+        specialMccMnc2Digits_.push_back("40416");
+        specialMccMnc2Digits_.push_back("40417");
+        specialMccMnc2Digits_.push_back("40418");
+        specialMccMnc2Digits_.push_back("40419");
+        specialMccMnc2Digits_.push_back("40420");
+        specialMccMnc2Digits_.push_back("40421");
+        specialMccMnc2Digits_.push_back("40422");
+        specialMccMnc2Digits_.push_back("40424");
+        specialMccMnc2Digits_.push_back("40425");
+        specialMccMnc2Digits_.push_back("40427");
+        specialMccMnc2Digits_.push_back("40428");
+        specialMccMnc2Digits_.push_back("40429");
+        specialMccMnc2Digits_.push_back("40430");
+        specialMccMnc2Digits_.push_back("40431");
+        specialMccMnc2Digits_.push_back("40433");
+        specialMccMnc2Digits_.push_back("40434");
+        specialMccMnc2Digits_.push_back("40435");
+        specialMccMnc2Digits_.push_back("40436");
+        specialMccMnc2Digits_.push_back("40437");
+        specialMccMnc2Digits_.push_back("40438");
+        specialMccMnc2Digits_.push_back("40440");
+        specialMccMnc2Digits_.push_back("40441");
+        specialMccMnc2Digits_.push_back("40442");
+        specialMccMnc2Digits_.push_back("40443");
+        specialMccMnc2Digits_.push_back("40444");
+        specialMccMnc2Digits_.push_back("40445");
+        specialMccMnc2Digits_.push_back("40446");
+        specialMccMnc2Digits_.push_back("40449");
+        specialMccMnc2Digits_.push_back("40450");
+        specialMccMnc2Digits_.push_back("40451");
+        specialMccMnc2Digits_.push_back("40452");
+        specialMccMnc2Digits_.push_back("40453");
+        specialMccMnc2Digits_.push_back("40454");
+        specialMccMnc2Digits_.push_back("40455");
+        specialMccMnc2Digits_.push_back("40456");
+        specialMccMnc2Digits_.push_back("40457");
+        specialMccMnc2Digits_.push_back("40458");
+        specialMccMnc2Digits_.push_back("40459");
+        specialMccMnc2Digits_.push_back("40460");
+        specialMccMnc2Digits_.push_back("40462");
+        specialMccMnc2Digits_.push_back("40464");
+        specialMccMnc2Digits_.push_back("40466");
+        specialMccMnc2Digits_.push_back("40467");
+        specialMccMnc2Digits_.push_back("40468");
+        specialMccMnc2Digits_.push_back("40469");
+        specialMccMnc2Digits_.push_back("40470");
+        specialMccMnc2Digits_.push_back("40471");
+        specialMccMnc2Digits_.push_back("40472");
+        specialMccMnc2Digits_.push_back("40473");
+        specialMccMnc2Digits_.push_back("40474");
+        specialMccMnc2Digits_.push_back("40475");
+        specialMccMnc2Digits_.push_back("40476");
+        specialMccMnc2Digits_.push_back("40477");
+        specialMccMnc2Digits_.push_back("40478");
+        specialMccMnc2Digits_.push_back("40479");
+        specialMccMnc2Digits_.push_back("40480");
+        specialMccMnc2Digits_.push_back("40481");
+        specialMccMnc2Digits_.push_back("40482");
+        specialMccMnc2Digits_.push_back("40483");
+        specialMccMnc2Digits_.push_back("40484");
+        specialMccMnc2Digits_.push_back("40485");
+        specialMccMnc2Digits_.push_back("40486");
+        specialMccMnc2Digits_.push_back("40487");
+        specialMccMnc2Digits_.push_back("40488");
+        specialMccMnc2Digits_.push_back("40489");
+        specialMccMnc2Digits_.push_back("40490");
+        specialMccMnc2Digits_.push_back("40491");
+        specialMccMnc2Digits_.push_back("40492");
+        specialMccMnc2Digits_.push_back("40493");
+        specialMccMnc2Digits_.push_back("40494");
+        specialMccMnc2Digits_.push_back("40495");
+        specialMccMnc2Digits_.push_back("40496");
+        specialMccMnc2Digits_.push_back("40497");
+        specialMccMnc2Digits_.push_back("40498");
+        specialMccMnc2Digits_.push_back("40501");
+        specialMccMnc2Digits_.push_back("40505");
+        specialMccMnc2Digits_.push_back("40506");
+        specialMccMnc2Digits_.push_back("40507");
+        specialMccMnc2Digits_.push_back("40508");
+        specialMccMnc2Digits_.push_back("40509");
+        specialMccMnc2Digits_.push_back("40510");
+        specialMccMnc2Digits_.push_back("40511");
+        specialMccMnc2Digits_.push_back("40512");
+        specialMccMnc2Digits_.push_back("40513");
+        specialMccMnc2Digits_.push_back("40514");
+        specialMccMnc2Digits_.push_back("40515");
+        specialMccMnc2Digits_.push_back("40517");
+        specialMccMnc2Digits_.push_back("40518");
+        specialMccMnc2Digits_.push_back("40519");
+        specialMccMnc2Digits_.push_back("40520");
+        specialMccMnc2Digits_.push_back("40521");
+        specialMccMnc2Digits_.push_back("40522");
+        specialMccMnc2Digits_.push_back("40523");
+        specialMccMnc2Digits_.push_back("40524");
+        specialMccMnc2Digits_.push_back("40548");
+        specialMccMnc2Digits_.push_back("40551");
+        specialMccMnc2Digits_.push_back("40552");
+        specialMccMnc2Digits_.push_back("40553");
+        specialMccMnc2Digits_.push_back("40554");
+        specialMccMnc2Digits_.push_back("40555");
+        specialMccMnc2Digits_.push_back("40556");
+        specialMccMnc2Digits_.push_back("40566");
+        specialMccMnc2Digits_.push_back("40567");
+        specialMccMnc2Digits_.push_back("40570");
+        specialMccMnc2Digits_.push_back("23210");
     }
-    return false;
 }
 
-MccPool::MccPool()
+void MccPool::AddMccMncForCa()
 {
-    InitMccTables();
+    specialMccMnc_.push_back("302370");
+    specialMccMnc_.push_back("302720");
+    specialMccMnc_.push_back("310260");
+    specialMccMnc_.push_back("405025");
+    specialMccMnc_.push_back("405026");
+    specialMccMnc_.push_back("405027");
+    specialMccMnc_.push_back("405028");
+    specialMccMnc_.push_back("405029");
+    specialMccMnc_.push_back("405030");
+    specialMccMnc_.push_back("405031");
+    specialMccMnc_.push_back("405032");
+    specialMccMnc_.push_back("405033");
+    specialMccMnc_.push_back("405034");
+    specialMccMnc_.push_back("405035");
+    specialMccMnc_.push_back("405036");
+    specialMccMnc_.push_back("405037");
+    specialMccMnc_.push_back("405038");
+    specialMccMnc_.push_back("405039");
+    specialMccMnc_.push_back("405040");
+    specialMccMnc_.push_back("405041");
+    specialMccMnc_.push_back("405042");
+    specialMccMnc_.push_back("405043");
+    specialMccMnc_.push_back("405044");
+    specialMccMnc_.push_back("405045");
+    specialMccMnc_.push_back("405046");
+    specialMccMnc_.push_back("405047");
+    specialMccMnc_.push_back("405750");
+    specialMccMnc_.push_back("405751");
+    specialMccMnc_.push_back("405752");
+    specialMccMnc_.push_back("405753");
+    specialMccMnc_.push_back("405754");
+    specialMccMnc_.push_back("405755");
+    specialMccMnc_.push_back("405756");
+    specialMccMnc_.push_back("405799");
+    specialMccMnc_.push_back("405800");
+    specialMccMnc_.push_back("405801");
 }
 
-MccPool::~MccPool()
+void MccPool::AddMccMncForInAirtel()
 {
-    mccAccessTable_.clear();
+    specialMccMnc_.push_back("405802");
+    specialMccMnc_.push_back("405803");
+    specialMccMnc_.push_back("405804");
+    specialMccMnc_.push_back("405805");
+    specialMccMnc_.push_back("405806");
+    specialMccMnc_.push_back("405807");
+    specialMccMnc_.push_back("405808");
+    specialMccMnc_.push_back("405809");
+    specialMccMnc_.push_back("405810");
+    specialMccMnc_.push_back("405811");
+    specialMccMnc_.push_back("405812");
+    specialMccMnc_.push_back("405813");
+    specialMccMnc_.push_back("405814");
+    specialMccMnc_.push_back("405815");
+    specialMccMnc_.push_back("405816");
+    specialMccMnc_.push_back("405817");
+    specialMccMnc_.push_back("405818");
+    specialMccMnc_.push_back("405819");
+    specialMccMnc_.push_back("405820");
+    specialMccMnc_.push_back("405821");
+    specialMccMnc_.push_back("405822");
+    specialMccMnc_.push_back("405823");
+    specialMccMnc_.push_back("405824");
+    specialMccMnc_.push_back("405825");
+    specialMccMnc_.push_back("405826");
+    specialMccMnc_.push_back("405827");
+    specialMccMnc_.push_back("405828");
+    specialMccMnc_.push_back("405829");
+    specialMccMnc_.push_back("405830");
+    specialMccMnc_.push_back("405831");
+    specialMccMnc_.push_back("405832");
+    specialMccMnc_.push_back("405833");
+    specialMccMnc_.push_back("405834");
+    specialMccMnc_.push_back("405835");
+    specialMccMnc_.push_back("405836");
 }
 
+void MccPool::AddMccMncForInHutch()
+{
+    specialMccMnc_.push_back("405837");
+    specialMccMnc_.push_back("405838");
+    specialMccMnc_.push_back("405839");
+    specialMccMnc_.push_back("405840");
+    specialMccMnc_.push_back("405841");
+    specialMccMnc_.push_back("405842");
+    specialMccMnc_.push_back("405843");
+    specialMccMnc_.push_back("405844");
+    specialMccMnc_.push_back("405845");
+    specialMccMnc_.push_back("405846");
+    specialMccMnc_.push_back("405847");
+    specialMccMnc_.push_back("405848");
+    specialMccMnc_.push_back("405849");
+    specialMccMnc_.push_back("405850");
+    specialMccMnc_.push_back("405851");
+    specialMccMnc_.push_back("405852");
+    specialMccMnc_.push_back("405853");
+    specialMccMnc_.push_back("405854");
+    specialMccMnc_.push_back("405855");
+    specialMccMnc_.push_back("405856");
+    specialMccMnc_.push_back("405857");
+    specialMccMnc_.push_back("405858");
+    specialMccMnc_.push_back("405859");
+    specialMccMnc_.push_back("405860");
+    specialMccMnc_.push_back("405861");
+    specialMccMnc_.push_back("405862");
+    specialMccMnc_.push_back("405863");
+    specialMccMnc_.push_back("405864");
+    specialMccMnc_.push_back("405865");
+    specialMccMnc_.push_back("405866");
+    specialMccMnc_.push_back("405867");
+    specialMccMnc_.push_back("405868");
+    specialMccMnc_.push_back("405869");
+    specialMccMnc_.push_back("405870");
+    specialMccMnc_.push_back("405871");
+    specialMccMnc_.push_back("405872");
+    specialMccMnc_.push_back("405873");
+    specialMccMnc_.push_back("405874");
+    specialMccMnc_.push_back("405875");
+}
+
+void MccPool::AddMccMncForMy()
+{
+    specialMccMnc_.push_back("405876");
+    specialMccMnc_.push_back("405877");
+    specialMccMnc_.push_back("405878");
+    specialMccMnc_.push_back("405879");
+    specialMccMnc_.push_back("405880");
+    specialMccMnc_.push_back("405881");
+    specialMccMnc_.push_back("405882");
+    specialMccMnc_.push_back("405883");
+    specialMccMnc_.push_back("405884");
+    specialMccMnc_.push_back("405885");
+    specialMccMnc_.push_back("405886");
+    specialMccMnc_.push_back("405908");
+    specialMccMnc_.push_back("405909");
+    specialMccMnc_.push_back("405910");
+    specialMccMnc_.push_back("405911");
+    specialMccMnc_.push_back("405912");
+    specialMccMnc_.push_back("405913");
+    specialMccMnc_.push_back("405914");
+    specialMccMnc_.push_back("405915");
+    specialMccMnc_.push_back("405916");
+    specialMccMnc_.push_back("405917");
+    specialMccMnc_.push_back("405918");
+    specialMccMnc_.push_back("405919");
+    specialMccMnc_.push_back("405920");
+    specialMccMnc_.push_back("405921");
+    specialMccMnc_.push_back("405922");
+    specialMccMnc_.push_back("405923");
+    specialMccMnc_.push_back("405924");
+    specialMccMnc_.push_back("405925");
+    specialMccMnc_.push_back("405926");
+    specialMccMnc_.push_back("405927");
+    specialMccMnc_.push_back("405928");
+    specialMccMnc_.push_back("405929");
+    specialMccMnc_.push_back("405930");
+    specialMccMnc_.push_back("405931");
+    specialMccMnc_.push_back("405932");
+    specialMccMnc_.push_back("502142");
+    specialMccMnc_.push_back("502143");
+    specialMccMnc_.push_back("502145");
+    specialMccMnc_.push_back("502146");
+    specialMccMnc_.push_back("502147");
+    specialMccMnc_.push_back("502148");
+}
+
+MccPool::MccPool() {}
+
+MccPool::~MccPool() {}
 } // namespace Telephony
 } // namespace OHOS
