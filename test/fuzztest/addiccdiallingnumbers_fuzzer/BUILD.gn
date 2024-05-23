@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -31,6 +31,7 @@ ohos_fuzztest("AddIccDiallingNumbersFuzzTest") {
     "$SUBSYSTEM_DIR/core_service/services/core/include",
     "$SUBSYSTEM_DIR/core_service/services/tel_ril/include",
     "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer",
+    "$SUBSYSTEM_DIR/core_service/utils/common/include",
   ]
 
   configs = [ "$SUBSYSTEM_DIR/core_service/utils:telephony_log_config" ]
@@ -38,6 +39,7 @@ ohos_fuzztest("AddIccDiallingNumbersFuzzTest") {
   deps = [
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
+    "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
   ]
 
   external_deps = [
@@ -53,7 +55,6 @@ ohos_fuzztest("AddIccDiallingNumbersFuzzTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
-    "drivers_interface_ril:hril_innerkits",
     "drivers_interface_ril:libril_proxy_1.1",
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",
@@ -80,7 +81,18 @@ ohos_fuzztest("AddIccDiallingNumbersFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+    "-fvisibility=hidden",
   ]
+
+  ldflags = [
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+  ]
+
   sources = [
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
     "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer/addcoreservicetoken_fuzzer.cpp",

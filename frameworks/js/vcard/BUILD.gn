@@ -33,7 +33,6 @@ ohos_shared_library("vcard") {
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
     "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
     "$SUBSYSTEM_DIR/core_service/utils:libtel_vcard",
-    "//third_party/node:node_header",
   ]
 
   external_deps = [

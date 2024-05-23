@@ -67,6 +67,10 @@ void VCardEncoder::SetPhoneNumberEncodedCallback(std::shared_ptr<PhoneNumberEnco
 void VCardEncoder::ContructContact(std::shared_ptr<VCardContact> contact,
     std::shared_ptr<DataShare::DataShareResultSet> rawResultSet, int32_t &errorCode)
 {
+    if (rawResultSet == nullptr) {
+        TELEPHONY_LOGE("rawResultSet is nullptr!");
+        return;
+    }
     int32_t rawResultSetNum = rawResultSet->GoToFirstRow();
     while (rawResultSetNum == 0 && errorCode == TELEPHONY_SUCCESS) {
         int32_t index = 0;

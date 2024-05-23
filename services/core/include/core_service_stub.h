@@ -32,6 +32,8 @@ private:
     void AddHandlerNetWorkToMap();
     void AddHandlerSimToMap();
     void AddHandlerSimToMapExt();
+    void AddHandlerPdpProfileToMap();
+    void AddHandlerOpkeyVersionToMap();
 
 private:
     using CoreServiceFunc = int32_t (CoreServiceStub::*)(MessageParcel &data, MessageParcel &reply);
@@ -39,6 +41,7 @@ private:
     int32_t OnGetPsRadioTech(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCsRadioTech(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetOperatorNumeric(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetResidentNetworkNumeric(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetOperatorName(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSignalInfoList(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetNetworkState(MessageParcel &data, MessageParcel &reply);
@@ -49,6 +52,7 @@ private:
     int32_t OnGetNetworkSelectionMode(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetIsoCountryCodeForNetwork(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetImei(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetImeiSv(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetMeid(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetUniqueDeviceId(MessageParcel &data, MessageParcel &reply);
     int32_t OnIsNrSupported(MessageParcel &data, MessageParcel &reply);
@@ -126,6 +130,11 @@ private:
     int32_t OnUnregisterImsRegInfoCallback(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetBasebandVersion(MessageParcel &data, MessageParcel &reply);
     int32_t OnFactoryReset(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetNrSsbIdInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnInitExtraModule(MessageParcel &data, MessageParcel &reply);
+    int32_t OnIsAllowedInsertApn(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetTargetOpkey(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply);
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;

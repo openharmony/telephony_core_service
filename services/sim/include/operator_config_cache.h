@@ -22,32 +22,39 @@
 
 namespace OHOS {
 namespace Telephony {
-class OperatorConfigCache : public AppExecFwk::EventHandler {
+class OperatorConfigCache : public TelEventHandler {
 public:
-    explicit OperatorConfigCache(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        std::weak_ptr<SimFileManager> simFileManager, int32_t slotId);
+    explicit OperatorConfigCache(std::weak_ptr<SimFileManager> simFileManager, int32_t slotId);
     virtual ~OperatorConfigCache() = default;
     void ClearAllCache(int32_t slotId);
     void ClearMemoryCache(int32_t slotId);
     void ClearOperatorValue(int32_t slotId);
-    int32_t LoadOperatorConfig(int32_t slotId, OperatorConfig &poc);
+    int32_t LoadOperatorConfig(int32_t slotId, OperatorConfig &poc, int32_t state = 0);
     int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc);
+    int32_t UpdateOperatorConfigs(int32_t slotId);
     std::string EncryptIccId(const std::string iccid);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     bool RegisterForIccChange();
     bool UnRegisterForIccChange();
+    bool IsNeedOperatorLoad(int32_t slotId);
 
 private:
     OperatorFileParser parser_;
     std::weak_ptr<SimFileManager> simFileManager_;
     std::string GetOpKey(int32_t slotId);
     void CopyOperatorConfig(const OperatorConfig &from, OperatorConfig &to);
+    void UpdateCurrentOpc(int32_t slotId, OperatorConfig &poc, int32_t state,
+        bool canAnnounceChanged, bool needUpdateLoading);
     void SendSimMatchedOperatorInfo(int32_t slotId);
-    bool AnnounceOperatorConfigChanged(int32_t slotId);
+    bool AnnounceOperatorConfigChanged(int32_t slotId, int32_t state);
+    void notifyInitApnConfigs(int32_t slotId);
     inline static const std::string KEY_SLOTID = "slotId";
+    inline static const std::string CHANGE_STATE = "state";
+    inline static const int32_t STATE_PARA_UPDATE = 3;
     inline static const std::string OPERATOR_CONFIG_CHANGED = "operatorConfigChanged";
     OperatorConfig opc_;
     int32_t slotId_;
+    bool isLoadingConfig = false;
     std::mutex mutex_;
 };
 } // namespace Telephony

@@ -16,39 +16,47 @@
 #ifndef OHOS_STK_CONTROLLER_H
 #define OHOS_STK_CONTROLLER_H
 
-#include "event_handler.h"
-#include "inner_event.h"
 #include "i_tel_ril_manager.h"
+#include "inner_event.h"
 #include "sim_state_manager.h"
+#include "tel_event_handler.h"
 #include "want.h"
 
 namespace OHOS {
 namespace Telephony {
-class StkController : public AppExecFwk::EventHandler {
+class StkController : public TelEventHandler {
 public:
-    StkController(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        const std::weak_ptr<Telephony::ITelRilManager> &telRilManager,
+    explicit StkController(const std::weak_ptr<Telephony::ITelRilManager> &telRilManager,
         const std::weak_ptr<Telephony::SimStateManager> &simStateManager, int32_t slotId);
     virtual ~StkController() = default;
     void Init();
+    std::string initStkBudleName();
     int32_t SendTerminalResponseCmd(const std::string &strCmd);
     int32_t SendEnvelopeCmd(const std::string &strCmd);
     int32_t SendCallSetupRequestResult(bool accept);
     void UnRegisterEvents();
 
+public:
+    enum {
+        RETRY_SEND_RIL_PROACTIVE_COMMAND = 0,
+    };
+
 private:
     void RegisterEvents();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void OnIccStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
-    void OnSendRilSessionEnd(const AppExecFwk::InnerEvent::Pointer &event) const;
-    void OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Pointer &event) const;
-    void OnSendRilAlphaNotify(const AppExecFwk::InnerEvent::Pointer &event) const;
-    void OnSendRilEventNotify(const AppExecFwk::InnerEvent::Pointer &event) const;
-    void OnIccRefresh(const AppExecFwk::InnerEvent::Pointer &event) const;
-    bool PublishStkEvent(const AAFwk::Want &want) const;
+    void OnSendRilSessionEnd(const AppExecFwk::InnerEvent::Pointer &event);
+    void OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Pointer &event);
+    void OnSendRilAlphaNotify(const AppExecFwk::InnerEvent::Pointer &event);
+    void OnSendRilEventNotify(const AppExecFwk::InnerEvent::Pointer &event);
+    void OnIccRefresh(const AppExecFwk::InnerEvent::Pointer &event);
+    bool PublishStkEvent(AAFwk::Want &want);
     void OnSendTerminalResponseResult(const AppExecFwk::InnerEvent::Pointer &event);
     void OnSendEnvelopeCmdResult(const AppExecFwk::InnerEvent::Pointer &event);
     void OnSendCallSetupRequestResult(const AppExecFwk::InnerEvent::Pointer &event);
+    bool CheckIsSystemApp(const std::string &bundleName);
+    sptr<OHOS::IRemoteObject> GetBundleMgr();
+    void RetrySendRilProactiveCommand();
 
 private:
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
@@ -59,8 +67,11 @@ private:
     int32_t terminalResponseResult_ = 0;
     int32_t callSetupResponseResult_ = 0;
     bool responseFinished_ = false;
+    std::string stkBundleName_ = "";
     std::mutex stkMutex_;
     std::condition_variable stkCv_;
+    AAFwk::Want retryWant_;
+    int32_t remainTryCount_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

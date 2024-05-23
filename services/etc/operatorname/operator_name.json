@@ -5,12 +5,12 @@
             "zh-Hans-CN": "中国移动",
             "en-Latn-US": "China Mobile",
             "zh-Hant-TW": "中國移動",
-            "zh-Hant-HK": "中國移動",
+            "zh-Hant-HK": "中國移動"
         },
         {
             "mcc_mnc_array": [46001,46006,46009,46031,46032],
             "zh-Hans-CN": "中国联通",
-            "en-Latn-US": "China Union",
+            "en-Latn-US": "China Unicom",
             "zh-Hant-TW": "中國聯通",
             "zh-Hant-HK": "中國聯通"
         },

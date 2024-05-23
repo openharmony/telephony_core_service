@@ -30,6 +30,8 @@ public:
 
 private:
     int32_t ReportImsRegInfoInner(const ImsRegStateCallback &stateCallback, const ImsRegInfo &info);
+    int32_t InsertImsRegCallback(int32_t slotId, ImsServiceType imsSrvType, ImsRegStateCallback &stateCallback);
+    void RemoveImsRegCallback(int32_t slotId, ImsServiceType imsSrvType);
     static void ReportImsRegInfoWork(uv_work_t *work, int32_t status);
     static int32_t ReportImsRegInfo(const ImsRegInfo &info, const ImsRegStateCallback &stateCallback);
 

@@ -17,7 +17,7 @@
 
 #include <cinttypes>
 
-#include "hril_network_parcel.h"
+#include "tel_ril_network_parcel.h"
 #include "network_search_manager.h"
 
 namespace OHOS {
@@ -227,6 +227,7 @@ const std::map<RadioEvent, std::any> EventSender::mapFunctions_ = {
     { RadioEvent::RADIO_SET_STATUS, &ITelRilManager::SetRadioState },
     { RadioEvent::RADIO_GET_STATUS, &ITelRilManager::GetRadioState },
     { RadioEvent::RADIO_GET_IMEI, &ITelRilManager::GetImei },
+    { RadioEvent::RADIO_GET_IMEISV, &ITelRilManager::GetImeiSv },
     { RadioEvent::RADIO_GET_MEID, &ITelRilManager::GetMeid },
     { RadioEvent::RADIO_NETWORK_SEARCH_RESULT, &ITelRilManager::GetNetworkSearchInformation },
     { RadioEvent::RADIO_GET_VOICE_TECH, &ITelRilManager::GetVoiceRadioTechnology },
@@ -235,6 +236,7 @@ const std::map<RadioEvent, std::any> EventSender::mapFunctions_ = {
     { RadioEvent::RADIO_SET_NR_OPTION_MODE, &ITelRilManager::SetNrOptionMode },
     { RadioEvent::RADIO_GET_NR_OPTION_MODE, &ITelRilManager::GetNrOptionMode },
     { RadioEvent::RADIO_GET_RRC_CONNECTION_STATE, &ITelRilManager::GetRrcConnectionState },
+    { RadioEvent::RADIO_GET_NR_SSBID_INFO, &ITelRilManager::GetNrSsbId },
 };
 
 AppExecFwk::InnerEvent::Pointer EventSender::GetEvent(int32_t slotId, RadioEvent radioEvent, int32_t param)

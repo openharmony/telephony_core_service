@@ -56,10 +56,13 @@ ohos_shared_library("libtel_common") {
     "../frameworks/js/napi/napi_util.cpp",
     "common/src/enum_convert.cpp",
     "common/src/str_convert.cpp",
+    "common/src/tel_event_handler.cpp",
+    "common/src/tel_event_queue.cpp",
     "common/src/telephony_common_utils.cpp",
     "common/src/telephony_config.cpp",
     "common/src/telephony_ext_utils_wrapper.cpp",
     "common/src/telephony_permission.cpp",
+    "common/src/tel_aes_crypto_util.cpp",
     "preferences/src/tel_profile_util.cpp",
   ]
 
@@ -90,6 +93,8 @@ ohos_shared_library("libtel_common") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
@@ -97,6 +102,7 @@ ohos_shared_library("libtel_common") {
     "napi:ace_napi",
     "preferences:native_preferences",
     "samgr:samgr_proxy",
+    "huks:libhukssdk",
   ]
 
   innerapi_tags = [ "platformsdk" ]

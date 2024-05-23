@@ -24,6 +24,7 @@
 #include "core_service.h"
 #include "napi_util.h"
 #include "system_ability_definition.h"
+#include "tel_event_handler.h"
 #include "unistd.h"
 
 using namespace OHOS::Telephony;
@@ -32,18 +33,12 @@ static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t SIM_TYPE_NUM = 2;
 constexpr int32_t SIZE_LIMIT = 4;
-constexpr int32_t SLEEP_TIME_SECONDS = 10;
 constexpr uint32_t FUCTION_SIZE = 100;
 
 bool IsServiceInited()
 {
     if (!g_isInited) {
-        auto onStart = [] { DelayedSingleton<CoreService>::GetInstance()->OnStart(); };
-        std::thread startThread(onStart);
-        pthread_setname_np(startThread.native_handle(), "addiccdiallingnumbers_fuzzer");
-        startThread.join();
-
-        sleep(SLEEP_TIME_SECONDS);
+        DelayedSingleton<CoreService>::GetInstance()->OnStart();
         if (DelayedSingleton<CoreService>::GetInstance()->GetServiceRunningState() ==
             static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
             g_isInited = true;
@@ -230,6 +225,11 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     HasSimCard(data, size);
     AddIccDiallingNumbers(data, size);
     IsCTSimCard(data, size);
+    auto telRilManager = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
+    if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
+        return;
+    }
+    telRilManager->handler_->ClearFfrt(true);
     return;
 }
 } // namespace OHOS
@@ -240,5 +240,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::AddCoreServiceTokenFuzzer token;
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::DelayedSingleton<CoreService>::DestroyInstance();
     return 0;
 }

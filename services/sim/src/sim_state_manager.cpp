@@ -16,14 +16,13 @@
 #include "sim_state_manager.h"
 
 #include "core_service_errors.h"
-#include "runner_pool.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
 std::mutex SimStateManager::mtx_;
-constexpr static const int32_t WAIT_TIME_SECOND = 1;
+constexpr static const int32_t WAIT_TIME_SECOND = 3;
 constexpr static const int32_t WAIT_TIME_LONG_SECOND = 20;
 
 SimStateManager::SimStateManager(std::shared_ptr<ITelRilManager> telRilManager)
@@ -44,12 +43,7 @@ void SimStateManager::Init(int32_t slotId)
         TELEPHONY_LOGE("SimStateManager::Init telRilManager_ is null.");
         return;
     }
-    eventLoop_ = RunnerPool::GetInstance().GetCommonRunner();
-    if (eventLoop_.get() == nullptr) {
-        TELEPHONY_LOGE("SimStateHandle failed to create EventRunner");
-        return;
-    }
-    simStateHandle_ = std::make_shared<SimStateHandle>(eventLoop_, shared_from_this());
+    simStateHandle_ = std::make_shared<SimStateHandle>(shared_from_this());
     if (simStateHandle_ == nullptr) {
         TELEPHONY_LOGE("SimStateManager::failed to create new SimStateHandle");
         return;
@@ -103,6 +97,14 @@ SimState SimStateManager::GetSimState()
     return ret;
 }
 
+bool SimStateManager::IfModemInitDone()
+{
+    if (simStateHandle_ != nullptr) {
+        return simStateHandle_->modemInitDone_;
+    }
+    return false;
+}
+
 CardType SimStateManager::GetCardType()
 {
     CardType ret = CardType::UNKNOWN_CARD;
@@ -112,6 +114,16 @@ CardType SimStateManager::GetCardType()
         ret = simStateHandle_->GetCardType();
     }
     return ret;
+}
+
+int32_t SimStateManager::SetModemInit(bool state)
+{
+    if (simStateHandle_ != nullptr) {
+        TELEPHONY_LOGI("state: %{public}d", state);
+        simStateHandle_->modemInitDone_ = state;
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
 int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
@@ -126,7 +138,7 @@ int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockS
     simStateHandle_->UnlockPin(slotId, pin);
     while (!responseReady_) {
         TELEPHONY_LOGI("UnlockPin::wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == std::cv_status::timeout) {
             break;
         }
     }
@@ -135,9 +147,9 @@ int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockS
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
-    if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+    if (unlockResult == UNLOCK_SUCCESS) {
         response.result = UNLOCK_OK;
-    } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+    } else if (unlockResult == UNLOCK_PASSWORD_ERR) {
         response.result = UNLOCK_INCORRECT;
     } else {
         response.result = UNLOCK_FAIL;
@@ -160,7 +172,7 @@ int32_t SimStateManager::UnlockPuk(
     simStateHandle_->UnlockPuk(slotId, newPin, puk);
     while (!responseReady_) {
         TELEPHONY_LOGI("UnlockPuk::wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == std::cv_status::timeout) {
             break;
         }
     }
@@ -169,9 +181,9 @@ int32_t SimStateManager::UnlockPuk(
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
-    if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+    if (unlockResult == UNLOCK_SUCCESS) {
         response.result = UNLOCK_OK;
-    } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+    } else if (unlockResult == UNLOCK_PASSWORD_ERR) {
         response.result = UNLOCK_INCORRECT;
     } else {
         response.result = UNLOCK_FAIL;
@@ -203,9 +215,9 @@ int32_t SimStateManager::AlterPin(
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
-    if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+    if (unlockResult == UNLOCK_SUCCESS) {
         response.result = UNLOCK_OK;
-    } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+    } else if (unlockResult == UNLOCK_PASSWORD_ERR) {
         response.result = UNLOCK_INCORRECT;
     } else {
         response.result = UNLOCK_FAIL;
@@ -246,9 +258,9 @@ int32_t SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, L
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
-    if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+    if (unlockResult == UNLOCK_SUCCESS) {
         response.result = UNLOCK_OK;
-    } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+    } else if (unlockResult == UNLOCK_PASSWORD_ERR) {
         response.result = UNLOCK_INCORRECT;
     } else {
         response.result = UNLOCK_FAIL;
@@ -320,9 +332,9 @@ int32_t SimStateManager::UnlockPin2(int32_t slotId, const std::string &pin2, Loc
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
-    if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+    if (unlockResult == UNLOCK_SUCCESS) {
         response.result = UNLOCK_OK;
-    } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+    } else if (unlockResult == UNLOCK_PASSWORD_ERR) {
         response.result = UNLOCK_INCORRECT;
     } else {
         response.result = UNLOCK_FAIL;
@@ -354,9 +366,9 @@ int32_t SimStateManager::UnlockPuk2(
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
-    if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+    if (unlockResult == UNLOCK_SUCCESS) {
         response.result = UNLOCK_OK;
-    } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+    } else if (unlockResult == UNLOCK_PASSWORD_ERR) {
         response.result = UNLOCK_INCORRECT;
     } else {
         response.result = UNLOCK_FAIL;
@@ -388,9 +400,9 @@ int32_t SimStateManager::AlterPin2(
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
-    if (unlockResult == HRIL_UNLOCK_SUCCESS) {
+    if (unlockResult == UNLOCK_SUCCESS) {
         response.result = UNLOCK_OK;
-    } else if (unlockResult == HRIL_UNLOCK_PASSWORD_ERR) {
+    } else if (unlockResult == UNLOCK_PASSWORD_ERR) {
         response.result = UNLOCK_INCORRECT;
     } else {
         response.result = UNLOCK_FAIL;

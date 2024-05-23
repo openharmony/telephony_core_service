@@ -15,10 +15,8 @@
 
 #include "stk_manager.h"
 
-#include "runner_pool.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
-
 
 namespace OHOS {
 namespace Telephony {
@@ -41,12 +39,7 @@ void StkManager::Init(int slotId)
         TELEPHONY_LOGE("StkManager[%{public}d]::Init() telRilManager or simStateManager_ is nullptr", slotId);
         return;
     }
-    stkEventLoop_ = RunnerPool::GetInstance().GetCommonRunner();
-    if (stkEventLoop_.get() == nullptr) {
-        TELEPHONY_LOGE("StkManager[%{public}d]::Init() failed to create EventRunner", slotId);
-        return;
-    }
-    stkController_ = std::make_shared<StkController>(stkEventLoop_, telRilManager_, simStateManager_, slotId);
+    stkController_ = std::make_shared<StkController>(telRilManager_, simStateManager_, slotId);
     if (stkController_ == nullptr) {
         TELEPHONY_LOGE("StkManager[%{public}d]::Init() failed to create StkController", slotId);
         return;

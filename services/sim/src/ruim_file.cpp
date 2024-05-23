@@ -19,6 +19,7 @@
 #include "common_event_support.h"
 #include "radio_event.h"
 #include "telephony_common_utils.h"
+#include "telephony_ext_wrapper.h"
 
 using namespace std;
 using namespace OHOS::AppExecFwk;
@@ -26,9 +27,7 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
-RuimFile::RuimFile(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager)
-    : IccFile(runner, simStateManager)
+RuimFile::RuimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("RuimFile", simStateManager)
 {
     fileQueried_ = false;
     InitMemberFunc();
@@ -190,9 +189,19 @@ bool RuimFile::ProcessGetIccidDone(const AppExecFwk::InnerEvent::Pointer &event)
     }
     if (fd->exception == nullptr) {
         std::string iccData = fd->resultData;
+        std::string fullIccData = iccData;
+        GetFullIccid(fullIccData);
         SwapPairsForIccId(iccData);
         TELEPHONY_LOGI("RuimFile::ProcessEvent MSG_SIM_OBTAIN_ICCID_DONE result success");
-        iccId_ = iccData;
+        decIccId_ = iccData;
+        if (!fullIccData.empty() && fullIccData.compare(iccId_) != 0) {
+            if (filesFetchedObser_ != nullptr) {
+                TELEPHONY_LOGI("slotId:%{public}d iccid loaded", slotId_);
+                iccidLoadObser_->NotifyObserver(RadioEvent::RADIO_SIM_ICCID_LOADED, slotId_);
+            }
+        }
+        iccId_ = fullIccData;
+        FileChangeToExt(iccId_, FileChangeType::ICCID_FILE_LOAD);
     }
     return isFileProcessResponse;
 }
@@ -216,6 +225,7 @@ bool RuimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
         if (!imsi_.empty()) {
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
         }
+        FileChangeToExt(imsi_, FileChangeType::C_IMSI_FILE_LOAD);
     }
     return isFileHandleResponse;
 }

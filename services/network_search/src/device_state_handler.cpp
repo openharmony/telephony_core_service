@@ -61,14 +61,14 @@ void DeviceStateHandler::ProcessScreenDisplay(bool isScreenOn)
 void DeviceStateHandler::ProcessPowerSaveMode(bool isPowerSaveModeOn)
 {
     isPowerSaveModeOn_ = isPowerSaveModeOn;
-    SetDeviceState(POWER_SAVE_MODE, isPowerSaveModeOn_);
+    SetDeviceState(TEL_POWER_SAVE_MODE, isPowerSaveModeOn_);
     ProcessDeviceState();
 }
 
 void DeviceStateHandler::ProcessChargingState(bool isCharging)
 {
     isCharging_ = isCharging;
-    SetDeviceState(CHARGING_STATE, isCharging_);
+    SetDeviceState(TEL_CHARGING_STATE, isCharging_);
     ProcessDeviceState();
 }
 
@@ -97,7 +97,7 @@ void DeviceStateHandler::ProcessDeviceState()
 
     if (isLowData_ != IsLowPowerConsumption()) {
         isLowData_ = !isLowData_;
-        SetDeviceState(LOW_DATA_STATE, isLowData_);
+        SetDeviceState(TEL_LOW_DATA_STATE, isLowData_);
     }
 
     int32_t newFilter = NOTIFICATION_FILTER_NONE;
@@ -192,9 +192,9 @@ void DeviceStateHandler::SyncSettings()
     TELEPHONY_LOGI("DeviceStateHandler::SyncSettings isCharging_=%{public}d, isLowData_=%{public}d,"
         " isPowerSaveModeOn_=%{public}d, notificationFilter_=%{public}d",
         isCharging_, isLowData_, isPowerSaveModeOn_, notificationFilter_);
-    SetDeviceState(CHARGING_STATE, isCharging_);
-    SetDeviceState(LOW_DATA_STATE, isLowData_);
-    SetDeviceState(POWER_SAVE_MODE, isPowerSaveModeOn_);
+    SetDeviceState(TEL_CHARGING_STATE, isCharging_);
+    SetDeviceState(TEL_LOW_DATA_STATE, isLowData_);
+    SetDeviceState(TEL_POWER_SAVE_MODE, isPowerSaveModeOn_);
     SetNotificationFilter(notificationFilter_, true);
 }
 

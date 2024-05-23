@@ -19,15 +19,18 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_service_hisysevent.h"
+#include "enum_convert.h"
 #include "hilog/log.h"
-#include "hril_sim_parcel.h"
 #include "if_system_ability_manager.h"
 #include "inner_event.h"
 #include "iservice_registry.h"
 #include "radio_event.h"
+#include "satellite_service_client.h"
 #include "sim_constant.h"
 #include "sim_state_manager.h"
 #include "system_ability_definition.h"
+#include "tel_event_handler.h"
+#include "tel_ril_sim_parcel.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_state_registry_client.h"
 #include "telephony_types.h"
@@ -53,9 +56,8 @@ const std::map<uint32_t, SimStateHandle::Func> SimStateHandle::memberFuncMap_ = 
     { MSG_SIM_SEND_NCFG_OPER_INFO_DONE, &SimStateHandle::GetSendSimMatchedOperatorInfoResult },
 };
 
-SimStateHandle::SimStateHandle(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, const std::weak_ptr<SimStateManager> &simStateManager)
-    : AppExecFwk::EventHandler(runner), simStateManager_(simStateManager)
+SimStateHandle::SimStateHandle(const std::weak_ptr<SimStateManager> &simStateManager)
+    : TelEventHandler("SimStateHandle"), simStateManager_(simStateManager)
 {
     TELEPHONY_LOGI("SimStateHandle::SimStateHandle()");
 }
@@ -65,6 +67,11 @@ void SimStateHandle::Init(int32_t slotId)
     slotId_ = slotId;
     TELEPHONY_LOGI("SimStateHandle::HasSimCard(), slotId_ = %{public}d", slotId_);
     ConnectService();
+    if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED)) {
+        std::shared_ptr<SatelliteServiceClient> satelliteClient =
+            DelayedSingleton<SatelliteServiceClient>::GetInstance();
+        satelliteClient->AddSimHandler(slotId_, std::static_pointer_cast<TelEventHandler>(shared_from_this()));
+    }
     auto telRilManager = telRilManager_.lock();
     if (telRilManager != nullptr) {
         TELEPHONY_LOGI("SimStateHandle::SimStateHandle RegisterEvent start");
@@ -82,6 +89,14 @@ void SimStateHandle::Init(int32_t slotId)
     externalState_ = SimState::SIM_STATE_UNKNOWN;
     CoreServiceHiSysEvent::WriteSimStateBehaviorEvent(slotId, static_cast<int32_t>(externalState_));
     externalType_ = CardType::UNKNOWN_CARD;
+}
+
+int32_t SimStateHandle::IsSatelliteSupported()
+{
+    char satelliteSupported[SYSPARA_SIZE] = { 0 };
+    GetParameter(TEL_SATELLITE_SUPPORTED, SATELLITE_DEFAULT_VALUE, satelliteSupported, SYSPARA_SIZE);
+    TELEPHONY_LOGI("satelliteSupported is %{public}s", satelliteSupported);
+    return std::atoi(satelliteSupported);
 }
 
 bool SimStateHandle::HasSimCard()
@@ -299,8 +314,9 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
     const int32_t newSimType = ar.simType_;
     const int32_t newSimStatus = ar.simStatus_;
     iccState_ = ar;
-    TELEPHONY_LOGI(
-        "SimStateHandle::ProcessIccCardState SimType[%{public}d], SimStatus[%{public}d]", newSimType, newSimStatus);
+    auto iter = simIccStatusMap_.find(newSimStatus);
+    TELEPHONY_LOGI("SimStateHandle::ProcessIccCardState SimType[%{public}d], SimStatus[%{public}s](%{public}d)",
+        newSimType, iter->second.c_str(), newSimStatus);
     if (oldSimType_ != newSimType) {
         CardTypeEscape(newSimType, slotId);
         oldSimType_ = newSimType;
@@ -308,9 +324,10 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
     if (oldSimStatus_ != newSimStatus) {
         SimStateEscape(newSimStatus, slotId, reason);
         oldSimStatus_ = newSimStatus;
-        TELEPHONY_LOGI(
-            "will to NotifyIccStateChanged at newSimStatus[%{public}d] observerHandler_ is nullptr[%{public}d] ",
-            newSimStatus, (observerHandler_ == nullptr));
+        iter = simIccStatusMap_.find(newSimStatus);
+        TELEPHONY_LOGI("will to NotifyIccStateChanged at newSimStatus[%{public}s]"
+            "(%{public}d) observerHandler_ is nullptr[%{public}d] ",
+            iter->second.c_str(), newSimStatus, (observerHandler_ == nullptr));
         if (observerHandler_ != nullptr) {
             observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_CHANGE, slotId);
         }
@@ -325,6 +342,28 @@ void SimStateHandle::UnInit()
     if (telRilManager != nullptr) {
         telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
         telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STATE_CHANGED);
+    }
+    if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED) &&
+        satelliteCallback_ != nullptr) {
+        std::shared_ptr<SatelliteServiceClient> satelliteClient =
+            DelayedSingleton<SatelliteServiceClient>::GetInstance();
+        satelliteClient->UnRegisterCoreNotify(slotId_, RadioEvent::RADIO_SIM_STATE_CHANGE);
+    }
+}
+
+void SimStateHandle::RegisterSatelliteCallback()
+{
+    satelliteCallback_ =
+        std::make_unique<SatelliteCoreCallback>(std::static_pointer_cast<TelEventHandler>(shared_from_this()))
+            .release();
+    std::shared_ptr<SatelliteServiceClient> satelliteClient = DelayedSingleton<SatelliteServiceClient>::GetInstance();
+    satelliteClient->RegisterCoreNotify(slotId_, RadioEvent::RADIO_SIM_STATE_CHANGE, satelliteCallback_);
+}
+
+void SimStateHandle::UnregisterSatelliteCallback()
+{
+    if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED)) {
+        satelliteCallback_ = nullptr;
     }
 }
 
@@ -427,11 +466,11 @@ std::string SimStateHandle::GetAidByCardType(CardType type)
 
 void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("SimStateHandle::GetSimCardData slotId = %{public}d", slotId);
+    TELEPHONY_LOGD("SimStateHandle::GetSimCardData slotId = %{public}d", slotId);
     int32_t error = 0;
     IccState iccState;
     std::shared_ptr<CardStatusInfo> param = event->GetSharedObject<CardStatusInfo>();
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
         TELEPHONY_LOGE("SimStateHandle::GetSimCardData() fail");
         return;
@@ -439,11 +478,12 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
     if (param != nullptr) {
         iccState.simType_ = param->simType;
         iccState.simStatus_ = param->simState;
-        TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), simType_ = %{public}d, simStatus_ = %{public}d",
-            iccState.simType_, iccState.simStatus_);
+        modemInitDone_ = true;
+        TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), slot%{public}d, type = %{public}d, status = %{public}d",
+            slotId, iccState.simType_, iccState.simStatus_);
     } else {
         error = static_cast<int32_t>(response->error);
-        TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), error = %{public}d", error);
+        TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), slot%{public}d, error = %{public}d", slotId, error);
         return;
     }
     ProcessIccCardState(iccState, slotId);
@@ -454,7 +494,7 @@ void SimStateHandle::GetSimLockState(int32_t slotId, const AppExecFwk::InnerEven
     TELEPHONY_LOGI("SimStateHandle::GetSimLockState slotId = %{public}d", slotId);
     int32_t error = 0;
     std::shared_ptr<int32_t> param = event->GetSharedObject<int32_t>();
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
         TELEPHONY_LOGE("SimStateHandle::GetSimLockState() fail");
         return;
@@ -474,7 +514,7 @@ void SimStateHandle::GetSetLockResult(int32_t slotId, const AppExecFwk::InnerEve
 {
     TELEPHONY_LOGI("SimStateHandle::GetSetLockResult slotId = %{public}d", slotId);
     std::shared_ptr<LockStatusResp> param = event->GetSharedObject<LockStatusResp>();
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
         TELEPHONY_LOGE("SimStateHandle::GetSetLockResult() fail");
         return;
@@ -494,7 +534,7 @@ void SimStateHandle::GetUnlockResult(int32_t slotId, const AppExecFwk::InnerEven
 {
     TELEPHONY_LOGI("SimStateHandle::GetUnlockResult slotId = %{public}d", slotId);
     std::shared_ptr<LockStatusResp> param = event->GetSharedObject<LockStatusResp>();
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
         TELEPHONY_LOGE("SimStateHandle::GetSimUnlockResult() fail");
         return;
@@ -515,7 +555,7 @@ void SimStateHandle::GetUnlockSimLockResult(int32_t slotId, const AppExecFwk::In
 {
     TELEPHONY_LOGI("SimStateHandle::GetUnlockSimLockResult slotId = %{public}d", slotId);
     std::shared_ptr<LockStatusResp> param = event->GetSharedObject<LockStatusResp>();
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
         TELEPHONY_LOGE("SimStateHandle::GetUnlockSimLockResult() fail");
         return;
@@ -547,7 +587,7 @@ void SimStateHandle::GetSendSimMatchedOperatorInfoResult(
     int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("SimStateHandle::GetSendSimMatchedOperatorInfoResult slotId = %{public}d", slotId);
-    std::shared_ptr<HRilRadioResponseInfo> response = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if (response == nullptr) {
         TELEPHONY_LOGE("SimStateHandle::GetSendSimMatchedOperatorInfoResult() fail");
         return;
@@ -592,7 +632,7 @@ bool SimStateHandle::PublishSimStateEvent(std::string event, int32_t eventCode, 
     data.SetCode(eventCode);
     data.SetData(eventData);
     EventFwk::CommonEventPublishInfo publishInfo;
-    publishInfo.SetOrdered(true);
+    publishInfo.SetOrdered(false);
     bool publishResult = CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
     TELEPHONY_LOGI("SimStateHandle::PublishSimStateEvent result : %{public}d", publishResult);
     return publishResult;
@@ -618,7 +658,9 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 
     switch (eventId) {
         case RadioEvent::RADIO_STATE_CHANGED:
-            OnRadioStateUnavailable(event);
+            if (IsRadioStateUnavailable(event)) {
+                break;
+            }
             [[fallthrough]]; // fall_through
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
             ObtainIccStatus(slotId_);
@@ -792,7 +834,7 @@ void SimStateHandle::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventH
             observerHandler_->RegObserver(RadioEvent::RADIO_SIM_STATE_READY, handler);
             if (IsIccReady() && handler != nullptr) {
                 TELEPHONY_LOGI("SimStateHandle::RegisterIccReady() OK send");
-                handler->SendEvent(RadioEvent::RADIO_SIM_STATE_READY);
+                TelEventHandler::SendTelEvent(handler, RadioEvent::RADIO_SIM_STATE_READY);
             }
             break;
         case RadioEvent::RADIO_SIM_STATE_LOCKED:
@@ -842,20 +884,24 @@ void SimStateHandle::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::Even
     }
 }
 
-void SimStateHandle::OnRadioStateUnavailable(const AppExecFwk::InnerEvent::Pointer &event)
+bool SimStateHandle::IsRadioStateUnavailable(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::shared_ptr<HRilInt32Parcel> object = event->GetSharedObject<HRilInt32Parcel>();
+    std::shared_ptr<Int32Parcel> object = event->GetSharedObject<Int32Parcel>();
     if (object == nullptr) {
         TELEPHONY_LOGE("object is nullptr!");
-        return;
+        return false;
     }
     int32_t radioState = object->data;
-    if (radioState == ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE && HasSimCard()) {
+    if (radioState == ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE) {
+        TELEPHONY_LOGI("received radio unavailable");
         IccState iccState;
         iccState.simType_ = ICC_UNKNOWN_TYPE;
         iccState.simStatus_ = ICC_CONTENT_UNKNOWN;
+        modemInitDone_ = false;
         ProcessIccCardState(iccState, slotId_);
+        return true;
     }
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS

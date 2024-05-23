@@ -19,25 +19,27 @@
 #include "common_event_subscriber.h"
 #include "event_handler.h"
 #include "event_runner.h"
-#include "hril_modem_parcel.h"
-#include "sim_file_controller.h"
-#include "usim_file_controller.h"
+#include "tel_ril_modem_parcel.h"
 #include "i_tel_ril_manager.h"
+#include "isim_file.h"
+#include "isim_file_controller.h"
 #include "ruim_file.h"
 #include "ruim_file_controller.h"
 #include "sim_file.h"
+#include "sim_file_controller.h"
 #include "system_ability_status_change_stub.h"
 #include "isim_file.h"
 #include "isim_file_controller.h"
 #include "csim_file_controller.h"
 #include "telephony_log_wrapper.h"
+#include "usim_file_controller.h"
 
 namespace OHOS {
 namespace Telephony {
-class SimFileManager : public AppExecFwk::EventHandler, public EventFwk::CommonEventSubscriber {
+class SimFileManager : public TelEventHandler, public EventFwk::CommonEventSubscriber {
 public:
     using HANDLE = std::shared_ptr<AppExecFwk::EventHandler>;
-    SimFileManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+    SimFileManager(
         const EventFwk::CommonEventSubscribeInfo &sp, std::weak_ptr<Telephony::ITelRilManager> telRilManager,
         std::weak_ptr<Telephony::SimStateManager> state);
     virtual ~SimFileManager();
@@ -48,7 +50,10 @@ public:
     std::u16string GetSimSpn();
     std::u16string GetSimEons(const std::string &plmn, int32_t lac, bool longNameRequired);
     std::u16string GetSimIccId();
+    std::u16string GetSimDecIccId();
     std::u16string GetIMSI();
+    std::u16string GetMCC();
+    std::u16string GetMNC();
     std::u16string GetLocaleFromDefaultSim();
     std::u16string GetSimGid1();
     std::u16string GetSimGid2();
@@ -74,6 +79,7 @@ public:
     std::shared_ptr<IccFileController> GetIccFileController();
     std::shared_ptr<IccDiallingNumbersHandler> ObtainDiallingNumberHandler();
     bool SetVoiceMailInfo(const std::u16string &mailName, const std::u16string &mailNumber);
+    bool SetSimTelephoneNumber(const std::u16string &alphaTag, const std::u16string &phoneNumber);
     bool HasSimCard();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
@@ -88,8 +94,6 @@ protected:
     std::shared_ptr<IccFileController> fileController_ = nullptr;
     std::shared_ptr<IccFile> simFile_ = nullptr;
     std::shared_ptr<IccDiallingNumbersHandler> diallingNumberHandler_ = nullptr;
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord_ = nullptr;
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoopFileController_ = nullptr;
     HandleRunningState stateRecord_ = HandleRunningState::STATE_NOT_START;
     HandleRunningState stateHandler_ = HandleRunningState::STATE_NOT_START;
     std::weak_ptr<Telephony::SimStateManager> simStateManager_;

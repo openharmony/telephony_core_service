@@ -16,23 +16,23 @@
 #ifndef OHOS_SIM_STATE_HANDLE_H
 #define OHOS_SIM_STATE_HANDLE_H
 
+#include <chrono>
+#include <condition_variable>
 #include <list>
 #include <memory>
 #include <mutex>
-#include <condition_variable>
-#include <chrono>
 #include <string>
 #include <vector>
 
-#include "event_handler.h"
-#include "event_runner.h"
-#include "want.h"
-#include "i_tel_ril_manager.h"
 #include "i_sim_manager.h"
+#include "i_tel_ril_manager.h"
 #include "icc_state.h"
 #include "observer_handler.h"
+#include "satellite_core_callback.h"
 #include "sim_state_type.h"
+#include "tel_event_handler.h"
 #include "telephony_errors.h"
+#include "want.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -101,11 +101,10 @@ struct UnlockData {
     int32_t lockState = 0;
 };
 
-class SimStateHandle : public AppExecFwk::EventHandler {
+class SimStateHandle : public TelEventHandler {
 public:
     using Func = void (SimStateHandle::*)(int32_t, const AppExecFwk::InnerEvent::Pointer &);
-    SimStateHandle(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        const std::weak_ptr<SimStateManager> &simStateManager);
+    explicit SimStateHandle(const std::weak_ptr<SimStateManager> &simStateManager);
     ~SimStateHandle() = default;
     void Init(int32_t slotId);
     void UnInit();
@@ -129,11 +128,16 @@ public:
     bool IsIccReady();
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
+    void RegisterSatelliteCallback();
+    void UnregisterSatelliteCallback();
     int32_t SimAuthentication(int32_t slotId, AuthType authType, const std::string &authData);
     SimAuthenticationResponse GetSimAuthenticationResponse();
     void SendSimMatchedOperatorInfo(
         int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey);
     int32_t GetSendSimMatchedOperatorInfoResponse();
+
+public:
+    bool modemInitDone_ = false;
 
 private:
     void SyncCmdResponse();
@@ -154,7 +158,8 @@ private:
     void GetSimAuthenticationResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     void GetSendSimMatchedOperatorInfoResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     std::string GetAidByCardType(CardType type);
-    void OnRadioStateUnavailable(const AppExecFwk::InnerEvent::Pointer &event);
+    bool IsRadioStateUnavailable(const AppExecFwk::InnerEvent::Pointer &event);
+    int32_t IsSatelliteSupported();
 
 private:
     static const std::map<uint32_t, Func> memberFuncMap_;
@@ -163,7 +168,7 @@ private:
     int32_t slotId_ = DEFAULT_SIM_SLOT_ID;
     UnlockData unlockRespon_ = { UNLOCK_FAIL, TELEPHONY_ERROR, static_cast<int32_t>(LockState::LOCK_ERROR) };
     SimAuthenticationResponse simAuthRespon_ = { 0 };
-    int32_t sendSimMatchedOperatorInfoResult_ = static_cast<int32_t>(HRilErrType::NONE);
+    int32_t sendSimMatchedOperatorInfoResult_ = static_cast<int32_t>(ErrType::NONE);
     LockStatusResponse simlockRespon_ = { UNLOCK_FAIL, TELEPHONY_ERROR };
     IccState iccState_; // icc card states
     SimState externalState_; // need to broadcast sim state;
@@ -171,6 +176,7 @@ private:
     std::weak_ptr<SimStateManager> simStateManager_;
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_; // ril manager
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
+    sptr<ISatelliteCoreCallback> satelliteCallback_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

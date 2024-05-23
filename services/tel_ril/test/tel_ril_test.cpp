@@ -177,6 +177,7 @@ void TelRilTest::OnInitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE] = &TelRilTest::OnRequestGetPreferredNetworkTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE] = &TelRilTest::OnRequestSetPreferredNetworkTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_IMEI] = &TelRilTest::OnRequestGetImeiTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_IMEISV] = &TelRilTest::OnRequestGetImeiSvTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_BASEBAND_VERSION] = &TelRilTest::OnRequestGetBasebandVersionTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_MEID] = &TelRilTest::OnRequestGetMeidTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_CS_REG_STATUS] = &TelRilTest::OnRequestGetCsRegStatusTest;
@@ -189,6 +190,7 @@ void TelRilTest::OnInitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_GET_RRC_CONNECTION_STATE] = &TelRilTest::OnRequestGetRrcConnectionStateTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_NR_OPTION_MODE] = &TelRilTest::OnRequestGetNrOptionModeTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_NR_OPTION_MODE] = &TelRilTest::OnRequestSetNrOptionModeTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_NR_SSBID_INFO] = &TelRilTest::OnRequestGetNrSsbIdTest;
 }
 
 void TelRilTest::OnInitForRegister(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
@@ -1430,6 +1432,17 @@ void TelRilTest::OnRequestGetImeiTest(int32_t slotId, const std::shared_ptr<AppE
     }
 }
 
+void TelRilTest::OnRequestGetImeiSvTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    auto event = AppExecFwk::InnerEvent::Get(TYPESBITMAP);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestGetImeiSvTest -->");
+        telRilManager_->GetImeiSv(slotId, event);
+        TELEPHONY_LOGI("OnRequestGetImeiSvTest finished");
+    }
+}
+
 void TelRilTest::OnRequestGetBasebandVersionTest(int32_t slotId,
     const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
@@ -1509,7 +1522,7 @@ void TelRilTest::OnRequestSetLocateUpdatesTest(
         const int32_t NOTIFY_STAT_ONLY = 1;
         const int32_t NOTIFY_STAT_LAC_CELLID = 2;
         int32_t notifyModeValue = REG_NOTIFY_STAT_LAC_CELLID;
-        HRilRegNotifyMode mode;
+        RegNotifyMode mode;
         std::cout << "Please input notifyMode(NOTIFY_STAT_ONLY: 1 / NOTIFY_STAT_LAC_CELLID: 2): " << endl;
         std::cin >> notifyModeValue;
         if (notifyModeValue == NOTIFY_STAT_ONLY) {
@@ -1596,6 +1609,19 @@ void TelRilTest::OnRequestSetNrOptionModeTest(int32_t slotId, const std::shared_
         std::cin >> mode;
         telRilManager_->SetNrOptionMode(slotId, mode, event);
         TELEPHONY_LOGI("TelRilTest::OnRequestSetNrOptionModeTest --> finished");
+    }
+}
+
+void TelRilTest::OnRequestGetNrSsbIdTest(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_NR_SSBID_INFO);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestGetNrSsbIdTest -->");
+        telRilManager_->GetNrSsbId(slotId, event);
+        TELEPHONY_LOGI("TelRilTest::OnRequestGetNrSsbIdTest --> finished");
     }
 }
 
@@ -1926,11 +1952,9 @@ void TelRilTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
             break;
         }
         case uint32_t(CustomMessageID::MSG_SIM_AUTHENTICATION_DONE): {
-            TELEPHONY_LOGI("sim authentication done");
             break;
         }
         case uint32_t(CustomMessageID::MSG_SIM_SEND_NCFG_OPER_INFO_DONE): {
-            TELEPHONY_LOGI("sim SendSimMatchedOperatorInfo done");
             break;
         }
         case uint32_t(DiffInterfaceId::TEST_GET_BASEBAND_VERSION): {
@@ -1990,7 +2014,7 @@ void TelRilTest::DemoHandler::GetFileAndDataSize(const unsigned char *data, int 
 
 void TelRilTest::DemoHandler::OnRequestShutDownTestResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
     if (responseInfo == nullptr) {
         TELEPHONY_LOGI("OnRequestShutDownTestResponse success");
     }
@@ -1999,7 +2023,7 @@ void TelRilTest::DemoHandler::OnRequestShutDownTestResponse(const AppExecFwk::In
 
 void TelRilTest::DemoHandler::OnRequestGetBasebandVersionTestResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::shared_ptr<HRilStringParcel> basebandVersion = event->GetSharedObject<HRilStringParcel>();
+    std::shared_ptr<StringParcel> basebandVersion = event->GetSharedObject<StringParcel>();
     if (basebandVersion != nullptr) {
         TELEPHONY_LOGI("test get baseband version:%{public}s", basebandVersion->data.c_str());
     }
@@ -2132,6 +2156,7 @@ void Promote()
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_POWER_STATE) << " --> OnRequestSetRadioStateTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE) << " --> OnRequestGetRadioStateTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMEI) << "--> OnRequestGetImeiTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMEISV) << "--> OnRequestGetImeiSvTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_BASEBAND_VERSION) << "--> OnRequestGetBasebandVersionTest"
          << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_MEID) << "--> OnRequestGetMeidTest" << endl;
@@ -2320,6 +2345,7 @@ void NetworkTest()
          << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_SET_NR_OPTION_MODE) << "--> OnRequestSetNrOptionModeTest"
          << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_GET_NR_SSBID_INFO) << "--> OnRequestGetNrSsbIdTest" << endl;
 }
 } // namespace Telephony
 } // namespace OHOS

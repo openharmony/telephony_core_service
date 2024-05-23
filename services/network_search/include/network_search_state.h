@@ -49,6 +49,7 @@ public:
     void SetImsServiceStatus(const ImsServiceStatus &imsServiceStatus);
     void NotifyStateChange();
     void CsRadioTechChange();
+    void SetLongOperatorName(const std::string &longName, DomainType domainType);
 
 private:
     void NotifyPsRegStatusChange();

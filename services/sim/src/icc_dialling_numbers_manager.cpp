@@ -17,16 +17,16 @@
 
 #include "core_service_errors.h"
 #include "radio_event.h"
-#include "runner_pool.h"
 #include "telephony_errors.h"
 
 namespace OHOS {
 namespace Telephony {
 constexpr static const int32_t WAIT_TIME_SECOND = 1;
+constexpr static const int32_t WAIT_QUERY_TIME_SECOND = 30;
 
-IccDiallingNumbersManager::IccDiallingNumbersManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+IccDiallingNumbersManager::IccDiallingNumbersManager(
     std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simState)
-    : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), simStateManager_(simState)
+    : TelEventHandler("IccDiallingNumbersManager"), simFileManager_(simFileManager), simStateManager_(simState)
 {}
 
 void IccDiallingNumbersManager::Init()
@@ -37,19 +37,13 @@ void IccDiallingNumbersManager::Init()
         return;
     }
 
-    eventLoopDiallingNumbers_ = RunnerPool::GetInstance().GetCommonRunner();
-    if (eventLoopDiallingNumbers_.get() == nullptr) {
-        TELEPHONY_LOGE("IccDiallingNumbersManager failed to create EventRunner");
-        return;
-    }
-
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
         TELEPHONY_LOGE("SimFileManager null pointer");
         return;
     }
 
-    diallingNumbersCache_ = std::make_shared<IccDiallingNumbersCache>(eventLoopDiallingNumbers_, simFileManager);
+    diallingNumbersCache_ = std::make_shared<IccDiallingNumbersCache>(simFileManager);
     if (diallingNumbersCache_ == nullptr) {
         TELEPHONY_LOGE("simFile create nullptr.");
         return;
@@ -97,12 +91,10 @@ void IccDiallingNumbersManager::InitFdnCache()
     if (diallingNumbersCache_ != nullptr) {
         diallingNumbersCache_->ClearDiallingNumberCache();
     }
-    std::thread initTask([&]() {
-        pthread_setname_np(pthread_self(), "init_fdn_cache");
+    TelFFRTUtils::Submit([&]() {
         std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers;
         QueryIccDiallingNumbers(DiallingNumbersInfo::SIM_FDN, diallingNumbers);
     });
-    initTask.detach();
 }
 
 void IccDiallingNumbersManager::ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -125,7 +117,7 @@ void IccDiallingNumbersManager::ProcessLoadDone(const AppExecFwk::InnerEvent::Po
         TELEPHONY_LOGE("ProcessDiallingNumberLoadDone: get null pointer!!!");
     }
     TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessLoadDone: end");
-    hasEventDone_ = true;
+    hasQueryEventDone_ = true;
     processWait_.notify_all();
 }
 
@@ -133,10 +125,10 @@ void IccDiallingNumbersManager::ProcessUpdateDone(const AppExecFwk::InnerEvent::
 {
     std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
     if (object != nullptr && object->exception != nullptr) {
-        std::shared_ptr<HRilRadioResponseInfo> responseInfo =
-            std::static_pointer_cast<HRilRadioResponseInfo>(object->exception);
+        std::shared_ptr<RadioResponseInfo> responseInfo =
+            std::static_pointer_cast<RadioResponseInfo>(object->exception);
         TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessUpdateDone error %{public}d", responseInfo->error);
-        hasEventDone_ = (responseInfo->error == HRilErrType::NONE);
+        hasEventDone_ = (responseInfo->error == ErrType::NONE);
     } else {
         hasEventDone_ = true;
     }
@@ -148,10 +140,10 @@ void IccDiallingNumbersManager::ProcessWriteDone(const AppExecFwk::InnerEvent::P
 {
     std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
     if (object != nullptr && object->exception != nullptr) {
-        std::shared_ptr<HRilRadioResponseInfo> responseInfo =
-            std::static_pointer_cast<HRilRadioResponseInfo>(object->exception);
+        std::shared_ptr<RadioResponseInfo> responseInfo =
+            std::static_pointer_cast<RadioResponseInfo>(object->exception);
         TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessWriteDone error %{public}d", responseInfo->error);
-        hasEventDone_ = (responseInfo->error == HRilErrType::NONE);
+        hasEventDone_ = (responseInfo->error == ErrType::NONE);
     } else {
         hasEventDone_ = true;
     }
@@ -163,10 +155,10 @@ void IccDiallingNumbersManager::ProcessDeleteDone(const AppExecFwk::InnerEvent::
 {
     std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
     if (object != nullptr && object->exception != nullptr) {
-        std::shared_ptr<HRilRadioResponseInfo> responseInfo =
-            std::static_pointer_cast<HRilRadioResponseInfo>(object->exception);
+        std::shared_ptr<RadioResponseInfo> responseInfo =
+            std::static_pointer_cast<RadioResponseInfo>(object->exception);
         TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessDeleteDone error %{public}d", responseInfo->error);
-        hasEventDone_ = (responseInfo->error == HRilErrType::NONE);
+        hasEventDone_ = (responseInfo->error == ErrType::NONE);
     } else {
         hasEventDone_ = true;
     }
@@ -264,7 +256,6 @@ int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
     int type, std::vector<std::shared_ptr<DiallingNumbersInfo>> &result)
 {
     std::unique_lock<std::mutex> lock(mtx_);
-    ClearRecords();
     if (diallingNumbersCache_ == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -275,17 +266,21 @@ int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     TELEPHONY_LOGI("QueryIccDiallingNumbers start:%{public}d", type);
-    int fileId = GetFileIdForType(type);
-    int extensionEf = diallingNumbersCache_->ExtendedElementFile(fileId);
-    AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_GET_DONE);
-    hasEventDone_ = false;
-    diallingNumbersCache_->ObtainAllDiallingNumberFiles(fileId, extensionEf, event);
-    processWait_.wait(lock, [this] { return hasEventDone_ == true; });
-    TELEPHONY_LOGI("IccDiallingNumbersManager::QueryIccDiallingNumbers: end");
+    if (hasQueryEventDone_) {
+        ClearRecords();
+        int fileId = GetFileIdForType(type);
+        int extensionEf = diallingNumbersCache_->ExtendedElementFile(fileId);
+        AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_GET_DONE);
+        hasQueryEventDone_ = false;
+        diallingNumbersCache_->ObtainAllDiallingNumberFiles(fileId, extensionEf, event);
+    }
+    processWait_.wait_for(
+        lock, std::chrono::seconds(WAIT_QUERY_TIME_SECOND), [this] { return hasQueryEventDone_ == true; });
+    TELEPHONY_LOGI("QueryIccDiallingNumbers: end");
     if (!diallingNumbersList_.empty()) {
         result = diallingNumbersList_;
     }
-    return hasEventDone_ ? TELEPHONY_SUCCESS : CORE_ERR_SIM_CARD_LOAD_FAILED;
+    return hasQueryEventDone_ ? TELEPHONY_SUCCESS : CORE_ERR_SIM_CARD_LOAD_FAILED;
 }
 
 AppExecFwk::InnerEvent::Pointer IccDiallingNumbersManager::BuildCallerInfo(int eventId)
@@ -345,17 +340,11 @@ bool IccDiallingNumbersManager::IsValidType(int type)
 std::shared_ptr<IccDiallingNumbersManager> IccDiallingNumbersManager::CreateInstance(
     std::weak_ptr<SimFileManager> simFile, std::shared_ptr<SimStateManager> simState)
 {
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoop = RunnerPool::GetInstance().GetCommonRunner();
-    if (eventLoop.get() == nullptr) {
-        TELEPHONY_LOGE("IccDiallingNumbersManager  failed to create EventRunner");
-        return nullptr;
-    }
     if (simFile.lock() == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersManager::Init SimFileManager null pointer");
         return nullptr;
     }
-    std::shared_ptr<IccDiallingNumbersManager> manager =
-        std::make_shared<IccDiallingNumbersManager>(eventLoop, simFile, simState);
+    std::shared_ptr<IccDiallingNumbersManager> manager = std::make_shared<IccDiallingNumbersManager>(simFile, simState);
     if (manager == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersManager::Init manager create nullptr.");
         return nullptr;

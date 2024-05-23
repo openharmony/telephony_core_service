@@ -24,24 +24,24 @@ std::unordered_map<int32_t, std::shared_ptr<TelRilRequest>> TelRilBase::requestM
 std::mutex TelRilBase::requestLock_;
 std::shared_ptr<TelRilHandler> TelRilBase::handler_;
 
-TelRilBase::TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_2::IRil> rilInterface,
+TelRilBase::TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : observerHandler_(observerHandler), rilInterface_(rilInterface), slotId_(slotId)
 {
     handler_ = handler;
 }
 
-void TelRilBase::ResetRilInterface(sptr<HDI::Ril::V1_2::IRil> rilInterface)
+void TelRilBase::ResetRilInterface(sptr<HDI::Ril::V1_3::IRil> rilInterface)
 {
     rilInterface_ = rilInterface;
 }
 
-std::shared_ptr<TelRilRequest> TelRilBase::CreateTelRilRequest(
-    int32_t request, const AppExecFwk::InnerEvent::Pointer &result)
+std::shared_ptr<TelRilRequest> TelRilBase::CreateTelRilRequest(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    std::shared_ptr<TelRilRequest> telRilRequest = std::make_shared<TelRilRequest>(GetNextSerialId(), request, result);
+    std::shared_ptr<TelRilRequest> telRilRequest = std::make_shared<TelRilRequest>(GetNextSerialId(), result);
     std::lock_guard<std::mutex> lockRequest(TelRilBase::requestLock_);
     TelRilBase::requestMap_.insert(std::make_pair(telRilRequest->serialId_, telRilRequest));
+    TELEPHONY_LOGD("CreateTelRilRequest serialId : %{public}d", static_cast<int32_t>(telRilRequest->serialId_));
     if (handler_ != nullptr) {
         handler_->ApplyRunningLock(TelRilHandler::NORMAL_RUNNING_LOCK);
     } else {
@@ -58,7 +58,7 @@ int32_t TelRilBase::GetNextSerialId(void)
     return nextSerialId_++;
 }
 
-std::shared_ptr<TelRilRequest> TelRilBase::FindTelRilRequest(const HRilRadioResponseInfo &responseInfo)
+std::shared_ptr<TelRilRequest> TelRilBase::FindTelRilRequest(const RadioResponseInfo &responseInfo)
 {
     int32_t serial = responseInfo.serial;
     std::shared_ptr<TelRilRequest> telRilRequest = nullptr;
@@ -81,15 +81,15 @@ std::shared_ptr<TelRilRequest> TelRilBase::FindTelRilRequest(const HRilRadioResp
     return telRilRequest;
 }
 
-int32_t TelRilBase::GetSerialId(const AppExecFwk::InnerEvent::Pointer &response, uint32_t requestId)
+int32_t TelRilBase::GetSerialId(const AppExecFwk::InnerEvent::Pointer &response)
 {
     if (rilInterface_ == nullptr) {
-        TELEPHONY_LOGE("ERROR : eventId=%{public}d --> rilInterface_ == nullptr !!!", requestId);
+        TELEPHONY_LOGE("ERROR : rilInterface_ == nullptr !!!");
         return -TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(requestId, response);
+    std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(response);
     if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("telRilRequest is nullptr, eventId=%{public}d", requestId);
+        TELEPHONY_LOGE("telRilRequest is nullptr");
         return -TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return telRilRequest->serialId_;
@@ -106,18 +106,18 @@ void TelRilBase::DfxWriteCallFaultEvent(std::shared_ptr<TelRilRequest> telRilReq
         case RadioEvent::RADIO_DIAL:
             CoreServiceHiSysEvent::WriteDialCallFaultEvent(slotId_,
                 static_cast<int32_t>(CallErrorCode::CALL_ERROR_RADIO_RESPONSEINFO_ERROR),
-                "HRilErrType " + std::to_string(error));
+                "ErrType " + std::to_string(error));
             break;
         case RadioEvent::RADIO_ACCEPT_CALL:
             CoreServiceHiSysEvent::WriteAnswerCallFaultEvent(slotId_,
                 static_cast<int32_t>(CallErrorCode::CALL_ERROR_RADIO_RESPONSEINFO_ERROR),
-                "HRilErrType " + std::to_string(error));
+                "ErrType " + std::to_string(error));
             break;
         case RadioEvent::RADIO_REJECT_CALL:
         case RadioEvent::RADIO_HANGUP_CONNECT:
             CoreServiceHiSysEvent::WriteHangUpFaultEvent(slotId_,
                 static_cast<int32_t>(CallErrorCode::CALL_ERROR_RADIO_RESPONSEINFO_ERROR),
-                "HRilErrType " + std::to_string(error));
+                "ErrType " + std::to_string(error));
             break;
         default:
             break;
@@ -125,9 +125,9 @@ void TelRilBase::DfxWriteCallFaultEvent(std::shared_ptr<TelRilRequest> telRilReq
 }
 
 int32_t TelRilBase::ErrorResponse(
-    std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo)
+    std::shared_ptr<TelRilRequest> telRilRequest, const RadioResponseInfo &responseInfo)
 {
-    std::shared_ptr<HRilRadioResponseInfo> respInfo = std::make_shared<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> respInfo = std::make_shared<RadioResponseInfo>();
     if (telRilRequest != nullptr && telRilRequest->pointer_ != nullptr) {
         const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler = telRilRequest->pointer_->GetOwner();
         if (handler == nullptr) {
@@ -139,7 +139,8 @@ int32_t TelRilBase::ErrorResponse(
         respInfo->error = responseInfo.error;
         respInfo->flag = telRilRequest->pointer_->GetParam();
         DfxWriteCallFaultEvent(telRilRequest, static_cast<int32_t>(responseInfo.error));
-        return handler->SendEvent(eventId, respInfo);
+        TelEventHandler::SendTelEvent(handler, eventId, respInfo);
+        return static_cast<int32_t>(responseInfo.error);
     } else {
         TELEPHONY_LOGE("ERROR : telRilRequest  or telRilRequest->pointer_ is null !!!");
     }

@@ -1,0 +1,114 @@
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+SUBSYSTEM_DIR = "../../../.."
+import("//build/config/features.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+##############################fuzztest##########################################
+ohos_fuzztest("SetRadioStateFuzzTest") {
+  module_output_path = "core_service/core_service"
+  module_out_path = module_output_path
+  fuzz_config_file =
+      "$SUBSYSTEM_DIR/core_service/test/fuzztest/setradiostate_fuzzer"
+
+  include_dirs = [
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/include",
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/network_search/include",
+    "$SUBSYSTEM_DIR/core_service/services/core/include",
+    "$SUBSYSTEM_DIR/core_service/services/sim/include",
+    "$SUBSYSTEM_DIR/core_service/services/tel_ril/include",
+    "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer",
+    "$SUBSYSTEM_DIR/core_service/utils/common/include",
+  ]
+
+  configs = [ "$SUBSYSTEM_DIR/core_service/utils:telephony_log_config" ]
+
+  deps = [
+    "$SUBSYSTEM_DIR/core_service:tel_core_service",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
+    "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:data_ability_helper",
+    "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "config_policy:configpolicy_util",
+    "drivers_interface_ril:libril_proxy_1.1",
+    "eventhandler:libeventhandler",
+    "hdf_core:libhdi",
+    "hdf_core:libpub_utils",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "napi:ace_napi",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_ext:net_tether_manager_if",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"SetRadioStateFuzzTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+    "-fvisibility=hidden",
+  ]
+
+  ldflags = [
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+  ]
+
+  sources = [
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/network_search/src/get_network_search_info_callback.cpp",
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/network_search/src/set_nr_option_mode_callback.cpp",
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/network_search/src/set_preferred_network_callback.cpp",
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/network_search/src/set_radio_state_callback.cpp",
+    "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer/addcoreservicetoken_fuzzer.cpp",
+    "setradiostate_fuzzer.cpp",
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+  deps = []
+  deps += [
+    # deps file
+    ":SetRadioStateFuzzTest",
+  ]
+}
+###############################################################################

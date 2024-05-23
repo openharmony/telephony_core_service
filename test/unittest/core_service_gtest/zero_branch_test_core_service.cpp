@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,33 +20,32 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_service.h"
+#include "core_service_client.h"
+#include "core_service_dump_helper.h"
+#include "core_service_hisysevent.h"
 #include "network_search_manager.h"
 #include "network_search_test_callback_stub.h"
 #include "operator_name.h"
 #include "operator_name_utils.h"
-#include "runner_pool.h"
 #include "security_token.h"
 #include "sim_manager.h"
 #include "tel_ril_manager.h"
 #include "telephony_log_wrapper.h"
-#include "time_zone_manager.h"
 
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
+std::shared_ptr<SimManager> g_simManagerPtr = nullptr;
 
 namespace {
+constexpr int32_t SLEEP_TIME_SECONDS = 3;
 constexpr int32_t SLOT_ID = 0;
-const int32_t INVALID_SLOTID = 2;
+const int32_t INVALID_SLOTID = -1;
 constexpr int32_t NR_NSA_OPTION_ONLY = 1;
+constexpr int32_t SIGNAL_STRENGTH_GOOD = 3;
+const std::string NITZ_STR = "23/10/16,09:10:33+32,00";
+const std::string NITZ_STR_INVALID = "202312102359";
 } // namespace
-
-class DemoHandler : public AppExecFwk::EventHandler {
-public:
-    explicit DemoHandler(std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner) {}
-    virtual ~DemoHandler() {}
-    void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) {}
-};
 
 class CoreServiceBranchTest : public testing::Test {
 public:
@@ -57,12 +56,33 @@ public:
 };
 void CoreServiceBranchTest::SetUpTestCase()
 {
-    RunnerPool::GetInstance().Init();
     DelayedSingleton<CoreService>::GetInstance()->Init();
+    auto iSimManager = DelayedSingleton<CoreService>::GetInstance()->simManager_;
+    if (iSimManager == nullptr) {
+        return;
+    }
+    g_simManagerPtr = std::static_pointer_cast<SimManager>(iSimManager);
 }
 
 void CoreServiceBranchTest::TearDownTestCase()
 {
+    if (g_simManagerPtr != nullptr && g_simManagerPtr->multiSimMonitor_ != nullptr) {
+        g_simManagerPtr->multiSimMonitor_->remainCount_ = 0;
+        sleep(SLEEP_TIME_SECONDS);
+    }
+    auto telRilManager = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
+    if (telRilManager == nullptr) {
+        return;
+    }
+    auto handler = telRilManager->handler_;
+    if (handler != nullptr) {
+        handler->RemoveAllEvents();
+        handler->SendEvent(0, 0, AppExecFwk::EventQueue::Priority::HIGH);
+        sleep(SLEEP_TIME_SECONDS);
+    }
+    telRilManager->DisConnectRilInterface();
+    telRilManager->DeInit();
+    DelayedSingleton<CoreService>::GetInstance()->Stop();
     DelayedSingleton<CoreService>::DestroyInstance();
 }
 
@@ -127,6 +147,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_002, Function | Me
     std::u16string u16Ret = u"";
     DelayedSingleton<CoreService>::GetInstance()->GetIsoCountryCodeForNetwork(SLOT_ID, u16Ret);
     DelayedSingleton<CoreService>::GetInstance()->GetImei(SLOT_ID, u16Ret);
+    DelayedSingleton<CoreService>::GetInstance()->GetImeiSv(SLOT_ID, u16Ret);
     DelayedSingleton<CoreService>::GetInstance()->GetMeid(SLOT_ID, u16Ret);
     DelayedSingleton<CoreService>::GetInstance()->GetUniqueDeviceId(SLOT_ID, u16Ret);
     DelayedSingleton<CoreService>::GetInstance()->IsNrSupported(SLOT_ID);
@@ -176,7 +197,6 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_001, Function | Medium
     DelayedSingleton<CoreService>::GetInstance()->GetDefaultVoiceSimId(simId);
     int32_t dsdsMode = 0;
     DelayedSingleton<CoreService>::GetInstance()->GetDsdsMode(dsdsMode);
-    DelayedSingleton<CoreService>::GetInstance()->SetPrimarySlotId(SLOT_ID);
     DelayedSingleton<CoreService>::GetInstance()->GetPrimarySlotId(result);
     const std::u16string cardNumber = Str8ToStr16("SimNumber12345678901");
     DelayedSingleton<CoreService>::GetInstance()->SetShowNumber(SLOT_ID, cardNumber);
@@ -224,8 +244,8 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_002, Function | Medium
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_001, Function | MediumTest | Level1)
 {
-    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::GET_BASEBAND_VERSION);
-    for (uint32_t code = 0; code < maxCode; code++) {
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    for (uint32_t code = 0; code <= maxCode; code++) {
         if (code == static_cast<uint32_t>(CoreServiceInterfaceCode::HAS_OPERATOR_PRIVILEGES)) {
             continue;
         }
@@ -241,182 +261,173 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_001, Function | Mediu
 }
 
 /**
- * @tc.number   Telephony_TimeZoneManager_001
+ * @tc.number   Telephony_CoreService_Stub_002
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneManager_001, Function | MediumTest | Level1)
+HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_002, Function | MediumTest | Level1)
+{
+    SecurityToken token;
+    int32_t slotId = SLOT_ID;
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    for (uint32_t code = 0; code <= maxCode; code++) {
+        MessageParcel data;
+        MessageParcel reply;
+        MessageOption option;
+        data.WriteInterfaceToken(CoreServiceStub::GetDescriptor());
+        data.WriteInt32(slotId);
+        DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, data, reply, option);
+    }
+    std::string version;
+    EXPECT_GE(
+        DelayedSingleton<CoreService>::GetInstance()->GetBasebandVersion(SLOT_ID, version), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CoreService_Stub_003
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_003, Function | MediumTest | Level1)
+{
+    SecurityToken token;
+    int32_t slotId = SLOT_ID;
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    for (uint32_t code = 0; code <= maxCode; code++) {
+        if (code == static_cast<uint32_t>(CoreServiceInterfaceCode::HAS_OPERATOR_PRIVILEGES)) {
+            continue;
+        }
+        MessageParcel data;
+        MessageParcel reply;
+        MessageOption option;
+        data.WriteInterfaceToken(CoreServiceStub::GetDescriptor());
+        data.WriteInt32(slotId);
+        data.WriteRemoteObject(callback->AsObject().GetRefPtr());
+        DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, data, reply, option);
+    }
+    std::string version;
+    EXPECT_GE(
+        DelayedSingleton<CoreService>::GetInstance()->GetBasebandVersion(SLOT_ID, version), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CoreService_Stub_004
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_004, Function | MediumTest | Level1)
+{
+    SecurityToken token;
+    int32_t slotId = SLOT_ID;
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    DelayedSingleton<CoreService>::GetInstance()->GetRadioState(slotId, callback);
+    auto simManager = DelayedSingleton<CoreService>::GetInstance()->simManager_;
+    auto networkSearchManager_ = DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_;
+    auto telRilManager_ = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
+    DelayedSingleton<CoreService>::GetInstance()->simManager_ = nullptr;
+    DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_ = nullptr;
+    DelayedSingleton<CoreService>::GetInstance()->telRilManager_ = nullptr;
+    DelayedSingleton<CoreService>::GetInstance()->GetRadioState(slotId, callback);
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    for (uint32_t code = 0; code <= maxCode; code++) {
+        MessageParcel data;
+        MessageParcel reply;
+        MessageOption option;
+        data.WriteInterfaceToken(CoreServiceStub::GetDescriptor());
+        data.WriteInt32(slotId);
+        data.WriteRemoteObject(callback->AsObject().GetRefPtr());
+        DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, data, reply, option);
+    }
+    DelayedSingleton<CoreService>::GetInstance()->simManager_ = simManager;
+    DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_ = networkSearchManager_;
+    DelayedSingleton<CoreService>::GetInstance()->telRilManager_ = telRilManager_;
+    std::vector<std::u16string> args = { u"test", u"test1" };
+    DelayedSingleton<CoreService>::GetInstance()->Dump(slotId, args);
+    slotId--;
+    DelayedSingleton<CoreService>::GetInstance()->Dump(slotId, args);
+    DelayedSingleton<CoreService>::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
+    DelayedSingleton<CoreService>::GetInstance()->OnStart();
+    DelayedSingleton<CoreService>::GetInstance()->OnStop();
+    EXPECT_EQ(DelayedSingleton<CoreService>::GetInstance()->GetServiceRunningState(),
+        static_cast<int32_t>(ServiceRunningState::STATE_NOT_START));
+}
+
+/**
+ * @tc.number   Telephony_CoreService_DumpHelper_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_DumpHelper_001, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
+    if (telRilManager == nullptr) {
+        return;
+    }
+    telRilManager->OnInit();
+    DelayedSingleton<CoreService>::GetInstance()->telRilManager_ = telRilManager;
+    int32_t slotCount = DelayedSingleton<CoreService>::GetInstance()->GetMaxSimCount();
     auto simManager = std::make_shared<SimManager>(telRilManager);
+    if (simManager == nullptr) {
+        return;
+    }
+    simManager->OnInit(slotCount);
+    DelayedSingleton<CoreService>::GetInstance()->simManager_ = simManager;
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
-    TimeZoneManager::GetInstance().Init(networkSearchManager);
-    std::string countryCode = "cn";
-    TimeZoneManager::GetInstance().UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
-    int32_t offset = 0;
-    TimeZoneManager::GetInstance().UpdateTimeZoneOffset(offset, DEFAULT_SIM_SLOT_ID);
-    std::string timeZone = "Asia/Singapore";
-    EXPECT_FALSE(TimeZoneManager::GetInstance().UpdateLocationTimeZone(timeZone));
-    TimeZoneManager::GetInstance().SendUpdateLocationRequest();
-    TimeZoneManager::GetInstance().SendUpdateLocationCountryCodeRequest();
-    TimeZoneManager::GetInstance().IsRoaming();
-    TimeZoneManager::GetInstance().HasSimCard();
-    TimeZoneManager::GetInstance().GetCurrentLac();
+    if (networkSearchManager == nullptr) {
+        return;
+    }
+    networkSearchManager->OnInit();
+    DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_ = networkSearchManager;
 
-    auto inner = std::make_shared<NetworkSearchManagerInner>();
-    networkSearchManager->AddManagerInner(DEFAULT_SIM_SLOT_ID, inner);
-    TimeZoneManager::GetInstance().Init(networkSearchManager);
-    inner->eventLoop_ = AppExecFwk::EventRunner::Create("test");
-    TimeZoneManager::GetInstance().Init(networkSearchManager);
-    TimeZoneManager::GetInstance().Init(networkSearchManager);
-    TimeZoneManager::GetInstance().UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
-    TimeZoneManager::GetInstance().UpdateTimeZoneOffset(offset, DEFAULT_SIM_SLOT_ID);
-    TimeZoneManager::GetInstance().SendUpdateLocationRequest();
-    TimeZoneManager::GetInstance().SendUpdateLocationCountryCodeRequest();
-    TimeZoneManager::GetInstance().IsRoaming();
-    TimeZoneManager::GetInstance().HasSimCard();
-    TimeZoneManager::GetInstance().GetCurrentLac();
-    EXPECT_FALSE(TimeZoneManager::GetInstance().UpdateLocationTimeZone(timeZone));
+    auto coreServiceDumpHelper = std::make_shared<CoreServiceDumpHelper>();
+    std::vector<std::string> argsInStr;
+    std::string result;
+    coreServiceDumpHelper->ShowHelp(result);
+    coreServiceDumpHelper->ShowCoreServiceTimeInfo(result);
+    int32_t slotId = SLOT_ID;
+    bool hasSimCard = false;
+    simManager->simStateManager_[slotId]->simStateHandle_->iccState_.simStatus_ = ICC_CARD_ABSENT;
+    DelayedSingleton<CoreService>::GetInstance()->HasSimCard(slotId, hasSimCard);
+    EXPECT_FALSE(hasSimCard);
+    coreServiceDumpHelper->ShowCoreServiceInfo(result);
+    simManager->simStateManager_[slotId]->simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
+    DelayedSingleton<CoreService>::GetInstance()->HasSimCard(slotId, hasSimCard);
+    EXPECT_TRUE(hasSimCard);
+    coreServiceDumpHelper->ShowCoreServiceInfo(result);
+    coreServiceDumpHelper->Dump(argsInStr, result);
+    EXPECT_FALSE(result.empty());
+    if (simManager->multiSimMonitor_ != nullptr) {
+        simManager->multiSimMonitor_->remainCount_ = 0;
+        sleep(SLEEP_TIME_SECONDS);
+    }
 }
 
 /**
- * @tc.number   Telephony_TimeZoneUpdater_001
+ * @tc.number   Telephony_CoreService_HiSysEvent_001
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneUpdater_001, Function | MediumTest | Level1)
+HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_HiSysEvent_001, Function | MediumTest | Level1)
 {
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>(eventLoop);
-    timeZoneUpdater->Init();
-    auto event = AppExecFwk::InnerEvent::Get(0);
-    timeZoneUpdater->ProcessEvent(event);
-    std::string countryCode = "cn";
-    timeZoneUpdater->UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
-    int32_t offset = 0;
-    timeZoneUpdater->UpdateTimeZoneOffset(offset, DEFAULT_SIM_SLOT_ID);
-    std::string timeZone = "Asia/Shanghai";
-    timeZoneUpdater->UpdateLocationTimeZone(timeZone);
-    timeZoneUpdater->SendUpdateLocationRequest();
-    timeZoneUpdater->SendUpdateLocationCountryCodeRequest();
-    timeZoneUpdater->RegisterSetting();
-    Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=auto_timezone_test");
-    std::string key = "settings.telephony.autotimezonetest";
-    std::string value;
-    timeZoneUpdater->QuerySetting(uri, key, value);
-    timeZoneUpdater->StartEventSubscriber();
-    timeZoneUpdater->RequestLocationUpdate();
-    timeZoneUpdater->IsAutoTimeZone();
-    timeZoneUpdater->IsAirplaneMode();
-    timeZoneUpdater->IsScreenOn();
-    timeZoneUpdater->IsLocationTimeZoneEnabled();
-    timeZoneUpdater->UpdateTelephonyTimeZone();
-    timeZoneUpdater->UpdateTelephonyTimeZone(countryCode);
-    timeZoneUpdater->UpdateTelephonyTimeZone(offset);
-    timeZoneUpdater->NeedUpdateLocationTimeZone(timeZone);
-    timeZoneUpdater->SaveTimeZone(timeZone);
-    timeZoneUpdater->HandleAutoTimeZoneChange(event);
-    timeZoneUpdater->HandleAirplaneModeChange(event);
-    timeZoneUpdater->HandleLocationTimeOut(event);
-    timeZoneUpdater->HandleScreenOnEvent(event);
-    timeZoneUpdater->HandleCountryCodeChange(event);
-    timeZoneUpdater->HandleNetworkConnected(event);
-    timeZoneUpdater->HandleRequestLocationUpdate(event);
-    timeZoneUpdater->HandleRequestLocationCountryCode(event);
-    timeZoneUpdater->StopEventSubscriber();
-    timeZoneUpdater->UnRegisterSetting();
-    timeZoneUpdater->UnInit();
-    countryCode = "CN";
-    EXPECT_EQ(timeZoneUpdater->StringToLower(countryCode), "cn");
-    EXPECT_TRUE(timeZoneUpdater->IsTimeZoneMatchCountryCode(timeZone));
-    EXPECT_FALSE(timeZoneUpdater->IsMultiTimeZoneCountry(countryCode));
-}
-
-/**
- * @tc.number   Telephony_TimeZoneUpdater_002
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneUpdater_002, Function | MediumTest | Level1)
-{
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto timeZoneUpdater = std::make_shared<TimeZoneUpdater>(eventLoop);
-    auto event = AppExecFwk::InnerEvent::Get(0);
-    timeZoneUpdater->ProcessEvent(event);
-    std::string countryCode = "cn";
-    timeZoneUpdater->UpdateCountryCode(countryCode, DEFAULT_SIM_SLOT_ID);
-    int32_t offset = 0;
-    timeZoneUpdater->UpdateTimeZoneOffset(offset, DEFAULT_SIM_SLOT_ID);
-    std::string timeZone = "Asia/Shanghai";
-    timeZoneUpdater->UpdateLocationTimeZone(timeZone);
-    timeZoneUpdater->SendUpdateLocationRequest();
-    timeZoneUpdater->SendUpdateLocationCountryCodeRequest();
-    timeZoneUpdater->StartEventSubscriber();
-    timeZoneUpdater->StartEventSubscriber();
-    timeZoneUpdater->RequestLocationUpdate();
-    timeZoneUpdater->IsLocationTimeZoneEnabled();
-    timeZoneUpdater->HandleCountryCodeChange(event);
-    timeZoneUpdater->HandleNetworkConnected(event);
-    timeZoneUpdater->HandleRequestLocationUpdate(event);
-    timeZoneUpdater->HandleRequestLocationCountryCode(event);
-    timeZoneUpdater->HandleAutoTimeZoneChange(event);
-    timeZoneUpdater->HandleAirplaneModeChange(event);
-    timeZoneUpdater->HandleLocationTimeOut(event);
-    timeZoneUpdater->HandleScreenOnEvent(event);
-    timeZoneUpdater->StopEventSubscriber();
-    timeZoneUpdater->StopEventSubscriber();
-    timeZoneUpdater->UnRegisterSetting();
-    EXPECT_FALSE(timeZoneUpdater->IsMultiTimeZoneCountry(countryCode));
-}
-
-/**
- * @tc.number   Telephony_TimeZoneLocationSuggester_001
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationSuggester_001, Function | MediumTest | Level1)
-{
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto suggester = std::make_shared<TimeZoneLocationSuggester>(eventLoop);
-    suggester->Init();
-    suggester->NitzUpdate();
-#ifdef ABILITY_LOCATION_SUPPORT
-    Parcel parcel;
-    std::unique_ptr<Location::Location> location = Location::Location::Unmarshalling(parcel);
-    suggester->LocationUpdate(location);
-    suggester->GetLocationExpirationTime();
-    suggester->IsLocationExpired();
-#endif
-    suggester->ClearLocation();
-    EXPECT_FALSE(suggester->HasLocation());
-}
-
-/**
- * @tc.number   Telephony_TimeZoneLocationUpdate_001
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationUpdate_001, Function | MediumTest | Level1)
-{
-    auto eventLoop = AppExecFwk::EventRunner::Create("test");
-    auto suggester = std::make_shared<TimeZoneLocationSuggester>(eventLoop);
-    auto update = std::make_shared<TimeZoneLocationUpdate>(suggester);
-    update->StartPassiveUpdate();
-    update->StopPassiveUpdate();
-    update->RequestUpdate();
-    update->CancelUpdate();
-#ifdef ABILITY_LOCATION_SUPPORT
-    update->LocationSwitchChange();
-    Parcel parcel;
-    std::unique_ptr<Location::Location> location = Location::Location::Unmarshalling(parcel);
-    update->LocationReport(location);
-    update->RegisterLocationChange();
-    update->UnregisterLocationChange();
-    update->RegisterSwitchCallback();
-    update->UnregisterSwitchCallback();
-#endif
-    update->IsLocationEnabled();
-    EXPECT_NE(update->GetIsoCountryCode(), "test");
+    auto coreServiceHiSysEvent = std::make_shared<CoreServiceHiSysEvent>();
+    int32_t slotId = SLOT_ID;
+    int32_t argInt = SLOT_ID;
+    std::string argStr = "";
+    coreServiceHiSysEvent->WriteSignalLevelBehaviorEvent(slotId, argInt);
+    coreServiceHiSysEvent->WriteNetworkStateBehaviorEvent(slotId, argInt, argInt, argInt);
+    coreServiceHiSysEvent->WriteDefaultDataSlotIdBehaviorEvent(slotId);
+    coreServiceHiSysEvent->WriteSimStateBehaviorEvent(slotId, argInt);
+    coreServiceHiSysEvent->WriteDialCallFaultEvent(slotId, argInt, argStr);
+    coreServiceHiSysEvent->WriteAnswerCallFaultEvent(slotId, argInt, argStr);
+    coreServiceHiSysEvent->WriteHangUpFaultEvent(slotId, argInt, argStr);
+    coreServiceHiSysEvent->WriteSmsSendFaultEvent(
+        slotId, SmsMmsMessageType::SMS_SHORT_MESSAGE, SmsMmsErrorCode::SMS_ERROR_NULL_POINTER, argStr);
+    coreServiceHiSysEvent->WriteSmsReceiveFaultEvent(
+        slotId, SmsMmsMessageType::SMS_SHORT_MESSAGE, SmsMmsErrorCode::SMS_ERROR_NULL_POINTER, argStr);
+    coreServiceHiSysEvent->WriteDataActivateFaultEvent(
+        slotId, argInt, CellularDataErrorCode::DATA_ERROR_PS_NOT_ATTACH, argStr);
+    coreServiceHiSysEvent->WriteAirplaneModeChangeEvent(argInt);
 }
 
 /**
@@ -427,14 +438,23 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TimeZoneLocationUpdate_001, Function |
 HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("MultiSimController");
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
-        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager, runner);
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     std::shared_ptr<RadioProtocolController> radioProtocolController = nullptr;
+    multiSimController->PublishSetPrimaryEvent(true);
     multiSimController->EncryptIccId("");
+    multiSimController->getDefaultMainSlotByIccId();
     multiSimController->CheckIfNeedSwitchMainSlotId();
+    multiSimController->IsAllModemInitDone();
+    multiSimController->ReCheckPrimary();
+    int simId = 0;
+    multiSimController->GetTargetDefaultSimId(INVALID_SLOTID, simId);
+    multiSimController->GetTargetSimId(INVALID_SLOTID, simId);
+    std::string iccId = "";
+    multiSimController->GetTargetIccId(INVALID_SLOTID, iccId);
+
     EXPECT_FALSE(multiSimController->IsValidSlotId(INVALID_SLOTID));
     multiSimController->maxCount_ = 1;
     EXPECT_FALSE(multiSimController->InitPrimary());
@@ -694,6 +714,109 @@ HWTEST_F(CoreServiceBranchTest, Telephony_TelRilManager_001, Function | MediumTe
     telRilManager->rilInterface_ = nullptr;
     telRilManager->HandleRilInterfaceStatusCallback(status);
     EXPECT_TRUE(status.status == SERVIE_STATUS_STOP);
+}
+
+/**
+ * @tc.number   Telephony_NitzUpdate_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_NitzUpdate_001, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto nitzUpdate = std::make_shared<NitzUpdate>(networkSearchManager, SLOT_ID);
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    nitzUpdate->ProcessNitzUpdate(event);
+    nitzUpdate->ProcessTimeZone();
+    std::string countryCode = "";
+    nitzUpdate->UpdateCountryCode(countryCode);
+    countryCode = "cn";
+    nitzUpdate->UpdateCountryCode(countryCode);
+    nitzUpdate->AutoTimeChange();
+    NitzUpdate::NetworkTime networkTime;
+    std::string nitzStr = NITZ_STR;
+    EXPECT_TRUE(nitzUpdate->NitzParse(nitzStr, networkTime));
+    nitzUpdate->ProcessTime(networkTime);
+    int64_t networkTimeSec = nitzUpdate->lastNetworkTime_;
+    nitzUpdate->IsValidTime(networkTimeSec);
+    nitzUpdate->SaveTime(networkTimeSec);
+    nitzUpdate->IsAutoTime();
+    nitzStr = NITZ_STR_INVALID;
+    EXPECT_FALSE(nitzUpdate->NitzParse(nitzStr, networkTime));
+}
+
+/**
+ * @tc.number   Telephony_IsAllowedInsertApn_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_IsAllowedInsertApn_001, Function | MediumTest | Level1)
+{
+    std::string jsonValue = "";
+    auto coreServiceClient = std::make_shared<CoreServiceClient>();
+    coreServiceClient->OnRemoteDied(nullptr);
+    auto recipient = std::make_shared<CoreServiceClient::CoreServiceDeathRecipient>(CoreServiceClient::GetInstance());
+    recipient->OnRemoteDied(nullptr);
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    if (TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_ != nullptr) {
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.isAllowedInsertApn_ != nullptr, true);
+    }
+    EXPECT_TRUE(coreServiceClient->IsAllowedInsertApn(jsonValue));
+}
+
+/**
+ * @tc.number   Telephony_GetTargetOpkey_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_GetTargetOpkey_001, Function | MediumTest | Level1)
+{
+    std::u16string opkey;
+    auto coreServiceClient = std::make_shared<CoreServiceClient>();
+    coreServiceClient->OnRemoteDied(nullptr);
+    auto recipient = std::make_shared<CoreServiceClient::CoreServiceDeathRecipient>(CoreServiceClient::GetInstance());
+    recipient->OnRemoteDied(nullptr);
+    int32_t result = coreServiceClient->GetTargetOpkey(SLOT_ID, opkey);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_SignalInformationExt_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_SignalInformation_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<SignalInformation> gsm = std::make_shared<GsmSignalInformation>();
+    std::shared_ptr<SignalInformation> cdma = std::make_shared<CdmaSignalInformation>();
+    std::shared_ptr<SignalInformation> wcdma = std::make_shared<WcdmaSignalInformation>();
+    std::shared_ptr<SignalInformation> lte = std::make_shared<LteSignalInformation>();
+    std::shared_ptr<SignalInformation> nr = std::make_shared<NrSignalInformation>();
+    std::shared_ptr<SignalInformation> tdScdma = std::make_shared<TdScdmaSignalInformation>();
+    if (gsm == nullptr || cdma == nullptr || wcdma == nullptr || lte == nullptr || nr == nullptr ||
+        tdScdma == nullptr) {
+        return;
+    }
+    gsm->GetSignalLevel();
+    gsm->SetSignalLevel(SIGNAL_STRENGTH_GOOD);
+    EXPECT_EQ(gsm->GetSignalLevel(), SIGNAL_STRENGTH_GOOD);
+    cdma->GetSignalLevel();
+    cdma->SetSignalLevel(SIGNAL_STRENGTH_GOOD);
+    EXPECT_EQ(cdma->GetSignalLevel(), SIGNAL_STRENGTH_GOOD);
+    wcdma->GetSignalLevel();
+    wcdma->SetSignalLevel(SIGNAL_STRENGTH_GOOD);
+    EXPECT_EQ(wcdma->GetSignalLevel(), SIGNAL_STRENGTH_GOOD);
+    lte->GetSignalLevel();
+    lte->SetSignalLevel(SIGNAL_STRENGTH_GOOD);
+    EXPECT_EQ(lte->GetSignalLevel(), SIGNAL_STRENGTH_GOOD);
+    nr->GetSignalLevel();
+    nr->SetSignalLevel(SIGNAL_STRENGTH_GOOD);
+    EXPECT_EQ(nr->GetSignalLevel(), SIGNAL_STRENGTH_GOOD);
+    tdScdma->GetSignalLevel();
+    tdScdma->SetSignalLevel(SIGNAL_STRENGTH_GOOD);
+    EXPECT_EQ(tdScdma->GetSignalLevel(), SIGNAL_STRENGTH_GOOD);
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -16,7 +16,7 @@
 #ifndef TEL_RIL_MODEM_H
 #define TEL_RIL_MODEM_H
 
-#include "hril_modem_parcel.h"
+#include "tel_ril_modem_parcel.h"
 #include "tel_ril_base.h"
 #include "telephony_types.h"
 
@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 class TelRilModem : public TelRilBase {
 public:
-    TelRilModem(int32_t slotId, sptr<HDI::Ril::V1_2::IRil> rilInterface,
+    TelRilModem(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
         std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     ~TelRilModem() = default;
 
@@ -38,10 +38,12 @@ public:
     int32_t SetRadioState(int32_t fun, int32_t rst, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetRadioState(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetImei(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetImeiSv(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetMeid(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetImeiResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &imei);
+    int32_t GetImeiSvResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &imeiSv);
     int32_t GetMeidResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &meid);
     int32_t GetVoiceRadioTechnologyResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::VoiceRadioTechnology &voiceRadioTechnology);

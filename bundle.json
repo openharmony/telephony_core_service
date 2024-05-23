@@ -38,12 +38,14 @@
                 "access_token",
                 "battery_manager",
                 "bundle_framework",
+                "cJSON",
                 "c_utils",
                 "common_event_service",
                 "config_policy",
                 "data_share",
                 "drivers_interface_ril",
                 "eventhandler",
+                "ffrt",
                 "hdf_core",
                 "hilog",
                 "hisysevent",
@@ -60,10 +62,10 @@
                 "safwk",
                 "samgr",
                 "telephony_data",
-                "time_service"
+                "time_service",
+                "huks"
             ],
             "third_party": [
-                "jsoncpp",
                 "libphonenumber",
                 "libpng",
                 "libxml2",

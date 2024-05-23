@@ -30,6 +30,7 @@ enum class CoreServiceInterfaceCode {
     SET_RADIO_STATE,
     GET_RADIO_STATE,
     GET_IMEI,
+    GET_IMEISV,
     GET_MEID,
     GET_UNIQUE_DEVICE_ID,
     HAS_SIM_CARD,
@@ -113,6 +114,12 @@ enum class CoreServiceInterfaceCode {
     GET_BASEBAND_VERSION,
     GET_DSDS_MODE,
     FACTORY_RESET,
+    GET_NR_SSB_ID_INFO,
+    INIT_EXTRA_MODULE,
+    IS_ALLOWED_INSERT_APN,
+    GET_TARGET_OPKEY,
+    GET_OPKEY_VERSION,
+    GET_RESIDENT_NETWORK_NUMERIC,
 };
 } // namespace Telephony
 } // namespace OHOS

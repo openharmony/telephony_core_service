@@ -19,16 +19,14 @@
 #include <atomic>
 #include <string_view>
 
-#include "event_handler.h"
-#include "event_runner.h"
-
-#include "sim_state_manager.h"
 #include "i_tel_ril_manager.h"
 #include "icc_operator_rule.h"
+#include "sim_state_manager.h"
+#include "tel_event_handler.h"
 
 namespace OHOS {
 namespace Telephony {
-class IccOperatorPrivilegeController : public AppExecFwk::EventHandler {
+class IccOperatorPrivilegeController : public TelEventHandler {
 public:
     enum : uint32_t {
         MSG_OPEN_LOGICAL_CHANNEL_DONE = 0x7ffffff0,
@@ -36,9 +34,8 @@ public:
         MSG_CLOSE_LOGICAL_CHANNEL_DONE = 0x7ffffff2
     };
 
-    IccOperatorPrivilegeController(std::shared_ptr<AppExecFwk::EventRunner> runner,
-        std::shared_ptr<Telephony::ITelRilManager> telRilManager,
-        std::shared_ptr<SimStateManager> simStateManager);
+    explicit IccOperatorPrivilegeController(
+        std::shared_ptr<Telephony::ITelRilManager> telRilManager, std::shared_ptr<SimStateManager> simStateManager);
 
     virtual ~IccOperatorPrivilegeController();
 

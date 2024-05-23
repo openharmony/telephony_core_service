@@ -16,12 +16,13 @@
 #ifndef OHOS_USIM_DIALLING_NUMBERS_SERVICE_H
 #define OHOS_USIM_DIALLING_NUMBERS_SERVICE_H
 
+#include "icc_dialling_numbers_handler.h"
 #include "icc_file_controller.h"
 #include "sim_constant.h"
-#include "icc_dialling_numbers_handler.h"
-#include "tag_service.h"
-#include "telephony_log_wrapper.h"
 #include "sim_utils.h"
+#include "tag_service.h"
+#include "tel_event_handler.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -42,9 +43,9 @@ enum UsimConstant {
     BIT_OF_BYTE = 8
 };
 
-class UsimDiallingNumbersService : public AppExecFwk::EventHandler {
+class UsimDiallingNumbersService : public TelEventHandler {
 public:
-    explicit UsimDiallingNumbersService(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    UsimDiallingNumbersService();
     ~UsimDiallingNumbersService();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     void ObtainUsimElementaryFiles(const AppExecFwk::InnerEvent::Pointer &pointer);

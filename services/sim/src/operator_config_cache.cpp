@@ -14,32 +14,24 @@
  */
 #include "operator_config_cache.h"
 
-#include <json/json.h>
+#include <fstream>
 #include <openssl/sha.h>
 #include <string_ex.h>
 #include <telephony_types.h>
 
+#include "cJSON.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_manager_inner.h"
+#include "pdp_profile_rdb_helper.h"
 #include "radio_event.h"
-#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-OperatorConfigCache::OperatorConfigCache(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    std::weak_ptr<SimFileManager> simFileManager, int32_t slotId)
-    : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), slotId_(slotId)
+OperatorConfigCache::OperatorConfigCache(std::weak_ptr<SimFileManager> simFileManager, int32_t slotId)
+    : TelEventHandler("OperatorConfigCache"), simFileManager_(simFileManager), slotId_(slotId)
 {
     TELEPHONY_LOGI("OperatorConfigCache create");
-    if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_ != nullptr &&
-        TELEPHONY_EXT_WRAPPER.updateOpcVersion_ != nullptr) {
-        if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_()) {
-            ClearAllCache(slotId);
-            TELEPHONY_LOGI("clear all cache done");
-            TELEPHONY_EXT_WRAPPER.updateOpcVersion_();
-        }
-    }
 }
 
 void OperatorConfigCache::ClearAllCache(int32_t slotId)
@@ -78,7 +70,21 @@ void OperatorConfigCache::ClearMemoryCache(int32_t slotId)
     opc_.configValue.clear();
 }
 
-int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &poc)
+void OperatorConfigCache::UpdateCurrentOpc(
+    int32_t slotId, OperatorConfig &poc, int32_t state, bool canAnnounceChanged, bool needUpdateLoading)
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    CopyOperatorConfig(poc, opc_);
+    lock.unlock();
+    if (canAnnounceChanged) {
+        AnnounceOperatorConfigChanged(slotId, state);
+    }
+    if (needUpdateLoading) {
+        isLoadingConfig = false;
+    }
+}
+
+int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &poc, int32_t state)
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
@@ -86,42 +92,46 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::string iccid = Str16ToStr8(simFileManager->GetSimIccId());
-    std::string filename = EncryptIccId(iccid) + ".json";
     std::string opkey = GetOpKey(slotId);
+    std::string filename = EncryptIccId(iccid + opkey) + ".json";
     if (opkey == std::string(INITIAL_OPKEY)) {
         TELEPHONY_LOGI("load default operator config");
         filename = DEFAULT_OPERATOR_CONFIG;
     }
+    isLoadingConfig = true;
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     CoreManagerInner::GetInstance().GetSimState(slotId, simState);
-    TELEPHONY_LOGI("LoadOperatorConfig simState = %{public}d", simState);
+    TELEPHONY_LOGI("LoadOperatorConfig slotId = %{public}d simState = %{public}d", slotId, simState);
     bool canAnnounceChanged = (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_READY);
-    Json::Value opcJson;
-    if (parser_.ParseOperatorConfigFromFile(poc, parser_.GetOperatorConfigFilePath(filename), opcJson)) {
+    cJSON *root = nullptr;
+    if (parser_.ParseOperatorConfigFromFile(poc, parser_.GetOperatorConfigFilePath(filename), root)) {
         TELEPHONY_LOGI("load from file success opc size %{public}zu", poc.configValue.size());
         if (poc.configValue.size() > 0) {
-            std::unique_lock<std::mutex> lock(mutex_);
-            CopyOperatorConfig(poc, opc_);
-            lock.unlock();
-            if (canAnnounceChanged) {
-                AnnounceOperatorConfigChanged(slotId);
+            // state indicate the case of load operator config
+            UpdateCurrentOpc(slotId, poc, state, canAnnounceChanged, false);
+            root = nullptr;
+            return TELEPHONY_ERR_SUCCESS;
+        }
+    }
+    root = cJSON_CreateObject();
+    if (parser_.ParseFromCustomSystem(slotId, poc, root)) {
+        TELEPHONY_LOGI("load from custom system success");
+        parser_.WriteOperatorConfigJson(filename, root);
+
+        if (poc.configValue.size() > 0) {
+            // state indicate the case of load operator config
+            UpdateCurrentOpc(slotId, poc, state, canAnnounceChanged, true);
+            if (root != nullptr) {
+                cJSON_Delete(root);
+                root = nullptr;
             }
             return TELEPHONY_ERR_SUCCESS;
         }
     }
-    if (parser_.ParseFromCustomSystem(slotId, poc, opcJson)) {
-        TELEPHONY_LOGI("load from custom system success");
-        parser_.WriteOperatorConfigJson(filename, opcJson);
-
-        if (poc.configValue.size() > 0) {
-            std::unique_lock<std::mutex> lock(mutex_);
-            CopyOperatorConfig(poc, opc_);
-            lock.unlock();
-            if (canAnnounceChanged) {
-                AnnounceOperatorConfigChanged(slotId);
-            }
-            return TELEPHONY_ERR_SUCCESS;
-        }
+    isLoadingConfig = false;
+    if (root != nullptr) {
+        cJSON_Delete(root);
+        root = nullptr;
     }
     return CORE_ERR_OPERATOR_CONF_NOT_EXIT;
 }
@@ -129,7 +139,7 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
 int32_t OperatorConfigCache::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
 {
     if (opc_.configValue.size() > 0) {
-        TELEPHONY_LOGI("get from memory");
+        TELEPHONY_LOGD("get from memory");
         std::unique_lock<std::mutex> lock(mutex_);
         CopyOperatorConfig(opc_, poc);
         lock.unlock();
@@ -137,6 +147,20 @@ int32_t OperatorConfigCache::GetOperatorConfigs(int32_t slotId, OperatorConfig &
     }
     TELEPHONY_LOGI("reload operator config");
     return LoadOperatorConfig(slotId, poc);
+}
+
+int32_t OperatorConfigCache::UpdateOperatorConfigs(int32_t slotId)
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    ClearMemoryCache(slotId);
+    lock.unlock();
+    if (slotId == 0) {
+        TELEPHONY_LOGD("OperatorConfigCache:UpdateOperatorConfigs ClearFilesCache");
+        parser_.ClearFilesCache();
+    }
+    OperatorConfig opc;
+    int32_t ret = LoadOperatorConfig(slotId_, opc, STATE_PARA_UPDATE);
+    return ret;
 }
 
 void OperatorConfigCache::CopyOperatorConfig(const OperatorConfig &from, OperatorConfig &to)
@@ -245,26 +269,68 @@ void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId)
     CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
     std::string operName = Str16ToStr8(simFileManager->GetOpName());
     std::string operKey = Str16ToStr8(simFileManager->GetOpKey());
+    std::string operNameNew = (operKey == "") ? "NULL" : operName;
     int32_t response = CoreManagerInner::GetInstance().SendSimMatchedOperatorInfo(slotId,
-        static_cast<int32_t>(simState), operName, operKey);
+        static_cast<int32_t>(simState), operNameNew, operKey);
     TELEPHONY_LOGI("OperatorConfigCache::SendSimMatchedOperatorInfo response = %{public}d", response);
 }
 
-bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId)
+void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
 {
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    CoreManagerInner::GetInstance().GetSimState(slotId, simState);
+    if (simState != SimState::SIM_STATE_READY) {
+        return;
+    }
+    auto helper = PdpProfileRdbHelper::GetInstance();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("get PdpProfileRdbHelper Failed.");
+        return;
+    }
+    TELEPHONY_LOGI("OperatorConfigCache:notifyInitApnConfigs end");
+    helper->notifyInitApnConfigs(slotId);
+}
+
+bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t state)
+{
+    notifyInitApnConfigs(slotId);
     SendSimMatchedOperatorInfo(slotId);
     AAFwk::Want want;
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     want.SetParam(KEY_SLOTID, slotId);
+    want.SetParam(CHANGE_STATE, state);
     std::string eventData(OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventData data;
     data.SetWant(want);
     data.SetData(eventData);
     EventFwk::CommonEventPublishInfo publishInfo;
-    publishInfo.SetOrdered(true);
+    publishInfo.SetOrdered(false);
     bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
     TELEPHONY_LOGI("OperatorConfigCache:AnnounceOperatorConfigChanged end###result = %{public}d", publishResult);
     return publishResult;
+}
+
+bool OperatorConfigCache::IsNeedOperatorLoad(int32_t slotId)
+{
+    std::string opkey = GetOpKey(slotId);
+    TELEPHONY_LOGI("IsNeedOperatorLoad slotId %{public}d opkey %{public}s isLoadingConfig: %{public}d",
+        slotId, opkey.data(), isLoadingConfig);
+    if (opkey.empty() || opkey == std::string(INITIAL_OPKEY)) {
+        return true;
+    }
+    if (isLoadingConfig) {
+        return false;
+    }
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
+        TELEPHONY_LOGI("simFileManager is nullptr");
+        return true;
+    }
+    std::string iccid = Str16ToStr8(simFileManager->GetSimIccId());
+    std::string filename = EncryptIccId(iccid) + ".json";
+    std::string path = parser_.GetOperatorConfigFilePath(filename);
+    std::ifstream f(path.c_str());
+    return !f.good();
 }
 } // namespace Telephony
 } // namespace OHOS

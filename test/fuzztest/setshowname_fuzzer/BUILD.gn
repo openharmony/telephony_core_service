@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -27,6 +27,7 @@ ohos_fuzztest("SetShowNameFuzzTest") {
   include_dirs = [
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/include",
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
+    "$SUBSYSTEM_DIR/core_service/utils/common/include",
     "$SUBSYSTEM_DIR/core_service/services/core/include",
     "$SUBSYSTEM_DIR/core_service/services/network_search/include",
     "$SUBSYSTEM_DIR/core_service/services/sim/include",
@@ -40,6 +41,7 @@ ohos_fuzztest("SetShowNameFuzzTest") {
   deps = [
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
+    "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
   ]
 
   external_deps = [
@@ -49,7 +51,6 @@ ohos_fuzztest("SetShowNameFuzzTest") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "c_utils:utils",
-    "drivers_interface_ril:hril_innerkits",
     "drivers_interface_ril:ril_idl_headers",
     "hdf_core:libhdi",
     "hilog:libhilog",
@@ -71,7 +72,18 @@ ohos_fuzztest("SetShowNameFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+    "-fvisibility=hidden",
   ]
+
+  ldflags = [
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+  ]
+
   sources = [
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
     "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer/addcoreservicetoken_fuzzer.cpp",

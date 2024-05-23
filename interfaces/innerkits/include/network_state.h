@@ -38,10 +38,13 @@ public:
     void SetNetworkState(RegServiceState state, DomainType domainType);
     void SetNrState(NrState state);
     void SetCfgTech(RadioTech tech);
+    void SetLongOperatorName(const std::string &longName, DomainType domainType);
     RegServiceState GetPsRegStatus() const;
     RegServiceState GetCsRegStatus() const;
     RoamingType GetPsRoamingStatus() const;
     RoamingType GetCsRoamingStatus() const;
+    bool IsCdma() const;
+    bool IsGsm() const;
     /*
      * Obtains RAT of the PS domain on the registered network.
      * @return Returns RAT of the PS domain on the registered network

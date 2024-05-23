@@ -34,6 +34,7 @@ public:
     bool HasSimCard();
     SimState GetSimState();
     CardType GetCardType();
+    int32_t SetModemInit(bool state);
     int32_t UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response);
     int32_t UnlockPuk(int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response);
     int32_t AlterPin(
@@ -53,6 +54,7 @@ public:
         int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response);
     int32_t SendSimMatchedOperatorInfo(
         int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey);
+    bool IfModemInitDone();
 
 public:
     static bool responseReady_;
@@ -65,7 +67,6 @@ private:
 private:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<SimStateHandle> simStateHandle_ = nullptr;
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
     SimHandleRun simStateRun_ = STATE_NOT_START;
     static std::mutex mtx_;
 };

@@ -23,6 +23,7 @@ ohos_unittest("tel_core_service_gtest") {
 
   sources = [
     "network_search_test_callback_stub.cpp",
+    "satellite_service_test.cpp",
     "security_token.cpp",
     "zero_branch_test_core_service.cpp",
   ]
@@ -44,7 +45,6 @@ ohos_unittest("tel_core_service_gtest") {
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
     "//third_party/googletest:gtest_main",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   external_deps = [
@@ -56,13 +56,13 @@ ohos_unittest("tel_core_service_gtest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
-    "drivers_interface_ril:hril_innerkits",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",
@@ -127,6 +127,7 @@ ohos_unittest("tel_network_search_gtest") {
     "sim_test_util.cpp",
     "sim_type_convert_test.cpp",
     "vcard_test.cpp",
+    "vsim_test.cpp",
     "zero_branch_test.cpp",
     "zero_branch_test_sim_ril.cpp",
   ]
@@ -148,7 +149,6 @@ ohos_unittest("tel_network_search_gtest") {
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
     "//third_party/googletest:gtest_main",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   external_deps = [
@@ -160,13 +160,13 @@ ohos_unittest("tel_network_search_gtest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
-    "drivers_interface_ril:hril_innerkits",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",

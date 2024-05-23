@@ -29,6 +29,7 @@
 #include "sim_state_type.h"
 #include "string"
 #include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
 #include "telephony_observer_broker.h"
 #include "vector"
 
@@ -165,16 +166,20 @@ int32_t TelephonyStateRegistryProxy::UpdateSignalInfo(
     MessageParcel in;
     MessageParcel out;
     if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed");
         return TELEPHONY_ERR_FAIL;
     }
     if (!in.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("[slot%{public}d] write slotId fail", slotId);
         return TELEPHONY_ERR_FAIL;
     }
     int32_t size = vec.size();
     if (size <= 0 || size > SignalInformation::MAX_SIGNAL_NUM) {
+        TELEPHONY_LOGE("signal size error, size=%{public}d", size);
         return TELEPHONY_ERR_FAIL;
     }
     if (!in.WriteInt32(size)) {
+        TELEPHONY_LOGE("write size failed");
         return TELEPHONY_ERR_FAIL;
     }
     for (const auto &v : vec) {
@@ -182,6 +187,7 @@ int32_t TelephonyStateRegistryProxy::UpdateSignalInfo(
     }
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote() return nullptr!");
         return TELEPHONY_ERR_FAIL;
     }
     int result = remote->SendRequest(
@@ -306,6 +312,9 @@ int32_t TelephonyStateRegistryProxy::RegisterStateChange(
         return TELEPHONY_ERR_FAIL;
     }
     if (!in.WriteBool(isUpdate)) {
+        return TELEPHONY_ERR_FAIL;
+    }
+    if (callback == nullptr) {
         return TELEPHONY_ERR_FAIL;
     }
     if (!in.WriteRemoteObject(callback->AsObject().GetRefPtr())) {

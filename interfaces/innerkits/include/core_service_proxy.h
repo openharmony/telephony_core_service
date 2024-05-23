@@ -29,6 +29,7 @@ public:
     int32_t GetCsRadioTech(int32_t slotId, int32_t &csRadioTech) override;
     int32_t GetSignalInfoList(int32_t slotId, std::vector<sptr<SignalInformation>> &signals) override;
     std::u16string GetOperatorNumeric(int32_t slotId) override;
+    std::string GetResidentNetworkNumeric(int32_t slotId) override;
     int32_t GetOperatorName(int32_t slotId, std::u16string &operatorName) override;
     int32_t GetBasebandVersion(int32_t slotId, std::string &version) override;
     int32_t GetNetworkState(int32_t slotId, sptr<NetworkState> &networkState) override;
@@ -37,6 +38,7 @@ public:
     int32_t SetNrOptionMode(int32_t slotId, int32_t mode, const sptr<INetworkSearchCallback> &callback) override;
     int32_t GetNrOptionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
     int32_t GetImei(int32_t slotId, std::u16string &imei) override;
+    int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) override;
     int32_t GetMeid(int32_t slotId, std::u16string &meid) override;
     int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) override;
     int32_t GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
@@ -137,6 +139,11 @@ public:
         int32_t slotId, ImsServiceType imsSrvType, const sptr<ImsRegInfoCallback> &callback) override;
     int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType) override;
     int32_t FactoryReset(int32_t slotId) override;
+    int32_t GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation) override;
+    int32_t InitExtraModule(int32_t slotId) override;
+    bool IsAllowedInsertApn(std::string &value) override;
+    int32_t GetTargetOpkey(int32_t slotId, std::u16string &opkey) override;
+    int32_t GetOpkeyVersion(std::string &versionInfo) override;
 
 private:
     template<class T>

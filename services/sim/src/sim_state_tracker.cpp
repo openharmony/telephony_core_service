@@ -20,21 +20,34 @@
 #include "core_manager_inner.h"
 #include "os_account_manager_wrapper.h"
 #include "radio_event.h"
+#include "telephony_ext_wrapper.h"
 #include "thread"
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t OPKEY_VMSG_LENTH = 3;
 const int32_t ACTIVE_USER_ID = 100;
-SimStateTracker::SimStateTracker(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache,
-    int32_t slotId)
-    : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager), operatorConfigCache_(operatorConfigCache),
+SimStateTracker::SimStateTracker(std::weak_ptr<SimFileManager> simFileManager,
+    std::shared_ptr<OperatorConfigCache> operatorConfigCache, int32_t slotId)
+    : TelEventHandler("SimStateTracker"), simFileManager_(simFileManager), operatorConfigCache_(operatorConfigCache),
       slotId_(slotId)
 {
     if (simFileManager.lock() == nullptr) {
         TELEPHONY_LOGE("can not make OperatorConfigLoader");
     }
     operatorConfigLoader_ = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
+    if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_ != nullptr &&
+        TELEPHONY_EXT_WRAPPER.updateOpcVersion_ != nullptr) {
+        if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_()) {
+            operatorConfigCache->ClearAllCache(slotId);
+            TELEPHONY_LOGI("clear all cache done");
+            if (operatorConfigLoader_->InitOpKeyData() == TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGI("InitOpKeyData succ");
+                TELEPHONY_EXT_WRAPPER.updateOpcVersion_();
+            }
+            TELEPHONY_LOGI("Version updated end");
+        }
+    }
     InitListener();
 }
 
@@ -64,6 +77,79 @@ void SimStateTracker::InitListener()
     TELEPHONY_LOGI("SubscribeSystemAbility COMMON_EVENT_SERVICE_ID result:%{public}d", ret);
 }
 
+void SimStateTracker::ProcessSimRecordLoad(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("SimStateTracker::Refresh config");
+    auto slotId = event->GetParam();
+    if (slotId != slotId_) {
+        TELEPHONY_LOGE("is not current slotId");
+        return;
+    }
+    bool hasSimCard = false;
+    CoreManagerInner::GetInstance().HasSimCard(slotId_, hasSimCard);
+    if (!hasSimCard) {
+        TELEPHONY_LOGE("sim is not exist");
+        return;
+    }
+    TelFFRTUtils::Submit([&]() { operatorConfigLoader_->LoadOperatorConfig(slotId_); });
+}
+
+void SimStateTracker::ProcessSimOpkeyLoad(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<std::vector<std::string>> msgObj = event->GetSharedObject<std::vector<std::string>>();
+    if ((msgObj == nullptr) || ((*msgObj).size() != OPKEY_VMSG_LENTH)) {
+        TELEPHONY_LOGI("argument count error");
+        return;
+    }
+    int slotId;
+    if (!StrToInt((*msgObj)[0], slotId)) {
+        return;
+    }
+    if (slotId != slotId_) {
+        TELEPHONY_LOGE("is not current slotId");
+        return;
+    }
+    std::string opkey = (*msgObj)[1];
+    std::string opName = (*msgObj)[2];
+    TELEPHONY_LOGI("OnOpkeyLoad slotId, %{public}d opkey: %{public}s opName: %{public}s",
+        slotId, opkey.data(), opName.data());
+    if (!opkey.empty()) {
+        auto simFileManager = simFileManager_.lock();
+        if (simFileManager != nullptr) {
+            simFileManager->SetOpKey(opkey);
+            simFileManager->SetOpName(opName);
+        }
+        TelFFRTUtils::Submit([&]() {
+            OperatorConfig opc;
+            operatorConfigCache_->LoadOperatorConfig(slotId_, opc);
+        });
+    } else {
+        bool hasSimCard = false;
+        CoreManagerInner::GetInstance().HasSimCard(slotId_, hasSimCard);
+        if (!hasSimCard) {
+            TELEPHONY_LOGE("sim is not exist");
+            return;
+        }
+        TelFFRTUtils::Submit([&]() { operatorConfigLoader_->LoadOperatorConfig(slotId_); });
+    }
+}
+
+void SimStateTracker::ProcessOperatorCacheDel(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("SimStateTracker::ProcessOperatorCacheDel");
+    auto slotId = event->GetParam();
+    if (slotId != slotId_) {
+        TELEPHONY_LOGE("is not current slotId");
+        return;
+    }
+    if (operatorConfigCache_ == nullptr) {
+        TELEPHONY_LOGE("operatorConfigCache is nullptr");
+        return;
+    }
+    operatorConfigCache_->ClearOperatorValue(slotId);
+    operatorConfigCache_->ClearMemoryCache(slotId);
+}
+
 void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -75,23 +161,15 @@ void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         return;
     }
     if (event->GetInnerEventId() == RadioEvent::RADIO_SIM_RECORDS_LOADED) {
-        TELEPHONY_LOGI("SimStateTracker::Refresh config");
-        auto slotId = event->GetParam();
-        if (slotId != slotId_) {
-            TELEPHONY_LOGE("is not current slotId");
-            return;
-        }
-        bool hasSimCard = false;
-        CoreManagerInner::GetInstance().HasSimCard(slotId_, hasSimCard);
-        if (!hasSimCard) {
-            TELEPHONY_LOGE("sim is not exist");
-            return;
-        }
-        std::thread loadOperatorConfigTask([&]() {
-            pthread_setname_np(pthread_self(), "load_operator_config");
-            operatorConfigLoader_->LoadOperatorConfig(slotId_);
-        });
-        loadOperatorConfigTask.detach();
+        ProcessSimRecordLoad(event);
+    }
+
+    if (event->GetInnerEventId() == RadioEvent::RADIO_SIM_OPKEY_LOADED) {
+        ProcessSimOpkeyLoad(event);
+    }
+
+    if (event->GetInnerEventId() == RadioEvent::RADIO_OPERATOR_CACHE_DELETE) {
+        ProcessOperatorCacheDel(event);
     }
 }
 
@@ -107,6 +185,30 @@ bool SimStateTracker::RegisterForIccLoaded()
     return true;
 }
 
+bool SimStateTracker::RegisterOpkeyLoaded()
+{
+    TELEPHONY_LOGI("SimStateTracker::RegisterOpkeyLoaded");
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
+        TELEPHONY_LOGE("simFileManager::can not get simFileManager");
+        return false;
+    }
+    simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_OPKEY_LOADED);
+    return true;
+}
+
+bool SimStateTracker::RegisterOperatorCacheDel()
+{
+    TELEPHONY_LOGI("SimStateTracker::RegisterOperatorCacheDel");
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
+        TELEPHONY_LOGE("simFileManager::can not get simFileManager");
+        return false;
+    }
+    simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_OPERATOR_CACHE_DELETE);
+    return true;
+}
+
 bool SimStateTracker::UnRegisterForIccLoaded()
 {
     TELEPHONY_LOGI("SimStateTracker::UnRegisterForIccLoaded");
@@ -116,6 +218,30 @@ bool SimStateTracker::UnRegisterForIccLoaded()
         return false;
     }
     simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    return true;
+}
+
+bool SimStateTracker::UnRegisterOpkeyLoaded()
+{
+    TELEPHONY_LOGI("SimStateTracker::UnRegisterOpkeyLoaded");
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
+        TELEPHONY_LOGE("simFileManager::can not get simFileManager");
+        return false;
+    }
+    simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_OPKEY_LOADED);
+    return true;
+}
+
+bool SimStateTracker::UnregisterOperatorCacheDel()
+{
+    TELEPHONY_LOGI("SimStateTracker::UnregisterOperatorCacheDel");
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
+        TELEPHONY_LOGE("simFileManager::can not get simFileManager");
+        return false;
+    }
+    simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_OPERATOR_CACHE_DELETE);
     return true;
 }
 
@@ -143,14 +269,20 @@ void SimStateTracker::SystemAbilityStatusChangeListener::OnAddSystemAbility(
             break;
         }
         case COMMON_EVENT_SERVICE_ID: {
-            TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID running");
+            TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID running, isUserSwitchSubscribered is :%{public}d",
+                isUserSwitchSubscribered);
+            if (isUserSwitchSubscribered) {
+                return;
+            }
             MatchingSkills matchingSkills;
             matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
             CommonEventSubscribeInfo subscriberInfo(matchingSkills);
             subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
             userSwitchSubscriber_ = std::make_shared<UserSwitchEventSubscriber>(subscriberInfo, slotId_, configLoader_);
-            bool subRet = CommonEventManager::SubscribeCommonEvent(userSwitchSubscriber_);
-            TELEPHONY_LOGI("Subscribe user switched subRet is :%{public}d", subRet);
+            if (CommonEventManager::SubscribeCommonEvent(userSwitchSubscriber_)) {
+                isUserSwitchSubscribered = true;
+                TELEPHONY_LOGI("Subscribe user switched success");
+            }
             break;
         }
         default:
@@ -168,11 +300,15 @@ void SimStateTracker::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
             break;
         }
         case COMMON_EVENT_SERVICE_ID: {
-            TELEPHONY_LOGE("COMMON_EVENT_SERVICE_ID stopped");
-            if (userSwitchSubscriber_ != nullptr) {
-                bool subRet = CommonEventManager::UnSubscribeCommonEvent(userSwitchSubscriber_);
-                TELEPHONY_LOGI("Unsubscribe user switched subRet is :%{public}d", subRet);
+            TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID stopped, isUserSwitchSubscribered is :%{public}d",
+                isUserSwitchSubscribered);
+            if (!isUserSwitchSubscribered) {
+                return;
+            }
+            if (userSwitchSubscriber_ != nullptr && CommonEventManager::UnSubscribeCommonEvent(userSwitchSubscriber_)) {
                 userSwitchSubscriber_ = nullptr;
+                isUserSwitchSubscribered = false;
+                TELEPHONY_LOGI("Unsubscribe user switched success");
             }
             break;
         }

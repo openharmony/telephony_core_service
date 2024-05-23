@@ -17,7 +17,7 @@
 #define NETWORK_SEARCH_INCLUDE_SIGNAL_INFO_H
 
 #include "event_handler.h"
-#include "hril_types.h"
+#include "tel_ril_types.h"
 #include "signal_information.h"
 
 namespace OHOS {
@@ -30,6 +30,7 @@ public:
     void InitSignalBar(const int32_t bar = 5) const;
     void GetSignalInfoList(std::vector<sptr<SignalInformation>> &signals);
     void ProcessSignalIntensity(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessSignalIntensity(int32_t slotId, const Rssi *signalIntensity);
 
 private:
     bool ProcessGsm(const GsmRssi &gsmSignal);

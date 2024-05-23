@@ -22,6 +22,7 @@
 #include "ims_reg_info_callback.h"
 #include "network_search_result.h"
 #include "network_state.h"
+#include "nr_ssb_information.h"
 #include "operator_config_types.h"
 #include "signal_information.h"
 #include "sim_state_type.h"
@@ -37,12 +38,14 @@ public:
     virtual int32_t GetPsRadioTech(int32_t slotId, int32_t &psRadioTech) = 0;
     virtual int32_t GetCsRadioTech(int32_t slotId, int32_t &csRadioTech) = 0;
     virtual std::u16string GetOperatorNumeric(int32_t slotId) = 0;
+    virtual std::string GetResidentNetworkNumeric(int32_t slotId) = 0;
     virtual int32_t GetOperatorName(int32_t slotId, std::u16string &operatorName) = 0;
     virtual int32_t GetSignalInfoList(int32_t slotId, std::vector<sptr<SignalInformation>> &signals) = 0;
     virtual int32_t GetNetworkState(int32_t slotId, sptr<NetworkState> &networkState) = 0;
     virtual int32_t SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual int32_t GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual int32_t GetImei(int32_t slotId, std::u16string &imei) = 0;
+    virtual int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) = 0;
     virtual int32_t GetMeid(int32_t slotId, std::u16string &meid) = 0;
     virtual int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) = 0;
     virtual bool IsNrSupported(int32_t slotId) = 0;
@@ -140,11 +143,16 @@ public:
     virtual int32_t UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType) = 0;
     virtual int32_t GetBasebandVersion(int32_t slotId, std::string &version) = 0;
     virtual int32_t FactoryReset(int32_t slotId) = 0;
+    virtual int32_t GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation) = 0;
+    virtual int32_t InitExtraModule(int32_t slotId) = 0;
+    virtual bool IsAllowedInsertApn(std::string &value) = 0;
+    virtual int32_t GetTargetOpkey(int32_t slotId, std::u16string &opkey) = 0;
+    virtual int32_t GetOpkeyVersion(std::string &versionInfo) = 0;
 
 protected:
     const int32_t ERROR = -1;
     const int32_t MIN_STRING_LE = 0;
-    const int32_t MAX_STRING_LE = 32;
+    const int32_t MAX_STRING_LE = 36;
     const int32_t MAX_VECTOR = 100;
 };
 } // namespace Telephony

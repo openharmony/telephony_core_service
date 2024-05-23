@@ -17,7 +17,7 @@
 #define OHOS_I_SIM_MANAGER_H
 
 #include "dialling_numbers_info.h"
-#include "i_network_search.h"
+#include "event_handler.h"
 #include "operator_config_types.h"
 #include "sim_account_callback.h"
 #include "sim_state_type.h"
@@ -29,11 +29,12 @@ public:
     using HANDLE = const std::shared_ptr<AppExecFwk::EventHandler>;
     // Init
     virtual bool OnInit(int32_t slotCount) = 0;
-    virtual void SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager) = 0;
+    virtual int32_t InitTelExtraModule(int32_t slotId) = 0;
     // SimState
     virtual int32_t HasSimCard(int32_t slotId, bool &hasSimCard) = 0;
     virtual int32_t GetSimState(int32_t slotId, SimState &simState) = 0;
     virtual int32_t GetCardType(int32_t slotId, CardType &cardType) = 0;
+    virtual int32_t SetModemInit(int32_t slotId, bool state) = 0;
     virtual int32_t UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response) = 0;
     virtual int32_t UnlockPuk(
         int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response) = 0;
@@ -65,13 +66,14 @@ public:
     virtual int32_t GetDefaultCellularDataSlotId() = 0;
     virtual int32_t GetDefaultCellularDataSimId(int32_t &simId) = 0;
     virtual int32_t RegisterSimAccountCallback(
-        const std::string &bundleName, const sptr<SimAccountCallback> &callback) = 0;
-    virtual int32_t UnregisterSimAccountCallback(const std::string &bundleName) = 0;
+        const int32_t tokenId, const sptr<SimAccountCallback> &callback) = 0;
+    virtual int32_t UnregisterSimAccountCallback(const int32_t tokenId) = 0;
     virtual int32_t GetPrimarySlotId(int32_t &slotId) = 0;
     virtual int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber) = 0;
     virtual int32_t GetShowName(int32_t slotId, std::u16string &showName) = 0;
     virtual int32_t GetActiveSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList) = 0;
     virtual int32_t GetOperatorConfigs(int slotId, OperatorConfig &poc) = 0;
+    virtual int32_t UpdateOperatorConfigs(int32_t slotId) = 0;
     virtual int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) = 0;
     virtual int32_t SimAuthentication(
         int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response) = 0;

@@ -84,7 +84,7 @@ void ObserverHandler::NotifyObserver(int32_t what)
 
     for (auto handler : iter->second) {
         TELEPHONY_LOGD("handler->SendEvent:%{public}d", what);
-        handler->SendEvent(what);
+        TelEventHandler::SendTelEvent(handler, what);
     }
 }
 } // namespace Telephony

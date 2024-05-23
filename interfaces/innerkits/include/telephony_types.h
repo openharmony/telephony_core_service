@@ -27,7 +27,10 @@ namespace OHOS {
 namespace Telephony {
 #define SIM_SLOT_COUNT GetMaxSlotCount<int32_t>()
 #define PREFERRED_NETWORK_TYPE GetPreferredNetworkType<int32_t>()
+#define VSIM_MODEM_COUNT GetVSimModemCount<int32_t>()
+#define IS_SUPPORT_VSIM (VSIM_MODEM_COUNT > 0)
 inline const int32_t SYSPARA_SIZE = 128;
+inline constexpr size_t ARRAY_SIZE = 1024;
 inline const int32_t DEFAULT_SIM_SLOT_ID = 0;
 inline const int32_t DEFAULT_SIM_SLOT_ID_REMOVE = -1;
 inline const int32_t INVALID_MAIN_CARD_SLOTID = -2;
@@ -35,7 +38,12 @@ inline const int32_t ERROR_SLOT_OPKEY = -2;
 inline const int32_t DSDS_MODE_V2 = 0;
 inline const int32_t DSDS_MODE_V3 = 1;
 inline const size_t MAX_PARAMETER_LENGTH = 100;
+inline const int32_t DUAL_SLOT_COUNT = 2;
+inline const int32_t MAX_SLOT_COUNT = 3;
+inline const int32_t VSIM_DEFAULT_VALUE = -1;
 inline int32_t maxSlotCount_ = 0;
+inline int32_t vSimModemCount_ = VSIM_DEFAULT_VALUE;
+inline constexpr const char *SATELLITE_DEFAULT_VALUE = "0";
 inline constexpr const char *DEFAULT_SLOT_COUNT = "1";
 inline constexpr const char *TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
 inline constexpr const char *DEFAULT_PREFERRED_NETWORK_TYPE = "5"; // CORE_NETWORK_MODE_LTE_WCDMA_GSM
@@ -45,6 +53,9 @@ inline constexpr const char *INITIAL_OPKEY = "-1";
 inline constexpr const char *DEFAULT_OPERATOR_CONFIG = "default_operator_config.json";
 inline constexpr const char *OPKEY_PROP_PREFIX = "telephony.sim.opkey";
 inline constexpr const char *COUNTRY_CODE_KEY = "telephony.sim.countryCode";
+inline constexpr const char *TEL_SATELLITE_SUPPORTED = "const.telephony.satellite.supported";
+inline constexpr const char *DEFAULT_VSIM_MODEM_COUNT = "0";
+inline constexpr const char *VSIM_MODEM_COUNT_STR = "const.telephony.vsimModemCount";
 
 template<typename T>
 inline T GetMaxSlotCount()
@@ -58,6 +69,17 @@ inline T GetMaxSlotCount()
 }
 
 template<typename T>
+inline T GetVSimModemCount()
+{
+    if (vSimModemCount_ == VSIM_DEFAULT_VALUE) {
+        char vSimModemCount[SYSPARA_SIZE] = { 0 };
+        GetParameter(VSIM_MODEM_COUNT_STR, DEFAULT_VSIM_MODEM_COUNT, vSimModemCount, SYSPARA_SIZE);
+        vSimModemCount_ = std::atoi(vSimModemCount);
+    }
+    return vSimModemCount_;
+}
+
+template<typename T>
 inline T GetPreferredNetworkType()
 {
     char preferredNetworkType[SYSPARA_SIZE] = { 0 };
@@ -65,6 +87,11 @@ inline T GetPreferredNetworkType()
     T networkType = std::atoi(preferredNetworkType);
     return networkType;
 }
+
+enum SatelliteValue {
+    SATELLITE_NOT_SUPPORTED = 0,
+    SATELLITE_SUPPORTED = 1,
+};
 
 enum SimSlotId {
     SIM_SLOT_0 = 0,

@@ -113,6 +113,14 @@ public:
     std::u16string GetOperatorNumeric(int32_t slotId);
 
     /**
+     * @brief Obtain the resident network numeric
+     *
+     * @param slotId[in], sim slot id
+     * @return std::string resident network numeric of PLMN of the SIM card.
+     */
+    std::string GetResidentNetworkNumeric(int32_t slotId);
+
+    /**
      * @brief Obtain the operator name
      *
      * @param slotId[in], sim slot id
@@ -157,6 +165,15 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetImei(int32_t slotId, std::u16string &imei);
+
+    /**
+     * @brief Obtains the software version number of a specified card slot of the device
+     *
+     * @param slotId[in], sim slot id
+     * @param imeiSv[out], the International Mobile Equipment Identification Number of the SIM card
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv);
 
     /**
      * @brief Checks whether a SIM card is inserted in a specified slot.
@@ -846,12 +863,54 @@ public:
     int32_t GetBasebandVersion(int32_t slotId, std::string &version);
 
     /**
+     * @brief Obtain the NR ssb id information
+     *
+     * @param slotId[in], sim slot id
+     * @param nrSsbInfomation[out], the nr ssb information of the SIM card
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation);
+
+    /**
      * @brief Reset all network settings of telephony
      *
      * @param slotId[in], sim slot id
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t FactoryReset(int32_t slotId);
+
+    /**
+     * @brief init extra module function, for extra slot.
+     *
+     * @param slotId[in], sim slot id
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t InitExtraModule(int32_t slotId);
+
+    /**
+     * @brief Check whether insert apn in table.
+     *
+     * @param value[in], apn value
+     * @return return true if need insert, otherwise return false
+     */
+    bool IsAllowedInsertApn(std::string &value);
+
+    /**
+     * @brief get cust opkey for sim card
+     *
+     * @param slotId[in], sim slot id
+     * @param opkey[out], cust opkey for sim card
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetTargetOpkey(int32_t slotId, std::u16string &opkey);
+
+    /**
+     * @brief get opkey param version
+     *
+     * @param versionInfo[out], opkey param version info
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetOpkeyVersion(std::string &versionInfo);
 
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);

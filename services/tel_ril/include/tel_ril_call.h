@@ -16,14 +16,14 @@
 #ifndef TEL_RIL_CALL_H
 #define TEL_RIL_CALL_H
 
-#include "hril_call_parcel.h"
+#include "tel_ril_call_parcel.h"
 #include "tel_ril_base.h"
 
 namespace OHOS {
 namespace Telephony {
 class TelRilCall : public TelRilBase {
 public:
-    TelRilCall(int32_t slotId, sptr<HDI::Ril::V1_2::IRil> rilInterface,
+    TelRilCall(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
         std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     ~TelRilCall() = default;
 

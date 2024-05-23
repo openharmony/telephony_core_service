@@ -366,7 +366,7 @@ void PinInfoParaAnalyze(napi_env env, napi_value arg, AsyncContextPIN &pinContex
 
     napi_value pin = NapiUtil::GetNamedProperty(env, arg, "password");
     if (pin) {
-        char tmpStr[kMaxNumberLen + 1] = {0};
+        char tmpStr[ARRAY_SIZE] = {0};
         NapiValueToCppValue(env, pin, napi_string, tmpStr);
         pinContext.inStr1 = std::string(tmpStr);
     }
@@ -386,7 +386,7 @@ void PersoLockInfoAnalyze(napi_env env, napi_value arg, AsyncContextPIN &pinCont
 
     napi_value password = NapiUtil::GetNamedProperty(env, arg, "password");
     if (password) {
-        char tmpStr[kMaxNumberLen + 1] = {0};
+        char tmpStr[ARRAY_SIZE] = {0};
         NapiValueToCppValue(env, password, napi_string, tmpStr);
         pinContext.inStr1 = std::string(tmpStr);
     }
@@ -1306,7 +1306,7 @@ napi_value UnlockPin(napi_env env, napi_callback_info info)
 {
     auto pinContext = new AsyncContextPIN();
     BaseContext &context = pinContext->asyncContext.context;
-    char tmpStr[kMaxNumberLen + 1] = {0};
+    char tmpStr[ARRAY_SIZE] = {0};
 
     auto initPara = std::make_tuple(&pinContext->asyncContext.slotId, tmpStr, &context.callbackRef);
     AsyncPara para {
@@ -1363,8 +1363,8 @@ napi_value UnlockPuk(napi_env env, napi_callback_info info)
 {
     auto pukContext = new AsyncContextPIN();
     BaseContext &context = pukContext->asyncContext.context;
-    char tmpStr1[kMaxNumberLen + 1] = {0};
-    char tmpStr2[kMaxNumberLen + 1] = {0};
+    char tmpStr1[ARRAY_SIZE] = {0};
+    char tmpStr2[ARRAY_SIZE] = {0};
 
     auto initPara = std::make_tuple(&pukContext->asyncContext.slotId, tmpStr1, tmpStr2, &context.callbackRef);
     AsyncPara para {
@@ -1425,8 +1425,8 @@ napi_value AlterPin(napi_env env, napi_callback_info info)
     auto alterPinContext = new AsyncContextPIN();
     BaseContext &context = alterPinContext->asyncContext.context;
 
-    char tmpStr1[kMaxNumberLen + 1] = {0};
-    char tmpStr2[kMaxNumberLen + 1] = {0};
+    char tmpStr1[ARRAY_SIZE] = {0};
+    char tmpStr2[ARRAY_SIZE] = {0};
     auto initPara = std::make_tuple(&alterPinContext->asyncContext.slotId, tmpStr1, tmpStr2, &context.callbackRef);
     AsyncPara para {
         .funcName = "AlterPin",
@@ -1841,7 +1841,7 @@ napi_value UnlockPin2(napi_env env, napi_callback_info info)
     auto pinContext = new AsyncContextPIN();
     BaseContext &context = pinContext->asyncContext.context;
 
-    char tmpStr[kMaxNumberLen + 1] = {0};
+    char tmpStr[ARRAY_SIZE] = {0};
     auto initPara = std::make_tuple(&pinContext->asyncContext.slotId, tmpStr, &context.callbackRef);
     AsyncPara para {
         .funcName = "UnlockPin2",
@@ -1898,8 +1898,8 @@ napi_value UnlockPuk2(napi_env env, napi_callback_info info)
 {
     auto pinContext = new AsyncContextPIN();
     BaseContext &context = pinContext->asyncContext.context;
-    char tmpStr1[kMaxNumberLen + 1] = {0};
-    char tmpStr2[kMaxNumberLen + 1] = {0};
+    char tmpStr1[ARRAY_SIZE] = {0};
+    char tmpStr2[ARRAY_SIZE] = {0};
 
     auto initPara = std::make_tuple(&pinContext->asyncContext.slotId, tmpStr1,
         tmpStr2, &context.callbackRef);
@@ -1958,8 +1958,8 @@ napi_value AlterPin2(napi_env env, napi_callback_info info)
 {
     auto pinContext = new AsyncContextPIN();
     BaseContext &context = pinContext->asyncContext.context;
-    char tmpStr1[kMaxNumberLen + 1] = {0};
-    char tmpStr2[kMaxNumberLen + 1] = {0};
+    char tmpStr1[ARRAY_SIZE] = {0};
+    char tmpStr2[ARRAY_SIZE] = {0};
 
     auto initPara = std::make_tuple(&pinContext->asyncContext.slotId, tmpStr1, tmpStr2, &context.callbackRef);
     AsyncPara para {

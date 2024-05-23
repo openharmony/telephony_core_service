@@ -46,6 +46,8 @@ public:
 
     std::u16string GetOperatorNumeric(int32_t slotId) override;
 
+    std::string GetResidentNetworkNumeric(int32_t slotId) override;
+
     int32_t GetOperatorName(int32_t slotId, std::u16string &operatorName) override;
 
     int32_t GetNetworkState(int32_t slotId, sptr<NetworkState> &networkState) override;
@@ -55,6 +57,8 @@ public:
     int32_t GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 
     int32_t GetImei(int32_t slotId, std::u16string &imei) override;
+
+    int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) override;
 
     int32_t GetMeid(int32_t slotId, std::u16string &meid) override;
 
@@ -242,6 +246,16 @@ public:
     int64_t GetSpendTime();
 
     int32_t GetServiceRunningState();
+
+    int32_t GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation) override;
+
+    int32_t InitExtraModule(int32_t slotId) override;
+
+    bool IsAllowedInsertApn(std::string &value) override;
+
+    int32_t GetTargetOpkey(int32_t slotId, std::u16string &opkey) override;
+
+    int32_t GetOpkeyVersion(std::string &versionInfo) override;
 
 private:
     bool Init();
