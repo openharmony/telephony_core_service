@@ -21,7 +21,6 @@ namespace OHOS {
 namespace Telephony {
 std::vector<std::shared_ptr<MccAccess>> MccPool::mccAccessTable_;
 std::vector<std::string> MccPool::specialMccMnc_;
-std::vector<std::string> MccPool::specialMccMnc2Digits_;
 constexpr size_t MCC_ACCESS_TABLE_LEN = 240;
 std::shared_ptr<MccAccess> MccPool::AccessToMcc(int mcc)
 {
@@ -346,14 +345,6 @@ bool MccPool::LengthIsThreeMnc(const std::string &mccMncCode)
     return (obj == specialMccMnc_.end()) ? false : true;
 }
 
-bool MccPool::LengthIsTwoMnc(const string &mccMncCode)
-{
-    InitSpecialMccMnc2DigitsTables();
-    std::vector<std::string>::iterator obj =
-        std::find(specialMccMnc2Digits_.begin(), specialMccMnc2Digits_.end(), mccMncCode);
-    return (obj == specialMccMnc2Digits_.end()) ? false : true;
-}
-
 void MccPool::InitSpecialMccMncTables()
 {
     if (specialMccMnc_.size() == 0) {
@@ -361,131 +352,6 @@ void MccPool::InitSpecialMccMncTables()
         AddMccMncForInAirtel();
         AddMccMncForInHutch();
         AddMccMncForMy();
-    }
-}
-
-void MccPool::InitSpecialMccMnc2DigitsTables()
-{
-    if (specialMccMnc2Digits_.size() == 0) {
-        specialMccMnc2Digits_.push_back("40400");
-        specialMccMnc2Digits_.push_back("40401");
-        specialMccMnc2Digits_.push_back("40402");
-        specialMccMnc2Digits_.push_back("40403");
-        specialMccMnc2Digits_.push_back("40404");
-        specialMccMnc2Digits_.push_back("40405");
-        specialMccMnc2Digits_.push_back("40407");
-        specialMccMnc2Digits_.push_back("40409");
-        specialMccMnc2Digits_.push_back("40410");
-        specialMccMnc2Digits_.push_back("40411");
-        specialMccMnc2Digits_.push_back("40412");
-        specialMccMnc2Digits_.push_back("40413");
-        specialMccMnc2Digits_.push_back("40414");
-        specialMccMnc2Digits_.push_back("40415");
-        specialMccMnc2Digits_.push_back("40416");
-        specialMccMnc2Digits_.push_back("40417");
-        specialMccMnc2Digits_.push_back("40418");
-        specialMccMnc2Digits_.push_back("40419");
-        specialMccMnc2Digits_.push_back("40420");
-        specialMccMnc2Digits_.push_back("40421");
-        specialMccMnc2Digits_.push_back("40422");
-        specialMccMnc2Digits_.push_back("40424");
-        specialMccMnc2Digits_.push_back("40425");
-        specialMccMnc2Digits_.push_back("40427");
-        specialMccMnc2Digits_.push_back("40428");
-        specialMccMnc2Digits_.push_back("40429");
-        specialMccMnc2Digits_.push_back("40430");
-        specialMccMnc2Digits_.push_back("40431");
-        specialMccMnc2Digits_.push_back("40433");
-        specialMccMnc2Digits_.push_back("40434");
-        specialMccMnc2Digits_.push_back("40435");
-        specialMccMnc2Digits_.push_back("40436");
-        specialMccMnc2Digits_.push_back("40437");
-        specialMccMnc2Digits_.push_back("40438");
-        specialMccMnc2Digits_.push_back("40440");
-        specialMccMnc2Digits_.push_back("40441");
-        specialMccMnc2Digits_.push_back("40442");
-        specialMccMnc2Digits_.push_back("40443");
-        specialMccMnc2Digits_.push_back("40444");
-        specialMccMnc2Digits_.push_back("40445");
-        specialMccMnc2Digits_.push_back("40446");
-        specialMccMnc2Digits_.push_back("40449");
-        specialMccMnc2Digits_.push_back("40450");
-        specialMccMnc2Digits_.push_back("40451");
-        specialMccMnc2Digits_.push_back("40452");
-        specialMccMnc2Digits_.push_back("40453");
-        specialMccMnc2Digits_.push_back("40454");
-        specialMccMnc2Digits_.push_back("40455");
-        specialMccMnc2Digits_.push_back("40456");
-        specialMccMnc2Digits_.push_back("40457");
-        specialMccMnc2Digits_.push_back("40458");
-        specialMccMnc2Digits_.push_back("40459");
-        specialMccMnc2Digits_.push_back("40460");
-        specialMccMnc2Digits_.push_back("40462");
-        specialMccMnc2Digits_.push_back("40464");
-        specialMccMnc2Digits_.push_back("40466");
-        specialMccMnc2Digits_.push_back("40467");
-        specialMccMnc2Digits_.push_back("40468");
-        specialMccMnc2Digits_.push_back("40469");
-        specialMccMnc2Digits_.push_back("40470");
-        specialMccMnc2Digits_.push_back("40471");
-        specialMccMnc2Digits_.push_back("40472");
-        specialMccMnc2Digits_.push_back("40473");
-        specialMccMnc2Digits_.push_back("40474");
-        specialMccMnc2Digits_.push_back("40475");
-        specialMccMnc2Digits_.push_back("40476");
-        specialMccMnc2Digits_.push_back("40477");
-        specialMccMnc2Digits_.push_back("40478");
-        specialMccMnc2Digits_.push_back("40479");
-        specialMccMnc2Digits_.push_back("40480");
-        specialMccMnc2Digits_.push_back("40481");
-        specialMccMnc2Digits_.push_back("40482");
-        specialMccMnc2Digits_.push_back("40483");
-        specialMccMnc2Digits_.push_back("40484");
-        specialMccMnc2Digits_.push_back("40485");
-        specialMccMnc2Digits_.push_back("40486");
-        specialMccMnc2Digits_.push_back("40487");
-        specialMccMnc2Digits_.push_back("40488");
-        specialMccMnc2Digits_.push_back("40489");
-        specialMccMnc2Digits_.push_back("40490");
-        specialMccMnc2Digits_.push_back("40491");
-        specialMccMnc2Digits_.push_back("40492");
-        specialMccMnc2Digits_.push_back("40493");
-        specialMccMnc2Digits_.push_back("40494");
-        specialMccMnc2Digits_.push_back("40495");
-        specialMccMnc2Digits_.push_back("40496");
-        specialMccMnc2Digits_.push_back("40497");
-        specialMccMnc2Digits_.push_back("40498");
-        specialMccMnc2Digits_.push_back("40501");
-        specialMccMnc2Digits_.push_back("40505");
-        specialMccMnc2Digits_.push_back("40506");
-        specialMccMnc2Digits_.push_back("40507");
-        specialMccMnc2Digits_.push_back("40508");
-        specialMccMnc2Digits_.push_back("40509");
-        specialMccMnc2Digits_.push_back("40510");
-        specialMccMnc2Digits_.push_back("40511");
-        specialMccMnc2Digits_.push_back("40512");
-        specialMccMnc2Digits_.push_back("40513");
-        specialMccMnc2Digits_.push_back("40514");
-        specialMccMnc2Digits_.push_back("40515");
-        specialMccMnc2Digits_.push_back("40517");
-        specialMccMnc2Digits_.push_back("40518");
-        specialMccMnc2Digits_.push_back("40519");
-        specialMccMnc2Digits_.push_back("40520");
-        specialMccMnc2Digits_.push_back("40521");
-        specialMccMnc2Digits_.push_back("40522");
-        specialMccMnc2Digits_.push_back("40523");
-        specialMccMnc2Digits_.push_back("40524");
-        specialMccMnc2Digits_.push_back("40548");
-        specialMccMnc2Digits_.push_back("40551");
-        specialMccMnc2Digits_.push_back("40552");
-        specialMccMnc2Digits_.push_back("40553");
-        specialMccMnc2Digits_.push_back("40554");
-        specialMccMnc2Digits_.push_back("40555");
-        specialMccMnc2Digits_.push_back("40556");
-        specialMccMnc2Digits_.push_back("40566");
-        specialMccMnc2Digits_.push_back("40567");
-        specialMccMnc2Digits_.push_back("40570");
-        specialMccMnc2Digits_.push_back("23210");
     }
 }
 

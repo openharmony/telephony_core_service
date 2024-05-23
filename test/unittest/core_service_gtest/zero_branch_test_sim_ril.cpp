@@ -754,8 +754,6 @@ HWTEST_F(SimRilBranchTest, Telephony_MccPool_001, Function | MediumTest | Level1
     EXPECT_EQ(MccPool::ShortestMncLengthFromMcc(MCC_US_A), MCC_LONG);
     ASSERT_TRUE(MccPool::LengthIsThreeMnc("302370"));
     ASSERT_FALSE(MccPool::LengthIsThreeMnc("46000"));
-    ASSERT_TRUE(MccPool::LengthIsTwoMnc("40402"));
-    ASSERT_FALSE(MccPool::LengthIsTwoMnc("46000"));
 
     auto mccAccess = MccPool::AccessToMcc(MCC_BJ);
     EXPECT_EQ(mccAccess->iso_, "bj");
