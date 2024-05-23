@@ -43,7 +43,7 @@ using namespace testing::ext;
 namespace {
 constexpr int32_t SLOT_ID = 0;
 constexpr int INVALID_MCC = 100;
-const int32_t INVALID_SLOTID = 2;
+const int32_t INVALID_SLOTID = -1;
 } // namespace
 
 class DemoHandler : public AppExecFwk::EventHandler {
