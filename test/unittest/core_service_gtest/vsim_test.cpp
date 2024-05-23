@@ -121,8 +121,9 @@ HWTEST_F(SimTest, Telephony_VSim_InitExtraModule_0700, Function | MediumTest | L
  */
 HWTEST_F(SimTest, Telephony_VSim_InitExtraModule_0800, Function | MediumTest | Level1)
 {
-    DelayedSingleton<CoreService>::GetInstance()->Init();
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_VSIM
     EXPECT_EQ(TELEPHONY_SUCCESS, CoreServiceClient::GetInstance().InitExtraModule(2));
+#endif
 }
 
 /**
