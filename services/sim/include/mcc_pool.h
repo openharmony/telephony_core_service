@@ -307,7 +307,6 @@ private:
     static void AddMccMncForInAirtel();
     static void AddMccMncForInHutch();
     static void AddMccMncForMy();
-
 };
 } // namespace Telephony
 } // namespace OHOS
