@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,7 @@
 #include <map>
 #include "event_handler.h"
 
-#include "hril_network_parcel.h"
+#include "tel_ril_network_parcel.h"
 #include "network_search_state.h"
 
 namespace OHOS {
@@ -64,8 +64,9 @@ public:
 
 private:
     RegServiceState ConvertRegFromRil(RilRegister code) const;
-    RadioTech ConvertTechFromRil(HRilRadioTech code) const;
+    RadioTech ConvertTechFromRil(TelRilRadioTech code) const;
     void UpdateNrState();
+    int32_t UpdateNsaState(int32_t nsaState);
     void NotifyNrFrequencyChanged();
     int32_t GetRrcConnectionState(int32_t &rrcState);
     bool IsValidConfig(const std::string &config);

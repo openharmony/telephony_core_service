@@ -18,8 +18,8 @@
 
 #include <memory>
 #include "event_handler.h"
-#include "hril_types.h"
-#include "hril_modem_parcel.h"
+#include "tel_ril_types.h"
+#include "tel_ril_modem_parcel.h"
 #include "message_parcel.h"
 #include "network_state.h"
 #include "telephony_types.h"
@@ -36,6 +36,7 @@ public:
     void ProcessSetRadioState(const AppExecFwk::InnerEvent::Pointer &event) const;
     void RadioFirstPowerOn(std::shared_ptr<NetworkSearchManager> &nsm, ModemPowerState radioState) const;
     void ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) const;
+    void ProcessGetImeiSv(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessGetMeid(const AppExecFwk::InnerEvent::Pointer &event) const;
     void UpdatePhone(RadioTech csRadioTech, const RadioTech &psRadioTech);
     void SetPhoneType(PhoneType phoneType);
@@ -50,9 +51,9 @@ public:
 private:
     PhoneType RadioTechToPhoneType(RadioTech csRadioTech, const RadioTech &psRadioTech) const;
     bool WriteRadioStateResponseInfo(
-        int64_t &index, MessageParcel &data, bool result, std::shared_ptr<HRilRadioResponseInfo> &responseInfo) const;
+        int64_t &index, MessageParcel &data, bool result, std::shared_ptr<RadioResponseInfo> &responseInfo) const;
     bool WriteRadioStateObject(
-        int64_t &index, MessageParcel &data, bool result, std::unique_ptr<HRilRadioStateInfo> &object) const;
+        int64_t &index, MessageParcel &data, bool result, std::unique_ptr<RadioStateInfo> &object) const;
     void UpdateInfoOfSetRadioState(ModemPowerState &radioState, bool result, MessageParcel &data, int64_t index) const;
     PhoneType phoneType_ = PhoneType::PHONE_TYPE_IS_NONE;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;

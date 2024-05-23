@@ -16,31 +16,14 @@
 #include "tel_ril_sms.h"
 
 #include "core_service_hisysevent.h"
-#include "hril_notification.h"
-#include "hril_request.h"
 #include "radio_event.h"
 
 namespace OHOS {
 namespace Telephony {
-TelRilSms::TelRilSms(int32_t slotId, sptr<HDI::Ril::V1_2::IRil> rilInterface,
+TelRilSms::TelRilSms(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {}
-
-bool TelRilSms::IsSmsResponse(uint32_t code)
-{
-    return ((code >= HREQ_SMS_BASE) && (code < HREQ_SIM_BASE));
-}
-
-bool TelRilSms::IsSmsNotification(uint32_t code)
-{
-    return ((code >= HNOTI_SMS_BASE) && (code < HNOTI_SIM_BASE));
-}
-
-bool TelRilSms::IsSmsRespOrNotify(uint32_t code)
-{
-    return IsSmsResponse(code) || IsSmsNotification(code);
-}
 
 HDI::Ril::V1_1::GsmSmsMessageInfo TelRilSms::ConstructGsmSendSmsRequestLinkList(std::string &smsPdu, std::string &pdu)
 {
@@ -62,16 +45,14 @@ OHOS::HDI::Ril::V1_1::SmsMessageIOInfo TelRilSms::ConstructSmsMessageIOInfoReque
 int32_t TelRilSms::SendGsmSms(std::string &smsPdu, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
     HDI::Ril::V1_1::GsmSmsMessageInfo gsmSmsMessageInfo = ConstructGsmSendSmsRequestLinkList(smsPdu, pdu);
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SEND_GSM_SMS, &HDI::Ril::V1_1::IRil::SendGsmSms, gsmSmsMessageInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SendGsmSms, gsmSmsMessageInfo);
 }
 
 int32_t TelRilSms::SendCdmaSms(std::string pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
     HDI::Ril::V1_1::SendCdmaSmsMessageInfo cdmaSmsMessageInfo = {};
     cdmaSmsMessageInfo.smscPdu = pdu;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SEND_CDMA_SMS, &HDI::Ril::V1_1::IRil::SendCdmaSms,
-        cdmaSmsMessageInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SendCdmaSms, cdmaSmsMessageInfo);
 }
 
 int32_t TelRilSms::AddSimMessage(
@@ -79,14 +60,12 @@ int32_t TelRilSms::AddSimMessage(
 {
     OHOS::HDI::Ril::V1_1::SmsMessageIOInfo mGsmSmsMessageInfo = ConstructSmsMessageIOInfoRequestLinkList(smscPdu, pdu);
     mGsmSmsMessageInfo.state = status;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_ADD_SIM_MESSAGE, &HDI::Ril::V1_1::IRil::AddSimMessage,
-        mGsmSmsMessageInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::AddSimMessage, mGsmSmsMessageInfo);
 }
 
 int32_t TelRilSms::DelSimMessage(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_DEL_SIM_MESSAGE, &HDI::Ril::V1_1::IRil::DelSimMessage, gsmIndex);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::DelSimMessage, gsmIndex);
 }
 
 int32_t TelRilSms::UpdateSimMessage(int32_t gsmIndex, int32_t state, std::string smscPdu, std::string pdu,
@@ -95,8 +74,7 @@ int32_t TelRilSms::UpdateSimMessage(int32_t gsmIndex, int32_t state, std::string
     OHOS::HDI::Ril::V1_1::SmsMessageIOInfo smsMessageIOInfo = ConstructSmsMessageIOInfoRequestLinkList(smscPdu, pdu);
     smsMessageIOInfo.index = gsmIndex;
     smsMessageIOInfo.state = state;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_UPDATE_SIM_MESSAGE,
-        &HDI::Ril::V1_1::IRil::UpdateSimMessage, smsMessageIOInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::UpdateSimMessage, smsMessageIOInfo);
 }
 
 int32_t TelRilSms::SetSmscAddr(int32_t tosca, std::string address, const AppExecFwk::InnerEvent::Pointer &response)
@@ -104,27 +82,24 @@ int32_t TelRilSms::SetSmscAddr(int32_t tosca, std::string address, const AppExec
     OHOS::HDI::Ril::V1_1::ServiceCenterAddress serCenterAddress;
     serCenterAddress.address = address;
     serCenterAddress.tosca = tosca;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SET_SMSC_ADDR, &HDI::Ril::V1_1::IRil::SetSmscAddr,
-        serCenterAddress);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SetSmscAddr, serCenterAddress);
 }
 
 int32_t TelRilSms::GetSmscAddr(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_GET_SMSC_ADDR, &HDI::Ril::V1_1::IRil::GetSmscAddr);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetSmscAddr);
 }
 
 int32_t TelRilSms::GetCdmaCBConfig(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_GET_CDMA_CB_CONFIG, &HDI::Ril::V1_1::IRil::GetCdmaCBConfig);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetCdmaCBConfig);
 }
 
 int32_t TelRilSms::SendSmsMoreMode(
     std::string &smscPdu, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response)
 {
     HDI::Ril::V1_1::GsmSmsMessageInfo gsmSmsMessageInfo = ConstructGsmSendSmsRequestLinkList(smscPdu, pdu);
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SEND_SMS_MORE_MODE,
-        &HDI::Ril::V1_1::IRil::SendSmsMoreMode, gsmSmsMessageInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SendSmsMoreMode, gsmSmsMessageInfo);
 }
 
 int32_t TelRilSms::SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response)
@@ -132,8 +107,7 @@ int32_t TelRilSms::SendSmsAck(bool success, int32_t cause, const AppExecFwk::Inn
     HDI::Ril::V1_1::ModeData mModeData;
     mModeData.result = success;
     mModeData.mode = cause;
-    return Request(
-        TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SEND_SMS_ACK, &HDI::Ril::V1_1::IRil::SendSmsAck, mModeData);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SendSmsAck, mModeData);
 }
 
 int32_t TelRilSms::SetCBConfig(
@@ -143,8 +117,7 @@ int32_t TelRilSms::SetCBConfig(
     cellBroadcastInfo.mode = mode;
     cellBroadcastInfo.mids = idList.empty() ? "" : idList;
     cellBroadcastInfo.dcss = dcsList.empty() ? "" : dcsList;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SET_CB_CONFIG, &HDI::Ril::V1_1::IRil::SetCBConfig,
-        cellBroadcastInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SetCBConfig, cellBroadcastInfo);
 }
 
 int32_t TelRilSms::SetCdmaCBConfig(
@@ -159,13 +132,12 @@ int32_t TelRilSms::SetCdmaCBConfig(
         iCdmaCBConfigInfo.checked = cdmaCBConfigInfo.checked;
         iCdmaCBConfigInfoList.list.push_back(iCdmaCBConfigInfo);
     }
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_SET_CDMA_CB_CONFIG,
-        &HDI::Ril::V1_1::IRil::SetCdmaCBConfig, iCdmaCBConfigInfoList);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SetCdmaCBConfig, iCdmaCBConfigInfoList);
 }
 
 int32_t TelRilSms::GetCBConfig(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_GET_CB_CONFIG, &HDI::Ril::V1_1::IRil::GetCBConfig);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetCBConfig);
 }
 
 int32_t TelRilSms::AddCdmaSimMessage(int32_t status, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response)
@@ -173,14 +145,12 @@ int32_t TelRilSms::AddCdmaSimMessage(int32_t status, std::string &pdu, const App
     OHOS::HDI::Ril::V1_1::SmsMessageIOInfo mSmsMessageIOInfo = {};
     mSmsMessageIOInfo.state = status;
     mSmsMessageIOInfo.pdu = pdu;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_ADD_CDMA_SIM_MESSAGE,
-        &HDI::Ril::V1_1::IRil::AddCdmaSimMessage, mSmsMessageIOInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::AddCdmaSimMessage, mSmsMessageIOInfo);
 }
 
 int32_t TelRilSms::DelCdmaSimMessage(int32_t cdmaIndex, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_DEL_CDMA_SIM_MESSAGE,
-        &HDI::Ril::V1_1::IRil::DelCdmaSimMessage, cdmaIndex);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::DelCdmaSimMessage, cdmaIndex);
 }
 
 int32_t TelRilSms::UpdateCdmaSimMessage(
@@ -190,18 +160,17 @@ int32_t TelRilSms::UpdateCdmaSimMessage(
     smsMessageIOInfo.index = cdmaIndex;
     smsMessageIOInfo.state = state;
     smsMessageIOInfo.pdu = pdu;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, HREQ_SMS_UPDATE_CDMA_SIM_MESSAGE,
-        &HDI::Ril::V1_1::IRil::UpdateCdmaSimMessage, smsMessageIOInfo);
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::UpdateCdmaSimMessage, smsMessageIOInfo);
 }
 
 uint8_t TelRilSms::ConvertHexCharToInt(uint8_t ch)
 {
     if ((ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F')) {
-        return ((ch - 'A') % HRIL_UPPER_CASE_LETTERS_OFFSET + HRIL_DEC);
+        return ((ch - 'A') % UPPER_CASE_LETTERS_OFFSET + DEC);
     } else if (ch >= '0' && ch <= '9') {
         return (ch - '0');
     } else {
-        return HRIL_INVALID_HEX_CHAR;
+        return INVALID_HEX_CHAR;
     }
 }
 
@@ -228,7 +197,7 @@ uint8_t *TelRilSms::ConvertHexStringToBytes(const uint8_t *hexString, size_t len
     while (i < length) {
         uint8_t hexCh1 = ConvertHexCharToInt(hexStr[i]);
         uint8_t hexCh2 = ConvertHexCharToInt(hexStr[i + 1]);
-        if (hexCh1 == HRIL_INVALID_HEX_CHAR || hexCh2 == HRIL_INVALID_HEX_CHAR) {
+        if (hexCh1 == INVALID_HEX_CHAR || hexCh2 == INVALID_HEX_CHAR) {
             free(bytes);
             return nullptr;
         }

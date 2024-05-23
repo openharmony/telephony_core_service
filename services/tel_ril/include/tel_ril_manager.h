@@ -17,7 +17,7 @@
 #define TEL_RIL_MANAGER_H
 
 #include <singleton.h>
-#include <v1_2/iril.h>
+#include <v1_3/iril.h>
 
 #include "hdf_service_status_listener.h"
 #include "i_tel_ril_manager.h"
@@ -125,6 +125,8 @@ public:
 
     int32_t GetImei(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
+    int32_t GetImeiSv(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+
     int32_t GetMeid(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t GetVoiceRadioTechnology(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
@@ -132,11 +134,11 @@ public:
     int32_t GetPhysicalChannelConfig(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t SetLocateUpdates(
-        int32_t slotId, HRilRegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response) override;
+        int32_t slotId, RegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     /**
      * @param slotId is the card slot index number
-     * @param newFilter is the notification filter with bits in HRilNotificationFilter
+     * @param newFilter is the notification filter with bits in NotificationFilter
      * @param response is the feedback info after setting notification filter
      * @return int32_t Indicates if notification filter is set successfully
      */
@@ -145,7 +147,7 @@ public:
 
     /**
      * @param slotId is the card slot index number
-     * @param deviceStateType is the device state type in HRilDeviceStateType
+     * @param deviceStateType is the device state type in DeviceStateType
      * @param deviceStateOn Indicates the specific device state is on
      * @param response is the feedback info after setting device state
      * @return int32_t Indicates if device state is set successfully
@@ -160,6 +162,8 @@ public:
     int32_t GetNrOptionMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t GetRrcConnectionState(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+
+    int32_t GetNrSsbId(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t SendGsmSms(
         int32_t slotId, std::string smscPdu, std::string pdu, const AppExecFwk::InnerEvent::Pointer &response) override;
@@ -278,6 +282,7 @@ public:
     int32_t SendSimMatchedOperatorInfo(int32_t slotId, const NcfgOperatorInfo &reqInfo,
         const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t CloseUnFinishedUssd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t InitTelExtraModule(int32_t slotId) override;
 
     /**
      * Register hdf status listener
@@ -301,6 +306,7 @@ public:
     std::shared_ptr<TelRilModem> GetTelRilModem(int32_t slotId);
     void SendAckAndLock(void);
     void ReduceRunningLock();
+    void ReleaseRunningLock();
 
 public:
     static const int32_t INVALID_WAKELOCK = -1;
@@ -316,6 +322,7 @@ private:
     void HandleRilInterfaceStatusCallback(const OHOS::HDI::ServiceManager::V1_0::ServiceStatus &status);
     bool ReConnectRilInterface();
     bool DisConnectRilInterface();
+    void ResetRilInterfaceBySlotId(int32_t slotId);
 
     std::shared_ptr<ObserverHandler> GetObserverHandler(int32_t slotId);
 
@@ -342,7 +349,7 @@ private:
             return (_obj.get()->*(_func))(std::forward<ParamTypes>(_args)..., _result);
         } else {
             TELEPHONY_LOGE("%{public}s - func: %{public}s", _module.c_str(), "null pointer");
-            return HRIL_ERR_NULL_POINT;
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
     }
 
@@ -355,11 +362,10 @@ private:
     std::vector<std::shared_ptr<TelRilModem>> telRilModem_;
     std::vector<std::shared_ptr<TelRilNetwork>> telRilNetwork_;
     std::vector<std::shared_ptr<ObserverHandler>> observerHandler_;
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
     std::shared_ptr<TelRilHandler> handler_ = nullptr;
     sptr<OHOS::HDI::ServiceManager::V1_0::IServiceManager> servMgr_ = nullptr;
     sptr<HdfServiceStatusListener::IServStatListener> hdfListener_ = nullptr;
-    sptr<HDI::Ril::V1_2::IRil> rilInterface_ = nullptr;
+    sptr<HDI::Ril::V1_3::IRil> rilInterface_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

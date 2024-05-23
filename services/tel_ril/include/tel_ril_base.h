@@ -21,8 +21,8 @@
 
 #include "event_runner.h"
 #include "functional"
-#include "hril_base_parcel.h"
-#include "hril_types.h"
+#include "tel_ril_base_parcel.h"
+#include "tel_ril_types.h"
 #include "iremote_broker.h"
 #include "observer_handler.h"
 #include "radio_event.h"
@@ -32,19 +32,17 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_types.h"
-#include "v1_2/iril.h"
+#include "v1_3/iril.h"
 
 namespace OHOS {
 namespace Telephony {
 struct TelRilRequest {
     int32_t serialId_ = 0;
-    int32_t requestId_ = 0;
     AppExecFwk::InnerEvent::Pointer &pointer_ = nullptr_;
 
-    TelRilRequest(int32_t serialId, int32_t requestId, const AppExecFwk::InnerEvent::Pointer &pointer)
+    TelRilRequest(int32_t serialId, const AppExecFwk::InnerEvent::Pointer &pointer)
     {
         serialId_ = serialId;
-        requestId_ = requestId;
         pointer_ = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(pointer));
     }
 private:
@@ -53,21 +51,20 @@ private:
 
 class TelRilBase {
 public:
-    TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_2::IRil> rilInterface,
+    TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
         std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     virtual ~TelRilBase() = default;
 
-    static std::shared_ptr<TelRilRequest> CreateTelRilRequest(
-        int32_t request, const AppExecFwk::InnerEvent::Pointer &result);
-    void ResetRilInterface(sptr<HDI::Ril::V1_2::IRil> rilInterface);
-    static std::shared_ptr<TelRilRequest> FindTelRilRequest(const HRilRadioResponseInfo &responseInfo);
-    int32_t ErrorResponse(std::shared_ptr<TelRilRequest> telRilRequest, const HRilRadioResponseInfo &responseInfo);
+    static std::shared_ptr<TelRilRequest> CreateTelRilRequest(const AppExecFwk::InnerEvent::Pointer &result);
+    void ResetRilInterface(sptr<HDI::Ril::V1_3::IRil> rilInterface);
+    static std::shared_ptr<TelRilRequest> FindTelRilRequest(const RadioResponseInfo &responseInfo);
+    int32_t ErrorResponse(std::shared_ptr<TelRilRequest> telRilRequest, const RadioResponseInfo &responseInfo);
 
 protected:
     template<typename FuncType, typename... ParamTypes>
-    inline int32_t Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response, int32_t requestId,
-        FuncType &&_func, ParamTypes &&... _args);
-    inline HRilRadioResponseInfo BuildHRilRadioResponseInfo(const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo);
+    inline int32_t Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response, FuncType &&_func,
+        ParamTypes &&... _args);
+    inline RadioResponseInfo BuildHRilRadioResponseInfo(const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo);
     inline int32_t Response(const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo);
     template<typename T>
     inline int32_t Response(const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo, T data);
@@ -85,21 +82,21 @@ protected:
     inline int32_t Notify(const char *funcName, std::shared_ptr<T> data, RadioEvent notifyId);
     inline int32_t ConfirmSupplementOfTelRilRequestInfo(
         const char *funcName, std::shared_ptr<TelRilRequest> telRilRequest);
+    template<typename T>
+    inline int32_t SendEventData(
+        const char *funcName, uint32_t eventId, std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler, T data);
 
 protected:
     std::shared_ptr<ObserverHandler> observerHandler_;
-    sptr<HDI::Ril::V1_2::IRil> rilInterface_;
+    sptr<HDI::Ril::V1_3::IRil> rilInterface_;
     int32_t slotId_;
 
 private:
     static int32_t GetNextSerialId(void);
-    int32_t GetSerialId(const AppExecFwk::InnerEvent::Pointer &response, uint32_t requestId);
+    int32_t GetSerialId(const AppExecFwk::InnerEvent::Pointer &response);
     template<typename T>
     inline int32_t SendHandlerEvent(const char *funcName, std::shared_ptr<TelRilRequest> telRilRequest,
         std::function<T(std::shared_ptr<TelRilRequest>)> getDataFunc);
-    template<typename T>
-    inline int32_t SendEventData(
-        const char *funcName, uint32_t eventId, std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler, T data);
     void DfxWriteCallFaultEvent(std::shared_ptr<TelRilRequest> telRilRequest, const int32_t error);
 
 private:
@@ -111,15 +108,15 @@ private:
 
 template<typename FuncType, typename... ParamTypes>
 inline int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response,
-    int32_t requestId, FuncType &&_func, ParamTypes &&... _args)
+    FuncType &&_func, ParamTypes &&... _args)
 {
-    std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(requestId, response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("%{public}s() telRilRequest is null: eventid=%{public}d", funcName, requestId);
+    if (rilInterface_ == nullptr) {
+        TELEPHONY_LOGE("%{public}s() rilInterface_ is null", funcName);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (rilInterface_ == nullptr) {
-        TELEPHONY_LOGE("%{public}s() rilInterface_ is null: eventid=%{public}d", funcName, requestId);
+    std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(response);
+    if (telRilRequest == nullptr) {
+        TELEPHONY_LOGE("%{public}s() telRilRequest is null", funcName);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return (rilInterface_->*(_func))(slotId_, telRilRequest->serialId_, std::forward<ParamTypes>(_args)...);
@@ -128,13 +125,13 @@ inline int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::Inner
 inline int32_t TelRilBase::Response(const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo)
 {
     auto getDataFunc = [&iResponseInfo](std::shared_ptr<TelRilRequest> telRilRequest) {
-        std::shared_ptr<HRilRadioResponseInfo> result = std::make_shared<HRilRadioResponseInfo>();
+        std::shared_ptr<RadioResponseInfo> result = std::make_shared<RadioResponseInfo>();
         result->flag = telRilRequest->pointer_->GetParam();
-        result->error = static_cast<HRilErrType>(iResponseInfo.error);
+        result->error = static_cast<ErrType>(iResponseInfo.error);
         result->serial = iResponseInfo.serial;
         return result;
     };
-    return Response<HRilRadioResponseInfo>(funcName, iResponseInfo, getDataFunc);
+    return Response<RadioResponseInfo>(funcName, iResponseInfo, getDataFunc);
 }
 
 template<typename T>
@@ -174,7 +171,7 @@ inline int32_t TelRilBase::Response(const char *funcName, const HDI::Ril::V1_1::
         TELEPHONY_LOGE("func %{public}s telRilReques or telRilRequest->pointer or data is null", funcName);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    if (radioResponseInfo.error != HRilErrType::NONE) {
+    if (radioResponseInfo.error != ErrType::NONE) {
         return ErrorResponse(telRilRequest, radioResponseInfo);
     }
     return SendHandlerEvent<T>(funcName, telRilRequest, getDataFunc);
@@ -196,7 +193,7 @@ template<typename T>
 inline int32_t TelRilBase::SendEventData(
     const char *funcName, uint32_t eventId, std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler, T data)
 {
-    if (!handler->SendEvent(eventId, data)) {
+    if (!TelEventHandler::SendTelEvent(handler, eventId, data)) {
         TELEPHONY_LOGE("func %{public}s Send eventId:%{public}d is failed!", funcName, eventId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -227,14 +224,14 @@ inline int32_t TelRilBase::Notify(const char *funcName, RadioEvent notifyId)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-inline HRilRadioResponseInfo TelRilBase::BuildHRilRadioResponseInfo(
+inline RadioResponseInfo TelRilBase::BuildHRilRadioResponseInfo(
     const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo)
 {
-    HRilRadioResponseInfo responseInfo = { 0 };
+    RadioResponseInfo responseInfo = { 0 };
     responseInfo.flag = iResponseInfo.flag;
     responseInfo.serial = iResponseInfo.serial;
-    responseInfo.error = (HRilErrType)iResponseInfo.error;
-    responseInfo.type = (HRilResponseTypes)iResponseInfo.type;
+    responseInfo.error = (ErrType)iResponseInfo.error;
+    responseInfo.type = (ResponseTypes)iResponseInfo.type;
     return responseInfo;
 }
 

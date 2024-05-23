@@ -46,6 +46,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0100, Function | MediumTest | Level3
     mCoreService->SetRadioState(0, true, callback);
     std::u16string testU16Str = u"";
     EXPECT_NE(mCoreService->GetImei(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetImeiSv(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetMeid(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetUniqueDeviceId(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetNrOptionMode(0, callback), TELEPHONY_ERR_SUCCESS);
@@ -72,7 +73,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0100, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->GetSimAccountInfo(0, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->SetDefaultVoiceSlotId(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetDefaultVoiceSlotId(), TELEPHONY_ERR_SUCCESS);
-    mCoreService->SetPrimarySlotId(0);
+    mCoreService->SetPrimarySlotId(INVALID_VALUE);
     mCoreService->GetPreferredNetwork(0, callback);
     mCoreService->SetPreferredNetwork(0, 1, callback);
     EXPECT_NE(mCoreService->SetShowNumber(0, testU16Str), TELEPHONY_ERR_SUCCESS);
@@ -192,6 +193,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0400, Function | MediumTest | Level3
     mCoreService->SetRadioState(0, true, callback);
     std::u16string testU16Str = u"";
     EXPECT_NE(mCoreService->GetImei(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetImeiSv(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetMeid(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetUniqueDeviceId(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetNrOptionMode(0, callback), TELEPHONY_ERR_SUCCESS);
@@ -218,7 +220,6 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0400, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->GetSimAccountInfo(0, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->SetDefaultVoiceSlotId(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetDefaultVoiceSlotId(), TELEPHONY_ERR_SUCCESS);
-    mCoreService->SetPrimarySlotId(0);
     mCoreService->GetPreferredNetwork(0, callback);
     mCoreService->SetPreferredNetwork(0, 1, callback);
     EXPECT_NE(mCoreService->SetShowNumber(0, testU16Str), TELEPHONY_ERR_SUCCESS);

@@ -22,24 +22,28 @@ namespace OHOS {
 namespace Telephony {
 class SimFile : public IccFile {
 public:
-    SimFile(const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager);
+    explicit SimFile(std::shared_ptr<SimStateManager> simStateManager);
     void StartLoad();
     std::string ObtainMsisdnNumber();
     std::string ObtainSimOperator();
+    std::string ObtainMCC();
+    std::string ObtainMNC();
     std::string ObtainIsoCountryCode();
     int ObtainSpnCondition(bool roaming, const std::string &operatorNum);
     int ObtainCallForwardStatus();
     std::shared_ptr<UsimFunctionHandle> ObtainUsimFunctionHandle();
-    void UpdateMsisdnNumber(
-        const std::string &alphaTag, const std::string &number, const AppExecFwk::InnerEvent::Pointer &onComplete);
+    bool UpdateMsisdnNumber(
+        const std::string &alphaTag, const std::string &number);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     ~SimFile() = default;
     bool ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event);
     bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber);
     bool SetVoiceMailCount(int32_t voiceMailCount);
     bool SetVoiceCallForwarding(bool enable, const std::string &number);
+    void ProcessIccRefresh(int msgId);
     std::string GetVoiceMailNumber();
     void SetVoiceMailNumber(const std::string mailNumber);
+    void ClearData();
 
 protected:
     enum SpnStatus {
@@ -49,7 +53,6 @@ protected:
         OBTAIN_OPERATOR_NAMESTRING,
         OBTAIN_OPERATOR_NAME_SHORTFORM
     };
-    void ProcessIccRefresh(int msgId);
     void ProcessFileLoaded(bool response);
     void OnAllFilesFetched();
     void LoadSimFiles();
@@ -125,6 +128,7 @@ private:
     bool ProcessObtainLiLanguage(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessObtainPlLanguage(const AppExecFwk::InnerEvent::Pointer &event);
     void StartObtainSpn();
+    void LoadSimOtherFile();
 
     void CheckMncLength();
     bool IsContinueGetSpn(bool start, SpnStatus curStatus, SpnStatus &newStatus);

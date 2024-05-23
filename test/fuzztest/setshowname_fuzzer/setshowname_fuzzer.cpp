@@ -26,23 +26,18 @@
 #include "napi_util.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
+#include "tel_event_handler.h"
 #include "unistd.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
 static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
-constexpr int32_t SLEEP_TIME_SECONDS = 10;
 
 bool IsServiceInited()
 {
     if (!g_isInited) {
-        auto onStart = [] { DelayedSingleton<CoreService>::GetInstance()->OnStart(); };
-        std::thread startThread(onStart);
-        pthread_setname_np(startThread.native_handle(), "setshowname_fuzzer");
-        startThread.join();
-
-        sleep(SLEEP_TIME_SECONDS);
+        DelayedSingleton<CoreService>::GetInstance()->OnStart();
         if (DelayedSingleton<CoreService>::GetInstance()->GetServiceRunningState() ==
             static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
             g_isInited = true;
@@ -153,6 +148,12 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetIMSI(data, size);
     IsSimActive(data, size);
     SetShowName(data, size);
+    auto telRilManager = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
+    if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
+        return;
+    }
+    telRilManager->handler_->ClearFfrt(true);
+    return;
 }
 } // namespace OHOS
 
@@ -162,5 +163,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::AddCoreServiceTokenFuzzer token;
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::DelayedSingleton<CoreService>::DestroyInstance();
     return 0;
 }

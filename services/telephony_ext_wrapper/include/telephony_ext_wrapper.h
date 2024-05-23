@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,9 @@
 #include "signal_information.h"
 #include "network_state.h"
 #include "cell_information.h"
+#include "want.h"
+#include "i_icc_file.h"
+#include "tel_ril_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -56,14 +59,35 @@ public:
     typedef bool (*IS_NR_SUPPORTED_NATIVE)(int32_t modemRaf);
     typedef void (*GET_SIGNAL_INFO_LIST_EXT)(int32_t slotId,
 	    std::vector<sptr<OHOS::Telephony::SignalInformation>> &signals);
-    typedef bool (*IS_CAPABILITY_SUPPORT_EXT)(uint32_t capablity);
     typedef void (*GET_NETWORK_CAPABILITY_EXT)(int32_t slotId, int32_t networkCapabilityType,
 	    int32_t &networkCapabilityState);
-    typedef int32_t (*WRAP_NATIVE_NETWORK_MODE_EXT)(int32_t nativeMode);
     typedef void (*ON_GET_NETWORK_SEARCH_INFORMATION_EXT)(int32_t &availableSize,
         std::vector<OHOS::Telephony::NetworkInformation> &networkInformations);
-    typedef void (*FILTER_SEND_SIGNAL_INFORMAION_EXT)(int32_t slotId,
-	    std::vector<sptr<OHOS::Telephony::SignalInformation>> &vec);
+    typedef void (*CREATE_ICC_FILE_EXT)(int32_t slotId, std::shared_ptr<OHOS::Telephony::IIccFileExt> iccFileExt);
+
+    typedef void (*UPDATE_COUNTRY_CODE_EXT)(int32_t, const char *);
+    typedef void (*UPDATE_TIME_ZONE_OFFSET_EXT)(int32_t, int32_t);
+    typedef void (*UPDATE_NETWORK_STATE_EXT)(int32_t slotId, std::unique_ptr<NetworkState> &networkState);
+    typedef int32_t (*UPDATE_NSA_STATE_EXT)(
+        int32_t slotId, int32_t cellId, bool endcAvailable, bool dcNrRestricted, int32_t nsaState);
+    /* add for vsim begin */
+    typedef void (*IS_VSIM_IN_STATUS)(int32_t slotId, int32_t type, bool &status);
+    typedef void (*GET_VSIM_SLOT_ID)(int32_t &slotId);
+    typedef void (*ON_ALL_FILES_FETCHED_EXT)(int32_t slotId);
+    typedef void (*PUT_VSIM_EXTRA_INFO)(OHOS::AAFwk::Want &want, int32_t slotId, int32_t value);
+    typedef void (*CHANGE_SPN_AND_RULE_EXT)(std::string &spn, int32_t &rule, bool &showSpn);
+    typedef void (*GET_VSIM_CARD_STATE)(int32_t &cardType);
+    typedef bool (*GET_SIM_ID_EXT)(int32_t slotId, int32_t &simId);
+    typedef bool (*GET_SLOT_ID_EXT)(int32_t simId, int32_t &slotId);
+    /* add for vsim end */
+    typedef bool (*IS_ALLOWED_INSERT_APN)(std::string &value);
+    typedef void (*GET_TARGET_OPKEY)(int32_t slotId, std::u16string &opkey);
+    typedef void (*SORT_SIGNAL_INFO_LIST_EXT)(
+        int32_t slotId, std::vector<sptr<OHOS::Telephony::SignalInformation>> &signals);
+    typedef void (*GET_OPKEY_VERSION)(std::string &versionInfo);
+
+    typedef bool (*PROCESS_SIGNAL_INFOS)(int32_t slotId, Rssi &signalIntensity);
+    typedef bool (*PROCESS_STATE_CHANGE_EXT)(int32_t slotId, sptr<NetworkState> &ns);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -86,14 +110,42 @@ public:
     GET_PREFERRED_NETWORK_EXT getPreferredNetworkExt_ = nullptr;
     IS_NR_SUPPORTED_NATIVE isNrSupportedNative_ = nullptr;
     GET_SIGNAL_INFO_LIST_EXT getSignalInfoListExt_ = nullptr;
-    IS_CAPABILITY_SUPPORT_EXT isCapabilitySupportExt_ = nullptr;
     GET_NETWORK_CAPABILITY_EXT getNetworkCapabilityExt_ = nullptr;
-    WRAP_NATIVE_NETWORK_MODE_EXT wrapNativeNetworkModeExt_ = nullptr;
     ON_GET_NETWORK_SEARCH_INFORMATION_EXT onGetNetworkSearchInformationExt_ = nullptr;
-    FILTER_SEND_SIGNAL_INFORMAION_EXT filterSendSignalInformationExt_ = nullptr;
+    CREATE_ICC_FILE_EXT createIccFileExt_ = nullptr;
+    UPDATE_NETWORK_STATE_EXT updateNetworkStateExt_ = nullptr;
+    UPDATE_NSA_STATE_EXT updateNsaStateExt_ = nullptr;
+
+    UPDATE_COUNTRY_CODE_EXT updateCountryCodeExt_ = nullptr;
+    UPDATE_TIME_ZONE_OFFSET_EXT updateTimeZoneOffsetExt_ = nullptr;
+
+    /* add for vsim begin */
+    IS_VSIM_IN_STATUS isVSimInStatus_ = nullptr;
+    GET_VSIM_SLOT_ID getVSimSlotId_ = nullptr;
+    ON_ALL_FILES_FETCHED_EXT onAllFilesFetchedExt_ = nullptr;
+    PUT_VSIM_EXTRA_INFO putVSimExtraInfo_ = nullptr;
+    CHANGE_SPN_AND_RULE_EXT changeSpnAndRuleExt_ = nullptr;
+    GET_VSIM_CARD_STATE getVSimCardState_ = nullptr;
+    GET_SIM_ID_EXT getSimIdExt_ = nullptr;
+    GET_SLOT_ID_EXT getSlotIdExt_ = nullptr;
+    /* add for vsim end */
+    IS_ALLOWED_INSERT_APN isAllowedInsertApn_ = nullptr;
+    GET_TARGET_OPKEY getTargetOpkey_ = nullptr;
+    SORT_SIGNAL_INFO_LIST_EXT sortSignalInfoListExt_ = nullptr;
+    GET_OPKEY_VERSION getOpkeyVersion_ = nullptr;
+    PROCESS_SIGNAL_INFOS processSignalInfos_ = nullptr;
+    PROCESS_STATE_CHANGE_EXT processStateChangeExt_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
+    void* telephonyVSimWrapperHandle_ = nullptr;
+    void InitTelephonyExtWrapperForNetWork();
+    void InitTelephonyExtWrapperForVoiceMail();
+    void InitTelephonyExtWrapperForCust();
+    void InitTelephonyExtWrapperForVSim();
+    void InitTelephonyExtWrapperForApnCust();
+    void InitTelephonyExtWrapperForSim();
+    void InitTelephonyExtWrapperForOpkeyVersion();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

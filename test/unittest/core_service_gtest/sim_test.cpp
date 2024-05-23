@@ -88,10 +88,14 @@ HWTEST_F(SimTest, Telephony_Sim_ParseFromCustomSystem_0100, Function | MediumTes
         }
         OperatorConfig opc;
         OperatorFileParser parser;
-        Json::Value opcJsonValue;
+        cJSON *opcJsonValue = nullptr;
         if (isCanGetFromDefaultCustomSystemNormal) {
             EXPECT_EQ(parser.ParseFromCustomSystem(SimTest::slotId_, opc, opcJsonValue),
                 isCanGetFromDefaultCustomSystemNormal);
+        }
+        if (opcJsonValue != nullptr) {
+            cJSON_Delete(opcJsonValue);
+            opcJsonValue = nullptr;
         }
     }
 }
@@ -139,10 +143,14 @@ HWTEST_F(SimTest, Telephony_Sim_ParseFromCustomSystem_0300, Function | MediumTes
         }
         OperatorConfig opc;
         OperatorFileParser parser;
-        Json::Value opcJsonValue;
+        cJSON *opcJsonValue = nullptr;
         if (isCanGetFromDefaultCustomSystemNormal) {
             EXPECT_EQ(parser.ParseFromCustomSystem(SimTest::slotId1_, opc, opcJsonValue),
                 isCanGetFromDefaultCustomSystemNormal);
+        }
+        if (opcJsonValue != nullptr) {
+            cJSON_Delete(opcJsonValue);
+            opcJsonValue = nullptr;
         }
     }
 }
@@ -1341,6 +1349,21 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimEons_0100, Function | MediumTest | Level3)
  * @tc.desc     Function test
  */
 HWTEST_F(SimTest, Telephony_Sim_IsNrSupported_0100, Function | MediumTest | Level3)
+{
+    if (!SimTest::HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceClient::GetInstance().IsNrSupported(slotId_);
+        ASSERT_TRUE(true);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_IsNrSupported_0200
+ * @tc.name     Is nr supported
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_IsNrSupported_0200, Function | MediumTest | Level3)
 {
     if (!SimTest::HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");

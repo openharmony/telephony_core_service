@@ -24,9 +24,8 @@ std::atomic_int IccDiallingNumbersHandler::nextSerialId_(1);
 std::unordered_map<int, std::shared_ptr<DiallingNumberLoadRequest>> IccDiallingNumbersHandler::requestMap_;
 static std::mutex requestLock_;
 
-IccDiallingNumbersHandler::IccDiallingNumbersHandler(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<IccFileController> fh)
-    : AppExecFwk::EventHandler(runner), fileController_(fh)
+IccDiallingNumbersHandler::IccDiallingNumbersHandler(std::shared_ptr<IccFileController> fh)
+    : TelEventHandler("IccDiallingNumbersHandler"), fileController_(fh)
 {
     InitFuncMap();
 }
@@ -269,6 +268,10 @@ void IccDiallingNumbersHandler::ProcessDiallingNumberLoadDone(const AppExecFwk::
         return;
     }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessDiallingNumberLoadDone fd is nullptr");
+        return;
+    }
     int loadId = fd->arg1;
     id = loadId;
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest = FindLoadRequest(loadId);
@@ -337,13 +340,17 @@ bool IccDiallingNumbersHandler::SendBackResult(int loadId)
         return false;
     }
     std::unique_ptr<DiallingNumbersHandlerResult> data = make_unique<DiallingNumbersHandlerResult>(fd.get());
+    if (data == nullptr) {
+        TELEPHONY_LOGE("data is nullptr!");
+        return false;
+    }
     data->result = loadRequest->GetResult();
     data->exception = loadRequest->GetException();
     if (owner == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersHandler::SendBackResult owner null pointer");
         return false;
     }
-    owner->SendEvent(id, data);
+    TelEventHandler::SendTelEvent(owner, id, data);
     ClearLoadRequest(loadId);
     TELEPHONY_LOGI("IccDiallingNumbersHandler::SendBackResult send end");
     return true;
@@ -352,6 +359,10 @@ bool IccDiallingNumbersHandler::SendBackResult(int loadId)
 AppExecFwk::InnerEvent::Pointer IccDiallingNumbersHandler::BuildCallerInfo(int eventId, int loadId)
 {
     std::unique_ptr<FileToControllerMsg> object = std::make_unique<FileToControllerMsg>();
+    if (object == nullptr) {
+        TELEPHONY_LOGE("object is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     object->arg1 = loadId;
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object, eventParam);
@@ -367,6 +378,10 @@ AppExecFwk::InnerEvent::Pointer IccDiallingNumbersHandler::BuildCallerInfo(
     int eventId, std::shared_ptr<void> pobj, int loadId)
 {
     std::unique_ptr<FileToControllerMsg> object = std::make_unique<FileToControllerMsg>();
+    if (object == nullptr) {
+        TELEPHONY_LOGE("object is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
     object->arg1 = loadId;
     object->iccLoader = pobj;
     int eventParam = 0;
@@ -402,7 +417,7 @@ void IccDiallingNumbersHandler::ClearLoadRequest(int serial)
 void IccDiallingNumbersHandler::FetchDiallingNumberContent(
     const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, const std::string &recordData)
 {
-    TELEPHONY_LOGI("FetchDiallingNumberContent start");
+    TELEPHONY_LOGD("FetchDiallingNumberContent start");
     int recordLen = 0;
     std::shared_ptr<unsigned char> data = SIMUtils::HexStringConvertToBytes(recordData, recordLen);
     if (diallingNumber == nullptr || data == nullptr) {
@@ -419,9 +434,8 @@ void IccDiallingNumbersHandler::FetchDiallingNumberContent(
     offset += length;
     length = static_cast<int>(record[offset]);
     if (length > MAX_NUMBER_SIZE_BYTES) {
-        diallingNumber->number_ = u"";
+        length = MAX_NUMBER_SIZE_BYTES;
         TELEPHONY_LOGE("FetchDiallingNumberContent number error");
-        return;
     }
     /* parse number */
     ++offset;
@@ -571,10 +585,10 @@ bool IccDiallingNumbersHandler::FormatNameAndNumber(
     return true;
 }
 
-std::shared_ptr<HRilRadioResponseInfo> IccDiallingNumbersHandler::MakeExceptionResult(int code)
+std::shared_ptr<RadioResponseInfo> IccDiallingNumbersHandler::MakeExceptionResult(int code)
 {
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = std::make_shared<HRilRadioResponseInfo>();
-    responseInfo->error = static_cast<Telephony::HRilErrType>(code);
+    std::shared_ptr<RadioResponseInfo> responseInfo = std::make_shared<RadioResponseInfo>();
+    responseInfo->error = static_cast<Telephony::ErrType>(code);
     return responseInfo;
 }
 

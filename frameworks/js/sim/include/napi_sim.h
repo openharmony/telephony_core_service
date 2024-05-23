@@ -26,8 +26,6 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr size_t ARRAY_SIZE = 64;
-constexpr size_t kMaxNumberLen = 100;
 
 template<typename T>
 struct AsyncContext {

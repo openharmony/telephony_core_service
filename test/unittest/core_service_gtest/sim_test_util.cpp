@@ -91,24 +91,19 @@ bool SimTest::ParseOperatorConf(int32_t slotId)
     const std::string rawJson = R"({ "string": "JSON中国", "long": 2147483699, "int": 88, "bool": true,
         "strA": ["street", "city", "country"], "longA": [ 2147483699, 2147483900, 2147499999],
         "intA": [1, 2, 3]})";
-    JSONCPP_STRING err;
-    Json::Value root;
-    Json::CharReaderBuilder builder;
-    Json::CharReader *reader(builder.newCharReader());
-    if (!reader->parse(rawJson.c_str(), rawJson.c_str() + rawJson.length(), &root, &err)) {
-        TELEPHONY_LOGE("ParserUtil::ParserPdpProfileJson reader is error!\n");
+    cJSON *root = cJSON_Parse(rawJson.c_str());
+    if (root == nullptr) {
+        TELEPHONY_LOGE("SimTest::ParseOperatorConf root is error!\n");
         return false;
     }
-    delete reader;
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(runner, subcribeInfo,
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo,
         std::weak_ptr<ITelRilManager>(telRilManager), std::weak_ptr<SimStateManager>(simStateManager));
-    OperatorConfigCache ofpc(nullptr, std::weak_ptr<SimFileManager>(simFileManager), slotId);
+    OperatorConfigCache ofpc(std::weak_ptr<SimFileManager>(simFileManager), slotId);
     OperatorFileParser ofp;
     OperatorConfig poc;
     std::u16string result;
@@ -121,9 +116,12 @@ bool SimTest::ParseOperatorConf(int32_t slotId)
         return false;
     }
     ofp.WriteOperatorConfigJson(filename, root);
-    Json::Value ret;
+    cJSON_Delete(root);
+    cJSON *ret = nullptr;
     ofp.ParseOperatorConfigFromFile(poc, filename, ret);
     CompareOperatorConfProcess(poc);
+    root = nullptr;
+    ret = nullptr;
     return true;
 }
 

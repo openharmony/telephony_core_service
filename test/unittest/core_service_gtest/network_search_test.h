@@ -21,6 +21,7 @@
 
 #include "accesstoken_kit.h"
 #include "core_service_client.h"
+#include "core_manager_inner.h"
 #include "token_setproc.h"
 
 namespace OHOS {
@@ -209,6 +210,7 @@ public:
     void PrintTdScdmaSignalInformation(sptr<SignalInformation> signal);
     void PrintLteSignalInformation(sptr<SignalInformation> signal);
     void PrintNrSignalInformation(sptr<SignalInformation> signal);
+    void PrintNrSsbIdInfo(std::shared_ptr<NrSsbInformation> nr);
 
 public:
     static sptr<ICoreService> telephonyService_;

@@ -20,12 +20,14 @@
 
 #include "common_event_support.h"
 #include "core_manager_inner.h"
-#include "hril_network_parcel.h"
+#include "tel_ril_network_parcel.h"
 #include "network_search_manager.h"
 #include "operator_config_types.h"
 #include "operator_name_utils.h"
 #include "resource_utils.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
+
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;
 
@@ -64,10 +66,11 @@ void OperatorName::OnReceiveEvent(const EventFwk::CommonEventData &data)
         sptr<NetworkState> networkState = GetNetworkStatus();
         if (networkState != nullptr && networkState->GetRegStatus() == RegServiceState::REG_STATE_IN_SERVICE) {
             NotifySpnChanged();
+            networkSearchState_->NotifyStateChange();
         }
     } else if (action == CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED) {
         TELEPHONY_LOGI("locale changed Slot%{public}d", slotId_);
-        NotifySpnChanged();
+        TrySetLongOperatorNameWithTranslation();
         auto networkSearchManager = networkSearchManager_.lock();
         if (networkSearchManager == nullptr) {
             TELEPHONY_LOGE("networkSearchManager is nullptr slotId:%{public}d", slotId_);
@@ -121,7 +124,7 @@ void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &eve
     networkSearchManager->TriggerTimezoneRefresh(slotId_);
 }
 
-void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const
+void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("OperatorName::GsmOperatorInfo event is nullptr slotId:%{public}d", slotId_);
@@ -135,6 +138,7 @@ void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
         longName = operatorInfoResult->longName;
         shortName = operatorInfoResult->shortName;
         numeric = operatorInfoResult->numeric;
+        UpdateOperatorLongName(longName, numeric);
     }
     TELEPHONY_LOGI(
         "OperatorName::GsmOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : %{public}s "
@@ -146,7 +150,7 @@ void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
     }
 }
 
-void OperatorName::CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event) const
+void OperatorName::CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("OperatorName::CdmaOperatorInfo event is nullptr slotId:%{public}d", slotId_);
@@ -160,6 +164,7 @@ void OperatorName::CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event
         longName = operatorInfoResult->longName;
         shortName = operatorInfoResult->shortName;
         numeric = operatorInfoResult->numeric;
+        UpdateOperatorLongName(longName, numeric);
     }
     TELEPHONY_LOGI(
         "OperatorName::CdmaOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : %{public}s "
@@ -195,7 +200,7 @@ void OperatorName::NotifySpnChanged()
         TELEPHONY_LOGE("OperatorName::NotifySpnChanged networkSearchManager is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    TELEPHONY_LOGI("OperatorName::NotifySpnChanged slotId:%{public}d", slotId_);
+    TELEPHONY_LOGD("OperatorName::NotifySpnChanged slotId:%{public}d", slotId_);
     std::string netPlmn = "";
     std::string simPlmn = "";
     std::string domesticSpn = "";
@@ -203,7 +208,7 @@ void OperatorName::NotifySpnChanged()
     sptr<NetworkState> networkState = GetNetworkStatus();
     if (networkState != nullptr) {
         regStatus = networkState->GetRegStatus();
-        std::string netPlmn = networkState->GetPlmnNumeric();
+        netPlmn = networkState->GetPlmnNumeric();
     }
     if (simManager_ != nullptr) {
         std::u16string operatorNumeric = u"";
@@ -288,6 +293,7 @@ void OperatorName::NotifyGsmSpnChanged(
     std::string plmn = "";
     std::string spn = "";
     bool showPlmn = false;
+    bool showPlmnOld = false;
     bool showSpn = false;
     bool roaming = networkState->IsRoaming();
     if (enableCust_ && displayConditionCust_ != SPN_INVALID) {
@@ -300,16 +306,25 @@ void OperatorName::NotifyGsmSpnChanged(
     }
     UpdatePlmn(regStatus, networkState, spnRule, plmn, showPlmn);
     UpdateSpn(regStatus, networkState, spnRule, spn, showSpn);
+    if (TELEPHONY_EXT_WRAPPER.changeSpnAndRuleExt_) {
+        TELEPHONY_EXT_WRAPPER.changeSpnAndRuleExt_(spn, spnRule, showSpn);
+    }
+    showPlmnOld = showPlmn;
+    if (spn.empty() || !plmn.empty()) {
+        showPlmn = true;
+    }
     TELEPHONY_LOGI(
         "OperatorName::NotifyGsmSpnChanged showSpn:%{public}d curSpn_:%{public}s spn:%{public}s showPlmn:%{public}d "
-        "curPlmn_:%{public}s plmn:%{public}s slotId:%{public}d",
-        showSpn, curSpn_.c_str(), spn.c_str(), showPlmn, curPlmn_.c_str(), plmn.c_str(), slotId_);
+        "curPlmn_:%{public}s plmn:%{public}s showPlmnOld:%{public}d enableCust_:%{public}d "
+        "displayConditionCust_:%{public}d domesticSpn:%{public}s slotId:%{public}d",
+        showSpn, curSpn_.c_str(), spn.c_str(), showPlmn, curPlmn_.c_str(), plmn.c_str(), showPlmnOld, enableCust_,
+        displayConditionCust_, domesticSpn.c_str(), slotId_);
     if (curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn || curPlmnShow_ != showPlmn ||
         curSpn_.compare(spn) || curPlmn_.compare(plmn)) {
         TELEPHONY_LOGI("OperatorName::NotifyGsmSpnChanged start send broadcast slotId:%{public}d...", slotId_);
         PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn, domesticSpn);
     } else {
-        TELEPHONY_LOGI(
+        TELEPHONY_LOGD(
             "OperatorName::NotifyGsmSpnChanged spn no changed, not need to update slotId:%{public}d", slotId_);
     }
 }
@@ -702,6 +717,37 @@ void OperatorName::UpdateOplCust(const std::vector<std::string> &oplCust)
             oplCust_.push_back(opl);
         }
     }
+}
+
+void OperatorName::UpdateOperatorLongName(std::string &operatorLongName, const std::string &numeric)
+{
+    sptr<NetworkState> networkState = GetNetworkStatus();
+    if (networkState == nullptr) {
+        return;
+    }
+
+    RegServiceState regStatus = networkState->GetRegStatus();
+    if (regStatus != RegServiceState::REG_STATE_IN_SERVICE) {
+        return;
+    }
+
+    std::string customizedOperatorLongName = GetCustomName(numeric);
+    if (!customizedOperatorLongName.empty()) {
+        operatorLongName = customizedOperatorLongName;
+    }
+}
+
+void OperatorName::TrySetLongOperatorNameWithTranslation()
+{
+    sptr<NetworkState> networkState = GetNetworkStatus();
+    if (networkState != nullptr && networkSearchState_ != nullptr) {
+        std::string longOperatorName = networkState->GetLongOperatorName();
+        std::string numeric = networkState->GetPlmnNumeric();
+        UpdateOperatorLongName(longOperatorName, numeric);
+        networkSearchState_->SetLongOperatorName(longOperatorName, DomainType::DOMAIN_TYPE_CS);
+        networkSearchState_->SetLongOperatorName(longOperatorName, DomainType::DOMAIN_TYPE_PS);
+    }
+    NotifySpnChanged();
 }
 } // namespace Telephony
 } // namespace OHOS

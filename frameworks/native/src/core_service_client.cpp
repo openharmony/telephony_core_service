@@ -187,6 +187,16 @@ std::u16string CoreServiceClient::GetOperatorNumeric(int32_t slotId)
     return proxy->GetOperatorNumeric(slotId);
 }
 
+std::string CoreServiceClient::GetResidentNetworkNumeric(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return "";
+    }
+    return proxy->GetResidentNetworkNumeric(slotId);
+}
+
 int32_t CoreServiceClient::GetOperatorName(int32_t slotId, std::u16string &operatorName)
 {
     auto proxy = GetProxy();
@@ -235,6 +245,16 @@ int32_t CoreServiceClient::GetImei(int32_t slotId, std::u16string &imei)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->GetImei(slotId, imei);
+}
+
+int32_t CoreServiceClient::GetImeiSv(int32_t slotId, std::u16string &imeiSv)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetImeiSv(slotId, imeiSv);
 }
 
 int32_t CoreServiceClient::HasSimCard(int32_t slotId, bool &hasSimCard)
@@ -818,7 +838,7 @@ int32_t CoreServiceClient::GetMaxSimCount()
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        return 0;
     }
     return proxy->GetMaxSimCount();
 }
@@ -937,6 +957,7 @@ int32_t CoreServiceClient::GetPrimarySlotId(int32_t &slotId)
 
 int32_t CoreServiceClient::SetPrimarySlotId(int32_t slotId)
 {
+    TELEPHONY_LOGI("[slot%{public}d] entry", slotId);
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
@@ -1000,6 +1021,16 @@ int32_t CoreServiceClient::GetBasebandVersion(int32_t slotId, std::string &versi
     return proxy->GetBasebandVersion(slotId, version);
 }
 
+int32_t CoreServiceClient::GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetNrSsbIdInfo(slotId, nrSsbInformation);
+}
+
 int32_t CoreServiceClient::FactoryReset(int32_t slotId)
 {
     auto proxy = GetProxy();
@@ -1008,6 +1039,46 @@ int32_t CoreServiceClient::FactoryReset(int32_t slotId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->FactoryReset(slotId);
+}
+
+int32_t CoreServiceClient::InitExtraModule(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->InitExtraModule(slotId);
+}
+
+bool CoreServiceClient::IsAllowedInsertApn(std::string &value)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return true;
+    }
+    return proxy->IsAllowedInsertApn(value);
+}
+
+int32_t CoreServiceClient::GetTargetOpkey(int32_t slotId, std::u16string &opkey)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetTargetOpkey(slotId, opkey);
+}
+
+int32_t CoreServiceClient::GetOpkeyVersion(std::string &versionInfo)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetOpkeyVersion(versionInfo);
 }
 } // namespace Telephony
 } // namespace OHOS

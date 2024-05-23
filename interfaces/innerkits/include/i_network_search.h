@@ -26,7 +26,9 @@
 #include "network_search_callback_base.h"
 #include "network_search_result.h"
 #include "network_state.h"
+#include "nr_ssb_information.h"
 #include "signal_information.h"
+#include "tel_ril_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -35,9 +37,11 @@ public:
     using HANDLE = const std::shared_ptr<AppExecFwk::EventHandler>;
     using NSCALLBACK = const sptr<INetworkSearchCallback>;
     virtual bool OnInit() = 0;
+    virtual int32_t InitTelExtraModule(int32_t slotId) = 0;
     virtual int32_t GetPsRadioTech(int32_t slotId, int32_t &psRadioTech) = 0;
     virtual int32_t GetCsRadioTech(int32_t slotId, int32_t &csRadioTech) = 0;
     virtual std::u16string GetOperatorNumeric(int32_t slotId) = 0;
+    virtual std::string GetResidentNetworkNumeric(int32_t slotId) = 0;
     virtual int32_t GetOperatorName(int32_t slotId, std::u16string &operatorName) = 0;
     /**
      * @brief Get network state
@@ -92,6 +96,7 @@ public:
      */
     virtual int32_t GetPsRoamingState(int32_t slotId) = 0;
     virtual int32_t GetImei(int32_t slotId, std::u16string &imei) = 0;
+    virtual int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) = 0;
     virtual int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) = 0;
     virtual int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) = 0;
     virtual int32_t SendUpdateCellLocationRequest(int32_t slotId) = 0;
@@ -129,11 +134,17 @@ public:
      * @return Returns the 5G New Radio (NR) status.
      */
     virtual NrState GetNrState(int32_t slotId) = 0;
-    virtual int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName,
+    virtual int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const int32_t tokenId,
         const sptr<ImsRegInfoCallback> &callback) = 0;
     virtual int32_t UnregisterImsRegInfoCallback(
-        int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName) = 0;
+        int32_t slotId, ImsServiceType imsSrvType, const int32_t tokenId) = 0;
     virtual int32_t GetBasebandVersion(int32_t slotId, std::string &version) = 0;
+    /**
+     * @brief Init airplane mode.
+     *
+     * @param slotId[in], sim slot id
+     */
+    virtual void InitAirplaneMode(int32_t slotId) = 0;
     /**
      * @brief Get the airplane mode.
      *
@@ -170,6 +181,7 @@ public:
     virtual int32_t UpdateRadioOn(int32_t slotId) = 0;
     virtual int32_t GetRrcConnectionState(int32_t slotId, int32_t &status) = 0;
     virtual int32_t FactoryReset(int32_t slotId) = 0;
+    virtual int32_t GetNrSsbId(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation) = 0;
 
     /**
      * @brief support Nr network or not
@@ -178,6 +190,15 @@ public:
      * @return false not support
      */
     virtual bool IsNrSupported(int32_t slotId) = 0;
+
+    /**
+     * @brief support Satellite network or not
+     *
+     * @return true support
+     * @return false not support
+     */
+    virtual bool IsSatelliteEnabled() = 0;
+
     /**
      * @brief Update physical link active status
      *
@@ -187,6 +208,11 @@ public:
     virtual void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive) = 0;
     virtual int32_t NotifyCallStatusToNetworkSearch(int32_t slotId, int32_t callStatus) = 0;
     virtual int32_t HandleNotifyStateChangeWithDelay(int32_t slotId, bool isNeedDelay) = 0;
+    virtual int32_t IsGsm(int32_t slotId, bool &isGsm) = 0;
+    virtual int32_t IsCdma(int32_t slotId, bool &isCdma) = 0;
+    virtual int32_t StartRadioOnState(int32_t slotId) = 0;
+    virtual int32_t StartGetRilSignalIntensity(int32_t slotId) = 0;
+    virtual int32_t ProcessSignalIntensity(int32_t slotId, const struct Rssi &signalIntensity) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

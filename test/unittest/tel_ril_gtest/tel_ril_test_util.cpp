@@ -273,6 +273,7 @@ void TelRilTest::InitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE] = &TelRilTest::GetPreferredNetworkParaTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE] = &TelRilTest::SetPreferredNetworkParaTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_IMEI] = &TelRilTest::GetImeiTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_IMEISV] = &TelRilTest::GetImeiSvTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_MEID] = &TelRilTest::GetMeidTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO] = &TelRilTest::GetVoiceRadioTechnologyTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_PHYSICAL_CHANNEL_CONFIG] = &TelRilTest::GetPhysicalChannelConfigTest;
@@ -282,6 +283,8 @@ void TelRilTest::InitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_GET_RRC_CONNECTION_STATE] = &TelRilTest::GetRrcConnectionStateTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_NR_OPTION_MODE] = &TelRilTest::GetNrOptionModeTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_NR_OPTION_MODE] = &TelRilTest::SetNrOptionModeTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_NR_SSBID_INFO] = &TelRilTest::GetNrSsbIdTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_CELL_INFO_LIST_TYPE] = &TelRilTest::GetCellInfoListTest;
 }
 
 void TelRilTest::InitModem()
@@ -1674,6 +1677,25 @@ void TelRilTest::GetImeiTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHa
 }
 
 /**
+ * @brief Get IMEISV
+ *
+ * @param handler
+ */
+void TelRilTest::GetImeiSvTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_IMEISV);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetImeisVTest -->");
+        telRilManager_->GetImeiSv(slotId, event);
+        TELEPHONY_LOGI("TelRilTest::GetImeiSvTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
  * @brief Get MEID
  *
  * @param handler
@@ -1742,7 +1764,7 @@ void TelRilTest::SetLocateUpdatesTest(int32_t slotId, std::shared_ptr<AppExecFwk
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
         TELEPHONY_LOGI("TelRilTest::SetLocateUpdatesTest -->");
-        HRilRegNotifyMode mode = REG_NOTIFY_STAT_LAC_CELLID;
+        RegNotifyMode mode = REG_NOTIFY_STAT_LAC_CELLID;
         telRilManager_->SetLocateUpdates(slotId, mode, event);
         TELEPHONY_LOGI("TelRilTest::SetLocateUpdatesTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
@@ -1844,6 +1866,44 @@ void TelRilTest::SetNrOptionModeTest(int32_t slotId, std::shared_ptr<AppExecFwk:
         int32_t mode = 1;
         telRilManager_->SetNrOptionMode(slotId, mode, event);
         TELEPHONY_LOGI("TelRilTest::SetNrOptionModeTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Get NR ssb id Information
+ *
+ * @param handler
+ */
+void TelRilTest::GetNrSsbIdTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_NR_SSBID_INFO);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetNrSsbIdTest -->");
+        telRilManager_->GetNrSsbId(slotId, event);
+        TELEPHONY_LOGI("TelRilTest::GetNrSsbIdTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Get cellinfo list
+ *
+ * @param handler
+ */
+void TelRilTest::GetCellInfoListTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_CELL_INFO_LIST_TYPE);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetCellInfoListTest -->");
+        telRilManager_->GetCellInfoList(slotId, event);
+        TELEPHONY_LOGI("TelRilTest::GetCellInfoListTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }
@@ -2324,9 +2384,9 @@ bool TelRilTest::DemoHandler::GetBoolResult(int32_t eventId)
         return ret;
     }
     if ((resultInfo_ != nullptr) &&
-        ((resultInfo_->error == HRilErrType::NONE) || (resultInfo_->error == HRilErrType::HRIL_ERR_GENERIC_FAILURE) ||
-         (resultInfo_->error == HRilErrType::HRIL_ERR_INVALID_RESPONSE) ||
-         (resultInfo_->error == HRilErrType::HRIL_ERR_INVALID_MODEM_PARAMETER))) {
+        ((resultInfo_->error == ErrType::NONE) || (resultInfo_->error == ErrType::ERR_GENERIC_FAILURE) ||
+         (resultInfo_->error == ErrType::ERR_INVALID_RESPONSE) ||
+         (resultInfo_->error == ErrType::ERR_INVALID_MODEM_PARAMETER))) {
         ret = true;
     }
     if (resultInfo_ == nullptr) {
@@ -2344,7 +2404,7 @@ void TelRilTest::DemoHandler::ProcessResponseInfo(const AppExecFwk::InnerEvent::
     if (event != nullptr) {
         eventId_ = event->GetInnerEventId();
         TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> eventId:%{public}d", eventId_);
-        // for some SIM interfaces, response data need to be get before HRilRadioResponseInfo
+        // for some SIM interfaces, response data need to be get before RadioResponseInfo
         switch (eventId_) {
             case static_cast<int32_t>(RadioEvent::RADIO_SIM_GET_IMSI): {
                 TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> RADIO_SIM_GET_IMSI");
@@ -2353,7 +2413,7 @@ void TelRilTest::DemoHandler::ProcessResponseInfo(const AppExecFwk::InnerEvent::
                     TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> imsi=%{public}s", imsi->c_str());
                 } else {
                     TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> get resultInfo_");
-                    resultInfo_ = event->GetSharedObject<HRilRadioResponseInfo>();
+                    resultInfo_ = event->GetSharedObject<RadioResponseInfo>();
                 }
                 break;
             }
@@ -2369,13 +2429,13 @@ void TelRilTest::DemoHandler::ProcessResponseInfo(const AppExecFwk::InnerEvent::
                         g_smscAddr.c_str(), g_tosca);
                 } else {
                     TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> get resultInfo_");
-                    resultInfo_ = event->GetSharedObject<HRilRadioResponseInfo>();
+                    resultInfo_ = event->GetSharedObject<RadioResponseInfo>();
                 }
                 break;
             }
             default: {
                 TELEPHONY_LOGI("TelRilTest::DemoHandler::ProcessResponseInfo --> case default");
-                resultInfo_ = event->GetSharedObject<HRilRadioResponseInfo>();
+                resultInfo_ = event->GetSharedObject<RadioResponseInfo>();
             }
         }
     }

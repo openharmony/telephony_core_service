@@ -18,6 +18,7 @@
 #include "radio_event.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "telephony_ext_wrapper.h"
 
 using namespace std;
 using namespace OHOS::AppExecFwk;
@@ -25,9 +26,7 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
-IsimFile::IsimFile(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager)
-    : IccFile(runner, simStateManager)
+IsimFile::IsimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("IsimFile", simStateManager)
 {
     fileQueried_ = false;
     InitMemberFunc();
@@ -88,6 +87,9 @@ void IsimFile::OnAllFilesFetched()
     filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
     NotifyRegistrySimState(CardType::SINGLE_MODE_ISIM_CARD, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
     LoadVoiceMail();
+    if (TELEPHONY_EXT_WRAPPER.onAllFilesFetchedExt_) {
+        TELEPHONY_EXT_WRAPPER.onAllFilesFetchedExt_(slotId_);
+    }
 }
 
 bool IsimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
@@ -138,7 +140,13 @@ bool IsimFile::ProcessGetIccidDone(const AppExecFwk::InnerEvent::Pointer &event)
     }
     if (fd->exception == nullptr) {
         std::string iccData = fd->resultData;
-        TELEPHONY_LOGI("IsimFile::ProcessEvent MSG_SIM_OBTAIN_ICCID_DONE result success");
+        TELEPHONY_LOGI("IsimFile::ProcessEvent MSG_SIM_OBTAIN_ICCID_DONE result success, slotId:%{public}d", slotId_);
+        if (!iccData.empty() && iccData.compare(iccId_) != 0) {
+            if (filesFetchedObser_ != nullptr) {
+                TELEPHONY_LOGI("slotId:%{public}d iccid loaded", slotId_);
+                iccidLoadObser_->NotifyObserver(RadioEvent::RADIO_SIM_ICCID_LOADED, slotId_);
+            }
+        }
         iccId_ = iccData;
     }
     return isFileProcessResponse;

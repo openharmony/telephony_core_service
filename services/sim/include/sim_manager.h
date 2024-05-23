@@ -37,11 +37,12 @@ public:
     virtual ~SimManager();
     // Init
     bool OnInit(int32_t slotCount) override;
-    void SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager) override;
+    int32_t InitTelExtraModule(int32_t slotId) override;
     // SimState
     int32_t HasSimCard(int32_t slotId, bool &hasSimCard) override;
     int32_t GetSimState(int32_t slotId, SimState &simState) override;
     int32_t GetCardType(int32_t slotId, CardType &cardType) override;
+    int32_t SetModemInit(int32_t slotId, bool state) override;
     int32_t UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response) override;
     int32_t UnlockPuk(
         int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response) override;
@@ -79,6 +80,7 @@ public:
     int32_t GetSimId(int32_t slotId) override;
     int32_t GetActiveSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList) override;
     int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) override;
+    int32_t UpdateOperatorConfigs(int32_t slotId) override;
     int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) override;
     int32_t SimAuthentication(
         int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response) override;
@@ -138,15 +140,18 @@ public:
     int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue) override;
     int32_t QueryImsSwitch(int32_t, int32_t &imsSwitchValue) override;
     int32_t RegisterSimAccountCallback(
-        const std::string &bundleName, const sptr<SimAccountCallback> &callback) override;
-    int32_t UnregisterSimAccountCallback(const std::string &bundleName) override;
+        const int32_t tokenId, const sptr<SimAccountCallback> &callback) override;
+    int32_t UnregisterSimAccountCallback(const int32_t tokenId) override;
 
 private:
     bool IsValidSlotId(int32_t slotId);
+    template<class N>
+    bool IsValidSlotId(int32_t slotId, std::vector<N> vec);
     bool IsValidAuthType(AuthType authType);
     bool IsValidSlotIdForDefault(int32_t slotId);
     void InitMultiSimObject();
     void InitSingleSimObject();
+    void InitBaseManager(int32_t slotId);
     bool HasSimCardInner(int32_t slotId);
 
 private:

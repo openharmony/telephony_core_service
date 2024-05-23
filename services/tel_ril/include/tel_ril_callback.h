@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,13 +16,13 @@
 #ifndef TEL_RIL_CALLBACK_H
 #define TEL_RIL_CALLBACK_H
 
-#include <v1_2/iril.h>
+#include <v1_3/iril.h>
 
 #include "tel_ril_manager.h"
 
 namespace OHOS {
 namespace Telephony {
-class TelRilCallback : public HDI::Ril::V1_2::IRilCallback {
+class TelRilCallback : public HDI::Ril::V1_3::IRilCallback {
 public:
     explicit TelRilCallback(std::shared_ptr<TelRilManager> telRilManager);
     ~TelRilCallback() = default;
@@ -115,6 +115,8 @@ public:
     int32_t SetRadioStateResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t GetRadioStateResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;
     int32_t GetImeiResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &imei) override;
+    int32_t GetImeiSvResponse(
+        const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &imeiSv) override;
     int32_t GetMeidResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &meid) override;
     int32_t GetVoiceRadioTechnologyResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::VoiceRadioTechnology &voiceRadioTechnology) override;
@@ -195,6 +197,8 @@ public:
         const HDI::Ril::V1_1::CellListCurrentInfo &cellListCurrentInfo) override;
     int32_t NetworkCurrentCellUpdated_1_1(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellListCurrentInfo) override;
+    int32_t NetworkCurrentCellUpdated_1_2(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_2::CellListCurrentInfo_1_2 &cellListCurrentInfo) override;
     int32_t ResidentNetworkUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const std::string &plmn) override;
     int32_t GetSignalStrengthResponse(
@@ -212,10 +216,14 @@ public:
     int32_t SetNetworkSelectionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t GetNeighboringCellInfoListResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CellListNearbyInfo &cellInfoList) override;
+    int32_t GetNeighboringCellInfoListResponse_1_2(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_2::CellListNearbyInfo_1_2 &cellInfoList) override;
     int32_t GetCurrentCellInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList) override;
     int32_t GetCurrentCellInfoResponse_1_1(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellListCurrentInfo) override;
+    int32_t GetCurrentCellInfoResponse_1_2(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_2::CellListCurrentInfo_1_2 &cellListCurrentInfo) override;
     int32_t SetPreferredNetworkResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t GetPreferredNetworkResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::PreferredNetworkTypeInfo &preferredNetworkTypeInfo) override;
@@ -230,6 +238,8 @@ public:
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t rrcConnectionState) override;
     int32_t GetRrcConnectionStateUpdated(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;
+    int32_t GetNrSsbIdResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_2::NrCellSsbIds &nrCellSsbIds) override;
 
     // Sms
     int32_t NewSmsNotify(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
@@ -296,11 +306,23 @@ private:
         return TaskSchedule(responseInfo.slotId, _func, _moduleFunc, std::forward<ParamTypes>(_args)...);
     }
 
+    inline int32_t GetMaxSimSlot() const
+    {
+        auto maxSimCount = SIM_SLOT_COUNT;
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_VSIM
+        if (SIM_SLOT_COUNT == DUAL_SLOT_COUNT) {
+            maxSimCount = MAX_SLOT_COUNT;
+        }
+#endif
+        return maxSimCount;
+    }
+
     template<typename FuncType, typename ModuleFuncType, typename... ParamTypes>
     inline int32_t TaskSchedule(
         int32_t slotId, FuncType &&_func, ModuleFuncType _moduleFunc, ParamTypes &&... _args) const
     {
-        if (slotId < SIM_SLOT_0 || slotId >= SIM_SLOT_COUNT) {
+        auto maxSimCount = GetMaxSimSlot();
+        if (slotId < SIM_SLOT_0 || slotId >= maxSimCount) {
             TELEPHONY_LOGE("slotId:%{public}d is inValid ", slotId);
             return TELEPHONY_ERR_ARGUMENT_INVALID;
         }

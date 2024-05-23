@@ -28,6 +28,8 @@ CoreServiceStub::CoreServiceStub()
     AddHandlerNetWorkToMap();
     AddHandlerSimToMap();
     AddHandlerSimToMapExt();
+    AddHandlerPdpProfileToMap();
+    AddHandlerOpkeyVersionToMap();
 }
 
 void CoreServiceStub::AddHandlerNetWorkToMap()
@@ -35,6 +37,8 @@ void CoreServiceStub::AddHandlerNetWorkToMap()
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_PS_RADIO_TECH)] = &CoreServiceStub::OnGetPsRadioTech;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CS_RADIO_TECH)] = &CoreServiceStub::OnGetCsRadioTech;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPERATOR_NUMERIC)] = &CoreServiceStub::OnGetOperatorNumeric;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_RESIDENT_NETWORK_NUMERIC)] =
+        &CoreServiceStub::OnGetResidentNetworkNumeric;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPERATOR_NAME)] = &CoreServiceStub::OnGetOperatorName;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIGNAL_INFO_LIST)] = &CoreServiceStub::OnGetSignalInfoList;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NETWORK_STATE)] = &CoreServiceStub::OnGetNetworkState;
@@ -49,6 +53,7 @@ void CoreServiceStub::AddHandlerNetWorkToMap()
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ISO_COUNTRY_CODE_FOR_NETWORK)] =
         &CoreServiceStub::OnGetIsoCountryCodeForNetwork;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMEI)] = &CoreServiceStub::OnGetImei;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMEISV)] = &CoreServiceStub::OnGetImeiSv;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_MEID)] = &CoreServiceStub::OnGetMeid;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_UNIQUE_DEVICE_ID)] = &CoreServiceStub::OnGetUniqueDeviceId;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMS_REG_STATUS)] = &CoreServiceStub::OnGetImsRegStatus;
@@ -70,6 +75,7 @@ void CoreServiceStub::AddHandlerNetWorkToMap()
         &CoreServiceStub::OnUnregisterImsRegInfoCallback;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_BASEBAND_VERSION)] = &CoreServiceStub::OnGetBasebandVersion;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::FACTORY_RESET)] = &CoreServiceStub::OnFactoryReset;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NR_SSB_ID_INFO)] = &CoreServiceStub::OnGetNrSsbIdInfo;
 }
 
 void CoreServiceStub::AddHandlerSimToMap()
@@ -156,6 +162,18 @@ void CoreServiceStub::AddHandlerSimToMapExt()
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_NR_SUPPORTED)] = &CoreServiceStub::OnIsNrSupported;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SLOTID)] = &CoreServiceStub::OnGetSlotId;
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SIMID)] = &CoreServiceStub::OnGetSimId;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::INIT_EXTRA_MODULE)] = &CoreServiceStub::OnInitExtraModule;
+}
+
+void CoreServiceStub::AddHandlerPdpProfileToMap()
+{
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_ALLOWED_INSERT_APN)] = &CoreServiceStub::OnIsAllowedInsertApn;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_TARGET_OPKEY)] = &CoreServiceStub::OnGetTargetOpkey;
+}
+
+void CoreServiceStub::AddHandlerOpkeyVersionToMap()
+{
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPKEY_VERSION)] = &CoreServiceStub::OnGetOpkeyVersion;
 }
 
 int32_t CoreServiceStub::OnRemoteRequest(
@@ -207,6 +225,14 @@ int32_t CoreServiceStub::OnGetOperatorNumeric(MessageParcel &data, MessageParcel
     auto slotId = data.ReadInt32();
     std::u16string result = GetOperatorNumeric(slotId);
     reply.WriteString16(result);
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetResidentNetworkNumeric(MessageParcel &data, MessageParcel &reply)
+{
+    auto slotId = data.ReadInt32();
+    std::string result = GetResidentNetworkNumeric(slotId);
+    reply.WriteString(result);
     return NO_ERROR;
 }
 
@@ -330,6 +356,25 @@ int32_t CoreServiceStub::OnGetImei(MessageParcel &data, MessageParcel &reply)
     }
     if (!reply.WriteString16(imei)) {
         TELEPHONY_LOGE("OnRemoteRequest::OnGetImei write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnGetImeiSv(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string imeiSv = u"";
+    int32_t result = GetImeiSv(slotId, imeiSv);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetImeiSv write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteString16(imeiSv)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetImeiSv write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return result;
@@ -1557,10 +1602,11 @@ int32_t CoreServiceStub::OnGetCellInfoList(MessageParcel &data, MessageParcel &r
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     if (result != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetCellInfoList failed, result:%{public}d, cell size:%{public}zu", result,
+            cellInfo.size());
         return result;
     }
     reply.WriteInt32(static_cast<int32_t>(cellInfo.size()));
-    TELEPHONY_LOGI("OnRemoteRequest OnGetCellInfoList cell size %{public}zu", cellInfo.size());
     for (const auto &v : cellInfo) {
         v->Marshalling(reply);
     }
@@ -1653,12 +1699,88 @@ int32_t CoreServiceStub::OnGetBasebandVersion(MessageParcel &data, MessageParcel
     return result;
 }
 
+int32_t CoreServiceStub::OnGetNrSsbIdInfo(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::shared_ptr<NrSsbInformation> nrSsbInformation = std::make_shared<NrSsbInformation>();
+    if (nrSsbInformation == nullptr) {
+        TELEPHONY_LOGE("nrSsbInformation is null.");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t result = GetNrSsbIdInfo(slotId, nrSsbInformation);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("Write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!nrSsbInformation->Marshalling(reply)) {
+        TELEPHONY_LOGE("Marshalling is failed.");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    return result;
+}
+
 int32_t CoreServiceStub::OnFactoryReset(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
     int32_t result = FactoryReset(slotId);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("Write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnInitExtraModule(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t result = InitExtraModule(slotId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("Write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnIsAllowedInsertApn(MessageParcel &data, MessageParcel &reply)
+{
+    std::string value = data.ReadString();
+    bool result = IsAllowedInsertApn(value);
+    if (!reply.WriteBool(result)) {
+        TELEPHONY_LOGE("Write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t CoreServiceStub::OnGetTargetOpkey(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string opkey;
+    int32_t result = GetTargetOpkey(slotId, opkey);
+    if (!reply.WriteString16(opkey)) {
+        TELEPHONY_LOGE("Write reply opkey failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("Write reply result failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply)
+{
+    std::string versionInfo;
+    int32_t result = GetOpkeyVersion(versionInfo);
+    if (!reply.WriteString(versionInfo)) {
+        TELEPHONY_LOGE("Write versionInfo result failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("Write reply result failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return result;

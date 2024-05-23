@@ -42,6 +42,8 @@ namespace OHOS {
 namespace Telephony {
 static const std::string OPKEY_URI = "datashare:///com.ohos.opkeyability";
 const std::string OPKEY_INFO_URI = "datashare:///com.ohos.opkeyability/opkey/opkey_info";
+const std::string OPKEY_INIT_URI = "datashare:///com.ohos.opkeyability/opkey/opkey_init";
+const std::string SIM_INFO_URI = "datashare:///com.ohos.simability/sim/sim_info";
 
 class OperatorConfigLoader {
 public:
@@ -49,12 +51,15 @@ public:
         std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache);
     virtual ~OperatorConfigLoader();
     OperatorConfig LoadOperatorConfig(int32_t slotId);
+    int InitOpKeyData();
 
 private:
     std::string LoadOpKeyOnMccMnc(int32_t slotId);
     std::shared_ptr<DataShare::DataShareHelper> CreateOpKeyHelper() const;
+    std::shared_ptr<DataShare::DataShareHelper> CreateSimHelper() const;
     std::string GetOpKey(std::shared_ptr<DataShare::DataShareResultSet> resultSet, int32_t slotId);
     bool MatchOperatorRule(std::shared_ptr<DataShare::DataShareResultSet> &resultSet, int row);
+    int InsertOpkeyToSimDb(std::string opKeyVal);
 
 private:
     std::weak_ptr<SimFileManager> simFileManager_;

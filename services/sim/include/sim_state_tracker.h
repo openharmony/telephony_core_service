@@ -31,16 +31,19 @@ namespace Telephony {
 using namespace OHOS::EventFwk;
 using CommonEventSubscribeInfo = OHOS::EventFwk::CommonEventSubscribeInfo;
 using CommonEventSubscriber = OHOS::EventFwk::CommonEventSubscriber;
-class SimStateTracker : public AppExecFwk::EventHandler {
+class SimStateTracker : public TelEventHandler {
 public:
-    SimStateTracker(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache,
-        int32_t slotId);
+    SimStateTracker(std::weak_ptr<SimFileManager> simFileManager,
+        std::shared_ptr<OperatorConfigCache> operatorConfigCache, int32_t slotId);
     ~SimStateTracker();
     void InitListener();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     bool RegisterForIccLoaded();
+    bool RegisterOpkeyLoaded();
+    bool RegisterOperatorCacheDel();
     bool UnRegisterForIccLoaded();
+    bool UnRegisterOpkeyLoaded();
+    bool UnregisterOperatorCacheDel();
 
     std::shared_ptr<OperatorConfigLoader> operatorConfigLoader_ = nullptr;
 
@@ -51,6 +54,9 @@ private:
     std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
     int32_t slotId_;
     OperatorConfig config_;
+    void ProcessSimRecordLoad(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessSimOpkeyLoad(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessOperatorCacheDel(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     class UserSwitchEventSubscriber : public CommonEventSubscriber {
@@ -77,6 +83,7 @@ private:
         const int32_t slotId_;
         std::shared_ptr<OperatorConfigLoader> configLoader_ = nullptr;
         std::shared_ptr<UserSwitchEventSubscriber> userSwitchSubscriber_ = nullptr;
+        bool isUserSwitchSubscribered = false;
     };
 };
 } // namespace Telephony

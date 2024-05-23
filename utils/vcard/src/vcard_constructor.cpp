@@ -248,7 +248,6 @@ int32_t VCardConstructor::ConstructName(std::shared_ptr<VCardContact> contact)
         result_ << ITEM_SEPARATOR;
         result_ << ITEM_SEPARATOR;
         result_ << ITEM_SEPARATOR;
-        result_ << ITEM_SEPARATOR;
         result_ << END_OF_LINE;
         AddSinglePartNameField(VCARD_TYPE_FN, displayName);
         result_ << END_OF_LINE;
@@ -312,6 +311,10 @@ void VCardConstructor::AddSinglePartNameField(std::string property, std::string 
     std::string encodedPart = needQuotedPrintable ? EncodeQuotedPrintable(part) : DealCharacters(part);
     result_ << property;
     AddCharsetOrQuotedPrintable(IsNeedCharsetParam({ part }), needQuotedPrintable);
+    if (property == VCARD_TYPE_N) {
+        result_ << DATA_SEPARATOR << ITEM_SEPARATOR << encodedPart;
+        return;
+    }
     result_ << DATA_SEPARATOR << encodedPart;
 }
 
@@ -539,6 +542,10 @@ void VCardConstructor::AddPostalLine(
 void VCardConstructor::ConstructPostalLine(std::shared_ptr<VCardPostalData> postalData, std::stringstream &postalLine,
     bool &needCharset, bool &needAddQuotedPrintable)
 {
+    if (postalData == nullptr) {
+        TELEPHONY_LOGI("postalData is nullptr!");
+        return;
+    }
     std::string poBox = postalData->GetPOBox();
     std::string street = postalData->GetStreet();
     std::string city = postalData->GetCity();
@@ -721,6 +728,9 @@ void VCardConstructor::AddTelLine(const std::string &labelId, const std::string 
             paramTypes.push_back("X-" + labelName);
             AddParamTypes(paramTypes);
         }
+    } else if (labelId.empty()) {
+        paramTypes.push_back(VCARD_PARAM_TYPE_CELL);
+        AddParamTypes(paramTypes);
     }
     result_ << DATA_SEPARATOR << number;
     result_ << END_OF_LINE;
@@ -973,10 +983,8 @@ void VCardConstructor::AddParamType(const std::string &paramType)
 
 void VCardConstructor::AddParamType(std::stringstream &result, const std::string &paramType)
 {
-    if (VCardConfiguration::IsVer40(cardType_) || VCardConfiguration::IsVer30(cardType_)) {
-        result << VCARD_PARAM_TYPE;
-        result << PARAM_EQUAL;
-    }
+    result << VCARD_PARAM_TYPE;
+    result << PARAM_EQUAL;
     result << paramType;
 }
 

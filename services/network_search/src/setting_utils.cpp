@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ const std::string SettingUtils::NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI =
 const std::string SettingUtils::NETWORK_SEARCH_SETTING_PREFERRED_NETWORK_MODE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=preferred_network_mode";
 
-const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIME = "settings.telephony.autotime";
+const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIME = "auto_time";
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIMEZONE = "auto_timezone";
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE = "settings.telephony.airplanemode";
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE =
@@ -184,6 +184,19 @@ void AutoTimeObserver::OnChange()
     TELEPHONY_LOGI("AutoTimeObserver::OnChange");
     if (networkSearchHandler_ != nullptr) {
         InnerEvent::Pointer event = InnerEvent::Get(SettingEventCode::MSG_AUTO_TIME);
+        networkSearchHandler_->SendEvent(event);
+    }
+}
+
+AutoTimezoneObserver::AutoTimezoneObserver(std::shared_ptr<NetworkSearchHandler> &networkSearchHandler)
+    : networkSearchHandler_(networkSearchHandler)
+{}
+
+void AutoTimezoneObserver::OnChange()
+{
+    TELEPHONY_LOGI("AutoTimezoneObserver::OnChange");
+    if (networkSearchHandler_ != nullptr) {
+        InnerEvent::Pointer event = InnerEvent::Get(SettingEventCode::MSG_AUTO_TIMEZONE);
         networkSearchHandler_->SendEvent(event);
     }
 }

@@ -15,13 +15,10 @@
 
 #include "icc_dialling_numbers_cache.h"
 
-#include "runner_pool.h"
-
 namespace OHOS {
 namespace Telephony {
-IccDiallingNumbersCache::IccDiallingNumbersCache(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimFileManager> simFileManager)
-    : AppExecFwk::EventHandler(runner), simFileManager_(simFileManager)
+IccDiallingNumbersCache::IccDiallingNumbersCache(std::shared_ptr<SimFileManager> simFileManager)
+    : TelEventHandler("IccDiallingNumbersCache"), simFileManager_(simFileManager)
 {
     InitFileTypeMap();
 }
@@ -44,12 +41,7 @@ void IccDiallingNumbersCache::Init()
         return;
     }
 
-    std::shared_ptr<AppExecFwk::EventRunner> loaderLoop = RunnerPool::GetInstance().GetCommonRunner();
-    if (loaderLoop.get() == nullptr) {
-        TELEPHONY_LOGE("IccDiallingNumbersCache failed to create usimpdiallingnumbers loop");
-        return;
-    }
-    usimDiallingNumberSrv_ = std::make_shared<UsimDiallingNumbersService>(loaderLoop);
+    usimDiallingNumberSrv_ = std::make_shared<UsimDiallingNumbersService>();
     if (usimDiallingNumberSrv_ == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersCache failed to create usimpdiallingnumbers.");
         return;
@@ -148,13 +140,13 @@ void IccDiallingNumbersCache::ProcessChangeDiallingNumbersDone(const AppExecFwk:
         if (fd->exception == nullptr) {
             diallingNumberFileList_.at(fileId)->at(index - 1) = diallingNumber;
         } else {
-            std::shared_ptr<HRilRadioResponseInfo> responseInfo =
-                std::static_pointer_cast<HRilRadioResponseInfo>(fd->exception);
+            std::shared_ptr<RadioResponseInfo> responseInfo =
+                std::static_pointer_cast<RadioResponseInfo>(fd->exception);
             if (responseInfo == nullptr) {
                 TELEPHONY_LOGE("responseInfo is nullptr");
                 return;
             }
-            if (responseInfo->error == HRilErrType::NONE) {
+            if (responseInfo->error == ErrType::NONE) {
                 diallingNumberFileList_.at(fileId)->at(index - 1) = diallingNumber;
             }
         }
@@ -301,8 +293,8 @@ void IccDiallingNumbersCache::ObtainAllDiallingNumberFiles(
 void IccDiallingNumbersCache::SendExceptionResult(const AppExecFwk::InnerEvent::Pointer &caller, int errCode)
 {
     std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList = nullptr;
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = std::make_shared<HRilRadioResponseInfo>();
-    responseInfo->error = static_cast<Telephony::HRilErrType>(errCode);
+    std::shared_ptr<RadioResponseInfo> responseInfo = std::make_shared<RadioResponseInfo>();
+    responseInfo->error = static_cast<Telephony::ErrType>(errCode);
     std::shared_ptr<void> exception = static_cast<std::shared_ptr<void>>(responseInfo);
     SendBackResult(caller, diallingNumberList, exception);
 }
@@ -322,7 +314,7 @@ void IccDiallingNumbersCache::SendBackResult(const AppExecFwk::InnerEvent::Point
     data->result = static_cast<std::shared_ptr<void>>(ar);
     data->exception = object;
     if (owner != nullptr) {
-        owner->SendEvent(id, data);
+        TelEventHandler::SendTelEvent(owner, id, data);
     } else {
         TELEPHONY_LOGE("IccDiallingNumbersCache::SendBackResult null owner");
     }

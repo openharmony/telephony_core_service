@@ -17,12 +17,12 @@
 
 #include "core_manager_inner.h"
 #include "core_service_dump_helper.h"
+#include "ffrt_inner.h"
 #include "ims_core_service_client.h"
 #include "ipc_skeleton.h"
 #include "network_search_manager.h"
 #include "network_search_types.h"
 #include "parameter.h"
-#include "runner_pool.h"
 #include "sim_manager.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
@@ -36,6 +36,7 @@ namespace OHOS {
 namespace Telephony {
 namespace {
 const int32_t MAX_IPC_THREAD_NUM = 6;
+const int32_t MAX_FFRT_THREAD_NUM = 16;
 }
 const bool G_REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<CoreService>::GetInstance().get());
@@ -62,8 +63,11 @@ void CoreService::OnStart()
         }
         registerToService_ = true;
     }
-    RunnerPool::GetInstance().Init();
     IPCSkeleton::SetMaxWorkThreadNum(MAX_IPC_THREAD_NUM);
+    int ffrtRet = ffrt_set_cpu_worker_max_num(ffrt::qos_default, MAX_FFRT_THREAD_NUM);
+    if (ffrtRet == -1) {
+        TELEPHONY_LOGE("ffrt_set_cpu_worker_max_num fail");
+    }
     if (!Init()) {
         TELEPHONY_LOGE("failed to init CoreService");
         return;
@@ -106,8 +110,10 @@ bool CoreService::Init()
             return false;
         }
     }
-    simManager_->SetNetworkSearchManager(networkSearchManager_);
     CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+        networkSearchManager_->InitAirplaneMode(slotId);
+    }
     TELEPHONY_LOGI("CoreService::Init success");
     return true;
 }
@@ -191,6 +197,15 @@ std::u16string CoreService::GetOperatorNumeric(int32_t slotId)
     return networkSearchManager_->GetOperatorNumeric(slotId);
 }
 
+std::string CoreService::GetResidentNetworkNumeric(int32_t slotId)
+{
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return "";
+    }
+    return networkSearchManager_->GetResidentNetworkNumeric(slotId);
+}
+
 int32_t CoreService::GetOperatorName(int32_t slotId, std::u16string &operatorName)
 {
     if (networkSearchManager_ == nullptr) {
@@ -268,6 +283,23 @@ int32_t CoreService::GetImei(int32_t slotId, std::u16string &imei)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return networkSearchManager_->GetImei(slotId, imei);
+}
+
+int32_t CoreService::GetImeiSv(int32_t slotId, std::u16string &imeiSv)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->GetImeiSv(slotId, imeiSv);
 }
 
 int32_t CoreService::GetMeid(int32_t slotId, std::u16string &meid)
@@ -1454,7 +1486,7 @@ int32_t CoreService::RegisterImsRegInfoCallback(
         TELEPHONY_LOGE("failed! network search manager is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return networkSearchManager_->RegisterImsRegInfoCallback(slotId, imsSrvType, GetBundleName(), callback);
+    return networkSearchManager_->RegisterImsRegInfoCallback(slotId, imsSrvType, GetTokenID(), callback);
 }
 
 int32_t CoreService::UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType)
@@ -1471,7 +1503,7 @@ int32_t CoreService::UnregisterImsRegInfoCallback(int32_t slotId, ImsServiceType
         TELEPHONY_LOGE("failed! network search manager is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return networkSearchManager_->UnregisterImsRegInfoCallback(slotId, imsSrvType, GetBundleName());
+    return networkSearchManager_->UnregisterImsRegInfoCallback(slotId, imsSrvType, GetTokenID());
 }
 
 int32_t CoreService::GetBasebandVersion(int32_t slotId, std::string &version)
@@ -1506,6 +1538,15 @@ int32_t CoreService::FactoryReset(int32_t slotId)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return networkSearchManager_->FactoryReset(slotId);
+}
+
+int32_t CoreService::InitExtraModule(int32_t slotId)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    return CoreManagerInner::GetInstance().InitExtraModule(slotId);
 }
 
 int32_t CoreService::Dump(std::int32_t fd, const std::vector<std::u16string> &args)
@@ -1547,6 +1588,48 @@ int64_t CoreService::GetEndTime()
 int64_t CoreService::GetSpendTime()
 {
     return endTime_ - bindTime_;
+}
+
+int32_t CoreService::GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::CELL_LOCATION)) {
+        TELEPHONY_LOGE("Do not support Permission::CELL_LOCATION");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->GetNrSsbId(slotId, nrSsbInformation);
+}
+
+bool CoreService::IsAllowedInsertApn(std::string &value)
+{
+    if (TELEPHONY_EXT_WRAPPER.isAllowedInsertApn_ != nullptr) {
+        return TELEPHONY_EXT_WRAPPER.isAllowedInsertApn_(value);
+    }
+    return true;
+}
+
+int32_t CoreService::GetTargetOpkey(int32_t slotId, std::u16string &opkey)
+{
+    if (TELEPHONY_EXT_WRAPPER.getTargetOpkey_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.getTargetOpkey_(slotId, opkey);
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t CoreService::GetOpkeyVersion(std::string &versionInfo)
+{
+    if (TELEPHONY_EXT_WRAPPER.getOpkeyVersion_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.getOpkeyVersion_(versionInfo);
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 } // namespace Telephony
 } // namespace OHOS

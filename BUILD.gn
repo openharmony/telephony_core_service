@@ -1,4 +1,4 @@
-# Copyright (C) 2021-2023 Huawei Device Co., Ltd.
+# Copyright (C) 2021-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -18,6 +18,8 @@ TELEPHONY_NETWORK_SEARCH_ROOT = "services/network_search"
 TELEPHONY_SIM_ROOT = "services/sim"
 TELEPHONY_TEL_RIL_ROOT = "services/tel_ril"
 TELEPHONY_IMS_CORE_SERVICE_SRC_PATH = "services/ims_service_interaction/src"
+TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH =
+    "services/satellite_service_interaction/src"
 TELEPHONY_EXT_WRAPPER_ROOT = "services/telephony_ext_wrapper"
 
 ohos_shared_library("tel_core_service") {
@@ -48,15 +50,17 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_type.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_utils.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/nitz_update.cpp",
+    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/nr_ssb_info.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/operator_name.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/operator_name_utils.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/radio_info.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/setting_utils.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/signal_info.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/time_zone_location_suggester.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/time_zone_location_update.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/time_zone_manager.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/time_zone_updater.cpp",
+    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback.cpp",
+    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback_stub.cpp",
+    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_service_client.cpp",
+    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_service_proxy.cpp",
+    "$TELEPHONY_SIM_ROOT/src/base_data_helper.cpp",
     "$TELEPHONY_SIM_ROOT/src/csim_file_controller.cpp",
     "$TELEPHONY_SIM_ROOT/src/icc_dialling_numbers_cache.cpp",
     "$TELEPHONY_SIM_ROOT/src/icc_dialling_numbers_handler.cpp",
@@ -75,6 +79,7 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_SIM_ROOT/src/operator_config_loader.cpp",
     "$TELEPHONY_SIM_ROOT/src/operator_file_parser.cpp",
     "$TELEPHONY_SIM_ROOT/src/operator_matching_rule.cpp",
+    "$TELEPHONY_SIM_ROOT/src/pdp_profile_rdb_helper.cpp",
     "$TELEPHONY_SIM_ROOT/src/plmn_file.cpp",
     "$TELEPHONY_SIM_ROOT/src/radio_protocol_controller.cpp",
     "$TELEPHONY_SIM_ROOT/src/ruim_file.cpp",
@@ -114,7 +119,6 @@ ohos_shared_library("tel_core_service") {
     "services/core/src/core_service_dump_helper.cpp",
     "services/core/src/core_service_hisysevent.cpp",
     "services/core/src/core_service_stub.cpp",
-    "services/core/src/runner_pool.cpp",
   ]
 
   include_dirs = [
@@ -123,6 +127,7 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_NETWORK_SEARCH_ROOT/include",
     "$TELEPHONY_EXT_WRAPPER_ROOT/include",
     "services/core/include",
+    "services/satellite_service_interaction/include",
     "utils/log/include",
   ]
 
@@ -139,7 +144,6 @@ ohos_shared_library("tel_core_service") {
   deps = [
     "interfaces/innerkits:tel_core_service_api",
     "utils:libtel_common",
-    "//third_party/jsoncpp:jsoncpp",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
     "//third_party/libpng:libpng",
     "//third_party/libxml2:libxml2",
@@ -154,15 +158,19 @@ ohos_shared_library("tel_core_service") {
     "ability_runtime:data_ability_helper",
     "ability_runtime:dataobs_manager",
     "ability_runtime:wantagent_innerkits",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
-    "drivers_interface_ril:hril_innerkits",
     "drivers_interface_ril:libril_proxy_1.1",
     "drivers_interface_ril:libril_proxy_1.2",
+    "drivers_interface_ril:libril_proxy_1.3",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "hdf_core:libhdi",
     "hdf_core:libpub_utils",
     "hilog:libhilog",
@@ -177,6 +185,7 @@ ohos_shared_library("tel_core_service") {
     "samgr:samgr_proxy",
     "telephony_data:tel_telephony_data",
     "time_service:time_client",
+    "huks:libhukssdk",
   ]
 
   if (defined(global_parts_info) &&

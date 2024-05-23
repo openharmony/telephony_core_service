@@ -25,6 +25,7 @@
 #include "napi_util.h"
 #include "sim_file.h"
 #include "system_ability_definition.h"
+#include "tel_event_handler.h"
 #include "unistd.h"
 
 using namespace OHOS::Telephony;
@@ -32,7 +33,6 @@ namespace OHOS {
 static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t TYPE_NUM = 2;
-constexpr int32_t SLEEP_TIME_SECONDS = 10;
 constexpr int32_t SIM_AUTH_EAP_SIM_TYPE = 128;
 constexpr int32_t SIM_AUTH_EAP_AKA_TYPE = 129;
 bool g_flag = false;
@@ -40,12 +40,7 @@ bool g_flag = false;
 bool IsServiceInited()
 {
     if (!g_isInited) {
-        auto onStart = [] { DelayedSingleton<CoreService>::GetInstance()->OnStart(); };
-        std::thread startThread(onStart);
-        pthread_setname_np(startThread.native_handle(), "simauthentication_fuzzer");
-        startThread.join();
-
-        sleep(SLEEP_TIME_SECONDS);
+        DelayedSingleton<CoreService>::GetInstance()->OnStart();
         if (DelayedSingleton<CoreService>::GetInstance()->GetServiceRunningState() ==
             static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
             g_isInited = true;
@@ -150,8 +145,7 @@ void ParseOpl5g(const uint8_t *data, size_t size)
 
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoopRecord = AppExecFwk::EventRunner::Create("SimFile");
-    std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(eventLoopRecord, simStateManager);
+    std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(simStateManager);
     std::string fileData(reinterpret_cast<const char *>(data), size);
     std::vector<std::string> records;
     records.push_back(fileData);
@@ -170,6 +164,11 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     QueryIccDiallingNumbers(data, size);
     SimAuthentication(data, size);
     ParseOpl5g(data, size);
+    auto telRilManager = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
+    if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
+        return;
+    }
+    telRilManager->handler_->ClearFfrt(true);
     return;
 }
 } // namespace OHOS
@@ -180,5 +179,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::AddCoreServiceTokenFuzzer token;
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::DelayedSingleton<CoreService>::DestroyInstance();
     return 0;
 }

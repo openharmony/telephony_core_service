@@ -69,6 +69,9 @@ const int32_t INPUT_GET_NETWORK_CAPABILITY = 31;
 const int32_t INPUT_SET_NETWORK_CAPABILITY = 32;
 const int32_t INPUT_SET_NR_OPTION_MODE = 33;
 const int32_t INPUT_FACTORY_RESET = 34;
+const int32_t INPUT_GET_NR_SSBID = 35;
+const int32_t INPUT_GET_RESIDENT_NETWORK_NUMERIC = 36;
+const int32_t INPUT_GET_IMEISV = 37;
 const int32_t INPUT_INIT_TIME = 99;
 const int32_t INPUT_QUIT = 100;
 const int32_t SLEEP_TIME = 5;
@@ -159,6 +162,12 @@ void TestGetOperatorNumeric()
     std::u16string result = g_telephonyService->GetOperatorNumeric(InputSlotId());
     std::string str = Str16ToStr8(result);
     TELEPHONY_LOGI("TelephonyTestService Remote GetOperatorNumeric result:%{public}s", str.c_str());
+}
+
+void TestGetResidentNetworkNumeric()
+{
+    std::string result = g_telephonyService->GetResidentNetworkNumeric(InputSlotId());
+    TELEPHONY_LOGI("TelephonyTestService Remote GetResidentNetworkNumeric result:%{public}s", result.c_str());
 }
 
 void TestGetOperatorName()
@@ -605,6 +614,22 @@ void TestGetImei()
     std::cout << "imei:" << str << std::endl;
 }
 
+void TestGetImeiSv()
+{
+    AccessToken token;
+    if (g_telephonyService == nullptr) {
+        std::cout << "TestGetImeiSv g_telephonyService is nullptr." << std::endl;
+        return;
+    }
+    std::u16string imeiSv = u"";
+    int32_t result = g_telephonyService->GetImeiSv(InputSlotId(), imeiSv);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        std::cout << "error:" << result << std::endl;
+    }
+    std::string str = Str16ToStr8(imeiSv);
+    std::cout << "imeiSv:" << str << std::endl;
+}
+
 void TestGetMeid()
 {
     AccessToken token;
@@ -693,6 +718,40 @@ void TestFactoryReset()
     }
 }
 
+void TestGetNrSsbId()
+{
+    AccessToken token;
+    if (g_telephonyService != nullptr) {
+        std::shared_ptr<NrSsbInformation> nrSsbInformation = std::make_shared<NrSsbInformation>();
+        if (nrSsbInformation == nullptr) {
+            TELEPHONY_LOGE("nrSsbInformation is null");
+        }
+        int32_t result = g_telephonyService->GetNrSsbIdInfo(InputSlotId(), nrSsbInformation);
+        TELEPHONY_LOGI("TelephonyTestService::GetNrSsbIdInfo result:%{public}d", result);
+        if (result != TELEPHONY_ERR_SUCCESS) {
+            return;
+        }
+        TELEPHONY_LOGI("Arfcn %{private}d, Pci %{private}d, Rsrp %{public}d, Sinr %{public}d,"
+            "TimeAdvance %{private}d, NbCellCount %{public}d",
+            nrSsbInformation->GetArfcn(), nrSsbInformation->GetPci(), nrSsbInformation->GetRsrp(),
+            nrSsbInformation->GetSinr(), nrSsbInformation->GetTimeAdvance(), nrSsbInformation->GetNbCellCount());
+        std::vector<SsbInfo> sCellSsbList;
+        nrSsbInformation->GetSCellSsbIdList(sCellSsbList);
+        for (auto &info : sCellSsbList) {
+            TELEPHONY_LOGI("Servicing Cell ssbId %{private}d, rsrp %{public}d", info.ssbId, info.rsrp);
+        }
+        std::vector<NeighboringCellSsbInformation> nbCellSsbList;
+        nrSsbInformation->GetNbCellSsbIdList(nbCellSsbList);
+        for (auto &info : nbCellSsbList) {
+            TELEPHONY_LOGI("Neighboring Cell pci %{private}d, arfcn %{private}d, rsrp %{public}d, sinr %{public}d",
+                info.pci, info.arfcn, info.rsrp, info.sinr);
+            for (auto &nb_info : info.ssbList) {
+                TELEPHONY_LOGI("Neighboring Cell ssbId %{private}d, rsrp %{public}d", nb_info.ssbId, nb_info.rsrp);
+            }
+        }
+    }
+}
+
 void Prompt()
 {
     printf("\n-----------start test remote api--------------\n"
@@ -729,6 +788,9 @@ void Prompt()
            "32:SetNetworkCapability\n"
            "33:SetNrOptionMode\n"
            "34:FactoryReset\n"
+           "35:GetNrSsbId\n"
+           "36:GetResidentNetworkNumeric\n"
+           "37:GetImeiSv\n"
            "99:InitTimeAndTimeZone\n"
            "100:exit \n");
 }
@@ -803,6 +865,9 @@ void Init()
     memberFuncMap_[INPUT_SET_NETWORK_CAPABILITY] = TestSetNetworkCapability;
     memberFuncMap_[INPUT_GET_NETWORK_CAPABILITY] = TestGetNetworkCapability;
     memberFuncMap_[INPUT_SET_NR_OPTION_MODE] = TestSetNrOptionMode;
+    memberFuncMap_[INPUT_GET_NR_SSBID] = TestGetNrSsbId;
+    memberFuncMap_[INPUT_GET_RESIDENT_NETWORK_NUMERIC] = TestGetResidentNetworkNumeric;
+    memberFuncMap_[INPUT_GET_IMEISV] = TestGetImeiSv;
     memberFuncMap_[INPUT_FACTORY_RESET] = TestFactoryReset;
 }
 

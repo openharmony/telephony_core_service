@@ -23,9 +23,8 @@ std::mutex SimSmsController::mtx_;
 constexpr static const int32_t WAIT_TIME_SECOND = 1;
 constexpr static const int32_t WAIT_TIME_TEN_SECOND = 10;
 
-SimSmsController::SimSmsController(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager)
-    : AppExecFwk::EventHandler(runner), stateManager_(simStateManager)
+SimSmsController::SimSmsController(std::shared_ptr<SimStateManager> simStateManager)
+    : TelEventHandler("SimSmsController"), stateManager_(simStateManager)
 {}
 
 void SimSmsController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -95,10 +94,10 @@ void SimSmsController::ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &
         return;
     }
     responseReady_ = true;
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
     if (responseInfo != nullptr) {
         TELEPHONY_LOGE("SimSmsController::ProcessUpdateDone error %{public}d", responseInfo->error);
-        responseReady_ = (responseInfo->error == HRilErrType::NONE);
+        responseReady_ = (responseInfo->error == ErrType::NONE);
     }
     TELEPHONY_LOGI("SimSmsController::ProcessUpdateDone: end");
     processWait_.notify_all();
@@ -111,10 +110,10 @@ void SimSmsController::ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &e
         return;
     }
     responseReady_ = true;
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
     if (responseInfo != nullptr) {
         TELEPHONY_LOGE("SimSmsController::ProcessWriteDone error %{public}d", responseInfo->error);
-        responseReady_ = (responseInfo->error == HRilErrType::NONE);
+        responseReady_ = (responseInfo->error == ErrType::NONE);
     }
     TELEPHONY_LOGI("SimSmsController::ProcessWriteDone: end");
     processWait_.notify_all();
@@ -127,10 +126,10 @@ void SimSmsController::ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &
         return;
     }
     responseReady_ = true;
-    std::shared_ptr<HRilRadioResponseInfo> responseInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
     if (responseInfo != nullptr) {
         TELEPHONY_LOGE("SimSmsController::ProcessDeleteDone error %{public}d", responseInfo->error);
-        responseReady_ = (responseInfo->error == HRilErrType::NONE);
+        responseReady_ = (responseInfo->error == ErrType::NONE);
     }
     TELEPHONY_LOGI("SimSmsController::ProcessDeleteDone: end");
     processWait_.notify_all();

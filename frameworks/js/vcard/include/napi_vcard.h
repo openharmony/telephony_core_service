@@ -23,7 +23,6 @@
 #include "base_context.h"
 #include "datashare_helper.h"
 #include "datashare_predicates.h"
-#include "datashare_predicates_proxy.h"
 #include "napi_base_context.h"
 #include "napi_vcard_type.h"
 #include "telephony_napi_common_error.h"

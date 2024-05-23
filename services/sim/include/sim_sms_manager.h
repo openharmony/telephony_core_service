@@ -45,7 +45,6 @@ protected:
     std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
     std::shared_ptr<SimStateManager> stateManager_ = nullptr;
     std::shared_ptr<SimSmsController> smsController_ = nullptr;
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoopSms_ = nullptr;
     HandleRunningState stateSms_ = HandleRunningState::STATE_NOT_START;
 };
 } // namespace Telephony

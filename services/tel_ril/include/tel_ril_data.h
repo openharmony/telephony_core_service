@@ -16,7 +16,7 @@
 #ifndef TEL_RIL_DATA_H
 #define TEL_RIL_DATA_H
 
-#include "hril_data_parcel.h"
+#include "tel_ril_data_parcel.h"
 #include "tel_ril_base.h"
 #include "telephony_types.h"
 
@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 class TelRilData : public TelRilBase {
 public:
-    TelRilData(int32_t slotId, sptr<HDI::Ril::V1_2::IRil> rilInterface,
+    TelRilData(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
         std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     ~TelRilData() = default;
 

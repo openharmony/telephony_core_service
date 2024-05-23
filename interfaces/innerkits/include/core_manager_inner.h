@@ -46,10 +46,11 @@ public:
     void UnRegisterCellularCallObject(const sptr<NetworkSearchCallBackBase> &callback);
     bool IsInitFinished(void);
     bool IsInitFinishedForTelRil(void);
+    int32_t InitExtraModule(int32_t slotId);
     int32_t GetDefaultSlotId(void);
     int32_t GetMaxSimCount(void);
-    int32_t RegisterSimAccountCallback(const std::string &bundleName, const sptr<SimAccountCallback> &callback);
-    int32_t UnregisterSimAccountCallback(const std::string &bundleName);
+    int32_t RegisterSimAccountCallback(const int32_t tokenId, const sptr<SimAccountCallback> &callback);
+    int32_t UnregisterSimAccountCallback(const int32_t tokenId);
 
     /******************** telRilManager start *******************/
     int32_t SetRadioState(
@@ -207,6 +208,7 @@ public:
     int32_t GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     int32_t GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode);
     int32_t GetImei(int32_t slotId, std::u16string &imei);
+    int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv);
     int32_t GetMeid(int32_t slotId, std::u16string &meid);
     int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId);
     PhoneType GetPhoneType(int32_t slotId);
@@ -222,11 +224,17 @@ public:
     int32_t UpdateRadioOn(int32_t slotId);
 
     bool IsNrSupported(int32_t slotId);
+    bool IsSatelliteEnabled();
     int32_t GetNrOptionMode(int32_t slotId, NrMode &mode);
     FrequencyType GetFrequencyType(int32_t slotId) const;
     NrState GetNrState(int32_t slotId) const;
     void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive);
     int32_t NotifyCallStatusToNetworkSearch(int32_t slotId, int32_t callStatus);
+    int32_t IsGsm(int32_t slotId, bool &isGsm);
+    int32_t IsCdma(int32_t slotId, bool &isCdma);
+    int32_t StartRadioOnState(int32_t slotId);
+    int32_t StartGetRilSignalIntensity(int32_t slotId);
+    int32_t ProcessSignalIntensity(int32_t slotId, const Rssi &signalIntensity);
     /******************** networkSearchManager end *******************/
     /******************** simManager start ***************************/
     int32_t ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum);
@@ -240,6 +248,7 @@ public:
     int32_t HasSimCard(int32_t slotId, bool &hasSimCard);
     int32_t GetSimState(int32_t slotId, SimState &simState);
     int32_t GetCardType(int32_t slotId, CardType &cardType);
+    int32_t SetModemInit(int32_t slotId, bool state);
     int32_t UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response);
     int32_t UnlockPuk(int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response);
     int32_t AlterPin(
@@ -256,6 +265,7 @@ public:
     int32_t GetShowName(int32_t slotId, std::u16string &showName);
     int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList);
     int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc);
+    int32_t UpdateOperatorConfigs();
     int32_t GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric);
     int32_t GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode);
     int32_t GetSimIccId(int32_t slotId, std::u16string &iccId);
@@ -314,6 +324,7 @@ private:
 
 private:
     bool isInitAllObj_ = false;
+    bool isInitExtraObj_ = false;
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
     std::shared_ptr<ISimManager> simManager_ = nullptr;
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;

@@ -31,6 +31,7 @@ ohos_fuzztest("UpdateSmsIccFuzzTest") {
     "$SUBSYSTEM_DIR/core_service/services/core/include",
     "$SUBSYSTEM_DIR/core_service/services/tel_ril/include",
     "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer",
+    "$SUBSYSTEM_DIR/core_service/utils/common/include",
   ]
 
   configs = [ "$SUBSYSTEM_DIR/core_service/utils:telephony_log_config" ]
@@ -53,7 +54,6 @@ ohos_fuzztest("UpdateSmsIccFuzzTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
-    "drivers_interface_ril:hril_innerkits",
     "drivers_interface_ril:libril_proxy_1.1",
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",

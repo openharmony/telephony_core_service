@@ -33,6 +33,7 @@ public:
 
     void Init(int32_t slotId);
     int32_t GetOperatorConfigs(int slotId, OperatorConfig &poc);
+    int32_t UpdateOperatorConfigs(int32_t slotId);
     int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges);
 
 private:
@@ -46,8 +47,6 @@ private:
     std::shared_ptr<SimStateTracker> simStateTracker_ = nullptr;
     std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
     std::shared_ptr<IccOperatorPrivilegeController> privilegeController_ = nullptr;
-    std::shared_ptr<AppExecFwk::EventRunner> operatorConfigCacheRunner_;
-    std::shared_ptr<AppExecFwk::EventRunner> simStateTrackerRunner_;
     std::shared_ptr<AppExecFwk::EventRunner> privilegesRunner_;
 };
 } // namespace Telephony

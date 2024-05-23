@@ -1,0 +1,53 @@
+# Copyright (C) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+CORE_SERVICE_PATH = "../../.."
+
+ohos_executable("tel_core_service_ui_test") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+  install_enable = true
+  sources = [
+    "ims_reg_info_callback_gtest.cpp",
+    "ui_client_test.cpp",
+  ]
+
+  deps = [ "${CORE_SERVICE_PATH}/interfaces/innerkits:tel_core_service_api" ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:abilitykit_native",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "cellular_data:tel_cellular_data_api",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+    "state_registry:tel_state_registry_api",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceUiTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+
+  part_name = "core_service"
+  subsystem_name = "telephony"
+}

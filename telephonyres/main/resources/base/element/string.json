@@ -241,6 +241,14 @@
             "value": "IMSI unavailable, please insert a valid SIM card"
         },
         {
+            "name": "call_failed_imsiSv_unknow",
+            "value": "IMEISV unkown, please insert a valid SIM card"
+        },
+        {
+            "name": "call_failed_imeiSv_not_accepted",
+            "value": "IMSISV unavailable, please insert a valid SIM card"
+        },
+        {
             "name": "call_failed_dial_modify_to_ussd",
             "value": "Call modified to USSD request"
         },

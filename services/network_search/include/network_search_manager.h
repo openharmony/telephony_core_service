@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,6 @@
 
 #include "device_state_handler.h"
 #include "device_state_observer.h"
-#include "event_handler.h"
 #include "i_network_search.h"
 #include "i_sim_manager.h"
 #include "i_tel_ril_manager.h"
@@ -56,18 +55,20 @@ struct NetworkSearchManagerInner {
     static const int64_t SERIAL_NUMBER_EXEMPT = 1100;
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
     std::shared_ptr<NetworkSearchHandler> networkSearchHandler_ = nullptr;
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoop_ = nullptr;
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     std::shared_ptr<DeviceStateHandler> deviceStateHandler_ = nullptr;
     std::shared_ptr<DeviceStateObserver> deviceStateObserver_ = nullptr;
     sptr<AutoTimeObserver> settingAutoTimeObserver_ = nullptr;
+    sptr<AutoTimezoneObserver> settingAutoTimezoneObserver_ = nullptr;
     sptr<AirplaneModeObserver> airplaneModeObserver_ = nullptr;
     HandleRunningState state_ = HandleRunningState::STATE_NOT_START;
     std::unique_ptr<NetworkSearchResult> networkSearchResult_ = nullptr;
     SelectionMode selection_ = SelectionMode::MODE_TYPE_UNKNOWN;
     ModemPowerState radioState_ = ModemPowerState::CORE_SERVICE_POWER_OFF;
     std::u16string imei_ = u"";
+    std::u16string imeiSv_ = u"";
     std::u16string meid_ = u"";
+    std::string residentNetworkNumeric_ = "";
     std::string basebandVersion_ = "";
     NrMode nrMode_ = NrMode::NR_MODE_UNKNOWN;
     int32_t rrcConnectionStatus_ = 0;
@@ -75,7 +76,7 @@ struct NetworkSearchManagerInner {
     std::mutex mutex_;
     bool isRadioFirstPowerOn_ = true;
     bool airplaneMode_ = false;
-    int32_t preferredNetworkValue_ = 0;
+    int32_t preferredNetworkValue_ = PREFERRED_NETWORK_TYPE;
     int64_t serialNum_ = SERIAL_NUMBER_DEFAULT;
     std::mutex msgNumMutex_;
     std::mutex serialNumMutex_;
@@ -104,9 +105,6 @@ struct NetworkSearchManagerInner {
             if (!RegisterDeviceStateObserver()) {
                 return false;
             }
-        }
-        if (eventLoop_ != nullptr) {
-            eventLoop_->Run();
         }
         state_ = HandleRunningState::STATE_RUNNING;
         return true;
@@ -152,6 +150,7 @@ public:
     virtual ~NetworkSearchManager();
 
     bool OnInit() override;
+    int32_t InitTelExtraModule(int32_t slotId) override;
     void SetRadioState(int32_t slotId, bool isOn, int32_t rst) override;
     int32_t SetRadioState(int32_t slotId, bool isOn, int32_t rst, NSCALLBACK &callback) override;
     int32_t GetRadioState(int32_t slotId) override;
@@ -176,6 +175,7 @@ public:
     int32_t SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback) override;
     int32_t GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode) override;
     int32_t GetImei(int32_t slotId, std::u16string &imei) override;
+    int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) override;
     int32_t GetPsRegState(int32_t slotId) override;
     int32_t GetCsRegState(int32_t slotId) override;
     int32_t GetPsRoamingState(int32_t slotId) override;
@@ -187,6 +187,7 @@ public:
     int32_t GetMeid(int32_t slotId, std::u16string &meid) override;
     int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) override;
     bool IsNrSupported(int32_t slotId) override;
+    bool IsSatelliteEnabled() override;
     FrequencyType GetFrequencyType(int32_t slotId) override;
     NrState GetNrState(int32_t slotId) override;
     void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive) override;
@@ -197,10 +198,10 @@ public:
     int32_t SetNrOptionMode(int32_t slotId, int32_t mode, NSCALLBACK &callback) override;
     int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) override;
     int32_t GetNrOptionMode(int32_t slotId, NSCALLBACK &callback) override;
-    int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName,
+    int32_t RegisterImsRegInfoCallback(int32_t slotId, ImsServiceType imsSrvType, const int32_t tokenId,
         const sptr<ImsRegInfoCallback> &callback) override;
     int32_t UnregisterImsRegInfoCallback(
-        int32_t slotId, ImsServiceType imsSrvType, const std::string &bundleName) override;
+        int32_t slotId, ImsServiceType imsSrvType, const int32_t tokenId) override;
     int32_t GetNetworkCapability(
         int32_t slotId, int32_t networkCapabilityType, int32_t &networkCapabilityState) override;
     int32_t SetNetworkCapability(
@@ -236,6 +237,7 @@ public:
     int32_t GetPreferredNetworkValue(int32_t slotId) const;
     void UpdatePhone(int32_t slotId, RadioTech csRadioTech, const RadioTech &psRadioTech);
     void SetImei(int32_t slotId, std::u16string imei);
+    void SetImeiSv(int32_t slotId, std::u16string imeiSv);
     void UpdateCellLocation(int32_t slotId, int32_t techType, int32_t cellId, int32_t lac);
     void SetMeid(int32_t slotId, std::u16string meid);
     void SetFrequencyType(int32_t slotId, FrequencyType type);
@@ -243,6 +245,7 @@ public:
     std::shared_ptr<NetworkSearchManagerInner> FindManagerInner(int32_t slotId);
     void SetLocateUpdate(int32_t slotId);
     int32_t GetAirplaneMode(bool &airplaneMode) override;
+    void InitAirplaneMode(int32_t slotId) override;
     int32_t ProcessNotifyStateChangeEvent(int32_t slotId);
     bool IsRadioFirstPowerOn(int32_t slotId);
     void SetRadioFirstPowerOn(int32_t slotId, bool isFirstPowerOn);
@@ -257,6 +260,14 @@ public:
     int32_t HandleRrcStateChanged(int32_t slotId, int32_t status);
     int32_t GetRrcConnectionState(int32_t slotId, int32_t &status) override;
     int32_t UpdateRrcConnectionState(int32_t slotId, int32_t &status);
+    int32_t GetNrSsbId(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation) override;
+    int32_t IsGsm(int32_t slotId, bool &isGsm) override;
+    int32_t IsCdma(int32_t slotId, bool &isCdma) override;
+    std::string GetResidentNetworkNumeric(int32_t slotId) override;
+    void SetResidentNetworkNumeric(int32_t slotId, std::string operatorNumeric);
+    int32_t ProcessSignalIntensity(int32_t slotId, const Rssi &signalIntensity) override;
+    int32_t StartRadioOnState(int32_t slotId) override;
+    int32_t StartGetRilSignalIntensity(int32_t slotId) override;
 
     inline void InitMsgNum(int32_t slotId)
     {
@@ -309,11 +320,17 @@ public:
         return simManager_;
     }
 
+public:
+    static std::mutex ctx_;
+    static bool ssbResponseReady_;
+    static std::condition_variable cv_;
+
 private:
     bool InitPointer(std::shared_ptr<NetworkSearchManagerInner> &inner, int32_t slotId);
     void ClearManagerInner();
     void AddManagerInner(int32_t slotId, const std::shared_ptr<NetworkSearchManagerInner> &inner);
     bool RemoveManagerInner(int32_t slotId);
+    int32_t InitModuleBySlotId(int32_t slotId);
     int32_t GetDelayNotifyTime();
     int32_t RevertLastTechnology(int32_t slotId);
     int32_t ConvertNetworkModeToCapabilityType(int32_t preferredNetwork);
@@ -322,7 +339,7 @@ private:
     struct ImsRegInfoCallbackRecord {
         int32_t slotId;
         ImsServiceType imsSrvType;
-        std::string bundleName;
+        int32_t tokenId = 0;
         sptr<ImsRegInfoCallback> imsCallback;
     };
 
@@ -334,6 +351,7 @@ private:
     std::map<int32_t, std::shared_ptr<NetworkSearchManagerInner>> mapManagerInner_;
     std::list<ImsRegInfoCallbackRecord> listImsRegInfoCallbackRecord_;
     std::mutex mutexInner_;
+    std::mutex mutexIms_;
     int32_t delayTime_ = 0;
 };
 } // namespace Telephony

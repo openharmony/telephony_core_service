@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,13 +18,15 @@
 #include <cinttypes>
 
 #include "core_service_hisysevent.h"
-#include "hril_modem_parcel.h"
+#include "enum_convert.h"
 #include "i_network_search_callback.h"
 #include "network_search_manager.h"
 #include "parameter.h"
 #include "resource_utils.h"
 #include "string_ex.h"
+#include "tel_ril_modem_parcel.h"
 #include "telephony_errors.h"
+#include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -104,14 +106,15 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
         return;
     }
     UpdateCellularCall(regStatus, CS_TYPE);
-    RadioTech tech = ConvertTechFromRil(static_cast<HRilRadioTech>(csRegStateResult->radioTechnology));
+    RadioTech tech = ConvertTechFromRil(static_cast<TelRilRadioTech>(csRegStateResult->radioTechnology));
     RoamingType roam = RoamingType::ROAMING_STATE_UNKNOWN;
     if (registrationStatus == RilRegister::REG_STATE_ROAMING) {
         roam = RoamingType::ROAMING_STATE_UNSPEC;
     }
     UpdateNetworkSearchState(regStatus, tech, roam, DomainType::DOMAIN_TYPE_CS);
-    TELEPHONY_LOGI("regStatus= %{public}d radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
-        registrationStatus, csRegStateResult->radioTechnology, roam, slotId_);
+    auto iter = rilRegisterStateMap_.find(static_cast<int32_t>(registrationStatus));
+    TELEPHONY_LOGI("regStatus= %{public}s(%{public}d) radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
+        iter->second.c_str(), registrationStatus, csRegStateResult->radioTechnology, roam, slotId_);
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
         TELEPHONY_LOGI("cs domain change, slotId:%{public}d", slotId_);
         networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
@@ -163,7 +166,7 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
         return;
     }
     UpdateCellularCall(regStatus, IMS_TYPE);
-    RadioTech tech = ConvertTechFromRil(static_cast<HRilRadioTech>(psRegStatusResult->radioTechnology));
+    RadioTech tech = ConvertTechFromRil(static_cast<TelRilRadioTech>(psRegStatusResult->radioTechnology));
     RoamingType roam = RoamingType::ROAMING_STATE_UNKNOWN;
     if (registrationStatus == RilRegister::REG_STATE_ROAMING) {
         roam = RoamingType::ROAMING_STATE_UNSPEC;
@@ -174,8 +177,9 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
     nrSupport_ = psRegStatusResult->isNrAvailable;
     UpdateNrState();
     UpdateCfgTech();
-    TELEPHONY_LOGI("regStatus= %{public}d radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
-        registrationStatus, psRegStatusResult->radioTechnology, roam, slotId_);
+    auto iter = rilRegisterStateMap_.find(static_cast<int32_t>(registrationStatus));
+    TELEPHONY_LOGI("regStatus= %{public}s(%{public}d) radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
+        iter->second.c_str(), registrationStatus, psRegStatusResult->radioTechnology, roam, slotId_);
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
         TELEPHONY_LOGI("ps domain change, slotId:%{public}d", slotId_);
         networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
@@ -325,26 +329,56 @@ void NetworkRegister::UpdateNrState()
     RadioTech rat = networkSearchState_->GetNetworkStatus()->GetPsRadioTech();
     if (rat == RadioTech::RADIO_TECHNOLOGY_NR) {
         nrState_ = NrState::NR_NSA_STATE_SA_ATTACHED;
-        networkSearchState_->SetNrState(nrState_);
-        return;
-    }
-    if (isNrSecondaryCell_) {
-        nrState_ = NrState::NR_NSA_STATE_DUAL_CONNECTED;
-        networkSearchState_->SetNrState(nrState_);
-        return;
-    }
-    if (endcSupport_) {
-        if (dcNrRestricted_) {
-            nrState_ = NrState::NR_STATE_NOT_SUPPORT;
-            networkSearchState_->SetNrState(nrState_);
-            return;
-        }
-        if (!dcNrRestricted_) {
-            nrState_ = NrState::NR_NSA_STATE_NO_DETECT;
-            networkSearchState_->SetNrState(nrState_);
-            return;
+    } else {
+        if (isNrSecondaryCell_) {
+            nrState_ = NrState::NR_NSA_STATE_DUAL_CONNECTED;
+        } else if (endcSupport_) {
+            if (dcNrRestricted_) {
+                nrState_ = NrState::NR_STATE_NOT_SUPPORT;
+            } else {
+                nrState_ = NrState::NR_NSA_STATE_NO_DETECT;
+            }
         }
     }
+    nrState_ = static_cast<NrState>(UpdateNsaState(static_cast<int32_t>(nrState_)));
+    networkSearchState_->SetNrState(nrState_);
+}
+
+int32_t NetworkRegister::UpdateNsaState(int32_t nsaState)
+{
+    int32_t newNsaState = nsaState;
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr || networkSearchState_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchState_ is nullptr, slotId:%{public}d", slotId_);
+        return newNsaState;
+    }
+    std::vector<sptr<CellInformation>> cellInfo;
+    networkSearchManager->GetCellInfoList(slotId_, cellInfo);
+    int32_t cellId = 0;
+    auto iter = cellInfo.begin();
+    while (iter != cellInfo.end()) {
+        if ((*iter)->GetNetworkType() == CellInformation::CellType::CELL_TYPE_LTE) {
+            cellId = (*iter)->GetCellId();
+            break;
+        }
+        iter++;
+    }
+    auto networkState = networkSearchState_->GetNetworkStatus();
+    if (networkState == nullptr) {
+        TELEPHONY_LOGE("networkState is nullptr, slotId:%{public}d", slotId_);
+        return newNsaState;
+    }
+    RegServiceState regState = networkState->GetRegStatus();
+    RadioTech psRegTech = networkState->GetPsRadioTech();
+    if (regState != RegServiceState::REG_STATE_IN_SERVICE ||
+        (psRegTech != RadioTech::RADIO_TECHNOLOGY_LTE && psRegTech != RadioTech::RADIO_TECHNOLOGY_LTE_CA)) {
+        return newNsaState;
+    }
+    if (TELEPHONY_EXT_WRAPPER.updateNsaStateExt_ != nullptr) {
+        newNsaState = TELEPHONY_EXT_WRAPPER.updateNsaStateExt_(
+            slotId_, cellId, nrSupport_, dcNrRestricted_, newNsaState);
+    }
+    return newNsaState;
 }
 
 void NetworkRegister::UpdateCfgTech()
@@ -354,10 +388,9 @@ void NetworkRegister::UpdateCfgTech()
         return;
     }
     RadioTech tech = networkSearchState_->GetNetworkStatus()->GetPsRadioTech();
-    TELEPHONY_LOGI("Before conversion, tech:%{public}d slotId:%{public}d", tech, slotId_);
+    TELEPHONY_LOGI("tech:%{public}d slotId:%{public}d", tech, slotId_);
     RadioTech cfgTech = GetTechnologyByNrConfig(tech);
     networkSearchState_->SetCfgTech(cfgTech);
-    TELEPHONY_LOGI("After conversion, cfgTech:%{public}d slotId:%{public}d", cfgTech, slotId_);
 }
 
 void NetworkRegister::ProcessRestrictedState(const AppExecFwk::InnerEvent::Pointer &event) const {}
@@ -387,30 +420,30 @@ RegServiceState NetworkRegister::GetRegServiceState() const
     return regStatusResult_;
 }
 
-RadioTech NetworkRegister::ConvertTechFromRil(HRilRadioTech code) const
+RadioTech NetworkRegister::ConvertTechFromRil(TelRilRadioTech code) const
 {
     switch (code) {
-        case HRilRadioTech::RADIO_TECHNOLOGY_GSM:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_GSM:
             return RadioTech::RADIO_TECHNOLOGY_GSM;
-        case HRilRadioTech::RADIO_TECHNOLOGY_1XRTT:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_1XRTT:
             return RadioTech::RADIO_TECHNOLOGY_1XRTT;
-        case HRilRadioTech::RADIO_TECHNOLOGY_HSPA:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_HSPA:
             return RadioTech::RADIO_TECHNOLOGY_HSPA;
-        case HRilRadioTech::RADIO_TECHNOLOGY_HSPAP:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_HSPAP:
             return RadioTech::RADIO_TECHNOLOGY_HSPAP;
-        case HRilRadioTech::RADIO_TECHNOLOGY_WCDMA:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_WCDMA:
             return RadioTech::RADIO_TECHNOLOGY_WCDMA;
-        case HRilRadioTech::RADIO_TECHNOLOGY_LTE:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_LTE:
             return RadioTech::RADIO_TECHNOLOGY_LTE;
-        case HRilRadioTech::RADIO_TECHNOLOGY_EVDO:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_EVDO:
             return RadioTech::RADIO_TECHNOLOGY_EVDO;
-        case HRilRadioTech::RADIO_TECHNOLOGY_EHRPD:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_EHRPD:
             return RadioTech::RADIO_TECHNOLOGY_EHRPD;
-        case HRilRadioTech::RADIO_TECHNOLOGY_TD_SCDMA:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_TD_SCDMA:
             return RadioTech::RADIO_TECHNOLOGY_TD_SCDMA;
-        case HRilRadioTech::RADIO_TECHNOLOGY_LTE_CA:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_LTE_CA:
             return RadioTech::RADIO_TECHNOLOGY_LTE_CA;
-        case HRilRadioTech::RADIO_TECHNOLOGY_NR:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_NR:
             return RadioTech::RADIO_TECHNOLOGY_NR;
         default:
             return RadioTech::RADIO_TECHNOLOGY_UNKNOWN;

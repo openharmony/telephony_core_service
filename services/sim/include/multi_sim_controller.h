@@ -18,7 +18,6 @@
 
 #include <list>
 
-#include "i_network_search.h"
 #include "if_system_ability_manager.h"
 #include "radio_protocol_controller.h"
 #include "sim_constant.h"
@@ -34,13 +33,14 @@ class MultiSimController {
 public:
     MultiSimController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
         std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
-        std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager,
-        const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+        std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager);
     virtual ~MultiSimController();
+
+    void AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
+        std::shared_ptr<Telephony::SimFileManager> simFileManager);
 
     void Init();
     bool InitData(int32_t slotId);
-    void SetNetworkSearchManager(std::shared_ptr<INetworkSearch> networkSearchManager);
     int32_t GetDefaultVoiceSlotId();
     int32_t SetDefaultVoiceSlotId(int32_t slotId);
     int32_t GetDefaultSmsSlotId();
@@ -52,6 +52,7 @@ public:
     int32_t SetPrimarySlotId(int32_t slotId);
     int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber);
     int32_t SetShowNumber(int32_t slotId, std::u16string Number, bool force = false);
+    int32_t SetShowNumberToDB(int32_t slotId, std::u16string Number);
     int32_t GetShowName(int32_t slotId, std::u16string &showName);
     int32_t SetShowName(int32_t slotId, std::u16string name, bool force = false);
     int32_t GetSimTelephoneNumber(int32_t slotId, std::u16string &telephoneNumber);
@@ -61,6 +62,7 @@ public:
     bool ForgetAllData();
     bool ForgetAllData(int32_t slotId);
     int32_t GetSlotId(int32_t simId);
+    int32_t GetSimId(int32_t slotId);
     int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue);
     int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue);
     bool GetListFromDataBase();
@@ -68,6 +70,11 @@ public:
     int32_t GetRadioProtocolTech(int32_t slotId);
     void GetRadioProtocol(int32_t slotId);
     bool InitShowName(int slotId);
+    void ReCheckPrimary();
+
+public:
+    int32_t unInitModemSlotId_ = INVALID_VALUE;
+    static constexpr const char *PHONE_NUMBER_PREF = "sim_number_";
 
 private:
     bool IsValidData(int32_t slotId);
@@ -80,7 +87,6 @@ private:
     void SortCache();
     void SavePrimarySlotIdInfo(int32_t slotId);
     void SaveDefaultCellularDataSlotIdInfo(int32_t slotId);
-    std::u16string GetIccId(int32_t slotId);
     bool AnnouncePrimarySimIdChanged(int32_t simId);
     bool AnnounceDefaultVoiceSimIdChanged(int32_t simId);
     bool AnnounceDefaultSmsSimIdChanged(int32_t simId);
@@ -89,6 +95,7 @@ private:
     bool RefreshActiveIccAccountInfoList();
     std::string EncryptIccId(const std::string iccid);
     void CheckIfNeedSwitchMainSlotId();
+    int32_t getDefaultMainSlotByIccId();
     bool IsValidSlotId(int32_t slotId);
     bool InitPrimary();
     bool IsAllCardsReady();
@@ -96,6 +103,12 @@ private:
     void SendMainCardBroadCast(int32_t slotId);
     void SendDefaultCellularDataBroadCast(int32_t slotId);
     void InitMainCardSlotId();
+    void PublishSetPrimaryEvent(bool setDone);
+    int32_t GetTargetDefaultSimId(int32_t slotId, int &simId);
+    size_t GetLocalCacheSize();
+    int32_t GetTargetSimId(int32_t slotId, int &simId);
+    int32_t GetTargetIccId(int32_t slotId, std::string &iccId);
+    bool IsAllModemInitDone();
 
 private:
     int32_t maxCount_ = 0;
@@ -108,7 +121,6 @@ private:
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
     std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;
-    std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
     IccAccountInfo iccAccountInfo_;
     std::vector<IccAccountInfo> iccAccountInfoList_;
     std::vector<SimRdbInfo> localCacheInfo_;

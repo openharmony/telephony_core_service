@@ -113,6 +113,7 @@ enum class DiffInterfaceId {
     TEST_GET_PREFERRED_NETWORK_TYPE,
     TEST_SET_PREFERRED_NETWORK_TYPE,
     TEST_GET_IMEI,
+    TEST_GET_IMEISV,
     TEST_GET_MEID,
     TEST_GET_RADIO_PROTOCOL,
     TEST_SET_RADIO_PROTOCOL,
@@ -130,6 +131,8 @@ enum class DiffInterfaceId {
     TEST_GET_RRC_CONNECTION_STATE,
     TEST_GET_NR_OPTION_MODE,
     TEST_SET_NR_OPTION_MODE,
+    TEST_GET_NR_SSBID_INFO,
+    TEST_GET_CELL_INFO_LIST_TYPE,
     TEST_EXIT,
 };
 
@@ -164,7 +167,7 @@ public:
         std::mutex callbackMutex_;
         std::condition_variable cv_;
         int32_t eventId_;
-        std::shared_ptr<HRilRadioResponseInfo> resultInfo_;
+        std::shared_ptr<RadioResponseInfo> resultInfo_;
     };
 
 public:
@@ -265,6 +268,7 @@ private:
     void SetPreferredNetworkParaTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetPreferredNetworkParaTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetImeiTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
+    void GetImeiSvTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetMeidTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetVoiceRadioTechnologyTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetPhysicalChannelConfigTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
@@ -279,6 +283,8 @@ private:
     void GetRrcConnectionStateTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetNrOptionModeTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void SetNrOptionModeTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
+    void GetNrSsbIdTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
+    void GetCellInfoListTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
 
     uint32_t GetRandNum();
     std::string GetRandPhoneNum(const int len);

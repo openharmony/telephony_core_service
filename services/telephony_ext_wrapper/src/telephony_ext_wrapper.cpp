@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,14 +21,21 @@ namespace OHOS {
 namespace Telephony {
 namespace {
 const std::string TELEPHONY_EXT_WRAPPER_PATH = "libtelephony_ext_service.z.so";
+const std::string TELEPHONY_VSIM_WRAPPER_PATH = "libtel_vsim_symbol.z.so";
 } // namespace
 
 TelephonyExtWrapper::TelephonyExtWrapper() {}
 TelephonyExtWrapper::~TelephonyExtWrapper()
 {
     TELEPHONY_LOGD("TelephonyExtWrapper::~TelephonyExtWrapper() start");
-    dlclose(telephonyExtWrapperHandle_);
-    telephonyExtWrapperHandle_ = nullptr;
+    if (telephonyExtWrapperHandle_ != nullptr) {
+        dlclose(telephonyExtWrapperHandle_);
+        telephonyExtWrapperHandle_ = nullptr;
+    }
+    if (telephonyVSimWrapperHandle_ != nullptr) {
+        dlclose(telephonyVSimWrapperHandle_);
+        telephonyVSimWrapperHandle_ = nullptr;
+    }
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapper()
@@ -39,7 +46,17 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
         TELEPHONY_LOGE("libtelephony_ext_service.z.so was not loaded, error: %{public}s", dlerror());
         return;
     }
+    InitTelephonyExtWrapperForSim();
+    InitTelephonyExtWrapperForNetWork();
+    InitTelephonyExtWrapperForVoiceMail();
+    InitTelephonyExtWrapperForCust();
+    InitTelephonyExtWrapperForVSim();
+    InitTelephonyExtWrapperForOpkeyVersion();
+    TELEPHONY_LOGI("telephony ext wrapper init success");
+}
 
+void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
+{
     checkOpcVersionIsUpdate_ = (CHECK_OPC_VERSION_IS_UPDATE)dlsym(telephonyExtWrapperHandle_,
         "CheckOpcVersionIsUpdate");
     updateOpcVersion_ = (UPDATE_OPC_VERSION)dlsym(telephonyExtWrapperHandle_, "UpdateOpcVersion");
@@ -50,25 +67,44 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
     getPreferredNetworkExt_ = (GET_PREFERRED_NETWORK_EXT)dlsym(telephonyExtWrapperHandle_, "GetPreferredNetworkExt");
     isNrSupportedNative_ = (IS_NR_SUPPORTED_NATIVE)dlsym(telephonyExtWrapperHandle_, "IsNrSupportedNativeExt");
     getSignalInfoListExt_ = (GET_SIGNAL_INFO_LIST_EXT)dlsym(telephonyExtWrapperHandle_, "GetSignalInfoListExt");
-    isCapabilitySupportExt_ = (IS_CAPABILITY_SUPPORT_EXT)dlsym(telephonyExtWrapperHandle_, "IsCapabilitySupportExt");
     getNetworkCapabilityExt_ = (GET_NETWORK_CAPABILITY_EXT)dlsym(telephonyExtWrapperHandle_, "GetNetworkCapabilityExt");
-    wrapNativeNetworkModeExt_ =
-        (WRAP_NATIVE_NETWORK_MODE_EXT)dlsym(telephonyExtWrapperHandle_, "WrapNativeNetworkModeExt");
     onGetNetworkSearchInformationExt_ = (ON_GET_NETWORK_SEARCH_INFORMATION_EXT)dlsym(telephonyExtWrapperHandle_,
         "OnGetNetworkSearchInformationExt");
-    filterSendSignalInformationExt_ =
-        (FILTER_SEND_SIGNAL_INFORMAION_EXT)dlsym(telephonyExtWrapperHandle_, "FilterSendSignalInformationExt");
     getNetworkStatusExt_ = (GET_NETWORK_STATUS_EXT)dlsym(telephonyExtWrapperHandle_, "GetNetworkStatusExt");
     if (checkOpcVersionIsUpdate_ == nullptr || updateOpcVersion_ == nullptr || getCellInfoList_ == nullptr ||
         getRadioTechExt_ == nullptr || getNrOptionModeExt_ == nullptr || getSignalInfoListExt_ == nullptr ||
-        isCapabilitySupportExt_ == nullptr || getNetworkCapabilityExt_ == nullptr ||
-        wrapNativeNetworkModeExt_ == nullptr || onGetNetworkSearchInformationExt_ == nullptr ||
-        filterSendSignalInformationExt_ == nullptr || getNetworkStatusExt_ == nullptr || isNrSupportedNative_ == nullptr
-        || getNrOptionModeExtend_ == nullptr || getPreferredNetworkExt_ == nullptr
-    ) {
+        getNetworkCapabilityExt_ == nullptr || onGetNetworkSearchInformationExt_ == nullptr ||
+        getNetworkStatusExt_ == nullptr || isNrSupportedNative_ == nullptr ||
+        getNrOptionModeExtend_ == nullptr || getPreferredNetworkExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
-        return;
     }
+    updateCountryCodeExt_ = (UPDATE_COUNTRY_CODE_EXT)dlsym(telephonyExtWrapperHandle_, "UpdateCountryCodeExt");
+    updateTimeZoneOffsetExt_ =
+        (UPDATE_TIME_ZONE_OFFSET_EXT)dlsym(telephonyExtWrapperHandle_, "UpdateTimeZoneOffsetExt");
+    if (updateCountryCodeExt_ == nullptr || updateTimeZoneOffsetExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+
+    sortSignalInfoListExt_ = (SORT_SIGNAL_INFO_LIST_EXT)dlsym(telephonyExtWrapperHandle_, "SortSignalInfoListExt");
+    if (sortSignalInfoListExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+    updateNsaStateExt_ = (UPDATE_NSA_STATE_EXT)dlsym(telephonyExtWrapperHandle_, "UpdateNsaStateExt");
+    if (updateNsaStateExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+    processSignalInfos_ = (PROCESS_SIGNAL_INFOS)dlsym(telephonyExtWrapperHandle_, "ProcessSignalInfosExt");
+    if (processSignalInfos_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+    processStateChangeExt_ = (PROCESS_STATE_CHANGE_EXT)dlsym(telephonyExtWrapperHandle_, "ProcessStateChangeExt");
+    if (processStateChangeExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
+{
     getVoiceMailIccidParameter_ = (GET_VOICE_MAIL_ICCID_PARAMETER)dlsym(telephonyExtWrapperHandle_,
         "GetVoiceMailIccidParameter");
     setVoiceMailIccidParameter_ = (SET_VOICE_MAIL_ICCID_PARAMETER)dlsym(telephonyExtWrapperHandle_,
@@ -89,17 +125,80 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
         "GetVoiceMailTagExt");
     resetVoiceMailManagerExt_ = (RESET_VOICE_MAIL_MANAGER_EXT)dlsym(telephonyExtWrapperHandle_,
         "ResetVoiceMailManagerExt");
-    getNetworkStatusExt_ = (GET_NETWORK_STATUS_EXT)dlsym(telephonyExtWrapperHandle_, "GetNetworkStatusExt");	
+    getNetworkStatusExt_ = (GET_NETWORK_STATUS_EXT)dlsym(telephonyExtWrapperHandle_, "GetNetworkStatusExt");
     if (getVoiceMailIccidParameter_ == nullptr || setVoiceMailIccidParameter_ == nullptr ||
         initVoiceMailManagerExt_ == nullptr || deinitVoiceMailManagerExt_ == nullptr ||
         resetVoiceMailLoadedFlagExt_ == nullptr || setVoiceMailOnSimExt_ == nullptr ||
         getVoiceMailFixedExt_ == nullptr || getVoiceMailNumberExt_ == nullptr ||
         getVoiceMailTagExt_ == nullptr || resetVoiceMailManagerExt_ == nullptr ||
-		getNetworkStatusExt_ == nullptr) {
+        getNetworkStatusExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
     }
-    TELEPHONY_LOGI("telephony ext wrapper init success");
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForCust()
+{
+    updateNetworkStateExt_ = (UPDATE_NETWORK_STATE_EXT)dlsym(telephonyExtWrapperHandle_, "UpdateNetworkStateExt");
+    if (updateNetworkStateExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+    InitTelephonyExtWrapperForApnCust();
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForVSim()
+{
+    TELEPHONY_LOGI("[VSIM] telephony ext wrapper init begin");
+    telephonyVSimWrapperHandle_ = dlopen(TELEPHONY_VSIM_WRAPPER_PATH.c_str(), RTLD_NOW);
+    if (telephonyVSimWrapperHandle_ == nullptr) {
+        TELEPHONY_LOGE("libtel_vsim_symbol.z.so was not loaded, error: %{public}s", dlerror());
+        return;
+    }
+    isVSimInStatus_ = (IS_VSIM_IN_STATUS) dlsym(telephonyVSimWrapperHandle_, "IsVSimInStatus");
+    getVSimSlotId_ = (GET_VSIM_SLOT_ID) dlsym(telephonyVSimWrapperHandle_, "GetVSimSlotId");
+    onAllFilesFetchedExt_ = (ON_ALL_FILES_FETCHED_EXT) dlsym(telephonyVSimWrapperHandle_,
+        "OnAllFilesFetchedExt");
+    putVSimExtraInfo_ = (PUT_VSIM_EXTRA_INFO) dlsym(telephonyVSimWrapperHandle_,
+        "PutVSimExtraInfo");
+    changeSpnAndRuleExt_ = (CHANGE_SPN_AND_RULE_EXT) dlsym(telephonyVSimWrapperHandle_,
+        "ChangeSpnAndRuleExt");
+    getVSimCardState_ = (GET_VSIM_CARD_STATE) dlsym(telephonyVSimWrapperHandle_, "GetVSimCardState");
+    getSimIdExt_ = (GET_SIM_ID_EXT) dlsym(telephonyVSimWrapperHandle_, "GetSimIdExt");
+    getSlotIdExt_ = (GET_SLOT_ID_EXT) dlsym(telephonyVSimWrapperHandle_, "GetSlotIdExt");
+    if (isVSimInStatus_ == nullptr || getVSimSlotId_ == nullptr || onAllFilesFetchedExt_ == nullptr ||
+        putVSimExtraInfo_ == nullptr || changeSpnAndRuleExt_ == nullptr || getVSimCardState_ == nullptr ||
+        getSimIdExt_ == nullptr || getSlotIdExt_ == nullptr) {
+        TELEPHONY_LOGE("[VSIM] telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGI("[VSIM] telephony ext wrapper init success");
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForApnCust()
+{
+    isAllowedInsertApn_ = (IS_ALLOWED_INSERT_APN)dlsym(telephonyExtWrapperHandle_, "IsAllowedInsertApn");
+    getTargetOpkey_ = (GET_TARGET_OPKEY)dlsym(telephonyExtWrapperHandle_, "GetTargetOpkey");
+    if (isAllowedInsertApn_ == nullptr || getTargetOpkey_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
+{
+    createIccFileExt_ = (CREATE_ICC_FILE_EXT)dlsym(telephonyExtWrapperHandle_, "CreateIccFileExt");
+    if (createIccFileExt_ == nullptr) {
+        TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+        return;
+    }
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForOpkeyVersion()
+{
+    getOpkeyVersion_ = (GET_OPKEY_VERSION)dlsym(telephonyExtWrapperHandle_, "GetOpkeyVersion");
+    if (getOpkeyVersion_ == nullptr) {
+        TELEPHONY_LOGE("[OpkeyVersion]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+        return;
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

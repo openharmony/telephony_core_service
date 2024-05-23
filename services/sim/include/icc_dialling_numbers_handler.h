@@ -16,16 +16,15 @@
 #ifndef OHOS_SIM_DIALLING_NUMBERS_HANDLER_H
 #define OHOS_SIM_DIALLING_NUMBERS_HANDLER_H
 
-#include <unordered_map>
 #include <thread>
+#include <unordered_map>
 
-#include "event_handler.h"
-#include "event_runner.h"
 #include "dialling_numbers_info.h"
 #include "icc_file_controller.h"
 #include "sim_data_type.h"
 #include "sim_number_decode.h"
 #include "sim_utils.h"
+#include "tel_event_handler.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -185,10 +184,9 @@ struct DiallingNumberUpdateInfor {
     std::string pin2 = "";
     bool isDel = false;
 };
-class IccDiallingNumbersHandler : public AppExecFwk::EventHandler {
+class IccDiallingNumbersHandler : public TelEventHandler {
 public:
-    IccDiallingNumbersHandler(
-        const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<IccFileController> fh);
+    explicit IccDiallingNumbersHandler(std::shared_ptr<IccFileController> fh);
     ~IccDiallingNumbersHandler();
     void GetDiallingNumbers(int ef, int extensionEF, int recordNumber, AppExecFwk::InnerEvent::Pointer &response);
     void GetAllDiallingNumbers(int ef, int extensionEF, AppExecFwk::InnerEvent::Pointer &response);
@@ -230,7 +228,7 @@ private:
     std::shared_ptr<unsigned char> CreateSavingSequence(
         const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int dataLength);
     std::shared_ptr<unsigned char> CreateNameSequence(const std::u16string &name, int &seqLength);
-    std::shared_ptr<HRilRadioResponseInfo> MakeExceptionResult(int code);
+    std::shared_ptr<RadioResponseInfo> MakeExceptionResult(int code);
     void FillNumberFiledForDiallingNumber(
         std::shared_ptr<unsigned char> diallingNumber, const std::string &number, int dataLength);
     bool FormatNameAndNumber(std::shared_ptr<DiallingNumbersInfo> &diallingNumber, bool isDel);

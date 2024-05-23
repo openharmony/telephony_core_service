@@ -32,10 +32,9 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
+constexpr static const int32_t WAIT_TIME_SECOND = 1;
 std::mutex IccFile::mtx_;
-SimFile::SimFile(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<SimStateManager> simStateManager)
-    : IccFile(runner, simStateManager)
+SimFile::SimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("SimFile", simStateManager)
 {
     fileQueried_ = false;
     displayConditionOfSpn_ = SPN_INVALID;
@@ -46,6 +45,44 @@ void SimFile::StartLoad()
 {
     TELEPHONY_LOGI("SimFile::StartLoad() start");
     LoadSimFiles();
+}
+
+std::string SimFile::ObtainMCC()
+{
+    if (mcc_.empty()) {
+        std::string imsi = ObtainIMSI();
+        if (imsi.empty()) {
+            TELEPHONY_LOGE("SimFile ObtainMCC: IMSI is null");
+            return "";
+        }
+        if ((lengthOfMnc_ == UNINITIALIZED_MNC) || (lengthOfMnc_ == UNKNOWN_MNC)) {
+            TELEPHONY_LOGE("SimFile ObtainMCC:  mncLength invalid");
+            return "";
+        }
+        int length = MCC_LEN + lengthOfMnc_;
+        int imsiLen = static_cast<int>(imsi.size());
+        mcc_ = ((imsiLen >= length) ? imsi.substr(0, MCC_LEN) : "");
+    }
+    return mcc_;
+}
+
+std::string SimFile::ObtainMNC()
+{
+    if (mnc_.empty()) {
+        std::string imsi = ObtainIMSI();
+        if (imsi.empty()) {
+            TELEPHONY_LOGE("SimFile ObtainMNC: IMSI is null");
+            return "";
+        }
+        if ((lengthOfMnc_ == UNINITIALIZED_MNC) || (lengthOfMnc_ == UNKNOWN_MNC)) {
+            TELEPHONY_LOGE("SimFile ObtainMNC:  mncLength invalid");
+            return "";
+        }
+        int length = MCC_LEN + lengthOfMnc_;
+        int imsiLen = static_cast<int>(imsi.size());
+        mnc_ = ((imsiLen >= length) ? imsi.substr(MCC_LEN, lengthOfMnc_) : "");
+    }
+    return mnc_;
 }
 
 std::string SimFile::ObtainSimOperator()
@@ -89,9 +126,32 @@ int SimFile::ObtainCallForwardStatus()
     return callForwardStatus_;
 }
 
-void SimFile::UpdateMsisdnNumber(
-    const std::string &alphaTag, const std::string &number, const AppExecFwk::InnerEvent::Pointer &onComplete)
-{}
+bool SimFile::UpdateMsisdnNumber(const std::string &alphaTag, const std::string &number)
+{
+    lastMsisdn_ = number;
+    lastMsisdnTag_ = alphaTag;
+    waitResult_ = false;
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
+    diallingNumber->name_ = Str8ToStr16(alphaTag);
+    diallingNumber->number_ = Str8ToStr16(number);
+    std::unique_lock<std::mutex> lock(IccFile::mtx_);
+    AppExecFwk::InnerEvent::Pointer phoneNumberEvent =
+            CreateDiallingNumberPointer(MSG_SIM_SET_MSISDN_DONE, 0, 0, nullptr);
+    DiallingNumberUpdateInfor infor;
+    infor.diallingNumber = diallingNumber;
+    infor.fileId = ELEMENTARY_FILE_MSISDN;
+    infor.extFile = ObtainExtensionElementaryFile(ELEMENTARY_FILE_MSISDN);
+    infor.index = 1;
+    diallingNumberHandler_->UpdateDiallingNumbers(infor, phoneNumberEvent);
+    while (!waitResult_) {
+        TELEPHONY_LOGI("update msisdn number wait, response = false");
+        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
+    }
+    TELEPHONY_LOGI("UpdateMsisdnNumber finished %{public}d", waitResult_);
+    return waitResult_;
+}
 
 void SimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
@@ -115,6 +175,7 @@ void SimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 
 void SimFile::ProcessIccRefresh(int msgId)
 {
+    TELEPHONY_LOGI("SimFile::ProcessIccRefresh msgId %{public}d, slotId_ = %{public}d", msgId, slotId_);
     switch (msgId) {
         case ELEMENTARY_FILE_MBDN:
             fileToGet_++;
@@ -134,6 +195,14 @@ void SimFile::ProcessIccRefresh(int msgId)
         case ELEMENTARY_FILE_CFF_CPHS:
             break;
         default:
+            auto iccFileExt = iccFile_.lock();
+            if (TELEPHONY_EXT_WRAPPER.createIccFileExt_ != nullptr && iccFileExt) {
+                TELEPHONY_LOGI("icc refresh, clear telephonyext data");
+                iccFileExt->ClearData();
+            }
+            if (operatorCacheDelObser_ != nullptr) {
+                operatorCacheDelObser_->NotifyObserver(RadioEvent::RADIO_OPERATOR_CACHE_DELETE, slotId_);
+            }
             LoadSimFiles();
             break;
     }
@@ -166,6 +235,9 @@ void SimFile::OnAllFilesFetched()
     }
     PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_LOADED, "");
     LoadVoiceMail();
+    if (TELEPHONY_EXT_WRAPPER.onAllFilesFetchedExt_) {
+        TELEPHONY_EXT_WRAPPER.onAllFilesFetchedExt_(slotId_);
+    }
 }
 
 bool SimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
@@ -203,30 +275,8 @@ void SimFile::ObtainCallForwardFiles()
     fileToGet_++;
 }
 
-void SimFile::LoadSimFiles()
+void SimFile::LoadSimOtherFile()
 {
-    TELEPHONY_LOGI("SimFile LoadSimFiles started");
-    fileQueried_ = true;
-
-    AppExecFwk::InnerEvent::Pointer eventIMSI = BuildCallerInfo(MSG_SIM_OBTAIN_IMSI_DONE);
-    telRilManager_->GetImsi(slotId_, eventIMSI);
-    fileToGet_++;
-
-    AppExecFwk::InnerEvent::Pointer eventIccId = BuildCallerInfo(MSG_SIM_OBTAIN_ICCID_DONE);
-    fileController_->ObtainBinaryFile(ELEMENTARY_FILE_ICCID, eventIccId);
-    fileToGet_++;
-
-    AppExecFwk::InnerEvent::Pointer eventSpn = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
-    ObtainSpnPhase(true, eventSpn);
-
-    AppExecFwk::InnerEvent::Pointer eventGid1 = BuildCallerInfo(MSG_SIM_OBTAIN_GID1_DONE);
-    fileController_->ObtainBinaryFile(ELEMENTARY_FILE_GID1, eventGid1);
-    fileToGet_++;
-
-    AppExecFwk::InnerEvent::Pointer eventGid2 = BuildCallerInfo(MSG_SIM_OBTAIN_GID2_DONE);
-    fileController_->ObtainBinaryFile(ELEMENTARY_FILE_GID2, eventGid2);
-    fileToGet_++;
-
     AppExecFwk::InnerEvent::Pointer eventPnn = BuildCallerInfo(MSG_SIM_OBTAIN_PNN_DONE);
     fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_PNN, eventPnn);
     fileToGet_++;
@@ -249,10 +299,6 @@ void SimFile::LoadSimFiles()
     fileController_->ObtainLinearFixedFile(ELEMENTARY_FILE_MBI, 1, eventMBI);
     fileToGet_++;
 
-    AppExecFwk::InnerEvent::Pointer eventAD = BuildCallerInfo(MSG_SIM_OBTAIN_AD_DONE);
-    fileController_->ObtainBinaryFile(ELEMENTARY_FILE_AD, eventAD);
-    fileToGet_++;
-
     AppExecFwk::InnerEvent::Pointer eventMWIS = BuildCallerInfo(MSG_SIM_OBTAIN_MWIS_DONE);
     fileController_->ObtainLinearFixedFile(ELEMENTARY_FILE_MWIS, 1, eventMWIS);
     fileToGet_++;
@@ -260,7 +306,38 @@ void SimFile::LoadSimFiles()
     AppExecFwk::InnerEvent::Pointer eventCPHS = BuildCallerInfo(MSG_SIM_OBTAIN_VOICE_MAIL_INDICATOR_CPHS_DONE);
     fileController_->ObtainBinaryFile(ELEMENTARY_FILE_VOICE_MAIL_INDICATOR_CPHS, eventCPHS);
     fileToGet_++;
+}
 
+void SimFile::LoadSimFiles()
+{
+    TELEPHONY_LOGI("SimFile LoadSimFiles started");
+    fileQueried_ = true;
+    fileToGet_ = 0;
+
+    AppExecFwk::InnerEvent::Pointer eventIMSI = BuildCallerInfo(MSG_SIM_OBTAIN_IMSI_DONE);
+    telRilManager_->GetImsi(slotId_, eventIMSI);
+    fileToGet_++;
+
+    auto iccFileExt = iccFile_.lock();
+    if (TELEPHONY_EXT_WRAPPER.createIccFileExt_ != nullptr && iccFileExt) {
+        iccFileExt->LoadSimMatchedFileFromRilCache();
+    } else {
+        AppExecFwk::InnerEvent::Pointer eventIccId = BuildCallerInfo(MSG_SIM_OBTAIN_ICCID_DONE);
+        fileController_->ObtainBinaryFile(ELEMENTARY_FILE_ICCID, eventIccId);
+        fileToGet_++;
+        AppExecFwk::InnerEvent::Pointer eventGid1 = BuildCallerInfo(MSG_SIM_OBTAIN_GID1_DONE);
+        fileController_->ObtainBinaryFile(ELEMENTARY_FILE_GID1, eventGid1);
+        fileToGet_++;
+        AppExecFwk::InnerEvent::Pointer eventGid2 = BuildCallerInfo(MSG_SIM_OBTAIN_GID2_DONE);
+        fileController_->ObtainBinaryFile(ELEMENTARY_FILE_GID2, eventGid2);
+        fileToGet_++;
+        AppExecFwk::InnerEvent::Pointer eventAD = BuildCallerInfo(MSG_SIM_OBTAIN_AD_DONE);
+        fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_AD, eventAD);
+        fileToGet_++;
+    }
+    AppExecFwk::InnerEvent::Pointer eventSpn = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    ObtainSpnPhase(true, eventSpn);
+    LoadSimOtherFile();
     ObtainCallForwardFiles();
 }
 
@@ -288,8 +365,13 @@ void SimFile::ObtainSpnPhase(bool start, const AppExecFwk::InnerEvent::Pointer &
 void SimFile::StartObtainSpn()
 {
     UpdateSPN(IccFileController::NULLSTR);
-    AppExecFwk::InnerEvent::Pointer eventSPN = BuildCallerInfo(MSG_SIM_OBTAIN_SPN_DONE);
-    fileController_->ObtainBinaryFile(ELEMENTARY_FILE_SPN, eventSPN);
+    auto iccFileExt = iccFile_.lock();
+    if (TELEPHONY_EXT_WRAPPER.createIccFileExt_ != nullptr && iccFileExt) {
+        iccFileExt->LoadSimMatchedFileFromRilCacheByEfid(ELEMENTARY_FILE_SPN);
+    } else {
+        AppExecFwk::InnerEvent::Pointer eventSPN = BuildCallerInfo(MSG_SIM_OBTAIN_SPN_DONE);
+        fileController_->ObtainBinaryFile(ELEMENTARY_FILE_SPN, eventSPN);
+    }
     fileToGet_++;
     spnStatus_ = SpnStatus::OBTAIN_SPN_GENERAL;
 }
@@ -317,6 +399,7 @@ void SimFile::ProcessSpnGeneral(const AppExecFwk::InnerEvent::Pointer &event)
             spnStatus_ = SpnStatus::OBTAIN_OPERATOR_NAMESTRING;
         } else {
             TELEPHONY_LOGI("SimFile Load Spn3Gpp done");
+            FileChangeToExt(spn, FileChangeType::SPN_FILE_LOAD);
             spnStatus_ = SpnStatus::OBTAIN_SPN_NONE;
         }
     } else {
@@ -324,8 +407,13 @@ void SimFile::ProcessSpnGeneral(const AppExecFwk::InnerEvent::Pointer &event)
     }
 
     if (spnStatus_ == SpnStatus::OBTAIN_OPERATOR_NAMESTRING) {
-        AppExecFwk::InnerEvent::Pointer eventCphs = BuildCallerInfo(MSG_SIM_OBTAIN_SPN_DONE);
-        fileController_->ObtainBinaryFile(ELEMENTARY_FILE_SPN_CPHS, eventCphs);
+        auto iccFileExt = iccFile_.lock();
+        if (TELEPHONY_EXT_WRAPPER.createIccFileExt_ != nullptr && iccFileExt) {
+            iccFileExt->LoadSimMatchedFileFromRilCacheByEfid(ELEMENTARY_FILE_SPN_CPHS);
+        } else {
+            AppExecFwk::InnerEvent::Pointer eventCphs = BuildCallerInfo(MSG_SIM_OBTAIN_SPN_DONE);
+            fileController_->ObtainBinaryFile(ELEMENTARY_FILE_SPN_CPHS, eventCphs);
+        }
         fileToGet_++;
     }
 }
@@ -346,6 +434,7 @@ void SimFile::ProcessSpnCphs(const AppExecFwk::InnerEvent::Pointer &event)
         } else {
             displayConditionOfSpn_ = 0;
             TELEPHONY_LOGI("SimFile Load ELEMENTARY_FILE_SPN_CPHS done: %{public}s", spn.c_str());
+            FileChangeToExt(spn, FileChangeType::SPN_FILE_LOAD);
             spnStatus_ = SpnStatus::OBTAIN_SPN_NONE;
         }
     } else {
@@ -353,8 +442,13 @@ void SimFile::ProcessSpnCphs(const AppExecFwk::InnerEvent::Pointer &event)
     }
 
     if (spnStatus_ == SpnStatus::OBTAIN_OPERATOR_NAME_SHORTFORM) {
-        AppExecFwk::InnerEvent::Pointer eventShortCphs = BuildCallerInfo(MSG_SIM_OBTAIN_SPN_DONE);
-        fileController_->ObtainBinaryFile(ELEMENTARY_FILE_SPN_SHORT_CPHS, eventShortCphs);
+        auto iccFileExt = iccFile_.lock();
+        if (TELEPHONY_EXT_WRAPPER.createIccFileExt_ != nullptr && iccFileExt) {
+            iccFileExt->LoadSimMatchedFileFromRilCacheByEfid(ELEMENTARY_FILE_SPN_SHORT_CPHS);
+        } else {
+            AppExecFwk::InnerEvent::Pointer eventShortCphs = BuildCallerInfo(MSG_SIM_OBTAIN_SPN_DONE);
+            fileController_->ObtainBinaryFile(ELEMENTARY_FILE_SPN_SHORT_CPHS, eventShortCphs);
+        }
         fileToGet_++;
     }
 }
@@ -380,6 +474,7 @@ void SimFile::ProcessSpnShortCphs(const AppExecFwk::InnerEvent::Pointer &event)
         UpdateSPN(IccFileController::NULLSTR);
         TELEPHONY_LOGI("SimFile No SPN get in either CHPS or 3GPP");
     }
+    FileChangeToExt(spn_, FileChangeType::SPN_FILE_LOAD);
     spnStatus_ = SpnStatus::OBTAIN_SPN_NONE;
 }
 
@@ -427,22 +522,22 @@ void SimFile::ParsePnn(const std::vector<std::string> &records)
         unsigned char *tlv = data.get();
         std::shared_ptr<PlmnNetworkName> file = std::make_shared<PlmnNetworkName>();
         int tagAndLength = NETWORK_NAME_LENGTH + 1;
-        if (recordLen > tagAndLength) {
-            if (recordLen >= (tagAndLength + static_cast<int>(tlv[NETWORK_NAME_LENGTH])) &&
-                tlv[NETWORK_NAME_IEI] == (unsigned char)LONG_NAME_FLAG) {
-                file->longName =
-                    SIMUtils::Gsm7bitConvertToString(tlv + NETWORK_NAME_TEXT_STRING, tlv[NETWORK_NAME_LENGTH] - 1);
-            }
-            int shortNameOffset = tagAndLength + tlv[NETWORK_NAME_LENGTH];
-            if (recordLen > (shortNameOffset + tagAndLength)) {
-                if (recordLen >= (shortNameOffset + tagAndLength +
-                                     static_cast<int>(tlv[shortNameOffset + NETWORK_NAME_LENGTH])) &&
-                    tlv[shortNameOffset + NETWORK_NAME_IEI] == (unsigned char)SHORT_NAME_FLAG) {
-                    file->shortName =
-                        SIMUtils::Gsm7bitConvertToString(tlv + (shortNameOffset + NETWORK_NAME_TEXT_STRING),
-                            tlv[shortNameOffset + NETWORK_NAME_LENGTH] - 1);
-                }
-            }
+        if (recordLen <= tagAndLength) {
+            TELEPHONY_LOGD("recordLen <= tagAndLength");
+            continue;
+        }
+        if (recordLen >= (tagAndLength + static_cast<int>(tlv[NETWORK_NAME_LENGTH])) &&
+            tlv[NETWORK_NAME_IEI] == (unsigned char)LONG_NAME_FLAG) {
+            file->longName =
+                SIMUtils::Gsm7bitConvertToString(tlv + NETWORK_NAME_TEXT_STRING, tlv[NETWORK_NAME_LENGTH] - 1);
+        }
+        int shortNameOffset = tagAndLength + tlv[NETWORK_NAME_LENGTH];
+        if (recordLen > (shortNameOffset + tagAndLength) &&
+            recordLen >=
+            (shortNameOffset + tagAndLength + static_cast<int>(tlv[shortNameOffset + NETWORK_NAME_LENGTH])) &&
+            tlv[shortNameOffset + NETWORK_NAME_IEI] == (unsigned char)SHORT_NAME_FLAG) {
+            file->shortName = SIMUtils::Gsm7bitConvertToString(
+                tlv + (shortNameOffset + NETWORK_NAME_TEXT_STRING), tlv[shortNameOffset + NETWORK_NAME_LENGTH] - 1);
         }
         TELEPHONY_LOGI("longName: %{public}s, shortName: %{public}s", file->longName.c_str(), file->shortName.c_str());
         if (!file->longName.empty() || !file->shortName.empty()) {
@@ -600,6 +695,7 @@ bool SimFile::ProcessObtainGid1Done(const AppExecFwk::InnerEvent::Pointer &event
     }
 
     gid1_ = iccData;
+    FileChangeToExt(gid1_, FileChangeType::GID1_FILE_LOAD);
     TELEPHONY_LOGI("SimFile GID1: %{public}s", fileData);
     return isFileProcessResponse;
 }
@@ -627,6 +723,7 @@ bool SimFile::ProcessObtainGid2Done(const AppExecFwk::InnerEvent::Pointer &event
     }
 
     gid2_ = iccData;
+    FileChangeToExt(gid2_, FileChangeType::GID2_FILE_LOAD);
     TELEPHONY_LOGI("SimFile GID2: %{public}s", fileData);
     return isFileProcessResponse;
 }
@@ -655,7 +752,7 @@ bool SimFile::ProcessGetMsisdnDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessSetMsisdnDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileProcessResponse = false;
+    bool isFileProcessResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("update Msisdn event is nullptr!");
         return isFileProcessResponse;
@@ -669,7 +766,12 @@ bool SimFile::ProcessSetMsisdnDone(const AppExecFwk::InnerEvent::Pointer &event)
     if (fd->exception == nullptr) {
         msisdn_ = lastMsisdn_;
         msisdnTag_ = lastMsisdnTag_;
+        waitResult_ = true;
+        processWait_.notify_all();
         TELEPHONY_LOGI("SimFile Success to update EF[MSISDN]");
+    } else {
+        processWait_.notify_all();
+        TELEPHONY_LOGE("SimFile Fail to update EF[MSISDN]");
     }
     return isFileProcessResponse;
 }
@@ -945,9 +1047,20 @@ bool SimFile::ProcessGetIccIdDone(const AppExecFwk::InnerEvent::Pointer &event)
     }
     if (fd->exception == nullptr) {
         std::string iccData = fd->resultData;
+        TELEPHONY_LOGI("ICCID length is %{public}zu, slotId:%{public}d", iccData.length(), slotId_);
+        std::string fullIccData = iccData;
+        GetFullIccid(fullIccData);
         SwapPairsForIccId(iccData);
-        TELEPHONY_LOGI("SimFile::ProcessEvent ICCID result success");
-        iccId_ = iccData;
+        TELEPHONY_LOGI("SwapPairsForIccId ICCID length is %{public}zu", fullIccData.length());
+        decIccId_ = iccData;
+        if (!fullIccData.empty() && fullIccData.compare(iccId_) != 0) {
+            if (filesFetchedObser_ != nullptr) {
+                TELEPHONY_LOGI("slotId:%{public}d iccid loaded", slotId_);
+                iccidLoadObser_->NotifyObserver(RadioEvent::RADIO_SIM_ICCID_LOADED, slotId_);
+            }
+        }
+        iccId_ = fullIccData;
+        FileChangeToExt(iccId_, FileChangeType::ICCID_FILE_LOAD);
     }
     return isFileProcessResponse;
 }
@@ -970,7 +1083,9 @@ bool SimFile::ProcessObtainIMSIDone(const AppExecFwk::InnerEvent::Pointer &event
         SaveCountryCode();
         TELEPHONY_LOGI("SimFile::ObtainIsoCountryCode result success");
         if (!imsi_.empty()) {
+            CheckMncLength();
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
+            FileChangeToExt(imsi_, FileChangeType::G_IMSI_FILE_LOAD);
         }
     }
     return isFileProcessResponse;
@@ -1080,6 +1195,7 @@ void SimFile::CheckMncLength()
     bool cond = sz >= lenNum;
     if ((!imsi.empty()) && (lengthOfMnc_ != UNKNOWN_MNC) && cond) {
         operatorNumeric_ = imsi.substr(0, lenNum);
+        FileChangeToExt(operatorNumeric_, FileChangeType::G_MCCMNC_FILE_LOAD);
     }
 }
 
@@ -1664,7 +1780,12 @@ bool SimFile::UpdateVoiceMail(const std::string &mailName, const std::string &ma
         infor.extFile = ELEMENTARY_FILE_EXT6;
         infor.index = indexOfMailbox_;
         diallingNumberHandler_->UpdateDiallingNumbers(infor, event);
-        processWait_.wait(lock);
+        while (!waitResult_) {
+            TELEPHONY_LOGI("update voicemail wait, response = false");
+            if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+                break;
+            }
+        }
     } else if (CphsVoiceMailAvailable()) {
         std::unique_lock<std::mutex> lock(IccFile::mtx_);
         AppExecFwk::InnerEvent::Pointer event =
@@ -1675,7 +1796,12 @@ bool SimFile::UpdateVoiceMail(const std::string &mailName, const std::string &ma
         infor.extFile = ELEMENTARY_FILE_EXT1;
         infor.index = 1;
         diallingNumberHandler_->UpdateDiallingNumbers(infor, event);
-        processWait_.wait(lock);
+        while (!waitResult_) {
+            TELEPHONY_LOGI("update voicemail wait, response = false");
+            if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+                break;
+            }
+        }
     } else {
         TELEPHONY_LOGE("UpdateVoiceMail indexOfMailbox_ %{public}d is invalid!!", indexOfMailbox_);
     }
@@ -1804,6 +1930,12 @@ bool SimFile::EfCfisAvailable(int32_t size)
         }
     }
     return false;
+}
+
+void SimFile::ClearData()
+{
+    spnStatus_ = OBTAIN_SPN_NONE;
+    IccFile::ClearData();
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -113,6 +113,7 @@ const std::string ResourceUtils::CALL_FAILED_CALL_BARRED = "call_failed_call_bar
 const std::string ResourceUtils::CALL_FAILED_FDN_BLOCKED = "call_failed_fdn_blocked";
 const std::string ResourceUtils::CALL_FAILED_IMSI_UNKNOWN_IN_VLR = "call_failed_imsi_unknow";
 const std::string ResourceUtils::CALL_FAILED_IMEI_NOT_ACCEPTED = "call_failed_imei_not_accepted";
+const std::string ResourceUtils::CALL_FAILED_IMEISV_NOT_ACCEPTED = "call_failed_imeisv_not_accepted";
 const std::string ResourceUtils::CALL_FAILED_DIAL_MODIFIED_TO_USSD = "call_failed_dial_modify_to_ussd";
 const std::string ResourceUtils::CALL_FAILED_DIAL_MODIFIED_TO_SS = "call_failed_dial_modify_to_ss";
 const std::string ResourceUtils::CALL_FAILED_DIAL_MODIFIED_TO_DIAL = "call_failed_dial_modify_to_dial";
@@ -213,6 +214,7 @@ const std::map<std::string, ResourceUtils::ResourceType> ResourceUtils::mapResou
     { ResourceUtils::CALL_FAILED_FDN_BLOCKED, ResourceUtils::ResourceType::ResourceTypeString },
     { ResourceUtils::CALL_FAILED_IMSI_UNKNOWN_IN_VLR, ResourceUtils::ResourceType::ResourceTypeString },
     { ResourceUtils::CALL_FAILED_IMEI_NOT_ACCEPTED, ResourceUtils::ResourceType::ResourceTypeString },
+    { ResourceUtils::CALL_FAILED_IMEISV_NOT_ACCEPTED, ResourceUtils::ResourceType::ResourceTypeString },
     { ResourceUtils::CALL_FAILED_DIAL_MODIFIED_TO_USSD, ResourceUtils::ResourceType::ResourceTypeString },
     { ResourceUtils::CALL_FAILED_DIAL_MODIFIED_TO_SS, ResourceUtils::ResourceType::ResourceTypeString },
     { ResourceUtils::CALL_FAILED_DIAL_MODIFIED_TO_DIAL, ResourceUtils::ResourceType::ResourceTypeString },
@@ -312,6 +314,7 @@ const std::map<int32_t, std::string> ResourceUtils::callFailedResourceName_ = {
     { DisconnectedReasons::FDN_BLOCKED, ResourceUtils::CALL_FAILED_FDN_BLOCKED },
     { DisconnectedReasons::IMSI_UNKNOWN_IN_VLR, ResourceUtils::CALL_FAILED_IMSI_UNKNOWN_IN_VLR },
     { DisconnectedReasons::IMEI_NOT_ACCEPTED, ResourceUtils::CALL_FAILED_IMEI_NOT_ACCEPTED },
+    { DisconnectedReasons::IMEISV_NOT_ACCEPTED, ResourceUtils::CALL_FAILED_IMEISV_NOT_ACCEPTED },
     { DisconnectedReasons::DIAL_MODIFIED_TO_USSD, ResourceUtils::CALL_FAILED_DIAL_MODIFIED_TO_USSD },
     { DisconnectedReasons::DIAL_MODIFIED_TO_SS, ResourceUtils::CALL_FAILED_DIAL_MODIFIED_TO_SS },
     { DisconnectedReasons::DIAL_MODIFIED_TO_DIAL, ResourceUtils::CALL_FAILED_DIAL_MODIFIED_TO_DIAL },

@@ -21,6 +21,7 @@
 #include "network_search_notify.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -349,6 +350,7 @@ void NetworkSearchState::NotifyPsRadioTechChange()
     }
 
     if (networkState_->GetPsRadioTech() != networkStateOld_->GetPsRadioTech()) {
+        networkSearchManager->UpdatePhone(slotId_, networkState_->GetCsRadioTech(), networkState_->GetPsRadioTech());
         networkSearchManager->SendUpdateCellLocationRequest(slotId_);
         networkSearchManager->NotifyPsRatChanged(slotId_);
     }
@@ -416,15 +418,9 @@ void NetworkSearchState::NotifyStateChange()
         return;
     }
 
-    // We must Update RadioTech(PhoneType) bebore notifying observers,
-    // otherwise observers may get the wrong phone type
-    CsRadioTechChange();
-
-    NotifyPsRadioTechChange();
-    NotifyPsRegStatusChange();
-    NotifyPsRoamingStatusChange();
-    NotifyEmergencyChange();
-    NotifyNrStateChange();
+    if (TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_(slotId_, networkState_);
+    }
 
     if (!(*networkState_ == *networkStateOld_)) {
         TELEPHONY_LOGI(
@@ -438,6 +434,22 @@ void NetworkSearchState::NotifyStateChange()
         MessageParcel data;
         networkState_->Marshalling(data);
         ns->ReadFromParcel(data);
+        if (TELEPHONY_EXT_WRAPPER.processStateChangeExt_ != nullptr) {
+            bool needDelay = TELEPHONY_EXT_WRAPPER.processStateChangeExt_(slotId_, ns);
+            if (needDelay) {
+                return;
+            }
+        }
+        // We must Update RadioTech(PhoneType) bebore notifying observers,
+        // otherwise observers may get the wrong phone type
+        CsRadioTechChange();
+
+        NotifyPsRadioTechChange();
+        NotifyPsRegStatusChange();
+        NotifyPsRoamingStatusChange();
+        NotifyEmergencyChange();
+        NotifyNrStateChange();
+
         DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifyNetworkStateUpdated(slotId_, ns);
         networkState_->Marshalling(data);
         networkStateOld_->ReadFromParcel(data);
@@ -464,6 +476,15 @@ void NetworkSearchState::CsRadioTechChange()
 
     if (networkState_->GetCsRadioTech() != networkStateOld_->GetCsRadioTech()) {
         networkSearchManager->UpdatePhone(slotId_, networkState_->GetCsRadioTech(), networkState_->GetPsRadioTech());
+    }
+}
+
+void NetworkSearchState::SetLongOperatorName(const std::string &longName, DomainType domainType)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (networkState_ != nullptr) {
+        networkState_->SetLongOperatorName(longName, domainType);
+        TELEPHONY_LOGD("NetworkSearchState::SetLongOperatorName longName : %{public}s", longName.c_str());
     }
 }
 } // namespace Telephony
