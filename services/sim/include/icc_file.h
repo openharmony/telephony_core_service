@@ -101,6 +101,7 @@ public:
     void ProcessExtGetFileDone(const AppExecFwk::InnerEvent::Pointer &event);
     void SetIccFile(std::shared_ptr<OHOS::Telephony::IIccFileExt> &iccFile);
     void AddRecordsToLoadNum();
+    virtual void ProcessExtGetFileResponse();
 
 protected:
     virtual void ProcessFileLoaded(bool response) = 0;
