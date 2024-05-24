@@ -146,7 +146,7 @@ protected:
     std::vector<std::shared_ptr<PlmnNetworkName>> pnnFiles_;
     std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles_;
     std::vector<std::shared_ptr<OperatorPlmnInfo>> opl5gFiles_;
-    int lengthOfMnc_ = DEFAULT_MNC;
+    int lengthOfMnc_ = UNINITIALIZED_MNC;
     int indexOfMailbox_ = 1;
     int fileToGet_ = 0;
     bool loaded_ = false;
