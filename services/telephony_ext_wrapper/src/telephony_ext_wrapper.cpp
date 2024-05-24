@@ -101,6 +101,11 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
     if (processStateChangeExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+    publishSpnInfoChangedExt_ = (PUBLISH_SPN_INFO_CHANGED_EXT)dlsym(telephonyExtWrapperHandle_,
+        "PublishSpnInfoChangedExt");
+    if (publishSpnInfoChangedExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
