@@ -19,6 +19,7 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_ext_wrapper.h"
+#include "operator_name_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -186,9 +187,10 @@ bool NetworkSelection::AvailNetworkResult(
         std::vector<NetworkInformation> networkInformation;
         if (availableSize > 0) {
             for (auto &availableNetworkInfoItem : availableNetworkInfo) {
-                std::string longName = availableNetworkInfoItem.longName;
-                std::string shortName = availableNetworkInfoItem.shortName;
                 std::string numeric = availableNetworkInfoItem.numeric;
+                std::string customName = OperatorNameUtils::GetInstance().GetCustomName(numeric);
+                std::string longName = customName.empty()? availableNetworkInfoItem.longName : customName;
+                std::string shortName = availableNetworkInfoItem.shortName;
                 int32_t status = availableNetworkInfoItem.status;
                 int32_t rat = availableNetworkInfoItem.rat;
                 NetworkInformation networkStateItem;
