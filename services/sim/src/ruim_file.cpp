@@ -194,12 +194,6 @@ bool RuimFile::ProcessGetIccidDone(const AppExecFwk::InnerEvent::Pointer &event)
         SwapPairsForIccId(iccData);
         TELEPHONY_LOGI("RuimFile::ProcessEvent MSG_SIM_OBTAIN_ICCID_DONE result success");
         decIccId_ = iccData;
-        if (!fullIccData.empty() && fullIccData.compare(iccId_) != 0) {
-            if (filesFetchedObser_ != nullptr) {
-                TELEPHONY_LOGI("slotId:%{public}d iccid loaded", slotId_);
-                iccidLoadObser_->NotifyObserver(RadioEvent::RADIO_SIM_ICCID_LOADED, slotId_);
-            }
-        }
         iccId_ = fullIccData;
         FileChangeToExt(iccId_, FileChangeType::ICCID_FILE_LOAD);
     }
