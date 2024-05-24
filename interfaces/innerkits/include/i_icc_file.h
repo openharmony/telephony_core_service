@@ -91,7 +91,7 @@ public:
     {
     }
 
-    virtual void ProcessExtGetFileResponse(const AppExecFwk::InnerEvent::Pointer &event)
+    virtual void ProcessExtGetFileResponse()
     {
     }
 
