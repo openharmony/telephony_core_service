@@ -91,6 +91,10 @@ public:
     {
     }
 
+    virtual void ProcessExtGetFileResponse(const AppExecFwk::InnerEvent::Pointer &event)
+    {
+    }
+
 protected:
     std::weak_ptr<OHOS::Telephony::IIccFileExt> iccFile_;
 };
