@@ -70,6 +70,7 @@ public:
     typedef void (*UPDATE_NETWORK_STATE_EXT)(int32_t slotId, std::unique_ptr<NetworkState> &networkState);
     typedef int32_t (*UPDATE_NSA_STATE_EXT)(
         int32_t slotId, int32_t cellId, bool endcAvailable, bool dcNrRestricted, int32_t nsaState);
+    typedef void (*PUBLISH_SPN_INFO_CHANGED_EXT)(OHOS::AAFwk::Want &want);
     /* add for vsim begin */
     typedef void (*IS_VSIM_IN_STATUS)(int32_t slotId, int32_t type, bool &status);
     typedef void (*GET_VSIM_SLOT_ID)(int32_t &slotId);
@@ -115,6 +116,7 @@ public:
     CREATE_ICC_FILE_EXT createIccFileExt_ = nullptr;
     UPDATE_NETWORK_STATE_EXT updateNetworkStateExt_ = nullptr;
     UPDATE_NSA_STATE_EXT updateNsaStateExt_ = nullptr;
+    PUBLISH_SPN_INFO_CHANGED_EXT publishSpnInfoChangedExt_ = nullptr;
 
     UPDATE_COUNTRY_CODE_EXT updateCountryCodeExt_ = nullptr;
     UPDATE_TIME_ZONE_OFFSET_EXT updateTimeZoneOffsetExt_ = nullptr;
