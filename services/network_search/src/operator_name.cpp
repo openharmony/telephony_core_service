@@ -385,6 +385,9 @@ void OperatorName::PublishEvent(const int32_t rule, const RegServiceState state,
     CommonEventPublishInfo publishInfo;
     publishInfo.SetSticky(true);
     bool publishResult = CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
+    if (TELEPHONY_EXT_WRAPPER.publishSpnInfoChangedExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.publishSpnInfoChangedExt_(want);
+    }
     TELEPHONY_LOGI("OperatorName::PublishEvent result : %{public}d slotId:%{public}d", publishResult, slotId_);
     if (publishResult) {
         curRegState_ = state;
