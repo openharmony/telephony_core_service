@@ -457,7 +457,7 @@ void NetworkSearchState::NotifyStateChange()
         networkState_->Marshalling(data);
         networkStateOld_->ReadFromParcel(data);
     }
-    updateDelay_ = true;
+    updateDelay_ = false;
 }
 
 void NetworkSearchState::CsRadioTechChange()
