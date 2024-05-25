@@ -30,6 +30,17 @@
 
 namespace OHOS {
 namespace Telephony {
+
+enum VSimInStatusType {
+    IS_VSIM_ON = 1,
+    IS_VSIM_IN_PROCESS = 2,
+    IS_RADIO_AVAILABLE = 7,
+    IS_VSIM_CAUSE_CARD_RELOAD = 8,
+    IS_VSIM_ENABLED = 9,
+    NEED_BLOCK_PIN = 10,
+    NEED_BLOCK_UNRESERVED_SUBID = 11,
+};
+
 class TelephonyExtWrapper final {
 DECLARE_DELAYED_REF_SINGLETON(TelephonyExtWrapper);
 

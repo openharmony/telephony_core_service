@@ -28,6 +28,7 @@
 #include "sim_data.h"
 #include "sim_utils.h"
 #include "string_ex.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -96,7 +97,7 @@ bool MultiSimController::ForgetAllData(int32_t slotId)
 void MultiSimController::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
     std::shared_ptr<Telephony::SimFileManager> simFileManager)
 {
-    if (simStateManager_.size() == SIM_SLOT_COUNT) {
+    if (static_cast<int>(simStateManager_.size()) == SIM_SLOT_COUNT) {
         simStateManager_.push_back(simStateManager);
         simFileManager_.push_back(simFileManager);
         maxCount_ = MAX_SLOT_COUNT;
@@ -841,6 +842,15 @@ int32_t MultiSimController::GetPrimarySlotId()
 int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
 {
     TELEPHONY_LOGD("slotId = %{public}d", slotId);
+    if (IS_SUPPORT_VSIM && TELEPHONY_EXT_WRAPPER.isVSimInStatus_) {
+        bool isVsimEnable = false;
+        TELEPHONY_EXT_WRAPPER.isVSimInStatus_(slotId, IS_VSIM_ENABLED, isVsimEnable);
+        if (isVsimEnable) {
+            TELEPHONY_LOGE("vsim enabled, not allowed switch card");
+            return TELEPHONY_ERR_FAIL;
+        }
+    }
+
     if (!IsValidData(slotId)) {
         TELEPHONY_LOGE("no sim card");
         return TELEPHONY_ERR_NO_SIM_CARD;
