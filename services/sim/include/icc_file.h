@@ -174,7 +174,6 @@ protected:
     std::unique_ptr<ObserverHandler> spnUpdatedObser_ = nullptr;
     std::unique_ptr<ObserverHandler> recordsOverrideObser_ = nullptr;
     std::unique_ptr<ObserverHandler> opkeyLoadObser_ = nullptr;
-    std::unique_ptr<ObserverHandler> iccidLoadObser_ = nullptr;
     std::unique_ptr<ObserverHandler> operatorCacheDelObser_ = nullptr;
     virtual AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId);
     virtual AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId, int arg1, int arg2);
@@ -203,13 +202,10 @@ private:
     void UnregisterAllFilesLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void RegisterOpkeyLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void UnregisterOpkeyLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-    void RegisterIccidLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
-    void UnregisterIccidLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void RegisterOperatorCacheDel(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void UnregisterOperatorCacheDel(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void AddRecordsOverrideObser();
     void AddOpkeyLoadObser();
-    void AddIccidLoadObser();
     void AddOperatorCacheDelObser();
 };
 } // namespace Telephony
