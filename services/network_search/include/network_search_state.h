@@ -69,6 +69,7 @@ private:
     bool imsRegStatus_ = false;
     int32_t slotId_ = 0;
     std::unique_ptr<ImsServiceStatus> imsServiceStatus_ = nullptr;
+    bool updateDelay_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

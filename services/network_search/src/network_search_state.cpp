@@ -304,12 +304,12 @@ void NetworkSearchState::NotifyPsRegStatusChange()
         return;
     }
 
-    if (networkState_->GetPsRegStatus() == RegServiceState::REG_STATE_IN_SERVICE &&
-        networkStateOld_->GetPsRegStatus() != RegServiceState::REG_STATE_IN_SERVICE) {
+    if (updateDelay_ || (networkState_->GetPsRegStatus() == RegServiceState::REG_STATE_IN_SERVICE &&
+        networkStateOld_->GetPsRegStatus() != RegServiceState::REG_STATE_IN_SERVICE)) {
         networkSearchManager->NotifyPsConnectionAttachedChanged(slotId_);
     }
-    if (networkState_->GetPsRegStatus() != RegServiceState::REG_STATE_IN_SERVICE &&
-        networkStateOld_->GetPsRegStatus() == RegServiceState::REG_STATE_IN_SERVICE) {
+    if (updateDelay_ || (networkState_->GetPsRegStatus() != RegServiceState::REG_STATE_IN_SERVICE &&
+        networkStateOld_->GetPsRegStatus() == RegServiceState::REG_STATE_IN_SERVICE)) {
         networkSearchManager->NotifyPsConnectionDetachedChanged(slotId_);
     }
 }
@@ -326,12 +326,12 @@ void NetworkSearchState::NotifyPsRoamingStatusChange()
         TELEPHONY_LOGE("NotifyPsRoamingStatusChange networkState_ is null slotId:%{public}d", slotId_);
         return;
     }
-    if (networkState_->GetPsRoamingStatus() > RoamingType::ROAMING_STATE_UNKNOWN &&
-        networkStateOld_->GetPsRoamingStatus() == RoamingType::ROAMING_STATE_UNKNOWN) {
+    if (updateDelay_ || (networkState_->GetPsRoamingStatus() > RoamingType::ROAMING_STATE_UNKNOWN &&
+        networkStateOld_->GetPsRoamingStatus() == RoamingType::ROAMING_STATE_UNKNOWN)) {
         networkSearchManager->NotifyPsRoamingOpenChanged(slotId_);
     }
-    if (networkStateOld_->GetPsRoamingStatus() > RoamingType::ROAMING_STATE_UNKNOWN &&
-        networkState_->GetPsRoamingStatus() == RoamingType::ROAMING_STATE_UNKNOWN) {
+    if (updateDelay_ || (networkStateOld_->GetPsRoamingStatus() > RoamingType::ROAMING_STATE_UNKNOWN &&
+        networkState_->GetPsRoamingStatus() == RoamingType::ROAMING_STATE_UNKNOWN)) {
         networkSearchManager->NotifyPsRoamingCloseChanged(slotId_);
     }
 }
@@ -349,7 +349,7 @@ void NetworkSearchState::NotifyPsRadioTechChange()
         return;
     }
 
-    if (networkState_->GetPsRadioTech() != networkStateOld_->GetPsRadioTech()) {
+    if (updateDelay_ || networkState_->GetPsRadioTech() != networkStateOld_->GetPsRadioTech()) {
         networkSearchManager->UpdatePhone(slotId_, networkState_->GetCsRadioTech(), networkState_->GetPsRadioTech());
         networkSearchManager->SendUpdateCellLocationRequest(slotId_);
         networkSearchManager->NotifyPsRatChanged(slotId_);
@@ -368,7 +368,7 @@ void NetworkSearchState::NotifyEmergencyChange()
         TELEPHONY_LOGE("NotifyEmergencyChange networkState_ is null slotId:%{public}d", slotId_);
         return;
     }
-    if (networkState_->IsEmergency() != networkStateOld_->IsEmergency()) {
+    if (updateDelay_ || (networkState_->IsEmergency() != networkStateOld_->IsEmergency())) {
         if (networkState_->IsEmergency()) {
             networkSearchManager->NotifyEmergencyOpenChanged(slotId_);
         } else {
@@ -390,7 +390,7 @@ void NetworkSearchState::NotifyNrStateChange()
         return;
     }
 
-    if (networkState_->GetNrState() != networkStateOld_->GetNrState()) {
+    if (updateDelay_ || (networkState_->GetNrState() != networkStateOld_->GetNrState())) {
         networkSearchManager->NotifyNrStateChanged(slotId_);
     }
 }
@@ -422,7 +422,7 @@ void NetworkSearchState::NotifyStateChange()
         TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_(slotId_, networkState_);
     }
 
-    if (!(*networkState_ == *networkStateOld_)) {
+    if (updateDelay_ || !(*networkState_ == *networkStateOld_)) {
         TELEPHONY_LOGI(
             "NetworkSearchState::StateCheck isNetworkStateChange notify to app... slotId:%{public}d", slotId_);
         sptr<NetworkState> ns = new NetworkState;
@@ -437,6 +437,9 @@ void NetworkSearchState::NotifyStateChange()
         if (TELEPHONY_EXT_WRAPPER.processStateChangeExt_ != nullptr) {
             bool needDelay = TELEPHONY_EXT_WRAPPER.processStateChangeExt_(slotId_, ns);
             if (needDelay) {
+                networkState_->Marshalling(data);
+                networkStateOld_->ReadFromParcel(data);
+                updateDelay_ = true;
                 return;
             }
         }
@@ -454,6 +457,7 @@ void NetworkSearchState::NotifyStateChange()
         networkState_->Marshalling(data);
         networkStateOld_->ReadFromParcel(data);
     }
+    updateDelay_ = false;
 }
 
 void NetworkSearchState::CsRadioTechChange()
@@ -474,7 +478,7 @@ void NetworkSearchState::CsRadioTechChange()
         return;
     }
 
-    if (networkState_->GetCsRadioTech() != networkStateOld_->GetCsRadioTech()) {
+    if (updateDelay_ || networkState_->GetCsRadioTech() != networkStateOld_->GetCsRadioTech()) {
         networkSearchManager->UpdatePhone(slotId_, networkState_->GetCsRadioTech(), networkState_->GetPsRadioTech());
     }
 }
