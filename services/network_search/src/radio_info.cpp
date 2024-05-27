@@ -312,6 +312,7 @@ void RadioInfo::AirplaneModeChange()
         return;
     }
     if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_OFF && isAirplaneModeOn == false) {
+        TELEPHONY_LOGI("radio is off, airplaneMode is closed, slotId:%{public}d", slotId_);
         auto simManager = nsm->GetSimManager();
         if (simManager == nullptr) {
             TELEPHONY_LOGE("get simManager failed");
@@ -322,6 +323,7 @@ void RadioInfo::AirplaneModeChange()
         }
     }
     if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_ON && isAirplaneModeOn == true) {
+        TELEPHONY_LOGI("radio is on, airplaneMode is opened, slotId:%{public}d", slotId_);
         sptr<NetworkSearchCallBackBase> cellularData = nsm->GetCellularDataCallBack();
         if (cellularData) {
             cellularData->ClearCellularDataConnections(slotId_);
