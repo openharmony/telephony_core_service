@@ -201,11 +201,15 @@ int32_t CoreServiceStub::OnGetPsRadioTech(MessageParcel &data, MessageParcel &re
     auto slotId = data.ReadInt32();
     int32_t radioTech = 0;
     int32_t result = GetPsRadioTech(slotId, radioTech);
-    reply.WriteInt32(result);
+    bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteInt32(radioTech);
+        ret = (ret && reply.WriteInt32(radioTech));
     }
-    return result;
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetCsRadioTech(MessageParcel &data, MessageParcel &reply)
@@ -213,11 +217,15 @@ int32_t CoreServiceStub::OnGetCsRadioTech(MessageParcel &data, MessageParcel &re
     auto slotId = data.ReadInt32();
     int32_t radioTech = 0;
     int32_t result = GetCsRadioTech(slotId, radioTech);
-    reply.WriteInt32(result);
+    bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteInt32(radioTech);
+        ret = (ret && reply.WriteInt32(radioTech));
     }
-    return result;
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetOperatorNumeric(MessageParcel &data, MessageParcel &reply)
@@ -241,11 +249,15 @@ int32_t CoreServiceStub::OnGetOperatorName(MessageParcel &data, MessageParcel &r
     auto slotId = data.ReadInt32();
     std::u16string operatorName = u"";
     int32_t result = GetOperatorName(slotId, operatorName);
-    reply.WriteInt32(result);
+    bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteString16(operatorName);
+        ret = (ret && reply.WriteString16(operatorName));
     }
-    return result;
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetSignalInfoList(MessageParcel &data, MessageParcel &reply)
@@ -253,15 +265,17 @@ int32_t CoreServiceStub::OnGetSignalInfoList(MessageParcel &data, MessageParcel 
     auto slotId = data.ReadInt32();
     std::vector<sptr<SignalInformation>> signals;
     int32_t result = GetSignalInfoList(slotId, signals);
-    reply.WriteInt32(result);
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        return result;
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    reply.WriteInt32(static_cast<int32_t>(signals.size()));
-    for (const auto &v : signals) {
-        v->Marshalling(reply);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteInt32(static_cast<int32_t>(signals.size()));
+        for (const auto &v : signals) {
+            v->Marshalling(reply);
+        }
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetNetworkState(MessageParcel &data, MessageParcel &reply)
@@ -273,11 +287,14 @@ int32_t CoreServiceStub::OnGetNetworkState(MessageParcel &data, MessageParcel &r
         TELEPHONY_LOGE("networkState is nullptr and permission is not denied.");
         result = TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    reply.WriteInt32(result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
     if (result == TELEPHONY_ERR_SUCCESS) {
         networkState->Marshalling(reply);
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSetRadioState(MessageParcel &data, MessageParcel &reply)
@@ -301,7 +318,7 @@ int32_t CoreServiceStub::OnSetRadioState(MessageParcel &data, MessageParcel &rep
         TELEPHONY_LOGE("CoreServiceStub::OnSetRadioState write reply failed.");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetRadioState(MessageParcel &data, MessageParcel &reply)
@@ -324,7 +341,7 @@ int32_t CoreServiceStub::OnGetRadioState(MessageParcel &data, MessageParcel &rep
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     TELEPHONY_LOGD("CoreServiceStub::OnGetRadioState result:%{public}d", result);
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetIsoCountryCodeForNetwork(MessageParcel &data, MessageParcel &reply)
@@ -332,14 +349,15 @@ int32_t CoreServiceStub::OnGetIsoCountryCodeForNetwork(MessageParcel &data, Mess
     int32_t slotId = data.ReadInt32();
     std::u16string countryCode;
     int32_t result = GetIsoCountryCodeForNetwork(slotId, countryCode);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("OnRemoteRequest::GET_ISO_COUNTRY_CODE write reply failed.");
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(countryCode));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteString16(countryCode);
-    }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetImei(MessageParcel &data, MessageParcel &reply)
@@ -351,14 +369,13 @@ int32_t CoreServiceStub::OnGetImei(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("OnRemoteRequest::OnGetImei write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        return result;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        if (!reply.WriteString16(imei)) {
+            TELEPHONY_LOGE("OnRemoteRequest::OnGetImei write reply failed.");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
     }
-    if (!reply.WriteString16(imei)) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnGetImei write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetImeiSv(MessageParcel &data, MessageParcel &reply)
@@ -370,14 +387,13 @@ int32_t CoreServiceStub::OnGetImeiSv(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("OnRemoteRequest::OnGetImeiSv write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        return result;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        if (!reply.WriteString16(imeiSv)) {
+            TELEPHONY_LOGE("OnRemoteRequest::OnGetImeiSv write reply failed.");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
     }
-    if (!reply.WriteString16(imeiSv)) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnGetImeiSv write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetMeid(MessageParcel &data, MessageParcel &reply)
@@ -389,14 +405,13 @@ int32_t CoreServiceStub::OnGetMeid(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("OnRemoteRequest::OnGetMeid write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        return result;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        if (!reply.WriteString16(meid)) {
+            TELEPHONY_LOGE("OnRemoteRequest::OnGetMeid write reply failed.");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
     }
-    if (!reply.WriteString16(meid)) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnGetMeid write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetUniqueDeviceId(MessageParcel &data, MessageParcel &reply)
@@ -408,14 +423,13 @@ int32_t CoreServiceStub::OnGetUniqueDeviceId(MessageParcel &data, MessageParcel 
         TELEPHONY_LOGE("OnRemoteRequest::OnGetUniqueDeviceId write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        return result;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        if (!reply.WriteString16(deviceId)) {
+            TELEPHONY_LOGE("OnRemoteRequest::OnGetUniqueDeviceId write reply failed.");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
     }
-    if (!reply.WriteString16(deviceId)) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnGetUniqueDeviceId write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnIsNrSupported(MessageParcel &data, MessageParcel &reply)
@@ -450,7 +464,7 @@ int32_t CoreServiceStub::OnSetNrOptionMode(MessageParcel &data, MessageParcel &r
         TELEPHONY_LOGE("OnRemoteRequest::OnSetNrOptionMode write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetNrOptionMode(MessageParcel &data, MessageParcel &reply)
@@ -472,7 +486,7 @@ int32_t CoreServiceStub::OnGetNrOptionMode(MessageParcel &data, MessageParcel &r
         TELEPHONY_LOGE("OnRemoteRequest::OnGetNrOptionMode write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnHasSimCard(MessageParcel &data, MessageParcel &reply)
@@ -489,7 +503,7 @@ int32_t CoreServiceStub::OnHasSimCard(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetSimState(MessageParcel &data, MessageParcel &reply)
@@ -505,7 +519,7 @@ int32_t CoreServiceStub::OnGetSimState(MessageParcel &data, MessageParcel &reply
         TELEPHONY_LOGE("OnRemoteRequest::GET_SIM_STATE write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetDsdsMode(MessageParcel &data, MessageParcel &reply)
@@ -520,7 +534,7 @@ int32_t CoreServiceStub::OnGetDsdsMode(MessageParcel &data, MessageParcel &reply
         TELEPHONY_LOGE("OnRemoteRequest::GET_DSDS_MODE write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetCardType(MessageParcel &data, MessageParcel &reply)
@@ -536,7 +550,7 @@ int32_t CoreServiceStub::OnGetCardType(MessageParcel &data, MessageParcel &reply
         TELEPHONY_LOGE("OnRemoteRequest::GET_CARD_TYPE write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetISOCountryCodeForSim(MessageParcel &data, MessageParcel &reply)
@@ -552,7 +566,7 @@ int32_t CoreServiceStub::OnGetISOCountryCodeForSim(MessageParcel &data, MessageP
         TELEPHONY_LOGE("OnRemoteRequest::GET_ISO_COUNTRY_CODE write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetSimSpn(MessageParcel &data, MessageParcel &reply)
@@ -568,7 +582,7 @@ int32_t CoreServiceStub::OnGetSimSpn(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("OnRemoteRequest::GET_SPN write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetSimIccId(MessageParcel &data, MessageParcel &reply)
@@ -584,7 +598,7 @@ int32_t CoreServiceStub::OnGetSimIccId(MessageParcel &data, MessageParcel &reply
         TELEPHONY_LOGE("OnRemoteRequest::GET_ICCID write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetSimOperatorNumeric(MessageParcel &data, MessageParcel &reply)
@@ -600,7 +614,7 @@ int32_t CoreServiceStub::OnGetSimOperatorNumeric(MessageParcel &data, MessagePar
         TELEPHONY_LOGE("OnRemoteRequest::GET_SIM_OPERATOR_NUMERIC write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetIMSI(MessageParcel &data, MessageParcel &reply)
@@ -616,7 +630,7 @@ int32_t CoreServiceStub::OnGetIMSI(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("OnRemoteRequest::GET_IMSI write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnIsCTSimCard(MessageParcel &data, MessageParcel &reply)
@@ -632,7 +646,7 @@ int32_t CoreServiceStub::OnIsCTSimCard(MessageParcel &data, MessageParcel &reply
         TELEPHONY_LOGE("OnRemoteRequest::IS_CT_SIM_CARD write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnIsSimActive(MessageParcel &data, MessageParcel &reply)
@@ -691,7 +705,7 @@ int32_t CoreServiceStub::OnGetNetworkSearchInformation(MessageParcel &data, Mess
         TELEPHONY_LOGE("OnRemoteRequest::OnGetNetworkSearchInformation write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetNetworkSelectionMode(MessageParcel &data, MessageParcel &reply)
@@ -711,7 +725,7 @@ int32_t CoreServiceStub::OnGetNetworkSelectionMode(MessageParcel &data, MessageP
         TELEPHONY_LOGE("CoreServiceStub::OnGetNetworkSelectionMode write reply failed.");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSetNetworkSelectionMode(MessageParcel &data, MessageParcel &reply)
@@ -737,7 +751,7 @@ int32_t CoreServiceStub::OnSetNetworkSelectionMode(MessageParcel &data, MessageP
         TELEPHONY_LOGE("OnRemoteRequest::OnSetNetworkSelectionMode write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetLocaleFromDefaultSim(MessageParcel &data, MessageParcel &reply)
@@ -764,7 +778,7 @@ int32_t CoreServiceStub::OnGetSimGid1(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("OnRemoteRequest::GetSimGid1 write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetSimGid2(MessageParcel &data, MessageParcel &reply)
@@ -808,7 +822,7 @@ int32_t CoreServiceStub::OnGetSimSubscriptionInfo(MessageParcel &data, MessagePa
         TELEPHONY_LOGE("OnGetSimSubscriptionInfo write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSetDefaultVoiceSlotId(MessageParcel &data, MessageParcel &reply)
@@ -820,7 +834,7 @@ int32_t CoreServiceStub::OnSetDefaultVoiceSlotId(MessageParcel &data, MessagePar
         TELEPHONY_LOGE("OnSetDefaultVoiceSlotId write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetDefaultVoiceSlotId(MessageParcel &data, MessageParcel &reply)
@@ -842,15 +856,13 @@ int32_t CoreServiceStub::OnGetDefaultVoiceSimId(MessageParcel &data, MessageParc
         TELEPHONY_LOGE("write int32 reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        return result;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        if (!reply.WriteInt32(simId)) {
+            TELEPHONY_LOGE("write int32 reply failed.");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
     }
-    if (!reply.WriteInt32(simId)) {
-        TELEPHONY_LOGE("write int32 reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-
-    return TELEPHONY_SUCCESS;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSetPrimarySlotId(MessageParcel &data, MessageParcel &reply)
@@ -861,21 +873,22 @@ int32_t CoreServiceStub::OnSetPrimarySlotId(MessageParcel &data, MessageParcel &
         TELEPHONY_LOGE("OnRemoteRequest::OnSetPrimarySlotId write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetPrimarySlotId(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = INVALID_VALUE;
     int32_t result = GetPrimarySlotId(slotId);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("OnGetPrimarySlotId write reply failed.");
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(slotId));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteInt32(slotId);
-    }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnUnlockPin(MessageParcel &data, MessageParcel &reply)
@@ -895,7 +908,7 @@ int32_t CoreServiceStub::OnUnlockPin(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("CoreServiceStub::OnUnlockPin write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnUnlockPuk(MessageParcel &data, MessageParcel &reply)
@@ -916,7 +929,7 @@ int32_t CoreServiceStub::OnUnlockPuk(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("CoreServiceStub::OnUnlockPuk write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnAlterPin(MessageParcel &data, MessageParcel &reply)
@@ -937,7 +950,7 @@ int32_t CoreServiceStub::OnAlterPin(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("CoreServiceStub::OnAlterPin write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnUnlockPin2(MessageParcel &data, MessageParcel &reply)
@@ -957,7 +970,7 @@ int32_t CoreServiceStub::OnUnlockPin2(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("CoreServiceStub::OnUnlockPin2 write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnUnlockPuk2(MessageParcel &data, MessageParcel &reply)
@@ -978,7 +991,7 @@ int32_t CoreServiceStub::OnUnlockPuk2(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("CoreServiceStub::OnUnlockPuk2 write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnAlterPin2(MessageParcel &data, MessageParcel &reply)
@@ -999,7 +1012,7 @@ int32_t CoreServiceStub::OnAlterPin2(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("CoreServiceStub::OnAlterPin2 write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSetLockState(MessageParcel &data, MessageParcel &reply)
@@ -1025,7 +1038,7 @@ int32_t CoreServiceStub::OnSetLockState(MessageParcel &data, MessageParcel &repl
         TELEPHONY_LOGE("CoreServiceStub::OnSetLockState write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetLockState(MessageParcel &data, MessageParcel &reply)
@@ -1044,7 +1057,7 @@ int32_t CoreServiceStub::OnGetLockState(MessageParcel &data, MessageParcel &repl
         TELEPHONY_LOGE("CoreServiceStub::OnGetLockState write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnRefreshSimState(MessageParcel &data, MessageParcel &reply)
@@ -1071,7 +1084,7 @@ int32_t CoreServiceStub::OnSetActiveSim(MessageParcel &data, MessageParcel &repl
         TELEPHONY_LOGE("CoreServiceStub::OnSetActiveSim write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetPreferredNetwork(MessageParcel &data, MessageParcel &reply)
@@ -1092,7 +1105,7 @@ int32_t CoreServiceStub::OnGetPreferredNetwork(MessageParcel &data, MessageParce
         TELEPHONY_LOGE("OnRemoteRequest::OnGetPreferredNetwork write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetNetworkCapability(MessageParcel &data, MessageParcel &reply)
@@ -1109,7 +1122,7 @@ int32_t CoreServiceStub::OnGetNetworkCapability(MessageParcel &data, MessageParc
         TELEPHONY_LOGE("OnRemoteRequest::OnGetNetworkCapability write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSetNetworkCapability(MessageParcel &data, MessageParcel &reply)
@@ -1122,7 +1135,7 @@ int32_t CoreServiceStub::OnSetNetworkCapability(MessageParcel &data, MessageParc
         TELEPHONY_LOGE("OnRemoteRequest::OnSetNetworkCapability write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSetShowNumber(MessageParcel &data, MessageParcel &reply)
@@ -1151,7 +1164,7 @@ int32_t CoreServiceStub::OnGetShowNumber(OHOS::MessageParcel &data, OHOS::Messag
         TELEPHONY_LOGE("OnGetShowNumber write reply failed.");
         return ERR_FLATTEN_OBJECT;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSetShowName(MessageParcel &data, MessageParcel &reply)
@@ -1164,7 +1177,7 @@ int32_t CoreServiceStub::OnSetShowName(MessageParcel &data, MessageParcel &reply
         TELEPHONY_LOGE("OnSetShowName write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSetPreferredNetwork(MessageParcel &data, MessageParcel &reply)
@@ -1188,7 +1201,7 @@ int32_t CoreServiceStub::OnSetPreferredNetwork(MessageParcel &data, MessageParce
         TELEPHONY_LOGE("OnRemoteRequest::OnSetPreferredNetwork write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetShowName(OHOS::MessageParcel &data, OHOS::MessageParcel &reply)
@@ -1204,7 +1217,7 @@ int32_t CoreServiceStub::OnGetShowName(OHOS::MessageParcel &data, OHOS::MessageP
         TELEPHONY_LOGE("OnGetShowName write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetActiveSimAccountInfoList(MessageParcel &data, MessageParcel &reply)
@@ -1228,7 +1241,7 @@ int32_t CoreServiceStub::OnGetActiveSimAccountInfoList(MessageParcel &data, Mess
         }
         ++it;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetOperatorConfig(MessageParcel &data, MessageParcel &reply)
@@ -1247,7 +1260,7 @@ int32_t CoreServiceStub::OnGetOperatorConfig(MessageParcel &data, MessageParcel 
             return TELEPHONY_ERR_WRITE_REPLY_FAIL;
         }
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetSimPhoneNumber(MessageParcel &data, MessageParcel &reply)
@@ -1263,7 +1276,7 @@ int32_t CoreServiceStub::OnGetSimPhoneNumber(MessageParcel &data, MessageParcel 
         TELEPHONY_LOGE("OnRemoteRequest::OnGetSimPhoneNumber write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetSimTeleNumberIdentifier(MessageParcel &data, MessageParcel &reply)
@@ -1291,7 +1304,7 @@ int32_t CoreServiceStub::OnGetVoiceMailInfor(MessageParcel &data, MessageParcel 
         TELEPHONY_LOGE("OnRemoteRequest::OnGetVoiceMailInfor write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetVoiceMailNumber(MessageParcel &data, MessageParcel &reply)
@@ -1307,7 +1320,7 @@ int32_t CoreServiceStub::OnGetVoiceMailNumber(MessageParcel &data, MessageParcel
         TELEPHONY_LOGE("OnRemoteRequest::OnGetVoiceMailNumber write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetVoiceMailCount(MessageParcel &data, MessageParcel &reply)
@@ -1323,7 +1336,7 @@ int32_t CoreServiceStub::OnGetVoiceMailCount(MessageParcel &data, MessageParcel 
         TELEPHONY_LOGE("OnRemoteRequest::OnGetVoiceMailCount write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSetVoiceMailCount(MessageParcel &data, MessageParcel &reply)
@@ -1335,7 +1348,7 @@ int32_t CoreServiceStub::OnSetVoiceMailCount(MessageParcel &data, MessageParcel 
         TELEPHONY_LOGE("OnRemoteRequest::OnSetVoiceMailCount write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSetVoiceCallForwarding(MessageParcel &data, MessageParcel &reply)
@@ -1348,7 +1361,7 @@ int32_t CoreServiceStub::OnSetVoiceCallForwarding(MessageParcel &data, MessagePa
         TELEPHONY_LOGE("OnRemoteRequest::OnSetVoiceCallForwarding write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnDiallingNumbersGet(MessageParcel &data, MessageParcel &reply)
@@ -1362,14 +1375,13 @@ int32_t CoreServiceStub::OnDiallingNumbersGet(MessageParcel &data, MessageParcel
         TELEPHONY_LOGE("OnRemoteRequest::OnDiallingNumbersGet write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        return result;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteInt32(static_cast<int32_t>(diallingNumbers.size()));
+        for (const auto &v : diallingNumbers) {
+            v->Marshalling(reply);
+        }
     }
-    reply.WriteInt32(static_cast<int32_t>(diallingNumbers.size()));
-    for (const auto &v : diallingNumbers) {
-        v->Marshalling(reply);
-    }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnAddIccDiallingNumbers(MessageParcel &data, MessageParcel &reply)
@@ -1387,7 +1399,7 @@ int32_t CoreServiceStub::OnAddIccDiallingNumbers(MessageParcel &data, MessagePar
         TELEPHONY_LOGE("OnAddIccDiallingNumbers write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnUpdateIccDiallingNumbers(MessageParcel &data, MessageParcel &reply)
@@ -1405,7 +1417,7 @@ int32_t CoreServiceStub::OnUpdateIccDiallingNumbers(MessageParcel &data, Message
         TELEPHONY_LOGE("OnUpdateIccDiallingNumbers write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnDelIccDiallingNumbers(MessageParcel &data, MessageParcel &reply)
@@ -1423,7 +1435,7 @@ int32_t CoreServiceStub::OnDelIccDiallingNumbers(MessageParcel &data, MessagePar
         TELEPHONY_LOGE("OnDelIccDiallingNumbers write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSetVoiceMailInfo(MessageParcel &data, MessageParcel &reply)
@@ -1438,7 +1450,7 @@ int32_t CoreServiceStub::OnSetVoiceMailInfo(MessageParcel &data, MessageParcel &
         TELEPHONY_LOGE("OnSetVoiceMailInfo write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetMaxSimCount(MessageParcel &data, MessageParcel &reply)
@@ -1461,15 +1473,13 @@ int32_t CoreServiceStub::OnGetOpKey(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("OnRemoteRequest::OnGetOpKey write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnGetOpKey failed.");
-        return result;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        if (!reply.WriteString16(opkey)) {
+            TELEPHONY_LOGE("OnRemoteRequest::OnGetOpKey write reply failed.");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
     }
-    if (!reply.WriteString16(opkey)) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnGetOpKey write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetOpKeyExt(MessageParcel &data, MessageParcel &reply)
@@ -1481,15 +1491,13 @@ int32_t CoreServiceStub::OnGetOpKeyExt(MessageParcel &data, MessageParcel &reply
         TELEPHONY_LOGE("OnRemoteRequest::OnGetOpKeyExt write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnGetOpKeyExt  failed.");
-        return result;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        if (!reply.WriteString16(opkeyExt)) {
+            TELEPHONY_LOGE("OnRemoteRequest::OnGetOpKeyExt write reply failed.");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
     }
-    if (!reply.WriteString16(opkeyExt)) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnGetOpKeyExt write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetOpName(MessageParcel &data, MessageParcel &reply)
@@ -1501,15 +1509,13 @@ int32_t CoreServiceStub::OnGetOpName(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("OnRemoteRequest::OnGetOpName write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnGetOpName failed.");
-        return result;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        if (!reply.WriteString16(opname)) {
+            TELEPHONY_LOGE("OnRemoteRequest::OnGetOpName write reply failed.");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
     }
-    if (!reply.WriteString16(opname)) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnGetOpName write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSendEnvelopeCmd(MessageParcel &data, MessageParcel &reply)
@@ -1523,7 +1529,7 @@ int32_t CoreServiceStub::OnSendEnvelopeCmd(MessageParcel &data, MessageParcel &r
         TELEPHONY_LOGE("OnRemoteRequest::OnSendEnvelopeCmd write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSendTerminalResponseCmd(MessageParcel &data, MessageParcel &reply)
@@ -1537,7 +1543,7 @@ int32_t CoreServiceStub::OnSendTerminalResponseCmd(MessageParcel &data, MessageP
         TELEPHONY_LOGE("OnRemoteRequest::OnSendTerminalResponseCmd write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSendCallSetupRequestResult(MessageParcel &data, MessageParcel &reply)
@@ -1551,7 +1557,7 @@ int32_t CoreServiceStub::OnSendCallSetupRequestResult(MessageParcel &data, Messa
         TELEPHONY_LOGE("OnRemoteRequest::OnSendCallSetupRequestResult write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnUnlockSimLock(MessageParcel &data, MessageParcel &reply)
@@ -1573,7 +1579,7 @@ int32_t CoreServiceStub::OnUnlockSimLock(MessageParcel &data, MessageParcel &rep
         TELEPHONY_LOGE("CoreServiceStub::OnUnlockSimLock write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetImsRegStatus(MessageParcel &data, MessageParcel &reply)
@@ -1601,14 +1607,11 @@ int32_t CoreServiceStub::OnGetCellInfoList(MessageParcel &data, MessageParcel &r
         TELEPHONY_LOGE("OnRemoteRequest::OnGetCellInfoList write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnGetCellInfoList failed, result:%{public}d, cell size:%{public}zu", result,
-            cellInfo.size());
-        return result;
-    }
-    reply.WriteInt32(static_cast<int32_t>(cellInfo.size()));
-    for (const auto &v : cellInfo) {
-        v->Marshalling(reply);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteInt32(static_cast<int32_t>(cellInfo.size()));
+        for (const auto &v : cellInfo) {
+            v->Marshalling(reply);
+        }
     }
     return NO_ERROR;
 }
@@ -1621,7 +1624,7 @@ int32_t CoreServiceStub::OnGetCellLocation(MessageParcel &data, MessageParcel &r
         TELEPHONY_LOGE("OnRemoteRequest::OnGetCellLocation write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnHasOperatorPrivileges(MessageParcel &data, MessageParcel &reply)
@@ -1637,7 +1640,7 @@ int32_t CoreServiceStub::OnHasOperatorPrivileges(MessageParcel &data, MessagePar
         TELEPHONY_LOGE("OnHasOperatorPrivileges write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnSimAuthentication(MessageParcel &data, MessageParcel &reply)
@@ -1652,7 +1655,7 @@ int32_t CoreServiceStub::OnSimAuthentication(MessageParcel &data, MessageParcel 
     reply.WriteInt32(response.sw2);
     reply.WriteString(response.response);
 
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnRegisterImsRegInfoCallback(MessageParcel &data, MessageParcel &reply)
@@ -1667,8 +1670,12 @@ int32_t CoreServiceStub::OnRegisterImsRegInfoCallback(MessageParcel &data, Messa
     } else {
         result = RegisterImsRegInfoCallback(slotId, imsSrvType, callback);
     }
-    reply.WriteInt32(result);
-    return result;
+    bool ret = reply.WriteInt32(result);
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnUnregisterImsRegInfoCallback(MessageParcel &data, MessageParcel &reply)
@@ -1676,8 +1683,12 @@ int32_t CoreServiceStub::OnUnregisterImsRegInfoCallback(MessageParcel &data, Mes
     int32_t slotId = data.ReadInt32();
     ImsServiceType imsSrvType = static_cast<ImsServiceType>(data.ReadInt32());
     int32_t result = UnregisterImsRegInfoCallback(slotId, imsSrvType);
-    reply.WriteInt32(result);
-    return result;
+    bool ret = reply.WriteInt32(result);
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetBasebandVersion(MessageParcel &data, MessageParcel &reply)
@@ -1689,14 +1700,13 @@ int32_t CoreServiceStub::OnGetBasebandVersion(MessageParcel &data, MessageParcel
         TELEPHONY_LOGE("OnRemoteRequest::OnGetBasebandVersion write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        return result;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        if (!reply.WriteString(version)) {
+            TELEPHONY_LOGE("OnRemoteRequest::OnGetBasebandVersion write reply failed.");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
     }
-    if (!reply.WriteString(version)) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnGetBasebandVersion write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetNrSsbIdInfo(MessageParcel &data, MessageParcel &reply)
@@ -1712,14 +1722,13 @@ int32_t CoreServiceStub::OnGetNrSsbIdInfo(MessageParcel &data, MessageParcel &re
         TELEPHONY_LOGE("Write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        return result;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        if (!nrSsbInformation->Marshalling(reply)) {
+            TELEPHONY_LOGE("Marshalling is failed.");
+            return TELEPHONY_ERR_WRITE_DATA_FAIL;
+        }
     }
-    if (!nrSsbInformation->Marshalling(reply)) {
-        TELEPHONY_LOGE("Marshalling is failed.");
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnFactoryReset(MessageParcel &data, MessageParcel &reply)
@@ -1730,7 +1739,7 @@ int32_t CoreServiceStub::OnFactoryReset(MessageParcel &data, MessageParcel &repl
         TELEPHONY_LOGE("Write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnInitExtraModule(MessageParcel &data, MessageParcel &reply)
@@ -1741,7 +1750,7 @@ int32_t CoreServiceStub::OnInitExtraModule(MessageParcel &data, MessageParcel &r
         TELEPHONY_LOGE("Write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnIsAllowedInsertApn(MessageParcel &data, MessageParcel &reply)
@@ -1752,7 +1761,7 @@ int32_t CoreServiceStub::OnIsAllowedInsertApn(MessageParcel &data, MessageParcel
         TELEPHONY_LOGE("Write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return TELEPHONY_ERR_SUCCESS;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetTargetOpkey(MessageParcel &data, MessageParcel &reply)
@@ -1768,7 +1777,7 @@ int32_t CoreServiceStub::OnGetTargetOpkey(MessageParcel &data, MessageParcel &re
         TELEPHONY_LOGE("Write reply result failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply)
@@ -1783,7 +1792,7 @@ int32_t CoreServiceStub::OnGetOpkeyVersion(MessageParcel &data, MessageParcel &r
         TELEPHONY_LOGE("Write reply result failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return NO_ERROR;
 }
 } // namespace Telephony
 } // namespace OHOS
