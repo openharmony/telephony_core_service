@@ -175,6 +175,7 @@ ohos_shared_library("tel_core_service") {
     "hdf_core:libpub_utils",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
+    "huks:libhukssdk",
     "i18n:intl_util",
     "i18n:zone_util",
     "init:libbegetutil",
@@ -185,7 +186,6 @@ ohos_shared_library("tel_core_service") {
     "samgr:samgr_proxy",
     "telephony_data:tel_telephony_data",
     "time_service:time_client",
-    "huks:libhukssdk",
   ]
 
   if (defined(global_parts_info) &&
