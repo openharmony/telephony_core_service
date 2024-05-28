@@ -2055,7 +2055,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_003, Function | MediumTest |
     EXPECT_TRUE(networkSearchManager->GetCellLocation(INVALID_SLOTID) == nullptr);
     bool airplaneMode = false;
     EXPECT_NE(networkSearchManager->GetAirplaneMode(airplaneMode), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(networkSearchManager->UpdateRadioOn(-1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->UpdateRadioOn(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->UpdateNrOptionMode(INVALID_SLOTID, NrMode::NR_MODE_UNKNOWN), TELEPHONY_SUCCESS);
     int32_t status = 0;
     EXPECT_NE(networkSearchManager->UpdateRrcConnectionState(INVALID_SLOTID, status), TELEPHONY_SUCCESS);
