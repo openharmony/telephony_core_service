@@ -728,6 +728,12 @@ void IccFile::SaveCountryCode()
     SetParameter(key.c_str(), countryCode.c_str());
 }
 
+void IccFile::ProcessExtGetFileResponse()
+{
+    bool response = true;
+    ProcessFileLoaded(response);
+}
+
 void IccFile::ProcessExtGetFileDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     ProcessEvent(event);

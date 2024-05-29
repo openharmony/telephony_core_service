@@ -91,6 +91,10 @@ public:
     {
     }
 
+    virtual void ProcessExtGetFileResponse()
+    {
+    }
+
 protected:
     std::weak_ptr<OHOS::Telephony::IIccFileExt> iccFile_;
 };
