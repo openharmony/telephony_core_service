@@ -323,17 +323,23 @@ void PrintfUsage()
 
 int32_t MainExit()
 {
-    std::vector<AccessTokenIDEx>::iterator it = simAccountCallbackTokenIDVec_.begin();
-    while (it != simAccountCallbackTokenIDVec_.end()) {
-        simAccountCallbackTokenIDVec_.erase(it);
+    if (!simAccountCallbackTokenIDVec_.empty()) {
+        std::vector<AccessTokenIDEx>::iterator it = simAccountCallbackTokenIDVec_.begin();
+        while (it != simAccountCallbackTokenIDVec_.end()) {
+            simAccountCallbackTokenIDVec_.erase(it++);
+        }
     }
-    it = imsCallbackTokenIDVec_.begin();
-    while (it != imsCallbackTokenIDVec_.end()) {
-        imsCallbackTokenIDVec_.erase(it);
+    if (!imsCallbackTokenIDVec_.empty()) {
+        std::vector<AccessTokenIDEx>::iterator it = imsCallbackTokenIDVec_.begin();
+        while (it != imsCallbackTokenIDVec_.end()) {
+            imsCallbackTokenIDVec_.erase(it++);
+        }
     }
-    it = stateObserverTokenIDVec_.begin();
-    while (it != stateObserverTokenIDVec_.end()) {
-        stateObserverTokenIDVec_.erase(it);
+    if (!stateObserverTokenIDVec_.empty()) {
+        std::vector<AccessTokenIDEx>::iterator it = stateObserverTokenIDVec_.begin();
+        while (it != stateObserverTokenIDVec_.end()) {
+            stateObserverTokenIDVec_.erase(it++);
+        }
     }
     OHOS::Telephony::g_memberFuncMap.clear();
     std::cout << "exit success" << std::endl;
@@ -385,7 +391,7 @@ int32_t RunTest()
         std::cout << "err: invalid input!" << std::endl;
         break;
     }
-    return mainExit();
+    return MainExit();
 }
 } // namespace Telephony
 } // namespace OHOS
@@ -401,7 +407,7 @@ int32_t main()
         std::cin >> code;
         if (code == static_cast<int32_t>(OHOS::Telephony::CallManagerInterfaceType::REGISTER_CALLBACK_TYPE)) {
             OHOS::Telephony::RunTest();
-            OHOS::Telephony::mainExit();
+            OHOS::Telephony::MainExit();
         } else if (code == exitCode) {
             break;
         }
