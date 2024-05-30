@@ -45,6 +45,7 @@ constexpr int32_t NR_NSA_OPTION_ONLY = 1;
 constexpr int32_t SIGNAL_STRENGTH_GOOD = 3;
 const std::string NITZ_STR = "23/10/16,09:10:33+32,00";
 const std::string NITZ_STR_INVALID = "202312102359";
+constexpr int32_t LTE_RSSI_GOOD = -80;
 } // namespace
 
 class CoreServiceBranchTest : public testing::Test {
@@ -817,6 +818,20 @@ HWTEST_F(CoreServiceBranchTest, Telephony_SignalInformation_001, Function | Medi
     tdScdma->GetSignalLevel();
     tdScdma->SetSignalLevel(SIGNAL_STRENGTH_GOOD);
     EXPECT_EQ(tdScdma->GetSignalLevel(), SIGNAL_STRENGTH_GOOD);
+}
+
+/**
+ * @tc.number   Telephony_SignalInfo_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_SignalInfo_001, Function | MediumTest | Level1)
+{
+    auto signalInfo = std::make_shared<SignalInfo>();
+    Rssi signalIntensity;
+    signalIntensity.lte.rsrp = LTE_RSSI_GOOD;
+    signalInfo->ProcessSignalIntensity(SLOT_ID, &signalIntensity);
+    EXPECT_TRUE(signalInfo->ProcessLte(signalIntensity.lte));
 }
 } // namespace Telephony
 } // namespace OHOS
