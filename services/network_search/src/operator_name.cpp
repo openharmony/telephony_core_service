@@ -193,7 +193,7 @@ sptr<NetworkState> OperatorName::GetNetworkStatus()
 /**
  * 3GPP TS 51.011 V5.0.0(2001-12) 10.3.11
  */
-void OperatorName::NotifySpnChanged()
+void OperatorName::NotifySpnChanged(bool isForce)
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
@@ -220,9 +220,9 @@ void OperatorName::NotifySpnChanged()
     }
 
     if (networkSearchManager->GetPhoneType(slotId_) == PhoneType::PHONE_TYPE_IS_GSM) {
-        NotifyGsmSpnChanged(regStatus, networkState, domesticSpn);
+        NotifyGsmSpnChanged(regStatus, networkState, domesticSpn, isForce);
     } else if (networkSearchManager->GetPhoneType(slotId_) == PhoneType::PHONE_TYPE_IS_CDMA) {
-        NotifyCdmaSpnChanged(regStatus, networkState, domesticSpn);
+        NotifyCdmaSpnChanged(regStatus, networkState, domesticSpn, isForce);
     }
 }
 
@@ -283,7 +283,7 @@ void OperatorName::UpdateSpn(
 }
 
 void OperatorName::NotifyGsmSpnChanged(
-    RegServiceState regStatus, sptr<NetworkState> &networkState, const std::string &domesticSpn)
+    RegServiceState regStatus, sptr<NetworkState> &networkState, const std::string &domesticSpn, bool isForce)
 {
     if (networkState == nullptr) {
         TELEPHONY_LOGE("OperatorName::NotifyGsmSpnChanged networkState is nullptr slotId:%{public}d", slotId_);
@@ -319,8 +319,8 @@ void OperatorName::NotifyGsmSpnChanged(
         "displayConditionCust_:%{public}d domesticSpn:%{public}s slotId:%{public}d",
         showSpn, curSpn_.c_str(), spn.c_str(), showPlmn, curPlmn_.c_str(), plmn.c_str(), showPlmnOld, enableCust_,
         displayConditionCust_, domesticSpn.c_str(), slotId_);
-    if (curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn || curPlmnShow_ != showPlmn ||
-        curSpn_.compare(spn) || curPlmn_.compare(plmn)) {
+    if (isForce || curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn ||
+        curPlmnShow_ != showPlmn || curSpn_.compare(spn) || curPlmn_.compare(plmn)) {
         TELEPHONY_LOGI("OperatorName::NotifyGsmSpnChanged start send broadcast slotId:%{public}d...", slotId_);
         PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn, domesticSpn);
     } else {
@@ -330,7 +330,7 @@ void OperatorName::NotifyGsmSpnChanged(
 }
 
 void OperatorName::NotifyCdmaSpnChanged(
-    RegServiceState regStatus, sptr<NetworkState> &networkState, const std::string &domesticSpn)
+    RegServiceState regStatus, sptr<NetworkState> &networkState, const std::string &domesticSpn, bool isForce)
 {
     if (networkState == nullptr) {
         TELEPHONY_LOGE("OperatorName::NotifyCdmaSpnChanged networkState is nullptr slotId:%{public}d", slotId_);
@@ -358,8 +358,8 @@ void OperatorName::NotifyCdmaSpnChanged(
         "OperatorName::NotifyCdmaSpnChanged showSpn:%{public}d curSpn_:%{public}s spn:%{public}s "
         "showPlmn:%{public}d curPlmn_:%{public}s plmn:%{public}s slotId:%{public}d",
         showSpn, curSpn_.c_str(), spn.c_str(), showPlmn, curPlmn_.c_str(), plmn.c_str(), slotId_);
-    if (curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn || curPlmnShow_ != showPlmn ||
-        curSpn_.compare(spn) || curPlmn_.compare(plmn)) {
+    if (isForce || curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn ||
+        curPlmnShow_ != showPlmn || curSpn_.compare(spn) || curPlmn_.compare(plmn)) {
         TELEPHONY_LOGI("OperatorName::NotifyCdmaSpnChanged start send broadcast slotId:%{public}d...", slotId_);
         PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn, domesticSpn);
     } else {
