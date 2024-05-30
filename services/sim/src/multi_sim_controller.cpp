@@ -402,6 +402,9 @@ void MultiSimController::SortCache()
         sortCache[localCacheInfo_[j].slotIndex] = localCacheInfo_[j];
     }
     localCacheInfo_ = sortCache;
+    count = localCacheInfo_.size();
+    TELEPHONY_LOGI("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d", static_cast<unsigned long>(count),
+                   maxCount_);
 }
 
 /*
