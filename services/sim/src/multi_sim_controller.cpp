@@ -652,8 +652,8 @@ int32_t MultiSimController::GetDefaultVoiceSlotId()
     std::unique_lock<std::mutex> lock(mutex_);
     if (localCacheInfo_.size() != static_cast<size_t>(maxCount_)) {
         size_t count = localCacheInfo_.size();
-        TELEPHONY_LOGE("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d", static_cast<unsigned long>(count),
-            maxCount_);
+        TELEPHONY_LOGE("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d",
+            static_cast<unsigned long>(count), maxCount_);
         return INVALID_VALUE;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
@@ -715,8 +715,8 @@ int32_t MultiSimController::SetDefaultVoiceSlotId(int32_t slotId)
     std::unique_lock<std::mutex> lock(mutex_);
     if (localCacheInfo_.size() != static_cast<size_t>(maxCount_)) {
         size_t count = localCacheInfo_.size();
-        TELEPHONY_LOGE("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d", static_cast<unsigned long>(count),
-            maxCount_);
+        TELEPHONY_LOGE("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d",
+            static_cast<unsigned long>(count), maxCount_);
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     for (; i < maxCount_; i++) { // save to cache
@@ -752,8 +752,8 @@ int32_t MultiSimController::GetDefaultSmsSlotId()
     std::unique_lock<std::mutex> lock(mutex_);
     if (localCacheInfo_.size() != static_cast<size_t>(maxCount_)) {
         size_t count = localCacheInfo_.size();
-        TELEPHONY_LOGE("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d", static_cast<unsigned long>(count),
-            maxCount_);
+        TELEPHONY_LOGE("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d",
+            static_cast<unsigned long>(count), maxCount_);
         return INVALID_VALUE;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
@@ -787,8 +787,8 @@ int32_t MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
     std::unique_lock<std::mutex> lock(mutex_);
     if (localCacheInfo_.size() != static_cast<size_t>(maxCount_)) {
         size_t count = localCacheInfo_.size();
-        TELEPHONY_LOGE("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d", static_cast<unsigned long>(count),
-            maxCount_);
+        TELEPHONY_LOGE("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d",
+            static_cast<unsigned long>(count), maxCount_);
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     for (; i < maxCount_; i++) { // save to cache
