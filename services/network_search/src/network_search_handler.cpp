@@ -1259,6 +1259,7 @@ void NetworkSearchHandler::SystemAbilityStatusChangeListener::OnAddSystemAbility
         TELEPHONY_LOGE("OnAddSystemAbility COMMON_EVENT_SERVICE_ID opName_ is nullptr");
         return;
     }
+    opName_->NotifySpnChanged(true);
     bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(opName_);
     TELEPHONY_LOGI("NetworkSearchHandler::OnAddSystemAbility subscribeResult = %{public}d", subscribeResult);
 }
