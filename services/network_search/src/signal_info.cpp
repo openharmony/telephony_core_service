@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -148,6 +148,9 @@ void SignalInfo::ProcessSignalIntensity(int32_t slotId, const Rssi *signalIntens
     if (!gsmUpdate || !cdmaUpdate || !lteUpdate || !wcdmaUpdate || !tdScdmaUpdate || !nrUpdate) {
         std::vector<sptr<SignalInformation>> signals;
         GetSignalInfoList(signals);
+        if (TELEPHONY_EXT_WRAPPER.sortSignalInfoListExt_ != nullptr) {
+            TELEPHONY_EXT_WRAPPER.sortSignalInfoListExt_(slotId, signals);
+        }
         DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifySignalInfoUpdated(slotId, signals);
         int level = 0;
         if (signals.size() != 0) {
