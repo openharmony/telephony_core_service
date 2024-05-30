@@ -36,7 +36,7 @@ public:
     virtual ~OperatorName() = default;
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     void HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event);
-    void NotifySpnChanged();
+    void NotifySpnChanged(bool isForce = false);
     void TrySetLongOperatorNameWithTranslation();
 
 private:
@@ -45,10 +45,10 @@ private:
     void PublishEvent(int32_t rule, RegServiceState state, bool showPlmn, const std::string &plmn, bool showSpn,
         const std::string &spn, const std::string &domesticSpn);
     sptr<NetworkState> GetNetworkStatus();
-    void NotifyGsmSpnChanged(
-        RegServiceState regStatus, sptr<NetworkState> &networkState, const std::string &domesticSpn);
-    void NotifyCdmaSpnChanged(
-        RegServiceState regStatus, sptr<NetworkState> &networkState, const std::string &domesticSpn);
+    void NotifyGsmSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState,
+        const std::string &domesticSpn, bool isForce = false);
+    void NotifyCdmaSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState,
+        const std::string &domesticSpn, bool isForce = false);
 
     void UpdatePlmn(RegServiceState regStatus, sptr<NetworkState> &networkState, int32_t spnRule, std::string &plmn,
         bool &showPlmn);
