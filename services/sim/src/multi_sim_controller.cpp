@@ -403,8 +403,8 @@ void MultiSimController::SortCache()
     }
     localCacheInfo_ = sortCache;
     count = localCacheInfo_.size();
-    TELEPHONY_LOGI("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d", static_cast<unsigned long>(count),
-                   maxCount_);
+    TELEPHONY_LOGI("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d",
+        static_cast<unsigned long>(count), maxCount_);
 }
 
 /*
