@@ -751,6 +751,7 @@ int32_t MultiSimController::GetDefaultSmsSlotId()
     }
     std::unique_lock<std::mutex> lock(mutex_);
     if (localCacheInfo_.size() != static_cast<size_t>(maxCount_)) {
+        size_t count = localCacheInfo_.size();
         TELEPHONY_LOGE("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d", static_cast<unsigned long>(count),
             maxCount_);
         return INVALID_VALUE;
@@ -785,6 +786,7 @@ int32_t MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
     int32_t i = DEFAULT_SIM_SLOT_ID;
     std::unique_lock<std::mutex> lock(mutex_);
     if (localCacheInfo_.size() != static_cast<size_t>(maxCount_)) {
+        size_t count = localCacheInfo_.size();
         TELEPHONY_LOGE("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d", static_cast<unsigned long>(count),
             maxCount_);
         return TELEPHONY_ERR_NO_SIM_CARD;
