@@ -166,6 +166,7 @@ protected:
     const uint8_t BYTE_NUM6 = 0xFE;
     const uint8_t BYTE_NUM7 = 0xF0;
     const int DATA_STEP = 2;
+    const int LENGTH_TWO = 2;
     static std::unique_ptr<ObserverHandler> filesFetchedObser_;
     std::unique_ptr<ObserverHandler> lockedFilesFetchedObser_ = nullptr;
     std::unique_ptr<ObserverHandler> networkLockedFilesFetchedObser_ = nullptr;
