@@ -341,9 +341,9 @@ int32_t VCardConstructor::ConstructPhones(std::shared_ptr<VCardContact> contact)
         }
         std::string labelId = data->GetLabelId();
         std::string labelName = data->GetLabelName();
-        int32_t type = static_cast<int32_t>(PhoneVcType::NUM_HOME);
-        if (VCardUtils::IsNum(labelId)) {
-            type = std::stoi(labelId);
+        int64_t type = static_cast<int64_t>(PhoneVcType::NUM_HOME);
+        if (VCardUtils::IsNum(labelId) && labelId.size() < INT_64_LENTGH + 1) {
+            type = std::stoll(labelId);
         }
         if (phoneNumberEncodedCallback_ != nullptr) {
             phoneNumberEncodedCallback_->onCallback(number, type, labelName, false);
@@ -722,8 +722,8 @@ void VCardConstructor::AddTelLine(const std::string &labelId, const std::string 
     auto paramTypes = VCardUtils::GetTypeFromPhoneLabelId(labelId);
     if (!paramTypes.empty()) {
         AddParamTypes(paramTypes);
-    } else if (VCardUtils::IsNum(labelId)) {
-        auto phoneType = static_cast<PhoneVcType>(std::stoi(labelId));
+    } else if (VCardUtils::IsNum(labelId) && labelId.size() < INT_64_LENTGH + 1) {
+        auto phoneType = static_cast<PhoneVcType>(std::stoll(labelId));
         if (phoneType == PhoneVcType::CUSTOM_LABEL) {
             paramTypes.push_back("X-" + labelName);
             AddParamTypes(paramTypes);
