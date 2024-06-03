@@ -1951,7 +1951,7 @@ bool SimFile::EfCfisAvailable(int32_t size)
 void SimFile::ClearData()
 {
     spnStatus_ = OBTAIN_SPN_NONE;
-    reloadIccidCount_ = 3;
+    reloadIccidCount_ = RELOAD_ICCID_COUNT;
     IccFile::ClearData();
 }
 } // namespace Telephony
