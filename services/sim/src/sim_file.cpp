@@ -33,6 +33,7 @@ using namespace OHOS::EventFwk;
 namespace OHOS {
 namespace Telephony {
 constexpr static const int32_t WAIT_TIME_SECOND = 1;
+const int64_t DELAY_TIME = 500;
 std::mutex IccFile::mtx_;
 SimFile::SimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("SimFile", simStateManager)
 {
@@ -1055,7 +1056,27 @@ bool SimFile::ProcessGetIccIdDone(const AppExecFwk::InnerEvent::Pointer &event)
         decIccId_ = iccData;
         iccId_ = fullIccData;
         FileChangeToExt(iccId_, FileChangeType::ICCID_FILE_LOAD);
+    } else {
+        if (iccId_.empty() && reloadIccidCount_ > 0) {
+            fileToGet_++;
+            SendEvent(SimFile::RELOAD_ICCID_EVENT, 0, DELAY_TIME);
+            TELEPHONY_LOGI("retry reload iccid %{public}d, slotId is %{public}d",
+                static_cast<int32_t>(reloadIccidCount_), slotId_);
+            reloadIccidCount_--;
+        }
     }
+    return isFileProcessResponse;
+}
+
+bool SimFile::ProcessReloadIccid(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    bool isFileProcessResponse = false;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("ProcessReloadIccid event is nullptr");
+        return isFileProcessResponse;
+    }
+    AppExecFwk::InnerEvent::Pointer eventIccId = BuildCallerInfo(MSG_SIM_OBTAIN_ICCID_DONE);
+    fileController_->ObtainBinaryFile(ELEMENTARY_FILE_ICCID, eventIccId);
     return isFileProcessResponse;
 }
 
@@ -1659,6 +1680,7 @@ void SimFile::InitMemberFunc()
     memberFuncMap_[RadioEvent::RADIO_SIM_STATE_READY] = &SimFile::ProcessIccReady;
     memberFuncMap_[RadioEvent::RADIO_SIM_STATE_LOCKED] = &SimFile::ProcessIccLocked;
     memberFuncMap_[RadioEvent::RADIO_SIM_STATE_SIMLOCK] = &SimFile::ProcessIccLocked;
+    memberFuncMap_[SimFile::RELOAD_ICCID_EVENT] = &SimFile::ProcessReloadIccid;
     memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] = &SimFile::ProcessObtainIMSIDone;
     memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] = &SimFile::ProcessGetIccIdDone;
     memberFuncMap_[MSG_SIM_OBTAIN_MBI_DONE] = &SimFile::ProcessGetMbiDone;
@@ -1929,6 +1951,7 @@ bool SimFile::EfCfisAvailable(int32_t size)
 void SimFile::ClearData()
 {
     spnStatus_ = OBTAIN_SPN_NONE;
+    reloadIccidCount_ = 3;
     IccFile::ClearData();
 }
 } // namespace Telephony

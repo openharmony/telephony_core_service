@@ -45,6 +45,11 @@ public:
     void SetVoiceMailNumber(const std::string mailNumber);
     void ClearData();
 
+public:
+    enum {
+        RELOAD_ICCID_EVENT = 0,
+    };
+
 protected:
     enum SpnStatus {
         OBTAIN_SPN_NONE,
@@ -127,11 +132,13 @@ private:
     bool ProcessObtainSpnPhase(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessObtainLiLanguage(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessObtainPlLanguage(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessReloadIccid(const AppExecFwk::InnerEvent::Pointer &event);
     void StartObtainSpn();
     void LoadSimOtherFile();
 
     void CheckMncLength();
     bool IsContinueGetSpn(bool start, SpnStatus curStatus, SpnStatus &newStatus);
+    std::atomic<int32_t> reloadIccidCount_ = 32;
     const int MNC_INDEX = 7;
     const int MCC_LEN = 3;
     const int MNC_LEN = 2;
