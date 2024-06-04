@@ -45,6 +45,11 @@ public:
     void SetVoiceMailNumber(const std::string mailNumber);
     void ClearData();
 
+public:
+    enum {
+        RELOAD_ICCID_EVENT = 0,
+    };
+
 protected:
     enum SpnStatus {
         OBTAIN_SPN_NONE,
@@ -127,11 +132,13 @@ private:
     bool ProcessObtainSpnPhase(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessObtainLiLanguage(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessObtainPlLanguage(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessReloadIccid(const AppExecFwk::InnerEvent::Pointer &event);
     void StartObtainSpn();
     void LoadSimOtherFile();
 
     void CheckMncLength();
     bool IsContinueGetSpn(bool start, SpnStatus curStatus, SpnStatus &newStatus);
+    std::atomic<int32_t> reloadIccidCount_ = 3;
     const int MNC_INDEX = 7;
     const int MCC_LEN = 3;
     const int MNC_LEN = 2;
@@ -140,6 +147,7 @@ private:
     const int INVALID_BYTES_NUM = 1;
     const int SPN_CHAR_POS = 0;
     const int MAIL_DELAY_TIME = 50 * 1000;
+    const int RELOAD_ICCID_COUNT = 3;
     static const uint8_t CPHS_VOICE_MAIL_MASK = 0x30;
     static const uint8_t CPHS_VOICE_MAIL_EXSIT = 0x30;
     static const int CFIS_BCD_NUMBER_LENGTH_OFFSET = 2;
