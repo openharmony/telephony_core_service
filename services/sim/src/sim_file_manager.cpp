@@ -847,7 +847,9 @@ void SimFileManager::ChangeSimFileByCardType(SimFileManager::IccType type)
         TELEPHONY_LOGI("SimFileManager handle new icc invalid type received %{public}d", type);
         return;
     }
-    if (type == iccType_) {
+    if (type == iccType_ || (iccType_ == SimFileManager::IccType::ICC_TYPE_USIM && type ==
+        SimFileManager::IccType::ICC_TYPE_GSM) || (iccType_ == SimFileManager::IccType::ICC_TYPE_GSM &&
+        type == SimFileManager::IccType::ICC_TYPE_USIM)) {
         TELEPHONY_LOGI("SimFileManager same type as ready");
         return;
     }
