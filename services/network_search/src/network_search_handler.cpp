@@ -1252,7 +1252,7 @@ bool NetworkSearchHandler::IsSatelliteOn() const
 
 void NetworkSearchHandler::ClearSignalAndCellInfoList() const
 {
-    if(signalInfo_ != nullptr) {
+    if (signalInfo_ != nullptr) {
         signalInfo_->Reset();
     }
     if (cellInfo_ != nullptr) {
