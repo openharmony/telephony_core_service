@@ -59,6 +59,8 @@ private:
     std::shared_ptr<DataShare::DataShareHelper> CreateSimHelper() const;
     std::string GetOpKey(std::shared_ptr<DataShare::DataShareResultSet> resultSet, int32_t slotId);
     bool MatchOperatorRule(std::shared_ptr<DataShare::DataShareResultSet> &resultSet, int row);
+    void SetMatchResultToSimFileManager(std::string opKeyVal, std::string opNameVal, std::string opKeyExtVal,
+        int32_t slotId, std::shared_ptr<SimFileManager> simFileManager);
     int InsertOpkeyToSimDb(std::string opKeyVal);
 
 private:
@@ -69,6 +71,7 @@ private:
     std::string spnFromSim_;
     std::string gid1FromSim_;
     std::string gid2FromSim_;
+    std::string mccmncFromSim_;
 };
 } // namespace Telephony
 } // namespace OHOS

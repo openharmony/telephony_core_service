@@ -157,17 +157,20 @@ std::string OperatorConfigLoader::GetOpKey(std::shared_ptr<DataShare::DataShareR
     spnFromSim_ = Str16ToStr8(simFileManager->GetSimSpn());
     gid1FromSim_ = Str16ToStr8(simFileManager->GetSimGid1());
     gid2FromSim_ = Str16ToStr8(simFileManager->GetSimGid2());
+    mccmncFromSim_ = Str16ToStr8(simFileManager->GetSimOperatorNumeric());
+    std::string opKeyVal = mccmncFromSim_;
+    std::string opNameVal = "COMMON";
+    std::string opKeyExtVal = "";
     int count;
     resultSet->GetRowCount(count);
     TELEPHONY_LOGI("GetOpKey count: %{public}d", count);
     if (count <= 0) {
-        TELEPHONY_LOGE("GetOpKey count: %{public}d null return", count);
-        return DEFAULT_OPERATOR_KEY;
+        TELEPHONY_LOGE("GetOpKey count: %{public}d, use MccMnc as opkey, COMMON as opname", count);
+        resultSet->Close();
+        SetMatchResultToSimFileManager(opKeyVal, opNameVal, opKeyExtVal, slotId, simFileManager);
+        return opKeyVal;
     }
     int columnIndex;
-    std::string opKeyVal = DEFAULT_OPERATOR_KEY;
-    std::string opNameVal;
-    std::string opKeyExtVal;
     for (int row = 0; row < count; row++) {
         if (MatchOperatorRule(resultSet, row)) {
             resultSet->GetColumnIndex(OPKEY, columnIndex);
@@ -179,14 +182,20 @@ std::string OperatorConfigLoader::GetOpKey(std::shared_ptr<DataShare::DataShareR
         }
     }
     resultSet->Close();
+    SetMatchResultToSimFileManager(opKeyVal, opNameVal, opKeyExtVal, slotId, simFileManager);
+    InsertOpkeyToSimDb(opKeyVal);
+    return opKeyVal;
+}
+
+void OperatorConfigLoader::SetMatchResultToSimFileManager(std::string opKeyVal, std::string opNameVal,
+    std::string opKeyExtVal, int32_t slotId, std::shared_ptr<SimFileManager> simFileManager)
+{
     std::string key;
     SetParameter(key.append(OPKEY_PROP_PREFIX).append(std::to_string(slotId)).c_str(), opKeyVal.c_str());
     key.shrink_to_fit();
     simFileManager->SetOpKey(opKeyVal);
     simFileManager->SetOpName(opNameVal);
     simFileManager->SetOpKeyExt(opKeyExtVal);
-    InsertOpkeyToSimDb(opKeyVal);
-    return opKeyVal;
 }
 
 bool OperatorConfigLoader::MatchOperatorRule(std::shared_ptr<DataShare::DataShareResultSet> &resultSet, int row)
