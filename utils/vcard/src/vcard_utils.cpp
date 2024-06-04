@@ -290,10 +290,10 @@ int32_t VCardUtils::GetLabelIdFromImType(std::string type)
 std::vector<std::string> VCardUtils::GetTypeFromPhoneLabelId(std::string labelId)
 {
     std::vector<std::string> paramTypes = {};
-    if (!IsNum(labelId)) {
+    if (!IsNum(labelId) || labelId.size() > INT_64_LENTGH) {
         return paramTypes;
     }
-    int32_t num = std::stoi(labelId);
+    int64_t num = std::stoll(labelId);
     auto phoneType = static_cast<PhoneVcType>(num);
     auto it = phoneLabelIdToType.find(phoneType);
     if (it != phoneLabelIdToType.end()) {
