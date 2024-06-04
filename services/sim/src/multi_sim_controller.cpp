@@ -1257,6 +1257,7 @@ int32_t MultiSimController::IsSatelliteSupported()
     char satelliteSupported[SYSPARA_SIZE] = { 0 };
     GetParameter(TEL_SATELLITE_SUPPORTED, SATELLITE_DEFAULT_VALUE, satelliteSupported, SYSPARA_SIZE);
     TELEPHONY_LOGI("satelliteSupported is %{public}s", satelliteSupported);
+    return std::atoi(satelliteSupported);
 }
 
 } // namespace Telephony
