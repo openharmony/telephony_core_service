@@ -39,7 +39,7 @@ void OperatorConfigCache::ClearAllCache(int32_t slotId)
     std::unique_lock<std::mutex> lock(mutex_);
     ClearOperatorValue(slotId);
     ClearMemoryCache(slotId);
-    parser_.ClearFilesCache();
+    OperaorFileParser::ClearFilesCache();
     lock.unlock();
 }
 
@@ -157,7 +157,7 @@ int32_t OperatorConfigCache::UpdateOperatorConfigs(int32_t slotId)
     lock.unlock();
     if (slotId == 0) {
         TELEPHONY_LOGD("OperatorConfigCache:UpdateOperatorConfigs ClearFilesCache");
-        parser_.ClearFilesCache();
+        OperaorFileParser::ClearFilesCache();
     }
     OperatorConfig opc;
     int32_t ret = LoadOperatorConfig(slotId_, opc, STATE_PARA_UPDATE);

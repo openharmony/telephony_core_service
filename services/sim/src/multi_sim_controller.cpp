@@ -203,6 +203,27 @@ bool MultiSimController::IsAllModemInitDone()
     return true;
 }
 
+bool MultiSimController::IsDataShareError()
+{
+    return simDbHelper_ != nullptr && simDbHelper_->IsDataShareError();
+}
+
+void MultiSimController::ResetDataShareError()
+{
+    if (simDbHelper_ != nullptr) {
+        simDbHelper_->ResetDataShareError();
+    }
+}
+
+int32_t MultiSimController::UpdateOpKeyInfo()
+{
+    if (simDbHelper_ == nullptr) {
+        TELEPHONY_LOGE("simDbHelper is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    return simDbHelper_->UpdateOpKeyInfo();
+}
+
 bool MultiSimController::IsAllCardsLoaded()
 {
     if (localCacheInfo_.empty()) {

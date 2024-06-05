@@ -83,6 +83,8 @@ public:
     bool HasSimCard();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
+    void DeleteOperatorCache();
+    void UpdateOpkeyConfig();
     bool IsCTSimCard();
     static std::shared_ptr<SimFileManager> CreateInstance(
         std::weak_ptr<Telephony::ITelRilManager> ril, std::weak_ptr<SimStateManager> simState);

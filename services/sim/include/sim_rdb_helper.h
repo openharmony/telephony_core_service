@@ -28,6 +28,7 @@
 #include "sim_rdb_info.h"
 #include "sim_utils.h"
 #include "system_ability_definition.h"
+#include "telephony_data_helper.h"
 #include "telephony_log_wrapper.h"
 #include "uri.h"
 
@@ -55,9 +56,14 @@ public:
     int32_t ForgetAllData();
     int32_t ForgetAllData(int32_t slotId);
     int32_t ClearData();
+    int32_t UpdateOpKeyInfo();
+    bool IsDataShareError();
+    void ResetDataShareError();
 
 private:
+    std::shared_ptr<TelephonyDataHelper> mTelephonyDataHelper = DelayedSingleton<TelephonyDataHelper>::GetInstance();
     std::shared_ptr<DataShare::DataShareHelper> CreateDataHelper();
+    std::shared_ptr<DataShare::DataShareHelper> CreateOpKeyHelper();
     int Insert(
         std::shared_ptr<DataShare::DataShareHelper> dataShareHelper, const DataShare::DataShareValuesBucket &values);
     std::shared_ptr<DataShare::DataShareResultSet> Query(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,

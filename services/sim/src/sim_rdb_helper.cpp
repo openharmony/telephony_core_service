@@ -28,17 +28,53 @@ SimRdbHelper::~SimRdbHelper() {}
 std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateDataHelper()
 {
     TELEPHONY_LOGD("start");
-    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (saManager == nullptr) {
-        TELEPHONY_LOGE("Get system ability mgr failed.");
-        return nullptr;
+    if (mTelephonyDataHelper_ == nullptr) {
+        TELEPHONY_LOGE("get CreateDataHelper Failed");
     }
-    auto remoteObj = saManager->GetSystemAbility(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID);
-    if (remoteObj == nullptr) {
-        TELEPHONY_LOGE("GetSystemAbility Service Failed.");
-        return nullptr;
+    return mTelephonyDataHelper_->CreateSimHelper();
+}
+
+std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateOpKeyHelper()
+{
+    TELEPHONY_LOGI("SimRdbHelper::CreateOpKeyHelper");
+    if (mTelephonyDataHelper_ == nullptr) {
+        TELEPHONY_LOGE("get CreateOpKeyHelper Failed");
     }
-    return DataShare::DataShareHelper::Creator(remoteObj, SIM_URI);
+    return mTelephonyDataHelper_->CreateOpKeyHelper();
+}
+
+int SimRdbHelper::UpdateOpKeyInfo()
+{
+    TELEPHONY_LOGI("InitOpKeyData start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateOpKeyHelper();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("OpKey helper is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    URI uri(SimRdbInfo::OPKEY_INIT_URI);
+    std::vector<DataShare::DataShareValuesBucket> values;
+    int result = helper->BatchInsert(uri, values);
+    helper->Release();
+    helper = nullptr;
+    if (result <= 0) {
+        TELEPHONY_LOGI("InitOpkeyInfo opkey not change");
+        return result;
+    }
+    helper = CreateDataHelper();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("Sim helper is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    TELEPHONY_LOGI("InitOpKeyInfo Opkey changed. clear opkey cache");
+    DataShare::DataShareValuesBucket valuesBucket;
+    DataShare::DataShareValuesObject valueObj("");
+    valuesBucket.Put(SimData::OPKEY, valueObj);
+    DataShare::DataSharePredicates predicates;
+    result = Update(helper, valuesBucket, predicates);
+    helper->Release();
+    helper = nullptr;
+    TELEPHONY_LOGI("InitOpKeyInfo end");
+    return TELEPHONY_SUCCESS;
 }
 
 int SimRdbHelper::Insert(
@@ -532,6 +568,18 @@ int32_t SimRdbHelper::ClearData()
     int result = Delete(dataShareHelper, predicates);
     dataShareHelper->Release();
     return result;
+}
+
+bool SimRdbHelper::IsDataShareError()
+{
+    return mTelephonyDatahelper != nullptr && mTelephonyDatahelper->IsDataShareError();
+}
+
+void SimRdbHelper::ResetDataShareError()
+{
+    if (mTelephonyDatahelper != nullptr) {
+        mTelephonyDatahelper->ResetDataShareError();
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

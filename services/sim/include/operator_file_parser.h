@@ -31,8 +31,8 @@ public:
         OperatorConfig &poc, const std::string &path, cJSON *root, bool needSaveTempOpc = false);
     bool WriteOperatorConfigJson(std::string filename, const cJSON *root);
     std::string GetOperatorConfigFilePath(std::string filename);
-    void ClearFilesCache();
-    bool isCachePathExit();
+    static ClearFilesCache();
+    static bool isCachePathExit();
     virtual ~OperatorFileParser();
 
 private:
@@ -41,7 +41,7 @@ private:
     void CreateJsonFromOperatorConfig(cJSON *root);
     void ParseArray(const std::string key, const cJSON *value, OperatorConfig &poc);
     bool CloseFile(FILE *f);
-    void DeleteFiles();
+    static void DeleteFiles();
     std::map<std::string, std::string> tempConfig_;
     inline static const char *DEFAULT_OPERATE_CONFIG_PATH = "etc/telephony/operator_config.json";
     inline static const char *DEFAULT_OPERATE_CONFIG_DIR = "/data/service/el1/public/telephony/operatorconfig";

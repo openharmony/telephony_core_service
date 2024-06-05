@@ -53,6 +53,9 @@ public:
 public:
     enum {
         REGISTER_SIM_NOTIFY_EVENT = 0,
+        REGISTER_DADASHARE_READY = 1,
+        DATA_SHARE_READY = 2,
+        RESET_OPKEY_CONFIG = 3,
     };
 
 private:
@@ -67,6 +70,36 @@ private:
     void InitData(int32_t slotId);
     bool IsValidSlotId(int32_t slotId);
     std::list<SimAccountCallbackRecord> GetSimAccountCallbackRecords();
+    void InitListener();
+    void SubscribeDataShareReady();
+    void UnSubscribeListeners();
+    void CheckOpcNeedUpdata(const bool isDataShareError);
+    int32_t CheckUpdateOpcVersion();
+    void ClearAllOpcCache();
+    void UpdateAllOpkeyConfigs();
+
+private:
+    class DataShareEventSubscriber : public CommonEventSubscriber {
+    public:
+        explicit DataShareEventSubscriber(
+            const CommonEventSubscribeInfo &info, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+            : CommonEventSubscriber(info), handler_(handler) {}
+        ~DataShareEventSubscriber() = default;
+        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+        std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
+    };
+
+    class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
+    public:
+        explicit SystemAbilityStatusChangeListener(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+        : handler_(handler) {};
+        ~SystemAbilityStatusChangeListener() = default;
+        virtual void OnAddSystemAbility(int32_t systemabilityId, const std::string &deviceId) override;
+        virtual void OnRemoveSystemAbility(int32_t systemabilityId, const std::string &deviceId) override;
+    
+    private:
+        std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
+    };
 
 private:
     std::shared_ptr<MultiSimController> controller_ = nullptr;
@@ -74,7 +107,10 @@ private:
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager_;
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     std::list<SimAccountCallbackRecord> listSimAccountCallbackRecord_;
+    std::shared_ptr<DataShareEventSubscriber> dataShareEventSubscriber_ = nullptr;
+    sptr<ISystemAbilityStatusChange> statusChangeListener = nullptr;
     std::mutex mutexInner_;
+    std::mutex mutexForData_;
     std::atomic<int32_t> remainCount_ = 30;
     int32_t maxSlotCount_ = 0;
 };

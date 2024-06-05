@@ -17,7 +17,7 @@
 
 #include <string_ex.h>
 #include "sim_data.h"
-#include "base_data_helper.h"
+#include "telephony_data_helper.h"
 #include "core_manager_inner.h"
 #include "operator_matching_rule.h"
 #include "sim_state_type.h"
@@ -52,41 +52,6 @@ OperatorConfig OperatorConfigLoader::LoadOperatorConfig(int32_t slotId)
     operatorConfigCache_->LoadOperatorConfig(slotId, opc);
     TELEPHONY_LOGI("LoadOperatorConfig %{public}zu", opc.configValue.size());
     return opc;
-}
-
-int OperatorConfigLoader::InitOpKeyData()
-{
-    TELEPHONY_LOGI("InitOpKeyData start");
-    std::shared_ptr<DataShare::DataShareHelper> helper = CreateOpKeyHelper();
-    if (helper == nullptr) {
-        TELEPHONY_LOGE("OpKey helper is nullptr");
-        return TELEPHONY_ERROR;
-    }
-    Uri uri(OPKEY_INIT_URI);
-    std::vector<DataShare::DataShareValuesBucket> values;
-    int result = helper->BatchInsert(uri, values);
-    helper->Release();
-    helper = nullptr;
-    if (result <= 0) {
-        TELEPHONY_LOGI("InitOpKeyData opkey not change.");
-        return result;
-    }
-    helper = CreateSimHelper();
-    if (helper == nullptr) {
-        TELEPHONY_LOGE("Sim helper is nullptr");
-        return TELEPHONY_ERROR;
-    }
-    TELEPHONY_LOGI("InitOpKeyData opkey changed, clear opkey temp.");
-    DataShare::DataShareValuesBucket valuesBucket;
-    DataShare::DataShareValueObject valueObj("");
-    valuesBucket.Put(SimData::OPKEY, valueObj);
-    DataShare::DataSharePredicates predicates;
-    Uri simUri(SIM_INFO_URI);
-    result = helper->Update(simUri, predicates, valuesBucket);
-    helper->Release();
-    helper = nullptr;
-    TELEPHONY_LOGI("InitOpKeyData end");
-    return TELEPHONY_SUCCESS;
 }
 
 std::string OperatorConfigLoader::LoadOpKeyOnMccMnc(int32_t slotId)
@@ -135,8 +100,19 @@ int OperatorConfigLoader::InsertOpkeyToSimDb(std::string opKeyValue)
     values.Put(SimData::OPKEY, valueObj);
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SimData::ICC_ID, iccidFromSim_);
+    predicates.And();
+    predicates.EqualTo(SimData::IMSI, imsiFromSim_);
     Uri simUri(SIM_INFO_URI);
-    int result = helper->Update(simUri, predicates, values);
+    std::vector<std::string> colume;
+    auto resultSet = helper->Query(simUri, predicates, colume);
+    int rowCount = 0;
+    if (resultSet != nullptr) {
+        resultSet->GetRowCount(rowCount);
+    }
+    int result = 0;
+    if (rowCount > 0) {
+        int result = helper->Update(simUri, predicates, values);
+    }
     helper->Release();
     return result;
 }
@@ -251,21 +227,21 @@ bool OperatorConfigLoader::MatchOperatorRule(std::shared_ptr<DataShare::DataShar
 std::shared_ptr<DataShare::DataShareHelper> OperatorConfigLoader::CreateOpKeyHelper() const
 {
     TELEPHONY_LOGI("OperatorConfigLoader::CreateOpKeyHelper");
-    auto helper = BaseDataHelper::GetInstance();
+    auto helper = TelephonyDataHelper::GetInstance();
     if (helper == nullptr) {
         TELEPHONY_LOGE("get CreateOpKeyHelper Failed.");
     }
-    return helper->CreateDataHelper(OPKEY_URI.c_str());
+    return helper->CreateOpKeyHelper();
 }
 
 std::shared_ptr<DataShare::DataShareHelper> OperatorConfigLoader::CreateSimHelper() const
 {
     TELEPHONY_LOGI("OperatorConfigLoader::CreateSimHelper");
-    auto helper = BaseDataHelper::GetInstance();
+    auto helper = TelephonyDataHelper::GetInstance();
     if (helper == nullptr) {
-        TELEPHONY_LOGE("get CreateOpKeyHelper Failed.");
+        TELEPHONY_LOGE("get CreateSimHelper Failed.");
     }
-    return helper->CreateDataHelper(SIM_URI);
+    return helper->CreateSimHelper();
 }
 } // namespace Telephony
 } // namespace OHOS
