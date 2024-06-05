@@ -76,7 +76,7 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             RegisterSimNotify();
             break;
         }
-        case MultiSimMonitor::REGISTER_DADASHARE_READY: {
+        case MultiSimMonitor::REGISTER_DATASHARE_READY: {
             SubscribeDataShareReady();
             break;
         }
@@ -273,7 +273,7 @@ void MultiSimMonitor::SystemAbilityStatusChangeListener::OnAddSystemAbility(int3
     switch (systemAbilityId) {
         case COMMON_EVENT_SERVICE_ID: {
             TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID is running");
-            handler->SendEvent(MultiSimMonitor::REGISTER_DATASHARE_READY);
+            handler_->SendEvent(MultiSimMonitor::REGISTER_DATASHARE_READY);
             break;
         }
         default:
