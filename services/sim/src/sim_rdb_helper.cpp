@@ -28,19 +28,19 @@ SimRdbHelper::~SimRdbHelper() {}
 std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateDataHelper()
 {
     TELEPHONY_LOGD("start");
-    if (mTelephonyDataHelper_ == nullptr) {
+    if (mTelephonyDatahelper == nullptr) {
         TELEPHONY_LOGE("get CreateDataHelper Failed");
     }
-    return mTelephonyDataHelper_->CreateSimHelper();
+    return mTelephonyDatahelper->CreateSimHelper();
 }
 
 std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateOpKeyHelper()
 {
     TELEPHONY_LOGI("SimRdbHelper::CreateOpKeyHelper");
-    if (mTelephonyDataHelper_ == nullptr) {
+    if (mTelephonyDatahelper == nullptr) {
         TELEPHONY_LOGE("get CreateOpKeyHelper Failed");
     }
-    return mTelephonyDataHelper_->CreateOpKeyHelper();
+    return mTelephonyDatahelper->CreateOpKeyHelper();
 }
 
 int SimRdbHelper::UpdateOpKeyInfo()
@@ -51,13 +51,13 @@ int SimRdbHelper::UpdateOpKeyInfo()
         TELEPHONY_LOGE("OpKey helper is nullptr");
         return TELEPHONY_ERROR;
     }
-    URI uri(SimRdbInfo::OPKEY_INIT_URI);
+    Uri uri(SimRdbInfo::OPKEY_INIT_URI);
     std::vector<DataShare::DataShareValuesBucket> values;
     int result = helper->BatchInsert(uri, values);
     helper->Release();
     helper = nullptr;
     if (result <= 0) {
-        TELEPHONY_LOGI("InitOpkeyInfo opkey not change");
+        TELEPHONY_LOGI("InitOpKeyInfo opkey not change");
         return result;
     }
     helper = CreateDataHelper();
@@ -67,7 +67,7 @@ int SimRdbHelper::UpdateOpKeyInfo()
     }
     TELEPHONY_LOGI("InitOpKeyInfo Opkey changed. clear opkey cache");
     DataShare::DataShareValuesBucket valuesBucket;
-    DataShare::DataShareValuesObject valueObj("");
+    DataShare::DataShareValueObject valueObj("");
     valuesBucket.Put(SimData::OPKEY, valueObj);
     DataShare::DataSharePredicates predicates;
     result = Update(helper, valuesBucket, predicates);

@@ -31,7 +31,7 @@ public:
         OperatorConfig &poc, const std::string &path, cJSON *root, bool needSaveTempOpc = false);
     bool WriteOperatorConfigJson(std::string filename, const cJSON *root);
     std::string GetOperatorConfigFilePath(std::string filename);
-    static ClearFilesCache();
+    static void ClearFilesCache();
     static bool isCachePathExit();
     virtual ~OperatorFileParser();
 

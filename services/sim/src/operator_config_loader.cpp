@@ -111,7 +111,7 @@ int OperatorConfigLoader::InsertOpkeyToSimDb(std::string opKeyValue)
     }
     int result = 0;
     if (rowCount > 0) {
-        int result = helper->Update(simUri, predicates, values);
+        result = helper->Update(simUri, predicates, values);
     }
     helper->Release();
     return result;
