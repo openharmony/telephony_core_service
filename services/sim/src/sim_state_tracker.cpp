@@ -36,18 +36,6 @@ SimStateTracker::SimStateTracker(std::weak_ptr<SimFileManager> simFileManager,
         TELEPHONY_LOGE("can not make OperatorConfigLoader");
     }
     operatorConfigLoader_ = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
-    if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_ != nullptr &&
-        TELEPHONY_EXT_WRAPPER.updateOpcVersion_ != nullptr) {
-        if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_()) {
-            operatorConfigCache->ClearAllCache(slotId);
-            TELEPHONY_LOGI("clear all cache done");
-            if (operatorConfigLoader_->InitOpKeyData() == TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGI("InitOpKeyData succ");
-                TELEPHONY_EXT_WRAPPER.updateOpcVersion_();
-            }
-            TELEPHONY_LOGI("Version updated end");
-        }
-    }
     InitListener();
 }
 

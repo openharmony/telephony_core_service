@@ -201,9 +201,7 @@ void SimFile::ProcessIccRefresh(int msgId)
                 TELEPHONY_LOGI("icc refresh, clear telephonyext data");
                 iccFileExt->ClearData();
             }
-            if (operatorCacheDelObser_ != nullptr) {
-                operatorCacheDelObser_->NotifyObserver(RadioEvent::RADIO_OPERATOR_CACHE_DELETE, slotId_);
-            }
+            DeleteOperatorCache();
             LoadSimFiles();
             break;
     }

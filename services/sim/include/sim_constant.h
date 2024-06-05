@@ -285,6 +285,8 @@ enum CallForwardingStatus {
     CALL_FORWARDING_STATUS_ENABLED = 1,
     CALL_FORWARDING_STATUS_UNKNOWN = -1,
 };
+
+inline const std::string DATASHARE_READY_EVENT = "usual.event.DATA_SHARE_READY";
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_SIM_CONSTANT_H
