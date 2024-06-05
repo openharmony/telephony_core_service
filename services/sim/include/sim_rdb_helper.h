@@ -61,7 +61,7 @@ public:
     void ResetDataShareError();
 
 private:
-    std::shared_ptr<TelephonyDataHelper> mTelephonyDataHelper = DelayedSingleton<TelephonyDataHelper>::GetInstance();
+    std::shared_ptr<TelephonyDataHelper> mTelephonyDatahelper = DelayedSingleton<TelephonyDataHelper>::GetInstance();
     std::shared_ptr<DataShare::DataShareHelper> CreateDataHelper();
     std::shared_ptr<DataShare::DataShareHelper> CreateOpKeyHelper();
     int Insert(

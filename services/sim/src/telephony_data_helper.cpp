@@ -23,7 +23,7 @@ TelephonyDataHelper::TelephonyDataHelper() {}
 
 TelephonyDataHelper::~TelephonyDataHelper() = default;
 
-std::shared_ptr<OHOS::DataShare::TelephonyDataHelper> TelephonyDataHelper::CreateDataHelper(
+std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreateDataHelper(
     const std::string &strUri, const std::string &extUri)
 {
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -44,17 +44,17 @@ std::shared_ptr<OHOS::DataShare::TelephonyDataHelper> TelephonyDataHelper::Creat
     }
     return result;
 }
-std::shared_ptr<OHOS::DataShare::TelephonyDataHelper> TelephonyDataHelper::CreateOpKeyHelper()
+std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreateOpKeyHelper()
 {
     return CreateDataHelper(OPKEY_DB_URI, OPKEY_URI);
 }
 
-std::shared_ptr<OHOS::DataShare::TelephonyDataHelper> TelephonyDataHelper::CreateSimHelper()
+std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreateSimHelper()
 {
     return CreateDataHelper(SIM_DB_URI, SIM_URI);
 }
 
-std::shared_ptr<OHOS::DataShare::TelephonyDataHelper> TelephonyDataHelper::CreatePdpHelper()
+std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreatePdpHelper()
 {
     return CreateDataHelper(PDP_DB_URI, PDP_URI);
 }

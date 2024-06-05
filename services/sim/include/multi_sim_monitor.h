@@ -53,7 +53,7 @@ public:
 public:
     enum {
         REGISTER_SIM_NOTIFY_EVENT = 0,
-        REGISTER_DADASHARE_READY = 1,
+        REGISTER_DATASHARE_READY = 1,
         DATA_SHARE_READY = 2,
         RESET_OPKEY_CONFIG = 3,
     };
@@ -92,10 +92,10 @@ private:
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
     public:
         explicit SystemAbilityStatusChangeListener(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-        : handler_(handler) {};
+            : handler_(handler) {};
         ~SystemAbilityStatusChangeListener() = default;
-        virtual void OnAddSystemAbility(int32_t systemabilityId, const std::string &deviceId) override;
-        virtual void OnRemoveSystemAbility(int32_t systemabilityId, const std::string &deviceId) override;
+        virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+        virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
     
     private:
         std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
@@ -107,8 +107,8 @@ private:
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager_;
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     std::list<SimAccountCallbackRecord> listSimAccountCallbackRecord_;
-    std::shared_ptr<DataShareEventSubscriber> dataShareEventSubscriber_ = nullptr;
-    sptr<ISystemAbilityStatusChange> statusChangeListener = nullptr;
+    std::shared_ptr<DataShareEventSubscriber> dataShareSubscriber_ = nullptr;
+    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     std::mutex mutexInner_;
     std::mutex mutexForData_;
     std::atomic<int32_t> remainCount_ = 30;
