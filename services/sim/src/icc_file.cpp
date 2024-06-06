@@ -825,8 +825,8 @@ void IccFile::DeleteOperatorCache()
 
 void IccFile::UpdateOpkeyConfig()
 {
-    if (operatorCacheDelObser_ != nullptr && ObtainFilesFetched()) {
-        operatorCacheDelObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
+    if (filesFetchedObser_ != nullptr && ObtainFilesFetched()) {
+        filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
     }
 }
 } // namespace Telephony

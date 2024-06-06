@@ -76,17 +76,6 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             RegisterSimNotify();
             break;
         }
-        case MultiSimMonitor::REGISTER_DATASHARE_READY: {
-            SubscribeDataShareReady();
-            break;
-        }
-        case MultiSimMonitor::DATA_SHARE_READY: {
-            if (controller_->IsDataShareError()) {
-                controller_->ResetDataShareError();
-                CheckOpcNeedUpdata(true);
-            }
-            break;
-        }
         case MultiSimMonitor::RESET_OPKEY_CONFIG: {
             ClearAllOpcCache();
             UpdateAllOpkeyConfigs();
@@ -257,7 +246,7 @@ void MultiSimMonitor::UnSubscribeListeners()
 void MultiSimMonitor::InitListener()
 {
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(shared_from_this());
+    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(*this);
     if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
         TELEPHONY_LOGE("samgrProxy or statusChangeListener_ is nullptr");
         return;
@@ -273,7 +262,7 @@ void MultiSimMonitor::SystemAbilityStatusChangeListener::OnAddSystemAbility(int3
     switch (systemAbilityId) {
         case COMMON_EVENT_SERVICE_ID: {
             TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID is running");
-            handler_->SendEvent(MultiSimMonitor::REGISTER_DATASHARE_READY);
+            handler_.SubscribeDataShareReady();
             break;
         }
         default:
@@ -306,17 +295,14 @@ void MultiSimMonitor::SubscribeDataShareReady()
     matchingSkills.AddEvent(DATASHARE_READY_EVENT);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
-    dataShareSubscriber_ = std::make_shared<DataShareEventSubscriber>(subscriberInfo, shared_from_this());
+    dataShareSubscriber_ = std::make_shared<DataShareEventSubscriber>(subscriberInfo, *this);
     if (CommonEventManager::SubscribeCommonEvent(dataShareSubscriber_)) {
         TELEPHONY_LOGI("Subscribe datashare ready success");
     } else {
         dataShareSubscriber_ = nullptr;
         TELEPHONY_LOGE("Subscribe datashare ready fail");
     }
-    if (controller_->IsDataShareError()) {
-        controller_->ResetDataShareError();
-        CheckOpcNeedUpdata(true);
-    }
+    CheckDataShareError();
 }
 
 void MultiSimMonitor::DataShareEventSubscriber::OnReceiveEvent(const CommonEventData &data)
@@ -325,7 +311,15 @@ void MultiSimMonitor::DataShareEventSubscriber::OnReceiveEvent(const CommonEvent
     std::string action = want.GetAction();
     TELEPHONY_LOGI("action = %{public}s", action.c_str());
     if (action == DATASHARE_READY_EVENT) {
-        handler_->SendEvent(MultiSimMonitor::DATA_SHARE_READY);
+        handler_.CheckDataShareError();
+    }
+}
+
+void MultiSimMonitor::CheckDataShareError()
+{
+    if (controller_->isDataShareError()) {
+        controller_->ResetDataShareError();
+        CheckOpcNeedUpdata(true);
     }
 }
 
