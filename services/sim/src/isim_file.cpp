@@ -139,9 +139,12 @@ bool IsimFile::ProcessGetIccidDone(const AppExecFwk::InnerEvent::Pointer &event)
         return isFileProcessResponse;
     }
     if (fd->exception == nullptr) {
-        std::string iccData = fd->resultData;
-        TELEPHONY_LOGI("IsimFile::ProcessEvent MSG_SIM_OBTAIN_ICCID_DONE result success");
-        iccId_ = iccData;
+        iccId_ = fd->resultData;
+        TELEPHONY_LOGI("IsimFile::ProcessEvent MSG_SIM_OBTAIN_ICCID_DONE result success, slotId:%{public}d", slotId_);
+        if (filesFetchedObser_ != nullptr) {
+            TELEPHONY_LOGI("slotId:%{public}d iccid loaded", slotId_);
+            iccidLoadObser_->NotifyObserver(RadioEvent::RADIO_QUERY_ICCID_DONE, slotId_);
+        }
     }
     return isFileProcessResponse;
 }

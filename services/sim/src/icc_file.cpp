@@ -82,6 +82,7 @@ IccFile::IccFile(const std::string &name, std::shared_ptr<SimStateManager> simSt
     AddRecordsOverrideObser();
     AddOpkeyLoadObser();
     AddOperatorCacheDelObser();
+    AddIccidLoadObser();
     TELEPHONY_LOGI("simmgr IccFile::IccFile finish");
 }
 
@@ -156,6 +157,11 @@ std::string IccFile::ObtainMNC()
 void IccFile::UpdateImsi(std::string imsi)
 {
     imsi_ = imsi;
+}
+
+void IccFile::UpdateIccId(std::string iccid)
+{
+    iccId_ = iccid;
 }
 
 std::string IccFile::ObtainIccId()
@@ -382,8 +388,8 @@ void IccFile::RegisterAllFilesLoaded(std::shared_ptr<AppExecFwk::EventHandler> e
     int eventCode = RadioEvent::RADIO_SIM_RECORDS_LOADED;
     if (filesFetchedObser_ != nullptr) {
         filesFetchedObser_->RegObserver(eventCode, eventHandler);
+        TELEPHONY_LOGD("IccFile::RegisterAllFilesLoaded: registerd, slotId:%{public}d", slotId_);
     }
-    TELEPHONY_LOGD("IccFile::RegisterAllFilesLoaded: registerd");
     if (ObtainFilesFetched()) {
         TELEPHONY_LOGI("IccFile::RegisterAllFilesLoaded: notify, slotId:%{public}d", slotId_);
         if (eventHandler != nullptr) {
@@ -419,6 +425,21 @@ void IccFile::RegisterOperatorCacheDel(std::shared_ptr<AppExecFwk::EventHandler>
     TELEPHONY_LOGD("IccFile::RegisterOperatorCacheDel: registered");
 }
 
+void IccFile::RegisterIccidLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+{
+    int eventCode = RadioEvent::RADIO_QUERY_ICCID_DONE;
+    if (iccidLoadObser_ != nullptr) {
+        iccidLoadObser_->RegObserver(eventCode, eventHandler);
+        TELEPHONY_LOGI("IccFile::RegisterIccidLoaded: registered, slotId:%{public}d", slotId_);
+    }
+    if (!iccId_.empty()) {
+        TELEPHONY_LOGI("IccFile::RegisterIccidLoaded: notify, slotId:%{public}d", slotId_);
+        if (eventHandler != nullptr) {
+            TelEventHandler::SendTelEvent(eventHandler, RadioEvent::RADIO_QUERY_ICCID_DONE, slotId_, 0);
+        }
+    }
+}
+
 void IccFile::UnregisterOpkeyLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (opkeyLoadObser_ != nullptr) {
@@ -430,6 +451,13 @@ void IccFile::UnregisterOperatorCacheDel(const std::shared_ptr<AppExecFwk::Event
 {
     if (operatorCacheDelObser_ != nullptr) {
         operatorCacheDelObser_->Remove(RadioEvent::RADIO_OPERATOR_CACHE_DELETE, handler);
+    }
+}
+
+void IccFile::UnregisterIccidLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    if (iccidLoadObser_ != nullptr) {
+        iccidLoadObser_->Remove(RadioEvent::RADIO_QUERY_ICCID_DONE, handler);
     }
 }
 
@@ -447,6 +475,9 @@ void IccFile::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler>
             break;
         case RadioEvent::RADIO_OPERATOR_CACHE_DELETE:
             RegisterOperatorCacheDel(handler);
+            break;
+        case RadioEvent::RADIO_QUERY_ICCID_DONE:
+            RegisterIccidLoaded(handler);
             break;
         default:
             TELEPHONY_LOGI("RegisterCoreNotify default");
@@ -467,6 +498,9 @@ void IccFile::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandle
             break;
         case RadioEvent::RADIO_OPERATOR_CACHE_DELETE:
             UnregisterOperatorCacheDel(handler);
+            break;
+        case RadioEvent::RADIO_QUERY_ICCID_DONE:
+            UnregisterIccidLoaded(handler);
             break;
         default:
             TELEPHONY_LOGI("UnregisterCoreNotify default");
@@ -696,7 +730,7 @@ void IccFile::ResetVoiceMailVariable()
 
 void IccFile::ClearData()
 {
-    TELEPHONY_LOGI("IccFile CleaerData");
+    TELEPHONY_LOGI("IccFile ClearData");
     imsi_ = "";
     iccId_ = "";
     decIccId_ = "";
@@ -799,6 +833,15 @@ void IccFile::AddRecordsOverrideObser()
     recordsOverrideObser_ = std::make_unique<ObserverHandler>();
     if (recordsOverrideObser_ == nullptr) {
         TELEPHONY_LOGE("IccFile::IccFile recordsOverrideObser_ create nullptr.");
+        return;
+    }
+}
+
+void IccFile::AddIccidLoadObser()
+{
+    iccidLoadObser_ = std::make_unique<ObserverHandler>();
+    if (iccidLoadObser_ == nullptr) {
+        TELEPHONY_LOGE("IccFile::IccFile iccidLoadObser_ create nullptr.");
         return;
     }
 }
