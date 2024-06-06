@@ -53,9 +53,7 @@ public:
 public:
     enum {
         REGISTER_SIM_NOTIFY_EVENT = 0,
-        REGISTER_DATASHARE_READY = 1,
-        DATA_SHARE_READY = 2,
-        RESET_OPKEY_CONFIG = 3,
+        RESET_OPKEY_CONFIG = 1,
     };
 
 private:
@@ -77,28 +75,28 @@ private:
     int32_t CheckUpdateOpcVersion();
     void ClearAllOpcCache();
     void UpdateAllOpkeyConfigs();
+    void CheckDataShareError();
 
 private:
     class DataShareEventSubscriber : public CommonEventSubscriber {
     public:
         explicit DataShareEventSubscriber(
-            const CommonEventSubscribeInfo &info, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+            const CommonEventSubscribeInfo &info, MultiSimMonitor &handler)
             : CommonEventSubscriber(info), handler_(handler) {}
         ~DataShareEventSubscriber() = default;
         void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
-        std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
+        MultiSimMonitor &handler_;
     };
 
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
     public:
-        explicit SystemAbilityStatusChangeListener(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
-            : handler_(handler) {};
+        explicit SystemAbilityStatusChangeListener(MultiSimMonitor &handler) : handler_(handler) {};
         ~SystemAbilityStatusChangeListener() = default;
         virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
         virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
     
     private:
-        std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
+        MultiSimMonitor &handler;
     };
 
 private:
