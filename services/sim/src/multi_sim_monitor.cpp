@@ -317,7 +317,7 @@ void MultiSimMonitor::DataShareEventSubscriber::OnReceiveEvent(const CommonEvent
 
 void MultiSimMonitor::CheckDataShareError()
 {
-    if (controller_->isDataShareError()) {
+    if (controller_->IsDataShareError()) {
         controller_->ResetDataShareError();
         CheckOpcNeedUpdata(true);
     }
