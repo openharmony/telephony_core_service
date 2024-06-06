@@ -534,6 +534,11 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
 void MultiSimController::CheckIfNeedSwitchMainSlotId()
 {
     TELEPHONY_LOGD("start");
+    bool satelliteStatusOn = CoreManagerInner::GetInstance().IsSatelliteEnabled();
+    if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED) && satelliteStatusOn) {
+        TELEPHONY_LOGI("CheckIfNeedSwitchMainSlotId satelliteStatusOn");
+        return;
+    }
     int32_t defaultSlotId = getDefaultMainSlotByIccId();
     if (IsSimActive(defaultSlotId)) {
         if (IsAllCardsReady() && defaultSlotId != lastPrimarySlotId_) {
@@ -1268,5 +1273,13 @@ void MultiSimController::GetRadioProtocol(int32_t slotId)
     }
     radioProtocolController_->GetRadioProtocol(slotId);
 }
+int32_t MultiSimController::IsSatelliteSupported()
+{
+    char satelliteSupported[SYSPARA_SIZE] = { 0 };
+    GetParameter(TEL_SATELLITE_SUPPORTED, SATELLITE_DEFAULT_VALUE, satelliteSupported, SYSPARA_SIZE);
+    TELEPHONY_LOGI("satelliteSupported is %{public}s", satelliteSupported);
+    return std::atoi(satelliteSupported);
+}
+
 } // namespace Telephony
 } // namespace OHOS

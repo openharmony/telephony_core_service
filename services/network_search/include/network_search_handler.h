@@ -143,10 +143,12 @@ private:
     void RadioResidentNetworkChange(const AppExecFwk::InnerEvent::Pointer &event);
     void SatelliteStatusChanged(const AppExecFwk::InnerEvent::Pointer &event);
     bool InitOperatorName();
-    int32_t IsSatelliteSupported();
+    int32_t IsSatelliteSupported() const;
     void GetNrSsbIdResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void SyncGetSsbInfoResponse();
     bool SubModuleInit();
+    void ClearSignalAndCellInfoList() const;
+    bool IsSatelliteOn() const;
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;

@@ -109,6 +109,7 @@ private:
     int32_t GetTargetSimId(int32_t slotId, int &simId);
     int32_t GetTargetIccId(int32_t slotId, std::string &iccId);
     bool IsAllModemInitDone();
+    int32_t IsSatelliteSupported();
 
 private:
     int32_t maxCount_ = 0;
