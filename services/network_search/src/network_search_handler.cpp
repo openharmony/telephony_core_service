@@ -16,6 +16,7 @@
 #include "network_search_handler.h"
 
 #include "core_service_errors.h"
+#include "core_manager_inner.h"
 #include "ims_core_service_client.h"
 #include "mcc_pool.h"
 #include "network_search_manager.h"
@@ -532,12 +533,7 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
         RegServiceState::REG_STATE_POWER_OFF : RegServiceState::REG_STATE_NO_SERVICE;
     networkSearchState->SetNetworkState(regState, DomainType::DOMAIN_TYPE_CS);
     networkSearchState->SetNetworkState(regState, DomainType::DOMAIN_TYPE_PS);
-    if (signalInfo_ != nullptr) {
-        signalInfo_->Reset();
-    }
-    if (cellInfo_ != nullptr) {
-        cellInfo_->ClearCellInfoList();
-    }
+    ClearSignalAndCellInfoList();
     networkSearchState->NotifyStateChange();
     networkSearchManager->UpdateNrOptionMode(slotId_, NrMode::NR_MODE_UNKNOWN);
     bool isAirplaneModeOn = false;
@@ -550,7 +546,8 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
     }
     bool hasSim = false;
     simManager->HasSimCard(slotId_, hasSim);
-    if (!isAirplaneModeOn && (hasSim || IsPowerOnPrimaryRadioWhenNoSim()) && radioState == CORE_SERVICE_POWER_OFF) {
+    if (!isAirplaneModeOn && (hasSim || IsPowerOnPrimaryRadioWhenNoSim()) && radioState == CORE_SERVICE_POWER_OFF &&
+        !IsSatelliteOn()) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
     }
     sptr<NetworkSearchCallBackBase> cellularData = networkSearchManager->GetCellularDataCallBack();
@@ -1236,12 +1233,31 @@ void NetworkSearchHandler::SetCellRequestMinInterval(uint32_t minInterval)
     cellRequestMinInterval_ = minInterval;
 }
 
-int32_t NetworkSearchHandler::IsSatelliteSupported()
+int32_t NetworkSearchHandler::IsSatelliteSupported() const
 {
     char satelliteSupported[SYSPARA_SIZE] = { 0 };
     GetParameter(TEL_SATELLITE_SUPPORTED, SATELLITE_DEFAULT_VALUE, satelliteSupported, SYSPARA_SIZE);
     TELEPHONY_LOGI("satelliteSupported is %{public}s", satelliteSupported);
     return std::atoi(satelliteSupported);
+}
+
+bool NetworkSearchHandler::IsSatelliteOn() const
+{
+    bool isSatelliteOn = CoreManagerInner::GetInstance().IsSatelliteEnabled();
+    bool isSupportSatellite = (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED));
+    bool isSatelliteState = isSatelliteOn && isSupportSatellite;
+    TELEPHONY_LOGI("NetworkSearchHandler::IsSatelliteOn %{public}d", isSatelliteState);
+    return isSatelliteState;
+}
+
+void NetworkSearchHandler::ClearSignalAndCellInfoList() const
+{
+    if (signalInfo_ != nullptr) {
+        signalInfo_->Reset();
+    }
+    if (cellInfo_ != nullptr) {
+        cellInfo_->ClearCellInfoList();
+    }
 }
 
 NetworkSearchHandler::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(
