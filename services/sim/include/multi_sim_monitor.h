@@ -96,7 +96,7 @@ private:
         virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
     
     private:
-        MultiSimMonitor &handler;
+        MultiSimMonitor &handler_;
     };
 
 private:
