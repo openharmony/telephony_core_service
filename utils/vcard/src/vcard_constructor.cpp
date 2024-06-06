@@ -983,8 +983,10 @@ void VCardConstructor::AddParamType(const std::string &paramType)
 
 void VCardConstructor::AddParamType(std::stringstream &result, const std::string &paramType)
 {
-    result << VCARD_PARAM_TYPE;
-    result << PARAM_EQUAL;
+    if (isV30OrV40_) {
+        result << VCARD_PARAM_TYPE;
+        result << PARAM_EQUAL;
+    }
     result << paramType;
 }
 
