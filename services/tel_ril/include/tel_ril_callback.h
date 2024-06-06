@@ -142,6 +142,8 @@ public:
         const HDI::Ril::V1_1::IccIoResultInfo &result) override;
     int32_t GetSimStatusResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CardStatusInfo &result) override;
+    int32_t GetSimCardStatusResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_3::SimCardStatusInfo &result) override;
     int32_t GetImsiResponse(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &response) override;
     int32_t GetSimLockStatusResponse(

@@ -21,6 +21,7 @@ IccState::IccState()
 {
     simType_ = 0;
     simStatus_ = ICC_CARD_ABSENT;
+    iccid_ = "";
 }
 } // namespace Telephony
 } // namespace OHOS

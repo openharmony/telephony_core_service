@@ -50,6 +50,39 @@ struct CardStatusInfo {
 };
 
 /**
+ * @brief Defines the SIM card status information.
+ */
+struct SimCardStatusInfo {
+    /** SIM card index. */
+    int32_t index = 0;
+
+    /**
+     * SIM card type:
+     * 0: unknown.
+     * 1: common SIM card.
+     * 2: USIM, supporting 4G.
+     */
+    int32_t simType = 0;
+
+    /**
+     * SIM card status:
+     * 1: unknown
+     * 0: SIM card not inserted
+     * 1: SIM card detected normally
+     * 2: PIN required
+     * 3: PUK required
+     * 4: PIN2 required
+     * 5: PUK2 required
+     */
+    int32_t simState = 0;
+
+    /**
+     * SIM card iccid:
+     */
+    std::string iccid = "";
+};
+
+/**
  * @brief Defines the SIM data request information in 3GPP TS 27.007 V4.3.0
  * (2001-12) 8.18, + CRSM.
  */

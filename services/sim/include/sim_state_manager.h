@@ -34,6 +34,7 @@ public:
     bool HasSimCard();
     SimState GetSimState();
     CardType GetCardType();
+    std::string GetIccid();
     int32_t SetModemInit(bool state);
     int32_t UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response);
     int32_t UnlockPuk(int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response);

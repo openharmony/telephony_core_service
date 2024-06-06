@@ -117,8 +117,9 @@ void SimFileManager::Init(int slotId)
     stateHandler_ = HandleRunningState::STATE_RUNNING;
 
     simStateManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_CARD_TYPE_CHANGE);
+    simStateManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_ICCID_LOADED);
     telRilManager->RegisterCoreNotify(slotId, shared_from_this(), RadioEvent::RADIO_VOICE_TECH_CHANGED, nullptr);
-    telRilManager->RegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_ICC_REFRESH, nullptr);
+    telRilManager->RegisterCoreNotify(slotId, shared_from_this(), RadioEvent::RADIO_ICC_REFRESH, nullptr);
     TELEPHONY_LOGI("SimFileManager::Init() end");
 }
 
@@ -257,12 +258,20 @@ std::u16string SimFileManager::GetSimEons(const std::string &plmn, int32_t lac, 
 
 std::u16string SimFileManager::GetSimIccId()
 {
+    auto simStateManager = simStateManager_.lock();
+    if (simStateManager == nullptr) {
+        TELEPHONY_LOGE("simStateManager nullptr");
+        return Str8ToStr16("");
+    }
+    std::string result = simStateManager->GetIccid();
+    if (!result.empty()) {
+        return Str8ToStr16(result);
+    }
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::GetSimIccId simFile nullptr");
         return Str8ToStr16("");
     }
-
-    std::string result = simFile_->ObtainIccId();
+    result = simFile_->ObtainIccId();
     TELEPHONY_LOGD("SimFileManager::GetSimIccId result:%{public}s ", (result.empty() ? "false" : "true"));
     return Str8ToStr16(result);
 }
@@ -761,6 +770,15 @@ void SimFileManager::HandleSimRecordsLoaded()
     }
 }
 
+void SimFileManager::HandleSimIccidLoaded(std::string iccid)
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("simFile_ is null");
+        return;
+    }
+    simFile_->UpdateIccId(iccid);
+}
+
 void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -782,30 +800,36 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             if (iccType == SimFileManager::IccType::ICC_TYPE_CDMA &&
                 simStateManager->GetCardType() == CardType::SINGLE_MODE_USIM_CARD) {
                 iccType = SimFileManager::IccType::ICC_TYPE_USIM;
-                TELEPHONY_LOGI("SimFileManager change iccType to USIM");
+                TELEPHONY_LOGI("change iccType to USIM, slotId: %{public}d", slotId_);
             }
             ChangeSimFileByCardType(iccType);
             break;
         }
         case RadioEvent::RADIO_CARD_TYPE_CHANGE: {
             CardType cardType = simStateManager->GetCardType();
-            TELEPHONY_LOGI("SimFileManager GetCardType is %{public}d", cardType);
+            TELEPHONY_LOGI("getCardType is %{public}d, slotId: %{public}d", cardType, slotId_);
             SimFileManager::IccType iccType = GetIccTypeByCardType(cardType);
             ChangeSimFileByCardType(iccType);
             break;
         }
         case RadioEvent::RADIO_SIM_RECORDS_LOADED: {
-            TELEPHONY_LOGI("SimFileManager::ProcessEvent, handle sim records loaded event");
+            TELEPHONY_LOGI("handle sim records loaded event, slotId: %{public}d", slotId_);
             HandleSimRecordsLoaded();
             break;
         }
         case RadioEvent::RADIO_ICC_REFRESH: {
-            TELEPHONY_LOGI("SimFileManager::ProcessEvent, handle sim refresh event");
+            TELEPHONY_LOGI("handle sim refresh event, slotId: %{public}d", slotId_);
             if (simFile_ == nullptr) {
                 TELEPHONY_LOGE("simFile_ is null");
                 return;
             }
             simFile_->ProcessIccRefresh(MSG_ID_DEFAULT);
+            break;
+        }
+        case RadioEvent::RADIO_SIM_ICCID_LOADED: {
+            TELEPHONY_LOGI("handle sim iccid load event, slotId: %{public}d", slotId_);
+            std::string iccid = simStateManager->GetIccid();
+            HandleSimIccidLoaded(iccid);
             break;
         }
         default:

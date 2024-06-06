@@ -83,6 +83,7 @@ public:
 public:
     int32_t simType_ = 0;
     int32_t simStatus_ = 0;
+    std::string iccid_ = "";
 };
 } // namespace Telephony
 } // namespace OHOS
