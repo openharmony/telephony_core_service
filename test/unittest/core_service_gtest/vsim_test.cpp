@@ -164,6 +164,7 @@ HWTEST_F(SimTest, Telephony_VSim_Wrapper_0100, Function | MediumTest | Level1)
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getVSimCardState_ != nullptr);
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getSimIdExt_ != nullptr);
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getSlotIdExt_ != nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isHandleVSim_ != nullptr);
     }
 }
 
@@ -184,6 +185,7 @@ HWTEST_F(SimTest, Telephony_VSim_Wrapper_0200, Function | MediumTest | Level1)
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getVSimCardState_ == nullptr);
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getSimIdExt_ == nullptr);
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getSlotIdExt_ == nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isHandleVSim_ == nullptr);
     }
 }
 

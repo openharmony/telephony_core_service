@@ -161,18 +161,18 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForVSim()
     }
     isVSimInStatus_ = (IS_VSIM_IN_STATUS) dlsym(telephonyVSimWrapperHandle_, "IsVSimInStatus");
     getVSimSlotId_ = (GET_VSIM_SLOT_ID) dlsym(telephonyVSimWrapperHandle_, "GetVSimSlotId");
-    onAllFilesFetchedExt_ = (ON_ALL_FILES_FETCHED_EXT) dlsym(telephonyVSimWrapperHandle_,
-        "OnAllFilesFetchedExt");
-    putVSimExtraInfo_ = (PUT_VSIM_EXTRA_INFO) dlsym(telephonyVSimWrapperHandle_,
-        "PutVSimExtraInfo");
-    changeSpnAndRuleExt_ = (CHANGE_SPN_AND_RULE_EXT) dlsym(telephonyVSimWrapperHandle_,
-        "ChangeSpnAndRuleExt");
+    onAllFilesFetchedExt_ = (ON_ALL_FILES_FETCHED_EXT) dlsym(telephonyVSimWrapperHandle_, "OnAllFilesFetchedExt");
+    putVSimExtraInfo_ = (PUT_VSIM_EXTRA_INFO) dlsym(telephonyVSimWrapperHandle_, "PutVSimExtraInfo");
+    changeSpnAndRuleExt_ = (CHANGE_SPN_AND_RULE_EXT) dlsym(telephonyVSimWrapperHandle_, "ChangeSpnAndRuleExt");
     getVSimCardState_ = (GET_VSIM_CARD_STATE) dlsym(telephonyVSimWrapperHandle_, "GetVSimCardState");
     getSimIdExt_ = (GET_SIM_ID_EXT) dlsym(telephonyVSimWrapperHandle_, "GetSimIdExt");
     getSlotIdExt_ = (GET_SLOT_ID_EXT) dlsym(telephonyVSimWrapperHandle_, "GetSlotIdExt");
-    if (isVSimInStatus_ == nullptr || getVSimSlotId_ == nullptr || onAllFilesFetchedExt_ == nullptr ||
+    isHandleVSim_ = (IS_HANDLE_VSIM) dlsym(telephonyVSimWrapperHandle_, "IsHandleVSim");
+
+    bool hasFuncNull = (isVSimInStatus_ == nullptr || getVSimSlotId_ == nullptr || onAllFilesFetchedExt_ == nullptr ||
         putVSimExtraInfo_ == nullptr || changeSpnAndRuleExt_ == nullptr || getVSimCardState_ == nullptr ||
-        getSimIdExt_ == nullptr || getSlotIdExt_ == nullptr) {
+        getSimIdExt_ == nullptr || getSlotIdExt_ == nullptr || isHandleVSim_ == nullptr);
+    if (hasFuncNull) {
         TELEPHONY_LOGE("[VSIM] telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
     }
