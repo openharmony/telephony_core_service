@@ -20,8 +20,10 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "os_account_manager_wrapper.h"
+#include "operator_file_parser.h"
 #include "radio_event.h"
 #include "string_ex.h"
+#include "telephony_errors.h"
 #include "telephony_ext_wrapper.h"
 
 namespace OHOS {
@@ -41,12 +43,14 @@ MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<MultiSimController> &cont
 MultiSimMonitor::~MultiSimMonitor()
 {
     TELEPHONY_LOGD("destory");
+    UnSubscribeListeners();
 }
 
 void MultiSimMonitor::Init()
 {
     TELEPHONY_LOGD("init");
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
+    InitListener();
 }
 
 void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -72,8 +76,71 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             RegisterSimNotify();
             break;
         }
+        case MultiSimMonitor::RESET_OPKEY_CONFIG: {
+            ClearAllOpcCache();
+            UpdateAllOpkeyConfigs();
+            break;
+        }
         default:
             break;
+    }
+}
+
+void MultiSimMonitor::CheckOpcNeedUpdata(const bool isDataShareError)
+{
+    TelFFRTUtils::Submit([&]() {
+        bool isOpcVersionUpdated = CheckUpdateOpcVersion() == TELEPHONY_SUCCESS;
+        if (isOpcVersionUpdated) {
+            OperatorFileParser::ClearFilesCache();
+        }
+        TELEPHONY_LOGI("CheckOpcNeedUpdata isDataShareError: %{public}d, isOpcVersionUpdated: %{public}d",
+            isDataShareError, isOpcVersionUpdated);
+        if (isOpcVersionUpdated || isDataShareError) {
+            SendEvent(MultiSimMonitor::RESET_OPKEY_CONFIG);
+        }
+    });
+}
+
+int32_t MultiSimMonitor::CheckUpdateOpcVersion()
+{
+    if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_ != nullptr &&
+        TELEPHONY_EXT_WRAPPER.updateOpcVersion_ != nullptr) {
+        std::lock_guard<std::mutex> lock(mutexForData_);
+        if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_()) {
+            TELEPHONY_LOGI("need update config");
+            if (controller_->UpdateOpKeyInfo() != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGW("UpdateOpKeyInfo error");
+                return TELEPHONY_ERROR;
+            }
+            TELEPHONY_EXT_WRAPPER.updateOpcVersion_();
+            TELEPHONY_LOGI("Version updated succ");
+            return TELEPHONY_SUCCESS;
+        }
+    }
+    return TELEPHONY_ERROR;
+}
+
+void MultiSimMonitor::ClearAllOpcCache()
+{
+    for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
+        auto simFileManager = simFileManager_[slotId].lock();
+        if (simFileManager == nullptr) {
+            TELEPHONY_LOGE("simFileManager is nullptr, slotId : %{public}zu", slotId);
+            continue;
+        }
+        simFileManager->DeleteOperatorCache();
+    }
+}
+
+void MultiSimMonitor::UpdateAllOpkeyConfigs()
+{
+    for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
+        auto simFileManager = simFileManager_[slotId].lock();
+        if (simFileManager == nullptr) {
+            TELEPHONY_LOGE("simFileManager is nullptr, slotId : %{public}zu", slotId);
+            continue;
+        }
+        simFileManager->UpdateOpkeyConfig();
     }
 }
 
@@ -158,6 +225,102 @@ bool MultiSimMonitor::IsVSimSlotId(int32_t slotId)
         return vSimSlotId == slotId;
     }
     return false;
+}
+
+void MultiSimMonitor::UnSubscribeListeners()
+{
+    if (dataShareSubscriber_ != nullptr && CommonEventManager::UnSubscribeCommonEvent(dataShareSubscriber_)) {
+        dataShareSubscriber_ = nullptr;
+        TELEPHONY_LOGI("Unsubscribe datashare ready success");
+    }
+    if (statusChangeListener_ != nullptr) {
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy != nullptr) {
+            samgrProxy->UnSubscribeSystemAbility(OHOS::COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+            statusChangeListener_ = nullptr;
+            TELEPHONY_LOGI("Unsubscribe COMMON_EVENT_SERVICE_ID success");
+        }
+    }
+}
+
+void MultiSimMonitor::InitListener()
+{
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(*this);
+    if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
+        TELEPHONY_LOGE("samgrProxy or statusChangeListener_ is nullptr");
+        return;
+    }
+    auto ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+    TELEPHONY_LOGI("SubscribeSystemAbility COMMON_EVENT_SERVICE_ID result is %{public}d", ret);
+    CheckOpcNeedUpdata(false);
+}
+
+void MultiSimMonitor::SystemAbilityStatusChangeListener::OnAddSystemAbility(int32_t systemAbilityId,
+    const std::string &deviceId)
+{
+    switch (systemAbilityId) {
+        case COMMON_EVENT_SERVICE_ID: {
+            TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID is running");
+            handler_.SubscribeDataShareReady();
+            break;
+        }
+        default:
+            TELEPHONY_LOGE("systemAbilityId is invalid");
+            break;
+    }
+}
+
+void MultiSimMonitor::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(int32_t systemAbilityId,
+    const std::string &deviceId)
+{
+    switch (systemAbilityId) {
+        case COMMON_EVENT_SERVICE_ID: {
+            TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID stopped");
+            break;
+        }
+        default:
+            TELEPHONY_LOGE("systemAbilityId is invalid");
+            break;
+    }
+}
+
+void MultiSimMonitor::SubscribeDataShareReady()
+{
+    if (dataShareSubscriber_ != nullptr) {
+        TELEPHONY_LOGW("datashare ready has Subscribed");
+        return;
+    }
+    MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(DATASHARE_READY_EVENT);
+    CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
+    dataShareSubscriber_ = std::make_shared<DataShareEventSubscriber>(subscriberInfo, *this);
+    if (CommonEventManager::SubscribeCommonEvent(dataShareSubscriber_)) {
+        TELEPHONY_LOGI("Subscribe datashare ready success");
+    } else {
+        dataShareSubscriber_ = nullptr;
+        TELEPHONY_LOGE("Subscribe datashare ready fail");
+    }
+    CheckDataShareError();
+}
+
+void MultiSimMonitor::DataShareEventSubscriber::OnReceiveEvent(const CommonEventData &data)
+{
+    OHOS::EventFwk::Want want = data.GetWant();
+    std::string action = want.GetAction();
+    TELEPHONY_LOGI("action = %{public}s", action.c_str());
+    if (action == DATASHARE_READY_EVENT) {
+        handler_.CheckDataShareError();
+    }
+}
+
+void MultiSimMonitor::CheckDataShareError()
+{
+    if (controller_->IsDataShareError()) {
+        controller_->ResetDataShareError();
+        CheckOpcNeedUpdata(true);
+    }
 }
 
 int32_t MultiSimMonitor::RegisterSimAccountCallback(

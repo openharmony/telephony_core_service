@@ -815,5 +815,19 @@ void IccFile::AddRecordsToLoadNum()
 {
     fileToGet_++;
 }
+
+void IccFile::DeleteOperatorCache()
+{
+    if (operatorCacheDelObser_ != nullptr) {
+        operatorCacheDelObser_->NotifyObserver(RadioEvent::RADIO_OPERATOR_CACHE_DELETE, slotId_);
+    }
+}
+
+void IccFile::UpdateOpkeyConfig()
+{
+    if (filesFetchedObser_ != nullptr && ObtainFilesFetched()) {
+        filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
