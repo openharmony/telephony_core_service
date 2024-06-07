@@ -61,7 +61,7 @@ public:
     typedef char* (*GET_VOICE_MAIL_TAG_EXT)(int32_t, const char*);
     typedef void (*RESET_VOICE_MAIL_MANAGER_EXT)(int32_t);
     typedef void (*GET_NETWORK_STATUS_EXT)(int32_t slotId, sptr<OHOS::Telephony::NetworkState> &networkState);
-	
+
     typedef int32_t (*GET_CELL_INFO_LIST)(int32_t slotId, std::vector<sptr<OHOS::Telephony::CellInformation>> &cells);
     typedef void (*GET_RADIO_TECH_EXT)(int32_t slotId, int32_t &domainRadioTech);
     typedef void (*GET_NR_OPTION_MODE_EXT)(int32_t slotId, int32_t &mode);
@@ -91,6 +91,7 @@ public:
     typedef void (*GET_VSIM_CARD_STATE)(int32_t &cardType);
     typedef bool (*GET_SIM_ID_EXT)(int32_t slotId, int32_t &simId);
     typedef bool (*GET_SLOT_ID_EXT)(int32_t simId, int32_t &slotId);
+    typedef bool (*IS_HANDLE_VSIM)(void);
     /* add for vsim end */
     typedef bool (*IS_ALLOWED_INSERT_APN)(std::string &value);
     typedef void (*GET_TARGET_OPKEY)(int32_t slotId, std::u16string &opkey);
@@ -141,6 +142,7 @@ public:
     GET_VSIM_CARD_STATE getVSimCardState_ = nullptr;
     GET_SIM_ID_EXT getSimIdExt_ = nullptr;
     GET_SLOT_ID_EXT getSlotIdExt_ = nullptr;
+    IS_HANDLE_VSIM isHandleVSim_ = nullptr;
     /* add for vsim end */
     IS_ALLOWED_INSERT_APN isAllowedInsertApn_ = nullptr;
     GET_TARGET_OPKEY getTargetOpkey_ = nullptr;

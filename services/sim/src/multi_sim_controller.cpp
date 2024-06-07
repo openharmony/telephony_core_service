@@ -879,13 +879,9 @@ int32_t MultiSimController::GetPrimarySlotId()
 int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
 {
     TELEPHONY_LOGD("slotId = %{public}d", slotId);
-    if (IS_SUPPORT_VSIM && TELEPHONY_EXT_WRAPPER.isVSimInStatus_) {
-        bool isVsimEnable = false;
-        TELEPHONY_EXT_WRAPPER.isVSimInStatus_(slotId, IS_VSIM_ENABLED, isVsimEnable);
-        if (isVsimEnable) {
-            TELEPHONY_LOGE("vsim enabled, not allowed switch card");
-            return TELEPHONY_ERR_FAIL;
-        }
+    if (TELEPHONY_EXT_WRAPPER.isHandleVSim_ && TELEPHONY_EXT_WRAPPER.isHandleVSim_()) {
+        TELEPHONY_LOGE("in vsim handle, not allowed switch card");
+        return TELEPHONY_ERR_FAIL;
     }
 
     if (!IsValidData(slotId)) {

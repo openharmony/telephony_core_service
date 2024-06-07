@@ -514,6 +514,25 @@ void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Poi
     }
 }
 
+void NetworkSearchHandler::RadioOnWhenHasSim(std::shared_ptr<NetworkSearchManager> &networkSearchManager,
+    int32_t radioState) const
+{
+    bool isAirplaneMode = false;
+    if (networkSearchManager->GetAirplaneMode(isAirplaneMode) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("RadioOffOrUnavailableState GetAirplaneMode fail slotId: %{public}d", slotId_);
+    }
+    auto simManager = networkSearchManager->GetSimManager();
+    if (simManager == nullptr) {
+        return;
+    }
+    bool hasSim = false;
+    simManager->HasSimCard(slotId_, hasSim);
+    if (!isAirplaneMode && (hasSim || IsPowerOnPrimaryRadioWhenNoSim()) && radioState == CORE_SERVICE_POWER_OFF &&
+        !IsSatelliteOn()) {
+        networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
+    }
+}
+
 void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
 {
     TELEPHONY_LOGD("RadioOffOrUnavailableState enter... slotId:%{public}d", slotId_);
@@ -536,20 +555,11 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
     ClearSignalAndCellInfoList();
     networkSearchState->NotifyStateChange();
     networkSearchManager->UpdateNrOptionMode(slotId_, NrMode::NR_MODE_UNKNOWN);
-    bool isAirplaneModeOn = false;
-    if (networkSearchManager->GetAirplaneMode(isAirplaneModeOn) != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("RadioOffOrUnavailableState GetAirplaneMode fail slotId:%{public}d", slotId_);
+
+    if (!TELEPHONY_EXT_WRAPPER.isHandleVSim_ || !TELEPHONY_EXT_WRAPPER.isHandleVSim_()) {
+        RadioOnWhenHasSim(networkSearchManager, radioState);
     }
-    auto simManager = networkSearchManager->GetSimManager();
-    if (simManager == nullptr) {
-        return;
-    }
-    bool hasSim = false;
-    simManager->HasSimCard(slotId_, hasSim);
-    if (!isAirplaneModeOn && (hasSim || IsPowerOnPrimaryRadioWhenNoSim()) && radioState == CORE_SERVICE_POWER_OFF &&
-        !IsSatelliteOn()) {
-        networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
-    }
+
     sptr<NetworkSearchCallBackBase> cellularData = networkSearchManager->GetCellularDataCallBack();
     if (cellularData) {
         cellularData->ClearCellularDataConnections(slotId_);

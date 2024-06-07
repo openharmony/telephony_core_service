@@ -149,6 +149,7 @@ private:
     bool SubModuleInit();
     void ClearSignalAndCellInfoList() const;
     bool IsSatelliteOn() const;
+    void RadioOnWhenHasSim(std::shared_ptr<NetworkSearchManager> &networkSearchManager, int32_t radioState) const;
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
