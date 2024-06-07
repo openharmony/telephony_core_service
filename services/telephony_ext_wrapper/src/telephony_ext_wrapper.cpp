@@ -191,7 +191,9 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForApnCust()
 void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
 {
     createIccFileExt_ = (CREATE_ICC_FILE_EXT)dlsym(telephonyExtWrapperHandle_, "CreateIccFileExt");
-    if (createIccFileExt_ == nullptr) {
+    getRoamingBrokerNumeric_ = (GET_ROAMINGBROKER_NUMERIC)dlsym(telephonyExtWrapperHandle_, "GetRoamingBrokerNumeric");
+    getRoamingBrokerImsi_ = (GET_ROAMINGBROKER_IMSI)dlsym(telephonyExtWrapperHandle_, "GetRoamingBrokerImsi");
+    if (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || getRoamingBrokerImsi_ == nullptr) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
     }
