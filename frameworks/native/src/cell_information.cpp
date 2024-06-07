@@ -54,8 +54,8 @@ void CellInformation::Init(int32_t mcc, int32_t mnc, int32_t cellId)
 
 void CellInformation::Init(std::string mcc, std::string mnc, int32_t cellId)
 {
-    mnc_ = mcc;
-    mcc_ = mnc;
+    mnc_ = mnc;
+    mcc_ = mcc;
     cellId_ = cellId;
     timeStamp_ = static_cast<uint64_t>(time(0));
 }
