@@ -61,6 +61,7 @@ public:
     virtual CellInformation::CellType GetNetworkType() const = 0;
     virtual std::string ToString() const = 0;
     void Init(int32_t mcc, int32_t mnc, int32_t cellId);
+    void Init(std::string mcc, std::string mnc, int32_t cellId);
 
     /**
      * @brief Obtain the cell Id
