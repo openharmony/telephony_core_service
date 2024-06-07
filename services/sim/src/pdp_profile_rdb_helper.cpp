@@ -14,6 +14,7 @@
  */
 
 #include "pdp_profile_rdb_helper.h"
+#include "telephony_data_helper.h"
 #include "telephony_log_wrapper.h"
 
 static constexpr const char *PDP_PROFILE_RDB_URI = "datashare:///com.ohos.pdpprofileability/net";
@@ -29,17 +30,12 @@ PdpProfileRdbHelper::~PdpProfileRdbHelper() = default;
 
 std::shared_ptr<DataShare::DataShareHelper> PdpProfileRdbHelper::CreatePdpProfileDataHelper()
 {
-    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (saManager == nullptr) {
-        TELEPHONY_LOGE("Get system ability mgr failed.");
-        return nullptr;
+    TELEPHONY_LOGI("PdpProfileRdbHelper::CreatePdpProfileDataHelper");
+    auto helper = TelephonyDataHelper::GetInstance();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("get CreatePdpProfileDataHelper Failed");
     }
-    auto remoteObj = saManager->GetSystemAbility(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID);
-    if (remoteObj == nullptr) {
-        TELEPHONY_LOGE("GetSystemAbility Service Failed.");
-        return nullptr;
-    }
-    return DataShare::DataShareHelper::Creator(remoteObj, PDP_PROFILE_RDB_URI);
+    return helper->CreatePdpHelper();
 }
 
 void PdpProfileRdbHelper::notifyInitApnConfigs(int32_t slotId)

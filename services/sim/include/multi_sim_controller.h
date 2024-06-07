@@ -71,6 +71,9 @@ public:
     void GetRadioProtocol(int32_t slotId);
     bool InitShowName(int slotId);
     void ReCheckPrimary();
+    bool IsDataShareError();
+    void ResetDataShareError();
+    int32_t UpdateOpKeyInfo();
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;

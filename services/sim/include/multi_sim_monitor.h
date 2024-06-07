@@ -53,6 +53,7 @@ public:
 public:
     enum {
         REGISTER_SIM_NOTIFY_EVENT = 0,
+        RESET_OPKEY_CONFIG = 1,
     };
 
 private:
@@ -67,6 +68,36 @@ private:
     void InitData(int32_t slotId);
     bool IsValidSlotId(int32_t slotId);
     std::list<SimAccountCallbackRecord> GetSimAccountCallbackRecords();
+    void InitListener();
+    void SubscribeDataShareReady();
+    void UnSubscribeListeners();
+    void CheckOpcNeedUpdata(const bool isDataShareError);
+    int32_t CheckUpdateOpcVersion();
+    void ClearAllOpcCache();
+    void UpdateAllOpkeyConfigs();
+    void CheckDataShareError();
+
+private:
+    class DataShareEventSubscriber : public CommonEventSubscriber {
+    public:
+        explicit DataShareEventSubscriber(
+            const CommonEventSubscribeInfo &info, MultiSimMonitor &handler)
+            : CommonEventSubscriber(info), handler_(handler) {}
+        ~DataShareEventSubscriber() = default;
+        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+        MultiSimMonitor &handler_;
+    };
+
+    class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
+    public:
+        explicit SystemAbilityStatusChangeListener(MultiSimMonitor &handler) : handler_(handler) {};
+        ~SystemAbilityStatusChangeListener() = default;
+        virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+        virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+    
+    private:
+        MultiSimMonitor &handler_;
+    };
 
 private:
     std::shared_ptr<MultiSimController> controller_ = nullptr;
@@ -74,7 +105,10 @@ private:
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager_;
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     std::list<SimAccountCallbackRecord> listSimAccountCallbackRecord_;
+    std::shared_ptr<DataShareEventSubscriber> dataShareSubscriber_ = nullptr;
+    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     std::mutex mutexInner_;
+    std::mutex mutexForData_;
     std::atomic<int32_t> remainCount_ = 30;
     int32_t maxSlotCount_ = 0;
 };

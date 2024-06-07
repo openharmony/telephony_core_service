@@ -23,6 +23,7 @@ public:
     inline static const std::string SIM_RDB_SELECTION = "datashare:///com.ohos.simability/sim/sim_info";
     inline static const std::string SIM_RDB_DEFAULT_SET_URI =
         "datashare:///com.ohos.simability/sim/sim_info/set_card";
+    inline static const std::string OPKEY_INIT_URI = "datashare:///com.ohos.opkeyability/opkey/opkey_init";
     int simId;
     std::string iccId;
     std::string cardId;

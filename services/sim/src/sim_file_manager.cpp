@@ -665,6 +665,20 @@ bool SimFileManager::InitDiallingNumberHandler()
     return true;
 }
 
+void SimFileManager::DeleteOperatorCache()
+{
+    if (simFile_ != nullptr) {
+        simFile_->DeleteOperatorCache();
+    }
+}
+
+void SimFileManager::UpdateOpkeyConfig()
+{
+    if (simFile_ != nullptr) {
+        simFile_->UpdateOpkeyConfig();
+    }
+}
+
 bool SimFileManager::IsCTSimCard()
 {
     auto simStateManager = simStateManager_.lock();
