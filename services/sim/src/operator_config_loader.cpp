@@ -23,6 +23,7 @@
 #include "sim_state_type.h"
 #include "telephony_types.h"
 #include "telephony_errors.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -73,6 +74,9 @@ std::string OperatorConfigLoader::LoadOpKeyOnMccMnc(int32_t slotId)
         return DEFAULT_OPERATOR_KEY;
     }
     std::string mccmncFromSim = Str16ToStr8(simFileManager->GetSimOperatorNumeric());
+    if (TELEPHONY_EXT_WRAPPER.getRoamingBrokerNumeric_) {
+        TELEPHONY_EXT_WRAPPER.getRoamingBrokerNumeric_(slotId, mccmncFromSim);
+    }
     predicates.EqualTo(MCCMNC, mccmncFromSim);
     resultSet = helper->Query(uri, predicates, colume);
     if (resultSet != nullptr) {
@@ -134,6 +138,10 @@ std::string OperatorConfigLoader::GetOpKey(std::shared_ptr<DataShare::DataShareR
     gid1FromSim_ = Str16ToStr8(simFileManager->GetSimGid1());
     gid2FromSim_ = Str16ToStr8(simFileManager->GetSimGid2());
     mccmncFromSim_ = Str16ToStr8(simFileManager->GetSimOperatorNumeric());
+    if (TELEPHONY_EXT_WRAPPER.getRoamingBrokerNumeric_ && TELEPHONY_EXT_WRAPPER.getRoamingBrokerImsi_) {
+        TELEPHONY_EXT_WRAPPER.getRoamingBrokerNumeric_(slotId, mccmncFromSim_);
+        TELEPHONY_EXT_WRAPPER.getRoamingBrokerImsi_(slotId, imsiFromSim_);
+    }
     std::string opKeyVal = mccmncFromSim_;
     std::string opNameVal = "COMMON";
     std::string opKeyExtVal = "";
