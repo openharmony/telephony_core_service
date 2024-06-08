@@ -82,6 +82,8 @@ public:
     typedef int32_t (*UPDATE_NSA_STATE_EXT)(
         int32_t slotId, int32_t cellId, bool endcAvailable, bool dcNrRestricted, int32_t nsaState);
     typedef void (*PUBLISH_SPN_INFO_CHANGED_EXT)(OHOS::AAFwk::Want &want);
+    typedef void (*GET_ROAMINGBROKER_NUMERIC)(int32_t slotId, std::string &numeric);
+    typedef void (*GET_ROAMINGBROKER_IMSI)(int32_t slotId, std::string &imsi);
     /* add for vsim begin */
     typedef void (*IS_VSIM_IN_STATUS)(int32_t slotId, int32_t type, bool &status);
     typedef void (*GET_VSIM_SLOT_ID)(int32_t &slotId);
@@ -148,6 +150,8 @@ public:
     GET_TARGET_OPKEY getTargetOpkey_ = nullptr;
     SORT_SIGNAL_INFO_LIST_EXT sortSignalInfoListExt_ = nullptr;
     GET_OPKEY_VERSION getOpkeyVersion_ = nullptr;
+    GET_ROAMINGBROKER_NUMERIC getRoamingBrokerNumeric_ = nullptr;
+    GET_ROAMINGBROKER_IMSI getRoamingBrokerImsi_ = nullptr;
     PROCESS_SIGNAL_INFOS processSignalInfos_ = nullptr;
     PROCESS_STATE_CHANGE_EXT processStateChangeExt_ = nullptr;
 
