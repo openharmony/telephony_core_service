@@ -512,7 +512,7 @@ bool ResourceUtils::GetIntArrayByName(std::string name, std::vector<int32_t> &va
 
 void ResourceUtils::ShowAllValue()
 {
-    lock_guard<std::mutex> locker(mutex_);
+    std::lock_guard<std::mutex> locker(mutex_);
     for (auto iter : mapResourceNameType_) {
         switch (iter.second) {
             case ResourceType::ResourceTypeString:
@@ -562,7 +562,7 @@ bool ResourceUtils::GetCallFailedMessageName(int32_t reason, std::string &name)
 
 bool ResourceUtils::GetStringValueByName(const std::string &name, std::string &value)
 {
-    lock_guard<std::mutex> locker(mutex_);
+    std::lock_guard<std::mutex> locker(mutex_);
     auto itor = mapResourceValues_.find(name);
     if (itor == mapResourceValues_.end() || !itor->second.has_value()) {
         return false;
@@ -579,7 +579,7 @@ bool ResourceUtils::IsFileExist(const std::string &filePath)
 
 bool ResourceUtils::GetStringArrayValueByName(const std::string &name, std::vector<std::string> &value)
 {
-    lock_guard<std::mutex> locker(mutex_);
+    std::lock_guard<std::mutex> locker(mutex_);
     auto itor = mapResourceValues_.find(name);
     if (itor == mapResourceValues_.end() || !itor->second.has_value()) {
         return false;
@@ -590,7 +590,7 @@ bool ResourceUtils::GetStringArrayValueByName(const std::string &name, std::vect
 
 bool ResourceUtils::GetBooleanValueByName(const std::string &name, bool &value)
 {
-    lock_guard<std::mutex> locker(mutex_);
+    std::lock_guard<std::mutex> locker(mutex_);
     auto itor = mapResourceValues_.find(name);
     if (itor == mapResourceValues_.end() || !itor->second.has_value()) {
         return false;
@@ -601,7 +601,7 @@ bool ResourceUtils::GetBooleanValueByName(const std::string &name, bool &value)
 
 bool ResourceUtils::GetIntegerValueByName(const std::string &name, int32_t &value)
 {
-    lock_guard<std::mutex> locker(mutex_);
+    std::lock_guard<std::mutex> locker(mutex_);
     auto itor = mapResourceValues_.find(name);
     if (itor == mapResourceValues_.end() || !itor->second.has_value()) {
         return false;
@@ -612,7 +612,7 @@ bool ResourceUtils::GetIntegerValueByName(const std::string &name, int32_t &valu
 
 bool ResourceUtils::GetIntArrayValueByName(const std::string &name, std::vector<int32_t> &value)
 {
-    lock_guard<std::mutex> locker(mutex_);
+    std::lock_guard<std::mutex> locker(mutex_);
     auto itor = mapResourceValues_.find(name);
     if (itor == mapResourceValues_.end() || !itor->second.has_value()) {
         return false;
