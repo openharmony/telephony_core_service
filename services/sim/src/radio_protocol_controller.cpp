@@ -55,6 +55,7 @@ void RadioProtocolController::Init()
 
 int32_t RadioProtocolController::GetRadioProtocolTech(int32_t slotId)
 {
+    std::unique_lock<std::mutex> radioProtocolLock(radioProtocolMutex_);
     return static_cast<int32_t>(radioProtocol_[slotId].technology);
 }
 
@@ -242,6 +243,7 @@ void RadioProtocolController::ExecuteCheckCommunication()
 
 void RadioProtocolController::ExecuteUpdateCommunication()
 {
+    std::unique_lock<std::mutex> radioProtocolLock(radioProtocolMutex_);
     BuildRadioProtocolForCommunication(RadioProtocolPhase::RADIO_PROTOCOL_PHASE_UPDATE,
         RadioProtocolStatus::RADIO_PROTOCOL_STATUS_NONE);
     ResetNextCommunicationSlotCount();
@@ -250,6 +252,7 @@ void RadioProtocolController::ExecuteUpdateCommunication()
 
 void RadioProtocolController::ExecuteCompleteCommunication()
 {
+    std::unique_lock<std::mutex> radioProtocolLock(radioProtocolMutex_);
     TELEPHONY_LOGI("RadioProtocolController::ExecuteCompleteCommunication failed:%{public}d", communicationFailed_);
     BuildRadioProtocolForCommunication(RadioProtocolPhase::RADIO_PROTOCOL_PHASE_COMPLETE,
         communicationFailed_ ? RadioProtocolStatus::RADIO_PROTOCOL_STATUS_FAIL :
@@ -336,6 +339,7 @@ void RadioProtocolController::SendRadioProtocolEvent(std::vector<RadioProtocol> 
 
 void RadioProtocolController::UpdateRadioProtocol(std::shared_ptr<RadioProtocol> radioProtocol)
 {
+    std::unique_lock<std::mutex> radioProtocolLock(radioProtocolMutex_);
     int32_t slotId = radioProtocol->slotId;
     if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT)) {
         radioProtocol_[slotId].sessionId = radioProtocol->sessionId;
