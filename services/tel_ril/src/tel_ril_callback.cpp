@@ -437,6 +437,12 @@ int32_t TelRilCallback::GetSimStatusResponse(
     return Response(responseInfo, &TelRilManager::GetTelRilSim, &TelRilSim::GetSimStatusResponse, result);
 }
 
+int32_t TelRilCallback::GetSimCardStatusResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_3::SimCardStatusInfo &result)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilSim, &TelRilSim::GetSimCardStatusResponse, result);
+}
+
 int32_t TelRilCallback::GetImsiResponse(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &response)
 {

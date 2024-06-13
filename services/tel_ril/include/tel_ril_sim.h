@@ -70,6 +70,8 @@ public:
 
     int32_t GetSimStatusResponse(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::CardStatusInfo &result);
+    int32_t GetSimCardStatusResponse(
+        const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_3::SimCardStatusInfo &result);
     int32_t GetImsiResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &result);
     int32_t GetSimIOResponse(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::IccIoResultInfo &result);
@@ -116,6 +118,8 @@ private:
     void BuildIccIoResult(std::shared_ptr<IccIoResultInfo> iccIoResult, const HDI::Ril::V1_1::IccIoResultInfo &result);
     void BuildCardStatusInfo(
         std::shared_ptr<CardStatusInfo> cardStatusInfo, const HDI::Ril::V1_1::CardStatusInfo &result);
+    void BuildSimCardStatusInfo(
+        std::shared_ptr<SimCardStatusInfo> simCardStatusInfo, const HDI::Ril::V1_3::SimCardStatusInfo &result);
     void BuildLockStatusResp(
         std::shared_ptr<LockStatusResp> lockStatusResp, const HDI::Ril::V1_1::LockStatusResp &lockStatus);
     void BuildRadioProtocol(

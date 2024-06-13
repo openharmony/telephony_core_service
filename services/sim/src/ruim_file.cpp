@@ -196,6 +196,10 @@ bool RuimFile::ProcessGetIccidDone(const AppExecFwk::InnerEvent::Pointer &event)
         decIccId_ = iccData;
         iccId_ = fullIccData;
         FileChangeToExt(iccId_, FileChangeType::ICCID_FILE_LOAD);
+        if (filesFetchedObser_ != nullptr) {
+            TELEPHONY_LOGI("slotId:%{public}d iccid loaded", slotId_);
+            iccidLoadObser_->NotifyObserver(RadioEvent::RADIO_QUERY_ICCID_DONE, slotId_);
+        }
     }
     return isFileProcessResponse;
 }

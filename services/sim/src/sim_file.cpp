@@ -1046,7 +1046,7 @@ bool SimFile::ProcessGetIccIdDone(const AppExecFwk::InnerEvent::Pointer &event)
     }
     if (fd->exception == nullptr) {
         std::string iccData = fd->resultData;
-        TELEPHONY_LOGI("ICCID length is %{public}zu", iccData.length());
+        TELEPHONY_LOGI("ICCID length is %{public}zu, slotId:%{public}d", iccData.length(), slotId_);
         std::string fullIccData = iccData;
         GetFullIccid(fullIccData);
         SwapPairsForIccId(iccData);
@@ -1054,6 +1054,10 @@ bool SimFile::ProcessGetIccIdDone(const AppExecFwk::InnerEvent::Pointer &event)
         decIccId_ = iccData;
         iccId_ = fullIccData;
         FileChangeToExt(iccId_, FileChangeType::ICCID_FILE_LOAD);
+        if (filesFetchedObser_ != nullptr) {
+            TELEPHONY_LOGI("slotId:%{public}d iccid loaded", slotId_);
+            iccidLoadObser_->NotifyObserver(RadioEvent::RADIO_QUERY_ICCID_DONE, slotId_);
+        }
     } else {
         if (iccId_.empty() && reloadIccidCount_ > 0) {
             fileToGet_++;

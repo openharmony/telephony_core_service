@@ -153,6 +153,14 @@ int32_t TelRilSim::GetSimStatusResponse(
     return Response<CardStatusInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, cardStatusInfo);
 }
 
+int32_t TelRilSim::GetSimCardStatusResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_3::SimCardStatusInfo &result)
+{
+    std::shared_ptr<SimCardStatusInfo> simCardStatusInfo = std::make_shared<SimCardStatusInfo>();
+    BuildSimCardStatusInfo(simCardStatusInfo, result);
+    return Response<SimCardStatusInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, simCardStatusInfo);
+}
+
 int32_t TelRilSim::GetImsiResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &result)
 {
     return Response<std::string>(TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<std::string>(result));
@@ -491,6 +499,19 @@ void TelRilSim::BuildCardStatusInfo(
     cardStatusInfo->index = result.index;
     cardStatusInfo->simType = result.simType;
     cardStatusInfo->simState = result.simState;
+    TELEPHONY_LOGD("cardStatusInfo: index:%{public}d, simType:%{public}d, simState:%{public}d",
+        result.index, result.simType, result.simState);
+}
+
+void TelRilSim::BuildSimCardStatusInfo(std::shared_ptr<SimCardStatusInfo> simCardStatusInfo,
+    const HDI::Ril::V1_3::SimCardStatusInfo &result)
+{
+    simCardStatusInfo->index = result.index;
+    simCardStatusInfo->simType = result.simType;
+    simCardStatusInfo->simState = result.simState;
+    simCardStatusInfo->iccid = result.iccid;
+    TELEPHONY_LOGD("simCardStatusInfo: index:%{public}d, simType:%{public}d, simState:%{public}d",
+        result.index, result.simType, result.simState);
 }
 
 void TelRilSim::BuildLockStatusResp(
