@@ -55,24 +55,22 @@ public:
     /**
      * UpdateCallState
      *
-     * @param slotId sim slot id
      * @param callStatus call status
      * @param number call number
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t UpdateCallState(int32_t slotId, int32_t callStatus, const std::u16string &number) = 0;
+    virtual int32_t UpdateCallState(int32_t callStatus, const std::u16string &number) = 0;
 
     /**
      * UpdateCallStateForSlotId
      *
      * @param slotId sim slot id
-     * @param callId call id
      * @param callStatus call status
      * @param number incoming number
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     virtual int32_t UpdateCallStateForSlotId(
-        int32_t slotId, int32_t callId, int32_t callStatus, const std::u16string &incomingNumber) = 0;
+        int32_t slotId, int32_t callStatus, const std::u16string &number) = 0;
 
     /**
      * UpdateSignalInfo
