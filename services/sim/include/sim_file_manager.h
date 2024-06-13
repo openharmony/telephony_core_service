@@ -129,6 +129,7 @@ private:
     void StoreVoiceMailNumber(const std::u16string mailNumber, bool isSavedIccRecoeds);
     std::string GetVoiceMailSimImsiFromParam();
     void HandleSimRecordsLoaded();
+    void HandleSimIccidLoaded(std::string iccid);
     bool IsPhoneTypeGsm(int32_t slotId);
     std::string EncryptImsi(const std::string imsi);
     bool IsEncryptImsiEmpty(const std::string encryptImsi);

@@ -53,6 +53,16 @@ void MultiSimMonitor::Init()
     InitListener();
 }
 
+void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
+    std::shared_ptr<Telephony::SimFileManager> simFileManager)
+{
+    if (simStateManager_.size() == SIM_SLOT_COUNT) {
+        simStateManager_.push_back(simStateManager);
+        simFileManager_.push_back(simFileManager);
+        RegisterSimNotify(SIM_SLOT_2);
+    }
+}
+
 void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -62,7 +72,9 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     auto eventCode = event->GetInnerEventId();
     TELEPHONY_LOGI("eventCode is %{public}d", eventCode);
     switch (eventCode) {
-        case RadioEvent::RADIO_SIM_RECORDS_LOADED: {
+        case RadioEvent::RADIO_QUERY_ICCID_DONE:
+        case RadioEvent::RADIO_SIM_STATE_LOCKED:
+        case RadioEvent::RADIO_SIM_STATE_READY: {
             auto slotId = event->GetParam();
             InitData(slotId);
             break;
@@ -183,6 +195,9 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
         simFileManager->ClearData();
+    } else if (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN) {
+        TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when sim is unknown");
+        simFileManager->ClearData();
     }
     if (controller_->unInitModemSlotId_ == slotId) {
         TELEPHONY_LOGI("need to recheck primary");
@@ -210,11 +225,7 @@ void MultiSimMonitor::RegisterCoreNotify(
 
 bool MultiSimMonitor::IsValidSlotId(int32_t slotId)
 {
-    if (maxSlotCount_ == 0) {
-        maxSlotCount_ = (SIM_SLOT_COUNT == DUAL_SLOT_COUNT && VSIM_MODEM_COUNT == MAX_SLOT_COUNT) ?
-            MAX_SLOT_COUNT : SIM_SLOT_COUNT;
-    }
-    return (slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < maxSlotCount_);
+    return (slotId >= DEFAULT_SIM_SLOT_ID) && slotId < static_cast<int32_t>(simStateManager_.size());
 }
 
 bool MultiSimMonitor::IsVSimSlotId(int32_t slotId)
@@ -407,14 +418,30 @@ void MultiSimMonitor::RegisterSimNotify()
     }
     TELEPHONY_LOGI("Register with time left %{public}d", static_cast<int32_t>(remainCount_));
     for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
-        auto simFileManager = simFileManager_[slotId].lock();
-        if (simFileManager == nullptr) {
-            TELEPHONY_LOGE("simFileManager is null slotId : %{public}zu", slotId);
-            continue;
-        }
-        simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
-        simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+        RegisterSimNotify(static_cast<int32_t>(slotId));
     }
+}
+
+void MultiSimMonitor::RegisterSimNotify(int32_t slotId)
+{
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("RegisterSimNotify slotId is invalid");
+        return;
+    }
+    auto simFileManager = simFileManager_[slotId].lock();
+    if (simFileManager == nullptr) {
+        TELEPHONY_LOGE("simFileManager is null slotId : %{public}d", slotId);
+        return;
+    }
+    simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_QUERY_ICCID_DONE);
+    if (simStateManager_[slotId] == nullptr) {
+        TELEPHONY_LOGE("simStateManager is null slotId : %{public}d", slotId);
+        return;
+    }
+    simStateManager_[slotId]->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+    simStateManager_[slotId]->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
+    simStateManager_[slotId]->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
+    TELEPHONY_LOGI("RegisterSimNotify %{public}d", slotId);
 }
 
 void MultiSimMonitor::UnRegisterSimNotify()
@@ -425,8 +452,14 @@ void MultiSimMonitor::UnRegisterSimNotify()
             TELEPHONY_LOGE("simFileManager is null slotId : %{public}zu", slotId);
             continue;
         }
-        simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
-        simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+        simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_QUERY_ICCID_DONE);
+        if (simStateManager_[slotId] == nullptr) {
+            TELEPHONY_LOGE("simStateManager is null slotId : %{public}zu", slotId);
+            continue;
+        }
+        simStateManager_[slotId]->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+        simStateManager_[slotId]->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
+        simStateManager_[slotId]->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
     }
 }
 } // namespace Telephony

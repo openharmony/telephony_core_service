@@ -87,6 +87,7 @@ int32_t SimManager::InitTelExtraModule(int32_t slotId)
     simAccountManager_.resize(MAX_SLOT_COUNT);
     InitBaseManager(slotId);
     multiSimController_->AddExtraManagers(simStateManager_[slotId], simFileManager_[slotId]);
+    multiSimMonitor_->AddExtraManagers(simStateManager_[slotId], simFileManager_[slotId]);
     slotCount_ = MAX_SLOT_COUNT;
     return TELEPHONY_SUCCESS;
 }

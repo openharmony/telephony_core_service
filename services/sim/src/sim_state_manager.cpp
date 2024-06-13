@@ -116,6 +116,15 @@ CardType SimStateManager::GetCardType()
     return ret;
 }
 
+std::string SimStateManager::GetIccid()
+{
+    if (simStateHandle_ != nullptr) {
+        std::lock_guard<std::mutex> lck(mtx_);
+        return simStateHandle_->GetIccid();
+    }
+    return "";
+}
+
 int32_t SimStateManager::SetModemInit(bool state)
 {
     if (simStateHandle_ != nullptr) {

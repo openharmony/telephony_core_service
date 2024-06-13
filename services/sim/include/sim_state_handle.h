@@ -110,6 +110,7 @@ public:
     void UnInit();
     SimState GetSimState();
     CardType GetCardType();
+    std::string GetIccid();
     bool HasSimCard();
     void ObtainRealtimeIccStatus(int32_t slotId);
     void UnlockPin(int32_t slotId, const std::string &pin);
@@ -126,6 +127,7 @@ public:
     void UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo);
     void SetRilManager(std::weak_ptr<Telephony::ITelRilManager> telRilManager);
     bool IsIccReady();
+    bool IsIccLocked();
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
     void RegisterSatelliteCallback();
@@ -177,6 +179,7 @@ private:
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_; // ril manager
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     sptr<ISatelliteCoreCallback> satelliteCallback_ = nullptr;
+    std::string iccid_ = "";
 };
 } // namespace Telephony
 } // namespace OHOS

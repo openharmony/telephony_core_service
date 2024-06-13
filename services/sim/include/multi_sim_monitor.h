@@ -42,11 +42,14 @@ public:
     ~MultiSimMonitor();
 
     void Init();
+    void AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
+        std::shared_ptr<Telephony::SimFileManager> simFileManager);
     void RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     int32_t RegisterSimAccountCallback(const int32_t tokenId, const sptr<SimAccountCallback> &callback);
     int32_t UnregisterSimAccountCallback(const int32_t tokenId);
     void NotifySimAccountChanged();
     void RegisterSimNotify();
+    void RegisterSimNotify(int32_t slotId);
     void UnRegisterSimNotify();
     bool IsVSimSlotId(int32_t slotId);
 
