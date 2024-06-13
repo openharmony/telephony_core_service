@@ -101,6 +101,17 @@ int32_t TelephonyStateRegistryClient::UpdateCellularDataFlow(int32_t slotId, int
 }
 
 int32_t TelephonyStateRegistryClient::UpdateCallState(
+    int32_t callStatus, const std::u16string &number)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->UpdateCallState(callStatus, number);
+}
+
+int32_t TelephonyStateRegistryClient::UpdateCallStateForSlotId(
     int32_t slotId, int32_t callStatus, const std::u16string &number)
 {
     auto proxy = GetProxy();
@@ -108,18 +119,7 @@ int32_t TelephonyStateRegistryClient::UpdateCallState(
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->UpdateCallState(slotId, callStatus, number);
-}
-
-int32_t TelephonyStateRegistryClient::UpdateCallStateForSlotId(
-    int32_t slotId, int32_t callId, int32_t callStatus, const std::u16string &number)
-{
-    auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return proxy->UpdateCallStateForSlotId(slotId, callId, callStatus, number);
+    return proxy->UpdateCallStateForSlotId(slotId, callStatus, number);
 }
 
 int32_t TelephonyStateRegistryClient::UpdateSignalInfo(
