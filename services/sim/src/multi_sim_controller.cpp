@@ -101,6 +101,9 @@ void MultiSimController::AddExtraManagers(std::shared_ptr<Telephony::SimStateMan
         simStateManager_.push_back(simStateManager);
         simFileManager_.push_back(simFileManager);
         maxCount_ = MAX_SLOT_COUNT;
+        size_t count = localCacheInfo_.size();
+        TELEPHONY_LOGI("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d",
+            static_cast<unsigned long>(count), maxCount_);
     }
 }
 
@@ -181,10 +184,10 @@ void MultiSimController::ReCheckPrimary()
 
 bool MultiSimController::IsAllCardsReady()
 {
-    for (int32_t i = 0; i < maxCount_; i++) {
+    for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
         if (simStateManager_[i] != nullptr && (simStateManager_[i]->GetSimState() != SimState::SIM_STATE_READY
             && simStateManager_[i]->GetSimState() != SimState::SIM_STATE_LOCKED)) {
-            TELEPHONY_LOGI("single card ready");
+            TELEPHONY_LOGI("slot:%{public}d not ready", i);
             return false;
         }
     }
@@ -193,9 +196,9 @@ bool MultiSimController::IsAllCardsReady()
 
 bool MultiSimController::IsAllModemInitDone()
 {
-    for (int32_t i = 0; i < maxCount_; i++) {
+    for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
         if (simStateManager_[i] != nullptr && !(simStateManager_[i]->IfModemInitDone())) {
-            TELEPHONY_LOGI("single modem init done");
+            TELEPHONY_LOGI("slot:%{public}d modem init not done", i);
             unInitModemSlotId_ = i;
             return false;
         }
@@ -230,9 +233,9 @@ bool MultiSimController::IsAllCardsLoaded()
         TELEPHONY_LOGI("there is no card loaded");
         return false;
     }
-    for (int32_t i = 0; i < maxCount_; i++) {
+    for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
         if (localCacheInfo_[i].iccId.empty()) {
-            TELEPHONY_LOGI("single card loaded");
+            TELEPHONY_LOGI("slot:%{public}d not loaded", i);
             return false;
         }
     }
@@ -522,6 +525,7 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
         TELEPHONY_LOGE("failed by out of range");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
+
     if (!SetActiveSimToRil(slotId, ENTITY_CARD, enable)) {
         TELEPHONY_LOGE("SetActiveSimToRil failed");
         return TELEPHONY_ERR_RIL_CMD_FAIL;
@@ -677,14 +681,12 @@ int32_t MultiSimController::GetDefaultVoiceSlotId()
         return simDbHelper_->GetDefaultVoiceCardSlotId();
     }
     std::unique_lock<std::mutex> lock(mutex_);
-    if (localCacheInfo_.size() != static_cast<size_t>(maxCount_)) {
-        size_t count = localCacheInfo_.size();
-        TELEPHONY_LOGE("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d",
-            static_cast<unsigned long>(count), maxCount_);
+    if (localCacheInfo_.size() <= 0) {
+        TELEPHONY_LOGE("failed by nullptr");
         return INVALID_VALUE;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
-    for (; i < maxCount_; i++) {
+    for (; i < localCacheInfo_.size(); i++) {
         if (localCacheInfo_[i].isVoiceCard == MAIN_CARD && localCacheInfo_[i].isActive == ACTIVE) {
             return i;
         }
@@ -740,13 +742,11 @@ int32_t MultiSimController::SetDefaultVoiceSlotId(int32_t slotId)
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
     std::unique_lock<std::mutex> lock(mutex_);
-    if (localCacheInfo_.size() != static_cast<size_t>(maxCount_)) {
-        size_t count = localCacheInfo_.size();
-        TELEPHONY_LOGE("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d",
-            static_cast<unsigned long>(count), maxCount_);
+    if (localCacheInfo_.size() <= 0) {
+        TELEPHONY_LOGE("failed by nullptr");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
-    for (; i < maxCount_; i++) { // save to cache
+    for (; i < localCacheInfo_.size(); i++) { // save to cache
         if (slotId == i) {
             localCacheInfo_[i].isVoiceCard = MAIN_CARD;
             curSimId = localCacheInfo_[i].simId;
@@ -777,14 +777,12 @@ int32_t MultiSimController::GetDefaultSmsSlotId()
         return simDbHelper_->GetDefaultMessageCardSlotId();
     }
     std::unique_lock<std::mutex> lock(mutex_);
-    if (localCacheInfo_.size() != static_cast<size_t>(maxCount_)) {
-        size_t count = localCacheInfo_.size();
-        TELEPHONY_LOGE("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d",
-            static_cast<unsigned long>(count), maxCount_);
+    if (localCacheInfo_.size() <= 0) {
+        TELEPHONY_LOGE("failed by nullptr");
         return INVALID_VALUE;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
-    for (; i < maxCount_; i++) {
+    for (; i < localCacheInfo_.size(); i++) {
         if (localCacheInfo_[i].isMessageCard == MAIN_CARD && localCacheInfo_[i].isActive == ACTIVE) {
             return i;
         }
@@ -812,13 +810,11 @@ int32_t MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
     std::unique_lock<std::mutex> lock(mutex_);
-    if (localCacheInfo_.size() != static_cast<size_t>(maxCount_)) {
-        size_t count = localCacheInfo_.size();
-        TELEPHONY_LOGE("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d",
-            static_cast<unsigned long>(count), maxCount_);
+    if (localCacheInfo_.size() <= 0) {
+        TELEPHONY_LOGE("failed by nullptr");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
-    for (; i < maxCount_; i++) { // save to cache
+    for (; i < localCacheInfo_.size(); i++) { // save to cache
         if (slotId == i) {
             localCacheInfo_[i].isMessageCard = MAIN_CARD;
             curSimId = localCacheInfo_[slotId].simId;
