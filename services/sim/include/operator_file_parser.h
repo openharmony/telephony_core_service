@@ -15,6 +15,7 @@
 
 #ifndef OHOS_OPERATOR_FILE_PARSER_H
 #define OHOS_OPERATOR_FILE_PARSER_H
+#include <mutex>
 
 #include "cJSON.h"
 #include "core_service_errors.h"
@@ -50,6 +51,7 @@ private:
     inline static const int SUCCESS = 0;
     inline static const int MAX_BYTE_LEN = 10 * 1024 * 1024;
     inline static const int LOADER_JSON_ERROR = -1;
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
