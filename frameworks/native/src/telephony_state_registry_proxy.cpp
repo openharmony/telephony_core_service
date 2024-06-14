@@ -95,15 +95,12 @@ int32_t TelephonyStateRegistryProxy::UpdateCellularDataFlow(
 }
 
 int32_t TelephonyStateRegistryProxy::UpdateCallState(
-    int32_t slotId, int32_t callStatus, const std::u16string &number)
+    int32_t callStatus, const std::u16string &number)
 {
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
     if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
         return TELEPHONY_ERR_FAIL;
     }
     if (!in.WriteInt32(callStatus)) {
@@ -126,7 +123,7 @@ int32_t TelephonyStateRegistryProxy::UpdateCallState(
 }
 
 int32_t TelephonyStateRegistryProxy::UpdateCallStateForSlotId(
-    int32_t slotId, int32_t callId, int32_t callStatus, const std::u16string &number)
+    int32_t slotId, int32_t callStatus, const std::u16string &number)
 {
     MessageOption option;
     MessageParcel in;
@@ -135,9 +132,6 @@ int32_t TelephonyStateRegistryProxy::UpdateCallStateForSlotId(
         return TELEPHONY_ERR_FAIL;
     }
     if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_FAIL;
-    }
-    if (!in.WriteInt32(callId)) {
         return TELEPHONY_ERR_FAIL;
     }
     if (!in.WriteInt32(callStatus)) {
