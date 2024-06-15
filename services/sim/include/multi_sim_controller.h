@@ -74,6 +74,8 @@ public:
     bool IsDataShareError();
     void ResetDataShareError();
     int32_t UpdateOpKeyInfo();
+    bool IsSetActiveSimInProgress();
+    bool IsSetPrimarySlotIdInProgress();
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
@@ -130,6 +132,8 @@ private:
     std::vector<SimRdbInfo> localCacheInfo_;
     std::mutex mutex_;
     std::shared_ptr<RadioProtocolController> radioProtocolController_ = nullptr;
+    bool isSetActiveSimInProgress_ = false;
+    bool isSetPrimarySlotIdInProgress_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
