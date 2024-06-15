@@ -525,17 +525,20 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
         TELEPHONY_LOGE("failed by out of range");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-
+    isSetActiveSimInProgress_ = true;
     if (!SetActiveSimToRil(slotId, ENTITY_CARD, enable)) {
         TELEPHONY_LOGE("SetActiveSimToRil failed");
+        isSetActiveSimInProgress_ = false;
         return TELEPHONY_ERR_RIL_CMD_FAIL;
     }
     if (force) {
         TELEPHONY_LOGD("no need to update cache");
+        isSetActiveSimInProgress_ = false;
         return TELEPHONY_ERR_SUCCESS;
     }
     if (simDbHelper_ == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
+        isSetActiveSimInProgress_ = false;
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     DataShare::DataShareValuesBucket values;
@@ -544,16 +547,19 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
     int32_t result = simDbHelper_->UpdateDataBySimId(curSimId, values);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("failed by database");
+        isSetActiveSimInProgress_ = false;
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     std::unique_lock<std::mutex> lock(mutex_);
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("failed by out of range");
+        isSetActiveSimInProgress_ = false;
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     localCacheInfo_[slotId].isActive = enable;
     lock.unlock();
     CheckIfNeedSwitchMainSlotId();
+    isSetActiveSimInProgress_ = false;
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -891,13 +897,16 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
         return TELEPHONY_ERR_SUCCESS;
     }
     // change protocol for default cellulardata slotId
+    isSetPrimarySlotIdInProgress_ = true;
     PublishSetPrimaryEvent(false);
     if (radioProtocolController_ == nullptr || !radioProtocolController_->SetRadioProtocol(slotId)) {
         TELEPHONY_LOGE("SetRadioProtocol failed");
+        isSetPrimarySlotIdInProgress_ = false;
         PublishSetPrimaryEvent(true);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     SavePrimarySlotIdInfo(slotId);
+    isSetPrimarySlotIdInProgress_ = false;
     PublishSetPrimaryEvent(true);
     for (int32_t i = 0; i < maxCount_; i++) {
         if (!(localCacheInfo_[i].iccId.empty())) {
@@ -1293,6 +1302,18 @@ int32_t MultiSimController::IsSatelliteSupported()
     GetParameter(TEL_SATELLITE_SUPPORTED, SATELLITE_DEFAULT_VALUE, satelliteSupported, SYSPARA_SIZE);
     TELEPHONY_LOGI("satelliteSupported is %{public}s", satelliteSupported);
     return std::atoi(satelliteSupported);
+}
+
+bool MultiSimController::IsSetActiveSimInProgress()
+{
+    TELEPHONY_LOGD("isSetActiveSimInProgress_ is %{public}d", isSetActiveSimInProgress_);
+    return isSetActiveSimInProgress_;
+}
+
+bool MultiSimController::IsSetPrimarySlotIdInProgress()
+{
+    TELEPHONY_LOGD("isSetPrimarySlotIdInProgress_ is %{public}d", isSetPrimarySlotIdInProgress_);
+    return isSetPrimarySlotIdInProgress_;
 }
 
 } // namespace Telephony

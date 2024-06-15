@@ -143,6 +143,9 @@ public:
         const int32_t tokenId, const sptr<SimAccountCallback> &callback) override;
     int32_t UnregisterSimAccountCallback(const int32_t tokenId) override;
 
+    bool IsSetActiveSimInProgress() override;
+    bool IsSetPrimarySlotIdInProgress() override;
+
 private:
     bool IsValidSlotId(int32_t slotId);
     template<class N>
