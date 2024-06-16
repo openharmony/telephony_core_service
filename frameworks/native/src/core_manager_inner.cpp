@@ -2442,6 +2442,24 @@ int32_t CoreManagerInner::StartGetRilSignalIntensity(int32_t slotId)
     return networkSearchManager_->StartGetRilSignalIntensity(slotId);
 }
 
+bool CoreManagerInner::IsSetActiveSimInProgress()
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERROR;
+    }
+    return simManager_->IsSetActiveSimInProgress();
+}
+
+bool CoreManagerInner::IsSetPrimarySlotIdInProgress()
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERROR;
+    }
+    return simManager_->IsSetPrimarySlotIdInProgress();
+}
+
 /******************** simManager_ end ************************/
 } // namespace Telephony
 } // namespace OHOS
