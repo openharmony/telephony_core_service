@@ -36,11 +36,12 @@ OperatorNameUtils OperatorNameUtils::operatorNameUtils_;
 const char *PATH = "/etc/telephony/operator_name.json";
 const char *ITEM_OPERATOR_NAMES = "operator_names";
 const char *ITEM_PLMN = "mcc_mnc_array";
-const char *ITEM_ZH_HANS_CN = "zh-Hans-CN";
-const char *ITEM_EN_LATN_US = "en-Latn-US";
-const char *ITEM_ZH_HANT_TW = "zh-Hant-TW";
-const char *ITEM_ZH_HANT_HK = "zh-Hant-HK";
-const char *LANGUAGE_SCRIPT = "Hant";
+const char *ITEM_ZH_CN = "zh_CN";
+const char *ITEM_EN_US = "en_US";
+const char *ITEM_ZH_TW = "zh_TW";
+const char *ITEM_ZH_HK = "zh_HK";
+const char *ITEM_ZH_HANS = "zh_Hans";
+const char *ITEM_ZH_HANT = "zh_Hant";
 const int MAX_BYTE_LEN = 10 * 1024 * 1024;
 
 OperatorNameUtils &OperatorNameUtils::GetInstance()
@@ -180,10 +181,12 @@ void OperatorNameUtils::ParserOperatorNames(std::vector<OperatorNameCust> &vec, 
             }
         }
 
-        nameCust.zhHansCN = ParseString(cJSON_GetObjectItem(itemRoot, ITEM_ZH_HANS_CN));
-        nameCust.enLatnUS = ParseString(cJSON_GetObjectItem(itemRoot, ITEM_EN_LATN_US));
-        nameCust.zhHantTW = ParseString(cJSON_GetObjectItem(itemRoot, ITEM_ZH_HANT_TW));
-        nameCust.zhHantHK = ParseString(cJSON_GetObjectItem(itemRoot, ITEM_ZH_HANT_HK));
+        nameCust.zhCN = ParseString(cJSON_GetObjectItem(itemRoot, ITEM_ZH_CN));
+        nameCust.enUS = ParseString(cJSON_GetObjectItem(itemRoot, ITEM_EN_US));
+        nameCust.zhTW = ParseString(cJSON_GetObjectItem(itemRoot, ITEM_ZH_TW));
+        nameCust.zhHK = ParseString(cJSON_GetObjectItem(itemRoot, ITEM_ZH_HK));
+        nameCust.zhHans = ParseString(cJSON_GetObjectItem(itemRoot, ITEM_ZH_HANS));
+        nameCust.zhHant = ParseString(cJSON_GetObjectItem(itemRoot, ITEM_ZH_HANT));
         vec.push_back(nameCust);
     }
     itemRoot = nullptr;
@@ -213,23 +216,38 @@ std::string OperatorNameUtils::GetNameByLocale(OperatorNameCust &value)
 {
     std::string locale = OHOS::Global::I18n::LocaleConfig::GetSystemLocale();
     OHOS::Global::I18n::LocaleInfo localeInfo(locale);
-    TELEPHONY_LOGD("locale is %{public}s, language is %{public}s, script is %{public}s, region is %{public}s",
-        locale.c_str(), localeInfo.GetLanguage().c_str(), localeInfo.GetScript().c_str(),
-        localeInfo.GetRegion().c_str());
-    if (localeInfo.GetScript() == std::string(LANGUAGE_SCRIPT)) {
-        locale = std::string(ITEM_ZH_HANT_HK);
+    std::string languageCode = localeInfo.GetLanguage() + "_" + localeInfo.GetRegion();
+    std::string countryCodeTempScript = "";
+    if (!(localeInfo.GetScript().empty())) {
+        countryCodeTempScript = localeInfo.GetLanguage() + "_" + localeInfo.GetScript();
     }
-
-    if (locale == std::string(ITEM_ZH_HANS_CN)) {
-        return value.zhHansCN;
+    TELEPHONY_LOGD("locale is %{public}s, languageCode is %{public}s, countryCodeTempScript is %{public}s",
+        locale.c_str(), languageCode.c_str(), countryCodeTempScript.c_str());
+    if (countryCodeTempScript == std::string(ITEM_ZH_HANS)) {
+        languageCode = std::string(ITEM_ZH_HANS);
     }
-    if (locale == std::string(ITEM_ZH_HANT_TW)) {
-        return value.zhHantTW;
+    if (countryCodeTempScript == std::string(ITEM_ZH_HANT)) {
+        languageCode = std::string(ITEM_ZH_HANT);
     }
-    if (locale == std::string(ITEM_ZH_HANT_HK)) {
-        return value.zhHantHK;
+    if (languageCode == std::string(ITEM_ZH_CN)) {
+        return value.zhCN;
     }
-    return value.enLatnUS;
+    if (languageCode == std::string(ITEM_ZH_TW)) {
+        return value.zhTW;
+    }
+    if (languageCode == std::string(ITEM_ZH_HK)) {
+        return value.zhHK;
+    }
+    if (languageCode == std::string(ITEM_ZH_HANS)) {
+        return value.zhHans;
+    }
+    if (languageCode == std::string(ITEM_ZH_HANT)) {
+        return value.zhHant;
+    }
+    if (languageCode == std::string(ITEM_EN_US)) {
+        return value.enUS;
+    }
+    return value.enUS;
 }
 
 std::string OperatorNameUtils::GetCustomName(const std::string &numeric)
