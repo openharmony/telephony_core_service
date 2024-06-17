@@ -2442,13 +2442,13 @@ int32_t CoreManagerInner::StartGetRilSignalIntensity(int32_t slotId)
     return networkSearchManager_->StartGetRilSignalIntensity(slotId);
 }
 
-bool CoreManagerInner::IsSetActiveSimInProgress()
+bool CoreManagerInner::IsSetActiveSimInProgress(int32_t slotId)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
         return TELEPHONY_ERROR;
     }
-    return simManager_->IsSetActiveSimInProgress();
+    return simManager_->IsSetActiveSimInProgress(slotId);
 }
 
 bool CoreManagerInner::IsSetPrimarySlotIdInProgress()
