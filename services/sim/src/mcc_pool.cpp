@@ -19,11 +19,13 @@ using namespace std;
 
 namespace OHOS {
 namespace Telephony {
+std::mutex mccMutex_;
 std::vector<std::shared_ptr<MccAccess>> MccPool::mccAccessTable_;
 std::vector<std::string> MccPool::specialMccMnc_;
 constexpr size_t MCC_ACCESS_TABLE_LEN = 240;
 std::shared_ptr<MccAccess> MccPool::AccessToMcc(int mcc)
 {
+    std::lock_guard<std::mutex> lock(mccMutex_);
     InitMccTables();
     auto it = std::find_if(mccAccessTable_.begin(), mccAccessTable_.end(),
         [mcc](const auto &p) { return p != nullptr && p->mcc_ == mcc; });
