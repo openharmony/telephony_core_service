@@ -2,31 +2,48 @@
     "version": 1,
     "operator_names": [{
             "mcc_mnc_array": [46000,46002,46004,46007,46008,46013,46021,46022],
-            "zh-Hans-CN": "中国移动",
-            "en-Latn-US": "China Mobile",
-            "zh-Hant-TW": "中國移動",
-            "zh-Hant-HK": "中國移動"
+            "zh_CN": "中国移动",
+            "en_US": "China Mobile",
+            "zh_TW": "中國移動",
+            "zh_HK": "中國移動",
+            "zh_Hans": "中国移动",
+            "zh_Hant": "中國移動"
         },
         {
             "mcc_mnc_array": [46001,46006,46009,46031,46032],
-            "zh-Hans-CN": "中国联通",
-            "en-Latn-US": "China Unicom",
-            "zh-Hant-TW": "中國聯通",
-            "zh-Hant-HK": "中國聯通"
+            "zh_CN": "中国联通",
+            "en_US": "China Unicom",
+            "zh_TW": "中國聯通",
+            "zh_HK": "中國聯通",
+            "zh_Hans": "中国联通",
+            "zh_Hant": "中國聯通"
         },
         {
             "mcc_mnc_array": [46003,46011,46050,46051],
-            "zh-Hans-CN": "中国电信",
-            "en-Latn-US": "China Telecom",
-            "zh-Hant-TW": "中國電信",
-            "zh-Hant-HK": "中國電信"
+            "zh_CN": "中国电信",
+            "en_US": "China Telecom",
+            "zh_TW": "中國電信",
+            "zh_HK": "中國電信",
+            "zh_Hans": "中国电信",
+            "zh_Hant": "中國電信"
         },
         {
             "mcc_mnc_array": [46015,46060,46061],
-            "zh-Hans-CN": "中国广电",
-            "en-Latn-US": "China Broadnet",
-            "zh-Hant-TW": "中國廣電",
-            "zh-Hant-HK": "中國廣電"
+            "zh_CN": "中国广电",
+            "en_US": "China Broadnet",
+            "zh_TW": "中國廣電",
+            "zh_HK": "中國廣電",
+            "zh_Hans": "中国广电",
+            "zh_Hant": "中國廣電"
+        },
+        {
+            "mcc_mnc_array": [99999,999999],
+            "zh_CN": "未知网络",
+            "en_US": "Unknown",
+            "zh_TW": "未知網絡",
+            "zh_HK": "未知網絡",
+            "zh_Hans": "未知网络",
+            "zh_Hant": "未知網絡"
         }
     ]
 }
