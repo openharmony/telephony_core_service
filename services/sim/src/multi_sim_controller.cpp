@@ -73,6 +73,7 @@ void MultiSimController::Init()
         radioProtocolController_->Init();
     }
     maxCount_ = SIM_SLOT_COUNT;
+    isSetActiveSimInProgress_.resize(maxCount_, 0);
     TELEPHONY_LOGI("Create SimRdbHelper count = %{public}d", maxCount_);
 }
 
@@ -100,6 +101,7 @@ void MultiSimController::AddExtraManagers(std::shared_ptr<Telephony::SimStateMan
     if (static_cast<int>(simStateManager_.size()) == SIM_SLOT_COUNT) {
         simStateManager_.push_back(simStateManager);
         simFileManager_.push_back(simFileManager);
+        isSetActiveSimInProgress_.push_back(0);
         maxCount_ = MAX_SLOT_COUNT;
         size_t count = localCacheInfo_.size();
         TELEPHONY_LOGI("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d",
@@ -525,20 +527,20 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
         TELEPHONY_LOGE("failed by out of range");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    isSetActiveSimInProgress_ = true;
+    isSetActiveSimInProgress_[slotId] = 1;
     if (!SetActiveSimToRil(slotId, ENTITY_CARD, enable)) {
         TELEPHONY_LOGE("SetActiveSimToRil failed");
-        isSetActiveSimInProgress_ = false;
+        isSetActiveSimInProgress_[slotId] = 0;
         return TELEPHONY_ERR_RIL_CMD_FAIL;
     }
     if (force) {
         TELEPHONY_LOGD("no need to update cache");
-        isSetActiveSimInProgress_ = false;
+        isSetActiveSimInProgress_[slotId] = 0;
         return TELEPHONY_ERR_SUCCESS;
     }
     if (simDbHelper_ == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
-        isSetActiveSimInProgress_ = false;
+        isSetActiveSimInProgress_[slotId] = 0;
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     DataShare::DataShareValuesBucket values;
@@ -547,19 +549,19 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
     int32_t result = simDbHelper_->UpdateDataBySimId(curSimId, values);
     if (result == INVALID_VALUE) {
         TELEPHONY_LOGE("failed by database");
-        isSetActiveSimInProgress_ = false;
+        isSetActiveSimInProgress_[slotId] = 0;
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     std::unique_lock<std::mutex> lock(mutex_);
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("failed by out of range");
-        isSetActiveSimInProgress_ = false;
+        isSetActiveSimInProgress_[slotId] = 0;
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     localCacheInfo_[slotId].isActive = enable;
     lock.unlock();
     CheckIfNeedSwitchMainSlotId();
-    isSetActiveSimInProgress_ = false;
+    isSetActiveSimInProgress_[slotId] = 0;
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -1304,10 +1306,14 @@ int32_t MultiSimController::IsSatelliteSupported()
     return std::atoi(satelliteSupported);
 }
 
-bool MultiSimController::IsSetActiveSimInProgress()
+bool MultiSimController::IsSetActiveSimInProgress(int32_t slotId)
 {
-    TELEPHONY_LOGD("isSetActiveSimInProgress_ is %{public}d", isSetActiveSimInProgress_);
-    return isSetActiveSimInProgress_;
+    if (static_cast<uint32_t>(slotId) >= isSetActiveSimInProgress_.size()) {
+        TELEPHONY_LOGE("IsSetActiveSimInProgress invalid slotId: %{public}d", slotId);
+        return false;
+    }
+    TELEPHONY_LOGD("isSetActiveSimInProgress_ %{public}d, is %{public}d", slotId, isSetActiveSimInProgress_[slotId]);
+    return static_cast<bool>(isSetActiveSimInProgress_[slotId]);
 }
 
 bool MultiSimController::IsSetPrimarySlotIdInProgress()

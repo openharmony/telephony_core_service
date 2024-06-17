@@ -135,7 +135,7 @@ public:
     virtual int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue) = 0;
     virtual int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue) = 0;
 
-    virtual bool IsSetActiveSimInProgress() = 0;
+    virtual bool IsSetActiveSimInProgress(int32_t slotId) = 0;
     virtual bool IsSetPrimarySlotIdInProgress() = 0;
 };
 } // namespace Telephony

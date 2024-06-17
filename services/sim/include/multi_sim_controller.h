@@ -74,7 +74,7 @@ public:
     bool IsDataShareError();
     void ResetDataShareError();
     int32_t UpdateOpKeyInfo();
-    bool IsSetActiveSimInProgress();
+    bool IsSetActiveSimInProgress(int32_t slotId);
     bool IsSetPrimarySlotIdInProgress();
 
 public:
@@ -132,7 +132,7 @@ private:
     std::vector<SimRdbInfo> localCacheInfo_;
     std::mutex mutex_;
     std::shared_ptr<RadioProtocolController> radioProtocolController_ = nullptr;
-    bool isSetActiveSimInProgress_ = false;
+    std::vector<int> isSetActiveSimInProgress_;
     bool isSetPrimarySlotIdInProgress_ = false;
 };
 } // namespace Telephony
