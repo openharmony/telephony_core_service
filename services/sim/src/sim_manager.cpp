@@ -1197,13 +1197,13 @@ int32_t SimManager::UnregisterSimAccountCallback(const int32_t tokenId)
     return multiSimMonitor_->UnregisterSimAccountCallback(tokenId);
 }
 
-bool SimManager::IsSetActiveSimInProgress()
+bool SimManager::IsSetActiveSimInProgress(int32_t slotId)
 {
     if (multiSimController_ == nullptr) {
         TELEPHONY_LOGE("multiSimController_ is nullptr");
         return false;
     }
-    return multiSimController_->IsSetActiveSimInProgress();
+    return multiSimController_->IsSetActiveSimInProgress(slotId);
 }
 
 bool SimManager::IsSetPrimarySlotIdInProgress()
