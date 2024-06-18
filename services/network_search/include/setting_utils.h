@@ -54,7 +54,7 @@ public:
     bool UnRegisterSettingsObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     void RegisterSettingsObserver();
     void SetCommonEventSubscribeInfo(const EventFwk::CommonEventSubscribeInfo &subscribeInfo);
-    std::shared_ptr<EventFwk::CommonEventSubscribeInfo> GetCommonEventSubscriber();
+    std::shared_ptr<EventFwk::CommonEventSubscriber> GetCommonEventSubscriber();
     int32_t Query(Uri uri, const std::string &key, std::string &value);
     int32_t Insert(Uri uri, const std::string &key, const std::string &value);
     int32_t Update(Uri uri, const std::string &key, const std::string &value);

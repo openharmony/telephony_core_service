@@ -94,7 +94,7 @@ bool SettingUtils::UnRegisterSettingsObserver(
 {
     std::lock_guard<std::mutex> lock(mtx_);
     auto it = registerInfos_.begin();
-    for (;it != registerInfos_.end();) {
+    for (; it != registerInfos_.end();) {
         if (it->first == uri && it->second == dataObserver) {
             it = registerInfos_.erase(it);
         } else {
@@ -117,13 +117,13 @@ bool SettingUtils::RegisterSettingsObserver(
 {
     std::lock_guard<std::mutex> lock(mtx_);
     auto it = registerInfos_.begin();
-    for (;it != registerInfos_.end(); it++) {
+    for (; it != registerInfos_.end(); it++) {
         if (it->first == uri && it->second == dataObserver) {
             break;
         }
     }
     if (it == registerInfos_.end()) {
-        registerInfos_.empalce_back(std::make_pair(uri, dataObserver));
+        registerInfos_.emplace_back(std::make_pair(uri, dataObserver));
     }
     return RegisterToDataShare(uri, dataObserver);
 }
