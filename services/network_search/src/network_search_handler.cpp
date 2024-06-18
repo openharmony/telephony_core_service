@@ -173,6 +173,7 @@ bool NetworkSearchHandler::InitOperatorName()
         TELEPHONY_LOGE("failed to create new operatorName slotId:%{public}d", slotId_);
         return false;
     }
+    return true;
 }
 
 bool NetworkSearchHandler::InitSettingUtils()
