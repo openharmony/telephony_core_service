@@ -143,6 +143,8 @@ private:
     void RadioResidentNetworkChange(const AppExecFwk::InnerEvent::Pointer &event);
     void SatelliteStatusChanged(const AppExecFwk::InnerEvent::Pointer &event);
     bool InitOperatorName();
+    bool InitSettingUtils();
+    int32_t SubscribeSystemAbility();
     int32_t IsSatelliteSupported() const;
     void GetNrSsbIdResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void SyncGetSsbInfoResponse();
