@@ -15,9 +15,12 @@
 
 #include "setting_utils.h"
 
+#include "common_event_manager.h"
 #include "rdb_errno.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "want.h"
+#include "datashare_errno.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -40,6 +43,7 @@ const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIMEZONE = "auto_ti
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE = "settings.telephony.airplanemode";
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE =
     "settings.telephony.preferrednetworkmode";
+const std::string COMMON_EVENT_DATA_SHARE_READY = "usual.event.DATA_SHARE_READY";
 
 SettingUtils::SettingUtils() = default;
 
@@ -60,9 +64,43 @@ std::shared_ptr<DataShare::DataShareHelper> SettingUtils::CreateDataShareHelper(
     return DataShare::DataShareHelper::Creator(remoteObj, NETWORK_SEARCH_SETTING_URI, NETWORK_SEARCH_SETTING_EXT_URI);
 }
 
+std::shared_ptr<DataShare::DataShareHelper> SettingUtils::CreateNonBlockDataShareHelper()
+{
+    sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        TELEPHONY_LOGE("SettingUtils: GetSystemAbilityManager failed.");
+        return nullptr;
+    }
+    sptr<IRemoteObject> remoteObj = saManager->GetSystemAbility(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID);
+    if (remoteObj == nullptr) {
+        TELEPHONY_LOGE("SettingUtils: GetSystemAbility Service Failed.");
+        return nullptr;
+    }
+    auto [ret, helper] = DataShare::DataShareHelper::Create(remoteObj, NETWORK_SEARCH_SETTING_URI,
+        NETWORK_SEARCH_SETTING_EXT_URI);
+    if (ret == DataShare::E_OK) {
+        return helper;
+    } else if (ret == DataShare::E_DATA_SHARE_NOT_READY) {
+        TELEPHONY_LOGE("SettingUtils: datashare not ready.");
+        return nullptr;
+    } else {
+        TELEPHONY_LOGE("SettingUtils: create datashare fail, ret = %{public}d.", ret);
+        return nullptr;
+    }
+}
+
 bool SettingUtils::UnRegisterSettingsObserver(
     const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
+    std::lock_guard<std::mutex> lock(mtx_);
+    auto it = registerInfos_.begin();
+    for (;it != registerInfos_.end();) {
+        if (it->first == uri && it->second == dataObserver) {
+            it = registerInfos_.erase(it);
+        } else {
+            it++;
+        }
+    }
     std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("settingHelper is null");
@@ -77,7 +115,30 @@ bool SettingUtils::UnRegisterSettingsObserver(
 bool SettingUtils::RegisterSettingsObserver(
     const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
+    std::lock_guard<std::mutex> lock(mtx_);
+    auto it = registerInfos_.begin();
+    for (;it != registerInfos_.end(); it++) {
+        if (it->first == uri && it->second == dataObserver) {
+            break;
+        }
+    }
+    if (it == registerInfos_.end()) {
+        registerInfos_.empalce_back(std::make_pair(uri, dataObserver));
+    }
+    return RegisterToDataShare(uri, dataObserver);
+}
+
+void SettingUtils::RegisterSettingsObserver()
+{
+    for (auto it = registerInfos_.begin(); it != registerInfos_.end(); it++) {
+        RegisterToDataShare(uri, dataObserver);
+    }
+}
+
+bool SettingUtils::RegisterToDataShare(
+    const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateNonBlockDataShareHelper();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("settingHelper is null");
         return false;
@@ -173,6 +234,32 @@ int32_t SettingUtils::Update(Uri uri, const std::string &key, const std::string 
     settingHelper->NotifyChange(uri);
     settingHelper->Release();
     return TELEPHONY_SUCCESS;
+}
+
+void SettingUtils::SetCommonEventSubscribeInfo(const EventFwk::CommonEventSubscribeInfo &subscribeInfo)
+{
+    commonEventSubscriber_ = std::make_shared<BroadcastSubscriber>(subscribeInfo);
+}
+
+std::shared_ptr<EventFwk::CommonEventSubscriber> SettingUtils::GetCommonEventSubscriber()
+{
+    return commonEventSubscriber_;
+}
+
+SettingUtils::BroadcastSubscriber::BroadcastSubscriber(const EventFwk::CommonEventSubscribeInfo &sp)
+    : EventFwk::CommonEventSubscriber(sp)
+{}
+
+void SettingUtils::BroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
+{
+    const AAFwk::Want &want = data.GetWant();
+    std::string action = want.GetAction();
+    if (action != COMMON_EVENT_DATA_SHARE_READY) {
+        TELEPHONY_LOGE("SettingUtils::CommonEventSubscriber event is not COMMON_EVENT_DATA_SHARE_READY");
+        return;
+    }
+    SettingUtils::GetInstance()->RegisterSettingsObserver();
+    TELEPHONY_LOGI("SettingUtils::OnReceiveEvent datashare is ready!");
 }
 
 AutoTimeObserver::AutoTimeObserver(std::shared_ptr<NetworkSearchHandler> &networkSearchHandler)
