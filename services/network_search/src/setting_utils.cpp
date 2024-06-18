@@ -131,7 +131,7 @@ bool SettingUtils::RegisterSettingsObserver(
 void SettingUtils::RegisterSettingsObserver()
 {
     for (auto it = registerInfos_.begin(); it != registerInfos_.end(); it++) {
-        RegisterToDataShare(uri, dataObserver);
+        RegisterToDataShare(it->first, it->second);
     }
 }
 
