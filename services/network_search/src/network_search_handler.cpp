@@ -200,7 +200,6 @@ void NetworkSearchHandler::SubscribeSystemAbility()
         int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
         TELEPHONY_LOGI("SubscribeSystemAbility  COMMON_EVENT_SERVICE_ID result:%{public}d", ret);
     }
-    return true;
 }
 
 void NetworkSearchHandler::RegisterEvents()
