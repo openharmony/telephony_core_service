@@ -178,11 +178,11 @@ bool NetworkSearchHandler::InitOperatorName()
 bool NetworkSearchHandler::InitSettingUtils()
 {
     EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(COMMON_EVENT_DATA_SHARE_READY)；
+    matchingSkills.AddEvent(COMMON_EVENT_DATA_SHARE_READY);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     subscriberInfo.SetPermission("ohos.permission.PUBLISH_SYSTEM_COMMON_EVENT");
-    SettingUtils::GetInstance()->SetCommonEventSubsribeInfo(subscriberInfo);
+    SettingUtils::GetInstance()->SetCommonEventSubscribeInfo(subscriberInfo);
     if (SettingUtils::GetInstance()->GetCommonEventSubscriber() == nullptr) {
         TELEPHONY_LOGE("InitSettingUtils fail! slotId:%{public}d", slotId_);
         return false;
