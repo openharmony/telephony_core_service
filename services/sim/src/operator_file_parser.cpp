@@ -109,6 +109,7 @@ bool OperatorFileParser::ParseFromCustomSystem(int32_t slotId, OperatorConfig &o
     }
     char *filePath = nullptr;
     cJSON *tempRoot = nullptr;
+    std::lock_guard<std::mutex> lock(mutex_);
     tempConfig_.clear();
     for (size_t i = 0; i < MAX_CFG_POLICY_DIRS_CNT; i++) {
         filePath = cfgFiles->paths[i];
