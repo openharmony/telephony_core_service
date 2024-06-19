@@ -168,7 +168,7 @@ int32_t TelephonyStateRegistryProxy::UpdateSignalInfo(
         return TELEPHONY_ERR_FAIL;
     }
     int32_t size = vec.size();
-    if (size <= 0 || size > SignalInformation::MAX_SIGNAL_NUM) {
+    if (size < 0 || size > SignalInformation::MAX_SIGNAL_NUM) {
         TELEPHONY_LOGE("signal size error, size=%{public}d", size);
         return TELEPHONY_ERR_FAIL;
     }

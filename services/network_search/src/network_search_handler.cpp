@@ -1263,7 +1263,14 @@ bool NetworkSearchHandler::IsSatelliteOn() const
 void NetworkSearchHandler::ClearSignalAndCellInfoList() const
 {
     if (signalInfo_ != nullptr) {
+        TELEPHONY_LOGD("reset signal info slotId: %{public}d", slotId_);
         signalInfo_->Reset();
+        std::vector<sptr<SignalInformation>> signals;
+        signalInfo_->GetSignalInfoList(signals);
+        if (TELEPHONY_EXT_WRAPPER.sortSignalInfoListExt_ != nullptr) {
+            TELEPHONY_EXT_WRAPPER.sortSignalInfoListExt_(slotId_, signals);
+        }
+        DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifySignalInfoUpdated(slotId_, signals);
     }
     if (cellInfo_ != nullptr) {
         cellInfo_->ClearCellInfoList();
