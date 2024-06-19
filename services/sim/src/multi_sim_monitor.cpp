@@ -49,6 +49,7 @@ MultiSimMonitor::~MultiSimMonitor()
 void MultiSimMonitor::Init()
 {
     TELEPHONY_LOGD("init");
+    isSimAccountLoaded_.resize(SIM_SLOT_COUNT, 0);
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
     InitListener();
 }
@@ -59,6 +60,7 @@ void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManage
     if (simStateManager_.size() == SIM_SLOT_COUNT) {
         simStateManager_.push_back(simStateManager);
         simFileManager_.push_back(simFileManager);
+        isSimAccountLoaded_.push_back(0);
         RegisterSimNotify(SIM_SLOT_2);
     }
 }
@@ -171,6 +173,7 @@ void MultiSimMonitor::InitData(int32_t slotId)
         TELEPHONY_LOGE("MultiSimMonitor::InitData failed");
         return;
     }
+    isSimAccountLoaded_[slotId] = 1;
     if (observerHandler_ == nullptr) {
         TELEPHONY_LOGE("MultiSimMonitor::InitData observerHandler_ is nullptr");
         return;
@@ -194,6 +197,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when sim is absent");
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
+        isSimAccountLoaded_[slotId] = 0;
         simFileManager->ClearData();
     } else if (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN) {
         TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when sim is unknown");
@@ -214,11 +218,12 @@ void MultiSimMonitor::RegisterCoreNotify(
         return;
     }
     observerHandler_->RegObserver(what, handler);
-    if (controller_ == nullptr) {
-        TELEPHONY_LOGE("controller_ is nullptr");
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("MultiSimMonitor::RegisterCoreNotify slotId is invalid");
         return;
     }
-    if (controller_->IsSimActive(slotId) || IsVSimSlotId(slotId)) {
+    if (isSimAccountLoaded_[slotId] || IsVSimSlotId(slotId)) {
+        TELEPHONY_LOGI("notify slotId:%{public}d sim account loaded", slotId);
         TelEventHandler::SendTelEvent(handler, RadioEvent::RADIO_SIM_ACCOUNT_LOADED, slotId, 0);
     }
 }
