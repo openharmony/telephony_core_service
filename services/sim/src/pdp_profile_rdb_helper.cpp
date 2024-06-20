@@ -34,6 +34,7 @@ std::shared_ptr<DataShare::DataShareHelper> PdpProfileRdbHelper::CreatePdpProfil
     auto helper = TelephonyDataHelper::GetInstance();
     if (helper == nullptr) {
         TELEPHONY_LOGE("get CreatePdpProfileDataHelper Failed");
+        return nullptr;
     }
     return helper->CreatePdpHelper();
 }
