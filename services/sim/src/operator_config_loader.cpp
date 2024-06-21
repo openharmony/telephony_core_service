@@ -238,6 +238,7 @@ std::shared_ptr<DataShare::DataShareHelper> OperatorConfigLoader::CreateOpKeyHel
     auto helper = TelephonyDataHelper::GetInstance();
     if (helper == nullptr) {
         TELEPHONY_LOGE("get CreateOpKeyHelper Failed.");
+        return nullptr;
     }
     return helper->CreateOpKeyHelper();
 }
@@ -248,6 +249,7 @@ std::shared_ptr<DataShare::DataShareHelper> OperatorConfigLoader::CreateSimHelpe
     auto helper = TelephonyDataHelper::GetInstance();
     if (helper == nullptr) {
         TELEPHONY_LOGE("get CreateSimHelper Failed.");
+        return nullptr;
     }
     return helper->CreateSimHelper();
 }

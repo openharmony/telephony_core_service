@@ -30,6 +30,7 @@ std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateDataHelper()
     TELEPHONY_LOGD("start");
     if (mTelephonyDatahelper == nullptr) {
         TELEPHONY_LOGE("get CreateDataHelper Failed");
+        return nullptr;
     }
     return mTelephonyDatahelper->CreateSimHelper();
 }
@@ -39,6 +40,7 @@ std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateOpKeyHelper()
     TELEPHONY_LOGI("SimRdbHelper::CreateOpKeyHelper");
     if (mTelephonyDatahelper == nullptr) {
         TELEPHONY_LOGE("get CreateOpKeyHelper Failed");
+        return nullptr;
     }
     return mTelephonyDatahelper->CreateOpKeyHelper();
 }
