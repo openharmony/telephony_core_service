@@ -102,7 +102,7 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 
 void MultiSimMonitor::CheckOpcNeedUpdata(const bool isDataShareError)
 {
-    TelFFRTUtils::Submit([isDataShareError]() {
+    TelFFRTUtils::Submit([=]() {
         bool isOpcVersionUpdated = CheckUpdateOpcVersion() == TELEPHONY_SUCCESS;
         if (isOpcVersionUpdated) {
             OperatorFileParser::ClearFilesCache();
