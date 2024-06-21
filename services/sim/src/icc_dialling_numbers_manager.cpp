@@ -77,24 +77,9 @@ void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Point
         case MSG_SIM_DIALLING_NUMBERS_DELETE_DONE:
             ProcessDeleteDone(event);
             break;
-        case RadioEvent::RADIO_SIM_RECORDS_LOADED:
-            InitFdnCache();
-            break;
         default:
             break;
     }
-}
-
-void IccDiallingNumbersManager::InitFdnCache()
-{
-    TELEPHONY_LOGI("IccDiallingNumbersManager::InitFdnCache start");
-    if (diallingNumbersCache_ != nullptr) {
-        diallingNumbersCache_->ClearDiallingNumberCache();
-    }
-    TelFFRTUtils::Submit([&]() {
-        std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers;
-        QueryIccDiallingNumbers(DiallingNumbersInfo::SIM_FDN, diallingNumbers);
-    });
 }
 
 void IccDiallingNumbersManager::ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
