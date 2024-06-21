@@ -201,7 +201,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         handler->SendEvent(0, 0, AppExecFwk::EventQueue::Priority::HIGH);
         sleep(SLEEP_TIME_SECONDS);
     }
-    telRilManager->handler_->ClearFfrt(true);
+    telRilManager->handler_->ClearFfrt(false);
+    telRilManager->handler_->queue_ = nullptr;
     return;
 }
 } // namespace OHOS
