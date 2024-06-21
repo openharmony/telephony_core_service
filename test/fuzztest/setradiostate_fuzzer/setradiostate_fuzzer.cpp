@@ -314,7 +314,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
         return;
     }
-    telRilManager->handler_->ClearFfrt(true);
+    telRilManager->handler_->ClearFfrt(false);
+    telRilManager->handler_->queue_ = nullptr;
     return;
 }
 } // namespace OHOS
