@@ -53,6 +53,11 @@ static inline bool IsValidSlotId(int32_t slotId)
     return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT));
 }
 
+static inline bool IsValidSlotIdEx(int32_t slotId)
+{
+    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT + PARAMETER_COUNT_ONE));
+}
+
 static inline bool IsValidSlotIdForDefault(int32_t slotId)
 {
     return ((slotId >= DEFAULT_SIM_SLOT_ID_REMOVE) && (slotId < SIM_SLOT_COUNT));
@@ -1186,7 +1191,7 @@ void NativeGetSimAccountInfo(napi_env env, void *data)
         return;
     }
     AsyncIccAccountInfo *info = static_cast<AsyncIccAccountInfo *>(data);
-    if (!IsValidSlotId(info->asyncContext.slotId)) {
+    if (!IsValidSlotIdEx(info->asyncContext.slotId)) {
         TELEPHONY_LOGE("NativeGetSimAccountInfo slotId is invalid");
         info->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
@@ -1510,7 +1515,7 @@ void NativeHasSimCard(napi_env env, void *data)
         return;
     }
     AsyncContext<bool> *reVal = static_cast<AsyncContext<bool> *>(data);
-    if (!IsValidSlotId(reVal->slotId)) {
+    if (!IsValidSlotIdEx(reVal->slotId)) {
         TELEPHONY_LOGE("slotId is invalid");
         reVal->context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
