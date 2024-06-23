@@ -26,6 +26,7 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t MAX_SIZE = 1000;
+constexpr int32_t PARAMETER_COUNT_ONE = 1;
 bool CoreServiceProxy::WriteInterfaceToken(MessageParcel &data)
 {
     if (!data.WriteInterfaceToken(CoreServiceProxy::GetDescriptor())) {
@@ -1135,7 +1136,7 @@ std::u16string CoreServiceProxy::GetSimEons(int32_t slotId, const std::string &p
 int32_t CoreServiceProxy::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
 {
     TELEPHONY_LOGD("GetSimAccountInfo slotId = %{public}d", slotId);
-    if (!IsValidSlotId(slotId)) {
+    if (!IsValidSlotIdEx(slotId)) {
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     MessageParcel data;
@@ -1498,6 +1499,17 @@ bool CoreServiceProxy::IsValidSlotId(int32_t slotId)
 {
     int32_t count = GetMaxSimCount();
     if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < count)) {
+        return true;
+    }
+
+    TELEPHONY_LOGE("SlotId is InValid = %{public}d", slotId);
+    return false;
+}
+
+bool CoreServiceProxy::IsValidSlotIdEx(int32_t slotId)
+{
+    int32_t count = GetMaxSimCount();
+    if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < count + PARAMETER_COUNT_ONE)) {
         return true;
     }
 
