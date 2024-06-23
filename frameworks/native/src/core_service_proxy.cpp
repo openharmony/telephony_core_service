@@ -26,7 +26,6 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t MAX_SIZE = 1000;
-constexpr int32_t PARAMETER_COUNT_ONE = 1;
 bool CoreServiceProxy::WriteInterfaceToken(MessageParcel &data)
 {
     if (!data.WriteInterfaceToken(CoreServiceProxy::GetDescriptor())) {
@@ -1509,7 +1508,8 @@ bool CoreServiceProxy::IsValidSlotId(int32_t slotId)
 bool CoreServiceProxy::IsValidSlotIdEx(int32_t slotId)
 {
     int32_t count = GetMaxSimCount();
-    if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < count + PARAMETER_COUNT_ONE)) {
+    // One more slot for VSim.
+    if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < count + 1)) {
         return true;
     }
 

@@ -115,7 +115,8 @@ static inline bool IsValidSlotId(int32_t slotId)
 
 static inline bool IsValidSlotIdEx(int32_t slotId)
 {
-    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT + PARAMETER_COUNT_ONE));
+    // One more slot for VSim.
+    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT + 1));
 }
 
 static inline bool IsValidNetworkCapabilityType(int32_t networkCapabilityType)
