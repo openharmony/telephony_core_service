@@ -32,7 +32,6 @@ std::condition_variable NetworkSearchManager::cv_;
 static const int32_t REQ_INTERVAL = 30;
 const int32_t SATELLITE_STATUS_ON = 1;
 const size_t MCC_LEN = 3;
-const std::string COMMON_EVENT_DATA_SHARE_READY = "usual.event.DATA_SHARE_READY";
 const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandler::memberFuncMap_ = {
     { RadioEvent::RADIO_SIM_STATE_CHANGE, &NetworkSearchHandler::SimStateChange },
     { RadioEvent::RADIO_IMSI_LOADED_READY, &NetworkSearchHandler::ImsiLoadedReady },
@@ -179,7 +178,7 @@ bool NetworkSearchHandler::InitOperatorName()
 bool NetworkSearchHandler::InitSettingUtils()
 {
     EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(COMMON_EVENT_DATA_SHARE_READY);
+    matchingSkills.AddEvent(SettingUtils::COMMON_EVENT_DATA_SHARE_READY);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     subscriberInfo.SetPermission("ohos.permission.PUBLISH_SYSTEM_COMMON_EVENT");

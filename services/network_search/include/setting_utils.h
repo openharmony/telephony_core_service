@@ -49,6 +49,7 @@ public:
     static const std::string SETTINGS_NETWORK_SEARCH_AUTO_TIMEZONE;
     static const std::string SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE;
     static const std::string SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE;
+    static const std::string COMMON_EVENT_DATA_SHARE_READY;
 
     bool RegisterSettingsObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     bool UnRegisterSettingsObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
@@ -70,7 +71,7 @@ private:
     const int32_t RDB_INVALID_VALUE = -1;
     std::mutex mtx_;
     std::vector<std::pair<Uri, sptr<AAFwk::IDataAbilityObserver>>> registerInfos_;
-    std::shared_ptr<EventFwk::CommonEventSubscriber> commonEventSubscriber_;
+    std::shared_ptr<EventFwk::CommonEventSubscriber> commonEventSubscriber_ = nullptr;
 
 private:
     class BroadcastSubscriber : public EventFwk::CommonEventSubscriber {
