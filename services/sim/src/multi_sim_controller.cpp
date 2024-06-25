@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -693,7 +693,7 @@ int32_t MultiSimController::GetDefaultVoiceSlotId()
         return INVALID_VALUE;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
-    for (; i < localCacheInfo_.size(); i++) {
+    for (; i < static_cast<int32_t>localCacheInfo_.size(); i++) {
         if (localCacheInfo_[i].isVoiceCard == MAIN_CARD && localCacheInfo_[i].isActive == ACTIVE) {
             return i;
         }
@@ -753,7 +753,7 @@ int32_t MultiSimController::SetDefaultVoiceSlotId(int32_t slotId)
         TELEPHONY_LOGE("failed by nullptr");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
-    for (; i < localCacheInfo_.size(); i++) { // save to cache
+    for (; i < static_cast<int32_t>localCacheInfo_.size(); i++) { // save to cache
         if (slotId == i) {
             localCacheInfo_[i].isVoiceCard = MAIN_CARD;
             curSimId = localCacheInfo_[i].simId;
@@ -789,7 +789,7 @@ int32_t MultiSimController::GetDefaultSmsSlotId()
         return INVALID_VALUE;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
-    for (; i < localCacheInfo_.size(); i++) {
+    for (; i < static_cast<int32_t>localCacheInfo_.size(); i++) {
         if (localCacheInfo_[i].isMessageCard == MAIN_CARD && localCacheInfo_[i].isActive == ACTIVE) {
             return i;
         }
@@ -821,7 +821,7 @@ int32_t MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
         TELEPHONY_LOGE("failed by nullptr");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
-    for (; i < localCacheInfo_.size(); i++) { // save to cache
+    for (; i < static_cast<int32_t>localCacheInfo_.size(); i++) { // save to cache
         if (slotId == i) {
             localCacheInfo_[i].isMessageCard = MAIN_CARD;
             curSimId = localCacheInfo_[slotId].simId;

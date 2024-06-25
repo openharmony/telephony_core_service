@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,7 +57,7 @@ void MultiSimMonitor::Init()
 void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
     std::shared_ptr<Telephony::SimFileManager> simFileManager)
 {
-    if (simStateManager_.size() == SIM_SLOT_COUNT) {
+    if (static_cast<int32_t>(simStateManager_.size()) == SIM_SLOT_COUNT) {
         simStateManager_.push_back(simStateManager);
         simFileManager_.push_back(simFileManager);
         isSimAccountLoaded_.push_back(0);
