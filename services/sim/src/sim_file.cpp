@@ -1724,6 +1724,7 @@ void SimFile::InitMemberFunc()
 int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
 {
     unsigned int cond = 0;
+    unsigned int condTemp = 0;
     if (displayConditionOfSpn_ <= SPN_INVALID) {
         return cond;
     }
@@ -1733,12 +1734,15 @@ int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
             cond |= static_cast<unsigned int>(SPN_CONDITION_DISPLAY_SPN);
         }
     } else {
-        cond = SPN_CONDITION_DISPLAY_SPN;
+        condTemp = SPN_CONDITION_DISPLAY_SPN;
         if ((static_cast<unsigned int>(displayConditionOfSpn_) & static_cast<unsigned int>(SPN_COND_PLMN)) ==
             SPN_COND_PLMN) {
-            cond |= static_cast<unsigned int>(SPN_CONDITION_DISPLAY_PLMN);
+            condTemp |= static_cast<unsigned int>(SPN_CONDITION_DISPLAY_PLMN);
         }
+        cond = SPN_CONDITION_DISPLAY_PLMN;
     }
+    TELEPHONY_LOGI("displayConditionOfSpn_:%{public}d, roaming:%{public}d, cond:%{public}d, condTemp:%{public}d",
+        displayConditionOfSpn_, roaming, cond, condTemp);
     return cond;
 }
 
