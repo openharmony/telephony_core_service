@@ -14,7 +14,7 @@
     "force_volte_switch_on_bool": false,
     "enable_operator_name_cust_bool": true,
     "operator_name_cust_string": "",
-    "spn_display_condition_cust_int": 1,
+    "spn_display_condition_cust_int": -1,
     "pnn_cust_string_array": [],
     "opl_cust_string_array": [],
     "emergency_call_string_array": [],
