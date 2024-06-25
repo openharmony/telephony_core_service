@@ -43,7 +43,7 @@ const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIMEZONE = "auto_ti
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE = "settings.telephony.airplanemode";
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE =
     "settings.telephony.preferrednetworkmode";
-const std::string COMMON_EVENT_DATA_SHARE_READY = "usual.event.DATA_SHARE_READY";
+const std::string SettingUtils::COMMON_EVENT_DATA_SHARE_READY = "usual.event.DATA_SHARE_READY";
 
 SettingUtils::SettingUtils() = default;
 

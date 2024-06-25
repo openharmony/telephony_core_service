@@ -32,6 +32,7 @@ std::condition_variable NetworkSearchManager::cv_;
 static const int32_t REQ_INTERVAL = 30;
 const int32_t SATELLITE_STATUS_ON = 1;
 const size_t MCC_LEN = 3;
+const std::string PERMISSION_PUBLISH_SYSTEM_EVENT = "ohos.permission.PUBLISH_SYSTEM_COMMON_EVENT";
 const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandler::memberFuncMap_ = {
     { RadioEvent::RADIO_SIM_STATE_CHANGE, &NetworkSearchHandler::SimStateChange },
     { RadioEvent::RADIO_IMSI_LOADED_READY, &NetworkSearchHandler::ImsiLoadedReady },
@@ -181,7 +182,7 @@ bool NetworkSearchHandler::InitSettingUtils()
     matchingSkills.AddEvent(SettingUtils::COMMON_EVENT_DATA_SHARE_READY);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    subscriberInfo.SetPermission("ohos.permission.PUBLISH_SYSTEM_COMMON_EVENT");
+    subscriberInfo.SetPermission(PERMISSION_PUBLISH_SYSTEM_EVENT);
     SettingUtils::GetInstance()->SetCommonEventSubscribeInfo(subscriberInfo);
     if (SettingUtils::GetInstance()->GetCommonEventSubscriber() == nullptr) {
         TELEPHONY_LOGE("InitSettingUtils fail! slotId:%{public}d", slotId_);
