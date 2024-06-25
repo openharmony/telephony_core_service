@@ -873,7 +873,7 @@ void SimStateHandle::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventH
                 TelEventHandler::SendTelEvent(handler, RadioEvent::RADIO_SIM_ICCID_LOADED, slotId_, 0);
                 TELEPHONY_LOGI("SimStateHandle::RegisterIccidLoaded() OK send, slotId = %{public}d", slotId_);
             }
-			break;
+            break;
         default:
             TELEPHONY_LOGI("SimStateHandle RegisterCoreNotify do default");
             break;
