@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -873,6 +873,7 @@ void SimStateHandle::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventH
                 TelEventHandler::SendTelEvent(handler, RadioEvent::RADIO_SIM_ICCID_LOADED, slotId_, 0);
                 TELEPHONY_LOGI("SimStateHandle::RegisterIccidLoaded() OK send, slotId = %{public}d", slotId_);
             }
+            break;
         default:
             TELEPHONY_LOGI("SimStateHandle RegisterCoreNotify do default");
             break;
