@@ -212,6 +212,11 @@ ohos_shared_library("tel_core_service") {
     defines += [ "ABILITY_LOCATION_SUPPORT" ]
   }
 
+  if (telephony_hicollie_able) {
+    external_deps += [ "hicollie:libhicollie" ]
+    defines += [ "HICOLLIE_ENABLE" ]
+  }
+
   part_name = "core_service"
   subsystem_name = "telephony"
 }

@@ -16,6 +16,12 @@ declare_args() {
   telephony_vsim_feature = false
   telephony_fullnetwork_feature = false
   data_service_ext_feature = false
+
+  telephony_hicollie_able = true
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.hiviewdfx_hicollie)) {
+    telephony_hicollie_able = false
+  }
 }
 
 print("telephony_ext_feature = ${telephony_ext_feature}")
