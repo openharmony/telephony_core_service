@@ -29,6 +29,8 @@
 #include "result_set.h"
 #include "system_ability_definition.h"
 #include "uri.h"
+#include "system_ability_status_change_stub.h"
+#include "common_event_subscriber.h"
 
 #include "network_search_handler.h"
 
@@ -47,21 +49,37 @@ public:
     static const std::string SETTINGS_NETWORK_SEARCH_AUTO_TIMEZONE;
     static const std::string SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE;
     static const std::string SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE;
+    static const std::string COMMON_EVENT_DATA_SHARE_READY;
 
     bool RegisterSettingsObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     bool UnRegisterSettingsObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    void RegisterSettingsObserver();
+    void SetCommonEventSubscribeInfo(const EventFwk::CommonEventSubscribeInfo &subscribeInfo);
+    std::shared_ptr<EventFwk::CommonEventSubscriber> GetCommonEventSubscriber();
     int32_t Query(Uri uri, const std::string &key, std::string &value);
     int32_t Insert(Uri uri, const std::string &key, const std::string &value);
     int32_t Update(Uri uri, const std::string &key, const std::string &value);
 
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
+    std::shared_ptr<DataShare::DataShareHelper> CreateNonBlockDataShareHelper();
+    bool RegisterToDataShare(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
 
 private:
     const std::string SETTING_KEY = "KEYWORD";
     const std::string SETTING_VALUE = "VALUE";
     const int32_t RDB_INVALID_VALUE = -1;
     std::mutex mtx_;
+    std::vector<std::pair<Uri, sptr<AAFwk::IDataAbilityObserver>>> registerInfos_;
+    std::shared_ptr<EventFwk::CommonEventSubscriber> commonEventSubscriber_ = nullptr;
+
+private:
+    class BroadcastSubscriber : public EventFwk::CommonEventSubscriber {
+    public:
+        BroadcastSubscriber(const EventFwk::CommonEventSubscribeInfo &sp);
+        ~BroadcastSubscriber() = default;
+        void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
+    };
 };
 
 class SettingEventCode {
