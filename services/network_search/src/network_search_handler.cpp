@@ -1315,7 +1315,10 @@ void NetworkSearchHandler::SystemAbilityStatusChangeListener::OnAddSystemAbility
     }
     opName_->NotifySpnChanged(true);
     bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(opName_);
-    TELEPHONY_LOGI("NetworkSearchHandler::OnAddSystemAbility subscribeResult = %{public}d", subscribeResult);
+    bool settingsResult = EventFwk::CommonEventManager::SubscribeCommonEvent(
+        SettingUtils::GetInstance()->GetCommonEventSubscriber());
+    TELEPHONY_LOGI("NetworkSearchHandler::OnAddSystemAbility subscribeResult = %{public}d, %{public}d", subscribeResult,
+        settingsResult);
 }
 
 void NetworkSearchHandler::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
@@ -1330,10 +1333,7 @@ void NetworkSearchHandler::SystemAbilityStatusChangeListener::OnRemoveSystemAbil
         return;
     }
     bool subscribeResult = CommonEventManager::UnSubscribeCommonEvent(opName_);
-    bool settingsResult = EventFwk::CommonEventManager::SubscribeCommonEvent(
-        SettingUtils::GetInstance()->GetCommonEventSubscriber());
-    TELEPHONY_LOGI("NetworkSearchHandler::OnAddSystemAbility subscribeResult = %{public}d, %{public}d", subscribeResult,
-        settingsResult);
+    TELEPHONY_LOGI("NetworkSearchHandler::OnRemoveSystemAbility subscribeResult = %{public}d", subscribeResult);
 }
 
 bool NetworkSearchHandler::IsPowerOnPrimaryRadioWhenNoSim() const
