@@ -35,14 +35,17 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 
     auto simCharDecode = std::make_shared<SimCharDecode>();
     auto simNumberDecode = std::make_shared<SimNumberDecode>();
-    int32_t bcdExtType = static_cast<int32_t>(size);
-    uint8_t result = static_cast<uint8_t>(size);
-    char argument = static_cast<char>(size);
+    int32_t offset = 0;
+    int32_t bcdExtType = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    uint8_t result = static_cast<uint8_t>(*data + offset);
+    offset += sizeof(int32_t);
+    char argument = static_cast<char>(*data + offset);
     std::string str(reinterpret_cast<const char *>(data), size);
     std::string number(reinterpret_cast<const char *>(data), size);
     std::vector<uint8_t> bcdCodes;
     bcdCodes.push_back(result);
-    bool includeLen = static_cast<int32_t>(size % 2);
+    bool includeLen = static_cast<int32_t>(*data % 2);
     simCharDecode->IsChineseString(str);
     simNumberDecode->IsValidNumberString(number);
     simNumberDecode->CharToBCD(argument, result, bcdExtType);
@@ -52,9 +55,15 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
     OHOS::AddCoreServiceTokenFuzzer token;
+    return 0;
+}
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;

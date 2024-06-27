@@ -53,7 +53,7 @@ void UnlockPin(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     dataMessageParcel.WriteInt32(slotId);
     std::string pin(reinterpret_cast<const char *>(data), size);
     std::u16string pinStr = Str8ToStr16(pin);
@@ -69,7 +69,7 @@ void UnlockPuk(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     dataMessageParcel.WriteInt32(slotId);
     std::string pin(reinterpret_cast<const char *>(data), size);
     std::u16string pinStr = Str8ToStr16(pin);
@@ -88,7 +88,7 @@ void AlterPin(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     dataMessageParcel.WriteInt32(slotId);
     std::string newPin(reinterpret_cast<const char *>(data), size);
     std::u16string newPinStr = Str8ToStr16(newPin);
@@ -107,7 +107,7 @@ void UnlockPin2(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     dataMessageParcel.WriteInt32(slotId);
     std::string pin2(reinterpret_cast<const char *>(data), size);
     std::u16string pin2Str = Str8ToStr16(pin2);
@@ -123,7 +123,7 @@ void UnlockPuk2(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     dataMessageParcel.WriteInt32(slotId);
     std::string pin2(reinterpret_cast<const char *>(data), size);
     std::u16string pin2Str = Str8ToStr16(pin2);
@@ -142,7 +142,7 @@ void AlterPin2(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     dataMessageParcel.WriteInt32(slotId);
     std::string newPin2(reinterpret_cast<const char *>(data), size);
     std::u16string newPin2Str = Str8ToStr16(newPin2);
@@ -161,11 +161,13 @@ void SetLockState(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     dataMessageParcel.WriteInt32(slotId);
-    int32_t lockType = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t offset = 0;
+    int32_t lockType = static_cast<int32_t>(*data + offset);
     dataMessageParcel.WriteInt32(lockType);
-    int32_t lockState = static_cast<int32_t>(size % SLOT_NUM);
+    offset += sizeof(int32_t);
+    int32_t lockState = static_cast<int32_t>(*data + offset);
     dataMessageParcel.WriteInt32(lockState);
     std::string password(reinterpret_cast<const char *>(data), size);
     std::u16string passwordStr = Str8ToStr16(password);
@@ -181,9 +183,9 @@ void SetActiveSim(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     dataMessageParcel.WriteInt32(slotId);
-    int32_t enable = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t enable = static_cast<int32_t>(*data + sizeof(int32_t));
     dataMessageParcel.WriteInt32(enable);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnSetActiveSim(dataMessageParcel, reply);
@@ -196,9 +198,9 @@ void DiallingNumbersGet(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     dataMessageParcel.WriteInt32(slotId);
-    int32_t type = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t type = static_cast<int32_t>(*data + sizeof(int32_t));
     dataMessageParcel.WriteInt32(type);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnDiallingNumbersGet(dataMessageParcel, reply);
@@ -211,9 +213,9 @@ void DelIccDiallingNumbers(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     dataMessageParcel.WriteInt32(slotId);
-    int32_t type = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t type = static_cast<int32_t>(*data + sizeof(int32_t));
     dataMessageParcel.WriteInt32(type);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnDelIccDiallingNumbers(dataMessageParcel, reply);
@@ -226,9 +228,9 @@ void UnlockSimLock(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     dataMessageParcel.WriteInt32(slotId);
-    int32_t lockType = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t lockType = static_cast<int32_t>(*data + sizeof(int32_t));
     dataMessageParcel.WriteInt32(lockType);
     std::string password(reinterpret_cast<const char *>(data), size);
     std::u16string passwordStr = Str8ToStr16(password);
@@ -271,9 +273,15 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
     OHOS::AddCoreServiceTokenFuzzer token;
+    return 0;
+}
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     OHOS::DelayedSingleton<CoreService>::DestroyInstance();
