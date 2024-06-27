@@ -47,6 +47,7 @@
                 "eventhandler",
                 "ffrt",
                 "hdf_core",
+                "hicollie",
                 "hilog",
                 "hisysevent",
                 "i18n",
