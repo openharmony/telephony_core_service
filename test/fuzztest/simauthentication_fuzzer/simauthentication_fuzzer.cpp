@@ -55,7 +55,7 @@ void GetSimTelephoneNumber(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -70,7 +70,7 @@ void GetVoiceMailIdentifier(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -85,7 +85,7 @@ void GetVoiceMailNumber(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -100,10 +100,10 @@ void QueryIccDiallingNumbers(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteInt32(static_cast<int32_t>(size % TYPE_NUM));
+    dataMessageParcel.WriteInt32(static_cast<int32_t>(*data % TYPE_NUM));
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
@@ -116,11 +116,11 @@ void SimAuthentication(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     std::string authData(reinterpret_cast<const char *>(data), size);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    int32_t authType = static_cast<int32_t>(size % TYPE_NUM);
+    int32_t authType = static_cast<int32_t>(*data % TYPE_NUM);
     if (authType) {
         dataMessageParcel.WriteInt32(SIM_AUTH_EAP_AKA_TYPE);
     } else {
@@ -175,9 +175,15 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
     OHOS::AddCoreServiceTokenFuzzer token;
+    return 0;
+}
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     OHOS::DelayedSingleton<CoreService>::DestroyInstance();

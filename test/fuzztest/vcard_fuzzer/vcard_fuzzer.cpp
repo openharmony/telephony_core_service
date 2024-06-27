@@ -71,7 +71,7 @@ EMAIL;INTERNET:"llll"
 END:VCARD
 )";
     WriteTestData(inputString);
-    int32_t errorCode;
+    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
@@ -92,7 +92,7 @@ EMAIL;INTERNET:"llll"
 END:VCARD
 )" + fuzzdata;
     WriteTestData(inputString);
-    int32_t errorCode;
+    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
@@ -103,7 +103,7 @@ void DecodeVcardRelation(const uint8_t *data, size_t size)
         "E6=B5=8B=E8=AF=95;=E6=B5=8B=E8=AF=95=69=64;=E6=B5=8B=E8=AF=95=6E=61=6D=65\r\nX_OHOS_CUSTOM:"
         "relation;realationName;labelId;labelName\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
-    int32_t errorCode;
+    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
@@ -116,14 +116,15 @@ void DecodeVcardRelationData(const uint8_t *data, size_t size)
         "relation;realationName;labelId;labelName\r\nEND:VCARD\r\n" +
         fuzzdata;
     WriteTestData(inputString);
-    int32_t errorCode;
+    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
 void ContructName(const uint8_t *data, size_t size)
 {
     auto nameData = std::make_shared<VCardNameData>();
-    nameData->displayName_ = "test";
+    std::string displayName(reinterpret_cast<const char *>(data), size);
+    nameData->displayName_ = displayName;
     nameData->family_ = "测试F";
     nameData->given_ = "wowowo";
     nameData->middle_ = "测试M";
@@ -171,7 +172,8 @@ void ContructNameData(const uint8_t *data, size_t size)
 void ContructRelation(const uint8_t *data, size_t size)
 {
     auto data1 = std::make_shared<VCardRelationData>();
-    data1->relationName_ = "测试";
+    std::string test(reinterpret_cast<const char *>(data), size);
+    data1->relationName_ = test;
     data1->labelId_ = "测试id";
     data1->labelName_ = "测试name";
     auto data2 = std::make_shared<VCardRelationData>();
@@ -213,7 +215,7 @@ void DecodeVcardRelationV30(const uint8_t *data, size_t size)
     std::string inputString = "BEGIN:VCARD\r\nVERSION:3.0\r\nN:\r\nFN:\r\nTEL;TYPE=HOME:1202020\r\nTEL;TYPE=WORK,FAX:"
                               "49305484\r\nTEL;TYPE=X-Work:503330303030\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
-    int32_t errorCode;
+    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
@@ -224,7 +226,7 @@ void DecodeVcardRelationDataV30(const uint8_t *data, size_t size)
                               "49305484\r\nTEL;TYPE=X-Work:503330303030\r\nEND:VCARD\r\n" +
                               fuzzdata;
     WriteTestData(inputString);
-    int32_t errorCode;
+    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
@@ -234,7 +236,7 @@ void DecodeVcardRelationV40(const uint8_t *data, size_t size)
         "BEGIN:VCARD\r\nVERSION:4.0\r\nN:test1;;;;\r\nFN:test1\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:4.0\r\nN:test2;;;"
         ";\r\nFN:test2\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:4.0\r\nN:test3;;;;\r\nFN:test3\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
-    int32_t errorCode;
+    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
@@ -246,21 +248,21 @@ void DecodeVcardRelationDataV40(const uint8_t *data, size_t size)
         ";\r\nFN:test2\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:4.0\r\nN:test3;;;;\r\nFN:test3\r\nEND:VCARD\r\n" +
         fuzzdata;
     WriteTestData(inputString);
-    int32_t errorCode;
+    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
 void Import(const uint8_t *data, size_t size)
 {
     std::string fuzzdata(reinterpret_cast<const char *>(data), size);
-    int32_t accountId = static_cast<int32_t>(size);
+    int32_t accountId = static_cast<int32_t>(*data);
     VCardManager::GetInstance().Import(fuzzdata, accountId);
 }
 
 void ImportLock(const uint8_t *data, size_t size)
 {
     std::string fuzzdata(reinterpret_cast<const char *>(data), size);
-    int32_t accountId = static_cast<int32_t>(size);
+    int32_t accountId = static_cast<int32_t>(*data);
     VCardManager::GetInstance().ImportLock(fuzzdata, nullptr, accountId);
 }
 
@@ -269,7 +271,7 @@ void Export(const uint8_t *data, size_t size)
     std::string fuzzdata(reinterpret_cast<const char *>(data), size);
     DataShare::DataSharePredicates predicates;
     predicates.Between(Contact::ID, "0", "10");
-    int32_t cardType = static_cast<int32_t>(size % TYPE_NUM);
+    int32_t cardType = static_cast<int32_t>(*data % TYPE_NUM);
     VCardManager::GetInstance().Export(fuzzdata, predicates, cardType);
 }
 
@@ -278,7 +280,7 @@ void ExportLock(const uint8_t *data, size_t size)
     std::string fuzzdata(reinterpret_cast<const char *>(data), size);
     DataShare::DataSharePredicates predicates;
     predicates.Between(Contact::ID, "0", "10");
-    int32_t cardType = static_cast<int32_t>(size % TYPE_NUM);
+    int32_t cardType = static_cast<int32_t>(*data % TYPE_NUM);
     VCardManager::GetInstance().ExportLock(fuzzdata, nullptr, predicates, cardType);
 }
 
@@ -287,7 +289,7 @@ void ExportToStr(const uint8_t *data, size_t size)
     std::string fuzzdata(reinterpret_cast<const char *>(data), size);
     DataShare::DataSharePredicates predicates;
     predicates.Between(Contact::ID, "0", "10");
-    int32_t cardType = static_cast<int32_t>(size % TYPE_NUM);
+    int32_t cardType = static_cast<int32_t>(*data % TYPE_NUM);
     VCardManager::GetInstance().ExportToStr(fuzzdata, predicates, cardType);
     VCardManager::GetInstance().SetDataHelper(nullptr);
 }
@@ -295,8 +297,8 @@ void ExportToStr(const uint8_t *data, size_t size)
 void VCardUtilsTest(const uint8_t *data, size_t size)
 {
     std::string fuzzdata(reinterpret_cast<const char *>(data), size);
-    int32_t intPara = static_cast<int32_t>(size);
-    char argument = static_cast<char>(size);
+    int32_t intPara = static_cast<int32_t>(*data);
+    char argument = static_cast<char>(*data);
     std::string fileData(reinterpret_cast<const char *>(data), size);
     std::string numberStr = std::to_string(intPara);
     std::vector<std::string> records;

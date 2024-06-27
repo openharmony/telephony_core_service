@@ -35,15 +35,21 @@ bool g_flag = false;
 
 void SendSmsMoreMode(const uint8_t *data, size_t size)
 {
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t success = static_cast<int32_t>(size % BOOL_NUM);
-    int32_t responseId = static_cast<int32_t>(size);
-    int32_t status = static_cast<int32_t>(size);
-    int32_t state = static_cast<int32_t>(size);
-    int32_t gsmIndex = static_cast<int32_t>(size);
-    int32_t cdmaIndex = static_cast<int32_t>(size);
-    int32_t tosca = static_cast<int32_t>(size);
-    uint8_t hexChar = static_cast<uint8_t>(size);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t success = static_cast<int32_t>(*data % BOOL_NUM);
+    int32_t offset = 0;
+    int32_t responseId = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    int32_t status = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    int32_t state = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    int32_t gsmIndex = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    int32_t cdmaIndex = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    int32_t tosca = static_cast<int32_t>(*data + offset);
+    uint8_t hexChar = static_cast<uint8_t>(*data);
     std::string smscPdu(reinterpret_cast<const char *>(data), size);
     std::string pdu(reinterpret_cast<const char *>(data), size);
     std::string address(reinterpret_cast<const char *>(data), size);
@@ -70,11 +76,15 @@ void SendSmsMoreMode(const uint8_t *data, size_t size)
 
 void GetCallList(const uint8_t *data, size_t size)
 {
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t resultId = static_cast<int32_t>(size);
-    int32_t index = static_cast<int32_t>(size);
-    int32_t switchOn = static_cast<int32_t>(size);
-    int32_t switchOff = static_cast<int32_t>(size);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t offset = 0;
+    int32_t resultId = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    int32_t index = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    int32_t switchOn = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    int32_t switchOff = static_cast<int32_t>(*data + offset);
     std::string address(reinterpret_cast<const char *>(data), size);
     std::string fac(reinterpret_cast<const char *>(data), size);
     std::string password(reinterpret_cast<const char *>(data), size);
@@ -112,8 +122,8 @@ void GetCallList(const uint8_t *data, size_t size)
 
 void AnswerResponse(const uint8_t *data, size_t size)
 {
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t resultId = static_cast<int32_t>(size);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t resultId = static_cast<int32_t>(*data);
     std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(*data);
     AppExecFwk::InnerEvent::Pointer result = AppExecFwk::InnerEvent::Get(resultId, object);
     HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
@@ -135,13 +145,19 @@ void AnswerResponse(const uint8_t *data, size_t size)
 
 void DeactivatePdpContext(const uint8_t *data, size_t size)
 {
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t cid = static_cast<int32_t>(size);
-    int32_t reason = static_cast<int32_t>(size);
-    int32_t responseId = static_cast<int32_t>(size);
-    int32_t dataPermitted = static_cast<int32_t>(size);
-    int32_t profileId = static_cast<int32_t>(size);
-    int32_t verType = static_cast<int32_t>(size);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t offset = 0;
+    int32_t cid = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    int32_t reason = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    int32_t responseId = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    int32_t dataPermitted = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    int32_t profileId = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    int32_t verType = static_cast<int32_t>(*data + offset);
     std::string apn(reinterpret_cast<const char *>(data), size);
     std::string protocol(reinterpret_cast<const char *>(data), size);
     std::string userName(reinterpret_cast<const char *>(data), size);
@@ -181,7 +197,7 @@ void DeactivatePdpContext(const uint8_t *data, size_t size)
 
 void SimStkProactiveNotify(const uint8_t *data, size_t size)
 {
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     std::string response(reinterpret_cast<const char *>(data), size);
     HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     responseInfo.slotId = slotId;
@@ -203,11 +219,14 @@ void SimStkProactiveNotify(const uint8_t *data, size_t size)
 
 void GetSimStatus(const uint8_t *data, size_t size)
 {
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t accept = static_cast<int32_t>(size % BOOL_NUM);
-    int32_t resultId = static_cast<int32_t>(size);
-    int32_t serial = static_cast<int32_t>(size);
-    int32_t index = static_cast<int32_t>(size);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t accept = static_cast<int32_t>(*data % BOOL_NUM);
+    int32_t offset = 0;
+    int32_t resultId = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    int32_t serial = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    int32_t index = static_cast<int32_t>(*data + offset);
     std::string simIoInfoData(reinterpret_cast<const char *>(data), size);
     std::string path(reinterpret_cast<const char *>(data), size);
     std::string pin2(reinterpret_cast<const char *>(data), size);
@@ -267,9 +286,15 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
     OHOS::AddCoreServiceTokenFuzzer token;
+    return 0;
+}
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;

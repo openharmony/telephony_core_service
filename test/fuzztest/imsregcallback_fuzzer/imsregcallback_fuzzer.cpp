@@ -37,14 +37,14 @@ void OnRemoteRequest(const uint8_t *data, size_t size)
     if (!dataMessageParcel.WriteInterfaceToken(ImsRegInfoCallbackStub::GetDescriptor())) {
         return;
     }
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t reg = static_cast<int32_t>(size % BOOL_NUM);
-    int32_t tech = static_cast<int32_t>(size % TECH_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t reg = static_cast<int32_t>(*data % BOOL_NUM);
+    int32_t tech = static_cast<int32_t>(*data % TECH_NUM);
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(reg);
     dataMessageParcel.WriteInt32(tech);
 
-    uint32_t code = static_cast<uint32_t>(size % IMS_SERVICE_TYPE_NUM);
+    uint32_t code = static_cast<uint32_t>(*data % IMS_SERVICE_TYPE_NUM);
     MessageParcel reply;
     MessageOption option;
     sptr<NapiImsRegInfoCallback> imsCallback = new NapiImsRegInfoCallback();
@@ -62,9 +62,15 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
     OHOS::AddCoreServiceTokenFuzzer token;
+    return 0;
+}
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
