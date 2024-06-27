@@ -19,6 +19,12 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
+#ifdef HICOLLIE_ENABLE
+#include "xcollie/xcollie.h"
+#include "xcollie/xcollie_define.h"
+#define XCOLLIE_TIMEOUT_SECONDS 30
+#endif
+
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t INVALID_VALUE = -1;
@@ -190,10 +196,49 @@ int32_t CoreServiceStub::OnRemoteRequest(
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
+            int32_t idTimer = SetTimer(code);
+            int32_t result = (this->*memberFunc)(data, reply);
+            CancelTimer(idTimer);
+            return result;
         }
     }
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+}
+
+int32_t CoreServiceStub::SetTimer(uint32_t code)
+{
+#ifdef HICOLLIE_ENABLE
+    int32_t idTimer = HiviewDFX::INVALID_ID;
+    std::map<uint32_t, std::string>::iterator itCollieId = collieCodeStringMap_.find(code);
+    if (itCollieId != collieCodeStringMap_.end()) {
+        std::string collieStr = itCollieId->second;
+        std::string collieName = "CoreServiceStub: " + collieStr;
+        unsigned int flag = HiviewDFX::XCOLLIE_FLAG_LOG | HiviewDFX::XCOLLIE_FLAG_NOOP;
+        auto TimerCallback = [collieStr](void *) {
+            TELEPHONY_LOGE("OnRemoteRequest timeout func: %{public}s", collieStr.c_str());
+        };
+        idTimer = HiviewDFX::XCollie::GetInstance().SetTimer(
+            collieName, XCOLLIE_TIMEOUT_SECONDS, TimerCallback, nullptr, flag);
+        TELEPHONY_LOGD("SetTimer id: %{public}d, name: %{public}s.", idTimer, collieStr.c_str());
+    }
+    return idTimer;
+#else
+    TELEPHONY_LOGD("No HICOLLIE_ENABLE");
+    return -1;
+#endif
+}
+
+void CoreServiceStub::CancelTimer(int32_t id)
+{
+#ifdef HICOLLIE_ENABLE
+    if (id == HiviewDFX::INVALID_ID) {
+        return;
+    }
+    TELEPHONY_LOGD("CancelTimer id: %{public}d.", id);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+#else
+    return;
+#endif
 }
 
 int32_t CoreServiceStub::OnGetPsRadioTech(MessageParcel &data, MessageParcel &reply)
