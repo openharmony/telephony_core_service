@@ -415,6 +415,14 @@ int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)
         dataShareHelper->Release();
         return TELEPHONY_SUCCESS;
     }
+    int rowCount = 0;
+    result->GetRowCount(rowCount);
+    if (rowCount <= 0) {
+        TELEPHONY_LOGE("dont query the iccid record in db");
+        result->Close();
+        dataShareHelper->Release();
+        return TELEPHONY_SUCCESS;
+    }
     int resultSetNum = result->GoToFirstRow();
     while (resultSetNum == 0) {
         SaveDataToBean(result, simBean);
