@@ -113,6 +113,12 @@ static inline bool IsValidSlotId(int32_t slotId)
     return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT));
 }
 
+static inline bool IsValidSlotIdEx(int32_t slotId)
+{
+    // One more slot for VSim.
+    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT + 1));
+}
+
 static inline bool IsValidNetworkCapabilityType(int32_t networkCapabilityType)
 {
     return ((networkCapabilityType == static_cast<int32_t>(NetworkCapabilityType::SERVICE_TYPE_LTE)) ||
@@ -211,7 +217,7 @@ static napi_value GetRadioTech(napi_env env, napi_callback_info info)
 static void NativeGetSignalInfoList(napi_env env, void *data)
 {
     auto asyncContext = static_cast<SignalInfoListContext *>(data);
-    if (!IsValidSlotId(asyncContext->slotId)) {
+    if (!IsValidSlotIdEx(asyncContext->slotId)) {
         TELEPHONY_LOGE("NativeGetSignalInfoList slotId is invalid");
         asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
         return;
@@ -370,7 +376,7 @@ static void NativeGetNetworkState(napi_env env, void *data)
     if (asyncContext == nullptr) {
         return;
     }
-    if (!IsValidSlotId(asyncContext->slotId)) {
+    if (!IsValidSlotIdEx(asyncContext->slotId)) {
         TELEPHONY_LOGE("NativeGetNetworkState slotId is invalid");
         asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
         return;
@@ -2883,7 +2889,7 @@ static napi_value ObserverOn(napi_env env, napi_callback_info info)
         TELEPHONY_LOGE("Can not get slotId value");
         return nullptr;
     }
-    if (!IsValidSlotId(slotId)) {
+    if (!IsValidSlotIdEx(slotId)) {
         TELEPHONY_LOGE("slotId%{public}d is invalid", slotId);
         ReportFunctionFailed(env, TELEPHONY_ERR_ARGUMENT_INVALID, "on_imsRegStateChange");
         return nullptr;
@@ -2946,7 +2952,7 @@ static napi_value ObserverOff(napi_env env, napi_callback_info info)
         TELEPHONY_LOGE("Can not get slotId value");
         return nullptr;
     }
-    if (!IsValidSlotId(slotId)) {
+    if (!IsValidSlotIdEx(slotId)) {
         TELEPHONY_LOGE("slotId%{public}d is invalid", slotId);
         ReportFunctionFailed(env, TELEPHONY_ERR_ARGUMENT_INVALID, "off_imsRegStateChange");
         return nullptr;
