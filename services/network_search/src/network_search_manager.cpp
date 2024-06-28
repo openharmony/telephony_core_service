@@ -600,6 +600,9 @@ int32_t NetworkSearchManager::GetSignalInfoList(int32_t slotId, std::vector<sptr
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     inner->networkSearchHandler_->GetSignalInfo(signals);
+    if (signals.empty()) {
+        return TELEPHONY_ERR_SUCCESS;
+    }
     if (TELEPHONY_EXT_WRAPPER.getSignalInfoListExt_ != nullptr) {
         TELEPHONY_EXT_WRAPPER.getSignalInfoListExt_(slotId, signals);
     }
