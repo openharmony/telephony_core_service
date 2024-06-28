@@ -41,6 +41,11 @@ enum VSimInStatusType {
     NEED_BLOCK_UNRESERVED_SUBID = 11,
 };
 
+enum {
+    INVALID_SLOT_ID = -1,
+    VSIM_SLOT_ID = 2,
+};
+
 class TelephonyExtWrapper final {
 DECLARE_DELAYED_REF_SINGLETON(TelephonyExtWrapper);
 

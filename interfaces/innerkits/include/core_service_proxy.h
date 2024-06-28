@@ -79,6 +79,7 @@ public:
     int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
     int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) override;
     bool IsValidSlotId(int32_t slotId);
+    bool IsValidSlotIdEx(int32_t slotId);
     bool IsValidSlotIdForDefault(int32_t slotId);
     bool IsValidStringLength(std::u16string str);
     bool IsValidServiceType(ImsServiceType serviceType);
