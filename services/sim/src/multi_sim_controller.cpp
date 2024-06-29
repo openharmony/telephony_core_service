@@ -1254,6 +1254,7 @@ int32_t MultiSimController::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchVal
         return TELEPHONY_ERROR;
     }
     SimRdbInfo simRdbInfo;
+    simRdbInfo.imsSwitch = IMS_SWITCH_STATUS_UNKNOWN;
     simDbHelper_->QueryDataByIccId(curIccid, simRdbInfo);
     imsSwitchValue = simRdbInfo.imsSwitch;
     return TELEPHONY_SUCCESS;
