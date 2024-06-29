@@ -858,7 +858,7 @@ void NativeGetSimState(napi_env env, void *data)
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     int32_t errorCode =
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimState(asyncContext->slotId, simState);
-    TELEPHONY_LOGD("NAPI NativeGetSimState %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeGetSimState %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext->context.resolved = true;
         asyncContext->callbackVal = static_cast<int32_t>(simState);
@@ -873,10 +873,12 @@ void GetSimStateCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContext<int32_t>> context(static_cast<AsyncContext<int32_t> *>(data));
     NapiAsyncCommomCompleteCallback(env, status, *context, false);
+    TELEPHONY_LOGI("GetSimStateCallback end");
 }
 
 napi_value GetSimState(napi_env env, napi_callback_info info)
 {
+    TELEPHONY_LOGI("GetSimState start");
     return NapiCreateAsyncWork<int32_t, NativeGetSimState, GetSimStateCallback>(env, info, "GetSimState");
 }
 
