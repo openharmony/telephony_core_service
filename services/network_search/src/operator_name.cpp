@@ -306,7 +306,7 @@ void OperatorName::NotifyGsmSpnChanged(
     }
     UpdatePlmn(regStatus, networkState, spnRule, plmn, showPlmn);
     UpdateSpn(regStatus, networkState, spnRule, spn, showSpn);
-    if (slotId_ == VSIM_SLOT_ID) {
+    if (slotId_ == static_cast<int32_t>(SimSlotType::VSIM_SLOT_ID)) {
         UpdateVSimSpn(spn, spnRule, showSpn);
     }
 
@@ -333,9 +333,9 @@ void OperatorName::NotifyGsmSpnChanged(
 void OperatorName::UpdateVSimSpn(std::string &spn, int32_t &rule, bool &showSpn)
 {
     if (TELEPHONY_EXT_WRAPPER.getVSimSlotId_ && TELEPHONY_EXT_WRAPPER.changeSpnAndRuleExt_) {
-        int vSimSlotId = INVALID_SLOT_ID;
+        int vSimSlotId = static_cast<int>(SimSlotType::INVALID_SLOT_ID);
         TELEPHONY_EXT_WRAPPER.getVSimSlotId_(vSimSlotId);
-        if (vSimSlotId == VSIM_SLOT_ID) {
+        if (vSimSlotId == static_cast<int>(SimSlotType::VSIM_SLOT_ID)) {
             TELEPHONY_EXT_WRAPPER.changeSpnAndRuleExt_(spn, rule, showSpn);
         }
     }
