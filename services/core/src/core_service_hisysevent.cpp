@@ -31,6 +31,7 @@ static constexpr const char *SMS_SEND_FAILED_EVENT = "SMS_SEND_FAILED";
 static constexpr const char *SMS_RECEIVE_FAILED_EVENT = "SMS_RECEIVE_FAILED";
 static constexpr const char *DATA_ACTIVATE_FAILED_EVENT = "DATA_ACTIVATE_FAILED";
 static constexpr const char *AIRPLANE_MODE_EVENT = "AIRPLANE_MODE_STATE";
+static constexpr const char *SET_ACTIVESIM_FAILED_EVENT = "SET_ACTIVESIM_FAILED";
 
 // KEY
 static constexpr const char *SLOT_ID_KEY = "SLOT_ID";
@@ -119,6 +120,13 @@ void CoreServiceHiSysEvent::WriteDataActivateFaultEvent(
 void CoreServiceHiSysEvent::WriteAirplaneModeChangeEvent(const int32_t enable)
 {
     HiWriteBehaviorEvent(AIRPLANE_MODE_EVENT, SWITCH_KEY, enable);
+}
+
+void CoreServiceHiSysEvent::WriteSetActiveSimFaultEvent(
+    int32_t slotId, SimCardErrorCode errorCode, const std::string &desc)
+{
+    HiWriteFaultEvent(SET_ACTIVESIM_FAILED_EVENT, MODULE_NAME_KEY, CORE_SERVICE_MODULE, SLOT_ID_KEY, slotId,
+        ERROR_TYPE_KEY static_cast<int32_t>(errorCode), ERROR_MSG_KEY desc);
 }
 
 } // namespace Telephony
