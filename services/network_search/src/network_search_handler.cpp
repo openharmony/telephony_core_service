@@ -401,6 +401,8 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
             inner->deviceStateHandler_->ProcessRadioState();
         }
         networkSearchManager->InitSimRadioProtocol(slotId_);
+        std::u16string imei = u"";
+        networkSearchManager->GetImei(slotId_, imei);
     } else {
         networkSearchManager->SetRadioStateValue(slotId_, CORE_SERVICE_POWER_NOT_AVAILABLE);
     }
