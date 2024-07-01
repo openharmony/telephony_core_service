@@ -196,11 +196,7 @@ void SimFile::ProcessIccRefresh(int msgId)
         case ELEMENTARY_FILE_CFF_CPHS:
             break;
         default:
-            auto iccFileExt = iccFile_.lock();
-            if (TELEPHONY_EXT_WRAPPER.createIccFileExt_ != nullptr && iccFileExt) {
-                TELEPHONY_LOGI("icc refresh, clear telephonyext data");
-                iccFileExt->ClearData();
-            }
+            ClearData();
             DeleteOperatorCache();
             LoadSimFiles();
             break;
