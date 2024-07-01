@@ -48,6 +48,7 @@ public:
     static void WriteDataActivateFaultEvent(
         int32_t slotId, int32_t switchState, CellularDataErrorCode errorType, const std::string &errorMsg);
     static void WriteAirplaneModeChangeEvent(const int32_t enable);
+    static void WriteSetActiveSimFaultEvent(int32_t slotId, SimCardErrorCode errorCode, const std::string &desc);
 };
 } // namespace Telephony
 } // namespace OHOS

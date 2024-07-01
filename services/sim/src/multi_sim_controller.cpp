@@ -528,6 +528,8 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
     }
     isSetActiveSimInProgress_[slotId] = 1;
     if (!SetActiveSimToRil(slotId, ENTITY_CARD, enable)) {
+        CoreServiceHiSysEvent::WriteSetActiveSimFaultEvent(
+            slotId, SimCardErrorCode::SET_ACTIVESIM_ERROR, "SetActiveSimToRil failure");
         TELEPHONY_LOGE("SetActiveSimToRil failed");
         isSetActiveSimInProgress_[slotId] = 0;
         return TELEPHONY_ERR_RIL_CMD_FAIL;
