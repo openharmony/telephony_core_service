@@ -377,7 +377,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
         return;
     }
     int32_t radioState = object->data;
-    TELEPHONY_LOGI("NetworkSearchHandler::RadioState change: %{public}d", radioState);
+    TELEPHONY_LOGI("NetworkSearchHandler::RadioState change: %{public}d, slotId: %{public}d", radioState, slotId_);
     switch (radioState) {
         case CORE_SERVICE_POWER_NOT_AVAILABLE:
         case CORE_SERVICE_POWER_OFF: {
