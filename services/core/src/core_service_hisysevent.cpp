@@ -126,7 +126,7 @@ void CoreServiceHiSysEvent::WriteSetActiveSimFaultEvent(
     int32_t slotId, SimCardErrorCode errorCode, const std::string &desc)
 {
     HiWriteFaultEvent(SET_ACTIVESIM_FAILED_EVENT, MODULE_NAME_KEY, CORE_SERVICE_MODULE, SLOT_ID_KEY, slotId,
-        ERROR_TYPE_KEY, static_cast<int32_t>(errorCode), ERROR_MSG_KEY desc);
+        ERROR_TYPE_KEY, static_cast<int32_t>(errorCode), ERROR_MSG_KEY, desc);
 }
 
 } // namespace Telephony
