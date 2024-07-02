@@ -20,6 +20,8 @@
 #include "radio_event.h"
 #include "telephony_common_utils.h"
 #include "telephony_ext_wrapper.h"
+#include "configuration.h"
+#include "app_mgr_client.h"
 
 using namespace std;
 using namespace OHOS::AppExecFwk;
@@ -222,6 +224,27 @@ bool RuimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
         SaveCountryCode();
         if (!imsi_.empty()) {
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
+            int imsiSize = static_cast<int>(imsi_.size());
+            std::string mcc = "";
+            bool isSizeEnough = imsiSize >= MCC_LEN;
+            if (isSizeEnough) {
+                mcc = imsi_.substr(0, MCC_LEN);
+            }
+            std::string mnc = "";
+            isSizeEnough = imsiSize >= MCC_LEN + lengthOfMnc_;
+            if ((lengthOfMnc_ != UNINITIALIZED_MNC) && (lengthOfMnc_ != UNKNOWN_MNC) && isSizeEnough) {
+                mnc = imsi_.substr(MCC_LEN, lengthOfMnc_);
+            }
+            int mncLength = MccPool::ShortestMncLengthFromMcc(std::stoi(mcc));
+            isSizeEnough = imsiSize >= MCC_LEN + mncLength;
+            if (mnc.empty() && IsValidDecValue(mcc) && isSizeEnough) {
+                mnc = imsi_.substr(MCC_LEN, mncLength);
+            }
+            AppExecFwk::Configuration configuration;
+            configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_MCC, mcc);
+            configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_MNC, mnc);
+            auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
+            appMgrClient->UpdateConfiguration(configuration);
         }
         FileChangeToExt(imsi_, FileChangeType::C_IMSI_FILE_LOAD);
     }

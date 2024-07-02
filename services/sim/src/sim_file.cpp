@@ -25,6 +25,8 @@
 #include "telephony_common_utils.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_state_registry_client.h"
+#include "configuration.h"
+#include "app_mgr_client.h"
 
 using namespace std;
 using namespace OHOS::AppExecFwk;
@@ -1213,6 +1215,13 @@ void SimFile::CheckMncLength()
     if ((!imsi.empty()) && (lengthOfMnc_ != UNKNOWN_MNC) && cond) {
         operatorNumeric_ = imsi.substr(0, lenNum);
         FileChangeToExt(operatorNumeric_, FileChangeType::G_MCCMNC_FILE_LOAD);
+        std::string mcc = imsi.substr(0, MCC_LEN);
+        std::string mnc = imsi.substr(MCC_LEN, lengthOfMnc_);
+        AppExecFwk::Configuration configuration;
+        configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_MCC, mcc);
+        configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_MNC, mnc);
+        auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
+        appMgrClient->UpdateConfiguration(configuration);
     }
 }
 
