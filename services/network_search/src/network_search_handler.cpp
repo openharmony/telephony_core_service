@@ -377,7 +377,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
         return;
     }
     int32_t radioState = object->data;
-    TELEPHONY_LOGI("NetworkSearchHandler::RadioState change: %{public}d", radioState);
+    TELEPHONY_LOGI("NetworkSearchHandler::RadioState change: %{public}d, slotId: %{public}d", radioState, slotId_);
     switch (radioState) {
         case CORE_SERVICE_POWER_NOT_AVAILABLE:
         case CORE_SERVICE_POWER_OFF: {
@@ -401,6 +401,8 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
             inner->deviceStateHandler_->ProcessRadioState();
         }
         networkSearchManager->InitSimRadioProtocol(slotId_);
+        std::u16string imei = u"";
+        networkSearchManager->GetImei(slotId_, imei);
     } else {
         networkSearchManager->SetRadioStateValue(slotId_, CORE_SERVICE_POWER_NOT_AVAILABLE);
     }
