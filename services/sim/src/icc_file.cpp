@@ -133,7 +133,7 @@ void IccFile::SetVoiceMailByOperator(std::string spn)
 std::string IccFile::ObtainIMSI()
 {
     if (imsi_.empty()) {
-        TELEPHONY_LOGI("IccFile::ObtainIMSI is null:");
+        TELEPHONY_LOGD("IccFile::ObtainIMSI is null:");
     }
     return imsi_;
 }

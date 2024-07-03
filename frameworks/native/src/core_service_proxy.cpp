@@ -163,8 +163,9 @@ int32_t CoreServiceProxy::GetOperatorName(int32_t slotId, std::u16string &operat
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
         operatorName = reply.ReadString16();
+    } else {
+        TELEPHONY_LOGE("GetOperatorName call fail,slotId:%{public}d", slotId);
     }
-    TELEPHONY_LOGI("GetOperatorName call end");
     return result;
 }
 
@@ -482,7 +483,7 @@ int32_t CoreServiceProxy::GetImei(int32_t slotId, std::u16string &imei)
     if (result == TELEPHONY_ERR_SUCCESS) {
         imei = reply.ReadString16();
     }
-    TELEPHONY_LOGI("CoreServiceProxy::GetImei success");
+    TELEPHONY_LOGD("CoreServiceProxy::GetImei success");
     return result;
 }
 
@@ -1455,7 +1456,7 @@ int32_t CoreServiceProxy::GetActiveSimAccountInfoList(std::vector<IccAccountInfo
         for (int i = 0; i < size; i++) {
             IccAccountInfo accountInfo;
             accountInfo.ReadFromParcel(reply);
-            TELEPHONY_LOGI("CoreServiceProxy::GetActiveSimAccountInfoList success");
+            TELEPHONY_LOGD("CoreServiceProxy::GetActiveSimAccountInfoList success");
             iccAccountInfoList.emplace_back(accountInfo);
         }
     }
@@ -2714,7 +2715,7 @@ int32_t CoreServiceProxy::GetCellInfoList(int32_t slotId, std::vector<sptr<CellI
     if (result == TELEPHONY_ERR_SUCCESS) {
         ProcessCellInfo(reply, cellInfo);
     }
-    TELEPHONY_LOGI("CoreServiceProxy::GetCellInfoList cell size:%{public}zu\n", cellInfo.size());
+    TELEPHONY_LOGD("CoreServiceProxy::GetCellInfoList cell size:%{public}zu\n", cellInfo.size());
     return result;
 }
 

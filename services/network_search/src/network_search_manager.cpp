@@ -1449,7 +1449,7 @@ bool NetworkSearchManager::IsNeedDelayNotify(int32_t slotId)
         return false;
     }
     if (delayTime_ <= INVALID_DELAY_TIME) {
-        TELEPHONY_LOGI("The system properties are not configured with a valid delay time.");
+        TELEPHONY_LOGD("The system properties are not configured with a valid delay time.");
         return false;
     }
     int32_t networkCapabilityState = 0;
@@ -1581,7 +1581,7 @@ void NetworkSearchManager::TriggerTimezoneRefresh(int32_t slotId)
             inner->networkSearchHandler_->TimezoneRefresh();
         }
     }
-    TELEPHONY_LOGE("NetworkSearchManager::TriggerTimezoneRefresh slotId:%{public}d", slotId);
+    TELEPHONY_LOGD("NetworkSearchManager::TriggerTimezoneRefresh slotId:%{public}d", slotId);
 }
 
 void NetworkSearchManager::InitAirplaneMode(int32_t slotId)

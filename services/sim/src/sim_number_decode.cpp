@@ -73,11 +73,8 @@ const std::string *SimNumberDecode::chooseExtendedByType(const int bcdExtType)
 
 bool SimNumberDecode::CharToBCD(const char c, uint8_t &result, const int bcdExtType)
 {
-    TELEPHONY_LOGI(
-        "SimNumberDecode::CharToBCD begin with:char'%{public}c' and bcdExtType:'%{public}d'", c, bcdExtType);
     if (c >= '0' && c <= '9') {
         result = c - '0';
-        TELEPHONY_LOGI("SimNumberDecode::CharToBCD end with:result '%{public}d'", result);
         return true;
     }
     const std::string *extendedPtr = chooseExtendedByType(bcdExtType);
@@ -92,14 +89,11 @@ bool SimNumberDecode::CharToBCD(const char c, uint8_t &result, const int bcdExtT
         return false;
     }
     result = static_cast<uint8_t>(chrIdx + CHAR_START);
-    TELEPHONY_LOGI("SimNumberDecode::CharToBCD end with:result '%{public}d'", result);
     return true;
 }
 
 bool SimNumberDecode::BcdToChar(const uint8_t bcdCode, char &result, const int bcdExtType)
 {
-    TELEPHONY_LOGI("SimNumberDecode::BcdToChar begin with:bcdCode'%{public}d' and bcdExtType:'%{public}d'",
-        bcdCode, bcdExtType);
     const int32_t surplus = static_cast<int32_t>(bcdCode) - CHAR_START;
     if (surplus < INIT_VAL) {
         result = '0' + bcdCode;
@@ -115,7 +109,6 @@ bool SimNumberDecode::BcdToChar(const uint8_t bcdCode, char &result, const int b
         return false;
     }
     result = extendedPtr->at(surplus);
-    TELEPHONY_LOGI("SimNumberDecode::BcdToChar success end with result:'%{public}c'", result);
     return true;
 }
 
@@ -156,8 +149,6 @@ bool SimNumberDecode::NumberConvertToBCD(
     if (count % EVEN == 1) {
         bcdCodes.back() |= HI_FOUR;
     }
-    TELEPHONY_LOGI(
-        "SimNumberDecode::NumberConvertToBCD success end_B with result:'%{publci}s'", HexToStr(bcdCodes).c_str());
     return true;
 }
 
@@ -184,9 +175,6 @@ std::string SimNumberDecode::BCDConvertToString(
 bool SimNumberDecode::BCDSectionConvertToString(const std::vector<uint8_t>::const_iterator &codeBeg,
     const std::vector<uint8_t>::const_iterator &codeEnd, std::string &number, const int bcdExtType)
 {
-    TELEPHONY_LOGI(
-        "SimNumberDecode::BCDSectionConvertToString begin with codes:'%{public}s' and bcdExtType:'%{public}d'",
-        HexToStr(std::vector<uint8_t>(codeBeg, codeEnd)).c_str(), bcdExtType);
     for (std::vector<uint8_t>::const_iterator it = codeBeg; it != codeEnd; ++it) {
         uint8_t loFourBit = (*it & LO_FOUR);
         char c = INIT_VAL;
@@ -217,8 +205,6 @@ bool SimNumberDecode::BCDConvertToString(const std::vector<uint8_t>::const_itera
         TELEPHONY_LOGE("occur error by iterator");
         return false;
     }
-    TELEPHONY_LOGI("SimNumberDecode::BCDConvertToString begin with codes:'%{public}s' and bcdExtType:'%{public}d'",
-        HexToStr(std::vector<uint8_t>(codeBeg, codeEnd)).c_str(), bcdExtType);
     std::vector<uint8_t>::const_iterator it = codeBeg;
     const bool prependPlus = (*it == FLAG_INTERNATIONAL);
     ++it;

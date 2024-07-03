@@ -508,7 +508,7 @@ bool MultiSimController::IsSimActive(int32_t slotId)
         return false;
     }
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
-        TELEPHONY_LOGE("failed by out of range");
+        TELEPHONY_LOGD("failed by out of range");
         return false;
     }
     return localCacheInfo_[slotId].isActive == ACTIVE ? true : false;

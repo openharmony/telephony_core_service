@@ -509,7 +509,7 @@ int SimFileManager::ObtainSpnCondition(bool roaming, const std::string &operator
     }
 
     int result = simFile_->ObtainSpnCondition(roaming, operatorNum);
-    TELEPHONY_LOGI("SimFileManager::ObtainSpnCondition:%{public}d", result);
+    TELEPHONY_LOGD("SimFileManager::ObtainSpnCondition:%{public}d", result);
     return result;
 }
 
@@ -715,7 +715,7 @@ bool SimFileManager::IsCTSimCard()
     if (!plmn.empty()) {
         auto plmnRet = find(CT_CPLMNS.begin(), CT_CPLMNS.end(), plmn);
         result = plmnRet != CT_CPLMNS.end();
-        TELEPHONY_LOGI("[slot%{public}d] plmn check result = %{public}d", slotId_, result);
+        TELEPHONY_LOGD("[slot%{public}d] plmn check result = %{public}d", slotId_, result);
     }
     if (!iccId.empty()) {
         if (result) {
