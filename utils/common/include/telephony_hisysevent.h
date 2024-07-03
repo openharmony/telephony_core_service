@@ -391,6 +391,16 @@ enum class CellularDataErrorCode {
     DATA_ERROR_RADIO_RESPONSEINFO_ERROR,
 };
 
+/**
+ * @brief Indicates the error code of simcard.
+ */
+enum class SimCardErrorCode {
+    /**
+     * Indicates setactivesim error.
+     */
+    SET_ACTIVESIM_ERROR = 300,
+};
+
 class TelephonyHiSysEvent {
 public:
     template<typename... Types>
