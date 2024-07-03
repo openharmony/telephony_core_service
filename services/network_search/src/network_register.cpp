@@ -388,7 +388,7 @@ void NetworkRegister::UpdateCfgTech()
         return;
     }
     RadioTech tech = networkSearchState_->GetNetworkStatus()->GetPsRadioTech();
-    TELEPHONY_LOGI("tech:%{public}d slotId:%{public}d", tech, slotId_);
+    TELEPHONY_LOGD("tech:%{public}d slotId:%{public}d", tech, slotId_);
     RadioTech cfgTech = GetTechnologyByNrConfig(tech);
     networkSearchState_->SetCfgTech(cfgTech);
 }
