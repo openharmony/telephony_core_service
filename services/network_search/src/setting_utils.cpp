@@ -130,6 +130,7 @@ bool SettingUtils::RegisterSettingsObserver(
 
 void SettingUtils::RegisterSettingsObserver()
 {
+    std::lock_guard<std::mutex> lock(mtx_);
     for (auto it = registerInfos_.begin(); it != registerInfos_.end(); it++) {
         RegisterToDataShare(it->first, it->second);
     }
