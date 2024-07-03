@@ -155,7 +155,7 @@ void DeviceStateHandler::SetCellRequestMinInterval(uint32_t minInterval) const
 void DeviceStateHandler::SetNotificationFilter(int32_t newFilter, bool force)
 {
     if (!force && newFilter == notificationFilter_) {
-        TELEPHONY_LOGE("DeviceStateHandler::SetNotificationFilter is not necessary");
+        TELEPHONY_LOGD("DeviceStateHandler::SetNotificationFilter is not necessary");
         return;
     }
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SET_NOTIFICATION_FILTER);

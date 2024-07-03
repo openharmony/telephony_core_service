@@ -345,7 +345,7 @@ ResourceUtils &ResourceUtils::Get()
 {
     static ResourceUtils utils_;
     if (!utils_.Init()) {
-        TELEPHONY_LOGE("ResourceUtils::Get init failed.");
+        TELEPHONY_LOGD("ResourceUtils::Get init failed.");
     }
     return utils_;
 }

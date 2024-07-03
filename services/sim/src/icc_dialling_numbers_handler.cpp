@@ -442,7 +442,7 @@ void IccDiallingNumbersHandler::FetchDiallingNumberContent(
     std::string tempStrNumber =
     SimNumberDecode::BCDConvertToString(data, offset, length, SimNumberDecode::BCD_TYPE_ADN);
     diallingNumber->number_ = Str8ToStr16(tempStrNumber);
-    TELEPHONY_LOGI("FetchDiallingNumberContent result end");
+    TELEPHONY_LOGD("FetchDiallingNumberContent result end");
 }
 
 std::shared_ptr<unsigned char> IccDiallingNumbersHandler::CreateSavingSequence(

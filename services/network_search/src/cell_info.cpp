@@ -788,7 +788,7 @@ void CellInfo::GetCellInfoList(std::vector<sptr<CellInformation>> &cellInfo)
             AddCellInformation(cell, cellInfo);
         }
     }
-    TELEPHONY_LOGI("CellInfo::GetCellInfoList size:%{public}zu slotId:%{public}d", cellInfo.size(), slotId_);
+    TELEPHONY_LOGD("CellInfo::GetCellInfoList size:%{public}zu slotId:%{public}d", cellInfo.size(), slotId_);
 }
 
 void CellInfo::ClearCellInfoList()

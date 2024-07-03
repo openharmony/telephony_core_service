@@ -182,7 +182,8 @@ inline int32_t TelRilBase::SendHandlerEvent(const char *funcName, std::shared_pt
     std::function<T(std::shared_ptr<TelRilRequest>)> getDataFunc)
 {
     auto handler = telRilRequest->pointer_->GetOwner();
-    if (handler == nullptr) {
+    if (handler == nullptr && strcmp(funcName, "SetDeviceStateResponse") != 0 &&
+        strcmp(funcName, "SetNotificationFilterResponse") != 0) {
         TELEPHONY_LOGE("func %{public}s handler == nullptr !!!", funcName);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
