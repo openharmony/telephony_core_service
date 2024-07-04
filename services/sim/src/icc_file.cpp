@@ -539,6 +539,9 @@ std::string IccFile::ObtainValidLanguage(const std::string &langData)
 
 void IccFile::SwapPairsForIccId(std::string &iccId)
 {
+    if (iccId.empty() || iccId.length() < LENGTH_TWO) {
+        return;
+    }
     std::string result = "";
     for (size_t i = 0; i < iccId.length() - 1; i += DATA_STEP) {
         if (iccId[i + 1] > '9') {
@@ -558,6 +561,9 @@ void IccFile::SwapPairsForIccId(std::string &iccId)
 
 void IccFile::GetFullIccid(std::string &iccId)
 {
+    if (iccId.empty() || iccId.length() < LENGTH_TWO) {
+        return;
+    }
     std::string result = "";
     for (size_t i = 0; i < iccId.length() - 1; i += DATA_STEP) {
         result += iccId[i + 1];
