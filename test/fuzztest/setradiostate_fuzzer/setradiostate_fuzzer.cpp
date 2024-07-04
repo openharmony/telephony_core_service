@@ -62,7 +62,7 @@ void SetRadioState(const uint8_t *data, size_t size)
     if (callbackWrap == nullptr) {
         return;
     }
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
     MessageParcel reply;
@@ -80,7 +80,7 @@ void GetRadioState(const uint8_t *data, size_t size)
     if (callbackWrap == nullptr) {
         return;
     }
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
     MessageParcel reply;
@@ -98,8 +98,8 @@ void SetNrOptionMode(const uint8_t *data, size_t size)
     if (callbackWrap == nullptr) {
         return;
     }
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t nrMode = static_cast<int32_t>(size % NR_MODE);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t nrMode = static_cast<int32_t>(*data % NR_MODE);
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(nrMode);
     dataMessageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
@@ -113,7 +113,7 @@ void GetNrOptionMode(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     DelayedSingleton<CoreService>::GetInstance()->GetNrOptionMode(slotId, nullptr);
 }
 
@@ -129,7 +129,7 @@ void GetNetworkSearchInformation(const uint8_t *data, size_t size)
     if (callbackWrap == nullptr) {
         return;
     }
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
     MessageParcel reply;
@@ -148,8 +148,8 @@ void SetNetworkSelectionMode(const uint8_t *data, size_t size)
     if (callbackWrap == nullptr) {
         return;
     }
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t selectionMode = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t selectionMode = static_cast<int32_t>(*data + sizeof(int32_t));
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(selectionMode);
     dataMessageParcel.WriteBool(false);
@@ -169,8 +169,8 @@ void SetPreferredNetwork(const uint8_t *data, size_t size)
     if (callbackWrap == nullptr) {
         return;
     }
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t networkMode = static_cast<int32_t>(size % NETWORK_MODE);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t networkMode = static_cast<int32_t>(*data % NETWORK_MODE);
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(networkMode);
     dataMessageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
@@ -184,7 +184,7 @@ void SetVoiceCallForwarding(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBool(true);
@@ -215,10 +215,10 @@ void GetImsRegStatus(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    int32_t imsRegType = static_cast<int32_t>(size % IMS_TYPE);
+    int32_t imsRegType = static_cast<int32_t>(*data % IMS_TYPE);
     dataMessageParcel.WriteInt32(imsRegType);
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
@@ -232,7 +232,7 @@ void GetCellLocation(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -247,8 +247,8 @@ void RegisterImsRegInfoCallback(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t imsRegType = static_cast<int32_t>(size % IMS_TYPE);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t imsRegType = static_cast<int32_t>(*data % IMS_TYPE);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(imsRegType);
@@ -264,8 +264,8 @@ void UnRegisterImsRegInfoCallback(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t imsRegType = static_cast<int32_t>(size % IMS_TYPE);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t imsRegType = static_cast<int32_t>(*data % IMS_TYPE);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(imsRegType);
@@ -281,7 +281,7 @@ void GetSimOperatorNumeric(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -321,9 +321,15 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
     OHOS::AddCoreServiceTokenFuzzer token;
+    return 0;
+}
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     OHOS::DelayedSingleton<CoreService>::DestroyInstance();

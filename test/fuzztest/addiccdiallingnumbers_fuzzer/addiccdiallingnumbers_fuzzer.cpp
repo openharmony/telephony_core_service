@@ -78,7 +78,7 @@ void GetSimGid1(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -93,7 +93,7 @@ void GetSimGid2(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -108,7 +108,7 @@ void GetSimAccountInfo(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -123,7 +123,7 @@ void GetCardType(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -138,7 +138,7 @@ void GetSimState(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -153,7 +153,7 @@ void GetDsdsMode(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t dsdsMode = static_cast<int32_t>(size);
+    int32_t dsdsMode = static_cast<int32_t>(*data);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(dsdsMode);
     dataMessageParcel.WriteBuffer(data, size);
@@ -168,7 +168,7 @@ void HasSimCard(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -183,8 +183,8 @@ void AddIccDiallingNumbers(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t type = size % SIM_TYPE_NUM + 1; // SIM_ADN 1  SIM_FDN 2
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t type = *data % SIM_TYPE_NUM + 1; // SIM_ADN 1  SIM_FDN 2
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(type);
@@ -200,7 +200,7 @@ void IsCTSimCard(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -236,9 +236,15 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
     OHOS::AddCoreServiceTokenFuzzer token;
+    return 0;
+}
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     OHOS::DelayedSingleton<CoreService>::DestroyInstance();

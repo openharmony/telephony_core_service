@@ -50,7 +50,7 @@ void GetNetworkState(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -65,7 +65,7 @@ void GetImei(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -80,7 +80,7 @@ void GetImeiSv(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -95,7 +95,7 @@ void GetSimOperatorNumeric(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -110,7 +110,7 @@ void GetISOCountryCodeForSim(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -125,7 +125,7 @@ void SendTerminalResponseCmd(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     std::string cmd(reinterpret_cast<const char *>(data), size);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
@@ -158,9 +158,15 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
     OHOS::AddCoreServiceTokenFuzzer token;
+    return 0;
+}
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     OHOS::DelayedSingleton<CoreService>::DestroyInstance();
