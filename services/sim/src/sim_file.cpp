@@ -168,7 +168,7 @@ void SimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            bool isFileProcessResponse = (this->*memberFunc)(event);
+            bool isFileProcessResponse = memberFunc(event);
             ProcessFileLoaded(isFileProcessResponse);
         }
     } else {
@@ -1684,46 +1684,101 @@ bool SimFile::IsContinueGetSpn(bool start, SpnStatus curStatus, SpnStatus &newSt
 
 void SimFile::InitMemberFunc()
 {
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_READY] = &SimFile::ProcessIccReady;
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_LOCKED] = &SimFile::ProcessIccLocked;
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_SIMLOCK] = &SimFile::ProcessIccLocked;
-    memberFuncMap_[SimFile::RELOAD_ICCID_EVENT] = &SimFile::ProcessReloadIccid;
-    memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] = &SimFile::ProcessObtainIMSIDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] = &SimFile::ProcessGetIccIdDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_MBI_DONE] = &SimFile::ProcessGetMbiDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_CPHS_MAILBOX_DONE] = &SimFile::ProcessGetCphsMailBoxDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_MBDN_DONE] = &SimFile::ProcessGetMbdnDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_MSISDN_DONE] = &SimFile::ProcessGetMsisdnDone;
-    memberFuncMap_[MSG_SIM_SET_MSISDN_DONE] = &SimFile::ProcessSetMsisdnDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_MWIS_DONE] = &SimFile::ProcessGetMwisDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_VOICE_MAIL_INDICATOR_CPHS_DONE] = &SimFile::ProcessVoiceMailCphs;
-    memberFuncMap_[MSG_SIM_OBTAIN_AD_DONE] = &SimFile::ProcessGetAdDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_SPN_DONE] = &SimFile::ProcessObtainSpnPhase;
-    memberFuncMap_[MSG_SIM_OBTAIN_LI_LANGUAGE_DONE] = &SimFile::ProcessObtainLiLanguage;
-    memberFuncMap_[MSG_SIM_OBTAIN_PL_LANGUAGE_DONE] = &SimFile::ProcessObtainPlLanguage;
-    memberFuncMap_[MSG_SIM_OBTAIN_CFF_DONE] = &SimFile::ProcessGetCffDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_SPDI_DONE] = &SimFile::ProcessGetSpdiDone;
-    memberFuncMap_[MSG_SIM_UPDATE_DONE] = &SimFile::ProcessUpdateDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_PNN_DONE] = &SimFile::ProcessGetPnnDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_OPL_DONE] = &SimFile::ProcessGetOplDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_OPL5G_DONE] = &SimFile::ProcessGetOpl5gDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_ALL_SMS_DONE] = &SimFile::ProcessGetAllSmsDone;
-    memberFuncMap_[MSG_SIM_MARK_SMS_READ_DONE] = &SimFile::ProcessMarkSms;
-    memberFuncMap_[MSG_SIM_SMS_ON_SIM] = &SimFile::ProcessSmsOnSim;
-    memberFuncMap_[MSG_SIM_OBTAIN_SMS_DONE] = &SimFile::ProcessGetSmsDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_SST_DONE] = &SimFile::ProcessGetSstDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_INFO_CPHS_DONE] = &SimFile::ProcessGetInfoCphs;
-    memberFuncMap_[MSG_SIM_SET_MBDN_DONE] = &SimFile::ProcessSetMbdn;
-    memberFuncMap_[MSG_SIM_SET_CPHS_MAILBOX_DONE] = &SimFile::ProcessSetCphsMailbox;
-    memberFuncMap_[MSG_SIM_OBTAIN_CFIS_DONE] = &SimFile::ProcessGetCfisDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_CSP_CPHS_DONE] = &SimFile::ProcessGetCspCphs;
-    memberFuncMap_[MSG_SIM_OBTAIN_GID1_DONE] = &SimFile::ProcessObtainGid1Done;
-    memberFuncMap_[MSG_SIM_OBTAIN_GID2_DONE] = &SimFile::ProcessObtainGid2Done;
-    memberFuncMap_[MSG_SIM_OBTAIN_PLMN_W_ACT_DONE] = &SimFile::ProcessGetPlmnActDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_OPLMN_W_ACT_DONE] = &SimFile::ProcessGetOplmnActDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_HPLMN_W_ACT_DONE] = &SimFile::ProcessGetHplmActDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_EHPLMN_DONE] = &SimFile::ProcessGetEhplmnDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_FPLMN_DONE] = &SimFile::ProcessGetFplmnDone;
+    InitBaseMemberFunc();
+    InitObtainMemberFunc();
+    InitPlmnMemberFunc();
+}
+
+void SimFile::InitBaseMemberFunc()
+{
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_READY] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccReady(event); };
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_LOCKED] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccLocked(event); };
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_SIMLOCK] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccLocked(event); };
+    memberFuncMap_[SimFile::RELOAD_ICCID_EVENT] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessReloadIccid(event); };
+    memberFuncMap_[MSG_SIM_SET_MSISDN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSetMsisdnDone(event); };
+    memberFuncMap_[MSG_SIM_UPDATE_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessUpdateDone(event); };
+    memberFuncMap_[MSG_SIM_MARK_SMS_READ_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessMarkSms(event); };
+    memberFuncMap_[MSG_SIM_SMS_ON_SIM] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSmsOnSim(event); };
+    memberFuncMap_[MSG_SIM_SET_MBDN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSetMbdn(event); };
+    memberFuncMap_[MSG_SIM_SET_CPHS_MAILBOX_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSetCphsMailbox(event); };
+}
+
+void SimFile::InitObtainMemberFunc()
+{
+    memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainIMSIDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetIccIdDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_MBI_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetMbiDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_CPHS_MAILBOX_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetCphsMailBoxDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_MBDN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetMbdnDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_MSISDN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetMsisdnDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_MWIS_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetMwisDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_VOICE_MAIL_INDICATOR_CPHS_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessVoiceMailCphs(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_AD_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetAdDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_LI_LANGUAGE_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainLiLanguage(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_PL_LANGUAGE_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainPlLanguage(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_CFF_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetCffDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_SPDI_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetSpdiDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_PNN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetPnnDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_OPL_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetOplDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_OPL5G_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetOpl5gDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_ALL_SMS_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetAllSmsDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_SMS_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetSmsDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_SST_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetSstDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_INFO_CPHS_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetInfoCphs(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_CFIS_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetCfisDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_CSP_CPHS_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetCspCphs(event); };
+}
+
+void SimFile::InitPlmnMemberFunc()
+{
+    memberFuncMap_[MSG_SIM_OBTAIN_SPN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainSpnPhase(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_GID1_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainGid1Done(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_GID2_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainGid2Done(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_PLMN_W_ACT_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetPlmnActDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_OPLMN_W_ACT_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetOplmnActDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_HPLMN_W_ACT_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetHplmActDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_EHPLMN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetEhplmnDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_FPLMN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetFplmnDone(event); };
 }
 
 int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)

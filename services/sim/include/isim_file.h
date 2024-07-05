@@ -48,7 +48,7 @@ protected:
     bool ProcessIsimRefresh(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
-    using RecordProcessFunc = bool (IsimFile::*)(const AppExecFwk::InnerEvent::Pointer &event);
+    using RecordProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<int, RecordProcessFunc> memberFuncMap_;
     void InitMemberFunc();
     void ProcessLockedAllFilesFetched();

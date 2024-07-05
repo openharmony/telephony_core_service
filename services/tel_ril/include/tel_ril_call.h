@@ -50,7 +50,7 @@ public:
     int32_t GetCallRestriction(std::string fac, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SetCallRestriction(std::string restrictionType,
         int32_t mode, std::string password, const AppExecFwk::InnerEvent::Pointer &result);
-    int32_t SendDtmf(const std::string &sDTMFCode, int32_t index, int32_t switchOn, int32_t switchOff,
+    int32_t SendDtmfString(const std::string &sDTMFCode, int32_t index, int32_t switchOn, int32_t switchOff,
         const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SendDtmf(char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t StartDtmf(char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &result);

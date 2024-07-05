@@ -38,9 +38,10 @@ void ImsCoreServiceCallbackStub::InitFuncMap()
 {
     /****************** ims basic ability ******************/
     requestFuncMap_[static_cast<uint32_t>(ImsCoreServiceCallbackInterfaceCode::IMS_SERVICE_STATUS_REPORT)] =
-        &ImsCoreServiceCallbackStub::OnImsServiceStatusReportInner;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnImsServiceStatusReportInner(data, reply); };
     requestFuncMap_[static_cast<uint32_t>(ImsCoreServiceCallbackInterfaceCode::IMS_GET_REGISTRATION_STATUS)] =
-        &ImsCoreServiceCallbackStub::OnGetImsRegistrationStatusResponseInner;
+        [this](
+            MessageParcel &data, MessageParcel &reply) { return OnGetImsRegistrationStatusResponseInner(data, reply); };
 }
 
 int32_t ImsCoreServiceCallbackStub::OnRemoteRequest(
@@ -56,7 +57,7 @@ int32_t ImsCoreServiceCallbackStub::OnRemoteRequest(
     if (itFunc != requestFuncMap_.end()) {
         auto requestFunc = itFunc->second;
         if (requestFunc != nullptr) {
-            return (this->*requestFunc)(data, reply);
+            return requestFunc(data, reply);
         }
     }
     TELEPHONY_LOGI("ImsCoreServiceCallbackStub::OnRemoteRequest, default case, need check.");

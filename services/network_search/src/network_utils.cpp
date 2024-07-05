@@ -22,16 +22,6 @@
 
 namespace OHOS {
 namespace Telephony {
-/**
- * @brief function pointer of class ITelRilManager.
- *
- */
-using RilFunc_Event = int32_t (ITelRilManager::*)(int32_t, const AppExecFwk::InnerEvent::Pointer &);
-using RilFunc_Int_Event = int32_t (ITelRilManager::*)(int32_t, int32_t, const AppExecFwk::InnerEvent::Pointer &);
-using RilFunc_Int_Int_Event = int32_t (ITelRilManager::*)(
-    int32_t, int32_t, int32_t, const AppExecFwk::InnerEvent::Pointer &);
-using RilFunc_Int_String_Event = int32_t (ITelRilManager::*)(
-    int32_t, int32_t, std::string, const AppExecFwk::InnerEvent::Pointer &);
 
 // group
 static const int32_t GSM = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_GSM);
@@ -219,24 +209,88 @@ bool NetworkUtils::RemoveCallbackFromMap(int64_t index)
     return (networkSearchCacheMap_.erase(index));
 }
 
-const std::map<RadioEvent, std::any> EventSender::mapFunctions_ = {
-    { RadioEvent::RADIO_GET_NETWORK_SELECTION_MODE, &ITelRilManager::GetNetworkSelectionMode },
-    { RadioEvent::RADIO_SET_NETWORK_SELECTION_MODE, &ITelRilManager::SetNetworkSelectionMode },
-    { RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE, &ITelRilManager::GetPreferredNetwork },
-    { RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, &ITelRilManager::SetPreferredNetwork },
-    { RadioEvent::RADIO_SET_STATUS, &ITelRilManager::SetRadioState },
-    { RadioEvent::RADIO_GET_STATUS, &ITelRilManager::GetRadioState },
-    { RadioEvent::RADIO_GET_IMEI, &ITelRilManager::GetImei },
-    { RadioEvent::RADIO_GET_IMEISV, &ITelRilManager::GetImeiSv },
-    { RadioEvent::RADIO_GET_MEID, &ITelRilManager::GetMeid },
-    { RadioEvent::RADIO_NETWORK_SEARCH_RESULT, &ITelRilManager::GetNetworkSearchInformation },
-    { RadioEvent::RADIO_GET_VOICE_TECH, &ITelRilManager::GetVoiceRadioTechnology },
-    { RadioEvent::RADIO_OPERATOR, &ITelRilManager::GetOperatorInfo },
-    { RadioEvent::RADIO_GET_BASEBAND_VERSION, &ITelRilManager::GetBasebandVersion },
-    { RadioEvent::RADIO_SET_NR_OPTION_MODE, &ITelRilManager::SetNrOptionMode },
-    { RadioEvent::RADIO_GET_NR_OPTION_MODE, &ITelRilManager::GetNrOptionMode },
-    { RadioEvent::RADIO_GET_RRC_CONNECTION_STATE, &ITelRilManager::GetRrcConnectionState },
-    { RadioEvent::RADIO_GET_NR_SSBID_INFO, &ITelRilManager::GetNrSsbId },
+const std::map<RadioEvent, RilFunc_Event> EventSender::mapFunctions_ = {
+    { RadioEvent::RADIO_GET_NETWORK_SELECTION_MODE,
+        [](ITelRilManager *rilManager, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) {
+            return rilManager->GetNetworkSelectionMode(slotId, result);
+        } },
+    { RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE,
+        [](ITelRilManager *rilManager, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) {
+            return rilManager->GetPreferredNetwork(slotId, response);
+        } },
+    { RadioEvent::RADIO_GET_STATUS,
+        [](ITelRilManager *rilManager, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) {
+            return rilManager->GetRadioState(slotId, response);
+        } },
+    { RadioEvent::RADIO_GET_IMEI,
+        [](ITelRilManager *rilManager, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) {
+            return rilManager->GetImei(slotId, response);
+        } },
+    { RadioEvent::RADIO_GET_IMEISV,
+        [](ITelRilManager *rilManager, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) {
+            return rilManager->GetImeiSv(slotId, response);
+        } },
+    { RadioEvent::RADIO_GET_MEID,
+        [](ITelRilManager *rilManager, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) {
+            return rilManager->GetMeid(slotId, response);
+        } },
+    { RadioEvent::RADIO_NETWORK_SEARCH_RESULT,
+        [](ITelRilManager *rilManager, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) {
+            return rilManager->GetNetworkSearchInformation(slotId, result);
+        } },
+    { RadioEvent::RADIO_GET_VOICE_TECH,
+        [](ITelRilManager *rilManager, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) {
+            return rilManager->GetVoiceRadioTechnology(slotId, response);
+        } },
+    { RadioEvent::RADIO_OPERATOR,
+        [](ITelRilManager *rilManager, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) {
+            return rilManager->GetOperatorInfo(slotId, response);
+        } },
+    { RadioEvent::RADIO_GET_BASEBAND_VERSION,
+        [](ITelRilManager *rilManager, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) {
+            return rilManager->GetBasebandVersion(slotId, response);
+        } },
+    { RadioEvent::RADIO_GET_NR_OPTION_MODE,
+        [](ITelRilManager *rilManager, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) {
+            return rilManager->GetNrOptionMode(slotId, response);
+        } },
+    { RadioEvent::RADIO_GET_RRC_CONNECTION_STATE,
+        [](ITelRilManager *rilManager, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) {
+            return rilManager->GetRrcConnectionState(slotId, response);
+        } },
+    { RadioEvent::RADIO_GET_NR_SSBID_INFO,
+        [](ITelRilManager *rilManager, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) {
+            return rilManager->GetNrSsbId(slotId, response);
+        } },
+};
+
+const std::map<RadioEvent, RilFunc_Int_Event> EventSender::mapFunctionsInt_ = {
+    { RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE,
+        [](ITelRilManager *rilManager, int32_t slotId, int32_t preferredNetworkType,
+            const AppExecFwk::InnerEvent::Pointer &response) {
+            return rilManager->SetPreferredNetwork(slotId, preferredNetworkType, response);
+        } },
+    { RadioEvent::RADIO_SET_NR_OPTION_MODE,
+        [](ITelRilManager *rilManager, int32_t slotId, int32_t mode, const AppExecFwk::InnerEvent::Pointer &response) {
+            return rilManager->SetNrOptionMode(slotId, mode, response);
+        } },
+
+};
+
+const std::map<RadioEvent, RilFunc_Int_Int_Event> EventSender::mapFunctionsIntInt_ = {
+    { RadioEvent::RADIO_SET_STATUS,
+        [](ITelRilManager *rilManager, int32_t slotId, int32_t fun, int32_t rst,
+            const AppExecFwk::InnerEvent::Pointer &response) {
+            return rilManager->SetRadioState(slotId, fun, rst, response);
+        } },
+};
+
+const std::map<RadioEvent, RilFunc_Int_String_Event> EventSender::mapFunctionsIntString_ = {
+    { RadioEvent::RADIO_SET_NETWORK_SELECTION_MODE,
+        [](ITelRilManager *rilManager, int32_t slotId, int32_t automaticFlag, std::string oper,
+            const AppExecFwk::InnerEvent::Pointer &result) {
+            return rilManager->SetNetworkSelectionMode(slotId, automaticFlag, oper, result);
+        } },
 };
 
 AppExecFwk::InnerEvent::Pointer EventSender::GetEvent(int32_t slotId, RadioEvent radioEvent, int32_t param)
@@ -317,7 +371,7 @@ AppExecFwk::InnerEvent::Pointer EventSender::GetEvent(
 
 bool EventSender::SendBase(int32_t slotId, RadioEvent radioEvent)
 {
-    auto fun = GetFunctionOfEvent<RilFunc_Event>(radioEvent);
+    auto fun = GetFunctionOfEvent<RilFunc_Event>(mapFunctions_, radioEvent);
     std::tuple<int32_t, RadioEvent, int32_t, const sptr<INetworkSearchCallback> *, RilFunc_Event> parameters(
         slotId, radioEvent, 0, nullptr, fun);
     return Send<EventGetMode::GET_EVENT_BY_HANDLERID, RilFunc_Event>(parameters);
@@ -325,7 +379,7 @@ bool EventSender::SendBase(int32_t slotId, RadioEvent radioEvent)
 
 bool EventSender::SendBase(int32_t slotId, RadioEvent radioEvent, int32_t param)
 {
-    auto fun = GetFunctionOfEvent<RilFunc_Int_Event>(radioEvent);
+    auto fun = GetFunctionOfEvent<RilFunc_Int_Event>(mapFunctionsInt_, radioEvent);
     std::tuple<int32_t, RadioEvent, int32_t, const sptr<INetworkSearchCallback> *, RilFunc_Int_Event> parameters(
         slotId, radioEvent, param, nullptr, fun);
     return Send<EventGetMode::GET_EVENT_BY_PARAM, RilFunc_Int_Event, int32_t>(parameters, param);
@@ -333,7 +387,7 @@ bool EventSender::SendBase(int32_t slotId, RadioEvent radioEvent, int32_t param)
 
 bool EventSender::SendBase(int32_t slotId, RadioEvent radioEvent, int32_t firstParam, int32_t secondParam)
 {
-    auto fun = GetFunctionOfEvent<RilFunc_Int_Int_Event>(radioEvent);
+    auto fun = GetFunctionOfEvent<RilFunc_Int_Int_Event>(mapFunctionsIntInt_, radioEvent);
     std::tuple<int32_t, RadioEvent, int32_t, const sptr<INetworkSearchCallback> *, RilFunc_Int_Int_Event> parameters(
         slotId, radioEvent, firstParam, nullptr, fun);
     return Send<EventGetMode::GET_EVENT_BY_PARAM, RilFunc_Int_Int_Event, int32_t, int32_t>(
@@ -342,7 +396,7 @@ bool EventSender::SendBase(int32_t slotId, RadioEvent radioEvent, int32_t firstP
 
 bool EventSender::SendBase(int32_t slotId, RadioEvent radioEvent, int32_t firstParam, std::string secondParam)
 {
-    auto fun = GetFunctionOfEvent<RilFunc_Int_String_Event>(radioEvent);
+    auto fun = GetFunctionOfEvent<RilFunc_Int_String_Event>(mapFunctionsIntString_, radioEvent);
     std::tuple<int32_t, RadioEvent, int32_t, const sptr<INetworkSearchCallback> *, RilFunc_Int_String_Event> parameters(
         slotId, radioEvent, firstParam, nullptr, fun);
     return Send<EventGetMode::GET_EVENT_BY_PARAM, RilFunc_Int_String_Event, int32_t, std::string>(
@@ -351,7 +405,7 @@ bool EventSender::SendBase(int32_t slotId, RadioEvent radioEvent, int32_t firstP
 
 bool EventSender::SendCallback(int32_t slotId, RadioEvent radioEvent, const sptr<INetworkSearchCallback> *callback)
 {
-    auto fun = GetFunctionOfEvent<RilFunc_Event>(radioEvent);
+    auto fun = GetFunctionOfEvent<RilFunc_Event>(mapFunctions_, radioEvent);
     std::tuple<int32_t, RadioEvent, int32_t, const sptr<INetworkSearchCallback> *, RilFunc_Event> parameters(
         slotId, radioEvent, 0, callback, fun);
     return Send<EventGetMode::GET_EVENT_BY_INDEX, RilFunc_Event>(parameters);
@@ -360,7 +414,7 @@ bool EventSender::SendCallback(int32_t slotId, RadioEvent radioEvent, const sptr
 bool EventSender::SendCallback(
     int32_t slotId, RadioEvent radioEvent, const sptr<INetworkSearchCallback> *callback, int32_t param)
 {
-    auto fun = GetFunctionOfEvent<RilFunc_Event>(radioEvent);
+    auto fun = GetFunctionOfEvent<RilFunc_Event>(mapFunctions_, radioEvent);
     std::tuple<int32_t, RadioEvent, int32_t, const sptr<INetworkSearchCallback> *, RilFunc_Event> parameters(
         slotId, radioEvent, param, callback, fun);
     return Send<EventGetMode::GET_EVENT_BY_PARAM, RilFunc_Event>(parameters);
@@ -369,7 +423,7 @@ bool EventSender::SendCallback(
 bool EventSender::SendCallbackEx(
     int32_t slotId, RadioEvent radioEvent, const sptr<INetworkSearchCallback> *callback, int32_t param)
 {
-    auto fun = GetFunctionOfEvent<RilFunc_Int_Event>(radioEvent);
+    auto fun = GetFunctionOfEvent<RilFunc_Int_Event>(mapFunctionsInt_, radioEvent);
     std::tuple<int32_t, RadioEvent, int32_t, const sptr<INetworkSearchCallback> *, RilFunc_Int_Event> parameters(
         slotId, radioEvent, param, callback, fun);
     return Send<EventGetMode::GET_EVENT_BY_INDEX, RilFunc_Int_Event, int32_t>(parameters, param);
@@ -378,7 +432,7 @@ bool EventSender::SendCallbackEx(
 bool EventSender::SendCallback(int32_t slotId, RadioEvent radioEvent, const sptr<INetworkSearchCallback> *callback,
     int32_t firstParam, int32_t secondParam)
 {
-    auto fun = GetFunctionOfEvent<RilFunc_Int_Int_Event>(radioEvent);
+    auto fun = GetFunctionOfEvent<RilFunc_Int_Int_Event>(mapFunctionsIntInt_, radioEvent);
     std::tuple<int32_t, RadioEvent, int32_t, const sptr<INetworkSearchCallback> *, RilFunc_Int_Int_Event> parameters(
         slotId, radioEvent, firstParam, callback, fun);
     return Send<EventGetMode::GET_EVENT_BY_INDEX, RilFunc_Int_Int_Event, int32_t, int32_t>(
@@ -388,7 +442,7 @@ bool EventSender::SendCallback(int32_t slotId, RadioEvent radioEvent, const sptr
 bool EventSender::SendCallback(int32_t slotId, RadioEvent radioEvent, const sptr<INetworkSearchCallback> *callback,
     int32_t firstParam, std::string secondParam)
 {
-    auto fun = GetFunctionOfEvent<RilFunc_Int_String_Event>(radioEvent);
+    auto fun = GetFunctionOfEvent<RilFunc_Int_String_Event>(mapFunctionsIntString_, radioEvent);
     std::tuple<int32_t, RadioEvent, int32_t, const sptr<INetworkSearchCallback> *, RilFunc_Int_String_Event> parameters(
         slotId, radioEvent, firstParam, callback, fun);
     return Send<EventGetMode::GET_EVENT_BY_INDEX, RilFunc_Int_String_Event, int32_t, std::string>(

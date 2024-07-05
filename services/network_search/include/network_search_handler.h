@@ -40,7 +40,7 @@ namespace Telephony {
 class NetworkSearchManager;
 class NetworkSearchHandler : public TelEventHandler {
 public:
-    using NsHandlerFunc = void (NetworkSearchHandler::*)(const AppExecFwk::InnerEvent::Pointer &);
+    using NsHandlerFunc = std::function<void(NetworkSearchHandler *, const AppExecFwk::InnerEvent::Pointer &)>;
     explicit NetworkSearchHandler(const std::weak_ptr<NetworkSearchManager> &networkSearchManager,
         const std::weak_ptr<ITelRilManager> &telRilManager, const std::weak_ptr<ISimManager> &simManager,
         int32_t slotId);

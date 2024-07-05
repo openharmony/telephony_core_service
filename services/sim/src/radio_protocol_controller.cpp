@@ -95,14 +95,22 @@ bool RadioProtocolController::SetRadioProtocol(int32_t slotId)
 
 void RadioProtocolController::InitMemberFunc()
 {
-    memberFuncMap_[MSG_SIM_TIME_OUT_ACTIVE] = &RadioProtocolController::ProcessActiveSimTimeOutDone;
-    memberFuncMap_[MSG_SIM_SET_ACTIVE] = &RadioProtocolController::ProcessActiveSimToRilResponse;
-    memberFuncMap_[RADIO_SIM_GET_RADIO_PROTOCOL] = &RadioProtocolController::ProcessGetRadioProtocol;
-    memberFuncMap_[RADIO_SIM_CHECK_RADIO_PROTOCOL] = &RadioProtocolController::ProcessCheckRadioProtocol;
-    memberFuncMap_[RADIO_SIM_UPDATE_RADIO_PROTOCOL] = &RadioProtocolController::ProcessUpdateRadioProtocol;
-    memberFuncMap_[RADIO_SIM_RADIO_PROTOCOL_NOTIFY] = &RadioProtocolController::ProcessRadioProtocolNotify;
-    memberFuncMap_[RADIO_SIM_SET_RADIO_PROTOCOL_COMPLETE] = &RadioProtocolController::ProcessSetRadioProtocolComplete;
-    memberFuncMap_[RADIO_SIM_SET_RADIO_PROTOCOL_TIMEOUT] = &RadioProtocolController::ProcessSetRadioProtocolTimeout;
+    memberFuncMap_[MSG_SIM_TIME_OUT_ACTIVE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { ProcessActiveSimTimeOutDone(event); };
+    memberFuncMap_[MSG_SIM_SET_ACTIVE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { ProcessActiveSimToRilResponse(event); };
+    memberFuncMap_[RADIO_SIM_GET_RADIO_PROTOCOL] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { ProcessGetRadioProtocol(event); };
+    memberFuncMap_[RADIO_SIM_CHECK_RADIO_PROTOCOL] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { ProcessCheckRadioProtocol(event); };
+    memberFuncMap_[RADIO_SIM_UPDATE_RADIO_PROTOCOL] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { ProcessUpdateRadioProtocol(event); };
+    memberFuncMap_[RADIO_SIM_RADIO_PROTOCOL_NOTIFY] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { ProcessRadioProtocolNotify(event); };
+    memberFuncMap_[RADIO_SIM_SET_RADIO_PROTOCOL_COMPLETE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { ProcessSetRadioProtocolComplete(event); };
+    memberFuncMap_[RADIO_SIM_SET_RADIO_PROTOCOL_TIMEOUT] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { ProcessSetRadioProtocolTimeout(event); };
 }
 
 void RadioProtocolController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -120,7 +128,7 @@ void RadioProtocolController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
             TELEPHONY_LOGE("RadioProtocolController::ProcessEvent memberFunc is nullptr");
             return;
         }
-        (this->*memberFunc)(event);
+        memberFunc(event);
     }
 }
 

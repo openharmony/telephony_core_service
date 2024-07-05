@@ -44,15 +44,17 @@ void UsimDiallingNumbersService::ProcessEvent(const AppExecFwk::InnerEvent::Poin
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            (this->*memberFunc)(event);
+            memberFunc(event);
         }
     }
 }
 
 void UsimDiallingNumbersService::InitFuncMap()
 {
-    memberFuncMap_[MSG_USIM_PBR_LOAD_DONE] = &UsimDiallingNumbersService::ProcessPbrLoadDone;
-    memberFuncMap_[MSG_USIM_USIM_ADN_LOAD_DONE] = &UsimDiallingNumbersService::ProcessDiallingNumberLoadDone;
+    memberFuncMap_[MSG_USIM_PBR_LOAD_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { ProcessPbrLoadDone(event); };
+    memberFuncMap_[MSG_USIM_USIM_ADN_LOAD_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { ProcessDiallingNumberLoadDone(event); };
 }
 
 void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
