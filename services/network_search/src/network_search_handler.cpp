@@ -521,8 +521,7 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
         }
     } else if (operatorInfoResult_->flag == NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT) {
         if (operatorName_ != nullptr) {
-            auto operatorInfo = AppExecFwk::InnerEvent::Get(0, 0, operatorInfoResult_);
-            operatorName_->handleOperatorInfo(operatorInfo);
+            operatorName_->handleOperatorInfo(GetEvent(operatorInfoResult_));
         }
     } else {
         TELEPHONY_LOGI("Aborting outdated operator info event slotId:%{public}d", slotId_);
@@ -533,14 +532,11 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
 void NetworkSearchHandler::UpdateNetworkState()
 {
     if (networkRegister_ != nullptr) {
-        auto psInfo = AppExecFwk::InnerEvent::Get(0, 0, psRegStatusResultInfo_);
-        auto csInfo = AppExecFwk::InnerEvent::Get(0, 0, csRegStatusInfo_);
-        networkRegister_->ProcessPsRegister(psInfo);
-        networkRegister_->ProcessCsRegister(csInfo);
+        networkRegister_->ProcessPsRegister(GetEvent(psRegStatusResultInfo_));
+        networkRegister_->ProcessCsRegister(GetEvent(csRegStatusInfo_));
     }
     if (operatorName_ != nullptr) {
-        auto operatorInfo = AppExecFwk::InnerEvent::Get(0, 0, operatorInfoResult_);
-        operatorName_->handleOperatorInfo(operatorInfo);
+        operatorName_->handleOperatorInfo(GetEvent(operatorInfoResult_));
         operatorName_->TrySetLongOperatorNameWithTranslation();
     }
     auto networkSearchManager = networkSearchManager_.lock();
