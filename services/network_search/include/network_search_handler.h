@@ -152,6 +152,7 @@ private:
     void ClearSignalAndCellInfoList() const;
     bool IsSatelliteOn() const;
     void RadioOnWhenHasSim(std::shared_ptr<NetworkSearchManager> &networkSearchManager, int32_t radioState) const;
+    void UpdateNetworkState();
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
@@ -166,6 +167,9 @@ private:
     std::unique_ptr<NitzUpdate> nitzUpdate_ = nullptr;
     std::unique_ptr<CellInfo> cellInfo_ = nullptr;
     std::unique_ptr<NrSsbInfo> nrSsbInfo_ = nullptr;
+    std::shared_ptr<PsRegStatusResultInfo> psRegStatusResultInfo_ = nullptr;
+    std::shared_ptr<CsRegStatusInfo> csRegStatusInfo_ = nullptr;
+    std::shared_ptr<OperatorInfoResult> operatorInfoResult_ = nullptr;
     static const std::map<uint32_t, NsHandlerFunc> memberFuncMap_;
     int64_t lastTimeSignalReq_ = 0;
     int64_t lastTimeOperatorReq_ = 0;
@@ -178,6 +182,7 @@ private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     sptr<ISatelliteCoreCallback> satelliteCallback_ = nullptr;
     const int32_t INVALID_SLOT_ID = -1;
+    bool isCsCapable_ = true;
 
 private:
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
