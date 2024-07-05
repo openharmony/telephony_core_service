@@ -226,7 +226,7 @@ std::string SIMUtils::DiallingNumberStringFieldConvertToString(
 
 std::u16string SIMUtils::UcsConvertToString(unsigned char *data, int length, int offset)
 {
-    if (length <= offset + 1) {
+    if (data == nullptr || length <= offset + 1) {
         return u"";
     }
     int len = data[offset + 1] & BYTE_VALUE;
@@ -251,12 +251,16 @@ std::u16string SIMUtils::UcsConvertToString(unsigned char *data, int length, int
     }
     int outlen = 0;
     std::shared_ptr<char16_t> cs = CharsConvertToChar16(dataUsc, MAX_ENGLISH_NAME * HALF_LEN, outlen, true);
+    if (cs == nullptr) {
+        TELEPHONY_LOGE("cs is nullptr");
+        return u"";
+    }
     return std::u16string(cs.get(), 0, outlen);
 }
 
 std::u16string SIMUtils::UcsWideConvertToString(unsigned char *data, int length, int offset)
 {
-    if (length <= offset + 1) {
+    if (data == nullptr || length <= offset + 1) {
         return u"";
     }
     int len = data[offset + 1] & BYTE_VALUE;
@@ -281,6 +285,10 @@ std::u16string SIMUtils::UcsWideConvertToString(unsigned char *data, int length,
     }
     int outlen = 0;
     std::shared_ptr<char16_t> cs = CharsConvertToChar16(dataUsc, MAX_ENGLISH_NAME * HALF_LEN, outlen, true);
+    if (cs == nullptr) {
+        TELEPHONY_LOGE("cs is nullptr");
+        return u"";
+    }
     return std::u16string(cs.get(), 0, outlen);
 }
 
