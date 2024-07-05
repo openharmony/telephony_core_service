@@ -102,11 +102,6 @@ void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("operatorInfoResult is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    if (operatorInfoResult->flag != networkSearchManager->GetSerialNum(slotId_) &&
-        operatorInfoResult->flag != NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT) {
-        TELEPHONY_LOGI("Aborting outdated operator info event slotId:%{public}d", slotId_);
-        return;
-    }
     PhoneType type = networkSearchManager->GetPhoneType(slotId_);
     if (type == PhoneType::PHONE_TYPE_IS_GSM) {
         GsmOperatorInfo(event);
@@ -115,11 +110,6 @@ void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &eve
     } else {
         TELEPHONY_LOGE("OperatorName::HandleOperatorInfo phone type:%{public}d invalid", type);
     }
-    networkSearchManager->decMsgNum(slotId_);
-    if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
-        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
-    }
-
     NotifySpnChanged();
     networkSearchManager->TriggerTimezoneRefresh(slotId_);
 }
