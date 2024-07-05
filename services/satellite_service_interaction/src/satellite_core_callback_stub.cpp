@@ -32,13 +32,13 @@ SatelliteCoreCallbackStub::SatelliteCoreCallbackStub()
 void SatelliteCoreCallbackStub::InitFuncMap()
 {
     requestFuncMap_[static_cast<uint32_t>(SatelliteCoreCallbackInterfaceCode::SET_RADIO_STATE_RESPONSE)] =
-        &SatelliteCoreCallbackStub::OnSetRadioStateResponse;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetRadioStateResponse(data, reply); };
     requestFuncMap_[static_cast<uint32_t>(SatelliteCoreCallbackInterfaceCode::RADIO_STATE_CHANGED)] =
-        &SatelliteCoreCallbackStub::OnRadioStateChanged;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRadioStateChanged(data, reply); };
     requestFuncMap_[static_cast<uint32_t>(SatelliteCoreCallbackInterfaceCode::SATELLITE_STATUS_CHANGED)] =
-        &SatelliteCoreCallbackStub::OnSatelliteStatusChanged;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSatelliteStatusChanged(data, reply); };
     requestFuncMap_[static_cast<uint32_t>(SatelliteCoreCallbackInterfaceCode::SIM_STATE_CHANGED)] =
-        &SatelliteCoreCallbackStub::OnSimStateChanged;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSimStateChanged(data, reply); };
 }
 
 SatelliteCoreCallbackStub::~SatelliteCoreCallbackStub()
@@ -59,7 +59,7 @@ int32_t SatelliteCoreCallbackStub::OnRemoteRequest(
     if (itFunc != requestFuncMap_.end()) {
         auto requestFunc = itFunc->second;
         if (requestFunc != nullptr) {
-            return (this->*requestFunc)(data, reply);
+            return requestFunc(data, reply);
         }
     }
     TELEPHONY_LOGD("Do not found the requestFunc of code=%{public}d, need to check", code);

@@ -68,7 +68,7 @@ private:
     void RadioProtocolControllerContinue();
 
 private:
-    using ProcessFunc = void (RadioProtocolController::*)(const AppExecFwk::InnerEvent::Pointer &event);
+    using ProcessFunc = std::function<void(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
     std::map<int32_t, ProcessFunc> memberFuncMap_;
     std::vector<RadioProtocol> radioProtocol_;

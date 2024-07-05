@@ -34,12 +34,19 @@ const int32_t *NR_SIGNAL_THRESHOLD = SignalInformation::NR_SIGNAL_THRESHOLD_5BAR
 int32_t CellInfo::signalBar_ = SIGNAL_FIVE_BARS;
 
 const std::map<TelRilRatType, CellInfo::CallInfoFunc> CellInfo::memberFuncMap_ = {
-    {TelRilRatType::NETWORK_TYPE_GSM, &CellInfo::ProcessNeighboringCellGsm},
-    {TelRilRatType::NETWORK_TYPE_CDMA, &CellInfo::ProcessNeighboringCellCdma},
-    {TelRilRatType::NETWORK_TYPE_WCDMA, &CellInfo::ProcessNeighboringCellWcdma},
-    {TelRilRatType::NETWORK_TYPE_TDSCDMA, &CellInfo::ProcessNeighboringCellTdscdma},
-    {TelRilRatType::NETWORK_TYPE_LTE, &CellInfo::ProcessNeighboringCellLte},
-    {TelRilRatType::NETWORK_TYPE_NR, &CellInfo::ProcessNeighboringCellNr}};
+    { TelRilRatType::NETWORK_TYPE_GSM,
+        [](CellInfo *ci, CellNearbyInfo *cellInfo) { return ci->ProcessNeighboringCellGsm(cellInfo); } },
+    { TelRilRatType::NETWORK_TYPE_CDMA,
+        [](CellInfo *ci, CellNearbyInfo *cellInfo) { return ci->ProcessNeighboringCellCdma(cellInfo); } },
+    { TelRilRatType::NETWORK_TYPE_WCDMA,
+        [](CellInfo *ci, CellNearbyInfo *cellInfo) { return ci->ProcessNeighboringCellWcdma(cellInfo); } },
+    { TelRilRatType::NETWORK_TYPE_TDSCDMA,
+        [](CellInfo *ci, CellNearbyInfo *cellInfo) { return ci->ProcessNeighboringCellTdscdma(cellInfo); } },
+    { TelRilRatType::NETWORK_TYPE_LTE,
+        [](CellInfo *ci, CellNearbyInfo *cellInfo) { return ci->ProcessNeighboringCellLte(cellInfo); } },
+    { TelRilRatType::NETWORK_TYPE_NR,
+        [](CellInfo *ci, CellNearbyInfo *cellInfo) { return ci->ProcessNeighboringCellNr(cellInfo); } }
+};
 
 CellInfo::CellInfo(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
     : networkSearchManager_(networkSearchManager), slotId_(slotId)
@@ -102,7 +109,7 @@ void CellInfo::ProcessNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer 
         if (itFunc != memberFuncMap_.end()) {
             auto memberFunc = itFunc->second;
             if (memberFunc != nullptr) {
-                (this->*memberFunc)(&cell[i]);
+                memberFunc(this, &cell[i]);
             }
         }
     }
