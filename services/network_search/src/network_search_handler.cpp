@@ -448,7 +448,7 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
     }
     networkSearchManager->decMsgNum(slotId_);
     TelRilRegStatus regStatus = psRegStatusResultInfo_->regStatus;
-    bool isEmergency = (regStatus == TelRilRegStatus::REG_MT_EMERGENCY) && isCsCapalbe_;
+    bool isEmergency = (regStatus == TelRilRegStatus::REG_MT_EMERGENCY) && isCsCapable_;
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || isEmergency) {
         UpdateNetworkState();
     }
@@ -478,7 +478,7 @@ void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::P
     }
     networkSearchManager->decMsgNum(slotId_);
     TelRilRegStatus regStatus = csRegStatusInfo_->regStatus;
-    bool isEmergency = (regStatus == TelRilRegStatus::REG_MT_EMERGENCY) && isCsCapalbe_;
+    bool isEmergency = (regStatus == TelRilRegStatus::REG_MT_EMERGENCY) && isCsCapable_;
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || isEmergency) {
         UpdateNetworkState();
     }
@@ -521,7 +521,7 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
         }
     } else if (operatorInfoResult_->flag == NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT) {
         if (operatorName_ != nullptr) {
-            operatorName_->handleOperatorInfo(GetEvent(operatorInfoResult_));
+            operatorName_->HandleOperatorInfo(GetEvent(operatorInfoResult_));
         }
     } else {
         TELEPHONY_LOGI("Aborting outdated operator info event slotId:%{public}d", slotId_);
@@ -536,12 +536,12 @@ void NetworkSearchHandler::UpdateNetworkState()
         networkRegister_->ProcessCsRegister(GetEvent(csRegStatusInfo_));
     }
     if (operatorName_ != nullptr) {
-        operatorName_->handleOperatorInfo(GetEvent(operatorInfoResult_));
+        operatorName_->HandleOperatorInfo(GetEvent(operatorInfoResult_));
         operatorName_->TrySetLongOperatorNameWithTranslation();
     }
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager != nullptr) {
-        networkSearchManager->ProcessNotifyStateChangedEvent(slotId_);
+        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
     }
     TELEPHONY_LOGI("NetworkSearchHandler::UpdateNetworkState slotId:%{public}d", slotId_);
 }
