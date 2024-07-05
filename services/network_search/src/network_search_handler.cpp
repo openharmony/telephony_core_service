@@ -448,7 +448,7 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
     }
     networkSearchManager->decMsgNum(slotId_);
     TelRilRegStatus regStatus = psRegStatusResultInfo_->regStatus;
-    bool isEmergency = (regState == TelRilRegStatus::REG_MT_EMERGENCY) && isCsCapalbe_;
+    bool isEmergency = (regStatus == TelRilRegStatus::REG_MT_EMERGENCY) && isCsCapalbe_;
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || isEmergency) {
         UpdateNetworkState();
     }
@@ -473,12 +473,12 @@ void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::P
         return;
     }
     if (csRegStatusInfo_->flag != networkSearchManager->GetSerialNum(slotId_)) {
-        TELEPHONY_LOGI("Aborting outdated ps registration event slotId:%{public}d", slotId_);
+        TELEPHONY_LOGI("Aborting outdated cs registration event slotId:%{public}d", slotId_);
         return;
     }
     networkSearchManager->decMsgNum(slotId_);
     TelRilRegStatus regStatus = csRegStatusInfo_->regStatus;
-    bool isEmergency = (regState == TelRilRegStatus::REG_MT_EMERGENCY) && isCsCapalbe_;
+    bool isEmergency = (regStatus == TelRilRegStatus::REG_MT_EMERGENCY) && isCsCapalbe_;
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || isEmergency) {
         UpdateNetworkState();
     }
@@ -506,7 +506,7 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr ||
         networkSearchManager->GetRadioState(slotId_) == static_cast<int>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
-        TELEPHONY_LOGI("radio is power off, no need update voice reg state");
+        TELEPHONY_LOGI("radio is power off, no need update operator info");
         return;
     }
     operatorInfoResult_ = event->GetSharedObject<OperatorInfoResult>();
@@ -524,6 +524,8 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
             auto operatorInfo = AppExecFwk::InnerEvent::Get(0, 0, operatorInfoResult_);
             operatorName_->handleOperatorInfo(operatorInfo);
         }
+    } else {
+        TELEPHONY_LOGI("Aborting outdated operator info event slotId:%{public}d", slotId_);
     }
     TELEPHONY_LOGD("NetworkSearchHandler::RadioRilOperator slotId:%{public}d", slotId_);
 }
@@ -543,7 +545,7 @@ void NetworkSearchHandler::UpdateNetworkState()
     }
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager != nullptr) {
-        networkSearchManager->ProcessNotifyStateChangedEvent(slotId);
+        networkSearchManager->ProcessNotifyStateChangedEvent(slotId_);
     }
     TELEPHONY_LOGI("NetworkSearchHandler::UpdateNetworkState slotId:%{public}d", slotId_);
 }
