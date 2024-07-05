@@ -2682,6 +2682,7 @@ HWTEST_F(BranchTest, Telephony_SIMUtils_001, Function | MediumTest | Level1)
     EXPECT_TRUE(simUtils->CharsConvertToChar16(bytes, 1, outChar16Len, true) == nullptr);
     EXPECT_FALSE(simUtils->CharsConvertToChar16(bytes, OBTAIN_SPN_GENERAL, outChar16Len, true) == nullptr);
     EXPECT_FALSE(simUtils->CharsConvertToChar16(bytes, OBTAIN_SPN_GENERAL, outChar16Len, false) == nullptr);
+    EXPECT_FALSE(simUtils->CharsConvertToChar16(bytes, MAX_ENGLISH_NAME * OBTAIN_SPN_GENERAL, outChar16Len, false) == nullptr);
     EXPECT_NE(simUtils->Gsm7bitConvertToString(bytes, 1), "");
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(bytesTwo, 0, 0, 1), "");
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(nullptr, 0, 1, 1), "");
