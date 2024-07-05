@@ -871,7 +871,6 @@ int32_t MultiSimController::GetDefaultCellularDataSlotId()
 int32_t MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
 {
     SaveDefaultCellularDataSlotIdInfo(slotId);
-    lastCellularDataSlotId_ = slotId;
     CoreServiceHiSysEvent::WriteDefaultDataSlotIdBehaviorEvent(slotId);
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -997,6 +996,7 @@ void MultiSimController::SavePrimarySlotIdInfo(int32_t slotId)
 void MultiSimController::SaveDefaultCellularDataSlotIdInfo(int32_t slotId)
 {
     SetParameter(MAIN_CELLULAR_DATA_SLOTID_KEY.c_str(), std::to_string(slotId).c_str());
+    lastCellularDataSlotId_ = slotId;
     SendDefaultCellularDataBroadCast(slotId);
 }
 
