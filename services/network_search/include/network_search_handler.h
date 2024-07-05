@@ -153,6 +153,12 @@ private:
     bool IsSatelliteOn() const;
     void RadioOnWhenHasSim(std::shared_ptr<NetworkSearchManager> &networkSearchManager, int32_t radioState) const;
     void UpdateNetworkState();
+    template<typename T>
+    inline AppExecFwk::InnerEvent::Pointer GetEvent(std::shared_ptr<T> info)
+    {
+        auto res = std::make_shared<T>(*info);
+        return AppExecFwk::InnerEvent::Get(0, res);
+    }
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
