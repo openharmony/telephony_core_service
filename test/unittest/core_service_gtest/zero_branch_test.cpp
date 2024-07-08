@@ -1857,7 +1857,7 @@ HWTEST_F(BranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
     operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "ChinaMobile");
     std::shared_ptr<OperatorInfoResult> operatorResult = std::make_shared<OperatorInfoResult>();
     operatorResult->flag = NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT;
-    operatorName->HandleOperatorInfo(OperatorInfoResult);
+    operatorName->HandleOperatorInfo(operatorResult);
     operatorName->TrySetLongOperatorNameWithTranslation();
 }
 
