@@ -437,6 +437,7 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
         TELEPHONY_LOGI("radio is power off, no need update data reg state");
         return;
     }
+    std::lock_guard<std::mutex> lock(mutex_);
     psRegStatusResultInfo_ = event->GetSharedObject<PsRegStatusResultInfo>();
     if (psRegStatusResultInfo_ == nullptr) {
         TELEPHONY_LOGE("psRegStatusResult is nullptr slotId:%{public}d", slotId_);
@@ -467,6 +468,7 @@ void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::P
         TELEPHONY_LOGI("radio is power off, no need update voice reg state");
         return;
     }
+    std::lock_guard<std::mutex> lock(mutex_);
     csRegStatusInfo_ = event->GetSharedObject<CsRegStatusInfo>();
     if (csRegStatusInfo_ == nullptr) {
         TELEPHONY_LOGE("csRegStatusResult is nullptr slotId:%{public}d", slotId_);
@@ -509,6 +511,7 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
         TELEPHONY_LOGI("radio is power off, no need update operator info");
         return;
     }
+    std::lock_guard<std::mutex> lock(mutex_);
     operatorInfoResult_ = event->GetSharedObject<OperatorInfoResult>();
     if (operatorInfoResult_ == nullptr) {
         TELEPHONY_LOGE("operatorInfoResult is nullptr slotId:%{public}d", slotId_);
@@ -521,7 +524,7 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
         }
     } else if (operatorInfoResult_->flag == NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT) {
         if (operatorName_ != nullptr) {
-            operatorName_->HandleOperatorInfo(GetEvent(operatorInfoResult_));
+            operatorName_->HandleOperatorInfo(operatorInfoResult_);
         }
     } else {
         TELEPHONY_LOGI("Aborting outdated operator info event slotId:%{public}d", slotId_);
@@ -532,11 +535,11 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
 void NetworkSearchHandler::UpdateNetworkState()
 {
     if (networkRegister_ != nullptr) {
-        networkRegister_->ProcessPsRegister(GetEvent(psRegStatusResultInfo_));
-        networkRegister_->ProcessCsRegister(GetEvent(csRegStatusInfo_));
+        networkRegister_->ProcessPsRegister(psRegStatusResultInfo_);
+        networkRegister_->ProcessCsRegister(csRegStatusInfo_);
     }
     if (operatorName_ != nullptr) {
-        operatorName_->HandleOperatorInfo(GetEvent(operatorInfoResult_));
+        operatorName_->HandleOperatorInfo(operatorInfoResult_);
         operatorName_->TrySetLongOperatorNameWithTranslation();
     }
     auto networkSearchManager = networkSearchManager_.lock();

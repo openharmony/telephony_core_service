@@ -86,27 +86,22 @@ void OperatorName::OnReceiveEvent(const EventFwk::CommonEventData &data)
     }
 }
 
-void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
+void OperatorName::HandleOperatorInfo(const std::shared_ptr<OperatorInfoResult> operatorInfoResult)
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("OperatorName::HandleOperatorInfo networkSearchManager is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-    std::shared_ptr<OperatorInfoResult> operatorInfoResult = event->GetSharedObject<OperatorInfoResult>();
     if (operatorInfoResult == nullptr) {
         TELEPHONY_LOGE("operatorInfoResult is nullptr slotId:%{public}d", slotId_);
         return;
     }
     PhoneType type = networkSearchManager->GetPhoneType(slotId_);
     if (type == PhoneType::PHONE_TYPE_IS_GSM) {
-        GsmOperatorInfo(event);
+        GsmOperatorInfo(operatorInfoResult);
     } else if (type == PhoneType::PHONE_TYPE_IS_CDMA) {
-        CdmaOperatorInfo(event);
+        CdmaOperatorInfo(operatorInfoResult);
     } else {
         TELEPHONY_LOGE("OperatorName::HandleOperatorInfo phone type:%{public}d invalid", type);
     }
@@ -114,16 +109,11 @@ void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &eve
     networkSearchManager->TriggerTimezoneRefresh(slotId_);
 }
 
-void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
+void OperatorName::GsmOperatorInfo(const std::shared_ptr<OperatorInfoResult> operatorInfoResult)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("OperatorName::GsmOperatorInfo event is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
     std::string longName = "";
     std::string shortName = "";
     std::string numeric = "";
-    std::shared_ptr<OperatorInfoResult> operatorInfoResult = event->GetSharedObject<OperatorInfoResult>();
     if (operatorInfoResult != nullptr) {
         longName = operatorInfoResult->longName;
         shortName = operatorInfoResult->shortName;
@@ -140,16 +130,11 @@ void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
     }
 }
 
-void OperatorName::CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
+void OperatorName::CdmaOperatorInfo(const std::shared_ptr<OperatorInfoResult> operatorInfoResult)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("OperatorName::CdmaOperatorInfo event is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
     std::string longName = "";
     std::string shortName = "";
     std::string numeric = "";
-    std::shared_ptr<OperatorInfoResult> operatorInfoResult = event->GetSharedObject<OperatorInfoResult>();
     if (operatorInfoResult != nullptr) {
         longName = operatorInfoResult->longName;
         shortName = operatorInfoResult->shortName;
