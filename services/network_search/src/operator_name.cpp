@@ -76,7 +76,6 @@ void OperatorName::OnReceiveEvent(const EventFwk::CommonEventData &data)
             TELEPHONY_LOGE("networkSearchManager is nullptr slotId:%{public}d", slotId_);
             return;
         }
-        networkSearchManager->decMsgNum(slotId_);
         if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
             networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
         }
