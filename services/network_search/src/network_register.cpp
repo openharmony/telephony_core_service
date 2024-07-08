@@ -78,18 +78,13 @@ void NetworkRegister::UpdateNetworkSearchState(RegServiceState regStatus,
     networkSearchState_->SetNetworkStateToRoaming(roam, type);
 }
 
-void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &event)
+void NetworkRegister::ProcessCsRegister(const std::shared_ptr<CsRegStatusInfo> csRegStateResult)
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister networkSearchManager is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    if (event == nullptr) {
-        TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister event is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-    std::shared_ptr<CsRegStatusInfo> csRegStateResult = event->GetSharedObject<CsRegStatusInfo>();
     if (csRegStateResult == nullptr) {
         TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister csRegStateResult is nullptr slotId:%{public}d", slotId_);
         return;
@@ -129,18 +124,13 @@ void NetworkRegister::UpdateCellularCall(const RegServiceState &regStatus, const
     }
 }
 
-void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &event)
+void NetworkRegister::ProcessPsRegister(const std::shared_ptr<PsRegStatusResultInfo> psRegStatusResult)
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister networkSearchManager is nullptr");
         return;
     }
-    if (event == nullptr) {
-        TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister event is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-    std::shared_ptr<PsRegStatusResultInfo> psRegStatusResult = event->GetSharedObject<PsRegStatusResultInfo>();
     if (psRegStatusResult == nullptr) {
         TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister psRegStatusResult is nullptr slotId:%{public}d", slotId_);
         return;
