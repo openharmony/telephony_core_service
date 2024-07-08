@@ -22,6 +22,7 @@ namespace Telephony {
 std::mutex mccMutex_;
 std::vector<std::shared_ptr<MccAccess>> MccPool::mccAccessTable_;
 std::vector<std::string> MccPool::specialMccMnc_;
+std::vector<std::string> MccPool::indiaMccMnc_;
 constexpr size_t MCC_ACCESS_TABLE_LEN = 240;
 std::shared_ptr<MccAccess> MccPool::AccessToMcc(int mcc)
 {
@@ -139,7 +140,7 @@ void MccPool::AddMccForEurope()
     mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_US_G, "us", MCC_LONG));
     mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_PR, "pr", MCC_SHORT));
     mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_VI, "vi", MCC_SHORT));
-    mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_MX, "mx", MCC_LONG));
+    mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_MX, "mx", MCC_SHORT));
     mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_JM, "jm", MCC_LONG));
     mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_GP, "gp", MCC_SHORT));
     mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_BB, "bb", MCC_LONG));
@@ -317,7 +318,7 @@ void MccPool::AddMccForAustralia()
     mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_CR, "cr", MCC_SHORT));
     mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_PA, "pa", MCC_SHORT));
     mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_PE, "pe", MCC_SHORT));
-    mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_AR, "ar", MCC_LONG));
+    mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_AR, "ar", MCC_SHORT));
     mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_BR, "br", MCC_SHORT));
     mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_CL, "cl", MCC_SHORT));
     mccAccessTable_.push_back(std::make_shared<MccAccess>(MCC_CO, "co", MCC_LONG));
@@ -338,6 +339,37 @@ bool MccPool::MccCompare(const std::shared_ptr<MccAccess> &mccAccessA, const std
         return false;
     }
     return (mccAccessA->mcc_ < mccAccessB->mcc_);
+}
+
+bool MccPool::LengthIsTwoMnc(const std::string &mccMncCode)
+{
+    InitIndiaTables();
+    std::vector<std::string>::iterator obj = std::find(indiaMccMnc_.begin(), indiaMccMnc_.end(), mccMncCode);
+    return (obj == indiaMccMnc_.end()) ? false : true;
+}
+
+void MccPool::InitIndiaTables()
+{
+    if (indiaMccMnc_.size() == 0) {
+        AddMccMncForInPartOne();
+        AddMccMncForInPartTwo();
+        AddMccMncForInPartThree();
+    }
+}
+
+void MccPool::AddMccMncForInPartOne()
+{
+    indiaMccMnc_.push_back("302370");
+}
+
+void MccPool::AddMccMncForInPartTwo()
+{
+    indiaMccMnc_.push_back("302370");
+}
+
+void MccPool::AddMccMncForInPartThree()
+{
+    indiaMccMnc_.push_back("302370");
 }
 
 bool MccPool::LengthIsThreeMnc(const std::string &mccMncCode)

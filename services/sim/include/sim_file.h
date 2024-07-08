@@ -44,6 +44,8 @@ public:
     std::string GetVoiceMailNumber();
     void SetVoiceMailNumber(const std::string mailNumber);
     void ClearData();
+    inline static const char *INDIA_MCC_ONE = "404";
+    inline static const char *INDIA_MCC_TWO = "405";
 
 public:
     enum {
@@ -136,13 +138,19 @@ private:
     void StartObtainSpn();
     void LoadSimOtherFile();
 
-    void CheckMncLength();
+    void CheckMncLengthForAdDone();
+    void CheckMncLengthForImsiDone();
+    bool CheckMncLen(std::string imsi, int imsiSize);
+    bool CheckMncLongLen(std::string imsi, int imsiSize);
+    void OnMccMncLoaded(std::string imsi);
     bool IsContinueGetSpn(bool start, SpnStatus curStatus, SpnStatus &newStatus);
     std::atomic<int32_t> reloadIccidCount_ = 3;
     const int MNC_INDEX = 7;
     const int MCC_LEN = 3;
+    const int MNC_LONG_LEN = 3;
     const int MNC_LEN = 2;
     const int MCCMNC_LEN = 6;
+    const int MCCMNC_SHORT_LEN = 5;
     const int LOAD_STEP = 1;
     const int INVALID_BYTES_NUM = 1;
     const int SPN_CHAR_POS = 0;
