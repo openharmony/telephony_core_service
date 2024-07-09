@@ -76,6 +76,11 @@ std::shared_ptr<DataShare::DataShareHelper> SettingUtils::CreateNonBlockDataShar
         TELEPHONY_LOGE("SettingUtils: GetSystemAbility Service Failed.");
         return nullptr;
     }
+    sptr<IRemoteObject> distributedData = saManager->GetSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+    if (distributedData == nullptr) {
+        TELEPHONY_LOGE("SettingUtils: distributedData is not started.");
+        return nullptr;
+    }
     auto [ret, helper] = DataShare::DataShareHelper::Create(remoteObj, NETWORK_SEARCH_SETTING_URI,
         NETWORK_SEARCH_SETTING_EXT_URI);
     if (ret == DataShare::E_OK) {
