@@ -910,11 +910,6 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
     SavePrimarySlotIdInfo(slotId);
     isSetPrimarySlotIdInProgress_ = false;
     PublishSetPrimaryEvent(true);
-    for (int32_t i = 0; i < maxCount_; i++) {
-        if (!(localCacheInfo_[i].iccId.empty())) {
-            InitActive(i);
-        }
-    }
     return TELEPHONY_ERR_SUCCESS;
 }
 
