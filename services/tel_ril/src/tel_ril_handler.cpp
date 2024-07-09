@@ -92,9 +92,7 @@ void TelRilHandler::ApplyRunningLock(int32_t lockType)
         this->SendEvent(RUNNING_LOCK_TIMEOUT_EVENT_ID, reqLockSerialNum_, RUNNING_LOCK_DEFAULT_TIMEOUT_MS);
     } else if (ackRunningLock_ != nullptr && lockType == ACK_RUNNING_LOCK) {
         ackLockSerialNum_++;
-        if (!reqRunningLock_->IsUsed()) {
-            ackRunningLock_->Lock(DELAR_RELEASE_RUNNING_LOCK_TIMEOUT_MS);
-        }
+        ackRunningLock_->Lock(DELAR_RELEASE_RUNNING_LOCK_TIMEOUT_MS);
         TELEPHONY_LOGI("ApplyRunningLock,ackLockSerialNum_:%{public}d", static_cast<int>(ackLockSerialNum_));
         this->SendEvent(ACK_RUNNING_LOCK_TIMEOUT_EVENT_ID, ackLockSerialNum_, ACK_RUNNING_LOCK_DEFAULT_TIMEOUT_MS);
     } else {
