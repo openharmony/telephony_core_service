@@ -30,6 +30,7 @@
 #include "system_ability_definition.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -61,6 +62,9 @@ void StkController::Init()
 {
     stkBundleName_ = initStkBudleName();
     RegisterEvents();
+    if (TELEPHONY_EXT_WRAPPER.initBip_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.initBip_(slotId_);
+    }
 }
 
 std::string StkController::initStkBudleName()
@@ -221,6 +225,21 @@ void StkController::OnSendRilSessionEnd(const AppExecFwk::InnerEvent::Pointer &e
         slotId_, publishResult);
 }
 
+bool StkController::CheckIsBipCmd(const std::string &cmdData)
+{
+    std::string commandType = cmdData.substr(STK_CMD_TYPE_INDEX, STK_CMD_TYPE_LEN);
+    if (commandType == STK_BIP_CMD_OPEN_CHANNEL || commandType == STK_BIP_CMD_SEND_DATA ||
+        commandType == STK_BIP_CMD_RECEVIE_DATA || commandType == STK_BIP_CMD_GET_CHANNEL_STATUS ||
+        commandType == STK_BIP_CMD_CLOSE_CHANNEL) {
+        if (TELEPHONY_EXT_WRAPPER.sendEvent_ &&
+            TELEPHONY_EXT_WRAPPER.sendEvent_(std::make_shared<std::string>(cmdData), slotId_)) {
+                TELEPHONY_LOGE("StkController slotId_ [%{public}d] ", slotId_);
+        }
+        return true;
+    }
+    return false;
+}
+
 void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Pointer &event)
 {
     auto stkData = event->GetSharedObject<std::string>();
@@ -228,7 +247,12 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
         TELEPHONY_LOGE("StkController[%{public}d]::OnSendRilProactiveCommand() stkData is nullptr", slotId_);
         return;
     }
+
     std::string cmdData = (std::string)*stkData;
+    if (CheckIsBipCmd(cmdData)) {
+        return;
+    }
+
     AAFwk::Want want;
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_STK_COMMAND);
     want.SetParam(PARAM_SLOTID, slotId_);
