@@ -30,15 +30,19 @@ public:
 
 private:
     void AddHandlerNetWorkToMap();
+    void AddHandlerDeviceToMap();
+    void AddHandlerImsToMap();
     void AddHandlerSimToMap();
+    void AddHandlerSimLockToMap();
     void AddHandlerSimToMapExt();
+    void AddHandlerVoiceMailToMap();
     void AddHandlerPdpProfileToMap();
     void AddHandlerOpkeyVersionToMap();
     int32_t SetTimer(uint32_t code);
     void CancelTimer(int32_t id);
 
 private:
-    using CoreServiceFunc = int32_t (CoreServiceStub::*)(MessageParcel &data, MessageParcel &reply);
+    using CoreServiceFunc = std::function<int32_t(MessageParcel &data, MessageParcel &reply)>;
 
     int32_t OnGetPsRadioTech(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCsRadioTech(MessageParcel &data, MessageParcel &reply);

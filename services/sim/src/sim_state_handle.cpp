@@ -42,18 +42,54 @@ std::mutex SimStateManager::ctx_;
 bool SimStateManager::responseReady_ = false;
 std::condition_variable SimStateManager::cv_;
 const std::map<uint32_t, SimStateHandle::Func> SimStateHandle::memberFuncMap_ = {
-    { MSG_SIM_UNLOCK_PIN_DONE, &SimStateHandle::GetUnlockResult },
-    { MSG_SIM_UNLOCK_PUK_DONE, &SimStateHandle::GetUnlockResult },
-    { MSG_SIM_CHANGE_PIN_DONE, &SimStateHandle::GetUnlockResult },
-    { MSG_SIM_UNLOCK_PIN2_DONE, &SimStateHandle::GetUnlockResult },
-    { MSG_SIM_UNLOCK_PUK2_DONE, &SimStateHandle::GetUnlockResult },
-    { MSG_SIM_CHANGE_PIN2_DONE, &SimStateHandle::GetUnlockResult },
-    { MSG_SIM_UNLOCK_SIMLOCK_DONE, &SimStateHandle::GetUnlockSimLockResult },
-    { MSG_SIM_ENABLE_PIN_DONE, &SimStateHandle::GetSetLockResult },
-    { MSG_SIM_CHECK_PIN_DONE, &SimStateHandle::GetSimLockState },
-    { MSG_SIM_GET_REALTIME_ICC_STATUS_DONE, &SimStateHandle::GetSimCardData },
-    { MSG_SIM_AUTHENTICATION_DONE, &SimStateHandle::GetSimAuthenticationResult },
-    { MSG_SIM_SEND_NCFG_OPER_INFO_DONE, &SimStateHandle::GetSendSimMatchedOperatorInfoResult },
+    { MSG_SIM_UNLOCK_PIN_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetUnlockResult(slotId, event);
+        } },
+    { MSG_SIM_UNLOCK_PUK_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetUnlockResult(slotId, event);
+        } },
+    { MSG_SIM_CHANGE_PIN_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetUnlockResult(slotId, event);
+        } },
+    { MSG_SIM_UNLOCK_PIN2_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetUnlockResult(slotId, event);
+        } },
+    { MSG_SIM_UNLOCK_PUK2_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetUnlockResult(slotId, event);
+        } },
+    { MSG_SIM_CHANGE_PIN2_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetUnlockResult(slotId, event);
+        } },
+    { MSG_SIM_UNLOCK_SIMLOCK_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetUnlockSimLockResult(slotId, event);
+        } },
+    { MSG_SIM_ENABLE_PIN_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetSetLockResult(slotId, event);
+        } },
+    { MSG_SIM_CHECK_PIN_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetSimLockState(slotId, event);
+        } },
+    { MSG_SIM_GET_REALTIME_ICC_STATUS_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetSimCardData(slotId, event);
+        } },
+    { MSG_SIM_AUTHENTICATION_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetSimAuthenticationResult(slotId, event);
+        } },
+    { MSG_SIM_SEND_NCFG_OPER_INFO_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetSendSimMatchedOperatorInfoResult(slotId, event);
+        } },
 };
 
 SimStateHandle::SimStateHandle(const std::weak_ptr<SimStateManager> &simStateManager)
@@ -658,7 +694,7 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            (this->*memberFunc)(slotId_, event);
+            memberFunc(this, slotId_, event);
         }
         SyncCmdResponse();
         return;

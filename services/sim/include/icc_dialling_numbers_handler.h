@@ -212,7 +212,7 @@ protected:
     const std::string DEDICATED_FILE_TELECOM = "7F10";
 
 private:
-    using ProcessFunc = void (IccDiallingNumbersHandler::*)(const AppExecFwk::InnerEvent::Pointer &event, int &id);
+    using ProcessFunc = std::function<void(const AppExecFwk::InnerEvent::Pointer &event, int &id)>;
     std::map<int, ProcessFunc> memberFuncMap_;
     AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId, int loadId);
     AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId, std::shared_ptr<void> pobj, int loadId);

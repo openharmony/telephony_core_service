@@ -83,9 +83,12 @@ protected:
     std::shared_ptr<UsimFunctionHandle> UsimFunctionHandle_ = nullptr;
 
 private:
-    using FileProcessFunc = bool (SimFile::*)(const AppExecFwk::InnerEvent::Pointer &event);
+    using FileProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<int, FileProcessFunc> memberFuncMap_;
     void InitMemberFunc();
+    void InitBaseMemberFunc();
+    void InitObtainMemberFunc();
+    void InitPlmnMemberFunc();
     void ObtainSpnPhase(bool start, const AppExecFwk::InnerEvent::Pointer &event);
     std::string AnalysisBcdPlmn(std::string data, std::string description);
     void ProcessElementaryFileCsp(std::string data);

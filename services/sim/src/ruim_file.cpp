@@ -89,7 +89,7 @@ void RuimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            bool isFileHandleResponse = (this->*memberFunc)(event);
+            bool isFileHandleResponse = memberFunc(event);
             ProcessFileLoaded(isFileHandleResponse);
         }
     } else {
@@ -297,13 +297,20 @@ bool RuimFile::ObtainCsimSpnDisplayCondition()
 
 void RuimFile::InitMemberFunc()
 {
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_READY] = &RuimFile::ProcessIccReady;
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_LOCKED] = &RuimFile::ProcessIccLocked;
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_SIMLOCK] = &RuimFile::ProcessIccLocked;
-    memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] = &RuimFile::ProcessGetImsiDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] = &RuimFile::ProcessGetIccidDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_CDMA_SUBSCRIPTION_DONE] = &RuimFile::ProcessGetSubscriptionDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_CSIM_SPN_DONE] = &RuimFile::ProcessGetSpnDone;
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_READY] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccReady(event); };
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_LOCKED] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccLocked(event); };
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_SIMLOCK] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccLocked(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetImsiDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetIccidDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_CDMA_SUBSCRIPTION_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetSubscriptionDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_CSIM_SPN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetSpnDone(event); };
 }
 
 bool RuimFile::ProcessGetSpnDone(const AppExecFwk::InnerEvent::Pointer &event)

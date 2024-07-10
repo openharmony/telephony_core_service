@@ -66,7 +66,7 @@ protected:
     AppExecFwk::InnerEvent::Pointer callerPointer_ = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
 
 private:
-    using ProcessFunc = void (UsimDiallingNumbersService::*)(const AppExecFwk::InnerEvent::Pointer &event);
+    using ProcessFunc = std::function<void(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<int, ProcessFunc> memberFuncMap_;
     void UpdatePhoneDiallingNumberFile();
     std::string GetEmailContents(int index);

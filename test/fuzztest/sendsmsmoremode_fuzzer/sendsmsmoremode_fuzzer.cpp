@@ -112,7 +112,7 @@ void GetCallList(const uint8_t *data, size_t size)
     telRilCall->SetClir(index, result);
     telRilCall->GetCallRestriction(fac, result);
     telRilCall->SetCallRestriction(fac, index, password, result);
-    telRilCall->SendDtmf(sDTMFCode, index, switchOn, switchOff, result);
+    telRilCall->SendDtmfString(sDTMFCode, index, switchOn, switchOff, result);
     telRilCall->GetUssd(result);
     telRilCall->GetMute(result);
     telRilCall->GetEmergencyCallList(result);

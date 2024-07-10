@@ -32,154 +32,244 @@ constexpr int32_t INVALID_VALUE = -1;
 CoreServiceStub::CoreServiceStub()
 {
     AddHandlerNetWorkToMap();
+    AddHandlerDeviceToMap();
+    AddHandlerImsToMap();
     AddHandlerSimToMap();
+    AddHandlerSimLockToMap();
     AddHandlerSimToMapExt();
+    AddHandlerVoiceMailToMap();
     AddHandlerPdpProfileToMap();
     AddHandlerOpkeyVersionToMap();
 }
 
 void CoreServiceStub::AddHandlerNetWorkToMap()
 {
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_PS_RADIO_TECH)] = &CoreServiceStub::OnGetPsRadioTech;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CS_RADIO_TECH)] = &CoreServiceStub::OnGetCsRadioTech;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPERATOR_NUMERIC)] = &CoreServiceStub::OnGetOperatorNumeric;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_PS_RADIO_TECH)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetPsRadioTech(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CS_RADIO_TECH)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetCsRadioTech(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPERATOR_NUMERIC)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetOperatorNumeric(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_RESIDENT_NETWORK_NUMERIC)] =
-        &CoreServiceStub::OnGetResidentNetworkNumeric;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPERATOR_NAME)] = &CoreServiceStub::OnGetOperatorName;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIGNAL_INFO_LIST)] = &CoreServiceStub::OnGetSignalInfoList;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NETWORK_STATE)] = &CoreServiceStub::OnGetNetworkState;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_RADIO_STATE)] = &CoreServiceStub::OnSetRadioState;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_RADIO_STATE)] = &CoreServiceStub::OnGetRadioState;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetResidentNetworkNumeric(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPERATOR_NAME)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetOperatorName(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIGNAL_INFO_LIST)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSignalInfoList(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NETWORK_STATE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetNetworkState(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_RADIO_STATE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetRadioState(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_RADIO_STATE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetRadioState(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NETWORK_SEARCH_RESULT)] =
-        &CoreServiceStub::OnGetNetworkSearchInformation;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetNetworkSearchInformation(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NETWORK_SELECTION_MODE)] =
-        &CoreServiceStub::OnGetNetworkSelectionMode;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetNetworkSelectionMode(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_NETWORK_SELECTION_MODE)] =
-        &CoreServiceStub::OnSetNetworkSelectionMode;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetNetworkSelectionMode(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ISO_COUNTRY_CODE_FOR_NETWORK)] =
-        &CoreServiceStub::OnGetIsoCountryCodeForNetwork;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMEI)] = &CoreServiceStub::OnGetImei;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMEISV)] = &CoreServiceStub::OnGetImeiSv;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_MEID)] = &CoreServiceStub::OnGetMeid;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_UNIQUE_DEVICE_ID)] = &CoreServiceStub::OnGetUniqueDeviceId;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMS_REG_STATUS)] = &CoreServiceStub::OnGetImsRegStatus;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CELL_INFO_LIST)] = &CoreServiceStub::OnGetCellInfoList;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CELL_LOCATION)] = &CoreServiceStub::OnGetCellLocation;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetIsoCountryCodeForNetwork(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CELL_INFO_LIST)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetCellInfoList(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CELL_LOCATION)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetCellLocation(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_PREFERRED_NETWORK_MODE)] =
-        &CoreServiceStub::OnGetPreferredNetwork;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetPreferredNetwork(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_PREFERRED_NETWORK_MODE)] =
-        &CoreServiceStub::OnSetPreferredNetwork;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetPreferredNetwork(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NETWORK_CAPABILITY)] =
-        &CoreServiceStub::OnGetNetworkCapability;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetNetworkCapability(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_NETWORK_CAPABILITY)] =
-        &CoreServiceStub::OnSetNetworkCapability;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_NR_OPTION_MODE)] = &CoreServiceStub::OnSetNrOptionMode;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NR_OPTION_MODE)] = &CoreServiceStub::OnGetNrOptionMode;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetNetworkCapability(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_NR_OPTION_MODE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetNrOptionMode(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NR_OPTION_MODE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetNrOptionMode(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NR_SSB_ID_INFO)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetNrSsbIdInfo(data, reply); };
+}
+
+void CoreServiceStub::AddHandlerDeviceToMap()
+{
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMEI)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetImei(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMEISV)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetImeiSv(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_MEID)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetMeid(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_UNIQUE_DEVICE_ID)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetUniqueDeviceId(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_BASEBAND_VERSION)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetBasebandVersion(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::FACTORY_RESET)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnFactoryReset(data, reply); };
+}
+
+void CoreServiceStub::AddHandlerImsToMap()
+{
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMS_REG_STATUS)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetImsRegStatus(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::REG_IMS_CALLBACK)] =
-        &CoreServiceStub::OnRegisterImsRegInfoCallback;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRegisterImsRegInfoCallback(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UN_REG_IMS_CALLBACK)] =
-        &CoreServiceStub::OnUnregisterImsRegInfoCallback;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_BASEBAND_VERSION)] = &CoreServiceStub::OnGetBasebandVersion;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::FACTORY_RESET)] = &CoreServiceStub::OnFactoryReset;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NR_SSB_ID_INFO)] = &CoreServiceStub::OnGetNrSsbIdInfo;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUnregisterImsRegInfoCallback(data, reply); };
 }
 
 void CoreServiceStub::AddHandlerSimToMap()
 {
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::HAS_SIM_CARD)] = &CoreServiceStub::OnHasSimCard;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_STATE)] = &CoreServiceStub::OnGetSimState;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_DSDS_MODE)] = &CoreServiceStub::OnGetDsdsMode;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ISO_COUNTRY_CODE)] =
-        &CoreServiceStub::OnGetISOCountryCodeForSim;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SPN)] = &CoreServiceStub::OnGetSimSpn;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ICCID)] = &CoreServiceStub::OnGetSimIccId;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::HAS_SIM_CARD)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnHasSimCard(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_STATE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimState(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_DSDS_MODE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetDsdsMode(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SPN)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimSpn(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ICCID)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimIccId(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_OPERATOR_NUMERIC)] =
-        &CoreServiceStub::OnGetSimOperatorNumeric;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMSI)] = &CoreServiceStub::OnGetIMSI;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_CT_SIM_CARD)] = &CoreServiceStub::OnIsCTSimCard;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_SIM_ACTIVE)] = &CoreServiceStub::OnIsSimActive;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_LANGUAGE)] = &CoreServiceStub::OnGetLocaleFromDefaultSim;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_GID1)] = &CoreServiceStub::OnGetSimGid1;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_GID2)] = &CoreServiceStub::OnGetSimGid2;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_EONS)] = &CoreServiceStub::OnGetSimEons;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SUB_INFO)] = &CoreServiceStub::OnGetSimSubscriptionInfo;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimOperatorNumeric(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_IMSI)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetIMSI(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_CT_SIM_CARD)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnIsCTSimCard(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_SIM_ACTIVE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnIsSimActive(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_LANGUAGE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetLocaleFromDefaultSim(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_GID1)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimGid1(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_GID2)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimGid2(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_EONS)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimEons(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SUB_INFO)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimSubscriptionInfo(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_DEFAULT_VOICE_SLOTID)] =
-        &CoreServiceStub::OnSetDefaultVoiceSlotId;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetDefaultVoiceSlotId(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_DEFAULT_VOICE_SLOTID)] =
-        &CoreServiceStub::OnGetDefaultVoiceSlotId;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetDefaultVoiceSlotId(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_DEFAULT_VOICE_SIMID)] =
-        &CoreServiceStub::OnGetDefaultVoiceSimId;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_PRIMARY_SLOTID)] = &CoreServiceStub::OnSetPrimarySlotId;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_PRIMARY_SLOTID)] = &CoreServiceStub::OnGetPrimarySlotId;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetDefaultVoiceSimId(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_PRIMARY_SLOTID)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetPrimarySlotId(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_PRIMARY_SLOTID)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetPrimarySlotId(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_SHOW_NUMBER)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetShowNumber(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SHOW_NUMBER)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetShowNumber(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_SHOW_NAME)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetShowName(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SHOW_NAME)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetShowName(data, reply); };
+}
 
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_SHOW_NUMBER)] = &CoreServiceStub::OnSetShowNumber;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SHOW_NUMBER)] = &CoreServiceStub::OnGetShowNumber;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_SHOW_NAME)] = &CoreServiceStub::OnSetShowName;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SHOW_NAME)] = &CoreServiceStub::OnGetShowName;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ACTIVE_ACCOUNT_INFO_LIST)] =
-        &CoreServiceStub::OnGetActiveSimAccountInfoList;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPERATOR_CONFIG)] = &CoreServiceStub::OnGetOperatorConfig;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UNLOCK_PIN)] = &CoreServiceStub::OnUnlockPin;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UNLOCK_PUK)] = &CoreServiceStub::OnUnlockPuk;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::ALTER_PIN)] = &CoreServiceStub::OnAlterPin;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::CHECK_LOCK)] = &CoreServiceStub::OnGetLockState;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SWITCH_LOCK)] = &CoreServiceStub::OnSetLockState;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UNLOCK_PIN2)] = &CoreServiceStub::OnUnlockPin2;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UNLOCK_PUK2)] = &CoreServiceStub::OnUnlockPuk2;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::ALTER_PIN2)] = &CoreServiceStub::OnAlterPin2;
+void CoreServiceStub::AddHandlerSimLockToMap()
+{
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UNLOCK_PIN)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUnlockPin(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UNLOCK_PUK)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUnlockPuk(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::ALTER_PIN)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnAlterPin(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::CHECK_LOCK)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetLockState(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SWITCH_LOCK)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetLockState(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UNLOCK_PIN2)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUnlockPin2(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UNLOCK_PUK2)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUnlockPuk2(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::ALTER_PIN2)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnAlterPin2(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UNLOCK_SIMLOCK)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUnlockSimLock(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::HAS_OPERATOR_PRIVILEGES)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnHasOperatorPrivileges(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SIM_AUTHENTICATION)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSimAuthentication(data, reply); };
 }
 
 void CoreServiceStub::AddHandlerSimToMapExt()
 {
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::REFRESH_SIM_STATE)] = &CoreServiceStub::OnRefreshSimState;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_SIM_ACTIVE)] = &CoreServiceStub::OnSetActiveSim;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_PHONE_NUMBER)] = &CoreServiceStub::OnGetSimPhoneNumber;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ISO_COUNTRY_CODE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetISOCountryCodeForSim(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ACTIVE_ACCOUNT_INFO_LIST)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetActiveSimAccountInfoList(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPERATOR_CONFIG)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetOperatorConfig(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::REFRESH_SIM_STATE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRefreshSimState(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_SIM_ACTIVE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetActiveSim(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_PHONE_NUMBER)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimPhoneNumber(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_TELENUMBER_IDENTIFIER)] =
-        &CoreServiceStub::OnGetSimTeleNumberIdentifier;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_VOICE_MAIL_TAG)] = &CoreServiceStub::OnGetVoiceMailInfor;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_VOICE_MAIL_NUMBER)] = &CoreServiceStub::OnGetVoiceMailNumber;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_VOICE_MAIL_COUNT)] = &CoreServiceStub::OnGetVoiceMailCount;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_VOICE_MAIL_COUNT)] = &CoreServiceStub::OnSetVoiceMailCount;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimTeleNumberIdentifier(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_VOICE_CALL_FORWARDING)] =
-        &CoreServiceStub::OnSetVoiceCallForwarding;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoiceCallForwarding(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::ICC_DIALLING_NUMBERS_GET)] =
-        &CoreServiceStub::OnDiallingNumbersGet;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnDiallingNumbersGet(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::ICC_DIALLING_NUMBERS_INSERT)] =
-        &CoreServiceStub::OnAddIccDiallingNumbers;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnAddIccDiallingNumbers(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::ICC_DIALLING_NUMBERS_UPDATE)] =
-        &CoreServiceStub::OnUpdateIccDiallingNumbers;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateIccDiallingNumbers(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::ICC_DIALLING_NUMBERS_DELETE)] =
-        &CoreServiceStub::OnDelIccDiallingNumbers;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_VOICE_MAIL)] = &CoreServiceStub::OnSetVoiceMailInfo;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_MAX_SIM_COUNT)] = &CoreServiceStub::OnGetMaxSimCount;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPKEY)] = &CoreServiceStub::OnGetOpKey;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPNAME)] = &CoreServiceStub::OnGetOpName;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPKEY_EXT)] = &CoreServiceStub::OnGetOpKeyExt;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::STK_CMD_FROM_APP_ENVELOPE)] = &CoreServiceStub::OnSendEnvelopeCmd;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnDelIccDiallingNumbers(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_MAX_SIM_COUNT)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetMaxSimCount(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::STK_CMD_FROM_APP_ENVELOPE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSendEnvelopeCmd(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::STK_CMD_FROM_APP_TERMINAL_RESPONSE)] =
-        &CoreServiceStub::OnSendTerminalResponseCmd;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSendTerminalResponseCmd(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::STK_RESULT_FROM_APP_CALL_SETUP_REQUEST)] =
-        &CoreServiceStub::OnSendCallSetupRequestResult;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CARD_TYPE)] = &CoreServiceStub::OnGetCardType;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UNLOCK_SIMLOCK)] = &CoreServiceStub::OnUnlockSimLock;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::HAS_OPERATOR_PRIVILEGES)] =
-        &CoreServiceStub::OnHasOperatorPrivileges;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SIM_AUTHENTICATION)] = &CoreServiceStub::OnSimAuthentication;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_NR_SUPPORTED)] = &CoreServiceStub::OnIsNrSupported;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SLOTID)] = &CoreServiceStub::OnGetSlotId;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SIMID)] = &CoreServiceStub::OnGetSimId;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::INIT_EXTRA_MODULE)] = &CoreServiceStub::OnInitExtraModule;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSendCallSetupRequestResult(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CARD_TYPE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetCardType(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_NR_SUPPORTED)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnIsNrSupported(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SLOTID)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSlotId(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SIMID)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimId(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::INIT_EXTRA_MODULE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnInitExtraModule(data, reply); };
+}
+
+void CoreServiceStub::AddHandlerVoiceMailToMap()
+{
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_VOICE_MAIL_TAG)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoiceMailInfor(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_VOICE_MAIL_NUMBER)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoiceMailNumber(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_VOICE_MAIL_COUNT)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoiceMailCount(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_VOICE_MAIL_COUNT)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoiceMailCount(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_VOICE_MAIL)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoiceMailInfo(data, reply); };
 }
 
 void CoreServiceStub::AddHandlerPdpProfileToMap()
 {
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_ALLOWED_INSERT_APN)] = &CoreServiceStub::OnIsAllowedInsertApn;
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_TARGET_OPKEY)] = &CoreServiceStub::OnGetTargetOpkey;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_ALLOWED_INSERT_APN)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnIsAllowedInsertApn(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_TARGET_OPKEY)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetTargetOpkey(data, reply); };
 }
 
 void CoreServiceStub::AddHandlerOpkeyVersionToMap()
 {
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPKEY_VERSION)] = &CoreServiceStub::OnGetOpkeyVersion;
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPKEY)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetOpKey(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPNAME)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetOpName(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPKEY_EXT)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetOpKeyExt(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPKEY_VERSION)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetOpkeyVersion(data, reply); };
 }
 
 int32_t CoreServiceStub::OnRemoteRequest(
@@ -197,7 +287,7 @@ int32_t CoreServiceStub::OnRemoteRequest(
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
             int32_t idTimer = SetTimer(code);
-            int32_t result = (this->*memberFunc)(data, reply);
+            int32_t result = memberFunc(data, reply);
             CancelTimer(idTimer);
             return result;
         }
