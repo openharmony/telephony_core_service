@@ -351,140 +351,22 @@ bool MccPool::LengthIsTwoMnc(const std::string &mccMncCode)
 void MccPool::InitIndiaTables()
 {
     if (indiaMccMnc_.size() == 0) {
-        AddMccMncForInPartOne();
-        AddMccMncForInPartTwo();
-        AddMccMncForInPartThree();
+       indiaMccMnc_ = {"40400", "40401", "40402", "40403", "40404", "40405", "40407", "40409",
+                       "40410", "40411", "40412", "40413", "40414", "40415", "40416", "40417",
+                       "40418", "40419", "40420", "40421", "40422", "40424", "40425", "40427",
+                       "40428", "40429", "40430", "40431", "40433", "40434", "40435", "40436",
+                       "40437", "40438", "40440", "40441", "40442", "40443", "40444", "40445",
+                       "40446", "40449", "40450", "40451", "40452", "40453", "40454", "40455",
+                       "40456", "40457", "40458", "40459", "40460", "40462", "40464", "40466",
+                       "40467", "40468", "40469", "40470", "40471", "40472", "40473", "40474",
+                       "40475", "40476", "40477", "40478", "40479", "40480", "40481", "40482",
+                       "40483", "40484", "40485", "40486", "40487", "40488", "40489", "40490",
+                       "40491", "40492", "40493", "40494", "40495", "40496", "40497", "40498",
+                       "40501", "40505", "40506", "40507", "40508", "40509", "40510", "40511",
+                       "40512", "40513", "40514", "40515", "40517", "40518", "40519", "40520",
+                       "40521", "40522", "40523", "40524", "40548", "40551", "40552", "40553",
+                       "40554", "40555", "40556", "40566", "40567", "40570"};
     }
-}
-
-void MccPool::AddMccMncForInPartOne()
-{
-    indiaMccMnc_.push_back("40400");
-    indiaMccMnc_.push_back("40401");
-    indiaMccMnc_.push_back("40402");
-    indiaMccMnc_.push_back("40403");
-    indiaMccMnc_.push_back("40404");
-    indiaMccMnc_.push_back("40405");
-    indiaMccMnc_.push_back("40407");
-    indiaMccMnc_.push_back("40409");
-    indiaMccMnc_.push_back("40410");
-    indiaMccMnc_.push_back("40411");
-    indiaMccMnc_.push_back("40412");
-    indiaMccMnc_.push_back("40413");
-    indiaMccMnc_.push_back("40414");
-    indiaMccMnc_.push_back("40415");
-    indiaMccMnc_.push_back("40416");
-    indiaMccMnc_.push_back("40417");
-    indiaMccMnc_.push_back("40418");
-    indiaMccMnc_.push_back("40419");
-    indiaMccMnc_.push_back("40420");
-    indiaMccMnc_.push_back("40421");
-    indiaMccMnc_.push_back("40422");
-    indiaMccMnc_.push_back("40424");
-    indiaMccMnc_.push_back("40425");
-    indiaMccMnc_.push_back("40427");
-    indiaMccMnc_.push_back("40428");
-    indiaMccMnc_.push_back("40429");
-    indiaMccMnc_.push_back("40430");
-    indiaMccMnc_.push_back("40431");
-    indiaMccMnc_.push_back("40433");
-    indiaMccMnc_.push_back("40434");
-    indiaMccMnc_.push_back("40435");
-    indiaMccMnc_.push_back("40436");
-    indiaMccMnc_.push_back("40437");
-    indiaMccMnc_.push_back("40438");
-    indiaMccMnc_.push_back("40440");
-    indiaMccMnc_.push_back("40441");
-    indiaMccMnc_.push_back("40442");
-    indiaMccMnc_.push_back("40443");
-    indiaMccMnc_.push_back("40444");
-    indiaMccMnc_.push_back("40445");
-    indiaMccMnc_.push_back("40446");
-    indiaMccMnc_.push_back("40449");
-    indiaMccMnc_.push_back("40450");
-    indiaMccMnc_.push_back("40451");
-    indiaMccMnc_.push_back("40452");
-    indiaMccMnc_.push_back("40453");
-    indiaMccMnc_.push_back("40454");
-    indiaMccMnc_.push_back("40455");
-}
-
-void MccPool::AddMccMncForInPartTwo()
-{
-    indiaMccMnc_.push_back("40456");
-    indiaMccMnc_.push_back("40457");
-    indiaMccMnc_.push_back("40458");
-    indiaMccMnc_.push_back("40459");
-    indiaMccMnc_.push_back("40460");
-    indiaMccMnc_.push_back("40462");
-    indiaMccMnc_.push_back("40464");
-    indiaMccMnc_.push_back("40466");
-    indiaMccMnc_.push_back("40467");
-    indiaMccMnc_.push_back("40468");
-    indiaMccMnc_.push_back("40469");
-    indiaMccMnc_.push_back("40470");
-    indiaMccMnc_.push_back("40471");
-    indiaMccMnc_.push_back("40472");
-    indiaMccMnc_.push_back("40473");
-    indiaMccMnc_.push_back("40474");
-    indiaMccMnc_.push_back("40475");
-    indiaMccMnc_.push_back("40476");
-    indiaMccMnc_.push_back("40477");
-    indiaMccMnc_.push_back("40478");
-    indiaMccMnc_.push_back("40479");
-    indiaMccMnc_.push_back("40480");
-    indiaMccMnc_.push_back("40481");
-    indiaMccMnc_.push_back("40482");
-    indiaMccMnc_.push_back("40483");
-    indiaMccMnc_.push_back("40484");
-    indiaMccMnc_.push_back("40485");
-    indiaMccMnc_.push_back("40486");
-    indiaMccMnc_.push_back("40487");
-    indiaMccMnc_.push_back("40488");
-    indiaMccMnc_.push_back("40489");
-    indiaMccMnc_.push_back("40490");
-    indiaMccMnc_.push_back("40491");
-    indiaMccMnc_.push_back("40492");
-    indiaMccMnc_.push_back("40493");
-    indiaMccMnc_.push_back("40494");
-    indiaMccMnc_.push_back("40495");
-    indiaMccMnc_.push_back("40496");
-    indiaMccMnc_.push_back("40497");
-    indiaMccMnc_.push_back("40498");
-    indiaMccMnc_.push_back("40501");
-    indiaMccMnc_.push_back("40505");
-    indiaMccMnc_.push_back("40506");
-    indiaMccMnc_.push_back("40507");
-    indiaMccMnc_.push_back("40508");
-    indiaMccMnc_.push_back("40509");
-    indiaMccMnc_.push_back("40510");
-    indiaMccMnc_.push_back("40511");
-}
-
-void MccPool::AddMccMncForInPartThree()
-{
-    indiaMccMnc_.push_back("40512");
-    indiaMccMnc_.push_back("40513");
-    indiaMccMnc_.push_back("40514");
-    indiaMccMnc_.push_back("40515");
-    indiaMccMnc_.push_back("40517");
-    indiaMccMnc_.push_back("40518");
-    indiaMccMnc_.push_back("40519");
-    indiaMccMnc_.push_back("40520");
-    indiaMccMnc_.push_back("40521");
-    indiaMccMnc_.push_back("40522");
-    indiaMccMnc_.push_back("40523");
-    indiaMccMnc_.push_back("40524");
-    indiaMccMnc_.push_back("40548");
-    indiaMccMnc_.push_back("40551");
-    indiaMccMnc_.push_back("40552");
-    indiaMccMnc_.push_back("40553");
-    indiaMccMnc_.push_back("40554");
-    indiaMccMnc_.push_back("40555");
-    indiaMccMnc_.push_back("40556");
-    indiaMccMnc_.push_back("40566");
-    indiaMccMnc_.push_back("40567");
-    indiaMccMnc_.push_back("40570");
 }
 
 bool MccPool::LengthIsThreeMnc(const std::string &mccMncCode)
