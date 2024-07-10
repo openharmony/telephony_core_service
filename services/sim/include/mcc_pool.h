@@ -310,9 +310,6 @@ private:
     static void AddMccMncForInHutch();
     static void AddMccMncForMy();
     static void InitIndiaTables();
-    static void AddMccMncForInPartOne();
-    static void AddMccMncForInPartTwo();
-    static void AddMccMncForInPartThree();
 };
 } // namespace Telephony
 } // namespace OHOS
