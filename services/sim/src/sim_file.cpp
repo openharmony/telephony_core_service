@@ -1182,16 +1182,16 @@ bool SimFile::ProcessGetAdDone(const AppExecFwk::InnerEvent::Pointer &event)
     return isFileProcessResponse;
 }
 
-bool SimFile::CheckMncLen(std::string imsi, int imsiSize, int mccLen, int mccmncLen, bool isCheckUninitMnc)
+bool SimFile::CheckMncLen(std::string imsi, int imsiSize, int mncLen, int mccmncLen, bool isCheckUninitMnc)
 {
     if (isCheckUninitMnc) {
-        return ((lengthOfMnc_ == UNINITIALIZED_MNC) || (lengthOfMnc_ == UNKNOWN_MNC) || (lengthOfMnc_ == MNC_LEN)) &&
-            ((!imsi.empty()) && (imsiSize >= MCCMNC_LEN));
+        return ((lengthOfMnc_ == UNINITIALIZED_MNC) || (lengthOfMnc_ == UNKNOWN_MNC) || (lengthOfMnc_ == mncLen)) &&
+            ((!imsi.empty()) && (imsiSize >= mccmncLen));
     }
-    return ((lengthOfMnc_ == UNKNOWN_MNC) || (lengthOfMnc_ == MNC_LEN)) && ((!imsi.empty()) && (imsiSize >= MCCMNC_LEN));
+    return ((lengthOfMnc_ == UNKNOWN_MNC) || (lengthOfMnc_ == mncLen)) && ((!imsi.empty()) && (imsiSize >= mccmncLen));
 }
 
-bool SimFile::IsIndisMcc(std::string mccCode)
+bool SimFile::IsIndiaMcc(std::string mccCode)
 {
     if (indiaMcc_.size() == 0) {
         indiaMcc_ = {"404", "405"};
@@ -1213,9 +1213,9 @@ void SimFile::CheckMncLengthForAdDone()
         }
     }
 
-    if (CheckMncLongLen(imsi, imsiSize, MNC_LONG_LEN, MCCMNC_SHORT_LEN, true)) {
+    if (CheckMncLen(imsi, imsiSize, MNC_LONG_LEN, MCCMNC_SHORT_LEN, true)) {
         std::string mccCode = imsi.substr(0, MCC_LEN);
-        if (IsIndisMcc(mccCode)) {
+        if (IsIndiaMcc(mccCode)) {
             std::string mccMncCode = imsi.substr(0, MCCMNC_SHORT_LEN);
             if (MccPool::LengthIsTwoMnc(mccMncCode)) {
                 lengthOfMnc_ = MNC_LEN;
@@ -1227,13 +1227,13 @@ void SimFile::CheckMncLengthForAdDone()
     if (lengthOfMnc_ == UNKNOWN_MNC || lengthOfMnc_ == UNINITIALIZED_MNC) {
         if (!imsi.empty()) {
             std::string mccCode = imsi.substr(0, MCC_LEN);
-            if (IsIndisMcc(mccCode)) {
+            if (IsIndiaMcc(mccCode)) {
                 lengthOfMnc_ = MNC_LONG_LEN;
                 TELEPHONY_LOGI("SimFile AdDone update3 lengthOfMnc_= %{public}d", lengthOfMnc_);
             } else {
                 int mcc = atoi(mccCode.c_str());
                 lengthOfMnc_ = MccPool::ShortestMncLengthFromMcc(mcc);
-                TELEPHONY_LOGI("SimFile AdDone updat4 lengthOfMnc_= %{public}d", lengthOfMnc_);
+                TELEPHONY_LOGI("SimFile AdDone update4 lengthOfMnc_= %{public}d", lengthOfMnc_);
             }
         } else {
             lengthOfMnc_ = UNKNOWN_MNC;
@@ -1257,9 +1257,9 @@ void SimFile::CheckMncLengthForImsiDone()
         }
     }
 
-    if (CheckMncLongLen(imsi, imsiSize, MNC_LONG_LEN, MCCMNC_SHORT_LEN, false)) {
+    if (CheckMncLen(imsi, imsiSize, MNC_LONG_LEN, MCCMNC_SHORT_LEN, false)) {
         std::string mccCode = imsi.substr(0, MCC_LEN);
-        if (IsIndisMcc(mccCode)) {
+        if (IsIndiaMcc(mccCode)) {
             std::string mccMncCode = imsi.substr(0, MCCMNC_SHORT_LEN);
             if (MccPool::LengthIsTwoMnc(mccMncCode)) {
                 lengthOfMnc_ = MNC_LEN;
@@ -1271,13 +1271,13 @@ void SimFile::CheckMncLengthForImsiDone()
     if (lengthOfMnc_ == UNKNOWN_MNC) {
         if (!imsi.empty()) {
             std::string mccCode = imsi.substr(0, MCC_LEN);
-            if (IsIndisMcc(mccCode)) {
+            if (IsIndiaMcc(mccCode)) {
                 lengthOfMnc_ = MNC_LONG_LEN;
                 TELEPHONY_LOGI("SimFile imsidone update3 lengthOfMnc_= %{public}d", lengthOfMnc_);
             } else {
                 int mcc = atoi(mccCode.c_str());
                 lengthOfMnc_ = MccPool::ShortestMncLengthFromMcc(mcc);
-                TELEPHONY_LOGI("SimFile imsidone updat4 lengthOfMnc_= %{public}d", lengthOfMnc_);
+                TELEPHONY_LOGI("SimFile imsidone update4 lengthOfMnc_= %{public}d", lengthOfMnc_);
             }
         } else {
             lengthOfMnc_ = UNKNOWN_MNC;
